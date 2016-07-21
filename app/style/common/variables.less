@@ -1,0 +1,274 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// ----------------------------------------------------------------------------
+// Font
+// ----------------------------------------------------------------------------
+@ars-font-path:       "../font/";
+
+@font-family-base:    BlinkMacSystemFont, -apple-system, "Helvetica Neue", Arial, sans-serif;
+
+@font-size-xxs:       8px;
+@font-size-xs:        11px;
+@font-size-sm:        16px;
+@font-size-md:        20px;
+@font-size-lg:        24px;
+@font-size-xl:        32px;
+@font-size-xxl:       60px;
+
+@line-height-xs:      11px;
+@line-height-sm:      16px;
+@line-height-md:      20px;
+@line-height-lg:      24px;
+@line-height-xl:      32px;
+@line-height-xxl:     64px;
+
+// ----------------------------------------------------------------------------
+// Icons
+// ----------------------------------------------------------------------------
+@icon-size-sm:  16px;
+@icon-size-md:  32px;
+@icon-size-lg:  64px;
+
+// ----------------------------------------------------------------------------
+// Accent Colors
+// ----------------------------------------------------------------------------
+@accent_colors-0: transparent;
+@accent_colors-1: @w-blue;
+@accent_colors-2: @w-green;
+@accent_colors-3: @w-yellow;
+@accent_colors-4: @w-red;
+@accent_colors-5: @w-orange;
+@accent_colors-6: @w-pink;
+@accent_colors-7: @w-purple;
+
+// ----------------------------------------------------------------------------
+// Dot sizes
+// ----------------------------------------------------------------------------
+@dot-xs:       4px;
+@dot-sm:       6px;
+@dot-md:       8px;
+@dot-lg:       10px;
+@dot-xl:       12px;
+
+// ----------------------------------------------------------------------------
+// Common Colors
+// ----------------------------------------------------------------------------
+@graphite-dark:           #323639;
+@graphite:                #8d989f;
+
+// use for seperator and icon surrounds on white background
+@seperator-color:       fade(@graphite, 24%);
+
+// ----------------------------------------------------------------------------
+// Buttons
+// ----------------------------------------------------------------------------
+@button-border-radius: 4px;
+@button-border-size: 1px;
+
+@button-height: 40px;
+@button-width: 192px;
+
+@button-medium-height: 32px;
+@button-medium-sm-height: 28px;
+@button-medium-width: 108px;
+
+@button-round-size: 28px;
+@button-round-size-xs: 28px;
+@button-round-size-sm: 32px;
+@button-round-size-md: 40px;
+@button-round-size-lg: 64px;
+@button-round-size-xl: 72px;
+
+// ----------------------------------------------------------------------------
+// Framework
+// ----------------------------------------------------------------------------
+@app-bg:              #fafafa;
+@left-bg:             #1f1f1f;
+@left-color:          #fff;
+
+@left-width:          304px;
+@left-fluid-width:    .33 * 100%;
+
+// ----------------------------------------------------------------------------
+// Conversation List
+// ----------------------------------------------------------------------------
+@conversation-list-width:               @left-width;
+@conversation-list-item-height:         48px;
+@conversation-list-item-left-width:     56px;
+@conversation-list-item-right-width:    56px;
+@conversation-list-controls-width:      104px;
+
+// ----------------------------------------------------------------------------
+// Conversation
+// ----------------------------------------------------------------------------
+@conversation-max-width:               800px;
+
+@conversation-message-max-width:       640px;
+@conversation-message-sender-width:    72px;
+@conversation-message-timestamp-width: 96px;
+
+// ----------------------------------------------------------------------------
+// Conversation Input
+// ----------------------------------------------------------------------------
+@conversation-input-min-height:        56px;
+@conversation-input-max-height:        200px;
+@conversation-input-line-height:       @line-height-lg;
+@conversation-input-separator-color:   fade(@w-gray, 56%);
+
+// ----------------------------------------------------------------------------
+// Conversation Title Bar
+// ----------------------------------------------------------------------------
+@conversation-title-bar-height:        40px;
+
+// ----------------------------------------------------------------------------
+// Z-Indexes
+// ----------------------------------------------------------------------------
+@z-index-level-0: 0;
+@z-index-level-1: 10;
+@z-index-level-2: 100;
+@z-index-level-3: 1000;
+@z-index-level-4: 10000;
+@z-index-level-5: 100000;
+@z-index-level-6: 1000000;
+@z-index-level-7: 10000000;
+
+@z-index-bubble:     @z-index-level-3;
+@z-index-modal:      @z-index-level-4;
+@z-index-warnings:   @z-index-level-7;
+
+// ----------------------------------------------------------------------------
+// Modal
+// ----------------------------------------------------------------------------
+@modal-padding: 24px;
+
+// ----------------------------------------------------------------------------
+// Avatar
+// ---------------------------------------------------------------------------
+@avatar-diameter-xl:            240px;
+@avatar-border-xl:              1px;
+@avatar-initials-xl:            @font-size-xl;
+
+@avatar-diameter-lg:            168px;
+@avatar-border-lg:              1px;
+@avatar-initials-lg:            @font-size-xl;
+
+@avatar-diameter-md:            72px;
+@avatar-border-md:              3px;
+@avatar-initials-md:            @font-size-lg;
+
+@avatar-diameter-sm:            40px;
+@avatar-border-sm:              2px;
+@avatar-initials-sm:            @font-size-sm;
+
+@avatar-diameter-xs:            24px;
+@avatar-border-xs:              1px;
+@avatar-initials-xs:            @font-size-xs;
+
+// ----------------------------------------------------------------------------
+// Self - Profile
+// ----------------------------------------------------------------------------
+@settings-modal-width:         520px;
+@settings-modal-padding:       @modal-padding;
+@settings-modal-line-height:   @line-height-lg;
+@settings-modal-font-weight:   300;
+@settings-modal-label-weight:  600;
+
+// ----------------------------------------------------------------------------
+// Accent Color Picker
+// ----------------------------------------------------------------------------
+@accent-color-picker-height:      24px;
+@accent-color-picker-line-height: 2px;
+@accent-color-picker-spacing:     (@accent-color-picker-height - @accent-color-picker-line-height) / 2;
+
+// ----------------------------------------------------------------------------
+// About
+// ----------------------------------------------------------------------------
+@about-line-height:         8px;
+@about-padding:             @modal-padding;
+@about-text-color:          #fff;
+@about-width:               320px;
+
+@about-logo-height:         48px;
+@about-logo-margin-bottom:  68px;
+@about-logo-margin-top:     72px;
+@about-logo-width:          144px;
+
+@about-links-line-height:   @line-height-lg;
+@about-links-margin-bottom: 68px;
+@about-links-margin-top:    32px;
+
+// ----------------------------------------------------------------------------
+// Bubble
+// ----------------------------------------------------------------------------
+@bubble-width:                 288px;
+@bubble-height:                420px;
+@bubble-height-lg:             440px;
+@bubble-footer-height:         56px;
+@bubble-border-radius:         4px;
+
+@bubble-inner-padding:         24px;
+@bubble-image-margin:          2px;
+@common-contacts-avatar-size:  48px;
+
+@bubble-transition_offset:     104%;
+
+// ----------------------------------------------------------------------------
+// Media queries breakpoints
+// ----------------------------------------------------------------------------
+@screen-sm:     480px;
+@screen-md-min: 768px;
+@screen-lg-min: 1312px;
+
+// So media queries don't overlap when required, provide a maximum
+@screen-sm-max: @screen-md-min - 1;
+@screen-md-max: @screen-lg-min - 1;
+
+// defines when images jump inline
+@screen-inline-images: (@left-width + @conversation-max-width);
+
+// ----------------------------------------------------------------------------
+// Warnings
+// ----------------------------------------------------------------------------
+@warning-bar-feature-height:    64px;
+@warning-bar-connection-height: 32px;
+
+// ----------------------------------------------------------------------------
+// Animations
+// ----------------------------------------------------------------------------
+
+// for slower animation use n * slower
+@animation-timing-faster: .15s;
+@animation-timing-fast:   .35s;
+@animation-timing-slow:   .55s;
+@animation-timing-slower: .7s;
+
+// easing functions
+@ease-in-quad:      cubic-bezier(0.550, 0.085, 0.680, 0.530);
+@ease-in-cubic:     cubic-bezier(0.550, 0.055, 0.675, 0.190);
+@ease-in-expo:      cubic-bezier(0.600, 0.040, 0.980, 0.335);
+@ease-in-quart:     cubic-bezier(0.895, 0.030, 0.685, 0.220);
+@ease-out-expo:     cubic-bezier(0.190, 1.000, 0.220, 1.000);
+@ease-out-quart:    cubic-bezier(0.165, 0.840, 0.440, 1.000);
+@ease-out-back:     cubic-bezier(0.175, 0.885, 0.320, 1.275);
+@ease-in-out-expo:  cubic-bezier(1.000, 0.000, 0.000, 1.000);
+@ease-in-out-quart: cubic-bezier(0.770, 0.000, 0.175, 1.000);
+
+// start ui
+@start-ui-search-bar-offset: 88px;

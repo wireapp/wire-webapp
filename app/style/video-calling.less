@@ -1,0 +1,165 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@keyframes video-fade-in { to{ opacity: 1; } }
+
+// mixins
+.video-container-small() {
+  position: absolute;
+  top: 44px;
+  right: 44px;
+  width: 160px;
+  height: 120px;
+
+  background-color: fade(#000, 8%);
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, .24);
+}
+
+.video-element {
+  background-color: @graphite-dark;
+  border-radius: 4px;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+
+  &.video-element-portrait {
+    object-fit: contain;
+  }
+
+  &.video-element-mirrored {
+    transform: scaleX(-1);
+  }
+}
+
+.video-container-element() {
+  background-color: @graphite-dark;
+  border-radius: 4px;
+  height: 100%;
+  width: 100%;
+}
+
+// common
+.video-element-overlay {
+  .full-screen;
+  .flex-center;
+  color: #fff;
+  background-color: fade(#000, 24%);
+  border-radius: 4px;
+}
+
+.video-element-remote {
+  .full-screen;
+  opacity: 0;
+
+  // fade in animation
+  animation-name: video-fade-in;
+  animation-duration: @animation-timing-slower;
+  animation-timing-function: @ease-out-quart;
+  animation-fill-mode: forwards;
+
+  .video-element {
+    .video-container-element();
+    object-fit: cover;
+    &.video-mode-portrait {
+      object-fit: contain;
+    }
+  }
+}
+
+.video-element-remote-participant {
+  .flex-center;
+  background: #fff;
+  height: 100%;
+}
+
+.video-element-remote-video {
+  .full-screen;
+}
+
+.video-element-remote-minimized {
+  .video-container-small;
+  left: auto;
+  bottom: auto;
+}
+
+.video-element-remote-fullscreen {
+  .full-screen;
+  .flex-center;
+  color: #fff;
+  cursor: pointer;
+}
+
+.video-element-local {
+  .video-container-small;
+  border-radius: 4px;
+
+  .video-element {
+    .video-container-element();
+    margin-bottom: 16px;
+  }
+}
+
+.video-message {
+  .full-screen;
+  .flex-center;
+  color: #fff;
+
+}
+
+.video-title {
+  position: fixed;
+  width: 100%;
+  top: 48px;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+}
+
+.video-timer {
+  margin-top: 8px;
+}
+
+.video-controls {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  bottom: 54px;
+  transition: opacity .25s ease-in-out;
+}
+
+.video-toggle-button {
+  margin-left: 72px;
+}
+
+.video-controls-button {
+  margin-right: 8px;
+
+  &:first-child {
+    margin-right: 32px;
+  }
+  &:last-child {
+    margin-left: 24px;
+    margin-right: 0;
+  }
+}
+
+.video-element-dark {
+  color: @graphite-dark;
+}

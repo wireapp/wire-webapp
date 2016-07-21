@@ -1,0 +1,68 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// FILE
+.file {
+  .asset-container-style;
+  position: relative;
+  margin-top: 16px;
+  display: flex;
+  height: 64px;
+  align-items: center;
+  padding: 12px;
+}
+
+.file-icon {
+  font-size: @font-size-xl;
+  position: relative;
+}
+
+.file-icon-ext {
+  bottom: 4px;
+  color: #fff;
+  font-family: @font-family-base;
+  font-size: 8px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  text-align: center;
+}
+
+.file-desc {
+  flex: 1 1 auto;
+  line-height: @line-height-sm;
+  min-width: 0;
+  margin-left: 12px;
+}
+
+.file-desc-meta {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  & > li:not(:first-child):before {
+    content: "\b7"; // middot
+    padding-right: 4px;
+  }
+
+  & > li:not(:last-child) {
+    margin-right: 4px;
+  }
+}

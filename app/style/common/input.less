@@ -1,0 +1,115 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// input mixin
+.input-box {
+  border-radius: @button-border-radius;
+  color: #fff;
+  display: block;
+  height: @button-height;
+  line-height: @button-height;
+  margin-bottom: 8px;
+  outline: 0;
+  padding: 0 16px 0 16px;
+  width: 100%;
+
+  &::-ms-clear {
+    display: none;
+  }
+}
+
+// input
+.input {
+  .input-box;
+  background-color: fade(#000, 40%);
+  border: none;
+
+  &::placeholder {
+    .label-xs();
+    color: fade(#fff, 56%);
+  }
+}
+.input-select {
+  position: relative;
+
+  select {
+    appearance: none;
+
+    // fixes firefox outline
+    // http://stackoverflow.com/questions/3773430/remove-outline-from-select-box-in-ff
+    &:-moz-focusring {
+      color: transparent;
+      text-shadow: 0 0 0 #fff;
+    }
+
+    // hide select box arrow in IE
+    &::-ms-expand {
+      display: none;
+    }
+  }
+
+  label {
+    height: @button-height;
+    line-height: @button-height;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 0;
+    width: @button-height;
+  }
+}
+
+.input-group {
+  display: flex;
+  margin-bottom: 8px;
+  border-radius: @button-border-radius;
+  overflow: hidden;
+
+  input, button {
+    border-radius: 0;
+    margin-bottom: 0;
+
+    &:invalid {
+      box-shadow: none;
+    }
+  }
+}
+
+.input-group-button {
+  flex: 0 0 auto;
+  line-height: @button-height;
+  width: @button-height;
+  padding: 0;
+
+  &.visible {
+    display: block;
+  }
+
+  .has-error &,
+  &:not(.visible) {
+    display: none;
+  }
+}
+
+.input-code {
+  text-align: center;
+  letter-spacing: 8px;
+  font-size: @font-size-lg;
+}

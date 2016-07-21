@@ -1,0 +1,91 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.self-profile {
+  .full-screen();
+  display: none;
+  max-width: 448px;
+  margin-left: 160px;
+  margin-right: 16px;
+  color: #fff;
+  line-height: @line-height-lg;
+
+  &.self-profile-transition-in {
+    transition-delay: @animation-timing-fast;
+    transition-duration: @animation-timing-fast;
+    transition-property: transform opacity;
+    transition-timing-function: @ease-out-expo;
+    .hardware-acc;
+  }
+
+  &.self-profile-transition-out {
+    transition-delay: @animation-timing-fast + .1;
+    transition-duration: @animation-timing-fast;
+    transition-property: transform opacity;
+    transition-timing-function: @ease-out-expo;
+    .hardware-acc;
+  }
+
+  &.self-profile-hidden {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+
+  &.self-profile-visible {
+    opacity: 1;
+  }
+
+  #setting-bubble {
+    margin-left: 13px;
+  }
+}
+
+.self-profile-name {
+  margin-top: 32px;
+  font-weight: 600;
+}
+
+.self-profile-mail,
+.self-profile-phone {
+  .no-text-selection();
+}
+
+.self-profile-settings-button {
+  position: absolute;
+  top: 36px;
+  right: 0;
+}
+
+.self-profile-footer {
+  align-items: center;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  width: 100%;
+}
+
+.self-profile-camera-button {
+  font-size: @icon-size-md;
+  margin-bottom: 40px;
+}
+
+.self-profile-color-picker {
+  margin-bottom: 56px;
+}

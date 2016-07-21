@@ -1,0 +1,96 @@
+<script type="text/html" id="template-confirm-connect">
+  <div class="confirm">
+    <div class="confirm-hack"></div>
+    <div class="confirm-content">
+      <span class="headline" data-bind="l10n_text: z.string.people_connect_headline"></span>
+      <p class="message" data-bind="l10n_html: {'id': z.string.people_connect_message, 'replace': {'placeholder': '%@.first_name', 'content': '<span class=\'user\'></span>'}}"></p>
+    </div>
+    <div class="button-group">
+      <div data-action="cancel" class="button button-medium button-inverted" data-uie-name="do-ignore" data-bind="l10n_text: z.string.people_button_ignore"></div>
+      <div data-action="confirm" class="button button-medium" data-uie-name="do-connect" data-bind="l10n_text: z.string.people_button_connect"></div>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="template-confirm-leave">
+  <div class="confirm">
+    <div class="confirm-hack"></div>
+    <div class="confirm-content">
+      <span class="headline" data-bind="l10n_text: z.string.people_leave_headline"></span>
+      <p class="message" data-bind="l10n_text: z.string.people_leave_message"></p>
+    </div>
+    <div class="button-group">
+      <div data-action="cancel" class="button button-medium button-inverted" data-uie-name="do-cancel" data-bind="l10n_text: z.string.people_button_cancel"></div>
+      <div data-action="confirm" class="button button-medium" data-uie-name="do-confirm" data-uie-value="leave" data-bind="l10n_text: z.string.people_button_leave"></div>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="template-confirm-block">
+  <div class="confirm">
+    <div class="confirm-hack"></div>
+    <div class="confirm-content">
+      <span class="headline" data-bind="l10n_text: z.string.people_block_headline"></span>
+      <p class="message" data-bind="l10n_html: {'id': z.string.people_block_message, 'replace': {'placeholder': '%@.first_name', 'content': '<span class=\'user\'></span>'}}"></p>
+    </div>
+    <div class="button-group">
+      <div data-action="cancel" class="button button-medium button-inverted" data-uie-name="do-cancel" data-bind="l10n_text: z.string.people_button_cancel"></div>
+      <div data-action="confirm" class="button button-medium" data-uie-name="do-confirm" data-uie-value="block" data-bind="l10n_text: z.string.people_button_block"></div>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="template-confirm-remove">
+  <div class="confirm">
+    <div class="confirm-hack"></div>
+    <div class="confirm-content">
+      <span class="headline" data-bind="l10n_text: z.string.people_remove_headline"></span>
+      <p class="message" data-bind="l10n_html: {'id': z.string.people_remove_message, 'replace': {'placeholder': '%@.first_name', 'content': '<span class=\'user\'></span>'}}"></p>
+    </div>
+    <div class="button-group">
+      <div data-action="cancel" class="button button-medium button-inverted" data-uie-name="do-cancel" data-bind="l10n_text: z.string.people_button_cancel"></div>
+      <div data-action="confirm" class="button button-medium" data-uie-name="do-confirm" data-uie-value="remove" data-bind="l10n_text: z.string.people_button_remove"></div>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="template-confirm-unblock">
+  <div class="confirm">
+    <div class="confirm-hack"></div>
+    <div class="confirm-content">
+      <span class="headline" data-bind="l10n_text: z.string.people_unblock_headline"></span>
+      <p class="message" data-bind="l10n_html: {'id': z.string.people_unblock_message, 'replace': {'placeholder': '%@.first_name', 'content': '<span class=\'user\'></span>'}}"></p>
+    </div>
+    <div class="button-group">
+      <div data-action="cancel" class="button button-medium button-inverted" data-uie-name="do-cancel" data-bind="l10n_text: z.string.people_button_cancel"></div>
+      <div data-action="confirm" class="button button-medium" data-uie-name="do-confirm" data-uie-value="unblock" data-bind="l10n_text: z.string.people_button_unblock"></div>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="template-confirm-cancel_request">
+  <div class="confirm">
+    <div class="confirm-hack"></div>
+    <div class="confirm-content">
+      <span class="headline" data-bind="l10n_text: z.string.people_cancel_request_headline"></span>
+      <p class="message" data-bind="l10n_html: {'id': z.string.people_cancel_request_message, 'replace': {'placeholder': '%@.first_name', 'content': '<span class=\'user\'></span>'}}"></p>
+    </div>
+    <div class="button-group">
+      <div data-action="cancel" class="button button-medium button-inverted" data-uie-name="do-cancel" data-bind="l10n_text: z.string.people_button_no"></div>
+      <div data-action="confirm" class="button button-medium" data-uie-name="do-confirm" data-uie-value="cancel_request" data-bind="l10n_text: z.string.people_button_yes"></div>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="template-confirm-my-fingerprint">
+  <div class="user-profile-my-fingerprint confirm">
+    <div data-action="cancel" data-uie-name="do-cancel" class="user-profile-top-right-button button-icon icon-close"></div>
+    <div data-bind="click: click_on_show_my_devices, l10n_text: z.string.people_tabs_device_detail_device_fingerprint"></div>
+    <device-card class="user-profile-device-detail-card" params="device: device()"></device-card>
+    <div class="user-profile-device-detail-fingerprint" data-bind="html: z.util.print_devices_id(fingerprint_local())"></div>
+    <div class="user-profile-device-detail-footer">
+      <span class="button-label text-theme" data-bind="click: click_on_show_my_devices, l10n_text: z.string.people_tabs_device_detail_all_my_devices"></span>
+    </div>
+  </div>
+</script>
+

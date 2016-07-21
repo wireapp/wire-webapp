@@ -1,0 +1,89 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.connect-request-wrapper {
+  .full-screen();
+  overflow-x: hidden;
+}
+
+.connect-requests {
+  bottom: 0;
+  max-height: 100%;
+  position: absolute;
+  width: 100%;
+}
+
+.connect-requests-inner {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  max-width: @conversation-max-width;
+  width: 100%;
+}
+
+.connect-request {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 584px;
+  width: 384px;
+
+  & + .connect-request {
+    border-top: 1px solid fade(#000, 8%);
+  }
+
+  > .name,
+  > .mail {
+    .ellipsis();
+    width: 100%;
+  }
+
+  > .name {
+    margin-top: 40px;
+  }
+
+  > .button-group {
+    margin-bottom: 40px;
+  }
+
+}
+
+.connect-request-content {
+  align-items: center;
+  display: flex;
+  flex: 1 1;
+  flex-direction: column;
+  justify-content: center;
+
+  > .image {
+    display: inline-block;
+    height: 240px;
+    margin-bottom: 32px;
+    margin-top: 24px;
+    width: 240px;
+  }
+
+  > .contacts {
+    margin-bottom: 40px;
+  }
+
+  > .contacts[data-contacts="0"] {
+    margin-bottom: 0;
+  }
+}

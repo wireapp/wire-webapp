@@ -1,0 +1,212 @@
+#
+# Wire
+# Copyright (C) 2016 Wire Swiss GmbH
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see http://www.gnu.org/licenses/.
+#
+
+window.z ?= {}
+z.ViewModel ?= {}
+
+
+class z.ViewModel.VideoCallingViewModel
+  constructor: (element_id, @call_center, @user_repository, @conversation_repository) ->
+    @logger = new z.util.Logger 'z.ViewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS
+
+    @self_user = @user_repository.self
+
+    @available_devices = @call_center.media_devices_handler.available_devices
+    @current_device_id = @call_center.media_devices_handler.current_device_id
+    @current_device_index = @call_center.media_devices_handler.current_device_index
+
+    @local_video_stream = @call_center.media_stream_handler.local_media_streams.video
+    @remote_video_stream = @call_center.media_stream_handler.remote_media_streams.video
+
+    @self_stream_state = @call_center.media_stream_handler.self_stream_state
+
+    @is_choosing_screen = ko.observable false
+    @is_minimized = ko.observable false
+
+    @minimize_timeout = undefined
+
+    @number_of_screen_devices = ko.observable 0
+    @number_of_video_devices = ko.observable 0
+    @video_mode = ko.observable z.calling.enum.VideoOrientation.LANDSCAPE
+
+    @joined_call = @call_center.joined_call
+
+    @videod_call = ko.pureComputed =>
+      for call_et in @call_center.calls()
+        is_active = call_et.state() in z.calling.enum.CallStateGroups.IS_ACTIVE
+        is_client_videod = call_et.self_client_joined() and @self_stream_state.screen_shared() or @self_stream_state.videod()
+        is_remote_videod = call_et.is_remote_videod() and not call_et.is_ongoing_on_another_client()
+        return call_et if is_active and (is_client_videod or is_remote_videod or @is_choosing_screen())
+
+    @is_ongoing = ko.pureComputed =>
+      return @videod_call()? and @joined_call()?.state() is z.calling.enum.CallState.ONGOING
+
+    @overlay_icon_class = ko.pureComputed =>
+      if @is_ongoing()
+        if @self_stream_state.muted()
+          return 'icon-mute'
+        else if not @self_stream_state.screen_shared() and not @self_stream_state.videod()
+          return 'icon-video-off'
+
+    @remote_user = ko.pureComputed =>
+      return @joined_call()?.participants()[0]?.user
+
+    @show_local = ko.pureComputed =>
+      return not @is_minimized() and not @is_choosing_screen()
+    @show_local_video = ko.pureComputed =>
+      is_visible = @self_stream_state.screen_shared() or @self_stream_state.videod() or @videod_call()?.state() isnt z.calling.enum.CallState.ONGOING
+      return @local_video_stream() and is_visible
+
+    @show_remote = ko.pureComputed =>
+      return @show_remote_video() or @show_remote_participant() or @is_choosing_screen()
+    @show_remote_participant = ko.pureComputed =>
+      is_visible = @remote_user() and not @is_minimized() and not @joined_call()?.is_remote_videod() or not @remote_video_stream()
+      return @is_ongoing() and is_visible
+    @show_remote_video = ko.pureComputed =>
+      is_visible = @joined_call()?.is_remote_videod() and @remote_video_stream()
+      return @is_ongoing() and is_visible
+
+    @show_switch_camera = ko.pureComputed =>
+      is_visible = @local_video_stream() and @available_devices.video_input().length > 1 and @self_stream_state.videod()
+      return @is_ongoing() and is_visible
+    @show_switch_screen = ko.pureComputed =>
+      is_visible = @local_video_stream() and @available_devices.screen_input().length > 1 and @self_stream_state.screen_shared()
+      return @is_ongoing() and is_visible
+
+    @show_controls = ko.pureComputed =>
+      is_visible = @show_remote_video() or @show_remote_participant() and not @is_minimized()
+      return @is_ongoing() and is_visible
+    @show_toggle_screen = ko.pureComputed ->
+      return z.calling.CallCenter.supports_screen_sharing()
+    @disable_toggle_screen = ko.pureComputed =>
+      return @joined_call()?.is_remote_screen_shared()
+
+    @videod_call.subscribe (videod_call) =>
+      if videod_call
+        if @show_local_video() or @show_remote_video() or @is_choosing_screen() or videod_call.state() is z.calling.enum.CallState.INCOMING
+          @is_minimized false
+          @logger.log @logger.levels.INFO, "Displaying call '#{videod_call.id}' full-screen", videod_call
+        else
+          @is_minimized true
+          @logger.log @logger.levels.INFO, "Minimizing call '#{videod_call.id}' that is not videod", videod_call
+      else
+        @is_minimized false
+        @logger.log @logger.levels.INFO, 'Resetting full-screen calling to maximize'
+
+    @available_devices.screen_input.subscribe (media_devices) =>
+      if _.isArray media_devices then @number_of_screen_devices media_devices.length else @number_of_screen_devices 0
+    @available_devices.video_input.subscribe (media_devices) =>
+      if _.isArray media_devices then @number_of_video_devices media_devices.length else @number_of_video_devices 0
+    @show_remote_participant.subscribe (show_remote_participant) =>
+      if @minimize_timeout
+        window.clearTimeout @minimize_timeout
+        @minimize_timeout = undefined
+
+      if show_remote_participant and @videod_call() and not @is_choosing_screen()
+        @logger.log @logger.levels.INFO, "Scheduled minimizing call '#{@videod_call().id}' on timeout as remote user '#{@remote_user()?.name()}' is not videod"
+        @minimize_timeout = window.setTimeout =>
+          @is_minimized true if not @is_choosing_screen()
+          @logger.log @logger.levels.INFO, "Minimizing call '#{@videod_call().id}' on timeout as remote user '#{@remote_user()?.name()}' is not videod"
+        , 5000
+
+    amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE_SCREEN, @choose_shared_screen
+
+    ko.applyBindings @, document.getElementById element_id
+
+  choose_shared_screen: (conversation_id) =>
+    return if @disable_toggle_screen()
+
+    if @self_stream_state.screen_shared() or z.util.Environment.browser.firefox
+      @call_center.state_handler.toggle_screen conversation_id
+
+    else if z.util.Environment.electron
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN,
+        conversation_type: if @joined_call().is_group() then 'group' else 'one_to_one'
+        kind_of_call_when_sharing: if @joined_call().is_remote_videod() then 'video' else 'audio'
+
+      @call_center.media_devices_handler.get_screen_sources()
+      .then (screen_sources) =>
+        if screen_sources.length > 1
+          @is_minimized false
+          @is_choosing_screen true
+        else
+          @call_center.state_handler.toggle_screen conversation_id
+      .catch (error) =>
+        @logger.log @logger.levels.ERROR, 'Unable to get screens sources for sharing', error
+
+  clicked_on_cancel_call: =>
+    @call_center.state_handler.leave_call @joined_call()?.id
+
+  clicked_on_cancel_screen: =>
+    @is_choosing_screen false
+
+  clicked_on_mute_audio: =>
+    @call_center.state_handler.toggle_audio @joined_call()?.id
+
+  clicked_on_share_screen: =>
+    @choose_shared_screen @joined_call().id
+
+  clicked_on_choose_screen: (screen_source) =>
+    @current_device_id.screen_input ''
+    @logger.log @logger.levels.INFO, "Selected '#{screen_source.name}' for screen sharing", screen_source
+    @is_choosing_screen false
+    @current_device_id.screen_input screen_source.id
+    @call_center.state_handler.toggle_screen @joined_call().id
+    if not @joined_call().is_remote_videod()
+      @is_minimized true
+      @logger.log @logger.levels.INFO, "Minimizing call '#{@videod_call().id}' on screen selection as remote user '#{@remote_user()?.name()}' is not videod"
+
+  clicked_on_stop_video: =>
+    @call_center.state_handler.toggle_video @joined_call()?.id
+
+  clicked_on_toggle_camera: =>
+    @call_center.media_devices_handler.toggle_next_camera()
+
+  clicked_on_toggle_screen: =>
+    @call_center.media_devices_handler.toggle_next_screen()
+
+  clicked_on_minimize: =>
+    @is_minimized true
+    @logger.log @logger.levels.INFO, "Minimizing call '#{@videod_call().id}' on user click"
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.MINIMIZED_FROM_FULLSCREEN,
+      conversation_type: if @joined_call().is_group() then 'group' else 'one_to_one'
+
+  clicked_on_maximize: =>
+    @is_minimized false
+    @logger.log @logger.levels.INFO, "Maximizing call '#{@videod_call().id}' on user click"
+
+  # Detect the aspect ratio of a MediaElement and set the video mode.
+  on_loadedmetadata: (view_model, event) =>
+    media_element = event.target
+    if media_element.videoHeight > media_element.videoWidth
+      detected_video_mode = z.calling.enum.VideoOrientation.PORTRAIT
+    else
+      detected_video_mode = z.calling.enum.VideoOrientation.LANDSCAPE
+    @video_mode detected_video_mode
+    @logger.log @logger.levels.INFO, "Video is in '#{detected_video_mode}' mode"
+
+
+# http://stackoverflow.com/questions/28762211/unable-to-mute-html5-video-tag-in-firefox
+ko.bindingHandlers.mute_media_element =
+  update: (element, valueAccessor) ->
+    element.muted = true if valueAccessor()
+
+
+ko.bindingHandlers.source_stream =
+  update: (element, valueAccessor) ->
+    element.srcObject = valueAccessor()

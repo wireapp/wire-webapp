@@ -1,0 +1,28 @@
+<div id="conversation-titlebar" class="conversation-titlebar" data-bind="with: $root.conversation_titlebar">
+  <!-- ko if: conversation_et() -->
+    <div id="show-participants"
+          data-bind="click: click_on_participants, attr: {'title': people_tooltip}"
+          data-bubble="#participants-bubble"
+          data-placement="bottom"
+          data-uie-name="do-participants"
+          class="conversation-titlebar-name">
+      <span class="conversation-titlebar-name-label label-bold-xs ellipsis" data-bind="text: conversation_et().display_name()"></span>
+      <span class="conversation-titlebar-name-icon icon-down"></span>
+    </div>
+
+    <!-- ko if: show_call_controls() -->
+      <div class="conversation-titlebar-icons">
+        <!-- ko ifnot: conversation_et().is_group() -->
+          <span class="conversation-titlebar-icon button-icon-large icon-video"
+                data-bind="click: click_on_video_button, l10n_tooltip: z.string.tooltip_conversation_video_call"
+                data-uie-name="do-video-call">
+          </span>
+        <!-- /ko -->
+        <span class="conversation-titlebar-icon button-icon-large icon-call"
+              data-bind="click: click_on_call_button, l10n_tooltip: z.string.tooltip_conversation_call"
+              data-uie-name="do-call">
+        </span>
+      </div>
+    <!-- /ko -->
+  <!-- /ko -->
+</div>

@@ -1,0 +1,161 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.conversation-list {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  width: @left-width;
+
+  .os-mac.platform-electron & {
+    padding-top: 40px;
+  }
+
+  &:not(.conversation-list-is-hidden) {
+    .start-ui-transition-fadein();
+  }
+
+  &.conversation-list-is-hidden {
+    .start-ui-transition-fadeout();
+  }
+}
+
+.conversation-list-center {
+  flex: 1 1 auto;
+  position: relative;
+
+  &.conversation-list-center-border-bottom {border-bottom: 1px solid fade(#fff, 16%)}
+  &.conversation-list-center-border-top {border-top: 1px solid fade(#fff, 16%)}
+}
+
+.conversation-list-items {
+  .full-screen;
+  .list-unstyled;
+  margin: 0;
+  padding: 4px 0 16px 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.conversation-list-item {
+  display: flex;
+  user-select: none;
+  height: @conversation-list-item-height;
+  line-height: @conversation-list-item-height;
+  position: relative;
+  width: 100%;
+
+  > .left-column {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: @conversation-list-item-left-width;
+  }
+
+  > .center-column {
+    .ellipsis;
+    flex: 1 1;
+    cursor: pointer;
+    margin-right: -8px;
+    position: relative;
+  }
+
+  > .right-column {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    position: relative;
+    width: @conversation-list-item-right-width;
+
+    > .icon-silence,
+    > .icon-more {
+      transition-property: opacity;
+      transition-timing-function: @ease-out-quart;
+      opacity: 0;
+    }
+
+    > .icon-more {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      margin-left: -8px;
+      margin-top: -8px;
+    }
+
+    > .icon-silence {
+      pointer-events: none;
+
+      &.conversation-muted {
+        opacity: 1;
+      }
+    }
+  }
+
+  &.hover,
+  &:hover {
+    .right-column > .icon-more {
+      transition-delay: @animation-timing-faster + 0.05;
+      transition-duration: @animation-timing-slow;
+      opacity: 1;
+    }
+    .right-column > .icon-silence {
+      transition-duration: @animation-timing-fast;
+      opacity: 0;
+    }
+  }
+}
+
+.conversation-list-separator {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(fade(#fff, 40%), fade(#fff, 0)) top center / 256px 1px no-repeat ;
+  border: none;
+}
+
+.conversation-list-footer {
+  height: @conversation-input-min-height;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 12px;
+  padding-right: 12px;
+
+  .conversation-list-footer-contacts-label {
+    color: #fff;
+    margin-left: 16px;
+  }
+}
+
+.conversation-list-settings {
+  position: relative;
+}
+
+.conversation-list-settings-badge {
+  .dot-md;
+  content: "";
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}

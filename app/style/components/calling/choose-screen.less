@@ -1,0 +1,79 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+choose-screen {
+  .full-screen;
+  background-color: fade(#000, 56%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.choose-screen-list {
+  display: flex;
+  margin-bottom: 32px;
+  max-width: 100%;
+  padding-left: 32px;
+  padding-right: 32px;
+
+  &:hover > .choose-screen-list-item {
+    &:before {
+      .full-screen;
+      background-color: fade(#000, 24%);
+      content: "";
+    }
+  }
+
+  & > .choose-screen-list-item:hover {
+    transform: scale(.95);
+
+    &:before {
+      content: none;
+    }
+  }
+}
+
+.choose-screen-list-item {
+  transition: all @animation-timing-faster;
+  background-color: @graphite-dark;
+  cursor: pointer;
+  width: auto;
+  height: 176px;
+  position: relative;
+
+  &:not(:last-child) {
+    margin-right: 32px;
+  }
+}
+
+.choose-screen-list-image {
+  width: auto;
+  height: 176px;
+  border-radius: 4px;
+}
+
+.choose-screen-controls {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  bottom: 54px;
+  transition: opacity .25s ease-in-out;
+}

@@ -1,0 +1,235 @@
+<script type="text/html" id="all-verified">
+  <div class="message-header">
+    <div class="message-header-icon">
+      <svg width="16" height="16">
+        <use xlink:href="#icon-verified"></use>
+      </svg>
+    </div>
+    <div class="message-header-label">
+      <span data-bind="l10n_text: z.string.tooltip_conversation_all_verified"></span>
+      <hr class="message-header-line" />
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="call">
+  <div class="message-header">
+    <div class="message-header-icon">
+      <svg class="message-icon-missed-call" width="40" height="40" viewBox="0 0 1024 1024" data-bind="css: accent_color">
+        <path d="M512 853.333v0c188.513 0 341.333-152.82 341.333-341.333s-152.82-341.333-341.333-341.333c-188.513 0-341.333 152.82-341.333 341.333s152.82 341.333 341.333 341.333v0zM512 874.667v0c-200.295 0-362.667-162.371-362.667-362.667s162.371-362.667 362.667-362.667c200.295 0 362.667 162.371 362.667 362.667s-162.371 362.667-362.667 362.667v0z"></path>
+        <path opacity="0.5600000023841858" d="M512 917.333v0c223.859 0 405.333-181.474 405.333-405.333s-181.474-405.333-405.333-405.333c-223.859 0-405.333 181.474-405.333 405.333s181.474 405.333 405.333 405.333v0zM512 938.667v0c-235.641 0-426.667-191.025-426.667-426.667s191.025-426.667 426.667-426.667c235.641 0 426.667 191.025 426.667 426.667s-191.025 426.667-426.667 426.667v0z"></path>
+        <path opacity="0.23999999463558197" d="M512 981.333v0c259.206 0 469.333-210.128 469.333-469.333s-210.128-469.333-469.333-469.333c-259.206 0-469.333 210.128-469.333 469.333s210.128 469.333 469.333 469.333v0zM512 1002.667v0c-270.988 0-490.667-219.679-490.667-490.667s219.679-490.667 490.667-490.667c270.988 0 490.667 219.679 490.667 490.667s-219.679 490.667-490.667 490.667v0z"></path>
+      </svg>
+      <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+    </div>
+    <div class="message-header-label">
+      <span class="label-semibold-xs" data-bind='text: message.sender_name()'></span>
+      <span class="ellipsis" data-bind="text: message.caption()"></span>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="location">
+  <div class="message-header message-header-user-is-hideable">
+    <div class="message-header-icon">
+      <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+    </div>
+    <div class="message-header-label label-semibold text-graphite" data-bind='text_with_emoji: message.user().first_name'></div>
+  </div>
+  <div class="message-body message-location-body">
+    <div class="message-location-icon icon-location"></div>
+    <div class="message-location-label" data-bind="text: name"></div>
+    <a target="_blank" class="label-xs text-theme" data-bind="attr: {href: link_src}, l10n_text: z.string.conversation_location_link"></a>
+  </div>
+</script>
+
+<script type="text/html" id="normal">
+  <div class="message-header message-header-user-is-hideable">
+    <div class="message-header-icon">
+      <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+    </div>
+    <div class="message-header-label label-semibold text-graphite" data-bind='text: message.user().first_name'></div>
+  </div>
+  <div class="message-body">
+    <!-- ko foreach: {data: message.assets, as: 'asset'} -->
+      <!-- ko if: asset.is_medium_image() -->
+        <div class="message-asset-image" data-bind="fit_to_viewport: asset">
+          <div class="image image-loading" data-bind="background_image: asset.resource(), viewport_changed: $parents[1].viewport_changed, click: $parents[1].show_detail, attr: {'data-uie-visible': $parent.visible}" data-uie-name="go-image-detail" >
+            <img class="image-element" data-bind="attr: {src: asset.dummy_url}"/>
+            <span class="image-placeholder-icon">
+              <div class="three-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </span>
+          </div>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: asset.is_text() -->
+        <!-- ko if: asset.should_render_text -->
+          <div class="text" data-bind="html: asset.render()"></div>
+        <!-- /ko -->
+        <!-- ko foreach: asset.previews() -->
+          <link-preview-asset params="preview: $data, viewport_changed: $parents[2].viewport_changed"></link-preview-asset>
+        <!-- /ko -->
+      <!-- /ko -->
+      <!-- ko if: asset.is_video() -->
+        <video-asset params="asset: asset"></video-asset>
+      <!-- /ko -->
+      <!-- ko if: asset.is_audio() -->
+        <audio-asset params="asset: asset"></audio-asset>
+      <!-- /ko -->
+      <!-- ko if: asset.is_file() -->
+        <file-asset params="asset: asset"></file-asset>
+      <!-- /ko -->
+      <!-- ko if: asset.is_location() -->
+        <location-asset params="asset: asset"></location-asset>
+      <!-- /ko -->
+
+      <!-- ko if: message.is_deletable() -->
+        <span class="delete button-icon icon-trash-small" data-uie-name="do-message-delete" data-bind="click: message.delete"></span>
+      <!-- /ko -->
+      <!-- ko if: message.has_asset() && asset && asset.status() === z.assets.AssetTransferState.UPLOADED -->
+        <span class="download button-icon icon-download-small" data-uie-name="file-download" data-bind="click: asset.download" ></span>
+      <!-- /ko -->
+      <!-- ko ifnot: message.timestamp == '' -->
+        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
+      <!-- /ko -->
+
+    <!-- /ko -->
+  </div>
+</script>
+
+<script type="text/html" id="device">
+  <div class="message-header">
+    <div class="message-header-icon">
+      <svg width="16" height="16">
+        <use xlink:href="#icon-not-verified"></use>
+      </svg>
+    </div>
+    <div class="message-header-label">
+      <span class="label-semibold-xs" data-bind='text: message.sender_name()'></span>
+      <span class="ellipsis" data-bind="text: caption"></span>
+      <span class="ellipsis text-theme" data-bind="text: caption_device, click: click_on_device"></span>
+      <hr class="message-header-line" />
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="member">
+  <!-- ko if: show_large_avatar() -->
+    <div class="message-connected">
+      <span class="message-connected-header" data-bind='text: other_user().name()'></span>
+      <span class="label-xs" data-bind="text: caption"></span>
+      <user-avatar class="message-connected-avatar user-avatar-xl user-avatar-no-badge"
+                   data-bind="css: {'user-avatar-no-badge': other_user().sent()}"
+                   params="user: other_user()"></user-avatar>
+      <!-- ko if: other_user().sent() -->
+        <div class="message-connected-cancel text-theme"
+             data-bind="click: $parent.click_on_cancel_request,
+                        l10n_text: z.string.conversation_connection_cancel_request"
+             data-uie-name="do-cancel-request"></div>
+      <!-- /ko -->
+    </div>
+  <!-- /ko -->
+  <!-- ko ifnot: show_large_avatar() -->
+    <div class="message-header">
+      <div class="message-header-icon">
+        <span class="icon-chat" data-bind="visible: message.member_message_type === z.message.SystemMessageType.CONVERSATION_CREATE || message.member_message_type === z.message.SystemMessageType.CONVERSATION_RESUME"></span>
+        <span class="icon-minus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE"></span>
+        <span class="icon-plus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN"></span>
+      </div>
+      <div class="message-header-label">
+        <span class="label-semibold-xs" data-bind='text: message.sender_name()'></span>
+        <span class="ellipsis" data-bind="text: message.caption()"></span>
+        <hr class="message-header-line" />
+      </div>
+    </div>
+    <div class="message-body">
+      <!-- ko foreach: remote_user_ets -->
+        <!-- ko if: message.member_message_type === z.message.SystemMessageType.CONVERSATION_CREATE || message.member_message_type === z.message.SystemMessageType.CONVERSATION_RESUME -->
+          <user-avatar class="user-avatar-sm user-avatar-no-border" data-bubble="#participants-bubble" data-placement="vertical" params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+        <!-- /ko -->
+        <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN -->
+          <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+        <!-- /ko -->
+        <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE -->
+          <user-avatar class="user-avatar-xs translucent" data-bubble="#participants-bubble" data-placement="vertical" params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+        <!-- /ko -->
+      <!-- /ko -->
+    </div>
+  <!-- /ko -->
+</script>
+
+<script type="text/html" id="ping">
+  <div class="message-header">
+    <div class="message-header-icon">
+      <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+    </div>
+    <div class="message-header-label" data-bind="css: message.accent_color">
+      <span class="label-semibold-xs" data-bind='text: message.sender_name()'></span>
+      <span class="ellipsis" data-bind="text: message.caption"></span>
+      <span class="message-icon-ping icon-ping" data-bind="css: message.animation"></span>
+    </div>
+  </div>
+  <!-- ko ifnot: message.timestamp == '' -->
+    <span class="delete button-icon icon-trash-small" data-uie-name="do-message-delete" data-bind="click: message.delete"></span>
+    <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+  <!-- /ko -->
+</script>
+
+<script type="text/html" id="system">
+  <div class="message-header">
+    <div class="message-header-icon">
+      <span class="icon-edit text-graphite-dark"></span>
+    </div>
+    <div class="message-header-label">
+      <span class="label-semibold-xs" data-bind='text: message.sender_name()'></span>
+      <span class="ellipsis" data-bind="text: message.caption()"></span>
+      <hr class="message-header-line" />
+    </div>
+  </div>
+  <div class="message-body label-semibold" data-bind="text: message.name"></div>
+</script>
+
+<script type="text/html" id="unable-to-decrypt">
+  <div class="message-header">
+    <div class="message-header-icon">
+      <span class="icon-sysmsg-error text-red"></span>
+    </div>
+    <div class="message-header-label ellipsis">
+      <span data-bind="html: caption"></span>
+      <span>&nbsp;</span>
+      <a class="text-theme" data-bind="l10n_text: z.string.conversation_unable_to_decrypt_link, attr: {'href': link}" target="_blank"></a>
+      <hr class="message-header-line" />
+    </div>
+  </div>
+  <div class="message-body message-body-decrypt-error">
+    <div class="message-header-decrypt-error-label" data-bind="html: error_message"></div>
+    <!-- ko if: message.is_recoverable -->
+      <div class="message-header-decrypt-reset-session">
+        <svg class="message-header-decrypt-reset-session-spinner svg-theme spin"
+             data-bind="style : { visibility : is_resetting_session() ? 'visible' : 'hidden' }"
+             width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" data-uie-name="status-loading">
+          <path class="fill-theme" d="M12.416 12.417c-2.374 2.375-6.28 2.33-8.72-.112-2.444-2.442-2.488-6.347-.113-8.72 1.658-1.66 4.12-2.18 6.343-1.394.477.17 1-.08 1.17-.557.167-.477-.083-1-.56-1.17C7.658-.552 4.453.124 2.286 2.29-.808 5.384-.75 10.448 2.4 13.6c3.15 3.152 8.216 3.21 11.312.113 2.165-2.166 2.84-5.37 1.824-8.25-.168-.476-.692-.726-1.17-.558-.476.17-.726.692-.557 1.17.784 2.222.265 4.684-1.394 6.342z"></path>
+        </svg>
+        <span class="message-header-decrypt-reset-session-action button-label text-theme"
+              data-bind="click: $parent.on_session_reset_click, l10n_text: z.string.conversation_unable_to_decrypt_reset_session, style : { visibility : !is_resetting_session() ? 'visible' : 'hidden' }"></span>
+      </div>
+      <!-- /ko -->
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="timestamp">
+  <div class="message-header message-timestamp message-timestamp-hidden">
+    <div class="message-header-icon">
+      <span class="message-unread-dot dot-md bg-theme"></span>
+    </div>
+    <div class="message-header-label">
+      <time data-timestamp-type="normal" class="label-xs" data-bind="relative_timestamp: message.timestamp, attr: {'data-timestamp': message.timestamp}"></time>
+      <time data-timestamp-type="day" class="label-bold-xs" data-bind="relative_timestamp: message.timestamp, relative_timestamp_day: true, attr: {'data-timestamp': message.timestamp}"></time>
+    </div>
+  </div>
+</script>

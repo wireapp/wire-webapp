@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<!-- Wire, Copyright (C) 2016 Wire Swiss GmbH -->
+<!-- {{config.CURRENT_VERSION_ID}} -->
+<html id="wire-main-app">
+  <head>
+    #include('meta.htm')
+    #include('graph.htm')
+    <title>Wire for Web – modern, private communications in your browsers.</title>
+    #include('#dest/style.htm')
+  </head>
+
+  <body>
+    #include('svg.htm')
+    #include('loading.htm')
+    #include('wire-main.htm')
+    #include('#dest/debug.htm')
+
+    #include('#dest/vendor.htm')
+    #include('#dest/component.htm')
+    #include('#dest/app.htm')
+
+    #include('partials/template-user-profile.htm')
+    #include('partials/template-confirm.htm')
+    #include('partials/template-message.htm')
+  </body>
+</html>

@@ -1,0 +1,38 @@
+*.pyc
+.DS_Store
+.grunt
+.Icon
+/_SpecRunner.html
+/app/ext
+/aws/s3
+/aws/static
+/aws/templates/**/*.html
+/aws/templates/auth
+/aws/version
+/deploy
+/dist
+/docs
+/nbproject
+/node_modules
+/temp
+/test/_SpecRunner.html
+/test/coverage
+/test/js/*
+/Web.config
+aws-keys.json
+Gruntfile.js
+npm-debug.log
+strings-ar.coffee
+strings-fr.coffee
+strings-it.coffee
+strings-pt.coffee
+strings-ru.coffee
+
+# Automatically created files
+/doc
+
+# IntelliJ
+# http://devnet.jetbrains.com/docs/DOC-1186
+/.idea/**/*.xml
+!/.idea/codeStyleSettings.xml
+!/.idea/modules.xml

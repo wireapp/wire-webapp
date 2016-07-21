@@ -1,0 +1,61 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@dot-color-lite:  fade(@graphite-dark, 16%);
+@dot-color:       fade(@graphite-dark, 40%);
+
+@dot-animation-duration: 1.4s;
+
+@keyframes animation-first-dot {
+  0%    {background-color: @dot-color-lite;}
+  25%   {background-color: @dot-color;}
+  50%   {background-color: @dot-color-lite;}
+  100%  {background-color: @dot-color-lite;}
+}
+
+@keyframes animation-second-dot {
+  0%    {background-color: @dot-color-lite;}
+  25%   {background-color: @dot-color-lite;}
+  50%   {background-color: @dot-color;}
+  100%  {background-color: @dot-color-lite;}
+}
+
+@keyframes animation-third-dot {
+  0%    {background-color: @dot-color-lite;}
+  50%   {background-color: @dot-color-lite;}
+  75%   {background-color: @dot-color;}
+  100%  {background-color: @dot-color-lite;}
+}
+
+.three-dots {
+  display: flex;
+
+  & > span:nth-child(1) {animation: animation-first-dot 1.4s linear infinite;}
+  & > span:nth-child(2) {animation: animation-second-dot 1.4s linear infinite;}
+  & > span:nth-child(3) {animation: animation-third-dot 1.4s linear infinite;}
+
+  & > span {
+    .dot-xs;
+    background-color: @dot-color-lite;
+  }
+
+  & > span + span {
+    margin-left: 4px;
+  }
+}

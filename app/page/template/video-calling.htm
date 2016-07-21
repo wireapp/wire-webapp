@@ -1,0 +1,99 @@
+<div id="video-calling" data-bind="hide_controls: 4000" class="video-calling">
+  <!-- ko if: videod_call() -->
+    <!-- ko if: show_remote() -->
+      <div id="video-element-remote"
+           class="video-element-remote"
+           data-bind="css: {'video-element-remote-minimized': is_minimized()}">
+
+        <!-- ko if: show_remote_video() -->
+          <video class="video-element"
+                 autoplay
+                 data-bind="attr: {sinkId: current_device_id.audio_output()},
+                            css: {'video-element-portrait': video_mode()},
+                            event: {loadedmetadata: on_loadedmetadata},
+                            source_stream: remote_video_stream()"></video>
+        <!-- /ko -->
+        <!-- ko if: show_remote_participant() -->
+          <div class="video-element-remote-participant" data-bind="css: {'hidden': is_minimized()}">
+            <!-- ko ifnot: joined_call().is_group() -->
+              <user-avatar class="video-element-remote-participant user-avatar-xl user-avatar-no-badge"
+                           params="user: remote_user()"></user-avatar>
+            <!-- /ko -->
+          </div>
+        <!-- /ko -->
+
+        <!-- ko if: show_remote_video() && !is_choosing_screen() -->
+          <div class="video-element-overlay hide-controls-hidden"></div>
+        <!-- /ko -->
+        <!-- ko if: is_minimized() -->
+          <div class="video-element-remote-fullscreen icon-fullscreen hide-controls-hidden"
+               data-uie-name="do-call-controls-video-maximize"
+               data-bind="click: clicked_on_maximize">
+          </div>
+        <!-- /ko -->
+
+        <!-- ko if: show_controls() -->
+          <div id="video-title" class="video-title hide-controls-hidden" data-bind="css: {'video-element-dark': show_remote_participant()}">
+            <div class="video-remote-name" data-bind="text: joined_call().conversation_et.display_name()"></div>
+            <div class="video-timer label-xs" data-bind="text: z.util.format_seconds(joined_call().duration_time())"></div>
+          </div>
+        <!-- /ko -->
+
+        <!-- ko if: is_choosing_screen() -->
+          <choose-screen params="cancel: clicked_on_cancel_screen,
+                                 choose: clicked_on_choose_screen,
+                                 screens: available_devices.screen_input"></choose-screen>
+        <!-- /ko -->
+
+        <!-- ko if: show_controls() && !is_choosing_screen() -->
+          <div id="video-controls" class="video-controls hide-controls-hidden">
+            <div class="video-controls-button button-round button-round-md icon-chat"
+                 data-uie-name="do-call-controls-video-minimize"
+                 data-bind="click: clicked_on_minimize, css: {'button-round-dark': !show_remote_participant()}"></div>
+            <div class="video-controls-button button-round button-round-md icon-mute"
+                 data-uie-name="do-call-controls-video-call-mute"
+                 data-bind="click: clicked_on_mute_audio, css: {'toggled': self_stream_state.muted(), 'button-round-dark': !show_remote_participant()}"></div>
+            <!-- ko if: show_toggle_screen() -->
+              <div class="video-controls-button button-round button-round-md icon-screensharing"
+                   data-bind="click: clicked_on_share_screen, css: {'toggled': self_stream_state.screen_shared(), 'button-round-dark': !show_remote_participant(), 'disabled': disable_toggle_screen()}"></div>
+            <!-- /ko -->
+            <div class="video-controls-button button-round button-round-md icon-video"
+                 data-bind="click: clicked_on_stop_video, css: {'toggled': self_stream_state.videod(), 'button-round-dark': !show_remote_participant()}"></div>
+            <div class="video-controls-button button-round button-round-md button-round-theme-red icon-end-call"
+                 data-uie-name="do-call-controls-video-call-cancel"
+                 data-bind="click: clicked_on_cancel_call"></div>
+          </div>
+        <!-- /ko -->
+      </div>
+    <!-- /ko -->
+
+    <!-- ko if: show_local() -->
+      <div id="video-element-local" class="video-element-local">
+        <!-- ko if: show_local_video() -->
+          <video class="video-element"
+                 autoplay
+                 data-bind="css: {'mirror': !self_stream_state.screen_shared()},
+                            source_stream: local_video_stream(),
+                            mute_media_element: local_video_stream()"></video>
+        <!-- /ko -->
+        <!-- ko if: overlay_icon_class() -->
+          <span class="video-element-overlay" data-bind="css: overlay_icon_class()"></span>
+        <!-- /ko -->
+        <!-- ko if: show_switch_camera()-->
+          <device-toggle-button class="video-toggle-button hide-controls-hidden"
+                                data-bind="click: clicked_on_toggle_camera, css: {'video-element-dark': show_remote_participant()"
+                                params="index: current_device_index.video_input,
+                                        length: number_of_video_devices,
+                                        type: z.calling.enum.MediaDeviceType.VIDEO_INPUT"></device-toggle-button>
+        <!-- /ko -->
+        <!-- ko if: show_switch_screen()-->
+          <device-toggle-button class="video-toggle-button hide-controls-hidden"
+                                data-bind="click: clicked_on_toggle_screen, css: {'video-element-dark': show_remote_participant()"
+                                params="index: current_device_index.screen_input,
+                                        length: number_of_screen_devices,
+                                        type: z.calling.enum.MediaDeviceType.SCREEN_INPUT"></device-toggle-button>
+        <!-- /ko -->
+      </div>
+    <!-- /ko -->
+  <!-- /ko -->
+</div>

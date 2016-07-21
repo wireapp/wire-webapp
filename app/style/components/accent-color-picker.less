@@ -1,0 +1,66 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+accent-color-picker {
+  .clear;
+  display: block;
+  width: 100%;
+}
+
+.accent-color-picker-segment {
+  display: flex;
+  float: left;
+  width: calc(100% / 7);
+  height: @accent-color-picker-height;
+  cursor: pointer;
+
+  &.accent-color-1 > div { background-color: @accent_colors-1; border-color: @accent_colors-1 }
+  &.accent-color-2 > div { background-color: @accent_colors-2; border-color: @accent_colors-2 }
+  &.accent-color-3 > div { background-color: @accent_colors-3; border-color: @accent_colors-3 }
+  &.accent-color-4 > div { background-color: @accent_colors-4; border-color: @accent_colors-4 }
+  &.accent-color-5 > div { background-color: @accent_colors-5; border-color: @accent_colors-5 }
+  &.accent-color-6 > div { background-color: @accent_colors-6; border-color: @accent_colors-6 }
+  &.accent-color-7 > div { background-color: @accent_colors-7; border-color: @accent_colors-7 }
+
+  &.hover .circle,
+  &:hover .circle,
+  &.selected .circle {
+    .circle(@accent-color-picker-height);
+    transition-property: transform;
+    transition-timing-function: @ease-out-expo;
+    transition-duration: @animation-timing-fast;
+    background-color: transparent;
+    border-width: @accent-color-picker-line-height;
+    border-style: solid;
+    margin: 0;
+  }
+
+  .circle {
+    width: @accent-color-picker-height;
+  }
+
+  .spacer {
+    &:not(.circle) {
+      flex: 1 1;
+    }
+    height: @accent-color-picker-line-height;
+    margin-top: @accent-color-picker-spacing;
+    margin-bottom: @accent-color-picker-spacing;
+  }
+}

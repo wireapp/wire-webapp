@@ -1,0 +1,57 @@
+<div id="archive" class="archive">
+  <div class="archive-header">
+    <span class="label-bold-xs" data-bind="l10n_text: z.string.conversation_list_popover_archive"></span>
+    <span class="archive-header-close-button button-icon-large icon-close" data-uie-name="do-close-archive" data-bind="click: click_on_close_archive"></span>
+  </div>
+  <div class="conversation-list-center">
+    <ul class="conversation-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_archived">
+      <!-- ko foreach: conversations_archived -->
+        <li class="conversation-list-item">
+          <div class="left-column">
+            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.UNREAD -->
+              <span data-bind="unread_indicator: number_of_unread_messages" data-uie-name="status-unread"></span>
+            <!-- /ko -->
+            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.PING -->
+              <span class="icon-ping text-theme" data-uie-name="status-unread"></span>
+            <!-- /ko -->
+            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.HOT_PING -->
+              <span class="icon-ping-hot text-theme" data-uie-name="status-unread"></span>
+            <!-- /ko -->
+            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.CONNECT -->
+              <span class="dot-md dot-outlined border-theme" data-uie-name="status-unread"></span>
+            <!-- /ko -->
+            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.MISSED_CALL -->
+              <!-- ko if: is_one2one() -->
+                <svg fill="#fff" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" data-uie-name="status-unread">
+                  <circle opacity=".16" cx="9" cy="9" r="9"></circle>
+                  <circle cx="9" cy="9" r="3"></circle>
+                  <circle opacity=".32" cx="9" cy="9" r="6"></circle>
+                </svg>
+              <!-- /ko -->
+              <!-- ko if: is_group() -->
+                <svg fill="#fff" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 17c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0 1c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9-4.03 9-9 9z" opacity=".32"></path>
+                  <path d="M9 14c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 1c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z" opacity=".72"></path>
+                  <path d="M9 11c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm0 1c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"></path>
+                </svg>
+              <!-- /ko -->
+            <!-- /ko -->
+          </div>
+          <div class="center-column"
+               data-bind="attr: {'data-uie-uid': id, 'data-uie-value': display_name}, click: $root.click_on_archived_conversation, text: display_name()"
+               data-uie-name="item-conversation-archived"></div>
+          <div class="right-column">
+              <span class="button-icon icon-more"
+                    data-bind="attr: {'id': 'options-' + id}, click: $root.click_on_actions, l10n_tooltip: z.string.tooltip_conversation_list_more"
+                    data-bubble="#actions-bubble"
+                    data-placement="right-flex"
+                    data-uie-name="go-options"></span>
+              <span class="icon-silence"
+                    data-bind="css: {'conversation-muted': is_muted()}"
+                    data-uie-name="status-silence"></span>
+          </div>
+        </li>
+      <!-- /ko -->
+    </ul>
+  </div>
+</div>

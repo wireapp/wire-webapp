@@ -1,0 +1,55 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@keyframes content-incoming {0%{ opacity: 0; transform: translate(24px, 0); } 100%{ opacity: 1; transform: translate(0, 0);}}
+@keyframes loading-spinner-fade-in {0%{ opacity: 0; } 99%{ opacity: 0; } 100%{ opacity: 1;}}
+
+.conversation {
+  .full-screen;
+}
+
+.conversation-loading {
+  .full-screen;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation-name: loading-spinner-fade-in;
+  animation-duration: 1s;
+  max-width: @conversation-max-width;
+}
+
+.conversation-verified {
+  align-items: center;
+  display: flex;
+  height: 16px;
+  justify-content: flex-end;
+  margin-right: 24px;
+  margin-top: 24px;
+  pointer-events: none;
+}
+
+.conversation-verified-icon {
+  margin-left: 12px;
+}
+
+.content-animation-incoming {
+  animation-name: content-incoming;
+  animation-duration: @animation-timing-slow;
+  animation-timing-function: @ease-out-expo;
+}

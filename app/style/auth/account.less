@@ -1,0 +1,132 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+#section-account {
+  .selector-mode {
+    border-bottom: 1px solid fade(#fff, 88%);
+    margin-bottom: 24px;
+
+    .btn-mode {
+      background-color: transparent;
+      font-weight: 600;
+      padding: 0 8px;
+      width: 100%;
+    }
+  }
+
+  .selector-mode:after {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid fade(#fff, 88%);
+    content: "";
+    margin-left: 72px;
+    height: 0;
+    width: 0;
+  }
+
+  .selector-mode-login:after {
+    margin-left: 232px;
+  }
+
+  .platform-web & .spacer {
+    min-height: 32px;
+  }
+
+  #form-account-login {
+    .selector-method {
+      opacity: 0; /* TODO: remove when re-enabling phone login */
+      height: 0px; /* TODO: reset to 24px when re-enabling phone login */
+      margin: 0 72px 24px 72px;
+
+      .btn-method {
+        background-color: transparent;
+        color: fade(#fff, 64%);
+        font-weight: 600;
+        height: 24px;
+        line-height: 22px;
+        width: 80px;
+      }
+
+      .is-active {
+        border-color: fade(#fff, 92%);
+        border-radius: 12px;
+        color: #fff;
+      }
+    }
+
+    #login-method-email {
+      .checkbox {
+        height: 24px;
+        margin: 16px 4px;
+      }
+
+      .expired-info {
+        display: inline-block;
+        font-size: 13px;
+        font-weight: 400;
+        height: 24px;
+        line-height: 24px;
+        margin: 12px 0 24px;
+      }
+    }
+
+    #login-method-phone {
+      #wire-login-country-code {
+        border-right: 1px solid fade(#fff, 40%);
+        flex: 0 0 auto;
+        text-align: center;
+        padding: 0;
+        width: 72px;
+      }
+
+      #wire-login-phone {
+        border-left: 0;
+      }
+    }
+  }
+
+  #form-account-register {
+    .column-terms-of-use {
+      align-items: center;
+      display: flex;
+      height: 40px;
+    }
+
+    .checkbox-terms-of-use {
+      label {
+        &::after,
+        &::before {
+          color: #fff;
+        }
+      }
+
+      &.input-error {
+        label {
+          &::after,
+          &::before {
+            border: 2px solid #febf02;
+            border-radius: 4px;
+            top: -2px;
+            left: -2px;
+          }
+        }
+      }
+    }
+  }
+}

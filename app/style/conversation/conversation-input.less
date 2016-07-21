@@ -1,0 +1,85 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.conversation-input {
+  display: flex;
+  box-sizing: content-box;
+  position: absolute;
+  width: 100%;
+  min-height: @conversation-input-min-height;
+  bottom: 0;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.conversation-input-separator {
+  border-top: 1px solid fade(@graphite, 12%);
+}
+
+.conversation-input-text {
+  .accent-selection-color;
+  .custom-scrollbar;
+  .reset-textarea;
+  flex: 1 1;
+  line-height: @conversation-input-line-height;
+  letter-spacing: inherit;
+  height: @conversation-input-line-height;
+  margin-bottom: (@conversation-input-min-height - @conversation-input-line-height) / 2;
+  margin-top: (@conversation-input-min-height - @conversation-input-line-height) / 2;
+  min-height: @conversation-input-line-height;
+  max-height: @conversation-input-max-height;
+  max-width: @conversation-max-width - @conversation-message-sender-width - @conversation-message-timestamp-width;
+  overflow: hidden;
+  text-rendering: optimizeLegibility;
+
+  &::placeholder {
+    .label-xs;
+    color: fade(@graphite, 48%);
+    padding-left: 8px;
+  }
+}
+
+.controls-left {
+  width: @conversation-message-sender-width;
+  height: @conversation-input-min-height;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.controls-center {
+  flex: 1 1;
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.controls-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: @conversation-message-timestamp-width;
+}
+
+.controls-right-button {
+  flex: 0 0 auto;
+  margin-left: 12px;
+  margin-right: 12px;
+}

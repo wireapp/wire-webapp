@@ -1,0 +1,196 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.search-list {
+  .search-list-sm& {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+.search-list-item {
+  cursor: pointer;
+  margin-bottom: 16px;
+  overflow: hidden;
+
+  .search-list-sm & {
+    text-align: center;
+
+    &:nth-child(3n) {
+      margin-right: 0;
+    }
+  }
+
+  .search-list-md &,
+  .search-list-lg & {
+    display: flex;
+  }
+
+  .search-list-lg & {
+    height: 56px;
+    margin: 0;
+  }
+
+  .search-list-lg &.hover,
+  .search-list-lg &:hover {
+    .search-list-item-connect {
+      // fade in
+      transition-property: opacity;
+      transition-duration: @animation-timing-slow;
+      transition-timing-function: @ease-out-quart;
+      transition-delay: @animation-timing-faster + 0.05;
+      opacity: 1;
+      width: 48px;
+    }
+  }
+  .search-list-lg &:not(.hover):not(:hover) {
+    .search-list-item-connect {
+      // fade out
+      transition-property: opacity, width;
+      transition-duration: @animation-timing-fast, 0s;
+      transition-delay: 0s, @animation-timing-fast;
+      transition-timing-function: @ease-out-quart, linear;
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+  }
+
+  &.search-list-item-collapse {
+    .list-item-collapse();
+  }
+}
+
+.search-list-item-image {
+
+  .search-list-sm & {
+    margin-bottom: 3px;
+  }
+
+  .search-list-md &,
+  .search-list-lg & {
+    flex: 0 0 auto;
+    height: @avatar-diameter-sm;
+    position: relative;
+  }
+}
+
+.search-list-item-image-overlay {
+  .full-screen();
+  align-items: center;
+  justify-content: center;
+  display: flex;
+
+  .background {
+    .full-screen();
+    border-radius: 50%;
+    opacity: 0;
+  }
+
+  .checkmark {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+
+  .search-list-item-connect-anim & {
+
+    .background {
+      // fade int
+      transition-property: opacity;
+      transition-duration: @animation-timing-fast;
+      transition-timing-function: @ease-out-quart;
+      opacity: .64;
+    }
+
+    .checkmark {
+      transition-property: transform, opacity;
+      transition-delay: .1s;
+      transition-duration: @animation-timing-slow;
+      transition-timing-function: @ease-out-back;
+      transform: scale(1);
+      opacity: 1;
+    }
+
+  }
+}
+
+.search-list-item-content {
+  align-items: flex-start;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+
+  .search-list-sm & {
+    width: @avatar-diameter-md;
+  }
+
+  .search-list-md &,
+  .search-list-lg & {
+    flex: 1 1;
+    height: @avatar-diameter-sm;
+    margin-left: 16px;
+    min-width: 0; // this will ensure that ellipses is working
+  }
+}
+
+.search-list-item-content-name {
+  .ellipsis;
+  width: 100%;
+
+  .search-list-sm & {
+    .label-xs();
+  }
+}
+
+.search-list-item-content-info {
+  display: none;
+
+  .search-list-lg & {
+    .ellipsis;
+    font-size: @font-size-xs;
+    color: fade(#fff, 56%);
+    display: block;
+    height: 17px;
+    width: 100%;
+  }
+}
+
+.search-list-item-connect {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  height: @avatar-diameter-sm;
+
+  > .icon-button {
+    margin-left: 8px;
+  }
+}
+
+.search-list-item-header {
+  .ellipsis;
+  height: @avatar-diameter-sm;
+  line-height: @avatar-diameter-sm;
+  margin-left: 16px;
+  max-width: 184px;
+}
+
+.search-list-theme-black .image.state-badge:before {
+  background-color: #000;
+  color: #fff;
+}

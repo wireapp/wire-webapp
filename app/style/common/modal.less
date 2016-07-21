@@ -1,0 +1,157 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.modal {
+  z-index: @z-index-modal;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &:before {
+    position: fixed;
+  }
+
+  .modal-header {
+    .icon-close {
+      margin-top: 4px;
+    }
+  }
+
+  .modal-content {
+    cursor: default;
+    margin: auto; // http://stackoverflow.com/questions/24538100/issue-when-centering-vertically-with-flexbox-when-heights-are-unknown
+    padding: @settings-modal-padding;
+    position: relative;
+    width: 384px;
+
+    a.close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      width: 100% !important;
+      min-height: 100% !important;
+      border-radius: 0;
+    }
+
+    header {
+      .text-center;
+      position: relative;
+      line-height: @settings-modal-line-height;
+      margin-bottom: @settings-modal-line-height;
+    }
+
+    section {
+      display: flex;
+      font-size: @font-size-xs;
+      padding-bottom: 24px;
+
+      &:not(:first-child) {
+        padding-top: 24px;
+      }
+      &:not(:last-child) {
+        border-bottom: 1px solid @seperator-color;
+      }
+    }
+  }
+
+  .modal-title {
+    font-weight: 600;
+    line-height: @line-height-lg;
+    margin-bottom: 16px;
+    padding-right: 48px;
+  }
+
+  .modal-text {
+    line-height: @line-height-lg;
+    margin-bottom: 16px;
+    padding-right: 32px;
+  }
+
+  .modal-option {
+    .modal-option-checkbox {
+      margin-right: 4px;
+    }
+    padding-right: 32px;
+  }
+
+  .modal-footer {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+
+    .button {
+      &:not(:last-child) {
+        margin-right: 16px;
+      }
+    }
+  }
+
+  .modal-button-close {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+  }
+}
+
+.modal-large {
+
+  .modal-content {
+    width: 540px;
+  }
+
+  .modal-header {
+    margin-bottom: 24px;
+    min-height: 16px;
+  }
+
+  .modal-center {
+    height: 304px;
+    margin-left: -24px;
+    margin-right: -24px;
+    position: relative;
+  }
+
+  .modal-footer {
+    height: 72px;
+    margin-bottom: -24px;
+
+    .button {
+      width: 210px;
+    }
+  }
+}
+
+// custom modal classes
+.modal-logout-checkbox {
+  margin-bottom: 16px;
+}
+
+.modal-connected-devices {
+  .label-xs;
+  line-height: @line-height-sm;
+  margin-bottom: 16px;
+
+  & div:nth-child(even) {
+    margin-bottom: 16px;
+  }
+}

@@ -1,0 +1,8 @@
+<!-- ko if: $root.conversation_repository.active_conversation().is_verified() -->
+  <div class="conversation-verified">
+    <span class="label-xs" data-bind="l10n_text: z.string.conversation_verified"></span>
+    <svg class="conversation-verified-icon" width="16" height="16">
+      <use xlink:href="#icon-verified"></use>
+    </svg>
+  </div>
+<!-- /ko -->

@@ -1,0 +1,68 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+link-preview-asset {
+  cursor: pointer;
+  display: block;
+  margin-top: 16px;
+  position: relative;
+}
+
+.link-preview-icon {
+  left: -@conversation-message-sender-width;
+  line-height: @line-height-lg;
+  position: absolute;
+  text-align: center;
+  width: 72px;
+}
+
+.link-preview-title {
+  .label-semibold;
+  font-size: @font-size-sm;
+  line-height: @line-height-lg;
+}
+
+.link-preview-site {
+  .label-xs;
+  color: @graphite-dark;
+  display: block;
+  line-height: @line-height-lg;
+  -webkit-user-select: initial;
+}
+
+.link-preview-image {
+  .asset-container-style;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  width: 480px;
+  height: 160px;
+  margin-top: 8px;
+  overflow: hidden;
+
+  &:not(.image-loading) {
+    .three-dots { display: none}
+
+    > img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}

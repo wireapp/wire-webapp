@@ -1,0 +1,286 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+
+user-profile {
+  .bubble-content();
+  color: @graphite-dark;
+}
+
+// TODO: make generic shift classes
+.user-profile-transition {
+  .hardware-acc();
+  height: 100%;
+  transition-property: transform;
+  transition-duration: @animation-timing-fast;
+  // TODO: timing function
+
+  &.user-profile-transition-push {
+    transform: translateX(-@bubble-transition_offset);
+  }
+}
+
+.user-profile-default {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.user-profile-device-detail {
+  position: absolute;
+  top: 0;
+  right: -@bubble-transition_offset;
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  line-height: @line-height-lg;
+}
+
+// user-profile-default
+.user-profile-header {
+  padding-top: 21px;
+  padding-left: 56px;
+  padding-right: 56px;
+  text-align: center;
+
+  > .user-profile-back-button {
+    .single-user-mode & {
+      display: none;
+    }
+  }
+
+  > .name,
+  > .email {
+    .ellipsis;
+    position: relative;
+  }
+
+  > .email {
+    display: block;
+    text-decoration: none;
+  }
+}
+
+.user-profile-user-verified {
+  position: absolute;
+  top: 24px;
+  right: 18px;
+}
+
+.user-profile-tabs {
+  border-bottom: 1px solid @seperator-color;
+  color: @graphite;
+  cursor: pointer;
+  display: flex;
+  line-height: 40px;
+  position: relative;
+
+  &:after {
+    background-color: #fff;
+    border-right: 1px solid @seperator-color;
+    border-top: 1px solid @seperator-color;
+    bottom: 0;
+    content: " ";
+    display: block;
+    height: 7px;
+    position: absolute;
+    transform: rotate(-45deg) translate(-50%,25%);
+    width: 7px;
+  }
+
+  &[data-tab-index='0'] {
+    &:after {left: calc(100% * .25);}
+    & .user-profile-tab:nth-child(1) {color: @graphite-dark;}
+  }
+  &[data-tab-index='1'] {
+    &:after {left: calc(100% * .75);}
+    & .user-profile-tab:nth-child(2) {color: @graphite-dark;}
+  }
+}
+
+.user-profile-tab {
+  .label-xs;
+  cursor: pointer;
+  text-align: center;
+  width: 50%;
+}
+
+.user-profile-details {
+  align-items: center;
+  display: flex;
+  flex: 1 1;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.user-profile-devices {
+  flex: 1 1;
+  margin-bottom: 16px;
+  margin-right: -16px;
+  overflow-y: scroll;
+  padding-top: 16px;
+  padding-left: 16px;
+  padding-right: 32px;
+
+  // scroll borders thanks to http://lea.verou.me/2012/04/background-attachment-local/
+  background: linear-gradient(fade(#fff, 0%), #fff) 0 100%, linear-gradient(fade(#000, 8%), fade(#000, 8%)) 0 100%;
+  background-repeat: no-repeat;
+  background-size: 100% 25px, 100% 1px;
+  background-attachment: local, scroll;
+}
+
+.user-profile-device {
+  padding-top: 16px;
+  padding-bottom: 16px;
+  padding-left: 40px;
+  position: relative;
+  width: 100%;
+
+  & + & {
+    border-top: 1px solid @seperator-color;
+  }
+
+  &:first-child {
+    margin-top: 8px;
+  }
+}
+
+.user-profile-device-verified {
+  position: absolute;
+  left: 8px;
+}
+
+  // user avatar
+.user-profile-avatar {
+  .square(168px);
+}
+
+.user-profile-contacts {
+  margin-top: 24px;
+}
+
+.user-profile-avatar + .user-profile-contacts[data-contacts="0"] {
+  margin-top: 0;
+}
+
+.user-profile-footer {
+  padding-bottom: 18px;
+  padding-left: 18px;
+  padding-right: 18px;
+
+  > .footer-controls-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+
+    .button:first-child {
+      margin-right: 16px;
+    }
+  }
+
+  > .footer-connection-request {
+    .label-bold-xs;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  > .footer-connection-request {
+    height: @bubble-footer-height - 4px;
+    margin-top: 2px;
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+  }
+}
+
+.user-profile-device-message {
+  font-size: @font-size-xs;
+  line-height: @line-height-sm;
+  margin-left: 8px;
+  margin-right: 12px;
+}
+
+
+.user-profile-device-detail-message {
+  font-size: @font-size-xs;
+  line-height: @line-height-sm;
+  margin-right: 12px;
+}
+
+.user-profile-device-detail-highlight {
+  font-weight: 600;
+}
+
+.user-profile-my-device-button {
+  line-height: 28px;
+}
+
+.user-profile-device-detail-card {
+  margin-top: 16px;
+  margin-bottom: 16px !important;
+}
+
+.user-profile-device-detail-fingerprint {
+  margin-bottom: 16px;
+}
+
+.user-profile-device-detail-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.user-profile-top-right-button {
+  position: absolute;
+  right: 18px;
+  top: 18px;
+}
+
+// my fingerprint
+.user-profile-my-fingerprint {
+  justify-content: flex-end !important;
+  line-height: 24px;
+}
+
+// common
+.user-profile-back-button {
+  position: absolute;
+  left: 18px;
+  top: 18px;
+}
+
+// reset session
+.user-profile-device-reset {
+  position: relative;
+}
+
+.user-profile-device-reset-spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+}
+

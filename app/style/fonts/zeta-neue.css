@@ -1,0 +1,215 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@font-face {
+  font-family: 'Wire';
+  src: url('/font/Wire.ttf?180716') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'Wire' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-plus:before {
+  content: "\e100";
+}
+.icon-minus:before {
+  content: "\e101";
+}
+.icon-check:before {
+  content: "\e102";
+}
+.icon-close:before {
+  content: "\e603";
+}
+.icon-block:before {
+  content: "\e104";
+}
+.icon-back:before {
+  content: "\e110";
+}
+.icon-forward:before {
+  content: "\e111";
+}
+.icon-down:before {
+  content: "\e113";
+}
+.icon-undo:before {
+  content: "\e116";
+}
+.icon-reload:before {
+  content: "\e117";
+}
+.icon-grid:before {
+  content: "\e123";
+}
+.icon-more:before {
+  content: "\e125";
+}
+.icon-spinner:before {
+  content: "\e126";
+}
+.icon-info:before {
+  content: "\e127";
+}
+.icon-play:before {
+  content: "\e131";
+}
+.icon-pause:before {
+  content: "\e132";
+}
+.icon-ping:before {
+  content: "\e137";
+}
+.icon-exit-fullscreen:before {
+  content: "\e138";
+}
+.icon-fullscreen:before {
+  content: "\e139";
+}
+.icon-people:before {
+  content: "\e142";
+}
+.icon-camera:before {
+  content: "\e143";
+}
+.icon-shutter:before {
+  content: "\e144";
+}
+.icon-library:before {
+  content: "\e145";
+}
+.icon-movie:before {
+  content: "\e146";
+}
+.icon-location:before {
+  content: "\e148";
+}
+.icon-chat:before {
+  content: "\e150";
+}
+.icon-file:before {
+  content: "\e152";
+}
+.icon-attachment:before {
+  content: "\e154";
+}
+.icon-speaker:before {
+  content: "\e158";
+}
+.icon-microphone:before {
+  content: "\e160";
+}
+.icon-mute:before {
+  content: "\e159";
+}
+.icon-notification:before {
+  content: "\e161";
+}
+.icon-silence:before {
+  content: "\e162";
+}
+.icon-search:before {
+  content: "\e163";
+}
+.icon-settings:before {
+  content: "\e164";
+}
+.icon-pending:before {
+  content: "\e165";
+}
+.icon-link:before {
+  content: "\e167";
+}
+.icon-envelope:before {
+  content: "\e172";
+}
+.icon-edit:before {
+  content: "\e177";
+}
+.icon-view:before {
+  content: "\e185";
+}
+.icon-trash:before {
+  content: "\e186";
+}
+.icon-trash-small:before {
+  content: "\e1860";
+}
+.icon-download:before {
+  content: "\e197";
+}
+.icon-download-small:before {
+  content: "\e1970";
+}
+.icon-leave:before {
+  content: "\e205";
+}
+.icon-error:before {
+  content: "\e208";
+}
+.icon-call:before {
+  content: "\e211";
+}
+.icon-archive:before {
+  content: "\e212";
+}
+.icon-people-add:before {
+  content: "\e215";
+}
+.icon-gif:before {
+  content: "\e219";
+}
+.icon-end-call:before {
+  content: "\e222";
+}
+.icon-sysmsg-error:before {
+  content: "\e225";
+}
+.icon-video:before {
+  content: "\e226";
+}
+.icon-screensharing:before {
+  content: "\e227";
+}
+.icon-video-off:before {
+  content: "\e231";
+}
+.icon-checkbox:before {
+  content: "\e600";
+}
+.icon-checkbox-checked:before {
+  content: "\e601";
+}
+.icon-contacts:before {
+  content: "\e602";
+}

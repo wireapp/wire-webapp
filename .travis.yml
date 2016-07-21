@@ -1,0 +1,42 @@
+# http://docs.travis-ci.com/user/workers/container-based-infrastructure/
+sudo: required
+dist: trusty
+
+# https://docs.travis-ci.com/user/installing-dependencies/#Installing-Packages-with-the-APT-Addon
+addons:
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
+
+# http://docs.travis-ci.com/user/languages/javascript-with-nodejs/
+language: node_js
+node_js:
+  - node
+
+# https://blog.travis-ci.com/2013-12-05-speed-up-your-builds-cache-your-dependencies
+cache:
+  directories:
+    - bower_components
+    - node_modules
+
+env:
+  global:
+    # RAYGUN_USERNAME
+    - secure: "xMiUg9p7HCDUarPgsb5CVuTTnYWAZfJf1a8AJA0WKLg1XY3hN/CayYE4jxor+hW2GZVhAeUFPHJXo0OpF9yhXdspVG4i6p/ZAq97N2rlGIHXngTGp6J3pCRtC1wIJqG9g45lST84IfrP0yqnMcY2rnQkE0ZbY9Qn4gIvCEjXJpzA8aI4Lqr/K/LI3cYdnlgPu0s9E2I/Kl0ZenDqD9W0TFyufWNXzH8HqyrEw7UjRM9d8oosYydM5bNmW4oCrMrLMDcqbwC8PPvJUrJKt8tubDuqDDNVECiSE2Rz8FPA3r017heQOOGinzAiUkMVHlJEdcPxBViPhGE6BN10QC1vR6uxaM/9UBIUodLfculzhZ5xcHYgEVHC1w4M5+zoa4F8iecUMMwT1+qC6Na/apTpUNy+OLguK4Se7dTKtfd4+FTbWZANI8xT5duVNnJ//rH6U06OpXDKNvWlYyGl2zZr0gcTXGqxKU+7kVjNZa1k6ltOgy86pTm4VAOLBGfqUbSwRVhW3aqJKS/yjsAkT9oLKuB3T0osVPcsSxS4MmODUmUazr7UMZr8t2S0L0v0NE/Q1I+gykqEzV8ecd9s6RXaWQiwZXgSjMe3UR3qrFO+r1fbwXIo45biPyd1rDFR1Y/dPHxDCPOV6fXjWXp68r5d9tcZTc6xjU1vgoplJfxAyhA="
+    # RAYGUN_PASSWORD
+    - secure: "29BtoWU0D68HVLqJ5iG3QNs+B2ytaZsTRsgW5T0WBCWS8b4cOOFLjwQHh5f+Qr0oPjU+cwQ0Sequ9wzGK882lhoT5SyddURhnj2CxWko0zmeNst2YpjEEdrgvtqQMGG+SXizjG9gcPcf52mF0du7LdICh1pN5HZMVckPD02t4+quZn0SpwdvQSCdWtivSNSenguhdJg9z6ulKKJUV3nqvdJsSAC48q9awEfc59dvo8nf7v44bTlIcqGkiCMpR2pxPXjwOvogWQcUZvd2onSZvtOJWOega5iAc0PvSs9p2eLpY82lQSlvsLxaytSiQw50rDLYi1p4ouUn//DUH0Ir8A3g57MRzXkMLs1JDXOJyTbPgLkOdB/TmlryQ2iT0XnHp4ncjWrWjmgQPDKizk7HFeSvMPKjo9V2F46FwXClq1b/U1jP5PVOQHwtujVVmp9CXvBedz1SLaY2GIe0uLexFis1P5UZSCmtP/GpnO47JIguYU43Xkre2hdn1pnpCHiDv4xWISfinBZa+gncjAEodKkApysx48cK6nbZ8HLPnMGDk04oZO+zFz2IprkkefdoKJ32J6BnBtQqmJAXwPaC+AiIEcHWTbHRtZM0NvaxsQFB/MPCy+A2H1amC63wE/CJZbGf2sNQZCNUwsFq8awRxHt8frSS/9Rw+Wg6jDMZp+w="
+
+# http://docs.travis-ci.com/user/gui-and-headless-browsers
+before_install:
+  - export CHROME_BIN=/usr/bin/google-chrome
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+
+# http://docs.travis-ci.com/user/pull-requests/
+script:
+  - npm test
+
+notifications:
+  email: false

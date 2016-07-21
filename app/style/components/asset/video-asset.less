@@ -1,0 +1,110 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@keyframes loading {
+  to { transform: rotate(360deg); }
+}
+
+// Video asset component
+video-asset {
+  .asset-container-style;
+  display: block;
+  margin-top: 16px;
+  position: relative;
+
+  &:after {
+    content: "";
+    display: block;
+    padding-bottom: 75%; // video ratio 4:3
+  }
+}
+
+.video-asset-placeholder {
+  .full-screen;
+  align-items: center;
+  color: @seperator-color;
+  display: flex;
+  font-size: @font-size-xl;
+  justify-content: center;
+  z-index: -1;
+}
+
+.video-playback-error {
+  .full-screen;
+  align-items: center;
+  background-color: fade(@graphite-dark, 40%);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+}
+
+.video-asset-container {
+  .full-screen();
+
+  video {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// Video controls center
+.video-controls-center {
+  .full-screen();
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// Video controls bottom bar
+.video-controls-bottom {
+  align-items: center;
+  bottom: 0;
+  color: #fff;
+  display: flex;
+  height: 56px;
+  padding-left: 24px;
+  padding-right: 24px;
+  position: absolute;
+  width: 100%;
+
+  &:before {
+    .full-screen;
+    content: "";
+    background: linear-gradient(to bottom, fade(#fff, 0), fade(#000, 40%));
+    z-index: -1;
+  }
+}
+
+.video-controls-time {
+  width: 56px;
+  text-align: center;
+}
+
+.video-controls-seekbar {
+  margin-left: 24px;
+  margin-right: 24px;
+}
+
+&.hide-controls {
+  .video-controls-bottom,
+  .media-button-pause {
+    opacity: 0;
+    transition: opacity @animation-timing-fast ease-in-out;
+  }
+}

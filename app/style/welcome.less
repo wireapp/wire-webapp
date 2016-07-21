@@ -1,0 +1,56 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+@keyframes welcome-fade-in { 0%{ opacity: 0; transform: translateX(32px); } 100%{ opacity: 1; transform: translateY(0);}}
+
+.welcome {
+  .full-screen;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.welcome-inner {
+  animation-name: welcome-fade-in;
+  animation-duration: @animation-timing-slow;
+  animation-timing-function: @ease-out-expo;
+  animation-delay: @animation-timing-fast;
+  animation-fill-mode: forwards;
+  width: 320px;
+  opacity: 0;
+}
+
+.welcome-text {
+  font-size: 40px;
+  font-weight: 200;
+  line-height: 48px;
+  margin-bottom: 40px;
+}
+
+.welcome-button {
+
+  & + & {
+    margin-top: 16px;
+  }
+
+  > svg {
+    margin-top: 10px;
+  }
+}

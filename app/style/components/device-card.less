@@ -1,0 +1,68 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+device-card {
+  display: flex;
+  position: relative;
+
+  &:not(:last-child) {
+    margin-bottom: 8px;
+  }
+
+  &:not(.device-card-no-hover) {
+    cursor: pointer;
+
+    &:after {
+      .icon-mixin("\e111");
+      color: @graphite;
+      pointer-events: none;
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%) scale(.5);
+    }
+  }
+}
+
+.device-status {
+  width: 24px;
+}
+
+.device-info {
+  line-height: @line-height-sm;
+  padding-right: 16px;
+  width: 100%;
+}
+
+.device-label,
+.device-model {
+  font-weight: 600;
+}
+
+.device-id-part {
+  display: inline-block;
+
+  &+& {
+    margin-left: 4px;
+  }
+
+  &:nth-child(odd) {
+    font-weight: 600;
+  }
+}

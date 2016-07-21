@@ -1,0 +1,168 @@
+{
+  "name": "wire-webapp",
+  "dependencies": {
+    "amplify": "https://github.com/wireapp/amplify.git#1.1.4",
+    "antiscroll-2": "https://github.com/welovecoding/antiscroll-2.git#1.2.7",
+    "cryptobox": "https://github.com/wireapp/cryptobox-bower.git#v1.0.5",
+    "cryptojs": "http://crypto-js.googlecode.com/files/CryptoJS%20v3.1.2.zip",
+    "highlight.js": "https://github.com/isagalaev/highlight.js.git#9.4.0",
+    "dexie": "https://github.com/dfahlander/Dexie.js.git#1.4.1",
+    "generic-message-proto": "https://github.com/wireapp/generic-message-proto.git#1.11.0",
+    "iframeTracker-jquery": "https://github.com/vincepare/iframeTracker-jquery.git#1.1.0",
+    "jquery": "https://github.com/jquery/jquery.git#2.1.4",
+    "keyboardjs": "https://github.com/RobertWHurst/KeyboardJS.git#2.2.1",
+    "knockout": "https://github.com/knockout/knockout.git#3.4.0",
+    "moment": "https://github.com/moment/moment.git#2.13.0",
+    "normalize-css": "https://github.com/necolas/normalize.css.git#3.0.3",
+    "object-hash": "https://github.com/puleos/object-hash.git#1.1.2",
+    "pako": "https://github.com/nodeca/pako.git#1.0.1",
+    "phone-format": "https://github.com/albeebe/phoneformat.js.git#v1.0.3",
+    "platform.js": "https://github.com/bestiejs/platform.js.git#0870795f0c277a33cc2078a96e74434f89aa11d8",
+    "protobuf": "https://github.com/gregor/protobuf.js.git#32ada41d3c963bd5f43d7cdadced2d6d2ccd082a",
+    "raygun4js": "https://github.com/MindscapeHQ/raygun4js.git#2.3.2",
+    "soundmanager2": "https://github.com/scottschiller/SoundManager2.git#V2.97a.20150601",
+    "twitter-text": "https://github.com/twitter/twitter-text.git#v1.13.4",
+    "uint32": "https://github.com/fxa/uint32.js.git#0.2.1",
+    "underscore": "https://github.com/jashkenas/underscore.git#1.8.3",
+    "uuid": "https://github.com/LiosK/UUID.js.git#v3.3.0",
+    "wire-audio-files": "https://github.com/wireapp/wire-audio-files.git#1.0.0",
+    "webapp-module-bubble": "https://github.com/wireapp/webapp-module-bubble.git#1.0.0",
+    "webapp-module-external": "https://github.com/wireapp/webapp-module-external.git#1.0.0",
+    "webapp-module-image-compressor": "https://github.com/wireapp/webapp-module-image-compressor.git#1.0.0",
+    "webapp-module-image-rotation": "https://github.com/wireapp/webapp-module-image-rotation.git#1.0.0",
+    "webapp-module-logger": "https://github.com/wireapp/webapp-module-logger.git#1.0.0",
+    "webapp-module-modal": "https://github.com/wireapp/webapp-module-modal.git#1.0.0",
+    "webapp-module-namespace": "https://github.com/wireapp/webapp-module-namespace.git#1.0.0",
+    "webrtc-adapter": "https://github.com/webrtc/adapter.git#gh-pages",
+    "wire-theme": "https://github.com/wireapp/wire-theme.git#9174e3b09902c8768420b34e68995b0e27c96e4c"
+  },
+  "exportsOverride": {
+    "amplify": {
+      "js": "lib/amplify.js"
+    },
+    "antiscroll-2": {
+      "css": "dist/antiscroll-2.css",
+      "js": "dist/antiscroll-2.js"
+    },
+    "blueimp-canvas-to-blob": {
+      "js": "js/canvas-to-blob.js"
+    },
+    "blueimp-load-image": {
+      "js": "js/load-image.min.js"
+    },
+    "bytebuffer": {
+      "js": "dist/ByteBufferAB.js"
+    },
+    "cryptobox": {
+      "js": "dist/cryptobox.js"
+    },
+    "cryptojs" : {
+      "js/": [
+        "components/core.js",
+        "components/cipher-core.js",
+        "components/lib-typedarrays.js",
+        "components/md5.js",
+        "components/enc-base64.js",
+        "components/aes.js",
+        "components/pad-nopadding.js",
+        "components/sha256.js"
+      ]
+    },
+    "dexie": {
+      "js": "dist/dexie.js"
+    },
+    "generic-message-proto": {
+      "proto": "proto/messages.proto"
+    },
+    "highlight.js": {
+      "css": "src/styles/github.css"
+    },
+    "jquery": {
+      "js": "dist/jquery.js"
+    },
+    "iframeTracker-jquery": {
+      "js": "jquery.iframetracker.js"
+    },
+    "jquery-mousewheel": {
+      "js": "jquery.mousewheel.js"
+    },
+    "keyboardjs": {
+      "js": "dist/keyboard.js"
+    },
+    "knockout": {
+      "js": "dist/knockout.debug.js"
+    },
+    "moment": {
+      "js": ["moment.js", "locale/de.js"]
+    },
+    "normalize-css": {
+      "css": "normalize.css"
+    },
+    "object-hash": {
+      "js": "dist/object_hash.js"
+    },
+    "pako": {
+      "js": "dist/pako.min.js"
+    },
+    "phone-format": {
+      "js": "dist/phone-format-global.js"
+    },
+    "platform.js": {
+      "js": "platform.js"
+    },
+    "protobuf": {
+      "js": "dist/protobuf.js"
+    },
+    "raygun4js": {
+      "js": "dist/raygun.vanilla.js"
+    },
+    "soundmanager2": {
+      "js": "script/soundmanager2.js"
+    },
+    "twitter-text": {
+      "js": "js/twitter-text.js"
+    },
+    "uint32": {
+      "js": "uint32.js"
+    },
+    "underscore": {
+      "js": "underscore.js"
+    },
+    "uuid": {
+      "js": "src/uuid.js"
+    },
+    "wire-audio-files": {
+      "audio": "webapp/*"
+    },
+    "webapp-module-external": {
+      "js/": ["modules/*.js", "modules/**/*.js"],
+      "css": "modules/**/*.css"
+    },
+    "webapp-module-image-compressor": {
+      "js/": "dist/js/*.js"
+    },
+    "webapp-module-namespace": {
+      "js/": "js/*.js"
+    },
+    "webapp-module-image-rotation": {
+      "js/": "js/*.js"
+    },
+    "webapp-module-bubble": {
+      "js/": "dist/script/*.js",
+      "less": "app/style/webapp-module-bubble.less"
+    },
+    "webapp-module-logger": {
+      "js/": "dist/js/Logger.js"
+    },
+    "webapp-module-modal": {
+      "js/": "dist/script/*.js",
+      "less": "app/style/webapp-module-modal.less"
+    },
+    "webrtc-adapter": {
+      "js": "adapter-1.4.0.js"
+    },
+    "wire-theme": {
+      "less": "app/style/{wire-theme,variables,input}.less"
+    }
+  }
+}
