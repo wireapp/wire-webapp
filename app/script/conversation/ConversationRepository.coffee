@@ -1035,7 +1035,7 @@ class z.conversation.ConversationRepository
     return new z.proto.MsgDeleted conversation_id, message_id
 
   ###
-  Construct an encrypted message event.
+  Construct an encrypted message event from backend response of outgoing messages.
 
   @private
   @param response [JSON] Backend response
@@ -1046,8 +1046,8 @@ class z.conversation.ConversationRepository
     event =
       data: undefined
       from: @user_repository.self().id
-      time: response.time
-      type: 'conversation.otr-message-add'
+      time: response.time or new Date().toISOString()
+      type: z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD
       conversation: conversation_id
 
     return event
