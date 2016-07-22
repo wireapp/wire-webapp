@@ -20,15 +20,15 @@
 
 module.exports =
   options:
-    accessKeyId: 'AKIAJQUA3OJOZBJZQBYA'
-    secretAccessKey: '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'
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
     region: 'eu-west-1'
 
   default:
     options:
       bucket: 'wire-webapp'
     files: [
-        dest: '/<%= grunt.config("aws.deploy.options.version") %>.zip'
-        src: '<%= dir.aws.s3 %>/ebs.zip'
-        stream: true
-      ]
+      dest: '/<%= grunt.config("aws.deploy.options.version") %>.zip'
+      src: '<%= dir.aws.s3 %>/ebs.zip'
+      stream: true
+    ]
