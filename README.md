@@ -18,6 +18,10 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 
 # How to build the open source client
 
+## Build Status
+
+[![Build Status](https://travis-ci.com/wearezeta/mars.svg?token=SQCPsz4qtNG1rdAhT8fB&branch=dev)](https://travis-ci.com/wearezeta/mars)
+
 ### Requirements
 
 - Install [Node.js](https://nodejs.org/)
