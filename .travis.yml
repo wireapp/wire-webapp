@@ -52,3 +52,5 @@ deploy:
   app: Webapp
   env: wire-webapp-dev
   bucket_name: wire-webapp
+  on:
+    all_branches: true
