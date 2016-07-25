@@ -65,7 +65,7 @@ deploy:
   bucket_name: wire-webapp
   on:
     branch: dev
-	
+
   # https://wire-webapp-staging.zinfra.io/
   provider: elasticbeanstalk
   edge: true
