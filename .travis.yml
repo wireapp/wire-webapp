@@ -38,6 +38,10 @@ before_install:
 notifications:
   email: false
 
+# http://docs.travis-ci.com/user/deployment/
+before_deploy:
+  - npm run deploy-travis-dev
+
 # https://github.com/travis-ci/dpl#elastic-beanstalk
 deploy:
   provider: elasticbeanstalk
