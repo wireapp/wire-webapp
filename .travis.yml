@@ -64,6 +64,7 @@ deploy:
   env: wire-webapp-dev
   bucket_name: wire-webapp
   on:
+    repo: wireapp/wire-webapp
     branch: dev
 
   # https://wire-webapp-staging.zinfra.io/
@@ -80,6 +81,7 @@ deploy:
   env: wire-webapp-staging
   bucket_name: wire-webapp
   on:
+    repo: wireapp/wire-webapp
     branch: staging
 
   # https://wire-webapp-prod-next.wire.com/
@@ -96,6 +98,7 @@ deploy:
   env: wire-webapp-prod-next
   bucket_name: wire-webapp
   on:
+    repo: wireapp/wire-webapp
     branch: prod
 
 after_deploy:
