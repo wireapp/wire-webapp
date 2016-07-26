@@ -2,6 +2,18 @@
 sudo: required
 dist: trusty
 
+# https://docs.travis-ci.com/user/encryption-keys/
+env:
+  global:
+    # RAYGUN_USERNAME
+    - secure: "xMiUg9p7HCDUarPgsb5CVuTTnYWAZfJf1a8AJA0WKLg1XY3hN/CayYE4jxor+hW2GZVhAeUFPHJXo0OpF9yhXdspVG4i6p/ZAq97N2rlGIHXngTGp6J3pCRtC1wIJqG9g45lST84IfrP0yqnMcY2rnQkE0ZbY9Qn4gIvCEjXJpzA8aI4Lqr/K/LI3cYdnlgPu0s9E2I/Kl0ZenDqD9W0TFyufWNXzH8HqyrEw7UjRM9d8oosYydM5bNmW4oCrMrLMDcqbwC8PPvJUrJKt8tubDuqDDNVECiSE2Rz8FPA3r017heQOOGinzAiUkMVHlJEdcPxBViPhGE6BN10QC1vR6uxaM/9UBIUodLfculzhZ5xcHYgEVHC1w4M5+zoa4F8iecUMMwT1+qC6Na/apTpUNy+OLguK4Se7dTKtfd4+FTbWZANI8xT5duVNnJ//rH6U06OpXDKNvWlYyGl2zZr0gcTXGqxKU+7kVjNZa1k6ltOgy86pTm4VAOLBGfqUbSwRVhW3aqJKS/yjsAkT9oLKuB3T0osVPcsSxS4MmODUmUazr7UMZr8t2S0L0v0NE/Q1I+gykqEzV8ecd9s6RXaWQiwZXgSjMe3UR3qrFO+r1fbwXIo45biPyd1rDFR1Y/dPHxDCPOV6fXjWXp68r5d9tcZTc6xjU1vgoplJfxAyhA="
+    # RAYGUN_PASSWORD
+    - secure: "29BtoWU0D68HVLqJ5iG3QNs+B2ytaZsTRsgW5T0WBCWS8b4cOOFLjwQHh5f+Qr0oPjU+cwQ0Sequ9wzGK882lhoT5SyddURhnj2CxWko0zmeNst2YpjEEdrgvtqQMGG+SXizjG9gcPcf52mF0du7LdICh1pN5HZMVckPD02t4+quZn0SpwdvQSCdWtivSNSenguhdJg9z6ulKKJUV3nqvdJsSAC48q9awEfc59dvo8nf7v44bTlIcqGkiCMpR2pxPXjwOvogWQcUZvd2onSZvtOJWOega5iAc0PvSs9p2eLpY82lQSlvsLxaytSiQw50rDLYi1p4ouUn//DUH0Ir8A3g57MRzXkMLs1JDXOJyTbPgLkOdB/TmlryQ2iT0XnHp4ncjWrWjmgQPDKizk7HFeSvMPKjo9V2F46FwXClq1b/U1jP5PVOQHwtujVVmp9CXvBedz1SLaY2GIe0uLexFis1P5UZSCmtP/GpnO47JIguYU43Xkre2hdn1pnpCHiDv4xWISfinBZa+gncjAEodKkApysx48cK6nbZ8HLPnMGDk04oZO+zFz2IprkkefdoKJ32J6BnBtQqmJAXwPaC+AiIEcHWTbHRtZM0NvaxsQFB/MPCy+A2H1amC63wE/CJZbGf2sNQZCNUwsFq8awRxHt8frSS/9Rw+Wg6jDMZp+w="
+    # WIRE_WEBAPP_BOT_EMAIL
+    - secure: "cRgk2yvpezpf2/Z/49wgJ1rm8i3e7h7nAOkbF8ykOcka9VanaGy5pn2JJs9/EMEBbKK8+tUkD9MKm1k4xd2qotxXZsOeonvzMV5yBcF/XZ887vW7FByvfFQ9iqSq+VA7sgUr6qr6+N51Wp4DZh++ojFBh6D8LB1hHqKCCRnM2PFECrMG03CXVc0rbSNLdGh7xm11pCteLxANciQv9xCUAVCyQNy3QorEczTyY50k/0nT29Axqn2FFjaLnLtG+nM7ufLaySPfOVAnWX7sb2yf08yC38bBktwnpbWKjJlveK6aFA4LVuj7eXLTfA1DF/0AUmlk0MNmUPCHz7Xo+YLLIua8+Rms6bzLCeUswJyDp69/2WdidrTUDNtRjNQ2BkNowfhOOuSrsf/3WLP/Sli9fX7G70RBHICBNZ3qJ40V8PkQJTKTQYUtVL7cmnH94OjBxy/rwmBfHQSa4zx8JNFn+IDHCATVb7RIPARTHBiAK+C0kne/Ito0k59MLbWiic+y+1Y2CtDHJqlgxYMMSnrPd3+4z0/LFbkMwnyL3QQlt1U4kFn4XOlOSp6aHg5ke2HGueQBiUJcfj52rbLRceBay9A+HrNLfVhzDTiUUbkfx544sdUv8PyITpZxYXKrGSqvIvDUFOA5rwj90NwwokTi+tHzPTbbDFYRn0IvNdHCJbo="
+    # WIRE_WEBAPP_BOT_PASSWORD
+    - secure: "U9Fq+z04H9EbI55M6VDAVelLtETVSS9oNNCJo5llDSij0pjrNZpxj3MeKhRZQc8yiZ4hOC5nUbNPHpvIKBkw+xD/Pg32t6SVZl4ZSDPm3XZTFYpWj/U/NB+/l/ivK4bNmx62hLOL8Dhr5A67UlwwCr4tYVmLu7wcUNwgtkyAii1mqoAC0yT4qzDQBalGAk/Q+ZatmjAZM/5ZU8H3jags0+bubJlJKlU0YOmSzXFdFSQLFMQSwEeVEH7vMIkOmFIK6L6qveSDJDmNj2tvgn8ZLr6p7TvOLovGbfPiNKcrEyeADJQrG0J3IQ6dHYOCIN1SzibdJEWqluk6T/N0mNq27AKEzXsV8VHl6VAnswxAq1pljlGF5Nj0OUt5JAUzavbt7tw3TBwC96+55YJdvPZ9ESg2S4afj94nEUISLldNDVEQPBUt4qfkTznKMOeBNzVItO9IhSQK65wUQ07//nxHsV38GMMKMWhtujFrqhAdtC6TCBGVxdCYQziCKW3xsmt2nNosxIkxESF9Osw7A5YbjwoREu7nIZOA0TYrJxZRz0AlV1D1WfNv/7KP5J0LQCR90jdoAnTvkTP4+WfX7C8UkyowpxpBUKvbe9d65cYTCzN69eT/lEQBmQz06Y8Wh+ou5q4BeNQmfgwUK7tYr1/vY9DqNskpaLyJsXKPO+gkTm4="
+
 # https://docs.travis-ci.com/user/installing-dependencies/#Installing-Packages-with-the-APT-Addon
 addons:
   apt:
@@ -21,13 +33,6 @@ cache:
     - bower_components
     - node_modules
 
-env:
-  global:
-    # RAYGUN_USERNAME
-    - secure: "xMiUg9p7HCDUarPgsb5CVuTTnYWAZfJf1a8AJA0WKLg1XY3hN/CayYE4jxor+hW2GZVhAeUFPHJXo0OpF9yhXdspVG4i6p/ZAq97N2rlGIHXngTGp6J3pCRtC1wIJqG9g45lST84IfrP0yqnMcY2rnQkE0ZbY9Qn4gIvCEjXJpzA8aI4Lqr/K/LI3cYdnlgPu0s9E2I/Kl0ZenDqD9W0TFyufWNXzH8HqyrEw7UjRM9d8oosYydM5bNmW4oCrMrLMDcqbwC8PPvJUrJKt8tubDuqDDNVECiSE2Rz8FPA3r017heQOOGinzAiUkMVHlJEdcPxBViPhGE6BN10QC1vR6uxaM/9UBIUodLfculzhZ5xcHYgEVHC1w4M5+zoa4F8iecUMMwT1+qC6Na/apTpUNy+OLguK4Se7dTKtfd4+FTbWZANI8xT5duVNnJ//rH6U06OpXDKNvWlYyGl2zZr0gcTXGqxKU+7kVjNZa1k6ltOgy86pTm4VAOLBGfqUbSwRVhW3aqJKS/yjsAkT9oLKuB3T0osVPcsSxS4MmODUmUazr7UMZr8t2S0L0v0NE/Q1I+gykqEzV8ecd9s6RXaWQiwZXgSjMe3UR3qrFO+r1fbwXIo45biPyd1rDFR1Y/dPHxDCPOV6fXjWXp68r5d9tcZTc6xjU1vgoplJfxAyhA="
-    # RAYGUN_PASSWORD
-    - secure: "29BtoWU0D68HVLqJ5iG3QNs+B2ytaZsTRsgW5T0WBCWS8b4cOOFLjwQHh5f+Qr0oPjU+cwQ0Sequ9wzGK882lhoT5SyddURhnj2CxWko0zmeNst2YpjEEdrgvtqQMGG+SXizjG9gcPcf52mF0du7LdICh1pN5HZMVckPD02t4+quZn0SpwdvQSCdWtivSNSenguhdJg9z6ulKKJUV3nqvdJsSAC48q9awEfc59dvo8nf7v44bTlIcqGkiCMpR2pxPXjwOvogWQcUZvd2onSZvtOJWOega5iAc0PvSs9p2eLpY82lQSlvsLxaytSiQw50rDLYi1p4ouUn//DUH0Ir8A3g57MRzXkMLs1JDXOJyTbPgLkOdB/TmlryQ2iT0XnHp4ncjWrWjmgQPDKizk7HFeSvMPKjo9V2F46FwXClq1b/U1jP5PVOQHwtujVVmp9CXvBedz1SLaY2GIe0uLexFis1P5UZSCmtP/GpnO47JIguYU43Xkre2hdn1pnpCHiDv4xWISfinBZa+gncjAEodKkApysx48cK6nbZ8HLPnMGDk04oZO+zFz2IprkkefdoKJ32J6BnBtQqmJAXwPaC+AiIEcHWTbHRtZM0NvaxsQFB/MPCy+A2H1amC63wE/CJZbGf2sNQZCNUwsFq8awRxHt8frSS/9Rw+Wg6jDMZp+w="
-
 # http://docs.travis-ci.com/user/gui-and-headless-browsers
 before_install:
   - export CHROME_BIN=/usr/bin/google-chrome
@@ -36,3 +41,63 @@ before_install:
 
 notifications:
   email: false
+
+# http://docs.travis-ci.com/user/deployment/
+before_deploy:
+  - if [ "$TRAVIS_BRANCH" == "dev" ]; then npm run deploy-travis-dev; fi
+  - if [ "$TRAVIS_BRANCH" == "staging" ]; then npm run deploy-travis-staging; fi
+  - if [ "$TRAVIS_BRANCH" == "prod" ]; then npm run deploy-travis-prod; fi
+
+# https://github.com/travis-ci/dpl#elastic-beanstalk
+deploy:
+  # https://wire-webapp-dev.zinfra.io/
+  provider: elasticbeanstalk
+  edge: true
+  skip_cleanup: true
+  zip-file: 'aws/s3/ebs.zip'
+  access-key-id:
+    secure: MpVUBkrtmIPqYLzrsYisYsE/UnOFU6q0ufgfWNBxHAFm/mDST9v+Kk1ZvhNKYskgMzJllQJBBqiRn05Fegam+DQ0oclbPr7Eg4mQrPbsrLIsc2qEpqw3fk8bqOssnHkKe1wlz7ihW3eQ78zOgsS/w95Zyd7wWiDzz8s7KvRPN8DLRGu2ksDdkPfM6RCbs9qsdSA5k8+DhZRXZCL/IHalE3plqOOJgCgTq9kzMRvxnFnVy0tLGzWQJvGOLYpjRwaAoqoLK7AX+WLfMSnBn+MuWCGmqPdk9Xto4cJnC5toASjNtu/bGYWuy4ShpzTivuwioJbxt5JGiq78j/MVu/5oBjzosJlSpNlY5++wrkLvfpkWMuJSC3/V40LkpLa+XF/MP18Bpbi44GmLTOCq4wJ/WRrYMAt4yQWURNJAv9tKqLyqgJ47HLBMEYABWUdr81apZm3ZKbqqmyu4GLclc7ivnVBjfmf5oDxMDUqp8owQO9YOsUX9t8Rw9XiPdasjx5EQ+EcvoAyBCPV6qlnFi7pj7wWnxu1DNhzxeW70BKhXizYwcBqSlvX88pbgCxc273Id0dAilrCgvD0/B2mvLPIVbJsscMyykjC7ZZOaznhfHQqeu/fXdfcVawVt+annovbFOWxjX5232ghbq12ux6qZ+2GNziW9vtEJeitPZ3XRPMc=
+  secret-access-key:
+    secure: aCiIP0To/YPm9E3G/q/JIHASRN0b69R23w8WYovmMsBFHddh0MBXnhh+Kf5Cuos+NdVatNs7mAqulLdmBF8TZhreEhLOd9PppEXPVXJrlvdDKejX3S6czUWD8tb4fSE4/qF9H8XYVa+Aznn/2Vlu3fFggAcAMv8lm7igTNb8rc2YZkaByNvwDjauoB1CwgvMsJiptDNy/m9EOJST9RqS/SDAFsPEFQLih0BRWbSYnEZ6yYtQ7T+ROOjjBxTefqf9E6s6PuXI9zrDzGtKE3mwibASts5lfVcKWBp/m1Droog7QxRgixUo9CoE4bK3tcSqpgBx/Mn1RL43C8pt2n2yxeXr6Rl1rdnpvVmz/7XbQqBtbX+atot63PKW4fuTlwCmnQfBWwsAqUZmnCHs0EgcFQR6VoO1D5FLKAWOFeo4RBCQ3mOr/kU3wTG0OrDVf3C1VpTD8W07AVIwcYm/jOSPJYgWwDk+OPz0f8UYbJTe8UO14LU/Wy6QT81cjEwjXJdCcv6IZS50iDNq9PxaACoOqAmfDZNwxuQBxN0kR1eWEobE+zucIfpa6OteA980X22xQIimPcVmmBcDjYce//o/12UNKZprUXeUqSPJsXWw8p3CIbJP8lI35aiTR3kjOG7XBG0QO1HyBHKudZHPGo3RU6dXVegu6POujy+oxbkQNyo=
+  region: eu-west-1
+  app: Webapp
+  env: wire-webapp-dev
+  bucket_name: wire-webapp
+  on:
+    branch: dev
+
+  # https://wire-webapp-staging.zinfra.io/
+  provider: elasticbeanstalk
+  edge: true
+  skip_cleanup: true
+  zip-file: 'aws/s3/ebs.zip'
+  access-key-id:
+    secure: MpVUBkrtmIPqYLzrsYisYsE/UnOFU6q0ufgfWNBxHAFm/mDST9v+Kk1ZvhNKYskgMzJllQJBBqiRn05Fegam+DQ0oclbPr7Eg4mQrPbsrLIsc2qEpqw3fk8bqOssnHkKe1wlz7ihW3eQ78zOgsS/w95Zyd7wWiDzz8s7KvRPN8DLRGu2ksDdkPfM6RCbs9qsdSA5k8+DhZRXZCL/IHalE3plqOOJgCgTq9kzMRvxnFnVy0tLGzWQJvGOLYpjRwaAoqoLK7AX+WLfMSnBn+MuWCGmqPdk9Xto4cJnC5toASjNtu/bGYWuy4ShpzTivuwioJbxt5JGiq78j/MVu/5oBjzosJlSpNlY5++wrkLvfpkWMuJSC3/V40LkpLa+XF/MP18Bpbi44GmLTOCq4wJ/WRrYMAt4yQWURNJAv9tKqLyqgJ47HLBMEYABWUdr81apZm3ZKbqqmyu4GLclc7ivnVBjfmf5oDxMDUqp8owQO9YOsUX9t8Rw9XiPdasjx5EQ+EcvoAyBCPV6qlnFi7pj7wWnxu1DNhzxeW70BKhXizYwcBqSlvX88pbgCxc273Id0dAilrCgvD0/B2mvLPIVbJsscMyykjC7ZZOaznhfHQqeu/fXdfcVawVt+annovbFOWxjX5232ghbq12ux6qZ+2GNziW9vtEJeitPZ3XRPMc=
+  secret-access-key:
+    secure: aCiIP0To/YPm9E3G/q/JIHASRN0b69R23w8WYovmMsBFHddh0MBXnhh+Kf5Cuos+NdVatNs7mAqulLdmBF8TZhreEhLOd9PppEXPVXJrlvdDKejX3S6czUWD8tb4fSE4/qF9H8XYVa+Aznn/2Vlu3fFggAcAMv8lm7igTNb8rc2YZkaByNvwDjauoB1CwgvMsJiptDNy/m9EOJST9RqS/SDAFsPEFQLih0BRWbSYnEZ6yYtQ7T+ROOjjBxTefqf9E6s6PuXI9zrDzGtKE3mwibASts5lfVcKWBp/m1Droog7QxRgixUo9CoE4bK3tcSqpgBx/Mn1RL43C8pt2n2yxeXr6Rl1rdnpvVmz/7XbQqBtbX+atot63PKW4fuTlwCmnQfBWwsAqUZmnCHs0EgcFQR6VoO1D5FLKAWOFeo4RBCQ3mOr/kU3wTG0OrDVf3C1VpTD8W07AVIwcYm/jOSPJYgWwDk+OPz0f8UYbJTe8UO14LU/Wy6QT81cjEwjXJdCcv6IZS50iDNq9PxaACoOqAmfDZNwxuQBxN0kR1eWEobE+zucIfpa6OteA980X22xQIimPcVmmBcDjYce//o/12UNKZprUXeUqSPJsXWw8p3CIbJP8lI35aiTR3kjOG7XBG0QO1HyBHKudZHPGo3RU6dXVegu6POujy+oxbkQNyo=
+  region: eu-west-1
+  app: Webapp
+  env: wire-webapp-staging
+  bucket_name: wire-webapp
+  on:
+    branch: staging
+
+  # https://wire-webapp-prod-next.wire.com/
+  provider: elasticbeanstalk
+  edge: true
+  skip_cleanup: true
+  zip-file: 'aws/s3/ebs.zip'
+  access-key-id:
+    secure: MpVUBkrtmIPqYLzrsYisYsE/UnOFU6q0ufgfWNBxHAFm/mDST9v+Kk1ZvhNKYskgMzJllQJBBqiRn05Fegam+DQ0oclbPr7Eg4mQrPbsrLIsc2qEpqw3fk8bqOssnHkKe1wlz7ihW3eQ78zOgsS/w95Zyd7wWiDzz8s7KvRPN8DLRGu2ksDdkPfM6RCbs9qsdSA5k8+DhZRXZCL/IHalE3plqOOJgCgTq9kzMRvxnFnVy0tLGzWQJvGOLYpjRwaAoqoLK7AX+WLfMSnBn+MuWCGmqPdk9Xto4cJnC5toASjNtu/bGYWuy4ShpzTivuwioJbxt5JGiq78j/MVu/5oBjzosJlSpNlY5++wrkLvfpkWMuJSC3/V40LkpLa+XF/MP18Bpbi44GmLTOCq4wJ/WRrYMAt4yQWURNJAv9tKqLyqgJ47HLBMEYABWUdr81apZm3ZKbqqmyu4GLclc7ivnVBjfmf5oDxMDUqp8owQO9YOsUX9t8Rw9XiPdasjx5EQ+EcvoAyBCPV6qlnFi7pj7wWnxu1DNhzxeW70BKhXizYwcBqSlvX88pbgCxc273Id0dAilrCgvD0/B2mvLPIVbJsscMyykjC7ZZOaznhfHQqeu/fXdfcVawVt+annovbFOWxjX5232ghbq12ux6qZ+2GNziW9vtEJeitPZ3XRPMc=
+  secret-access-key:
+    secure: aCiIP0To/YPm9E3G/q/JIHASRN0b69R23w8WYovmMsBFHddh0MBXnhh+Kf5Cuos+NdVatNs7mAqulLdmBF8TZhreEhLOd9PppEXPVXJrlvdDKejX3S6czUWD8tb4fSE4/qF9H8XYVa+Aznn/2Vlu3fFggAcAMv8lm7igTNb8rc2YZkaByNvwDjauoB1CwgvMsJiptDNy/m9EOJST9RqS/SDAFsPEFQLih0BRWbSYnEZ6yYtQ7T+ROOjjBxTefqf9E6s6PuXI9zrDzGtKE3mwibASts5lfVcKWBp/m1Droog7QxRgixUo9CoE4bK3tcSqpgBx/Mn1RL43C8pt2n2yxeXr6Rl1rdnpvVmz/7XbQqBtbX+atot63PKW4fuTlwCmnQfBWwsAqUZmnCHs0EgcFQR6VoO1D5FLKAWOFeo4RBCQ3mOr/kU3wTG0OrDVf3C1VpTD8W07AVIwcYm/jOSPJYgWwDk+OPz0f8UYbJTe8UO14LU/Wy6QT81cjEwjXJdCcv6IZS50iDNq9PxaACoOqAmfDZNwxuQBxN0kR1eWEobE+zucIfpa6OteA980X22xQIimPcVmmBcDjYce//o/12UNKZprUXeUqSPJsXWw8p3CIbJP8lI35aiTR3kjOG7XBG0QO1HyBHKudZHPGo3RU6dXVegu6POujy+oxbkQNyo=
+  region: eu-west-1
+  app: Webapp
+  env: wire-webapp-prod-next
+  bucket_name: wire-webapp
+  on:
+    branch: prod
+
+after_deploy:
+  - chmod ugo+x ./bin/deployment_notification.sh
+  - ./bin/deployment_notification.sh
