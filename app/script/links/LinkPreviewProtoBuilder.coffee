@@ -49,6 +49,8 @@ z.links.LinkPreviewProtoBuilder = do ->
       preview = new z.proto.Article data.url or url, data.title, data.description
       return new z.proto.LinkPreview url, offset, preview
 
+    return undefined
+
   return {
     build_from_open_graph_data: build_from_open_graph_data
   }
