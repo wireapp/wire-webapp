@@ -1014,7 +1014,7 @@ describe 'bucket_values', ->
 # z.util.iterate_array_index
 ###############################################################################
 describe 'iterate_array_index', ->
-  it 'returns undefined in case of wrong in case of wrong input parameters', ->
+  it 'returns undefined in case of wrong input parameters', ->
     expect(z.util.iterate_array_index 'Test', 0).toBe undefined
     expect(z.util.iterate_array_index [1, 2, 3], 'Test').toBe undefined
     expect(z.util.iterate_array_index [], 0).toBe undefined
