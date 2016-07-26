@@ -88,7 +88,7 @@ describe 'z.user.UserRepository', ->
         expect(connection_et).not.toBeDefined()
 
     describe 'get_connections', ->
-      it 'can get the connected users', (done) ->
+      it 'gets the connected users', (done) ->
         server.respondWith 'GET', "#{test_factory.settings.connection.rest_url}/connections?size=500", [
           200
           'Content-Type': 'application/json'
@@ -115,7 +115,7 @@ describe 'z.user.UserRepository', ->
         user_et = new z.entity.User()
         user_repository.save_user user_et
 
-        it 'can add a client entity to a user entity', ->
+        it 'adds a client entity to a user entity', ->
           user_repository.add_client_to_user user_et.id, new z.client.Client()
           expect(user_et.devices().length).toBe 1
 
@@ -152,11 +152,11 @@ describe 'z.user.UserRepository', ->
       afterEach ->
         user_repository.users.removeAll()
 
-      it 'can find an existing user', ->
+      it 'finds an existing user', ->
         user_et = user_repository.find_user user.id
         expect(user_et).toEqual user
 
-      it 'can not find an unknown user', ->
+      it 'cannot find an unknown user', ->
         expect(user_repository.find_user '1').toBeFalsy()
 
     describe 'get_user_by_name', ->
@@ -182,7 +182,7 @@ describe 'z.user.UserRepository', ->
           expect(result.length).toBe 2
 
     describe 'save_user', ->
-      it 'can save a user', ->
+      it 'saves a user', ->
         user = new z.entity.User()
         user.id = entities.user.jane_roe.id
 
@@ -201,10 +201,10 @@ describe 'z.user.UserRepository', ->
       afterEach ->
         user_repository.users.removeAll()
 
-      it 'can find an existing user', ->
+      it 'finds an existing user', ->
         expect(user_repository.user_exists user.id).toBeTruthy()
 
-      it 'can not find an unknown user', ->
+      it 'cannot find an unknown user', ->
         expect(user_repository.user_exists '1').toBeFalsy()
 
     describe '_assign_all_clients', ->
