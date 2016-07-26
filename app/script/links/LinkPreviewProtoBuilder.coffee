@@ -48,8 +48,6 @@ z.links.LinkPreviewProtoBuilder = do ->
     if has_valid_attributes data
       preview = new z.proto.Article data.url or url, data.title, data.description
       return new z.proto.LinkPreview url, offset, preview
-    else
-      return undefined
 
   return {
     build_from_open_graph_data: build_from_open_graph_data

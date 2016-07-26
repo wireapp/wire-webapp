@@ -99,4 +99,3 @@ describe 'build_from_open_graph_data', ->
     link = 'https://github.com/wireapp/wire-webapp'
     link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data data, link
     expect(link_preview.article.title).toBe data.title
-
