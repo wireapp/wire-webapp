@@ -64,7 +64,7 @@ deploy:
     env: wire-webapp-dev
     bucket_name: wire-webapp
     on:
-      repo: wire-webapp
+      repo: wireapp/wire-webapp
       branch: dev
 
 after_deploy:
