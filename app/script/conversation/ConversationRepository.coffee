@@ -914,7 +914,7 @@ class z.conversation.ConversationRepository
       generic_message.text.link_preview.push link_preview
       @_send_and_save_encrypted_value conversation_et, generic_message
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, 'Error while sending link preview', error
+      @logger.log @logger.levels.ERROR, "Error while sending link preview: #{error.message}", error
 
   ###
   Send message to specific converation.
