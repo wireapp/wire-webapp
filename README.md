@@ -20,7 +20,7 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 
 ## Build Status
 
-[![Build Status](https://travis-ci.org/wireapp/wire-webapp.svg?branch=master)](https://travis-ci.org/wireapp/wire-webapp)
+[![Build Status](https://travis-ci.org/wireapp/wire-webapp.svg?branch=dev)](https://travis-ci.org/wireapp/wire-webapp)
 
 ### Requirements
 
