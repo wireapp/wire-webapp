@@ -85,3 +85,18 @@ describe 'build_from_open_graph_data', ->
     mock = OpenGraphMocks.getSpotifyMock()
     link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url
     expect(link_preview).not.toBeDefined()
+
+  it 'returns a link preview if type is "object"', ->
+    data =
+      'image':
+        'url': 'data:image/png;base64,PLACEHOLDER'
+      'site_name': 'GitHub'
+      'type': 'object'
+      'title': 'wireapp/wire-webapp'
+      'url': 'https://github.com/wireapp/wire-webapp'
+      'description': 'wire-webapp - 👽 Wire for Web'
+
+    link = 'https://github.com/wireapp/wire-webapp'
+    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data data, link
+    expect(link_preview.article.title).toBe data.title
+
