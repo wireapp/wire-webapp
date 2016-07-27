@@ -32,10 +32,7 @@ class z.calling.handler.CallStateHandler
     @calls = ko.observableArray []
     @joined_call = ko.pureComputed => return call_et for call_et in @calls() when call_et.self_client_joined()
 
-    @self_state =
-      muted: @call_center.media_stream_handler.self_stream_state.muted
-      screen_shared: @call_center.media_stream_handler.self_stream_state.screen_shared
-      videod: @call_center.media_stream_handler.self_stream_state.videod
+    @self_state = @call_center.media_stream_handler.self_stream_state
 
     @is_handling_notifications = ko.observable true
     @subscribe_to_events()
@@ -142,7 +139,7 @@ class z.calling.handler.CallStateHandler
       # Call with us joined
       if self_user_joined
         # ...from this device
-        if client_joined_change
+        if client_joined_change and participants_count is 0
           @_create_outgoing_call event
           # ...from another device
         else

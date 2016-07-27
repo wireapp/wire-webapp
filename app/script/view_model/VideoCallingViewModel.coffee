@@ -21,7 +21,7 @@ z.ViewModel ?= {}
 
 
 class z.ViewModel.VideoCallingViewModel
-  constructor: (element_id, @call_center, @user_repository, @conversation_repository) ->
+  constructor: (element_id, @call_center, @user_repository, @conversation_repository, @is_multitasking) ->
     @logger = new z.util.Logger 'z.ViewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS
 
     @self_user = @user_repository.self
@@ -36,7 +36,6 @@ class z.ViewModel.VideoCallingViewModel
     @self_stream_state = @call_center.media_stream_handler.self_stream_state
 
     @is_choosing_screen = ko.observable false
-    @is_minimized = ko.observable false
 
     @minimize_timeout = undefined
 
@@ -67,7 +66,7 @@ class z.ViewModel.VideoCallingViewModel
       return @joined_call()?.participants()[0]?.user
 
     @show_local = ko.pureComputed =>
-      return not @is_minimized() and not @is_choosing_screen()
+      return not @is_multitasking() and not @is_choosing_screen()
     @show_local_video = ko.pureComputed =>
       is_visible = @self_stream_state.screen_shared() or @self_stream_state.videod() or @videod_call()?.state() isnt z.calling.enum.CallState.ONGOING
       return @local_video_stream() and is_visible
@@ -75,7 +74,7 @@ class z.ViewModel.VideoCallingViewModel
     @show_remote = ko.pureComputed =>
       return @show_remote_video() or @show_remote_participant() or @is_choosing_screen()
     @show_remote_participant = ko.pureComputed =>
-      is_visible = @remote_user() and not @is_minimized() and not @joined_call()?.is_remote_videod() or not @remote_video_stream()
+      is_visible = @remote_user() and not @is_multitasking() and not @joined_call()?.is_remote_videod() or not @remote_video_stream()
       return @is_ongoing() and is_visible
     @show_remote_video = ko.pureComputed =>
       is_visible = @joined_call()?.is_remote_videod() and @remote_video_stream()
@@ -89,7 +88,7 @@ class z.ViewModel.VideoCallingViewModel
       return @is_ongoing() and is_visible
 
     @show_controls = ko.pureComputed =>
-      is_visible = @show_remote_video() or @show_remote_participant() and not @is_minimized()
+      is_visible = @show_remote_video() or @show_remote_participant() and not @is_multitasking()
       return @is_ongoing() and is_visible
     @show_toggle_screen = ko.pureComputed ->
       return z.calling.CallCenter.supports_screen_sharing()
@@ -99,13 +98,13 @@ class z.ViewModel.VideoCallingViewModel
     @videod_call.subscribe (videod_call) =>
       if videod_call
         if @show_local_video() or @show_remote_video() or @is_choosing_screen() or videod_call.state() is z.calling.enum.CallState.INCOMING
-          @is_minimized false
+          @is_multitasking false
           @logger.log @logger.levels.INFO, "Displaying call '#{videod_call.id}' full-screen", videod_call
         else
-          @is_minimized true
+          @is_multitasking true
           @logger.log @logger.levels.INFO, "Minimizing call '#{videod_call.id}' that is not videod", videod_call
       else
-        @is_minimized false
+        @is_multitasking false
         @logger.log @logger.levels.INFO, 'Resetting full-screen calling to maximize'
 
     @available_devices.screen_input.subscribe (media_devices) =>
@@ -120,9 +119,9 @@ class z.ViewModel.VideoCallingViewModel
       if show_remote_participant and @videod_call() and not @is_choosing_screen()
         @logger.log @logger.levels.INFO, "Scheduled minimizing call '#{@videod_call().id}' on timeout as remote user '#{@remote_user()?.name()}' is not videod"
         @minimize_timeout = window.setTimeout =>
-          @is_minimized true if not @is_choosing_screen()
+          @is_multitasking true if not @is_choosing_screen()
           @logger.log @logger.levels.INFO, "Minimizing call '#{@videod_call().id}' on timeout as remote user '#{@remote_user()?.name()}' is not videod"
-        , 5000
+        , 4000
 
     amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE_SCREEN, @choose_shared_screen
 
@@ -142,7 +141,6 @@ class z.ViewModel.VideoCallingViewModel
       @call_center.media_devices_handler.get_screen_sources()
       .then (screen_sources) =>
         if screen_sources.length > 1
-          @is_minimized false
           @is_choosing_screen true
         else
           @call_center.state_handler.toggle_screen conversation_id
@@ -168,7 +166,7 @@ class z.ViewModel.VideoCallingViewModel
     @current_device_id.screen_input screen_source.id
     @call_center.state_handler.toggle_screen @joined_call().id
     if not @joined_call().is_remote_videod()
-      @is_minimized true
+      @is_multitasking true
       @logger.log @logger.levels.INFO, "Minimizing call '#{@videod_call().id}' on screen selection as remote user '#{@remote_user()?.name()}' is not videod"
 
   clicked_on_stop_video: =>
@@ -181,13 +179,11 @@ class z.ViewModel.VideoCallingViewModel
     @call_center.media_devices_handler.toggle_next_screen()
 
   clicked_on_minimize: =>
-    @is_minimized true
+    @is_multitasking true
     @logger.log @logger.levels.INFO, "Minimizing call '#{@videod_call().id}' on user click"
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.MINIMIZED_FROM_FULLSCREEN,
-      conversation_type: if @joined_call().is_group() then 'group' else 'one_to_one'
 
   clicked_on_maximize: =>
-    @is_minimized false
+    @is_multitasking false
     @logger.log @logger.levels.INFO, "Maximizing call '#{@videod_call().id}' on user click"
 
   # Detect the aspect ratio of a MediaElement and set the video mode.
