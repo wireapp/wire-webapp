@@ -28,7 +28,7 @@ z.calling.enum.CallStateGroups =
     z.calling.enum.CallState.OUTGOING
   ]
   IS_ENDED: [
-    z.calling.enum.CallState.DELETED
+    z.calling.enum.CallState.ENDED
     z.calling.enum.CallState.UNKNOWN
   ]
   IS_RINGING: [
