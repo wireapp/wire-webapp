@@ -52,7 +52,7 @@ describe 'z.util.DebugUtil', ->
 
   describe 'get_amount_of_clients_in_conversation', ->
 
-    it 'resolves entities used in an event', ->
+    it 'gets the amount of all clients in the current conversation (including own clients)', ->
       conversation_repository = debug_util.conversation_repository
 
       first_client = new z.client.Client()
