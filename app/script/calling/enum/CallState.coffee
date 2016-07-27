@@ -21,9 +21,8 @@ z.calling ?= {}
 z.calling.enum ?= {}
 
 z.calling.enum.CallState =
-  CANCELED: 'canceled'
   CONNECTING: 'connecting'
-  DELETED: 'deleted'
+  ENDED: 'ended'
   IGNORED: 'ignored'
   INCOMING: 'incoming'
   ONGOING: 'ongoing'
