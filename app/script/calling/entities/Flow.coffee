@@ -442,7 +442,7 @@ class z.calling.entities.Flow
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_CREATED
       @local_sdp @_rewrite_sdp sdp_answer, z.calling.enum.SDPSource.LOCAL
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Creating '#{z.calling.rtc.SDPType.ANSWER}' failed: #{error.name}", error
+      @logger.log @logger.levels.ERROR, "Creating '#{z.calling.rtc.SDPType.ANSWER}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'create_sdp', type: z.calling.rtc.SDPType.ANSWER}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
 
@@ -467,7 +467,7 @@ class z.calling.entities.Flow
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_CREATED
       @local_sdp @_rewrite_sdp sdp_offer, z.calling.enum.SDPSource.LOCAL
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Creating '#{z.calling.rtc.SDPType.OFFER}' failed: #{error.name}", error
+      @logger.log @logger.levels.ERROR, "Creating '#{z.calling.rtc.SDPType.OFFER}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'create_sdp', type: z.calling.rtc.SDPType.OFFER}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
       @_solve_colliding_states()
@@ -590,7 +590,7 @@ class z.calling.entities.Flow
         @_send_local_sdp() if not @has_sent_local_sdp()
       , 1000
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Setting local SDP of type '#{@local_sdp().type}' failed: #{error.name}", error
+      @logger.log @logger.levels.ERROR, "Setting local SDP of type '#{@local_sdp().type}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'set_sdp', location: 'local', type: @local_sdp()?.type}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
 
@@ -607,7 +607,7 @@ class z.calling.entities.Flow
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET
       @should_add_remote_sdp false
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Setting remote SDP of type '#{@remote_sdp().type}' failed: #{error.name}", error
+      @logger.log @logger.levels.ERROR, "Setting remote SDP of type '#{@remote_sdp().type}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'set_sdp', location: 'remote', type: @remote_sdp()?.type}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
 
@@ -818,7 +818,7 @@ class z.calling.entities.Flow
     .then =>
       @logger.log @logger.levels.INFO, "Replaced the '#{media_stream_info.type}' track"
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to replace the '#{media_stream_info.type}' track: #{error.message}", error
+      @logger.log @logger.levels.ERROR, "Failed to replace the '#{media_stream_info.type}' track: #{error.name} - #{error.message}", error
 
   ###
   Reset the flows MediaStream and media elements.
@@ -834,7 +834,7 @@ class z.calling.entities.Flow
             {stream: media_stream, audio_tracks: media_stream.getAudioTracks(), video_tracks: media_stream.getVideoTracks()}
       # @param [InvalidStateError] error
       catch error
-        @logger.log @logger.levels.ERROR, "We caught the #{error.message}", error
+        @logger.log @logger.levels.ERROR, "We caught the #{error.name}: #{error.message}", error
         Raygun.send new Error('Failed to remove MediaStream from PeerConnection'), error
     else
       @logger.log @logger.levels.INFO, 'No PeerConnection found to remove MediaStream from'
@@ -903,7 +903,7 @@ class z.calling.entities.Flow
       if @peer_connection?.signalingState isnt z.calling.rtc.SignalingState.CLOSED
         @_close_peer_connection()
     catch error
-      @logger.log @logger.levels.ERROR, "We caught the #{error.name}", error
+      @logger.log @logger.levels.ERROR, "We caught the #{error.name}: #{error.message}", error
     @_remove_media_streams()
     @_reset_signaling_states()
     @ice_candidates_cache = []

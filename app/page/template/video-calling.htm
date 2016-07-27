@@ -3,7 +3,7 @@
     <!-- ko if: show_remote() -->
       <div id="video-element-remote"
            class="video-element-remote"
-           data-bind="css: {'video-element-remote-minimized': is_minimized()}">
+           data-bind="css: {'video-element-remote-minimized': is_multitasking()}">
 
         <!-- ko if: show_remote_video() -->
           <video class="video-element"
@@ -14,7 +14,7 @@
                             source_stream: remote_video_stream()"></video>
         <!-- /ko -->
         <!-- ko if: show_remote_participant() -->
-          <div class="video-element-remote-participant" data-bind="css: {'hidden': is_minimized()}">
+          <div class="video-element-remote-participant">
             <!-- ko ifnot: joined_call().is_group() -->
               <user-avatar class="video-element-remote-participant user-avatar-xl user-avatar-no-badge"
                            params="user: remote_user()"></user-avatar>
@@ -25,17 +25,10 @@
         <!-- ko if: show_remote_video() && !is_choosing_screen() -->
           <div class="video-element-overlay hide-controls-hidden"></div>
         <!-- /ko -->
-        <!-- ko if: is_minimized() -->
+        <!-- ko if: is_multitasking() -->
           <div class="video-element-remote-fullscreen icon-fullscreen hide-controls-hidden"
                data-uie-name="do-call-controls-video-maximize"
                data-bind="click: clicked_on_maximize">
-          </div>
-        <!-- /ko -->
-
-        <!-- ko if: show_controls() -->
-          <div id="video-title" class="video-title hide-controls-hidden" data-bind="css: {'video-element-dark': show_remote_participant()}">
-            <div class="video-remote-name" data-bind="text: joined_call().conversation_et.display_name()"></div>
-            <div class="video-timer label-xs" data-bind="text: z.util.format_seconds(joined_call().duration_time())"></div>
           </div>
         <!-- /ko -->
 
@@ -43,6 +36,13 @@
           <choose-screen params="cancel: clicked_on_cancel_screen,
                                  choose: clicked_on_choose_screen,
                                  screens: available_devices.screen_input"></choose-screen>
+        <!-- /ko -->
+
+        <!-- ko if: show_controls() -->
+          <div id="video-title" class="video-title hide-controls-hidden" data-bind="css: {'video-element-dark': show_remote_participant()}">
+            <div class="video-remote-name" data-bind="text: joined_call().conversation_et.display_name()"></div>
+            <div class="video-timer label-xs" data-bind="text: z.util.format_seconds(joined_call().duration_time())"></div>
+          </div>
         <!-- /ko -->
 
         <!-- ko if: show_controls() && !is_choosing_screen() -->
