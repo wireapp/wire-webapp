@@ -490,9 +490,9 @@ class z.calling.handler.MediaStreamHandler
     switch media_stream_info.type
       when z.calling.enum.MediaType.AUDIO
         @remote_media_streams.audio.push media_stream_info.stream
-        @call_center.media_element_handler.add_media_element media_stream_info
       when z.calling.enum.MediaType.AUDIO_VIDEO, z.calling.enum.MediaType.VIDEO
         @remote_media_streams.video media_stream_info.stream
+    @call_center.media_element_handler.add_media_element media_stream_info
 
 
   ###############################################################################
