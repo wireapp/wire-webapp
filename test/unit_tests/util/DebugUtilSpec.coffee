@@ -50,7 +50,7 @@ describe 'z.util.DebugUtil', ->
         done()
       .catch done.fail
 
-  describe 'get_amount_of_clients_in_conversation', ->
+  describe 'get_number_of_clients_in_conversation', ->
 
     it 'gets the amount of all clients in the current conversation (including own clients)', ->
       conversation_repository = debug_util.conversation_repository
