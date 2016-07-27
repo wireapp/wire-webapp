@@ -123,15 +123,21 @@ class z.calling.entities.Flow
           @call_et.delete_participant @participant_et if @call_et.self_client_joined()
 
     @signaling_state.subscribe (signaling_state) =>
-      if signaling_state is z.calling.rtc.SignalingState.CLOSED and not @converted_own_sdp_state()
-        @logger.log @logger.levels.DEBUG, "PeerConnection with '#{@remote_user.name()}' was closed"
-        @call_et.delete_participant @participant_et
-        @_remove_media_streams()
-        if not @is_group()
-          @call_et.finished_reason = z.calling.enum.CallFinishedReason.CONNECTION_DROPPED
+      switch signaling_state
+        when z.calling.rtc.SignalingState.CLOSED
+          return if @converted_own_sdp_state()
+          @logger.log @logger.levels.DEBUG, "PeerConnection with '#{@remote_user.name()}' was closed"
+          @call_et.delete_participant @participant_et
+          @_remove_media_streams()
+          if not @is_group()
+            @call_et.finished_reason = z.calling.enum.CallFinishedReason.CONNECTION_DROPPED
+        when z.calling.rtc.SignalingState.REMOTE_OFFER
+          @negotiation_needed true
 
     @negotiation_mode = ko.observable z.calling.enum.SDPNegotiationMode.DEFAULT
     @negotiation_needed = ko.observable false
+    @negotiation_needed.subscribe (negotiation_needed) =>
+      @logger.log @logger.levels.DEBUG, 'State changed - negotiation needed: true' if negotiation_needed
 
 
     ###############################################################################
@@ -402,7 +408,6 @@ class z.calling.entities.Flow
     @peer_connection.onnegotiationneeded = (event) =>
       if not @negotiation_needed()
         @logger.log @logger.levels.DEBUG, 'State changed - negotiation needed: true', event
-        @negotiation_needed true
 
     # Signaling state has changed.
     @peer_connection.onsignalingstatechange = (event) =>
@@ -787,6 +792,8 @@ class z.calling.entities.Flow
     @_add_media_stream @audio_stream() if @audio_stream()
     @_add_media_stream @video_stream() if @video_stream() and not media_streams_identical
 
+    @negotiation_needed true
+
   ###
   Compare whether local audio and video streams are identical.
   @private
@@ -806,6 +813,7 @@ class z.calling.entities.Flow
     .then (media_stream_info) =>
       @_add_media_stream media_stream_info.stream
       @logger.log @logger.levels.INFO, 'Replaced the MediaStream successfully', media_stream_info.stream
+      @negotiation_needed true
       return media_stream_info
 
   ###

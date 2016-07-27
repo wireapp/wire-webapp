@@ -33,13 +33,16 @@ class z.ViewModel.RightViewModel
 
     # state
     @state = ko.observable z.ViewModel.CONTENT_STATE.BLANK
-    @is_multitasking = ko.observable false
+    @multitasking =
+      auto_minimize: ko.observable true
+      is_minimized: ko.observable false
+      reset_minimize: ko.observable false
 
     # nested view models
     @call_shortcuts =        new z.ViewModel.CallShortcutsViewModel @call_center
-    @video_calling =         new z.ViewModel.VideoCallingViewModel 'video-calling', @call_center, @user_repository, @conversation_repository, @is_multitasking
+    @video_calling =         new z.ViewModel.VideoCallingViewModel 'video-calling', @call_center, @user_repository, @conversation_repository, @multitasking
     @connect_requests =      new z.ViewModel.ConnectRequestsViewModel 'connect-requests', @user_repository
-    @conversation_titlebar = new z.ViewModel.ConversationTitlebarViewModel 'conversation-titlebar', @conversation_repository, @call_center, @is_multitasking
+    @conversation_titlebar = new z.ViewModel.ConversationTitlebarViewModel 'conversation-titlebar', @conversation_repository, @call_center, @multitasking
     @conversation_input =    new z.ViewModel.ConversationInputViewModel 'conversation-input', @conversation_repository, @user_repository
     @message_list =          new z.ViewModel.MessageListViewModel 'message-list', @conversation_repository, @user_repository
     @participants =          new z.ViewModel.ParticipantsViewModel 'participants', @user_repository, @conversation_repository, @search_repository
@@ -58,8 +61,8 @@ class z.ViewModel.RightViewModel
         @conversation_input.removed_from_view()
         @conversation_titlebar.removed_from_view()
 
-    @is_multitasking.subscribe (is_multitasking) =>
-      if is_multitasking
+    @multitasking.is_minimized.subscribe (is_minimized) =>
+      if is_minimized
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.MINIMIZED_FROM_FULLSCREEN,
         conversation_type: if @call_center.joined_call().is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
 
