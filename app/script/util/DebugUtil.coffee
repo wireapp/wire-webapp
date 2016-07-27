@@ -32,7 +32,7 @@ class z.util.DebugUtil
     return new Promise (resolve) =>
       @user_repository.get_user_by_id user_id, (user_et) -> resolve user_et
 
-  get_amount_of_clients_in_conversation: ->
+  get_number_of_clients_in_conversation: ->
     user_ets = @conversation_repository.active_conversation().participating_user_ets()
 
     other_clients = user_ets
