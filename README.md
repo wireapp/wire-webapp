@@ -18,6 +18,10 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 
 # How to build the open source client
 
+## Build Status
+
+[![Build Status](https://travis-ci.org/wireapp/wire-webapp.svg?branch=master)](https://travis-ci.org/wireapp/wire-webapp)
+
 ### Requirements
 
 - Install [Node.js](https://nodejs.org/)

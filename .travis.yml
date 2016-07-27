@@ -34,9 +34,5 @@ before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
 
-# http://docs.travis-ci.com/user/pull-requests/
-script:
-  - npm test
-
 notifications:
   email: false
