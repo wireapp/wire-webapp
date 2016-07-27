@@ -40,14 +40,17 @@
         <!-- /ko -->
 
         <!-- ko if: show_controls() -->
-          <div id="video-title" class="video-title hide-controls-hidden" data-bind="css: {'video-element-dark': show_remote_participant()}">
+          <div id="video-title" class="video-title"
+               data-bind="css: {'hide-controls-hidden': !show_remote_participant() && !is_choosing_screen(),
+                                'video-element-dark': show_remote_participant()}">
             <div class="video-remote-name" data-bind="text: joined_call().conversation_et.display_name()"></div>
             <div class="video-timer label-xs" data-bind="text: z.util.format_seconds(joined_call().duration_time())"></div>
           </div>
         <!-- /ko -->
 
         <!-- ko if: show_controls() && !is_choosing_screen() -->
-          <div id="video-controls" class="video-controls hide-controls-hidden">
+          <div id="video-controls" class="video-controls"
+               data-bind="css: {'hide-controls-hidden': !show_remote_participant()}">
             <div class="video-controls-button button-round button-round-md icon-chat"
                  data-uie-name="do-call-controls-video-minimize"
                  data-bind="click: clicked_on_minimize, css: {'button-round-dark': !show_remote_participant()}"></div>
