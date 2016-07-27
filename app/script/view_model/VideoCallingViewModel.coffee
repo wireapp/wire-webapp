@@ -38,6 +38,7 @@ class z.ViewModel.VideoCallingViewModel
     @is_choosing_screen = ko.observable false
 
     @minimize_timeout = undefined
+    @reset_multitasking = undefined
 
     @number_of_screen_devices = ko.observable 0
     @number_of_video_devices = ko.observable 0
@@ -74,8 +75,8 @@ class z.ViewModel.VideoCallingViewModel
     @show_remote = ko.pureComputed =>
       return @show_remote_video() or @show_remote_participant() or @is_choosing_screen()
     @show_remote_participant = ko.pureComputed =>
-      is_visible = @remote_user() and not @is_multitasking() and not @joined_call()?.is_remote_videod() or not @remote_video_stream()
-      return @is_ongoing() and is_visible
+      is_visible = @remote_user() and not @is_multitasking() and not @is_choosing_screen()
+      return @is_ongoing() and not @show_remote_video() and is_visible
     @show_remote_video = ko.pureComputed =>
       is_visible = @joined_call()?.is_remote_videod() and @remote_video_stream()
       return @is_ongoing() and is_visible
@@ -95,14 +96,14 @@ class z.ViewModel.VideoCallingViewModel
     @disable_toggle_screen = ko.pureComputed =>
       return @joined_call()?.is_remote_screen_shared()
 
-    @videod_call.subscribe (videod_call) =>
-      if videod_call
-        if @show_local_video() or @show_remote_video() or @is_choosing_screen() or videod_call.state() is z.calling.enum.CallState.INCOMING
+    @joined_call.subscribe (joined_call) =>
+      if joined_call
+        if @show_local_video() or @show_remote_video() or videod_call.state() is z.calling.enum.CallState.INCOMING
           @is_multitasking false
-          @logger.log @logger.levels.INFO, "Displaying call '#{videod_call.id}' full-screen", videod_call
+          @logger.log @logger.levels.INFO, "Displaying call '#{joined_call.id}' full-screen", joined_call
         else
           @is_multitasking true
-          @logger.log @logger.levels.INFO, "Minimizing call '#{videod_call.id}' that is not videod", videod_call
+          @logger.log @logger.levels.INFO, "Minimizing call '#{joined_call.id}' that is not videod", joined_call
       else
         @is_multitasking false
         @logger.log @logger.levels.INFO, 'Resetting full-screen calling to maximize'
@@ -142,6 +143,9 @@ class z.ViewModel.VideoCallingViewModel
       .then (screen_sources) =>
         if screen_sources.length > 1
           @is_choosing_screen true
+          if @is_multitasking()
+            @is_multitasking false
+            @reset_multitasking = true
         else
           @call_center.state_handler.toggle_screen conversation_id
       .catch (error) =>
@@ -165,7 +169,11 @@ class z.ViewModel.VideoCallingViewModel
     @is_choosing_screen false
     @current_device_id.screen_input screen_source.id
     @call_center.state_handler.toggle_screen @joined_call().id
-    if not @joined_call().is_remote_videod()
+    if @reset_multitasking
+      @is_multitasking true
+      @reset_multitasking = undefined
+      @logger.log @logger.levels.INFO, "Minimizing call '#{@videod_call().id}' on screen selection to return to previous state"
+    else if not @joined_call().is_remote_videod()
       @is_multitasking true
       @logger.log @logger.levels.INFO, "Minimizing call '#{@videod_call().id}' on screen selection as remote user '#{@remote_user()?.name()}' is not videod"
 
