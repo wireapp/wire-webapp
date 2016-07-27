@@ -78,6 +78,6 @@ describe 'z.util.DebugUtil', ->
       conversation_repository.conversations.push conversation_et
       conversation_repository.active_conversation conversation_et
 
-      amount = debug_util.get_amount_of_clients_in_conversation()
+      amount = debug_util.get_number_of_clients_in_conversation()
       expect(amount).toBe 4
 
