@@ -32,6 +32,17 @@ class z.util.DebugUtil
     return new Promise (resolve) =>
       @user_repository.get_user_by_id user_id, (user_et) -> resolve user_et
 
+  get_amount_of_clients_in_conversation: ->
+    user_ets = @conversation_repository.active_conversation().participating_user_ets()
+
+    other_clients = user_ets
+    .map (user_et) -> user_et.devices().length
+    .reduce (previous, current) -> previous + current
+
+    my_clients = @user_repository.self().devices().length
+
+    return other_clients + my_clients
+
   get_event_info: (event) ->
     debug_information =
       event: event
