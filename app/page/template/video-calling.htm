@@ -11,6 +11,7 @@
                  data-bind="attr: {sinkId: current_device_id.audio_output()},
                             css: {'video-element-portrait': video_mode()},
                             event: {loadedmetadata: on_loadedmetadata},
+                            mute_media_element: remote_video_stream(),
                             source_stream: remote_video_stream()"></video>
         <!-- /ko -->
         <!-- ko if: show_remote_participant() -->
@@ -73,8 +74,8 @@
           <video class="video-element"
                  autoplay
                  data-bind="css: {'mirror': !self_stream_state.screen_shared()},
-                            source_stream: local_video_stream(),
-                            mute_media_element: local_video_stream()"></video>
+                            mute_media_element: local_video_stream(),
+                            source_stream: local_video_stream()"></video>
         <!-- /ko -->
         <!-- ko if: overlay_icon_class() -->
           <span class="video-element-overlay" data-bind="css: overlay_icon_class()"></span>
