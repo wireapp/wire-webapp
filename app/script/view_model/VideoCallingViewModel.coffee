@@ -98,7 +98,7 @@ class z.ViewModel.VideoCallingViewModel
 
     @joined_call.subscribe (joined_call) =>
       if joined_call
-        if @show_local_video() or @show_remote_video() or videod_call.state() is z.calling.enum.CallState.INCOMING
+        if @show_local_video() or @show_remote_video()
           @is_multitasking false
           @logger.log @logger.levels.INFO, "Displaying call '#{joined_call.id}' full-screen", joined_call
         else

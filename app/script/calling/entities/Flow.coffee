@@ -390,7 +390,7 @@ class z.calling.entities.Flow
     # ICE connection state has changed.
     @peer_connection.oniceconnectionstatechange = (event) =>
       @logger.log @logger.levels.DEBUG, 'State changed - ICE connection', event
-      return if not @peer_connection or @call_et.state() is z.calling.enum.CallState.DELETED
+      return if not @peer_connection or @call_et.state() is z.calling.enum.CallState.ENDED
 
       @logger.log @logger.levels.LEVEL_1, "ICE connection state: #{@peer_connection.iceConnectionState}"
       @logger.log @logger.levels.LEVEL_1, "ICE gathering state: #{@peer_connection.iceGatheringState}"

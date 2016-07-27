@@ -329,7 +329,7 @@ class z.calling.handler.CallStateHandler
     .then (call_et) =>
       @logger.log @logger.levels.INFO, "Delete call in conversation '#{conversation_id}'"
       # Reset call and delete it afterwards
-      call_et.state z.calling.enum.CallState.DELETED
+      call_et.state z.calling.enum.CallState.ENDED
       call_et.reset_call()
       @calls.remove call_et
       @call_center.media_stream_handler.reset_media_streams()
