@@ -374,7 +374,7 @@ class z.calling.handler.CallStateHandler
               amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.VOICE_CALL_INITIATED
               media_action = if is_videod then 'audio_call' else 'video_call'
               amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-                action: media_action, conversation_type: if conversation_et.is_one2one() then 'one_to_one' else 'group'
+                action: media_action, conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
         return true
 
   ###

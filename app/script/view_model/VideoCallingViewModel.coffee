@@ -135,7 +135,7 @@ class z.ViewModel.VideoCallingViewModel
 
     else if z.util.Environment.electron
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN,
-        conversation_type: if @joined_call().is_group() then 'group' else 'one_to_one'
+        conversation_type: if @joined_call().is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
         kind_of_call_when_sharing: if @joined_call().is_remote_videod() then 'video' else 'audio'
 
       @call_center.media_devices_handler.get_screen_sources()

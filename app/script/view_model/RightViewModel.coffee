@@ -61,7 +61,7 @@ class z.ViewModel.RightViewModel
     @is_multitasking.subscribe (is_multitasking) =>
       if is_multitasking
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.MINIMIZED_FROM_FULLSCREEN,
-        conversation_type: if @call_center.joined_call().is_group() then 'group' else 'one_to_one'
+        conversation_type: if @call_center.joined_call().is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
 
     @user_repository.connect_requests.subscribe (requests) =>
       if @state() is z.ViewModel.CONTENT_STATE.PENDING and requests.length is 0
