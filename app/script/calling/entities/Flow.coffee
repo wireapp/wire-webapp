@@ -878,10 +878,9 @@ class z.calling.entities.Flow
       media_stream_tracks = z.calling.handler.MediaStreamHandler.get_media_tracks @audio_stream(), z.calling.enum.MediaType.AUDIO
 
     if media_stream_tracks?.length
-      @audio_stream().removeTrack media_stream_tracks[0] if @audio_stream()
-      @video_stream().removeTrack media_stream_tracks[0] if @video_stream()
-      media_stream_info.stream.addTrack media_stream_tracks[0]
-      @logger.log @logger.levels.INFO, "Upgraded local MediaStream of type '#{media_stream_info.type}' with '#{media_stream_tracks[0].kind}'",
+      cloned_stream_track = media_stream_tracks[0].clone()
+      media_stream_info.stream.addTrack cloned_stream_track
+      @logger.log @logger.levels.INFO, "Upgraded local MediaStream of type '#{media_stream_info.type}' with '#{cloned_stream_track.kind}'",
         {stream: media_stream_info.stream, audio_tracks: media_stream_info.stream.getAudioTracks(), video_tracks: media_stream_info.stream.getVideoTracks()}
       media_stream_info.update_stream_type()
     else
