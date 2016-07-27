@@ -24,5 +24,26 @@
         </span>
       </div>
     <!-- /ko -->
+
+    <!-- ko if: has_ongoing_call() -->
+      <div class="conversation-titlebar-icons">
+        <!-- ko if: show_maximize_control() -->
+          <span class="conversation-titlebar-icon button-icon-large icon-fullscreen "
+                data-bind="click: click_on_maximize"
+                data-uie-name="do-maximize-call">
+          </span>
+        <!-- /ko -->
+        <!-- ko if: call_self_state.screen_shared() -->
+          <span class="conversation-titlebar-icon conversation-titlebar-icon-status button-icon-large icon-screensharing"
+            data-uie-name="status-self-screensharing">
+          </span>
+        <!-- /ko -->
+        <!-- ko if: call_self_state.videod() -->
+          <span class="conversation-titlebar-icon conversation-titlebar-icon-status button-icon-large icon-video"
+                data-uie-name="status-self-video">
+          </span>
+        <!-- /ko -->
+      </div>
+    <!-- /ko -->
   <!-- /ko -->
 </div>

@@ -155,7 +155,7 @@ class z.telemetry.calling.CallTelemetry
       attributes =
         conversation_participants: call_et.conversation_et.number_of_participants()
         conversation_participants_in_call: call_et.max_number_of_participants
-        conversation_type: if call_et.is_group() then 'group' else 'one_to_one'
+        conversation_type: if call_et.is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
 
       if call_et.is_remote_videod()
         event_name = event_name.replace '_call', '_video_call'
@@ -186,7 +186,7 @@ class z.telemetry.calling.CallTelemetry
       attributes =
         conversation_participants: call_et.conversation_et.number_of_participants()
         conversation_participants_in_call: call_et.max_number_of_participants
-        conversation_type: if call_et.is_group() then 'group' else 'one_to_one'
+        conversation_type: if call_et.is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
         duration: duration_bucket
         duration_sec: duration
         reason: call_et.finished_reason

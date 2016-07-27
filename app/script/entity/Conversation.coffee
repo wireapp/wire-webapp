@@ -113,10 +113,8 @@ class z.entity.Conversation
     # Call related
     @call = ko.observable undefined
     @has_active_call = ko.computed =>
-      has_active_call = false
-      if @call()?.state() in z.calling.enum.CallStateGroups.IS_ACTIVE and not @call().is_ongoing_on_another_client()
-        has_active_call = true
-      return has_active_call
+      return false if not @call()
+      return @call().state() not in z.calling.enum.CallStateGroups.IS_ENDED and not @call().is_ongoing_on_another_client()
 
     @unread_events = ko.computed =>
       unread_event = []

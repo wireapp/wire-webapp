@@ -43,9 +43,6 @@ ko.components.register 'link-preview-asset',
     return new z.components.LinkPreviewAssetComponent params, component_info
   template: """
             <div class="link-preview-icon icon-link"></div>
-            <div class="link-preview-title" data-bind="text: preview.title, click: on_link_preview_click"></div>
-            <a class="link-preview-site text-graphite-dark ellipsis" target="_blank" rel="nofollow"
-               data-bind="text: preview.permanent_url, attr: {href: preview.permanent_url, title: preview.permanent_url}"></a>
             <!-- ko if: preview.image_resource() -->
               <span class="link-preview-image image-placeholder-icon image-loading"
                     data-bind="background_image: preview.image_resource(), viewport_changed: viewport_changed, click: on_link_preview_click">
@@ -57,4 +54,7 @@ ko.components.register 'link-preview-asset',
                 </div>
               </span>
             <!-- /ko -->
+            <div class="link-preview-title" data-bind="text: preview.title, click: on_link_preview_click"></div>
+            <a class="link-preview-site text-graphite ellipsis" target="_blank" rel="nofollow"
+               data-bind="text: preview.permanent_url, attr: {href: preview.permanent_url, title: preview.permanent_url}"></a>
             """
