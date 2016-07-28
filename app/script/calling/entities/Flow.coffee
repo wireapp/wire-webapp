@@ -932,9 +932,9 @@ class z.calling.entities.Flow
   # Logging
   ###############################################################################
 
-  # Get full telemetry report.
+  # Get full telemetry report for automation.
   get_telemetry: =>
-    @telemetry.get_report()
+    @telemetry.get_automation_report()
 
   # Log flow status to console.
   log_status: =>
