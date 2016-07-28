@@ -39,9 +39,10 @@ link-preview-asset {
 }
 
 .link-preview-site {
-  .label-xs;
-  color: @graphite-dark;
+  color: @graphite;
   display: block;
+  font-size: @font-size-xs;
+  font-weight: 400;
   line-height: @line-height-lg;
   -webkit-user-select: initial;
 }
@@ -50,14 +51,14 @@ link-preview-asset {
   .asset-container-style;
   align-items: center;
   display: flex;
-  justify-content: center;
-  width: 480px;
-  height: 160px;
-  margin-top: 8px;
+  justify-content: flex-start;
+  max-width: 480px;
+  max-height: 160px;
+  margin-bottom: 16px;
   overflow: hidden;
 
   &:not(.image-loading) {
-    .three-dots { display: none}
+    .three-dots {display: none}
 
     > img {
       width: 100%;

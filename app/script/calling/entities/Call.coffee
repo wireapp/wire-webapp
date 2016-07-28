@@ -134,8 +134,8 @@ class z.calling.entities.Call
           @_on_state_connecting()
         when z.calling.enum.CallState.INCOMING
           @_on_state_incoming()
-        when z.calling.enum.CallState.DELETED
-          @_on_state_deleted()
+        when z.calling.enum.CallState.ENDED
+          @_on_state_ended()
         when z.calling.enum.CallState.IGNORED
           @_on_state_ignored()
         when z.calling.enum.CallState.ONGOING
@@ -157,14 +157,14 @@ class z.calling.entities.Call
     @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
     @is_declined false
 
-  _on_state_incoming: =>
-    @_play_call_sound true
-    @_group_call_timeout true if @is_group()
-
-  _on_state_deleted: =>
+  _on_state_ended: =>
     if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
       @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
     @is_declined false
+
+  _on_state_incoming: =>
+    @_play_call_sound true
+    @_group_call_timeout true if @is_group()
 
   _on_state_ignored: =>
     if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
@@ -226,10 +226,8 @@ class z.calling.entities.Call
 
   # Ignore a call.
   ignore: =>
-    if @is_group()
-      @is_declined true # TODO would be nice if group call could have also an ignored state
-    else
-      @state z.calling.enum.CallState.IGNORED
+    @state z.calling.enum.CallState.IGNORED
+    @is_declined true
 
 
   ###############################################################################

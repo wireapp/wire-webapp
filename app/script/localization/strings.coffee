@@ -202,10 +202,10 @@ z.string.modal_session_reset_message_2 = 'us.'
 z.string.modal_too_many_members_headline = 'Full house'
 z.string.modal_too_many_members_message = 'Up to %max people can join a conversation. There is room for %no more people in here.'
 # Whitelist screensharing
-z.string.modal_whitelist_screensharing_headline = 'Whitelist us for screen sharing'
-z.string.modal_whitelist_screensharing_message_1 = 'Until Firefox adds us to the list, manually add the current domain on "about:config" to "media.getusermedia.screensharing.allowed_domains". Follow the'
+z.string.modal_whitelist_screensharing_headline = 'Wire needs permission to share your screen'
+z.string.modal_whitelist_screensharing_message_1 = 'Open about:config and add *.wire.com to the list of allowed domains for screensharing. See'
 z.string.modal_whitelist_screensharing_message_link = 'FAQ'
-z.string.modal_whitelist_screensharing_message_2 = 'that guides you through the process.'
+z.string.modal_whitelist_screensharing_message_2 = 'for details.'
 # Parallel uploads
 z.string.modal_uploads_parallel = 'You can send up to %no files at once.'
 
@@ -453,7 +453,7 @@ z.string.url_support_history = 'https://support.wire.com/hc/en-us/articles/20783
 z.string.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/articles/202590081'
 z.string.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
-z.string.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/202935412'
+z.string.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
 z.string.url_support_session = 'https://support.wire.com/hc/en-us/'
 z.string.url_downloads = 'https://wire.com/download/'
 z.string.url_app_store = 'https://wire.com/download/osx/'

@@ -17,27 +17,9 @@
 #
 
 window.z ?= {}
-z.calling ?= {}
-z.calling.enum ?= {}
+z.tracking ?= {}
+z.tracking.attribute ?= {}
 
-z.calling.enum.CallStateGroups =
-  IS_ACTIVE: [
-    z.calling.enum.CallState.CONNECTING
-    z.calling.enum.CallState.INCOMING
-    z.calling.enum.CallState.ONGOING
-    z.calling.enum.CallState.OUTGOING
-  ]
-  IS_ENDED: [
-    z.calling.enum.CallState.ENDED
-    z.calling.enum.CallState.UNKNOWN
-  ]
-  IS_RINGING: [
-    z.calling.enum.CallState.INCOMING
-    z.calling.enum.CallState.OUTGOING
-  ]
-  CAN_CONNECT: [
-    z.calling.enum.CallState.IGNORED
-    z.calling.enum.CallState.INCOMING
-    z.calling.enum.CallState.ONGOING
-    z.calling.enum.CallState.OUTGOING
-  ]
+z.tracking.attribute.ConversationType =
+  GROUP: 'group'
+  ONE_TO_ONE: 'one_to_one'

@@ -105,13 +105,18 @@ window.TestFactory.prototype.exposeClientActors = function () {
   var self = this;
   return new Promise(function (resolve) {
     self.exposeCryptographyActors().then(function () {
+      var client = new z.client.Client();
+      client.id = '60aee26b7f55a99f';
+      client.class = 'desktop';
+
       var user = new z.entity.User(entities.user.john_doe.id);
-      user.tracking_id = entities.user.john_doe.tracking_id;
-      user.locale = entities.user.john_doe.locale;
+      user.devices.push(client);
       user.email(entities.user.john_doe.email);
+      user.is_me = true;
+      user.locale = entities.user.john_doe.locale;
       user.name(entities.user.john_doe.name);
       user.phone(entities.user.john_doe.phone);
-      user.is_me = true;
+      user.tracking_id = entities.user.john_doe.tracking_id;
 
       window.client_service = new z.client.ClientService(self.client, window.storage_service);
       window.client_service.logger.level = self.settings.logging_level;

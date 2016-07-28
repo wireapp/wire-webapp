@@ -73,7 +73,7 @@ class z.links.LinkPreviewRepository
   ###
   _fetch_open_graph_data: (link) ->
     return new Promise (resolve, reject) ->
-      openGraph link, (error, data) ->
+      window.openGraph link, (error, data) ->
         if error then reject error else resolve data
 
   ###

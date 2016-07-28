@@ -7,6 +7,9 @@
 /aws/s3
 /aws/static
 /aws/templates/**/*.html
+!/aws/templates/base_error.html
+!/aws/templates/debug.html
+!/aws/templates/error.html
 /aws/templates/auth
 /aws/version
 /deploy

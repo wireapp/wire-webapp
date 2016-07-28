@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #
 # Wire
 # Copyright (C) 2016 Wire Swiss GmbH
@@ -15,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
-
-#!/usr/bin/python
 
 import os
 
