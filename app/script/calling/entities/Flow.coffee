@@ -879,6 +879,7 @@ class z.calling.entities.Flow
 
     if media_stream_tracks?.length
       cloned_stream_track = media_stream_tracks[0].clone()
+      cloned_stream_track.enabled = media_stream_tracks[0].enabled
       media_stream_info.stream.addTrack cloned_stream_track
       @logger.log @logger.levels.INFO, "Upgraded local MediaStream of type '#{media_stream_info.type}' with '#{cloned_stream_track.kind}'",
         {stream: media_stream_info.stream, audio_tracks: media_stream_info.stream.getAudioTracks(), video_tracks: media_stream_info.stream.getVideoTracks()}
