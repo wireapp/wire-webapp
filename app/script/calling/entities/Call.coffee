@@ -47,7 +47,7 @@ class z.calling.entities.Call
     @is_remote_screen_shared = ko.pureComputed =>
       return @remote_media_type() is z.calling.enum.MediaType.SCREEN
     @is_remote_videod = ko.pureComputed =>
-      return @remote_media_type() in [z.calling.enum.MediaType.SCREEN, z.calling.enum.MediaType.VIDEO]
+      return @remote_media_type() is z.calling.enum.MediaType.VIDEO
 
     @self_client_joined = ko.observable false
     @self_user_joined = ko.observable false

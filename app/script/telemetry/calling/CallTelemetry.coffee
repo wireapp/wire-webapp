@@ -157,7 +157,7 @@ class z.telemetry.calling.CallTelemetry
         conversation_participants_in_call: call_et.max_number_of_participants
         conversation_type: if call_et.is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
 
-      if call_et.is_remote_videod()
+      if  call_et.is_remote_screen_shared() or call_et.is_remote_videod()
         event_name = event_name.replace '_call', '_video_call'
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name, attributes
@@ -192,7 +192,7 @@ class z.telemetry.calling.CallTelemetry
         reason: call_et.finished_reason
 
       event_name = z.tracking.EventName.CALLING.ENDED_CALL
-      if call_et.is_remote_videod()
+      if call_et.is_remote_screen_shared() or call_et.is_remote_videod()
         event_name = event_name.replace '_call', '_video_call'
 
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name, attributes

@@ -131,7 +131,7 @@ class z.telemetry.calling.FlowTelemetry
   schedule_check: (timeout) ->
     window.setTimeout =>
       @check_stream z.calling.enum.MediaType.AUDIO, timeout
-      @check_stream z.calling.enum.MediaType.VIDEO, timeout if @call_et.is_remote_videod()
+      @check_stream z.calling.enum.MediaType.VIDEO, timeout if @call_et.is_remote_screen_shared() or @call_et.is_remote_videod()
     , timeout
 
   ###
@@ -338,7 +338,7 @@ class z.telemetry.calling.FlowTelemetry
       stream_stats = stats.audio
       stream_stats.volume_sent = window.parseInt report.audioInputLevel, 10
       stream_stats.codec_sent = codec
-    else if @call_et.is_remote_videod()
+    else if @call_et.is_remote_screen_shared() or @call_et.is_remote_videod()
       stream_stats = stats.video
       if report.googFrameHeightReceived
         stream_stats.frame_height_received = window.parseInt report.googFrameHeightReceived, 10
