@@ -48,6 +48,15 @@ class z.telemetry.calling.FlowTelemetry
   ###############################################################################
 
   ###
+  Create flow status report for automation.
+  @return [Object] Report
+  ###
+  create_automation_report: =>
+    report = @create_report()
+    report.meta.remote_user_id = @remote_user_id
+    return report
+
+  ###
   Create flow status report.
   @param passed_error [Error] Optional error to be added to report
   @return [Object] Report
@@ -373,9 +382,9 @@ class z.telemetry.calling.FlowTelemetry
   ###############################################################################
 
   # Get full report.
-  get_report: =>
+  get_automation_report: =>
     return {} =
-      report: @create_report()
+      report: @create_automation_report()
 
   # Log the flow to the browser console.
   log_status: (participant_et) =>

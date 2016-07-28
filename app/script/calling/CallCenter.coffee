@@ -44,7 +44,6 @@ class z.calling.CallCenter
   @return [Boolean] True if screen sharing is supported
   ###
   @supports_screen_sharing: ->
-    return false if z.util.Environment.frontend.is_production()
     return z.util.Environment.browser.supports.screen_sharing
 
   ###

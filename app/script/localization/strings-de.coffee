@@ -202,10 +202,10 @@ z.string.de.modal_session_reset_message_2 = 'uns.'
 z.string.de.modal_too_many_members_headline = 'Volles Haus'
 z.string.de.modal_too_many_members_message = 'An einer Unterhaltung für eine Gruppe können bis zu %max Personen teilnehmen. Hier ist noch Platz für %no Personen.'
 # Whitelist screensharing
-z.string.de.modal_whitelist_screensharing_headline = 'Wire needs permission to share your screen'
-z.string.de.modal_whitelist_screensharing_message_1 = 'Open about:config and add *.wire.com to the list of allowed domains for screensharing. See'
+z.string.de.modal_whitelist_screensharing_headline = 'Wire braucht die Berechtigung deinen Bildschirm zu teilen'
+z.string.de.modal_whitelist_screensharing_message_1 = 'Öffne about:config und füge *.wire.com zur Liste der für Screensharing zugelassenen Domains hinzu. Lies den'
 z.string.de.modal_whitelist_screensharing_message_link = 'FAQ'
-z.string.de.modal_whitelist_screensharing_message_2 = 'for details.'
+z.string.de.modal_whitelist_screensharing_message_2 = 'für weitere Informationen.'
 # Parallel uploads
 z.string.de.modal_uploads_parallel = 'Du kannst bis zu %no Dateien auf einmal senden.'
 
