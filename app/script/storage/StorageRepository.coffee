@@ -186,7 +186,7 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
 
   @param primary_key [String] Primary key to save the object with
   @param value [value] Object to be stored
-  @return [Promise] Promise that will resolve with the saved record
+  @return [Promise] Promise that will resolve with the saved record's key
   ###
   save_value: (primary_key, value) =>
     return @storage_service.save @storage_service.OBJECT_STORE_AMPLIFY, primary_key, value: value
