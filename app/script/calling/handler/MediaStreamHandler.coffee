@@ -377,6 +377,7 @@ class z.calling.handler.MediaStreamHandler
     @call_center.timings().time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED if @call_center.timings()
     @logger.log @logger.levels.DEBUG, "Received initial MediaStream with '#{media_stream_info.stream.getTracks().length}' MediaStreamTrack/s",
       {stream: media_stream_info.stream, audio_tracks: media_stream_info.stream.getAudioTracks(), video_tracks: media_stream_info.stream.getVideoTracks()}
+    @_set_stream_state media_stream_info
     @set_local_media_stream media_stream_info
 
   ###
