@@ -24,6 +24,9 @@ describe 'z.storage.StorageRepository', ->
   beforeAll (done) ->
     test_factory.exposeStorageActors().then(done).catch done.fail
 
+  beforeEach ->
+    storage_repository.clear_all_stores()
+
   describe 'construct_primary_key', ->
     it 'constructs primary keys', ->
       conversation_id = '35d8767e-83c9-4e9a-a5ee-32ba7de706f2'
