@@ -19,11 +19,12 @@
 ###############################################################################
 # Raygun Sourcefile upload
 ###############################################################################
+
+fs = require 'fs'
+request = require 'request'
+
 module.exports = (grunt) ->
   grunt.registerTask 'raygun', (env='staging') ->
-    fs = require 'fs'
-    request = require 'request'
-
     done = @async()
 
     options =
