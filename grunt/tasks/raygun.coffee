@@ -40,14 +40,14 @@ module.exports = (grunt) ->
 
     files = []
     for min_script in fs.readdirSync 'deploy/min'
-      grunt.verbose.writeln "File deploy/min/#{min_script['cyan']} will be uploaded."
+      grunt.log.writeln "File deploy/min/#{min_script['cyan']} will be uploaded."
       files.push "deploy/min/#{min_script}"
 
     pending_upload_count = files.length
     failed_upload_count = 0
 
     for file, index in files
-      grunt.verbose.writeln "Adding file ##{index + 1} #{files[index].toString()['cyan']} to the upload queue."
+      grunt.log.writeln "Adding file ##{index + 1} #{files[index].toString()['cyan']} to the upload queue."
       options.headers =
         'WireFilename': file
         'WireRequest': index
@@ -55,7 +55,7 @@ module.exports = (grunt) ->
         file = response.request.headers.WireFilename
         number = response.request.headers.WireRequest
         if response.statusCode is 200
-          grunt.verbose.write "File ##{number} #{file['cyan']} successfully uploaded"
+          grunt.log.write "File ##{number} #{file['cyan']} successfully uploaded"
         else
           grunt.log.error "Upload of file ##{number} #{file['cyan']} failed with code #{response.statusCode.toString()['cyan']}"
           failed_upload_count++
@@ -68,7 +68,7 @@ module.exports = (grunt) ->
           grunt.log.ok "#{number_of_files['cyan']} #{file_string} uploaded to Raygun."
           done()
         else
-          grunt.verbose.writeln ", #{pending_upload_count} files remaining"
+          grunt.log.writeln ", #{pending_upload_count} files remaining"
 
       form = req.form()
       if file.indexOf('min/') > -1 and file.indexOf('map') is -1
