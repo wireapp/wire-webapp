@@ -52,8 +52,13 @@ module.exports = (grunt) ->
         'WireFilename': file
         'WireRequest': index
       req = request.post options, (error, response) =>
+        if not response.request
+          grunt.fail.warn 'Failed uploading file to Raygun. Are the credentials correct?'
+          continue
+
         file = response.request.headers.WireFilename
         number = response.request.headers.WireRequest
+
         if response.statusCode is 200
           grunt.log.write "File ##{number} #{file['cyan']} successfully uploaded"
         else
@@ -64,7 +69,6 @@ module.exports = (grunt) ->
         if pending_upload_count is 0
           number_of_files = (files.length - failed_upload_count).toString()
           file_string = grunt.util.pluralize files.length, 'file/files'
-          grunt.log.writeln()
           grunt.log.ok "#{number_of_files['cyan']} #{file_string} uploaded to Raygun."
           done()
         else
