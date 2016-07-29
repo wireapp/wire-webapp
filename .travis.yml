@@ -105,6 +105,6 @@ after_deploy:
   - chmod ugo+x ./bin/deployment_notification.sh
   - ./bin/deployment_notification.sh
 
-after_failure:
+after_script:
   - echo after_failure
   - cat /home/travis/build/wireapp/wire-webapp/npm-debug.log
