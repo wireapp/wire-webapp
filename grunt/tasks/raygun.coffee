@@ -24,7 +24,7 @@ fs = require 'fs'
 request = require 'request'
 
 module.exports = (grunt) ->
-  grunt.registerTask 'raygun', (env='staging') ->
+  grunt.registerTask 'raygun', (env = 'staging') ->
     done = @async()
 
     options =
@@ -60,7 +60,7 @@ module.exports = (grunt) ->
         if response.statusCode is 200
           file = response.request.headers.WireFilename
           number = response.request.headers.WireRequest
-          
+
           grunt.log.write "File ##{number} #{file['cyan']} successfully uploaded"
         else
           file = response.request.headers.WireFilename
