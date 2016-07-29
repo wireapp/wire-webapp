@@ -48,16 +48,24 @@ module.exports = (grunt) ->
 
     for file, index in files
       grunt.log.writeln "Adding file ##{index + 1} #{files[index].toString()['cyan']} to the upload queue."
+
       options.headers =
         'WireFilename': file
         'WireRequest': index
+
       req = request.post options, (error, response) =>
-        file = response.request.headers.WireFilename
-        number = response.request.headers.WireRequest
+        if not response.request
+          grunt.log.write "#{file['red']} Upload to Raygun failed. Are the credentials correct?"
 
         if response.statusCode is 200
+          file = response.request.headers.WireFilename
+          number = response.request.headers.WireRequest
+          
           grunt.log.write "File ##{number} #{file['cyan']} successfully uploaded"
         else
+          file = response.request.headers.WireFilename
+          number = response.request.headers.WireRequest
+
           grunt.log.error "Upload of file ##{number} #{file['cyan']} failed with code #{response.statusCode.toString()['cyan']}"
           failed_upload_count++
 
