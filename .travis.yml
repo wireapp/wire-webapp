@@ -46,7 +46,7 @@ notifications:
 before_deploy:
   - if [ "$TRAVIS_BRANCH" == "dev" ]; then npm run deploy-travis-dev; fi
   - if [ "$TRAVIS_BRANCH" == "staging" ]; then npm run deploy-travis-staging; fi
-  - if [ "$TRAVIS_BRANCH" == "prod" ]; then npm run deploy-travis-prod || echo 'contents of npm-debug.log:' && cat /home/travis/build/wireapp/wire-webapp/npm-debug.log && exit 1; fi
+  - if [ "$TRAVIS_BRANCH" == "prod" ]; then npm run deploy-travis-prod || { echo 'contents of npm-debug.log:' && cat /home/travis/build/wireapp/wire-webapp/npm-debug.log && exit 1; } fi
 
 # https://github.com/travis-ci/dpl#elastic-beanstalk
 deploy:
