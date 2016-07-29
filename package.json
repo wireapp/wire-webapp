@@ -40,7 +40,7 @@
     "test": "grunt check && grunt test",
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
-    "deploy-travis-prod": "grunt app_deploy_travis:prod --force"
+    "deploy-travis-prod": "grunt app_deploy_travis:prod"
   },
   "repository": {
     "type": "git",

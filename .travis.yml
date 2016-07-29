@@ -25,7 +25,7 @@ addons:
 # http://docs.travis-ci.com/user/languages/javascript-with-nodejs/
 language: node_js
 node_js:
-  - "5"
+  - 5
 
 # https://blog.travis-ci.com/2013-12-05-speed-up-your-builds-cache-your-dependencies
 cache:
