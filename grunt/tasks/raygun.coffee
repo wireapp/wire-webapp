@@ -52,10 +52,6 @@ module.exports = (grunt) ->
         'WireFilename': file
         'WireRequest': index
       req = request.post options, (error, response) =>
-        if not response.request
-          grunt.fail.warn 'Failed uploading file to Raygun. Are the credentials correct?'
-          continue
-
         file = response.request.headers.WireFilename
         number = response.request.headers.WireRequest
 
