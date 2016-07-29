@@ -21,8 +21,17 @@ z.links ?= {}
 
 z.links.LinkPreviewProtoBuilder = do ->
 
+  has_valid_attributes = (data) ->
+    has_valid_description = true if data.description
+    has_valid_title = true if data.title
+    has_valid_type = true if data.type in ['article', 'object', 'website']
+    has_valid_type = true if not data.type?
+    has_valid_url = true if data.url
+    return has_valid_description and has_valid_title and has_valid_type and has_valid_url
+
   ###
-  Create link preview proto message
+  Create Protocol Buffers message for link previews.
+  Open Graph data can be validated through: https://developers.facebook.com/tools/debug/
 
   @param data [Object] open graph data
   @param url [String] link entered by the user
@@ -31,16 +40,15 @@ z.links.LinkPreviewProtoBuilder = do ->
   @returns [z.proto.LinkPreview]
   ###
   build_from_open_graph_data = (data, url, offset = 0) ->
-    preview = null
+    return undefined if _.isEmpty data
 
-    return if _.isEmpty data
+    data.url = data.url or url
 
-    switch
-      when not data.type? or data.type in ['article', 'website'] and data.title
-        preview = new z.proto.Article data.url or url, data.title, data.description
-
-    if preview?
+    if has_valid_attributes data
+      preview = new z.proto.Article data.url or url, data.title, data.description
       return new z.proto.LinkPreview url, offset, preview
+
+    return undefined
 
   return {
     build_from_open_graph_data: build_from_open_graph_data

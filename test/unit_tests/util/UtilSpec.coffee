@@ -22,49 +22,49 @@
 # z.util.render_message
 ###############################################################################
 describe 'z.util.render_message', ->
-  it 'can render a normal link', ->
+  it 'renders a normal link', ->
     actual = z.util.render_message 'Check this: http://www.wire.com/'
     expected = 'Check this: <a href="http://www.wire.com/" target="_blank" rel="nofollow">http://www.wire.com/</a>'
     expect(actual).toBe expected
 
-  it 'can render a normal link without protocol', ->
+  it 'renders a normal link without protocol', ->
     actual = z.util.render_message 'Check this: wire.com/about/'
     expected = 'Check this: <a href="http://wire.com/about/" target="_blank" rel="nofollow">wire.com/about/</a>'
     expect(actual).toBe expected
 
-  it 'can render complicated image links', ->
+  it 'renders complicated image links', ->
     link = 'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&crop=(0,27,848,506.0960451977401)&cropxunits=848&cropyunits=595&format=jpg&quality=90&width=752&maxheight=42'
     actual = z.util.render_message link
     expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow\">#{link}</a>"
     expect(actual).toBe expected
 
-  it 'can render URLs with underscores', ->
+  it 'renders URLs with underscores', ->
     link = 'http://en.wikipedia.org/wiki/Stormtrooper_(Star_Wars)'
     text = "Stormtroopers: #{link} !!!"
     actual = z.util.render_message text
     expected = "Stormtroopers: <a href=\"#{link}\" target=\"_blank\" rel=\"nofollow\">#{link}</a> !!!"
     expect(actual).toBe expected
 
-  it 'can render links with multiple underscores', ->
+  it 'renders links with multiple underscores', ->
     link = 'https://www.nike.com/events-registration/event?id=6245&languageLocale=de_de&cp=EUNS_KW_DE_&s_kwcid=AL!2799!3!46005237943!b!!g!!womens%20running'
     actual = z.util.render_message link
     expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow\">#{link}</a>"
     expect(actual).toBe expected
 
-  it 'can render URLs without a trailing slash', ->
+  it 'renders URLs without a trailing slash', ->
     link = 'http://www.underscore.com'
     text = "e.g. #{link}."
     actual = z.util.render_message text
     expected = "e.g. <a href=\"#{link}\" target=\"_blank\" rel=\"nofollow\">#{link}</a>."
     expect(actual).toBe expected
 
-  it 'can render localhost links', ->
+  it 'renders localhost links', ->
     link = 'http://localhost:8888/'
     actual = z.util.render_message link
     expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow\">#{link}</a>"
     expect(actual).toBe expected
 
-  it 'can render links with IP addresses', ->
+  it 'renders links with IP addresses', ->
     link = 'http://192.168.10.44:8080//job/webapp_atomic_test/4290/cucumber-html-reports'
     actual = z.util.render_message link
     expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow\">#{link}</a>"
@@ -75,41 +75,44 @@ describe 'z.util.render_message', ->
     expected = '&lt;a href=&quot;javascript:alert(&#x27;ohoh!&#x27;)&quot;&gt;what?&lt;/a&gt;'
     expect(actual).toBe expected
 
-  it 'can render an email address', ->
+  it 'renders an email address', ->
     actual = z.util.render_message "send it over to hello@wire.com"
     expected = 'send it over to <a href="mailto:hello@wire.com">hello@wire.com</a>'
     expect(actual).toBe expected
 
-  it 'can render an email address with pluses', ->
+  it 'renders an email address with pluses', ->
     actual = z.util.render_message "send it over to hello+world@wire.com"
     expected = 'send it over to <a href="mailto:hello+world@wire.com">hello+world@wire.com</a>'
     expect(actual).toBe expected
 
-  it 'can render an email long domains', ->
+  it 'renders an email long domains', ->
     actual = z.util.render_message "send it over to janedoe@school.university.edu"
     expected = 'send it over to <a href="mailto:janedoe@school.university.edu">janedoe@school.university.edu</a>'
     expect(actual).toBe expected
 
-  it 'can render an email with multiple subdomains', ->
+  it 'renders an email with multiple subdomains', ->
     actual = z.util.render_message "send it over to bla@foo.co.uk"
     expected = 'send it over to <a href="mailto:bla@foo.co.uk">bla@foo.co.uk</a>'
     expect(actual).toBe expected
 
   # The tag "<br />" is preferred for compatibility sake.
   # @see http://stackoverflow.com/a/1946442/451634
-  #
-  it 'can render endlines to <br />', ->
+  it 'renders endlines to <br />', ->
     text = "Hello,\nworld!\nHow is it going?\n"
     actual = z.util.render_message text
     expected = "Hello,<br />world!<br />How is it going?"
     expect(actual).toBe expected
 
-  it 'can render text with more than one newline in between', ->
+  it 'renders text with more than one newline in between', ->
     text = "Hello,\n\n\n\n\n\n\nworld!"
     actual = z.util.render_message text
     expected = "Hello,<br /><br /><br /><br /><br /><br /><br />world!"
     expect(actual).toBe expected
 
+  xit 'renders an emoticon of someone shrugging', ->
+    text = '¯\_(ツ)_/¯'
+    actual = z.util.render_message text
+    expect(actual).toBe text
 
 ###############################################################################
 # z.util.encode_base64_md5_array_buffer_view
@@ -125,12 +128,12 @@ describe 'z.util.encode_base64_md5_array_buffer_view', ->
 # z.util.encode_base64
 ###############################################################################
 describe 'z.util.encode_base64', ->
-  it 'encode text', ->
+  it 'encodes text', ->
     actual = z.util.encode_base64 'Hello, world!'
     expected = 'SGVsbG8sIHdvcmxkIQ=='
     expect(actual).toBe expected
 
-  it 'encode symbols', ->
+  it 'encodes symbols', ->
     actual = z.util.encode_base64 'Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"'
     expected = 'SGVsbG8sIHdvcmxkIUAjJCVeJiooKV8re31bXXw8PiwuPy9+YCI='
     expect(actual).toBe expected
@@ -140,17 +143,17 @@ describe 'z.util.encode_base64', ->
 # z.util.encode_base64_sha256
 ###############################################################################
 describe 'z.util.encode_base64_sha256', ->
-  it 'encode Base64 and SHA-256 empty string', ->
+  it 'encodes Base64 and SHA-256 empty string', ->
     actual = z.util.encode_sha256_base64 ''
     expected = '47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='
     expect(actual).toBe expected
 
-  it 'encode Base64 and SHA-256 text', ->
+  it 'encodes Base64 and SHA-256 text', ->
     actual = z.util.encode_sha256_base64 'Hello, world!'
     expected = 'MV9b23bQeMQ7isAGTkoBZGErH853yGk0W/yUx1iU7dM='
     expect(actual).toBe expected
 
-  it 'encode Base64 and SHA-256 symbols', ->
+  it 'encodes Base64 and SHA-256 symbols', ->
     actual = z.util.encode_sha256_base64 'Hello, world!@#$%^&*()_+{}[]|<>,.?/~`"'
     expected = 'lt/heVPfGQB07sONclI2TZBZHuIMH86noUEWEbahMw4='
     expect(actual).toBe expected
@@ -161,7 +164,7 @@ describe 'z.util.encode_base64_sha256', ->
 ###############################################################################
 describe 'z.util.base64_to_blob', ->
 
-  it 'encode Base64 data URI to blob', ->
+  it 'encodes Base64 data URI to blob', ->
     base64 = z.util.array_to_base64 new Uint8Array [1, 2, 3]
     data_uri = "data:application/octet-binary;base64,#{base64}"
     blob = z.util.base64_to_blob data_uri
@@ -192,7 +195,7 @@ describe 'z.util.create_random_uuid', ->
 # z.util.bytes_to_uuid
 ###############################################################################
 describe 'z.util.bytes_to_uuid', ->
-  it 'can create uuid from byte array', ->
+  it 'creates uuid from byte array', ->
     expected = '1692b76b-d66b-4688-a099-71512ec1f51e'
     actual = z.util.bytes_to_uuid [22, 146, 183, 107, 214, 107, 70, 136, 160, 153, 113, 81, 46, 193, 245, 30]
     expect(actual).toBe expected
@@ -202,7 +205,7 @@ describe 'z.util.bytes_to_uuid', ->
 # z.util.uuid_to_bytes
 ###############################################################################
 describe 'z.util.uuid_to_bytes', ->
-  it 'can create byte array from uuid', ->
+  it 'creates byte array from uuid', ->
     expected = [22, 146, 183, 107, 214, 107, 70, 136, 160, 153, 113, 81, 46, 193, 245, 30]
     actual = z.util.uuid_to_bytes '1692b76b-d66b-4688-a099-71512ec1f51e'
     expect(actual).toEqual expected
@@ -212,19 +215,19 @@ describe 'z.util.uuid_to_bytes', ->
 # z.util.format_bytes
 ###############################################################################
 describe 'z.util.format_bytes', ->
-  it 'render 0 bytes', ->
+  it 'renders 0 bytes', ->
     actual = z.util.format_bytes 0
     expect(actual).toEqual '0B'
 
-  it 'render 1KB', ->
+  it 'renders 1KB', ->
     actual = z.util.format_bytes 1024
     expect(actual).toEqual '1KB'
 
-  it 'render 25MB', ->
+  it 'renders 25MB', ->
     actual = z.util.format_bytes 25 * 1024 * 1024
     expect(actual).toEqual '25MB'
 
-  it 'render 25GB', ->
+  it 'renders 25GB', ->
     actual = z.util.format_bytes 25 * 1024 * 1024 * 1024
     expect(actual).toEqual '25GB'
 
@@ -233,22 +236,22 @@ describe 'z.util.format_bytes', ->
 # z.util.get_file_extension
 ###############################################################################
 describe 'z.util.get_file_extension', ->
-  it 'should return extension common extensions', ->
+  it 'returns common extensions', ->
     expect(z.util.get_file_extension('file.jpg')).toEqual 'jpg'
     expect(z.util.get_file_extension('file.png')).toEqual 'png'
     expect(z.util.get_file_extension('file.docx')).toEqual 'docx'
     expect(z.util.get_file_extension('file.exe')).toEqual 'exe'
     expect(z.util.get_file_extension('file.dmg')).toEqual 'dmg'
 
-  it 'should return extension for gzip compressed tar archive', ->
+  it 'returns extensions for gzip compressed tar archives', ->
     actual = z.util.get_file_extension 'archive.tar.gz'
     expect(actual).toEqual 'tar.gz'
 
-  it 'should return an empty string if filename has no extension', ->
+  it 'returns an empty string if filename has no extension', ->
     actual = z.util.get_file_extension 'image'
     expect(actual).toEqual ''
 
-  it 'should return extension jpg for image.jpg', ->
+  it 'returns extension jpg for image.jpg', ->
     actual = z.util.get_file_extension 'path/to/image.jpg'
     expect(actual).toEqual 'jpg'
 
@@ -257,19 +260,19 @@ describe 'z.util.get_file_extension', ->
 # z.util.trim_file_extension
 ###############################################################################
 describe 'z.util.trim_file_extension', ->
-  it 'should return string without extension for image.jpg', ->
+  it 'returns the filename without extension', ->
     actual = z.util.trim_file_extension 'image.jpg'
     expect(actual).toEqual 'image'
 
-  it 'should return string if no extension found', ->
+  it 'returns the filename when there is no extension', ->
     actual = z.util.trim_file_extension 'image'
     expect(actual).toEqual 'image'
 
-  it 'should return string without extension for filename with slashes', ->
+  it 'returns the filename without extension or directory path', ->
     actual = z.util.trim_file_extension 'foo/bar.exe'
     expect(actual).toEqual 'foo/bar'
 
-  it 'should return string without extension for tar.gz', ->
+  it 'returns the filename without extension for .tar.gz', ->
     actual = z.util.trim_file_extension 'archive.tar.gz'
     expect(actual).toEqual 'archive'
 
@@ -277,7 +280,7 @@ describe 'z.util.trim_file_extension', ->
 # z.util.ko_array_push_all
 ###############################################################################
 describe 'z.util.ko_array_push_all', ->
-  it 'can append multiple items', ->
+  it 'appends multiple items', ->
     actual = ko.observableArray [1, 2]
     z.util.ko_array_push_all actual, [3, 4]
     expected = [1, 2, 3, 4]
@@ -288,7 +291,7 @@ describe 'z.util.ko_array_push_all', ->
 # z.util.ko_array_unshift_all
 ###############################################################################
 describe 'z.util.ko_array_unshift_all', ->
-  it 'can prepend multiple items', ->
+  it 'prepends multiple items', ->
     actual = ko.observableArray [3, 4]
     z.util.ko_array_unshift_all actual, [1, 2]
     expected = [1, 2, 3, 4]
@@ -301,19 +304,19 @@ describe 'z.util.ko_array_unshift_all', ->
 describe 'z.util.contains', ->
   string = 'Club Zeta'
 
-  it 'can find "ub" in Club Zeta', ->
+  it 'finds "ub" in Club Zeta', ->
     actual = z.util.contains string, 'ub'
     expect(actual).toBeTruthy()
 
-  it 'can find "Club Z" in Club Zeta', ->
+  it 'finds "Club Z" in Club Zeta', ->
     actual = z.util.contains string, 'Club Z'
     expect(actual).toBeTruthy()
 
-  it 'can find "club z" in Club Zeta', ->
+  it 'finds "club z" in Club Zeta', ->
     actual = z.util.contains string, 'club z'
     expect(actual).toBeTruthy()
 
-  it 'cannot find "wurst" in Club Zeta', ->
+  it 'doesn\'t find "wurst" in Club Zeta', ->
     actual = z.util.contains string, 'wurst'
     expect(actual).toBeFalsy()
 
@@ -404,7 +407,7 @@ describe 'z.util.get_content_type_from_data_url', ->
 # z.util.sort_groups_by_last_event
 ###############################################################################
 describe 'z.util.sort_groups_by_last_event', ->
-  it 'can find out that Group A is more recent than Group B', ->
+  it 'finds out that Group A is more recent than Group B', ->
     group_a = new z.entity.Conversation()
     group_a.name 'Latest'
     group_a.last_event_timestamp 1414505857975
@@ -419,7 +422,7 @@ describe 'z.util.sort_groups_by_last_event', ->
     expect(ordered_groups[0].name()).toEqual group_a.name()
     expect(ordered_groups[1].name()).toEqual group_b.name()
 
-  it 'can find out that Group B is more recent than Group A', ->
+  it 'finds out that Group B is more recent than Group A', ->
     group_a = new z.entity.Conversation()
     group_a.name 'Older'
     group_a.last_event_timestamp 1414505766449
@@ -434,7 +437,7 @@ describe 'z.util.sort_groups_by_last_event', ->
     expect(ordered_groups[0].name()).toEqual group_b.name()
     expect(ordered_groups[1].name()).toEqual group_a.name()
 
-  it 'can find out if two groups are equally recent', ->
+  it 'finds out if two groups are equally recent', ->
     group_a = new z.entity.Conversation()
     group_a.name 'Latest'
     group_a.last_event_timestamp 1414505857975
@@ -671,7 +674,7 @@ describe 'Markdown for bold text', ->
     expected = '<strong>bold text (not italic)</strong>'
     expect(actual).toBe expected
 
-  it 'can render a bold word within a sentence', ->
+  it 'renders a bold word within a sentence', ->
     actual = z.util.render_message 'Markdown **just** rocks!'
     expected = 'Markdown <strong>just</strong> rocks!'
     expect(actual).toEqual expected
@@ -732,7 +735,7 @@ describe 'Markdown for italic text', ->
     expect(actual).toBe expected
 
 describe 'Markdown for code snippets', ->
-  it 'can render code blocks', ->
+  it 'renders code blocks', ->
     actual = z.util.render_message "```console.log('A')```"
     expected = '<code>console.log(&#x27;A&#x27;)</code>'
     expect(actual).toEqual expected
@@ -742,12 +745,12 @@ describe 'Markdown for code snippets', ->
     expected = '<code>&lt;b&gt;Hello&lt;/b&gt;</code>'
     expect(actual).toEqual expected
 
-  it 'can render code within code spans', ->
+  it 'renders code within code spans', ->
     actual = z.util.render_message "This is `code`."
     expected = 'This is <code>code</code>.'
     expect(actual).toEqual expected
 
-  it 'can render code within code blocks', ->
+  it 'renders code within code blocks', ->
     actual = z.util.render_message "This is ```code```."
     expected = 'This is <code>code</code>.'
     expect(actual).toEqual expected
@@ -762,38 +765,38 @@ describe 'Markdown for code snippets', ->
     expected = "<pre><code class=\"lang-xml\"><span class=\"hljs-tag\">&lt;<span class=\"hljs-title\">dependency</span>&gt;</span><br />  <span class=\"hljs-tag\">&lt;<span class=\"hljs-title\">groupId</span>&gt;</span>com.ibm.icu<span class=\"hljs-tag\">&lt;/<span class=\"hljs-title\">groupId</span>&gt;</span><br />  <span class=\"hljs-tag\">&lt;<span class=\"hljs-title\">artifactId</span>&gt;</span>icu4j<span class=\"hljs-tag\">&lt;/<span class=\"hljs-title\">artifactId</span>&gt;</span><br />  <span class=\"hljs-tag\">&lt;<span class=\"hljs-title\">version</span>&gt;</span>53.1<span class=\"hljs-tag\">&lt;/<span class=\"hljs-title\">version</span>&gt;</span><br /><span class=\"hljs-tag\">&lt;/<span class=\"hljs-title\">dependency</span>&gt;</span><br /></code></pre>"
     expect(actual).toEqual expected
 
-  it 'can render escaped Ruby code blocks', ->
+  it 'renders escaped Ruby code blocks', ->
     code = "```ruby\nrequire 'redcarpet'\nmarkdown = Redcarpet.new(\"Hello World!\")\nputs markdown.to_html\n```"
     actual = z.util.render_message code
     expected = "<pre><code class=\"lang-ruby\">require <span class=\"hljs-string\">'redcarpet'</span><br />markdown = Redcarpet.<span class=\"hljs-function\"><span class=\"hljs-title\">new</span><span class=\"hljs-params\">(<span class=\"hljs-string\">\"Hello World!\"</span>)</span></span><br />puts markdown.to_html<br /></code></pre>"
     expect(actual).toEqual expected
 
-  it 'can render escaped JavaScript code blocks', ->
+  it 'renders escaped JavaScript code blocks', ->
     code = "```js\n$(document).ready(function() {\n  $('pre code').each(function(i, block) {\n    hljs.highlightBlock(block);\n  });\n});```"
     actual = z.util.render_message code
     expected = "<pre><code class=\"lang-js\">$(<span class=\"hljs-built_in\">document</span>).ready(<span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span><span class=\"hljs-params\">()</span> </span>{<br />  $(<span class=\"hljs-string\">'pre code'</span>).each(<span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span><span class=\"hljs-params\">(i, block)</span> </span>{<br />    hljs.highlightBlock(block);<br />  });<br />});<br /></code></pre>"
     expect(actual).toEqual expected
 
-  it 'can render escaped CoffeeScript code blocks', ->
+  it 'renders escaped CoffeeScript code blocks', ->
     code = "```coffeescript\n# TODO: This is not a general utility:\n# It should be part of a view model as it's UI related.\n  z.util.convert_timestamps = ->\n    if $('time').length > 0\n      recalculate = ->```"
     actual = z.util.render_message code
     expected = "<pre><code class=\"lang-coffeescript\"><span class=\"hljs-comment\"># TODO: This is not a general utility:</span><br /><span class=\"hljs-comment\"># It should be part of a view model as it's UI related.</span><br />  z.util.convert_timestamps = <span class=\"hljs-function\">-&gt;</span><br />    <span class=\"hljs-keyword\">if</span> $(<span class=\"hljs-string\">'time'</span>).length &gt; <span class=\"hljs-number\">0</span><br /><span class=\"hljs-function\">      <span class=\"hljs-title\">recalculate</span> = -&gt;</span><br /></code></pre>"
     expect(actual).toEqual expected
 
-  it 'can render escaped HTML code blocks', ->
+  it 'renders escaped HTML code blocks', ->
     code = "```html\n<a href=\"javascript:wire.app.logout()\">This is a trick</a>\n```"
     actual = z.util.render_message code
     expected = "<pre><code class=\"lang-html\">&lt;<span class=\"hljs-tag\">a</span> href=<span class=\"hljs-string\">\"javascript:wire.app.logout()\"</span>&gt;This is <span class=\"hljs-tag\">a</span> trick&lt;/a&gt;<br /></code></pre>"
     expect(actual).toEqual expected
 
-  it 'can render escaped HTML code spans', ->
+  it 'renders escaped HTML code spans', ->
     code = "`<a href=\"javascript:wire.app.logout()\">This is a trick</a>`"
     actual = z.util.render_message code
     expected = "<code>&lt;a href=&quot;javascript:wire.app.logout()&quot;&gt;This is a trick&lt;/a&gt;</code>"
     expect(actual).toEqual expected
 
 describe 'Markdown with mixed markups', ->
-  it 'can render font weights together with links', ->
+  it 'renders font weights together with links', ->
     # TODO: Someday we need a link factory (Factory Pattern!)
     link_1 = '<a href="http://www.link.com" target="_blank" rel="nofollow">www.link.com</a>'
     link_2 = '<a href="http://www.anotherlink.net" target="_blank" rel="nofollow">www.anotherlink.net</a>'
@@ -857,11 +860,11 @@ describe 'z.util.zero_padding', ->
     actual = z.util.zero_padding '1', 10
     expect(actual).toBe '0000000001'
 
-  it 'should return string if max is smaller then string length', ->
+  it 'returns string if max is smaller then string length', ->
     actual = z.util.zero_padding '1000000000', 8
     expect(actual).toBe '1000000000'
 
-  it 'should return string if max is equal string length', ->
+  it 'returns string if max is equal string length', ->
     actual = z.util.zero_padding '1000000000', 10
     expect(actual).toBe '1000000000'
 
@@ -995,14 +998,14 @@ describe 'Merging objects', ->
 # z.util.bucket_values
 ###############################################################################
 describe 'bucket_values', ->
-  it 'should return correct value for zero', ->
+  it 'returns correct value for zero', ->
     expect(z.util.bucket_values 0, [0, 5, 10, 15, 20, 25]).toBe '0'
 
-  it 'should return the correct bucket if value is inside the given limits', ->
+  it 'returns the correct bucket if value is inside the given limits', ->
     expect(z.util.bucket_values 13, [0, 5, 10, 15, 20, 25]).toBe '11-15'
     expect(z.util.bucket_values 1023, [0, 100, 200, 500, 1000, 2000]).toBe '1001-2000'
 
-  it 'should return the correct bucket if value is above the given limits', ->
+  it 'returns the correct bucket if value is above the given limits', ->
     expect(z.util.bucket_values 100, [0, 5, 10, 15, 20, 25]).toBe '26-'
     expect(z.util.bucket_values 10023, [0, 100, 200, 500, 1000, 2000]).toBe '2001-'
 
@@ -1011,7 +1014,7 @@ describe 'bucket_values', ->
 # z.util.iterate_array_index
 ###############################################################################
 describe 'iterate_array_index', ->
-  it 'should return undefined in case of wrong in case of wrong input parameters', ->
+  it 'returns undefined in case of wrong input parameters', ->
     expect(z.util.iterate_array_index 'Test', 0).toBe undefined
     expect(z.util.iterate_array_index [1, 2, 3], 'Test').toBe undefined
     expect(z.util.iterate_array_index [], 0).toBe undefined

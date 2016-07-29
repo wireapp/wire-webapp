@@ -194,7 +194,7 @@ class z.entity.Message
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.SELECTED_MESSAGE,
       context: 'single'
-      conversation_type: if active_conversation.is_one2one() then 'one_to_one' else 'group'
+      conversation_type: if active_conversation.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
       type: type
 
     amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,

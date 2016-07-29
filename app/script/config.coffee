@@ -72,8 +72,8 @@ z.config =
     WIDTH: 320
     HEIGHT: 320
 
-  # 5 megabyte image upload limit
-  MAXIMUM_IMAGE_FILE_SIZE: 5 * 1024 * 1024
+  # 15 megabyte image upload limit
+  MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024
 
   # 25 megabyte upload limit ( minus iv and padding )
   MAXIMUM_ASSET_FILE_SIZE: 25 * 1024 * 1024 - 16 - 16

@@ -48,6 +48,15 @@ class z.telemetry.calling.FlowTelemetry
   ###############################################################################
 
   ###
+  Create flow status report for automation.
+  @return [Object] Report
+  ###
+  create_automation_report: =>
+    report = @create_report()
+    report.meta.remote_user_id = @remote_user_id
+    return report
+
+  ###
   Create flow status report.
   @param passed_error [Error] Optional error to be added to report
   @return [Object] Report
@@ -122,7 +131,7 @@ class z.telemetry.calling.FlowTelemetry
   schedule_check: (timeout) ->
     window.setTimeout =>
       @check_stream z.calling.enum.MediaType.AUDIO, timeout
-      @check_stream z.calling.enum.MediaType.VIDEO, timeout if @call_et.is_remote_videod()
+      @check_stream z.calling.enum.MediaType.VIDEO, timeout if @call_et.is_remote_screen_shared() or @call_et.is_remote_videod()
     , timeout
 
   ###
@@ -329,7 +338,7 @@ class z.telemetry.calling.FlowTelemetry
       stream_stats = stats.audio
       stream_stats.volume_sent = window.parseInt report.audioInputLevel, 10
       stream_stats.codec_sent = codec
-    else if @call_et.is_remote_videod()
+    else if @call_et.is_remote_screen_shared() or @call_et.is_remote_videod()
       stream_stats = stats.video
       if report.googFrameHeightReceived
         stream_stats.frame_height_received = window.parseInt report.googFrameHeightReceived, 10
@@ -373,9 +382,9 @@ class z.telemetry.calling.FlowTelemetry
   ###############################################################################
 
   # Get full report.
-  get_report: =>
+  get_automation_report: =>
     return {} =
-      report: @create_report()
+      report: @create_automation_report()
 
   # Log the flow to the browser console.
   log_status: (participant_et) =>

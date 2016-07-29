@@ -32,10 +32,7 @@ class z.calling.handler.CallStateHandler
     @calls = ko.observableArray []
     @joined_call = ko.pureComputed => return call_et for call_et in @calls() when call_et.self_client_joined()
 
-    @self_state =
-      muted: @call_center.media_stream_handler.self_stream_state.muted
-      screen_shared: @call_center.media_stream_handler.self_stream_state.screen_shared
-      videod: @call_center.media_stream_handler.self_stream_state.videod
+    @self_state = @call_center.media_stream_handler.self_stream_state
 
     @is_handling_notifications = ko.observable true
     @subscribe_to_events()
@@ -117,6 +114,7 @@ class z.calling.handler.CallStateHandler
   @param client_joined_change [Boolean] Client joined state change triggered by client action
   ###
   on_call_state: (event, client_joined_change = false) ->
+    @logger.log @logger.levels.DEBUG, "Handling call state event with self client change: #{client_joined_change}", event
     participant_ids = @_get_remote_participant_ids event.participants
     self_user_joined = @_is_self_user_joined event.participants
     participants_count = participant_ids.length
@@ -138,19 +136,22 @@ class z.calling.handler.CallStateHandler
         # ...which has ended
       else
         @delete_call call_et.id
-    .catch =>
-      # Call with us joined
-      if self_user_joined
-        # ...from this device
-        if client_joined_change
-          @_create_outgoing_call event
+    .catch (error) =>
+      if error.type is z.calling.CallError::TYPE.CALL_NOT_FOUND
+        # Call with us joined
+        if self_user_joined
+          # ...from this device
+          if client_joined_change and participants_count is 0
+            @_create_outgoing_call event
           # ...from another device
-        else
-          @_create_ongoing_call event, participant_ids
+          else
+            @_create_ongoing_call event, participant_ids
           # ...with other participants
-      # New call we are not joined
-      else if participants_count > 0
-        @_create_incoming_call event, participant_ids
+          # New call we are not joined
+        else if participants_count > 0
+          @_create_incoming_call event, participant_ids
+      else
+        @logger.log @logger.levels.ERROR, "Failed to handle state event: #{error.message}", error
 
   ###
   Create the payload for to be set as call state.
@@ -332,7 +333,7 @@ class z.calling.handler.CallStateHandler
     .then (call_et) =>
       @logger.log @logger.levels.INFO, "Delete call in conversation '#{conversation_id}'"
       # Reset call and delete it afterwards
-      call_et.state z.calling.enum.CallState.DELETED
+      call_et.state z.calling.enum.CallState.ENDED
       call_et.reset_call()
       @calls.remove call_et
       @call_center.media_stream_handler.reset_media_streams()
@@ -377,7 +378,7 @@ class z.calling.handler.CallStateHandler
               amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.VOICE_CALL_INITIATED
               media_action = if is_videod then 'audio_call' else 'video_call'
               amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-                action: media_action, conversation_type: if conversation_et.is_one2one() then 'one_to_one' else 'group'
+                action: media_action, conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
         return true
 
   ###
@@ -590,6 +591,7 @@ class z.calling.handler.CallStateHandler
     @call_center.get_call_by_id event.conversation
     .then (call_et) =>
       @logger.log @logger.levels.WARN, "Call entity for '#{event.conversation}' already exists", call_et
+      return call_et
     .catch =>
       conversation_et = @call_center.conversation_repository.get_conversation_by_id event.conversation
       call_et = new z.calling.entities.Call conversation_et, @call_center.user_repository.self(), @call_center.telemetry
