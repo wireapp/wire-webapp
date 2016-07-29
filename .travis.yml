@@ -106,4 +106,5 @@ after_deploy:
   - ./bin/deployment_notification.sh
 
 after_failure:
+  - echo after_failure
   - cat /home/travis/build/wireapp/wire-webapp/npm-debug.log
