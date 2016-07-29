@@ -288,7 +288,7 @@ class z.calling.handler.MediaStreamHandler
         @logger.log @logger.levels.WARN, "Requesting MediaStream access aborted - 'No microphone'"
         @_show_device_not_found_hint z.calling.enum.MediaType.AUDIO, conversation_id
         reject new z.calling.CallError 'No microphone found', z.calling.CallError::TYPE.NO_MICROPHONE_FOUND
-      else if not @call_center.media_devices_handler.has_camera() and media_stream_constraints.video
+      else if not @call_center.media_devices_handler.has_camera() and media_type is z.calling.enum.MediaType.VIDEO
         @logger.log @logger.levels.WARN, "Requesting MediaStream access aborted - 'No camera'"
         @_show_device_not_found_hint z.calling.enum.MediaType.VIDEO, conversation_id
         reject new z.calling.CallError 'No camera found', z.calling.CallError::TYPE.NO_CAMERA_FOUND
