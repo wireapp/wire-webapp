@@ -95,7 +95,11 @@
               <!-- ko if: call().state() === z.calling.enum.CallState.ONGOING -->
                 <!-- ko if: $root.show_toggle_screen() -->
                   <div class="button-round button-round-dark icon-screensharing"
-                       data-bind="click: $root.on_toggle_screen, css: {'toggled': $root.self_stream_state.screen_shared(), 'disabled': $root.disable_toggle_screen()}"></div>
+                       data-bind="click: $root.on_toggle_screen, css: {'toggled': $root.self_stream_state.screen_shared(), 'disabled': $root.disable_toggle_screen()}">
+                    <!-- ko if: is_group() -->
+                      <span class="beta-label">Beta</span>
+                    <!-- /ko -->
+                  </div>
                 <!-- /ko -->
                 <!-- ko ifnot: is_group() -->
                   <div class="button-round button-round-dark icon-video"
