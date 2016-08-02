@@ -19,7 +19,7 @@
 
 .conversation-list-call {
   display: flex;
-  padding-bottom: 16px;
+  padding-bottom: 8px;
   padding-top: 8px;
   position: relative;
 }
@@ -40,14 +40,15 @@
 }
 
 .conversation-list-call-controls-row {
-  min-height: 40px;
+  min-height: 48px;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   .button-pill + .button-pill,
-  .button-round + .button-round {
+  .button-round + .button-round,
+  .call-controls-action + .call-controls-action {
     margin-left: 16px;
   }
 
@@ -63,6 +64,21 @@
   user-avatar {
     margin-right: 16px;
     margin-top: 16px;
+  }
+
+  .call-controls-action {
+    display: inline-block;
+    text-align: center;
+    .down {
+      margin-top: 2px;
+      .beta-label {
+        .text-uppercase;
+        font-family: @font-family-base;
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 12px;
+      }
+    }
   }
 }
 
