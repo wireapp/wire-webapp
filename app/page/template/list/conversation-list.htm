@@ -88,28 +88,52 @@
         <!-- /ko -->
         <!-- ko if: call().self_user_joined() -->
           <div class="conversation-list-call-controls-row">
-            <div>
-              <div class="button-round button-round-dark icon-mute"
-                   data-uie-name="do-call-mute"
-                   data-bind="click: $root.on_toggle_audio, css: {'toggled': $root.self_stream_state.muted()}"></div>
+            <div class="call-controls-left">
+
+              <div class="call-controls-action call-controls-action-mute">
+                <div class="up">
+                  <div class="button-round button-round-dark icon-mute"
+                       data-uie-name="do-call-mute"
+                       data-bind="click: $root.on_toggle_audio, css: {'toggled': $root.self_stream_state.muted()}"></div>
+                </div>
+                <div class="down">
+                  <span class="beta-label hidden">&nbsp;</span>
+                </div>
+              </div>
+
               <!-- ko if: call().state() === z.calling.enum.CallState.ONGOING -->
                 <!-- ko if: $root.show_toggle_screen() -->
-                  <div class="button-round button-round-dark icon-screensharing"
-                       data-bind="click: $root.on_toggle_screen, css: {'toggled': $root.self_stream_state.screen_shared(), 'disabled': $root.disable_toggle_screen()}">
-                    <!-- ko if: is_group() -->
-                      <span class="beta-label">Beta</span>
-                    <!-- /ko -->
+                  <div class="call-controls-action call-controls-action-screensharing">
+                    <div class="up">
+                      <div class="button-round button-round-dark icon-screensharing"
+                           data-bind="click: $root.on_toggle_screen, css: {'toggled': $root.self_stream_state.screen_shared(), 'disabled': $root.disable_toggle_screen()}">
+                      </div>
+                    </div>
+                    <div class="down">
+                      <!-- ko if: is_group() -->
+                        <span class="beta-label">Beta</span>
+                       <!-- /ko -->
+                    </div>
                   </div>
                 <!-- /ko -->
-                <!-- ko ifnot: is_group() -->
-                  <div class="button-round button-round-dark icon-video"
-                       data-bind="click: $root.on_toggle_video, css: {'toggled': $root.self_stream_state.videod()}"></div>
-                <!-- /ko -->
               <!-- /ko -->
+
             </div>
-            <div class="button-round button-round-theme-red icon-end-call"
-                 data-uie-name="do-call-controls-call-ignore"
-                 data-bind="click: $root.on_cancel_call"></div>
+
+            <div class="call-controls-right">
+
+              <div class="call-controls-action call-controls-action-end-call">
+                <div class="up">
+                  <div class="button-round button-round-theme-red icon-end-call"
+                       data-uie-name="do-call-controls-call-ignore"
+                       data-bind="click: $root.on_cancel_call"></div>
+                </div>
+                <div class="down">
+                  <span class="beta-label hidden">&nbsp;</span>
+                </div>
+              </div>
+            </div>
+
           </div>
         <!-- /ko -->
       </div>
