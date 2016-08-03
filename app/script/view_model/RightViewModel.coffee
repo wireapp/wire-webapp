@@ -62,7 +62,7 @@ class z.ViewModel.RightViewModel
         @conversation_titlebar.removed_from_view()
 
     @multitasking.is_minimized.subscribe (is_minimized) =>
-      if is_minimized
+      if is_minimized and @call_center.joined_call()
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.MINIMIZED_FROM_FULLSCREEN,
         conversation_type: if @call_center.joined_call().is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
 

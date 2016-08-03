@@ -43,18 +43,20 @@ ko.components.register 'link-preview-asset',
     return new z.components.LinkPreviewAssetComponent params, component_info
   template: """
             <div class="link-preview-icon icon-link"></div>
-            <!-- ko if: preview.image_resource() -->
-              <span class="link-preview-image image-placeholder-icon image-loading"
-                    data-bind="background_image: preview.image_resource(), viewport_changed: viewport_changed, click: on_link_preview_click">
-                <img />
-                <div class="three-dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </span>
-            <!-- /ko -->
-            <div class="link-preview-title" data-bind="text: preview.title, click: on_link_preview_click"></div>
-            <a class="link-preview-site text-graphite ellipsis" target="_blank" rel="nofollow"
-               data-bind="text: preview.permanent_url, attr: {href: preview.permanent_url, title: preview.permanent_url}"></a>
+            <div class="link-preview-container" data-bind="click: on_link_preview_click">
+              <!-- ko if: preview.image_resource() -->
+                <span class="link-preview-image image-placeholder-icon image-loading"
+                      data-bind="background_image: preview.image_resource(), viewport_changed: viewport_changed">
+                  <img />
+                  <div class="three-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </span>
+              <!-- /ko -->
+              <div class="link-preview-title" data-bind="text: preview.title"></div>
+              <a class="link-preview-site text-graphite ellipsis" target="_blank" rel="nofollow"
+                 data-bind="text: preview.permanent_url, attr: {href: preview.permanent_url, title: preview.permanent_url}"></a>
+            </div>
             """

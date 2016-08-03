@@ -49,7 +49,7 @@ class z.ViewModel.VideoCallingViewModel
       for call_et in @call_center.calls()
         is_active = call_et.state() in z.calling.enum.CallStateGroups.IS_ACTIVE
         is_client_videod = call_et.self_client_joined() and @self_stream_state.screen_shared() or @self_stream_state.videod()
-        is_remote_videod = call_et.is_remote_videod() and not call_et.is_ongoing_on_another_client()
+        is_remote_videod = (call_et.is_remote_screen_shared() or call_et.is_remote_videod()) and not call_et.is_ongoing_on_another_client()
         return call_et if is_active and (is_client_videod or is_remote_videod or @is_choosing_screen())
 
     @is_ongoing = ko.pureComputed =>
@@ -66,10 +66,10 @@ class z.ViewModel.VideoCallingViewModel
       return @joined_call()?.participants()[0]?.user
 
     @show_local = ko.pureComputed =>
-      return not @multitasking.is_minimized() and not @is_choosing_screen()
+      return (@show_local_video() or @overlay_icon_class()) and not @multitasking.is_minimized() and not @is_choosing_screen()
     @show_local_video = ko.pureComputed =>
       is_visible = @self_stream_state.screen_shared() or @self_stream_state.videod() or @videod_call()?.state() isnt z.calling.enum.CallState.ONGOING
-      return @local_video_stream() and is_visible
+      return is_visible and @local_video_stream()
 
     @show_remote = ko.pureComputed =>
       return @show_remote_video() or @show_remote_participant() or @is_choosing_screen()
@@ -77,7 +77,7 @@ class z.ViewModel.VideoCallingViewModel
       is_visible = @remote_user() and not @multitasking.is_minimized() and not @is_choosing_screen()
       return @is_ongoing() and not @show_remote_video() and is_visible
     @show_remote_video = ko.pureComputed =>
-      is_visible = @joined_call()?.is_remote_videod() and @remote_video_stream()
+      is_visible = (@joined_call()?.is_remote_screen_shared() or @joined_call()?.is_remote_videod()) and @remote_video_stream()
       return @is_ongoing() and is_visible
 
     @show_switch_camera = ko.pureComputed =>

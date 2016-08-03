@@ -84,15 +84,19 @@
           <span class="video-element-overlay" data-bind="css: overlay_icon_class()"></span>
         <!-- /ko -->
         <!-- ko if: show_switch_camera()-->
-          <device-toggle-button class="video-toggle-button hide-controls-hidden"
-                                data-bind="click: clicked_on_toggle_camera, css: {'video-element-dark': show_remote_participant()"
+          <device-toggle-button class="device-toggle-button"
+                                data-bind="click: clicked_on_toggle_camera,
+                                          css: {'hide-controls-hidden': !show_remote_participant(),
+                                                'device-toggle-button-dark': show_remote_participant()}"
                                 params="index: current_device_index.video_input,
                                         length: number_of_video_devices,
                                         type: z.calling.enum.MediaDeviceType.VIDEO_INPUT"></device-toggle-button>
         <!-- /ko -->
         <!-- ko if: show_switch_screen()-->
-          <device-toggle-button class="video-toggle-button hide-controls-hidden"
-                                data-bind="click: clicked_on_toggle_screen, css: {'video-element-dark': show_remote_participant()"
+          <device-toggle-button class="device-toggle-button"
+                                data-bind="click: clicked_on_toggle_screen,
+                                          css: {'hide-controls-hidden': !show_remote_participant(),
+                                                'device-toggle-button-dark': show_remote_participant()}"
                                 params="index: current_device_index.screen_input,
                                         length: number_of_screen_devices,
                                         type: z.calling.enum.MediaDeviceType.SCREEN_INPUT"></device-toggle-button>
