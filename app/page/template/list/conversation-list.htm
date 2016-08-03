@@ -29,7 +29,9 @@
           <div class="conversation-list-call-controls-row conversation-list-call-controls-row-participants"
                data-bind="click: $root.click_on_conversation">
             <!-- ko foreach: call().participants() -->
-              <user-avatar class="user-avatar-xs" params="user: $data.user"></user-avatar>
+              <user-avatar class="user-avatar-xs"
+                           params="user: $data.user"
+                           data-bind="attr: {title: $data.user.name}"></user-avatar>
             <!-- /ko -->
           </div>
         <!-- /ko -->
@@ -112,7 +114,21 @@
                     <div class="down">
                       <!-- ko if: is_group() -->
                         <span class="beta-label">Beta</span>
-                       <!-- /ko -->
+                      <!-- /ko -->
+                      <!-- ko ifnot: is_group() -->
+                        <span class="beta-label hidden">&nbsp;</span>
+                      <!-- /ko -->
+                    </div>
+                  </div>
+                <!-- /ko -->
+                <!-- ko ifnot: is_group() -->
+                  <div class="call-controls-action call-controls-action-video">
+                    <div class="up">
+                      <div class="button-round button-round-dark icon-video"
+                           data-bind="click: $root.on_toggle_video, css: {'toggled': $root.self_stream_state.videod()}"></div>
+                    </div>
+                    <div class="down">
+                      <span class="beta-label hidden">&nbsp;</span>
                     </div>
                   </div>
                 <!-- /ko -->
