@@ -19,6 +19,7 @@
 # grunt test_init && grunt test_run:conversation/ConversationService
 
 describe 'Conversation Service', ->
+  conversation_mapper = null
   server = null
 
   urls =
@@ -32,10 +33,12 @@ describe 'Conversation Service', ->
   beforeAll (done) ->
     test_factory.exposeStorageActors()
     .then (storage_repository) ->
-      server = sinon.fakeServer.create()
       client = test_factory.client
       storage_service = storage_repository.storage_service
       conversation_service = new z.conversation.ConversationService client, storage_service
+
+      conversation_mapper = new z.conversation.ConversationMapper()
+      server = sinon.fakeServer.create()
       done()
     .catch done.fail
 
@@ -43,7 +46,7 @@ describe 'Conversation Service', ->
     server.restore()
 
   describe 'get_last_events', ->
-    it 'can get the latest event IDs of all conversations', ->
+    it 'gets the latest event IDs of all conversations', ->
       request_url = "#{urls.rest_url}/conversations/last-events"
       server.respondWith 'GET', request_url, [
         200
@@ -71,7 +74,7 @@ describe 'Conversation Service', ->
         expect(has_further_events).toBe false
         done()
 
-    xit 'works', (done) ->
+    it 'works', (done) ->
       conversation_payload = {
         "access": ["private"],
         "creator": "0410795a-58dc-40d8-b216-cbc2360be21a",
@@ -101,8 +104,8 @@ describe 'Conversation Service', ->
         "last_event": "24fe.800122000b16c279"
       }
 
-      conversation_service.load_events_from_db conversation_payload.id, 1466549621778, 30
-      .then (loaded_events) =>
-        console.log "BENY", loaded_events
-        expect(loaded_events.length).toBe 0
+      conversation_et = conversation_mapper.map_conversation conversation_payload
+      conversation_service.save_conversation_in_db conversation_et
+      .then (conversation_record) =>
+        expect(conversation_record.name()).toBe conversation_payload.name
         done()

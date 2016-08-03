@@ -42,7 +42,7 @@ class z.conversation.ConversationService
       @storage_service.save store_name, conversation_et.id, conversation_et.serialize()
       .then (primary_key) =>
         @logger.log @logger.levels.INFO, "Conversation '#{primary_key}' was stored for the first time"
-        resolve()
+        resolve conversation_et
       .catch (error) =>
         @logger.log @logger.levels.ERROR, "Conversation '#{conversation_et.id}' could not be stored", error
         reject error
