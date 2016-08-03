@@ -29,7 +29,9 @@
           <div class="conversation-list-call-controls-row conversation-list-call-controls-row-participants"
                data-bind="click: $root.click_on_conversation">
             <!-- ko foreach: call().participants() -->
-              <user-avatar class="user-avatar-xs" params="user: $data.user"></user-avatar>
+              <user-avatar class="user-avatar-xs"
+                           params="user: $data.user"
+                           data-bind="attr: {title: $data.user.name}"></user-avatar>
             <!-- /ko -->
           </div>
         <!-- /ko -->
