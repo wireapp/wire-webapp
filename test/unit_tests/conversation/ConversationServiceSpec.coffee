@@ -100,7 +100,7 @@ describe 'Conversation Service', ->
         {
           key: "#{conversation_id}@#{sender_id}@1470317313389"
           object: {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","type":"conversation.otr-message-add","conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a"},"meta":{"timestamp":1470317313389,"version":1},"mapped":{"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","data":{"content":"Fifth message","nonce":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","previews":[]},"type":"conversation.message-add"}}
-        },
+        }
       ]
       # @formatter:on
 
