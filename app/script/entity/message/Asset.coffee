@@ -78,8 +78,8 @@ class z.entity.Asset
   ###
   is_video: ->
     if @type is z.assets.AssetType.FILE and @file_type?.startsWith('video') and not z.util.Environment.browser.firefox
-      can_play_audio = document.createElement('video').canPlayType @file_type
-      return true if can_play_audio isnt ''
+      can_play = document.createElement('video').canPlayType @file_type
+      return true if can_play isnt ''
     return false
   ###
   Check if asset is a audio.
@@ -88,8 +88,8 @@ class z.entity.Asset
   ###
   is_audio: ->
     if @type is z.assets.AssetType.FILE and @file_type?.startsWith 'audio'
-      can_play_audio = document.createElement('audio').canPlayType @file_type
-      return true if can_play_audio isnt ''
+      can_play = document.createElement('audio').canPlayType @file_type
+      return true if can_play isnt ''
     return false
 
   ###

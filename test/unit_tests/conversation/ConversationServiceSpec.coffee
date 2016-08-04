@@ -74,7 +74,9 @@ describe 'Conversation Service', ->
         expect(has_further_events).toBe false
         done()
 
-    it 'works', (done) ->
+  describe 'save_conversation_in_db', ->
+
+    it 'saves a conversation', (done) ->
       conversation_payload = {
         "access": ["private"],
         "creator": "0410795a-58dc-40d8-b216-cbc2360be21a",
@@ -97,7 +99,7 @@ describe 'Conversation Service', ->
             "archived": null
           }, "others": [{"status": 0, "id": "0410795a-58dc-40d8-b216-cbc2360be21a"}]
         },
-        "name": "Michael Koppen",
+        "name": "Michael",
         "id": "573b6978-7700-443e-9ce5-ff78b35ac590",
         "type": 2,
         "last_event_time": "2016-06-21T22:53:41.778Z",
