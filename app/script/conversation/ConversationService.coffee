@@ -199,6 +199,7 @@ class z.conversation.ConversationService
 
   @param message_id [String] ID of conversation to remove message from
   @param primary_key [String] ID of the actual message
+  @return [Promise] Resolves with the number of deleted records
   ###
   delete_message_from_db: (conversation_id, message_id) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
