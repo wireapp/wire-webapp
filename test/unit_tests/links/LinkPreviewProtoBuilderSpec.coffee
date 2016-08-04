@@ -88,14 +88,27 @@ describe 'build_from_open_graph_data', ->
 
   it 'returns a link preview if type is "object"', ->
     data =
-      'image':
-        'url': 'data:image/png;base64,PLACEHOLDER'
-      'site_name': 'GitHub'
-      'type': 'object'
-      'title': 'wireapp/wire-webapp'
-      'url': 'https://github.com/wireapp/wire-webapp'
-      'description': 'wire-webapp - 👽 Wire for Web'
+      description: 'wire-webapp - 👽 Wire for Web'
+      image:
+        url: 'data:image/png;base64,PLACEHOLDER'
+      site_name: 'GitHub'
+      title: 'wireapp/wire-webapp'
+      type: 'object'
+      url: 'https://github.com/wireapp/wire-webapp'
 
-    link = 'https://github.com/wireapp/wire-webapp'
+    link = data.link
+    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data data, link
+    expect(link_preview.article.title).toBe data.title
+
+  it 'returns a link preview even if there is no description', ->
+    data =
+      description: ''
+      image:
+        url: 'data:image/png;base64,PLACEHOLDER'
+      title: 'Superstar & Star'
+      type: 'website'
+      url: 'http://superstar.com/index.html'
+
+    link = data.link
     link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data data, link
     expect(link_preview.article.title).toBe data.title
