@@ -38,6 +38,26 @@ describe 'z.storage.StorageRepository', ->
 
       expect(actual).toBe expected
 
+    it 'works with timestamps', ->
+      conversation_id = '35d8767e-83c9-4e9a-a5ee-32ba7de706f2'
+      sender_id = '532af01e-1e24-4366-aacf-33b67d4ee376'
+      timestamp = 1468091455076
+
+      actual = storage_repository.construct_primary_key conversation_id, sender_id, timestamp
+      expected = "#{conversation_id}@#{sender_id}@#{timestamp}"
+
+      expect(actual).toBe expected
+
+    it 'throws an error on missing timestamps', ->
+      expect ->
+        storage_repository.construct_primary_key 'A', 'A'
+      .toThrowError z.storage.StorageError::INVALID_TIMESTAMP
+
+    it 'throws an error on invalid timestamps', ->
+      expect ->
+        storage_repository.construct_primary_key 'A', 'A', 'A'
+      .toThrowError z.storage.StorageError::INVALID_TIMESTAMP
+
   describe 'save_value',  ->
     it 'persists values', (done)->
       primary_key = 'test'
