@@ -58,3 +58,17 @@
   font-size: @font-size-xxs;
   line-height: @line-height-sm;
 }
+
+@keyframes pulsate-animation {to {opacity: .32}}
+.conversation-titlebar-icon-status {
+  color: @w-red;
+  cursor: default;
+}
+
+.conversation-titlebar-icon-status:before {
+  animation: pulsate-animation;
+  animation-direction: alternate;
+  animation-duration: @animation-timing-slower * 2;
+  animation-iteration-count: infinite;
+  animation-timing-function: @ease-in-cubic;
+}

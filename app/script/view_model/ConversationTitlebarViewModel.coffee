@@ -21,7 +21,7 @@ z.ViewModel ?= {}
 
 # Parent: z.ViewModel.ConversationTitlebarViewModel
 class z.ViewModel.ConversationTitlebarViewModel
-  constructor: (element_id, @conversation_repository) ->
+  constructor: (element_id, @conversation_repository, @call_center, @multitasking) ->
     @logger = new z.util.Logger 'z.ViewModel.ConversationTitlebarViewModel', z.config.LOGGER.OPTIONS
 
     # TODO remove this for now to ensure that buttons are clickable in osx wrappers
@@ -30,13 +30,28 @@ class z.ViewModel.ConversationTitlebarViewModel
     , 1000
 
     @conversation_et = @conversation_repository.active_conversation
+    @call_self_state = @call_center.media_stream_handler.self_stream_state
+    @joined_call = @call_center.joined_call
+
+    @has_call = ko.pureComputed =>
+      return false if not @conversation_et() or not @joined_call()
+      return @conversation_et().id is @joined_call().id
+
+    @has_ongoing_call = ko.pureComputed =>
+      return false if not @joined_call()
+      return @has_call() and @joined_call().state() is z.calling.enum.CallState.ONGOING
+
+    @show_maximize_control = ko.pureComputed =>
+      return false if not @joined_call()
+      has_local_video = @call_self_state.videod() or @call_self_state.screen_shared()
+      has_remote_video = (@joined_call().is_remote_screen_shared() or @joined_call().is_remote_videod()) and @call_center.media_stream_handler.remote_media_streams.video()
+      return @has_ongoing_call() and @multitasking.is_minimized() and has_local_video and not has_remote_video
 
     @show_call_controls = ko.computed =>
       return false if not @conversation_et()
       is_supported_conversation = @conversation_et().is_group() or @conversation_et().is_one2one()
       is_active_conversation = @conversation_et().participating_user_ids().length and not @conversation_et().removed_from_conversation()
-      is_self_client_joined = @conversation_et().call()?.self_client_joined()
-      return is_supported_conversation and is_active_conversation and not is_self_client_joined
+      return not @has_call() and is_supported_conversation and is_active_conversation
 
     @people_tooltip = z.localization.Localizer.get_text {
       id: z.string.tooltip_conversation_people
@@ -55,6 +70,11 @@ class z.ViewModel.ConversationTitlebarViewModel
 
   click_on_call_button: =>
     amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, @conversation_et().id
+
+  click_on_maximize: =>
+    @multitasking.auto_minimize false
+    @multitasking.is_minimized false
+    @logger.log @logger.levels.INFO, "Maximizing call '#{@joined_call().id}' on user click"
 
   click_on_participants: =>
     @show_participants()

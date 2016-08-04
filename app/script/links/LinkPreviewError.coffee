@@ -25,6 +25,14 @@ class z.links.LinkPreviewError
     @stack = (new Error()).stack
     @type = type
 
+    switch @type
+      when z.links.LinkPreviewError::TYPE.NOT_SUPPORTED
+        @message = 'Your client cannot render link previews using Open Graph data.'
+      when z.links.LinkPreviewError::TYPE.UNSUPPORTED_TYPE
+        @message = 'Open Graph data from the given link does not provide necessary attributes.'
+      when z.links.LinkPreviewError::TYPE.NO_DATA_AVAILABLE
+        @message = 'Link does not provide Open Graph data.'
+
   @:: = new Error()
   @::constructor = @
   @::TYPE =

@@ -867,7 +867,7 @@ class z.conversation.ConversationRepository
       .then ([json, asset_id]) =>
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_SENT
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-          action: 'photo', conversation_type: if conversation_et.is_one2one() then 'one_to_one' else 'group'
+          action: 'photo', conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
         event = @_construct_otr_asset_event json, conversation_id, asset_id
         return @cryptography_repository.save_encrypted_event generic_message, event
       .then (record) =>
@@ -892,7 +892,7 @@ class z.conversation.ConversationRepository
     .then ->
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.PING_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-        action: 'ping', conversation_type: if conversation_et.is_one2one() then 'one_to_one' else 'group'
+        action: 'ping', conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
     .catch (error) => @logger.log @logger.levels.ERROR, "#{error.message}"
 
   ###
@@ -914,7 +914,7 @@ class z.conversation.ConversationRepository
       generic_message.text.link_preview.push link_preview
       @_send_and_save_encrypted_value conversation_et, generic_message
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, 'Error while sending link preview', error
+      @logger.log @logger.levels.ERROR, "Error while sending link preview: #{error.message}", error
 
   ###
   Send message to specific converation.
@@ -938,7 +938,7 @@ class z.conversation.ConversationRepository
     .then (message_record) =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.MESSAGE_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-        action: 'text', conversation_type: if conversation_et.is_one2one() then 'one_to_one' else 'group'
+        action: 'text', conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
       @_analyze_sent_message message
       return message_record
     .catch (error) =>
@@ -1035,7 +1035,7 @@ class z.conversation.ConversationRepository
     return new z.proto.MsgDeleted conversation_id, message_id
 
   ###
-  Construct an encrypted message event.
+  Construct an encrypted message event from backend response of outgoing messages.
 
   @private
   @param response [JSON] Backend response
@@ -1046,8 +1046,8 @@ class z.conversation.ConversationRepository
     event =
       data: undefined
       from: @user_repository.self().id
-      time: response.time
-      type: 'conversation.otr-message-add'
+      time: response.time or new Date().toISOString()
+      type: z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD
       conversation: conversation_id
 
     return event
@@ -1213,7 +1213,7 @@ class z.conversation.ConversationRepository
       size_bytes: file.size
       size_mb: z.util.bucket_values (file.size / 1024 / 1024), [0, 5, 10, 15, 20, 25]
       type: z.util.get_file_extension file.name
-    conversation_type = if conversation_et.is_one2one() then 'one_to_one' else 'group'
+    conversation_type = if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED,
       $.extend tracking_data, {conversation_type: conversation_type}
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,

@@ -212,15 +212,3 @@
   .square(@button-round-size-xl);
   line-height: @button-round-size-xl;
 }
-
-// example:
-// <div class="button-round button-round-lg icon-plus button-round-pulsate"></div>
-//
-@keyframes pulsate-animation {to {opacity: .64}}
-.button-round-pulsate:before {
-  animation: pulsate-animation;
-  animation-direction: alternate;
-  animation-duration: @animation-timing-slower;
-  animation-iteration-count: infinite;
-  animation-timing-function: @ease-in-cubic;
-}

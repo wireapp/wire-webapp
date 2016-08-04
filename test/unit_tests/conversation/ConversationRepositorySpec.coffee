@@ -643,3 +643,20 @@ describe 'z.conversation.ConversationRepository', ->
       should_send_as_external = conversation_repository._send_as_external_message conversation_et, generic_message
       expect(should_send_as_external).toBeFalsy()
 
+  describe '_construct_otr_message_event', ->
+
+    it 'creates a time if no time is given', ->
+      date = new Date 2016, 7, 10, 9, 2, 25, 350
+      jasmine.clock().mockDate(date);
+
+      backend_response =
+        redundant: {}
+        time: undefined
+        missing: {}
+        deleted: {}
+
+      conversation_id = '35d8767e-83c9-4e9a-a5ee-32ba7de706f2'
+      iso_date = date.toISOString()
+      event = conversation_repository._construct_otr_message_event backend_response, conversation_id
+      expect(event.time).toBe iso_date
+      expect(event.conversation).toBe conversation_id

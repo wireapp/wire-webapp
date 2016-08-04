@@ -202,10 +202,10 @@ z.string.de.modal_session_reset_message_2 = 'uns.'
 z.string.de.modal_too_many_members_headline = 'Volles Haus'
 z.string.de.modal_too_many_members_message = 'An einer Unterhaltung für eine Gruppe können bis zu %max Personen teilnehmen. Hier ist noch Platz für %no Personen.'
 # Whitelist screensharing
-z.string.de.modal_whitelist_screensharing_headline = 'Whitelist us for screen sharing'
-z.string.de.modal_whitelist_screensharing_message_1 = 'Until Firefox adds us to the list, manually add the current domain on "about:config" to "media.getusermedia.screensharing.allowed_domains". Follow the'
+z.string.de.modal_whitelist_screensharing_headline = 'Wire braucht die Berechtigung deinen Bildschirm zu teilen'
+z.string.de.modal_whitelist_screensharing_message_1 = 'Öffne about:config und füge *.wire.com zur Liste der für Screensharing zugelassenen Domains hinzu. Lies den'
 z.string.de.modal_whitelist_screensharing_message_link = 'FAQ'
-z.string.de.modal_whitelist_screensharing_message_2 = 'that guides you through the process.'
+z.string.de.modal_whitelist_screensharing_message_2 = 'für weitere Informationen.'
 # Parallel uploads
 z.string.de.modal_uploads_parallel = 'Du kannst bis zu %no Dateien auf einmal senden.'
 
@@ -453,7 +453,7 @@ z.string.de.url_support_history = 'https://support.wire.com/hc/de/articles/20783
 z.string.de.url_support_mic_access_denied = 'https://support.wire.com/hc/de/articles/202590081'
 z.string.de.url_support_mic_not_found = 'https://support.wire.com/hc/de/articles/202970662'
 z.string.de.url_support_screen_access_denied = 'https://support.wire.com/hc/de/articles/202935412'
-z.string.de.url_support_screen_whitelist = 'https://support.wire.com/hc/de/articles/202935412'
+z.string.de.url_support_screen_whitelist = 'https://support.wire.com/hc/de/articles/209423889'
 z.string.de.url_support_session = 'https://support.wire.com/hc/de'
 z.string.de.url_downloads = 'https://wire.com/download/?hl=de'
 z.string.de.url_app_store = 'https://wire.com/download/osx/'
