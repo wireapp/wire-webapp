@@ -38,8 +38,7 @@ describe 'z.conversation.ConversationRepository', ->
     return message_et
 
   _generate_conversation = (conversation_type = z.conversation.ConversationType.REGULAR, connection_status = z.user.ConnectionStatus.ACCEPTED) ->
-    conversation_et = new z.entity.Conversation()
-    conversation_et.id = z.util.create_random_uuid()
+    conversation_et = new z.entity.Conversation z.util.create_random_uuid()
     conversation_et.type conversation_type
 
     connection_et = new z.entity.Connection()
@@ -643,3 +642,24 @@ describe 'z.conversation.ConversationRepository', ->
       should_send_as_external = conversation_repository._send_as_external_message conversation_et, generic_message
       expect(should_send_as_external).toBeFalsy()
 
+  xdescribe 'get_events', ->
+    it 'gets messages which are not broken by design', (done) ->
+      conversation_et = new z.entity.Conversation '573b6978-7700-443e-9ce5-ff78b35ac590'
+      bad_message = {"raw":{"from":"532af01e-1e24-4366-aacf-33b67d4ee376","type":"conversation.otr-message-add","conversation":"573b6978-7700-443e-9ce5-ff78b35ac590"},"meta":{"timestamp":null,"version":1},"mapped":{"conversation":"573b6978-7700-443e-9ce5-ff78b35ac590","id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Hello World :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"}}
+      good_message = {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","type":"conversation.otr-message-add","conversation":"573b6978-7700-443e-9ce5-ff78b35ac590"},"meta":{"timestamp":1470317313389,"version":1},"mapped":{"conversation":"573b6978-7700-443e-9ce5-ff78b35ac590","id":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","data":{"content":"Fifth message","nonce":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","previews":[]},"type":"conversation.message-add"}}
+
+      bad_message_key = "#{conversation_et.id}@#{bad_message.raw.from}@NaN"
+      good_message_key = "#{conversation_et.id}@#{good_message.raw.from}@#{new Date(good_message.raw.time).getTime()}"
+
+      # TODO: Combine "exposeStorageActors" & "exposeConversationActors"
+      storage_service = conversation_repository.conversation_service.storage_service
+      object_store = storage_service.OBJECT_STORE_CONVERSATION_EVENTS
+
+      save_messages = []
+      save_messages.push storage_service.save object_store, bad_message, bad_message_key
+      save_messages.push storage_service.save object_store, good_message_key, good_message
+
+      Promise.all save_messages
+      .then =>
+        expect('A').toBe 'A'
+        done()
