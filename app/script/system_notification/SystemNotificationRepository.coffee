@@ -324,9 +324,10 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Notification message data
   ###
   _create_options_data: (input, message_et) ->
-    return {} =
+    return {
       conversation_id: input.id or input.conversation_id
       message_id: message_et.id
+    }
 
   ###
   Creates the notification tag.

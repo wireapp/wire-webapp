@@ -325,10 +325,11 @@ class z.calling.entities.Flow
   @return [RTCConfiguration] Configuration object to initialize PeerConnection
   ###
   _configure_peer_connection: ->
-    return {} =
+    return {
       iceServers: @payload().ice_servers
       bundlePolicy: 'max-bundle'
       rtcpMuxPolicy: 'require'
+    }
 
   ###
   Initialize the PeerConnection for the flow.
@@ -713,10 +714,11 @@ class z.calling.entities.Flow
   @return [Object] Object containing data for RTCICECandidate
   ###
   _fake_ice_candidate: (candidate_message) ->
-    return {} =
+    return {
       candidate: candidate_message
       sdpMLineIndex: 0
       sdpMid: 'audio'
+    }
 
   ###
   Send an ICE candidate to the backend.

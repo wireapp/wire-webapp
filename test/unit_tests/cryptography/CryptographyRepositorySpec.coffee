@@ -75,7 +75,6 @@ describe 'z.cryptography.CryptographyRepository', ->
       .catch done.fail
 
     it 'can construct an encrypted payload for multiple cryptographic sessions', ->
-
       cryptobox_session_map =
         "#{john_doe.id}":
           "#{john_doe.clients.phone_id}": new cryptobox.CryptoboxSession "#{john_doe.id}@#{john_doe.clients.phone_id}"
@@ -114,5 +113,41 @@ describe 'z.cryptography.CryptographyRepository', ->
         expect(cryptography_repository.cryptobox.session_save).toHaveBeenCalled()
         expect(cryptography_repository.cryptobox.session_load).toHaveBeenCalled()
         expect(cryptography_repository._initiate_new_session).not.toHaveBeenCalled()
+        done()
+      .catch done.fail
+
+
+  describe '_initiate_new_sessions', ->
+    it 'continues even if Crpytobox fails to initiate a session', (done) ->
+      cryptobox_session_map = {}
+
+      user_client_map = {
+        "9ebf4524-f8b8-449c-ba01-298d07a984db": [
+          "2d903309868dcb67",
+          "b049cd91c066749",
+        ]
+      }
+
+      invalid_pre_key = {
+        "key": "hAEZ//9YINuaXGS5sas9HtV2ay45zhxK2DBEAKl4Xo3scYHHxKD5WCBhS/JwRqoKqv5JLiBhYA1WRRaL1praegzP6hLbv9Ckzg==",
+        "id": 65535
+      }
+
+      user_pre_key_map = {
+        "9ebf4524-f8b8-449c-ba01-298d07a984db": {
+          "2d903309868dcb67": {
+            "key": "pQABARn//wKhAFgg9HCJSq5PfmZNmpzfPlcOD6CplXXVo68PVn0TTI8vXEADoQChAFgguioxlRIXWe/unjpHsQRMtTebtm67nwMuZaVJeetuI5AE9g==",
+            "id": 65535
+          },
+          "b049cd91c066749": invalid_pre_key
+        }
+      }
+
+      spyOn(cryptography_repository, 'get_users_pre_keys').and.returnValue new Promise (resolve) ->
+        resolve user_pre_key_map
+
+      # TODO: Define "cryptobox" inside "cryptography_repository"
+      cryptography_repository._initiate_new_sessions cryptobox_session_map, user_client_map
+      .then (cryptobox_session_map) ->
         done()
       .catch done.fail
