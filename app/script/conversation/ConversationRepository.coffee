@@ -875,8 +875,11 @@ class z.conversation.ConversationRepository
           @asset_service.post_asset_v2 conversation_id, updated_payload, ciphertext, true
       .then ([json, asset_id]) =>
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_SENT
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-          action: 'photo', conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
+          action: 'photo'
+          conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+          with_bot: @is_bot_conversation()
+        }
         event = @_construct_otr_asset_event json, conversation_id, asset_id
         return @cryptography_repository.save_encrypted_event generic_message, event
       .then (record) =>
@@ -898,10 +901,13 @@ class z.conversation.ConversationRepository
   ###
   send_encrypted_knock: (conversation_et) =>
     @_send_and_save_encrypted_value conversation_et, new z.proto.Knock false
-    .then ->
+    .then =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.PING_SENT
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-        action: 'ping', conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
+        action: 'ping'
+        conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+        with_bot: @is_bot_conversation()
+      }
     .catch (error) => @logger.log @logger.levels.ERROR, "#{error.message}"
 
   ###
@@ -946,8 +952,11 @@ class z.conversation.ConversationRepository
         @_send_and_save_encrypted_value conversation_et, generic_message
     .then (message_record) =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.MESSAGE_SENT
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-        action: 'text', conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
+        action: 'text'
+        conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+        with_bot: @is_bot_conversation()
+      }
       @_analyze_sent_message message
       return message_record
     .catch (error) =>
@@ -1225,8 +1234,11 @@ class z.conversation.ConversationRepository
     conversation_type = if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED,
       $.extend tracking_data, {conversation_type: conversation_type}
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-      action: 'file', conversation_type: conversation_type
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
+      action: 'file'
+      conversation_type: conversation_type
+      with_bot: @is_bot_conversation()
+    }
 
     @send_encrypted_asset_metadata conversation_et, file
     .then (record) =>
