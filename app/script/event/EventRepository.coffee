@@ -337,6 +337,10 @@ class z.event.EventRepository
       if sending_client
         log_message = "Received encrypted event '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
       else if event.from
+        # TODO: Throw specific exception and catch on upper level
+        if source is @NOTIFICATION_SOURCE.SOCKET
+          @logger.log "Ignored unencrypted event: '#{event.type}'", event
+          return resolve true
         log_message = "Received unencrypted event '#{event.type}' from user '#{event.from}'"
       else
         log_message = "Received call event '#{event.type}' in conversation '#{event.conversation}'"

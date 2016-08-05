@@ -149,3 +149,14 @@ describe 'Event Repository', ->
         expect(event_repository._distribute_event).toHaveBeenCalled()
         done()
       .catch done.fail
+
+    it 'skips unencrypted events coming from the WebSocket', (done) ->
+      # @formatter:off
+      notification = {"payload":[{"conversation":"9fe8b359-b9e0-4624-b63c-71747664e4fa","time":"2016-08-05T16:18:41.820Z","data":{"content":"Unencrypted Hello","nonce":"1cea64c5-afbe-4c9d-b7d0-c49aa3b0a53d"},"from":"532af01e-1e24-4366-aacf-33b67d4ee376","id":"74f.800122000b2d7182","type":"conversation.message-add"}],"transient":false,"id":"46569440-5b28-11e6-bfff-22000a520a63"}
+      # @formatter:on
+      event = notification.payload[0]
+      event_repository._handle_event event
+      .then (is_saved) ->
+        expect(is_saved).toBe true
+        done()
+      .catch done.fail
