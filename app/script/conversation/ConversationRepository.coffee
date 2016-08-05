@@ -324,6 +324,15 @@ class z.conversation.ConversationRepository
     return @active_conversation() is conversation_et
 
   ###
+  Check whether the conversation is held with a Wire welcome bot like Anna or Otto.
+  @return [Boolean] True, if conversation with a bot
+  ###
+  is_bot_conversation: ->
+    return false if @active_conversation().type() isnt z.conversation.ConversationType.ONE2ONE
+    possible_bot = @active_conversation().participating_user_ets()[0]
+    return !!possible_bot.email().match /(anna|ottobot|welcome)(\+\S+)?@wire.com/ig
+
+  ###
   Check whether message has been read.
 
   @param conversation_id [String] Conversation ID
