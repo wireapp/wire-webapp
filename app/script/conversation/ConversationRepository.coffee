@@ -172,31 +172,31 @@ class z.conversation.ConversationRepository
         @logger.log @logger.levels.ERROR, "Failed to retrieve conversations from backend: #{error.message}", error
         reject error
 
-  ###
-  Get conversation events.
-  @param conversation_et [z.entity.Conversation] Conversation to start from
-  ###
   get_events: (conversation_et) ->
-    conversation_et.is_pending true
-    timestamp = conversation_et.get_first_message()?.timestamp
-    @conversation_service.load_events_from_db conversation_et.id, timestamp
-    .then (loaded_events) =>
-      [events, has_further_events] = loaded_events
-      conversation_et.has_further_messages has_further_events
-      if events.length is 0
-        @logger.log @logger.levels.INFO, "No events for conversation '#{conversation_et.id}' found", events
-      else if timestamp
-        date = new Date(timestamp).toISOString()
-        @logger.log @logger.levels.INFO,
-          "Loaded #{events.length} event(s) starting at '#{date}' for conversation '#{conversation_et.id}'", events
-      else
-        @logger.log @logger.levels.INFO,
-          "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
-      raw_events = (event.mapped or event.raw for event in events)
-      @_add_events_to_conversation events: raw_events, conversation_et
-      conversation_et.is_pending false
-    .catch (error) =>
-      @logger.log @logger.levels.INFO, "Could not load events for conversation: #{conversation_et.id}", error
+    return new Promise (resolve, reject) =>
+      conversation_et.is_pending true
+      timestamp = conversation_et.get_first_message()?.timestamp
+
+      @conversation_service.load_events_from_db conversation_et.id, timestamp
+      .then (loaded_events) =>
+        [events, has_further_events] = loaded_events
+        conversation_et.has_further_messages has_further_events
+        if events.length is 0
+          @logger.log @logger.levels.INFO, "No events for conversation '#{conversation_et.id}' found", events
+        else if timestamp
+          date = new Date(timestamp).toISOString()
+          @logger.log @logger.levels.INFO,
+            "Loaded #{events.length} event(s) starting at '#{date}' for conversation '#{conversation_et.id}'", events
+        else
+          @logger.log @logger.levels.INFO,
+            "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
+        raw_events = (event.mapped or event.raw for event in events)
+        mapped_messages = @_add_events_to_conversation events: raw_events, conversation_et
+        conversation_et.is_pending false
+        resolve mapped_messages
+      .catch (error) =>
+        @logger.log @logger.levels.INFO, "Could not load events for conversation: #{conversation_et.id}", error
+        reject error
 
   ###
   Get conversation unread events.
@@ -1450,6 +1450,7 @@ class z.conversation.ConversationRepository
   @param json [Object] Event data
   @param conversation_et [z.entity.Conversation] Conversation entity the events will be added to
   @param prepend [Boolean] Should existing messages be prepended
+  @return [Array<z.entity.Message>] Array of mapped messages
   ###
   _add_events_to_conversation: (json, conversation_et, prepend = true) ->
     return if not json?
@@ -1461,6 +1462,8 @@ class z.conversation.ConversationRepository
       conversation_et.prepend_messages message_ets
     else
       conversation_et.add_messages message_ets
+
+    return message_ets
 
   ###
   Check for duplicates by event IDs and cache the event ID.

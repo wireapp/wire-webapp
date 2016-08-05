@@ -225,7 +225,7 @@ window.TestFactory.prototype.exposeConversationActors = function () {
   var self = this;
   return new Promise(function (resolve) {
     self.exposeUserActors().then(function () {
-      window.conversation_service = new z.conversation.ConversationService(self.client);
+      window.conversation_service = new z.conversation.ConversationService(self.client, window.storage_service);
       window.conversation_service.logger.level = self.settings.logging_level;
 
       window.conversation_repository = new z.conversation.ConversationRepository(
