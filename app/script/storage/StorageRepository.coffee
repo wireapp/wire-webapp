@@ -186,7 +186,7 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
 
   @param primary_key [String] Primary key to save the object with
   @param value [value] Object to be stored
-  @return [Promise] Promise that will resolve with the saved record
+  @return [Promise] Promise that will resolve with the saved record's key
   ###
   save_value: (primary_key, value) =>
     return @storage_service.save @storage_service.OBJECT_STORE_AMPLIFY, primary_key, value: value
@@ -205,12 +205,13 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   Construct a unique primary key.
 
   @param conversation_id [String] ID of conversation
-  @param sender_id [String, undefined] ID of message sender
+  @param sender_id [String] ID of message sender
   @param time [String] Time in ISO format to create timestamp from
   @return [String] Generated primary key
   ###
   construct_primary_key: (conversation_id, sender_id = @storage_service.user_id, time) ->
     timestamp = new Date(time).getTime()
+    throw new z.storage.StorageError z.storage.StorageError::INVALID_TIMESTAMP if window.isNaN timestamp
     return "#{conversation_id}@#{sender_id}@#{timestamp}"
 
   ###

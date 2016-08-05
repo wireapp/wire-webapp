@@ -19,18 +19,19 @@
 # grunt test_init && grunt test_run:conversation/EventMapper
 
 describe 'Event Mapper', ->
-
   conversation_et = null
   event_mapper = null
 
+  beforeAll (done) ->
+    z.util.protobuf.load_protos 'ext/proto/generic-message-proto/messages.proto'
+    .then -> done()
+
   beforeEach ->
-    conversation_et = new z.entity.Conversation()
-    conversation_et.id = z.util.create_random_uuid()
+    conversation_et = new z.entity.Conversation z.util.create_random_uuid()
     event_mapper = new z.conversation.EventMapper()
 
   describe 'map_json_event', ->
-
-    it 'should map text message without link preview', ->
+    it 'maps text messages without link previews', ->
       event_id = z.util.create_random_uuid
 
       event =
@@ -47,7 +48,7 @@ describe 'Event Mapper', ->
       expect(message_et.get_first_asset().text).toBe 'foo'
       expect(message_et).toBeDefined()
 
-    it 'should map text message with link preview', ->
+    it 'maps text messages with link previews', ->
       event_id = z.util.create_random_uuid
 
       article = new z.proto.Article 'test.com', 'Test title', 'Test description'
@@ -70,7 +71,7 @@ describe 'Event Mapper', ->
       expect(message_et.get_first_asset().previews()[0].original_url).toBe 'test.com'
       expect(message_et).toBeDefined()
 
-    it 'should map text message with unsupported link preview', ->
+    it 'maps text messages with unsupported link previews', ->
       event_id = z.util.create_random_uuid
 
       twitter_status = new z.proto.TwitterStatus 'test.com'
@@ -91,3 +92,12 @@ describe 'Event Mapper', ->
       expect(message_et.get_first_asset().text).toBe 'test.com'
       expect(message_et.get_first_asset().previews().length).toBe 0
       expect(message_et).toBeDefined()
+
+    it 'skips messages which cannot be mapped', ->
+      # @formatter:off
+      good_message = {"conversation":conversation_et.id,"id":"4cec0f75-d963-486d-9401-415240ac2ad8","from":"532af01e-1e24-4366-aacf-33b67d4ee376","time":"2016-08-04T15:12:12.453Z","data":{"content":"Message with timestamp","nonce":"4cec0f75-d963-486d-9401-415240ac2ad8","previews":[]},"type":"conversation.message-add"}
+      bad_message = {"conversation":conversation_et.id,"id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Knock, are you there? :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"}
+      # @formatter:on
+
+      message_ets = event_mapper.map_json_events events: [good_message, bad_message], conversation_et
+      expect(message_ets.length).toBe 1
