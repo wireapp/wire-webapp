@@ -58,8 +58,9 @@ class z.components.VideoAssetComponent
   on_timeupdate: =>
     @video_time @video_element.currentTime
 
-  on_error: =>
+  on_error: (component, jquery_event) =>
     @video_playback_error true
+    @logger.log @logger.levels.ERROR, 'Video cannot be played', jquery_event
 
   on_play_button_clicked: =>
     if @video_src()?
