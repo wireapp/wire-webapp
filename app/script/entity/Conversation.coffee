@@ -498,7 +498,7 @@ class z.entity.Conversation
   ###############################################################################
 
   serialize: =>
-    return {} =
+    return {
       id: @id
       archived_state: @archived_state()
       archived_timestamp: @archived_timestamp()
@@ -507,3 +507,4 @@ class z.entity.Conversation
       last_read_timestamp: @last_read_timestamp()
       muted_state: @muted_state()
       muted_timestamp: @muted_timestamp()
+    }

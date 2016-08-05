@@ -284,7 +284,7 @@ class z.client.ClientRepository
     else
       device_model = "#{device_model} (Temporary)" if client_type is z.client.ClientType.TEMPORARY
 
-    return {} =
+    return {
       class: 'desktop'
       cookie: @_get_cookie_label_value @self_user().email() or @self_user().phone()
       label: device_label
@@ -294,6 +294,7 @@ class z.client.ClientRepository
       prekeys: pre_keys
       sigkeys: signaling_keys
       type: client_type
+    }
 
   ###
   Gets the value for a cookie label.

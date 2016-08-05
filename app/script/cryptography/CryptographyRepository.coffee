@@ -433,9 +433,10 @@ class z.cryptography.CryptographyRepository
   @return [Object] Payload to send to backend
   ###
   _construct_payload: (sender) ->
-    return {} =
-    sender: sender
-    recipients: {}
+    return {
+      sender: sender
+      recipients: {}
+    }
 
   ###
   Encrypt the generic message for a given session.

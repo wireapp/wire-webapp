@@ -91,12 +91,13 @@ class z.cryptography.CryptographyMapper
 
   _map_asset_meta_data: (original) ->
     if original.audio?
-      return {} =
+      return {
         duration: original.audio.duration_in_millis.toNumber() / 1000
         loudness: new Uint8Array(original.audio.normalized_loudness?.toArrayBuffer() or [])
+      }
 
   _map_asset_original: (original, event_nonce) ->
-    return {} =
+    return {
       data:
         content_length: original.size.toNumber()
         content_type: original.mime_type
@@ -105,42 +106,48 @@ class z.cryptography.CryptographyMapper
           nonce: event_nonce
         meta: @_map_asset_meta_data(original)
       type: z.event.Backend.CONVERSATION.ASSET_META
+    }
 
   _map_asset_not_uploaded: (not_uploaded) ->
-    return {} =
+    return {
       data:
         reason: not_uploaded
       type: z.event.Backend.CONVERSATION.ASSET_UPLOAD_FAILED
+    }
 
   _map_asset_uploaded: (uploaded, event_id) ->
-    return {} =
+    return {
       data:
         id: event_id
         otr_key: new Uint8Array uploaded.otr_key?.toArrayBuffer()
         sha256: new Uint8Array uploaded.sha256?.toArrayBuffer()
       type: z.event.Backend.CONVERSATION.ASSET_UPLOAD_COMPLETE
+    }
 
   _map_asset_preview: (preview, event_id) ->
-    return {} =
+    return {
       data:
         id: event_id
         otr_key: new Uint8Array preview.remote.otr_key?.toArrayBuffer()
         sha256: new Uint8Array preview.remote.sha256?.toArrayBuffer()
       type: z.event.Backend.CONVERSATION.ASSET_PREVIEW
+    }
 
   _map_cleared: (cleared) ->
-    return {} =
+    return {
       conversation: cleared.conversation_id
       data:
         cleared_timestamp: cleared.cleared_timestamp.toString()
       type: z.event.Backend.CONVERSATION.MEMBER_UPDATE
+    }
 
   _map_deleted: (deleted) ->
-    return {} =
+    return {
       data:
         conversation_id: deleted.conversation_id
         message_id: deleted.message_id
       type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
+    }
 
   ###
   Unpacks a specific generic message which is wrapped inside an external generic message.
@@ -173,7 +180,7 @@ class z.cryptography.CryptographyMapper
       throw new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
 
   _map_image_medium: (image, event_id) ->
-    return {} =
+    return {
       data:
         content_length: image.size
         content_type: image.mime_type
@@ -189,6 +196,7 @@ class z.cryptography.CryptographyMapper
         otr_key: new Uint8Array image.otr_key?.toArrayBuffer()
         sha256: new Uint8Array image.sha256?.toArrayBuffer()
       type: z.event.Backend.CONVERSATION.ASSET_ADD
+    }
 
   _map_knock: (knock, event_id) ->
     if knock.hot_knock
@@ -196,20 +204,22 @@ class z.cryptography.CryptographyMapper
       @logger.log @logger.levels.INFO, error_message
       throw new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.IGNORED_HOT_KNOCK
     else
-      return {} =
+      return {
         data:
           nonce: event_id
         type: z.event.Backend.CONVERSATION.KNOCK
+      }
 
   _map_last_read: (last_read) ->
-    return {} =
+    return {
       conversation: last_read.conversation_id
       data:
         last_read_timestamp: last_read.last_read_timestamp.toString()
       type: z.event.Backend.CONVERSATION.MEMBER_UPDATE
+    }
 
   _map_location: (location, event_id) ->
-    return {} =
+    return {
       data:
         location:
           longitude: location.longitude
@@ -218,11 +228,13 @@ class z.cryptography.CryptographyMapper
           zoom: location.zoom
         nonce: event_id
       type: z.event.Backend.CONVERSATION.LOCATION
+    }
 
   _map_text: (text, event_id) ->
-    return {} =
+    return {
       data:
         content: "#{text.content}"
         nonce: event_id
         previews: text.link_preview.map (preview) -> preview.encode64()
       type: z.event.Backend.CONVERSATION.MESSAGE_ADD
+    }
