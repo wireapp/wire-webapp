@@ -59,11 +59,11 @@ describe 'z.storage.StorageRepository', ->
       .toThrowError z.storage.StorageError::INVALID_TIMESTAMP
 
   describe 'save_value',  ->
-    it 'persists values in an object format', (done)->
+    it 'persists primitive values in an object format', (done)->
       primary_key = 'test_key'
-      value = 'test_value'
+      primitive_value = 'test_value'
 
-      storage_repository.save_value primary_key, value
+      storage_repository.save_value primary_key, primitive_value
       .then (storage_key) ->
         expect(storage_key).toBe primary_key
         done()
