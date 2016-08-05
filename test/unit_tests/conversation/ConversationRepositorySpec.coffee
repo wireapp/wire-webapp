@@ -562,7 +562,6 @@ describe 'z.conversation.ConversationRepository', ->
         .catch done.fail
 
   describe '_send_as_external_message', ->
-
     it 'should return true for big payload', ->
       external_conversation_et = _generate_conversation()
       external_conversation_et.participating_user_ids [0..128]
@@ -584,8 +583,38 @@ describe 'z.conversation.ConversationRepository', ->
   describe 'get_events', ->
     it 'gets messages which are not broken by design', (done) ->
       conversation_et = new z.entity.Conversation '573b6978-7700-443e-9ce5-ff78b35ac590'
-      bad_message = {"raw":{"from":"532af01e-1e24-4366-aacf-33b67d4ee376","type":"conversation.otr-message-add","conversation":"573b6978-7700-443e-9ce5-ff78b35ac590"},"meta":{"timestamp":null,"version":1},"mapped":{"conversation":"573b6978-7700-443e-9ce5-ff78b35ac590","id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Hello World :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"}}
-      good_message = {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","type":"conversation.otr-message-add","conversation":"573b6978-7700-443e-9ce5-ff78b35ac590"},"meta":{"timestamp":1470317313389,"version":1},"mapped":{"conversation":"573b6978-7700-443e-9ce5-ff78b35ac590","id":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","data":{"content":"Fifth message","nonce":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","previews":[]},"type":"conversation.message-add"}}
+      bad_message = {
+        "raw": {
+          "from": "532af01e-1e24-4366-aacf-33b67d4ee376",
+          "type": "conversation.otr-message-add",
+          "conversation": "573b6978-7700-443e-9ce5-ff78b35ac590"
+        },
+        "meta": {"timestamp": null, "version": 1},
+        "mapped": {
+          "conversation": "573b6978-7700-443e-9ce5-ff78b35ac590",
+          "id": "aeac8355-739b-4dfc-a119-891a52c6a8dc",
+          "from": "532af01e-1e24-4366-aacf-33b67d4ee376",
+          "data": {"content": "Hello World :)", "nonce": "aeac8355-739b-4dfc-a119-891a52c6a8dc"},
+          "type": "conversation.message-add"
+        }
+      }
+      good_message = {
+        "raw": {
+          "from": "8b497692-7a38-4a5d-8287-e3d1006577d6",
+          "time": "2016-08-04T13:28:33.389Z",
+          "type": "conversation.otr-message-add",
+          "conversation": "573b6978-7700-443e-9ce5-ff78b35ac590"
+        },
+        "meta": {"timestamp": 1470317313389, "version": 1},
+        "mapped": {
+          "conversation": "573b6978-7700-443e-9ce5-ff78b35ac590",
+          "id": "5a8cd79a-82bb-49ca-a59e-9a8e76df77fb",
+          "from": "8b497692-7a38-4a5d-8287-e3d1006577d6",
+          "time": "2016-08-04T13:28:33.389Z",
+          "data": {"content": "Fifth message", "nonce": "5a8cd79a-82bb-49ca-a59e-9a8e76df77fb", "previews": []},
+          "type": "conversation.message-add"
+        }
+      }
 
       bad_message_key = "#{conversation_et.id}@#{bad_message.raw.from}@NaN"
       good_message_key = "#{conversation_et.id}@#{good_message.raw.from}@#{new Date(good_message.raw.time).getTime()}"
@@ -602,3 +631,35 @@ describe 'z.conversation.ConversationRepository', ->
       .then (loaded_events) =>
         expect(loaded_events.length).toBe 1
         done()
+
+  describe 'is_bot_conversation', ->
+    it 'detects bot conversations by the email of the remote participant', ->
+      bot = new z.entity.User()
+      bot.email 'anna@wire.com'
+
+      conversation_et = new z.entity.Conversation z.util.create_random_uuid()
+      conversation_et.participating_user_ets.push bot
+      conversation_et.type z.conversation.ConversationType.SELF
+      conversation_repository.active_conversation conversation_et
+
+      expect(conversation_repository.is_bot_conversation()).toBe false
+      conversation_et.type z.conversation.ConversationType.ONE2ONE
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'anne@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe false
+      bot.email 'anna+123@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'anna+quiz@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'welcome@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'welcome+123@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'welcome+chef@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'welcome+@@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'ottobot@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'hello@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe false
