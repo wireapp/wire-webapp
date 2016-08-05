@@ -60,7 +60,7 @@ describe 'Conversation Service', ->
       conversation_service.get_last_events callback
       server.respond()
       response = callback.getCall(0).args[0]
-      expect(callback).toBeTruthy
+      expect(callback).toBeTruthy()
       expect(response.has_more).toBeFalsy()
       expect(response.conversations.length).toBe 5
       expect(response.conversations[0].event).toEqual '13c.800122000a64b3ee'
