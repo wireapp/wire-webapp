@@ -92,7 +92,8 @@ class z.conversation.EventMapper
     message_et.primary_key = "#{conversation_et.id}@#{message_et.from}@#{message_et.timestamp}"
 
     if window.isNaN message_et.timestamp
-      @logger.log @logger.levels.ERROR, 'Could not get timestamp for message', event
+      @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
+      message_et = undefined
 
     return message_et
 
@@ -336,9 +337,9 @@ class z.conversation.EventMapper
   ###
   _map_link_previews: (link_previews = []) ->
     return link_previews
-      .map (encoded_link_preview) -> z.proto.LinkPreview.decode64 encoded_link_preview
-      .map (link_preview) => @_map_link_preview link_preview
-      .filter (link_preview_et) -> link_preview_et?
+    .map (encoded_link_preview) -> z.proto.LinkPreview.decode64 encoded_link_preview
+    .map (link_preview) => @_map_link_preview link_preview
+    .filter (link_preview_et) -> link_preview_et?
 
   ###
   Map link preview
@@ -430,8 +431,8 @@ class z.conversation.EventMapper
     asset_et.file_name = data.data.info.name
     asset_et.meta = data.data.meta
     asset_et.original_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, asset_et.id, data.data.otr_key, data.data.sha256,
-    if data.data.preview_id?
-      asset_et.preview_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, data.data.preview_id, data.data.preview_otr_key, data.data.preview_sha256
+      if data.data.preview_id?
+        asset_et.preview_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, data.data.preview_id, data.data.preview_otr_key, data.data.preview_sha256
     asset_et.status data.data.status or z.assets.AssetTransferState.UPLOADING # TODO
     return asset_et
 

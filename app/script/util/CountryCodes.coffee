@@ -1504,8 +1504,9 @@ z.util.CountryCodes = do ->
     }
   ]
 
-  return {} =
+  return {
     get_country_code: get_country_code
     get_country_name: get_country_name
     get_country_by_code: get_country_by_code
     COUNTRY_CODES: COUNTRY_CODES
+  }

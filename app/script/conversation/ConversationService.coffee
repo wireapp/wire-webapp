@@ -42,7 +42,7 @@ class z.conversation.ConversationService
       @storage_service.save store_name, conversation_et.id, conversation_et.serialize()
       .then (primary_key) =>
         @logger.log @logger.levels.INFO, "Conversation '#{primary_key}' was stored for the first time"
-        resolve()
+        resolve conversation_et
       .catch (error) =>
         @logger.log @logger.levels.ERROR, "Conversation '#{conversation_et.id}' could not be stored", error
         reject error
@@ -199,6 +199,7 @@ class z.conversation.ConversationService
 
   @param message_id [String] ID of conversation to remove message from
   @param primary_key [String] ID of the actual message
+  @return [Promise] Resolves with the number of deleted records
   ###
   delete_message_from_db: (conversation_id, message_id) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
@@ -283,7 +284,7 @@ class z.conversation.ConversationService
   @param conversation_id [String] ID of conversation
   @param offset [String] Timestamp that loaded events have to undercut
   @param limit [Number] Amount of events to load
-  @return [Promise] Promise that resolves with the retrieved records
+  @return [Promise] Promise that resolves with the retrieved records ([events, has_further_events])
   ###
   load_events_from_db: (conversation_id, offset, limit = z.config.MESSAGES_FETCH_LIMIT) ->
     return new Promise (resolve, reject) =>

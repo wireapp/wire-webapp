@@ -114,7 +114,7 @@ class z.storage.StorageService
       @db.version(3).stores version_3
       @db.version(4).stores version_4
       .upgrade (transaction) =>
-        @logger.log @logger.levels.WARN, 'Database upgrade to version 4 needed', transaction
+        @logger.log @logger.levels.WARN, 'Database upgrade to version 4', transaction
         transaction[@OBJECT_STORE_CLIENTS].toCollection().modify (client) =>
           client.meta =
             is_verified: true
@@ -123,7 +123,7 @@ class z.storage.StorageService
       @db.version(5).stores version_4
       @db.version(6).stores version_4
       .upgrade (transaction) =>
-        @logger.log @logger.levels.WARN, 'Database upgrade to version 6 needed', transaction
+        @logger.log @logger.levels.WARN, 'Database upgrade to version 6', transaction
         transaction[@OBJECT_STORE_CONVERSATIONS].toCollection().eachKey (key) =>
           @db[@OBJECT_STORE_CONVERSATIONS].update key, {id: key}
         transaction[@OBJECT_STORE_SESSIONS].toCollection().eachKey (key) =>

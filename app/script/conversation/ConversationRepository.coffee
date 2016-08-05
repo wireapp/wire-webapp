@@ -172,31 +172,31 @@ class z.conversation.ConversationRepository
         @logger.log @logger.levels.ERROR, "Failed to retrieve conversations from backend: #{error.message}", error
         reject error
 
-  ###
-  Get conversation events.
-  @param conversation_et [z.entity.Conversation] Conversation to start from
-  ###
   get_events: (conversation_et) ->
-    conversation_et.is_pending true
-    timestamp = conversation_et.get_first_message()?.timestamp
-    @conversation_service.load_events_from_db conversation_et.id, timestamp
-    .then (loaded_events) =>
-      [events, has_further_events] = loaded_events
-      conversation_et.has_further_messages has_further_events
-      if events.length is 0
-        @logger.log @logger.levels.INFO, "No events for conversation '#{conversation_et.id}' found", events
-      else if timestamp
-        date = new Date(timestamp).toISOString()
-        @logger.log @logger.levels.INFO,
-          "Loaded #{events.length} event(s) starting at '#{date}' for conversation '#{conversation_et.id}'", events
-      else
-        @logger.log @logger.levels.INFO,
-          "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
-      raw_events = (event.mapped or event.raw for event in events)
-      @_add_events_to_conversation events: raw_events, conversation_et
-      conversation_et.is_pending false
-    .catch (error) =>
-      @logger.log @logger.levels.INFO, "Could not load events for conversation: #{conversation_et.id}", error
+    return new Promise (resolve, reject) =>
+      conversation_et.is_pending true
+      timestamp = conversation_et.get_first_message()?.timestamp
+
+      @conversation_service.load_events_from_db conversation_et.id, timestamp
+      .then (loaded_events) =>
+        [events, has_further_events] = loaded_events
+        conversation_et.has_further_messages has_further_events
+        if events.length is 0
+          @logger.log @logger.levels.INFO, "No events for conversation '#{conversation_et.id}' found", events
+        else if timestamp
+          date = new Date(timestamp).toISOString()
+          @logger.log @logger.levels.INFO,
+            "Loaded #{events.length} event(s) starting at '#{date}' for conversation '#{conversation_et.id}'", events
+        else
+          @logger.log @logger.levels.INFO,
+            "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
+        raw_events = (event.mapped or event.raw for event in events)
+        mapped_messages = @_add_events_to_conversation events: raw_events, conversation_et
+        conversation_et.is_pending false
+        resolve mapped_messages
+      .catch (error) =>
+        @logger.log @logger.levels.INFO, "Could not load events for conversation: #{conversation_et.id}", error
+        reject error
 
   ###
   Get conversation unread events.
@@ -322,6 +322,15 @@ class z.conversation.ConversationRepository
   ###
   is_active_conversation: (conversation_et) ->
     return @active_conversation() is conversation_et
+
+  ###
+  Check whether the conversation is held with a Wire welcome bot like Anna or Otto.
+  @return [Boolean] True, if conversation with a bot
+  ###
+  is_bot_conversation: ->
+    return false if @active_conversation().type() isnt z.conversation.ConversationType.ONE2ONE
+    possible_bot = @active_conversation().participating_user_ets()[0]
+    return !!possible_bot.email().match /(anna|ottobot|welcome)(\+\S+)?@wire.com/ig
 
   ###
   Check whether message has been read.
@@ -866,8 +875,11 @@ class z.conversation.ConversationRepository
           @asset_service.post_asset_v2 conversation_id, updated_payload, ciphertext, true
       .then ([json, asset_id]) =>
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_SENT
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-          action: 'photo', conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
+          action: 'photo'
+          conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+          with_bot: @is_bot_conversation()
+        }
         event = @_construct_otr_asset_event json, conversation_id, asset_id
         return @cryptography_repository.save_encrypted_event generic_message, event
       .then (record) =>
@@ -889,10 +901,13 @@ class z.conversation.ConversationRepository
   ###
   send_encrypted_knock: (conversation_et) =>
     @_send_and_save_encrypted_value conversation_et, new z.proto.Knock false
-    .then ->
+    .then =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.PING_SENT
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-        action: 'ping', conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
+        action: 'ping'
+        conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+        with_bot: @is_bot_conversation()
+      }
     .catch (error) => @logger.log @logger.levels.ERROR, "#{error.message}"
 
   ###
@@ -937,8 +952,11 @@ class z.conversation.ConversationRepository
         @_send_and_save_encrypted_value conversation_et, generic_message
     .then (message_record) =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.MESSAGE_SENT
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-        action: 'text', conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
+        action: 'text'
+        conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+        with_bot: @is_bot_conversation()
+      }
       @_analyze_sent_message message
       return message_record
     .catch (error) =>
@@ -1216,8 +1234,11 @@ class z.conversation.ConversationRepository
     conversation_type = if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED,
       $.extend tracking_data, {conversation_type: conversation_type}
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-      action: 'file', conversation_type: conversation_type
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
+      action: 'file'
+      conversation_type: conversation_type
+      with_bot: @is_bot_conversation()
+    }
 
     @send_encrypted_asset_metadata conversation_et, file
     .then (record) =>
@@ -1450,6 +1471,7 @@ class z.conversation.ConversationRepository
   @param json [Object] Event data
   @param conversation_et [z.entity.Conversation] Conversation entity the events will be added to
   @param prepend [Boolean] Should existing messages be prepended
+  @return [Array<z.entity.Message>] Array of mapped messages
   ###
   _add_events_to_conversation: (json, conversation_et, prepend = true) ->
     return if not json?
@@ -1461,6 +1483,8 @@ class z.conversation.ConversationRepository
       conversation_et.prepend_messages message_ets
     else
       conversation_et.add_messages message_ets
+
+    return message_ets
 
   ###
   Check for duplicates by event IDs and cache the event ID.
