@@ -17,7 +17,10 @@ elif [ "$TRAVIS_BRANCH" = "prod" ]; then
 fi;
 
 # Message
-MESSAGE_CONTENT="**New Wire for Web version #$TRAVIS_BUILD_NUMBER online for $TRAVIS_BRANCH.** ᕦ(￣ ³￣)ᕤ\n- $WEBAPP_URL\n- Last commit from: $AUTHOR_OF_LAST_COMMIT\n- Last commit summary: $SUMMARY_OF_LAST_COMMIT"
+MESSAGE_CONTENT="**New Wire for Web version #$TRAVIS_BUILD_NUMBER online for $TRAVIS_BRANCH.** ᕦ(￣ ³￣)ᕤ
+- $WEBAPP_URL
+- Last commit from: $AUTHOR_OF_LAST_COMMIT
+- Last commit summary: $SUMMARY_OF_LAST_COMMIT"
 
 # Conversations
 CONVERSATION_IDS[0]="9fe8b359-b9e0-4624-b63c-71747664e4fa" # ω Webapp Releases
