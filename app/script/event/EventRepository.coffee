@@ -26,7 +26,6 @@ class z.event.EventRepository
     SOCKET: 'WebSocket'
     STREAM: 'Notification Stream'
 
-
   ###
   Construct a new Event Repository.
   @param web_socket_service [z.event.WebSocketService] WebSocket service
@@ -337,10 +336,7 @@ class z.event.EventRepository
       if sending_client
         log_message = "Received encrypted event '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
       else if event.from
-        # TODO: Throw specific exception and catch on upper level
-        if source is @NOTIFICATION_SOURCE.SOCKET
-          @logger.log "Ignored unencrypted event: '#{event.type}'", event
-          return resolve true
+        throw new z.event.EventError z.event.EventError::TYPE.UNSUPPORTED_TYPE if source is @NOTIFICATION_SOURCE.SOCKET
         log_message = "Received unencrypted event '#{event.type}' from user '#{event.from}'"
       else
         log_message = "Received call event '#{event.type}' in conversation '#{event.conversation}'"
@@ -387,11 +383,17 @@ class z.event.EventRepository
         @last_notification_id notification.id
         resolve @last_notification_id()
       else
-        Promise.all (@_handle_event event, source for event in events)
-        .then =>
+        proceed = =>
           @last_notification_id notification.id
           resolve @last_notification_id()
+
+        Promise.all (@_handle_event event, source for event in events)
+        .then =>
+          proceed()
         .catch (error) =>
-          @logger.log @logger.levels.ERROR,
-            "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
-          reject error
+          if error.message is z.event.EventError::TYPE.UNSUPPORTED_TYPE
+            @logger.log @logger.levels.WARN, "Ignored notification '#{notification.id}' from '#{source}': #{error.message}", error
+            proceed()
+          else
+            @logger.log @logger.levels.ERROR, "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
+            reject error
