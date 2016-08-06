@@ -336,8 +336,7 @@ class z.event.EventRepository
       if sending_client
         log_message = "Received encrypted event '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
       else if event.from
-        throw new z.event.EventError z.event.EventError::TYPE.UNSUPPORTED_TYPE if source is @NOTIFICATION_SOURCE.SOCKET
-        log_message = "Received unencrypted event '#{event.type}' from user '#{event.from}'"
+        throw new z.event.EventError z.event.EventError::TYPE.OUTDATED_SCHEMA
       else
         log_message = "Received call event '#{event.type}' in conversation '#{event.conversation}'"
       @logger.log @logger.levels.INFO, log_message, {event_object: event, event_json: JSON.stringify event}
@@ -391,7 +390,7 @@ class z.event.EventRepository
         .then =>
           proceed()
         .catch (error) =>
-          if error.message is z.event.EventError::TYPE.UNSUPPORTED_TYPE
+          if error.message is z.event.EventError::TYPE.OUTDATED_SCHEMA
             @logger.log @logger.levels.WARN, "Ignored notification '#{notification.id}' from '#{source}': #{error.message}", error
             proceed()
           else
