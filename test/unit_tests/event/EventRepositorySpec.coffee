@@ -109,14 +109,12 @@ describe 'Event Repository', ->
   describe '_handle_event', ->
     beforeEach ->
       spyOn(cryptography_repository, 'save_encrypted_event').and.returnValue Promise.resolve(mapped: 'dummy content')
-      spyOn(cryptography_repository, 'save_unencrypted_event').and.returnValue Promise.resolve(mapped: 'dummy content')
       spyOn(event_repository, '_distribute_event')
 
     it 'should not save but distribute user events', (done) ->
       event_repository._handle_event {type: z.event.Backend.USER.UPDATE}, z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
       .then ->
         expect(cryptography_repository.save_encrypted_event).not.toHaveBeenCalled()
-        expect(cryptography_repository.save_unencrypted_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).toHaveBeenCalled()
         done()
       .catch done.fail
@@ -125,7 +123,6 @@ describe 'Event Repository', ->
       event_repository._handle_event {type: z.event.Backend.CALL.FLOW_ACTIVE}, z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
       .then ->
         expect(cryptography_repository.save_encrypted_event).not.toHaveBeenCalled()
-        expect(cryptography_repository.save_unencrypted_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).toHaveBeenCalled()
         done()
       .catch done.fail
@@ -134,7 +131,6 @@ describe 'Event Repository', ->
       event_repository._handle_event {type: z.event.Backend.CONVERSATION.CREATE}, z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
       .then ->
         expect(cryptography_repository.save_encrypted_event).not.toHaveBeenCalled()
-        expect(cryptography_repository.save_unencrypted_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).toHaveBeenCalled()
         done()
       .catch done.fail
@@ -143,7 +139,6 @@ describe 'Event Repository', ->
       event_repository._handle_event {type: z.event.Backend.CONVERSATION.MESSAGE_ADD}, z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
       .then ->
         expect(cryptography_repository.save_encrypted_event).not.toHaveBeenCalled()
-        expect(cryptography_repository.save_unencrypted_event).toHaveBeenCalled()
         expect(event_repository._distribute_event).toHaveBeenCalled()
         done()
       .catch done.fail

@@ -573,20 +573,6 @@ class z.cryptography.CryptographyRepository
         throw error
 
   ###
-  Save an unencrypted event.
-  @param event [Object] JSON of unencrypted backend event
-  @return [Promise] Promise that will resolve with the saved record
-  ###
-  save_unencrypted_event: (event) ->
-    @storage_repository.save_unencrypted_conversation_event event
-    .then (primary_key) =>
-      @logger.log @logger.levels.INFO, "Saved unencrypted event '#{event.type}' with primary key '#{primary_key}'"
-      @storage_repository.load_event_for_conversation primary_key
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Saving unencrypted message failed: #{error.message}", error
-      throw error
-
-  ###
   @return [z.proto.GenericMessage] Decrypted message in ProtocolBuffer format
   ###
   _decrypt_message: (event, ciphertext) =>

@@ -26,6 +26,7 @@ class z.event.EventRepository
     SOCKET: 'WebSocket'
     STREAM: 'Notification Stream'
 
+
   ###
   Construct a new Event Repository.
   @param web_socket_service [z.event.WebSocketService] WebSocket service
@@ -347,8 +348,6 @@ class z.event.EventRepository
       else if event.type in z.event.EventTypeHandling.DECRYPT
         promise = @cryptography_repository.decrypt_event(event).then (generic_message) =>
           @cryptography_repository.save_encrypted_event generic_message, event
-      else if event.type in z.event.EventTypeHandling.STORE
-        promise = @cryptography_repository.save_unencrypted_event event
       else
         promise = Promise.resolve {raw: event}
 
@@ -387,7 +386,7 @@ class z.event.EventRepository
           resolve @last_notification_id()
 
         Promise.all (@_handle_event event, source for event in events)
-        .then =>
+        .then ->
           proceed()
         .catch (error) =>
           if error.message is z.event.EventError::TYPE.OUTDATED_SCHEMA
