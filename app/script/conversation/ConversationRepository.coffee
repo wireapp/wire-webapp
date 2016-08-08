@@ -808,14 +808,13 @@ class z.conversation.ConversationRepository
   ###
   Send encrypted external message
 
-  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
+  @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Generic message to be sent as external message
   @return [Promise] Promise that resolves after sending the external message
   ###
-  send_encrypted_external_message: (conversation_et, generic_message) =>
+  _send_encrypted_external_value: (conversation_id, generic_message) =>
     @logger.log @logger.levels.INFO, "Sending external message of type '#{generic_message.content}'", generic_message
 
-    conversation_id = conversation_et.id
     key_bytes = null
     sha256 = null
     ciphertext = null
@@ -838,13 +837,6 @@ class z.conversation.ConversationRepository
       return @_update_payload_for_changed_clients error_response, generic_message, initial_payload
       .then (updated_payload) =>
         return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
-    .then (response) =>
-      event = @_construct_otr_message_event response, conversation_et.id
-      return @cryptography_repository.save_encrypted_event generic_message, event
-    .then (record) =>
-      @add_event conversation_et, record.mapped if record?.mapped
-    .catch (error) =>
-      @logger.log @logger.levels.WARN, "Failed to send external message for conversation with id '#{conversation_id}'", error
 
   ###
   Sends an OTR Image Asset
@@ -932,7 +924,7 @@ class z.conversation.ConversationRepository
       @logger.log @logger.levels.ERROR, "Error while sending link preview: #{error.message}", error
 
   ###
-  Send message to specific converation.
+  Send message to specific conversation.
 
   @note Will either send a normal or external message.
   @param message [String] plain text message
@@ -946,10 +938,7 @@ class z.conversation.ConversationRepository
 
     Promise.resolve()
     .then =>
-      if @_send_as_external_message conversation_et, generic_message
-        @send_encrypted_external_message conversation_et, generic_message
-      else
-        @_send_and_save_encrypted_value conversation_et, generic_message
+      return @_send_and_save_encrypted_value conversation_et, generic_message
     .then (message_record) =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.MESSAGE_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
@@ -960,15 +949,12 @@ class z.conversation.ConversationRepository
       @_analyze_sent_message message
       return message_record
     .catch (error) =>
-      if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE and retry
-        @send_encrypted_external_message conversation_et, generic_message
-      else
-        @logger.log @logger.levels.ERROR, "#{error.message}", error
-        error = new Error "Failed to send message: #{error.message}"
-        custom_data =
-          source: 'Sending message'
-        Raygun.send error, custom_data
-        throw error
+      @logger.log @logger.levels.ERROR, "#{error.message}", error
+      error = new Error "Failed to send message: #{error.message}"
+      custom_data =
+        source: 'Sending message'
+      Raygun.send error, custom_data
+      throw error
 
   ###
   Sending a message to the remote end of a session reset.
@@ -1126,7 +1112,7 @@ class z.conversation.ConversationRepository
   @private
   @param conversation_et [z.entity.Conversation] Conversation to send message to
   @param message_content [z.proto] Protobuf message content to be added to generic message
-  @return [Promise] Promise that resolves when message has been added to the conversation
+  @return [Promise] Promise that resolves with the saved record, when the message has been added to the conversation
   ###
   _send_and_save_encrypted_value: (conversation_et, message_content) =>
     return new Promise (resolve, reject) =>
@@ -1141,7 +1127,12 @@ class z.conversation.ConversationRepository
       else if message_content instanceof z.proto.GenericMessage
         generic_message = message_content
 
-      @_send_encrypted_value conversation_et.id, generic_message
+      Promise.resolve()
+      .then =>
+        if @_send_as_external_message conversation_et, generic_message
+          @_send_encrypted_external_value conversation_et.id, generic_message
+        else
+          @_send_encrypted_value conversation_et.id, generic_message
       .then (response) =>
         event = @_construct_otr_message_event response, conversation_et.id
         return @cryptography_repository.save_encrypted_event generic_message, event
@@ -1161,7 +1152,7 @@ class z.conversation.ConversationRepository
         reject error
 
   ###
-  Sends a generic message to the conversation
+  Sends a generic message to a conversation.
 
   @private
   @param conversation_id [String] Conversation ID
@@ -1175,12 +1166,12 @@ class z.conversation.ConversationRepository
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
     .then (payload) =>
       initial_payload = payload
-      @logger.log @logger.levels.INFO, "Sending encrypted message to conversation '#{conversation_id}'", payload
+      @logger.log @logger.levels.INFO, "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
       return @conversation_service.post_encrypted_message conversation_id, payload, false
     .catch (error_response) =>
       return @_update_payload_for_changed_clients error_response, generic_message, initial_payload
       .then (updated_payload) =>
-        @logger.log @logger.levels.INFO, "Sending updated encrypted message to conversation '#{conversation_id}'", updated_payload
+        @logger.log @logger.levels.INFO, "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
         return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
 
   ###

@@ -404,7 +404,7 @@ class z.cryptography.CryptographyRepository
       else
         payload = @_construct_payload @current_client().id
         use_local_sessions = true
-        @logger.log @logger.levels.INFO, 'Encrypt message using local sessions'
+        @logger.log @logger.levels.INFO, "Encrypt '#{generic_message.content}' message using local sessions"
       return @get_sessions user_client_map, use_local_sessions
     .then (cryptobox_session_map) =>
       return @_add_payload_recipients payload, generic_message, cryptobox_session_map
