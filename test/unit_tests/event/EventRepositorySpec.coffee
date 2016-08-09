@@ -226,3 +226,15 @@ describe 'Event Repository', ->
         expect(record.raw.type).toBe z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
         done()
       .catch done.fail
+
+    it 'accepts plain decryption error events', (done) ->
+      # @formatter:off
+      event = {"conversation":"7f0939c8-dbd9-48f5-839e-b0ebcfffec8c","id":"f518d6ff-19d3-48a0-b0c1-cc71c6e81136","type":"conversation.unable-to-decrypt","from":"532af01e-1e24-4366-aacf-33b67d4ee376","time":"2016-08-09T12:58:49.485Z","error":"Offset is outside the bounds of the DataView (17cd13b4b2a3a98)","error_code":"1778 (17cd13b4b2a3a98)"}
+      # @formatter:on
+      source = z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
+
+      event_repository._handle_event event, source
+      .then (record) ->
+        expect(record.raw.type).toBe z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
+        done()
+      .catch done.fail
