@@ -178,3 +178,15 @@ describe 'Event Repository', ->
       .catch (error) ->
         expect(error.message).toBe z.event.EventError::TYPE.OUTDATED_SCHEMA
         done()
+
+    it 'accepts plain "conversation.rename" events', (done) ->
+      # @formatter:off
+      event =  {"conversation":"64dcb45f-bf8d-4eac-a263-649a60d69305","time":"2016-08-09T11:57:37.498Z","data":{"name":"Renamed"},"from":"532af01e-1e24-4366-aacf-33b67d4ee376","id":"7.800122000b2f7cca","type":"conversation.rename"}
+      # @formatter:on
+      source = z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
+
+      event_repository._handle_event event, source
+      .then (record) ->
+        expect(record.raw.type).toBe z.event.Backend.CONVERSATION.RENAME
+        done()
+      .catch done.fail
