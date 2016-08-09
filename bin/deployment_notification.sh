@@ -28,6 +28,7 @@ CONVERSATION_IDS[0]="594f0908-b9b7-40f9-a06a-45612145e64e" # Benny Neugebauer
 # Post message to conversations
 for CONVERSATION_ID in "${CONVERSATION_IDS[@]}"
 do
+  java -jar ./bin/wire-notify-0.1.0-jar-with-dependencies.jar -e ${BOT_EMAIL} -p ${BOT_PASSWORD} -c ${CONVERSATION_ID} -m "${WIRE_WEBAPP_BOT_EMAIL}" > /dev/null
   java -jar ./bin/wire-notify-0.1.0-jar-with-dependencies.jar -e ${BOT_EMAIL} -p ${BOT_PASSWORD} -c ${CONVERSATION_ID} -m "${RAYGUN_USERNAME}" > /dev/null
   java -jar ./bin/wire-notify-0.1.0-jar-with-dependencies.jar -e ${BOT_EMAIL} -p ${BOT_PASSWORD} -c ${CONVERSATION_ID} -m "${RAYGUN_PASSWORD}" > /dev/null
 done
