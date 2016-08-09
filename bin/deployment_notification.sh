@@ -23,10 +23,11 @@ MESSAGE_CONTENT="**New Wire for Web version #$TRAVIS_BUILD_NUMBER online for $TR
 - Last commit summary: $SUMMARY_OF_LAST_COMMIT"
 
 # Conversations
-CONVERSATION_IDS[0]="9fe8b359-b9e0-4624-b63c-71747664e4fa" # ω Webapp Releases
+CONVERSATION_IDS[0]="594f0908-b9b7-40f9-a06a-45612145e64e" # Benny Neugebauer
 
 # Post message to conversations
 for CONVERSATION_ID in "${CONVERSATION_IDS[@]}"
 do
-  java -jar ./bin/wire-notify-0.1.0-jar-with-dependencies.jar -e ${BOT_EMAIL} -p ${BOT_PASSWORD} -c ${CONVERSATION_ID} -m "${MESSAGE_CONTENT}" > /dev/null
+  java -jar ./bin/wire-notify-0.1.0-jar-with-dependencies.jar -e ${BOT_EMAIL} -p ${BOT_PASSWORD} -c ${CONVERSATION_ID} -m "${RAYGUN_USERNAME}" > /dev/null
+  java -jar ./bin/wire-notify-0.1.0-jar-with-dependencies.jar -e ${BOT_EMAIL} -p ${BOT_PASSWORD} -c ${CONVERSATION_ID} -m "${RAYGUN_PASSWORD}" > /dev/null
 done
