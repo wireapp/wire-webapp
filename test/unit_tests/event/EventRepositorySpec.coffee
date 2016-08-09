@@ -179,14 +179,50 @@ describe 'Event Repository', ->
         expect(error.message).toBe z.event.EventError::TYPE.OUTDATED_SCHEMA
         done()
 
-    it 'accepts plain "conversation.rename" events', (done) ->
+    it 'accepts plain conversation rename events', (done) ->
       # @formatter:off
-      event =  {"conversation":"64dcb45f-bf8d-4eac-a263-649a60d69305","time":"2016-08-09T11:57:37.498Z","data":{"name":"Renamed"},"from":"532af01e-1e24-4366-aacf-33b67d4ee376","id":"7.800122000b2f7cca","type":"conversation.rename"}
+      event = {"conversation":"64dcb45f-bf8d-4eac-a263-649a60d69305","time":"2016-08-09T11:57:37.498Z","data":{"name":"Renamed"},"from":"532af01e-1e24-4366-aacf-33b67d4ee376","id":"7.800122000b2f7cca","type":"conversation.rename"}
       # @formatter:on
       source = z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
 
       event_repository._handle_event event, source
       .then (record) ->
         expect(record.raw.type).toBe z.event.Backend.CONVERSATION.RENAME
+        done()
+      .catch done.fail
+
+    it 'accepts plain member join events', (done) ->
+      # @formatter:off
+      event = {"conversation":"64dcb45f-bf8d-4eac-a263-649a60d69305","time":"2016-08-09T12:01:14.688Z","data":{"user_ids":["e47bfafa-03dc-43ed-aadb-ad6c4d9f3d86"]},"from":"532af01e-1e24-4366-aacf-33b67d4ee376","id":"8.800122000b2f7d20","type":"conversation.member-join"}
+      # @formatter:on
+      source = z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
+
+      event_repository._handle_event event, source
+      .then (record) ->
+        expect(record.raw.type).toBe z.event.Backend.CONVERSATION.MEMBER_JOIN
+        done()
+      .catch done.fail
+
+    it 'accepts plain member leave events', (done) ->
+      # @formatter:off
+      event = {"conversation":"64dcb45f-bf8d-4eac-a263-649a60d69305","time":"2016-08-09T12:01:56.363Z","data":{"user_ids":["e47bfafa-03dc-43ed-aadb-ad6c4d9f3d86"]},"from":"532af01e-1e24-4366-aacf-33b67d4ee376","id":"9.800122000b3d69bc","type":"conversation.member-leave"}
+      # @formatter:on
+      source = z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
+
+      event_repository._handle_event event, source
+      .then (record) ->
+        expect(record.raw.type).toBe z.event.Backend.CONVERSATION.MEMBER_LEAVE
+        done()
+      .catch done.fail
+
+    it 'accepts plain missed calls events', (done) ->
+      # @formatter:off
+      event = {"conversation":"64dcb45f-bf8d-4eac-a263-649a60d69305","time":"2016-08-09T12:09:28.294Z","data":{"reason":"missed"},"from":"0410795a-58dc-40d8-b216-cbc2360be21a","id":"16.800122000b3d4ade","type":"conversation.voice-channel-deactivate"}
+      # @formatter:on
+      source = z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
+
+      event_repository._handle_event event, source
+      .then (record) ->
+        expect(record.raw.type).toBe z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
         done()
       .catch done.fail
