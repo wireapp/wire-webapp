@@ -143,6 +143,8 @@ class z.tracking.EventTrackingRepository
     return @user_properties.settings.privacy.improve_wire
 
   _track_event: (event_name, attributes) =>
+    if not z.util.Environment.frontend.is_production()
+      @logger.log "Localytics event '#{event_name}'", attributes
     if @session_values[event_name] isnt undefined
       if attributes is undefined
         # Increment session event value
