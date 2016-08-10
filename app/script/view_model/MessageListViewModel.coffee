@@ -326,6 +326,7 @@ class z.ViewModel.MessageListViewModel
   ###
   after_message_render: (elements, message) =>
     window.requestAnimFrame =>
+      return if not @conversation_repository.active_conversation()
       message_index = @conversation_repository.active_conversation().messages_visible().indexOf message
       if message_index > 0
         last_message = @conversation_repository.active_conversation().messages_visible()[message_index - 1]
