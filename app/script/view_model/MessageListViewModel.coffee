@@ -457,6 +457,13 @@ class z.ViewModel.MessageListViewModel
       when z.message.SuperType.UNABLE_TO_DECRYPT
         return 'message-system'
 
+  get_context_menu_entries: (message) ->
+    entries = new z.components.ContextMenuEntries()
+    entries.push 'edit', 'edit'
+    entries.push 'copy', 'copy'
+    entries.push 'delete', 'delete'
+    return entries
+
   ###
   Shows detail image view.
   @param asset_et [z.assets.Asset] Asset to be displayed

@@ -101,10 +101,7 @@
       <!-- /ko -->
 
       <!-- ko if: message.is_deletable() -->
-        <span class="delete button-icon icon-trash-small" data-uie-name="do-message-delete" data-bind="click: message.delete"></span>
-      <!-- /ko -->
-      <!-- ko if: message.has_asset() && asset && asset.status() === z.assets.AssetTransferState.UPLOADED -->
-        <span class="download button-icon icon-download-small" data-uie-name="file-download" data-bind="click: asset.download" ></span>
+        <context-menu params="entries: $parents[1].get_context_menu_entries" class="context-menu icon-more"></context-menu>
       <!-- /ko -->
       <!-- ko ifnot: message.timestamp == '' -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
@@ -187,7 +184,7 @@
     </div>
   </div>
   <!-- ko ifnot: message.timestamp == '' -->
-    <span class="delete button-icon icon-trash-small" data-uie-name="do-message-delete" data-bind="click: message.delete"></span>
+    <context-menu params="entries: get_context_menu_entries" class="context-menu icon-more"></context-menu>
     <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
   <!-- /ko -->
 </script>
