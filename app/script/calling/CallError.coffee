@@ -33,6 +33,7 @@ class z.calling.CallError
     CONVERSATION_EMPTY: 'z.calling.CallError::TYPE.CONVERSATION_EMPTY'
     CONVERSATION_TOO_BIG: 'z.calling.CallError::TYPE.CONVERSATION_TOO_BIG'
     FLOW_NOT_FOUND: 'z.calling.CallError::TYPE.FLOW_NOT_FOUND'
+    NO_AUDIO_STREAM_FOUND: 'z.calling.CallError::TYPE.NO_AUDIO_STREAM_FOUND'
     NO_CAMERA_FOUND: 'z.calling.CallError::TYPE.NO_CAMERA_FOUND'
     NO_CONVERSATION_ID: 'z.calling.CallError::TYPE.NO_CONVERSATION_ID'
     NO_DEVICES_FOUND: 'z.calling.CallError::TYPE.NO_DEVICES_FOUND'

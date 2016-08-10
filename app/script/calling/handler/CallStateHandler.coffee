@@ -431,7 +431,7 @@ class z.calling.handler.CallStateHandler
     .then =>
       return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to toggle video state: #{error.message}", error
+      @logger.log @logger.levels.ERROR, "Failed to toggle audio state: #{error.message}", error
 
   ###
   User action to toggle the call state.
@@ -464,7 +464,7 @@ class z.calling.handler.CallStateHandler
     .then =>
       return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to toggle audio state: #{error.message}", error
+      @logger.log @logger.levels.ERROR, "Failed to toggle video state: #{error.message}", error
 
   ###
   Check whether we are actively participating in a call.

@@ -18,7 +18,7 @@
 
 # grunt test_init && grunt test_run:calling/mapper/SDPMapper
 
-describe 'z.calling.mapper', ->
+describe 'z.calling.mapper.SDPMapper', ->
   sdp_mapper = undefined
 
   beforeAll ->

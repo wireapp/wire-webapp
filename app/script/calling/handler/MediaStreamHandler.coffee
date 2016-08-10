@@ -84,11 +84,11 @@ class z.calling.handler.MediaStreamHandler
     @request_hint_timeout = undefined
 
     @local_media_streams.audio.subscribe (media_stream) =>
-      if media_stream
+      if media_stream instanceof MediaStream
         @logger.log @logger.levels.DEBUG, "Local MediaStream contains MediaStreamTrack of kind 'audio'",
           {stream: media_stream, audio_tracks: media_stream.getAudioTracks()}
     @local_media_streams.video.subscribe (media_stream) =>
-      if media_stream
+      if media_stream instanceof MediaStream
         @logger.log @logger.levels.DEBUG, "Local MediaStream contains MediaStreamTrack of kind 'video'",
           {stream: media_stream, video_tracks: media_stream.getVideoTracks()}
 
@@ -519,7 +519,12 @@ class z.calling.handler.MediaStreamHandler
 
   # Toggle the mute state of the microphone.
   toggle_microphone_muted: =>
-    @_toggle_audio_enabled() if @local_media_streams.audio()
+    Promise.resolve()
+    .then =>
+      if @local_media_streams.audio()
+        @_toggle_audio_enabled()
+      else
+        throw new z.calling.CallError 'No audio stream found to toggle mute state', z.calling.CallError::TYPE.NO_AUDIO_STREAM_FOUND
 
   # Toggle the screen.
   toggle_screen_shared: =>
