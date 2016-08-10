@@ -101,7 +101,7 @@
       <!-- /ko -->
 
       <!-- ko if: message.is_deletable() -->
-        <context-menu params="entries: $parents[1].get_context_menu_entries" class="context-menu icon-more"></context-menu>
+        <context-menu params="entries: $parents[1].get_context_menu_entries, tag: 'message'" class="context-menu icon-more"></context-menu>
       <!-- /ko -->
       <!-- ko ifnot: message.timestamp == '' -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
@@ -184,7 +184,7 @@
     </div>
   </div>
   <!-- ko ifnot: message.timestamp == '' -->
-    <context-menu params="entries: get_context_menu_entries" class="context-menu icon-more"></context-menu>
+    <context-menu params="entries: get_context_menu_entries, tag: 'message'" class="context-menu icon-more"></context-menu>
     <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
   <!-- /ko -->
 </script>

@@ -108,6 +108,7 @@ class z.ViewModel.MessageListViewModel
         , 1000
 
     amplify.subscribe z.event.WebApp.CONVERSATION.PEOPLE.HIDE, @hide_bubble
+    amplify.subscribe z.event.WebApp.CONTEXT_MENU, @on_context_menu_action
 
   ###
   Remove all subscriptions and reset states.
@@ -477,3 +478,6 @@ class z.ViewModel.MessageListViewModel
   click_on_cancel_request: (message_et) =>
     next_conversation_et = @conversation_repository.get_next_conversation @conversation_repository.active_conversation()
     @user_repository.cancel_connection_request message_et.other_user(), next_conversation_et
+
+  on_context_menu_action: () =>
+    LOG arguments
