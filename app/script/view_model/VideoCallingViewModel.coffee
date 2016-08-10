@@ -39,11 +39,10 @@ class z.ViewModel.VideoCallingViewModel
 
     @minimize_timeout = undefined
 
-    @remote_video_object_fit = ko.observable 'contain'
+    @remote_video_element_contain = ko.observable false
 
     @number_of_screen_devices = ko.observable 0
     @number_of_video_devices = ko.observable 0
-    @video_mode = ko.observable z.calling.enum.VideoOrientation.LANDSCAPE
 
     @joined_call = @call_center.joined_call
 
@@ -194,20 +193,19 @@ class z.ViewModel.VideoCallingViewModel
     @logger.log @logger.levels.INFO, "Maximizing call '#{@videod_call().id}' on user click"
 
   double_clicked_on_remote_video: =>
-    if @remote_video_object_fit() is 'cover'
-      @remote_video_object_fit 'contain'
-    else
-      @remote_video_object_fit 'cover'
+    @remote_video_element_contain not @remote_video_element_contain()
+    @logger.log @logger.levels.INFO, "Switched remote video object-fit. Contain is '#{@remote_video_element_contain()}'"
 
   # Detect the aspect ratio of a MediaElement and set the video mode.
   on_loadedmetadata: (view_model, event) =>
     media_element = event.target
     if media_element.videoHeight > media_element.videoWidth
+      @remote_video_element_contain true
       detected_video_mode = z.calling.enum.VideoOrientation.PORTRAIT
     else
+      @remote_video_element_contain false
       detected_video_mode = z.calling.enum.VideoOrientation.LANDSCAPE
-    @video_mode detected_video_mode
-    @logger.log @logger.levels.INFO, "Video is in '#{detected_video_mode}' mode"
+    @logger.log @logger.levels.INFO, "Remote video is in '#{detected_video_mode}' mode"
 
 
 # http://stackoverflow.com/questions/28762211/unable-to-mute-html5-video-tag-in-firefox
