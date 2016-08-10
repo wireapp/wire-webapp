@@ -340,6 +340,8 @@ class z.conversation.ConversationRepository
   @return [Boolean] Is the message marked as read
   ###
   is_message_read: (conversation_id, message_id) =>
+    return false if not conversation_id or not message_id
+
     conversation_et = @get_conversation_by_id conversation_id
     message_et = conversation_et.get_message_by_id message_id
 
