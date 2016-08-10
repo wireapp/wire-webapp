@@ -520,6 +520,18 @@ z.util.array_chunks = (array, size) ->
 z.util.strip_url_wrapper = (url) ->
   return url.replace(/^url\(["']?/, '').replace /["']?\)$/, ''
 
+###
+Removes protocol, www and trailing slashes in the given url
+
+@param url [String
+###
+z.util.naked_url = (url = '') ->
+  return url
+    .toLowerCase()
+    .replace /.*?:\/\//, '' # remove protocol
+    .replace /\/$/, '' # remove trailing slash
+    .replace 'www.', ''
+
 
 z.util.valid_profile_image_size = (file, min_width, min_height, callback) ->
   image = new Image()

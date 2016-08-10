@@ -39,6 +39,8 @@ class z.ViewModel.VideoCallingViewModel
 
     @minimize_timeout = undefined
 
+    @remote_video_object_fit = ko.observable 'contain'
+
     @number_of_screen_devices = ko.observable 0
     @number_of_video_devices = ko.observable 0
     @video_mode = ko.observable z.calling.enum.VideoOrientation.LANDSCAPE
@@ -190,6 +192,17 @@ class z.ViewModel.VideoCallingViewModel
   clicked_on_maximize: =>
     @multitasking.is_minimized false
     @logger.log @logger.levels.INFO, "Maximizing call '#{@videod_call().id}' on user click"
+
+  clicked_on_remote_video: =>
+    cur_time = new Date()
+    if not @last_remote_video_click
+      @last_remote_video_click = 0
+    if (cur_time - @last_remote_video_click) < 500
+      if @remote_video_object_fit() is 'cover'
+        @remote_video_object_fit 'contain'
+      else
+        @remote_video_object_fit 'cover'
+    @last_remote_video_click = cur_time
 
   # Detect the aspect ratio of a MediaElement and set the video mode.
   on_loadedmetadata: (view_model, event) =>

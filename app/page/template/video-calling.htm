@@ -10,6 +10,7 @@
                  autoplay
                  data-bind="attr: {sinkId: current_device_id.audio_output()},
                             css: {'video-element-portrait': video_mode()},
+                            style: {'object-fit': remote_video_object_fit()},
                             event: {loadedmetadata: on_loadedmetadata},
                             mute_media_element: remote_video_stream(),
                             source_stream: remote_video_stream()"></video>
@@ -24,7 +25,8 @@
         <!-- /ko -->
 
         <!-- ko if: show_remote_video() && !is_choosing_screen() -->
-          <div class="video-element-overlay hide-controls-hidden"></div>
+          <div class="video-element-overlay hide-controls-hidden"
+               data-bind="click: clicked_on_remote_video"></div>
         <!-- /ko -->
         <!-- ko if: multitasking.is_minimized() -->
           <div class="video-element-remote-fullscreen icon-fullscreen hide-controls-hidden"
