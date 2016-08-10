@@ -114,7 +114,7 @@ class z.ViewModel.ActionsViewModel
 
   click_on_unarchive_action: =>
     @conversation_repository.unarchive_conversation @_click_on_action(), =>
-      amplify.subscribe z.event.WebApp.ARCHIVE.CLOSE if @conversation_repository.conversations_archived().length is 0
+      amplify.publish z.event.WebApp.ARCHIVE.CLOSE if @conversation_repository.conversations_archived().length is 0
 
   _click_on_action: =>
     conversation_et = @selected_conversation() or @conversation_repository.active_conversation()
