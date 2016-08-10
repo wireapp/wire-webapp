@@ -193,16 +193,11 @@ class z.ViewModel.VideoCallingViewModel
     @multitasking.is_minimized false
     @logger.log @logger.levels.INFO, "Maximizing call '#{@videod_call().id}' on user click"
 
-  clicked_on_remote_video: =>
-    cur_time = new Date()
-    if not @last_remote_video_click
-      @last_remote_video_click = 0
-    if (cur_time - @last_remote_video_click) < 500
-      if @remote_video_object_fit() is 'cover'
-        @remote_video_object_fit 'contain'
-      else
-        @remote_video_object_fit 'cover'
-    @last_remote_video_click = cur_time
+  double_clicked_on_remote_video: =>
+    if @remote_video_object_fit() is 'cover'
+      @remote_video_object_fit 'contain'
+    else
+      @remote_video_object_fit 'cover'
 
   # Detect the aspect ratio of a MediaElement and set the video mode.
   on_loadedmetadata: (view_model, event) =>
