@@ -302,7 +302,8 @@ describe 'Conversation', ->
     message_et = null
 
     beforeEach ->
-      message_et = new z.entity.Message z.util.create_random_uuid()
+      message_et = new z.entity.Message()
+      message_et.id = z.util.create_random_uuid()
       conversation_et.add_message message_et
 
     afterEach ->
@@ -310,6 +311,15 @@ describe 'Conversation', ->
 
     it 'should remove message by id', ->
       expect(conversation_et.messages().length).toBe 1
+      conversation_et.remove_message_by_id message_et.id
+      expect(conversation_et.messages().length).toBe 0
+
+    it 'should remove all message with the same id', ->
+      duplicated_message_et = new z.entity.Message()
+      duplicated_message_et.id = message_et.id
+      conversation_et.add_message duplicated_message_et
+
+      expect(conversation_et.messages().length).toBe 2
       conversation_et.remove_message_by_id message_et.id
       expect(conversation_et.messages().length).toBe 0
 

@@ -367,7 +367,7 @@ class z.assets.AssetService
       , metadata
 
       xhr = new XMLHttpRequest()
-      xhr.open 'POST', @client.create_url "/assets/v3"
+      xhr.open 'POST', @client.create_url '/assets/v3'
       xhr.setRequestHeader 'Content-Type', 'multipart/mixed; boundary=' + @BOUNDARY
       xhr.setRequestHeader 'Authorization', "#{@client.access_token_type} #{@client.access_token}"
       xhr.onload = (event) -> if @status is 201 then resolve JSON.parse(@response) else reject event
