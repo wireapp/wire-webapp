@@ -26,7 +26,7 @@
 
         <!-- ko if: show_remote_video() && !is_choosing_screen() -->
           <div class="video-element-overlay hide-controls-hidden"
-               data-bind="click: clicked_on_remote_video"></div>
+               data-bind="event: {dblclick: double_clicked_on_remote_video}"></div>
         <!-- /ko -->
         <!-- ko if: multitasking.is_minimized() -->
           <div class="video-element-remote-fullscreen icon-fullscreen hide-controls-hidden"
