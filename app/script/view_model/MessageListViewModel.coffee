@@ -463,31 +463,32 @@ class z.ViewModel.MessageListViewModel
   @param message_et [z.entity.Message]
   ###
   get_context_menu_entries: (message_et) ->
-    entries = new z.components.ContextMenuEntries()
-
-    if message_et.is_deletable()
-      entries.push z.string.conversation_context_menu_delete, 'delete'
+    entries = []
 
     if message_et.has_asset()
-      entries.push z.string.conversation_context_menu_download, 'download'
+      entries.push label: z.string.conversation_context_menu_download, action: 'download'
+
+    if message_et.is_deletable()
+      entries.push label: z.string.conversation_context_menu_delete, action: 'delete'
 
     return entries
 
   ###
   Click on context menu entry
+  @param tag [String] associated tag
+  @param action [String] action that was triggered
+  @param data [Object] optional data
   ###
-  on_context_menu_action: (event) =>
-    return if not event.tag is 'message'
+  on_context_menu_action: (tag, action, data) =>
+    return if tag isnt 'message'
 
-    message_id = event.data.message_id
-    message_et = @conversation().get_message_by_id message_id
+    message_et = @conversation().get_message_by_id data
 
-    switch event.action
+    switch action
       when 'delete'
         message_et?.delete()
       when 'download'
-        asset_et = message_et.get_first_asset()
-        asset_et?.download()
+        message_et?.get_first_asset()?.download()
 
   ###
   Shows detail image view.

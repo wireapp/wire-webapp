@@ -19,49 +19,72 @@
 window.z ?= {}
 z.components ?= {}
 
-class z.components.ContextMenuEntries
+z.components.ContextMenuEvent =
+  CONTEXT_MENU: 'z.components.ContextMenuEvent::CONTEXT_MENU'
 
-  constructor: ->
-    @entries = []
-
-  push: (label, action) ->
-    @entries.push
-      label: label
-      action: action
-
-
+# Display context menu for the given entries. Entries should be provided as an Array of objects containing
+# 'label' and 'action'. Dom Event 'z.components.ContextMenuEvent.CONTEXT_MENU' is fired when the
+# context menu is clicked and data is updated.
+#
+# entries example:
+# [
+#   {label: 'copy', action: 'action-id'},
+#   {label: 'delete', action: 'action-id'}
+# ]
+#
+# @param [Object] params
+# @option params [String] tag
+# @option params [Object] data additional data that is passed when items in the context menu are clicked
+# @option params [Array|Function] entries Array or Function that provides data for the context menu entries
+# @option params [String] placement where to display the context menu ('left', 'right', 'top', 'bottom')
+#
 class z.components.ContextMenuViewModel
 
   constructor: (params, component_info) ->
     # parameter list
     @tag = params.tag
     @data = params.data
-    @entries = params.entries
+    @entry_provider = params.entries
     @placement = params.placement or 'left'
+    @element = component_info.element
 
     @bubble = undefined
+    @entries = ko.observableArray()
 
     @host_id = z.util.create_random_uuid()
     @bubble_id = z.util.create_random_uuid()
 
     @on_entry_click = (data) =>
-      amplify.publish z.event.WebApp.CONTEXT_MENU,
-        tag: @tag
-        data: @data
-        action: data.action
+      amplify.publish z.event.WebApp.CONTEXT_MENU, @tag, data.action, @data
 
     @get_entries = ->
-      entries = if _.isFunction(@entries) then @entries() else @entries
-      return entries?.entries
+      entries = if _.isFunction(@entry_provider) then @entry_provider() else @entry_provider
+      @entries entries
 
-    $(component_info.element)
-      .click =>
-        @bubble ?= new zeta.webapp.module.Bubble {host_selector: "##{@host_id}"}
-        @bubble.toggle()
-      .attr
-        'id': @host_id
-        'data-bubble': "##{@bubble_id}"
-        'data-placement': @placement
+    @element.addEventListener 'click', @on_context_menu_button_click
+    @element.addEventListener z.components.ContextMenuEvent.CONTEXT_MENU, @on_custom_context_menu
+    @element.setAttribute 'id', @host_id
+    @element.setAttribute 'data-bubble', "##{@bubble_id}"
+    @element.setAttribute 'data-placement', @placement
+    @element.setAttribute 'data-context-tag', @tag
+    @element.setAttribute 'data-context-data', @data
+
+    window.addEventListener 'scroll', @on_window_scroll, true
+
+  on_window_scroll: =>
+    @bubble?.hide()
+
+  on_context_menu_button_click: =>
+    @get_entries()
+    @element.dispatchEvent new Event z.components.ContextMenuEvent.CONTEXT_MENU
+
+  on_custom_context_menu: =>
+    @bubble ?= new zeta.webapp.module.Bubble {host_selector: "##{@host_id}"}
+    @bubble.toggle()
+
+  dispose: =>
+    @element.removeEventListener 'click', @on_context_menu_button_click
+    window.removeEventListener 'scroll', @on_window_scroll
 
 
 ko.components.register 'context-menu',
@@ -70,7 +93,7 @@ ko.components.register 'context-menu',
   template: """
             <div data-bind="attr: {id: bubble_id}" class="bubble">
               <ul class="bubble-menu">
-                <!-- ko foreach: get_entries() -->
+                <!-- ko foreach: entries -->
                   <li data-bind="click: $parent.on_entry_click, text: label, attr: {'data-context-action': action}"></li>
                 <!-- /ko -->
               </ul>

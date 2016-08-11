@@ -183,7 +183,7 @@ class z.entity.Message
   ###
   is_deletable: ->
     return true if @is_ping() or not @has_asset()
-    return @get_first_asset.status() not in [z.assets.AssetTransferState.DOWNLOADING, z.assets.AssetTransferState.UPLOADING]
+    return @get_first_asset().status() not in [z.assets.AssetTransferState.DOWNLOADING, z.assets.AssetTransferState.UPLOADING]
 
   ###
   Triggers event to delete message.

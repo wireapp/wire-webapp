@@ -1030,17 +1030,6 @@ class z.conversation.ConversationRepository
     return asset
 
   ###
-  Create MsgDeleted protobuf message.
-
-  @private
-  @param conversation_id [String] Conversation ID
-  @param message_id [String] ID of message to be deleted
-  @return [z.proto.MsgDeleted] MsgDeleted protobuf message
-  ###
-  _construct_delete: (conversation_id, message_id) ->
-    return new z.proto.MessageHide conversation_id, message_id
-
-  ###
   Construct an encrypted message event.
 
   @private
@@ -1259,7 +1248,7 @@ class z.conversation.ConversationRepository
     conversation_et = @active_conversation()
     if message_et?
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'deleted', @_construct_delete conversation_et.id, message_et.id
+      generic_message.set 'hidden', new z.proto.MessageHide conversation_et.id, message_et.id
 
       @_send_encrypted_value @self_conversation().id, generic_message
       .then =>

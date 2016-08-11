@@ -45,26 +45,3 @@ class z.entity.ContentMessage extends z.entity.Message
   ###
   get_first_asset: ->
     return @assets()[0]
-
-  ###
-  Gets the first asset attached to the message of a specified asset type.
-
-  @param asset_type [z.assets.AssetType] Type the asset should be of
-
-  @return [z.entity.Asset] First matching asset
-  ###
-  get_first_asset_of_type: (asset_type) ->
-    return asset_et for asset_et in @assets() when asset_et.type is asset_type
-
-  ###
-  Gets the first asset attached to the message of a specified image type.
-
-  @param image_type [z.assets.ImageType] Type the image asset should be of
-
-  @return [z.entity.Asset] First matching asset
-  ###
-  get_first_image_of_type: (image_type) ->
-    if image_type is z.assets.ImageSizeType.MEDIUM
-      return asset_et for asset_et in @assets() when asset_et.type is z.asset.AssetType.MEDIUM_IMAGE
-    else if image_type is z.assets.ImageSizeType.PREVIEW
-      return asset_et for asset_et in @assets() when asset_et.type is z.asset.AssetType.PREVIEW_IMAGE

@@ -17,35 +17,14 @@
  *
  */
 
-.bubble-menu {
-  .list-unstyled;
-  background-color: #fff;
-  border-radius: @bubble-border-radius;
-  margin: -@bubble-border-radius;
-  padding: @bubble-border-radius;
-  text-align: center;
-  width: 168px;
+context-menu {
 
-  > li {
-    .label-bold-xs;
-    color: @graphite-dark;
-    cursor: pointer;
-    height: 40px;
-    line-height: 40px;
-    user-select: none;
-
-    &.hover,
-    &:hover {
-      background-color: fade(@graphite, 8%);
-    }
-
-    &.active,
-    &:active {
-      background-color: fade(@graphite, 16%);
-    }
+  .bubble {
+    min-height: initial;
   }
 
-  > li + li {
-    border-top: 1px solid fade(@graphite, 16%);
+  .bubble-menu {
+    font-family: @font-family-base;
   }
+
 }
