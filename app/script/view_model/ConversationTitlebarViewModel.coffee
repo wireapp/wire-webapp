@@ -69,6 +69,7 @@ class z.ViewModel.ConversationTitlebarViewModel
     amplify.unsubscribe z.event.WebApp.SHORTCUT.ADD_PEOPLE
 
   click_on_call_button: =>
+    return if not @conversation_et()
     amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, @conversation_et().id
 
   click_on_maximize: =>
@@ -80,6 +81,7 @@ class z.ViewModel.ConversationTitlebarViewModel
     @show_participants()
 
   click_on_video_button: =>
+    return if not @conversation_et()
     if @conversation_et().is_group()
       amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP
     else

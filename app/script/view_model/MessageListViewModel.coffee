@@ -326,6 +326,7 @@ class z.ViewModel.MessageListViewModel
   ###
   after_message_render: (elements, message) =>
     window.requestAnimFrame =>
+      return if not @conversation_repository.active_conversation()
       message_index = @conversation_repository.active_conversation().messages_visible().indexOf message
       if message_index > 0
         last_message = @conversation_repository.active_conversation().messages_visible()[message_index - 1]
@@ -373,7 +374,7 @@ class z.ViewModel.MessageListViewModel
 
       if z.util.array_is_last @conversation().messages_visible(), message
         # Defer initial rendering
-        window.requestAnimFrame => @on_initial_rendering()
+        window.requestAnimFrame => @on_initial_rendering?()
 
   before_message_remove: (dom_node) ->
     if $(dom_node).hasClass 'message' and not @conversation_is_changing

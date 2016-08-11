@@ -120,7 +120,8 @@ class z.auth.AuthService
               $.ajax settings
             , 500
           else
-            error_description = "Requesting access token failed after '#{options.retries}' attempt(s): #{errorThrown}"
+            error_description = "Requesting access token failed: #{errorThrown}"
+
             if jqXHR.responseJSON or jqXHR.responseText?.startsWith '{'
               error = jqXHR.responseJSON or JSON.parse jqXHR.responseText
               if error.code is z.service.BackendClientError::STATUS_CODE.FORBIDDEN
@@ -132,7 +133,7 @@ class z.auth.AuthService
               Raygun.send error
 
             @save_access_token_in_client()
-            @logger.log @logger.levels.ERROR, error_description, jqXHR
+            @logger.log @logger.levels.ERROR, "#{error_description} - '#{options.retries}' attempt(s)", jqXHR
             reject error
 
       if @client.access_token

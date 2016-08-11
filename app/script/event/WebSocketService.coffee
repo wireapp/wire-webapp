@@ -156,7 +156,7 @@ class z.event.WebSocketService
       ping_interval_diff = @last_ping_time - current_time
 
       if ping_interval_diff > PING_INTERVAL + PING_INTERVAL_THRESHOLD
-        @logger.log @logger.levels.WARN, 'Ping interval check failed', event
+        @logger.log @logger.levels.WARN, 'Ping interval check failed'
         @reconnect z.event.WebSocketService::CHANGE_TRIGGER.PING_INTERVAL
       else
         @logger.log @logger.levels.INFO, 'Sending ping to WebSocket'
