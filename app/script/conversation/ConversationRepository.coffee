@@ -554,7 +554,6 @@ class z.conversation.ConversationRepository
   leave_conversation: (conversation_et, next_conversation_et, callback) =>
     @conversation_service.delete_members conversation_et.id, @user_repository.self().id
     .then (response) =>
-      amplify.publish z.event.WebApp.EVENT.INJECT, response
       @member_leave conversation_et, response
     .then =>
       if callback?
