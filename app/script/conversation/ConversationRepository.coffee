@@ -592,7 +592,7 @@ class z.conversation.ConversationRepository
     .then ->
       callback?()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to rename conversation (#{conversation_et.id}): #{error}"
+      @logger.log @logger.levels.ERROR, "Failed to rename conversation (#{conversation_et.id}): #{error.message}"
 
   reset_session: (user_id, client_id, conversation_id) =>
     @logger.log @logger.levels.INFO, "Resetting session with client '#{client_id}' of user '#{user_id}'"
