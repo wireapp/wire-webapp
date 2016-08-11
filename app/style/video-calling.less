@@ -38,10 +38,6 @@
   width: 100%;
   object-fit: cover;
 
-  &.video-element-portrait {
-    object-fit: contain;
-  }
-
   &.video-element-mirrored {
     transform: scaleX(-1);
   }
@@ -75,8 +71,8 @@
 
   .video-element {
     .video-container-element();
-    object-fit: cover;
-    &.video-mode-portrait {
+
+    &.video-element-contain {
       object-fit: contain;
     }
   }

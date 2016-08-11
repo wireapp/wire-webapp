@@ -9,8 +9,7 @@
           <video class="video-element"
                  autoplay
                  data-bind="attr: {sinkId: current_device_id.audio_output()},
-                            css: {'video-element-portrait': video_mode()},
-                            style: {'object-fit': remote_video_object_fit()},
+                            css: {'video-element-contain': remote_video_element_contain()},
                             event: {loadedmetadata: on_loadedmetadata},
                             mute_media_element: remote_video_stream(),
                             source_stream: remote_video_stream()"></video>
