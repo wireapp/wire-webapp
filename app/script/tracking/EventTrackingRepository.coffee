@@ -147,7 +147,8 @@ class z.tracking.EventTrackingRepository
   _log_event: (event_name, attributes) =>
     if attributes
       @logger.log "Localytics event '#{event_name}' with attributes: #{JSON.stringify(attributes)}"
-    @logger.log "Localytics event '#{event_name}' without attributes"
+    else
+      @logger.log "Localytics event '#{event_name}' without attributes"
 
   _track_event: (event_name, attributes) =>
     @_log_event event_name, attributes
