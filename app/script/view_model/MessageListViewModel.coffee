@@ -458,12 +458,30 @@ class z.ViewModel.MessageListViewModel
       when z.message.SuperType.UNABLE_TO_DECRYPT
         return 'message-system'
 
-  get_context_menu_entries: (message) ->
+  ###
+  Create context menu entries for given message
+  @param message_et [z.entity.Message]
+  ###
+  get_context_menu_entries: (message_et) ->
     entries = new z.components.ContextMenuEntries()
-    entries.push 'edit', 'edit'
-    entries.push 'copy', 'copy'
-    entries.push 'delete', 'delete'
+
+    if message_et.is_deletable()
+      entries.push z.string.conversation_context_menu_delete, 'delete'
+
     return entries
+
+  ###
+  Click on context menu entry
+  ###
+  on_context_menu_action: (event) =>
+    return if not event.tag is 'message'
+
+    message_id = event.data.message_id
+    message_et = @conversation().get_message_by_id message_id
+
+    switch event.action
+      when 'delete'
+        message_et.delete()
 
   ###
   Shows detail image view.
@@ -478,6 +496,3 @@ class z.ViewModel.MessageListViewModel
   click_on_cancel_request: (message_et) =>
     next_conversation_et = @conversation_repository.get_next_conversation @conversation_repository.active_conversation()
     @user_repository.cancel_connection_request message_et.other_user(), next_conversation_et
-
-  on_context_menu_action: () =>
-    LOG arguments
