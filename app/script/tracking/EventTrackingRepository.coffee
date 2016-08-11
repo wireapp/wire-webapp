@@ -145,7 +145,10 @@ class z.tracking.EventTrackingRepository
     return @user_properties.settings.privacy.improve_wire
 
   _log_event: (event_name, attributes) =>
-    @logger.log "Localytics event '#{event_name}'", attributes
+    if attributes
+      @logger.log "Localytics event '#{event_name}' with attributes: #{JSON.stringify(attributes)}"
+    else
+      @logger.log "Localytics event '#{event_name}' without attributes"
 
   _track_event: (event_name, attributes) =>
     @_log_event event_name, attributes
