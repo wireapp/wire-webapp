@@ -177,6 +177,15 @@ class z.entity.Message
     return @super_type is z.message.SuperType.UNABLE_TO_DECRYPT
 
   ###
+  Check if message can be deleted.
+
+  @return [Boolean]
+  ###
+  is_deletable: ->
+    return true if @is_ping() or not @has_asset()
+    return @get_first_asset.status() not in [z.assets.AssetTransferState.DOWNLOADING, z.assets.AssetTransferState.UPLOADING]
+
+  ###
   Triggers event to delete message.
   ###
   delete: =>

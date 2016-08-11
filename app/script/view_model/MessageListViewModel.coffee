@@ -468,6 +468,9 @@ class z.ViewModel.MessageListViewModel
     if message_et.is_deletable()
       entries.push z.string.conversation_context_menu_delete, 'delete'
 
+    if message_et.has_asset()
+      entries.push z.string.conversation_context_menu_download, 'download'
+
     return entries
 
   ###
@@ -481,7 +484,10 @@ class z.ViewModel.MessageListViewModel
 
     switch event.action
       when 'delete'
-        message_et.delete()
+        message_et?.delete()
+      when 'download'
+        asset_et = message_et.get_first_asset()
+        asset_et?.download()
 
   ###
   Shows detail image view.

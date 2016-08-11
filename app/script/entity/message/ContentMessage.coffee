@@ -68,13 +68,3 @@ class z.entity.ContentMessage extends z.entity.Message
       return asset_et for asset_et in @assets() when asset_et.type is z.asset.AssetType.MEDIUM_IMAGE
     else if image_type is z.assets.ImageSizeType.PREVIEW
       return asset_et for asset_et in @assets() when asset_et.type is z.asset.AssetType.PREVIEW_IMAGE
-
-  ###
-  Check if message can be deleted.
-
-  @return [Boolean]
-  ###
-  is_deletable: ->
-    asset = @assets()[0]
-    return true if not asset.is_file()
-    return asset.status() not in [z.assets.AssetTransferState.DOWNLOADING, z.assets.AssetTransferState.UPLOADING]

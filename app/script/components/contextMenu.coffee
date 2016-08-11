@@ -52,7 +52,7 @@ class z.components.ContextMenuViewModel
 
     @get_entries = ->
       entries = if _.isFunction(@entries) then @entries() else @entries
-      return entries.entries
+      return entries?.entries
 
     $(component_info.element)
       .click =>
