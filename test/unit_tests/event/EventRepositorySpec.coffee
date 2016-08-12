@@ -135,18 +135,21 @@ describe 'Event Repository', ->
         done()
       .catch done.fail
 
-    it 'should save and distribute conversation.message-add event', (done) ->
-      event_repository._handle_event {type: z.event.Backend.CONVERSATION.MESSAGE_ADD}, z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
-      .then ->
-        expect(cryptography_repository.save_encrypted_event).not.toHaveBeenCalled()
-        expect(event_repository._distribute_event).toHaveBeenCalled()
+    it 'shouldn\'t save and distribute "conversation.message-add" events', (done) ->
+      # @formatter:off
+      event = {"conversation":"9fe8b359-b9e0-4624-b63c-71747664e4fa","time":"2016-08-12T10:40:58.769Z","data":{"content":"unencrypted","nonce":"9f239249-3648-4a6c-a5f6-a3c8f902a919"},"from":"062418ea-9b93-4d93-b59b-11aba3f702d8","id":"754.800122000b3f0470","type":"conversation.message-add"}
+      # @formatter:on
+
+      event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
+      .catch (error) ->
+        expect(error.message).toBe z.event.EventError::TYPE.OUTDATED_SCHEMA
         done()
-      .catch done.fail
 
     it 'skips old events arriving via WebSocket', (done) ->
       # @formatter:off
       notification = {"payload":[{"conversation":"9fe8b359-b9e0-4624-b63c-71747664e4fa","time":"2016-08-05T16:18:41.820Z","data":{"content":"Unencrypted Hello","nonce":"1cea64c5-afbe-4c9d-b7d0-c49aa3b0a53d"},"from":"532af01e-1e24-4366-aacf-33b67d4ee376","id":"74f.800122000b2d7182","type":"conversation.message-add"}],"transient":false,"id":"46569440-5b28-11e6-bfff-22000a520a63"}
       # @formatter:on
+
       event = notification.payload[0]
       source = z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
 
