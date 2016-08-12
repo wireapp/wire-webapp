@@ -339,7 +339,11 @@ class z.event.EventRepository
         log_message = "Received encrypted event '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
       else if event.from
         log_message = "Received plain event '#{event.id}' of type '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
-        if event.type is z.event.Backend.CONVERSATION.MESSAGE_ADD
+        if event.type in [
+          z.event.Backend.CONVERSATION.ASSET_ADD
+          z.event.Backend.CONVERSATION.KNOCK
+          z.event.Backend.CONVERSATION.MESSAGE_ADD
+        ]
           throw new z.event.EventError z.event.EventError::TYPE.OUTDATED_SCHEMA
       else
         log_message = "Received call event '#{event.type}' in conversation '#{event.conversation}'"
@@ -357,7 +361,7 @@ class z.event.EventRepository
         promise = Promise.resolve {raw: event}
 
       promise.then (record) =>
-        if record and (source is @NOTIFICATION_SOURCE.SOCKET or @is_recovering  or record.raw.type.startsWith 'conversation')
+        if record and (source is @NOTIFICATION_SOURCE.SOCKET or @is_recovering or record.raw.type.startsWith 'conversation')
           @_distribute_event record.mapped or record.raw
         resolve record
       .catch (error) =>
