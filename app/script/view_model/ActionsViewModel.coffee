@@ -79,47 +79,60 @@ class z.ViewModel.ActionsViewModel
     event.stopPropagation()
 
   click_on_archive_action: =>
-    @conversation_repository.archive_conversation @_click_on_action()
+    @_click_on_action()
+    .then (conversation_et) =>
+      @conversation_repository.archive_conversation conversation_et
 
   click_on_block_action: =>
-    conversation_et = @_click_on_action()
-    next_conversation_et = @conversation_repository.get_next_conversation conversation_et
-    user_et = conversation_et.participating_user_ets()[0]
-    amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.BLOCK,
-      data: user_et.first_name()
-      action: => @user_repository.block_user user_et, ->
-        amplify.publish z.event.WebApp.CONVERSATION.SWITCH, conversation_et, next_conversation_et
+    @_click_on_action()
+    .then (conversation_et) =>
+      next_conversation_et = @conversation_repository.get_next_conversation conversation_et
+      user_et = conversation_et.participating_user_ets()[0]
+      amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.BLOCK,
+        data: user_et.first_name()
+        action: => @user_repository.block_user user_et, ->
+          amplify.publish z.event.WebApp.CONVERSATION.SWITCH, conversation_et, next_conversation_et
 
   click_on_cancel_action: =>
-    conversation_et = @_click_on_action()
-    next_conversation_et = @conversation_repository.get_next_conversation conversation_et
-    @user_repository.cancel_connection_request conversation_et.participating_user_ets()[0], next_conversation_et
+    @_click_on_action()
+    .then (conversation_et) =>
+      next_conversation_et = @conversation_repository.get_next_conversation conversation_et
+      @user_repository.cancel_connection_request conversation_et.participating_user_ets()[0], next_conversation_et
 
   click_on_clear_action: =>
-    conversation_et = @_click_on_action()
-    amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CLEAR,
-      data: conversation_et.display_name()
-      conversation: conversation_et
-      action: (leave = false) => @conversation_repository.clear_conversation conversation_et, leave
+    @_click_on_action()
+    .then (conversation_et) =>
+      amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CLEAR,
+        data: conversation_et.display_name()
+        conversation: conversation_et
+        action: (leave = false) => @conversation_repository.clear_conversation conversation_et, leave
 
   click_on_leave_action: =>
-    conversation_et = @_click_on_action()
-    next_conversation_et = @conversation_repository.get_next_conversation conversation_et
-    amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.LEAVE,
-      data: conversation_et.display_name()
-      action: => @conversation_repository.leave_conversation conversation_et, next_conversation_et
+    @_click_on_action()
+    .then (conversation_et) =>
+      next_conversation_et = @conversation_repository.get_next_conversation conversation_et
+      amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.LEAVE,
+        data: conversation_et.display_name()
+        action: => @conversation_repository.leave_conversation conversation_et, next_conversation_et
 
   click_on_mute_action: =>
-    @conversation_repository.toggle_silence_conversation @_click_on_action()
+    @_click_on_action()
+    .then (conversation_et) =>
+      @conversation_repository.toggle_silence_conversation conversation_et
 
   click_on_unarchive_action: =>
-    @conversation_repository.unarchive_conversation @_click_on_action(), =>
-      amplify.subscribe z.event.WebApp.ARCHIVE.CLOSE if @conversation_repository.conversations_archived().length is 0
+    @_click_on_action()
+    .then (conversation_et) =>
+      @conversation_repository.unarchive_conversation conversation_et, =>
+        amplify.publish z.event.WebApp.ARCHIVE.CLOSE if @conversation_repository.conversations_archived().length is 0
 
   _click_on_action: =>
-    conversation_et = @selected_conversation() or @conversation_repository.active_conversation()
-    return if not conversation_et
-    amplify.publish z.event.WebApp.ARCHIVE.CLOSE if not conversation_et.is_archived()
-    @action_bubbles[conversation_et.id]?.hide()
-    @selected_conversation null
-    return conversation_et
+    return new Promise (resolve) =>
+      conversation_et = @selected_conversation() or @conversation_repository.active_conversation()
+      if conversation_et
+        amplify.publish z.event.WebApp.ARCHIVE.CLOSE if not conversation_et.is_archived()
+        @action_bubbles[conversation_et.id]?.hide()
+        @selected_conversation null
+        resolve conversation_et
+      else
+        @logger.log @logger.levels.ERROR, 'Cannot complete menu actions as there is no active conversation'
