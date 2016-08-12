@@ -240,6 +240,26 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
       .catch (error) -> reject error
 
   ###
+  Save an unencrypted conversation event.
+  @param event [Object] JSON event to be stored
+  @return [Promise] Promise that resolves with the stored record
+  ###
+  save_unencrypted_conversation_event: (event) ->
+    return new Promise (resolve, reject) =>
+      primary_key = @construct_primary_key event.conversation, event.from, event.time
+
+      event_object =
+        raw: event
+        meta:
+          timestamp: new Date(event.time).getTime()
+          version: 1
+
+      store_name = @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
+      @storage_service.save store_name, primary_key, event_object
+      .then (primary_key) -> resolve primary_key
+      .catch (error) -> reject error
+
+  ###
   Load a conversation event for a given primary key.
 
   @param primary_key [String] Primary key to save the object with

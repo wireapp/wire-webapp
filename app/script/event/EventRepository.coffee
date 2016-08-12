@@ -306,6 +306,7 @@ class z.event.EventRepository
   ###
   inject_event: (event) =>
     if event.conversation isnt @user_repository.self().id
+      @logger.log "Injected event ID '#{event.id}' of type '#{event.type}'", event
       @_handle_event event, @NOTIFICATION_SOURCE.INJECTION
 
   ###
@@ -337,7 +338,7 @@ class z.event.EventRepository
       if sending_client
         log_message = "Received encrypted event '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
       else if event.from
-        log_message = "Received unencrypted event '#{event.type}' from user '#{event.from}'"
+        log_message = "Received plain event '#{event.id}' of type '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
         if event.type is z.event.Backend.CONVERSATION.MESSAGE_ADD
           throw new z.event.EventError z.event.EventError::TYPE.OUTDATED_SCHEMA
       else
@@ -350,6 +351,8 @@ class z.event.EventRepository
       else if event.type in z.event.EventTypeHandling.DECRYPT
         promise = @cryptography_repository.decrypt_event(event).then (generic_message) =>
           @cryptography_repository.save_encrypted_event generic_message, event
+      else if event.type in z.event.EventTypeHandling.STORE
+        promise = @cryptography_repository.save_unencrypted_event event
       else
         promise = Promise.resolve {raw: event}
 
