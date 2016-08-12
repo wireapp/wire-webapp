@@ -934,7 +934,7 @@ class z.conversation.ConversationRepository
   @param retry [Boolean] Try to resend as external with first attempt failed (optional)
   @return [Promise] Promise that resolves after sending the message
   ###
-  send_encrypted_message: (message, conversation_et, retry = true) =>
+  send_encrypted_message: (message, conversation_et) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'text', new z.proto.Text message
 
@@ -1288,12 +1288,27 @@ class z.conversation.ConversationRepository
   ###############################################################################
 
   message_deleted: (event_json) =>
-    conversation_id = event_json.data.conversation_id
+    conversation_id = event_json.data.conversation_id or event_json.conversation
     message_id = event_json.data.message_id
 
     if conversation_id? and message_id?
       conversation_et = @find_conversation_by_id conversation_id
+      sender_id = event_json.from
+
+      if @user_repository.self().id isnt sender_id
+        message_to_delete_et = conversation_et.get_message_by_id message_id
+
+        amplify.publish z.event.WebApp.EVENT.INJECT,
+          conversation: conversation_id
+          id: event_json.id
+          data:
+            deleted_time: event_json.time
+          type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+          from: message_to_delete_et.from
+          time: message_to_delete_et.timestamp
+
       @_delete_message conversation_et, message_id
+
     else
       @logger.log "Failed to delete message with id '#{message_id}'' for conversation '#{conversation_et.id}'"
 
@@ -1591,6 +1606,8 @@ class z.conversation.ConversationRepository
         when z.event.Backend.CONVERSATION.ASSET_PREVIEW
           @asset_preview conversation_et, event
         when z.event.Backend.CONVERSATION.MESSAGE_DELETE
+          @message_deleted event
+        when z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
           @message_deleted event
         else
           @add_event conversation_et, event

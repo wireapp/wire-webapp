@@ -82,6 +82,8 @@ class z.conversation.EventMapper
         message_et = @_map_event_location event
       when z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
         message_et = @_map_system_event_unable_to_decrypt event
+      when z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+        message_et = @_map_system_event_delete_everywhere event
       else
         message_et = @_map_event_ignored()
 
@@ -450,4 +452,18 @@ class z.conversation.EventMapper
     # error_code style "3690 (f0c0272e8f053774)"
     message_et.error_code = event.error_code?.substring(0, 4)
     message_et.client_id = event.error_code?.substring(5).replace(/[()]/g, '')
+    return message_et
+
+  ###
+  Maps JSON data of delete everywhere event to message entity
+
+  @private
+
+  @param data [Object] Error data received as JSON
+
+  @return [z.entity.MediumImage] Medium image asset entity
+  ###
+  _map_system_event_delete_everywhere: (event) ->
+    message_et = new z.entity.DeleteMessage()
+    message_et.deleted_timestamp = new Date(event.data.deleted_time).getTime()
     return message_et
