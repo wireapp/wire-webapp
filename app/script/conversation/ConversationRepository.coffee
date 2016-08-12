@@ -594,7 +594,7 @@ class z.conversation.ConversationRepository
     .then ->
       callback?()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to rename conversation (#{conversation_et.id}): #{error}"
+      @logger.log @logger.levels.ERROR, "Failed to rename conversation (#{conversation_et.id}): #{error.message}"
 
   reset_session: (user_id, client_id, conversation_id) =>
     @logger.log @logger.levels.INFO, "Resetting session with client '#{client_id}' of user '#{user_id}'"
@@ -1495,7 +1495,7 @@ class z.conversation.ConversationRepository
       # @todo Maybe we need to reset "@processed_event_nonces" someday to save some memory, until now it's fine.
       return false
     else
-      @logger.log @logger.levels.WARN, "Event with nonce has been already processed : #{event_nonce}", message_et
+      @logger.log @logger.levels.WARN, "Event with nonce '#{event_nonce}' has been already processed.", message_et
       amplify.publish z.event.WebApp.ANALYTICS.EVENT,
         z.tracking.SessionEventName.INTEGER.EVENT_HIDDEN_DUE_TO_DUPLICATE_NONCE
       return true

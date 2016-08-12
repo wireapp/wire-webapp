@@ -215,32 +215,11 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
     return "#{conversation_id}@#{sender_id}@#{timestamp}"
 
   ###
-  Save an unencrypted conversation event.
-
-  @param event [Object] JSON event to be stored
-  @return [Promise] Promise that resolves with the stored record
-  ###
-  save_unencrypted_conversation_event: (event) ->
-    return new Promise (resolve, reject) =>
-      primary_key = @construct_primary_key event.conversation, event.from, event.time
-
-      event_object =
-        raw: event
-        meta:
-          timestamp: new Date(event.time).getTime()
-          version: 1
-
-      store_name = @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
-      @storage_service.save store_name, primary_key, event_object
-      .then (primary_key) -> resolve primary_key
-      .catch (error) -> reject error
-
-  ###
   Save a decrypted conversation event.
 
   @param primary_key [String] Primary key to save the object with
   @param otr_message_event [Object] JSON event to be stored
-  @param mapped_json [Object] OTR event mapped to its unencrypted counterpart
+  @param mapped_json [Object] OTR event mapped to it's decrypted counterpart
   @return [Promise] Promise that resolves with the stored record
   ###
   save_decrypted_conversation_event: (primary_key, otr_message_event, mapped_json) ->
@@ -254,6 +233,26 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
 
       # We don't need to keep ciphertext once it has been successfully decrypted
       event_object.raw.data = undefined
+
+      store_name = @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
+      @storage_service.save store_name, primary_key, event_object
+      .then (primary_key) -> resolve primary_key
+      .catch (error) -> reject error
+
+  ###
+  Save an unencrypted conversation event.
+  @param event [Object] JSON event to be stored
+  @return [Promise] Promise that resolves with the stored record
+  ###
+  save_unencrypted_conversation_event: (event) ->
+    return new Promise (resolve, reject) =>
+      primary_key = @construct_primary_key event.conversation, event.from, event.time
+
+      event_object =
+        raw: event
+        meta:
+          timestamp: new Date(event.time).getTime()
+          version: 1
 
       store_name = @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
       @storage_service.save store_name, primary_key, event_object

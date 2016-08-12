@@ -306,6 +306,7 @@ class z.event.EventRepository
   ###
   inject_event: (event) =>
     if event.conversation isnt @user_repository.self().id
+      @logger.log "Injected event ID '#{event.id}' of type '#{event.type}'", event
       @_handle_event event, @NOTIFICATION_SOURCE.INJECTION
 
   ###
@@ -329,7 +330,7 @@ class z.event.EventRepository
   ###
   Handle a single event from the notification stream or WebSocket.
   @param event [JSON] Backend event extracted from notification stream
-  @return [Promise] Promise that resolves with boolean whether the event was saved
+  @return [Promise] Resolves with the saved record or boolean true if the event was skipped
   ###
   _handle_event: (event, source) ->
     return new Promise (resolve, reject) =>
@@ -337,7 +338,13 @@ class z.event.EventRepository
       if sending_client
         log_message = "Received encrypted event '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
       else if event.from
-        log_message = "Received unencrypted event '#{event.type}' from user '#{event.from}'"
+        log_message = "Received plain event '#{event.id}' of type '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
+        if event.type in [
+          z.event.Backend.CONVERSATION.ASSET_ADD
+          z.event.Backend.CONVERSATION.KNOCK
+          z.event.Backend.CONVERSATION.MESSAGE_ADD
+        ]
+          throw new z.event.EventError z.event.EventError::TYPE.OUTDATED_SCHEMA
       else
         log_message = "Received call event '#{event.type}' in conversation '#{event.conversation}'"
       @logger.log @logger.levels.INFO, log_message, {event_object: event, event_json: JSON.stringify event}
@@ -354,7 +361,7 @@ class z.event.EventRepository
         promise = Promise.resolve {raw: event}
 
       promise.then (record) =>
-        if record and (source is @NOTIFICATION_SOURCE.SOCKET or @is_recovering  or record.raw.type.startsWith 'conversation')
+        if record and (source is @NOTIFICATION_SOURCE.SOCKET or @is_recovering or record.raw.type.startsWith 'conversation')
           @_distribute_event record.mapped or record.raw
         resolve record
       .catch (error) =>
@@ -383,11 +390,17 @@ class z.event.EventRepository
         @last_notification_id notification.id
         resolve @last_notification_id()
       else
-        Promise.all (@_handle_event event, source for event in events)
-        .then =>
+        proceed = =>
           @last_notification_id notification.id
           resolve @last_notification_id()
+
+        Promise.all (@_handle_event event, source for event in events)
+        .then ->
+          proceed()
         .catch (error) =>
-          @logger.log @logger.levels.ERROR,
-            "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
-          reject error
+          if error.message is z.event.EventError::TYPE.OUTDATED_SCHEMA
+            @logger.log @logger.levels.WARN, "Ignored notification '#{notification.id}' from '#{source}': #{error.message}", error
+            proceed()
+          else
+            @logger.log @logger.levels.ERROR, "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
+            reject error
