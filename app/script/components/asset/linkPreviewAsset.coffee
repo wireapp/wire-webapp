@@ -33,7 +33,7 @@ class z.components.LinkPreviewAssetComponent
     @url = @preview.original_url
 
   on_link_preview_click: =>
-    window.open @preview.permanent_url
+    window.open @url
 
   dispose: =>
     @element.removeEventListener 'click', @on_link_preview_click
