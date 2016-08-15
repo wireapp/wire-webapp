@@ -136,7 +136,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
 
-    it 'sets the number of connect requests when checking the inbox', ->
+    it 'shows the number of connection requests when viewing the inbox', ->
       title_view_model.content_state z.ViewModel.CONTENT_STATE.PENDING
 
       pending_connection = new z.entity.Connection()
