@@ -19,8 +19,9 @@
 # grunt test_init && grunt test_run:view_model/WindowTitleViewModel
 
 describe 'z.ViewModel.WindowTitleViewModel', ->
-  title_view_model = undefined
+  suffix = z.localization.Localizer.get_text z.string.wire
   test_factory = new TestFactory()
+  title_view_model = undefined
 
   beforeAll (done) ->
     test_factory.exposeConversationActors()
@@ -31,17 +32,25 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
     .catch done.fail
 
   describe 'initiate_title_updates', ->
+    beforeEach ->
+      title_view_model.content_state z.ViewModel.CONTENT_STATE.CONVERSATION
+
     it 'sets a default title', ->
       selected_conversation = new z.entity.Conversation z.util.create_random_uuid()
       selected_conversation.name 'Selected Conversation'
       selected_conversation.type z.conversation.ConversationType.REGULAR
       title_view_model.conversation_repository.active_conversation selected_conversation
 
-      suffix = z.localization.Localizer.get_text z.string.wire
       expected_title = "#{selected_conversation.name()} - #{suffix}"
-
       title_view_model.initiate_title_updates()
+      expect(window.document.title).toBe expected_title
 
+    it 'shows the name of the self user when opening the settings', ->
+      title_view_model.content_state z.ViewModel.CONTENT_STATE.PROFILE
+      user_name = window.user_repository.self().name()
+
+      expected_title = "#{user_name} - #{suffix}"
+      title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
 
     it 'does not update the badge count for muted conversations', ->
@@ -63,7 +72,6 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
 
       # Check title when there are no messages
       title_view_model.initiate_title_updates()
-      suffix = z.localization.Localizer.get_text z.string.wire
       expected_title = "#{selected_conversation.name()} - #{suffix}"
       expect(window.document.title).toBe expected_title
 
