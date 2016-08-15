@@ -1314,7 +1314,7 @@ class z.conversation.ConversationRepository
   @param time [String] ISO 8601 formatted time string
   @param message_to_delete_et [z.entity.Message]
   ###
-  _add_delete_message: (conversation_id, message_id, time, message_to_delete_et) =>
+  _add_delete_message: (conversation_id, message_id, time, message_to_delete_et) ->
     amplify.publish z.event.WebApp.EVENT.INJECT,
       conversation: conversation_id
       id: message_id
