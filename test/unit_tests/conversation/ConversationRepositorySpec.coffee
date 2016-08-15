@@ -304,7 +304,7 @@ describe 'z.conversation.ConversationRepository', ->
       spyOn conversation_repository, '_delete_message'
       spyOn conversation_repository, '_add_delete_message'
 
-    it 'should delete message if user is self', ->
+    it 'delete message if user is self', ->
       event =
         conversation: conversation_et.id
         id: message_et.id
@@ -317,7 +317,7 @@ describe 'z.conversation.ConversationRepository', ->
       expect(conversation_repository._delete_message).toHaveBeenCalled()
       expect(conversation_repository._add_delete_message).not.toHaveBeenCalled()
 
-    it 'should delete message and add delete message if user is not self', ->
+    it 'delete message and add delete message if user is not self', ->
       event =
         conversation: conversation_et.id
         id: message_et.id
