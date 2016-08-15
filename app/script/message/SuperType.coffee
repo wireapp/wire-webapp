@@ -25,8 +25,8 @@ Enum for different message super types.
 z.message.SuperType =
   ALL_VERIFIED: 'all-verified'
   CALL: 'call'
-  CONVERSATION_RENAME: 'rename' # TODO used?
   CONTENT: 'normal'
+  DELETE: 'delete'
   DEVICE: 'device'
   LOCATION: 'location'
   MEMBER: 'member'

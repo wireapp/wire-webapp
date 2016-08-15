@@ -7,7 +7,7 @@
     "cryptojs": "http://crypto-js.googlecode.com/files/CryptoJS%20v3.1.2.zip",
     "highlight.js": "https://github.com/isagalaev/highlight.js.git#9.4.0",
     "dexie": "https://github.com/dfahlander/Dexie.js.git#1.4.1",
-    "generic-message-proto": "https://github.com/wireapp/generic-message-proto.git#1.11.0",
+    "generic-message-proto": "https://github.com/wireapp/generic-message-proto.git#1.14.0",
     "iframeTracker-jquery": "https://github.com/vincepare/iframeTracker-jquery.git#1.1.0",
     "jquery": "https://github.com/jquery/jquery.git#2.1.4",
     "keyboardjs": "https://github.com/RobertWHurst/KeyboardJS.git#2.2.1",

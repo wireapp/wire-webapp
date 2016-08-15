@@ -1032,17 +1032,6 @@ class z.conversation.ConversationRepository
     return asset
 
   ###
-  Create MsgDeleted protobuf message.
-
-  @private
-  @param conversation_id [String] Conversation ID
-  @param message_id [String] ID of message to be deleted
-  @return [z.proto.MsgDeleted] MsgDeleted protobuf message
-  ###
-  _construct_delete: (conversation_id, message_id) ->
-    return new z.proto.MsgDeleted conversation_id, message_id
-
-  ###
   Construct an encrypted message event.
 
   @private
@@ -1261,7 +1250,7 @@ class z.conversation.ConversationRepository
     conversation_et = @active_conversation()
     if message_et?
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'deleted', @_construct_delete conversation_et.id, message_et.id
+      generic_message.set 'hidden', new z.proto.MessageHide conversation_et.id, message_et.id
 
       @_send_encrypted_value @self_conversation().id, generic_message
       .then =>
@@ -1291,13 +1280,40 @@ class z.conversation.ConversationRepository
 
   message_deleted: (event_json) =>
     conversation_id = event_json.data.conversation_id
-    message_id = event_json.data.message_id
+    message_to_delete_id = event_json.data.message_id
 
-    if conversation_id? and message_id?
+    if not conversation_id?
+      conversation_id = event_json.conversation
+
+    if conversation_id? and message_to_delete_id?
       conversation_et = @find_conversation_by_id conversation_id
-      @_delete_message conversation_et, message_id
+      sender_id = event_json.from
+
+      if @user_repository.self().id isnt sender_id
+        message_to_delete_et = conversation_et.get_message_by_id message_to_delete_id
+        @_add_delete_message conversation_id, event_json.id, event_json.time, message_to_delete_et
+
+      @_delete_message conversation_et, message_to_delete_id
+
     else
-      @logger.log "Failed to delete message with id '#{message_id}'' for conversation '#{conversation_et.id}'"
+      @logger.log "Failed to delete message with id '#{message_to_delete_id}'' for conversation '#{conversation_id}'"
+
+  ###
+  Add delete message to conversation
+  @param conversation_id [String]
+  @param message_id [String]
+  @param time [String] ISO 8601 formatted time string
+  @param message_to_delete_et [z.entity.Message]
+  ###
+  _add_delete_message: (conversation_id, message_id, time, message_to_delete_et) ->
+    amplify.publish z.event.WebApp.EVENT.INJECT,
+      conversation: conversation_id
+      id: message_id
+      data:
+        deleted_time: time
+      type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+      from: message_to_delete_et.from
+      time: message_to_delete_et.timestamp
 
   ###
   A message or ping received in a conversation.
@@ -1593,6 +1609,8 @@ class z.conversation.ConversationRepository
         when z.event.Backend.CONVERSATION.ASSET_PREVIEW
           @asset_preview conversation_et, event
         when z.event.Backend.CONVERSATION.MESSAGE_DELETE
+          @message_deleted event
+        when z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
           @message_deleted event
         else
           @add_event conversation_et, event

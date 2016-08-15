@@ -20,7 +20,7 @@ window.z ?= {}
 z.ViewModel ?= {}
 
 class z.ViewModel.WindowTitleViewModel
-  constructor: (@content, @user_repository, @conversation_repository) ->
+  constructor: (@content_state, @user_repository, @conversation_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS
     amplify.subscribe z.event.WebApp.LOADED, @initiate_title_updates
 
@@ -34,8 +34,8 @@ class z.ViewModel.WindowTitleViewModel
       number_of_connect_requests = @user_repository.connect_requests().length
 
       @conversation_repository.conversations_unarchived().forEach (conversation_et) ->
-        if conversation_et.type() isnt z.conversation.ConversationType.CONNECT
-          number_of_unread_conversations++ if conversation_et.number_of_unread_messages() > 0
+        if not conversation_et.is_request() and not conversation_et.is_muted() and conversation_et.number_of_unread_messages()
+          number_of_unread_conversations++
 
       badge_count = number_of_connect_requests + number_of_unread_conversations
 
@@ -44,7 +44,7 @@ class z.ViewModel.WindowTitleViewModel
 
       amplify.publish z.event.WebApp.CONVERSATION.UNREAD, badge_count
 
-      switch @content.state()
+      switch @content_state()
         when z.ViewModel.CONTENT_STATE.PENDING
           if number_of_connect_requests > 1
             window_title += z.localization.Localizer.get_text {

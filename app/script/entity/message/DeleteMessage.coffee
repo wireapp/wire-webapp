@@ -17,9 +17,16 @@
 #
 
 window.z ?= {}
-z.event ?= {}
+z.entity ?= {}
 
-z.event.Client =
-  CONVERSATION:
-    UNABLE_TO_DECRYPT: 'conversation.unable-to-decrypt'
-    DELETE_EVERYWHERE: 'conversation.delete-everywhere'
+class z.entity.DeleteMessage extends z.entity.Message
+  constructor: ->
+    super()
+    @super_type = z.message.SuperType.DELETE
+    @deleted_timestamp = ''
+
+    @display_deleted_timestamp = =>
+      return  z.localization.Localizer.get_text {
+        id: z.string.conversation_delete_timestamp
+        replace: {placeholder: '%@timestamp', content: moment(@deleted_timestamp).format 'HH:mm'}
+      }
