@@ -34,9 +34,8 @@ class z.ViewModel.WindowTitleViewModel
       number_of_connect_requests = @user_repository.connect_requests().length
 
       @conversation_repository.conversations_unarchived().forEach (conversation_et) ->
-        if conversation_et.type() isnt z.conversation.ConversationType.CONNECT
-          if not conversation_et.is_muted() and conversation_et.number_of_unread_messages() > 0
-            number_of_unread_conversations++
+        if not conversation_et.is_request() and not conversation_et.is_muted() and conversation_et.number_of_unread_messages()
+          number_of_unread_conversations++
 
       badge_count = number_of_connect_requests + number_of_unread_conversations
 
