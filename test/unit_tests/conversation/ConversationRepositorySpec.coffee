@@ -288,6 +288,45 @@ describe 'z.conversation.ConversationRepository', ->
       result = conversation_repository.get_groups_by_name 'Removed'
       expect(result.length).toBe 0
 
+  xdescribe 'message_deleted', ->
+
+    conversation_et = null
+    message_et = null
+
+    beforeEach ->
+      conversation_et = _generate_conversation z.conversation.ConversationType.REGULAR
+      conversation_repository.save_conversation conversation_et
+
+      message_et = new z.entity.PingMessage()
+      message_et.id = z.util.create_random_uuid()
+      conversation_et.add_message message_et
+
+      spyOn conversation_repository, '_delete_message'
+      spyOn conversation_repository, '_add_delete_message'
+      spyOn(cryptography_repository, 'load_session').and.returnValue session
+
+    it 'should delete message if user is self', ->
+      event =
+        conversation: conversation_et.id
+        id: message_et.id
+        from: user_repository.self().id
+        time: new Date().toISOString()
+
+      conversation_et.message_deleted event
+      expect(conversation_repository._delete_message).toHaveBeenCalled()
+      expect(conversation_repository._add_delete_message).not.toHaveBeenCalled()
+
+    it 'should delete message and add delete message if user is not self', ->
+      event =
+        conversation: conversation_et.id
+        id: message_et.id
+        from: z.util.create_random_uuid()
+        time: new Date().toISOString()
+
+      conversation_et.message_deleted event
+      expect(conversation_repository._delete_message).toHaveBeenCalled()
+      expect(conversation_repository._add_delete_message).toHaveBeenCalled()
+
   describe 'get_number_of_pending_uploads', ->
 
     it 'should return number of pending uploads if there are pending uploads', ->

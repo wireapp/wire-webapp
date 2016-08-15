@@ -1288,29 +1288,39 @@ class z.conversation.ConversationRepository
   ###############################################################################
 
   message_deleted: (event_json) =>
-    conversation_id = event_json.data.conversation_id or event_json.conversation
-    message_id = event_json.data.message_id
+    conversation_id = event_json.data.conversation_id
+    message_to_delete_id = event_json.data.message_id
+    sender_id = event_json.from
 
-    if conversation_id? and message_id?
+    if not conversation_id?
+      conversation_id = event_json.conversation
+
+    if conversation_id? and message_to_delete_id?
       conversation_et = @find_conversation_by_id conversation_id
-      sender_id = event_json.from
 
       if @user_repository.self().id isnt sender_id
-        message_to_delete_et = conversation_et.get_message_by_id message_id
+        message_to_delete_et = conversation_et.get_message_by_id message_to_delete_id
+        @_add_delete_message conversation_id, event_json.id, event_json.time, message_to_delete_et
 
-        amplify.publish z.event.WebApp.EVENT.INJECT,
-          conversation: conversation_id
-          id: event_json.id
-          data:
-            deleted_time: event_json.time
-          type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
-          from: message_to_delete_et.from
-          time: message_to_delete_et.timestamp
-
-      @_delete_message conversation_et, message_id
+      @_delete_message conversation_et, message_to_delete_id
 
     else
-      @logger.log "Failed to delete message with id '#{message_id}'' for conversation '#{conversation_et.id}'"
+      @logger.log "Failed to delete message with id '#{message_to_delete_id}'' for conversation '#{conversation_id}'"
+
+  ###
+  Add delete message to conversation
+  @param event_json [Object] JSON data of 'conversation.asset-upload-complete' event
+  @param message_to_delete_et [z.entity.Message]
+  ###
+  _add_delete_message: (conversation_id, message_id, time, message_to_delete_et) =>
+    amplify.publish z.event.WebApp.EVENT.INJECT,
+      conversation: conversation_id
+      id: message_id
+      data:
+        deleted_time: time
+      type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+      from: message_to_delete_et.from
+      time: message_to_delete_et.timestamp
 
   ###
   A message or ping received in a conversation.
