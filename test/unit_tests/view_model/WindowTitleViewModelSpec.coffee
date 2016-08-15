@@ -145,10 +145,20 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       user_et = new z.entity.User z.util.create_random_uuid()
       user_et.connection pending_connection
 
+      # Test one connect request message
+      title_view_model.user_repository.users.push user_et
+      waiting_people = title_view_model.user_repository.connect_requests().length
+
+      message = z.localization.Localizer.get_text z.string.conversation_list_one_connection_request
+
+      expected_title = "(#{waiting_people}) #{message} - #{suffix}"
+      title_view_model.initiate_title_updates()
+      expect(window.document.title).toBe expected_title
+
+      # Test multiple connect request messages
       another_user_et = new z.entity.User z.util.create_random_uuid()
       another_user_et.connection pending_connection
 
-      title_view_model.user_repository.users.push user_et
       title_view_model.user_repository.users.push another_user_et
       waiting_people = title_view_model.user_repository.connect_requests().length
 
