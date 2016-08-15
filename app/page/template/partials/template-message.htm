@@ -100,12 +100,8 @@
         <location-asset params="asset: asset"></location-asset>
       <!-- /ko -->
 
-      <!-- ko if: message.is_deletable() -->
-        <span class="delete button-icon icon-trash-small" data-uie-name="do-message-delete" data-bind="click: message.delete"></span>
-      <!-- /ko -->
-      <!-- ko if: message.has_asset() && asset && asset.status() === z.assets.AssetTransferState.UPLOADED -->
-        <span class="download button-icon icon-download-small" data-uie-name="file-download" data-bind="click: asset.download" ></span>
-      <!-- /ko -->
+      <context-menu params="entries: function() {return $parents[1].get_context_menu_entries(message)}, tag: 'message', data: message.id"
+                    class="context-menu icon-more"></context-menu>
       <!-- ko ifnot: message.timestamp == '' -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
       <!-- /ko -->
@@ -186,8 +182,9 @@
       <span class="message-icon-ping icon-ping" data-bind="css: message.animation"></span>
     </div>
   </div>
+  <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
+                class="context-menu icon-more"></context-menu>
   <!-- ko ifnot: message.timestamp == '' -->
-    <span class="delete button-icon icon-trash-small" data-uie-name="do-message-delete" data-bind="click: message.delete"></span>
     <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
   <!-- /ko -->
 </script>

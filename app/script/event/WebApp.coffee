@@ -92,6 +92,7 @@ z.event.WebApp =
     SHOW: 'wire.webapp.conversation-list.show'
     ARCHIVE:
       HIDE: 'wire.webapp.conversation-list.archive.hide'
+  CONTEXT_MENU: 'wire.webapp.context-menu'
   DEBUG:
     UPDATE_LAST_CALL_STATUS: 'wire.webapp.debug.update-last-call-status'
   EXTENSIONS:

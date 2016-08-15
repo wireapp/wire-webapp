@@ -108,6 +108,7 @@ class z.ViewModel.MessageListViewModel
         , 1000
 
     amplify.subscribe z.event.WebApp.CONVERSATION.PEOPLE.HIDE, @hide_bubble
+    amplify.subscribe z.event.WebApp.CONTEXT_MENU, @on_context_menu_action
 
   ###
   Remove all subscriptions and reset states.
@@ -456,6 +457,38 @@ class z.ViewModel.MessageListViewModel
           return 'message-system message-rename'
       when z.message.SuperType.UNABLE_TO_DECRYPT
         return 'message-system'
+
+  ###
+  Create context menu entries for given message
+  @param message_et [z.entity.Message]
+  ###
+  get_context_menu_entries: (message_et) ->
+    entries = []
+
+    if message_et.has_asset()
+      entries.push label: z.string.conversation_context_menu_download, action: 'download'
+
+    if message_et.is_deletable()
+      entries.push label: z.string.conversation_context_menu_delete, action: 'delete'
+
+    return entries
+
+  ###
+  Click on context menu entry
+  @param tag [String] associated tag
+  @param action [String] action that was triggered
+  @param data [Object] optional data
+  ###
+  on_context_menu_action: (tag, action, data) =>
+    return if tag isnt 'message'
+
+    message_et = @conversation().get_message_by_id data
+
+    switch action
+      when 'delete'
+        message_et?.delete()
+      when 'download'
+        message_et?.get_first_asset()?.download()
 
   ###
   Shows detail image view.
