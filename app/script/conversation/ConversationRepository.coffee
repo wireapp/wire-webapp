@@ -1309,7 +1309,9 @@ class z.conversation.ConversationRepository
 
   ###
   Add delete message to conversation
-  @param event_json [Object] JSON data of 'conversation.asset-upload-complete' event
+  @param conversation_id [String]
+  @param message_id [String]
+  @param time [String] ISO 8601 formatted time string
   @param message_to_delete_et [z.entity.Message]
   ###
   _add_delete_message: (conversation_id, message_id, time, message_to_delete_et) =>

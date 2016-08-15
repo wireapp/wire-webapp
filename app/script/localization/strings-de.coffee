@@ -260,6 +260,7 @@ z.string.de.conversation_asset_downloading = 'Herunterladen…'
 z.string.de.conversation_asset_upload_failed = 'Hochladen fehlgeschlagen'
 z.string.de.conversation_asset_upload_too_large = 'Du kannst Dateien bis zu %no senden.'
 z.string.de.conversation_playback_error = 'Konnte nicht abgespielt werden'
+z.string.de.conversation_delete_timestamp = 'Gelöscht um %@timestamp'
 
 # Conversation list
 z.string.de.conversation_list_archive = 'Archiv'
