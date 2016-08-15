@@ -112,7 +112,7 @@ class z.main.App
     view.start_ui                  = new z.ViewModel.StartUIViewModel 'start-ui', @repository.conversation, @repository.search, @repository.user, @repository.connect
     view.archive                   = new z.ViewModel.ArchiveViewModel 'archive', @repository.conversation
     view.actions                   = new z.ViewModel.ActionsViewModel 'actions-bubble', @repository.conversation, @repository.user, view.conversation_list
-    view.title                     = new z.ViewModel.WindowTitleViewModel view.content, @repository.user, @repository.conversation
+    view.title                     = new z.ViewModel.WindowTitleViewModel view.content.state, @repository.user, @repository.conversation
     view.welcome                   = new z.ViewModel.WelcomeViewModel 'welcome', @repository.user
     view.settings                  = new z.ViewModel.SettingsViewModel 'self-settings', @repository.user, @repository.conversation, @repository.client, @repository.cryptography
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
