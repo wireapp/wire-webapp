@@ -31,10 +31,22 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
     .catch done.fail
 
   describe 'initiate_title_updates', ->
-    it 'does not update the badge count for muted conversations', ->
-      selected_conversation_name = 'Selected Conversation'
+    it 'sets a default title', ->
       selected_conversation = new z.entity.Conversation z.util.create_random_uuid()
-      selected_conversation.name selected_conversation_name
+      selected_conversation.name 'Selected Conversation'
+      selected_conversation.type z.conversation.ConversationType.REGULAR
+      title_view_model.conversation_repository.active_conversation selected_conversation
+
+      suffix = z.localization.Localizer.get_text z.string.wire
+      expected_title = "#{selected_conversation.name()} - #{suffix}"
+
+      title_view_model.initiate_title_updates()
+
+      expect(window.document.title).toBe expected_title
+
+    it 'does not update the badge count for muted conversations', ->
+      selected_conversation = new z.entity.Conversation z.util.create_random_uuid()
+      selected_conversation.name 'Selected Conversation'
       selected_conversation.type z.conversation.ConversationType.REGULAR
       title_view_model.conversation_repository.active_conversation selected_conversation
 
@@ -51,8 +63,8 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
 
       # Check title when there are no messages
       title_view_model.initiate_title_updates()
-      initial_title = z.localization.Localizer.get_text z.string.wire
-      expected_title = "#{selected_conversation_name} - #{initial_title}"
+      suffix = z.localization.Localizer.get_text z.string.wire
+      expected_title = "#{selected_conversation.name()} - #{suffix}"
       expect(window.document.title).toBe expected_title
 
       # Add messages to the muted conversation
