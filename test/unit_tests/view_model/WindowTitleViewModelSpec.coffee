@@ -23,7 +23,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
   test_factory = new TestFactory()
   title_view_model = undefined
 
-  beforeAll (done) ->
+  beforeEach (done) ->
     test_factory.exposeConversationActors()
     .then (conversation_repository) ->
       state = ko.observable z.ViewModel.CONTENT_STATE.CONVERSATION
@@ -32,15 +32,12 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
     .catch done.fail
 
   describe 'initiate_title_updates', ->
-    beforeEach ->
-      title_view_model.content_state z.ViewModel.CONTENT_STATE.CONVERSATION
-
-    it 'shows a default title when there is an unknown state', ->
+    it 'sets a default title when there is an unknown state', ->
       title_view_model.content_state 'invalid or unknown'
       title_view_model.initiate_title_updates()
       expect(window.document.title).toBe suffix
 
-    it 'shows the name of the conversation when a conversation is selected', ->
+    it 'sets the name of the conversation (when the conversation is selected)', ->
       selected_conversation = new z.entity.Conversation z.util.create_random_uuid()
       selected_conversation.name 'Selected Conversation'
       selected_conversation.type z.conversation.ConversationType.REGULAR
@@ -48,6 +45,24 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
 
       expected_title = "#{selected_conversation.name()} - #{suffix}"
       title_view_model.initiate_title_updates()
+      expect(window.document.title).toBe expected_title
+
+    it 'sets the name of the conversation and a badge count (when the conversation is selected and when there are unread messages)', ->
+      message = new z.entity.Message()
+      message.id = z.util.create_random_uuid()
+      message.timestamp = Date.now()
+
+      conversation = new z.entity.Conversation z.util.create_random_uuid()
+      conversation.add_message message
+      conversation.name 'Birthday Bash'
+      conversation.type z.conversation.ConversationType.REGULAR
+
+      title_view_model.conversation_repository.conversations_unarchived.push conversation
+      title_view_model.conversation_repository.active_conversation conversation
+      title_view_model.initiate_title_updates()
+
+      unread_messages = conversation.number_of_unread_messages()
+      expected_title = "(#{unread_messages}) #{conversation.name()} - #{suffix}"
       expect(window.document.title).toBe expected_title
 
     it 'shows the name of the self user when opening the settings', ->
@@ -99,3 +114,35 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       # Check title when there are messages in the muted conversation
       title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
+
+      # Add messages to the selected conversation
+      message = new z.entity.Message()
+      message.id = z.util.create_random_uuid()
+      message.timestamp = Date.now()
+      selected_conversation.add_message message
+      unread_messages = selected_conversation.number_of_unread_messages()
+      expect(unread_messages).toBe 1
+
+      # Check title when there are messages in the selected conversation
+      title_view_model.initiate_title_updates()
+      expected_title = "(#{unread_messages}) #{selected_conversation.name()} - #{suffix}"
+      expect(window.document.title).toBe expected_title
+
+    it 'publishes the badge count (for Wire\'s wrapper)', (done) ->
+      message = new z.entity.Message()
+      message.id = z.util.create_random_uuid()
+      message.timestamp = Date.now()
+
+      conversation = new z.entity.Conversation z.util.create_random_uuid()
+      conversation.add_message message
+      conversation.name 'Birthday Bash'
+      conversation.type z.conversation.ConversationType.REGULAR
+
+      title_view_model.conversation_repository.conversations_unarchived.push conversation
+      title_view_model.conversation_repository.active_conversation conversation
+
+      amplify.subscribe z.event.WebApp.CONVERSATION.UNREAD, (badge_count) ->
+        expect(badge_count).toBe 1
+        done()
+
+      title_view_model.initiate_title_updates()
