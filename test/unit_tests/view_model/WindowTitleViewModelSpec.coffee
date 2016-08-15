@@ -35,7 +35,12 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
     beforeEach ->
       title_view_model.content_state z.ViewModel.CONTENT_STATE.CONVERSATION
 
-    it 'sets a default title', ->
+    it 'shows a default title when there is an unknown state', ->
+      title_view_model.content_state 'invalid or unknown'
+      title_view_model.initiate_title_updates()
+      expect(window.document.title).toBe suffix
+
+    it 'shows the name of the conversation when a conversation is selected', ->
       selected_conversation = new z.entity.Conversation z.util.create_random_uuid()
       selected_conversation.name 'Selected Conversation'
       selected_conversation.type z.conversation.ConversationType.REGULAR
