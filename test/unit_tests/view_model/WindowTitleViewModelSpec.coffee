@@ -37,6 +37,14 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       title_view_model.initiate_title_updates()
       expect(window.document.title).toBe suffix
 
+    it 'sets the name of the self user when opening the settings', ->
+      title_view_model.content_state z.ViewModel.CONTENT_STATE.PROFILE
+      user_name = window.user_repository.self().name()
+
+      expected_title = "#{user_name} - #{suffix}"
+      title_view_model.initiate_title_updates()
+      expect(window.document.title).toBe expected_title
+
     it 'sets the name of the conversation (when the conversation is selected)', ->
       selected_conversation = new z.entity.Conversation z.util.create_random_uuid()
       selected_conversation.name 'Selected Conversation'
@@ -65,15 +73,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       expected_title = "(#{unread_messages}) #{conversation.name()} - #{suffix}"
       expect(window.document.title).toBe expected_title
 
-    it 'shows the name of the self user when opening the settings', ->
-      title_view_model.content_state z.ViewModel.CONTENT_STATE.PROFILE
-      user_name = window.user_repository.self().name()
-
-      expected_title = "#{user_name} - #{suffix}"
-      title_view_model.initiate_title_updates()
-      expect(window.document.title).toBe expected_title
-
-    it 'does not update the badge count for muted conversations', ->
+    it 'does not change the title if muted conversations receive messages', ->
       selected_conversation = new z.entity.Conversation z.util.create_random_uuid()
       selected_conversation.name 'Selected Conversation'
       selected_conversation.type z.conversation.ConversationType.REGULAR
@@ -126,6 +126,41 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       # Check title when there are messages in the selected conversation
       title_view_model.initiate_title_updates()
       expected_title = "(#{unread_messages}) #{selected_conversation.name()} - #{suffix}"
+      expect(window.document.title).toBe expected_title
+
+    it 'sets the name of the self user when opening the settings', ->
+      title_view_model.content_state z.ViewModel.CONTENT_STATE.PROFILE
+      user_name = window.user_repository.self().name()
+
+      expected_title = "#{user_name} - #{suffix}"
+      title_view_model.initiate_title_updates()
+      expect(window.document.title).toBe expected_title
+
+    it 'sets the number of connect requests when checking the inbox', ->
+      title_view_model.content_state z.ViewModel.CONTENT_STATE.PENDING
+
+      pending_connection = new z.entity.Connection()
+      pending_connection.status z.user.ConnectionStatus.PENDING
+
+      user_et = new z.entity.User z.util.create_random_uuid()
+      user_et.connection pending_connection
+
+      another_user_et = new z.entity.User z.util.create_random_uuid()
+      another_user_et.connection pending_connection
+
+      title_view_model.user_repository.users.push user_et
+      title_view_model.user_repository.users.push another_user_et
+      waiting_people = title_view_model.user_repository.connect_requests().length
+
+      message = z.localization.Localizer.get_text {
+        id: z.string.conversation_list_many_connection_request
+        replace: {
+          placeholder: '%no', content: waiting_people
+        }
+      }
+
+      expected_title = "(#{waiting_people}) #{message} - #{suffix}"
+      title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
 
     it 'publishes the badge count (for Wire\'s wrapper)', (done) ->
