@@ -931,10 +931,9 @@ class z.conversation.ConversationRepository
   @note Will either send a normal or external message.
   @param message [String] plain text message
   @param conversation_et [z.entity.Conversation] Conversation that should receive the message
-  @param retry [Boolean] Try to resend as external with first attempt failed (optional)
   @return [Promise] Promise that resolves after sending the message
   ###
-  send_encrypted_message: (message, conversation_et, retry = true) =>
+  send_encrypted_message: (message, conversation_et) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'text', new z.proto.Text message
 
@@ -943,7 +942,7 @@ class z.conversation.ConversationRepository
       return @_send_and_save_encrypted_value conversation_et, generic_message
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
-        return @_send_encrypted_external_value conversation_et, generic_message
+        return @_send_encrypted_external_value conversation_et.id, generic_message
       else
         throw error
     .then (message_record) =>
