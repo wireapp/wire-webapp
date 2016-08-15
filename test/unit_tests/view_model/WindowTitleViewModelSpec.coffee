@@ -36,11 +36,24 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       selected_conversation = new z.entity.Conversation z.util.create_random_uuid()
       selected_conversation.name selected_conversation_name
       selected_conversation.type z.conversation.ConversationType.REGULAR
+      title_view_model.conversation_repository.active_conversation selected_conversation
 
       muted_conversation = new z.entity.Conversation z.util.create_random_uuid()
       muted_conversation.muted_state true
       muted_conversation.name 'Muted Conversation'
       muted_conversation.type z.conversation.ConversationType.REGULAR
+
+      # Add conversations to conversation repository
+      expect(title_view_model.conversation_repository.conversations_unarchived().length).toBe 0
+      title_view_model.conversation_repository.conversations_unarchived.push selected_conversation
+      title_view_model.conversation_repository.conversations_unarchived.push muted_conversation
+      expect(title_view_model.conversation_repository.conversations_unarchived().length).toBe 2
+
+      # Check title when there are no messages
+      title_view_model.initiate_title_updates()
+      initial_title = z.localization.Localizer.get_text z.string.wire
+      expected_title = "#{selected_conversation_name} - #{initial_title}"
+      expect(window.document.title).toBe expected_title
 
       # Add messages to the muted conversation
       message = new z.entity.Message()
@@ -53,22 +66,11 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       message.timestamp = Date.now()
       muted_conversation.add_message message
 
-      # Add conversations to conversation repository
-      expect(title_view_model.conversation_repository.conversations_unarchived().length).toBe 0
-      title_view_model.conversation_repository.conversations_unarchived.push selected_conversation
-      title_view_model.conversation_repository.conversations_unarchived.push muted_conversation
-      title_view_model.conversation_repository.active_conversation selected_conversation
-      expect(title_view_model.conversation_repository.conversations_unarchived().length).toBe 2
-
-      # Check title when there are no messages
-      title_view_model.initiate_title_updates()
-      initial_title = z.localization.Localizer.get_text z.string.wire
-      expected_title = "#{selected_conversation_name} - #{initial_title}"
-      expect(window.document.title).toBe expected_title
-
       expect(muted_conversation.messages().length).toBe 2
       expect(muted_conversation.messages_unordered().length).toBe 2
       expect(muted_conversation.unread_events().length).toBe 2
       expect(muted_conversation.number_of_unread_messages()).toBe 2
 
+      # Check title when there are messages in the muted conversation
+      title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
