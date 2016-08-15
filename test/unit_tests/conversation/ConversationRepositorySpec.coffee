@@ -288,7 +288,7 @@ describe 'z.conversation.ConversationRepository', ->
       result = conversation_repository.get_groups_by_name 'Removed'
       expect(result.length).toBe 0
 
-  xdescribe 'message_deleted', ->
+  describe 'message_deleted', ->
 
     conversation_et = null
     message_et = null
@@ -303,16 +303,17 @@ describe 'z.conversation.ConversationRepository', ->
 
       spyOn conversation_repository, '_delete_message'
       spyOn conversation_repository, '_add_delete_message'
-      spyOn(cryptography_repository, 'load_session').and.returnValue session
 
     it 'should delete message if user is self', ->
       event =
         conversation: conversation_et.id
         id: message_et.id
+        data:
+          message_id: message_et.id
         from: user_repository.self().id
         time: new Date().toISOString()
 
-      conversation_et.message_deleted event
+      conversation_repository.message_deleted event
       expect(conversation_repository._delete_message).toHaveBeenCalled()
       expect(conversation_repository._add_delete_message).not.toHaveBeenCalled()
 
@@ -320,10 +321,12 @@ describe 'z.conversation.ConversationRepository', ->
       event =
         conversation: conversation_et.id
         id: message_et.id
+        data:
+          message_id: message_et.id
         from: z.util.create_random_uuid()
         time: new Date().toISOString()
 
-      conversation_et.message_deleted event
+      conversation_repository.message_deleted event
       expect(conversation_repository._delete_message).toHaveBeenCalled()
       expect(conversation_repository._add_delete_message).toHaveBeenCalled()
 

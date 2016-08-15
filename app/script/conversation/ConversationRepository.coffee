@@ -1038,7 +1038,7 @@ class z.conversation.ConversationRepository
   @return [z.proto.MsgDeleted] MsgDeleted protobuf message
   ###
   _construct_delete: (conversation_id, message_id) ->
-    return new z.proto.MsgDeleted conversation_id, message_id
+    return new z.proto.MessageHide conversation_id, message_id
 
   ###
   Construct an encrypted message event.
@@ -1290,13 +1290,13 @@ class z.conversation.ConversationRepository
   message_deleted: (event_json) =>
     conversation_id = event_json.data.conversation_id
     message_to_delete_id = event_json.data.message_id
-    sender_id = event_json.from
 
     if not conversation_id?
       conversation_id = event_json.conversation
 
     if conversation_id? and message_to_delete_id?
       conversation_et = @find_conversation_by_id conversation_id
+      sender_id = event_json.from
 
       if @user_repository.self().id isnt sender_id
         message_to_delete_et = conversation_et.get_message_by_id message_to_delete_id
