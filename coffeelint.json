@@ -55,12 +55,12 @@
     "level": "warn",
     "value": "unix"
   },
-"max_line_length": {
-  "name": "max_line_length",
-  "value": 120,
-  "level": "ignore",
-  "limitComments": false
-},
+  "max_line_length": {
+    "name": "max_line_length",
+    "value": 120,
+    "level": "ignore",
+    "limitComments": false
+  },
   "missing_fat_arrows": {
     "name": "missing_fat_arrows",
     "level": "ignore"
