@@ -260,6 +260,7 @@ z.string.conversation_asset_downloading = 'Downloading…'
 z.string.conversation_asset_upload_failed = 'Upload Failed'
 z.string.conversation_asset_upload_too_large = 'You can send files up to %no'
 z.string.conversation_playback_error = 'Unable to play'
+z.string.conversation_delete_timestamp = 'Deleted on %@timestamp'
 
 # Conversation list
 z.string.conversation_list_archive = 'ARCHIVE'
