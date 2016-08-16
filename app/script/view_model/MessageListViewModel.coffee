@@ -466,13 +466,13 @@ class z.ViewModel.MessageListViewModel
     entries = []
 
     if message_et.has_asset()
-      entries.push label: z.string.conversation_context_menu_download, action: 'download'
+      entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
 
     if message_et.is_deletable()
-      entries.push label: z.string.conversation_context_menu_delete, action: 'delete'
+      entries.push {label: z.string.conversation_context_menu_delete, action: 'delete'}
 
     if message_et.user().is_me
-      entries.push label: z.string.conversation_context_menu_delete_everyone, action: 'delete-everyone'
+      entries.push {label: z.string.conversation_context_menu_delete_everyone, action: 'delete-everyone'}
 
     return entries
 

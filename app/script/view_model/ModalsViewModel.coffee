@@ -32,7 +32,7 @@ z.ViewModel.ModalType =
   CONNECTED_DEVICE: '.modal-connected-device'
   CONTACTS: '.modal-contacts'
   DELETE_MESSAGE: '.modal-delete-message'
-  DELETE_EVERYONE_MESSAGE: '.modal-delete-everyone-message'
+  DELETE_EVERYONE_MESSAGE: '.modal-delete-message-everyone'
   TOO_LONG_MESSAGE: '.modal-too-long-message'
   TOO_MANY_MEMBERS: '.modal-too-many-members'
   LEAVE: '.modal-leave'
