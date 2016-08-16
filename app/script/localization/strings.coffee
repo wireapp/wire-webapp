@@ -175,8 +175,12 @@ z.string.modal_connected_device_message = 'If you didn’t do this, remove the d
 z.string.modal_connected_device_manage_devices = 'manage devices'
 # Delete message
 z.string.modal_delete_button = 'Delete'
-z.string.modal_delete_headline = 'Delete message'
-z.string.modal_delete_message = 'The message will only be removed from your view of the conversation. This cannot be undone.'
+z.string.modal_delete_headline = 'Delete only for me?'
+z.string.modal_delete_message = 'This cannot be undone.'
+# Delete message
+z.string.modal_delete_everyone_button = 'Delete'
+z.string.modal_delete_everyone_headline = 'Delete for everyone?'
+z.string.modal_delete_everyone_message = 'This cannot be undone.'
 # Too long message
 z.string.modal_too_long_headline = 'Message too long'
 z.string.modal_too_long_message = 'You can send messages up to %no characters long.'
