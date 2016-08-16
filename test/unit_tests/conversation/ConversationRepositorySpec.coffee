@@ -303,6 +303,7 @@ describe 'z.conversation.ConversationRepository', ->
 
       spyOn conversation_repository, '_delete_message'
       spyOn conversation_repository, '_add_delete_message'
+      spyOn(conversation_repository,'get_message_from_db').and.returnValue Promise.resolve new z.entity.Message()
 
     it 'delete message if user is self', ->
       event =

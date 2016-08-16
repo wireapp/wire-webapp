@@ -173,6 +173,18 @@ class z.conversation.ConversationRepository
         @logger.log @logger.levels.ERROR, "Failed to retrieve conversations from backend: #{error.message}", error
         reject error
 
+  ###
+  Get Message with given ID from the database.
+  @param conversation_et [z.entity.Conversation]
+  @param message_id [String]
+  @return [Promise] z.entity.Message
+  ###
+  get_message_from_db: (conversation_et, message_id) =>
+    @conversation_service.load_event_from_db conversation_et.id, message_id
+    .then (event) =>
+      raw_event = event.mapped or event.raw
+      return @event_mapper.map_json_event raw_event, conversation_et
+
   get_events: (conversation_et) ->
     return new Promise (resolve, reject) =>
       conversation_et.is_pending true
@@ -1308,8 +1320,11 @@ class z.conversation.ConversationRepository
       sender_id = event_json.from
 
       if @user_repository.self().id isnt sender_id
-        message_to_delete_et = conversation_et.get_message_by_id message_to_delete_id
-        @_add_delete_message conversation_id, event_json.id, event_json.time, message_to_delete_et
+        @get_message_from_db conversation_et.id, message_to_delete_id
+        .then (message_to_delete_et) =>
+          return @_add_delete_message conversation_id, event_json.id, event_json.time, message_to_delete_et
+        .catch (error) =>
+          @logger.log "Failed add delete message for conversation '#{conversation_id}'", error
 
       @_delete_message conversation_et, message_to_delete_id
 
