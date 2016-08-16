@@ -1268,7 +1268,7 @@ class z.conversation.ConversationRepository
       @_send_encrypted_value conversation_et.id, generic_message
       .then =>
         return @_delete_message conversation_et, message_et.id
-      .catch (error) ->
+      .catch (error) =>
         @logger.log "Failed to send delete message for everyone with id '#{message_id}' for conversation '#{conversation_et.id}'", error
 
   ###
@@ -1286,7 +1286,7 @@ class z.conversation.ConversationRepository
       .then =>
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE, {mode: 'single'}
         return @_delete_message conversation_et, message_et.id
-      .catch (error) ->
+      .catch (error) =>
         @logger.log "Failed to send delete message with id '#{message_id}' for conversation '#{conversation_et.id}'", error
 
   ###
@@ -1309,27 +1309,25 @@ class z.conversation.ConversationRepository
   ###############################################################################
 
   message_deleted: (event_json) =>
-    conversation_id = event_json.data.conversation_id
-    message_to_delete_id = event_json.data.message_id
+    conversation_et = undefined
+    message_to_delete_id = undefined
 
-    if not conversation_id?
-      conversation_id = event_json.conversation
-
-    if conversation_id? and message_to_delete_id?
+    Promise.resolve()
+    .then =>
+      message_to_delete_id = event_json.data.message_id
+      conversation_id = event_json.data.conversation_id or event_json.conversation
       conversation_et = @find_conversation_by_id conversation_id
-      sender_id = event_json.from
+    .then =>
+      @get_message_from_db conversation_et, message_to_delete_id
+    .then (message_to_delete_et) =>
+      if @user_repository.self().id isnt event_json.from
+        return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
+    .then =>
+      return @_delete_message conversation_et, message_to_delete_id
+    .catch (error) =>
+      @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
+      throw error
 
-      if @user_repository.self().id isnt sender_id
-        @get_message_from_db conversation_et.id, message_to_delete_id
-        .then (message_to_delete_et) =>
-          return @_add_delete_message conversation_id, event_json.id, event_json.time, message_to_delete_et
-        .catch (error) =>
-          @logger.log "Failed add delete message for conversation '#{conversation_id}'", error
-
-      @_delete_message conversation_et, message_to_delete_id
-
-    else
-      @logger.log "Failed to delete message with id '#{message_to_delete_id}'' for conversation '#{conversation_id}'"
 
   ###
   Add delete message to conversation
