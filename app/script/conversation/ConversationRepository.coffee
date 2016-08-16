@@ -98,7 +98,8 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.SELF.CLIENT_ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
-    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.DELETE, @delete_message
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.DELETE_SELF, @delete_message
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.DELETE_EVERYONE, @delete_message_everyone
 
 
   ###############################################################################
@@ -171,6 +172,18 @@ class z.conversation.ConversationRepository
       .catch (error) =>
         @logger.log @logger.levels.ERROR, "Failed to retrieve conversations from backend: #{error.message}", error
         reject error
+
+  ###
+  Get Message with given ID from the database.
+  @param conversation_et [z.entity.Conversation]
+  @param message_id [String]
+  @return [Promise] z.entity.Message
+  ###
+  get_message_from_db: (conversation_et, message_id) =>
+    @conversation_service.load_event_from_db conversation_et.id, message_id
+    .then (event) =>
+      raw_event = event.mapped or event.raw
+      return @event_mapper.map_json_event raw_event, conversation_et
 
   get_events: (conversation_et) ->
     return new Promise (resolve, reject) =>
@@ -1242,30 +1255,52 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
 
   ###
-  Delete message in conversation.
+  Delete message for everyone.
 
-  @param conversation_et [z.entity.Conversation] Conversation to post the file
-  @param message_et [z.entity.Message] Message object
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
   ###
-  delete_message: (message_et) =>
-    conversation_et = @active_conversation()
-    if message_et?
+  delete_message_everyone: (conversation_et, message_et) =>
+    Promise.resolve()
+    .then ->
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
+      return generic_message
+    .then (generic_message) =>
+      @_send_encrypted_value conversation_et.id, generic_message
+    .then =>
+      return @_delete_message conversation_et, message_et.id
+    .catch (error) =>
+      @logger.log "Failed to send delete message for everyone with id '#{message_id}' for conversation '#{conversation_et.id}'", error
+      throw error
+
+  ###
+  Delete message on your own clients.
+
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  ###
+  delete_message: (conversation_et, message_et) =>
+    Promise.resolve()
+    .then ->
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'hidden', new z.proto.MessageHide conversation_et.id, message_et.id
-
+      return generic_message
+    .then (generic_message) =>
       @_send_encrypted_value @self_conversation().id, generic_message
-      .then =>
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE, {mode: 'single'}
-        return @_delete_message conversation_et, message_et.id
-      .catch (error) ->
-        @logger.log "Failed to send delete message with id '#{message_id}' for conversation '#{conversation_et.id}'", error
+    .then =>
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE, {mode: 'single'}
+      return @_delete_message conversation_et, message_et.id
+    .catch (error) =>
+      @logger.log "Failed to send delete message with id '#{message_id}' for conversation '#{conversation_et.id}'", error
+      throw error
 
   ###
   Can user upload assets to conversation.
 
   # TODO move to conversation et
 
-  @param conversation_et [z.entity.Conversation] Conversation to rename
+  @param conversation_et [z.entity.Conversation]
   ###
   _can_upload_assets_to_conversation: (conversation_et) ->
     return false if not conversation_et?
@@ -1280,24 +1315,25 @@ class z.conversation.ConversationRepository
   ###############################################################################
 
   message_deleted: (event_json) =>
-    conversation_id = event_json.data.conversation_id
-    message_to_delete_id = event_json.data.message_id
+    conversation_et = undefined
+    message_to_delete_id = undefined
 
-    if not conversation_id?
-      conversation_id = event_json.conversation
-
-    if conversation_id? and message_to_delete_id?
+    Promise.resolve()
+    .then =>
+      message_to_delete_id = event_json.data.message_id
+      conversation_id = event_json.data.conversation_id or event_json.conversation
       conversation_et = @find_conversation_by_id conversation_id
-      sender_id = event_json.from
+    .then =>
+      @get_message_from_db conversation_et, message_to_delete_id
+    .then (message_to_delete_et) =>
+      if @user_repository.self().id isnt event_json.from
+        return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
+    .then =>
+      return @_delete_message conversation_et, message_to_delete_id
+    .catch (error) =>
+      @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
+      throw error
 
-      if @user_repository.self().id isnt sender_id
-        message_to_delete_et = conversation_et.get_message_by_id message_to_delete_id
-        @_add_delete_message conversation_id, event_json.id, event_json.time, message_to_delete_et
-
-      @_delete_message conversation_et, message_to_delete_id
-
-    else
-      @logger.log "Failed to delete message with id '#{message_to_delete_id}'' for conversation '#{conversation_id}'"
 
   ###
   Add delete message to conversation

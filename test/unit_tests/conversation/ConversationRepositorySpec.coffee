@@ -291,44 +291,51 @@ describe 'z.conversation.ConversationRepository', ->
   describe 'message_deleted', ->
 
     conversation_et = null
-    message_et = null
+    message_to_delete_et = null
 
     beforeEach ->
       conversation_et = _generate_conversation z.conversation.ConversationType.REGULAR
       conversation_repository.save_conversation conversation_et
 
-      message_et = new z.entity.PingMessage()
-      message_et.id = z.util.create_random_uuid()
-      conversation_et.add_message message_et
+      message_to_delete_et = new z.entity.PingMessage()
+      message_to_delete_et.id = z.util.create_random_uuid()
+      conversation_et.add_message message_to_delete_et
 
+      spyOn(conversation_repository, 'get_message_from_db').and.returnValue Promise.resolve message_to_delete_et
       spyOn conversation_repository, '_delete_message'
       spyOn conversation_repository, '_add_delete_message'
 
-    it 'delete message if user is self', ->
+    it 'deletes message if user is self', (done) ->
       event =
         conversation: conversation_et.id
-        id: message_et.id
+        id: z.util.create_random_uuid()
         data:
-          message_id: message_et.id
+          message_id: message_to_delete_et.id
         from: user_repository.self().id
         time: new Date().toISOString()
 
       conversation_repository.message_deleted event
-      expect(conversation_repository._delete_message).toHaveBeenCalled()
-      expect(conversation_repository._add_delete_message).not.toHaveBeenCalled()
+      .then ->
+        expect(conversation_repository._delete_message).toHaveBeenCalledWith conversation_et, message_to_delete_et.id
+        expect(conversation_repository._add_delete_message).not.toHaveBeenCalled()
+        done()
+      .catch done.fail
 
-    it 'delete message and add delete message if user is not self', ->
+    it 'deletes message and add delete message if user is not self', (done) ->
       event =
         conversation: conversation_et.id
-        id: message_et.id
+        id: z.util.create_random_uuid()
         data:
-          message_id: message_et.id
+          message_id: message_to_delete_et.id
         from: z.util.create_random_uuid()
         time: new Date().toISOString()
 
       conversation_repository.message_deleted event
-      expect(conversation_repository._delete_message).toHaveBeenCalled()
-      expect(conversation_repository._add_delete_message).toHaveBeenCalled()
+      .then ->
+        expect(conversation_repository._delete_message).toHaveBeenCalledWith conversation_et, message_to_delete_et.id
+        expect(conversation_repository._add_delete_message).toHaveBeenCalled()
+        done()
+      .catch done.fail
 
   describe 'get_number_of_pending_uploads', ->
 
@@ -443,23 +450,6 @@ describe 'z.conversation.ConversationRepository', ->
         conversation: conversation_et.id
 
       conversation_repository.asset_upload_failed conversation_et, event
-
-      expect(conversation_service.delete_message_from_db).toHaveBeenCalledWith conversation_et.id, message_et.id
-      expect(conversation_et.get_message_by_id message_et.id).toBeUndefined()
-
-    it 'should delete message on receiver side', ->
-      # mocked event response
-      event =
-        data:
-          conversation_id: conversation_et.id
-          message_id: message_et.id
-        from: z.util.create_random_uuid()
-        time: Date.now()
-        id: message_et.id
-        type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
-        conversation: conversation_et.id
-
-      conversation_repository.message_deleted event
 
       expect(conversation_service.delete_message_from_db).toHaveBeenCalledWith conversation_et.id, message_et.id
       expect(conversation_et.get_message_by_id message_et.id).toBeUndefined()
