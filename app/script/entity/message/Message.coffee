@@ -207,7 +207,31 @@ class z.entity.Message
       type: type
 
     amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
-      action: => amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.DELETE, @
+      action: => amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.DELETE, active_conversation, @
+
+  ###
+  Triggers event to delete message for everyone.
+  ###
+  delete_everyone: =>
+    active_conversation = wire.app.repository.conversation.active_conversation()
+    type = 'text'
+
+    if @is_system()
+      type = 'system'
+    else if @is_ping()
+      type = 'ping'
+    else if @has_asset_image()
+      type = 'image'
+    else if @has_asset()
+      type = 'file'
+
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.SELECTED_MESSAGE,
+      context: 'single'
+      conversation_type: if active_conversation.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+      type: type
+
+    amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
+      action: => amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.DELETE_EVERYONE, active_conversation, @
 
   ###
   Sort messages by timestamp

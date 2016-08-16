@@ -40,4 +40,5 @@ z.event.EventTypeHandling =
     z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
     z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
     z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
+    z.event.Client.CONVERSATION.DELETE_EVERYWHERE
   ]

@@ -99,6 +99,7 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.SELF.CLIENT_ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
     amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.DELETE, @delete_message
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.DELETE_EVERYONE, @delete_message_everyone
 
 
   ###############################################################################
@@ -1242,13 +1243,29 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
 
   ###
-  Delete message in conversation.
+  Delete message for everyone.
 
-  @param conversation_et [z.entity.Conversation] Conversation to post the file
-  @param message_et [z.entity.Message] Message object
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
   ###
-  delete_message: (message_et) =>
-    conversation_et = @active_conversation()
+  delete_message_everyone: (conversation_et, message_et) =>
+    if message_et?
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
+
+      @_send_encrypted_value conversation_et.id, generic_message
+      .then =>
+        return @_delete_message conversation_et, message_et.id
+      .catch (error) ->
+        @logger.log "Failed to send delete message for everyone with id '#{message_id}' for conversation '#{conversation_et.id}'", error
+
+  ###
+  Delete message on your own clients.
+
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  ###
+  delete_message: (conversation_et, message_et) =>
     if message_et?
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'hidden', new z.proto.MessageHide conversation_et.id, message_et.id
@@ -1265,7 +1282,7 @@ class z.conversation.ConversationRepository
 
   # TODO move to conversation et
 
-  @param conversation_et [z.entity.Conversation] Conversation to rename
+  @param conversation_et [z.entity.Conversation]
   ###
   _can_upload_assets_to_conversation: (conversation_et) ->
     return false if not conversation_et?

@@ -471,6 +471,9 @@ class z.ViewModel.MessageListViewModel
     if message_et.is_deletable()
       entries.push label: z.string.conversation_context_menu_delete, action: 'delete'
 
+    if message_et.user().is_me
+      entries.push label: z.string.conversation_context_menu_delete_everyone, action: 'delete-everyone'
+
     return entries
 
   ###
@@ -487,6 +490,8 @@ class z.ViewModel.MessageListViewModel
     switch action
       when 'delete'
         message_et?.delete()
+      when 'delete-everyone'
+        message_et?.delete_everyone()
       when 'download'
         message_et?.get_first_asset()?.download()
 
