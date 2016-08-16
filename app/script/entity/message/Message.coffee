@@ -207,7 +207,7 @@ class z.entity.Message
       type: type
 
     amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
-      action: => amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.DELETE, active_conversation, @
+      action: => amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.DELETE_SELF, active_conversation, @
 
   ###
   Triggers event to delete message for everyone.

@@ -461,7 +461,7 @@ z.string.de.url_support_history = 'https://support.wire.com/hc/de/articles/20783
 z.string.de.url_support_mic_access_denied = 'https://support.wire.com/hc/de/articles/202590081'
 z.string.de.url_support_mic_not_found = 'https://support.wire.com/hc/de/articles/202970662'
 z.string.de.url_support_screen_access_denied = 'https://support.wire.com/hc/de/articles/202935412'
-z.string.de.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.de.url_support_screen_whitelist = 'https://support.wire.com/hc/de/articles/209423889'
 z.string.de.url_support_session = 'https://support.wire.com/hc/de'
 z.string.de.url_downloads = 'https://wire.com/download/?hl=de'
 z.string.de.url_app_store = 'https://wire.com/download/osx/'

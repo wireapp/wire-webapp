@@ -305,7 +305,7 @@ describe 'z.conversation.ConversationRepository', ->
       spyOn conversation_repository, '_delete_message'
       spyOn conversation_repository, '_add_delete_message'
 
-    it 'delete message if user is self', (done) ->
+    it 'deletes message if user is self', (done) ->
       event =
         conversation: conversation_et.id
         id: z.util.create_random_uuid()
@@ -321,7 +321,7 @@ describe 'z.conversation.ConversationRepository', ->
         done()
       .catch done.fail
 
-    it 'delete message and add delete message if user is not self', (done) ->
+    it 'deletes message and add delete message if user is not self', (done) ->
       event =
         conversation: conversation_et.id
         id: z.util.create_random_uuid()
