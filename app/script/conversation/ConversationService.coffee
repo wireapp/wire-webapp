@@ -285,7 +285,6 @@ class z.conversation.ConversationService
   @param message_id [String]
   ###
   load_event_from_db: (conversation_id, message_id) ->
-    debugger
     return new Promise (resolve, reject) =>
       @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
       .where 'raw.conversation'
