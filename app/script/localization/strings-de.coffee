@@ -175,8 +175,12 @@ z.string.de.modal_connected_device_message = 'Falls du dieses Gerät nicht hinzu
 z.string.de.modal_connected_device_manage_devices = 'Geräte verwalten'
 # Delete message
 z.string.de.modal_delete_button = 'Löschen'
-z.string.de.modal_delete_headline = 'Nachricht löschen'
-z.string.de.modal_delete_message = 'Die Nachricht wird nur auf deiner Seite der Unterhaltung gelöscht. Dies kann nicht rückgängig gemacht werden.'
+z.string.de.modal_delete_headline = 'Nur für mich löschen?'
+z.string.de.modal_delete_message = 'Dies kann nicht rückgängig gemacht werden.'
+# Delete message
+z.string.de.modal_delete_everyone_button = 'Löschen'
+z.string.de.modal_delete_everyone_headline = 'Für alle löschen?'
+z.string.de.modal_delete_everyone_message = 'Dies kann nicht rückgängig gemacht werden.'
 # Too long message
 z.string.de.modal_too_long_headline = 'Nachricht zu lang'
 z.string.de.modal_too_long_message = 'Du kannst Nachrichten mit bis zu %no Zeichen senden.'
@@ -260,6 +264,9 @@ z.string.de.conversation_asset_downloading = 'Herunterladen…'
 z.string.de.conversation_asset_upload_failed = 'Hochladen fehlgeschlagen'
 z.string.de.conversation_asset_upload_too_large = 'Du kannst Dateien bis zu %no senden.'
 z.string.de.conversation_playback_error = 'Konnte nicht abgespielt werden'
+z.string.de.conversation_context_menu_delete = 'nur für mich löschen'
+z.string.de.conversation_context_menu_delete_everyone = 'für alle löschen'
+z.string.de.conversation_context_menu_download = 'herunterladen'
 z.string.de.conversation_delete_timestamp = 'Gelöscht um %@timestamp'
 
 # Conversation list
@@ -454,7 +461,7 @@ z.string.de.url_support_history = 'https://support.wire.com/hc/de/articles/20783
 z.string.de.url_support_mic_access_denied = 'https://support.wire.com/hc/de/articles/202590081'
 z.string.de.url_support_mic_not_found = 'https://support.wire.com/hc/de/articles/202970662'
 z.string.de.url_support_screen_access_denied = 'https://support.wire.com/hc/de/articles/202935412'
-z.string.de.url_support_screen_whitelist = 'https://support.wire.com/hc/de/articles/209423889'
+z.string.de.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
 z.string.de.url_support_session = 'https://support.wire.com/hc/de'
 z.string.de.url_downloads = 'https://wire.com/download/?hl=de'
 z.string.de.url_app_store = 'https://wire.com/download/osx/'
