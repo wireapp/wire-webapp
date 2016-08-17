@@ -170,7 +170,7 @@ class z.audio.AudioRepository
         audio_element.loop = play_in_loop
         audio_element.currentTime = 0 if audio_element.currentTime isnt 0
         audio_element.play()
-        .then ->
+        .then =>
           @currently_looping[audio_id] = audio_id if play_in_loop
           resolve audio_element
         .catch (error) ->
