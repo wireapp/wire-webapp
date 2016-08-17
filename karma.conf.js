@@ -29,12 +29,10 @@ module.exports = function (config) {
 
     // list of files / patterns to load in the browser
     files: [
-      //Do not write files or patterns here. Put them in grunt/config/karma.coffee
+      // Do not write files or patterns here. Put them in grunt/config/karma.coffee
     ],
 
-    proxies: {
-      "/ext/": "/base/ext/"
-    },
+    proxies: {},
 
     // list of files to exclude
     exclude: [],
