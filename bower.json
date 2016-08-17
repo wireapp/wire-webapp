@@ -20,7 +20,6 @@
     "platform.js": "https://github.com/bestiejs/platform.js.git#0870795f0c277a33cc2078a96e74434f89aa11d8",
     "protobuf": "https://github.com/gregor/protobuf.js.git#32ada41d3c963bd5f43d7cdadced2d6d2ccd082a",
     "raygun4js": "https://github.com/MindscapeHQ/raygun4js.git#2.3.2",
-    "soundmanager2": "https://github.com/scottschiller/SoundManager2.git#V2.97a.20150601",
     "twitter-text": "https://github.com/twitter/twitter-text.git#v1.13.4",
     "uint32": "https://github.com/fxa/uint32.js.git#0.2.1",
     "underscore": "https://github.com/jashkenas/underscore.git#1.8.3",
@@ -115,9 +114,6 @@
     },
     "raygun4js": {
       "js": "dist/raygun.vanilla.js"
-    },
-    "soundmanager2": {
-      "js": "script/soundmanager2.js"
     },
     "twitter-text": {
       "js": "js/twitter-text.js"

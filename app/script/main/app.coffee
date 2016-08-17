@@ -208,8 +208,9 @@ class z.main.App
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.APP_LOADED
       return @repository.conversation.update_conversations @repository.conversation.conversations_unarchived()
     .then =>
-      @repository.announce.init()
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS
+      @repository.announce.init()
+      @repository.audio.init true
       @logger.log @logger.levels.INFO, 'App fully loaded'
     .catch (error) =>
       @logger.log @logger.levels.INFO, 'Error during app initialization.'

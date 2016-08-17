@@ -19,22 +19,23 @@
 window.z ?= {}
 z.audio ?= {}
 
-# Enum of audio settings.
-z.audio.AudioSetting =
-  ALL: 'all'
-  NONE: 'none'
-  SOME: 'some'
-
-AUDIO_PATH = '/audio'
-
 # Audio repository for all audio interactions.
 class z.audio.AudioRepository
+  AUDIO_PATH: '/audio'
+
   # Construct a new Audio Repository.
   constructor: ->
     @logger = new z.util.Logger 'z.audio.AudioRepository', z.config.LOGGER.OPTIONS
+
     @audio_context = undefined
-    @in_loop = {}
-    @_init_sound_manager()
+
+    @audio_elements = {}
+    @currently_looping = {}
+    @sound_setting = ko.observable z.audio.AudioSetting.ALL
+
+    @sound_setting.subscribe (sound_setting) =>
+      @_stop_all() if sound_setting is z.audio.AudioSetting.NONE
+
     @_subscribe_to_audio_properties()
 
   # Closing the AudioContext.
@@ -58,103 +59,152 @@ class z.audio.AudioRepository
       return undefined
 
   ###
-  Initialize a sound.
-
-  @private
-  @param id [z.audio.AudioType] ID of the sound
-  @param url [String] URL of sound file
-  @return [Function] Function to set up the sound in SoundManager
+  Initialize the repository.
+  @param pre_load [Boolean] Should sounds be pre-loadedwith false as default
   ###
-  _init_sound: (id, url) ->
-    return soundManager.createSound id: id, url: url
+  init: (pre_load = false) =>
+    @_init_sounds()
+    @_subscribe_to_audio_events()
+    @_preload() if pre_load
 
-  # Initialize all sounds.
+  ###
+  Start playback of a sound in a loop.
+  @note Prevent playing multiples instances of looping sounds
+  @param audio_id [z.audio.AudioType] Sound identifier
+  ###
+  loop: (audio_id) =>
+    @play audio_id, true
+
+  ###
+  Start playback of a sound.
+  @param audio_id [z.audio.AudioType] Sound identifier
+  @param play_in_loop [Boolean] Play sound in loop
+  ###
+  play: (audio_id, play_in_loop) =>
+    @_check_sound_setting audio_id
+    .then =>
+      @_get_sound_by_id audio_id
+    .then (audio_element) =>
+      @_play audio_id, audio_element, play_in_loop
+    .then (audio_element) =>
+      @logger.log @logger.levels.INFO, "Playing sound '#{audio_id}' (in loop: '#{play_in_loop}')", audio_element
+    .catch (error) =>
+      switch error.type
+        when z.audio.AudioError::TYPE.FAILED_TO_PLAY
+          @logger.log @logger.levels.ERROR, "Failed playing sound '#{audio_id}': #{error.message}"
+        when z.audio.AudioError::TYPE.NOT_FOUND
+          @logger.log @logger.levels.ERROR, "Could not find sound '#{audio_id}'"
+
+  ###
+  Stop playback of a sound.
+  @param audio_id [z.audio.AudioType] Sound identifier
+  ###
+  stop: (audio_id) =>
+    @_get_sound_by_id audio_id
+    .then (audio_element) =>
+      if not audio_element.paused
+        @logger.log @logger.levels.INFO, "Stopping sound '#{audio_id}'", audio_element
+        audio_element.pause()
+      delete @currently_looping[audio_id] if @currently_looping[audio_id]
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Failed stopping sound '#{audio_id}': #{error.message}", audio_element
+
+  ###
+  Check if sound should be played with current setting.
+  @private
+  @param audio_id [z.audio.AudioType] Sound identifier
+  @param [Promise] Resolves if the sound should be played
+  ###
+  _check_sound_setting: (audio_id) ->
+    return new Promise (resolve, reject) =>
+      if @sound_setting() is z.audio.AudioSetting.NONE and audio_id not in z.audio.AudioPlayingType.NONE
+        reject new z.audio.AudioError 'Ignored request to play sound: z.audio.AudioPlayingType.NONE', z.audio.AudioError::TYPE.IGNORED_SOUND
+      else if @sound_setting() is z.audio.AudioSetting.SOME and audio_id not in z.audio.AudioPlayingType.SOME
+        reject new z.audio.AudioError 'Ignored request to play sound: z.audio.AudioPlayingType.SOME', z.audio.AudioError::TYPE.IGNORED_SOUND
+      else
+        resolve()
+
+  ###
+  Create HTMLAudioElement.
+  @param source_path [String] Source for HTMLAudioElement
+  @param [HTMLAudioElement]
+  ###
+  _create_audio_element: (source_path) ->
+    audio_element = new Audio()
+    audio_element.preload = 'none'
+    audio_element.src = source_path
+    return audio_element
+
+  ###
+  Get the sound object
+  @private
+  @param audio_id [z.audio.AudioType] Sound identifier
+  @return [Promise] Resolves with the HTMLAudioElement
+  ###
+  _get_sound_by_id: (audio_id) =>
+    return new Promise (resolve, reject) =>
+      if @audio_elements[audio_id]
+        resolve @audio_elements[audio_id]
+      else
+        reject new z.audio.AudioError 'Audio not found', z.audio.AudioError::TYPE.NOT_FOUND
+
+  ###
+  Initialize all sounds.
+  @private
+  ###
   _init_sounds: ->
-    @alert = @_init_sound z.audio.AudioType.ALERT, "#{AUDIO_PATH}/alert.mp3"
-    @call_drop = @_init_sound z.audio.AudioType.CALL_DROP, "#{AUDIO_PATH}/call_drop.mp3"
-    @network_interruption = @_init_sound z.audio.AudioType.NETWORK_INTERRUPTION, "#{AUDIO_PATH}/nw_interruption.mp3"
-    @new_message = @_init_sound z.audio.AudioType.NEW_MESSAGE, "#{AUDIO_PATH}/new_message.mp3"
-    @ping_from_me = @_init_sound z.audio.AudioType.OUTGOING_PING, "#{AUDIO_PATH}/ping_from_me.mp3"
-    @ping_from_them = @_init_sound z.audio.AudioType.INCOMING_PING, "#{AUDIO_PATH}/ping_from_them.mp3"
-    @ready_to_talk = @_init_sound z.audio.AudioType.READY_TO_TALK, "#{AUDIO_PATH}/ready_to_talk.mp3"
-    @ringing_from_me = @_init_sound z.audio.AudioType.OUTGOING_CALL, "#{AUDIO_PATH}/ringing_from_me.mp3"
-    @ringing_from_them = @_init_sound z.audio.AudioType.INCOMING_CALL, "#{AUDIO_PATH}/ringing_from_them.mp3"
-    @talk_later = @_init_sound z.audio.AudioType.TALK_LATER, "#{AUDIO_PATH}/talk_later.mp3"
+    @audio_elements[audio_id] = @_create_audio_element "#{@AUDIO_PATH}/#{audio_id}.mp3" for type, audio_id of z.audio.AudioType
+    @logger.log @logger.levels.INFO, 'Initialized sounds'
+
+  ###
+  Start playback of a sound.
+  @private
+  @param audio_id [z.audio.AudioType] Sound identifier
+  @param audio_element [HTMLAudioElement] AudioElement to play
+  @param play_in_loop [Boolean] Play sound in loop
+  @return [Promise] Resolves with the HTMLAudioElement
+  ###
+  _play: (audio_id, audio_element, play_in_loop = false) ->
+    return new Promise (resolve, reject) ->
+      if audio_element.paused
+        audio_element.loop = play_in_loop
+        audio_element.currentTime = 0 if audio_element.currentTime isnt 0
+        audio_element.play()
+        .then ->
+          @currently_looping[audio_id] = audio_id if play_in_loop
+          resolve audio_element
+        .catch (error) ->
+          reject new z.audio.AudioError error.message, z.audio.AudioError::TYPE.FAILED_TO_PLAY
+      else
+        reject new z.audio.AudioError 'Sound is already playing', z.audio.AudioError::TYPE.ALREADY_PLAYING
+
+  ###
+  Preload all sounds for immediate playback.
+  @private
+  ###
+  _preload: =>
+    for audio_id, audio_element of @audio_elements
+      audio_element.preload = 'auto'
+      audio_element.load()
+    @logger.log @logger.levels.INFO, 'Pre-loading audio files for immediate playback'
+
+  ###
+  Stop all sounds playing in loop.
+  @private
+  ###
+  _stop_all: ->
+    @stop audio_id for audio_id of @currently_looping
 
   # Use Amplify to subscribe to all audio playback related events.
   _subscribe_to_audio_events: ->
-    amplify.subscribe z.event.WebApp.AUDIO.PLAY, @, @_play
-    amplify.subscribe z.event.WebApp.AUDIO.PLAY_IN_LOOP, @, @_play_in_loop
-    amplify.subscribe z.event.WebApp.AUDIO.STOP, @, @_stop
+    amplify.subscribe z.event.WebApp.AUDIO.PLAY, @play
+    amplify.subscribe z.event.WebApp.AUDIO.PLAY_IN_LOOP, @loop
+    amplify.subscribe z.event.WebApp.AUDIO.STOP, @stop
 
   # Use Amplify to subscribe to all audio properties related events.
   _subscribe_to_audio_properties: ->
-    @sound_setting = ko.observable z.audio.AudioSetting.ALL
-    @sound_setting.subscribe (sound_setting) =>
-      @_stop_all() if sound_setting is z.audio.AudioSetting.NONE
-
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, (properties) =>
       @sound_setting properties.settings.sound.alerts
 
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, (value) =>
       @sound_setting value
-
-  # Initialize the SoundManager.
-  _init_sound_manager: ->
-    soundManager.setup
-      debugMode: false
-      useConsole: false
-      onready: =>
-        @_init_sounds()
-        @_subscribe_to_audio_events()
-
-  ###
-  Start playback of a sound
-  @param audio_id [String] Sound that should be played
-  ###
-  _play: (audio_id) ->
-    audio = soundManager.getSoundById audio_id
-
-    return if @sound_setting() is z.audio.AudioSetting.NONE and audio_id not in z.audio.AudioPlayingType.NONE
-    return if @sound_setting() is z.audio.AudioSetting.SOME and audio_id not in z.audio.AudioPlayingType.SOME
-
-    @logger.log "Playing sound: #{audio_id}", audio
-    audio.play()
-
-  ###
-  Start playback of a sound in a loop.
-
-  @note Prevent playing multiples instances of looping sounds
-  @param audio [Object] SoundManager sound object
-  @param is_first_time [Boolean] Is this the initial call or an on finish loop
-  ###
-  _play_in_loop: (audio_id, is_first_time = true) ->
-    audio = soundManager.getSoundById audio_id
-
-    return if @sound_setting() is z.audio.AudioSetting.NONE and audio_id not in z.audio.AudioPlayingType.NONE
-    return if @sound_setting() is z.audio.AudioSetting.SOME and audio_id not in z.audio.AudioPlayingType.SOME
-
-    if not @in_loop[audio_id]
-      @logger.log "Looping sound: #{audio_id}", audio
-      @in_loop[audio_id] = audio_id
-    else
-      return if is_first_time
-
-    audio.play onfinish: =>
-      @_play_in_loop audio.id, false
-
-  ###
-  Stop playback of a sound.
-  @param audio [Object] SoundManager sound object
-  ###
-  _stop: (audio_id) ->
-    audio = soundManager.getSoundById audio_id
-
-    @logger.log "Stopping sound: #{audio_id}", audio
-    audio.stop()
-
-    delete @in_loop[audio_id] if @in_loop[audio_id]
-
-  # Stop all sounds playing in loop.
-  _stop_all: ->
-    @_stop sound for sound of @in_loop

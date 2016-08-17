@@ -28,6 +28,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
     .then (conversation_repository) ->
       state = ko.observable z.ViewModel.CONTENT_STATE.CONVERSATION
       title_view_model = new z.ViewModel.WindowTitleViewModel state, window.user_repository, conversation_repository
+      title_view_model.logger.level = z.util.Logger::levels.ERROR
       done()
     .catch done.fail
 

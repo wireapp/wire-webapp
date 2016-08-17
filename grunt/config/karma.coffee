@@ -23,15 +23,19 @@ module.exports =
     configFile: 'karma.conf.js'
     files: [
       {pattern: 'ext/proto/generic-message-proto/messages.proto', included: false, served: true, nocache: true}
+      {pattern: 'audio/*.mp3', included: false, served: true, nocache: false}
       # helper files
-      '../node_modules/jasmine-ajax/lib/mock-ajax.js',
-      '../node_modules/sinon/pkg/sinon-1.17.3.js',
-      '../test/api/environment.js',
-      '../test/api/payloads.js',
-      '../test/api/SDP_payloads.js',
-      '../test/api/TestFactory.js',
-      '../test/api/OpenGraphMocks.js',
+      '../node_modules/jasmine-ajax/lib/mock-ajax.js'
+      '../node_modules/sinon/pkg/sinon-1.17.5.js'
+      '../test/api/environment.js'
+      '../test/api/payloads.js'
+      '../test/api/SDP_payloads.js'
+      '../test/api/TestFactory.js'
+      '../test/api/OpenGraphMocks.js'
       '../test/js/calling/CallRequestResponseMock.js'
     ]
+    proxies:
+      '/audio/': '/base/audio/'
+      '/ext/': '/base/ext/'
   test:
     colors: false
