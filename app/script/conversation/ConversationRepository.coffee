@@ -884,7 +884,7 @@ class z.conversation.ConversationRepository
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_SENT
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
           action: 'photo'
-          conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+          conversation_type: z.tracking.helpers.get_conversation_type conversation_et
           with_bot: @is_bot_conversation()
         }
         event = @_construct_otr_asset_event json, conversation_id, asset_id
@@ -912,7 +912,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.PING_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
         action: 'ping'
-        conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+        conversation_type: z.tracking.helpers.get_conversation_type conversation_et
         with_bot: @is_bot_conversation()
       }
     .catch (error) => @logger.log @logger.levels.ERROR, "#{error.message}"
@@ -962,7 +962,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.MESSAGE_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
         action: 'text'
-        conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+        conversation_type: z.tracking.helpers.get_conversation_type conversation_et
         with_bot: @is_bot_conversation()
       }
       @_analyze_sent_message message
@@ -1229,7 +1229,7 @@ class z.conversation.ConversationRepository
       size_bytes: file.size
       size_mb: z.util.bucket_values (file.size / 1024 / 1024), [0, 5, 10, 15, 20, 25]
       type: z.util.get_file_extension file.name
-    conversation_type = if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+    conversation_type = z.tracking.helpers.get_conversation_type conversation_et
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED,
       $.extend tracking_data, {conversation_type: conversation_type}
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
@@ -1269,6 +1269,8 @@ class z.conversation.ConversationRepository
     .then (generic_message) =>
       @_send_encrypted_value conversation_et.id, generic_message
     .then =>
+      @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE
+    .then =>
       return @_delete_message conversation_et, message_et.id
     .catch (error) =>
       @logger.log "Failed to send delete message for everyone with id '#{message_id}' for conversation '#{conversation_et.id}'", error
@@ -1289,11 +1291,28 @@ class z.conversation.ConversationRepository
     .then (generic_message) =>
       @_send_encrypted_value @self_conversation().id, generic_message
     .then =>
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE, {mode: 'single'}
+      @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL
+    .then =>
       return @_delete_message conversation_et, message_et.id
     .catch (error) =>
       @logger.log "Failed to send delete message with id '#{message_id}' for conversation '#{conversation_et.id}'", error
       throw error
+
+  ###
+  Track delete action.
+
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  @param method [z.tracking.attribute.DeleteType]
+  ###
+  _track_delete_message: (conversation, message_et, method) ->
+    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE,
+      conversation_type: z.tracking.helpers.get_conversation_type conversation
+      method: method
+      time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
+      time_elapsed_action: seconds_since_message_creation
+      type: z.tracking.helpers.get_message_type message_et
 
   ###
   Can user upload assets to conversation.

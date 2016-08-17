@@ -54,9 +54,6 @@ class z.components.ContextMenuViewModel
     @host_id = z.util.create_random_uuid()
     @bubble_id = z.util.create_random_uuid()
 
-    @on_entry_click = (data) =>
-      amplify.publish z.event.WebApp.CONTEXT_MENU, @tag, data.action, @data
-
     @get_entries = ->
       entries = if _.isFunction(@entry_provider) then @entry_provider() else @entry_provider
       @entries entries
@@ -74,7 +71,11 @@ class z.components.ContextMenuViewModel
   on_window_scroll: =>
     @bubble?.hide()
 
-  on_context_menu_button_click: =>
+  on_context_menu_entry_click: (entry, event) =>
+    event.stopPropagation()
+    amplify.publish z.event.WebApp.CONTEXT_MENU, @tag, entry.action, @data
+
+  on_context_menu_button_click: () =>
     @get_entries()
     @element.dispatchEvent new Event z.components.ContextMenuEvent.CONTEXT_MENU
 
@@ -94,7 +95,7 @@ ko.components.register 'context-menu',
             <div data-bind="attr: {id: bubble_id}" class="bubble">
               <ul class="bubble-menu">
                 <!-- ko foreach: entries -->
-                  <li data-bind="click: $parent.on_entry_click, text: label, attr: {'data-context-action': action}"></li>
+                  <li data-bind="click: $parent.on_context_menu_entry_click, text: label, attr: {'data-context-action': action}"></li>
                 <!-- /ko -->
               </ul>
             </div>

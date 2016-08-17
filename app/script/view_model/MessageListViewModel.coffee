@@ -462,8 +462,10 @@ class z.ViewModel.MessageListViewModel
   Create context menu entries for given message
   @param message_et [z.entity.Message]
   ###
-  get_context_menu_entries: (message_et) ->
+  get_context_menu_entries: (message_et) =>
     entries = []
+
+    @_track_context_menu message_et
 
     if message_et.has_asset()
       entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
@@ -475,6 +477,16 @@ class z.ViewModel.MessageListViewModel
       entries.push {label: z.string.conversation_context_menu_delete_everyone, action: 'delete-everyone'}
 
     return entries
+
+  ###
+  Track context menu click
+  @param message_et [z.entity.Message]
+  ###
+  _track_context_menu: (message_et) =>
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.SELECTED_MESSAGE,
+      context: 'single'
+      conversation_type: z.tracking.helpers.get_conversation_type @conversation()
+      type: z.tracking.helpers.get_message_type message_et
 
   ###
   Click on context menu entry
