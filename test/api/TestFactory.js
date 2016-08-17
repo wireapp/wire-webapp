@@ -310,3 +310,16 @@ window.TestFactory.prototype.exposeAnnounceActors = function () {
     resolve(window.announce_repository);
   });
 };
+
+/**
+ *
+ * @returns {Promise<z.audio.AudioRepository>}
+ */
+window.TestFactory.prototype.exposeAudioActors = function () {
+  var self = this;
+  return new Promise(function (resolve) {
+    window.audio_repository = new z.audio.AudioRepository();
+    window.audio_repository.logger.level = self.settings.logging_level;
+    resolve(window.audio_repository);
+  });
+};

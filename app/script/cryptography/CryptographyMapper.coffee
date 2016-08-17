@@ -57,6 +57,8 @@ class z.cryptography.CryptographyMapper
         return @_map_asset generic_message.asset, generic_message.message_id, event.data?.id
       when 'cleared'
         return @_map_cleared generic_message.cleared
+      when 'hidden'
+        return @_map_hidden generic_message.hidden
       when 'deleted'
         return @_map_deleted generic_message.deleted
       when 'external'
@@ -139,6 +141,14 @@ class z.cryptography.CryptographyMapper
       data:
         cleared_timestamp: cleared.cleared_timestamp.toString()
       type: z.event.Backend.CONVERSATION.MEMBER_UPDATE
+    }
+
+  _map_hidden: (hidden) ->
+    return {
+      data:
+        conversation_id: hidden.conversation_id
+        message_id: hidden.message_id
+      type: z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
     }
 
   _map_deleted: (deleted) ->

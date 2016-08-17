@@ -49,6 +49,7 @@ class z.announce.AnnounceRepository
         key = "#{z.storage.StorageKey.ANNOUNCE.ANNOUNCE_KEY}@#{announce.key}"
         if not z.storage.get_value key
           z.storage.set_value key, 'read'
+          return if not z.util.Environment.browser.supports.notifications
           return if window.Notification.permission is z.util.BrowserPermissionType.DENIED
 
           if not (z.localization.Localizer.locale is 'en')

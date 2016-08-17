@@ -68,36 +68,14 @@
 
   &.hover .time,
   &:hover .time,
+  &.hover .context-menu,
+  &:hover .context-menu,
   .show-timestamp.time {
-    opacity: 1;
-  }
-
-  &.hover .delete,
-  &:hover .delete,
-  &.hover .download,
-  &:hover .download {
     opacity: 1;
   }
 
   &:last-child {
     margin-bottom: 24px;
-  }
-
-  .download {
-    .action-pill-style;
-    position: absolute;
-    right: 72px;
-    top: 40px;
-  }
-
-  .delete {
-    .square(18px);
-    .action-pill-style;
-    display: flex;
-    justify-content: center;
-    position: absolute;
-    right: 72px;
-    top: 3px;
   }
 
   .time {
@@ -110,6 +88,17 @@
     right: 24px;
     top: 3px;
   }
+}
+
+// CONTEXT MENU
+.context-menu {
+  .square(18px);
+  .action-pill-style;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  right: 72px;
+  top: 3px;
 }
 
 .message-fade-out {
@@ -256,6 +245,12 @@
   &.accent-color-7 { path {fill: @accent_colors-7}}
 }
 
+// DELETE MESSAGE
+.message-delete-label-icon {
+  font-size: 8px;
+  margin-left: 8px;
+}
+
 // DECRYPT MESSAGE
 .message-body-decrypt-error {
   min-height: 24px;
@@ -300,7 +295,7 @@
 
 .message-ping {
   .time,
-  .delete {
+  .context-menu {
     top: 21px;
   }
 }
@@ -329,7 +324,7 @@
     }
 
     .time,
-    .delete {
+    .context-menu {
       top: 24px;
       background-color: fade(#fff, 80%);
       border-radius: 16px;

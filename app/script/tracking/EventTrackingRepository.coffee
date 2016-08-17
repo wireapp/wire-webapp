@@ -102,7 +102,7 @@ class z.tracking.EventTrackingRepository
     script_node.src = 'https://web.localytics.com/v3/localytics.min.js'
     (c = document.getElementsByTagName(node_type)[0]).parentNode.insertBefore script_node, c
     @localytics 'init', LOCALYTICS.APP_KEY, options
-    @logger.log @logger.levels.INFO, 'Enabling Localytics reporting'
+    @logger.log @logger.levels.INFO, 'Localytics reporting is enabled'
 
   _localytics_disabled: ->
     if not z.util.get_url_parameter z.auth.URLParameter.LOCALYTICS
@@ -118,7 +118,9 @@ class z.tracking.EventTrackingRepository
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.SEND_DATA, @_send_data
 
   _start_session_without_user_tracking: =>
-    return if @_localytics_disabled()
+    if @_localytics_disabled()
+      amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @_log_event
+      return
     @_init_localytics window, document, 'script', @localytics
     @localytics 'open'
     @localytics 'upload'
@@ -142,7 +144,14 @@ class z.tracking.EventTrackingRepository
     return false if @tracking_id is undefined
     return @user_properties.settings.privacy.improve_wire
 
+  _log_event: (event_name, attributes) =>
+    if attributes
+      @logger.log "Localytics event '#{event_name}' with attributes: #{JSON.stringify(attributes)}"
+    else
+      @logger.log "Localytics event '#{event_name}' without attributes"
+
   _track_event: (event_name, attributes) =>
+    @_log_event event_name, attributes
     if @session_values[event_name] isnt undefined
       if attributes is undefined
         # Increment session event value

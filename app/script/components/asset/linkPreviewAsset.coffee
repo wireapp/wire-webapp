@@ -30,9 +30,10 @@ class z.components.LinkPreviewAssetComponent
     @preview = params.preview
     @viewport_changed = params.viewport_changed
     @element = component_info.element
+    @url = @preview.original_url
 
   on_link_preview_click: =>
-    window.open @preview.permanent_url
+    window.open @url
 
   dispose: =>
     @element.removeEventListener 'click', @on_link_preview_click
@@ -57,6 +58,6 @@ ko.components.register 'link-preview-asset',
               <!-- /ko -->
               <div class="link-preview-title" data-bind="text: preview.title"></div>
               <a class="link-preview-site text-graphite ellipsis" target="_blank" rel="nofollow"
-                 data-bind="text: preview.permanent_url, attr: {href: preview.permanent_url, title: preview.permanent_url}"></a>
+                 data-bind="text: z.util.naked_url(url), attr: {href: url, title: url}"></a>
             </div>
             """

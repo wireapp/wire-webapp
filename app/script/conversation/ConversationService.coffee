@@ -279,6 +279,26 @@ class z.conversation.ConversationService
         reject error
 
   ###
+  Load conversation event.
+
+  @param conversation_id [String] ID of conversation
+  @param message_id [String]
+  ###
+  load_event_from_db: (conversation_id, message_id) ->
+    return new Promise (resolve, reject) =>
+      @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+      .where 'raw.conversation'
+      .equals conversation_id
+      .filter (record) -> record.mapped?.id is message_id
+      .first()
+      .then (record) ->
+        resolve record
+      .catch (error) =>
+        @logger.log @logger.levels.ERROR,
+          "Failed to get event for conversation '#{conversation_id}': #{error.message}", error
+        reject error
+
+  ###
   Load conversation events.
 
   @param conversation_id [String] ID of conversation
@@ -299,7 +319,7 @@ class z.conversation.ConversationService
         resolve [records.slice(0, limit), has_further_events]
       .catch (error) =>
         @logger.log @logger.levels.ERROR,
-          "Failed to get events for conversation '#{conversation_et.id}': #{error.message}", error
+          "Failed to get events for conversation '#{conversation_id}': #{error.message}", error
         reject error
 
   ###

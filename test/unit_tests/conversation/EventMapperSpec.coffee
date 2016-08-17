@@ -71,28 +71,6 @@ describe 'Event Mapper', ->
       expect(message_et.get_first_asset().previews()[0].original_url).toBe 'test.com'
       expect(message_et).toBeDefined()
 
-    it 'maps text messages with unsupported link previews', ->
-      event_id = z.util.create_random_uuid
-
-      twitter_status = new z.proto.TwitterStatus 'test.com'
-      link_preview = new z.proto.LinkPreview 'test.com', 0, null, twitter_status
-
-      event =
-        conversation: conversation_et.id
-        data:
-          content: 'test.com'
-          nonce: event_id
-          previews: [link_preview.encode64()]
-        id: event_id
-        from: z.util.create_random_uuid
-        time: Date.now()
-        type: z.event.Backend.CONVERSATION.MESSAGE_ADD
-
-      message_et = event_mapper.map_json_event event, conversation_et
-      expect(message_et.get_first_asset().text).toBe 'test.com'
-      expect(message_et.get_first_asset().previews().length).toBe 0
-      expect(message_et).toBeDefined()
-
     it 'skips messages which cannot be mapped', ->
       # @formatter:off
       good_message = {"conversation":conversation_et.id,"id":"4cec0f75-d963-486d-9401-415240ac2ad8","from":"532af01e-1e24-4366-aacf-33b67d4ee376","time":"2016-08-04T15:12:12.453Z","data":{"content":"Message with timestamp","nonce":"4cec0f75-d963-486d-9401-415240ac2ad8","previews":[]},"type":"conversation.message-add"}

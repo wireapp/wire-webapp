@@ -175,8 +175,12 @@ z.string.modal_connected_device_message = 'If you didn’t do this, remove the d
 z.string.modal_connected_device_manage_devices = 'manage devices'
 # Delete message
 z.string.modal_delete_button = 'Delete'
-z.string.modal_delete_headline = 'Delete message'
-z.string.modal_delete_message = 'The message will only be removed from your view of the conversation. This cannot be undone.'
+z.string.modal_delete_headline = 'Delete only for me?'
+z.string.modal_delete_message = 'This cannot be undone.'
+# Delete message
+z.string.modal_delete_everyone_button = 'Delete'
+z.string.modal_delete_everyone_headline = 'Delete for everyone?'
+z.string.modal_delete_everyone_message = 'This cannot be undone.'
 # Too long message
 z.string.modal_too_long_headline = 'Message too long'
 z.string.modal_too_long_message = 'You can send messages up to %no characters long.'
@@ -260,6 +264,10 @@ z.string.conversation_asset_downloading = 'Downloading…'
 z.string.conversation_asset_upload_failed = 'Upload Failed'
 z.string.conversation_asset_upload_too_large = 'You can send files up to %no'
 z.string.conversation_playback_error = 'Unable to play'
+z.string.conversation_context_menu_delete = 'delete only for me'
+z.string.conversation_context_menu_delete_everyone = 'delete for everyone'
+z.string.conversation_context_menu_download = 'download'
+z.string.conversation_delete_timestamp = 'Deleted on %@timestamp'
 
 # Conversation list
 z.string.conversation_list_archive = 'ARCHIVE'

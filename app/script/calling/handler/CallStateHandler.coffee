@@ -379,7 +379,7 @@ class z.calling.handler.CallStateHandler
               media_action = if is_videod then 'audio_call' else 'video_call'
               amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
                 action: media_action
-                conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+                conversation_type: z.tracking.helpers.get_conversation_type conversation_et
                 with_bot: @call_center.conversation_repository.is_bot_conversation()
               }
         return true
@@ -431,7 +431,7 @@ class z.calling.handler.CallStateHandler
     .then =>
       return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to toggle video state: #{error.message}", error
+      @logger.log @logger.levels.ERROR, "Failed to toggle audio state: #{error.message}", error
 
   ###
   User action to toggle the call state.
@@ -464,7 +464,7 @@ class z.calling.handler.CallStateHandler
     .then =>
       return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to toggle audio state: #{error.message}", error
+      @logger.log @logger.levels.ERROR, "Failed to toggle video state: #{error.message}", error
 
   ###
   Check whether we are actively participating in a call.

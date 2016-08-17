@@ -67,6 +67,44 @@ describe 'Conversation Service', ->
       expect(response.conversations[4].id).toEqual '0925d3a9-65a8-4445-b6dd-56f82a1ec75b'
 
   describe 'load_events_from_db', ->
+
+    conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
+    sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
+
+    # @formatter:off
+    messages = [
+      {
+        key: "#{conversation_id}@#{sender_id}@1470317275182"
+        object: {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","type":"conversation.otr-message-add","conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a"},"meta":{"timestamp":1470317275182,"version":1},"mapped":{"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"}}
+      },
+      {
+        key: "#{conversation_id}@#{sender_id}@1470317278993"
+        object: {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","type":"conversation.otr-message-add","conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a"},"meta":{"timestamp":1470317278993,"version":1},"mapped":{"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}}
+      }
+    ]
+    # @formatter:on
+
+    beforeEach (done) ->
+      Promise.all messages.map (message) ->
+        return conversation_service.storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
+      .then done
+      .catch done.fail
+
+    it 'returns mapped message_et if event with id is found', (done) ->
+      conversation_service.load_event_from_db conversation_id, '4af67f76-09f9-4831-b3a4-9df877b8c29a'
+      .then (message_et) =>
+        expect(message_et).toEqual messages[1].object
+        done()
+      .catch done.fail
+
+    it 'returns undefined if no event with id is found', (done) ->
+      conversation_service.load_event_from_db conversation_id, z.util.create_random_uuid()
+      .then (message_et) =>
+        expect(message_et).not.toBeDefined()
+        done()
+      .catch done.fail
+
+  describe 'load_events_from_db', ->
     it 'returns an information set about the loaded events even if no records are found', (done) ->
       conversation_service.load_events_from_db 'invalid_id', 1466549621778, 30
       .then (loaded_events) =>

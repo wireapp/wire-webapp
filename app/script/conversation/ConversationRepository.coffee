@@ -98,7 +98,8 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.SELF.CLIENT_ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
-    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.DELETE, @delete_message
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.DELETE_SELF, @delete_message
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.DELETE_EVERYONE, @delete_message_everyone
 
 
   ###############################################################################
@@ -171,6 +172,18 @@ class z.conversation.ConversationRepository
       .catch (error) =>
         @logger.log @logger.levels.ERROR, "Failed to retrieve conversations from backend: #{error.message}", error
         reject error
+
+  ###
+  Get Message with given ID from the database.
+  @param conversation_et [z.entity.Conversation]
+  @param message_id [String]
+  @return [Promise] z.entity.Message
+  ###
+  get_message_from_db: (conversation_et, message_id) =>
+    @conversation_service.load_event_from_db conversation_et.id, message_id
+    .then (event) =>
+      raw_event = event.mapped or event.raw
+      return @event_mapper.map_json_event raw_event, conversation_et
 
   get_events: (conversation_et) ->
     return new Promise (resolve, reject) =>
@@ -340,6 +353,8 @@ class z.conversation.ConversationRepository
   @return [Boolean] Is the message marked as read
   ###
   is_message_read: (conversation_id, message_id) =>
+    return false if not conversation_id or not message_id
+
     conversation_et = @get_conversation_by_id conversation_id
     message_et = conversation_et.get_message_by_id message_id
 
@@ -592,7 +607,7 @@ class z.conversation.ConversationRepository
     .then ->
       callback?()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to rename conversation (#{conversation_et.id}): #{error}"
+      @logger.log @logger.levels.ERROR, "Failed to rename conversation (#{conversation_et.id}): #{error.message}"
 
   reset_session: (user_id, client_id, conversation_id) =>
     @logger.log @logger.levels.INFO, "Resetting session with client '#{client_id}' of user '#{user_id}'"
@@ -808,14 +823,13 @@ class z.conversation.ConversationRepository
   ###
   Send encrypted external message
 
-  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
+  @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Generic message to be sent as external message
   @return [Promise] Promise that resolves after sending the external message
   ###
-  send_encrypted_external_message: (conversation_et, generic_message) =>
+  _send_encrypted_external_value: (conversation_id, generic_message) =>
     @logger.log @logger.levels.INFO, "Sending external message of type '#{generic_message.content}'", generic_message
 
-    conversation_id = conversation_et.id
     key_bytes = null
     sha256 = null
     ciphertext = null
@@ -838,13 +852,6 @@ class z.conversation.ConversationRepository
       return @_update_payload_for_changed_clients error_response, generic_message, initial_payload
       .then (updated_payload) =>
         return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
-    .then (response) =>
-      event = @_construct_otr_message_event response, conversation_et.id
-      return @cryptography_repository.save_encrypted_event generic_message, event
-    .then (record) =>
-      @add_event conversation_et, record.mapped if record?.mapped
-    .catch (error) =>
-      @logger.log @logger.levels.WARN, "Failed to send external message for conversation with id '#{conversation_id}'", error
 
   ###
   Sends an OTR Image Asset
@@ -877,7 +884,7 @@ class z.conversation.ConversationRepository
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_SENT
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
           action: 'photo'
-          conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+          conversation_type: z.tracking.helpers.get_conversation_type conversation_et
           with_bot: @is_bot_conversation()
         }
         event = @_construct_otr_asset_event json, conversation_id, asset_id
@@ -905,7 +912,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.PING_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
         action: 'ping'
-        conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+        conversation_type: z.tracking.helpers.get_conversation_type conversation_et
         with_bot: @is_bot_conversation()
       }
     .catch (error) => @logger.log @logger.levels.ERROR, "#{error.message}"
@@ -932,43 +939,39 @@ class z.conversation.ConversationRepository
       @logger.log @logger.levels.ERROR, "Error while sending link preview: #{error.message}", error
 
   ###
-  Send message to specific converation.
+  Send message to specific conversation.
 
   @note Will either send a normal or external message.
   @param message [String] plain text message
   @param conversation_et [z.entity.Conversation] Conversation that should receive the message
-  @param retry [Boolean] Try to resend as external with first attempt failed (optional)
   @return [Promise] Promise that resolves after sending the message
   ###
-  send_encrypted_message: (message, conversation_et, retry = true) =>
+  send_encrypted_message: (message, conversation_et) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'text', new z.proto.Text message
 
     Promise.resolve()
     .then =>
-      if @_send_as_external_message conversation_et, generic_message
-        @send_encrypted_external_message conversation_et, generic_message
+      return @_send_and_save_encrypted_value conversation_et, generic_message
+    .catch (error) =>
+      if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
+        return @_send_and_save_encrypted_value conversation_et, generic_message, true
       else
-        @_send_and_save_encrypted_value conversation_et, generic_message
+        throw error
     .then (message_record) =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.MESSAGE_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
         action: 'text'
-        conversation_type: if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+        conversation_type: z.tracking.helpers.get_conversation_type conversation_et
         with_bot: @is_bot_conversation()
       }
       @_analyze_sent_message message
       return message_record
     .catch (error) =>
-      if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE and retry
-        @send_encrypted_external_message conversation_et, generic_message
-      else
-        @logger.log @logger.levels.ERROR, "#{error.message}", error
-        error = new Error "Failed to send message: #{error.message}"
-        custom_data =
-          source: 'Sending message'
-        Raygun.send error, custom_data
-        throw error
+      @logger.log @logger.levels.ERROR, "#{error.message}", error
+      error = new Error "Failed to send message: #{error.message}"
+      Raygun.send error, {source: 'Sending message'}
+      throw error
 
   ###
   Sending a message to the remote end of a session reset.
@@ -1040,17 +1043,6 @@ class z.conversation.ConversationRepository
     asset = new z.proto.Asset()
     asset.set 'uploaded', uploaded_asset
     return asset
-
-  ###
-  Create MsgDeleted protobuf message.
-
-  @private
-  @param conversation_id [String] Conversation ID
-  @param message_id [String] ID of message to be deleted
-  @return [z.proto.MsgDeleted] MsgDeleted protobuf message
-  ###
-  _construct_delete: (conversation_id, message_id) ->
-    return new z.proto.MsgDeleted conversation_id, message_id
 
   ###
   Construct an encrypted message event.
@@ -1126,9 +1118,10 @@ class z.conversation.ConversationRepository
   @private
   @param conversation_et [z.entity.Conversation] Conversation to send message to
   @param message_content [z.proto] Protobuf message content to be added to generic message
-  @return [Promise] Promise that resolves when message has been added to the conversation
+  @param force_sending [Boolean] Force sending message as external message
+  @return [Promise] Promise that resolves with the saved record, when the message has been added to the conversation
   ###
-  _send_and_save_encrypted_value: (conversation_et, message_content) =>
+  _send_and_save_encrypted_value: (conversation_et, message_content, force_sending = false) =>
     return new Promise (resolve, reject) =>
       reject() if conversation_et.removed_from_conversation()
 
@@ -1141,7 +1134,12 @@ class z.conversation.ConversationRepository
       else if message_content instanceof z.proto.GenericMessage
         generic_message = message_content
 
-      @_send_encrypted_value conversation_et.id, generic_message
+      Promise.resolve()
+      .then =>
+        if force_sending or @_send_as_external_message conversation_et, generic_message
+          @_send_encrypted_external_value conversation_et.id, generic_message
+        else
+          @_send_encrypted_value conversation_et.id, generic_message
       .then (response) =>
         event = @_construct_otr_message_event response, conversation_et.id
         return @cryptography_repository.save_encrypted_event generic_message, event
@@ -1161,7 +1159,7 @@ class z.conversation.ConversationRepository
         reject error
 
   ###
-  Sends a generic message to the conversation
+  Sends a generic message to a conversation.
 
   @private
   @param conversation_id [String] Conversation ID
@@ -1175,12 +1173,12 @@ class z.conversation.ConversationRepository
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
     .then (payload) =>
       initial_payload = payload
-      @logger.log @logger.levels.INFO, "Sending encrypted message to conversation '#{conversation_id}'", payload
+      @logger.log @logger.levels.INFO, "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
       return @conversation_service.post_encrypted_message conversation_id, payload, false
     .catch (error_response) =>
       return @_update_payload_for_changed_clients error_response, generic_message, initial_payload
       .then (updated_payload) =>
-        @logger.log @logger.levels.INFO, "Sending updated encrypted message to conversation '#{conversation_id}'", updated_payload
+        @logger.log @logger.levels.INFO, "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
         return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
 
   ###
@@ -1231,7 +1229,7 @@ class z.conversation.ConversationRepository
       size_bytes: file.size
       size_mb: z.util.bucket_values (file.size / 1024 / 1024), [0, 5, 10, 15, 20, 25]
       type: z.util.get_file_extension file.name
-    conversation_type = if conversation_et.is_one2one() then z.tracking.attribute.ConversationType.ONE_TO_ONE else z.tracking.attribute.ConversationType.GROUP
+    conversation_type = z.tracking.helpers.get_conversation_type conversation_et
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED,
       $.extend tracking_data, {conversation_type: conversation_type}
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
@@ -1257,30 +1255,71 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
 
   ###
-  Delete message in conversation.
+  Delete message for everyone.
 
-  @param conversation_et [z.entity.Conversation] Conversation to post the file
-  @param message_et [z.entity.Message] Message object
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
   ###
-  delete_message: (message_et) =>
-    conversation_et = @active_conversation()
-    if message_et?
+  delete_message_everyone: (conversation_et, message_et) =>
+    Promise.resolve()
+    .then ->
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'deleted', @_construct_delete conversation_et.id, message_et.id
+      generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
+      return generic_message
+    .then (generic_message) =>
+      @_send_encrypted_value conversation_et.id, generic_message
+    .then =>
+      @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE
+    .then =>
+      return @_delete_message conversation_et, message_et.id
+    .catch (error) =>
+      @logger.log "Failed to send delete message for everyone with id '#{message_id}' for conversation '#{conversation_et.id}'", error
+      throw error
 
+  ###
+  Delete message on your own clients.
+
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  ###
+  delete_message: (conversation_et, message_et) =>
+    Promise.resolve()
+    .then ->
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'hidden', new z.proto.MessageHide conversation_et.id, message_et.id
+      return generic_message
+    .then (generic_message) =>
       @_send_encrypted_value @self_conversation().id, generic_message
-      .then =>
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE, {mode: 'single'}
-        return @_delete_message conversation_et, message_et.id
-      .catch (error) ->
-        @logger.log "Failed to send delete message with id '#{message_id}' for conversation '#{conversation_et.id}'", error
+    .then =>
+      @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL
+    .then =>
+      return @_delete_message conversation_et, message_et.id
+    .catch (error) =>
+      @logger.log "Failed to send delete message with id '#{message_id}' for conversation '#{conversation_et.id}'", error
+      throw error
+
+  ###
+  Track delete action.
+
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  @param method [z.tracking.attribute.DeleteType]
+  ###
+  _track_delete_message: (conversation, message_et, method) ->
+    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE,
+      conversation_type: z.tracking.helpers.get_conversation_type conversation
+      method: method
+      time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
+      time_elapsed_action: seconds_since_message_creation
+      type: z.tracking.helpers.get_message_type message_et
 
   ###
   Can user upload assets to conversation.
 
   # TODO move to conversation et
 
-  @param conversation_et [z.entity.Conversation] Conversation to rename
+  @param conversation_et [z.entity.Conversation]
   ###
   _can_upload_assets_to_conversation: (conversation_et) ->
     return false if not conversation_et?
@@ -1295,14 +1334,42 @@ class z.conversation.ConversationRepository
   ###############################################################################
 
   message_deleted: (event_json) =>
-    conversation_id = event_json.data.conversation_id
-    message_id = event_json.data.message_id
+    conversation_et = undefined
+    message_to_delete_id = undefined
 
-    if conversation_id? and message_id?
+    Promise.resolve()
+    .then =>
+      message_to_delete_id = event_json.data.message_id
+      conversation_id = event_json.data.conversation_id or event_json.conversation
       conversation_et = @find_conversation_by_id conversation_id
-      @_delete_message conversation_et, message_id
-    else
-      @logger.log "Failed to delete message with id '#{message_id}'' for conversation '#{conversation_et.id}'"
+    .then =>
+      @get_message_from_db conversation_et, message_to_delete_id
+    .then (message_to_delete_et) =>
+      if @user_repository.self().id isnt event_json.from
+        return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
+    .then =>
+      return @_delete_message conversation_et, message_to_delete_id
+    .catch (error) =>
+      @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
+      throw error
+
+
+  ###
+  Add delete message to conversation
+  @param conversation_id [String]
+  @param message_id [String]
+  @param time [String] ISO 8601 formatted time string
+  @param message_to_delete_et [z.entity.Message]
+  ###
+  _add_delete_message: (conversation_id, message_id, time, message_to_delete_et) ->
+    amplify.publish z.event.WebApp.EVENT.INJECT,
+      conversation: conversation_id
+      id: message_id
+      data:
+        deleted_time: time
+      type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+      from: message_to_delete_et.from
+      time: message_to_delete_et.timestamp
 
   ###
   A message or ping received in a conversation.
@@ -1502,7 +1569,7 @@ class z.conversation.ConversationRepository
       # @todo Maybe we need to reset "@processed_event_nonces" someday to save some memory, until now it's fine.
       return false
     else
-      @logger.log @logger.levels.WARN, "Event with nonce has been already processed : #{event_nonce}", message_et
+      @logger.log @logger.levels.WARN, "Event with nonce '#{event_nonce}' has been already processed.", message_et
       amplify.publish z.event.WebApp.ANALYTICS.EVENT,
         z.tracking.SessionEventName.INTEGER.EVENT_HIDDEN_DUE_TO_DUPLICATE_NONCE
       return true
@@ -1598,6 +1665,8 @@ class z.conversation.ConversationRepository
         when z.event.Backend.CONVERSATION.ASSET_PREVIEW
           @asset_preview conversation_et, event
         when z.event.Backend.CONVERSATION.MESSAGE_DELETE
+          @message_deleted event
+        when z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
           @message_deleted event
         else
           @add_event conversation_et, event

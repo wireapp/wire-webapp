@@ -35,3 +35,4 @@ class z.event.EventError
     MISSING_CLIENT_ID: 'z.event.EventError::TYPE.MISSING_CLIENT_ID'
     NO_NOTIFICATIONS: 'z.event.EventError::TYPE.NO_NOTIFICATIONS'
     REQUEST_FAILURE: 'z.event.EventError::TYPE.REQUEST_FAILURE'
+    OUTDATED_SCHEMA: 'Outdated event schema'
