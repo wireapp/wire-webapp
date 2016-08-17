@@ -574,8 +574,9 @@ class z.calling.entities.Flow
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
       @has_sent_local_sdp true
 
-    on_failure = =>
+    on_failure = (error) =>
       @logger.log @logger.levels.WARN, "Failed to send local SDP of type '#{@local_sdp().type}'"
+      @reset_flow() if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
 
     @logger.log @logger.levels.INFO, "Sending local SDP for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
     amplify.publish z.event.WebApp.CALL.SIGNALING.SEND_LOCAL_SDP_INFO, sdp_info, on_success, on_failure
@@ -902,6 +903,7 @@ class z.calling.entities.Flow
   @note Reset PC initialized first to prevent new local SDP
   ###
   reset_flow: =>
+    window.clearTimeout @send_sdp_timeout if @send_sdp_timeout
     @logger.log @logger.levels.INFO, "Resetting flow '#{@id}'"
     @telemetry.reset_statistics()
     .then (statistics) =>
