@@ -154,7 +154,6 @@ class z.cryptography.CryptographyMapper
   _map_deleted: (deleted) ->
     return {
       data:
-        conversation_id: deleted.conversation_id
         message_id: deleted.message_id
       type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
     }

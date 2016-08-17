@@ -1263,6 +1263,9 @@ class z.conversation.ConversationRepository
   delete_message_everyone: (conversation_et, message_et) =>
     Promise.resolve()
     .then ->
+      if not message_et.user().is_me
+        throw new Error 'Cannot delete other users message'
+    .then ->
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
       return generic_message
@@ -1333,26 +1336,36 @@ class z.conversation.ConversationRepository
   # Event callbacks
   ###############################################################################
 
-  message_deleted: (event_json) =>
-    conversation_et = undefined
-    message_to_delete_id = undefined
-
+  message_hidden: (event_json) =>
     Promise.resolve()
     .then =>
-      message_to_delete_id = event_json.data.message_id
-      conversation_id = event_json.data.conversation_id or event_json.conversation
-      conversation_et = @find_conversation_by_id conversation_id
-    .then =>
-      @get_message_from_db conversation_et, message_to_delete_id
-    .then (message_to_delete_et) =>
-      if @user_repository.self().id isnt event_json.from
-        return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
-    .then =>
-      return @_delete_message conversation_et, message_to_delete_id
+      if event_json.from isnt @user_repository.self().id
+        throw new Error 'Sender is not self user'
+      return @find_conversation_by_id event_json.data.conversation_id
+    .then (conversation_et) =>
+      return @_delete_message conversation_et, event_json.data.message_id
     .catch (error) =>
       @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
       throw error
 
+  message_deleted: (event_json) =>
+    conversation_et = undefined
+
+    Promise.resolve()
+    .then =>
+      conversation_et = @find_conversation_by_id event_json.conversation
+    .then =>
+      @get_message_from_db conversation_et, event_json.data.message_id
+    .then (message_to_delete_et) =>
+      if event_json.from isnt message_to_delete_et.from
+        throw new Error 'Sender can only delete own messages'
+      if event_json.from isnt @user_repository.self().id
+        return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
+    .then =>
+      return @_delete_message conversation_et, event_json.data.message_id
+    .catch (error) =>
+      @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
+      throw error
 
   ###
   Add delete message to conversation
@@ -1667,7 +1680,7 @@ class z.conversation.ConversationRepository
         when z.event.Backend.CONVERSATION.MESSAGE_DELETE
           @message_deleted event
         when z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
-          @message_deleted event
+          @message_hidden event
         else
           @add_event conversation_et, event
 
