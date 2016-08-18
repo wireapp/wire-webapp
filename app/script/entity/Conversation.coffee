@@ -462,6 +462,15 @@ class z.entity.Conversation
     return @messages()[@messages().length - 1]
 
   ###
+  Get the last text message of the conversation.
+  @return [z.entity.Message, undefined] Last message entity or undefined
+  ###
+  get_last_text_message_content: ->
+    for message_et in @messages() when message_et.has_asset_text() by -1
+      # TODO self
+      return message_et
+
+  ###
   Get a message by it's unique ID.
   @param id [String] ID of message to be retrieved
   @return [z.entity.Message, undefined] Message with ID or undefined

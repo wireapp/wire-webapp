@@ -25,22 +25,38 @@ class z.ViewModel.ConversationInputViewModel
     @logger = new z.util.Logger 'z.ViewModel.ConversationInputViewModel', z.config.LOGGER.OPTIONS
 
     @conversation_et = @conversation_repository.active_conversation
-    @conversation_et.subscribe => @conversation_has_focus true
+    @conversation_et.subscribe =>
+      @conversation_has_focus true
+      @is_editing false
 
     @self = @user_repository.self
     @list_not_bottom = ko.observable true
 
-    @conversation_has_focus = ko.observable(true).extend notify: 'always'
+    @edit_message_et = undefined
+    @edit_input = ko.observable ''
+    @is_editing = ko.observable false
+    @is_editing.subscribe (is_editing)=>
+      if not is_editing
+        @edit_input ''
+        @edit_message_et = undefined
+
+  @conversation_has_focus = ko.observable(true).extend notify: 'always'
     @browser_has_focus = ko.observable true
 
-    @blinking_cursor = ko.computed =>
+    @blinking_cursor = ko.pureComputed =>
       return @browser_has_focus() and @conversation_has_focus()
 
-    @has_text_input = ko.computed =>
+    @has_text_input = ko.pureComputed =>
       return @conversation_et()?.input().length > 0
 
-    @show_giphy_button = ko.computed =>
+    @show_giphy_button = ko.pureComputed =>
       return @has_text_input() and @conversation_et()?.input().length <= 15
+
+    @input = ko.pureComputed
+      read: =>
+        if @is_editing() then @edit_input() else @conversation_et()?.input()
+      write: (value) =>
+        if @is_editing() then @edit_input value else @conversation_et()?.input value
 
     @ping_tooltip = z.localization.Localizer.get_text {
       id: z.string.tooltip_conversation_ping
@@ -71,7 +87,10 @@ class z.ViewModel.ConversationInputViewModel
   removed_from_view: ->
     amplify.unsubscribe z.event.WebApp.SHORTCUT.PING
 
-  ping: =>
+  toggle_extensions_menu: ->
+    amplify.publish z.event.WebApp.EXTENSIONS.GIPHY.SHOW
+
+  sing_ping: =>
     return if @ping_disabled()
 
     @ping_disabled true
@@ -81,11 +100,7 @@ class z.ViewModel.ConversationInputViewModel
         @ping_disabled false
       , 2000
 
-  toggle_extensions_menu: ->
-    amplify.publish z.event.WebApp.EXTENSIONS.GIPHY.SHOW
-
-  send_message: (data, event) =>
-    message = z.util.trim_line_breaks @conversation_et().input()
+  send_message: (message) =>
     if message.length is 0
       return
 
@@ -103,8 +118,13 @@ class z.ViewModel.ConversationInputViewModel
     else
       @conversation_repository.send_encrypted_message message, @conversation_et()
 
-    @conversation_et().input ''
-    $(event.target).focus()
+  edit_message: (message, message_et) =>
+    if message.length is 0
+      @conversation
+      return
+
+    LOG 'edit message', message
+    @is_editing false
 
   upload_images: (images) =>
     for image in images
@@ -168,3 +188,29 @@ class z.ViewModel.ConversationInputViewModel
   on_input_click: =>
     if not @has_text_input()
       $('.messages-wrap').scroll_to_bottom()
+
+  on_input_enter: (data, event) =>
+    message = z.util.trim_line_breaks @input()
+
+    if @is_editing()
+      @edit_message message, @edit_message_et
+    else
+      @send_message message
+
+    @input ''
+    $(event.target).focus()
+
+  on_input_key_down: (data, event) =>
+    switch event.keyCode
+      when z.util.KEYCODE.ARROW_UP
+        return if @is_editing()
+        message_et = @conversation_et().get_last_text_message_content()
+        if message_et?
+          @is_editing true
+          @input message_et.get_first_asset().text
+      when z.util.KEYCODE.ESC
+        @is_editing false
+    return true
+
+  cancel_edit: =>
+    @is_editing false

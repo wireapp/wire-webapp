@@ -1,10 +1,14 @@
 <!--@formatter:off-->
 <div class="conversation-input"
-     data-bind="with: $root.conversation_input, css: {'conversation-input-separator': $root.conversation_input.list_not_bottom()}">
+     data-bind="with: $root.conversation_input,
+                css: {
+                  'conversation-input-separator': $root.conversation_input.list_not_bottom(),
+                  'conversation-input-editing': $root.conversation_input.is_editing()
+                }">
 
   <!-- ko if: conversation_et() && conversation_et().connection().status() !== z.user.ConnectionStatus.SENT -->
     <div class="controls-left">
-      <!-- ko if: conversation_et().input().length > 0 -->
+      <!-- ko if: input().length > 0 -->
         <user-avatar class="user-avatar-xs cursor-default" params="user: self()"></user-avatar>
       <!-- /ko -->
     </div>
@@ -13,12 +17,12 @@
       <div class="controls-center">
         <textarea id="conversation-input-text"
                   class="conversation-input-text border-theme"
-                  data-bind="css: {'show-cursor': !conversation_et().input()},
+                  data-bind="event: {'keydown': on_input_key_down},
                              focus_on_keydown: true,
-                             enter: send_message,
+                             enter: on_input_enter,
                              hasFocus: blinking_cursor,
-                             textInput: conversation_et().input,
-                             resize: conversation_et().input,
+                             textInput: input,
+                             resize: input,
                              resize_callback: scroll_message_list,
                              click: on_input_click,
                              l10n_placeholder: z.string.tooltip_conversation_input_placeholder"
@@ -28,33 +32,47 @@
 
       <div class="controls-right">
 
-        <!-- ko if: show_giphy_button -->
-          <span class="controls-right-button button-icon-large icon-gif"
-                data-bind="click: toggle_extensions_menu, l10n_tooltip: z.string.extensions_bubble_button_gif"
-                data-uie-name="do-giphy-popover">
-          </span>
+        <!-- ko ifnot: is_editing -->
+
+          <!-- ko if: show_giphy_button -->
+            <span class="controls-right-button button-icon-large icon-gif"
+                  data-bind="click: toggle_extensions_menu, l10n_tooltip: z.string.extensions_bubble_button_gif"
+                  data-uie-name="do-giphy-popover">
+            </span>
+          <!-- /ko -->
+
+          <!-- ko if: conversation_et().input().length === 0 -->
+            <label id="conversation-input-photo"
+                   class="controls-right-button button-icon-large icon-library"
+                   data-bind="attr: {'title': picture_tooltip}">
+              <input data-bind="file_select: upload_images" type="file" multiple="multiple"
+                     accept=".jpg-large, image/jpeg, image/png, image/bmp, image/gif" data-uie-name="do-share-image"/>
+            </label>
+
+            <label id="conversation-input-files"
+                     class="controls-right-button button-icon-large icon-attachment"
+                     data-bind="attr: {'title': file_tooltip}">
+              <input data-bind="file_select: upload_files" type="file" multiple="multiple"
+                       accept="*" data-uie-name="do-share-file"/>
+            </label>
+
+            <span class="controls-right-button button-icon-large icon-ping"
+                  data-bind="click: ping, attr: {'title': ping_tooltip}, css:{'disabled': ping_disabled}"
+                  data-uie-name="do-ping">
+            </span>
+          <!-- /ko -->
+
         <!-- /ko -->
 
-        <!-- ko if: conversation_et().input().length === 0 -->
-          <label id="conversation-input-photo"
-                 class="controls-right-button button-icon-large icon-library"
-                 data-bind="attr: {'title': picture_tooltip}">
-            <input data-bind="file_select: upload_images" type="file" multiple="multiple"
-                   accept=".jpg-large, image/jpeg, image/png, image/bmp, image/gif" data-uie-name="do-share-image"/>
-          </label>
+        <!-- ko if: is_editing -->
 
-          <label id="conversation-input-files"
-                   class="controls-right-button button-icon-large icon-attachment"
-                   data-bind="attr: {'title': file_tooltip}">
-            <input data-bind="file_select: upload_files" type="file" multiple="multiple"
-                     accept="*" data-uie-name="do-share-file"/>
-          </label>
-
-          <span class="controls-right-button button-icon-large icon-ping"
-                data-bind="click: ping, attr: {'title': ping_tooltip}, css:{'disabled': ping_disabled}"
-                data-uie-name="do-ping">
+          <span class="controls-right-button button-icon-large icon-close"
+                data-bind="click: cancel_edit"
+                data-uie-name="do-cancel-edit">
           </span>
+
         <!-- /ko -->
+
       </div>
     <!-- /ko -->
   <!-- /ko -->

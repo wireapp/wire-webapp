@@ -111,7 +111,9 @@ ko.bindingHandlers.resize = do ->
 ko.bindingHandlers.enter =
   init: (element, valueAccessor, allBindings, data, context) ->
     wrapper = (data, event) ->
+      LOG 'ko.bindingHandlers.enter', event
       if event.keyCode is z.util.KEYCODE.ENTER and not event.shiftKey and not event.altKey
+        LOG 'fire'
         valueAccessor()?.call @, data, event
         return false
       else

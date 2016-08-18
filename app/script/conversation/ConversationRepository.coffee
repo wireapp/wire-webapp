@@ -339,6 +339,8 @@ class z.conversation.ConversationRepository
   ###
   Check whether message has been read.
 
+  # TODO move to z.entity.Conversation
+
   @param conversation_id [String] Conversation ID
   @param message_id [String] Message ID
   @return [Boolean] Is the message marked as read
@@ -898,8 +900,10 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the knock
   ###
   send_encrypted_knock: (conversation_et) =>
-    @_send_and_save_encrypted_value conversation_et, new z.proto.Knock false
-    .then ->
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'knock', new z.proto.Knock false
+    @_send_and_save_encrypted_value conversation_et, generic_message
+    .then =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.PING_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
         action: 'ping'
@@ -1103,50 +1107,41 @@ class z.conversation.ConversationRepository
 
   @private
   @param conversation_et [z.entity.Conversation] Conversation to send message to
-  @param message_content [z.proto] Protobuf message content to be added to generic message
+  @param generic_message [z.proto] Protobuf message content to be added to generic message
   @return [Promise] Promise that resolves with the saved record, when the message has been added to the conversation
   ###
-  _send_and_save_encrypted_value: (conversation_et, message_content) =>
-    return new Promise (resolve, reject) =>
-      reject() if conversation_et.removed_from_conversation()
+  _send_and_save_encrypted_value: (conversation_et, generic_message) =>
+    Promise.resolve()
+    .then ->
+      if conversation_et.removed_from_conversation()
+        throw new Error 'Cannot send message to conversation you are not part of'
+    .then =>
+      if @_send_as_external_message conversation_et, generic_message
+        @_send_encrypted_external_value conversation_et.id, generic_message
+      else
+        @_send_encrypted_value conversation_et.id, generic_message
+    .catch (error) =>
+      if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
+        return @_send_encrypted_external_value conversation_et.id, generic_message
+      else
+        throw error
+    .then (response) =>
+      event = @_construct_otr_message_event response, conversation_et.id
+      return @cryptography_repository.save_encrypted_event generic_message, event
+    .then (record) =>
+      @add_event conversation_et, record.mapped if record?.mapped
+      return record
+    .catch (error) =>
+      error_message = "Could not send OTR message of type '#{generic_message.content}' to conversation ID '#{conversation_et.id}' (#{conversation_et.display_name()}): #{error.message}"
 
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      raygun_error = new Error 'Encryption failed'
+      custom_data = error_message: "Could not send OTR message of type '#{generic_message.content}'"
+      Raygun.send raygun_error, custom_data
 
-      if message_content instanceof z.proto.Knock
-        generic_message.set 'knock', message_content
-      else if message_content instanceof z.proto.Text
-        generic_message.set 'text', message_content
-      else if message_content instanceof z.proto.GenericMessage
-        generic_message = message_content
-
-      Promise.resolve()
-      .then =>
-        if @_send_as_external_message conversation_et, generic_message
-          @_send_encrypted_external_value conversation_et.id, generic_message
-        else
-          @_send_encrypted_value conversation_et.id, generic_message
-      .catch (error) =>
-        if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
-          return @_send_encrypted_external_value conversation_et.id, generic_message
-        else
-          throw error
-      .then (response) =>
-        event = @_construct_otr_message_event response, conversation_et.id
-        return @cryptography_repository.save_encrypted_event generic_message, event
-      .then (record) =>
-        @add_event conversation_et, record.mapped if record?.mapped
-        resolve record
-      .catch (error) =>
-        error_message = "Could not send OTR message of type '#{generic_message.content}' to conversation ID '#{conversation_et.id}' (#{conversation_et.display_name()}): #{error.message}"
-
-        raygun_error = new Error 'Encryption failed'
-        custom_data = error_message: "Could not send OTR message of type '#{generic_message.content}'"
-        Raygun.send raygun_error, custom_data
-
-        @logger.log @logger.levels.ERROR, error_message, {error: error, event: generic_message}
-        if error.label is z.service.BackendClientError::LABEL.UNKNOWN_CLIENT
-          amplify.publish z.event.WebApp.SIGN_OUT, 'unknown_sender', true
-        reject error
+      @logger.log @logger.levels.ERROR, error_message, {error: error, event: generic_message}
+      if error.label is z.service.BackendClientError::LABEL.UNKNOWN_CLIENT
+        amplify.publish z.event.WebApp.SIGN_OUT, 'unknown_sender', true
+      throw error
 
   ###
   Sends a generic message to a conversation.
