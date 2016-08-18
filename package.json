@@ -28,7 +28,7 @@
     "grunt-todo": "0.5.0",
     "jasmine-ajax": "3.2.0",
     "jasmine-core": "2.4.1",
-    "karma": "1.2.0",
+    "karma": "1.1.2",
     "karma-chrome-launcher": "1.0.1",
     "karma-coverage": "1.1.1",
     "karma-jasmine": "1.0.2",

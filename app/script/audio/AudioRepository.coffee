@@ -165,16 +165,24 @@ class z.audio.AudioRepository
   @return [Promise] Resolves with the HTMLAudioElement
   ###
   _play: (audio_id, audio_element, play_in_loop = false) ->
-    return new Promise (resolve, reject) ->
+    if not audio_id or not audio_element
+      return Promise.reject new z.audio.AudioError 'Missing AudioElement or ID', z.audio.AudioError::TYPE.NOT_FOUND
+
+    return new Promise (resolve, reject) =>
       if audio_element.paused
         audio_element.loop = play_in_loop
         audio_element.currentTime = 0 if audio_element.currentTime isnt 0
-        audio_element.play()
-        .then =>
+        play_promise = audio_element.play()
+
+        _play_success = =>
           @currently_looping[audio_id] = audio_id if play_in_loop
           resolve audio_element
-        .catch (error) ->
-          reject new z.audio.AudioError error.message, z.audio.AudioError::TYPE.FAILED_TO_PLAY
+
+        if play_promise
+          play_promise.then(_play_success).catch (error) ->
+            reject new z.audio.AudioError error.message, z.audio.AudioError::TYPE.FAILED_TO_PLAY
+        else
+          _play_success()
       else
         reject new z.audio.AudioError 'Sound is already playing', z.audio.AudioError::TYPE.ALREADY_PLAYING
 
