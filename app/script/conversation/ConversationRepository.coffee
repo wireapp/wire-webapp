@@ -944,11 +944,6 @@ class z.conversation.ConversationRepository
     Promise.resolve()
     .then =>
       return @_send_and_save_encrypted_value conversation_et, generic_message
-    .catch (error) =>
-      if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
-        return @_send_and_save_encrypted_value conversation_et, generic_message, true
-      else
-        throw error
     .then (message_record) =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.MESSAGE_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
@@ -1109,10 +1104,9 @@ class z.conversation.ConversationRepository
   @private
   @param conversation_et [z.entity.Conversation] Conversation to send message to
   @param message_content [z.proto] Protobuf message content to be added to generic message
-  @param force_sending [Boolean] Force sending message as external message
   @return [Promise] Promise that resolves with the saved record, when the message has been added to the conversation
   ###
-  _send_and_save_encrypted_value: (conversation_et, message_content, force_sending = false) =>
+  _send_and_save_encrypted_value: (conversation_et, message_content) =>
     return new Promise (resolve, reject) =>
       reject() if conversation_et.removed_from_conversation()
 
@@ -1127,10 +1121,15 @@ class z.conversation.ConversationRepository
 
       Promise.resolve()
       .then =>
-        if force_sending or @_send_as_external_message conversation_et, generic_message
+        if @_send_as_external_message conversation_et, generic_message
           @_send_encrypted_external_value conversation_et.id, generic_message
         else
           @_send_encrypted_value conversation_et.id, generic_message
+      .catch (error) =>
+        if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
+          return @_send_encrypted_external_value conversation_et.id, generic_message
+        else
+          throw error
       .then (response) =>
         event = @_construct_otr_message_event response, conversation_et.id
         return @cryptography_repository.save_encrypted_event generic_message, event
