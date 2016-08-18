@@ -20,24 +20,27 @@ window.z ?= {}
 z.calling ?= {}
 
 class z.calling.CallError
-  constructor: (message, type) ->
+  constructor: (message) ->
     @name = @constructor.name
-    @message = message
-    @type = type
+    @message = message or z.calling.CallError::TYPE.UNKNOWN
     @stack = (new Error()).stack
 
   @:: = new Error()
   @::constructor = @
   @::TYPE = {
-    CALL_NOT_FOUND: 'z.calling.CallError::TYPE.CALL_NOT_FOUND'
-    CONVERSATION_EMPTY: 'z.calling.CallError::TYPE.CONVERSATION_EMPTY'
-    CONVERSATION_TOO_BIG: 'z.calling.CallError::TYPE.CONVERSATION_TOO_BIG'
-    FLOW_NOT_FOUND: 'z.calling.CallError::TYPE.FLOW_NOT_FOUND'
-    NO_AUDIO_STREAM_FOUND: 'z.calling.CallError::TYPE.NO_AUDIO_STREAM_FOUND'
-    NO_CAMERA_FOUND: 'z.calling.CallError::TYPE.NO_CAMERA_FOUND'
-    NO_CONVERSATION_ID: 'z.calling.CallError::TYPE.NO_CONVERSATION_ID'
-    NO_DEVICES_FOUND: 'z.calling.CallError::TYPE.NO_DEVICES_FOUND'
-    NO_MICROPHONE_FOUND: 'z.calling.CallError::TYPE.NO_MICROPHONE_FOUND'
-    NOT_SUPPORTED: 'z.calling.CallError::TYPE.NOT_SUPPORTED'
-    VOICE_CHANNEL_FULL: 'z.calling.CallError::TYPE.VOICE_CHANNEL_FULL'
+    CALL_NOT_FOUND: 'No call for conversation ID found'
+    CONVERSATION_EMPTY: 'No users in conversation'
+    CONVERSATION_TOO_BIG: 'Too many participants in conversation'
+    FLOW_NOT_FOUND: 'Flow not found'
+    NO_AUDIO_STREAM_FOUND: 'No audio stream found to toggle mute state'
+    NO_CAMERA_FOUND: 'No camera found'
+    NO_CONVERSATION_ID: 'No conversation ID given'
+    NO_DEVICES_FOUND: 'No MediaDevices found'
+    NO_MICROPHONE_FOUND: 'No microphone found'
+    NO_REPLACEABLE_TRACK: 'No replaceable MediaStreamTrack found'
+    NOT_SUPPORTED: 'Not supported'
+    RTP_SENDER_NOT_SUPPORTED: 'PeerConnection does not support getSenders()'
+    SCREEN_NOT_SUPPORTED: 'Screen sharing is not yet supported by this browser'
+    UNKNOWN: 'Unknown CallError'
+    VOICE_CHANNEL_FULL: 'Too many participants in call'
   }

@@ -156,6 +156,10 @@ z.string.modal_call_no_video_in_group_message = 'Video calls are not available i
 z.string.modal_call_second_incoming_headline = 'Answer call?'
 z.string.modal_call_second_incoming_message = 'Your current call will end.'
 z.string.modal_call_second_incoming_action = 'Answer'
+# Second ongoing call
+z.string.modal_call_second_ongoing_headline = 'Hang up call on another device?'
+z.string.modal_call_second_ongoing_message = 'You can only be in one call at a time.'
+z.string.modal_call_second_ongoing_action = 'Hang Up'
 # Second outgoing call
 z.string.modal_call_second_outgoing_headline = 'Hang up current call?'
 z.string.modal_call_second_outgoing_message = 'You can only be in one call at a time.'

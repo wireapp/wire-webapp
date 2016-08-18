@@ -155,7 +155,7 @@
       "less": "app/style/webapp-module-modal.less"
     },
     "webrtc-adapter": {
-      "js": "adapter-1.4.0.js"
+      "js": "adapter-2.0.2.js"
     },
     "wire-theme": {
       "less": "app/style/{wire-theme,variables,input}.less"

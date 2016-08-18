@@ -338,7 +338,7 @@ class z.event.EventRepository
       if sending_client
         log_message = "Received encrypted event '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
       else if event.from
-        log_message = "Received plain event '#{event.id}' of type '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
+        log_message = "Received unencrypted event '#{event.id}' of type '#{event.type}' from user '#{event.from}'"
         if event.type in [
           z.event.Backend.CONVERSATION.ASSET_ADD
           z.event.Backend.CONVERSATION.KNOCK

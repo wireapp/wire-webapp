@@ -99,7 +99,7 @@ class z.calling.handler.CallSignalingHandler
         for ice_candidate in mapped_candidates
           flow_et.add_remote_ice_candidate ice_candidate
       else
-        throw new z.calling.CallError "Flow '#{event.flow}' not found", z.calling.CallError::TYPE.FLOW_NOT_FOUND
+        throw new z.calling.CallError z.calling.CallError::TYPE.FLOW_NOT_FOUND
     .catch =>
       # Or cache them
       @logger.log @logger.levels.INFO, "Cached '#{mapped_candidates.length}' ICE candidates for unknown flow '#{event.flow}'", mapped_candidates
@@ -119,13 +119,16 @@ class z.calling.handler.CallSignalingHandler
         @logger.log @logger.levels.INFO, "Received remote SDP for existing flow '#{event.flow}'", remote_sdp
         flow_et.save_remote_sdp remote_sdp
       else
-        throw new z.calling.CallError "Flow '#{event.flow}' not found", z.calling.CallError::TYPE.FLOW_NOT_FOUND
-    .catch =>
-      if event.state is z.calling.rtc.SDPType.OFFER
-        @_cache_remote_sdp event.flow, remote_sdp
-        @logger.log @logger.levels.INFO, "Cached remote SDP for unknown flow '#{event.flow}'", remote_sdp
+        throw new z.calling.CallError z.calling.CallError::TYPE.FLOW_NOT_FOUND
+    .catch (error) =>
+      if error.message is z.calling.CallError::TYPE.FLOW_NOT_FOUND
+        if event.state is z.calling.rtc.SDPType.OFFER
+          @_cache_remote_sdp event.flow, remote_sdp
+          @logger.log @logger.levels.INFO, "Cached remote SDP for unknown flow '#{event.flow}'", remote_sdp
+        else
+          @logger.log @logger.levels.WARN, "Ignored remote SDP non-offer before call for flow '#{event.flow}'", remote_sdp
       else
-        @logger.log @logger.levels.WARN, "Ignored remote SDP non-offer before call for flow '#{event.flow}'", remote_sdp
+        @logger.log @logger.levels.ERROR, "Failed to handle remote SDP: #{error.message}", error
 
 
   ###############################################################################
@@ -174,7 +177,7 @@ class z.calling.handler.CallSignalingHandler
         @logger.log @logger.levels.DEBUG, "POSTing for flows in '#{conversation_id}' successful", response
         @_add_flow call_et, flow for flow in response.flows when flow.active is true
     .catch (error) =>
-      if error.type is z.calling.CallError::TYPE.CALL_NOT_FOUND
+      if error.message is z.calling.CallError::TYPE.CALL_NOT_FOUND
         @logger.log @logger.levels.WARN, "POSTing for flows in '#{conversation_id}' successful, call gone", error
       else
         @logger.log @logger.levels.ERROR,

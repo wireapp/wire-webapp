@@ -156,6 +156,10 @@ z.string.de.modal_call_no_video_in_group_message = 'Videoanrufe sind in Gruppen 
 z.string.de.modal_call_second_incoming_headline = 'Anruf annehmen?'
 z.string.de.modal_call_second_incoming_message = 'Dein aktueller Anruf wird beendet.'
 z.string.de.modal_call_second_incoming_action = 'Annehmen'
+# Second ongoing call
+z.string.modal_call_second_ongoing_headline = 'Anruf auf einem anderen Gerät beenden?'
+z.string.modal_call_second_ongoing_message = 'Nur ein zeitgleicher Anruf möglich.'
+z.string.modal_call_second_ongoing_action = 'Beenden'
 # Second outgoing call
 z.string.de.modal_call_second_outgoing_headline = 'Aktuellen Anruf beenden?'
 z.string.de.modal_call_second_outgoing_message = 'Nur ein zeitgleicher Anruf möglich.'
