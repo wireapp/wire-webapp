@@ -61,12 +61,12 @@ describe 'z.audio.AudioRepository', ->
         expect(error.type).toBe z.audio.AudioError::TYPE.NOT_FOUND
         done()
 
-  xdescribe '_play', ->
+  describe '_play', ->
     beforeEach ->
       audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL] = new Audio "/audio/#{z.audio.AudioType.OUTGOING_CALL}.mp3"
 
     afterEach ->
-      audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL].stop()
+      audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL].pause()
 
     it 'plays an available sound', (done) ->
       audio_repository._play z.audio.AudioType.OUTGOING_CALL, audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL], false
@@ -87,10 +87,26 @@ describe 'z.audio.AudioRepository', ->
     it 'does not play a sound twice concurrently', (done) ->
       audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL].play()
       .then ->
-        audio_repository._play z.audio.AudioType.OUTGOING_CALL
+        audio_repository._play z.audio.AudioType.OUTGOING_CALL, audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL]
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.audio.AudioError
         expect(error.type).toBe z.audio.AudioError::TYPE.ALREADY_PLAYING
+        done()
+      .catch done.fail
+
+    it 'handles a missing audio id sound', (done) ->
+      audio_repository._play undefined, audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL]
+      .catch (error) ->
+        expect(error).toEqual jasmine.any z.audio.AudioError
+        expect(error.type).toBe z.audio.AudioError::TYPE.NOT_FOUND
+        done()
+      .catch done.fail
+
+    it 'handles a missing audio element', (done) ->
+      audio_repository._play z.audio.AudioType.OUTGOING_CALL, undefined
+      .catch (error) ->
+        expect(error).toEqual jasmine.any z.audio.AudioError
+        expect(error.type).toBe z.audio.AudioError::TYPE.NOT_FOUND
         done()
       .catch done.fail
