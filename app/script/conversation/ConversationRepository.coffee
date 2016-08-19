@@ -339,8 +339,6 @@ class z.conversation.ConversationRepository
   ###
   Check whether message has been read.
 
-  # TODO move to z.entity.Conversation
-
   @param conversation_id [String] Conversation ID
   @param message_id [String] Message ID
   @return [Boolean] Is the message marked as read
@@ -966,7 +964,6 @@ class z.conversation.ConversationRepository
   Send edited message to specific conversation.
 
   # TODO send link preview
-
 
   @param message [String] plain text message
   @param original_message_et [z.entity.Message]

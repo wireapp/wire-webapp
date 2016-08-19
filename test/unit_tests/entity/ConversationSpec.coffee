@@ -566,3 +566,8 @@ describe 'Conversation', ->
 
       user_et.email 'hello@wire.com'
       expect(conversation_et.is_with_bot()).toBe false
+
+  describe 'get_last_text_message_content', ->
+
+    it 'returns undefined if conversation has no messages', ->
+      expect(conversation_et.get_last_text_message_content()).not.toBeDefined()

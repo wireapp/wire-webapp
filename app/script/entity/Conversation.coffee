@@ -466,8 +466,7 @@ class z.entity.Conversation
   @return [z.entity.Message, undefined] Last message entity or undefined
   ###
   get_last_text_message_content: ->
-    for message_et in @messages() when message_et.has_asset_text() by -1
-      # TODO self
+    for message_et in @messages() when message_et.has_asset_text() and message_et.user().is_me by -1
       return message_et
 
   ###
