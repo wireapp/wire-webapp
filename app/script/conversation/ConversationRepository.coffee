@@ -915,7 +915,6 @@ class z.conversation.ConversationRepository
   ###
   Send message to specific conversation.
 
-  @note Will either send a normal or external message.
   @param message [String] plain text message
   @param conversation_et [z.entity.Conversation] Conversation that should receive the message
   @return [Promise] Promise that resolves after sending the message
@@ -961,6 +960,33 @@ class z.conversation.ConversationRepository
       @logger.log @logger.levels.ERROR, "#{error.message}", error
       error = new Error "Failed to send message: #{error.message}"
       Raygun.send error, {source: 'Sending message'}
+      throw error
+
+  ###
+  Send edited message to specific conversation.
+
+  # TODO send link preview
+
+
+  @param message [String] plain text message
+  @param original_message_et [z.entity.Message]
+  @param conversation_et [z.entity.Conversation]
+  @return [Promise] Promise that resolves after sending the message
+  ###
+  send_encrypted_message_edit: (message, original_message_et, conversation_et) =>
+    Promise.resolve()
+    .then =>
+      # exit with error?
+      if original_message_et.get_first_asset().text is message
+        throw new Error 'Edited message equals original message'
+    .then () =>
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'edited', new z.proto.MessageEdit original_message_et.id, new z.proto.Text message
+      return generic_message
+    .then (generic_message) =>
+      @_send_and_save_encrypted_value conversation_et, generic_message
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Error while sending message: #{error.message}", error
       throw error
 
   ###
@@ -1304,8 +1330,6 @@ class z.conversation.ConversationRepository
 
   ###
   Can user upload assets to conversation.
-
-  # TODO move to conversation et
 
   @param conversation_et [z.entity.Conversation]
   ###

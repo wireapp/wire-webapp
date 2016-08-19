@@ -31,6 +31,7 @@ class z.entity.Message
     @type = ''
     @user = ko.observable new z.entity.User()
     @visible = ko.observable true
+    @is_editing = ko.observable false
 
     @display_timestamp_short = =>
       date = moment.unix @timestamp / 1000

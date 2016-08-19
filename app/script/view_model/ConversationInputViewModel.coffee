@@ -35,12 +35,12 @@ class z.ViewModel.ConversationInputViewModel
     @edit_message_et = undefined
     @edit_input = ko.observable ''
     @is_editing = ko.observable false
-    @is_editing.subscribe (is_editing)=>
+    @is_editing.subscribe (is_editing) =>
       if not is_editing
         @edit_input ''
         @edit_message_et = undefined
 
-  @conversation_has_focus = ko.observable(true).extend notify: 'always'
+    @conversation_has_focus = ko.observable(true).extend notify: 'always'
     @browser_has_focus = ko.observable true
 
     @blinking_cursor = ko.pureComputed =>
@@ -90,7 +90,7 @@ class z.ViewModel.ConversationInputViewModel
   toggle_extensions_menu: ->
     amplify.publish z.event.WebApp.EXTENSIONS.GIPHY.SHOW
 
-  sing_ping: =>
+  ping: =>
     return if @ping_disabled()
 
     @ping_disabled true
@@ -119,12 +119,12 @@ class z.ViewModel.ConversationInputViewModel
       @conversation_repository.send_encrypted_message message, @conversation_et()
 
   edit_message: (message, message_et) =>
-    if message.length is 0
-      @conversation
-      return
-
-    LOG 'edit message', message
     @is_editing false
+
+    if message.length is 0
+      @conversation_repository.delete_message_everyone @conversation_et(), message_et
+    else
+      @conversation_repository.send_encrypted_message_edit message, message_et, @conversation_et()
 
   upload_images: (images) =>
     for image in images
@@ -204,10 +204,10 @@ class z.ViewModel.ConversationInputViewModel
     switch event.keyCode
       when z.util.KEYCODE.ARROW_UP
         return if @is_editing()
-        message_et = @conversation_et().get_last_text_message_content()
-        if message_et?
+        @edit_message_et = @conversation_et().get_last_text_message_content()
+        if @edit_message_et?
           @is_editing true
-          @input message_et.get_first_asset().text
+          @input @edit_message_et.get_first_asset().text
       when z.util.KEYCODE.ESC
         @is_editing false
     return true
