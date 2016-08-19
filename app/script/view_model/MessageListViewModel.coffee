@@ -473,7 +473,7 @@ class z.ViewModel.MessageListViewModel
     if message_et.is_deletable()
       entries.push {label: z.string.conversation_context_menu_delete, action: 'delete'}
 
-    if message_et.user().is_me
+    if message_et.user().is_me and not @conversation().removed_from_conversation()
       entries.push {label: z.string.conversation_context_menu_delete_everyone, action: 'delete-everyone'}
 
     return entries
