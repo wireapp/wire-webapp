@@ -288,6 +288,91 @@ describe 'z.conversation.ConversationRepository', ->
       result = conversation_repository.get_groups_by_name 'Removed'
       expect(result.length).toBe 0
 
+  describe 'delete_message_everyone', ->
+
+    conversation_et = null
+
+    beforeEach ->
+      conversation_et = _generate_conversation z.conversation.ConversationType.REGULAR
+
+      spyOn(conversation_repository, '_send_encrypted_value').and.returnValue Promise.resolve()
+
+    it 'does not delete other users messages', (done) ->
+      user_et = new z.entity.User()
+      user_et.is_me = false
+      message_to_delete_et = new z.entity.Message()
+      message_to_delete_et.id = z.util.create_random_uuid()
+      message_to_delete_et.user user_et
+      conversation_et.add_message message_to_delete_et
+
+      conversation_repository.delete_message_everyone conversation_et, message_to_delete_et
+      .then done.fail
+      .catch done
+
+    it 'sends delete and deletes message for own messages', (done) ->
+      user_et = new z.entity.User()
+      user_et.is_me = true
+      message_to_delete_et = new z.entity.Message()
+      message_to_delete_et.id = z.util.create_random_uuid()
+      message_to_delete_et.user user_et
+      conversation_et.add_message message_to_delete_et
+
+      expect(conversation_et.get_message_by_id(message_to_delete_et.id)).toBeDefined()
+      conversation_repository.delete_message_everyone conversation_et, message_to_delete_et
+      .then ->
+        expect(conversation_et.get_message_by_id(message_to_delete_et.id)).not.toBeDefined()
+        done()
+      .catch done.fail
+
+  describe 'message_hidden', ->
+
+    conversation_et = null
+    message_to_hide_et = null
+
+    beforeEach ->
+      conversation_et = _generate_conversation z.conversation.ConversationType.REGULAR
+      conversation_repository.save_conversation conversation_et
+
+      message_to_hide_et = new z.entity.PingMessage()
+      message_to_hide_et.id = z.util.create_random_uuid()
+      conversation_et.add_message message_to_hide_et
+
+    it 'does not hide message if sender is not self user', (done) ->
+      event =
+        conversation: conversation_et.id
+        id: z.util.create_random_uuid()
+        data:
+          message_id: message_to_hide_et.id
+          conversation_id: conversation_et.id
+        from: z.util.create_random_uuid()
+        time: new Date().toISOString()
+        type: z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
+
+      expect(conversation_et.get_message_by_id(message_to_hide_et.id)).toBeDefined()
+      conversation_repository.message_hidden event
+      .then done.fail
+      .catch ->
+        expect(conversation_et.get_message_by_id(message_to_hide_et.id)).toBeDefined()
+        done()
+
+    it 'hides message if sender is self user', (done) ->
+      event =
+        conversation: conversation_et.id
+        id: z.util.create_random_uuid()
+        data:
+          message_id: message_to_hide_et.id
+          conversation_id: conversation_et.id
+        from: user_repository.self().id
+        time: new Date().toISOString()
+        type: z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
+
+      expect(conversation_et.get_message_by_id(message_to_hide_et.id)).toBeDefined()
+      conversation_repository.message_hidden event
+      .then ->
+        expect(conversation_et.get_message_by_id(message_to_hide_et.id)).not.toBeDefined()
+        done()
+      .catch done.fail
+
   describe 'message_deleted', ->
 
     conversation_et = null
@@ -299,10 +384,10 @@ describe 'z.conversation.ConversationRepository', ->
 
       message_to_delete_et = new z.entity.PingMessage()
       message_to_delete_et.id = z.util.create_random_uuid()
+      message_to_delete_et.from = user_repository.self().id
       conversation_et.add_message message_to_delete_et
 
       spyOn(conversation_repository, 'get_message_from_db').and.returnValue Promise.resolve message_to_delete_et
-      spyOn conversation_repository, '_delete_message'
       spyOn conversation_repository, '_add_delete_message'
 
     it 'deletes message if user is self', (done) ->
@@ -313,26 +398,33 @@ describe 'z.conversation.ConversationRepository', ->
           message_id: message_to_delete_et.id
         from: user_repository.self().id
         time: new Date().toISOString()
+        type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
 
+      expect(conversation_et.get_message_by_id(message_to_delete_et.id)).toBeDefined()
       conversation_repository.message_deleted event
       .then ->
-        expect(conversation_repository._delete_message).toHaveBeenCalledWith conversation_et, message_to_delete_et.id
+        expect(conversation_et.get_message_by_id(message_to_delete_et.id)).not.toBeDefined()
         expect(conversation_repository._add_delete_message).not.toHaveBeenCalled()
         done()
       .catch done.fail
 
     it 'deletes message and add delete message if user is not self', (done) ->
+      other_user_id = z.util.create_random_uuid()
+      message_to_delete_et.from = other_user_id
+
       event =
         conversation: conversation_et.id
         id: z.util.create_random_uuid()
         data:
           message_id: message_to_delete_et.id
-        from: z.util.create_random_uuid()
+        from: other_user_id
         time: new Date().toISOString()
+        type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
 
+      expect(conversation_et.get_message_by_id(message_to_delete_et.id)).toBeDefined()
       conversation_repository.message_deleted event
       .then ->
-        expect(conversation_repository._delete_message).toHaveBeenCalledWith conversation_et, message_to_delete_et.id
+        expect(conversation_et.get_message_by_id(message_to_delete_et.id)).not.toBeDefined()
         expect(conversation_repository._add_delete_message).toHaveBeenCalled()
         done()
       .catch done.fail

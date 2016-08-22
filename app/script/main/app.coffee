@@ -443,10 +443,12 @@ class z.main.App
 
   # Disable debugging on any environment.
   disable_debugging: ->
+    z.config.LOGGER.OPTIONS.domains['app.wire.com'] = -> 0
     amplify.publish z.event.WebApp.PROPERTIES.CHANGE.DEBUG, false
 
   # Enable debugging on any environment.
   enable_debugging: ->
+    z.config.LOGGER.OPTIONS.domains['app.wire.com'] = -> 300
     amplify.publish z.event.WebApp.PROPERTIES.CHANGE.DEBUG, true
 
   # Report call telemetry to Raygun for analysis.
