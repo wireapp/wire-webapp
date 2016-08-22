@@ -933,7 +933,6 @@ class z.conversation.ConversationRepository
   ###
   Send message to specific conversation.
 
-  @note Will either send a normal or external message.
   @param message [String] plain text message
   @param conversation_et [z.entity.Conversation] Conversation that should receive the message
   @return [Promise] Promise that resolves after sending the message
@@ -971,17 +970,23 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the message
   ###
   send_encrypted_message_edit: (message, original_message_et, conversation_et) =>
+    generic_message = undefined
     Promise.resolve()
     .then =>
       # exit with error?
       if original_message_et.get_first_asset().text is message
         throw new Error 'Edited message equals original message'
-    .then () =>
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'edited', new z.proto.MessageEdit original_message_et.id, new z.proto.Text message
       return generic_message
     .then (generic_message) =>
-      @_send_and_save_encrypted_value conversation_et, generic_message
+      # TODO external
+      @_send_encrypted_value conversation_et.id, generic_message
+    .then (response) =>
+      event = @_construct_otr_message_event response, conversation_et.id
+      return @cryptography_repository.save_encrypted_event generic_message, event
+    .then (record) =>
+      @on_conversation_event record.mapped if record?.mapped
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Error while sending message: #{error.message}", error
       throw error
@@ -1135,10 +1140,9 @@ class z.conversation.ConversationRepository
   ###
   _send_and_save_encrypted_value: (conversation_et, generic_message) =>
     Promise.resolve()
-    .then ->
+    .then =>
       if conversation_et.removed_from_conversation()
         throw new Error 'Cannot send message to conversation you are not part of'
-    .then =>
       if @_send_as_external_message conversation_et, generic_message
         @_send_encrypted_external_value conversation_et.id, generic_message
       else
@@ -1146,8 +1150,7 @@ class z.conversation.ConversationRepository
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
         return @_send_encrypted_external_value conversation_et.id, generic_message
-      else
-        throw error
+      throw error
     .then (response) =>
       event = @_construct_otr_message_event response, conversation_et.id
       return @cryptography_repository.save_encrypted_event generic_message, event
@@ -1273,7 +1276,6 @@ class z.conversation.ConversationRepository
     .then ->
       if not message_et.user().is_me
         throw new Error 'Cannot delete other users message'
-    .then ->
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
       return generic_message
@@ -1342,26 +1344,45 @@ class z.conversation.ConversationRepository
   # Event callbacks
   ###############################################################################
 
-  message_hidden: (event_json) =>
+  ###
+  A text message received in a conversation.
+  @param conversation_et [z.entity.Conversation] Conversation to add the event to
+  @param event_json [Object] JSON data of 'conversation.message-add'
+  ###
+  message_added: (conversation_et, event_json) =>
+    Promise.resolve()
+    .then =>
+      if event_json.data.replacing_message_id
+        return @_update_edited_message conversation_et, event_json
+      return event_json
+    .then (updated_event_json) =>
+      # TODO: check if message it outdated (e.g. link preview arrived after message was edited)
+      if event_json.data.replacing_message_id
+        @_delete_message conversation_et, event_json.data.replacing_message_id
+      @add_event conversation_et, updated_event_json
+
+  ###
+  A hide message received in a conversation.
+  @param conversation_et [z.entity.Conversation] Conversation to add the event to
+  @param event_json [Object] JSON data of 'conversation.message-hidden'
+  ###
+  message_hidden: (conversation_et, event_json) =>
     Promise.resolve()
     .then =>
       if event_json.from isnt @user_repository.self().id
         throw new Error 'Sender is not self user'
-      return @find_conversation_by_id event_json.data.conversation_id
-    .then (conversation_et) =>
       return @_delete_message conversation_et, event_json.data.message_id
     .catch (error) =>
       @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
       throw error
 
-  message_deleted: (event_json) =>
-    conversation_et = undefined
-
-    Promise.resolve()
-    .then =>
-      conversation_et = @find_conversation_by_id event_json.conversation
-    .then =>
-      @get_message_from_db conversation_et, event_json.data.message_id
+  ###
+  A hide message received in a conversation.
+  @param conversation_et [z.entity.Conversation] Conversation to add the event to
+  @param event_json [Object] JSON data of 'conversation.message-delete'
+  ###
+  message_deleted: (conversation_et, event_json) =>
+    @get_message_from_db conversation_et, event_json.data.message_id
     .then (message_to_delete_et) =>
       if event_json.from isnt message_to_delete_et.from
         throw new Error 'Sender can only delete own messages'
@@ -1372,23 +1393,6 @@ class z.conversation.ConversationRepository
     .catch (error) =>
       @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
       throw error
-
-  ###
-  Add delete message to conversation
-  @param conversation_id [String]
-  @param message_id [String]
-  @param time [String] ISO 8601 formatted time string
-  @param message_to_delete_et [z.entity.Message]
-  ###
-  _add_delete_message: (conversation_id, message_id, time, message_to_delete_et) ->
-    amplify.publish z.event.WebApp.EVENT.INJECT,
-      conversation: conversation_id
-      id: message_id
-      data:
-        deleted_time: time
-      type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
-      from: message_to_delete_et.from
-      time: message_to_delete_et.timestamp
 
   ###
   A message or ping received in a conversation.
@@ -1683,10 +1687,12 @@ class z.conversation.ConversationRepository
           @asset_upload_failed conversation_et, event
         when z.event.Backend.CONVERSATION.ASSET_PREVIEW
           @asset_preview conversation_et, event
+        when z.event.Backend.CONVERSATION.MESSAGE_ADD
+          @message_added conversation_et, event
         when z.event.Backend.CONVERSATION.MESSAGE_DELETE
-          @message_deleted event
+          @message_deleted conversation_et, event
         when z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
-          @message_hidden event
+          @message_hidden conversation_et, event
         else
           @add_event conversation_et, event
 
@@ -1794,6 +1800,23 @@ class z.conversation.ConversationRepository
     @conversation_service.delete_messages_from_db conversation_et.id
 
   ###
+  Add delete message to conversation
+  @param conversation_id [String]
+  @param message_id [String]
+  @param time [String] ISO 8601 formatted time string
+  @param message_to_delete_et [z.entity.Message]
+  ###
+  _add_delete_message: (conversation_id, message_id, time, message_to_delete_et) ->
+    amplify.publish z.event.WebApp.EVENT.INJECT,
+      conversation: conversation_id
+      id: message_id
+      data:
+        deleted_time: time
+      type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+      from: message_to_delete_et.from
+      time: message_to_delete_et.timestamp
+
+  ###
   Update asset in UI and DB as failed
   @param message_et [z.entity.Message] Message to update
   ###
@@ -1836,6 +1859,19 @@ class z.conversation.ConversationRepository
     asset_et.preview_resource resource
     @conversation_service.update_asset_preview_in_db message_et.primary_key, asset_data
 
+
+  ###
+  Update edited message with timestamp from the original message
+  @return [Object] updated event_json
+  ###
+  _update_edited_message: (conversation_et, event_json) =>
+    @get_message_from_db conversation_et, event_json.data.replacing_message_id
+    .then (original_message_et) =>
+      return [original_message_et, @event_mapper.map_json_event event_json, conversation_et]
+    .then ([original_message_et, edited_message_et]) =>
+      return @conversation_service.update_message_timestamp_in_db edited_message_et.primary_key, original_message_et.timestamp
+    .then (record) =>
+      return record.mapped
 
   ###############################################################################
   # Helpers

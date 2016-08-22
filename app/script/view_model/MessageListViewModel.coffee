@@ -369,6 +369,11 @@ class z.ViewModel.MessageListViewModel
           .find '.message-header-user-is-hideable'
           .removeClass 'hide-user'
 
+        if message.is_content() and message.replacing_message_id
+          $(elements)
+          .find '.message-header-user-is-hideable'
+          .removeClass 'hide-user'
+
       if message?.is_ping()
         now = Date.now()
         message.animated now - current < 2000

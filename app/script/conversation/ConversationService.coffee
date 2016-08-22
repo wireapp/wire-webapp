@@ -220,6 +220,24 @@ class z.conversation.ConversationService
     .delete()
 
   ###
+  Update events timestamp.
+
+  @param primary_key [String] Primary key used to find an event in the database
+  @param timestamp [Number]
+  ###
+  update_message_timestamp_in_db: (primary_key, timestamp) ->
+    updated_record = undefined
+    @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
+    .then (record) =>
+      record.meta.timestamp = timestamp
+      record.mapped.time = record.raw.time = new Date(timestamp).toISOString()
+      updated_record = record
+      @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
+    .then =>
+      @logger.log 'Updated message_et timestamp', primary_key
+      return updated_record
+
+  ###
   Delete events from a conversation.
 
   @param primary_key [String] Primary key used to find an event in the database
