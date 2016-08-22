@@ -94,7 +94,7 @@ class z.ViewModel.ConversationInputViewModel
     return if @ping_disabled()
 
     @ping_disabled true
-    @conversation_repository.send_encrypted_knock @conversation_et()
+    @conversation_repository.send_knock @conversation_et()
     .then =>
       window.setTimeout =>
         @ping_disabled false
@@ -114,9 +114,9 @@ class z.ViewModel.ConversationInputViewModel
     link_data = z.links.LinkPreviewHelpers.get_first_link_with_offset message
     if link_data?
       [url, offset] = link_data
-      @conversation_repository.send_encrypted_message_with_link_preview message, url, offset, @conversation_et()
+      @conversation_repository.send_message_with_link_preview message, url, offset, @conversation_et()
     else
-      @conversation_repository.send_encrypted_message message, @conversation_et()
+      @conversation_repository.send_message message, @conversation_et()
 
   edit_message: (message, message_et) =>
     @is_editing false
@@ -124,7 +124,7 @@ class z.ViewModel.ConversationInputViewModel
     if message.length is 0
       @conversation_repository.delete_message_everyone @conversation_et(), message_et
     else
-      @conversation_repository.send_encrypted_message_edit message, message_et, @conversation_et()
+      @conversation_repository.send_message_edit message, message_et, @conversation_et()
 
   upload_images: (images) =>
     for image in images
