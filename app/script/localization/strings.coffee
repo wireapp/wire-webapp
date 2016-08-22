@@ -264,9 +264,9 @@ z.string.conversation_asset_downloading = 'Downloading…'
 z.string.conversation_asset_upload_failed = 'Upload Failed'
 z.string.conversation_asset_upload_too_large = 'You can send files up to %no'
 z.string.conversation_playback_error = 'Unable to play'
-z.string.conversation_context_menu_delete = 'delete only for me'
-z.string.conversation_context_menu_delete_everyone = 'delete for everyone'
-z.string.conversation_context_menu_download = 'download'
+z.string.conversation_context_menu_delete = 'Delete only for me'
+z.string.conversation_context_menu_delete_everyone = 'Delete for everyone'
+z.string.conversation_context_menu_download = 'Download'
 z.string.conversation_delete_timestamp = 'Deleted on %@timestamp'
 
 # Conversation list
