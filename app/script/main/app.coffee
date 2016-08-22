@@ -152,8 +152,8 @@ class z.main.App
       return @_get_user_self()
     .then (self_user_et) =>
       @view.loading.switch_message z.string.init_received_self_user, true
-      @repository.client.init self_user_et
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER
+      @repository.client.init self_user_et
       return @repository.storage.init false
     .then =>
       @view.loading.switch_message z.string.init_initialized_storage, true
@@ -213,16 +213,19 @@ class z.main.App
       @repository.audio.init true
       @logger.log @logger.levels.INFO, 'App fully loaded'
     .catch (error) =>
-      @logger.log @logger.levels.INFO, 'Error during app initialization.'
+      error_message = "Error during initialization of app version '#{z.util.Environment.version false}'"
+      if z.util.Environment.electron
+        error_message = "#{error_message} - Electron '#{platform.os.family}' '#{z.util.Environment.version()}'"
+
+      @logger.log @logger.levels.INFO, error_message, {error: error}
       @logger.log @logger.levels.DEBUG,
         "App reload: '#{is_reload}', Document referrer: '#{document.referrer}', Location: '#{window.location.href}'"
-      error_message = error.message or error
-      invalid_client = [z.client.ClientError::TYPE.MISSING_ON_BACKEND, z.client.ClientError::TYPE.NO_LOCAL_CLIENT]
-      if is_reload and error.type not in invalid_client
+
+      if is_reload and error.type not in [z.client.ClientError::TYPE.MISSING_ON_BACKEND, z.client.ClientError::TYPE.NO_LOCAL_CLIENT]
         @auth.client.execute_on_connectivity().then -> window.location.reload false
       else if navigator.onLine
-        @logger.log @logger.levels.ERROR,
-          "Could not load app version '#{z.util.Environment.version false}': #{error_message}", error
+        @logger.log @logger.levels.ERROR, "Caused by: #{error?.message or error}"
+        Raygun.send error if error instanceof z.storage.StorageError
         @logout 'init_app'
       else
         @logger.log @logger.levels.WARN, 'No connectivity. Trigger reload on regained connectivity.', error
@@ -248,8 +251,9 @@ class z.main.App
                 @repository.user.change_picture blob, -> amplify.publish z.event.WebApp.WELCOME.UNSPLASH_LOADED
             resolve user_et
       .catch (error) =>
-        error = new Error "Loading self user failed: #{error}"
-        @logger.log @logger.levels.ERROR, error.message
+        if not error instanceof z.storage.StorageError
+          error = new Error "Loading self user failed: #{error}"
+          @logger.log @logger.levels.ERROR, error.message
         reject error
 
   ###

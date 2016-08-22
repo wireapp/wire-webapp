@@ -136,8 +136,8 @@ class z.storage.StorageService
         @logger.log @logger.levels.LEVEL_1, "Storage Service initialized with database '#{@db_name}'"
         resolve @db_name
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Failed to initialize database '#{@db_name}' for Storage Service"
-        reject error
+        @logger.log @logger.levels.ERROR, "Failed to initialize database '#{@db_name}' for Storage Service: #{error?.message or error}", {error: error}
+        reject new z.storage.StorageError z.storage.StorageError::TYPE.FAILED_TO_OPEN
 
 
   ###############################################################################
