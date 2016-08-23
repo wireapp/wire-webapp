@@ -337,15 +337,6 @@ class z.conversation.ConversationRepository
     return @active_conversation() is conversation_et
 
   ###
-  Check whether the conversation is held with a Wire welcome bot like Anna or Otto.
-  @return [Boolean] True, if conversation with a bot
-  ###
-  is_bot_conversation: ->
-    return false if @active_conversation().type() isnt z.conversation.ConversationType.ONE2ONE
-    possible_bot = @active_conversation().participating_user_ets()[0]
-    return !!possible_bot.email().match /(anna|ottobot|welcome)(\+\S+)?@wire.com/ig
-
-  ###
   Check whether message has been read.
 
   @param conversation_id [String] Conversation ID
@@ -885,7 +876,7 @@ class z.conversation.ConversationRepository
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
           action: 'photo'
           conversation_type: z.tracking.helpers.get_conversation_type conversation_et
-          with_bot: @is_bot_conversation()
+          with_bot: conversation_et.is_with_bot()
         }
         event = @_construct_otr_asset_event json, conversation_id, asset_id
         return @cryptography_repository.save_encrypted_event generic_message, event
@@ -908,17 +899,17 @@ class z.conversation.ConversationRepository
   ###
   send_encrypted_knock: (conversation_et) =>
     @_send_and_save_encrypted_value conversation_et, new z.proto.Knock false
-    .then =>
+    .then ->
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.PING_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
         action: 'ping'
         conversation_type: z.tracking.helpers.get_conversation_type conversation_et
-        with_bot: @is_bot_conversation()
+        with_bot: conversation_et.is_with_bot()
       }
     .catch (error) => @logger.log @logger.levels.ERROR, "#{error.message}"
 
   ###
-  Send message to specific converation.
+  Send message to specific conversation.
 
   @note Will either send a normal or external message.
   @param message [String] plain text message
@@ -963,7 +954,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
         action: 'text'
         conversation_type: z.tracking.helpers.get_conversation_type conversation_et
-        with_bot: @is_bot_conversation()
+        with_bot: conversation_et.is_with_bot()
       }
       @_analyze_sent_message message
       return message_record
@@ -1235,7 +1226,7 @@ class z.conversation.ConversationRepository
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
       action: 'file'
       conversation_type: conversation_type
-      with_bot: @is_bot_conversation()
+      with_bot: conversation_et.is_with_bot()
     }
 
     @send_encrypted_asset_metadata conversation_et, file
