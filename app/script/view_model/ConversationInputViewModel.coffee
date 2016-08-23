@@ -27,18 +27,15 @@ class z.ViewModel.ConversationInputViewModel
     @conversation_et = @conversation_repository.active_conversation
     @conversation_et.subscribe =>
       @conversation_has_focus true
-      @is_editing false
+      @cancel_edit()
 
     @self = @user_repository.self
     @list_not_bottom = ko.observable true
 
-    @edit_message_et = undefined
+    @edit_message_et = ko.observable()
     @edit_input = ko.observable ''
-    @is_editing = ko.observable false
-    @is_editing.subscribe (is_editing) =>
-      if not is_editing
-        @edit_input ''
-        @edit_message_et = undefined
+    @is_editing = ko.pureComputed =>
+      return @edit_message_et()?
 
     @conversation_has_focus = ko.observable(true).extend notify: 'always'
     @browser_has_focus = ko.observable true
@@ -78,6 +75,7 @@ class z.ViewModel.ConversationInputViewModel
     amplify.subscribe z.event.WebApp.SEARCH.HIDE, => window.requestAnimFrame => @conversation_has_focus true
     amplify.subscribe z.event.WebApp.EXTENSIONS.GIPHY.SEND, => @conversation_et()?.input ''
     amplify.subscribe z.event.WebApp.CONVERSATION.IMAGE.SEND, @upload_images
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.EDIT, @edit_message
 
   added_to_view: =>
     setTimeout =>
@@ -118,13 +116,13 @@ class z.ViewModel.ConversationInputViewModel
     else
       @conversation_repository.send_message message, @conversation_et()
 
-  edit_message: (message, message_et) =>
-    @is_editing false
-
+  send_message_edit: (message, message_et) =>
     if message.length is 0
       @conversation_repository.delete_message_everyone @conversation_et(), message_et
     else
       @conversation_repository.send_message_edit message, message_et, @conversation_et()
+
+    @cancel_edit()
 
   upload_images: (images) =>
     for image in images
@@ -193,7 +191,7 @@ class z.ViewModel.ConversationInputViewModel
     message = z.util.trim_line_breaks @input()
 
     if @is_editing()
-      @edit_message message, @edit_message_et
+      @send_message_edit message, @edit_message_et()
     else
       @send_message message
 
@@ -203,14 +201,19 @@ class z.ViewModel.ConversationInputViewModel
   on_input_key_down: (data, event) =>
     switch event.keyCode
       when z.util.KEYCODE.ARROW_UP
-        return if @is_editing()
-        @edit_message_et = @conversation_et().get_last_text_message_content()
-        if @edit_message_et?
-          @is_editing true
-          @input @edit_message_et.get_first_asset().text
+        @edit_message @conversation_et().get_last_text_message_content()
       when z.util.KEYCODE.ESC
-        @is_editing false
+        @cancel_edit()
     return true
 
+  edit_message: (message_et) =>
+    return if not message_et?.is_editable?()
+    @cancel_edit()
+    @edit_message_et message_et
+    @edit_message_et()?.is_editing true
+    @input @edit_message_et().get_first_asset().text
+
   cancel_edit: =>
-    @is_editing false
+    @edit_message_et()?.is_editing false
+    @edit_message_et undefined
+    @edit_input ''

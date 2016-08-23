@@ -187,6 +187,20 @@ class z.entity.Message
     return @get_first_asset().status() not in [z.assets.AssetTransferState.DOWNLOADING, z.assets.AssetTransferState.UPLOADING]
 
   ###
+  Check if message can be edited.
+
+  @return [Boolean]
+  ###
+  is_editable: ->
+    return @has_asset_text() and @user().is_me
+
+  ###
+  Triggers event to delete message.
+  ###
+  edit: =>
+    amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.EDIT, @
+
+  ###
   Triggers event to delete message.
   ###
   delete: =>
