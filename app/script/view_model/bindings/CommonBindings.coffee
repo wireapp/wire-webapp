@@ -274,14 +274,15 @@ ko.bindingHandlers.relative_timestamp = do ->
 ko.bindingHandlers.hide_controls =
   init: (element, valueAccessor) ->
     timeout = valueAccessor()
-    timer = undefined
+    hide_timeout = undefined
 
     element.onmouseenter = -> element.classList.remove 'hide-controls'
-    element.onmouseleave = -> element.classList.add 'hide-controls'
+    element.onmouseleave = -> element.classList.add 'hide-controls' if document.hasFocus()
     element.onmousemove = ->
-      window.clearTimeout timer if timer
+      window.clearTimeout hide_timeout if hide_timeout
+
       element.classList.remove 'hide-controls'
 
-      timer = window.setTimeout ->
+      hide_timeout = window.setTimeout ->
         element.classList.add 'hide-controls'
       , timeout

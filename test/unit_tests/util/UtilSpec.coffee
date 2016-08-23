@@ -569,6 +569,37 @@ describe 'z.util.strip_url_wrapper', ->
 
 
 ###############################################################################
+# z.util.naked_url
+###############################################################################
+describe 'z.util.naked_url', ->
+  it 'returns into naked url', ->
+
+    expected_url = 'wire.com'
+    urls = [
+      'HTTPS://WWW.WIRE.COM/',
+      'https://www.wire.com/',
+      'http://www.wire.com/',
+      'https://www.wire.com',
+      'http://www.wire.com',
+      'https://wire.com/',
+      'http://wire.com/',
+      'https://wire.com',
+      'http://wire.com',
+      'www.wire.com/',
+      'www.wire.com',
+      'wire.com/'
+    ]
+
+    all_urls_naked = urls
+      .map (url) -> z.util.naked_url url
+      .every (url) -> url is expected_url
+
+    expect(all_urls_naked).toBeTruthy()
+
+  it 'returns empty string if url is not set', ->
+    expect(z.util.naked_url()).toBe ''
+
+###############################################################################
 # z.util.string_format
 ###############################################################################
 describe 'z.util.string_format', ->

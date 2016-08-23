@@ -85,13 +85,15 @@ z.event.WebApp =
     ASSET:
       CANCEL: 'wire.webapp.conversation.asset.cancel'
     MESSAGE:
-      DELETE: 'wire.webapp.conversation.message.delete'
+      DELETE_SELF: 'wire.webapp.conversation.message.delete-self'
+      DELETE_EVERYONE: 'wire.webapp.conversation.message.delete-everyone'
     IMAGE:
       SEND: 'wire.webapp.conversation.image.send'
   CONVERSATION_LIST:
     SHOW: 'wire.webapp.conversation-list.show'
     ARCHIVE:
       HIDE: 'wire.webapp.conversation-list.archive.hide'
+  CONTEXT_MENU: 'wire.webapp.context-menu'
   DEBUG:
     UPDATE_LAST_CALL_STATUS: 'wire.webapp.debug.update-last-call-status'
   EXTENSIONS:

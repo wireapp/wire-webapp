@@ -22,3 +22,4 @@ z.event ?= {}
 z.event.Client =
   CONVERSATION:
     UNABLE_TO_DECRYPT: 'conversation.unable-to-decrypt'
+    DELETE_EVERYWHERE: 'conversation.delete-everywhere'

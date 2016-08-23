@@ -210,9 +210,10 @@ z.ui.Shortcut = do ->
 
   _init()
 
-  return {} =
+  return {
     shortcut_map: shortcut_map
     get_shortcut: get_shortcut
     get_shortcut_tooltip: get_shortcut_tooltip
     get_beautified_shortcut_mac: get_beautified_shortcut_mac
     get_beautified_shortcut_win: get_beautified_shortcut_win
+  }

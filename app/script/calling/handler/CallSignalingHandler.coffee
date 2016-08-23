@@ -276,7 +276,7 @@ class z.calling.handler.CallSignalingHandler
         "PUTting local SDP for flow '#{sdp_info.flow_id}' failed: #{error.message}", error
       attributes = {cause: error.label or error.name, method: 'put', request: 'sdp', sdp_type: sdp_info.sdp.type}
       @call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
-      on_failure? new Error error
+      on_failure? error
 
   ###
   Cache remote SDP until we have the flow.

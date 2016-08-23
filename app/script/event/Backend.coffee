@@ -46,6 +46,7 @@ z.event.Backend =
     MEMBER_LEAVE: 'conversation.member-leave'
     MEMBER_UPDATE: 'conversation.member-update'
     MESSAGE_ADD: 'conversation.message-add'
+    MESSAGE_HIDDEN: 'conversation.message-hidden'
     MESSAGE_DELETE: 'conversation.message-delete'
     OTR_ASSET_ADD: 'conversation.otr-asset-add'
     OTR_MESSAGE_ADD: 'conversation.otr-message-add'

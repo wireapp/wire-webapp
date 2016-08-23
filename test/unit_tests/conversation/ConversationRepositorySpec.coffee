@@ -19,11 +19,13 @@
 # grunt test_init && grunt test_run:conversation/ConversationRepository
 #@formatter:off
 describe 'z.conversation.ConversationRepository', ->
+  test_factory = new TestFactory()
+
+  client = test_factory.client
   conversation_et = null
   self_user_et = null
   server = null
-  test_factory = new TestFactory()
-  client = test_factory.client
+  storage_service = null
 
   _find_conversation = (conversation, conversations) ->
     ko.utils.arrayFirst conversations(), (conversation_et) ->
@@ -38,8 +40,7 @@ describe 'z.conversation.ConversationRepository', ->
     return message_et
 
   _generate_conversation = (conversation_type = z.conversation.ConversationType.REGULAR, connection_status = z.user.ConnectionStatus.ACCEPTED) ->
-    conversation_et = new z.entity.Conversation()
-    conversation_et.id = z.util.create_random_uuid()
+    conversation_et = new z.entity.Conversation z.util.create_random_uuid()
     conversation_et.type conversation_type
 
     connection_et = new z.entity.Connection()
@@ -59,6 +60,8 @@ describe 'z.conversation.ConversationRepository', ->
 
     test_factory.exposeConversationActors()
     .then (conversation_repository) ->
+      storage_service = conversation_repository.conversation_service.storage_service
+
       conversation_et = _generate_conversation z.conversation.ConversationType.SELF
       conversation_et.id = payload.conversations.knock.post.conversation
       conversation_repository.save_conversation conversation_et
@@ -111,72 +114,8 @@ describe 'z.conversation.ConversationRepository', ->
 
   afterEach ->
     server.restore()
+    storage_service.clear_all_stores()
     jQuery.ajax.restore()
-
-  xdescribe 'Sending Ping events', ->
-    # @todo Unit test for sending encrypted pings
-    it 'can ping', ->
-      conversation_repository.send_ping conversation_et
-      server.respond()
-
-      expect(conversation_et.messages().length).toBe 1
-      expect(conversation_et.messages()[0].super_type).toEqual 'ping'
-
-  # @todo Initialize z.proto Message types
-  xdescribe 'Check for duplicated messages', ->
-    it 'ignores duplicated events (even if they do not occur in pairs)', ->
-      first_message = {"conversation": conversation_et.id, "time": "2015-03-12T16:43:37.993Z", "data": {"content": "Hello ", "nonce": "7092baae-d9ba-44a7-923b-0bffd076993f"}, "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5", "id": "1ec.800122000a775854", "type": "conversation.message-add"}
-      second_message = {"conversation": conversation_et.id, "time": "2015-03-12T16:43:41.063Z", "data": {"content": "World", "nonce": "cef2e84f-4d22-4e4d-b252-74153a4bcc23"}, "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5", "id": "1ed.800122000a775857", "type": "conversation.message-add"}
-      third_message = {"conversation": conversation_et.id, "time": "2015-03-12T16:44:51.253Z", "data": {"content": "!", "nonce": "4bc077b2-e261-4577-936f-2a105ddffd58"}, "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5", "id": "1ee.800122000a77587e", "type": "conversation.message-add"}
-
-      conversation_repository.on_conversation_event first_message
-      conversation_repository.on_conversation_event first_message
-
-      expect(conversation_et.messages().length).toBe 1
-
-      conversation_repository.on_conversation_event second_message
-      conversation_repository.on_conversation_event first_message
-      conversation_repository.on_conversation_event third_message
-      conversation_repository.on_conversation_event first_message
-
-      expect(conversation_et.messages().length).toBe 3
-
-    it 'ignores duplicated events (in any order) of different event types', ->
-      text = {"conversation": conversation_et.id, "time": "2015-03-12T23:33:53.717Z", "data": {"content": "Message", "nonce": "1dab326f-d410-47eb-bbc6-429642f8841b"}, "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5", "id": "1a8.800122000a777d0e", "type": "conversation.message-add"}
-      ping = {"conversation": conversation_et.id, "time": "2015-03-12T23:33:58.636Z", "data": {"nonce": "c2ebd2bf-d742-4c0c-b2a5-5b06f7d422f0"}, "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5", "id": "1a9.800122000a777d10", "type": "conversation.knock"}
-      hot_ping = {"conversation": conversation_et.id, "time": "2015-03-12T23:34:00.254Z", "data": {"nonce": "c2ebd2bf-d742-4c0c-b2a5-5b06f7d422f0", "ref": "1a9.800122000a777d10"}, "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5", "id": "1aa.800122000a777d11", "type": "conversation.hot-knock"}
-      call_activate = {"conversation": conversation_et.id, "time": "2015-03-12T23:34:10.501Z", "data": null, "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5", "id": "1ab.800122000a5c3101", "type": "conversation.voice-channel-activate"}
-      call_deactivate = {"conversation": conversation_et.id, "time": "2015-03-12T23:34:28.328Z", "data": {"reason": "missed"}, "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5", "id": "1ac.800122000a5c3109", "type": "conversation.voice-channel-deactivate"}
-      preview_image = {"conversation": conversation_et.id, "time": "2015-03-12T23:43:32.850Z", "data": {"content_length": 931, "data": "...", "content_type": "image/jpeg", "id": "3af1cdda-7f20-5cd9-b5fc-c13001979790", "info": {"height": 30, "tag": "preview", "original_width": 2448, "width": 30, "name": null, "correlation_id": "53f970d9-2e82-498f-89d2-5f8f25b0fafa", "original_height": 2448, "nonce": "53f970d9-2e82-498f-89d2-5f8f25b0fafa", "public": false}}, "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5", "id": "1ae.800122000a5c318d", "type": "conversation.asset-add"}
-      full_size_image = {"conversation": conversation_et.id, "time": "2015-03-12T23:43:36.405Z", "data": {"content_length": 212646, "data": null, "content_type": "image/jpeg", "id": "688309d6-c4aa-5bb1-908f-5051b74c1978", "info": {"height": 1448, "tag": "medium", "original_width": 2448, "width": 1448, "name": null, "correlation_id": "53f970d9-2e82-498f-89d2-5f8f25b0fafa", "original_height": 2448, "nonce": "53f970d9-2e82-498f-89d2-5f8f25b0fafa", "public": false}}, "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5", "id": "1af.800122000a5c318e", "type": "conversation.asset-add"}
-
-      conversation_repository.on_conversation_event call_deactivate
-      conversation_repository.on_conversation_event ping
-      conversation_repository.on_conversation_event hot_ping
-      conversation_repository.on_conversation_event call_deactivate
-      conversation_repository.on_conversation_event call_deactivate
-      conversation_repository.on_conversation_event hot_ping
-      conversation_repository.on_conversation_event text
-      conversation_repository.on_conversation_event ping
-      conversation_repository.on_conversation_event preview_image
-      conversation_repository.on_conversation_event full_size_image
-      conversation_repository.on_conversation_event text
-      conversation_repository.on_conversation_event text
-      conversation_repository.on_conversation_event call_activate
-      conversation_repository.on_conversation_event text
-
-      expect(conversation_et.messages().length).toBe 7
-
-    it 'accepts full size images being sent before preview images', ->
-      preview_image = {"conversation": conversation_et.id, "time": "2015-03-12T23:43:32.850Z", "data": {"content_length": 931, "data": "...", "content_type": "image/jpeg", "id": "3af1cdda-7f20-5cd9-b5fc-c13001979790", "info": {"height": 30, "tag": "preview", "original_width": 2448, "width": 30, "name": null, "correlation_id": "53f970d9-2e82-498f-89d2-5f8f25b0fafa", "original_height": 2448, "nonce": "53f970d9-2e82-498f-89d2-5f8f25b0fafa", "public": false}}, "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5", "id": "1ae.800122000a5c318d", "type": "conversation.asset-add"}
-      full_size_image = {"conversation": conversation_et.id, "time": "2015-03-12T23:43:36.405Z", "data": {"content_length": 212646, "data": null, "content_type": "image/jpeg", "id": "688309d6-c4aa-5bb1-908f-5051b74c1978", "info": {"height": 1448, "tag": "medium", "original_width": 2448, "width": 1448, "name": null, "correlation_id": "53f970d9-2e82-498f-89d2-5f8f25b0fafa", "original_height": 2448, "nonce": "53f970d9-2e82-498f-89d2-5f8f25b0fafa", "public": false}}, "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5", "id": "1af.800122000a5c318e", "type": "conversation.asset-add"}
-
-      conversation_repository.on_conversation_event full_size_image
-      conversation_repository.on_conversation_event preview_image
-      # Duplicated events will be ignored
-      conversation_repository.on_conversation_event full_size_image
-
-      expect(conversation_et.messages().length).toBe 2
 
   describe 'handle member join correctly', ->
 
@@ -198,7 +137,6 @@ describe 'z.conversation.ConversationRepository', ->
       conversation_repository.on_conversation_event member_join_event
       expect(conversation_repository.member_join).toHaveBeenCalled()
 
-    # TODO: HERE!
     it 'ignores member join if joining a one2on2 conversation', ->
 
       # conversation has a corresponding pending connection
@@ -350,6 +288,147 @@ describe 'z.conversation.ConversationRepository', ->
       result = conversation_repository.get_groups_by_name 'Removed'
       expect(result.length).toBe 0
 
+  describe 'delete_message_everyone', ->
+
+    conversation_et = null
+
+    beforeEach ->
+      conversation_et = _generate_conversation z.conversation.ConversationType.REGULAR
+
+      spyOn(conversation_repository, '_send_encrypted_value').and.returnValue Promise.resolve()
+
+    it 'does not delete other users messages', (done) ->
+      user_et = new z.entity.User()
+      user_et.is_me = false
+      message_to_delete_et = new z.entity.Message()
+      message_to_delete_et.id = z.util.create_random_uuid()
+      message_to_delete_et.user user_et
+      conversation_et.add_message message_to_delete_et
+
+      conversation_repository.delete_message_everyone conversation_et, message_to_delete_et
+      .then done.fail
+      .catch done
+
+    it 'sends delete and deletes message for own messages', (done) ->
+      user_et = new z.entity.User()
+      user_et.is_me = true
+      message_to_delete_et = new z.entity.Message()
+      message_to_delete_et.id = z.util.create_random_uuid()
+      message_to_delete_et.user user_et
+      conversation_et.add_message message_to_delete_et
+
+      expect(conversation_et.get_message_by_id(message_to_delete_et.id)).toBeDefined()
+      conversation_repository.delete_message_everyone conversation_et, message_to_delete_et
+      .then ->
+        expect(conversation_et.get_message_by_id(message_to_delete_et.id)).not.toBeDefined()
+        done()
+      .catch done.fail
+
+  describe 'message_hidden', ->
+
+    conversation_et = null
+    message_to_hide_et = null
+
+    beforeEach ->
+      conversation_et = _generate_conversation z.conversation.ConversationType.REGULAR
+      conversation_repository.save_conversation conversation_et
+
+      message_to_hide_et = new z.entity.PingMessage()
+      message_to_hide_et.id = z.util.create_random_uuid()
+      conversation_et.add_message message_to_hide_et
+
+    it 'does not hide message if sender is not self user', (done) ->
+      event =
+        conversation: conversation_et.id
+        id: z.util.create_random_uuid()
+        data:
+          message_id: message_to_hide_et.id
+          conversation_id: conversation_et.id
+        from: z.util.create_random_uuid()
+        time: new Date().toISOString()
+        type: z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
+
+      expect(conversation_et.get_message_by_id(message_to_hide_et.id)).toBeDefined()
+      conversation_repository.message_hidden event
+      .then done.fail
+      .catch ->
+        expect(conversation_et.get_message_by_id(message_to_hide_et.id)).toBeDefined()
+        done()
+
+    it 'hides message if sender is self user', (done) ->
+      event =
+        conversation: conversation_et.id
+        id: z.util.create_random_uuid()
+        data:
+          message_id: message_to_hide_et.id
+          conversation_id: conversation_et.id
+        from: user_repository.self().id
+        time: new Date().toISOString()
+        type: z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
+
+      expect(conversation_et.get_message_by_id(message_to_hide_et.id)).toBeDefined()
+      conversation_repository.message_hidden event
+      .then ->
+        expect(conversation_et.get_message_by_id(message_to_hide_et.id)).not.toBeDefined()
+        done()
+      .catch done.fail
+
+  describe 'message_deleted', ->
+
+    conversation_et = null
+    message_to_delete_et = null
+
+    beforeEach ->
+      conversation_et = _generate_conversation z.conversation.ConversationType.REGULAR
+      conversation_repository.save_conversation conversation_et
+
+      message_to_delete_et = new z.entity.PingMessage()
+      message_to_delete_et.id = z.util.create_random_uuid()
+      message_to_delete_et.from = user_repository.self().id
+      conversation_et.add_message message_to_delete_et
+
+      spyOn(conversation_repository, 'get_message_from_db').and.returnValue Promise.resolve message_to_delete_et
+      spyOn conversation_repository, '_add_delete_message'
+
+    it 'deletes message if user is self', (done) ->
+      event =
+        conversation: conversation_et.id
+        id: z.util.create_random_uuid()
+        data:
+          message_id: message_to_delete_et.id
+        from: user_repository.self().id
+        time: new Date().toISOString()
+        type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
+
+      expect(conversation_et.get_message_by_id(message_to_delete_et.id)).toBeDefined()
+      conversation_repository.message_deleted event
+      .then ->
+        expect(conversation_et.get_message_by_id(message_to_delete_et.id)).not.toBeDefined()
+        expect(conversation_repository._add_delete_message).not.toHaveBeenCalled()
+        done()
+      .catch done.fail
+
+    it 'deletes message and add delete message if user is not self', (done) ->
+      other_user_id = z.util.create_random_uuid()
+      message_to_delete_et.from = other_user_id
+
+      event =
+        conversation: conversation_et.id
+        id: z.util.create_random_uuid()
+        data:
+          message_id: message_to_delete_et.id
+        from: other_user_id
+        time: new Date().toISOString()
+        type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
+
+      expect(conversation_et.get_message_by_id(message_to_delete_et.id)).toBeDefined()
+      conversation_repository.message_deleted event
+      .then ->
+        expect(conversation_et.get_message_by_id(message_to_delete_et.id)).not.toBeDefined()
+        expect(conversation_repository._add_delete_message).toHaveBeenCalled()
+        done()
+      .catch done.fail
+
   describe 'get_number_of_pending_uploads', ->
 
     it 'should return number of pending uploads if there are pending uploads', ->
@@ -463,23 +542,6 @@ describe 'z.conversation.ConversationRepository', ->
         conversation: conversation_et.id
 
       conversation_repository.asset_upload_failed conversation_et, event
-
-      expect(conversation_service.delete_message_from_db).toHaveBeenCalledWith conversation_et.id, message_et.id
-      expect(conversation_et.get_message_by_id message_et.id).toBeUndefined()
-
-    it 'should delete message on receiver side', ->
-      # mocked event response
-      event =
-        data:
-          conversation_id: conversation_et.id
-          message_id: message_et.id
-        from: z.util.create_random_uuid()
-        time: Date.now()
-        id: message_et.id
-        type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
-        conversation: conversation_et.id
-
-      conversation_repository.message_deleted event
 
       expect(conversation_service.delete_message_from_db).toHaveBeenCalledWith conversation_et.id, message_et.id
       expect(conversation_et.get_message_by_id message_et.id).toBeUndefined()
@@ -624,7 +686,6 @@ describe 'z.conversation.ConversationRepository', ->
         .catch done.fail
 
   describe '_send_as_external_message', ->
-
     it 'should return true for big payload', ->
       external_conversation_et = _generate_conversation()
       external_conversation_et.participating_user_ids [0..128]
@@ -643,3 +704,57 @@ describe 'z.conversation.ConversationRepository', ->
       should_send_as_external = conversation_repository._send_as_external_message conversation_et, generic_message
       expect(should_send_as_external).toBeFalsy()
 
+  describe 'get_events', ->
+    it 'gets messages which are not broken by design', (done) ->
+      conversation_et = new z.entity.Conversation z.util.create_random_uuid()
+      #@formatter:off
+      bad_message = {"raw":{"from":"532af01e-1e24-4366-aacf-33b67d4ee376","type":"conversation.otr-message-add","conversation":conversation_et.id},"meta":{"timestamp":null,"version":1},"mapped":{"conversation":"573b6978-7700-443e-9ce5-ff78b35ac590","id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Hello World :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"}}
+      good_message = {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","type":"conversation.otr-message-add","conversation":conversation_et.id},"meta":{"timestamp":1470317313389,"version":1},"mapped":{"conversation":"573b6978-7700-443e-9ce5-ff78b35ac590","id":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","data":{"content":"Fifth message","nonce":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","previews":[]},"type":"conversation.message-add"}}
+      #@formatter:on
+      bad_message_key = "#{conversation_et.id}@#{bad_message.raw.from}@NaN"
+      good_message_key = "#{conversation_et.id}@#{good_message.raw.from}@#{new Date(good_message.raw.time).getTime()}"
+
+      object_store = storage_service.OBJECT_STORE_CONVERSATION_EVENTS
+
+      save_messages = []
+      save_messages.push storage_service.save object_store, bad_message_key, bad_message
+      save_messages.push storage_service.save object_store, good_message_key, good_message
+
+      Promise.all save_messages
+      .then =>
+        return conversation_repository.get_events conversation_et
+      .then (loaded_events) =>
+        expect(loaded_events.length).toBe 1
+        done()
+
+  describe 'is_bot_conversation', ->
+    it 'detects bot conversations by the email of the remote participant', ->
+      bot = new z.entity.User()
+      bot.email 'anna@wire.com'
+
+      conversation_et = new z.entity.Conversation z.util.create_random_uuid()
+      conversation_et.participating_user_ets.push bot
+      conversation_et.type z.conversation.ConversationType.SELF
+      conversation_repository.active_conversation conversation_et
+
+      expect(conversation_repository.is_bot_conversation()).toBe false
+      conversation_et.type z.conversation.ConversationType.ONE2ONE
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'anne@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe false
+      bot.email 'anna+123@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'anna+quiz@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'welcome@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'welcome+123@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'welcome+chef@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'welcome+@@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'ottobot@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe true
+      bot.email 'hello@wire.com'
+      expect(conversation_repository.is_bot_conversation()).toBe false

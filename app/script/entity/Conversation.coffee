@@ -279,12 +279,12 @@ class z.entity.Conversation
     z.util.ko_array_unshift_all @messages_unordered, message_ets
 
   ###
-  Removes a single message from the conversation by message id.
+  Removes message from the conversation by message id.
   @param message_id [String] ID of the message entity to be removed from the conversation
   ###
   remove_message_by_id: (message_id) ->
-    message_et = @get_message_by_id message_id
-    @messages_unordered.remove message_et if message_et?
+    for message_et in @messages_unordered() by -1
+      @messages_unordered.remove message_et if message_et.id is message_id
 
   ###
   Removes a single message from the conversation.
@@ -498,7 +498,7 @@ class z.entity.Conversation
   ###############################################################################
 
   serialize: =>
-    return {} =
+    return {
       id: @id
       archived_state: @archived_state()
       archived_timestamp: @archived_timestamp()
@@ -507,3 +507,4 @@ class z.entity.Conversation
       last_read_timestamp: @last_read_timestamp()
       muted_state: @muted_state()
       muted_timestamp: @muted_timestamp()
+    }

@@ -383,8 +383,9 @@ class z.telemetry.calling.FlowTelemetry
 
   # Get full report.
   get_automation_report: =>
-    return {} =
+    return {
       report: @create_automation_report()
+    }
 
   # Log the flow to the browser console.
   log_status: (participant_et) =>

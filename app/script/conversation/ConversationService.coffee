@@ -42,7 +42,7 @@ class z.conversation.ConversationService
       @storage_service.save store_name, conversation_et.id, conversation_et.serialize()
       .then (primary_key) =>
         @logger.log @logger.levels.INFO, "Conversation '#{primary_key}' was stored for the first time"
-        resolve()
+        resolve conversation_et
       .catch (error) =>
         @logger.log @logger.levels.ERROR, "Conversation '#{conversation_et.id}' could not be stored", error
         reject error
@@ -199,6 +199,7 @@ class z.conversation.ConversationService
 
   @param message_id [String] ID of conversation to remove message from
   @param primary_key [String] ID of the actual message
+  @return [Promise] Resolves with the number of deleted records
   ###
   delete_message_from_db: (conversation_id, message_id) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
@@ -278,12 +279,32 @@ class z.conversation.ConversationService
         reject error
 
   ###
+  Load conversation event.
+
+  @param conversation_id [String] ID of conversation
+  @param message_id [String]
+  ###
+  load_event_from_db: (conversation_id, message_id) ->
+    return new Promise (resolve, reject) =>
+      @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+      .where 'raw.conversation'
+      .equals conversation_id
+      .filter (record) -> record.mapped?.id is message_id
+      .first()
+      .then (record) ->
+        resolve record
+      .catch (error) =>
+        @logger.log @logger.levels.ERROR,
+          "Failed to get event for conversation '#{conversation_id}': #{error.message}", error
+        reject error
+
+  ###
   Load conversation events.
 
   @param conversation_id [String] ID of conversation
   @param offset [String] Timestamp that loaded events have to undercut
   @param limit [Number] Amount of events to load
-  @return [Promise] Promise that resolves with the retrieved records
+  @return [Promise] Promise that resolves with the retrieved records ([events, has_further_events])
   ###
   load_events_from_db: (conversation_id, offset, limit = z.config.MESSAGES_FETCH_LIMIT) ->
     return new Promise (resolve, reject) =>
@@ -298,7 +319,7 @@ class z.conversation.ConversationService
         resolve [records.slice(0, limit), has_further_events]
       .catch (error) =>
         @logger.log @logger.levels.ERROR,
-          "Failed to get events for conversation '#{conversation_et.id}': #{error.message}", error
+          "Failed to get events for conversation '#{conversation_id}': #{error.message}", error
         reject error
 
   ###

@@ -225,7 +225,7 @@ window.TestFactory.prototype.exposeConversationActors = function () {
   var self = this;
   return new Promise(function (resolve) {
     self.exposeUserActors().then(function () {
-      window.conversation_service = new z.conversation.ConversationService(self.client);
+      window.conversation_service = new z.conversation.ConversationService(self.client, window.storage_service);
       window.conversation_service.logger.level = self.settings.logging_level;
 
       window.conversation_repository = new z.conversation.ConversationRepository(
@@ -308,5 +308,18 @@ window.TestFactory.prototype.exposeAnnounceActors = function () {
     window.announce_repository = new z.announce.AnnounceRepository(window.announce_service);
     window.announce_repository.logger.level = self.settings.logging_level;
     resolve(window.announce_repository);
+  });
+};
+
+/**
+ *
+ * @returns {Promise<z.audio.AudioRepository>}
+ */
+window.TestFactory.prototype.exposeAudioActors = function () {
+  var self = this;
+  return new Promise(function (resolve) {
+    window.audio_repository = new z.audio.AudioRepository();
+    window.audio_repository.logger.level = self.settings.logging_level;
+    resolve(window.audio_repository);
   });
 };

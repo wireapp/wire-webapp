@@ -175,8 +175,12 @@ z.string.de.modal_connected_device_message = 'Falls du dieses Gerät nicht hinzu
 z.string.de.modal_connected_device_manage_devices = 'Geräte verwalten'
 # Delete message
 z.string.de.modal_delete_button = 'Löschen'
-z.string.de.modal_delete_headline = 'Nachricht löschen'
-z.string.de.modal_delete_message = 'Die Nachricht wird nur auf deiner Seite der Unterhaltung gelöscht. Dies kann nicht rückgängig gemacht werden.'
+z.string.de.modal_delete_headline = 'Nur für mich löschen?'
+z.string.de.modal_delete_message = 'Dies kann nicht rückgängig gemacht werden.'
+# Delete message
+z.string.de.modal_delete_everyone_button = 'Löschen'
+z.string.de.modal_delete_everyone_headline = 'Für alle löschen?'
+z.string.de.modal_delete_everyone_message = 'Dies kann nicht rückgängig gemacht werden.'
 # Too long message
 z.string.de.modal_too_long_headline = 'Nachricht zu lang'
 z.string.de.modal_too_long_message = 'Du kannst Nachrichten mit bis zu %no Zeichen senden.'
@@ -260,6 +264,10 @@ z.string.de.conversation_asset_downloading = 'Herunterladen…'
 z.string.de.conversation_asset_upload_failed = 'Hochladen fehlgeschlagen'
 z.string.de.conversation_asset_upload_too_large = 'Du kannst Dateien bis zu %no senden.'
 z.string.de.conversation_playback_error = 'Konnte nicht abgespielt werden'
+z.string.de.conversation_context_menu_delete = 'Nur für mich löschen'
+z.string.de.conversation_context_menu_delete_everyone = 'Für alle löschen'
+z.string.de.conversation_context_menu_download = 'Herunterladen'
+z.string.de.conversation_delete_timestamp = 'Gelöscht um %@timestamp'
 
 # Conversation list
 z.string.de.conversation_list_archive = 'Archiv'

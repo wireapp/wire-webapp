@@ -28,6 +28,7 @@ IGNORED_BACKEND_ERRORS = [
   z.service.BackendClientError::STATUS_CODE.NOT_FOUND
   z.service.BackendClientError::STATUS_CODE.PRECONDITION_FAILED
   z.service.BackendClientError::STATUS_CODE.REQUEST_TIMEOUT
+  z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
   z.service.BackendClientError::STATUS_CODE.TOO_MANY_REQUESTS
 ]
 

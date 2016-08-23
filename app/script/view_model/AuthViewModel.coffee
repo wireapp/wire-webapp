@@ -37,6 +37,8 @@ class z.ViewModel.AuthViewModel
     @event_tracker = new z.tracking.EventTrackingRepository()
     @user_service = new z.user.UserService @auth.client
 
+    @audio_repository = @auth.audio
+
     # Cryptography
     @asset_service = new z.assets.AssetService @auth.client
     # TODO: Don't operate with the service directly. Get a repository!
@@ -238,6 +240,8 @@ class z.ViewModel.AuthViewModel
     # Select country based on location of user IP
     @country_code (z.util.CountryCodes.get_country_code($('[name=geoip]').attr 'country') or 1).toString()
     @changed_country_code()
+
+    @audio_repository.init()
 
 
   ###############################################################################

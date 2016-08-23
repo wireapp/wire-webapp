@@ -82,6 +82,8 @@ class z.conversation.EventMapper
         message_et = @_map_event_location event
       when z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
         message_et = @_map_system_event_unable_to_decrypt event
+      when z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+        message_et = @_map_system_event_delete_everywhere event
       else
         message_et = @_map_event_ignored()
 
@@ -92,7 +94,8 @@ class z.conversation.EventMapper
     message_et.primary_key = "#{conversation_et.id}@#{message_et.from}@#{message_et.timestamp}"
 
     if window.isNaN message_et.timestamp
-      @logger.log @logger.levels.ERROR, 'Could not get timestamp for message', event
+      @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
+      message_et = undefined
 
     return message_et
 
@@ -336,9 +339,9 @@ class z.conversation.EventMapper
   ###
   _map_link_previews: (link_previews = []) ->
     return link_previews
-      .map (encoded_link_preview) -> z.proto.LinkPreview.decode64 encoded_link_preview
-      .map (link_preview) => @_map_link_preview link_preview
-      .filter (link_preview_et) -> link_preview_et?
+    .map (encoded_link_preview) -> z.proto.LinkPreview.decode64 encoded_link_preview
+    .map (link_preview) => @_map_link_preview link_preview
+    .filter (link_preview_et) -> link_preview_et?
 
   ###
   Map link preview
@@ -430,8 +433,8 @@ class z.conversation.EventMapper
     asset_et.file_name = data.data.info.name
     asset_et.meta = data.data.meta
     asset_et.original_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, asset_et.id, data.data.otr_key, data.data.sha256,
-    if data.data.preview_id?
-      asset_et.preview_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, data.data.preview_id, data.data.preview_otr_key, data.data.preview_sha256
+      if data.data.preview_id?
+        asset_et.preview_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, data.data.preview_id, data.data.preview_otr_key, data.data.preview_sha256
     asset_et.status data.data.status or z.assets.AssetTransferState.UPLOADING # TODO
     return asset_et
 
@@ -449,4 +452,18 @@ class z.conversation.EventMapper
     # error_code style "3690 (f0c0272e8f053774)"
     message_et.error_code = event.error_code?.substring(0, 4)
     message_et.client_id = event.error_code?.substring(5).replace(/[()]/g, '')
+    return message_et
+
+  ###
+  Maps JSON data of delete everywhere event to message entity
+
+  @private
+
+  @param data [Object] Error data received as JSON
+
+  @return [z.entity.MediumImage] Medium image asset entity
+  ###
+  _map_system_event_delete_everywhere: (event) ->
+    message_et = new z.entity.DeleteMessage()
+    message_et.deleted_timestamp = new Date(event.data.deleted_time).getTime()
     return message_et

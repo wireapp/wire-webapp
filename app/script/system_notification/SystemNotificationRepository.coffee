@@ -324,9 +324,10 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Notification message data
   ###
   _create_options_data: (input, message_et) ->
-    return {} =
+    return {
       conversation_id: input.id or input.conversation_id
       message_id: message_et.id
+    }
 
   ###
   Creates the notification tag.
@@ -382,7 +383,7 @@ class z.SystemNotification.SystemNotificationRepository
   @param message_et [z.entity.Message] Message entity
   ###
   _notify_banner: (conversation_et, message_et) ->
-    return if z.util.Environment.browser.supports.notifications is false
+    return if not z.util.Environment.browser.supports.notifications
     return if window.Notification.permission is z.util.BrowserPermissionType.DENIED
     return if document.hasFocus()
     return if message_et.user()?.is_me

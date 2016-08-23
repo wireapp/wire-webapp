@@ -112,7 +112,7 @@ class z.main.App
     view.start_ui                  = new z.ViewModel.StartUIViewModel 'start-ui', @repository.conversation, @repository.search, @repository.user, @repository.connect
     view.archive                   = new z.ViewModel.ArchiveViewModel 'archive', @repository.conversation
     view.actions                   = new z.ViewModel.ActionsViewModel 'actions-bubble', @repository.conversation, @repository.user, view.conversation_list
-    view.title                     = new z.ViewModel.WindowTitleViewModel view.content, @repository.user, @repository.conversation
+    view.title                     = new z.ViewModel.WindowTitleViewModel view.content.state, @repository.user, @repository.conversation
     view.welcome                   = new z.ViewModel.WelcomeViewModel 'welcome', @repository.user
     view.settings                  = new z.ViewModel.SettingsViewModel 'self-settings', @repository.user, @repository.conversation, @repository.client, @repository.cryptography
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
@@ -208,8 +208,9 @@ class z.main.App
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.APP_LOADED
       return @repository.conversation.update_conversations @repository.conversation.conversations_unarchived()
     .then =>
-      @repository.announce.init()
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS
+      @repository.announce.init()
+      @repository.audio.init true
       @logger.log @logger.levels.INFO, 'App fully loaded'
     .catch (error) =>
       @logger.log @logger.levels.INFO, 'Error during app initialization.'
@@ -442,10 +443,12 @@ class z.main.App
 
   # Disable debugging on any environment.
   disable_debugging: ->
+    z.config.LOGGER.OPTIONS.domains['app.wire.com'] = -> 0
     amplify.publish z.event.WebApp.PROPERTIES.CHANGE.DEBUG, false
 
   # Enable debugging on any environment.
   enable_debugging: ->
+    z.config.LOGGER.OPTIONS.domains['app.wire.com'] = -> 300
     amplify.publish z.event.WebApp.PROPERTIES.CHANGE.DEBUG, true
 
   # Report call telemetry to Raygun for analysis.

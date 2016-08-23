@@ -55,9 +55,8 @@ module.exports = (grunt) ->
 
       req = request.post options, (error, response) =>
         if error
-          grunt.log.error 'Upload to Raygun failed. Are the Raygun credentials correct?'
           grunt.log.error error.message
-          return done()
+          throw new Error 'Upload to Raygun failed. Are the Raygun credentials correct?'
 
         if response.statusCode is 200
           file = response.request.headers.WireFilename

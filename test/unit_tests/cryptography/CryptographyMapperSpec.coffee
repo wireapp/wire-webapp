@@ -199,11 +199,29 @@ describe 'z.cryptography.CryptographyMapper', ->
         done()
       .catch done.fail
 
-    it 'resolves with a mapped deleted message', (done) ->
+    it 'resolves with a mapped hidden message', (done) ->
       conversation_id = z.util.create_random_uuid()
       message_id = z.util.create_random_uuid()
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'deleted', new z.proto.MsgDeleted conversation_id, message_id
+      generic_message.set 'hidden', new z.proto.MessageHide conversation_id, message_id
+
+      mapper.map_generic_message generic_message, event
+      .then (event_json) ->
+        expect(_.isObject event_json).toBeTruthy()
+        expect(event_json.type).toBe z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
+        expect(event_json.conversation).toBe event.conversation
+        expect(event_json.from).toBe event.from
+        expect(event_json.time).toBe event.time
+        expect(event_json.id).toBe generic_message.message_id
+        expect(event_json.data.conversation_id).toBe conversation_id
+        expect(event_json.data.message_id).toBe message_id
+        done()
+      .catch done.fail
+
+    it 'resolves with a mapped deleted message', (done) ->
+      message_id = z.util.create_random_uuid()
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'deleted', new z.proto.MessageDelete message_id
 
       mapper.map_generic_message generic_message, event
       .then (event_json) ->
@@ -213,7 +231,6 @@ describe 'z.cryptography.CryptographyMapper', ->
         expect(event_json.from).toBe event.from
         expect(event_json.time).toBe event.time
         expect(event_json.id).toBe generic_message.message_id
-        expect(event_json.data.conversation_id).toBe conversation_id
         expect(event_json.data.message_id).toBe message_id
         done()
       .catch done.fail

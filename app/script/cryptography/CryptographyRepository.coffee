@@ -205,7 +205,7 @@ class z.cryptography.CryptographyRepository
       .then (cryptobox_session_map) ->
         resolve cryptobox_session_map
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Failed to get sessions: #{error.message}", user_client_map
+        @logger.log @logger.levels.ERROR, "Failed to get sessions: #{error.message}", [error, user_client_map]
         reject error
 
   ###
@@ -344,7 +344,11 @@ class z.cryptography.CryptographyRepository
       for user_id, client_pre_keys of user_pre_key_map
         cryptobox_session_map[user_id] ?= {}
         for client_id, pre_key of client_pre_keys when pre_key
-          cryptobox_session_map[user_id][client_id] = @_session_from_prekey user_id, client_id, pre_key.key
+          try
+            session = @_session_from_prekey user_id, client_id, pre_key.key
+            cryptobox_session_map[user_id][client_id] = @_session_from_prekey user_id, client_id, pre_key.key
+          catch error
+            @logger.log @logger.levels.ERROR, "Problem initiating a session for client ID '#{client_id}' from user ID '#{user_id}': #{error.message} — Skipping session.", error
       return cryptobox_session_map
     .catch (error) =>
       if error.type is z.user.UserError::TYPE.REQUEST_FAILURE
@@ -400,7 +404,7 @@ class z.cryptography.CryptographyRepository
       else
         payload = @_construct_payload @current_client().id
         use_local_sessions = true
-        @logger.log @logger.levels.INFO, 'Encrypt message using local sessions'
+        @logger.log @logger.levels.INFO, "Encrypt '#{generic_message.content}' message using local sessions"
       return @get_sessions user_client_map, use_local_sessions
     .then (cryptobox_session_map) =>
       return @_add_payload_recipients payload, generic_message, cryptobox_session_map
@@ -429,9 +433,10 @@ class z.cryptography.CryptographyRepository
   @return [Object] Payload to send to backend
   ###
   _construct_payload: (sender) ->
-    return {} =
+    return {
       sender: sender
       recipients: {}
+    }
 
   ###
   Encrypt the generic message for a given session.
@@ -517,7 +522,10 @@ class z.cryptography.CryptographyRepository
 
         # Show error in JS console
         @logger.log @logger.levels.ERROR,
-          "Decryption of '#{event.type}' (#{primary_key}) failed: #{decrypt_error.message}", {error: decrypt_error, event: event}
+          "Decryption of '#{event.type}' (#{primary_key}) failed: #{decrypt_error.message}", {
+            error: decrypt_error,
+            event: event
+          }
 
         # Report error to Localytics and Raygun
         hashed_error_message = z.util.murmurhash3 decrypt_error.message, 42

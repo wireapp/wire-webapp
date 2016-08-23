@@ -108,6 +108,7 @@ class z.ViewModel.MessageListViewModel
         , 1000
 
     amplify.subscribe z.event.WebApp.CONVERSATION.PEOPLE.HIDE, @hide_bubble
+    amplify.subscribe z.event.WebApp.CONTEXT_MENU, @on_context_menu_action
 
   ###
   Remove all subscriptions and reset states.
@@ -326,6 +327,7 @@ class z.ViewModel.MessageListViewModel
   ###
   after_message_render: (elements, message) =>
     window.requestAnimFrame =>
+      return if not @conversation_repository.active_conversation()
       message_index = @conversation_repository.active_conversation().messages_visible().indexOf message
       if message_index > 0
         last_message = @conversation_repository.active_conversation().messages_visible()[message_index - 1]
@@ -373,7 +375,7 @@ class z.ViewModel.MessageListViewModel
 
       if z.util.array_is_last @conversation().messages_visible(), message
         # Defer initial rendering
-        window.requestAnimFrame => @on_initial_rendering()
+        window.requestAnimFrame => @on_initial_rendering?()
 
   before_message_remove: (dom_node) ->
     if $(dom_node).hasClass 'message' and not @conversation_is_changing
@@ -455,6 +457,55 @@ class z.ViewModel.MessageListViewModel
           return 'message-system message-rename'
       when z.message.SuperType.UNABLE_TO_DECRYPT
         return 'message-system'
+
+  ###
+  Create context menu entries for given message
+  @param message_et [z.entity.Message]
+  ###
+  get_context_menu_entries: (message_et) =>
+    entries = []
+
+    @_track_context_menu message_et
+
+    if message_et.has_asset()
+      entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
+
+    if message_et.is_deletable()
+      entries.push {label: z.string.conversation_context_menu_delete, action: 'delete'}
+
+    if message_et.user().is_me and not @conversation().removed_from_conversation()
+      entries.push {label: z.string.conversation_context_menu_delete_everyone, action: 'delete-everyone'}
+
+    return entries
+
+  ###
+  Track context menu click
+  @param message_et [z.entity.Message]
+  ###
+  _track_context_menu: (message_et) =>
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.SELECTED_MESSAGE,
+      context: 'single'
+      conversation_type: z.tracking.helpers.get_conversation_type @conversation()
+      type: z.tracking.helpers.get_message_type message_et
+
+  ###
+  Click on context menu entry
+  @param tag [String] associated tag
+  @param action [String] action that was triggered
+  @param data [Object] optional data
+  ###
+  on_context_menu_action: (tag, action, data) =>
+    return if tag isnt 'message'
+
+    message_et = @conversation().get_message_by_id data
+
+    switch action
+      when 'delete'
+        message_et?.delete()
+      when 'delete-everyone'
+        message_et?.delete_everyone()
+      when 'download'
+        message_et?.get_first_asset()?.download()
 
   ###
   Shows detail image view.

@@ -256,7 +256,6 @@ class z.user.UserRepository
   _update_connection_status: (user_et, status, show_conversation = false) =>
     return Promise.resolve()
     .then =>
-      # check if the status has changed
       return if user_et.connection().status() is status
       return @user_service.update_connection_status user_et.id, status
     .then (response) =>
@@ -265,9 +264,10 @@ class z.user.UserRepository
       @logger.log @logger.levels.ERROR,
         "Connection status change to '#{status}' for user '#{user_et.id}' failed: #{error.message}", error
       custom_data =
+        current_status: user_et.connection().status()
         failed_action: status
         server_error: error
-      Raygun.send new Error('Connection Status change failed'), custom_data
+      Raygun.send new Error('Connection status change failed'), custom_data
 
   ###############################################################################
   # Events

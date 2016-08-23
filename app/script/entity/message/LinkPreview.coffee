@@ -24,7 +24,7 @@ class z.entity.LinkPreview
 
     @title = ''
     @summary = ''
-    @orginal_url = ''
+    @original_url = ''
     @permanent_url = ''
     @url_offset = 0
 
