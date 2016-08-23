@@ -569,5 +569,75 @@ describe 'Conversation', ->
 
   describe 'get_last_text_message_content', ->
 
+    self_user_et = undefined
+
+    beforeEach ->
+      self_user_et = new z.entity.User()
+      self_user_et.is_me = true
+
+    afterEach ->
+      conversation_et.remove_messages()
+
     it 'returns undefined if conversation has no messages', ->
       expect(conversation_et.get_last_text_message_content()).not.toBeDefined()
+
+    it 'returns undefined if last message is not text and not added by self user', ->
+      message_et = new z.entity.PingMessage()
+      message_et.id = z.util.create_random_uuid()
+      message_et.user new z.entity.User()
+      conversation_et.add_message message_et
+      expect(conversation_et.get_last_text_message_content()).not.toBeDefined()
+
+    it 'returns undefined if last message is not text and not added by self user', ->
+      message_et = new z.entity.PingMessage()
+      message_et.id = z.util.create_random_uuid()
+      message_et.user new z.entity.User()
+      conversation_et.add_message message_et
+      expect(conversation_et.get_last_text_message_content()).not.toBeDefined()
+
+    it 'returns undefined if last message is text and not send by self user', ->
+      message_et = new z.entity.ContentMessage()
+      message_et.add_asset new z.entity.Text()
+      message_et.id = z.util.create_random_uuid()
+      message_et.user new z.entity.User()
+      conversation_et.add_message message_et
+      expect(conversation_et.get_last_text_message_content()).not.toBeDefined()
+
+    it 'returns message if last message is text and send by self user', ->
+      message_et = new z.entity.ContentMessage()
+      message_et.add_asset new z.entity.Text()
+      message_et.id = z.util.create_random_uuid()
+      message_et.user self_user_et
+      conversation_et.add_message message_et
+      expect(conversation_et.get_last_text_message_content()).toBeDefined()
+
+    it 'returns message if last message is text and send by self user', ->
+      message_et = new z.entity.ContentMessage()
+      message_et.add_asset new z.entity.Text()
+      message_et.id = z.util.create_random_uuid()
+      message_et.user self_user_et
+      conversation_et.add_message message_et
+
+      ping_message_et = new z.entity.PingMessage()
+      ping_message_et.id = z.util.create_random_uuid()
+      ping_message_et.user new z.entity.User()
+      conversation_et.add_message ping_message_et
+
+      expect(conversation_et.get_last_text_message_content()).toBeDefined()
+      expect(conversation_et.get_last_text_message_content().id).toBe message_et.id
+
+    it 'returns message if last message is text and send by self user', ->
+      message_et = new z.entity.ContentMessage()
+      message_et.add_asset new z.entity.Text()
+      message_et.id = z.util.create_random_uuid()
+      message_et.user self_user_et
+      conversation_et.add_message message_et
+
+      next_message_et = new z.entity.ContentMessage()
+      next_message_et.add_asset new z.entity.Text()
+      next_message_et.id = z.util.create_random_uuid()
+      next_message_et.user self_user_et
+      conversation_et.add_message next_message_et
+
+      expect(conversation_et.get_last_text_message_content()).toBeDefined()
+      expect(conversation_et.get_last_text_message_content().id).toBe next_message_et.id

@@ -109,12 +109,7 @@ class z.ViewModel.ConversationInputViewModel
         characters: message.length
       return
 
-    link_data = z.links.LinkPreviewHelpers.get_first_link_with_offset message
-    if link_data?
-      [url, offset] = link_data
-      @conversation_repository.send_message_with_link_preview message, url, offset, @conversation_et()
-    else
-      @conversation_repository.send_message message, @conversation_et()
+    @conversation_repository.send_message_with_link_preview message, @conversation_et()
 
   send_message_edit: (message, message_et) =>
     if message.length is 0

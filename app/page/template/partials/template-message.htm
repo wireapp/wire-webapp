@@ -64,8 +64,7 @@
     <div class="message-header-label label-semibold text-graphite">
       <span data-bind='text: message.sender_name()'></span>
       <!-- ko if: was_edited() -->
-        <span class="message-header-label-icon icon-edit"></span>
-        <span data-bind="text: moment(message.edited_timestamp).format('HH:mm')"></span>
+        <span class="message-header-label-icon icon-edit" data-bind="attr: {title: moment(message.edited_timestamp).format('HH:mm')}"></span>
       <!-- /ko -->
     </div>
   </div>

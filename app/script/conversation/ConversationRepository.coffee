@@ -884,16 +884,17 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation that should receive the message
   @return [Promise] Promise that resolves after sending the message
   ###
-  send_message_with_link_preview: (message, url, offset, conversation_et) =>
+  send_message_with_link_preview: (message, conversation_et) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'text', new z.proto.Text message
 
     @_send_and_save_generic_message conversation_et, generic_message
     .then =>
-      @link_repository.get_link_preview url, offset
+      @link_repository.get_link_preview_from_string message
     .then (link_preview) =>
-      generic_message.text.link_preview.push link_preview
-      @_send_and_save_generic_message conversation_et, generic_message
+      if link_preview?
+        generic_message.text.link_preview.push link_preview
+        @_send_and_save_generic_message conversation_et, generic_message
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Error while sending link preview: #{error.message}", error
 
@@ -929,8 +930,6 @@ class z.conversation.ConversationRepository
   ###
   Send edited message to specific conversation.
 
-  # TODO send link preview
-
   @param message [String] plain text message
   @param original_message_et [z.entity.Message]
   @param conversation_et [z.entity.Conversation]
@@ -947,13 +946,18 @@ class z.conversation.ConversationRepository
       generic_message.set 'edited', new z.proto.MessageEdit original_message_et.id, new z.proto.Text message
       return generic_message
     .then (generic_message) =>
-      # TODO external
       @_send_generic_message conversation_et.id, generic_message
     .then (response) =>
       event = @_construct_otr_message_event response, conversation_et.id
       return @cryptography_repository.save_encrypted_event generic_message, event
     .then (record) =>
       @on_conversation_event record.mapped if record?.mapped
+    .then =>
+      @link_repository.get_link_preview_from_string message
+    .then (link_preview) =>
+      if link_preview?
+        generic_message.edited.text.link_preview.push link_preview
+        @_send_and_save_generic_message conversation_et, generic_message
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Error while sending message: #{error.message}", error
       throw error
@@ -1196,6 +1200,8 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
   _send_encrypted_message: (conversation_id, generic_message, payload) =>
+    @logger.log @logger.levels.INFO,
+      "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
     @conversation_service.post_encrypted_message conversation_id, payload, false
     .catch (error_response) =>
       return @_update_payload_for_changed_clients error_response, generic_message, payload
