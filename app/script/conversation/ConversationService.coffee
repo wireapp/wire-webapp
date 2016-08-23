@@ -229,8 +229,9 @@ class z.conversation.ConversationService
     updated_record = undefined
     @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
     .then (record) =>
-      record.meta.timestamp = timestamp
+      record.mapped.data.edited_time = record.mapped.time
       record.mapped.time = record.raw.time = new Date(timestamp).toISOString()
+      record.meta.timestamp = timestamp
       updated_record = record
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>

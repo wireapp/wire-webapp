@@ -1165,7 +1165,7 @@ class z.conversation.ConversationRepository
     .then (payload) =>
       payload.data = z.util.array_to_base64 ciphertext
       payload.native_push = true
-      @_send_encrypted_message conversation_id, payload
+      @_send_encrypted_message conversation_id, generic_message, payload
     .catch (error) =>
       @logger.log @logger.levels.INFO, 'Failed sending external message', error
 
@@ -1182,7 +1182,7 @@ class z.conversation.ConversationRepository
     .then (user_client_map) =>
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
     .then (payload) =>
-      @_send_encrypted_message conversation_id, payload
+      @_send_encrypted_message conversation_id, generic_message, payload
     .catch (error) =>
       @logger.log @logger.levels.INFO, 'Failed sending generic message', error
 
@@ -1192,12 +1192,13 @@ class z.conversation.ConversationRepository
   @private
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
+  @param payload [Object]
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
-  _send_encrypted_message: (conversation_id, payload) =>
+  _send_encrypted_message: (conversation_id, generic_message, payload) =>
     @conversation_service.post_encrypted_message conversation_id, payload, false
     .catch (error_response) =>
-      return @_update_payload_for_changed_clients error_response, generic_message, initial_payload
+      return @_update_payload_for_changed_clients error_response, generic_message, payload
       .then (updated_payload) =>
         @logger.log @logger.levels.INFO,
           "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload

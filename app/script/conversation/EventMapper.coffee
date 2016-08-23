@@ -229,6 +229,7 @@ class z.conversation.EventMapper
     message_et.assets.push @_map_asset_text event.data
     message_et.nonce = event.data.nonce
     message_et.replacing_message_id = event.data.replacing_message_id
+    message_et.edited_timestamp = new Date(event.data.edited_time).getTime()
     return message_et
 
   ###
