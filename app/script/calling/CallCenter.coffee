@@ -158,8 +158,8 @@ class z.calling.CallCenter
       if conversation_id
         for call_et in @calls() when call_et.id is conversation_id
           return call_et
-        throw new z.calling.CallError 'No call for conversation ID found', z.calling.CallError::TYPE.CALL_NOT_FOUND
-      throw new z.calling.CallError 'No conversation ID given', z.calling.CallError::TYPE.NO_CONVERSATION_ID
+        throw new z.calling.CallError z.calling.CallError::TYPE.CALL_NOT_FOUND
+      throw new z.calling.CallError z.calling.CallError::TYPE.NO_CONVERSATION_ID
 
   ###
   Helper to identify the creator of a call or choose the first joined one.

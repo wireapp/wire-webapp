@@ -155,7 +155,7 @@ class z.auth.AuthRepository
       access_token_type = z.storage.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE
 
       if access_token
-        @logger.log @logger.levels.INFO, 'Cached access token found in Local Storage', access_token
+        @logger.log @logger.levels.INFO, 'Cached access token found in Local Storage', {access_token: access_token}
         @auth_service.save_access_token_in_client access_token_type, access_token
         @_schedule_token_refresh z.storage.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION
         resolve()

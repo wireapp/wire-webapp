@@ -137,7 +137,7 @@ class z.calling.handler.CallStateHandler
       else
         @delete_call call_et.id
     .catch (error) =>
-      if error.type is z.calling.CallError::TYPE.CALL_NOT_FOUND
+      if error.message is z.calling.CallError::TYPE.CALL_NOT_FOUND
         # Call with us joined
         if self_user_joined
           # ...from this device
@@ -249,15 +249,15 @@ class z.calling.handler.CallStateHandler
       when z.service.BackendClientError::LABEL.CONVERSATION_TOO_BIG
         amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CALL_FULL_CONVERSATION,
           data: error.max_members
-        throw new z.calling.CallError error.message, z.calling.CallError::TYPE.CONVERSATION_TOO_BIG
+        throw new z.calling.CallError z.calling.CallError::TYPE.CONVERSATION_TOO_BIG
       when z.service.BackendClientError::LABEL.INVALID_OPERATION
         amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION
         @delete_call conversation_id
-        throw new z.calling.CallError error.message, z.calling.CallError::TYPE.CONVERSATION_EMPTY
+        throw new z.calling.CallError z.calling.CallError::TYPE.CONVERSATION_EMPTY
       when z.service.BackendClientError::LABEL.VOICE_CHANNEL_FULL
         amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CALL_FULL_VOICE_CHANNEL,
           data: error.max_joined
-        throw new z.calling.CallError error.message, z.calling.CallError::TYPE.VOICE_CHANNEL_FULL
+        throw new z.calling.CallError z.calling.CallError::TYPE.VOICE_CHANNEL_FULL
       # User has been removed from conversation, call should be deleted
       else
         @call_center.telemetry.report_error "PUTting the state to '#{payload.state}' failed: #{error.message}", error
@@ -362,19 +362,21 @@ class z.calling.handler.CallStateHandler
   join_call: (conversation_id, is_videod) =>
     @call_center.timings new z.telemetry.calling.CallSetupTimings conversation_id
 
-    is_outgoing_call = false
-
     @call_center.get_call_by_id conversation_id
+    .then (call_et) ->
+      return call_et.state()
     .catch ->
-      is_outgoing_call = true
-    .then =>
-      if is_outgoing_call and not z.calling.CallCenter.supports_calling()
+      return z.calling.enum.CallState.OUTGOING
+    .then (call_state) =>
+      if call_state is z.calling.enum.CallState.OUTGOING and not z.calling.CallCenter.supports_calling()
         amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL
       else
         @call_center.conversation_repository.get_conversation_by_id conversation_id, (conversation_et) =>
-          @_already_joined_in_call conversation_id, is_videod, is_outgoing_call
+          @_check_concurrent_joined_call conversation_id, call_state
+          .then =>
+            return @_join_call conversation_id, is_videod
           .then ->
-            if is_outgoing_call
+            if call_state is z.calling.enum.CallState.OUTGOING
               amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.VOICE_CALL_INITIATED
               media_action = if is_videod then 'audio_call' else 'video_call'
               amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
@@ -439,8 +441,8 @@ class z.calling.handler.CallStateHandler
   @param is_videod [Boolean] Is this a video call
   ###
   toggle_joined: (conversation_id, is_videod) =>
-    if @_self_participant_on_a_call() is conversation_id
-      @leave_call conversation_id if @_self_client_on_a_call()
+    if @_self_client_on_a_call() is conversation_id
+      @leave_call conversation_id
     else
       @join_call conversation_id, is_videod
 
@@ -471,11 +473,10 @@ class z.calling.handler.CallStateHandler
 
   @private
   @param new_call_id [String] Conversation ID of call about to be joined
-  @param is_videod [Boolean] Is video enabled for this new call
-  @param is_outgoing_call [Boolean] Is the new call outgoing
+  @param call_state [z.calling.enum.CallState] Call state of new call
   @return [Promise] Promise that resolves when the new call was joined
   ###
-  _already_joined_in_call: (new_call_id, is_videod, is_outgoing_call) =>
+  _check_concurrent_joined_call: (new_call_id, call_state) =>
     return new Promise (resolve) =>
       ongoing_call_id = @_self_participant_on_a_call()
       if ongoing_call_id
@@ -483,16 +484,12 @@ class z.calling.handler.CallStateHandler
         amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CALL_START_ANOTHER,
           action: =>
             @leave_call ongoing_call_id
-            window.setTimeout =>
-              @_join_call new_call_id, is_videod
-              .then -> resolve()
-            , 1000
+            window.setTimeout resolve, 1000
           close: ->
-            amplify.publish z.event.WebApp.CALL.STATE.IGNORE, new_call_id if not is_outgoing_call
-          data: is_outgoing_call
+            amplify.publish z.event.WebApp.CALL.STATE.IGNORE, new_call_id if call_state is z.calling.enum.CallState.INCOMING
+          data: call_state
       else
-        @_join_call new_call_id, is_videod
-        .then -> resolve()
+        resolve()
 
   ###
   Check whether a call is ongoing in a conversation.
@@ -521,9 +518,9 @@ class z.calling.handler.CallStateHandler
   _join_call: (conversation_id, is_videod) ->
     @call_center.get_call_by_id conversation_id
     .catch (error) ->
-      throw error if error.type isnt z.calling.CallError::TYPE.CALL_NOT_FOUND
+      throw error if error.message isnt z.calling.CallError::TYPE.CALL_NOT_FOUND
     .then =>
-      if @call_center.media_stream_handler.has_active_streams()
+      if @call_center.media_stream_handler.has_media_streams()
         @logger.log @logger.levels.INFO, 'MediaStream has already been initialized', @call_center.media_stream_handler.local_media_streams
       else
         return @call_center.media_stream_handler.initiate_media_stream conversation_id, is_videod
@@ -626,9 +623,12 @@ class z.calling.handler.CallStateHandler
         call_et.update_remote_state event.participants
         call_et.state z.calling.enum.CallState.INCOMING
         @call_center.telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, call_et
-        @call_center.media_stream_handler.initiate_media_stream call_et.id, true if call_et.is_remote_videod()
         @logger.log @logger.levels.DEBUG,
           "Incoming '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}'", call_et
+        if call_et.is_remote_videod()
+          @call_center.media_stream_handler.initiate_media_stream call_et.id, true
+          .catch (error) =>
+            @logger.log @logger.levels.ERROR, "Failed to start self video for incoming call: #{error.message}", error
 
   ###
   Constructs an ongoing call entity.

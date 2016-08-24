@@ -49,9 +49,9 @@ class z.ViewModel.VideoCallingViewModel
     @videod_call = ko.pureComputed =>
       for call_et in @call_center.calls()
         is_active = call_et.state() in z.calling.enum.CallStateGroups.IS_ACTIVE
-        is_client_videod = call_et.self_client_joined() and @self_stream_state.screen_shared() or @self_stream_state.videod()
+        is_self_videod = call_et.self_client_joined() and @self_stream_state.screen_shared() or @self_stream_state.videod()
         is_remote_videod = (call_et.is_remote_screen_shared() or call_et.is_remote_videod()) and not call_et.is_ongoing_on_another_client()
-        return call_et if is_active and (is_client_videod or is_remote_videod or @is_choosing_screen())
+        return call_et if is_active and (is_self_videod or is_remote_videod or @is_choosing_screen())
 
     @is_ongoing = ko.pureComputed =>
       return @videod_call()? and @joined_call()?.state() is z.calling.enum.CallState.ONGOING

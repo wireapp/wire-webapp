@@ -31,9 +31,12 @@
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, .24);
 }
 
+.video-container-round() {
+  border-radius: 4px;
+}
+
 .video-element {
   background-color: @graphite-dark;
-  border-radius: 4px;
   height: 100%;
   width: 100%;
   object-fit: cover;
@@ -45,7 +48,6 @@
 
 .video-container-element() {
   background-color: @graphite-dark;
-  border-radius: 4px;
   height: 100%;
   width: 100%;
 }
@@ -89,9 +91,14 @@
 }
 
 .video-element-remote-minimized {
+  .video-container-round;
   .video-container-small;
   left: auto;
   bottom: auto;
+
+  .video-element {
+    .video-container-round;
+  }
 }
 
 .video-element-remote-fullscreen {
@@ -102,11 +109,12 @@
 }
 
 .video-element-local {
+  .video-container-round;
   .video-container-small;
-  border-radius: 4px;
 
   .video-element {
     .video-container-element();
+    .video-container-round;
     margin-bottom: 16px;
   }
 }
