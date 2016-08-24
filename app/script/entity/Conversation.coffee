@@ -462,10 +462,10 @@ class z.entity.Conversation
     return @messages()[@messages().length - 1]
 
   ###
-  Get the last text message of the conversation.
-  @return [z.entity.Message, undefined] Last message entity or undefined
+  Get the last text message that was added by self user.
+  @return [z.entity.Message]
   ###
-  get_last_text_message_content: ->
+  get_last_added_text_message: ->
     for message_et in @messages() when message_et.has_asset_text() and message_et.user().is_me by -1
       return message_et
 

@@ -958,7 +958,7 @@ class z.conversation.ConversationRepository
         generic_message.edited.text.link_preview.push link_preview
         @_send_and_save_generic_message conversation_et, generic_message
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Error while sending message: #{error.message}", error
+      @logger.log @logger.levels.ERROR, "Error while editing message: #{error.message}", error
       throw error
 
   ###
@@ -1882,7 +1882,7 @@ class z.conversation.ConversationRepository
     @get_message_from_db conversation_et, event_json.data.replacing_message_id
     .then (original_message_et) =>
       if event_json.from isnt original_message_et.from
-        throw new Error 'Sender can only delete own messages'
+        throw new Error 'Sender can only edit own messages'
       return [original_message_et, @event_mapper.map_json_event event_json, conversation_et]
     .then ([original_message_et, edited_message_et]) =>
       return @conversation_service.update_message_timestamp_in_db edited_message_et.primary_key, original_message_et.timestamp

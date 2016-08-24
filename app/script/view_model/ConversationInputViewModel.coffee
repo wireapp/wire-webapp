@@ -196,7 +196,7 @@ class z.ViewModel.ConversationInputViewModel
   on_input_key_down: (data, event) =>
     switch event.keyCode
       when z.util.KEYCODE.ARROW_UP
-        if @edit_message @conversation_et().get_last_text_message_content()
+        if @edit_message @conversation_et().get_last_added_text_message()
           @_move_cursor_to_end event.target
       when z.util.KEYCODE.ESC
         @cancel_edit()
