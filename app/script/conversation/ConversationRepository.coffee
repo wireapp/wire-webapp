@@ -868,7 +868,7 @@ class z.conversation.ConversationRepository
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'knock', new z.proto.Knock false
     @_send_and_save_generic_message conversation_et, generic_message
-    .then =>
+    .then ->
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.PING_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
         action: 'ping'
@@ -939,7 +939,6 @@ class z.conversation.ConversationRepository
     generic_message = undefined
     Promise.resolve()
     .then ->
-      # exit with error?
       if original_message_et.get_first_asset().text is message
         throw new Error 'Edited message equals original message'
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
@@ -1372,7 +1371,6 @@ class z.conversation.ConversationRepository
         return @_update_edited_message conversation_et, event_json
       return event_json
     .then (updated_event_json) =>
-      # TODO: check if message it outdated (e.g. link preview arrived after message was edited)
       if event_json.data.replacing_message_id
         @_delete_message conversation_et, event_json.data.replacing_message_id
       @add_event conversation_et, updated_event_json

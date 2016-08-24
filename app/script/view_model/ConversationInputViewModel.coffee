@@ -112,12 +112,12 @@ class z.ViewModel.ConversationInputViewModel
     @conversation_repository.send_message_with_link_preview message, @conversation_et()
 
   send_message_edit: (message, message_et) =>
-    if message.length is 0
-      @conversation_repository.delete_message_everyone @conversation_et(), message_et
-    else
-      @conversation_repository.send_message_edit message, message_et, @conversation_et()
-
     @cancel_edit()
+
+    if message.length is 0
+      return @conversation_repository.delete_message_everyone @conversation_et(), message_et
+    if message isnt message_et.get_first_asset().text
+      @conversation_repository.send_message_edit message, message_et, @conversation_et()
 
   upload_images: (images) =>
     for image in images
