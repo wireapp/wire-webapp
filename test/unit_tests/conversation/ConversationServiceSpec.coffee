@@ -132,6 +132,13 @@ describe 'Conversation Service', ->
         done()
       .catch done.fail
 
+    it 'fails if no timestamp is specified', (done) ->
+      conversation_service.update_message_timestamp_in_db messages[0].key, undefined
+      .then done.fail
+      .catch (error) ->
+        expect((error)).toEqual jasmine.any(TypeError)
+        done()
+
   describe 'load_events_from_db', ->
     it 'returns an information set about the loaded events even if no records are found', (done) ->
       conversation_service.load_events_from_db 'invalid_id', 1466549621778, 30

@@ -227,7 +227,12 @@ class z.conversation.ConversationService
   ###
   update_message_timestamp_in_db: (primary_key, timestamp) ->
     updated_record = undefined
-    @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
+    Promise.resolve()
+    .then ->
+      if not timestamp?
+        throw new TypeError 'Missing timestamp'
+    .then =>
+      @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
     .then (record) =>
       record.mapped.data.edited_time = record.mapped.time
       record.mapped.time = record.raw.time = new Date(timestamp).toISOString()
