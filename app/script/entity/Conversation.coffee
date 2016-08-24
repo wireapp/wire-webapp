@@ -41,12 +41,12 @@ class z.entity.Conversation
     @participating_user_ets = ko.observableArray [] # Does not include us
     @participating_user_ids = ko.observableArray []
     @self = undefined
-    @number_of_participants = ko.computed => return @participating_user_ids().length
+    @number_of_participants = ko.pureComputed => return @participating_user_ids().length
 
-    @is_group = ko.computed => @type() is z.conversation.ConversationType.REGULAR
-    @is_one2one = ko.computed => @type() is z.conversation.ConversationType.ONE2ONE
-    @is_request = ko.computed => @type() is z.conversation.ConversationType.CONNECT
-    @is_self = ko.computed => @type() is z.conversation.ConversationType.SELF
+    @is_group = ko.pureComputed => @type() is z.conversation.ConversationType.REGULAR
+    @is_one2one = ko.pureComputed => @type() is z.conversation.ConversationType.ONE2ONE
+    @is_request = ko.pureComputed => @type() is z.conversation.ConversationType.CONNECT
+    @is_self = ko.pureComputed => @type() is z.conversation.ConversationType.SELF
 
     # in case this is a one2one conversation this is the connection to that user
     @connection = ko.observable new z.entity.Connection()
@@ -69,17 +69,17 @@ class z.entity.Conversation
     # Conversation states for view
     ###############################################################################
 
-    @is_muted = ko.computed =>
+    @is_muted = ko.pureComputed =>
       return @muted_state()
 
-    @is_archived = ko.computed =>
+    @is_archived = ko.pureComputed =>
       archived = @last_event_timestamp() <= @archived_timestamp()
       if archived then return @archived_state() else return @archived_state() and @muted_state()
 
-    @is_cleared = ko.computed =>
+    @is_cleared = ko.pureComputed =>
       return @last_event_timestamp() <= @cleared_timestamp()
 
-    @is_verified = ko.computed =>
+    @is_verified = ko.pureComputed =>
       return false if @participating_user_ets().length is 0
       return @participating_user_ets().every (user_et) -> user_et.is_verified()
 
@@ -92,7 +92,7 @@ class z.entity.Conversation
     ###############################################################################
 
     @messages_unordered = ko.observableArray()
-    @messages = ko.computed => @messages_unordered().sort (a, b) -> a.timestamp - b.timestamp
+    @messages = ko.pureComputed => @messages_unordered().sort (a, b) -> a.timestamp - b.timestamp
     @messages.subscribe => @update_latest_from_message @get_last_message()
 
     @creation_message = undefined
@@ -112,24 +112,24 @@ class z.entity.Conversation
 
     # Call related
     @call = ko.observable undefined
-    @has_active_call = ko.computed =>
+    @has_active_call = ko.pureComputed =>
       return false if not @call()
       return @call().state() not in z.calling.enum.CallStateGroups.IS_ENDED and not @call().is_ongoing_on_another_client()
 
-    @unread_events = ko.computed =>
+    @unread_events = ko.pureComputed =>
       unread_event = []
       for message_et in @messages() when message_et.visible() by -1
         break if message_et.timestamp <= @last_read_timestamp()
         unread_event.push message_et
       return unread_event
 
-    @number_of_unread_events = ko.computed =>
+    @number_of_unread_events = ko.pureComputed =>
       return @unread_events().length
 
-    @number_of_unread_messages = ko.computed =>
+    @number_of_unread_messages = ko.pureComputed =>
       return (message_et for message_et in @unread_events() when not message_et.user().is_me).length
 
-    @unread_type = ko.computed =>
+    @unread_type = ko.pureComputed =>
       return z.conversation.ConversationUnreadType.CONNECT if @connection().status() is z.user.ConnectionStatus.SENT
       unread_type = z.conversation.ConversationUnreadType.UNREAD
       return unread_type if @number_of_unread_messages() <= 0
@@ -492,6 +492,15 @@ class z.entity.Conversation
   get_number_of_pending_uploads: ->
     pending_uploads = (message_et for message_et in @messages() when message_et.assets?()[0]?.pending_upload?())
     return pending_uploads.length
+
+  ###
+  Check whether the conversation is held with a Wire welcome bot like Anna or Otto.
+  @return [Boolean] True, if conversation with a bot
+  ###
+  is_with_bot: =>
+    return false if not @is_one2one()
+    possible_bot_email = @participating_user_ets()[0].email()
+    return !!possible_bot_email?.match /(anna|ottobot|welcome)(\+\S+)?@wire.com/ig
 
   ###############################################################################
   # Serialization

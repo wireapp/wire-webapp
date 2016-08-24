@@ -726,35 +726,3 @@ describe 'z.conversation.ConversationRepository', ->
       .then (loaded_events) =>
         expect(loaded_events.length).toBe 1
         done()
-
-  describe 'is_bot_conversation', ->
-    it 'detects bot conversations by the email of the remote participant', ->
-      bot = new z.entity.User()
-      bot.email 'anna@wire.com'
-
-      conversation_et = new z.entity.Conversation z.util.create_random_uuid()
-      conversation_et.participating_user_ets.push bot
-      conversation_et.type z.conversation.ConversationType.SELF
-      conversation_repository.active_conversation conversation_et
-
-      expect(conversation_repository.is_bot_conversation()).toBe false
-      conversation_et.type z.conversation.ConversationType.ONE2ONE
-      expect(conversation_repository.is_bot_conversation()).toBe true
-      bot.email 'anne@wire.com'
-      expect(conversation_repository.is_bot_conversation()).toBe false
-      bot.email 'anna+123@wire.com'
-      expect(conversation_repository.is_bot_conversation()).toBe true
-      bot.email 'anna+quiz@wire.com'
-      expect(conversation_repository.is_bot_conversation()).toBe true
-      bot.email 'welcome@wire.com'
-      expect(conversation_repository.is_bot_conversation()).toBe true
-      bot.email 'welcome+123@wire.com'
-      expect(conversation_repository.is_bot_conversation()).toBe true
-      bot.email 'welcome+chef@wire.com'
-      expect(conversation_repository.is_bot_conversation()).toBe true
-      bot.email 'welcome+@@wire.com'
-      expect(conversation_repository.is_bot_conversation()).toBe true
-      bot.email 'ottobot@wire.com'
-      expect(conversation_repository.is_bot_conversation()).toBe true
-      bot.email 'hello@wire.com'
-      expect(conversation_repository.is_bot_conversation()).toBe false
