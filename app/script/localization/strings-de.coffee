@@ -264,10 +264,12 @@ z.string.de.conversation_asset_downloading = 'Herunterladen…'
 z.string.de.conversation_asset_upload_failed = 'Hochladen fehlgeschlagen'
 z.string.de.conversation_asset_upload_too_large = 'Du kannst Dateien bis zu %no senden.'
 z.string.de.conversation_playback_error = 'Konnte nicht abgespielt werden'
+z.string.de.conversation_context_menu_edit = 'Bearbeiten'
 z.string.de.conversation_context_menu_delete = 'Für mich löschen'
 z.string.de.conversation_context_menu_delete_everyone = 'Für alle löschen'
 z.string.de.conversation_context_menu_download = 'Herunterladen'
 z.string.de.conversation_delete_timestamp = 'Gelöscht um %@timestamp'
+z.string.de.conversation_edit_timestamp = 'Editiert um %@timestamp'
 
 # Conversation list
 z.string.de.conversation_list_archive = 'Archiv'

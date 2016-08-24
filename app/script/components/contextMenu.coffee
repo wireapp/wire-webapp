@@ -74,6 +74,7 @@ class z.components.ContextMenuViewModel
   on_context_menu_entry_click: (entry, event) =>
     event.stopPropagation()
     amplify.publish z.event.WebApp.CONTEXT_MENU, @tag, entry.action, @data
+    @bubble.hide()
 
   on_context_menu_button_click: () =>
     @get_entries()

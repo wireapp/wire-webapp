@@ -45,7 +45,7 @@ ko.bindingHandlers.show_all_timestamps =
     $element = $(element)
     $element.on 'mousemove mouseout', (e) ->
       rect = $(@).find('.messages')[0].getBoundingClientRect()
-      show_timestamps = e.clientX > rect.right - 96 and e.clientX < rect.right
+      show_timestamps = e.clientX > rect.right - 64 and e.clientX < rect.right
       $('.time').toggleClass 'show-timestamp', show_timestamps
 
 # Start loading image once they are in the viewport
