@@ -29,6 +29,13 @@ class z.entity.ContentMessage extends z.entity.Message
     @nonce = null
     @super_type = z.message.SuperType.CONTENT
     @replacing_message_id = null
+    @edited_timestamp = null
+
+    @display_edited_timestamp = =>
+      return  z.localization.Localizer.get_text {
+        id: z.string.conversation_edit_timestamp
+        replace: {placeholder: '%@timestamp', content: moment(@edited_timestamp).format 'HH:mm'}
+      }
 
   ###
   Add another content asset to the message.

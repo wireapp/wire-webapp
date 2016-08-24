@@ -196,19 +196,26 @@ class z.ViewModel.ConversationInputViewModel
   on_input_key_down: (data, event) =>
     switch event.keyCode
       when z.util.KEYCODE.ARROW_UP
-        @edit_message @conversation_et().get_last_text_message_content()
+        if @edit_message @conversation_et().get_last_text_message_content()
+          @_move_cursor_to_end event.target
       when z.util.KEYCODE.ESC
         @cancel_edit()
     return true
 
   edit_message: (message_et) =>
-    return if not message_et?.is_editable?()
+    return false if not message_et?.is_editable?() or message_et is @edit_message_et()
     @cancel_edit()
     @edit_message_et message_et
     @edit_message_et()?.is_editing true
     @input @edit_message_et().get_first_asset().text
+    return true
 
   cancel_edit: =>
     @edit_message_et()?.is_editing false
     @edit_message_et undefined
     @edit_input ''
+
+  _move_cursor_to_end: (input_element) ->
+    setTimeout ->
+      input_element.selectionStart = input_element.selectionEnd = input_element.value.length * 2
+    , 0
