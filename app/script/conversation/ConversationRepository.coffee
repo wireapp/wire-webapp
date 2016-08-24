@@ -1187,8 +1187,6 @@ class z.conversation.ConversationRepository
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
     .then (payload) =>
       @_send_encrypted_message conversation_id, generic_message, payload
-    .catch (error) =>
-      @logger.log @logger.levels.INFO, 'Failed sending generic message', error
 
   ###
   Sends otr message to a conversation.
@@ -1885,6 +1883,8 @@ class z.conversation.ConversationRepository
   _update_edited_message: (conversation_et, event_json) =>
     @get_message_from_db conversation_et, event_json.data.replacing_message_id
     .then (original_message_et) =>
+      if event_json.from isnt original_message_et.from
+        throw new Error 'Sender can only delete own messages'
       return [original_message_et, @event_mapper.map_json_event event_json, conversation_et]
     .then ([original_message_et, edited_message_et]) =>
       return @conversation_service.update_message_timestamp_in_db edited_message_et.primary_key, original_message_et.timestamp
