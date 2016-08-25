@@ -185,11 +185,15 @@ class z.conversation.ConversationRepository
       raw_event = event.mapped or event.raw
       return @event_mapper.map_json_event raw_event, conversation_et
 
-  get_events: (conversation_et) ->
+  ###
+  Loads all events for the the given conversation.
+  @param conversation_et [z.entity.Conversation]
+  @param timestamp [Number] Timestamp that loaded events have to undercut
+  @return [Promise] Array of z.entity.Message instances
+  ###
+  get_events: (conversation_et, timestamp) ->
     return new Promise (resolve, reject) =>
       conversation_et.is_pending true
-      timestamp = conversation_et.get_first_message()?.timestamp
-
       @conversation_service.load_events_from_db conversation_et.id, timestamp
       .then (loaded_events) =>
         [events, has_further_events] = loaded_events
@@ -897,6 +901,7 @@ class z.conversation.ConversationRepository
         @_send_and_save_generic_message conversation_et, generic_message
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Error while sending link preview: #{error.message}", error
+      throw error
 
   ###
   Send message to specific conversation.
@@ -1377,14 +1382,15 @@ class z.conversation.ConversationRepository
 
   ###
   A hide message received in a conversation.
-  @param conversation_et [z.entity.Conversation] Conversation to add the event to
   @param event_json [Object] JSON data of 'conversation.message-hidden'
   ###
-  message_hidden: (conversation_et, event_json) =>
+  message_hidden: (event_json) =>
     Promise.resolve()
     .then =>
       if event_json.from isnt @user_repository.self().id
         throw new Error 'Sender is not self user'
+      return @find_conversation_by_id event_json.data.conversation_id
+    .then (conversation_et) =>
       return @_delete_message conversation_et, event_json.data.message_id
     .catch (error) =>
       @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
@@ -1706,7 +1712,7 @@ class z.conversation.ConversationRepository
         when z.event.Backend.CONVERSATION.MESSAGE_DELETE
           @message_deleted conversation_et, event
         when z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
-          @message_hidden conversation_et, event
+          @message_hidden event
         else
           @add_event conversation_et, event
 

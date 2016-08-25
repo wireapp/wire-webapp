@@ -242,7 +242,8 @@ class z.ViewModel.MessageListViewModel
       old_list_height = inner_container.scrollHeight
 
       @capture_scrolling_event = false
-      @conversation_repository.get_events @conversation()
+      timestamp = @conversation().get_first_message()?.timestamp
+      @conversation_repository.get_events @conversation(), timestamp
       .then =>
         new_list_height = inner_container.scrollHeight
         $('.messages-wrap').scrollTop new_list_height - old_list_height
