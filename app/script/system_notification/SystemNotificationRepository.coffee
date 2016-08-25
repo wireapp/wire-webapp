@@ -388,6 +388,7 @@ class z.SystemNotification.SystemNotificationRepository
     return if document.hasFocus()
     return if message_et.user()?.is_me
     return if conversation_et.is_muted?()
+    return if message_et.was_edited?()
 
     notification_content =
       title: @_create_title conversation_et, message_et
@@ -413,6 +414,7 @@ class z.SystemNotification.SystemNotificationRepository
   ###
   _notify_sound: (conversation_et, message_et) ->
     return if conversation_et.is_muted?()
+    return if message_et.was_edited?()
     return if not document.hasFocus() and z.util.Environment.browser.firefox and z.util.Environment.os.mac
     switch message_et.super_type
       when z.message.SuperType.CONTENT
