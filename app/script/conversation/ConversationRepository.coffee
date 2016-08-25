@@ -1377,14 +1377,15 @@ class z.conversation.ConversationRepository
 
   ###
   A hide message received in a conversation.
-  @param conversation_et [z.entity.Conversation] Conversation to add the event to
   @param event_json [Object] JSON data of 'conversation.message-hidden'
   ###
-  message_hidden: (conversation_et, event_json) =>
+  message_hidden: (event_json) =>
     Promise.resolve()
     .then =>
       if event_json.from isnt @user_repository.self().id
         throw new Error 'Sender is not self user'
+      return @find_conversation_by_id event_json.data.conversation_id
+    .then (conversation_et) =>
       return @_delete_message conversation_et, event_json.data.message_id
     .catch (error) =>
       @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
@@ -1706,7 +1707,7 @@ class z.conversation.ConversationRepository
         when z.event.Backend.CONVERSATION.MESSAGE_DELETE
           @message_deleted conversation_et, event
         when z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
-          @message_hidden conversation_et, event
+          @message_hidden event
         else
           @add_event conversation_et, event
 
