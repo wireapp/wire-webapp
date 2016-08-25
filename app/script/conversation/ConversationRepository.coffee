@@ -901,6 +901,7 @@ class z.conversation.ConversationRepository
         @_send_and_save_generic_message conversation_et, generic_message
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Error while sending link preview: #{error.message}", error
+      throw error
 
   ###
   Send message to specific conversation.

@@ -101,14 +101,6 @@ class z.ViewModel.ConversationInputViewModel
   send_message: (message) =>
     if message.length is 0
       return
-
-    if message.length > z.config.MAXIMUM_MESSAGE_LENGTH
-      amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.TOO_LONG_MESSAGE,
-        data: z.config.MAXIMUM_MESSAGE_LENGTH
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CHARACTER_LIMIT_REACHED,
-        characters: message.length
-      return
-
     @conversation_repository.send_message_with_link_preview message, @conversation_et()
 
   send_message_edit: (message, message_et) =>
@@ -184,6 +176,13 @@ class z.ViewModel.ConversationInputViewModel
 
   on_input_enter: (data, event) =>
     message = z.util.trim_line_breaks @input()
+
+    if message.length > z.config.MAXIMUM_MESSAGE_LENGTH
+      amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.TOO_LONG_MESSAGE,
+        data: z.config.MAXIMUM_MESSAGE_LENGTH
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CHARACTER_LIMIT_REACHED,
+        characters: message.length
+      return
 
     if @is_editing()
       @send_message_edit message, @edit_message_et()
