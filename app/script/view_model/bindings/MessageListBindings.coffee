@@ -28,11 +28,12 @@ ko.bindingHandlers.focus_on_keydown =
 
           meta_key_is_pressed = e.metaKey or e.ctrlKey
           is_paste_action = meta_key_is_pressed and e.keyCode is z.util.KEYCODE.V
+          is_arrow_key = z.util.KEYCODE.is_arrow_key e.keyCode
 
           # check for activeElement needed, cause in IE11 i could be undefined under some circumstances
           active_element_is_input = document.activeElement and document.activeElement.tagName in ['INPUT', 'TEXTAREA']
 
-          if not active_element_is_input
+          if not active_element_is_input and not is_arrow_key
             element.focus() if not meta_key_is_pressed or is_paste_action
 
           return true

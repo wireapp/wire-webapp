@@ -29,3 +29,8 @@ z.util.KEYCODE =
   ESC: 27
   ENTER: 13
   V: 86
+
+z.util.KEYCODE.is_arrow_key = (keyCode) ->
+  return keyCode in [z.util.KEYCODE.ARROW_DOWN, z.util.KEYCODE.ARROW_LEFT, z.util.KEYCODE.ARROW_RIGHT, z.util.KEYCODE.ARROW_UP]
+
+

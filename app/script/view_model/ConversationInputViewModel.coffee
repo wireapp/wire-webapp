@@ -41,7 +41,7 @@ class z.ViewModel.ConversationInputViewModel
     @browser_has_focus = ko.observable true
 
     @blinking_cursor = ko.pureComputed =>
-      return @browser_has_focus() and @conversation_has_focus()
+      return @browser_has_focus() and @conversation_has_focus() and @is_editing()
 
     @has_text_input = ko.pureComputed =>
       return @conversation_et()?.input().length > 0
@@ -51,7 +51,7 @@ class z.ViewModel.ConversationInputViewModel
 
     @input = ko.pureComputed
       read: =>
-        if @is_editing() then @edit_input() else @conversation_et()?.input()
+        if @is_editing() then @edit_input() else @conversation_et()?.input?() or ''
       write: (value) =>
         if @is_editing() then @edit_input value else @conversation_et()?.input value
 
@@ -196,19 +196,18 @@ class z.ViewModel.ConversationInputViewModel
   on_input_key_down: (data, event) =>
     switch event.keyCode
       when z.util.KEYCODE.ARROW_UP
-        if @edit_message @conversation_et().get_last_added_text_message()
-          @_move_cursor_to_end event.target
+        @edit_message @conversation_et().get_last_added_text_message() if @input().length is 0
       when z.util.KEYCODE.ESC
         @cancel_edit()
     return true
 
-  edit_message: (message_et) =>
-    return false if not message_et?.is_editable?() or message_et is @edit_message_et()
+  edit_message: (message_et, input_element) =>
+    return if not message_et?.is_editable?() or message_et is @edit_message_et()
     @cancel_edit()
     @edit_message_et message_et
     @edit_message_et()?.is_editing true
     @input @edit_message_et().get_first_asset().text
-    return true
+    @_move_cursor_to_end input_element if input_element?
 
   cancel_edit: =>
     @edit_message_et()?.is_editing false
