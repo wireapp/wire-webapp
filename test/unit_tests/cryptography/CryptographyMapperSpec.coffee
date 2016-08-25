@@ -354,7 +354,7 @@ describe 'z.cryptography.CryptographyMapper', ->
 
     it 'rejects with an error for an unhandled generic message type', (done) ->
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'liking', z.proto.LikeAction.LIKE
+      generic_message.set 'reaction', new z.proto.Reaction '💖'
 
       mapper.map_generic_message generic_message, {id: 'ABC'}
       .then done.fail
