@@ -323,11 +323,12 @@ class z.conversation.ConversationService
         reject error
 
   ###
-  Load conversation events.
+  Load conversation events. Start and end are not included.
+  Events are always sorted beginning with the newest timestamp.
 
   @param conversation_id [String] ID of conversation
-  @param start [String] Timestamp that loaded events have to undercut
-  @param end [String] Timestamp that loaded events have to undercut
+  @param start [String] starting from this timestamp
+  @param end [String] stop when reaching timestamp
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
   ###
