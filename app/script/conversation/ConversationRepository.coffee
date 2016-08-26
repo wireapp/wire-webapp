@@ -953,6 +953,8 @@ class z.conversation.ConversationRepository
     .then (record) =>
       @on_conversation_event record.mapped if record?.mapped
     .then =>
+      @_track_edit_message conversation_et, original_message_et
+    .then =>
       @link_repository.get_link_preview_from_string message
     .then (link_preview) =>
       if link_preview?
@@ -1343,6 +1345,19 @@ class z.conversation.ConversationRepository
       time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
       time_elapsed_action: seconds_since_message_creation
       type: z.tracking.helpers.get_message_type message_et
+
+  ###
+  Track edit action.
+
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  ###
+  _track_edit_message: (conversation, message_et) ->
+    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.EDITED_MESSAGE,
+      conversation_type: z.tracking.helpers.get_conversation_type conversation
+      time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
+      time_elapsed_action: seconds_since_message_creation
 
   ###
   Can user upload assets to conversation.
