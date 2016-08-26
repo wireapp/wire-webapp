@@ -307,7 +307,7 @@ class z.main.App
       @logger.log '\'window.onbeforeunload\' was triggered, so we will disconnect from the backend.'
       @repository.event.disconnect z.event.WebSocketService::CHANGE_TRIGGER.PAGE_NAVIGATION
       @repository.call_center.state_handler.leave_call_on_beforeunload()
-      @repository.storage.terminate()
+      @repository.storage.terminate 'window.onbeforeunload'
       return undefined
 
   # Hide the loading spinner and show the application UI.

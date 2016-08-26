@@ -311,9 +311,10 @@ class z.storage.StorageService
   ###
   Closes the database. This operation completes immediately and there is no returned Promise.
   @see https://github.com/dfahlander/Dexie.js/wiki/Dexie.close()
+  @param reason [String] Cause for the termination
   ###
-  terminate: ->
-    @logger.log "Closing database connection with '#{@db.name}'"
+  terminate: (reason = 'unknown reason') ->
+    @logger.log "Closing database connection with '#{@db.name}' because of '#{reason}'."
     @db.close()
 
   ###
