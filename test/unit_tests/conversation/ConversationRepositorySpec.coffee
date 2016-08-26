@@ -349,7 +349,7 @@ describe 'z.conversation.ConversationRepository', ->
         type: z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
 
       expect(conversation_et.get_message_by_id(message_to_hide_et.id)).toBeDefined()
-      conversation_repository.message_hidden event
+      conversation_repository.message_hidden conversation_et, event
       .then done.fail
       .catch ->
         expect(conversation_et.get_message_by_id(message_to_hide_et.id)).toBeDefined()
@@ -367,7 +367,7 @@ describe 'z.conversation.ConversationRepository', ->
         type: z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
 
       expect(conversation_et.get_message_by_id(message_to_hide_et.id)).toBeDefined()
-      conversation_repository.message_hidden event
+      conversation_repository.message_hidden conversation_et, event
       .then ->
         expect(conversation_et.get_message_by_id(message_to_hide_et.id)).not.toBeDefined()
         done()

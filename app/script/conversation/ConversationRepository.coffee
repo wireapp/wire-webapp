@@ -185,15 +185,11 @@ class z.conversation.ConversationRepository
       raw_event = event.mapped or event.raw
       return @event_mapper.map_json_event raw_event, conversation_et
 
-  ###
-  Loads all events for the the given conversation.
-  @param conversation_et [z.entity.Conversation]
-  @param timestamp [Number] Timestamp that loaded events have to undercut
-  @return [Promise] Array of z.entity.Message instances
-  ###
-  get_events: (conversation_et, timestamp) ->
+  get_events: (conversation_et) ->
     return new Promise (resolve, reject) =>
       conversation_et.is_pending true
+      timestamp = conversation_et.get_first_message()?.timestamp
+
       @conversation_service.load_events_from_db conversation_et.id, timestamp
       .then (loaded_events) =>
         [events, has_further_events] = loaded_events
