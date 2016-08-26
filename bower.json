@@ -4,7 +4,7 @@
     "amplify": "https://github.com/wireapp/amplify.git#1.1.4",
     "antiscroll-2": "https://github.com/welovecoding/antiscroll-2.git#1.2.7",
     "cryptobox": "https://github.com/wireapp/cryptobox-bower.git#v1.0.5",
-    "cryptojs": "http://crypto-js.googlecode.com/files/CryptoJS%20v3.1.2.zip",
+    "cryptojs": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/crypto-js/CryptoJS%20v3.1.2.zip",
     "highlight.js": "https://github.com/isagalaev/highlight.js.git#9.4.0",
     "dexie": "https://github.com/dfahlander/Dexie.js.git#1.4.1",
     "generic-message-proto": "https://github.com/wireapp/generic-message-proto.git#1.14.0",
@@ -32,7 +32,7 @@
     "webapp-module-logger": "https://github.com/wireapp/webapp-module-logger.git#1.0.0",
     "webapp-module-modal": "https://github.com/wireapp/webapp-module-modal.git#1.0.0",
     "webapp-module-namespace": "https://github.com/wireapp/webapp-module-namespace.git#1.0.0",
-    "webrtc-adapter": "https://github.com/webrtc/adapter.git#gh-pages",
+    "webrtc-adapter": "https://github.com/webrtc/adapter.git#2.0.2",
     "wire-theme": "https://github.com/wireapp/wire-theme.git#9174e3b09902c8768420b34e68995b0e27c96e4c"
   },
   "exportsOverride": {
@@ -155,7 +155,7 @@
       "less": "app/style/webapp-module-modal.less"
     },
     "webrtc-adapter": {
-      "js": "adapter-2.0.2.js"
+      "js": "release/adapter.js"
     },
     "wire-theme": {
       "less": "app/style/{wire-theme,variables,input}.less"

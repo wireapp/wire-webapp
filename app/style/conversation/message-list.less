@@ -94,6 +94,11 @@
   color: @graphite;
 }
 
+.message-fade-out {
+  opacity: 0;
+  transition: opacity @animation-timing-slow @ease-out-quart
+}
+
 // CONTEXT MENU
 .context-menu {
   .square(18px);
@@ -103,11 +108,11 @@
   position: absolute;
   right: 72px;
   top: 3px;
-}
 
-.message-fade-out {
-  opacity: 0;
-  transition: opacity @animation-timing-slow @ease-out-quart
+  &:focus {
+    opacity: 1 !important;
+    outline: none;
+  }
 }
 
 // MESSAGE GRID

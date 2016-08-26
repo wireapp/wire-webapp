@@ -136,6 +136,10 @@ class z.ViewModel.MessageListViewModel
 
     if not conversation_et.is_loaded()
       @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
+
+        # release any event that are not unread
+        conversation_et.release()
+
         @conversation_repository.get_events conversation_et
         .then =>
           @_set_conversation conversation_et, callback
@@ -242,8 +246,7 @@ class z.ViewModel.MessageListViewModel
       old_list_height = inner_container.scrollHeight
 
       @capture_scrolling_event = false
-      timestamp = @conversation().get_first_message()?.timestamp
-      @conversation_repository.get_events @conversation(), timestamp
+      @conversation_repository.get_events @conversation()
       .then =>
         new_list_height = inner_container.scrollHeight
         $('.messages-wrap').scrollTop new_list_height - old_list_height

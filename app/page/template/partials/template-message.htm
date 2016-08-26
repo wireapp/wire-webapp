@@ -106,7 +106,8 @@
       <!-- /ko -->
 
       <context-menu params="entries: function() {return $parents[1].get_context_menu_entries(message)}, tag: 'message', data: message.id"
-                    class="context-menu icon-more"></context-menu>
+                    class="context-menu icon-more"
+                    tabindex="-1"></context-menu>
       <!-- ko ifnot: message.timestamp == '' -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
       <!-- /ko -->
@@ -188,7 +189,8 @@
     </div>
   </div>
   <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
-                class="context-menu icon-more"></context-menu>
+                class="context-menu icon-more"
+                tabindex="-1"></context-menu>
   <!-- ko ifnot: message.timestamp == '' -->
     <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
   <!-- /ko -->
