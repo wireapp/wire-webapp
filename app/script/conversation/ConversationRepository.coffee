@@ -1172,6 +1172,7 @@ class z.conversation.ConversationRepository
       @_send_encrypted_message conversation_id, generic_message, payload
     .catch (error) =>
       @logger.log @logger.levels.INFO, 'Failed sending external message', error
+      throw error
 
   ###
   Sends a generic message to a conversation.
