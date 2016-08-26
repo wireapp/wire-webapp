@@ -295,7 +295,7 @@ describe 'z.conversation.ConversationRepository', ->
     beforeEach ->
       conversation_et = _generate_conversation z.conversation.ConversationType.REGULAR
 
-      spyOn(conversation_repository, '_send_encrypted_value').and.returnValue Promise.resolve()
+      spyOn(conversation_repository, '_send_generic_message').and.returnValue Promise.resolve()
 
     it 'does not delete other users messages', (done) ->
       user_et = new z.entity.User()
@@ -401,7 +401,7 @@ describe 'z.conversation.ConversationRepository', ->
         type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
 
       expect(conversation_et.get_message_by_id(message_to_delete_et.id)).toBeDefined()
-      conversation_repository.message_deleted event
+      conversation_repository.message_deleted conversation_et, event
       .then ->
         expect(conversation_et.get_message_by_id(message_to_delete_et.id)).not.toBeDefined()
         expect(conversation_repository._add_delete_message).not.toHaveBeenCalled()
@@ -422,7 +422,7 @@ describe 'z.conversation.ConversationRepository', ->
         type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
 
       expect(conversation_et.get_message_by_id(message_to_delete_et.id)).toBeDefined()
-      conversation_repository.message_deleted event
+      conversation_repository.message_deleted conversation_et, event
       .then ->
         expect(conversation_et.get_message_by_id(message_to_delete_et.id)).not.toBeDefined()
         expect(conversation_repository._add_delete_message).toHaveBeenCalled()

@@ -31,6 +31,7 @@ class z.entity.Message
     @type = ''
     @user = ko.observable new z.entity.User()
     @visible = ko.observable true
+    @is_editing = ko.observable false
 
     @display_timestamp_short = =>
       date = moment.unix @timestamp / 1000
@@ -184,6 +185,20 @@ class z.entity.Message
   is_deletable: ->
     return true if @is_ping() or not @has_asset()
     return @get_first_asset().status() not in [z.assets.AssetTransferState.DOWNLOADING, z.assets.AssetTransferState.UPLOADING]
+
+  ###
+  Check if message can be edited.
+
+  @return [Boolean]
+  ###
+  is_editable: ->
+    return @has_asset_text() and @user().is_me
+
+  ###
+  Triggers event to delete message.
+  ###
+  edit: =>
+    amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.EDIT, @
 
   ###
   Triggers event to delete message.

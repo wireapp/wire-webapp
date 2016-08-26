@@ -24,7 +24,21 @@ class z.links.LinkPreviewRepository
     @logger = new z.util.Logger 'z.links.LinkPreviewRepository', z.config.LOGGER.OPTIONS
 
   ###
-  Create link preview for given link. This will upload associated image as asset and will
+  Searches for url in given string and creates a link preview.
+  This will upload associated image as asset and will resolve with an z.proto.LinkPreview instance
+
+  @param string [String]
+  ###
+  get_link_preview_from_string: (string) =>
+    Promise.resolve()
+    .then =>
+      data = z.links.LinkPreviewHelpers.get_first_link_with_offset string
+      if data
+        [url, offset] = data
+        @get_link_preview url, offset
+
+  ###
+  Creates link preview for given link. This will upload associated image as asset and will
   resolve with an z.proto.LinkPreview instance
 
   @param url [String]

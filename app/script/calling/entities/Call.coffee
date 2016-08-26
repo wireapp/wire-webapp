@@ -254,6 +254,7 @@ class z.calling.entities.Call
   @return [Boolean] Has the participant been removed
   ###
   delete_participant: (participant_et, delete_on_backend = true) =>
+    @interrupted_participants.remove @participant_et
     return false if not @get_participant_by_id participant_et.user.id
 
     # Delete participant
@@ -485,6 +486,7 @@ class z.calling.entities.Call
     @session_id undefined
     @self_user_joined false
     @is_declined false
+    amplify.publish z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION if @network_interruption()
 
   ###
   Reset the call timers.

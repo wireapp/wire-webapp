@@ -51,12 +51,12 @@ describe 'z.storage.StorageRepository', ->
     it 'throws an error on missing timestamps', ->
       expect ->
         storage_repository.construct_primary_key 'A', 'A'
-      .toThrowError z.storage.StorageError::INVALID_TIMESTAMP
+      .toThrowError z.storage.StorageError, z.storage.StorageError::TYPE.INVALID_TIMESTAMP
 
     it 'throws an error on invalid timestamps', ->
       expect ->
         storage_repository.construct_primary_key 'A', 'A', 'A'
-      .toThrowError z.storage.StorageError::INVALID_TIMESTAMP
+      .toThrowError z.storage.StorageError, z.storage.StorageError::TYPE.INVALID_TIMESTAMP
 
   describe 'save_value',  ->
     it 'persists primitive values in an object format', (done)->
