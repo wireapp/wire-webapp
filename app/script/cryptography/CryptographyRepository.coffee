@@ -560,8 +560,7 @@ class z.cryptography.CryptographyRepository
   save_encrypted_event: (generic_message, event) =>
     @cryptography_mapper.map_generic_message generic_message, event
     .then (mapped) =>
-      primary_key = @storage_repository.construct_primary_key event.conversation, event.from, event.time
-      return @storage_repository.save_conversation_event primary_key, event, mapped
+      return @storage_repository.save_conversation_event mapped
     .then (primary_key) =>
       @logger.log @logger.levels.INFO, "Saved '#{generic_message.content}' (OTR) with primary key '#{primary_key}'"
       return @storage_repository.load_event_for_conversation primary_key
