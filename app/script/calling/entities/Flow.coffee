@@ -130,11 +130,19 @@ class z.calling.entities.Flow
           @_remove_media_streams()
           if not @is_group()
             @call_et.finished_reason = z.calling.enum.CallFinishedReason.CONNECTION_DROPPED
+
         when z.calling.rtc.SignalingState.REMOTE_OFFER
           @negotiation_needed true
 
+        when z.calling.rtc.SignalingState.STABLE
+          @negotiation_mode z.calling.enum.SDPNegotiationMode.DEFAULT
+
     @negotiation_mode = ko.observable z.calling.enum.SDPNegotiationMode.DEFAULT
     @negotiation_needed = ko.observable false
+
+    @negotiation_mode.subscribe (negotiation_mode) =>
+      @logger.log @logger.levels.DEBUG, "Negotiation mode changed: #{negotiation_mode}"
+
     @negotiation_needed.subscribe (negotiation_needed) =>
       @logger.log @logger.levels.DEBUG, 'State changed - negotiation needed: true' if negotiation_needed
 
