@@ -327,8 +327,8 @@ class z.conversation.ConversationService
   Events are always sorted beginning with the newest timestamp.
 
   @param conversation_id [String] ID of conversation
-  @param start [String] starting from this timestamp
-  @param end [String] stop when reaching timestamp
+  @param start [Number] starting from this timestamp
+  @param end [Number] stop when reaching timestamp
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
   ###
