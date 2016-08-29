@@ -344,7 +344,7 @@ class z.conversation.ConversationService
         return false if end and record.meta.timestamp <= end
         return true
     .then (records) ->
-      return records.slice(0, limit)
+      return records.slice 0, limit
     .catch (error) =>
       @logger.log @logger.levels.ERROR,
         "Failed to get events for conversation '#{conversation_id}': #{error.message}", error
