@@ -61,6 +61,8 @@ class z.cryptography.CryptographyMapper
         return @_map_hidden generic_message.hidden
       when 'deleted'
         return @_map_deleted generic_message.deleted
+      when 'edited'
+        return @_map_edited generic_message.edited, generic_message.message_id
       when 'external'
         return @_map_external generic_message.external, event
       when 'image'
@@ -247,3 +249,8 @@ class z.cryptography.CryptographyMapper
         previews: text.link_preview.map (preview) -> preview.encode64()
       type: z.event.Backend.CONVERSATION.MESSAGE_ADD
     }
+
+  _map_edited: (edited, event_id) ->
+    mapped = @_map_text edited.text, event_id
+    mapped.data.replacing_message_id = edited.replacing_message_id
+    return mapped

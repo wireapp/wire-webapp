@@ -23,7 +23,7 @@ class z.entity.DeleteMessage extends z.entity.Message
   constructor: ->
     super()
     @super_type = z.message.SuperType.DELETE
-    @deleted_timestamp = ''
+    @deleted_timestamp = null
 
     @display_deleted_timestamp = =>
       return  z.localization.Localizer.get_text {

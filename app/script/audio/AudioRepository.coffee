@@ -50,7 +50,7 @@ class z.audio.AudioRepository
     if @audio_context
       @logger.log @logger.levels.INFO, 'Reusing existing AudioContext', @audio_context
       return @audio_context
-    else if window.AudioContext
+    else if window.AudioContext and window.AudioContext::createMediaStreamSource
       @audio_context = new window.AudioContext()
       @logger.log @logger.levels.INFO, 'Initialized a new AudioContext', @audio_context
       return @audio_context
@@ -80,14 +80,14 @@ class z.audio.AudioRepository
   @param audio_id [z.audio.AudioType] Sound identifier
   @param play_in_loop [Boolean] Play sound in loop
   ###
-  play: (audio_id, play_in_loop) =>
+  play: (audio_id, play_in_loop = false) =>
     @_check_sound_setting audio_id
     .then =>
       @_get_sound_by_id audio_id
     .then (audio_element) =>
       @_play audio_id, audio_element, play_in_loop
     .then (audio_element) =>
-      @logger.log @logger.levels.INFO, "Playing sound '#{audio_id}' (in loop: '#{play_in_loop}')", audio_element
+      @logger.log @logger.levels.INFO, "Playing sound '#{audio_id}' (loop: '#{play_in_loop}')", audio_element
     .catch (error) =>
       switch error.type
         when z.audio.AudioError::TYPE.FAILED_TO_PLAY

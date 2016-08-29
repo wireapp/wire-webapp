@@ -28,6 +28,11 @@
   background-color: #fff;
 }
 
+.conversation-input-editing {
+  background-color: fade(@w-yellow, 16%);
+  transition: background-color @animation-timing-faster @ease-in-quad;
+}
+
 .conversation-input-separator {
   border-top: 1px solid fade(@graphite, 12%);
 }
@@ -36,6 +41,7 @@
   .accent-selection-color;
   .custom-scrollbar;
   .reset-textarea;
+  background-color: transparent;
   flex: 1 1;
   line-height: @conversation-input-line-height;
   letter-spacing: inherit;

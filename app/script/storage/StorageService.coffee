@@ -136,8 +136,8 @@ class z.storage.StorageService
         @logger.log @logger.levels.LEVEL_1, "Storage Service initialized with database '#{@db_name}'"
         resolve @db_name
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Failed to initialize database '#{@db_name}' for Storage Service"
-        reject error
+        @logger.log @logger.levels.ERROR, "Failed to initialize database '#{@db_name}' for Storage Service: #{error?.message or error}", {error: error}
+        reject new z.storage.StorageError z.storage.StorageError::TYPE.FAILED_TO_OPEN
 
 
   ###############################################################################
@@ -311,9 +311,10 @@ class z.storage.StorageService
   ###
   Closes the database. This operation completes immediately and there is no returned Promise.
   @see https://github.com/dfahlander/Dexie.js/wiki/Dexie.close()
+  @param reason [String] Cause for the termination
   ###
-  terminate: ->
-    @logger.log "Closing database connection with '#{@db.name}'"
+  terminate: (reason = 'unknown reason') ->
+    @logger.log "Closing database connection with '#{@db.name}' because of '#{reason}'."
     @db.close()
 
   ###

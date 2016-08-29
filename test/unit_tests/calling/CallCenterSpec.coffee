@@ -403,7 +403,7 @@ describe 'z.calling.CallCenter', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.calling.CallError
-        expect(error.type).toBe z.calling.CallError::TYPE.CONVERSATION_TOO_BIG
+        expect(error.message).toBe z.calling.CallError::TYPE.CONVERSATION_TOO_BIG
         expect(call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
         done()
       server.requests[0].respond 409, 'Content-Type': 'application/json', JSON.stringify error_payload
@@ -421,7 +421,7 @@ describe 'z.calling.CallCenter', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.calling.CallError
-        expect(error.type).toBe z.calling.CallError::TYPE.VOICE_CHANNEL_FULL
+        expect(error.message).toBe z.calling.CallError::TYPE.VOICE_CHANNEL_FULL
         expect(call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
         done()
       server.requests[0].respond 409, 'Content-Type': 'application/json', JSON.stringify error_payload
@@ -438,7 +438,7 @@ describe 'z.calling.CallCenter', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.calling.CallError
-        expect(error.type).toBe z.calling.CallError::TYPE.CONVERSATION_EMPTY
+        expect(error.message).toBe z.calling.CallError::TYPE.CONVERSATION_EMPTY
         expect(call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
         done()
       server.requests[0].respond 400, 'Content-Type': 'application/json', JSON.stringify error_payload

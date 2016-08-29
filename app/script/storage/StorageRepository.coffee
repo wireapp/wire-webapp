@@ -193,9 +193,10 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
 
   ###
   Closes the database connection.
+  @param reason [String] Cause for the termination
   ###
-  terminate: ->
-    @storage_service.terminate()
+  terminate: (reason) ->
+    @storage_service.terminate reason
 
   ###############################################################################
   # Conversation Events
@@ -211,7 +212,7 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   ###
   construct_primary_key: (conversation_id, sender_id = @storage_service.user_id, time) ->
     timestamp = new Date(time).getTime()
-    throw new z.storage.StorageError z.storage.StorageError::INVALID_TIMESTAMP if window.isNaN timestamp
+    throw new z.storage.StorageError z.storage.StorageError::TYPE.INVALID_TIMESTAMP if window.isNaN timestamp
     return "#{conversation_id}@#{sender_id}@#{timestamp}"
 
   ###

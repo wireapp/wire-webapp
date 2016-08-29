@@ -44,6 +44,7 @@ z.tracking.EventName =
     CHARACTER_LIMIT_REACHED: 'conversation.character_limit_reached'
     CREATE_GROUP_CONVERSATION: 'createGroupConversation'
     DELETED_MESSAGE: 'conversation.deleted_message'
+    EDITED_MESSAGE: 'conversation.edited_message'
     SELECTED_MESSAGE: 'conversation.selected_message'
   MEDIA:
     COMPLETED_MEDIA_ACTION: 'media.completed_media_action'

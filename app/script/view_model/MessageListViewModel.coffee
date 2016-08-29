@@ -136,6 +136,10 @@ class z.ViewModel.MessageListViewModel
 
     if not conversation_et.is_loaded()
       @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
+
+        # release any event that are not unread
+        conversation_et.release()
+
         @conversation_repository.get_events conversation_et
         .then =>
           @_set_conversation conversation_et, callback
@@ -369,6 +373,11 @@ class z.ViewModel.MessageListViewModel
           .find '.message-header-user-is-hideable'
           .removeClass 'hide-user'
 
+        if message.is_content() and message.replacing_message_id
+          $(elements)
+          .find '.message-header-user-is-hideable'
+          .removeClass 'hide-user'
+
       if message?.is_ping()
         now = Date.now()
         message.animated now - current < 2000
@@ -470,6 +479,9 @@ class z.ViewModel.MessageListViewModel
     if message_et.has_asset()
       entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
 
+    if message_et.is_editable() and not @conversation().removed_from_conversation()
+      entries.push {label: z.string.conversation_context_menu_edit, action: 'edit'}
+
     if message_et.is_deletable()
       entries.push {label: z.string.conversation_context_menu_delete, action: 'delete'}
 
@@ -506,6 +518,8 @@ class z.ViewModel.MessageListViewModel
         message_et?.delete_everyone()
       when 'download'
         message_et?.get_first_asset()?.download()
+      when 'edit'
+        message_et?.edit()
 
   ###
   Shows detail image view.

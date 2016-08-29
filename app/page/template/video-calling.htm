@@ -16,7 +16,7 @@
         <!-- /ko -->
         <!-- ko if: show_remote_participant() -->
           <div class="video-element-remote-participant">
-            <!-- ko ifnot: joined_call().is_group() -->
+            <!-- ko ifnot: videod_call().is_group() -->
               <user-avatar class="video-element-remote-participant user-avatar-xl user-avatar-no-badge"
                            params="user: remote_user()"></user-avatar>
             <!-- /ko -->
@@ -44,8 +44,8 @@
           <div id="video-title" class="video-title"
                data-bind="css: {'hide-controls-hidden': !show_remote_participant() && !is_choosing_screen(),
                                 'video-element-dark': show_remote_participant()}">
-            <div class="video-remote-name" data-bind="text: joined_call().conversation_et.display_name()"></div>
-            <div class="video-timer label-xs" data-bind="text: z.util.format_seconds(joined_call().duration_time())"></div>
+            <div class="video-remote-name" data-bind="text: videod_call().conversation_et.display_name()"></div>
+            <div class="video-timer label-xs" data-bind="text: z.util.format_seconds(videod_call().duration_time())"></div>
           </div>
         <!-- /ko -->
 

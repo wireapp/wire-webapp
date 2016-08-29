@@ -71,20 +71,20 @@
                  data-bind="click: $root.on_ignore_call, l10n_text: z.string.call_decline">
             </div>
             <!-- ko if: call().is_remote_videod() -->
-            <div class="button button-pill button-full button-sm button-theme-green"
-                 data-uie-name="do-call-controls-call-accept"
-                 data-bind="click: $root.on_accept_video">
-              <span class="icon-video"></span>
-              <span data-bind="l10n_text: z.string.call_accept"></span>
-            </div>
+              <div class="button button-pill button-full button-sm button-theme-green"
+                   data-uie-name="do-call-controls-call-accept"
+                   data-bind="click: $root.on_accept_video">
+                <span class="icon-video"></span>
+                <span data-bind="l10n_text: z.string.call_accept"></span>
+              </div>
             <!-- /ko -->
             <!-- ko ifnot: call().is_remote_videod() -->
-            <div class="button button-pill button-full button-sm button-theme-green"
-                 data-uie-name="do-call-controls-call-accept"
-                 data-bind="click: $root.on_accept_call">
-              <span class="icon-call"></span>
-              <span data-bind="l10n_text: z.string.call_accept"></span>
-            </div>
+              <div class="button button-pill button-full button-sm button-theme-green"
+                   data-uie-name="do-call-controls-call-accept"
+                   data-bind="click: $root.on_accept_call">
+                <span class="icon-call"></span>
+                <span data-bind="l10n_text: z.string.call_accept"></span>
+              </div>
             <!-- /ko -->
           </div>
         <!-- /ko -->

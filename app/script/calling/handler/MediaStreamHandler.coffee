@@ -78,8 +78,8 @@ class z.calling.handler.MediaStreamHandler
 
     @local_media_type = ko.observable z.calling.enum.MediaType.AUDIO
 
-    @has_active_streams = ko.pureComputed =>
-      return @local_media_streams.audio()?.active or @local_media_streams.video()?.active
+    @has_media_streams = ko.pureComputed =>
+      return @local_media_streams.audio() or @local_media_streams.video()
 
     @request_hint_timeout = undefined
 
@@ -151,7 +151,7 @@ class z.calling.handler.MediaStreamHandler
 
         resolve [z.calling.enum.MediaType.SCREEN, constraints]
       else
-        reject new z.calling.CallError 'Screen sharing is not yet supported by this browser', z.calling.CallError::TYPE.NOT_SUPPORTED
+        reject new z.calling.CallError z.calling.CallError::TYPE.SCREEN_NOT_SUPPORTED
 
   ###
   Get the video constraints to be used for MediaStream creation.
@@ -221,6 +221,7 @@ class z.calling.handler.MediaStreamHandler
         @_initiate_media_stream_failure error, media_type, conversation_id
       @logger.log @logger.levels.ERROR, "Requesting MediaStream failed: #{error.name}", error
       @call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA, undefined, {cause: error.name, video: is_videod}
+      throw error
 
   # Release the MediaStreams.
   release_media_streams: =>
@@ -234,19 +235,16 @@ class z.calling.handler.MediaStreamHandler
   @param media_stream_info [z.calling.payloads.MediaStreamInfo] Info about new MediaStream
   ###
   replace_media_stream: (media_stream_info) =>
-    @logger.log @logger.levels.DEBUG, "Received new MediaStream with '#{media_stream_info.stream.getTracks().length}' MediaStreamTrack/s",
+    @logger.log @logger.levels.DEBUG, "Received new MediaStream with '#{media_stream_info.stream.getTracks().length}' MediaStreamTrack(s)",
       {stream: media_stream_info.stream, audio_tracks: media_stream_info.stream.getAudioTracks(), video_tracks: media_stream_info.stream.getVideoTracks()}
     @_set_stream_state media_stream_info
-    return Promise.all (flow_et.switch_media_stream media_stream_info for flow_et in @call_center.joined_call().get_flows())
+    return Promise.all (flow_et.update_media_stream media_stream_info for flow_et in @call_center.joined_call().get_flows())
     .then (resolve_array) =>
-      [media_stream_info, replaced_stream] = resolve_array[0]
-      if replaced_stream
-        @release_media_streams media_stream_info.type
+      media_stream_info = resolve_array[0]
+      if media_stream_info.type is z.calling.enum.MediaType.AUDIO
+        @_release_media_stream @local_media_streams.audio(), z.calling.enum.MediaType.AUDIO
       else
-        if media_stream_info.type is z.calling.enum.MediaType.VIDEO
-          @_release_media_stream @local_media_streams.video(), z.calling.enum.MediaType.VIDEO
-        else
-          @_release_media_stream @local_media_streams.audio(), z.calling.enum.MediaType.AUDIO
+        @_release_media_stream @local_media_streams.video(), z.calling.enum.MediaType.VIDEO
       @set_local_media_stream media_stream_info
 
   ###
@@ -262,8 +260,7 @@ class z.calling.handler.MediaStreamHandler
       when z.calling.enum.MediaType.SCREEN
         constraints_promise = @get_screen_stream_constraints()
       when z.calling.enum.MediaType.VIDEO
-        request_audio = not z.util.Environment.browser.firefox
-        constraints_promise = @get_media_stream_constraints request_audio, true
+        constraints_promise = @get_media_stream_constraints false, true
 
     constraints_promise.then ([media_type, media_stream_constraints]) =>
       return @request_media_stream media_type, media_stream_constraints
@@ -287,11 +284,11 @@ class z.calling.handler.MediaStreamHandler
       if not @call_center.media_devices_handler.has_microphone()
         @logger.log @logger.levels.WARN, "Requesting MediaStream access aborted - 'No microphone'"
         @_show_device_not_found_hint z.calling.enum.MediaType.AUDIO, conversation_id
-        reject new z.calling.CallError 'No microphone found', z.calling.CallError::TYPE.NO_MICROPHONE_FOUND
+        reject new z.calling.CallError z.calling.CallError::TYPE.NO_MICROPHONE_FOUND
       else if not @call_center.media_devices_handler.has_camera() and media_type is z.calling.enum.MediaType.VIDEO
         @logger.log @logger.levels.WARN, "Requesting MediaStream access aborted - 'No camera'"
         @_show_device_not_found_hint z.calling.enum.MediaType.VIDEO, conversation_id
-        reject new z.calling.CallError 'No camera found', z.calling.CallError::TYPE.NO_CAMERA_FOUND
+        reject new z.calling.CallError z.calling.CallError::TYPE.NO_CAMERA_FOUND
       else
         @logger.log @logger.levels.INFO, "Requesting MediaStream access for '#{media_type}'", media_stream_constraints
         @request_hint_timeout = window.setTimeout =>
@@ -375,7 +372,7 @@ class z.calling.handler.MediaStreamHandler
   _initiate_media_stream_success: (media_stream_info) =>
     return if not media_stream_info
     @call_center.timings().time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED if @call_center.timings()
-    @logger.log @logger.levels.DEBUG, "Received initial MediaStream with '#{media_stream_info.stream.getTracks().length}' MediaStreamTrack/s",
+    @logger.log @logger.levels.DEBUG, "Received initial MediaStream with '#{media_stream_info.stream.getTracks().length}' MediaStreamTrack(s)",
       {stream: media_stream_info.stream, audio_tracks: media_stream_info.stream.getAudioTracks(), video_tracks: media_stream_info.stream.getVideoTracks()}
     @_set_stream_state media_stream_info
     @set_local_media_stream media_stream_info
@@ -524,7 +521,7 @@ class z.calling.handler.MediaStreamHandler
       if @local_media_streams.audio()
         @_toggle_audio_enabled()
       else
-        throw new z.calling.CallError 'No audio stream found to toggle mute state', z.calling.CallError::TYPE.NO_AUDIO_STREAM_FOUND
+        throw new z.calling.CallError z.calling.CallError::TYPE.NO_AUDIO_STREAM_FOUND
 
   # Toggle the screen.
   toggle_screen_shared: =>

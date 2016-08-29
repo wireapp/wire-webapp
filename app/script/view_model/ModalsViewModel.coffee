@@ -137,16 +137,16 @@ class z.ViewModel.ModalsViewModel
       replace: {placeholder: '%no', content: content}
     }
 
-  _show_modal_call_start_another: (is_outgoing, title_element, message_element) ->
+  ###
+  @note Modal supports z.calling.enum.CallState.INCOMING, z.calling.enum.CallState.ONGOING, z.calling.enum.CallState.OUTGOING
+  @param call_state [z.calling.enum.CallState] Current call state
+  ###
+  _show_modal_call_start_another: (call_state, title_element, message_element) ->
     action_element = $(z.ViewModel.ModalType.CALL_START_ANOTHER).find('.modal-action')
-    if is_outgoing
-      action_element.text z.localization.Localizer.get_text z.string.modal_call_second_outgoing_action
-      message_element.text z.localization.Localizer.get_text z.string.modal_call_second_outgoing_message
-      title_element.text z.localization.Localizer.get_text z.string.modal_call_second_outgoing_headline
-    else
-      action_element.text  z.localization.Localizer.get_text z.string.modal_call_second_incoming_action
-      message_element.text z.localization.Localizer.get_text z.string.modal_call_second_incoming_message
-      title_element.text z.localization.Localizer.get_text z.string.modal_call_second_incoming_headline
+
+    action_element.text z.localization.Localizer.get_text z.string["modal_call_second_#{call_state}_action"]
+    message_element.text z.localization.Localizer.get_text z.string["modal_call_second_#{call_state}_message"]
+    title_element.text z.localization.Localizer.get_text z.string["modal_call_second_#{call_state}_headline"]
 
   _show_modal_clear: (options, type) ->
     if options.conversation.is_group() and not options.conversation.removed_from_conversation()

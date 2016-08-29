@@ -156,6 +156,10 @@ z.string.modal_call_no_video_in_group_message = 'Video calls are not available i
 z.string.modal_call_second_incoming_headline = 'Answer call?'
 z.string.modal_call_second_incoming_message = 'Your current call will end.'
 z.string.modal_call_second_incoming_action = 'Answer'
+# Second ongoing call
+z.string.modal_call_second_ongoing_headline = 'Hang up call on another device?'
+z.string.modal_call_second_ongoing_message = 'You can only be in one call at a time.'
+z.string.modal_call_second_ongoing_action = 'Hang Up'
 # Second outgoing call
 z.string.modal_call_second_outgoing_headline = 'Hang up current call?'
 z.string.modal_call_second_outgoing_message = 'You can only be in one call at a time.'
@@ -264,10 +268,12 @@ z.string.conversation_asset_downloading = 'Downloading…'
 z.string.conversation_asset_upload_failed = 'Upload Failed'
 z.string.conversation_asset_upload_too_large = 'You can send files up to %no'
 z.string.conversation_playback_error = 'Unable to play'
+z.string.conversation_context_menu_edit = 'Edit'
 z.string.conversation_context_menu_delete = 'Delete for Me'
 z.string.conversation_context_menu_delete_everyone = 'Delete for Everyone'
 z.string.conversation_context_menu_download = 'Download'
 z.string.conversation_delete_timestamp = 'Deleted on %@timestamp'
+z.string.conversation_edit_timestamp = 'Edited on %@timestamp'
 
 # Conversation list
 z.string.conversation_list_archive = 'ARCHIVE'
