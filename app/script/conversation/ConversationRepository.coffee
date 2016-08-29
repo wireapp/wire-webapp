@@ -182,8 +182,7 @@ class z.conversation.ConversationRepository
   get_message_from_db: (conversation_et, message_id) =>
     @conversation_service.load_event_from_db conversation_et.id, message_id
     .then (event) =>
-      raw_event = event.mapped or event.raw
-      return @event_mapper.map_json_event raw_event, conversation_et
+      return @event_mapper.map_json_event event, conversation_et
 
   get_events: (conversation_et) ->
     return new Promise (resolve, reject) =>
@@ -203,8 +202,7 @@ class z.conversation.ConversationRepository
         else
           @logger.log @logger.levels.INFO,
             "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
-        raw_events = (event.mapped or event.raw for event in events)
-        mapped_messages = @_add_events_to_conversation events: raw_events, conversation_et
+        mapped_messages = @_add_events_to_conversation events: events, conversation_et
         conversation_et.is_pending false
         resolve mapped_messages
       .catch (error) =>
@@ -221,8 +219,7 @@ class z.conversation.ConversationRepository
     @conversation_service.load_unread_events_from_db conversation_et, timestamp
     .then (events) =>
       if events.length
-        raw_events = (event.mapped or event.raw for event in events)
-        @_add_events_to_conversation events: raw_events, conversation_et
+        @_add_events_to_conversation events: events, conversation_et
       conversation_et.is_pending false
     .catch (error) =>
       @logger.log @logger.levels.INFO, "Could not load unread events for conversation: #{conversation_et.id}", error
@@ -848,7 +845,7 @@ class z.conversation.ConversationRepository
         event = @_construct_otr_asset_event json, conversation_id, asset_id
         return @cryptography_repository.save_encrypted_event generic_message, event
       .then (record) =>
-        @add_event conversation_et, record.mapped
+        @add_event conversation_et, record
         resolve()
       .catch (error) =>
         @logger.log "Failed to upload otr asset for conversation #{conversation_id}", error
@@ -951,7 +948,7 @@ class z.conversation.ConversationRepository
       event = @_construct_otr_message_event response, conversation_et.id
       return @cryptography_repository.save_encrypted_event generic_message, event
     .then (record) =>
-      @on_conversation_event record.mapped if record?.mapped
+      @on_conversation_event record
     .then =>
       @_track_edit_message conversation_et, original_message_et
     .then =>
@@ -1132,7 +1129,7 @@ class z.conversation.ConversationRepository
       event = @_construct_otr_message_event response, conversation_et.id
       return @cryptography_repository.save_encrypted_event generic_message, event
     .then (record) =>
-      @add_event conversation_et, record.mapped if record?.mapped
+      @add_event conversation_et, record
       return record
     .catch (error) =>
       error_message = "Could not send OTR message of type '#{generic_message.content}' to conversation ID '#{conversation_et.id}' (#{conversation_et.display_name()}): #{error.message}"
@@ -1270,8 +1267,8 @@ class z.conversation.ConversationRepository
 
     @send_asset_metadata conversation_et, file
     .then (record) =>
-      message_et = conversation_et.get_message_by_id record.mapped.id
-      @send_asset conversation_et, file, record.mapped.id
+      message_et = conversation_et.get_message_by_id record.id
+      @send_asset conversation_et, file, record.id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
       @logger.log "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
@@ -1905,7 +1902,7 @@ class z.conversation.ConversationRepository
     .then ([original_message_et, edited_message_et]) =>
       return @conversation_service.update_message_timestamp_in_db edited_message_et.primary_key, original_message_et.timestamp
     .then (record) ->
-      return record.mapped
+      return record
 
   ###############################################################################
   # Helpers

@@ -265,12 +265,10 @@ class z.event.EventRepository
   get_conversation_ids_with_active_events: (include_on, exclude_on) =>
     return new Promise (resolve, reject) =>
       @cryptography_repository.storage_repository.load_events_by_types _.flatten [include_on, exclude_on]
-      .then (records) ->
-        raw_events = (record.raw for record in records)
-
+      .then (events) ->
         filtered_conversations = {}
 
-        for event in raw_events
+        for event in events
           conversation_id = event.conversation
           if event.type in include_on
             filtered_conversations[conversation_id] = null
@@ -358,11 +356,11 @@ class z.event.EventRepository
       else if event.type in z.event.EventTypeHandling.STORE
         promise = @cryptography_repository.save_unencrypted_event event
       else
-        promise = Promise.resolve {raw: event}
+        promise = Promise.resolve event
 
       promise.then (record) =>
-        if record and (source is @NOTIFICATION_SOURCE.SOCKET or @is_recovering or record.raw.type.startsWith 'conversation')
-          @_distribute_event record.mapped or record.raw
+        if record and (source is @NOTIFICATION_SOURCE.SOCKET or @is_recovering or record.type.startsWith 'conversation')
+          @_distribute_event record
         resolve record
       .catch (error) =>
         if error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
