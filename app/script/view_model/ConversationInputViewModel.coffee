@@ -176,8 +176,8 @@ class z.ViewModel.ConversationInputViewModel
   show_separator: (is_scrolled_bottom) =>
     @list_not_bottom not is_scrolled_bottom
 
-  on_window_click: (e) =>
-    return if $(e.target).closest(".conversation-input").length
+  on_window_click: (event) =>
+    return if $(event.target).closest(".conversation-input").length
     @cancel_edit()
 
   on_input_click: =>
