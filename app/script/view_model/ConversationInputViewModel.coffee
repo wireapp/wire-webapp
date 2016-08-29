@@ -37,6 +37,12 @@ class z.ViewModel.ConversationInputViewModel
     @is_editing = ko.pureComputed =>
       return @edit_message_et()?
 
+    @is_editing.subscribe (is_editing) =>
+      if is_editing
+        window.addEventListener 'click', @on_window_click
+      else
+        window.removeEventListener 'click', @on_window_click
+
     @conversation_has_focus = ko.observable(true).extend notify: 'always'
     @browser_has_focus = ko.observable true
 
@@ -169,6 +175,10 @@ class z.ViewModel.ConversationInputViewModel
 
   show_separator: (is_scrolled_bottom) =>
     @list_not_bottom not is_scrolled_bottom
+
+  on_window_click: (event) =>
+    return if $(event.target).closest(".conversation-input").length
+    @cancel_edit()
 
   on_input_click: =>
     if not @has_text_input()
