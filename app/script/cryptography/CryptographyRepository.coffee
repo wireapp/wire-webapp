@@ -561,7 +561,7 @@ class z.cryptography.CryptographyRepository
     @cryptography_mapper.map_generic_message generic_message, event
     .then (mapped) =>
       primary_key = @storage_repository.construct_primary_key event.conversation, event.from, event.time
-      return @storage_repository.save_decrypted_conversation_event primary_key, event, mapped
+      return @storage_repository.save_conversation_event primary_key, event, mapped
     .then (primary_key) =>
       @logger.log @logger.levels.INFO, "Saved '#{generic_message.content}' (OTR) with primary key '#{primary_key}'"
       return @storage_repository.load_event_for_conversation primary_key
@@ -578,7 +578,7 @@ class z.cryptography.CryptographyRepository
   @return [Promise] Promise that will resolve with the saved record
   ###
   save_unencrypted_event: (event) ->
-    @storage_repository.save_unencrypted_conversation_event event
+    @storage_repository.save_conversation_event event
     .then (primary_key) =>
       @logger.log @logger.levels.INFO, "Saved unencrypted event '#{event.type}' with primary key '#{primary_key}'"
       @storage_repository.load_event_for_conversation primary_key

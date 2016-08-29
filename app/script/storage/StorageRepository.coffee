@@ -216,47 +216,15 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
     return "#{conversation_id}@#{sender_id}@#{timestamp}"
 
   ###
-  Save a decrypted conversation event.
-
-  @param primary_key [String] Primary key to save the object with
-  @param otr_message_event [Object] JSON event to be stored
-  @param mapped_json [Object] OTR event mapped to it's decrypted counterpart
-  @return [Promise] Promise that resolves with the stored record
-  ###
-  save_decrypted_conversation_event: (primary_key, otr_message_event, mapped_json) ->
-    return new Promise (resolve, reject) =>
-      event_object =
-        raw: otr_message_event
-        meta:
-          timestamp: new Date(otr_message_event.time).getTime()
-          version: 1
-        mapped: mapped_json
-
-      # We don't need to keep ciphertext once it has been successfully decrypted
-      event_object.raw.data = undefined
-
-      store_name = @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
-      @storage_service.save store_name, primary_key, event_object
-      .then (primary_key) -> resolve primary_key
-      .catch (error) -> reject error
-
-  ###
   Save an unencrypted conversation event.
   @param event [Object] JSON event to be stored
   @return [Promise] Promise that resolves with the stored record
   ###
-  save_unencrypted_conversation_event: (event) ->
+  save_conversation_event: (event) ->
     return new Promise (resolve, reject) =>
       primary_key = @construct_primary_key event.conversation, event.from, event.time
-
-      event_object =
-        raw: event
-        meta:
-          timestamp: new Date(event.time).getTime()
-          version: 1
-
       store_name = @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
-      @storage_service.save store_name, primary_key, event_object
+      @storage_service.save store_name, primary_key, event
       .then (primary_key) -> resolve primary_key
       .catch (error) -> reject error
 
@@ -278,9 +246,9 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   load_events_by_types: (event_types) ->
     return new Promise (resolve, reject) =>
       @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where 'raw.type'
+      .where 'type'
       .anyOf event_types
-      .sortBy 'raw.time'
+      .sortBy 'time'
       .then (records) ->
         resolve records
       .catch (error) =>
