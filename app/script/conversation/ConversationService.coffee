@@ -339,11 +339,10 @@ class z.conversation.ConversationService
     .reverse()
     .sortBy 'meta.timestamp'
     .then (records) ->
-      if start
-        records = (record for record in records when record.meta.timestamp < start)
-      if end
-        records = (record for record in records when record.meta.timestamp > end)
-      return records
+      return records.filter (record) ->
+        return false if start && record.meta.timestamp >= start
+        return false if end && record.meta.timestamp <= end
+        return true
     .then (records) ->
       return records.slice(0, limit)
     .catch (error) =>
