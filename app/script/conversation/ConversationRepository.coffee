@@ -1901,8 +1901,6 @@ class z.conversation.ConversationRepository
       return [original_message_et, @event_mapper.map_json_event event_json, conversation_et]
     .then ([original_message_et, edited_message_et]) =>
       return @conversation_service.update_message_timestamp_in_db edited_message_et.primary_key, original_message_et.timestamp
-    .then (record) ->
-      return record
 
   ###############################################################################
   # Helpers
