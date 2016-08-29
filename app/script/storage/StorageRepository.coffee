@@ -193,9 +193,10 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
 
   ###
   Closes the database connection.
+  @param reason [String] Cause for the termination
   ###
-  terminate: ->
-    @storage_service.terminate()
+  terminate: (reason) ->
+    @storage_service.terminate reason
 
   ###############################################################################
   # Conversation Events

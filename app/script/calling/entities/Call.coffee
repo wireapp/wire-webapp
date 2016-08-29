@@ -486,7 +486,7 @@ class z.calling.entities.Call
     @session_id undefined
     @self_user_joined false
     @is_declined false
-    amplify.publish z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION if @network_interruption()
+    amplify.publish z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION
 
   ###
   Reset the call timers.
