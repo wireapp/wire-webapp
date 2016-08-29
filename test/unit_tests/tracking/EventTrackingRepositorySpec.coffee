@@ -151,3 +151,35 @@ describe 'z.tracking.EventTrackingRepository', ->
         tracking_repository._check_error_payload faked_payload
 
       expect(tracking_repository.reported_errors().length).toBe 1
+
+  describe '_attach_promise_rejection_handler', ->
+    error_description = 'Unit test error'
+
+    beforeAll ->
+      tracking_repository._attach_promise_rejection_handler()
+
+    afterAll ->
+      tracking_repository._detach_promise_rejection_handler()
+
+    it 'handles a Promise rejected with an Error that is uncaught', (done) ->
+      window.onerror = (error_message, file_name, line_number, column_number, error) ->
+        expect(error_message).toBe error_description
+        expect(error.message).toBe error_description
+        done()
+
+      Promise.reject new Error 'Unit test error'
+
+    it 'handles a Promise rejected with a String that is uncaught', (done) ->
+      window.onerror = (error_message, file_name, line_number, column_number, error) ->
+        expect(error_message).toBe error_description
+        expect(error).toBe error_description
+        expect(error.message).toBeUndefined()
+        done()
+
+      Promise.reject 'Unit test error'
+
+    it 'ignores a rejected Promise that is caught', (done) ->
+      window.onerror = done.fail
+
+      Promise.reject new Error error_description
+      .catch done
