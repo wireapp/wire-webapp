@@ -323,52 +323,32 @@ class z.conversation.ConversationService
         reject error
 
   ###
-  Load conversation events.
+  Load conversation events. Start and end are not included.
+  Events are always sorted beginning with the newest timestamp.
 
   @param conversation_id [String] ID of conversation
-  @param offset [String] Timestamp that loaded events have to undercut
+  @param start [Number] starting from this timestamp
+  @param end [Number] stop when reaching timestamp
   @param limit [Number] Amount of events to load
-  @return [Promise] Promise that resolves with the retrieved records ([events, has_further_events])
-  ###
-  load_events_from_db: (conversation_id, offset, limit = z.config.MESSAGES_FETCH_LIMIT) ->
-    return new Promise (resolve, reject) =>
-      @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where 'raw.conversation'
-      .equals conversation_id
-      .reverse()
-      .sortBy 'meta.timestamp'
-      .then (records) ->
-        records = (record for record in records when record.meta.timestamp < offset) if offset
-        has_further_events = records.length > limit
-        resolve [records.slice(0, limit), has_further_events]
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR,
-          "Failed to get events for conversation '#{conversation_id}': #{error.message}", error
-        reject error
-
-  ###
-  Load all unread events of a conversation.
-
-  @param conversation_et [z.entity.Conversation] Conversation entity
-  @param offset [String] Timestamp that loaded events have to undercut
   @return [Promise] Promise that resolves with the retrieved records
   ###
-  load_unread_events_from_db: (conversation_et, offset) ->
-    return new Promise (resolve, reject) =>
-      conversation_id = conversation_et.id
-      @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where 'raw.conversation'
-      .equals conversation_id
-      .reverse()
-      .sortBy 'raw.time'
-      .then (records) ->
-        records = (record for record in records when record.meta.timestamp < offset) if offset
-        records = (record for record in records when record.meta.timestamp > conversation_et.last_read_timestamp())
-        resolve records
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR,
-          "Failed to get unread events for conversation '#{conversation_et.id}': #{error.message}", error
-        reject error
+  load_events_from_db: (conversation_id, start, end, limit) ->
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where 'raw.conversation'
+    .equals conversation_id
+    .reverse()
+    .sortBy 'meta.timestamp'
+    .then (records) ->
+      return records.filter (record) ->
+        return false if start and record.meta.timestamp >= start
+        return false if end and record.meta.timestamp <= end
+        return true
+    .then (records) ->
+      return records.slice 0, limit
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR,
+        "Failed to get events for conversation '#{conversation_id}': #{error.message}", error
+      throw error
 
   ###
   Add users to an existing conversation.
