@@ -340,8 +340,8 @@ class z.conversation.ConversationService
     .sortBy 'meta.timestamp'
     .then (records) ->
       return records.filter (record) ->
-        return false if start && record.meta.timestamp >= start
-        return false if end && record.meta.timestamp <= end
+        return false if start and record.meta.timestamp >= start
+        return false if end and record.meta.timestamp <= end
         return true
     .then (records) ->
       return records.slice(0, limit)
