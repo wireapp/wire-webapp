@@ -93,6 +93,15 @@ class z.storage.StorageService
         "#{@OBJECT_STORE_PREKEYS}": ''
         "#{@OBJECT_STORE_SESSIONS}": ''
 
+      version_5 =
+        "#{@OBJECT_STORE_AMPLIFY}": ''
+        "#{@OBJECT_STORE_CLIENTS}": ', meta.primary_key'
+        "#{@OBJECT_STORE_CONVERSATION_EVENTS}": ', conversation, time, type'
+        "#{@OBJECT_STORE_CONVERSATIONS}": ', id, last_event_timestamp'
+        "#{@OBJECT_STORE_KEYS}": ''
+        "#{@OBJECT_STORE_PREKEYS}": ''
+        "#{@OBJECT_STORE_SESSIONS}": ''
+
       @db = new Dexie @db_name
 
       @db.on 'blocked', =>
@@ -130,6 +139,15 @@ class z.storage.StorageService
           @db[@OBJECT_STORE_SESSIONS].update key, {id: key}
         transaction[@OBJECT_STORE_PREKEYS].toCollection().eachKey (key) =>
           @db[@OBJECT_STORE_PREKEYS].update key, {id: key}
+      @db.version(7).stores version_5
+      .upgrade (transaction) =>
+        @logger.log @logger.levels.WARN, 'Database upgrade to version 7', transaction
+        transaction[@OBJECT_STORE_CONVERSATIONS].toCollection().modify (event) =>
+          mapped_event = event.mapped or event.raw
+          delete event.mapped
+          delete event.raw
+          delete event.meta
+          $.extend event, mapped_event
 
       @db.open()
       .then =>
