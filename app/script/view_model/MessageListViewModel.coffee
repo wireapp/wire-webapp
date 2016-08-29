@@ -479,7 +479,7 @@ class z.ViewModel.MessageListViewModel
     if message_et.has_asset()
       entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
 
-    if message_et.is_editable()
+    if message_et.is_editable() and not @conversation().removed_from_conversation()
       entries.push {label: z.string.conversation_context_menu_edit, action: 'edit'}
 
     if message_et.is_deletable()
