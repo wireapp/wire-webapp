@@ -31,6 +31,20 @@ class z.storage.StorageService
   OBJECT_STORE_PREKEYS: 'prekeys'
   OBJECT_STORE_SESSIONS: 'sessions'
 
+  ###
+  Construct a unique primary key.
+  @param event [Object] Message event
+  @return [String] Generated primary key
+  ###
+  @construct_primary_key: (event) ->
+    throw new z.storage.StorageError z.storage.StorageError::TYPE.NO_CONVERSATION_ID if not event.conversation
+    throw new z.storage.StorageError z.storage.StorageError::TYPE.NO_SENDER_ID if not event.from
+    throw new z.storage.StorageError z.storage.StorageError::TYPE.NO_TIME if not event.time
+    timestamp = new Date(event.time).getTime()
+    throw new z.storage.StorageError z.storage.StorageError::TYPE.INVALID_TIMESTAMP if window.isNaN timestamp
+    return "#{event.conversation}@#{event.from}@#{timestamp}"
+
+
   constructor: ->
     @logger = new z.util.Logger 'z.storage.StorageService', z.config.LOGGER.OPTIONS
 
