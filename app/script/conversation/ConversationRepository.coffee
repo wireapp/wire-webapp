@@ -810,6 +810,16 @@ class z.conversation.ConversationRepository
     @_send_and_save_generic_message conversation_et, generic_message
 
   ###
+  Send a confirmation for a content message.
+  @param conversation [z.entity.Conversation] Conversation that content message was received in
+  @param message_id [String] ID of message for which to acknowledge receipt
+  ###
+  send_confirmation_status: (conversation_et, message_id) =>
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'confirmation', new z.proto.Confirmation message_id, z.proto.Confirmation.Type.DELIVERED
+    @_send_generic_message conversation_et.id, generic_message
+
+  ###
   Sends an OTR Image Asset
   ###
   send_image_asset: (conversation_et, image) =>
@@ -1431,6 +1441,8 @@ class z.conversation.ConversationRepository
   ###
   add_event: (conversation_et, event_json) =>
     @_add_event_to_conversation event_json, conversation_et, (message_et) =>
+      if conversation_et.is_one2one() and not message_et.user().is_me and message_et.type in z.event.EventTypeHandling.CONFIRM
+        @send_confirmation_status conversation_et, message_et.id
       @_send_event_notification event_json, conversation_et, message_et
 
   ###

@@ -562,9 +562,6 @@ class z.cryptography.CryptographyRepository
     .then (mapped) =>
       primary_key = @storage_repository.construct_primary_key event.conversation, event.from, event.time
       return @storage_repository.save_decrypted_conversation_event primary_key, event, mapped
-    .then (primary_key) =>
-      @logger.log @logger.levels.INFO, "Saved '#{generic_message.content}' (OTR) with primary key '#{primary_key}'"
-      return @storage_repository.load_event_for_conversation primary_key
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Saving encrypted message failed: #{error.message}", error
       if error instanceof z.cryptography.CryptographyError
