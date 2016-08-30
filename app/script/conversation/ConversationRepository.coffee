@@ -190,9 +190,10 @@ class z.conversation.ConversationRepository
       timestamp = conversation_et.get_first_message()?.timestamp
       @conversation_service.load_events_from_db conversation_et.id, timestamp, null, z.config.MESSAGES_FETCH_LIMIT
       .then (events) =>
+        if events.length < z.config.MESSAGES_FETCH_LIMIT
+          conversation_et.has_further_messages false
         if events.length is 0
           @logger.log @logger.levels.INFO, "No events for conversation '#{conversation_et.id}' found", events
-          conversation_et.has_further_messages false
         else if timestamp
           date = new Date(timestamp).toISOString()
           @logger.log @logger.levels.INFO,
