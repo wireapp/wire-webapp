@@ -20,17 +20,27 @@ window.z ?= {}
 z.event ?= {}
 
 z.event.EventTypeHandling =
+  CONFIRM: [
+    z.event.Backend.CONVERSATION.ASSET_ADD
+    z.event.Backend.CONVERSATION.KNOCK
+    z.event.Backend.CONVERSATION.LOCATION
+    z.event.Backend.CONVERSATION.MESSAGE_ADD
+  ]
   DECRYPT: [
     z.event.Backend.CONVERSATION.OTR_ASSET_ADD
     z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD
   ]
   IGNORE: [
-    z.event.Backend.CONVERSATION.CLIENT_MESSAGE_ADD
     z.event.Backend.CONVERSATION.TYPING
+  ]
+  OUTDATED: [
+    z.event.Backend.CONVERSATION.ASSET_ADD
+    z.event.Backend.CONVERSATION.CLIENT_MESSAGE_ADD
+    z.event.Backend.CONVERSATION.KNOCK
+    z.event.Backend.CONVERSATION.MESSAGE_ADD
   ]
   STORE: [
     z.event.Backend.CONVERSATION.ASSET_ADD
-    z.event.Backend.CONVERSATION.HOT_KNOCK
     z.event.Backend.CONVERSATION.KNOCK
     z.event.Backend.CONVERSATION.LOCATION
     z.event.Backend.CONVERSATION.MEMBER_JOIN

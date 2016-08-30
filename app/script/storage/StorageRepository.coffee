@@ -225,7 +225,7 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
       primary_key = @construct_primary_key event.conversation, event.from, event.time
       store_name = @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
       @storage_service.save store_name, primary_key, event
-      .then (primary_key) -> resolve primary_key
+      .then -> resolve event
       .catch (error) -> reject error
 
   ###

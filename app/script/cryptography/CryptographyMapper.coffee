@@ -57,14 +57,14 @@ class z.cryptography.CryptographyMapper
         return @_map_asset generic_message.asset, generic_message.message_id, event.data?.id
       when 'cleared'
         return @_map_cleared generic_message.cleared
-      when 'hidden'
-        return @_map_hidden generic_message.hidden
       when 'deleted'
         return @_map_deleted generic_message.deleted
       when 'edited'
         return @_map_edited generic_message.edited, generic_message.message_id
       when 'external'
         return @_map_external generic_message.external, event
+      when 'hidden'
+        return @_map_hidden generic_message.hidden
       when 'image'
         return @_map_image generic_message.image, event.data.id
       when 'knock'
@@ -100,6 +100,13 @@ class z.cryptography.CryptographyMapper
         loudness: new Uint8Array(original.audio.normalized_loudness?.toArrayBuffer() or [])
       }
 
+  _map_asset_not_uploaded: (not_uploaded) ->
+    return {
+      data:
+        reason: not_uploaded
+      type: z.event.Backend.CONVERSATION.ASSET_UPLOAD_FAILED
+    }
+
   _map_asset_original: (original, event_nonce) ->
     return {
       data:
@@ -112,11 +119,13 @@ class z.cryptography.CryptographyMapper
       type: z.event.Backend.CONVERSATION.ASSET_META
     }
 
-  _map_asset_not_uploaded: (not_uploaded) ->
+  _map_asset_preview: (preview, event_id) ->
     return {
       data:
-        reason: not_uploaded
-      type: z.event.Backend.CONVERSATION.ASSET_UPLOAD_FAILED
+        id: event_id
+        otr_key: new Uint8Array preview.remote.otr_key?.toArrayBuffer()
+        sha256: new Uint8Array preview.remote.sha256?.toArrayBuffer()
+      type: z.event.Backend.CONVERSATION.ASSET_PREVIEW
     }
 
   _map_asset_uploaded: (uploaded, event_id) ->
@@ -128,15 +137,6 @@ class z.cryptography.CryptographyMapper
       type: z.event.Backend.CONVERSATION.ASSET_UPLOAD_COMPLETE
     }
 
-  _map_asset_preview: (preview, event_id) ->
-    return {
-      data:
-        id: event_id
-        otr_key: new Uint8Array preview.remote.otr_key?.toArrayBuffer()
-        sha256: new Uint8Array preview.remote.sha256?.toArrayBuffer()
-      type: z.event.Backend.CONVERSATION.ASSET_PREVIEW
-    }
-
   _map_cleared: (cleared) ->
     return {
       conversation: cleared.conversation_id
@@ -145,20 +145,17 @@ class z.cryptography.CryptographyMapper
       type: z.event.Backend.CONVERSATION.MEMBER_UPDATE
     }
 
-  _map_hidden: (hidden) ->
-    return {
-      data:
-        conversation_id: hidden.conversation_id
-        message_id: hidden.message_id
-      type: z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
-    }
-
   _map_deleted: (deleted) ->
     return {
       data:
         message_id: deleted.message_id
       type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
     }
+
+  _map_edited: (edited, event_id) ->
+    mapped = @_map_text edited.text, event_id
+    mapped.data.replacing_message_id = edited.replacing_message_id
+    return mapped
 
   ###
   Unpacks a specific generic message which is wrapped inside an external generic message.
@@ -181,6 +178,14 @@ class z.cryptography.CryptographyMapper
       return @_map_generic_message generic_message, event
     .catch (error) ->
       throw new z.cryptography.CryptographyError error.message, z.cryptography.CryptographyError::TYPE.BROKEN_EXTERNAL
+
+  _map_hidden: (hidden) ->
+    return {
+      data:
+        conversation_id: hidden.conversation_id
+        message_id: hidden.message_id
+      type: z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
+    }
 
   _map_image: (image, event_id) ->
     if image.tag is 'medium'
@@ -249,8 +254,3 @@ class z.cryptography.CryptographyMapper
         previews: text.link_preview.map (preview) -> preview.encode64()
       type: z.event.Backend.CONVERSATION.MESSAGE_ADD
     }
-
-  _map_edited: (edited, event_id) ->
-    mapped = @_map_text edited.text, event_id
-    mapped.data.replacing_message_id = edited.replacing_message_id
-    return mapped

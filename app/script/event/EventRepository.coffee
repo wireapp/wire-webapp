@@ -337,11 +337,7 @@ class z.event.EventRepository
         log_message = "Received encrypted event '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
       else if event.from
         log_message = "Received unencrypted event '#{event.id}' of type '#{event.type}' from user '#{event.from}'"
-        if event.type in [
-          z.event.Backend.CONVERSATION.ASSET_ADD
-          z.event.Backend.CONVERSATION.KNOCK
-          z.event.Backend.CONVERSATION.MESSAGE_ADD
-        ]
+        if event.type in z.event.EventTypeHandling.OUTDATED
           throw new z.event.EventError z.event.EventError::TYPE.OUTDATED_SCHEMA
       else
         log_message = "Received call event '#{event.type}' in conversation '#{event.conversation}'"

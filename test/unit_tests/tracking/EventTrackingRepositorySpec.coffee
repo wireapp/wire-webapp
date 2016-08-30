@@ -170,10 +170,9 @@ describe 'z.tracking.EventTrackingRepository', ->
       Promise.reject new Error 'Unit test error'
 
     it 'handles a Promise rejected with a String that is uncaught', (done) ->
-      window.onerror = (error_message, file_name, line_number, column_number, error) ->
+      window.onerror = (error_message, file_name) ->
         expect(error_message).toBe error_description
-        expect(error).toBe error_description
-        expect(error.message).toBeUndefined()
+        expect(file_name).toBeNull()
         done()
 
       Promise.reject 'Unit test error'
