@@ -561,9 +561,6 @@ class z.cryptography.CryptographyRepository
     @cryptography_mapper.map_generic_message generic_message, event
     .then (mapped) =>
       return @storage_repository.save_conversation_event mapped
-    .then (primary_key) =>
-      @logger.log @logger.levels.INFO, "Saved '#{generic_message.content}' (OTR) with primary key '#{primary_key}'"
-      return @storage_repository.load_event_for_conversation primary_key
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Saving encrypted message failed: #{error.message}", error
       if error instanceof z.cryptography.CryptographyError
@@ -578,9 +575,6 @@ class z.cryptography.CryptographyRepository
   ###
   save_unencrypted_event: (event) ->
     @storage_repository.save_conversation_event event
-    .then (primary_key) =>
-      @logger.log @logger.levels.INFO, "Saved unencrypted event '#{event.type}' with primary key '#{primary_key}'"
-      @storage_repository.load_event_for_conversation primary_key
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Saving unencrypted message failed: #{error.message}", error
       throw error
