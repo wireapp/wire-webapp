@@ -332,14 +332,15 @@ class z.conversation.ConversationService
   ###
   load_events_from_db: (conversation_id, start, end, limit) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-    .where 'raw.conversation'
+    .where 'conversation'
     .equals conversation_id
     .reverse()
-    .sortBy 'meta.timestamp'
+    .sortBy 'time'
     .then (records) ->
       return records.filter (record) ->
-        return false if start and record.meta.timestamp >= start
-        return false if end and record.meta.timestamp <= end
+        timestamp = new Date(record.time).getTime()
+        return false if start and timestamp >= start
+        return false if end and timestamp <= end
         return true
     .then (records) ->
       return records.slice 0, limit
