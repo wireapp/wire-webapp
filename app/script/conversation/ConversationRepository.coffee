@@ -188,13 +188,11 @@ class z.conversation.ConversationRepository
     return new Promise (resolve, reject) =>
       conversation_et.is_pending true
       timestamp = conversation_et.get_first_message()?.timestamp
-
-      @conversation_service.load_events_from_db conversation_et.id, timestamp
-      .then (loaded_events) =>
-        [events, has_further_events] = loaded_events
-        conversation_et.has_further_messages has_further_events
+      @conversation_service.load_events_from_db conversation_et.id, timestamp, null, z.config.MESSAGES_FETCH_LIMIT
+      .then (events) =>
         if events.length is 0
           @logger.log @logger.levels.INFO, "No events for conversation '#{conversation_et.id}' found", events
+          conversation_et.has_further_messages false
         else if timestamp
           date = new Date(timestamp).toISOString()
           @logger.log @logger.levels.INFO,
@@ -216,7 +214,7 @@ class z.conversation.ConversationRepository
   _get_unread_events: (conversation_et) ->
     conversation_et.is_pending true
     timestamp = conversation_et.get_first_message()?.timestamp
-    @conversation_service.load_unread_events_from_db conversation_et, timestamp
+    @conversation_service.load_events_from_db conversation_et.id, timestamp, conversation_et.last_read_timestamp()
     .then (events) =>
       if events.length
         @_add_events_to_conversation events: events, conversation_et
