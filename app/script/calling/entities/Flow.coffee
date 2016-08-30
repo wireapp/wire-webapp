@@ -775,7 +775,7 @@ class z.calling.entities.Flow
   update_media_stream: (media_stream_info) =>
     @_replace_media_track media_stream_info
     .catch (error) =>
-      if error.message in [z.calling.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
+      if error.type in [z.calling.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
         @logger.log @logger.levels.INFO, "Replacement of MediaStream and renegotiation necessary: #{error.message}", error
         return @_replace_media_stream media_stream_info
       throw error
@@ -857,7 +857,7 @@ class z.calling.entities.Flow
       @logger.log @logger.levels.INFO, "Replaced the '#{media_stream_info.type}' track"
       return media_stream_info
     .catch (error) =>
-      if error.message not in [z.calling.CallError::TYPE.NOT_SUPPORTED, z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
+      if error.type not in [z.calling.CallError::TYPE.NOT_SUPPORTED, z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
         @logger.log @logger.levels.ERROR, "Failed to replace the '#{media_stream_info.type}' track: #{error.name} - #{error.message}", error
       throw error
 

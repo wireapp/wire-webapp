@@ -108,7 +108,7 @@ class z.event.EventRepository
   # Initiate the WebSocket connection.
   connect: =>
     if not @current_client().id
-      throw new z.event.EventError 'Missing client id', z.event.EventError::TYPE.MISSING_CLIENT_ID
+      throw new z.event.EventError z.event.EventError::TYPE.NO_CLIENT_ID
 
     @web_socket_service.client_id = @current_client().id
     @web_socket_service.connect (notification) =>
@@ -178,9 +178,8 @@ class z.event.EventRepository
             amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_events_expectation, true, [@notifications_total]
 
         else
-          error_message = "No notifications found since '#{last_notification_id}'"
-          @logger.log @logger.levels.INFO, error_message, response
-          reject new z.event.EventError error_message, z.event.EventError::TYPE.NO_NOTIFICATIONS
+          @logger.log @logger.levels.INFO, "No notifications found since '#{last_notification_id}'", response
+          reject new z.event.EventError z.event.EventError::TYPE.NO_NOTIFICATIONS
 
       @notification_service.get_notifications @current_client().id, last_notification_id, limit
       .then (response) -> _got_notifications response
@@ -190,13 +189,11 @@ class z.event.EventRepository
         if response.notifications
           _got_notifications response
         else if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
-          error_message = "No notifications found since '#{last_notification_id}'"
-          @logger.log @logger.levels.INFO, error_message, response
-          reject new z.event.EventError error_message, z.event.EventError::TYPE.NO_NOTIFICATIONS
+          @logger.log @logger.levels.INFO, "No notifications found since '#{last_notification_id}'", response
+          reject new z.event.EventError z.event.EventError::TYPE.NO_NOTIFICATIONS
         else
-          error_message = "Failed to get notifications: #{error.message}"
-          @logger.log @logger.levels.ERROR, error_message, error
-          reject new z.event.EventError error_message, z.event.EventError::TYPE.REQUEST_FAILURE
+          @logger.log @logger.levels.ERROR, "Failed to get notifications: #{error.message}", error
+          reject new z.event.EventError z.event.EventError::TYPE.REQUEST_FAILURE
 
   ###
   Get the last notification ID for a given client.
@@ -242,7 +239,7 @@ class z.event.EventRepository
         resolve @notifications_total
       .catch (error) =>
         @can_handle_web_socket true
-        if error.type in [z.event.EventError::TYPE.NO_NOTIFICATIONS, z.event.EventError::TYPE.DATABASE_NOT_FOUND]
+        if error.type in [z.event.EventError::TYPE.NO_LAST_ID, z.event.EventError::TYPE.NO_NOTIFICATIONS]
           amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, false
           @find_ongoing_calls()
           @logger.log @logger.levels.INFO, 'No notifications found for this user', error
@@ -336,9 +333,8 @@ class z.event.EventRepository
       if sending_client
         log_message = "Received encrypted event '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
       else if event.from
+        throw new z.event.EventError z.event.EventError::TYPE.DEPRECATED_SCHEMA if event.type in z.event.EventTypeHandling.DEPRECATED
         log_message = "Received unencrypted event '#{event.id}' of type '#{event.type}' from user '#{event.from}'"
-        if event.type in z.event.EventTypeHandling.OUTDATED
-          throw new z.event.EventError z.event.EventError::TYPE.OUTDATED_SCHEMA
       else
         log_message = "Received call event '#{event.type}' in conversation '#{event.conversation}'"
       @logger.log @logger.levels.INFO, log_message, {event_object: event, event_json: JSON.stringify event}
@@ -392,7 +388,7 @@ class z.event.EventRepository
         .then ->
           proceed()
         .catch (error) =>
-          if error.message is z.event.EventError::TYPE.OUTDATED_SCHEMA
+          if error.message is z.event.EventError::TYPE.DEPRECATED_SCHEMA
             @logger.log @logger.levels.WARN, "Ignored notification '#{notification.id}' from '#{source}': #{error.message}", error
             proceed()
           else

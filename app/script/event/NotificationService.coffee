@@ -70,13 +70,11 @@ class z.event.NotificationService
         if record?.value
           resolve record.value
         else
-          error_message = 'Last notification ID not found in storage'
-          @logger.log @logger.levels.WARN, error_message
-          reject new z.event.EventError error_message, z.event.EventError::TYPE.DATABASE_NOT_FOUND
+          @logger.log @logger.levels.WARN, 'Last notification ID not found in storage'
+          reject new z.event.EventError z.event.EventError::TYPE.NO_LAST_ID
       .catch (error) =>
-        error_message = "Failed to get last notification ID from storage: #{error.message}"
-        @logger.log @logger.levels.ERROR, error_message, error
-        reject new z.event.EventError error_message, z.event.EventError::TYPE.DATABASE_FAILURE
+        @logger.log @logger.levels.ERROR, "Failed to get last notification ID from storage: #{error.message}", error
+        reject new z.event.EventError z.event.EventError::TYPE.DATABASE_FAILURE
 
   ###
   Load last notifications id from storage.

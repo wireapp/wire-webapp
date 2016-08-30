@@ -70,7 +70,7 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
       .then (local_identity) =>
         return {} if not local_identity
         if skip_sessions
-          throw new z.storage.SkipError 'Skipped loading of sessions and pre-keys'
+          throw new z.storage.StorageError z.storage.StorageError::TYPE.SKIP_LOADING
         else
           return @_load_sessions()
       .then =>
@@ -79,7 +79,7 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
         @logger.log @logger.levels.INFO, 'Initialized repository'
         resolve @
       .catch (error) =>
-        if error instanceof z.storage.SkipError
+        if error.type is z.storage.StorageError::TYPE.SKIP_LOADING
           @logger.log "Initialized repository with the following exception: #{error.message}"
           resolve @
         else

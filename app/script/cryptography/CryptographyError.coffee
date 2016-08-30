@@ -20,11 +20,30 @@ window.z ?= {}
 z.cryptography ?= {}
 
 class z.cryptography.CryptographyError
-  constructor: (message, type) ->
+  constructor: (type) ->
     @name = @constructor.name
-    @message = message
     @stack = (new Error()).stack
-    @type = type
+    @type = type or z.cryptography.CryptographyError::UNKNOWN
+
+    @message = switch @type
+      when z.cryptography.CryptographyError::TYPE.BROKEN_EXTERNAL
+        'Failed to map external message'
+      when z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
+        'Ignored asset preview'
+      when z.cryptography.CryptographyError::TYPE.IGNORED_HOT_KNOCK
+        'Ignored hot knock'
+      when z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
+        'Ignored image preview'
+      when z.cryptography.CryptographyError::TYPE.NO_DATA_CONTENT
+        'No message data content found'
+      when z.cryptography.CryptographyError::TYPE.NO_GENERIC_MESSAGE
+        'No GenericMessage found'
+      when z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
+        'Message was previously stored'
+      when z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+        'Unhandled event type'
+      else
+        'Unknown CryptographyError'
 
   @:: = new Error()
   @::constructor = @
@@ -33,6 +52,8 @@ class z.cryptography.CryptographyError
     IGNORED_ASSET: 'z.cryptography.CryptographyError::TYPE.IGNORED_ASSET'
     IGNORED_HOT_KNOCK: 'z.cryptography.CryptographyError::TYPE.IGNORED_HOT_KNOCK'
     IGNORED_PREVIEW: 'z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW'
-    MISSING_MESSAGE: 'z.cryptography.CryptographyError::TYPE.MISSING_MESSAGE'
+    NO_DATA_CONTENT: 'z.cryptography.CryptographyError::TYPE.NO_DATA_CONTENT'
+    NO_GENERIC_MESSAGE: 'z.cryptography.CryptographyError::TYPE.NO_GENERIC_MESSAGE'
     PREVIOUSLY_STORED: 'z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED'
     UNHANDLED_TYPE: 'z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE'
+    UNKNOWN: 'z.cryptography.CryptographyError::TYPE.UNKNOWN'

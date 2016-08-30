@@ -23,19 +23,22 @@ class z.links.LinkPreviewError
   constructor: (type) ->
     @name = @constructor.name
     @stack = (new Error()).stack
-    @type = type
+    @type = type or z.links.LinkPreviewError::TYPE.UNKNOWN
 
-    switch @type
+    @message = switch @type
       when z.links.LinkPreviewError::TYPE.NOT_SUPPORTED
-        @message = 'Your client cannot render link previews using Open Graph data.'
+        'Your client cannot render link previews using Open Graph data.'
       when z.links.LinkPreviewError::TYPE.UNSUPPORTED_TYPE
-        @message = 'Open Graph data from the given link does not provide necessary attributes.'
+        'Open Graph data from the given link does not provide necessary attributes.'
       when z.links.LinkPreviewError::TYPE.NO_DATA_AVAILABLE
-        @message = 'Link does not provide Open Graph data.'
+        'Link does not provide Open Graph data.'
+      else
+        'Unknown LinkPreviewError'
 
   @:: = new Error()
   @::constructor = @
   @::TYPE =
+    NO_DATA_AVAILABLE: 'z.links.LinkPreviewError::TYPE.NO_DATA_AVAILABLE'
     NOT_SUPPORTED: 'z.links.LinkPreviewError::TYPE.NOT_SUPPORTED'
     UNSUPPORTED_TYPE: 'z.links.LinkPreviewError::TYPE.UNSUPPORTED_TYPE'
-    NO_DATA_AVAILABLE: 'z.links.LinkPreviewError::TYPE.NO_DATA_AVAILABLE'
+    UNKNOWN: 'z.links.LinkPreviewError::TYPE.UNKNOWN'

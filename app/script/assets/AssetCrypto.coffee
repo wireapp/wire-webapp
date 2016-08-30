@@ -35,26 +35,23 @@ z.assets.AssetCrypto =
 
     window.crypto.getRandomValues iv
 
-    return new Promise (resolve, reject) ->
-      window.crypto.subtle.generateKey {name: 'AES-CBC', length: 256}, true, ['encrypt']
-      .then (ckey) ->
-        key = ckey
+    return window.crypto.subtle.generateKey {name: 'AES-CBC', length: 256}, true, ['encrypt']
+    .then (ckey) ->
+      key = ckey
 
-        window.crypto.subtle.encrypt {name: 'AES-CBC', iv: iv.buffer}, key, plaintext
-      .then (ciphertext) ->
-        iv_ciphertext = new Uint8Array(ciphertext.byteLength + iv.byteLength)
-        iv_ciphertext.set iv, 0
-        iv_ciphertext.set new Uint8Array(ciphertext), iv.byteLength
+      return window.crypto.subtle.encrypt {name: 'AES-CBC', iv: iv.buffer}, key, plaintext
+    .then (ciphertext) ->
+      iv_ciphertext = new Uint8Array(ciphertext.byteLength + iv.byteLength)
+      iv_ciphertext.set iv, 0
+      iv_ciphertext.set new Uint8Array(ciphertext), iv.byteLength
 
-        window.crypto.subtle.digest 'SHA-256', iv_ciphertext
-      .then (digest) ->
-        computed_sha256 = digest
+      return window.crypto.subtle.digest 'SHA-256', iv_ciphertext
+    .then (digest) ->
+      computed_sha256 = digest
 
-        window.crypto.subtle.exportKey 'raw', key
-      .then (key_bytes) ->
-        resolve [key_bytes, computed_sha256, iv_ciphertext.buffer]
-      .catch (error) ->
-        reject error
+      return window.crypto.subtle.exportKey 'raw', key
+    .then (key_bytes) ->
+      return [key_bytes, computed_sha256, iv_ciphertext.buffer]
 
   ###
   @param key_bytes [ArrayBuffer] AES key used for encryption
@@ -64,21 +61,16 @@ z.assets.AssetCrypto =
   @param [ArrayBuffer]
   ###
   decrypt_aes_asset: (ciphertext, key_bytes, reference_sha256) ->
-    return new Promise (resolve, reject) ->
-      window.crypto.subtle.digest 'SHA-256', ciphertext
-      .then (computed_sha256) ->
-        a = new Uint32Array reference_sha256
-        b = new Uint32Array computed_sha256
+    return window.crypto.subtle.digest 'SHA-256', ciphertext
+    .then (computed_sha256) ->
+      a = new Uint32Array reference_sha256
+      b = new Uint32Array computed_sha256
 
-        if not a.every((x, i) -> x is b[i])
-          throw new Error 'Encrypted asset does not match its SHA-256 hash'
+      if not a.every((x, i) -> x is b[i])
+        throw new Error 'Encrypted asset does not match its SHA-256 hash'
 
-        window.crypto.subtle.importKey 'raw', key_bytes, 'AES-CBC', false, ['decrypt']
-      .then (key) ->
-        iv = ciphertext.slice 0, 16
-        img_ciphertext = ciphertext.slice 16
-        window.crypto.subtle.decrypt {name: 'AES-CBC', iv: iv}, key, img_ciphertext
-      .then (img_plaintext) ->
-        resolve img_plaintext
-      .catch (error) ->
-        reject error
+      return window.crypto.subtle.importKey 'raw', key_bytes, 'AES-CBC', false, ['decrypt']
+    .then (key) ->
+      iv = ciphertext.slice 0, 16
+      img_ciphertext = ciphertext.slice 16
+      return window.crypto.subtle.decrypt {name: 'AES-CBC', iv: iv}, key, img_ciphertext

@@ -121,7 +121,7 @@ class z.calling.handler.CallSignalingHandler
       else
         throw new z.calling.CallError z.calling.CallError::TYPE.FLOW_NOT_FOUND
     .catch (error) =>
-      if error.message is z.calling.CallError::TYPE.FLOW_NOT_FOUND
+      if error.type is z.calling.CallError::TYPE.FLOW_NOT_FOUND
         if event.state is z.calling.rtc.SDPType.OFFER
           @_cache_remote_sdp event.flow, remote_sdp
           @logger.log @logger.levels.INFO, "Cached remote SDP for unknown flow '#{event.flow}'", remote_sdp
@@ -177,7 +177,7 @@ class z.calling.handler.CallSignalingHandler
         @logger.log @logger.levels.DEBUG, "POSTing for flows in '#{conversation_id}' successful", response
         @_add_flow call_et, flow for flow in response.flows when flow.active is true
     .catch (error) =>
-      if error.message is z.calling.CallError::TYPE.CALL_NOT_FOUND
+      if error.type is z.calling.CallError::TYPE.CALL_NOT_FOUND
         @logger.log @logger.levels.WARN, "POSTing for flows in '#{conversation_id}' successful, call gone", error
       else
         @logger.log @logger.levels.ERROR,

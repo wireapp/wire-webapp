@@ -349,7 +349,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       .then done.fail
       .catch (error) ->
         expect(error instanceof z.cryptography.CryptographyError).toBeTruthy()
-        expect(error.type).toBe z.cryptography.CryptographyError::TYPE.MISSING_MESSAGE
+        expect(error.type).toBe z.cryptography.CryptographyError::TYPE.NO_GENERIC_MESSAGE
         done()
 
     it 'rejects with an error for an unhandled generic message type', (done) ->

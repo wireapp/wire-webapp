@@ -125,11 +125,9 @@ class z.auth.AuthService
             if jqXHR.responseJSON or jqXHR.responseText?.startsWith '{'
               error = jqXHR.responseJSON or JSON.parse jqXHR.responseText
               if error.code is z.service.BackendClientError::STATUS_CODE.FORBIDDEN
-                error_message = "#{error_description} (#{error.label} - #{error.message})"
-                error = new z.auth.AccessTokenError error_message, z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
+                error = new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
             else
-              error_message = 'Access token refresh failed'
-              error = new z.auth.AccessTokenError error_message, z.auth.AccessTokenError::TYPE.REQUEST_FAILED
+              error = new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REQUEST_FAILED
               Raygun.send error
 
             @save_access_token_in_client()

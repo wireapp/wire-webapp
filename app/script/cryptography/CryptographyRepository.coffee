@@ -97,10 +97,10 @@ class z.cryptography.CryptographyRepository
       return response.prekey
     .catch (error) ->
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
-        throw new z.user.UserError 'Pre-key not found', z.user.UserError::TYPE.PRE_KEY_NOT_FOUND
+        throw new z.user.UserError z.user.UserError::TYPE.PRE_KEY_NOT_FOUND
       else
-        error_message = "Failed to get pre-key from backend: #{error.message}"
-        throw new z.user.UserError error_message, z.user.UserError::TYPE.REQUEST_FAILURE
+        @logger.log @logger.levels.ERROR, "Failed to get pre-key from backend: #{error.message}"
+        throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
   ###
   Get a pre-key for client of in the user client map.
@@ -112,8 +112,8 @@ class z.cryptography.CryptographyRepository
     .then (response) ->
       return response
     .catch (error) ->
-      error_message = "Failed to get pre-key from backend: #{error.message}"
-      throw new z.user.UserError error_message, z.user.UserError::TYPE.REQUEST_FAILURE
+      @logger.log @logger.levels.ERROR, "Failed to get pre-key from backend: #{error.message}"
+      throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
   ###
   Construct the pre-key.
@@ -471,9 +471,8 @@ class z.cryptography.CryptographyRepository
   decrypt_event: (event) =>
     return new Promise (resolve, reject) =>
       if not event.data
-        error_message = new Error "Encrypted event with ID '#{event.id}' does not contain its data payload"
-        @logger.log @logger.levels.ERROR, error_message, event
-        reject new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.MISSING_MESSAGE
+        @logger.log @logger.levels.ERROR, "Encrypted event with ID '#{event.id}' does not contain its data payload", event
+        reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.NO_DATA_CONTENT
         return
 
       if event.type is z.event.Backend.CONVERSATION.OTR_ASSET_ADD
@@ -487,9 +486,8 @@ class z.cryptography.CryptographyRepository
         if loaded_event is undefined
           resolve @_decrypt_message event, ciphertext
         else
-          error_message = "Skipped decryption of event '#{event.type}' (#{primary_key}) because it was previously stored"
-          @logger.log @logger.levels.INFO, error_message
-          reject new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
+          @logger.log @logger.levels.INFO, "Skipped decryption of event '#{event.type}' (#{primary_key}) because it was previously stored"
+          reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
       .catch (decrypt_error) =>
         # Get error information
         receiving_client_id = event.data.recipient
@@ -562,10 +560,10 @@ class z.cryptography.CryptographyRepository
     .then (mapped) =>
       return @storage_repository.save_conversation_event mapped
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Saving encrypted message failed: #{error.message}", error
       if error instanceof z.cryptography.CryptographyError
         return undefined
       else
+        @logger.log @logger.levels.ERROR, "Saving encrypted message failed: #{error.message}", error
         throw error
 
   ###
