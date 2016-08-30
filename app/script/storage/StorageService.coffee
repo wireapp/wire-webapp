@@ -142,7 +142,7 @@ class z.storage.StorageService
       @db.version(7).stores version_5
       .upgrade (transaction) =>
         @logger.log @logger.levels.WARN, 'Database upgrade to version 7', transaction
-        transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) =>
+        transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
           mapped_event = event.mapped or event.raw
           delete event.mapped
           delete event.raw
