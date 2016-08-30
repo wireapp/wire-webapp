@@ -372,17 +372,6 @@
   }
 }
 
-.message-body-like {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: @conversation-message-sender-width;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 24px;
-}
-
 .message-asset-image {
   margin-top: 16px;
   margin-bottom: 24px;
@@ -410,34 +399,5 @@
     align-items: center;
     display: none;
     justify-content: center;
-  }
-}
-
-// MESSAGE FOOTER
-.message-footer {
-  display: flex;
-  flex-wrap: wrap;
-  line-height: @avatar-diameter-xs;
-}
-
-.message-footer-icon {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: @conversation-message-sender-width;
-}
-
-.message-footer-label {
-  color: @graphite;
-  font-size: @font-size-xs;
-}
-
-.message-footer-bottom {
-  display: flex;
-  margin-left: @conversation-message-sender-width;
-  width: 100%;
-
-  > * + * {
-    margin-left: 8px;
   }
 }
