@@ -195,7 +195,7 @@ class z.main.App
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS, conversation_ets.length, 50
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS, connection_ets.length, 50
 
-      @repository.conversation.map_connections @repository.user.connections()
+      @repository.conversation.initialize_connections @repository.user.connections()
       @_subscribe_to_beforeunload()
       return @repository.event.initialize_from_notification_stream()
     .then (notifications_count) =>

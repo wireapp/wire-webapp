@@ -118,7 +118,7 @@ describe 'z.conversation.ConversationRepository', ->
     storage_service.clear_all_stores()
     jQuery.ajax.restore()
 
-  describe 'handle member join correctly', ->
+  describe 'member join', ->
 
     member_join_event = null
 
@@ -134,11 +134,11 @@ describe 'z.conversation.ConversationRepository', ->
         "type": "conversation.member-join"
       }
 
-    it 'processes member join if joining a group conversation', ->
+    it 'should process event if joining a group conversation', ->
       conversation_repository.on_conversation_event member_join_event
       expect(conversation_repository._on_member_join).toHaveBeenCalled()
 
-    it 'ignores member join if joining a one2on2 conversation', ->
+    it 'should ignore event if joining a one2on2 conversation', ->
 
       # conversation has a corresponding pending connection
       connection_et_a = new z.entity.Connection()
@@ -150,7 +150,7 @@ describe 'z.conversation.ConversationRepository', ->
       expect(conversation_repository._on_member_join).not.toHaveBeenCalled()
 
     # @todo Cached conversation events are not properly reset anymore
-    xit 'caches events while getting the conversation from the backend', ->
+    xit 'caches events while getting the conversation from the backend', (done) ->
       expect(conversation_repository.conversations().length).toBe 1
       conversation_repository.conversations.removeAll()
       expect(conversation_repository.conversations().length).toBe 0
@@ -164,10 +164,12 @@ describe 'z.conversation.ConversationRepository', ->
 
       server.respond()
       expect(conversation_repository.fetching_conversations[conversation_et.id]).toBeUndefined()
-      conversation = conversation_repository.get_conversation_by_id conversation_et.id
-      expect(conversation.messages().length).toBe 2
-      expect(conversation.messages()[0].type).toBe z.event.Backend.CONVERSATION.MEMBER_JOIN
-      expect(conversation.messages()[1].type).toBe z.event.Backend.CONVERSATION.MESSAGE_ADD
+      conversation_repository.get_conversation_by_id conversation_et.id
+      .then (conversation_et) ->
+        expect(conversation_et.messages().length).toBe 2
+        expect(conversation_et.messages()[0].type).toBe z.event.Backend.CONVERSATION.MEMBER_JOIN
+        expect(conversation_et.messages()[1].type).toBe z.event.Backend.CONVERSATION.MESSAGE_ADD
+        done()
 
   describe 'map connection', ->
     connection_et = undefined
@@ -182,11 +184,11 @@ describe 'z.conversation.ConversationRepository', ->
       spyOn(conversation_service, 'get_conversation_by_id').and.callThrough()
       spyOn(client, 'send_request').and.callThrough()
 
-    it 'maps connection to existing conversation', ->
+    it 'should map connection to existing conversation', ->
       conversation_repository.map_connections [connection_et]
       expect(conversation_et.connection()).toBe connection_et
 
-    it 'maps connection to a new conversation', ->
+    it 'should map connection to a new conversation', ->
       connection_et.status z.user.ConnectionStatus.ACCEPTED
       conversation_repository.conversations.removeAll()
       conversation_repository.map_connections [connection_et]
@@ -197,7 +199,7 @@ describe 'z.conversation.ConversationRepository', ->
 
       server.respond()
 
-    it 'maps cancelled connections to exiting conversation and filters it correctly', ->
+    it 'should map cancelled connections to exiting conversation and filters it correctly', ->
       connection_et.status z.user.ConnectionStatus.CANCELLED
       conversation_repository.map_connections [connection_et]
       expect(_find_conversation(conversation_et, conversation_repository.conversations)).not.toBeNull()

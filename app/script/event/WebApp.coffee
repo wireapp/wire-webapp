@@ -73,7 +73,7 @@ z.event.WebApp =
     EVENT_FROM_BACKEND: 'wire.webapp.conversation.event-from-backend'
     EPHEMERAL_MESSAGE_TIMEOUT: 'wire.webapp.conversation.ephemeral-message-timeout'
     LOADED_STATES: 'wire.webapp.conversation.loaded-states'
-    MAP_CONNECTIONS: 'wire.webapp.conversation.map-connections'
+    MAP_CONNECTION: 'wire.webapp.conversation.map-connection'
     MISSED_EVENTS: 'wire.webapp.conversation.missed-events'
     PEOPLE:
       HIDE: 'wire.webapp.conversation.people.hide'
