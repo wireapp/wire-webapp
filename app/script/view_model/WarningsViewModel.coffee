@@ -91,7 +91,7 @@ class z.ViewModel.WarningsViewModel
     switch warning_to_remove
       when z.ViewModel.WarningType.REQUEST_MICROPHONE
         amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CALLING,
-          action: -> (window.open z.localization.Localizer.get_text z.string.url_support_mic_access_denied)?.focus()
+          action: -> (z.util.safely_open_url_in_tab z.localization.Localizer.get_text z.string.url_support_mic_access_denied)?.focus()
       when z.ViewModel.WarningType.REQUEST_NOTIFICATION
       # We block subsequent permission requests for notifications when the user ignores the request.
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.REQUEST_PERMISSION, false

@@ -503,7 +503,7 @@ class z.ViewModel.AuthViewModel
 
   clicked_on_password: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, value: 'fromSignIn'
-    (window.open z.localization.Localizer.get_text z.string.url_password_reset)?.focus()
+    (z.util.safely_open_url_in_tab z.localization.Localizer.get_text z.string.url_password_reset)?.focus()
 
   clicked_on_register: => @_set_hash z.auth.AuthView.MODE.ACCOUNT_REGISTER
 
@@ -552,13 +552,13 @@ class z.ViewModel.AuthViewModel
 
   clicked_on_terms: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.NAVIGATION.OPENED_TERMS
-    (window.open z.localization.Localizer.get_text z.string.url_terms_of_use)?.focus()
+    (z.util.safely_open_url_in_tab z.localization.Localizer.get_text z.string.url_terms_of_use)?.focus()
 
   clicked_on_verify_later: => @_authentication_successful()
 
   clicked_on_wire_link: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.NAVIGATION.OPENED_WIRE_WEBSITE
-    (window.open z.localization.Localizer.get_text z.string.url_wire)?.focus()
+    (z.util.safely_open_url_in_tab z.localization.Localizer.get_text z.string.url_wire)?.focus()
 
   keydown_phone_code: (view_model, event) =>
     combo_key = if z.util.Environment.os.win then event.ctrlKey else event.metaKey
