@@ -111,32 +111,36 @@
       <!-- ko ifnot: message.timestamp == '' -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
       <!-- /ko -->
-
-      <div class="message-body-like">
-        <span class="icon-like font-size-xs"></span>
-      </div>
-
     <!-- /ko -->
+
+    <!-- ko ifnot: message.has_likes() -->
+      <div class="message-body-like" data-bind="style: {opacity: $data.is_liked() ? 1 : ''}, click: function() {$data.is_liked(!$data.is_liked())}">
+        <span class="icon-like button-icon font-size-xs" data-bind="css:{'text-red icon-liked': is_liked()}"></span>
+      </div>
+    <!-- /ko -->
+
   </div>
-  <div class="message-footer">
-    <div class="message-footer-icon">
-      <span class="icon-liked font-size-xs text-red"></span>
+  <!-- ko if: message.has_likes() -->
+    <div class="message-footer">
+      <div class="message-footer-icon">
+        <span class="icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}, click: function() {$data.is_liked(!$data.is_liked())}"></span>
+      </div>
+      <div class="message-footer-label" data-bind="click: function() {$data.show_likes(true)}">
+        <span class="font-size-xs text-graphite">23 people</span>
+        <!-- ko ifnot: message.show_likes() -->
+          <span class="icon-more button-icon font-size-xs"></span>
+        <!-- /ko -->
+      </div>
+      <!-- ko if: message.show_likes() -->
+        <div class="message-footer-bottom">
+          <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), click: $parent.on_message_user_click"></user-avatar>
+          <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), click: $parent.on_message_user_click"></user-avatar>
+          <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), click: $parent.on_message_user_click"></user-avatar>
+          <span class="icon-close button-icon font-size-xs flex-center user-avatar-box-xs" data-bind="click: function() { $data.show_likes(false) }"></span>
+        </div>
+      <!-- /ko -->
     </div>
-    <div class="message-footer-label">
-      128 people
-    </div>
-    <div class="message-footer-bottom">
-      <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), click: $parent.on_message_user_click"></user-avatar>
-      <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), user()click: $parent.on_message_user_click"></user-avatar>
-      <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), click: $parent.on_message_user_click"></user-avatar>
-      <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), click: $parent.on_message_user_click"></user-avatar>
-      <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), click: $parent.on_message_user_click"></user-avatar>
-      <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), click: $parent.on_message_user_click"></user-avatar>
-      <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), click: $parent.on_message_user_click"></user-avatar>
-      <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), click: $parent.on_message_user_click"></user-avatar>
-      <span class="icon-close font-size-xs flex-center user-avatar-box-xs"></span>
-    </div>
-  </div>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="device">

@@ -381,6 +381,11 @@
   justify-content: center;
   align-items: center;
   height: 24px;
+  opacity: 0;
+
+  .message:hover & {
+    opacity: 1;
+  }
 }
 
 .message-asset-image {
@@ -428,14 +433,18 @@
 }
 
 .message-footer-label {
-  color: @graphite;
-  font-size: @font-size-xs;
+  display: flex;
+
+  > * + * {
+    margin-left: 8px;
+  }
 }
 
 .message-footer-bottom {
   display: flex;
   margin-left: @conversation-message-sender-width;
   width: 100%;
+  margin-top: 8px;
 
   > * + * {
     margin-left: 8px;

@@ -37,6 +37,11 @@ class z.entity.ContentMessage extends z.entity.Message
         replace: {placeholder: '%@timestamp', content: moment(@edited_timestamp).format 'HH:mm'}
       }
 
+    # like
+    @is_liked = ko.observable false
+    @has_likes = ko.observable false
+    @show_likes = ko.observable false
+
   ###
   Add another content asset to the message.
 
