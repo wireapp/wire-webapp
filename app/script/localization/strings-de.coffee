@@ -158,7 +158,7 @@ z.string.de.modal_call_second_incoming_headline = 'Anruf annehmen?'
 z.string.de.modal_call_second_incoming_message = 'Dein aktueller Anruf wird beendet.'
 z.string.de.modal_call_second_incoming_action = 'Annehmen'
 # Second ongoing call
-z.string.de.modal_call_second_ongoing_headline = 'Hang up call on another device?'
+z.string.de.modal_call_second_ongoing_headline = 'Anruf auf einem anderen Gerät beenden?'
 z.string.de.modal_call_second_ongoing_message = 'Nur ein zeitgleicher Anruf möglich.'
 z.string.de.modal_call_second_ongoing_action = 'Beenden'
 # Second outgoing call
