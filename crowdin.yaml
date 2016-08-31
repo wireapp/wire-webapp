@@ -1,5 +1,3 @@
-api_key: <%= ENV['WIRE_CROWDIN_API_KEY'] %>
-
 project_identifier: wire-cs
 base_path: .
 
