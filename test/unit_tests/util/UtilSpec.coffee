@@ -700,9 +700,8 @@ describe 'Markdown for code snippets', ->
 
 describe 'Markdown with mixed markups', ->
   it 'renders font weights together with links', ->
-    # TODO: Someday we need a link factory (Factory Pattern!)
-    link_1 = '<a href="http://www.link.com" target="_blank" rel="nofollow">www.link.com</a>'
-    link_2 = '<a href="http://www.anotherlink.net" target="_blank" rel="nofollow">www.anotherlink.net</a>'
+    link_1 = '<a href="http://www.link.com" target="_blank" rel="nofollow noopener noreferrer">www.link.com</a>'
+    link_2 = '<a href="http://www.anotherlink.net" target="_blank" rel="nofollow noopener noreferrer">www.anotherlink.net</a>'
     text = "This is *italic* and **bold** and ***bold-italic*** with a www.link.com and www.anotherlink.net."
 
     actual = z.util.render_message text
