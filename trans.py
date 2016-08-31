@@ -20,7 +20,7 @@
 import os
 
 home_dir = os.path.expanduser('~')
-user_config = os.path.join(home_dir, 'crowdin.yaml')
+user_config = os.path.join(home_dir, '.crowdin.yaml')
 
 os.system('crowdin-cli-py --identity={} upload sources'.format(user_config))
 os.system('crowdin-cli-py --identity={} download'.format(user_config))
