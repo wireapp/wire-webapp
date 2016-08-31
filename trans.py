@@ -19,8 +19,11 @@
 
 import os
 
-os.system('crowdin-cli-py upload sources')
-os.system('crowdin-cli-py download')
+home_dir = os.path.expanduser('~')
+user_config = os.path.join(home_dir, '.crowdin.yaml')
+
+os.system('crowdin-cli-py --identity={} upload sources'.format(user_config))
+os.system('crowdin-cli-py --identity={} download'.format(user_config))
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 root = 'app/script/localization/'
