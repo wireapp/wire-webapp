@@ -816,7 +816,7 @@ class z.conversation.ConversationRepository
     return true # disable for now
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
-    @_send_generic_message_to_users conversation_et.id, generic_message, [message_et.user().id]
+    @_send_generic_message conversation_et.id, generic_message, [message_et.user().id]
 
   ###
   Sends an OTR Image Asset
@@ -1189,27 +1189,14 @@ class z.conversation.ConversationRepository
   @private
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
+  @param user_ids [Array<String>] Optional array of user IDs to limit sending to
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
-  _send_generic_message: (conversation_id, generic_message) =>
+  _send_generic_message: (conversation_id, generic_message, user_ids) =>
     @_create_user_client_map conversation_id
     .then (user_client_map) =>
-      return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
-    .then (payload) =>
-      @_send_encrypted_message conversation_id, generic_message, payload
-
-  ###
-  Sends a generic message to specific users in a conversation.
-  @private
-  @param conversation_id [String] Conversation ID
-  @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
-  @param user_ids [Array<String>] Array of user IDs to send message to
-  @return [Promise] Promise that resolves after sending the encrypted message
-  ###
-  _send_generic_message_to_users: (conversation_id, generic_message, user_ids) =>
-    @_create_user_client_map conversation_id
-    .then (user_client_map) =>
-      delete user_client_map[user_id] for user_id in user_ids
+      if user_ids
+        delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
     .then (payload) =>
       @_send_encrypted_message conversation_id, generic_message, payload, user_ids
