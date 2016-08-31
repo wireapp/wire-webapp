@@ -80,9 +80,8 @@ class z.connect.ConnectGoogleService
         else
           @_authenticate().then(resolve).catch reject
       else
-        error_message = 'Google Auth Client for JavaScript not loaded'
-        @logger.log @logger.levels.WARN, error_message
-        error = new z.connect.ConnectError error_message, z.connect.ConnectError::TYPE.GOOGLE_CLIENT
+        @logger.log @logger.levels.WARN, 'Google Auth Client for JavaScript not loaded'
+        error = new z.connect.ConnectError z.connect.ConnectError::TYPE.GOOGLE_CLIENT
         Raygun.send error
         reject error
 
