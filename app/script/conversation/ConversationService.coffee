@@ -376,16 +376,20 @@ class z.conversation.ConversationService
     }
   }
 
-  @param conversation_id [String] ID of conversation to send message in
+  @note Options for the precondition check on missing clients are:
+    'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending  @param conversation_id [String] ID of conversation to send message in
   @param payload [Object] Payload to be posted
   @option [OtrRecipients] recipients Map with per-recipient data
   @option [String] sender Client ID of the sender
-  @param force_sending [Boolean] Should the backend ignore missing clients
+  @param precondition_option [Array<String>|Boolean] Level that backend checks for missing clients
   @return [Promise] Promise that resolve when the message was sent
   ###
-  post_encrypted_message: (conversation_id, payload, force_sending) ->
+  post_encrypted_message: (conversation_id, payload, precondition_option) ->
     url = @client.create_url "/conversations/#{conversation_id}/otr/messages"
-    url = "#{url}?ignore_missing=true" if force_sending
+    if _.isArray precondition_option
+      url = "#{url}?report_missing=#{precondition_option.join ','}"
+    else if precondition_option
+      url = "#{url}?ignore_missing=true"
 
     @client.send_json
       url: url

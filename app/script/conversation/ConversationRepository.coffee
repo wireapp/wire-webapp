@@ -810,12 +810,13 @@ class z.conversation.ConversationRepository
   ###
   Send a confirmation for a content message.
   @param conversation [z.entity.Conversation] Conversation that content message was received in
-  @param message_id [String] ID of message for which to acknowledge receipt
+  @param message_et [String] ID of message for which to acknowledge receipt
   ###
-  send_confirmation_status: (conversation_et, message_id) =>
+  send_confirmation_status: (conversation_et, message_et) =>
+    return true # disable for now
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'confirmation', new z.proto.Confirmation message_id, z.proto.Confirmation.Type.DELIVERED
-    @_send_generic_message conversation_et.id, generic_message
+    generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
+    @_send_generic_message_to_users conversation_et.id, generic_message, [message_et.user().id]
 
   ###
   Sends an OTR Image Asset
@@ -1198,18 +1199,37 @@ class z.conversation.ConversationRepository
       @_send_encrypted_message conversation_id, generic_message, payload
 
   ###
-  Sends otr message to a conversation.
-
+  Sends a generic message to specific users in a conversation.
   @private
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
-  @param payload [Object]
+  @param user_ids [Array<String>] Array of user IDs to send message to
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
-  _send_encrypted_message: (conversation_id, generic_message, payload) =>
+  _send_generic_message_to_users: (conversation_id, generic_message, user_ids) =>
+    @_create_user_client_map conversation_id
+    .then (user_client_map) =>
+      delete user_client_map[user_id] for user_id in user_ids
+      return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+    .then (payload) =>
+      @_send_encrypted_message conversation_id, generic_message, payload, user_ids
+
+  ###
+  Sends otr message to a conversation.
+
+  @private
+  @note Options for the precondition check on missing clients are:
+    'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending
+  @param conversation_id [String] Conversation ID
+  @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
+  @param payload [Object]
+  @param precondition_option [Array<String>|Boolean] Level that backend checks for missing clients
+  @return [Promise] Promise that resolves after sending the encrypted message
+  ###
+  _send_encrypted_message: (conversation_id, generic_message, payload, precondition_option = false) =>
     @logger.log @logger.levels.INFO,
       "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
-    @conversation_service.post_encrypted_message conversation_id, payload, false
+    @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
     .catch (error_response) =>
       return @_update_payload_for_changed_clients error_response, generic_message, payload
       .then (updated_payload) =>
@@ -1440,7 +1460,7 @@ class z.conversation.ConversationRepository
   add_event: (conversation_et, event_json) =>
     @_add_event_to_conversation event_json, conversation_et, (message_et) =>
       if conversation_et.is_one2one() and not message_et.user().is_me and message_et.type in z.event.EventTypeHandling.CONFIRM
-        @send_confirmation_status conversation_et, message_et.id
+        @send_confirmation_status conversation_et, message_et
       @_send_event_notification event_json, conversation_et, message_et
 
   ###
