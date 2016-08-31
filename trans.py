@@ -18,9 +18,8 @@
 #
 
 import os
-from os.path import expanduser
 
-home_dir = expanduser('~')
+home_dir = os.path.expanduser('~')
 user_config = os.path.join(home_dir, 'crowdin.yaml')
 
 os.system('crowdin-cli-py --identity={} upload sources'.format(user_config))
