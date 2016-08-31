@@ -210,7 +210,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, source
       .then (record) ->
-        expect(record.raw.type).toBe z.event.Backend.CONVERSATION.RENAME
+        expect(record.type).toBe z.event.Backend.CONVERSATION.RENAME
         done()
       .catch done.fail
 
@@ -222,7 +222,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, source
       .then (record) ->
-        expect(record.raw.type).toBe z.event.Backend.CONVERSATION.MEMBER_JOIN
+        expect(record.type).toBe z.event.Backend.CONVERSATION.MEMBER_JOIN
         done()
       .catch done.fail
 
@@ -234,7 +234,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, source
       .then (record) ->
-        expect(record.raw.type).toBe z.event.Backend.CONVERSATION.MEMBER_LEAVE
+        expect(record.type).toBe z.event.Backend.CONVERSATION.MEMBER_LEAVE
         done()
       .catch done.fail
 
@@ -246,7 +246,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, source
       .then (record) ->
-        expect(record.raw.type).toBe z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
+        expect(record.type).toBe z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
         done()
       .catch done.fail
 
@@ -258,6 +258,6 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, source
       .then (record) ->
-        expect(record.raw.type).toBe z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
+        expect(record.type).toBe z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
         done()
       .catch done.fail
