@@ -100,14 +100,16 @@ class z.calling.CallCenter
   @param event [Object] Event payload
   ###
   on_event: (event) =>
-    return if @state_handler.is_handling_notifications() or event.type not in SUPPORTED_EVENTS
+    return if event.type not in SUPPORTED_EVENTS
 
-    @logger.log @logger.levels.INFO,
-      "»» Event: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
-    if z.calling.CallCenter.supports_calling()
-      @_on_event_in_supported_browsers event
+    if @state_handler.block_event_handling
+      @logger.log @logger.levels.INFO, "Skipping '#{event.type}' event", {event_object: event, event_json: JSON.stringify event}
     else
-      @_on_event_in_unsupported_browsers event
+      @logger.log @logger.levels.INFO, "Handling '#{event.type}' event", {event_object: event, event_json: JSON.stringify event}
+      if z.calling.CallCenter.supports_calling()
+        @_on_event_in_supported_browsers event
+      else
+        @_on_event_in_unsupported_browsers event
 
   ###
   Backend calling event handling for browsers supporting calling.

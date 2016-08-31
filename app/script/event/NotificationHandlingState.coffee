@@ -17,9 +17,9 @@
 #
 
 window.z ?= {}
-z.message ?= {}
+z.event ?= {}
 
-# Enum for different confirmation types.
-z.message.ConfirmationType =
-  DELIVERED: 'delivered'
-  READ: 'read'
+z.event.NotificationHandlingState =
+  STREAM: 'z.event.NotificationHandlingState.STREAM'
+  RECOVERY: 'z.event.NotificationHandlingState.RECOVERY'
+  WEB_SOCKET: 'z.event.NotificationHandlingState.WEB_SOCKET'

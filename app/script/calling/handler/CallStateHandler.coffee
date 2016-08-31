@@ -34,7 +34,7 @@ class z.calling.handler.CallStateHandler
 
     @self_state = @call_center.media_stream_handler.self_stream_state
 
-    @is_handling_notifications = ko.observable true
+    @block_event_handling = true
     @subscribe_to_events()
     return
 
@@ -83,12 +83,12 @@ class z.calling.handler.CallStateHandler
   ###
   Set the notification handling state.
   @note Temporarily ignore call related events when handling notifications from the stream
-  @param handling_notifications [Boolean] Notifications are being handled from the stream
+  @param handling_state [z.event.NotificationHandlingState] State of the notifications stream handling
   ###
-  set_notification_handling_state: (handling_notifications) =>
-    @is_handling_notifications handling_notifications
-    @_update_ongoing_calls() if not @is_handling_notifications()
-    @logger.log @logger.levels.INFO, "Ignoring call events: #{handling_notifications}"
+  set_notification_handling_state: (handling_state) =>
+    @block_event_handling = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
+    @_update_ongoing_calls() if not @block_event_handling
+    @logger.log @logger.levels.INFO, "Block handling of call events: #{@block_event_handling}"
 
   ###
   Update state of currently ongoing calls.
