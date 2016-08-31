@@ -915,3 +915,13 @@ describe 'z.util.zero_padding', ->
     actual = z.util.zero_padding 666
     expected = '666'
     expect(actual).toEqual expected
+
+describe 'z.util.safe_window_open', ->
+  it 'doesn\'t contain a reference to the opening tab', ->
+    url = 'https://wire.com/'
+
+    new_window = window.open url
+    expect(new_window.opener).not.toBeNull()
+
+    new_window = z.util.safe_window_open url
+    expect(new_window.opener).toBeNull()

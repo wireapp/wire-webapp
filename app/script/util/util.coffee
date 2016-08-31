@@ -322,11 +322,11 @@ Opens a new browser tab (target="_blank") with a given URL in a safe environment
 @see https://mathiasbynens.github.io/rel-noopener/
 @param url [String] URL you want to open in a new browser tab
 ###
-z.util.safely_open_url_in_tab = (url) ->
-  target_window = window.open()
-  target_window.opener = null
-  target_window.location = url
-  return target_window
+z.util.safe_window_open = (url) ->
+  new_window = window.open()
+  new_window.opener = null
+  new_window.location = url
+  return new_window
 
 z.util.auto_link_emails = (text) ->
   email_pattern = /([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)/gim

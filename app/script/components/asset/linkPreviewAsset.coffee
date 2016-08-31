@@ -33,7 +33,7 @@ class z.components.LinkPreviewAssetComponent
     @url = @preview.original_url
 
   on_link_preview_click: =>
-    z.util.safely_open_url_in_tab @url
+    z.util.safe_window_open @url
 
   dispose: =>
     @element.removeEventListener 'click', @on_link_preview_click

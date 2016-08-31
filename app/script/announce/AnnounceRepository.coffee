@@ -69,7 +69,7 @@ class z.announce.AnnounceRepository
             amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.CLICKED, campaign: announce.campaign
             @logger.log @logger.levels.INFO, "Announcement '#{announce.title}' clicked"
             if announce.link
-              z.util.safely_open_url_in_tab announce.link
+              z.util.safe_window_open announce.link
             if announce.refresh
               window.location.reload true
             notification.close()
