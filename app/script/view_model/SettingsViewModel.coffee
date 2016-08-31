@@ -68,7 +68,7 @@ class z.ViewModel.SettingsViewModel
     @data_setting = ko.observable()
     @data_setting.subscribe (setting) => @user_repository.save_property_data_settings setting
 
-    @delete_status = ko.observable 'button'
+    @delete_status = ko.observable DELETE_STATUS.BUTTON
     @delete_confirm_text = ko.observable ''
 
     @sound_setting = ko.observable()
