@@ -25,11 +25,8 @@
 aws-keys.json
 Gruntfile.js
 npm-debug.log
-strings-ar.coffee
-strings-fr.coffee
-strings-it.coffee
-strings-pt.coffee
-strings-ru.coffee
+strings-*.coffee
+!strings-de.coffee
 
 # Automatically created files
 /doc

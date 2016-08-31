@@ -138,6 +138,7 @@ z.string.de.call_banner_outgoing = 'Rufe %@.first_name an'
 # Warnings
 z.string.de.modal_button_cancel = 'Abbrechen'
 z.string.de.modal_button_ok = 'Ok'
+z.string.de.modal_button_send = 'Senden'
 
 # Block a user
 z.string.de.modal_block_conversation_headline = '%@.name blockieren?'
@@ -157,9 +158,9 @@ z.string.de.modal_call_second_incoming_headline = 'Anruf annehmen?'
 z.string.de.modal_call_second_incoming_message = 'Dein aktueller Anruf wird beendet.'
 z.string.de.modal_call_second_incoming_action = 'Annehmen'
 # Second ongoing call
-z.string.modal_call_second_ongoing_headline = 'Anruf auf einem anderen Gerät beenden?'
-z.string.modal_call_second_ongoing_message = 'Nur ein zeitgleicher Anruf möglich.'
-z.string.modal_call_second_ongoing_action = 'Beenden'
+z.string.de.modal_call_second_ongoing_headline = 'Hang up call on another device?'
+z.string.de.modal_call_second_ongoing_message = 'Nur ein zeitgleicher Anruf möglich.'
+z.string.de.modal_call_second_ongoing_action = 'Beenden'
 # Second outgoing call
 z.string.de.modal_call_second_outgoing_headline = 'Aktuellen Anruf beenden?'
 z.string.de.modal_call_second_outgoing_message = 'Nur ein zeitgleicher Anruf möglich.'
@@ -390,7 +391,7 @@ z.string.de.preferences_password = 'Passwort'
 z.string.de.preferences_password_reset = 'Passwort zurücksetzen'
 z.string.de.preferences_delete = 'Benutzerkonto löschen'
 z.string.de.preferences_email_sent = 'E-Mail gesendet'
-z.string.de.preferences_delete_info = 'Wir sende eine E-Mail an %email. Klicke den Link, um dein Benutzerkonto dauerhaft zu löschen.'
+z.string.de.preferences_delete_info = 'Wir senden eine E-Mail an %email. Klicke den Link, um dein Benutzerkonto dauerhaft zu löschen.'
 
 z.string.de.preferences_contacts = 'Kontakte'
 z.string.de.preferences_share_contacts = 'Aus Gmail importieren'

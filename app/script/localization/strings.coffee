@@ -138,6 +138,7 @@ z.string.call_banner_outgoing = 'Calling %@.first_name'
 # Warnings
 z.string.modal_button_cancel = 'Cancel'
 z.string.modal_button_ok = 'Ok'
+z.string.modal_button_send = 'Send'
 
 # Block a user
 z.string.modal_block_conversation_headline = 'Block %@.name?'
