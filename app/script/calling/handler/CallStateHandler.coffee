@@ -137,7 +137,7 @@ class z.calling.handler.CallStateHandler
       else
         @delete_call call_et.id
     .catch (error) =>
-      if error.message is z.calling.CallError::TYPE.CALL_NOT_FOUND
+      if error.type is z.calling.CallError::TYPE.CALL_NOT_FOUND
         # Call with us joined
         if self_user_joined
           # ...from this device
@@ -518,7 +518,7 @@ class z.calling.handler.CallStateHandler
   _join_call: (conversation_id, is_videod) ->
     @call_center.get_call_by_id conversation_id
     .catch (error) ->
-      throw error if error.message isnt z.calling.CallError::TYPE.CALL_NOT_FOUND
+      throw error if error.type isnt z.calling.CallError::TYPE.CALL_NOT_FOUND
     .then =>
       if @call_center.media_stream_handler.has_media_streams()
         @logger.log @logger.levels.INFO, 'MediaStream has already been initialized', @call_center.media_stream_handler.local_media_streams

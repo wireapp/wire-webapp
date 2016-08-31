@@ -274,7 +274,7 @@ class z.conversation.ConversationRepository
   ###
   get_conversation_by_id: (conversation_id, callback) ->
     if not conversation_id
-      Raygun.send new Error 'Trying to get conversation without ID'
+      throw new Error 'Trying to get conversation without ID'
       return
 
     conversation_et = @find_conversation_by_id conversation_id

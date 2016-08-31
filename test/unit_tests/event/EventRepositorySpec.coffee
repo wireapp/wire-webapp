@@ -51,7 +51,7 @@ describe 'Event Repository', ->
         if last_notification_id
           Promise.resolve last_notification_id
         else
-          Promise.reject new z.event.EventError 'ID not found in storage', z.event.EventError::TYPE.DATABASE_NOT_FOUND
+          Promise.reject new z.event.EventError z.event.EventError::TYPE.NO_LAST_ID
 
       notification_service.save_last_notification_id_to_db = ->
         Promise.resolve z.event.NotificationService::PRIMARY_KEY_LAST_NOTIFICATION
@@ -142,7 +142,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
       .catch (error) ->
-        expect(error.message).toBe z.event.EventError::TYPE.OUTDATED_SCHEMA
+        expect(error.type).toBe z.event.EventError::TYPE.DEPRECATED_SCHEMA
         done()
 
     it 'skips outdated "conversation.message-add" events arriving via WebSocket', (done) ->
@@ -155,7 +155,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, source
       .catch (error) ->
-        expect(error.message).toBe z.event.EventError::TYPE.OUTDATED_SCHEMA
+        expect(error.type).toBe z.event.EventError::TYPE.DEPRECATED_SCHEMA
         done()
 
     it 'skips outdated "conversation.asset-add" events', (done) ->
@@ -165,7 +165,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
       .catch (error) ->
-        expect(error.message).toBe z.event.EventError::TYPE.OUTDATED_SCHEMA
+        expect(error.type).toBe z.event.EventError::TYPE.DEPRECATED_SCHEMA
         done()
 
     it 'skips outdated "conversation.knock" events', (done) ->
@@ -175,7 +175,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.SOCKET
       .catch (error) ->
-        expect(error.message).toBe z.event.EventError::TYPE.OUTDATED_SCHEMA
+        expect(error.type).toBe z.event.EventError::TYPE.DEPRECATED_SCHEMA
         done()
 
     it 'skips outdated events arriving via notification stream', (done) ->
@@ -187,7 +187,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, source
       .catch (error) ->
-        expect(error.message).toBe z.event.EventError::TYPE.OUTDATED_SCHEMA
+        expect(error.type).toBe z.event.EventError::TYPE.DEPRECATED_SCHEMA
         done()
 
     it 'skips outdated events which get injected', (done) ->
@@ -199,7 +199,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, source
       .catch (error) ->
-        expect(error.message).toBe z.event.EventError::TYPE.OUTDATED_SCHEMA
+        expect(error.type).toBe z.event.EventError::TYPE.DEPRECATED_SCHEMA
         done()
 
     it 'accepts plain conversation rename events', (done) ->

@@ -39,19 +39,14 @@ class z.connect.ConnectRepository
     return new Promise (resolve, reject) =>
       @connect_google_service.get_contacts()
       .catch (error) =>
-        error_message = 'Google Contacts SDK error'
-        @logger.log @logger.levels.INFO, error_message, error
-        connect_error = new z.connect.ConnectError error_message, z.connect.ConnectError::TYPE.GOOGLE_DOWNLOAD
-        reject connect_error
-        throw connect_error
+        @logger.log @logger.levels.INFO, 'Google Contacts SDK error', error
+        throw new z.connect.ConnectError z.connect.ConnectError::TYPE.GOOGLE_DOWNLOAD
       .then (response) =>
         return @_parse_google_contacts response
       .then (phone_book) =>
         if phone_book.cards.length is 0
-          error_message = 'No contacts found for upload'
-          @logger.log @logger.levels.WARN, error_message
-          resolve []
-          throw new z.connect.ConnectError error_message, z.connect.ConnectError::TYPE.NO_CONTACTS
+          @logger.log @logger.levels.WARN, 'No contacts found for upload'
+          throw new z.connect.ConnectError z.connect.ConnectError::TYPE.NO_CONTACTS
         else
           @logger.log @logger.levels.INFO, "Uploading hashes of '#{phone_book.cards.length}' contacts for matching", phone_book
           return @connect_service.post_onboarding phone_book
@@ -61,15 +56,19 @@ class z.connect.ConnectRepository
         @user_repository.save_property_contact_import_google Date.now()
         resolve response
       .catch (error) =>
-        if error not instanceof z.connect.ConnectError
+        if error instanceof z.connect.ConnectError
+          switch error.type
+            when z.connect.ConnectError::TYPE.GOOGLE_DOWNLOAD
+              reject error
+            when z.connect.ConnectError::TYPE.NO_CONTACTS
+              resolve []
+        else
           if error.code is z.service.BackendClientError::STATUS_CODE.TOO_MANY_REQUESTS
             error_message = 'Backend refused Gmail contacts upload: Endpoint used too frequent'
             @logger.log @logger.levels.ERROR, error_message
           else
-            error_message = 'Gmail contacts upload failed'
-            @logger.log @logger.levels.ERROR, error_message, error
-          reject new z.connect.ConnectError error_message, z.connect.ConnectError::TYPE.UPLOAD
-
+            @logger.log @logger.levels.ERROR, 'Gmail contacts upload failed', error
+          reject new z.connect.ConnectError z.connect.ConnectError::TYPE.UPLOAD
 
   ###
   Retrieve a user's OSX address book contacts.
@@ -80,9 +79,8 @@ class z.connect.ConnectRepository
       phone_book = @_parse_osx_contacts()
 
       if phone_book.cards.length is 0
-        error_message = 'No contacts found for upload'
-        @logger.log @logger.levels.WARN, error_message
-        reject new z.connect.ConnectError 'No contacts found for upload', z.connect.ConnectError::TYPE.NO_CONTACTS
+        @logger.log @logger.levels.WARN, 'No contacts found for upload'
+        reject new z.connect.ConnectError z.connect.ConnectError::TYPE.NO_CONTACTS
       else
         @logger.log @logger.levels.INFO, "Uploading hashes of '#{phone_book.cards.length}' contacts for matching", phone_book
         @connect_service.post_onboarding phone_book
@@ -96,9 +94,8 @@ class z.connect.ConnectRepository
             error_message = 'Backend refused OS X contacts upload: Endpoint used too frequent'
             @logger.log @logger.levels.ERROR, error_message
           else
-            error_message = 'OS X contacts upload failed'
-            @logger.log @logger.levels.ERROR, error_message, error
-          reject new z.connect.ConnectError error_message, z.connect.ConnectError::TYPE.UPLOAD
+            @logger.log @logger.levels.ERROR, 'OS X contacts upload failed', error
+          reject new z.connect.ConnectError z.connect.ConnectError::TYPE.UPLOAD
 
   ###
   Encode phone book
