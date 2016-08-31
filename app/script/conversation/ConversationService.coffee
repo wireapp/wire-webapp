@@ -203,9 +203,9 @@ class z.conversation.ConversationService
   ###
   delete_message_from_db: (conversation_id, message_id) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-    .where 'raw.conversation'
+    .where 'conversation'
     .equals conversation_id
-    .and (record) -> record.mapped?.id is message_id
+    .and (record) -> record.id is message_id
     .delete()
 
   ###
@@ -215,7 +215,7 @@ class z.conversation.ConversationService
   ###
   delete_messages_from_db: (conversation_id) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-    .where 'raw.conversation'
+    .where 'conversation'
     .equals conversation_id
     .delete()
 
@@ -234,9 +234,7 @@ class z.conversation.ConversationService
     .then =>
       @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
     .then (record) =>
-      record.mapped.data.edited_time = record.mapped.time
-      record.mapped.time = record.raw.time = new Date(timestamp).toISOString()
-      record.meta.timestamp = timestamp
+      record.time = new Date(timestamp).toISOString()
       updated_record = record
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
@@ -251,10 +249,10 @@ class z.conversation.ConversationService
   update_asset_as_uploaded_in_db: (primary_key, asset_data) ->
     @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
     .then (record) =>
-      record.mapped.data.id = asset_data.id
-      record.mapped.data.otr_key = asset_data.otr_key
-      record.mapped.data.sha256 = asset_data.sha256
-      record.mapped.data.status = z.assets.AssetTransferState.UPLOADED
+      record.data.id = asset_data.id
+      record.data.otr_key = asset_data.otr_key
+      record.data.sha256 = asset_data.sha256
+      record.data.status = z.assets.AssetTransferState.UPLOADED
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
       @logger.log 'Updated asset message_et (uploaded)', primary_key
@@ -267,9 +265,9 @@ class z.conversation.ConversationService
   update_asset_preview_in_db: (primary_key, asset_data) ->
     @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
     .then (record) =>
-      record.mapped.data.preview_id = asset_data.id
-      record.mapped.data.preview_otr_key = asset_data.otr_key
-      record.mapped.data.preview_sha256 = asset_data.sha256
+      record.data.preview_id = asset_data.id
+      record.data.preview_otr_key = asset_data.otr_key
+      record.data.preview_sha256 = asset_data.sha256
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
       @logger.log 'Updated asset message_et (preview)', primary_key
@@ -282,8 +280,8 @@ class z.conversation.ConversationService
   update_asset_as_failed_in_db: (primary_key, reason) ->
     @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
     .then (record) =>
-      record.mapped.data.status = z.assets.AssetTransferState.UPLOAD_FAILED
-      record.mapped.data.reason = reason
+      record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED
+      record.data.reason = reason
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
       @logger.log 'Updated asset message_et (failed)', primary_key
@@ -311,9 +309,9 @@ class z.conversation.ConversationService
   load_event_from_db: (conversation_id, message_id) ->
     return new Promise (resolve, reject) =>
       @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where 'raw.conversation'
+      .where 'conversation'
       .equals conversation_id
-      .filter (record) -> record.mapped?.id is message_id
+      .filter (record) -> record.id is message_id
       .first()
       .then (record) ->
         resolve record
@@ -334,14 +332,15 @@ class z.conversation.ConversationService
   ###
   load_events_from_db: (conversation_id, start, end, limit) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-    .where 'raw.conversation'
+    .where 'conversation'
     .equals conversation_id
     .reverse()
-    .sortBy 'meta.timestamp'
+    .sortBy 'time'
     .then (records) ->
       return records.filter (record) ->
-        return false if start and record.meta.timestamp >= start
-        return false if end and record.meta.timestamp <= end
+        timestamp = new Date(record.time).getTime()
+        return false if start and timestamp >= start
+        return false if end and timestamp <= end
         return true
     .then (records) ->
       return records.slice 0, limit
