@@ -182,8 +182,7 @@ class z.conversation.ConversationRepository
   get_message_from_db: (conversation_et, message_id) =>
     @conversation_service.load_event_from_db conversation_et.id, message_id
     .then (event) =>
-      raw_event = event.mapped or event.raw
-      return @event_mapper.map_json_event raw_event, conversation_et
+      return @event_mapper.map_json_event event, conversation_et
 
   get_events: (conversation_et) ->
     return new Promise (resolve, reject) =>
@@ -202,8 +201,7 @@ class z.conversation.ConversationRepository
         else
           @logger.log @logger.levels.INFO,
             "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
-        raw_events = (event.mapped or event.raw for event in events)
-        mapped_messages = @_add_events_to_conversation events: raw_events, conversation_et
+        mapped_messages = @_add_events_to_conversation events: events, conversation_et
         conversation_et.is_pending false
         resolve mapped_messages
       .catch (error) =>
@@ -220,8 +218,7 @@ class z.conversation.ConversationRepository
     @conversation_service.load_events_from_db conversation_et.id, timestamp, conversation_et.last_read_timestamp()
     .then (events) =>
       if events.length
-        raw_events = (event.mapped or event.raw for event in events)
-        @_add_events_to_conversation events: raw_events, conversation_et
+        @_add_events_to_conversation events: events, conversation_et
       conversation_et.is_pending false
     .catch (error) =>
       @logger.log @logger.levels.INFO, "Could not load unread events for conversation: #{conversation_et.id}", error
@@ -813,12 +810,13 @@ class z.conversation.ConversationRepository
   ###
   Send a confirmation for a content message.
   @param conversation [z.entity.Conversation] Conversation that content message was received in
-  @param message_id [String] ID of message for which to acknowledge receipt
+  @param message_et [String] ID of message for which to acknowledge receipt
   ###
-  send_confirmation_status: (conversation_et, message_id) =>
+  send_confirmation_status: (conversation_et, message_et) =>
+    return true # disable for now
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'confirmation', new z.proto.Confirmation message_id, z.proto.Confirmation.Type.DELIVERED
-    @_send_generic_message conversation_et.id, generic_message
+    generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
+    @_send_generic_message_to_users conversation_et.id, generic_message, [message_et.user().id]
 
   ###
   Sends an OTR Image Asset
@@ -857,7 +855,7 @@ class z.conversation.ConversationRepository
         event = @_construct_otr_asset_event json, conversation_id, asset_id
         return @cryptography_repository.save_encrypted_event generic_message, event
       .then (record) =>
-        @add_event conversation_et, record.mapped
+        @add_event conversation_et, record
         resolve()
       .catch (error) =>
         @logger.log "Failed to upload otr asset for conversation #{conversation_id}", error
@@ -960,7 +958,7 @@ class z.conversation.ConversationRepository
       event = @_construct_otr_message_event response, conversation_et.id
       return @cryptography_repository.save_encrypted_event generic_message, event
     .then (record) =>
-      @on_conversation_event record.mapped if record?.mapped
+      @on_conversation_event record
     .then =>
       @_track_edit_message conversation_et, original_message_et
     .then =>
@@ -1141,7 +1139,7 @@ class z.conversation.ConversationRepository
       event = @_construct_otr_message_event response, conversation_et.id
       return @cryptography_repository.save_encrypted_event generic_message, event
     .then (record) =>
-      @add_event conversation_et, record.mapped if record?.mapped
+      @add_event conversation_et, record
       return record
     .catch (error) =>
       error_message = "Could not send OTR message of type '#{generic_message.content}' to conversation ID '#{conversation_et.id}' (#{conversation_et.display_name()}): #{error.message}"
@@ -1201,18 +1199,37 @@ class z.conversation.ConversationRepository
       @_send_encrypted_message conversation_id, generic_message, payload
 
   ###
-  Sends otr message to a conversation.
-
+  Sends a generic message to specific users in a conversation.
   @private
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
-  @param payload [Object]
+  @param user_ids [Array<String>] Array of user IDs to send message to
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
-  _send_encrypted_message: (conversation_id, generic_message, payload) =>
+  _send_generic_message_to_users: (conversation_id, generic_message, user_ids) =>
+    @_create_user_client_map conversation_id
+    .then (user_client_map) =>
+      delete user_client_map[user_id] for user_id in user_ids
+      return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+    .then (payload) =>
+      @_send_encrypted_message conversation_id, generic_message, payload, user_ids
+
+  ###
+  Sends otr message to a conversation.
+
+  @private
+  @note Options for the precondition check on missing clients are:
+    'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending
+  @param conversation_id [String] Conversation ID
+  @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
+  @param payload [Object]
+  @param precondition_option [Array<String>|Boolean] Level that backend checks for missing clients
+  @return [Promise] Promise that resolves after sending the encrypted message
+  ###
+  _send_encrypted_message: (conversation_id, generic_message, payload, precondition_option = false) =>
     @logger.log @logger.levels.INFO,
       "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
-    @conversation_service.post_encrypted_message conversation_id, payload, false
+    @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
     .catch (error_response) =>
       return @_update_payload_for_changed_clients error_response, generic_message, payload
       .then (updated_payload) =>
@@ -1279,8 +1296,8 @@ class z.conversation.ConversationRepository
 
     @send_asset_metadata conversation_et, file
     .then (record) =>
-      message_et = conversation_et.get_message_by_id record.mapped.id
-      @send_asset conversation_et, file, record.mapped.id
+      message_et = conversation_et.get_message_by_id record.id
+      @send_asset conversation_et, file, record.id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
       @logger.log "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
@@ -1443,7 +1460,7 @@ class z.conversation.ConversationRepository
   add_event: (conversation_et, event_json) =>
     @_add_event_to_conversation event_json, conversation_et, (message_et) =>
       if conversation_et.is_one2one() and not message_et.user().is_me and message_et.type in z.event.EventTypeHandling.CONFIRM
-        @send_confirmation_status conversation_et, message_et.id
+        @send_confirmation_status conversation_et, message_et
       @_send_event_notification event_json, conversation_et, message_et
 
   ###
@@ -1915,8 +1932,6 @@ class z.conversation.ConversationRepository
       return [original_message_et, @event_mapper.map_json_event event_json, conversation_et]
     .then ([original_message_et, edited_message_et]) =>
       return @conversation_service.update_message_timestamp_in_db edited_message_et.primary_key, original_message_et.timestamp
-    .then (record) ->
-      return record.mapped
 
   ###############################################################################
   # Helpers

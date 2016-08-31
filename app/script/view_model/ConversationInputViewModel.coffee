@@ -177,7 +177,7 @@ class z.ViewModel.ConversationInputViewModel
     @list_not_bottom not is_scrolled_bottom
 
   on_window_click: (event) =>
-    return if $(event.target).closest(".conversation-input").length
+    return if $(event.target).closest('.conversation-input').length
     @cancel_edit()
 
   on_input_click: =>
