@@ -125,10 +125,10 @@
       <div class="message-footer-icon">
         <span class="icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}, click: function() {$data.is_liked(!$data.is_liked())}"></span>
       </div>
-      <div class="message-footer-label" data-bind="click: function() {$data.show_likes(true)}">
+      <div class="message-footer-label cursor-pointer" data-bind="click: function() {$data.show_likes(true)}">
         <span class="font-size-xs text-graphite">23 people</span>
         <!-- ko ifnot: message.show_likes() -->
-          <span class="icon-more button-icon font-size-xs"></span>
+          <span class="icon-more font-size-xs"></span>
         <!-- /ko -->
       </div>
       <!-- ko if: message.show_likes() -->

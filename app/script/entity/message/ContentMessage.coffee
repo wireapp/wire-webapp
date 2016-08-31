@@ -39,7 +39,7 @@ class z.entity.ContentMessage extends z.entity.Message
 
     # like
     @is_liked = ko.observable false
-    @has_likes = ko.observable false
+    @has_likes = ko.observable true
     @show_likes = ko.observable false
 
   ###
