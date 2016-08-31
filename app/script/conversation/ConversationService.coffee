@@ -205,7 +205,7 @@ class z.conversation.ConversationService
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where 'conversation'
     .equals conversation_id
-    .and (record) -> record?.id is message_id
+    .and (record) -> record.id is message_id
     .delete()
 
   ###
@@ -311,7 +311,7 @@ class z.conversation.ConversationService
       @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
       .where 'conversation'
       .equals conversation_id
-      .filter (record) -> record?.id is message_id
+      .filter (record) -> record.id is message_id
       .first()
       .then (record) ->
         resolve record
