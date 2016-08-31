@@ -314,7 +314,7 @@ z.util.alias =
 
 
 z.util.add_blank_targets = (text_with_anchors) ->
-  return "#{text_with_anchors}".replace /rel="nofollow"/gi, 'target="_blank" rel="nofollow"'
+  return "#{text_with_anchors}".replace /rel="nofollow"/gi, 'target="_blank" rel="nofollow noopener noreferrer"'
 
 
 z.util.auto_link_emails = (text) ->
@@ -332,7 +332,7 @@ z.util.cut_last_characters = (message, amount) ->
 
 
 z.util.markup_links = (message) ->
-  return message.replace(/<a\s+href=/gi, '<a target="_blank" rel="nofollow" href=')
+  return message.replace(/<a\s+href=/gi, '<a target="_blank" rel="nofollow noopener noreferrer" href=')
 
 # Source: https://github.com/KyleAMathews/deepmerge/blob/master/index.js
 z.util.merge_objects = (target, source) ->
