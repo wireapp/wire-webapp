@@ -69,6 +69,7 @@
     </div>
   </div>
   <div class="message-body">
+
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
       <!-- ko if: asset.is_medium_image() -->
         <div class="message-asset-image" data-bind="fit_to_viewport: asset">
@@ -111,9 +112,36 @@
       <!-- ko ifnot: message.timestamp == '' -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
       <!-- /ko -->
-
     <!-- /ko -->
+
+    <!-- ko ifnot: message.other_likes().length -->
+      <div class="message-body-like" data-uie-name="message-liked" data-bind="attr: {'data-ui-value': message.is_liked()}, style: {opacity: $data.is_liked() ? 1 : ''}, click: function() {$parent.click_on_like($data, !$data.is_liked())}">
+        <span class="icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}"></span>
+      </div>
+    <!-- /ko -->
+
   </div>
+  <!-- ko if: message.other_likes().length -->
+    <div class="message-footer">
+      <div class="message-footer-icon">
+        <span class="icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}, click: function() {$parent.click_on_like($data, !$data.is_liked())}"></span>
+      </div>
+      <div class="message-footer-label cursor-pointer" data-bind="click: function() {$data.show_likes(true)}">
+        <span class="font-size-xs text-graphite" data-bind="text: like_caption"></span>
+        <!-- ko if: !message.show_likes() && message.other_likes().length > 5 -->
+          <span class="icon-more font-size-xs"></span>
+        <!-- /ko -->
+      </div>
+      <!-- ko if: message.show_likes() -->
+        <div class="message-footer-bottom" data-uie-name="message-liked-users">
+          <!-- ko foreach: message.reactions_user_ets() -->
+            <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+          <!-- /ko -->
+          <span class="icon-close button-icon font-size-xs flex-center user-avatar-box-xs" data-bind="click: function() { $data.show_likes(false) }"></span>
+        </div>
+      <!-- /ko -->
+    </div>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="device">

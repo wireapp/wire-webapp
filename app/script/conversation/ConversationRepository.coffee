@@ -982,6 +982,7 @@ class z.conversation.ConversationRepository
   Send a reaction to a content message.
   @param conversation [z.entity.Conversation] Conversation that content message was received in
   @param message_et [String] ID of message for react to
+  @param reaction [z.message.ReactionType]
   ###
   send_reaction: (conversation_et, message_et, reaction) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
@@ -1669,13 +1670,18 @@ class z.conversation.ConversationRepository
   _on_reaction: (conversation_et, event_json) ->
     @get_message_from_db conversation_et, event_json.data.message_id
     .then (message_et) =>
+      return @_update_message_reactions message_et, event_json
+    .then (message_et) =>
       @logger.log "Updated reactions of message '#{message_et.id}' in database", message_et
       return @conversation_service.update_message_reactions_in_db message_et.primary_key, message_et.reactions()
     .then =>
       @logger.log @logger.levels.DEBUG, "Reaction to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
       return conversation_et.get_message_by_id event_json.data.message_id
     .then (message_et) =>
-      return @_update_message_reactions message_et, event_json if message_et
+      if message_et
+        @_update_message_reactions message_et, event_json
+        @_update_user_ets message_et
+        return message_et
     .catch (error) =>
       @logger.log "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
       throw error
@@ -1815,10 +1821,21 @@ class z.conversation.ConversationRepository
   _update_user_ets: (message_et, callback) =>
     @user_repository.get_user_by_id message_et.from, (user_et) =>
       message_et.user user_et
+
       if message_et.is_member()
         @user_repository.get_users_by_id message_et.user_ids(), (user_ets) ->
           message_et.user_ets user_ets
-      else if message_et.has_asset_text()
+        return
+
+      if message_et.reactions?
+        if Object.keys(message_et.reactions()).length
+          user_ids = (user_id for user_id of message_et.reactions())
+          @user_repository.get_users_by_id user_ids, (user_ets) ->
+            message_et.reactions_user_ets user_ets
+        else
+          message_et.reactions_user_ets.removeAll()
+
+      if message_et.has_asset_text()
         for asset_et in message_et.assets() when asset_et.is_text()
           if not message_et.user()
             Raygun.send new Error 'Message does not contain user when updating'
