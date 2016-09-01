@@ -23,8 +23,8 @@ z.event ?= {}
 class z.event.EventRepository
   @::NOTIFICATION_SOURCE =
     INJECTION: 'Injection'
-    SOCKET: 'WebSocket'
     STREAM: 'Notification Stream'
+    WEB_SOCKET: 'WebSocket'
 
 
   ###
@@ -38,6 +38,19 @@ class z.event.EventRepository
     @logger = new z.util.Logger 'z.event.EventRepository', z.config.LOGGER.OPTIONS
 
     @current_client = undefined
+
+    @notification_handling_state = ko.observable z.event.NotificationHandlingState.STREAM
+    @notification_handling_state.subscribe (handling_state) =>
+      @logger.log @logger.levels.OFF, "Changed notification handling state to '#{handling_state}'"
+      amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, handling_state
+
+      switch handling_state
+        when z.event.NotificationHandlingState.RECOVERY
+          amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
+        when z.event.NotificationHandlingState.WEB_SOCKET
+          @_handle_buffered_notifications()
+          if @notification_handling_state() is z.event.NotificationHandlingState.RECOVERY
+            amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
 
     @notifications_handled = 0
     @notifications_loaded = ko.observable false
@@ -64,37 +77,19 @@ class z.event.EventRepository
             replace = [@notifications_handled, @notifications_total]
             amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_events_progress, false, replace
 
-      else if @notifications_loaded() and not @can_handle_web_socket()
+      else if @notifications_loaded() and not @notification_handling_state() isnt z.event.NotificationHandlingState.WEB_SOCKET
         @logger.log @logger.levels.INFO, "Done handling '#{@notifications_total}' notifications from the stream"
-        if @is_recovering()
-          @is_recovering false
-        else
-          amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, false
+        @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET
         @find_ongoing_calls()
-        @can_handle_web_socket true
         @notifications_loaded false
         @notifications_promises[0] @last_notification_id()
 
     @web_socket_buffer = []
-    @can_handle_web_socket = ko.observable false
-    @can_handle_web_socket.subscribe (was_handled) =>
-      @_handle_buffered_notifications() if was_handled
 
     @last_notification_id = ko.observable undefined
     @last_notification_id.subscribe (last_notification_id) =>
       @logger.log @logger.levels.INFO, "Last notification ID updated to '#{last_notification_id}'"
       @notification_service.save_last_notification_id_to_db last_notification_id if last_notification_id
-
-    @is_recovering = ko.observable false
-    @is_recovering.subscribe (is_recovering) =>
-      if is_recovering
-        amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, true
-        @can_handle_web_socket false
-        amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
-      else
-        amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, false
-        @can_handle_web_socket true
-        amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
 
     amplify.subscribe z.event.WebApp.CONNECTION.RECONNECT, @reconnect
     amplify.subscribe z.event.WebApp.CONNECTION.ONLINE, @recover_from_notification_stream
@@ -112,7 +107,7 @@ class z.event.EventRepository
 
     @web_socket_service.client_id = @current_client().id
     @web_socket_service.connect (notification) =>
-      if @can_handle_web_socket()
+      if @notification_handling_state() is z.event.NotificationHandlingState.WEB_SOCKET
         @notifications_queue.push notification
       else
         @_buffer_web_socket_notification notification
@@ -129,7 +124,7 @@ class z.event.EventRepository
   @param trigger [z.event.WebSocketService::CHANGE_TRIGGER] Trigger of the disconnect
   ###
   reconnect: (trigger) =>
-    @can_handle_web_socket false
+    @notification_handling_state z.event.NotificationHandlingState.RECOVERY
     @web_socket_service.reconnect trigger
 
   ###
@@ -210,15 +205,15 @@ class z.event.EventRepository
   Will retrieve missed notifications from the stream after a connectivity loss.
   ###
   recover_from_notification_stream: =>
-    @is_recovering true
+    @notification_handling_state z.event.NotificationHandlingState.RECOVERY
     @update_from_notification_stream()
     .then (number_of_notifications) =>
-      @is_recovering false if number_of_notifications is 0
+      @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET if number_of_notifications is 0
       @logger.log @logger.levels.INFO, "Retrieved '#{number_of_notifications}' notifications from stream after connectivity loss"
     .catch (error) =>
       if error.type isnt z.event.EventError::TYPE.NO_NOTIFICATIONS
         @logger.log @logger.levels.ERROR, "Failed to recover from notification stream: #{error.message}", error
-        @is_recovering false
+        @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET
         # @todo What do we do in this case?
         amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
 
@@ -238,9 +233,8 @@ class z.event.EventRepository
           @logger.log @logger.levels.INFO, "ID of last notification fetched from stream is '#{last_notification_id}'"
         resolve @notifications_total
       .catch (error) =>
-        @can_handle_web_socket true
+        @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET
         if error.type in [z.event.EventError::TYPE.NO_LAST_ID, z.event.EventError::TYPE.NO_NOTIFICATIONS]
-          amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, false
           @find_ongoing_calls()
           @logger.log @logger.levels.INFO, 'No notifications found for this user', error
           resolve 0
@@ -325,6 +319,7 @@ class z.event.EventRepository
   ###
   Handle a single event from the notification stream or WebSocket.
   @param event [JSON] Backend event extracted from notification stream
+  @param source [String] Source of backend event
   @return [Promise] Resolves with the saved record or boolean true if the event was skipped
   ###
   _handle_event: (event, source) ->
@@ -335,8 +330,12 @@ class z.event.EventRepository
       else if event.from
         throw new z.event.EventError z.event.EventError::TYPE.DEPRECATED_SCHEMA if event.type in z.event.EventTypeHandling.DEPRECATED
         log_message = "Received unencrypted event '#{event.id}' of type '#{event.type}' from user '#{event.from}'"
-      else
+      else if event.type.startsWith 'call'
         log_message = "Received call event '#{event.type}' in conversation '#{event.conversation}'"
+      else if event.type.startsWith 'user'
+        log_message = "Received user event '#{event.type}'"
+      else
+        log_message = "Received unknown event '#{event.type}' in conversation '#{event.conversation}'"
       @logger.log @logger.levels.INFO, log_message, {event_object: event, event_json: JSON.stringify event}
 
       if event.type in z.event.EventTypeHandling.IGNORE
@@ -351,8 +350,7 @@ class z.event.EventRepository
         promise = Promise.resolve event
 
       promise.then (record) =>
-        if record and (source is @NOTIFICATION_SOURCE.SOCKET or @is_recovering or record.type.startsWith 'conversation')
-          @_distribute_event record
+        @_distribute_event record if record
         resolve record
       .catch (error) =>
         if error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
@@ -370,7 +368,11 @@ class z.event.EventRepository
   _handle_notification: (notification) =>
     return new Promise (resolve, reject) =>
       events = notification.payload
-      source = if @can_handle_web_socket() then @NOTIFICATION_SOURCE.SOCKET else @NOTIFICATION_SOURCE.STREAM
+      source = switch @notification_handling_state()
+        when z.event.NotificationHandlingState.WEB_SOCKET
+          @NOTIFICATION_SOURCE.WEB_SOCKET
+        else
+          @NOTIFICATION_SOURCE.STREAM
 
       @logger.log @logger.levels.INFO,
         "Handling notification '#{notification.id}' from '#{source}' containing '#{events.length}' events", notification

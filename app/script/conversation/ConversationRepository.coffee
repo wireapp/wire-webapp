@@ -38,16 +38,16 @@ class z.conversation.ConversationRepository
     @event_mapper = new z.conversation.EventMapper @asset_service, @user_repository
 
     @active_conversation = ko.observable()
-
     @conversations = ko.observableArray []
-    @has_initialized_participants = false
-    @is_handling_notifications = true
-    @fetching_conversations = {}
 
-    @self_conversation = ko.computed =>
+    @block_event_handling = true
+    @fetching_conversations = {}
+    @has_initialized_participants = false
+
+    @self_conversation = ko.pureComputed =>
       return @find_conversation_by_id @user_repository.self().id if @user_repository.self()
 
-    @filtered_conversations = ko.computed =>
+    @filtered_conversations = ko.pureComputed =>
       @conversations().filter (conversation_et) ->
         states_to_filter = [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.CANCELLED, z.user.ConnectionStatus.PENDING]
         return false if conversation_et.connection().status() in states_to_filter
@@ -55,8 +55,10 @@ class z.conversation.ConversationRepository
         return false if conversation_et.is_cleared() and conversation_et.removed_from_conversation()
         return true
 
-    @sorted_conversations = ko.computed =>
+    @sorted_conversations = ko.pureComputed =>
       @filtered_conversations().sort z.util.sort_groups_by_last_event
+
+    @message_sending_queue = []
 
     @conversations_archived = ko.observableArray []
     @conversations_call = ko.observableArray []
@@ -118,7 +120,7 @@ class z.conversation.ConversationRepository
   create_new_conversation: (user_ids, name, on_success, on_error) =>
     @conversation_service.create_conversation user_ids, name, (response, error) =>
       if response
-        on_success? @create response
+        on_success? @_on_create response
       else
         on_error? error
 
@@ -406,7 +408,7 @@ class z.conversation.ConversationRepository
   ###
   mark_as_read: (conversation_et) =>
     return if conversation_et is undefined
-    return if @is_handling_notifications
+    return if @block_event_handling
     return if conversation_et.number_of_unread_events() is 0
     return if conversation_et.get_last_message()?.type is z.event.Backend.CONVERSATION.MEMBER_UPDATE
 
@@ -435,11 +437,12 @@ class z.conversation.ConversationRepository
   ###
   Set the notification handling state.
   @note Temporarily do not unarchive conversations when handling the notification stream
-  @param handling_notifications [Boolean] Notifications are being handled from the stream
+  @param handling_state [z.event.NotificationHandlingState] State of the notifications stream handling
   ###
-  set_notification_handling_state: (handling_notifications) =>
-    @is_handling_notifications = handling_notifications
-    @logger.log @logger.levels.INFO, "Ignoring events for unarchiving: #{handling_notifications}"
+  set_notification_handling_state: (handling_state) =>
+    @block_event_handling = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
+    @_execute_message_queue() if not @block_event_handling
+    @logger.log @logger.levels.INFO, "Block handling of conversation events: #{@block_event_handling}"
 
   ###
   Update participating users in a conversation.
@@ -813,10 +816,14 @@ class z.conversation.ConversationRepository
   @param message_et [String] ID of message for which to acknowledge receipt
   ###
   send_confirmation_status: (conversation_et, message_et) =>
-    return true # disable for now
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
-    @_send_generic_message conversation_et.id, generic_message, [message_et.user().id]
+    return if message_et.user().is_me or not conversation_et.is_one2one() or message_et.type not in z.event.EventTypeHandling.CONFIRM
+
+    if @block_event_handling
+      @message_sending_queue.push [conversation_et, message_et]
+    else
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
+      @_send_generic_message conversation_et.id, generic_message, [message_et.user().id]
 
   ###
   Sends an OTR Image Asset
@@ -1125,6 +1132,10 @@ class z.conversation.ConversationRepository
     user_client_map = {}
     user_client_map[user_id] = [client_id]
     return user_client_map
+
+  _execute_message_queue: ->
+    @send_confirmation_status conversation_et, message_et for [conversation_et, message_et] in @message_sending_queue
+    @message_sending_queue = []
 
   ###############################################################################
   # Send Generic Messages
@@ -1459,7 +1470,7 @@ class z.conversation.ConversationRepository
           @_on_add_event conversation_et, event
 
       # Un-archive it also on the backend side
-      if not @is_handling_notifications and previously_archived and not conversation_et.is_archived()
+      if not @block_event_handling and previously_archived and not conversation_et.is_archived()
         @logger.log @logger.levels.INFO, "Unarchiving conversation '#{conversation_et.id}' with new event"
         @unarchive_conversation conversation_et
 
@@ -1471,8 +1482,7 @@ class z.conversation.ConversationRepository
   ###
   _on_add_event: (conversation_et, event_json) ->
     @_add_event_to_conversation event_json, conversation_et, (message_et) =>
-      if conversation_et.is_one2one() and not message_et.user().is_me and message_et.type in z.event.EventTypeHandling.CONFIRM
-        @send_confirmation_status conversation_et, message_et
+      @send_confirmation_status conversation_et, message_et
       @_send_event_notification event_json, conversation_et, message_et
 
   ###
