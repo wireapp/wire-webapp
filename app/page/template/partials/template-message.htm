@@ -115,7 +115,7 @@
     <!-- /ko -->
 
     <!-- ko ifnot: message.other_likes().length -->
-      <div class="message-body-like" data-bind="style: {opacity: $data.is_liked() ? 1 : ''}, click: function() {$parent.click_on_like($data, !$data.is_liked())}">
+      <div class="message-body-like" data-uie-name="message-liked" data-bind="attr: {'data-ui-value': message.is_liked()}style: {opacity: $data.is_liked() ? 1 : ''}, click: function() {$parent.click_on_like($data, !$data.is_liked())}">
         <span class="icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}"></span>
       </div>
     <!-- /ko -->
@@ -133,7 +133,7 @@
         <!-- /ko -->
       </div>
       <!-- ko if: message.show_likes() -->
-        <div class="message-footer-bottom">
+        <div class="message-footer-bottom" data-uie-name="message-liked-users">
           <!-- ko foreach: message.reactions_user_ets() -->
             <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
           <!-- /ko -->
