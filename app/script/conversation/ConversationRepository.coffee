@@ -118,7 +118,7 @@ class z.conversation.ConversationRepository
   create_new_conversation: (user_ids, name, on_success, on_error) =>
     @conversation_service.create_conversation user_ids, name, (response, error) =>
       if response
-        on_success? @create response
+        on_success? @_on_create response
       else
         on_error? error
 
