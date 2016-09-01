@@ -17,17 +17,9 @@
 #
 
 window.z ?= {}
-z.event ?= {}
+z.message ?= {}
 
-z.event.Client =
-  CONVERSATION:
-    ASSET_META: 'conversation.asset-meta'
-    ASSET_PREVIEW: 'conversation.asset-preview'
-    ASSET_UPLOAD_COMPLETE: 'conversation.asset-upload-complete'
-    ASSET_UPLOAD_FAILED: 'conversation.asset-upload-failed'
-    DELETE_EVERYWHERE: 'conversation.delete-everywhere'
-    LOCATION: 'conversation.location'
-    MESSAGE_DELETE: 'conversation.message-delete'
-    MESSAGE_HIDDEN: 'conversation.message-hidden'
-    REACTION: 'conversation.reaction'
-    UNABLE_TO_DECRYPT: 'conversation.unable-to-decrypt'
+# Enum for different reactions.
+z.message.ReactionType =
+  LIKE: '💖'
+  NONE: ''

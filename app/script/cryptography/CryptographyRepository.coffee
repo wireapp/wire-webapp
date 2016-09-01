@@ -480,7 +480,7 @@ class z.cryptography.CryptographyRepository
       else if event.type is z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD
         ciphertext = event.data.text
 
-      primary_key = @storage_repository.construct_primary_key event.conversation, event.from, event.time
+      primary_key = z.storage.StorageService.construct_primary_key event
       @storage_repository.load_event_for_conversation primary_key
       .then (loaded_event) =>
         if loaded_event is undefined

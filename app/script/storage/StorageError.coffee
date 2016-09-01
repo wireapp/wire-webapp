@@ -32,6 +32,12 @@ class z.storage.StorageError
         'Failed to open database'
       when z.storage.StorageError::TYPE.INVALID_TIMESTAMP
         'Invalid timestamp'
+      when z.storage.StorageError::TYPE.NO_CONVERSATION_ID
+        'Missing conversation ID'
+      when z.storage.StorageError::TYPE.NO_SENDER_ID
+        'Missing sender ID'
+      when z.storage.StorageError::TYPE.NO_TIME
+        'Missing time'
       when z.storage.StorageError::TYPE.SKIP_LOADING
         'Skipped loading of sessions and pre-keys'
       when z.storage.StorageError::TYPE.UNKNOWN
@@ -43,6 +49,9 @@ class z.storage.StorageError
     DATA_STORE_NOT_FOUND: 'z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND'
     FAILED_TO_OPEN: 'z.storage.StorageError::TYPE.FAILED_TO_OPEN'
     INVALID_TIMESTAMP: 'z.storage.StorageError::TYPE.INVALID_TIMESTAMP'
+    NO_CONVERSATION_ID: 'z.storage.StorageError::TYPE.NO_CONVERSATION_ID'
+    NO_SENDER_ID: 'z.storage.StorageError::TYPE.NO_SENDER_ID'
+    NO_TIME: 'z.storage.StorageError::TYPE.NO_TIME'
     SKIP_LOADING: 'z.storage.StorageError:TYPE.SKIP_SESSIONS'
     UNKNOWN: 'z.storage.StorageError::TYPE.UNKNOWN'
   }
