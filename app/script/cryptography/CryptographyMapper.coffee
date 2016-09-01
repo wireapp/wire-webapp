@@ -73,6 +73,8 @@ class z.cryptography.CryptographyMapper
         return @_map_last_read generic_message.lastRead
       when 'location'
         return @_map_location generic_message.location, generic_message.message_id
+      when 'reaction'
+        return @_map_reaction generic_message.reaction
       when 'text'
         return @_map_text generic_message.text, generic_message.message_id
       else
@@ -104,7 +106,7 @@ class z.cryptography.CryptographyMapper
     return {
       data:
         reason: not_uploaded
-      type: z.event.Backend.CONVERSATION.ASSET_UPLOAD_FAILED
+      type: z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED
     }
 
   _map_asset_original: (original, event_nonce) ->
@@ -116,7 +118,7 @@ class z.cryptography.CryptographyMapper
           name: original.name
           nonce: event_nonce
         meta: @_map_asset_meta_data(original)
-      type: z.event.Backend.CONVERSATION.ASSET_META
+      type: z.event.Client.CONVERSATION.ASSET_META
     }
 
   _map_asset_preview: (preview, event_id) ->
@@ -125,7 +127,7 @@ class z.cryptography.CryptographyMapper
         id: event_id
         otr_key: new Uint8Array preview.remote.otr_key?.toArrayBuffer()
         sha256: new Uint8Array preview.remote.sha256?.toArrayBuffer()
-      type: z.event.Backend.CONVERSATION.ASSET_PREVIEW
+      type: z.event.Client.CONVERSATION.ASSET_PREVIEW
     }
 
   _map_asset_uploaded: (uploaded, event_id) ->
@@ -134,7 +136,7 @@ class z.cryptography.CryptographyMapper
         id: event_id
         otr_key: new Uint8Array uploaded.otr_key?.toArrayBuffer()
         sha256: new Uint8Array uploaded.sha256?.toArrayBuffer()
-      type: z.event.Backend.CONVERSATION.ASSET_UPLOAD_COMPLETE
+      type: z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE
     }
 
   _map_cleared: (cleared) ->
@@ -149,7 +151,7 @@ class z.cryptography.CryptographyMapper
     return {
       data:
         message_id: deleted.message_id
-      type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
+      type: z.event.Client.CONVERSATION.MESSAGE_DELETE
     }
 
   _map_edited: (edited, event_id) ->
@@ -185,7 +187,7 @@ class z.cryptography.CryptographyMapper
       data:
         conversation_id: hidden.conversation_id
         message_id: hidden.message_id
-      type: z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
+      type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN
     }
 
   _map_image: (image, event_id) ->
@@ -244,7 +246,15 @@ class z.cryptography.CryptographyMapper
           name: location.name
           zoom: location.zoom
         nonce: event_id
-      type: z.event.Backend.CONVERSATION.LOCATION
+      type: z.event.Client.CONVERSATION.LOCATION
+    }
+
+  _map_reaction: (reaction) ->
+    return {
+      data:
+        message_id: reaction.message_id
+        reaction: reaction.emoji
+      type: z.event.Client.CONVERSATION.REACTION
     }
 
   _map_text: (text, event_id) ->

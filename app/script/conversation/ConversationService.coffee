@@ -195,7 +195,7 @@ class z.conversation.ConversationService
       callback: callback
 
   ###
-  Delete events from a conversation.
+  Delete a message from a conversation.
 
   @param message_id [String] ID of conversation to remove message from
   @param primary_key [String] ID of the actual message
@@ -209,9 +209,8 @@ class z.conversation.ConversationService
     .delete()
 
   ###
-  Delete events from a conversation.
-
-  @param conversation_id [String] delete message for this conversation
+  Delete all message of a conversation.
+  @param conversation_id [String] Delete messages for this conversation
   ###
   delete_messages_from_db: (conversation_id) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
@@ -221,25 +220,36 @@ class z.conversation.ConversationService
 
   ###
   Update events timestamp.
-
-  @param primary_key [String] Primary key used to find an event in the database
-  @param timestamp [Number]
+  @param event_json [JSON] Message event to update in the database
+  @param timestamp [Number] Updated timestamp
   ###
-  update_message_timestamp_in_db: (primary_key, timestamp) ->
-    updated_record = undefined
+  update_message_timestamp_in_db: (event_json, timestamp) ->
     Promise.resolve()
-    .then ->
-      if not timestamp?
+    .then =>
+      if timestamp
+        primary_key = z.storage.StorageService.construct_primary_key event_json
+        changes =
+          time: new Date(timestamp).toISOString()
+        return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
+      else
         throw new TypeError 'Missing timestamp'
     .then =>
-      @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
-    .then (record) =>
-      record.time = new Date(timestamp).toISOString()
-      updated_record = record
-      @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
+      event_json.time = new Date(timestamp).toISOString()
+      @logger.log @logger.levels.INFO, "Updated time of message '#{event_json.id}' to '#{event_json.time}'", event_json
+      return event_json
+
+  ###
+  Update events reactions.
+  @param primary_key [String] Primary key of message event to update in the database
+  @param reactions [Object] Updated reactions
+  ###
+  update_message_reactions_in_db: (primary_key, reactions) ->
+    Promise.resolve()
     .then =>
-      @logger.log 'Updated message_et timestamp', primary_key
-      return updated_record
+      if reactions
+        @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, {reactions: reactions}
+      else
+        throw new TypeError 'Missing reactions'
 
   ###
   Delete events from a conversation.
@@ -288,7 +298,7 @@ class z.conversation.ConversationService
 
   ###
   Loads conversation states from the local database.
-
+  @return [Promise] Promise that resolves with all the stored conversation states
   ###
   load_conversation_states_from_db: =>
     return new Promise (resolve, reject) =>

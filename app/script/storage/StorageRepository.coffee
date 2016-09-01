@@ -203,26 +203,13 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   ###############################################################################
 
   ###
-  Construct a unique primary key.
-
-  @param conversation_id [String] ID of conversation
-  @param sender_id [String] ID of message sender
-  @param time [String] Time in ISO format to create timestamp from
-  @return [String] Generated primary key
-  ###
-  construct_primary_key: (conversation_id, sender_id = @storage_service.user_id, time) ->
-    timestamp = new Date(time).getTime()
-    throw new z.storage.StorageError z.storage.StorageError::TYPE.INVALID_TIMESTAMP if window.isNaN timestamp
-    return "#{conversation_id}@#{sender_id}@#{timestamp}"
-
-  ###
   Save an unencrypted conversation event.
   @param event [Object] JSON event to be stored
   @return [Promise] Promise that resolves with the stored record
   ###
   save_conversation_event: (event) ->
     return new Promise (resolve, reject) =>
-      primary_key = @construct_primary_key event.conversation, event.from, event.time
+      primary_key = z.storage.StorageService.construct_primary_key event
       store_name = @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
       @storage_service.save store_name, primary_key, event
       .then -> resolve event

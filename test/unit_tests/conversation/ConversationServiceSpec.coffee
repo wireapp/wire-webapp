@@ -18,7 +18,7 @@
 
 # grunt test_init && grunt test_run:conversation/ConversationService
 
-describe 'Conversation Service', ->
+describe 'z.conversation.ConversationService', ->
   conversation_mapper = null
   server = null
 
@@ -106,34 +106,23 @@ describe 'Conversation Service', ->
 
   describe 'update_message_timestamp_in_db', ->
     # @formatter:off
-    messages = [
-      {
-        key: '35a9a89d-70dc-4d9e-88a2-4d8758458a6a@8b497692-7a38-4a5d-8287-e3d1006577d6@1470317278993'
-        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
-      }
-    ]
+    event = {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
     # @formatter:on
 
-    beforeEach (done) ->
-      Promise.all messages.map (message) ->
-        return conversation_service.storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
-      .then done
-      .catch done.fail
-
-    it 'returns updated record', (done) ->
+    it 'returns updated event', (done) ->
       timestamp = Date.now()
       time = new Date(timestamp).toISOString()
-      conversation_service.update_message_timestamp_in_db messages[0].key, timestamp
-      .then (record) =>
-        expect(record.time).toEqual time
+      conversation_service.update_message_timestamp_in_db event, timestamp
+      .then (event_json) =>
+        expect(event_json.time).toEqual time
         done()
       .catch done.fail
 
     it 'fails if no timestamp is specified', (done) ->
-      conversation_service.update_message_timestamp_in_db messages[0].key, undefined
+      conversation_service.update_message_timestamp_in_db event, undefined
       .then done.fail
       .catch (error) ->
-        expect((error)).toEqual jasmine.any(TypeError)
+        expect(error).toEqual jasmine.any TypeError
         done()
 
   describe 'load_events_from_db', ->

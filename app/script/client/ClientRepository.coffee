@@ -29,8 +29,8 @@ class z.client.ClientRepository
     @clients = ko.observableArray()
     @current_client = ko.observable undefined
 
-    amplify.subscribe z.event.Backend.USER.CLIENT.ADD, @on_client_add
-    amplify.subscribe z.event.Backend.USER.CLIENT.REMOVE, @on_client_remove
+    amplify.subscribe z.event.Backend.USER.CLIENT_ADD, @on_client_add
+    amplify.subscribe z.event.Backend.USER.CLIENT_REMOVE, @on_client_remove
     amplify.subscribe z.event.WebApp.CLIENT.DELETE, @delete_client_and_session
 
     return @

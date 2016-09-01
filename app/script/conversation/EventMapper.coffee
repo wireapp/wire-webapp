@@ -58,10 +58,8 @@ class z.conversation.EventMapper
   ###
   _map_json_event: (event, conversation_et) ->
     switch event.type
-      when z.event.Backend.CONVERSATION.ASSET_META
-        message_et = @_map_event_asset_meta event
-      when z.event.Backend.CONVERSATION.ASSET_ADD
-        message_et = @_map_event_asset_add event
+      when z.event.Backend.CONVERSATION.KNOCK
+        message_et = @_map_event_ping event
       when z.event.Backend.CONVERSATION.MESSAGE_ADD
         message_et = @_map_event_message_add event
       when z.event.Backend.CONVERSATION.MEMBER_JOIN
@@ -76,22 +74,27 @@ class z.conversation.EventMapper
         message_et = @_map_event_voice_channel_activate()
       when z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
         message_et = @_map_event_voice_channel_deactivate event
-      when z.event.Backend.CONVERSATION.KNOCK
-        message_et = @_map_event_ping event
-      when z.event.Backend.CONVERSATION.LOCATION
+      when z.event.Client.CONVERSATION.ASSET_META
+        message_et = @_map_event_asset_meta event
+      when z.event.Client.CONVERSATION.ASSET_ADD
+        message_et = @_map_event_asset_add event
+      when z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+        message_et = @_map_system_event_delete_everywhere event
+      when z.event.Client.CONVERSATION.LOCATION
         message_et = @_map_event_location event
       when z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
         message_et = @_map_system_event_unable_to_decrypt event
-      when z.event.Client.CONVERSATION.DELETE_EVERYWHERE
-        message_et = @_map_system_event_delete_everywhere event
       else
         message_et = @_map_event_ignored()
 
     message_et.id = event.id
-    message_et.type = event.type
     message_et.from = event.from
     message_et.timestamp = new Date(event.time).getTime()
-    message_et.primary_key = "#{conversation_et.id}@#{message_et.from}@#{message_et.timestamp}"
+    message_et.primary_key = z.storage.StorageService.construct_primary_key event
+    message_et.type = event.type
+
+    if message_et.is_content()
+      message_et.reactions event.reactions or {}
 
     if window.isNaN message_et.timestamp
       @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event

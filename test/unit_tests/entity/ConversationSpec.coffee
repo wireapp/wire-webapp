@@ -284,7 +284,7 @@ describe 'Conversation', ->
 
     it 'detects duplicate messages', ->
       content = z.message.SuperType.CONTENT
-      asset_meta = z.event.Backend.CONVERSATION.ASSET_META
+      asset_meta = z.event.Client.CONVERSATION.ASSET_META
 
       message1.super_type = content
       message1.type = asset_meta
@@ -505,14 +505,14 @@ describe 'Conversation', ->
       older_message_et.timestamp = older_timestamp
       older_message_et.id = z.util.create_random_uuid()
       older_message_et.nonce = z.util.create_random_uuid()
-      older_message_et.type = z.event.Backend.CONVERSATION.ASSET_META
+      older_message_et.type = z.event.Client.CONVERSATION.ASSET_META
       older_message_et.add_asset asset_et
 
       newer_message_et = new z.entity.ContentMessage()
       newer_message_et.timestamp = newer_timestamp
       newer_message_et.id = older_message_et.id
       newer_message_et.nonce = older_message_et.nonce
-      newer_message_et.type = z.event.Backend.CONVERSATION.ASSET_META
+      newer_message_et.type = z.event.Client.CONVERSATION.ASSET_META
       newer_message_et.add_asset asset_et
 
       conversation_et._check_for_duplicate_nonce older_message_et, newer_message_et
