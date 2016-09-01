@@ -195,7 +195,7 @@ z.string.de.modal_leave_conversation_message = 'Die Personen werden benachrichti
 z.string.de.modal_leave_conversation_button = 'Verlassen'
 # Logout
 z.string.de.modal_logout_headline = 'Daten löschen?'
-z.string.de.modal_logout_message = 'Dies entfernt alle deine persönlichen Informationen und Unterhaltungen von diesem Gerät.'
+z.string.de.modal_logout_message = 'Deine persönlichen Daten und Unterhaltungen vollständig von diesem Gerät entfernen.'
 z.string.de.modal_logout_button = 'Abmelden'
 # New device
 z.string.de.modal_new_device_headline = '"%@.name" hat begonnen ein neues Gerät zu nutzen'

@@ -101,11 +101,11 @@ class z.SystemNotification.SystemNotificationRepository
   ###
   Set the muted state.
   @note Temporarily mute notifications on recovery from Notification Stream
-  @param muted [Boolean] Are sounds and notifications muted
+  @param handling_notifications [z.event.NotificationHandlingState] Updated notification handling state
   ###
   set_muted_state: (handling_notifications) =>
-    @muted = handling_notifications
-    @logger.log @logger.levels.INFO, "Setting muted state to: #{handling_notifications}"
+    @muted = handling_notifications is z.event.NotificationHandlingState.STREAM
+    @logger.log @logger.levels.INFO, "Set muted state to: #{@muted}"
 
   ###
   @param should_request [Boolean] True, when permission should be requested
