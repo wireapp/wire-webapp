@@ -20,11 +20,22 @@ window.z ?= {}
 z.connect ?= {}
 
 class z.connect.ConnectError
-  constructor: (message, type) ->
+  constructor: (type) ->
     @name = @constructor.name
-    @message = message
     @stack = (new Error()).stack
-    @type = type
+    @type = type or z.connect.ConnectError::TYPE.UNKNOWN
+
+    @message = switch @type
+      when z.connect.ConnectError::TYPE.GOOGLE_CLIENT
+        'Google Auth Client for JavaScript not loaded'
+      when z.connect.ConnectError::TYPE.GOOGLE_DOWNLOAD
+        'Failed to download contacts from Google'
+      when z.connect.ConnectError::TYPE.NO_CONTACTS
+        'No contacts found for matching'
+      when z.connect.ConnectError::TYPE.UPLOAD
+        'Address book upload failed'
+      else
+
 
   @:: = new Error()
   @::constructor = @

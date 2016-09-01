@@ -160,8 +160,7 @@ class z.auth.AuthRepository
         @_schedule_token_refresh z.storage.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION
         resolve()
       else
-        error_message = 'No cached access token found in Local Storage'
-        reject new z.auth.AccessTokenError error_message, z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE
+        reject new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE
 
   ###
   Initially get access-token provided a valid cookie.
@@ -170,9 +169,9 @@ class z.auth.AuthRepository
   get_access_token: =>
     return new Promise (resolve, reject) =>
       if @auth_service.client.is_requesting_access_token()
-        error_message = 'Access Token request already in progress'
-        @logger.log @logger.levels.WARN, error_message
-        reject new z.auth.AccessTokenError error_message, z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
+        error = new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
+        @logger.log @logger.levels.WARN, error.message
+        reject error
       else
         @auth_service.post_access()
         .then (access_token) =>

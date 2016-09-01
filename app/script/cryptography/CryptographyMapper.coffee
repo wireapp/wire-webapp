@@ -35,10 +35,10 @@ class z.cryptography.CryptographyMapper
     mapped = undefined
 
     Promise.resolve()
-    .then ->
+    .then =>
       if not generic_message
-        error_message = "Failed to map OTR event '#{event.id}' as decrypted generic message is missing"
-        throw new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.MISSING_MESSAGE
+        @logger.log @logger.levels.ERROR, "Failed to map OTR event '#{event.id}' as decrypted generic message is missing"
+        throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.NO_GENERIC_MESSAGE
     .then ->
       mapped =
         conversation: event.conversation
@@ -51,7 +51,7 @@ class z.cryptography.CryptographyMapper
       $.extend mapped, specific_content
       return mapped
 
-  _map_generic_message: (generic_message, event) ->
+  _map_generic_message: (generic_message, event) =>
     switch generic_message.content
       when 'asset'
         return @_map_asset generic_message.asset, generic_message.message_id, event.data?.id
@@ -76,8 +76,8 @@ class z.cryptography.CryptographyMapper
       when 'text'
         return @_map_text generic_message.text, generic_message.message_id
       else
-        error_message = "Skipped event '#{generic_message.message_id}' of unhandled type '#{generic_message.content}'"
-        throw new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+        @logger.log @logger.levels.WARN, "Skipped event '#{generic_message.message_id}' of unhandled type '#{generic_message.content}'"
+        throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
 
   _map_asset: (asset, event_nonce, event_id) ->
     if asset.uploaded?
@@ -89,9 +89,9 @@ class z.cryptography.CryptographyMapper
     else if asset.original?
       return @_map_asset_original asset.original, event_nonce
     else
-      error_message = 'Ignored asset preview'
-      @logger.log @logger.levels.INFO, error_message
-      throw new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
+      error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
+      @logger.log @logger.levels.INFO, error.message
+      throw error
 
   _map_asset_meta_data: (original) ->
     if original.audio?
@@ -177,7 +177,8 @@ class z.cryptography.CryptographyMapper
       @logger.log @logger.levels.INFO, "Received external message of type '#{generic_message.content}'", generic_message
       return @_map_generic_message generic_message, event
     .catch (error) ->
-      throw new z.cryptography.CryptographyError error.message, z.cryptography.CryptographyError::TYPE.BROKEN_EXTERNAL
+      @logger.log @logger.levels.ERROR, "Failed to map external message: #{error.message}", error
+      throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.BROKEN_EXTERNAL
 
   _map_hidden: (hidden) ->
     return {
@@ -191,9 +192,9 @@ class z.cryptography.CryptographyMapper
     if image.tag is 'medium'
       return @_map_image_medium image, event_id
     else
-      error_message = 'Ignored image preview'
-      @logger.log @logger.levels.INFO, error_message
-      throw new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
+      error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
+      @logger.log @logger.levels.INFO, error.message
+      throw error
 
   _map_image_medium: (image, event_id) ->
     return {
@@ -216,9 +217,9 @@ class z.cryptography.CryptographyMapper
 
   _map_knock: (knock, event_id) ->
     if knock.hot_knock
-      error_message = 'Ignored hot knock'
-      @logger.log @logger.levels.INFO, error_message
-      throw new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.IGNORED_HOT_KNOCK
+      error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_HOT_KNOCK
+      @logger.log @logger.levels.INFO, error.message
+      throw error
     else
       return {
         data:

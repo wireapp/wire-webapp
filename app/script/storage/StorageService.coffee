@@ -180,7 +180,7 @@ class z.storage.StorageService
           @logger.log @logger.levels.ERROR, "Failed to delete '#{primary_key}' from store '#{store_name}'", error
           reject error
       else
-        reject new Error "Data store '#{store_name}' not found"
+        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   clear_all_stores: =>
     promises = (@delete_store store_name for store_name of @db._dbSchema)
@@ -227,7 +227,7 @@ class z.storage.StorageService
           @logger.log @logger.levels.ERROR, "Could not load objects from store '#{store_name}'", error
           reject error
       else
-        reject new Error "Data store '#{store_name}' not found"
+        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   ###
   Returns an array of all keys in a given object store.
@@ -250,7 +250,7 @@ class z.storage.StorageService
             resolve accepted_keys
         .catch (error) -> reject error
       else
-        reject new Error "Data store '#{store_name}' not found"
+        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   ###
   Loads persisted data via a promise.
@@ -270,7 +270,7 @@ class z.storage.StorageService
           @logger.log @logger.levels.ERROR, "Failed to load '#{primary_key}' from store '#{store_name}'", error
           reject error
       else
-        reject new Error "Data store '#{store_name}' not found"
+        reject new Error z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   ###
   Loads all objects from an object store and returns them with their keys and values.
@@ -324,7 +324,7 @@ class z.storage.StorageService
           @logger.log @logger.levels.ERROR, "Failed to put '#{primary_key}' into store '#{store_name}'", error
           reject error
       else
-        reject new Error "Data store '#{store_name}' not found"
+        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   ###
   Closes the database. This operation completes immediately and there is no returned Promise.
@@ -355,4 +355,4 @@ class z.storage.StorageService
           @logger.log @logger.levels.ERROR, "Failed to update '#{primary_key}' in store '#{store_name}'", error
           reject error
       else
-        reject new Error "Data store '#{store_name}' not found"
+        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
