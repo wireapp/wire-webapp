@@ -132,7 +132,7 @@ class z.ViewModel.SettingsViewModel
 
   click_on_reset_password: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, value: 'fromProfile'
-    (window.open z.string.url_password_reset)?.focus()
+    (z.util.safe_window_open z.string.url_password_reset)?.focus()
 
   click_on_device: (client_et) =>
     @selected_device client_et
