@@ -275,6 +275,7 @@ z.string.conversation_context_menu_delete_everyone = 'Delete for Everyone'
 z.string.conversation_context_menu_download = 'Download'
 z.string.conversation_delete_timestamp = 'Deleted on %@timestamp'
 z.string.conversation_edit_timestamp = 'Edited on %@timestamp'
+z.string.conversation_likes_caption = '%@number people'
 
 # Conversation list
 z.string.conversation_list_archive = 'ARCHIVE'
