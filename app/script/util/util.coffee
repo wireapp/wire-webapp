@@ -314,8 +314,19 @@ z.util.alias =
 
 
 z.util.add_blank_targets = (text_with_anchors) ->
-  return "#{text_with_anchors}".replace /rel="nofollow"/gi, 'target="_blank" rel="nofollow"'
+  return "#{text_with_anchors}".replace /rel="nofollow"/gi, 'target="_blank" rel="nofollow noopener noreferrer"'
 
+###
+Opens a new browser tab (target="_blank") with a given URL in a safe environment.
+
+@see https://mathiasbynens.github.io/rel-noopener/
+@param url [String] URL you want to open in a new browser tab
+###
+z.util.safe_window_open = (url) ->
+  new_window = window.open()
+  new_window.opener = null
+  new_window.location = url
+  return new_window
 
 z.util.auto_link_emails = (text) ->
   email_pattern = /([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)/gim
@@ -332,7 +343,7 @@ z.util.cut_last_characters = (message, amount) ->
 
 
 z.util.markup_links = (message) ->
-  return message.replace(/<a\s+href=/gi, '<a target="_blank" rel="nofollow" href=')
+  return message.replace(/<a\s+href=/gi, '<a target="_blank" rel="nofollow noopener noreferrer" href=')
 
 # Source: https://github.com/KyleAMathews/deepmerge/blob/master/index.js
 z.util.merge_objects = (target, source) ->
