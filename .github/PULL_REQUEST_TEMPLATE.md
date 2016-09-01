@@ -1,10 +1,7 @@
 ## Description
 <!--- Describe your changes -->
 
-## How Has This Been Tested?
-<!--- Please describe in detail how you tested your changes. -->
-
-## Screenshots:
+## Screenshots
 <!--- Screenshots (if appropriate) -->
 
 ## Types of changes
