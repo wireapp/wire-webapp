@@ -30,6 +30,7 @@ class z.entity.ContentMessage extends z.entity.Message
     @super_type = z.message.SuperType.CONTENT
     @replacing_message_id = null
     @edited_timestamp = null
+    @reactions = ko.observable {}
 
     @display_edited_timestamp = =>
       return  z.localization.Localizer.get_text {

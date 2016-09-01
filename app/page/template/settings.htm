@@ -99,8 +99,8 @@
             <!-- /ko -->
             <!-- ko if: delete_status() === 'dialog' -->
               <p data-uie-name="delete-confirm-text" data-bind="text: delete_confirm_text"></p>
-              <span class="button button-sm" data-uie-name="do-delete-account" data-bind="click: click_on_delete_send">Send</span>
-              <span class="button-label text-theme delete-cancel-button" data-uie-name="do-delete-cancel" data-bind="click: click_on_delete_cancel">Cancel</span>
+              <span class="button button-sm" data-uie-name="do-delete-account" data-bind="click: click_on_delete_send, l10n_text: z.string.modal_button_send"></span>
+              <span class="button-label text-theme delete-cancel-button" data-uie-name="do-delete-cancel" data-bind="click: click_on_delete_cancel, l10n_text: z.string.modal_button_cancel"></span>
             <!-- /ko -->
             <!-- ko if: delete_status() === 'sent' -->
               <span data-uie-name="delete-sent" data-bind="click: click_on_delete, l10n_text: z.string.preferences_email_sent"></span>

@@ -280,7 +280,7 @@ class z.main.App
 
       token_promise.catch (error) =>
         if is_reload
-          if error.type is error.type is z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
+          if error.type is z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
             @logger.log @logger.levels.ERROR, "Session expired on page reload: #{error.message}", error
             Raygun.send new Error ('Session expired on page reload'), error
             @_redirect_to_login true

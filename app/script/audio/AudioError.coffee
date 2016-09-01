@@ -20,11 +20,22 @@ window.z ?= {}
 z.audio ?= {}
 
 class z.audio.AudioError
-  constructor: (message, type) ->
+  constructor: (type) ->
     @name = @constructor.name
-    @message = message
-    @type = type
     @stack = (new Error()).stack
+    @type = type or z.audio.AudioError::TYPE.UNKNOWN
+
+    @message = switch @type
+      when z.audio.AudioError::TYPE.ALREADY_PLAYING
+        'Sound is already playing'
+      when z.audio.AudioError::TYPE.FAILED_TO_PLAY
+        'Failed to play sound'
+      when z.audio.AudioError::TYPE.IGNORED_SOUND
+        'Ignored request to play sound'
+      when z.audio.AudioError::TYPE.NOT_FOUND
+        'AudioElement or ID not found'
+      else
+        'Unknown AudioError'
 
   @:: = new Error()
   @::constructor = @
@@ -33,4 +44,5 @@ class z.audio.AudioError
     FAILED_TO_PLAY: 'z.audio.AudioError::TYPE.FAILED_TO_PLAY'
     IGNORED_SOUND: 'z.audio.AudioError::TYPE.IGNORED_SOUND'
     NOT_FOUND: 'z.audio.AudioError::TYPE.NOT_FOUND'
+    UNKNOWN: 'z.audio.AudioError::TYPE.UNKNOWN'
   }

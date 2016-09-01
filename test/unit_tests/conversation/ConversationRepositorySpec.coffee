@@ -122,7 +122,7 @@ describe 'z.conversation.ConversationRepository', ->
     member_join_event = null
 
     beforeEach ->
-      spyOn(conversation_repository, 'member_join').and.callThrough()
+      spyOn(conversation_repository, '_on_member_join').and.callThrough()
 
       member_join_event = {
         "conversation": conversation_et.id,
@@ -135,7 +135,7 @@ describe 'z.conversation.ConversationRepository', ->
 
     it 'processes member join if joining a group conversation', ->
       conversation_repository.on_conversation_event member_join_event
-      expect(conversation_repository.member_join).toHaveBeenCalled()
+      expect(conversation_repository._on_member_join).toHaveBeenCalled()
 
     it 'ignores member join if joining a one2on2 conversation', ->
 
@@ -146,7 +146,7 @@ describe 'z.conversation.ConversationRepository', ->
       user_repository.connections.push connection_et_a
 
       conversation_repository.on_conversation_event member_join_event
-      expect(conversation_repository.member_join).not.toHaveBeenCalled()
+      expect(conversation_repository._on_member_join).not.toHaveBeenCalled()
 
     # @todo Cached conversation events are not properly reset anymore
     xit 'caches events while getting the conversation from the backend', ->
@@ -324,7 +324,7 @@ describe 'z.conversation.ConversationRepository', ->
         done()
       .catch done.fail
 
-  describe 'message_hidden', ->
+  describe '_on_message_hidden', ->
 
     conversation_et = null
     message_to_hide_et = null
@@ -346,10 +346,10 @@ describe 'z.conversation.ConversationRepository', ->
           conversation_id: conversation_et.id
         from: z.util.create_random_uuid()
         time: new Date().toISOString()
-        type: z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
+        type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN
 
       expect(conversation_et.get_message_by_id(message_to_hide_et.id)).toBeDefined()
-      conversation_repository.message_hidden event
+      conversation_repository._on_message_hidden event
       .then done.fail
       .catch ->
         expect(conversation_et.get_message_by_id(message_to_hide_et.id)).toBeDefined()
@@ -364,16 +364,16 @@ describe 'z.conversation.ConversationRepository', ->
           conversation_id: conversation_et.id
         from: user_repository.self().id
         time: new Date().toISOString()
-        type: z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
+        type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN
 
       expect(conversation_et.get_message_by_id(message_to_hide_et.id)).toBeDefined()
-      conversation_repository.message_hidden event
+      conversation_repository._on_message_hidden event
       .then ->
         expect(conversation_et.get_message_by_id(message_to_hide_et.id)).not.toBeDefined()
         done()
       .catch done.fail
 
-  describe 'message_deleted', ->
+  describe '_on_message_deleted', ->
 
     conversation_et = null
     message_to_delete_et = null
@@ -398,10 +398,10 @@ describe 'z.conversation.ConversationRepository', ->
           message_id: message_to_delete_et.id
         from: user_repository.self().id
         time: new Date().toISOString()
-        type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
+        type: z.event.Client.CONVERSATION.MESSAGE_DELETE
 
       expect(conversation_et.get_message_by_id(message_to_delete_et.id)).toBeDefined()
-      conversation_repository.message_deleted conversation_et, event
+      conversation_repository._on_message_deleted conversation_et, event
       .then ->
         expect(conversation_et.get_message_by_id(message_to_delete_et.id)).not.toBeDefined()
         expect(conversation_repository._add_delete_message).not.toHaveBeenCalled()
@@ -419,10 +419,10 @@ describe 'z.conversation.ConversationRepository', ->
           message_id: message_to_delete_et.id
         from: other_user_id
         time: new Date().toISOString()
-        type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
+        type: z.event.Client.CONVERSATION.MESSAGE_DELETE
 
       expect(conversation_et.get_message_by_id(message_to_delete_et.id)).toBeDefined()
-      conversation_repository.message_deleted conversation_et, event
+      conversation_repository._on_message_deleted conversation_et, event
       .then ->
         expect(conversation_et.get_message_by_id(message_to_delete_et.id)).not.toBeDefined()
         expect(conversation_repository._add_delete_message).toHaveBeenCalled()
@@ -483,10 +483,10 @@ describe 'z.conversation.ConversationRepository', ->
         from: z.util.create_random_uuid()
         time: Date.now()
         id: message_et.id
-        type: z.event.Backend.CONVERSATION.ASSET_UPLOAD_COMPLETE
+        type: z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE
         conversation: conversation_et.id
 
-      conversation_repository.asset_upload_complete conversation_et, event
+      conversation_repository._on_asset_upload_complete conversation_et, event
 
       expect(conversation_service.update_asset_as_uploaded_in_db).toHaveBeenCalled()
       expect(message_et.assets()[0].original_resource().otr_key).toBe event.data.otr_key
@@ -503,10 +503,10 @@ describe 'z.conversation.ConversationRepository', ->
         from: z.util.create_random_uuid()
         time: Date.now()
         id: message_et.id
-        type: z.event.Backend.CONVERSATION.ASSET_PREVIEW
+        type: z.event.Client.CONVERSATION.ASSET_PREVIEW
         conversation: conversation_et.id
 
-      conversation_repository.asset_preview conversation_et, event
+      conversation_repository._on_asset_preview conversation_et, event
 
       expect(conversation_service.update_asset_preview_in_db).toHaveBeenCalled()
       expect(message_et.assets()[0].preview_resource().otr_key).toBe event.data.otr_key
@@ -521,10 +521,10 @@ describe 'z.conversation.ConversationRepository', ->
         from: z.util.create_random_uuid()
         time: Date.now()
         id: message_et.id
-        type: z.event.Backend.CONVERSATION.ASSET_UPLOAD_FAILED
+        type: z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED
         conversation: conversation_et.id
 
-      conversation_repository.asset_upload_failed conversation_et, event
+      conversation_repository._on_asset_upload_failed conversation_et, event
 
       expect(conversation_service.update_asset_as_failed_in_db).toHaveBeenCalled()
       expect(message_et.assets()[0].status()).toBe z.assets.AssetTransferState.UPLOAD_FAILED
@@ -538,10 +538,10 @@ describe 'z.conversation.ConversationRepository', ->
         from: z.util.create_random_uuid()
         time: Date.now()
         id: message_et.id
-        type: z.event.Backend.CONVERSATION.ASSET_UPLOAD_FAILED
+        type: z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED
         conversation: conversation_et.id
 
-      conversation_repository.asset_upload_failed conversation_et, event
+      conversation_repository._on_asset_upload_failed conversation_et, event
 
       expect(conversation_service.delete_message_from_db).toHaveBeenCalledWith conversation_et.id, message_et.id
       expect(conversation_et.get_message_by_id message_et.id).toBeUndefined()
@@ -708,11 +708,11 @@ describe 'z.conversation.ConversationRepository', ->
     it 'gets messages which are not broken by design', (done) ->
       conversation_et = new z.entity.Conversation z.util.create_random_uuid()
       #@formatter:off
-      bad_message = {"raw":{"from":"532af01e-1e24-4366-aacf-33b67d4ee376","type":"conversation.otr-message-add","conversation":conversation_et.id},"meta":{"timestamp":null,"version":1},"mapped":{"conversation":"573b6978-7700-443e-9ce5-ff78b35ac590","id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Hello World :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"}}
-      good_message = {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","type":"conversation.otr-message-add","conversation":conversation_et.id},"meta":{"timestamp":1470317313389,"version":1},"mapped":{"conversation":"573b6978-7700-443e-9ce5-ff78b35ac590","id":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","data":{"content":"Fifth message","nonce":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","previews":[]},"type":"conversation.message-add"}}
+      bad_message = {"conversation":"#{conversation_et.id}","id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Hello World :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"}
+      good_message = {"conversation":"#{conversation_et.id}","id":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","data":{"content":"Fifth message","nonce":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","previews":[]},"type":"conversation.message-add"}
       #@formatter:on
-      bad_message_key = "#{conversation_et.id}@#{bad_message.raw.from}@NaN"
-      good_message_key = "#{conversation_et.id}@#{good_message.raw.from}@#{new Date(good_message.raw.time).getTime()}"
+      bad_message_key = "#{conversation_et.id}@#{bad_message.from}@NaN"
+      good_message_key = "#{conversation_et.id}@#{good_message.from}@#{new Date(good_message.time).getTime()}"
 
       object_store = storage_service.OBJECT_STORE_CONVERSATION_EVENTS
 

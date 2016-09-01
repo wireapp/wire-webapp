@@ -31,6 +31,20 @@ class z.storage.StorageService
   OBJECT_STORE_PREKEYS: 'prekeys'
   OBJECT_STORE_SESSIONS: 'sessions'
 
+  ###
+  Construct a unique primary key.
+  @param event [Object] Message event
+  @return [String] Generated primary key
+  ###
+  @construct_primary_key: (event) ->
+    throw new z.storage.StorageError z.storage.StorageError::TYPE.NO_CONVERSATION_ID if not event.conversation
+    throw new z.storage.StorageError z.storage.StorageError::TYPE.NO_SENDER_ID if not event.from
+    throw new z.storage.StorageError z.storage.StorageError::TYPE.NO_TIME if not event.time
+    timestamp = new Date(event.time).getTime()
+    throw new z.storage.StorageError z.storage.StorageError::TYPE.INVALID_TIMESTAMP if window.isNaN timestamp
+    return "#{event.conversation}@#{event.from}@#{timestamp}"
+
+
   constructor: ->
     @logger = new z.util.Logger 'z.storage.StorageService', z.config.LOGGER.OPTIONS
 
@@ -93,6 +107,15 @@ class z.storage.StorageService
         "#{@OBJECT_STORE_PREKEYS}": ''
         "#{@OBJECT_STORE_SESSIONS}": ''
 
+      version_5 =
+        "#{@OBJECT_STORE_AMPLIFY}": ''
+        "#{@OBJECT_STORE_CLIENTS}": ', meta.primary_key'
+        "#{@OBJECT_STORE_CONVERSATION_EVENTS}": ', conversation, time, type'
+        "#{@OBJECT_STORE_CONVERSATIONS}": ', id, last_event_timestamp'
+        "#{@OBJECT_STORE_KEYS}": ''
+        "#{@OBJECT_STORE_PREKEYS}": ''
+        "#{@OBJECT_STORE_SESSIONS}": ''
+
       @db = new Dexie @db_name
 
       @db.on 'blocked', =>
@@ -130,6 +153,15 @@ class z.storage.StorageService
           @db[@OBJECT_STORE_SESSIONS].update key, {id: key}
         transaction[@OBJECT_STORE_PREKEYS].toCollection().eachKey (key) =>
           @db[@OBJECT_STORE_PREKEYS].update key, {id: key}
+      @db.version(7).stores version_5
+      .upgrade (transaction) =>
+        @logger.log @logger.levels.WARN, 'Database upgrade to version 7', transaction
+        transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
+          mapped_event = event.mapped or event.raw
+          delete event.mapped
+          delete event.raw
+          delete event.meta
+          $.extend event, mapped_event
 
       @db.open()
       .then =>
@@ -162,7 +194,7 @@ class z.storage.StorageService
           @logger.log @logger.levels.ERROR, "Failed to delete '#{primary_key}' from store '#{store_name}'", error
           reject error
       else
-        reject new Error "Data store '#{store_name}' not found"
+        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   clear_all_stores: =>
     promises = (@delete_store store_name for store_name of @db._dbSchema)
@@ -209,7 +241,7 @@ class z.storage.StorageService
           @logger.log @logger.levels.ERROR, "Could not load objects from store '#{store_name}'", error
           reject error
       else
-        reject new Error "Data store '#{store_name}' not found"
+        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   ###
   Returns an array of all keys in a given object store.
@@ -232,7 +264,7 @@ class z.storage.StorageService
             resolve accepted_keys
         .catch (error) -> reject error
       else
-        reject new Error "Data store '#{store_name}' not found"
+        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   ###
   Loads persisted data via a promise.
@@ -252,7 +284,7 @@ class z.storage.StorageService
           @logger.log @logger.levels.ERROR, "Failed to load '#{primary_key}' from store '#{store_name}'", error
           reject error
       else
-        reject new Error "Data store '#{store_name}' not found"
+        reject new Error z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   ###
   Loads all objects from an object store and returns them with their keys and values.
@@ -306,7 +338,7 @@ class z.storage.StorageService
           @logger.log @logger.levels.ERROR, "Failed to put '#{primary_key}' into store '#{store_name}'", error
           reject error
       else
-        reject new Error "Data store '#{store_name}' not found"
+        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   ###
   Closes the database. This operation completes immediately and there is no returned Promise.
@@ -337,4 +369,4 @@ class z.storage.StorageService
           @logger.log @logger.levels.ERROR, "Failed to update '#{primary_key}' in store '#{store_name}'", error
           reject error
       else
-        reject new Error "Data store '#{store_name}' not found"
+        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND

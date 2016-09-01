@@ -182,8 +182,7 @@ class z.conversation.ConversationRepository
   get_message_from_db: (conversation_et, message_id) =>
     @conversation_service.load_event_from_db conversation_et.id, message_id
     .then (event) =>
-      raw_event = event.mapped or event.raw
-      return @event_mapper.map_json_event raw_event, conversation_et
+      return @event_mapper.map_json_event event, conversation_et
 
   get_events: (conversation_et) ->
     return new Promise (resolve, reject) =>
@@ -202,8 +201,7 @@ class z.conversation.ConversationRepository
         else
           @logger.log @logger.levels.INFO,
             "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
-        raw_events = (event.mapped or event.raw for event in events)
-        mapped_messages = @_add_events_to_conversation events: raw_events, conversation_et
+        mapped_messages = @_add_events_to_conversation events: events, conversation_et
         conversation_et.is_pending false
         resolve mapped_messages
       .catch (error) =>
@@ -220,8 +218,7 @@ class z.conversation.ConversationRepository
     @conversation_service.load_events_from_db conversation_et.id, timestamp, conversation_et.last_read_timestamp()
     .then (events) =>
       if events.length
-        raw_events = (event.mapped or event.raw for event in events)
-        @_add_events_to_conversation events: raw_events, conversation_et
+        @_add_events_to_conversation events: events, conversation_et
       conversation_et.is_pending false
     .catch (error) =>
       @logger.log @logger.levels.INFO, "Could not load unread events for conversation: #{conversation_et.id}", error
@@ -277,7 +274,7 @@ class z.conversation.ConversationRepository
   ###
   get_conversation_by_id: (conversation_id, callback) ->
     if not conversation_id
-      Raygun.send new Error 'Trying to get conversation without ID'
+      throw new Error 'Trying to get conversation without ID'
       return
 
     conversation_et = @find_conversation_by_id conversation_id
@@ -501,7 +498,7 @@ class z.conversation.ConversationRepository
 
     @conversation_service.update_member_properties conversation_et.id, payload
     .then =>
-      @member_update conversation_et, {data: payload}, next_conversation_et
+      @_on_member_update conversation_et, {data: payload}, next_conversation_et
       @logger.log @logger.levels.INFO,
         "Archived conversation '#{conversation_et.id}' on '#{payload.otr_archived_ref}'"
     .catch (error) =>
@@ -558,7 +555,7 @@ class z.conversation.ConversationRepository
     @conversation_service.delete_members conversation_et.id, @user_repository.self().id
     .then (response) =>
       amplify.publish z.event.WebApp.EVENT.INJECT, response
-      @member_leave conversation_et, response
+      @_on_member_leave conversation_et, response
     .then =>
       if callback?
         callback next_conversation_et
@@ -666,7 +663,7 @@ class z.conversation.ConversationRepository
       @conversation_service.update_member_properties conversation_et.id, payload
       .then =>
         response = {data: payload}
-        @member_update conversation_et, response
+        @_on_member_update conversation_et, response
         @logger.log @logger.levels.INFO,
           "Toggle silence to '#{payload.otr_muted}' for conversation '#{conversation_et.id}' on '#{payload.otr_muted_ref}'"
         resolve response
@@ -689,7 +686,7 @@ class z.conversation.ConversationRepository
       @conversation_service.update_member_properties conversation_et.id, payload
       .then =>
         response = {data: payload}
-        @member_update conversation_et, response
+        @_on_member_update conversation_et, response
         @logger.log @logger.levels.INFO,
           "Unarchived conversation '#{conversation_et.id}' on '#{payload.otr_archived_ref}'"
         callback?()
@@ -813,12 +810,13 @@ class z.conversation.ConversationRepository
   ###
   Send a confirmation for a content message.
   @param conversation [z.entity.Conversation] Conversation that content message was received in
-  @param message_id [String] ID of message for which to acknowledge receipt
+  @param message_et [String] ID of message for which to acknowledge receipt
   ###
-  send_confirmation_status: (conversation_et, message_id) =>
+  send_confirmation_status: (conversation_et, message_et) =>
+    return true # disable for now
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'confirmation', new z.proto.Confirmation message_id, z.proto.Confirmation.Type.DELIVERED
-    @_send_generic_message conversation_et.id, generic_message
+    generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
+    @_send_generic_message conversation_et.id, generic_message, [message_et.user().id]
 
   ###
   Sends an OTR Image Asset
@@ -857,7 +855,7 @@ class z.conversation.ConversationRepository
         event = @_construct_otr_asset_event json, conversation_id, asset_id
         return @cryptography_repository.save_encrypted_event generic_message, event
       .then (record) =>
-        @add_event conversation_et, record.mapped
+        @_on_add_event conversation_et, record
         resolve()
       .catch (error) =>
         @logger.log "Failed to upload otr asset for conversation #{conversation_id}", error
@@ -960,7 +958,7 @@ class z.conversation.ConversationRepository
       event = @_construct_otr_message_event response, conversation_et.id
       return @cryptography_repository.save_encrypted_event generic_message, event
     .then (record) =>
-      @on_conversation_event record.mapped if record?.mapped
+      @on_conversation_event record
     .then =>
       @_track_edit_message conversation_et, original_message_et
     .then =>
@@ -972,6 +970,21 @@ class z.conversation.ConversationRepository
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Error while editing message: #{error.message}", error
       throw error
+
+  ###
+  Send a reaction to a content message.
+  @param conversation [z.entity.Conversation] Conversation that content message was received in
+  @param message_et [String] ID of message for react to
+  ###
+  send_reaction: (conversation_et, message_et, reaction) =>
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'reaction', new z.proto.Reaction reaction, message_et.id
+    @_send_generic_message conversation_et.id, generic_message
+    .then (response) =>
+      event = @_construct_otr_message_event response, conversation_et.id
+      return @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
+    .then (mapped_event) =>
+      @on_conversation_event mapped_event
 
   ###
   Sending a message to the remote end of a session reset.
@@ -1141,7 +1154,7 @@ class z.conversation.ConversationRepository
       event = @_construct_otr_message_event response, conversation_et.id
       return @cryptography_repository.save_encrypted_event generic_message, event
     .then (record) =>
-      @add_event conversation_et, record.mapped if record?.mapped
+      @_on_add_event conversation_et, record
       return record
     .catch (error) =>
       error_message = "Could not send OTR message of type '#{generic_message.content}' to conversation ID '#{conversation_et.id}' (#{conversation_et.display_name()}): #{error.message}"
@@ -1191,28 +1204,34 @@ class z.conversation.ConversationRepository
   @private
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
+  @param user_ids [Array<String>] Optional array of user IDs to limit sending to
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
-  _send_generic_message: (conversation_id, generic_message) =>
+  _send_generic_message: (conversation_id, generic_message, user_ids) =>
     @_create_user_client_map conversation_id
     .then (user_client_map) =>
+      if user_ids
+        delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
     .then (payload) =>
-      @_send_encrypted_message conversation_id, generic_message, payload
+      @_send_encrypted_message conversation_id, generic_message, payload, user_ids
 
   ###
   Sends otr message to a conversation.
 
   @private
+  @note Options for the precondition check on missing clients are:
+    'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
   @param payload [Object]
+  @param precondition_option [Array<String>|Boolean] Level that backend checks for missing clients
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
-  _send_encrypted_message: (conversation_id, generic_message, payload) =>
+  _send_encrypted_message: (conversation_id, generic_message, payload, precondition_option = false) =>
     @logger.log @logger.levels.INFO,
       "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
-    @conversation_service.post_encrypted_message conversation_id, payload, false
+    @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
     .catch (error_response) =>
       return @_update_payload_for_changed_clients error_response, generic_message, payload
       .then (updated_payload) =>
@@ -1279,8 +1298,8 @@ class z.conversation.ConversationRepository
 
     @send_asset_metadata conversation_et, file
     .then (record) =>
-      message_et = conversation_et.get_message_by_id record.mapped.id
-      @send_asset conversation_et, file, record.mapped.id
+      message_et = conversation_et.get_message_by_id record.id
+      @send_asset conversation_et, file, record.id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
       @logger.log "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
@@ -1386,72 +1405,96 @@ class z.conversation.ConversationRepository
   ###############################################################################
 
   ###
-  A text message received in a conversation.
-  @param conversation_et [z.entity.Conversation] Conversation to add the event to
-  @param event_json [Object] JSON data of 'conversation.message-add'
-  ###
-  message_added: (conversation_et, event_json) =>
-    Promise.resolve()
-    .then =>
-      if event_json.data.replacing_message_id
-        return @_update_edited_message conversation_et, event_json
-      return event_json
-    .then (updated_event_json) =>
-      if event_json.data.replacing_message_id
-        @_delete_message conversation_et, event_json.data.replacing_message_id
-      @add_event conversation_et, updated_event_json
+  Listener for incoming events from the WebSocket.
 
-  ###
-  A hide message received in a conversation.
-  @param event_json [Object] JSON data of 'conversation.message-hidden'
-  ###
-  message_hidden: (event_json) =>
-    Promise.resolve()
-    .then =>
-      if event_json.from isnt @user_repository.self().id
-        throw new Error 'Sender is not self user'
-      return @find_conversation_by_id event_json.data.conversation_id
-    .then (conversation_et) =>
-      return @_delete_message conversation_et, event_json.data.message_id
-    .catch (error) =>
-      @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
-      throw error
+  @private
+  @note We check for events received multiple times via the WebSocket by event id here
+  @param event [Object] JSON data for event
+  ####
+  on_conversation_event: (event) =>
+    if not event
+      error = new Error('Event response is undefined')
+      custom_data =
+        source: 'WebSocket'
+      Raygun.send error, custom_data
 
-  ###
-  A hide message received in a conversation.
-  @param conversation_et [z.entity.Conversation] Conversation to add the event to
-  @param event_json [Object] JSON data of 'conversation.message-delete'
-  ###
-  message_deleted: (conversation_et, event_json) =>
-    @get_message_from_db conversation_et, event_json.data.message_id
-    .then (message_to_delete_et) =>
-      if event_json.from isnt message_to_delete_et.from
-        throw new Error 'Sender can only delete own messages'
-      if event_json.from isnt @user_repository.self().id
-        return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
-    .then =>
-      return @_delete_message conversation_et, event_json.data.message_id
-    .catch (error) =>
-      @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
-      throw error
+    @logger.log "»» Event: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
+
+    # Ignore member join if we join a one2one conversation (accept a connection request)
+    if event.type is z.event.Backend.CONVERSATION.MEMBER_JOIN
+      connection_et = @user_repository.get_connection_by_conversation_id event.conversation
+      return if connection_et?.status() is z.user.ConnectionStatus.PENDING
+
+    # Check if conversation was archived
+    @get_conversation_by_id event.conversation, (conversation_et) =>
+      previously_archived = conversation_et.is_archived()
+
+      switch event.type
+        when z.event.Backend.CONVERSATION.CREATE
+          @_on_create event
+        when z.event.Backend.CONVERSATION.MEMBER_JOIN
+          @_on_member_join conversation_et, event
+        when z.event.Backend.CONVERSATION.MEMBER_LEAVE
+          @_on_member_leave conversation_et, event
+        when z.event.Backend.CONVERSATION.MEMBER_UPDATE
+          @_on_member_update conversation_et, event
+        when z.event.Backend.CONVERSATION.RENAME
+          @_on_rename conversation_et, event
+        when z.event.Backend.CONVERSATION.MESSAGE_ADD
+          @_on_message_add conversation_et, event
+        when z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE
+          @_on_asset_upload_complete conversation_et, event
+        when z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED
+          @_on_asset_upload_failed conversation_et, event
+        when z.event.Client.CONVERSATION.ASSET_PREVIEW
+          @_on_asset_preview conversation_et, event
+        when z.event.Client.CONVERSATION.MESSAGE_DELETE
+          @_on_message_deleted conversation_et, event
+        when z.event.Client.CONVERSATION.MESSAGE_HIDDEN
+          @_on_message_hidden event
+        when z.event.Client.CONVERSATION.REACTION
+          @_on_reaction conversation_et, event
+        else
+          @_on_add_event conversation_et, event
+
+      # Un-archive it also on the backend side
+      if not @is_handling_notifications and previously_archived and not conversation_et.is_archived()
+        @logger.log @logger.levels.INFO, "Unarchiving conversation '#{conversation_et.id}' with new event"
+        @unarchive_conversation conversation_et
 
   ###
   A message or ping received in a conversation.
+  @private
   @param conversation_et [z.entity.Conversation] Conversation to add the event to
   @param event_json [Object] JSON data of 'conversation.message-add' or 'conversation.knock' event
   ###
-  add_event: (conversation_et, event_json) =>
+  _on_add_event: (conversation_et, event_json) ->
     @_add_event_to_conversation event_json, conversation_et, (message_et) =>
       if conversation_et.is_one2one() and not message_et.user().is_me and message_et.type in z.event.EventTypeHandling.CONFIRM
-        @send_confirmation_status conversation_et, message_et.id
+        @send_confirmation_status conversation_et, message_et
       @_send_event_notification event_json, conversation_et, message_et
 
   ###
-  An asset was uploaded
+  An asset preview was send.
+  @private
+  @param event_json [Object] JSON data of 'conversation.asset-upload-failed' event
+  @return [z.entity.Conversation] The conversation that was created
+  ###
+  _on_asset_preview: (conversation_et, event_json) ->
+    message_et = conversation_et.get_message_by_id event_json.id
+
+    if not message_et?
+      return @logger.log @logger.levels.ERROR, 'Asset preview: Could not find message with id '#{event_json.id}'", event_json
+
+    @update_message_with_asset_preview conversation_et, message_et, event_json.data
+
+  ###
+  An asset was uploaded.
+  @private
   @param event_json [Object] JSON data of 'conversation.asset-upload-complete' event
   @return [z.entity.Conversation] The conversation that was created
   ###
-  asset_upload_complete: (conversation_et, event_json) ->
+  _on_asset_upload_complete: (conversation_et, event_json) ->
     message_et = conversation_et.get_message_by_id event_json.id
 
     if not message_et?
@@ -1460,11 +1503,12 @@ class z.conversation.ConversationRepository
     @update_message_as_upload_complete conversation_et, message_et, event_json.data
 
   ###
-  An asset failed
+  An asset failed.
+  @private
   @param event_json [Object] JSON data of 'conversation.asset-upload-failed' event
   @return [z.entity.Conversation] The conversation that was created
   ###
-  asset_upload_failed: (conversation_et, event_json) ->
+  _on_asset_upload_failed: (conversation_et, event_json) ->
     message_et = conversation_et.get_message_by_id event_json.id
 
     if not message_et?
@@ -1476,24 +1520,12 @@ class z.conversation.ConversationRepository
       @update_message_as_upload_failed message_et
 
   ###
-  An asset preview was send
-  @param event_json [Object] JSON data of 'conversation.asset-upload-failed' event
-  @return [z.entity.Conversation] The conversation that was created
-  ###
-  asset_preview: (conversation_et, event_json) ->
-    message_et = conversation_et.get_message_by_id event_json.id
-
-    if not message_et?
-      return @logger.log @logger.levels.ERROR, 'Asset preview: Could not find message with id '#{event_json.id}'", event_json
-
-    @update_message_with_asset_preview conversation_et, message_et, event_json.data
-
-  ###
   A conversation was created.
+  @private
   @param event_json [Object] JSON data of 'conversation.create' event
   @return [z.entity.Conversation] The conversation that was created
   ###
-  create: (event_json) =>
+  _on_create: (event_json) ->
     conversation_et = @find_conversation_by_id event_json.id
 
     if not conversation_et?
@@ -1506,10 +1538,11 @@ class z.conversation.ConversationRepository
 
   ###
   User were added to a group conversation.
+  @private
   @param conversation_et [z.entity.Conversation] Conversation to add users to
   @param event_json [Object] JSON data of 'conversation.member-join' event
   ###
-  member_join: (conversation_et, event_json) =>
+  _on_member_join: (conversation_et, event_json) ->
     for user_id in event_json.data.user_ids when user_id isnt @user_repository.self().id
       conversation_et.participating_user_ids.push user_id if user_id not in conversation_et.participating_user_ids()
 
@@ -1523,10 +1556,11 @@ class z.conversation.ConversationRepository
 
   ###
   Members of a group conversation were removed or left.
+  @private
   @param conversation_et [z.entity.Conversation] Conversation to remove users from
   @param event_json [Object] JSON data of 'conversation.member-leave' event
   ###
-  member_leave: (conversation_et, event_json) =>
+  _on_member_leave: (conversation_et, event_json) ->
     @_add_event_to_conversation event_json, conversation_et, (message_et) =>
       for user_et in message_et.user_ets()
         if conversation_et.call()
@@ -1547,11 +1581,12 @@ class z.conversation.ConversationRepository
   ###
   Membership properties for a conversation were updated.
 
+  @private
   @param conversation_et [z.entity.Conversation] Conversation entity that will be updated
   @param event_json [Object] JSON data of 'conversation.member-update' event
   @param conversation_et [z.entity.Conversation] Next conversation in list
   ###
-  member_update: (conversation_et, event_json, next_conversation_et) =>
+  _on_member_update: (conversation_et, event_json, next_conversation_et) ->
     previously_archived = conversation_et.is_archived()
     next_conversation_et = @get_next_conversation conversation_et if not next_conversation_et?
 
@@ -1563,11 +1598,85 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.CONVERSATION.SWITCH, conversation_et, next_conversation_et
 
   ###
+  A text message received in a conversation.
+  @private
+  @param conversation_et [z.entity.Conversation] Conversation to add the event to
+  @param event_json [Object] JSON data of 'conversation.message-add'
+  ###
+  _on_message_add: (conversation_et, event_json) ->
+    Promise.resolve()
+    .then =>
+      if event_json.data.replacing_message_id
+        return @_update_edited_message conversation_et, event_json
+      return event_json
+    .then (updated_event_json) =>
+      if event_json.data.replacing_message_id
+        @_delete_message conversation_et, event_json.data.replacing_message_id
+      @_on_add_event conversation_et, updated_event_json
+
+  ###
+  A hide message received in a conversation.
+  @private
+  @param conversation_et [z.entity.Conversation] Conversation to add the event to
+  @param event_json [Object] JSON data of 'conversation.message-delete'
+  ###
+  _on_message_deleted: (conversation_et, event_json) =>
+    @get_message_from_db conversation_et, event_json.data.message_id
+    .then (message_to_delete_et) =>
+      if event_json.from isnt message_to_delete_et.from
+        throw new Error 'Sender can only delete own messages'
+      if event_json.from isnt @user_repository.self().id
+        return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
+    .then =>
+      return @_delete_message conversation_et, event_json.data.message_id
+    .catch (error) =>
+      @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
+      throw error
+
+  ###
+  A hide message received in a conversation.
+  @private
+  @param event_json [Object] JSON data of 'conversation.message-hidden'
+  ###
+  _on_message_hidden: (event_json) =>
+    Promise.resolve()
+    .then =>
+      if event_json.from isnt @user_repository.self().id
+        throw new Error 'Sender is not self user'
+      return @find_conversation_by_id event_json.data.conversation_id
+    .then (conversation_et) =>
+      return @_delete_message conversation_et, event_json.data.message_id
+    .catch (error) =>
+      @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
+      throw error
+
+  ###
+  Someone reacted to a message.
+  @private
+  @param conversation_et [z.entity.Conversation] Conversation entity that a message was reacted upon in
+  @param event_json [Object] JSON data of 'conversation.reaction' event
+  ###
+  _on_reaction: (conversation_et, event_json) ->
+    @get_message_from_db conversation_et, event_json.data.message_id
+    .then (message_et) =>
+      @logger.log "Updated reactions of message '#{message_et.id}' in database", message_et
+      return @conversation_service.update_message_reactions_in_db message_et.primary_key, message_et.reactions()
+    .then =>
+      @logger.log @logger.levels.DEBUG, "Reaction to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
+      return conversation_et.get_message_by_id event_json.data.message_id
+    .then (message_et) =>
+      return @_update_message_reactions message_et, event_json if message_et
+    .catch (error) =>
+      @logger.log "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
+      throw error
+
+  ###
   A conversation was renamed.
+  @private
   @param conversation_et [z.entity.Conversation] Conversation entity that will be renamed
   @param event_json [Object] JSON data of 'conversation.rename' event
   ###
-  rename: (conversation_et, event_json) =>
+  _on_rename: (conversation_et, event_json) ->
     @_add_event_to_conversation event_json, conversation_et, (message_et) =>
       @conversation_mapper.update_properties conversation_et, event_json.data
       amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
@@ -1687,62 +1796,6 @@ class z.conversation.ConversationRepository
   ###
   _send_event_notification: (event_json, conversation_et, message_et) ->
     amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
-
-  ###
-  Listener for incoming events from the WebSocket.
-
-  @private
-  @note We check for events received multiple times via the WebSocket by event id here
-  @param event [Object] JSON data for event
-  ####
-  on_conversation_event: (event) =>
-    if not event
-      error = new Error('Event response is undefined')
-      custom_data =
-        source: 'WebSocket'
-      Raygun.send error, custom_data
-
-    @logger.log "»» Event: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
-
-    # Ignore member join if we join a one2one conversation (accept a connection request)
-    if event.type is z.event.Backend.CONVERSATION.MEMBER_JOIN
-      connection_et = @user_repository.get_connection_by_conversation_id event.conversation
-      return if connection_et?.status() is z.user.ConnectionStatus.PENDING
-
-    # Check if conversation was archived
-    @get_conversation_by_id event.conversation, (conversation_et) =>
-      previously_archived = conversation_et.is_archived()
-
-      switch event.type
-        when z.event.Backend.CONVERSATION.CREATE
-          @create event
-        when z.event.Backend.CONVERSATION.MEMBER_JOIN
-          @member_join conversation_et, event
-        when z.event.Backend.CONVERSATION.MEMBER_LEAVE
-          @member_leave conversation_et, event
-        when z.event.Backend.CONVERSATION.MEMBER_UPDATE
-          @member_update conversation_et, event
-        when z.event.Backend.CONVERSATION.RENAME
-          @rename conversation_et, event
-        when z.event.Backend.CONVERSATION.ASSET_UPLOAD_COMPLETE
-          @asset_upload_complete conversation_et, event
-        when z.event.Backend.CONVERSATION.ASSET_UPLOAD_FAILED
-          @asset_upload_failed conversation_et, event
-        when z.event.Backend.CONVERSATION.ASSET_PREVIEW
-          @asset_preview conversation_et, event
-        when z.event.Backend.CONVERSATION.MESSAGE_ADD
-          @message_added conversation_et, event
-        when z.event.Backend.CONVERSATION.MESSAGE_DELETE
-          @message_deleted conversation_et, event
-        when z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
-          @message_hidden event
-        else
-          @add_event conversation_et, event
-
-      # Un-archive it also on the backend side
-      if not @is_handling_notifications and previously_archived and not conversation_et.is_archived()
-        @logger.log @logger.levels.INFO, "Unarchiving conversation '#{conversation_et.id}' with new event"
-        @unarchive_conversation conversation_et
 
   ###
   Updates the user entities that are part of a message.
@@ -1902,21 +1955,33 @@ class z.conversation.ConversationRepository
     asset_et.preview_resource resource
     @conversation_service.update_asset_preview_in_db message_et.primary_key, asset_data
 
-
   ###
   Update edited message with timestamp from the original message
-  @return [Object] updated event_json
+  @param conversation_et [z.entity.Conversation] Conversation of edited message
+  @param event_json [JSON] Edit message event
+  @return [Object] Updated event_json
   ###
   _update_edited_message: (conversation_et, event_json) =>
     @get_message_from_db conversation_et, event_json.data.replacing_message_id
     .then (original_message_et) =>
       if event_json.from isnt original_message_et.from
         throw new Error 'Sender can only edit own messages'
-      return [original_message_et, @event_mapper.map_json_event event_json, conversation_et]
-    .then ([original_message_et, edited_message_et]) =>
-      return @conversation_service.update_message_timestamp_in_db edited_message_et.primary_key, original_message_et.timestamp
-    .then (record) ->
-      return record.mapped
+      return @conversation_service.update_message_timestamp_in_db event_json, original_message_et.timestamp
+
+
+  ###############################################################################
+  # Reactions
+  ###############################################################################
+
+  _update_message_reactions: (message_et, event_json) ->
+    reactions = message_et.reactions()
+    if event_json.data.reaction
+      reactions[event_json.from] = event_json.data.reaction
+    else
+      delete reactions[event_json.from]
+    message_et.reactions reactions
+    return message_et
+
 
   ###############################################################################
   # Helpers

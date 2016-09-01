@@ -29,8 +29,8 @@ class z.client.ClientRepository
     @clients = ko.observableArray()
     @current_client = ko.observable undefined
 
-    amplify.subscribe z.event.Backend.USER.CLIENT.ADD, @on_client_add
-    amplify.subscribe z.event.Backend.USER.CLIENT.REMOVE, @on_client_remove
+    amplify.subscribe z.event.Backend.USER.CLIENT_ADD, @on_client_add
+    amplify.subscribe z.event.Backend.USER.CLIENT_REMOVE, @on_client_remove
     amplify.subscribe z.event.WebApp.CLIENT.DELETE, @delete_client_and_session
 
     return @
@@ -92,13 +92,12 @@ class z.client.ClientRepository
   ###
   get_current_client_from_db: =>
     @client_service.load_client_from_db @PRIMARY_KEY_CURRENT_CLIENT
-    .catch (error) ->
-      throw new z.client.ClientError error.message, z.client.ClientError::TYPE.DATABASE_FAILURE
+    .catch ->
+      throw new z.client.ClientError z.client.ClientError::TYPE.DATABASE_FAILURE
     .then (client_payload) =>
       if _.isString client_payload
-        error_message = "No current local client connected to '#{@PRIMARY_KEY_CURRENT_CLIENT}' found in database"
-        @logger.log @logger.levels.INFO, error_message
-        throw new z.client.ClientError error_message, z.client.ClientError::TYPE.NO_LOCAL_CLIENT
+        @logger.log @logger.levels.INFO, "No current local client connected to '#{@PRIMARY_KEY_CURRENT_CLIENT}' found in database"
+        throw new z.client.ClientError z.client.ClientError::TYPE.NO_LOCAL_CLIENT
       else
         client_et = @client_mapper.map_client client_payload
         @current_client client_et
@@ -130,8 +129,8 @@ class z.client.ClientRepository
   @return [String] Primary key
   ###
   _construct_primary_key: (user_id, client_id) ->
-    throw new z.client.ClientError 'User ID is not defined', z.client.ClientError::TYPE.NO_USER_ID if not user_id
-    throw new z.client.ClientError 'Client ID is not defined', z.client.ClientError::TYPE.NO_CLIENT_ID if not client_id
+    throw new z.client.ClientError z.client.ClientError::TYPE.NO_USER_ID if not user_id
+    throw new z.client.ClientError z.client.ClientError::TYPE.NO_CLIENT_ID if not client_id
     return "#{user_id}@#{client_id}"
 
   ###
@@ -205,11 +204,10 @@ class z.client.ClientRepository
         @logger.log @logger.levels.WARN, error_message, error
         @cryptography_repository.storage_repository.delete_everything()
         .catch (error) =>
-          error_message = "Deleting database after failed client validation unsuccessful: #{error.message}"
-          @logger.log @logger.levels.ERROR, error_message, error
-          throw new z.client.ClientError error_message, z.client.ClientError::TYPE.DATABASE_FAILURE
+          @logger.log @logger.levels.ERROR, "Deleting database after failed client validation unsuccessful: #{error.message}", error
+          throw new z.client.ClientError z.client.ClientError::TYPE.DATABASE_FAILURE
         .then ->
-          throw new z.client.ClientError error_message, z.client.ClientError::TYPE.MISSING_ON_BACKEND
+          throw new z.client.ClientError z.client.ClientError::TYPE.MISSING_ON_BACKEND
       else if error.type is z.client.ClientError::TYPE.NO_LOCAL_CLIENT
         throw error
       else
@@ -234,11 +232,10 @@ class z.client.ClientRepository
         return @client_service.post_clients @_create_registration_payload client_type, password, keys
       .catch (error) =>
         if error.label is z.service.BackendClientError::LABEL.TOO_MANY_CLIENTS
-          throw new z.client.ClientError error.message, z.client.ClientError::TYPE.TOO_MANY_CLIENTS
+          throw new z.client.ClientError z.client.ClientError::TYPE.TOO_MANY_CLIENTS
         else
-          error_message = "Client registration request failed: #{error.message}"
-          @logger.log @logger.levels.ERROR, error_message, error
-          throw new z.client.ClientError error_message, z.client.ClientError::TYPE.REQUEST_FAILURE
+          @logger.log @logger.levels.ERROR, "Client registration request failed: #{error.message}", error
+          throw new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FAILURE
       .then (response) =>
         @logger.log @logger.levels.INFO,
           "Registered '#{response.type}' client '#{response.id}' with cookie label '#{response.cookie}'", response
@@ -249,9 +246,8 @@ class z.client.ClientRepository
         if error.type in [z.client.ClientError::TYPE.REQUEST_FAILURE, z.client.ClientError::TYPE.TOO_MANY_CLIENTS]
           throw error
         else
-          error_message = "Failed to save client: #{error.message}"
-          @logger.log @logger.levels.ERROR, error_message, error
-          throw new z.client.ClientError error_message, z.client.ClientError::TYPE.DATABASE_FAILURE
+          @logger.log @logger.levels.ERROR, "Failed to save client: #{error.message}", error
+          throw new z.client.ClientError z.client.ClientError::TYPE.DATABASE_FAILURE
       .then (client_payload) =>
         # Update cookie
         return @_transfer_cookie_label client_type, client_payload.cookie
@@ -355,23 +351,21 @@ class z.client.ClientRepository
   delete_client: (client_id, password) =>
     return new Promise (resolve, reject) =>
       if not password
-        error_message = "Could not delete client '#{client_id}' because password was not submitted"
-        @logger.log @logger.levels.ERROR, error_message
-        reject new z.client.ClientError error_message, z.client.ClientError::TYPE.REQUEST_FORBIDDEN
+        @logger.log @logger.levels.ERROR, "Could not delete client '#{client_id}' because password is missing"
+        reject new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FORBIDDEN
 
       @client_service.delete_client client_id, password
       .then =>
         @_remove_client client_id
         resolve @clients()
       .catch (error) =>
-        error_message = "Unable to delete client '#{client_id}': #{error.message}"
-        @logger.log @logger.levels.ERROR, error_message,
+        @logger.log @logger.levels.ERROR, "Unable to delete client '#{client_id}': #{error.message}",
           {error: error, password: password}
 
         if error.code is z.service.BackendClientError::STATUS_CODE.FORBIDDEN
-          error = new z.client.ClientError error_message, z.client.ClientError::TYPE.REQUEST_FORBIDDEN
+          error = new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FORBIDDEN
         else
-          error = new z.client.ClientError error_message, z.client.ClientError::TYPE.REQUEST_FAILURE
+          error = new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FAILURE
         reject error
 
   ###
@@ -432,7 +426,7 @@ class z.client.ClientRepository
   @return [Boolean] Type of current client is permanent
   ###
   is_current_client_permanent: =>
-    throw new z.client.ClientError 'No current client', z.client.ClientError::TYPE.CLIENT_NOT_SET if not @current_client()
+    throw new z.client.ClientError z.client.ClientError::TYPE.CLIENT_NOT_SET if not @current_client()
     if z.util.Environment.electron
       is_permanent = true
     else
@@ -533,9 +527,9 @@ class z.client.ClientRepository
   @return [Boolean] Is the client the current local client
   ###
   _is_current_client: (user_id, client_id) ->
-    throw new z.client.ClientError 'No current client', z.client.ClientError::TYPE.CLIENT_NOT_SET if not @current_client()
-    throw new z.client.ClientError 'User ID is not defined', z.client.ClientError::TYPE.NO_USER_ID if not user_id
-    throw new z.client.ClientError 'Client ID is not defined', z.client.ClientError::TYPE.NO_CLIENT_ID if not client_id
+    throw new z.client.ClientError z.client.ClientError::TYPE.CLIENT_NOT_SET if not @current_client()
+    throw new z.client.ClientError z.client.ClientError::TYPE.NO_USER_ID if not user_id
+    throw new z.client.ClientError z.client.ClientError::TYPE.NO_CLIENT_ID if not client_id
     return user_id is @self_user().id and client_id is @current_client().id
 
   ###

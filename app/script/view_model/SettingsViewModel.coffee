@@ -19,6 +19,11 @@
 window.z ?= {}
 z.ViewModel ?= {}
 
+DELETE_STATUS =
+  BUTTON: 'button'
+  DIALOG: 'dialog'
+  SENT: 'sent'
+
 SETTING =
   ALL: '0'
   NONE: '2'
@@ -63,7 +68,7 @@ class z.ViewModel.SettingsViewModel
     @data_setting = ko.observable()
     @data_setting.subscribe (setting) => @user_repository.save_property_data_settings setting
 
-    @delete_status = ko.observable 'button'
+    @delete_status = ko.observable DELETE_STATUS.BUTTON
     @delete_confirm_text = ko.observable ''
 
     @sound_setting = ko.observable()
@@ -113,21 +118,21 @@ class z.ViewModel.SettingsViewModel
       id: z.string.preferences_delete_info
       replace: {placeholder: '%email', content: @user().email()}
 
-    @delete_status 'dialog'
+    @delete_status DELETE_STATUS.DIALOG
 
   click_on_delete_send: ->
     @user_repository.delete_me()
-    @delete_status 'sent'
-    setTimeout =>
-      @delete_status 'button'
+    @delete_status DELETE_STATUS.SENT
+    window.setTimeout =>
+      @delete_status DELETE_STATUS.BUTTON
     , 5000
 
   click_on_delete_cancel: ->
-    @delete_status 'button'
+    @delete_status DELETE_STATUS.BUTTON
 
   click_on_reset_password: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, value: 'fromProfile'
-    (window.open z.string.url_password_reset)?.focus()
+    (z.util.safe_window_open z.string.url_password_reset)?.focus()
 
   click_on_device: (client_et) =>
     @selected_device client_et

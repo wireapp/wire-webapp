@@ -70,7 +70,7 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
       .then (local_identity) =>
         return {} if not local_identity
         if skip_sessions
-          throw new z.storage.SkipError 'Skipped loading of sessions and pre-keys'
+          throw new z.storage.StorageError z.storage.StorageError::TYPE.SKIP_LOADING
         else
           return @_load_sessions()
       .then =>
@@ -79,7 +79,7 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
         @logger.log @logger.levels.INFO, 'Initialized repository'
         resolve @
       .catch (error) =>
-        if error instanceof z.storage.SkipError
+        if error.type is z.storage.StorageError::TYPE.SKIP_LOADING
           @logger.log "Initialized repository with the following exception: #{error.message}"
           resolve @
         else
@@ -203,61 +203,16 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   ###############################################################################
 
   ###
-  Construct a unique primary key.
-
-  @param conversation_id [String] ID of conversation
-  @param sender_id [String] ID of message sender
-  @param time [String] Time in ISO format to create timestamp from
-  @return [String] Generated primary key
-  ###
-  construct_primary_key: (conversation_id, sender_id = @storage_service.user_id, time) ->
-    timestamp = new Date(time).getTime()
-    throw new z.storage.StorageError z.storage.StorageError::TYPE.INVALID_TIMESTAMP if window.isNaN timestamp
-    return "#{conversation_id}@#{sender_id}@#{timestamp}"
-
-  ###
-  Save a decrypted conversation event.
-
-  @param primary_key [String] Primary key to save the object with
-  @param otr_message_event [Object] JSON event to be stored
-  @param mapped_json [Object] OTR event mapped to it's decrypted counterpart
-  @return [Promise] Promise that resolves with the stored record
-  ###
-  save_decrypted_conversation_event: (primary_key, otr_message_event, mapped_json) ->
-    return new Promise (resolve, reject) =>
-      event_object =
-        raw: otr_message_event
-        meta:
-          timestamp: new Date(otr_message_event.time).getTime()
-          version: 1
-        mapped: mapped_json
-
-      # We don't need to keep ciphertext once it has been successfully decrypted
-      event_object.raw.data = undefined
-
-      store_name = @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
-      @storage_service.save store_name, primary_key, event_object
-      .then -> resolve event_object
-      .catch (error) -> reject error
-
-  ###
   Save an unencrypted conversation event.
   @param event [Object] JSON event to be stored
   @return [Promise] Promise that resolves with the stored record
   ###
-  save_unencrypted_conversation_event: (event) ->
+  save_conversation_event: (event) ->
     return new Promise (resolve, reject) =>
-      primary_key = @construct_primary_key event.conversation, event.from, event.time
-
-      event_object =
-        raw: event
-        meta:
-          timestamp: new Date(event.time).getTime()
-          version: 1
-
+      primary_key = z.storage.StorageService.construct_primary_key event
       store_name = @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
-      @storage_service.save store_name, primary_key, event_object
-      .then (primary_key) -> resolve primary_key
+      @storage_service.save store_name, primary_key, event
+      .then -> resolve event
       .catch (error) -> reject error
 
   ###
@@ -278,9 +233,9 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   load_events_by_types: (event_types) ->
     return new Promise (resolve, reject) =>
       @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where 'raw.type'
+      .where 'type'
       .anyOf event_types
-      .sortBy 'raw.time'
+      .sortBy 'time'
       .then (records) ->
         resolve records
       .catch (error) =>

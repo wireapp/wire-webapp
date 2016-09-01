@@ -17,13 +17,9 @@
 #
 
 window.z ?= {}
-z.storage ?= {}
+z.message ?= {}
 
-class z.storage.SkipError
-  constructor: (message) ->
-    @name = @constructor.name
-    @message = message
-    @stack = (new Error()).stack
-
-  @:: = new Error()
-  @::constructor = @
+# Enum for different reactions.
+z.message.ReactionType =
+  LIKE: '💖'
+  NONE: ''
