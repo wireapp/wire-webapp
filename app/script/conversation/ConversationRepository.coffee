@@ -1670,7 +1670,7 @@ class z.conversation.ConversationRepository
   _on_reaction: (conversation_et, event_json) ->
     @get_message_from_db conversation_et, event_json.data.message_id
     .then (message_et) =>
-      return @_update_message_reactions message_et, event_json if message_et
+      return @_update_message_reactions message_et, event_json
     .then (message_et) =>
       @logger.log "Updated reactions of message '#{message_et.id}' in database", message_et
       return @conversation_service.update_message_reactions_in_db message_et.primary_key, message_et.reactions()
@@ -1678,10 +1678,10 @@ class z.conversation.ConversationRepository
       @logger.log @logger.levels.DEBUG, "Reaction to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
       return conversation_et.get_message_by_id event_json.data.message_id
     .then (message_et) =>
-      return @_update_message_reactions message_et, event_json if message_et
-    .then (message_et) =>
-      @_update_user_ets message_et
-      return message_et
+      if message_et
+        @_update_message_reactions message_et, event_json
+        @_update_user_ets message_et
+        return message_et
     .catch (error) =>
       @logger.log "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
       throw error

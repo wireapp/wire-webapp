@@ -115,7 +115,7 @@
     <!-- /ko -->
 
     <!-- ko ifnot: message.other_likes().length -->
-      <div class="message-body-like" data-uie-name="message-liked" data-bind="attr: {'data-ui-value': message.is_liked()}style: {opacity: $data.is_liked() ? 1 : ''}, click: function() {$parent.click_on_like($data, !$data.is_liked())}">
+      <div class="message-body-like" data-uie-name="message-liked" data-bind="attr: {'data-ui-value': message.is_liked()}, style: {opacity: $data.is_liked() ? 1 : ''}, click: function() {$parent.click_on_like($data, !$data.is_liked())}">
         <span class="icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}"></span>
       </div>
     <!-- /ko -->
