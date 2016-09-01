@@ -537,4 +537,4 @@ class z.ViewModel.MessageListViewModel
 
   click_on_like: (message_et, like) =>
     reaction = if like then z.message.ReactionType.LIKE else z.message.ReactionType.NONE
-    @conversation_repository.send_reaction(@conversation(), message_et, reaction)
+    @conversation_repository.send_reaction @conversation(), message_et, reaction
