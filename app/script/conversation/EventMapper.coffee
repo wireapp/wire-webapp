@@ -58,6 +58,8 @@ class z.conversation.EventMapper
   ###
   _map_json_event: (event, conversation_et) ->
     switch event.type
+      when z.event.Backend.CONVERSATION.ASSET_ADD
+        message_et = @_map_event_asset_add event
       when z.event.Backend.CONVERSATION.KNOCK
         message_et = @_map_event_ping event
       when z.event.Backend.CONVERSATION.MESSAGE_ADD
@@ -76,8 +78,6 @@ class z.conversation.EventMapper
         message_et = @_map_event_voice_channel_deactivate event
       when z.event.Client.CONVERSATION.ASSET_META
         message_et = @_map_event_asset_meta event
-      when z.event.Client.CONVERSATION.ASSET_ADD
-        message_et = @_map_event_asset_add event
       when z.event.Client.CONVERSATION.DELETE_EVERYWHERE
         message_et = @_map_system_event_delete_everywhere event
       when z.event.Client.CONVERSATION.LOCATION
