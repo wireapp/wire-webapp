@@ -95,6 +95,7 @@ class z.conversation.EventMapper
 
     if message_et.is_reactable()
       message_et.reactions event.reactions or {}
+      message_et.status event.status if event.status
 
     if window.isNaN message_et.timestamp
       @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event

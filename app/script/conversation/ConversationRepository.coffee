@@ -1437,6 +1437,8 @@ class z.conversation.ConversationRepository
           @_on_asset_upload_failed conversation_et, event
         when z.event.Client.CONVERSATION.ASSET_PREVIEW
           @_on_asset_preview conversation_et, event
+        when z.event.Client.CONVERSATION.CONFIRMATION
+          @_on_confirmation conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_DELETE
           @_on_message_deleted conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_HIDDEN
@@ -1506,6 +1508,23 @@ class z.conversation.ConversationRepository
       @_delete_message_by_id conversation_et, message_et.id
     else
       @update_message_as_upload_failed message_et
+
+  ###
+  Confirmation for to message received.
+  @private
+  @param conversation_et [z.entity.Conversation] Conversation entity that a message was reacted upon in
+  @param event_json [Object] JSON data of 'conversation.confirmation' event
+  ###
+  _on_confirmation: (conversation_et, event_json) ->
+    @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
+    .then (message_et) =>
+      was_updated = message_et.update_status event_json.data.status
+      if was_updated
+        return @conversation_service.update_message_in_db message_et, {status: message_et.status()}
+    .catch (error) =>
+      if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+        @logger.log "Failed to handle status update of a message in conversation '#{conversation_et.id}'", error
+        throw error
 
   ###
   A conversation was created.
@@ -1938,6 +1957,11 @@ class z.conversation.ConversationRepository
       type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
       from: message_to_delete_et.from
       time: message_to_delete_et.timestamp
+
+
+  ###############################################################################
+  # Message updates
+  ###############################################################################
 
   ###
   Update asset in UI and DB as failed

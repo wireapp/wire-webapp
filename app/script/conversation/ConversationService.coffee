@@ -229,7 +229,7 @@ class z.conversation.ConversationService
     .delete()
 
   ###
-  Update events reactions.
+  Update a message in the database.
   @param message_et [z.entity.Message] Message event to update in the database
   @param changes [Object] Changes to update message with
   ###
@@ -241,8 +241,7 @@ class z.conversation.ConversationService
       throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NO_CHANGES
 
   ###
-  Delete events from a conversation.
-
+  Update asset as uploaded in database.
   @param primary_key [String] Primary key used to find an event in the database
   ###
   update_asset_as_uploaded_in_db: (primary_key, asset_data) ->
@@ -257,8 +256,7 @@ class z.conversation.ConversationService
       @logger.log 'Updated asset message_et (uploaded)', primary_key
 
   ###
-  Delete events from a conversation.
-
+  Update asset with preview in database.
   @param primary_key [String] Primary key used to find an event in the database
   ###
   update_asset_preview_in_db: (primary_key, asset_data) ->
@@ -272,8 +270,7 @@ class z.conversation.ConversationService
       @logger.log 'Updated asset message_et (preview)', primary_key
 
   ###
-  Delete events from a conversation.
-
+  Update asset as failed in database.
   @param primary_key [String] Primary key used to find an event in the database
   ###
   update_asset_as_failed_in_db: (primary_key, reason) ->
@@ -301,7 +298,6 @@ class z.conversation.ConversationService
 
   ###
   Load conversation event.
-
   @param conversation_id [String] ID of conversation
   @param message_id [String]
   ###
