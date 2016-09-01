@@ -30,7 +30,9 @@ class z.entity.ContentMessage extends z.entity.Message
     @super_type = z.message.SuperType.CONTENT
     @replacing_message_id = null
     @edited_timestamp = null
+
     @reactions = ko.observable {}
+    @reactions_user_ets = ko.observableArray()
 
     @display_edited_timestamp = =>
       return  z.localization.Localizer.get_text {
@@ -39,9 +41,19 @@ class z.entity.ContentMessage extends z.entity.Message
       }
 
     # like
-    @is_liked = ko.observable false
-    @has_likes = ko.observable true
+    @is_liked = ko.pureComputed =>
+      likes = @reactions_user_ets().filter (user_et) -> return user_et.is_me
+      return likes.length is 1
+    @other_likes = ko.pureComputed =>
+      return @reactions_user_ets().filter (user_et) -> return not user_et.is_me
     @show_likes = ko.observable false
+
+    @like_caption = ko.pureComputed =>
+      if @other_likes().length <= 5
+        return (@reactions_user_ets().map (user_et) -> user_et.first_name()).join ', '
+      else
+        return @other_likes().length + ' people'
+
 
   ###
   Add another content asset to the message.

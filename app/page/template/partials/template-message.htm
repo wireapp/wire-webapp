@@ -69,6 +69,7 @@
     </div>
   </div>
   <div class="message-body">
+
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
       <!-- ko if: asset.is_medium_image() -->
         <div class="message-asset-image" data-bind="fit_to_viewport: asset">
@@ -113,29 +114,29 @@
       <!-- /ko -->
     <!-- /ko -->
 
-    <!-- ko ifnot: message.has_likes() -->
-      <div class="message-body-like" data-bind="style: {opacity: $data.is_liked() ? 1 : ''}, click: function() {$data.is_liked(!$data.is_liked())}">
+    <!-- ko ifnot: message.other_likes().length -->
+      <div class="message-body-like" data-bind="style: {opacity: $data.is_liked() ? 1 : ''}, click: function() {$parent.click_on_like($data, !$data.is_liked())}">
         <span class="icon-like button-icon font-size-xs" data-bind="css:{'text-red icon-liked': is_liked()}"></span>
       </div>
     <!-- /ko -->
 
   </div>
-  <!-- ko if: message.has_likes() -->
+  <!-- ko if: message.other_likes().length -->
     <div class="message-footer">
       <div class="message-footer-icon">
-        <span class="icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}, click: function() {$data.is_liked(!$data.is_liked())}"></span>
+        <span class="icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}, click: function() {$parent.click_on_like($data, !$data.is_liked())}"></span>
       </div>
       <div class="message-footer-label cursor-pointer" data-bind="click: function() {$data.show_likes(true)}">
-        <span class="font-size-xs text-graphite">23 people</span>
-        <!-- ko ifnot: message.show_likes() -->
+        <span class="font-size-xs text-graphite" data-bind="text: like_caption"></span>
+        <!-- ko if: !message.show_likes() -->
           <span class="icon-more font-size-xs"></span>
         <!-- /ko -->
       </div>
       <!-- ko if: message.show_likes() -->
         <div class="message-footer-bottom">
-          <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), click: $parent.on_message_user_click"></user-avatar>
-          <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), click: $parent.on_message_user_click"></user-avatar>
-          <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: user(), click: $parent.on_message_user_click"></user-avatar>
+          <!-- ko foreach: message.other_likes() -->
+            <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+          <!-- /ko -->
           <span class="icon-close button-icon font-size-xs flex-center user-avatar-box-xs" data-bind="click: function() { $data.show_likes(false) }"></span>
         </div>
       <!-- /ko -->
