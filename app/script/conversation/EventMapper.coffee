@@ -45,7 +45,7 @@ class z.conversation.EventMapper
     try
       return @_map_json_event event, conversation_et
     catch error
-      @logger.log @logger.levels.ERROR, 'Cannot map event', {error: error, event: event}
+      @logger.log @logger.levels.ERROR, "Failed to map event: #{error.message}", {error: error, event: event}
       return undefined
 
   ###
