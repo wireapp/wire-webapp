@@ -785,7 +785,7 @@ class z.conversation.ConversationRepository
       event.data.otr_key = key_bytes
       event.data.sha256 = sha256
       event.id = nonce
-      return @asset_upload_complete conversation_et, event
+      return @_on_asset_upload_complete conversation_et, event
 
   ###
   When we reset a session then we must inform the remote client about this action.
@@ -1318,7 +1318,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: upload_duration}
     .catch (error) =>
-      @logger.log "Failed to upload asset for conversation'#{conversation_et.id}", error
+      @logger.log "Failed to upload asset for conversation '#{conversation_et.id}", error
       if message_et.id
         @send_asset_upload_failed conversation_et, message_et.id
         @update_message_as_upload_failed message_et
