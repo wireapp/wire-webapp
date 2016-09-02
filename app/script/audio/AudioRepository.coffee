@@ -89,11 +89,14 @@ class z.audio.AudioRepository
     .then (audio_element) =>
       @logger.log @logger.levels.INFO, "Playing sound '#{audio_id}' (loop: '#{play_in_loop}')", audio_element
     .catch (error) =>
-      if error.type is z.audio.AudioError::TYPE.NOT_FOUND
-        @logger.log @logger.levels.ERROR, "Could not find sound '#{audio_id}'"
-      else
-        @logger.log @logger.levels.ERROR, "Failed playing sound '#{audio_id}': #{error.message}"
-        throw error
+      switch error.type
+        when z.audio.AudioError::TYPE.NOT_FOUND
+          @logger.log @logger.levels.ERROR, "Could not find sound '#{audio_id}'"
+        when z.audio.AudioError::TYPE.ALREADY_PLAYING
+          @logger.log @logger.levels.WARN, "Skipped already playing sound '#{audio_id}'"
+        else
+          @logger.log @logger.levels.ERROR, "Failed playing sound '#{audio_id}': #{error.message}"
+          throw error
 
   ###
   Stop playback of a sound.
