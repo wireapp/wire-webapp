@@ -195,10 +195,20 @@ class z.conversation.ConversationService
       callback: callback
 
   ###
-  Delete a message from a conversation.
+  Delete a message from a conversation with the given primary.
 
-  @param message_id [String] ID of conversation to remove message from
-  @param primary_key [String] ID of the actual message
+  @param conversation_id [String] ID of conversation to remove message from
+  @param message_id [String] ID of the actual message
+  @return [Promise] Resolves with the number of deleted records
+  ###
+  delete_message_with_key_from_db: (conversation_id, primary_key) ->
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS].delete primary_key
+
+  ###
+  Delete a message from a conversation. Duplicates are delete as well.
+
+  @param conversation_id [String] ID of conversation to remove message from
+  @param message_id [String] ID of the actual message
   @return [Promise] Resolves with the number of deleted records
   ###
   delete_message_from_db: (conversation_id, message_id) ->
