@@ -111,6 +111,12 @@ describe 'z.util.render_message', ->
     actual = z.util.render_message text
     expect(actual).toBe text
 
+  xit 'renders URLs with @-signs correctly', ->
+    link = 'https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1448956.html'
+    actual = z.util.render_message link
+    expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>"
+    expect(actual).toBe expected
+
 describe 'z.util.encode_base64_md5_array_buffer_view', ->
   it 'can convert typed array to base64', ->
     actual = z.util.encode_base64_md5_array_buffer_view(new Uint8Array([8,8]))
