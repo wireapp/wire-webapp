@@ -182,7 +182,9 @@ class z.conversation.ConversationRepository
   get_message_from_db: (conversation_et, message_id) =>
     @conversation_service.load_event_from_db conversation_et.id, message_id
     .then (event) =>
-      return @event_mapper.map_json_event event, conversation_et
+      if event
+        return @event_mapper.map_json_event event, conversation_et
+      throw new Error 'Message not found'
 
   get_events: (conversation_et) ->
     return new Promise (resolve, reject) =>
@@ -814,6 +816,7 @@ class z.conversation.ConversationRepository
   @param message_et [String] ID of message for which to acknowledge receipt
   ###
   send_confirmation_status: (conversation_et, message_et) =>
+    return # temporarily disable delivery receipts
     return if message_et.user().is_me or not conversation_et.is_one2one() or message_et.type not in z.event.EventTypeHandling.CONFIRM
 
     if @block_event_handling
