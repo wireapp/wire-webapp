@@ -801,35 +801,31 @@ class z.conversation.ConversationRepository
   Sends an OTR Image Asset
   ###
   send_image_asset: (conversation_et, image) =>
-    return new Promise (resolve, reject) =>
-      conversation_id = conversation_et.id
-      generic_message = null
-
-      @asset_service.create_image_proto image
-      .then ([image, ciphertext]) =>
-        generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-        generic_message.set 'image', image
-        return @_send_encrypted_asset conversation_id, generic_message, ciphertext
-      .then ([json, asset_id]) =>
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_SENT
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
-          action: 'photo'
-          conversation_type: z.tracking.helpers.get_conversation_type conversation_et
-          with_bot: conversation_et.is_with_bot()
-        }
-        event = @_construct_otr_asset_event json, conversation_id, asset_id
-        return @cryptography_repository.save_encrypted_event generic_message, event
-      .then (record) =>
-        @_on_add_event conversation_et, record
-        resolve()
-      .catch (error) =>
-        @logger.log "Failed to upload otr asset for conversation #{conversation_id}", error
-        exception = new Error('Event response is undefined')
-        custom_data =
-          source: 'Sending medium image'
-          error: error
-        Raygun.send exception, custom_data
-        reject error
+    generic_message = null
+    @asset_service.create_image_proto image
+    .then ([image, ciphertext]) =>
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'image', image
+      return @_send_encrypted_asset conversation_et.id, generic_message, ciphertext
+    .then ([json, asset_id]) =>
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_SENT
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
+        action: 'photo'
+        conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+        with_bot: conversation_et.is_with_bot()
+      }
+      event = @_construct_otr_asset_event json, conversation_et.id, asset_id
+      return @cryptography_repository.save_encrypted_event generic_message, event
+    .then (record) =>
+      @_on_add_event conversation_et, record
+    .catch (error) =>
+      @logger.log "Failed to upload otr asset for conversation #{conversation_et.id}", error
+      exception = new Error('Event response is undefined')
+      custom_data =
+        source: 'Sending medium image'
+        error: error
+      Raygun.send exception, custom_data
+      throw error
 
   ###
   Send an encrypted knock.
