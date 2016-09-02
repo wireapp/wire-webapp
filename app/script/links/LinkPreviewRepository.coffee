@@ -36,6 +36,8 @@ class z.links.LinkPreviewRepository
       if data
         [url, offset] = data
         @get_link_preview url, offset
+        .catch (error) ->
+          throw error if error not instanceof z.links.LinkPreviewError
 
   ###
   Creates link preview for given link. This will upload associated image as asset and will

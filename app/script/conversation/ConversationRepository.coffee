@@ -785,7 +785,7 @@ class z.conversation.ConversationRepository
       event.data.otr_key = key_bytes
       event.data.sha256 = sha256
       event.id = nonce
-      return @asset_upload_complete conversation_et, event
+      return @_on_asset_upload_complete conversation_et, event
 
   ###
   When we reset a session then we must inform the remote client about this action.
@@ -1318,7 +1318,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: upload_duration}
     .catch (error) =>
-      @logger.log "Failed to upload asset for conversation'#{conversation_et.id}", error
+      @logger.log "Failed to upload asset for conversation '#{conversation_et.id}", error
       if message_et.id
         @send_asset_upload_failed conversation_et, message_et.id
         @update_message_as_upload_failed message_et
@@ -1343,7 +1343,7 @@ class z.conversation.ConversationRepository
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE
     .then =>
-      return @_delete_message conversation_et, message_et.id
+      return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
       @logger.log "Failed to send delete message for everyone with id '#{message_id}' for conversation '#{conversation_et.id}'", error
       throw error
@@ -1365,7 +1365,7 @@ class z.conversation.ConversationRepository
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL
     .then =>
-      return @_delete_message conversation_et, message_et.id
+      return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
       @logger.log "Failed to send delete message with id '#{message_id}' for conversation '#{conversation_et.id}'", error
       throw error
@@ -1526,7 +1526,7 @@ class z.conversation.ConversationRepository
       return @logger.log @logger.levels.ERROR, "Upload failed: Could not find message with id '#{event_json.id}'", event_json
 
     if event_json.data.reason is z.assets.AssetUploadFailedReason.CANCELLED
-      @_delete_message conversation_et, message_et.id
+      @_delete_message_by_id conversation_et, message_et.id
     else
       @update_message_as_upload_failed message_et
 
@@ -1617,12 +1617,12 @@ class z.conversation.ConversationRepository
   _on_message_add: (conversation_et, event_json) ->
     Promise.resolve()
     .then =>
-      if event_json.data.replacing_message_id
+      if event_json.data.previews.length
+        return @_update_link_preview conversation_et, event_json
+      else if event_json.data.replacing_message_id
         return @_update_edited_message conversation_et, event_json
       return event_json
     .then (updated_event_json) =>
-      if event_json.data.replacing_message_id
-        @_delete_message conversation_et, event_json.data.replacing_message_id
       @_on_add_event conversation_et, updated_event_json
 
   ###
@@ -1639,7 +1639,7 @@ class z.conversation.ConversationRepository
       if event_json.from isnt @user_repository.self().id
         return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
     .then =>
-      return @_delete_message conversation_et, event_json.data.message_id
+      return @_delete_message_by_id conversation_et, event_json.data.message_id
     .catch (error) =>
       @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
       throw error
@@ -1656,7 +1656,7 @@ class z.conversation.ConversationRepository
         throw new Error 'Sender is not self user'
       return @find_conversation_by_id event_json.data.conversation_id
     .then (conversation_et) =>
-      return @_delete_message conversation_et, event_json.data.message_id
+      return @_delete_message_by_id conversation_et, event_json.data.message_id
     .catch (error) =>
       @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
       throw error
@@ -1825,9 +1825,8 @@ class z.conversation.ConversationRepository
       if message_et.is_member()
         @user_repository.get_users_by_id message_et.user_ids(), (user_ets) ->
           message_et.user_ets user_ets
-        return
 
-      if message_et.reactions?
+      if message_et.reactions
         if Object.keys(message_et.reactions()).length
           user_ids = (user_id for user_id of message_et.reactions())
           @user_repository.get_users_by_id user_ids, (user_ets) ->
@@ -1841,7 +1840,8 @@ class z.conversation.ConversationRepository
             Raygun.send new Error 'Message does not contain user when updating'
           else
             asset_et.theme_color = message_et.user().accent_color()
-      callback? message_et
+
+      return callback? message_et
 
   ###
   Cancel asset upload.
@@ -1850,7 +1850,7 @@ class z.conversation.ConversationRepository
   cancel_asset_upload: (message_et) =>
     conversation_et = @active_conversation()
     @asset_service.cancel_asset_upload message_et.assets()[0].upload_id()
-    @_delete_message conversation_et, message_et.id
+    @_delete_message_by_id conversation_et, message_et.id
     @send_asset_upload_failed conversation_et, message_et.id, z.assets.AssetUploadFailedReason.CANCELLED
 
   _handle_deleted_clients: (deleted_client_map, payload) ->
@@ -1906,11 +1906,20 @@ class z.conversation.ConversationRepository
         throw error_response
 
   ###
-  Delete message from UI an database
+  Delete message from UI and database. Primary key is used to delete message in database.
+  @param conversation_et [z.entity.Conversation] Conversation that contains the message
+  @param message_et [z.entity.Message] Message to delete
+  ###
+  _delete_message: (conversation_et, message_et) =>
+    conversation_et.remove_message_by_id message_et.id
+    @conversation_service.delete_message_with_key_from_db conversation_et.id, message_et.primary_key
+
+  ###
+  Delete message from UI and database
   @param conversation_et [z.entity.Conversation] Conversation that contains the message
   @param message_id [String] Message to delete
   ###
-  _delete_message: (conversation_et, message_id) =>
+  _delete_message_by_id: (conversation_et, message_id) =>
     conversation_et.remove_message_by_id message_id
     @conversation_service.delete_message_from_db conversation_et.id, message_id
 
@@ -1983,7 +1992,7 @@ class z.conversation.ConversationRepository
     @conversation_service.update_asset_preview_in_db message_et.primary_key, asset_data
 
   ###
-  Update edited message with timestamp from the original message
+  Update edited message with timestamp from the original message and delete original
   @param conversation_et [z.entity.Conversation] Conversation of edited message
   @param event_json [JSON] Edit message event
   @return [Object] Updated event_json
@@ -1994,7 +2003,22 @@ class z.conversation.ConversationRepository
       if event_json.from isnt original_message_et.from
         throw new Error 'Sender can only edit own messages'
       return @conversation_service.update_message_timestamp_in_db event_json, original_message_et.timestamp
+    .then (updated_event_json) =>
+      @_delete_message_by_id conversation_et, event_json.data.replacing_message_id
+      return updated_event_json
 
+  ###
+  Update link preview message
+  @param conversation_et [z.entity.Conversation] Conversation of edited message
+  @param event_json [JSON] Edit message event
+  @return [Object] Updated event_json
+  ###
+  _update_link_preview: (conversation_et, event_json) =>
+    @get_message_from_db conversation_et, event_json.id
+    .then (original_message_et) =>
+      @_delete_message conversation_et, original_message_et
+    .then ->
+      return event_json
 
   ###############################################################################
   # Reactions
