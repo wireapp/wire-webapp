@@ -1992,7 +1992,7 @@ class z.conversation.ConversationRepository
     @conversation_service.update_asset_preview_in_db message_et.primary_key, asset_data
 
   ###
-  Update edited message with timestamp from the original message and delete it original
+  Update edited message with timestamp from the original message and delete original
   @param conversation_et [z.entity.Conversation] Conversation of edited message
   @param event_json [JSON] Edit message event
   @return [Object] Updated event_json
