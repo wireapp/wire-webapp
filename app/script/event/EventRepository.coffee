@@ -44,13 +44,13 @@ class z.event.EventRepository
       @logger.log @logger.levels.OFF, "Changed notification handling state to '#{handling_state}'"
       amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, handling_state
 
-      switch handling_state
-        when z.event.NotificationHandlingState.RECOVERY
-          amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
-        when z.event.NotificationHandlingState.WEB_SOCKET
-          @_handle_buffered_notifications()
-          if @notification_handling_state() is z.event.NotificationHandlingState.RECOVERY
-            amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
+      if handling_state is z.event.NotificationHandlingState.WEB_SOCKET
+        @_handle_buffered_notifications()
+        if @previous_handling_state is z.event.NotificationHandlingState.RECOVERY
+          amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
+      @previous_handling_state = handling_state
+
+    @previous_handling_state = @notification_handling_state()
 
     @notifications_handled = 0
     @notifications_loaded = ko.observable false
@@ -205,7 +205,7 @@ class z.event.EventRepository
   Will retrieve missed notifications from the stream after a connectivity loss.
   ###
   recover_from_notification_stream: =>
-    @notification_handling_state z.event.NotificationHandlingState.RECOVERY
+    amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
     @update_from_notification_stream()
     .then (number_of_notifications) =>
       @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET if number_of_notifications is 0
