@@ -115,7 +115,7 @@
     <!-- /ko -->
 
     <!-- ko ifnot: message.other_likes().length -->
-      <div class="message-body-like" data-uie-name="message-liked" data-bind="attr: {'data-ui-value': message.is_liked()}, style: {opacity: $data.is_liked() ? 1 : ''}, click: function() {$parent.click_on_like($data, !$data.is_liked())}">
+      <div class="message-body-like" data-uie-name="message-liked" data-bind="attr: {'data-ui-value': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: $parent.click_on_like">
         <span class="message-body-like-icon icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}"></span>
       </div>
     <!-- /ko -->
@@ -124,7 +124,7 @@
   <!-- ko if: message.other_likes().length -->
     <div class="message-footer">
       <div class="message-footer-icon">
-        <span class="icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}, click: $parent.click_on_like()"></span>
+        <span class="icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}, click: $parent.click_on_like"></span>
       </div>
       <div class="message-footer-label cursor-pointer" data-bind="click: function() {$data.show_likes(true)}">
         <span class="font-size-xs text-graphite" data-bind="text: like_caption"></span>
