@@ -314,16 +314,17 @@ class z.assets.AssetService
   @deprecated
   @param conversation_id [String] ID of the self conversation
   @param json_payload [Object] First part of the multipart message
-  @param body_payload [Object] Image to be used as new profile picture
+  @param image_data [Uint8Array|ArrayBuffer] encrypted image data
   @param force_sending [Boolean] Force sending
   @param upload_id [String] Identifies the upload request
   ###
-  post_asset_v2: (conversation_id, json_payload, body_payload, force_sending, upload_id) ->
+  post_asset_v2: (conversation_id, json_payload, image_data, force_sending, upload_id) ->
     return new Promise (resolve, reject) =>
       url = @client.create_url "/conversations/#{conversation_id}/otr/assets"
       url = "#{url}?ignore_missing=true" if force_sending
 
-      data = @_create_asset_multipart_body body_payload, json_payload
+      image_data = new Uint8Array image_data
+      data = @_create_asset_multipart_body image_data, json_payload
       pending_uploads = @pending_uploads
 
       xhr = new XMLHttpRequest()
@@ -387,17 +388,15 @@ class z.assets.AssetService
       delete @pending_uploads[upload_id]
 
   ###
-  Post an OTR asset to a conversation.
-
-  @param file [File, Blob] Image
-  @param image [Object] Image to be used as new profile picture
+  Create image proto message.
+  @param image [File, Blob]
   ###
-  create_asset_proto: (file) ->
+  create_image_proto: (image) ->
     original_image = null
     compressed_image = null
     image_bytes = null
 
-    @compress_image file
+    @compress_image image
     .then (data) ->
       [original_image, compressed_image] = data
       return z.util.base64_to_array compressed_image.src
@@ -416,3 +415,17 @@ class z.assets.AssetService
       image_asset.set_otr_key key_bytes
       image_asset.set_sha256 sha256
       return [image_asset, new Uint8Array ciphertext]
+
+  ###
+  Create asset proto message.
+  @param asset [File, Blob]
+  ###
+  create_asset_proto: (asset) ->
+    z.util.load_file_buffer asset
+    .then (file_bytes) ->
+      return z.assets.AssetCrypto.encrypt_aes_asset file_bytes
+    .then ([key_bytes, sha256, ciphertext] ) ->
+      [key_bytes, sha256, ciphertext] = data
+      asset = new z.proto.Asset()
+      asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256
+      return [asset, ciphertext]
