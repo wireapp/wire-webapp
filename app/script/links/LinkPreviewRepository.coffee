@@ -66,7 +66,7 @@ class z.links.LinkPreviewRepository
         throw new z.links.LinkPreviewError z.links.LinkPreviewError::TYPE.UNSUPPORTED_TYPE
     .then (link_preview) =>
       return @_fetch_preview_image link_preview, open_graph_data.image
-    .catch (error) =>
+    .catch (error) ->
       throw error if error not instanceof z.links.LinkPreviewError
 
   ###
