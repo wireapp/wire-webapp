@@ -36,6 +36,8 @@ class z.links.LinkPreviewRepository
       if data
         [url, offset] = data
         @get_link_preview url, offset
+        .catch (error) ->
+          throw error if error not instanceof z.links.LinkPreviewError
 
   ###
   Creates link preview for given link. This will upload associated image as asset and will
@@ -66,8 +68,6 @@ class z.links.LinkPreviewRepository
         throw new z.links.LinkPreviewError z.links.LinkPreviewError::TYPE.UNSUPPORTED_TYPE
     .then (link_preview) =>
       return @_fetch_preview_image link_preview, open_graph_data.image
-    .catch (error) ->
-      throw error if error not instanceof z.links.LinkPreviewError
 
   ###
   Fetch and upload open graph images
