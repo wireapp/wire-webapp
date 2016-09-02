@@ -273,6 +273,8 @@ z.string.de.conversation_context_menu_edit = 'Bearbeiten'
 z.string.de.conversation_context_menu_delete = 'Für mich löschen'
 z.string.de.conversation_context_menu_delete_everyone = 'Für alle löschen'
 z.string.de.conversation_context_menu_download = 'Herunterladen'
+z.string.de.conversation_context_menu_like = 'Gefällt mir'
+z.string.de.conversation_context_menu_unlike = 'Gefällt mir nicht'
 z.string.de.conversation_delete_timestamp = 'Gelöscht um %@timestamp'
 z.string.de.conversation_edit_timestamp = 'Editiert um %@timestamp'
 

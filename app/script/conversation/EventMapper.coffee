@@ -93,7 +93,7 @@ class z.conversation.EventMapper
     message_et.primary_key = z.storage.StorageService.construct_primary_key event
     message_et.type = event.type
 
-    if message_et.is_content()
+    if message_et.is_reactable()
       message_et.reactions event.reactions or {}
 
     if window.isNaN message_et.timestamp

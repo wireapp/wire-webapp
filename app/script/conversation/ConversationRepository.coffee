@@ -100,8 +100,6 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.SELF.CLIENT_ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
-    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.DELETE_SELF, @delete_message
-    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.DELETE_EVERYONE, @delete_message_everyone
 
 
   ###############################################################################

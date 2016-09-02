@@ -85,8 +85,6 @@ z.event.WebApp =
     ASSET:
       CANCEL: 'wire.webapp.conversation.asset.cancel'
     MESSAGE:
-      DELETE_SELF: 'wire.webapp.conversation.message.delete-self'
-      DELETE_EVERYONE: 'wire.webapp.conversation.message.delete-everyone'
       EDIT: 'wire.webapp.conversation.message.edit'
     IMAGE:
       SEND: 'wire.webapp.conversation.image.send'
