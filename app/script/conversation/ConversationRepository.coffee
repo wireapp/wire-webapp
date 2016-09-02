@@ -1825,9 +1825,8 @@ class z.conversation.ConversationRepository
       if message_et.is_member()
         @user_repository.get_users_by_id message_et.user_ids(), (user_ets) ->
           message_et.user_ets user_ets
-        return
 
-      if message_et.reactions?
+      if message_et.reactions
         if Object.keys(message_et.reactions()).length
           user_ids = (user_id for user_id of message_et.reactions())
           @user_repository.get_users_by_id user_ids, (user_ets) ->
@@ -1841,7 +1840,8 @@ class z.conversation.ConversationRepository
             Raygun.send new Error 'Message does not contain user when updating'
           else
             asset_et.theme_color = message_et.user().accent_color()
-      callback? message_et
+
+      return callback? message_et
 
   ###
   Cancel asset upload.
