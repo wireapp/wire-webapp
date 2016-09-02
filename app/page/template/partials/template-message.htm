@@ -107,7 +107,7 @@
       <!-- /ko -->
 
       <context-menu params="entries: function() {return $parents[1].get_context_menu_entries(message)}, tag: 'message', data: message.id"
-                    class="context-menu icon-more"
+                    class="context-menu icon-more font-size-xs"
                     tabindex="-1"></context-menu>
       <!-- ko ifnot: message.timestamp == '' -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
@@ -116,7 +116,7 @@
 
     <!-- ko ifnot: message.other_likes().length -->
       <div class="message-body-like" data-uie-name="message-liked" data-bind="attr: {'data-ui-value': message.is_liked()}, style: {opacity: $data.is_liked() ? 1 : ''}, click: function() {$parent.click_on_like($data, !$data.is_liked())}">
-        <span class="icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}"></span>
+        <span class="message-body-like-icon icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}"></span>
       </div>
     <!-- /ko -->
 
@@ -217,7 +217,7 @@
     </div>
   </div>
   <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
-                class="context-menu icon-more"
+                class="context-menu icon-more font-size-xs"
                 tabindex="-1"></context-menu>
   <!-- ko ifnot: message.timestamp == '' -->
     <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>

@@ -380,12 +380,22 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 24px;
   opacity: 0;
+
+  .image-widescreen & {
+    bottom: 8px;
+  }
 
   .message:hover & {
     opacity: 1;
   }
+}
+
+.message-body-like-icon {
+  .circle(24px);
+  background: #fff;
+  display: flex;
+  justify-content: center;
 }
 
 .message-asset-image {
@@ -444,6 +454,7 @@
 
 .message-footer-bottom {
   display: flex;
+  margin-top: 4px;
   margin-left: @conversation-message-sender-width;
   width: 100%;
 
