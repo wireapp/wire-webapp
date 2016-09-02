@@ -2002,9 +2002,10 @@ class z.conversation.ConversationRepository
     .then (original_message_et) =>
       if event_json.from isnt original_message_et.from
         throw new Error 'Sender can only edit own messages'
-      @_delete_message_by_id conversation_et, event_json.data.replacing_message_id
-    .then =>
       return @conversation_service.update_message_timestamp_in_db event_json, original_message_et.timestamp
+    .then (updated_event_json) =>
+      @_delete_message_by_id conversation_et, event_json.data.replacing_message_id
+      return updated_event_json
 
   ###
   Update link preview message
