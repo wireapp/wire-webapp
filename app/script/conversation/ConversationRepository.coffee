@@ -1906,16 +1906,16 @@ class z.conversation.ConversationRepository
         throw error_response
 
   ###
-  Delete message from UI an database with primary key
+  Delete message from UI and database. Primary key is used to delete message in database.
   @param conversation_et [z.entity.Conversation] Conversation that contains the message
-  @param primary_key [String] Message to delete
+  @param message_et [z.entity.Message] Message to delete
   ###
   _delete_message: (conversation_et, message_et) =>
     conversation_et.remove_message_by_id message_et.id
     @conversation_service.delete_message_with_key_from_db conversation_et.id, message_et.primary_key
 
   ###
-  Delete message from UI an database
+  Delete message from UI and database
   @param conversation_et [z.entity.Conversation] Conversation that contains the message
   @param message_id [String] Message to delete
   ###
