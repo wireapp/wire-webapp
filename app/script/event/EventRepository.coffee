@@ -323,42 +323,29 @@ class z.event.EventRepository
   @return [Promise] Resolves with the saved record or boolean true if the event was skipped
   ###
   _handle_event: (event, source) ->
-    return new Promise (resolve, reject) =>
-      sending_client = event.data?.sender
-      if sending_client
-        log_message = "Received encrypted event '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
-      else if event.from
-        throw new z.event.EventError z.event.EventError::TYPE.DEPRECATED_SCHEMA if event.type in z.event.EventTypeHandling.DEPRECATED
-        log_message = "Received unencrypted event '#{event.id}' of type '#{event.type}' from user '#{event.from}'"
-      else if event.type.startsWith 'call'
-        log_message = "Received call event '#{event.type}' in conversation '#{event.conversation}'"
-      else if event.type.startsWith 'user'
-        log_message = "Received user event '#{event.type}'"
-      else
-        log_message = "Received unknown event '#{event.type}' in conversation '#{event.conversation}'"
-      @logger.log @logger.levels.INFO, log_message, {event_object: event, event_json: JSON.stringify event}
-
       if event.type in z.event.EventTypeHandling.IGNORE
         @logger.log "Event ignored: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
-        return resolve true
-      else if event.type in z.event.EventTypeHandling.DECRYPT
-        promise = @cryptography_repository.decrypt_event(event).then (generic_message) =>
-          @cryptography_repository.save_encrypted_event generic_message, event
-      else if event.type in z.event.EventTypeHandling.STORE
-        promise = @cryptography_repository.save_unencrypted_event event
-      else
-        promise = Promise.resolve event
+        return Promise.resolve true
 
-      promise.then (record) =>
-        @_distribute_event record if record
-        resolve record
+      Promise.resolve()
+      .then =>
+        if event.type in z.event.EventTypeHandling.DECRYPT
+          return @cryptography_repository.decrypt_event(event)
+          .then (generic_message) =>
+            @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
+        return event
+      .then (mapped_event) =>
+        if mapped_event.type in z.event.EventTypeHandling.STORE
+          return @cryptography_repository.save_unencrypted_event mapped_event
+        return mapped_event
+      .then (record) =>
+        @_distribute_event record
+        return record
       .catch (error) =>
         if error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
-          resolve true
+          return true
         else
-          @logger.log @logger.levels.ERROR,
-            "Failed to handle '#{event.type}' event '#{event.id or 'no ID'}' from '#{source}': '#{error.message}'", event
-          reject error
+          throw error
 
   ###
   Handle all events from the payload of an incoming notification.
