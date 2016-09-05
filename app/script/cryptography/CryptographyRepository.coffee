@@ -235,9 +235,9 @@ class z.cryptography.CryptographyRepository
         @logger.log @logger.levels.INFO, "Deleting session for client '#{client_id}' of user '#{user_id}'", cryptobox_session
         @cryptobox.session_delete cryptobox_session.id
         .then -> return cryptobox_session.id
-
-      @logger.log @logger.levels.INFO, "We cannot delete the session for client '#{client_id}' of user '#{user_id}' because it was not found"
-      return undefined
+      else
+        @logger.log @logger.levels.INFO, "We cannot delete the session for client '#{client_id}' of user '#{user_id}' because it was not found"
+        return undefined
 
   ###
   Save a session.

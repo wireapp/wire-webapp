@@ -1898,8 +1898,8 @@ class z.conversation.ConversationRepository
         @_handle_deleted_clients error_response.deleted, payload
         .then (updated_payload) =>
           return @_handle_missing_clients error_response.missing, generic_message, updated_payload
-
-      throw error_response
+      else
+        throw error_response
 
   ###
   Delete message from UI and database. Primary key is used to delete message in database.
