@@ -344,8 +344,7 @@ class z.event.EventRepository
     .catch (error) ->
       if error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
         return true
-      else
-        throw error
+      throw error
 
   ###
   Handle all events from the payload of an incoming notification.
