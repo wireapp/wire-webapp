@@ -29,11 +29,11 @@ class z.entity.Message
     message_ets.sort (m1, m2) -> m1.timestamp > m2.timestamp
 
   # Construct a new base message entity.
-  constructor: ->
+  constructor: (id = '0', super_type = '') ->
     @from = ''
-    @id = '0'
+    @id = id
     @primary_key = undefined
-    @super_type = ''
+    @super_type = super_type
     @timestamp = Date.now()
     @type = ''
     @user = ko.observable new z.entity.User()

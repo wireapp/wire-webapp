@@ -69,7 +69,7 @@ class z.conversation.EventMapper
       when z.event.Backend.CONVERSATION.MEMBER_LEAVE
         message_et = @_map_event_member_leave event
       when z.event.Backend.CONVERSATION.MEMBER_UPDATE
-        message_et = @_map_event_member_update()
+        message_et = @_map_event_member_update event
       when z.event.Backend.CONVERSATION.RENAME
         message_et = @_map_event_rename event
       when z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
@@ -214,8 +214,10 @@ class z.conversation.EventMapper
 
   @return [z.entity.MemberMessage] Member message entity
   ###
-  _map_event_member_update: ->
+  _map_event_member_update: (event) ->
     message_et = new z.entity.MemberMessage()
+    # don't render last read
+    message_et.visible not event.data.last_read_timestamp
     return message_et
 
   ###

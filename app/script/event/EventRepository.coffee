@@ -60,7 +60,7 @@ class z.event.EventRepository
     @notifications_blocked = false
 
     @notifications_queue.subscribe (notifications) =>
-      if notifications.length > 0
+      if notifications.length
         return if @notifications_blocked
 
         notification = @notifications_queue()[0]
