@@ -84,7 +84,7 @@ class z.ViewModel.SelfProfileViewModel
   logout: =>
     # TODO: Rely on client repository
     if @client_repository.current_client().type is z.client.ClientType.PERMANENT
-      amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.LOGOUT,
+      amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT,
         action: (clear_data) ->
           amplify.publish z.event.WebApp.SIGN_OUT, 'user_requested', clear_data
     else
@@ -155,7 +155,7 @@ class z.ViewModel.SelfProfileViewModel
 
   on_show_new_clients: =>
     amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE
-    amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CONNECTED_DEVICE,
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONNECTED_DEVICE,
       data: @new_clients()
       close: =>
         @new_clients.removeAll()

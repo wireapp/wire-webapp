@@ -323,10 +323,16 @@ Opens a new browser tab (target="_blank") with a given URL in a safe environment
 @param url [String] URL you want to open in a new browser tab
 ###
 z.util.safe_window_open = (url) ->
-  new_window = window.open()
-  new_window.opener = null
-  new_window.location = url
-  return new_window
+  if not url.match /^http[s]?:\/\//i
+    url = "http://#{url}"
+
+  if navigator.userAgent.indexOf('Electron') > -1
+    window.open url
+  else
+    new_window = window.open()
+    new_window.opener = null
+    new_window.location = url
+    return new_window
 
 z.util.auto_link_emails = (text) ->
   email_pattern = /([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)/gim

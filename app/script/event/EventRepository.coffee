@@ -44,13 +44,13 @@ class z.event.EventRepository
       @logger.log @logger.levels.OFF, "Changed notification handling state to '#{handling_state}'"
       amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, handling_state
 
-      switch handling_state
-        when z.event.NotificationHandlingState.RECOVERY
-          amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
-        when z.event.NotificationHandlingState.WEB_SOCKET
-          @_handle_buffered_notifications()
-          if @notification_handling_state() is z.event.NotificationHandlingState.RECOVERY
-            amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
+      if handling_state is z.event.NotificationHandlingState.WEB_SOCKET
+        @_handle_buffered_notifications()
+        if @previous_handling_state is z.event.NotificationHandlingState.RECOVERY
+          amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
+      @previous_handling_state = handling_state
+
+    @previous_handling_state = @notification_handling_state()
 
     @notifications_handled = 0
     @notifications_loaded = ko.observable false
@@ -60,7 +60,7 @@ class z.event.EventRepository
     @notifications_blocked = false
 
     @notifications_queue.subscribe (notifications) =>
-      if notifications.length > 0
+      if notifications.length
         return if @notifications_blocked
 
         notification = @notifications_queue()[0]
@@ -91,7 +91,6 @@ class z.event.EventRepository
       @logger.log @logger.levels.INFO, "Last notification ID updated to '#{last_notification_id}'"
       @notification_service.save_last_notification_id_to_db last_notification_id if last_notification_id
 
-    amplify.subscribe z.event.WebApp.CONNECTION.RECONNECT, @reconnect
     amplify.subscribe z.event.WebApp.CONNECTION.ONLINE, @recover_from_notification_stream
     amplify.subscribe z.event.WebApp.EVENT.INJECT, @inject_event
 
@@ -101,7 +100,7 @@ class z.event.EventRepository
   ###############################################################################
 
   # Initiate the WebSocket connection.
-  connect: =>
+  connect_web_socket: =>
     if not @current_client().id
       throw new z.event.EventError z.event.EventError::TYPE.NO_CLIENT_ID
 
@@ -116,14 +115,14 @@ class z.event.EventRepository
   Close the WebSocket connection.
   @param trigger [z.event.WebSocketService::CHANGE_TRIGGER] Trigger of the disconnect
   ###
-  disconnect: (trigger) =>
+  disconnect_web_socket: (trigger) =>
     @web_socket_service.reset trigger
 
   ###
   Re-connect the WebSocket connection.
-  @param trigger [z.event.WebSocketService::CHANGE_TRIGGER] Trigger of the disconnect
+  @param trigger [z.event.WebSocketService::CHANGE_TRIGGER] Trigger of the reconnect
   ###
-  reconnect: (trigger) =>
+  reconnect_web_socket: (trigger) =>
     @notification_handling_state z.event.NotificationHandlingState.RECOVERY
     @web_socket_service.reconnect trigger
 
@@ -137,8 +136,9 @@ class z.event.EventRepository
   # Handle buffered notifications.
   _handle_buffered_notifications: =>
     @logger.log @logger.levels.INFO, "Received '#{@web_socket_buffer.length}' notifications via WebSocket while recovering from stream"
-    z.util.ko_array_push_all @notifications_queue, @web_socket_buffer
-    @web_socket_buffer.length = 0
+    if @web_socket_buffer.length
+      z.util.ko_array_push_all @notifications_queue, @web_socket_buffer
+      @web_socket_buffer.length = 0
 
 
   ###############################################################################
@@ -206,6 +206,7 @@ class z.event.EventRepository
   ###
   recover_from_notification_stream: =>
     @notification_handling_state z.event.NotificationHandlingState.RECOVERY
+    amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
     @update_from_notification_stream()
     .then (number_of_notifications) =>
       @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET if number_of_notifications is 0
@@ -215,7 +216,7 @@ class z.event.EventRepository
         @logger.log @logger.levels.ERROR, "Failed to recover from notification stream: #{error.message}", error
         @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET
         # @todo What do we do in this case?
-        amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
+        amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
 
   ###
   Fetch all missed events from the notification stream since the last ID stored in database.

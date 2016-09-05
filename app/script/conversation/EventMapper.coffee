@@ -45,7 +45,7 @@ class z.conversation.EventMapper
     try
       return @_map_json_event event, conversation_et
     catch error
-      @logger.log @logger.levels.ERROR, 'Cannot map event', {error: error, event: event}
+      @logger.log @logger.levels.ERROR, "Failed to map event: #{error.message}", {error: error, event: event}
       return undefined
 
   ###
@@ -69,7 +69,7 @@ class z.conversation.EventMapper
       when z.event.Backend.CONVERSATION.MEMBER_LEAVE
         message_et = @_map_event_member_leave event
       when z.event.Backend.CONVERSATION.MEMBER_UPDATE
-        message_et = @_map_event_member_update()
+        message_et = @_map_event_member_update event
       when z.event.Backend.CONVERSATION.RENAME
         message_et = @_map_event_rename event
       when z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
@@ -93,7 +93,7 @@ class z.conversation.EventMapper
     message_et.primary_key = z.storage.StorageService.construct_primary_key event
     message_et.type = event.type
 
-    if message_et.is_content()
+    if message_et.is_reactable()
       message_et.reactions event.reactions or {}
 
     if window.isNaN message_et.timestamp
@@ -214,8 +214,10 @@ class z.conversation.EventMapper
 
   @return [z.entity.MemberMessage] Member message entity
   ###
-  _map_event_member_update: ->
+  _map_event_member_update: (event) ->
     message_et = new z.entity.MemberMessage()
+    # don't render last read
+    message_et.visible not event.data.last_read_timestamp
     return message_et
 
   ###

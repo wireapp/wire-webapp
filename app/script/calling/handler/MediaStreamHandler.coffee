@@ -343,11 +343,11 @@ class z.calling.handler.MediaStreamHandler
   _hide_permission_failed_hint: (media_type) ->
     switch media_type
       when z.calling.enum.MediaType.AUDIO
-        amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.DENIED_MICROPHONE
+        amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_MICROPHONE
       when z.calling.enum.MediaType.SCREEN
-        amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.DENIED_SCREEN
+        amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_SCREEN
       when z.calling.enum.MediaType.VIDEO
-        amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.DENIED_CAMERA
+        amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_CAMERA
 
   ###
   Hide the permission request hint banner.
@@ -358,11 +358,11 @@ class z.calling.handler.MediaStreamHandler
     return if z.util.Environment.electron
     switch media_type
       when z.calling.enum.MediaType.AUDIO
-        amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.REQUEST_MICROPHONE
+        amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_MICROPHONE
       when z.calling.enum.MediaType.SCREEN
-        amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.REQUEST_SCREEN
+        amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_SCREEN
       when z.calling.enum.MediaType.VIDEO
-        amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.REQUEST_CAMERA
+        amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_CAMERA
 
   ###
   Initial request for local MediaStream was successful.
@@ -426,7 +426,7 @@ class z.calling.handler.MediaStreamHandler
     if media_type is z.calling.enum.MediaType.SCREEN
       if z.util.Environment.browser.firefox and error.name is z.calling.rtc.MediaStreamError.NOT_ALLOWED_ERROR
         @logger.log @logger.levels.WARN, 'We are not on the white list. Manually add the current domain to media.getusermedia.screensharing.allowed_domains on about:config'
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.WHITELIST_SCREENSHARING
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.WHITELIST_SCREENSHARING
       else
         @logger.log @logger.levels.ERROR, "Failed to enable screen sharing: #{error.message}", error
     else
@@ -441,9 +441,9 @@ class z.calling.handler.MediaStreamHandler
   ###
   _show_device_not_found_hint: (media_type, conversation_id) ->
     if media_type is z.calling.enum.MediaType.AUDIO
-      amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.NOT_FOUND_MICROPHONE
+      amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NOT_FOUND_MICROPHONE
     else if media_type is z.calling.enum.MediaType.VIDEO
-      amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.NOT_FOUND_CAMERA
+      amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NOT_FOUND_CAMERA
     amplify.publish z.event.WebApp.CALL.STATE.IGNORE, conversation_id if conversation_id
 
   ###
@@ -454,11 +454,11 @@ class z.calling.handler.MediaStreamHandler
   _show_permission_denied_hint: (media_type) ->
     switch media_type
       when z.calling.enum.MediaType.AUDIO
-        amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.DENIED_MICROPHONE
+        amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_MICROPHONE
       when z.calling.enum.MediaType.SCREEN
-        amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.DENIED_SCREEN
+        amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_SCREEN
       when z.calling.enum.MediaType.VIDEO
-        amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.DENIED_CAMERA
+        amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_CAMERA
 
   ###
   Show permission request hint banner.
@@ -469,11 +469,11 @@ class z.calling.handler.MediaStreamHandler
     return if z.util.Environment.electron
     switch media_type
       when z.calling.enum.MediaType.AUDIO
-        amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.REQUEST_MICROPHONE
+        amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_MICROPHONE
       when z.calling.enum.MediaType.SCREEN
-        amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.REQUEST_SCREEN
+        amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_SCREEN
       when z.calling.enum.MediaType.VIDEO
-        amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.REQUEST_CAMERA
+        amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_CAMERA
 
 
   ###############################################################################
