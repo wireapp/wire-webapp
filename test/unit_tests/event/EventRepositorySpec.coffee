@@ -72,7 +72,7 @@ describe 'Event Repository', ->
       spyOn(notification_service, 'get_last_notification_id_from_db').and.callThrough()
 
     it 'should skip fetching notifications if last notification ID not found in storage', (done) ->
-      event_repository.connect()
+      event_repository.connect_web_socket()
       event_repository.update_from_notification_stream()
       .then ->
         expect(notification_service.get_last_notification_id_from_db).toHaveBeenCalled()
@@ -82,7 +82,7 @@ describe 'Event Repository', ->
 
     it 'should buffer notifications when notification stream is not processed', ->
       last_notification_id = z.util.create_random_uuid()
-      event_repository.connect()
+      event_repository.connect_web_socket()
       websocket_service_mock.publish {id: z.util.create_random_uuid(), payload: []}
       expect(event_repository._buffer_web_socket_notification).toHaveBeenCalled()
       expect(event_repository._handle_notification).not.toHaveBeenCalled()
@@ -93,7 +93,7 @@ describe 'Event Repository', ->
       last_notification_id = z.util.create_random_uuid()
       last_published_notification_id = z.util.create_random_uuid()
       event_repository.last_notification_id last_notification_id
-      event_repository.connect()
+      event_repository.connect_web_socket()
       websocket_service_mock.publish {id: z.util.create_random_uuid(), payload: []}
 
       websocket_service_mock.publish {id: last_published_notification_id, payload: []}

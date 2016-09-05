@@ -66,11 +66,10 @@ class z.event.NotificationService
   get_last_notification_id_from_db: =>
     return new Promise (resolve, reject) =>
       @storage_service.load @storage_service.OBJECT_STORE_AMPLIFY, @PRIMARY_KEY_LAST_NOTIFICATION
-      .then (record) =>
+      .then (record) ->
         if record?.value
           resolve record.value
         else
-          @logger.log @logger.levels.WARN, 'Last notification ID not found in storage'
           reject new z.event.EventError z.event.EventError::TYPE.NO_LAST_ID
       .catch (error) =>
         @logger.log @logger.levels.ERROR, "Failed to get last notification ID from storage: #{error.message}", error
