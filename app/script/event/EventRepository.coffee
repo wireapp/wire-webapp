@@ -319,10 +319,9 @@ class z.event.EventRepository
   ###
   Handle a single event from the notification stream or WebSocket.
   @param event [JSON] Backend event extracted from notification stream
-  @param source [String] Source of backend event
   @return [Promise] Resolves with the saved record or boolean true if the event was skipped
   ###
-  _handle_event: (event, source) ->
+  _handle_event: (event) ->
       if event.type in z.event.EventTypeHandling.IGNORE
         @logger.log "Event ignored: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
         return Promise.resolve true
@@ -338,9 +337,9 @@ class z.event.EventRepository
         if mapped_event.type in z.event.EventTypeHandling.STORE
           return @cryptography_repository.save_unencrypted_event mapped_event
         return mapped_event
-      .then (record) =>
-        @_distribute_event record
-        return record
+      .then (saved_event) =>
+        @_distribute_event saved_event
+        return saved_event
       .catch (error) =>
         if error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
           return true
@@ -369,17 +368,10 @@ class z.event.EventRepository
         @last_notification_id notification.id
         resolve @last_notification_id()
       else
-        proceed = =>
+        Promise.all (@_handle_event event for event in events)
+        .then ->
           @last_notification_id notification.id
           resolve @last_notification_id()
-
-        Promise.all (@_handle_event event, source for event in events)
-        .then ->
-          proceed()
         .catch (error) =>
-          if error.message is z.event.EventError::TYPE.DEPRECATED_SCHEMA
-            @logger.log @logger.levels.WARN, "Ignored notification '#{notification.id}' from '#{source}': #{error.message}", error
-            proceed()
-          else
-            @logger.log @logger.levels.ERROR, "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
-            reject error
+          @logger.log @logger.levels.ERROR, "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
+          reject error
