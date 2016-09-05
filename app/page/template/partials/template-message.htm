@@ -39,7 +39,7 @@
   <div class="message-body message-location-body">
     <div class="message-location-icon icon-location"></div>
     <div class="message-location-label" data-bind="text: name"></div>
-    <a target="_blank" class="label-xs text-theme" data-bind="attr: {href: link_src}, l10n_text: z.string.conversation_location_link"></a>
+    <a rel="nofollow noopener noreferrer" target="_blank" class="label-xs text-theme" data-bind="attr: {href: link_src}, l10n_text: z.string.conversation_location_link"></a>
   </div>
 </script>
 
@@ -246,7 +246,7 @@
     <div class="message-header-label ellipsis">
       <span data-bind="html: caption"></span>
       <span>&nbsp;</span>
-      <a class="text-theme" data-bind="l10n_text: z.string.conversation_unable_to_decrypt_link, attr: {'href': link}" target="_blank"></a>
+      <a class="text-theme" data-bind="l10n_text: z.string.conversation_unable_to_decrypt_link, attr: {'href': link}" rel="nofollow noopener noreferrer" target="_blank"></a>
       <hr class="message-header-line" />
     </div>
   </div>
