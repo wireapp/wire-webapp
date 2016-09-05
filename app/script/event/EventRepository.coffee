@@ -322,29 +322,29 @@ class z.event.EventRepository
   @return [Promise] Resolves with the saved record or boolean true if the event was skipped
   ###
   _handle_event: (event) ->
-      if event.type in z.event.EventTypeHandling.IGNORE
-        @logger.log "Event ignored: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
-        return Promise.resolve true
+    if event.type in z.event.EventTypeHandling.IGNORE
+      @logger.log "Event ignored: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
+      return Promise.resolve true
 
-      Promise.resolve()
-      .then =>
-        if event.type in z.event.EventTypeHandling.DECRYPT
-          return @cryptography_repository.decrypt_event(event)
-          .then (generic_message) =>
-            @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
-        return event
-      .then (mapped_event) =>
-        if mapped_event.type in z.event.EventTypeHandling.STORE
-          return @cryptography_repository.save_unencrypted_event mapped_event
-        return mapped_event
-      .then (saved_event) =>
-        @_distribute_event saved_event
-        return saved_event
-      .catch (error) =>
-        if error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
-          return true
-        else
-          throw error
+    Promise.resolve()
+    .then =>
+      if event.type in z.event.EventTypeHandling.DECRYPT
+        return @cryptography_repository.decrypt_event(event)
+        .then (generic_message) =>
+          @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
+      return event
+    .then (mapped_event) =>
+      if mapped_event.type in z.event.EventTypeHandling.STORE
+        return @cryptography_repository.save_unencrypted_event mapped_event
+      return mapped_event
+    .then (saved_event) =>
+      @_distribute_event saved_event
+      return saved_event
+    .catch (error) =>
+      if error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
+        return true
+      else
+        throw error
 
   ###
   Handle all events from the payload of an incoming notification.
