@@ -1467,7 +1467,7 @@ class z.conversation.ConversationRepository
     message_et = conversation_et.get_message_by_id event_json.id
 
     if not message_et?
-      return @logger.log @logger.levels.ERROR, 'Asset preview: Could not find message with id '#{event_json.id}'", event_json
+      return @logger.log @logger.levels.ERROR, "Asset preview: Could not find message with id '#{event_json.id}'", event_json
 
     @update_message_with_asset_preview conversation_et, message_et, event_json.data
 
