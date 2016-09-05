@@ -184,7 +184,7 @@ class z.conversation.ConversationRepository
     .then (event) =>
       if event
         return @event_mapper.map_json_event event, conversation_et
-      throw new Error 'Message not found'
+      throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
 
   get_events: (conversation_et) ->
     return new Promise (resolve, reject) =>
@@ -1625,6 +1625,8 @@ class z.conversation.ConversationRepository
       return event_json
     .then (updated_event_json) =>
       @_on_add_event conversation_et, updated_event_json
+    .catch (error) ->
+      throw error if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
 
   ###
   A hide message received in a conversation.
@@ -1642,8 +1644,9 @@ class z.conversation.ConversationRepository
     .then =>
       return @_delete_message_by_id conversation_et, event_json.data.message_id
     .catch (error) =>
-      @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
-      throw error
+      if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+        @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
+        throw error
 
   ###
   A hide message received in a conversation.
@@ -1684,8 +1687,9 @@ class z.conversation.ConversationRepository
         @_update_user_ets message_et
         return message_et
     .catch (error) =>
-      @logger.log "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
-      throw error
+      if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+        @logger.log "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
+        throw error
 
   ###
   A conversation was renamed.
