@@ -83,11 +83,11 @@ class z.SystemNotification.SystemNotificationRepository
   request_permission: (on_permission_granted, on_permission_denied) ->
     return if not z.util.Environment.browser.supports.notifications
     if window.Notification.permission is z.util.BrowserPermissionType.DEFAULT
-      amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.REQUEST_NOTIFICATION
+      amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_NOTIFICATION
       # Note: The callback will be only triggered in Chrome.
       # If you ignore a permission request on Firefox, then the callback will not be triggered.
       window.Notification.requestPermission? (permission) ->
-        amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.REQUEST_NOTIFICATION
+        amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_NOTIFICATION
         if permission is z.util.BrowserPermissionType.GRANTED
           amplify.publish z.event.WebApp.ANALYTICS.EVENT,
             z.tracking.EventName.PERMISSION.ALLOW_NOTIFICATIONS, value: 'allow'

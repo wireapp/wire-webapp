@@ -83,7 +83,7 @@ class z.ViewModel.ConversationTitlebarViewModel
   click_on_video_button: =>
     return if not @conversation_et()
     if @conversation_et().is_group()
-      amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP
+      amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP
     else
       amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, @conversation_et().id, true
 

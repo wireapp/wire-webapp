@@ -171,7 +171,7 @@ class z.main.App
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type
       @repository.cryptography.current_client = client_observable
       @repository.event.current_client = client_observable
-      @repository.event.connect()
+      @repository.event.connect_web_socket()
       promises = [
         @repository.client.get_clients_for_self()
         @repository.user.init_properties()
@@ -305,7 +305,7 @@ class z.main.App
   _subscribe_to_beforeunload: ->
     $(window).on 'beforeunload', =>
       @logger.log '\'window.onbeforeunload\' was triggered, so we will disconnect from the backend.'
-      @repository.event.disconnect z.event.WebSocketService::CHANGE_TRIGGER.PAGE_NAVIGATION
+      @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.PAGE_NAVIGATION
       @repository.call_center.state_handler.leave_call_on_beforeunload()
       @repository.storage.terminate 'window.onbeforeunload'
       return undefined
@@ -361,15 +361,15 @@ class z.main.App
     @logger.log @logger.levels.INFO, 'Internet connection regained. Re-establishing WebSocket connection...'
     @auth.client.execute_on_connectivity()
     .then =>
-      amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.NO_INTERNET
-      amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
-      @repository.event.reconnect z.event.WebSocketService::CHANGE_TRIGGER.ONLINE
+      amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.NO_INTERNET
+      amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
+      @repository.event.reconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.ONLINE
 
   # Reflect internet connection loss in the UI.
   on_internet_connection_lost: =>
     @logger.log @logger.levels.WARN, 'Internet connection lost'
-    @repository.event.disconnect z.event.WebSocketService::CHANGE_TRIGGER.OFFLINE
-    amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.NO_INTERNET
+    @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.OFFLINE
+    amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NO_INTERNET
 
 
   ###############################################################################
@@ -385,7 +385,7 @@ class z.main.App
   logout: (cause, clear_data = false, session_expired = false) =>
     _logout = =>
       # Disconnect from our backend, end tracking and clear cached data
-      @repository.event.disconnect z.event.WebSocketService::CHANGE_TRIGGER.LOGOUT
+      @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.LOGOUT
       amplify.publish z.event.WebApp.ANALYTICS.SESSION.CLOSE
 
       # Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
