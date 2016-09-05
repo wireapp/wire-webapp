@@ -78,8 +78,8 @@ class z.ViewModel.WarningsViewModel
     , @, deferEvaluation: true
     @warning_dimmed.extend rateLimit: 200
 
-    amplify.subscribe z.event.WebApp.WARNINGS.SHOW, @show_warning
-    amplify.subscribe z.event.WebApp.WARNINGS.DISMISS, @dismiss_warning
+    amplify.subscribe z.event.WebApp.WARNING.SHOW, @show_warning
+    amplify.subscribe z.event.WebApp.WARNING.DISMISS, @dismiss_warning
 
     ko.applyBindings @, document.getElementById element_id
 
@@ -90,7 +90,7 @@ class z.ViewModel.WarningsViewModel
 
     switch warning_to_remove
       when z.ViewModel.WarningType.REQUEST_MICROPHONE
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CALLING,
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALLING,
           action: -> (z.util.safe_window_open z.localization.Localizer.get_text z.string.url_support_mic_access_denied)?.focus()
       when z.ViewModel.WarningType.REQUEST_NOTIFICATION
       # We block subsequent permission requests for notifications when the user ignores the request.
