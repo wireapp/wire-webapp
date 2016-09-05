@@ -1520,7 +1520,7 @@ class z.conversation.ConversationRepository
   _on_add_event: (conversation_et, event_json) ->
     @_add_event_to_conversation event_json, conversation_et, (message_et) =>
       @send_confirmation_status conversation_et, message_et
-      @_send_event_notification event_json, conversation_et, message_et
+      @_send_event_notification conversation_et, message_et
 
   ###
   An asset preview was send.
@@ -1710,6 +1710,7 @@ class z.conversation.ConversationRepository
   _on_reaction: (conversation_et, event_json) ->
     @get_message_from_db conversation_et, event_json.data.message_id
     .then (message_et) =>
+      @_send_reaction_notification conversation_et, message_et, event_json
       return @_update_message_reactions message_et, event_json
     .then (message_et) =>
       @logger.log "Updated reactions of message '#{message_et.id}' in database", message_et
@@ -1847,12 +1848,28 @@ class z.conversation.ConversationRepository
   Forward the event to the SystemNotification repository for browser and audio notifications.
 
   @private
-  @param event_json [Object] JSON data of received event
-  @param conversation_et [z.entity.Conversation] Conversation that was created
+  @param conversation_et [z.entity.Conversation] Conversation that event was received in
   @param message_et [z.entity.Message] Message that has been received
   ###
-  _send_event_notification: (event_json, conversation_et, message_et) ->
+  _send_event_notification: (conversation_et, message_et) ->
     amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
+
+  ###
+  Forward the reaction event to the SystemNotification repository for browser and audio notifications.
+
+  @private
+  @param conversation_et [z.entity.Conversation] Conversation that event was received in
+  @param message_et [z.entity.Message] Message that has been reacted upon
+  @param event_json [Object] JSON data of received reaction event
+  ###
+  _send_reaction_notification: (conversation_et, message_et, event_json) ->
+    return if not event_json.data.reaction
+    return if not message_et.from isnt @user_repository.self().id
+
+    @user_repository.get_user_by_id event_json.from, (user_et) ->
+      reaction_message_et = new z.entity.Message message_et.id, z.message.SuperType.REACTION
+      reaction_message_et.user user_et
+      amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, reaction_message_et
 
   ###
   Updates the user entities that are part of a message.

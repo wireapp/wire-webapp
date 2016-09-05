@@ -517,6 +517,7 @@ z.string.de.system_notification_member_leave_left = '%s.first_name hat die Unter
 z.string.de.system_notification_member_leave_removed_many = '%s.first_name hat %no Kontakte aus der Unterhaltung entfernt'
 z.string.de.system_notification_member_leave_removed_one = '%s.first_name hat %@.first_name aus der Unterhaltung entfernt'
 z.string.de.system_notification_ping = 'Hat gepingt'
+z.string.system_notification_reaction = 'Gefällt deine Nachricht'
 z.string.de.system_notification_voice_channel_activate = 'Ruft an'
 z.string.de.system_notification_voice_channel_deactivate = 'Hat versucht anzurufen'
 z.string.de.system_notification_shared_audio = 'Hat eine Audio-Nachricht geteilt'

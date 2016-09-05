@@ -31,6 +31,7 @@ z.message.SuperType =
   LOCATION: 'location'
   MEMBER: 'member'
   PING: 'ping'
+  REACTION: 'reaction'
   SPECIAL: 'special'
   SYSTEM: 'system'
   UNABLE_TO_DECRYPT: 'unable-to-decrypt'
