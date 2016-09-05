@@ -775,9 +775,9 @@ class z.conversation.ConversationRepository
   @param reason [z.assets.AssetUploadFailedReason] cause for the failed upload (optional)
   ###
   send_asset_upload_failed: (conversation_et, nonce, reason = z.assets.AssetUploadFailedReason.FAILED) =>
-    reason = if reason is z.assets.AssetUploadFailedReason.CANCELLED then z.proto.Asset.NotUploaded.CANCELLED else z.proto.Asset.NotUploaded.FAILED
+    reason_proto = if reason is z.assets.AssetUploadFailedReason.CANCELLED then z.proto.Asset.NotUploaded.CANCELLED else z.proto.Asset.NotUploaded.FAILED
     asset = new z.proto.Asset()
-    asset.set 'not_uploaded', z.proto.Asset.NotUploaded.CANCELLED
+    asset.set 'not_uploaded', reason_proto
     generic_message = new z.proto.GenericMessage nonce
     generic_message.set 'asset', asset
     @_send_and_save_generic_message conversation_et, generic_message
