@@ -373,28 +373,18 @@
 }
 
 .message-body-like {
+  .flex-center;
   position: absolute;
   bottom: 0;
   left: 0;
   width: @conversation-message-sender-width;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
 
   .image-widescreen & {
     bottom: 8px;
   }
-
-  .message:hover & {
-    opacity: 1;
-  }
 }
 
 .message-body-like-icon {
-  .circle(24px);
-  display: flex;
-  justify-content: center;
 
   .image-widescreen & {
     background-color: #fff;
@@ -463,5 +453,18 @@
 
   > * + * {
     margin-left: 8px;
+  }
+}
+
+// hover
+.message-show-on-hover {
+  opacity: 0;
+  transition-property: opacity;
+  transition-timing-function: @ease-out-quart;
+  transition-duration: @animation-timing-fast;
+
+  .message:hover & {
+    opacity: 1;
+    transition-delay: @animation-timing-faster + 0.05;
   }
 }
