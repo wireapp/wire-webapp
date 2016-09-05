@@ -32,11 +32,10 @@ z.event.EventTypeHandling =
     z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD
   ]
   IGNORE: [
-    z.event.Backend.CONVERSATION.TYPING
     z.event.Backend.CONVERSATION.ASSET_ADD
-    z.event.Backend.CONVERSATION.CLIENT_MESSAGE_ADD
     z.event.Backend.CONVERSATION.KNOCK
     z.event.Backend.CONVERSATION.MESSAGE_ADD
+    z.event.Backend.CONVERSATION.TYPING
   ]
   STORE: [
     z.event.Backend.CONVERSATION.ASSET_ADD
