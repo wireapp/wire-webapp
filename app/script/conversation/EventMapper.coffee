@@ -214,7 +214,7 @@ class z.conversation.EventMapper
 
   @return [z.entity.MemberMessage] Member message entity
   ###
-  _map_event_member_update: (event)->
+  _map_event_member_update: (event) ->
     message_et = new z.entity.MemberMessage()
     # don't render last read
     message_et.visible not event.data.last_read_timestamp
