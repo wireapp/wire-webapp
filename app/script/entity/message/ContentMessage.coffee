@@ -52,11 +52,10 @@ class z.entity.ContentMessage extends z.entity.Message
     @like_caption = ko.pureComputed =>
       if @reactions_user_ets().length <= 5
         return (@reactions_user_ets().map (user_et) -> user_et.first_name()).join ', '
-      else
-        return  z.localization.Localizer.get_text {
-          id: z.string.conversation_likes_caption
-          replace: {placeholder: '%@number', content: @reactions_user_ets().length}
-        }
+
+      return  z.localization.Localizer.get_text
+        id: z.string.conversation_likes_caption
+        replace: {placeholder: '%@number', content: @reactions_user_ets().length}
 
   ###
   Add another content asset to the message.

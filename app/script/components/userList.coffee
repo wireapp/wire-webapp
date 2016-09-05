@@ -52,8 +52,7 @@ class z.components.UserListViewModel
         return 'search-list-sm'
       else if @mode is z.components.UserListMode.INFO
         return 'search-list-lg'
-      else
-        return 'search-list-md'
+      return 'search-list-md'
 
     @show_buttons = =>
       return @user_connect?

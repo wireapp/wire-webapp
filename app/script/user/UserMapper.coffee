@@ -52,9 +52,8 @@ class z.user.UserMapper
   map_users_from_object: (data) ->
     if data?
       return (@map_user_from_object user for user in data when user isnt undefined)
-    else
-      @logger.log @logger.levels.WARN, 'We got no user data from the backend'
-      return []
+    @logger.log @logger.levels.WARN, 'We got no user data from the backend'
+    return []
 
   ###
   Maps JSON user into a blank user entity or updates an existing one.

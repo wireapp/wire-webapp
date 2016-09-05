@@ -121,8 +121,7 @@ class z.calling.handler.MediaDevicesHandler
 
         @logger.log @logger.levels.INFO, 'Updated MediaDevice list', media_devices
         return media_devices
-      else
-        throw new z.calling.CallError z.calling.CallError::TYPE.NO_DEVICES_FOUND
+      throw new z.calling.CallError z.calling.CallError::TYPE.NO_DEVICES_FOUND
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Failed to update MediaDevice list: #{error.message}", error
 

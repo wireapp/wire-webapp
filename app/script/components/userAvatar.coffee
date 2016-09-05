@@ -35,8 +35,7 @@ class z.components.UserAvatar
     @initials = ko.computed =>
       if @element.hasClass 'user-avatar-xs'
         return z.util.get_first_character @user.initials()
-      else
-        return @user.initials()
+      return @user.initials()
 
     @state = ko.computed =>
       status = @user.connection().status()

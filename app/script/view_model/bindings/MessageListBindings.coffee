@@ -126,8 +126,7 @@ ko.bindingHandlers.relative_timestamp = do ->
       return "#{yesterday_string} #{date.local().format('HH:mm')}"
     else if moment().diff(date, 'days') < 7
       return date.local().format 'dddd HH:mm'
-    else
-      return date.local().format 'MMMM D, HH:mm'
+    return date.local().format 'MMMM D, HH:mm'
 
   calculate_timestamp_day = (date) ->
     today = moment().local().format 'YYMMDD'
@@ -146,8 +145,7 @@ ko.bindingHandlers.relative_timestamp = do ->
       return "#{yesterday_string} #{date.local().format('HH:mm')}"
     else if moment().diff(date, 'days') < 7
       return date.local().format 'dddd HH:mm'
-    else
-      return date.local().format 'dddd, MMMM D, HH:mm'
+    return date.local().format 'dddd, MMMM D, HH:mm'
 
   # should be fine to update every minute
   setInterval ->
