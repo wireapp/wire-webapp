@@ -58,7 +58,11 @@ class z.conversation.ConversationRepository
     @sorted_conversations = ko.pureComputed =>
       @filtered_conversations().sort z.util.sort_groups_by_last_event
 
-    @message_sending_queue = []
+    @sending_promises = []
+    @sending_queue = ko.observableArray []
+    @sending_blocked = false
+
+    @sending_queue.subscribe @_execute_from_sending_queue
 
     @conversations_archived = ko.observableArray []
     @conversations_call = ko.observableArray []
@@ -100,6 +104,42 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.SELF.CLIENT_ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
+
+  ###
+  Adds a generic message to a the sending queue.
+
+  @private
+  @param conversation_id [String] Conversation ID
+  @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
+  @param user_ids [Array<String>] Optional array of user IDs to limit sending to
+  @return [Promise] Promise that resolves when the message was sent
+  ###
+  _add_to_sending_queue: (conversation_id, generic_message, user_ids) =>
+    return new Promise (resolve, reject) =>
+      queue_entry =
+        function: => @_send_generic_message conversation_id, generic_message, user_ids
+        resolve: resolve
+        reject: reject
+
+      @sending_queue.push queue_entry
+
+  ###
+  Sends a generic message from the sending queue.
+  @private
+  ###
+  _execute_from_sending_queue: =>
+    return if @block_event_handling or @sending_blocked
+
+    queue_entry = @sending_queue()[0]
+    if queue_entry
+      @sending_blocked = true
+      queue_entry.function()
+      .catch (error) ->
+        queue_entry.reject error
+      .then (response) =>
+        queue_entry.resolve response if response
+        @sending_blocked = false
+        @sending_queue.shift()
 
 
   ###############################################################################
@@ -441,7 +481,7 @@ class z.conversation.ConversationRepository
   ###
   set_notification_handling_state: (handling_state) =>
     @block_event_handling = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
-    @_execute_message_queue() if not @block_event_handling
+    @_execute_from_sending_queue()
     @logger.log @logger.levels.INFO, "Block handling of conversation events: #{@block_event_handling}"
 
   ###
@@ -538,7 +578,7 @@ class z.conversation.ConversationRepository
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'cleared', message_content
 
-      @_send_generic_message @self_conversation().id, generic_message
+      @_add_to_sending_queue @self_conversation().id, generic_message
       .then =>
         @logger.log @logger.levels.INFO,
           "Cleared conversation '#{conversation_et.id}' as read on '#{new Date(cleared_timestamp).toISOString()}'"
@@ -715,7 +755,7 @@ class z.conversation.ConversationRepository
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'lastRead', message_content
 
-      @_send_generic_message @self_conversation().id, generic_message
+      @_add_to_sending_queue @self_conversation().id, generic_message
       .then =>
         @logger.log @logger.levels.INFO,
           "Marked conversation '#{conversation_et.id}' as read on '#{new Date(timestamp).toISOString()}'"
@@ -816,15 +856,11 @@ class z.conversation.ConversationRepository
   @param message_et [String] ID of message for which to acknowledge receipt
   ###
   send_confirmation_status: (conversation_et, message_et) =>
-    return # temporarily disable delivery receipts
     return if message_et.user().is_me or not conversation_et.is_one2one() or message_et.type not in z.event.EventTypeHandling.CONFIRM
 
-    if @block_event_handling
-      @message_sending_queue.push [conversation_et, message_et]
-    else
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
-      @_send_generic_message conversation_et.id, generic_message, [message_et.user().id]
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
+    @_add_to_sending_queue conversation_et.id, generic_message, [message_et.user().id]
 
   ###
   Sends an OTR Image Asset
@@ -961,7 +997,7 @@ class z.conversation.ConversationRepository
       generic_message.set 'edited', new z.proto.MessageEdit original_message_et.id, new z.proto.Text message
       return generic_message
     .then (generic_message) =>
-      @_send_generic_message conversation_et.id, generic_message
+      @_add_to_sending_queue conversation_et.id, generic_message
     .then (response) =>
       event = @_construct_otr_message_event response, conversation_et.id
       return @cryptography_repository.save_encrypted_event generic_message, event
@@ -988,7 +1024,7 @@ class z.conversation.ConversationRepository
   send_reaction: (conversation_et, message_et, reaction) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'reaction', new z.proto.Reaction reaction, message_et.id
-    @_send_generic_message conversation_et.id, generic_message
+    @_add_to_sending_queue conversation_et.id, generic_message
     .then (response) =>
       event = @_construct_otr_message_event response, conversation_et.id
       return @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
@@ -1135,8 +1171,8 @@ class z.conversation.ConversationRepository
     return user_client_map
 
   _execute_message_queue: ->
-    @send_confirmation_status conversation_et, message_et for [conversation_et, message_et] in @message_sending_queue
-    @message_sending_queue = []
+    @send_confirmation_status conversation_et, message_et for [conversation_et, message_et] in @sending_queue
+    @sending_queue = []
 
   ###############################################################################
   # Send Generic Messages
@@ -1158,7 +1194,7 @@ class z.conversation.ConversationRepository
       if @_send_as_external_message conversation_et, generic_message
         @_send_external_generic_message conversation_et.id, generic_message
       else
-        @_send_generic_message conversation_et.id, generic_message
+        @_add_to_sending_queue conversation_et.id, generic_message
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
         return @_send_external_generic_message conversation_et.id, generic_message
@@ -1218,7 +1254,7 @@ class z.conversation.ConversationRepository
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
   @param user_ids [Array<String>] Optional array of user IDs to limit sending to
-  @return [Promise] Promise that resolves after sending the encrypted message
+  @return [Promise] Promise that resolves when the message was sent
   ###
   _send_generic_message: (conversation_id, generic_message, user_ids) =>
     @_create_user_client_map conversation_id
@@ -1335,18 +1371,18 @@ class z.conversation.ConversationRepository
     Promise.resolve()
     .then ->
       if not message_et.user().is_me
-        throw new Error 'Cannot delete other users message'
+        throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
       return generic_message
     .then (generic_message) =>
-      @_send_generic_message conversation_et.id, generic_message
+      @_add_to_sending_queue conversation_et.id, generic_message
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE
     .then =>
       return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
-      @logger.log "Failed to send delete message for everyone with id '#{message_id}' for conversation '#{conversation_et.id}'", error
+      @logger.log "Failed to send delete message for everyone with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
       throw error
 
   ###
@@ -1362,13 +1398,13 @@ class z.conversation.ConversationRepository
       generic_message.set 'hidden', new z.proto.MessageHide conversation_et.id, message_et.id
       return generic_message
     .then (generic_message) =>
-      @_send_generic_message @self_conversation().id, generic_message
+      @_add_to_sending_queue @self_conversation().id, generic_message
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL
     .then =>
       return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
-      @logger.log "Failed to send delete message with id '#{message_id}' for conversation '#{conversation_et.id}'", error
+      @logger.log "Failed to send delete message with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
       throw error
 
   ###
@@ -1638,7 +1674,7 @@ class z.conversation.ConversationRepository
     @get_message_from_db conversation_et, event_json.data.message_id
     .then (message_to_delete_et) =>
       if event_json.from isnt message_to_delete_et.from
-        throw new Error 'Sender can only delete own messages'
+        throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
       if event_json.from isnt @user_repository.self().id
         return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
     .then =>
@@ -2006,7 +2042,7 @@ class z.conversation.ConversationRepository
     @get_message_from_db conversation_et, event_json.data.replacing_message_id
     .then (original_message_et) =>
       if event_json.from isnt original_message_et.from
-        throw new Error 'Sender can only edit own messages'
+        throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
       return @conversation_service.update_message_timestamp_in_db event_json, original_message_et.timestamp
     .then (updated_event_json) =>
       @_delete_message_by_id conversation_et, event_json.data.replacing_message_id
