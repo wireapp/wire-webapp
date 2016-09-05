@@ -162,6 +162,13 @@ class z.storage.StorageService
           delete event.raw
           delete event.meta
           $.extend event, mapped_event
+      @db.version(8).stores version_5
+      .upgrade (transaction) =>
+        @logger.log @logger.levels.WARN, 'Database upgrade to version 8', transaction
+        transaction[@OBJECT_STORE_CONVERSATION_EVENTS]
+          .where 'type'
+          .anyOf 'conversation.member-update'
+          .delete()
 
       @db.open()
       .then =>
