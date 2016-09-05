@@ -323,6 +323,9 @@ Opens a new browser tab (target="_blank") with a given URL in a safe environment
 @param url [String] URL you want to open in a new browser tab
 ###
 z.util.safe_window_open = (url) ->
+  if not url.match /^http[s]?:\/\//i
+    url = 'http://' + url
+
   new_window = window.open()
   new_window.opener = null
   new_window.location = url
