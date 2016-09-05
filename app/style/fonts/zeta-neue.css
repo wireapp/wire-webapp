@@ -19,7 +19,7 @@
 
 @font-face {
   font-family: 'Wire';
-  src: url('/font/Wire.ttf?180716') format('truetype');
+  src: url('/font/Wire.ttf?hy9gt1') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -155,6 +155,12 @@
 }
 .icon-edit:before {
   content: "\e177";
+}
+.icon-like:before {
+  content: "\e183";
+}
+.icon-liked:before {
+  content: "\e184";
 }
 .icon-view:before {
   content: "\e185";

@@ -195,7 +195,7 @@ z.string.de.modal_leave_conversation_message = 'Die Personen werden benachrichti
 z.string.de.modal_leave_conversation_button = 'Verlassen'
 # Logout
 z.string.de.modal_logout_headline = 'Daten löschen?'
-z.string.de.modal_logout_message = 'Dies entfernt alle deine persönlichen Informationen und Unterhaltungen von diesem Gerät.'
+z.string.de.modal_logout_message = 'Deine persönlichen Daten und Unterhaltungen vollständig von diesem Gerät entfernen.'
 z.string.de.modal_logout_button = 'Abmelden'
 # New device
 z.string.de.modal_new_device_headline = '"%@.name" hat begonnen ein neues Gerät zu nutzen'
@@ -273,6 +273,8 @@ z.string.de.conversation_context_menu_edit = 'Bearbeiten'
 z.string.de.conversation_context_menu_delete = 'Für mich löschen'
 z.string.de.conversation_context_menu_delete_everyone = 'Für alle löschen'
 z.string.de.conversation_context_menu_download = 'Herunterladen'
+z.string.de.conversation_context_menu_like = 'Gefällt mir'
+z.string.de.conversation_context_menu_unlike = 'Gefällt mir nicht'
 z.string.de.conversation_delete_timestamp = 'Gelöscht um %@timestamp'
 z.string.de.conversation_edit_timestamp = 'Editiert um %@timestamp'
 

@@ -316,7 +316,7 @@ class z.ViewModel.MessageListViewModel
     reset_progress = ->
       window.setTimeout ->
         message_et.is_resetting_session false
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.SESSION_RESET
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SESSION_RESET
       , 550
 
     message_et.is_resetting_session true
@@ -479,6 +479,12 @@ class z.ViewModel.MessageListViewModel
     if message_et.has_asset()
       entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
 
+    if message_et.is_reactable()
+      if message_et.is_liked()
+        entries.push {label: z.string.conversation_context_menu_unlike, action: 'react'}
+      else
+        entries.push {label: z.string.conversation_context_menu_like, action: 'react'}
+
     if message_et.is_editable() and not @conversation().removed_from_conversation()
       entries.push {label: z.string.conversation_context_menu_edit, action: 'edit'}
 
@@ -513,13 +519,17 @@ class z.ViewModel.MessageListViewModel
 
     switch action
       when 'delete'
-        message_et?.delete()
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
+          action: => @conversation_repository.delete_message @conversation(), message_et
       when 'delete-everyone'
-        message_et?.delete_everyone()
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
+          action: => @conversation_repository.delete_message_everyone @conversation(), message_et
       when 'download'
         message_et?.get_first_asset()?.download()
       when 'edit'
-        message_et?.edit()
+        amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.EDIT, message_et
+      when 'react'
+        @click_on_like message_et
 
   ###
   Shows detail image view.
@@ -534,3 +544,7 @@ class z.ViewModel.MessageListViewModel
   click_on_cancel_request: (message_et) =>
     next_conversation_et = @conversation_repository.get_next_conversation @conversation_repository.active_conversation()
     @user_repository.cancel_connection_request message_et.other_user(), next_conversation_et
+
+  click_on_like: (message_et) =>
+    reaction = if message_et.is_liked() then z.message.ReactionType.NONE else z.message.ReactionType.LIKE
+    @conversation_repository.send_reaction @conversation(), message_et, reaction

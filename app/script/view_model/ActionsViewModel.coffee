@@ -88,7 +88,7 @@ class z.ViewModel.ActionsViewModel
     .then (conversation_et) =>
       next_conversation_et = @conversation_repository.get_next_conversation conversation_et
       user_et = conversation_et.participating_user_ets()[0]
-      amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.BLOCK,
+      amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BLOCK,
         data: user_et.first_name()
         action: => @user_repository.block_user user_et, ->
           amplify.publish z.event.WebApp.CONVERSATION.SWITCH, conversation_et, next_conversation_et
@@ -102,7 +102,7 @@ class z.ViewModel.ActionsViewModel
   click_on_clear_action: =>
     @_click_on_action()
     .then (conversation_et) =>
-      amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CLEAR,
+      amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CLEAR,
         data: conversation_et.display_name()
         conversation: conversation_et
         action: (leave = false) => @conversation_repository.clear_conversation conversation_et, leave
@@ -111,7 +111,7 @@ class z.ViewModel.ActionsViewModel
     @_click_on_action()
     .then (conversation_et) =>
       next_conversation_et = @conversation_repository.get_next_conversation conversation_et
-      amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.LEAVE,
+      amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LEAVE,
         data: conversation_et.display_name()
         action: => @conversation_repository.leave_conversation conversation_et, next_conversation_et
 

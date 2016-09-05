@@ -30,7 +30,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
   beforeEach (done) ->
     test_factory.exposeSystemNotificationActors()
     .then ->
-      amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, false
+      amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NotificationHandlingState.WEB_SOCKET
 
       # Create entities
       user_et = user_repository.user_mapper.map_user_from_object payload.users.get.one[0]

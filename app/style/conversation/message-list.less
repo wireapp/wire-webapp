@@ -372,6 +372,35 @@
   }
 }
 
+.message-body-like {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: @conversation-message-sender-width;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+
+  .image-widescreen & {
+    bottom: 8px;
+  }
+
+  .message:hover & {
+    opacity: 1;
+  }
+}
+
+.message-body-like-icon {
+  .circle(24px);
+  display: flex;
+  justify-content: center;
+
+  .image-widescreen & {
+    background-color: #fff;
+  }
+}
+
 .message-asset-image {
   margin-top: 16px;
   margin-bottom: 24px;
@@ -399,5 +428,40 @@
     align-items: center;
     display: none;
     justify-content: center;
+  }
+}
+
+// MESSAGE FOOTER
+.message-footer {
+  display: flex;
+  flex-wrap: wrap;
+  line-height: @avatar-diameter-xs;
+}
+
+.message-footer-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: @conversation-message-sender-width;
+}
+
+.message-footer-label {
+  font-size: @font-size-xs;
+  display: flex;
+  align-items: center;
+
+  > * + * {
+    margin-left: 8px;
+  }
+}
+
+.message-footer-bottom {
+  display: flex;
+  margin-top: 4px;
+  margin-left: @conversation-message-sender-width;
+  width: 100%;
+
+  > * + * {
+    margin-left: 8px;
   }
 }
