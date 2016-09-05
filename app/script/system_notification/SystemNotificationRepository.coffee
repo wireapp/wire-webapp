@@ -31,6 +31,7 @@ class z.SystemNotification.SystemNotificationRepository
     z.message.SuperType.CONTENT
     z.message.SuperType.MEMBER
     z.message.SuperType.PING
+    z.message.SuperType.REACTION
     z.message.SuperType.SYSTEM
   ]
 
@@ -273,14 +274,21 @@ class z.SystemNotification.SystemNotificationRepository
         }
 
   ###
-  Creates the notification body for ping and hot-ping.
-
+  Creates the notification body for ping.
   @private
-  @param message_et [z.entity.PingMessage] Ping message entity
   @return [String] Notification message body
   ###
-  _create_body_ping: (message_et) ->
+  _create_body_ping: ->
     return z.localization.Localizer.get_text z.string.system_notification_ping
+
+
+  ###
+  Creates the notification body for reaction.
+  @private
+  @return [String] Notification message body
+  ###
+  _create_body_reaction: ->
+    return z.localization.Localizer.get_text z.string.system_notification_reaction
 
   ###
   Selects the type of system message that the notification body needs to be created for.
@@ -311,7 +319,9 @@ class z.SystemNotification.SystemNotificationRepository
       when z.message.SuperType.MEMBER
         return @_create_body_member_update message_et, conversation_et.is_group?()
       when z.message.SuperType.PING
-        return @_create_body_ping message_et
+        return @_create_body_ping()
+      when z.message.SuperType.REACTION
+        return @_create_body_reaction()
       when z.message.SuperType.SYSTEM
         return @_create_body_conversation_rename message_et
 
