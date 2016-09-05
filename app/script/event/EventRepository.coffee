@@ -340,7 +340,7 @@ class z.event.EventRepository
     .then (saved_event) =>
       @_distribute_event saved_event
       return saved_event
-    .catch (error) =>
+    .catch (error) ->
       if error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
         return true
       else
