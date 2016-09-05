@@ -1030,7 +1030,6 @@ class z.conversation.ConversationRepository
     .catch (error_response) =>
       return @_update_payload_for_changed_clients error_response, generic_message, payload
       .then (updated_payload) =>
-        @logger.log @logger.levels.INFO,
         return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
 
   ###

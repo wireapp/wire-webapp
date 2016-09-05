@@ -424,7 +424,7 @@ class z.assets.AssetService
     z.util.load_file_buffer asset
     .then (file_bytes) ->
       return z.assets.AssetCrypto.encrypt_aes_asset file_bytes
-    .then ([key_bytes, sha256, ciphertext] ) ->
+    .then ([key_bytes, sha256, ciphertext]) ->
       asset = new z.proto.Asset()
       asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256
       return [asset, ciphertext]
