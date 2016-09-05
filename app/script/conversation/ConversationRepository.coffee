@@ -481,7 +481,7 @@ class z.conversation.ConversationRepository
       callback?()
     .catch (error_response) ->
       if error_response.label is z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS,
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS,
           data:
             max: z.config.MAXIMUM_CONVERSATION_SIZE
             open_spots: Math.max 0, z.config.MAXIMUM_CONVERSATION_SIZE - (conversation_et.number_of_participants() + 1)

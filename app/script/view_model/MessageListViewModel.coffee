@@ -316,7 +316,7 @@ class z.ViewModel.MessageListViewModel
     reset_progress = ->
       window.setTimeout ->
         message_et.is_resetting_session false
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.SESSION_RESET
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SESSION_RESET
       , 550
 
     message_et.is_resetting_session true
@@ -519,10 +519,10 @@ class z.ViewModel.MessageListViewModel
 
     switch action
       when 'delete'
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
           action: => @conversation_repository.delete_message @conversation(), message_et
       when 'delete-everyone'
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
           action: => @conversation_repository.delete_message_everyone @conversation(), message_et
       when 'download'
         message_et?.get_first_asset()?.download()

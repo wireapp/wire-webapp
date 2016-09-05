@@ -146,7 +146,7 @@ class z.auth.AuthRepository
       else if error.type isnt z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
         @logger.log @logger.levels.ERROR, "Refreshing access token failed: '#{error.type}'", error
         # @todo What do we do in this case?
-        amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
+        amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
 
   # Get the cached access token from the Amplify store.
   get_cached_access_token: ->
