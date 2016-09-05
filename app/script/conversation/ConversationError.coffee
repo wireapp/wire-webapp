@@ -28,6 +28,8 @@ class z.conversation.ConversationError
     @message = switch @type
       when z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         'Message not found'
+      when z.conversation.ConversationError::TYPE.WRONG_USER
+        'Wrong user tried to change or delete a message'
       else
         'Unknown ConversationError'
 
@@ -35,4 +37,5 @@ class z.conversation.ConversationError
   @::constructor = @
   @::TYPE =
     MESSAGE_NOT_FOUND: 'z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND'
+    WRONG_USER: 'z.conversation.ConversationError::TYPE.WRONG_USER'
     UNKNOWN: 'z.conversation.ConversationError::TYPE.UNKNOWN'
