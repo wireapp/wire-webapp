@@ -46,6 +46,7 @@ z.tracking.EventName =
     DELETED_MESSAGE: 'conversation.deleted_message'
     EDITED_MESSAGE: 'conversation.edited_message'
     SELECTED_MESSAGE: 'conversation.selected_message'
+    REACTED_TO_MESSAGE: 'conversation.reacted_to_message'
   MEDIA:
     COMPLETED_MEDIA_ACTION: 'media.completed_media_action'
     PLAYED_AUDIO_MESSAGE: 'media.played_audio_message'
