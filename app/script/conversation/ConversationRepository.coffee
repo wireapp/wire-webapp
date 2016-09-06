@@ -771,59 +771,27 @@ class z.conversation.ConversationRepository
 
   ###
   Send encrypted assets. Used for file transfers.
-
-  # TODO unify with image asset
-  # create and send original proto message (message-add)
-  # create and send uploaded proto message with status (asset-add)
-
   @param conversation_id [String] Conversation ID
   @return [Object] Collection with User IDs which hold their Client IDs in an Array
   ###
   send_asset: (conversation_et, file, nonce) =>
-    conversation_id = conversation_et.id
     generic_message = null
-    key_bytes = null
-    sha256 = null
-    ciphertext = null
-    body_payload = null
-    initial_payload = null
-
-    return Promise.resolve()
-    .then ->
+    Promise.resolve()
+    .then =>
       message_et = conversation_et.get_message_by_id nonce
       asset_et = message_et.assets()[0]
       asset_et.upload_id nonce # TODO combine
       asset_et.uploaded_on_this_client true
-
-      return z.util.load_file_buffer file
-    .then (file_bytes) ->
-      return z.assets.AssetCrypto.encrypt_aes_asset file_bytes
-    .then (data) ->
-      # TODO send original message and
-      [key_bytes, sha256, ciphertext] = data
-      key_bytes = new Uint8Array key_bytes
-      sha256 = new Uint8Array sha256
-    .then =>
-      return @_create_user_client_map conversation_id
-    .then (user_client_map) =>
+      return @asset_service.create_asset_proto file
+    .then ([asset, ciphertext]) =>
       generic_message = new z.proto.GenericMessage nonce
-      generic_message.set 'asset', @_construct_asset_uploaded key_bytes, sha256
-      return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
-    .then (payload) =>
-      payload.inline = false
-      payload.native_push = true
-      body_payload = new Uint8Array ciphertext
-      initial_payload = payload
-      return @asset_service.post_asset_v2 conversation_id, payload, body_payload, false, nonce
-    .catch (error_response) =>
-      return @_update_payload_for_changed_clients error_response, generic_message, initial_payload
-      .then (updated_payload) =>
-        @asset_service.post_asset_v2 conversation_id, updated_payload, body_payload, true, nonce
+      generic_message.set 'asset', asset
+      @_send_encrypted_asset conversation_et.id, generic_message, ciphertext, nonce
     .then (response) =>
       [json, asset_id] = response
       event = @_construct_otr_asset_event response, conversation_et.id, asset_id
-      event.data.otr_key = key_bytes
-      event.data.sha256 = sha256
+      event.data.otr_key = generic_message.asset.uploaded.otr_key
+      event.data.sha256 = generic_message.asset.uploaded.sha256
       event.id = nonce
       return @_on_asset_upload_complete conversation_et, event
 
@@ -834,8 +802,10 @@ class z.conversation.ConversationRepository
   @param file [File] File to send
   ###
   send_asset_metadata: (conversation_et, file) =>
+    asset = new z.proto.Asset()
+    asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'asset', @_construct_asset_original file
+    generic_message.set 'asset', asset
     @_send_and_save_generic_message conversation_et, generic_message
 
   ###
@@ -846,8 +816,11 @@ class z.conversation.ConversationRepository
   @param reason [z.assets.AssetUploadFailedReason] cause for the failed upload (optional)
   ###
   send_asset_upload_failed: (conversation_et, nonce, reason = z.assets.AssetUploadFailedReason.FAILED) =>
+    reason_proto = if reason is z.assets.AssetUploadFailedReason.CANCELLED then z.proto.Asset.NotUploaded.CANCELLED else z.proto.Asset.NotUploaded.FAILED
+    asset = new z.proto.Asset()
+    asset.set 'not_uploaded', reason_proto
     generic_message = new z.proto.GenericMessage nonce
-    generic_message.set 'asset', @_construct_asset_not_uploaded reason
+    generic_message.set 'asset', asset
     @_send_and_save_generic_message conversation_et, generic_message
 
   ###
@@ -866,49 +839,31 @@ class z.conversation.ConversationRepository
   Sends an OTR Image Asset
   ###
   send_image_asset: (conversation_et, image) =>
-    return new Promise (resolve, reject) =>
-      asset = null
-      ciphertext = null
-      conversation_id = conversation_et.id
-      generic_message = null
-      initial_payload = null
-
-      @asset_service.create_asset_proto image
-      .then ([asset, asset_ciphertext]) =>
-        ciphertext = asset_ciphertext
-        generic_message = new z.proto.GenericMessage z.util.create_random_uuid(), null, asset
-        return @_create_user_client_map conversation_id
-      .then (user_client_map) =>
-        return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
-      .then (payload) =>
-        initial_payload = payload
-        initial_payload.inline = false
-        initial_payload.native_push = true
-        return @asset_service.post_asset_v2 conversation_id, initial_payload, ciphertext, false
-      .catch (error_response) =>
-        return @_update_payload_for_changed_clients error_response, generic_message, initial_payload
-        .then (updated_payload) =>
-          @asset_service.post_asset_v2 conversation_id, updated_payload, ciphertext, true
-      .then ([json, asset_id]) =>
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_SENT
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
-          action: 'photo'
-          conversation_type: z.tracking.helpers.get_conversation_type conversation_et
-          with_bot: conversation_et.is_with_bot()
-        }
-        event = @_construct_otr_asset_event json, conversation_id, asset_id
-        return @cryptography_repository.save_encrypted_event generic_message, event
-      .then (record) =>
-        @_on_add_event conversation_et, record
-        resolve()
-      .catch (error) =>
-        @logger.log "Failed to upload otr asset for conversation #{conversation_id}", error
-        exception = new Error('Event response is undefined')
-        custom_data =
-          source: 'Sending medium image'
-          error: error
-        Raygun.send exception, custom_data
-        reject error
+    generic_message = null
+    @asset_service.create_image_proto image
+    .then ([image, ciphertext]) =>
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'image', image
+      return @_send_encrypted_asset conversation_et.id, generic_message, ciphertext
+    .then ([json, asset_id]) =>
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_SENT
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
+        action: 'photo'
+        conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+        with_bot: conversation_et.is_with_bot()
+      }
+      event = @_construct_otr_asset_event json, conversation_et.id, asset_id
+      return @cryptography_repository.save_encrypted_event generic_message, event
+    .then (record) =>
+      @_on_add_event conversation_et, record
+    .catch (error) =>
+      @logger.log "Failed to upload otr asset for conversation #{conversation_et.id}", error
+      exception = new Error('Event response is undefined')
+      custom_data =
+        source: 'Sending medium image'
+        error: error
+      Raygun.send exception, custom_data
+      throw error
 
   ###
   Send an encrypted knock.
@@ -1059,48 +1014,6 @@ class z.conversation.ConversationRepository
       .catch (error) =>
         @logger.log @logger.levels.ERROR, "Sending conversation reset failed: #{error.message}", error
         reject error
-
-  ###
-  Create not uploaded Asset protobuf message (failure).
-
-  @private
-  @param reason [z.assets.AssetUploadFailedReason] Conversation ID
-  @return [z.proto.Asset] Asset protobuf message
-  ###
-  _construct_asset_not_uploaded: (reason) ->
-    asset = new z.proto.Asset()
-    if reason is z.assets.AssetUploadFailedReason.CANCELLED
-      asset.set 'not_uploaded', z.proto.Asset.NotUploaded.CANCELLED
-    else
-      asset.set 'not_uploaded', z.proto.Asset.NotUploaded.FAILED
-    return asset
-
-  ###
-  Create original Asset protobuf message.
-
-  @private
-  @param file [Object] File data
-  @return [z.proto.Asset] Asset protobuf message
-  ###
-  _construct_asset_original: (file) ->
-    original_asset = new z.proto.Asset.Original file.type, file.size, file.name
-    asset = new z.proto.Asset()
-    asset.set 'original', original_asset
-    return asset
-
-  ###
-  Create uploaded Asset proto (success).
-
-  @private
-  @param otr_key [ByteArray] Encryption key
-  @param sha256 [ByteArray] Sha256
-  @return [z.proto.Asset] Asset protobuf message
-  ###
-  _construct_asset_uploaded: (otr_key, sha256) ->
-    uploaded_asset = new z.proto.Asset.RemoteData otr_key, sha256
-    asset = new z.proto.Asset()
-    asset.set 'uploaded', uploaded_asset
-    return asset
 
   ###
   Construct an encrypted message event.
@@ -1287,6 +1200,29 @@ class z.conversation.ConversationRepository
         @logger.log @logger.levels.INFO,
           "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
         return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
+
+  ###
+  Sends otr asset to a conversation.
+
+  @private
+  @param conversation_id [String] Conversation ID
+  @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
+  @param image_data [Uint8Array|ArrayBuffer]
+  @param nonce [String]
+  @return [Promise] Promise that resolves after sending the encrypted message
+  ###
+  _send_encrypted_asset: (conversation_id, generic_message, image_data, nonce) =>
+    @_create_user_client_map conversation_id
+    .then (user_client_map) =>
+      return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+    .then (payload) =>
+      payload.inline = false
+      payload.native_push = true
+      @asset_service.post_asset_v2 conversation_id, payload, image_data, false, nonce
+      .catch (error_response) =>
+        return @_update_payload_for_changed_clients error_response, generic_message, payload
+        .then (updated_payload) =>
+          @asset_service.post_asset_v2 conversation_id, updated_payload, image_data, true, nonce
 
   ###
   Estimate whether message should be send as type external.
@@ -1520,7 +1456,7 @@ class z.conversation.ConversationRepository
   _on_add_event: (conversation_et, event_json) ->
     @_add_event_to_conversation event_json, conversation_et, (message_et) =>
       @send_confirmation_status conversation_et, message_et
-      @_send_event_notification event_json, conversation_et, message_et
+      @_send_event_notification conversation_et, message_et
 
   ###
   An asset preview was send.
@@ -1532,7 +1468,7 @@ class z.conversation.ConversationRepository
     message_et = conversation_et.get_message_by_id event_json.id
 
     if not message_et?
-      return @logger.log @logger.levels.ERROR, 'Asset preview: Could not find message with id '#{event_json.id}'", event_json
+      return @logger.log @logger.levels.ERROR, "Asset preview: Could not find message with id '#{event_json.id}'", event_json
 
     @update_message_with_asset_preview conversation_et, message_et, event_json.data
 
@@ -1710,6 +1646,7 @@ class z.conversation.ConversationRepository
   _on_reaction: (conversation_et, event_json) ->
     @get_message_from_db conversation_et, event_json.data.message_id
     .then (message_et) =>
+      @_send_reaction_notification conversation_et, message_et, event_json
       return @_update_message_reactions message_et, event_json
     .then (message_et) =>
       @logger.log "Updated reactions of message '#{message_et.id}' in database", message_et
@@ -1847,12 +1784,28 @@ class z.conversation.ConversationRepository
   Forward the event to the SystemNotification repository for browser and audio notifications.
 
   @private
-  @param event_json [Object] JSON data of received event
-  @param conversation_et [z.entity.Conversation] Conversation that was created
+  @param conversation_et [z.entity.Conversation] Conversation that event was received in
   @param message_et [z.entity.Message] Message that has been received
   ###
-  _send_event_notification: (event_json, conversation_et, message_et) ->
+  _send_event_notification: (conversation_et, message_et) ->
     amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
+
+  ###
+  Forward the reaction event to the SystemNotification repository for browser and audio notifications.
+
+  @private
+  @param conversation_et [z.entity.Conversation] Conversation that event was received in
+  @param message_et [z.entity.Message] Message that has been reacted upon
+  @param event_json [Object] JSON data of received reaction event
+  ###
+  _send_reaction_notification: (conversation_et, message_et, event_json) ->
+    return if not event_json.data.reaction
+    return if not message_et.from isnt @user_repository.self().id
+
+    @user_repository.get_user_by_id event_json.from, (user_et) ->
+      reaction_message_et = new z.entity.Message message_et.id, z.message.SuperType.REACTION
+      reaction_message_et.user user_et
+      amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, reaction_message_et
 
   ###
   Updates the user entities that are part of a message.
