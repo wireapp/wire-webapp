@@ -479,7 +479,7 @@ class z.ViewModel.MessageListViewModel
     if message_et.has_asset()
       entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
 
-    if message_et.is_reactable()
+    if message_et.is_reactable() and not @conversation().removed_from_conversation()
       if message_et.is_liked()
         entries.push {label: z.string.conversation_context_menu_unlike, action: 'react'}
       else
@@ -529,7 +529,7 @@ class z.ViewModel.MessageListViewModel
       when 'edit'
         amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.EDIT, message_et
       when 'react'
-        @click_on_like message_et
+        @click_on_like message_et, false
 
   ###
   Shows detail image view.
@@ -545,6 +545,24 @@ class z.ViewModel.MessageListViewModel
     next_conversation_et = @conversation_repository.get_next_conversation @conversation_repository.active_conversation()
     @user_repository.cancel_connection_request message_et.other_user(), next_conversation_et
 
-  click_on_like: (message_et) =>
+  click_on_like: (message_et, button = true) =>
     reaction = if message_et.is_liked() then z.message.ReactionType.NONE else z.message.ReactionType.LIKE
     @conversation_repository.send_reaction @conversation(), message_et, reaction
+    @_track_reaction @conversation(), message_et, reaction, button
+
+  ###
+  Track reaction action.
+
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  @param reaction [z.message.ReactionType]
+  @param button [Boolean]
+  ###
+  _track_reaction: (conversation_et, message_et, reaction, button = true) ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.REACTED_TO_MESSAGE,
+      action: if reaction then 'like' else 'unlike'
+      with_bot: conversation_et.is_with_bot()
+      method: if button then 'button' else 'menu'
+      user: if message_et.user().is_me then 'sender' else 'receiver'
+      type: z.tracking.helpers.get_message_type message_et
+      reacted_to_last_message: conversation_et.get_last_message() is message_et
