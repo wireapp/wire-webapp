@@ -546,6 +546,7 @@ class z.ViewModel.MessageListViewModel
     @user_repository.cancel_connection_request message_et.other_user(), next_conversation_et
 
   click_on_like: (message_et, button = true) =>
+    return if @conversation().removed_from_conversation()
     reaction = if message_et.is_liked() then z.message.ReactionType.NONE else z.message.ReactionType.LIKE
     @conversation_repository.send_reaction @conversation(), message_et, reaction
     @_track_reaction @conversation(), message_et, reaction, button
