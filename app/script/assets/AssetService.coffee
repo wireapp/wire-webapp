@@ -410,7 +410,7 @@ class z.assets.AssetService
       image_asset.set_height compressed_image.height
       image_asset.set_original_width original_image.width
       image_asset.set_original_height original_image.height
-      image_asset.set_mime_type file.type
+      image_asset.set_mime_type image.type
       image_asset.set_size image_bytes.length
       image_asset.set_otr_key key_bytes
       image_asset.set_sha256 sha256
