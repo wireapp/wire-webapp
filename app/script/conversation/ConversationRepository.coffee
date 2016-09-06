@@ -1800,11 +1800,12 @@ class z.conversation.ConversationRepository
   ###
   _send_reaction_notification: (conversation_et, message_et, event_json) ->
     return if not event_json.data.reaction
-    return if not message_et.from isnt @user_repository.self().id
+    return if message_et.from isnt @user_repository.self().id
 
     @user_repository.get_user_by_id event_json.from, (user_et) ->
       reaction_message_et = new z.entity.Message message_et.id, z.message.SuperType.REACTION
       reaction_message_et.user user_et
+      reaction_message_et.reaction = event_json.data.reaction
       amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, reaction_message_et
 
   ###
@@ -2013,6 +2014,7 @@ class z.conversation.ConversationRepository
       @_delete_message conversation_et, original_message_et
     .then ->
       return event_json
+
 
   ###############################################################################
   # Reactions

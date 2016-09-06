@@ -285,10 +285,14 @@ class z.SystemNotification.SystemNotificationRepository
   ###
   Creates the notification body for reaction.
   @private
+  @param message_et [z.entity.Message] Fake reaction message entity
   @return [String] Notification message body
   ###
-  _create_body_reaction: ->
-    return z.localization.Localizer.get_text z.string.system_notification_reaction
+  _create_body_reaction: (message_et) ->
+    return z.localization.Localizer.get_text {
+      id: z.string.system_notification_reaction
+      replace: {placeholder: '%reaction', content: message_et.reaction}
+    }
 
   ###
   Selects the type of system message that the notification body needs to be created for.
@@ -321,7 +325,7 @@ class z.SystemNotification.SystemNotificationRepository
       when z.message.SuperType.PING
         return @_create_body_ping()
       when z.message.SuperType.REACTION
-        return @_create_body_reaction()
+        return @_create_body_reaction message_et
       when z.message.SuperType.SYSTEM
         return @_create_body_conversation_rename message_et
 
