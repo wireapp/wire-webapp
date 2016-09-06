@@ -369,7 +369,7 @@ class z.event.EventRepository
         resolve @last_notification_id()
       else
         Promise.all (@_handle_event event for event in events)
-        .then ->
+        .then =>
           @last_notification_id notification.id
           resolve @last_notification_id()
         .catch (error) =>
