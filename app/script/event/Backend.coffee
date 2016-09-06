@@ -33,7 +33,6 @@ z.event.Backend =
     STATE: 'call.state'
   CONVERSATION:
     ASSET_ADD: 'conversation.asset-add'
-    CLIENT_MESSAGE_ADD: 'conversation.client-message-add'
     CONNECT_REQUEST: 'conversation.connect-request'
     CREATE: 'conversation.create'
     KNOCK: 'conversation.knock'

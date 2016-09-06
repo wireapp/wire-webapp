@@ -146,13 +146,13 @@ describe 'Event Repository', ->
       # @formatter:on
 
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
-      .then done.fail
-      .catch (error) ->
-        expect(error.type).toBe z.event.EventError::TYPE.DEPRECATED_SCHEMA
+      .then (result) ->
+        expect(result).toBeTruthy()
         expect(cryptography_repository.save_encrypted_event).not.toHaveBeenCalled()
         expect(cryptography_repository.save_unencrypted_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).not.toHaveBeenCalled()
         done()
+      .catch done.fail
 
     it 'skips outdated "conversation.asset-add" events', (done) ->
       # @formatter:off
@@ -160,13 +160,13 @@ describe 'Event Repository', ->
       # @formatter:on
 
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
-      .then done.fail
-      .catch (error) ->
-        expect(error.type).toBe z.event.EventError::TYPE.DEPRECATED_SCHEMA
+      .then (result) ->
+        expect(result).toBeTruthy()
         expect(cryptography_repository.save_encrypted_event).not.toHaveBeenCalled()
         expect(cryptography_repository.save_unencrypted_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).not.toHaveBeenCalled()
         done()
+      .catch done.fail
 
     it 'skips outdated "conversation.knock" events', (done) ->
       # @formatter:off
@@ -174,13 +174,13 @@ describe 'Event Repository', ->
       # @formatter:on
 
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
-      .then done.fail
-      .catch (error) ->
-        expect(error.type).toBe z.event.EventError::TYPE.DEPRECATED_SCHEMA
+      .then (result) ->
+        expect(result).toBeTruthy()
         expect(cryptography_repository.save_encrypted_event).not.toHaveBeenCalled()
         expect(cryptography_repository.save_unencrypted_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).not.toHaveBeenCalled()
         done()
+      .catch done.fail
 
     it 'skips outdated events arriving via notification stream', (done) ->
       event_repository.notification_handling_state z.event.NotificationHandlingState.STREAM
@@ -189,27 +189,13 @@ describe 'Event Repository', ->
       # @formatter:on
 
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.STREAM
-      .then done.fail
-      .catch (error) ->
-        expect(error.type).toBe z.event.EventError::TYPE.DEPRECATED_SCHEMA
+      .then (result) ->
+        expect(result).toBeTruthy()
         expect(cryptography_repository.save_encrypted_event).not.toHaveBeenCalled()
         expect(cryptography_repository.save_unencrypted_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).not.toHaveBeenCalled()
         done()
-
-    it 'skips outdated events which get injected', (done) ->
-      # @formatter:off
-      event = {"conversation":"9fe8b359-b9e0-4624-b63c-71747664e4fa","time":"2016-08-05T16:18:41.820Z","data":{"content":"Hello","nonce":"1cea64c5-afbe-4c9d-b7d0-c49aa3b0a53d"},"from":"532af01e-1e24-4366-aacf-33b67d4ee376","id":"74f.800122000b2d7182","type":"conversation.message-add"}
-      # @formatter:on
-
-      event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.INJECTION
-      .then done.fail
-      .catch (error) ->
-        expect(error.type).toBe z.event.EventError::TYPE.DEPRECATED_SCHEMA
-        expect(cryptography_repository.save_encrypted_event).not.toHaveBeenCalled()
-        expect(cryptography_repository.save_unencrypted_event).not.toHaveBeenCalled()
-        expect(event_repository._distribute_event).not.toHaveBeenCalled()
-        done()
+      .catch done.fail
 
     it 'accepts conversation.rename events', (done) ->
       # @formatter:off
