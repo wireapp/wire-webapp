@@ -775,8 +775,9 @@ class z.conversation.ConversationRepository
   @return [Object] Collection with User IDs which hold their Client IDs in an Array
   ###
   send_asset: (conversation_et, file, nonce) =>
+    generic_message = null
     Promise.resolve()
-    .then ->
+    .then =>
       message_et = conversation_et.get_message_by_id nonce
       asset_et = message_et.assets()[0]
       asset_et.upload_id nonce # TODO combine
@@ -789,8 +790,8 @@ class z.conversation.ConversationRepository
     .then (response) =>
       [json, asset_id] = response
       event = @_construct_otr_asset_event response, conversation_et.id, asset_id
-      event.data.otr_key = key_bytes
-      event.data.sha256 = sha256
+      event.data.otr_key = generic_message.asset.uploaded.otr_key
+      event.data.sha256 = generic_message.asset.uploaded.sha256
       event.id = nonce
       return @_on_asset_upload_complete conversation_et, event
 
