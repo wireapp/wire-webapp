@@ -560,6 +560,7 @@ class z.ViewModel.MessageListViewModel
   ###
   _track_reaction: (conversation_et, message_et, reaction, button = true) ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.REACTED_TO_MESSAGE,
+      conversation_type: z.tracking.helpers.get_conversation_type conversation_et
       action: if reaction then 'like' else 'unlike'
       with_bot: conversation_et.is_with_bot()
       method: if button then 'button' else 'menu'
