@@ -34,7 +34,7 @@ class z.calling.handler.CallStateHandler
 
     @self_state = @call_center.media_stream_handler.self_stream_state
 
-    @is_handling_notifications = ko.observable true
+    @block_event_handling = true
     @subscribe_to_events()
     return
 
@@ -83,12 +83,12 @@ class z.calling.handler.CallStateHandler
   ###
   Set the notification handling state.
   @note Temporarily ignore call related events when handling notifications from the stream
-  @param handling_notifications [Boolean] Notifications are being handled from the stream
+  @param handling_state [z.event.NotificationHandlingState] State of the notifications stream handling
   ###
-  set_notification_handling_state: (handling_notifications) =>
-    @is_handling_notifications handling_notifications
-    @_update_ongoing_calls() if not @is_handling_notifications()
-    @logger.log @logger.levels.INFO, "Ignoring call events: #{handling_notifications}"
+  set_notification_handling_state: (handling_state) =>
+    @block_event_handling = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
+    @_update_ongoing_calls() if not @block_event_handling
+    @logger.log @logger.levels.INFO, "Block handling of call events: #{@block_event_handling}"
 
   ###
   Update state of currently ongoing calls.
@@ -137,7 +137,7 @@ class z.calling.handler.CallStateHandler
       else
         @delete_call call_et.id
     .catch (error) =>
-      if error.message is z.calling.CallError::TYPE.CALL_NOT_FOUND
+      if error.type is z.calling.CallError::TYPE.CALL_NOT_FOUND
         # Call with us joined
         if self_user_joined
           # ...from this device
@@ -247,15 +247,15 @@ class z.calling.handler.CallStateHandler
     @call_center.media_stream_handler.release_media_streams()
     switch error.label
       when z.service.BackendClientError::LABEL.CONVERSATION_TOO_BIG
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CALL_FULL_CONVERSATION,
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_FULL_CONVERSATION,
           data: error.max_members
         throw new z.calling.CallError z.calling.CallError::TYPE.CONVERSATION_TOO_BIG
       when z.service.BackendClientError::LABEL.INVALID_OPERATION
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION
         @delete_call conversation_id
         throw new z.calling.CallError z.calling.CallError::TYPE.CONVERSATION_EMPTY
       when z.service.BackendClientError::LABEL.VOICE_CHANNEL_FULL
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CALL_FULL_VOICE_CHANNEL,
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_FULL_VOICE_CHANNEL,
           data: error.max_joined
         throw new z.calling.CallError z.calling.CallError::TYPE.VOICE_CHANNEL_FULL
       # User has been removed from conversation, call should be deleted
@@ -369,7 +369,7 @@ class z.calling.handler.CallStateHandler
       return z.calling.enum.CallState.OUTGOING
     .then (call_state) =>
       if call_state is z.calling.enum.CallState.OUTGOING and not z.calling.CallCenter.supports_calling()
-        amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL
+        amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL
       else
         @call_center.conversation_repository.get_conversation_by_id conversation_id, (conversation_et) =>
           @_check_concurrent_joined_call conversation_id, call_state
@@ -481,7 +481,7 @@ class z.calling.handler.CallStateHandler
       ongoing_call_id = @_self_participant_on_a_call()
       if ongoing_call_id
         @logger.log @logger.levels.WARN, 'You cannot start a second call while already participating in another one.'
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.CALL_START_ANOTHER,
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_START_ANOTHER,
           action: =>
             @leave_call ongoing_call_id
             window.setTimeout resolve, 1000
@@ -518,7 +518,7 @@ class z.calling.handler.CallStateHandler
   _join_call: (conversation_id, is_videod) ->
     @call_center.get_call_by_id conversation_id
     .catch (error) ->
-      throw error if error.message isnt z.calling.CallError::TYPE.CALL_NOT_FOUND
+      throw error if error.type isnt z.calling.CallError::TYPE.CALL_NOT_FOUND
     .then =>
       if @call_center.media_stream_handler.has_media_streams()
         @logger.log @logger.levels.INFO, 'MediaStream has already been initialized', @call_center.media_stream_handler.local_media_streams

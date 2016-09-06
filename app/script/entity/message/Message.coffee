@@ -21,12 +21,19 @@ z.entity ?= {}
 
 # Base message entity.
 class z.entity.Message
+  ###
+  Sort messages by timestamp
+  @return [Boolean] Is message of type system
+  ###
+  @sort_by_timestamp: (message_ets) ->
+    message_ets.sort (m1, m2) -> m1.timestamp > m2.timestamp
+
   # Construct a new base message entity.
-  constructor: ->
+  constructor: (id = '0', super_type = '') ->
     @from = ''
-    @id = '0'
+    @id = id
     @primary_key = undefined
-    @super_type = ''
+    @super_type = super_type
     @timestamp = Date.now()
     @type = ''
     @user = ko.observable new z.entity.User()
@@ -47,7 +54,6 @@ class z.entity.Message
 
   ###
   Check if message contains a preview image asset.
-
   @return [Boolean] Message contains a preview image
   ###
   has_asset: ->
@@ -57,7 +63,6 @@ class z.entity.Message
 
   ###
   Check if message contains any image asset.
-
   @return [Boolean] Message contains any image
   ###
   has_asset_image: ->
@@ -67,7 +72,6 @@ class z.entity.Message
 
   ###
   Check if message contains a medium image asset.
-
   @return [Boolean] Message contains a medium image
   ###
   has_asset_medium_image: ->
@@ -77,7 +81,6 @@ class z.entity.Message
 
   ###
   Check if message contains a preview image asset.
-
   @return [Boolean] Message contains a preview image
   ###
   has_asset_preview_image: ->
@@ -87,7 +90,6 @@ class z.entity.Message
 
   ###
   Check if message contains a preview image asset.
-
   @return [Boolean] Message contains a preview image
   ###
   has_asset_file: ->
@@ -97,7 +99,6 @@ class z.entity.Message
 
   ###
   Check if message contains a text asset.
-
   @return [Boolean] Message contains text
   ###
   has_asset_text: ->
@@ -107,7 +108,6 @@ class z.entity.Message
 
   ###
   Check if message contains a nonce.
-
   @return [Boolean] Message contains a nonce
   ###
   has_nonce: ->
@@ -115,7 +115,6 @@ class z.entity.Message
 
   ###
   Check if message is a call message.
-
   @return [Boolean] Is message of type call
   ###
   is_call: ->
@@ -123,7 +122,6 @@ class z.entity.Message
 
   ###
   Check if message is a content message.
-
   @return [Boolean] Is message of type content
   ###
   is_content: ->
@@ -131,7 +129,6 @@ class z.entity.Message
 
   ###
   Check if message is a member message.
-
   @return [Boolean] Is message of type member
   ###
   is_member: ->
@@ -139,7 +136,6 @@ class z.entity.Message
 
   ###
   Check if message is a ping message.
-
   @return [Boolean] Is message of type ping
   ###
   is_ping: ->
@@ -147,7 +143,6 @@ class z.entity.Message
 
   ###
   Check if message is a system message.
-
   @return [Boolean] Is message of type system
   ###
   is_system: ->
@@ -155,7 +150,6 @@ class z.entity.Message
 
   ###
   Check if message is a e2ee message.
-
   @return [Boolean] Is message of type system
   ###
   is_device: ->
@@ -163,7 +157,6 @@ class z.entity.Message
 
   ###
   Check if message is a e2ee message.
-
   @return [Boolean] Is message of type system
   ###
   is_all_verified: ->
@@ -171,7 +164,6 @@ class z.entity.Message
 
   ###
   Check if message is a e2ee message.
-
   @return [Boolean] Is message of type system
   ###
   is_unable_to_decrypt: ->
@@ -179,7 +171,6 @@ class z.entity.Message
 
   ###
   Check if message can be deleted.
-
   @return [Boolean]
   ###
   is_deletable: ->
@@ -188,38 +179,14 @@ class z.entity.Message
 
   ###
   Check if message can be edited.
-
   @return [Boolean]
   ###
   is_editable: ->
     return @has_asset_text() and @user().is_me
 
   ###
-  Triggers event to delete message.
+  Check if message can be reacted to.
+  @return [Boolean]
   ###
-  edit: =>
-    amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.EDIT, @
-
-  ###
-  Triggers event to delete message.
-  ###
-  delete: =>
-    active_conversation = wire.app.repository.conversation.active_conversation()
-    amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
-      action: => amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.DELETE_SELF, active_conversation, @
-
-  ###
-  Triggers event to delete message for everyone.
-  ###
-  delete_everyone: =>
-    active_conversation = wire.app.repository.conversation.active_conversation()
-    amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
-      action: => amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.DELETE_EVERYONE, active_conversation, @
-
-  ###
-  Sort messages by timestamp
-
-  @return [Boolean] Is message of type system
-  ###
-  @sort_by_timestamp: (message_ets) ->
-    message_ets.sort (m1, m2) -> m1.timestamp > m2.timestamp
+  is_reactable: ->
+    return @is_content()

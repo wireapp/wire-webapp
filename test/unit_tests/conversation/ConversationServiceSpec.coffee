@@ -18,7 +18,7 @@
 
 # grunt test_init && grunt test_run:conversation/ConversationService
 
-describe 'Conversation Service', ->
+describe 'z.conversation.ConversationService', ->
   conversation_mapper = null
   server = null
 
@@ -75,11 +75,11 @@ describe 'Conversation Service', ->
     messages = [
       {
         key: "#{conversation_id}@#{sender_id}@1470317275182"
-        object: {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","type":"conversation.otr-message-add","conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a"},"meta":{"timestamp":1470317275182,"version":1},"mapped":{"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"}}
+        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"}
       },
       {
         key: "#{conversation_id}@#{sender_id}@1470317278993"
-        object: {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","type":"conversation.otr-message-add","conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a"},"meta":{"timestamp":1470317278993,"version":1},"mapped":{"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}}
+        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
       }
     ]
     # @formatter:on
@@ -106,95 +106,84 @@ describe 'Conversation Service', ->
 
   describe 'update_message_timestamp_in_db', ->
     # @formatter:off
-    messages = [
-      {
-        key: '35a9a89d-70dc-4d9e-88a2-4d8758458a6a@8b497692-7a38-4a5d-8287-e3d1006577d6@1470317278993'
-        object: {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","type":"conversation.otr-message-add","conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a"},"meta":{"timestamp":1470317278993,"version":1},"mapped":{"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}}
-      }
-    ]
+    event = {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
     # @formatter:on
 
+    it 'returns updated event', (done) ->
+      timestamp = Date.now()
+      time = new Date(timestamp).toISOString()
+      conversation_service.update_message_timestamp_in_db event, timestamp
+      .then (event_json) =>
+        expect(event_json.time).toEqual time
+        done()
+      .catch done.fail
+
+    it 'fails if no timestamp is specified', (done) ->
+      conversation_service.update_message_timestamp_in_db event, undefined
+      .then done.fail
+      .catch (error) ->
+        expect(error).toEqual jasmine.any TypeError
+        done()
+
+  describe 'load_events_from_db', ->
+    conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
+    sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
+    messages = undefined
+
     beforeEach (done) ->
+      messages = [0...10].map (index) ->
+        return {
+          key: "#{conversation_id}@#{sender_id}@#{index}"
+          object: {"conversation": conversation_id, "time": index}
+        }
+
       Promise.all messages.map (message) ->
         return conversation_service.storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
       .then done
       .catch done.fail
 
-    it 'returns updated record', (done) ->
-      timestamp = Date.now()
-      time = new Date(timestamp).toISOString()
-      conversation_service.update_message_timestamp_in_db messages[0].key, timestamp
-      .then (record) =>
-        expect(record.mapped.time).toEqual time
-        expect(record.mapped.data.edited_time).toEqual messages[0].object.mapped.time
-        expect(record.meta.timestamp).toEqual timestamp
-        expect(record.raw.time).toEqual time
-        done()
-      .catch done.fail
-
-    it 'fails if no timestamp is specified', (done) ->
-      conversation_service.update_message_timestamp_in_db messages[0].key, undefined
-      .then done.fail
-      .catch (error) ->
-        expect((error)).toEqual jasmine.any(TypeError)
-        done()
-
-  describe 'load_events_from_db', ->
-    it 'returns an information set about the loaded events even if no records are found', (done) ->
-      conversation_service.load_events_from_db 'invalid_id', 1466549621778, 30
-      .then (loaded_events) =>
-        [events, has_further_events] = loaded_events
+    it 'doesnt load events for invalid conversation id', (done) ->
+      conversation_service.load_events_from_db 'invalid_id', 9, 30
+      .then (events) =>
         expect(events.length).toBe 0
-        expect(has_further_events).toBe false
         done()
 
-    it 'returns conversation events', (done) ->
-      conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
-      sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
+    it 'loads all events', (done) ->
+      conversation_service.load_events_from_db conversation_id
+      .then (events) =>
+        expect(events.length).toBe 10
+        done()
 
-      # @formatter:off
-      messages = [
-        {
-          key: "#{conversation_id}@#{sender_id}@1470317275182"
-          object: {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","type":"conversation.otr-message-add","conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a"},"meta":{"timestamp":1470317275182,"version":1},"mapped":{"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"}}
-        },
-        {
-          key: "#{conversation_id}@#{sender_id}@1470317278993"
-          object: {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","type":"conversation.otr-message-add","conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a"},"meta":{"timestamp":1470317278993,"version":1},"mapped":{"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}}
-        },
-        {
-          key: "#{conversation_id}@#{sender_id}@1470317282495"
-          object: {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:02.495Z","type":"conversation.otr-message-add","conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a"},"meta":{"timestamp":1470317282495,"version":1},"mapped":{"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"2e70c133-afe6-4265-bb4b-e71704529668","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:02.495Z","data":{"content":"Third message","nonce":"2e70c133-afe6-4265-bb4b-e71704529668","previews":[]},"type":"conversation.message-add"}}
-        },
-        {
-          key: "#{conversation_id}@#{sender_id}@1470317310019"
-          object: {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:30.019Z","type":"conversation.otr-message-add","conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a"},"meta":{"timestamp":1470317310019,"version":1},"mapped":{"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"0880f7b9-b8f1-45e4-825e-fa120daa98b2","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:30.019Z","data":{"content":"Fourth message","nonce":"0880f7b9-b8f1-45e4-825e-fa120daa98b2","previews":[]},"type":"conversation.message-add"}}
-        },
-        {
-          key: "#{conversation_id}@#{sender_id}@1470317313389"
-          object: {"raw":{"from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","type":"conversation.otr-message-add","conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a"},"meta":{"timestamp":1470317313389,"version":1},"mapped":{"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","data":{"content":"Fifth message","nonce":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","previews":[]},"type":"conversation.message-add"}}
-        }
-      ]
-      # @formatter:on
+    it 'loads all events with limit', (done) ->
+      conversation_service.load_events_from_db conversation_id, null, null, 5
+      .then (events) =>
+        expect(events.length).toBe 5
+        done()
 
-      promises = []
-      for message in messages
-        promise = conversation_service.storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
-        promises.push promise
+    it 'loads events with start timestamp', (done) ->
+      conversation_service.load_events_from_db conversation_id, 4
+      .then (events) =>
+        expect(events.length).toBe 4
+        expect(events[0].time).toBe 3
+        expect(events[1].time).toBe 2
+        expect(events[2].time).toBe 1
+        expect(events[3].time).toBe 0
+        done()
 
-      Promise.all promises
-      .then =>
-        limit = 4
-        conversation_service.load_events_from_db conversation_id, undefined, limit
-        .then (loaded_events) =>
-          [events, has_further_events] = loaded_events
-          expect(events.length).toBe limit
-          expect(has_further_events).toBe true
-          expect(events[0].meta.timestamp).toBe messages[messages.length - 1].object.meta.timestamp
-          expect(events[1].meta.timestamp).toBe messages[messages.length - 2].object.meta.timestamp
-          expect(events[2].meta.timestamp).toBe messages[messages.length - 3].object.meta.timestamp
-          expect(events[3].meta.timestamp).toBe messages[messages.length - limit].object.meta.timestamp
-          done()
+    it 'loads events with start and end timestamp', (done) ->
+      conversation_service.load_events_from_db conversation_id, 8, 6
+      .then (events) =>
+        expect(events.length).toBe 1
+        expect(events[0].time).toBe 7
+        done()
+
+    it 'loads events with start and end timestamp', (done) ->
+      conversation_service.load_events_from_db conversation_id, 8, 1, 2
+      .then (events) =>
+        expect(events.length).toBe 2
+        expect(events[0].time).toBe 7
+        expect(events[1].time).toBe 6
+        done()
 
   describe 'save_conversation_in_db', ->
     it 'saves a conversation', (done) ->
@@ -206,3 +195,52 @@ describe 'Conversation Service', ->
       .then (conversation_record) =>
         expect(conversation_record.name()).toBe conversation_payload.name
         done()
+
+  describe 'delete_message_with_key_from_db', ->
+
+    conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
+    sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
+
+    # @formatter:off
+    messages = [
+      {
+        key: "#{conversation_id}@#{sender_id}@1470317275182"
+        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"}
+      },
+      {
+        key: "#{conversation_id}@#{sender_id}@1470317278993"
+        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
+      },
+
+      {
+        key: "#{conversation_id}@#{sender_id}@1470317278994"
+        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message (Duplicate)","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
+      }
+    ]
+    # @formatter:on
+
+    beforeEach (done) ->
+      Promise.all messages.map (message) ->
+        return conversation_service.storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
+      .then done
+      .catch done.fail
+
+    it 'deletes message with the given key', (done) ->
+      conversation_service.delete_message_with_key_from_db conversation_id, messages[1].key
+      .then ->
+        conversation_service.load_events_from_db conversation_id
+      .then (events) ->
+        expect(events.length).toBe 2
+        for event in events
+          expect(event.data.content).not.toBe messages[1].object.data.content
+        done()
+      .catch done.fail
+
+    it 'does not delete if event if key is wrong', (done) ->
+      conversation_service.delete_message_with_key_from_db conversation_id, 'wrongKey'
+      .then ->
+        conversation_service.load_events_from_db conversation_id
+      .then (events) ->
+        expect(events.length).toBe 3
+        done()
+      .catch done.fail

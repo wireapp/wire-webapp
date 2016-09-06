@@ -195,53 +195,71 @@ class z.conversation.ConversationService
       callback: callback
 
   ###
-  Delete events from a conversation.
+  Delete a message from a conversation with the given primary.
 
-  @param message_id [String] ID of conversation to remove message from
-  @param primary_key [String] ID of the actual message
+  @param conversation_id [String] ID of conversation to remove message from
+  @param message_id [String] ID of the actual message
+  @return [Promise] Resolves with the number of deleted records
+  ###
+  delete_message_with_key_from_db: (conversation_id, primary_key) ->
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS].delete primary_key
+
+  ###
+  Delete a message from a conversation. Duplicates are delete as well.
+
+  @param conversation_id [String] ID of conversation to remove message from
+  @param message_id [String] ID of the actual message
   @return [Promise] Resolves with the number of deleted records
   ###
   delete_message_from_db: (conversation_id, message_id) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-    .where 'raw.conversation'
+    .where 'conversation'
     .equals conversation_id
-    .and (record) -> record.mapped?.id is message_id
+    .and (record) -> record.id is message_id
     .delete()
 
   ###
-  Delete events from a conversation.
-
-  @param conversation_id [String] delete message for this conversation
+  Delete all message of a conversation.
+  @param conversation_id [String] Delete messages for this conversation
   ###
   delete_messages_from_db: (conversation_id) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-    .where 'raw.conversation'
+    .where 'conversation'
     .equals conversation_id
     .delete()
 
   ###
   Update events timestamp.
-
-  @param primary_key [String] Primary key used to find an event in the database
-  @param timestamp [Number]
+  @param event_json [JSON] Message event to update in the database
+  @param timestamp [Number] Updated timestamp
   ###
-  update_message_timestamp_in_db: (primary_key, timestamp) ->
-    updated_record = undefined
+  update_message_timestamp_in_db: (event_json, timestamp) ->
     Promise.resolve()
-    .then ->
-      if not timestamp?
+    .then =>
+      if timestamp
+        primary_key = z.storage.StorageService.construct_primary_key event_json
+        changes =
+          time: new Date(timestamp).toISOString()
+        return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
+      else
         throw new TypeError 'Missing timestamp'
     .then =>
-      @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
-    .then (record) =>
-      record.mapped.data.edited_time = record.mapped.time
-      record.mapped.time = record.raw.time = new Date(timestamp).toISOString()
-      record.meta.timestamp = timestamp
-      updated_record = record
-      @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
+      event_json.time = new Date(timestamp).toISOString()
+      @logger.log @logger.levels.INFO, "Updated time of message '#{event_json.id}' to '#{event_json.time}'", event_json
+      return event_json
+
+  ###
+  Update events reactions.
+  @param primary_key [String] Primary key of message event to update in the database
+  @param reactions [Object] Updated reactions
+  ###
+  update_message_reactions_in_db: (primary_key, reactions) ->
+    Promise.resolve()
     .then =>
-      @logger.log 'Updated message_et timestamp', primary_key
-      return updated_record
+      if reactions
+        @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, {reactions: reactions}
+      else
+        throw new TypeError 'Missing reactions'
 
   ###
   Delete events from a conversation.
@@ -251,10 +269,10 @@ class z.conversation.ConversationService
   update_asset_as_uploaded_in_db: (primary_key, asset_data) ->
     @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
     .then (record) =>
-      record.mapped.data.id = asset_data.id
-      record.mapped.data.otr_key = asset_data.otr_key
-      record.mapped.data.sha256 = asset_data.sha256
-      record.mapped.data.status = z.assets.AssetTransferState.UPLOADED
+      record.data.id = asset_data.id
+      record.data.otr_key = asset_data.otr_key
+      record.data.sha256 = asset_data.sha256
+      record.data.status = z.assets.AssetTransferState.UPLOADED
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
       @logger.log 'Updated asset message_et (uploaded)', primary_key
@@ -267,9 +285,9 @@ class z.conversation.ConversationService
   update_asset_preview_in_db: (primary_key, asset_data) ->
     @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
     .then (record) =>
-      record.mapped.data.preview_id = asset_data.id
-      record.mapped.data.preview_otr_key = asset_data.otr_key
-      record.mapped.data.preview_sha256 = asset_data.sha256
+      record.data.preview_id = asset_data.id
+      record.data.preview_otr_key = asset_data.otr_key
+      record.data.preview_sha256 = asset_data.sha256
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
       @logger.log 'Updated asset message_et (preview)', primary_key
@@ -282,15 +300,15 @@ class z.conversation.ConversationService
   update_asset_as_failed_in_db: (primary_key, reason) ->
     @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
     .then (record) =>
-      record.mapped.data.status = z.assets.AssetTransferState.UPLOAD_FAILED
-      record.mapped.data.reason = reason
+      record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED
+      record.data.reason = reason
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
       @logger.log 'Updated asset message_et (failed)', primary_key
 
   ###
   Loads conversation states from the local database.
-
+  @return [Promise] Promise that resolves with all the stored conversation states
   ###
   load_conversation_states_from_db: =>
     return new Promise (resolve, reject) =>
@@ -311,9 +329,9 @@ class z.conversation.ConversationService
   load_event_from_db: (conversation_id, message_id) ->
     return new Promise (resolve, reject) =>
       @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where 'raw.conversation'
+      .where 'conversation'
       .equals conversation_id
-      .filter (record) -> record.mapped?.id is message_id
+      .filter (record) -> record.id is message_id
       .first()
       .then (record) ->
         resolve record
@@ -323,52 +341,33 @@ class z.conversation.ConversationService
         reject error
 
   ###
-  Load conversation events.
+  Load conversation events. Start and end are not included.
+  Events are always sorted beginning with the newest timestamp.
 
   @param conversation_id [String] ID of conversation
-  @param offset [String] Timestamp that loaded events have to undercut
+  @param start [Number] starting from this timestamp
+  @param end [Number] stop when reaching timestamp
   @param limit [Number] Amount of events to load
-  @return [Promise] Promise that resolves with the retrieved records ([events, has_further_events])
-  ###
-  load_events_from_db: (conversation_id, offset, limit = z.config.MESSAGES_FETCH_LIMIT) ->
-    return new Promise (resolve, reject) =>
-      @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where 'raw.conversation'
-      .equals conversation_id
-      .reverse()
-      .sortBy 'meta.timestamp'
-      .then (records) ->
-        records = (record for record in records when record.meta.timestamp < offset) if offset
-        has_further_events = records.length > limit
-        resolve [records.slice(0, limit), has_further_events]
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR,
-          "Failed to get events for conversation '#{conversation_id}': #{error.message}", error
-        reject error
-
-  ###
-  Load all unread events of a conversation.
-
-  @param conversation_et [z.entity.Conversation] Conversation entity
-  @param offset [String] Timestamp that loaded events have to undercut
   @return [Promise] Promise that resolves with the retrieved records
   ###
-  load_unread_events_from_db: (conversation_et, offset) ->
-    return new Promise (resolve, reject) =>
-      conversation_id = conversation_et.id
-      @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where 'raw.conversation'
-      .equals conversation_id
-      .reverse()
-      .sortBy 'raw.time'
-      .then (records) ->
-        records = (record for record in records when record.meta.timestamp < offset) if offset
-        records = (record for record in records when record.meta.timestamp > conversation_et.last_read_timestamp())
-        resolve records
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR,
-          "Failed to get unread events for conversation '#{conversation_et.id}': #{error.message}", error
-        reject error
+  load_events_from_db: (conversation_id, start, end, limit) ->
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where 'conversation'
+    .equals conversation_id
+    .reverse()
+    .sortBy 'time'
+    .then (records) ->
+      return records.filter (record) ->
+        timestamp = new Date(record.time).getTime()
+        return false if start and timestamp >= start
+        return false if end and timestamp <= end
+        return true
+    .then (records) ->
+      return records.slice 0, limit
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR,
+        "Failed to get events for conversation '#{conversation_id}': #{error.message}", error
+      throw error
 
   ###
   Add users to an existing conversation.
@@ -397,16 +396,20 @@ class z.conversation.ConversationService
     }
   }
 
-  @param conversation_id [String] ID of conversation to send message in
+  @note Options for the precondition check on missing clients are:
+    'false' - all clients, 'Array<String>' - only clients of listed users, 'true' - force sending  @param conversation_id [String] ID of conversation to send message in
   @param payload [Object] Payload to be posted
   @option [OtrRecipients] recipients Map with per-recipient data
   @option [String] sender Client ID of the sender
-  @param force_sending [Boolean] Should the backend ignore missing clients
+  @param precondition_option [Array<String>|Boolean] Level that backend checks for missing clients
   @return [Promise] Promise that resolve when the message was sent
   ###
-  post_encrypted_message: (conversation_id, payload, force_sending) ->
+  post_encrypted_message: (conversation_id, payload, precondition_option) ->
     url = @client.create_url "/conversations/#{conversation_id}/otr/messages"
-    url = "#{url}?ignore_missing=true" if force_sending
+    if _.isArray precondition_option
+      url = "#{url}?report_missing=#{precondition_option.join ','}"
+    else if precondition_option
+      url = "#{url}?ignore_missing=true"
 
     @client.send_json
       url: url

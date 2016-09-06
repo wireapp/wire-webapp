@@ -51,7 +51,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       mapper.map_generic_message generic_message, event
       .then (event_json) ->
         expect(_.isObject event_json).toBeTruthy()
-        expect(event_json.type).toBe z.event.Backend.CONVERSATION.ASSET_META
+        expect(event_json.type).toBe z.event.Client.CONVERSATION.ASSET_META
         expect(event_json.conversation).toBe event.conversation
         expect(event_json.from).toBe event.from
         expect(event_json.time).toBe event.time
@@ -74,7 +74,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       mapper.map_generic_message generic_message, event
       .then (event_json) ->
         expect(_.isObject event_json).toBeTruthy()
-        expect(event_json.type).toBe z.event.Backend.CONVERSATION.ASSET_META
+        expect(event_json.type).toBe z.event.Client.CONVERSATION.ASSET_META
         expect(event_json.conversation).toBe event.conversation
         expect(event_json.from).toBe event.from
         expect(event_json.time).toBe event.time
@@ -102,7 +102,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       mapper.map_generic_message generic_message, event
       .then (event_json) ->
         expect(_.isObject event_json).toBeTruthy()
-        expect(event_json.type).toBe z.event.Backend.CONVERSATION.ASSET_UPLOAD_COMPLETE
+        expect(event_json.type).toBe z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE
         expect(event_json.conversation).toBe event.conversation
         expect(event_json.from).toBe event.from
         expect(event_json.time).toBe event.time
@@ -121,7 +121,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       mapper.map_generic_message generic_message, event
       .then (event_json) ->
         expect(_.isObject event_json).toBeTruthy()
-        expect(event_json.type).toBe z.event.Backend.CONVERSATION.ASSET_UPLOAD_FAILED
+        expect(event_json.type).toBe z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED
         expect(event_json.conversation).toBe event.conversation
         expect(event_json.from).toBe event.from
         expect(event_json.time).toBe event.time
@@ -140,7 +140,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       mapper.map_generic_message generic_message, event
       .then (event_json) ->
         expect(_.isObject event_json).toBeTruthy()
-        expect(event_json.type).toBe z.event.Backend.CONVERSATION.ASSET_UPLOAD_FAILED
+        expect(event_json.type).toBe z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED
         expect(event_json.conversation).toBe event.conversation
         expect(event_json.from).toBe event.from
         expect(event_json.time).toBe event.time
@@ -170,7 +170,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       mapper.map_generic_message generic_message, event
       .then (event_json) ->
         expect(_.isObject event_json).toBeTruthy()
-        expect(event_json.type).toBe z.event.Backend.CONVERSATION.ASSET_PREVIEW
+        expect(event_json.type).toBe z.event.Client.CONVERSATION.ASSET_PREVIEW
         expect(event_json.conversation).toBe event.conversation
         expect(event_json.from).toBe event.from
         expect(event_json.time).toBe event.time
@@ -208,7 +208,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       mapper.map_generic_message generic_message, event
       .then (event_json) ->
         expect(_.isObject event_json).toBeTruthy()
-        expect(event_json.type).toBe z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
+        expect(event_json.type).toBe z.event.Client.CONVERSATION.MESSAGE_HIDDEN
         expect(event_json.conversation).toBe event.conversation
         expect(event_json.from).toBe event.from
         expect(event_json.time).toBe event.time
@@ -226,7 +226,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       mapper.map_generic_message generic_message, event
       .then (event_json) ->
         expect(_.isObject event_json).toBeTruthy()
-        expect(event_json.type).toBe z.event.Backend.CONVERSATION.MESSAGE_DELETE
+        expect(event_json.type).toBe z.event.Client.CONVERSATION.MESSAGE_DELETE
         expect(event_json.conversation).toBe event.conversation
         expect(event_json.from).toBe event.from
         expect(event_json.time).toBe event.time
@@ -327,6 +327,24 @@ describe 'z.cryptography.CryptographyMapper', ->
         done()
       .catch done.fail
 
+    it 'resolves with a mapped reaction message', (done) ->
+      message_id = z.util.create_random_uuid()
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'reaction', new z.proto.Reaction '💖', message_id
+
+      mapper.map_generic_message generic_message, event
+      .then (event_json) ->
+        expect(_.isObject event_json).toBeTruthy()
+        expect(event_json.type).toBe z.event.Client.CONVERSATION.REACTION
+        expect(event_json.conversation).toBe event.conversation
+        expect(event_json.from).toBe event.from
+        expect(event_json.time).toBe event.time
+        expect(event_json.id).toBe generic_message.message_id
+        expect(event_json.data.message_id).toBe message_id
+        expect(event_json.data.reaction).toBe '💖'
+        done()
+      .catch done.fail
+
     it 'resolves with a mapped text message', (done) ->
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'text', new z.proto.Text 'Unit test'
@@ -349,12 +367,12 @@ describe 'z.cryptography.CryptographyMapper', ->
       .then done.fail
       .catch (error) ->
         expect(error instanceof z.cryptography.CryptographyError).toBeTruthy()
-        expect(error.type).toBe z.cryptography.CryptographyError::TYPE.MISSING_MESSAGE
+        expect(error.type).toBe z.cryptography.CryptographyError::TYPE.NO_GENERIC_MESSAGE
         done()
 
     it 'rejects with an error for an unhandled generic message type', (done) ->
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'liking', z.proto.LikeAction.LIKE
+      generic_message.set 'calling', new z.proto.Calling 'Test'
 
       mapper.map_generic_message generic_message, {id: 'ABC'}
       .then done.fail
@@ -421,7 +439,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       mapper.map_generic_message generic_message, event
       .then (event_json) ->
         expect(_.isObject event_json).toBeTruthy()
-        expect(event_json.type).toBe z.event.Backend.CONVERSATION.LOCATION
+        expect(event_json.type).toBe z.event.Client.CONVERSATION.LOCATION
         expect(event_json.conversation).toBe event.conversation
         expect(event_json.from).toBe event.from
         expect(event_json.time).toBe event.time
@@ -431,5 +449,22 @@ describe 'z.cryptography.CryptographyMapper', ->
         expect(event_json.data.location.name).toBe generic_message.location.name
         expect(event_json.data.location.zoom).toBe generic_message.location.zoom
         expect(event_json.data.nonce).toBe generic_message.message_id
+        done()
+      .catch done.fail
+
+    it 'resolves with a mapped reaction message', (done) ->
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'reaction', new z.proto.Reaction z.message.ReactionType.LIKE, generic_message.message_id
+
+      mapper.map_generic_message generic_message, event
+      .then (event_json) ->
+        expect(_.isObject event_json).toBeTruthy()
+        expect(event_json.type).toBe z.event.Client.CONVERSATION.REACTION
+        expect(event_json.conversation).toBe event.conversation
+        expect(event_json.from).toBe event.from
+        expect(event_json.time).toBe event.time
+        expect(event_json.id).toBe generic_message.message_id
+        expect(event_json.data.message_id).toBe generic_message.message_id
+        expect(event_json.data.reaction).toBe z.message.ReactionType.LIKE
         done()
       .catch done.fail

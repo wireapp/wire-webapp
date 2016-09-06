@@ -258,11 +258,13 @@ class z.tracking.EventTrackingRepository
       if _.isObject error
         window.onerror.call @, error.message, error.fileName, error.lineNumber, error.columnNumber, error
       else
-        window.onerror.call @, error, undefined, undefined, undefined, error
+        window.onerror.call @, error, null, null, null
 
-      promise = event.promise
-      if promise
-        promise.catch => @logger.log @logger.levels.OFF, 'Handled uncaught Promise in error reporting'
+      rejected_promise = event.promise
+      if rejected_promise
+        window.setTimeout =>
+          rejected_promise.catch (error) => @logger.log @logger.levels.OFF, 'Handled uncaught Promise in error reporting', error
+        , 0
 
   _detach_promise_rejection_handler: ->
     window.onunhandledrejection = undefined

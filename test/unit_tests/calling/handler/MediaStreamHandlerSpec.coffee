@@ -90,7 +90,7 @@ describe 'z.calling.handler.MediaStreamHandler', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.calling.CallError
-        expect(error.message).toBe z.calling.CallError::TYPE.NO_AUDIO_STREAM_FOUND
+        expect(error.type).toBe z.calling.CallError::TYPE.NO_AUDIO_STREAM_FOUND
         done()
 
 

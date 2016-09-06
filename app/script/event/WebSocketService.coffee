@@ -111,7 +111,8 @@ class z.event.WebSocketService
   ###
   reconnect: (trigger) =>
     if not z.storage.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION
-      @logger.log @logger.levels.INFO, 'Access token has to be refreshed before reconnecting the WebSocket'
+      @logger.log @logger.levels.INFO, "Access token has to be refreshed before reconnecting the WebSocket triggered by '#{trigger}'"
+      amplify.unsubscribeAll z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED
       amplify.subscribe z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED, => @pending_reconnect trigger
       return amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW
 
@@ -121,13 +122,13 @@ class z.event.WebSocketService
       @connect @on_notification
       .then =>
         @reconnect_count = 0
-        @logger.log @logger.levels.INFO, "Reconnected to WebSocket triggered by '#{trigger}'"
+        @logger.log @logger.levels.INFO, "Reconnect to WebSocket triggered by '#{trigger}'"
         @on_socket_reconnected()
 
     if @reconnect_count is 1
       reconnect()
     else
-      @reconnect_timeout_id = setTimeout ->
+      @reconnect_timeout_id = window.setTimeout ->
         reconnect()
       , RECONNECT_INTERVAL
 
@@ -145,7 +146,7 @@ class z.event.WebSocketService
       window.clearInterval @ping_interval_id
       window.clearTimeout @reconnect_timeout_id
     if reconnect
-      amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
+      amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
       @reconnect trigger
 
   # Send a WebSocket ping.
@@ -170,7 +171,7 @@ class z.event.WebSocketService
   @param trigger [z.event.WebSocketService::CHANGE_TRIGGER] Trigger of the reconnect
   ###
   on_socket_reconnected: =>
-    amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
+    amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
     @logger.log @logger.levels.WARN, 'Re-established WebSocket connection. Recovering from Notification Stream...'
     amplify.publish z.event.WebApp.CONNECTION.ONLINE
 
@@ -179,7 +180,7 @@ class z.event.WebSocketService
   @param trigger [z.event.WebSocketService::CHANGE_TRIGGER] Trigger of the connection close
   ###
   on_socket_closed: (trigger) ->
-    amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
+    amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
     error = new Error "WebSocket connection lost: #{trigger}"
     custom_data =
       network_status: navigator.onLine

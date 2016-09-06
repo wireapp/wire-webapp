@@ -17,13 +17,25 @@
 #
 
 window.z ?= {}
-z.storage ?= {}
+z.conversation ?= {}
 
-class z.storage.SkipError
-  constructor: (message) ->
+class z.conversation.ConversationError
+  constructor: (type) ->
     @name = @constructor.name
-    @message = message
     @stack = (new Error()).stack
+    @type = type or z.conversation.ConversationError::TYPE.UNKNOWN
+
+    @message = switch @type
+      when z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+        'Message not found'
+      when z.conversation.ConversationError::TYPE.WRONG_USER
+        'Wrong user tried to change or delete a message'
+      else
+        'Unknown ConversationError'
 
   @:: = new Error()
   @::constructor = @
+  @::TYPE =
+    MESSAGE_NOT_FOUND: 'z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND'
+    WRONG_USER: 'z.conversation.ConversationError::TYPE.WRONG_USER'
+    UNKNOWN: 'z.conversation.ConversationError::TYPE.UNKNOWN'

@@ -49,7 +49,7 @@ class z.ViewModel.ModalsViewModel
 
     @modals = {}
 
-    amplify.subscribe z.event.WebApp.WARNINGS.MODAL, @show_modal
+    amplify.subscribe z.event.WebApp.WARNING.MODAL, @show_modal
 
     ko.applyBindings @, document.getElementById element_id
 

@@ -20,11 +20,20 @@ window.z ?= {}
 z.auth ?= {}
 
 class z.auth.AccessTokenError
-  constructor: (message, type) ->
+  constructor: (type) ->
     @name = @constructor.name
-    @message = message
-    @type = type
     @stack = (new Error()).stack
+    @type = type or z.auth.AccessTokenError::UNKNOWN
+
+    @message = switch @type
+      when z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE
+        'No cached access token found in Local Storage'
+      when z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
+        'Access Token request already in progress'
+      when z.auth.AccessTokenError::TYPE.REQUEST_FAILED
+        'Request to POST for access token failed'
+      when z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
+        'Request to POST for access token forbidden'
 
   @:: = new Error()
   @::constructor = @

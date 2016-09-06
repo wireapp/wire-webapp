@@ -20,19 +20,33 @@ window.z ?= {}
 z.event ?= {}
 
 class z.event.EventError
-  constructor: (message, type) ->
+  constructor: (type) ->
     @name = @constructor.name
-    @message = message
+    @type = type or z.event.EventError::TYPE.UNKNOWN
     @stack = (new Error()).stack
-    @type = type
+
+    @message = switch @type
+      when z.event.EventError::TYPE.DATABASE_FAILURE
+        'Event related database transaction failure'
+      when z.event.EventError::TYPE.DEPRECATED_SCHEMA
+        'Event type is deprecated'
+      when z.event.EventError::TYPE.NO_CLIENT_ID
+        'Missing client id'
+      when z.event.EventError::TYPE.NO_LAST_ID
+        'Last notification ID not found in storage'
+      when z.event.EventError::TYPE.NO_NOTIFICATIONS
+        'No notifications found'
+      when z.event.EventError::TYPE.REQUEST_FAILURE
+        'Event related backend request failure'
+      else
+        'Unknown EventError'
 
   @:: = new Error()
   @::constructor = @
   @::TYPE =
     DATABASE_FAILURE: 'z.event.EventError::TYPE.DATABASE_FAILURE'
-    DATABASE_NOT_FOUND: 'z.event.EventError::TYPE.DATABASE_NOT_FOUND'
-    LAST_ID_NOT_SPECIFIED: 'z.event.EventError::TYPE.LAST_ID_NOT_SPECIFIED'
-    MISSING_CLIENT_ID: 'z.event.EventError::TYPE.MISSING_CLIENT_ID'
+    DEPRECATED_SCHEMA: 'z.event.EventError::TYPE.DEPRECATED_SCHEMA'
+    NO_CLIENT_ID: 'z.event.EventError::TYPE.NO_CLIENT_ID'
+    NO_LAST_ID: 'z.event.EventError::TYPE.NO_LAST_ID'
     NO_NOTIFICATIONS: 'z.event.EventError::TYPE.NO_NOTIFICATIONS'
     REQUEST_FAILURE: 'z.event.EventError::TYPE.REQUEST_FAILURE'
-    OUTDATED_SCHEMA: 'Outdated event schema'

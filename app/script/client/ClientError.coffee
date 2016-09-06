@@ -20,11 +20,32 @@ window.z ?= {}
 z.client ?= {}
 
 class z.client.ClientError
-  constructor: (message, type) ->
+  constructor: (type) ->
     @name = @constructor.name
-    @message = message
-    @type = type
     @stack = (new Error()).stack
+    @type = type or z.client.ClientError::TYPE.UNKNOWN
+
+    @message = switch @type
+      when z.client.ClientError::TYPE.CLIENT_NOT_SET
+        'Local client is not yet set'
+      when z.client.ClientError::TYPE.DATABASE_FAILURE
+        'Client related database transaction failed'
+      when z.client.ClientError::TYPE.MISSING_ON_BACKEND
+        'Local client does not exist on backend'
+      when z.client.ClientError::TYPE.NO_CLIENT_ID
+        'Client ID is not defined'
+      when z.client.ClientError::TYPE.NO_LOCAL_CLIENT
+        'No local client found in database'
+      when z.client.ClientError::TYPE.NO_USER_ID
+        'User ID is not defined'
+      when z.client.ClientError::TYPE.REQUEST_FAILURE
+        'Client related backend request failed'
+      when z.client.ClientError::TYPE.REQUEST_FORBIDDEN
+        'Client related backend request forbidden'
+      when z.client.ClientError::TYPE.TOO_MANY_CLIENTS
+        'User has reached the maximum of allowed clients'
+      else
+        'Unknown ClientError'
 
   @:: = new Error()
   @::constructor = @
@@ -38,4 +59,5 @@ class z.client.ClientError
     REQUEST_FAILURE: 'z.client.ClientError::TYPE.REQUEST_FAILURE'
     REQUEST_FORBIDDEN: 'z.client.ClientError::TYPE.REQUEST_FORBIDDEN'
     TOO_MANY_CLIENTS: 'z.client.ClientError::TYPE.TOO_MANY_CLIENTS'
+    UNKNOWN: 'z.client.ClientError::TYPE.UNKNOWN'
   }

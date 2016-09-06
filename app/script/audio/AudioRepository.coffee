@@ -90,10 +90,13 @@ class z.audio.AudioRepository
       @logger.log @logger.levels.INFO, "Playing sound '#{audio_id}' (loop: '#{play_in_loop}')", audio_element
     .catch (error) =>
       switch error.type
-        when z.audio.AudioError::TYPE.FAILED_TO_PLAY
-          @logger.log @logger.levels.ERROR, "Failed playing sound '#{audio_id}': #{error.message}"
         when z.audio.AudioError::TYPE.NOT_FOUND
           @logger.log @logger.levels.ERROR, "Could not find sound '#{audio_id}'"
+        when z.audio.AudioError::TYPE.ALREADY_PLAYING
+          @logger.log @logger.levels.WARN, "Skipped already playing sound '#{audio_id}'"
+        else
+          @logger.log @logger.levels.ERROR, "Failed playing sound '#{audio_id}': #{error.message}"
+          throw error
 
   ###
   Stop playback of a sound.
@@ -108,6 +111,7 @@ class z.audio.AudioRepository
       delete @currently_looping[audio_id] if @currently_looping[audio_id]
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Failed stopping sound '#{audio_id}': #{error.message}", audio_element
+      throw error
 
   ###
   Check if sound should be played with current setting.
@@ -118,9 +122,9 @@ class z.audio.AudioRepository
   _check_sound_setting: (audio_id) ->
     return new Promise (resolve, reject) =>
       if @sound_setting() is z.audio.AudioSetting.NONE and audio_id not in z.audio.AudioPlayingType.NONE
-        reject new z.audio.AudioError 'Ignored request to play sound: z.audio.AudioPlayingType.NONE', z.audio.AudioError::TYPE.IGNORED_SOUND
+        reject new z.audio.AudioError z.audio.AudioError::TYPE.IGNORED_SOUND
       else if @sound_setting() is z.audio.AudioSetting.SOME and audio_id not in z.audio.AudioPlayingType.SOME
-        reject new z.audio.AudioError 'Ignored request to play sound: z.audio.AudioPlayingType.SOME', z.audio.AudioError::TYPE.IGNORED_SOUND
+        reject new z.audio.AudioError z.audio.AudioError::TYPE.IGNORED_SOUND
       else
         resolve()
 
@@ -146,7 +150,7 @@ class z.audio.AudioRepository
       if @audio_elements[audio_id]
         resolve @audio_elements[audio_id]
       else
-        reject new z.audio.AudioError 'Audio not found', z.audio.AudioError::TYPE.NOT_FOUND
+        reject new z.audio.AudioError z.audio.AudioError::TYPE.NOT_FOUND
 
   ###
   Initialize all sounds.
@@ -166,7 +170,7 @@ class z.audio.AudioRepository
   ###
   _play: (audio_id, audio_element, play_in_loop = false) ->
     if not audio_id or not audio_element
-      return Promise.reject new z.audio.AudioError 'Missing AudioElement or ID', z.audio.AudioError::TYPE.NOT_FOUND
+      return Promise.reject new z.audio.AudioError z.audio.AudioError::TYPE.NOT_FOUND
 
     return new Promise (resolve, reject) =>
       if audio_element.paused
@@ -179,12 +183,12 @@ class z.audio.AudioRepository
           resolve audio_element
 
         if play_promise
-          play_promise.then(_play_success).catch (error) ->
-            reject new z.audio.AudioError error.message, z.audio.AudioError::TYPE.FAILED_TO_PLAY
+          play_promise.then(_play_success).catch ->
+            reject new z.audio.AudioError z.audio.AudioError::TYPE.FAILED_TO_PLAY
         else
           _play_success()
       else
-        reject new z.audio.AudioError 'Sound is already playing', z.audio.AudioError::TYPE.ALREADY_PLAYING
+        reject new z.audio.AudioError z.audio.AudioError::TYPE.ALREADY_PLAYING
 
   ###
   Preload all sounds for immediate playback.

@@ -142,7 +142,7 @@ class z.ViewModel.ConversationInputViewModel
   upload_files: (files) =>
     pending_uploads = @conversation_repository.get_number_of_pending_uploads()
     if pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS
-      amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.UPLOAD_PARALLEL,
+      amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_PARALLEL,
         data: z.config.MAXIMUM_ASSET_UPLOADS
       return
 
@@ -152,7 +152,7 @@ class z.ViewModel.ConversationInputViewModel
           {size: file.size, type: file.type}
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT
         setTimeout ->
-          amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.UPLOAD_TOO_LARGE,
+          amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_TOO_LARGE,
             data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE)
         , 200
         return
@@ -177,7 +177,7 @@ class z.ViewModel.ConversationInputViewModel
     @list_not_bottom not is_scrolled_bottom
 
   on_window_click: (event) =>
-    return if $(event.target).closest(".conversation-input").length
+    return if $(event.target).closest('.conversation-input').length
     @cancel_edit()
 
   on_input_click: =>
@@ -188,7 +188,7 @@ class z.ViewModel.ConversationInputViewModel
     message = z.util.trim_line_breaks @input()
 
     if message.length > z.config.MAXIMUM_MESSAGE_LENGTH
-      amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.TOO_LONG_MESSAGE,
+      amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_LONG_MESSAGE,
         data: z.config.MAXIMUM_MESSAGE_LENGTH
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CHARACTER_LIMIT_REACHED,
         characters: message.length

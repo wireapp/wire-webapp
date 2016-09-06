@@ -17,21 +17,9 @@
 #
 
 window.z ?= {}
-z.message ?= {}
+z.event ?= {}
 
-###
-Enum for different message super types.
-###
-z.message.SuperType =
-  ALL_VERIFIED: 'all-verified'
-  CALL: 'call'
-  CONTENT: 'normal'
-  DELETE: 'delete'
-  DEVICE: 'device'
-  LOCATION: 'location'
-  MEMBER: 'member'
-  PING: 'ping'
-  REACTION: 'reaction'
-  SPECIAL: 'special'
-  SYSTEM: 'system'
-  UNABLE_TO_DECRYPT: 'unable-to-decrypt'
+z.event.NotificationHandlingState =
+  STREAM: 'z.event.NotificationHandlingState.STREAM'
+  RECOVERY: 'z.event.NotificationHandlingState.RECOVERY'
+  WEB_SOCKET: 'z.event.NotificationHandlingState.WEB_SOCKET'

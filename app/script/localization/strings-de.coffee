@@ -138,6 +138,7 @@ z.string.de.call_banner_outgoing = 'Rufe %@.first_name an'
 # Warnings
 z.string.de.modal_button_cancel = 'Abbrechen'
 z.string.de.modal_button_ok = 'Ok'
+z.string.de.modal_button_send = 'Senden'
 
 # Block a user
 z.string.de.modal_block_conversation_headline = '%@.name blockieren?'
@@ -157,9 +158,9 @@ z.string.de.modal_call_second_incoming_headline = 'Anruf annehmen?'
 z.string.de.modal_call_second_incoming_message = 'Dein aktueller Anruf wird beendet.'
 z.string.de.modal_call_second_incoming_action = 'Annehmen'
 # Second ongoing call
-z.string.modal_call_second_ongoing_headline = 'Anruf auf einem anderen Gerät beenden?'
-z.string.modal_call_second_ongoing_message = 'Nur ein zeitgleicher Anruf möglich.'
-z.string.modal_call_second_ongoing_action = 'Beenden'
+z.string.de.modal_call_second_ongoing_headline = 'Anruf auf einem anderen Gerät beenden?'
+z.string.de.modal_call_second_ongoing_message = 'Nur ein zeitgleicher Anruf möglich.'
+z.string.de.modal_call_second_ongoing_action = 'Beenden'
 # Second outgoing call
 z.string.de.modal_call_second_outgoing_headline = 'Aktuellen Anruf beenden?'
 z.string.de.modal_call_second_outgoing_message = 'Nur ein zeitgleicher Anruf möglich.'
@@ -194,7 +195,7 @@ z.string.de.modal_leave_conversation_message = 'Die Personen werden benachrichti
 z.string.de.modal_leave_conversation_button = 'Verlassen'
 # Logout
 z.string.de.modal_logout_headline = 'Daten löschen?'
-z.string.de.modal_logout_message = 'Dies entfernt alle deine persönlichen Informationen und Unterhaltungen von diesem Gerät.'
+z.string.de.modal_logout_message = 'Deine persönlichen Daten und Unterhaltungen vollständig von diesem Gerät entfernen.'
 z.string.de.modal_logout_button = 'Abmelden'
 # New device
 z.string.de.modal_new_device_headline = '"%@.name" hat begonnen ein neues Gerät zu nutzen'
@@ -272,6 +273,8 @@ z.string.de.conversation_context_menu_edit = 'Bearbeiten'
 z.string.de.conversation_context_menu_delete = 'Für mich löschen'
 z.string.de.conversation_context_menu_delete_everyone = 'Für alle löschen'
 z.string.de.conversation_context_menu_download = 'Herunterladen'
+z.string.de.conversation_context_menu_like = 'Gefällt mir'
+z.string.de.conversation_context_menu_unlike = 'Gefällt mir nicht'
 z.string.de.conversation_delete_timestamp = 'Gelöscht um %@timestamp'
 z.string.de.conversation_edit_timestamp = 'Editiert um %@timestamp'
 
@@ -390,7 +393,7 @@ z.string.de.preferences_password = 'Passwort'
 z.string.de.preferences_password_reset = 'Passwort zurücksetzen'
 z.string.de.preferences_delete = 'Benutzerkonto löschen'
 z.string.de.preferences_email_sent = 'E-Mail gesendet'
-z.string.de.preferences_delete_info = 'Wir sende eine E-Mail an %email. Klicke den Link, um dein Benutzerkonto dauerhaft zu löschen.'
+z.string.de.preferences_delete_info = 'Wir senden eine E-Mail an %email. Klicke den Link, um dein Benutzerkonto dauerhaft zu löschen.'
 
 z.string.de.preferences_contacts = 'Kontakte'
 z.string.de.preferences_share_contacts = 'Aus Gmail importieren'
@@ -514,6 +517,7 @@ z.string.de.system_notification_member_leave_left = '%s.first_name hat die Unter
 z.string.de.system_notification_member_leave_removed_many = '%s.first_name hat %no Kontakte aus der Unterhaltung entfernt'
 z.string.de.system_notification_member_leave_removed_one = '%s.first_name hat %@.first_name aus der Unterhaltung entfernt'
 z.string.de.system_notification_ping = 'Hat gepingt'
+z.string.system_notification_reaction = '%reaction deine Nachricht'
 z.string.de.system_notification_voice_channel_activate = 'Ruft an'
 z.string.de.system_notification_voice_channel_deactivate = 'Hat versucht anzurufen'
 z.string.de.system_notification_shared_audio = 'Hat eine Audio-Nachricht geteilt'

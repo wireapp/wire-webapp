@@ -111,11 +111,8 @@ class z.calling.entities.Call
       return @self_user_joined() and not @self_client_joined()
 
     @network_interruption = ko.pureComputed =>
-      if @is_connected()
-        if @is_group()
-          return @interrupted_participants().length > 0 and @interrupted_participants().length is @participants().length
-        else
-          return @interrupted_participants().length > 0
+      if @is_connected() and not @is_group()
+        return @interrupted_participants().length > 0
       return false
 
     @network_interruption.subscribe (is_interrupted) ->

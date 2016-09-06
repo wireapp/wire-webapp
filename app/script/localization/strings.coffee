@@ -138,6 +138,7 @@ z.string.call_banner_outgoing = 'Calling %@.first_name'
 # Warnings
 z.string.modal_button_cancel = 'Cancel'
 z.string.modal_button_ok = 'Ok'
+z.string.modal_button_send = 'Send'
 
 # Block a user
 z.string.modal_block_conversation_headline = 'Block %@.name?'
@@ -272,8 +273,11 @@ z.string.conversation_context_menu_edit = 'Edit'
 z.string.conversation_context_menu_delete = 'Delete for Me'
 z.string.conversation_context_menu_delete_everyone = 'Delete for Everyone'
 z.string.conversation_context_menu_download = 'Download'
+z.string.conversation_context_menu_like = 'Like'
+z.string.conversation_context_menu_unlike = 'Unlike'
 z.string.conversation_delete_timestamp = 'Deleted on %@timestamp'
 z.string.conversation_edit_timestamp = 'Edited on %@timestamp'
+z.string.conversation_likes_caption = '%@number people'
 
 # Conversation list
 z.string.conversation_list_archive = 'ARCHIVE'
@@ -514,6 +518,7 @@ z.string.system_notification_member_leave_left = '%s.first_name left the convers
 z.string.system_notification_member_leave_removed_many = '%s.first_name removed %no people from the conversation'
 z.string.system_notification_member_leave_removed_one = '%s.first_name removed %@.first_name from the conversation'
 z.string.system_notification_ping = 'Pinged'
+z.string.system_notification_reaction = '%reaction your message'
 z.string.system_notification_voice_channel_activate = 'Calling'
 z.string.system_notification_voice_channel_deactivate = 'Called'
 z.string.system_notification_shared_audio = 'Shared an audio message'

@@ -20,27 +20,59 @@ window.z ?= {}
 z.calling ?= {}
 
 class z.calling.CallError
-  constructor: (message) ->
+  constructor: (type) ->
     @name = @constructor.name
-    @message = message or z.calling.CallError::TYPE.UNKNOWN
     @stack = (new Error()).stack
+    @type = type or z.calling.CallError::TYPE.UNKNOWN
+
+    @message = switch @type
+      when z.calling.CallError::TYPE.CALL_NOT_FOUND
+        'No call for conversation ID found'
+      when z.calling.CallError::TYPE.CONVERSATION_EMPTY
+        'No users in conversation'
+      when z.calling.CallError::TYPE.CONVERSATION_TOO_BIG
+        'Too many participants in conversation'
+      when z.calling.CallError::TYPE.FLOW_NOT_FOUND
+        'Flow not found'
+      when z.calling.CallError::TYPE.NO_AUDIO_STREAM_FOUND
+        'No audio stream found to toggle mute state'
+      when z.calling.CallError::TYPE.NO_CAMERA_FOUND
+        'No camera found'
+      when z.calling.CallError::TYPE.NO_CONVERSATION_ID
+        'No conversation ID given'
+      when z.calling.CallError::TYPE.NO_DEVICES_FOUND
+        'No MediaDevices found'
+      when z.calling.CallError::TYPE.NO_MICROPHONE_FOUND
+        'No microphone found'
+      when z.calling.CallError::TYPE.NO_REPLACEABLE_TRACK
+        'No replaceable MediaStreamTrack found'
+      when z.calling.CallError::TYPE.NOT_SUPPORTED
+        'Not supported'
+      when z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
+        'PeerConnection does not support getSenders()'
+      when z.calling.CallError::TYPE.SCREEN_NOT_SUPPORTED
+        'Screen sharing is not yet supported by this browser'
+      when z.calling.CallError::TYPE.VOICE_CHANNEL_FULL
+        'Too many participants in call'
+      else
+        'Unknown CallError'
 
   @:: = new Error()
   @::constructor = @
   @::TYPE = {
-    CALL_NOT_FOUND: 'No call for conversation ID found'
-    CONVERSATION_EMPTY: 'No users in conversation'
-    CONVERSATION_TOO_BIG: 'Too many participants in conversation'
-    FLOW_NOT_FOUND: 'Flow not found'
-    NO_AUDIO_STREAM_FOUND: 'No audio stream found to toggle mute state'
-    NO_CAMERA_FOUND: 'No camera found'
-    NO_CONVERSATION_ID: 'No conversation ID given'
-    NO_DEVICES_FOUND: 'No MediaDevices found'
-    NO_MICROPHONE_FOUND: 'No microphone found'
-    NO_REPLACEABLE_TRACK: 'No replaceable MediaStreamTrack found'
-    NOT_SUPPORTED: 'Not supported'
-    RTP_SENDER_NOT_SUPPORTED: 'PeerConnection does not support getSenders()'
-    SCREEN_NOT_SUPPORTED: 'Screen sharing is not yet supported by this browser'
-    UNKNOWN: 'Unknown CallError'
-    VOICE_CHANNEL_FULL: 'Too many participants in call'
+    CALL_NOT_FOUND: 'z.calling.CallError::TYPE.CALL_NOT_FOUND'
+    CONVERSATION_EMPTY: 'z.calling.CallError::TYPE.CONVERSATION_EMPTY'
+    CONVERSATION_TOO_BIG: 'z.calling.CallError::TYPE.CONVERSATION_TOO_BIG'
+    FLOW_NOT_FOUND: 'z.calling.CallError::TYPE.FLOW_NOT_FOUND'
+    NO_AUDIO_STREAM_FOUND: 'z.calling.CallError::TYPE.NO_AUDIO_STREAM_FOUND'
+    NO_CAMERA_FOUND: 'z.calling.CallError::TYPE.NO_CAMERA_FOUND'
+    NO_CONVERSATION_ID: 'z.calling.CallError::TYPE.NO_CONVERSATION_ID'
+    NO_DEVICES_FOUND: 'z.calling.CallError::TYPE.NO_DEVICES_FOUND'
+    NO_MICROPHONE_FOUND: 'z.calling.CallError::TYPE.NO_MICROPHONE_FOUND'
+    NO_REPLACEABLE_TRACK: 'z.calling.CallError::TYPE.NO_REPLACEABLE_TRACK'
+    NOT_SUPPORTED: 'z.calling.CallError::TYPE.NOT_SUPPORTED'
+    RTP_SENDER_NOT_SUPPORTED: 'z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED'
+    SCREEN_NOT_SUPPORTED: 'z.calling.CallError::TYPE.SCREEN_NOT_SUPPORTED'
+    UNKNOWN: 'z.calling.CallError::TYPE.UNKNOWN'
+    VOICE_CHANNEL_FULL: 'z.calling.CallError::TYPE.VOICE_CHANNEL_FULL'
   }

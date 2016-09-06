@@ -19,19 +19,10 @@
 window.z ?= {}
 z.message ?= {}
 
-###
-Enum for different message super types.
-###
-z.message.SuperType =
-  ALL_VERIFIED: 'all-verified'
-  CALL: 'call'
-  CONTENT: 'normal'
-  DELETE: 'delete'
-  DEVICE: 'device'
-  LOCATION: 'location'
-  MEMBER: 'member'
-  PING: 'ping'
-  REACTION: 'reaction'
-  SPECIAL: 'special'
-  SYSTEM: 'system'
-  UNABLE_TO_DECRYPT: 'unable-to-decrypt'
+# Enum for different confirmation types.
+z.message.SendingStatus =
+  FAILED: 0
+  SENDING: 1
+  SENT: 2
+  DELIVERED: 3
+  READ: 4

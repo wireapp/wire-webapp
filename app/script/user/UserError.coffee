@@ -20,16 +20,23 @@ window.z ?= {}
 z.user ?= {}
 
 class z.user.UserError
-  constructor: (message, type) ->
+  constructor: (type) ->
     @name = @constructor.name
-    @message = message
-    @type = type
     @stack = (new Error()).stack
+    @type = type or z.user.UserError::TYPE.UNKNOWN
+
+    @message = switch @type
+      when z.user.UserError::TYPE.PRE_KEY_NOT_FOUND
+        'Pre-key not found'
+      when z.user.UserError::TYPE.REQUEST_FAILURE
+        'User related backend request failure'
+      else
+        'Unknown UserError'
 
   @:: = new Error()
   @::constructor = @
   @::TYPE = {
-    NO_CLIENTS: 'z.user.UserError::TYPE.NO_CLIENTS'
     PRE_KEY_NOT_FOUND: 'z.user.UserError::TYPE.PRE_KEY_NOT_FOUND'
     REQUEST_FAILURE: 'z.user.UserError::TYPE.REQUEST_FAILURE'
+    UNKNOWN: 'z.user.UserError::TYPE.UNKNOWN'
   }

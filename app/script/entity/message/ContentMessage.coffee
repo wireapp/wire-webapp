@@ -31,11 +31,32 @@ class z.entity.ContentMessage extends z.entity.Message
     @replacing_message_id = null
     @edited_timestamp = null
 
+    @reactions = ko.observable {}
+    @reactions_user_ets = ko.observableArray()
+    @reactions_user_ids = ko.pureComputed => (@reactions_user_ets().map (user_et) -> user_et.id).join ', '
+
     @display_edited_timestamp = =>
       return  z.localization.Localizer.get_text {
         id: z.string.conversation_edit_timestamp
         replace: {placeholder: '%@timestamp', content: moment(@edited_timestamp).format 'HH:mm'}
       }
+
+    # like
+    @is_liked = ko.pureComputed =>
+      likes = @reactions_user_ets().filter (user_et) -> return user_et.is_me
+      return likes.length is 1
+    @other_likes = ko.pureComputed =>
+      return @reactions_user_ets().filter (user_et) -> return not user_et.is_me
+    @show_likes = ko.observable false
+
+    @like_caption = ko.pureComputed =>
+      if @reactions_user_ets().length <= 5
+        return (@reactions_user_ets().map (user_et) -> user_et.first_name()).join ', '
+      else
+        return  z.localization.Localizer.get_text {
+          id: z.string.conversation_likes_caption
+          replace: {placeholder: '%@number', content: @reactions_user_ets().length}
+        }
 
   ###
   Add another content asset to the message.
