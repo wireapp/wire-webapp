@@ -84,10 +84,10 @@ class z.cryptography.CryptographyMapper
       return @_map_asset_preview asset.preview, event_id
     else if asset.original?
       return @_map_asset_original asset.original, event_nonce
-    else
-      error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
-      @logger.log @logger.levels.INFO, error.message
-      throw error
+
+    error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
+    @logger.log @logger.levels.INFO, error.message
+    throw error
 
   _map_asset_meta_data: (original) ->
     if original.audio?
@@ -187,10 +187,10 @@ class z.cryptography.CryptographyMapper
   _map_image: (image, event_id) ->
     if image.tag is 'medium'
       return @_map_image_medium image, event_id
-    else
-      error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
-      @logger.log @logger.levels.INFO, error.message
-      throw error
+
+    error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
+    @logger.log @logger.levels.INFO, error.message
+    throw error
 
   _map_image_medium: (image, event_id) ->
     return {

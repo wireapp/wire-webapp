@@ -40,8 +40,7 @@ class z.components.UserListInputViewModel
     @placeholder = ko.computed =>
       if @input() is '' and @selected().length is 0
         return z.localization.Localizer.get_text params.placeholder
-      else
-        return ''
+      return ''
 
   on_key_press: (data, event) =>
     @selected.pop() if event.keyCode is z.util.KEYCODE.DELETE and @input() is ''

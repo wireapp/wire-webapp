@@ -114,8 +114,7 @@ ko.bindingHandlers.enter =
       if event.keyCode is z.util.KEYCODE.ENTER and not event.shiftKey and not event.altKey
         valueAccessor()?.call @, data, event
         return false
-      else
-        return true
+      return true
 
     ko.applyBindingsToNode element,
       event:

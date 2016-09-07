@@ -54,9 +54,8 @@ class z.audio.AudioRepository
       @audio_context = new window.AudioContext()
       @logger.log @logger.levels.INFO, 'Initialized a new AudioContext', @audio_context
       return @audio_context
-    else
-      @logger.log @logger.levels.ERROR, 'The flow audio cannot use the Web Audio API as it is unavailable.'
-      return undefined
+    @logger.log @logger.levels.ERROR, 'The flow audio cannot use the Web Audio API as it is unavailable.'
+    return undefined
 
   ###
   Initialize the repository.

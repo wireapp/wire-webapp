@@ -411,9 +411,9 @@ class z.calling.handler.MediaStreamHandler
         media_stream_track.stop()
         @logger.log @logger.levels.INFO, "Stopping MediaStreamTrack of kind '#{media_stream_track.kind}' successful", media_stream_track
       return true
-    else
-      @logger.log @logger.levels.WARN, 'No MediaStreamTrack found to stop', media_stream
-      return false
+
+    @logger.log @logger.levels.WARN, 'No MediaStreamTrack found to stop', media_stream
+    return false
 
   ###
   Failed to replace an input source.

@@ -157,10 +157,9 @@ class z.calling.handler.CallSignalingHandler
         @logger.log @logger.levels.WARN, "DELETEing flow '#{flow_info.flow_id}' would have to be forced"
         flow_info.reason = z.calling.payloads.FlowDeletionReason.RELEASED
         return @delete_flow flow_info
-      else
-        @logger.log @logger.levels.ERROR, "DELETEing flow '#{flow_info.flow_id}' failed: #{error.message}", error
-        attributes = {cause: error.label or error.name, method: 'delete', request: 'flows'}
-        @call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
+      @logger.log @logger.levels.ERROR, "DELETEing flow '#{flow_info.flow_id}' failed: #{error.message}", error
+      attributes = {cause: error.label or error.name, method: 'delete', request: 'flows'}
+      @call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
 
   ###
   Post for flows.

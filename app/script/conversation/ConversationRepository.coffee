@@ -1737,11 +1737,11 @@ class z.conversation.ConversationRepository
       @processed_event_nonces[event_nonce] = null
       # @todo Maybe we need to reset "@processed_event_nonces" someday to save some memory, until now it's fine.
       return false
-    else
-      @logger.log @logger.levels.WARN, "Event with nonce '#{event_nonce}' has been already processed.", message_et
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT,
-        z.tracking.SessionEventName.INTEGER.EVENT_HIDDEN_DUE_TO_DUPLICATE_NONCE
-      return true
+
+    @logger.log @logger.levels.WARN, "Event with nonce '#{event_nonce}' has been already processed.", message_et
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT,
+      z.tracking.SessionEventName.INTEGER.EVENT_HIDDEN_DUE_TO_DUPLICATE_NONCE
+    return true
 
   ###
   Fetch all unread events and users of a conversation.
@@ -1854,19 +1854,19 @@ class z.conversation.ConversationRepository
       if _.isEmpty deleted_client_map
         @logger.log @logger.levels.INFO, 'No obsolete clients that need to be removed'
         return payload
-      else
-        @logger.log @logger.levels.INFO, 'Removing payload for deleted clients', deleted_client_map
-        delete_promises = []
-        for user_id, client_ids of deleted_client_map
-          for client_id in client_ids
-            @logger.log @logger.levels.WARN, "The client '#{client_id}' from '#{user_id}' is obsolete and will be removed"
-            delete payload.recipients[user_id][client_id]
-            delete_promises.push @user_repository.client_repository.delete_client_and_session user_id, client_id
-          delete payload.recipients[user_id] if Object.keys(payload.recipients[user_id]).length is 0
 
-        Promise.all delete_promises
-        .then ->
-          return payload
+      @logger.log @logger.levels.INFO, 'Removing payload for deleted clients', deleted_client_map
+      delete_promises = []
+      for user_id, client_ids of deleted_client_map
+        for client_id in client_ids
+          @logger.log @logger.levels.WARN, "The client '#{client_id}' from '#{user_id}' is obsolete and will be removed"
+          delete payload.recipients[user_id][client_id]
+          delete_promises.push @user_repository.client_repository.delete_client_and_session user_id, client_id
+        delete payload.recipients[user_id] if Object.keys(payload.recipients[user_id]).length is 0
+
+      Promise.all delete_promises
+      .then ->
+        return payload
 
   _handle_missing_clients: (missing_client_map, generic_message, payload) ->
     return Promise.resolve()
@@ -1874,20 +1874,20 @@ class z.conversation.ConversationRepository
       if _.isEmpty missing_client_map
         @logger.log @logger.levels.INFO, 'No missing clients that need to be added'
         return payload
-      else
-        @logger.log @logger.levels.INFO, "Adding payload for missing clients of '#{Object.keys(missing_client_map).length}' users", missing_client_map
-        save_promises = []
 
-        @cryptography_repository.encrypt_generic_message missing_client_map, generic_message, payload
-        .then (updated_payload) =>
-          payload = updated_payload
-          for user_id, client_ids of missing_client_map
-            for client_id in client_ids
-              save_promises.push @user_repository.add_client_to_user user_id, new z.client.Client {id: client_id}
+      @logger.log @logger.levels.INFO, "Adding payload for missing clients of '#{Object.keys(missing_client_map).length}' users", missing_client_map
+      save_promises = []
 
-          return Promise.all save_promises
-        .then ->
-          return payload
+      @cryptography_repository.encrypt_generic_message missing_client_map, generic_message, payload
+      .then (updated_payload) =>
+        payload = updated_payload
+        for user_id, client_ids of missing_client_map
+          for client_id in client_ids
+            save_promises.push @user_repository.add_client_to_user user_id, new z.client.Client {id: client_id}
+
+        return Promise.all save_promises
+      .then ->
+        return payload
 
   _update_payload_for_changed_clients: (error_response, generic_message, payload) =>
     return Promise.resolve()

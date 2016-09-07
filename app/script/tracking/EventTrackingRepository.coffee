@@ -280,8 +280,8 @@ class z.tracking.EventTrackingRepository
     error_hash = objectHash.sha1 raygun_payload.Details.Error
     if @reported_errors().includes error_hash
       return false
-    else
-      @reported_errors.push error_hash
+
+    @reported_errors.push error_hash
     return raygun_payload
 
   _reset_session_values: =>

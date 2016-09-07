@@ -589,8 +589,7 @@ z.util.get_first_character = (string) ->
   find_emoji_in_string = re.exec string
   if find_emoji_in_string and find_emoji_in_string.index is 0
     return find_emoji_in_string[0]
-  else
-    return string[0]
+  return string[0]
 
 
 z.util.string_format = ->

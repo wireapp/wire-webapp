@@ -300,8 +300,7 @@ class z.cryptography.CryptographyRepository
     if Object.keys(missing_session_map).length > 0
       @logger.log @logger.levels.INFO, "Missing sessions for '#{Object.keys(missing_session_map).length}' users", missing_session_map
       return @_initiate_new_sessions cryptobox_session_map, missing_session_map
-    else
-      return Promise.resolve cryptobox_session_map
+    return Promise.resolve cryptobox_session_map
 
   ###
   Initiate a new session for a given client.
@@ -541,7 +540,6 @@ class z.cryptography.CryptographyRepository
 
         # Show error message in message view
         amplify.publish z.event.WebApp.EVENT.INJECT, unable_to_decrypt_event
-
         resolve [undefined, undefined]
 
   ###
@@ -562,9 +560,8 @@ class z.cryptography.CryptographyRepository
     .catch (error) =>
       if error instanceof z.cryptography.CryptographyError
         return undefined
-      else
-        @logger.log @logger.levels.ERROR, "Saving encrypted message failed: #{error.message}", error
-        throw error
+      @logger.log @logger.levels.ERROR, "Saving encrypted message failed: #{error.message}", error
+      throw error
 
   ###
   Save an unencrypted event.

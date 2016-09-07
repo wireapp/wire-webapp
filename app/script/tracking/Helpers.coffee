@@ -31,8 +31,7 @@ z.tracking.helpers = {
 
     if conversation_et.is_one2one()
       return z.tracking.attribute.ConversationType.ONE_TO_ONE
-    else
-      return z.tracking.attribute.ConversationType.GROUP
+    return z.tracking.attribute.ConversationType.GROUP
 
   ###
   Get corresponding tracking attribute for message type

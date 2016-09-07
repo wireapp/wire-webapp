@@ -241,8 +241,7 @@ class z.conversation.ConversationService
         changes =
           time: new Date(timestamp).toISOString()
         return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
-      else
-        throw new TypeError 'Missing timestamp'
+      throw new TypeError 'Missing timestamp'
     .then =>
       event_json.time = new Date(timestamp).toISOString()
       @logger.log @logger.levels.INFO, "Updated time of message '#{event_json.id}' to '#{event_json.time}'", event_json

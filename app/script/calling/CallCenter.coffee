@@ -171,8 +171,7 @@ class z.calling.CallCenter
   get_creator_id: (event) ->
     if creator_id = event.creator or event.from
       return creator_id
-    else
-      return user_id for user_id, device_info of event.participants when device_info.state is z.calling.enum.ParticipantState.JOINED
+    return user_id for user_id, device_info of event.participants when device_info.state is z.calling.enum.ParticipantState.JOINED
 
 
   ###############################################################################

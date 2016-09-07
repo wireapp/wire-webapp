@@ -53,19 +53,16 @@ class z.links.LinkPreviewRepository
     .then =>
       if window.openGraph
         return @_fetch_open_graph_data url
-      else
-        throw new z.links.LinkPreviewError z.links.LinkPreviewError::TYPE.NOT_SUPPORTED
+      throw new z.links.LinkPreviewError z.links.LinkPreviewError::TYPE.NOT_SUPPORTED
     .then (data) ->
       open_graph_data = data
       if open_graph_data
         return z.links.LinkPreviewProtoBuilder.build_from_open_graph_data data, url, offset
-      else
-        throw new z.links.LinkPreviewError z.links.LinkPreviewError::TYPE.NO_DATA_AVAILABLE
+      throw new z.links.LinkPreviewError z.links.LinkPreviewError::TYPE.NO_DATA_AVAILABLE
     .then (link_preview) ->
       if link_preview?
         return link_preview
-      else
-        throw new z.links.LinkPreviewError z.links.LinkPreviewError::TYPE.UNSUPPORTED_TYPE
+      throw new z.links.LinkPreviewError z.links.LinkPreviewError::TYPE.UNSUPPORTED_TYPE
     .then (link_preview) =>
       return @_fetch_preview_image link_preview, open_graph_data.image
 
@@ -79,8 +76,7 @@ class z.links.LinkPreviewRepository
       .then (asset) ->
         link_preview.article.set 'image', asset
         return link_preview
-    else
-      return link_preview
+    return link_preview
 
   ###
   Fetch open graph data
