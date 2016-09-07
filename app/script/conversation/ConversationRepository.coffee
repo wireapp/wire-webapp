@@ -219,8 +219,11 @@ class z.conversation.ConversationRepository
   @param message_id [String]
   @return [Promise] z.entity.Message
   ###
-  get_message_from_db: (conversation_et, message_id) =>
-    @conversation_service.load_event_from_db conversation_et.id, message_id
+  get_message_in_conversation_by_id: (conversation_et, message_id) =>
+    message_et = conversation_et.get_message_by_id message_id
+    return Promise.resolve message_et if message_et
+
+    return @conversation_service.load_event_from_db conversation_et.id, message_id
     .then (event) =>
       if event
         return @event_mapper.map_json_event event, conversation_et
@@ -1608,7 +1611,7 @@ class z.conversation.ConversationRepository
   @param event_json [Object] JSON data of 'conversation.message-delete'
   ###
   _on_message_deleted: (conversation_et, event_json) =>
-    @get_message_from_db conversation_et, event_json.data.message_id
+    @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
     .then (message_to_delete_et) =>
       if event_json.from isnt message_to_delete_et.from
         throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
@@ -1645,20 +1648,13 @@ class z.conversation.ConversationRepository
   @param event_json [Object] JSON data of 'conversation.reaction' event
   ###
   _on_reaction: (conversation_et, event_json) ->
-    @get_message_from_db conversation_et, event_json.data.message_id
+    @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
     .then (message_et) =>
+      message_et.update_reactions event_json
+      @_update_user_ets message_et
       @_send_reaction_notification conversation_et, message_et, event_json
-      @_update_message_reactions message_et, event_json
-      @logger.log "Updated reactions of message '#{message_et.id}' in database", message_et
-      return @conversation_service.update_message_in_db message_et.primary_key, {reactions: message_et.reactions()}
-    .then =>
       @logger.log @logger.levels.DEBUG, "Reaction to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
-      return conversation_et.get_message_by_id event_json.data.message_id
-    .then (message_et) =>
-      if message_et
-        @_update_message_reactions message_et, event_json
-        @_update_user_ets message_et
-        return message_et
+      return @conversation_service.update_message_in_db message_et, {reactions: message_et.reactions()}
     .catch (error) =>
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         @logger.log "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
@@ -1993,14 +1989,19 @@ class z.conversation.ConversationRepository
   @return [Object] Updated event_json
   ###
   _update_edited_message: (conversation_et, event_json) =>
-    @get_message_from_db conversation_et, event_json.data.replacing_message_id
+    @get_message_in_conversation_by_id conversation_et, event_json.data.replacing_message_id
     .then (original_message_et) =>
       if event_json.from isnt original_message_et.from
         throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
-      return @conversation_service.update_message_timestamp_in_db event_json, original_message_et.timestamp
-    .then (updated_event_json) =>
+
+      event_json.time = new Date(timestamp).toISOString()
+      if window.isNaN event_json.time
+        throw new TypeError 'Missing timestamp'
+
+      return @conversation_service.update_message_in_db event_json, {time: event_json.time}
+    .then =>
       @_delete_message_by_id conversation_et, event_json.data.replacing_message_id
-      return updated_event_json
+      return event_json
 
   ###
   Update link preview message
@@ -2009,25 +2010,11 @@ class z.conversation.ConversationRepository
   @return [Object] Updated event_json
   ###
   _update_link_preview: (conversation_et, event_json) =>
-    @get_message_from_db conversation_et, event_json.id
+    @get_message_in_conversation_by_id conversation_et, event_json.id
     .then (original_message_et) =>
       @_delete_message conversation_et, original_message_et
     .then ->
       return event_json
-
-
-  ###############################################################################
-  # Reactions
-  ###############################################################################
-
-  _update_message_reactions: (message_et, event_json) ->
-    reactions = message_et.reactions()
-    if event_json.data.reaction
-      reactions[event_json.from] = event_json.data.reaction
-    else
-      delete reactions[event_json.from]
-    message_et.reactions reactions
-    return message_et
 
 
   ###############################################################################
