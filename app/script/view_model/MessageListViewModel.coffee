@@ -316,7 +316,7 @@ class z.ViewModel.MessageListViewModel
     reset_progress = ->
       window.setTimeout ->
         message_et.is_resetting_session false
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.SESSION_RESET
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.SESSION_RESET
       , 550
 
     message_et.is_resetting_session true
@@ -479,7 +479,7 @@ class z.ViewModel.MessageListViewModel
     if message_et.has_asset()
       entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
 
-    if message_et.is_reactable()
+    if message_et.is_reactable() and not @conversation().removed_from_conversation()
       if message_et.is_liked()
         entries.push {label: z.string.conversation_context_menu_unlike, action: 'react'}
       else
@@ -519,17 +519,17 @@ class z.ViewModel.MessageListViewModel
 
     switch action
       when 'delete'
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
           action: => @conversation_repository.delete_message @conversation(), message_et
       when 'delete-everyone'
-        amplify.publish z.event.WebApp.WARNINGS.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
           action: => @conversation_repository.delete_message_everyone @conversation(), message_et
       when 'download'
         message_et?.get_first_asset()?.download()
       when 'edit'
         amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.EDIT, message_et
       when 'react'
-        @click_on_like message_et
+        @click_on_like message_et, false
 
   ###
   Shows detail image view.
@@ -545,6 +545,26 @@ class z.ViewModel.MessageListViewModel
     next_conversation_et = @conversation_repository.get_next_conversation @conversation_repository.active_conversation()
     @user_repository.cancel_connection_request message_et.other_user(), next_conversation_et
 
-  click_on_like: (message_et) =>
+  click_on_like: (message_et, button = true) =>
+    return if @conversation().removed_from_conversation()
     reaction = if message_et.is_liked() then z.message.ReactionType.NONE else z.message.ReactionType.LIKE
     @conversation_repository.send_reaction @conversation(), message_et, reaction
+    @_track_reaction @conversation(), message_et, reaction, button
+
+  ###
+  Track reaction action.
+
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  @param reaction [z.message.ReactionType]
+  @param button [Boolean]
+  ###
+  _track_reaction: (conversation_et, message_et, reaction, button = true) ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.REACTED_TO_MESSAGE,
+      conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+      action: if reaction then 'like' else 'unlike'
+      with_bot: conversation_et.is_with_bot()
+      method: if button then 'button' else 'menu'
+      user: if message_et.user().is_me then 'sender' else 'receiver'
+      type: z.tracking.helpers.get_message_type message_et
+      reacted_to_last_message: conversation_et.get_last_message() is message_et

@@ -31,6 +31,7 @@ class z.SystemNotification.SystemNotificationRepository
     z.message.SuperType.CONTENT
     z.message.SuperType.MEMBER
     z.message.SuperType.PING
+    z.message.SuperType.REACTION
     z.message.SuperType.SYSTEM
   ]
 
@@ -83,11 +84,11 @@ class z.SystemNotification.SystemNotificationRepository
   request_permission: (on_permission_granted, on_permission_denied) ->
     return if not z.util.Environment.browser.supports.notifications
     if window.Notification.permission is z.util.BrowserPermissionType.DEFAULT
-      amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.REQUEST_NOTIFICATION
+      amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_NOTIFICATION
       # Note: The callback will be only triggered in Chrome.
       # If you ignore a permission request on Firefox, then the callback will not be triggered.
       window.Notification.requestPermission? (permission) ->
-        amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.REQUEST_NOTIFICATION
+        amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_NOTIFICATION
         if permission is z.util.BrowserPermissionType.GRANTED
           amplify.publish z.event.WebApp.ANALYTICS.EVENT,
             z.tracking.EventName.PERMISSION.ALLOW_NOTIFICATIONS, value: 'allow'
@@ -273,14 +274,25 @@ class z.SystemNotification.SystemNotificationRepository
         }
 
   ###
-  Creates the notification body for ping and hot-ping.
-
+  Creates the notification body for ping.
   @private
-  @param message_et [z.entity.PingMessage] Ping message entity
   @return [String] Notification message body
   ###
-  _create_body_ping: (message_et) ->
+  _create_body_ping: ->
     return z.localization.Localizer.get_text z.string.system_notification_ping
+
+
+  ###
+  Creates the notification body for reaction.
+  @private
+  @param message_et [z.entity.Message] Fake reaction message entity
+  @return [String] Notification message body
+  ###
+  _create_body_reaction: (message_et) ->
+    return z.localization.Localizer.get_text {
+      id: z.string.system_notification_reaction
+      replace: {placeholder: '%reaction', content: message_et.reaction}
+    }
 
   ###
   Selects the type of system message that the notification body needs to be created for.
@@ -311,7 +323,9 @@ class z.SystemNotification.SystemNotificationRepository
       when z.message.SuperType.MEMBER
         return @_create_body_member_update message_et, conversation_et.is_group?()
       when z.message.SuperType.PING
-        return @_create_body_ping message_et
+        return @_create_body_ping()
+      when z.message.SuperType.REACTION
+        return @_create_body_reaction message_et
       when z.message.SuperType.SYSTEM
         return @_create_body_conversation_rename message_et
 

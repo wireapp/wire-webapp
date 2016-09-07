@@ -21,5 +21,5 @@ z.message ?= {}
 
 # Enum for different reactions.
 z.message.ReactionType =
-  LIKE: '💖'
+  LIKE: '❤️'
   NONE: ''

@@ -31,10 +31,8 @@ class z.components.CommonContactsViewModel
     @_set_contacts_data 0
 
     @search_repository.get_common_contacts @user.id
-      .then (user_ets) =>
-        @_display_contacts user_ets
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Could not update users common contacts: #{error.message}", error
+    .then (user_ets) =>
+      @_display_contacts user_ets
 
   _set_contacts_data: (value) ->
     $(@element).attr 'data-contacts', value

@@ -33,6 +33,7 @@ class z.entity.ContentMessage extends z.entity.Message
 
     @reactions = ko.observable {}
     @reactions_user_ets = ko.observableArray()
+    @reactions_user_ids = ko.pureComputed => (@reactions_user_ets().map (user_et) -> user_et.first_name()).join ', '
 
     @display_edited_timestamp = =>
       return  z.localization.Localizer.get_text {

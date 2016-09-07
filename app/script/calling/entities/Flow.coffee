@@ -170,11 +170,13 @@ class z.calling.entities.Flow
       progress_gathering_states = [z.calling.rtc.ICEGatheringState.GATHERING, z.calling.rtc.ICEGatheringState.COMPLETE]
       in_progress = in_connection_progress and @gathering_state() in progress_gathering_states
 
-      in_offer_state = @local_sdp_type() is z.calling.rtc.SDPType.OFFER
-      in_wrong_state = in_offer_state and @signaling_state() is z.calling.rtc.SignalingState.REMOTE_OFFER
-      is_blocked = @signaling_state() is z.calling.rtc.SignalingState.CLOSED
+      is_answer = @local_sdp_type() is z.calling.rtc.SDPType.ANSWER
+      is_offer = @local_sdp_type() is z.calling.rtc.SDPType.OFFER
+      in_remote_offer_state = @signaling_state() is z.calling.rtc.SignalingState.REMOTE_OFFER
+      in_stable_state = @signaling_state() is z.calling.rtc.SignalingState.STABLE
+      in_proper_state = (is_offer and in_stable_state) or (is_answer and in_remote_offer_state)
 
-      return @local_sdp() and @should_add_local_sdp() and not is_blocked and not in_progress and not in_wrong_state
+      return @local_sdp() and @should_add_local_sdp() and in_proper_state and not in_progress
 
     @can_set_local_sdp.subscribe (can_set) =>
       if can_set
@@ -196,11 +198,13 @@ class z.calling.entities.Flow
     @should_add_remote_sdp = ko.observable false
 
     @can_set_remote_sdp = ko.pureComputed =>
-      is_remote_offer = @remote_sdp_type() is z.calling.rtc.SDPType.OFFER
-      have_local_offer = @signaling_state() is z.calling.rtc.SignalingState.LOCAL_OFFER
-      in_wrong_state = is_remote_offer and have_local_offer
+      is_answer = @remote_sdp_type() is z.calling.rtc.SDPType.ANSWER
+      is_offer = @remote_sdp_type() is z.calling.rtc.SDPType.OFFER
+      in_local_offer_state = @signaling_state() is z.calling.rtc.SignalingState.LOCAL_OFFER
+      in_stable_state = @signaling_state() is z.calling.rtc.SignalingState.STABLE
+      in_proper_state = (is_offer and in_stable_state) or (is_answer and in_local_offer_state)
 
-      return @pc_initialized() and @should_add_remote_sdp() and not in_wrong_state
+      return @pc_initialized() and @should_add_remote_sdp() and in_proper_state
 
     @can_set_remote_sdp.subscribe (can_set) =>
       if can_set
@@ -457,7 +461,6 @@ class z.calling.entities.Flow
     sdp_info = new z.calling.payloads.SDPInfo {conversation_id: @conversation_id, flow_id: @id, sdp: @local_sdp()}
 
     on_success = =>
-      @_clear_send_sdp_timeout()
       @has_sent_local_sdp true
       @logger.log @logger.levels.INFO, "Sending local SDP of type '#{@local_sdp().type}' successful"
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
@@ -466,6 +469,7 @@ class z.calling.entities.Flow
       @logger.log @logger.levels.WARN, "Failed to send local SDP of type '#{@local_sdp().type}'"
       @reset_flow() if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
 
+    @_clear_send_sdp_timeout()
     @logger.log @logger.levels.INFO, "Sending local SDP for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
     amplify.publish z.event.WebApp.CALL.SIGNALING.SEND_LOCAL_SDP_INFO, sdp_info, on_success, on_failure
 

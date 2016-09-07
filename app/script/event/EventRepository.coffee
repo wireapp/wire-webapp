@@ -47,7 +47,7 @@ class z.event.EventRepository
       if handling_state is z.event.NotificationHandlingState.WEB_SOCKET
         @_handle_buffered_notifications()
         if @previous_handling_state is z.event.NotificationHandlingState.RECOVERY
-          amplify.publish z.event.WebApp.WARNINGS.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
+          amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
       @previous_handling_state = handling_state
 
     @previous_handling_state = @notification_handling_state()
@@ -60,7 +60,7 @@ class z.event.EventRepository
     @notifications_blocked = false
 
     @notifications_queue.subscribe (notifications) =>
-      if notifications.length > 0
+      if notifications.length
         return if @notifications_blocked
 
         notification = @notifications_queue()[0]
@@ -91,7 +91,6 @@ class z.event.EventRepository
       @logger.log @logger.levels.INFO, "Last notification ID updated to '#{last_notification_id}'"
       @notification_service.save_last_notification_id_to_db last_notification_id if last_notification_id
 
-    amplify.subscribe z.event.WebApp.CONNECTION.RECONNECT, @reconnect
     amplify.subscribe z.event.WebApp.CONNECTION.ONLINE, @recover_from_notification_stream
     amplify.subscribe z.event.WebApp.EVENT.INJECT, @inject_event
 
@@ -101,7 +100,7 @@ class z.event.EventRepository
   ###############################################################################
 
   # Initiate the WebSocket connection.
-  connect: =>
+  connect_web_socket: =>
     if not @current_client().id
       throw new z.event.EventError z.event.EventError::TYPE.NO_CLIENT_ID
 
@@ -116,14 +115,14 @@ class z.event.EventRepository
   Close the WebSocket connection.
   @param trigger [z.event.WebSocketService::CHANGE_TRIGGER] Trigger of the disconnect
   ###
-  disconnect: (trigger) =>
+  disconnect_web_socket: (trigger) =>
     @web_socket_service.reset trigger
 
   ###
   Re-connect the WebSocket connection.
-  @param trigger [z.event.WebSocketService::CHANGE_TRIGGER] Trigger of the disconnect
+  @param trigger [z.event.WebSocketService::CHANGE_TRIGGER] Trigger of the reconnect
   ###
-  reconnect: (trigger) =>
+  reconnect_web_socket: (trigger) =>
     @notification_handling_state z.event.NotificationHandlingState.RECOVERY
     @web_socket_service.reconnect trigger
 
@@ -137,8 +136,9 @@ class z.event.EventRepository
   # Handle buffered notifications.
   _handle_buffered_notifications: =>
     @logger.log @logger.levels.INFO, "Received '#{@web_socket_buffer.length}' notifications via WebSocket while recovering from stream"
-    z.util.ko_array_push_all @notifications_queue, @web_socket_buffer
-    @web_socket_buffer.length = 0
+    if @web_socket_buffer.length
+      z.util.ko_array_push_all @notifications_queue, @web_socket_buffer
+      @web_socket_buffer.length = 0
 
 
   ###############################################################################
@@ -205,7 +205,8 @@ class z.event.EventRepository
   Will retrieve missed notifications from the stream after a connectivity loss.
   ###
   recover_from_notification_stream: =>
-    amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
+    @notification_handling_state z.event.NotificationHandlingState.RECOVERY
+    amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY
     @update_from_notification_stream()
     .then (number_of_notifications) =>
       @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET if number_of_notifications is 0
@@ -215,7 +216,7 @@ class z.event.EventRepository
         @logger.log @logger.levels.ERROR, "Failed to recover from notification stream: #{error.message}", error
         @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET
         # @todo What do we do in this case?
-        amplify.publish z.event.WebApp.WARNINGS.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
+        amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
 
   ###
   Fetch all missed events from the notification stream since the last ID stored in database.
@@ -319,46 +320,31 @@ class z.event.EventRepository
   ###
   Handle a single event from the notification stream or WebSocket.
   @param event [JSON] Backend event extracted from notification stream
-  @param source [String] Source of backend event
   @return [Promise] Resolves with the saved record or boolean true if the event was skipped
   ###
-  _handle_event: (event, source) ->
-    return new Promise (resolve, reject) =>
-      sending_client = event.data?.sender
-      if sending_client
-        log_message = "Received encrypted event '#{event.type}' from client '#{sending_client}' of user '#{event.from}'"
-      else if event.from
-        throw new z.event.EventError z.event.EventError::TYPE.DEPRECATED_SCHEMA if event.type in z.event.EventTypeHandling.DEPRECATED
-        log_message = "Received unencrypted event '#{event.id}' of type '#{event.type}' from user '#{event.from}'"
-      else if event.type.startsWith 'call'
-        log_message = "Received call event '#{event.type}' in conversation '#{event.conversation}'"
-      else if event.type.startsWith 'user'
-        log_message = "Received user event '#{event.type}'"
-      else
-        log_message = "Received unknown event '#{event.type}' in conversation '#{event.conversation}'"
-      @logger.log @logger.levels.INFO, log_message, {event_object: event, event_json: JSON.stringify event}
+  _handle_event: (event) ->
+    if event.type in z.event.EventTypeHandling.IGNORE
+      @logger.log "Event ignored: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
+      return Promise.resolve true
 
-      if event.type in z.event.EventTypeHandling.IGNORE
-        @logger.log "Event ignored: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
-        return resolve true
-      else if event.type in z.event.EventTypeHandling.DECRYPT
-        promise = @cryptography_repository.decrypt_event(event).then (generic_message) =>
-          @cryptography_repository.save_encrypted_event generic_message, event
-      else if event.type in z.event.EventTypeHandling.STORE
-        promise = @cryptography_repository.save_unencrypted_event event
-      else
-        promise = Promise.resolve event
-
-      promise.then (record) =>
-        @_distribute_event record if record
-        resolve record
-      .catch (error) =>
-        if error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
-          resolve true
-        else
-          @logger.log @logger.levels.ERROR,
-            "Failed to handle '#{event.type}' event '#{event.id or 'no ID'}' from '#{source}': '#{error.message}'", event
-          reject error
+    Promise.resolve()
+    .then =>
+      if event.type in z.event.EventTypeHandling.DECRYPT
+        return @cryptography_repository.decrypt_event(event)
+        .then (generic_message) =>
+          @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
+      return event
+    .then (mapped_event) =>
+      if mapped_event.type in z.event.EventTypeHandling.STORE
+        return @cryptography_repository.save_unencrypted_event mapped_event
+      return mapped_event
+    .then (saved_event) =>
+      @_distribute_event saved_event
+      return saved_event
+    .catch (error) ->
+      if error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
+        return true
+      throw error
 
   ###
   Handle all events from the payload of an incoming notification.
@@ -382,17 +368,10 @@ class z.event.EventRepository
         @last_notification_id notification.id
         resolve @last_notification_id()
       else
-        proceed = =>
+        Promise.all (@_handle_event event for event in events)
+        .then =>
           @last_notification_id notification.id
           resolve @last_notification_id()
-
-        Promise.all (@_handle_event event, source for event in events)
-        .then ->
-          proceed()
         .catch (error) =>
-          if error.message is z.event.EventError::TYPE.DEPRECATED_SCHEMA
-            @logger.log @logger.levels.WARN, "Ignored notification '#{notification.id}' from '#{source}': #{error.message}", error
-            proceed()
-          else
-            @logger.log @logger.levels.ERROR, "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
-            reject error
+          @logger.log @logger.levels.ERROR, "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
+          reject error

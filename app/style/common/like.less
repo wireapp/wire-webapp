@@ -1,0 +1,29 @@
+.like-button {
+  .circle(24px);
+  cursor: pointer;
+  position: relative;
+
+  > span {
+    .absolute-center(10px);
+    .font-size-xs;
+
+    &:first-child {
+      color: @graphite;
+    }
+
+    &:last-child {
+      color: @w-red;
+
+      opacity: 0;
+      transform: scale(6);
+      transition: all @animation-timing-fast @ease-out-quart;
+    }
+  }
+}
+
+.like-button-liked {
+  > span:last-child {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

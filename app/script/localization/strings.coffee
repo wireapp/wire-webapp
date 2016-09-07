@@ -518,6 +518,7 @@ z.string.system_notification_member_leave_left = '%s.first_name left the convers
 z.string.system_notification_member_leave_removed_many = '%s.first_name removed %no people from the conversation'
 z.string.system_notification_member_leave_removed_one = '%s.first_name removed %@.first_name from the conversation'
 z.string.system_notification_ping = 'Pinged'
+z.string.system_notification_reaction = '%reaction your message'
 z.string.system_notification_voice_channel_activate = 'Calling'
 z.string.system_notification_voice_channel_deactivate = 'Called'
 z.string.system_notification_shared_audio = 'Shared an audio message'

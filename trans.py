@@ -17,7 +17,8 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-import os, sys
+import os
+import sys
 
 home_dir = os.path.expanduser('~')
 user_config = os.path.join(home_dir, '.crowdin.yaml')

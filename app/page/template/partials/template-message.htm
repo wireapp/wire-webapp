@@ -115,8 +115,11 @@
     <!-- /ko -->
 
     <!-- ko ifnot: message.other_likes().length -->
-      <div class="message-body-like" data-uie-name="message-liked" data-bind="attr: {'data-ui-value': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: $parent.click_on_like">
-        <span class="message-body-like-icon icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}"></span>
+      <div class="message-body-like">
+        <span class="message-body-like-icon like-button message-show-on-hover" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: $parent.click_on_like">
+          <span class="icon-liked"></span>
+          <span class="icon-liked"></span>
+        </span>
       </div>
     <!-- /ko -->
 
@@ -124,16 +127,19 @@
   <!-- ko if: message.other_likes().length -->
     <div class="message-footer">
       <div class="message-footer-icon">
-        <span class="icon-liked button-icon font-size-xs text-red" data-bind="css:{'text-graphite': !is_liked()}, click: $parent.click_on_like"></span>
+        <span class="like-button" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: $parent.click_on_like">
+          <span class="icon-liked"></span>
+          <span class="icon-liked"></span>
+        </span>
       </div>
       <div class="message-footer-label cursor-pointer" data-bind="click: function() {$data.show_likes(true)}">
-        <span class="font-size-xs text-graphite" data-bind="text: like_caption"></span>
+        <span class="font-size-xs text-graphite" data-uie-name="message-liked-names" data-bind="text: like_caption, attr: {'data-uie-value': reactions_user_ids()}" ></span>
         <!-- ko if: !message.show_likes() && message.other_likes().length > 5 -->
           <span class="icon-more font-size-xs"></span>
         <!-- /ko -->
       </div>
       <!-- ko if: message.show_likes() -->
-        <div class="message-footer-bottom" data-uie-name="message-liked-users">
+        <div class="message-footer-bottom" data-uie-name="message-liked-avatars">
           <!-- ko foreach: message.reactions_user_ets() -->
             <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
           <!-- /ko -->
