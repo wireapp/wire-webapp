@@ -547,9 +547,14 @@ class z.ViewModel.MessageListViewModel
 
   click_on_like: (message_et, button = true) =>
     return if @conversation().removed_from_conversation()
+
     reaction = if message_et.is_liked() then z.message.ReactionType.NONE else z.message.ReactionType.LIKE
-    @conversation_repository.send_reaction @conversation(), message_et, reaction
-    @_track_reaction @conversation(), message_et, reaction, button
+    message_et.is_liked not message_et.is_liked()
+
+    setTimeout =>
+      @conversation_repository.send_reaction @conversation(), message_et, reaction
+      @_track_reaction @conversation(), message_et, reaction, button
+    , 50
 
   ###
   Track reaction action.
