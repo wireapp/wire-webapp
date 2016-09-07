@@ -42,9 +42,17 @@ class z.entity.ContentMessage extends z.entity.Message
       }
 
     # like
-    @is_liked = ko.pureComputed =>
-      likes = @reactions_user_ets().filter (user_et) -> return user_et.is_me
-      return likes.length is 1
+    @is_liked_provisional = ko.observable()
+    @is_liked = ko.pureComputed
+      read: =>
+        if @is_liked_provisional()?
+          is_liked_provisional = @is_liked_provisional()
+          @is_liked_provisional null
+          return is_liked_provisional
+        likes = @reactions_user_ets().filter (user_et) -> return user_et.is_me
+        return likes.length is 1
+      write: (value) =>
+        @is_liked_provisional value
     @other_likes = ko.pureComputed =>
       return @reactions_user_ets().filter (user_et) -> return not user_et.is_me
     @show_likes = ko.observable false

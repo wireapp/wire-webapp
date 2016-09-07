@@ -1648,10 +1648,9 @@ class z.conversation.ConversationRepository
     @get_message_from_db conversation_et, event_json.data.message_id
     .then (message_et) =>
       @_send_reaction_notification conversation_et, message_et, event_json
-      return @_update_message_reactions message_et, event_json
-    .then (message_et) =>
+      @_update_message_reactions message_et, event_json
       @logger.log "Updated reactions of message '#{message_et.id}' in database", message_et
-      return @conversation_service.update_message_reactions_in_db message_et.primary_key, message_et.reactions()
+      return @conversation_service.update_message_in_db message_et.primary_key, {reactions: message_et.reactions()}
     .then =>
       @logger.log @logger.levels.DEBUG, "Reaction to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
       return conversation_et.get_message_by_id event_json.data.message_id
