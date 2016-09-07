@@ -82,6 +82,14 @@ class z.entity.ContentMessage extends z.entity.Message
   get_first_asset: ->
     return @assets()[0]
 
+  update_reactions: (event_json) ->
+    reactions = @reactions()
+    if event_json.data.reaction
+      reactions[event_json.from] = event_json.data.reaction
+    else
+      delete reactions[event_json.from]
+    @reactions reactions
+
   ###
   Check whether the message was edited.
 
