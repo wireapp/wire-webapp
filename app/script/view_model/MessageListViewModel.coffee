@@ -551,7 +551,7 @@ class z.ViewModel.MessageListViewModel
     reaction = if message_et.is_liked() then z.message.ReactionType.NONE else z.message.ReactionType.LIKE
     message_et.is_liked not message_et.is_liked()
 
-    setTimeout =>
+    window.setTimeout =>
       @conversation_repository.send_reaction @conversation(), message_et, reaction
       @_track_reaction @conversation(), message_et, reaction, button
     , 50
