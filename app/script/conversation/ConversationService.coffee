@@ -251,15 +251,13 @@ class z.conversation.ConversationService
   ###
   Update events reactions.
   @param primary_key [String] Primary key of message event to update in the database
-  @param reactions [Object] Updated reactions
+  @param changes [Object] Updated reactions
   ###
-  update_message_reactions_in_db: (primary_key, reactions) ->
-    Promise.resolve()
-    .then =>
-      if reactions
-        @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, {reactions: reactions}
-      else
-        throw new TypeError 'Missing reactions'
+  update_message_in_db: (primary_key, changes) ->
+    keys = Object.keys changes
+    if keys.length and changes[keys[0]]
+      return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
+    Promise.reject new TypeError 'Missing changes'
 
   ###
   Delete events from a conversation.
