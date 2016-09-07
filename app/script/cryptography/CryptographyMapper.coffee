@@ -32,24 +32,18 @@ class z.cryptography.CryptographyMapper
   @return [Object] Promise that resolves with the mapped event
   ###
   map_generic_message: (generic_message, event) =>
-    mapped = undefined
-
     Promise.resolve()
     .then =>
       if not generic_message
-        @logger.log @logger.levels.ERROR, "Failed to map OTR event '#{event.id}' as decrypted generic message is missing"
         throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.NO_GENERIC_MESSAGE
-    .then ->
-      mapped =
+      return @_map_generic_message generic_message, event
+    .then (specific_content) ->
+      return $.extend
         conversation: event.conversation
         id: generic_message.message_id
         from: event.from
         time: event.time
-    .then =>
-      return @_map_generic_message generic_message, event
-    .then (specific_content) ->
-      $.extend mapped, specific_content
-      return mapped
+      , specific_content
 
   _map_generic_message: (generic_message, event) =>
     switch generic_message.content
