@@ -391,7 +391,7 @@ describe 'z.conversation.ConversationRepository', ->
       message_to_delete_et.from = user_repository.self().id
       conversation_et.add_message message_to_delete_et
 
-      spyOn(conversation_repository, 'get_message_from_db').and.returnValue Promise.resolve message_to_delete_et
+      spyOn(conversation_repository, 'get_message_in_conversation_by_id').and.returnValue Promise.resolve message_to_delete_et
       spyOn conversation_repository, '_add_delete_message'
 
     it 'deletes message if user is self', (done) ->

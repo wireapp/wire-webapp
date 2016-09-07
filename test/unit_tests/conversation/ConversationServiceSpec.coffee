@@ -86,7 +86,7 @@ describe 'z.conversation.ConversationService', ->
 
     beforeEach (done) ->
       Promise.all messages.map (message) ->
-        return conversation_service.storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
+        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
       .then done
       .catch done.fail
 
@@ -104,25 +104,23 @@ describe 'z.conversation.ConversationService', ->
         done()
       .catch done.fail
 
-  describe 'update_message_timestamp_in_db', ->
+  describe 'update_message_in_db', ->
     # @formatter:off
     event = {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
     # @formatter:on
 
-    it 'returns updated event', (done) ->
-      timestamp = Date.now()
-      time = new Date(timestamp).toISOString()
-      conversation_service.update_message_timestamp_in_db event, timestamp
-      .then (event_json) =>
-        expect(event_json.time).toEqual time
-        done()
+    it 'updated event in the database', (done) ->
+      event.time = new Date(Date.now()).toISOString()
+      conversation_service.update_message_in_db event, {time: event.time}
+      .then done
       .catch done.fail
 
-    it 'fails if no timestamp is specified', (done) ->
-      conversation_service.update_message_timestamp_in_db event, undefined
+    it 'fails if changes are not specified', (done) ->
+      conversation_service.update_message_in_db event, undefined
       .then done.fail
       .catch (error) ->
-        expect(error).toEqual jasmine.any TypeError
+        expect(error).toEqual jasmine.any z.conversation.ConversationError
+        expect(error.type).toBe z.conversation.ConversationError::TYPE.NO_CHANGES
         done()
 
   describe 'load_events_from_db', ->
@@ -138,7 +136,7 @@ describe 'z.conversation.ConversationService', ->
         }
 
       Promise.all messages.map (message) ->
-        return conversation_service.storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
+        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
       .then done
       .catch done.fail
 
@@ -221,7 +219,7 @@ describe 'z.conversation.ConversationService', ->
 
     beforeEach (done) ->
       Promise.all messages.map (message) ->
-        return conversation_service.storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
+        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
       .then done
       .catch done.fail
 

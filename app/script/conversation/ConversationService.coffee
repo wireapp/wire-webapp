@@ -229,35 +229,16 @@ class z.conversation.ConversationService
     .delete()
 
   ###
-  Update events timestamp.
-  @param event_json [JSON] Message event to update in the database
-  @param timestamp [Number] Updated timestamp
-  ###
-  update_message_timestamp_in_db: (event_json, timestamp) ->
-    Promise.resolve()
-    .then =>
-      if timestamp
-        primary_key = z.storage.StorageService.construct_primary_key event_json
-        changes =
-          time: new Date(timestamp).toISOString()
-        return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
-      else
-        throw new TypeError 'Missing timestamp'
-    .then =>
-      event_json.time = new Date(timestamp).toISOString()
-      @logger.log @logger.levels.INFO, "Updated time of message '#{event_json.id}' to '#{event_json.time}'", event_json
-      return event_json
-
-  ###
   Update events reactions.
-  @param primary_key [String] Primary key of message event to update in the database
-  @param changes [Object] Updated reactions
+  @param message_et [z.entity.Message] Message event to update in the database
+  @param changes [Object] Changes to update message with
   ###
-  update_message_in_db: (primary_key, changes) ->
-    keys = Object.keys changes
-    if keys.length and changes[keys[0]]
-      return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
-    Promise.reject new TypeError 'Missing changes'
+  update_message_in_db: (message_et, changes) ->
+    Promise.resolve message_et.primary_key or z.storage.StorageService.construct_primary_key message_et
+    .then (primary_key) =>
+      if _.isObject(changes) and changes[Object.keys(changes)[0]]?
+        return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
+      throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NO_CHANGES
 
   ###
   Delete events from a conversation.
