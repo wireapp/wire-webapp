@@ -1993,10 +1993,10 @@ class z.conversation.ConversationRepository
     .then (original_message_et) =>
       if event_json.from isnt original_message_et.from
         throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
-
-      event_json.time = new Date(timestamp).toISOString()
-      if window.isNaN event_json.time
+      if not original_message_et.timestamp
         throw new TypeError 'Missing timestamp'
+
+      event_json.time = new Date(original_message_et.timestamp).toISOString()
 
       return @conversation_service.update_message_in_db event_json, {time: event_json.time}
     .then =>
