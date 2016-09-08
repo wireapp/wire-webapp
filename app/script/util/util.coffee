@@ -70,12 +70,11 @@ z.util.iterate_array_index = (array, current_index) ->
 z.util.load_image = (blob) ->
   return new Promise (resolve, reject) ->
     img = new Image()
-    img.onload = resolve
+    img.onload = -> resolve @
     img.onerror = reject
 
     object_url = window.URL.createObjectURL blob
     img.src = object_url
-    window.URL.revokeObjectURL object_url
 
 
 z.util.load_file_buffer = (file) ->

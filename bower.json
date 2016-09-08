@@ -28,7 +28,6 @@
     "webapp-module-bubble": "https://github.com/wireapp/webapp-module-bubble.git#1.0.0",
     "webapp-module-external": "https://github.com/wireapp/webapp-module-external.git#1.0.1",
     "webapp-module-image-compressor": "https://github.com/wireapp/webapp-module-image-compressor.git#1.0.0",
-    "webapp-module-image-rotation": "https://github.com/wireapp/webapp-module-image-rotation.git#1.0.0",
     "webapp-module-logger": "https://github.com/wireapp/webapp-module-logger.git#1.0.0",
     "webapp-module-modal": "https://github.com/wireapp/webapp-module-modal.git#1.0.0",
     "webapp-module-namespace": "https://github.com/wireapp/webapp-module-namespace.git#1.0.0",
@@ -138,9 +137,6 @@
       "js/": "dist/js/*.js"
     },
     "webapp-module-namespace": {
-      "js/": "js/*.js"
-    },
-    "webapp-module-image-rotation": {
       "js/": "js/*.js"
     },
     "webapp-module-bubble": {

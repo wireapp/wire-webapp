@@ -28,7 +28,6 @@ class z.assets.AssetService
   ###
   constructor: (@client) ->
     @logger = new z.util.Logger 'z.assets.AssetService', z.config.LOGGER.OPTIONS
-    @rotator = new zeta.webapp.module.image.rotation.ImageFileRotator()
     @compressor = new zeta.webapp.module.image.ImageCompressor()
 
     @BOUNDARY = 'frontier'
@@ -143,28 +142,21 @@ class z.assets.AssetService
   @option retention [z.assets.AssetRetentionPolicy]
   ###
   upload_image_asset: (file, options) ->
-    compressed_image = null
-    image_bytes = null
-
-    @compress_image file
-    .then (data) ->
-      [original_image, compressed_image] = data
-      return z.util.base64_to_array compressed_image.src
-    .then (bytes) =>
-      image_bytes = bytes
-      @_upload_asset image_bytes, options
-    .then (data) ->
-      [key_bytes, sha256, key, token] = data
-      image_meta_data = new z.proto.Asset.ImageMetaData compressed_image.width, compressed_image.height
-      asset = new z.proto.Asset()
-      asset.set 'original', new z.proto.Asset.Original file.type, image_bytes.length, null, image_meta_data
-      asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token
-      return asset
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, error
-      asset = new z.proto.Asset()
-      asset.set 'not_uploaded', z.proto.Asset.NotUploaded.FAILED
-      return asset
+    @_compress_image image
+    .then ([compressed_image, compressed_bytes]) ->
+      @_upload_asset compressed_bytes, options
+      .then (data) ->
+        [key_bytes, sha256, key, token] = data
+        image_meta_data = new z.proto.Asset.ImageMetaData compressed_image.width, compressed_image.height
+        asset = new z.proto.Asset()
+        asset.set 'original', new z.proto.Asset.Original file.type, compressed_bytes.length, null, image_meta_data
+        asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token
+        return asset
+      .catch (error) =>
+        @logger.log @logger.levels.ERROR, error
+        asset = new z.proto.Asset()
+        asset.set 'not_uploaded', z.proto.Asset.NotUploaded.FAILED
+        return asset
 
   ###
   Generates the URL an asset can be downloaded from.
@@ -206,42 +198,6 @@ class z.assets.AssetService
   ###############################################################################
   # Private
   ###############################################################################
-
-  ###
-  Compress image before uploading.
-
-  @param file [File, Blob] Image
-  ###
-  compress_image: (file) ->
-    return new Promise (resolve) =>
-      @_convert_image file, (image) =>
-        @compressor.transform_image image, (compressed_image) ->
-          resolve [image, compressed_image]
-
-  ###
-  Convert an image before uploading it.
-
-  @param file [File, Blob] Image
-  @param callback [Function] Function to be called on return
-  ###
-  _convert_image: (file, callback) ->
-    @_rotate_image file, (rotated_file) ->
-      z.util.read_deferred(rotated_file, 'url').done (url) ->
-        image = new Image()
-        image.onload = -> callback image
-        image.onerror = (e) => @logger.log "Loading image failed #{e}"
-        image.src = url
-  ###
-  Rotate an image file unless it is a gif.
-
-  @private
-
-  @param file [Object] Image file to be rotated
-  @param callback [Function] Function to be called on return
-  ###
-  _rotate_image: (file, callback) ->
-    return callback file if file.type is 'image/gif'
-    @rotator.rotate file, callback
 
   ###
   Update the profile image of the user.
@@ -392,29 +348,21 @@ class z.assets.AssetService
   @param image [File, Blob]
   ###
   create_image_proto: (image) ->
-    original_image = null
-    compressed_image = null
-    image_bytes = null
-
-    z.util.load_file_buffer image
-    .then (buffer) ->
-      image_bytes = new Uint8Array buffer
-      return new z.util.load_image image
-    .then (image) ->
-      original_image = compressed_image = image
-      return z.assets.AssetCrypto.encrypt_aes_asset image_bytes
-    .then ([key_bytes, sha256, ciphertext]) ->
-      image_asset = new z.proto.ImageAsset()
-      image_asset.set_tag z.assets.ImageSizeType.MEDIUM
-      image_asset.set_width compressed_image.width
-      image_asset.set_height compressed_image.height
-      image_asset.set_original_width original_image.width
-      image_asset.set_original_height original_image.height
-      image_asset.set_mime_type image.type
-      image_asset.set_size image_bytes.length
-      image_asset.set_otr_key key_bytes
-      image_asset.set_sha256 sha256
-      return [image_asset, new Uint8Array ciphertext]
+    @_compress_image image
+    .then ([compressed_image, compressed_bytes]) ->
+      return z.assets.AssetCrypto.encrypt_aes_asset compressed_bytes
+      .then ([key_bytes, sha256, ciphertext]) ->
+        image_asset = new z.proto.ImageAsset()
+        image_asset.set_tag z.assets.ImageSizeType.MEDIUM
+        image_asset.set_width compressed_image.width
+        image_asset.set_height compressed_image.height
+        image_asset.set_original_width compressed_image.width
+        image_asset.set_original_height compressed_image.height
+        image_asset.set_mime_type image.type
+        image_asset.set_size compressed_bytes.length
+        image_asset.set_otr_key key_bytes
+        image_asset.set_sha256 sha256
+        return [image_asset, new Uint8Array ciphertext]
 
   ###
   Create asset proto message.
@@ -428,3 +376,26 @@ class z.assets.AssetService
       asset = new z.proto.Asset()
       asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256
       return [asset, ciphertext]
+
+  ###############################################################################
+  # Image processing
+  ###############################################################################
+
+  ###
+  Compress image.
+  @param asset [File, Blob]
+  ###
+  _compress_image: (blob) ->
+    z.util.load_file_buffer blob
+    .then (buffer) =>
+      return @_compress_worker buffer
+    .then (compressed_bytes) ->
+      return z.util.load_image new Blob [compressed_bytes], 'type': blob.type
+      .then (compressed_image) ->
+        return [compressed_image, compressed_bytes]
+
+  _compress_worker: (buffer) ->
+    return new Promise (resolve) ->
+      worker = new Worker 'worker/image-worker.js'
+      worker.onmessage = (event) -> resolve event.data
+      worker.postMessage buffer
