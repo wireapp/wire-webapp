@@ -28,16 +28,10 @@ class z.assets.AssetService
   ###
   constructor: (@client) ->
     @logger = new z.util.Logger 'z.assets.AssetService', z.config.LOGGER.OPTIONS
+    @rotator = new zeta.webapp.module.image.rotation.ImageFileRotator()
     @compressor = new zeta.webapp.module.image.ImageCompressor()
 
     @BOUNDARY = 'frontier'
-
-    @PREVIEW_CONFIG =
-      squared: false
-      max_image_size: 30
-      max_byte_size: 1024
-      lossy_scaling: true
-      compression: 0
 
     @SMALL_PROFILE_CONFIG =
       squared: true
@@ -120,16 +114,11 @@ class z.assets.AssetService
   @option retention [z.assets.AssetRetentionPolicy]
   ###
   _upload_asset: (bytes, options) ->
-    key_bytes = null
-    sha256 = null
-
     z.assets.AssetCrypto.encrypt_aes_asset bytes
-    .then (data) =>
-      [key_bytes, sha256, ciphertext] = data
+    .then ([key_bytes, sha256, ciphertext]) =>
       return @post_asset_v3 ciphertext, options
-    .then (data) ->
-      {key, token} = data
-      return [key_bytes, sha256, key, token]
+      .then ({key, token}) ->
+        return [key_bytes, sha256, key, token]
 
   ###
   Upload image the new asset api v3. Promise will resolve with z.proto.Asset instance.
@@ -152,11 +141,11 @@ class z.assets.AssetService
         asset.set 'original', new z.proto.Asset.Original file.type, compressed_bytes.length, null, image_meta_data
         asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token
         return asset
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, error
-        asset = new z.proto.Asset()
-        asset.set 'not_uploaded', z.proto.Asset.NotUploaded.FAILED
-        return asset
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, error
+      asset = new z.proto.Asset()
+      asset.set 'not_uploaded', z.proto.Asset.NotUploaded.FAILED
+      return asset
 
   ###
   Generates the URL an asset can be downloaded from.
@@ -198,6 +187,31 @@ class z.assets.AssetService
   ###############################################################################
   # Private
   ###############################################################################
+
+  ###
+  Convert an image before uploading it.
+
+  @param file [File, Blob] Image
+  @param callback [Function] Function to be called on return
+  ###
+  _convert_image: (file, callback) ->
+    @_rotate_image file, (rotated_file) ->
+      z.util.read_deferred(rotated_file, 'url').done (url) ->
+        image = new Image()
+        image.onload = -> callback image
+        image.onerror = (e) => @logger.log "Loading image failed #{e}"
+        image.src = url
+  ###
+  Rotate an image file unless it is a gif.
+
+  @private
+
+  @param file [Object] Image file to be rotated
+  @param callback [Function] Function to be called on return
+  ###
+  _rotate_image: (file, callback) ->
+    return callback file if file.type is 'image/gif'
+    @rotator.rotate file, callback
 
   ###
   Update the profile image of the user.
@@ -388,14 +402,10 @@ class z.assets.AssetService
   _compress_image: (blob) ->
     z.util.load_file_buffer blob
     .then (buffer) =>
-      return @_compress_worker buffer
+      if blob.type is 'image/gif'
+        return z.util.load_file_buffer blob
+      return new z.util.Worker 'worker/image-worker.js'.post buffer
     .then (compressed_bytes) ->
-      return z.util.load_image new Blob [compressed_bytes], 'type': blob.type
+      return z.util.load_image new Blob [new Uint8Array compressed_bytes], 'type': blob.type
       .then (compressed_image) ->
-        return [compressed_image, compressed_bytes]
-
-  _compress_worker: (buffer) ->
-    return new Promise (resolve) ->
-      worker = new Worker 'worker/image-worker.js'
-      worker.onmessage = (event) -> resolve event.data
-      worker.postMessage buffer
+        return [compressed_image, new Uint8Array compressed_bytes]
