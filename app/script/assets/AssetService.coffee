@@ -396,13 +396,13 @@ class z.assets.AssetService
     compressed_image = null
     image_bytes = null
 
-    @compress_image image
-    .then (data) ->
-      [original_image, compressed_image] = data
-      return z.util.base64_to_array compressed_image.src
-    .then (data) ->
-      image_bytes = data
-      z.assets.AssetCrypto.encrypt_aes_asset image_bytes
+    z.util.load_file_buffer image
+    .then (buffer) ->
+      image_bytes = new Uint8Array buffer
+      return new z.util.load_image image
+    .then (image) ->
+      original_image = compressed_image = image
+      return z.assets.AssetCrypto.encrypt_aes_asset image_bytes
     .then ([key_bytes, sha256, ciphertext]) ->
       image_asset = new z.proto.ImageAsset()
       image_asset.set_tag z.assets.ImageSizeType.MEDIUM
