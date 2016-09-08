@@ -1996,10 +1996,10 @@ class z.conversation.ConversationRepository
       if not original_message_et.timestamp
         throw new TypeError 'Missing timestamp'
 
-      event_json.time = new Date(original_message_et.timestamp).toISOString()
-
-      return @conversation_service.update_message_in_db event_json, {time: event_json.time}
-    .then =>
+      time = new Date(original_message_et.timestamp).toISOString()
+      @conversation_service.update_message_in_db event_json, {edited_time: event_json.time, time: time}
+      event_json.edited_time = event_json.time
+      event_json.time = time
       @_delete_message_by_id conversation_et, event_json.data.replacing_message_id
       return event_json
 
