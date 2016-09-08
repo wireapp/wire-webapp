@@ -18,56 +18,53 @@
 
 # grunt test_init && grunt test_run:util/Util
 
-###############################################################################
-# z.util.render_message
-###############################################################################
 describe 'z.util.render_message', ->
   it 'renders a normal link', ->
     actual = z.util.render_message 'Check this: http://www.wire.com/'
-    expected = 'Check this: <a href="http://www.wire.com/" target="_blank" rel="nofollow">http://www.wire.com/</a>'
+    expected = 'Check this: <a href="http://www.wire.com/" target="_blank" rel="nofollow noopener noreferrer">http://www.wire.com/</a>'
     expect(actual).toBe expected
 
   it 'renders a normal link without protocol', ->
     actual = z.util.render_message 'Check this: wire.com/about/'
-    expected = 'Check this: <a href="http://wire.com/about/" target="_blank" rel="nofollow">wire.com/about/</a>'
+    expected = 'Check this: <a href="http://wire.com/about/" target="_blank" rel="nofollow noopener noreferrer">wire.com/about/</a>'
     expect(actual).toBe expected
 
   it 'renders complicated image links', ->
     link = 'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&crop=(0,27,848,506.0960451977401)&cropxunits=848&cropyunits=595&format=jpg&quality=90&width=752&maxheight=42'
     actual = z.util.render_message link
-    expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow\">#{link}</a>"
+    expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>"
     expect(actual).toBe expected
 
   it 'renders URLs with underscores', ->
     link = 'http://en.wikipedia.org/wiki/Stormtrooper_(Star_Wars)'
     text = "Stormtroopers: #{link} !!!"
     actual = z.util.render_message text
-    expected = "Stormtroopers: <a href=\"#{link}\" target=\"_blank\" rel=\"nofollow\">#{link}</a> !!!"
+    expected = "Stormtroopers: <a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a> !!!"
     expect(actual).toBe expected
 
   it 'renders links with multiple underscores', ->
     link = 'https://www.nike.com/events-registration/event?id=6245&languageLocale=de_de&cp=EUNS_KW_DE_&s_kwcid=AL!2799!3!46005237943!b!!g!!womens%20running'
     actual = z.util.render_message link
-    expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow\">#{link}</a>"
+    expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>"
     expect(actual).toBe expected
 
   it 'renders URLs without a trailing slash', ->
     link = 'http://www.underscore.com'
     text = "e.g. #{link}."
     actual = z.util.render_message text
-    expected = "e.g. <a href=\"#{link}\" target=\"_blank\" rel=\"nofollow\">#{link}</a>."
+    expected = "e.g. <a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>."
     expect(actual).toBe expected
 
   it 'renders localhost links', ->
     link = 'http://localhost:8888/'
     actual = z.util.render_message link
-    expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow\">#{link}</a>"
+    expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>"
     expect(actual).toBe expected
 
   it 'renders links with IP addresses', ->
     link = 'http://192.168.10.44:8080//job/webapp_atomic_test/4290/cucumber-html-reports'
     actual = z.util.render_message link
-    expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow\">#{link}</a>"
+    expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>"
     expect(actual).toBe expected
 
   it 'escapes links when they are posted as plain HTML', ->
@@ -114,19 +111,18 @@ describe 'z.util.render_message', ->
     actual = z.util.render_message text
     expect(actual).toBe text
 
-###############################################################################
-# z.util.encode_base64_md5_array_buffer_view
-###############################################################################
+  xit 'renders URLs with @-signs correctly', ->
+    link = 'https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1448956.html'
+    actual = z.util.render_message link
+    expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>"
+    expect(actual).toBe expected
+
 describe 'z.util.encode_base64_md5_array_buffer_view', ->
   it 'can convert typed array to base64', ->
     actual = z.util.encode_base64_md5_array_buffer_view(new Uint8Array([8,8]))
     expected = 'w+7NCDwPSCf1JgWbA7deTA=='
     expect(actual).toBe expected
 
-
-###############################################################################
-# z.util.encode_base64
-###############################################################################
 describe 'z.util.encode_base64', ->
   it 'encodes text', ->
     actual = z.util.encode_base64 'Hello, world!'
@@ -138,10 +134,6 @@ describe 'z.util.encode_base64', ->
     expected = 'SGVsbG8sIHdvcmxkIUAjJCVeJiooKV8re31bXXw8PiwuPy9+YCI='
     expect(actual).toBe expected
 
-
-###############################################################################
-# z.util.encode_base64_sha256
-###############################################################################
 describe 'z.util.encode_base64_sha256', ->
   it 'encodes Base64 and SHA-256 empty string', ->
     actual = z.util.encode_sha256_base64 ''
@@ -158,22 +150,13 @@ describe 'z.util.encode_base64_sha256', ->
     expected = 'lt/heVPfGQB07sONclI2TZBZHuIMH86noUEWEbahMw4='
     expect(actual).toBe expected
 
-
-###############################################################################
-# z.util.base64_to_blob
-###############################################################################
 describe 'z.util.base64_to_blob', ->
-
   it 'encodes Base64 data URI to blob', ->
     base64 = z.util.array_to_base64 new Uint8Array [1, 2, 3]
     data_uri = "data:application/octet-binary;base64,#{base64}"
     blob = z.util.base64_to_blob data_uri
     expect(blob.type).toBe 'application/octet-binary'
 
-
-###############################################################################
-# z.util.create_random_uuid
-###############################################################################
 describe 'z.util.create_random_uuid', ->
   it 'has the right length', ->
     actual = z.util.create_random_uuid().length
@@ -190,30 +173,18 @@ describe 'z.util.create_random_uuid', ->
     expected = true
     expect(actual).toBe expected
 
-
-###############################################################################
-# z.util.bytes_to_uuid
-###############################################################################
 describe 'z.util.bytes_to_uuid', ->
   it 'creates uuid from byte array', ->
     expected = '1692b76b-d66b-4688-a099-71512ec1f51e'
     actual = z.util.bytes_to_uuid [22, 146, 183, 107, 214, 107, 70, 136, 160, 153, 113, 81, 46, 193, 245, 30]
     expect(actual).toBe expected
 
-
-###############################################################################
-# z.util.uuid_to_bytes
-###############################################################################
 describe 'z.util.uuid_to_bytes', ->
   it 'creates byte array from uuid', ->
     expected = [22, 146, 183, 107, 214, 107, 70, 136, 160, 153, 113, 81, 46, 193, 245, 30]
     actual = z.util.uuid_to_bytes '1692b76b-d66b-4688-a099-71512ec1f51e'
     expect(actual).toEqual expected
 
-
-###############################################################################
-# z.util.format_bytes
-###############################################################################
 describe 'z.util.format_bytes', ->
   it 'renders 0 bytes', ->
     actual = z.util.format_bytes 0
@@ -231,10 +202,6 @@ describe 'z.util.format_bytes', ->
     actual = z.util.format_bytes 25 * 1024 * 1024 * 1024
     expect(actual).toEqual '25GB'
 
-
-###############################################################################
-# z.util.get_file_extension
-###############################################################################
 describe 'z.util.get_file_extension', ->
   it 'returns common extensions', ->
     expect(z.util.get_file_extension('file.jpg')).toEqual 'jpg'
@@ -255,10 +222,6 @@ describe 'z.util.get_file_extension', ->
     actual = z.util.get_file_extension 'path/to/image.jpg'
     expect(actual).toEqual 'jpg'
 
-
-###############################################################################
-# z.util.trim_file_extension
-###############################################################################
 describe 'z.util.trim_file_extension', ->
   it 'returns the filename without extension', ->
     actual = z.util.trim_file_extension 'image.jpg'
@@ -276,9 +239,6 @@ describe 'z.util.trim_file_extension', ->
     actual = z.util.trim_file_extension 'archive.tar.gz'
     expect(actual).toEqual 'archive'
 
-###############################################################################
-# z.util.ko_array_push_all
-###############################################################################
 describe 'z.util.ko_array_push_all', ->
   it 'appends multiple items', ->
     actual = ko.observableArray [1, 2]
@@ -286,10 +246,6 @@ describe 'z.util.ko_array_push_all', ->
     expected = [1, 2, 3, 4]
     expect(actual()).toEqual expected
 
-
-###############################################################################
-# z.util.ko_array_unshift_all
-###############################################################################
 describe 'z.util.ko_array_unshift_all', ->
   it 'prepends multiple items', ->
     actual = ko.observableArray [3, 4]
@@ -297,10 +253,6 @@ describe 'z.util.ko_array_unshift_all', ->
     expected = [1, 2, 3, 4]
     expect(actual()).toEqual expected
 
-
-###############################################################################
-# z.util.contains
-###############################################################################
 describe 'z.util.contains', ->
   string = 'Club Zeta'
 
@@ -320,10 +272,6 @@ describe 'z.util.contains', ->
     actual = z.util.contains string, 'wurst'
     expect(actual).toBeFalsy()
 
-
-###############################################################################
-# z.util.base64_to_array
-###############################################################################
 describe 'z.util.base64_to_array', ->
   it 'can convert a gif', ->
     actual = z.util.base64_to_array 'data:image/gif;base64,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'
@@ -337,20 +285,12 @@ describe 'z.util.base64_to_array', ->
       buffer_decoded = z.util.base64_to_array buffer_encoded
       expect(buffer_decoded).toEqual array
 
-
-###############################################################################
-# z.util.google_uri_to_e164
-###############################################################################
 describe 'z.util.phone_uri_to_e164', ->
   it 'can convert a Google phone number uri', ->
     actual = z.util.phone_uri_to_e164 'tel:+49-151-50304525'
     expected = '+4915150304525'
     expect(actual).toBe expected
 
-
-###############################################################################
-# z.util.strip_data_uri
-###############################################################################
 describe 'z.util.strip_data_uri', ->
   it 'can strip data uri', ->
     base64 = 'AAAAAAA'
@@ -367,10 +307,6 @@ describe 'z.util.strip_data_uri', ->
     expect(base64_png).toBe base64
     expect(base64_jpg).toBe base64
 
-
-###############################################################################
-# z.util.phone_number_to_e164
-###############################################################################
 describe 'z.util.phone_number_to_e164', ->
   it 'can convert a US number', ->
     actual = z.util.phone_number_to_e164 '555-666-7777', 'US'
@@ -392,20 +328,12 @@ describe 'z.util.phone_number_to_e164', ->
     expected = ''
     expect(actual).toBe expected
 
-
-###############################################################################
-# z.util.get_content_type_from_data_url
-###############################################################################
 describe 'z.util.get_content_type_from_data_url', ->
   it 'can extract the type of a an image', ->
     actual = z.util.get_content_type_from_data_url 'data:image/gif;base64,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'
     expected = 'image/gif'
     expect(actual).toEqual expected
 
-
-###############################################################################
-# z.util.sort_groups_by_last_event
-###############################################################################
 describe 'z.util.sort_groups_by_last_event', ->
   it 'finds out that Group A is more recent than Group B', ->
     group_a = new z.entity.Conversation()
@@ -451,10 +379,6 @@ describe 'z.util.sort_groups_by_last_event', ->
 
     expect(actual).toEqual expected
 
-
-###############################################################################
-# z.util.sort_user_by_first_name
-###############################################################################
 xdescribe 'z.util.sort_user_by_first_name', ->
   it 'can sort a list of users', ->
     user_a = new z.entity.User()
@@ -470,10 +394,6 @@ xdescribe 'z.util.sort_user_by_first_name', ->
 
     expect(actual).toEqual expected
 
-
-###############################################################################
-# z.util.array_get_next
-###############################################################################
 describe 'z.util.array_get_next', ->
   a = 'a'
   b = 'b'
@@ -502,10 +422,6 @@ describe 'z.util.array_get_next', ->
     expected = null
     expect(actual).toEqual expected
 
-
-###############################################################################
-# z.util.array_is_last
-###############################################################################
 describe 'z.util.array_is_last', ->
   a = 'a'
   b = 'b'
@@ -525,10 +441,6 @@ describe 'z.util.array_is_last', ->
     actual = z.util.array_is_last array, d
     expect(actual).toBeFalsy()
 
-
-###############################################################################
-# z.util.array_is_last
-###############################################################################
 describe 'z.util.trunc_text', ->
   it 'returns the full string if it is shorter than the target length', ->
     text = z.util.trunc_text "#{lorem_ipsum.substr 0, 80}", 90
@@ -550,10 +462,6 @@ describe 'z.util.trunc_text', ->
     expect(text.length).toBe 70
     expect(text.charAt 69).toBe '…'
 
-
-###############################################################################
-# z.util.strip_url_wrapper
-###############################################################################
 describe 'z.util.strip_url_wrapper', ->
   it 'return the string without url wrapper (single quotes)', ->
     text = z.util.strip_url_wrapper "url('/path/to/image/image.png')"
@@ -567,10 +475,6 @@ describe 'z.util.strip_url_wrapper', ->
     text = z.util.strip_url_wrapper 'url(/path/to/image/image.png)'
     expect(text).toBe '/path/to/image/image.png'
 
-
-###############################################################################
-# z.util.naked_url
-###############################################################################
 describe 'z.util.naked_url', ->
   it 'returns into naked url', ->
 
@@ -599,18 +503,11 @@ describe 'z.util.naked_url', ->
   it 'returns empty string if url is not set', ->
     expect(z.util.naked_url()).toBe ''
 
-###############################################################################
-# z.util.string_format
-###############################################################################
 describe 'z.util.string_format', ->
   it 'returns string with replaced placeholder', ->
     actual = z.util.string_format 'foo={0}&bar={1}', 1, 2
     expect(actual).toBe 'foo=1&bar=2'
 
-
-###############################################################################
-# z.util.array_chunks
-###############################################################################
 describe 'z.util.array_chunks', ->
   arr = null
 
@@ -641,18 +538,11 @@ describe 'z.util.array_chunks', ->
     expect(actual[3].length).toBe 1
     expect(arr.length).toBe 10
 
-###############################################################################
-# z.util.remove_line_breaks
-###############################################################################
 describe 'z.util.remove_line_breaks', ->
   it 'removes all the line breaks', ->
     actual = z.util.remove_line_breaks 'A\nB\nC\nD'
     expect(actual).toBe 'ABCD'
 
-
-###############################################################################
-# z.util.trim_line_breaks
-###############################################################################
 describe 'z.util.trim_line_breaks', ->
   it 'does not remove line breaks in between', ->
     actual = z.util.trim_line_breaks 'A\nB\nC\nD'
@@ -670,10 +560,6 @@ describe 'z.util.trim_line_breaks', ->
     actual = z.util.trim_line_breaks '\n\n\n\nB\nC\n\n\n\n\n'
     expect(actual).toBe 'B\nC'
 
-
-###############################################################################
-# z.util.append_url_parameter
-###############################################################################
 describe 'z.util.append_url_parameter', ->
   it 'append param with & when url contains param', ->
     url = 'foo.com?bar=true'
@@ -685,19 +571,11 @@ describe 'z.util.append_url_parameter', ->
     actual = z.util.append_url_parameter url, 'fum=true'
     expect(actual).toBe 'foo.com?fum=true'
 
-
-###############################################################################
-# z.util.get_url_parameter
-###############################################################################
 describe 'z.util.get_url_parameter', ->
   it 'get param with no arguments', ->
     actual = z.util.get_url_parameter 'foo'
     expect(actual).toBe null
 
-
-###############################################################################
-# Markdown Rendering
-###############################################################################
 describe 'Markdown for bold text', ->
   it 'renders bold text', ->
     text = '**bold text (not italic)**'
@@ -828,9 +706,8 @@ describe 'Markdown for code snippets', ->
 
 describe 'Markdown with mixed markups', ->
   it 'renders font weights together with links', ->
-    # TODO: Someday we need a link factory (Factory Pattern!)
-    link_1 = '<a href="http://www.link.com" target="_blank" rel="nofollow">www.link.com</a>'
-    link_2 = '<a href="http://www.anotherlink.net" target="_blank" rel="nofollow">www.anotherlink.net</a>'
+    link_1 = '<a href="http://www.link.com" target="_blank" rel="nofollow noopener noreferrer">www.link.com</a>'
+    link_2 = '<a href="http://www.anotherlink.net" target="_blank" rel="nofollow noopener noreferrer">www.anotherlink.net</a>'
     text = "This is *italic* and **bold** and ***bold-italic*** with a www.link.com and www.anotherlink.net."
 
     actual = z.util.render_message text
@@ -869,10 +746,6 @@ describe 'Markdown exceptions', ->
     actual = z.util.render_message text
     expect(actual).toBe text
 
-
-###############################################################################
-# z.util.append_url_parameter
-###############################################################################
 describe 'z.util.print_devices_id', ->
   it 'can print device id', ->
     actual = z.util.print_devices_id '66e66c79e8d1dea4'
@@ -882,10 +755,6 @@ describe 'z.util.print_devices_id', ->
     actual = z.util.print_devices_id '6e66c79e8d1dea4'
     expect(actual).toBe "<span class='device-id-part'>06</span><span class='device-id-part'>e6</span><span class='device-id-part'>6c</span><span class='device-id-part'>79</span><span class='device-id-part'>e8</span><span class='device-id-part'>d1</span><span class='device-id-part'>de</span><span class='device-id-part'>a4</span>"
 
-
-###############################################################################
-# z.util.append_url_parameter
-###############################################################################
 describe 'z.util.zero_padding', ->
   it 'should add zero padding when string length is smaller then max', ->
     actual = z.util.zero_padding '1', 10
@@ -903,10 +772,6 @@ describe 'z.util.zero_padding', ->
     actual = z.util.zero_padding 42, 10
     expect(actual).toBe '0000000042'
 
-
-###############################################################################
-# z.util.append_url_parameter
-###############################################################################
 describe 'z.util.format_seconds', ->
   it 'should format seconds', ->
     expect(z.util.format_seconds(50)).toBe '00:50'
@@ -923,10 +788,6 @@ describe 'z.util.format_seconds', ->
   it 'should format undefined as 00:00', ->
     expect(z.util.format_seconds()).toBe '00:00'
 
-
-###############################################################################
-# z.util.is_same_location
-###############################################################################
 describe 'z.util.is_same_location', ->
   it 'returns false if page was accessed directly', ->
     actual = z.util.is_same_location '', 'https://app.wire.com'
@@ -980,10 +841,6 @@ describe 'z.util.is_same_location', ->
     actual = z.util.is_same_location 'https://app.wire.com/?hl=de', 'https://app.wire.com/?hl=de'
     expect(actual).toBeTruthy()
 
-
-###############################################################################
-# z.util.merge_objects
-###############################################################################
 describe 'Merging objects', ->
   it 'merges two objects into a new one without modifying the sources', ->
     object_a =
@@ -1024,10 +881,6 @@ describe 'Merging objects', ->
     expect(merged_object.ordering.c).toBe 3
     expect(merged_object.ordering.d).toBe 4
 
-
-###############################################################################
-# z.util.bucket_values
-###############################################################################
 describe 'bucket_values', ->
   it 'returns correct value for zero', ->
     expect(z.util.bucket_values 0, [0, 5, 10, 15, 20, 25]).toBe '0'
@@ -1040,10 +893,6 @@ describe 'bucket_values', ->
     expect(z.util.bucket_values 100, [0, 5, 10, 15, 20, 25]).toBe '26-'
     expect(z.util.bucket_values 10023, [0, 100, 200, 500, 1000, 2000]).toBe '2001-'
 
-
-###############################################################################
-# z.util.iterate_array_index
-###############################################################################
 describe 'iterate_array_index', ->
   it 'returns undefined in case of wrong input parameters', ->
     expect(z.util.iterate_array_index 'Test', 0).toBe undefined
@@ -1057,10 +906,6 @@ describe 'iterate_array_index', ->
     expect(z.util.iterate_array_index [1, 2, 3, 4, 5], 3).toBe 4
     expect(z.util.iterate_array_index [1, 2, 3, 4, 5], 4).toBe 0
 
-
-###############################################################################
-# z.util.zero_padding
-###############################################################################
 describe 'z.util.zero_padding', ->
   it 'can add one zero to 6', ->
     actual = z.util.zero_padding 6
@@ -1076,3 +921,19 @@ describe 'z.util.zero_padding', ->
     actual = z.util.zero_padding 666
     expected = '666'
     expect(actual).toEqual expected
+
+describe 'z.util.safe_window_open', ->
+  it 'doesn\'t contain a reference to the opening tab', ->
+    url = 'https://wire.com/'
+
+    new_window = window.open url
+    expect(new_window.opener).not.toBeNull()
+
+    new_window = z.util.safe_window_open url
+    expect(new_window.opener).toBeNull()
+
+  it 'add http if protocol is missing', ->
+    url = 'wire.com/'
+
+    new_window = window.open url
+    expect(new_window.location).not.toBe 'http://wire.com/'

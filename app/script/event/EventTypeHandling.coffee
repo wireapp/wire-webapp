@@ -20,25 +20,34 @@ window.z ?= {}
 z.event ?= {}
 
 z.event.EventTypeHandling =
+  CONFIRM: [
+    z.event.Backend.CONVERSATION.ASSET_ADD
+    z.event.Backend.CONVERSATION.KNOCK
+    z.event.Backend.CONVERSATION.MESSAGE_ADD
+    z.event.Client.CONVERSATION.LOCATION
+    z.event.Client.CONVERSATION.REACTION
+  ]
   DECRYPT: [
     z.event.Backend.CONVERSATION.OTR_ASSET_ADD
     z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD
   ]
   IGNORE: [
-    z.event.Backend.CONVERSATION.CLIENT_MESSAGE_ADD
+    z.event.Backend.CONVERSATION.ASSET_ADD
+    z.event.Backend.CONVERSATION.KNOCK
+    z.event.Backend.CONVERSATION.MESSAGE_ADD
     z.event.Backend.CONVERSATION.TYPING
   ]
   STORE: [
     z.event.Backend.CONVERSATION.ASSET_ADD
-    z.event.Backend.CONVERSATION.HOT_KNOCK
     z.event.Backend.CONVERSATION.KNOCK
-    z.event.Backend.CONVERSATION.LOCATION
     z.event.Backend.CONVERSATION.MEMBER_JOIN
     z.event.Backend.CONVERSATION.MEMBER_LEAVE
     z.event.Backend.CONVERSATION.MESSAGE_ADD
     z.event.Backend.CONVERSATION.RENAME
     z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
     z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
-    z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
+    z.event.Client.CONVERSATION.ASSET_META
     z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+    z.event.Client.CONVERSATION.LOCATION
+    z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
   ]

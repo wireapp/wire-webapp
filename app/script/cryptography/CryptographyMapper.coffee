@@ -32,39 +32,33 @@ class z.cryptography.CryptographyMapper
   @return [Object] Promise that resolves with the mapped event
   ###
   map_generic_message: (generic_message, event) =>
-    mapped = undefined
-
     Promise.resolve()
-    .then ->
+    .then =>
       if not generic_message
-        error_message = "Failed to map OTR event '#{event.id}' as decrypted generic message is missing"
-        throw new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.MISSING_MESSAGE
-    .then ->
-      mapped =
+        throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.NO_GENERIC_MESSAGE
+      return @_map_generic_message generic_message, event
+    .then (specific_content) ->
+      return $.extend
         conversation: event.conversation
         id: generic_message.message_id
         from: event.from
         time: event.time
-    .then =>
-      return @_map_generic_message generic_message, event
-    .then (specific_content) ->
-      $.extend mapped, specific_content
-      return mapped
+      , specific_content
 
-  _map_generic_message: (generic_message, event) ->
+  _map_generic_message: (generic_message, event) =>
     switch generic_message.content
       when 'asset'
         return @_map_asset generic_message.asset, generic_message.message_id, event.data?.id
       when 'cleared'
         return @_map_cleared generic_message.cleared
-      when 'hidden'
-        return @_map_hidden generic_message.hidden
       when 'deleted'
         return @_map_deleted generic_message.deleted
       when 'edited'
         return @_map_edited generic_message.edited, generic_message.message_id
       when 'external'
         return @_map_external generic_message.external, event
+      when 'hidden'
+        return @_map_hidden generic_message.hidden
       when 'image'
         return @_map_image generic_message.image, event.data.id
       when 'knock'
@@ -73,11 +67,13 @@ class z.cryptography.CryptographyMapper
         return @_map_last_read generic_message.lastRead
       when 'location'
         return @_map_location generic_message.location, generic_message.message_id
+      when 'reaction'
+        return @_map_reaction generic_message.reaction
       when 'text'
         return @_map_text generic_message.text, generic_message.message_id
       else
-        error_message = "Skipped event '#{generic_message.message_id}' of unhandled type '#{generic_message.content}'"
-        throw new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+        @logger.log @logger.levels.WARN, "Skipped event '#{generic_message.message_id}' of unhandled type '#{generic_message.content}'"
+        throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
 
   _map_asset: (asset, event_nonce, event_id) ->
     if asset.uploaded?
@@ -89,9 +85,9 @@ class z.cryptography.CryptographyMapper
     else if asset.original?
       return @_map_asset_original asset.original, event_nonce
     else
-      error_message = 'Ignored asset preview'
-      @logger.log @logger.levels.INFO, error_message
-      throw new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
+      error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
+      @logger.log @logger.levels.INFO, error.message
+      throw error
 
   _map_asset_meta_data: (original) ->
     if original.audio?
@@ -99,6 +95,13 @@ class z.cryptography.CryptographyMapper
         duration: original.audio.duration_in_millis.toNumber() / 1000
         loudness: new Uint8Array(original.audio.normalized_loudness?.toArrayBuffer() or [])
       }
+
+  _map_asset_not_uploaded: (not_uploaded) ->
+    return {
+      data:
+        reason: not_uploaded
+      type: z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED
+    }
 
   _map_asset_original: (original, event_nonce) ->
     return {
@@ -109,23 +112,7 @@ class z.cryptography.CryptographyMapper
           name: original.name
           nonce: event_nonce
         meta: @_map_asset_meta_data(original)
-      type: z.event.Backend.CONVERSATION.ASSET_META
-    }
-
-  _map_asset_not_uploaded: (not_uploaded) ->
-    return {
-      data:
-        reason: not_uploaded
-      type: z.event.Backend.CONVERSATION.ASSET_UPLOAD_FAILED
-    }
-
-  _map_asset_uploaded: (uploaded, event_id) ->
-    return {
-      data:
-        id: event_id
-        otr_key: new Uint8Array uploaded.otr_key?.toArrayBuffer()
-        sha256: new Uint8Array uploaded.sha256?.toArrayBuffer()
-      type: z.event.Backend.CONVERSATION.ASSET_UPLOAD_COMPLETE
+      type: z.event.Client.CONVERSATION.ASSET_META
     }
 
   _map_asset_preview: (preview, event_id) ->
@@ -134,7 +121,16 @@ class z.cryptography.CryptographyMapper
         id: event_id
         otr_key: new Uint8Array preview.remote.otr_key?.toArrayBuffer()
         sha256: new Uint8Array preview.remote.sha256?.toArrayBuffer()
-      type: z.event.Backend.CONVERSATION.ASSET_PREVIEW
+      type: z.event.Client.CONVERSATION.ASSET_PREVIEW
+    }
+
+  _map_asset_uploaded: (uploaded, event_id) ->
+    return {
+      data:
+        id: event_id
+        otr_key: new Uint8Array uploaded.otr_key?.toArrayBuffer()
+        sha256: new Uint8Array uploaded.sha256?.toArrayBuffer()
+      type: z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE
     }
 
   _map_cleared: (cleared) ->
@@ -145,20 +141,17 @@ class z.cryptography.CryptographyMapper
       type: z.event.Backend.CONVERSATION.MEMBER_UPDATE
     }
 
-  _map_hidden: (hidden) ->
-    return {
-      data:
-        conversation_id: hidden.conversation_id
-        message_id: hidden.message_id
-      type: z.event.Backend.CONVERSATION.MESSAGE_HIDDEN
-    }
-
   _map_deleted: (deleted) ->
     return {
       data:
         message_id: deleted.message_id
-      type: z.event.Backend.CONVERSATION.MESSAGE_DELETE
+      type: z.event.Client.CONVERSATION.MESSAGE_DELETE
     }
+
+  _map_edited: (edited, event_id) ->
+    mapped = @_map_text edited.text, event_id
+    mapped.data.replacing_message_id = edited.replacing_message_id
+    return mapped
 
   ###
   Unpacks a specific generic message which is wrapped inside an external generic message.
@@ -180,15 +173,24 @@ class z.cryptography.CryptographyMapper
       @logger.log @logger.levels.INFO, "Received external message of type '#{generic_message.content}'", generic_message
       return @_map_generic_message generic_message, event
     .catch (error) ->
-      throw new z.cryptography.CryptographyError error.message, z.cryptography.CryptographyError::TYPE.BROKEN_EXTERNAL
+      @logger.log @logger.levels.ERROR, "Failed to map external message: #{error.message}", error
+      throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.BROKEN_EXTERNAL
+
+  _map_hidden: (hidden) ->
+    return {
+      data:
+        conversation_id: hidden.conversation_id
+        message_id: hidden.message_id
+      type: z.event.Client.CONVERSATION.MESSAGE_HIDDEN
+    }
 
   _map_image: (image, event_id) ->
     if image.tag is 'medium'
       return @_map_image_medium image, event_id
     else
-      error_message = 'Ignored image preview'
-      @logger.log @logger.levels.INFO, error_message
-      throw new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
+      error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
+      @logger.log @logger.levels.INFO, error.message
+      throw error
 
   _map_image_medium: (image, event_id) ->
     return {
@@ -211,9 +213,9 @@ class z.cryptography.CryptographyMapper
 
   _map_knock: (knock, event_id) ->
     if knock.hot_knock
-      error_message = 'Ignored hot knock'
-      @logger.log @logger.levels.INFO, error_message
-      throw new z.cryptography.CryptographyError error_message, z.cryptography.CryptographyError::TYPE.IGNORED_HOT_KNOCK
+      error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_HOT_KNOCK
+      @logger.log @logger.levels.INFO, error.message
+      throw error
     else
       return {
         data:
@@ -238,7 +240,15 @@ class z.cryptography.CryptographyMapper
           name: location.name
           zoom: location.zoom
         nonce: event_id
-      type: z.event.Backend.CONVERSATION.LOCATION
+      type: z.event.Client.CONVERSATION.LOCATION
+    }
+
+  _map_reaction: (reaction) ->
+    return {
+      data:
+        message_id: reaction.message_id
+        reaction: reaction.emoji
+      type: z.event.Client.CONVERSATION.REACTION
     }
 
   _map_text: (text, event_id) ->
@@ -249,8 +259,3 @@ class z.cryptography.CryptographyMapper
         previews: text.link_preview.map (preview) -> preview.encode64()
       type: z.event.Backend.CONVERSATION.MESSAGE_ADD
     }
-
-  _map_edited: (edited, event_id) ->
-    mapped = @_map_text edited.text, event_id
-    mapped.data.replacing_message_id = edited.replacing_message_id
-    return mapped

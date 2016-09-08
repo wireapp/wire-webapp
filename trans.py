@@ -18,22 +18,31 @@
 #
 
 import os
+import sys
 
-os.system('crowdin-cli-py upload sources')
-os.system('crowdin-cli-py download')
+home_dir = os.path.expanduser('~')
+user_config = os.path.join(home_dir, '.crowdin.yaml')
+
+os.system('crowdin-cli-py --identity={} upload sources'.format(user_config))
+os.system('crowdin-cli-py --identity={} download'.format(user_config))
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
-root = 'app/script/localization/'
-
 
 def get_locale(filename):
   locale = filename.replace('strings-', '').replace('.coffee', '')
   return locale if len(locale) == 2 else None
 
+root = 'app/script/localization/'
 
 for filename in os.listdir(root):
   locale = get_locale(filename)
   if locale:
+    if locale != 'de':
+      file_to_delete = os.path.join(root, filename)
+      sys.stdout.write('Removing unsupported locale "{}" ({})\n'.format(locale, file_to_delete))
+      os.remove(file_to_delete)
+      continue
+
     with open(os.path.join(root, filename), 'r') as f:
       source = f.read()
 

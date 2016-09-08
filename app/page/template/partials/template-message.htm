@@ -39,7 +39,7 @@
   <div class="message-body message-location-body">
     <div class="message-location-icon icon-location"></div>
     <div class="message-location-label" data-bind="text: name"></div>
-    <a target="_blank" class="label-xs text-theme" data-bind="attr: {href: link_src}, l10n_text: z.string.conversation_location_link"></a>
+    <a class="label-xs text-theme" data-bind="attr: {href: link_src}, l10n_text: z.string.conversation_location_link" rel="nofollow noopener noreferrer" target="_blank"></a>
   </div>
 </script>
 
@@ -69,6 +69,7 @@
     </div>
   </div>
   <div class="message-body">
+
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
       <!-- ko if: asset.is_medium_image() -->
         <div class="message-asset-image" data-bind="fit_to_viewport: asset">
@@ -106,14 +107,47 @@
       <!-- /ko -->
 
       <context-menu params="entries: function() {return $parents[1].get_context_menu_entries(message)}, tag: 'message', data: message.id"
-                    class="context-menu icon-more"
+                    class="context-menu icon-more font-size-xs"
                     tabindex="-1"></context-menu>
       <!-- ko ifnot: message.timestamp == '' -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
       <!-- /ko -->
-
     <!-- /ko -->
+
+    <!-- ko ifnot: message.other_likes().length -->
+      <div class="message-body-like">
+        <span class="message-body-like-icon like-button message-show-on-hover" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: $parent.click_on_like">
+          <span class="icon-liked"></span>
+          <span class="icon-liked"></span>
+        </span>
+      </div>
+    <!-- /ko -->
+
   </div>
+  <!-- ko if: message.other_likes().length -->
+    <div class="message-footer">
+      <div class="message-footer-icon">
+        <span class="like-button" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: $parent.click_on_like">
+          <span class="icon-liked"></span>
+          <span class="icon-liked"></span>
+        </span>
+      </div>
+      <div class="message-footer-label cursor-pointer" data-bind="click: function() {$data.show_likes(true)}">
+        <span class="font-size-xs text-graphite" data-uie-name="message-liked-names" data-bind="text: like_caption, attr: {'data-uie-value': reactions_user_ids()}" ></span>
+        <!-- ko if: !message.show_likes() && message.other_likes().length > 5 -->
+          <span class="icon-more font-size-xs"></span>
+        <!-- /ko -->
+      </div>
+      <!-- ko if: message.show_likes() -->
+        <div class="message-footer-bottom" data-uie-name="message-liked-avatars">
+          <!-- ko foreach: message.reactions_user_ets() -->
+            <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+          <!-- /ko -->
+          <span class="icon-close button-icon font-size-xs flex-center user-avatar-box-xs" data-bind="click: function() { $data.show_likes(false) }"></span>
+        </div>
+      <!-- /ko -->
+    </div>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="device">
@@ -189,7 +223,7 @@
     </div>
   </div>
   <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
-                class="context-menu icon-more"
+                class="context-menu icon-more font-size-xs"
                 tabindex="-1"></context-menu>
   <!-- ko ifnot: message.timestamp == '' -->
     <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
@@ -218,7 +252,7 @@
     <div class="message-header-label ellipsis">
       <span data-bind="html: caption"></span>
       <span>&nbsp;</span>
-      <a class="text-theme" data-bind="l10n_text: z.string.conversation_unable_to_decrypt_link, attr: {'href': link}" target="_blank"></a>
+      <a class="text-theme" data-bind="l10n_text: z.string.conversation_unable_to_decrypt_link, attr: {'href': link}" rel="nofollow noopener noreferrer" target="_blank"></a>
       <hr class="message-header-line" />
     </div>
   </div>

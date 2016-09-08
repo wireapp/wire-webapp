@@ -133,7 +133,7 @@ describe 'z.client.ClientRepository', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any Error
-        expect(error.message).toEqual 'Expected unit test error'
+        expect(error.type).toBe z.client.ClientError::TYPE.DATABASE_FAILURE
         done()
 
   describe '_construct_primary_key', ->
@@ -170,7 +170,7 @@ describe 'z.client.ClientRepository', ->
     it 'throws an error on Electron if no current client', ->
       z.util.Environment.electron = true
       function_call = -> client_repository.is_current_client_permanent()
-      expect(function_call).toThrowError z.client.ClientError, 'No current client'
+      expect(function_call).toThrowError z.client.ClientError, 'Local client is not yet set'
 
     it 'returns true if current client is permanent', ->
       client_repository.current_client new z.client.Client {type: z.client.ClientType.PERMANENT}
@@ -184,7 +184,7 @@ describe 'z.client.ClientRepository', ->
 
     it 'throws an error if no current client', ->
       function_call = -> client_repository.is_current_client_permanent()
-      expect(function_call).toThrowError z.client.ClientError, 'No current client'
+      expect(function_call).toThrowError z.client.ClientError, 'Local client is not yet set'
 
   describe '_is_current_client', ->
     beforeEach -> client_repository.current_client undefined
@@ -207,7 +207,7 @@ describe 'z.client.ClientRepository', ->
 
     it 'throws an error if current client is not set', ->
       function_call = -> client_repository._is_current_client user_id, client_id
-      expect(function_call).toThrowError z.client.ClientError, 'No current client'
+      expect(function_call).toThrowError z.client.ClientError, 'Local client is not yet set'
 
     it 'throws an error if client ID is not specified', ->
       client_repository.current_client new z.client.Client()

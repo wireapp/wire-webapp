@@ -45,7 +45,7 @@ class z.conversation.EventMapper
     try
       return @_map_json_event event, conversation_et
     catch error
-      @logger.log @logger.levels.ERROR, 'Cannot map event', {error: error, event: event}
+      @logger.log @logger.levels.ERROR, "Failed to map event: #{error.message}", {error: error, event: event}
       return undefined
 
   ###
@@ -58,10 +58,10 @@ class z.conversation.EventMapper
   ###
   _map_json_event: (event, conversation_et) ->
     switch event.type
-      when z.event.Backend.CONVERSATION.ASSET_META
-        message_et = @_map_event_asset_meta event
       when z.event.Backend.CONVERSATION.ASSET_ADD
         message_et = @_map_event_asset_add event
+      when z.event.Backend.CONVERSATION.KNOCK
+        message_et = @_map_event_ping event
       when z.event.Backend.CONVERSATION.MESSAGE_ADD
         message_et = @_map_event_message_add event
       when z.event.Backend.CONVERSATION.MEMBER_JOIN
@@ -69,29 +69,32 @@ class z.conversation.EventMapper
       when z.event.Backend.CONVERSATION.MEMBER_LEAVE
         message_et = @_map_event_member_leave event
       when z.event.Backend.CONVERSATION.MEMBER_UPDATE
-        message_et = @_map_event_member_update()
+        message_et = @_map_event_member_update event
       when z.event.Backend.CONVERSATION.RENAME
         message_et = @_map_event_rename event
       when z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
         message_et = @_map_event_voice_channel_activate()
       when z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
         message_et = @_map_event_voice_channel_deactivate event
-      when z.event.Backend.CONVERSATION.KNOCK
-        message_et = @_map_event_ping event
-      when z.event.Backend.CONVERSATION.LOCATION
+      when z.event.Client.CONVERSATION.ASSET_META
+        message_et = @_map_event_asset_meta event
+      when z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+        message_et = @_map_system_event_delete_everywhere event
+      when z.event.Client.CONVERSATION.LOCATION
         message_et = @_map_event_location event
       when z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
         message_et = @_map_system_event_unable_to_decrypt event
-      when z.event.Client.CONVERSATION.DELETE_EVERYWHERE
-        message_et = @_map_system_event_delete_everywhere event
       else
         message_et = @_map_event_ignored()
 
     message_et.id = event.id
-    message_et.type = event.type
     message_et.from = event.from
     message_et.timestamp = new Date(event.time).getTime()
-    message_et.primary_key = "#{conversation_et.id}@#{message_et.from}@#{message_et.timestamp}"
+    message_et.primary_key = z.storage.StorageService.construct_primary_key event
+    message_et.type = event.type
+
+    if message_et.is_reactable()
+      message_et.reactions event.reactions or {}
 
     if window.isNaN message_et.timestamp
       @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
@@ -211,8 +214,10 @@ class z.conversation.EventMapper
 
   @return [z.entity.MemberMessage] Member message entity
   ###
-  _map_event_member_update: ->
+  _map_event_member_update: (event) ->
     message_et = new z.entity.MemberMessage()
+    # don't render last read
+    message_et.visible not event.data.last_read_timestamp
     return message_et
 
   ###

@@ -17,32 +17,28 @@
 #
 
 window.z ?= {}
-z.audio ?= {}
+z.conversation ?= {}
 
-class z.audio.AudioError
+class z.conversation.ConversationError
   constructor: (type) ->
     @name = @constructor.name
     @stack = (new Error()).stack
-    @type = type or z.audio.AudioError::TYPE.UNKNOWN
+    @type = type or z.conversation.ConversationError::TYPE.UNKNOWN
 
     @message = switch @type
-      when z.audio.AudioError::TYPE.ALREADY_PLAYING
-        'Sound is already playing'
-      when z.audio.AudioError::TYPE.FAILED_TO_PLAY
-        'Failed to play sound'
-      when z.audio.AudioError::TYPE.IGNORED_SOUND
-        'Ignored request to play sound'
-      when z.audio.AudioError::TYPE.NOT_FOUND
-        'AudioElement or ID not found'
+      when z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+        'Message not found'
+      when z.conversation.ConversationError::TYPE.NO_CHANGES
+        'Missing changes to message'
+      when z.conversation.ConversationError::TYPE.WRONG_USER
+        'Wrong user tried to change or delete a message'
       else
-        'Unknown AudioError'
+        'Unknown ConversationError'
 
   @:: = new Error()
   @::constructor = @
-  @::TYPE = {
-    ALREADY_PLAYING: 'z.audio.AudioError::TYPE.ALREADY_PLAYING'
-    FAILED_TO_PLAY: 'z.audio.AudioError::TYPE.FAILED_TO_PLAY'
-    IGNORED_SOUND: 'z.audio.AudioError::TYPE.IGNORED_SOUND'
-    NOT_FOUND: 'z.audio.AudioError::TYPE.NOT_FOUND'
-    UNKNOWN: 'z.audio.AudioError::TYPE.UNKNOWN'
-  }
+  @::TYPE =
+    MESSAGE_NOT_FOUND: 'z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND'
+    NO_CHANGES: 'z.conversation.ConversationError::TYPE.NO_CHANGES'
+    WRONG_USER: 'z.conversation.ConversationError::TYPE.WRONG_USER'
+    UNKNOWN: 'z.conversation.ConversationError::TYPE.UNKNOWN'

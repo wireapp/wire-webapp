@@ -17,13 +17,9 @@
 #
 
 window.z ?= {}
-z.storage ?= {}
+z.event ?= {}
 
-class z.storage.SkipError
-  constructor: (message) ->
-    @name = @constructor.name
-    @message = message
-    @stack = (new Error()).stack
-
-  @:: = new Error()
-  @::constructor = @
+z.event.NotificationHandlingState =
+  STREAM: 'z.event.NotificationHandlingState.STREAM'
+  RECOVERY: 'z.event.NotificationHandlingState.RECOVERY'
+  WEB_SOCKET: 'z.event.NotificationHandlingState.WEB_SOCKET'

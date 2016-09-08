@@ -67,7 +67,6 @@ z.event.WebApp =
     ACCESS_TOKEN:
       RENEW: 'wire.webapp.connection.access-token.renew'
       RENEWED: 'wire.webapp.connection.access-token.renewed'
-    RECONNECT: 'wire.webapp.connection.reconnect'
     ONLINE: 'wire.webapp.connection.online'
   CONVERSATION:
     DEBUG: 'wire.webapp.conversation.debug'
@@ -85,8 +84,6 @@ z.event.WebApp =
     ASSET:
       CANCEL: 'wire.webapp.conversation.asset.cancel'
     MESSAGE:
-      DELETE_SELF: 'wire.webapp.conversation.message.delete-self'
-      DELETE_EVERYONE: 'wire.webapp.conversation.message.delete-everyone'
       EDIT: 'wire.webapp.conversation.message.edit'
     IMAGE:
       SEND: 'wire.webapp.conversation.image.send'
@@ -162,7 +159,7 @@ z.event.WebApp =
   USER:
     UNBLOCKED: 'wire.webapp.user.unblocked'
     EVENT_FROM_BACKEND: 'wire.webapp.user.event-from-backend'
-  WARNINGS:
+  WARNING:
     SHOW: 'wire.webapp.warning.show'
     DISMISS: 'wire.webapp.warning.dismiss'
     MODAL: 'wire.webapp.warning.modal'

@@ -63,13 +63,13 @@ class z.announce.AnnounceRepository
             requireInteraction: true
 
           amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.SENT, campaign: announce.campaign
-          @logger.log @logger.levels.INFO, "Announcement Shown '#{announce.title}'"
+          @logger.log @logger.levels.INFO, "Announcement '#{announce.title}' shown"
 
-          notification.onclick = (event) =>
+          notification.onclick = =>
             amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.CLICKED, campaign: announce.campaign
-            @logger.log @logger.levels.INFO, "Announcement Clicked '#{announce.title}'"
+            @logger.log @logger.levels.INFO, "Announcement '#{announce.title}' clicked"
             if announce.link
-              window.open announce.link, '_blank'
+              z.util.safe_window_open announce.link
             if announce.refresh
               window.location.reload true
             notification.close()
