@@ -52,14 +52,16 @@ z.string.auth_account_terms_of_use = 'Terms of Use'
 z.string.auth_account_terms_of_use_detail = 'I accept'
 
 # Authentication: VERIFY section
+z.string.auth_verify_account_add = 'Add'
+z.string.auth_verify_account_detail = 'This lets you use Wire on multiple devices.'
+z.string.auth_verify_account_headline = 'Add email address and password.'
+z.string.auth_verify_account_logout = 'Log out'
 z.string.auth_verify_code_description = 'Enter the verification code\nwe sent to %@number.'
 z.string.auth_verify_code_resend = 'No code showing up?'
 z.string.auth_verify_code_resend_detail = 'Resend'
 z.string.auth_verify_code_resend_timer = 'You can request a new code %expiration.'
 z.string.auth_verify_code_change_phone = 'Change phone number'
-z.string.auth_verify_email_button = 'Add'
-z.string.auth_verify_email_detail = 'Using Wire in multiple devices requires an email address and password.'
-z.string.auth_verify_email_headline = 'Hello, %name.'
+z.string.auth_verify_password_headline = 'Enter your password'
 
 # Authentication: limit section
 z.string.auth_limit_devices_headline = 'Devices'
@@ -111,10 +113,10 @@ z.string.auth_error_offline = 'No Internet connection'
 z.string.auth_error_password_long = 'The password you entered is too long'
 z.string.auth_error_password_short = 'Choose a password with at least 8 characters.'
 z.string.auth_error_password_wrong = 'Wrong password. Please try again.'
+z.string.auth_error_phone_number_forbidden = 'Sorry. This phone number is forbidden.'
 z.string.auth_error_phone_number_invalid = 'Invalid Phone Number'
 z.string.auth_error_phone_number_unknown = 'Unknown Phone Number'
 z.string.auth_error_sign_in = 'Please verify your details and try again.'
-z.string.auth_error_terms_of_use = 'Please accept Wire Terms of Use.'
 
 # Call stuff
 z.string.call_state_outgoing = 'Ringing…'
