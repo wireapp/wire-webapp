@@ -1108,14 +1108,7 @@ class z.conversation.ConversationRepository
     .then =>
       if conversation_et.removed_from_conversation()
         throw new Error 'Cannot send message to conversation you are not part of'
-      if @_send_as_external_message conversation_et, generic_message
-        @_send_external_generic_message conversation_et.id, generic_message
-      else
-        @_add_to_sending_queue conversation_et.id, generic_message
-    .catch (error) =>
-      if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
-        return @_send_external_generic_message conversation_et.id, generic_message
-      throw error
+      @_add_to_sending_queue conversation_et.id, generic_message
     .then (response) =>
       event = @_construct_otr_message_event response, conversation_et.id
       return @cryptography_repository.save_encrypted_event generic_message, event
@@ -1174,13 +1167,22 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves when the message was sent
   ###
   _send_generic_message: (conversation_id, generic_message, user_ids) =>
-    @_create_user_client_map conversation_id
-    .then (user_client_map) =>
-      if user_ids
-        delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
-      return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
-    .then (payload) =>
-      @_send_encrypted_message conversation_id, generic_message, payload, user_ids
+    Promise.resolve @_send_as_external_message conversation_id, generic_message
+    .then (send_as_external) =>
+      if send_as_external
+        @_send_external_generic_message conversation_id, generic_message
+      else
+        @_create_user_client_map conversation_id
+        .then (user_client_map) =>
+          if user_ids
+            delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
+          return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+        .then (payload) =>
+          @_send_encrypted_message conversation_id, generic_message, payload, user_ids
+    .catch (error) =>
+      if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
+        return @_send_external_generic_message conversation_id, generic_message
+      throw error
 
   ###
   Sends otr message to a conversation.
@@ -1232,15 +1234,17 @@ class z.conversation.ConversationRepository
   Estimate whether message should be send as type external.
 
   @private
-  @param conversation_et [z.entitity.Conversation] Conversation entity
+  @param conversation_id [String]
   @param generic_message [z.protobuf.GenericMessage] Generic message that will be send
   @return [Boolean] Is payload likely to be too big so that we switch to type external?
   ###
-  _send_as_external_message: (conversation_et, generic_message) ->
-    estimated_number_of_clients = conversation_et.number_of_participants() * 4
-    message_in_bytes = new Uint8Array(generic_message.toArrayBuffer()).length
-    estimated_payload_in_bytes = estimated_number_of_clients * message_in_bytes
-    return estimated_payload_in_bytes / 1024 > 200
+  _send_as_external_message: (conversation_id, generic_message) ->
+    return new Promise (resolve) =>
+      @get_conversation_by_id conversation_id, (conversation_et) ->
+        estimated_number_of_clients = conversation_et.number_of_participants() * 4
+        message_in_bytes = new Uint8Array(generic_message.toArrayBuffer()).length
+        estimated_payload_in_bytes = estimated_number_of_clients * message_in_bytes
+        resolve estimated_payload_in_bytes / 1024 > 200
 
   ###
   Post images to a conversation.
