@@ -67,6 +67,17 @@ z.util.iterate_array_index = (array, current_index) ->
   return (current_index + 1) % array.length
 
 
+z.util.load_image = (blob) ->
+  return new Promise (resolve, reject) ->
+    object_url = window.URL.createObjectURL blob
+    img = new Image()
+    img.onload = ->
+      resolve @
+      window.URL.revokeObjectURL object_url
+    img.onerror = reject
+    img.src = object_url
+
+
 z.util.load_file_buffer = (file) ->
   return new Promise (resolve, reject) ->
     reader = new FileReader()
