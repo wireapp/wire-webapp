@@ -51,6 +51,8 @@ class z.cryptography.CryptographyMapper
         return @_map_asset generic_message.asset, generic_message.message_id, event.data?.id
       when 'cleared'
         return @_map_cleared generic_message.cleared
+      when 'confirmation'
+        return @_map_confirmation generic_message.confirmation
       when 'deleted'
         return @_map_deleted generic_message.deleted
       when 'edited'
@@ -139,6 +141,18 @@ class z.cryptography.CryptographyMapper
       data:
         cleared_timestamp: cleared.cleared_timestamp.toString()
       type: z.event.Backend.CONVERSATION.MEMBER_UPDATE
+    }
+
+  _map_confirmation: (confirmation) ->
+    return {
+      data:
+        message_id: confirmation.message_id
+        status: switch confirmation.type
+          when z.proto.Confirmation.Type.DELIVERED
+            z.message.StatusType.DELIVERED
+          when z.proto.Confirmation.Type.READ
+            z.message.StatusType.SEEN
+      type: z.event.Client.CONVERSATION.CONFIRMATION
     }
 
   _map_deleted: (deleted) ->
