@@ -897,13 +897,13 @@ class z.conversation.ConversationRepository
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'text', new z.proto.Text message
 
-    @_send_and_save_generic_message conversation_et, generic_message
+    @_send_and_inject_generic_message conversation_et, generic_message
     .then =>
       @link_repository.get_link_preview_from_string message
     .then (link_preview) =>
       if link_preview?
         generic_message.text.link_preview.push link_preview
-        @_send_and_save_generic_message conversation_et, generic_message
+        @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Error while sending link preview: #{error.message}", error
       throw error
@@ -1026,13 +1026,14 @@ class z.conversation.ConversationRepository
   @param conversation_id [String] Conversation ID
   @return [Object] Object in form of 'conversation.otr-message-add'
   ###
-  _construct_otr_message_event: (response, conversation_id) ->
+  _construct_otr_message_event: (conversation_id) ->
     event =
       data: undefined
       from: @user_repository.self().id
-      time: response.time
+      time: new Date().toISOString()
       type: 'conversation.otr-message-add'
       conversation: conversation_id
+      status: z.message.StatusType.SENDING
 
     return event
 
@@ -1093,6 +1094,25 @@ class z.conversation.ConversationRepository
   ###############################################################################
   # Send Generic Messages
   ###############################################################################
+
+  # HACK
+  _send_and_inject_generic_message: (conversation_et, generic_message) =>
+    Promise.resolve()
+    .then =>
+      if conversation_et.removed_from_conversation()
+        throw new Error 'Cannot send message to conversation you are not part of'
+      return wire.app.repository.event.test_inject_event @_construct_otr_message_event(conversation_et.id), generic_message
+    .then (event) =>
+      @_add_to_sending_queue conversation_et.id, generic_message
+      .then (response) =>
+        return @get_message_in_conversation_by_id conversation_et, event.id
+        .then (message_et) =>
+          # TODO: update with event time
+          message_et.status z.message.StatusType.SENT
+          @conversation_service.update_message_in_db message_et, {status: z.message.StatusType.SENT}
+        console.warn response
+    .catch (error) =>
+      console.warn error
 
   ###
   Saves and sends a generic message to the conversation
