@@ -809,7 +809,7 @@ class z.conversation.ConversationRepository
     asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'asset', asset
-    @_send_and_save_generic_message conversation_et, generic_message
+    @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
   When we reset a session then we must inform the remote client about this action.
@@ -824,7 +824,7 @@ class z.conversation.ConversationRepository
     asset.set 'not_uploaded', reason_proto
     generic_message = new z.proto.GenericMessage nonce
     generic_message.set 'asset', asset
-    @_send_and_save_generic_message conversation_et, generic_message
+    @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
   Send a confirmation for a content message.
@@ -876,7 +876,7 @@ class z.conversation.ConversationRepository
   send_knock: (conversation_et) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'knock', new z.proto.Knock false
-    @_send_and_save_generic_message conversation_et, generic_message
+    @_send_and_inject_generic_message conversation_et, generic_message
     .then ->
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.PING_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
@@ -921,7 +921,7 @@ class z.conversation.ConversationRepository
 
     Promise.resolve()
     .then =>
-      return @_send_and_save_generic_message conversation_et, generic_message
+      @_send_and_inject_generic_message conversation_et, generic_message
     .then (message_record) =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.MESSAGE_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
@@ -953,14 +953,7 @@ class z.conversation.ConversationRepository
         throw new Error 'Edited message equals original message'
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'edited', new z.proto.MessageEdit original_message_et.id, new z.proto.Text message
-      return generic_message
-    .then (generic_message) =>
-      @_add_to_sending_queue conversation_et.id, generic_message
-    .then (response) =>
-      event = @_construct_otr_message_event response, conversation_et.id
-      return @cryptography_repository.save_encrypted_event generic_message, event
-    .then (record) =>
-      @on_conversation_event record
+      @_send_and_inject_generic_message conversation_et, generic_message
     .then =>
       @_track_edit_message conversation_et, original_message_et
     .then =>
@@ -968,7 +961,7 @@ class z.conversation.ConversationRepository
     .then (link_preview) =>
       if link_preview?
         generic_message.edited.text.link_preview.push link_preview
-        @_send_and_save_generic_message conversation_et, generic_message
+        @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Error while editing message: #{error.message}", error
       throw error
@@ -982,12 +975,7 @@ class z.conversation.ConversationRepository
   send_reaction: (conversation_et, message_et, reaction) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'reaction', new z.proto.Reaction reaction, message_et.id
-    @_add_to_sending_queue conversation_et.id, generic_message
-    .then (response) =>
-      event = @_construct_otr_message_event response, conversation_et.id
-      return @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
-    .then (mapped_event) =>
-      @on_conversation_event mapped_event
+    @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
   Sending a message to the remote end of a session reset.
@@ -1095,56 +1083,28 @@ class z.conversation.ConversationRepository
   # Send Generic Messages
   ###############################################################################
 
-  # HACK
   _send_and_inject_generic_message: (conversation_et, generic_message) =>
     Promise.resolve()
     .then =>
       if conversation_et.removed_from_conversation()
         throw new Error 'Cannot send message to conversation you are not part of'
-      return wire.app.repository.event.test_inject_event @_construct_otr_message_event(conversation_et.id), generic_message
+      optimistic_event = @_construct_otr_message_event(conversation_et.id)
+      return @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
+    .then (mapped_event) =>
+      if mapped_event.type in z.event.EventTypeHandling.STORE
+        return @cryptography_repository.save_unencrypted_event mapped_event
+      return mapped_event
+    .then (saved_event) =>
+      @on_conversation_event saved_event
+      return saved_event
     .then (event) =>
       @_add_to_sending_queue conversation_et.id, generic_message
       .then (response) =>
+        # TODO: update with event time
         return @get_message_in_conversation_by_id conversation_et, event.id
         .then (message_et) =>
-          # TODO: update with event time
           message_et.status z.message.StatusType.SENT
           @conversation_service.update_message_in_db message_et, {status: z.message.StatusType.SENT}
-        console.warn response
-    .catch (error) =>
-      console.warn error
-
-  ###
-  Saves and sends a generic message to the conversation
-
-  @private
-  @param conversation_et [z.entity.Conversation] Conversation to send message to
-  @param generic_message [z.proto] Protobuf message content to be added to generic message
-  @return [Promise] Promise that resolves with the saved record, when the message has been added to the conversation
-  ###
-  _send_and_save_generic_message: (conversation_et, generic_message) =>
-    Promise.resolve()
-    .then =>
-      if conversation_et.removed_from_conversation()
-        throw new Error 'Cannot send message to conversation you are not part of'
-      @_add_to_sending_queue conversation_et.id, generic_message
-    .then (response) =>
-      event = @_construct_otr_message_event response, conversation_et.id
-      return @cryptography_repository.save_encrypted_event generic_message, event
-    .then (record) =>
-      @_on_add_event conversation_et, record
-      return record
-    .catch (error) =>
-      error_message = "Could not send OTR message of type '#{generic_message.content}' to conversation ID '#{conversation_et.id}' (#{conversation_et.display_name()}): #{error.message}"
-
-      raygun_error = new Error 'Encryption failed'
-      custom_data = error_message: "Could not send OTR message of type '#{generic_message.content}'"
-      Raygun.send raygun_error, custom_data
-
-      @logger.log @logger.levels.ERROR, error_message, {error: error, event: generic_message}
-      if error.label is z.service.BackendClientError::LABEL.UNKNOWN_CLIENT
-        amplify.publish z.event.WebApp.SIGN_OUT, 'unknown_sender', true
-      throw error
 
   ###
   Send encrypted external message

@@ -346,17 +346,6 @@ class z.event.EventRepository
         return true
       throw error
 
-  # HACK
-  test_inject_event: (event, generic_message) ->
-    @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
-    .then (mapped_event) =>
-      if mapped_event.type in z.event.EventTypeHandling.STORE
-        return @cryptography_repository.save_unencrypted_event mapped_event
-      return mapped_event
-    .then (saved_event) =>
-      @_distribute_event saved_event
-      return saved_event
-
   ###
   Handle all events from the payload of an incoming notification.
   @param event [Object] Event data
