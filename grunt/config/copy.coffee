@@ -34,6 +34,7 @@ module.exports =
       'image/**/*'
       'font/**/*'
       'style/*.css'
+      'worker/*'
     ]
 
   dist_audio:
@@ -63,6 +64,7 @@ module.exports =
       'image/**/*'
       'font/**/*'
       'style/*.css'
+      'worker/*'
     ]
 
   deploy_audio:
