@@ -401,7 +401,7 @@ class z.assets.AssetService
   ###
   _compress_image: (blob) ->
     z.util.load_file_buffer blob
-    .then (buffer) =>
+    .then (buffer) ->
       if blob.type is 'image/gif'
         return z.util.load_file_buffer blob
       return new z.util.Worker 'worker/image-worker.js'.post buffer
