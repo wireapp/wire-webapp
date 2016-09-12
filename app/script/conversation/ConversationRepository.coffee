@@ -1132,9 +1132,10 @@ class z.conversation.ConversationRepository
 
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Generic message to be sent as external message
+  @param user_ids [Array<String>] Optional array of user IDs to limit sending to
   @return [Promise] Promise that resolves after sending the external message
   ###
-  _send_external_generic_message: (conversation_id, generic_message) =>
+  _send_external_generic_message: (conversation_id, generic_message, user_ids) =>
     @logger.log @logger.levels.INFO, "Sending external message of type '#{generic_message.content}'", generic_message
 
     key_bytes = null
@@ -1146,13 +1147,15 @@ class z.conversation.ConversationRepository
       [key_bytes, sha256, ciphertext] = data
       return @_create_user_client_map conversation_id
     .then (user_client_map) =>
+      if user_ids
+        delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
       generic_message_external = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message_external.set 'external', new z.proto.External new Uint8Array(key_bytes), new Uint8Array(sha256)
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message_external
     .then (payload) =>
       payload.data = z.util.array_to_base64 ciphertext
       payload.native_push = true
-      @_send_encrypted_message conversation_id, generic_message, payload
+      @_send_encrypted_message conversation_id, generic_message, payload, user_ids
     .catch (error) =>
       @logger.log @logger.levels.INFO, 'Failed sending external message', error
       throw error
