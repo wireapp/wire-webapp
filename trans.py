@@ -37,7 +37,7 @@ root = 'app/script/localization/'
 for filename in os.listdir(root):
   locale = get_locale(filename)
   if locale:
-    if locale != 'de':
+    if locale not in ['de', 'fr']:
       file_to_delete = os.path.join(root, filename)
       sys.stdout.write('Removing unsupported locale "{}" ({})\n'.format(locale, file_to_delete))
       os.remove(file_to_delete)
