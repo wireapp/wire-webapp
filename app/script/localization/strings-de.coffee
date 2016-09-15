@@ -97,7 +97,6 @@ z.string.de.auth_placeholder_name = 'Name'
 z.string.de.auth_placeholder_password_put = 'Passwort'
 z.string.de.auth_placeholder_password_set = 'Passwort (min. acht Zeichen)'
 z.string.de.auth_placeholder_phone = 'Telefonnummer'
-z.string.de.auth_hello = 'Hallo, %name.'
 
 # Authentication: Validation errors
 z.string.de.auth_error_code = 'Ungültiger Verifizierungs-Code'
@@ -107,10 +106,8 @@ z.string.de.auth_error_email_forbidden = 'Es tut uns leid. Diese E-Mail-Adresse 
 z.string.de.auth_error_email_malformed = 'Bitte gib eine gültige E-Mail-Adresse ein.'
 z.string.de.auth_error_email_missing = 'Bitte gib eine E-Mail-Adresse ein.'
 z.string.de.auth_error_misc = 'Probleme mit der Verbindung. Versuche es erneut.'
-z.string.de.auth_error_name_long = 'Gib einen kürzeren Namen ein'
 z.string.de.auth_error_name_short = 'Gib deinen Namen mit mindestens zwei Zeichen ein'
 z.string.de.auth_error_offline = 'Keine Internetverbindung'
-z.string.de.auth_error_password_long = 'Das eingegebene Passwort ist zu lang'
 z.string.de.auth_error_password_short = 'Wähle ein Passwort mit mindestens acht Zeichen.'
 z.string.de.auth_error_password_wrong = 'Falsches Passwort. Bitte versuche es erneut.'
 z.string.de.auth_error_phone_number_forbidden = 'Es tut uns leid. Diese Telefonnummer ist verboten.'
@@ -126,16 +123,6 @@ z.string.de.call_decline = 'Ablehnen'
 z.string.de.call_accept = 'Annehmen'
 z.string.de.call_join = 'Beitreten'
 z.string.de.call_choose_shared_screen = 'Wähle eine Bildschirm aus'
-
-# Calling Bar
-z.string.de.call_banner_connecting = 'Verbinde…'
-z.string.de.call_banner_in = 'in'
-z.string.de.call_banner_incoming_1to1 = '%s.first_name ruft an'
-z.string.de.call_banner_incoming_video_1to1 = '%s.first_name ruft mit Video an'
-z.string.de.call_banner_incoming_group = '%s.first_name ruft %@.group an'
-z.string.de.call_banner_join = 'Anruf annehmen'
-z.string.de.call_banner_ongoing = 'Aktiver Anruf'
-z.string.de.call_banner_outgoing = 'Rufe %@.first_name an'
 
 # Warnings
 z.string.de.modal_button_cancel = 'Abbrechen'
@@ -231,9 +218,8 @@ z.string.de.conversation_you_dative = 'dir'
 z.string.de.conversation_you_accusative = 'dich'
 
 z.string.de.conversation_connection_accepted = 'Hinzugefügt'
-z.string.de.conversation_connection_cancel_request = 'Kontaktanfrage abbrechen'
 z.string.de.conversation_connection_blocked = 'Blockiert'
-z.string.de.conversation_connection_pending = 'Ausstehend'
+z.string.de.conversation_connection_cancel_request = 'Kontaktanfrage abbrechen'
 z.string.de.conversation_create = ' hat eine Unterhaltung mit %@names begonnen'
 z.string.de.conversation_create_you = ' hast eine Unterhaltung mit %@names begonnen'
 z.string.de.conversation_device_started_using = ' hat begonnen'
@@ -242,7 +228,6 @@ z.string.de.conversation_device_unverified = ' hast die Überprüfung von einem 
 z.string.de.conversation_device_your_devices = ' deine Geräte'
 z.string.de.conversation_device_user_devices = ' %@names Geräte'
 z.string.de.conversation_device_a_new_device = ' ein neues Gerät'
-z.string.de.conversation_device_this_device = ' dieses Gerät'
 z.string.de.conversation_just_now = 'Gerade eben'
 z.string.de.conversation_location_link = 'Zeige Standort'
 z.string.de.conversation_member_join = ' hat %@names hinzugefügt'
@@ -282,11 +267,9 @@ z.string.de.conversation_edit_timestamp = 'Editiert um %@timestamp'
 z.string.de.conversation_likes_caption = '%@number Personen'
 
 # Conversation list
-z.string.de.conversation_list_archive = 'Archiv'
 z.string.de.conversation_list_empty_conversation = 'Leere Unterhaltung'
 z.string.de.conversation_list_many_connection_request = '%no Kontaktanfragen'
 z.string.de.conversation_list_one_connection_request = 'Eine Kontaktanfrage'
-z.string.de.conversation_list_search_header_placeholder = 'Unterhaltung beginnen'
 z.string.de.conversation_list_popover_archive = 'Archivieren'
 z.string.de.conversation_list_popover_block = 'Blockieren'
 z.string.de.conversation_list_popover_cancel = 'Anfrage abbrechen'
@@ -344,10 +327,6 @@ z.string.de.people_tabs_device_detail_reset_session = 'Session zurücksetzen'
 z.string.de.people_tabs_device_detail_show_my_device = 'Zeige meinen Fingerabdruck'
 z.string.de.people_tabs_device_detail_verified = 'Ok'
 
-# Add people to conversation share history dialogue
-z.string.de.people_add_to_headline = 'Kontakte hinzufügen und Verlauf teilen?'
-z.string.de.people_add_to_message = 'Neu hinzugefügte Kontakte können den bisherigen Verlauf sehen. Erstelle eine neue Unterhaltung, um dies zu vermeiden.'
-
 # Block user
 z.string.de.people_block_headline = 'Blockieren?'
 z.string.de.people_block_message = '%@.first_name wird dich auf Wire nicht finden können.'
@@ -377,7 +356,6 @@ z.string.de.people_button_add = 'Kontakte hinzufügen'
 z.string.de.people_button_block = 'Blockieren'
 z.string.de.people_button_cancel = 'Abbrechen'
 z.string.de.people_button_connect = 'Hinzufügen'
-z.string.de.people_button_continue = 'Weiter'
 z.string.de.people_button_create = 'Unterhaltung erstellen'
 z.string.de.people_button_ignore = 'Ignorieren'
 z.string.de.people_button_leave = 'Verlassen'
@@ -474,9 +452,6 @@ z.string.de.url_support_mic_access_denied = 'https://support.wire.com/hc/de/arti
 z.string.de.url_support_mic_not_found = 'https://support.wire.com/hc/de/articles/202970662'
 z.string.de.url_support_screen_access_denied = 'https://support.wire.com/hc/de/articles/202935412'
 z.string.de.url_support_screen_whitelist = 'https://support.wire.com/hc/de/articles/209423889'
-z.string.de.url_support_session = 'https://support.wire.com/hc/de'
-z.string.de.url_downloads = 'https://wire.com/download/?hl=de'
-z.string.de.url_app_store = 'https://wire.com/download/osx/'
 z.string.de.url_decrypt_error_1 = 'https://wire.com/privacy/error-1/?hl=de'
 z.string.de.url_decrypt_error_2 = 'https://wire.com/privacy/error-2/?hl=de'
 
@@ -503,11 +478,6 @@ z.string.de.warning_tell_me_how = 'Zeig mir wie'
 z.string.de.warning_connectivity_connection_lost = 'Verbindung wird wiederhergestellt. Wire kann Nachrichten möglicherweise nicht empfangen.'
 z.string.de.warning_connectivity_no_internet = 'Keine Internetverbindung. Du kannst keine Nachrichten senden und empfangen.'
 
-# Warnings: App banner
-z.string.de.warning_app_banner_win = 'Wire ist für Windows verfügbar.'
-z.string.de.warning_app_banner_osx = 'Wire ist für OS X verfügbar.'
-z.string.de.warning_app_banner_link = 'App herunterladen'
-
 # Browser notifications
 z.string.de.system_notification_asset_add = 'Hat ein Bild geteilt'
 z.string.de.system_notification_connection_accepted = 'Hat deine Kontaktanfrage akzeptiert'
@@ -528,11 +498,6 @@ z.string.de.system_notification_shared_video = 'Hat ein Video geteilt'
 z.string.de.system_notification_shared_file = 'Hat eine Datei geteilt'
 
 # Tooltips
-z.string.de.tooltip_call_banner_accept = 'Anruf annehmen'
-z.string.de.tooltip_call_banner_ignore = 'Ignorieren (%shortcut)'
-z.string.de.tooltip_call_banner_mute = 'Mikrofon stummschalten (%shortcut)'
-z.string.de.tooltip_call_banner_unmute = 'Mikrofon anschalten (%shortcut)'
-
 z.string.de.tooltip_conversation_call = 'Anruf'
 z.string.de.tooltip_conversation_video_call = 'Videoanruf'
 z.string.de.tooltip_conversation_file = 'Datei senden'
