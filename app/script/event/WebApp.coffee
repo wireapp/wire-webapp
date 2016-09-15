@@ -130,7 +130,6 @@ z.event.WebApp =
     UPLOAD_PICTURE: 'wire.webapp.profile.upload-picture'
   PROPERTIES:
     CHANGE:
-      APP_BANNER: 'wire.webapp.properties.change.app-banner'
       DEBUG: 'wire.webapp.properties.change.debug'
     UPDATE:
       GOOGLE: 'wire.webapp.properties.update.google'
