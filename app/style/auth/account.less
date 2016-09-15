@@ -45,14 +45,13 @@
   }
 
   .platform-web & .spacer {
-    min-height: 32px;
+    min-height: 52px;
   }
 
   #form-account-login {
     .selector-method {
-      opacity: 0; /* TODO: remove when re-enabling phone login */
-      height: 0px; /* TODO: reset to 24px when re-enabling phone login */
-      margin: 0 72px 24px 72px;
+      height: 24px;
+      margin: 0 72px 24px;
 
       .btn-method {
         background-color: transparent;
@@ -70,12 +69,7 @@
       }
     }
 
-    #login-method-email {
-      .checkbox {
-        height: 24px;
-        margin: 16px 4px;
-      }
-
+    #login-method-password {
       .expired-info {
         display: inline-block;
         font-size: 13px;
@@ -97,6 +91,14 @@
 
       #wire-login-phone {
         border-left: 0;
+      }
+    }
+
+    #login-method-password,
+    #login-method-phone {
+      .checkbox-remember {
+        height: 24px;
+        margin: 12px 4px 0;
       }
     }
   }

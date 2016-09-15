@@ -26,8 +26,8 @@ z.auth.AuthView =
     VERTICAL_BOTTOM: 'vertical-bottom'
     VERTICAL_TOP: 'vertical-top'
   MODE:
-    ACCOUNT_EMAIL: 'email'
     ACCOUNT_LOGIN: 'login'
+    ACCOUNT_PASSWORD: 'password'
     ACCOUNT_REGISTER: 'register'
     ACCOUNT_PHONE: 'phone'
     HISTORY: 'history'
@@ -38,8 +38,9 @@ z.auth.AuthView =
     POSTED_RESEND: 'resend'
     POSTED_RETRY: 'retry'
     POSTED_VERIFY: 'verify'
-    VERIFY_ADD_EMAIL: 'add_email'
+    VERIFY_ACCOUNT: 'account'
     VERIFY_CODE: 'code'
+    VERIFY_PASSWORD: 'phone-password'
   REGISTRATION_CONTEXT:
     EMAIL: 'email'
     GENERIC_INVITE: 'generic_invite'
