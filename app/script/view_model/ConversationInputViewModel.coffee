@@ -160,18 +160,12 @@ class z.ViewModel.ConversationInputViewModel
     @conversation_repository.upload_files @conversation_et(), files
 
   scroll_message_list: (list_height_new, list_height_old) ->
-    diff = list_height_new - list_height_old
-    input_height = $('.conversation-input').height()
-    is_scrolled_bottom = $('.messages-wrap').is_scrolled_bottom()
+    $('.message-list').data('antiscroll')?.rebuild()
 
-    $('.message-list')
-    .css 'bottom', input_height
-    .data('antiscroll')?.rebuild()
-
-    if is_scrolled_bottom
+    if $('.messages-wrap').is_scrolled_bottom()
       $('.messages-wrap').scroll_to_bottom()
     else
-      $('.messages-wrap').scroll_by diff
+      $('.messages-wrap').scroll_by list_height_new - list_height_old
 
   show_separator: (is_scrolled_bottom) =>
     @list_not_bottom not is_scrolled_bottom
