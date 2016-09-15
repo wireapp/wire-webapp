@@ -132,7 +132,7 @@ class z.assets.AssetService
   ###
   upload_image_asset: (image, options) ->
     @_compress_image image
-    .then ([compressed_image, compressed_bytes]) ->
+    .then ([compressed_image, compressed_bytes]) =>
       @_upload_asset compressed_bytes, options
       .then ([key_bytes, sha256, key, token]) ->
         image_meta_data = new z.proto.Asset.ImageMetaData compressed_image.width, compressed_image.height
