@@ -197,7 +197,7 @@ z.string.de.modal_leave_conversation_message = 'Die Personen werden benachrichti
 z.string.de.modal_leave_conversation_button = 'Verlassen'
 # Logout
 z.string.de.modal_logout_headline = 'Daten löschen?'
-z.string.de.modal_logout_message = 'Deine persönlichen Daten und Unterhaltungen vollständig von diesem Gerät entfernen.'
+z.string.de.modal_logout_message = 'Deine persönlichen Informationen und Unterhaltungen vollständig von diesem Gerät entfernen.'
 z.string.de.modal_logout_button = 'Abmelden'
 # New device
 z.string.de.modal_new_device_headline = '"%@.name" hat begonnen ein neues Gerät zu nutzen'
@@ -275,10 +275,11 @@ z.string.de.conversation_context_menu_edit = 'Bearbeiten'
 z.string.de.conversation_context_menu_delete = 'Für mich löschen'
 z.string.de.conversation_context_menu_delete_everyone = 'Für alle löschen'
 z.string.de.conversation_context_menu_download = 'Herunterladen'
-z.string.de.conversation_context_menu_like = 'Gefällt mir'
-z.string.de.conversation_context_menu_unlike = 'Gefällt mir nicht'
+z.string.de.conversation_context_menu_like = 'Like'
+z.string.de.conversation_context_menu_unlike = 'Unlike'
 z.string.de.conversation_delete_timestamp = 'Gelöscht um %@timestamp'
 z.string.de.conversation_edit_timestamp = 'Editiert um %@timestamp'
+z.string.de.conversation_likes_caption = '%@number people'
 
 # Conversation list
 z.string.de.conversation_list_archive = 'Archiv'
@@ -519,7 +520,7 @@ z.string.de.system_notification_member_leave_left = '%s.first_name hat die Unter
 z.string.de.system_notification_member_leave_removed_many = '%s.first_name hat %no Kontakte aus der Unterhaltung entfernt'
 z.string.de.system_notification_member_leave_removed_one = '%s.first_name hat %@.first_name aus der Unterhaltung entfernt'
 z.string.de.system_notification_ping = 'Hat gepingt'
-z.string.system_notification_reaction = '%reaction deine Nachricht'
+z.string.de.system_notification_reaction = '%reaction your message'
 z.string.de.system_notification_voice_channel_activate = 'Ruft an'
 z.string.de.system_notification_voice_channel_deactivate = 'Hat versucht anzurufen'
 z.string.de.system_notification_shared_audio = 'Hat eine Audio-Nachricht geteilt'
