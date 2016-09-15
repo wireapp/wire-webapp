@@ -125,20 +125,19 @@ class z.assets.AssetService
   In case of an successful upload the uploaded property is set. Otherwise it will be marked as not
   uploaded.
 
-  @param file [File, Blob] Image
+  @param image [File, Blob]
   @param options [Object]
   @option public [Boolean]
   @option retention [z.assets.AssetRetentionPolicy]
   ###
-  upload_image_asset: (file, options) ->
+  upload_image_asset: (image, options) ->
     @_compress_image image
     .then ([compressed_image, compressed_bytes]) ->
       @_upload_asset compressed_bytes, options
-      .then (data) ->
-        [key_bytes, sha256, key, token] = data
+      .then ([key_bytes, sha256, key, token]) ->
         image_meta_data = new z.proto.Asset.ImageMetaData compressed_image.width, compressed_image.height
         asset = new z.proto.Asset()
-        asset.set 'original', new z.proto.Asset.Original file.type, compressed_bytes.length, null, image_meta_data
+        asset.set 'original', new z.proto.Asset.Original image.type, compressed_bytes.length, null, image_meta_data
         asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token
         return asset
     .catch (error) =>
