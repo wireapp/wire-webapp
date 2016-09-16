@@ -105,7 +105,7 @@ class z.SystemNotification.SystemNotificationRepository
   @param handling_notifications [z.event.NotificationHandlingState] Updated notification handling state
   ###
   set_muted_state: (handling_notifications) =>
-    @muted = handling_notifications is z.event.NotificationHandlingState.STREAM
+    @muted = handling_notifications isnt z.event.NotificationHandlingState.WEB_SOCKET
     @logger.log @logger.levels.INFO, "Set muted state to: #{@muted}"
 
   ###
