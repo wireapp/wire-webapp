@@ -790,8 +790,7 @@ class z.conversation.ConversationRepository
       generic_message = new z.proto.GenericMessage nonce
       generic_message.set 'asset', asset
       @_send_encrypted_asset conversation_et.id, generic_message, ciphertext, nonce
-    .then (response) =>
-      [json, asset_id] = response
+    .then ([response, asset_id]) =>
       event = @_construct_otr_asset_event response, conversation_et.id, asset_id
       event.data.otr_key = generic_message.asset.uploaded.otr_key
       event.data.sha256 = generic_message.asset.uploaded.sha256
@@ -946,9 +945,8 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the message
   ###
   send_message_edit: (message, original_message_et, conversation_et) =>
-    generic_message = undefined
     Promise.resolve()
-    .then ->
+    .then =>
       if original_message_et.get_first_asset().text is message
         throw new Error 'Edited message equals original message'
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
@@ -1096,15 +1094,16 @@ class z.conversation.ConversationRepository
       return mapped_event
     .then (saved_event) =>
       @on_conversation_event saved_event
-      return saved_event
-    .then (event) =>
+
+      # we don't need to wait for the sending to resolve
       @_add_to_sending_queue conversation_et.id, generic_message
-      .then (response) =>
-        # TODO: update with event time
-        return @get_message_in_conversation_by_id conversation_et, event.id
-        .then (message_et) =>
-          message_et.status z.message.StatusType.SENT
-          @conversation_service.update_message_in_db message_et, {status: z.message.StatusType.SENT}
+      .then =>
+        @get_message_in_conversation_by_id conversation_et, saved_event.id
+      .then (message_et) =>
+        message_et.status z.message.StatusType.SENT
+        @conversation_service.update_message_in_db message_et, {status: z.message.StatusType.SENT}
+
+      return saved_event
 
   ###
   Send encrypted external message
@@ -1457,12 +1456,12 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] The conversation that was created
   ###
   _on_asset_preview: (conversation_et, event_json) ->
-    message_et = conversation_et.get_message_by_id event_json.id
-
-    if not message_et?
-      return @logger.log @logger.levels.ERROR, "Asset preview: Could not find message with id '#{event_json.id}'", event_json
-
-    @update_message_with_asset_preview conversation_et, message_et, event_json.data
+    @get_message_in_conversation_by_id conversation_et, event_json.id
+    .then (message_et) =>
+      @update_message_with_asset_preview conversation_et, message_et, event_json.data
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, 'Failed to update asset preview', error
+      throw error
 
   ###
   An asset was uploaded.
@@ -1471,12 +1470,12 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] The conversation that was created
   ###
   _on_asset_upload_complete: (conversation_et, event_json) ->
-    message_et = conversation_et.get_message_by_id event_json.id
-
-    if not message_et?
-      return @logger.log @logger.levels.ERROR, "Upload complete: Could not find message with id '#{event_json.id}'", event_json
-
-    @update_message_as_upload_complete conversation_et, message_et, event_json.data
+    @get_message_in_conversation_by_id conversation_et, event_json.id
+    .then (message_et) =>
+      @update_message_as_upload_complete conversation_et, message_et, event_json.data
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, 'Failed to update asset complete', error
+      throw error
 
   ###
   An asset failed.
@@ -1485,15 +1484,15 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] The conversation that was created
   ###
   _on_asset_upload_failed: (conversation_et, event_json) ->
-    message_et = conversation_et.get_message_by_id event_json.id
-
-    if not message_et?
-      return @logger.log @logger.levels.ERROR, "Upload failed: Could not find message with id '#{event_json.id}'", event_json
-
-    if event_json.data.reason is z.assets.AssetUploadFailedReason.CANCELLED
-      @_delete_message_by_id conversation_et, message_et.id
-    else
-      @update_message_as_upload_failed message_et
+    @get_message_in_conversation_by_id conversation_et, event_json.id
+    .then (message_et) =>
+      if event_json.data.reason is z.assets.AssetUploadFailedReason.CANCELLED
+        @_delete_message_by_id conversation_et, message_et.id
+      else
+        @update_message_as_upload_failed message_et
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, 'Failed to update asset failed', error
+      throw error
 
   ###
   Confirmation for to message received.
@@ -2006,11 +2005,11 @@ class z.conversation.ConversationRepository
       if not original_message_et.timestamp
         throw new TypeError 'Missing timestamp'
 
-      time = new Date(original_message_et.timestamp).toISOString()
-      @conversation_service.update_message_in_db event_json, {edited_time: event_json.time, time: time}
       event_json.edited_time = event_json.time
-      event_json.time = time
+      event_json.time = new Date(original_message_et.timestamp).toISOString()
+      @_delete_message_by_id conversation_et, event_json.id
       @_delete_message_by_id conversation_et, event_json.data.replacing_message_id
+      @cryptography_repository.save_unencrypted_event event_json
       return event_json
 
   ###

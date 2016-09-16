@@ -87,7 +87,7 @@
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(), css: {'message-is-editing': $parent.is_editing, 'text-graphite': message.status() === 1}"></div>
+          <div class="text" data-bind="html: asset.render(), css: {'message-is-editing': $parent.is_editing, 'text-fade-in': message.status() === 2}"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset params="preview: $data, viewport_changed: $parents[2].viewport_changed"></link-preview-asset>
