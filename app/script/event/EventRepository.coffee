@@ -178,16 +178,16 @@ class z.event.EventRepository
 
       @notification_service.get_notifications @current_client().id, last_notification_id, limit
       .then (response) -> _got_notifications response
-      .catch (response) =>
+      .catch (error_response) =>
         # When asking for notifications with a since set to a notification ID that does not belong to our client ID,
         #   we will get a 404 AND notifications
-        if response.notifications
-          _got_notifications response
-        else if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
-          @logger.log @logger.levels.INFO, "No notifications found since '#{last_notification_id}'", response
+        if error_response.notifications
+          _got_notifications error_response
+        else if error_response.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+          @logger.log @logger.levels.INFO, "No notifications found since '#{last_notification_id}'", error_response
           reject new z.event.EventError z.event.EventError::TYPE.NO_NOTIFICATIONS
         else
-          @logger.log @logger.levels.ERROR, "Failed to get notifications: #{error.message}", error
+          @logger.log @logger.levels.ERROR, "Failed to get notifications: #{error_response.message}", error_response
           reject new z.event.EventError z.event.EventError::TYPE.REQUEST_FAILURE
 
   ###
