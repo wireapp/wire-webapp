@@ -832,7 +832,6 @@ class z.conversation.ConversationRepository
   @param message_et [String] ID of message for which to acknowledge receipt
   ###
   send_confirmation_status: (conversation_et, message_et) =>
-    return # temporarily disable confirmation messages
     return if message_et.user().is_me or not conversation_et.is_one2one() or message_et.type not in z.event.EventTypeHandling.CONFIRM
 
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
