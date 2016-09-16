@@ -1174,7 +1174,7 @@ class z.ViewModel.AuthViewModel
   @private
   ###
   _validate_phone: ->
-    if not z.util.is_valid_phone_number(@phone_number_e164()) and z.util.Environment.backend.current is 'production'
+    if not z.util.is_valid_phone_number @phone_number_e164()
       @_add_error z.string.auth_error_phone_number_invalid, z.auth.AuthView.TYPE.PHONE
 
 

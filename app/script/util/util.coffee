@@ -591,8 +591,11 @@ Checks if input has the format of an international phone number
 @return [Boolean] Is the input a phone number string
 ###
 z.util.is_valid_phone_number = (phone_number) ->
-  re = /^\+?[1-9]\d{1,14}$/
-  return re.test phone_number
+  if z.util.Environment.backend.current is 'production'
+    regular_expression = /^\+[1-9]\d{1,14}$/
+  else
+    regular_expression = /^\+[0-9]\d{1,14}$/
+  return regular_expression.test phone_number
 
 
 z.util.get_first_character = (string) ->
