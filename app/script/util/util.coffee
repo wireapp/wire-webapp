@@ -333,7 +333,7 @@ Opens a new browser tab (target="_blank") with a given URL in a safe environment
 @see https://mathiasbynens.github.io/rel-noopener/
 @param url [String] URL you want to open in a new browser tab
 ###
-z.util.safe_window_open = (url) ->
+z.util.safe_window_open = (url, focus = true) ->
   if not url.match /^http[s]?:\/\//i
     url = "http://#{url}"
 
@@ -343,7 +343,11 @@ z.util.safe_window_open = (url) ->
     new_window = window.open()
     new_window.opener = null
     new_window.location = url
-    return new_window
+
+  if new_window and focus
+    new_window.focus()
+
+  return new_window
 
 z.util.auto_link_emails = (text) ->
   email_pattern = /([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)/gim
