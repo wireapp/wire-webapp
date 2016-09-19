@@ -791,9 +791,10 @@ class z.conversation.ConversationRepository
       generic_message.set 'asset', asset
       @_send_encrypted_asset conversation_et.id, generic_message, ciphertext, nonce
     .then ([response, asset_id]) =>
-      event = @_construct_otr_asset_event response, conversation_et.id, asset_id
+      event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
       event.data.otr_key = generic_message.asset.uploaded.otr_key
       event.data.sha256 = generic_message.asset.uploaded.sha256
+      event.data.id = asset_id
       event.id = nonce
       return @_on_asset_upload_complete conversation_et, event
 
@@ -856,19 +857,29 @@ class z.conversation.ConversationRepository
         # we don't need to wait for the sending to resolve
         @_send_encrypted_asset conversation_et.id, generic_message, ciphertext
         .then ([response, asset_id]) =>
-          @get_message_in_conversation_by_id conversation_et, saved_event.id
-          .then (message_et) =>
-            saved_event.data.id = asset_id
-            ort_key = saved_event.data.otr_key
-            sha256 = saved_event.data.sha256
-            message_et.get_first_asset().resource z.assets.AssetRemoteData.v2 conversation_et.id, asset_id, ort_key, sha256
-            message_et.status z.message.StatusType.SENT
-
-            @conversation_service.update_message_in_db message_et,
-              data: saved_event.data
-              status: z.message.StatusType.SENT
+          saved_event.data.id = asset_id
+          @_update_image_as_sent conversation_et, saved_event
+        .catch (error) =>
+          @logger.log "Failed to upload otr asset for conversation #{conversation_et.id}", error
+          exception = new Error('Event response is undefined')
+          custom_data =
+            source: 'Sending medium image'
+            error: error
+          Raygun.send exception, custom_data
 
         return saved_event
+
+  ###
+  Update image message with given event data
+  ###
+  _update_image_as_sent: (conversation_et, event_json) =>
+    @get_message_in_conversation_by_id conversation_et, event_json.id
+    .then (message_et) =>
+      asset_data = event_json.data
+      remote_data = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
+      message_et.get_first_asset().resource remote_data
+      message_et.status z.message.StatusType.SENT
+      @conversation_service.update_message_in_db message_et, {data: asset_data, status: z.message.StatusType.SENT}
 
   ###
   Send an encrypted knock.
@@ -1008,19 +1019,19 @@ class z.conversation.ConversationRepository
         reject error
 
   ###
-  Construct an encrypted message event.
+  Construct event payload.
 
   @private
-  @param response [JSON] Backend response
   @param conversation_id [String] Conversation ID
-  @return [Object] Object in form of 'conversation.otr-message-add'
+  @param event_type [z.event.Backend.*]
+  @return [Object] event payload
   ###
-  _construct_otr_event: (conversation_id, type) ->
+  _construct_otr_event: (conversation_id, event_type) ->
     return {} =
       data: {}
       from: @user_repository.self().id
       time: new Date().toISOString()
-      type: type
+      type: event_type
       conversation: conversation_id
       status: z.message.StatusType.SENDING
 
