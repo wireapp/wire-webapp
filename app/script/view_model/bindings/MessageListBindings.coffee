@@ -62,8 +62,7 @@ ko.bindingHandlers.background_image =
 
     _on_viewport_change = _.debounce ->
       if _in_view element
-        subscription.dispose()
-        asset_et.load()
+        asset_et().load()
         .then (blob) ->
           $(element).removeClass 'image-loading'
           object_url = window.URL.createObjectURL blob
@@ -71,10 +70,17 @@ ko.bindingHandlers.background_image =
     , 500
 
     image_element = $(element).find 'img'
-    asset_et = ko.unwrap valueAccessor()
+    asset_et = valueAccessor()
+
     viewport_changed = allBindingsAccessor.get 'viewport_changed'
-    subscription = viewport_changed.subscribe _on_viewport_change
+    viewport_subscription = viewport_changed.subscribe _on_viewport_change
+    asset_subscription = asset_et.subscribe _on_viewport_change
+
     _on_viewport_change()
+
+    ko.utils.domNodeDisposal.addDisposeCallback element, ->
+      viewport_subscription.dispose()
+      asset_subscription.dispose()
 
 # Fit image to viewport
 #

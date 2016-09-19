@@ -841,31 +841,29 @@ class z.conversation.ConversationRepository
   Sends an OTR Image Asset
   ###
   send_image_asset: (conversation_et, image) =>
-    generic_message = null
     @asset_service.create_image_proto image
-    .then ([image, ciphertext]) =>
+    .then (data) =>
+      [image, ciphertext] = data
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'image', image
-      return @_send_encrypted_asset conversation_et.id, generic_message, ciphertext
-    .then ([json, asset_id]) =>
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_SENT
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
-        action: 'photo'
-        conversation_type: z.tracking.helpers.get_conversation_type conversation_et
-        with_bot: conversation_et.is_with_bot()
-      }
-      event = @_construct_otr_asset_event json, conversation_et.id, asset_id
-      return @cryptography_repository.save_encrypted_event generic_message, event
-    .then (record) =>
-      @_on_add_event conversation_et, record
-    .catch (error) =>
-      @logger.log "Failed to upload otr asset for conversation #{conversation_et.id}", error
-      exception = new Error('Event response is undefined')
-      custom_data =
-        source: 'Sending medium image'
-        error: error
-      Raygun.send exception, custom_data
-      throw error
+      optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
+      @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
+      .then (mapped_event) =>
+        @cryptography_repository.save_unencrypted_event mapped_event
+      .then (saved_event) =>
+        @on_conversation_event saved_event
+
+        # we don't need to wait for the sending to resolve
+        @_send_encrypted_asset conversation_et.id, generic_message, ciphertext
+        .then ([response, asset_id]) =>
+          @get_message_in_conversation_by_id conversation_et, saved_event.id
+          .then (message_et) =>
+            ort_key = saved_event.data.otr_key
+            sha256 = saved_event.data.sha256
+            asset_et = message_et.get_first_asset()
+            asset_et.resource z.assets.AssetRemoteData.v2 conversation_et.id, asset_id, ort_key, sha256
+
+        return saved_event
 
   ###
   Send an encrypted knock.
@@ -1012,36 +1010,14 @@ class z.conversation.ConversationRepository
   @param conversation_id [String] Conversation ID
   @return [Object] Object in form of 'conversation.otr-message-add'
   ###
-  _construct_otr_message_event: (conversation_id) ->
-    event =
-      data: undefined
+  _construct_otr_event: (conversation_id, type) ->
+    return {} =
+      data: {}
       from: @user_repository.self().id
       time: new Date().toISOString()
-      type: 'conversation.otr-message-add'
+      type: type
       conversation: conversation_id
       status: z.message.StatusType.SENDING
-
-    return event
-
-  ###
-  Construct an encrypted asset event.
-
-  @private
-  @param response [JSON] Backend response
-  @param conversation_id [String] Conversation ID
-  @param asset_id [String] Asset ID
-  @return [Object] Object in form of 'conversation.otr-asset-add'
-  ###
-  _construct_otr_asset_event: (response, conversation_id, asset_id) ->
-    event =
-      data:
-        id: asset_id
-      from: @user_repository.self().id
-      time: response.time
-      type: 'conversation.otr-asset-add'
-      conversation: conversation_id
-
-    return event
 
   ###
   Create a user client map for a given conversation.
@@ -1086,7 +1062,7 @@ class z.conversation.ConversationRepository
     .then =>
       if conversation_et.removed_from_conversation()
         throw new Error 'Cannot send message to conversation you are not part of'
-      optimistic_event = @_construct_otr_message_event(conversation_et.id)
+      optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.MESSAGE_ADD
       return @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
     .then (mapped_event) =>
       if mapped_event.type in z.event.EventTypeHandling.STORE
