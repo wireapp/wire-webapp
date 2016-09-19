@@ -72,5 +72,6 @@ class z.announce.AnnounceRepository
               z.util.safe_window_open announce.link
             if announce.refresh
               window.location.reload true
+              window.focus()
             notification.close()
           break
