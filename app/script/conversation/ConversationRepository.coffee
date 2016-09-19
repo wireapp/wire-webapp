@@ -832,6 +832,7 @@ class z.conversation.ConversationRepository
   @param message_et [String] ID of message for which to acknowledge receipt
   ###
   send_confirmation_status: (conversation_et, message_et) =>
+    return # temporarily disable confirmation messages
     return if message_et.user().is_me or not conversation_et.is_one2one() or message_et.type not in z.event.EventTypeHandling.CONFIRM
 
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
@@ -843,8 +844,7 @@ class z.conversation.ConversationRepository
   ###
   send_image_asset: (conversation_et, image) =>
     @asset_service.create_image_proto image
-    .then (data) =>
-      [image, ciphertext] = data
+    .then ([image, ciphertext]) =>
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'image', image
       optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
@@ -1086,12 +1086,23 @@ class z.conversation.ConversationRepository
       # we don't need to wait for the sending to resolve
       @_add_to_sending_queue conversation_et.id, generic_message
       .then =>
-        @get_message_in_conversation_by_id conversation_et, saved_event.id
-      .then (message_et) =>
-        message_et.status z.message.StatusType.SENT
-        @conversation_service.update_message_in_db message_et, {status: z.message.StatusType.SENT}
+        if saved_event.type in z.event.EventTypeHandling.STORE
+          @_update_message_sent_status conversation_et, saved_event.id
 
       return saved_event
+
+  ###
+  Update message as sent in db and view
+  @param conversation_et [z.entity.Conversation]
+  @param message_id [String]
+  @return [Promise]
+  ###
+  _update_message_sent_status: (conversation_et, message_id) =>
+    @get_message_in_conversation_by_id conversation_et, message_id
+    .then (message_et) =>
+      changes = status: z.message.StatusType.SENT
+      message_et.status z.message.StatusType.SENT
+      @conversation_service.update_message_in_db message_et, changes
 
   ###
   Send encrypted external message
