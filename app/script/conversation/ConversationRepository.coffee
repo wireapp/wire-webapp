@@ -1108,14 +1108,7 @@ class z.conversation.ConversationRepository
     .then =>
       if conversation_et.removed_from_conversation()
         throw new Error 'Cannot send message to conversation you are not part of'
-      if @_send_as_external_message conversation_et, generic_message
-        @_send_external_generic_message conversation_et.id, generic_message
-      else
-        @_add_to_sending_queue conversation_et.id, generic_message
-    .catch (error) =>
-      if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
-        return @_send_external_generic_message conversation_et.id, generic_message
-      throw error
+      @_add_to_sending_queue conversation_et.id, generic_message
     .then (response) =>
       event = @_construct_otr_message_event response, conversation_et.id
       return @cryptography_repository.save_encrypted_event generic_message, event
@@ -1139,9 +1132,10 @@ class z.conversation.ConversationRepository
 
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Generic message to be sent as external message
+  @param user_ids [Array<String>] Optional array of user IDs to limit sending to
   @return [Promise] Promise that resolves after sending the external message
   ###
-  _send_external_generic_message: (conversation_id, generic_message) =>
+  _send_external_generic_message: (conversation_id, generic_message, user_ids) =>
     @logger.log @logger.levels.INFO, "Sending external message of type '#{generic_message.content}'", generic_message
 
     key_bytes = null
@@ -1153,13 +1147,15 @@ class z.conversation.ConversationRepository
       [key_bytes, sha256, ciphertext] = data
       return @_create_user_client_map conversation_id
     .then (user_client_map) =>
+      if user_ids
+        delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
       generic_message_external = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message_external.set 'external', new z.proto.External new Uint8Array(key_bytes), new Uint8Array(sha256)
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message_external
     .then (payload) =>
       payload.data = z.util.array_to_base64 ciphertext
       payload.native_push = true
-      @_send_encrypted_message conversation_id, generic_message, payload
+      @_send_encrypted_message conversation_id, generic_message, payload, user_ids
     .catch (error) =>
       @logger.log @logger.levels.INFO, 'Failed sending external message', error
       throw error
@@ -1174,13 +1170,22 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves when the message was sent
   ###
   _send_generic_message: (conversation_id, generic_message, user_ids) =>
-    @_create_user_client_map conversation_id
-    .then (user_client_map) =>
-      if user_ids
-        delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
-      return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
-    .then (payload) =>
-      @_send_encrypted_message conversation_id, generic_message, payload, user_ids
+    Promise.resolve @_send_as_external_message conversation_id, generic_message
+    .then (send_as_external) =>
+      if send_as_external
+        @_send_external_generic_message conversation_id, generic_message
+      else
+        @_create_user_client_map conversation_id
+        .then (user_client_map) =>
+          if user_ids
+            delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
+          return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+        .then (payload) =>
+          @_send_encrypted_message conversation_id, generic_message, payload, user_ids
+    .catch (error) =>
+      if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
+        return @_send_external_generic_message conversation_id, generic_message
+      throw error
 
   ###
   Sends otr message to a conversation.
@@ -1232,15 +1237,17 @@ class z.conversation.ConversationRepository
   Estimate whether message should be send as type external.
 
   @private
-  @param conversation_et [z.entitity.Conversation] Conversation entity
+  @param conversation_id [String]
   @param generic_message [z.protobuf.GenericMessage] Generic message that will be send
   @return [Boolean] Is payload likely to be too big so that we switch to type external?
   ###
-  _send_as_external_message: (conversation_et, generic_message) ->
-    estimated_number_of_clients = conversation_et.number_of_participants() * 4
-    message_in_bytes = new Uint8Array(generic_message.toArrayBuffer()).length
-    estimated_payload_in_bytes = estimated_number_of_clients * message_in_bytes
-    return estimated_payload_in_bytes / 1024 > 200
+  _send_as_external_message: (conversation_id, generic_message) ->
+    return new Promise (resolve) =>
+      @get_conversation_by_id conversation_id, (conversation_et) ->
+        estimated_number_of_clients = conversation_et.number_of_participants() * 4
+        message_in_bytes = new Uint8Array(generic_message.toArrayBuffer()).length
+        estimated_payload_in_bytes = estimated_number_of_clients * message_in_bytes
+        resolve estimated_payload_in_bytes / 1024 > 200
 
   ###
   Post images to a conversation.
@@ -1437,6 +1444,8 @@ class z.conversation.ConversationRepository
           @_on_asset_upload_failed conversation_et, event
         when z.event.Client.CONVERSATION.ASSET_PREVIEW
           @_on_asset_preview conversation_et, event
+        when z.event.Client.CONVERSATION.CONFIRMATION
+          @_on_confirmation conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_DELETE
           @_on_message_deleted conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_HIDDEN
@@ -1506,6 +1515,23 @@ class z.conversation.ConversationRepository
       @_delete_message_by_id conversation_et, message_et.id
     else
       @update_message_as_upload_failed message_et
+
+  ###
+  Confirmation for to message received.
+  @private
+  @param conversation_et [z.entity.Conversation] Conversation entity that a message was reacted upon in
+  @param event_json [Object] JSON data of 'conversation.confirmation' event
+  ###
+  _on_confirmation: (conversation_et, event_json) ->
+    @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
+    .then (message_et) =>
+      was_updated = message_et.update_status event_json.data.status
+      if was_updated
+        return @conversation_service.update_message_in_db message_et, {status: message_et.status()}
+    .catch (error) =>
+      if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+        @logger.log "Failed to handle status update of a message in conversation '#{conversation_et.id}'", error
+        throw error
 
   ###
   A conversation was created.
@@ -1939,6 +1965,11 @@ class z.conversation.ConversationRepository
       from: message_to_delete_et.from
       time: message_to_delete_et.timestamp
 
+
+  ###############################################################################
+  # Message updates
+  ###############################################################################
+
   ###
   Update asset in UI and DB as failed
   @param message_et [z.entity.Message] Message to update
@@ -1996,10 +2027,10 @@ class z.conversation.ConversationRepository
       if not original_message_et.timestamp
         throw new TypeError 'Missing timestamp'
 
-      event_json.time = new Date(original_message_et.timestamp).toISOString()
-
-      return @conversation_service.update_message_in_db event_json, {time: event_json.time}
-    .then =>
+      time = new Date(original_message_et.timestamp).toISOString()
+      @conversation_service.update_message_in_db event_json, {edited_time: event_json.time, time: time}
+      event_json.edited_time = event_json.time
+      event_json.time = time
       @_delete_message_by_id conversation_et, event_json.data.replacing_message_id
       return event_json
 

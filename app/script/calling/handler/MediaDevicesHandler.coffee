@@ -182,9 +182,9 @@ class z.calling.handler.MediaDevicesHandler
         [media_device, media_device_index] = @_get_current_device media_devices, device_id_observable()
         if not media_device.deviceId
           if updated_device = @available_devices["#{device_type}"]()[0]
-            @logger.log @logger.levels.WARN,
-              "Current '#{media_type}' device '#{device_id_observable()}' not found and replaced by '#{updated_device.name}'", media_devices
             device_id_observable updated_device.deviceId
+            @logger.log @logger.levels.WARN,
+              "Current '#{media_type}' device '#{device_id_observable()}' not found and replaced by '#{updated_device.label or updated_device.deviceId}'", media_devices
           else
             @logger.log @logger.levels.WARN, "Current '#{media_type}' device '#{device_id_observable()}' not found and reset'", media_devices
             device_id_observable ''

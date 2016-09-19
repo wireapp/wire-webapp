@@ -17,20 +17,14 @@
 #
 
 window.z ?= {}
-z.tracking ?= {}
-z.tracking.event ?= {}
+z.util ?= {}
 
-class z.tracking.event.PhoneVerification
-  ###
-  Construct a phone verification event.
+class z.util.Worker
+  constructor: (uri) ->
 
-  @param context [String] <"registration"|"postLogin"|"signIn">
-  @param state [String] <"succeeded"|"error"|"resent">
-  @param description [String] <"codeRequestError"|undefined>
-  ###
-  constructor: (@context, @state, @description) ->
-    @name = 'PhoneVerification'
-    @attributes =
-      context: @context
-      state: @state
-      description: @description
+    @post = (data) ->
+      return new Promise (resolve, reject) ->
+        worker = new window.Worker uri
+        worker.onmessage = (event) -> resolve event.data
+        worker.onerror = (error) -> reject error
+        worker.postMessage data

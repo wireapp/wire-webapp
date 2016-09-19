@@ -95,6 +95,7 @@ class z.conversation.EventMapper
 
     if message_et.is_reactable()
       message_et.reactions event.reactions or {}
+      message_et.status event.status if event.status
 
     if window.isNaN message_et.timestamp
       @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
@@ -234,7 +235,7 @@ class z.conversation.EventMapper
     message_et.assets.push @_map_asset_text event.data
     message_et.nonce = event.data.nonce
     message_et.replacing_message_id = event.data.replacing_message_id
-    message_et.edited_timestamp = new Date(event.data.edited_time).getTime()
+    message_et.edited_timestamp = new Date(event.edited_time or event.data.edited_time).getTime()
     return message_et
 
   ###

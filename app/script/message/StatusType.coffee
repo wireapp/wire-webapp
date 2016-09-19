@@ -20,9 +20,9 @@ window.z ?= {}
 z.message ?= {}
 
 # Enum for different confirmation types.
-z.message.SendingStatus =
+z.message.StatusType =
+  DELIVERED: 3
   FAILED: 0
+  SEEN: 4
   SENDING: 1
   SENT: 2
-  DELIVERED: 3
-  READ: 4

@@ -690,23 +690,34 @@ describe 'z.conversation.ConversationRepository', ->
         .catch done.fail
 
   describe '_send_as_external_message', ->
-    it 'should return true for big payload', ->
+
+    it 'should return true for big payload', (done) ->
       external_conversation_et = _generate_conversation()
       external_conversation_et.participating_user_ids [0..128]
+      conversation_repository.save_conversation external_conversation_et
+
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'text', new z.proto.Text 'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message'
 
-      should_send_as_external = conversation_repository._send_as_external_message conversation_et, generic_message
-      expect(should_send_as_external).toBeTruthy()
+      conversation_repository._send_as_external_message conversation_et.id, generic_message
+      .then (should_send_as_external) ->
+        expect(should_send_as_external).toBeTruthy()
+        done()
+      .catch done.fail
 
-    it 'should return false for small payload', ->
+    it 'should return false for small payload', (done) ->
       external_conversation_et = _generate_conversation()
       external_conversation_et.participating_user_ids [0..1]
+      conversation_repository.save_conversation external_conversation_et
+
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'text', new z.proto.Text 'Test'
 
-      should_send_as_external = conversation_repository._send_as_external_message conversation_et, generic_message
-      expect(should_send_as_external).toBeFalsy()
+      conversation_repository._send_as_external_message conversation_et.id, generic_message
+      .then (should_send_as_external) ->
+        expect(should_send_as_external).toBeFalsy()
+        done()
+      .catch done.fail
 
   describe 'get_events', ->
     it 'gets messages which are not broken by design', (done) ->

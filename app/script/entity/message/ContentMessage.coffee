@@ -34,6 +34,7 @@ class z.entity.ContentMessage extends z.entity.Message
     @reactions = ko.observable {}
     @reactions_user_ets = ko.observableArray()
     @reactions_user_ids = ko.pureComputed => (@reactions_user_ets().map (user_et) -> user_et.first_name()).join ', '
+    @status = ko.observable z.message.StatusType.SENT
 
     @display_edited_timestamp = =>
       return  z.localization.Localizer.get_text {
@@ -89,6 +90,14 @@ class z.entity.ContentMessage extends z.entity.Message
     else
       delete reactions[event_json.from]
     @reactions reactions
+
+  update_status: (updated_status) ->
+    if @status() >= z.message.StatusType.SENT
+      if updated_status > @status()
+        return @status updated_status
+    else if @stats() isnt updated_status
+      return @status updated_status
+    return false
 
   ###
   Check whether the message was edited.

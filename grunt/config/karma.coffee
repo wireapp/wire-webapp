@@ -24,6 +24,7 @@ module.exports =
     files: [
       {pattern: 'ext/proto/generic-message-proto/messages.proto', included: false, served: true, nocache: true}
       {pattern: 'audio/*.mp3', included: false, served: true, nocache: false}
+      {pattern: 'worker/*.js', included: false, served: true, nocache: true}
       # helper files
       '../node_modules/jasmine-ajax/lib/mock-ajax.js'
       '../node_modules/sinon/pkg/sinon-1.17.5.js'
@@ -37,5 +38,6 @@ module.exports =
     proxies:
       '/audio/': '/base/audio/'
       '/ext/': '/base/ext/'
+      '/worker/': '/base/worker/'
   test:
     colors: false

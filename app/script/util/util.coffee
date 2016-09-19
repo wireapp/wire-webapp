@@ -67,6 +67,17 @@ z.util.iterate_array_index = (array, current_index) ->
   return (current_index + 1) % array.length
 
 
+z.util.load_image = (blob) ->
+  return new Promise (resolve, reject) ->
+    object_url = window.URL.createObjectURL blob
+    img = new Image()
+    img.onload = ->
+      resolve @
+      window.URL.revokeObjectURL object_url
+    img.onerror = reject
+    img.src = object_url
+
+
 z.util.load_file_buffer = (file) ->
   return new Promise (resolve, reject) ->
     reader = new FileReader()
@@ -580,8 +591,11 @@ Checks if input has the format of an international phone number
 @return [Boolean] Is the input a phone number string
 ###
 z.util.is_valid_phone_number = (phone_number) ->
-  re = /^\+?[1-9]\d{1,14}$/
-  return re.test phone_number
+  if z.util.Environment.backend.current is 'production'
+    regular_expression = /^\+[1-9]\d{1,14}$/
+  else
+    regular_expression = /^\+[0-9]\d{1,14}$/
+  return regular_expression.test phone_number
 
 
 z.util.get_first_character = (string) ->

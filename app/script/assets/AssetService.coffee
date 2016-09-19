@@ -33,13 +33,6 @@ class z.assets.AssetService
 
     @BOUNDARY = 'frontier'
 
-    @PREVIEW_CONFIG =
-      squared: false
-      max_image_size: 30
-      max_byte_size: 1024
-      lossy_scaling: true
-      compression: 0
-
     @SMALL_PROFILE_CONFIG =
       squared: true
       max_image_size: 280
@@ -121,45 +114,32 @@ class z.assets.AssetService
   @option retention [z.assets.AssetRetentionPolicy]
   ###
   _upload_asset: (bytes, options) ->
-    key_bytes = null
-    sha256 = null
-
     z.assets.AssetCrypto.encrypt_aes_asset bytes
-    .then (data) =>
-      [key_bytes, sha256, ciphertext] = data
+    .then ([key_bytes, sha256, ciphertext]) =>
       return @post_asset_v3 ciphertext, options
-    .then (data) ->
-      {key, token} = data
-      return [key_bytes, sha256, key, token]
+      .then ({key, token}) ->
+        return [key_bytes, sha256, key, token]
 
   ###
   Upload image the new asset api v3. Promise will resolve with z.proto.Asset instance.
   In case of an successful upload the uploaded property is set. Otherwise it will be marked as not
   uploaded.
 
-  @param file [File, Blob] Image
+  @param image [File, Blob]
   @param options [Object]
   @option public [Boolean]
   @option retention [z.assets.AssetRetentionPolicy]
   ###
-  upload_image_asset: (file, options) ->
-    compressed_image = null
-    image_bytes = null
-
-    @compress_image file
-    .then (data) ->
-      [original_image, compressed_image] = data
-      return z.util.base64_to_array compressed_image.src
-    .then (bytes) =>
-      image_bytes = bytes
-      @_upload_asset image_bytes, options
-    .then (data) ->
-      [key_bytes, sha256, key, token] = data
-      image_meta_data = new z.proto.Asset.ImageMetaData compressed_image.width, compressed_image.height
-      asset = new z.proto.Asset()
-      asset.set 'original', new z.proto.Asset.Original file.type, image_bytes.length, null, image_meta_data
-      asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token
-      return asset
+  upload_image_asset: (image, options) ->
+    @_compress_image image
+    .then ([compressed_image, compressed_bytes]) =>
+      @_upload_asset compressed_bytes, options
+      .then ([key_bytes, sha256, key, token]) ->
+        image_meta_data = new z.proto.Asset.ImageMetaData compressed_image.width, compressed_image.height
+        asset = new z.proto.Asset()
+        asset.set 'original', new z.proto.Asset.Original image.type, compressed_bytes.length, null, image_meta_data
+        asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token
+        return asset
     .catch (error) =>
       @logger.log @logger.levels.ERROR, error
       asset = new z.proto.Asset()
@@ -206,17 +186,6 @@ class z.assets.AssetService
   ###############################################################################
   # Private
   ###############################################################################
-
-  ###
-  Compress image before uploading.
-
-  @param file [File, Blob] Image
-  ###
-  compress_image: (file) ->
-    return new Promise (resolve) =>
-      @_convert_image file, (image) =>
-        @compressor.transform_image image, (compressed_image) ->
-          resolve [image, compressed_image]
 
   ###
   Convert an image before uploading it.
@@ -392,29 +361,21 @@ class z.assets.AssetService
   @param image [File, Blob]
   ###
   create_image_proto: (image) ->
-    original_image = null
-    compressed_image = null
-    image_bytes = null
-
-    @compress_image image
-    .then (data) ->
-      [original_image, compressed_image] = data
-      return z.util.base64_to_array compressed_image.src
-    .then (data) ->
-      image_bytes = data
-      z.assets.AssetCrypto.encrypt_aes_asset image_bytes
-    .then ([key_bytes, sha256, ciphertext]) ->
-      image_asset = new z.proto.ImageAsset()
-      image_asset.set_tag z.assets.ImageSizeType.MEDIUM
-      image_asset.set_width compressed_image.width
-      image_asset.set_height compressed_image.height
-      image_asset.set_original_width original_image.width
-      image_asset.set_original_height original_image.height
-      image_asset.set_mime_type image.type
-      image_asset.set_size image_bytes.length
-      image_asset.set_otr_key key_bytes
-      image_asset.set_sha256 sha256
-      return [image_asset, new Uint8Array ciphertext]
+    @_compress_image image
+    .then ([compressed_image, compressed_bytes]) ->
+      return z.assets.AssetCrypto.encrypt_aes_asset compressed_bytes
+      .then ([key_bytes, sha256, ciphertext]) ->
+        image_asset = new z.proto.ImageAsset()
+        image_asset.set_tag z.assets.ImageSizeType.MEDIUM
+        image_asset.set_width compressed_image.width
+        image_asset.set_height compressed_image.height
+        image_asset.set_original_width compressed_image.width
+        image_asset.set_original_height compressed_image.height
+        image_asset.set_mime_type image.type
+        image_asset.set_size compressed_bytes.length
+        image_asset.set_otr_key key_bytes
+        image_asset.set_sha256 sha256
+        return [image_asset, new Uint8Array ciphertext]
 
   ###
   Create asset proto message.
@@ -428,3 +389,23 @@ class z.assets.AssetService
       asset = new z.proto.Asset()
       asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256
       return [asset, ciphertext]
+
+  ###############################################################################
+  # Image processing
+  ###############################################################################
+
+  ###
+  Compress image.
+  @param asset [File, Blob]
+  ###
+  _compress_image: (blob) ->
+    z.util.load_file_buffer blob
+    .then (buffer) ->
+      if blob.type is 'image/gif'
+        return z.util.load_file_buffer blob
+      image_worker = new z.util.Worker 'worker/image-worker.js'
+      return image_worker.post buffer
+    .then (compressed_bytes) ->
+      return z.util.load_image new Blob [new Uint8Array compressed_bytes], 'type': blob.type
+      .then (compressed_image) ->
+        return [compressed_image, new Uint8Array compressed_bytes]
