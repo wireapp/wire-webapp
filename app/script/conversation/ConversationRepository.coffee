@@ -861,11 +861,7 @@ class z.conversation.ConversationRepository
           @_update_image_as_sent conversation_et, saved_event
         .catch (error) =>
           @logger.log "Failed to upload otr asset for conversation #{conversation_et.id}", error
-          exception = new Error('Event response is undefined')
-          custom_data =
-            source: 'Sending medium image'
-            error: error
-          Raygun.send exception, custom_data
+          throw error
 
         return saved_event
 
