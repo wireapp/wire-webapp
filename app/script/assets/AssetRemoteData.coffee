@@ -55,9 +55,10 @@ class z.assets.AssetRemoteData
   @param sha256 [Uint8Array]
   ###
   @v2: (conversation_id, asset_id, otr_key, sha256) ->
-    remote_data = new z.assets.AssetRemoteData otr_key, sha256
-    remote_data.generate_url = -> wire.app.service.asset.generate_asset_url_v2 asset_id, conversation_id
-    return remote_data
+    if asset_id
+      remote_data = new z.assets.AssetRemoteData otr_key, sha256
+      remote_data.generate_url = -> wire.app.service.asset.generate_asset_url_v2 asset_id, conversation_id
+      return remote_data
 
   ###
   Loads and decrypts stored asset

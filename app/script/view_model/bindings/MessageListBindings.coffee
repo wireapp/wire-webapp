@@ -62,11 +62,12 @@ ko.bindingHandlers.background_image =
 
     _on_viewport_change = _.debounce ->
       if _in_view element
-        asset_et().load()
+        asset_et().load?()
         .then (blob) ->
           $(element).removeClass 'image-loading'
           object_url = window.URL.createObjectURL blob
           image_element[0].src = object_url
+          viewport_subscription.dispose()
     , 500
 
     image_element = $(element).find 'img'

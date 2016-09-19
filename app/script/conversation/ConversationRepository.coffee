@@ -858,10 +858,15 @@ class z.conversation.ConversationRepository
         .then ([response, asset_id]) =>
           @get_message_in_conversation_by_id conversation_et, saved_event.id
           .then (message_et) =>
+            saved_event.data.id = asset_id
             ort_key = saved_event.data.otr_key
             sha256 = saved_event.data.sha256
-            asset_et = message_et.get_first_asset()
-            asset_et.resource z.assets.AssetRemoteData.v2 conversation_et.id, asset_id, ort_key, sha256
+            message_et.get_first_asset().resource z.assets.AssetRemoteData.v2 conversation_et.id, asset_id, ort_key, sha256
+            message_et.status z.message.StatusType.SENT
+
+            @conversation_service.update_message_in_db message_et,
+              data: saved_event.data
+              status: z.message.StatusType.SENT
 
         return saved_event
 
@@ -1432,12 +1437,12 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] The conversation that was created
   ###
   _on_asset_preview: (conversation_et, event_json) ->
-    @get_message_in_conversation_by_id conversation_et, event_json.id
-    .then (message_et) =>
-      @update_message_with_asset_preview conversation_et, message_et, event_json.data
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, 'Failed to update asset preview', error
-      throw error
+    message_et = conversation_et.get_message_by_id event_json.id
+
+    if not message_et?
+      return @logger.log @logger.levels.ERROR, "Asset preview: Could not find message with id '#{event_json.id}'", event_json
+
+    @update_message_with_asset_preview conversation_et, message_et, event_json.data
 
   ###
   An asset was uploaded.
@@ -1446,12 +1451,12 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] The conversation that was created
   ###
   _on_asset_upload_complete: (conversation_et, event_json) ->
-    @get_message_in_conversation_by_id conversation_et, event_json.id
-    .then (message_et) =>
-      @update_message_as_upload_complete conversation_et, message_et, event_json.data
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, 'Failed to update asset complete', error
-      throw error
+    message_et = conversation_et.get_message_by_id event_json.id
+
+    if not message_et?
+      return @logger.log @logger.levels.ERROR, "Upload complete: Could not find message with id '#{event_json.id}'", event_json
+
+    @update_message_as_upload_complete conversation_et, message_et, event_json.data
 
   ###
   An asset failed.
@@ -1460,15 +1465,15 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] The conversation that was created
   ###
   _on_asset_upload_failed: (conversation_et, event_json) ->
-    @get_message_in_conversation_by_id conversation_et, event_json.id
-    .then (message_et) =>
-      if event_json.data.reason is z.assets.AssetUploadFailedReason.CANCELLED
-        @_delete_message_by_id conversation_et, message_et.id
-      else
-        @update_message_as_upload_failed message_et
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, 'Failed to update asset failed', error
-      throw error
+    message_et = conversation_et.get_message_by_id event_json.id
+
+    if not message_et?
+      return @logger.log @logger.levels.ERROR, "Upload failed: Could not find message with id '#{event_json.id}'", event_json
+
+    if event_json.data.reason is z.assets.AssetUploadFailedReason.CANCELLED
+      @_delete_message_by_id conversation_et, message_et.id
+    else
+      @update_message_as_upload_failed message_et
 
   ###
   Confirmation for to message received.
