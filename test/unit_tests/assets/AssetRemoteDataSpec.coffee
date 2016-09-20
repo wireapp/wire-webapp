@@ -29,7 +29,9 @@ describe 'z.assets.AssetRemoteData', ->
       z.assets.AssetCrypto.encrypt_aes_asset video_bytes
       .then (data) ->
         [key_bytes, sha256, ciphertext] = data
-        remote_data = z.assets.AssetRemoteData.v2 '', '', new Uint8Array(key_bytes), new Uint8Array(sha256)
+        conversation_id = z.util.create_random_uuid()
+        asset_id = z.util.create_random_uuid()
+        remote_data = z.assets.AssetRemoteData.v2 conversation_id, asset_id, new Uint8Array(key_bytes), new Uint8Array(sha256)
         spyOn(remote_data, '_load_buffer').and.returnValue Promise.resolve([ciphertext, video_type])
         done()
 

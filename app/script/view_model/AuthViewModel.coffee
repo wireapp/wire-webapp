@@ -534,7 +534,7 @@ class z.ViewModel.AuthViewModel
 
   clicked_on_resend_code: =>
     return if not @can_resend_code()
-    @sign_in_phone()
+    @login_phone()
 
   clicked_on_resend_registration: =>
     return if not @can_resend_registration()

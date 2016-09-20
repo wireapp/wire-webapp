@@ -73,7 +73,7 @@
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
       <!-- ko if: asset.is_medium_image() -->
         <div class="message-asset-image" data-bind="fit_to_viewport: asset">
-          <div class="image image-loading" data-bind="background_image: asset.resource(), viewport_changed: $parents[1].viewport_changed, click: $parents[1].show_detail, attr: {'data-uie-visible': $parent.visible}" data-uie-name="go-image-detail" >
+          <div class="image image-loading" data-bind="background_image: asset.resource, viewport_changed: $parents[1].viewport_changed, click: $parents[1].show_detail, attr: {'data-uie-visible': $parent.visible}" data-uie-name="go-image-detail" >
             <img class="image-element" data-bind="attr: {src: asset.dummy_url}"/>
             <span class="image-placeholder-icon">
               <div class="three-dots">
@@ -87,7 +87,7 @@
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(), css: {'message-is-editing': $parent.is_editing}"></div>
+          <div class="text" data-bind="html: asset.render(), css: {'message-is-editing': $parent.is_editing, 'text-graphite': message.status() === z.message.StatusType.SENDING}"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset params="preview: $data, viewport_changed: $parents[2].viewport_changed"></link-preview-asset>

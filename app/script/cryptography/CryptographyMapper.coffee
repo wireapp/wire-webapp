@@ -43,6 +43,7 @@ class z.cryptography.CryptographyMapper
         id: generic_message.message_id
         from: event.from
         time: event.time
+        status: event.status
       , specific_content
 
   _map_generic_message: (generic_message, event) =>
