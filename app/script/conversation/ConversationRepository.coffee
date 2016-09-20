@@ -954,6 +954,7 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the message
   ###
   send_message_edit: (message, original_message_et, conversation_et) =>
+    generic_message = null
     Promise.resolve()
     .then =>
       if original_message_et.get_first_asset().text is message
