@@ -383,7 +383,7 @@ class z.ViewModel.StartUIViewModel
     @invite_message z.localization.Localizer.get_text
       id: z.string.invite_message
       replace: [
-        {placeholder: '%url', content: z.util.Invite.get_invitation_to_connect_url self.id}
+        {placeholder: '%url', content: 'DUMMY'}
       ]
 
     @invite_bubble = new zeta.webapp.module.Bubble

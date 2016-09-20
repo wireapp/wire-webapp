@@ -125,25 +125,6 @@ class z.user.UserRepository
       @logger.log @logger.levels.ERROR, "Failed to send connection request to user '#{user_et.id}': #{error.message}", error
 
   ###
-  Create a connection request from generic invite token
-  @param token [String]
-  ###
-  create_connection_from_invite_token: (token) =>
-    user_id = z.util.Invite.get_user_from_invitation_token token
-
-    return if not user_id or @self().id is user_id
-
-    @get_user_by_id user_id, (user_et) =>
-      connection_et = user_et.connection()
-      return if connection_et.status() in [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.ACCEPTED,
-        z.user.ConnectionStatus.SENT]
-
-      if connection_et.status() is z.user.ConnectionStatus.PENDING
-        @accept_connection_request user_et
-      else
-        @create_connection user_et
-
-  ###
   Get a connection for a user ID.
   @param user_id [String] User ID
   @return [z.entity.Connection] User connection entity

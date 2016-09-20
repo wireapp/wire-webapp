@@ -20,7 +20,6 @@ window.z ?= {}
 z.auth ?= {}
 
 z.auth.URLParameter =
-  CONNECT: 'connect'
   ENVIRONMENT: 'env'
   EXPIRED: 'expired'
   INVITE: 'invite'
