@@ -790,11 +790,11 @@ class z.conversation.ConversationRepository
       generic_message = new z.proto.GenericMessage nonce
       generic_message.set 'asset', asset
       @_send_encrypted_asset conversation_et.id, generic_message, ciphertext, nonce
-    .then (response) =>
-      [json, asset_id] = response
-      event = @_construct_otr_asset_event response, conversation_et.id, asset_id
+    .then ([response, asset_id]) =>
+      event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
       event.data.otr_key = generic_message.asset.uploaded.otr_key
       event.data.sha256 = generic_message.asset.uploaded.sha256
+      event.data.id = asset_id
       event.id = nonce
       return @_on_asset_upload_complete conversation_et, event
 
@@ -809,7 +809,7 @@ class z.conversation.ConversationRepository
     asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'asset', asset
-    @_send_and_save_generic_message conversation_et, generic_message
+    @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
   When we reset a session then we must inform the remote client about this action.
@@ -824,7 +824,7 @@ class z.conversation.ConversationRepository
     asset.set 'not_uploaded', reason_proto
     generic_message = new z.proto.GenericMessage nonce
     generic_message.set 'asset', asset
-    @_send_and_save_generic_message conversation_et, generic_message
+    @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
   Send a confirmation for a content message.
@@ -843,31 +843,39 @@ class z.conversation.ConversationRepository
   Sends an OTR Image Asset
   ###
   send_image_asset: (conversation_et, image) =>
-    generic_message = null
     @asset_service.create_image_proto image
     .then ([image, ciphertext]) =>
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'image', image
-      return @_send_encrypted_asset conversation_et.id, generic_message, ciphertext
-    .then ([json, asset_id]) =>
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_SENT
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
-        action: 'photo'
-        conversation_type: z.tracking.helpers.get_conversation_type conversation_et
-        with_bot: conversation_et.is_with_bot()
-      }
-      event = @_construct_otr_asset_event json, conversation_et.id, asset_id
-      return @cryptography_repository.save_encrypted_event generic_message, event
-    .then (record) =>
-      @_on_add_event conversation_et, record
-    .catch (error) =>
-      @logger.log "Failed to upload otr asset for conversation #{conversation_et.id}", error
-      exception = new Error('Event response is undefined')
-      custom_data =
-        source: 'Sending medium image'
-        error: error
-      Raygun.send exception, custom_data
-      throw error
+      optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
+      @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
+      .then (mapped_event) =>
+        @cryptography_repository.save_unencrypted_event mapped_event
+      .then (saved_event) =>
+        @on_conversation_event saved_event
+
+        # we don't need to wait for the sending to resolve
+        @_send_encrypted_asset conversation_et.id, generic_message, ciphertext
+        .then ([response, asset_id]) =>
+          saved_event.data.id = asset_id
+          @_update_image_as_sent conversation_et, saved_event
+        .catch (error) =>
+          @logger.log "Failed to upload otr asset for conversation #{conversation_et.id}", error
+          throw error
+
+        return saved_event
+
+  ###
+  Update image message with given event data
+  ###
+  _update_image_as_sent: (conversation_et, event_json) =>
+    @get_message_in_conversation_by_id conversation_et, event_json.id
+    .then (message_et) =>
+      asset_data = event_json.data
+      remote_data = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
+      message_et.get_first_asset().resource remote_data
+      message_et.status z.message.StatusType.SENT
+      @conversation_service.update_message_in_db message_et, {data: asset_data, status: z.message.StatusType.SENT}
 
   ###
   Send an encrypted knock.
@@ -877,7 +885,7 @@ class z.conversation.ConversationRepository
   send_knock: (conversation_et) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'knock', new z.proto.Knock false
-    @_send_and_save_generic_message conversation_et, generic_message
+    @_send_and_inject_generic_message conversation_et, generic_message
     .then ->
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.PING_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
@@ -898,13 +906,13 @@ class z.conversation.ConversationRepository
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'text', new z.proto.Text message
 
-    @_send_and_save_generic_message conversation_et, generic_message
+    @_send_and_inject_generic_message conversation_et, generic_message
     .then =>
       @link_repository.get_link_preview_from_string message
     .then (link_preview) =>
       if link_preview?
         generic_message.text.link_preview.push link_preview
-        @_send_and_save_generic_message conversation_et, generic_message
+        @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Error while sending link preview: #{error.message}", error
       throw error
@@ -922,7 +930,7 @@ class z.conversation.ConversationRepository
 
     Promise.resolve()
     .then =>
-      return @_send_and_save_generic_message conversation_et, generic_message
+      @_send_and_inject_generic_message conversation_et, generic_message
     .then (message_record) =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.MESSAGE_SENT
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
@@ -947,21 +955,13 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the message
   ###
   send_message_edit: (message, original_message_et, conversation_et) =>
-    generic_message = undefined
     Promise.resolve()
-    .then ->
+    .then =>
       if original_message_et.get_first_asset().text is message
         throw new Error 'Edited message equals original message'
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'edited', new z.proto.MessageEdit original_message_et.id, new z.proto.Text message
-      return generic_message
-    .then (generic_message) =>
-      @_add_to_sending_queue conversation_et.id, generic_message
-    .then (response) =>
-      event = @_construct_otr_message_event response, conversation_et.id
-      return @cryptography_repository.save_encrypted_event generic_message, event
-    .then (record) =>
-      @on_conversation_event record
+      @_send_and_inject_generic_message conversation_et, generic_message
     .then =>
       @_track_edit_message conversation_et, original_message_et
     .then =>
@@ -969,7 +969,7 @@ class z.conversation.ConversationRepository
     .then (link_preview) =>
       if link_preview?
         generic_message.edited.text.link_preview.push link_preview
-        @_send_and_save_generic_message conversation_et, generic_message
+        @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Error while editing message: #{error.message}", error
       throw error
@@ -983,12 +983,7 @@ class z.conversation.ConversationRepository
   send_reaction: (conversation_et, message_et, reaction) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'reaction', new z.proto.Reaction reaction, message_et.id
-    @_add_to_sending_queue conversation_et.id, generic_message
-    .then (response) =>
-      event = @_construct_otr_message_event response, conversation_et.id
-      return @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
-    .then (mapped_event) =>
-      @on_conversation_event mapped_event
+    @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
   Sending a message to the remote end of a session reset.
@@ -1020,42 +1015,21 @@ class z.conversation.ConversationRepository
         reject error
 
   ###
-  Construct an encrypted message event.
+  Construct event payload.
 
   @private
-  @param response [JSON] Backend response
   @param conversation_id [String] Conversation ID
-  @return [Object] Object in form of 'conversation.otr-message-add'
+  @param event_type [z.event.Backend.*]
+  @return [Object] event payload
   ###
-  _construct_otr_message_event: (response, conversation_id) ->
-    event =
-      data: undefined
+  _construct_otr_event: (conversation_id, event_type) ->
+    return {} =
+      data: {}
       from: @user_repository.self().id
-      time: response.time
-      type: 'conversation.otr-message-add'
+      time: new Date().toISOString()
+      type: event_type
       conversation: conversation_id
-
-    return event
-
-  ###
-  Construct an encrypted asset event.
-
-  @private
-  @param response [JSON] Backend response
-  @param conversation_id [String] Conversation ID
-  @param asset_id [String] Asset ID
-  @return [Object] Object in form of 'conversation.otr-asset-add'
-  ###
-  _construct_otr_asset_event: (response, conversation_id, asset_id) ->
-    event =
-      data:
-        id: asset_id
-      from: @user_repository.self().id
-      time: response.time
-      type: 'conversation.otr-asset-add'
-      conversation: conversation_id
-
-    return event
+      status: z.message.StatusType.SENDING
 
   ###
   Create a user client map for a given conversation.
@@ -1095,37 +1069,40 @@ class z.conversation.ConversationRepository
   # Send Generic Messages
   ###############################################################################
 
-  ###
-  Saves and sends a generic message to the conversation
-
-  @private
-  @param conversation_et [z.entity.Conversation] Conversation to send message to
-  @param generic_message [z.proto] Protobuf message content to be added to generic message
-  @return [Promise] Promise that resolves with the saved record, when the message has been added to the conversation
-  ###
-  _send_and_save_generic_message: (conversation_et, generic_message) =>
+  _send_and_inject_generic_message: (conversation_et, generic_message) =>
     Promise.resolve()
     .then =>
       if conversation_et.removed_from_conversation()
         throw new Error 'Cannot send message to conversation you are not part of'
+      optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.MESSAGE_ADD
+      return @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
+    .then (mapped_event) =>
+      if mapped_event.type in z.event.EventTypeHandling.STORE
+        return @cryptography_repository.save_unencrypted_event mapped_event
+      return mapped_event
+    .then (saved_event) =>
+      @on_conversation_event saved_event
+
+      # we don't need to wait for the sending to resolve
       @_add_to_sending_queue conversation_et.id, generic_message
-    .then (response) =>
-      event = @_construct_otr_message_event response, conversation_et.id
-      return @cryptography_repository.save_encrypted_event generic_message, event
-    .then (record) =>
-      @_on_add_event conversation_et, record
-      return record
-    .catch (error) =>
-      error_message = "Could not send OTR message of type '#{generic_message.content}' to conversation ID '#{conversation_et.id}' (#{conversation_et.display_name()}): #{error.message}"
+      .then =>
+        if saved_event.type in z.event.EventTypeHandling.STORE
+          @_update_message_sent_status conversation_et, saved_event.id
 
-      raygun_error = new Error 'Encryption failed'
-      custom_data = error_message: "Could not send OTR message of type '#{generic_message.content}'"
-      Raygun.send raygun_error, custom_data
+      return saved_event
 
-      @logger.log @logger.levels.ERROR, error_message, {error: error, event: generic_message}
-      if error.label is z.service.BackendClientError::LABEL.UNKNOWN_CLIENT
-        amplify.publish z.event.WebApp.SIGN_OUT, 'unknown_sender', true
-      throw error
+  ###
+  Update message as sent in db and view
+  @param conversation_et [z.entity.Conversation]
+  @param message_id [String]
+  @return [Promise]
+  ###
+  _update_message_sent_status: (conversation_et, message_id) =>
+    @get_message_in_conversation_by_id conversation_et, message_id
+    .then (message_et) =>
+      changes = status: z.message.StatusType.SENT
+      message_et.status z.message.StatusType.SENT
+      @conversation_service.update_message_in_db message_et, changes
 
   ###
   Send encrypted external message
@@ -2027,11 +2004,11 @@ class z.conversation.ConversationRepository
       if not original_message_et.timestamp
         throw new TypeError 'Missing timestamp'
 
-      time = new Date(original_message_et.timestamp).toISOString()
-      @conversation_service.update_message_in_db event_json, {edited_time: event_json.time, time: time}
       event_json.edited_time = event_json.time
-      event_json.time = time
+      event_json.time = new Date(original_message_et.timestamp).toISOString()
+      @_delete_message_by_id conversation_et, event_json.id
       @_delete_message_by_id conversation_et, event_json.data.replacing_message_id
+      @cryptography_repository.save_unencrypted_event event_json
       return event_json
 
   ###

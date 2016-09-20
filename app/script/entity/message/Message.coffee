@@ -39,6 +39,7 @@ class z.entity.Message
     @user = ko.observable new z.entity.User()
     @visible = ko.observable true
     @is_editing = ko.observable false
+    @status = ko.observable z.message.StatusType.UNSPECIFIED
 
     @display_timestamp_short = =>
       date = moment.unix @timestamp / 1000
@@ -190,3 +191,15 @@ class z.entity.Message
   ###
   is_reactable: ->
     return @is_content()
+
+  ###
+  Update the status of a message.
+  @param update_status [z.message.StatusType] New status of message
+  ###
+  update_status: (updated_status) ->
+    if @status() >= z.message.StatusType.SENT
+      if updated_status > @status()
+        return @status updated_status
+    else if @status() isnt updated_status
+      return @status updated_status
+    return false
