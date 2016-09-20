@@ -190,16 +190,10 @@ class z.cryptography.CryptographyRepository
   @param user_client_map [Object] User client map to get sessions for
   @return [Promise<Array<cryptobox.CryptoboxSession>>] Promise that resolves with an array of sessions
   ###
-  get_sessions: (user_client_map, use_local_sessions = true) =>
+  get_sessions: (user_client_map) =>
     return new Promise (resolve, reject) =>
-      cryptobox_session_map = {}
-      missing_session_map = {}
-
-      if use_local_sessions
-        [cryptobox_session_map, missing_session_map] = @_get_sessions_local user_client_map
-        @logger.log @logger.levels.INFO, "Found local sessions for '#{Object.keys(cryptobox_session_map).length}' users", cryptobox_session_map
-      else
-        missing_session_map = user_client_map
+      [cryptobox_session_map, missing_session_map] = @_get_sessions_local user_client_map
+      @logger.log @logger.levels.INFO, "Found local sessions for '#{Object.keys(cryptobox_session_map).length}' users", cryptobox_session_map
 
       @_get_sessions_missing cryptobox_session_map, missing_session_map
       .then (cryptobox_session_map) ->
@@ -345,7 +339,6 @@ class z.cryptography.CryptographyRepository
         cryptobox_session_map[user_id] ?= {}
         for client_id, pre_key of client_pre_keys when pre_key
           try
-            session = @_session_from_prekey user_id, client_id, pre_key.key
             cryptobox_session_map[user_id][client_id] = @_session_from_prekey user_id, client_id, pre_key.key
           catch error
             @logger.log @logger.levels.ERROR, "Problem initiating a session for client ID '#{client_id}' from user ID '#{user_id}': #{error.message} — Skipping session.", error
@@ -395,17 +388,8 @@ class z.cryptography.CryptographyRepository
   @param generic_message [z.proto.GenericMessage] Proto buffer message to be encrypted
   @return [Promise] Promise that resolves with the encrypted payload
   ###
-  encrypt_generic_message: (user_client_map, generic_message, payload) =>
-    return Promise.resolve()
-    .then =>
-      if payload
-        use_local_sessions = false
-        @logger.log @logger.levels.INFO, 'Skip local sessions when encrypting message'
-      else
-        payload = @_construct_payload @current_client().id
-        use_local_sessions = true
-        @logger.log @logger.levels.INFO, "Encrypt '#{generic_message.content}' message using local sessions"
-      return @get_sessions user_client_map, use_local_sessions
+  encrypt_generic_message: (user_client_map, generic_message, payload = @_construct_payload @current_client().id) =>
+    @get_sessions user_client_map
     .then (cryptobox_session_map) =>
       return @_add_payload_recipients payload, generic_message, cryptobox_session_map
 
