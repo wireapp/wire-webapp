@@ -41,9 +41,8 @@ class z.calling.CallService
   @param delete_flow_info [Object] Info needed to delete a flow
   @option delete_flow_info [String] conversation_id
   @option delete_flow_info [String] flow_id
-  @param callbacks [Array<Function>] Callbacks after the request has been made
   ###
-  delete_flow: (delete_flow_info, callbacks) ->
+  delete_flow: (delete_flow_info) ->
     reason = delete_flow_info.reason
     url = "/conversations/#{delete_flow_info.conversation_id}/call/flows/#{delete_flow_info.flow_id}"
     url += "?reason=#{reason}" if reason
@@ -52,46 +51,36 @@ class z.calling.CallService
       type: 'DELETE'
       api_endpoint: '/conversations/{conversation_id}/call/flows/{flow_id}'
       url: @client.create_url url
-      callback: callbacks
 
   ###
   Lists existing call flows for a specific conversation.
-
   @param conversation_id [String] Conversation ID
-  @param callbacks [Array<Function>] Callbacks after the request has been made
   ###
-  get_flows: (conversation_id, callbacks) ->
+  get_flows: (conversation_id) ->
     @client.send_request
       type: 'GET'
       api_endpoint: '/conversations/{conversation_id}/call/flows'
       url: @client.create_url "/conversations/#{conversation_id}/call/flows"
-      callback: callbacks
 
   ###
   Returns the participants and their call states in a specified conversation.
-
   @param conversation_id [String] Conversation ID
-  @param callbacks [Array<Function>] Callbacks after the request has been made
   ###
-  get_state: (conversation_id, callbacks) ->
+  get_state: (conversation_id) ->
     @client.send_request
       type: 'GET'
       api_endpoint: '/conversations/{conversation_id}/call/state'
       url: @client.create_url "/conversations/#{conversation_id}/call/state"
-      callback: callbacks
 
   ###
   Commands the backend to create a flow.
-
   @param conversation_id [String] Conversation ID
-  @param callbacks [Array<Function>] Callbacks after the request has been made
   ###
-  post_flows: (conversation_id, callbacks) ->
+  post_flows: (conversation_id) ->
     @client.send_request
       type: 'POST'
       api_endpoint: '/conversations/{conversation_id}/call/flows'
       url: @client.create_url "/conversations/#{conversation_id}/call/flows"
-      callback: callbacks
 
   ###
   Add an ICE candidate.
@@ -99,16 +88,14 @@ class z.calling.CallService
   @param conversation_id [String] Conversation ID
   @param flow_id [String] Flow ID
   @param ice_info [z.calling.payloads.ICECandidateInfo] Signaling info bundled with ICE candidate
-  @param callbacks [Array<Function>] Callbacks after the request has been made
   ###
-  post_local_candidates: (conversation_id, flow_id, ice_info, callbacks) ->
+  post_local_candidates: (conversation_id, flow_id, ice_info) ->
     @client.send_json
       type: 'POST'
       api_endpoint: '/conversations/{conversation_id}/call/flows/{flow_id}/local_candidates'
       url: @client.create_url "/conversations/#{conversation_id}/call/flows/#{flow_id}/local_candidates"
       data:
         candidates: [ice_info]
-      callback: callbacks
 
   ###
   Update the SDP of a connection.
@@ -121,28 +108,24 @@ class z.calling.CallService
   @param conversation_id [String] Conversation ID
   @param flow_id [String] Flow ID
   @param sdp [z.calling.SDPInfo] Signaling info bundled with SDP
-  @param callbacks [Array<Function>] Callbacks after the request has been made
   ###
-  put_local_sdp: (conversation_id, flow_id, sdp, callbacks) ->
+  put_local_sdp: (conversation_id, flow_id, sdp) ->
     @client.send_json
       type: 'PUT'
       api_endpoint: '/conversations/{conversation_id}/call/flows/{flow_id}/local_sdp'
       url: @client.create_url "/conversations/#{conversation_id}/call/flows/#{flow_id}/local_sdp"
       data: sdp
-      callback: callbacks
 
   ###
   Returns the current state of the client and all participants.
 
   @param conversation_id [String] Conversation ID
   @param payload [Object] Participant payload to be set
-  @param callbacks [Array<Function>] Callbacks after the request has been made
   ###
-  put_state: (conversation_id, payload, callbacks) ->
+  put_state: (conversation_id, payload) ->
     @client.send_json
       type: 'PUT'
       api_endpoint: '/conversations/{conversation_id}/call/state'
       url: @client.create_url "/conversations/#{conversation_id}/call/state"
       data:
         self: payload
-      callback: callbacks
