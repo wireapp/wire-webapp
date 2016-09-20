@@ -104,7 +104,7 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'prepare_prod', [
     'clean:deploy'
-    'coffee:deploy_prod'
+    'coffee:deploy'
     'coffee:prod'
     'less:deploy'
     'postcss:deploy'
@@ -122,7 +122,7 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'prepare_taco', [
     'clean:deploy'
-    'coffee:deploy_prod'
+    'coffee:deploy'
     'coffee:prod'
     'less:deploy'
     'postcss:deploy'
@@ -158,7 +158,7 @@ module.exports = (grunt) ->
     ]
 
   grunt.registerTask 'host', (port, open = true) ->
-    if port isnt undefined 
+    if port isnt undefined
       grunt.config 'connect.server.port', port
     grunt.task.run 'connect'
     grunt.task.run 'open:dist' if open

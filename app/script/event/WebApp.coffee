@@ -174,7 +174,6 @@ z.event.WebApp =
     ARCHIVE: 'wire.webapp.shortcut.archive'
     CALL_IGNORE: 'wire.webapp.shortcut.call-ignore'
     CALL_MUTE: 'wire.webapp.shortcut.call-mute'
-    DEBUG: 'wire.webapp.shortcut.debug'
     NEXT: 'wire.webapp.shortcut.next'
     PEOPLE: 'wire.webapp.shortcut.people'
     PICTURE: 'wire.webapp.shortcut.picture'
