@@ -173,18 +173,6 @@ describe 'z.util.create_random_uuid', ->
     expected = true
     expect(actual).toBe expected
 
-describe 'z.util.bytes_to_uuid', ->
-  it 'creates uuid from byte array', ->
-    expected = '1692b76b-d66b-4688-a099-71512ec1f51e'
-    actual = z.util.bytes_to_uuid [22, 146, 183, 107, 214, 107, 70, 136, 160, 153, 113, 81, 46, 193, 245, 30]
-    expect(actual).toBe expected
-
-describe 'z.util.uuid_to_bytes', ->
-  it 'creates byte array from uuid', ->
-    expected = [22, 146, 183, 107, 214, 107, 70, 136, 160, 153, 113, 81, 46, 193, 245, 30]
-    actual = z.util.uuid_to_bytes '1692b76b-d66b-4688-a099-71512ec1f51e'
-    expect(actual).toEqual expected
-
 describe 'z.util.format_bytes', ->
   it 'renders 0 bytes', ->
     actual = z.util.format_bytes 0

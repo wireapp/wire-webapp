@@ -281,32 +281,6 @@ z.util.create_random_uuid = ->
   return UUID.genV4().hexString
 
 
-z.util.bytes_to_uuid = (bytes) ->
-  hex = []
-  i = 0
-  while i < bytes.length
-    hex.push (bytes[i] >>> 4).toString 16
-    hex.push (bytes[i] & 0xF).toString 16
-    i++
-  hex.join('').replace /(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/, '$1-$2-$3-$4-$5'
-
-
-z.util.uuid_to_bytes = (hex) ->
-  parts = hex.split '-'
-  ints = []
-  intPos = 0
-  i = 0
-
-  while i < parts.length
-    j = 0
-
-    while j < parts[i].length
-      ints[intPos++] = window.parseInt parts[i].substr(j, 2), 16
-      j += 2
-    i++
-  ints
-
-
 z.util.encode_base64 = (text) ->
   return window.btoa text
 
