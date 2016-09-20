@@ -144,82 +144,53 @@ class z.service.Client
 
         @number_of_requests @number_of_requests() + 1
 
-        if _.isArray config.callback
-          $.ajax
-            contentType: config.contentType
-            data: config.data
-            headers: headers
-            processData: config.processData
-            timeout: config.timeout
-            type: config.type
-            url: config.url
-            xhrFields: xhrFields
-          .always (data_or_jqXHR, textStatus, jqXHR_or_data) =>
-            if textStatus not in ['error', 'timeout']
-              if jqXHR_or_data.wire
-                jqXHR_or_data.wire.original_request_options.api_endpoint = config.api_endpoint
-                jqXHR_or_data.wire.responded = new Date()
-              resolve [data_or_jqXHR, jqXHR_or_data]
-            else
-              switch data_or_jqXHR.status
-                when z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
-                  @logger.log @logger.levels.WARN, 'Request failed due to connectivity problem.', config
-                  @request_queue.push [config, resolve, reject]
-                  @execute_on_connectivity().then => @execute_request_queue()
-                when z.service.BackendClientError::STATUS_CODE.UNAUTHORIZED
-                  @logger.log @logger.levels.WARN, 'Request failed as access token is invalid.', config
-                  @request_queue.push [config, resolve, reject]
-                  amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW
+        $.ajax
+          contentType: config.contentType
+          data: config.data
+          headers: headers
+          processData: config.processData
+          timeout: config.timeout
+          type: config.type
+          url: config.url
+        .done (data, textStatus, jqXHR) =>
+          @logger.log @logger.levels.OFF, "Server Response ##{jqXHR.wire.request_id} from '#{config.url}':", data
+          config.callback? data
+          resolve data
+        .fail (jqXHR, textStatus, errorThrown) =>
+          switch jqXHR.status
+            when z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
+              @logger.log @logger.levels.WARN, 'Request failed due to connectivity problem.', config
+              @request_queue.push [config, resolve, reject]
+              @execute_on_connectivity().then => @execute_request_queue()
+              return
+            when z.service.BackendClientError::STATUS_CODE.UNAUTHORIZED
+              @request_queue.push [config, resolve, reject]
+              @logger.log @logger.levels.WARN, 'Request failed as access token is invalid.', config
+              amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW
+              return
+            when z.service.BackendClientError::STATUS_CODE.FORBIDDEN
+              switch jqXHR.responseJSON?.label
+                when z.service.BackendClientError::LABEL.INVALID_CREDENTIALS
+                  Raygun.send new Error 'Server request failed: Invalid credentials'
+                when z.service.BackendClientError::LABEL.TOO_MANY_CLIENTS, z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
+                  @logger.log @logger.levels.WARN, "Server request failed: '#{jqXHR.responseJSON.label}'"
                 else
-                  reject data_or_jqXHR.responseJSON or new z.service.BackendClientError data_or_jqXHR.status
-        else
-          $.ajax
-            contentType: config.contentType
-            data: config.data
-            headers: headers
-            processData: config.processData
-            timeout: config.timeout
-            type: config.type
-            url: config.url
-          .done (data, textStatus, jqXHR) =>
-            @logger.log @logger.levels.OFF, "Server Response ##{jqXHR.wire.request_id} from '#{config.url}':", data
-            config.callback? data
-            resolve data
-          .fail (jqXHR, textStatus, errorThrown) =>
-            switch jqXHR.status
-              when z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
-                @logger.log @logger.levels.WARN, 'Request failed due to connectivity problem.'
-                @request_queue.push [config, resolve, reject]
-                @execute_on_connectivity().then => @execute_request_queue()
-                return
-              when z.service.BackendClientError::STATUS_CODE.UNAUTHORIZED
-                @request_queue.push [config, resolve, reject]
-                @logger.log @logger.levels.WARN, 'Request failed as access token is invalid.'
-                amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW
-                return
-              when z.service.BackendClientError::STATUS_CODE.FORBIDDEN
-                switch jqXHR.responseJSON?.label
-                  when z.service.BackendClientError::LABEL.INVALID_CREDENTIALS
-                    Raygun.send new Error 'Server request failed: Invalid credentials'
-                  when z.service.BackendClientError::LABEL.TOO_MANY_CLIENTS, z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
-                    @logger.log @logger.levels.WARN, "Server request failed: '#{jqXHR.responseJSON.label}'"
-                  else
-                    Raygun.send new Error 'Server request failed'
-              else
-                if jqXHR.status not in IGNORED_BACKEND_ERRORS
-                  Raygun.send new Error "Server request failed: #{jqXHR.status}"
-
-            if _.isFunction config.callback
-              config.callback null, jqXHR.responseJSON or new z.service.BackendClientError errorThrown
+                  Raygun.send new Error 'Server request failed'
             else
-              if navigator.onLine
-                reject jqXHR.responseJSON or new z.service.BackendClientError jqXHR.status
-              else
-                error_data =
-                  code: z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
-                  label: z.service.BackendClientError::LABEL.CONNECTIVITY_PROBLEM
-                  message: 'Problem with the network connectivity'
-                reject new z.service.BackendClientError error_data
+              if jqXHR.status not in IGNORED_BACKEND_ERRORS
+                Raygun.send new Error "Server request failed: #{jqXHR.status}"
+
+          if _.isFunction config.callback
+            config.callback null, jqXHR.responseJSON or new z.service.BackendClientError errorThrown
+          else
+            if navigator.onLine
+              reject jqXHR.responseJSON or new z.service.BackendClientError jqXHR.status
+            else
+              error_data =
+                code: z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
+                label: z.service.BackendClientError::LABEL.CONNECTIVITY_PROBLEM
+                message: 'Problem with the network connectivity'
+              reject new z.service.BackendClientError error_data
 
   ###
   Send AJAX request with compressed JSON body.

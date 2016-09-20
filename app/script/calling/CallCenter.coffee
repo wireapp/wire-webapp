@@ -117,7 +117,6 @@ class z.calling.CallCenter
   @param event [Object] Event payload
   ###
   _on_event_in_supported_browsers: (event) ->
-    @telemetry.trace_event event
     switch event.type
       when z.event.Backend.CALL.FLOW_ADD
         @signaling_handler.on_flow_add_event event

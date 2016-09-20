@@ -144,10 +144,8 @@ class z.calling.handler.CallSignalingHandler
     Promise.resolve @call_center.media_element_handler.remove_media_element flow_info.flow_id
     .then =>
       @logger.log @logger.levels.INFO, "DELETEing flow '#{flow_info.flow_id}'"
-      return @call_center.call_service.delete_flow flow_info, []
-    .then (response_array) =>
-      [response, jqXHR] = response_array
-      @call_center.telemetry.trace_request flow_info.conversation_id, jqXHR
+      return @call_center.call_service.delete_flow flow_info
+    .then (response) =>
       @logger.log @logger.levels.DEBUG, "DELETEing flow '#{flow_info.flow_id}' successful"
       if flow_info.reason is z.calling.payloads.FlowDeletionReason.RELEASED
         @logger.log @logger.levels.DEBUG, 'Flow was released - We need implement posting for flows to renegotiate'
@@ -168,10 +166,8 @@ class z.calling.handler.CallSignalingHandler
   ###
   post_for_flows: (conversation_id) =>
     @logger.log @logger.levels.INFO, "POSTing for flows in conversation '#{conversation_id}'"
-    @call_center.call_service.post_flows conversation_id, []
-    .then (response_array) =>
-      [response, jqXHR] = response_array
-      @call_center.telemetry.trace_request conversation_id, jqXHR
+    @call_center.call_service.post_flows conversation_id
+    .then (response) =>
       return @call_center.get_call_by_id conversation_id
       .then (call_et) =>
         @logger.log @logger.levels.DEBUG, "POSTing for flows in '#{conversation_id}' successful", response
@@ -244,7 +240,7 @@ class z.calling.handler.CallSignalingHandler
   ###
   _get_flows: (conversation_id) ->
     @logger.log @logger.levels.INFO, "GETting flows for '#{conversation_id}'"
-    return @call_center.call_service.get_flows conversation_id, []
+    return @call_center.call_service.get_flows conversation_id
     .then (response_array) =>
       [response, jqXHR] = response_array
       @logger.log @logger.levels.DEBUG, "GETting flows for '#{conversation_id}' successful"
@@ -268,10 +264,8 @@ class z.calling.handler.CallSignalingHandler
   ###
   put_local_sdp: (sdp_info, on_success, on_failure) =>
     @logger.log @logger.levels.INFO, "PUTting local SDP for flow '#{sdp_info.flow_id}'", sdp_info
-    @call_center.call_service.put_local_sdp sdp_info.conversation_id, sdp_info.flow_id, sdp_info.sdp, []
-    .then (response_array) =>
-      [response, jqXHR] = response_array
-      @call_center.telemetry.trace_request sdp_info.conversation_id, jqXHR
+    @call_center.call_service.put_local_sdp sdp_info.conversation_id, sdp_info.flow_id, sdp_info.sdp
+    .then (response) =>
       @logger.log @logger.levels.DEBUG, "PUTting local SDP for flow '#{sdp_info.flow_id}' successful"
       on_success? response
     .catch (error) =>
@@ -307,10 +301,8 @@ class z.calling.handler.CallSignalingHandler
     candidate = @ice_mapper.map_ice_object_to_message ice_info.ice_candidate
 
     @logger.log @logger.levels.INFO, "POSTing local ICE candidate for flow '#{ice_info.flow_id}'", candidate
-    @call_center.call_service.post_local_candidates ice_info.conversation_id, ice_info.flow_id, candidate, []
-    .then (response_array) =>
-      [response, jqXHR] = response_array
-      @call_center.telemetry.trace_request ice_info.conversation_id, jqXHR
+    @call_center.call_service.post_local_candidates ice_info.conversation_id, ice_info.flow_id, candidate
+    .then =>
       @logger.log @logger.levels.INFO, "POSTing local ICE candidate for flow '#{ice_info.flow_id}' successful"
     .catch (error) =>
       @logger.log @logger.levels.ERROR,
