@@ -1264,8 +1264,6 @@ class z.ViewModel.AuthViewModel
   _redirect_to_app: =>
     url = '/'
     url = "/#{@auth.settings.parameter}" if @auth.settings.parameter?
-    connect_token = z.util.get_url_parameter z.auth.URLParameter.CONNECT
-    url = z.util.append_url_parameter url, "#{z.auth.URLParameter.CONNECT}=#{connect_token}" if connect_token
     window.location.replace url
 
   _register_client: =>
