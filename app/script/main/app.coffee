@@ -327,7 +327,7 @@ class z.main.App
       setTimeout ->
         amplify.publish z.event.WebApp.PENDING.SHOW
       , 1000
-    else if has_picture and not connect_token
+    else if has_picture
       amplify.publish z.event.WebApp.PROFILE.SHOW
       setTimeout ->
         amplify.publish z.event.WebApp.SEARCH.SHOW

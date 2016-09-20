@@ -954,6 +954,7 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the message
   ###
   send_message_edit: (message, original_message_et, conversation_et) =>
+    generic_message = null
     Promise.resolve()
     .then =>
       if original_message_et.get_first_asset().text is message
@@ -1841,10 +1842,8 @@ class z.conversation.ConversationRepository
   @param message_et [z.entity.Message] message_et on which the cancel was initiated
   ###
   cancel_asset_upload: (message_et) =>
-    conversation_et = @active_conversation()
     @asset_service.cancel_asset_upload message_et.assets()[0].upload_id()
-    @_delete_message_by_id conversation_et, message_et.id
-    @send_asset_upload_failed conversation_et, message_et.id, z.assets.AssetUploadFailedReason.CANCELLED
+    @send_asset_upload_failed @active_conversation(), message_et.id, z.assets.AssetUploadFailedReason.CANCELLED
 
   _handle_deleted_clients: (deleted_client_map, payload) ->
     return Promise.resolve()
