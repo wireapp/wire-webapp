@@ -286,7 +286,8 @@ z.string.de.invite_hint_selected = 'Zum Kopieren %meta_key + C drücken'
 z.string.de.invite_hint_unselected = 'Markieren und %meta_key + C drücken'
 z.string.de.invite_detail = 'Der Link gilt für zwei Wochen.'
 z.string.de.invite_headline = 'Lade Freunde zu Wire ein'
-z.string.de.invite_message = 'Füge mich auf Wire als Kontakt hinzu.\nModerne, private Kommunikation. %url'
+z.string.de.invite_message = 'Ich bin bei Wire. Suche nach %mail \noder gehe auf https://get.wire.com, um mich als Kontakt hinzuzufügen.'
+z.string.de.invite_message_no_email = 'Ich bin bei Wire. Gehe auf https://get.wire.com, um mich als Kontakt hinzuzufügen.'
 
 # Extensions
 z.string.de.extensions_bubble_button_gif = 'Gif'
