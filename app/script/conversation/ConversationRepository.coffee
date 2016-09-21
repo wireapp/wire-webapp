@@ -857,6 +857,7 @@ class z.conversation.ConversationRepository
         @_send_encrypted_asset conversation_et.id, generic_message, ciphertext
         .then ([response, asset_id]) =>
           saved_event.data.id = asset_id
+          saved_event.data.info.nonce = asset_id
           @_update_image_as_sent conversation_et, saved_event
         .catch (error) =>
           @logger.log "Failed to upload otr asset for conversation #{conversation_et.id}", error
