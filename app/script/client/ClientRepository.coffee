@@ -379,6 +379,8 @@ class z.client.ClientRepository
     @cryptography_repository.reset_session user_id, client_id
     .then =>
       @delete_client_from_db user_id, client_id
+    .then =>
+      @logger.log @logger.levels.WARN, "Client '#{client_id}' of user '#{user_id}' is obsolete and was removed locally"
 
   delete_client_from_db: (user_id, client_id) ->
     primary_key = @_construct_primary_key user_id, client_id
