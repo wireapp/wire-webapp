@@ -205,12 +205,6 @@ class z.ViewModel.AuthViewModel
     $(".#{element_id}").show()
 
   _init_base: ->
-    if z.util.get_url_parameter z.auth.URLParameter.CONNECT
-      @get_wire true
-      @registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.GENERIC_INVITE
-    else if z.util.get_url_parameter z.auth.URLParameter.EXPIRED
-      @session_expired true
-
     modes_to_block = [
       z.auth.AuthView.MODE.HISTORY
       z.auth.AuthView.MODE.LIMIT
@@ -223,8 +217,14 @@ class z.ViewModel.AuthViewModel
       z.auth.AuthView.MODE.VERIFY_PASSWORD
     ]
 
-    if invite = z.util.get_url_parameter z.auth.URLParameter.INVITE
+    if z.util.get_url_parameter z.auth.URLParameter.CONNECT
+      @get_wire true
+      @registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.GENERIC_INVITE
+    else if invite = z.util.get_url_parameter z.auth.URLParameter.INVITE
+      @get_wire true
       @register_from_invite invite
+    else if z.util.get_url_parameter z.auth.URLParameter.EXPIRED
+      @session_expired true
     else if @_has_no_hash() and z.storage.get_value z.storage.StorageKey.AUTH.SHOW_LOGIN
       @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
     else if @_get_hash() in modes_to_block
@@ -258,16 +258,11 @@ class z.ViewModel.AuthViewModel
       if invite_info.email
         @username invite_info.email
         @prefilled_email = invite_info.email
-      else
-        @logger.log @logger.levels.WARN, 'Invite information does not contain an email address'
-      @_set_hash z.auth.AuthView.MODE.ACCOUNT_REGISTER
-      @_on_hash_change()
-    .catch (error) =>
-      if error.label is z.service.BackendClientError::LABEL.INVALID_INVITATION_CODE
-        @logger.log @logger.levels.WARN, 'Invalid Invitation Code'
-      else
+    .catch (error) ->
+      if error.label isnt z.service.BackendClientError::LABEL.INVALID_INVITATION_CODE
         Raygun.send new Error('Invitation not found'), {invite_code: invite, error: error}
-      @_on_hash_change()
+    .then =>
+      @_set_hash z.auth.AuthView.MODE.ACCOUNT_REGISTER
 
 
   ###############################################################################
