@@ -189,15 +189,13 @@ class z.calling.handler.CallStateHandler
       return Promise.reject new Error error_description
 
     @logger.log @logger.levels.INFO, "GETting call state for '#{conversation_id}'"
-    @call_center.call_service.get_state conversation_id, []
+    @call_center.call_service.get_state conversation_id
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "GETting call state for '#{conversation_id}' failed: #{error.message}", error
       attributes = {cause: error.label or error.name, method: 'get', request: 'state'}
       @call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
       throw error
-    .then (response_array) =>
-      [response, jqXHR] = response_array
-      @call_center.telemetry.trace_request conversation_id, jqXHR
+    .then (response) =>
       @logger.log @logger.levels.DEBUG, "GETting call state for '#{conversation_id}' successful", response
       return response
 
@@ -216,12 +214,10 @@ class z.calling.handler.CallStateHandler
 
     @logger.log @logger.levels.INFO,
       "PUTting the state to '#{payload.state}' in '#{conversation_id}'", payload
-    @call_center.call_service.put_state conversation_id, payload, []
+    @call_center.call_service.put_state conversation_id, payload
     .catch (error) =>
       @_put_state_failure error, conversation_id, payload
-    .then (response_array) =>
-      [response, jqXHR] = response_array
-      @call_center.telemetry.trace_request conversation_id, jqXHR
+    .then (response) =>
       @logger.log @logger.levels.DEBUG,
         "PUTting the state to '#{payload.state}' in '#{conversation_id}' successful", response
       return response

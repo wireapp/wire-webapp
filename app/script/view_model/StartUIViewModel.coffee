@@ -380,11 +380,14 @@ class z.ViewModel.StartUIViewModel
 
     self = @user_repository.self()
 
-    @invite_message z.localization.Localizer.get_text
-      id: z.string.invite_message
-      replace: [
-        {placeholder: '%url', content: z.util.Invite.get_invitation_to_connect_url self.id}
-      ]
+    if self.email()
+      @invite_message z.localization.Localizer.get_text
+        id: z.string.invite_message
+        replace: [
+          {placeholder: '%mail', content: self.email()}
+        ]
+    else
+      @invite_message z.localization.Localizer.get_text z.string.invite_message_no_email
 
     @invite_bubble = new zeta.webapp.module.Bubble
       host_selector: '#invite-button'

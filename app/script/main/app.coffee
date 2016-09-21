@@ -316,11 +316,6 @@ class z.main.App
     conversation_et = @repository.conversation.get_most_recent_conversation()
     has_picture = !!@repository.user.self().picture_medium()
 
-    connect_token = z.util.get_url_parameter z.auth.URLParameter.CONNECT
-    if connect_token
-      @logger.log @logger.levels.INFO, 'Found connect token'
-      @repository.user.create_connection_from_invite_token connect_token
-
     if conversation_et and has_picture
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
       setTimeout =>
@@ -332,7 +327,7 @@ class z.main.App
       setTimeout ->
         amplify.publish z.event.WebApp.PENDING.SHOW
       , 1000
-    else if has_picture and not connect_token
+    else if has_picture
       amplify.publish z.event.WebApp.PROFILE.SHOW
       setTimeout ->
         amplify.publish z.event.WebApp.SEARCH.SHOW

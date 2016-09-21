@@ -281,32 +281,6 @@ z.util.create_random_uuid = ->
   return UUID.genV4().hexString
 
 
-z.util.bytes_to_uuid = (bytes) ->
-  hex = []
-  i = 0
-  while i < bytes.length
-    hex.push (bytes[i] >>> 4).toString 16
-    hex.push (bytes[i] & 0xF).toString 16
-    i++
-  hex.join('').replace /(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/, '$1-$2-$3-$4-$5'
-
-
-z.util.uuid_to_bytes = (hex) ->
-  parts = hex.split '-'
-  ints = []
-  intPos = 0
-  i = 0
-
-  while i < parts.length
-    j = 0
-
-    while j < parts[i].length
-      ints[intPos++] = window.parseInt parts[i].substr(j, 2), 16
-      j += 2
-    i++
-  ints
-
-
 z.util.encode_base64 = (text) ->
   return window.btoa text
 
@@ -333,7 +307,7 @@ Opens a new browser tab (target="_blank") with a given URL in a safe environment
 @see https://mathiasbynens.github.io/rel-noopener/
 @param url [String] URL you want to open in a new browser tab
 ###
-z.util.safe_window_open = (url) ->
+z.util.safe_window_open = (url, focus = true) ->
   if not url.match /^http[s]?:\/\//i
     url = "http://#{url}"
 
@@ -343,7 +317,11 @@ z.util.safe_window_open = (url) ->
     new_window = window.open()
     new_window.opener = null
     new_window.location = url
-    return new_window
+
+  if new_window and focus
+    new_window.focus()
+
+  return new_window
 
 z.util.auto_link_emails = (text) ->
   email_pattern = /([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)/gim

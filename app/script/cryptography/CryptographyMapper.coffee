@@ -43,6 +43,7 @@ class z.cryptography.CryptographyMapper
         id: generic_message.message_id
         from: event.from
         time: event.time
+        status: event.status
       , specific_content
 
   _map_generic_message: (generic_message, event) =>
@@ -206,7 +207,7 @@ class z.cryptography.CryptographyMapper
       @logger.log @logger.levels.INFO, error.message
       throw error
 
-  _map_image_medium: (image, event_id) ->
+  _map_image_medium: (image, event_id = z.util.create_random_uuid()) ->
     return {
       data:
         content_length: image.size

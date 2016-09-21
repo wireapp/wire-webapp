@@ -47,7 +47,7 @@ ko.components.register 'link-preview-asset',
             <div class="link-preview-container" data-bind="click: on_link_preview_click">
               <!-- ko if: preview.image_resource() -->
                 <span class="link-preview-image image-placeholder-icon image-loading"
-                      data-bind="background_image: preview.image_resource(), viewport_changed: viewport_changed">
+                      data-bind="background_image: preview.image_resource, viewport_changed: viewport_changed">
                   <img />
                   <div class="three-dots">
                     <span></span>
