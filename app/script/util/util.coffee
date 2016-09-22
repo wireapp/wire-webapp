@@ -91,7 +91,11 @@ z.util.load_url_buffer = (url, xhr_accessor_function) ->
     xhr = new XMLHttpRequest()
     xhr.open 'GET', url, true
     xhr.responseType = 'arraybuffer'
-    xhr.onload = -> resolve [xhr.response, xhr.getResponseHeader 'content-type']
+    xhr.onload = ->
+      if xhr.status is 200
+        resolve [xhr.response, xhr.getResponseHeader 'content-type']
+      else
+        reject new Error "Requesting arraybuffer failed with status #{xhr.status}"
     xhr.onerror = reject
     xhr.onabort = reject
     xhr_accessor_function? xhr
