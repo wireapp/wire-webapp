@@ -98,8 +98,7 @@ class z.calling.entities.Call
 
     @self_client_joined.subscribe (is_joined) =>
       if is_joined
-        if @state() isnt z.calling.enum.CallState.OUTGOING
-          amplify.publish z.event.WebApp.CALL.SIGNALING.POST_FLOWS, @id
+        amplify.publish z.event.WebApp.CALL.SIGNALING.POST_FLOWS, @id if @get_number_of_participants()
       else
         @is_connected false
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP
@@ -262,7 +261,7 @@ class z.calling.entities.Call
       @_delete_flow_by_id flow_et, delete_on_backend
 
     @logger.log @logger.levels.DEBUG, "Participants updated: '#{participant_et.user.name()}' removed"
-    if @get_number_of_participants() is 0
+    if not @get_number_of_participants()
       amplify.publish z.event.WebApp.CALL.STATE.DELETE, @id
     return true
 
