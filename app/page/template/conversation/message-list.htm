@@ -2,10 +2,7 @@
    <div class="messages-wrap" data-bind="antiscroll, event: {scroll: on_scroll}">
      <div class="messages"
           data-bind="css: {'messages-centered': center_messages},
-                     foreach: {data: conversation().messages_visible,
-                     as: 'message', afterRender:
-                     after_message_render, beforeRemove:
-                     before_message_remove}">
+                     foreach: {data: conversation().messages_visible, as: 'message'}">
       <div class="message"
            data-bind="css: $parent.get_css_class(message),
                       attr: {'data-uie-uid': message.id, 'data-uie-value': message.super_type}"

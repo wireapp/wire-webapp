@@ -116,10 +116,10 @@
   display: flex;
   margin-bottom: 4px;
   line-height: @avatar-diameter-xs;
+}
 
-  &.hide-user {
-    display: none;
-  }
+.message-hide-user-avatar {
+  display: none;
 }
 
 .message-header-icon {
@@ -168,6 +168,10 @@
   margin-bottom: 16px;
   padding-top: 8px; // TODO margin top is not working because of collapsing margins
 
+  &:not(.message-timestamp-visible) {
+    display: none;;
+  }
+
   &:not(.message-timestamp-unread) {
     .message-unread-dot {
       display: none;
@@ -189,14 +193,6 @@
 .message-timestamp-day {
   time[data-timestamp-type='normal'] {display: none;}
   time[data-timestamp-type='day'] {display: block;}
-}
-
-.message-system .message-timestamp {
-  display: none;
-}
-
-.message-timestamp-hidden {
-  display: none;
 }
 
 // MEMBER MESSAGE

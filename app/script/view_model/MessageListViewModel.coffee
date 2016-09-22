@@ -36,9 +36,6 @@ class z.ViewModel.MessageListViewModel
 
     @conversation_is_changing = false
 
-    # is there a rendered message with an unread dot
-    @first_unread_timestamp = ko.observable()
-
     # store conversation to mark as read when browser gets focus
     @mark_as_read_on_focus = undefined
 
@@ -56,7 +53,6 @@ class z.ViewModel.MessageListViewModel
     @viewport_changed.extend rateLimit: 100
 
     @recalculate_timeout = undefined
-    @on_initial_rendering = undefined
 
     @should_scroll_to_bottom = true
 
@@ -118,7 +114,6 @@ class z.ViewModel.MessageListViewModel
     conversation_et?.release()
     @messages_subscription?.dispose()
     @capture_scrolling_event = false
-    @first_unread_timestamp undefined
 
   ###
   Change conversation.
@@ -162,8 +157,9 @@ class z.ViewModel.MessageListViewModel
       # return immediately if nothing to render
       @_initial_rendering conversation_et, callback
     else
-      # will be executed after all messages are rendered
-      @on_initial_rendering = _.once => @_initial_rendering conversation_et, callback
+      setTimeout =>
+        @_initial_rendering conversation_et, callback
+      , 200
 
   ###
   Registers for mouse wheel events and incoming messages.
@@ -324,104 +320,6 @@ class z.ViewModel.MessageListViewModel
     .then -> reset_progress()
     .catch -> reset_progress()
 
-  ###
-  Is called by knockout whenever a new message is rendered.
-  @param elements [Array] List of elements that were added to the DOM (Note: This also contains html comments)
-  @param message [z.entity.Message] rendered message
-  ###
-  after_message_render: (elements, message) =>
-    window.requestAnimFrame =>
-      return if not @conversation_repository.active_conversation()
-      message_index = @conversation_repository.active_conversation().messages_visible().indexOf message
-      if message_index > 0
-        last_message = @conversation_repository.active_conversation().messages_visible()[message_index - 1]
-
-      last = moment.unix last_message?.timestamp / 1000
-      current = moment.unix message.timestamp / 1000
-
-      if not last_message? or moment(current).diff(last, 'minutes') > 60 and message.is_content()
-        $(elements)
-        .find '.message-timestamp'
-        .removeClass 'message-timestamp-hidden'
-
-      if last_message?
-        ###
-        @note For content messages (except pings):
-          Don't show user avatar next to message if the last message in the conversation was already sent by the same user
-        ###
-        if last_message.is_content() and last_message.user().id is message.user().id and message.is_content()
-          $(elements)
-          .find '.message-header-user-is-hideable'
-          .addClass 'hide-user'
-
-        if last_message.timestamp is @conversation().last_read_timestamp() and not @first_unread_timestamp()
-          @first_unread_timestamp message.timestamp
-          $(elements)
-          .find '.message-timestamp'
-          .addClass 'message-timestamp-unread'
-          .removeClass 'message-timestamp-hidden'
-          .end()
-          .find '.message-header-user-is-hideable'
-          .removeClass 'hide-user'
-
-        if not last.isSame current, 'day'
-          $(elements)
-          .find '.message-timestamp'
-          .addClass 'message-timestamp-day'
-          .removeClass 'message-timestamp-hidden'
-          .end()
-          .find '.message-header-user-is-hideable'
-          .removeClass 'hide-user'
-
-        if message.is_content() and message.replacing_message_id
-          $(elements)
-          .find '.message-header-user-is-hideable'
-          .removeClass 'hide-user'
-
-      if message?.is_ping()
-        now = Date.now()
-        message.animated now - current < 2000
-
-      if z.util.array_is_last @conversation().messages_visible(), message
-        # Defer initial rendering
-        window.requestAnimFrame => @on_initial_rendering?()
-
-  before_message_remove: (dom_node) ->
-    if $(dom_node).hasClass 'message' and not @conversation_is_changing
-
-      has_timestamp = $(dom_node).find('.message-timestamp-hidden').length is 0
-      has_day_timestamp = $(dom_node).find('.message-timestamp-day').length > 0
-      has_avatar = $(dom_node).find('.hide-user').length is 0
-      next_message = $(dom_node).next()
-
-      if has_timestamp
-        next_message
-        .find '.message-timestamp'
-        .removeClass 'message-timestamp-hidden'
-        .end()
-        .find '.message-header-user-is-hideable'
-        .removeClass 'hide-user'
-      else if has_day_timestamp
-        next_message
-        .find '.message-timestamp'
-        .addClass 'message-timestamp-day'
-        .removeClass 'message-timestamp-hidden'
-        .end()
-        .find '.message-header-user-is-hideable'
-        .removeClass 'hide-user'
-      else if has_avatar
-        next_message
-        .find '.message-header-user-is-hideable'
-        .removeClass 'hide-user'
-
-      $(dom_node)
-      .addClass 'message-fade-out'
-      .on 'transitionend', ->
-        $(@).remove()
-    else
-      # clean up whatever this is
-      $(dom_node).remove()
-
   # Subscribes to iFrame click events.
   _subscribe_to_iframe_clicks: ->
     $('iframe.soundcloud').iframeTracker blurCallback: ->
@@ -540,6 +438,42 @@ class z.ViewModel.MessageListViewModel
     target_element = $(event.currentTarget)
     return if target_element.hasClass 'image-loading'
     amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, target_element.find('img')[0].src
+
+  get_timestamp_class: (message_et) ->
+    last_message = @conversation().get_previous_message message_et
+    return if not last_message?
+
+    last = moment.unix last_message?.timestamp / 1000
+    current = moment.unix message_et.timestamp / 1000
+
+    if last_message.timestamp is @conversation().last_read_timestamp()
+      return 'message-timestamp-visible message-timestamp-unread'
+
+    if not last.isSame current, 'day'
+      return 'message-timestamp-visible message-timestamp-day'
+
+    if not last_message or moment(current).diff(last, 'minutes') > 60 and message_et.is_content()
+      return 'message-timestamp-visible'
+
+  ###
+  Checks its older neighbor in order to see if the avatar should be rendered or not
+  @param message_et [z.entity.Message]
+  ###
+  should_hide_user_avatar: (message_et) ->
+    last_message = @conversation().get_previous_message message_et
+    return if not last_message?
+
+    # TODO avoid double check
+    if @get_timestamp_class message_et
+      return false
+
+    if message_et.is_content() and message_et.replacing_message_id
+      return false
+
+    if last_message.is_content() and last_message.user().id is message_et.user().id and message_et.is_content()
+      return true
+
+    return false
 
   click_on_cancel_request: (message_et) =>
     next_conversation_et = @conversation_repository.get_next_conversation @conversation_repository.active_conversation()
