@@ -207,7 +207,7 @@ class z.cryptography.CryptographyMapper
       @logger.log @logger.levels.INFO, error.message
       throw error
 
-  _map_image_medium: (image, event_id = z.util.create_random_uuid()) ->
+  _map_image_medium: (image, event_id) ->
     return {
       data:
         content_length: image.size
@@ -217,7 +217,7 @@ class z.cryptography.CryptographyMapper
           tag: image.tag
           width: image.width
           height: image.height
-          nonce: event_id
+          nonce: event_id or z.util.create_random_uuid() # set nonce even if asset id is missing
           original_width: image.original_width
           original_height: image.original_height
           public: false
