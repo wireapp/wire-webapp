@@ -448,16 +448,16 @@ class z.ViewModel.MessageListViewModel
     last_message = @conversation().get_previous_message message_et
     return if not last_message?
 
-    last = moment.unix last_message?.timestamp / 1000
-    current = moment.unix message_et.timestamp / 1000
-
     if last_message.timestamp is @conversation_last_read_timestamp
       return 'message-timestamp-visible message-timestamp-unread'
+
+    last = moment last_message.timestamp
+    current = moment message_et.timestamp
 
     if not last.isSame current, 'day'
       return 'message-timestamp-visible message-timestamp-day'
 
-    if not last_message or moment(current).diff(last, 'minutes') > 60
+    if current.diff(last, 'minutes') > 60
       return 'message-timestamp-visible'
 
   ###
@@ -466,7 +466,6 @@ class z.ViewModel.MessageListViewModel
   ###
   should_hide_user_avatar: (message_et) ->
     last_message = @conversation().get_previous_message message_et
-    return if not last_message?
 
     # TODO avoid double check
     if @get_timestamp_class message_et
@@ -475,7 +474,7 @@ class z.ViewModel.MessageListViewModel
     if message_et.is_content() and message_et.replacing_message_id
       return false
 
-    if last_message.is_content() and last_message.user().id is message_et.user().id
+    if last_message?.is_content() and last_message?.user().id is message_et.user().id
       return true
 
     return false
