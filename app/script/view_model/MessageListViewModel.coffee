@@ -36,6 +36,9 @@ class z.ViewModel.MessageListViewModel
 
     @conversation_is_changing = false
 
+    # store last read to show until user switches conversation
+    @conversation_last_read_timestamp = undefined
+
     # store conversation to mark as read when browser gets focus
     @mark_as_read_on_focus = undefined
 
@@ -114,6 +117,7 @@ class z.ViewModel.MessageListViewModel
     conversation_et?.release()
     @messages_subscription?.dispose()
     @capture_scrolling_event = false
+    @conversation_last_read_timestamp = false
 
   ###
   Change conversation.
@@ -128,6 +132,7 @@ class z.ViewModel.MessageListViewModel
 
     # update new conversation
     @conversation conversation_et
+    @conversation_last_read_timestamp = @conversation().last_read_timestamp()
 
     if not conversation_et.is_loaded()
       @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
@@ -446,7 +451,7 @@ class z.ViewModel.MessageListViewModel
     last = moment.unix last_message?.timestamp / 1000
     current = moment.unix message_et.timestamp / 1000
 
-    if last_message.timestamp is @conversation().last_read_timestamp()
+    if last_message.timestamp is @conversation_last_read_timestamp
       return 'message-timestamp-visible message-timestamp-unread'
 
     if not last.isSame current, 'day'
