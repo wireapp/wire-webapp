@@ -479,7 +479,7 @@ class z.ViewModel.MessageListViewModel
     if message_et.has_asset()
       entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
 
-    if message_et.is_reactable() and not @conversation().removed_from_conversation()
+    if message_et.is_reactable() and not @conversation().removed_from_conversation() and message_et.status() isnt z.message.StatusType.SENDING
       if message_et.is_liked()
         entries.push {label: z.string.conversation_context_menu_unlike, action: 'react'}
       else
@@ -491,7 +491,7 @@ class z.ViewModel.MessageListViewModel
     if message_et.is_deletable()
       entries.push {label: z.string.conversation_context_menu_delete, action: 'delete'}
 
-    if message_et.user().is_me and not @conversation().removed_from_conversation()
+    if message_et.user().is_me and not @conversation().removed_from_conversation() and message_et.status() isnt z.message.StatusType.SENDING
       entries.push {label: z.string.conversation_context_menu_delete_everyone, action: 'delete-everyone'}
 
     return entries

@@ -114,7 +114,7 @@
       <!-- /ko -->
     <!-- /ko -->
 
-    <!-- ko ifnot: message.other_likes().length -->
+    <!-- ko if: !message.other_likes().length && message.status() !== z.message.StatusType.SENDING -->
       <div class="message-body-like">
         <span class="message-body-like-icon like-button message-show-on-hover" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: $parent.click_on_like">
           <span class="icon-liked"></span>
