@@ -457,7 +457,7 @@ class z.ViewModel.MessageListViewModel
     if not last.isSame current, 'day'
       return 'message-timestamp-visible message-timestamp-day'
 
-    if not last_message or moment(current).diff(last, 'minutes') > 60 and message_et.is_content()
+    if not last_message or moment(current).diff(last, 'minutes') > 60
       return 'message-timestamp-visible'
 
   ###
@@ -475,7 +475,7 @@ class z.ViewModel.MessageListViewModel
     if message_et.is_content() and message_et.replacing_message_id
       return false
 
-    if last_message.is_content() and last_message.user().id is message_et.user().id and message_et.is_content()
+    if last_message.is_content() and last_message.user().id is message_et.user().id
       return true
 
     return false
