@@ -460,9 +460,7 @@ class z.main.App
 
   # Initialize debugging features.
   init_debugging: =>
-    return if not z.ViewModel.DebugViewModel
     @_attach_live_reload() if z.util.Environment.frontend.is_localhost()
-    @_initialize_sidebar() if not z.util.Environment.frontend.is_production()
 
   # Attach live reload on localhost.
   _attach_live_reload: ->
@@ -471,11 +469,6 @@ class z.main.App
     live_reload.src = 'http://localhost:32123/livereload.js'
     document.body.appendChild live_reload
     $('html').addClass 'development'
-
-  # Initialize the view model for the debug sidebar.
-  _initialize_sidebar: ->
-    @view.debug_view = new z.ViewModel.DebugViewModel 'debug', @repository.conversation, @repository.user
-
 
 ###############################################################################
 # Setting up the App
