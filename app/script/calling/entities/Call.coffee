@@ -150,6 +150,8 @@ class z.calling.entities.Call
   ###############################################################################
 
   _on_state_connecting: =>
+    attributes = direction: if @previous_state is z.calling.enum.CallState.OUTGOING then z.calling.enum.CallState.OUTGOING else z.calling.enum.CallState.INCOMING
+    @telemetry.track_event z.tracking.EventName.CALLING.JOINED_CALL, @, attributes
     @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
     @is_declined false
 
