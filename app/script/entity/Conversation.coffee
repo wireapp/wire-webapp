@@ -462,6 +462,15 @@ class z.entity.Conversation
     return @messages()[@messages().length - 1]
 
   ###
+  Get the previous message for give message.
+  @return [z.entity.Message, undefined]
+  ###
+  get_previous_message: (message_et) ->
+    messages_visible = @messages_visible()
+    message_index = messages_visible.indexOf message_et
+    return messages_visible[message_index - 1] if message_index > 0
+
+  ###
   Get the last text message that was added by self user.
   @return [z.entity.Message]
   ###

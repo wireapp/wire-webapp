@@ -30,7 +30,7 @@
 </script>
 
 <script type="text/html" id="location">
-  <div class="message-header message-header-user-is-hideable">
+  <div class="message-header" data-bind="css: {'message-hide-user-avatar': $parent.should_hide_user_avatar($data)}">
     <div class="message-header-icon">
       <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
     </div>
@@ -57,7 +57,7 @@
 </script>
 
 <script type="text/html" id="normal">
-  <div class="message-header message-header-user-is-hideable">
+  <div class="message-header" data-bind="css: {'message-hide-user-avatar': $parent.should_hide_user_avatar($data)}">
     <div class="message-header-icon">
       <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
     </div>
@@ -219,7 +219,7 @@
     <div class="message-header-label" data-bind="css: message.accent_color">
       <span class="label-semibold-xs" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption"></span>
-      <span class="message-icon-ping icon-ping" data-bind="css: message.animation"></span>
+      <span class="message-icon-ping icon-ping" data-bind="css: message.animation()"></span>
     </div>
   </div>
   <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
@@ -274,7 +274,7 @@
 </script>
 
 <script type="text/html" id="timestamp">
-  <div class="message-header message-timestamp message-timestamp-hidden">
+  <div class="message-header message-timestamp" data-bind="css: $parent.get_timestamp_class($data)">
     <div class="message-header-icon">
       <span class="message-unread-dot dot-md bg-theme"></span>
     </div>
