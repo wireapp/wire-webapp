@@ -165,7 +165,7 @@ class z.ViewModel.MessageListViewModel
       # return immediately if nothing to render
       @_initial_rendering conversation_et, callback
     else
-      setTimeout =>
+      window.setTimeout =>
         @_initial_rendering conversation_et, callback
       , 200
 
@@ -450,6 +450,9 @@ class z.ViewModel.MessageListViewModel
   get_timestamp_class: (message_et) ->
     last_message = @conversation().get_previous_message message_et
     return if not last_message?
+
+    if message_et.is_call()
+      return ''
 
     if last_message.timestamp is @conversation_last_read_timestamp
       return 'message-timestamp-visible message-timestamp-unread'
