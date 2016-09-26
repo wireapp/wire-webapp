@@ -205,32 +205,8 @@ class z.ViewModel.AuthViewModel
     $(".#{element_id}").show()
 
   _init_base: ->
-    modes_to_block = [
-      z.auth.AuthView.MODE.HISTORY
-      z.auth.AuthView.MODE.LIMIT
-      z.auth.AuthView.MODE.POSTED
-      z.auth.AuthView.MODE.POSTED_PENDING
-      z.auth.AuthView.MODE.POSTED_RETRY
-      z.auth.AuthView.MODE.POSTED_VERIFY
-      z.auth.AuthView.MODE.VERIFY_ACCOUNT
-      z.auth.AuthView.MODE.VERIFY_CODE
-      z.auth.AuthView.MODE.VERIFY_PASSWORD
-    ]
-
-    if z.util.get_url_parameter z.auth.URLParameter.CONNECT
-      @get_wire true
-      @registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.GENERIC_INVITE
-    else if invite = z.util.get_url_parameter z.auth.URLParameter.INVITE
-      @get_wire true
-      @register_from_invite invite
-    else if z.util.get_url_parameter z.auth.URLParameter.EXPIRED
-      @session_expired true
-    else if @_has_no_hash() and z.storage.get_value z.storage.StorageKey.AUTH.SHOW_LOGIN
-      @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
-    else if @_get_hash() in modes_to_block
-      @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
-    else
-      @_on_hash_change()
+    @_init_url_parameter()
+    @_init_url_hash()
 
     $(window)
       .on 'dragover drop', -> false
@@ -244,6 +220,36 @@ class z.ViewModel.AuthViewModel
     @changed_country_code()
 
     @audio_repository.init()
+
+  _init_url_hash: ->
+    modes_to_block = [
+      z.auth.AuthView.MODE.HISTORY
+      z.auth.AuthView.MODE.LIMIT
+      z.auth.AuthView.MODE.POSTED
+      z.auth.AuthView.MODE.POSTED_PENDING
+      z.auth.AuthView.MODE.POSTED_RETRY
+      z.auth.AuthView.MODE.POSTED_VERIFY
+      z.auth.AuthView.MODE.VERIFY_ACCOUNT
+      z.auth.AuthView.MODE.VERIFY_CODE
+      z.auth.AuthView.MODE.VERIFY_PASSWORD
+    ]
+
+    if @_has_no_hash() and z.storage.get_value z.storage.StorageKey.AUTH.SHOW_LOGIN
+      @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
+    else if @_get_hash() in modes_to_block
+      @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
+    else
+      @_on_hash_change()
+
+  _init_url_parameter: ->
+    if z.util.get_url_parameter z.auth.URLParameter.CONNECT
+      @get_wire true
+      @registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.GENERIC_INVITE
+    else if invite = z.util.get_url_parameter z.auth.URLParameter.INVITE
+      @get_wire true
+      @register_from_invite invite
+    else if z.util.get_url_parameter z.auth.URLParameter.EXPIRED
+      @session_expired true
 
 
   ###############################################################################
