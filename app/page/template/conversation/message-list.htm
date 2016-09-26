@@ -5,7 +5,7 @@
                      foreach: {data: conversation().messages_visible, as: 'message'}">
       <div class="message"
            data-bind="css: $parent.get_css_class(message),
-                      attr: {'data-uie-uid': message.id, 'data-uie-value': message.super_type}"
+                      attr: {'data-uie-uid': message.id, 'data-uie-value': message.super_type}, 'data-uie-sending-status': message.status()"
            data-uie-name="item-message">
         <div data-bind="template: {name: 'timestamp'}"></div>
         <div data-bind="template: {name: message.super_type}"></div>
