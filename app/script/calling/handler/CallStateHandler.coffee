@@ -132,22 +132,26 @@ class z.calling.handler.CallStateHandler
 
       if joined_count >= 1
         @_update_call event, participant_ids
-        @_update_self call_et, self_user_joined, client_joined_change
-        # ...which has ended
+        .then =>
+          @_update_self call_et, self_user_joined, client_joined_change
       else
+        # ...which has ended
         @delete_call call_et.id
     .catch (error) =>
       if error.type is z.calling.CallError::TYPE.CALL_NOT_FOUND
         # Call with us joined
         if self_user_joined
           # ...from this device
-          if client_joined_change and participants_count is 0
-            @_create_outgoing_call event
+          if client_joined_change
+            if participants_count > 0
+              # ...with other participants
+              @_create_connecting_call event, participant_ids
+            else
+              @_create_outgoing_call event
           # ...from another device
           else
             @_create_ongoing_call event, participant_ids
-          # ...with other participants
-          # New call we are not joined
+        # New call we are not joined
         else if participants_count > 0
           @_create_incoming_call event, participant_ids
       else
@@ -533,9 +537,7 @@ class z.calling.handler.CallStateHandler
   @param joined_participant_ids [Array<String>] User IDs of joined participants
   ###
   _update_call: (event, joined_participant_ids) ->
-    conversation_id = event.conversation
-
-    @call_center.get_call_by_id conversation_id
+    @call_center.get_call_by_id event.conversation
     .then (call_et) =>
       @call_center.user_repository.get_users_by_id joined_participant_ids, (participant_ets) ->
         # This happens if we leave an ongoing call or if we accept a call on another device that we have ignored.
@@ -543,7 +545,7 @@ class z.calling.handler.CallStateHandler
         call_et.update_participants (new z.calling.entities.Participant user_et for user_et in participant_ets), limit
         call_et.update_remote_state event.participants
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "No call found in conversation '#{conversation_id}' to update", error
+      @logger.log @logger.levels.WARN, "No call found in conversation '#{event.conversation}' to update", error
 
   ###
   Update the self states of the call.
@@ -560,8 +562,8 @@ class z.calling.handler.CallStateHandler
 
     if call_et.self_user_joined() and not call_et.self_client_joined()
       call_et.state z.calling.enum.CallState.ONGOING
-    else if call_et.state() in z.calling.enum.CallState.OUTGOING
-      call_et.state z.calling.enum.CallState.CONNECTING if call_et.get_number_of_participants() > 0
+    else if call_et.state() is z.calling.enum.CallState.OUTGOING
+      call_et.state z.calling.enum.CallState.CONNECTING if call_et.get_number_of_participants()
     else if call_et.state() in z.calling.enum.CallStateGroups.CAN_CONNECT
       if call_et.self_client_joined() and client_joined_change
         call_et.state z.calling.enum.CallState.CONNECTING
@@ -598,6 +600,26 @@ class z.calling.handler.CallStateHandler
       conversation_et.call call_et
       @calls.push call_et
       return call_et
+
+  ###
+  Constructs an connecting call entity.
+
+  @private
+  @param event [Object] 'call.state' event containing info to create call
+  @param remote_participant_ids [Array<String>, undefined] User IDs of remote participants joined in call
+  @return [z.calling.Call] Call entity
+  ###
+  _create_connecting_call: (event, remote_participant_ids = []) ->
+    @_create_call event
+    .then (call_et) =>
+      call_et.state z.calling.enum.CallState.CONNECTING
+      @call_center.user_repository.get_users_by_id remote_participant_ids, (remote_user_ets) =>
+        participant_ets = (new z.calling.entities.Participant user_et for user_et in remote_user_ets)
+        call_et.update_participants participant_ets
+        call_et.update_remote_state event.participants
+        call_et.self_client_joined true
+        call_et.self_user_joined true
+        @logger.log @logger.levels.DEBUG, "Connecting '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}' from this client", call_et
 
   ###
   Constructs an incoming call entity.
@@ -643,9 +665,7 @@ class z.calling.handler.CallStateHandler
         participant_ets = (new z.calling.entities.Participant user_et for user_et in remote_user_ets)
         call_et.update_participants participant_ets
         call_et.update_remote_state event.participants
-        conversation_name = call_et.conversation_et.display_name()
-        @logger.log @logger.levels.DEBUG,
-          "Ongoing '#{call_et.remote_media_type()}' call to '#{conversation_name}' from another client", call_et
+        @logger.log @logger.levels.DEBUG, "Ongoing '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}' from another client", call_et
 
   ###
   Constructs an outgoing call entity.

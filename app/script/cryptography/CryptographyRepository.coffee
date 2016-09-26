@@ -310,17 +310,13 @@ class z.cryptography.CryptographyRepository
     .then (pre_key) =>
       return @_session_from_prekey user_id, client_id, pre_key.key
     .catch (error) =>
-      if error instanceof z.user.UserError
-        if error.type is z.user.UserError::TYPE.PRE_KEY_NOT_FOUND
-          @logger.log @logger.levels.WARN,
-            "Client '#{client_id}' does no longer exist on the backend, should ignored and removed locally"
+      switch error.type
+        when z.user.UserError::TYPE.PRE_KEY_NOT_FOUND
           amplify.publish z.event.WebApp.CLIENT.DELETE, user_id, client_id
-        else if error.type is z.user.UserError::TYPE.REQUEST_FAILURE
-          @logger.log @logger.levels.WARN,
-            "Failed to request pre-key for client '#{client_id}' of user '#{user_id}'': #{error.message}", error
-      else
-        @logger.log @logger.levels.ERROR,
-          "Failed to initialize session from pre-key for client '#{client_id}' of user '#{user_id}': #{error.message}", error
+        when z.user.UserError::TYPE.REQUEST_FAILURE
+          @logger.log @logger.levels.WARN, "Failed to request pre-key for client '#{client_id}' of user '#{user_id}'': #{error.message}", error
+        else
+          @logger.log @logger.levels.ERROR, "Failed to initialize session from pre-key for client '#{client_id}' of user '#{user_id}': #{error.message}", error
       return undefined
 
   ###
@@ -337,16 +333,18 @@ class z.cryptography.CryptographyRepository
       @logger.log @logger.levels.INFO, "Fetched pre-keys for '#{Object.keys(user_pre_key_map).length}' users", user_pre_key_map
       for user_id, client_pre_keys of user_pre_key_map
         cryptobox_session_map[user_id] ?= {}
-        for client_id, pre_key of client_pre_keys when pre_key
-          try
-            cryptobox_session_map[user_id][client_id] = @_session_from_prekey user_id, client_id, pre_key.key
-          catch error
-            @logger.log @logger.levels.ERROR, "Problem initiating a session for client ID '#{client_id}' from user ID '#{user_id}': #{error.message} — Skipping session.", error
+        for client_id, pre_key of client_pre_keys
+          if pre_key
+            try
+              cryptobox_session_map[user_id][client_id] = @_session_from_prekey user_id, client_id, pre_key.key
+            catch error
+              @logger.log @logger.levels.ERROR, "Problem initiating a session for client ID '#{client_id}' from user ID '#{user_id}': #{error.message} — Skipping session.", error
+          else
+            amplify.publish z.event.WebApp.CLIENT.DELETE, user_id, client_id
       return cryptobox_session_map
     .catch (error) =>
       if error.type is z.user.UserError::TYPE.REQUEST_FAILURE
-        @logger.log @logger.levels.WARN,
-          "Failed to request pre-keys for user '#{user_id}'': #{error.message}", error
+        @logger.log @logger.levels.WARN, "Failed to request pre-keys for user '#{user_id}'': #{error.message}", error
       throw error
 
   ###

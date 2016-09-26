@@ -178,8 +178,7 @@ class z.client.ClientService
       .then (primary_key) =>
         @logger.log @logger.levels.INFO,
           "Client '#{client_payload.id}' stored with primary key '#{primary_key}'", client_payload
-        return @load_client_from_db primary_key
-      .then (record) -> resolve record
+        resolve client_payload
       .catch (error) -> reject error
 
   ###

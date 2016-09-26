@@ -81,14 +81,15 @@ class z.telemetry.calling.CallTelemetry
   @param call_et [z.calling.Call] Call entity
   @param attributes [Object] Attributes for the event
   ###
-  track_event: (event_name, call_et, attributes) ->
+  track_event: (event_name, call_et, attributes = {}) ->
     if call_et
-      attributes =
+      attributes = $.extend
         conversation_participants: call_et.conversation_et.number_of_participants()
         conversation_participants_in_call: call_et.max_number_of_participants
         conversation_type: if call_et.is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
+      , attributes
 
-      if  call_et.is_remote_screen_shared() or call_et.is_remote_videod()
+      if call_et.is_remote_screen_shared() or call_et.is_remote_videod()
         event_name = event_name.replace '_call', '_video_call'
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name, attributes
