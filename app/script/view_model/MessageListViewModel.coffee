@@ -37,7 +37,7 @@ class z.ViewModel.MessageListViewModel
     @conversation_is_changing = false
 
     # store last read to show until user switches conversation
-    @conversation_last_read_timestamp = undefined
+    @conversation_last_read_timestamp = ko.observable undefined
 
     # store conversation to mark as read when browser gets focus
     @mark_as_read_on_focus = undefined
@@ -117,7 +117,7 @@ class z.ViewModel.MessageListViewModel
     conversation_et?.release()
     @messages_subscription?.dispose()
     @capture_scrolling_event = false
-    @conversation_last_read_timestamp = false
+    @conversation_last_read_timestamp false
 
   ###
   Change conversation.
@@ -135,7 +135,7 @@ class z.ViewModel.MessageListViewModel
 
     # keep last read timestamp to render unread when entering conversation
     if @conversation().number_of_unread_messages() > 0
-      @conversation_last_read_timestamp = @conversation().last_read_timestamp()
+      @conversation_last_read_timestamp @conversation().last_read_timestamp()
 
     if not conversation_et.is_loaded()
       @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
@@ -454,7 +454,7 @@ class z.ViewModel.MessageListViewModel
     if message_et.is_call()
       return ''
 
-    if last_message.timestamp is @conversation_last_read_timestamp
+    if last_message.timestamp is @conversation_last_read_timestamp()
       return 'message-timestamp-visible message-timestamp-unread'
 
     last = moment last_message.timestamp
