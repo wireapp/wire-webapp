@@ -613,12 +613,12 @@ class z.calling.handler.CallStateHandler
     @_create_call event
     .then (call_et) =>
       call_et.state z.calling.enum.CallState.CONNECTING
-      call_et.self_client_joined true
-      call_et.self_user_joined true
       @call_center.user_repository.get_users_by_id remote_participant_ids, (remote_user_ets) =>
         participant_ets = (new z.calling.entities.Participant user_et for user_et in remote_user_ets)
         call_et.update_participants participant_ets
         call_et.update_remote_state event.participants
+        call_et.self_client_joined true
+        call_et.self_user_joined true
         @logger.log @logger.levels.DEBUG, "Connecting '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}' from this client", call_et
 
   ###
