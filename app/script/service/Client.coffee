@@ -51,9 +51,9 @@ class z.service.Client
     @web_socket_url = settings.web_socket_url
 
     @request_queue = []
-    @is_requesting_access_token = ko.observable false
-    @is_requesting_access_token.subscribe (is_requesting) =>
-      @execute_request_queue() if @access_token isnt '' and @request_queue.length > 0 and not is_requesting
+    @request_queue_blocked = ko.observable false
+    @request_queue_blocked.subscribe (is_blocked) =>
+      @execute_request_queue() if @access_token isnt '' and @request_queue.length > 0 and not is_blocked
 
     @access_token = ''
     @access_token_type = ''
@@ -132,8 +132,8 @@ class z.service.Client
   ###
   send_request: (config) ->
     return new Promise (resolve, reject) =>
-      if @is_requesting_access_token()
-        @logger.log @logger.levels.INFO, 'Request queued while access token is refreshed', config
+      if @request_queue_blocked()
+        @logger.log @logger.levels.INFO, 'Request queued for later execution', config
         @request_queue.push [config, resolve, reject]
       else
         headers = config.headers or {}
@@ -153,15 +153,19 @@ class z.service.Client
           type: config.type
           url: config.url
         .done (data, textStatus, jqXHR) =>
-          @logger.log @logger.levels.OFF, "Server Response ##{jqXHR.wire.request_id} from '#{config.url}':", data
+          @logger.log @logger.levels.OFF, "Server Response '#{jqXHR.wire.request_id}' from '#{config.url}':", data
           config.callback? data
           resolve data
         .fail (jqXHR, textStatus, errorThrown) =>
           switch jqXHR.status
             when z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
               @logger.log @logger.levels.WARN, 'Request failed due to connectivity problem.', config
+              @request_queue_blocked true
               @request_queue.push [config, resolve, reject]
-              @execute_on_connectivity().then => @execute_request_queue()
+              @execute_on_connectivity()
+              .then =>
+                @request_queue_blocked false
+                @execute_request_queue()
               return
             when z.service.BackendClientError::STATUS_CODE.UNAUTHORIZED
               @request_queue.push [config, resolve, reject]
@@ -183,14 +187,7 @@ class z.service.Client
           if _.isFunction config.callback
             config.callback null, jqXHR.responseJSON or new z.service.BackendClientError errorThrown
           else
-            if navigator.onLine
-              reject jqXHR.responseJSON or new z.service.BackendClientError jqXHR.status
-            else
-              error_data =
-                code: z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
-                label: z.service.BackendClientError::LABEL.CONNECTIVITY_PROBLEM
-                message: 'Problem with the network connectivity'
-              reject new z.service.BackendClientError error_data
+            reject jqXHR.responseJSON or new z.service.BackendClientError jqXHR.status
 
   ###
   Send AJAX request with compressed JSON body.
