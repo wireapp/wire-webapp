@@ -48,10 +48,12 @@ class z.user.UserRepository
       return user_ets
     .extend rateLimit: 50
 
-    amplify.subscribe z.event.WebApp.PROPERTIES.CHANGE.DEBUG, @save_property_enable_debugging
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @properties_updated
     amplify.subscribe z.event.Backend.USER.CONNECTION, @user_connection
     amplify.subscribe z.event.Backend.USER.UPDATE, @user_update
+    amplify.subscribe z.event.WebApp.CLIENT.ADD, @add_client_to_user
+    amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @remove_client_from_user
+    amplify.subscribe z.event.WebApp.PROPERTIES.CHANGE.DEBUG, @save_property_enable_debugging
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @properties_updated
 
 
   ###############################################################################
@@ -69,15 +71,6 @@ class z.user.UserRepository
     @_update_connection_status user_et, z.user.ConnectionStatus.ACCEPTED, show_conversation
     .then ->
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.CONNECT_REQUEST_ACCEPTED
-
-  add_client_to_user: (user_id, client_et) =>
-    return Promise.resolve()
-    .then =>
-      user_et = @find_user user_id
-      @client_repository._save_client user_id, client_et.to_json()
-      .then ->
-        user_et.add_client client_et
-        return user_et
 
   ###
   Block a user.
@@ -97,7 +90,6 @@ class z.user.UserRepository
     @_update_connection_status user_et, z.user.ConnectionStatus.CANCELLED
     .then ->
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, next_conversation_et if next_conversation_et
-
 
   ###
   Create a connection request.
@@ -312,6 +304,39 @@ class z.user.UserRepository
 
 
   ###############################################################################
+  # Clients
+  ###############################################################################
+
+  ###
+  Adds a new client to the database and the user.
+
+  @param user_id [String] ID of user
+  @param client_id [String] ID of client to be deleted
+  @return [Promise] Promise that resolves when a client and its session have been deleted
+  ###
+  add_client_to_user: (user_id, client_et) =>
+    @client_repository.save_client_in_db user_id, client_et.to_json()
+    .then =>
+      @find_user user_id
+    .then (user_et) ->
+      user_et.add_client client_et
+
+  ###
+  Removes a stored client and the session connected with it.
+
+  @param user_id [String] ID of user
+  @param client_id [String] ID of client to be deleted
+  @return [Promise] Promise that resolves when a client and its session have been deleted
+  ###
+  remove_client_from_user: (user_id, client_id) =>
+    @client_repository.remove_client user_id, client_id
+    .then =>
+      @find_user user_id
+    .then (user_et) ->
+      user_et.remove_client client_id
+
+
+  ###############################################################################
   # Users
   ###############################################################################
 
@@ -516,6 +541,7 @@ class z.user.UserRepository
         user_et.name z.localization.Localizer.get_text z.string.nonexistent_user
         user_ets.push user_et
     return user_ets
+
 
   ###############################################################################
   # Profile

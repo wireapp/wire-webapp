@@ -26,12 +26,12 @@ class z.client.ClientRepository
     @logger = new z.util.Logger 'z.client.ClientRepository', z.config.LOGGER.OPTIONS
 
     @client_mapper = new z.client.ClientMapper()
-    @clients = ko.observableArray()
+    @clients = ko.pureComputed =>
+      if @self_user() then @self_user().devices() else []
     @current_client = ko.observable undefined
 
     amplify.subscribe z.event.Backend.USER.CLIENT_ADD, @on_client_add
     amplify.subscribe z.event.Backend.USER.CLIENT_REMOVE, @on_client_remove
-    amplify.subscribe z.event.WebApp.CLIENT.DELETE, @delete_client_and_session
 
     return @
 
@@ -39,9 +39,13 @@ class z.client.ClientRepository
     @self_user self_user
     @logger.log @logger.levels.INFO, "Initialized repository with user ID '#{@self_user().id}'"
 
+
   ###############################################################################
   # Service interactions
   ###############################################################################
+
+  delete_client_from_db: (user_id, client_id) ->
+    return @client_service.delete_client_from_db @_construct_primary_key user_id, client_id
 
   ###
   Delete the temporary client on the backend.
@@ -106,6 +110,18 @@ class z.client.ClientRepository
         return @current_client()
 
   ###
+  Save the a client into the database.
+
+  @private
+  @param user_id [String] ID of user client to be stored belongs to
+  @param client_payload [Object] Client data to be stored in database
+  @return [Promise] Promise that resolves with the record stored in database
+  ###
+  save_client_in_db: (user_id, client_payload) =>
+    primary_key = @_construct_primary_key user_id, client_payload.id
+    return @client_service.save_client_in_db primary_key, client_payload
+
+  ###
   Updates properties for a client record in database.
 
   @todo Merge "meta" property before updating it, Object.assign(payload.meta, changes.meta)
@@ -134,25 +150,13 @@ class z.client.ClientRepository
     return "#{user_id}@#{client_id}"
 
   ###
-  Save the a client into the database.
-
-  @private
-  @param user_id [String] ID of user client to be stored belongs to
-  @param client_payload [Object] Client data to be stored in database
-  @return [Promise] Promise that resolves with the record stored in database
-  ###
-  _save_client: (user_id, client_payload) =>
-    primary_key = @_construct_primary_key user_id, client_payload.id
-    return @client_service.save_client_in_db primary_key, client_payload
-
-  ###
   Save the local client into the database.
 
   @private
   @param client_payload [Object] Client data to be stored in database
   @return [Promise] Promise that resolves with the record stored in database
   ###
-  _save_current_client: (client_payload) =>
+  _save_current_client_in_db: (client_payload) =>
     client_payload.meta =
       is_verified: true
     return @client_service.save_client_in_db @PRIMARY_KEY_CURRENT_CLIENT, client_payload
@@ -219,7 +223,6 @@ class z.client.ClientRepository
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/registerClient
 
   @note Password is needed for the registration of a client once 1st client has been registered.
-
   @param password [String] User password for verification
   @return [Promise<z.client.Client>] Promise that will resolve with the newly registered client
   ###
@@ -241,7 +244,7 @@ class z.client.ClientRepository
           "Registered '#{response.type}' client '#{response.id}' with cookie label '#{response.cookie}'", response
         @current_client @client_mapper.map_client response
         # Save client
-        return @_save_current_client response
+        return @_save_current_client_in_db response
       .catch (error) =>
         if error.type in [z.client.ClientError::TYPE.REQUEST_FAILURE, z.client.ClientError::TYPE.TOO_MANY_CLIENTS]
           throw error
@@ -349,42 +352,36 @@ class z.client.ClientRepository
   @return [Promise] Promise that resolves with the remaining user devices
   ###
   delete_client: (client_id, password) =>
-    return new Promise (resolve, reject) =>
-      if not password
-        @logger.log @logger.levels.ERROR, "Could not delete client '#{client_id}' because password is missing"
-        reject new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FORBIDDEN
+    if not password
+      @logger.log @logger.levels.ERROR, "Could not delete client '#{client_id}' because password is missing"
+      Promise.reject new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FORBIDDEN
 
-      @client_service.delete_client client_id, password
-      .then =>
-        @_remove_client client_id
-        resolve @clients()
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Unable to delete client '#{client_id}': #{error.message}",
-          {error: error, password: password}
+    @client_service.delete_client client_id, password
+    .then =>
+      @delete_client_from_db @self_user().id, client_id
+    .then =>
+      @self_user().remove_client client_id
+      return @clients()
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Unable to delete client '#{client_id}': #{error.message}", error
 
-        if error.code is z.service.BackendClientError::STATUS_CODE.FORBIDDEN
-          error = new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FORBIDDEN
-        else
-          error = new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FAILURE
-        reject error
+      if error.code is z.service.BackendClientError::STATUS_CODE.FORBIDDEN
+        error = new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FORBIDDEN
+      else
+        error = new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FAILURE
+      throw error
 
   ###
-  Delete a stored client and the session connected with it.
+  Removes a stored client and the session connected with it.
 
   @param user_id [String] ID of user
   @param client_id [String] ID of client to be deleted
   @return [Promise] Promise that resolves when a client and its session have been deleted
   ###
-  delete_client_and_session: (user_id, client_id) =>
-    @cryptography_repository.reset_session user_id, client_id
+  remove_client: (user_id, client_id) =>
+    @cryptography_repository.delete_session user_id, client_id
     .then =>
       @delete_client_from_db user_id, client_id
-    .then =>
-      @logger.log @logger.levels.WARN, "Client '#{client_id}' of user '#{user_id}' is obsolete and was removed locally"
-
-  delete_client_from_db: (user_id, client_id) ->
-    primary_key = @_construct_primary_key user_id, client_id
-    return @client_service.delete_client_from_db primary_key
 
   ###
   Retrieves meta information about all the clients of a given user.
@@ -409,16 +406,8 @@ class z.client.ClientRepository
     .then (response) =>
       return @_get_clients_by_user_id response, @self_user().id, expect_current_client
     .then (client_ets) =>
-      for possibly_new_client in client_ets
-        found = false
-
-        @clients().forEach (client_et) ->
-          found = true if possibly_new_client.id is client_et.id
-
-        @clients.push possibly_new_client if not found
-        @clients.sort (client_a, client_b) ->
-          return new Date(client_b.time) - new Date(client_a.time)
-      return @clients()
+      @self_user().add_client client_et for client_et in client_ets
+      return @self_user().devices()
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Unable to retrieve clients data: #{error}"
       throw error
@@ -434,23 +423,6 @@ class z.client.ClientRepository
     else
       is_permanent = @current_client().is_permanent()
     return is_permanent
-
-  ###
-  Removes a client locally.
-  @param client_id [String] ID of the client that should be removed
-  @return [Promise] Promise that resolves with the primary key of the removed client
-  ###
-  remove_client: (client_id) ->
-    return new Promise (resolve, reject) =>
-      user_id = @self_user().id
-      primary_key = @_construct_primary_key user_id, client_id
-      primary_key = @PRIMARY_KEY_CURRENT_CLIENT if @_is_current_client user_id, client_id
-      @client_service.delete_client_from_db primary_key
-      .then (primary_key) =>
-        @clients.remove (client_et) ->
-          client_et.id is client_id
-        resolve primary_key
-      .catch (error) -> reject error
 
   ###
   Match backend client response with locally stored ones.
@@ -485,7 +457,7 @@ class z.client.ClientRepository
           client_payload.meta =
             is_verified: false
             primary_key: @_construct_primary_key user_id, client_payload.id
-          return @_save_client user_id, client_payload
+          return @save_client_in_db user_id, client_payload
 
         # Known clients will be returned as object, unknown clients will resolve with their expected primary key
         for result in results
@@ -504,7 +476,7 @@ class z.client.ClientRepository
             [client_payload, contains_update] = @client_mapper.update_client result, clients_from_backend[result.id]
             if contains_update
               @logger.log @logger.levels.INFO, "Client '#{result.id}' will be overwritten with update in database", client_payload
-              promises.push @_save_client user_id, client_payload
+              promises.push @save_client_in_db user_id, client_payload
             else
               clients_stored_in_db.push client_payload
 
@@ -534,16 +506,6 @@ class z.client.ClientRepository
     throw new z.client.ClientError z.client.ClientError::TYPE.NO_CLIENT_ID if not client_id
     return user_id is @self_user().id and client_id is @current_client().id
 
-  ###
-  Remove a client from the local clients.
-  @private
-  @param client_id [String] ID of client to be removed
-  ###
-  _remove_client: (client_id) =>
-    for client in @clients() when client.id is client_id
-      @clients.remove client
-      break
-
 
   ###############################################################################
   # Conversation Events
@@ -551,28 +513,22 @@ class z.client.ClientRepository
 
   ###
   A client was added by the self user.
-  @todo map, save and add to user
   @param event_json [Object] JSON data of 'user.client-add' event
   ###
   on_client_add: (event_json) =>
     @logger.log @logger.levels.INFO, 'Client of self user added', event_json
-    amplify.publish z.event.WebApp.SELF.CLIENT_ADD, event_json.client
+    client_et = @client_mapper.map_client event_json.client
+    amplify.publish z.event.WebApp.CLIENT.ADD, @self_user().id, client_et
 
   ###
-  A client was added by the self user.
+  A client was removed by the self user.
   @param event_json [Object] JSON data of 'user.client-remove' event
   ###
   on_client_remove: (event_json) =>
     client_id = event_json?.client.id
-    @_client_removal client_id if client_id
+    return if not client_id
 
-  ###
-  Remove a client of the self user identified by id.
-  @private
-  @param client_id [String] ID of client to be removed
-  ###
-  _client_removal: (client_id) ->
-    @remove_client client_id
-    .then =>
-      @logger.log "Removed client from database: #{client_id}"
-      amplify.publish z.event.WebApp.SIGN_OUT, 'client_removed', true if client_id is @current_client().id
+    if client_id is @current_client().id
+      amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.CLIENT_REMOVED, true
+    else
+      amplify.publish z.event.WebApp.CLIENT.REMOVE, @self_user().id, client_id
