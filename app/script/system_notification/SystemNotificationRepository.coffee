@@ -167,9 +167,13 @@ class z.SystemNotification.SystemNotificationRepository
       return  z.localization.Localizer.get_text z.string.system_notification_asset_add
     else if message_et.has_asset()
       asset_et = message_et.assets()[0]
-      return z.localization.Localizer.get_text z.string.system_notification_shared_audio if asset_et.is_audio()
-      return z.localization.Localizer.get_text z.string.system_notification_shared_video if asset_et.is_video()
-      return z.localization.Localizer.get_text z.string.system_notification_shared_file if asset_et.is_file()
+      switch asset_et.type
+        when z.assets.AssetType.FILE
+          return z.localization.Localizer.get_text z.string.system_notification_shared_audio if asset_et.is_audio()
+          return z.localization.Localizer.get_text z.string.system_notification_shared_video if asset_et.is_video()
+          return z.localization.Localizer.get_text z.string.system_notification_shared_file
+        when z.assets.AssetType.LOCATION
+          return z.localization.Localizer.get_text z.string.system_notification_shared_location
 
   ###
   Creates the notification body for a renamed conversation.
