@@ -463,10 +463,10 @@ class z.SystemNotification.SystemNotificationRepository
     message_id = notification_content.options.data.message_id
     timeout_trigger_id = undefined
     notification.onclick = =>
-      notification_content.trigger()
       amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.CLICK
-      @logger.log @logger.levels.INFO, "Notification for '#{message_id} in '#{conversation_id}' closed by click."
       window.focus()
+      notification_content.trigger()
+      @logger.log @logger.levels.INFO, "Notification for '#{message_id} in '#{conversation_id}' closed by click."
       notification.close()
     notification.onclose = =>
       clearTimeout timeout_trigger_id
