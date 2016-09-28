@@ -30,7 +30,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', '3.14159265358979323846264338327950')
 SUPPORTED = {
   'chrome': 51,
   'firefox': 45,
-  'opera': 37,
+  'opera': 40,
   'msedge': 12,
 }
 
