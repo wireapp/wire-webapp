@@ -202,6 +202,10 @@ class z.ViewModel.ConversationInputViewModel
         @edit_message @conversation_et().get_last_added_text_message(), event.target if @input().length is 0
       when z.util.KEYCODE.ESC
         @cancel_edit()
+      when z.util.KEYCODE.ENTER
+        if event.altKey
+          z.util.insert_at_caret event.target, '\n'
+          $(event.target).change()
     return true
 
   edit_message: (message_et, input_element) =>

@@ -626,6 +626,7 @@ z.util.compare_names = (name_a, name_b) ->
 z.util.capitalize_first_char = (s) ->
   return "#{s.charAt(0).toUpperCase()}#{s.substring 1}"
 
+
 z.util.print_devices_id = (id) ->
   return '' if not id
   id_with_padding = z.util.zero_padding id, 16
@@ -653,3 +654,35 @@ z.util.bucket_values = (value, bucket_limits) ->
 
   last_limit = bucket_limits[bucket_limits.length - 1]
   return "#{last_limit+1}-"
+
+
+# http://stackoverflow.com/a/1064139
+z.util.insert_at_caret = (txtarea, text) ->
+  if not txtarea
+    return
+  scroll_pos = txtarea.scrollTop
+  str_pos = 0
+  br = if txtarea.selectionStart or txtarea.selectionStart is '0' then 'ff' else if document.selection then 'ie' else false
+  if br is 'ie'
+    txtarea.focus()
+    range = document.selection.createRange()
+    range.moveStart 'character', -txtarea.value.length
+    str_pos = range.text.length
+  else if br is 'ff'
+    str_pos = txtarea.selectionStart
+  front = txtarea.value.substring 0, str_pos
+  back = txtarea.value.substring str_pos, txtarea.value.length
+  txtarea.value = front + text + back
+  str_pos = str_pos + text.length
+  if br is 'ie'
+    txtarea.focus()
+    ie_range = document.selection.createRange()
+    ie_range.moveStart 'character', -txtarea.value.length
+    ie_range.moveStart 'character', str_pos
+    ie_range.moveEnd 'character', 0
+    ie_range.select()
+  else if br is 'ff'
+    txtarea.selectionStart = str_pos
+    txtarea.selectionEnd = str_pos
+    txtarea.focus()
+  txtarea.scrollTop = scroll_pos
