@@ -398,10 +398,10 @@ z.string.preferences_device_button_remove = 'Remove'
 z.string.preferences_device_button_cancel = 'Cancel'
 z.string.preferences_device_activated = 'Activated in '
 z.string.preferences_device_id = 'ID: '
-z.string.preferences_device_reset_session_description = 'If fingerprints don’t match, reset your secure session to make sure that the correct fingerprints are shown on all devices.'
+z.string.preferences_device_reset_session_description = 'If fingerprints don’t match, reset the session to generate new encryption keys on both sides.'
 z.string.preferences_device_reset_session_button = 'Reset session'
 z.string.preferences_device_fingerprint_label = 'Key fingerprint'
-z.string.preferences_device_fingerprint_message = 'Wire gives every device a unique fingerprint. Compare fingerprints to verify your devices and conversations.'
+z.string.preferences_device_fingerprint_message = 'Wire gives every device a unique fingerprint. Compare them and verify your devices and conversations.'
 
 # Profile
 z.string.profile_about = 'About'
