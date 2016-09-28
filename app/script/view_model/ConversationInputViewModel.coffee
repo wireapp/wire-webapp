@@ -206,6 +206,7 @@ class z.ViewModel.ConversationInputViewModel
         if event.altKey
           z.util.insert_at_caret event.target, '\n'
           $(event.target).change()
+          event.preventDefault()
     return true
 
   edit_message: (message_et, input_element) =>
