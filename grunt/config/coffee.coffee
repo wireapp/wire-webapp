@@ -54,13 +54,6 @@ module.exports =
     ext: '.js'
     src: ['**/*.coffee', '!**/auth_init*.coffee']
 
-  deploy_prod:
-    cwd: '<%= dir.app_ %>'
-    dest: '<%= dir.deploy %>'
-    expand: true
-    ext: '.js'
-    src: ['**/*.coffee',  '!**/auth_init*.coffee', '!**/DebugViewModel.coffee']
-
   edge:
     cwd: '<%= dir.app_ %>'
     dest: '<%= dir.deploy %>'

@@ -205,32 +205,8 @@ class z.ViewModel.AuthViewModel
     $(".#{element_id}").show()
 
   _init_base: ->
-    if z.util.get_url_parameter z.auth.URLParameter.CONNECT
-      @get_wire true
-      @registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.GENERIC_INVITE
-    else if z.util.get_url_parameter z.auth.URLParameter.EXPIRED
-      @session_expired true
-
-    modes_to_block = [
-      z.auth.AuthView.MODE.HISTORY
-      z.auth.AuthView.MODE.LIMIT
-      z.auth.AuthView.MODE.POSTED
-      z.auth.AuthView.MODE.POSTED_PENDING
-      z.auth.AuthView.MODE.POSTED_RETRY
-      z.auth.AuthView.MODE.POSTED_VERIFY
-      z.auth.AuthView.MODE.VERIFY_ACCOUNT
-      z.auth.AuthView.MODE.VERIFY_CODE
-      z.auth.AuthView.MODE.VERIFY_PASSWORD
-    ]
-
-    if invite = z.util.get_url_parameter z.auth.URLParameter.INVITE
-      @register_from_invite invite
-    else if @_has_no_hash() and z.storage.get_value z.storage.StorageKey.AUTH.SHOW_LOGIN
-      @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
-    else if @_get_hash() in modes_to_block
-      @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
-    else
-      @_on_hash_change()
+    @_init_url_parameter()
+    @_init_url_hash()
 
     $(window)
       .on 'dragover drop', -> false
@@ -245,6 +221,36 @@ class z.ViewModel.AuthViewModel
 
     @audio_repository.init()
 
+  _init_url_hash: ->
+    modes_to_block = [
+      z.auth.AuthView.MODE.HISTORY
+      z.auth.AuthView.MODE.LIMIT
+      z.auth.AuthView.MODE.POSTED
+      z.auth.AuthView.MODE.POSTED_PENDING
+      z.auth.AuthView.MODE.POSTED_RETRY
+      z.auth.AuthView.MODE.POSTED_VERIFY
+      z.auth.AuthView.MODE.VERIFY_ACCOUNT
+      z.auth.AuthView.MODE.VERIFY_CODE
+      z.auth.AuthView.MODE.VERIFY_PASSWORD
+    ]
+
+    if @_has_no_hash() and z.storage.get_value z.storage.StorageKey.AUTH.SHOW_LOGIN
+      @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
+    else if @_get_hash() in modes_to_block
+      @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
+    else
+      @_on_hash_change()
+
+  _init_url_parameter: ->
+    if z.util.get_url_parameter z.auth.URLParameter.CONNECT
+      @get_wire true
+      @registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.GENERIC_INVITE
+    else if invite = z.util.get_url_parameter z.auth.URLParameter.INVITE
+      @get_wire true
+      @register_from_invite invite
+    else if z.util.get_url_parameter z.auth.URLParameter.EXPIRED
+      @session_expired true
+
 
   ###############################################################################
   # Invitation Stuff
@@ -258,16 +264,11 @@ class z.ViewModel.AuthViewModel
       if invite_info.email
         @username invite_info.email
         @prefilled_email = invite_info.email
-      else
-        @logger.log @logger.levels.WARN, 'Invite information does not contain an email address'
-      @_set_hash z.auth.AuthView.MODE.ACCOUNT_REGISTER
-      @_on_hash_change()
-    .catch (error) =>
-      if error.label is z.service.BackendClientError::LABEL.INVALID_INVITATION_CODE
-        @logger.log @logger.levels.WARN, 'Invalid Invitation Code'
-      else
+    .catch (error) ->
+      if error.label isnt z.service.BackendClientError::LABEL.INVALID_INVITATION_CODE
         Raygun.send new Error('Invitation not found'), {invite_code: invite, error: error}
-      @_on_hash_change()
+    .then =>
+      @_set_hash z.auth.AuthView.MODE.ACCOUNT_REGISTER
 
 
   ###############################################################################
@@ -528,13 +529,13 @@ class z.ViewModel.AuthViewModel
 
   clicked_on_password: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, value: 'fromSignIn'
-    (z.util.safe_window_open z.localization.Localizer.get_text z.string.url_password_reset)?.focus()
+    z.util.safe_window_open z.localization.Localizer.get_text z.string.url_password_reset
 
   clicked_on_register: => @_set_hash z.auth.AuthView.MODE.ACCOUNT_REGISTER
 
   clicked_on_resend_code: =>
     return if not @can_resend_code()
-    @sign_in_phone()
+    @login_phone()
 
   clicked_on_resend_registration: =>
     return if not @can_resend_registration()
@@ -577,13 +578,13 @@ class z.ViewModel.AuthViewModel
 
   clicked_on_terms: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.NAVIGATION.OPENED_TERMS
-    (z.util.safe_window_open z.localization.Localizer.get_text z.string.url_terms_of_use)?.focus()
+    z.util.safe_window_open z.localization.Localizer.get_text z.string.url_terms_of_use
 
   clicked_on_verify_later: => @_authentication_successful()
 
   clicked_on_wire_link: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.NAVIGATION.OPENED_WIRE_WEBSITE
-    (z.util.safe_window_open z.localization.Localizer.get_text z.string.url_wire)?.focus()
+    z.util.safe_window_open z.localization.Localizer.get_text z.string.url_wire
 
   keydown_auth: (event) =>
     if event.keyCode is z.util.KEYCODE.ENTER
@@ -1264,8 +1265,6 @@ class z.ViewModel.AuthViewModel
   _redirect_to_app: =>
     url = '/'
     url = "/#{@auth.settings.parameter}" if @auth.settings.parameter?
-    connect_token = z.util.get_url_parameter z.auth.URLParameter.CONNECT
-    url = z.util.append_url_parameter url, "#{z.auth.URLParameter.CONNECT}=#{connect_token}" if connect_token
     window.location.replace url
 
   _register_client: =>

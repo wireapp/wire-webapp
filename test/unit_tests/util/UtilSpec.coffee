@@ -173,18 +173,6 @@ describe 'z.util.create_random_uuid', ->
     expected = true
     expect(actual).toBe expected
 
-describe 'z.util.bytes_to_uuid', ->
-  it 'creates uuid from byte array', ->
-    expected = '1692b76b-d66b-4688-a099-71512ec1f51e'
-    actual = z.util.bytes_to_uuid [22, 146, 183, 107, 214, 107, 70, 136, 160, 153, 113, 81, 46, 193, 245, 30]
-    expect(actual).toBe expected
-
-describe 'z.util.uuid_to_bytes', ->
-  it 'creates byte array from uuid', ->
-    expected = [22, 146, 183, 107, 214, 107, 70, 136, 160, 153, 113, 81, 46, 193, 245, 30]
-    actual = z.util.uuid_to_bytes '1692b76b-d66b-4688-a099-71512ec1f51e'
-    expect(actual).toEqual expected
-
 describe 'z.util.format_bytes', ->
   it 'renders 0 bytes', ->
     actual = z.util.format_bytes 0
@@ -840,46 +828,6 @@ describe 'z.util.is_same_location', ->
   it 'returns true if page was reloaded with parameters', ->
     actual = z.util.is_same_location 'https://app.wire.com/?hl=de', 'https://app.wire.com/?hl=de'
     expect(actual).toBeTruthy()
-
-describe 'Merging objects', ->
-  it 'merges two objects into a new one without modifying the sources', ->
-    object_a =
-      alphabet: ['A', 'B', 'C']
-      numbers: [1, 2, 3]
-
-    object_b =
-      alphabet: ['X', 'Y', 'Z']
-      numbers: [1, 4]
-
-    merged_object = z.util.merge_objects object_a, object_b
-
-    expect(object_a.alphabet.length).toBe 3
-    expect(object_a.numbers.length).toBe 3
-
-    expect(object_b.alphabet.length).toBe 3
-    expect(object_b.numbers.length).toBe 2
-
-    expect(merged_object.alphabet.length).toBe 6
-    expect(merged_object.numbers.length).toBe 4
-
-  it 'merges complex objects', ->
-    object_a =
-      ordering:
-        a: 'a'
-        b: 'b'
-        c: 'c'
-
-    object_b =
-      ordering:
-        c: 3
-        d: 4
-
-    merged_object = z.util.merge_objects object_a, object_b
-
-    expect(merged_object.ordering.a).toBe 'a'
-    expect(merged_object.ordering.b).toBe 'b'
-    expect(merged_object.ordering.c).toBe 3
-    expect(merged_object.ordering.d).toBe 4
 
 describe 'bucket_values', ->
   it 'returns correct value for zero', ->

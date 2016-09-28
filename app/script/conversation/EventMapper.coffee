@@ -417,7 +417,8 @@ class z.conversation.EventMapper
     asset_et.original_width = data.data.info.original_width
     asset_et.original_height = data.data.info.original_height
     asset_et.ratio = asset_et.original_height / asset_et.original_width
-    asset_et.resource z.assets.AssetRemoteData.v2 data.conversation, asset_et.id, data.data.otr_key, data.data.sha256
+    if asset_et.id
+      asset_et.resource z.assets.AssetRemoteData.v2 data.conversation, asset_et.id, data.data.otr_key, data.data.sha256
     asset_et.dummy_url = z.util.dummy_image asset_et.original_width, asset_et.original_height
     return asset_et
 

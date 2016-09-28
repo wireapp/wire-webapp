@@ -58,12 +58,9 @@
     "cryptojs" : {
       "js/": [
         "components/core.js",
-        "components/cipher-core.js",
         "components/lib-typedarrays.js",
         "components/md5.js",
         "components/enc-base64.js",
-        "components/aes.js",
-        "components/pad-nopadding.js",
         "components/sha256.js"
       ]
     },

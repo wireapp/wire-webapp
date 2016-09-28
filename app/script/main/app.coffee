@@ -316,11 +316,6 @@ class z.main.App
     conversation_et = @repository.conversation.get_most_recent_conversation()
     has_picture = !!@repository.user.self().picture_medium()
 
-    connect_token = z.util.get_url_parameter z.auth.URLParameter.CONNECT
-    if connect_token
-      @logger.log @logger.levels.INFO, 'Found connect token'
-      @repository.user.create_connection_from_invite_token connect_token
-
     if conversation_et and has_picture
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
       setTimeout =>
@@ -332,7 +327,7 @@ class z.main.App
       setTimeout ->
         amplify.publish z.event.WebApp.PENDING.SHOW
       , 1000
-    else if has_picture and not connect_token
+    else if has_picture
       amplify.publish z.event.WebApp.PROFILE.SHOW
       setTimeout ->
         amplify.publish z.event.WebApp.SEARCH.SHOW
@@ -465,9 +460,7 @@ class z.main.App
 
   # Initialize debugging features.
   init_debugging: =>
-    return if not z.ViewModel.DebugViewModel
     @_attach_live_reload() if z.util.Environment.frontend.is_localhost()
-    @_initialize_sidebar() if not z.util.Environment.frontend.is_production()
 
   # Attach live reload on localhost.
   _attach_live_reload: ->
@@ -476,11 +469,6 @@ class z.main.App
     live_reload.src = 'http://localhost:32123/livereload.js'
     document.body.appendChild live_reload
     $('html').addClass 'development'
-
-  # Initialize the view model for the debug sidebar.
-  _initialize_sidebar: ->
-    @view.debug_view = new z.ViewModel.DebugViewModel 'debug', @repository.conversation, @repository.user
-
 
 ###############################################################################
 # Setting up the App

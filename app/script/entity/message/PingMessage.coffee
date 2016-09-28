@@ -23,13 +23,12 @@ class z.entity.PingMessage extends z.entity.Message
   constructor: ->
     super()
     @super_type = z.message.SuperType.PING
-    @animated = ko.observable false
 
-    @caption = ko.computed =>
+    @caption = ko.pureComputed =>
       string = if @user().is_me then z.string.conversation_ping_you else z.string.conversation_ping
       return z.localization.Localizer.get_text string
     , @, deferEvaluation: true
 
-    @animation = ko.computed ->
-      return 'ping-animation ping-animation-soft'
+    @animation = ko.pureComputed ->
+      return 'ping-animation ping-animation-soft' if Date.now() - @timestamp < 2000
     , @, deferEvaluation: true

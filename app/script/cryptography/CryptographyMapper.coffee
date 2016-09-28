@@ -43,6 +43,7 @@ class z.cryptography.CryptographyMapper
         id: generic_message.message_id
         from: event.from
         time: event.time
+        status: event.status
       , specific_content
 
   _map_generic_message: (generic_message, event) =>
@@ -216,7 +217,7 @@ class z.cryptography.CryptographyMapper
           tag: image.tag
           width: image.width
           height: image.height
-          nonce: event_id
+          nonce: event_id or z.util.create_random_uuid() # set nonce even if asset id is missing
           original_width: image.original_width
           original_height: image.original_height
           public: false

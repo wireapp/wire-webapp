@@ -15,30 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
-# This module of the Wire Software uses software code from Nicholas Fisher
-# governed by the MIT license (https://github.com/KyleAMathews/deepmerge).
-#
-## The MIT License (MIT)
-##
-## Copyright (c) 2012 Nicholas Fisher
-##
-## Permission is hereby granted, free of charge, to any person obtaining a copy
-## of this software and associated documentation files (the "Software"), to deal
-## in the Software without restriction, including without limitation the rights
-## to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-## copies of the Software, and to permit persons to whom the Software is
-## furnished to do so, subject to the following conditions:
-##
-## The above copyright notice and this permission notice shall be included in all
-## copies or substantial portions of the Software.
-##
-## THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-## IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-## FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-## AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-## LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-## SOFTWARE.
 
 window.z ?= {}
 z.util ?= {}
@@ -91,7 +67,11 @@ z.util.load_url_buffer = (url, xhr_accessor_function) ->
     xhr = new XMLHttpRequest()
     xhr.open 'GET', url, true
     xhr.responseType = 'arraybuffer'
-    xhr.onload = -> resolve [xhr.response, xhr.getResponseHeader 'content-type']
+    xhr.onload = ->
+      if xhr.status is 200
+        resolve [xhr.response, xhr.getResponseHeader 'content-type']
+      else
+        reject new Error "Requesting arraybuffer failed with status #{xhr.status}"
     xhr.onerror = reject
     xhr.onabort = reject
     xhr_accessor_function? xhr
@@ -281,32 +261,6 @@ z.util.create_random_uuid = ->
   return UUID.genV4().hexString
 
 
-z.util.bytes_to_uuid = (bytes) ->
-  hex = []
-  i = 0
-  while i < bytes.length
-    hex.push (bytes[i] >>> 4).toString 16
-    hex.push (bytes[i] & 0xF).toString 16
-    i++
-  hex.join('').replace /(\w{8})(\w{4})(\w{4})(\w{4})(\w{12})/, '$1-$2-$3-$4-$5'
-
-
-z.util.uuid_to_bytes = (hex) ->
-  parts = hex.split '-'
-  ints = []
-  intPos = 0
-  i = 0
-
-  while i < parts.length
-    j = 0
-
-    while j < parts[i].length
-      ints[intPos++] = window.parseInt parts[i].substr(j, 2), 16
-      j += 2
-    i++
-  ints
-
-
 z.util.encode_base64 = (text) ->
   return window.btoa text
 
@@ -333,7 +287,7 @@ Opens a new browser tab (target="_blank") with a given URL in a safe environment
 @see https://mathiasbynens.github.io/rel-noopener/
 @param url [String] URL you want to open in a new browser tab
 ###
-z.util.safe_window_open = (url) ->
+z.util.safe_window_open = (url, focus = true) ->
   if not url.match /^http[s]?:\/\//i
     url = "http://#{url}"
 
@@ -343,7 +297,11 @@ z.util.safe_window_open = (url) ->
     new_window = window.open()
     new_window.opener = null
     new_window.location = url
-    return new_window
+
+  if new_window and focus
+    new_window.focus()
+
+  return new_window
 
 z.util.auto_link_emails = (text) ->
   email_pattern = /([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)/gim
@@ -362,37 +320,6 @@ z.util.cut_last_characters = (message, amount) ->
 z.util.markup_links = (message) ->
   return message.replace(/<a\s+href=/gi, '<a target="_blank" rel="nofollow noopener noreferrer" href=')
 
-# Source: https://github.com/KyleAMathews/deepmerge/blob/master/index.js
-z.util.merge_objects = (target, source) ->
-  array = Array.isArray source
-  destination = array and [] or {}
-
-  if array
-    target = target or []
-    destination = destination.concat target
-    source.forEach (property, key) ->
-      if typeof destination[key] is 'undefined'
-        destination[key] = property
-      else if typeof property is 'object'
-        destination[key] = z.util.merge_objects target[key], property
-      else
-        if target.indexOf(property) is -1
-          destination.push property
-  else
-    if target and typeof target is 'object'
-      Object.keys(target).forEach (key) ->
-        destination[key] = target[key]
-
-    Object.keys(source).forEach (key) ->
-      if typeof source[key] isnt 'object' or not source[key]
-        destination[key] = source[key]
-      else
-        if not target[key]
-          destination[key] = source[key]
-        else
-          destination[key] = z.util.merge_objects target[key], source[key]
-
-  return destination
 
 # Note: We are using "Underscore.js" to escape HTML in the original message
 z.util.render_message = (message, theme_color) ->

@@ -92,7 +92,7 @@ class z.ViewModel.SelfProfileViewModel
       .then -> amplify.publish z.event.WebApp.SIGN_OUT, 'user_requested', true
 
   show_support_page: ->
-    (z.util.safe_window_open z.string.url_support)?.focus()
+    z.util.safe_window_open z.string.url_support
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS_MENU.SHOW_SUPPORT_PAGE
 
   toggle_about: ->

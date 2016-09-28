@@ -26,75 +26,6 @@ class z.telemetry.calling.CallTelemetry
     @logger = new z.util.Logger 'z.telemetry.calling.CallTelemetry', z.config.LOGGER.OPTIONS
 
     @sessions = {}
-    @requests = {}
-    @traces = {}
-
-
-  ###############################################################################
-  # Call traces
-  ###############################################################################
-
-  ###
-  Add an event to the call trace.
-  @param event [JSON] Backend event
-  ###
-  trace_event: (event) =>
-    @traces[event.conversation] ?= []
-
-    timing_incoming = Date.now()
-
-    @traces[event.conversation].push {
-      from: 'backend'
-      to: 'us'
-      transport: 'WebSocket'
-      response:
-        payload: event
-        timestamp: timing_incoming
-        timestamp_iso_8601: new Date(timing_incoming).toISOString()
-    }
-
-  ###
-  Add a backend response to the debug trace.
-  @param conversation_id [String] Conversation ID of call
-  @param jqXHR [jQuery XMLHttpRequest] jQuery object of backend response
-  ###
-  trace_request: (conversation_id, jqXHR) ->
-    timestamp_incoming = jqXHR.wire.responded.getTime()
-    timestamp_outgoing = jqXHR.wire.requested.getTime()
-
-    request_duration = timestamp_incoming - timestamp_outgoing
-    request_type = "#{jqXHR.wire.original_request_options.type} #{jqXHR.wire.original_request_options.api_endpoint}"
-    @requests[request_type] ?= []
-    @requests[request_type].push request_duration
-    hits = @requests[request_type].length
-    average = z.util.Statistics.average @requests[request_type]
-    standard_deviation = z.util.Statistics.standard_deviation @requests[request_type], average
-    @logger.log @logger.levels.INFO, "Request #{request_type} took #{request_duration}ms"
-    @logger.log @logger.levels.INFO, "# of requests #{hits} - Avg: #{average}ms | SD: #{standard_deviation}"
-
-    trace_payload = {}
-    if jqXHR.wire.original_request_options.data
-      trace_payload = JSON.parse z.util.types.convert_array_buffer_to_string jqXHR.wire.original_request_options.data
-
-    @traces[conversation_id] ?= []
-    @traces[conversation_id].push {
-      from: 'us'
-      to: 'backend'
-      transport: 'REST'
-      request:
-        method: jqXHR.wire.original_request_options.type
-        url: jqXHR.wire.original_request_options.url
-        payload: trace_payload
-        timestamp: timestamp_outgoing
-        timestamp_iso_8601: new Date(timestamp_outgoing).toISOString()
-      response:
-        status:
-          code: jqXHR.status
-          text: jqXHR.statusText
-        payload: jqXHR.responseJSON
-        timestamp: timestamp_incoming
-        timestamp_iso_8601: new Date(timestamp_incoming).toISOString()
-    }
 
 
   ###############################################################################
@@ -127,7 +58,7 @@ class z.telemetry.calling.CallTelemetry
   ###
   Report an error to Raygun.
   @param description [String] Error description
-  @param custom_date [Object] Custom data passed into the report
+  @param passed_error [Object] Error to be attached to the report
   ###
   report_error: (description, passed_error) ->
     raygun_error = new Error description
@@ -150,19 +81,23 @@ class z.telemetry.calling.CallTelemetry
   @param call_et [z.calling.Call] Call entity
   @param attributes [Object] Attributes for the event
   ###
-  track_event: (event_name, call_et, attributes) ->
+  track_event: (event_name, call_et, attributes = {}) ->
     if call_et
-      attributes =
+      attributes = $.extend
         conversation_participants: call_et.conversation_et.number_of_participants()
         conversation_participants_in_call: call_et.max_number_of_participants
         conversation_type: if call_et.is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
+      , attributes
 
-      if  call_et.is_remote_screen_shared() or call_et.is_remote_videod()
+      if call_et.is_remote_screen_shared() or call_et.is_remote_videod()
         event_name = event_name.replace '_call', '_video_call'
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name, attributes
 
-  # Track the call duration.
+  ###
+  Track the call duration.
+  @param call_et [z.calling.Call] Call entity
+  ###
   track_duration: (call_et) =>
     duration = Math.floor (Date.now() - call_et.timer_start) / 1000
     if not window.isNaN duration

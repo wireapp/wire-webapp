@@ -271,6 +271,43 @@ describe 'z.cryptography.CryptographyMapper', ->
         done()
       .catch done.fail
 
+    it 'resolves with a mapped medium image message when event id is not set', (done) ->
+      image =
+        tag: 'medium'
+        width: 640
+        height: 480
+        original_width: 1280
+        original_height: 960
+        mime_type: 'jpg'
+        size: 1024
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      image_asset = new z.proto.ImageAsset image.tag, image.width, image.height, image.original_width,
+        image.original_height, image.mime_type, image.size
+      generic_message.set 'image', image_asset
+
+      delete event.data.id
+
+      mapper.map_generic_message generic_message, event
+      .then (event_json) ->
+        expect(_.isObject event_json).toBeTruthy()
+        expect(event_json.type).toBe z.event.Backend.CONVERSATION.ASSET_ADD
+        expect(event_json.conversation).toBe event.conversation
+        expect(event_json.from).toBe event.from
+        expect(event_json.time).toBe event.time
+        expect(event_json.id).toBe generic_message.message_id
+        expect(event_json.data.content_length).toBe image.size
+        expect(event_json.data.content_type).toBe image.mime_type
+        expect(event_json.data.id).not.toBeDefined()
+        expect(event_json.data.info.tag).toBe image.tag
+        expect(event_json.data.info.width).toBe image.width
+        expect(event_json.data.info.height).toBe image.height
+        expect(event_json.data.info.nonce).toBeDefined()
+        expect(event_json.data.info.original_width).toBe image.original_width
+        expect(event_json.data.info.original_height).toBe image.original_height
+        expect(event_json.data.info.public).toBeFalsy()
+        done()
+      .catch done.fail
+
     it 'rejects with an error for a preview image message', (done) ->
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'image', new z.proto.ImageAsset 'preview'

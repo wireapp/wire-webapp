@@ -50,6 +50,12 @@ class z.calling.handler.MediaDevicesHandler
     @has_camera = ko.pureComputed => return @available_devices.video_input().length > 0
     @has_microphone = ko.pureComputed => return @available_devices.audio_input().length > 0
 
+    @initialize_media_devices()
+
+  # Initialize the list of MediaDevices and subscriptions
+  initialize_media_devices: =>
+    return if not z.calling.CallCenter.supports_calling()
+
     @get_media_devices()
     .then =>
       if @available_devices.video_input().length
@@ -57,8 +63,14 @@ class z.calling.handler.MediaDevicesHandler
         @current_device_id.video_input @available_devices.video_input()[default_device_index].deviceId
         @current_device_index.video_input default_device_index
       @_subscribe_to_observables()
+      @_subscribe_to_devices()
 
-    @_subscribe_to_devices()
+  # Subscribe to MediaDevices updates if available.
+  _subscribe_to_devices: =>
+    if navigator.mediaDevices.ondevicechange?
+      navigator.mediaDevices.ondevicechange = =>
+        @logger.log @logger.levels.INFO, 'List of available MediaDevices has changed'
+        @get_media_devices()
 
   # Subscribe to Knockout observables.
   _subscribe_to_observables: =>
@@ -93,13 +105,6 @@ class z.calling.handler.MediaDevicesHandler
       if media_device_id and @call_center.joined_call() and @call_center.media_stream_handler.local_media_type() is z.calling.enum.MediaType.VIDEO
         @call_center.media_stream_handler.replace_input_source z.calling.enum.MediaType.VIDEO
         @_update_current_index_from_id z.calling.enum.MediaDeviceType.VIDEO_INPUT, media_device_id
-
-  # Subscribe to MediaDevices updates if available.
-  _subscribe_to_devices: =>
-    if navigator.mediaDevices.ondevicechange?
-      navigator.mediaDevices.ondevicechange = =>
-        @logger.log @logger.levels.INFO, 'List of available MediaDevices has changed'
-        @get_media_devices()
 
   ###
   Update list of available MediaDevices.
