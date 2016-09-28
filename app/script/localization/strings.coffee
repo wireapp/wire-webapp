@@ -492,11 +492,12 @@ z.string.system_notification_member_leave_removed_many = '%s.first_name removed 
 z.string.system_notification_member_leave_removed_one = '%s.first_name removed %@.first_name from the conversation'
 z.string.system_notification_ping = 'Pinged'
 z.string.system_notification_reaction = '%reaction your message'
+z.string.system_notification_shared_audio = 'Shared an audio message'
+z.string.system_notification_shared_file = 'Shared a file'
+z.string.system_notification_shared_location = 'Shared a location'
+z.string.system_notification_shared_video = 'Shared a video'
 z.string.system_notification_voice_channel_activate = 'Calling'
 z.string.system_notification_voice_channel_deactivate = 'Called'
-z.string.system_notification_shared_audio = 'Shared an audio message'
-z.string.system_notification_shared_video = 'Shared a video'
-z.string.system_notification_shared_file = 'Shared a file'
 
 # Tooltips
 z.string.tooltip_conversation_call = 'Call'
