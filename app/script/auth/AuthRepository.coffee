@@ -166,7 +166,7 @@ class z.auth.AuthRepository
   ###
   get_access_token: =>
     return new Promise (resolve, reject) =>
-      if @auth_service.client.request_queue_blocked_state() is z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
+      if @auth_service.client.is_requesting_access_token()
         error = new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
         @logger.log @logger.levels.WARN, error.message
         reject error

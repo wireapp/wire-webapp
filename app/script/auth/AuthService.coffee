@@ -86,7 +86,7 @@ class z.auth.AuthService
   ###
   post_access: (options) ->
     return new Promise (resolve, reject) =>
-      @client.request_queue_blocked_state z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
+      @client.request_queue_blocked true
 
       options = $.extend
         should_retry: true
@@ -299,4 +299,4 @@ class z.auth.AuthService
   save_access_token_in_client: (type = '', value = '') =>
     @client.access_token_type = type
     @client.access_token = value
-    @client.request_queue_blocked_state z.service.RequestQueueBlockedState.NONE
+    @client.request_queue_blocked false

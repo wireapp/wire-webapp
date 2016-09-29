@@ -51,10 +51,9 @@ class z.service.Client
     @web_socket_url = settings.web_socket_url
 
     @request_queue = []
-    @request_queue_blocked_state = ko.observable false
-    @request_queue_blocked_state.subscribe (blocked_state) =>
-      if blocked_state is z.service.RequestQueueBlockedState.NONE and @access_token and @request_queue.length
-        @execute_request_queue()
+    @request_queue_blocked = ko.observable false
+    @request_queue_blocked.subscribe (is_blocked) =>
+      @execute_request_queue() if @access_token isnt '' and @request_queue.length > 0 and not is_blocked
 
     @access_token = ''
     @access_token_type = ''
@@ -133,7 +132,7 @@ class z.service.Client
   ###
   send_request: (config) ->
     return new Promise (resolve, reject) =>
-      if @request_queue_blocked_state() isnt z.service.RequestQueueBlockedState.NONE
+      if @request_queue_blocked()
         @logger.log @logger.levels.INFO, 'Request queued for later execution', config
         @request_queue.push [config, resolve, reject]
       else
@@ -161,11 +160,11 @@ class z.service.Client
           switch jqXHR.status
             when z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
               @logger.log @logger.levels.WARN, 'Request failed due to connectivity problem.', config
-              @request_queue_blocked_state z.service.RequestQueueBlockedState.CONNECTIVITY_PROBLEM
+              @request_queue_blocked true
               @request_queue.push [config, resolve, reject]
               @execute_on_connectivity()
               .then =>
-                @request_queue_blocked_state z.service.RequestQueueBlockedState.NONE
+                @request_queue_blocked false
                 @execute_request_queue()
               return
             when z.service.BackendClientError::STATUS_CODE.UNAUTHORIZED
