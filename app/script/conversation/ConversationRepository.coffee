@@ -878,47 +878,39 @@ class z.conversation.ConversationRepository
       @conversation_service.update_message_in_db message_et, {data: asset_data, status: z.message.StatusType.SENT}
 
   ###
-  Send an encrypted knock.
+  Send an knock to specified conversation.
   @param conversation_et [z.entity.Conversation] Conversation to send knock in
   @return [Promise] Promise that resolves after sending the knock
   ###
   send_knock: (conversation_et) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'knock', new z.proto.Knock false
+
     @_send_and_inject_generic_message conversation_et, generic_message
-    .then ->
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.PING_SENT
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
-        action: 'ping'
-        conversation_type: z.tracking.helpers.get_conversation_type conversation_et
-        with_bot: conversation_et.is_with_bot()
-      }
     .catch (error) => @logger.log @logger.levels.ERROR, "#{error.message}"
 
   ###
-  Send message to specific conversation.
+  Send link preview in specified conversation.
 
-  @param message [String] plain text message
+  @param message [String] Plain text message that possibly contains link
   @param conversation_et [z.entity.Conversation] Conversation that should receive the message
+  @param generic_message [z.protobuf.GenericMessage] GenericMessage of containing text or edited message
   @return [Promise] Promise that resolves after sending the message
   ###
-  send_message_with_link_preview: (message, conversation_et) =>
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'text', new z.proto.Text message
-
-    @_send_and_inject_generic_message conversation_et, generic_message
-    .then =>
-      @link_repository.get_link_preview_from_string message
+  send_link_preview: (message, conversation_et, generic_message) =>
+    @link_repository.get_link_preview_from_string message
     .then (link_preview) =>
       if link_preview?
-        generic_message.text.link_preview.push link_preview
+        switch generic_message.content
+          when 'edited'
+            generic_message.edited.text.link_preview.push link_preview
+          when 'text'
+            generic_message.text.link_preview.push link_preview
         @_send_and_inject_generic_message conversation_et, generic_message
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Error while sending link preview: #{error.message}", error
-      throw error
+        @link_repository.get_link_preview_from_string message
 
   ###
-  Send message to specific conversation.
+  Send text message in specified conversation.
 
   @param message [String] plain text message
   @param conversation_et [z.entity.Conversation] Conversation that should receive the message
@@ -928,26 +920,12 @@ class z.conversation.ConversationRepository
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'text', new z.proto.Text message
 
-    Promise.resolve()
-    .then =>
-      @_send_and_inject_generic_message conversation_et, generic_message
-    .then (message_record) =>
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.MESSAGE_SENT
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
-        action: 'text'
-        conversation_type: z.tracking.helpers.get_conversation_type conversation_et
-        with_bot: conversation_et.is_with_bot()
-      }
-      @_analyze_sent_message message
-      return message_record
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, "#{error.message}", error
-      error = new Error "Failed to send message: #{error.message}"
-      Raygun.send error, {source: 'Sending message'}
-      throw error
+    @_send_and_inject_generic_message conversation_et, generic_message
+    .then ->
+      return generic_message
 
   ###
-  Send edited message to specific conversation.
+  Send edited message in specified conversation.
 
   @param message [String] plain text message
   @param original_message_et [z.entity.Message]
@@ -955,24 +933,34 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the message
   ###
   send_message_edit: (message, original_message_et, conversation_et) =>
-    generic_message = null
-    Promise.resolve()
-    .then =>
-      if original_message_et.get_first_asset().text is message
-        throw new Error 'Edited message equals original message'
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'edited', new z.proto.MessageEdit original_message_et.id, new z.proto.Text message
-      @_send_and_inject_generic_message conversation_et, generic_message
+    if original_message_et.get_first_asset().text is message
+      return Promise.reject new Error 'Edited message equals original message'
+
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'edited', new z.proto.MessageEdit original_message_et.id, new z.proto.Text message
+
+    @_send_and_inject_generic_message conversation_et, generic_message
     .then =>
       @_track_edit_message conversation_et, original_message_et
-    .then =>
-      @link_repository.get_link_preview_from_string message
-    .then (link_preview) =>
-      if link_preview?
-        generic_message.edited.text.link_preview.push link_preview
-        @_send_and_inject_generic_message conversation_et, generic_message
+      @send_link_preview message, conversation_et, generic_message
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Error while editing message: #{error.message}", error
+      throw error
+
+  ###
+  Send text message with link preview in specified conversation.
+
+  @param message [String] plain text message
+  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
+  @return [Promise] Promise that resolves after sending the message
+  ###
+  send_message_with_link_preview: (message, conversation_et) =>
+    @send_message message, conversation_et
+    .then (generic_message) =>
+      @_track_rich_media_content message
+      @send_link_preview message, conversation_et, generic_message
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Error while sending text message: #{error.message}", error
       throw error
 
   ###
@@ -984,6 +972,7 @@ class z.conversation.ConversationRepository
   send_reaction: (conversation_et, message_et, reaction) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'reaction', new z.proto.Reaction reaction, message_et.id
+
     @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
@@ -1066,6 +1055,7 @@ class z.conversation.ConversationRepository
     @send_confirmation_status conversation_et, message_et for [conversation_et, message_et] in @sending_queue
     @sending_queue = []
 
+
   ###############################################################################
   # Send Generic Messages
   ###############################################################################
@@ -1089,6 +1079,7 @@ class z.conversation.ConversationRepository
       .then =>
         if saved_event.type in z.event.EventTypeHandling.STORE
           @_update_message_sent_status conversation_et, saved_event.id
+        @_track_completed_media_action conversation_et, generic_message
 
       return saved_event
 
@@ -1264,11 +1255,6 @@ class z.conversation.ConversationRepository
     conversation_type = z.tracking.helpers.get_conversation_type conversation_et
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED,
       $.extend tracking_data, {conversation_type: conversation_type}
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
-      action: 'file'
-      conversation_type: conversation_type
-      with_bot: conversation_et.is_with_bot()
-    }
 
     @send_asset_metadata conversation_et, file
     .then (record) =>
@@ -1331,35 +1317,6 @@ class z.conversation.ConversationRepository
     .catch (error) =>
       @logger.log "Failed to send delete message with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
       throw error
-
-  ###
-  Track delete action.
-
-  @param conversation_et [z.entity.Conversation]
-  @param message_et [z.entity.Message]
-  @param method [z.tracking.attribute.DeleteType]
-  ###
-  _track_delete_message: (conversation, message_et, method) ->
-    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE,
-      conversation_type: z.tracking.helpers.get_conversation_type conversation
-      method: method
-      time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
-      time_elapsed_action: seconds_since_message_creation
-      type: z.tracking.helpers.get_message_type message_et
-
-  ###
-  Track edit action.
-
-  @param conversation_et [z.entity.Conversation]
-  @param message_et [z.entity.Message]
-  ###
-  _track_edit_message: (conversation, message_et) ->
-    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.EDITED_MESSAGE,
-      conversation_type: z.tracking.helpers.get_conversation_type conversation
-      time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
-      time_elapsed_action: seconds_since_message_creation
 
   ###
   Can user upload assets to conversation.
@@ -2079,20 +2036,65 @@ class z.conversation.ConversationRepository
     , 0
 
   ###
-  Analyze sent text message for rich media content.
+  Track generic messages for media actions.
+  @private
+  @param conversation_et [z.entity.Conversation]
+  @param generic_message [z.protobuf.GenericMessage]
+  ###
+  _track_completed_media_action: (conversation_et, generic_message) ->
+    action_type = switch generic_message.content
+      when 'asset' then 'asset' if generic_message.asset.original?
+      when 'knock' then 'ping'
+      when 'text' then 'text' if not generic_message.text.link_preview.length
+
+    return if not action_type
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
+      action: action_type
+      conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+      with_bot: conversation_et.is_with_bot()
+    }
+
+  ###
+  Track delete action.
+
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  @param method [z.tracking.attribute.DeleteType]
+  ###
+  _track_delete_message: (conversation, message_et, method) ->
+    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE,
+      conversation_type: z.tracking.helpers.get_conversation_type conversation
+      method: method
+      time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
+      time_elapsed_action: seconds_since_message_creation
+      type: z.tracking.helpers.get_message_type message_et
+
+  ###
+  Track edit action.
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  ###
+  _track_edit_message: (conversation, message_et) ->
+    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.EDITED_MESSAGE,
+      conversation_type: z.tracking.helpers.get_conversation_type conversation
+      time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
+      time_elapsed_action: seconds_since_message_creation
+
+  ###
+  Track rich media content actions in text messages.
   @private
   @param message [String] Message content to be checked for rich media
   ###
-  _analyze_sent_message: (message) ->
+  _track_rich_media_content: (message) ->
     soundcloud_links = message.match z.media.MediaEmbeds.regex.soundcloud
     if soundcloud_links
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT,
-        z.tracking.SessionEventName.INTEGER.SOUNDCLOUD_LINKS_SENT, soundcloud_links.length
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.SOUNDCLOUD_LINKS_SENT, soundcloud_links.length
 
     youtube_links = message.match z.media.MediaEmbeds.regex.youtube
     if youtube_links
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT,
-        z.tracking.SessionEventName.INTEGER.YOUTUBE_LINKS_SENT, youtube_links.length
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.YOUTUBE_LINKS_SENT, youtube_links.length
 
   ###
   Analyze sent text message for rich media content.
