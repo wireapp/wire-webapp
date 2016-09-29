@@ -36,6 +36,8 @@ z.config =
         'wire-webapp-staging.wire.com': -> 300
         'zinfra.io': -> 300
 
+  TIME_BETWEEN_PING: 30000
+
   # number of message that will be pulled
   MESSAGES_FETCH_LIMIT: 30
 
@@ -54,6 +56,13 @@ z.config =
     ORANGE: 5
     PINK: 6
     PURPLE: 7
+
+  # Ignored by the emoji lib
+  EXCLUDE_EMOJI: [
+    '\u2122' # trademark
+    '\u00A9' # copyright
+    '\u00AE' # registered
+  ]
 
   # Conversation size
   MAXIMUM_CONVERSATION_SIZE: 128
@@ -91,8 +100,8 @@ z.config =
   # measured in pixel
   SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100
 
-  # Interval when to check whether to unblock the sending queue
-  SENDING_QUEUE_UNBLOCK_INTERVAL: 60 * 1000
+  # defines if it was a recently viewed conversation (5 min)
+  CONVERSATION_ACTIVITY_TIMEOUT: 5 * 60 * 1000
 
   PROPERTIES_KEY: 'webapp'
 

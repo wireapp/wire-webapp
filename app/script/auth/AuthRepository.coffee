@@ -130,7 +130,9 @@ class z.auth.AuthRepository
   request_login_code: (request_code) =>
     @auth_service.post_login_send request_code
 
-  # Renew access-token provided a valid cookie.
+  ###
+  Renew access-token provided a valid cookie.
+  ###
   renew_access_token: =>
     @get_access_token()
     .then =>

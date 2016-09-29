@@ -61,7 +61,6 @@ class z.conversation.ConversationRepository
     @sending_promises = []
     @sending_queue = ko.observableArray []
     @sending_blocked = false
-    @sending_interval = undefined
 
     @sending_queue.subscribe @_execute_from_sending_queue
 
@@ -134,20 +133,11 @@ class z.conversation.ConversationRepository
     queue_entry = @sending_queue()[0]
     if queue_entry
       @sending_blocked = true
-      @sending_interval = window.setInterval =>
-        return if @conversation_service.client.request_queue_blocked()
-        @logger.log @logger.levels.ERROR, 'Sending of message from queue failed, unblocking queue', {entry_function: @sending_queue()[0].function, queue: @sending_queue()}
-        @sending_blocked = false
-        @_execute_from_sending_queue()
-        window.clearInterval @sending_interval
-      , z.config.SENDING_QUEUE_UNBLOCK_INTERVAL
-
       queue_entry.function()
       .catch (error) ->
         queue_entry.reject error
       .then (response) =>
         queue_entry.resolve response if response
-        window.clearInterval @sending_interval
         @sending_blocked = false
         @sending_queue.shift()
 
