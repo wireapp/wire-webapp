@@ -18,7 +18,7 @@
 
 #General terms
 z.string.de.wire = 'Wire'
-z.string.de.wire_osx = 'Wire für OS X'
+z.string.de.wire_osx = 'Wire für macOS'
 z.string.de.wire_windows = 'Wire für Windows'
 z.string.de.truncation = '…'
 z.string.de.nonexistent_user = 'Gelöschte Person'
