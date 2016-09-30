@@ -45,7 +45,9 @@ class z.ViewModel.SelfProfileViewModel
 
     amplify.subscribe z.event.WebApp.LOGOUT.ASK_TO_CLEAR_DATA, @logout
     amplify.subscribe z.event.WebApp.PROFILE.UPLOAD_PICTURE, @set_picture
-    amplify.subscribe z.event.WebApp.SELF.CLIENT_ADD, @on_client_add
+    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_client_add
+    amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @on_client_remove
+
 
 ###############################################################################
 # Self Profile
@@ -86,10 +88,10 @@ class z.ViewModel.SelfProfileViewModel
     if @client_repository.current_client().type is z.client.ClientType.PERMANENT
       amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT,
         action: (clear_data) ->
-          amplify.publish z.event.WebApp.SIGN_OUT, 'user_requested', clear_data
+          amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, clear_data
     else
       @client_repository.delete_temporary_client()
-      .then -> amplify.publish z.event.WebApp.SIGN_OUT, 'user_requested', true
+      .then -> amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, true
 
   show_support_page: ->
     z.util.safe_window_open z.string.url_support
@@ -148,10 +150,16 @@ class z.ViewModel.SelfProfileViewModel
 # Clients
 ###############################################################################
 
-  # TODO handle clients
-  on_client_add: (client) =>
+  on_client_add: (user_id, client_et) =>
+    return true if user_id isnt @user().id
     amplify.publish z.event.WebApp.SEARCH.BADGE.SHOW
-    @new_clients.push client
+    @new_clients.push client_et
+
+  on_client_remove: (user_id, client_id) =>
+    return true if user_id isnt @user().id
+    for client_et in @new_clients() when client_et.id is client_id
+      @new_clients.remove client_et
+      amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE if not @new_clients().length
 
   on_show_new_clients: =>
     amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE

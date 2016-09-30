@@ -60,7 +60,8 @@ z.event.WebApp =
       SEND_ICE_CANDIDATE_INFO: 'wire.webapp.call.signaling.send-ice-candidate-info'
       SEND_LOCAL_SDP_INFO: 'wire.webapp.call.signaling.send-local-sdp-info'
   CLIENT:
-    DELETE: 'wire.webapp.client.delete'
+    ADD: 'wire.webapp.user.client.add'
+    REMOVE: 'wire.webapp.client.remove'
   CONNECT:
     IMPORT_CONTACTS: 'wire.webapp.connect.import-contacts'
   CONNECTION:
@@ -156,8 +157,8 @@ z.event.WebApp =
   TELEMETRY:
     BACKEND_REQUESTS: 'wire.webapp.telemetry.backend_requests'
   USER:
-    UNBLOCKED: 'wire.webapp.user.unblocked'
     EVENT_FROM_BACKEND: 'wire.webapp.user.event-from-backend'
+    UNBLOCKED: 'wire.webapp.user.unblocked'
   WARNING:
     SHOW: 'wire.webapp.warning.show'
     DISMISS: 'wire.webapp.warning.dismiss'
@@ -166,9 +167,6 @@ z.event.WebApp =
     RESIZE:
       HEIGHT: 'wire.webapp.window.resize.height'
       WIDTH: 'wire.webapp.window.resize.width'
-  SELF:
-    CLIENT_ADD: 'wire.webapp.self.client-add'
-    CLIENT_REMOVE: 'wire.webapp.self.client-remove'
   SHORTCUT:
     ADD_PEOPLE: 'wire.webapp.shortcut.add-people'
     ARCHIVE: 'wire.webapp.shortcut.archive'

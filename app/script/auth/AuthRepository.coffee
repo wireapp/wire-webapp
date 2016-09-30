@@ -142,7 +142,7 @@ class z.auth.AuthRepository
       if error.type is z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
         @logger.log @logger.levels.WARN, "Session expired on access token refresh: #{error.message}", error
         Raygun.send error
-        amplify.publish z.event.WebApp.SIGN_OUT, 'session_expired', false, true
+        amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.SESSION_EXPIRED, false, true
       else if error.type isnt z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
         @logger.log @logger.levels.ERROR, "Refreshing access token failed: '#{error.type}'", error
         # @todo What do we do in this case?

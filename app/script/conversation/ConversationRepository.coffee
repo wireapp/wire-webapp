@@ -101,8 +101,8 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTION, @map_connection
     amplify.subscribe z.event.WebApp.CONVERSATION.STORE, @save_conversation_in_db
+    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
-    amplify.subscribe z.event.WebApp.SELF.CLIENT_ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
 
   ###
@@ -644,7 +644,7 @@ class z.conversation.ConversationRepository
 
   reset_session: (user_id, client_id, conversation_id) =>
     @logger.log @logger.levels.INFO, "Resetting session with client '#{client_id}' of user '#{user_id}'"
-    @cryptography_repository.reset_session user_id, client_id
+    @cryptography_repository.delete_session user_id, client_id
     .then (session_id) =>
       if session_id
         @logger.log @logger.levels.INFO, "Deleted session with client '#{client_id}' of user '#{user_id}'"
@@ -1814,9 +1814,8 @@ class z.conversation.ConversationRepository
         delete_promises = []
         for user_id, client_ids of deleted_client_map
           for client_id in client_ids
-            @logger.log @logger.levels.WARN, "The client '#{client_id}' from '#{user_id}' is obsolete and will be removed"
             delete payload.recipients[user_id][client_id]
-            delete_promises.push @user_repository.client_repository.delete_client_and_session user_id, client_id
+            delete_promises.push @user_repository.remove_client_from_user user_id, client_id
           delete payload.recipients[user_id] if Object.keys(payload.recipients[user_id]).length is 0
 
         Promise.all delete_promises
@@ -2097,15 +2096,17 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.YOUTUBE_LINKS_SENT, youtube_links.length
 
   ###
-  Analyze sent text message for rich media content.
-  @param client [Object]
+  Add new device message to conversations.
+  @param user_id [String] ID of user to add client to
+  @param client_et [z.client.Client] Client entity
   ###
-  on_self_client_add: (client) =>
+  on_self_client_add: (user_id, client_et) =>
     return
     self = @user_repository.self()
+    return true if user_id isnt self.id
     message_et = new z.entity.E2EEDeviceMessage()
     message_et.user self
-    message_et.device client
+    message_et.device client_et
     message_et.device_owner self
 
     # TODO save message
