@@ -773,7 +773,7 @@ class z.conversation.ConversationRepository
   ###############################################################################
 
   ###
-  Send encrypted assets. Used for file transfers.
+  Send assets to specified conversation. Used for file transfers.
   @param conversation_id [String] Conversation ID
   @return [Object] Collection with User IDs which hold their Client IDs in an Array
   ###
@@ -799,8 +799,7 @@ class z.conversation.ConversationRepository
       return @_on_asset_upload_complete conversation_et, event
 
   ###
-  When we reset a session then we must inform the remote client about this action.
-
+  Send asset metadata message to specified conversation.
   @param conversation_et [z.entity.Conversation] Conversation that should receive the file
   @param file [File] File to send
   ###
@@ -812,7 +811,7 @@ class z.conversation.ConversationRepository
     @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
-  When we reset a session then we must inform the remote client about this action.
+  Send asset upload failed message to specified conversation.
 
   @param conversation_et [z.entity.Conversation] Conversation that should receive the file
   @param nonce [String] id of the metadata message
@@ -827,7 +826,7 @@ class z.conversation.ConversationRepository
     @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
-  Send a confirmation for a content message.
+  Send confirmation for a content message in specified conversation.
   @param conversation [z.entity.Conversation] Conversation that content message was received in
   @param message_et [String] ID of message for which to acknowledge receipt
   ###
@@ -839,7 +838,9 @@ class z.conversation.ConversationRepository
     @_add_to_sending_queue conversation_et.id, generic_message, [message_et.user().id]
 
   ###
-  Sends an OTR Image Asset
+  Sends image asset in specified conversation.
+  @param conversation_et [z.entity.Conversation] Conversation to send image in
+  @param image [File, Blob]
   ###
   send_image_asset: (conversation_et, image) =>
     @asset_service.create_image_proto image
@@ -856,6 +857,10 @@ class z.conversation.ConversationRepository
         # we don't need to wait for the sending to resolve
         @_send_encrypted_asset conversation_et.id, generic_message, ciphertext
         .then ([response, asset_id]) =>
+          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
+            action: 'photo'
+            conversation_type: if conversation_et.is_one2one() then 'one_to_one' else 'group'
+            with_bot: conversation_et.is_with_bot()
           saved_event.data.id = asset_id
           saved_event.data.info.nonce = asset_id
           @_update_image_as_sent conversation_et, saved_event
@@ -866,19 +871,7 @@ class z.conversation.ConversationRepository
         return saved_event
 
   ###
-  Update image message with given event data
-  ###
-  _update_image_as_sent: (conversation_et, event_json) =>
-    @get_message_in_conversation_by_id conversation_et, event_json.id
-    .then (message_et) =>
-      asset_data = event_json.data
-      remote_data = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
-      message_et.get_first_asset().resource remote_data
-      message_et.status z.message.StatusType.SENT
-      @conversation_service.update_message_in_db message_et, {data: asset_data, status: z.message.StatusType.SENT}
-
-  ###
-  Send an knock to specified conversation.
+  Send knock in specified conversation.
   @param conversation_et [z.entity.Conversation] Conversation to send knock in
   @return [Promise] Promise that resolves after sending the knock
   ###
@@ -964,8 +957,8 @@ class z.conversation.ConversationRepository
       throw error
 
   ###
-  Send a reaction to a content message.
-  @param conversation [z.entity.Conversation] Conversation that content message was received in
+  Send reaction to a content message in specified conversation.
+  @param conversation [z.entity.Conversation] Conversation to send reaction in
   @param message_et [String] ID of message for react to
   @param reaction [z.message.ReactionType]
   ###
@@ -1054,6 +1047,20 @@ class z.conversation.ConversationRepository
   _execute_message_queue: ->
     @send_confirmation_status conversation_et, message_et for [conversation_et, message_et] in @sending_queue
     @sending_queue = []
+
+  ###
+  Update image message with given event data
+  @param conversation_et [z.entity.Conversation] Conversation image was sent in
+  @param event_json [JSON] Image event containing updated information after sending
+  ###
+  _update_image_as_sent: (conversation_et, event_json) =>
+    @get_message_in_conversation_by_id conversation_et, event_json.id
+    .then (message_et) =>
+      asset_data = event_json.data
+      remote_data = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
+      message_et.get_first_asset().resource remote_data
+      message_et.status z.message.StatusType.SENT
+      @conversation_service.update_message_in_db message_et, {data: asset_data, status: z.message.StatusType.SENT}
 
 
   ###############################################################################
@@ -2047,11 +2054,10 @@ class z.conversation.ConversationRepository
       when 'text' then 'text' if not generic_message.text.link_preview.length
 
     return if not action_type
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
       action: action_type
       conversation_type: z.tracking.helpers.get_conversation_type conversation_et
       with_bot: conversation_et.is_with_bot()
-    }
 
   ###
   Track delete action.
