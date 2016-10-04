@@ -282,14 +282,23 @@ z.util.add_blank_targets = (text_with_anchors) ->
   return "#{text_with_anchors}".replace /rel="nofollow"/gi, 'target="_blank" rel="nofollow noopener noreferrer"'
 
 ###
+Adds http to given url if protocol missing
+
+@param url [String] URL you want to open in a new browser tab
+###
+z.util.add_http = (url) ->
+  if not url.match /^http[s]?:\/\//i
+    url = "http://#{url}"
+  return url
+
+###
 Opens a new browser tab (target="_blank") with a given URL in a safe environment.
 
 @see https://mathiasbynens.github.io/rel-noopener/
 @param url [String] URL you want to open in a new browser tab
 ###
 z.util.safe_window_open = (url, focus = true) ->
-  if not url.match /^http[s]?:\/\//i
-    url = "http://#{url}"
+  url = z.util.add_http url
 
   if navigator.userAgent.indexOf('Electron') > -1
     window.open url
