@@ -66,7 +66,7 @@ class z.components.UserAvatar
           @avatar_image = @element.find '.user-avatar-image'
           @avatar_image.empty().append image
 
-          requestAnimFrame =>
+          window.requestAnimationFrame =>
             if not image_was_already_loaded
               @element.addClass 'user-avatar-loading-transition'
             @element.addClass 'user-avatar-image-loaded'
