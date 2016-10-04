@@ -33,17 +33,6 @@ z.util.CountryCodes = do ->
       return country.code if country.iso is iso_name
 
   ###
-  Get the full-text country name matching an ISO name
-
-  @param iso_name [String] ISO standard country name
-
-  @return [String] Matching full-text country name
-  ###
-  get_country_name = (iso_name) ->
-    for country in COUNTRY_CODES
-      return country.name if country.iso is iso_name
-
-  ###
   Get the country code matching to an ISO name
 
   @param code [Integer] Country code
@@ -1506,7 +1495,6 @@ z.util.CountryCodes = do ->
 
   return {
     get_country_code: get_country_code
-    get_country_name: get_country_name
     get_country_by_code: get_country_by_code
     COUNTRY_CODES: COUNTRY_CODES
   }
