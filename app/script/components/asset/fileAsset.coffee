@@ -63,7 +63,7 @@ ko.components.register 'file-asset',
               <!-- ko ifnot: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
                 <!-- ko if: asset.status() === z.assets.AssetTransferState.UPLOADED -->
                   <div class="file-icon icon-file" data-uie-name="file-icon" data-bind="click: asset.download, clickBubble: false">
-                    <span class="file-icon-ext label-bold-xs" data-bind="text: file_extension"></span>
+                    <span class="file-icon-ext icon-view"></span>
                   </div>
                 <!-- /ko -->
                 <!-- ko if: asset.status() === z.assets.AssetTransferState.DOWNLOADING -->
