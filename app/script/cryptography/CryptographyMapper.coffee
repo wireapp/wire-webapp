@@ -207,7 +207,7 @@ class z.cryptography.CryptographyMapper
       @logger.log @logger.levels.INFO, error.message
       throw error
 
-  _map_image_medium: (image, event_id) ->
+  _map_image_medium: (image, event_id = z.util.create_random_uuid()) ->
     return {
       data:
         content_length: image.size

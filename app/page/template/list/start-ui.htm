@@ -1,4 +1,4 @@
-<div id="start-ui">
+<div id="start-ui" data-bind="with: $root.start_ui">
   <div id="start-ui-header" class="start-ui-header border-theme">
     <user-input data-bind="input_hint: {text: group_hint_text, trigger: show_hint}"
                 class="start-ui-header-user-input"
@@ -25,7 +25,7 @@
   </div>
 
   <div class="start-ui-list-wrapper">
-    <div class="start-ui-list" data-bind="antiscroll: show_people_picker">
+    <div class="start-ui-list" data-bind="antiscroll: should_update_scrollbar">
       <!-- ko ifnot: show_spinner() -->
 
         <!-- ko ifnot: show_search_results() -->

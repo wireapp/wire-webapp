@@ -1,0 +1,28 @@
+<div id="preferences" class="left-list left-list-preferences" data-bind="with: $root.preferences">
+  <div class="left-list-header">
+    <span class="label-bold-xs" data-bind="l10n_text: z.string.preferences_headline"></span>
+    <span class="left-list-header-close-button button-icon-large icon-close" data-uie-name="do-close-preferences" data-bind="click: click_on_close_preferences"></span>
+  </div>
+  <div class="left-list-center">
+    <ul class="left-list-items preferences-list-items">
+      <li class="left-list-item left-list-item-clickable" data-bind="click: click_on_account, css: {'text-theme': preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT}" data-uie-name="go-account">
+        <div class="left-column icon-account"></div>
+        <div class="center-column" data-bind="l10n_text: z.string.preferences_account"></div>
+      </li>
+      <li class="left-list-item left-list-item-clickable" data-bind="click: click_on_devices, css: {'text-theme': preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES}" data-uie-name="go-devices">
+        <div class="left-column icon-devices"></div>
+        <div class="center-column" data-bind="l10n_text: z.string.preferences_devices"></div>
+      </li>
+      <li class="left-list-item left-list-item-clickable" data-bind="click: click_on_options, css: {'text-theme': preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS}" data-uie-name="go-options">
+        <div class="left-column icon-options"></div>
+        <div class="center-column" data-bind="l10n_text: z.string.preferences_options"></div>
+      </li>
+      <!-- ko ifnot: z.util.Environment.electron -->
+        <li class="left-list-item left-list-item-clickable" data-bind="click: click_on_about, css: {'text-theme': preferences_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT}" data-uie-name="go-about">
+          <div class="left-column icon-wire"></div>
+          <div class="center-column" data-bind="l10n_text: z.string.preferences_about"></div>
+        </li>
+      <!-- /ko -->
+    </ul>
+  </div>
+</div>

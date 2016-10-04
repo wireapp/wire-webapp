@@ -65,18 +65,18 @@ ko.components.register 'device-card',
                     <span class="text-graphite-dark" data-bind="visible: current, l10n_text: z.string.auth_limit_devices_current"></span>
                   </div>
                   <div class="text-graphite-dark label-xs">
-                    <span data-bind="l10n_text: z.string.preferences_device_id"></span>
+                    <span data-bind="l10n_text: z.string.settings_devices_id"></span>
                     <span data-uie-name="device-id" data-bind="html: z.util.print_devices_id(id)"></span>
                   </div>
                 <!-- /ko -->
                 <!-- ko if: detailed -->
                   <div class="label-xs device-label" data-bind="text: label"></div>
                   <div class="label-xs">
-                    <span data-bind="l10n_text: z.string.preferences_device_id"></span>
+                    <span data-bind="l10n_text: z.string.settings_devices_id"></span>
                     <span data-uie-name="device-id" data-bind="html: z.util.print_devices_id(id)"></span>
                   </div>
                   <div class="label-xs">
-                    <span data-bind="l10n_text: z.string.preferences_device_activated"></span>
+                    <span data-bind="l10n_text: z.string.settings_devices_activated"></span>
                     <span class="label-bold-xs" data-bind="text: location()"></span>
                   </div>
                   <div class="label-xs" data-bind="text: print_time(device.time)"></div>

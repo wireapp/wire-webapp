@@ -16,18 +16,8 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-window.z ?= {}
-z.ViewModel ?= {}
-
-SETTING =
-  ALL: '0'
-  NONE: '2'
-  SOME: '1'
-
-LOCALYTICS_SOUND_SETTING =
-  ALL: 'alwaysPlay'
-  SOME: 'FirstMessageOnly'
-  NONE: 'neverPlay'
-
-class z.ViewModel.SettingsViewModel
-  constructor: () ->
+z.ViewModel.list.LIST_STATE =
+  ARCHIVE: 'z.ViewModel.list.LIST_STATE.ARCHIVE'
+  CONVERSATIONS: 'z.ViewModel.list.LIST_STATE.CONVERSATIONS'
+  PREFERENCES: 'z.ViewModel.list.LIST_STATE.PREFERENCES'
+  START_UI: 'z.ViewModel.list.LIST_STATE.START_UI'
