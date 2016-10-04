@@ -20,22 +20,10 @@
 
 #background {
   .full-screen;
-  transform: translateZ(0);
-  transition-property: width;
-  transition-duration: @animation-timing-slow;
-  transition-timing-function: @ease-in-out-expo;
   width: @left-width;
   min-width: @left-width;
   background-color: fade(#000, 88%);
   overflow: hidden;
-
-  &.background-fullscreen {
-    width: 100%;
-
-    .background {
-      filter: none !important;
-    }
-  }
 
   @media (min-width: @screen-lg-min) {
     min-width: @left-fluid-width;
@@ -82,8 +70,4 @@
   .no-background-image & {
     background-image: radial-gradient(50% 50%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.16) 100%);
   }
-}
-
-.background-fullscreen-anim-disabled {
-  transition: none !important;
 }

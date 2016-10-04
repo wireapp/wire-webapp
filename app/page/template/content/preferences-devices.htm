@@ -1,0 +1,84 @@
+<div id="preferences-devices" class="preferences-page preferences-devices" data-bind="with: $root.preferences_devices">
+  <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_devices"></div>
+  <div class="preferences-content">
+  <!-- ko if: selected_device() != null -->
+    <section class="self-preferences-section">
+      <label class="control-label" data-bind="l10n_text: z.string.preferences_devices"></label>
+      <div class="form-control">
+        <!-- ko if: current_client() -->
+          <div class="self-preferences-device">
+            <device-card params="device: current_client, current: true, click: click_on_device"></device-card>
+          </div>
+        <!-- /ko -->
+        <div class="self-preferences-device-list" data-bind="foreach: devices">
+          <div class="self-preferences-device">
+            <svg width="16" height="16" data-uie-name="device-id" data-bind="attr: {'data-uie-value': id}">
+              <!-- ko if: meta.is_verified()-->
+                <use data-uie-name="user-device-verified" xlink:href="#icon-verified"></use>
+              <!-- /ko -->
+              <!-- ko ifnot: meta.is_verified()-->
+                <use data-uie-name="user-device-not-verified" xlink:href="#icon-not-verified"></use>
+              <!-- /ko -->
+            </svg>
+            <device-card params="device: $data, click: $parent.click_on_device"></device-card>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <header>
+      <span class="self-preferences-button-back button-icon icon-back"
+            data-bind="click: click_on_device_close"
+              data-uie-name="do-device-close"></span>
+      <div class="title" data-bind="text: selected_device().model"></div>
+    </header>
+
+    <section class="self-preferences-section">
+      <div class="form-control-padding">
+        <device-card params="device: selected_device(), detailed: true"></device-card>
+      </div>
+    </section>
+
+    <section class="self-preferences-section">
+      <div class="form-control-padding">
+        <div class="self-preferences-fingerprint-label" data-bind="l10n_text: z.string.preferences_devices_fingerprint"></div>
+        <!-- ko if: selected_device() != current_client() -->
+          <div class="self-preferences-fingerprint" data-bind="html: z.util.print_devices_id(fingerprint_remote())"></div>
+        <!-- /ko -->
+        <!-- ko if: selected_device() == current_client() -->
+          <div class="self-preferences-fingerprint" data-bind="html: z.util.print_devices_id(fingerprint_local())"></div>
+        <!-- /ko -->
+        <!-- ko if: selected_device() != current_client() -->
+          <div class="self-preferences-fingerprint-verified slider">
+            <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: selected_device().meta.is_verified">
+            <label class="button-label" for="toggle" data-bind="click: click_on_verify_client, l10n_text: z.string.people_tabs_device_detail_verified"></label>
+          </div>
+          <div class="label-xs" data-bind="l10n_text: z.string.preferences_devices_fingerprint_detail"></div>
+        <!-- /ko -->
+      </div>
+    </section>
+  <!-- /ko -->
+
+  <!-- ko if: selected_device() != current_client() -->
+    <section class="self-preferences-section">
+      <div class="form-control-padding">
+        <div class="self-preferences-reset-session">
+          <div class="label-xs" data-bind="l10n_text: z.string.preferences_devices_session_detail"></div>
+          <div class="self-preferences-reset-session-button">
+            <svg class="self-preferences-reset-session-spinner svg-theme spin"
+                 data-bind="style : { visibility : is_resetting_session() ? 'visible' : 'hidden' }"
+                 width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" data-uie-name="status-loading">
+              <path class="fill-theme" d="M12.416 12.417c-2.374 2.375-6.28 2.33-8.72-.112-2.444-2.442-2.488-6.347-.113-8.72 1.658-1.66 4.12-2.18 6.343-1.394.477.17 1-.08 1.17-.557.167-.477-.083-1-.56-1.17C7.658-.552 4.453.124 2.286 2.29-.808 5.384-.75 10.448 2.4 13.6c3.15 3.152 8.216 3.21 11.312.113 2.165-2.166 2.84-5.37 1.824-8.25-.168-.476-.692-.726-1.17-.558-.476.17-.726.692-.557 1.17.784 2.222.265 4.684-1.394 6.342z"></path>
+            </svg>
+            <span class="self-preferences-reset-session-button-label button-label text-blue" data-bind="click: click_on_reset_session, l10n_text: z.string.preferences_devices_session_reset, style : { visibility : !is_resetting_session() ? 'visible' : 'hidden' }"></span>
+          </div>
+        </div>
+        <div class="self-preferences-delete">
+          <div class="label-xs" data-bind="l10n_text: z.string.preferences_devices_remove_detail"></div>
+          <device-remove params="device: selected_device(), error: remove_form_error, remove: click_on_remove_device_submit"></device-remove>
+        </div>
+      </div>
+    </section>
+  <!-- /ko -->
+  </div>
+</div>

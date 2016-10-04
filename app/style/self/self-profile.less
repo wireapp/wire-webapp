@@ -17,44 +17,6 @@
  *
  */
 
-.self-profile {
-  .full-screen();
-  display: none;
-  max-width: 448px;
-  margin-left: 160px;
-  margin-right: 16px;
-  color: #fff;
-  line-height: @line-height-lg;
-
-  &.self-profile-transition-in {
-    transition-delay: @animation-timing-fast;
-    transition-duration: @animation-timing-fast;
-    transition-property: transform opacity;
-    transition-timing-function: @ease-out-expo;
-    .hardware-acc;
-  }
-
-  &.self-profile-transition-out {
-    transition-delay: @animation-timing-fast + .1;
-    transition-duration: @animation-timing-fast;
-    transition-property: transform opacity;
-    transition-timing-function: @ease-out-expo;
-    .hardware-acc;
-  }
-
-  &.self-profile-hidden {
-    transform: translateX(-100px);
-    opacity: 0;
-  }
-
-  &.self-profile-visible {
-    opacity: 1;
-  }
-
-  #setting-bubble {
-    margin-left: 13px;
-  }
-}
 
 .self-profile-name {
   margin-top: 32px;
@@ -64,28 +26,4 @@
 .self-profile-mail,
 .self-profile-phone {
   .no-text-selection();
-}
-
-.self-profile-settings-button {
-  position: absolute;
-  top: 36px;
-  right: 0;
-}
-
-.self-profile-footer {
-  align-items: center;
-  bottom: 0;
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  width: 100%;
-}
-
-.self-profile-camera-button {
-  font-size: @icon-size-md;
-  margin-bottom: 40px;
-}
-
-.self-profile-color-picker {
-  margin-bottom: 56px;
 }

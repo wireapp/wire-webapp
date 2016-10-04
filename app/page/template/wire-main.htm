@@ -14,45 +14,36 @@
       </div>
       <div id="left" class="left">
         #include('list/archive.htm')
+        #include('list/conversations.htm')
+        #include('list/preferences.htm')
         #include('list/start-ui.htm')
-        #include('list/conversation-list.htm')
         #include('list/actions.htm')
       </div>
       <div id="right" class="right">
-        <!-- ko if: state() === z.ViewModel.CONTENT_STATE.PENDING -->
-          #include('conversation/connect-requests.htm')
+        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS -->
+          #include('content/connect-requests.htm')
         <!-- /ko -->
-        <!-- ko if: state() === z.ViewModel.CONTENT_STATE.CONVERSATION -->
-          #include('conversation/conversation.htm')
+        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION -->
+          #include('content/conversation.htm')
         <!-- /ko -->
-        #include('self/self-profile.htm')
-      </div>
-      <div id="welcome" class="welcome" data-bind="visible: show_welcome()">
-        <div class="welcome-inner">
-          <div class="welcome-text" data-bind="l10n_text: z.string.upload_welcome"></div>
-          <!-- ko if: uploading_image() -->
-            <div class="welcome-button button button-full" data-uie-name="upload-picture">
-              <svg class="spin" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" data-uie-name="status-loading">
-                <path fill="#fff" d="M12.416 12.417c-2.374 2.375-6.28 2.33-8.72-.112-2.444-2.442-2.488-6.347-.113-8.72 1.658-1.66 4.12-2.18 6.343-1.394.477.17 1-.08 1.17-.557.167-.477-.083-1-.56-1.17C7.658-.552 4.453.124 2.286 2.29-.808 5.384-.75 10.448 2.4 13.6c3.15 3.152 8.216 3.21 11.312.113 2.165-2.166 2.84-5.37 1.824-8.25-.168-.476-.692-.726-1.17-.558-.476.17-.726.692-.557 1.17.784 2.222.265 4.684-1.394 6.342z"></path>
-              </svg>
-            </div>
-          <!-- /ko -->
-          <!-- ko if: !uploading_image() -->
-            <label class="welcome-button button button-full">
-              <span data-bind="l10n_text: z.string.upload_welcome_choose"></span>
-              <input type="file" accept="image/jpg,image/jpeg,image/png,image/bmp"
-                     data-bind="file_select: choose_your_own_picture"
-                     data-uie-name="do-select-picture"/>
-          </label>
-          <!-- /ko -->
-          <button class="welcome-button button button-full button-inverted text-white"
-                data-bind="click: keep_this_picture, attr:{'disabled': disable_keep_button()}, l10n_text: z.string.upload_welcome_keep"
-                data-uie-name="do-keep-picture"></button>
-        </div>
+        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT -->
+         #include('content/preferences-about.htm')
+        <!-- /ko -->
+        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT -->
+          #include('content/preferences-account.htm')
+        <!-- /ko -->
+        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES -->
+          #include('content/preferences-devices.htm')
+        <!-- /ko -->
+        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS -->
+          #include('content/preferences-options.htm')
+        <!-- /ko -->
+        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.WATERMARK -->
+        #include('content/watermark.htm')
+        <!-- /ko -->
       </div>
     </div>
     #include('video-calling.htm')
-    #include('settings.htm')
     #include('warning.htm')
     #include('modals.htm')
   <!-- /ko -->
