@@ -34,7 +34,7 @@ class z.auth.AuthRepository
 
   # Print all cookies for a user in the console.
   list_cookies: ->
-    @auth_service.get_cookies
+    @auth_service.get_cookies()
     .then (cookies) =>
       @logger.force_log 'Backend cookies:'
       for cookie, index in cookies
