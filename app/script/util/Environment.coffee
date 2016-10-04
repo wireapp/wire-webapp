@@ -23,7 +23,6 @@ APP_ENV =
   LOCALHOST: 'localhost'
   PRODUCTION: 'app.wire.com'
   PROD_NEXT: 'wire-webapp-prod-next.wire.com'
-  TACO: 'taco.wire.com'
   VIRTUAL_HOST: 'wire.ms' # The domain "wire.ms" is our virtual host for testing contact uploads
 
 BROWSER_NAME =

@@ -120,25 +120,6 @@ module.exports = (grunt) ->
     'clean:prod'
   ]
 
-  grunt.registerTask 'prepare_taco', [
-    'clean:deploy'
-    'coffee:deploy'
-    'coffee:prod'
-    'less:deploy'
-    'postcss:deploy'
-    'copy:deploy'
-    'copy:deploy_audio'
-    'copy:deploy_font'
-    'copy:deploy_favicon'
-    'includereplace:prod_index'
-    'includereplace:prod_auth'
-    'clean:deploy_app'
-    'uglify:deploy'
-    'clean:deploy_script'
-    'clean:prod'
-    'raygun:taco'
-  ]
-
   grunt.registerTask 'prepare_test', [
     'clean:test'
     'coffee:test'
