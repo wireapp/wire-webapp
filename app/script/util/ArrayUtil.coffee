@@ -48,6 +48,12 @@ z.util.ArrayUtil.random_element = (array) ->
 z.util.ArrayUtil.contains = (array, value) ->
   return array.indexOf(value) > -1
 
+z.util.ArrayUtil.find_closest_long = (array, value) ->
+  closest = array[0]
+  array.forEach (current) ->
+    closest = current if value.gte(current)
+  return closest
+
 ###
 Interpolates an array of numbers using linear interpolation
 

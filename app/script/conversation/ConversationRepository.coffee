@@ -925,7 +925,7 @@ class z.conversation.ConversationRepository
       return generic_message
 
 
-  send_ephemeral_message: (conversation_et, message, millis) =>
+  send_ephemeral_message: (conversation_et, millis, message) =>
     ephemeral_message = new z.proto.Ephemeral()
     ephemeral_message.set 'expire_after_millis', millis
     ephemeral_message.set 'text', new z.proto.Text message
@@ -1395,6 +1395,8 @@ class z.conversation.ConversationRepository
           @_on_confirmation conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_DELETE
           @_on_message_deleted conversation_et, event
+        when z.event.Client.CONVERSATION.MESSAGE_EPHEMERAL
+          @_on_message_ephemeral conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_HIDDEN
           @_on_message_hidden event
         when z.event.Client.CONVERSATION.REACTION
@@ -1596,6 +1598,11 @@ class z.conversation.ConversationRepository
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
         throw error
+
+  _on_message_ephemeral: (conversation_et, event_json) =>
+    Promise.resolve()
+    .then =>
+      return event_json
 
   ###
   A hide message received in a conversation.
