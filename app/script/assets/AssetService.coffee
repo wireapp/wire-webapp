@@ -36,22 +36,19 @@ class z.assets.AssetService
 
   @deprecated
   @param config [Object] Configuration object containing the jQuery call settings
-  @option config [String] url
   @option config [Object] data
   @option config [String] contentType
   @option config [String] contentDisposition
-  @option config [Function] callback
   ###
   post_asset: (config) ->
     @client.send_request
       type: 'POST'
-      url: config.url
+      url: @client.create_url '/assets'
       data: config.data
       processData: false # otherwise jquery will convert it to a query string
       contentType: config.contentType
       headers:
         'Content-Disposition': config.contentDisposition
-      callback: config.callback
 
   ###
   Upload any asset pair to the backend using asset api v1.
@@ -64,12 +61,10 @@ class z.assets.AssetService
     Promise.all [
       @post_asset
         contentType: small.content_type
-        url: @client.create_url '/assets'
         contentDisposition: small.get_content_disposition()
         data: small.array_buffer
       @post_asset
         contentType: medium.content_type
-        url: @client.create_url '/assets'
         contentDisposition: medium.get_content_disposition()
         data: medium.array_buffer
     ]
