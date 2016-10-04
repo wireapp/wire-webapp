@@ -90,18 +90,15 @@ class z.auth.AuthRepository
   @return [Promise] Promise that will resolve on success
   ###
   register: (new_user) =>
-    return new Promise (resolve, reject) =>
-      @auth_service.post_register new_user
-      .then (response) =>
-        z.storage.set_value z.storage.StorageKey.AUTH.PERSIST, true
-        z.storage.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
-        z.storage.set_value new_user.label_key, new_user.label
-        @logger.log @logger.levels.INFO,
-          "COOKIE::'#{new_user.label}' Saved cookie label with key '#{new_user.label_key}' in Local Storage",
-            key: new_user.label_key,
-            value: new_user.label
-        resolve response
-      .catch (error) -> reject error
+    @auth_service.post_register new_user
+    .then (response) =>
+      z.storage.set_value z.storage.StorageKey.AUTH.PERSIST, true
+      z.storage.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
+      z.storage.set_value new_user.label_key, new_user.label
+      @logger.log @logger.levels.INFO,
+        "COOKIE::'#{new_user.label}' Saved cookie label with key '#{new_user.label_key}' in Local Storage",
+          key: new_user.label_key,
+          value: new_user.label
 
   ###
   Resend an email or phone activation code.

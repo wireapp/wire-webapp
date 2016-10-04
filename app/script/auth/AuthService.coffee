@@ -45,17 +45,11 @@ class z.auth.AuthService
   @return [Promise] Promise that resolves with an array of cookies
   ###
   get_cookies: ->
-    return new Promise (resolve, reject) =>
-      $.ajax
-        crossDomain: true
-        headers:
-          Authorization: "Bearer #{window.decodeURIComponent(@client.access_token)}"
-        type: 'GET'
-        url: @client.create_url "#{@URL_COOKIES}"
-      .done (data) ->
-        resolve data.cookies
-      .fail (jqXHR, textStatus, errorThrown) ->
-        reject jqXHR.responseJSON or errorThrown
+    @client.send_request
+      url: @client.create_url "#{@URL_COOKIES}"
+      type: 'GET'
+    .then (data) ->
+      return data.cookies
 
   ###
   Get invite information.
@@ -63,16 +57,10 @@ class z.auth.AuthService
   @return [Promise] Promise that resolves with invitations information
   ###
   get_invitations_info: (code) ->
-    return new Promise (resolve, reject) =>
-      $.ajax
-        crossDomain: true
-        type: 'GET'
-        url: @client.create_url "#{@URL_INVITATIONS}/info"
-        data: "code=#{code}"
-      .done (data) ->
-        resolve data
-      .fail (jqXHR, textStatus, errorThrown) ->
-        reject jqXHR.responseJSON or errorThrown
+    @client.send_request
+      url: @client.create_url "#{@URL_INVITATIONS}/info"
+      type: 'GET'
+      data: "code=#{code}"
 
   ###
   Get access-token if a valid cookie is provided.
@@ -150,20 +138,10 @@ class z.auth.AuthService
   @return [Promise] Promise that resolves on successful code resend
   ###
   post_activate_send: (send_activation_code) ->
-    return new Promise (resolve, reject) =>
-      $.ajax
-        contentType: 'application/json; charset=utf-8'
-        crossDomain: true
-        data: pako.gzip JSON.stringify send_activation_code
-        headers:
-          'Content-Encoding': 'gzip'
-        processData: false
-        type: 'POST'
-        url: @client.create_url "#{@URL_ACTIVATE}/send"
-      .done ->
-        resolve z.service.BackendClientError::STATUS_CODE.OK
-      .fail (jqXHR, textStatus, errorThrown) ->
-        reject jqXHR.responseJSON or errorThrown
+    @client.send_json
+      url: @client.create_url "#{@URL_ACTIVATE}/send"
+      type: 'POST'
+      data: send_activation_code
 
   ###
   Delete all cookies on the backend.
@@ -228,38 +206,20 @@ class z.auth.AuthService
   @return [Promise] Promise that resolves on successful login code request
   ###
   post_login_send: (request_code) ->
-    return new Promise (resolve, reject) =>
-      $.ajax
-        contentType: 'application/json; charset=utf-8'
-        data: pako.gzip JSON.stringify request_code
-        headers:
-          'Content-Encoding': 'gzip'
-        processData: false
-        type: 'POST'
-        url: @client.create_url "#{@URL_LOGIN}/send"
-      .done (data) ->
-        resolve data
-      .fail (jqXHR, textStatus, errorThrown) ->
-        reject jqXHR.responseJSON or errorThrown
+    @client.send_json
+      url: @client.create_url "#{@URL_ACCESS}/logout"
+      type: 'POST'
+      data: request_code
 
   ###
   Logout on the backend side.
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/logout
   ###
   post_logout: ->
-    return new Promise (resolve, reject) =>
-      $.ajax
-        crossDomain: true
-        headers:
-          Authorization: "Bearer #{window.decodeURIComponent(@client.access_token)}"
-        type: 'POST'
-        url: @client.create_url "#{@URL_ACCESS}/logout"
-        xhrFields:
-          withCredentials: true
-      .done (data) ->
-        resolve data
-      .fail (jqXHR, textStatus, errorThrown) ->
-        reject [jqXHR.responseJSON or errorThrown]
+    @client.send_json
+      url: @client.create_url "#{@URL_ACCESS}/logout"
+      type: 'POST'
+      withCredentials: true
 
   ###
   Register a new user.
@@ -274,22 +234,11 @@ class z.auth.AuthService
   @return [Promise] Promise that will resolve on success
   ###
   post_register: (new_user) ->
-    return new Promise (resolve, reject) =>
-      $.ajax
-        contentType: 'application/json; charset=utf-8'
-        crossDomain: true
-        data: pako.gzip JSON.stringify new_user
-        headers:
-          'Content-Encoding': 'gzip'
-        processData: false
-        type: 'POST'
-        url: @client.create_url "#{@URL_REGISTER}?challenge_cookie=true"
-        xhrFields:
-          withCredentials: true
-      .done (data) ->
-        resolve data
-      .fail (jqXHR, textStatus, errorThrown) ->
-        reject jqXHR.responseJSON or errorThrown
+    @client.send_json
+      url: @client.create_url "#{@URL_COOKIES}/remove"
+      type: 'POST'
+      data: new_user
+      withCredentials: true
 
   ###
   Save the access token date in the client.
