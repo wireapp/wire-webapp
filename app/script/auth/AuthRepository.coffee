@@ -97,10 +97,9 @@ class z.auth.AuthRepository
         z.storage.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
         z.storage.set_value new_user.label_key, new_user.label
         @logger.log @logger.levels.INFO,
-          "COOKIE::'#{new_user.label}' Saved cookie label with key '#{new_user.label_key}' in Local Storage", {
+          "COOKIE::'#{new_user.label}' Saved cookie label with key '#{new_user.label_key}' in Local Storage",
             key: new_user.label_key,
             value: new_user.label
-          }
         resolve response
       .catch (error) -> reject error
 
