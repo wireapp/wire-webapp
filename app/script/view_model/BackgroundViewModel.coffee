@@ -35,9 +35,9 @@ class z.ViewModel.BackgroundViewModel
 
     @content.state.subscribe =>
       if @content.state() is z.ViewModel.CONTENT_STATE.PROFILE
-        requestAnimFrame =>
+        window.requestAnimationFrame =>
           @background_list_element.addClass 'background-fullscreen'
-          requestAnimFrame =>
+          window.requestAnimationFrame =>
             if @background_list_element.hasClass 'background-fullscreen-anim-disabled'
               @background_list_element.removeClass 'background-fullscreen-anim-disabled'
               $('.conversation, .connect-requests-wrapper').css 'z-index': ''
@@ -49,7 +49,7 @@ class z.ViewModel.BackgroundViewModel
     @blur_background = _.throttle (ratio) =>
       blur_radius = (ratio * 24) | 0
       blur_css = "blur(#{blur_radius}px)"
-      requestAnimFrame =>
+      window.requestAnimationFrame =>
         @background_list_element.find('.background').css
           '-webkit-filter': blur_css
           'filter': blur_css

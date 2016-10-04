@@ -78,7 +78,7 @@ class z.ViewModel.ConversationInputViewModel
 
   _init_subscriptions: ->
     amplify.subscribe z.event.WebApp.SEARCH.SHOW, => @conversation_has_focus false
-    amplify.subscribe z.event.WebApp.SEARCH.HIDE, => window.requestAnimFrame => @conversation_has_focus true
+    amplify.subscribe z.event.WebApp.SEARCH.HIDE, => window.requestAnimationFrame => @conversation_has_focus true
     amplify.subscribe z.event.WebApp.EXTENSIONS.GIPHY.SEND, => @conversation_et()?.input ''
     amplify.subscribe z.event.WebApp.CONVERSATION.IMAGE.SEND, @upload_images
     amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.EDIT, @edit_message
