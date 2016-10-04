@@ -18,11 +18,13 @@
 
 window.z ?= {}
 z.ViewModel ?= {}
+z.ViewModel.content ?= {}
+
 
 # View model for connection requests.
-class z.ViewModel.ConnectRequestsViewModel
+class z.ViewModel.content.ConnectRequestsViewModel
   constructor: (element_id, @user_repository) ->
-    @logger = new z.util.Logger 'z.ViewModel.ConnectRequestsViewModel', z.config.LOGGER.OPTIONS
+    @logger = new z.util.Logger 'z.ViewModel.content.ConnectRequestsViewModel', z.config.LOGGER.OPTIONS
 
     @connect_requests = @user_repository.connect_requests
 

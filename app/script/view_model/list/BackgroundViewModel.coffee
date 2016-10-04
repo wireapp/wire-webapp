@@ -19,15 +19,15 @@
 window.z ?= {}
 z.ViewModel ?= {}
 
-SETTING =
-  ALL: '0'
-  NONE: '2'
-  SOME: '1'
 
-LOCALYTICS_SOUND_SETTING =
-  ALL: 'alwaysPlay'
-  SOME: 'FirstMessageOnly'
-  NONE: 'neverPlay'
+class z.ViewModel.BackgroundViewModel
+  constructor: (element_id, @content_view_model, @conversation_repository, @user_repository) ->
 
-class z.ViewModel.SettingsViewModel
-  constructor: () ->
+    @webapp_loaded = ko.observable false
+
+    @self_user = ko.pureComputed =>
+      @user_repository.self()?.picture_medium_url() if @webapp_loaded()
+
+    amplify.subscribe z.event.WebApp.LOADED, => @webapp_loaded true
+
+    ko.applyBindings @, document.getElementById element_id
