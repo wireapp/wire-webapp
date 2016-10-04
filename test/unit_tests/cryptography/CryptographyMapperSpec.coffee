@@ -297,7 +297,7 @@ describe 'z.cryptography.CryptographyMapper', ->
         expect(event_json.id).toBe generic_message.message_id
         expect(event_json.data.content_length).toBe image.size
         expect(event_json.data.content_type).toBe image.mime_type
-        expect(event_json.data.id).not.toBeDefined()
+        expect(event_json.data.id).toBeDefined()
         expect(event_json.data.info.tag).toBe image.tag
         expect(event_json.data.info.width).toBe image.width
         expect(event_json.data.info.height).toBe image.height

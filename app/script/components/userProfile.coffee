@@ -225,7 +225,7 @@ class z.components.UserProfileViewModel
         device: @client_repository.current_client
         fingerprint_local: @fingerprint_local
         click_on_show_my_devices: ->
-          amplify.publish z.event.WebApp.PROFILE.SETTINGS.SHOW
+          amplify.publish z.event.WebApp.PREFERENCES.MANAGE_DEVICES
 
   click_on_reset_session: =>
     reset_progress = =>

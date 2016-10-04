@@ -17,37 +17,48 @@
  *
  */
 
-.conversation-list {
-  position: absolute;
-  top: 0;
-  right: 0;
+.left-list {
   bottom: 0;
   display: flex;
   flex-direction: column;
+  position: absolute;
+  right: 0;
+  top: 0;
   width: @left-width;
 
-  .os-mac.platform-electron & {
-    padding-top: 40px;
-  }
-
-  &:not(.conversation-list-is-hidden) {
-    .start-ui-transition-fadein();
-  }
-
-  &.conversation-list-is-hidden {
+  &:not(.left-list-is-visible) {
     .start-ui-transition-fadeout();
+  }
+
+  &.left-list-is-visible {
+    .start-ui-transition-fadein();
   }
 }
 
-.conversation-list-center {
+.left-list-header {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  height: 40px;
+  position: relative;
+}
+
+.left-list-header-close-button {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.left-list-center {
   flex: 1 1 auto;
   position: relative;
 
-  &.conversation-list-center-border-bottom {border-bottom: 1px solid fade(#fff, 16%)}
-  &.conversation-list-center-border-top {border-top: 1px solid fade(#fff, 16%)}
+  &.left-list-center-border-bottom {border-bottom: 1px solid fade(#fff, 16%)}
+  &.left-list-center-border-top {border-top: 1px solid fade(#fff, 16%)}
 }
 
-.conversation-list-items {
+.left-list-items {
   .full-screen;
   .list-unstyled;
   margin: 0;
@@ -56,19 +67,23 @@
   overflow-x: hidden;
 }
 
-.conversation-list-item {
+.left-list-item {
   display: flex;
   user-select: none;
-  height: @conversation-list-item-height;
-  line-height: @conversation-list-item-height;
+  height: @left-list-item-height;
+  line-height: @left-list-item-height;
   position: relative;
   width: 100%;
+
+  &.left-list-item-clickable {
+    cursor: pointer;
+  }
 
   > .left-column {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: @conversation-list-item-left-width;
+    width: @left-list-item-left-width;
   }
 
   > .center-column {
@@ -85,7 +100,7 @@
     align-items: center;
     color: #fff;
     position: relative;
-    width: @conversation-list-item-right-width;
+    width: @left-list-item-right-width;
 
     > .icon-silence,
     > .icon-more {
@@ -123,39 +138,4 @@
       opacity: 0;
     }
   }
-}
-
-.conversation-list-separator {
-  display: block;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(fade(#fff, 40%), fade(#fff, 0)) top center / 256px 1px no-repeat ;
-  border: none;
-}
-
-.conversation-list-footer {
-  height: @conversation-input-min-height;
-  color: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-left: 12px;
-  padding-right: 12px;
-
-  .conversation-list-footer-contacts-label {
-    color: #fff;
-    margin-left: 16px;
-  }
-}
-
-.conversation-list-settings {
-  position: relative;
-}
-
-.conversation-list-settings-badge {
-  .dot-md;
-  content: "";
-  position: absolute;
-  right: 5px;
-  top: 5px;
 }

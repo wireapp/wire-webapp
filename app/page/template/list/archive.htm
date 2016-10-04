@@ -1,12 +1,12 @@
-<div id="archive" class="archive">
-  <div class="archive-header">
-    <span class="label-bold-xs" data-bind="l10n_text: z.string.conversation_list_popover_archive"></span>
-    <span class="archive-header-close-button button-icon-large icon-close" data-uie-name="do-close-archive" data-bind="click: click_on_close_archive"></span>
+<div id="archive" class="left-list left-list-archive" data-bind="with: $root.archive">
+  <div class="left-list-header">
+    <span class="label-bold-xs" data-bind="l10n_text: z.string.archive_header"></span>
+    <span class="left-list-header-close-button button-icon-large icon-close" data-uie-name="do-close-archive" data-bind="click: click_on_close_archive"></span>
   </div>
-  <div class="conversation-list-center">
-    <ul class="conversation-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_archived">
+  <div class="left-list-center">
+    <ul class="left-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_archived">
       <!-- ko foreach: conversations_archived -->
-        <li class="conversation-list-item">
+        <li class="left-list-item">
           <div class="left-column">
             <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.UNREAD -->
               <span data-bind="unread_indicator: number_of_unread_messages" data-uie-name="status-unread"></span>
@@ -42,7 +42,7 @@
                data-uie-name="item-conversation-archived"></div>
           <div class="right-column">
               <span class="button-icon icon-more"
-                    data-bind="attr: {'id': 'options-' + id}, click: $root.click_on_actions, l10n_tooltip: z.string.tooltip_conversation_list_more"
+                    data-bind="attr: {'id': 'options-' + id}, click: $root.click_on_actions, l10n_tooltip: z.string.tooltip_conversations_more"
                     data-bubble="#actions-bubble"
                     data-placement="right-flex"
                     data-uie-name="go-options"></span>

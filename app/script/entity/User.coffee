@@ -77,13 +77,8 @@ class z.entity.User
         else return @ACCENT_COLOR.BLUE
     , @, deferEvaluation: true
 
-    @phone = ko.observable()
-    @display_phone = ko.computed =>
-      formatted_number = PhoneFormat.formatNumberForMobileDialing '', @phone()
-      return formatted_number or @phone()
-    , deferEvaluation: true
-
     @email = ko.observable()
+    @phone = ko.observable()
 
     @name = ko.observable ''
     @first_name = ko.computed =>

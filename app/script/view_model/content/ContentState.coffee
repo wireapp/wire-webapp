@@ -18,16 +18,14 @@
 
 window.z ?= {}
 z.ViewModel ?= {}
+z.ViewModel.content ?= {}
 
-SETTING =
-  ALL: '0'
-  NONE: '2'
-  SOME: '1'
 
-LOCALYTICS_SOUND_SETTING =
-  ALL: 'alwaysPlay'
-  SOME: 'FirstMessageOnly'
-  NONE: 'neverPlay'
-
-class z.ViewModel.SettingsViewModel
-  constructor: () ->
+z.ViewModel.content.CONTENT_STATE =
+  CONVERSATION: 'z.ViewModel.content.CONTENT_STATE.CONVERSATION'
+  CONNECTION_REQUESTS: 'z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS'
+  PREFERENCES_ABOUT: 'z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT'
+  PREFERENCES_ACCOUNT: 'z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT'
+  PREFERENCES_DEVICES: 'z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES'
+  PREFERENCES_OPTIONS: 'z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS'
+  WATERMARK: 'z.ViewModel.content.CONTENT_STATE.WATERMARK'
