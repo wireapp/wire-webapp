@@ -138,14 +138,12 @@ class z.user.UserService
   @option data [Integer] accent_id
   @option data [String] name
   @option data [Array<z.assets.Asset>] picture
-  @param callback [Function] Function to be called on server return
   ###
-  update_own_user_profile: (data, callback) ->
+  update_own_user_profile: (data) ->
     @client.send_json
       type: 'PUT'
       url: @client.create_url @URL_SELF
       data: data
-      callback: callback
 
   ###
   Change user email.
