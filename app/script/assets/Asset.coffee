@@ -40,8 +40,8 @@ class z.assets.Asset
       md5: config.md5
       width: config.width
       height: config.height
-      original_width: config.original_width
-      original_height: config.original_height
+      original_width: config.original_width or config.width
+      original_height: config.original_height or config.width
       native_push: config.native_push or false
 
   # Create the content disposition header for the asset.
@@ -50,15 +50,3 @@ class z.assets.Asset
     for key, value of @payload
       payload.push "#{key}=#{value}"
     return payload.join ';'
-
-  ###
-  Sets the image payload of the asset.
-
-  @param image [Object] Image object to be set on the asset entity
-  ###
-  set_image: (image) ->
-    @content_type = z.util.get_content_type_from_data_url image.src
-    @array_buffer = z.util.base64_to_array image.src
-    @payload.width = image.width
-    @payload.height = image.height
-    @payload.md5 = z.util.encode_base64_md5_array_buffer_view @array_buffer

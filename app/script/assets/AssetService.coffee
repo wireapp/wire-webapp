@@ -28,45 +28,27 @@ class z.assets.AssetService
   ###
   constructor: (@client) ->
     @logger = new z.util.Logger 'z.assets.AssetService', z.config.LOGGER.OPTIONS
-    @rotator = new zeta.webapp.module.image.rotation.ImageFileRotator()
-    @compressor = new zeta.webapp.module.image.ImageCompressor()
-
     @BOUNDARY = 'frontier'
-
-    @SMALL_PROFILE_CONFIG =
-      squared: true
-      max_image_size: 280
-      max_byte_size: 1024 * 1024
-      lossy_scaling: true
-      compression: 0.7
-
     @pending_uploads = {}
-
-  ###############################################################################
-  # REST API calls
-  ###############################################################################
 
   ###
   Upload any asset to the backend using asset api v1.
 
   @deprecated
   @param config [Object] Configuration object containing the jQuery call settings
-  @option config [String] url
   @option config [Object] data
   @option config [String] contentType
   @option config [String] contentDisposition
-  @option config [Function] callback
   ###
   post_asset: (config) ->
     @client.send_request
       type: 'POST'
-      url: config.url
+      url: @client.create_url '/assets'
       data: config.data
       processData: false # otherwise jquery will convert it to a query string
       contentType: config.contentType
       headers:
         'Content-Disposition': config.contentDisposition
-      callback: config.callback
 
   ###
   Upload any asset pair to the backend using asset api v1.
@@ -79,30 +61,48 @@ class z.assets.AssetService
     Promise.all [
       @post_asset
         contentType: small.content_type
-        url: @client.create_url '/assets'
         contentDisposition: small.get_content_disposition()
         data: small.array_buffer
       @post_asset
         contentType: medium.content_type
-        url: @client.create_url '/assets'
         contentDisposition: medium.get_content_disposition()
         data: medium.array_buffer
     ]
-
-  ###############################################################################
-  # Asset service interactions
-  ###############################################################################
 
   ###
   Update the user profile image by first making it usable, transforming it and then uploading the asset pair.
 
   @deprecated
   @param conversation_id [String] ID of self conversation
-  @param file [File, Blob] Image
+  @param image [File, Blob]
   ###
-  upload_profile_image: (conversation_id, file, callback) ->
-    @_convert_image file, (image) =>
-      @_upload_profile_assets conversation_id, image, callback
+  upload_profile_image: (conversation_id, image) ->
+    Promise.all([
+      @_compress_profile_image image
+      @_compress_image image
+    ]).then ([small, medium]) =>
+      [small_image, small_image_bytes] = small
+      [medium_image, medium_image_bytes] = medium
+
+      medium_asset = new z.assets.Asset
+        array_buffer: medium_image_bytes
+        content_type: 'image/jpg'
+        conversation_id: conversation_id
+        md5: z.util.encode_base64_md5_array_buffer_view medium_image_bytes
+        width: medium_image.height
+        height: medium_image.height
+        public: true
+
+      small_profile_asset = $.extend true, {}, medium_asset
+      small_profile_asset.array_buffer = small_image_bytes
+      small_profile_asset.payload.width = small_image.width
+      small_profile_asset.payload.height = small_image.height
+      small_profile_asset.payload.md5 = z.util.encode_base64_md5_array_buffer_view small_image_bytes
+      small_profile_asset.payload.tag = z.assets.ImageSizeType.SMALL_PROFILE
+
+      @post_asset_pair small_profile_asset, medium_asset
+    .then ([small_response, medium_response]) ->
+      return [small_response.data, medium_response.data]
 
   ###
   Upload arbitrary binary data using the new asset api v3.
@@ -182,74 +182,6 @@ class z.assets.AssetService
     asset_url = "#{url}?access_token=#{@client.access_token}"
     asset_url = "#{asset_url}&asset_token=#{asset_token}" if asset_token
     return asset_url
-
-  ###############################################################################
-  # Private
-  ###############################################################################
-
-  ###
-  Convert an image before uploading it.
-
-  @param file [File, Blob] Image
-  @param callback [Function] Function to be called on return
-  ###
-  _convert_image: (file, callback) ->
-    @_rotate_image file, (rotated_file) ->
-      z.util.read_deferred(rotated_file, 'url').done (url) ->
-        image = new Image()
-        image.onload = -> callback image
-        image.onerror = (e) => @logger.log "Loading image failed #{e}"
-        image.src = url
-  ###
-  Rotate an image file unless it is a gif.
-
-  @private
-
-  @param file [Object] Image file to be rotated
-  @param callback [Function] Function to be called on return
-  ###
-  _rotate_image: (file, callback) ->
-    return callback file if file.type is 'image/gif'
-    @rotator.rotate file, callback
-
-  ###
-  Update the profile image of the user.
-
-  @note We need to upload it in sizes 'smallProfile', and 'medium'.
-  @private
-
-  @param conversation_id [String] ID of the self conversation
-  @param image [Object] Image to be used as new profile picture
-  @param callback [Function] Function to be called on server return
-  ###
-  _upload_profile_assets: (conversation_id, image, callback) ->
-    # Finished compressing medium image
-    medium_image_compressed = (medium_image) =>
-      medium_asset = new z.assets.Asset
-        conversation_id: conversation_id
-        original_width: medium_image.width
-        original_height: medium_image.height
-        public: true
-      medium_asset.set_image medium_image
-
-      # Finished compressing small image
-      small_profile_image_compressed = (small_image) =>
-        small_profile_asset = $.extend true, {}, medium_asset
-        small_profile_asset.payload.tag = z.assets.ImageSizeType.SMALL_PROFILE
-        small_profile_asset.set_image small_image
-
-        @post_asset_pair small_profile_asset, medium_asset
-        .then (value) ->
-          [small_response, medium_response] = value
-          callback [small_response.data, medium_response.data]
-        .catch (error) ->
-          callback [], error
-
-      # Compress small image
-      @compressor.transform_image medium_image, small_profile_image_compressed, @SMALL_PROFILE_CONFIG
-
-    # Compress medium image
-    @compressor.transform_image image, medium_image_compressed # default config #
 
   ###
   Create request data for asset upload.
@@ -390,22 +322,33 @@ class z.assets.AssetService
       asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256
       return [asset, ciphertext]
 
-  ###############################################################################
-  # Image processing
-  ###############################################################################
-
   ###
   Compress image.
-  @param asset [File, Blob]
+  @param image [File, Blob]
   ###
-  _compress_image: (blob) ->
-    z.util.load_file_buffer blob
+  _compress_image: (image) ->
+    @_compress_image_with_worker 'worker/image-worker.js', image, -> image.type is 'image/gif'
+
+  ###
+  Compress profile image.
+  @param image [File, Blob]
+  ###
+  _compress_profile_image: (image) ->
+    @_compress_image_with_worker 'worker/profile-image-worker.js', image
+
+  ###
+  Compress image using given worker.
+  @param worker [String] path to worker file
+  @param image [File, Blob]
+  @param filter [Function] skips compression if function returns true
+  ###
+  _compress_image_with_worker: (worker, image, filter) ->
+    z.util.load_file_buffer image
     .then (buffer) ->
-      if blob.type is 'image/gif'
-        return z.util.load_file_buffer blob
-      image_worker = new z.util.Worker 'worker/image-worker.js'
+      return buffer if filter?()
+      image_worker = new z.util.Worker worker
       return image_worker.post buffer
     .then (compressed_bytes) ->
-      return z.util.load_image new Blob [new Uint8Array compressed_bytes], 'type': blob.type
+      return z.util.load_image new Blob [new Uint8Array compressed_bytes], 'type': image.type
       .then (compressed_image) ->
         return [compressed_image, new Uint8Array compressed_bytes]
