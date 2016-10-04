@@ -31,10 +31,6 @@ class z.assets.AssetService
     @BOUNDARY = 'frontier'
     @pending_uploads = {}
 
-  ###############################################################################
-  # REST API calls
-  ###############################################################################
-
   ###
   Upload any asset to the backend using asset api v1.
 
@@ -77,10 +73,6 @@ class z.assets.AssetService
         contentDisposition: medium.get_content_disposition()
         data: medium.array_buffer
     ]
-
-  ###############################################################################
-  # Asset service interactions
-  ###############################################################################
 
   ###
   Update the user profile image by first making it usable, transforming it and then uploading the asset pair.
@@ -195,10 +187,6 @@ class z.assets.AssetService
     asset_url = "#{url}?access_token=#{@client.access_token}"
     asset_url = "#{asset_url}&asset_token=#{asset_token}" if asset_token
     return asset_url
-
-  ###############################################################################
-  # Private
-  ###############################################################################
 
   ###
   Create request data for asset upload.
@@ -338,10 +326,6 @@ class z.assets.AssetService
       asset = new z.proto.Asset()
       asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256
       return [asset, ciphertext]
-
-  ###############################################################################
-  # Image processing
-  ###############################################################################
 
   ###
   Compress image.
