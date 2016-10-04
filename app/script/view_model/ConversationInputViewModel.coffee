@@ -204,7 +204,7 @@ class z.ViewModel.ConversationInputViewModel
         @cancel_edit()
       when z.util.KEYCODE.ENTER
         if event.altKey
-          z.util.insert_at_caret event.target, '\n'
+          z.util.KeyUtil.insert_at_caret event.target, '\n'
           $(event.target).change()
           event.preventDefault()
     return true
