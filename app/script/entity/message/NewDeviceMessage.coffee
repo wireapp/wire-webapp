@@ -56,6 +56,6 @@ class z.entity.NewDeviceMessage extends z.entity.Message
   click_on_device: =>
     # TODO device
     if @device_owner()?.is_me
-      amplify.publish z.event.WebApp.PROFILE.SETTINGS.SHOW
+      amplify.publish z.event.WebApp.PREFERENCES.MANAGE_DEVICES
     else
       amplify.subscribe z.event.WebApp.SHORTCUT.PEOPLE

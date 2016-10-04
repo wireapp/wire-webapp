@@ -267,6 +267,9 @@ z.string.de.conversation_edit_timestamp = 'Editiert um %@timestamp'
 z.string.de.conversation_likes_caption = '%@number Personen'
 z.string.de.conversation_message_delivered = 'Zugestellt'
 
+# Archive
+z.string.de.archive_header = 'Archiv'
+
 # Conversation list
 z.string.de.conversation_list_empty_conversation = 'Leere Unterhaltung'
 z.string.de.conversation_list_many_connection_request = '%no Kontaktanfragen'

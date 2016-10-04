@@ -87,8 +87,8 @@ class z.ViewModel.ParticipantsViewModel
       replace: {placeholder: '%shortcut', content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.ADD_PEOPLE}
     }
 
-    amplify.subscribe z.event.WebApp.PENDING.SHOW, =>
-      @participants_bubble.hide()
+    amplify.subscribe z.event.WebApp.CONTENT.SWITCH, (content_state) =>
+      @participants_bubble.hide() if content_state is z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
 
     amplify.subscribe z.event.WebApp.PEOPLE.SHOW, (user_et) =>
       @user_profile user_et
@@ -189,11 +189,11 @@ class z.ViewModel.ParticipantsViewModel
       data:
         user: user_et
       confirm: =>
-        @conversation_repository.remove_member @conversation(), user_et.id, (response, error) =>
+        @conversation_repository.remove_member @conversation(), user_et.id, (response) =>
           @reset_view() if response
 
-  show_self_profile: ->
-    amplify.publish z.event.WebApp.PROFILE.SHOW
+  show_account: ->
+    amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
 
   unblock: (user_et) =>
     @confirm_dialog = $('#participants').confirm

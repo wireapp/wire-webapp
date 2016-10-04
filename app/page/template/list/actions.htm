@@ -1,56 +1,56 @@
-<div id="actions-bubble" class="bubble">
+<div id="actions-bubble" class="bubble" data-bind="with: $root.actions">
   <ul class="bubble-menu">
     <!-- ko if: selected_conversation() -->
       <!-- ko if: !selected_conversation().is_request() && selected_conversation().removed_from_conversation() === false -->
         <!-- ko if: selected_conversation().is_muted() -->
           <li data-bind="click: click_on_mute_action,
                          attr: {'title': notify_conversation_tooltip},
-                         l10n_text: z.string.conversation_list_popover_notify"
+                         l10n_text: z.string.conversations_popover_notify"
               data-uie-name="do-notify"></li>
         <!-- /ko -->
         <!-- ko ifnot: selected_conversation().is_muted() -->
           <li data-bind="click: click_on_mute_action,
                          attr: {'title': silence_conversation_tooltip},
-                         l10n_text: z.string.conversation_list_popover_silence"
+                         l10n_text: z.string.conversations_popover_silence"
               data-uie-name="do-silence"></li>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: selected_conversation().is_archived() -->
         <li data-bind="click: click_on_unarchive_action,
-                       l10n_text: z.string.conversation_list_popover_unarchive,
-                       l10n_tooltip: z.string.conversation_list_popover_unarchive"
+                       l10n_text: z.string.conversations_popover_unarchive,
+                       l10n_tooltip: z.string.conversations_popover_unarchive"
             data-uie-name="do-unarchive"></li>
       <!-- /ko -->
       <!-- ko ifnot: selected_conversation().is_archived() -->
         <li data-bind="click: click_on_archive_action,
                        attr: {'title': archive_conversation_tooltip},
-                       l10n_text: z.string.conversation_list_popover_archive"
+                       l10n_text: z.string.conversations_popover_archive"
             data-uie-name="do-archive"></li>
       <!-- /ko -->
       <!-- ko if: selected_conversation().is_request() -->
         <li data-bind="click: click_on_cancel_action,
-                       l10n_text: z.string.conversation_list_popover_cancel,
-                       l10n_tooltip: z.string.conversation_list_popover_cancel"
+                       l10n_text: z.string.conversations_popover_cancel,
+                       l10n_tooltip: z.string.conversations_popover_cancel"
             data-uie-name="do-cancel-request"></li>
       <!-- /ko -->
       <!-- ko ifnot: selected_conversation().is_request() -->
         <!-- ko ifnot: selected_conversation().is_cleared() -->
           <li data-bind="click: click_on_clear_action,
-                         l10n_text: z.string.conversation_list_popover_clear,
-                         l10n_tooltip: z.string.conversation_list_popover_clear"
+                         l10n_text: z.string.conversations_popover_clear,
+                         l10n_tooltip: z.string.conversations_popover_clear"
               data-uie-name="do-clear"></li>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko ifnot: selected_conversation().is_group() -->
         <li data-bind="click: click_on_block_action,
-                       l10n_text: z.string.conversation_list_popover_block,
+                       l10n_text: z.string.conversations_popover_block,
                        l10n_tooltip: z.string.tooltip_people_block"
             data-uie-name="do-block"></li>
       <!-- /ko -->
       <!-- ko ifnot: selected_conversation().is_request() -->
         <!-- ko if: selected_conversation().is_group() && selected_conversation().removed_from_conversation() === false -->
           <li data-bind="click: click_on_leave_action,
-                         l10n_text: z.string.conversation_list_popover_leave,
+                         l10n_text: z.string.conversations_popover_leave,
                          l10n_tooltip: z.string.tooltip_people_leave"
               data-uie-name="do-leave"></li>
         <!-- /ko -->

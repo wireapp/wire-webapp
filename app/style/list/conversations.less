@@ -17,35 +17,52 @@
  *
  */
 
-.archive {
+.conversations {
+  position: absolute;
+  top: 0;
+  right: 0;
   bottom: 0;
   display: flex;
   flex-direction: column;
-  position: absolute;
-  right: 0;
-  top: 0;
   width: @left-width;
 
-  &:not(.archive-is-visible) {
+  .os-mac.platform-electron & {
+    padding-top: 40px;
+  }
+
+  &:not(.left-list-is-visible) {
     .start-ui-transition-fadeout();
   }
 
-  &.archive-is-visible {
+  &.left-list-is-visible {
     .start-ui-transition-fadein();
   }
 }
 
-.archive-header {
-  align-items: center;
+.conversations-footer {
+  height: @conversation-input-min-height;
+  color: #fff;
   display: flex;
-  justify-content: center;
-  height: 40px;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 12px;
+  padding-right: 12px;
+
+  .conversations-footer-contacts-label {
+    .label-xs;
+    color: #fff;
+    margin-left: 16px;
+  }
+}
+
+.conversations-settings {
   position: relative;
 }
 
-.archive-header-close-button {
+.conversations-settings-badge {
+  .dot-md;
+  content: "";
   position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 5px;
+  top: 5px;
 }

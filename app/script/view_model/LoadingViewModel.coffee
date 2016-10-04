@@ -31,31 +31,30 @@ class z.ViewModel.LoadingViewModel
     ko.applyBindings @, document.getElementById element_id
 
   switch_message: (message_locator, next_step = false, replace_content) =>
-    _create_message = (message_locator, replacements) ->
-      replacements = ({placeholder: replacement[0], content: replacement[1]} for replacement in replacements)
-      return z.localization.Localizer.get_text {
-        id: message_locator
-        replace: replacements
-      }
-
-    switch message_locator
-      when z.string.init_received_self_user
-        message = _create_message message_locator, [['%name', @user_repository.self().first_name()]]
-      when z.string.init_events_expectation
-        if replace_content[0] > 200
-          message_locator = z.string.init_events_expectation_long
-        message = _create_message message_locator, [['%events', replace_content[0]]]
-      when z.string.init_events_progress, z.string.init_sessions_progress
-        message = _create_message message_locator, [['%progress', replace_content[0]], ['%total', replace_content[1]]]
-      when z.string.init_sessions_expectation
-        if replace_content[0] > 100
-          message_locator = z.string.init_sessions_expectation_long
-        message = _create_message message_locator, [['%sessions', replace_content[0]]]
-      else
-        message = z.localization.Localizer.get_text message_locator
-
     if not z.util.Environment.frontend.is_production()
-      @loading_message message
+      _create_message = (message_locator, replacements) ->
+        replacements = ({placeholder: replacement[0], content: replacement[1]} for replacement in replacements)
+        return z.localization.Localizer.get_text {
+          id: message_locator
+          replace: replacements
+        }
+
+      @loading_message switch message_locator
+        when z.string.init_received_self_user
+          _create_message message_locator, [['%name', @user_repository.self().first_name()]]
+        when z.string.init_events_expectation
+          if replace_content[0] > 200
+            message_locator = z.string.init_events_expectation_long
+          _create_message message_locator, [['%events', replace_content[0]]]
+        when z.string.init_events_progress, z.string.init_sessions_progress
+          _create_message message_locator, [['%progress', replace_content[0]], ['%total', replace_content[1]]]
+        when z.string.init_sessions_expectation
+          if replace_content[0] > 100
+            message_locator = z.string.init_sessions_expectation_long
+          _create_message message_locator, [['%sessions', replace_content[0]]]
+        else
+          z.localization.Localizer.get_text message_locator
+
     @_next_step() if next_step
 
   _next_step: ->

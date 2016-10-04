@@ -18,21 +18,15 @@
 
 window.z ?= {}
 z.ViewModel ?= {}
+z.ViewModel.content ?= {}
 
 
-z.ViewModel.CONTENT_STATE =
-  PENDING: 'pending'
-  CONVERSATION: 'conversation'
-  PROFILE: 'profile'
-  BLANK: ''
-
-
-class z.ViewModel.RightViewModel
+class z.ViewModel.content.ContentViewModel
   constructor: (element_id, @user_repository, @conversation_repository, @call_center, @search_repository, @giphy_repository, @client_repository) ->
-    @logger = new z.util.Logger 'z.ViewModel.RightViewModel', z.config.LOGGER.OPTIONS
+    @logger = new z.util.Logger 'z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS
 
     # state
-    @state = ko.observable z.ViewModel.CONTENT_STATE.BLANK
+    @content_state = ko.observable z.ViewModel.content.CONTENT_STATE.WATERMARK
     @multitasking =
       auto_minimize: ko.observable true
       is_minimized: ko.observable false
@@ -41,20 +35,24 @@ class z.ViewModel.RightViewModel
     # nested view models
     @call_shortcuts =        new z.ViewModel.CallShortcutsViewModel @call_center
     @video_calling =         new z.ViewModel.VideoCallingViewModel 'video-calling', @call_center, @user_repository, @conversation_repository, @multitasking
-    @connect_requests =      new z.ViewModel.ConnectRequestsViewModel 'connect-requests', @user_repository
+    @connect_requests =      new z.ViewModel.content.ConnectRequestsViewModel 'connect-requests', @user_repository
     @conversation_titlebar = new z.ViewModel.ConversationTitlebarViewModel 'conversation-titlebar', @conversation_repository, @call_center, @multitasking
     @conversation_input =    new z.ViewModel.ConversationInputViewModel 'conversation-input', @conversation_repository, @user_repository
     @message_list =          new z.ViewModel.MessageListViewModel 'message-list', @conversation_repository, @user_repository
     @participants =          new z.ViewModel.ParticipantsViewModel 'participants', @user_repository, @conversation_repository, @search_repository
-    @self_profile =          new z.ViewModel.SelfProfileViewModel 'self-profile', @user_repository, @client_repository
     @giphy =                 new z.ViewModel.GiphyViewModel 'giphy-modal', @conversation_repository, @giphy_repository
     @detail_view =           new z.ViewModel.ImageDetailViewViewModel 'detail-view'
+
+    @preferences_about =        new z.ViewModel.content.PreferencesAboutViewModel 'preferences-about'
+    @preferences_account =      new z.ViewModel.content.PreferencesAccountViewModel 'preferences-account', @client_repository, @user_repository
+    @preferences_devices =      new z.ViewModel.content.PreferencesDevicesViewModel 'preferences-devices', @client_repository, @conversation_repository, @cryptography_repository
+    @preferences_options =      new z.ViewModel.content.PreferencesOptionsViewModel 'preferences-options'
 
     @previous_state = undefined
     @previous_conversation = undefined
 
-    @state.subscribe (value) =>
-      if value is z.ViewModel.CONTENT_STATE.CONVERSATION
+    @content_state.subscribe (value) =>
+      if value is z.ViewModel.content.CONTENT_STATE.CONVERSATION
         @conversation_input.added_to_view()
         @conversation_titlebar.added_to_view()
       else
@@ -67,7 +65,7 @@ class z.ViewModel.RightViewModel
         conversation_type: if @call_center.joined_call().is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
 
     @user_repository.connect_requests.subscribe (requests) =>
-      if @state() is z.ViewModel.CONTENT_STATE.PENDING and requests.length is 0
+      if @content_state() is z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS and requests.length is 0
         @show_conversation @conversation_repository.get_most_recent_conversation()
 
     @_init_subscriptions()
@@ -75,18 +73,15 @@ class z.ViewModel.RightViewModel
     ko.applyBindings @, document.getElementById element_id
 
   _init_subscriptions: =>
+    amplify.subscribe z.event.WebApp.CONTENT.SWITCH,        @switch_content
     amplify.subscribe z.event.WebApp.CONVERSATION.SHOW,     @show_conversation
     amplify.subscribe z.event.WebApp.CONVERSATION.SWITCH,   @switch_conversation
     amplify.subscribe z.event.WebApp.LIST.SCROLL,           @conversation_input.show_separator
-    amplify.subscribe z.event.WebApp.PENDING.SHOW,          @show_connect_requests
     amplify.subscribe z.event.WebApp.PEOPLE.TOGGLE,         @participants.toggle_participants_bubble
-    amplify.subscribe z.event.WebApp.PROFILE.SHOW,          @show_self_profile
-    amplify.subscribe z.event.WebApp.PROFILE.HIDE,          @hide_self_profile
     amplify.subscribe z.event.WebApp.WINDOW.RESIZE.HEIGHT,  @message_list.scroll_height
 
   ###
   Slide in specified content.
-
   @param content_selector [String] dom element to apply slide in animation
   ###
   _shift_content: (content_selector) ->
@@ -108,78 +103,69 @@ class z.ViewModel.RightViewModel
   @param conversation_et [z.entity.Conversation | String] Conversation entity or conversation ID
   ###
   show_conversation: (conversation_et) =>
-    return @show_connect_requests() if not conversation_et?
-    conversation_et = @conversation_repository.get_conversation_by_id conversation_et if not conversation_et.id?
+    return @switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS if not conversation_et
+
+    conversation_et = @conversation_repository.get_conversation_by_id conversation_et if not conversation_et.id
     return if conversation_et is @conversation_repository.active_conversation()
 
-    show_conversation = =>
-      @logger.log @logger.levels.LEVEL_1, "Switching view to conversation: #{conversation_et.id}"
-      @state z.ViewModel.CONTENT_STATE.CONVERSATION
-      @message_list.change_conversation conversation_et, =>
-        @_shift_content '.conversation'
-        @participants.change_conversation conversation_et
-
+    @content_state z.ViewModel.content.CONTENT_STATE.CONVERSATION
     @conversation_repository.active_conversation conversation_et
+    @message_list.change_conversation conversation_et, =>
+      @switch_content z.ViewModel.content.CONTENT_STATE.CONVERSATION
+      @participants.change_conversation conversation_et
+      @previous_conversation = @conversation_repository.active_conversation()
 
-    if @state() is z.ViewModel.CONTENT_STATE.PROFILE
-      @self_profile.hide()
-      setTimeout show_conversation, 750 # wait for self profile to disappear
-    else
-      show_conversation()
+  switch_content: (new_content_state) =>
+    return false if @content_state() is new_content_state
 
-  ###
-  Opens the incoming connection requests.
-
-  @note If there are no connection requests, it will open the self profile instead
-  ###
-  show_connect_requests: =>
-    return @show_self_profile() if @user_repository.connect_requests().length < 1
-
-    show_connect_request = =>
-      @conversation_repository.active_conversation null
-      @state z.ViewModel.CONTENT_STATE.PENDING
-      @_shift_content '.connect-requests'
-
-    @message_list.release_conversation() if @state() is z.ViewModel.CONTENT_STATE.CONVERSATION
-
-    if @state() is z.ViewModel.CONTENT_STATE.PROFILE
-      @self_profile.hide()
-      setTimeout show_connect_request, 750 # wait for self profile to disappear
-    else
-      show_connect_request()
-
-  ###
-  Open self profile.
-
-  @param animate [Boolean] Do background animation
-  ###
-  show_self_profile: (animate = true) =>
-    return if @state() is z.ViewModel.CONTENT_STATE.PROFILE
-
-    @previous_state = @state()
-    @previous_conversation = @conversation_repository.active_conversation()
-
-    @message_list.release_conversation() if @state() is z.ViewModel.CONTENT_STATE.CONVERSATION
-
-    @conversation_repository.active_conversation null
-    amplify.publish z.event.WebApp.LIST.FULLSCREEN_ANIM_DISABLED if not animate
-    @state z.ViewModel.CONTENT_STATE.PROFILE
-    @self_profile.show()
-
-  ###
-  Close self profile.
-  ###
-  hide_self_profile: =>
-    if @previous_state is z.ViewModel.CONTENT_STATE.PENDING
-      @show_connect_requests()
-    else
-      @show_conversation @previous_conversation
+    @_release_content()
+    new_content_state = @_check_content_availability new_content_state
+    if new_content_state isnt z.ViewModel.content.CONTENT_STATE.WELCOME
+      @_show_content new_content_state
 
   ###
   Switches the conversation if the other one is shown.
-
   @param conversation_et [z.entity.Conversation] Conversation entity to be verified as currently active for the switch
   @param next_conversation_et [z.entity.Conversation] Conversation entity to be shown
   ###
   switch_conversation: (conversation_et, next_conversation_et) =>
     @show_conversation next_conversation_et if @conversation_repository.is_active_conversation conversation_et
+
+  switch_previous_content: =>
+    if @previous_state is z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+      @switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+    else
+      @show_conversation @previous_conversation
+
+  _check_content_availability: (content_state) ->
+    if content_state is z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+      return z.ViewModel.content.CONTENT_STATE.WATERMARK if not @user_repository.connect_requests().length
+    return content_state
+
+  _get_element_of_content: (content_state) ->
+    switch content_state
+      when z.ViewModel.content.CONTENT_STATE.CONVERSATION then '.conversation'
+      when z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS then '.connect-requests'
+      when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT then '.preferences-about'
+      when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT then '.preferences-account'
+      when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES then '.preferences-devices'
+      when z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS then '.preferences-options'
+      else '.blank'
+
+  _release_content: ->
+    @previous_state = @content_state()
+
+    if @previous_state is z.ViewModel.content.CONTENT_STATE.CONVERSATION
+      @conversation_repository.active_conversation null
+      @message_list.release_conversation()
+
+  _show_content: (new_content_state) ->
+    _show_content = =>
+      @content_state new_content_state
+      @_shift_content @_get_element_of_content new_content_state
+
+    if @previous_state is z.ViewModel.content.CONTENT_STATE.WELCOME
+      @self_profile.hide()
+      window.setTimeout _show_content, 750 # wait for self profile to disappear
+    else
+      _show_content()

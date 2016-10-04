@@ -1,0 +1,44 @@
+<div id="preferences-account" class="preferences-page preferences-account" data-bind="with: $root.preferences_account">
+  <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_account"></div>
+  <div class="preferences-content">
+    <!-- ko if: self_user() -->
+      <div>
+        <input-element class="preferences-account-name" params="value: self_user().name, change: change_username, placeholder: z.string.preferences_account_username_placeholder" data-uie-name="enter-name" data-bind="l10n_tooltip: z.string.tooltip_profile_rename"></input-element>
+        <div class="preferences-account-mail" data-bind="text: self_user().email()" data-uie-name="enter-email"></div>
+        <div class="preferences-account-phone" data-bind="text: self_user().phone()" data-uie-name="enter-phone"></div>
+        <user-avatar class="preferences-account-avatar user-avatar-xl camera"
+                     data-bind="l10n_tooltip: z.string.tooltip_profile_picture"
+                     params="user: self_user(), click: click_on_change_picture"></user-avatar>
+        <input id="self-upload-file-input"
+               type="file" accept="image/jpg,image/jpeg,image/png,image/bmp"
+               data-bind="file_select: click_on_change_picture"
+               data-uie-name="do-select-picture"/>
+        <accent-color-picker class="v-account-color-picker" params="user: self_user(), selected: change_accent_color" data-uie-name="enter-accent-color"></accent-color-picker>
+        <section class="self-preferences-section">
+          <label class="control-label" data-bind="l10n_text: z.string.preferences_account"></label>
+          <div class="form-control account-controls">
+            <span class="button-label text-theme"
+                  data-bind="click: click_on_reset_password, l10n_text: z.string.preferences_account_password_reset, l10n_tooltip: z.string.tooltip_preferences_password"
+                  data-uie-name="go-password-reset"></span>
+            <div class="self-preferences-delete">
+              <!-- ko if: delete_status() === 'button' -->
+                <span class="button-label text-red"
+                      data-uie-name="go-delete-account"
+                      data-bind="click: click_on_delete, l10n_text: z.string.preferences_account_delete">
+                </span>
+              <!-- /ko -->
+              <!-- ko if: delete_status() === 'dialog' -->
+                <p data-uie-name="delete-confirm-text" data-bind="text: delete_confirm_text"></p>
+                <span class="button button-sm" data-uie-name="do-delete-account" data-bind="click: click_on_delete_send, l10n_text: z.string.modal_button_send"></span>
+                <span class="button-label text-theme delete-cancel-button" data-uie-name="do-delete-cancel" data-bind="click: click_on_delete_cancel, l10n_text: z.string.modal_button_cancel"></span>
+              <!-- /ko -->
+              <!-- ko if: delete_status() === 'sent' -->
+                <span data-uie-name="delete-sent" data-bind="click: click_on_delete, l10n_text: z.string.preferences_account_email_sent"></span>
+              <!-- /ko -->
+            </div>
+          </div>
+        </section>
+      </div>
+    <!-- /ko -->
+  </div>
+</div>

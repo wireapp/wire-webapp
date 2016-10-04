@@ -1,0 +1,72 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.preferences-page {
+  .preferences-titlebar {
+    .label-bold-xs;
+    align-items: center;
+    background-color: @app-bg;
+    border-bottom: 1px solid fade(@graphite, 12%);
+    display: flex;
+    height: @content-title-bar-height;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+  }
+
+  .preferences-content {
+    margin: 32px 32px 32px 72px;
+    width: 560px;
+
+    .preferences-control {
+      padding-left: -32px;
+    }
+
+    .preferences-detail {
+      .label-semibold-xs;
+      color: @graphite;
+      line-height: @line-height-sm;
+    }
+
+    .preferences-header {
+      .label-bold-xs;
+      color: @graphite-dark;
+      line-height: @line-height-sm;
+      margin-bottom: 16px;
+    }
+
+    .preferences-link {
+      display: block;
+      font-size: @font-size-sm;
+      line-height: @line-height-xl;
+    }
+
+    .preferences-section {
+      margin-bottom: 32px;
+    }
+
+    .preferences-separator {
+      background: @seperator-color;
+      border: 0;
+      height: 1px;
+    }
+  }
+}
+
+
