@@ -58,9 +58,8 @@ class z.auth.AuthService
   ###
   get_invitations_info: (code) ->
     @client.send_request
-      url: @client.create_url "#{@URL_INVITATIONS}/info"
+      url: @client.create_url "#{@URL_INVITATIONS}/info?code=#{code}"
       type: 'GET'
-      data: "code=#{code}"
 
   ###
   Get access-token if a valid cookie is provided.
@@ -207,7 +206,7 @@ class z.auth.AuthService
   ###
   post_login_send: (request_code) ->
     @client.send_json
-      url: @client.create_url "#{@URL_ACCESS}/logout"
+      url: @client.create_url "#{@URL_LOGIN}/send"
       type: 'POST'
       data: request_code
 
@@ -235,7 +234,7 @@ class z.auth.AuthService
   ###
   post_register: (new_user) ->
     @client.send_json
-      url: @client.create_url "#{@URL_COOKIES}/remove"
+      url: @client.create_url "#{@URL_REGISTER}?challenge_cookie=true"
       type: 'POST'
       data: new_user
       withCredentials: true
