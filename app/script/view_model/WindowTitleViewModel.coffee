@@ -45,23 +45,29 @@ class z.ViewModel.WindowTitleViewModel
       amplify.publish z.event.WebApp.CONVERSATION.UNREAD, badge_count
 
       switch @content_state()
-        when z.ViewModel.CONTENT_STATE.PENDING
+        when z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
           if number_of_connect_requests > 1
             window_title += z.localization.Localizer.get_text {
-              id: z.string.conversation_list_many_connection_request
+              id: z.string.conversations_connection_request_many
               replace: {placeholder: '%no', content: number_of_connect_requests}
             }
           else
-            window_title += z.localization.Localizer.get_text z.string.conversation_list_one_connection_request
-        when z.ViewModel.CONTENT_STATE.CONVERSATION
+            window_title += z.localization.Localizer.get_text z.string.conversations_connection_request_one
+        when z.ViewModel.content.CONTENT_STATE.CONVERSATION
           window_title += @conversation_repository.active_conversation()?.display_name()
-        when z.ViewModel.CONTENT_STATE.PROFILE
-          window_title += @user_repository.self().name()
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
+          window_title += z.localization.Localizer.get_text z.string.preferences_about
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+          window_title += z.localization.Localizer.get_text z.string.preferences_account
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
+          window_title += z.localization.Localizer.get_text z.string.preferences_devices
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
+          window_title += z.localization.Localizer.get_text z.string.preferences_options
 
       if window_title is ''
         window_title = z.localization.Localizer.get_text z.string.wire
       else
-        window_title += " - #{z.localization.Localizer.get_text z.string.wire}"
+        window_title += " · #{z.localization.Localizer.get_text z.string.wire}"
 
       window.document.title = window_title
 

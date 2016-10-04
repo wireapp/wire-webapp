@@ -19,7 +19,7 @@
 window.z ?= {}
 z.ViewModel ?= {}
 
-# Parent: z.ViewModel.RightViewModel
+# Parent: z.ViewModel.ContentViewModel
 class z.ViewModel.ConversationInputViewModel
   constructor: (element_id, @conversation_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.ConversationInputViewModel', z.config.LOGGER.OPTIONS

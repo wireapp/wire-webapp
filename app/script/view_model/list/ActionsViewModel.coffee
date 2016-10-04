@@ -18,11 +18,19 @@
 
 window.z ?= {}
 z.ViewModel ?= {}
+z.ViewModel.list ?= {}
 
 
-class z.ViewModel.ActionsViewModel
-  constructor: (element_id, @conversation_repository, @user_repository, @conversation_list) ->
-    @logger = new z.util.Logger 'z.ViewModel.ActionsViewModel', z.config.LOGGER.OPTIONS
+class z.ViewModel.list.ActionsViewModel
+  ###
+  @param element_id [String] HTML selector
+  @param list_view_model [z.ViewModel.list.ListViewModel] List view model
+  @param conversations_view_model [z.ViewModel.list.ConversationListViewModel] Conversation list view model
+  @param conversation_repository [z.conversation.ConversationRepository] Conversation repository
+  @param user_repository [z.user.UserRepository] User repository
+  ###
+  constructor: (element_id, @list_view_model, @conversations_view_model, @conversation_repository, @user_repository) ->
+    @logger = new z.util.Logger 'z.ViewModel.list.ActionsViewModel', z.config.LOGGER.OPTIONS
 
     @action_bubbles = {}
     @selected_conversation = ko.observable()
@@ -30,46 +38,43 @@ class z.ViewModel.ActionsViewModel
     @conversations_unarchived = @conversation_repository.conversations_unarchived
 
     @archive_conversation_tooltip = z.localization.Localizer.get_text {
-      id: z.string.tooltip_conversation_list_archive
+      id: z.string.tooltip_conversations_archive
       replace: {placeholder: '%shortcut', content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.ARCHIVE}
     }
     @notify_conversation_tooltip = z.localization.Localizer.get_text {
-      id: z.string.tooltip_conversation_list_notify
+      id: z.string.tooltip_conversations_notify
       replace: {placeholder: '%shortcut', content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.SILENCE}
     }
     @silence_conversation_tooltip = z.localization.Localizer.get_text {
-      id: z.string.tooltip_conversation_list_silence
+      id: z.string.tooltip_conversations_silence
       replace: {placeholder: '%shortcut', content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.SILENCE}
     }
 
     # fix for older wrapper versions
-    @conversation_list.click_on_archive_action = @click_on_archive_action
-    @conversation_list.click_on_block_action = @click_on_block_action
-    @conversation_list.click_on_cancel_action = @click_on_cancel_action
-    @conversation_list.click_on_clear_action = @click_on_clear_action
-    @conversation_list.click_on_leave_action = @click_on_leave_action
-    @conversation_list.click_on_mute_action = @click_on_mute_action
-    @conversation_list.selected_conversation = @selected_conversation
+    @conversations_view_model.click_on_archive_action = @click_on_archive_action
+    @conversations_view_model.click_on_block_action = @click_on_block_action
+    @conversations_view_model.click_on_cancel_action = @click_on_cancel_action
+    @conversations_view_model.click_on_clear_action = @click_on_clear_action
+    @conversations_view_model.click_on_leave_action = @click_on_leave_action
+    @conversations_view_model.click_on_mute_action = @click_on_mute_action
+    @conversations_view_model.selected_conversation = @selected_conversation
 
     @_init_subscriptions()
-
-    ko.applyBindings @, document.getElementById element_id
 
   _init_subscriptions: =>
     amplify.subscribe z.event.WebApp.SHORTCUT.ARCHIVE, @click_on_archive_action
     amplify.subscribe z.event.WebApp.SHORTCUT.SILENCE, @click_on_mute_action
-    amplify.subscribe z.event.WebApp.ACTION.SHOW, @click_on_actions
 
   click_on_actions: (conversation_et, event) =>
     @selected_conversation conversation_et
 
-    $('.conversation-list-item').removeClass 'hover'
+    $('.left-list-item').removeClass 'hover'
     list_element = $(event.currentTarget.parentNode.parentNode).addClass 'hover'
 
     if not @action_bubbles[conversation_et.id]
       @action_bubbles[conversation_et.id] = new zeta.webapp.module.Bubble
         host_selector: "##{$(event.currentTarget).attr 'id'}"
-        scroll_selector: '.conversation-list-items'
+        scroll_selector: '.left-list-items'
         on_hide: =>
           list_element.removeClass 'hover'
           @action_bubbles[conversation_et.id] = undefined
@@ -124,13 +129,14 @@ class z.ViewModel.ActionsViewModel
     @_click_on_action()
     .then (conversation_et) =>
       @conversation_repository.unarchive_conversation conversation_et, =>
-        amplify.publish z.event.WebApp.ARCHIVE.CLOSE if @conversation_repository.conversations_archived().length is 0
+        if not @conversation_repository.conversations_archived().length
+          @list_view_model.switch_list z.ViewModel.list.LIST_STATE.CONVERSATIONS
 
   _click_on_action: =>
     return new Promise (resolve) =>
       conversation_et = @selected_conversation() or @conversation_repository.active_conversation()
       if conversation_et
-        amplify.publish z.event.WebApp.ARCHIVE.CLOSE if not conversation_et.is_archived()
+        @list_view_model.switch_list z.ViewModel.list.LIST_STATE.CONVERSATIONS if not conversation_et.is_archived()
         @action_bubbles[conversation_et.id]?.hide()
         @selected_conversation null
         resolve conversation_et

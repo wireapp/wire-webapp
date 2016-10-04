@@ -18,16 +18,9 @@
 
 window.z ?= {}
 z.ViewModel ?= {}
+z.ViewModel.content ?= {}
 
-SETTING =
-  ALL: '0'
-  NONE: '2'
-  SOME: '1'
 
-LOCALYTICS_SOUND_SETTING =
-  ALL: 'alwaysPlay'
-  SOME: 'FirstMessageOnly'
-  NONE: 'neverPlay'
-
-class z.ViewModel.SettingsViewModel
-  constructor: () ->
+class z.ViewModel.content.PreferencesAboutViewModel
+  constructor: (element_id) ->
+    @logger = new z.util.Logger 'z.ViewModel.content.PreferencesAboutViewModel', z.config.LOGGER.OPTIONS

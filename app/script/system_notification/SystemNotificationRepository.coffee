@@ -387,7 +387,7 @@ class z.SystemNotification.SystemNotificationRepository
         when z.message.SystemMessageType.CONNECTION_ACCEPTED
           return -> amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et.conversation_id
         when z.message.SystemMessageType.CONNECTION_REQUEST
-          return -> amplify.publish z.event.WebApp.PENDING.SHOW
+          return -> amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
     return -> amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
 
   ###

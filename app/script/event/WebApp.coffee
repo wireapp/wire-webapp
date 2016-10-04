@@ -19,10 +19,8 @@
 window.z ?= {}
 z.event ?= {}
 
-# Enum of diffent webapp events.
+# Enum of different webapp events.
 z.event.WebApp =
-  ACTION:
-    SHOW: 'wire.webapp.action.show'
   ANALYTICS:
     EVENT: 'wire.webapp.analytics.event'
     INIT: 'wire.webapp.analytics.init'
@@ -37,9 +35,6 @@ z.event.WebApp =
     UPDATE_INIT: 'wire.webapp.app.update-init'
     HIDE: 'wire.webapp.app.hide'
     FADE_IN: 'wire.webapp.app.fade-in'
-  ARCHIVE:
-    SHOW: 'wire.webapp.archive.show'
-    CLOSE: 'wire.webapp.archive.close'
   CALL:
     EVENT_FROM_BACKEND: 'wire.webapp.call.event-from-backend'
     STATE:
@@ -88,10 +83,8 @@ z.event.WebApp =
       EDIT: 'wire.webapp.conversation.message.edit'
     IMAGE:
       SEND: 'wire.webapp.conversation.image.send'
-  CONVERSATION_LIST:
-    SHOW: 'wire.webapp.conversation-list.show'
-    ARCHIVE:
-      HIDE: 'wire.webapp.conversation-list.archive.hide'
+  CONTENT:
+    SWITCH: 'wire.webapp.content.switch'
   CONTEXT_MENU: 'wire.webapp.context-menu'
   DEBUG:
     UPDATE_LAST_CALL_STATUS: 'wire.webapp.debug.update-last-call-status'
@@ -104,9 +97,7 @@ z.event.WebApp =
     INJECT: 'wire.webapp.event.inject'
     NOTIFICATION_HANDLING_STATE: 'wire.webapp.event.notification_handling'
   LIST:
-    BLUR: 'wire.webapp.list.blur'
     SCROLL: 'wire.webapp.list.scroll'
-    FULLSCREEN_ANIM_DISABLED: 'wire.webapp.list.anim-disabled'
   LOADED: 'wire.webapp.loaded'
   PEOPLE:
     HIDE: 'wire.webapp.participant-et.hide'
@@ -119,16 +110,12 @@ z.event.WebApp =
     FADE_IN: 'wire.webapp.left.fade-in'
   LOGOUT:
     ASK_TO_CLEAR_DATA: 'wire.webapp.logout.ask-to-clear-data'
-  WELCOME:
-    SHOW: 'wire.webapp.profile.welcome.show'
-    UNSPLASH_LOADED: 'wire.webapp.profile.welcome.unsplash-loaded'
+  PREFERENCES:
+    MANAGE_DEVICES: 'wire.webapp.preferences.manage-devices'
+    UPLOAD_PICTURE: 'wire.webapp.preferences.upload-picture'
   PROFILE:
-    SHOW: 'wire.webapp.profile.show'
-    HIDE: 'wire.webapp.profile.hide'
-    FADE_IN: 'wire.webapp.profile.fade-in'
     SETTINGS:
       SHOW: 'wire.webapp.profile.settings.show'
-    UPLOAD_PICTURE: 'wire.webapp.profile.upload-picture'
   PROPERTIES:
     CHANGE:
       DEBUG: 'wire.webapp.properties.change.debug'

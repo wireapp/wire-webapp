@@ -18,11 +18,20 @@
 
 window.z ?= {}
 z.ViewModel ?= {}
+z.ViewModel.list ?= {}
 
 
-class z.ViewModel.StartUIViewModel
-  constructor: (element_id, @conversation_repository, @search_repository, @user_repository, @connect_repository) ->
-    @logger = new z.util.Logger 'z.ViewModel.StartUIViewModel', z.config.LOGGER.OPTIONS
+class z.ViewModel.list.StartUIViewModel
+  ###
+  @param element_id [String] HTML selector
+  @param list_view_model [z.ViewModel.list.ListViewModel] List view model
+  @param connect_repository [z.connect.ConnectRepository] Connect repository
+  @param conversation_repository [z.conversation.ConversationRepository] Conversation repository
+  @param search_repository [z.search.SearchRepository] Search repository
+  @param user_repository [z.user.UserRepository] User repository
+  ###
+  constructor: (element_id, @list_view_model, @connect_repository, @conversation_repository, @search_repository, @user_repository) ->
+    @logger = new z.util.Logger 'z.ViewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS
 
     @search = _.debounce (query) =>
       query = query.trim()
@@ -76,7 +85,10 @@ class z.ViewModel.StartUIViewModel
     @show_no_contacts_on_wire = ko.observable false
     @is_searching = ko.observable false
     @show_spinner = ko.observable false
-    @show_people_picker = ko.observable()
+
+    @should_update_scrollbar = (ko.computed =>
+      return @list_view_model.last_update()
+    ).extend notify: 'always', rateLimit: 500
 
     @has_uploaded_contacts = ko.observable false
 
@@ -146,16 +158,15 @@ class z.ViewModel.StartUIViewModel
     @user_bubble = undefined
     @user_bubble_last_id = undefined
 
+    @_init_subscriptions()
+
+  _init_subscriptions: =>
     amplify.subscribe z.event.WebApp.CONNECT.IMPORT_CONTACTS,         @import_contacts
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED,              @update_properties
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.GOOGLE,        @update_properties
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.OSX_CONTACTS,  @update_properties
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, @update_properties
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @update_properties
-    amplify.subscribe z.event.WebApp.SEARCH.HIDE, @close
-    amplify.subscribe z.event.WebApp.SEARCH.SHOW, @open
-
-    ko.applyBindings @, document.getElementById element_id
 
   clear_search_results: ->
     @search_results.groups.removeAll()
@@ -165,7 +176,7 @@ class z.ViewModel.StartUIViewModel
     @show_no_contacts_on_wire false
 
   click_on_close: =>
-    @_close()
+    @_close_list()
 
   _track_import: (source, ui_identifier, error) ->
     if ui_identifier is z.connect.ConnectTrigger.ONBOARDING
@@ -216,47 +227,39 @@ class z.ViewModel.StartUIViewModel
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Could not show the on-boarding results: #{error.message}", error
 
-  open: (update = true) =>
-    $(document).on 'keydown.show_search', (event) => @_close() if event.keyCode is z.util.KEYCODE.ESC
+  update_list: =>
+    @search_repository.get_top_people()
+    .then (user_ets) =>
+      @top_users user_ets if user_ets.length > 0
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Could not update the top people: #{error.message}", error
 
-    if update
-      @search_repository.get_top_people()
-      .then (user_ets) =>
-        @top_users user_ets if user_ets.length > 0
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Could not update the top people: #{error.message}", error
-
-      @show_spinner false
+    @show_spinner false
 
     # clean up
     @suggestions.removeAll()
     @selected_people.removeAll()
     @clear_search_results()
     @user_profile null
-    @_show()
+    $('user-input input').focus()
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.SEARCH_OPENED
 
-  _close: ->
-    amplify.publish z.event.WebApp.SEARCH.HIDE
-
-  close: =>
-    $(document).off 'keydown.show_search'
-
+  _close_list: ->
     @user_bubble?.hide()
     @invite_bubble?.hide()
     @show_spinner false
 
     @selected_people.removeAll()
     @search_input ''
-    @_hide()
+    $('user-input input').blur()
 
-    amplify.publish z.event.WebApp.CONVERSATION_LIST.SHOW
-    amplify.publish z.event.WebApp.LIST.BLUR, 0
+    amplify.publish z.event.WebApp.SEARCH.HIDE
+    @list_view_model.switch_list z.ViewModel.list.LIST_STATE.CONVERSATIONS
 
   click_on_group: (conversation_et) =>
     @conversation_repository.unarchive_conversation conversation_et if conversation_et.is_archived()
-    @_close()
+    @_close_list()
     amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
 
   click_on_other: (user_et, e) =>
@@ -330,15 +333,15 @@ class z.ViewModel.StartUIViewModel
 
 
   ###############################################################################
-  # USER BUBBLE
+  # User bubble
   ###############################################################################
 
   on_user_accept: (user_et) =>
-    @_close()
+    @_close_list()
     @user_repository.accept_connection_request user_et, true
 
   on_user_connect: =>
-    @_close()
+    @_close_list()
 
   on_user_ignore: (user_et) =>
     @user_repository.ignore_connection_request user_et
@@ -346,10 +349,10 @@ class z.ViewModel.StartUIViewModel
       @user_bubble?.hide()
 
   on_user_open: =>
-    @_close()
+    @_close_list()
 
   on_user_unblock: (user_et) =>
-    @_close()
+    @_close_list()
     @user_repository.unblock_user user_et, true
 
   on_cancel_request: =>
@@ -357,7 +360,7 @@ class z.ViewModel.StartUIViewModel
 
 
   ###############################################################################
-  # INVITE BUBBLE
+  # Invite bubble
   ###############################################################################
 
   click_on_contacts_import: =>
@@ -419,13 +422,14 @@ class z.ViewModel.StartUIViewModel
 
 
   ###############################################################################
-  # USER PROPERTIES
+  # User Properties
   ###############################################################################
 
   update_properties: =>
     @has_created_conversation @user_repository.properties.has_created_conversation
     @has_uploaded_contacts @user_repository.properties.contact_import.google? or @user_repository.properties.contact_import.osx?
     return true
+
 
   ###############################################################################
   # H
@@ -454,7 +458,7 @@ class z.ViewModel.StartUIViewModel
     # Error: {code: 403, message: "Users are not connected", label: "not-connected"}
     on_error = (error) =>
       @logger.log @logger.levels.WARN, "Unable to create conversation: #{error.message}"
-      @_close()
+      @_close_list()
 
     @conversation_repository.create_new_conversation user_ids, null, on_success, on_error
 
@@ -475,15 +479,3 @@ class z.ViewModel.StartUIViewModel
       window.setTimeout ->
         amplify.publish z.event.WebApp.CONVERSATION.IMAGE.SEND, images
       , 1000
-
-###############################################################################
-# Start UI animations
-###############################################################################
-  _hide: ->
-    $('#start-ui').removeClass 'start-ui-is-visible'
-    $('user-input input').blur()
-
-  _show: ->
-    $('#start-ui').addClass('start-ui-is-visible').find('.start-ui-list').scrollTop 0
-    $('user-input input').focus()
-    @show_people_picker Date.now()

@@ -165,7 +165,7 @@ class z.entity.Conversation
         else if @is_group()
           return @name() if @name()
           return (@participating_user_ets().map (user_et) -> user_et.first_name()).join ', ' if @participating_user_ets().length > 0
-          return z.localization.Localizer.get_text z.string.conversation_list_empty_conversation if @participating_user_ids().length is 0
+          return z.localization.Localizer.get_text z.string.conversations_empty_conversation if @participating_user_ids().length is 0
           return z.localization.Localizer.get_text z.string.truncation
         else
           return @name()

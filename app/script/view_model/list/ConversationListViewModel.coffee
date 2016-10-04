@@ -18,19 +18,22 @@
 
 window.z ?= {}
 z.ViewModel ?= {}
+z.ViewModel.list ?= {}
 
-class z.ViewModel.ConversationListViewModel
+
+class z.ViewModel.list.ConversationListViewModel
   ###
   @param element_id [String] HTML selector
-  @param content [z.ViewModel.RightViewModel] View model
+  @param list_view_model [z.ViewModel.list.ListViewModel] List view model
+  @param content_view_model [z.ViewModel.ContentViewModel] Content view model
   @param call_center [z.calling.CallCenter] Call center
-  @param user_repository [z.user.UserRepository] User repository
   @param conversation_repository [z.conversation.ConversationRepository] Conversation repository
+  @param user_repository [z.user.UserRepository] User repository
   ###
-  constructor: (element_id, @content, @call_center, @user_repository, @conversation_repository) ->
-    @logger = new z.util.Logger 'z.ViewModel.ConversationListViewModel', z.config.LOGGER.OPTIONS
+  constructor: (element_id, @list_view_model, @content_view_model, @call_center, @conversation_repository, @user_repository) ->
+    @logger = new z.util.Logger 'z.ViewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS
 
-    @selected_list_item = @content.state
+    @content_state = @content_view_model.content_state
     @selected_conversation = ko.observable()
     @status =
       call: ko.computed =>
@@ -52,14 +55,11 @@ class z.ViewModel.ConversationListViewModel
       count = @connect_requests().length
       if count > 1
         return z.localization.Localizer.get_text {
-          id: z.string.conversation_list_many_connection_request
+          id: z.string.conversations_connection_request_many
           replace: {placeholder: '%no', content: count}
         }
       else
-        return z.localization.Localizer.get_text z.string.conversation_list_one_connection_request
-
-    @is_conversation_list_visible = ko.observable true
-    @is_self_profile_visible = ko.observable false
+        return z.localization.Localizer.get_text z.string.conversations_connection_request_one
 
     @conversations_calls = @conversation_repository.conversations_call
     @conversations_archived = @conversation_repository.conversations_archived
@@ -71,7 +71,6 @@ class z.ViewModel.ConversationListViewModel
 
     @should_update_scrollbar = (ko.computed =>
       return @webapp_is_loaded() or
-          @is_conversation_list_visible() or
           @conversations_unarchived().length or
           @connect_requests().length or
           @conversations_calls().length
@@ -83,12 +82,12 @@ class z.ViewModel.ConversationListViewModel
 
     @archive_tooltip = ko.computed =>
       return z.localization.Localizer.get_text {
-        id: z.string.tooltip_conversation_list_archived
+        id: z.string.tooltip_conversations_archived
         replace: {placeholder: '%no', content: @conversations_archived().length}
       }
 
     @start_tooltip = z.localization.Localizer.get_text {
-      id: z.string.tooltip_conversation_list_tooltip_start
+      id: z.string.tooltip_conversations_tooltip_start
       replace: {placeholder: '%shortcut', content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.START}
     }
 
@@ -101,20 +100,15 @@ class z.ViewModel.ConversationListViewModel
 
     @_init_subscriptions()
 
-    ko.applyBindings @, document.getElementById element_id
-
-  click_on_actions: (conversation_et, event) ->
-    amplify.publish z.event.WebApp.ACTION.SHOW, conversation_et, event
+  click_on_actions: (conversation_et, event) =>
+    @list_view_model.actions.click_on_actions conversation_et, event
 
   click_on_connect_requests: ->
-    return if @selected_list_item() is z.ViewModel.CONTENT_STATE.PENDING
-    @is_self_profile_visible false
-    amplify.publish z.event.WebApp.PENDING.SHOW
+    @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
 
   click_on_conversation: (conversation_et) =>
     return if @_is_selected_conversation conversation_et
-    @is_self_profile_visible false
-    amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
+    @content_view_model.show_conversation conversation_et
 
   _init_subscriptions: =>
     amplify.subscribe z.event.WebApp.SEARCH.BADGE.SHOW, => @show_badge true
@@ -123,10 +117,6 @@ class z.ViewModel.ConversationListViewModel
     amplify.subscribe z.event.WebApp.SHORTCUT.PREV, @_go_to_prev_conversation
     amplify.subscribe z.event.WebApp.SHORTCUT.START, @click_on_people_button
     amplify.subscribe z.event.WebApp.LOADED, @on_webapp_loaded
-    amplify.subscribe z.event.WebApp.CONVERSATION_LIST.SHOW, @_show
-    amplify.subscribe z.event.WebApp.ARCHIVE.CLOSE, @_show
-    amplify.subscribe z.event.WebApp.ARCHIVE.SHOW, @_hide
-    amplify.subscribe z.event.WebApp.SEARCH.SHOW, @_hide
 
   _go_to_next_conversation: =>
     conversations = @conversation_repository.conversations_unarchived()
@@ -141,15 +131,15 @@ class z.ViewModel.ConversationListViewModel
     amplify.publish z.event.WebApp.CONVERSATION.SHOW, prev_conversation_et if prev_conversation_et
 
   _is_selected_conversation: (conversation_et) =>
-    @selected_list_item() is z.ViewModel.CONTENT_STATE.CONVERSATION and conversation_et.id is @active_conversation_id()
+    @content_state() is z.ViewModel.content.CONTENT_STATE.CONVERSATION and conversation_et.id is @active_conversation_id()
 
   on_webapp_loaded: =>
     @webapp_is_loaded true
 
 
-###############################################################################
-# Call stuff
-###############################################################################
+  ###############################################################################
+  # Call stuff
+  ###############################################################################
 
   on_accept_call: (conversation_et) =>
     @call_center.state_handler.join_call conversation_et.id, false
@@ -172,31 +162,16 @@ class z.ViewModel.ConversationListViewModel
   on_toggle_video: (conversation_et) =>
     @call_center.state_handler.toggle_video conversation_et.id
 
-###############################################################################
-# Footer actions
-###############################################################################
-  click_on_archived_button: ->
-    amplify.publish z.event.WebApp.ARCHIVE.SHOW
 
-  click_on_settings_button: =>
-    if @is_self_profile_visible()
-      amplify.publish z.event.WebApp.PROFILE.HIDE
-      @is_self_profile_visible false
-    else
-      amplify.publish z.event.WebApp.PROFILE.SHOW
-      @is_self_profile_visible true
+  ###############################################################################
+  # Footer actions
+  ###############################################################################
+
+  click_on_archived_button: =>
+    @list_view_model.switch_list z.ViewModel.list.LIST_STATE.ARCHIVE
+
+  click_on_preferences_button: =>
+    @list_view_model.switch_list z.ViewModel.list.LIST_STATE.PREFERENCES
 
   click_on_people_button: ->
-    amplify.publish z.event.WebApp.SEARCH.SHOW
-
-###############################################################################
-# Conversation List animations
-###############################################################################
-  _hide: ->
-    $('.conversation-list').addClass 'conversation-list-is-hidden'
-
-  _show: =>
-    $('#conversation-list').removeClass('conversation-list-is-hidden')
-
-    @is_conversation_list_visible true
-    @is_self_profile_visible false
+    @list_view_model.switch_list z.ViewModel.list.LIST_STATE.START_UI
