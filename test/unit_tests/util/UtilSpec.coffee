@@ -880,8 +880,15 @@ describe 'z.util.safe_window_open', ->
     new_window = z.util.safe_window_open url
     expect(new_window.opener).toBeNull()
 
-  it 'add http if protocol is missing', ->
+describe 'z.util.add_http', ->
+  it 'adds http if protocol is missing', ->
     url = 'wire.com/'
+    expect(z.util.add_http url).toBe 'http://wire.com/'
 
-    new_window = window.open url
-    expect(new_window.location).not.toBe 'http://wire.com/'
+  it 'does not add http if present', ->
+    url = 'http://wire.com/'
+    expect(z.util.add_http url).toBe 'http://wire.com/'
+
+  it 'does not add https if present', ->
+    url = 'https://wire.com/'
+    expect(z.util.add_http url).toBe 'https://wire.com/'
