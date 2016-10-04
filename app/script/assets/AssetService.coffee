@@ -99,7 +99,7 @@ class z.assets.AssetService
 
       medium_asset = new z.assets.Asset
         array_buffer: medium_image_bytes
-        content_type: medium_image.type
+        content_type: 'image/jpg'
         conversation_id: conversation_id
         md5: z.util.encode_base64_md5_array_buffer_view medium_image_bytes
         width: medium_image.height
@@ -107,7 +107,6 @@ class z.assets.AssetService
         public: true
 
       small_profile_asset = $.extend true, {}, medium_asset
-      small_profile_asset.content_type = small_image.type
       small_profile_asset.array_buffer = small_image_bytes
       small_profile_asset.payload.width = small_image.width
       small_profile_asset.payload.height = small_image.height
