@@ -32,13 +32,13 @@ class z.components.UserAvatar
       'id': z.util.create_random_uuid()
       'user-id': @user.id
 
-    @initials = ko.computed =>
+    @initials = ko.pureComputed =>
       if @element.hasClass 'user-avatar-xs'
         return z.util.get_first_character @user.initials()
       else
         return @user.initials()
 
-    @state = ko.computed =>
+    @state = ko.pureComputed =>
       status = @user.connection().status()
       return 'self' if @user.is_me
       return 'selected' if params.selected?() is true
@@ -48,7 +48,7 @@ class z.components.UserAvatar
       return 'unknown' if status in [z.user.ConnectionStatus.UNKNOWN, z.user.ConnectionStatus.CANCELLED]
       return ''
 
-    @css_classes = ko.computed =>
+    @css_classes = ko.pureComputed =>
       class_string = "accent-color-#{@user.accent_id()}"
       class_string += " #{@state()}" if @state()
       return class_string
@@ -56,7 +56,7 @@ class z.components.UserAvatar
     @on_click = (data, event) ->
       params.click? data.user, event.currentTarget.parentNode
 
-    ko.computed =>
+    @picture_preview_subscription = ko.computed =>
       image_url = @user.picture_preview_url()
       image_was_already_loaded = false
 
@@ -73,6 +73,10 @@ class z.components.UserAvatar
 
         image.src = z.util.strip_url_wrapper image_url
         image_was_already_loaded = image.complete
+
+  dispose: =>
+    @picture_preview_subscription.dispose()
+
 
 ko.components.register 'user-avatar',
   viewModel:
