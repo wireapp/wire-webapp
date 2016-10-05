@@ -48,7 +48,7 @@ class z.components.UserListInputViewModel
     return true
 
   dispose: =>
-    @selected_subscription.dipose()
+    @selected_subscription.dispose()
 
 
 ko.components.register 'user-input',
