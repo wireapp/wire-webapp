@@ -28,15 +28,6 @@ describe 'z.util.CountryCodes', ->
       code = z.util.CountryCodes.get_country_code 'XY'
       expect(code).toBeUndefined()
 
-  describe 'get_country_name', ->
-    it 'returns the country name for an existing ISO name', ->
-      code = z.util.CountryCodes.get_country_name 'DE'
-      expect(code).toBe 'Germany'
-
-    it 'returns undefined for a non-existent ISO name', ->
-      code = z.util.CountryCodes.get_country_name 'XY'
-      expect(code).toBeUndefined()
-
   describe 'get_country_by_code', ->
     it 'returns the most populated country for country code ', ->
       iso_name = z.util.CountryCodes.get_country_by_code 49

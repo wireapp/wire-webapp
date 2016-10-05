@@ -45,8 +45,9 @@ z.tracking.helpers = {
     switch
       when message_et.is_system() then return z.tracking.attribute.MessageType.SYSTEM
       when message_et.is_ping() then return z.tracking.attribute.MessageType.PING
-      when message_et.has_asset_image() then return z.tracking.attribute.MessageType.IMAGE
       when message_et.has_asset() then return z.tracking.attribute.MessageType.FILE
+      when message_et.has_asset_image() then return z.tracking.attribute.MessageType.IMAGE
+      when message_et.has_asset_location() then return z.tracking.attribute.MessageType.LOCATION
       else return z.tracking.attribute.MessageType.TEXT
 
 }

@@ -44,7 +44,7 @@ ko.bindingHandlers.bordered_list = do ->
 
   calculate_borders = _.throttle ($element) ->
     return if not $element
-    window.requestAnimFrame ->
+    window.requestAnimationFrame ->
       archive_column = $($element).parent()
       if $element.height() <= 0 or not $element.is_scrollable()
         return archive_column.removeClass 'conversation-list-center-border-bottom conversation-list-center-border-top'

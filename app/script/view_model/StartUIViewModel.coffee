@@ -296,7 +296,7 @@ class z.ViewModel.StartUIViewModel
 
   _collapse_item: (search_list_item, callback) ->
     search_list_item.find('.search-list-item-connect').remove()
-    window.requestAnimFrame ->
+    window.requestAnimationFrame ->
       search_list_item
         .addClass 'search-list-item-collapse'
         .on z.util.alias.animationend, (event) ->

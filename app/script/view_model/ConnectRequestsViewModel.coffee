@@ -49,4 +49,4 @@ class z.ViewModel.ConnectRequestsViewModel
   ###
   after_render: (elements, request) =>
     if z.util.array_is_last @connect_requests(), request
-      requestAnimFrame -> $('.connect-requests').scroll_to_bottom()
+      window.requestAnimationFrame -> $('.connect-requests').scroll_to_bottom()
