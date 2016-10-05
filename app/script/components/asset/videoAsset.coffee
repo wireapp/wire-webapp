@@ -29,6 +29,7 @@ class z.components.VideoAssetComponent
   constructor: (params, component_info) ->
     @logger = new z.util.Logger 'VideoAssetComponent', z.config.LOGGER.OPTIONS
     @asset = params.asset
+    @preview_subscription = undefined
 
     @video_element = $(component_info.element).find('video')[0]
     @video_src = ko.observable()
@@ -43,7 +44,7 @@ class z.components.VideoAssetComponent
     if @asset.preview_resource()
       @_load_video_preview()
     else
-      @asset.preview_resource.subscribe @_load_video_preview
+      @preview_subscription = @asset.preview_resource.subscribe @_load_video_preview
 
   _load_video_preview: =>
     @asset.load_preview()
@@ -86,6 +87,9 @@ class z.components.VideoAssetComponent
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.PLAYED_VIDEO_MESSAGE,
       duration: z.util.bucket_values(duration, [0, 10, 30, 60, 300, 900, 1800])
       duration_actual: duration
+
+  dispose: =>
+    @preview_subription?.dispose()
 
 ko.components.register 'video-asset',
   viewModel: createViewModel: (params, component_info) ->

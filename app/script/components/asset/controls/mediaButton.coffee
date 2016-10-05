@@ -57,6 +57,10 @@ class z.components.MediaButtonComponent
     @media_element.addEventListener 'playing', => @media_is_playing true
     @media_element.addEventListener 'pause', => @media_is_playing false
 
+  dispose: =>
+    @media_element.removeEventListener 'playing'
+    @media_element.removeEventListener 'pause'
+
 
 ko.components.register 'media-button',
   viewModel: createViewModel: (params, component_info) ->

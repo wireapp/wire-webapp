@@ -77,6 +77,14 @@ class z.components.SeekBarComponent
     else
       @seek_bar.style.backgroundImage = "linear-gradient(to right, currentColor #{progress}%, rgba(255,255,255,0.4) #{progress}%)"
 
+  dispose: =>
+    @seek_bar.removeEventListener 'mousedown'
+    @seek_bar.removeEventListener 'mouseup'
+    @seek_bar.removeEventListener 'mouseenter'
+    @seek_bar.removeEventListener 'mouseleave'
+    @seek_bar.removeEventListener 'change'
+    @media_element.removeEventListener 'timeupdate'
+    @media_element.removeEventListener 'ended'
 
 ko.components.register 'seek-bar',
   viewModel: createViewModel: (params, component_info) ->
