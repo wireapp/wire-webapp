@@ -2049,7 +2049,7 @@ class z.conversation.ConversationRepository
   ###
   _track_completed_media_action: (conversation_et, generic_message) ->
     action_type = switch generic_message.content
-      when 'asset' then 'asset' if generic_message.asset.original?
+      when 'asset' then 'file' if generic_message.asset.original?
       when 'knock' then 'ping'
       when 'text' then 'text' if not generic_message.text.link_preview.length
 
