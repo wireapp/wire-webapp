@@ -54,11 +54,17 @@ class z.components.MediaButtonComponent
     @on_pause_button_clicked = -> params.pause?()
     @on_cancel_button_clicked = -> params.cancel?()
 
-    @media_element.addEventListener 'playing', => @media_is_playing true
-    @media_element.addEventListener 'pause', => @media_is_playing false
+    @media_element.addEventListener 'playing', @on_play
+    @media_element.addEventListener 'pause', @on_pause
+
+  on_play: =>
+    @media_is_playing true
+
+  on_pause: =>
+    @media_is_playing false
 
   dispose: =>
-    @media_element.removeEventListener 'playing'
+    @media_element.removeEventListener 'playing', @on_play
     @media_element.removeEventListener 'pause'
 
 

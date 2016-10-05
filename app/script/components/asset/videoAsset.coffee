@@ -89,7 +89,7 @@ class z.components.VideoAssetComponent
       duration_actual: duration
 
   dispose: =>
-    @preview_subription?.dispose()
+    @preview_subscription?.dispose()
 
 ko.components.register 'video-asset',
   viewModel: createViewModel: (params, component_info) ->
