@@ -165,15 +165,13 @@ class z.SystemNotification.SystemNotificationRepository
         return z.util.trunc_text asset_et.text, z.config.BROWSER_NOTIFICATION.BODY_LENGTH
     else if message_et.has_asset_medium_image()
       return  z.localization.Localizer.get_text z.string.system_notification_asset_add
+    else if message_et.has_asset_location()
+      return z.localization.Localizer.get_text z.string.system_notification_shared_location
     else if message_et.has_asset()
       asset_et = message_et.assets()[0]
-      switch asset_et.type
-        when z.assets.AssetType.FILE
-          return z.localization.Localizer.get_text z.string.system_notification_shared_audio if asset_et.is_audio()
-          return z.localization.Localizer.get_text z.string.system_notification_shared_video if asset_et.is_video()
-          return z.localization.Localizer.get_text z.string.system_notification_shared_file
-        when z.assets.AssetType.LOCATION
-          return z.localization.Localizer.get_text z.string.system_notification_shared_location
+      return z.localization.Localizer.get_text z.string.system_notification_shared_audio if asset_et.is_audio()
+      return z.localization.Localizer.get_text z.string.system_notification_shared_video if asset_et.is_video()
+      return z.localization.Localizer.get_text z.string.system_notification_shared_file if asset_et.is_file()
 
   ###
   Creates the notification body for a renamed conversation.
