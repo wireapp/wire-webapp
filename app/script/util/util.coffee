@@ -195,7 +195,7 @@ Return base64 encoded md5 of the the given array
 @param array [Uint8Array]
 @return [String]
 ###
-z.util.array_to_md5_bashangee64 = (array) ->
+z.util.array_to_md5_base64 = (array) ->
   word_array = CryptoJS.lib.WordArray.create array
   return CryptoJS.MD5(word_array).toString(CryptoJS.enc.Base64)
 
