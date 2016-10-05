@@ -23,23 +23,9 @@
       <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
     </div>
     <div class="message-header-label">
-      <span class="label-semibold-xs" data-bind='text: message.sender_name()'></span>
+      <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption()"></span>
     </div>
-  </div>
-</script>
-
-<script type="text/html" id="location">
-  <div class="message-header" data-bind="css: {'message-hide-user-avatar': $parent.should_hide_user_avatar($data)}">
-    <div class="message-header-icon">
-      <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
-    </div>
-    <div class="message-header-label label-semibold text-graphite" data-bind='text_with_emoji: message.user().first_name'></div>
-  </div>
-  <div class="message-body message-location-body">
-    <div class="message-location-icon icon-location"></div>
-    <div class="message-location-label" data-bind="text: name"></div>
-    <a class="label-xs text-theme" data-bind="attr: {href: link_src}, l10n_text: z.string.conversation_location_link" rel="nofollow noopener noreferrer" target="_blank"></a>
   </div>
 </script>
 
@@ -48,7 +34,7 @@
     <div class="message-header-icon">
       <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
     </div>
-    <div class="message-header-label label-semibold text-graphite">
+    <div class="message-header-label label-bold">
       <span data-bind='text: message.sender_name()'></span>
       <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
     </div>
@@ -61,7 +47,7 @@
     <div class="message-header-icon">
       <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
     </div>
-    <div class="message-header-label label-semibold text-graphite">
+    <div class="message-header-label label-bold">
       <span data-bind='text: message.user().first_name()'></span>
       <!-- ko if: was_edited() -->
         <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
@@ -158,7 +144,7 @@
       </svg>
     </div>
     <div class="message-header-label">
-      <span class="label-semibold-xs" data-bind='text: message.sender_name()'></span>
+      <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: caption"></span>
       <span class="ellipsis text-theme" data-bind="text: caption_device, click: click_on_device"></span>
       <hr class="message-header-line" />
@@ -190,7 +176,7 @@
         <span class="icon-plus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN"></span>
       </div>
       <div class="message-header-label">
-        <span class="label-semibold-xs" data-bind='text: message.sender_name()'></span>
+        <span class="label-bold" data-bind='text: message.sender_name()'></span>
         <span class="ellipsis" data-bind="text: message.caption()"></span>
         <hr class="message-header-line" />
       </div>
@@ -217,7 +203,7 @@
       <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
     </div>
     <div class="message-header-label" data-bind="css: message.accent_color">
-      <span class="label-semibold-xs" data-bind='text: message.sender_name()'></span>
+      <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption"></span>
       <span class="message-icon-ping icon-ping" data-bind="css: message.animation()"></span>
     </div>
@@ -236,7 +222,7 @@
       <span class="icon-edit text-graphite-dark"></span>
     </div>
     <div class="message-header-label">
-      <span class="label-semibold-xs" data-bind='text: message.sender_name()'></span>
+      <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption()"></span>
       <hr class="message-header-line" />
     </div>
