@@ -206,11 +206,6 @@ z.util.encode_base64_md5_array_buffer_view = (array_buffer_view) ->
   md5_hash_hex = z.util.read_string_chars_as_hex md5_hash
   return btoa md5_hash_hex
 
-z.util.download_text = (content) ->
-  blob = new Blob([content], 'type': 'text/plain')
-  z.util.download_blob blob, 'download.txt'
-
-
 ###
 Downloads blob using a hidden link element.
 
@@ -231,22 +226,6 @@ z.util.download_blob = (blob, filename) ->
     document.body.removeChild link
     window.URL.revokeObjectURL url
   , 100
-
-
-z.util.read_deferred = (file, type) ->
-  deferred = new $.Deferred()
-  reader = new FileReader()
-  reader.onload = (e) -> deferred.resolve e.target.result
-  reader.onerror = (e) -> deferred.reject @
-
-  if type is 'buffer'
-    reader.readAsArrayBuffer file
-  else if type is 'url'
-    reader.readAsDataURL file
-  else
-    reader.readAsText file
-
-  return deferred.promise()
 
 
 z.util.phone_uri_to_e164 = (phone_number) ->
