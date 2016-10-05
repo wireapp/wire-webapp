@@ -65,7 +65,7 @@ class z.components.MediaButtonComponent
 
   dispose: =>
     @media_element.removeEventListener 'playing', @on_play
-    @media_element.removeEventListener 'pause'
+    @media_element.removeEventListener 'pause', @on_pause
 
 
 ko.components.register 'media-button',
