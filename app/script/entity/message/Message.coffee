@@ -30,16 +30,17 @@ class z.entity.Message
 
   # Construct a new base message entity.
   constructor: (id = '0', super_type = '') ->
+    @expire_after_millis = ko.observable false
     @from = ''
     @id = id
+    @is_editing = ko.observable false
     @primary_key = undefined
+    @status = ko.observable z.message.StatusType.UNSPECIFIED
     @super_type = super_type
     @timestamp = Date.now()
     @type = ''
     @user = ko.observable new z.entity.User()
     @visible = ko.observable true
-    @is_editing = ko.observable false
-    @status = ko.observable z.message.StatusType.UNSPECIFIED
 
     @display_timestamp_short = =>
       date = moment.unix @timestamp / 1000

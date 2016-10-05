@@ -59,7 +59,20 @@ class z.cryptography.CryptographyMapper
       when 'edited'
         return @_map_edited generic_message.edited, generic_message.message_id
       when 'ephemeral'
-        return @_map_ephemeral generic_message.ephemeral, generic_message.message_id
+        ranges = [
+          dcodeIO.Long.fromNumber 1000
+          dcodeIO.Long.fromNumber 10000
+          dcodeIO.Long.fromNumber 30000
+          dcodeIO.Long.fromNumber 60000
+        ]
+
+        mapped_millis = z.util.ArrayUtil.find_closest_long ranges, generic_message.ephemeral.expire_after_millis
+        wrapped_message = @_map_generic_message generic_message.ephemeral, event
+        wrapped_message.data.expire_after_millis = mapped_millis.toString()
+
+        console.warn "EPHEMERAL1", wrapped_message
+
+        return wrapped_message
       when 'external'
         return @_map_external generic_message.external, event
       when 'hidden'
