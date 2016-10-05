@@ -197,7 +197,7 @@ Return base64 encoded md5 of the the given array
 ###
 z.util.array_to_md5_base64 = (array) ->
   word_array = CryptoJS.lib.WordArray.create array
-  return CryptoJS.MD5(word_array).toString(CryptoJS.enc.Base64)
+  return CryptoJS.MD5(word_array).toString CryptoJS.enc.Base64
 
 ###
 Convert base64 dataURI to Blob
