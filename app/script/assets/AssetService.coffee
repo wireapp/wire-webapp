@@ -88,7 +88,7 @@ class z.assets.AssetService
         array_buffer: medium_image_bytes
         content_type: 'image/jpg'
         conversation_id: conversation_id
-        md5: z.util.encode_base64_md5_array_buffer_view medium_image_bytes
+        md5: z.util.array_to_md5_base64 medium_image_bytes
         width: medium_image.height
         height: medium_image.height
         public: true
@@ -97,7 +97,7 @@ class z.assets.AssetService
       small_profile_asset.array_buffer = small_image_bytes
       small_profile_asset.payload.width = small_image.width
       small_profile_asset.payload.height = small_image.height
-      small_profile_asset.payload.md5 = z.util.encode_base64_md5_array_buffer_view small_image_bytes
+      small_profile_asset.payload.md5 = z.util.array_to_md5_base64 small_image_bytes
       small_profile_asset.payload.tag = z.assets.ImageSizeType.SMALL_PROFILE
 
       @post_asset_pair small_profile_asset, medium_asset
@@ -191,7 +191,7 @@ class z.assets.AssetService
   ###
   _create_asset_multipart_body: (asset_data, metadata) ->
     metadata = JSON.stringify metadata
-    asset_data_md5 = z.util.encode_base64_md5_array_buffer_view asset_data
+    asset_data_md5 = z.util.array_to_md5_base64 asset_data
 
     body = ''
     body += '--' + @BOUNDARY + '\r\n'

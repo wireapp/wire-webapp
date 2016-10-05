@@ -190,6 +190,16 @@ z.util.array_to_base64 = (array) ->
   return sodium.to_base64 new Uint8Array(array), true
 
 ###
+Return base64 encoded md5 of the the given array
+
+@param array [Uint8Array]
+@return [String]
+###
+z.util.array_to_md5_bashangee64 = (array) ->
+  word_array = CryptoJS.lib.WordArray.create array
+  return CryptoJS.MD5(word_array).toString(CryptoJS.enc.Base64)
+
+###
 Convert base64 dataURI to Blob
 
 @param base64 [String] base64 encoded data uri
@@ -199,16 +209,6 @@ z.util.base64_to_blob = (base64) ->
   mime_type = z.util.get_content_type_from_data_url base64
   bytes = z.util.base64_to_array base64
   return new Blob [bytes], 'type': mime_type
-
-###
-Return base64 encoded md5 of the the given array
-
-@param array [Uint8Array]
-@return [String]
-###
-z.util.encode_base64_md5_array_buffer_view = (array) ->
-  word_array = CryptoJS.lib.WordArray.create array
-  return CryptoJS.MD5(word_array).toString(CryptoJS.enc.Base64)
 
 ###
 Downloads blob using a hidden link element.
