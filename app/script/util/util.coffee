@@ -200,11 +200,15 @@ z.util.base64_to_blob = (base64) ->
   bytes = z.util.base64_to_array base64
   return new Blob [bytes], 'type': mime_type
 
-z.util.encode_base64_md5_array_buffer_view = (array_buffer_view) ->
-  word_array = CryptoJS.lib.WordArray.create array_buffer_view
-  md5_hash = CryptoJS.MD5(word_array).toString()
-  md5_hash_hex = z.util.read_string_chars_as_hex md5_hash
-  return btoa md5_hash_hex
+###
+Return base64 encoded md5 of the the given array
+
+@param array [Uint8Array]
+@return [String]
+###
+z.util.encode_base64_md5_array_buffer_view = (array) ->
+  word_array = CryptoJS.lib.WordArray.create array
+  return CryptoJS.MD5(word_array).toString(CryptoJS.enc.Base64)
 
 ###
 Downloads blob using a hidden link element.
