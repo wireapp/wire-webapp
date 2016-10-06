@@ -37,6 +37,7 @@ class z.ViewModel.list.ListViewModel
     # state
     @list_state = ko.observable z.ViewModel.list.LIST_STATE.CONVERSATIONS
     @last_update = ko.observable()
+    @webapp_loaded = ko.observable false
 
     # nested view models
     @archive       = new z.ViewModel.list.ArchiveViewModel 'archive', @, @conversation_repository
@@ -46,11 +47,15 @@ class z.ViewModel.list.ListViewModel
 
     @actions       = new z.ViewModel.list.ActionsViewModel 'actions-bubble', @, @conversations, @conversation_repository, @user_repository
 
+    @self_user = ko.pureComputed => @user_repository.self()?.picture_medium_url() if @webapp_loaded()
+
     @_init_subscriptions()
 
     ko.applyBindings @, document.getElementById element_id
 
+
   _init_subscriptions: =>
+    amplify.subscribe z.event.WebApp.LOADED, => @webapp_loaded true
     amplify.subscribe z.event.WebApp.PROFILE.SETTINGS.SHOW, @open_device_management
     amplify.subscribe z.event.WebApp.SEARCH.SHOW,
     amplify.subscribe z.event.WebApp.PREFERENCES.MANAGE_DEVICES, @open_device_management

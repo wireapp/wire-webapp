@@ -108,7 +108,6 @@ class z.main.App
     view.main                      = new z.ViewModel.MainViewModel 'wire-main', @repository.user
     view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.user, @repository.conversation, @repository.call_center, @repository.search, @repository.giphy, @repository.client
     view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user
-    view.background                = new z.ViewModel.BackgroundViewModel 'background', view.content, @repository.conversation, @repository.user
     view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
     view.modals                    = new z.ViewModel.ModalsViewModel 'modals'
