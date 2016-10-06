@@ -2,8 +2,8 @@
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_devices"></div>
   <div class="preferences-content">
   <!-- ko if: selected_device() != null -->
-    <section class="self-preferences-section">
-      <label class="control-label" data-bind="l10n_text: z.string.preferences_devices"></label>
+    <section class="preferences-section">
+      <header class="preferences-header" data-bind="l10n_text: z.string.preferences_devices"></header>
       <div class="form-control">
         <!-- ko if: current_client() -->
           <div class="self-preferences-device">

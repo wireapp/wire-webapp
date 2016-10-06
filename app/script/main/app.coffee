@@ -244,9 +244,9 @@ class z.main.App
             if not user_et.picture_medium().length
               z.util.load_url_blob z.config.UNSPLASH_URL, (blob) =>
                 @repository.user.change_picture blob, ->
-                    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
-                      source: 'unsplash'
-                      outcome: 'success'
+                  amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
+                    source: 'unsplash'
+                    outcome: 'success'
             resolve user_et
       .catch (error) =>
         if not error instanceof z.storage.StorageError
@@ -321,12 +321,15 @@ class z.main.App
       amplify.publish z.event.WebApp.APP.FADE_IN
       # @todo Add OOBE
     else if conversation_et
+      @view.content.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
+      ###
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
       window.setTimeout =>
         types_to_notify = [z.conversation.ConversationType.REGULAR, z.conversation.ConversationType.ONE2ONE]
         if conversation_et.type() in types_to_notify
           @repository.system_notification.request_permission()
       , 2000
+      ###
     else if @repository.user.connect_requests().length
       window.setTimeout ->
         amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
