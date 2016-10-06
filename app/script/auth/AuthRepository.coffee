@@ -99,6 +99,7 @@ class z.auth.AuthRepository
         "COOKIE::'#{new_user.label}' Saved cookie label with key '#{new_user.label_key}' in Local Storage",
           key: new_user.label_key,
           value: new_user.label
+      return response
 
   ###
   Resend an email or phone activation code.
