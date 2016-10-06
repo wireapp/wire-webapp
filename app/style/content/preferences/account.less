@@ -1,0 +1,68 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.preferences-section-account {
+  display: flex;
+  position: relative;
+  justify-content: space-between;
+  width: 536px;
+}
+
+.preferences-account-name {
+  font-weight: bold;
+}
+
+.preferences-account-picture-button {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+
+  > span {
+    .full-screen;
+    .flex-center;
+    color: #fff;
+    font-size: @font-size-xl;
+    pointer-events: none;
+  }
+
+  > user-avatar {
+    pointer-events: none;
+  }
+
+  > input {
+    position: absolute;
+    left: -9999px;
+  }
+}
+
+.preferences-account-user-data {
+  line-height: @line-height-lg;
+}
+
+.preferences-account-accent-color {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.preferences-delete {
+  line-height: @line-height-lg;
+}
+
+
