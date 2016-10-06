@@ -31,7 +31,7 @@ class z.components.AccentColorPicker
 
     @user = ko.unwrap params.user
 
-    @accent_colors = ko.computed =>
+    @accent_colors = ko.pureComputed =>
       [1..7].map (id) =>
         css_class = "accent-color-#{id}"
         if @user? and @user.accent_id() is id

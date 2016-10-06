@@ -21,22 +21,6 @@ z.util ?= {}
 z.util.ArrayUtil ?= {}
 
 ###
-Moves an element from one place to another by it's index.
-This change happens in place which means that the array is modified immediately.
-
-todo: nice idea, DSL with "move_element.from(...).to(...).in(...)"
-
-@param from [Number] Source index of the element which should be moved
-@param to [Number] Destination index of the element which should be moved
-@param array [Array] Array where to move the array
-@return [Array] Given array
-###
-z.util.ArrayUtil.move_element = (from, to, array) ->
-  element = array[from]
-  array.splice from, 1
-  array.splice to, 0, element
-
-###
 Returns random element
 
 @param array [Array] source

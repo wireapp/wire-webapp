@@ -180,7 +180,7 @@ class z.ViewModel.MessageListViewModel
     messages_container = $('.messages-wrap')
     messages_container.on 'mousewheel', @on_mouse_wheel
 
-    window.requestAnimFrame =>
+    window.requestAnimationFrame =>
       is_current_conversation = conversation_et is @conversation()
       if not is_current_conversation
         @logger.log @logger.levels.INFO, 'Skipped loading conversation', conversation_et.display_name()
@@ -226,13 +226,13 @@ class z.ViewModel.MessageListViewModel
 
     # scroll to bottom if self user send the message
     if last_message?.from is @user_repository.self().id
-      window.requestAnimFrame -> messages_container.scroll_to_bottom()
+      window.requestAnimationFrame -> messages_container.scroll_to_bottom()
       return
 
     # scroll to the end of the list if we are under a certain threshold
     if @should_scroll_to_bottom
       @conversation_repository.mark_as_read @conversation() if document.hasFocus()
-      window.requestAnimFrame -> messages_container.scroll_to_bottom()
+      window.requestAnimationFrame -> messages_container.scroll_to_bottom()
 
     # mark as read when conversation is not scrollable
     is_scrollable = messages_container.is_scrollable()

@@ -927,7 +927,7 @@ class z.ViewModel.AuthViewModel
     else
       @disabled_by_animation true
 
-      requestAnimFrame =>
+      window.requestAnimationFrame =>
         animation_promises = []
 
         if old_component.length

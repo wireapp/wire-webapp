@@ -55,12 +55,21 @@ class z.entity.Message
     , @, deferEvaluation: true
 
   ###
-  Check if message contains a preview image asset.
-  @return [Boolean] Message contains a preview image
+  Check if message contains an asset of type file.
+  @return [Boolean] Message contains any file type asset
   ###
   has_asset: ->
     if @is_content()
       return true for asset_et in @assets() when asset_et.type is z.assets.AssetType.FILE
+    return false
+
+  ###
+  Check if message contains a file asset.
+  @return [Boolean] Message contains a file
+  ###
+  has_asset_file: ->
+    if @is_content()
+      return true for asset_et in @assets() when asset_et.is_file()
     return false
 
   ###
@@ -70,6 +79,15 @@ class z.entity.Message
   has_asset_image: ->
     if @is_content()
       return true for asset_et in @assets() when asset_et.is_medium_image() or asset_et.is_preview_image()
+    return false
+
+  ###
+  Check if message contains a location asset.
+  @return [Boolean] Message contains a location
+  ###
+  has_asset_location: ->
+    if @is_content()
+      return true for asset_et in @assets() when asset_et.is_location()
     return false
 
   ###
@@ -88,15 +106,6 @@ class z.entity.Message
   has_asset_preview_image: ->
     if @is_content()
       return true for asset_et in @assets() when asset_et.is_preview_image()
-    return false
-
-  ###
-  Check if message contains a preview image asset.
-  @return [Boolean] Message contains a preview image
-  ###
-  has_asset_file: ->
-    if @is_content()
-      return true for asset_et in @assets() when asset_et.is_file()
     return false
 
   ###

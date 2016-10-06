@@ -117,9 +117,9 @@ describe 'z.util.render_message', ->
     expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>"
     expect(actual).toBe expected
 
-describe 'z.util.encode_base64_md5_array_buffer_view', ->
+describe 'z.util.array_to_md5_base64', ->
   it 'can convert typed array to base64', ->
-    actual = z.util.encode_base64_md5_array_buffer_view(new Uint8Array([8,8]))
+    actual = z.util.array_to_md5_base64(new Uint8Array([8,8]))
     expected = 'w+7NCDwPSCf1JgWbA7deTA=='
     expect(actual).toBe expected
 

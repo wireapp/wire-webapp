@@ -29,8 +29,6 @@ module.exports = (grunt) ->
     switch target
       when 'prod'
         grunt.task.run 'prepare_prod'
-      when 'taco'
-        grunt.task.run 'prepare_taco'
       when 'staging'
         grunt.task.run 'prepare_staging'
       else

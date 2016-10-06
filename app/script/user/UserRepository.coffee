@@ -552,8 +552,7 @@ class z.user.UserRepository
   @param accent_id [Integer] New accent color
   ###
   change_accent_color: (accent_id) ->
-    @user_service.update_own_user_profile {accent_id: accent_id}, (response, error) =>
-      @self().accent_id accent_id if not error?
+    @user_service.update_own_user_profile({accent_id: accent_id}).then => @self().accent_id accent_id
 
   ###
   Change username.
@@ -561,8 +560,7 @@ class z.user.UserRepository
   ###
   change_username: (name) ->
     if name.length >= z.config.MINIMUM_USERNAME_LENGTH
-      @user_service.update_own_user_profile {name: name}, (response, error) =>
-        @self().name name if not error?
+      @user_service.update_own_user_profile({name: name}).then => @self().name name
 
   ###
   Change the profile image.
@@ -570,14 +568,14 @@ class z.user.UserRepository
   @param on_success [Function] Function to be executed on success
   ###
   change_picture: (picture, on_success) ->
-    @asset_service.upload_profile_image @self().id, picture, (upload_response, error) =>
-      if upload_response
-        @user_service.update_own_user_profile {picture: upload_response}, (update_response, error) =>
-          if not error?
-            @user_update {user: {id: @self().id, picture: upload_response}}
-            on_success?()
-      else
-        @logger.log @logger.levels.ERROR, "Error during profile image upload: #{error.message}", error
+    @asset_service.upload_profile_image @self().id, picture
+    .then (upload_response) =>
+      @user_service.update_own_user_profile {picture: upload_response}
+      .then =>
+        @user_update {user: {id: @self().id, picture: upload_response}}
+        on_success?()
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Error during profile image upload: #{error.message}", error
 
 
   ###############################################################################
