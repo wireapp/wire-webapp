@@ -43,7 +43,6 @@ class z.ViewModel.content.ContentViewModel
     @giphy =                 new z.ViewModel.GiphyViewModel 'giphy-modal', @conversation_repository, @giphy_repository
     @detail_view =           new z.ViewModel.ImageDetailViewViewModel 'detail-view'
 
-    @preferences_about =        new z.ViewModel.content.PreferencesAboutViewModel 'preferences-about'
     @preferences_account =      new z.ViewModel.content.PreferencesAccountViewModel 'preferences-account', @client_repository, @user_repository
     @preferences_devices =      new z.ViewModel.content.PreferencesDevicesViewModel 'preferences-devices', @client_repository, @conversation_repository, @cryptography_repository
     @preferences_options =      new z.ViewModel.content.PreferencesOptionsViewModel 'preferences-options'
@@ -119,9 +118,7 @@ class z.ViewModel.content.ContentViewModel
     return false if @content_state() is new_content_state
 
     @_release_content()
-    new_content_state = @_check_content_availability new_content_state
-    if new_content_state isnt z.ViewModel.content.CONTENT_STATE.WELCOME
-      @_show_content new_content_state
+    @_show_content @_check_content_availability new_content_state
 
   ###
   Switches the conversation if the other one is shown.
@@ -150,7 +147,7 @@ class z.ViewModel.content.ContentViewModel
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT then '.preferences-account'
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES then '.preferences-devices'
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS then '.preferences-options'
-      else '.blank'
+      else '.watermark'
 
   _release_content: ->
     @previous_state = @content_state()

@@ -47,18 +47,6 @@
 }
 
 .self-settings-section {
-  .control-label {
-    .ellipsis;
-    .text-right;
-    .text-uppercase;
-    font-weight: @settings-modal-label-weight;
-    line-height: @settings-modal-line-height;
-    max-width: 100%;
-    padding-right: @settings-modal-padding / 2;
-    position: relative;
-    width: 35%;
-  }
-
   .form-control {
     .text-left;
     display: inline-block;
@@ -75,52 +63,9 @@
     width: 100%;
   }
 
-  .form-control-button + .form-control-button {
-    margin-top: 8px;
-  }
-
   .form-control-checkbox-data {
     line-height: 24px;
   }
-
-  .form-control-hint {
-    color: fade(@graphite, 48%);
-    position: absolute;
-    right: 0;
-    top: 4px;
-  }
-}
-
-// sound control
-.input-thumb-style() {
-  border: none;
-  box-shadow: 0px 2px 6px 0px fade(#000, 32%), 0px 0px 2px 0px fade(#000, 16%);
-}
-.sound-control {
-  width: 100%;
-
-  &::-moz-range-thumb {.input-thumb-style;}
-  &::-webkit-slider-thumb {.input-thumb-style;}
-  &::-ms-thumb {.input-thumb-style;}
-}
-
-.sound-control-labels,
-.sound-control-hints {
-  display: flex;
-
-  & > label {
-    width: calc(100% / 3);
-  }
-}
-
-.sound-control-labels {
-  .label-xs;
-  line-height: @line-height-md;
-}
-
-.sound-control-hints {
-  color: fade(#61686d, 56%);
-  line-height: @line-height-sm;
 }
 
 .self-settings-delete {
