@@ -390,7 +390,7 @@ z.string.preferences_account_change_password = 'Change password'
 z.string.preferences_account_delete = 'Delete account'
 z.string.preferences_account_email_sent = 'Email Sent'
 z.string.preferences_account_delete_detail = 'We will send an email to %email. Follow the link to permanently delete your account.'
-z.string.preferences_account_sign_out = 'Log out'
+z.string.preferences_account_log_out = 'Log out'
 z.string.preferences_account_username_placeholder = 'Your full name'
 
 z.string.preferences_devices_activated_in = 'in %location'
