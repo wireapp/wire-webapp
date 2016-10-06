@@ -45,7 +45,7 @@ class z.ViewModel.content.ContentViewModel
 
     @preferences_account =      new z.ViewModel.content.PreferencesAccountViewModel 'preferences-account', @client_repository, @user_repository
     @preferences_devices =      new z.ViewModel.content.PreferencesDevicesViewModel 'preferences-devices', @client_repository, @conversation_repository, @cryptography_repository
-    @preferences_options =      new z.ViewModel.content.PreferencesOptionsViewModel 'preferences-options'
+    @preferences_options =      new z.ViewModel.content.PreferencesOptionsViewModel 'preferences-options', @user_repository
 
     @previous_state = undefined
     @previous_conversation = undefined

@@ -597,6 +597,7 @@ class z.user.UserRepository
         else
           @logger.log @logger.levels.INFO, 'User has no saved properties, using defaults'
       .then =>
+        console.log 'moar shit'
         amplify.publish z.event.WebApp.PROPERTIES.UPDATED, @properties
         amplify.publish z.event.WebApp.ANALYTICS.INIT, @properties, @self()
         resolve @properties
@@ -608,6 +609,7 @@ class z.user.UserRepository
   properties_updated: (properties) ->
     if properties.enable_debugging
       amplify.publish z.util.Logger::LOG_ON_DEBUG, properties.enable_debugging
+    return true
 
   ###
   Save the user properties.
