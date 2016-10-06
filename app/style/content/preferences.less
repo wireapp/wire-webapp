@@ -31,12 +31,9 @@
   }
 
   .preferences-content {
+    color: @graphite-dark;
     margin: 32px 32px 32px 72px;
     width: 560px;
-
-    .preferences-control {
-      padding-left: -32px;
-    }
 
     .preferences-detail {
       .label-semibold-xs;
@@ -46,15 +43,76 @@
 
     .preferences-header {
       .label-bold-xs;
-      color: @graphite-dark;
       line-height: @line-height-sm;
       margin-bottom: 16px;
+    }
+
+    .preferences-hint {
+      color: @graphite;
     }
 
     .preferences-link {
       display: block;
       font-size: @font-size-sm;
       line-height: @line-height-xl;
+    }
+
+    .preferences-option {
+      margin: 0 0 0 -34px;
+    }
+
+    .preferences-option-icon {
+      height: @line-height-xl;
+      font-size: @font-size-sm;
+      line-height: @line-height-sm;
+      padding: 0 0 8px 0;
+
+      label {
+        display: inline;
+        height: @line-height-sm;
+        line-height: @line-height-sm;
+      }
+
+      div,
+      svg {
+        display: inline;
+        width: @line-height-sm;
+        height: @line-height-sm;
+        margin-right: 18px;
+      }
+    }
+
+    .preferences-option-radio {
+      input[type=radio] {
+        display: none;
+      }
+
+      label {
+        display: flex;
+        height: @line-height-xl;
+        position: relative;
+        align-items: center;
+      }
+
+      label:before,
+      label:after {
+        content: "";
+        border-radius: 50%;
+        margin-right: 16px;
+        box-sizing: border-box;
+      }
+
+      label:before {
+        width: 16px;
+        height: 16px;
+        border: 1px solid @graphite;
+      }
+
+      input[type=radio]:checked + label:before {
+        border-color: #2391d3;
+        border-width: 6px;
+        background-color: #fff;
+      }
     }
 
     .preferences-section {
