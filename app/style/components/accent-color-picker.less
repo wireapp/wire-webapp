@@ -18,49 +18,38 @@
  */
 
 accent-color-picker {
-  .clear;
-  display: block;
-  width: 100%;
-}
+  display: inline-flex;
+  height: 24px;
 
-.accent-color-picker-segment {
-  display: flex;
-  float: left;
-  width: calc(100% / 7);
-  height: @accent-color-picker-height;
-  cursor: pointer;
+  input[type=radio] {
+    display: none;
 
-  &.accent-color-1 > div { background-color: @accent_colors-1; border-color: @accent_colors-1 }
-  &.accent-color-2 > div { background-color: @accent_colors-2; border-color: @accent_colors-2 }
-  &.accent-color-3 > div { background-color: @accent_colors-3; border-color: @accent_colors-3 }
-  &.accent-color-4 > div { background-color: @accent_colors-4; border-color: @accent_colors-4 }
-  &.accent-color-5 > div { background-color: @accent_colors-5; border-color: @accent_colors-5 }
-  &.accent-color-6 > div { background-color: @accent_colors-6; border-color: @accent_colors-6 }
-  &.accent-color-7 > div { background-color: @accent_colors-7; border-color: @accent_colors-7 }
-
-  &.hover .circle,
-  &:hover .circle,
-  &.selected .circle {
-    .circle(@accent-color-picker-height);
-    transition-property: transform;
-    transition-timing-function: @ease-out-expo;
-    transition-duration: @animation-timing-fast;
-    background-color: transparent;
-    border-width: @accent-color-picker-line-height;
-    border-style: solid;
-    margin: 0;
-  }
-
-  .circle {
-    width: @accent-color-picker-height;
-  }
-
-  .spacer {
-    &:not(.circle) {
-      flex: 1 1;
+    & + label {
+      cursor: pointer;
+      position: relative;
+      width: 56px;
     }
-    height: @accent-color-picker-line-height;
-    margin-top: @accent-color-picker-spacing;
-    margin-bottom: @accent-color-picker-spacing;
+
+    & + label:before {
+      .square(8px);
+      background-color: currentColor;
+    }
+
+    & + label:after,
+    & + label:before {
+      .absolute-center;
+      content: "";
+      border-radius: 50%;
+      transition: all @animation-timing-faster ease-out;
+    }
+
+    &:checked + label:before {
+      .square(12px);
+    }
+
+    &:checked + label:after {
+      .square(16px);
+      border: 1px solid currentColor;
+    }
   }
 }
