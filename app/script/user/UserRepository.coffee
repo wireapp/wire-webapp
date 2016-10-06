@@ -552,8 +552,7 @@ class z.user.UserRepository
   @param accent_id [Integer] New accent color
   ###
   change_accent_color: (accent_id) ->
-    @user_service.update_own_user_profile {accent_id: accent_id}, (response, error) =>
-      @self().accent_id accent_id if not error?
+    @user_service.update_own_user_profile({accent_id: accent_id}).then => @self().accent_id accent_id
 
   ###
   Change username.
@@ -561,8 +560,7 @@ class z.user.UserRepository
   ###
   change_username: (name) ->
     if name.length >= z.config.MINIMUM_USERNAME_LENGTH
-      @user_service.update_own_user_profile {name: name}, (response, error) =>
-        @self().name name if not error?
+      @user_service.update_own_user_profile({name: name}).then => @self().name name
 
   ###
   Change the profile image.
