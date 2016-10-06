@@ -1087,6 +1087,8 @@ class z.conversation.ConversationRepository
       optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.MESSAGE_ADD
       return @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
     .then (mapped_event) =>
+      console.warn "EPHEMERAL1", mapped_event
+
       if mapped_event.type in z.event.EventTypeHandling.STORE
         return @cryptography_repository.save_unencrypted_event mapped_event
       return mapped_event

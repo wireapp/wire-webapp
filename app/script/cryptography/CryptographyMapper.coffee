@@ -59,20 +59,7 @@ class z.cryptography.CryptographyMapper
       when 'edited'
         return @_map_edited generic_message.edited, generic_message.message_id
       when 'ephemeral'
-        ranges = [
-          dcodeIO.Long.fromNumber 1000
-          dcodeIO.Long.fromNumber 10000
-          dcodeIO.Long.fromNumber 30000
-          dcodeIO.Long.fromNumber 60000
-        ]
-
-        mapped_millis = z.util.ArrayUtil.find_closest_long ranges, generic_message.ephemeral.expire_after_millis
-        wrapped_message = @_map_generic_message generic_message.ephemeral, event
-        wrapped_message.data.expire_after_millis = mapped_millis.toString()
-
-        console.warn "EPHEMERAL1", wrapped_message
-
-        return wrapped_message
+        return @_map_ephemeral generic_message, event
       when 'external'
         return @_map_external generic_message.external, event
       when 'hidden'
@@ -183,8 +170,7 @@ class z.cryptography.CryptographyMapper
     mapped.data.replacing_message_id = edited.replacing_message_id
     return mapped
 
-  _map_ephemeral: (ephemeral, event_id) ->
-    # 1 second (1000), 10 seconds (10000), 30 seconds (30000), 1 minute (60000)
+  _map_ephemeral: (generic_message, event) ->
     ranges = [
       dcodeIO.Long.fromNumber 1000
       dcodeIO.Long.fromNumber 10000
@@ -192,12 +178,12 @@ class z.cryptography.CryptographyMapper
       dcodeIO.Long.fromNumber 60000
     ]
 
-    mapped_millis = z.util.ArrayUtil.find_closest_long ranges, ephemeral.expire_after_millis
+    mapped_millis = z.util.ArrayUtil.find_closest_long ranges, generic_message.ephemeral.expire_after_millis
+    generic_message.ephemeral.message_id = generic_message.message_id
+    embedded_message = @_map_generic_message generic_message.ephemeral, event
+    embedded_message.data.expire_after_millis = mapped_millis.toString()
 
-    event =
-      type: z.event.Client.CONVERSATION.MESSAGE_EPHEMERAL
-
-    return event
+    return embedded_message
 
   ###
   Unpacks a specific generic message which is wrapped inside an external generic message.
