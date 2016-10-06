@@ -233,11 +233,22 @@ class z.auth.AuthService
   @return [Promise] Promise that will resolve on success
   ###
   post_register: (new_user) ->
-    @client.send_json
-      url: @client.create_url "#{@URL_REGISTER}?challenge_cookie=true"
-      type: 'POST'
-      data: new_user
-      withCredentials: true
+    return new Promise (resolve, reject) =>
+      $.ajax
+        contentType: 'application/json; charset=utf-8'
+        crossDomain: true
+        data: pako.gzip JSON.stringify new_user
+        headers:
+          'Content-Encoding': 'gzip'
+        processData: false
+        type: 'POST'
+        url: @client.create_url "#{@URL_REGISTER}?challenge_cookie=true"
+        xhrFields:
+          withCredentials: true
+      .done (data) ->
+        resolve data
+      .fail (jqXHR, textStatus, errorThrown) ->
+        reject jqXHR.responseJSON or errorThrown
 
   ###
   Save the access token date in the client.
