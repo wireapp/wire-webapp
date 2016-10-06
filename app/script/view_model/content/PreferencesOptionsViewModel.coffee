@@ -20,11 +20,6 @@ window.z ?= {}
 z.ViewModel ?= {}
 z.ViewModel.content ?= {}
 
-SETTING =
-  ALL: '0'
-  NONE: '2'
-  SOME: '1'
-
 LOCALYTICS_SOUND_SETTING =
   ALL: 'alwaysPlay'
   SOME: 'FirstMessageOnly'
@@ -35,22 +30,22 @@ class z.ViewModel.content.PreferencesOptionsViewModel
   constructor: (element_id) ->
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS
 
-    @data_setting = ko.observable()
-    @data_setting.subscribe (setting) => @user_repository.save_property_data_settings setting
+    @option_data = ko.observable()
+    @option_data.subscribe (data_preference) => @user_repository.save_property_data_settings data_preference
 
-    @sound_setting = ko.observable()
-    @sound_setting.subscribe (setting) =>
+    @option_sound = ko.observable()
+    @option_sound.subscribe (sound_preference) =>
       audio_setting = z.audio.AudioSetting.ALL
       tracking_value = LOCALYTICS_SOUND_SETTING.ALL
 
-      if setting is SETTING.SOME
+      if sound_preference is OME
         audio_setting = z.audio.AudioSetting.SOME
         tracking_value = LOCALYTICS_SOUND_SETTING.SOME
-      else if setting is SETTING.NONE
+      else if sound_preference is NONE
         audio_setting = z.audio.AudioSetting.NONE
         tracking_value = LOCALYTICS_SOUND_SETTING.NONE
 
-      @user_repository.save_property_sound_alerts audio_setting
+      @user_repository.save_property_sound_alerts sound_preference
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SOUND_SETTINGS_CHANGED, value: tracking_value
 
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @update_properties
@@ -64,11 +59,5 @@ class z.ViewModel.content.PreferencesOptionsViewModel
     amplify.publish z.event.WebApp.SEARCH.SHOW
 
   update_properties: (properties) =>
-    if properties.settings.sound.alerts is z.audio.AudioSetting.ALL
-      @sound_setting SETTING.ALL
-    else if properties.settings.sound.alerts is z.audio.AudioSetting.SOME
-      @sound_setting SETTING.SOME
-    else if properties.settings.sound.alerts is z.audio.AudioSetting.NONE
-      @sound_setting SETTING.NONE
-
-    @data_setting properties.settings.privacy.report_errors
+    @option_data properties.settings.privacy.report_errors
+    @option_sound properties.settings.sound.alerts
