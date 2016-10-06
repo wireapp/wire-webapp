@@ -41,8 +41,8 @@ class z.ViewModel.content.PreferencesAccountViewModel
     amplify.subscribe z.event.WebApp.LOGOUT.ASK_TO_CLEAR_DATA, @logout
     amplify.subscribe z.event.WebApp.PREFERENCES.UPLOAD_PICTURE, @set_picture
 
-  change_accent_color: (color) =>
-    @user_repository.change_accent_color color.id
+  change_accent_color: (id) =>
+    @user_repository.change_accent_color id
 
   change_username: (name) =>
     @user_repository.change_username name

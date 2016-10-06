@@ -31,28 +31,20 @@ class z.components.AccentColorPicker
 
     @user = ko.unwrap params.user
 
-    @accent_colors = ko.pureComputed =>
-      [1..7].map (id) =>
-        css_class = "accent-color-#{id}"
-        if @user? and @user.accent_id() is id
-          css_class += ' selected'
-        color =
-          css: css_class
-          id: id
+    @accent_color_ids = [1..7]
 
-    @on_select = (color) ->
-      params?.selected color
+    @on_select = (id) ->
+      params?.selected id
+      return true
 
 
 # Knockout registration of the accent color picker component.
 ko.components.register 'accent-color-picker',
   viewModel: z.components.AccentColorPicker
   template: """
-              <!-- ko foreach : accent_colors() -->
-                <div class="accent-color-picker-segment" data-bind="css: $data.css, click: $parent.on_select">
-                  <div class="spacer"></div>
-                  <div class="spacer circle"></div>
-                  <div class="spacer"></div>
-                </div>
-              <!-- /ko -->
-            """
+    <!-- ko foreach : accent_color_ids -->
+      <input type="radio" name="accent"
+             data-bind="attr: {'id': 'accent' + $data, 'checked': $parent.user.accent_id() === $data}, click: $parent.on_select">
+      <label data-bind="attr: {'for': 'accent' + $data},css: 'accent-color-' + $data"></label>
+    <!-- /ko -->
+  """
