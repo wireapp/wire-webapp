@@ -51,6 +51,10 @@
       color: @graphite;
     }
 
+    .preferences-label {
+      color: @graphite-dark;
+    }
+
     .preferences-link {
       display: block;
       font-size: @font-size-sm;
@@ -63,6 +67,7 @@
     }
 
     .preferences-option-icon {
+      display: flex;
       height: @line-height-xl;
       font-size: @font-size-sm;
       line-height: @line-height-sm;
@@ -89,6 +94,7 @@
       }
 
       label {
+        cursor: pointer;
         display: flex;
         height: @line-height-xl;
         position: relative;
@@ -99,6 +105,7 @@
       label:before,
       label:after {
         content: "";
+        cursor: pointer;
         border-radius: 50%;
         margin-right: 16px;
         box-sizing: border-box;
@@ -111,7 +118,7 @@
       }
 
       input[type=radio]:checked + label:before {
-        border-color: #2391d3;
+        border-color: currentColor;
         border-width: 6px;
         background-color: #fff;
       }
