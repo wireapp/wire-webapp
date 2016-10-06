@@ -43,6 +43,8 @@ class z.ViewModel.ConversationInputViewModel
       else
         window.removeEventListener 'click', @on_window_click
 
+    @ephemeral_timer = @conversation_et.ephemeral_timer
+
     @conversation_has_focus = ko.observable(true).extend notify: 'always'
     @browser_has_focus = ko.observable true
 
@@ -105,8 +107,7 @@ class z.ViewModel.ConversationInputViewModel
       , 2000
 
   send_message: (message) =>
-    if message.length is 0
-      return
+    return if message.length is 0
     @conversation_repository.send_message_with_link_preview message, @conversation_et()
 
   send_message_edit: (message, message_et) =>
@@ -116,6 +117,10 @@ class z.ViewModel.ConversationInputViewModel
       return @conversation_repository.delete_message_everyone @conversation_et(), message_et
     if message isnt message_et.get_first_asset().text
       @conversation_repository.send_message_edit message, message_et, @conversation_et()
+
+  set_ephemeral_timer: =>
+    @conversation_et().ephemeral_timer 30000
+    @logger.log "Ephemeral timer for conversation '#{@conversation_et().name()}' is now at '#{@conversation_et().ephemeral_timer()}'."
 
   upload_images: (images) =>
     for image in images

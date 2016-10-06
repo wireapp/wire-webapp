@@ -19,7 +19,7 @@
 
 @font-face {
   font-family: 'Wire';
-  src: url('/font/Wire.ttf?hy9gt1') format('truetype');
+  src: url('/font/Wire.ttf?3b4ff8') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -39,6 +39,21 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-account:before {
+  content: "\e187";
+}
+.icon-devices:before {
+  content: "\e188";
+}
+.icon-options:before {
+  content: "\e135";
+}
+.icon-support:before {
+  content: "\e1270";
+}
+.icon-wire:before {
+  content: "\e202";
+}
 .icon-plus:before {
   content: "\e100";
 }
@@ -209,6 +224,9 @@
 }
 .icon-video-off:before {
   content: "\e231";
+}
+.icon-hourglass:before {
+  content: "\e239";
 }
 .icon-checkbox:before {
   content: "\e600";

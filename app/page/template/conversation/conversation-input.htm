@@ -42,6 +42,11 @@
           <!-- /ko -->
 
           <!-- ko if: input().length === 0 -->
+            <span class="controls-right-button button-icon-large icon-hourglass"
+                  data-bind="click: set_ephemeral_timer"
+                  data-uie-name="do-set-ephemeral-timer">
+            </span>
+
             <label id="conversation-input-photo"
                    class="controls-right-button button-icon-large icon-library"
                    data-bind="attr: {'title': picture_tooltip}">
