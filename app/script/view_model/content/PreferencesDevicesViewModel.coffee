@@ -70,7 +70,7 @@ class z.ViewModel.content.PreferencesDevicesViewModel
       close: =>
         @new_clients.removeAll()
       secondary: =>
-        @logger.log @logger.levels.ERROR, "Not yet implemented"
+        @logger.log @logger.levels.ERROR, 'Not yet implemented'
 
   _update_fingerprints: =>
     @cryptography_repository.get_session @self_user().id, @selected_device().id
