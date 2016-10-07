@@ -40,7 +40,7 @@ class z.ViewModel.WindowTitleViewModel
       badge_count = number_of_connect_requests + number_of_unread_conversations
 
       if badge_count > 0
-        window_title += "(#{badge_count}) "
+        window_title += "#{badge_count} · "
 
       amplify.publish z.event.WebApp.CONVERSATION.UNREAD, badge_count
 

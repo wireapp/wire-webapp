@@ -20,14 +20,7 @@
 
 #background {
   .full-screen;
-  width: @left-width;
-  min-width: @left-width;
   background-color: fade(#000, 88%);
-  overflow: hidden;
-
-  @media (min-width: @screen-lg-min) {
-    min-width: @left-fluid-width;
-  }
 }
 
 .background,
@@ -40,7 +33,6 @@
 }
 
 .background {
-  transform: translateZ(0);
   transition-property: opacity;
   transition-duration: @animation-timing-slow;
   transition-timing-function: @ease-out-quart;
