@@ -641,33 +641,3 @@ describe 'Conversation', ->
 
       expect(conversation_et.get_last_added_text_message()).toBeDefined()
       expect(conversation_et.get_last_added_text_message().id).toBe next_message_et.id
-
-  describe 'get_last_delivered_message', ->
-
-    it 'returns undefined if conversation has no messages', ->
-      expect(conversation_et.get_last_delivered_message()).not.toBeDefined()
-
-    it 'returns last delivered message', ->
-      sent_message_et = new z.entity.ContentMessage()
-      sent_message_et.id = z.util.create_random_uuid()
-      sent_message_et.status z.message.StatusType.SENT
-      conversation_et.add_message sent_message_et
-      expect(conversation_et.get_last_delivered_message()).not.toBeDefined()
-
-      delivered_message_et = new z.entity.ContentMessage()
-      delivered_message_et.id = z.util.create_random_uuid()
-      delivered_message_et.status z.message.StatusType.DELIVERED
-      conversation_et.add_message delivered_message_et
-      expect(conversation_et.get_last_delivered_message()).toBe delivered_message_et
-
-      next_sent_message_et = new z.entity.ContentMessage()
-      next_sent_message_et.id = z.util.create_random_uuid()
-      next_sent_message_et.status z.message.StatusType.SENT
-      conversation_et.add_message next_sent_message_et
-      expect(conversation_et.get_last_delivered_message()).toBe delivered_message_et
-
-      next_delivered_message_et = new z.entity.ContentMessage()
-      next_delivered_message_et.id = z.util.create_random_uuid()
-      next_delivered_message_et.status z.message.StatusType.DELIVERED
-      conversation_et.add_message next_delivered_message_et
-      expect(conversation_et.get_last_delivered_message()).toBe next_delivered_message_et
