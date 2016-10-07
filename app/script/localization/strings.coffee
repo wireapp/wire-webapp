@@ -265,6 +265,7 @@ z.string.conversation_context_menu_unlike = 'Unlike'
 z.string.conversation_delete_timestamp = 'Deleted on %@timestamp'
 z.string.conversation_edit_timestamp = 'Edited on %@timestamp'
 z.string.conversation_likes_caption = '%@number people'
+z.string.conversation_message_delivered = 'Delivered'
 
 # Conversation list
 z.string.conversation_list_empty_conversation = 'Empty conversation'

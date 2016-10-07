@@ -479,6 +479,14 @@ class z.entity.Conversation
       return message_et
 
   ###
+  Get the last delivered message.
+  @return [z.entity.Message]
+  ###
+  get_last_delivered_message: ->
+    for message_et in @messages() when message_et.status() is z.message.StatusType.DELIVERED by -1
+      return message_et
+
+  ###
   Get a message by it's unique ID.
   @param id [String] ID of message to be retrieved
   @return [z.entity.Message, undefined] Message with ID or undefined

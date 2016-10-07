@@ -485,6 +485,13 @@ class z.ViewModel.MessageListViewModel
 
     return false
 
+  ###
+  Checks if the given message is the last delivered one
+  @param message_et [z.entity.Message]
+  ###
+  is_last_delivered_message: (message_et) ->
+    return @conversation().get_last_delivered_message() is message_et
+
   click_on_cancel_request: (message_et) =>
     next_conversation_et = @conversation_repository.get_next_conversation @conversation_repository.active_conversation()
     @user_repository.cancel_connection_request message_et.other_user(), next_conversation_et
