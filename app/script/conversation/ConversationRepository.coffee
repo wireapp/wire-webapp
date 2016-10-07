@@ -806,8 +806,13 @@ class z.conversation.ConversationRepository
   send_asset_metadata: (conversation_et, file) =>
     asset = new z.proto.Asset()
     asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'asset', asset
+
+    if conversation_et.ephemeral_timer()
+      generic_message = @_wrap_in_ephemeral_message asset, conversation_et.ephemeral_timer()
+    else
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'asset', asset
+
     @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
@@ -868,7 +873,7 @@ class z.conversation.ConversationRepository
           saved_event.data.info.nonce = asset_id
           @_update_image_as_sent conversation_et, saved_event
         .catch (error) =>
-          @logger.log "Failed to upload otr asset for conversation #{conversation_et.id}", error
+          @logger.log @logger.levels.ERROR, "Failed to upload otr asset for conversation #{conversation_et.id}", error
           throw error
 
         return saved_event
@@ -933,12 +938,14 @@ class z.conversation.ConversationRepository
     ephemeral = new z.proto.Ephemeral()
     ephemeral.set 'expire_after_millis', millis
 
-    if typeof message.mention != 'undefined'
+    if message.mention?
       ephemeral.set 'text', message
-    else if typeof message.hot_knock != 'undefined'
+    else if message.hot_knock?
       ephemeral.set 'knock', message
-    else if typeof message.original_width != 'undefined'
+    else if message.original_width?
       ephemeral.set 'image', message
+    else
+      ephemeral.set 'asset', message
 
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'ephemeral', ephemeral
@@ -1114,8 +1121,6 @@ class z.conversation.ConversationRepository
       optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.MESSAGE_ADD
       return @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
     .then (mapped_event) =>
-      console.warn "EPHEMERAL1", mapped_event
-
       if mapped_event.type in z.event.EventTypeHandling.STORE
         return @cryptography_repository.save_unencrypted_event mapped_event
       return mapped_event
@@ -1314,7 +1319,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: upload_duration}
     .catch (error) =>
-      @logger.log "Failed to upload asset for conversation '#{conversation_et.id}", error
+      @logger.log @logger.levels.ERROR, "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
       if message_et.id
         @send_asset_upload_failed conversation_et, message_et.id
         @update_message_as_upload_failed message_et

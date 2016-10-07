@@ -99,7 +99,6 @@ class z.conversation.EventMapper
 
     if event.data.expire_after_millis
       message_et.expire_after_millis dcodeIO.Long.fromString event.data.expire_after_millis
-      console.warn "EPHEMERAL2", message_et
 
     if window.isNaN message_et.timestamp
       @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
