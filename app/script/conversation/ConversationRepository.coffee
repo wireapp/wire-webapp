@@ -845,8 +845,11 @@ class z.conversation.ConversationRepository
   send_image_asset: (conversation_et, image) =>
     @asset_service.create_image_proto image
     .then ([image, ciphertext]) =>
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'image', image
+      if conversation_et.ephemeral_timer()
+        generic_message = @_wrap_in_ephemeral_message image, conversation_et.ephemeral_timer()
+      else
+        generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+        generic_message.set 'image', image
       optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
       @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
       .then (mapped_event) =>
@@ -934,6 +937,8 @@ class z.conversation.ConversationRepository
       ephemeral.set 'text', message
     else if typeof message.hot_knock != 'undefined'
       ephemeral.set 'knock', message
+    else if typeof message.original_width != 'undefined'
+      ephemeral.set 'image', message
 
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'ephemeral', ephemeral

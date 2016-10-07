@@ -157,7 +157,7 @@ class z.ViewModel.ConversationInputViewModel
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_TOO_BIG,
           {size: file.size, type: file.type}
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT
-        setTimeout ->
+        window.setTimeout ->
           amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_TOO_LARGE,
             data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE)
         , 200
