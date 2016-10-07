@@ -119,7 +119,8 @@ class z.ViewModel.ConversationInputViewModel
       @conversation_repository.send_message_edit message, message_et, @conversation_et()
 
   set_ephemeral_timer: =>
-    @conversation_et().ephemeral_timer 30000
+    millis = dcodeIO.Long.fromString '30000'
+    @conversation_et().ephemeral_timer millis
     @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer()}'."
 
   upload_images: (images) =>

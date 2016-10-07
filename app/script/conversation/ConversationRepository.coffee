@@ -876,8 +876,13 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the knock
   ###
   send_knock: (conversation_et) =>
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'knock', new z.proto.Knock false
+    knock = new z.proto.Knock false
+
+    if conversation_et.ephemeral_timer()
+      generic_message = @_wrap_in_ephemeral_message knock, conversation_et.ephemeral_timer()
+    else
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'knock', knock
 
     @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) => @logger.log @logger.levels.ERROR, "#{error.message}"
@@ -923,10 +928,12 @@ class z.conversation.ConversationRepository
 
   _wrap_in_ephemeral_message: (message, millis) =>
     ephemeral = new z.proto.Ephemeral()
-    ephemeral.set 'expire_after_millis', dcodeIO.Long.fromString millis + ''
+    ephemeral.set 'expire_after_millis', millis
 
-    if message.mention
+    if typeof message.mention != 'undefined'
       ephemeral.set 'text', message
+    else if typeof message.hot_knock != 'undefined'
+      ephemeral.set 'knock', message
 
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'ephemeral', ephemeral
