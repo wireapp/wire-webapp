@@ -263,6 +263,8 @@ z.string.conversation_context_menu_unlike = 'Unlike'
 z.string.conversation_delete_timestamp = 'Deleted on %@timestamp'
 z.string.conversation_edit_timestamp = 'Edited on %@timestamp'
 z.string.conversation_likes_caption = '%@number people'
+z.string.conversation_all_archived = 'Everything archived'
+z.string.conversation_no_conversations = 'Start a conversation or invite people to join.'
 
 # Archive
 z.string.archive_header = 'Archive'

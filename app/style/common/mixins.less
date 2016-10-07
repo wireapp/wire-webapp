@@ -111,10 +111,9 @@
   border-radius: 50%;
 }
 
-// ----------------------------------------------------------------------------
-// TRANSFORM
-// ----------------------------------------------------------------------------
-.rotate-90 {
+.arrow-down:before {
+  .icon-mixin("\e111");
+  display: inline-block;
   transform: rotate(90deg);
 }
 
@@ -316,7 +315,7 @@
 // ICON MIXINS
 // ----------------------------------------------------------------------------
 
-.icon-mixin (@code, @icon-size){
+.icon-mixin (@code, @icon-size: 16px){
   content: @code;
   font-family: 'Wire';
   speak: none;
