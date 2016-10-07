@@ -265,6 +265,7 @@ z.string.de.conversation_context_menu_unlike = 'Gefällt mir nicht mehr'
 z.string.de.conversation_delete_timestamp = 'Gelöscht um %@timestamp'
 z.string.de.conversation_edit_timestamp = 'Editiert um %@timestamp'
 z.string.de.conversation_likes_caption = '%@number Personen'
+z.string.de.conversation_message_delivered = 'Zugestellt'
 
 # Conversation list
 z.string.de.conversation_list_empty_conversation = 'Leere Unterhaltung'
