@@ -97,8 +97,11 @@ class z.conversation.EventMapper
       message_et.reactions event.reactions or {}
       message_et.status event.status if event.status
 
-    if event.data.expire_after_millis
+    millis = event.data.expire_after_millis
+    if _.isString millis
       message_et.expire_after_millis dcodeIO.Long.fromString event.data.expire_after_millis
+    else if _.isNumber millis
+      console.warn "TIMESTAMP"
 
     if window.isNaN message_et.timestamp
       @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
