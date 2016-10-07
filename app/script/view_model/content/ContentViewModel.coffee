@@ -33,19 +33,20 @@ class z.ViewModel.content.ContentViewModel
       reset_minimize: ko.observable false
 
     # nested view models
-    @call_shortcuts =        new z.ViewModel.CallShortcutsViewModel @call_center
-    @video_calling =         new z.ViewModel.VideoCallingViewModel 'video-calling', @call_center, @user_repository, @conversation_repository, @multitasking
-    @connect_requests =      new z.ViewModel.content.ConnectRequestsViewModel 'connect-requests', @user_repository
-    @conversation_titlebar = new z.ViewModel.ConversationTitlebarViewModel 'conversation-titlebar', @conversation_repository, @call_center, @multitasking
-    @conversation_input =    new z.ViewModel.ConversationInputViewModel 'conversation-input', @conversation_repository, @user_repository
-    @message_list =          new z.ViewModel.MessageListViewModel 'message-list', @conversation_repository, @user_repository
-    @participants =          new z.ViewModel.ParticipantsViewModel 'participants', @user_repository, @conversation_repository, @search_repository
-    @giphy =                 new z.ViewModel.GiphyViewModel 'giphy-modal', @conversation_repository, @giphy_repository
-    @detail_view =           new z.ViewModel.ImageDetailViewViewModel 'detail-view'
+    @call_shortcuts =             new z.ViewModel.CallShortcutsViewModel @call_center
+    @video_calling =              new z.ViewModel.VideoCallingViewModel 'video-calling', @call_center, @user_repository, @conversation_repository, @multitasking
+    @connect_requests =           new z.ViewModel.content.ConnectRequestsViewModel 'connect-requests', @user_repository
+    @conversation_titlebar =      new z.ViewModel.ConversationTitlebarViewModel 'conversation-titlebar', @conversation_repository, @call_center, @multitasking
+    @conversation_input =         new z.ViewModel.ConversationInputViewModel 'conversation-input', @conversation_repository, @user_repository
+    @message_list =               new z.ViewModel.MessageListViewModel 'message-list', @conversation_repository, @user_repository
+    @participants =               new z.ViewModel.ParticipantsViewModel 'participants', @user_repository, @conversation_repository, @search_repository
+    @giphy =                      new z.ViewModel.GiphyViewModel 'giphy-modal', @conversation_repository, @giphy_repository
+    @detail_view =                new z.ViewModel.ImageDetailViewViewModel 'detail-view'
 
-    @preferences_account =      new z.ViewModel.content.PreferencesAccountViewModel 'preferences-account', @client_repository, @user_repository
-    @preferences_devices =      new z.ViewModel.content.PreferencesDevicesViewModel 'preferences-devices', @client_repository, @conversation_repository, @cryptography_repository
-    @preferences_options =      new z.ViewModel.content.PreferencesOptionsViewModel 'preferences-options'
+    @preferences_account =        new z.ViewModel.content.PreferencesAccountViewModel 'preferences-account', @client_repository, @user_repository
+    @preferences_device_details = new z.ViewModel.content.PreferencesDeviceDetailsViewModel 'preferences-devices', @client_repository, @conversation_repository, @cryptography_repository
+    @preferences_devices =        new z.ViewModel.content.PreferencesDevicesViewModel 'preferences-devices', @client_repository, @conversation_repository, @cryptography_repository
+    @preferences_options =        new z.ViewModel.content.PreferencesOptionsViewModel 'preferences-options', @user_repository
 
     @previous_state = undefined
     @previous_conversation = undefined
@@ -145,6 +146,7 @@ class z.ViewModel.content.ContentViewModel
       when z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS then '.connect-requests'
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT then '.preferences-about'
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT then '.preferences-account'
+      when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS then '.preferences-device-details'
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES then '.preferences-devices'
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS then '.preferences-options'
       else '.watermark'

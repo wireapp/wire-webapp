@@ -4,15 +4,8 @@
      data-uie-value="is-loading">
   <!-- ko stopBinding: true -->
     <div id="app" class="app">
-      <div id="background" data-bind="switch_background: self_user">
-        <div class="background no-image">
-          <div class="background-image"></div>
-          <div class="background-darken"></div>
-          <div class="background-accent bg-theme"></div>
-          <div class="background-vignette"></div>
-        </div>
-      </div>
       <div id="left" class="left">
+        #include('list/background.htm')
         #include('list/archive.htm')
         #include('list/conversations.htm')
         #include('list/preferences.htm')
@@ -31,6 +24,9 @@
         <!-- /ko -->
         <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT -->
           #include('content/preferences-account.htm')
+        <!-- /ko -->
+        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS -->
+          #include('content/preferences-device-details.htm')
         <!-- /ko -->
         <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES -->
           #include('content/preferences-devices.htm')

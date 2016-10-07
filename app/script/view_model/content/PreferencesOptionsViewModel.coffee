@@ -20,14 +20,9 @@ window.z ?= {}
 z.ViewModel ?= {}
 z.ViewModel.content ?= {}
 
-LOCALYTICS_SOUND_SETTING =
-  ALL: 'alwaysPlay'
-  SOME: 'FirstMessageOnly'
-  NONE: 'neverPlay'
-
 
 class z.ViewModel.content.PreferencesOptionsViewModel
-  constructor: (element_id) ->
+  constructor: (element_id, @user_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS
 
     @option_data = ko.observable()
@@ -35,15 +30,10 @@ class z.ViewModel.content.PreferencesOptionsViewModel
 
     @option_sound = ko.observable()
     @option_sound.subscribe (sound_preference) =>
-      audio_setting = z.audio.AudioSetting.ALL
-      tracking_value = LOCALYTICS_SOUND_SETTING.ALL
-
-      if sound_preference is OME
-        audio_setting = z.audio.AudioSetting.SOME
-        tracking_value = LOCALYTICS_SOUND_SETTING.SOME
-      else if sound_preference is NONE
-        audio_setting = z.audio.AudioSetting.NONE
-        tracking_value = LOCALYTICS_SOUND_SETTING.NONE
+      tracking_value = switch sound_preference
+        when z.audio.AudioSetting.ALL then 'alwaysPlay'
+        when z.audio.AudioSetting.SOME then 'firstMessageOnly'
+        when z.audio.AudioSetting.NONE then 'neverPlay'
 
       @user_repository.save_property_sound_alerts sound_preference
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SOUND_SETTINGS_CHANGED, value: tracking_value

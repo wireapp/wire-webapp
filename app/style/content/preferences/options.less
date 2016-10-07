@@ -1,0 +1,41 @@
+
+.preferences-options-radio {
+  input[type=radio] {
+    display: none;
+  }
+
+  label {
+    cursor: pointer;
+    display: flex;
+    height: @line-height-xl;
+    position: relative;
+    align-items: center;
+    white-space: pre;
+  }
+
+  label:before,
+  label:after {
+    content: "";
+    cursor: pointer;
+    border-radius: 50%;
+    margin-right: 16px;
+    box-sizing: border-box;
+  }
+
+  label:before {
+    width: 16px;
+    height: 16px;
+    border: 1px solid @graphite;
+  }
+
+  input[type=radio]:checked + label:before {
+    border-color: currentColor;
+    border-width: 6px;
+    background-color: #fff;
+  }
+}
+
+.preferences-options-checkbox-label {
+  color: @graphite-dark;
+  padding-left: 32px!important;
+}

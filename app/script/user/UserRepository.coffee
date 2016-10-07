@@ -608,6 +608,7 @@ class z.user.UserRepository
   properties_updated: (properties) ->
     if properties.enable_debugging
       amplify.publish z.util.Logger::LOG_ON_DEBUG, properties.enable_debugging
+    return true
 
   ###
   Save the user properties.

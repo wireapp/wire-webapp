@@ -31,6 +31,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS
 
     @self_user = @user_repository.self
+    @new_clients = ko.observableArray()
 
     @delete_status = ko.observable DELETE_STATUS.BUTTON
     @delete_confirm_text = ko.observable ''
@@ -38,6 +39,8 @@ class z.ViewModel.content.PreferencesAccountViewModel
     @_init_subscriptions()
 
   _init_subscriptions: =>
+    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_client_add
+    amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @on_client_remove
     amplify.subscribe z.event.WebApp.LOGOUT.ASK_TO_CLEAR_DATA, @logout
     amplify.subscribe z.event.WebApp.PREFERENCES.UPLOAD_PICTURE, @set_picture
 
@@ -111,3 +114,23 @@ class z.ViewModel.content.PreferencesAccountViewModel
   click_on_reset_password: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, value: 'fromProfile'
     z.util.safe_window_open z.string.url_password_reset
+
+  on_client_add: (user_id, client_et) =>
+    return true if user_id isnt @user().id
+    amplify.publish z.event.WebApp.SEARCH.BADGE.SHOW
+    @new_clients.push client_et
+
+  on_client_remove: (user_id, client_id) =>
+    return true if user_id isnt @user().id
+    for client_et in @new_clients() when client_et.id is client_id
+      @new_clients.remove client_et
+    amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE if not @new_clients().length
+
+  on_show_new_clients: =>
+    amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONNECTED_DEVICE,
+      data: @new_clients()
+      close: =>
+        @new_clients.removeAll()
+      secondary: =>
+        @logger.log @logger.levels.ERROR, 'Not yet implemented'
