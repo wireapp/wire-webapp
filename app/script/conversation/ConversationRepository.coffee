@@ -923,7 +923,7 @@ class z.conversation.ConversationRepository
 
   _wrap_in_ephemeral_message: (message, millis) =>
     ephemeral = new z.proto.Ephemeral()
-    ephemeral.set 'expire_after_millis', millis
+    ephemeral.set 'expire_after_millis', dcodeIO.Long.fromString millis + ''
 
     if message.mention
       ephemeral.set 'text', message
