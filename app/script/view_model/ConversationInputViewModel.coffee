@@ -120,7 +120,7 @@ class z.ViewModel.ConversationInputViewModel
 
   set_ephemeral_timer: =>
     @conversation_et().ephemeral_timer 30000
-    @logger.log "Ephemeral timer for conversation '#{@conversation_et().name()}' is now at '#{@conversation_et().ephemeral_timer()}'."
+    @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer()}'."
 
   upload_images: (images) =>
     for image in images

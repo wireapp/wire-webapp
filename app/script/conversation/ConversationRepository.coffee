@@ -910,13 +910,28 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the message
   ###
   send_message: (message, conversation_et) =>
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'text', new z.proto.Text message
+    text = new z.proto.Text message
+
+    if conversation_et.ephemeral_timer()
+      generic_message = @_wrap_in_ephemeral_message text, conversation_et.ephemeral_timer()
+    else
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'text', new z.proto.Text message
 
     @_send_and_inject_generic_message conversation_et, generic_message
-    .then ->
-      return generic_message
+    .then -> return generic_message
 
+  _wrap_in_ephemeral_message: (message, millis) =>
+    ephemeral = new z.proto.Ephemeral()
+    ephemeral.set 'expire_after_millis', millis
+
+    if message.mention
+      ephemeral.set 'text', message
+
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'ephemeral', ephemeral
+
+    return generic_message
 
   send_ephemeral_message: (conversation_et, millis, message) =>
     ephemeral_message = new z.proto.Ephemeral()
