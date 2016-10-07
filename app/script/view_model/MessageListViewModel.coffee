@@ -399,6 +399,11 @@ class z.ViewModel.MessageListViewModel
     if message_et.is_deletable()
       entries.push {label: z.string.conversation_context_menu_delete, action: 'delete'}
 
+    if message_et.expire_after_millis()
+      entries = [
+        {label: z.string.conversation_context_menu_delete, action: 'delete'}
+      ]
+
     if message_et.user().is_me and not @conversation().removed_from_conversation() and message_et.status() isnt z.message.StatusType.SENDING
       entries.push {label: z.string.conversation_context_menu_delete_everyone, action: 'delete-everyone'}
 
