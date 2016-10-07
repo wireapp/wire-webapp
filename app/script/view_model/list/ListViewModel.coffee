@@ -37,6 +37,7 @@ class z.ViewModel.list.ListViewModel
     # state
     @list_state = ko.observable z.ViewModel.list.LIST_STATE.CONVERSATIONS
     @last_update = ko.observable()
+    @webapp_loaded = ko.observable false
 
     # nested view models
     @archive       = new z.ViewModel.list.ArchiveViewModel 'archive', @, @conversation_repository
@@ -46,18 +47,25 @@ class z.ViewModel.list.ListViewModel
 
     @actions       = new z.ViewModel.list.ActionsViewModel 'actions-bubble', @, @conversations, @conversation_repository, @user_repository
 
+    @self_user = ko.pureComputed => @user_repository.self()?.picture_medium_url() if @webapp_loaded()
+
     @_init_subscriptions()
 
     ko.applyBindings @, document.getElementById element_id
 
+
   _init_subscriptions: =>
+    amplify.subscribe z.event.WebApp.LOADED, => @webapp_loaded true
     amplify.subscribe z.event.WebApp.PROFILE.SETTINGS.SHOW, @open_device_management
-    amplify.subscribe z.event.WebApp.SEARCH.SHOW,
     amplify.subscribe z.event.WebApp.PREFERENCES.MANAGE_DEVICES, @open_device_management
 
-  open_device_management: =>
+  open_device_management: (device_et) =>
     @switch_list z.ViewModel.list.LIST_STATE.PREFERENCES
-    @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
+    if device_et
+      @content_view_model.preferences_device_details.selected_device device_et
+      @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS
+    else
+      @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
 
   open_start_ui: =>
     @switch_list z.ViewModel.list.LIST_STATE.START_UI
