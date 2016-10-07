@@ -24,29 +24,30 @@
 
         </section>
         <section class="preferences-section">
-          <div class="form-control account-controls">
-            <a class="preferences-link" data-bind="click: click_on_reset_password, l10n_text: z.string.preferences_password_reset, l10n_tooltip: z.string.tooltip_preferences_password" rel="nofollow noopener noreferrer" target="_blank"></a>
-            <div class="self-preferences-delete">
-              <!-- ko if: delete_status() === 'button' -->
-                <span class="preferences-link text-theme"
-                      data-uie-name="go-delete-account"
-                      data-bind="click: click_on_delete, l10n_text: z.string.preferences_account_delete">
-                </span>
-              <!-- /ko -->
-              <!-- ko if: delete_status() === 'dialog' -->
-                <p data-uie-name="delete-confirm-text" data-bind="text: delete_confirm_text"></p>
-                <span class="button button-sm" data-uie-name="do-delete-account" data-bind="click: click_on_delete_send, l10n_text: z.string.modal_button_send"></span>
-                <span class="button button-sm button-inverted" data-uie-name="do-delete-cancel" data-bind="click: click_on_delete_cancel, l10n_text: z.string.modal_button_cancel"></span>
-              <!-- /ko -->
-              <!-- ko if: delete_status() === 'sent' -->
-                <span data-uie-name="delete-sent" data-bind="click: click_on_delete, l10n_text: z.string.preferences_account_email_sent"></span>
-              <!-- /ko -->
-            </div>
+          <div class="preferences-link text-theme" data-bind="click: click_on_reset_password, l10n_text: z.string.preferences_account_change_password, l10n_tooltip: z.string.tooltip_preferences_password"></div>
+          <div>
+            <!-- ko if: delete_status() === 'button' -->
+              <span class="preferences-link text-theme"
+                  data-uie-name="go-delete-account"
+                  data-bind="click: click_on_delete, l10n_text: z.string.preferences_account_delete">
+              </span>
+            <!-- /ko -->
+            <!-- ko if: delete_status() === 'dialog' -->
+              <p data-bind="text: delete_confirm_text" data-uie-name="delete-confirm-text"></p>
+              <span class="button button-sm" data-bind="click: click_on_delete_send, l10n_text: z.string.modal_button_send" data-uie-name="do-delete-account"></span>
+              <span class="button button-sm button-inverted" data-bind="click: click_on_delete_cancel, l10n_text: z.string.modal_button_cancel" data-uie-name="do-delete-cancel"></span>
+            <!-- /ko -->
+            <!-- ko if: delete_status() === 'sent' -->
+              <span data-bind="click: click_on_delete, l10n_text: z.string.preferences_account_email_sent" data-uie-name="delete-sent"></span>
+            <!-- /ko -->
           </div>
         </section>
-        <section class="preferences-section">
-          <a class="preferences-link" data-bind="click: logout, l10n_text: z.string.modal_logout_button" rel="nofollow noopener noreferrer" target="_blank"></a>
-        </section>
+
+        <!-- ko ifnot: z.util.Environment.electron -->
+          <section class="preferences-section">
+            <div class="preferences-link text-theme" data-bind="click: logout, l10n_text: z.string.preferences_account_log_out" data-uie-name="do-logout"></div>
+          </section>
+        <!-- /ko -->
       </div>
     <!-- /ko -->
   </div>

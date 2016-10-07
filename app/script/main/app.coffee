@@ -36,6 +36,8 @@ class z.main.App
     @view = @_setup_view_models()
     @util = @_setup_utils()
 
+    @first_run = false
+
     @_subscribe_to_events()
 
     @init_debugging()
@@ -108,7 +110,6 @@ class z.main.App
     view.main                      = new z.ViewModel.MainViewModel 'wire-main', @repository.user
     view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.user, @repository.conversation, @repository.call_center, @repository.search, @repository.giphy, @repository.client
     view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user
-    view.background                = new z.ViewModel.BackgroundViewModel 'background', view.content, @repository.conversation, @repository.user
     view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
     view.modals                    = new z.ViewModel.ModalsViewModel 'modals'
@@ -242,6 +243,7 @@ class z.main.App
           @service.storage.init user_et.id
           .then =>
             if not user_et.picture_medium().length
+              @first_run = true
               z.util.load_url_blob z.config.UNSPLASH_URL, (blob) =>
                 @repository.user.change_picture blob, ->
                   amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
@@ -299,7 +301,7 @@ class z.main.App
           @logger.log @logger.levels.WARN, 'No connectivity. Trigger reload on regained connectivity.', error
           @_watch_online_status()
 
-  # Subscribe to 'beforeunload to stop calls and disconnect the WebSocket.
+  # Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
   _subscribe_to_beforeunload: ->
     $(window).on 'beforeunload', =>
       @logger.log '\'window.onbeforeunload\' was triggered, so we will disconnect from the backend.'
@@ -311,34 +313,17 @@ class z.main.App
   # Hide the loading spinner and show the application UI.
   _show_ui: ->
     @logger.log @logger.levels.INFO, 'Showing application UI'
-    conversation_et = @repository.conversation.get_most_recent_conversation()
-    missing_user_image = not @repository.user.self().picture_medium()
-
-    if missing_user_image
-      # First run experience
-      amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.WATERMARK
-      amplify.publish z.event.WebApp.APP.HIDE
-      amplify.publish z.event.WebApp.APP.FADE_IN
-      # @todo Add OOBE
-    else if conversation_et
-      @view.content.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
-      ###
+    if @first_run or not @repository.user.users().length
+      @view.content.switch_content z.ViewModel.content.CONTENT_STATE.WATERMARK
+    else if conversation_et = @repository.conversation.get_most_recent_conversation()
+      # @view.content.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
-      window.setTimeout =>
-        types_to_notify = [z.conversation.ConversationType.REGULAR, z.conversation.ConversationType.ONE2ONE]
-        if conversation_et.type() in types_to_notify
-          @repository.system_notification.request_permission()
-      , 2000
-      ###
     else if @repository.user.connect_requests().length
-      window.setTimeout ->
-        amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
-      , 1000
-    else
-      amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.WATERMARK
-      window.setTimeout ->
-        amplify.publish z.event.WebApp.SEARCH.SHOW
-      , 1000
+      @view.content.switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+
+    window.setTimeout =>
+      @repository.system_notification.request_permission()
+    , 10000
 
     $('#loading-screen').remove()
     $('#wire-main')

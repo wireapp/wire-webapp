@@ -24,7 +24,6 @@ z.ViewModel.list ?= {}
 class z.ViewModel.list.ActionsViewModel
   ###
   @param element_id [String] HTML selector
-  @param list_view_model [z.ViewModel.list.ListViewModel] List view model
   @param conversations_view_model [z.ViewModel.list.ConversationListViewModel] Conversation list view model
   @param conversation_repository [z.conversation.ConversationRepository] Conversation repository
   @param user_repository [z.user.UserRepository] User repository

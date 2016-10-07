@@ -51,6 +51,10 @@
       color: @graphite;
     }
 
+    .preferences-label {
+      color: @graphite-dark;
+    }
+
     .preferences-link {
       display: block;
       font-size: @font-size-sm;
@@ -63,12 +67,14 @@
     }
 
     .preferences-option-icon {
+      display: flex;
       height: @line-height-xl;
       font-size: @font-size-sm;
       line-height: @line-height-sm;
       padding: 0 0 8px 0;
 
       label {
+        cursor: pointer;
         display: inline;
         height: @line-height-sm;
         line-height: @line-height-sm;
@@ -76,43 +82,11 @@
 
       div,
       svg {
+        cursor: pointer;
         display: inline;
         width: @line-height-sm;
         height: @line-height-sm;
         margin-right: 18px;
-      }
-    }
-
-    .preferences-option-radio {
-      input[type=radio] {
-        display: none;
-      }
-
-      label {
-        display: flex;
-        height: @line-height-xl;
-        position: relative;
-        align-items: center;
-      }
-
-      label:before,
-      label:after {
-        content: "";
-        border-radius: 50%;
-        margin-right: 16px;
-        box-sizing: border-box;
-      }
-
-      label:before {
-        width: 16px;
-        height: 16px;
-        border: 1px solid @graphite;
-      }
-
-      input[type=radio]:checked + label:before {
-        border-color: #2391d3;
-        border-width: 6px;
-        background-color: #fff;
       }
     }
 
