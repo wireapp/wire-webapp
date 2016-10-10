@@ -1,3 +1,22 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 .preferences-devices {
   .preferences-devices-model {
     font-weight: 600;
@@ -8,10 +27,52 @@
     color: @graphite;
     font-size: @font-size-xs;
     line-height: @line-height-sm;
+    margin: 16px 0;
   }
 
-  .preferences-devices-activated:first-of-type {
-    margin-top: 16px;
+  .preferences-devices-card {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    height: 72px;
+    padding-top: 8px;
+    width: 560px;
+
+    .preferences-devices-card-action {
+      display: flex;
+      justify-content: space-between;
+      height: 16px;
+      width: 48px;
+      margin-top: 16px;
+    }
+
+    .preferences-devices-card-data {
+      display: flex;
+    }
+
+    .preferences-devices-card-icon {
+      height: 16px;
+      width: 16px;
+      margin: 8px 16px 0 0;
+    }
+  }
+
+  .preferences-devices-card + .preferences-devices-card {
+    border-top: 1px solid @seperator-color;
+  }
+
+  .preferences-devices-details {
+    .label-bold-xs;
+    display: flex;
+    line-height: @line-height-sm;
+    margin: 0 0 16px -34px;
+  }
+
+  .preferences-devices-icon {
+    cursor: pointer;
+    height: 16px;
+    width: 16px;
+    margin-right: 16px;
   }
 
   .preferences-devices-id {
@@ -20,5 +81,26 @@
     span:first-child {
       .label-bold;
     }
+  }
+
+  .preferences-devices-activated-bold {
+    font-weight: 600;
+  }
+
+  .preferences-devices-fingerprint {
+    height: 48px;
+    line-height: @line-height-lg;
+    width: 356px;
+  }
+
+  .preferences-devices-fingerprint-label {
+    .label-bold-xs;
+    color: @graphite-dark;
+    margin-top: 32px;
+    margin-bottom: 8px;
+  }
+
+  .preferences-devices-verification {
+    margin: 16px auto;
   }
 }

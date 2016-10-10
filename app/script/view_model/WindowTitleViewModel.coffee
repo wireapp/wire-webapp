@@ -59,6 +59,8 @@ class z.ViewModel.WindowTitleViewModel
           window_title += z.localization.Localizer.get_text z.string.preferences_about
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
           window_title += z.localization.Localizer.get_text z.string.preferences_account
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS
+          window_title += z.localization.Localizer.get_text z.string.preferences_device_details
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
           window_title += z.localization.Localizer.get_text z.string.preferences_devices
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS

@@ -38,6 +38,7 @@ z.ViewModel.ModalType =
   LEAVE: '.modal-leave'
   LOGOUT: '.modal-logout'
   NEW_DEVICE: '.modal-new-device'
+  REMOVE_DEVICE: '.modal-remove-device'
   SESSION_RESET: '.modal-session-reset'
   UPLOAD_PARALLEL: '.modal-asset-upload-parallel'
   UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large'
@@ -81,6 +82,8 @@ class z.ViewModel.ModalsViewModel
         @_show_modal_leave options.data, title_element
       when z.ViewModel.ModalType.NEW_DEVICE
         @_show_modal_new_device options.data, title_element
+      when z.ViewModel.ModalType.REMOVE_DEVICE
+        @_show_modal_remove_device options.data, title_element
       when z.ViewModel.ModalType.TOO_MANY_MEMBERS
         @_show_modal_too_many_members options.data, message_element
       when z.ViewModel.ModalType.UPLOAD_PARALLEL
@@ -105,10 +108,12 @@ class z.ViewModel.ModalsViewModel
 
     $(type).find('.modal-action').click ->
       modal.hide ->
-        checkbox = $(type).find('.modal-option-checkbox')
-        if checkbox
+        if checkbox = $(type).find('.modal-option-checkbox')
           options.action checkbox.is ':checked'
           checkbox.attr 'checked', false
+        else if input = $(type).find('.modal-option-input')
+          options.action input.value
+          input.value = ''
         else
           options.action?()
 
@@ -181,6 +186,12 @@ class z.ViewModel.ModalsViewModel
     title_element.text z.localization.Localizer.get_text {
       id: z.string.modal_new_device_headline
       replace: {placeholder: '%@.name', content: content}
+    }
+
+  _show_modal_remove_device: (content, title_element) ->
+    title_element.text z.localization.Localizer.get_text {
+      id: z.string.modal_remove_device_headline
+      replace: {placeholder: '%device_name', content: content}
     }
 
   _show_modal_too_many_members: (content, message_element) ->

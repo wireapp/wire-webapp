@@ -17,57 +17,58 @@
  *
  */
 
-.preferences-section-account {
-  display: flex;
-  position: relative;
-  justify-content: space-between;
-  width: 536px;
-}
-
-.preferences-account-name {
-  font-weight: bold;
-}
-
-.preferences-account-mail,
-.preferences-account-phone {
-  .no-text-selection();
-}
-
-.preferences-account-picture-button {
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
-
-  > span {
-    .full-screen;
-    .flex-center;
-    color: #fff;
-    font-size: @font-size-xl;
-    pointer-events: none;
+.preferences-account {
+  .preferences-section-account-profile {
+    display: flex;
+    position: relative;
+    justify-content: space-between;
+    width: 536px;
   }
 
-  > user-avatar {
-    pointer-events: none;
+  .preferences-section-account-security {
+    margin-top: 96px;
   }
 
-  > input {
+  .preferences-account-accent-color {
     position: absolute;
-    left: -9999px;
+    bottom: 0;
+    left: 0;
+  }
+
+  .preferences-account-name {
+    font-weight: bold;
+  }
+
+  .preferences-account-mail,
+  .preferences-account-phone {
+    .no-text-selection();
+  }
+
+  .preferences-account-picture-button {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+
+    > span {
+      .full-screen;
+      .flex-center;
+      color: #fff;
+      font-size: @font-size-xl;
+      pointer-events: none;
+    }
+
+    > user-avatar {
+      pointer-events: none;
+    }
+
+    > input {
+      position: absolute;
+      left: -9999px;
+    }
+  }
+
+  .preferences-account-user-data {
+    line-height: @line-height-lg;
   }
 }
-
-.preferences-account-user-data {
-  line-height: @line-height-lg;
-}
-
-.preferences-account-accent-color {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-}
-
-.preferences-delete {
-  line-height: @line-height-lg;
-}
-
 

@@ -58,7 +58,7 @@
             <!-- /ko -->
           <!-- /ko -->
           <!-- ko if: (call().state() === z.calling.enum.CallState.ONGOING && !call().self_user_joined()) || call().is_declined() -->
-            <div class="button button-pill button-fluid button-outline button-sm"
+            <div class="button button-pill button-fluid button-outline button-small"
                  data-uie-name="do-call-controls-call-join"
                  data-bind="click: on_accept_call, l10n_text: z.string.call_join"></div>
           <!-- /ko -->
@@ -66,12 +66,12 @@
 
         <!-- ko if: call().state() === z.calling.enum.CallState.INCOMING && !call().is_declined() -->
           <div class="calls-controls-row">
-            <div class="button button-pill button-full button-sm button-theme-red"
+            <div class="button button-pill button-full button-small button-theme-red"
                  data-uie-name="do-call-controls-call-decline"
                  data-bind="click: on_ignore_call, l10n_text: z.string.call_decline">
             </div>
             <!-- ko if: call().is_remote_videod() -->
-              <div class="button button-pill button-full button-sm button-theme-green"
+              <div class="button button-pill button-full button-small button-theme-green"
                    data-uie-name="do-call-controls-call-accept"
                    data-bind="click: on_accept_video">
                 <span class="icon-video"></span>
@@ -79,7 +79,7 @@
               </div>
             <!-- /ko -->
             <!-- ko ifnot: call().is_remote_videod() -->
-              <div class="button button-pill button-full button-sm button-theme-green"
+              <div class="button button-pill button-full button-small button-theme-green"
                    data-uie-name="do-call-controls-call-accept"
                    data-bind="click: on_accept_call">
                 <span class="icon-call"></span>
@@ -157,7 +157,8 @@
   <!-- /ko -->
 
   <div class="left-list-center">
-    <ul class="left-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_unarchived">
+    <!-- ko if: conversations_unarchived().length > 0 -->
+      <ul class="left-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_unarchived">
 
       <!-- ko if: connect_requests().length > 0 -->
         <li class="left-list-item"
@@ -222,6 +223,18 @@
         </li>
       <!-- /ko -->
     </ul>
+    <!-- /ko -->
+    <!-- ko ifnot: conversations_unarchived().length > 0 -->
+      <!-- ko if: conversations_archived().length > 0 -->
+        <div class="full-screen flex-center label-xs text-white" data-bind="l10n_text: z.string.conversations_all_archived"></div>
+      <!-- /ko -->
+      <!-- ko ifnot: conversations_archived().length > 0 -->
+        <div class="conversation-hint-container">
+          <div class="conversation-hint-container-text" data-bind="l10n_text: z.string.conversations_no_conversations"></div>
+          <span class="arrow-down"></span>
+        </div>
+      <!-- /ko -->
+    <!-- /ko -->
   </div>
   <div class="conversations-footer">
     <span class="button-icon-large" data-bind="attr: {title: start_tooltip}, click: click_on_people_button" data-uie-name="go-people">

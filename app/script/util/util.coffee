@@ -226,7 +226,7 @@ z.util.download_blob = (blob, filename) ->
   link.click()
 
   # Wait before removing resource and link. Needed in FF
-  setTimeout ->
+  window.setTimeout ->
     document.body.removeChild link
     window.URL.revokeObjectURL url
   , 100
@@ -362,21 +362,16 @@ z.util.zero_padding = (value, length = 2) ->
 
 ###
 Human readable format of a timestamp. Not testable due to timezones :(
-
 @param timestamp [Number]
 @return [String]
 ###
-z.util.format_timestamp = (timestamp) ->
-  datetime = new Date timestamp
-
-  year = datetime.getFullYear()
-  month = z.util.zero_padding datetime.getMonth() + 1
-  day = z.util.zero_padding datetime.getDate()
-  hours = z.util.zero_padding datetime.getHours()
-  minutes = z.util.zero_padding datetime.getMinutes()
-  seconds = z.util.zero_padding datetime.getSeconds()
-
-  return "#{day}.#{month}.#{year} (#{hours}:#{minutes}:#{seconds})"
+z.util.format_timestamp = (timestamp, long_format = true) ->
+  time = moment timestamp
+  if long_format
+    format = if moment().year() is time.year() then 'ddd D MMM, HH:mm' else 'ddd D MMM YYYY, HH:mm'
+  else
+    format = 'DD.MM.YYYY (HH:mm:ss)'
+  return time.format format
 
 ###
 Test whether the given string is ISO 8601 format equally to date.toISOString()
@@ -390,9 +385,7 @@ z.util.is_iso_string = (date_string) ->
 z.util.sort_groups_by_last_event = (group_a, group_b) ->
   return group_b.last_event_timestamp() - group_a.last_event_timestamp()
 
-###
-  Returns a copy of an object, which is ordered by the keys of the original object.
-###
+# Returns a copy of an object, which is ordered by the keys of the original object.
 z.util.sort_object_by_keys = (object, reverse) ->
   sorted_object = {}
 

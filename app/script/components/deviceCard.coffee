@@ -35,21 +35,19 @@ class z.components.DeviceCard
     @data_uie_name += '-current' if @current
 
     @location = ko.pureComputed =>
-      result = ko.observable '?'
-      z.location.get_location @device.location?.lat, @device.location?.lon, (error, location) ->
-        result "#{location.place}, #{location.country_code}" if location
-      return result
+      return '?' if not @device.location?
+
+      z.location.get_location @device.location.lat, @device.location.lon
+      .then (location) ->
+        return "#{location.place}, #{location.country_code}"
+      .catch ->
+        return '?'
 
     $(component_info.element).addClass 'device-card-no-hover' if @detailed or not @click
     $(component_info.element).addClass 'device-card-detailed' if @detailed
 
   on_click_device: =>
     @click? @device
-
-  print_time: (timestamp) ->
-    reg_moment = moment(timestamp)
-    reg_format = if moment().year() is reg_moment.year() then 'ddd D MMM, HH:mm' else 'ddd D MMM YYYY, HH:mm'
-    return reg_moment.format reg_format
 
 
 ko.components.register 'device-card',
@@ -59,16 +57,6 @@ ko.components.register 'device-card',
   template: """
               <div class="device-info" data-bind="click: on_click_device,
                 attr: {'data-uie-uid': id, 'data-uie-value': label, 'data-uie-name': data_uie_name}">
-                <!-- ko ifnot: detailed -->
-                  <div class="label-xs">
-                    <span class="device-model" data-bind="text: model"></span>
-                    <span class="text-graphite-dark" data-bind="visible: current, l10n_text: z.string.auth_limit_devices_current"></span>
-                  </div>
-                  <div class="text-graphite-dark label-xs">
-                    <span data-bind="l10n_text: z.string.settings_devices_id"></span>
-                    <span data-uie-name="device-id" data-bind="html: z.util.print_devices_id(id)"></span>
-                  </div>
-                <!-- /ko -->
                 <!-- ko if: detailed -->
                   <div class="label-xs device-label" data-bind="text: label"></div>
                   <div class="label-xs">
@@ -79,7 +67,17 @@ ko.components.register 'device-card',
                     <span data-bind="l10n_text: z.string.settings_devices_activated"></span>
                     <span class="label-bold-xs" data-bind="text: location()"></span>
                   </div>
-                  <div class="label-xs" data-bind="text: print_time(device.time)"></div>
+                  <div class="label-xs" data-bind="text: z.util.format_timestamp(device.time)"></div>
+                <!-- /ko -->
+                <!-- ko ifnot: detailed -->
+                  <div class="label-xs">
+                    <span class="device-model" data-bind="text: model"></span>
+                    <span class="text-graphite-dark" data-bind="visible: current, l10n_text: z.string.auth_limit_devices_current"></span>
+                  </div>
+                  <div class="text-graphite-dark label-xs">
+                    <span data-bind="l10n_text: z.string.settings_devices_id"></span>
+                    <span data-uie-name="device-id" data-bind="html: z.util.print_devices_id(id)"></span>
+                  </div>
                 <!-- /ko -->
               </div>
             """

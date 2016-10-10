@@ -22,7 +22,7 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.ContentViewModel
-  constructor: (element_id, @user_repository, @conversation_repository, @call_center, @search_repository, @giphy_repository, @client_repository) ->
+  constructor: (element_id, @call_center, @client_repository, @conversation_repository, @cryptography_repository, @giphy_repository, @search_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS
 
     # state
@@ -45,7 +45,7 @@ class z.ViewModel.content.ContentViewModel
 
     @preferences_account =        new z.ViewModel.content.PreferencesAccountViewModel 'preferences-account', @client_repository, @user_repository
     @preferences_device_details = new z.ViewModel.content.PreferencesDeviceDetailsViewModel 'preferences-devices', @client_repository, @conversation_repository, @cryptography_repository
-    @preferences_devices =        new z.ViewModel.content.PreferencesDevicesViewModel 'preferences-devices', @client_repository, @conversation_repository, @cryptography_repository
+    @preferences_devices =        new z.ViewModel.content.PreferencesDevicesViewModel 'preferences-devices', @preferences_device_details, @client_repository, @conversation_repository, @cryptography_repository
     @preferences_options =        new z.ViewModel.content.PreferencesOptionsViewModel 'preferences-options', @user_repository
 
     @previous_state = undefined
@@ -159,12 +159,5 @@ class z.ViewModel.content.ContentViewModel
       @message_list.release_conversation()
 
   _show_content: (new_content_state) ->
-    _show_content = =>
-      @content_state new_content_state
-      @_shift_content @_get_element_of_content new_content_state
-
-    if @previous_state is z.ViewModel.content.CONTENT_STATE.WELCOME
-      @self_profile.hide()
-      window.setTimeout _show_content, 750 # wait for self profile to disappear
-    else
-      _show_content()
+    @content_state new_content_state
+    @_shift_content @_get_element_of_content new_content_state
