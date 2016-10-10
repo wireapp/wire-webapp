@@ -618,6 +618,7 @@ z.util.compare_names = (name_a, name_b) ->
 z.util.capitalize_first_char = (s) ->
   return "#{s.charAt(0).toUpperCase()}#{s.substring 1}"
 
+
 z.util.print_devices_id = (id) ->
   return '' if not id
   id_with_padding = z.util.zero_padding id, 16
