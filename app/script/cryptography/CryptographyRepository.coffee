@@ -95,7 +95,7 @@ class z.cryptography.CryptographyRepository
     @cryptography_service.get_user_pre_key user_id, client_id
     .then (response) ->
       return response.prekey
-    .catch (error) ->
+    .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         throw new z.user.UserError z.user.UserError::TYPE.PRE_KEY_NOT_FOUND
       else
@@ -111,7 +111,7 @@ class z.cryptography.CryptographyRepository
     @cryptography_service.get_users_pre_keys user_client_map
     .then (response) ->
       return response
-    .catch (error) ->
+    .catch (error) =>
       @logger.log @logger.levels.ERROR, "Failed to get pre-key from backend: #{error.message}"
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 

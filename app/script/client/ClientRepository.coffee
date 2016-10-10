@@ -361,9 +361,11 @@ class z.client.ClientRepository
       @delete_client_from_db @self_user().id, client_id
     .then =>
       @self_user().remove_client client_id
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, outcome: 'success'
       return @clients()
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Unable to delete client '#{client_id}': #{error.message}", error
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, outcome: 'fail'
 
       if error.code is z.service.BackendClientError::STATUS_CODE.FORBIDDEN
         error = new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FORBIDDEN

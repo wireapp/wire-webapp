@@ -116,12 +116,12 @@ class z.ViewModel.content.PreferencesAccountViewModel
     z.util.safe_window_open z.string.url_password_reset
 
   on_client_add: (user_id, client_et) =>
-    return true if user_id isnt @user().id
+    return true if user_id isnt @self_user().id
     amplify.publish z.event.WebApp.SEARCH.BADGE.SHOW
     @new_clients.push client_et
 
   on_client_remove: (user_id, client_id) =>
-    return true if user_id isnt @user().id
+    return true if user_id isnt @self_user().id
     for client_et in @new_clients() when client_et.id is client_id
       @new_clients.remove client_et
     amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE if not @new_clients().length

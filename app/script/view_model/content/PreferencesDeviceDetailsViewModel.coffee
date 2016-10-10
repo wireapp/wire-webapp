@@ -26,75 +26,53 @@ class z.ViewModel.content.PreferencesDeviceDetailsViewModel
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS
 
     @self_user = @client_repository.self_user
-    @new_clients = ko.observableArray()
 
-    @remove_form_visible = ko.observable false
-    @remove_form_error = ko.observable false
+    @device = ko.observable()
+    @device.subscribe (device_et) =>
+      return if not device_et
 
-    @selected_device = ko.observable()
-    @selected_device.subscribe =>
-      if @selected_device()
-        @is_resetting_session false
-        @remove_form_visible false
-        @remove_form_error false
-        @_update_fingerprints()
+      @is_resetting_session false
+      @fingerprint ''
+      @_update_fingerprint()
+      @_update_activation_location '?'
+      @_update_activation_time device_et.time
+      @_update_device_location device_et.location if device_et.location
 
-    @fingerprint_remote = ko.observable ''
-    @fingerprint_local = ko.observable ''
     @is_resetting_session = ko.observable false
+    @fingerprint = ko.observable ''
 
-    @current_client = @client_repository.current_client
-    # All clients except the current client
-    @devices = ko.observableArray()
-    @client_repository.clients.subscribe (client_ets) =>
-      @devices (client_et for client_et in client_ets when client_et.id isnt @current_client().id)
+    @activated_in = ko.observable z.localization.Localizer.get_text z.string.preferences_devices_activated_in
+    @activated_on = ko.observable z.localization.Localizer.get_text z.string.preferences_devices_activated_on
 
-    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_client_add
-    amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @on_client_remove
+  _update_activation_location: (location) ->
+    @activated_in z.localization.Localizer.get_text
+      id: z.string.preferences_devices_activated_in
+      replace:
+        placeholder: '%location'
+        content: "<span class='preferences-devices-activated-bold'>#{location}</span>"
 
-  on_client_add: (user_id, client_et) =>
-    return true if user_id isnt @user().id
-    amplify.publish z.event.WebApp.SEARCH.BADGE.SHOW
-    @new_clients.push client_et
+  _update_activation_time: (time) ->
+    @activated_on z.localization.Localizer.get_text
+      id: z.string.preferences_devices_activated_on
+      replace:
+        placeholder: '%time'
+        content: "<span class='preferences-devices-activated-bold'>#{z.util.format_timestamp time}</span>"
 
-  on_client_remove: (user_id, client_id) =>
-    return true if user_id isnt @user().id
-    for client_et in @new_clients() when client_et.id is client_id
-      @new_clients.remove client_et
-    amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE if not @new_clients().length
+  _update_device_location: (location) ->
+    z.location.get_location location.lat, location.lon
+    .then (retrieved_location) =>
+      @_update_activation_location "#{retrieved_location.place}, #{retrieved_location.country_code}"
+    .catch (error) =>
+      @logger.log @logger.levels.WARN, "Could not update device location: #{error.message}", error
 
-  on_show_new_clients: =>
-    amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE
-    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONNECTED_DEVICE,
-      data: @new_clients()
-      close: =>
-        @new_clients.removeAll()
-      secondary: =>
-        @logger.log @logger.levels.ERROR, 'Not yet implemented'
-
-  _update_fingerprints: =>
-    @cryptography_repository.get_session @self_user().id, @selected_device().id
+  _update_fingerprint: =>
+    @cryptography_repository.get_session @self_user().id, @device().id
     .then (cryptobox_session) =>
-      @fingerprint_remote cryptobox_session.fingerprint_remote()
-      @fingerprint_local cryptobox_session.fingerprint_local()
+      @fingerprint cryptobox_session.fingerprint_remote()
 
-  click_on_device: (client_et) =>
-    @selected_device client_et
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.VIEWED_DEVICE, outcome: 'success'
-
-  click_on_device_close: =>
-    @selected_device null
-
-  click_on_verify_client: =>
-    toggle_verified = !!!@selected_device().meta.is_verified()
-    client_id = @selected_device().id
-    user_id = @self_user().id
-    changes =
-      meta:
-        is_verified: toggle_verified
-
-    @client_repository.update_client_in_db user_id, client_id, changes
-    .then => @selected_device().meta.is_verified toggle_verified
+  click_on_details_close: ->
+    amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
+    @device null
 
   click_on_reset_session: =>
     reset_progress = =>
@@ -103,16 +81,20 @@ class z.ViewModel.content.PreferencesDeviceDetailsViewModel
       , 550
 
     @is_resetting_session true
-    @conversation_repository.reset_session @self_user().id, @selected_device().id, @conversation_repository.self_conversation().id
+    @conversation_repository.reset_session @self_user().id, @device().id, @conversation_repository.self_conversation().id
     .then -> reset_progress()
     .catch -> reset_progress()
 
-  click_on_remove_device_submit: (password) =>
-    @client_repository.delete_client @selected_device().id, password
-    .then =>
-      @selected_device null
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, outcome: 'success'
-    .catch =>
-      @logger.log @logger.levels.WARN, 'Unable to remove device'
-      @remove_form_error true
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, outcome: 'fail'
+  click_on_remove_device: =>
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE,
+      action: (password) =>
+        @client_repository.delete_client @device().id, password
+      data: @device().model
+
+  toggle_device_verification: =>
+    toggle_verified = !!!@device().meta.is_verified()
+
+    @client_repository.update_client_in_db @self_user().id, @device().id, {meta: is_verified: toggle_verified}
+    .then => @device().meta.is_verified toggle_verified
+
+    event.stopPropagation()

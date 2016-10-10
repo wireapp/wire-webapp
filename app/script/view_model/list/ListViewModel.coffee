@@ -65,7 +65,7 @@ class z.ViewModel.list.ListViewModel
       @content_view_model.preferences_device_details.selected_device device_et
       @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS
     else
-      @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
+      @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
 
   open_start_ui: =>
     @switch_list z.ViewModel.list.LIST_STATE.START_UI
