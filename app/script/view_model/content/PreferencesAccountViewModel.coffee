@@ -20,20 +20,21 @@ window.z ?= {}
 z.ViewModel ?= {}
 z.ViewModel.content ?= {}
 
-DELETE_STATUS =
-  BUTTON: 'button'
-  DIALOG: 'dialog'
-  SENT: 'sent'
-
 
 class z.ViewModel.content.PreferencesAccountViewModel
+  @ACCOUNT_DELETE_STATE =
+    BUTTON: 'button'
+    DIALOG: 'dialog'
+    SENT: 'sent'
+
+
   constructor: (element_id, @client_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS
 
     @self_user = @user_repository.self
     @new_clients = ko.observableArray()
 
-    @delete_status = ko.observable DELETE_STATUS.BUTTON
+    @account_deletion_state = ko.observable z.ViewModel.content.PreferencesAccountViewModel.ACCOUNT_DELETE_STATE.BUTTON
     @delete_confirm_text = ko.observable ''
 
     @_init_subscriptions()
@@ -50,19 +51,20 @@ class z.ViewModel.content.PreferencesAccountViewModel
   change_username: (name) =>
     @user_repository.change_username name
 
+  check_new_clients: =>
+    return if not @new_clients().length
+
+    amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONNECTED_DEVICE,
+      data: @new_clients()
+      close: =>
+        @new_clients.removeAll()
+      secondary: ->
+        amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
+
   click_on_change_picture: (files) =>
     @set_picture files, ->
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, source: 'fromPhotoLibrary'
-
-  logout: =>
-    # TODO: Rely on client repository
-    if @client_repository.current_client().type is z.client.ClientType.PERMANENT
-      amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT,
-        action: (clear_data) ->
-          amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, clear_data
-    else
-      @client_repository.delete_temporary_client()
-      .then -> amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, true
 
   set_picture: (files, callback) =>
     input_picture = files[0]
@@ -99,21 +101,31 @@ class z.ViewModel.content.PreferencesAccountViewModel
       id: z.string.preferences_account_delete_detail
       replace: {placeholder: '%email', content: @self_user().email()}
 
-    @delete_status DELETE_STATUS.DIALOG
+    @account_deletion_state z.ViewModel.content.PreferencesAccountViewModel.ACCOUNT_DELETE_STATE.DIALOG
 
   click_on_delete_send: ->
     @user_repository.delete_me()
-    @delete_status DELETE_STATUS.SENT
+    @account_deletion_state z.ViewModel.content.PreferencesAccountViewModel.ACCOUNT_DELETE_STATE.SENT
     window.setTimeout =>
-      @delete_status DELETE_STATUS.BUTTON
+      @account_deletion_state z.ViewModel.content.PreferencesAccountViewModel.ACCOUNT_DELETE_STATE.BUTTON
     , 5000
 
   click_on_delete_cancel: ->
-    @delete_status DELETE_STATUS.BUTTON
+    @account_deletion_state z.ViewModel.content.PreferencesAccountViewModel.ACCOUNT_DELETE_STATE.BUTTON
 
   click_on_reset_password: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, value: 'fromProfile'
     z.util.safe_window_open z.string.url_password_reset
+
+  logout: =>
+    # TODO: Rely on client repository
+    if @client_repository.current_client().type is z.client.ClientType.PERMANENT
+      amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT,
+        action: (clear_data) ->
+          amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, clear_data
+    else
+      @client_repository.delete_temporary_client()
+      .then -> amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, true
 
   on_client_add: (user_id, client_et) =>
     return true if user_id isnt @self_user().id
@@ -125,12 +137,3 @@ class z.ViewModel.content.PreferencesAccountViewModel
     for client_et in @new_clients() when client_et.id is client_id
       @new_clients.remove client_et
     amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE if not @new_clients().length
-
-  on_show_new_clients: =>
-    amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE
-    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONNECTED_DEVICE,
-      data: @new_clients()
-      close: =>
-        @new_clients.removeAll()
-      secondary: =>
-        @logger.log @logger.levels.ERROR, 'Not yet implemented'

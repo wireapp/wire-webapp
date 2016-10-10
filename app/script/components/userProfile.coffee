@@ -157,11 +157,11 @@ class z.components.UserProfileViewModel
       else
         @on_open()
 
-    @accent_color = ko.computed =>
+    @accent_color = ko.pureComputed =>
       return "accent-color-#{@user()?.accent_id()}"
     , @, deferEvaluation: true
 
-    @show_gray_image = ko.computed =>
+    @show_gray_image = ko.pureComputed =>
       return false if not @user()?
       return true if @user().connection().status() isnt z.user.ConnectionStatus.ACCEPTED and not @user().is_me
       return false

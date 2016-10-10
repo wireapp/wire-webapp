@@ -74,7 +74,7 @@ class z.ViewModel.ParticipantsViewModel
     # TODO create a viewmodel search?
     @user_input = ko.observable ''
     @user_selected = ko.observableArray []
-    @connected_users = ko.computed =>
+    @connected_users = ko.pureComputed =>
       connected_users = ko.utils.arrayFilter @user_repository.users(), (user_et) =>
         is_participant = ko.utils.arrayFirst @participants(), (participant) -> user_et.id is participant.id
         is_connected = user_et.connection().status() is z.user.ConnectionStatus.ACCEPTED

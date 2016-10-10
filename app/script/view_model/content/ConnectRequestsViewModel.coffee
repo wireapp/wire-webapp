@@ -28,6 +28,10 @@ class z.ViewModel.content.ConnectRequestsViewModel
 
     @connect_requests = @user_repository.connect_requests
 
+    @should_update_scrollbar = (ko.computed =>
+      return @connect_requests()
+    ).extend notify: 'always', rateLimit: 500
+
   ###
   Click on accept.
   @param user_et [z.entity.User] User to accept connection request from

@@ -27,7 +27,7 @@
 
         <!-- ko if: is_group() && call().state() === z.calling.enum.CallState.ONGOING && call().self_user_joined() -->
           <div class="conversation-list-call-controls-row conversation-list-call-controls-row-participants"
-               data-bind="click: click_on_conversation">
+               data-bind="click: $parent.click_on_conversation">
             <!-- ko foreach: call().participants() -->
               <user-avatar class="user-avatar-xs"
                            params="user: $data.user"
@@ -37,10 +37,10 @@
         <!-- /ko -->
 
         <div class="calls-controls-row calls-controls-row-conversation"
-             data-bind="click: click_on_conversation">
+             data-bind="click: $parent.click_on_conversation">
           <div class="name"
                data-bind="attr: {'data-uie-uid': id, 'data-uie-value': display_name()},
-                          css: {'text-theme': content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION && id === active_conversation_id()},
+                          css: {'text-theme': $parent.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION && id === $parent.active_conversation_id()},
                           text: display_name()"
                data-uie-name="item-call"></div>
           <!-- ko ifnot: call().is_declined() -->
@@ -60,7 +60,7 @@
           <!-- ko if: (call().state() === z.calling.enum.CallState.ONGOING && !call().self_user_joined()) || call().is_declined() -->
             <div class="button button-pill button-fluid button-outline button-small"
                  data-uie-name="do-call-controls-call-join"
-                 data-bind="click: on_accept_call, l10n_text: z.string.call_join"></div>
+                 data-bind="click: $parent.on_accept_call, l10n_text: z.string.call_join"></div>
           <!-- /ko -->
         </div>
 
@@ -68,12 +68,12 @@
           <div class="calls-controls-row">
             <div class="button button-pill button-full button-small button-theme-red"
                  data-uie-name="do-call-controls-call-decline"
-                 data-bind="click: on_ignore_call, l10n_text: z.string.call_decline">
+                 data-bind="click: $parent.on_ignore_call, l10n_text: z.string.call_decline">
             </div>
             <!-- ko if: call().is_remote_videod() -->
               <div class="button button-pill button-full button-small button-theme-green"
                    data-uie-name="do-call-controls-call-accept"
-                   data-bind="click: on_accept_video">
+                   data-bind="click: $parent.on_accept_video">
                 <span class="icon-video"></span>
                 <span data-bind="l10n_text: z.string.call_accept"></span>
               </div>
@@ -81,7 +81,7 @@
             <!-- ko ifnot: call().is_remote_videod() -->
               <div class="button button-pill button-full button-small button-theme-green"
                    data-uie-name="do-call-controls-call-accept"
-                   data-bind="click: on_accept_call">
+                   data-bind="click: $parent.on_accept_call">
                 <span class="icon-call"></span>
                 <span data-bind="l10n_text: z.string.call_accept"></span>
               </div>
@@ -96,7 +96,7 @@
                 <div class="up">
                   <div class="button-round button-round-dark icon-mute"
                        data-uie-name="do-call-mute"
-                       data-bind="click: on_toggle_audio, css: {'toggled': self_stream_state.muted()}"></div>
+                       data-bind="click: $parent.on_toggle_audio, css: {'toggled': $parent.self_stream_state.muted()}"></div>
                 </div>
                 <div class="down">
                   <span class="beta-label hidden">&nbsp;</span>
@@ -104,11 +104,11 @@
               </div>
 
               <!-- ko if: call().state() === z.calling.enum.CallState.ONGOING -->
-                <!-- ko if: show_toggle_screen() -->
+                <!-- ko if: $parent.show_toggle_screen() -->
                   <div class="call-controls-action call-controls-action-screensharing">
                     <div class="up">
                       <div class="button-round button-round-dark icon-screensharing"
-                           data-bind="click: on_toggle_screen, css: {'toggled': self_stream_state.screen_shared(), 'disabled': disable_toggle_screen()}">
+                           data-bind="click: $parent.on_toggle_screen, css: {'toggled': $parent.self_stream_state.screen_shared(), 'disabled': $parent.disable_toggle_screen()}">
                       </div>
                     </div>
                     <div class="down">
@@ -125,7 +125,7 @@
                   <div class="call-controls-action call-controls-action-video">
                     <div class="up">
                       <div class="button-round button-round-dark icon-video"
-                           data-bind="click: on_toggle_video, css: {'toggled': self_stream_state.videod()}"></div>
+                           data-bind="click: $parent.on_toggle_video, css: {'toggled': $parent.self_stream_state.videod()}"></div>
                     </div>
                     <div class="down">
                       <span class="beta-label hidden">&nbsp;</span>
@@ -142,7 +142,7 @@
                 <div class="up">
                   <div class="button-round button-round-theme-red icon-end-call"
                        data-uie-name="do-call-controls-call-ignore"
-                       data-bind="click: on_cancel_call"></div>
+                       data-bind="click: $parent.on_cancel_call"></div>
                 </div>
                 <div class="down">
                   <span class="beta-label hidden">&nbsp;</span>
@@ -157,7 +157,7 @@
   <!-- /ko -->
 
   <div class="left-list-center">
-    <!-- ko if: conversations_unarchived().length > 0 -->
+    <!-- ko if: conversations_unarchived().length > 0 || connect_requests().length > 0 -->
       <ul class="left-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_unarchived">
 
       <!-- ko if: connect_requests().length > 0 -->
@@ -212,7 +212,7 @@
                data-uie-name="item-conversation"></div>
           <div class="right-column">
             <span class="button-icon icon-more"
-                  data-bind="attr: {'id': 'options-' + id}, click: $parent.click_on_actions, l10n_tooltip: z.string.tooltip_conversations_more"
+                  data-bind="attr: {'id': 'options-' + id}, click: $root.click_on_actions, l10n_tooltip: z.string.tooltip_conversations_more"
                   data-bubble="#actions-bubble"
                   data-placement="right-flex"
                   data-uie-name="go-options"></span>
@@ -224,7 +224,7 @@
       <!-- /ko -->
     </ul>
     <!-- /ko -->
-    <!-- ko ifnot: conversations_unarchived().length > 0 -->
+    <!-- ko if: conversations_unarchived().length === 0 && connect_requests().length === 0 -->
       <!-- ko if: conversations_archived().length > 0 -->
         <div class="full-screen flex-center label-xs text-white" data-bind="l10n_text: z.string.conversations_all_archived"></div>
       <!-- /ko -->

@@ -41,7 +41,7 @@ class z.user.UserRepository
     @connections = ko.observableArray []
     @properties = new z.user.UserProperties()
 
-    @connect_requests = ko.computed =>
+    @connect_requests = ko.pureComputed =>
       user_ets = []
       for user_et in @users()
         user_ets.push user_et if user_et.connection().status() is z.user.ConnectionStatus.PENDING

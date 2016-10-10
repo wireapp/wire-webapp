@@ -29,30 +29,27 @@ class z.ViewModel.list.PreferencesListViewModel
   constructor: (element_id, @list_view_model, @content_view_model) ->
     @logger = new z.util.Logger 'z.ViewModel.list.PreferencesListViewModel', z.config.LOGGER.OPTIONS
 
-    @preferences_state = ko.observable z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+    @preferences_state = @content_view_model.content_state
     @should_update_scrollbar = (ko.computed =>
       return @list_view_model.last_update()
     ).extend notify: 'always', rateLimit: 500
+
+    @selected_about = ko.pureComputed => @preferences_state() is z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
+    @selected_account = ko.pureComputed => @preferences_state() is z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+    @selected_devices = ko.pureComputed => @preferences_state() in [z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES]
+    @selected_options = ko.pureComputed => @preferences_state() is z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
 
   click_on_close_preferences: =>
     @list_view_model.switch_list z.ViewModel.list.LIST_STATE.CONVERSATIONS
 
   click_on_about: =>
-    preferences_state = z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
-    @content_view_model.switch_content preferences_state
-    @preferences_state preferences_state
+    @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
 
   click_on_account: =>
-    preferences_state = z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
-    @content_view_model.switch_content preferences_state
-    @preferences_state preferences_state
+    @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
 
   click_on_devices: =>
-    preferences_state = z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
-    @content_view_model.switch_content preferences_state
-    @preferences_state preferences_state
+    @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
 
   click_on_options: =>
-    preferences_state = z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
-    @content_view_model.switch_content preferences_state
-    @preferences_state preferences_state
+    @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS

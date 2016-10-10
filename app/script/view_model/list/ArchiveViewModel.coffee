@@ -36,9 +36,6 @@ class z.ViewModel.list.ArchiveViewModel
       return @list_view_model.last_update()
     ).extend notify: 'always', rateLimit: 500
 
-  click_on_actions: (conversation_et, event) =>
-    @list_view_model.actions.click_on_actions conversation_et, event
-
   click_on_close_archive: =>
     @list_view_model.switch_list z.ViewModel.list.LIST_STATE.CONVERSATIONS
 

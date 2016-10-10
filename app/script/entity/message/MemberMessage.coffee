@@ -68,10 +68,10 @@ class z.entity.MemberMessage extends z.entity.SystemMessage
       ]
       return @member_message_type in large_avatar_types
 
-    @other_user = ko.computed =>
+    @other_user = ko.pureComputed =>
       if @user_ets().length is 1 then @user_ets()[0] else new z.entity.User()
 
-    @caption = ko.computed =>
+    @caption = ko.pureComputed =>
       return '' if @user_ets().length is 0
 
       switch @member_message_type

@@ -1,57 +1,59 @@
 <div id="preferences-options" class="preferences-page preferences-options" data-bind="with: $root.preferences_options">
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_options"></div>
-  <div class="preferences-content">
-    <section class="preferences-section">
-      <header class="preferences-header" data-bind="l10n_text: z.string.preferences_options_sound"></header>
-      <div class="preferences-option">
-        <div class="preferences-options-radio">
-          <input type="radio" id="preferences-options-sound-all" name="preferences-options-sound" value="all" data-bind="checked: option_sound">
-          <label class="text-theme" for="preferences-options-sound-all">
-            <span class="preferences-label" data-bind="l10n_text: z.string.preferences_options_sound_all"></span>
-            <span class="preferences-hint" data-bind="visible: option_sound() == z.audio.AudioSetting.ALL"> · <span data-bind="l10n_text: z.string.preferences_options_sound_all_detail"></span></span>
-          </label>
-          <input type="radio" id="preferences-options-sound-some" name="preferences-options-sound" value="some" data-bind="checked: option_sound">
-          <label class="text-theme" for="preferences-options-sound-some">
-            <span class="preferences-label" data-bind="l10n_text: z.string.preferences_options_sound_some"></span>
-            <span class="preferences-hint" data-bind="visible: option_sound() == z.audio.AudioSetting.SOME"> · <span data-bind="l10n_text: z.string.preferences_options_sound_some_detail"></span></span>
-          </label>
-          <input type="radio" id="preferences-options-sound-none" name="preferences-options-sound" value="none" data-bind="checked: option_sound">
-          <label class="text-theme" for="preferences-options-sound-none">
-            <span class="preferences-label" data-bind="l10n_text: z.string.preferences_options_sound_none"></span>
-            <span class="preferences-hint" data-bind="visible: option_sound() == z.audio.AudioSetting.NONE"> · <span data-bind="l10n_text: z.string.preferences_options_sound_none_detail"></span></span>
-          </label>
-        </div>
-      </div>
-    </section>
-
-    <section class="preferences-section">
-      <header class="preferences-header" data-bind="l10n_text: z.string.preferences_contacts"></header>
-      <div class="preferences-option">
-        <div class="preferences-option-icon" data-bind="click: connect_google, l10n_tooltip: z.string.tooltip_preferences_contacts" data-uie-name="do-share-contacts">
-          <svg>
-            <use xlink:href="#icon-gmail"></use>
-          </svg>
-          <label data-bind="l10n_text: z.string.preferences_options_contacts_gmail"></label>
-        </div>
-        <!-- ko if: window.zAddressBook -->
-          <div class="preferences-option-icon" data-bind="click: connect_osx_contacts, l10n_tooltip: z.string.preferences_share_osx_contacts" data-uie-name="do-share-osx-contacts">
-            <div class="icon-contacts"></div>
-            <label data-bind="l10n_text: z.string.preferences_options_contacts_osx"></label>
+  <div class="preferences-content-wrapper">
+    <div class="preferences-content" data-bind="antiscroll">
+      <section class="preferences-section">
+        <header class="preferences-header" data-bind="l10n_text: z.string.preferences_options_sound"></header>
+        <div class="preferences-option">
+          <div class="preferences-options-radio">
+            <input type="radio" id="preferences-options-sound-all" name="preferences-options-sound" value="all" data-bind="checked: option_sound">
+            <label class="text-theme" for="preferences-options-sound-all">
+              <span class="preferences-label" data-bind="l10n_text: z.string.preferences_options_sound_all"></span>
+              <span class="preferences-hint" data-bind="visible: option_sound() == z.audio.AudioSetting.ALL"> · <span data-bind="l10n_text: z.string.preferences_options_sound_all_detail"></span></span>
+            </label>
+            <input type="radio" id="preferences-options-sound-some" name="preferences-options-sound" value="some" data-bind="checked: option_sound">
+            <label class="text-theme" for="preferences-options-sound-some">
+              <span class="preferences-label" data-bind="l10n_text: z.string.preferences_options_sound_some"></span>
+              <span class="preferences-hint" data-bind="visible: option_sound() == z.audio.AudioSetting.SOME"> · <span data-bind="l10n_text: z.string.preferences_options_sound_some_detail"></span></span>
+            </label>
+            <input type="radio" id="preferences-options-sound-none" name="preferences-options-sound" value="none" data-bind="checked: option_sound">
+            <label class="text-theme" for="preferences-options-sound-none">
+              <span class="preferences-label" data-bind="l10n_text: z.string.preferences_options_sound_none"></span>
+              <span class="preferences-hint" data-bind="visible: option_sound() == z.audio.AudioSetting.NONE"> · <span data-bind="l10n_text: z.string.preferences_options_sound_none_detail"></span></span>
+            </label>
           </div>
-        <!-- /ko -->
-      </div>
-      <div class="preferences-detail"  data-bind="l10n_text: z.string.preferences_options_contacts_detail"></div>
-    </section>
-
-    <section class="preferences-section">
-      <header class="preferences-header" data-bind="l10n_text: z.string.preferences_options_data"></header>
-      <div class="preferences-option">
-        <div class="preferences-option-icon checkbox text-theme">
-          <input type="checkbox" id="checkbox" data-bind="attr: {'data-uie-value': option_data}, checked: option_data">
-          <label class="preferences-options-checkbox-label"  for="checkbox" data-bind="l10n_text: z.string.preferences_options_data_checkbox"></label>
         </div>
-      </div>
-      <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_options_data_detail"></div>
-    </section>
+      </section>
+
+      <section class="preferences-section">
+        <header class="preferences-header" data-bind="l10n_text: z.string.preferences_contacts"></header>
+        <div class="preferences-option">
+          <div class="preferences-option-icon" data-bind="click: connect_google, l10n_tooltip: z.string.tooltip_preferences_contacts" data-uie-name="do-share-contacts">
+            <svg>
+              <use xlink:href="#icon-gmail"></use>
+            </svg>
+            <label data-bind="l10n_text: z.string.preferences_options_contacts_gmail"></label>
+          </div>
+          <!-- ko if: window.zAddressBook -->
+            <div class="preferences-option-icon" data-bind="click: connect_osx_contacts, l10n_tooltip: z.string.preferences_share_osx_contacts" data-uie-name="do-share-osx-contacts">
+              <div class="icon-contacts"></div>
+              <label data-bind="l10n_text: z.string.preferences_options_contacts_osx"></label>
+            </div>
+          <!-- /ko -->
+        </div>
+        <div class="preferences-detail"  data-bind="l10n_text: z.string.preferences_options_contacts_detail"></div>
+      </section>
+
+      <section class="preferences-section">
+        <header class="preferences-header" data-bind="l10n_text: z.string.preferences_options_data"></header>
+        <div class="preferences-option">
+          <div class="preferences-option-icon checkbox text-theme">
+            <input type="checkbox" id="checkbox" data-bind="attr: {'data-uie-value': option_data}, checked: option_data">
+            <label class="preferences-options-checkbox-label"  for="checkbox" data-bind="l10n_text: z.string.preferences_options_data_checkbox"></label>
+          </div>
+        </div>
+        <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_options_data_detail"></div>
+      </section>
+    </div>
   </div>
 </div>
