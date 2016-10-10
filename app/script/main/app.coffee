@@ -36,8 +36,6 @@ class z.main.App
     @view = @_setup_view_models()
     @util = @_setup_utils()
 
-    @first_run = false
-
     @_subscribe_to_events()
 
     @init_debugging()
@@ -243,7 +241,7 @@ class z.main.App
           @service.storage.init user_et.id
           .then =>
             if not user_et.picture_medium().length
-              @first_run = true
+              @view.list.first_run true
               z.util.load_url_blob z.config.UNSPLASH_URL, (blob) =>
                 @repository.user.change_picture blob, ->
                   amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
@@ -313,7 +311,7 @@ class z.main.App
   # Hide the loading spinner and show the application UI.
   _show_ui: ->
     @logger.log @logger.levels.INFO, 'Showing application UI'
-    if @first_run or not @repository.user.users().length
+    if @view.list.first_run() or not @repository.user.users().length
       @view.content.switch_content z.ViewModel.content.CONTENT_STATE.WATERMARK
     else if conversation_et = @repository.conversation.get_most_recent_conversation()
       # @view.content.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES

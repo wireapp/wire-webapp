@@ -157,7 +157,7 @@
   <!-- /ko -->
 
   <div class="left-list-center">
-    <!-- ko if: conversations_unarchived().length > 0 || connect_requests().length > 0 -->
+    <!-- ko if: !$root.first_run() && (conversations_unarchived().length > 0 || connect_requests().length > 0) -->
       <ul class="left-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_unarchived">
 
       <!-- ko if: connect_requests().length > 0 -->
@@ -224,15 +224,15 @@
       <!-- /ko -->
     </ul>
     <!-- /ko -->
-    <!-- ko if: conversations_unarchived().length === 0 && connect_requests().length === 0 -->
-      <!-- ko if: conversations_archived().length > 0 -->
-        <div class="full-screen flex-center label-xs text-white" data-bind="l10n_text: z.string.conversations_all_archived"></div>
-      <!-- /ko -->
-      <!-- ko ifnot: conversations_archived().length > 0 -->
+    <!-- ko if: $root.first_run() || (conversations_unarchived().length === 0 && connect_requests().length === 0) -->
+      <!-- ko if: $root.first_run() || conversations_archived().length === 0 -->
         <div class="conversation-hint-container">
           <div class="conversation-hint-container-text" data-bind="l10n_text: z.string.conversations_no_conversations"></div>
           <span class="arrow-down"></span>
         </div>
+      <!-- /ko -->
+      <!-- ko if: conversations_archived().length > 0 -->
+        <div class="full-screen flex-center label-xs text-white" data-bind="l10n_text: z.string.conversations_all_archived"></div>
       <!-- /ko -->
     <!-- /ko -->
   </div>

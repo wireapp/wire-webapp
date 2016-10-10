@@ -39,6 +39,8 @@ class z.ViewModel.list.ListViewModel
     @last_update = ko.observable()
     @webapp_loaded = ko.observable false
 
+    @first_run = ko.observable false
+
     # nested view models
     @archive       = new z.ViewModel.list.ArchiveViewModel 'archive', @, @conversation_repository
     @conversations = new z.ViewModel.list.ConversationListViewModel 'conversations', @, @content_view_model, @call_center, @conversation_repository, @user_repository
@@ -100,6 +102,7 @@ class z.ViewModel.list.ListViewModel
       when z.ViewModel.list.LIST_STATE.PREFERENCES
         @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
       else
+        @first_run false
         @content_view_model.switch_previous_content()
 
   _get_element_id_of_list: (list_state) ->
