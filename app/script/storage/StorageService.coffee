@@ -40,6 +40,7 @@ class z.storage.StorageService
     throw new z.storage.StorageError z.storage.StorageError::TYPE.NO_CONVERSATION_ID if not event.conversation
     throw new z.storage.StorageError z.storage.StorageError::TYPE.NO_SENDER_ID if not event.from
     throw new z.storage.StorageError z.storage.StorageError::TYPE.NO_TIME if not event.time
+    throw new z.storage.StorageError z.storage.StorageError::TYPE.INVALID_TIME if not z.util.is_iso_string event.time
     timestamp = new Date(event.time).getTime()
     throw new z.storage.StorageError z.storage.StorageError::TYPE.INVALID_TIMESTAMP if window.isNaN timestamp
     return "#{event.conversation}@#{event.from}@#{timestamp}"

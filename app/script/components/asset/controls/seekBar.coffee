@@ -34,36 +34,41 @@ class z.components.SeekBarComponent
     @seek_bar = $(component_info.element).find('input')[0]
     @seek_bar_mouse_over = ko.observable false
     @seek_bar_thumb_dragged = ko.observable false
+    @show_seek_bar_thumb = ko.pureComputed => @seek_bar_thumb_dragged() or @seek_bar_mouse_over()
 
-    @show_seek_bar_thumb = ko.pureComputed =>
-      return @seek_bar_thumb_dragged() or @seek_bar_mouse_over()
-
-    @seek_bar.addEventListener 'mousedown', =>
-      @media_element.pause()
-      @seek_bar_thumb_dragged true
-
-    @seek_bar.addEventListener 'mouseup', =>
-      @media_element.play()
-      @seek_bar_thumb_dragged false
-
-    @seek_bar.addEventListener 'mouseenter', =>
-      @seek_bar_mouse_over true
-
-    @seek_bar.addEventListener 'mouseleave', =>
-      @seek_bar_mouse_over false
-
-    @seek_bar.addEventListener 'change', =>
-      time = @media_element.duration * (@seek_bar.value / 100)
-      @media_element.currentTime = time
-
-    @media_element.addEventListener 'timeupdate', =>
-      value = (100 / @media_element.duration) * @media_element.currentTime
-      @_update_seek_bar value
-
-    @media_element.addEventListener 'ended', =>
-      @_update_seek_bar 100
-
+    @seek_bar.addEventListener 'mousedown', @on_mouse_down
+    @seek_bar.addEventListener 'mouseup', @on_mouse_up
+    @seek_bar.addEventListener 'mouseenter', @on_mouse_enter
+    @seek_bar.addEventListener 'mouseleave', @on_mouse_leave
+    @seek_bar.addEventListener 'change', @on_change
+    @media_element.addEventListener 'timeupdate', @on_timeupdate
+    @media_element.addEventListener 'ended', @on_ended
     @_update_seek_bar_style 0
+
+  on_mouse_down: =>
+    @media_element.pause()
+    @seek_bar_thumb_dragged true
+
+  on_mouse_up: =>
+    @media_element.play()
+    @seek_bar_thumb_dragged false
+
+  on_mouse_enter: =>
+    @seek_bar_mouse_over true
+
+  on_mouse_leave: =>
+    @seek_bar_mouse_over false
+
+  on_change: =>
+    time = @media_element.duration * (@seek_bar.value / 100)
+    @media_element.currentTime = time
+
+  on_timeupdate: =>
+    value = (100 / @media_element.duration) * @media_element.currentTime
+    @_update_seek_bar value
+
+  on_ended: =>
+    @_update_seek_bar 100
 
   _update_seek_bar: (progress) =>
     return if @media_element.paused and progress < 100
@@ -77,6 +82,14 @@ class z.components.SeekBarComponent
     else
       @seek_bar.style.backgroundImage = "linear-gradient(to right, currentColor #{progress}%, rgba(255,255,255,0.4) #{progress}%)"
 
+  dispose: =>
+    @seek_bar.removeEventListener 'mousedown', @on_mouse_down
+    @seek_bar.removeEventListener 'mouseup', @on_mouse_up
+    @seek_bar.removeEventListener 'mouseenter', @on_mouse_enter
+    @seek_bar.removeEventListener 'mouseleave', @on_mouse_leave
+    @seek_bar.removeEventListener 'change', @on_change
+    @media_element.removeEventListener 'timeupdate', @on_timeupdate
+    @media_element.removeEventListener 'ended', @on_ended
 
 ko.components.register 'seek-bar',
   viewModel: createViewModel: (params, component_info) ->

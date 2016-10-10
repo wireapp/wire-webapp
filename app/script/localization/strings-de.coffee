@@ -18,7 +18,7 @@
 
 #General terms
 z.string.de.wire = 'Wire'
-z.string.de.wire_osx = 'Wire für OS X'
+z.string.de.wire_osx = 'Wire für macOS'
 z.string.de.wire_windows = 'Wire für Windows'
 z.string.de.truncation = '…'
 z.string.de.nonexistent_user = 'Gelöschte Person'
@@ -265,6 +265,7 @@ z.string.de.conversation_context_menu_unlike = 'Gefällt mir nicht mehr'
 z.string.de.conversation_delete_timestamp = 'Gelöscht um %@timestamp'
 z.string.de.conversation_edit_timestamp = 'Editiert um %@timestamp'
 z.string.de.conversation_likes_caption = '%@number Personen'
+z.string.de.conversation_message_delivered = 'Zugestellt'
 
 # Conversation list
 z.string.de.conversation_list_empty_conversation = 'Leere Unterhaltung'
@@ -492,11 +493,12 @@ z.string.de.system_notification_member_leave_removed_many = '%s.first_name hat %
 z.string.de.system_notification_member_leave_removed_one = '%s.first_name hat %@.first_name aus der Unterhaltung entfernt'
 z.string.de.system_notification_ping = 'Hat gepingt'
 z.string.de.system_notification_reaction = '%reaction deine Nachricht'
+z.string.de.system_notification_shared_audio = 'Hat eine Audio-Nachricht geteilt'
+z.string.de.system_notification_shared_file = 'Hat eine Datei geteilt'
+z.string.de.system_notification_shared_location = 'Hat einen Standort geteilt'
+z.string.de.system_notification_shared_video = 'Hat ein Video geteilt'
 z.string.de.system_notification_voice_channel_activate = 'Ruft an'
 z.string.de.system_notification_voice_channel_deactivate = 'Hat versucht anzurufen'
-z.string.de.system_notification_shared_audio = 'Hat eine Audio-Nachricht geteilt'
-z.string.de.system_notification_shared_video = 'Hat ein Video geteilt'
-z.string.de.system_notification_shared_file = 'Hat eine Datei geteilt'
 
 # Tooltips
 z.string.de.tooltip_conversation_call = 'Anruf'

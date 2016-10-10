@@ -86,6 +86,7 @@ class z.components.ContextMenuViewModel
 
   dispose: =>
     @element.removeEventListener 'click', @on_context_menu_button_click
+    @element.removeEventListener z.components.ContextMenuEvent.CONTEXT_MENU, @on_custom_context_menu
     window.removeEventListener 'scroll', @on_window_scroll
 
 

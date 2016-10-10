@@ -25,7 +25,7 @@ ko.bindingHandlers.input_hint =
     if ko.isObservable trigger
       trigger.subscribe (value) ->
         if value is true
-          requestAnimFrame ->
+          window.requestAnimationFrame ->
             input_field = $(element).find('input')
             rect = input_field[0].getBoundingClientRect()
 

@@ -48,10 +48,12 @@ class z.user.UserRepository
       return user_ets
     .extend rateLimit: 50
 
-    amplify.subscribe z.event.WebApp.PROPERTIES.CHANGE.DEBUG, @save_property_enable_debugging
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @properties_updated
     amplify.subscribe z.event.Backend.USER.CONNECTION, @user_connection
     amplify.subscribe z.event.Backend.USER.UPDATE, @user_update
+    amplify.subscribe z.event.WebApp.CLIENT.ADD, @add_client_to_user
+    amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @remove_client_from_user
+    amplify.subscribe z.event.WebApp.PROPERTIES.CHANGE.DEBUG, @save_property_enable_debugging
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @properties_updated
 
 
   ###############################################################################
@@ -69,15 +71,6 @@ class z.user.UserRepository
     @_update_connection_status user_et, z.user.ConnectionStatus.ACCEPTED, show_conversation
     .then ->
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.CONNECT_REQUEST_ACCEPTED
-
-  add_client_to_user: (user_id, client_et) =>
-    return Promise.resolve()
-    .then =>
-      user_et = @find_user user_id
-      @client_repository._save_client user_id, client_et.to_json()
-      .then ->
-        user_et.add_client client_et
-        return user_et
 
   ###
   Block a user.
@@ -97,7 +90,6 @@ class z.user.UserRepository
     @_update_connection_status user_et, z.user.ConnectionStatus.CANCELLED
     .then ->
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, next_conversation_et if next_conversation_et
-
 
   ###
   Create a connection request.
@@ -312,6 +304,39 @@ class z.user.UserRepository
 
 
   ###############################################################################
+  # Clients
+  ###############################################################################
+
+  ###
+  Adds a new client to the database and the user.
+
+  @param user_id [String] ID of user
+  @param client_id [String] ID of client to be deleted
+  @return [Promise] Promise that resolves when a client and its session have been deleted
+  ###
+  add_client_to_user: (user_id, client_et) =>
+    @client_repository.save_client_in_db user_id, client_et.to_json()
+    .then =>
+      @find_user user_id
+    .then (user_et) ->
+      user_et.add_client client_et
+
+  ###
+  Removes a stored client and the session connected with it.
+
+  @param user_id [String] ID of user
+  @param client_id [String] ID of client to be deleted
+  @return [Promise] Promise that resolves when a client and its session have been deleted
+  ###
+  remove_client_from_user: (user_id, client_id) =>
+    @client_repository.remove_client user_id, client_id
+    .then =>
+      @find_user user_id
+    .then (user_et) ->
+      user_et.remove_client client_id
+
+
+  ###############################################################################
   # Users
   ###############################################################################
 
@@ -517,6 +542,7 @@ class z.user.UserRepository
         user_ets.push user_et
     return user_ets
 
+
   ###############################################################################
   # Profile
   ###############################################################################
@@ -526,8 +552,7 @@ class z.user.UserRepository
   @param accent_id [Integer] New accent color
   ###
   change_accent_color: (accent_id) ->
-    @user_service.update_own_user_profile {accent_id: accent_id}, (response, error) =>
-      @self().accent_id accent_id if not error?
+    @user_service.update_own_user_profile({accent_id: accent_id}).then => @self().accent_id accent_id
 
   ###
   Change username.
@@ -535,8 +560,7 @@ class z.user.UserRepository
   ###
   change_username: (name) ->
     if name.length >= z.config.MINIMUM_USERNAME_LENGTH
-      @user_service.update_own_user_profile {name: name}, (response, error) =>
-        @self().name name if not error?
+      @user_service.update_own_user_profile({name: name}).then => @self().name name
 
   ###
   Change the profile image.
@@ -544,14 +568,14 @@ class z.user.UserRepository
   @param on_success [Function] Function to be executed on success
   ###
   change_picture: (picture, on_success) ->
-    @asset_service.upload_profile_image @self().id, picture, (upload_response, error) =>
-      if upload_response
-        @user_service.update_own_user_profile {picture: upload_response}, (update_response, error) =>
-          if not error?
-            @user_update {user: {id: @self().id, picture: upload_response}}
-            on_success?()
-      else
-        @logger.log @logger.levels.ERROR, "Error during profile image upload: #{error.message}", error
+    @asset_service.upload_profile_image @self().id, picture
+    .then (upload_response) =>
+      @user_service.update_own_user_profile {picture: upload_response}
+      .then =>
+        @user_update {user: {id: @self().id, picture: upload_response}}
+        on_success?()
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Error during profile image upload: #{error.message}", error
 
 
   ###############################################################################

@@ -17,13 +17,9 @@
 #
 
 window.z ?= {}
-z.util ?= {}
+z.auth ?= {}
 
-# http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
-window.requestAnimFrame = (->
-  window.requestAnimationFrame or
-  window.webkitRequestAnimationFrame or
-  window.mozRequestAnimationFrame or
-  (callback) ->
-    window.setTimeout callback, 1000 / 60
-)()
+z.auth.SignOutReasion =
+  CLIENT_REMOVED: 'client_removed'
+  SESSION_EXPIRED: 'session_expired'
+  USER_REQUESTED: 'user_requested'

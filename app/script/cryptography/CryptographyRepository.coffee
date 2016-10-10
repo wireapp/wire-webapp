@@ -173,6 +173,26 @@ class z.cryptography.CryptographyRepository
   ###############################################################################
 
   ###
+  Deletes a session.
+
+  @param user_id [String] User ID of our chat partner
+  @param client_id [String] Client ID of our chat partner
+  @return [Promise] Promise that will resolve with the ID of the reset session
+  ###
+  delete_session: (user_id, client_id) =>
+    return Promise.resolve()
+    .then =>
+      cryptobox_session = @load_session user_id, client_id
+
+      if cryptobox_session
+        @logger.log @logger.levels.INFO, "Deleting session for client '#{client_id}' of user '#{user_id}'", cryptobox_session
+        @cryptobox.session_delete cryptobox_session.id
+        .then -> return cryptobox_session.id
+      else
+        @logger.log @logger.levels.INFO, "We cannot delete the session for client '#{client_id}' of user '#{user_id}' because it was not found"
+        return undefined
+
+  ###
   Get session.
   @param user_id [String] User ID
   @param client_id [String] ID of client to retrieve session for
@@ -212,26 +232,6 @@ class z.cryptography.CryptographyRepository
   load_session: (user_id, client_id) =>
     session_id = @_construct_session_id user_id, client_id
     return @cryptobox.session_load session_id
-
-  ###
-  Resets a session.
-
-  @param user_id [String] User ID of our chat partner
-  @param client_id [String] Client ID of our chat partner
-  @return [Promise] Promise that will resolve with the ID of the reset session
-  ###
-  reset_session: (user_id, client_id) =>
-    return Promise.resolve()
-    .then =>
-      cryptobox_session = @load_session user_id, client_id
-
-      if cryptobox_session
-        @logger.log @logger.levels.INFO, "Deleting session for client '#{client_id}' of user '#{user_id}'", cryptobox_session
-        @cryptobox.session_delete cryptobox_session.id
-        .then -> return cryptobox_session.id
-      else
-        @logger.log @logger.levels.INFO, "We cannot delete the session for client '#{client_id}' of user '#{user_id}' because it was not found"
-        return undefined
 
   ###
   Save a session.
@@ -312,7 +312,7 @@ class z.cryptography.CryptographyRepository
     .catch (error) =>
       switch error.type
         when z.user.UserError::TYPE.PRE_KEY_NOT_FOUND
-          amplify.publish z.event.WebApp.CLIENT.DELETE, user_id, client_id
+          amplify.publish z.event.WebApp.CLIENT.REMOVE, user_id, client_id
         when z.user.UserError::TYPE.REQUEST_FAILURE
           @logger.log @logger.levels.WARN, "Failed to request pre-key for client '#{client_id}' of user '#{user_id}'': #{error.message}", error
         else
@@ -340,7 +340,7 @@ class z.cryptography.CryptographyRepository
             catch error
               @logger.log @logger.levels.ERROR, "Problem initiating a session for client ID '#{client_id}' from user ID '#{user_id}': #{error.message} — Skipping session.", error
           else
-            amplify.publish z.event.WebApp.CLIENT.DELETE, user_id, client_id
+            amplify.publish z.event.WebApp.CLIENT.REMOVE, user_id, client_id
       return cryptobox_session_map
     .catch (error) =>
       if error.type is z.user.UserError::TYPE.REQUEST_FAILURE

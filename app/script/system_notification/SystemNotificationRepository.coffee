@@ -165,6 +165,8 @@ class z.SystemNotification.SystemNotificationRepository
         return z.util.trunc_text asset_et.text, z.config.BROWSER_NOTIFICATION.BODY_LENGTH
     else if message_et.has_asset_medium_image()
       return  z.localization.Localizer.get_text z.string.system_notification_asset_add
+    else if message_et.has_asset_location()
+      return z.localization.Localizer.get_text z.string.system_notification_shared_location
     else if message_et.has_asset()
       asset_et = message_et.assets()[0]
       return z.localization.Localizer.get_text z.string.system_notification_shared_audio if asset_et.is_audio()
@@ -463,10 +465,10 @@ class z.SystemNotification.SystemNotificationRepository
     message_id = notification_content.options.data.message_id
     timeout_trigger_id = undefined
     notification.onclick = =>
-      notification_content.trigger()
       amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.CLICK
-      @logger.log @logger.levels.INFO, "Notification for '#{message_id} in '#{conversation_id}' closed by click."
       window.focus()
+      notification_content.trigger()
+      @logger.log @logger.levels.INFO, "Notification for '#{message_id} in '#{conversation_id}' closed by click."
       notification.close()
     notification.onclose = =>
       clearTimeout timeout_trigger_id
