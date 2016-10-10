@@ -35,8 +35,8 @@ describe 'z.storage.StorageService', ->
 
       expect(actual).toBe expected_key
 
-    it 'works with timestamps', ->
-      event.time = 1468091455076
+    it 'works with iso time', ->
+      event.time = new Date(1468091455076).toISOString()
       actual = z.storage.StorageService.construct_primary_key event
 
       expect(actual).toBe expected_key
@@ -56,7 +56,12 @@ describe 'z.storage.StorageService', ->
       function_call = -> z.storage.StorageService.construct_primary_key event
       expect(function_call).toThrowError z.storage.StorageError, 'Missing time'
 
-    it 'throws an error on invalid timestamps', ->
+    it 'throws an error on invalid time', ->
       event.time = 'A'
+      function_call = -> z.storage.StorageService.construct_primary_key event
+      expect(function_call).toThrowError z.storage.StorageError, 'Event time needs to be ISO 8601'
+
+    it 'throws an error on invalid timestamps', ->
+      event.time = '2011-11-39T14:48:00.000Z'
       function_call = -> z.storage.StorageService.construct_primary_key event
       expect(function_call).toThrowError z.storage.StorageError, 'Invalid timestamp'
