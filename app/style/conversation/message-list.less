@@ -70,16 +70,28 @@
     opacity: 1;
   }
 
+  &:not(:hover) {
+    .message-status {
+      opacity: 1;
+    }
+  }
+
+  .show-timestamp.time + .message-status {
+    opacity: 0;
+  }
+
   &:last-child {
     margin-bottom: 24px;
   }
 
-  .time {
+  .time,
+  .message-status {
     .action-pill-style;
     color: fade(#000, 40%);
     font-size: @font-size-xs;
     padding-left: 6px;
     padding-right: 6px;
+    pointer-events: none;
     position: absolute;
     right: 24px;
     top: 3px;
@@ -328,7 +340,8 @@
     }
 
     .time,
-    .context-menu {
+    .context-menu,
+    .message-status {
       top: 24px;
       background-color: fade(#fff, 80%);
       border-radius: 16px;

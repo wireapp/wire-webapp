@@ -112,12 +112,13 @@ class z.conversation.ConversationRepository
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
   @param user_ids [Array<String>] Optional array of user IDs to limit sending to
+  @param native_push [Boolean] Optional if message should enforce native push
   @return [Promise] Promise that resolves when the message was sent
   ###
-  _add_to_sending_queue: (conversation_id, generic_message, user_ids) =>
+  _add_to_sending_queue: (conversation_id, generic_message, user_ids, native_push) =>
     return new Promise (resolve, reject) =>
       queue_entry =
-        function: => @_send_generic_message conversation_id, generic_message, user_ids
+        function: => @_send_generic_message conversation_id, generic_message, user_ids, native_push
         resolve: resolve
         reject: reject
 
@@ -840,7 +841,7 @@ class z.conversation.ConversationRepository
 
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
-    @_add_to_sending_queue conversation_et.id, generic_message, [message_et.user().id]
+    @_add_to_sending_queue conversation_et.id, generic_message, [message_et.user().id], false
 
   ###
   Sends image asset in specified conversation.
@@ -1155,9 +1156,10 @@ class z.conversation.ConversationRepository
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Generic message to be sent as external message
   @param user_ids [Array<String>] Optional array of user IDs to limit sending to
+  @param native_push [Boolean] Optional if message should enforce native push
   @return [Promise] Promise that resolves after sending the external message
   ###
-  _send_external_generic_message: (conversation_id, generic_message, user_ids) =>
+  _send_external_generic_message: (conversation_id, generic_message, user_ids, native_push = true) =>
     @logger.log @logger.levels.INFO, "Sending external message of type '#{generic_message.content}'", generic_message
 
     key_bytes = null
@@ -1176,7 +1178,7 @@ class z.conversation.ConversationRepository
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message_external
     .then (payload) =>
       payload.data = z.util.array_to_base64 ciphertext
-      payload.native_push = true
+      payload.native_push = native_push
       @_send_encrypted_message conversation_id, generic_message, payload, user_ids
     .catch (error) =>
       @logger.log @logger.levels.INFO, 'Failed sending external message', error
@@ -1189,13 +1191,14 @@ class z.conversation.ConversationRepository
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
   @param user_ids [Array<String>] Optional array of user IDs to limit sending to
+  @param native_push [Boolean] Optional if message should enforce native push
   @return [Promise] Promise that resolves when the message was sent
   ###
-  _send_generic_message: (conversation_id, generic_message, user_ids) =>
+  _send_generic_message: (conversation_id, generic_message, user_ids, native_push = true) =>
     Promise.resolve @_send_as_external_message conversation_id, generic_message
     .then (send_as_external) =>
       if send_as_external
-        @_send_external_generic_message conversation_id, generic_message
+        @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
       else
         @_create_user_client_map conversation_id
         .then (user_client_map) =>
@@ -1203,10 +1206,11 @@ class z.conversation.ConversationRepository
             delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
           return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
         .then (payload) =>
+          payload.native_push = native_push
           @_send_encrypted_message conversation_id, generic_message, payload, user_ids
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
-        return @_send_external_generic_message conversation_id, generic_message
+        return @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
       throw error
 
   ###
@@ -1248,7 +1252,6 @@ class z.conversation.ConversationRepository
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
     .then (payload) =>
       payload.inline = false
-      payload.native_push = true
       @asset_service.post_asset_v2 conversation_id, payload, image_data, false, nonce
       .catch (error_response) =>
         return @_update_payload_for_changed_clients error_response, generic_message, payload
@@ -1955,7 +1958,7 @@ class z.conversation.ConversationRepository
         deleted_time: time
       type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
       from: message_to_delete_et.from
-      time: message_to_delete_et.timestamp
+      time: new Date(message_to_delete_et.timestamp).toISOString()
 
 
   ###############################################################################

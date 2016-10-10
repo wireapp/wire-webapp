@@ -97,6 +97,9 @@
                     tabindex="-1"></context-menu>
       <!-- ko ifnot: message.timestamp == '' -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
+        <!-- ko if: $parents[1].is_last_delivered_message(message) -->
+          <span class="message-status" data-bind="l10n_text: z.string.conversation_message_delivered"></span>
+        <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
 

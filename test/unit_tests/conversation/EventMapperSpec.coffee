@@ -41,7 +41,7 @@ describe 'Event Mapper', ->
           nonce: event_id
         id: event_id
         from: z.util.create_random_uuid
-        time: Date.now()
+        time: new Date().toISOString()
         type: z.event.Backend.CONVERSATION.MESSAGE_ADD
 
       message_et = event_mapper.map_json_event event, conversation_et
@@ -62,7 +62,7 @@ describe 'Event Mapper', ->
           previews: [link_preview.encode64()]
         id: event_id
         from: z.util.create_random_uuid
-        time: Date.now()
+        time: new Date().toISOString()
         type: z.event.Backend.CONVERSATION.MESSAGE_ADD
 
       message_et = event_mapper.map_json_event event, conversation_et

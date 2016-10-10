@@ -418,6 +418,7 @@ class z.cryptography.CryptographyRepository
     return {
       sender: sender
       recipients: {}
+      native_push: true
     }
 
   ###
