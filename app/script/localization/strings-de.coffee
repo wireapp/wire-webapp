@@ -263,6 +263,8 @@ z.string.de.conversation_context_menu_unlike = 'Gefällt mir nicht mehr'
 z.string.de.conversation_delete_timestamp = 'Gelöscht um %@timestamp'
 z.string.de.conversation_edit_timestamp = 'Editiert um %@timestamp'
 z.string.de.conversation_likes_caption = '%@number Personen'
+z.string.de.conversation_all_archived = 'Alles archiviert'
+z.string.conversation_no_conversations = 'Beginne eine Unterhaltung oder lade weitere Freunde ein.'
 
 # Archive
 z.string.de.archive_header = 'Archivieren'
