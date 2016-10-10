@@ -7,10 +7,10 @@
     </user-input>
     <div class="start-ui-header-actions clear" data-bind="css: {'start-ui-header-actions-visible': selected_people().length > 0}">
         <!-- ko if: selected_people().length === 1 -->
-          <div class="button button-sm button-fluid pull-left" data-bind="click: on_submit_search, l10n_text: z.string.search_open" data-uie-name="do-open"></div>
+          <div class="button button-small button-fluid pull-left" data-bind="click: on_submit_search, l10n_text: z.string.search_open" data-uie-name="do-open"></div>
         <!-- /ko -->
         <!-- ko if: selected_people().length > 1 -->
-          <div class="button button-sm button-fluid pull-left" data-bind="click: on_submit_search, l10n_text: z.string.search_open_group" data-uie-name="do-add-create"></div>
+          <div class="button button-small button-fluid pull-left" data-bind="click: on_submit_search, l10n_text: z.string.search_open_group" data-uie-name="do-add-create"></div>
         <!-- /ko -->
         <!-- ko if: selected_people().length >= 1 -->
           <div class="start-ui-header-actions-last button-round button-round-theme icon-call pull-right" data-bind="click: on_audio_call" data-uie-name="do-audio-call"></div>
@@ -74,25 +74,6 @@
           <div class="start-ui-no-top-people" data-bind="l10n_text: z.string.search_try_search"></div>
         <!-- /ko  -->
 
-        <!-- ko if: show_invite() && !show_no_contacts_on_wire() && !search_input() -->
-          <div class="start-ui-import-container">
-            <h1 class="start-ui-import-headline" data-bind="l10n_text: z.string.people_invite_headline"></h1>
-            <!-- ko if: window.zAddressBook -->
-              <div class="start-ui-import-buttons" data-uie-name="from-contacts" data-bind="click: click_on_contacts_import">
-                <div class="start-ui-import-buttons-icon icon-contacts"></div>
-                <span class="label-bold-xs" data-bind="l10n_text: z.string.people_invite_button_contacts"></span>
-              </div>
-            <!-- /ko -->
-            <div class="start-ui-import-buttons" data-uie-name="from-gmail" data-bind="click: click_on_gmail_import">
-              <svg class="start-ui-import-buttons-icon">
-                <use xlink:href="#icon-gmail"></use>
-              </svg>
-              <span class="label-bold-xs" data-bind="l10n_text: z.string.people_invite_button_gmail"></span>
-            </div>
-            <div class="start-ui-import-detail" data-bind="l10n_text: z.string.people_invite_detail"></div>
-          </div>
-        <!-- /ko  -->
-
       <!-- /ko  -->
 
       <!-- ko if: show_spinner() -->
@@ -103,6 +84,27 @@
 
     </div>
   </div>
+
+  <!-- ko if: show_invite() && !show_no_contacts_on_wire() && !search_input() -->
+    <div class="start-ui-import-container">
+      <div>
+        <h1 class="start-ui-import-headline" data-bind="l10n_text: z.string.people_invite_headline"></h1>
+        <!-- ko if: window.zAddressBook -->
+        <div class="start-ui-import-buttons" data-uie-name="from-contacts" data-bind="click: click_on_contacts_import">
+          <div class="start-ui-import-buttons-icon icon-contacts"></div>
+          <span class="label-bold-xs" data-bind="l10n_text: z.string.people_invite_button_contacts"></span>
+        </div>
+        <!-- /ko -->
+        <div class="start-ui-import-buttons" data-uie-name="from-gmail" data-bind="click: click_on_gmail_import">
+          <svg class="start-ui-import-buttons-icon">
+            <use xlink:href="#icon-gmail"></use>
+          </svg>
+          <span class="label-bold-xs" data-bind="l10n_text: z.string.people_invite_button_gmail"></span>
+        </div>
+        <div class="start-ui-import-detail" data-bind="l10n_text: z.string.people_invite_detail"></div>
+      </div>
+    </div>
+  <!-- /ko  -->
 
   <div class="start-ui-import" data-bind="click: show_invite_bubble" >
     <span id="invite-button" class="label-bold-xs" data-bind="text: invite_button_text" data-bubble="#invite-bubble" data-placement="top"></span>

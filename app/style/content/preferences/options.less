@@ -1,41 +1,61 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
-.preferences-options-radio {
-  input[type=radio] {
-    display: none;
+.preferences-options {
+  .preferences-options-radio {
+    input[type=radio] {
+      display: none;
+    }
+
+    label {
+      cursor: pointer;
+      display: flex;
+      height: @line-height-xl;
+      position: relative;
+      align-items: center;
+      white-space: pre;
+    }
+
+    label:before,
+    label:after {
+      content: "";
+      cursor: pointer;
+      border-radius: 50%;
+      margin-right: 16px;
+      box-sizing: border-box;
+    }
+
+    label:before {
+      width: 16px;
+      height: 16px;
+      border: 1px solid @graphite;
+    }
+
+    input[type=radio]:checked + label:before {
+      border-color: currentColor;
+      border-width: 6px;
+      background-color: #fff;
+    }
   }
 
-  label {
-    cursor: pointer;
-    display: flex;
-    height: @line-height-xl;
-    position: relative;
-    align-items: center;
-    white-space: pre;
+  .preferences-options-checkbox-label {
+    color: @graphite-dark;
+    padding-left: 32px!important;
   }
-
-  label:before,
-  label:after {
-    content: "";
-    cursor: pointer;
-    border-radius: 50%;
-    margin-right: 16px;
-    box-sizing: border-box;
-  }
-
-  label:before {
-    width: 16px;
-    height: 16px;
-    border: 1px solid @graphite;
-  }
-
-  input[type=radio]:checked + label:before {
-    border-color: currentColor;
-    border-width: 6px;
-    background-color: #fff;
-  }
-}
-
-.preferences-options-checkbox-label {
-  color: @graphite-dark;
-  padding-left: 32px!important;
 }

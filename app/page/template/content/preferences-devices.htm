@@ -1,18 +1,44 @@
 <div id="preferences-devices" class="preferences-page preferences-devices" data-bind="with: $root.preferences_devices">
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_devices"></div>
   <div class="preferences-content">
-    <section class="preferences-section">
+    <section class="preferences-section" data-uie-name="preferences-device-current">
       <header class="preferences-header" data-bind="l10n_text: z.string.preferences_devices_current"></header>
       <!-- ko if: current_client() -->
         <div class="preferences-devices-model" data-bind="text: current_client().model"></div>
-        <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferences_devices_id"></span><span data-bind="text: current_client().id"></span></div>
-        <div class="preferences-devices-activated" data-bind="l10n_html: {id: z.string.preferences_devices_activated_on, replace: {placeholder: '%time', content: '<span class=\'label-semibold\'>' + 'time' + '</span>'}}"></div>
-        <div class="preferences-devices-activated" data-bind="l10n_html: {id: z.string.preferences_devices_activated_in, replace: {placeholder: '%location', content: '<span class=\'label-semibold\'>' + location + '</span>'}}"></div>
+        <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferences_devices_id"></span><span data-bind="html: z.util.print_devices_id(current_client().id)" data-uie-name="preferences-device-current-id"></span></div>
+        <div class="preferences-devices-activated">
+          <div data-bind="html: activated_on"></div>
+          <div data-bind="html: activated_in"></div>
+        </div>
+        <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferences_devices_fingerprint"></div>
+        <div class="preferences-devices-fingerprint" data-bind="html: z.util.print_devices_id(fingerprint())"></div>
       <!-- /ko -->
     </section>
 
     <section class="preferences-section">
       <header class="preferences-header" data-bind="l10n_text: z.string.preferences_devices_active"></header>
+      <!-- ko foreach: devices -->
+        <div class="preferences-option preferences-devices-card" data-bind="click: $parent.click_on_show_device">
+          <div class="preferences-devices-card-data">
+            <svg class="preferences-devices-card-icon" data-bind="attr: {'data-uie-value': id}, click: $parent.toggle_device_verification" data-uie-name="device-id">
+              <!-- ko if: meta.is_verified()-->
+                <use data-uie-name="user-device-verified" xlink:href="#icon-verified"></use>
+              <!-- /ko -->
+              <!-- ko ifnot: meta.is_verified()-->
+                <use data-uie-name="user-device-not-verified" xlink:href="#icon-not-verified"></use>
+              <!-- /ko -->
+            </svg>
+            <div class="preferences-devices-card-info">
+              <div class="preferences-devices-model" data-bind="text: model"></div>
+              <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferences_devices_id"></span><span data-bind="html: z.util.print_devices_id(id)"></span></div>
+            </div>
+          </div>
+          <div class="preferences-devices-card-action">
+            <div class="icon-more" data-uie-name="go-device-details"></div>
+            <div class="icon-close" data-bind="click: $parent.click_on_remove_device" data-uie-name="do-device-remove"></div>
+          </div>
+        </div>
+      <!-- /ko -->
     </section>
   </div>
 </div>

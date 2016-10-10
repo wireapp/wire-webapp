@@ -62,8 +62,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       title_view_model.conversation_repository.active_conversation conversation
       title_view_model.initiate_title_updates()
 
-      unread_messages = conversation.number_of_unread_messages()
-      expected_title = "(#{unread_messages}) #{conversation.name()} · #{suffix}"
+      expected_title = "1 · #{conversation.name()} · #{suffix}"
       expect(window.document.title).toBe expected_title
 
     it 'does not change the title if muted conversations receive messages', ->
@@ -113,19 +112,45 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       message.id = z.util.create_random_uuid()
       message.timestamp = Date.now()
       selected_conversation.add_message message
-      unread_messages = selected_conversation.number_of_unread_messages()
-      expect(unread_messages).toBe 1
 
       # Check title when there are messages in the selected conversation
       title_view_model.initiate_title_updates()
-      expected_title = "(#{unread_messages}) #{selected_conversation.name()} · #{suffix}"
+      expected_title = "1 · #{selected_conversation.name()} · #{suffix}"
       expect(window.document.title).toBe expected_title
 
-    it 'sets the name of the self user when opening the settings', ->
-      title_view_model.content_state z.ViewModel.content.CONTENT_STATE.PROFILE
-      user_name = window.user_repository.self().name()
+    it 'sets the name of the self user when opening the preferences about page', ->
+      title_view_model.content_state z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
 
-      expected_title = "#{user_name} · #{suffix}"
+      expected_title = "#{z.string.preferences_about} · #{suffix}"
+      title_view_model.initiate_title_updates()
+      expect(window.document.title).toBe expected_title
+
+    it 'sets the name of the self user when opening the preferences account page', ->
+      title_view_model.content_state z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+
+      expected_title = "#{z.string.preferences_account} · #{suffix}"
+      title_view_model.initiate_title_updates()
+      expect(window.document.title).toBe expected_title
+
+
+    it 'sets the name of the self user when opening the preferences device details page', ->
+      title_view_model.content_state z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS
+
+      expected_title = "#{z.string.preferences_device_details} · #{suffix}"
+      title_view_model.initiate_title_updates()
+      expect(window.document.title).toBe expected_title
+
+    it 'sets the name of the self user when opening the preferences devices page', ->
+      title_view_model.content_state z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
+
+      expected_title = "#{z.string.preferences_devices} · #{suffix}"
+      title_view_model.initiate_title_updates()
+      expect(window.document.title).toBe expected_title
+
+    it 'sets the name of the self user when opening the preferences options page', ->
+      title_view_model.content_state z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
+
+      expected_title = "#{z.string.preferences_options} · #{suffix}"
       title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
 
@@ -140,11 +165,11 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
 
       # Test one connect request message
       title_view_model.user_repository.users.push user_et
-      waiting_people = title_view_model.user_repository.connect_requests().length
 
       message = z.localization.Localizer.get_text z.string.conversations_connection_request_one
+      waiting_people = title_view_model.user_repository.connect_requests().length
 
-      expected_title = "(#{waiting_people}) #{message} · #{suffix}"
+      expected_title = "#{waiting_people} · #{message} · #{suffix}"
       title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
 
@@ -162,7 +187,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
         }
       }
 
-      expected_title = "(#{waiting_people}) #{message} · #{suffix}"
+      expected_title = "#{waiting_people} · #{message} · #{suffix}"
       title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
 

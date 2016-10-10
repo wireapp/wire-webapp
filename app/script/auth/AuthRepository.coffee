@@ -38,7 +38,7 @@ class z.auth.AuthRepository
     .then (cookies) =>
       @logger.force_log 'Backend cookies:'
       for cookie, index in cookies
-        expiration = z.util.format_timestamp cookie.time
+        expiration = z.util.format_timestamp cookie.time, false
         log = "Label: #{cookie.label} | Type: #{cookie.type} |  Expiration: #{expiration}"
         @logger.force_log "Cookie No. #{index + 1} | #{log}"
     .catch (error) =>
@@ -219,7 +219,7 @@ class z.auth.AuthRepository
   @param expiration_timestamp [Integer] Timestamp when access token expires
   ###
   _log_access_token_expiration: (expiration_timestamp) =>
-    expiration_log = z.util.format_timestamp expiration_timestamp
+    expiration_log = z.util.format_timestamp expiration_timestamp, false
     @logger.log @logger.levels.INFO, "Your access token will expire on: #{expiration_log}"
 
   ###
@@ -237,7 +237,7 @@ class z.auth.AuthRepository
       @logger.log @logger.levels.INFO, 'Immediately executing access token refresh'
       @renew_access_token()
     else
-      time = z.util.format_timestamp callback_timestamp
+      time = z.util.format_timestamp callback_timestamp, false
       @logger.log @logger.levels.INFO, "Scheduling next access token refresh for '#{time}'"
 
       @access_token_refresh = window.setTimeout =>
