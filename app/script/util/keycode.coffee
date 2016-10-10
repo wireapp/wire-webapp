@@ -26,8 +26,8 @@ z.util.KEYCODE =
   ARROW_UP: 38
   BACKSPACE: 46
   DELETE: 8
-  ESC: 27
   ENTER: 13
+  ESC: 27
   V: 86
 
 z.util.KEYCODE.is_arrow_key = (keyCode) ->
