@@ -322,6 +322,15 @@ describe 'z.util.get_content_type_from_data_url', ->
     expected = 'image/gif'
     expect(actual).toEqual expected
 
+describe 'z.util.is_ISO_string', ->
+  it 'validates date', ->
+    expect(z.util.is_ISO_string()).toBeFalsy()
+    expect(z.util.is_ISO_string(new Date().getTime())).toBeFalsy()
+    expect(z.util.is_ISO_string("2011-90-05T14:48:00.000Z")).toBeFalsy()
+    expect(z.util.is_ISO_string("2011-10-05T14:48:00.000")).toBeFalsy()
+    expect(z.util.is_ISO_string(new Date().toISOString())).toBeTruthy()
+    expect(z.util.is_ISO_string("2011-10-05T14:48:00.000Z")).toBeTruthy()
+
 describe 'z.util.sort_groups_by_last_event', ->
   it 'finds out that Group A is more recent than Group B', ->
     group_a = new z.entity.Conversation()

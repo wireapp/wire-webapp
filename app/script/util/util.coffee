@@ -378,6 +378,14 @@ z.util.format_timestamp = (timestamp) ->
 
   return "#{day}.#{month}.#{year} (#{hours}:#{minutes}:#{seconds})"
 
+###
+Test whether the given string is ISO 8601 format equally to date.toISOString()
+
+@param date_string [String]
+@return [String]
+###
+z.util.is_ISO_string = (date_string) ->
+  return /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/.test date_string
 
 z.util.sort_groups_by_last_event = (group_a, group_b) ->
   return group_b.last_event_timestamp() - group_a.last_event_timestamp()
