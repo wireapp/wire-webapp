@@ -90,7 +90,16 @@
   .preferences-devices-fingerprint {
     height: 48px;
     line-height: @line-height-lg;
-    width: 356px;
+
+    .device-id-part {
+      display: inline;
+      font-family: monospace;
+    }
+
+    .device-id-part:nth-child(17):before {
+      content: " ";
+      display: block;
+    }
   }
 
   .preferences-devices-fingerprint-label {
