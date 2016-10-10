@@ -70,11 +70,22 @@
     opacity: 1;
   }
 
+  &:not(:hover) {
+    .message-status {
+      opacity: 1;
+    }
+  }
+
+  .show-timestamp.time + .message-status {
+    opacity: 0;
+  }
+
   &:last-child {
     margin-bottom: 24px;
   }
 
-  .time {
+  .time,
+  .message-status {
     .action-pill-style;
     color: fade(#000, 40%);
     font-size: @font-size-xs;
@@ -324,7 +335,8 @@
     }
 
     .time,
-    .context-menu {
+    .context-menu,
+    .message-status {
       top: 24px;
       background-color: fade(#fff, 80%);
       border-radius: 16px;
