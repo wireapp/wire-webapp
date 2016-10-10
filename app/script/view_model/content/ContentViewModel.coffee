@@ -51,13 +51,19 @@ class z.ViewModel.content.ContentViewModel
     @previous_state = undefined
     @previous_conversation = undefined
 
-    @content_state.subscribe (value) =>
-      if value is z.ViewModel.content.CONTENT_STATE.CONVERSATION
-        @conversation_input.added_to_view()
-        @conversation_titlebar.added_to_view()
-      else
-        @conversation_input.removed_from_view()
-        @conversation_titlebar.removed_from_view()
+    @content_state.subscribe (content_state) =>
+      switch content_state
+        when z.ViewModel.content.CONTENT_STATE.CONVERSATION
+          @conversation_input.added_to_view()
+          @conversation_titlebar.added_to_view()
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+          @preferences_account.check_new_clients()
+          @preferences_devices.update_fingerprint()
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
+          @preferences_devices.update_fingerprint()
+        else
+          @conversation_input.removed_from_view()
+          @conversation_titlebar.removed_from_view()
 
     @multitasking.is_minimized.subscribe (is_minimized) =>
       if is_minimized and @call_center.joined_call()
@@ -109,9 +115,10 @@ class z.ViewModel.content.ContentViewModel
     return if conversation_et is @conversation_repository.active_conversation()
 
     @content_state z.ViewModel.content.CONTENT_STATE.CONVERSATION
+    @_release_content()
     @conversation_repository.active_conversation conversation_et
     @message_list.change_conversation conversation_et, =>
-      @switch_content z.ViewModel.content.CONTENT_STATE.CONVERSATION
+      @_show_content z.ViewModel.content.CONTENT_STATE.CONVERSATION
       @participants.change_conversation conversation_et
       @previous_conversation = @conversation_repository.active_conversation()
 
@@ -130,10 +137,14 @@ class z.ViewModel.content.ContentViewModel
     @show_conversation next_conversation_et if @conversation_repository.is_active_conversation conversation_et
 
   switch_previous_content: =>
+    return if @previous_state is @content_state()
+
     if @previous_state is z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
       @switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
-    else
+    else if @previous_conversation?.is_archived is false
       @show_conversation @previous_conversation
+    else
+      @switch_content z.ViewModel.content.CONTENT_STATE.WATERMARK
 
   _check_content_availability: (content_state) ->
     if content_state is z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS

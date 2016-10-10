@@ -64,14 +64,14 @@ class z.ViewModel.list.StartUIViewModel
     @selected_people = ko.observableArray []
 
     @has_created_conversation = ko.observable false
-    @show_hint = ko.computed => @selected_people().length is 1 and not @has_created_conversation()
+    @show_hint = ko.pureComputed => @selected_people().length is 1 and not @has_created_conversation()
 
     @group_hint_text = z.localization.Localizer.get_text z.string.search_group_hint
 
     # results
     @top_users = ko.observableArray []
     @suggestions = ko.observableArray []
-    @connections = ko.computed =>
+    @connections = ko.pureComputed =>
       @conversation_repository.sorted_conversations()
       .filter (conversation_et) -> conversation_et.type() is z.conversation.ConversationType.ONE2ONE
     @connections.extend rateLimit: 500
@@ -92,34 +92,32 @@ class z.ViewModel.list.StartUIViewModel
 
     @has_uploaded_contacts = ko.observable false
 
-    @has_results = ko.computed =>
+    @has_results = ko.pureComputed =>
       return @search_results.groups().length > 0 or
              @search_results.contacts().length > 0 or
              @search_results.others().length > 0
 
-    @show_top_people = ko.computed =>
-      return !!@top_users().length
+    @show_connections = ko.pureComputed => return @top_users().length > 9 and not @show_suggestions()
 
-    @show_suggestions = ko.computed =>
-      return !!@suggestions().length
+    @show_invite = ko.pureComputed =>
+      no_top_people_and_suggestions = not @show_search_results() and not @show_top_people() and not @show_suggestions()
+      no_search_results = @show_search_results() and not @has_results() and not @is_searching()
+      return no_top_people_and_suggestions or no_search_results
 
-    @show_connections = ko.computed =>
-      return @top_users().length > 9 and not @show_suggestions()
+    @show_suggestions = ko.pureComputed => return !!@suggestions().length
 
-    @show_search_results = ko.computed =>
+    @show_search_results = ko.pureComputed =>
       if @selected_people().length is 0 and @search_input().length is 0
         @clear_search_results()
         return false
       return @has_results() or @search_input().length > 0
 
-    @show_invite = ko.computed =>
-      no_top_people_and_suggestions = not @show_search_results() and not @show_top_people() and not @show_suggestions()
-      no_search_results = @show_search_results() and not @has_results() and not @is_searching()
-      return no_top_people_and_suggestions or no_search_results
+    @show_top_people = ko.pureComputed => return !!@top_users().length
+
 
     # invite bubble states
     @show_invite_form = ko.observable true
-    @show_invite_form_only = ko.computed =>
+    @show_invite_form_only = ko.pureComputed =>
       return true if @has_uploaded_contacts()
       return true if not @has_uploaded_contacts() and not @show_top_people() and not @show_suggestions()
       return false
@@ -132,7 +130,7 @@ class z.ViewModel.list.StartUIViewModel
     @invite_bubble = null
     @invite_message = ko.observable ''
     @invite_message_selected = ko.observable true
-    @invite_hints = ko.computed =>
+    @invite_hints = ko.pureComputed =>
       meta_key_mac = z.localization.Localizer.get_text z.string.invite_meta_key_mac
       meta_key_pc = z.localization.Localizer.get_text z.string.invite_meta_key_pc
       meta_key = if z.util.Environment.os.mac then meta_key_mac else meta_key_pc
@@ -150,7 +148,7 @@ class z.ViewModel.list.StartUIViewModel
             placeholder: '%meta_key', content: meta_key
           ]
 
-    @invite_button_text = ko.computed =>
+    @invite_button_text = ko.pureComputed =>
       button_text = if @show_invite_form_only() then z.string.people_invite else z.string.people_bring_your_friends
       z.localization.Localizer.get_text button_text
 

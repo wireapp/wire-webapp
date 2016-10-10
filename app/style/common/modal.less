@@ -73,6 +73,20 @@
     }
   }
 
+  .modal-input {
+    background: #fff;
+    border: 1px solid fade(@graphite, 56%);
+    border-radius: 4px;
+    height: 28px;
+    padding-left: 4px;
+    width: 100%;
+
+    &::placeholder {
+      .label-xs();
+      color: fade(@graphite, 56%);
+    }
+  }
+
   .modal-title {
     font-weight: 600;
     line-height: @line-height-lg;
@@ -87,16 +101,8 @@
   }
 
   .modal-option {
-    .modal-option-checkbox {
+    .modal-checkbox {
       margin-right: 4px;
-    }
-
-    .modal-option-input {
-      border: 1px solid fade(@graphite, 56%);
-      border-radius: 4px;
-      height: 28px;
-      padding-left: 4px;
-      width: 100px;
     }
 
     padding-right: 32px;

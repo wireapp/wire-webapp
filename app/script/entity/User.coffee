@@ -53,7 +53,7 @@ class z.entity.User
     @joaat_hash = -1
 
     @accent_id = ko.observable z.config.ACCENT_ID.BLUE
-    @accent_theme = ko.computed =>
+    @accent_theme = ko.pureComputed =>
       switch @accent_id()
         when z.config.ACCENT_ID.BLUE then return @THEME.BLUE
         when z.config.ACCENT_ID.GREEN then return @THEME.GREEN
@@ -65,7 +65,7 @@ class z.entity.User
         else return @THEME.BLUE
     , @, deferEvaluation: true
 
-    @accent_color = ko.computed =>
+    @accent_color = ko.pureComputed =>
       switch @accent_id()
         when z.config.ACCENT_ID.BLUE then return @ACCENT_COLOR.BLUE
         when z.config.ACCENT_ID.GREEN then return @ACCENT_COLOR.GREEN
@@ -81,12 +81,12 @@ class z.entity.User
     @phone = ko.observable()
 
     @name = ko.observable ''
-    @first_name = ko.computed =>
+    @first_name = ko.pureComputed =>
       return @name().split(' ')[0]
-    @last_name = ko.computed =>
+    @last_name = ko.pureComputed =>
       parts = @name().split(' ')
       return parts.pop() if parts.length > 1
-    @initials = ko.computed =>
+    @initials = ko.pureComputed =>
       initials = ''
       if @first_name()? and @last_name()?
         initials = z.util.get_first_character(@first_name()) + z.util.get_first_character(@last_name())
@@ -118,13 +118,13 @@ class z.entity.User
     @connection = ko.observable new z.entity.Connection()
 
     # connection state shorthands TODO add others too since this is used very often?
-    @blocked = ko.computed => @connection().status() is z.user.ConnectionStatus.BLOCKED
-    @connected = ko.computed => @connection().status() is z.user.ConnectionStatus.ACCEPTED
-    @sent = ko.computed => @connection().status() is z.user.ConnectionStatus.SENT
+    @blocked = ko.pureComputed => @connection().status() is z.user.ConnectionStatus.BLOCKED
+    @connected = ko.pureComputed => @connection().status() is z.user.ConnectionStatus.ACCEPTED
+    @sent = ko.pureComputed => @connection().status() is z.user.ConnectionStatus.SENT
 
     # e2ee
     @devices = ko.observableArray()
-    @is_verified = ko.computed =>
+    @is_verified = ko.pureComputed =>
       return false if @devices().length is 0
       return @devices().every (client_et) -> client_et.meta.is_verified()
 

@@ -22,6 +22,12 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.PreferencesDeviceDetailsViewModel
+  @SESSION_RESET_STATE =
+    BUTTON: 'button'
+    RESET: 'reset'
+    ONGOING: 'ongoing'
+
+
   constructor: (element_id, @client_repository, @conversation_repository, @cryptography_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesDeviceDetailsViewModel', z.config.LOGGER.OPTIONS
 
@@ -31,14 +37,14 @@ class z.ViewModel.content.PreferencesDeviceDetailsViewModel
     @device.subscribe (device_et) =>
       return if not device_et
 
-      @is_resetting_session false
+      @session_reset_state z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.BUTTON
       @fingerprint ''
       @_update_fingerprint()
       @_update_activation_location '?'
       @_update_activation_time device_et.time
       @_update_device_location device_et.location if device_et.location
 
-    @is_resetting_session = ko.observable false
+    @session_reset_state = ko.observable z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.BUTTON
     @fingerprint = ko.observable ''
 
     @activated_in = ko.observable z.localization.Localizer.get_text z.string.preferences_devices_activated_in
@@ -75,20 +81,25 @@ class z.ViewModel.content.PreferencesDeviceDetailsViewModel
     @device null
 
   click_on_reset_session: =>
-    reset_progress = =>
-      window.setTimeout =>
-        @is_resetting_session false
-      , 550
-
-    @is_resetting_session true
+    @session_reset_state z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.ONGOING
     @conversation_repository.reset_session @self_user().id, @device().id, @conversation_repository.self_conversation().id
-    .then -> reset_progress()
-    .catch -> reset_progress()
+    .then =>
+      window.setTimeout =>
+        @session_reset_state z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET
+      , 550
+      window.setTimeout =>
+        @session_reset_state z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.BUTTON
+      , 5000
+    .catch (error) =>
+      @logger.log @logger.levels.WARN, "Failed to reset session with device '#{@device().id}' of self user: #{error.message}", error
+      @session_reset_state z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.BUTTON
 
   click_on_remove_device: =>
     amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE,
       action: (password) =>
         @client_repository.delete_client @device().id, password
+        .then =>
+          @click_on_details_close()
       data: @device().model
 
   toggle_device_verification: =>

@@ -36,7 +36,7 @@ class z.ViewModel.list.ConversationListViewModel
     @content_state = @content_view_model.content_state
     @selected_conversation = ko.observable()
     @status =
-      call: ko.computed =>
+      call: ko.pureComputed =>
         call_et = @call_center.joined_call()
         call_status = 'none'
 
@@ -51,7 +51,7 @@ class z.ViewModel.list.ConversationListViewModel
     @show_badge = ko.observable false
 
     @connect_requests = @user_repository.connect_requests
-    @connect_requests_text = ko.computed =>
+    @connect_requests_text = ko.pureComputed =>
       count = @connect_requests().length
       if count > 1
         return z.localization.Localizer.get_text {
@@ -76,11 +76,11 @@ class z.ViewModel.list.ConversationListViewModel
           @conversations_calls().length
     ).extend notify: 'always', rateLimit: 500
 
-    @active_conversation_id = ko.computed =>
+    @active_conversation_id = ko.pureComputed =>
       if @conversation_repository.active_conversation()?
         @conversation_repository.active_conversation().id
 
-    @archive_tooltip = ko.computed =>
+    @archive_tooltip = ko.pureComputed =>
       return z.localization.Localizer.get_text {
         id: z.string.tooltip_conversations_archived
         replace: {placeholder: '%no', content: @conversations_archived().length}
@@ -99,9 +99,6 @@ class z.ViewModel.list.ConversationListViewModel
       return @joined_call()?.is_remote_screen_shared()
 
     @_init_subscriptions()
-
-  click_on_actions: (conversation_et, event) =>
-    @list_view_model.actions.click_on_actions conversation_et, event
 
   click_on_connect_requests: ->
     @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS

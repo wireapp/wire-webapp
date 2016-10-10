@@ -34,6 +34,10 @@ class z.ViewModel.content.PreferencesDevicesViewModel
     @devices = ko.observableArray()
     @fingerprint = ko.observable ''
 
+    @should_update_scrollbar = (ko.computed =>
+      return @devices()
+    ).extend notify: 'always', rateLimit: 500
+
     # All clients except the current client
     @client_repository.clients.subscribe (client_ets) =>
       @devices (client_et for client_et in client_ets when client_et.id isnt @current_client().id)
@@ -46,8 +50,7 @@ class z.ViewModel.content.PreferencesDevicesViewModel
       @_update_device_location device_et.location if device_et.location
 
     @devices.subscribe (device_ets) =>
-      return if not device_ets?.length
-      @_update_fingerprint device_ets[0].id
+      @update_fingerprint() if device_ets.length and @fingerprint() is ''
 
   _update_activation_location: (location) ->
     @activated_in z.localization.Localizer.get_text
@@ -70,11 +73,6 @@ class z.ViewModel.content.PreferencesDevicesViewModel
     .catch (error) =>
       @logger.log @logger.levels.WARN, "Could not update device location: #{error.message}", error
 
-  _update_fingerprint: (device_id) =>
-    @cryptography_repository.get_session @self_user().id, device_id
-    .then (cryptobox_session) =>
-      @fingerprint cryptobox_session.fingerprint_local()
-
   click_on_show_device: (device_et) =>
     @preferences_device_details.device device_et
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS
@@ -93,3 +91,20 @@ class z.ViewModel.content.PreferencesDevicesViewModel
     .then -> device_et.meta.is_verified toggle_verified
 
     event.stopPropagation()
+
+  update_fingerprint: =>
+    return if @fingerprint() isnt ''
+
+    if @devices()[0]
+      user_id = @self_user().id
+      device_id = @devices()[0].id
+    else if Object.keys(@cryptography_repository.storage_repository.sessions).length
+      @logger.log @logger.levels.WARN, 'Current client has no active session with other clients of self users. We need to create fingerprint from another session.'
+      [user_id, device_id] = Object.keys(@cryptography_repository.storage_repository.sessions)[0].split '@'
+    else
+      @logger.log @logger.levels.WARN, 'Local client has no active sessions. We cannot create fingerprint.'
+      return
+
+    @cryptography_repository.get_session user_id, device_id
+    .then (cryptobox_session) =>
+      @fingerprint cryptobox_session.fingerprint_local() if cryptobox_session

@@ -1,5 +1,5 @@
 <div class="connect-request-wrapper">
-  <div id="connect-requests" class="connect-requests" data-bind="with: $root.connect_requests, antiscroll">
+  <div id="connect-requests" class="connect-requests" data-bind="with: $root.connect_requests, antiscroll: $root.connect_requests.should_update_scrollbar">
     <div class="connect-requests-inner" data-bind="foreach: {data: connect_requests, afterRender: after_render}">
       <div class="connect-request" data-uie-name="connect-request" data-bind="attr: {'data-uie-uid': id}">
         <div class="name popover-title" data-bind="text: name()"></div>

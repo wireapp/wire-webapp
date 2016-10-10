@@ -59,10 +59,13 @@ class z.ViewModel.list.ListViewModel
     amplify.subscribe z.event.WebApp.PROFILE.SETTINGS.SHOW, @open_device_management
     amplify.subscribe z.event.WebApp.PREFERENCES.MANAGE_DEVICES, @open_device_management
 
+  click_on_actions: (conversation_et, event) =>
+    @actions.click_on_actions conversation_et, event
+
   open_device_management: (device_et) =>
     @switch_list z.ViewModel.list.LIST_STATE.PREFERENCES
     if device_et
-      @content_view_model.preferences_device_details.selected_device device_et
+      @content_view_model.preferences_device_details.device device_et
       @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS
     else
       @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT

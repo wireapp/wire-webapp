@@ -18,6 +18,10 @@
  */
 
 .preferences-page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
   .preferences-titlebar {
     .label-bold-xs;
     align-items: center;
@@ -28,19 +32,26 @@
     justify-content: center;
     position: relative;
     width: 100%;
+    flex: 0 0 auto;
+  }
+
+  .preferences-content-wrapper {
+    width: 100%;
+    flex: 1 1 auto;
   }
 
   .preferences-content {
     color: @graphite-dark;
-    margin: 32px 32px 32px 72px;
-    width: 560px;
+    height: 100%;
+    padding: 32px 32px 32px 72px;
+    position: absolute;
 
     .preferences-button {
       margin-top: 8px;
     }
 
     .preferences-detail {
-      .label-semibold-xs;
+      .label-xs;
       color: @graphite;
       line-height: @line-height-sm;
       width: 380px;

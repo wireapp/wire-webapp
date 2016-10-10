@@ -545,9 +545,7 @@ z.string.tooltip_people_unblock = 'Unblock'
 
 z.string.tooltip_preferences_contacts = 'Sign in to your Gmail account to share contacts'
 z.string.tooltip_preferences_password = 'Open another website to reset your password'
-z.string.tooltip_preferences_sound = 'Select if events play sounds'
 z.string.tooltip_preferences_picture = 'Change your picture…'
-z.string.tooltip_preferences_preferences = 'Preferences…'
 z.string.tooltip_preferences_rename = 'Change your name'
 
 z.string.tooltip_search_close = 'Close (Esc)'

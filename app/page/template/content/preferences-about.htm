@@ -1,21 +1,23 @@
 <div id="preferences-about" class="preferences-page preferences-about">
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_about"></div>
-  <div class="preferences-content">
-    <section class="preferences-section">
-      <header class="preferences-header" data-bind="l10n_text: z.string.preferences_about_support"></header>
-      <a class="preferences-link" data-bind="l10n_href: z.string.url_support, l10n_text: z.string.preferences_about_support_website" data-uie-name="go-support" target="_blank"></a>
-      <a class="preferences-link" data-bind="l10n_href: z.string.url_support_contact, l10n_text: z.string.preferences_about_support_contact" data-uie-name="go-contact-support" target="_blank">Contact Support</a>
-    </section>
-    <section class="preferences-section">
-      <header class="preferences-header">Wire</header>
-      <a class="preferences-link" data-bind="l10n_href: z.string.url_terms_of_use, l10n_text: z.string.preferences_about_terms_of_use" data-uie-name="go-legal" rel="nofollow noopener noreferrer" target="_blank"></a>
-      <a class="preferences-link" data-bind="l10n_href: z.string.url_privacy, l10n_text: z.string.preferences_about_privacy_policy" data-uie-name="go-privacy" rel="nofollow noopener noreferrer" target="_blank"></a>
-      <a class="preferences-link" data-bind="l10n_href: z.string.url_wire, l10n_text: z.string.preferences_about_website" data-uie-name="go-wire-dot-com" rel="nofollow noopener noreferrer" target="_blank"></a>
-    </section>
-    <section class="preferences-section">
-      <header class="preferences-header"><hr class="preferences-separator"></header>
-      <div class="preferences-detail" data-bind="l10n_text: {id: z.string.preferences_about_version, replace: {placeholder: '%version', content: '{{config.CURRENT_VERSION_DATE}}'}}"></div>
-      <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_about_copyright"></div>
-    </section>
+  <div class="preferences-content-wrapper">
+    <div class="preferences-content" data-bind="antiscroll">
+      <section class="preferences-section">
+        <header class="preferences-header" data-bind="l10n_text: z.string.preferences_about_support"></header>
+        <a class="preferences-link" data-bind="l10n_href: z.string.url_support, l10n_text: z.string.preferences_about_support_website" data-uie-name="go-support" target="_blank"></a>
+        <a class="preferences-link" data-bind="l10n_href: z.string.url_support_contact, l10n_text: z.string.preferences_about_support_contact" data-uie-name="go-contact-support" target="_blank">Contact Support</a>
+      </section>
+      <section class="preferences-section">
+        <header class="preferences-header">Wire</header>
+        <a class="preferences-link" data-bind="l10n_href: z.string.url_terms_of_use, l10n_text: z.string.preferences_about_terms_of_use" data-uie-name="go-legal" rel="nofollow noopener noreferrer" target="_blank"></a>
+        <a class="preferences-link" data-bind="l10n_href: z.string.url_privacy, l10n_text: z.string.preferences_about_privacy_policy" data-uie-name="go-privacy" rel="nofollow noopener noreferrer" target="_blank"></a>
+        <a class="preferences-link" data-bind="l10n_href: z.string.url_wire, l10n_text: z.string.preferences_about_website" data-uie-name="go-wire-dot-com" rel="nofollow noopener noreferrer" target="_blank"></a>
+      </section>
+      <section class="preferences-section">
+        <header class="preferences-header"><hr class="preferences-separator"></header>
+        <div class="preferences-detail" data-bind="l10n_text: {id: z.string.preferences_about_version, replace: {placeholder: '%version', content: '{{config.CURRENT_VERSION_DATE}}'}}"></div>
+        <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_about_copyright"></div>
+      </section>
+    </div>
   </div>
 </div>

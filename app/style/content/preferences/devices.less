@@ -20,6 +20,7 @@
 .preferences-devices {
   .preferences-devices-model {
     font-weight: 600;
+    height: @line-height-xl;
     line-height: @line-height-xl;
   }
 
@@ -90,10 +91,10 @@
   .preferences-devices-fingerprint {
     height: 48px;
     line-height: @line-height-lg;
+    font-family: monospace;
 
     .device-id-part {
       display: inline;
-      font-family: monospace;
     }
 
     .device-id-part:nth-child(17):before {
@@ -107,6 +108,22 @@
     color: @graphite-dark;
     margin-top: 32px;
     margin-bottom: 8px;
+  }
+
+
+  .preferences-devices-session {
+    height: 36px;
+
+    .preferences-devices-session-spinner {
+      margin-top: 8px;
+      height: 24px;
+      width: 24px;
+    }
+
+    .preferences-devices-session-icon {
+      font-size: @font-size-lg;
+      padding-top: 8px;
+    }
   }
 
   .preferences-devices-verification {

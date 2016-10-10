@@ -47,7 +47,7 @@ class z.components.UserListViewModel
     @user_selected_filter = params.selectable
     @mode = params.mode or z.components.UserListMode.DEFAULT
 
-    @css_classes = ko.computed =>
+    @css_classes = ko.pureComputed =>
       if @mode is z.components.UserListMode.COMPACT
         return 'search-list-sm'
       else if @mode is z.components.UserListMode.INFO
