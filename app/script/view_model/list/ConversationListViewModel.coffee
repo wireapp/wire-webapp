@@ -54,12 +54,12 @@ class z.ViewModel.list.ConversationListViewModel
     @connect_requests_text = ko.pureComputed =>
       count = @connect_requests().length
       if count > 1
-        return z.localization.Localizer.get_text {
+        return z.localization.Localizer.get_text
           id: z.string.conversations_connection_request_many
-          replace: {placeholder: '%no', content: count}
-        }
-      else
-        return z.localization.Localizer.get_text z.string.conversations_connection_request_one
+          replace:
+            placeholder: '%no'
+            content: count
+      return z.localization.Localizer.get_text z.string.conversations_connection_request_one
 
     @conversations_calls = @conversation_repository.conversations_call
     @conversations_archived = @conversation_repository.conversations_archived
@@ -81,15 +81,17 @@ class z.ViewModel.list.ConversationListViewModel
         @conversation_repository.active_conversation().id
 
     @archive_tooltip = ko.pureComputed =>
-      return z.localization.Localizer.get_text {
+      return z.localization.Localizer.get_text
         id: z.string.tooltip_conversations_archived
-        replace: {placeholder: '%no', content: @conversations_archived().length}
-      }
+        replace:
+          placeholder: '%no'
+          content: @conversations_archived().length
 
-    @start_tooltip = z.localization.Localizer.get_text {
+    @start_tooltip = z.localization.Localizer.get_text
       id: z.string.tooltip_conversations_tooltip_start
-      replace: {placeholder: '%shortcut', content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.START}
-    }
+      replace:
+        placeholder: '%shortcut'
+        content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.START
 
     @self_stream_state = @call_center.media_stream_handler.self_stream_state
 

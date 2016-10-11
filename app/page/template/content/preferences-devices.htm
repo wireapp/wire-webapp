@@ -24,7 +24,7 @@
           <!-- ko foreach: devices -->
             <div class="preferences-option preferences-devices-card" data-bind="click: $parent.click_on_show_device">
               <div class="preferences-devices-card-data">
-                <svg class="preferences-devices-card-icon" data-bind="attr: {'data-uie-value': id}, click: $parent.toggle_device_verification" data-uie-name="device-id">
+                <svg class="preferences-devices-card-icon" data-bind="attr: {'data-uie-value': id}" data-uie-name="device-id">
                   <!-- ko if: meta.is_verified()-->
                     <use data-uie-name="user-device-verified" xlink:href="#icon-verified"></use>
                   <!-- /ko -->

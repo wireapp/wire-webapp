@@ -161,6 +161,10 @@ z.string.de.modal_connected_device_headline = 'Dein Benutzerkonto wurde verwende
 z.string.de.modal_connected_device_from = 'Mit:'
 z.string.de.modal_connected_device_message = 'Falls du dieses Gerät nicht hinzugefügt hast, entferne es und setze dein Passwort zurück.'
 z.string.de.modal_connected_device_manage_devices = 'Geräte verwalten'
+# Delete account
+z.string.de.modal_delete_account_action = 'Löschen'
+z.string.de.modal_delete_account_headline = 'Benutzerkonto löschen'
+z.string.de.modal_delete_account_message = 'Bestätige, dass du dein Benutzerkonto dauerhaft löschen möchtest. Wir senden eine E-Mail an %email.'
 # Delete message
 z.string.de.modal_delete_button = 'Löschen'
 z.string.de.modal_delete_headline = 'Nur für mich löschen?'
@@ -392,8 +396,6 @@ z.string.de.preferences_about_website = 'wire.com'
 
 z.string.de.preferences_account_change_password = 'Passwort ändern'
 z.string.de.preferences_account_delete = 'Benutzerkonto löschen'
-z.string.de.preferences_account_email_sent = 'E-Mail gesendet'
-z.string.de.preferences_account_delete_detail = 'Wir senden eine E-Mail an %email. Klicke den Link, um dein Benutzerkonto dauerhaft zu löschen.'
 z.string.de.preferences_account_log_out = 'Abmelden'
 z.string.de.preferences_account_username_placeholder = 'Dein vollständiger Name'
 
@@ -405,7 +407,7 @@ z.string.de.preferences_devices_fingerprint = 'Schlüssel-Fingerabdruck'
 z.string.de.preferences_devices_fingerprint_detail = 'Wire gibt jedem Gerät einen einzigartigen Fingerabdruck. Vergleiche diese und verifiziere deine Geräte und Unterhaltungen.'
 z.string.de.preferences_devices_id = 'ID: '
 z.string.de.preferences_devices_remove = 'Entfernen'
-z.string.preferences_devices_remove_cancel = 'Abbrechen'
+z.string.de.preferences_devices_remove_cancel = 'Abbrechen'
 z.string.de.preferences_devices_remove_detail = 'Entferne dieses Gerät, wenn du es nicht mehr benutzt.'
 z.string.de.preferences_devices_session_reset = 'Session zurücksetzen'
 z.string.de.preferences_devices_session_detail = 'Falls die Fingerabdrücke nicht übereinstimmen, setze die Session zurück um neue Verschlüsselungs-Schlüssel auf beiden Seiten zu erstellen.'

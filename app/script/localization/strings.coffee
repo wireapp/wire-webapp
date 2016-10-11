@@ -161,6 +161,10 @@ z.string.modal_connected_device_headline = 'Your account was used on:'
 z.string.modal_connected_device_from = 'From:'
 z.string.modal_connected_device_message = 'If you didn’t do this, remove the device and reset your password.'
 z.string.modal_connected_device_manage_devices = 'manage devices'
+# Delete account
+z.string.modal_delete_account_action = 'Delete'
+z.string.modal_delete_account_headline = 'Delete account'
+z.string.modal_delete_account_message = 'Confirm that you want to permanently delete your account. We will send an email to %email.'
 # Delete message
 z.string.modal_delete_button = 'Delete'
 z.string.modal_delete_headline = 'Delete only for me?'
@@ -392,8 +396,6 @@ z.string.preferences_about_website = 'wire.com'
 
 z.string.preferences_account_change_password = 'Change password'
 z.string.preferences_account_delete = 'Delete account'
-z.string.preferences_account_email_sent = 'Email Sent'
-z.string.preferences_account_delete_detail = 'We will send an email to %email. Follow the link to permanently delete your account.'
 z.string.preferences_account_log_out = 'Log out'
 z.string.preferences_account_username_placeholder = 'Your full name'
 
