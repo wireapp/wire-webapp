@@ -26,7 +26,12 @@
   }
 
   .preferences-section-account-security {
-    margin-top: 96px;
+    margin-top: 72px;
+    margin-bottom: 48px;
+
+    .preferences-separator {
+      margin-bottom: 24px;
+    }
   }
 
   .preferences-account-accent-color {
@@ -55,6 +60,10 @@
       color: #fff;
       font-size: @font-size-xl;
       pointer-events: none;
+
+      &:before {
+        text-shadow: 0 0 40px fade(#000, 80%);
+      }
     }
 
     > user-avatar {
