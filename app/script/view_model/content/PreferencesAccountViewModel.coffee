@@ -22,27 +22,17 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.PreferencesAccountViewModel
-  @ACCOUNT_DELETE_STATE =
-    BUTTON: 'button'
-    DIALOG: 'dialog'
-    SENT: 'sent'
-
-
   constructor: (element_id, @client_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS
 
     @self_user = @user_repository.self
     @new_clients = ko.observableArray()
 
-    @account_deletion_state = ko.observable z.ViewModel.content.PreferencesAccountViewModel.ACCOUNT_DELETE_STATE.BUTTON
-    @delete_confirm_text = ko.observable ''
-
     @_init_subscriptions()
 
   _init_subscriptions: =>
     amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_client_add
     amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @on_client_remove
-    amplify.subscribe z.event.WebApp.LOGOUT.ASK_TO_CLEAR_DATA, @logout
     amplify.subscribe z.event.WebApp.PREFERENCES.UPLOAD_PICTURE, @set_picture
 
   change_accent_color: (id) =>
@@ -65,6 +55,19 @@ class z.ViewModel.content.PreferencesAccountViewModel
   click_on_change_picture: (files) =>
     @set_picture files, ->
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, source: 'fromPhotoLibrary'
+
+  click_on_delete: ->
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_ACCOUNT,
+      action: =>
+        @user_repository.delete_me()
+      data: @self_user().email()
+
+  click_on_logout: =>
+    @client_repository.logout_client()
+
+  click_on_reset_password: ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, value: 'fromProfile'
+    z.util.safe_window_open z.string.url_password_reset
 
   set_picture: (files, callback) =>
     input_picture = files[0]
@@ -95,37 +98,6 @@ class z.ViewModel.content.PreferencesAccountViewModel
       callback? null, 'error'
       window.alert warning
     , 200
-
-  click_on_delete: ->
-    @delete_confirm_text z.localization.Localizer.get_text
-      id: z.string.preferences_account_delete_detail
-      replace: {placeholder: '%email', content: @self_user().email()}
-
-    @account_deletion_state z.ViewModel.content.PreferencesAccountViewModel.ACCOUNT_DELETE_STATE.DIALOG
-
-  click_on_delete_send: ->
-    @user_repository.delete_me()
-    @account_deletion_state z.ViewModel.content.PreferencesAccountViewModel.ACCOUNT_DELETE_STATE.SENT
-    window.setTimeout =>
-      @account_deletion_state z.ViewModel.content.PreferencesAccountViewModel.ACCOUNT_DELETE_STATE.BUTTON
-    , 5000
-
-  click_on_delete_cancel: ->
-    @account_deletion_state z.ViewModel.content.PreferencesAccountViewModel.ACCOUNT_DELETE_STATE.BUTTON
-
-  click_on_reset_password: ->
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, value: 'fromProfile'
-    z.util.safe_window_open z.string.url_password_reset
-
-  logout: =>
-    # TODO: Rely on client repository
-    if @client_repository.current_client().type is z.client.ClientType.PERMANENT
-      amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT,
-        action: (clear_data) ->
-          amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, clear_data
-    else
-      @client_repository.delete_temporary_client()
-      .then -> amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, true
 
   on_client_add: (user_id, client_et) =>
     return true if user_id isnt @self_user().id

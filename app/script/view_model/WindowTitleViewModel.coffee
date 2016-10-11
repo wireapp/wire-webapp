@@ -47,10 +47,11 @@ class z.ViewModel.WindowTitleViewModel
       switch @content_state()
         when z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
           if number_of_connect_requests > 1
-            window_title += z.localization.Localizer.get_text {
+            window_title += z.localization.Localizer.get_text
               id: z.string.conversations_connection_request_many
-              replace: {placeholder: '%no', content: number_of_connect_requests}
-            }
+              replace:
+                placeholder: '%no'
+                content: number_of_connect_requests
           else
             window_title += z.localization.Localizer.get_text z.string.conversations_connection_request_one
         when z.ViewModel.content.CONTENT_STATE.CONVERSATION
@@ -66,10 +67,9 @@ class z.ViewModel.WindowTitleViewModel
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
           window_title += z.localization.Localizer.get_text z.string.preferences_options
 
-      if window_title is ''
-        window_title = z.localization.Localizer.get_text z.string.wire
-      else
-        window_title += " · #{z.localization.Localizer.get_text z.string.wire}"
+      if window_title isnt '' and not window_title.endsWith ' '
+        window_title += " · "
+      window_title += z.localization.Localizer.get_text z.string.wire
 
       window.document.title = window_title
 

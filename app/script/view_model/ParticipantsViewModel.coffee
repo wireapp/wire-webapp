@@ -192,7 +192,7 @@ class z.ViewModel.ParticipantsViewModel
         @conversation_repository.remove_member @conversation(), user_et.id, (response) =>
           @reset_view() if response
 
-  show_account: ->
+  show_preferences_account: ->
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
 
   unblock: (user_et) =>
