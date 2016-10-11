@@ -49,9 +49,6 @@ class z.ViewModel.content.PreferencesDevicesViewModel
       @_update_activation_time device_et.time
       @_update_device_location device_et.location if device_et.location
 
-    @devices.subscribe (device_ets) =>
-      @update_fingerprint() if device_ets.length and @fingerprint() is ''
-
   _update_activation_location: (location) ->
     @activated_in z.localization.Localizer.get_text
       id: z.string.preferences_devices_activated_in
@@ -94,17 +91,4 @@ class z.ViewModel.content.PreferencesDevicesViewModel
 
   update_fingerprint: =>
     return if @fingerprint() isnt ''
-
-    if @devices()[0]
-      user_id = @self_user().id
-      device_id = @devices()[0].id
-    else if Object.keys(@cryptography_repository.storage_repository.sessions).length
-      @logger.log @logger.levels.WARN, 'Current client has no active session with other clients of self users. We need to create fingerprint from another session.'
-      [user_id, device_id] = Object.keys(@cryptography_repository.storage_repository.sessions)[0].split '@'
-    else
-      @logger.log @logger.levels.WARN, 'Local client has no active sessions. We cannot create fingerprint.'
-      return
-
-    @cryptography_repository.get_session user_id, device_id
-    .then (cryptobox_session) =>
-      @fingerprint cryptobox_session.fingerprint_local() if cryptobox_session
+    @fingerprint @cryptography_repository.storage_repository.identity.public_key.fingerprint()
