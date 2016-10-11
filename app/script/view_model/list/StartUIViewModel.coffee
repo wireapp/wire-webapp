@@ -114,7 +114,6 @@ class z.ViewModel.list.StartUIViewModel
 
     @show_top_people = ko.pureComputed => return !!@top_users().length
 
-
     # invite bubble states
     @show_invite_form = ko.observable true
     @show_invite_form_only = ko.pureComputed =>

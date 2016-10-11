@@ -111,6 +111,7 @@ z.event.WebApp =
   LOGOUT:
     ASK_TO_CLEAR_DATA: 'wire.webapp.logout.ask-to-clear-data'
   PREFERENCES:
+    MANAGE_ACCOUNT: 'wire.webapp.preferences.manage-account'
     MANAGE_DEVICES: 'wire.webapp.preferences.manage-devices'
     UPLOAD_PICTURE: 'wire.webapp.preferences.upload-picture'
   PROFILE:

@@ -58,19 +58,24 @@ class z.ViewModel.list.ListViewModel
 
   _init_subscriptions: =>
     amplify.subscribe z.event.WebApp.LOADED, => @webapp_loaded true
-    amplify.subscribe z.event.WebApp.PROFILE.SETTINGS.SHOW, @open_device_management
-    amplify.subscribe z.event.WebApp.PREFERENCES.MANAGE_DEVICES, @open_device_management
+    amplify.subscribe z.event.WebApp.PROFILE.SETTINGS.SHOW, @open_preferences_account # @todo remove when user base of wrappers version >= 2.11 is large enough
+    amplify.subscribe z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, @open_preferences_account
+    amplify.subscribe z.event.WebApp.PREFERENCES.MANAGE_DEVICES, @open_preferences_devices
 
   click_on_actions: (conversation_et, event) =>
     @actions.click_on_actions conversation_et, event
 
-  open_device_management: (device_et) =>
+  open_preferences_account: =>
+    @switch_list z.ViewModel.list.LIST_STATE.PREFERENCES
+    @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+
+  open_preferences_devices: (device_et) =>
     @switch_list z.ViewModel.list.LIST_STATE.PREFERENCES
     if device_et
       @content_view_model.preferences_device_details.device device_et
       @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS
     else
-      @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+      @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
 
   open_start_ui: =>
     @switch_list z.ViewModel.list.LIST_STATE.START_UI

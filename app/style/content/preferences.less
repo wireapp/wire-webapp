@@ -21,41 +21,43 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+}
 
-  .preferences-titlebar {
-    .label-bold-xs;
-    align-items: center;
-    background-color: @app-bg;
-    border-bottom: 1px solid fade(@graphite, 12%);
-    display: flex;
-    height: @content-title-bar-height;
-    justify-content: center;
-    position: relative;
-    width: 100%;
-    flex: 0 0 auto;
-  }
+.preferences-titlebar {
+  .label-bold-xs;
+  align-items: center;
+  background-color: @app-bg;
+  border-bottom: 1px solid fade(@graphite, 12%);
+  display: flex;
+  height: @content-title-bar-height;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  flex: 0 0 auto;
+}
 
-  .preferences-content-wrapper {
-    width: 100%;
-    flex: 1 1 auto;
-  }
+.preferences-content-wrapper {
+  width: 100%;
+  flex: 1 1 auto;
+}
 
-  .preferences-content {
-    color: @graphite-dark;
-    height: 100%;
-    padding: 32px 32px 32px 72px;
-    position: absolute;
+.preferences-content {
+  color: @graphite-dark;
+  height: 100%;
+  padding: 32px 32px 32px 72px;
+  position: absolute;
+}
 
-    .preferences-button {
-      margin-top: 8px;
-    }
+.preferences-button {
+  margin-top: 8px;
+}
 
-    .preferences-detail {
-      .label-xs;
-      color: @graphite;
-      line-height: @line-height-sm;
-      width: 380px;
-    }
+.preferences-detail {
+  color: @graphite;
+  font-size: @font-size-xs;
+  line-height: @line-height-sm;
+  width: 380px;
+}
 
     .preferences-header {
       .label-bold-xs;
@@ -63,64 +65,61 @@
       margin-bottom: 16px;
     }
 
-    .preferences-hint {
-      color: @graphite;
-    }
+.preferences-hint {
+  color: @graphite;
+}
 
-    .preferences-label {
-      color: @graphite-dark;
-    }
+.preferences-label {
+  color: @graphite-dark;
+}
 
-    .preferences-info {
-      line-height: @line-height-lg;
-      width: 400px;
-    }
+.preferences-info {
+  line-height: @line-height-lg;
+  width: 400px;
+}
 
-    .preferences-link {
-      display: block;
-      font-size: @font-size-sm;
-      line-height: @line-height-xl;
-      cursor: pointer;
-    }
+.preferences-link {
+  display: block;
+  font-size: @font-size-sm;
+  line-height: @line-height-xl;
+  cursor: pointer;
+}
 
-    .preferences-option {
-      margin: 0 0 0 -34px;
-    }
+.preferences-option {
+  margin: 0 0 0 -34px;
+}
 
-    .preferences-option-icon {
-      display: flex;
-      height: @line-height-xl;
-      font-size: @font-size-sm;
-      line-height: @line-height-sm;
-      padding: 0 0 8px 0;
+.preferences-option-icon {
+  display: flex;
+  height: @line-height-xl;
+  font-size: @font-size-sm;
+  line-height: @line-height-sm;
+  padding: 0 0 8px 0;
 
-      label {
-        cursor: pointer;
-        display: inline;
-        height: @line-height-sm;
-        line-height: @line-height-sm;
-      }
+  label {
+    cursor: pointer;
+    display: inline;
+    height: @line-height-sm;
+    line-height: @line-height-sm;
+  }
 
-      div,
-      svg {
-        cursor: pointer;
-        display: inline;
-        width: @line-height-sm;
-        height: @line-height-sm;
-        margin-right: 18px;
-      }
-    }
-
-    .preferences-section {
-      margin-bottom: 32px;
-    }
-
-    .preferences-separator {
-      background: @seperator-color;
-      border: 0;
-      height: 1px;
-    }
+  div,
+  svg {
+    cursor: pointer;
+    display: inline;
+    width: @line-height-sm;
+    height: @line-height-sm;
+    margin-right: 18px;
   }
 }
 
+.preferences-section {
+  margin-bottom: 32px;
+}
 
+.preferences-separator {
+  background: @seperator-color;
+  border: 0;
+  height: 1px;
+  margin: 0;
+}

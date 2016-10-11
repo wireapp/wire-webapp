@@ -2,39 +2,36 @@
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_account"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
-      <!-- ko if: self_user() -->
-        <div>
-          <section class="preferences-section preferences-section-account-profile">
-            <div class="preferences-account-user-data">
-              <input-element class="preferences-account-name" params="value: self_user().name, change: change_username, placeholder: z.string.preferences_account_username_placeholder" data-uie-name="enter-name" data-bind="l10n_tooltip: z.string.tooltip_preferences_rename"></input-element>
-              <span class="preferences-account-mail" data-bind="text: self_user().email()" data-uie-name="enter-email"></span>
-              <span class="preferences-account-phone" data-bind="text: self_user().phone()" data-uie-name="enter-phone"></span>
-            </div>
-
-            <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="l10n_tooltip: z.string.tooltip_preferences_picture">
-              <user-avatar class="user-avatar-lg" params="user: self_user()"></user-avatar>
-              <input id="self-upload-file-input"
-                     type="file" accept="image/jpg,image/jpeg,image/png,image/bmp"
-                     data-bind="file_select: click_on_change_picture"
-                     data-uie-name="do-select-picture"/>
-              <span class="icon-camera"></span>
-            </label>
-
-            <accent-color-picker class="preferences-account-accent-color" params="user: self_user(), selected: change_accent_color" data-uie-name="enter-accent-color"></accent-color-picker>
-          </section>
-
-          <section class="preferences-section preferences-section-account-security">
-            <header class="preferences-header"><hr class="preferences-separator"></header>
-            <div class="preferences-link text-theme" data-bind="click: click_on_reset_password, l10n_text: z.string.preferences_account_change_password, l10n_tooltip: z.string.tooltip_preferences_password" data-uie-name="do-reset-password"></div>
-            <div class="preferences-link text-theme" data-bind="click: click_on_delete, l10n_text: z.string.preferences_account_delete" data-uie-name="go-delete-account"></div>
-          </section>
-
-          <!-- ko ifnot: z.util.Environment.electron -->
-            <section class="preferences-section">
-              <div class="preferences-link text-theme" data-bind="click: click_on_logout, l10n_text: z.string.preferences_account_log_out" data-uie-name="do-logout"></div>
-            </section>
-          <!-- /ko -->
+      <section class="preferences-section preferences-section-account-profile">
+        <div class="preferences-account-user-data">
+          <input class="preferences-account-username" id="username" type="text" data-bind="attr: {size: username().length}, value: username, enter: change_username, l10n_placeholder: z.string.preferences_account_username_placeholder" data-uie-name="enter-name"/>
+          <label class="preferences-account-username-label" for="username"></label>
+          <div class="preferences-account-mail" data-bind="text: self_user().email()" data-uie-name="enter-email"></div>
+          <div class="preferences-account-phone" data-bind="text: self_user().phone()" data-uie-name="enter-phone"></div>
         </div>
+
+        <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="l10n_tooltip: z.string.tooltip_preferences_picture">
+          <user-avatar class="user-avatar-lg" params="user: self_user()"></user-avatar>
+          <input id="self-upload-file-input"
+                 type="file" accept="image/jpg,image/jpeg,image/png,image/bmp"
+                 data-bind="file_select: click_on_change_picture"
+                 data-uie-name="do-select-picture"/>
+          <span class="icon-camera"></span>
+        </label>
+
+        <accent-color-picker class="preferences-account-accent-color" params="user: self_user(), selected: change_accent_color" data-uie-name="enter-accent-color"></accent-color-picker>
+      </section>
+
+      <section class="preferences-section preferences-section-account-security">
+        <hr class="preferences-separator">
+        <div class="preferences-link text-theme" data-bind="click: click_on_reset_password, l10n_text: z.string.preferences_account_change_password, l10n_tooltip: z.string.tooltip_preferences_password" data-uie-name="do-reset-password"></div>
+        <div class="preferences-link text-theme" data-bind="click: click_on_delete_account, l10n_text: z.string.preferences_account_delete" data-uie-name="go-delete-account"></div>
+      </section>
+
+      <!-- ko ifnot: z.util.Environment.electron -->
+        <section class="preferences-section">
+          <div class="preferences-link text-theme" data-bind="click: click_on_logout, l10n_text: z.string.preferences_account_log_out" data-uie-name="do-logout"></div>
+        </section>
       <!-- /ko -->
     </div>
   </div>

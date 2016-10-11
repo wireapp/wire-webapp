@@ -27,6 +27,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
     @self_user = @user_repository.self
     @new_clients = ko.observableArray()
+    @username = ko.pureComputed => @self_user().name()
 
     @_init_subscriptions()
 
@@ -38,8 +39,15 @@ class z.ViewModel.content.PreferencesAccountViewModel
   change_accent_color: (id) =>
     @user_repository.change_accent_color id
 
-  change_username: (name) =>
-    @user_repository.change_username name
+  change_username: (name, e) =>
+    new_username = e.target.value
+
+    if new_username and new_username isnt @self_user().name()
+      @user_repository.change_username new_username
+    else
+      @username.notifySubscribers() # render old value
+
+    e.target.blur()
 
   check_new_clients: =>
     return if not @new_clients().length
@@ -56,7 +64,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
     @set_picture files, ->
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, source: 'fromPhotoLibrary'
 
-  click_on_delete: ->
+  click_on_delete_account: ->
     amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_ACCOUNT,
       action: =>
         @user_repository.delete_me()
@@ -72,10 +80,11 @@ class z.ViewModel.content.PreferencesAccountViewModel
   set_picture: (files, callback) =>
     input_picture = files[0]
     warning_file_format = z.localization.Localizer.get_text z.string.alert_upload_file_format
-    warning_file_size = z.localization.Localizer.get_text {
+    warning_file_size = z.localization.Localizer.get_text
       id: z.string.alert_upload_too_large
-      replace: {placeholder: '%no', content: z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024}
-    }
+      replace:
+        placeholder: '%no'
+        content: z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024
     warning_min_size = z.localization.Localizer.get_text z.string.alert_upload_too_small
 
     if input_picture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE
@@ -94,7 +103,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
   _show_upload_warning: (warning, callback) ->
     amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT
-    setTimeout ->
+    window.setTimeout ->
       callback? null, 'error'
       window.alert warning
     , 200

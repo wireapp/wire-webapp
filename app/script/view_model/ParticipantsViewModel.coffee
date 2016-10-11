@@ -193,7 +193,7 @@ class z.ViewModel.ParticipantsViewModel
           @reset_view() if response
 
   show_preferences_account: ->
-    amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+    amplify.publish z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT
 
   unblock: (user_et) =>
     @confirm_dialog = $('#participants').confirm

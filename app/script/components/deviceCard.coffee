@@ -84,7 +84,7 @@ ko.components.register 'device-card',
                     <span class="text-graphite-dark" data-bind="visible: current, l10n_text: z.string.auth_limit_devices_current"></span>
                   </div>
                   <div class="text-graphite-dark label-xs">
-                    <span data-bind="l10n_text: z.string.settings_devices_id"></span>
+                    <span data-bind="l10n_text: z.string.preferences_devices_id"></span>
                     <span data-uie-name="device-id" data-bind="html: z.util.print_devices_id(id)"></span>
                   </div>
                 <!-- /ko -->

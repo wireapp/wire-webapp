@@ -2,53 +2,49 @@
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_device_details"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
-      <!-- ko if: device() -->
-        <section class="preferences-section">
-          <header class="preferences-devices-details">
-            <div class="preferences-devices-icon icon-back" data-bind="click: click_on_details_close"></div>
-            <span data-bind="l10n_text: z.string.preferences_devices"></span>
-          </header>
-          <div class="preferences-devices-model" data-bind="text: device().model"></div>
-          <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferences_devices_id"></span><span data-bind="html: z.util.print_devices_id(device().id)"></span></div>
-          <div class="preferences-devices-activated">
-            <div data-bind="html: activated_on"></div>
-            <div data-bind="html: activated_in"></div>
-          </div>
-          <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferences_devices_fingerprint"></div>
-          <div class="preferences-devices-fingerprint" data-bind="html: z.util.print_devices_id(fingerprint())"></div>
-          <div class="preferences-devices-verification slider">
-            <input class="slider-input" type="checkbox" name="preferences_device_verification_toggle" id="preferences_device_verification" data-bind="checked: device().meta.is_verified">
-            <label class="button-label" for="preferences_device_verification" data-bind="click: toggle_device_verification, l10n_text: z.string.preferences_devices_verification"></label>
-          </div>
-          <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_devices_fingerprint_detail"></div>
-        </section>
+      <section class="preferences-section">
+        <header class="preferences-devices-details">
+          <div class="preferences-devices-icon icon-back" data-bind="click: click_on_details_close"></div>
+          <span data-bind="l10n_text: z.string.preferences_devices"></span>
+        </header>
+        <div class="preferences-devices-model" data-bind="text: device().model"></div>
+        <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferences_devices_id"></span><span data-bind="html: z.util.print_devices_id(device().id)"></span></div>
+        <div class="preferences-devices-activated">
+          <div data-bind="html: activated_on"></div>
+          <div data-bind="html: activated_in"></div>
+        </div>
+        <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferences_devices_fingerprint"></div>
+        <div class="preferences-devices-fingerprint" data-bind="html: z.util.print_devices_id(fingerprint())"></div>
+        <div class="preferences-devices-verification slider">
+          <input class="slider-input" type="checkbox" name="preferences_device_verification_toggle" id="preferences_device_verification" data-bind="checked: device().meta.is_verified">
+          <label class="button-label" for="preferences_device_verification" data-bind="click: toggle_device_verification, l10n_text: z.string.preferences_devices_verification"></label>
+        </div>
+        <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_devices_fingerprint_detail"></div>
+      </section>
 
-        <section class="preferences-section">
-          <header class="preferences-header"><hr class="preferences-separator"></header>
-        </section>
+      <section class="preferences-section">
+        <header class="preferences-header"><hr class="preferences-separator"></header>
+      </section>
 
-        <section class="preferences-section">
-          <div class="preferences-info" data-bind="l10n_text: z.string.preferences_devices_session_detail"></div>
-          <div class="preferences-devices-session">
-            <!-- ko if: session_reset_state() === z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.BUTTON -->
-              <button class="preferences-button button button-small button-fluid" data-bind="click: click_on_reset_session, l10n_text: z.string.preferences_devices_session_reset"></button>
-            <!-- /ko -->
-            <!-- ko if: session_reset_state() === z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.ONGOING -->
-              <svg class="preferences-devices-session-spinner svg-theme spin" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" data-uie-name="status-loading">
-                <path class="fill-theme" d="M12.416 12.417c-2.374 2.375-6.28 2.33-8.72-.112-2.444-2.442-2.488-6.347-.113-8.72 1.658-1.66 4.12-2.18 6.343-1.394.477.17 1-.08 1.17-.557.167-.477-.083-1-.56-1.17C7.658-.552 4.453.124 2.286 2.29-.808 5.384-.75 10.448 2.4 13.6c3.15 3.152 8.216 3.21 11.312.113 2.165-2.166 2.84-5.37 1.824-8.25-.168-.476-.692-.726-1.17-.558-.476.17-.726.692-.557 1.17.784 2.222.265 4.684-1.394 6.342z"></path>
-              </svg>
-            <!-- /ko -->
-            <!-- ko if: session_reset_state() === z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET -->
-              <div class="preferences-devices-session-icon icon-check text-theme"></div>
-            <!-- /ko -->
-          </div>
-        </section>
+      <section class="preferences-section">
+        <div class="preferences-info" data-bind="l10n_text: z.string.preferences_devices_session_detail"></div>
+        <div class="preferences-devices-session">
+          <!-- ko if: session_reset_state() === z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET -->
+            <button class="preferences-button button button-small button-fluid" data-bind="click: click_on_reset_session, l10n_text: z.string.preferences_devices_session_reset"></button>
+          <!-- /ko -->
+          <!-- ko if: session_reset_state() === z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.ONGOING -->
+            <div class="preferences-devices-session-reset" data-bind="l10n_text: z.string.preferences_devices_session_ongoing"></div>
+          <!-- /ko -->
+          <!-- ko if: session_reset_state() === z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION -->
+            <div class="preferences-devices-session-confirmation text-theme" data-bind="l10n_text: z.string.preferences_devices_session_confirmation"></div>
+          <!-- /ko -->
+        </div>
+      </section>
 
-        <section class="preferences-section">
-          <div class="preferences-info" data-bind="l10n_text: z.string.preferences_devices_remove_detail"></div>
-          <button class="preferences-button button button-small button-fluid" data-bind="click: click_on_remove_device, l10n_text: z.string.preferences_devices_remove"></button>
-        </section>
-      <!-- /ko -->
+      <section class="preferences-section">
+        <div class="preferences-info" data-bind="l10n_text: z.string.preferences_devices_remove_detail"></div>
+        <button class="preferences-button button button-small button-fluid" data-bind="click: click_on_remove_device, l10n_text: z.string.preferences_devices_remove"></button>
+      </section>
     </div>
   </div>
 </div>

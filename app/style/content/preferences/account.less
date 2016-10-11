@@ -17,58 +17,86 @@
  *
  */
 
-.preferences-account {
-  .preferences-section-account-profile {
-    display: flex;
-    position: relative;
-    justify-content: space-between;
-    width: 536px;
-  }
+.preferences-section-account-profile {
+  display: flex;
+  position: relative;
+  justify-content: space-between;
+  width: 536px;
+}
 
-  .preferences-section-account-security {
-    margin-top: 96px;
-  }
+.preferences-section-account-security {
+  margin-top: 72px;
+  margin-bottom: 48px;
 
-  .preferences-account-accent-color {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-  }
-
-  .preferences-account-name {
-    font-weight: bold;
-  }
-
-  .preferences-account-mail,
-  .preferences-account-phone {
-    .no-text-selection();
-  }
-
-  .preferences-account-picture-button {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-
-    > span {
-      .full-screen;
-      .flex-center;
-      color: #fff;
-      font-size: @font-size-xl;
-      pointer-events: none;
-    }
-
-    > user-avatar {
-      pointer-events: none;
-    }
-
-    > input {
-      position: absolute;
-      left: -9999px;
-    }
-  }
-
-  .preferences-account-user-data {
-    line-height: @line-height-lg;
+  .preferences-separator {
+    margin-bottom: 24px;
   }
 }
 
+.preferences-account-accent-color {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.preferences-account-mail,
+.preferences-account-phone {
+  .no-text-selection();
+}
+
+.preferences-account-picture-button {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+
+  > span {
+    .full-screen;
+    .flex-center;
+    color: #fff;
+    font-size: @font-size-xl;
+    pointer-events: none;
+
+    &:before {
+      text-shadow: 0 0 40px fade(#000, 80%);
+    }
+  }
+
+  > user-avatar {
+    pointer-events: none;
+  }
+
+  > input {
+    position: absolute;
+    left: -9999px;
+  }
+}
+
+.preferences-account-user-data {
+  line-height: @line-height-lg;
+}
+
+.preferences-account-username {
+  .reset-textarea;
+  background: transparent;
+  font-weight: bold;
+  height: @line-height-xl;
+  line-height: @line-height-xl;
+  margin-left: -4px;
+  padding-left: 4px;
+  padding-right: 4px;
+
+  &:hover + .preferences-account-username-label:after {
+    .icon-mixin("\e177"); // icon-edit
+    margin-left: 8px;
+  }
+
+  &:focus {
+    background-color: fade(@graphite, 12%);
+    width: 256px;
+  }
+
+  &:focus + .preferences-account-username-label:after {
+    content: "";
+    display: none;
+  }
+}

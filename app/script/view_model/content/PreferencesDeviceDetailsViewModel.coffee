@@ -23,7 +23,7 @@ z.ViewModel.content ?= {}
 
 class z.ViewModel.content.PreferencesDeviceDetailsViewModel
   @SESSION_RESET_STATE =
-    BUTTON: 'button'
+    CONFIRMATION: 'confirmation'
     RESET: 'reset'
     ONGOING: 'ongoing'
 
@@ -37,14 +37,14 @@ class z.ViewModel.content.PreferencesDeviceDetailsViewModel
     @device.subscribe (device_et) =>
       return if not device_et
 
-      @session_reset_state z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.BUTTON
+      @session_reset_state z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET
       @fingerprint ''
       @_update_fingerprint()
       @_update_activation_location '?'
       @_update_activation_time device_et.time
       @_update_device_location device_et.location if device_et.location
 
-    @session_reset_state = ko.observable z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.BUTTON
+    @session_reset_state = ko.observable z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET
     @fingerprint = ko.observable ''
 
     @activated_in = ko.observable z.localization.Localizer.get_text z.string.preferences_devices_activated_in
@@ -85,14 +85,14 @@ class z.ViewModel.content.PreferencesDeviceDetailsViewModel
     @conversation_repository.reset_session @self_user().id, @device().id, @conversation_repository.self_conversation().id
     .then =>
       window.setTimeout =>
-        @session_reset_state z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET
+        @session_reset_state z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION
       , 550
       window.setTimeout =>
-        @session_reset_state z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.BUTTON
+        @session_reset_state z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET
       , 5000
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "Failed to reset session with device '#{@device().id}' of self user: #{error.message}", error
-      @session_reset_state z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.BUTTON
+      @session_reset_state z.ViewModel.content.PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.RESET
+      throw error
 
   click_on_remove_device: =>
     amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.REMOVE_DEVICE,
