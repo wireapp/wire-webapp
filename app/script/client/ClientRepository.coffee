@@ -277,7 +277,12 @@ class z.client.ClientRepository
     device_model = platform.name
 
     if z.util.Environment.electron
-      if z.util.Environment.os.mac then identifier = z.string.wire_osx else identifier = z.string.wire_windows
+      if z.util.Environment.os.mac
+        identifier = z.string.wire_osx
+      else if z.util.Environment.os.win
+        identifier = z.string.wire_windows
+      else
+        identifier = z.string.wire_linux
       device_model = z.localization.Localizer.get_text identifier
       device_model = "#{device_model} (Internal)" if not z.util.Environment.frontend.is_production()
     else
