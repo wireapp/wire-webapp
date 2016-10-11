@@ -26,7 +26,7 @@
       <div class="calls-controls">
 
         <!-- ko if: is_group() && call().state() === z.calling.enum.CallState.ONGOING && call().self_user_joined() -->
-          <div class="conversation-list-call-controls-row conversation-list-call-controls-row-participants"
+          <div class="calls-controls-row calls-controls-row-participants"
                data-bind="click: $parent.click_on_conversation">
             <!-- ko foreach: call().participants() -->
               <user-avatar class="user-avatar-xs"
@@ -90,9 +90,9 @@
         <!-- /ko -->
         <!-- ko if: call().self_user_joined() -->
           <div class="calls-controls-row">
-            <div class="call-controls-left">
+            <div class="calls-controls-left">
 
-              <div class="call-controls-action call-controls-action-mute">
+              <div class="calls-controls-action calls-controls-action-mute">
                 <div class="up">
                   <div class="button-round button-round-dark icon-mute"
                        data-uie-name="do-call-mute"
@@ -105,7 +105,7 @@
 
               <!-- ko if: call().state() === z.calling.enum.CallState.ONGOING -->
                 <!-- ko if: $parent.show_toggle_screen() -->
-                  <div class="call-controls-action call-controls-action-screensharing">
+                  <div class="calls-controls-action calls-controls-action-screensharing">
                     <div class="up">
                       <div class="button-round button-round-dark icon-screensharing"
                            data-bind="click: $parent.on_toggle_screen, css: {'toggled': $parent.self_stream_state.screen_shared(), 'disabled': $parent.disable_toggle_screen()}">
@@ -122,7 +122,7 @@
                   </div>
                 <!-- /ko -->
                 <!-- ko ifnot: is_group() -->
-                  <div class="call-controls-action call-controls-action-video">
+                  <div class="calls-controls-action calls-controls-action-video">
                     <div class="up">
                       <div class="button-round button-round-dark icon-video"
                            data-bind="click: $parent.on_toggle_video, css: {'toggled': $parent.self_stream_state.videod()}"></div>
@@ -136,9 +136,9 @@
 
             </div>
 
-            <div class="call-controls-right">
+            <div class="calls-controls-right">
 
-              <div class="call-controls-action call-controls-action-end-call">
+              <div class="calls-controls-action calls-controls-action-end-call">
                 <div class="up">
                   <div class="button-round button-round-theme-red icon-end-call"
                        data-uie-name="do-call-controls-call-ignore"
