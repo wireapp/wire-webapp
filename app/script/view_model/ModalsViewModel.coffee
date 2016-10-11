@@ -31,6 +31,7 @@ z.ViewModel.ModalType =
   CLEAR_GROUP: '.modal-clear-group'
   CONNECTED_DEVICE: '.modal-connected-device'
   CONTACTS: '.modal-contacts'
+  DELETE_ACCOUNT: '.modal-delete-account'
   DELETE_MESSAGE: '.modal-delete-message'
   DELETE_EVERYONE_MESSAGE: '.modal-delete-message-everyone'
   TOO_LONG_MESSAGE: '.modal-too-long-message'
@@ -78,6 +79,8 @@ class z.ViewModel.ModalsViewModel
         type = @_show_modal_clear options, type
       when z.ViewModel.ModalType.CONNECTED_DEVICE
         @_show_modal_connected_device options.data
+      when z.ViewModel.ModalType.DELETE_ACCOUNT
+        @_show_modal_delete_account options.data, message_element
       when z.ViewModel.ModalType.LEAVE
         @_show_modal_leave options.data, title_element
       when z.ViewModel.ModalType.NEW_DEVICE
@@ -121,26 +124,31 @@ class z.ViewModel.ModalsViewModel
     modal.toggle()
 
   _show_modal_block: (content, title_element, message_element) ->
-    title_element.text z.localization.Localizer.get_text {
+    title_element.text z.localization.Localizer.get_text
       id: z.string.modal_block_conversation_headline
-      replace: {placeholder: '%@.name', content: content}
-    }
-    message_element.text z.localization.Localizer.get_text {
+      replace:
+        placeholder: '%@.name'
+        content: content
+
+    message_element.text z.localization.Localizer.get_text
       id: z.string.modal_block_conversation_message
-      replace: {placeholder: '%@.name', content: content}
-    }
+      replace:
+        placeholder: '%@.name'
+        content: content
 
   _show_modal_call_full_conversation: (content, message_element) ->
-    message_element.text z.localization.Localizer.get_text {
+    message_element.text z.localization.Localizer.get_text
       id: z.string.modal_call_conversation_full_message
-      replace: {placeholder: '%no', content: content}
-    }
+      replace:
+        placeholder: '%no'
+        content: content
 
   _show_modal_call_full_voice_channel: (content, message_element) ->
-    message_element.text z.localization.Localizer.get_text {
+    message_element.text z.localization.Localizer.get_text
       id: z.string.modal_call_voice_channel_full_message
-      replace: {placeholder: '%no', content: content}
-    }
+      replace:
+        placeholder: '%no'
+        content: content
 
   ###
   @note Modal supports z.calling.enum.CallState.INCOMING, z.calling.enum.CallState.ONGOING, z.calling.enum.CallState.OUTGOING
@@ -158,10 +166,11 @@ class z.ViewModel.ModalsViewModel
       type = z.ViewModel.ModalType.CLEAR_GROUP
 
     title_element = $(type).find('.modal-title')
-    title_element.text z.localization.Localizer.get_text {
+    title_element.text z.localization.Localizer.get_text
       id: z.string.modal_clear_conversation_headline
-      replace: {placeholder: '%@.name', content: options.data}
-    }
+      replace:
+        placeholder: '%@.name'
+        content: options.data
 
     return type
 
@@ -176,47 +185,59 @@ class z.ViewModel.ModalsViewModel
         .text "#{z.localization.Localizer.get_text z.string.modal_connected_device_from} #{device.model}"
         .appendTo devices_element
 
+  _show_modal_delete_account: (content, message_element) ->
+    message_element.text z.localization.Localizer.get_text
+      id: z.string.modal_delete_account_message
+      replace:
+        placeholder: '%email'
+        content: content
+
   _show_modal_leave: (content, title_element) ->
-    title_element.text z.localization.Localizer.get_text {
+    title_element.text z.localization.Localizer.get_text
       id: z.string.modal_leave_conversation_headline
-      replace: {placeholder: '%@.name', content: content}
-    }
+      replace:
+        placeholder: '%@.name'
+        content: content
 
   _show_modal_new_device: (content, title_element) ->
-    title_element.text z.localization.Localizer.get_text {
+    title_element.text z.localization.Localizer.get_text
       id: z.string.modal_new_device_headline
-      replace: {placeholder: '%@.name', content: content}
-    }
+      replace:
+        placeholder: '%@.name'
+        content: content
 
   _show_modal_remove_device: (content, title_element) ->
-    title_element.text z.localization.Localizer.get_text {
+    title_element.text z.localization.Localizer.get_text
       id: z.string.modal_remove_device_headline
-      replace: {placeholder: '%device_name', content: content}
-    }
+      replace:
+        placeholder: '%device_name'
+        content: content
 
   _show_modal_too_many_members: (content, message_element) ->
-    message_element.text z.localization.Localizer.get_text {
+    message_element.text z.localization.Localizer.get_text
       id: z.string.modal_too_many_members_message
       replace: [
         {placeholder: '%no', content: content.open_spots}
         {placeholder: '%max', content: content.max}
       ]
-    }
 
   _show_modal_upload_parallel: (content, title_element) ->
-    title_element.text z.localization.Localizer.get_text {
+    title_element.text z.localization.Localizer.get_text
       id: z.string.modal_uploads_parallel
-      replace: {placeholder: '%no', content: content}
-    }
+      replace:
+        placeholder: '%no'
+        content: content
 
   _show_modal_upload_too_large: (content, title_element) ->
-    title_element.text z.localization.Localizer.get_text {
+    title_element.text z.localization.Localizer.get_text
       id: z.string.conversation_asset_upload_too_large
-      replace: {placeholder: '%no', content: content}
-    }
+      replace:
+        placeholder: '%no'
+        content: content
 
   _show_modal_message_too_long: (content, message_element) ->
-    message_element.text z.localization.Localizer.get_text {
+    message_element.text z.localization.Localizer.get_text
       id: z.string.modal_too_long_message
-      replace: {placeholder: '%no', content: content}
-    }
+      replace:
+        placeholder: '%no'
+        content: content

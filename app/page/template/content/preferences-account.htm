@@ -25,28 +25,13 @@
 
           <section class="preferences-section preferences-section-account-security">
             <header class="preferences-header"><hr class="preferences-separator"></header>
-            <div class="preferences-link text-theme" data-bind="click: click_on_reset_password, l10n_text: z.string.preferences_account_change_password, l10n_tooltip: z.string.tooltip_preferences_password"></div>
-            <div>
-              <!-- ko if: account_deletion_state() === z.ViewModel.content.PreferencesAccountViewModel.ACCOUNT_DELETE_STATE.BUTTON -->
-                <div class="preferences-link text-theme"
-                    data-uie-name="go-delete-account"
-                    data-bind="click: click_on_delete, l10n_text: z.string.preferences_account_delete">
-                </div>
-              <!-- /ko -->
-              <!-- ko if: account_deletion_state() === z.ViewModel.content.PreferencesAccountViewModel.ACCOUNT_DELETE_STATE.DIALOG -->
-                <div class="preferences-info" data-bind="text: delete_confirm_text" data-uie-name="delete-confirm-text"></div>
-                <span class="preferences-button button button-small" data-bind="click: click_on_delete_send, l10n_text: z.string.modal_button_send" data-uie-name="do-delete-account"></span>
-                <span class="preferences-button button button-small button-inverted" data-bind="click: click_on_delete_cancel, l10n_text: z.string.modal_button_cancel" data-uie-name="do-delete-cancel"></span>
-              <!-- /ko -->
-              <!-- ko if: account_deletion_state() === z.ViewModel.content.PreferencesAccountViewModel.ACCOUNT_DELETE_STATE.SENT -->
-                <div class="preferences-link" data-bind="l10n_text: z.string.preferences_account_email_sent" data-uie-name="delete-sent"></div>
-              <!-- /ko -->
-            </div>
+            <div class="preferences-link text-theme" data-bind="click: click_on_reset_password, l10n_text: z.string.preferences_account_change_password, l10n_tooltip: z.string.tooltip_preferences_password" data-uie-name="do-reset-password"></div>
+            <div class="preferences-link text-theme" data-bind="click: click_on_delete, l10n_text: z.string.preferences_account_delete" data-uie-name="go-delete-account"></div>
           </section>
 
           <!-- ko ifnot: z.util.Environment.electron -->
             <section class="preferences-section">
-              <div class="preferences-link text-theme" data-bind="click: logout, l10n_text: z.string.preferences_account_log_out" data-uie-name="do-logout"></div>
+              <div class="preferences-link text-theme" data-bind="click: click_on_logout, l10n_text: z.string.preferences_account_log_out" data-uie-name="do-logout"></div>
             </section>
           <!-- /ko -->
         </div>

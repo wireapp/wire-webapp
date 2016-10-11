@@ -367,10 +367,10 @@ Human readable format of a timestamp. Not testable due to timezones :(
 ###
 z.util.format_timestamp = (timestamp, long_format = true) ->
   time = moment timestamp
+  format = 'DD.MM.YYYY (HH:mm:ss)'
   if long_format
     format = if moment().year() is time.year() then 'ddd D MMM, HH:mm' else 'ddd D MMM YYYY, HH:mm'
-  else
-    format = 'DD.MM.YYYY (HH:mm:ss)'
+
   return time.format format
 
 ###

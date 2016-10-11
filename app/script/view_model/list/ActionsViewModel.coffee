@@ -36,18 +36,21 @@ class z.ViewModel.list.ActionsViewModel
     @conversations_archived = @conversation_repository.conversations_archived
     @conversations_unarchived = @conversation_repository.conversations_unarchived
 
-    @archive_conversation_tooltip = z.localization.Localizer.get_text {
+    @archive_conversation_tooltip = z.localization.Localizer.get_text
       id: z.string.tooltip_conversations_archive
-      replace: {placeholder: '%shortcut', content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.ARCHIVE}
-    }
-    @notify_conversation_tooltip = z.localization.Localizer.get_text {
+      replace:
+        placeholder: '%shortcut'
+        content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.ARCHIVE
+    @notify_conversation_tooltip = z.localization.Localizer.get_text
       id: z.string.tooltip_conversations_notify
-      replace: {placeholder: '%shortcut', content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.SILENCE}
-    }
-    @silence_conversation_tooltip = z.localization.Localizer.get_text {
+      replace:
+        placeholder: '%shortcut'
+        content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.SILENCE
+    @silence_conversation_tooltip = z.localization.Localizer.get_text
       id: z.string.tooltip_conversations_silence
-      replace: {placeholder: '%shortcut', content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.SILENCE}
-    }
+      replace:
+        placeholder: '%shortcut'
+        content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.SILENCE
 
     # fix for older wrapper versions
     @conversations_view_model.click_on_archive_action = @click_on_archive_action

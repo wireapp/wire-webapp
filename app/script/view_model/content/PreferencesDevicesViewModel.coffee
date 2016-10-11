@@ -81,14 +81,6 @@ class z.ViewModel.content.PreferencesDevicesViewModel
       data: device_et.model
     event.stopPropagation()
 
-  toggle_device_verification: (device_et, event) =>
-    toggle_verified = !!!device_et.meta.is_verified()
-
-    @client_repository.update_client_in_db @self_user().id, device_et.id, {meta: is_verified: toggle_verified}
-    .then -> device_et.meta.is_verified toggle_verified
-
-    event.stopPropagation()
-
   update_fingerprint: =>
     return if @fingerprint() isnt ''
     @fingerprint @cryptography_repository.get_local_fingerprint()

@@ -34,10 +34,9 @@ class z.ViewModel.LoadingViewModel
     if not z.util.Environment.frontend.is_production()
       _create_message = (message_locator, replacements) ->
         replacements = ({placeholder: replacement[0], content: replacement[1]} for replacement in replacements)
-        return z.localization.Localizer.get_text {
+        return z.localization.Localizer.get_text
           id: message_locator
           replace: replacements
-        }
 
       @loading_message switch message_locator
         when z.string.init_received_self_user
