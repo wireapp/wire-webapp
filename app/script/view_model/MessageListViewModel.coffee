@@ -554,10 +554,10 @@ class z.ViewModel.MessageListViewModel
   start_ephemeral_timer: (message_id, message_et, expiration_number) ->
     if not @ephemeral_timers[message_id]
       @ephemeral_timers[message_id] = window.setTimeout (=>
-        @timeout_ephemeral_message message_id, message_et
+        @timeout_ephemeral_message message_id, message_et, @conversation()
       ), expiration_number
 
-  timeout_ephemeral_message: (message_id, message_et) =>
+  timeout_ephemeral_message: (message_id, message_et, conversation_et) =>
     changes =
       data:
         expire_after_millis: true
@@ -565,10 +565,13 @@ class z.ViewModel.MessageListViewModel
     @conversation_repository.conversation_service.storage_service.update 'conversation_events', message_id, changes
     .then =>
       @logger.log @logger.levels.INFO, "Updated message '#{message_id}'.", changes
-      if message_et.constructor.name is 'ContentMessage'
-        message_et.assets.pop()
+      if message_et.user().is_me
+        if message_et.constructor.name is 'ContentMessage'
+          message_et.assets.pop()
 
-        fake_text = new z.entity.Text()
-        fake_text.text = 'XXX'
+          fake_text = new z.entity.Text()
+          fake_text.text = 'XXX'
 
-        message_et.assets.push fake_text
+          message_et.assets.push fake_text
+      else
+        @conversation_repository.delete_message_everyone conversation_et, message_et
