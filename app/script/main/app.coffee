@@ -312,12 +312,11 @@ class z.main.App
   _show_ui: ->
     @logger.log @logger.levels.INFO, 'Showing application UI'
     if @view.list.first_run() or not @repository.user.users().length
-      @view.content.switch_content z.ViewModel.content.CONTENT_STATE.WATERMARK
+      amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.WATERMARK
     else if conversation_et = @repository.conversation.get_most_recent_conversation()
-      # @view.content.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
     else if @repository.user.connect_requests().length
-      @view.content.switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+      amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
 
     window.setTimeout =>
       @repository.system_notification.request_permission()

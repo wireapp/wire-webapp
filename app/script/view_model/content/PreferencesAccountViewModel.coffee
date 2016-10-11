@@ -56,7 +56,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
     @set_picture files, ->
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, source: 'fromPhotoLibrary'
 
-  click_on_delete: ->
+  click_on_delete_account: ->
     amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_ACCOUNT,
       action: =>
         @user_repository.delete_me()
@@ -72,10 +72,11 @@ class z.ViewModel.content.PreferencesAccountViewModel
   set_picture: (files, callback) =>
     input_picture = files[0]
     warning_file_format = z.localization.Localizer.get_text z.string.alert_upload_file_format
-    warning_file_size = z.localization.Localizer.get_text {
+    warning_file_size = z.localization.Localizer.get_text
       id: z.string.alert_upload_too_large
-      replace: {placeholder: '%no', content: z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024}
-    }
+      replace:
+        placeholder: '%no'
+        content: z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024
     warning_min_size = z.localization.Localizer.get_text z.string.alert_upload_too_small
 
     if input_picture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE
@@ -94,7 +95,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
   _show_upload_warning: (warning, callback) ->
     amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT
-    setTimeout ->
+    window.setTimeout ->
       callback? null, 'error'
       window.alert warning
     , 200

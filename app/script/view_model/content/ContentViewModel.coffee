@@ -141,7 +141,7 @@ class z.ViewModel.content.ContentViewModel
 
     if @previous_state is z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
       @switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
-    else if @previous_conversation?.is_archived is false
+    else if @previous_conversation?.is_archived() is false
       @show_conversation @previous_conversation
     else
       @switch_content z.ViewModel.content.CONTENT_STATE.WATERMARK

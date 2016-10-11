@@ -382,6 +382,7 @@ class z.client.ClientRepository
     else
       @delete_temporary_client()
       .then -> amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, true
+
   ###
   Removes a stored client and the session connected with it.
 

@@ -6,7 +6,7 @@
         <div>
           <section class="preferences-section preferences-section-account-profile">
             <div class="preferences-account-user-data">
-              <input-element class="preferences-account-name" params="value: self_user().name, change: change_username, placeholder: z.string.preferences_account_username_placeholder" data-uie-name="enter-name" data-bind="l10n_tooltip: z.string.tooltip_preferences_rename"></input-element>
+              <input-element class="preferences-account-name" params="value: self_user().name, change: change_username, placeholder: z.string.preferences_account_username_placeholder" data-bind="l10n_tooltip: z.string.tooltip_preferences_rename" data-uie-name="enter-name"></input-element>
               <span class="preferences-account-mail" data-bind="text: self_user().email()" data-uie-name="enter-email"></span>
               <span class="preferences-account-phone" data-bind="text: self_user().phone()" data-uie-name="enter-phone"></span>
             </div>
@@ -26,7 +26,7 @@
           <section class="preferences-section preferences-section-account-security">
             <hr class="preferences-separator">
             <div class="preferences-link text-theme" data-bind="click: click_on_reset_password, l10n_text: z.string.preferences_account_change_password, l10n_tooltip: z.string.tooltip_preferences_password" data-uie-name="do-reset-password"></div>
-            <div class="preferences-link text-theme" data-bind="click: click_on_delete, l10n_text: z.string.preferences_account_delete" data-uie-name="go-delete-account"></div>
+            <div class="preferences-link text-theme" data-bind="click: click_on_delete_account, l10n_text: z.string.preferences_account_delete" data-uie-name="go-delete-account"></div>
           </section>
 
           <!-- ko ifnot: z.util.Environment.electron -->
