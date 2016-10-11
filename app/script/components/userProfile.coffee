@@ -79,11 +79,12 @@ class z.components.UserProfileViewModel
       @is_resetting_session false
 
     @selected_device_subscription = @selected_device.subscribe =>
-      if @selected_device()?
-        @cryptography_repository.get_session @user().id, @selected_device().id
-        .then (cryptobox_session) =>
-          @fingerprint_remote cryptobox_session.fingerprint_remote()
-          @fingerprint_local cryptobox_session.fingerprint_local()
+      return if not @selected_device()
+
+      @fingerprint_local @cryptography_repository.get_local_fingerprint()
+      @cryptography_repository.get_remote_fingerprint @user().id, @selected_device().id
+      .then (fingerprint) =>
+        @fingerprint_remote fingerprint
 
     @add_people_tooltip = z.localization.Localizer.get_text {
       id: z.string.tooltip_people_add

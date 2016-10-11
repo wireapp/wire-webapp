@@ -91,4 +91,4 @@ class z.ViewModel.content.PreferencesDevicesViewModel
 
   update_fingerprint: =>
     return if @fingerprint() isnt ''
-    @fingerprint @cryptography_repository.storage_repository.identity.public_key.fingerprint()
+    @fingerprint @cryptography_repository.get_local_fingerprint()

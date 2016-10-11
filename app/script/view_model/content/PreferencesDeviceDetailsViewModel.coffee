@@ -72,9 +72,9 @@ class z.ViewModel.content.PreferencesDeviceDetailsViewModel
       @logger.log @logger.levels.WARN, "Could not update device location: #{error.message}", error
 
   _update_fingerprint: =>
-    @cryptography_repository.get_session @self_user().id, @device().id
-    .then (cryptobox_session) =>
-      @fingerprint cryptobox_session.fingerprint_remote()
+    @cryptography_repository.get_remote_fingerprint @self_user().id, @device().id
+    .then (fingerprint) =>
+      @fingerprint fingerprint
 
   click_on_details_close: ->
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES

@@ -85,6 +85,23 @@ class z.cryptography.CryptographyRepository
         reject error
 
   ###
+  Get the fingerprint of the local identity.
+  @return [String] Fingerprint of local identity public key
+  ###
+  get_local_fingerprint: =>
+    return @storage_repository.identity.public_key.fingerprint()
+
+  ###
+  Get the fingerprint of a remote identity.
+  @param user_id [String] ID of user
+  @param device_id [String] ID of device
+  ###
+  get_remote_fingerprint: (user_id, device_id) =>
+    @cryptography_repository.get_session user_id, device_id
+    .then (cryptobox_session) =>
+      return cryptobox_session.fingerprint_remote()
+
+  ###
   Get a pre-key for a user client.
 
   @param user_id [String] ID of user
