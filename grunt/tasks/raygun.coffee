@@ -35,8 +35,6 @@ module.exports = (grunt) ->
 
     if env is 'prod'
       options.uri = 'https://app.raygun.io/upload/jssymbols/8785p7'
-    else if env is 'taco'
-      options.uri = 'https://app.raygun.io/upload/jssymbols/cmhbz0'
 
     files = []
     for min_script in fs.readdirSync 'deploy/min'

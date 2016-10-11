@@ -61,7 +61,7 @@ class z.ViewModel.WarningsViewModel
       else
         top_margin = '64px'
       $('#app').css top: top_margin
-      requestAnimFrame -> $(window).trigger 'resize'
+      window.requestAnimationFrame -> $(window).trigger 'resize'
 
     @first_name = ko.observable()
     @call_id = undefined

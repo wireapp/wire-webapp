@@ -72,7 +72,7 @@ class z.components.UserListViewModel
 
     # filter all list items if a filter is provided
     if @user_filter?
-      @filtered_user_ets = ko.computed =>
+      @filtered_user_ets = ko.pureComputed =>
         ko.utils.arrayFilter @user_ets(), (user_et) =>
           user_name = window.getSlug user_et.name()
           search_query = window.getSlug @user_filter()

@@ -29,11 +29,8 @@ z.tracking.SessionEventName =
     EVENT_HIDDEN_DUE_TO_DUPLICATE_ID: 'eventHiddenDueToDuplicateIDActual'
     EVENT_HIDDEN_DUE_TO_DUPLICATE_NONCE: 'eventHiddenDueToDuplicateNonceActual'
     IMAGE_DETAIL_VIEW_OPENED: 'imageContentsClicksActual'
-    IMAGE_SENT: 'imagesSentActual'
     INCOMING_CALL_ACCEPTED: 'incomingCallsAcceptedActual'
     INCOMING_CALL_MUTED: 'incomingCallsMutedActual'
-    MESSAGE_SENT: 'textMessagesSentActual' # No differentiation between message with text or image
-    PING_SENT: 'pingsSentActual' # No differentiation between ping or hot ping
     SEARCH_OPENED: 'openedSearchActual'
     SOUNDCLOUD_CONTENT_CLICKED: 'soundcloudContentClicksActual'
     SOUNDCLOUD_LINKS_SENT: 'soundcloudLinksSentActual'
@@ -44,6 +41,5 @@ z.tracking.SessionEventName =
     TOTAL_OUTGOING_CONNECTION_REQUESTS: 'totalOutgoingConnectionRequestsActual'
     TOTAL_SILENCED_CONVERSATIONS: 'totalSilencedConversationsActual'
     USERS_ADDED_TO_CONVERSATIONS: 'usersAddedToConversationsActual'
-    VOICE_CALL_INITIATED: 'voiceCallsInitiatedActual'
     YOUTUBE_CONTENT_CLICKED: 'youtubeContentClicksActual'
     YOUTUBE_LINKS_SENT: 'youtubeLinksSentActual'

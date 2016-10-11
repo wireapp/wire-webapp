@@ -28,7 +28,7 @@ class z.components.DeviceRemove
     @remove_form_visible = ko.observable false
 
     @password = ko.observable ''
-    @password.subscribe (value) =>
+    @password_subscription = @password.subscribe (value) =>
       @device_remove_error false if value.length > 0
 
     @click_on_submit = =>
@@ -40,6 +40,9 @@ class z.components.DeviceRemove
 
     @click_on_remove_device = =>
       @remove_form_visible true
+
+  dispose: =>
+    @password_subscription.dispose()
 
 
 ko.components.register 'device-remove',

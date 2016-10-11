@@ -61,9 +61,7 @@ class z.ViewModel.SettingsViewModel
     # All clients except the current client
     @devices = ko.observableArray()
     @client_repository.clients.subscribe (client_ets) =>
-      client_ets = client_ets.filter (client_et) =>
-        return client_et.meta.user_id is @user().id and client_et.id isnt @current_client()?.id
-      @devices client_ets
+      @devices (client_et for client_et in client_ets when client_et.id isnt @current_client().id)
 
     @data_setting = ko.observable()
     @data_setting.subscribe (setting) => @user_repository.save_property_data_settings setting

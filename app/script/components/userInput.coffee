@@ -31,13 +31,13 @@ class z.components.UserListInputViewModel
     @input_element = $(@element).find '.search-input'
     @inner_element = $(@element).find '.search-inner'
 
-    @selected.subscribe =>
+    @selected_subscription = @selected.subscribe =>
       @input ''
       @input_element.focus()
       setTimeout =>
         @inner_element.scrollTop @inner_element[0].scrollHeight
 
-    @placeholder = ko.computed =>
+    @placeholder = ko.pureComputed =>
       if @input() is '' and @selected().length is 0
         return z.localization.Localizer.get_text params.placeholder
       else
@@ -46,6 +46,9 @@ class z.components.UserListInputViewModel
   on_key_press: (data, event) =>
     @selected.pop() if event.keyCode is z.util.KEYCODE.DELETE and @input() is ''
     return true
+
+  dispose: =>
+    @selected_subscription.dispose()
 
 
 ko.components.register 'user-input',

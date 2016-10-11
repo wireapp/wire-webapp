@@ -45,11 +45,9 @@ class z.entity.User
 
   ###
   Construct a new user entity.
-
   @param user_id [String] User ID
   ###
-  constructor: (user_id = '') ->
-    @id = user_id
+  constructor: (@id = '') ->
     @is_me = false
 
     @joaat_hash = -1
@@ -135,6 +133,13 @@ class z.entity.User
       return false if @devices().length is 0
       return @devices().every (client_et) -> client_et.meta.is_verified()
 
-  add_client: (client_et) ->
-    is_existent = ko.utils.arrayFirst @devices(), (exisiting_client) -> exisiting_client.id is client_et.id
-    @devices.push client_et if not is_existent
+  add_client: (new_client_et) =>
+    for client_et in @devices() when client_et.id is new_client_et.id
+      return
+
+    @devices.push new_client_et
+    if @is_me
+      @devices.sort (client_a, client_b) -> return new Date(client_b.time) - new Date(client_a.time)
+
+  remove_client: (client_id) =>
+    @devices.remove (client_et) -> client_et.id is client_id

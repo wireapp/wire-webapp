@@ -23,6 +23,7 @@ z.tracking.attribute ?= {}
 z.tracking.attribute.MessageType =
   FILE: 'file'
   IMAGE: 'image'
+  LOCATION: 'location'
   PING: 'ping'
   SYSTEM: 'system'
   TEXT: 'text'

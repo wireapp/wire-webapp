@@ -652,6 +652,7 @@ describe 'z.conversation.ConversationRepository', ->
       beforeEach ->
 
       it 'can remove the payload of deleted clients', (done) ->
+        spyOn(user_repository, 'remove_client_from_user').and.returnValue Promise.resolve()
         error_response =
           missing: {}
           deleted:
@@ -674,6 +675,7 @@ describe 'z.conversation.ConversationRepository', ->
       it 'can encrypt a generic message for a missing clients', (done) ->
         session = new cryptobox.CryptoboxSession "#{john_doe.user_id}@#{john_doe.client_id}"
         spyOn(cryptography_repository, 'load_session').and.returnValue session
+        spyOn(user_repository, 'add_client_to_user').and.returnValue Promise.resolve()
 
         error_response =
           missing:

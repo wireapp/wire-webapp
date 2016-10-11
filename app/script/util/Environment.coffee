@@ -23,7 +23,6 @@ APP_ENV =
   LOCALHOST: 'localhost'
   PRODUCTION: 'app.wire.com'
   PROD_NEXT: 'wire-webapp-prod-next.wire.com'
-  TACO: 'taco.wire.com'
   VIRTUAL_HOST: 'wire.ms' # The domain "wire.ms" is our virtual host for testing contact uploads
 
 BROWSER_NAME =
@@ -57,7 +56,7 @@ z.util.Environment = do ->
 
     requires_codec_rewrite: ->
       return false if not @supports_calling()
-      return @is_chrome() and @get_version() in [50, 51]
+      return @is_chrome() and @get_version() is 51
 
     supports_notifications: ->
       return false if window.Notification is undefined

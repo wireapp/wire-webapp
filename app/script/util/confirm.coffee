@@ -57,7 +57,7 @@ $.fn.confirm = (config) ->
       .find '.user'
       .html z.util.escape_html stripped_user_name
 
-  requestAnimFrame ->
+  window.requestAnimationFrame ->
     confirm.addClass 'confirm-is-visible'
 
   @destroy = ->

@@ -70,7 +70,7 @@ class z.components.UserProfileViewModel
     @is_resetting_session = ko.observable false
 
     # destroy confirm dialog when user changes
-    ko.computed =>
+    @cleanup_computed = ko.computed =>
       @confirm_dialog?.destroy() if @user()?
       @tab_index 0
       @devices_found null
@@ -78,7 +78,7 @@ class z.components.UserProfileViewModel
       @fingerprint_remote ''
       @is_resetting_session false
 
-    @selected_device.subscribe =>
+    @selected_device_subscription = @selected_device.subscribe =>
       if @selected_device()?
         @cryptography_repository.get_session @user().id, @selected_device().id
         .then (cryptobox_session) =>
@@ -167,11 +167,11 @@ class z.components.UserProfileViewModel
       return false
     , @, deferEvaluation: true
 
-    @connection_is_not_established = ko.computed =>
+    @connection_is_not_established = ko.pureComputed =>
       @user()?.connection().status() in [z.user.ConnectionStatus.PENDING, z.user.ConnectionStatus.SENT, z.user.ConnectionStatus.IGNORED]
     , @, deferEvaluation: true
 
-    @user_is_removed_from_conversation = ko.computed =>
+    @user_is_removed_from_conversation = ko.pureComputed =>
       return true if not @user()? or not @conversation()?
       return not (@user() in @conversation().participating_user_ets())
     , @, deferEvaluation: true
@@ -180,7 +180,7 @@ class z.components.UserProfileViewModel
       return @user()?.id and not @user().connected() and not @user().is_me
 
     # footer
-    @get_footer_template = ko.computed =>
+    @get_footer_template = ko.pureComputed =>
       return 'user-profile-footer-empty' if not @user()?
 
       ConversationType = z.conversation.ConversationType
@@ -261,6 +261,10 @@ class z.components.UserProfileViewModel
           @devices_found false
       .catch (error) =>
         @logger.log @logger.levels.ERROR, "Unable to retrieve clients data for user '#{user_id}': #{error}"
+
+  dispose: =>
+    @cleanup_computed.dispose()
+    @selected_device_subscription.dispose()
 
 ko.components.register 'user-profile',
   viewModel: createViewModel: (params, component_info) ->

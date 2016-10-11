@@ -34,8 +34,7 @@ class z.components.InputElement
     @edit = -> @editing true
 
     @editing = ko.observable false
-
-    @editing.subscribe (value) =>
+    @editing_subscription = @editing.subscribe (value) =>
       if value
         $(component_info.element).find('textarea').one 'keydown', (e) =>
           @editing false if e.keyCode is z.util.KEYCODE.ESC
@@ -43,6 +42,9 @@ class z.components.InputElement
         $(component_info.element).find('textarea').off 'keydown', 'esc', @abort
 
     @placeholder = params.placeholder
+
+  dispose: =>
+    @editing_subscription.dispose()
 
 
 # Knockout registration of the input element component.

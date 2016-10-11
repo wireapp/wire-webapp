@@ -190,6 +190,16 @@ z.util.array_to_base64 = (array) ->
   return sodium.to_base64 new Uint8Array(array), true
 
 ###
+Return base64 encoded md5 of the the given array
+
+@param array [Uint8Array]
+@return [String]
+###
+z.util.array_to_md5_base64 = (array) ->
+  word_array = CryptoJS.lib.WordArray.create array
+  return CryptoJS.MD5(word_array).toString CryptoJS.enc.Base64
+
+###
 Convert base64 dataURI to Blob
 
 @param base64 [String] base64 encoded data uri
@@ -199,17 +209,6 @@ z.util.base64_to_blob = (base64) ->
   mime_type = z.util.get_content_type_from_data_url base64
   bytes = z.util.base64_to_array base64
   return new Blob [bytes], 'type': mime_type
-
-z.util.encode_base64_md5_array_buffer_view = (array_buffer_view) ->
-  word_array = CryptoJS.lib.WordArray.create array_buffer_view
-  md5_hash = CryptoJS.MD5(word_array).toString()
-  md5_hash_hex = z.util.read_string_chars_as_hex md5_hash
-  return btoa md5_hash_hex
-
-z.util.download_text = (content) ->
-  blob = new Blob([content], 'type': 'text/plain')
-  z.util.download_blob blob, 'download.txt'
-
 
 ###
 Downloads blob using a hidden link element.
@@ -231,22 +230,6 @@ z.util.download_blob = (blob, filename) ->
     document.body.removeChild link
     window.URL.revokeObjectURL url
   , 100
-
-
-z.util.read_deferred = (file, type) ->
-  deferred = new $.Deferred()
-  reader = new FileReader()
-  reader.onload = (e) -> deferred.resolve e.target.result
-  reader.onerror = (e) -> deferred.reject @
-
-  if type is 'buffer'
-    reader.readAsArrayBuffer file
-  else if type is 'url'
-    reader.readAsDataURL file
-  else
-    reader.readAsText file
-
-  return deferred.promise()
 
 
 z.util.phone_uri_to_e164 = (phone_number) ->
@@ -282,14 +265,23 @@ z.util.add_blank_targets = (text_with_anchors) ->
   return "#{text_with_anchors}".replace /rel="nofollow"/gi, 'target="_blank" rel="nofollow noopener noreferrer"'
 
 ###
+Adds http to given url if protocol missing
+
+@param url [String] URL you want to open in a new browser tab
+###
+z.util.add_http = (url) ->
+  if not url.match /^http[s]?:\/\//i
+    url = "http://#{url}"
+  return url
+
+###
 Opens a new browser tab (target="_blank") with a given URL in a safe environment.
 
 @see https://mathiasbynens.github.io/rel-noopener/
 @param url [String] URL you want to open in a new browser tab
 ###
 z.util.safe_window_open = (url, focus = true) ->
-  if not url.match /^http[s]?:\/\//i
-    url = "http://#{url}"
+  url = z.util.add_http url
 
   if navigator.userAgent.indexOf('Electron') > -1
     window.open url
@@ -386,6 +378,14 @@ z.util.format_timestamp = (timestamp) ->
 
   return "#{day}.#{month}.#{year} (#{hours}:#{minutes}:#{seconds})"
 
+###
+Test whether the given string is ISO 8601 format equally to date.toISOString()
+
+@param date_string [String]
+@return [String]
+###
+z.util.is_iso_string = (date_string) ->
+  return /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/.test date_string
 
 z.util.sort_groups_by_last_event = (group_a, group_b) ->
   return group_b.last_event_timestamp() - group_a.last_event_timestamp()
@@ -625,6 +625,7 @@ z.util.compare_names = (name_a, name_b) ->
 
 z.util.capitalize_first_char = (s) ->
   return "#{s.charAt(0).toUpperCase()}#{s.substring 1}"
+
 
 z.util.print_devices_id = (id) ->
   return '' if not id

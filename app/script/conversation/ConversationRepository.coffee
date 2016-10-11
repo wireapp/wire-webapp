@@ -101,8 +101,8 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTION, @map_connection
     amplify.subscribe z.event.WebApp.CONVERSATION.STORE, @save_conversation_in_db
+    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
-    amplify.subscribe z.event.WebApp.SELF.CLIENT_ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
 
   ###
@@ -112,12 +112,13 @@ class z.conversation.ConversationRepository
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
   @param user_ids [Array<String>] Optional array of user IDs to limit sending to
+  @param native_push [Boolean] Optional if message should enforce native push
   @return [Promise] Promise that resolves when the message was sent
   ###
-  _add_to_sending_queue: (conversation_id, generic_message, user_ids) =>
+  _add_to_sending_queue: (conversation_id, generic_message, user_ids, native_push) =>
     return new Promise (resolve, reject) =>
       queue_entry =
-        function: => @_send_generic_message conversation_id, generic_message, user_ids
+        function: => @_send_generic_message conversation_id, generic_message, user_ids, native_push
         resolve: resolve
         reject: reject
 
@@ -644,7 +645,7 @@ class z.conversation.ConversationRepository
 
   reset_session: (user_id, client_id, conversation_id) =>
     @logger.log @logger.levels.INFO, "Resetting session with client '#{client_id}' of user '#{user_id}'"
-    @cryptography_repository.reset_session user_id, client_id
+    @cryptography_repository.delete_session user_id, client_id
     .then (session_id) =>
       if session_id
         @logger.log @logger.levels.INFO, "Deleted session with client '#{client_id}' of user '#{user_id}'"
@@ -773,7 +774,7 @@ class z.conversation.ConversationRepository
   ###############################################################################
 
   ###
-  Send encrypted assets. Used for file transfers.
+  Send assets to specified conversation. Used for file transfers.
   @param conversation_id [String] Conversation ID
   @return [Object] Collection with User IDs which hold their Client IDs in an Array
   ###
@@ -799,8 +800,7 @@ class z.conversation.ConversationRepository
       return @_on_asset_upload_complete conversation_et, event
 
   ###
-  When we reset a session then we must inform the remote client about this action.
-
+  Send asset metadata message to specified conversation.
   @param conversation_et [z.entity.Conversation] Conversation that should receive the file
   @param file [File] File to send
   ###
@@ -812,7 +812,7 @@ class z.conversation.ConversationRepository
     @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
-  When we reset a session then we must inform the remote client about this action.
+  Send asset upload failed message to specified conversation.
 
   @param conversation_et [z.entity.Conversation] Conversation that should receive the file
   @param nonce [String] id of the metadata message
@@ -827,7 +827,7 @@ class z.conversation.ConversationRepository
     @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
-  Send a confirmation for a content message.
+  Send confirmation for a content message in specified conversation.
   @param conversation [z.entity.Conversation] Conversation that content message was received in
   @param message_et [String] ID of message for which to acknowledge receipt
   ###
@@ -836,10 +836,12 @@ class z.conversation.ConversationRepository
 
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
-    @_add_to_sending_queue conversation_et.id, generic_message, [message_et.user().id]
+    @_add_to_sending_queue conversation_et.id, generic_message, [message_et.user().id], false
 
   ###
-  Sends an OTR Image Asset
+  Sends image asset in specified conversation.
+  @param conversation_et [z.entity.Conversation] Conversation to send image in
+  @param image [File, Blob]
   ###
   send_image_asset: (conversation_et, image) =>
     @asset_service.create_image_proto image
@@ -856,6 +858,10 @@ class z.conversation.ConversationRepository
         # we don't need to wait for the sending to resolve
         @_send_encrypted_asset conversation_et.id, generic_message, ciphertext
         .then ([response, asset_id]) =>
+          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
+            action: 'photo'
+            conversation_type: if conversation_et.is_one2one() then 'one_to_one' else 'group'
+            with_bot: conversation_et.is_with_bot()
           saved_event.data.id = asset_id
           saved_event.data.info.nonce = asset_id
           @_update_image_as_sent conversation_et, saved_event
@@ -866,59 +872,39 @@ class z.conversation.ConversationRepository
         return saved_event
 
   ###
-  Update image message with given event data
-  ###
-  _update_image_as_sent: (conversation_et, event_json) =>
-    @get_message_in_conversation_by_id conversation_et, event_json.id
-    .then (message_et) =>
-      asset_data = event_json.data
-      remote_data = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
-      message_et.get_first_asset().resource remote_data
-      message_et.status z.message.StatusType.SENT
-      @conversation_service.update_message_in_db message_et, {data: asset_data, status: z.message.StatusType.SENT}
-
-  ###
-  Send an encrypted knock.
+  Send knock in specified conversation.
   @param conversation_et [z.entity.Conversation] Conversation to send knock in
   @return [Promise] Promise that resolves after sending the knock
   ###
   send_knock: (conversation_et) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'knock', new z.proto.Knock false
+
     @_send_and_inject_generic_message conversation_et, generic_message
-    .then ->
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.PING_SENT
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
-        action: 'ping'
-        conversation_type: z.tracking.helpers.get_conversation_type conversation_et
-        with_bot: conversation_et.is_with_bot()
-      }
     .catch (error) => @logger.log @logger.levels.ERROR, "#{error.message}"
 
   ###
-  Send message to specific conversation.
+  Send link preview in specified conversation.
 
-  @param message [String] plain text message
+  @param message [String] Plain text message that possibly contains link
   @param conversation_et [z.entity.Conversation] Conversation that should receive the message
+  @param generic_message [z.protobuf.GenericMessage] GenericMessage of containing text or edited message
   @return [Promise] Promise that resolves after sending the message
   ###
-  send_message_with_link_preview: (message, conversation_et) =>
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'text', new z.proto.Text message
-
-    @_send_and_inject_generic_message conversation_et, generic_message
-    .then =>
-      @link_repository.get_link_preview_from_string message
+  send_link_preview: (message, conversation_et, generic_message) =>
+    @link_repository.get_link_preview_from_string message
     .then (link_preview) =>
       if link_preview?
-        generic_message.text.link_preview.push link_preview
+        switch generic_message.content
+          when 'edited'
+            generic_message.edited.text.link_preview.push link_preview
+          when 'text'
+            generic_message.text.link_preview.push link_preview
         @_send_and_inject_generic_message conversation_et, generic_message
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Error while sending link preview: #{error.message}", error
-      throw error
+        @link_repository.get_link_preview_from_string message
 
   ###
-  Send message to specific conversation.
+  Send text message in specified conversation.
 
   @param message [String] plain text message
   @param conversation_et [z.entity.Conversation] Conversation that should receive the message
@@ -928,26 +914,12 @@ class z.conversation.ConversationRepository
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'text', new z.proto.Text message
 
-    Promise.resolve()
-    .then =>
-      @_send_and_inject_generic_message conversation_et, generic_message
-    .then (message_record) =>
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.MESSAGE_SENT
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
-        action: 'text'
-        conversation_type: z.tracking.helpers.get_conversation_type conversation_et
-        with_bot: conversation_et.is_with_bot()
-      }
-      @_analyze_sent_message message
-      return message_record
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, "#{error.message}", error
-      error = new Error "Failed to send message: #{error.message}"
-      Raygun.send error, {source: 'Sending message'}
-      throw error
+    @_send_and_inject_generic_message conversation_et, generic_message
+    .then ->
+      return generic_message
 
   ###
-  Send edited message to specific conversation.
+  Send edited message in specified conversation.
 
   @param message [String] plain text message
   @param original_message_et [z.entity.Message]
@@ -955,35 +927,46 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the message
   ###
   send_message_edit: (message, original_message_et, conversation_et) =>
-    generic_message = null
-    Promise.resolve()
-    .then =>
-      if original_message_et.get_first_asset().text is message
-        throw new Error 'Edited message equals original message'
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'edited', new z.proto.MessageEdit original_message_et.id, new z.proto.Text message
-      @_send_and_inject_generic_message conversation_et, generic_message
+    if original_message_et.get_first_asset().text is message
+      return Promise.reject new Error 'Edited message equals original message'
+
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'edited', new z.proto.MessageEdit original_message_et.id, new z.proto.Text message
+
+    @_send_and_inject_generic_message conversation_et, generic_message
     .then =>
       @_track_edit_message conversation_et, original_message_et
-    .then =>
-      @link_repository.get_link_preview_from_string message
-    .then (link_preview) =>
-      if link_preview?
-        generic_message.edited.text.link_preview.push link_preview
-        @_send_and_inject_generic_message conversation_et, generic_message
+      @send_link_preview message, conversation_et, generic_message
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Error while editing message: #{error.message}", error
       throw error
 
   ###
-  Send a reaction to a content message.
-  @param conversation [z.entity.Conversation] Conversation that content message was received in
+  Send text message with link preview in specified conversation.
+
+  @param message [String] plain text message
+  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
+  @return [Promise] Promise that resolves after sending the message
+  ###
+  send_message_with_link_preview: (message, conversation_et) =>
+    @send_message message, conversation_et
+    .then (generic_message) =>
+      @_track_rich_media_content message
+      @send_link_preview message, conversation_et, generic_message
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Error while sending text message: #{error.message}", error
+      throw error
+
+  ###
+  Send reaction to a content message in specified conversation.
+  @param conversation [z.entity.Conversation] Conversation to send reaction in
   @param message_et [String] ID of message for react to
   @param reaction [z.message.ReactionType]
   ###
   send_reaction: (conversation_et, message_et, reaction) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'reaction', new z.proto.Reaction reaction, message_et.id
+
     @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
@@ -1066,6 +1049,21 @@ class z.conversation.ConversationRepository
     @send_confirmation_status conversation_et, message_et for [conversation_et, message_et] in @sending_queue
     @sending_queue = []
 
+  ###
+  Update image message with given event data
+  @param conversation_et [z.entity.Conversation] Conversation image was sent in
+  @param event_json [JSON] Image event containing updated information after sending
+  ###
+  _update_image_as_sent: (conversation_et, event_json) =>
+    @get_message_in_conversation_by_id conversation_et, event_json.id
+    .then (message_et) =>
+      asset_data = event_json.data
+      remote_data = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
+      message_et.get_first_asset().resource remote_data
+      message_et.status z.message.StatusType.SENT
+      @conversation_service.update_message_in_db message_et, {data: asset_data, status: z.message.StatusType.SENT}
+
+
   ###############################################################################
   # Send Generic Messages
   ###############################################################################
@@ -1089,6 +1087,7 @@ class z.conversation.ConversationRepository
       .then =>
         if saved_event.type in z.event.EventTypeHandling.STORE
           @_update_message_sent_status conversation_et, saved_event.id
+        @_track_completed_media_action conversation_et, generic_message
 
       return saved_event
 
@@ -1111,9 +1110,10 @@ class z.conversation.ConversationRepository
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Generic message to be sent as external message
   @param user_ids [Array<String>] Optional array of user IDs to limit sending to
+  @param native_push [Boolean] Optional if message should enforce native push
   @return [Promise] Promise that resolves after sending the external message
   ###
-  _send_external_generic_message: (conversation_id, generic_message, user_ids) =>
+  _send_external_generic_message: (conversation_id, generic_message, user_ids, native_push = true) =>
     @logger.log @logger.levels.INFO, "Sending external message of type '#{generic_message.content}'", generic_message
 
     key_bytes = null
@@ -1132,7 +1132,7 @@ class z.conversation.ConversationRepository
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message_external
     .then (payload) =>
       payload.data = z.util.array_to_base64 ciphertext
-      payload.native_push = true
+      payload.native_push = native_push
       @_send_encrypted_message conversation_id, generic_message, payload, user_ids
     .catch (error) =>
       @logger.log @logger.levels.INFO, 'Failed sending external message', error
@@ -1145,13 +1145,14 @@ class z.conversation.ConversationRepository
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
   @param user_ids [Array<String>] Optional array of user IDs to limit sending to
+  @param native_push [Boolean] Optional if message should enforce native push
   @return [Promise] Promise that resolves when the message was sent
   ###
-  _send_generic_message: (conversation_id, generic_message, user_ids) =>
+  _send_generic_message: (conversation_id, generic_message, user_ids, native_push = true) =>
     Promise.resolve @_send_as_external_message conversation_id, generic_message
     .then (send_as_external) =>
       if send_as_external
-        @_send_external_generic_message conversation_id, generic_message
+        @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
       else
         @_create_user_client_map conversation_id
         .then (user_client_map) =>
@@ -1159,10 +1160,11 @@ class z.conversation.ConversationRepository
             delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
           return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
         .then (payload) =>
+          payload.native_push = native_push
           @_send_encrypted_message conversation_id, generic_message, payload, user_ids
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
-        return @_send_external_generic_message conversation_id, generic_message
+        return @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
       throw error
 
   ###
@@ -1204,7 +1206,6 @@ class z.conversation.ConversationRepository
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
     .then (payload) =>
       payload.inline = false
-      payload.native_push = true
       @asset_service.post_asset_v2 conversation_id, payload, image_data, false, nonce
       .catch (error_response) =>
         return @_update_payload_for_changed_clients error_response, generic_message, payload
@@ -1264,11 +1265,6 @@ class z.conversation.ConversationRepository
     conversation_type = z.tracking.helpers.get_conversation_type conversation_et
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED,
       $.extend tracking_data, {conversation_type: conversation_type}
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION, {
-      action: 'file'
-      conversation_type: conversation_type
-      with_bot: conversation_et.is_with_bot()
-    }
 
     @send_asset_metadata conversation_et, file
     .then (record) =>
@@ -1331,35 +1327,6 @@ class z.conversation.ConversationRepository
     .catch (error) =>
       @logger.log "Failed to send delete message with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
       throw error
-
-  ###
-  Track delete action.
-
-  @param conversation_et [z.entity.Conversation]
-  @param message_et [z.entity.Message]
-  @param method [z.tracking.attribute.DeleteType]
-  ###
-  _track_delete_message: (conversation, message_et, method) ->
-    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE,
-      conversation_type: z.tracking.helpers.get_conversation_type conversation
-      method: method
-      time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
-      time_elapsed_action: seconds_since_message_creation
-      type: z.tracking.helpers.get_message_type message_et
-
-  ###
-  Track edit action.
-
-  @param conversation_et [z.entity.Conversation]
-  @param message_et [z.entity.Message]
-  ###
-  _track_edit_message: (conversation, message_et) ->
-    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.EDITED_MESSAGE,
-      conversation_type: z.tracking.helpers.get_conversation_type conversation
-      time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
-      time_elapsed_action: seconds_since_message_creation
 
   ###
   Can user upload assets to conversation.
@@ -1857,9 +1824,8 @@ class z.conversation.ConversationRepository
         delete_promises = []
         for user_id, client_ids of deleted_client_map
           for client_id in client_ids
-            @logger.log @logger.levels.WARN, "The client '#{client_id}' from '#{user_id}' is obsolete and will be removed"
             delete payload.recipients[user_id][client_id]
-            delete_promises.push @user_repository.client_repository.delete_client_and_session user_id, client_id
+            delete_promises.push @user_repository.remove_client_from_user user_id, client_id
           delete payload.recipients[user_id] if Object.keys(payload.recipients[user_id]).length is 0
 
         Promise.all delete_promises
@@ -1939,7 +1905,7 @@ class z.conversation.ConversationRepository
         deleted_time: time
       type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
       from: message_to_delete_et.from
-      time: message_to_delete_et.timestamp
+      time: new Date(message_to_delete_et.timestamp).toISOString()
 
 
   ###############################################################################
@@ -2079,31 +2045,77 @@ class z.conversation.ConversationRepository
     , 0
 
   ###
-  Analyze sent text message for rich media content.
+  Track generic messages for media actions.
+  @private
+  @param conversation_et [z.entity.Conversation]
+  @param generic_message [z.protobuf.GenericMessage]
+  ###
+  _track_completed_media_action: (conversation_et, generic_message) ->
+    action_type = switch generic_message.content
+      when 'asset' then 'file' if generic_message.asset.original?
+      when 'knock' then 'ping'
+      when 'text' then 'text' if not generic_message.text.link_preview.length
+
+    return if not action_type
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
+      action: action_type
+      conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+      with_bot: conversation_et.is_with_bot()
+
+  ###
+  Track delete action.
+
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  @param method [z.tracking.attribute.DeleteType]
+  ###
+  _track_delete_message: (conversation, message_et, method) ->
+    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE,
+      conversation_type: z.tracking.helpers.get_conversation_type conversation
+      method: method
+      time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
+      time_elapsed_action: seconds_since_message_creation
+      type: z.tracking.helpers.get_message_type message_et
+
+  ###
+  Track edit action.
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  ###
+  _track_edit_message: (conversation, message_et) ->
+    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.EDITED_MESSAGE,
+      conversation_type: z.tracking.helpers.get_conversation_type conversation
+      time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
+      time_elapsed_action: seconds_since_message_creation
+
+  ###
+  Track rich media content actions in text messages.
   @private
   @param message [String] Message content to be checked for rich media
   ###
-  _analyze_sent_message: (message) ->
+  _track_rich_media_content: (message) ->
     soundcloud_links = message.match z.media.MediaEmbeds.regex.soundcloud
     if soundcloud_links
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT,
-        z.tracking.SessionEventName.INTEGER.SOUNDCLOUD_LINKS_SENT, soundcloud_links.length
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.SOUNDCLOUD_LINKS_SENT, soundcloud_links.length
 
     youtube_links = message.match z.media.MediaEmbeds.regex.youtube
     if youtube_links
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT,
-        z.tracking.SessionEventName.INTEGER.YOUTUBE_LINKS_SENT, youtube_links.length
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.YOUTUBE_LINKS_SENT, youtube_links.length
 
   ###
-  Analyze sent text message for rich media content.
-  @param client [Object]
+  Add new device message to conversations.
+  @param user_id [String] ID of user to add client to
+  @param client_et [z.client.Client] Client entity
   ###
-  on_self_client_add: (client) =>
+  on_self_client_add: (user_id, client_et) =>
     return
     self = @user_repository.self()
+    return true if user_id isnt self.id
     message_et = new z.entity.E2EEDeviceMessage()
     message_et.user self
-    message_et.device client
+    message_et.device client_et
     message_et.device_owner self
 
     # TODO save message

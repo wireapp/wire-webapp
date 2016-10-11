@@ -81,8 +81,8 @@ class z.ViewModel.AuthViewModel
     # Manage devices
     @remove_form_error = ko.observable false
     @device_modal = undefined
-    @permanent_devices = ko.computed =>
-      client for client in @client_repository.clients() when client.type is z.client.ClientType.PERMANENT
+    @permanent_devices = ko.pureComputed =>
+      (client_et for client_et in @client_repository.clients() when client_et.type is z.client.ClientType.PERMANENT)
 
     @registration_context = z.auth.AuthView.REGISTRATION_CONTEXT.EMAIL
     @prefilled_email = ''
@@ -95,7 +95,7 @@ class z.ViewModel.AuthViewModel
       ko.observable ''
       ko.observable ''
     ]
-    @code = ko.computed => return (digit() for digit in @code_digits()).join('').substr 0, 6
+    @code = ko.pureComputed => return (digit() for digit in @code_digits()).join('').substr 0, 6
     @code.subscribe (code) =>
       @_clear_errors() if not code.length
       @verify_code() if code.length is 6
@@ -124,41 +124,41 @@ class z.ViewModel.AuthViewModel
     @accepted_terms_of_use = ko.observable false
     @accepted_terms_of_use.subscribe => @clear_error z.auth.AuthView.TYPE.TERMS
 
-    @can_login_password = ko.computed =>
+    @can_login_password = ko.pureComputed =>
       return not @disabled_by_animation() and @username().length and @password().length
 
-    @can_login_phone = ko.computed =>
+    @can_login_phone = ko.pureComputed =>
       return not @disabled_by_animation() and @country_code().length > 1 and @phone_number().length
 
-    @can_register = ko.computed =>
+    @can_register = ko.pureComputed =>
       return not @disabled_by_animation() and @username().length and @name().length and @password().length and @accepted_terms_of_use()
 
-    @can_resend_code = ko.computed =>
+    @can_resend_code = ko.pureComputed =>
       return not @disabled_by_animation() and @code_expiration_timestamp() < z.util.get_unix_timestamp()
 
-    @can_resend_registration = ko.computed =>
+    @can_resend_registration = ko.pureComputed =>
       return not @disabled_by_animation() and @username().length
 
-    @can_resend_verification = ko.computed =>
+    @can_resend_verification = ko.pureComputed =>
       return not @disabled_by_animation() and @username().length
 
-    @can_verify_password = ko.computed =>
+    @can_verify_password = ko.pureComputed =>
       return not @disabled_by_animation() and @password().length
 
-    @account_retry_text = ko.computed =>
+    @account_retry_text = ko.pureComputed =>
       return z.localization.Localizer.get_text
         id: z.string.auth_posted_retry
         replace: {placeholder: '%email', content: @username()}
-    @account_resend_text = ko.computed =>
+    @account_resend_text = ko.pureComputed =>
       return z.localization.Localizer.get_text
         id: z.string.auth_posted_resend
         replace: {placeholder: '%email', content: @username()}
-    @verify_code_text = ko.computed =>
+    @verify_code_text = ko.pureComputed =>
       phone_number = PhoneFormat.formatNumberForMobileDialing('', @phone_number_e164()) or @phone_number_e164()
       return z.localization.Localizer.get_text
         id: z.string.auth_verify_code_description
         replace: {placeholder: '%@number', content: phone_number}
-    @verify_code_timer_text = ko.computed =>
+    @verify_code_timer_text = ko.pureComputed =>
       return z.localization.Localizer.get_text
         id: z.string.auth_verify_code_resend_timer
         replace: {placeholder: '%expiration', content: @code_expiration_in()}
@@ -168,7 +168,7 @@ class z.ViewModel.AuthViewModel
     @visible_method = ko.observable undefined
 
     @account_mode = ko.observable undefined
-    @account_mode_login = ko.computed =>
+    @account_mode_login = ko.pureComputed =>
       login_modes = [
         z.auth.AuthView.MODE.ACCOUNT_LOGIN
         z.auth.AuthView.MODE.ACCOUNT_PASSWORD
@@ -177,15 +177,15 @@ class z.ViewModel.AuthViewModel
       return @account_mode() in login_modes
 
     @posted_mode = ko.observable undefined
-    @posted_mode_offline = ko.computed =>
+    @posted_mode_offline = ko.pureComputed =>
       return @posted_mode() is z.auth.AuthView.MODE.POSTED_OFFLINE
-    @posted_mode_pending = ko.computed =>
+    @posted_mode_pending = ko.pureComputed =>
       return @posted_mode() is z.auth.AuthView.MODE.POSTED_PENDING
-    @posted_mode_resend = ko.computed =>
+    @posted_mode_resend = ko.pureComputed =>
       return @posted_mode() is z.auth.AuthView.MODE.POSTED_RESEND
-    @posted_mode_retry = ko.computed =>
+    @posted_mode_retry = ko.pureComputed =>
       return @posted_mode() is z.auth.AuthView.MODE.POSTED_RETRY
-    @posted_mode_verify = ko.computed =>
+    @posted_mode_verify = ko.pureComputed =>
       return @posted_mode() is z.auth.AuthView.MODE.POSTED_VERIFY
 
     # Debugging
@@ -927,7 +927,7 @@ class z.ViewModel.AuthViewModel
     else
       @disabled_by_animation true
 
-      requestAnimFrame =>
+      window.requestAnimationFrame =>
         animation_promises = []
 
         if old_component.length

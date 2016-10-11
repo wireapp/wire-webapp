@@ -34,7 +34,7 @@ class z.auth.AuthRepository
 
   # Print all cookies for a user in the console.
   list_cookies: ->
-    @auth_service.get_cookies
+    @auth_service.get_cookies()
     .then (cookies) =>
       @logger.force_log 'Backend cookies:'
       for cookie, index in cookies
@@ -90,19 +90,16 @@ class z.auth.AuthRepository
   @return [Promise] Promise that will resolve on success
   ###
   register: (new_user) =>
-    return new Promise (resolve, reject) =>
-      @auth_service.post_register new_user
-      .then (response) =>
-        z.storage.set_value z.storage.StorageKey.AUTH.PERSIST, true
-        z.storage.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
-        z.storage.set_value new_user.label_key, new_user.label
-        @logger.log @logger.levels.INFO,
-          "COOKIE::'#{new_user.label}' Saved cookie label with key '#{new_user.label_key}' in Local Storage", {
-            key: new_user.label_key,
-            value: new_user.label
-          }
-        resolve response
-      .catch (error) -> reject error
+    @auth_service.post_register new_user
+    .then (response) =>
+      z.storage.set_value z.storage.StorageKey.AUTH.PERSIST, true
+      z.storage.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
+      z.storage.set_value new_user.label_key, new_user.label
+      @logger.log @logger.levels.INFO,
+        "COOKIE::'#{new_user.label}' Saved cookie label with key '#{new_user.label_key}' in Local Storage",
+          key: new_user.label_key,
+          value: new_user.label
+      return response
 
   ###
   Resend an email or phone activation code.
@@ -142,7 +139,7 @@ class z.auth.AuthRepository
       if error.type is z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
         @logger.log @logger.levels.WARN, "Session expired on access token refresh: #{error.message}", error
         Raygun.send error
-        amplify.publish z.event.WebApp.SIGN_OUT, 'session_expired', false, true
+        amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.SESSION_EXPIRED, false, true
       else if error.type isnt z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
         @logger.log @logger.levels.ERROR, "Refreshing access token failed: '#{error.type}'", error
         # @todo What do we do in this case?

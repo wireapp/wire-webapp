@@ -18,7 +18,7 @@
 
 #General terms
 z.string.wire = 'Wire'
-z.string.wire_osx = 'Wire for OS X'
+z.string.wire_osx = 'Wire for macOS'
 z.string.wire_windows = 'Wire for Windows'
 z.string.truncation = '…'
 z.string.nonexistent_user = 'Deleted User'
@@ -265,6 +265,7 @@ z.string.conversation_context_menu_unlike = 'Unlike'
 z.string.conversation_delete_timestamp = 'Deleted on %@timestamp'
 z.string.conversation_edit_timestamp = 'Edited on %@timestamp'
 z.string.conversation_likes_caption = '%@number people'
+z.string.conversation_message_delivered = 'Delivered'
 
 # Conversation list
 z.string.conversation_list_empty_conversation = 'Empty conversation'
@@ -398,10 +399,10 @@ z.string.preferences_device_button_remove = 'Remove'
 z.string.preferences_device_button_cancel = 'Cancel'
 z.string.preferences_device_activated = 'Activated in '
 z.string.preferences_device_id = 'ID: '
-z.string.preferences_device_reset_session_description = 'If fingerprints don’t match, reset your secure session to make sure that the correct fingerprints are shown on all devices.'
+z.string.preferences_device_reset_session_description = 'If fingerprints don’t match, reset the session to generate new encryption keys on both sides.'
 z.string.preferences_device_reset_session_button = 'Reset session'
 z.string.preferences_device_fingerprint_label = 'Key fingerprint'
-z.string.preferences_device_fingerprint_message = 'Wire gives every device a unique fingerprint. Compare fingerprints to verify your devices and conversations.'
+z.string.preferences_device_fingerprint_message = 'Wire gives every device a unique fingerprint. Compare them and verify your devices and conversations.'
 
 # Profile
 z.string.profile_about = 'About'
@@ -492,11 +493,12 @@ z.string.system_notification_member_leave_removed_many = '%s.first_name removed 
 z.string.system_notification_member_leave_removed_one = '%s.first_name removed %@.first_name from the conversation'
 z.string.system_notification_ping = 'Pinged'
 z.string.system_notification_reaction = '%reaction your message'
+z.string.system_notification_shared_audio = 'Shared an audio message'
+z.string.system_notification_shared_file = 'Shared a file'
+z.string.system_notification_shared_location = 'Shared a location'
+z.string.system_notification_shared_video = 'Shared a video'
 z.string.system_notification_voice_channel_activate = 'Calling'
 z.string.system_notification_voice_channel_deactivate = 'Called'
-z.string.system_notification_shared_audio = 'Shared an audio message'
-z.string.system_notification_shared_video = 'Shared a video'
-z.string.system_notification_shared_file = 'Shared a file'
 
 # Tooltips
 z.string.tooltip_conversation_call = 'Call'

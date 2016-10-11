@@ -217,6 +217,29 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         expect(result).toEqual JSON.stringify notification_content
         expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
 
+    describe 'for a location', ->
+      beforeEach ->
+        message_et.assets.push new z.entity.Location()
+        notification_content.options.body = z.string.system_notification_shared_location
+
+      it 'in a 1:1 conversation', ->
+        conversation_et.type z.conversation.ConversationType.ONE2ONE
+        notification_content.title = z.string.truncation
+        system_notification_repository.notify conversation_et, message_et
+
+        expectation = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(expectation).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+
+      it 'in a group conversation', ->
+        system_notification_repository.notify conversation_et, message_et
+
+        title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
+        notification_content.title = z.util.trunc_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+
   describe 'shows a well-formed group notification', ->
     beforeEach ->
       title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
@@ -382,25 +405,22 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       message_et = new z.entity.PingMessage()
       message_et.user user_et
       notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
+      notification_content.options.body = z.string.system_notification_ping
 
-    describe 'for a ping', ->
-      beforeEach ->
-        notification_content.options.body = z.string.system_notification_ping
+    it 'in a 1:1 conversation', ->
+      conversation_et.type z.conversation.ConversationType.ONE2ONE
+      notification_content.title = z.string.truncation
+      system_notification_repository.notify conversation_et, message_et
 
-      it 'in a 1:1 conversation', ->
-        conversation_et.type z.conversation.ConversationType.ONE2ONE
-        notification_content.title = z.string.truncation
-        system_notification_repository.notify conversation_et, message_et
+      expectation = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+      expect(expectation).toEqual JSON.stringify notification_content
+      expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
 
-        expectation = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(expectation).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+    it 'in a group conversation', ->
+      system_notification_repository.notify conversation_et, message_et
 
-      it 'in a group conversation', ->
-        system_notification_repository.notify conversation_et, message_et
-
-        title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-        notification_content.title = z.util.trunc_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+      title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
+      notification_content.title = z.util.trunc_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+      result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+      expect(result).toEqual JSON.stringify notification_content
+      expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1

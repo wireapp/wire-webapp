@@ -25,7 +25,7 @@ ko.bindingHandlers.switch_background = do ->
   current_image_url = undefined
 
   animation = (last, next) ->
-    requestAnimFrame ->
+    window.requestAnimationFrame ->
       next
         .css 'opacity': '1'
         .one z.util.alias.animationend, last.remove

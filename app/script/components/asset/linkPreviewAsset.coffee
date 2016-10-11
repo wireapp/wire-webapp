@@ -58,6 +58,6 @@ ko.components.register 'link-preview-asset',
               <!-- /ko -->
               <div class="link-preview-title" data-bind="text: preview.title"></div>
               <a class="link-preview-site text-graphite ellipsis" target="_blank" rel="nofollow noopener noreferrer"
-                 data-bind="text: z.util.naked_url(url), attr: {href: url, title: url}"></a>
+                 data-bind="text: z.util.naked_url(url), attr: {href: z.util.add_http(url), title: url}"></a>
             </div>
             """
