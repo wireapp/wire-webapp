@@ -4,17 +4,15 @@
     <div class="preferences-content" data-bind="antiscroll: should_update_scrollbar">
       <section class="preferences-section" data-uie-name="preferences-device-current">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferences_devices_current"></header>
-        <!-- ko if: current_client() -->
-          <div class="preferences-devices-model" data-bind="text: current_client().model"></div>
-          <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferences_devices_id"></span><span data-bind="html: z.util.print_devices_id(current_client().id)" data-uie-name="preferences-device-current-id"></span></div>
-          <div class="preferences-devices-activated">
-            <div data-bind="html: activated_on"></div>
-            <div data-bind="html: activated_in"></div>
-          </div>
-          <!-- ko if: fingerprint() -->
-            <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferences_devices_fingerprint"></div>
-            <div class="preferences-devices-fingerprint" data-bind="html: z.util.print_devices_id(fingerprint())"></div>
-          <!-- /ko -->
+        <div class="preferences-devices-model" data-bind="text: current_client().model"></div>
+        <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferences_devices_id"></span><span data-bind="html: z.util.print_devices_id(current_client().id)" data-uie-name="preferences-device-current-id"></span></div>
+        <div class="preferences-devices-activated">
+          <div data-bind="html: activated_on"></div>
+          <div data-bind="html: activated_in"></div>
+        </div>
+        <!-- ko if: fingerprint() -->
+          <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferences_devices_fingerprint"></div>
+          <div class="preferences-devices-fingerprint" data-bind="html: z.util.print_devices_id(fingerprint())"></div>
         <!-- /ko -->
       </section>
 
