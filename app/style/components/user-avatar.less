@@ -26,7 +26,7 @@ user-avatar {
   &.user-avatar-xl {
     .square(@avatar-diameter-xl);
 
-    .user-avatar-initals {
+    .user-avatar-initials {
       font-size: @avatar-initials-xl;
       line-height: @avatar-diameter-xl;
     }
@@ -39,12 +39,16 @@ user-avatar {
     .user-avatar-background {
       transform: scale(.9916);
     }
+
+    .user-avatar-badge:before {
+      font-size: @font-size-xl;
+    }
   }
 
   &.user-avatar-lg {
     .square(@avatar-diameter-lg);
 
-    .user-avatar-initals {
+    .user-avatar-initials {
       font-size: @avatar-initials-lg;
       line-height: @avatar-diameter-lg;
     }
@@ -62,7 +66,7 @@ user-avatar {
   &.user-avatar-md {
     .square(@avatar-diameter-md);
 
-    .user-avatar-initals {
+    .user-avatar-initials {
       font-size: @avatar-initials-md;
       line-height: @avatar-diameter-md;
     }
@@ -75,7 +79,7 @@ user-avatar {
   &.user-avatar-sm {
     .square(@avatar-diameter-sm);
 
-    .user-avatar-initals {
+    .user-avatar-initials {
       font-size: @avatar-initials-sm;
       line-height: @avatar-diameter-sm;
     }
@@ -88,7 +92,7 @@ user-avatar {
   &.user-avatar-xs {
     .square(@avatar-diameter-xs);
 
-    .user-avatar-initals {
+    .user-avatar-initials {
       font-size: @avatar-initials-xs;
       line-height: @avatar-diameter-xs;
     }
@@ -149,19 +153,25 @@ user-avatar {
 
   &.selected {
     .user-avatar-badge:before {
-      .icon-mixin("\e102"); // icon-check
+      .icon-mixin("\e102", @icon-size-sm); // icon-check
     }
   }
 
   &.pending {
     .user-avatar-badge:before {
-      .icon-mixin("\e165"); // icon-pending
+      .icon-mixin("\e165", @icon-size-sm); // icon-pending
     }
   }
 
   &.blocked {
     .user-avatar-badge:before {
-      .icon-mixin("\e104"); // icon-block
+      .icon-mixin("\e104", @icon-size-sm); // icon-block
+    }
+  }
+
+  &.camera {
+    .user-avatar-badge:before {
+      .icon-mixin("\e143", @icon-size-lg); // icon-camera
     }
   }
 
@@ -220,7 +230,7 @@ user-avatar {
   .accent-color-7 & {border-color: @accent_colors-7;}
 }
 
-.user-avatar-initals {
+.user-avatar-initials {
   .full-screen;
   .text-center;
   user-select: none;
@@ -249,7 +259,7 @@ user-avatar {
     transition-delay: @animation-timing-faster;
   }
 
-  .user-avatar-initals {
+  .user-avatar-initials {
     transition-property: opacity;
     transition-timing-function: @ease-in-quart;
     transition-duration: @animation-timing-faster;

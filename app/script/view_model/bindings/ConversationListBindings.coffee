@@ -47,10 +47,10 @@ ko.bindingHandlers.bordered_list = do ->
     window.requestAnimationFrame ->
       archive_column = $($element).parent()
       if $element.height() <= 0 or not $element.is_scrollable()
-        return archive_column.removeClass 'conversation-list-center-border-bottom conversation-list-center-border-top'
+        return archive_column.removeClass 'left-list-center-border-bottom conversations-center-border-top'
 
-      archive_column.toggleClass 'conversation-list-center-border-top', not $element.is_scrolled_top()
-      archive_column.toggleClass 'conversation-list-center-border-bottom', not $element.is_scrolled_bottom()
+      archive_column.toggleClass 'left-list-center-border-top', not $element.is_scrolled_top()
+      archive_column.toggleClass 'left-list-center-border-bottom', not $element.is_scrolled_bottom()
   , 100
 
   init: (element) ->

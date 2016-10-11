@@ -1,0 +1,256 @@
+<!--@formatter:off-->
+<div id="conversations" class="conversations left-list-is-visible" data-bind="with: $root.conversations">
+
+  <!-- ko foreach: conversations_calls -->
+    <div class="calls" data-bind="attr: {'data-uie-value': status.call}" data-uie-name="status-call">
+
+      <div class="calls-avatar">
+        <!-- ko ifnot: call().is_declined() -->
+          <!-- ko if: is_one2one() -->
+            <!-- ko if: call().participants()[0]-->
+              <user-avatar class="user-avatar-xs" params="user: call().participants()[0].user"></user-avatar>
+            <!-- /ko -->
+          <!-- /ko -->
+          <!-- ko if: is_group() && call().state() != z.calling.enum.CallState.ONGOING -->
+            <user-avatar class="user-avatar-xs" params="user: call().creator()"></user-avatar>
+          <!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: is_group() && (call().state() === z.calling.enum.CallState.ONGOING && !call().self_user_joined()) || call().is_declined() -->
+          <svg class="svg-theme" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+            <circle class="fill-theme" opacity=".16" cx="9" cy="9" r="9"></circle>
+            <circle class="fill-theme" cx="9" cy="9" r="3"></circle>
+            <circle class="fill-theme" opacity=".32" cx="9" cy="9" r="6"></circle>
+          </svg>
+        <!-- /ko -->
+      </div>
+      <div class="calls-controls">
+
+        <!-- ko if: is_group() && call().state() === z.calling.enum.CallState.ONGOING && call().self_user_joined() -->
+          <div class="conversation-list-call-controls-row conversation-list-call-controls-row-participants"
+               data-bind="click: $parent.click_on_conversation">
+            <!-- ko foreach: call().participants() -->
+              <user-avatar class="user-avatar-xs"
+                           params="user: $data.user"
+                           data-bind="attr: {title: $data.user.name}"></user-avatar>
+            <!-- /ko -->
+          </div>
+        <!-- /ko -->
+
+        <div class="calls-controls-row calls-controls-row-conversation"
+             data-bind="click: $parent.click_on_conversation">
+          <div class="name"
+               data-bind="attr: {'data-uie-uid': id, 'data-uie-value': display_name()},
+                          css: {'text-theme': $parent.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION && id === $parent.active_conversation_id()},
+                          text: display_name()"
+               data-uie-name="item-call"></div>
+          <!-- ko ifnot: call().is_declined() -->
+            <!-- ko if: call().state() === z.calling.enum.CallState.CONNECTING -->
+              <span class="label-xs" data-bind="l10n_text: z.string.call_state_connecting" data-uie-name="call-label-connecting"></span>
+            <!-- /ko -->
+            <!-- ko if: call().state() === z.calling.enum.CallState.OUTGOING -->
+              <span class="label-xs" data-bind="l10n_text: z.string.call_state_outgoing" data-uie-name="call-label-outgoing"></span>
+            <!-- /ko -->
+            <!-- ko if: call().state() === z.calling.enum.CallState.INCOMING -->
+              <span class="label-xs" data-bind="l10n_text: z.string.call_state_incoming" data-uie-name="call-label-incoming"></span>
+            <!-- /ko -->
+            <!-- ko if: call().state() === z.calling.enum.CallState.ONGOING && call().self_user_joined() -->
+              <span class="label-xs" data-bind="text: z.util.format_seconds(call().duration_time())" data-uie-name="call-duration"></span>
+            <!-- /ko -->
+          <!-- /ko -->
+          <!-- ko if: (call().state() === z.calling.enum.CallState.ONGOING && !call().self_user_joined()) || call().is_declined() -->
+            <div class="button button-pill button-fluid button-outline button-small"
+                 data-uie-name="do-call-controls-call-join"
+                 data-bind="click: $parent.on_accept_call, l10n_text: z.string.call_join"></div>
+          <!-- /ko -->
+        </div>
+
+        <!-- ko if: call().state() === z.calling.enum.CallState.INCOMING && !call().is_declined() -->
+          <div class="calls-controls-row">
+            <div class="button button-pill button-full button-small button-theme-red"
+                 data-uie-name="do-call-controls-call-decline"
+                 data-bind="click: $parent.on_ignore_call, l10n_text: z.string.call_decline">
+            </div>
+            <!-- ko if: call().is_remote_videod() -->
+              <div class="button button-pill button-full button-small button-theme-green"
+                   data-uie-name="do-call-controls-call-accept"
+                   data-bind="click: $parent.on_accept_video">
+                <span class="icon-video"></span>
+                <span data-bind="l10n_text: z.string.call_accept"></span>
+              </div>
+            <!-- /ko -->
+            <!-- ko ifnot: call().is_remote_videod() -->
+              <div class="button button-pill button-full button-small button-theme-green"
+                   data-uie-name="do-call-controls-call-accept"
+                   data-bind="click: $parent.on_accept_call">
+                <span class="icon-call"></span>
+                <span data-bind="l10n_text: z.string.call_accept"></span>
+              </div>
+            <!-- /ko -->
+          </div>
+        <!-- /ko -->
+        <!-- ko if: call().self_user_joined() -->
+          <div class="calls-controls-row">
+            <div class="call-controls-left">
+
+              <div class="call-controls-action call-controls-action-mute">
+                <div class="up">
+                  <div class="button-round button-round-dark icon-mute"
+                       data-uie-name="do-call-mute"
+                       data-bind="click: $parent.on_toggle_audio, css: {'toggled': $parent.self_stream_state.muted()}"></div>
+                </div>
+                <div class="down">
+                  <span class="beta-label hidden">&nbsp;</span>
+                </div>
+              </div>
+
+              <!-- ko if: call().state() === z.calling.enum.CallState.ONGOING -->
+                <!-- ko if: $parent.show_toggle_screen() -->
+                  <div class="call-controls-action call-controls-action-screensharing">
+                    <div class="up">
+                      <div class="button-round button-round-dark icon-screensharing"
+                           data-bind="click: $parent.on_toggle_screen, css: {'toggled': $parent.self_stream_state.screen_shared(), 'disabled': $parent.disable_toggle_screen()}">
+                      </div>
+                    </div>
+                    <div class="down">
+                      <!-- ko if: is_group() -->
+                        <span class="beta-label">Beta</span>
+                      <!-- /ko -->
+                      <!-- ko ifnot: is_group() -->
+                        <span class="beta-label hidden">&nbsp;</span>
+                      <!-- /ko -->
+                    </div>
+                  </div>
+                <!-- /ko -->
+                <!-- ko ifnot: is_group() -->
+                  <div class="call-controls-action call-controls-action-video">
+                    <div class="up">
+                      <div class="button-round button-round-dark icon-video"
+                           data-bind="click: $parent.on_toggle_video, css: {'toggled': $parent.self_stream_state.videod()}"></div>
+                    </div>
+                    <div class="down">
+                      <span class="beta-label hidden">&nbsp;</span>
+                    </div>
+                  </div>
+                <!-- /ko -->
+              <!-- /ko -->
+
+            </div>
+
+            <div class="call-controls-right">
+
+              <div class="call-controls-action call-controls-action-end-call">
+                <div class="up">
+                  <div class="button-round button-round-theme-red icon-end-call"
+                       data-uie-name="do-call-controls-call-ignore"
+                       data-bind="click: $parent.on_cancel_call"></div>
+                </div>
+                <div class="down">
+                  <span class="beta-label hidden">&nbsp;</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        <!-- /ko -->
+      </div>
+    </div>
+  <!-- /ko -->
+
+  <div class="left-list-center">
+    <!-- ko if: !$root.first_run() && (conversations_unarchived().length > 0 || connect_requests().length > 0) -->
+      <ul class="left-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_unarchived">
+
+      <!-- ko if: connect_requests().length > 0 -->
+        <li class="left-list-item"
+            data-bind="css: {'text-theme': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}">
+          <div class="left-column">
+            <div class="dot-md dot-outlined border-theme"></div>
+          </div>
+          <div class="center-column"
+               data-bind="click: click_on_connect_requests, text: connect_requests_text"
+               data-uie-name="item-pending-requests"></div>
+          <div class="right-column"></div>
+        </li>
+      <!-- /ko -->
+
+      <!-- ko foreach: conversations_unarchived -->
+        <li class="left-list-item"
+          data-bind="css: {'text-theme': $parent.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION && id === $parent.active_conversation_id()}">
+          <div class="overlay"></div>
+          <div class="left-column">
+            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.UNREAD -->
+              <span data-bind="unread_indicator: number_of_unread_messages" data-uie-name="status-unread"></span>
+            <!-- /ko -->
+            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.PING -->
+              <span class="icon-ping text-theme" data-uie-name="status-unread"></span>
+            <!-- /ko -->
+            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.HOT_PING -->
+              <span class="icon-ping text-theme" data-uie-name="status-unread"></span>
+            <!-- /ko -->
+            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.CONNECT -->
+              <span class="dot-md dot-outlined border-theme" data-uie-name="status-unread"></span>
+            <!-- /ko -->
+            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.MISSED_CALL -->
+              <!-- ko if: is_one2one() -->
+                <svg fill="#fff" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" data-uie-name="status-unread">
+                  <circle opacity=".16" cx="9" cy="9" r="9"></circle>
+                  <circle cx="9" cy="9" r="3"></circle>
+                  <circle opacity=".32" cx="9" cy="9" r="6"></circle>
+                </svg>
+              <!-- /ko -->
+              <!-- ko if: is_group() -->
+                <svg fill="#fff" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 17c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm0 1c-4.97 0-9-4.03-9-9s4.03-9 9-9 9 4.03 9 9-4.03 9-9 9z" opacity=".32"></path>
+                  <path d="M9 14c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 1c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z" opacity=".72"></path>
+                  <path d="M9 11c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm0 1c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"></path>
+                </svg>
+              <!-- /ko -->
+            <!-- /ko -->
+          </div>
+          <div class="center-column"
+               data-bind="attr: {'data-uie-uid': id, 'data-uie-value': display_name}, click: $parent.click_on_conversation, text: display_name()"
+               data-uie-name="item-conversation"></div>
+          <div class="right-column">
+            <span class="button-icon icon-more"
+                  data-bind="attr: {'id': 'options-' + id}, click: $root.click_on_actions, l10n_tooltip: z.string.tooltip_conversations_more"
+                  data-bubble="#actions-bubble"
+                  data-placement="right-flex"
+                  data-uie-name="go-options"></span>
+            <span class="icon-silence"
+                  data-bind="css: {'conversation-muted': is_muted()}"
+                  data-uie-name="status-silence"></span>
+          </div>
+        </li>
+      <!-- /ko -->
+    </ul>
+    <!-- /ko -->
+    <!-- ko if: $root.first_run() || (conversations_unarchived().length === 0 && connect_requests().length === 0) -->
+      <!-- ko if: $root.first_run() || conversations_archived().length === 0 -->
+        <div class="conversation-hint-container">
+          <div class="conversation-hint-container-text" data-bind="l10n_text: z.string.conversations_no_conversations"></div>
+          <span class="arrow-down"></span>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: conversations_archived().length > 0 -->
+        <div class="full-screen flex-center label-xs text-white" data-bind="l10n_text: z.string.conversations_all_archived"></div>
+      <!-- /ko -->
+    <!-- /ko -->
+  </div>
+  <div class="conversations-footer">
+    <span class="button-icon-large" data-bind="attr: {title: start_tooltip}, click: click_on_people_button" data-uie-name="go-people">
+      <div class="icon-people"></div>
+      <!-- ko if: conversations_archived().length === 0 -->
+        <span class="conversations-footer-contacts-label" data-bind="l10n_text: z.string.preferences_contacts"></span>
+      <!-- /ko -->
+    </span>
+    <!-- ko if: conversations_archived().length > 0 -->
+      <span class="button-icon-large icon-archive" data-bind="attr: {title: archive_tooltip}, click: click_on_archived_button" data-uie-name="go-archive"></span>
+    <!-- /ko -->
+    <span class="conversations-settings button-icon-large icon-settings" data-bind="click: click_on_preferences_button" data-uie-name="go-preferences">
+      <!-- ko if: show_badge() -->
+        <span class="conversations-settings-badge bg-theme"></span>
+      <!-- /ko -->
+    </span>
+  </div>
+</div>
+<!--@formatter:on-->

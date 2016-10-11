@@ -1,0 +1,141 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.left-list {
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: @left-width;
+
+  &:not(.left-list-is-visible) {
+    .start-ui-transition-fadeout();
+  }
+
+  &.left-list-is-visible {
+    .start-ui-transition-fadein();
+  }
+}
+
+.left-list-header {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  height: 40px;
+  position: relative;
+}
+
+.left-list-header-close-button {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.left-list-center {
+  flex: 1 1 auto;
+  position: relative;
+
+  &.left-list-center-border-bottom {border-bottom: 1px solid fade(#fff, 16%)}
+  &.left-list-center-border-top {border-top: 1px solid fade(#fff, 16%)}
+}
+
+.left-list-items {
+  .full-screen;
+  .list-unstyled;
+  margin: 0;
+  padding: 4px 0 16px 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.left-list-item {
+  display: flex;
+  user-select: none;
+  height: @left-list-item-height;
+  line-height: @left-list-item-height;
+  position: relative;
+  width: 100%;
+
+  &.left-list-item-clickable {
+    cursor: pointer;
+  }
+
+  > .left-column {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: @left-list-item-left-width;
+  }
+
+  > .center-column {
+    .ellipsis;
+    flex: 1 1;
+    cursor: pointer;
+    margin-right: -8px;
+    position: relative;
+  }
+
+  > .right-column {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    position: relative;
+    width: @left-list-item-right-width;
+
+    > .icon-silence,
+    > .icon-more {
+      transition-property: opacity;
+      transition-timing-function: @ease-out-quart;
+      opacity: 0;
+    }
+
+    > .icon-more {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      margin-left: -8px;
+      margin-top: -8px;
+    }
+
+    > .icon-silence {
+      pointer-events: none;
+
+      &.conversation-muted {
+        opacity: 1;
+      }
+    }
+  }
+
+  &.hover,
+  &:hover {
+    .right-column > .icon-more {
+      transition-delay: @animation-timing-faster + 0.05;
+      transition-duration: @animation-timing-slow;
+      opacity: 1;
+    }
+    .right-column > .icon-silence {
+      transition-duration: @animation-timing-fast;
+      opacity: 0;
+    }
+  }
+}

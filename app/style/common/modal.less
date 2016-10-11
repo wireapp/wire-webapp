@@ -35,7 +35,7 @@
   .modal-content {
     cursor: default;
     margin: auto; // http://stackoverflow.com/questions/24538100/issue-when-centering-vertically-with-flexbox-when-heights-are-unknown
-    padding: @settings-modal-padding;
+    padding: @modal-padding;
     position: relative;
     width: 384px;
 
@@ -55,8 +55,8 @@
     header {
       .text-center;
       position: relative;
-      line-height: @settings-modal-line-height;
-      margin-bottom: @settings-modal-line-height;
+      line-height: @line-height-lg;
+      margin-bottom: @line-height-lg;
     }
 
     section {
@@ -70,6 +70,20 @@
       &:not(:last-child) {
         border-bottom: 1px solid @seperator-color;
       }
+    }
+  }
+
+  .modal-input {
+    background: #fff;
+    border: 1px solid fade(@graphite, 56%);
+    border-radius: 4px;
+    height: 28px;
+    padding-left: 4px;
+    width: 100%;
+
+    &::placeholder {
+      .label-xs();
+      color: fade(@graphite, 56%);
     }
   }
 
@@ -87,9 +101,10 @@
   }
 
   .modal-option {
-    .modal-option-checkbox {
+    .modal-checkbox {
       margin-right: 4px;
     }
+
     padding-right: 32px;
   }
 

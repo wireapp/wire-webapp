@@ -1,0 +1,18 @@
+<div class="connect-request-wrapper">
+  <div id="connect-requests" class="connect-requests" data-bind="with: $root.connect_requests, antiscroll: $root.connect_requests.should_update_scrollbar">
+    <div class="connect-requests-inner" data-bind="foreach: {data: connect_requests, afterRender: after_render}">
+      <div class="connect-request" data-uie-name="connect-request" data-bind="attr: {'data-uie-uid': id}">
+        <div class="name popover-title" data-bind="text: name()"></div>
+        <div class="mail popover-meta text-theme" data-bind="text: email()"></div>
+        <div class="connect-request-content">
+          <div class="image round-bordered-image" data-bind="load_image: picture_preview_url()"></div>
+          <common-contacts class="contacts common-contacts-labeled" params="{user: $data}"></common-contacts>
+        </div>
+        <div class="button-group">
+          <div class="button button-inverted" data-uie-name="do-ignore" data-bind="click: $parent.click_on_ignore, l10n_text: z.string.connection_request_ignore"></div>
+          <div class="button" data-uie-name="do-accept" data-bind="click: $parent.click_on_accept, l10n_text: z.string.connection_request_connect"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

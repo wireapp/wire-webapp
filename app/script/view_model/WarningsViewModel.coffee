@@ -44,7 +44,7 @@ class z.ViewModel.WarningsViewModel
 
     # Array of warning banners
     @warnings = ko.observableArray()
-    @top_warning = ko.computed =>
+    @top_warning = ko.pureComputed =>
       return @warnings()[@warnings().length - 1]
     , @, deferEvaluation: true
     @warnings.subscribe (warnings) ->
@@ -66,7 +66,7 @@ class z.ViewModel.WarningsViewModel
     @first_name = ko.observable()
     @call_id = undefined
 
-    @warning_dimmed = ko.computed =>
+    @warning_dimmed = ko.pureComputed =>
       for warning in @warnings()
         return true if warning in [
           z.ViewModel.WarningType.REQUEST_CAMERA

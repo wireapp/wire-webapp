@@ -32,6 +32,7 @@ class z.client.ClientRepository
 
     amplify.subscribe z.event.Backend.USER.CLIENT_ADD, @on_client_add
     amplify.subscribe z.event.Backend.USER.CLIENT_REMOVE, @on_client_remove
+    amplify.subscribe z.event.WebApp.LOGOUT.ASK_TO_CLEAR_DATA, @logout_client
 
     return @
 
@@ -361,9 +362,11 @@ class z.client.ClientRepository
       @delete_client_from_db @self_user().id, client_id
     .then =>
       @self_user().remove_client client_id
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, outcome: 'success'
       return @clients()
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Unable to delete client '#{client_id}': #{error.message}", error
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, outcome: 'fail'
 
       if error.code is z.service.BackendClientError::STATUS_CODE.FORBIDDEN
         error = new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FORBIDDEN
@@ -371,6 +374,14 @@ class z.client.ClientRepository
         error = new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FAILURE
       throw error
 
+  logout_client: =>
+    if @current_client().type is z.client.ClientType.PERMANENT
+      amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT,
+        action: (clear_data) ->
+          amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, clear_data
+    else
+      @delete_temporary_client()
+      .then -> amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, true
   ###
   Removes a stored client and the session connected with it.
 
