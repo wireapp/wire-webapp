@@ -163,6 +163,11 @@ class z.storage.StorageService
           delete event.raw
           delete event.meta
           $.extend event, mapped_event
+      @db.version(8).stores version_5
+      .upgrade (transaction) =>
+        transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
+          if event.type is z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+            event.time = new Date(event.time).toISOString()
 
       @db.open()
       .then =>
