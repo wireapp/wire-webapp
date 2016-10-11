@@ -73,4 +73,4 @@ class z.ViewModel.WindowTitleViewModel
 
       window.document.title = window_title
 
-    .extend rateLimit: 750
+    .extend rateLimit: 250
