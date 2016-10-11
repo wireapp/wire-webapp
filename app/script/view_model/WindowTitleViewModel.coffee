@@ -68,7 +68,7 @@ class z.ViewModel.WindowTitleViewModel
           window_title += z.localization.Localizer.get_text z.string.preferences_options
 
       if window_title isnt '' and not window_title.endsWith ' '
-        window_title += " · "
+        window_title += ' · '
       window_title += z.localization.Localizer.get_text z.string.wire
 
       window.document.title = window_title

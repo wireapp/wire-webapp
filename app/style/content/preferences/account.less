@@ -17,67 +17,64 @@
  *
  */
 
-.preferences-account {
-  .preferences-section-account-profile {
-    display: flex;
-    position: relative;
-    justify-content: space-between;
-    width: 536px;
-  }
+.preferences-section-account-profile {
+  display: flex;
+  position: relative;
+  justify-content: space-between;
+  width: 536px;
+}
 
-  .preferences-section-account-security {
-    margin-top: 72px;
-    margin-bottom: 48px;
+.preferences-section-account-security {
+  margin-top: 72px;
+  margin-bottom: 48px;
 
-    .preferences-separator {
-      margin-bottom: 24px;
-    }
-  }
-
-  .preferences-account-accent-color {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-  }
-
-  .preferences-account-name {
-    font-weight: bold;
-  }
-
-  .preferences-account-mail,
-  .preferences-account-phone {
-    .no-text-selection();
-  }
-
-  .preferences-account-picture-button {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-
-    > span {
-      .full-screen;
-      .flex-center;
-      color: #fff;
-      font-size: @font-size-xl;
-      pointer-events: none;
-
-      &:before {
-        text-shadow: 0 0 40px fade(#000, 80%);
-      }
-    }
-
-    > user-avatar {
-      pointer-events: none;
-    }
-
-    > input {
-      position: absolute;
-      left: -9999px;
-    }
-  }
-
-  .preferences-account-user-data {
-    line-height: @line-height-lg;
+  .preferences-separator {
+    margin-bottom: 24px;
   }
 }
 
+.preferences-account-accent-color {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.preferences-account-name {
+  font-weight: bold;
+}
+
+.preferences-account-mail,
+.preferences-account-phone {
+  .no-text-selection();
+}
+
+.preferences-account-picture-button {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+
+  > span {
+    .full-screen;
+    .flex-center;
+    color: #fff;
+    font-size: @font-size-xl;
+    pointer-events: none;
+
+    &:before {
+      text-shadow: 0 0 40px fade(#000, 80%);
+    }
+  }
+
+  > user-avatar {
+    pointer-events: none;
+  }
+
+  > input {
+    position: absolute;
+    left: -9999px;
+  }
+}
+
+.preferences-account-user-data {
+  line-height: @line-height-lg;
+}
