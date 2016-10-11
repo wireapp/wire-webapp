@@ -78,3 +78,30 @@
 .preferences-account-user-data {
   line-height: @line-height-lg;
 }
+.preferences-account-username {
+  .reset-textarea;
+  background: transparent;
+  line-height: @line-height-xl;
+  height: @line-height-xl;
+  font-weight: bold;
+
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-left: -4px;
+  margin-right: -4px;
+
+  &:hover + .preferences-account-username-label:after {
+    .icon-mixin("\e177", @icon-size-sm); // icon-edit
+    margin-left: 8px;
+  }
+
+  &:focus {
+    width: 256px;
+    background-color: fade(@graphite, 12%);
+  }
+
+  &:focus + .preferences-account-username-label:after {
+    content: "";
+    display: none;
+  }
+}
