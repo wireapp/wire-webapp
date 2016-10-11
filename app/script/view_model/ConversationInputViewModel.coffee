@@ -120,8 +120,12 @@ class z.ViewModel.ConversationInputViewModel
 
   set_ephemeral_timer: =>
     millis = dcodeIO.Long.fromNumber 5000
-    @conversation_et().ephemeral_timer millis
-    @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer()}'."
+    if not @conversation_et().ephemeral_timer()
+      @conversation_et().ephemeral_timer millis
+      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer()}'."
+    else
+      @conversation_et().ephemeral_timer false
+      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' turned off."
 
   upload_images: (images) =>
     for image in images

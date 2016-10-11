@@ -43,7 +43,7 @@
 
           <!-- ko if: input().length === 0 -->
             <span class="controls-right-button button-icon-large icon-hourglass"
-                  data-bind="click: set_ephemeral_timer"
+                  data-bind="click: set_ephemeral_timer, css: {'ephemeral-mode': conversation_et().ephemeral_timer()}"
                   data-uie-name="do-set-ephemeral-timer">
             </span>
 
