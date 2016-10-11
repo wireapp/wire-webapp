@@ -97,11 +97,8 @@ class z.conversation.EventMapper
       message_et.reactions event.reactions or {}
       message_et.status event.status if event.status
 
-    millis = event.data.expire_after_millis
-    if _.isString millis
-      message_et.expire_after_millis dcodeIO.Long.fromString event.data.expire_after_millis
-    else if _.isNumber millis
-      console.warn "Loaded message where a timer already begun"
+    if event.data.expire_after_millis
+      @_map_ephemeral_message event, message_et
 
     if window.isNaN message_et.timestamp
       @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
@@ -112,6 +109,21 @@ class z.conversation.EventMapper
   ###############################################################################
   # Event mappers
   ###############################################################################
+
+  _map_ephemeral_message: (event, message_et) ->
+    message_et.type = z.event.Client.CONVERSATION.MESSAGE_EPHEMERAL
+    expiration = event.data.expire_after_millis
+
+    if _.isString expiration
+      message_et.expire_after_millis dcodeIO.Long.fromString event.data.expire_after_millis
+    else if _.isNumber expiration
+      difference = expiration - Date.now()
+      if difference > 0
+        message_et.expire_after_millis dcodeIO.Long.fromNumber difference
+    else
+        fake_text = new z.entity.Text()
+        fake_text.text = 'XXX'
+        message_et.assets([fake_text])
 
   ###
   Maps JSON data of conversation.asset_add message into message entity

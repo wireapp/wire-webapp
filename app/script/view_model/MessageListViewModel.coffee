@@ -551,7 +551,6 @@ class z.ViewModel.MessageListViewModel
         @logger.log @logger.levels.INFO, "Updated message '#{message_id}'.", changes
         @start_ephemeral_timer message_id, message_et, millis_number
 
-
   start_ephemeral_timer: (message_id, message_et, expiration_number) ->
     if not @ephemeral_timers[message_id]
       @ephemeral_timers[message_id] = window.setTimeout (=>

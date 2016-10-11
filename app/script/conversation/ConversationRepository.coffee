@@ -1337,7 +1337,7 @@ class z.conversation.ConversationRepository
   delete_message_everyone: (conversation_et, message_et) =>
     Promise.resolve()
     .then ->
-      if not message_et.user().is_me
+      if not message_et.user().is_me and not message_et.expire_after_millis()
         throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
