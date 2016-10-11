@@ -572,6 +572,3 @@ class z.ViewModel.MessageListViewModel
         fake_text.text = 'XXX'
 
         message_et.assets.push fake_text
-
-
-

@@ -173,9 +173,10 @@ class z.cryptography.CryptographyMapper
   _map_ephemeral: (generic_message, event) ->
     ranges = [
       dcodeIO.Long.fromNumber 1000
-      dcodeIO.Long.fromNumber 10000
-      dcodeIO.Long.fromNumber 30000
+      dcodeIO.Long.fromNumber 5000
+      dcodeIO.Long.fromNumber 15000
       dcodeIO.Long.fromNumber 60000
+      dcodeIO.Long.fromNumber 900000
     ]
 
     mapped_millis = z.util.ArrayUtil.find_closest_long ranges, generic_message.ephemeral.expire_after_millis
