@@ -97,9 +97,7 @@ class z.cryptography.CryptographyRepository
   @param device_id [String] ID of device
   ###
   get_remote_fingerprint: (user_id, device_id) =>
-    @cryptography_repository.get_session user_id, device_id
-    .then (cryptobox_session) =>
-      return cryptobox_session.fingerprint_remote()
+    return @get_session(user_id, device_id).then (cryptobox_session) => cryptobox_session.fingerprint_remote()
 
   ###
   Get a pre-key for a user client.
