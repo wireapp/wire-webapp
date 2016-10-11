@@ -58,6 +58,7 @@ class z.ViewModel.MessageListViewModel
     @recalculate_timeout = undefined
 
     @should_scroll_to_bottom = true
+    @ephemeral_timers = {}
 
     # Check if the message container is to small and then pull new events
     @on_mouse_wheel = _.throttle (e) =>
@@ -536,6 +537,7 @@ class z.ViewModel.MessageListViewModel
     millis = message_et.expire_after_millis()
 
     if millis instanceof dcodeIO.Long
+      millis_number = window.parseInt(millis.toString(), 10)
       expiration_long = millis.add dcodeIO.Long.fromNumber Date.now()
       expiration_number = window.parseInt(expiration_long.toString(), 10)
 
@@ -545,4 +547,32 @@ class z.ViewModel.MessageListViewModel
           expire_after_millis: expiration_number
 
       @conversation_repository.conversation_service.storage_service.update 'conversation_events', message_id, changes
-      .then => @logger.log @logger.levels.INFO, "Updated message '#{message_id}'"
+      .then =>
+        @logger.log @logger.levels.INFO, "Updated message '#{message_id}'.", changes
+        @start_ephemeral_timer message_id, message_et, millis_number
+
+
+  start_ephemeral_timer: (message_id, message_et, expiration_number) ->
+    if not @ephemeral_timers[message_id]
+      @ephemeral_timers[message_id] = window.setTimeout (=>
+        @timeout_ephemeral_message message_id, message_et
+      ), expiration_number
+
+  timeout_ephemeral_message: (message_id, message_et) =>
+    changes =
+      data:
+        expire_after_millis: true
+
+    @conversation_repository.conversation_service.storage_service.update 'conversation_events', message_id, changes
+    .then =>
+      @logger.log @logger.levels.INFO, "Updated message '#{message_id}'.", changes
+      if message_et.constructor.name is 'ContentMessage'
+        message_et.assets.pop()
+
+        fake_text = new z.entity.Text()
+        fake_text.text = 'XXX'
+
+        message_et.assets.push fake_text
+
+
+

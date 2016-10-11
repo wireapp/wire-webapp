@@ -101,7 +101,7 @@ class z.conversation.EventMapper
     if _.isString millis
       message_et.expire_after_millis dcodeIO.Long.fromString event.data.expire_after_millis
     else if _.isNumber millis
-      console.warn "TIMESTAMP"
+      console.warn "Loaded message where a timer already begun"
 
     if window.isNaN message_et.timestamp
       @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
