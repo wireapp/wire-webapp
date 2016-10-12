@@ -226,7 +226,7 @@
     <!-- /ko -->
     <!-- ko if: $root.first_run() || (conversations_unarchived().length === 0 && connect_requests().length === 0) -->
       <!-- ko if: $root.first_run() || conversations_archived().length === 0 -->
-        <div class="conversation-hint-container">
+        <div class="conversation-hint-container" data-uie-name="start-conversation-hint">
           <div class="conversation-hint-container-text" data-bind="l10n_text: z.string.conversations_no_conversations"></div>
           <span class="arrow-down"></span>
         </div>
