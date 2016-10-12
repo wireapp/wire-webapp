@@ -180,12 +180,11 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       title_view_model.user_repository.users.push another_user_et
       waiting_people = title_view_model.user_repository.connect_requests().length
 
-      message = z.localization.Localizer.get_text {
+      message = z.localization.Localizer.get_text
         id: z.string.conversations_connection_request_many
-        replace: {
-          placeholder: '%no', content: waiting_people
-        }
-      }
+        replace:
+          placeholder: '%no'
+          content: waiting_people
 
       expected_title = "#{waiting_people} · #{message} · #{suffix}"
       title_view_model.initiate_title_updates()

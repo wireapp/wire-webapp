@@ -208,8 +208,11 @@ class z.ViewModel.ModalsViewModel
     message_element.text z.localization.Localizer.get_text
       id: z.string.modal_too_many_members_message
       replace: [
-        {placeholder: '%no', content: content.open_spots}
-        {placeholder: '%max', content: content.max}
+        placeholder: '%no'
+        content: content.open_spots
+      ,
+        placeholder: '%max'
+        content: content.max
       ]
 
   _show_modal_upload_parallel: (content, title_element) ->

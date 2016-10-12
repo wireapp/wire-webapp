@@ -56,10 +56,11 @@ class z.entity.MemberMessage extends z.entity.SystemMessage
       return z.localization.Localizer.get_text identifier
 
     @_get_caption_with_names = (key, declension) =>
-      return z.localization.Localizer.get_text {
+      return z.localization.Localizer.get_text
         id: key
-        replace: {placeholder: '%@names', content: @_generate_name_string declension}
-      }
+        replace:
+          placeholder: '%@names'
+          content: @_generate_name_string declension
 
     @show_large_avatar = =>
       large_avatar_types = [

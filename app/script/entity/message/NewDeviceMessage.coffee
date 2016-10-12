@@ -45,13 +45,12 @@ class z.entity.NewDeviceMessage extends z.entity.Message
     @caption_device = ko.pureComputed =>
       if @unverified()
         return z.localization.Localizer.get_text z.string.conversation_device_your_devices if @device_owner().is_me
-        return  z.localization.Localizer.get_text {
+        return  z.localization.Localizer.get_text
           id: z.string.conversation_device_user_devices
-          replace: {placeholder: '%@name', content: @device_owner().first_name()}
-        }
-      else
-        # TODO current device
-        return z.localization.Localizer.get_text z.string.conversation_device_a_new_device
+          replace:
+            placeholder: '%@name'
+            content: @device_owner().first_name()
+      return z.localization.Localizer.get_text z.string.conversation_device_a_new_device
 
   click_on_device: =>
     if @device_owner()?.is_me

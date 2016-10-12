@@ -61,10 +61,11 @@ class z.ViewModel.ConversationInputViewModel
       write: (value) =>
         if @is_editing() then @edit_input value else @conversation_et()?.input value
 
-    @ping_tooltip = z.localization.Localizer.get_text {
+    @ping_tooltip = z.localization.Localizer.get_text
       id: z.string.tooltip_conversation_ping
-      replace: {placeholder: '%shortcut', content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.PING}
-    }
+      replace:
+        placeholder: '%shortcut'
+        content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.PING
     @picture_tooltip = z.localization.Localizer.get_text z.string.tooltip_conversation_picture
     @file_tooltip = z.localization.Localizer.get_text z.string.tooltip_conversation_file
 
@@ -124,10 +125,11 @@ class z.ViewModel.ConversationInputViewModel
     @conversation_repository.upload_images @conversation_et(), images
 
   _show_upload_warning: (image) ->
-    warning = z.localization.Localizer.get_text {
+    warning = z.localization.Localizer.get_text
       id: if image.type is 'image/gif' then z.string.alert_gif_too_large else z.string.alert_upload_too_large
-      replace: {placeholder: '%no', content: z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024}
-    }
+      replace:
+        placeholder: '%no'
+        content: z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024
 
     attributes =
       reason: 'too large'
