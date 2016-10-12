@@ -452,6 +452,7 @@ class z.ViewModel.MessageListViewModel
   ###
   show_detail: (asset_et, event) ->
     target_element = $(event.currentTarget)
+    return if target_element.hasClass 'image-ephemeral'
     return if target_element.hasClass 'image-loading'
     amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, target_element.find('img')[0].src
 
@@ -566,16 +567,23 @@ class z.ViewModel.MessageListViewModel
     .then =>
       @logger.log @logger.levels.INFO, "Ephemeral message with ID '#{message_id}' timed out.", message_et
 
+      message_et.expire_after_millis true
+
       if message_et.user().is_me
         switch message_et.constructor.name
           when 'ContentMessage'
-            message_et.assets.pop()
+            asset = message_et.assets.pop()
 
-            fake_text = new z.entity.Text()
-            fake_text.text = 'XXX'
+            switch asset.constructor.name
+              when 'Text'
+                fake_text = new z.entity.Text()
+                fake_text.text = 'XXX'
 
-            message_et.assets.push fake_text
+                message_et.assets.push fake_text
+              when 'MediumImage'
+                message_et.assets.push asset
+
           when 'PingMessage'
-            message_et.accent_color "accent-color-5"
+            message_et.accent_color 'accent-color-5'
       else
         @conversation_repository.delete_message_everyone conversation_et, message_et

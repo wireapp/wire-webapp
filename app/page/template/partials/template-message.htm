@@ -59,9 +59,15 @@
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
       <!-- ko if: asset.is_medium_image() -->
         <div class="message-asset-image" data-bind="fit_to_viewport: asset">
-          <div class="image image-loading" data-bind="background_image: asset.resource, viewport_changed: $parents[1].viewport_changed, click: $parents[1].show_detail, attr: {'data-uie-visible': $parent.visible}" data-uie-name="go-image-detail" >
-            <img class="image-element" data-bind="attr: {src: asset.dummy_url}"/>
-            <span class="image-placeholder-icon">
+          <div class="image image-loading" data-bind="
+            attr: {'data-uie-visible': $parent.visible},
+            background_image: asset.resource,
+            click: $parents[1].show_detail,
+            css: {'image-ephemeral': $parent.expire_after_millis() === true},
+            viewport_changed: $parents[1].viewport_changed
+            " data-uie-name="go-image-detail">
+            <img class="image-element" data-bind="attr: {src: asset.dummy_url}, css: {'image-ephemeral': $parent.expire_after_millis() === true}"/>
+            <span class="image-placeholder-icon" data-bind="css: {'image-ephemeral': $parent.expire_after_millis() === true}">
               <div class="three-dots">
                 <span></span>
                 <span></span>

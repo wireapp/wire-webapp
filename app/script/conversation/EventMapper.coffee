@@ -121,9 +121,9 @@ class z.conversation.EventMapper
       if difference > 0
         message_et.expire_after_millis dcodeIO.Long.fromNumber difference
     else
-        fake_text = new z.entity.Text()
-        fake_text.text = 'XXX'
-        message_et.assets([fake_text])
+      fake_text = new z.entity.Text()
+      fake_text.text = 'XXX'
+      message_et.assets([fake_text]) if message_et.assets
 
   ###
   Maps JSON data of conversation.asset_add message into message entity
