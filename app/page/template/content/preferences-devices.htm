@@ -10,10 +10,8 @@
           <div data-bind="html: activated_on"></div>
           <div data-bind="html: activated_in"></div>
         </div>
-        <!-- ko if: fingerprint() -->
-          <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferences_devices_fingerprint"></div>
-          <div class="preferences-devices-fingerprint" data-bind="html: z.util.print_devices_id(fingerprint())"></div>
-        <!-- /ko -->
+        <div class="preferences-devices-fingerprint-label" data-bind="l10n_text: z.string.preferences_devices_fingerprint"></div>
+        <div class="preferences-devices-fingerprint" data-bind="html: z.util.print_devices_id(fingerprint())"></div>
       </section>
 
       <hr class="preferences-devices-separator preferences-separator">
