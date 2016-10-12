@@ -65,6 +65,7 @@ class z.main.App
     service.conversation            = new z.conversation.ConversationService @auth.client, service.storage
     service.notification            = new z.event.NotificationService @auth.client, service.storage
     service.announce                = new z.announce.AnnounceService()
+    service.bot                     = new z.bot.BotService()
 
     return service
 

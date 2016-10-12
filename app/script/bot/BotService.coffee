@@ -17,13 +17,19 @@
 #
 
 window.z ?= {}
-z.auth ?= {}
+z.bot ?= {}
 
-z.auth.URLParameter =
-  BOT: 'bot'
-  CONNECT: 'connect'
-  ENVIRONMENT: 'env'
-  EXPIRED: 'expired'
-  INVITE: 'invite'
-  LOCALE: 'hl'
-  LOCALYTICS: 'localytics'
+class z.bot.BotService
+  constructor: ->
+    @logger = new z.util.Logger 'z.bot.BotService', z.config.LOGGER.OPTIONS
+    @url = "#{z.config.BOT_URL}"
+    return @
+
+  fetch: (username, callback) ->
+    $.get "#{@url}#{username}/"
+    .done (data, textStatus, jqXHR) =>
+      @logger.log @logger.levels.INFO, "Bot found. service: #{data['result']['service']}, provider: #{data['result']['provider']}"
+      callback? data['result']
+    .fail (jqXHR, textStatus, errorThrown) =>
+      @logger.log @logger.levels.ERROR, 'Failed to fetch bot', errorThrown
+      callback?()
