@@ -578,10 +578,11 @@ class z.ViewModel.MessageListViewModel
               when 'Text'
                 fake_text = new z.entity.Text()
                 fake_text.text = 'XXX'
-
                 message_et.assets.push fake_text
               when 'MediumImage'
                 message_et.assets.push asset
+              else
+                @logger.log @logger.levels.INFO, "Ephemeral asset of type '#{asset.constructor.name}' is unsupported.", asset
 
           when 'PingMessage'
             message_et.accent_color 'accent-color-5'
