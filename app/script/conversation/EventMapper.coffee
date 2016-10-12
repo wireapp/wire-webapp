@@ -114,8 +114,6 @@ class z.conversation.EventMapper
     message_et.type = z.event.Client.CONVERSATION.MESSAGE_EPHEMERAL
     expiration = event.data.expire_after_millis
 
-    console.warn "Ephemeral message", message_et
-
     if _.isString expiration
       message_et.expire_after_millis dcodeIO.Long.fromString event.data.expire_after_millis
     else if _.isNumber expiration

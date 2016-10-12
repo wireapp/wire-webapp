@@ -564,14 +564,18 @@ class z.ViewModel.MessageListViewModel
 
     @conversation_repository.conversation_service.storage_service.update 'conversation_events', message_id, changes
     .then =>
-      @logger.log @logger.levels.INFO, "Updated message '#{message_id}'.", changes
+      @logger.log @logger.levels.INFO, "Ephemeral message with ID '#{message_id}' timed out.", message_et
+
       if message_et.user().is_me
-        if message_et.constructor.name is 'ContentMessage'
-          message_et.assets.pop()
+        switch message_et.constructor.name
+          when 'ContentMessage'
+            message_et.assets.pop()
 
-          fake_text = new z.entity.Text()
-          fake_text.text = 'XXX'
+            fake_text = new z.entity.Text()
+            fake_text.text = 'XXX'
 
-          message_et.assets.push fake_text
+            message_et.assets.push fake_text
+          when 'PingMessage'
+            message_et.accent_color "accent-color-5"
       else
         @conversation_repository.delete_message_everyone conversation_et, message_et

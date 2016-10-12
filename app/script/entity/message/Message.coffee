@@ -50,9 +50,7 @@ class z.entity.Message
       z.util.get_first_name @user()
     , @, deferEvaluation: true
 
-    @accent_color = ko.computed =>
-      return "accent-color-#{@user().accent_id()}"
-    , @, deferEvaluation: true
+    @accent_color = ko.observable "accent-color-#{@user().accent_id()}"
 
   ###
   Check if message contains an asset of type file.
