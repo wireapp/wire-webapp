@@ -63,10 +63,12 @@ class z.ViewModel.ConversationInputViewModel
       write: (value) =>
         if @is_editing() then @edit_input value else @conversation_et()?.input value
 
-    @ping_tooltip = z.localization.Localizer.get_text {
+    @ping_tooltip = z.localization.Localizer.get_text
       id: z.string.tooltip_conversation_ping
-      replace: {placeholder: '%shortcut', content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.PING}
-    }
+      replace:
+        placeholder: '%shortcut'
+        content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.PING
+
     @picture_tooltip = z.localization.Localizer.get_text z.string.tooltip_conversation_picture
     @file_tooltip = z.localization.Localizer.get_text z.string.tooltip_conversation_file
 
@@ -76,6 +78,11 @@ class z.ViewModel.ConversationInputViewModel
       .blur => @browser_has_focus false
       .focus => @browser_has_focus true
 
+    @ephemeral_menu = new zeta.webapp.module.Bubble
+      host_selector: '#conversation-input-ephemeral'
+      scroll_selector: window
+
+    window.skata = @ephemeral_menu
     @_init_subscriptions()
 
   _init_subscriptions: ->
@@ -118,14 +125,17 @@ class z.ViewModel.ConversationInputViewModel
     if message isnt message_et.get_first_asset().text
       @conversation_repository.send_message_edit message, message_et, @conversation_et()
 
-  set_ephemeral_timer: =>
-    millis = dcodeIO.Long.fromNumber 5000
-    if not @conversation_et().ephemeral_timer()
-      @conversation_et().ephemeral_timer millis
-      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer()}'."
-    else
+  set_ephemeral_timer: (seconds) =>
+    if not seconds
       @conversation_et().ephemeral_timer false
       @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' turned off."
+    else
+      @conversation_et().ephemeral_timer dcodeIO.Long.fromNumber seconds * 1000
+      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer()}'."
+    @ephemeral_menu.toggle()
+
+  set_ephemeral: =>
+    @ephemeral_menu.toggle()
 
   upload_images: (images) =>
     for image in images

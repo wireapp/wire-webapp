@@ -42,9 +42,12 @@
           <!-- /ko -->
 
           <!-- ko if: input().length === 0 -->
-            <span class="controls-right-button button-icon-large icon-hourglass"
-                  data-bind="click: set_ephemeral_timer, css: {'ephemeral-mode': conversation_et().ephemeral_timer()}"
-                  data-uie-name="do-set-ephemeral-timer">
+            <span id="conversation-input-ephemeral"
+                  class="controls-right-button button-icon-large icon-hourglass"
+                  data-bind="click: set_ephemeral, css: {'ephemeral-mode': conversation_et().ephemeral_timer()}"
+                  data-uie-name="do-set-ephemeral-timer"
+                  data-bubble=".ephemeral-menu"
+                  data-placement="top">
             </span>
 
             <label id="conversation-input-photo"
