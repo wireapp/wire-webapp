@@ -20,6 +20,7 @@
 z.string.wire = 'Wire'
 z.string.wire_osx = 'Wire for macOS'
 z.string.wire_windows = 'Wire for Windows'
+z.string.wire_linux = 'Wire for Linux'
 z.string.truncation = '…'
 z.string.nonexistent_user = 'Deleted User'
 z.string.and = 'and'
