@@ -31,7 +31,7 @@ z.util.emoji = do ->
   find_surrogate_pair = (point) ->
     offset = point - 0x10000
     lead = 0xd800 + (offset >> 10)
-    trail = 0xdc00 + (offset & 0x3ff);
+    trail = 0xdc00 + (offset & 0x3ff)
     return [lead.toString(16), trail.toString(16)]
 
   contains_only_emojies = (text) ->
@@ -43,4 +43,3 @@ z.util.emoji = do ->
     contains_only_emojies: contains_only_emojies
     find_surrogate_pair: find_surrogate_pair
   }
-
