@@ -79,8 +79,6 @@ class z.ViewModel.ModalsViewModel
         type = @_show_modal_clear options, type
       when z.ViewModel.ModalType.CONNECTED_DEVICE
         @_show_modal_connected_device options.data
-      when z.ViewModel.ModalType.DELETE_ACCOUNT
-        @_show_modal_delete_account options.data, message_element
       when z.ViewModel.ModalType.LEAVE
         @_show_modal_leave options.data, title_element
       when z.ViewModel.ModalType.NEW_DEVICE
@@ -184,13 +182,6 @@ class z.ViewModel.ModalsViewModel
       $('<div>')
         .text "#{z.localization.Localizer.get_text z.string.modal_connected_device_from} #{device.model}"
         .appendTo devices_element
-
-  _show_modal_delete_account: (content, message_element) ->
-    message_element.text z.localization.Localizer.get_text
-      id: z.string.modal_delete_account_message
-      replace:
-        placeholder: '%email'
-        content: content
 
   _show_modal_leave: (content, title_element) ->
     title_element.text z.localization.Localizer.get_text
