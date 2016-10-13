@@ -27,7 +27,7 @@ class z.entity.Text extends z.entity.Asset
   @param id [String] Asset ID
   ###
   constructor: (id) ->
-    super(id)
+    super id
     @type = z.assets.AssetType.TEXT
 
     # Raw message text

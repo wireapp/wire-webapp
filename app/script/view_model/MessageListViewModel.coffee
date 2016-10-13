@@ -576,9 +576,9 @@ class z.ViewModel.MessageListViewModel
 
             switch asset.constructor.name
               when 'Text'
-                fake_text = new z.entity.Text()
-                fake_text.text = z.util.StringUtil.obfuscate asset.text
-                message_et.assets.push fake_text
+                obfuscated = new z.entity.Text asset.id
+                obfuscated.text = z.util.StringUtil.obfuscate asset.text
+                message_et.assets.push obfuscated
               when 'MediumImage'
                 message_et.assets.push asset
               else

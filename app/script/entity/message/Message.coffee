@@ -29,14 +29,30 @@ class z.entity.Message
     message_ets.sort (m1, m2) -> m1.timestamp > m2.timestamp
 
   # Construct a new base message entity.
-  constructor: (id = '0', super_type = '') ->
+  constructor: (@id = '0', @super_type = '') ->
     @expire_after_millis = ko.observable false
+    @ephemeral_status = ko.pureComputed =>
+      expiration = @expire_after_millis()
+
+      if expiration is true
+        return z.message.EphemeralStatusType.TIMED_OUT
+
+      if _.isString expiration
+        return z.message.EphemeralStatusType.INACTIVE
+      else if _.isNumber expiration
+        difference = expiration - Date.now()
+        if difference > 0
+          return z.message.EphemeralStatusType.ACTIVE
+        else
+          return z.message.EphemeralStatusType.TIMED_OUT
+      else
+        return z.message.EphemeralStatusType.NONE
+    , @, deferEvaluation: true
+
     @from = ''
-    @id = id
     @is_editing = ko.observable false
     @primary_key = undefined
     @status = ko.observable z.message.StatusType.UNSPECIFIED
-    @super_type = super_type
     @timestamp = Date.now()
     @type = ''
     @user = ko.observable new z.entity.User()
@@ -185,7 +201,8 @@ class z.entity.Message
   ###
   is_deletable: ->
     return true if @is_ping() or not @has_asset()
-    return @get_first_asset().status() not in [z.assets.AssetTransferState.DOWNLOADING, z.assets.AssetTransferState.UPLOADING]
+    return @get_first_asset().status() not in [z.assets.AssetTransferState.DOWNLOADING,
+        z.assets.AssetTransferState.UPLOADING]
 
   ###
   Check if message can be edited.
