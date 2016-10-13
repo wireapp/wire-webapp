@@ -98,6 +98,10 @@
   }
 }
 
+.message-ephemeral {
+  color: @accent_colors-5;
+}
+
 .message-is-editing {
   color: @graphite;
 }
@@ -409,6 +413,10 @@
     display: inline-block;
     position: relative;
     max-width: 100%;
+
+    &.image-ephemeral {
+      background-color: @accent_colors-5;
+    }
   }
 
   .image-loading {
@@ -420,6 +428,11 @@
     cursor: pointer;
     max-width: 100%;
     max-height: 80vh;
+
+    &.image-ephemeral {
+      cursor: default;
+      opacity: 0;
+    }
   }
 
   .image-placeholder-icon {
@@ -428,6 +441,9 @@
     align-items: center;
     display: none;
     justify-content: center;
+    &.image-ephemeral {
+      visibility: hidden;
+    }
   }
 }
 

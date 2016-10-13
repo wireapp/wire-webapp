@@ -808,8 +808,13 @@ class z.conversation.ConversationRepository
   send_asset_metadata: (conversation_et, file) =>
     asset = new z.proto.Asset()
     asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'asset', asset
+
+    if conversation_et.ephemeral_timer()
+      generic_message = @_wrap_in_ephemeral_message asset, conversation_et.ephemeral_timer()
+    else
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'asset', asset
+
     @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
@@ -847,8 +852,11 @@ class z.conversation.ConversationRepository
   send_image_asset: (conversation_et, image) =>
     @asset_service.create_image_proto image
     .then ([image, ciphertext]) =>
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'image', image
+      if conversation_et.ephemeral_timer()
+        generic_message = @_wrap_in_ephemeral_message image, conversation_et.ephemeral_timer()
+      else
+        generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+        generic_message.set 'image', image
       optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
       @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
       .then (mapped_event) =>
@@ -867,7 +875,7 @@ class z.conversation.ConversationRepository
           saved_event.data.info.nonce = asset_id
           @_update_image_as_sent conversation_et, saved_event
         .catch (error) =>
-          @logger.log "Failed to upload otr asset for conversation #{conversation_et.id}", error
+          @logger.log @logger.levels.ERROR, "Failed to upload otr asset for conversation #{conversation_et.id}", error
           throw error
 
         return saved_event
@@ -878,8 +886,13 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the knock
   ###
   send_knock: (conversation_et) =>
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'knock', new z.proto.Knock false
+    knock = new z.proto.Knock false
+
+    if conversation_et.ephemeral_timer()
+      generic_message = @_wrap_in_ephemeral_message knock, conversation_et.ephemeral_timer()
+    else
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'knock', knock
 
     @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) => @logger.log @logger.levels.ERROR, "#{error.message}"
@@ -912,12 +925,34 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the message
   ###
   send_message: (message, conversation_et) =>
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'text', new z.proto.Text message
+    text = new z.proto.Text message
+
+    if conversation_et.ephemeral_timer()
+      generic_message = @_wrap_in_ephemeral_message text, conversation_et.ephemeral_timer()
+    else
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'text', new z.proto.Text message
 
     @_send_and_inject_generic_message conversation_et, generic_message
-    .then ->
-      return generic_message
+    .then -> return generic_message
+
+  _wrap_in_ephemeral_message: (message, millis) ->
+    ephemeral = new z.proto.Ephemeral()
+    ephemeral.set 'expire_after_millis', millis
+
+    if message.mention?
+      ephemeral.set 'text', message
+    else if message.hot_knock?
+      ephemeral.set 'knock', message
+    else if message.original_width?
+      ephemeral.set 'image', message
+    else
+      ephemeral.set 'asset', message
+
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'ephemeral', ephemeral
+
+    return generic_message
 
   ###
   Send edited message in specified conversation.
@@ -1277,7 +1312,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: upload_duration}
     .catch (error) =>
-      @logger.log "Failed to upload asset for conversation '#{conversation_et.id}", error
+      @logger.log @logger.levels.ERROR, "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
       if message_et.id
         @send_asset_upload_failed conversation_et, message_et.id
         @update_message_as_upload_failed message_et
@@ -1292,7 +1327,7 @@ class z.conversation.ConversationRepository
   delete_message_everyone: (conversation_et, message_et) =>
     Promise.resolve()
     .then ->
-      if not message_et.user().is_me
+      if not message_et.user().is_me and not message_et.expire_after_millis()
         throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
@@ -1394,6 +1429,8 @@ class z.conversation.ConversationRepository
           @_on_confirmation conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_DELETE
           @_on_message_deleted conversation_et, event
+        when z.event.Client.CONVERSATION.MESSAGE_EPHEMERAL
+          @_on_message_ephemeral conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_HIDDEN
           @_on_message_hidden event
         when z.event.Client.CONVERSATION.REACTION
@@ -1585,7 +1622,7 @@ class z.conversation.ConversationRepository
   _on_message_deleted: (conversation_et, event_json) =>
     @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
     .then (message_to_delete_et) =>
-      if event_json.from isnt message_to_delete_et.from
+      if event_json.from isnt message_to_delete_et.from and not message_to_delete_et.expire_after_millis()
         throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
       if event_json.from isnt @user_repository.self().id
         return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
@@ -1595,6 +1632,10 @@ class z.conversation.ConversationRepository
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
         throw error
+
+  _on_message_ephemeral: (conversation_et, event_json) ->
+    Promise.resolve()
+    .then -> return event_json
 
   ###
   A hide message received in a conversation.

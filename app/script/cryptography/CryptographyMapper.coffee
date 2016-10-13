@@ -58,6 +58,8 @@ class z.cryptography.CryptographyMapper
         return @_map_deleted generic_message.deleted
       when 'edited'
         return @_map_edited generic_message.edited, generic_message.message_id
+      when 'ephemeral'
+        return @_map_ephemeral generic_message, event
       when 'external'
         return @_map_external generic_message.external, event
       when 'hidden'
@@ -167,6 +169,22 @@ class z.cryptography.CryptographyMapper
     mapped = @_map_text edited.text, event_id
     mapped.data.replacing_message_id = edited.replacing_message_id
     return mapped
+
+  _map_ephemeral: (generic_message, event) ->
+    ranges = [
+      dcodeIO.Long.fromNumber 1000
+      dcodeIO.Long.fromNumber 5000
+      dcodeIO.Long.fromNumber 15000
+      dcodeIO.Long.fromNumber 60000
+      dcodeIO.Long.fromNumber 900000
+    ]
+
+    mapped_millis = z.util.ArrayUtil.find_closest_long ranges, generic_message.ephemeral.expire_after_millis
+    generic_message.ephemeral.message_id = generic_message.message_id
+    embedded_message = @_map_generic_message generic_message.ephemeral, event
+    embedded_message.data.expire_after_millis = mapped_millis.toString()
+
+    return embedded_message
 
   ###
   Unpacks a specific generic message which is wrapped inside an external generic message.

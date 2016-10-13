@@ -43,6 +43,8 @@ class z.ViewModel.ConversationInputViewModel
       else
         window.removeEventListener 'click', @on_window_click
 
+    @ephemeral_timer = @conversation_et.ephemeral_timer
+
     @conversation_has_focus = ko.observable(true).extend notify: 'always'
     @browser_has_focus = ko.observable true
 
@@ -75,6 +77,10 @@ class z.ViewModel.ConversationInputViewModel
       .blur => @browser_has_focus false
       .focus => @browser_has_focus true
 
+    @ephemeral_menu = new zeta.webapp.module.Bubble
+      host_selector: '#conversation-input-ephemeral'
+      scroll_selector: window
+
     @_init_subscriptions()
 
   _init_subscriptions: ->
@@ -85,7 +91,7 @@ class z.ViewModel.ConversationInputViewModel
     amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.EDIT, @edit_message
 
   added_to_view: =>
-    setTimeout =>
+    window.setTimeout =>
       amplify.subscribe z.event.WebApp.SHORTCUT.PING, => @ping()
     , 50
 
@@ -106,8 +112,7 @@ class z.ViewModel.ConversationInputViewModel
       , 2000
 
   send_message: (message) =>
-    if message.length is 0
-      return
+    return if message.length is 0
     @conversation_repository.send_message_with_link_preview message, @conversation_et()
 
   send_message_edit: (message, message_et) =>
@@ -117,6 +122,18 @@ class z.ViewModel.ConversationInputViewModel
       return @conversation_repository.delete_message_everyone @conversation_et(), message_et
     if message isnt message_et.get_first_asset().text
       @conversation_repository.send_message_edit message, message_et, @conversation_et()
+
+  set_ephemeral_timer: (millis) =>
+    if not millis
+      @conversation_et().ephemeral_timer false
+      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' turned off."
+    else
+      @conversation_et().ephemeral_timer dcodeIO.Long.fromNumber millis
+      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer().toString()}'."
+    @ephemeral_menu.toggle()
+
+  set_ephemeral: =>
+    @ephemeral_menu.toggle()
 
   upload_images: (images) =>
     for image in images
@@ -153,7 +170,7 @@ class z.ViewModel.ConversationInputViewModel
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_TOO_BIG,
           {size: file.size, type: file.type}
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT
-        setTimeout ->
+        window.setTimeout ->
           amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_TOO_LARGE,
             data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE)
         , 200

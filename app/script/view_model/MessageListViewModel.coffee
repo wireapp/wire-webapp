@@ -58,6 +58,7 @@ class z.ViewModel.MessageListViewModel
     @recalculate_timeout = undefined
 
     @should_scroll_to_bottom = true
+    @ephemeral_timers = {}
 
     # Check if the message container is to small and then pull new events
     @on_mouse_wheel = _.throttle (e) =>
@@ -358,15 +359,17 @@ class z.ViewModel.MessageListViewModel
   @return [String] CSS class that is applied to the element
   ###
   get_css_class: (message) ->
+    suffix = ' message-ephemeral' if message.expire_after_millis()
+
     switch message.super_type
       when z.message.SuperType.CALL
         return 'message-system message-call'
       when z.message.SuperType.CONTENT
-        return 'message-normal'
+        return 'message-normal' + suffix
       when z.message.SuperType.MEMBER
         return 'message message-system message-member'
       when z.message.SuperType.PING
-        return 'message-ping'
+        return 'message-ping' + suffix
       when z.message.SuperType.SYSTEM
         if message.system_message_type is z.message.SystemMessageType.CONVERSATION_RENAME
           return 'message-system message-rename'
@@ -396,6 +399,11 @@ class z.ViewModel.MessageListViewModel
 
     if message_et.is_deletable()
       entries.push {label: z.string.conversation_context_menu_delete, action: 'delete'}
+
+    if message_et.expire_after_millis()
+      entries = [
+        {label: z.string.conversation_context_menu_delete, action: 'delete'}
+      ]
 
     if message_et.user().is_me and not @conversation().removed_from_conversation() and message_et.status() isnt z.message.StatusType.SENDING
       entries.push {label: z.string.conversation_context_menu_delete_everyone, action: 'delete-everyone'}
@@ -444,6 +452,7 @@ class z.ViewModel.MessageListViewModel
   ###
   show_detail: (asset_et, event) ->
     target_element = $(event.currentTarget)
+    return if target_element.hasClass 'image-ephemeral'
     return if target_element.hasClass 'image-loading'
     amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, target_element.find('img')[0].src
 
@@ -524,3 +533,58 @@ class z.ViewModel.MessageListViewModel
       user: if message_et.user().is_me then 'sender' else 'receiver'
       type: z.tracking.helpers.get_message_type message_et
       reacted_to_last_message: conversation_et.get_last_message() is message_et
+
+  message_in_viewport: (message_et) ->
+    millis = message_et.expire_after_millis()
+
+    if millis instanceof dcodeIO.Long
+      millis_number = window.parseInt(millis.toString(), 10)
+      expiration_long = millis.add dcodeIO.Long.fromNumber Date.now()
+      expiration_number = window.parseInt(expiration_long.toString(), 10)
+
+      message_id = "#{@conversation().id}@#{message_et.from}@#{message_et.timestamp}"
+      changes =
+        data:
+          expire_after_millis: expiration_number
+
+      @conversation_repository.conversation_service.storage_service.update 'conversation_events', message_id, changes
+      .then =>
+        @logger.log @logger.levels.INFO, "Updated message '#{message_id}'.", changes
+        @start_ephemeral_timer message_id, message_et, millis_number
+
+  start_ephemeral_timer: (message_id, message_et, expiration_number) ->
+    if not @ephemeral_timers[message_id]
+      @ephemeral_timers[message_id] = window.setTimeout (=>
+        @timeout_ephemeral_message message_id, message_et, @conversation()
+      ), expiration_number
+
+  timeout_ephemeral_message: (message_id, message_et, conversation_et) =>
+    changes =
+      data:
+        expire_after_millis: true
+
+    @conversation_repository.conversation_service.storage_service.update 'conversation_events', message_id, changes
+    .then =>
+      @logger.log @logger.levels.INFO, "Ephemeral message with ID '#{message_id}' timed out.", message_et
+
+      message_et.expire_after_millis true
+
+      if message_et.user().is_me
+        switch message_et.constructor.name
+          when 'ContentMessage'
+            asset = message_et.assets.pop()
+
+            switch asset.constructor.name
+              when 'Text'
+                fake_text = new z.entity.Text()
+                fake_text.text = 'XXX'
+                message_et.assets.push fake_text
+              when 'MediumImage'
+                message_et.assets.push asset
+              else
+                @logger.log @logger.levels.INFO, "Ephemeral asset of type '#{asset.constructor.name}' is unsupported.", asset
+
+          when 'PingMessage'
+            message_et.accent_color 'accent-color-5'
+      else
+        @conversation_repository.delete_message_everyone conversation_et, message_et

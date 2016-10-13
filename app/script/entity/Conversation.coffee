@@ -91,6 +91,8 @@ class z.entity.Conversation
     # Messages
     ###############################################################################
 
+    @ephemeral_timer = ko.observable false
+
     @messages_unordered = ko.observableArray()
     @messages = ko.pureComputed => @messages_unordered().sort (a, b) -> a.timestamp - b.timestamp
     @messages.subscribe => @update_latest_from_message @get_last_message()
@@ -110,7 +112,10 @@ class z.entity.Conversation
       return message_ets
     .extend trackArrayChanges: true
 
-    # Call related
+    ###############################################################################
+    # Calling
+    ###############################################################################
+
     @call = ko.observable undefined
     @has_active_call = ko.pureComputed =>
       return false if not @call()

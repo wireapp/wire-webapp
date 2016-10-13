@@ -62,7 +62,7 @@ ko.bindingHandlers.background_image =
 
     _on_viewport_change = _.debounce ->
       if _in_view element
-        asset_et()?.load()
+        asset_remote_data()?.load()
         .then (blob) ->
           $(element).removeClass 'image-loading'
           object_url = window.URL.createObjectURL blob
@@ -71,11 +71,11 @@ ko.bindingHandlers.background_image =
     , 500
 
     image_element = $(element).find 'img'
-    asset_et = valueAccessor()
+    asset_remote_data = valueAccessor()
 
     viewport_changed = allBindingsAccessor.get 'viewport_changed'
     viewport_subscription = viewport_changed.subscribe _on_viewport_change
-    asset_subscription = asset_et.subscribe _on_viewport_change
+    asset_subscription = asset_remote_data.subscribe _on_viewport_change
 
     _on_viewport_change()
 
@@ -178,3 +178,8 @@ ko.bindingHandlers.relative_timestamp = do ->
     ko.utils.domNodeDisposal.addDisposeCallback element, ->
       timestamp_index = timestamps.indexOf timestamp_func
       timestamps.splice timestamp_index, 1
+
+ko.bindingHandlers.message_in_viewport =
+  init: (element, valueAccessor, allBindingsAccessor) ->
+    callback = valueAccessor()
+    callback()
