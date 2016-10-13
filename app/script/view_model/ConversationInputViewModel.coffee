@@ -123,13 +123,13 @@ class z.ViewModel.ConversationInputViewModel
     if message isnt message_et.get_first_asset().text
       @conversation_repository.send_message_edit message, message_et, @conversation_et()
 
-  set_ephemeral_timer: (seconds) =>
-    if not seconds
+  set_ephemeral_timer: (millis) =>
+    if not millis
       @conversation_et().ephemeral_timer false
       @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' turned off."
     else
-      @conversation_et().ephemeral_timer dcodeIO.Long.fromNumber seconds * 1000
-      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer()}'."
+      @conversation_et().ephemeral_timer dcodeIO.Long.fromNumber millis
+      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer().toString()}'."
     @ephemeral_menu.toggle()
 
   set_ephemeral: =>
