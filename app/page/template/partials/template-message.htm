@@ -73,7 +73,7 @@
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(), css: {'text-large': z.util.emoji.contains_only_emojies(asset.text), 'message-is-editing': $parent.is_editing, 'text-graphite': message.status() === z.message.StatusType.SENDING}"></div>
+          <div class="text" data-bind="html: asset.render(), css: {'message-is-editing': $parent.is_editing, 'text-large': z.util.emoji.contains_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING}"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset params="preview: $data, viewport_changed: $parents[2].viewport_changed"></link-preview-asset>

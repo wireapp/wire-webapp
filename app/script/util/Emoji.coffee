@@ -28,18 +28,12 @@ z.util.emoji = do ->
   is_valid_string = (string) ->
     return _.isString(string) and string.length > 0
 
-  find_surrogate_pair = (point) ->
-    offset = point - 0x10000
-    lead = 0xd800 + (offset >> 10)
-    trail = 0xdc00 + (offset & 0x3ff)
-    return [lead.toString(16), trail.toString(16)]
+  remove_emojies = (text) ->
+    return text.replace(new RegExp(ranges.join('|'), 'g'), '')
 
   contains_only_emojies = (text) ->
-    if is_valid_string(text)
-      return text.replace(new RegExp(ranges.join('|'), 'g'), '').length is 0
-    return
+    return is_valid_string(text) and remove_emojies(text).length is 0
 
   return {
     contains_only_emojies: contains_only_emojies
-    find_surrogate_pair: find_surrogate_pair
   }
