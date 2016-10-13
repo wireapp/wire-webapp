@@ -211,7 +211,7 @@
     <div class="message-header-icon">
       <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
     </div>
-    <div class="message-header-label" data-bind="css: message.accent_color">
+    <div class="message-header-label" data-bind="css: message.ping_color">
       <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption"></span>
       <span class="message-icon-ping icon-ping" data-bind="css: message.animation()"></span>

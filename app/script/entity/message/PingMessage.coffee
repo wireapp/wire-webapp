@@ -29,6 +29,8 @@ class z.entity.PingMessage extends z.entity.Message
       return z.localization.Localizer.get_text string
     , @, deferEvaluation: true
 
-    @animation = ko.pureComputed ->
+    @animation = ko.pureComputed =>
       return 'ping-animation ping-animation-soft' if Date.now() - @timestamp < 2000
-    , @, deferEvaluation: true
+
+    @ping_color = ko.pureComputed =>
+      return if @is_expired() then 'text-ephemeral' else @accent_color()

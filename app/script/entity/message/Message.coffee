@@ -50,7 +50,8 @@ class z.entity.Message
       z.util.get_first_name @user()
     , @, deferEvaluation: true
 
-    @accent_color = ko.observable "accent-color-#{@user().accent_id()}"
+    @accent_color = ko.pureComputed =>
+      return "accent-color-#{@user().accent_id()}"
 
   ###
   Check if message contains an asset of type file.
@@ -199,6 +200,13 @@ class z.entity.Message
   ###
   is_reactable: ->
     return @is_content()
+
+  ###
+  Check if ephemeral message is expired.
+  @return [Boolean]
+  ###
+  is_expired: ->
+    return @expire_after_millis() is true
 
   ###
   Update the status of a message.

@@ -583,8 +583,5 @@ class z.ViewModel.MessageListViewModel
                 message_et.assets.push asset
               else
                 @logger.log @logger.levels.INFO, "Ephemeral asset of type '#{asset.constructor.name}' is unsupported.", asset
-
-          when 'PingMessage'
-            message_et.accent_color 'accent-color-5'
       else
         @conversation_repository.delete_message_everyone conversation_et, message_et
