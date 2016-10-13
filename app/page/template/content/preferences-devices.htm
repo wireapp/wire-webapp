@@ -31,8 +31,8 @@
                   <!-- /ko -->
                 </svg>
                 <div class="preferences-devices-card-info">
-                  <div class="preferences-devices-model" data-bind="text: model"></div>
-                  <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferences_devices_id"></span><span data-bind="html: z.util.print_devices_id(id)"></span></div>
+                  <div class="preferences-devices-model" data-bind="text: model" data-uie-name="preferences-device-active-model"></div>
+                  <div class="preferences-devices-id"><span data-bind="l10n_text: z.string.preferences_devices_id"></span><span data-bind="html: z.util.print_devices_id(id)" data-uie-name="preferences-device-active-id"></span></div>
                 </div>
               </div>
               <div class="preferences-devices-card-action">
