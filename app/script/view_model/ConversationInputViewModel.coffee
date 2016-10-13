@@ -91,7 +91,7 @@ class z.ViewModel.ConversationInputViewModel
     amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.EDIT, @edit_message
 
   added_to_view: =>
-    setTimeout =>
+    window.setTimeout =>
       amplify.subscribe z.event.WebApp.SHORTCUT.PING, => @ping()
     , 50
 
