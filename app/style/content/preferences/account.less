@@ -1,0 +1,102 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.preferences-section-account-profile {
+  display: flex;
+  position: relative;
+  justify-content: space-between;
+  width: 536px;
+}
+
+.preferences-section-account-security {
+  margin-top: 72px;
+  margin-bottom: 48px;
+
+  .preferences-separator {
+    margin-bottom: 24px;
+  }
+}
+
+.preferences-account-accent-color {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.preferences-account-mail,
+.preferences-account-phone {
+  .no-text-selection();
+}
+
+.preferences-account-picture-button {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+
+  > span {
+    .full-screen;
+    .flex-center;
+    color: #fff;
+    font-size: @font-size-xl;
+    pointer-events: none;
+
+    &:before {
+      text-shadow: 0 0 40px fade(#000, 80%);
+    }
+  }
+
+  > user-avatar {
+    pointer-events: none;
+  }
+
+  > input {
+    position: absolute;
+    left: -9999px;
+  }
+}
+
+.preferences-account-user-data {
+  line-height: @line-height-lg;
+}
+
+.preferences-account-username {
+  .reset-textarea;
+  background: transparent;
+  font-weight: bold;
+  height: @line-height-xl;
+  line-height: @line-height-xl;
+  margin-left: -4px;
+  padding-left: 4px;
+  padding-right: 4px;
+
+  &:hover + .preferences-account-username-label:after {
+    .icon-mixin("\e177"); // icon-edit
+    margin-left: 8px;
+  }
+
+  &:focus {
+    background-color: fade(@graphite, 12%);
+    width: 256px;
+  }
+
+  &:focus + .preferences-account-username-label:after {
+    content: "";
+    display: none;
+  }
+}

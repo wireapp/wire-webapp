@@ -31,7 +31,7 @@ class z.ViewModel.MessageListViewModel
     @logger = new z.util.Logger 'z.ViewModel.MessageListViewModel', z.config.LOGGER.OPTIONS
 
     @conversation = ko.observable new z.entity.Conversation()
-    @center_messages = ko.computed =>
+    @center_messages = ko.pureComputed =>
       return not @conversation().has_further_messages() and @conversation().messages_visible().length is 1 and @conversation().messages_visible()[0].is_connection()
 
     @conversation_is_changing = false

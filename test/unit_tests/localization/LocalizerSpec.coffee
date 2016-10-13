@@ -21,28 +21,36 @@
 describe 'Localizer', ->
   it 'can get localized strings', ->
     text = z.localization.Localizer.get_text z.string.upload_choose
+
     expect(text).toBe z.string.upload_choose
 
   it 'can replace line single strings in the localization', ->
-    text = z.localization.Localizer.get_text {
+    text = z.localization.Localizer.get_text
       id: 'Talk, message, share.'
-      replace: {placeholder: '%nl', content: '<br>'}
-    }
+      replace:
+        placeholder: '%nl'
+        content: '<br>'
+
     expect(text).toBe 'Talk, message, share.'
 
   it 'can replace multiple strings in the localization', ->
-    text = z.localization.Localizer.get_text {
+    text = z.localization.Localizer.get_text
       id: 'I’m on Wire. Search for %email or visit %url to connect with me.'
       replace: [
-        {placeholder: '%email', content: entities.user.john_doe.email}
-        {placeholder: '%url', content: 'html://LINK'}
+        placeholder: '%email'
+        content: entities.user.john_doe.email
+      ,
+        placeholder: '%url'
+        content: 'html://LINK'
       ]
-    }
+
     expect(text).toBe 'I’m on Wire. Search for jd@wire.com or visit html://LINK to connect with me.'
 
   it 'can replace user names in the localization', ->
-    text = z.localization.Localizer.get_text {
+    text = z.localization.Localizer.get_text
       id: '%@.first_name won’t see you in search results and won’t be able to send you messages.'
-      replace: {placeholder: '%@.first_name', content: '<span class=\"user\"></span>'}
-    }
+      replace:
+        placeholder: '%@.first_name'
+        content: '<span class=\"user\"></span>'
+
     expect(text).toBe '<span class="user"></span> won’t see you in search results and won’t be able to send you messages.'

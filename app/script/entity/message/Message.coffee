@@ -46,7 +46,7 @@ class z.entity.Message
       date = moment.unix @timestamp / 1000
       return date.local().format 'HH:mm'
 
-    @sender_name = ko.computed =>
+    @sender_name = ko.pureComputed =>
       z.util.get_first_name @user()
     , @, deferEvaluation: true
 

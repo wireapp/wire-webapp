@@ -19,7 +19,7 @@
 window.z ?= {}
 z.ViewModel ?= {}
 
-# Parent: z.ViewModel.RightViewModel
+# Parent: z.ViewModel.ContentViewModel
 class z.ViewModel.ConversationInputViewModel
   constructor: (element_id, @conversation_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.ConversationInputViewModel', z.config.LOGGER.OPTIONS
@@ -68,7 +68,6 @@ class z.ViewModel.ConversationInputViewModel
       replace:
         placeholder: '%shortcut'
         content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.PING
-
     @picture_tooltip = z.localization.Localizer.get_text z.string.tooltip_conversation_picture
     @file_tooltip = z.localization.Localizer.get_text z.string.tooltip_conversation_file
 
@@ -82,7 +81,6 @@ class z.ViewModel.ConversationInputViewModel
       host_selector: '#conversation-input-ephemeral'
       scroll_selector: window
 
-    window.skata = @ephemeral_menu
     @_init_subscriptions()
 
   _init_subscriptions: ->
@@ -144,10 +142,11 @@ class z.ViewModel.ConversationInputViewModel
     @conversation_repository.upload_images @conversation_et(), images
 
   _show_upload_warning: (image) ->
-    warning = z.localization.Localizer.get_text {
+    warning = z.localization.Localizer.get_text
       id: if image.type is 'image/gif' then z.string.alert_gif_too_large else z.string.alert_upload_too_large
-      replace: {placeholder: '%no', content: z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024}
-    }
+      replace:
+        placeholder: '%no'
+        content: z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024
 
     attributes =
       reason: 'too large'
