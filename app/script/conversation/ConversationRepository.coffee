@@ -954,17 +954,6 @@ class z.conversation.ConversationRepository
 
     return generic_message
 
-  send_ephemeral_message: (conversation_et, millis, message) =>
-    ephemeral_message = new z.proto.Ephemeral()
-    ephemeral_message.set 'expire_after_millis', millis
-    ephemeral_message.set 'text', new z.proto.Text message
-
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'ephemeral', ephemeral_message
-
-    @_send_and_inject_generic_message conversation_et, generic_message
-    .then -> return generic_message
-
   ###
   Send edited message in specified conversation.
 
