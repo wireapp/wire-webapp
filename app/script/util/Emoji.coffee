@@ -20,18 +20,13 @@ z.util.emoji = do ->
 
   # http://www.unicode.org/Public/emoji/1.0/emoji-data.txt
   # http://crocodillon.com/blog/parsing-emoji-unicode-in-javascript
-  ranges = [
-    '\ud83c[\udf00-\udfff]'
-    '\ud83d[\udc00-\udeff]'
-    '\ud83e[\udd10-\uddff]'
-    '[\u231a-\u27ff][\ufe0f]?'
-  ]
+  emoji_regex = /\ud83c[\udf00-\udfff]|\ud83d[\udc00-\udeff]|\ud83e[\udd10-\uddff]|[\u231a-\u27ff][\ufe0f]?/g
 
   is_valid_string = (string) ->
     return _.isString(string) and string.length > 0
 
   remove_emojies = (text) ->
-    return text.replace(new RegExp(ranges.join('|'), 'g'), '')
+    return text.replace emoji_regex, ''
 
   contains_only_emojies = (text) ->
     return is_valid_string(text) and remove_emojies(text).length is 0
