@@ -179,7 +179,7 @@ describe 'Conversation', ->
 
     it 'displays "Empty Conversation" if no other participants are in the conversation', ->
       conversation_et.type z.conversation.ConversationType.REGULAR
-      expect(conversation_et.display_name()).toBe z.string.conversation_list_empty_conversation
+      expect(conversation_et.display_name()).toBe z.string.conversations_empty_conversation
 
     it 'displays a fallback if no user name has been set for a group conversation', ->
       user = new z.entity.User z.util.create_random_uuid()

@@ -82,9 +82,6 @@ z.tracking.EventName =
     IMPORTED_CONTACTS: 'settings.imported_contacts'
     VIEWED_DEVICE: 'settings.viewed_device'
     REMOVED_DEVICE: 'settings.removed_device'
-  SETTINGS_MENU:
-    SHOW_ABOUT_SCREEN: 'about'
-    SHOW_SUPPORT_PAGE: 'help'
   SOUND_SETTINGS_CHANGED: 'soundIntensityPreference'
   TELEMETRY:
     APP_INITIALIZATION: 'telemetry.app_initialization'

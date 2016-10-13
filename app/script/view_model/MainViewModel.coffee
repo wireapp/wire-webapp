@@ -25,7 +25,7 @@ class z.ViewModel.MainViewModel
 
     @user = @user_repository.self
 
-    @main_classes = ko.computed =>
+    @main_classes = ko.pureComputed =>
       if @user()?
         main_css_classes = "main-accent-color-#{@user().accent_id()}"  # deprecated - still used on input control hover
         main_css_classes += " #{@user().accent_theme()}"

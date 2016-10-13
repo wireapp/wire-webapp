@@ -41,7 +41,7 @@ class z.user.UserRepository
     @connections = ko.observableArray []
     @properties = new z.user.UserProperties()
 
-    @connect_requests = ko.computed =>
+    @connect_requests = ko.pureComputed =>
       user_ets = []
       for user_et in @users()
         user_ets.push user_et if user_et.connection().status() is z.user.ConnectionStatus.PENDING
@@ -608,6 +608,7 @@ class z.user.UserRepository
   properties_updated: (properties) ->
     if properties.enable_debugging
       amplify.publish z.util.Logger::LOG_ON_DEBUG, properties.enable_debugging
+    return true
 
   ###
   Save the user properties.

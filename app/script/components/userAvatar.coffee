@@ -85,7 +85,7 @@ ko.components.register 'user-avatar',
   template: """
             <div class="user-avatar" data-bind="css: css_classes(), click: on_click">
               <div class="user-avatar-background"></div>
-              <div class="user-avatar-initals" data-bind="text: initials"></div>
+              <div class="user-avatar-initials" data-bind="text: initials"></div>
               <div class="user-avatar-image"></div>
               <div class="user-avatar-badge"></div>
               <div class="user-avatar-border"></div>

@@ -1,0 +1,74 @@
+<div id="participants-bubble" class="bubble">
+  <div id="participants" class="participants" data-bind="with: $root.participants, css: {'show-user': $root.participants.user_profile().id !== ''}">
+
+    <!-- ko if: state() == 'participants' -->
+      <div class="participants-transition">
+
+        <div class="participants-group">
+          <div class="participants-group-header">
+            <div class="name popover-title">
+              <div data-bind="visible: !editing(), text: conversation().display_name(), click: edit, l10n_tooltip: z.string.tooltip_people_rename" data-uie-name="status-name"></div>
+              <textarea data-bind="visible: editing, value: conversation().display_name(), enter: rename_conversation, hasFocus: editing, resize" data-uie-name="enter-name" maxlength="64"></textarea>
+            </div>
+            <span class="edit icon-edit" data-bind="visible: !editing(), click: edit"></span>
+            <div class="people popover-meta" data-bind="l10n_text: {'id': z.string.people_people, 'replace': {'placeholder': '%no', 'content': participants().length}}"></div>
+          </div>
+          <div class="participants-group-list">
+            <!-- ko if: render_participants -->
+              <user-list params="user: participants_unverified, click: show_participant, mode: z.components.UserListMode.COMPACT"></user-list>
+              <!-- ko if: participants_verified().length -->
+                <div class="participants-group-list-separator">
+                  <svg width="16" height="16">
+                    <use xlink:href="#icon-verified"></use>
+                  </svg>
+                  <span class="label-xs" data-bind="l10n_text: z.string.people_tabs_device_detail_verified"></span>
+                  <hr>
+                </div>
+                <user-list params="user: participants_verified, click: show_participant, mode: z.components.UserListMode.COMPACT"></user-list>
+              <!-- /ko -->
+            <!-- /ko -->
+          </div>
+          <div class="participants-group-footer">
+            <!-- ko if: conversation().removed_from_conversation() == false -->
+              <div class="button-icon pull-left" data-bind="click: add_people, attr:{'title': add_people_tooltip}" data-uie-name="do-add-people">
+                <div class="button-icon icon-people-add"></div>
+                <label data-bind="l10n_text: z.string.people_button_add"></label>
+              </div>
+              <div class="button-icon icon-minus pull-right" data-bind="click: leave_conversation, l10n_tooltip: z.string.tooltip_people_leave" data-uie-name="do-leave"></div>
+            <!-- /ko -->
+          </div>
+        </div>
+
+        <user-profile class="group-user-profile" params="
+          conversation: conversation,
+          mode: z.components.UserProfileMode.PEOPLE,
+          user: user_profile,
+          add_people: add_people,
+          block: block,
+          close: close,
+          connect: connect,
+          pending: pending,
+          leave: leave_conversation,
+          profile: show_preferences_account,
+          remove: remove,
+          unblock: unblock
+        "></user-profile>
+
+      </div>
+    <!-- /ko -->
+
+    <!-- ko if: state() == 'search' -->
+      <div class="participants-search">
+        <div class="participants-search-header">
+          <user-input class="user-list-light" params="input: user_input, selected: user_selected, placeholder: z.string.people_search_placeholder, close: on_search_close"></user-input>
+          <button class="search-button-open button button-medium button-full" data-bind="enable: user_selected().length > 0, click: on_search_add, l10n_text: z.string.people_confirm_label" data-uie-name="do-create"></button>
+        </div >
+        <div class="participants-search-list-wrapper">
+          <div class="participants-search-list" data-bind="antiscroll: user_selected">
+            <user-list params="user: connected_users, filter: user_input, selected: user_selected"></user-list>
+          </div>
+        </div>
+      </div>
+    <!-- /ko -->
+  </div>
+</div>

@@ -679,10 +679,11 @@ class z.conversation.ConversationRepository
     if not tag
       tag = z.localization.Localizer.get_text z.string.extensions_giphy_random
 
-    message = z.localization.Localizer.get_text {
+    message = z.localization.Localizer.get_text
       id: z.string.extensions_giphy_message
-      replace: {placeholder: '%tag', content: tag}
-    }
+      replace:
+        placeholder: '%tag'
+        content: tag
 
     z.util.load_url_blob url, (blob) =>
       @send_message message, conversation_et
