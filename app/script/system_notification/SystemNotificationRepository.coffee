@@ -181,13 +181,15 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Notification message body
   ###
   _create_body_conversation_rename: (message_et) ->
-    return z.localization.Localizer.get_text {
+    return z.localization.Localizer.get_text
       id: z.string.system_notification_conversation_rename
       replace: [
-        {placeholder: '%s.first_name', content: message_et.user().first_name()}
-        {placeholder: '%name', content: message_et.name}
+        placeholder: '%s.first_name'
+        content: message_et.user().first_name()
+      ,
+        placeholder: '%name'
+        content: message_et.name
       ]
-    }
 
   ###
   Creates the notification body for people being added to a group conversation.
@@ -198,23 +200,26 @@ class z.SystemNotification.SystemNotificationRepository
   ###
   _create_body_member_join: (message_et) ->
     if message_et.user_ets().length is 1
-      return z.localization.Localizer.get_text {
+      return z.localization.Localizer.get_text
         id: z.string.system_notification_member_join_one
         replace: [
-          {placeholder: '%s.first_name', content: message_et.user().first_name()}
-          {
-            placeholder: '%@.first_name'
-            content: z.util.get_first_name message_et.user_ets()[0], z.string.Declension.ACCUSATIVE
-          }
+          placeholder: '%s.first_name'
+          content: message_et.user().first_name()
+        ,
+          placeholder: '%@.first_name'
+          content: z.util.get_first_name message_et.user_ets()[0], z.string.Declension.ACCUSATIVE
         ]
-      }
-    return z.localization.Localizer.get_text {
+
+    return z.localization.Localizer.get_text
       id: z.string.system_notification_member_join_many
       replace: [
-        {placeholder: '%s.first_name', content: message_et.user().first_name()}
-        {placeholder: '%no', content: message_et.user_ids().length}
+        placeholder: '%s.first_name'
+        content: message_et.user().first_name()
+      ,
+        placeholder: '%no'
+        content: message_et.user_ids().length
       ]
-    }
+
 
 
   ###
@@ -227,27 +232,31 @@ class z.SystemNotification.SystemNotificationRepository
   _create_body_member_leave: (message_et) ->
     if message_et.user_ets().length is 1
       if message_et.user_ets()[0] is message_et.user()
-        return z.localization.Localizer.get_text {
+        return z.localization.Localizer.get_text
           id: z.string.system_notification_member_leave_left
-          replace: {placeholder: '%s.first_name', content: message_et.user().first_name()}
-        }
-      return z.localization.Localizer.get_text {
+          replace:
+            placeholder: '%s.first_name'
+            content: message_et.user().first_name()
+
+      return z.localization.Localizer.get_text
         id: z.string.system_notification_member_leave_removed_one
         replace: [
-          {placeholder: '%s.first_name', content: message_et.user().first_name()}
-          {
-            placeholder: '%@.first_name'
-            content: z.util.get_first_name message_et.user_ets()[0], z.string.Declension.ACCUSATIVE
-          }
+          placeholder: '%s.first_name'
+          content: message_et.user().first_name()
+        ,
+          placeholder: '%@.first_name'
+          content: z.util.get_first_name message_et.user_ets()[0], z.string.Declension.ACCUSATIVE
         ]
-      }
-    return z.localization.Localizer.get_text {
+
+    return z.localization.Localizer.get_text
       id: z.string.system_notification_member_leave_removed_many
       replace: [
-        {placeholder: '%s.first_name', content: message_et.user().first_name()}
-        {placeholder: '%no', content: message_et.user_ets().length}
+        placeholder: '%s.first_name'
+        content: message_et.user().first_name()
+      ,
+        placeholder: '%no'
+        content: message_et.user_ets().length
       ]
-    }
 
   ###
   Selects the type of system message that the notification body needs to be created for.
@@ -270,10 +279,11 @@ class z.SystemNotification.SystemNotificationRepository
       when z.message.SystemMessageType.CONNECTION_REQUEST
         return z.localization.Localizer.get_text z.string.system_notification_connection_request
       when z.message.SystemMessageType.CONVERSATION_CREATE
-        return z.localization.Localizer.get_text {
+        return z.localization.Localizer.get_text
           id: z.string.system_notification_conversation_create
-          replace: {placeholder: '%s.first_name', content: message_et.user().first_name()}
-        }
+          replace:
+            placeholder: '%s.first_name'
+            content: message_et.user().first_name()
 
   ###
   Creates the notification body for ping.
@@ -291,10 +301,11 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Notification message body
   ###
   _create_body_reaction: (message_et) ->
-    return z.localization.Localizer.get_text {
+    return z.localization.Localizer.get_text
       id: z.string.system_notification_reaction
-      replace: {placeholder: '%reaction', content: message_et.reaction}
-    }
+      replace:
+        placeholder: '%reaction'
+        content: message_et.reaction
 
   ###
   Selects the type of system message that the notification body needs to be created for.
