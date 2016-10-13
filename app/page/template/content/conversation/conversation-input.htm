@@ -19,13 +19,14 @@
                   class="conversation-input-text border-theme"
                   data-bind="event: {'keydown': on_input_key_down},
                              focus_on_keydown: true,
+                             css: {'ephemeral-input': conversation_et().ephemeral_timer()},
                              enter: on_input_enter,
                              hasFocus: blinking_cursor,
                              textInput: input,
                              resize: input,
                              resize_callback: scroll_message_list,
                              click: on_input_click,
-                             l10n_placeholder: z.string.tooltip_conversation_input_placeholder"
+                             attr: {'placeholder': input_tooltip}"
                   data-uie-name="input-message">
         </textarea>
       </div>

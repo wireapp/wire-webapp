@@ -70,7 +70,10 @@ class z.ViewModel.ConversationInputViewModel
         content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.PING
     @picture_tooltip = z.localization.Localizer.get_text z.string.tooltip_conversation_picture
     @file_tooltip = z.localization.Localizer.get_text z.string.tooltip_conversation_file
-
+    @input_tooltip = ko.pureComputed =>
+      if @conversation_et().ephemeral_timer()
+        return z.localization.Localizer.get_text z.string.tooltip_conversation_ephemeral
+      return z.localization.Localizer.get_text z.string.tooltip_conversation_input_placeholder
     @ping_disabled = ko.observable false
 
     $(window)
