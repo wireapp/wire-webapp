@@ -79,38 +79,46 @@ class z.components.UserProfileViewModel
       @is_resetting_session false
 
     @selected_device_subscription = @selected_device.subscribe =>
-      if @selected_device()?
-        @cryptography_repository.get_session @user().id, @selected_device().id
-        .then (cryptobox_session) =>
-          @fingerprint_remote cryptobox_session.fingerprint_remote()
-          @fingerprint_local cryptobox_session.fingerprint_local()
+      return if not @selected_device()
 
-    @add_people_tooltip = z.localization.Localizer.get_text {
+      @fingerprint_local @cryptography_repository.get_local_fingerprint()
+      @cryptography_repository.get_remote_fingerprint @user().id, @selected_device().id
+      .then (fingerprint) =>
+        @fingerprint_remote fingerprint
+
+    @add_people_tooltip = z.localization.Localizer.get_text
       id: z.string.tooltip_people_add
-      replace: {placeholder: '%shortcut', content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.ADD_PEOPLE}
-    }
+      replace:
+        placeholder: '%shortcut'
+        content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.ADD_PEOPLE
 
     @device_headline = ko.pureComputed =>
-      z.localization.Localizer.get_text {
+      z.localization.Localizer.get_text
         id: z.string.people_tabs_devices_headline
-        replace: {placeholder: '%@.name', content: @user().first_name()}
-      }
+        replace:
+          placeholder: '%@.name'
+          content: @user().first_name()
 
     @no_device_headline = ko.pureComputed =>
-      z.localization.Localizer.get_text {
+      z.localization.Localizer.get_text
         id: z.string.people_tabs_no_devices_headline
-        replace: {placeholder: '%@.name', content: @user().first_name()}
-      }
+        replace:
+          placeholder: '%@.name'
+          content: @user().first_name()
 
     @detail_message = ko.pureComputed =>
-      z.localization.Localizer.get_text {
+      z.localization.Localizer.get_text
         id: z.string.people_tabs_device_detail_headline
         replace: [
-          {placeholder: '%bold', content: "<span class='user-profile-device-detail-highlight'>"}
-          {placeholder: '%@.name', content: z.util.escape_html @user().first_name()}
-          {placeholder: '%end', content: '</span>'}
+          placeholder: '%bold'
+          content: "<span class='user-profile-device-detail-highlight'>"
+        ,
+          placeholder: '%@.name'
+          content: z.util.escape_html @user().first_name()
+        ,
+          placeholder: '%end'
+          content: '</span>'
         ]
-      }
 
     @on_cancel_request = =>
       amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT
@@ -157,11 +165,11 @@ class z.components.UserProfileViewModel
       else
         @on_open()
 
-    @accent_color = ko.computed =>
+    @accent_color = ko.pureComputed =>
       return "accent-color-#{@user()?.accent_id()}"
     , @, deferEvaluation: true
 
-    @show_gray_image = ko.computed =>
+    @show_gray_image = ko.pureComputed =>
       return false if not @user()?
       return true if @user().connection().status() isnt z.user.ConnectionStatus.ACCEPTED and not @user().is_me
       return false
@@ -225,7 +233,7 @@ class z.components.UserProfileViewModel
         device: @client_repository.current_client
         fingerprint_local: @fingerprint_local
         click_on_show_my_devices: ->
-          amplify.publish z.event.WebApp.PROFILE.SETTINGS.SHOW
+          amplify.publish z.event.WebApp.PREFERENCES.MANAGE_DEVICES
 
   click_on_reset_session: =>
     reset_progress = =>

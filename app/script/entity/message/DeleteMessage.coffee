@@ -26,7 +26,8 @@ class z.entity.DeleteMessage extends z.entity.Message
     @deleted_timestamp = null
 
     @display_deleted_timestamp = =>
-      return  z.localization.Localizer.get_text {
+      return  z.localization.Localizer.get_text
         id: z.string.conversation_delete_timestamp
-        replace: {placeholder: '%@timestamp', content: moment(@deleted_timestamp).format 'HH:mm'}
-      }
+        replace:
+          placeholder: '%@timestamp'
+          content: moment(@deleted_timestamp).format 'HH:mm'

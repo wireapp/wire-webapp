@@ -36,10 +36,11 @@ class z.entity.ContentMessage extends z.entity.Message
     @reactions_user_ids = ko.pureComputed => (@reactions_user_ets().map (user_et) -> user_et.first_name()).join ', '
 
     @display_edited_timestamp = =>
-      return  z.localization.Localizer.get_text {
+      return  z.localization.Localizer.get_text
         id: z.string.conversation_edit_timestamp
-        replace: {placeholder: '%@timestamp', content: moment(@edited_timestamp).format 'HH:mm'}
-      }
+        replace:
+          placeholder: '%@timestamp'
+          content: moment(@edited_timestamp).format 'HH:mm'
 
     # like
     @is_liked_provisional = ko.observable()
@@ -61,10 +62,11 @@ class z.entity.ContentMessage extends z.entity.Message
       if @reactions_user_ets().length <= 5
         return (@reactions_user_ets().map (user_et) -> user_et.first_name()).join ', '
       else
-        return  z.localization.Localizer.get_text {
+        return  z.localization.Localizer.get_text
           id: z.string.conversation_likes_caption
-          replace: {placeholder: '%@number', content: @reactions_user_ets().length}
-        }
+          replace:
+            placeholder: '%@number'
+            content: @reactions_user_ets().length
 
   ###
   Add another content asset to the message.
