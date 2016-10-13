@@ -522,14 +522,15 @@ z.string.de.system_notification_voice_channel_activate = 'Ruft an'
 z.string.de.system_notification_voice_channel_deactivate = 'Hat versucht anzurufen'
 
 # Tooltips
+z.string.de.tooltip_conversation_all_verified = 'Alle Fingerabdrücke sind überprüft'
 z.string.de.tooltip_conversation_call = 'Anruf'
-z.string.de.tooltip_conversation_video_call = 'Videoanruf'
+z.string.de.tooltip_conversation_ephemeral = 'Selbstzerstörende Nachricht'
 z.string.de.tooltip_conversation_file = 'Datei senden'
+z.string.de.tooltip_conversation_input_placeholder = 'Schreibe eine Nachricht'
 z.string.de.tooltip_conversation_people = 'Unterhaltungsübersicht (%shortcut)'
 z.string.de.tooltip_conversation_picture = 'Bild senden'
 z.string.de.tooltip_conversation_ping = 'Ping (%shortcut)'
-z.string.de.tooltip_conversation_all_verified = 'Alle Fingerabdrücke sind überprüft'
-z.string.de.tooltip_conversation_input_placeholder = 'Schreibe eine Nachricht'
+z.string.de.tooltip_conversation_video_call = 'Videoanruf'
 
 z.string.de.tooltip_conversations_archive = 'Archivieren (%shortcut)'
 z.string.de.tooltip_conversations_archived = 'Archiv anzeigen (%no)'

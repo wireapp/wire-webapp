@@ -522,14 +522,15 @@ z.string.system_notification_voice_channel_activate = 'Calling'
 z.string.system_notification_voice_channel_deactivate = 'Called'
 
 # Tooltips
+z.string.tooltip_conversation_all_verified = 'All fingerprints are verified'
 z.string.tooltip_conversation_call = 'Call'
-z.string.tooltip_conversation_video_call = 'Video Call'
+z.string.tooltip_conversation_ephemeral = 'Timed message'
 z.string.tooltip_conversation_file = 'Add file'
+z.string.tooltip_conversation_input_placeholder = 'Type a message'
 z.string.tooltip_conversation_people = 'People (%shortcut)'
 z.string.tooltip_conversation_picture = 'Add picture'
 z.string.tooltip_conversation_ping = 'Ping (%shortcut)'
-z.string.tooltip_conversation_all_verified = 'All fingerprints are verified'
-z.string.tooltip_conversation_input_placeholder = 'Type a message'
+z.string.tooltip_conversation_video_call = 'Video Call'
 
 z.string.tooltip_conversations_archive = 'Archive (%shortcut)'
 z.string.tooltip_conversations_archived = 'Show archive (%no)'
