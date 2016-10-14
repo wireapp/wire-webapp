@@ -98,6 +98,10 @@
         <location-asset params="asset: asset"></location-asset>
       <!-- /ko -->
 
+      <!-- ko if: message.expire_after_millis() -->
+        <ephemeral-timer class="message-ephemeral-timer"></ephemeral-timer>
+      <!-- /ko -->
+
       <context-menu params="entries: function() {return $parents[1].get_context_menu_entries(message)}, tag: 'message', data: message.id"
                     class="context-menu icon-more font-size-xs"
                     tabindex="-1"></context-menu>
