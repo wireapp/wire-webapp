@@ -29,3 +29,9 @@ describe 'z.util.StringUtil', ->
 
       expect(obfuscated).not.toBe text
       expect(whitespaces.length).toBe 6
+
+    it 'obfuscates a text keeping its length', ->
+      text = 'Bacon ipsum dolor amet sausage landjaeger ball tip brisket filet mignon, t-bone tenderloin tri-tip beef drumstick fatback burgdoggen ground round meatball. Tri-tip spare ribs ground round bresaola ball tip tail, sirloin chicken doner boudin turkey leberkas bacon alcatra. '
+      obfuscated = z.util.StringUtil.obfuscate text
+      expect(obfuscated).not.toBe text
+      expect(obfuscated.length).toBe text.length

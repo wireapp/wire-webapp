@@ -27,6 +27,6 @@ z.util.StringUtil =
       if character.match /[\n\r\s]+/gi
         obfuscated += character
       else
-        obfuscated += alphabet[Math.floor(Math.random() * text.length)]
+        obfuscated += z.util.ArrayUtil.random_element alphabet
 
     return obfuscated

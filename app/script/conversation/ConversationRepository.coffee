@@ -1413,7 +1413,7 @@ class z.conversation.ConversationRepository
       message_et.expire_after_millis true
       @conversation_service.update_message_in_db message_et, expire_after_millis: true
     .then =>
-      @logger.log "Obfuscated text message"
+      @logger.log "Obfuscated ping message"
 
   ###
   Can user upload assets to conversation.
