@@ -1365,17 +1365,14 @@ class z.conversation.ConversationRepository
       throw error
 
   timeout_ephemeral_message: (conversation_et, message_et) =>
-    changes =
-      data:
-        expire_after_millis: true
-
-    @conversation_service.update_message_in_db message_et, changes
-    .then =>
-      @logger.log @logger.levels.INFO, "Ephemeral message with ID '#{message_et.id}' timed out.", message_et
-
-      message_et.expire_after_millis true
-
-      if message_et.user().is_me
+    if message_et.user().is_me
+      # TODO switch obfuscate method
+      changes =
+        data:
+          expire_after_millis: true
+      @conversation_service.update_message_in_db message_et, changes
+      .then =>
+        message_et.expire_after_millis true
         switch message_et.constructor.name
           when 'ContentMessage'
             asset = message_et.assets.pop()
@@ -1389,8 +1386,9 @@ class z.conversation.ConversationRepository
                 message_et.assets.push asset
               else
                 @logger.log @logger.levels.INFO, "Ephemeral asset of type '#{asset.constructor.name}' is unsupported.", asset
-      else
-        @delete_message_everyone conversation_et, message_et
+    else
+      # TODO delete without trace
+      @delete_message_everyone conversation_et, message_et
 
   ###
   Can user upload assets to conversation.
