@@ -26,7 +26,8 @@ class z.cryptography.CryptographyMapper
     @logger = new z.util.Logger 'z.cryptography.CryptographyMapper', z.config.LOGGER.OPTIONS
 
   ###
-  OTR to JSON mapper.
+  Maps a generic message into an event in JSON.
+
   @param generic_message [z.proto.GenericMessage] Received ProtoBuffer message
   @param event [z.event.Backend.CONVERSATION.OTR-ASSET-ADD, z.event.Backend.CONVERSATION.OTR-MESSAGE-ADD] Event
   @return [Object] Promise that resolves with the mapped event
@@ -176,13 +177,12 @@ class z.cryptography.CryptographyMapper
       dcodeIO.Long.fromNumber 5000
       dcodeIO.Long.fromNumber 15000
       dcodeIO.Long.fromNumber 60000
-      dcodeIO.Long.fromNumber 900000
     ]
 
     mapped_millis = z.util.ArrayUtil.find_closest_long ranges, generic_message.ephemeral.expire_after_millis
     generic_message.ephemeral.message_id = generic_message.message_id
     embedded_message = @_map_generic_message generic_message.ephemeral, event
-    embedded_message.data.expire_after_millis = mapped_millis.toString()
+    embedded_message.expire_after_millis = mapped_millis.toString()
 
     return embedded_message
 

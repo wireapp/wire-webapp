@@ -535,20 +535,14 @@ class z.ViewModel.MessageListViewModel
   message_in_viewport: (message_et) ->
     millis = message_et.expire_after_millis()
 
-    if millis instanceof dcodeIO.Long
-      millis_number = window.parseInt(millis.toString(), 10)
-      expiration_long = millis.add dcodeIO.Long.fromNumber Date.now()
-      expiration_number = window.parseInt(expiration_long.toString(), 10)
+    if _.isString millis
+      millis_number = window.parseInt millis, 10
+      expiration_number = Date.now() + millis_number
 
-      message_id = "#{@conversation().id}@#{message_et.from}@#{message_et.timestamp}"
-      changes =
-        data:
-          expire_after_millis: expiration_number
-
-      @conversation_repository.conversation_service.storage_service.update 'conversation_events', message_id, changes
+      @conversation_repository.conversation_service.update_message_in_db message_et, expire_after_millis: expiration_number
       .then =>
-        @logger.log @logger.levels.INFO, "Updated message '#{message_id}'.", changes
-        @start_ephemeral_timer message_id, message_et, millis_number
+        @logger.log @logger.levels.INFO, "Updated message record '#{message_et.primary_key}'."
+        @start_ephemeral_timer message_et.primary_key, message_et, millis_number
 
   start_ephemeral_timer: (message_id, message_et, expiration_number) ->
     if not @ephemeral_timers[message_id]

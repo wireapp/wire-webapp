@@ -1367,25 +1367,21 @@ class z.conversation.ConversationRepository
   timeout_ephemeral_message: (conversation_et, message_et) =>
     if message_et.user().is_me
       # TODO switch obfuscate method
-      changes =
-        data:
-          expire_after_millis: true
-      @conversation_service.update_message_in_db message_et, changes
-      .then =>
-        message_et.expire_after_millis true
-        switch message_et.constructor.name
-          when 'ContentMessage'
-            asset = message_et.assets.pop()
-
-            switch asset.constructor.name
-              when 'Text'
-                obfuscated = new z.entity.Text asset.id
-                obfuscated.text = z.util.StringUtil.obfuscate asset.text
-                message_et.assets.push obfuscated
-              when 'MediumImage'
-                message_et.assets.push asset
-              else
-                @logger.log @logger.levels.INFO, "Ephemeral asset of type '#{asset.constructor.name}' is unsupported.", asset
+      switch
+        when message_et.has_asset_text()
+          @_obfuscate_text_message conversation_et, message_et.id
+        else
+          @conversation_service.update_message_in_db message_et, expire_after_millis: true
+          .then =>
+            message_et.expire_after_millis true
+            switch message_et.constructor.name
+              when 'ContentMessage'
+                asset = message_et.assets.pop()
+                switch asset.constructor.name
+                  when 'MediumImage'
+                    message_et.assets.push asset
+                  else
+                    @logger.log @logger.levels.INFO, "Ephemeral asset of type '#{asset.constructor.name}' is unsupported.", asset
     else
       # TODO delete without trace
       @delete_message_everyone conversation_et, message_et
@@ -1474,8 +1470,6 @@ class z.conversation.ConversationRepository
           @_on_confirmation conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_DELETE
           @_on_message_deleted conversation_et, event
-        when z.event.Client.CONVERSATION.MESSAGE_EPHEMERAL
-          @_on_message_ephemeral conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_HIDDEN
           @_on_message_hidden event
         when z.event.Client.CONVERSATION.REACTION
@@ -1677,10 +1671,6 @@ class z.conversation.ConversationRepository
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
         throw error
-
-  _on_message_ephemeral: (conversation_et, event_json) ->
-    Promise.resolve()
-    .then -> return event_json
 
   ###
   A hide message received in a conversation.

@@ -29,7 +29,6 @@ z.event.Client =
     DELETE_EVERYWHERE: 'conversation.delete-everywhere'
     LOCATION: 'conversation.location'
     MESSAGE_DELETE: 'conversation.message-delete'
-    MESSAGE_EPHEMERAL: 'conversation.message-ephemeral'
     MESSAGE_HIDDEN: 'conversation.message-hidden'
     REACTION: 'conversation.reaction'
     UNABLE_TO_DECRYPT: 'conversation.unable-to-decrypt'
