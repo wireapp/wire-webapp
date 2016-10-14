@@ -1,6 +1,7 @@
 <div class="ephemeral-menu bubble" data-bind="with: $root.conversation_input">
   <ul class="bubble-menu">
-    <li data-bind="click: function() {set_ephemeral_timer(0)}">None</li>
+    <li data-bind="click: function() {set_ephemeral_timer(0)}">None</li> <!-- TODO remove -->
+    <li data-bind="click: function() {set_ephemeral_timer(1000)}">1 second</li>
     <li data-bind="click: function() {set_ephemeral_timer(5000)}">5 seconds</li>
     <li data-bind="click: function() {set_ephemeral_timer(15000)}">15 seconds</li>
     <li data-bind="click: function() {set_ephemeral_timer(60000)}">1 minute</li>
