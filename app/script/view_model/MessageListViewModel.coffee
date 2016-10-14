@@ -359,17 +359,15 @@ class z.ViewModel.MessageListViewModel
   @return [String] CSS class that is applied to the element
   ###
   get_css_class: (message) ->
-    suffix = ' message-ephemeral' if message.expire_after_millis()
-
     switch message.super_type
       when z.message.SuperType.CALL
         return 'message-system message-call'
       when z.message.SuperType.CONTENT
-        return 'message-normal' + suffix
+        return 'message-normal'
       when z.message.SuperType.MEMBER
         return 'message message-system message-member'
       when z.message.SuperType.PING
-        return 'message-ping' + suffix
+        return 'message-ping'
       when z.message.SuperType.SYSTEM
         if message.system_message_type is z.message.SystemMessageType.CONVERSATION_RENAME
           return 'message-system message-rename'
