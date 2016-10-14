@@ -198,24 +198,29 @@ class z.search.SearchRepository
             user_et.mutual_friend_ets mutual_friend_ets
 
             if user_et.mutual_friend_ets().length is 1
-              user_et.relation_info = z.localization.Localizer.get_text {
+              user_et.relation_info = z.localization.Localizer.get_text
                 id: z.string.search_suggestion_one
-                replace: {placeholder: '%@.first_name', content: user_et.mutual_friend_ets()[0].first_name()}
-              }
+                replace:
+                  placeholder: '%@.first_name'
+                  content: user_et.mutual_friend_ets()[0].first_name()
             else if user_et.mutual_friend_ets().length is 2
-              user_et.relation_info = z.localization.Localizer.get_text {
+              user_et.relation_info = z.localization.Localizer.get_text
                 id: z.string.search_suggestion_two
                 replace: [
-                  {placeholder: '%@.first_name', content: user_et.mutual_friend_ets()[0].first_name()}
-                  {placeholder: '%@.other_name', content: user_et.mutual_friend_ets()[1].first_name()}
+                  placeholder: '%@.first_name'
+                  content: user_et.mutual_friend_ets()[0].first_name()
+                ,
+                  placeholder: '%@.other_name'
+                  content: user_et.mutual_friend_ets()[1].first_name()
                 ]
-              }
             else if user_et.mutual_friend_ets().length > 2
-              user_et.relation_info = z.localization.Localizer.get_text {
+              user_et.relation_info = z.localization.Localizer.get_text
                 id: z.string.search_suggestion_many
                 replace: [
-                  {placeholder: '%@.first_name', content: user_et.mutual_friend_ets()[0].first_name()}
-                  {placeholder: '%no', content: user_et.mutual_friends_total() - 1}
+                  placeholder: '%@.first_name'
+                  content: user_et.mutual_friend_ets()[0].first_name()
+                ,
+                  placeholder: '%no'
+                  content: user_et.mutual_friends_total() - 1
                 ]
-              }
         resolve user_ets

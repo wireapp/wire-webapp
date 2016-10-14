@@ -85,6 +85,21 @@ class z.cryptography.CryptographyRepository
         reject error
 
   ###
+  Get the fingerprint of the local identity.
+  @return [String] Fingerprint of local identity public key
+  ###
+  get_local_fingerprint: =>
+    return @storage_repository.identity.public_key.fingerprint()
+
+  ###
+  Get the fingerprint of a remote identity.
+  @param user_id [String] ID of user
+  @param device_id [String] ID of device
+  ###
+  get_remote_fingerprint: (user_id, device_id) =>
+    return @get_session(user_id, device_id).then (cryptobox_session) -> cryptobox_session.fingerprint_remote()
+
+  ###
   Get a pre-key for a user client.
 
   @param user_id [String] ID of user
@@ -95,7 +110,7 @@ class z.cryptography.CryptographyRepository
     @cryptography_service.get_user_pre_key user_id, client_id
     .then (response) ->
       return response.prekey
-    .catch (error) ->
+    .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         throw new z.user.UserError z.user.UserError::TYPE.PRE_KEY_NOT_FOUND
       else
@@ -111,7 +126,7 @@ class z.cryptography.CryptographyRepository
     @cryptography_service.get_users_pre_keys user_client_map
     .then (response) ->
       return response
-    .catch (error) ->
+    .catch (error) =>
       @logger.log @logger.levels.ERROR, "Failed to get pre-key from backend: #{error.message}"
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 

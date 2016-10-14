@@ -37,25 +37,23 @@ class z.entity.NewDeviceMessage extends z.entity.Message
     # You unverified one of John's devices -> profile
     # You unverified one of your devices -> settings
 
-    @caption = ko.computed =>
+    @caption = ko.pureComputed =>
       return z.localization.Localizer.get_text z.string.conversation_device_unverified if @unverified()
       return z.localization.Localizer.get_text z.string.conversation_device_started_using_you if @device_owner().is_me
       return z.localization.Localizer.get_text z.string.conversation_device_started_using
 
-    @caption_device = ko.computed =>
+    @caption_device = ko.pureComputed =>
       if @unverified()
         return z.localization.Localizer.get_text z.string.conversation_device_your_devices if @device_owner().is_me
-        return  z.localization.Localizer.get_text {
+        return  z.localization.Localizer.get_text
           id: z.string.conversation_device_user_devices
-          replace: {placeholder: '%@name', content: @device_owner().first_name()}
-        }
-      else
-        # TODO current device
-        return z.localization.Localizer.get_text z.string.conversation_device_a_new_device
+          replace:
+            placeholder: '%@name'
+            content: @device_owner().first_name()
+      return z.localization.Localizer.get_text z.string.conversation_device_a_new_device
 
   click_on_device: =>
-    # TODO device
     if @device_owner()?.is_me
-      amplify.publish z.event.WebApp.PROFILE.SETTINGS.SHOW
+      amplify.publish z.event.WebApp.PREFERENCES.MANAGE_DEVICES, @device()
     else
       amplify.subscribe z.event.WebApp.SHORTCUT.PEOPLE

@@ -56,10 +56,11 @@ class z.entity.MemberMessage extends z.entity.SystemMessage
       return z.localization.Localizer.get_text identifier
 
     @_get_caption_with_names = (key, declension) =>
-      return z.localization.Localizer.get_text {
+      return z.localization.Localizer.get_text
         id: key
-        replace: {placeholder: '%@names', content: @_generate_name_string declension}
-      }
+        replace:
+          placeholder: '%@names'
+          content: @_generate_name_string declension
 
     @show_large_avatar = =>
       large_avatar_types = [
@@ -68,10 +69,10 @@ class z.entity.MemberMessage extends z.entity.SystemMessage
       ]
       return @member_message_type in large_avatar_types
 
-    @other_user = ko.computed =>
+    @other_user = ko.pureComputed =>
       if @user_ets().length is 1 then @user_ets()[0] else new z.entity.User()
 
-    @caption = ko.computed =>
+    @caption = ko.pureComputed =>
       return '' if @user_ets().length is 0
 
       switch @member_message_type

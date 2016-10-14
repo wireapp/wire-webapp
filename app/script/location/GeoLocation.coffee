@@ -43,24 +43,23 @@ z.location = do ->
 
   ###
   Reverse loop up for geo location
-
-  @param lat [Number] latitude
-  @param lng [Number] longitude
-  @param callback [Function] Function to be called on return
+  @param latitude [Number] latitude
+  @param longitude [Number] longitude
   ###
-  get_location = (lat, lng, callback) ->
-    if not lat? or not lng?
-      callback? 'You need to specify latitude and longitude in order to get the location'
+  get_location = (latitude, longitude) ->
+    return new Promise (resolve, reject) ->
+      if not latitude? or not longitude?
+        reject new Error 'You need to specify latitude and longitude in order to retrieve the location'
 
-    $.ajax
-      url: "#{GOOGLE_GEOCODING_BASE_URL}?latlng=#{lat},#{lng}&key=#{API_KEY}"
-    .done (response) ->
-      if response.status is 'OK'
-        callback? null, _parse_results response.results
-      else
-        callback? response.status
-    .fail (jqXHR, textStatus, errorThrown) ->
-      callback? errorThrown
+      $.ajax
+        url: "#{GOOGLE_GEOCODING_BASE_URL}?latlng=#{latitude},#{longitude}&key=#{API_KEY}"
+      .done (response) ->
+        if response.status is 'OK'
+          resolve _parse_results response.results
+        else
+          reject response.status
+      .fail (jqXHR, textStatus, errorThrown) ->
+        reject new Error errorThrown
 
   ###
   Return link to google maps
