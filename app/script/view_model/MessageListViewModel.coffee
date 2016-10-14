@@ -555,33 +555,5 @@ class z.ViewModel.MessageListViewModel
   start_ephemeral_timer: (message_id, message_et, expiration_number) ->
     if not @ephemeral_timers[message_id]
       @ephemeral_timers[message_id] = window.setTimeout (=>
-        @timeout_ephemeral_message message_id, message_et, @conversation()
+        @conversation_repository.timeout_ephemeral_message @conversation(), message_et
       ), expiration_number
-
-  timeout_ephemeral_message: (message_id, message_et, conversation_et) =>
-    changes =
-      data:
-        expire_after_millis: true
-
-    @conversation_repository.conversation_service.storage_service.update 'conversation_events', message_id, changes
-    .then =>
-      @logger.log @logger.levels.INFO, "Ephemeral message with ID '#{message_id}' timed out.", message_et
-
-      message_et.expire_after_millis true
-
-      if message_et.user().is_me
-        switch message_et.constructor.name
-          when 'ContentMessage'
-            asset = message_et.assets.pop()
-
-            switch asset.constructor.name
-              when 'Text'
-                obfuscated = new z.entity.Text asset.id
-                obfuscated.text = z.util.StringUtil.obfuscate asset.text
-                message_et.assets.push obfuscated
-              when 'MediumImage'
-                message_et.assets.push asset
-              else
-                @logger.log @logger.levels.INFO, "Ephemeral asset of type '#{asset.constructor.name}' is unsupported.", asset
-      else
-        @conversation_repository.delete_message_everyone conversation_et, message_et

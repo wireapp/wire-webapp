@@ -1364,6 +1364,34 @@ class z.conversation.ConversationRepository
       @logger.log "Failed to send delete message with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
       throw error
 
+  timeout_ephemeral_message: (conversation_et, message_et) =>
+    changes =
+      data:
+        expire_after_millis: true
+
+    @conversation_service.update_message_in_db message_et, changes
+    .then =>
+      @logger.log @logger.levels.INFO, "Ephemeral message with ID '#{message_et.id}' timed out.", message_et
+
+      message_et.expire_after_millis true
+
+      if message_et.user().is_me
+        switch message_et.constructor.name
+          when 'ContentMessage'
+            asset = message_et.assets.pop()
+
+            switch asset.constructor.name
+              when 'Text'
+                obfuscated = new z.entity.Text asset.id
+                obfuscated.text = z.util.StringUtil.obfuscate asset.text
+                message_et.assets.push obfuscated
+              when 'MediumImage'
+                message_et.assets.push asset
+              else
+                @logger.log @logger.levels.INFO, "Ephemeral asset of type '#{asset.constructor.name}' is unsupported.", asset
+      else
+        @delete_message_everyone conversation_et, message_et
+
   ###
   Can user upload assets to conversation.
 

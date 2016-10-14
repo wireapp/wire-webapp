@@ -47,7 +47,6 @@ class z.entity.Message
           return z.message.EphemeralStatusType.TIMED_OUT
       else
         return z.message.EphemeralStatusType.NONE
-    , @, deferEvaluation: true
 
     @from = ''
     @is_editing = ko.observable false
