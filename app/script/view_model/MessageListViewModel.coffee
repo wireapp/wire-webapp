@@ -535,17 +535,17 @@ class z.ViewModel.MessageListViewModel
   message_in_viewport: (message_et) ->
     millis = message_et.expire_after_millis()
 
-    if _.isString millis
-      millis_number = window.parseInt millis, 10
-      expiration_number = Date.now() + millis_number
-
-      @conversation_repository.conversation_service.update_message_in_db message_et, expire_after_millis: expiration_number
+    if _.isNumber millis
+      expiration_date = Date.now() + millis
+      changes =
+        expire_after_millis: new Date(expiration_date).toISOString()
+      @conversation_repository.conversation_service.update_message_in_db message_et, changes
       .then =>
-        @logger.log @logger.levels.INFO, "Updated message record '#{message_et.primary_key}'."
-        @start_ephemeral_timer message_et.primary_key, message_et, millis_number
+        @logger.log @logger.levels.INFO, "Updated ephemeral message record '#{message_et.primary_key}' with '#{JSON.stringify(changes)}'."
+        @start_ephemeral_timer message_et.primary_key, message_et, millis
 
-  start_ephemeral_timer: (message_id, message_et, expiration_number) ->
+  start_ephemeral_timer: (message_id, message_et, millis_number) ->
     if not @ephemeral_timers[message_id]
       @ephemeral_timers[message_id] = window.setTimeout (=>
         @conversation_repository.timeout_ephemeral_message @conversation(), message_et
-      ), expiration_number
+      ), millis_number

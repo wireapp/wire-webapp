@@ -32,10 +32,10 @@ z.util.ArrayUtil.random_element = (array) ->
 z.util.ArrayUtil.contains = (array, value) ->
   return array.indexOf(value) > -1
 
-z.util.ArrayUtil.find_closest_long = (array, value) ->
+z.util.ArrayUtil.find_closest = (array, value) ->
   closest = array[0]
   array.forEach (current) ->
-    closest = current if value.gte(current)
+    closest = current if value >= current
   return closest
 
 ###

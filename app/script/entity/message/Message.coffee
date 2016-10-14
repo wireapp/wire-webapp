@@ -38,13 +38,14 @@ class z.entity.Message
         return z.message.EphemeralStatusType.TIMED_OUT
 
       if _.isString expiration
-        return z.message.EphemeralStatusType.INACTIVE
-      else if _.isNumber expiration
-        difference = expiration - Date.now()
-        if difference > 0
+        expiration_timestamp = new Date(expiration).getTime()
+        expires_in = expiration_timestamp - Date.now()
+        if expires_in > 0
           return z.message.EphemeralStatusType.ACTIVE
         else
           return z.message.EphemeralStatusType.TIMED_OUT
+      else if _.isNumber expiration
+        return z.message.EphemeralStatusType.INACTIVE
       else
         return z.message.EphemeralStatusType.NONE
 

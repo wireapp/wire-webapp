@@ -131,7 +131,7 @@ class z.ViewModel.ConversationInputViewModel
       @conversation_et().ephemeral_timer false
       @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' turned off."
     else
-      @conversation_et().ephemeral_timer dcodeIO.Long.fromNumber millis
+      @conversation_et().ephemeral_timer millis
       @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer().toString()}'."
     @ephemeral_menu.toggle()
 
