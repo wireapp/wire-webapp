@@ -1405,7 +1405,7 @@ class z.conversation.ConversationRepository
           content: obfuscated.text
           nonce: obfuscated.id
     .then =>
-      @logger.log "Obfuscated text message"
+      @logger.log 'Obfuscated text message'
 
   _obfuscate_ping_message: (conversation_et, message_id) =>
     @get_message_in_conversation_by_id conversation_et, message_id
@@ -1413,7 +1413,7 @@ class z.conversation.ConversationRepository
       message_et.expire_after_millis true
       @conversation_service.update_message_in_db message_et, expire_after_millis: true
     .then =>
-      @logger.log "Obfuscated ping message"
+      @logger.log 'Obfuscated ping message'
 
   ###
   Can user upload assets to conversation.
