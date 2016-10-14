@@ -1370,6 +1370,8 @@ class z.conversation.ConversationRepository
       switch
         when message_et.has_asset_text()
           @_obfuscate_text_message conversation_et, message_et.id
+        when message_et.is_ping()
+          @_obfuscate_ping_message conversation_et, message_et.id
         else
           @conversation_service.update_message_in_db message_et, expire_after_millis: true
           .then =>
@@ -1402,6 +1404,14 @@ class z.conversation.ConversationRepository
         data:
           content: obfuscated.text
           nonce: obfuscated.id
+    .then =>
+      @logger.log "Obfuscated text message"
+
+  _obfuscate_ping_message: (conversation_et, message_id) =>
+    @get_message_in_conversation_by_id conversation_et, message_id
+    .then (message_et) =>
+      message_et.expire_after_millis true
+      @conversation_service.update_message_in_db message_et, expire_after_millis: true
     .then =>
       @logger.log "Obfuscated text message"
 

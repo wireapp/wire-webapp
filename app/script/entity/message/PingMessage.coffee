@@ -33,4 +33,4 @@ class z.entity.PingMessage extends z.entity.Message
       return 'ping-animation ping-animation-soft' if Date.now() - @timestamp < 2000
 
     @ping_color = ko.pureComputed =>
-      return if @is_expired() then 'text-ephemeral' else @accent_color()
+      return if @is_expired() then 'ephemeral-message-obfuscated' else @accent_color()
