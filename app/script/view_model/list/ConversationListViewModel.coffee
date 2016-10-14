@@ -172,5 +172,5 @@ class z.ViewModel.list.ConversationListViewModel
   click_on_preferences_button: =>
     @list_view_model.switch_list z.ViewModel.list.LIST_STATE.PREFERENCES
 
-  click_on_people_button: ->
+  click_on_people_button: =>
     @list_view_model.switch_list z.ViewModel.list.LIST_STATE.START_UI
