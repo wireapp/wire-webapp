@@ -114,6 +114,9 @@ class z.main.App
 
     view.loading                   = new z.ViewModel.LoadingViewModel 'loading-screen', @repository.user
 
+    # backwards compatibility
+    view.conversation_list = view.list.conversations
+
     return view
 
   _setup_utils: ->
