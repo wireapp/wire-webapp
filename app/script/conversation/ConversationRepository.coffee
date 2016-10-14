@@ -1390,6 +1390,25 @@ class z.conversation.ConversationRepository
       # TODO delete without trace
       @delete_message_everyone conversation_et, message_et
 
+  _obfuscate_text_message: (conversation_et, message_id) =>
+    @get_message_in_conversation_by_id conversation_et, message_id
+    .then (message_et) =>
+      asset = message_et.get_first_asset()
+      obfuscated = new z.entity.Text asset.id
+      obfuscated.text = z.util.StringUtil.obfuscate asset.text
+      message_et.assets [obfuscated]
+      message_et.expire_after_millis true
+
+      # TODO link preview
+
+      @conversation_service.update_message_in_db message_et,
+        expire_after_millis: true
+        data:
+          content: obfuscated.text
+          nonce: obfuscated.id
+    .then =>
+      @logger.log "Obfuscated text message"
+
   ###
   Can user upload assets to conversation.
 
