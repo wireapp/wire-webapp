@@ -1392,7 +1392,7 @@ class z.conversation.ConversationRepository
     @get_message_in_conversation_by_id conversation_et, message_id
     .then (message_et) =>
       asset = message_et.get_first_asset()
-      obfuscated = new z.entity.Text asset.id
+      obfuscated = new z.entity.Text message_et.id
       obfuscated.text = z.util.StringUtil.obfuscate asset.text
       message_et.assets [obfuscated]
       message_et.expire_after_millis true
