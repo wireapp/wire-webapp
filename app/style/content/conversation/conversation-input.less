@@ -64,11 +64,9 @@
 }
 
 .controls-left {
+  .flex-center;
   width: @conversation-message-sender-width;
   height: @conversation-input-min-height;
-  align-items: center;
-  display: flex;
-  justify-content: center;
 }
 
 .controls-center {
@@ -93,11 +91,9 @@
 }
 
 .controls-right-button-ephemeral-timer {
-  .flex-center;
-  .circle(32px);
+  .button-round;
   border: 1px solid currentColor;
   color: @ephemeral-color;
-  cursor: pointer;
   font-size: @font-size-xs;
   font-weight: bold;
 }
