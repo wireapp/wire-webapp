@@ -544,10 +544,10 @@ class z.ViewModel.MessageListViewModel
       @conversation_repository.conversation_service.update_message_in_db message_et, changes
       .then =>
         @logger.log @logger.levels.INFO, "Updated ephemeral message record '#{message_et.primary_key}' with '#{JSON.stringify(changes)}'."
-        @start_ephemeral_timer message_et.primary_key, message_et, millis
+        @start_ephemeral_timer message_et, millis
 
-  start_ephemeral_timer: (message_id, message_et, millis_number) ->
-    if not @ephemeral_timers[message_id]
-      @ephemeral_timers[message_id] = window.setTimeout (=>
+  start_ephemeral_timer: (message_et, millis_number) ->
+    if not @ephemeral_timers[message_et.id]
+      @ephemeral_timers[message_et.id] = window.setTimeout (=>
         @conversation_repository.timeout_ephemeral_message @conversation(), message_et
       ), millis_number
