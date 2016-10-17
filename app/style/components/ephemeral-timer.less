@@ -27,16 +27,13 @@
 }
 
 .ephemeral-timer-bullet:before {
+  .circle(3px);
   display: block;
   content: "";
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background-color: #ff5000;
+  background-color: @ephemeral-color;
 }
 
 .ephemeral-timer-bullet-inactive:before {
-  background-color: #ff5000;
   opacity: 0.24;
 }
 
