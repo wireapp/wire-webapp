@@ -1420,11 +1420,13 @@ class z.conversation.ConversationRepository
   _obfuscate_asset_message: (conversation_et, message_id) =>
     @get_message_in_conversation_by_id conversation_et, message_id
     .then (message_et) =>
+      asset = message_et.get_first_asset()
       message_et.expire_after_millis true
       @conversation_service.update_message_in_db message_et,
         data:
+          content_type: asset.file_type
           info:
-            nonce: z.util.create_random_uuid()
+            nonce: message_et.nonce
           meta: {}
         expire_after_millis: true
     .then =>

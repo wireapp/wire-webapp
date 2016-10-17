@@ -96,7 +96,7 @@ ko.components.register 'video-asset',
     return new z.components.VideoAssetComponent params, component_info
   template: """
             <!-- ko if: asset.expired() -->
-              <div class="video-asset-container bg-color-ephemeral"></div>
+              <div class="video-asset-container"></div>
             <!-- /ko -->
             <!-- ko ifnot: asset.expired() -->
               <div class="video-asset-container" data-uie-name="video-asset" data-bind="hide_controls: 2000, attr: {'data-uie-value': asset.file_name}">
