@@ -37,7 +37,7 @@ class z.ViewModel.ConversationTitlebarViewModel
       return false if not @conversation_et() or not @joined_call()
       return @conversation_et().id is @joined_call().id
 
-    @has_ongoing_call = ko.pureComputed =>
+    @has_ongoing_call = ko.computed =>
       return false if not @joined_call()
       return @has_call() and @joined_call().state() is z.calling.enum.CallState.ONGOING
 
@@ -47,7 +47,7 @@ class z.ViewModel.ConversationTitlebarViewModel
       has_remote_video = (@joined_call().is_remote_screen_shared() or @joined_call().is_remote_videod()) and @call_center.media_stream_handler.remote_media_streams.video()
       return @has_ongoing_call() and @multitasking.is_minimized() and has_local_video and not has_remote_video
 
-    @show_call_controls = ko.pureComputed =>
+    @show_call_controls = ko.computed =>
       return false if not @conversation_et()
       is_supported_conversation = @conversation_et().is_group() or @conversation_et().is_one2one()
       is_active_conversation = @conversation_et().participating_user_ids().length and not @conversation_et().removed_from_conversation()
