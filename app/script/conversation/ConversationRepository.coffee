@@ -49,7 +49,11 @@ class z.conversation.ConversationRepository
 
     @filtered_conversations = ko.pureComputed =>
       @conversations().filter (conversation_et) ->
-        states_to_filter = [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.CANCELLED, z.user.ConnectionStatus.PENDING]
+        states_to_filter = [
+          z.user.ConnectionStatus.BLOCKED
+          z.user.ConnectionStatus.CANCELLED
+          z.user.ConnectionStatus.PENDING
+        ]
         return false if conversation_et.connection().status() in states_to_filter
         return false if conversation_et.is_self()
         return false if conversation_et.is_cleared() and conversation_et.removed_from_conversation()
@@ -789,13 +793,24 @@ class z.conversation.ConversationRepository
       asset_et.uploaded_on_this_client true
       return @asset_service.create_asset_proto file
     .then ([asset, ciphertext]) =>
-      generic_message = new z.proto.GenericMessage nonce
-      generic_message.set 'asset', asset
+      generic_message = undefined
+
+      if conversation_et.ephemeral_timer()
+        generic_message = @_wrap_in_ephemeral_message asset, conversation_et.ephemeral_timer()
+      else
+        generic_message = new z.proto.GenericMessage nonce
+        generic_message.set 'asset', asset
       @_send_encrypted_asset conversation_et.id, generic_message, ciphertext, nonce
     .then ([response, asset_id]) =>
       event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
-      event.data.otr_key = generic_message.asset.uploaded.otr_key
-      event.data.sha256 = generic_message.asset.uploaded.sha256
+
+      if conversation_et.ephemeral_timer()
+        asset = generic_message.ephemeral.asset
+      else
+        asset = generic_message.asset
+
+      event.data.otr_key = asset.uploaded.otr_key
+      event.data.sha256 = asset.uploaded.sha256
       event.data.id = asset_id
       event.id = nonce
       return @_on_asset_upload_complete conversation_et, event
@@ -1162,7 +1177,8 @@ class z.conversation.ConversationRepository
     z.assets.AssetCrypto.encrypt_aes_asset generic_message.toArrayBuffer()
     .then (data) =>
       [key_bytes, sha256, ciphertext] = data
-      return @_create_user_client_map conversation_id
+      skip_other_own_clients = generic_message.content is 'ephemeral'
+      return @_create_user_client_map conversation_id, skip_other_own_clients
     .then (user_client_map) =>
       if user_ids
         delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
@@ -1172,7 +1188,8 @@ class z.conversation.ConversationRepository
     .then (payload) =>
       payload.data = z.util.array_to_base64 ciphertext
       payload.native_push = native_push
-      @_send_encrypted_message conversation_id, generic_message, payload, user_ids
+      if skip_other_own_clients then pre_condition = true else pre_condition = user_ids
+      @_send_encrypted_message conversation_id, generic_message, payload, pre_condition
     .catch (error) =>
       @logger.log @logger.levels.INFO, 'Failed sending external message', error
       throw error
@@ -1193,8 +1210,7 @@ class z.conversation.ConversationRepository
       if send_as_external
         @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
       else
-        skip_other_own_clients = false
-        skip_other_own_clients = true if generic_message.content is 'ephemeral'
+        skip_other_own_clients = generic_message.content is 'ephemeral'
 
         @_create_user_client_map conversation_id, skip_other_own_clients
         .then (user_client_map) =>
@@ -1244,12 +1260,15 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
   _send_encrypted_asset: (conversation_id, generic_message, image_data, nonce) =>
-    @_create_user_client_map conversation_id
+    skip_other_own_clients = generic_message.content is 'ephemeral'
+
+    @_create_user_client_map conversation_id, skip_other_own_clients
     .then (user_client_map) =>
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
     .then (payload) =>
       payload.inline = false
-      @asset_service.post_asset_v2 conversation_id, payload, image_data, false, nonce
+      if skip_other_own_clients then force_sending = true else force_sending = false
+      @asset_service.post_asset_v2 conversation_id, payload, image_data, force_sending, nonce
       .catch (error_response) =>
         return @_update_payload_for_changed_clients error_response, generic_message, payload
         .then (updated_payload) =>
