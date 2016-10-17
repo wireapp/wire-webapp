@@ -1056,15 +1056,18 @@ class z.conversation.ConversationRepository
 
   @private
   @param conversation_id [String] Conversation ID
+  @param skip_other_own_clients [Boolean] True, if other own clients should be skipped (to not sync messages on own clients)
   @return [Promise<Object>] Promise that resolves with a user client map
   ###
-  _create_user_client_map: (conversation_id) ->
+  _create_user_client_map: (conversation_id, skip_other_own_clients = true) ->
     @get_all_users_in_conversation conversation_id
-    .then (user_ets) ->
+    .then (user_ets) =>
       user_client_map = {}
 
       for user_et in user_ets when user_et.devices()[0]
         user_client_map[user_et.id] = (client_et.id for client_et in user_et.devices())
+        if user_et.is_me and skip_other_own_clients
+          user_client_map[user_et.id] = [@user_repository.client_repository.current_client().id]
 
       return user_client_map
 
@@ -1190,7 +1193,10 @@ class z.conversation.ConversationRepository
       if send_as_external
         @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
       else
-        @_create_user_client_map conversation_id
+        skip_other_own_clients = false
+        skip_other_own_clients = true if generic_message.content is 'ephemeral'
+
+        @_create_user_client_map conversation_id, skip_other_own_clients
         .then (user_client_map) =>
           if user_ids
             delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
