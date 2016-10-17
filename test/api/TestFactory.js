@@ -124,6 +124,9 @@ window.TestFactory.prototype.exposeClientActors = function () {
       window.client_repository = new z.client.ClientRepository(client_service, window.cryptography_repository);
       window.client_repository.logger.level = self.settings.logging_level;
       window.client_repository.init(user);
+      var payload = {"cookie":"webapp@2153234453@temporary@1470926647664","time":"2016-10-07T16:01:42.133Z","location":{"lat":52.5233,"lon":13.4138},"address":"62.96.148.44","model":"Chrome (Temporary)","id":"132b3653b33f851f","type":"temporary","class":"desktop","label":"Windows 10","meta":{"is_verified":true,"primary_key":"local_identity"}};
+      var current_client = new z.client.Client(payload);
+      window.client_repository.current_client(current_client);
 
       resolve(window.client_repository);
     });
