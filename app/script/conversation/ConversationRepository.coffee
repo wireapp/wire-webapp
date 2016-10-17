@@ -1372,6 +1372,8 @@ class z.conversation.ConversationRepository
           @_obfuscate_text_message conversation_et, message_et.id
         when message_et.is_ping()
           @_obfuscate_ping_message conversation_et, message_et.id
+        when message_et.has_asset()
+          @_obfuscate_asset_message conversation_et, message_et.id
         else
           @conversation_service.update_message_in_db message_et, expire_after_millis: true
           .then =>
@@ -1414,6 +1416,19 @@ class z.conversation.ConversationRepository
       @conversation_service.update_message_in_db message_et, expire_after_millis: true
     .then =>
       @logger.log 'Obfuscated ping message'
+
+  _obfuscate_asset_message: (conversation_et, message_id) =>
+    @get_message_in_conversation_by_id conversation_et, message_id
+    .then (message_et) =>
+      message_et.expire_after_millis true
+      @conversation_service.update_message_in_db message_et,
+        data:
+          info:
+            nonce: z.util.create_random_uuid()
+          meta: {}
+        expire_after_millis: true
+    .then =>
+      @logger.log 'Obfuscated asset message'
 
   ###
   Can user upload assets to conversation.

@@ -73,3 +73,10 @@
 .accent-color-5 {color: @accent_colors-5}
 .accent-color-6 {color: @accent_colors-6}
 .accent-color-7 {color: @accent_colors-7}
+
+// background colors
+.bg-color(@color) {
+  background-color: @color !important;
+}
+
+.bg-color-ephemeral {.bg-color(@ephemeral-color)}

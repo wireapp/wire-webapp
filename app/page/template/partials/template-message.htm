@@ -86,19 +86,19 @@
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.is_video() -->
-        <video-asset params="asset: asset"></video-asset>
+        <video-asset data-bind="css: {'bg-color-ephemeral': asset.expired()}" params="asset: asset"></video-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_audio() -->
-        <audio-asset params="asset: asset"></audio-asset>
+        <audio-asset data-bind="css: {'bg-color-ephemeral': asset.expired()}" params="asset: asset"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_file() -->
-        <file-asset params="asset: asset"></file-asset>
+        <file-asset data-bind="css: {'bg-color-ephemeral': asset.expired()}" params="asset: asset"></file-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_location() -->
         <location-asset params="asset: asset"></location-asset>
       <!-- /ko -->
 
-      <!-- ko if: message.expire_after_millis() -->
+      <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
         <ephemeral-timer class="message-ephemeral-timer"></ephemeral-timer>
       <!-- /ko -->
 

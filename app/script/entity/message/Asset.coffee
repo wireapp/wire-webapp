@@ -30,6 +30,7 @@ class z.entity.Asset
   constructor: (@id) ->
     @key = ''
     @type = ''
+    @expired = ko.observable false
 
   ###
   Check if asset is a medium image.

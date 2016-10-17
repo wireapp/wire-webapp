@@ -31,10 +31,11 @@ class z.entity.Message
   # Construct a new base message entity.
   constructor: (@id = '0', @super_type = '') ->
     @expire_after_millis = ko.observable false
-    @ephemeral_status = ko.pureComputed =>
+    @ephemeral_status = ko.computed =>
       expiration = @expire_after_millis()
 
       if expiration is true
+        @get_first_asset()?.expired true
         return z.message.EphemeralStatusType.TIMED_OUT
 
       if _.isString expiration
@@ -43,6 +44,7 @@ class z.entity.Message
         if expires_in > 0
           return z.message.EphemeralStatusType.ACTIVE
         else
+          @get_first_asset()?.expired true
           return z.message.EphemeralStatusType.TIMED_OUT
       else if _.isNumber expiration
         return z.message.EphemeralStatusType.INACTIVE

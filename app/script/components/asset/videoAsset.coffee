@@ -95,42 +95,47 @@ ko.components.register 'video-asset',
   viewModel: createViewModel: (params, component_info) ->
     return new z.components.VideoAssetComponent params, component_info
   template: """
-            <div class="video-asset-container" data-uie-name="video-asset" data-bind="hide_controls: 2000, attr: {'data-uie-value': asset.file_name}">
-              <video data-bind="attr: {src: video_src},
-                                css: {hidden: asset.status() === z.assets.AssetTransferState.UPLOADING},
-                                event: { loadedmetadata: on_loadedmetadata,
-                                         timeupdate: on_timeupdate,
-                                         error: on_error,
-                                         playing: on_video_playing}">
-              </video>
-              <!-- ko if: video_playback_error -->
-                <div class="video-playback-error label-xs" data-bind="l10n_text: z.string.conversation_playback_error"></div>
-              <!-- /ko -->
-              <!-- ko ifnot: video_playback_error -->
-                <!-- ko if: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
-                  <div class="asset-placeholder">
-                    <div class="three-dots">
-                      <span></span>
-                      <span></span>
-                      <span></span>
+            <!-- ko if: asset.expired() -->
+              <div class="video-asset-container bg-color-ephemeral"></div>
+            <!-- /ko -->
+            <!-- ko ifnot: asset.expired() -->
+              <div class="video-asset-container" data-uie-name="video-asset" data-bind="hide_controls: 2000, attr: {'data-uie-value': asset.file_name}">
+                <video data-bind="attr: {src: video_src},
+                                  css: {hidden: asset.status() === z.assets.AssetTransferState.UPLOADING},
+                                  event: { loadedmetadata: on_loadedmetadata,
+                                           timeupdate: on_timeupdate,
+                                           error: on_error,
+                                           playing: on_video_playing}">
+                </video>
+                <!-- ko if: video_playback_error -->
+                  <div class="video-playback-error label-xs" data-bind="l10n_text: z.string.conversation_playback_error"></div>
+                <!-- /ko -->
+                <!-- ko ifnot: video_playback_error -->
+                  <!-- ko if: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
+                    <div class="asset-placeholder">
+                      <div class="three-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
                     </div>
-                  </div>
+                  <!-- /ko -->
+                  <!-- ko ifnot: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
+                    <div class="video-controls-center">
+                      <media-button params="src: video_element,
+                                            large: true,
+                                            asset: asset,
+                                            play: on_play_button_clicked,
+                                            pause: on_pause_button_clicked,
+                                            cancel: function() {asset.cancel($parents[1])}">
+                      </media-button>
+                    </div>
+                    <div class='video-controls-bottom' data-bind='visible: show_bottom_controls()'>
+                      <seek-bar data-ui-name="status-video-seekbar" class="video-controls-seekbar" params="src: video_element"></seek-bar>
+                      <span class="video-controls-time label-xs" data-uie-name="status-video-time" data-bind="text: z.util.format_seconds(video_time_rest())"></span>
+                    </div>
+                  <!-- /ko -->
                 <!-- /ko -->
-                <!-- ko ifnot: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
-                  <div class="video-controls-center">
-                    <media-button params="src: video_element,
-                                          large: true,
-                                          asset: asset,
-                                          play: on_play_button_clicked,
-                                          pause: on_pause_button_clicked,
-                                          cancel: function() {asset.cancel($parents[1])}">
-                    </media-button>
-                  </div>
-                  <div class='video-controls-bottom' data-bind='visible: show_bottom_controls()'>
-                    <seek-bar data-ui-name="status-video-seekbar" class="video-controls-seekbar" params="src: video_element"></seek-bar>
-                    <span class="video-controls-time label-xs" data-uie-name="status-video-time" data-bind="text: z.util.format_seconds(video_time_rest())"></span>
-                  </div>
-                <!-- /ko -->
-              <!-- /ko -->
-            </div>
+              </div>
+            <!-- /ko -->
             """
