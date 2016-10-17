@@ -62,7 +62,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       title_view_model.conversation_repository.active_conversation conversation
       title_view_model.initiate_title_updates()
 
-      expected_title = "1 · #{conversation.name()} · #{suffix}"
+      expected_title = "(1) · #{conversation.name()} · #{suffix}"
       expect(window.document.title).toBe expected_title
 
     it 'does not change the title if muted conversations receive messages', ->
@@ -115,7 +115,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
 
       # Check title when there are messages in the selected conversation
       title_view_model.initiate_title_updates()
-      expected_title = "1 · #{selected_conversation.name()} · #{suffix}"
+      expected_title = "(1) · #{selected_conversation.name()} · #{suffix}"
       expect(window.document.title).toBe expected_title
 
     it 'sets the name of the self user when opening the preferences about page', ->
@@ -169,7 +169,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       message = z.localization.Localizer.get_text z.string.conversations_connection_request_one
       waiting_people = title_view_model.user_repository.connect_requests().length
 
-      expected_title = "#{waiting_people} · #{message} · #{suffix}"
+      expected_title = "(#{waiting_people}) · #{message} · #{suffix}"
       title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
 
@@ -186,7 +186,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
           placeholder: '%no'
           content: waiting_people
 
-      expected_title = "#{waiting_people} · #{message} · #{suffix}"
+      expected_title = "(#{waiting_people}) · #{message} · #{suffix}"
       title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
 
