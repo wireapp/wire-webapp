@@ -36,11 +36,11 @@ class z.components.EphemeralTimer
         @progress elapsed_time / timer
     , update_interval
 
-    @bullet_count = [4..0]
+    @bullet_count = [0..4]
 
   is_bullet_active: (index) =>
     passed_index = @progress() > (index + 1) / @bullet_count.length
-    return 'ephemeral-timer-bullet-active' if passed_index
+    return 'ephemeral-timer-bullet-inactive' if passed_index
 
   destroy: =>
     window.clearInterval @interval_id
