@@ -21,15 +21,36 @@ z.components ?= {}
 
 class z.components.EphemeralTimer
   constructor: (params) ->
+    scheduled_time = new Date(params.expires()).getTime()
+    starting_time = Date.now()
+    timer = scheduled_time - starting_time
+    update_interval = 1000 / 10
+
+    @progress = ko.observable 0
+
+    @interval_id = window.setInterval =>
+      if Date.now() >= scheduled_time
+        window.clearInterval @interval_id
+      else
+        elapsed_time = timer - (scheduled_time - Date.now())
+        @progress elapsed_time / timer
+    , update_interval
+
+    @bullet_count = [4..0]
+
+  is_bullet_active: (index) =>
+    passed_index = @progress() > (index + 1) / @bullet_count.length
+    return 'ephemeral-timer-bullet-active' if passed_index
+
+  destroy: =>
+    window.clearInterval @interval_id
 
 ko.components.register 'ephemeral-timer',
-  viewModel: z.components.TopPeopleViewModel
+  viewModel: z.components.EphemeralTimer
   template: """
             <ul class="ephemeral-timer">
-              <li class="ephemeral-timer-bullet"></li>
-              <li class="ephemeral-timer-bullet"></li>
-              <li class="ephemeral-timer-bullet ephemeral-timer-bullet-active"></li>
-              <li class="ephemeral-timer-bullet ephemeral-timer-bullet-active"></li>
-              <li class="ephemeral-timer-bullet ephemeral-timer-bullet-active"></li>
+              <!-- ko foreach : bullet_count -->
+               <li class="ephemeral-timer-bullet" data-bind="css: $parent.is_bullet_active($data)"></li>
+              <!-- /ko -->
             </ul>
             """

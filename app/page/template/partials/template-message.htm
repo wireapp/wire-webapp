@@ -99,7 +99,7 @@
       <!-- /ko -->
 
       <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <ephemeral-timer class="message-ephemeral-timer"></ephemeral-timer>
+        <ephemeral-timer class="message-ephemeral-timer" params="expires: message.expire_after_millis()"></ephemeral-timer>
       <!-- /ko -->
 
       <context-menu params="entries: function() {return $parents[1].get_context_menu_entries(message)}, tag: 'message', data: message.id"
