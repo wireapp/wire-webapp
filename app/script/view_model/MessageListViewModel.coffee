@@ -537,8 +537,10 @@ class z.ViewModel.MessageListViewModel
 
     if _.isNumber millis
       expiration_date = Date.now() + millis
+      expiration_date_iso = new Date(expiration_date).toISOString()
       changes =
-        expire_after_millis: new Date(expiration_date).toISOString()
+        expire_after_millis: expiration_date_iso
+      message_et.expire_after_millis expiration_date_iso
       @conversation_repository.conversation_service.update_message_in_db message_et, changes
       .then =>
         @logger.log @logger.levels.INFO, "Updated ephemeral message record '#{message_et.primary_key}' with '#{JSON.stringify(changes)}'."
