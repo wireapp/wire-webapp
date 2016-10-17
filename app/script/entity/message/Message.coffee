@@ -35,7 +35,6 @@ class z.entity.Message
       expiration = @expire_after_millis()
 
       if expiration is true
-        @get_first_asset()?.expired true
         return z.message.EphemeralStatusType.TIMED_OUT
 
       if _.isString expiration
@@ -44,12 +43,14 @@ class z.entity.Message
         if expires_in > 0
           return z.message.EphemeralStatusType.ACTIVE
         else
-          @get_first_asset()?.expired true
           return z.message.EphemeralStatusType.TIMED_OUT
       else if _.isNumber expiration
         return z.message.EphemeralStatusType.INACTIVE
       else
         return z.message.EphemeralStatusType.NONE
+
+    @ephemeral_status.subscribe (status) =>
+      @get_first_asset()?.expired true if status is z.message.EphemeralStatusType.TIMED_OUT
 
     @from = ''
     @is_editing = ko.observable false
