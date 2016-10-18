@@ -949,7 +949,7 @@ class z.conversation.ConversationRepository
     ephemeral = new z.proto.Ephemeral()
     ephemeral.set 'expire_after_millis', millis
     ephemeral.set generic_message.content, generic_message[generic_message.content]
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid() # TODO use gm id?
+    generic_message = new z.proto.GenericMessage generic_message.message_id
     generic_message.set 'ephemeral', ephemeral
     return generic_message
 
