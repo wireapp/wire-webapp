@@ -43,6 +43,7 @@ class z.entity.Text extends z.entity.Asset
     @previews = ko.observableArray()
 
     @should_render_text = ko.pureComputed =>
+      return false if not @text? or @text.length is 0
       has_link_previews = @previews().length > 0
       return not has_link_previews or (has_link_previews and not z.links.LinkPreviewHelpers.contains_only_link(@text))
 

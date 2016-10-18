@@ -1376,7 +1376,6 @@ class z.conversation.ConversationRepository
 
   timeout_ephemeral_message: (conversation_et, message_et) =>
     if message_et.user().is_me
-      # TODO switch obfuscate method
       switch
         when message_et.has_asset_text()
           @_obfuscate_text_message conversation_et, message_et.id
@@ -1397,7 +1396,7 @@ class z.conversation.ConversationRepository
       asset = message_et.get_first_asset()
       obfuscated = new z.entity.Text message_et.id
       obfuscated.previews asset.previews()
-      obfuscated.text = z.util.StringUtil.obfuscate asset.text
+      obfuscated.text = z.util.StringUtil.obfuscate asset.text if obfuscated.previews().length is 0
       message_et.assets [obfuscated]
       message_et.expire_after_millis true
 
