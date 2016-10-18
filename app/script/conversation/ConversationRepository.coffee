@@ -1453,7 +1453,6 @@ class z.conversation.ConversationRepository
     @get_message_in_conversation_by_id conversation_et, message_id
     .then (message_et) =>
       asset = message_et.get_first_asset()
-      debugger
       message_et.expire_after_millis true
       @conversation_service.update_message_in_db message_et,
         data:
