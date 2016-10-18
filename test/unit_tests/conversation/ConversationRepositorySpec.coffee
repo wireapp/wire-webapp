@@ -433,6 +433,28 @@ describe 'z.conversation.ConversationRepository', ->
         done()
       .catch done.fail
 
+    it 'deletes message and skips delete message if message is ephemeral', (done) ->
+      other_user_id = z.util.create_random_uuid()
+      message_to_delete_et.from = other_user_id
+
+      event =
+        conversation: conversation_et.id
+        id: z.util.create_random_uuid()
+        data:
+          message_id: message_to_delete_et.id
+        from: other_user_id
+        time: new Date().toISOString()
+        type: z.event.Client.CONVERSATION.MESSAGE_DELETE
+        expire_after_millis: true
+
+      expect(conversation_et.get_message_by_id(message_to_delete_et.id)).toBeDefined()
+      conversation_repository._on_message_deleted conversation_et, event
+      .then ->
+        expect(conversation_et.get_message_by_id(message_to_delete_et.id)).not.toBeDefined()
+        expect(conversation_repository._add_delete_message).not.toHaveBeenCalled()
+        done()
+      .catch done.fail
+
   describe 'get_number_of_pending_uploads', ->
 
     it 'should return number of pending uploads if there are pending uploads', ->
