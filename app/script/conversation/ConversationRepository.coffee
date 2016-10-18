@@ -925,6 +925,8 @@ class z.conversation.ConversationRepository
     .then (link_preview) =>
       if link_preview?
         switch generic_message.content
+          when 'ephemeral'
+            generic_message.ephemeral.text.link_preview.push link_preview
           when 'edited'
             generic_message.edited.text.link_preview.push link_preview
           when 'text'
