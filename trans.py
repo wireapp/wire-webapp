@@ -21,6 +21,11 @@ import os
 import shutil
 import sys
 
+SUPPORTED_LOCALE = [
+  'de',
+  'es',
+  'ru',
+]
 home_dir = os.path.expanduser('~')
 
 os.system('crowdin-cli --identity=keys/crowdin.yaml upload sources')
@@ -47,7 +52,7 @@ for filename in os.listdir(root):
   remove_country(filename)
   locale = get_locale(filename)
   if locale:
-    if locale not in ['de', 'es']:
+    if locale not in SUPPORTED_LOCALE:
       file_to_delete = os.path.join(root, filename)
       sys.stdout.write('Removing unsupported locale "{}" ({})\n'.format(locale, file_to_delete))
       os.remove(file_to_delete)
