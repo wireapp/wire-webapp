@@ -24,6 +24,8 @@ import sys
 SUPPORTED_LOCALE = [
   'de',
   'es',
+  'hr',
+  'fi',
   'ro',
   'ru',
 ]
