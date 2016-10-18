@@ -246,7 +246,7 @@ class z.ViewModel.ConversationInputViewModel
   Create context menu entries for ephemeral timer
   @param message_et [z.entity.Message]
   ###
-  get_context_menu_entries: =>
+  get_context_menu_entries: ->
     return [
       {label: 'None', action: 0},
       {label: '1 second', action: 1000},
