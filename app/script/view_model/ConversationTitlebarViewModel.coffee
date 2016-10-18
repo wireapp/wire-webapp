@@ -37,7 +37,7 @@ class z.ViewModel.ConversationTitlebarViewModel
       return false if not @conversation_et() or not @joined_call()
       return @conversation_et().id is @joined_call().id
 
-    @has_ongoing_call = ko.pureComputed =>
+    @has_ongoing_call = ko.computed =>
       return false if not @joined_call()
       return @has_call() and @joined_call().state() is z.calling.enum.CallState.ONGOING
 
@@ -53,10 +53,11 @@ class z.ViewModel.ConversationTitlebarViewModel
       is_active_conversation = @conversation_et().participating_user_ids().length and not @conversation_et().removed_from_conversation()
       return not @has_call() and is_supported_conversation and is_active_conversation
 
-    @people_tooltip = z.localization.Localizer.get_text {
+    @people_tooltip = z.localization.Localizer.get_text
       id: z.string.tooltip_conversation_people
-      replace: {placeholder: '%shortcut', content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.PEOPLE}
-    }
+      replace:
+        placeholder: '%shortcut'
+        content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.PEOPLE
 
   added_to_view: =>
     setTimeout =>

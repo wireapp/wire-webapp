@@ -144,7 +144,7 @@
         <div class="modal-title" data-bind="l10n_text: z.string.warning_call_headline"></div>
       </div>
       <div class="modal-text" data-bind="l10n_text: z.string.warning_call_detail"></div>
-      <div class="modal-action button button-medium button-fluid" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_text: z.string.warning_tell_me_how" data-uie-name="go-faq"></div>
+      <div class="modal-action button button-medium button-fluid" data-bind="l10n_text: z.string.warning_tell_me_how" data-uie-name="go-faq"></div>
     </div>
   </div>
 
@@ -171,7 +171,7 @@
       <div class="modal-text" data-bind="l10n_text: z.string.modal_clear_conversation_message"></div>
       <div class="modal-option">
         <label class="input-checkbox">
-          <input class="modal-option-checkbox" type="checkbox" data-uie-name="enter-leave-conversation">
+          <input class="modal-checkbox" type="checkbox" data-uie-name="enter-leave-conversation">
           <span class="modal-option-text" data-bind="l10n_text: z.string.modal_clear_conversation_option"></span>
         </label>
       </div>
@@ -190,6 +190,20 @@
       </div>
       <div class="modal-text" data-bind="l10n_text: z.string.upload_google_message_error"></div>
       <div class="modal-action button button-medium button-fluid" data-bind="l10n_text: z.string.upload_google_button_again" data-uie-name="go-contacts-upload"></div>
+    </div>
+  </div>
+
+  <div class="modal modal-delete-account" data-uie-name="modal-delete-account">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-close icon-close icon-button pull-right"></div>
+        <div class="modal-title" data-bind="l10n_text: z.string.modal_delete_account_headline"></div>
+      </div>
+      <div class="modal-text" data-bind="l10n_text: z.string.modal_delete_account_message"></div>
+      <div class="modal-footer">
+        <div class="modal-close button button-medium button-full button-inverted" data-bind="l10n_text: z.string.modal_button_cancel" data-uie-name="do-cancel"></div>
+        <div class="modal-action button button-medium button-full" data-bind="l10n_text: z.string.modal_delete_account_action" data-uie-name="do-send"></div>
+      </div>
     </div>
   </div>
 
@@ -215,13 +229,13 @@
       </div>
       <div class="modal-logout-checkbox modal-option">
         <div class="checkbox text-theme">
-          <input class="modal-option-checkbox" type="checkbox" id="clear-data-checkbox" data-uie-name="do-clear-data">
+          <input class="modal-checkbox" type="checkbox" id="clear-data-checkbox" data-uie-name="do-clear-data">
           <label class="label-xs" for="clear-data-checkbox">
             <span class="text-graphite-dark" data-bind="l10n_text: z.string.modal_logout_message"></span>
           </label>
         </div>
       </div>
-      <div class="modal-action button button-medium button-fluid" rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_text: z.string.modal_logout_button" data-uie-name="go-logout"></div>
+      <div class="modal-action button button-medium button-fluid" data-bind="l10n_text: z.string.modal_logout_button" data-uie-name="go-logout"></div>
     </div>
   </div>
 
@@ -239,6 +253,19 @@
     </div>
   </div>
 
+  <div class="modal modal-remove-device" data-uie-name="modal-remove-device">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-close icon-close icon-button pull-right"></div>
+        <div class="modal-title"></div>
+      </div>
+      <div class="modal-text" data-bind="l10n_text: z.string.modal_remove_device_message"></div>
+      <input class="modal-input" type="password" data-bind="l10n_placeholder: z.string.auth_placeholder_password_put"/>
+      <div class="modal-footer">
+        <div class="modal-action button button-medium button-full" data-bind="l10n_text: z.string.modal_remove_device_button" data-uie-name="do-delete"></div>
+      </div>
+    </div>
+  </div>
   <div class="modal modal-connected-device" data-uie-name="modal-conntected-device">
     <div class="modal-content">
       <div class="modal-header">

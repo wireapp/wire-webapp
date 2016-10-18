@@ -106,19 +106,16 @@ class z.main.App
     view = {}
 
     view.main                      = new z.ViewModel.MainViewModel 'wire-main', @repository.user
-    view.content                   = new z.ViewModel.RightViewModel 'right', @repository.user, @repository.conversation, @repository.call_center, @repository.search, @repository.giphy, @repository.client
-    view.background                = new z.ViewModel.BackgroundViewModel 'background', view.content, @repository.conversation, @repository.user
-    view.conversation_list         = new z.ViewModel.ConversationListViewModel 'conversation-list', view.content, @repository.call_center, @repository.user, @repository.conversation
-    view.start_ui                  = new z.ViewModel.StartUIViewModel 'start-ui', @repository.conversation, @repository.search, @repository.user, @repository.connect
-    view.archive                   = new z.ViewModel.ArchiveViewModel 'archive', @repository.conversation
-    view.actions                   = new z.ViewModel.ActionsViewModel 'actions-bubble', @repository.conversation, @repository.user, view.conversation_list
-    view.title                     = new z.ViewModel.WindowTitleViewModel view.content.state, @repository.user, @repository.conversation
-    view.welcome                   = new z.ViewModel.WelcomeViewModel 'welcome', @repository.user
-    view.settings                  = new z.ViewModel.SettingsViewModel 'self-settings', @repository.user, @repository.conversation, @repository.client, @repository.cryptography
+    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.search, @repository.user
+    view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user
+    view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
     view.modals                    = new z.ViewModel.ModalsViewModel 'modals'
 
     view.loading                   = new z.ViewModel.LoadingViewModel 'loading-screen', @repository.user
+
+    # backwards compatibility
+    view.conversation_list = view.list.conversations
 
     return view
 
@@ -247,8 +244,12 @@ class z.main.App
           @service.storage.init user_et.id
           .then =>
             if not user_et.picture_medium().length
+              @view.list.first_run true
               z.util.load_url_blob z.config.UNSPLASH_URL, (blob) =>
-                @repository.user.change_picture blob, -> amplify.publish z.event.WebApp.WELCOME.UNSPLASH_LOADED
+                @repository.user.change_picture blob, ->
+                  amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
+                    source: 'unsplash'
+                    outcome: 'success'
             resolve user_et
       .catch (error) =>
         if not error instanceof z.storage.StorageError
@@ -301,7 +302,7 @@ class z.main.App
           @logger.log @logger.levels.WARN, 'No connectivity. Trigger reload on regained connectivity.', error
           @_watch_online_status()
 
-  # Subscribe to 'beforeunload to stop calls and disconnect the WebSocket.
+  # Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
   _subscribe_to_beforeunload: ->
     $(window).on 'beforeunload', =>
       @logger.log '\'window.onbeforeunload\' was triggered, so we will disconnect from the backend.'
@@ -313,32 +314,16 @@ class z.main.App
   # Hide the loading spinner and show the application UI.
   _show_ui: ->
     @logger.log @logger.levels.INFO, 'Showing application UI'
-    conversation_et = @repository.conversation.get_most_recent_conversation()
-    has_picture = !!@repository.user.self().picture_medium()
-
-    if conversation_et and has_picture
+    if @view.list.first_run() or not @repository.user.users().length
+      amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.WATERMARK
+    else if conversation_et = @repository.conversation.get_most_recent_conversation()
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
-      setTimeout =>
-        types_to_notify = [z.conversation.ConversationType.REGULAR, z.conversation.ConversationType.ONE2ONE]
-        if conversation_et.type() in types_to_notify
-          @repository.system_notification.request_permission()
-      , 2000
-    else if @repository.user.connect_requests().length > 0 and has_picture
-      setTimeout ->
-        amplify.publish z.event.WebApp.PENDING.SHOW
-      , 1000
-    else if has_picture
-      amplify.publish z.event.WebApp.PROFILE.SHOW
-      setTimeout ->
-        amplify.publish z.event.WebApp.SEARCH.SHOW
-      , 1000
-    else
-      # Triggered when newly registered user opens Wire (first run experience)
-      amplify.publish z.event.WebApp.PROFILE.SHOW, false
-      amplify.publish z.event.WebApp.APP.HIDE
-      setTimeout ->
-        amplify.publish z.event.WebApp.WELCOME.SHOW
-      , 1500
+    else if @repository.user.connect_requests().length
+      amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+
+    window.setTimeout =>
+      @repository.system_notification.request_permission()
+    , 10000
 
     $('#loading-screen').remove()
     $('#wire-main')

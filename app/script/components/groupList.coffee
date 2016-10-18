@@ -39,7 +39,7 @@ ko.components.register 'group-list',
   viewModel: z.components.GroupListViewModel
   template: """
             <div class="search-list search-list-md" data-bind="foreach: {data: groups, as: 'group'}">
-              <div class="search-list-item" data-bind="click: $root.click_on_group, attr: {'data-uie-uid': group.id, 'data-uie-value': group.display_name" data-uie-name="item-group">
+              <div class="search-list-item" data-bind="click: $parent.on_select, attr: {'data-uie-uid': group.id, 'data-uie-value': group.display_name" data-uie-name="item-group">
                 <!-- ko if: $parent.avatar === true -->
                   <user-avatar class="user-avatar-sm" params="user: $data.participating_user_ets()[0]"></user-avatar>
                 <!-- /ko  -->

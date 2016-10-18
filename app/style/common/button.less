@@ -20,7 +20,7 @@
 // default
 .button {
   .accent-background-color();
-  .button-lg(); // default size is large
+  .button-large(); // default size is large
   .label-bold-xs();
   border: @button-border-size solid transparent;
   border-radius: @button-border-radius;
@@ -75,14 +75,15 @@
   }
 
   // sizes
-  &.button-lg {
+  &.button-large {
     width: @button-width;
     height: @button-height;
     line-height: (@button-height - @button-border-size * 2);
   }
 
-  &.button-sm,
+  &.button-small,
   &.button-medium {
+    min-width: @button-medium-width;
     width: @button-medium-width;
     height: @button-medium-sm-height;
     line-height: (@button-medium-sm-height - @button-border-size * 2);

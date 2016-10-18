@@ -25,6 +25,6 @@ class z.entity.RenameMessage extends z.entity.SystemMessage
   constructor: ->
     super()
     @system_message_type = z.message.SystemMessageType.CONVERSATION_RENAME
-    @caption = ko.computed =>
+    @caption = ko.pureComputed =>
       return z.localization.Localizer.get_text z.string.conversation_rename_you if @user().is_me
       return z.localization.Localizer.get_text z.string.conversation_rename

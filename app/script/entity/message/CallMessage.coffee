@@ -28,7 +28,7 @@ class z.entity.CallMessage extends z.entity.Message
     @call_message_type = ''
     @finished_reason = ''
 
-    @caption = ko.computed =>
+    @caption = ko.pureComputed =>
       return z.localization.Localizer.get_text z.string.conversation_voice_channel_deactivate_you if @user().is_me
       return z.localization.Localizer.get_text z.string.conversation_voice_channel_deactivate
     , @, deferEvaluation: true

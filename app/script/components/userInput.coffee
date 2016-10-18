@@ -34,7 +34,7 @@ class z.components.UserListInputViewModel
     @selected_subscription = @selected.subscribe =>
       @input ''
       @input_element.focus()
-      setTimeout =>
+      window.setTimeout =>
         @inner_element.scrollTop @inner_element[0].scrollHeight
 
     @placeholder = ko.pureComputed =>

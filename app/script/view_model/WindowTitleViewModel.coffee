@@ -40,29 +40,37 @@ class z.ViewModel.WindowTitleViewModel
       badge_count = number_of_connect_requests + number_of_unread_conversations
 
       if badge_count > 0
-        window_title += "(#{badge_count}) "
+        window_title += "(#{badge_count}) · "
 
       amplify.publish z.event.WebApp.CONVERSATION.UNREAD, badge_count
 
       switch @content_state()
-        when z.ViewModel.CONTENT_STATE.PENDING
+        when z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
           if number_of_connect_requests > 1
-            window_title += z.localization.Localizer.get_text {
-              id: z.string.conversation_list_many_connection_request
-              replace: {placeholder: '%no', content: number_of_connect_requests}
-            }
+            window_title += z.localization.Localizer.get_text
+              id: z.string.conversations_connection_request_many
+              replace:
+                placeholder: '%no'
+                content: number_of_connect_requests
           else
-            window_title += z.localization.Localizer.get_text z.string.conversation_list_one_connection_request
-        when z.ViewModel.CONTENT_STATE.CONVERSATION
+            window_title += z.localization.Localizer.get_text z.string.conversations_connection_request_one
+        when z.ViewModel.content.CONTENT_STATE.CONVERSATION
           window_title += @conversation_repository.active_conversation()?.display_name()
-        when z.ViewModel.CONTENT_STATE.PROFILE
-          window_title += @user_repository.self().name()
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
+          window_title += z.localization.Localizer.get_text z.string.preferences_about
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+          window_title += z.localization.Localizer.get_text z.string.preferences_account
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS
+          window_title += z.localization.Localizer.get_text z.string.preferences_device_details
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
+          window_title += z.localization.Localizer.get_text z.string.preferences_devices
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
+          window_title += z.localization.Localizer.get_text z.string.preferences_options
 
-      if window_title is ''
-        window_title = z.localization.Localizer.get_text z.string.wire
-      else
-        window_title += " - #{z.localization.Localizer.get_text z.string.wire}"
+      if window_title isnt '' and not window_title.endsWith ' '
+        window_title += ' · '
+      window_title += z.localization.Localizer.get_text z.string.wire
 
       window.document.title = window_title
 
-    .extend rateLimit: 750
+    .extend rateLimit: 250
