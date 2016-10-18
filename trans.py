@@ -18,6 +18,7 @@
 #
 
 import os
+import shutil
 import sys
 
 home_dir = os.path.expanduser('~')
@@ -26,15 +27,24 @@ os.system('crowdin-cli --identity=keys/crowdin.yaml upload sources')
 os.system('crowdin-cli --identity=keys/crowdin.yaml download')
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
+root = 'app/script/localization/'
+
+
+def remove_country(filename):
+  parts = filename.split('-')
+  if len(parts) == 3:
+    source = os.path.join(root, filename)
+    dest = os.path.join(root, '%s-%s.coffee' % (parts[0], parts[1]))
+    shutil.move(source, dest)
 
 
 def get_locale(filename):
   locale = filename.replace('strings-', '').replace('.coffee', '')
   return locale if len(locale) == 2 else None
 
-root = 'app/script/localization/'
 
 for filename in os.listdir(root):
+  remove_country(filename)
   locale = get_locale(filename)
   if locale:
     if locale != 'de':
