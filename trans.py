@@ -27,6 +27,7 @@ os.system('crowdin-cli --identity=keys/crowdin.yaml download')
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
+
 def get_locale(filename):
   locale = filename.replace('strings-', '').replace('.coffee', '')
   return locale if len(locale) == 2 else None
