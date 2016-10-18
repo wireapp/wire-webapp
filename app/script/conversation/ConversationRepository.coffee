@@ -793,13 +793,10 @@ class z.conversation.ConversationRepository
       asset_et.uploaded_on_this_client true
       return @asset_service.create_asset_proto file
     .then ([asset, ciphertext]) =>
-      generic_message = undefined
-
+      generic_message = new z.proto.GenericMessage nonce
+      generic_message.set 'asset', asset
       if conversation_et.ephemeral_timer()
-        generic_message = @_wrap_in_ephemeral_message asset, conversation_et.ephemeral_timer()
-      else
-        generic_message = new z.proto.GenericMessage nonce
-        generic_message.set 'asset', asset
+        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
       @_send_encrypted_asset conversation_et.id, generic_message, ciphertext, nonce
     .then ([response, asset_id]) =>
       event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
@@ -823,13 +820,10 @@ class z.conversation.ConversationRepository
   send_asset_metadata: (conversation_et, file) =>
     asset = new z.proto.Asset()
     asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name
-
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'asset', asset
     if conversation_et.ephemeral_timer()
-      generic_message = @_wrap_in_ephemeral_message asset, conversation_et.ephemeral_timer()
-    else
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'asset', asset
-
+      generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
     @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
@@ -867,11 +861,10 @@ class z.conversation.ConversationRepository
   send_image_asset: (conversation_et, image) =>
     @asset_service.create_image_proto image
     .then ([image, ciphertext]) =>
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'image', image
       if conversation_et.ephemeral_timer()
-        generic_message = @_wrap_in_ephemeral_message image, conversation_et.ephemeral_timer()
-      else
-        generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-        generic_message.set 'image', image
+        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
       optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
       @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
       .then (mapped_event) =>
@@ -901,13 +894,10 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the knock
   ###
   send_knock: (conversation_et) =>
-    knock = new z.proto.Knock false
-
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'knock', new z.proto.Knock false
     if conversation_et.ephemeral_timer()
-      generic_message = @_wrap_in_ephemeral_message knock, conversation_et.ephemeral_timer()
-    else
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'knock', knock
+      generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
 
     @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) => @logger.log @logger.levels.ERROR, "#{error.message}"
@@ -941,33 +931,26 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the message
   ###
   send_message: (message, conversation_et) =>
-    text = new z.proto.Text message
-
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'text', new z.proto.Text message
     if conversation_et.ephemeral_timer()
-      generic_message = @_wrap_in_ephemeral_message text, conversation_et.ephemeral_timer()
-    else
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'text', new z.proto.Text message
-
+      generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
     @_send_and_inject_generic_message conversation_et, generic_message
     .then -> return generic_message
 
-  _wrap_in_ephemeral_message: (message, millis) ->
+  ###
+  Wraps generic message in ephemeral message.
+
+  @param generic_message [z.proto.Message]
+  @param millis [Number] expire time in milliseconds
+  @return [z.proto.Message]
+  ###
+  _wrap_in_ephemeral_message: (generic_message, millis) ->
     ephemeral = new z.proto.Ephemeral()
     ephemeral.set 'expire_after_millis', millis
-
-    if message.mention?
-      ephemeral.set 'text', message
-    else if message.hot_knock?
-      ephemeral.set 'knock', message
-    else if message.original_width?
-      ephemeral.set 'image', message
-    else
-      ephemeral.set 'asset', message
-
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    ephemeral.set generic_message.content, generic_message[generic_message.content]
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid() # TODO use gm id?
     generic_message.set 'ephemeral', ephemeral
-
     return generic_message
 
   ###
@@ -1413,11 +1396,10 @@ class z.conversation.ConversationRepository
     .then (message_et) =>
       asset = message_et.get_first_asset()
       obfuscated = new z.entity.Text message_et.id
+      obfuscated.previews asset.previews()
       obfuscated.text = z.util.StringUtil.obfuscate asset.text
       message_et.assets [obfuscated]
       message_et.expire_after_millis true
-
-      # TODO link preview
 
       @conversation_service.update_message_in_db message_et,
         expire_after_millis: true
