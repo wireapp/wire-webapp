@@ -48,12 +48,10 @@
               <span id="conversation-input-ephemeral"
                     class="conversation-input-ephemeral"
                     data-bind="l10n_tooltip: z.string.de.tooltip_conversation_ephemeral"
-                    data-uie-name="do-set-ephemeral-timer"
-                    data-bubble=".ephemeral-menu"
-                    data-placement="top">
+                    data-uie-name="do-set-ephemeral-timer">
                 <!-- ko if: conversation_et().ephemeral_timer() -->
                   <div class="controls-right-button controls-right-button-ephemeral-timer"
-                        data-bind="text: z.util.format_milliseconds_short(conversation_et().ephemeral_timer())">
+                       data-bind="text: z.util.format_milliseconds_short(conversation_et().ephemeral_timer())">
                   </div>
                 <!-- /ko -->
                 <!-- ko ifnot: conversation_et().ephemeral_timer() -->
