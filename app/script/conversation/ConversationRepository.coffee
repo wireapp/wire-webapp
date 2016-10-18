@@ -1405,7 +1405,6 @@ class z.conversation.ConversationRepository
         else
           @logger.log 'Unsupported ephemeral type', message_et.type
     else
-      # TODO delete without trace
       @delete_message_everyone conversation_et, message_et
 
   _obfuscate_text_message: (conversation_et, message_id) =>
@@ -1726,7 +1725,9 @@ class z.conversation.ConversationRepository
   _on_message_deleted: (conversation_et, event_json) =>
     @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
     .then (message_to_delete_et) =>
-      if event_json.from isnt message_to_delete_et.from and not message_to_delete_et.expire_after_millis()
+      if message_to_delete_et.expire_after_millis()
+        return
+      if event_json.from isnt message_to_delete_et.from
         throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
       if event_json.from isnt @user_repository.self().id
         return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
