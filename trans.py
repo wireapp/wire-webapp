@@ -24,6 +24,7 @@ import sys
 SUPPORTED_LOCALE = [
   'de',
   'es',
+  'ro',
   'ru',
 ]
 home_dir = os.path.expanduser('~')

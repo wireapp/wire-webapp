@@ -20,6 +20,7 @@ window.z ?= {}
 z.string ?= {}
 z.string.de ?= {}
 z.string.es ?= {}
+z.string.ro ?= {}
 z.string.ru ?= {}
 
 z.string.Declension =
