@@ -37,15 +37,13 @@ class z.conversation.ConversationService
   @return [Promise<String>] Promise that will resolve with the primary key of the persisted conversation entity
   ###
   _save_conversation_in_db: (conversation_et) ->
-    return new Promise (resolve, reject) =>
-      store_name = @storage_service.OBJECT_STORE_CONVERSATIONS
-      @storage_service.save store_name, conversation_et.id, conversation_et.serialize()
-      .then (primary_key) =>
-        @logger.log @logger.levels.INFO, "Conversation '#{primary_key}' was stored for the first time"
-        resolve conversation_et
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Conversation '#{conversation_et.id}' could not be stored", error
-        reject error
+    @storage_service.save @storage_service.OBJECT_STORE_CONVERSATIONS, conversation_et.id, conversation_et.serialize()
+    .then (primary_key) =>
+      @logger.log @logger.levels.INFO, "Conversation '#{primary_key}' was stored for the first time"
+      return conversation_et
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Conversation '#{conversation_et.id}' could not be stored", error
+      throw error
 
   ###
   Updates a conversation entity in the database.
@@ -287,14 +285,7 @@ class z.conversation.ConversationService
   @return [Promise] Promise that resolves with all the stored conversation states
   ###
   load_conversation_states_from_db: =>
-    return new Promise (resolve, reject) =>
-      @storage_service.get_all @storage_service.OBJECT_STORE_CONVERSATIONS
-      .then (conversation_states) =>
-        @logger.log @logger.levels.INFO, "Loaded '#{conversation_states.length}' local conversation states", conversation_states
-        resolve conversation_states
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, 'Failed to load local conversation states', error
-        reject error
+    @storage_service.get_all @storage_service.OBJECT_STORE_CONVERSATIONS
 
   ###
   Load conversation event.
@@ -302,18 +293,15 @@ class z.conversation.ConversationService
   @param message_id [String]
   ###
   load_event_from_db: (conversation_id, message_id) ->
-    return new Promise (resolve, reject) =>
-      @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where 'conversation'
-      .equals conversation_id
-      .filter (record) -> record.id is message_id
-      .first()
-      .then (record) ->
-        resolve record
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR,
-          "Failed to get event for conversation '#{conversation_id}': #{error.message}", error
-        reject error
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where 'conversation'
+    .equals conversation_id
+    .filter (record) -> record.id is message_id
+    .first()
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR,
+        "Failed to get event for conversation '#{conversation_id}': #{error.message}", error
+      throw error
 
   ###
   Load conversation events. Start and end are not included.
