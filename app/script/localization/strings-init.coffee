@@ -19,6 +19,7 @@
 window.z ?= {}
 z.string ?= {}
 z.string.de ?= {}
+z.string.es ?= {}
 
 z.string.Declension =
   ACCUSATIVE: 'accusative'
