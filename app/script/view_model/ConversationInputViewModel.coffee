@@ -80,10 +80,6 @@ class z.ViewModel.ConversationInputViewModel
       .blur => @browser_has_focus false
       .focus => @browser_has_focus true
 
-    @ephemeral_menu = new zeta.webapp.module.Bubble
-      host_selector: '#conversation-input-ephemeral'
-      scroll_selector: window
-
     @_init_subscriptions()
 
   _init_subscriptions: ->
@@ -92,6 +88,7 @@ class z.ViewModel.ConversationInputViewModel
     amplify.subscribe z.event.WebApp.EXTENSIONS.GIPHY.SEND, => @conversation_et()?.input ''
     amplify.subscribe z.event.WebApp.CONVERSATION.IMAGE.SEND, @upload_images
     amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.EDIT, @edit_message
+    amplify.subscribe z.event.WebApp.CONTEXT_MENU, @on_context_menu_action
 
   added_to_view: =>
     window.setTimeout =>
@@ -133,10 +130,6 @@ class z.ViewModel.ConversationInputViewModel
     else
       @conversation_et().ephemeral_timer millis
       @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer().toString()}'."
-    @ephemeral_menu.toggle()
-
-  set_ephemeral: =>
-    @ephemeral_menu.toggle()
 
   upload_images: (images) =>
     for image in images
@@ -248,3 +241,25 @@ class z.ViewModel.ConversationInputViewModel
     setTimeout ->
       input_element.selectionStart = input_element.selectionEnd = input_element.value.length * 2
     , 0
+
+  ###
+  Create context menu entries for ephemeral timer
+  @param message_et [z.entity.Message]
+  ###
+  get_context_menu_entries: =>
+    return [
+      {label: 'None', action: 0},
+      {label: '1 second', action: 1000},
+      {label: '5 seconds', action: 5000},
+      {label: '15 seconds', action: 15000},
+      {label: '1 minute', action: 60000},
+    ]
+
+  ###
+  Click on context menu entry
+  @param tag [String] associated tag
+  @param action [String] action that was triggered
+  ###
+  on_context_menu_action: (tag, action) =>
+    return if tag isnt 'ephemeral'
+    @set_ephemeral_timer action

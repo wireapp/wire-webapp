@@ -22,7 +22,6 @@
   box-sizing: content-box;
   width: 100%;
   min-height: @conversation-input-min-height;
-  overflow: hidden;
   background-color: #fff;
 }
 
@@ -85,6 +84,7 @@
 }
 
 .controls-right-button {
+  position: relative;
   flex: 0 0 auto;
   margin-left: 12px;
   margin-right: 12px;
@@ -100,6 +100,18 @@
   font-weight: bold;
   text-align: center;
   line-height: 30px;
+}
+
+.conversation-input-ephemeral {
+  position: relative;
+}
+
+.controls-right-button-ephemeral-context {
+  .square(32px);
+  position: absolute;
+  left: 0;
+  top: 0;
+  outline: 0;
 }
 
 .ephemeral-mode,

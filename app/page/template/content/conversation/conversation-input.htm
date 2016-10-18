@@ -44,7 +44,8 @@
 
           <!-- ko if: input().length === 0 -->
             <span id="conversation-input-ephemeral"
-                  data-bind="l10n_tooltip: z.string.de.tooltip_conversation_ephemeral, click: set_ephemeral"
+                  class="conversation-input-ephemeral"
+                  data-bind="l10n_tooltip: z.string.de.tooltip_conversation_ephemeral"
                   data-uie-name="do-set-ephemeral-timer"
                   data-bubble=".ephemeral-menu"
                   data-placement="top">
@@ -56,6 +57,9 @@
               <!-- ko ifnot: conversation_et().ephemeral_timer() -->
                 <span class="controls-right-button button-icon-large icon-hourglass"></span>
               <!-- /ko -->
+                <context-menu class="controls-right-button controls-right-button-ephemeral-context"
+                              params="entries: get_context_menu_entries(), placement: 'top', tag: 'ephemeral'"
+                              tabindex="-1"></context-menu>
             </span>
 
             <label id="conversation-input-photo"
