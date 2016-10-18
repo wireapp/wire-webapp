@@ -4,6 +4,6 @@ base_path: .
 files:
   -
     source: '/app/script/localization/strings.coffee'
-    translation: '/app/script/localization/strings-%two_letters_code%.coffee'
+    translation: '/app/script/localization/strings-%locale%.coffee'
     ignore:
       - /**/?.pot
