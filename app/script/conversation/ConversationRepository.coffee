@@ -932,7 +932,6 @@ class z.conversation.ConversationRepository
           when 'text'
             generic_message.text.link_preview.push link_preview
         @_send_and_inject_generic_message conversation_et, generic_message
-        @link_repository.get_link_preview_from_string message
 
   ###
   Send text message in specified conversation.
