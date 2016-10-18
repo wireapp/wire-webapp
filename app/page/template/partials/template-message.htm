@@ -66,20 +66,25 @@
             css: {'image-ephemeral': $parent.expire_after_millis() === true},
             viewport_changed: $parents[1].viewport_changed
             " data-uie-name="go-image-detail">
-            <img class="image-element" data-bind="attr: {src: asset.dummy_url}, css: {'image-ephemeral': $parent.expire_after_millis() === true}"/>
-            <span class="image-placeholder-icon" data-bind="css: {'image-ephemeral': $parent.expire_after_millis() === true}">
-              <div class="three-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-            </span>
+            <!-- ko ifnot: asset.expired() -->
+              <img class="image-element" data-bind="attr: {src: asset.dummy_url}"/>
+              <span class="image-placeholder-icon">
+                <div class="three-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </span>
+            <!-- /ko -->
+            <!-- ko if: asset.expired() -->
+              <img class="image-element image-ephemeral" data-bind="attr: {src: asset.dummy_url}"/>
+            <!-- /ko -->
           </div>
         </div>
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(), css: {'message-is-editing': $parent.is_editing, 'text-large': z.util.emoji.contains_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.ephemeral_status() === z.message.EphemeralStatusType.TIMED_OUT}"></div>
+          <div class="text" data-bind="html: asset.render(), css: {'message-is-editing': $parent.is_editing, 'text-large': z.util.emoji.contains_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.is_expired()}"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset params="preview: $data, viewport_changed: $parents[2].viewport_changed"></link-preview-asset>

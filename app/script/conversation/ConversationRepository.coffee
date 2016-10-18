@@ -1400,18 +1400,10 @@ class z.conversation.ConversationRepository
           @_obfuscate_ping_message conversation_et, message_et.id
         when message_et.has_asset()
           @_obfuscate_asset_message conversation_et, message_et.id
+        when message_et.has_asset_medium_image()
+          @_obfuscate_image_message conversation_et, message_et.id
         else
-          @conversation_service.update_message_in_db message_et, expire_after_millis: true
-          .then =>
-            message_et.expire_after_millis true
-            switch message_et.constructor.name
-              when 'ContentMessage'
-                asset = message_et.assets.pop()
-                switch asset.constructor.name
-                  when 'MediumImage'
-                    message_et.assets.push asset
-                  else
-                    @logger.log @logger.levels.INFO, "Ephemeral asset of type '#{asset.constructor.name}' is unsupported.", asset
+          @logger.log 'Unsupported ephemeral type', message_et.type
     else
       # TODO delete without trace
       @delete_message_everyone conversation_et, message_et
@@ -1457,6 +1449,26 @@ class z.conversation.ConversationRepository
         expire_after_millis: true
     .then =>
       @logger.log 'Obfuscated asset message'
+
+  _obfuscate_image_message: (conversation_et, message_id) =>
+    @get_message_in_conversation_by_id conversation_et, message_id
+    .then (message_et) =>
+      asset = message_et.get_first_asset()
+      debugger
+      message_et.expire_after_millis true
+      @conversation_service.update_message_in_db message_et,
+        data:
+          info:
+            nonce: message_et.nonce
+            height: asset.height
+            width: asset.width
+            original_height: asset.original_height
+            original_width: asset.original_width
+            tag: 'medium'
+        id: null
+        expire_after_millis: true
+    .then =>
+      @logger.log 'Obfuscated image message'
 
   ###
   Can user upload assets to conversation.
