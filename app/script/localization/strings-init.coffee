@@ -20,6 +20,8 @@ window.z ?= {}
 z.string ?= {}
 z.string.de ?= {}
 z.string.es ?= {}
+z.string.fi ?= {}
+z.string.hr ?= {}
 z.string.ro ?= {}
 z.string.ru ?= {}
 
