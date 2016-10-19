@@ -1060,7 +1060,7 @@ class z.conversation.ConversationRepository
   ###
   _create_user_client_map: (conversation_id, skip_own_clients = false) ->
     @get_all_users_in_conversation conversation_id
-    .then (user_ets) =>
+    .then (user_ets) ->
       user_client_map = {}
 
       for user_et in user_ets when user_et.devices()[0]
