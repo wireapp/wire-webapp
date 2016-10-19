@@ -28,6 +28,7 @@ class z.components.FileAssetComponent
   ###
   constructor: (params, component_info) ->
     @asset = params.asset
+    @expired = params.expired
 
     @circle_upload_progress = ko.pureComputed =>
       size = if @large then '200' else '100'
@@ -46,10 +47,10 @@ ko.components.register 'file-asset',
   viewModel: createViewModel: (params, component_info) ->
     return new z.components.FileAssetComponent params, component_info
   template: """
-            <!-- ko if: asset.expired() -->
+            <!-- ko if: expired() -->
               <div class="file bg-color-ephemeral"></div>
             <!-- /ko -->
-            <!-- ko ifnot: asset.expired() -->
+            <!-- ko ifnot: expired() -->
               <div class="file"
                  data-uie-name="file"
                  data-bind="attr: {'data-uie-value': asset.file_name},

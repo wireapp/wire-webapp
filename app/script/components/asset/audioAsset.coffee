@@ -29,6 +29,7 @@ class z.components.AudioAssetComponent
   constructor: (params, component_info) ->
     @logger = new z.util.Logger 'AudioAssetComponent', z.config.LOGGER.OPTIONS
     @asset = params.asset
+    @expired = params.expired
 
     @audio_src = ko.observable()
     @audio_element = $(component_info.element).find('audio')[0]
@@ -79,7 +80,7 @@ ko.components.register 'audio-asset',
   viewModel: createViewModel: (params, component_info) ->
     return new z.components.AudioAssetComponent params, component_info
   template: """
-    <!-- ko ifnot: asset.expired() -->
+    <!-- ko ifnot: expired() -->
       <audio data-bind="attr: {src: audio_src},
                         event: {loadedmetadata: on_loadedmetadata, timeupdate: on_timeupdate}">
       </audio>

@@ -66,7 +66,7 @@
             css: {'bg-color-ephemeral': message.is_expired()},
             viewport_changed: $parents[1].viewport_changed
             " data-uie-name="go-image-detail">
-            <!-- ko ifnot: asset.expired() -->
+            <!-- ko ifnot: message.is_expired() -->
               <img class="image-element" data-bind="attr: {src: asset.dummy_url}"/>
               <span class="image-placeholder-icon">
                 <div class="three-dots">
@@ -76,7 +76,7 @@
                 </div>
               </span>
             <!-- /ko -->
-            <!-- ko if: asset.expired() -->
+            <!-- ko if: message.is_expired() -->
               <img class="image-element image-ephemeral" data-bind="attr: {src: asset.dummy_url}"/>
             <!-- /ko -->
           </div>
@@ -91,13 +91,13 @@
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.is_video() -->
-        <video-asset data-bind="css: {'bg-color-ephemeral': asset.expired()}" params="asset: asset"></video-asset>
+        <video-asset data-bind="css: {'bg-color-ephemeral': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></video-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_audio() -->
-        <audio-asset data-bind="css: {'bg-color-ephemeral': asset.expired()}" params="asset: asset"></audio-asset>
+        <audio-asset data-bind="css: {'bg-color-ephemeral': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_file() -->
-        <file-asset data-bind="css: {'bg-color-ephemeral': asset.expired()}" params="asset: asset"></file-asset>
+        <file-asset data-bind="css: {'bg-color-ephemeral': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></file-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_location() -->
         <location-asset params="asset: asset"></location-asset>
