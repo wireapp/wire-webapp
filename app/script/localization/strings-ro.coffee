@@ -393,7 +393,7 @@ z.string.ro.preferences_about_terms_of_use = 'Termeni de folosire'
 z.string.ro.preferences_about_version = 'Versiune %version'
 z.string.ro.preferences_about_website = 'Site web Wire'
 
-z.string.ro.preferences_account_change_password = 'Schimbă parola'
+z.string.ro.preferences_account_reset_password = 'Schimbă parola'
 z.string.ro.preferences_account_delete = 'Șterge contul'
 z.string.ro.preferences_account_log_out = 'Deconectare'
 z.string.ro.preferences_account_username_placeholder = 'Numele tău complet'

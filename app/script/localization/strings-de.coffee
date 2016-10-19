@@ -395,7 +395,7 @@ z.string.de.preferences_about_terms_of_use = 'Nutzungsbedingungen'
 z.string.de.preferences_about_version = 'Version %version'
 z.string.de.preferences_about_website = 'Wire-Webseite'
 
-z.string.de.preferences_account_change_password = 'Passwort ändern'
+z.string.de.preferences_account_change_password = 'Passwort zurücksetzen'
 z.string.de.preferences_account_delete = 'Benutzerkonto löschen'
 z.string.de.preferences_account_log_out = 'Abmelden'
 z.string.de.preferences_account_username_placeholder = 'Dein vollständiger Name'
