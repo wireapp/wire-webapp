@@ -230,6 +230,9 @@
                 class="context-menu icon-more font-size-xs"
                 tabindex="-1"></context-menu>
     <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+    <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
+      <ephemeral-timer class="message-ephemeral-timer" params="expires: message.expire_after_millis()"></ephemeral-timer>
+    <!-- /ko -->
   </div>
 </script>
 

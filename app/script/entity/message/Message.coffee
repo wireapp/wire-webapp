@@ -50,7 +50,7 @@ class z.entity.Message
         return z.message.EphemeralStatusType.NONE
 
     @ephemeral_status.subscribe (status) =>
-      @get_first_asset()?.expired true if status is z.message.EphemeralStatusType.TIMED_OUT
+      @get_first_asset().expired true if @is_content() and status is z.message.EphemeralStatusType.TIMED_OUT
 
     @from = ''
     @is_editing = ko.observable false
