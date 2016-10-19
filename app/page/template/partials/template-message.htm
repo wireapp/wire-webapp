@@ -43,7 +43,7 @@
 </script>
 
 <script type="text/html" id="normal">
-  <div class="message-header" data-bind="css: {'message-hide-user-avatar': $parent.should_hide_user_avatar($data)}">
+  <div class="message-header" data-bind="visible: !$parent.should_hide_user_avatar($data)">
     <div class="message-header-icon">
       <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
     </div>
@@ -63,7 +63,7 @@
             attr: {'data-uie-visible': $parent.visible},
             background_image: asset.resource,
             click: $parents[1].show_detail,
-            css: {'image-ephemeral': message.is_expired()},
+            css: {'bg-color-ephemeral': message.is_expired()},
             viewport_changed: $parents[1].viewport_changed
             " data-uie-name="go-image-detail">
             <!-- ko ifnot: asset.expired() -->
@@ -84,7 +84,7 @@
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(), css: {'message-is-editing': $parent.is_editing, 'text-large': z.util.emoji.contains_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.is_expired()}"></div>
+          <div class="text" data-bind="html: asset.render(), css: {'text-graphite': $parent.is_editing, 'text-large': z.util.emoji.contains_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.is_expired()}"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset params="expired: message.is_expired(), preview: $data, viewport_changed: $parents[2].viewport_changed"></link-preview-asset>
@@ -102,20 +102,6 @@
       <!-- ko if: asset.is_location() -->
         <location-asset params="asset: asset"></location-asset>
       <!-- /ko -->
-
-      <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <ephemeral-timer class="message-ephemeral-timer" params="expires: message.expire_after_millis()"></ephemeral-timer>
-      <!-- /ko -->
-
-      <context-menu params="entries: function() {return $parents[1].get_context_menu_entries(message)}, tag: 'message', data: message.id"
-                    class="context-menu icon-more font-size-xs"
-                    tabindex="-1"></context-menu>
-      <!-- ko ifnot: message.timestamp == '' -->
-        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
-        <!-- ko if: $parents[1].is_last_delivered_message(message) -->
-          <span class="message-status" data-bind="l10n_text: z.string.conversation_message_delivered"></span>
-        <!-- /ko -->
-      <!-- /ko -->
     <!-- /ko -->
 
     <!-- ko if: !message.other_likes().length && message.status() !== z.message.StatusType.SENDING -->
@@ -126,6 +112,19 @@
         </span>
       </div>
     <!-- /ko -->
+
+    <div class="message-body-actions">
+      <context-menu params="entries: function() {return $parents[1].get_context_menu_entries(message)}, tag: 'message', data: message.id"
+                    class="context-menu icon-more font-size-xs"
+                    tabindex="-1"></context-menu>
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
+      <!-- ko if: $parent.is_last_delivered_message(message) -->
+        <span class="message-status" data-bind="l10n_text: z.string.conversation_message_delivered"></span>
+      <!-- /ko -->
+      <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
+        <ephemeral-timer class="message-ephemeral-timer" params="expires: message.expire_after_millis()"></ephemeral-timer>
+      <!-- /ko -->
+    </div>
 
   </div>
   <!-- ko if: message.other_likes().length -->
