@@ -18,7 +18,7 @@
 
 #General terms
 z.string.de.wire = 'Wire'
-z.string.de.wire_osx = 'Wire für macOS'
+z.string.de.wire_macos = 'Wire für macOS'
 z.string.de.wire_windows = 'Wire für Windows'
 z.string.de.wire_linux = 'Wire für Linux'
 z.string.de.truncation = '…'
@@ -418,7 +418,7 @@ z.string.de.preferences_devices_verification = 'Verifiziert'
 
 z.string.de.preferences_options_contacts = 'Kontakte'
 z.string.de.preferences_options_contacts_gmail = 'Aus Gmail importieren'
-z.string.de.preferences_options_contacts_osx = 'Aus Kontakte importieren'
+z.string.de.preferences_options_contacts_macos = 'Aus Kontakte importieren'
 z.string.de.preferences_options_contacts_detail = 'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.'
 z.string.de.preferences_options_data = 'Nutzungs- und Fehlerberichte'
 z.string.de.preferences_options_data_checkbox = 'Nutzungs- und Fehlerberichte'
@@ -549,7 +549,8 @@ z.string.de.tooltip_people_rename = 'Unterhaltung umbenennen'
 z.string.de.tooltip_people_remove = 'Aus Unterhaltung entfernen'
 z.string.de.tooltip_people_unblock = 'Freigeben'
 
-z.string.de.tooltip_preferences_contacts = 'Logge dich in dein Gmail-Konto ein, um deine Kontakte zu teilen'
+z.string.de.tooltip_preferences_contacts_gmail = 'Logge dich in dein Gmail-Konto ein, um deine Kontakte zu teilen'
+z.string.de.tooltip_preferences_contacts_macos = 'Teile alle deine Kontakte aus der macOS Kontakte-App'
 z.string.de.tooltip_preferences_password = 'Öffne eine andere Website, um dein Passwort zurückzusetzen'
 z.string.de.tooltip_preferences_picture = 'Ändere dein Bild…'
 z.string.de.tooltip_preferences_rename = 'Ändere deinen Namen'

@@ -121,9 +121,9 @@ z.event.WebApp =
     CHANGE:
       DEBUG: 'wire.webapp.properties.change.debug'
     UPDATE:
-      GOOGLE: 'wire.webapp.properties.update.google'
-      OSX_CONTACTS: 'wire.webapp.properties.update.google'
       CALL_MUTE: 'wire.webapp.properties.update.call-mute'
+      CONTACTS_GOOGLE: 'wire.webapp.properties.update.contacts-google'
+      CONTACTS_MACOS: 'wire.webapp.properties.update.contacts-macos'
       SEND_DATA: 'wire.webapp.properties.update.send-data'
       SOUND_ALERTS: 'wire.webapp.properties.update.sound-alerts'
       HAS_CREATED_CONVERSATION: 'wire.webapp.properties.update.has-created-conversation'

@@ -18,7 +18,7 @@
 
 #General terms
 z.string.wire = 'Wire'
-z.string.wire_osx = 'Wire for macOS'
+z.string.wire_macos = 'Wire for macOS'
 z.string.wire_windows = 'Wire for Windows'
 z.string.wire_linux = 'Wire for Linux'
 z.string.truncation = '…'
@@ -418,7 +418,7 @@ z.string.preferences_devices_verification = 'Verified'
 
 z.string.preferences_options_contacts = 'Contacts'
 z.string.preferences_options_contacts_gmail = 'Import from Gmail'
-z.string.preferences_options_contacts_osx = 'Import from Contacts'
+z.string.preferences_options_contacts_macos = 'Import from Contacts'
 z.string.preferences_options_contacts_detail = 'We use your contact data to connect you with others. We anonymize all information and do not share it with anyone else.'
 z.string.preferences_options_data = 'Usage and crash reports'
 z.string.preferences_options_data_checkbox = 'Usage and crash reports'
@@ -549,7 +549,8 @@ z.string.tooltip_people_rename = 'Change conversation name'
 z.string.tooltip_people_remove = 'Remove from conversation'
 z.string.tooltip_people_unblock = 'Unblock'
 
-z.string.tooltip_preferences_contacts = 'Sign in to your Gmail account to share contacts'
+z.string.tooltip_preferences_contacts_gmail = 'Log in to your Gmail account to share contacts'
+z.string.tooltip_preferences_contacts_macos = 'Share all your contacts from the macOS Contacts app'
 z.string.tooltip_preferences_password = 'Open another website to reset your password'
 z.string.tooltip_preferences_picture = 'Change your picture…'
 z.string.tooltip_preferences_rename = 'Change your name'

@@ -17,7 +17,7 @@
 #
 
 #General terms
-z.string.ro.wire_osx = 'Wire pentru macOS'
+z.string.ro.wire_macos = 'Wire pentru macOS'
 z.string.ro.wire_windows = 'Wire pentru Windows'
 z.string.ro.wire_linux = 'Wire pentru Linux'
 z.string.ro.nonexistent_user = 'Utilizator șters'
@@ -416,7 +416,7 @@ z.string.ro.preferences_devices_verification = 'Verificat'
 
 z.string.ro.preferences_options_contacts = 'Contacte'
 z.string.ro.preferences_options_contacts_gmail = 'Importă din Gmail'
-z.string.ro.preferences_options_contacts_osx = 'Importă din Contacte'
+z.string.ro.preferences_options_contacts_macos = 'Importă din Contacte'
 z.string.ro.preferences_options_contacts_detail = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.'
 z.string.ro.preferences_options_data = 'Rapoarte de folosire și de avarie'
 z.string.ro.preferences_options_data_checkbox = 'Rapoarte de folosire și de avarie'
@@ -547,7 +547,7 @@ z.string.ro.tooltip_people_rename = 'Schimbă numele conversației'
 z.string.ro.tooltip_people_remove = 'Elimină din conversație'
 z.string.ro.tooltip_people_unblock = 'Deblochează'
 
-z.string.ro.tooltip_preferences_contacts = 'Autentifică-te cu contul Gmail pentru a împărtăși contacte'
+z.string.ro.tooltip_preferences_contacts_gmail = 'Autentifică-te cu contul Gmail pentru a împărtăși contacte'
 z.string.ro.tooltip_preferences_password = 'Deschide un alt site web pentru a reseta parola'
 z.string.ro.tooltip_preferences_picture = 'Schimbă poza de profil…'
 z.string.ro.tooltip_preferences_rename = 'Schimbă numele tău'

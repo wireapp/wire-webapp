@@ -30,7 +30,7 @@ describe 'Shortcut', ->
       it 'can get shortcut for mac', ->
         z.util.Environment.os.mac = true
         mac_shortcut = z.ui.Shortcut.get_shortcut z.ui.ShortcutType.ADD_PEOPLE
-        expect(mac_shortcut).toBe map[z.ui.ShortcutType.ADD_PEOPLE].shortcut.webapp.osx
+        expect(mac_shortcut).toBe map[z.ui.ShortcutType.ADD_PEOPLE].shortcut.webapp.macos
 
       it 'can get shortcut for pc', ->
         z.util.Environment.os.mac = false
@@ -45,7 +45,7 @@ describe 'Shortcut', ->
       it 'can get shortcut for electron mac', ->
         z.util.Environment.os.mac = true
         mac_shortcut = z.ui.Shortcut.get_shortcut z.ui.ShortcutType.ADD_PEOPLE
-        expect(mac_shortcut).toBe map[z.ui.ShortcutType.ADD_PEOPLE].shortcut.electron.osx
+        expect(mac_shortcut).toBe map[z.ui.ShortcutType.ADD_PEOPLE].shortcut.electron.macos
 
       it 'can get shortcut for electron pc', ->
         z.util.Environment.os.mac = false
