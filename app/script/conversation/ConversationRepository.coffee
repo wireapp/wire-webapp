@@ -1245,14 +1245,16 @@ class z.conversation.ConversationRepository
   ###
   _send_encrypted_asset: (conversation_id, generic_message, image_data, nonce) =>
     skip_other_own_clients = generic_message.content is 'ephemeral'
+    precondition_option = false
 
     @_create_user_client_map conversation_id, skip_other_own_clients
     .then (user_client_map) =>
+      if skip_own_clients
+        precondition_option = Object.keys user_client_map
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
     .then (payload) =>
       payload.inline = false
-      if skip_other_own_clients then force_sending = true else force_sending = false
-      @asset_service.post_asset_v2 conversation_id, payload, image_data, force_sending, nonce
+      @asset_service.post_asset_v2 conversation_id, payload, image_data, precondition_option, nonce
       .catch (error_response) =>
         return @_update_payload_for_changed_clients error_response, generic_message, payload
         .then (updated_payload) =>
