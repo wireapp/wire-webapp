@@ -225,12 +225,12 @@
       <span class="message-icon-ping icon-ping" data-bind="css: message.animation()"></span>
     </div>
   </div>
-  <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
+  <div class="message-body-actions">
+    <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
                 class="context-menu icon-more font-size-xs"
                 tabindex="-1"></context-menu>
-  <!-- ko ifnot: message.timestamp == '' -->
     <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
-  <!-- /ko -->
+  </div>
 </script>
 
 <script type="text/html" id="system">
