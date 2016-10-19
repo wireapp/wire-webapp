@@ -42,6 +42,20 @@
   & a {text-decoration: none;}
   & * {.accent-selection-color;}
   &:last-child {margin-bottom: 24px;}
+
+  &.hover .time,
+  &:hover .time,
+  &.hover .context-menu,
+  &:hover .context-menu,
+  .show-timestamp.time {
+    opacity: 1;
+  }
+
+  &:not(:hover) {
+    .message-status {
+      opacity: 1;
+    }
+  }
 }
 
 // MESSAGE - HEADER
@@ -312,20 +326,6 @@
     }
   }
 
-  &.hover .time,
-  &:hover .time,
-  &.hover .context-menu,
-  &:hover .context-menu,
-  .show-timestamp.time {
-    opacity: 1;
-  }
-
-  &:not(:hover) {
-    .message-status {
-      opacity: 1;
-    }
-  }
-
   .show-timestamp.time + .message-status {
     opacity: 0;
   }
@@ -359,6 +359,10 @@
     top: 0;
     right: 8px;
   }
+}
+
+.message-body-actions-large {
+  width: 160px;
 }
 
 // MEMBER MESSAGE
