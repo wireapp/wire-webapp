@@ -114,7 +114,7 @@
     <!-- /ko -->
 
     <div class="message-body-actions">
-      <context-menu params="entries: function() {return $parents[1].get_context_menu_entries(message)}, tag: 'message', data: message.id"
+      <context-menu params="entries: function() {return $parent.get_context_menu_entries(message)}, tag: 'message', data: message.id"
                     class="context-menu icon-more font-size-xs"
                     tabindex="-1"></context-menu>
       <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>

@@ -548,6 +548,7 @@ class z.ViewModel.MessageListViewModel
 
   start_ephemeral_timer: (message_et, millis_number) ->
     if not @ephemeral_timers[message_et.id]
+      conversation_et = @conversation()
       @ephemeral_timers[message_et.id] = window.setTimeout (=>
-        @conversation_repository.timeout_ephemeral_message @conversation(), message_et
+        @conversation_repository.timeout_ephemeral_message conversation_et, message_et
       ), millis_number
