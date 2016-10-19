@@ -394,7 +394,7 @@ z.string.hr.preferences_about_terms_of_use = 'Uvjeti uporabe'
 z.string.hr.preferences_about_version = 'Verzija %version'
 z.string.hr.preferences_about_website = 'Wire website'
 
-z.string.hr.preferences_account_change_password = 'Promjena lozinke'
+z.string.hr.preferences_account_reset_password = 'Promjena lozinke'
 z.string.hr.preferences_account_delete = 'Brisanje računa'
 z.string.hr.preferences_account_log_out = 'Odjava'
 z.string.hr.preferences_account_username_placeholder = 'Vaše puno ime'

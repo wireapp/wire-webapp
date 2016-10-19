@@ -393,7 +393,7 @@ z.string.fi.preferences_about_terms_of_use = 'Käyttöehdot'
 z.string.fi.preferences_about_version = 'Versio %version'
 z.string.fi.preferences_about_website = 'Wiren verkkosivu'
 
-z.string.fi.preferences_account_change_password = 'Vaihda salasana'
+z.string.fi.preferences_account_reset_password = 'Vaihda salasana'
 z.string.fi.preferences_account_delete = 'Poista tili'
 z.string.fi.preferences_account_log_out = 'Kirjaudu ulos'
 z.string.fi.preferences_account_username_placeholder = 'Koko nimesi'

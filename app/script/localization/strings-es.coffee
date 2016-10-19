@@ -393,7 +393,7 @@ z.string.es.preferences_about_terms_of_use = 'Términos de uso'
 z.string.es.preferences_about_version = 'Versión %version'
 z.string.es.preferences_about_website = 'Página web de Wire'
 
-z.string.es.preferences_account_change_password = 'Cambiar contraseña'
+z.string.es.preferences_account_reset_password = 'Cambiar contraseña'
 z.string.es.preferences_account_delete = 'Eliminar cuenta'
 z.string.es.preferences_account_log_out = 'Cerrar sesión'
 z.string.es.preferences_account_username_placeholder = 'Tu nombre completo'
