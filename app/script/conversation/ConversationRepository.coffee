@@ -1165,14 +1165,15 @@ class z.conversation.ConversationRepository
     .then (user_client_map) =>
       if user_ids
         delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
+      if skip_own_clients
+        user_ids = Object.keys user_client_map
       generic_message_external = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message_external.set 'external', new z.proto.External new Uint8Array(key_bytes), new Uint8Array(sha256)
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message_external
     .then (payload) =>
       payload.data = z.util.array_to_base64 ciphertext
       payload.native_push = native_push
-      if skip_other_own_clients then pre_condition = true else pre_condition = user_ids
-      @_send_encrypted_message conversation_id, generic_message, payload, pre_condition
+      @_send_encrypted_message conversation_id, generic_message, payload, user_ids
     .catch (error) =>
       @logger.log @logger.levels.INFO, 'Failed sending external message', error
       throw error
