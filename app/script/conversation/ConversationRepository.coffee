@@ -1063,7 +1063,7 @@ class z.conversation.ConversationRepository
     .then (user_ets) ->
       user_client_map = {}
 
-      for user_et in user_ets when user_et.devices()[0]
+      for user_et in user_ets
         continue if user_et.is_me and skip_own_clients
         user_client_map[user_et.id] = (client_et.id for client_et in user_et.devices())
 
@@ -1198,11 +1198,12 @@ class z.conversation.ConversationRepository
         .then (user_client_map) =>
           if user_ids
             delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
+          if skip_own_clients
+            user_ids = Object.keys user_client_map
           return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
         .then (payload) =>
           payload.native_push = native_push
-          if skip_own_clients then pre_condition = true else pre_condition = user_ids
-          @_send_encrypted_message conversation_id, generic_message, payload, pre_condition
+          @_send_encrypted_message conversation_id, generic_message, payload, user_ids
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
         return @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
