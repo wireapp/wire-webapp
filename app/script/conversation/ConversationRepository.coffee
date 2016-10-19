@@ -1058,15 +1058,14 @@ class z.conversation.ConversationRepository
   @param skip_other_own_clients [Boolean] True, if other own clients should be skipped (to not sync messages on own clients)
   @return [Promise<Object>] Promise that resolves with a user client map
   ###
-  _create_user_client_map: (conversation_id, skip_other_own_clients = true) ->
+  _create_user_client_map: (conversation_id, skip_other_own_clients = false) ->
     @get_all_users_in_conversation conversation_id
     .then (user_ets) =>
       user_client_map = {}
 
       for user_et in user_ets when user_et.devices()[0]
         user_client_map[user_et.id] = (client_et.id for client_et in user_et.devices())
-        if user_et.is_me and skip_other_own_clients
-          user_client_map[user_et.id] = [@user_repository.client_repository.current_client().id]
+        continue if user_et.is_me and skip_other_own_clients
 
       return user_client_map
 
