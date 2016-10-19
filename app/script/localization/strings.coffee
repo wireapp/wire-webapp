@@ -395,7 +395,7 @@ z.string.preferences_about_terms_of_use = 'Terms of use'
 z.string.preferences_about_version = 'Version %version'
 z.string.preferences_about_website = 'Wire website'
 
-z.string.preferences_account_change_password = 'Change password'
+z.string.preferences_account_reset_password = 'Reset password'
 z.string.preferences_account_delete = 'Delete account'
 z.string.preferences_account_log_out = 'Log out'
 z.string.preferences_account_username_placeholder = 'Your full name'
