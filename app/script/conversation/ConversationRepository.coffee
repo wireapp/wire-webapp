@@ -1443,7 +1443,6 @@ class z.conversation.ConversationRepository
             original_height: asset.original_height
             original_width: asset.original_width
             tag: 'medium'
-        id: null
         expire_after_millis: true
     .then =>
       @logger.log 'Obfuscated image message'
