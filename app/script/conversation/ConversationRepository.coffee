@@ -1372,6 +1372,20 @@ class z.conversation.ConversationRepository
       @logger.log "Failed to send delete message with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
       throw error
 
+  ###
+  Get remaining lifetime for give message.
+
+  @param message_et [z.entity.Message]
+  ###
+  get_ephemeral_timer: (message_et) =>
+    millis = message_et.expire_after_millis()
+    return Promise.resolve() if not _.isNumber millis
+
+    expiration_date_iso = new Date(Date.now() + millis).toISOString()
+    message_et.expire_after_millis expiration_date_iso
+    @conversation_service.update_message_in_db message_et, {expire_after_millis: expiration_date_iso}
+    .then => return millis
+
   timeout_ephemeral_message: (conversation_et, message_et) =>
     if message_et.user().is_me
       switch

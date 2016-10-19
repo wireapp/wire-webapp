@@ -249,7 +249,6 @@ class z.ViewModel.ConversationInputViewModel
   get_context_menu_entries: ->
     return [
       {label: 'None', action: 0},
-      {label: '1 second', action: 1000},
       {label: '5 seconds', action: 5000},
       {label: '15 seconds', action: 15000},
       {label: '1 minute', action: 60000},

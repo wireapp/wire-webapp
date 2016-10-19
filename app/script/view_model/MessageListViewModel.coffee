@@ -532,23 +532,25 @@ class z.ViewModel.MessageListViewModel
       type: z.tracking.helpers.get_message_type message_et
       reacted_to_last_message: conversation_et.get_last_message() is message_et
 
-  message_in_viewport: (message_et) ->
-    millis = message_et.expire_after_millis()
+  ###
+  Message appeared in viewport.
 
-    if _.isNumber millis
-      expiration_date = Date.now() + millis
-      expiration_date_iso = new Date(expiration_date).toISOString()
-      changes =
-        expire_after_millis: expiration_date_iso
-      message_et.expire_after_millis expiration_date_iso
-      @conversation_repository.conversation_service.update_message_in_db message_et, changes
-      .then =>
-        @logger.log @logger.levels.INFO, "Updated ephemeral message record '#{message_et.primary_key}' with '#{JSON.stringify(changes)}'."
-        @start_ephemeral_timer message_et, millis
+  @param message_et [z.entity.Message]
+  ###
+  message_in_viewport: (message_et) =>
+    @conversation_repository.get_ephemeral_timer message_et
+    .then (millis) => @start_ephemeral_timer message_et, millis if millis
 
-  start_ephemeral_timer: (message_et, millis_number) ->
-    if not @ephemeral_timers[message_et.id]
-      conversation_et = @conversation()
-      @ephemeral_timers[message_et.id] = window.setTimeout (=>
-        @conversation_repository.timeout_ephemeral_message conversation_et, message_et
-      ), millis_number
+  ###
+  Start ephemeral timeout.
+
+  @param message_et [z.entity.Message]
+  @param millis [Number]
+  ###
+  start_ephemeral_timer: (message_et, millis) ->
+    return if @ephemeral_timers[message_et.id]
+
+    conversation_et = @conversation()
+    @ephemeral_timers[message_et.id] = window.setTimeout (=>
+      @conversation_repository.timeout_ephemeral_message conversation_et, message_et
+    ), millis
