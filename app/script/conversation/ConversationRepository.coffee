@@ -1388,7 +1388,7 @@ class z.conversation.ConversationRepository
     expiration_date_iso = new Date(Date.now() + millis).toISOString()
     message_et.expire_after_millis expiration_date_iso
     @conversation_service.update_message_in_db message_et, {expire_after_millis: expiration_date_iso}
-    .then => return millis
+    .then -> return millis
 
   timeout_ephemeral_message: (conversation_et, message_et) =>
     if message_et.user().is_me
