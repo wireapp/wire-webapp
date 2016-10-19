@@ -1244,10 +1244,10 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
   _send_encrypted_asset: (conversation_id, generic_message, image_data, nonce) =>
-    skip_other_own_clients = generic_message.content is 'ephemeral'
+    skip_own_clients = generic_message.content is 'ephemeral'
     precondition_option = false
 
-    @_create_user_client_map conversation_id, skip_other_own_clients
+    @_create_user_client_map conversation_id, skip_own_clients
     .then (user_client_map) =>
       if skip_own_clients
         precondition_option = Object.keys user_client_map
