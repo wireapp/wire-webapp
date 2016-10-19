@@ -1201,7 +1201,7 @@ class z.conversation.ConversationRepository
           return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
         .then (payload) =>
           payload.native_push = native_push
-          if skip_other_own_clients then pre_condition = true else pre_condition = user_ids
+          if skip_own_clients then pre_condition = true else pre_condition = user_ids
           @_send_encrypted_message conversation_id, generic_message, payload, pre_condition
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
