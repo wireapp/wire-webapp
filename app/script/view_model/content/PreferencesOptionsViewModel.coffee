@@ -44,7 +44,7 @@ class z.ViewModel.content.PreferencesOptionsViewModel
     amplify.publish z.event.WebApp.CONNECT.IMPORT_CONTACTS, z.connect.ConnectSource.GMAIL, z.connect.ConnectTrigger.SETTINGS
     amplify.publish z.event.WebApp.SEARCH.SHOW
 
-  connect_osx_contacts: ->
+  connect_macos_contacts: ->
     amplify.publish z.event.WebApp.CONNECT.IMPORT_CONTACTS, z.connect.ConnectSource.ICLOUD, z.connect.ConnectTrigger.SETTINGS
     amplify.publish z.event.WebApp.SEARCH.SHOW
 
