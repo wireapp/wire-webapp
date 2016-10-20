@@ -216,13 +216,17 @@ class z.assets.AssetService
   @param conversation_id [String] ID of the self conversation
   @param json_payload [Object] First part of the multipart message
   @param image_data [Uint8Array|ArrayBuffer] encrypted image data
-  @param force_sending [Boolean] Force sending
+  @param precondition_option [Array<String>|Boolean] Level that backend checks for missing clients
   @param upload_id [String] Identifies the upload request
   ###
-  post_asset_v2: (conversation_id, json_payload, image_data, force_sending, upload_id) ->
+  post_asset_v2: (conversation_id, json_payload, image_data, precondition_option, upload_id) ->
     return new Promise (resolve, reject) =>
       url = @client.create_url "/conversations/#{conversation_id}/otr/assets"
-      url = "#{url}?ignore_missing=true" if force_sending
+
+      if _.isArray precondition_option
+        url = "#{url}?report_missing=#{precondition_option.join ','}"
+      else if precondition_option
+        url = "#{url}?ignore_missing=true"
 
       image_data = new Uint8Array image_data
       data = @_create_asset_multipart_body image_data, json_payload

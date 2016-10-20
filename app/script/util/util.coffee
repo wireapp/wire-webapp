@@ -138,7 +138,7 @@ z.util.format_bytes = (bytes, decimals) ->
 ###
 Format seconds into hh:mm:ss.
 
-@param bytes [seconds] duration to format in seconds
+@param duration [Number] duration to format in seconds
 @return [String]
 ###
 z.util.format_seconds = (duration) ->
@@ -159,6 +159,16 @@ z.util.format_seconds = (duration) ->
     components.unshift hours
 
   return components.join ':'
+
+###
+Format seconds into 15s, 2m.
+
+@param duration [Number] duration to format in seconds
+@return [String]
+###
+z.util.format_milliseconds_short = (duration) ->
+  seconds = Math.floor duration / 1000
+  return if seconds < 60 then "#{seconds}s" else "#{Math.floor(seconds / 60)}m"
 
 
 z.util.get_content_type_from_data_url = (data_url) ->

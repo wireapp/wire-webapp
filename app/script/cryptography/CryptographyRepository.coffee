@@ -543,28 +543,6 @@ class z.cryptography.CryptographyRepository
         resolve [undefined, undefined]
 
   ###
-  Save an encrypted event.
-
-  @note IMPORTANT:
-    Session should only be saved after the plaintext is saved somewhere safe, as, after saving,
-    the session will be unable to decrypt the message again.
-
-  @param generic_message [z.proto.GenericMessage] Received ProtoBuffer message
-  @param event [JSON] JSON of 'z.event.Backend.CONVERSATION.OTR-ASSET-ADD' or 'z.event.Backend.CONVERSATION.OTR-MESSAGE-ADD' event
-  @return [Promise] Promise that will resolve with the saved record
-  ###
-  save_encrypted_event: (generic_message, event) =>
-    @cryptography_mapper.map_generic_message generic_message, event
-    .then (mapped) =>
-      return @storage_repository.save_conversation_event mapped
-    .catch (error) =>
-      if error instanceof z.cryptography.CryptographyError
-        return undefined
-      else
-        @logger.log @logger.levels.ERROR, "Saving encrypted message failed: #{error.message}", error
-        throw error
-
-  ###
   Save an unencrypted event.
   @param event [Object] JSON of unencrypted backend event
   @return [Promise] Promise that will resolve with the saved record

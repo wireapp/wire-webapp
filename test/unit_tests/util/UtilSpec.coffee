@@ -785,6 +785,15 @@ describe 'z.util.format_seconds', ->
   it 'should format undefined as 00:00', ->
     expect(z.util.format_seconds()).toBe '00:00'
 
+describe 'z.util.format_milliseconds_short', ->
+  it 'should format duration under 1 minute', ->
+    expect(z.util.format_milliseconds_short(5000)).toBe '5s'
+    expect(z.util.format_milliseconds_short(15000)).toBe '15s'
+
+  it 'should format duration over 1 minute', ->
+    expect(z.util.format_milliseconds_short(60000)).toBe '1m'
+    expect(z.util.format_milliseconds_short(900000)).toBe '15m'
+
 describe 'z.util.is_same_location', ->
   it 'returns false if page was accessed directly', ->
     actual = z.util.is_same_location '', 'https://app.wire.com'

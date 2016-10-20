@@ -17,20 +17,16 @@
 #
 
 window.z ?= {}
-z.entity ?= {}
+z.util ?= {}
+z.util.StringUtil =
+  obfuscate: (text) ->
+    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z']
+    obfuscated = ''
 
-class z.entity.PingMessage extends z.entity.Message
-  constructor: ->
-    super()
-    @super_type = z.message.SuperType.PING
+    for character in text
+      if character.match /[\n\r\s]+/gi
+        obfuscated += character
+      else
+        obfuscated += z.util.ArrayUtil.random_element alphabet
 
-    @caption = ko.pureComputed =>
-      string = if @user().is_me then z.string.conversation_ping_you else z.string.conversation_ping
-      return z.localization.Localizer.get_text string
-    , @, deferEvaluation: true
-
-    @animation = ko.pureComputed =>
-      return 'ping-animation ping-animation-soft' if Date.now() - @timestamp < 2000
-
-    @ping_color = ko.pureComputed =>
-      return if @is_expired() then 'ephemeral-message-obfuscated' else @accent_color()
+    return obfuscated

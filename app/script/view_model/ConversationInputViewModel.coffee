@@ -43,6 +43,8 @@ class z.ViewModel.ConversationInputViewModel
       else
         window.removeEventListener 'click', @on_window_click
 
+    @ephemeral_timer = @conversation_et.ephemeral_timer
+
     @conversation_has_focus = ko.observable(true).extend notify: 'always'
     @browser_has_focus = ko.observable true
 
@@ -68,7 +70,10 @@ class z.ViewModel.ConversationInputViewModel
         content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.PING
     @picture_tooltip = z.localization.Localizer.get_text z.string.tooltip_conversation_picture
     @file_tooltip = z.localization.Localizer.get_text z.string.tooltip_conversation_file
-
+    @input_tooltip = ko.pureComputed =>
+      if @conversation_et().ephemeral_timer()
+        return z.localization.Localizer.get_text z.string.tooltip_conversation_ephemeral
+      return z.localization.Localizer.get_text z.string.tooltip_conversation_input_placeholder
     @ping_disabled = ko.observable false
 
     $(window)
@@ -83,9 +88,10 @@ class z.ViewModel.ConversationInputViewModel
     amplify.subscribe z.event.WebApp.EXTENSIONS.GIPHY.SEND, => @conversation_et()?.input ''
     amplify.subscribe z.event.WebApp.CONVERSATION.IMAGE.SEND, @upload_images
     amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.EDIT, @edit_message
+    amplify.subscribe z.event.WebApp.CONTEXT_MENU, @on_context_menu_action
 
   added_to_view: =>
-    setTimeout =>
+    window.setTimeout =>
       amplify.subscribe z.event.WebApp.SHORTCUT.PING, => @ping()
     , 50
 
@@ -106,8 +112,7 @@ class z.ViewModel.ConversationInputViewModel
       , 2000
 
   send_message: (message) =>
-    if message.length is 0
-      return
+    return if message.length is 0
     @conversation_repository.send_message_with_link_preview message, @conversation_et()
 
   send_message_edit: (message, message_et) =>
@@ -117,6 +122,14 @@ class z.ViewModel.ConversationInputViewModel
       return @conversation_repository.delete_message_everyone @conversation_et(), message_et
     if message isnt message_et.get_first_asset().text
       @conversation_repository.send_message_edit message, message_et, @conversation_et()
+
+  set_ephemeral_timer: (millis) =>
+    if not millis
+      @conversation_et().ephemeral_timer false
+      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' turned off."
+    else
+      @conversation_et().ephemeral_timer millis
+      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer().toString()}'."
 
   upload_images: (images) =>
     for image in images
@@ -153,7 +166,7 @@ class z.ViewModel.ConversationInputViewModel
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_TOO_BIG,
           {size: file.size, type: file.type}
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT
-        setTimeout ->
+        window.setTimeout ->
           amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_TOO_LARGE,
             data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE)
         , 200
@@ -228,3 +241,26 @@ class z.ViewModel.ConversationInputViewModel
     setTimeout ->
       input_element.selectionStart = input_element.selectionEnd = input_element.value.length * 2
     , 0
+
+  ###
+  Create context menu entries for ephemeral timer
+  @param message_et [z.entity.Message]
+  ###
+  get_context_menu_entries: ->
+    return [
+      {label: z.localization.Localizer.get_text(z.string.ephememal_units_none), action: 0},
+      {label: "5 #{z.localization.Localizer.get_text(z.string.ephememal_units_seconds)}", action: 5000},
+      {label: "15 #{z.localization.Localizer.get_text(z.string.ephememal_units_seconds)}", action: 15000},
+      {label: "30 #{z.localization.Localizer.get_text(z.string.ephememal_units_seconds)}", action: 30000},
+      {label: "1 #{z.localization.Localizer.get_text(z.string.ephememal_units_minute)}", action: 60000},
+      {label: "5 #{z.localization.Localizer.get_text(z.string.ephememal_units_minutes)}", action: 300000},
+    ]
+
+  ###
+  Click on context menu entry
+  @param tag [String] associated tag
+  @param action [String] action that was triggered
+  ###
+  on_context_menu_action: (tag, action) =>
+    return if tag isnt 'ephemeral'
+    @set_ephemeral_timer action

@@ -49,7 +49,11 @@ class z.conversation.ConversationRepository
 
     @filtered_conversations = ko.pureComputed =>
       @conversations().filter (conversation_et) ->
-        states_to_filter = [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.CANCELLED, z.user.ConnectionStatus.PENDING]
+        states_to_filter = [
+          z.user.ConnectionStatus.BLOCKED
+          z.user.ConnectionStatus.CANCELLED
+          z.user.ConnectionStatus.PENDING
+        ]
         return false if conversation_et.connection().status() in states_to_filter
         return false if conversation_et.is_self()
         return false if conversation_et.is_cleared() and conversation_et.removed_from_conversation()
@@ -791,11 +795,19 @@ class z.conversation.ConversationRepository
     .then ([asset, ciphertext]) =>
       generic_message = new z.proto.GenericMessage nonce
       generic_message.set 'asset', asset
+      if conversation_et.ephemeral_timer()
+        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
       @_send_encrypted_asset conversation_et.id, generic_message, ciphertext, nonce
     .then ([response, asset_id]) =>
       event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
-      event.data.otr_key = generic_message.asset.uploaded.otr_key
-      event.data.sha256 = generic_message.asset.uploaded.sha256
+
+      if conversation_et.ephemeral_timer()
+        asset = generic_message.ephemeral.asset
+      else
+        asset = generic_message.asset
+
+      event.data.otr_key = asset.uploaded.otr_key
+      event.data.sha256 = asset.uploaded.sha256
       event.data.id = asset_id
       event.id = nonce
       return @_on_asset_upload_complete conversation_et, event
@@ -810,6 +822,8 @@ class z.conversation.ConversationRepository
     asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'asset', asset
+    if conversation_et.ephemeral_timer()
+      generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
     @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
@@ -849,6 +863,8 @@ class z.conversation.ConversationRepository
     .then ([image, ciphertext]) =>
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'image', image
+      if conversation_et.ephemeral_timer()
+        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
       optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
       @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
       .then (mapped_event) =>
@@ -867,7 +883,7 @@ class z.conversation.ConversationRepository
           saved_event.data.info.nonce = asset_id
           @_update_image_as_sent conversation_et, saved_event
         .catch (error) =>
-          @logger.log "Failed to upload otr asset for conversation #{conversation_et.id}", error
+          @logger.log @logger.levels.ERROR, "Failed to upload otr asset for conversation #{conversation_et.id}", error
           throw error
 
         return saved_event
@@ -880,6 +896,8 @@ class z.conversation.ConversationRepository
   send_knock: (conversation_et) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'knock', new z.proto.Knock false
+    if conversation_et.ephemeral_timer()
+      generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
 
     @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) => @logger.log @logger.levels.ERROR, "#{error.message}"
@@ -897,12 +915,13 @@ class z.conversation.ConversationRepository
     .then (link_preview) =>
       if link_preview?
         switch generic_message.content
+          when 'ephemeral'
+            generic_message.ephemeral.text.link_preview.push link_preview
           when 'edited'
             generic_message.edited.text.link_preview.push link_preview
           when 'text'
             generic_message.text.link_preview.push link_preview
         @_send_and_inject_generic_message conversation_et, generic_message
-        @link_repository.get_link_preview_from_string message
 
   ###
   Send text message in specified conversation.
@@ -914,10 +933,25 @@ class z.conversation.ConversationRepository
   send_message: (message, conversation_et) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'text', new z.proto.Text message
-
+    if conversation_et.ephemeral_timer()
+      generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
     @_send_and_inject_generic_message conversation_et, generic_message
-    .then ->
-      return generic_message
+    .then -> return generic_message
+
+  ###
+  Wraps generic message in ephemeral message.
+
+  @param generic_message [z.proto.Message]
+  @param millis [Number] expire time in milliseconds
+  @return [z.proto.Message]
+  ###
+  _wrap_in_ephemeral_message: (generic_message, millis) ->
+    ephemeral = new z.proto.Ephemeral()
+    ephemeral.set 'expire_after_millis', millis
+    ephemeral.set generic_message.content, generic_message[generic_message.content]
+    generic_message = new z.proto.GenericMessage generic_message.message_id
+    generic_message.set 'ephemeral', ephemeral
+    return generic_message
 
   ###
   Send edited message in specified conversation.
@@ -1021,14 +1055,16 @@ class z.conversation.ConversationRepository
 
   @private
   @param conversation_id [String] Conversation ID
+  @param skip_own_clients [Boolean] True, if other own clients should be skipped (to not sync messages on own clients)
   @return [Promise<Object>] Promise that resolves with a user client map
   ###
-  _create_user_client_map: (conversation_id) ->
+  _create_user_client_map: (conversation_id, skip_own_clients = false) ->
     @get_all_users_in_conversation conversation_id
     .then (user_ets) ->
       user_client_map = {}
 
-      for user_et in user_ets when user_et.devices()[0]
+      for user_et in user_ets
+        continue if user_et.is_me and skip_own_clients
         user_client_map[user_et.id] = (client_et.id for client_et in user_et.devices())
 
       return user_client_map
@@ -1120,14 +1156,17 @@ class z.conversation.ConversationRepository
     key_bytes = null
     sha256 = null
     ciphertext = null
+    skip_other_own_clients = generic_message.content is 'ephemeral'
 
     z.assets.AssetCrypto.encrypt_aes_asset generic_message.toArrayBuffer()
     .then (data) =>
       [key_bytes, sha256, ciphertext] = data
-      return @_create_user_client_map conversation_id
+      return @_create_user_client_map conversation_id, skip_other_own_clients
     .then (user_client_map) =>
       if user_ids
         delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
+      if skip_own_clients
+        user_ids = Object.keys user_client_map
       generic_message_external = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message_external.set 'external', new z.proto.External new Uint8Array(key_bytes), new Uint8Array(sha256)
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message_external
@@ -1155,10 +1194,13 @@ class z.conversation.ConversationRepository
       if send_as_external
         @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
       else
-        @_create_user_client_map conversation_id
+        skip_own_clients = generic_message.content is 'ephemeral'
+        @_create_user_client_map conversation_id, skip_own_clients
         .then (user_client_map) =>
           if user_ids
             delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
+          if skip_own_clients
+            user_ids = Object.keys user_client_map
           return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
         .then (payload) =>
           payload.native_push = native_push
@@ -1202,12 +1244,17 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
   _send_encrypted_asset: (conversation_id, generic_message, image_data, nonce) =>
-    @_create_user_client_map conversation_id
+    skip_own_clients = generic_message.content is 'ephemeral'
+    precondition_option = false
+
+    @_create_user_client_map conversation_id, skip_own_clients
     .then (user_client_map) =>
+      if skip_own_clients
+        precondition_option = Object.keys user_client_map
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
     .then (payload) =>
       payload.inline = false
-      @asset_service.post_asset_v2 conversation_id, payload, image_data, false, nonce
+      @asset_service.post_asset_v2 conversation_id, payload, image_data, precondition_option, nonce
       .catch (error_response) =>
         return @_update_payload_for_changed_clients error_response, generic_message, payload
         .then (updated_payload) =>
@@ -1277,7 +1324,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: upload_duration}
     .catch (error) =>
-      @logger.log "Failed to upload asset for conversation '#{conversation_et.id}", error
+      @logger.log @logger.levels.ERROR, "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
       if message_et.id
         @send_asset_upload_failed conversation_et, message_et.id
         @update_message_as_upload_failed message_et
@@ -1292,7 +1339,7 @@ class z.conversation.ConversationRepository
   delete_message_everyone: (conversation_et, message_et) =>
     Promise.resolve()
     .then ->
-      if not message_et.user().is_me
+      if not message_et.user().is_me and not message_et.expire_after_millis()
         throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
@@ -1328,6 +1375,95 @@ class z.conversation.ConversationRepository
     .catch (error) =>
       @logger.log "Failed to send delete message with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
       throw error
+
+  ###
+  Get remaining lifetime for give message.
+
+  @param message_et [z.entity.Message]
+  ###
+  get_ephemeral_timer: (message_et) =>
+    millis = message_et.expire_after_millis()
+    return Promise.resolve() if not _.isNumber millis
+
+    expiration_date_iso = new Date(Date.now() + millis).toISOString()
+    message_et.expire_after_millis expiration_date_iso
+    @conversation_service.update_message_in_db message_et, {expire_after_millis: expiration_date_iso}
+    .then -> return millis
+
+  timeout_ephemeral_message: (conversation_et, message_et) =>
+    if message_et.user().is_me
+      switch
+        when message_et.has_asset_text()
+          @_obfuscate_text_message conversation_et, message_et.id
+        when message_et.is_ping()
+          @_obfuscate_ping_message conversation_et, message_et.id
+        when message_et.has_asset()
+          @_obfuscate_asset_message conversation_et, message_et.id
+        when message_et.has_asset_medium_image()
+          @_obfuscate_image_message conversation_et, message_et.id
+        else
+          @logger.log 'Unsupported ephemeral type', message_et.type
+    else
+      @delete_message_everyone conversation_et, message_et
+
+  _obfuscate_text_message: (conversation_et, message_id) =>
+    @get_message_in_conversation_by_id conversation_et, message_id
+    .then (message_et) =>
+      asset = message_et.get_first_asset()
+      obfuscated = new z.entity.Text message_et.id
+      obfuscated.previews asset.previews()
+      obfuscated.text = z.util.StringUtil.obfuscate asset.text if obfuscated.previews().length is 0
+      message_et.assets [obfuscated]
+      message_et.expire_after_millis true
+
+      @conversation_service.update_message_in_db message_et,
+        expire_after_millis: true
+        data:
+          content: obfuscated.text
+          nonce: obfuscated.id
+    .then =>
+      @logger.log 'Obfuscated text message'
+
+  _obfuscate_ping_message: (conversation_et, message_id) =>
+    @get_message_in_conversation_by_id conversation_et, message_id
+    .then (message_et) =>
+      message_et.expire_after_millis true
+      @conversation_service.update_message_in_db message_et, expire_after_millis: true
+    .then =>
+      @logger.log 'Obfuscated ping message'
+
+  _obfuscate_asset_message: (conversation_et, message_id) =>
+    @get_message_in_conversation_by_id conversation_et, message_id
+    .then (message_et) =>
+      asset = message_et.get_first_asset()
+      message_et.expire_after_millis true
+      @conversation_service.update_message_in_db message_et,
+        data:
+          content_type: asset.file_type
+          info:
+            nonce: message_et.nonce
+          meta: {}
+        expire_after_millis: true
+    .then =>
+      @logger.log 'Obfuscated asset message'
+
+  _obfuscate_image_message: (conversation_et, message_id) =>
+    @get_message_in_conversation_by_id conversation_et, message_id
+    .then (message_et) =>
+      asset = message_et.get_first_asset()
+      message_et.expire_after_millis true
+      @conversation_service.update_message_in_db message_et,
+        data:
+          info:
+            nonce: message_et.nonce
+            height: asset.height
+            width: asset.width
+            original_height: asset.original_height
+            original_width: asset.original_width
+            tag: 'medium'
+        expire_after_millis: true
+    .then =>
+      @logger.log 'Obfuscated image message'
 
   ###
   Can user upload assets to conversation.
@@ -1585,6 +1721,8 @@ class z.conversation.ConversationRepository
   _on_message_deleted: (conversation_et, event_json) =>
     @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
     .then (message_to_delete_et) =>
+      if message_to_delete_et.expire_after_millis()
+        return
       if event_json.from isnt message_to_delete_et.from
         throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
       if event_json.from isnt @user_repository.self().id

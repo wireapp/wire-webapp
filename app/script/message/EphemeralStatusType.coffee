@@ -17,20 +17,10 @@
 #
 
 window.z ?= {}
-z.entity ?= {}
+z.message ?= {}
 
-class z.entity.PingMessage extends z.entity.Message
-  constructor: ->
-    super()
-    @super_type = z.message.SuperType.PING
-
-    @caption = ko.pureComputed =>
-      string = if @user().is_me then z.string.conversation_ping_you else z.string.conversation_ping
-      return z.localization.Localizer.get_text string
-    , @, deferEvaluation: true
-
-    @animation = ko.pureComputed =>
-      return 'ping-animation ping-animation-soft' if Date.now() - @timestamp < 2000
-
-    @ping_color = ko.pureComputed =>
-      return if @is_expired() then 'ephemeral-message-obfuscated' else @accent_color()
+z.message.EphemeralStatusType =
+  ACTIVE: 1
+  INACTIVE: 2
+  NONE: 0
+  TIMED_OUT: 3
