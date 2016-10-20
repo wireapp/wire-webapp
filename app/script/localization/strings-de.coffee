@@ -572,3 +572,8 @@ z.string.de.init_events_expectation_long = 'Lade %events neue Events'
 z.string.de.init_events_progress = 'Lade Events - %progress von %total'
 z.string.de.init_updated_from_notifications = 'Fast geschafft'
 z.string.de.init_app_pre_loaded = 'Viel Spaß mit Wire'
+
+z.string.de.ephememal_units_none = 'Aus'
+z.string.de.ephememal_units_seconds = 'Sekunden'
+z.string.de.ephememal_units_minute = 'Minute'
+z.string.de.ephememal_units_minutes = 'Minuten'

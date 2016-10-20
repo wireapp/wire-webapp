@@ -248,10 +248,12 @@ class z.ViewModel.ConversationInputViewModel
   ###
   get_context_menu_entries: ->
     return [
-      {label: 'None', action: 0},
-      {label: '5 seconds', action: 5000},
-      {label: '15 seconds', action: 15000},
-      {label: '1 minute', action: 60000},
+      {label: z.localization.Localizer.get_text(z.string.ephememal_units_none), action: 0},
+      {label: "5 #{z.localization.Localizer.get_text(z.string.ephememal_units_seconds)}", action: 5000},
+      {label: "15 #{z.localization.Localizer.get_text(z.string.ephememal_units_seconds)}", action: 15000},
+      {label: "30 #{z.localization.Localizer.get_text(z.string.ephememal_units_seconds)}", action: 30000},
+      {label: "1 #{z.localization.Localizer.get_text(z.string.ephememal_units_minute)}", action: 60000},
+      {label: "5 #{z.localization.Localizer.get_text(z.string.ephememal_units_minutes)}", action: 300000},
     ]
 
   ###
