@@ -90,18 +90,6 @@
   margin-right: 12px;
 }
 
-.controls-right-button-ephemeral-timer {
-  .circle(32px);
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  color: @ephemeral-color;
-  cursor: pointer;
-  font-size: @font-size-xs;
-  font-weight: bold;
-  text-align: center;
-  line-height: 30px;
-}
-
 .conversation-input-ephemeral {
   position: relative;
 }
@@ -117,4 +105,25 @@
 .ephemeral-mode,
 .bubble-menu .ephemeral-mode {
   color: @ephemeral-color;
+}
+
+.ephemeral-timer-button {
+  .circle(@avatar-diameter-xs);
+  position: relative;
+  color: @ephemeral-color;
+  border: 1px solid fade(@ephemeral-color, 40%);
+  font-size: @font-size-xs;
+  font-weight: 600;
+  line-height: @avatar-diameter-xs - 2;
+  text-align: center;
+  margin: 4px;
+}
+
+.ephemeral-timer-button-unit {
+  .circle(16px);
+  position: absolute;
+  right: -8px;
+  top: -2px;
+  background-color: #fff;
+  line-height: 14px;
 }
