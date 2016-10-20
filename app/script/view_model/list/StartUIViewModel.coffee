@@ -444,20 +444,17 @@ class z.ViewModel.list.StartUIViewModel
       callback conversation_et if _.isFunction callback
       return
 
-    on_success = (conversation_et) =>
+    @conversation_repository.create_new_conversation user_ids, null
+    .then (conversation_et) =>
       @logger.log @logger.levels.INFO, "Created new conversation with ID: #{conversation_et.id}"
       @user_repository.save_property_has_created_conversation()
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION,
         {creationContext: 'search', numberOfParticipants: user_ids.length}
       @click_on_group conversation_et
       callback conversation_et if _.isFunction callback
-
-    # Error: {code: 403, message: "Users are not connected", label: "not-connected"}
-    on_error = (error) =>
+    .catch (error) =>
       @logger.log @logger.levels.WARN, "Unable to create conversation: #{error.message}"
       @_close_list()
-
-    @conversation_repository.create_new_conversation user_ids, null, on_success, on_error
 
   on_audio_call: =>
     @on_submit_search (conversation_et) ->

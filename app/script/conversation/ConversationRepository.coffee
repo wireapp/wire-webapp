@@ -157,15 +157,11 @@ class z.conversation.ConversationRepository
 
   @param user_ids [Array<String>] IDs of users (excluding the requestor) to be part of the conversation
   @param name [String] User defined name for the Conversation (optional)
-  @param on_success [Function] Function to be called on success
-  @param on_error [Function] Function to be called on failure
   ###
-  create_new_conversation: (user_ids, name, on_success, on_error) =>
-    @conversation_service.create_conversation user_ids, name, (response, error) =>
-      if response
-        on_success? @_on_create response
-      else
-        on_error? error
+  create_new_conversation: (user_ids, name) =>
+    @conversation_service.create_conversation user_ids, name
+    .then (response) =>
+      @_on_create response
 
   ###
   Get a conversation from the backend.
@@ -512,6 +508,19 @@ class z.conversation.ConversationRepository
   ###############################################################################
   # Send events
   ###############################################################################
+
+  ###
+  Add a bot to an existing conversation.
+
+  @param conversation_et [z.entity.Conversation] Conversation to add bot to
+  @param provider_id [String] ID of bot provider
+  @param service_id [String] ID of service provider
+  ###
+  add_bot: (conversation_et, provider_id, service_id) =>
+    @conversation_service.post_bots conversation_et.id, provider_id, service_id
+    .then (response) =>
+      amplify.publish z.event.WebApp.EVENT.INJECT, response.event
+      @logger.log @logger.levels.DEBUG, "Successfully added bot to conversation '#{conversation_et.display_name()}'", response
 
   ###
   Add users to an existing conversation.

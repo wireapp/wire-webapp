@@ -95,16 +95,14 @@ class z.conversation.ConversationService
 
   @param user_ids [Array<String>] IDs of users (excluding the requestor) to be part of the conversation
   @param name [String] User defined name for the Conversation (optional)
-  @param callback [Function] Function to be called on server return
   ###
-  create_conversation: (user_ids, name, callback) ->
+  create_conversation: (user_ids, name) ->
     @client.send_json
       url: @client.create_url z.conversation.ConversationService::URL_CONVERSATIONS
       type: 'POST'
       data:
         users: user_ids
         name: name
-      callback: callback
 
   ###
   Create a One:One conversation.
@@ -331,6 +329,22 @@ class z.conversation.ConversationService
       @logger.log @logger.levels.ERROR,
         "Failed to get events for conversation '#{conversation_id}': #{error.message}", error
       throw error
+
+  ###
+  Add a bot to an existing conversation.
+
+  @param conversation_id [String] ID of conversation to add users to
+  @param provider_id [String] ID of bot provider
+  @param service_id [String] ID of service provider
+  @return [Promise] Promise that resolves with the server response
+  ###
+  post_bots: (conversation_id, provider_id, service_id) ->
+    @client.send_json
+      url: @client.create_url "/conversations/#{conversation_id}/bots"
+      type: 'POST'
+      data:
+        provider: provider_id
+        service: service_id
 
   ###
   Add users to an existing conversation.
