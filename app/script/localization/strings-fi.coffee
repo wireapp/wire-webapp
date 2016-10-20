@@ -17,7 +17,7 @@
 #
 
 #General terms
-z.string.fi.wire_osx = 'Wire macOS: lle'
+z.string.fi.wire_macos = 'Wire macOS: lle'
 z.string.fi.wire_windows = 'Wire Windowsille'
 z.string.fi.wire_linux = 'Wire Linuxille'
 z.string.fi.nonexistent_user = 'Poistettu käyttäjä'
@@ -416,7 +416,7 @@ z.string.fi.preferences_devices_verification = 'Vahvistettu'
 
 z.string.fi.preferences_options_contacts = 'Yhteystiedot'
 z.string.fi.preferences_options_contacts_gmail = 'Tuo Gmailista'
-z.string.fi.preferences_options_contacts_osx = 'Tuo Yhteystiedoista'
+z.string.fi.preferences_options_contacts_macos = 'Tuo Yhteystiedoista'
 z.string.fi.preferences_options_contacts_detail = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.'
 z.string.fi.preferences_options_data = 'Käyttö- ja vikaraportit'
 z.string.fi.preferences_options_data_checkbox = 'Käyttö- ja vikaraportit'
@@ -547,7 +547,7 @@ z.string.fi.tooltip_people_rename = 'Muuta keskustelun nimeä'
 z.string.fi.tooltip_people_remove = 'Poista keskustelusta'
 z.string.fi.tooltip_people_unblock = 'Poista esto'
 
-z.string.fi.tooltip_preferences_contacts = 'Kirjaudu gmail-tilillesi jakaaksesi kontakteja'
+z.string.fi.tooltip_preferences_contacts_gmail = 'Kirjaudu gmail-tilillesi jakaaksesi kontakteja'
 z.string.fi.tooltip_preferences_password = 'Avaa toinen nettisivu vaihtaaksesi salasanasi'
 z.string.fi.tooltip_preferences_picture = 'Vaihda kuvasi…'
 z.string.fi.tooltip_preferences_rename = 'Vaihda nimesi'

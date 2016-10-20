@@ -24,7 +24,7 @@ class z.ViewModel.ConversationTitlebarViewModel
   constructor: (element_id, @conversation_repository, @call_center, @multitasking) ->
     @logger = new z.util.Logger 'z.ViewModel.ConversationTitlebarViewModel', z.config.LOGGER.OPTIONS
 
-    # TODO remove this for now to ensure that buttons are clickable in osx wrappers
+    # TODO remove this for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout ->
       $('.titlebar').remove()
     , 1000

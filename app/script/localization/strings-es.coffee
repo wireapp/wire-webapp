@@ -17,7 +17,7 @@
 #
 
 #General terms
-z.string.es.wire_osx = 'Wire para macOS'
+z.string.es.wire_macos = 'Wire para macOS'
 z.string.es.wire_windows = 'Wire para Windows'
 z.string.es.wire_linux = 'Wire para Linux'
 z.string.es.nonexistent_user = 'Usuario Borrado'
@@ -416,7 +416,7 @@ z.string.es.preferences_devices_verification = 'Verificado'
 
 z.string.es.preferences_options_contacts = 'Contactos'
 z.string.es.preferences_options_contacts_gmail = 'Importar desde Gmail'
-z.string.es.preferences_options_contacts_osx = 'Importar desde contactos'
+z.string.es.preferences_options_contacts_macos = 'Importar desde contactos'
 z.string.es.preferences_options_contacts_detail = 'Compartir tus contactos te ayuda a conectarte con otros. Toda la información es anónima y no será compartida con nadie más.'
 z.string.es.preferences_options_data = 'Reportes de uso y fallas'
 z.string.es.preferences_options_data_checkbox = 'Reportes de uso y fallas'
@@ -547,7 +547,7 @@ z.string.es.tooltip_people_rename = 'Cambiar nombre de la conversación'
 z.string.es.tooltip_people_remove = 'Eliminar de la conversación'
 z.string.es.tooltip_people_unblock = 'Desbloquear'
 
-z.string.es.tooltip_preferences_contacts = 'Iniciar sesión en tu cuenta de Gmail para compartir los contactos'
+z.string.es.tooltip_preferences_contacts_gmail = 'Iniciar sesión en tu cuenta de Gmail para compartir los contactos'
 z.string.es.tooltip_preferences_password = 'Abrir otra página web para restablecer su contraseña'
 z.string.es.tooltip_preferences_picture = 'Cambiar tu foto…'
 z.string.es.tooltip_preferences_rename = 'Cambiar tu nombre'

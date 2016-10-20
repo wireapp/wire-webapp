@@ -17,7 +17,7 @@
 #
 
 #General terms
-z.string.ru.wire_osx = 'Wire для macOS'
+z.string.ru.wire_macos = 'Wire для macOS'
 z.string.ru.wire_windows = 'Wire для Windows'
 z.string.ru.wire_linux = 'Wire для Linux'
 z.string.ru.nonexistent_user = 'Удалённый пользователь'
@@ -416,7 +416,7 @@ z.string.ru.preferences_devices_verification = 'Подтверждён'
 
 z.string.ru.preferences_options_contacts = 'Контакты'
 z.string.ru.preferences_options_contacts_gmail = 'Импортировать из Gmail'
-z.string.ru.preferences_options_contacts_osx = 'Импортировать из контактов'
+z.string.ru.preferences_options_contacts_macos = 'Импортировать из контактов'
 z.string.ru.preferences_options_contacts_detail = 'Мы используем ваши контактные данные, чтобы соединить вас с другими пользователями. Мы анонимизируем всю информацию и не делимся ей с кем-либо еще.'
 z.string.ru.preferences_options_data = 'Отчеты о сбоях и использовании'
 z.string.ru.preferences_options_data_checkbox = 'Отчеты о сбоях и использовании'
@@ -547,7 +547,7 @@ z.string.ru.tooltip_people_rename = 'Изменить название разг�
 z.string.ru.tooltip_people_remove = 'Удалить из разговора'
 z.string.ru.tooltip_people_unblock = 'Разблокировать'
 
-z.string.ru.tooltip_preferences_contacts = 'Войдите в свой аккаунт Gmail, чтобы поделиться контактами'
+z.string.ru.tooltip_preferences_contacts_gmail = 'Войдите в свой аккаунт Gmail, чтобы поделиться контактами'
 z.string.ru.tooltip_preferences_password = 'Открыть страницу сброса пароля'
 z.string.ru.tooltip_preferences_picture = 'Измените свой аватар…'
 z.string.ru.tooltip_preferences_rename = 'Изменить свое имя'
