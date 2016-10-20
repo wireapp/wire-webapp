@@ -225,16 +225,16 @@
       <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption"></span>
       <span class="message-icon-ping icon-ping" data-bind="css: message.animation()"></span>
+      <div class="message-body-actions">
+        <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
+                      class="context-menu icon-more font-size-xs"
+                      tabindex="-1"></context-menu>
+        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+        <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
+          <ephemeral-timer class="message-ephemeral-timer" params="expires: message.expire_after_millis()"></ephemeral-timer>
+        <!-- /ko -->
+      </div>
     </div>
-  </div>
-  <div class="message-body-actions">
-    <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
-                class="context-menu icon-more font-size-xs"
-                tabindex="-1"></context-menu>
-    <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
-    <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-      <ephemeral-timer class="message-ephemeral-timer" params="expires: message.expire_after_millis()"></ephemeral-timer>
-    <!-- /ko -->
   </div>
 </script>
 
