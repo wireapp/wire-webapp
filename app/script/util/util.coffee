@@ -168,7 +168,7 @@ Format seconds into 15s, 2m.
 ###
 z.util.format_milliseconds_short = (duration) ->
   seconds = Math.floor duration / 1000
-  return if seconds < 60 then "#{seconds}s" else "#{Math.floor(seconds / 60)}m"
+  if seconds < 60 then [seconds, 's'] else [Math.floor(seconds / 60), 'm']
 
 
 z.util.get_content_type_from_data_url = (data_url) ->
