@@ -128,7 +128,16 @@ class z.service.Client
   ###
   Send jQuery AJAX request.
   @see http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings
-  @param config [jQuery.ajax SettingsObject]
+  @param config [Object]
+  @option config [Function] callback DEPRECATED: use Promises
+  @option config [String] contentType
+  @option config [Object] data
+  @option config [Object] headers
+  @option config [Boolean] processData
+  @option config [Number] timeout
+  @option config [String] type
+  @option config [String] url
+  @option config [Boolean] withCredentials
   ###
   send_request: (config) ->
     return new Promise (resolve, reject) =>
@@ -137,10 +146,13 @@ class z.service.Client
         @request_queue.push [config, resolve, reject]
       else
         headers = config.headers or {}
-        headers['Authorization'] = "#{@access_token_type} #{@access_token}" if @access_token
-
         xhrFields = {}
-        xhrFields['withCredentials'] = true if config.withCredentials
+
+        if @access_token
+          headers['Authorization'] = "#{@access_token_type} #{@access_token}"
+
+        if config.withCredentials
+          xhrFields['withCredentials'] = true
 
         @number_of_requests @number_of_requests() + 1
 
@@ -152,6 +164,7 @@ class z.service.Client
           timeout: config.timeout
           type: config.type
           url: config.url
+          xhrFields: xhrFields
         .done (data, textStatus, jqXHR) =>
           @logger.log @logger.levels.OFF, "Server Response ##{jqXHR.wire.request_id} from '#{config.url}':", data
           config.callback? data
@@ -195,20 +208,15 @@ class z.service.Client
   ###
   Send AJAX request with compressed JSON body.
 
-  @param config [Object]
-  @option config [Function] callback
-  @option config [JSON] data
-  @option config [String] type
-  @option config [String] url
+  Note that contentType will be overwritten with 'application/json; charset=utf-8'
+
+  @see send_request for valid parameters
   ###
   send_json: (config) ->
-    @send_request
-      api_endpoint: config.api_endpoint
-      callback: config.callback
+    json_config =
       contentType: 'application/json; charset=utf-8'
       data: pako.gzip JSON.stringify config.data if config.data
       headers:
         'Content-Encoding': 'gzip'
       processData: false
-      type: config.type
-      url: config.url
+    @send_request $.extend config, json_config, true
