@@ -39,10 +39,10 @@ z.ui.Shortcut = do ->
   shortcut_map[z.ui.ShortcutType.ADD_PEOPLE] =
     shortcut:
       webapp:
-        osx: 'command + shift + k'
+        macos: 'command + shift + k'
         pc: 'ctrl + shift + k'
       electron:
-        osx: 'command + shift + k'
+        macos: 'command + shift + k'
         pc: 'ctrl + shift + k'
         menu: true
     event: z.event.WebApp.SHORTCUT.ADD_PEOPLE
@@ -50,10 +50,10 @@ z.ui.Shortcut = do ->
   shortcut_map[z.ui.ShortcutType.ARCHIVE] =
     shortcut:
       webapp:
-        osx: 'command + alt + shift + d'
+        macos: 'command + alt + shift + d'
         pc: 'ctrl + alt + d'
       electron:
-        osx: 'command + d'
+        macos: 'command + d'
         pc: 'ctrl + d'
         menu: true
     event: z.event.WebApp.SHORTCUT.ARCHIVE
@@ -61,30 +61,30 @@ z.ui.Shortcut = do ->
   shortcut_map[z.ui.ShortcutType.CALL_IGNORE] =
     shortcut:
       webapp:
-        osx: 'command + alt + .'
+        macos: 'command + alt + .'
         pc: 'ctrl + alt + .'
       electron:
-        osx: 'command + .'
+        macos: 'command + .'
         pc: 'ctrl + .'
     event: z.event.WebApp.SHORTCUT.CALL_IGNORE
 
   shortcut_map[z.ui.ShortcutType.CALL_MUTE] =
     shortcut:
       webapp:
-        osx: 'command + alt + m'
+        macos: 'command + alt + m'
         pc: 'ctrl + alt + m'
       electron:
-        osx: 'command + alt + m'
+        macos: 'command + alt + m'
         pc: 'ctrl + alt + m'
     event: z.event.WebApp.SHORTCUT.CALL_MUTE
 
   shortcut_map[z.ui.ShortcutType.PREV] =
     shortcut:
       webapp:
-        osx: 'command + alt + down'
+        macos: 'command + alt + down'
         pc: 'alt + shift + down'
       electron:
-        osx: 'command + alt + down'
+        macos: 'command + alt + down'
         pc: 'alt + shift + down'
         menu: true
     event: z.event.WebApp.SHORTCUT.PREV
@@ -92,10 +92,10 @@ z.ui.Shortcut = do ->
   shortcut_map[z.ui.ShortcutType.NEXT] =
     shortcut:
       webapp:
-        osx: 'command + alt + up'
+        macos: 'command + alt + up'
         pc: 'alt + shift + up'
       electron:
-        osx: 'command + alt + up'
+        macos: 'command + alt + up'
         pc: 'alt + shift + up'
         menu: true
     event: z.event.WebApp.SHORTCUT.NEXT
@@ -103,10 +103,10 @@ z.ui.Shortcut = do ->
   shortcut_map[z.ui.ShortcutType.PING] =
     shortcut:
       webapp:
-        osx: 'command + alt + k'
+        macos: 'command + alt + k'
         pc: 'ctrl + alt + k'
       electron:
-        osx: 'command + k'
+        macos: 'command + k'
         pc: 'ctrl + k'
         menu: true
     event: z.event.WebApp.SHORTCUT.PING
@@ -114,10 +114,10 @@ z.ui.Shortcut = do ->
   shortcut_map[z.ui.ShortcutType.PEOPLE] =
     shortcut:
       webapp:
-        osx: 'command + alt + shift + i'
+        macos: 'command + alt + shift + i'
         pc: 'ctrl + alt + i'
       electron:
-        osx: 'command + i'
+        macos: 'command + i'
         pc: 'ctrl + i'
         menu: true
     event: z.event.WebApp.SHORTCUT.PEOPLE
@@ -125,10 +125,10 @@ z.ui.Shortcut = do ->
   shortcut_map[z.ui.ShortcutType.SILENCE] =
     shortcut:
       webapp:
-        osx: 'command + alt + s'
+        macos: 'command + alt + s'
         pc: 'ctrl + alt + s'
       electron:
-        osx: 'command + alt + s'
+        macos: 'command + alt + s'
         pc: 'ctrl + alt + s'
         menu: true
     event: z.event.WebApp.SHORTCUT.SILENCE
@@ -136,10 +136,10 @@ z.ui.Shortcut = do ->
   shortcut_map[z.ui.ShortcutType.START] =
     shortcut:
       webapp:
-        osx: 'command + alt + graveaccent' # KeyboardJS fires this when using cmd + alt + n
+        macos: 'command + alt + graveaccent' # KeyboardJS fires this when using cmd + alt + n
         pc: 'ctrl + alt + graveaccent'
       electron:
-        osx: 'command + n'
+        macos: 'command + n'
         pc: 'ctrl + n'
         menu: true
 
@@ -149,10 +149,10 @@ z.ui.Shortcut = do ->
     shortcut_map[z.ui.ShortcutType.DEBUG] =
       shortcut:
         webapp:
-          osx: 'command + alt + g'
+          macos: 'command + alt + g'
           pc: 'ctrl + alt + g'
         electron:
-          osx: 'command + alt + g'
+          macos: 'command + alt + g'
           pc: 'ctrl + alt + g'
       event: z.event.WebApp.SHORTCUT.DEBUG
 
@@ -194,7 +194,7 @@ z.ui.Shortcut = do ->
   get_shortcut = (shortcut_name) ->
     platform = if z.util.Environment.electron then 'electron' else 'webapp'
     platform_shortcuts = shortcut_map[shortcut_name].shortcut[platform]
-    os_shortcut = if z.util.Environment.os.mac then platform_shortcuts.osx else platform_shortcuts.pc
+    os_shortcut = if z.util.Environment.os.mac then platform_shortcuts.macos else platform_shortcuts.pc
     return os_shortcut
 
   get_shortcut_tooltip = (shortcut_name) ->

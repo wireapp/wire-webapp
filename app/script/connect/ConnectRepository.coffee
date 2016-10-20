@@ -71,12 +71,12 @@ class z.connect.ConnectRepository
           reject new z.connect.ConnectError z.connect.ConnectError::TYPE.UPLOAD
 
   ###
-  Retrieve a user's OSX address book contacts.
+  Retrieve a user's macOS address book contacts.
   @return [Promise] Promise that resolves with the user's address book contacts that match on Wire
   ###
-  get_osx_contacts: ->
+  get_macos_contacts: ->
     return new Promise (resolve, reject) =>
-      phone_book = @_parse_osx_contacts()
+      phone_book = @_parse_macos_contacts()
 
       if phone_book.cards.length is 0
         @logger.log @logger.levels.WARN, 'No contacts found for upload'
@@ -86,15 +86,15 @@ class z.connect.ConnectRepository
         @connect_service.post_onboarding phone_book
         .then (response) =>
           @logger.log @logger.levels.INFO,
-            "OS X contacts upload successful: #{response.results.length} matches, #{response['auto-connects'].length} auto connects", response
-          @user_repository.save_property_contact_import_osx Date.now()
+            "macOS contacts upload successful: #{response.results.length} matches, #{response['auto-connects'].length} auto connects", response
+          @user_repository.save_property_contact_import_macos Date.now()
           resolve response
         .catch (error) =>
           if error.code is z.service.BackendClientError::STATUS_CODE.TOO_MANY_REQUESTS
-            error_message = 'Backend refused OS X contacts upload: Endpoint used too frequent'
+            error_message = 'Backend refused macOS contacts upload: Endpoint used too frequent'
             @logger.log @logger.levels.ERROR, error_message
           else
-            @logger.log @logger.levels.ERROR, 'OS X contacts upload failed', error
+            @logger.log @logger.levels.ERROR, 'macOS contacts upload failed', error
           reject new z.connect.ConnectError z.connect.ConnectError::TYPE.UPLOAD
 
   ###
@@ -116,18 +116,14 @@ class z.connect.ConnectRepository
     return phone_book
 
   ###
-  Parse a user's OSX address book Contacts.
+  Parse a user's macOS address book Contacts.
   @private
   @return [z.connect.PhoneBook] Encoded phone book data
   ###
-  _parse_osx_contacts: ->
+  _parse_macos_contacts: ->
     return if not window.zAddressBook
 
-    if _.isFunction window.zAddressBook
-      address_book = window.zAddressBook() # for osx >= 2.7
-    else
-      address_book = window.zAddressBook # for osx < 2.7
-
+    address_book = window.zAddressBook()
     phone_book = new z.connect.PhoneBook @user_repository.self()
 
     me = address_book.getMe()

@@ -49,7 +49,6 @@ class z.calling.CallService
 
     @client.send_request
       type: 'DELETE'
-      api_endpoint: '/conversations/{conversation_id}/call/flows/{flow_id}'
       url: @client.create_url url
 
   ###
@@ -69,7 +68,6 @@ class z.calling.CallService
   get_state: (conversation_id) ->
     @client.send_request
       type: 'GET'
-      api_endpoint: '/conversations/{conversation_id}/call/state'
       url: @client.create_url "/conversations/#{conversation_id}/call/state"
 
   ###
@@ -92,7 +90,6 @@ class z.calling.CallService
   post_local_candidates: (conversation_id, flow_id, ice_info) ->
     @client.send_json
       type: 'POST'
-      api_endpoint: '/conversations/{conversation_id}/call/flows/{flow_id}/local_candidates'
       url: @client.create_url "/conversations/#{conversation_id}/call/flows/#{flow_id}/local_candidates"
       data:
         candidates: [ice_info]
@@ -125,7 +122,6 @@ class z.calling.CallService
   put_state: (conversation_id, payload) ->
     @client.send_json
       type: 'PUT'
-      api_endpoint: '/conversations/{conversation_id}/call/state'
       url: @client.create_url "/conversations/#{conversation_id}/call/state"
       data:
         self: payload

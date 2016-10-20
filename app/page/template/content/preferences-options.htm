@@ -28,16 +28,16 @@
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferences_options_contacts"></header>
         <div class="preferences-option">
-          <div class="preferences-option-icon" data-bind="click: connect_google, l10n_tooltip: z.string.tooltip_preferences_contacts" data-uie-name="do-share-contacts">
+          <div class="preferences-option-icon" data-bind="click: connect_google, l10n_tooltip: z.string.tooltip_preferences_contacts_gmail" data-uie-name="do-share-contacts">
             <svg>
               <use xlink:href="#icon-gmail"></use>
             </svg>
             <label data-bind="l10n_text: z.string.preferences_options_contacts_gmail"></label>
           </div>
           <!-- ko if: window.zAddressBook -->
-            <div class="preferences-option-icon" data-bind="click: connect_osx_contacts, l10n_tooltip: z.string.preferences_share_osx_contacts" data-uie-name="do-share-osx-contacts">
+            <div class="preferences-option-icon" data-bind="click: connect_macos_contacts, l10n_tooltip: z.string.tooltip_preferences_contacts_macos" data-uie-name="do-share-osx-contacts">
               <div class="icon-contacts"></div>
-              <label data-bind="l10n_text: z.string.preferences_options_contacts_osx"></label>
+              <label data-bind="l10n_text: z.string.preferences_options_contacts_macos"></label>
             </div>
           <!-- /ko -->
         </div>
