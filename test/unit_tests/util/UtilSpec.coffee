@@ -787,12 +787,12 @@ describe 'z.util.format_seconds', ->
 
 describe 'z.util.format_milliseconds_short', ->
   it 'should format duration under 1 minute', ->
-    expect(z.util.format_milliseconds_short(5000)).toBe [5, 's']
-    expect(z.util.format_milliseconds_short(15000)).toBe [15, 's']
+    expect(z.util.format_milliseconds_short(5000)).toEqual [5, 's']
+    expect(z.util.format_milliseconds_short(15000)).toEqual [15, 's']
 
   it 'should format duration over 1 minute', ->
-    expect(z.util.format_milliseconds_short(60000)).toBe [1, 'm']
-    expect(z.util.format_milliseconds_short(900000)).toBe [15, 'm']
+    expect(z.util.format_milliseconds_short(60000)).toEqual [1, 'm']
+    expect(z.util.format_milliseconds_short(900000)).toEqual [15, 'm']
 
 describe 'z.util.is_same_location', ->
   it 'returns false if page was accessed directly', ->
