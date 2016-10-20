@@ -110,3 +110,4 @@ z.config =
 
   UNSPLASH_URL: 'https://source.unsplash.com/1200x1200/?landscape'
   ANNOUNCE_URL: 'https://wire.com/api/v1/announce/'
+  BOT_URL: 'https://wire.com/api/v1/bot/'

@@ -171,7 +171,8 @@ class z.ViewModel.ParticipantsViewModel
           {numberOfParticipantsAdded: user_ids.length, numberOfGroupParticipants: @conversation().number_of_participants()}
     else
       user_ids = user_ids.concat @user_profile().id
-      @conversation_repository.create_new_conversation user_ids, null, (conversation_et) ->
+      @conversation_repository.create_new_conversation user_ids, null
+      .then (conversation_et) ->
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION,
           {creationContext: 'addedToOneToOne', numberOfParticipants: user_ids.length}
         amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
