@@ -158,10 +158,10 @@ class z.ViewModel.list.StartUIViewModel
     @_init_subscriptions()
 
   _init_subscriptions: =>
-    amplify.subscribe z.event.WebApp.CONNECT.IMPORT_CONTACTS,         @import_contacts
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED,              @update_properties
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.GOOGLE,        @update_properties
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.OSX_CONTACTS,  @update_properties
+    amplify.subscribe z.event.WebApp.CONNECT.IMPORT_CONTACTS,                    @import_contacts
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED,                         @update_properties
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_GOOGLE,          @update_properties
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_MACOS,           @update_properties
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, @update_properties
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @update_properties
 
@@ -195,7 +195,7 @@ class z.ViewModel.list.StartUIViewModel
     if source is z.connect.ConnectSource.GMAIL
       import_promise = @connect_repository.get_google_contacts()
     else if source is z.connect.ConnectSource.ICLOUD
-      import_promise = @connect_repository.get_osx_contacts()
+      import_promise = @connect_repository.get_macos_contacts()
 
     import_promise.then (response) =>
       @_show_onboarding_results response
@@ -424,7 +424,7 @@ class z.ViewModel.list.StartUIViewModel
 
   update_properties: =>
     @has_created_conversation @user_repository.properties.has_created_conversation
-    @has_uploaded_contacts @user_repository.properties.contact_import.google? or @user_repository.properties.contact_import.osx?
+    @has_uploaded_contacts @user_repository.properties.contact_import.google? or @user_repository.properties.contact_import.macos?
     return true
 
 

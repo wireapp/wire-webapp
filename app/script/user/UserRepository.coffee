@@ -627,16 +627,16 @@ class z.user.UserRepository
   save_property_contact_import_google: (timestamp) =>
     @properties.contact_import.google = timestamp
     @save_properties 'contact_import.google', timestamp
-    .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.GOOGLE, timestamp
+    .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_GOOGLE, timestamp
 
   ###
-  Save timestamp for OSX Contacts import.
+  Save timestamp for macOS Contacts import.
   @param timestamp [String] Timestamp to be saved
   ###
-  save_property_contact_import_osx: (timestamp) =>
-    @properties.contact_import.osx = timestamp
-    @save_properties 'contact_import.osx', timestamp
-    .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.OSX_CONTACTS, timestamp
+  save_property_contact_import_macos: (timestamp) =>
+    @properties.contact_import.macos = timestamp
+    @save_properties 'contact_import.macos', timestamp
+    .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_MACOS, timestamp
 
   ###
   Save data settings.

@@ -17,7 +17,7 @@
 #
 
 #General terms
-z.string.hr.wire_osx = 'Wire za macOS'
+z.string.hr.wire_macos = 'Wire za macOS'
 z.string.hr.wire_windows = 'Wire za Windows'
 z.string.hr.wire_linux = 'Wire za Linux'
 z.string.hr.truncation = '…'
@@ -417,7 +417,7 @@ z.string.hr.preferences_devices_verification = 'Verificirano'
 
 z.string.hr.preferences_options_contacts = 'Kontakti'
 z.string.hr.preferences_options_contacts_gmail = 'Uvezi iz Gmaila'
-z.string.hr.preferences_options_contacts_osx = 'Uvezi iz kontakata'
+z.string.hr.preferences_options_contacts_macos = 'Uvezi iz kontakata'
 z.string.hr.preferences_options_contacts_detail = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.'
 z.string.hr.preferences_options_data = 'Izvješće o korištenju i rušenju aplikacije'
 z.string.hr.preferences_options_data_checkbox = 'Izvješće o korištenju i rušenju aplikacije'
@@ -548,7 +548,7 @@ z.string.hr.tooltip_people_rename = 'Promijeni naziv razgovora'
 z.string.hr.tooltip_people_remove = 'Ukloni iz razgovora'
 z.string.hr.tooltip_people_unblock = 'Odblokiraj'
 
-z.string.hr.tooltip_preferences_contacts = 'Prijavite se na svoj Gmail račun za upload kontakata'
+z.string.hr.tooltip_preferences_contacts_gmail = 'Prijavite se na svoj Gmail račun za upload kontakata'
 z.string.hr.tooltip_preferences_password = 'Otvori web stranicu za ponovno postavljanje lozinke'
 z.string.hr.tooltip_preferences_picture = 'Promjena slike…'
 z.string.hr.tooltip_preferences_rename = 'Promijeni ime'
