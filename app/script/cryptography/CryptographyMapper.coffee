@@ -172,7 +172,7 @@ class z.cryptography.CryptographyMapper
     return mapped
 
   _map_ephemeral: (generic_message, event) ->
-    range = [1000, 5000, 15000, 60000]
+    range = [5000, 15000, 30000, 60000, 300000]
     millis_as_number = generic_message.ephemeral.expire_after_millis.toNumber()
     mapped_millis = z.util.ArrayUtil.find_closest range, millis_as_number
 
