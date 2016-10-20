@@ -403,6 +403,7 @@ z.string.de.preferences_account_username_placeholder = 'Dein vollständiger Name
 z.string.de.preferences_devices_activated_in = 'in %location'
 z.string.de.preferences_devices_activated_on = 'Aktiviert am %time'
 z.string.de.preferences_devices_active = 'Aktiv'
+z.string.de.preferences_devices_active_detail = 'Falls du eines dieser Geräte nicht erkennst, entferne es und setze dein Passwort zurück.'
 z.string.de.preferences_devices_current = 'Dieses Gerät'
 z.string.de.preferences_devices_fingerprint = 'Schlüssel-Fingerabdruck'
 z.string.de.preferences_devices_fingerprint_detail = 'Wire gibt jedem Gerät einen einzigartigen Fingerabdruck. Vergleiche diese und verifiziere deine Geräte und Unterhaltungen.'
