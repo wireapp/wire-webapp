@@ -22,7 +22,6 @@
   box-sizing: content-box;
   width: 100%;
   min-height: @conversation-input-min-height;
-  overflow: hidden;
   background-color: #fff;
 }
 
@@ -57,14 +56,16 @@
     color: fade(@graphite, 48%);
     padding-left: 8px;
   }
+
+  &.ephemeral-input::placeholder {
+    color: @ephemeral-color;
+  }
 }
 
 .controls-left {
+  .flex-center;
   width: @conversation-message-sender-width;
   height: @conversation-input-min-height;
-  align-items: center;
-  display: flex;
-  justify-content: center;
 }
 
 .controls-center {
@@ -83,7 +84,46 @@
 }
 
 .controls-right-button {
+  position: relative;
   flex: 0 0 auto;
   margin-left: 12px;
   margin-right: 12px;
+}
+
+.conversation-input-ephemeral {
+  position: relative;
+}
+
+.controls-right-button-ephemeral-context {
+  .square(32px);
+  position: absolute;
+  left: 0;
+  top: 0;
+  outline: 0;
+}
+
+.ephemeral-mode,
+.bubble-menu .ephemeral-mode {
+  color: @ephemeral-color;
+}
+
+.ephemeral-timer-button {
+  .circle(@avatar-diameter-xs);
+  position: relative;
+  color: @ephemeral-color;
+  border: 1px solid fade(@ephemeral-color, 40%);
+  font-size: @font-size-xs;
+  font-weight: 600;
+  line-height: @avatar-diameter-xs - 2;
+  text-align: center;
+  margin: 4px;
+}
+
+.ephemeral-timer-button-unit {
+  .circle(16px);
+  position: absolute;
+  right: -8px;
+  top: -2px;
+  background-color: #fff;
+  line-height: 14px;
 }

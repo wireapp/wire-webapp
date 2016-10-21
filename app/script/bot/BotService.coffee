@@ -17,13 +17,18 @@
 #
 
 window.z ?= {}
-z.auth ?= {}
+z.bot ?= {}
 
-z.auth.URLParameter =
-  BOT: 'bot'
-  CONNECT: 'connect'
-  ENVIRONMENT: 'env'
-  EXPIRED: 'expired'
-  INVITE: 'invite'
-  LOCALE: 'hl'
-  LOCALYTICS: 'localytics'
+class z.bot.BotService
+  constructor: ->
+    @logger = new z.util.Logger 'z.bot.BotService', z.config.LOGGER.OPTIONS
+    @url = "#{z.config.BOT_URL}"
+    return @
+
+  fetch_bot: (bot_name) ->
+    return new Promise (resolve) =>
+      $.get "#{@url}#{bot_name}/"
+      .done (data, textStatus, jqXHR) ->
+        resolve data.result
+      .fail (jqXHR, textStatus, errorThrown) =>
+        @logger.log @logger.levels.WARNING, "Could not find information for bot '#{bot_name}': #{errorThrown}"

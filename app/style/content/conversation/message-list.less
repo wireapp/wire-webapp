@@ -32,21 +32,6 @@
   transform: translateZ(0);
   height: 100%;
   max-width: @conversation-max-width;
-
-  &.messages-centered {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-}
-
-// actions pill
-.action-pill-style() {
-  opacity: 0;
-  line-height: 18px;
-  text-decoration: none;
-  z-index: 1;
-  transition: opacity, .3s;
 }
 
 // MESSAGE
@@ -54,13 +39,9 @@
   position: relative;
   margin-bottom: 16px;
 
-  a {
-    text-decoration: none;
-  }
-
-  & * {
-    .accent-selection-color();
-  }
+  & a {text-decoration: none;}
+  & * {.accent-selection-color;}
+  &:last-child {margin-bottom: 24px;}
 
   &.hover .time,
   &:hover .time,
@@ -75,70 +56,18 @@
       opacity: 1;
     }
   }
-
-  .show-timestamp.time + .message-status {
-    opacity: 0;
-  }
-
-  &:last-child {
-    margin-bottom: 24px;
-  }
-
-  .time,
-  .message-status {
-    .action-pill-style;
-    color: fade(#000, 40%);
-    font-size: @font-size-xs;
-    padding-left: 6px;
-    padding-right: 6px;
-    pointer-events: none;
-    position: absolute;
-    right: 24px;
-    top: 3px;
-  }
 }
 
-.message-is-editing {
-  color: @graphite;
-}
-
-.message-fade-out {
-  opacity: 0;
-  transition: opacity @animation-timing-slow @ease-out-quart
-}
-
-// CONTEXT MENU
-.context-menu {
-  .square(18px);
-  .action-pill-style;
-  display: flex;
-  justify-content: center;
-  position: absolute;
-  right: 72px;
-  top: 3px;
-
-  &:focus {
-    opacity: 1 !important;
-    outline: none;
-  }
-}
-
-// MESSAGE GRID
+// MESSAGE - HEADER
 .message-header {
   display: flex;
   margin-bottom: 4px;
   line-height: @avatar-diameter-xs;
 }
 
-.message-hide-user-avatar {
-  display: none;
-}
-
 .message-header-icon {
-  align-items: center;
+  .flex-center;
   color: @graphite-dark;
-  display: flex;
-  justify-content: center;
   width: @conversation-message-sender-width;
 }
 
@@ -172,7 +101,7 @@
   min-width: @conversation-message-timestamp-width;
 }
 
-// MEMBER TIMESTAMP
+// MESSAGE - TIMESTAMP
 .message-timestamp {
   border-bottom: 1px solid @seperator-color;
   height: 48px;
@@ -207,117 +136,7 @@
   time[data-timestamp-type='day'] {display: block;}
 }
 
-// MEMBER MESSAGE
-.message-connected {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  margin-top: 32px;
-  margin-bottom: 48px;
-}
-
-.message-connected-header {
-  font-size: @font-size-lg;
-  line-height: 42px;
-}
-
-.message-connected-avatar {
-  margin-top: 32px;
-}
-
-.message-connected-cancel {
-  .label-xs;
-  cursor: pointer;
-  margin-top: 32px;
-}
-
-// PING MESSAGE
-@keyframes ping-scale-animation {0%{ transform: scale(1); } 100%{ transform: scale(1.8);}}
-@keyframes ping-opacity-animation {0%{ opacity: 1; } 100%{ opacity: 0;}}
-
-.ping-animation {
-  animation-name: ping-scale-animation, ping-opacity-animation;
-  animation-delay: .05s, .05s;
-  animation-timing-function: @ease-out-expo, @ease-out-quart;
-  animation-duration: .7s, .7s;
-}
-
-.ping-animation-soft {animation-iteration-count: 3, 3}
-
-.message-icon-ping {
-  margin-left: 16px;
-}
-
-// CALL MESSAGE
-.message-icon-missed-call {
-  position: absolute;
-  top: 8px;
-  left: 16px;
-
-  &.accent-color-1 { path {fill: @accent_colors-1}}
-  &.accent-color-2 { path {fill: @accent_colors-2}}
-  &.accent-color-3 { path {fill: @accent_colors-3}}
-  &.accent-color-4 { path {fill: @accent_colors-4}}
-  &.accent-color-5 { path {fill: @accent_colors-5}}
-  &.accent-color-6 { path {fill: @accent_colors-6}}
-  &.accent-color-7 { path {fill: @accent_colors-7}}
-}
-
-// DECRYPT MESSAGE
-.message-body-decrypt-error {
-  min-height: 24px;
-}
-
-.message-header-decrypt-error-label {
-  .label-xs;
-  color: @graphite;
-}
-
-.message-header-decrypt-reset-session {
-  .label-xs;
-  display: inline-block;
-  cursor: pointer;
-  position: relative;
-  height: 16px;
-  width: 100%;
-}
-
-.message-header-decrypt-reset-session-action,
-.message-header-decrypt-reset-session-spinner {
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-.message-header-decrypt-reset-session-action {
-  height: 12px;
-}
-
-.message-header-decrypt-reset-session-spinner {
-  top: 4px;
-}
-
-// MESSAGE SPACING
-.message-rename,
-.message-member,
-.message-ping {
-  padding-top: 16px;
-  margin-bottom: 32px;
-}
-
-.message-ping {
-  .time,
-  .context-menu {
-    top: 21px;
-  }
-}
-
-.message-call {
-  margin-bottom: 40px;
-  padding-top: 16px;
-}
-
-// MESSAGE BODY
+// MESSAGE - BODY
 .message-body {
   position: relative;
   margin-top: -5px;
@@ -333,14 +152,6 @@
       @media (min-width: @screen-inline-images) {
         margin-left: 0;
       }
-    }
-
-    .time,
-    .context-menu,
-    .message-status {
-      top: 24px;
-      background-color: fade(#fff, 80%);
-      border-radius: 16px;
     }
   }
 
@@ -420,6 +231,11 @@
     cursor: pointer;
     max-width: 100%;
     max-height: 80vh;
+
+    &.image-ephemeral {
+      cursor: default;
+      opacity: 0;
+    }
   }
 
   .image-placeholder-icon {
@@ -439,9 +255,7 @@
 }
 
 .message-footer-icon {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  .flex-center;
   width: @conversation-message-sender-width;
 }
 
@@ -477,4 +291,191 @@
     opacity: 1;
     transition-delay: @animation-timing-faster + .05;
   }
+}
+
+// MESSAGE - ACTIONS
+.message-body-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: @conversation-message-timestamp-width;
+  height: @line-height-lg;
+
+  // actions pill
+  .action-pill-style() {
+    opacity: 0;
+    line-height: 18px;
+    text-decoration: none;
+    z-index: 1;
+    transition: opacity, .3s;
+  }
+
+  // CONTEXT MENU
+  .context-menu {
+    .square(18px);
+    .action-pill-style;
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    right: 72px;
+    top: 3px;
+
+    &:focus {
+      opacity: 1 !important;
+      outline: none;
+    }
+  }
+
+  .show-timestamp.time + .message-status {
+    opacity: 0;
+  }
+
+  .time,
+  .message-status {
+    .action-pill-style;
+    color: fade(#000, 40%);
+    font-size: @font-size-xs;
+    padding-left: 6px;
+    padding-right: 6px;
+    pointer-events: none;
+    position: absolute;
+    right: 24px;
+    top: 3px;
+  }
+
+  .image-widescreen & {
+    top: 24px;
+
+    .time,
+    .context-menu,
+    .message-status {
+      background-color: fade(#fff, 80%);
+      border-radius: 16px;
+    }
+  }
+
+  .message-ephemeral-timer {
+    position: absolute;
+    top: 0;
+    right: 8px;
+  }
+}
+
+.message-body-actions-large {
+  width: 160px;
+}
+
+// MEMBER MESSAGE
+.message-connected {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin-top: 32px;
+  margin-bottom: 48px;
+}
+
+.message-connected-header {
+  font-size: @font-size-lg;
+  line-height: 42px;
+}
+
+.message-connected-avatar {
+  margin-top: 32px;
+}
+
+.message-connected-cancel {
+  .label-xs;
+  cursor: pointer;
+  margin-top: 32px;
+}
+
+// PING MESSAGE
+@keyframes ping-scale-animation {0%{ transform: scale(1); } 100%{ transform: scale(1.8);}}
+@keyframes ping-opacity-animation {0%{ opacity: 1; } 100%{ opacity: 0;}}
+
+.ping-animation {
+  animation-name: ping-scale-animation, ping-opacity-animation;
+  animation-delay: .05s, .05s;
+  animation-timing-function: @ease-out-expo, @ease-out-quart;
+  animation-duration: .7s, .7s;
+}
+
+.ping-animation-soft {animation-iteration-count: 3, 3}
+
+.message-icon-ping {
+  margin-left: 8px;
+}
+
+// CALL MESSAGE
+.message-icon-missed-call {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+
+  &.accent-color-1 { path {fill: @accent_colors-1}}
+  &.accent-color-2 { path {fill: @accent_colors-2}}
+  &.accent-color-3 { path {fill: @accent_colors-3}}
+  &.accent-color-4 { path {fill: @accent_colors-4}}
+  &.accent-color-5 { path {fill: @accent_colors-5}}
+  &.accent-color-6 { path {fill: @accent_colors-6}}
+  &.accent-color-7 { path {fill: @accent_colors-7}}
+}
+
+// DECRYPT MESSAGE
+.message-body-decrypt-error {
+  min-height: 24px;
+}
+
+.message-header-decrypt-error-label {
+  .label-xs;
+  color: @graphite;
+}
+
+.message-header-decrypt-reset-session {
+  .label-xs;
+  display: inline-block;
+  cursor: pointer;
+  position: relative;
+  height: 16px;
+  width: 100%;
+}
+
+.message-header-decrypt-reset-session-action,
+.message-header-decrypt-reset-session-spinner {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.message-header-decrypt-reset-session-action {
+  height: 12px;
+}
+
+.message-header-decrypt-reset-session-spinner {
+  top: 4px;
+}
+
+// MESSAGE SPACING
+.message-rename,
+.message-member,
+.message-ping {
+  padding-top: 16px;
+  margin-bottom: 32px;
+}
+
+.message-ping {
+  .message-body-actions {
+    position: relative;
+  }
+}
+
+.message-call {
+  margin-bottom: 40px;
+  padding-top: 16px;
+}
+
+// TODO make generic class
+.ephemeral-message-obfuscated {
+  font-family: @font-family-ephemeral;
+  color: @ephemeral-color;
 }

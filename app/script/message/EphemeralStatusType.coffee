@@ -17,13 +17,10 @@
 #
 
 window.z ?= {}
-z.auth ?= {}
+z.message ?= {}
 
-z.auth.URLParameter =
-  BOT: 'bot'
-  CONNECT: 'connect'
-  ENVIRONMENT: 'env'
-  EXPIRED: 'expired'
-  INVITE: 'invite'
-  LOCALE: 'hl'
-  LOCALYTICS: 'localytics'
+z.message.EphemeralStatusType =
+  ACTIVE: 1
+  INACTIVE: 2
+  NONE: 0
+  TIMED_OUT: 3

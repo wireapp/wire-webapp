@@ -17,13 +17,16 @@
 #
 
 window.z ?= {}
-z.auth ?= {}
+z.util ?= {}
+z.util.StringUtil =
+  obfuscate: (text) ->
+    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z']
+    obfuscated = ''
 
-z.auth.URLParameter =
-  BOT: 'bot'
-  CONNECT: 'connect'
-  ENVIRONMENT: 'env'
-  EXPIRED: 'expired'
-  INVITE: 'invite'
-  LOCALE: 'hl'
-  LOCALYTICS: 'localytics'
+    for character in text
+      if character.match /[\n\r\s]+/gi
+        obfuscated += character
+      else
+        obfuscated += z.util.ArrayUtil.random_element alphabet
+
+    return obfuscated

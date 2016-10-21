@@ -162,7 +162,7 @@ class z.SystemNotification.SystemNotificationRepository
   _create_body_content: (message_et) ->
     if message_et.has_asset_text()
       for asset_et in message_et.assets() when asset_et.is_text()
-        return z.util.trunc_text asset_et.text, z.config.BROWSER_NOTIFICATION.BODY_LENGTH
+        return z.util.trunc_text asset_et.text, z.config.BROWSER_NOTIFICATION.BODY_LENGTH if not asset_et.previews().length
     else if message_et.has_asset_medium_image()
       return  z.localization.Localizer.get_text z.string.system_notification_asset_add
     else if message_et.has_asset_location()

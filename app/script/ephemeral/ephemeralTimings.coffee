@@ -17,13 +17,27 @@
 #
 
 window.z ?= {}
-z.auth ?= {}
+z.ephemeral ?= {}
 
-z.auth.URLParameter =
-  BOT: 'bot'
-  CONNECT: 'connect'
-  ENVIRONMENT: 'env'
-  EXPIRED: 'expired'
-  INVITE: 'invite'
-  LOCALE: 'hl'
-  LOCALYTICS: 'localytics'
+z.ephemeral.timings = do ->
+
+  # timings in milliseconds
+  timings = [
+    1000 * 5
+    1000 * 15
+    1000 * 30
+    1000 * 60
+    1000 * 60 * 5
+    1000 * 60 * 60 * 24
+  ]
+
+  get_values = ->
+    return timings
+
+  map_to_closest_timing = (milliseconds) ->
+    return z.util.ArrayUtil.find_closest timings, milliseconds
+
+  return {
+    get_values: get_values
+    map_to_closest_timing: map_to_closest_timing
+  }

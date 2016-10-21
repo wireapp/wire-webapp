@@ -107,5 +107,3 @@ class z.ViewModel.content.PreferencesDeviceDetailsViewModel
 
     @client_repository.update_client_in_db @self_user().id, @device().id, {meta: is_verified: toggle_verified}
     .then => @device().meta.is_verified toggle_verified
-
-    event.stopPropagation()

@@ -29,17 +29,34 @@ class z.entity.Message
     message_ets.sort (m1, m2) -> m1.timestamp > m2.timestamp
 
   # Construct a new base message entity.
-  constructor: (id = '0', super_type = '') ->
+  constructor: (@id = '0', @super_type = '') ->
+    @expire_after_millis = ko.observable false
+    @ephemeral_status = ko.computed =>
+      expiration = @expire_after_millis()
+
+      if expiration is true
+        return z.message.EphemeralStatusType.TIMED_OUT
+
+      if _.isString expiration
+        expiration_timestamp = new Date(expiration).getTime()
+        expires_in = expiration_timestamp - Date.now()
+        if expires_in > 0
+          return z.message.EphemeralStatusType.ACTIVE
+        else
+          return z.message.EphemeralStatusType.TIMED_OUT
+      else if _.isNumber expiration
+        return z.message.EphemeralStatusType.INACTIVE
+      else
+        return z.message.EphemeralStatusType.NONE
+
     @from = ''
-    @id = id
+    @is_editing = ko.observable false
     @primary_key = undefined
-    @super_type = super_type
+    @status = ko.observable z.message.StatusType.UNSPECIFIED
     @timestamp = Date.now()
     @type = ''
     @user = ko.observable new z.entity.User()
     @visible = ko.observable true
-    @is_editing = ko.observable false
-    @status = ko.observable z.message.StatusType.UNSPECIFIED
 
     @display_timestamp_short = =>
       date = moment.unix @timestamp / 1000
@@ -51,7 +68,6 @@ class z.entity.Message
 
     @accent_color = ko.pureComputed =>
       return "accent-color-#{@user().accent_id()}"
-    , @, deferEvaluation: true
 
   ###
   Check if message contains an asset of type file.
@@ -185,7 +201,8 @@ class z.entity.Message
   ###
   is_deletable: ->
     return true if @is_ping() or not @has_asset()
-    return @get_first_asset().status() not in [z.assets.AssetTransferState.DOWNLOADING, z.assets.AssetTransferState.UPLOADING]
+    return @get_first_asset().status() not in [z.assets.AssetTransferState.DOWNLOADING,
+        z.assets.AssetTransferState.UPLOADING]
 
   ###
   Check if message can be edited.
@@ -200,6 +217,13 @@ class z.entity.Message
   ###
   is_reactable: ->
     return @is_content()
+
+  ###
+  Check if ephemeral message is expired.
+  @return [Boolean]
+  ###
+  is_expired: ->
+    return @expire_after_millis() is true
 
   ###
   Update the status of a message.

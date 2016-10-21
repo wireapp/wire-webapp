@@ -19,13 +19,14 @@
                   class="conversation-input-text border-theme"
                   data-bind="event: {'keydown': on_input_key_down},
                              focus_on_keydown: true,
+                             css: {'ephemeral-input': conversation_et().ephemeral_timer()},
                              enter: on_input_enter,
                              hasFocus: blinking_cursor,
                              textInput: input,
                              resize: input,
                              resize_callback: scroll_message_list,
                              click: on_input_click,
-                             l10n_placeholder: z.string.tooltip_conversation_input_placeholder"
+                             attr: {'placeholder': input_tooltip}"
                   data-uie-name="input-message">
         </textarea>
       </div>
@@ -42,6 +43,27 @@
           <!-- /ko -->
 
           <!-- ko if: input().length === 0 -->
+
+            <!-- ko if: conversation_et().is_one2one() -->
+              <span id="conversation-input-ephemeral"
+                    class="controls-right-button conversation-input-ephemeral"
+                    data-bind="l10n_tooltip: z.string.de.tooltip_conversation_ephemeral"
+                    data-uie-name="do-set-ephemeral-timer">
+                <!-- ko if: conversation_et().ephemeral_timer() -->
+                  <div class="ephemeral-timer-button">
+                    <span class="ephemeral-timer-button-unit" data-bind="text: z.util.format_milliseconds_short(conversation_et().ephemeral_timer())[1]"></span>
+                    <span class="full-screen" data-bind="text: z.util.format_milliseconds_short(conversation_et().ephemeral_timer())[0]"></span>
+                  </div>
+                <!-- /ko -->
+                <!-- ko ifnot: conversation_et().ephemeral_timer() -->
+                  <span class="button-icon-large icon-hourglass"></span>
+                <!-- /ko -->
+                  <context-menu class="controls-right-button-ephemeral-context"
+                                params="entries: get_context_menu_entries(), placement: 'top', tag: 'ephemeral'"
+                                tabindex="-1"></context-menu>
+              </span>
+            <!-- /ko -->
+
             <label id="conversation-input-photo"
                    class="controls-right-button button-icon-large icon-library"
                    data-bind="attr: {'title': picture_tooltip}">

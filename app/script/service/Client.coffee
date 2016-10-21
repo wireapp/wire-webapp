@@ -178,7 +178,7 @@ class z.service.Client
               return
             when z.service.BackendClientError::STATUS_CODE.UNAUTHORIZED
               @request_queue.push [config, resolve, reject]
-              @logger.log @logger.levels.WARN, 'Request failed as access token is invalid.', config
+              @logger.log @logger.levels.WARN, "Request failed as access token (#{@access_token}) is invalid.", config
               amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW
               return
             when z.service.BackendClientError::STATUS_CODE.FORBIDDEN

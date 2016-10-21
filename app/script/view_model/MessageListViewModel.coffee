@@ -32,7 +32,7 @@ class z.ViewModel.MessageListViewModel
 
     @conversation = ko.observable new z.entity.Conversation()
     @center_messages = ko.pureComputed =>
-      return not @conversation().has_further_messages() and @conversation().messages_visible().length is 1 and @conversation().messages_visible()[0].is_connection()
+      return not @conversation().has_further_messages() and @conversation().messages_visible().length is 1 and @conversation().messages_visible()[0]?.is_connection?()
 
     @conversation_is_changing = false
 
@@ -58,6 +58,7 @@ class z.ViewModel.MessageListViewModel
     @recalculate_timeout = undefined
 
     @should_scroll_to_bottom = true
+    @ephemeral_timers = {}
 
     # Check if the message container is to small and then pull new events
     @on_mouse_wheel = _.throttle (e) =>
@@ -397,6 +398,11 @@ class z.ViewModel.MessageListViewModel
     if message_et.is_deletable()
       entries.push {label: z.string.conversation_context_menu_delete, action: 'delete'}
 
+    if message_et.expire_after_millis()
+      entries = [
+        {label: z.string.conversation_context_menu_delete, action: 'delete'}
+      ]
+
     if message_et.user().is_me and not @conversation().removed_from_conversation() and message_et.status() isnt z.message.StatusType.SENDING
       entries.push {label: z.string.conversation_context_menu_delete_everyone, action: 'delete-everyone'}
 
@@ -444,6 +450,7 @@ class z.ViewModel.MessageListViewModel
   ###
   show_detail: (asset_et, event) ->
     target_element = $(event.currentTarget)
+    return if target_element.hasClass 'image-ephemeral'
     return if target_element.hasClass 'image-loading'
     amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, target_element.find('img')[0].src
 
@@ -524,3 +531,26 @@ class z.ViewModel.MessageListViewModel
       user: if message_et.user().is_me then 'sender' else 'receiver'
       type: z.tracking.helpers.get_message_type message_et
       reacted_to_last_message: conversation_et.get_last_message() is message_et
+
+  ###
+  Message appeared in viewport.
+
+  @param message_et [z.entity.Message]
+  ###
+  message_in_viewport: (message_et) =>
+    @conversation_repository.get_ephemeral_timer message_et
+    .then (millis) => @start_ephemeral_timer message_et, millis if millis
+
+  ###
+  Start ephemeral timeout.
+
+  @param message_et [z.entity.Message]
+  @param millis [Number]
+  ###
+  start_ephemeral_timer: (message_et, millis) ->
+    return if @ephemeral_timers[message_et.id]
+
+    conversation_et = @conversation()
+    @ephemeral_timers[message_et.id] = window.setTimeout (=>
+      @conversation_repository.timeout_ephemeral_message conversation_et, message_et
+    ), millis
