@@ -39,5 +39,5 @@ z.ephemeral.timings = do ->
 
   return {
     get_values: get_values
-    map_to_closest_value: map_to_closest_timing
+    map_to_closest_timing: map_to_closest_timing
   }
