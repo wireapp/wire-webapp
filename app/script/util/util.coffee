@@ -164,16 +164,19 @@ z.util.format_seconds = (duration) ->
 Format seconds into 15s, 2m.
 
 @param duration [Number] duration to format in seconds
-@return [String]
+@return [Array] [number, unit]
 ###
 z.util.format_milliseconds_short = (duration) ->
   seconds = Math.floor duration / 1000
-  if seconds < 60 then [seconds, 's'] else [Math.floor(seconds / 60), 'm']
+  switch
+    when seconds < 60 then [seconds, 's']
+    when seconds < 60 * 60 then [Math.floor(seconds / 60), 'm']
+    when seconds < 60 * 60 * 24 then [Math.floor(seconds / 60 / 60), 'h']
+    else [Math.floor(seconds / 60 / 60 / 24), 'd']
 
 
 z.util.get_content_type_from_data_url = (data_url) ->
   return data_url.split(',')[0].split(':')[1].split(';')[0]
-
 
 
 z.util.strip_data_uri = (string) ->

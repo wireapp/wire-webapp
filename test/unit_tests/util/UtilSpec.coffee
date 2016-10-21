@@ -794,6 +794,12 @@ describe 'z.util.format_milliseconds_short', ->
     expect(z.util.format_milliseconds_short(60000)).toEqual [1, 'm']
     expect(z.util.format_milliseconds_short(900000)).toEqual [15, 'm']
 
+  it 'should format duration over 1 hour', ->
+    expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 3)).toEqual [3, 'h']
+
+  it 'should format duration over 1 day', ->
+    expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 24 * 3)).toEqual [3, 'd']
+
 describe 'z.util.is_same_location', ->
   it 'returns false if page was accessed directly', ->
     actual = z.util.is_same_location '', 'https://app.wire.com'
