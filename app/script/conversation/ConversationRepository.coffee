@@ -884,10 +884,7 @@ class z.conversation.ConversationRepository
         # we don't need to wait for the sending to resolve
         @_send_encrypted_asset conversation_et.id, generic_message, ciphertext
         .then ([response, asset_id]) =>
-          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-            action: 'photo'
-            conversation_type: if conversation_et.is_one2one() then 'one_to_one' else 'group'
-            with_bot: conversation_et.is_with_bot()
+          @_track_completed_media_action conversation_et, generic_message
           saved_event.data.id = asset_id
           saved_event.data.info.nonce = asset_id
           @_update_image_as_sent conversation_et, saved_event
@@ -2199,15 +2196,28 @@ class z.conversation.ConversationRepository
   @param generic_message [z.protobuf.GenericMessage]
   ###
   _track_completed_media_action: (conversation_et, generic_message) ->
-    action_type = switch generic_message.content
-      when 'asset' then 'file' if generic_message.asset.original?
+    if generic_message.content is 'ephemeral'
+      message = generic_message.ephemeral
+      message_content_type = generic_message.ephemeral.content
+      is_ephemeral = true
+      ephemeral_time = generic_message.ephemeral.expire_after_millis / 1000
+    else
+      message = generic_message
+      message_content_type = generic_message.content
+      is_ephemeral = false
+
+    action_type = switch message_content_type
+      when 'asset' then 'file' if message.asset.original?
+      when 'image' then 'photo'
       when 'knock' then 'ping'
-      when 'text' then 'text' if not generic_message.text.link_preview.length
+      when 'text' then 'text' if not message.text.link_preview.length
 
     return if not action_type
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
       action: action_type
       conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+      is_ephemeral: is_ephemeral
+      ephemeral_time: ephemeral_time if is_ephemeral
       with_bot: conversation_et.is_with_bot()
 
   ###

@@ -47,10 +47,6 @@ z.tracking.EventName =
     EDITED_MESSAGE: 'conversation.edited_message'
     SELECTED_MESSAGE: 'conversation.selected_message'
     REACTED_TO_MESSAGE: 'conversation.reacted_to_message'
-  MEDIA:
-    COMPLETED_MEDIA_ACTION: 'media.completed_media_action'
-    PLAYED_AUDIO_MESSAGE: 'media.played_audio_message'
-    PLAYED_VIDEO_MESSAGE: 'media.played_video_message'
   E2EE:
     CANNOT_DECRYPT_MESSAGE: 'e2ee.cannot_decrypt_message'
   FILE:
@@ -63,6 +59,10 @@ z.tracking.EventName =
     DOWNLOAD_FAILED: 'file.failed_file_download'
     DOWNLOAD_SUCCESSFUL: 'file.successfully_downloaded_file'
   IMAGE_SENT_ERROR: 'Image Sent Error'
+  MEDIA:
+    COMPLETED_MEDIA_ACTION: 'media.completed_media_action'
+    PLAYED_AUDIO_MESSAGE: 'media.played_audio_message'
+    PLAYED_VIDEO_MESSAGE: 'media.played_video_message'
   NAVIGATION:
     OPENED_WIRE_WEBSITE: 'navigation.opened_wire_website'
     OPENED_TERMS: 'navigation.opened_terms'
