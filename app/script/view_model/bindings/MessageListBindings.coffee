@@ -68,6 +68,7 @@ ko.bindingHandlers.background_image =
           object_url = window.URL.createObjectURL blob
           image_element[0].src = object_url
           viewport_subscription.dispose()
+        .catch -> return
     , 500
 
     image_element = $(element).find 'img'
