@@ -247,14 +247,31 @@ class z.ViewModel.ConversationInputViewModel
   @param message_et [z.entity.Message]
   ###
   get_context_menu_entries: ->
-    return [
-      {label: z.localization.Localizer.get_text(z.string.ephememal_units_none), action: 0},
-      {label: "5 #{z.localization.Localizer.get_text(z.string.ephememal_units_seconds)}", action: 5000},
-      {label: "15 #{z.localization.Localizer.get_text(z.string.ephememal_units_seconds)}", action: 15000},
-      {label: "30 #{z.localization.Localizer.get_text(z.string.ephememal_units_seconds)}", action: 30000},
-      {label: "1 #{z.localization.Localizer.get_text(z.string.ephememal_units_minute)}", action: 60000},
-      {label: "5 #{z.localization.Localizer.get_text(z.string.ephememal_units_minutes)}", action: 300000},
-    ]
+    entries = [label: z.localization.Localizer.get_text(z.string.ephememal_units_none), action: 0]
+    return entries.concat z.ephemeral.timings.get_values().map (milliseconds) =>
+      [number, unit] = z.util.format_milliseconds_short(milliseconds)
+      unit_locale = @_get_localized_unit_string number, unit
+      return label: "#{number} #{unit_locale}", action: milliseconds
+
+  ###
+  Returns the full localized unit string
+  @param number [Number]
+  @param unit [String] 's', 'm', 'd', 'h'
+  ###
+  _get_localized_unit_string: (number, unit) ->
+    return switch
+      when unit is 's'
+        if number is 1
+          return z.localization.Localizer.get_text z.string.ephememal_units_second
+        return z.localization.Localizer.get_text z.string.ephememal_units_seconds
+      when unit is 'm'
+        if number is 1
+          return z.localization.Localizer.get_text z.string.ephememal_units_minute
+        return z.localization.Localizer.get_text z.string.ephememal_units_minutes
+      when unit is 'd'
+        if number is 1
+          return z.localization.Localizer.get_text z.string.ephememal_units_day
+        return z.localization.Localizer.get_text z.string.ephememal_units_days
 
   ###
   Click on context menu entry
