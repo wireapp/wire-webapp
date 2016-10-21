@@ -528,6 +528,7 @@ class z.entity.Conversation
   ###
   is_with_bot: =>
     return false if not @is_one2one()
+    return false if not @participating_user_ets()[0]
     possible_bot_email = @participating_user_ets()[0].email()
     return !!possible_bot_email?.match /(anna|ottobot|welcome)(\+\S+)?@wire.com/ig
 
