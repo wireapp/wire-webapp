@@ -57,9 +57,8 @@ class z.components.DeviceCard
 
     z.location.get_location @device.location.lat, @device.location.lon
     .then (retrieved_location) =>
-      @_update_activation_location "#{retrieved_location.place}, #{retrieved_location.country_code}"
-    .catch (error) =>
-      @logger.log @logger.levels.WARN, "Could not update device location: #{error.message}", error
+      if retrieved_location
+        @_update_activation_location "#{retrieved_location.place}, #{retrieved_location.country_code}"
 
 
 ko.components.register 'device-card',
