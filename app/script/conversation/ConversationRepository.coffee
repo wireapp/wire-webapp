@@ -1165,12 +1165,12 @@ class z.conversation.ConversationRepository
     key_bytes = null
     sha256 = null
     ciphertext = null
-    skip_other_own_clients = generic_message.content is 'ephemeral'
+    skip_own_clients = generic_message.content is 'ephemeral'
 
     z.assets.AssetCrypto.encrypt_aes_asset generic_message.toArrayBuffer()
     .then (data) =>
       [key_bytes, sha256, ciphertext] = data
-      return @_create_user_client_map conversation_id, skip_other_own_clients
+      return @_create_user_client_map conversation_id, skip_own_clients
     .then (user_client_map) =>
       if user_ids
         delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
