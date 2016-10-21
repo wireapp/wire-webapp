@@ -575,7 +575,7 @@ z.string.init_events_progress = 'Loading messages - %progress of %total'
 z.string.init_updated_from_notifications = 'We are almost there'
 z.string.init_app_pre_loaded = 'Enjoy Wire'
 
-z.string.ephememal_units_none = 'off'
+z.string.ephememal_units_none = 'Off'
 z.string.ephememal_units_second = 'second'
 z.string.ephememal_units_seconds = 'seconds'
 z.string.ephememal_units_minute = 'minute'

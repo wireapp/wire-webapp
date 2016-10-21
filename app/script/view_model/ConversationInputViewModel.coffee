@@ -280,4 +280,4 @@ class z.ViewModel.ConversationInputViewModel
   ###
   on_context_menu_action: (tag, action) =>
     return if tag isnt 'ephemeral'
-    @set_ephemeral_timer action
+    @set_ephemeral_timer window.parseInt(action, 10)
