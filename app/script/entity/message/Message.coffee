@@ -209,7 +209,7 @@ class z.entity.Message
   @return [Boolean]
   ###
   is_editable: ->
-    return @has_asset_text() and @user().is_me and @expire_after_millis() is false
+    return @has_asset_text() and @user().is_me and not @is_ephemeral()
 
   ###
   Check if message is ephemeral.
@@ -230,7 +230,7 @@ class z.entity.Message
   @return [Boolean]
   ###
   is_reactable: ->
-    return @is_content() and @status() isnt z.message.StatusType.SENDING and @expire_after_millis() is false
+    return @is_content() and @status() isnt z.message.StatusType.SENDING and not @is_ephemeral()
 
   ###
   Update the status of a message.
