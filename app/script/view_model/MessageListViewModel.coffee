@@ -59,7 +59,6 @@ class z.ViewModel.MessageListViewModel
 
     @should_scroll_to_bottom = true
     @ephemeral_timers = {}
-    @start_timer_on_focus = undefined
 
     # Check if the message container is to small and then pull new events
     @on_mouse_wheel = _.throttle (e) =>
@@ -542,14 +541,10 @@ class z.ViewModel.MessageListViewModel
     if document.hasFocus()
       set_ephemeral_timer()
     else
-      @start_timer_on_focus = @conversation.id
+      start_timer_on_focus = @conversation.id
 
-      listener_name = "focus.#{message_et.id}"
-      $(window).on listener_name, =>
-        if @start_timer_on_focus is @conversation.id
-          set_ephemeral_timer()
-        $(window).off listener_name
-        @start_timer_on_focus = undefined
+      $(window).once 'focus', =>
+        set_ephemeral_timer() if start_timer_on_focus is @conversation.id
 
   ###
   Start ephemeral timeout.
