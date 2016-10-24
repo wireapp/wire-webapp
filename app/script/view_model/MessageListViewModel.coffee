@@ -59,6 +59,7 @@ class z.ViewModel.MessageListViewModel
 
     @should_scroll_to_bottom = true
     @ephemeral_timers = {}
+    @start_timer_on_focus = undefined
 
     # Check if the message container is to small and then pull new events
     @on_mouse_wheel = _.throttle (e) =>
@@ -529,12 +530,26 @@ class z.ViewModel.MessageListViewModel
 
   ###
   Message appeared in viewport.
-
   @param message_et [z.entity.Message]
   ###
   message_in_viewport: (message_et) =>
-    @conversation_repository.get_ephemeral_timer message_et
-    .then (millis) => @start_ephemeral_timer message_et, millis if millis
+    return if not message_et.is_ephemeral()
+
+    set_ephemeral_timer = =>
+      @conversation_repository.get_ephemeral_timer message_et
+      .then (millis) => @start_ephemeral_timer message_et, millis if millis
+
+    if document.hasFocus()
+      set_ephemeral_timer()
+    else
+      @start_timer_on_focus = @conversation.id
+
+      listener_name = "focus.#{message_et.id}"
+      $(window).on listener_name, =>
+        if @start_timer_on_focus is @conversation.id
+          set_ephemeral_timer()
+        $(window).off listener_name
+        @start_timer_on_focus = undefined
 
   ###
   Start ephemeral timeout.
