@@ -438,24 +438,24 @@ describe 'z.util.array_is_last', ->
     actual = z.util.array_is_last array, d
     expect(actual).toBeFalsy()
 
-describe 'z.util.trunc_text', ->
+describe 'z.util.truncate_text', ->
   it 'returns the full string if it is shorter than the target length', ->
-    text = z.util.trunc_text "#{lorem_ipsum.substr 0, 80}", 90
+    text = z.util.truncate_text "#{lorem_ipsum.substr 0, 80}", 90
     expect(text.length).toBe 80
     expect(text.charAt 79).not.toBe '…'
 
   it 'returns a truncated string of correct length if it is longer than the target length', ->
-    text = z.util.trunc_text "#{lorem_ipsum.substr 0, 80}", 70
+    text = z.util.truncate_text "#{lorem_ipsum.substr 0, 80}", 70
     expect(text.length).toBe 64
     expect(text.charAt 63).toBe '…'
 
   it 'returns a truncated string of correct length if word boundary is disabled', ->
-    text = z.util.trunc_text "#{lorem_ipsum.substr 0, 80}", 70, false
+    text = z.util.truncate_text "#{lorem_ipsum.substr 0, 80}", 70, false
     expect(text.length).toBe 70
     expect(text.charAt 69).toBe '…'
 
   it 'returns a truncated string of correct length if word boundary is disabled and there are no whitespaces in the string', ->
-    text = z.util.trunc_text "#{lorem_ipsum.replace(/\s/g, '').substr 0, 80}", 70
+    text = z.util.truncate_text "#{lorem_ipsum.replace(/\s/g, '').substr 0, 80}", 70
     expect(text.length).toBe 70
     expect(text.charAt 69).toBe '…'
 
