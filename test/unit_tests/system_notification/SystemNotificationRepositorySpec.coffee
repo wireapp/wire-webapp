@@ -38,7 +38,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
       # Notification
       notification_content =
-        title: z.util.trunc_text conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        title: z.util.truncate_text conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
         options:
           body: ''
           data:
@@ -131,7 +131,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         system_notification_repository.notify conversation_et, message_et
 
         title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-        notification_content.title = z.util.trunc_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
         result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
         expect(result).toEqual JSON.stringify notification_content
         expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
@@ -158,7 +158,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         system_notification_repository.notify conversation_et, message_et
 
         title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-        notification_content.title = z.util.trunc_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
         result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
         expect(result).toEqual JSON.stringify notification_content
         expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
@@ -189,7 +189,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         system_notification_repository.notify conversation_et, message_et
 
         title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-        notification_content.title = z.util.trunc_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
         result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
         expect(result).toEqual JSON.stringify notification_content
         expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
@@ -212,7 +212,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         system_notification_repository.notify conversation_et, message_et
 
         title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-        notification_content.title = z.util.trunc_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
         result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
         expect(result).toEqual JSON.stringify notification_content
         expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
@@ -235,7 +235,36 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         system_notification_repository.notify conversation_et, message_et
 
         title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-        notification_content.title = z.util.trunc_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+
+    describe 'for ephemeral messages', ->
+      beforeEach ->
+        message_et.expire_after_millis 5000
+        notification_content.title = z.string.system_notification_ephemeral_title
+        notification_content.options.body = z.string.system_notification_ephemeral
+
+      it 'that contains text', ->
+        system_notification_repository.notify conversation_et, message_et
+
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+
+      it 'that contains an image', ->
+        message_et.assets.push new z.entity.Location()
+        system_notification_repository.notify conversation_et, message_et
+
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+
+      it 'that contains a location', ->
+        message_et.assets.push new z.entity.MediumImage()
+        system_notification_repository.notify conversation_et, message_et
+
         result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
         expect(result).toEqual JSON.stringify notification_content
         expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
@@ -243,7 +272,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
   describe 'shows a well-formed group notification', ->
     beforeEach ->
       title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-      notification_content.title = z.util.trunc_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+      notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
       notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
 
     it 'if a group is created', ->
@@ -283,7 +312,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       beforeEach ->
         message_et.type = z.event.Backend.CONVERSATION.MEMBER_JOIN
         title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-        notification_content.title = z.util.trunc_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
         notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
 
       it 'with one user being added to the conversation', ->
@@ -320,7 +349,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       beforeEach ->
         message_et.type = z.event.Backend.CONVERSATION.MEMBER_LEAVE
         title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-        notification_content.title = z.util.trunc_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
         notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
 
       it 'with one user being removed from the conversation', ->
@@ -372,7 +401,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       message_et.user user_et
 
       title = message_et.user().name()
-      notification_content.title = z.util.trunc_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+      notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
       notification_content.options.data.conversation_id = connection_et.conversation_id
       notification_content.options.tag = connection_et.conversation_id
       notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
@@ -420,7 +449,17 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       system_notification_repository.notify conversation_et, message_et
 
       title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-      notification_content.title = z.util.trunc_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+      notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+      result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+      expect(result).toEqual JSON.stringify notification_content
+      expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+
+    it 'as an ephemeral message', ->
+      message_et.expire_after_millis 5000
+      notification_content.title = z.string.system_notification_ephemeral_title
+      notification_content.options.body = z.string.system_notification_ephemeral
+      system_notification_repository.notify conversation_et, message_et
+
       result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
       expect(result).toEqual JSON.stringify notification_content
       expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1

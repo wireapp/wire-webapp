@@ -501,7 +501,7 @@ z.util.valid_profile_image_size = (file, min_width, min_height, callback) ->
   image.src = window.URL.createObjectURL file
 
 
-z.util.trunc_text = (text, output_length, word_boundary = true) ->
+z.util.truncate_text = (text, output_length, word_boundary = true) ->
   if text.length > output_length
     trunc_index = output_length - 1
     if word_boundary and text.lastIndexOf(' ', output_length - 1) > output_length - 25
