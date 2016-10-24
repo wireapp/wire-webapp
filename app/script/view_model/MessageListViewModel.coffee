@@ -543,7 +543,7 @@ class z.ViewModel.MessageListViewModel
     else
       start_timer_on_focus = @conversation.id
 
-      $(window).once 'focus', =>
+      $(window).one 'focus', =>
         set_ephemeral_timer() if start_timer_on_focus is @conversation.id
 
   ###
