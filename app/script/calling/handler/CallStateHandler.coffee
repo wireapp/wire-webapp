@@ -381,6 +381,7 @@ class z.calling.handler.CallStateHandler
               amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
                 action: media_action
                 conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+                is_ephemeral: false
                 with_bot: conversation_et.is_with_bot()
         return true
 
