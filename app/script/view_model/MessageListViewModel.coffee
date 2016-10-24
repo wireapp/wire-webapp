@@ -529,12 +529,22 @@ class z.ViewModel.MessageListViewModel
 
   ###
   Message appeared in viewport.
-
   @param message_et [z.entity.Message]
   ###
   message_in_viewport: (message_et) =>
-    @conversation_repository.get_ephemeral_timer message_et
-    .then (millis) => @start_ephemeral_timer message_et, millis if millis
+    return if not message_et.is_ephemeral()
+
+    set_ephemeral_timer = =>
+      @conversation_repository.get_ephemeral_timer message_et
+      .then (millis) => @start_ephemeral_timer message_et, millis if millis
+
+    if document.hasFocus()
+      set_ephemeral_timer()
+    else
+      start_timer_on_focus = @conversation.id
+
+      $(window).once 'focus', =>
+        set_ephemeral_timer() if start_timer_on_focus is @conversation.id
 
   ###
   Start ephemeral timeout.
