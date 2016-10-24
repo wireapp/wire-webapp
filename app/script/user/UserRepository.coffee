@@ -650,6 +650,8 @@ class z.user.UserRepository
 
   ###
   Save the user properties.
+  @param key [String] User properties key name to update
+  @param value
   ###
   save_properties: (key, value) =>
     @user_service.change_user_properties_by_key z.config.PROPERTIES_KEY, @properties
@@ -697,9 +699,7 @@ class z.user.UserRepository
     @save_properties 'enable_debugging', is_enabled
     .then -> amplify.publish z.util.Logger::LOG_ON_DEBUG, is_enabled
 
-  ###
-  Save timestamp for Google Contacts import.
-  ###
+  # Save when user has created a conversation.
   save_property_has_created_conversation: =>
     @properties.has_created_conversation = true
     @save_properties 'has_created_conversation', @properties.has_created_conversation

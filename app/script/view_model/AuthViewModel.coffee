@@ -234,7 +234,7 @@ class z.ViewModel.AuthViewModel
       z.auth.AuthView.MODE.VERIFY_PASSWORD
     ]
 
-    if @_has_no_hash() and z.storage.get_value z.storage.StorageKey.AUTH.SHOW_LOGIN
+    if @_has_no_hash() and z.util.StorageUtil.get_value z.storage.StorageKey.AUTH.SHOW_LOGIN
       @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
     else if @_get_hash() in modes_to_block
       @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN

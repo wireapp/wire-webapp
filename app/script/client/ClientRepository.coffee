@@ -307,7 +307,7 @@ class z.client.ClientRepository
   @param login [String] Email or phone number of the user
   ###
   _get_cookie_label_value: (login) ->
-    return z.storage.get_value @construct_cookie_label_key login
+    return z.util.StorageUtil.get_value @construct_cookie_label_key login
 
   ###
   Loads the cookie label value from the Local Storage and saves it into IndexedDB.
@@ -324,7 +324,7 @@ class z.client.ClientRepository
     if cookie_label is undefined
       cookie_label = @construct_cookie_label @self_user().email() or @self_user().phone(), client_type
       @logger.log @logger.levels.WARN, "Cookie label is in an invalid state. We created a new one: '#{cookie_label}'"
-      z.storage.set_value local_storage_key, cookie_label
+      z.util.StorageUtil.set_value local_storage_key, cookie_label
 
     @logger.log "Saving cookie label '#{cookie_label}' in IndexedDB", {
       key: local_storage_key
@@ -340,7 +340,7 @@ class z.client.ClientRepository
   ###
   _load_current_client_type: ->
     return @current_client().type if @current_client()
-    is_permanent = z.storage.get_value z.storage.StorageKey.AUTH.PERSIST
+    is_permanent = z.util.StorageUtil.get_value z.storage.StorageKey.AUTH.PERSIST
     type = if is_permanent then z.client.ClientType.PERMANENT else z.client.ClientType.TEMPORARY
     type = if z.util.Environment.electron then z.client.ClientType.PERMANENT else type
     return type

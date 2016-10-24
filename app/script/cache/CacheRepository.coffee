@@ -50,7 +50,7 @@ class z.cache.CacheRepository
         should_be_deleted = false if stored_key.startsWith protected_key_pattern
 
       if should_be_deleted
-        z.storage.reset_value stored_key
+        z.util.StorageUtil.reset_value stored_key
         deleted_keys.push stored_key
 
     return deleted_keys

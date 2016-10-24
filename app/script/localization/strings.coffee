@@ -399,6 +399,7 @@ z.string.preferences_account_delete = 'Delete account'
 z.string.preferences_account_log_out = 'Log out'
 z.string.preferences_account_username_placeholder = 'Your full name'
 
+
 z.string.preferences_devices_activated_in = 'in %location'
 z.string.preferences_devices_activated_on = 'Activated on %time'
 z.string.preferences_devices_active = 'Active'
@@ -416,6 +417,8 @@ z.string.preferences_devices_session_reset = 'Reset session'
 z.string.preferences_devices_session_ongoing = 'Resetting session…'
 z.string.preferences_devices_verification = 'Verified'
 
+
+z.string.preferences_options_camera = 'Camera'
 z.string.preferences_options_contacts = 'Contacts'
 z.string.preferences_options_contacts_gmail = 'Import from Gmail'
 z.string.preferences_options_contacts_macos = 'Import from Contacts'
@@ -423,6 +426,7 @@ z.string.preferences_options_contacts_detail = 'We use your contact data to conn
 z.string.preferences_options_data = 'Usage and crash reports'
 z.string.preferences_options_data_checkbox = 'Usage and crash reports'
 z.string.preferences_options_data_detail = 'Make Wire better by sending anonymous information.'
+z.string.preferences_options_microphone = 'Microphone'
 z.string.preferences_options_sound = 'Sound alerts'
 z.string.preferences_options_sound_all = 'All'
 z.string.preferences_options_sound_all_detail = 'All sounds'
@@ -430,6 +434,7 @@ z.string.preferences_options_sound_none = 'None'
 z.string.preferences_options_sound_none_detail = 'Sshhh!'
 z.string.preferences_options_sound_some = 'Some'
 z.string.preferences_options_sound_some_detail = 'Pings and calls'
+z.string.preferences_options_speakers = 'Speakers'
 
 # Search
 z.string.search_group_hint = 'Keep typing or pick more people to create a group'

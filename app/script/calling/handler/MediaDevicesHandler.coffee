@@ -36,8 +36,8 @@ class z.calling.handler.MediaDevicesHandler
       video_input: ko.observableArray []
 
     @current_device_id =
-      audio_input: ko.observable 'default'
-      audio_output: ko.observable 'default'
+      audio_input: ko.observable()
+      audio_output: ko.observable()
       screen_input: ko.observable()
       video_input: ko.observable()
 
@@ -58,12 +58,22 @@ class z.calling.handler.MediaDevicesHandler
 
     @get_media_devices()
     .then =>
-      if @available_devices.video_input().length
-        default_device_index = @available_devices.video_input().length - 1
-        @current_device_id.video_input @available_devices.video_input()[default_device_index].deviceId
-        @current_device_index.video_input default_device_index
+      @_set_current_devices()
       @_subscribe_to_observables()
       @_subscribe_to_devices()
+
+  # Set current media device IDs.
+  _set_current_devices: =>
+    @current_device_id.audio_input z.util.StorageUtil.get_value(z.calling.enum.MediaDeviceType.AUDIO_INPUT) or 'default'
+    @current_device_id.audio_output z.util.StorageUtil.get_value(z.calling.enum.MediaDeviceType.AUDIO_OUTPUT) or 'default'
+    @current_device_id.video_input z.util.StorageUtil.get_value z.calling.enum.MediaDeviceType.VIDEO_INPUT
+
+    if not @current_device_id.video_input() and @available_devices.video_input().length
+      default_device_index = @available_devices.video_input().length - 1
+      @current_device_id.video_input @available_devices.video_input()[default_device_index].deviceId
+      @current_device_index.video_input default_device_index
+
+    @logger.log @logger.levels.INFO, 'Set selected MediaDevice IDs'
 
   # Subscribe to MediaDevices updates if available.
   _subscribe_to_devices: =>
@@ -87,22 +97,25 @@ class z.calling.handler.MediaDevicesHandler
       @_update_current_index_from_devices z.calling.enum.MediaDeviceType.VIDEO_INPUT, media_devices if media_devices
 
     @current_device_id.audio_input.subscribe (media_device_id) =>
-      if media_device_id and @call_center.joined_call()
+      z.util.StorageUtil.set_value z.calling.enum.MediaDeviceType.AUDIO_INPUT, media_device_id
+      if media_device_id and @call_center.media_stream_handler.local_media_streams.audio()
         @call_center.media_stream_handler.replace_input_source z.calling.enum.MediaType.AUDIO
         @_update_current_index_from_id z.calling.enum.MediaDeviceType.AUDIO_INPUT, media_device_id
 
     @current_device_id.audio_output.subscribe (media_device_id) =>
-      if media_device_id and @call_center.joined_call()
+      z.util.StorageUtil.set_value z.calling.enum.MediaDeviceType.AUDIO_OUTPUT, media_device_id
+      if media_device_id
         @call_center.media_element_handler.switch_media_element_output media_device_id
         @_update_current_index_from_id z.calling.enum.MediaDeviceType.AUDIO_OUTPUT, media_device_id
 
     @current_device_id.screen_input.subscribe (media_device_id) =>
-      if media_device_id and @call_center.joined_call() and @call_center.media_stream_handler.local_media_type() is z.calling.enum.MediaType.SCREEN
+      if media_device_id and @call_center.media_stream_handler.local_media_streams.video() and @call_center.media_stream_handler.local_media_type() is z.calling.enum.MediaType.SCREEN
         @call_center.media_stream_handler.replace_input_source z.calling.enum.MediaType.SCREEN
         @_update_current_index_from_id z.calling.enum.MediaDeviceType.SCREEN_INPUT, media_device_id
 
     @current_device_id.video_input.subscribe (media_device_id) =>
-      if media_device_id and @call_center.joined_call() and @call_center.media_stream_handler.local_media_type() is z.calling.enum.MediaType.VIDEO
+      z.util.StorageUtil.set_value z.calling.enum.MediaDeviceType.VIDEO_INPUT, media_device_id
+      if media_device_id and @call_center.media_stream_handler.local_media_streams.video() and @call_center.media_stream_handler.local_media_type() is z.calling.enum.MediaType.VIDEO
         @call_center.media_stream_handler.replace_input_source z.calling.enum.MediaType.VIDEO
         @_update_current_index_from_id z.calling.enum.MediaDeviceType.VIDEO_INPUT, media_device_id
 

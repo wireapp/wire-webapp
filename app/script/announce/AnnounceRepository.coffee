@@ -52,8 +52,8 @@ class z.announce.AnnounceRepository
           continue if announcement.version_max and z.util.Environment.version(false) > announcement.version_max
           continue if announcement.version_min and z.util.Environment.version(false) < announcement.version_min
         key = "#{z.storage.StorageKey.ANNOUNCE.ANNOUNCE_KEY}@#{announcement.key}"
-        if not z.storage.get_value key
-          z.storage.set_value key, 'read'
+        if not z.util.StorageUtil.get_value key
+          z.util.StorageUtil.set_value key, 'read'
           return if not z.util.Environment.browser.supports.notifications
           return if window.Notification.permission is z.util.BrowserPermissionType.DENIED
 

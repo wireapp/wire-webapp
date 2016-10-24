@@ -27,29 +27,101 @@
 
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferences_options_contacts"></header>
-        <div class="preferences-option">
-          <div class="preferences-option-icon" data-bind="click: connect_google, l10n_tooltip: z.string.tooltip_preferences_contacts_gmail" data-uie-name="do-share-contacts">
+        <div class="preferences-option preferences-option-pointer" data-uie-name="do-share-contacts">
+          <div class="preferences-option-icon" data-bind="click: connect_google, l10n_tooltip: z.string.tooltip_preferences_contacts_gmail">
             <svg>
               <use xlink:href="#icon-gmail"></use>
             </svg>
-            <label data-bind="l10n_text: z.string.preferences_options_contacts_gmail"></label>
           </div>
-          <!-- ko if: window.zAddressBook -->
-            <div class="preferences-option-icon" data-bind="click: connect_macos_contacts, l10n_tooltip: z.string.tooltip_preferences_contacts_macos" data-uie-name="do-share-osx-contacts">
-              <div class="icon-contacts"></div>
-              <label data-bind="l10n_text: z.string.preferences_options_contacts_macos"></label>
-            </div>
-          <!-- /ko -->
+          <label class="preferences-option-label" data-bind="connect_google, l10n_text: z.string.preferences_options_contacts_gmail, l10n_tooltip: z.string.tooltip_preferences_contacts_gmail"></label>
         </div>
+        <!-- ko if: window.zAddressBook -->
+          <div class="preferences-option preferences-option-pointer" data-uie-name="do-share-osx-contacts">
+            <div class="preferences-option-icon" data-bind="click: connect_macos_contacts, l10n_tooltip: z.string.tooltip_preferences_contacts_macos">
+              <div class="icon-contacts"></div>
+            </div>
+            <label class="preferences-option-label" data-bind="click: connect_macos_contacts, l10n_text: z.string.preferences_options_contacts_macos, l10n_tooltip: z.string.tooltip_preferences_contacts_macos"></label>
+          </div>
+        <!-- /ko -->
         <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_options_contacts_detail"></div>
       </section>
+
+      <!-- ko if: available_devices.audio_input().length -->
+        <section class="preferences-section">
+          <header class="preferences-header preferences-options-header" data-bind="l10n_text: z.string.preferences_options_microphone"></header>
+          <div class="preferences-option">
+            <div class="preferences-option-icon preferences-options-select-icon">
+              <div class="icon-microphone"></div>
+            </div>
+            <div class="input-select">
+              <select class="preferences-options-select" name="select"
+                      data-bind="enabled: available_devices.audio_input().length >= 2,
+                                 options: available_devices.audio_input,
+                                 optionsText: function(item) {return item.label || z.string.preferences_options_microphone},
+                                 optionsValue: 'deviceId',
+                                 value: current_device_id.audio_input"
+                      data-uie-name="enter-microphone">
+              </select>
+              <label class="icon-down preferences-options-label" data-bind="visible: available_devices.audio_input().length >= 2"></label>
+            </div>
+          </div>
+        </section>
+      <!-- /ko -->
+
+      <!-- ko if: available_devices.audio_output().length -->
+        <section class="preferences-section">
+          <header class="preferences-header preferences-options-header" data-bind="l10n_text: z.string.preferences_options_speakers"></header>
+          <div class="preferences-option">
+            <div class="preferences-option-icon preferences-options-select-icon">
+              <div class="icon-speaker"></div>
+            </div>
+            <div class="input-select">
+              <select class="preferences-options-select" name="select"
+                      data-bind="enabled: available_devices.audio_output().length >= 2,
+                                 options: available_devices.audio_output,
+                                 optionsText: function(item) {return item.label || z.string.preferences_options_speakers},
+                                 optionsValue: 'deviceId',
+                                 value: current_device_id.audio_output"
+                      data-uie-name="enter-speaker">
+              </select>
+              <label class="icon-down preferences-options-label" data-bind="visible: available_devices.audio_output().length >= 2"></label>
+            </div>
+          </div>
+        </section>
+      <!-- /ko -->
+
+      <!-- ko if: available_devices.video_input().length -->
+        <section class="preferences-section">
+          <header class="preferences-header preferences-options-header" data-bind="l10n_text: z.string.preferences_options_camera"></header>
+          <div class="preferences-option">
+            <div class="preferences-option-icon preferences-options-select-icon">
+              <div class="icon-video"></div>
+            </div>
+            <div class="input-select">
+              <select class="preferences-options-select" name="select"
+                      data-bind="enabled: available_devices.video_input().length >= 2,
+                                 options: available_devices.video_input,
+                                 optionsText: function(item) {return item.label || z.string.preferences_options_camera},
+                                 optionsValue: 'deviceId',
+                                 value: current_device_id.video_input"
+                      data-uie-name="enter-camera">
+              </select>
+              <label class="icon-down preferences-options-label" data-bind="visible: available_devices.video_input().length >= 2"></label>
+            </div>
+          </div>
+          <video class="preferences-options-video"
+                 autoplay
+                 data-bind="mute_media_element: video_stream(),
+                            source_stream: video_stream()"></video>
+        </section>
+      <!-- /ko -->
 
       <section class="preferences-section">
         <header class="preferences-header" data-bind="l10n_text: z.string.preferences_options_data"></header>
         <div class="preferences-option">
           <div class="preferences-option-icon checkbox text-theme">
             <input type="checkbox" id="checkbox" data-bind="attr: {'data-uie-value': option_data}, checked: option_data">
-            <label class="preferences-options-checkbox-label"  for="checkbox" data-bind="l10n_text: z.string.preferences_options_data_checkbox"></label>
+            <label class="preferences-options-checkbox-label" for="checkbox" data-bind="l10n_text: z.string.preferences_options_data_checkbox"></label>
           </div>
         </div>
         <div class="preferences-detail" data-bind="l10n_text: z.string.preferences_options_data_detail"></div>
