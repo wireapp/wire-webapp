@@ -162,7 +162,7 @@ class z.SystemNotification.SystemNotificationRepository
   _create_body_content: (message_et) ->
     if message_et.has_asset_text()
       for asset_et in message_et.assets() when asset_et.is_text()
-        return z.util.trunc_text asset_et.text, z.config.BROWSER_NOTIFICATION.BODY_LENGTH if not asset_et.previews().length
+        return z.util.truncate_text asset_et.text, z.config.BROWSER_NOTIFICATION.BODY_LENGTH if not asset_et.previews().length
     else if message_et.has_asset_medium_image()
       return  z.localization.Localizer.get_text z.string.system_notification_asset_add
     else if message_et.has_asset_location()
@@ -190,6 +190,14 @@ class z.SystemNotification.SystemNotificationRepository
         placeholder: '%name'
         content: message_et.name
       ]
+
+  ###
+  Creates the notification body.
+  @private
+  @return [String] Notification message body
+  ###
+  _create_body_ephemeral: ->
+    return z.localization.Localizer.get_text z.string.system_notification_ephemeral
 
   ###
   Creates the notification body for people being added to a group conversation.
@@ -328,6 +336,8 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Notification message body
   ###
   _create_options_body: (conversation_et, message_et) =>
+    return @_create_body_ephemeral() if message_et.is_ephemeral()
+
     switch message_et.super_type
       when z.message.SuperType.CALL
         return @_create_body_call message_et
@@ -375,14 +385,14 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Notification message title
   ###
   _create_title: (conversation_et, message_et) ->
+    if message_et.is_ephemeral()
+      return z.util.truncate_text z.localization.Localizer.get_text(z.string.system_notification_ephemeral_title), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
     if conversation_et.display_name?()
       if conversation_et.is_group()
-        return  z.util.trunc_text "#{message_et.user().first_name()} in #{conversation_et.display_name()}", z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
-      return z.util.trunc_text conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
-    if not message_et.user()
-      Raygun.send new Error 'Message does not contain user info'
-    else
-      return  z.util.trunc_text message_et.user().name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        return  z.util.truncate_text "#{message_et.user().first_name()} in #{conversation_et.display_name()}", z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+      return z.util.truncate_text conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+    return Raygun.send new Error 'Message does not contain user info' if not message_et.user()
+    return z.util.truncate_text message_et.user().name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
   ###
   Creates the notification trigger.
