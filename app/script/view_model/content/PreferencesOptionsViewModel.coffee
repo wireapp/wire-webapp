@@ -46,6 +46,9 @@ class z.ViewModel.content.PreferencesOptionsViewModel
       @user_repository.save_property_sound_alerts sound_preference
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SOUND_SETTINGS_CHANGED, value: tracking_value
 
+    @option_notifications = ko.observable()
+    #@option_notifications.subscribe (notifications_preference) => @user_repository.save_property_data_settings notifications_preference
+
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @update_properties
 
   connect_google: ->
