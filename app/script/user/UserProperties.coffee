@@ -34,6 +34,6 @@ class z.user.UserProperties
         alerts: z.audio.AudioSetting.ALL
     @contact_import =
       google: undefined
-      osx: undefined
+      macos: undefined
     @has_created_conversation = false
     @enable_debugging = false

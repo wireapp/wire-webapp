@@ -1265,6 +1265,8 @@ class z.ViewModel.AuthViewModel
   _redirect_to_app: =>
     url = '/'
     url = "/#{@auth.settings.parameter}" if @auth.settings.parameter?
+    bot_name = z.util.get_url_parameter z.auth.URLParameter.BOT
+    url = z.util.append_url_parameter url, "#{z.auth.URLParameter.BOT}=#{bot_name}" if bot_name
     window.location.replace url
 
   _register_client: =>

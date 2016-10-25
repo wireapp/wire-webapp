@@ -339,7 +339,9 @@ class z.storage.StorageService
     return new Dexie.Promise (resolve, reject) =>
       if @db[store_name]?
         @db[store_name].put entity, primary_key
-        .then (key) -> resolve key
+        .then (key) =>
+          @logger.log @logger.levels.INFO, "Saved '#{key}' into store '#{store_name}'", entity
+          resolve key
         .catch (error) =>
           @logger.log @logger.levels.ERROR, "Failed to put '#{primary_key}' into store '#{store_name}'", error
           reject error

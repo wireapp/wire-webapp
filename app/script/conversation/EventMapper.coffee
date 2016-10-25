@@ -97,6 +97,9 @@ class z.conversation.EventMapper
       message_et.reactions event.reactions or {}
       message_et.status event.status if event.status
 
+    if event.expire_after_millis
+      message_et.expire_after_millis event.expire_after_millis
+
     if window.isNaN message_et.timestamp
       @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
       message_et = undefined

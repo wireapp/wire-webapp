@@ -13,6 +13,7 @@
 <script src="/script/util/scroll-helpers.js"></script>
 <script src="/script/util/Statistics.js"></script>
 <script src="/script/util/storage.js"></script>
+<script src="/script/util/StringUtil.js"></script>
 <script src="/script/util/CountryCodes.js"></script>
 <script src="/script/util/worker.js"></script>
 <!-- Storage -->
@@ -26,6 +27,7 @@
 <script src="/script/service/BackendClientError.js"></script>
 <script src="/script/service/BackendEnvironment.js"></script>
 <script src="/script/service/Client.js"></script>
+<script src="/script/service/RequestQueueBlockedState.js"></script>
 <!-- Events -->
 <script src="/script/event/Backend.js"></script>
 <script src="/script/event/Client.js"></script>
@@ -45,6 +47,11 @@
 <!-- Localization -->
 <script src="/script/localization/strings-init.js"></script>
 <script src="/script/localization/strings-de.js"></script>
+<script src="/script/localization/strings-es.js"></script>
+<script src="/script/localization/strings-fi.js"></script>
+<script src="/script/localization/strings-hr.js"></script>
+<script src="/script/localization/strings-ro.js"></script>
+<script src="/script/localization/strings-ru.js"></script>
 <script src="/script/localization/strings.js"></script>
 <script src="/script/localization/Localizer.js"></script>
 <!-- Media -->
@@ -68,6 +75,9 @@
 <!-- Announce -->
 <script src="/script/announce/AnnounceService.js"></script>
 <script src="/script/announce/AnnounceRepository.js"></script>
+<!-- Bot -->
+<script src="/script/bot/BotService.js"></script>
+<script src="/script/bot/BotRepository.js"></script>
 <!-- Telemetry -->
 <script src="/script/telemetry/app_init/AppInitStatistics.js"></script>
 <script src="/script/telemetry/app_init/AppInitStatisticsValue.js"></script>
@@ -94,6 +104,8 @@
 <script src="/script/connect/ConnectSource.js"></script>
 <script src="/script/connect/ConnectTrigger.js"></script>
 <script src="/script/connect/PhoneBook.js"></script>
+<!-- Ephemeral -->
+<script src="/script/ephemeral/ephemeralTimings.js"></script>
 <!-- GeoLocation -->
 <script src="/script/location/GeoLocation.js"></script>
 <!-- Conversation -->
@@ -184,6 +196,7 @@
 <script src="/script/components/contextMenu.js"></script>
 <script src="/script/components/deviceCard.js"></script>
 <script src="/script/components/deviceRemove.js"></script>
+<script src="/script/components/ephemeralTimer.js"></script>
 <script src="/script/components/groupList.js"></script>
 <script src="/script/components/inputElement.js"></script>
 <script src="/script/components/topPeople.js"></script>
@@ -203,6 +216,7 @@
 <script src="/script/components/calling/deviceToggleButton.js"></script>
 <!-- Entities -->
 <script src="/script/message/CallMessageType.js"></script>
+<script src="/script/message/EphemeralStatusType.js"></script>
 <script src="/script/message/StatusType.js"></script>
 <script src="/script/message/PingMessageType.js"></script>
 <script src="/script/message/ReactionType.js"></script>

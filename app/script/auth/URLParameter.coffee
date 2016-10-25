@@ -20,6 +20,7 @@ window.z ?= {}
 z.auth ?= {}
 
 z.auth.URLParameter =
+  BOT: 'bot'
   CONNECT: 'connect'
   ENVIRONMENT: 'env'
   EXPIRED: 'expired'

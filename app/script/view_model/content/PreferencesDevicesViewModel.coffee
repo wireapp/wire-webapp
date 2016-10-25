@@ -66,9 +66,8 @@ class z.ViewModel.content.PreferencesDevicesViewModel
   _update_device_location: (location) ->
     z.location.get_location location.lat, location.lon
     .then (retrieved_location) =>
-      @_update_activation_location "#{retrieved_location.place}, #{retrieved_location.country_code}"
-    .catch (error) =>
-      @logger.log @logger.levels.WARN, "Could not update device location: #{error.message}", error
+      if retrieved_location
+        @_update_activation_location "#{retrieved_location.place}, #{retrieved_location.country_code}"
 
   click_on_show_device: (device_et) =>
     @preferences_device_details.device device_et

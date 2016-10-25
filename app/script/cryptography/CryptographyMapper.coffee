@@ -26,7 +26,8 @@ class z.cryptography.CryptographyMapper
     @logger = new z.util.Logger 'z.cryptography.CryptographyMapper', z.config.LOGGER.OPTIONS
 
   ###
-  OTR to JSON mapper.
+  Maps a generic message into an event in JSON.
+
   @param generic_message [z.proto.GenericMessage] Received ProtoBuffer message
   @param event [z.event.Backend.CONVERSATION.OTR-ASSET-ADD, z.event.Backend.CONVERSATION.OTR-MESSAGE-ADD] Event
   @return [Object] Promise that resolves with the mapped event
@@ -58,6 +59,8 @@ class z.cryptography.CryptographyMapper
         return @_map_deleted generic_message.deleted
       when 'edited'
         return @_map_edited generic_message.edited, generic_message.message_id
+      when 'ephemeral'
+        return @_map_ephemeral generic_message, event
       when 'external'
         return @_map_external generic_message.external, event
       when 'hidden'
@@ -167,6 +170,13 @@ class z.cryptography.CryptographyMapper
     mapped = @_map_text edited.text, event_id
     mapped.data.replacing_message_id = edited.replacing_message_id
     return mapped
+
+  _map_ephemeral: (generic_message, event) ->
+    millis_as_number = generic_message.ephemeral.expire_after_millis.toNumber()
+    generic_message.ephemeral.message_id = generic_message.message_id
+    embedded_message = @_map_generic_message generic_message.ephemeral, event
+    embedded_message.expire_after_millis = z.ephemeral.timings.map_to_closest_timing millis_as_number
+    return embedded_message
 
   ###
   Unpacks a specific generic message which is wrapped inside an external generic message.

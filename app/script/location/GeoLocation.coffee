@@ -57,7 +57,7 @@ z.location = do ->
         if response.status is 'OK'
           resolve _parse_results response.results
         else
-          reject response.status
+          resolve()
       .fail (jqXHR, textStatus, errorThrown) ->
         reject new Error errorThrown
 

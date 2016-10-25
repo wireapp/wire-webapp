@@ -71,7 +71,7 @@ z.util.load_url_buffer = (url, xhr_accessor_function) ->
       if xhr.status is 200
         resolve [xhr.response, xhr.getResponseHeader 'content-type']
       else
-        reject new Error "Requesting arraybuffer failed with status #{xhr.status} for #{url}"
+        reject new Error "Requesting arraybuffer failed with status #{xhr.status}"
     xhr.onerror = reject
     xhr.onabort = reject
     xhr_accessor_function? xhr
@@ -138,7 +138,7 @@ z.util.format_bytes = (bytes, decimals) ->
 ###
 Format seconds into hh:mm:ss.
 
-@param bytes [seconds] duration to format in seconds
+@param duration [Number] duration to format in seconds
 @return [String]
 ###
 z.util.format_seconds = (duration) ->
@@ -160,10 +160,23 @@ z.util.format_seconds = (duration) ->
 
   return components.join ':'
 
+###
+Format seconds into 15s, 2m.
+
+@param duration [Number] duration to format in seconds
+@return [Array] [number, unit]
+###
+z.util.format_milliseconds_short = (duration) ->
+  seconds = Math.floor duration / 1000
+  switch
+    when seconds < 60 then [seconds, 's']
+    when seconds < 60 * 60 then [Math.floor(seconds / 60), 'm']
+    when seconds < 60 * 60 * 24 then [Math.floor(seconds / 60 / 60), 'h']
+    else [Math.floor(seconds / 60 / 60 / 24), 'd']
+
 
 z.util.get_content_type_from_data_url = (data_url) ->
   return data_url.split(',')[0].split(':')[1].split(';')[0]
-
 
 
 z.util.strip_data_uri = (string) ->
@@ -488,7 +501,7 @@ z.util.valid_profile_image_size = (file, min_width, min_height, callback) ->
   image.src = window.URL.createObjectURL file
 
 
-z.util.trunc_text = (text, output_length, word_boundary = true) ->
+z.util.truncate_text = (text, output_length, word_boundary = true) ->
   if text.length > output_length
     trunc_index = output_length - 1
     if word_boundary and text.lastIndexOf(' ', output_length - 1) > output_length - 25

@@ -279,7 +279,7 @@ class z.client.ClientRepository
 
     if z.util.Environment.electron
       if z.util.Environment.os.mac
-        identifier = z.string.wire_osx
+        identifier = z.string.wire_macos
       else if z.util.Environment.os.win
         identifier = z.string.wire_windows
       else

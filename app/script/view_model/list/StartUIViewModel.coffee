@@ -158,10 +158,10 @@ class z.ViewModel.list.StartUIViewModel
     @_init_subscriptions()
 
   _init_subscriptions: =>
-    amplify.subscribe z.event.WebApp.CONNECT.IMPORT_CONTACTS,         @import_contacts
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED,              @update_properties
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.GOOGLE,        @update_properties
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.OSX_CONTACTS,  @update_properties
+    amplify.subscribe z.event.WebApp.CONNECT.IMPORT_CONTACTS,                    @import_contacts
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED,                         @update_properties
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_GOOGLE,          @update_properties
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_MACOS,           @update_properties
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, @update_properties
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @update_properties
 
@@ -195,7 +195,7 @@ class z.ViewModel.list.StartUIViewModel
     if source is z.connect.ConnectSource.GMAIL
       import_promise = @connect_repository.get_google_contacts()
     else if source is z.connect.ConnectSource.ICLOUD
-      import_promise = @connect_repository.get_osx_contacts()
+      import_promise = @connect_repository.get_macos_contacts()
 
     import_promise.then (response) =>
       @_show_onboarding_results response
@@ -424,7 +424,7 @@ class z.ViewModel.list.StartUIViewModel
 
   update_properties: =>
     @has_created_conversation @user_repository.properties.has_created_conversation
-    @has_uploaded_contacts @user_repository.properties.contact_import.google? or @user_repository.properties.contact_import.osx?
+    @has_uploaded_contacts @user_repository.properties.contact_import.google? or @user_repository.properties.contact_import.macos?
     return true
 
 
@@ -444,20 +444,17 @@ class z.ViewModel.list.StartUIViewModel
       callback conversation_et if _.isFunction callback
       return
 
-    on_success = (conversation_et) =>
+    @conversation_repository.create_new_conversation user_ids, null
+    .then (conversation_et) =>
       @logger.log @logger.levels.INFO, "Created new conversation with ID: #{conversation_et.id}"
       @user_repository.save_property_has_created_conversation()
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION,
         {creationContext: 'search', numberOfParticipants: user_ids.length}
       @click_on_group conversation_et
       callback conversation_et if _.isFunction callback
-
-    # Error: {code: 403, message: "Users are not connected", label: "not-connected"}
-    on_error = (error) =>
+    .catch (error) =>
       @logger.log @logger.levels.WARN, "Unable to create conversation: #{error.message}"
       @_close_list()
-
-    @conversation_repository.create_new_conversation user_ids, null, on_success, on_error
 
   on_audio_call: =>
     @on_submit_search (conversation_et) ->

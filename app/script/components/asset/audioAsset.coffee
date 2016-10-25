@@ -29,6 +29,7 @@ class z.components.AudioAssetComponent
   constructor: (params, component_info) ->
     @logger = new z.util.Logger 'AudioAssetComponent', z.config.LOGGER.OPTIONS
     @asset = params.asset
+    @expired = params.expired
 
     @audio_src = ko.observable()
     @audio_element = $(component_info.element).find('audio')[0]
@@ -79,37 +80,39 @@ ko.components.register 'audio-asset',
   viewModel: createViewModel: (params, component_info) ->
     return new z.components.AudioAssetComponent params, component_info
   template: """
-    <audio data-bind="attr: {src: audio_src},
-                      event: {loadedmetadata: on_loadedmetadata, timeupdate: on_timeupdate}">
-    </audio>
-    <!-- ko if: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
-      <div class="asset-placeholder">
-        <div class="three-dots">
-          <span></span>
-          <span></span>
-          <span></span>
+    <!-- ko ifnot: expired() -->
+      <audio data-bind="attr: {src: audio_src},
+                        event: {loadedmetadata: on_loadedmetadata, timeupdate: on_timeupdate}">
+      </audio>
+      <!-- ko if: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
+        <div class="asset-placeholder">
+          <div class="three-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
         </div>
-      </div>
-    <!-- /ko -->
-    <!-- ko ifnot: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
-      <media-button params="src: audio_element,
-                            asset: asset,
-                            play: on_play_button_clicked,
-                            pause: on_pause_button_clicked,
-                            cancel: function() {asset.cancel($parents[1])}">
-      </media-button>
-      <!-- ko if: asset.status() !== z.assets.AssetTransferState.UPLOADING -->
-        <span class="audio-controls-time label-xs"
-              data-uie-name="status-audio-time"
-              data-bind="text: z.util.format_seconds(audio_time())">
-        </span>
-        <!-- ko if: show_loudness_preview -->
-          <audio-seek-bar data-uie-name="status-audio-seekbar"
-                          params="src: audio_element, asset: asset, disabled: !audio_is_loaded()"></audio-seek-bar>
-        <!-- /ko -->
-        <!-- ko ifnot: show_loudness_preview -->
-          <seek-bar data-uie-name="status-audio-seekbar"
-                    params="src: audio_element, dark: true, disabled: !audio_is_loaded()"></seek-bar>
+      <!-- /ko -->
+      <!-- ko ifnot: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
+        <media-button params="src: audio_element,
+                              asset: asset,
+                              play: on_play_button_clicked,
+                              pause: on_pause_button_clicked,
+                              cancel: function() {asset.cancel($parents[1])}">
+        </media-button>
+        <!-- ko if: asset.status() !== z.assets.AssetTransferState.UPLOADING -->
+          <span class="audio-controls-time label-xs"
+                data-uie-name="status-audio-time"
+                data-bind="text: z.util.format_seconds(audio_time())">
+          </span>
+          <!-- ko if: show_loudness_preview -->
+            <audio-seek-bar data-uie-name="status-audio-seekbar"
+                            params="src: audio_element, asset: asset, disabled: !audio_is_loaded()"></audio-seek-bar>
+          <!-- /ko -->
+          <!-- ko ifnot: show_loudness_preview -->
+            <seek-bar data-uie-name="status-audio-seekbar"
+                      params="src: audio_element, dark: true, disabled: !audio_is_loaded()"></seek-bar>
+          <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->

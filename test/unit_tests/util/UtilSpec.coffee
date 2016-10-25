@@ -438,24 +438,24 @@ describe 'z.util.array_is_last', ->
     actual = z.util.array_is_last array, d
     expect(actual).toBeFalsy()
 
-describe 'z.util.trunc_text', ->
+describe 'z.util.truncate_text', ->
   it 'returns the full string if it is shorter than the target length', ->
-    text = z.util.trunc_text "#{lorem_ipsum.substr 0, 80}", 90
+    text = z.util.truncate_text "#{lorem_ipsum.substr 0, 80}", 90
     expect(text.length).toBe 80
     expect(text.charAt 79).not.toBe '…'
 
   it 'returns a truncated string of correct length if it is longer than the target length', ->
-    text = z.util.trunc_text "#{lorem_ipsum.substr 0, 80}", 70
+    text = z.util.truncate_text "#{lorem_ipsum.substr 0, 80}", 70
     expect(text.length).toBe 64
     expect(text.charAt 63).toBe '…'
 
   it 'returns a truncated string of correct length if word boundary is disabled', ->
-    text = z.util.trunc_text "#{lorem_ipsum.substr 0, 80}", 70, false
+    text = z.util.truncate_text "#{lorem_ipsum.substr 0, 80}", 70, false
     expect(text.length).toBe 70
     expect(text.charAt 69).toBe '…'
 
   it 'returns a truncated string of correct length if word boundary is disabled and there are no whitespaces in the string', ->
-    text = z.util.trunc_text "#{lorem_ipsum.replace(/\s/g, '').substr 0, 80}", 70
+    text = z.util.truncate_text "#{lorem_ipsum.replace(/\s/g, '').substr 0, 80}", 70
     expect(text.length).toBe 70
     expect(text.charAt 69).toBe '…'
 
@@ -784,6 +784,21 @@ describe 'z.util.format_seconds', ->
 
   it 'should format undefined as 00:00', ->
     expect(z.util.format_seconds()).toBe '00:00'
+
+describe 'z.util.format_milliseconds_short', ->
+  it 'should format duration under 1 minute', ->
+    expect(z.util.format_milliseconds_short(5000)).toEqual [5, 's']
+    expect(z.util.format_milliseconds_short(15000)).toEqual [15, 's']
+
+  it 'should format duration over 1 minute', ->
+    expect(z.util.format_milliseconds_short(60000)).toEqual [1, 'm']
+    expect(z.util.format_milliseconds_short(900000)).toEqual [15, 'm']
+
+  it 'should format duration over 1 hour', ->
+    expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 3)).toEqual [3, 'h']
+
+  it 'should format duration over 1 day', ->
+    expect(z.util.format_milliseconds_short(1000 * 60 * 60 * 24 * 3)).toEqual [3, 'd']
 
 describe 'z.util.is_same_location', ->
   it 'returns false if page was accessed directly', ->
