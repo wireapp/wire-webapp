@@ -1399,12 +1399,21 @@ class z.conversation.ConversationRepository
   ###
   get_ephemeral_timer: (message_et) =>
     millis = message_et.expire_after_millis()
-    return Promise.resolve() if not _.isNumber millis
 
-    expiration_date_iso = new Date(Date.now() + millis).toISOString()
-    message_et.expire_after_millis expiration_date_iso
-    @conversation_service.update_message_in_db message_et, {expire_after_millis: expiration_date_iso}
-    .then -> return millis
+    switch message_et.ephemeral_status()
+      when z.message.EphemeralStatusType.TIMED_OUT
+        return Promise.resolve 0
+      when z.message.EphemeralStatusType.ACTIVE
+        expiration_timestamp = new Date(millis).getTime()
+        expires_in = expiration_timestamp - Date.now()
+        return Promise.resolve expires_in
+      when z.message.EphemeralStatusType.INACTIVE
+        expiration_date_iso = new Date(Date.now() + millis).toISOString()
+        message_et.expire_after_millis expiration_date_iso
+        return @conversation_service.update_message_in_db message_et, {expire_after_millis: expiration_date_iso}
+        .then -> return millis
+      else
+        Promise.resolve()
 
   timeout_ephemeral_message: (conversation_et, message_et) =>
     if message_et.user().is_me

@@ -536,7 +536,7 @@ class z.ViewModel.MessageListViewModel
 
     set_ephemeral_timer = =>
       @conversation_repository.get_ephemeral_timer message_et
-      .then (millis) => @start_ephemeral_timer message_et, millis if millis
+      .then (millis) => @start_ephemeral_timer message_et, millis if millis?
 
     if document.hasFocus()
       set_ephemeral_timer()
