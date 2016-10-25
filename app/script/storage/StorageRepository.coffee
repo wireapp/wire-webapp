@@ -104,17 +104,11 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   @return [Promise] Promise that will resolve with the key pair loaded from storage
   ###
   _load_identity: =>
-    return new Promise (resolve, reject) =>
-      @storage_service.load @storage_service.OBJECT_STORE_KEYS, 'local_identity'
-      .then (identity_key_pair) ->
-        if identity_key_pair
-          bytes = sodium.from_base64 identity_key_pair.serialised
-          resolve Proteus.keys.IdentityKeyPair.deserialise bytes.buffer
-        else
-          resolve undefined
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Something failed: #{error?.message}", error
-        reject error
+    return @storage_service.load @storage_service.OBJECT_STORE_KEYS, 'local_identity'
+    .then (identity_key_pair) ->
+      if identity_key_pair
+        bytes = sodium.from_base64 identity_key_pair.serialised
+        return Proteus.keys.IdentityKeyPair.deserialise bytes.buffer
 
   ###
   Returns a dictionary of all de-serialized records in a given object store.
@@ -170,16 +164,11 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   @return [Promise] Promise that will resolve with the retrieved value
   ###
   get_value: (primary_key) =>
-    return new Promise (resolve, reject) =>
-      @storage_service.load @storage_service.OBJECT_STORE_AMPLIFY, primary_key
-      .then (record) ->
-        if record?.value
-          resolve record.value
-        else
-          reject new Error "Value for primary key '#{primary_key}' not found"
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Something failed: #{error?.message}", error
-        reject error
+    return @storage_service.load @storage_service.OBJECT_STORE_AMPLIFY, primary_key
+    .then (record) ->
+      if record?.value
+        return record.value
+      throw new Error "Value for primary key '#{primary_key}' not found"
 
   ###
   Save a value in the amplify value store.
@@ -231,16 +220,10 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   @return [Promise] Promise that resolves with the retrieved records
   ###
   load_events_by_types: (event_types) ->
-    return new Promise (resolve, reject) =>
-      @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where 'type'
-      .anyOf event_types
-      .sortBy 'time'
-      .then (records) ->
-        resolve records
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Something failed: #{error?.message}", error
-        reject error
+    return @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where 'type'
+    .anyOf event_types
+    .sortBy 'time'
 
   ###############################################################################
   # Identity
@@ -304,12 +287,8 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   @return [Promise] Promise that resolves with the deleted record
   ###
   delete_prekey: (prekey_id) ->
-    return new Promise (resolve, reject) =>
-      delete @prekeys[prekey_id]
-
-      @storage_service.delete @storage_service.OBJECT_STORE_PREKEYS, "#{prekey_id}"
-      .then (record) -> resolve record
-      .catch (error) -> reject error
+    delete @prekeys[prekey_id]
+    return @storage_service.delete @storage_service.OBJECT_STORE_PREKEYS, "#{prekey_id}"
 
   ###
   Load a pre-key.
@@ -337,12 +316,8 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   @return [Promise] Promise that resolves with the deleted record
   ###
   delete_session: (session_id) ->
-    return new Promise (resolve, reject) =>
-      delete @sessions[session_id]
-
-      @storage_service.delete @storage_service.OBJECT_STORE_SESSIONS, session_id
-      .then (record) -> resolve record
-      .catch (error) -> reject error
+    delete @sessions[session_id]
+    return @storage_service.delete @storage_service.OBJECT_STORE_SESSIONS, session_id
 
   ###
   Load a session.
