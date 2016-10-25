@@ -30,47 +30,52 @@ class z.announce.AnnounceRepository
 
   init: ->
     window.setTimeout =>
-      @fetch()
+      @fetch_announcements()
       @schedule_check()
     , CHECK_TIMEOUT
 
-  fetch: =>
-    @announce_service.fetch @process_announce_list
+  fetch_announcements: =>
+    @announce_service.get_announcements()
+    .then @process_announce_list
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Failed to fetch announcements: #{error}"
+
+
 
   schedule_check: =>
-    window.setInterval @fetch, CHECK_INTERVAL
+    window.setInterval @fetch_announcements, CHECK_INTERVAL
 
-  process_announce_list: (announce_list) =>
-    if announce_list
-      for announce in announce_list
+  process_announce_list: (announcements_list) =>
+    if announcements_list
+      for announcement in announcements_list
         if not z.util.Environment.frontend.is_localhost()
-          continue if announce.version_max and z.util.Environment.version(false) > announce.version_max
-          continue if announce.version_min and z.util.Environment.version(false) < announce.version_min
-        key = "#{z.storage.StorageKey.ANNOUNCE.ANNOUNCE_KEY}@#{announce.key}"
+          continue if announcement.version_max and z.util.Environment.version(false) > announcement.version_max
+          continue if announcement.version_min and z.util.Environment.version(false) < announcement.version_min
+        key = "#{z.storage.StorageKey.ANNOUNCE.ANNOUNCE_KEY}@#{announcement.key}"
         if not z.storage.get_value key
           z.storage.set_value key, 'read'
           return if not z.util.Environment.browser.supports.notifications
           return if window.Notification.permission is z.util.BrowserPermissionType.DENIED
 
           if not (z.localization.Localizer.locale is 'en')
-            announce.title = announce["title_#{z.localization.Localizer.locale}"] or announce.title
-            announce.message = announce["message_#{z.localization.Localizer.locale}"] or announce.message
+            announcement.title = announcement["title_#{z.localization.Localizer.locale}"] or announcement.title
+            announcement.message = announcement["message_#{z.localization.Localizer.locale}"] or announcement.message
 
-          notification = new window.Notification announce.title,
-            body: announce.message
+          notification = new window.Notification announcement.title,
+            body: announcement.message
             icon: if z.util.Environment.electron and z.util.Environment.os.mac then '' else window.notification_icon or '/image/logo/notification.png'
             sticky: true
             requireInteraction: true
 
-          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.SENT, campaign: announce.campaign
-          @logger.log @logger.levels.INFO, "Announcement '#{announce.title}' shown"
+          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.SENT, campaign: announcement.campaign
+          @logger.log @logger.levels.INFO, "Announcement '#{announcement.title}' shown"
 
           notification.onclick = =>
-            amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.CLICKED, campaign: announce.campaign
-            @logger.log @logger.levels.INFO, "Announcement '#{announce.title}' clicked"
-            if announce.link
-              z.util.safe_window_open announce.link
-            if announce.refresh
+            amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.CLICKED, campaign: announcement.campaign
+            @logger.log @logger.levels.INFO, "Announcement '#{announcement.title}' clicked"
+            if announcement.link
+              z.util.safe_window_open announcement.link
+            if announcement.refresh
               window.location.reload true
               window.focus()
             notification.close()
