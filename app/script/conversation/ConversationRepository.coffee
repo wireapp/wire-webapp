@@ -141,10 +141,10 @@ class z.conversation.ConversationRepository
       @sending_blocked = true
       @sending_interval = window.setInterval =>
         return if @conversation_service.client.request_queue_blocked_state() isnt z.service.RequestQueueBlockedState.NONE
-        @logger.log @logger.levels.ERROR, 'Sending of message from queue failed, unblocking queue', {entry_function: @sending_queue()[0].function, queue: @sending_queue()}
         @sending_blocked = false
-        @_execute_from_sending_queue()
         window.clearInterval @sending_interval
+        @logger.log @logger.levels.ERROR, 'Sending of message from queue failed, unblocking queue', @sending_queue()
+        @_execute_from_sending_queue()
       , z.config.SENDING_QUEUE_UNBLOCK_INTERVAL
 
       queue_entry.function()
