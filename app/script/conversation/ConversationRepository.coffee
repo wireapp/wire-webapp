@@ -1883,7 +1883,7 @@ class z.conversation.ConversationRepository
         @logger.log @logger.levels.DEBUG, "Updated reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
         return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
     .catch (error) =>
-      if error.type is z.conversation.ConversationError::TYPE.NON_SEQUENTIAL_UPDATE
+      if error.type is z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
         @_on_reaction conversation_et, event_json
       else if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         @logger.log "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error

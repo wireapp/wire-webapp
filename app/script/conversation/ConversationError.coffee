@@ -32,8 +32,6 @@ class z.conversation.ConversationError
         'Message not found'
       when z.conversation.ConversationError::TYPE.NO_CHANGES
         'Missing changes to message'
-      when z.conversation.ConversationError::TYPE.NON_SEQUENTIAL_UPDATE
-        'Update is non sequential'
       when z.conversation.ConversationError::TYPE.WRONG_USER
         'Wrong user tried to change or delete a message'
       else
@@ -45,6 +43,5 @@ class z.conversation.ConversationError
     CONVERSATION_NOT_FOUND: 'z.conversation.ConversationError::TYPE.CONVERSATION_NOT_FOUND'
     MESSAGE_NOT_FOUND: 'z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND'
     NO_CHANGES: 'z.conversation.ConversationError::TYPE.NO_CHANGES'
-    NON_SEQUENTIAL_UPDATE: 'z.conversation.ConversationError::TYPE.NON_SEQUENTIAL_UPDATE'
     WRONG_USER: 'z.conversation.ConversationError::TYPE.WRONG_USER'
     UNKNOWN: 'z.conversation.ConversationError::TYPE.UNKNOWN'

@@ -208,7 +208,7 @@ class z.conversation.ConversationService
               if record and changes.version is (record.version or 1) + 1
                 return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
               else
-                throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NON_SEQUENTIAL_UPDATE
+                throw new z.storage.StorageError z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
         else
           return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
       throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NO_CHANGES
