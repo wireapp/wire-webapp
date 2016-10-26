@@ -383,7 +383,7 @@ class z.ViewModel.MessageListViewModel
 
     @_track_context_menu message_et
 
-    if message_et.has_asset()
+    if message_et.has_asset() and not message_et.is_expired()
       entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
 
     if message_et.is_reactable() and not @conversation().removed_from_conversation()
@@ -445,7 +445,7 @@ class z.ViewModel.MessageListViewModel
   ###
   show_detail: (asset_et, event) ->
     target_element = $(event.currentTarget)
-    return if target_element.hasClass 'image-ephemeral'
+    return if target_element.hasClass 'bg-color-ephemeral'
     return if target_element.hasClass 'image-loading'
     amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, target_element.find('img')[0].src
 
