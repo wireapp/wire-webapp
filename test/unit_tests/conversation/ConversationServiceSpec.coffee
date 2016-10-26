@@ -47,25 +47,6 @@ describe 'z.conversation.ConversationService', ->
     storage_service.clear_all_stores()
     server.restore()
 
-  describe 'get_last_events', ->
-    it 'gets the latest event IDs of all conversations', ->
-      request_url = "#{urls.rest_url}/conversations/last-events"
-      server.respondWith 'GET', request_url, [
-        200
-        {'Content-Type': 'application/json'}
-        JSON.stringify payload.conversations.last_events.get
-      ]
-      callback = sinon.spy()
-
-      conversation_service.get_last_events callback
-      server.respond()
-      response = callback.getCall(0).args[0]
-      expect(callback).toBeTruthy()
-      expect(response.has_more).toBeFalsy()
-      expect(response.conversations.length).toBe 5
-      expect(response.conversations[0].event).toEqual '13c.800122000a64b3ee'
-      expect(response.conversations[4].id).toEqual '0925d3a9-65a8-4445-b6dd-56f82a1ec75b'
-
   describe 'load_events_from_db', ->
 
     conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
