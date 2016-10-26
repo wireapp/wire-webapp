@@ -57,6 +57,7 @@ class z.entity.Message
     @type = ''
     @user = ko.observable new z.entity.User()
     @visible = ko.observable true
+    @version = 1
 
     @display_timestamp_short = =>
       date = moment.unix @timestamp / 1000
@@ -213,6 +214,9 @@ class z.entity.Message
   ###
   is_reactable: ->
     return @is_content() and @status() isnt z.message.StatusType.SENDING and not @is_ephemeral()
+
+  increment_version: =>
+    @version = @version + 1
 
   ###
   Update the status of a message.

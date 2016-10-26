@@ -197,11 +197,20 @@ class z.conversation.ConversationService
   @param message_et [z.entity.Message] Message event to update in the database
   @param changes [Object] Changes to update message with
   ###
-  update_message_in_db: (message_et, changes) ->
+  update_message_in_db: (message_et, changes, conversation_id) ->
     Promise.resolve message_et.primary_key or z.storage.StorageService.construct_primary_key message_et
     .then (primary_key) =>
       if _.isObject(changes) and changes[Object.keys(changes)[0]]?
-        return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
+        if changes.version
+          return @storage_service.db.transaction 'rw', @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, =>
+            @load_event_from_db conversation_id, message_et.id
+            .then (record) =>
+              if record and changes.version is (record.version or 1) + 1
+                return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
+              else
+                throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NON_SEQUENTIAL_UPDATE
+        else
+          return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
       throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NO_CHANGES
 
   ###

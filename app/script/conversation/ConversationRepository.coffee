@@ -1546,7 +1546,7 @@ class z.conversation.ConversationRepository
     @get_message_in_conversation_by_id conversation_et, message_id
     .then (message_et) =>
       message_et.expire_after_millis true
-      @conversation_service.update_message_in_db message_et, expire_after_millis: true
+      @conversation_service.update_message_in_db message_et, {expire_after_millis: true}
     .then =>
       @logger.log 'Obfuscated ping message'
 
@@ -1876,13 +1876,16 @@ class z.conversation.ConversationRepository
   _on_reaction: (conversation_et, event_json) ->
     @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
     .then (message_et) =>
-      message_et.update_reactions event_json
-      @_update_user_ets message_et
-      @_send_reaction_notification conversation_et, message_et, event_json
-      @logger.log @logger.levels.DEBUG, "Reaction to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
-      return @conversation_service.update_message_in_db message_et, {reactions: message_et.reactions()}
+      changes = message_et.update_reactions event_json
+      if changes
+        @_update_user_ets message_et
+        @_send_reaction_notification conversation_et, message_et, event_json
+        @logger.log @logger.levels.DEBUG, "Updated reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
+        return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
     .catch (error) =>
-      if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+      if error.type is z.conversation.ConversationError::TYPE.NON_SEQUENTIAL_UPDATE
+        @_on_reaction conversation_et, event_json
+      else if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         @logger.log "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
         throw error
 

@@ -86,11 +86,16 @@ class z.entity.ContentMessage extends z.entity.Message
 
   update_reactions: (event_json) ->
     reactions = @reactions()
+
     if event_json.data.reaction
       reactions[event_json.from] = event_json.data.reaction
     else
       delete reactions[event_json.from]
-    @reactions reactions
+
+    if reactions isnt @reactions
+      @reactions reactions
+      @increment_version()
+      return {reactions: @reactions(), version: @version}
 
   ###
   Check whether the message was edited.
