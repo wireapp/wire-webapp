@@ -559,9 +559,8 @@ class z.conversation.ConversationRepository
   @param next_conversation_et [z.entity.Conversation] Next conversation to potentially switch to
   ###
   archive_conversation: (conversation_et, next_conversation_et) =>
+    return Promise.reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.CONVERSATION_NOT_FOUND if not conversation_et
 
-    # other clients just use the old event id as a flag. if archived is
-    # set they consider the conversation is archived
     payload =
       otr_archived: true
       otr_archived_ref: new Date(conversation_et.last_event_timestamp()).toISOString()
@@ -569,11 +568,9 @@ class z.conversation.ConversationRepository
     @conversation_service.update_member_properties conversation_et.id, payload
     .then =>
       @_on_member_update conversation_et, {data: payload}, next_conversation_et
-      @logger.log @logger.levels.INFO,
-        "Archived conversation '#{conversation_et.id}' on '#{payload.otr_archived_ref}'"
+      @logger.log @logger.levels.INFO, "Archived conversation '#{conversation_et.id}' on '#{payload.otr_archived_ref}'"
     .catch (error) =>
-      @logger.log @logger.levels.ERROR,
-        "Conversation '#{conversation_et.id}' could not be archived: #{error.code}\r\nPayload: #{JSON.stringify(payload)}", error
+      @logger.log @logger.levels.ERROR, "Conversation '#{conversation_et.id}' could not be archived: #{error.code}\r\nPayload: #{JSON.stringify(payload)}", error
 
   ###
   Clear conversation content and archive the conversation.
@@ -718,30 +715,27 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation to rename
   ###
   toggle_silence_conversation: (conversation_et) =>
-    return new Promise (resolve, reject) =>
-      if conversation_et.is_muted()
-        payload =
-          muted: false
-          otr_muted: false
-          otr_muted_ref: new Date().toISOString()
-      else
-        payload =
-          muted: true
-          muted_time: new Date().toJSON()
-          otr_muted: true
-          otr_muted_ref: new Date(conversation_et.last_event_timestamp()).toISOString()
+    return Promise.reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.CONVERSATION_NOT_FOUND if not conversation_et
 
-      @conversation_service.update_member_properties conversation_et.id, payload
-      .then =>
-        response = {data: payload}
-        @_on_member_update conversation_et, response
-        @logger.log @logger.levels.INFO,
-          "Toggle silence to '#{payload.otr_muted}' for conversation '#{conversation_et.id}' on '#{payload.otr_muted_ref}'"
-        resolve response
-      .catch (error) =>
-        reject_error = new Error "Conversation '#{conversation_et.id}' could not be muted: #{error.code}"
-        @logger.log @logger.levels.WARN, reject_error.message, error
-        reject reject_error
+    if conversation_et.is_muted()
+      payload =
+        otr_muted: false
+        otr_muted_ref: new Date().toISOString()
+    else
+      payload =
+        otr_muted: true
+        otr_muted_ref: new Date(conversation_et.last_event_timestamp()).toISOString()
+
+    @conversation_service.update_member_properties conversation_et.id, payload
+    .then =>
+      response = {data: payload}
+      @_on_member_update conversation_et, response
+      @logger.log @logger.levels.INFO, "Toggle silence to '#{payload.otr_muted}' for conversation '#{conversation_et.id}' on '#{payload.otr_muted_ref}'"
+      return response
+    .catch (error) =>
+      reject_error = new Error "Conversation '#{conversation_et.id}' could not be muted: #{error.code}"
+      @logger.log @logger.levels.WARN, reject_error.message, error
+      throw reject_error
 
   ###
   Un-archive a conversation.
@@ -749,24 +743,24 @@ class z.conversation.ConversationRepository
   @param callback [Function] Function to be called on return
   ###
   unarchive_conversation: (conversation_et, callback) =>
-    return new Promise (resolve, reject) =>
-      payload =
-        otr_archived: false
-        otr_archived_ref: new Date(conversation_et.last_event_timestamp()).toISOString()
+    return Promise.reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.CONVERSATION_NOT_FOUND if not conversation_et
 
-      @conversation_service.update_member_properties conversation_et.id, payload
-      .then =>
-        response = {data: payload}
-        @_on_member_update conversation_et, response
-        @logger.log @logger.levels.INFO,
-          "Unarchived conversation '#{conversation_et.id}' on '#{payload.otr_archived_ref}'"
-        callback?()
-        resolve response
-      .catch (error) =>
-        reject_error = new Error "Conversation '#{conversation_et.id}' could not be unarchived: #{error.code}"
-        @logger.log @logger.levels.WARN, reject_error.message, error
-        callback?()
-        reject reject_error
+    payload =
+      otr_archived: false
+      otr_archived_ref: new Date(conversation_et.last_event_timestamp()).toISOString()
+
+    @conversation_service.update_member_properties conversation_et.id, payload
+    .then =>
+      response = {data: payload}
+      @_on_member_update conversation_et, response
+      @logger.log @logger.levels.INFO, "Unarchived conversation '#{conversation_et.id}' on '#{payload.otr_archived_ref}'"
+      callback?()
+      return response
+    .catch (error) =>
+      reject_error = new Error "Conversation '#{conversation_et.id}' could not be unarchived: #{error.code}"
+      @logger.log @logger.levels.WARN, reject_error.message, error
+      callback?()
+      throw reject_error
 
   ###
   Update last read of conversation using timestamp.
