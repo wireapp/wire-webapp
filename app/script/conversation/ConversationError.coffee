@@ -26,6 +26,8 @@ class z.conversation.ConversationError
     @type = type or z.conversation.ConversationError::TYPE.UNKNOWN
 
     @message = switch @type
+      when z.conversation.ConversationError::TYPE.CONVERSATION_NOT_FOUND
+        'Conversation not found'
       when z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         'Message not found'
       when z.conversation.ConversationError::TYPE.NO_CHANGES
@@ -38,6 +40,7 @@ class z.conversation.ConversationError
   @:: = new Error()
   @::constructor = @
   @::TYPE =
+    CONVERSATION_NOT_FOUND: 'z.conversation.ConversationError::TYPE.CONVERSATION_NOT_FOUND'
     MESSAGE_NOT_FOUND: 'z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND'
     NO_CHANGES: 'z.conversation.ConversationError::TYPE.NO_CHANGES'
     WRONG_USER: 'z.conversation.ConversationError::TYPE.WRONG_USER'
