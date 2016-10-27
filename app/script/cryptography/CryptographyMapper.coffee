@@ -151,7 +151,7 @@ class z.cryptography.CryptographyMapper
       type: z.event.Client.CONVERSATION.ASSET_PREVIEW
     }
 
-    _map_asset_uploaded: (uploaded, event_id) ->
+  _map_asset_uploaded: (uploaded, event_id) ->
     return {
       data:
         id: event_id
