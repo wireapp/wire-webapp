@@ -127,9 +127,7 @@ class z.auth.AuthRepository
   request_login_code: (request_code) =>
     @auth_service.post_login_send request_code
 
-  ###
-  Renew access-token provided a valid cookie.
-  ###
+  # Renew access-token provided a valid cookie.
   renew_access_token: =>
     @get_access_token()
     .then =>
@@ -165,7 +163,7 @@ class z.auth.AuthRepository
   ###
   get_access_token: =>
     return new Promise (resolve, reject) =>
-      if @auth_service.client.is_requesting_access_token()
+      if @auth_service.client.request_queue_blocked_state() is z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
         error = new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
         @logger.log @logger.levels.WARN, error.message
         reject error

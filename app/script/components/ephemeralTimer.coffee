@@ -27,12 +27,32 @@ class z.components.EphemeralTimer
     update_interval = 1000 / 10
 
     @progress = ko.observable 0
+    @remaining_time = ko.observable 0
+
+    @title_caption = ko.pureComputed =>
+      title = ''
+      moment_duration = moment.duration(@remaining_time())
+      if moment_duration.asHours() is 1
+        title += "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hour}, "
+      else if moment_duration.asHours() > 1
+        title += "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hours}, "
+
+      if moment_duration.asMinutes() is 1
+        title += "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minute} #{z.localization.Localizer.get_text z.string.and} "
+      else if moment_duration.asMinutes() > 1
+        title += "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minutes} #{z.localization.Localizer.get_text z.string.and} "
+
+      if moment_duration.asSeconds() is 1
+        title += "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_second}"
+      else if moment_duration.asSeconds() > 1
+        title += "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_seconds}"
 
     @interval_id = window.setInterval =>
       if Date.now() >= scheduled_time
         window.clearInterval @interval_id
       else
-        elapsed_time = timer - (scheduled_time - Date.now())
+        @remaining_time scheduled_time - Date.now()
+        elapsed_time = timer - @remaining_time()
         @progress elapsed_time / timer
     , update_interval
 
@@ -48,7 +68,7 @@ class z.components.EphemeralTimer
 ko.components.register 'ephemeral-timer',
   viewModel: z.components.EphemeralTimer
   template: """
-            <ul class="ephemeral-timer">
+            <ul class="ephemeral-timer" data-bind="attr: {'title': title_caption()}">
               <!-- ko foreach : bullet_count -->
                <li class="ephemeral-timer-bullet" data-bind="css: $parent.is_bullet_active($data)"></li>
               <!-- /ko -->

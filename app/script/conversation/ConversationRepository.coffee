@@ -65,6 +65,7 @@ class z.conversation.ConversationRepository
     @sending_promises = []
     @sending_queue = ko.observableArray []
     @sending_blocked = false
+    @sending_interval = undefined
 
     @sending_queue.subscribe @_execute_from_sending_queue
 
@@ -138,11 +139,20 @@ class z.conversation.ConversationRepository
     queue_entry = @sending_queue()[0]
     if queue_entry
       @sending_blocked = true
+      @sending_interval = window.setInterval =>
+        return if @conversation_service.client.request_queue_blocked_state() isnt z.service.RequestQueueBlockedState.NONE
+        @sending_blocked = false
+        window.clearInterval @sending_interval
+        @logger.log @logger.levels.ERROR, 'Sending of message from queue failed, unblocking queue', @sending_queue()
+        @_execute_from_sending_queue()
+      , z.config.SENDING_QUEUE_UNBLOCK_INTERVAL
+
       queue_entry.function()
       .catch (error) ->
         queue_entry.reject error
       .then (response) =>
         queue_entry.resolve response if response
+        window.clearInterval @sending_interval
         @sending_blocked = false
         @sending_queue.shift()
 
@@ -884,10 +894,7 @@ class z.conversation.ConversationRepository
         # we don't need to wait for the sending to resolve
         @_send_encrypted_asset conversation_et.id, generic_message, ciphertext
         .then ([response, asset_id]) =>
-          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-            action: 'photo'
-            conversation_type: if conversation_et.is_one2one() then 'one_to_one' else 'group'
-            with_bot: conversation_et.is_with_bot()
+          @_track_completed_media_action conversation_et, generic_message
           saved_event.data.id = asset_id
           saved_event.data.info.nonce = asset_id
           @_update_image_as_sent conversation_et, saved_event
@@ -1392,12 +1399,21 @@ class z.conversation.ConversationRepository
   ###
   get_ephemeral_timer: (message_et) =>
     millis = message_et.expire_after_millis()
-    return Promise.resolve() if not _.isNumber millis
 
-    expiration_date_iso = new Date(Date.now() + millis).toISOString()
-    message_et.expire_after_millis expiration_date_iso
-    @conversation_service.update_message_in_db message_et, {expire_after_millis: expiration_date_iso}
-    .then -> return millis
+    switch message_et.ephemeral_status()
+      when z.message.EphemeralStatusType.TIMED_OUT
+        return Promise.resolve 0
+      when z.message.EphemeralStatusType.ACTIVE
+        expiration_timestamp = new Date(millis).getTime()
+        expires_in = expiration_timestamp - Date.now()
+        return Promise.resolve expires_in
+      when z.message.EphemeralStatusType.INACTIVE
+        expiration_date_iso = new Date(Date.now() + millis).toISOString()
+        message_et.expire_after_millis expiration_date_iso
+        return @conversation_service.update_message_in_db message_et, {expire_after_millis: expiration_date_iso}
+        .then -> return millis
+      else
+        Promise.resolve()
 
   timeout_ephemeral_message: (conversation_et, message_et) =>
     if message_et.user().is_me
@@ -2199,15 +2215,28 @@ class z.conversation.ConversationRepository
   @param generic_message [z.protobuf.GenericMessage]
   ###
   _track_completed_media_action: (conversation_et, generic_message) ->
-    action_type = switch generic_message.content
-      when 'asset' then 'file' if generic_message.asset.original?
+    if generic_message.content is 'ephemeral'
+      message = generic_message.ephemeral
+      message_content_type = generic_message.ephemeral.content
+      is_ephemeral = true
+      ephemeral_time = generic_message.ephemeral.expire_after_millis / 1000
+    else
+      message = generic_message
+      message_content_type = generic_message.content
+      is_ephemeral = false
+
+    action_type = switch message_content_type
+      when 'asset' then 'file' if message.asset.original?
+      when 'image' then 'photo'
       when 'knock' then 'ping'
-      when 'text' then 'text' if not generic_message.text.link_preview.length
+      when 'text' then 'text' if not message.text.link_preview.length
 
     return if not action_type
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
       action: action_type
       conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+      is_ephemeral: is_ephemeral
+      ephemeral_time: ephemeral_time if is_ephemeral
       with_bot: conversation_et.is_with_bot()
 
   ###
