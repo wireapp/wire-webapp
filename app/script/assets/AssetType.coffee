@@ -23,5 +23,5 @@ z.assets ?= {}
 z.assets.AssetType =
   FILE: 'File'
   LOCATION: 'Location'
-  MEDIUM_IMAGE: 'MediumImage'
+  IMAGE: 'Image'
   TEXT: 'Text'

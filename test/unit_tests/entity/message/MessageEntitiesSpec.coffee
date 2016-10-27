@@ -28,10 +28,7 @@ describe 'Message Entities', ->
 
     describe 'no asset', ->
       it 'has_asset_medium_image return false', ->
-        expect(message_et.has_asset_medium_image()).toBeFalsy()
-
-      it 'has_asset_preview_image return false', ->
-        expect(message_et.has_asset_preview_image()).toBeFalsy()
+        expect(message_et.has_asset_image()).toBeFalsy()
 
       it 'has_asset_text return false', ->
         expect(message_et.has_asset_text()).toBeFalsy()
@@ -41,10 +38,7 @@ describe 'Message Entities', ->
         message_et.assets.push new z.entity.MediumImage()
 
       it 'has_asset_medium_image return true', ->
-        expect(message_et.has_asset_medium_image()).toBeTruthy()
-
-      it 'has_asset_preview_image return false', ->
-        expect(message_et.has_asset_preview_image()).toBeFalsy()
+        expect(message_et.has_asset_image()).toBeTruthy()
 
       it 'has_asset_text return false', ->
         expect(message_et.has_asset_text()).toBeFalsy()
@@ -54,10 +48,7 @@ describe 'Message Entities', ->
         message_et.assets.push new z.entity.Text()
 
       it 'has_asset_medium_image return false', ->
-        expect(message_et.has_asset_medium_image()).toBeFalsy()
-
-      it 'has_asset_preview_image return false', ->
-        expect(message_et.has_asset_preview_image()).toBeFalsy()
+        expect(message_et.has_asset_image()).toBeFalsy()
 
       it 'has_asset_text return true', ->
         expect(message_et.has_asset_text()).toBeTruthy()

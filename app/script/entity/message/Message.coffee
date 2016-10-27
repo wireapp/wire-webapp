@@ -93,7 +93,7 @@ class z.entity.Message
   ###
   has_asset_image: ->
     if @is_content()
-      return true for asset_et in @assets() when asset_et.is_medium_image() or asset_et.is_preview_image()
+      return true for asset_et in @assets() when asset_et.is_image()
     return false
 
   ###

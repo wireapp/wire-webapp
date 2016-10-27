@@ -1418,7 +1418,7 @@ class z.conversation.ConversationRepository
           @_obfuscate_ping_message conversation_et, message_et.id
         when message_et.has_asset()
           @_obfuscate_asset_message conversation_et, message_et.id
-        when message_et.has_asset_medium_image()
+        when message_et.has_asset_image()
           @_obfuscate_image_message conversation_et, message_et.id
         else
           @logger.log 'Unsupported ephemeral type', message_et.type

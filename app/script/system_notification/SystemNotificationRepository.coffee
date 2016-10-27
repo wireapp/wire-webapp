@@ -163,7 +163,7 @@ class z.SystemNotification.SystemNotificationRepository
     if message_et.has_asset_text()
       for asset_et in message_et.assets() when asset_et.is_text()
         return z.util.truncate_text asset_et.text, z.config.BROWSER_NOTIFICATION.BODY_LENGTH if not asset_et.previews().length
-    else if message_et.has_asset_medium_image()
+    else if message_et.has_asset_image()
       return  z.localization.Localizer.get_text z.string.system_notification_asset_add
     else if message_et.has_asset_location()
       return z.localization.Localizer.get_text z.string.system_notification_shared_location
@@ -456,7 +456,6 @@ class z.SystemNotification.SystemNotificationRepository
     switch message_et.super_type
       when z.message.SuperType.CONTENT
         return if message_et.user().is_me
-        return if message_et.has_asset_preview_image()
         unless document.hasFocus() and conversation_et.id is @conversation_repository.active_conversation()?.id
           amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.NEW_MESSAGE
       when z.message.SuperType.PING

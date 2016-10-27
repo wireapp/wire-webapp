@@ -37,15 +37,7 @@ class z.entity.Asset
   @return [Boolean] Is asset of type medium image
   ###
   is_medium_image: ->
-    return @type is z.assets.AssetType.MEDIUM_IMAGE
-
-  ###
-  Check if asset is a preview image.
-
-  @return [Boolean] Is asset of type preview image
-  ###
-  is_preview_image: ->
-    return @type is z.assets.AssetType.PREVIEW_IMAGE
+    return @type is z.assets.AssetType.IMAGE
 
   ###
   Check if asset is a text.
