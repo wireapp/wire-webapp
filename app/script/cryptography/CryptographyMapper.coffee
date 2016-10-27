@@ -82,7 +82,9 @@ class z.cryptography.CryptographyMapper
         throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
 
   _map_asset: (asset, event_nonce, event_id) ->
-    if asset.uploaded?
+    if asset.uploaded? and asset.uploaded.asset_id and asset.original?.image?
+      return @_map_image_asset_v3 asset, event_nonce
+    else if asset.uploaded?
       return @_map_asset_uploaded asset.uploaded, event_id
     else if asset.not_uploaded?
       return @_map_asset_not_uploaded asset.not_uploaded
@@ -94,6 +96,25 @@ class z.cryptography.CryptographyMapper
       error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
       @logger.log @logger.levels.INFO, error.message
       throw error
+
+  _map_image_asset_v3: (asset, event_nonce) ->
+    return {
+      data:
+        content_length: asset.original.size.toNumber()
+        content_type: asset.original.mime_type
+        info:
+          width: asset.original.image.width
+          height: asset.original.image.height
+          nonce: event_nonce
+          original_width: asset.original.image.width
+          original_height: asset.original.image.height
+          tag: 'medium'
+        key: asset.uploaded.asset_id
+        token: asset.uploaded.asset_token
+        otr_key: new Uint8Array asset.uploaded.otr_key.toArrayBuffer()
+        sha256: new Uint8Array asset.uploaded.sha256.toArrayBuffer()
+      type: z.event.Backend.CONVERSATION.ASSET_ADD
+    }
 
   _map_asset_meta_data: (original) ->
     if original.audio?
