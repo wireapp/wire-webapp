@@ -36,7 +36,7 @@ class z.entity.Asset
 
   @return [Boolean] Is asset of type medium image
   ###
-  is_medium_image: ->
+  is_image: ->
     return @type is z.assets.AssetType.IMAGE
 
   ###
