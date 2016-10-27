@@ -85,31 +85,3 @@ class z.entity.Asset
       can_play = document.createElement('audio').canPlayType @file_type
       return true if can_play isnt ''
     return false
-
-  ###
-  Replace access token in image url.
-
-  @param url [String] asset url
-  @param access_token [String]
-  @return url [String]
-  ###
-  _replace_access_token: (url, access_token) ->
-    token = url.match /access_token=([^&\s]*)/i
-    return url.replace token[1], access_token
-
-  ###
-  Get current asset url.
-
-  @param url [String] asset url
-  @return url [String]
-  ###
-  generate_asset_url: (url) =>
-    @_replace_access_token url, wire.auth.client.access_token
-
-  ###
-  Process asset before rendering it
-
-  @todo Implement
-  ###
-  render: ->
-    return 'Not implemented'
