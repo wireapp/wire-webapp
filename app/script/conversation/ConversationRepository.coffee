@@ -1418,7 +1418,7 @@ class z.conversation.ConversationRepository
           @_obfuscate_ping_message conversation_et, message_et.id
         when message_et.has_asset()
           @_obfuscate_asset_message conversation_et, message_et.id
-        when message_et.has_asset_medium_image()
+        when message_et.has_asset_image()
           @_obfuscate_image_message conversation_et, message_et.id
         else
           @logger.log 'Unsupported ephemeral type', message_et.type
@@ -1477,8 +1477,6 @@ class z.conversation.ConversationRepository
             nonce: message_et.nonce
             height: asset.height
             width: asset.width
-            original_height: asset.original_height
-            original_width: asset.original_width
             tag: 'medium'
         expire_after_millis: true
     .then =>

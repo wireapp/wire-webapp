@@ -28,7 +28,7 @@ class z.entity.MediumImage extends z.entity.Asset
   ###
   constructor: (id) ->
     super id
-    @type = z.assets.AssetType.MEDIUM_IMAGE
+    @type = z.assets.AssetType.IMAGE
 
     @correlation_id = ''
 

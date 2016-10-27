@@ -59,7 +59,7 @@
   <div class="message-body">
 
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
-      <!-- ko if: asset.is_medium_image() -->
+      <!-- ko if: asset.is_image() -->
         <div class="message-asset-image" data-bind="fit_to_viewport: asset">
           <div class="image image-loading" data-bind="
             attr: {'data-uie-visible': $parent.visible},
