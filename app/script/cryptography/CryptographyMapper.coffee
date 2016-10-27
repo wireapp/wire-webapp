@@ -106,8 +106,6 @@ class z.cryptography.CryptographyMapper
           width: asset.original.image.width
           height: asset.original.image.height
           nonce: event_nonce
-          original_width: asset.original.image.width
-          original_height: asset.original.image.height
           tag: 'medium'
         key: asset.uploaded.asset_id
         token: asset.uploaded.asset_token
@@ -249,9 +247,6 @@ class z.cryptography.CryptographyMapper
           width: image.width
           height: image.height
           nonce: event_id or z.util.create_random_uuid() # set nonce even if asset id is missing
-          original_width: image.original_width
-          original_height: image.original_height
-          public: false
         otr_key: new Uint8Array image.otr_key?.toArrayBuffer()
         sha256: new Uint8Array image.sha256?.toArrayBuffer()
       type: z.event.Backend.CONVERSATION.ASSET_ADD

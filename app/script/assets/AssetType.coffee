@@ -24,5 +24,4 @@ z.assets.AssetType =
   FILE: 'File'
   LOCATION: 'Location'
   MEDIUM_IMAGE: 'MediumImage'
-  PREVIEW_IMAGE: 'PreviewImage'
   TEXT: 'Text'

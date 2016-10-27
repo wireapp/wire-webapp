@@ -49,19 +49,6 @@ describe 'Message Entities', ->
       it 'has_asset_text return false', ->
         expect(message_et.has_asset_text()).toBeFalsy()
 
-    describe 'preview asset', ->
-      beforeEach ->
-        message_et.assets.push new z.entity.PreviewImage()
-
-      it 'has_asset_medium_image return false', ->
-        expect(message_et.has_asset_medium_image()).toBeFalsy()
-
-      it 'has_asset_preview_image return true', ->
-        expect(message_et.has_asset_preview_image()).toBeTruthy()
-
-      it 'has_asset_text return false', ->
-        expect(message_et.has_asset_text()).toBeFalsy()
-
     describe 'text asset', ->
       beforeEach ->
         message_et.assets.push new z.entity.Text()

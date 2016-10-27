@@ -265,8 +265,6 @@ describe 'z.cryptography.CryptographyMapper', ->
         expect(event_json.data.info.width).toBe image.width
         expect(event_json.data.info.height).toBe image.height
         expect(event_json.data.info.nonce).toBe event.data.id
-        expect(event_json.data.info.original_width).toBe image.original_width
-        expect(event_json.data.info.original_height).toBe image.original_height
         expect(event_json.data.info.public).toBeFalsy()
         done()
       .catch done.fail
@@ -303,8 +301,6 @@ describe 'z.cryptography.CryptographyMapper', ->
         expect(event_json.data.info.tag).toBe 'medium'
         expect(event_json.data.info.width).toBe image_meta_data.width
         expect(event_json.data.info.height).toBe image_meta_data.height
-        expect(event_json.data.info.original_width).toBe image_meta_data.width
-        expect(event_json.data.info.original_height).toBe image_meta_data.height
         expect(event_json.data.info.nonce).toBe generic_message.message_id
         done()
       .catch done.fail
@@ -340,8 +336,6 @@ describe 'z.cryptography.CryptographyMapper', ->
         expect(event_json.data.info.width).toBe image.width
         expect(event_json.data.info.height).toBe image.height
         expect(event_json.data.info.nonce).toBeDefined()
-        expect(event_json.data.info.original_width).toBe image.original_width
-        expect(event_json.data.info.original_height).toBe image.original_height
         expect(event_json.data.info.public).toBeFalsy()
         done()
       .catch done.fail

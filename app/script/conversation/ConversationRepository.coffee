@@ -1477,8 +1477,6 @@ class z.conversation.ConversationRepository
             nonce: message_et.nonce
             height: asset.height
             width: asset.width
-            original_height: asset.original_height
-            original_width: asset.original_width
             tag: 'medium'
         expire_after_millis: true
     .then =>
