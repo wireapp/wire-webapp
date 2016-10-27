@@ -305,16 +305,6 @@ class z.entity.Conversation
     @messages_unordered.removeAll()
 
   ###
-  Replace a message in the conversation.
-
-  @param old_message_et [z.entity.Message] Message to be replaced
-  @param new_message_et [z.entity.Message] Message replacing the old one
-  ###
-  replace_message: (old_message_et, new_message_et) ->
-    @messages()[@messages.indexOf old_message_et] = new_message_et
-    @messages.valueHasMutated()
-
-  ###
   Checks for message duplicates by nonce and returns the message.
 
   @private
@@ -403,14 +393,6 @@ class z.entity.Conversation
   ###############################################################################
   # Update last activity
   ###############################################################################
-
-  ###
-  Update information about last activity from multiple messages.
-  @param message_ets [z.entity.Message[]] Array of messages to be added to conversation
-  ###
-  update_latest_from_messages: (message_ets) ->
-    last_message = message_ets[message_ets.length - 1]
-    @update_latest_from_message last_message
 
   ###
   Update information about last activity from single message.
