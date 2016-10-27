@@ -412,16 +412,18 @@ class z.conversation.EventMapper
 
   @return [z.entity.MediumImage] Medium image asset entity
   ###
-  _map_asset_medium_image: (data) ->
-    asset_et = new z.entity.MediumImage data.data.id
-    asset_et.correlation_id = data.data.info.correlation_id
-    asset_et.width = data.data.info.width
-    asset_et.height = data.data.info.height
-    asset_et.original_width = data.data.info.original_width
-    asset_et.original_height = data.data.info.original_height
+  _map_asset_medium_image: (event) ->
+    asset_et = new z.entity.MediumImage event.data.id
+    asset_et.correlation_id = event.data.info.correlation_id
+    asset_et.width = event.data.info.width
+    asset_et.height = event.data.info.height
+    asset_et.original_width = event.data.info.original_width
+    asset_et.original_height = event.data.info.original_height
     asset_et.ratio = asset_et.original_height / asset_et.original_width
-    if asset_et.id
-      asset_et.resource z.assets.AssetRemoteData.v2 data.conversation, asset_et.id, data.data.otr_key, data.data.sha256
+    if event.data.key
+      asset_et.resource z.assets.AssetRemoteData.v3 event.data.key, event.data.otr_key, event.data.sha256, event.data.token
+    else
+      asset_et.resource z.assets.AssetRemoteData.v2 event.conversation, asset_et.id, event.data.otr_key, event.data.sha256
     asset_et.dummy_url = z.util.dummy_image asset_et.original_width, asset_et.original_height
     return asset_et
 
