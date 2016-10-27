@@ -37,7 +37,7 @@ describe 'z.tracking.EventTrackingRepository', ->
       spyOn(tracking_repository, '_enable_error_reporting').and.callThrough()
       tracking_repository._subscribe()
 
-      properties = new z.user.UserProperties()
+      properties = new z.user_properties.UserProperties()
       self_user = user_repository.self()
 
       amplify.publish z.event.WebApp.ANALYTICS.INIT, properties, self_user
@@ -108,7 +108,7 @@ describe 'z.tracking.EventTrackingRepository', ->
 
   describe 'Error Reporting', ->
     beforeAll ->
-      properties = new z.user.UserProperties()
+      properties = new z.user_properties.UserProperties()
       self_user = user_repository.self()
       tracking_repository.init properties, self_user
 

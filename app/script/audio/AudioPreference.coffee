@@ -19,8 +19,8 @@
 window.z ?= {}
 z.audio ?= {}
 
-# Enum of audio settings.
-z.audio.AudioSetting =
+# Enum of audio preferences.
+z.audio.AudioPreference =
   ALL: 'all'
   NONE: 'none'
   SOME: 'some'

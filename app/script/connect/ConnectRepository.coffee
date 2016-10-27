@@ -26,9 +26,9 @@ class z.connect.ConnectRepository
 
   @param connect_service [z.connect.ConnectService] Backend REST API service implementation
   @param connect_google_service [z.connect.ConnectGoogleService] Google REST API implementation
-  @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
+  @param user_properties_repository [z.user_properties.UserPropertiesRepository] Repository for all user property interactions
   ###
-  constructor: (@connect_service, @connect_google_service, @user_repository) ->
+  constructor: (@connect_service, @connect_google_service, @user_properties_repository) ->
     @logger = new z.util.Logger 'z.connect.ConnectRepository', z.config.LOGGER.OPTIONS
 
   ###
@@ -53,7 +53,7 @@ class z.connect.ConnectRepository
       .then (response) =>
         @logger.log @logger.levels.INFO,
           "Gmail contacts upload successful: #{response.results.length} matches, #{response['auto-connects'].length} auto connects", response
-        @user_repository.save_property_contact_import_google Date.now()
+        @user_properties_repository.save_preference_contact_import_google Date.now()
         resolve response
       .catch (error) =>
         if error instanceof z.connect.ConnectError
@@ -87,7 +87,7 @@ class z.connect.ConnectRepository
         .then (response) =>
           @logger.log @logger.levels.INFO,
             "macOS contacts upload successful: #{response.results.length} matches, #{response['auto-connects'].length} auto connects", response
-          @user_repository.save_property_contact_import_macos Date.now()
+          @user_properties_repository.save_preference_contact_import_macos Date.now()
           resolve response
         .catch (error) =>
           if error.code is z.service.BackendClientError::STATUS_CODE.TOO_MANY_REQUESTS
@@ -124,7 +124,7 @@ class z.connect.ConnectRepository
     return if not window.zAddressBook
 
     address_book = window.zAddressBook()
-    phone_book = new z.connect.PhoneBook @user_repository.self()
+    phone_book = new z.connect.PhoneBook @user_properties_repository.self()
 
     me = address_book.getMe()
     for email in me.emails
@@ -156,13 +156,13 @@ class z.connect.ConnectRepository
   @return [z.connect.PhoneBook] Encoded phone book data
   ###
   _parse_google_contacts: (response) ->
-    phone_book = new z.connect.PhoneBook @user_repository.self()
+    phone_book = new z.connect.PhoneBook @user_properties_repository.self()
 
     # Add self info from Google
     if response.feed.author?
       self = response.feed.author
       google_email = self[0].email.$t.toLowerCase().trim()
-      if not @user_repository.self().email() is google_email
+      if not @user_properties_repository.self().email() is google_email
         phone_book.self.push google_email
 
     # Add Google contacts

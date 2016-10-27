@@ -74,7 +74,7 @@ class z.tracking.EventTrackingRepository
     amplify.subscribe z.event.WebApp.ANALYTICS.INIT, @init
 
   ###
-  @param user_properties [z.user.UserProperties]
+  @param user_properties [z.user_properties.UserProperties]
   @param user_et [z.entity.User]
   ###
   init: (user_properties, user_et) =>

@@ -30,7 +30,7 @@ class z.ViewModel.list.StartUIViewModel
   @param search_repository [z.search.SearchRepository] Search repository
   @param user_repository [z.user.UserRepository] User repository
   ###
-  constructor: (element_id, @list_view_model, @connect_repository, @conversation_repository, @search_repository, @user_repository) ->
+  constructor: (element_id, @list_view_model, @connect_repository, @conversation_repository, @search_repository, @user_repository, @user_properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS
 
     @search = _.debounce (query) =>
@@ -423,8 +423,8 @@ class z.ViewModel.list.StartUIViewModel
   ###############################################################################
 
   update_properties: =>
-    @has_created_conversation @user_repository.properties.has_created_conversation
-    @has_uploaded_contacts @user_repository.properties.contact_import.google? or @user_repository.properties.contact_import.macos?
+    @has_created_conversation @user_properties_repository.properties.has_created_conversation
+    @has_uploaded_contacts @user_properties_repository.properties.contact_import.google? or @user_properties_repository.properties.contact_import.macos?
     return true
 
 
@@ -447,7 +447,7 @@ class z.ViewModel.list.StartUIViewModel
     @conversation_repository.create_new_conversation user_ids, null
     .then (conversation_et) =>
       @logger.log @logger.levels.INFO, "Created new conversation with ID: #{conversation_et.id}"
-      @user_repository.save_property_has_created_conversation()
+      @user_properties_repository.save_preference_has_created_conversation()
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION,
         {creationContext: 'search', numberOfParticipants: user_ids.length}
       @click_on_group conversation_et

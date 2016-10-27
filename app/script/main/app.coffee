@@ -60,6 +60,7 @@ class z.main.App
     service.search                  = new z.search.SearchService @auth.client
     service.storage                 = new z.storage.StorageService()
     service.user                    = new z.user.UserService @auth.client
+    service.user_properties         = new z.user_properties.UserPropertiesService @auth.client
     service.web_socket              = new z.event.WebSocketService @auth.client
 
     service.client                  = new z.client.ClientService @auth.client, service.storage
@@ -73,6 +74,7 @@ class z.main.App
   _setup_repositories: ->
     repository = {}
 
+    repository.announce            = new z.announce.AnnounceRepository @service.announce
     repository.audio               = @auth.audio
     repository.storage             = new z.storage.StorageRepository @service.storage
     repository.cache               = new z.cache.CacheRepository()
@@ -81,10 +83,10 @@ class z.main.App
 
     repository.client              = new z.client.ClientRepository @service.client, repository.cryptography
     repository.user                = new z.user.UserRepository @service.user, @service.asset, @service.search, repository.client, repository.cryptography
-    repository.connect             = new z.connect.ConnectRepository @service.connect, @service.connect_google, repository.user
     repository.event               = new z.event.EventRepository @service.web_socket, @service.notification, repository.cryptography, repository.user
     repository.search              = new z.search.SearchRepository @service.search, repository.user
-    repository.announce            = new z.announce.AnnounceRepository @service.announce
+    repository.user_properties     = new z.user_properties.UserPropertiesRepository @service.user_properties
+    repository.connect             = new z.connect.ConnectRepository @service.connect, @service.connect_google, repository.user_properties
     repository.links               = new z.links.LinkPreviewRepository @service.asset
 
     repository.conversation        = new z.conversation.ConversationRepository(
@@ -108,8 +110,8 @@ class z.main.App
     view = {}
 
     view.main                      = new z.ViewModel.MainViewModel 'wire-main', @repository.user
-    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.search, @repository.user
-    view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user
+    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.search, @repository.user, @repository.user_properties
+    view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user, @repository.user_properties
     view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
     view.modals                    = new z.ViewModel.ModalsViewModel 'modals'
@@ -153,6 +155,7 @@ class z.main.App
       @view.loading.switch_message z.string.init_received_self_user, true
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER
       @repository.client.init self_user_et
+      @repository.user_properties.init self_user_et
       return @repository.storage.init false
     .then =>
       @view.loading.switch_message z.string.init_initialized_storage, true
@@ -173,13 +176,12 @@ class z.main.App
       @repository.event.connect_web_socket()
       promises = [
         @repository.client.get_clients_for_self()
-        @repository.user.init_properties()
         @repository.conversation.get_conversations()
         @repository.user.get_connections()
       ]
       return Promise.all promises
     .then (response_array) =>
-      [client_ets, user_properties, conversation_ets, connection_ets] = response_array
+      [client_ets, conversation_ets, connection_ets] = response_array
       @view.loading.switch_message z.string.init_received_user_data, true
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length
@@ -222,6 +224,7 @@ class z.main.App
       @logger.log @logger.levels.DEBUG,
         "App reload: '#{is_reload}', Document referrer: '#{document.referrer}', Location: '#{window.location.href}'"
 
+      return
       if is_reload and error.type not in [z.client.ClientError::TYPE.MISSING_ON_BACKEND, z.client.ClientError::TYPE.NO_LOCAL_CLIENT]
         @auth.client.execute_on_connectivity().then -> window.location.reload false
       else if navigator.onLine
@@ -333,7 +336,7 @@ class z.main.App
       amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
 
     window.setTimeout =>
-      @repository.system_notification.request_permission()
+      @repository.system_notification.check_permission()
     , 10000
 
     $('#loading-screen').remove()
@@ -439,12 +442,12 @@ class z.main.App
   # Disable debugging on any environment.
   disable_debugging: ->
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = -> 0
-    amplify.publish z.event.WebApp.PROPERTIES.CHANGE.DEBUG, false
+    @repository.user_properties.save_preference_enable_debugging false
 
   # Enable debugging on any environment.
   enable_debugging: ->
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = -> 300
-    amplify.publish z.event.WebApp.PROPERTIES.CHANGE.DEBUG, true
+    @repository.user_properties.save_preference_enable_debugging true
 
   # Report call telemetry to Raygun for analysis.
   report_call: =>

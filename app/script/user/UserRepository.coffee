@@ -40,7 +40,6 @@ class z.user.UserRepository
     @self = ko.observable()
     @users = ko.observableArray []
     @connections = ko.observableArray []
-    @properties = new z.user.UserProperties()
 
     @connect_requests = ko.pureComputed =>
       user_ets = []
@@ -53,8 +52,6 @@ class z.user.UserRepository
     amplify.subscribe z.event.Backend.USER.UPDATE, @user_update
     amplify.subscribe z.event.WebApp.CLIENT.ADD, @add_client_to_user
     amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @remove_client_from_user
-    amplify.subscribe z.event.WebApp.PROPERTIES.CHANGE.DEBUG, @save_property_enable_debugging
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @properties_updated
 
 
   ###############################################################################
@@ -615,106 +612,6 @@ class z.user.UserRepository
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
           source: 'unsplash'
           outcome: 'success'
-
-  ###############################################################################
-  # Properties
-  ###############################################################################
-
-  ###
-  Initialize properties on app startup.
-  ###
-  init_properties: =>
-    return new Promise (resolve, reject) =>
-      @user_service.get_user_properties()
-      .then (response) =>
-        if response.includes z.config.PROPERTIES_KEY
-          @user_service.get_user_properties_by_key z.config.PROPERTIES_KEY
-          .then (response) =>
-            $.extend true, @properties, response
-            @logger.log @logger.levels.INFO, 'Loaded user properties', @properties
-        else
-          @logger.log @logger.levels.INFO, 'User has no saved properties, using defaults'
-      .then =>
-        amplify.publish z.event.WebApp.PROPERTIES.UPDATED, @properties
-        amplify.publish z.event.WebApp.ANALYTICS.INIT, @properties, @self()
-        resolve @properties
-      .catch (error) =>
-        error = new Error "Failed to initialize user properties: #{error}"
-        @logger.log @logger.levels.ERROR, error.message, error
-        reject @properties
-
-  properties_updated: (properties) ->
-    if properties.enable_debugging
-      amplify.publish z.util.Logger::LOG_ON_DEBUG, properties.enable_debugging
-    return true
-
-  ###
-  Save the user properties.
-  @param key [String] User properties key name to update
-  @param value
-  ###
-  save_properties: (key, value) =>
-    @user_service.change_user_properties_by_key z.config.PROPERTIES_KEY, @properties
-    .then =>
-      @logger.log @logger.levels.INFO, "Saved updated settings: '#{key}' - '#{value}'"
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, 'Saving updated settings failed', error
-
-  ###
-  Save timestamp for Google Contacts import.
-  @param timestamp [String] Timestamp to be saved
-  ###
-  save_property_contact_import_google: (timestamp) =>
-    @properties.contact_import.google = timestamp
-    @save_properties 'contact_import.google', timestamp
-    .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_GOOGLE, timestamp
-
-  ###
-  Save timestamp for macOS Contacts import.
-  @param timestamp [String] Timestamp to be saved
-  ###
-  save_property_contact_import_macos: (timestamp) =>
-    @properties.contact_import.macos = timestamp
-    @save_properties 'contact_import.macos', timestamp
-    .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_MACOS, timestamp
-
-  ###
-  Save data settings.
-  @param is_enabled [String] Data setting to be saved
-  ###
-  save_property_data_settings: (is_enabled) =>
-    return if @properties.settings.privacy.report_errors is is_enabled
-    @properties.settings.privacy.report_errors = is_enabled
-    @properties.settings.privacy.improve_wire = is_enabled
-    @save_properties 'settings.privacy', is_enabled
-    .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.SEND_DATA, is_enabled
-
-  ###
-  Save debug logging setting.
-  @param is_enabled [Boolean] Should debug logging be enabled despite domain
-  ###
-  save_property_enable_debugging: (is_enabled) =>
-    return if @properties.enable_debugging is is_enabled
-    @properties.enable_debugging = is_enabled
-    @save_properties 'enable_debugging', is_enabled
-    .then -> amplify.publish z.util.Logger::LOG_ON_DEBUG, is_enabled
-
-  # Save when user has created a conversation.
-  save_property_has_created_conversation: =>
-    @properties.has_created_conversation = true
-    @save_properties 'has_created_conversation', @properties.has_created_conversation
-    .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION
-
-  ###
-  Save audio settings.
-  @param sound_alerts [String] Audio setting to be saved
-  ###
-  save_property_sound_alerts: (sound_alerts) =>
-    if @properties.settings.sound.alerts isnt sound_alerts
-      @properties.settings.sound.alerts = sound_alerts
-      @save_properties 'settings.sound.alerts', @properties.settings.sound.alerts
-      .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, sound_alerts
-
 
   ###############################################################################
   # Tracking helpers

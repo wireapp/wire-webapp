@@ -17,11 +17,20 @@
 #
 
 window.z ?= {}
-z.util ?= {}
+z.user_properties ?= {}
 
-
-# https://developer.mozilla.org/en-US/docs/Web/API/Notification.permission#Return_Value
-z.util.BrowserPermissionType =
-  DEFAULT: 'default'
-  DENIED: 'denied'
-  GRANTED: 'granted'
+class z.user_properties.UserProperties
+  constructor: ->
+    @version = 1
+    @settings =
+      notifications: z.system_notification.SystemNotificationPreference.ON
+      privacy:
+        report_errors: true
+        improve_wire: true
+      sound:
+        alerts: z.audio.AudioPreference.ALL
+    @contact_import =
+      google: undefined
+      macos: undefined
+    @has_created_conversation = false
+    @enable_debugging = false

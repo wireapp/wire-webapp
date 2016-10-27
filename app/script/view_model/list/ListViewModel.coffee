@@ -31,7 +31,7 @@ class z.ViewModel.list.ListViewModel
   @param search_repository [z.search.SearchRepository] Search repository
   @param user_repository [z.user.UserRepository] User repository
   ###
-  constructor: (element_id, @content_view_model, @call_center, @connect_repository, @conversation_repository, @search_repository, @user_repository) ->
+  constructor: (element_id, @content_view_model, @call_center, @connect_repository, @conversation_repository, @search_repository, @user_repository, @user_properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.list.ListViewModel', z.config.LOGGER.OPTIONS
 
     # state
@@ -45,7 +45,7 @@ class z.ViewModel.list.ListViewModel
     @archive       = new z.ViewModel.list.ArchiveViewModel 'archive', @, @conversation_repository
     @conversations = new z.ViewModel.list.ConversationListViewModel 'conversations', @, @content_view_model, @call_center, @conversation_repository, @user_repository
     @preferences   = new z.ViewModel.list.PreferencesListViewModel 'preferences', @, @content_view_model
-    @start_ui      = new z.ViewModel.list.StartUIViewModel 'start-ui', @, @connect_repository, @conversation_repository, @search_repository, @user_repository
+    @start_ui      = new z.ViewModel.list.StartUIViewModel 'start-ui', @, @connect_repository, @conversation_repository, @search_repository, @user_repository, @user_properties_repository
 
     @actions       = new z.ViewModel.list.ActionsViewModel 'actions-bubble', @, @conversations, @conversation_repository, @user_repository
 

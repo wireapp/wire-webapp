@@ -55,7 +55,7 @@ class z.announce.AnnounceRepository
         if not z.util.StorageUtil.get_value key
           z.util.StorageUtil.set_value key, 'read'
           return if not z.util.Environment.browser.supports.notifications
-          return if window.Notification.permission is z.util.BrowserPermissionType.DENIED
+          return if window.Notification.permission is z.system_notification.PermissionStatusState.DENIED
 
           if not (z.localization.Localizer.locale is 'en')
             announcement.title = announcement["title_#{z.localization.Localizer.locale}"] or announcement.title

@@ -118,12 +118,10 @@ z.event.WebApp =
     SETTINGS:
       SHOW: 'wire.webapp.profile.settings.show'
   PROPERTIES:
-    CHANGE:
-      DEBUG: 'wire.webapp.properties.change.debug'
     UPDATE:
-      CALL_MUTE: 'wire.webapp.properties.update.call-mute'
       CONTACTS_GOOGLE: 'wire.webapp.properties.update.contacts-google'
       CONTACTS_MACOS: 'wire.webapp.properties.update.contacts-macos'
+      NOTIFICATIONS: 'wire.webapp.properties.update.notifications'
       SEND_DATA: 'wire.webapp.properties.update.send-data'
       SOUND_ALERTS: 'wire.webapp.properties.update.sound-alerts'
       HAS_CREATED_CONVERSATION: 'wire.webapp.properties.update.has-created-conversation'
@@ -139,8 +137,8 @@ z.event.WebApp =
   SYSTEM_NOTIFICATION:
     CLICK: 'wire.webapp.system-notification.click'
     NOTIFY: 'wire.webapp.system-notification.notify'
+    PERMISSION_STATE: 'wire.webapp.system-notification.permission_state'
     REMOVE_READ: 'wire.webapp.system.notification.remove_read'
-    REQUEST_PERMISSION: 'wire.webapp.system-notification.request_permission'
     SHOW: 'wire.webapp.system-notification.show'
   TELEMETRY:
     BACKEND_REQUESTS: 'wire.webapp.telemetry.backend_requests'

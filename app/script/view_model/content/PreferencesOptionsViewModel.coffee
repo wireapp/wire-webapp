@@ -22,7 +22,7 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.PreferencesOptionsViewModel
-  constructor: (element_id, @call_center, @user_repository) ->
+  constructor: (element_id, @call_center, @user_properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS
 
     @media_devices_handler = @call_center.media_devices_handler
@@ -34,20 +34,20 @@ class z.ViewModel.content.PreferencesOptionsViewModel
     @video_stream = @media_stream_handler.local_media_streams.video
 
     @option_data = ko.observable()
-    @option_data.subscribe (data_preference) => @user_repository.save_property_data_settings data_preference
+    @option_data.subscribe (data_preference) => @user_properties_repository.save_preference_data data_preference
 
-    @option_sound = ko.observable()
-    @option_sound.subscribe (sound_preference) =>
-      tracking_value = switch sound_preference
-        when z.audio.AudioSetting.ALL then 'alwaysPlay'
-        when z.audio.AudioSetting.SOME then 'firstMessageOnly'
-        when z.audio.AudioSetting.NONE then 'neverPlay'
+    @option_audio = ko.observable()
+    @option_audio.subscribe (audio_preference) =>
+      tracking_value = switch audio_preference
+        when z.audio.AudioPreference.ALL then 'alwaysPlay'
+        when z.audio.AudioPreference.SOME then 'firstMessageOnly'
+        when z.audio.AudioPreference.NONE then 'neverPlay'
 
-      @user_repository.save_property_sound_alerts sound_preference
+      @user_properties_repository.save_preference_sound_alerts audio_preference
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SOUND_SETTINGS_CHANGED, value: tracking_value
 
     @option_notifications = ko.observable()
-    #@option_notifications.subscribe (notifications_preference) => @user_repository.save_property_data_settings notifications_preference
+    @option_notifications.subscribe (notifications_preference) => @user_properties_repository.save_preference_notifications notifications_preference
 
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @update_properties
 
@@ -76,5 +76,6 @@ class z.ViewModel.content.PreferencesOptionsViewModel
     @media_stream_handler.reset_media_streams()
 
   update_properties: (properties) =>
+    @option_audio properties.settings.sound.alerts
     @option_data properties.settings.privacy.report_errors
-    @option_sound properties.settings.sound.alerts
+    @option_notifications properties.settings.notifications

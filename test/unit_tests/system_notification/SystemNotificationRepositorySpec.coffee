@@ -82,9 +82,16 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
       expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
 
-    it 'if the browser tab has focus', ->
+    it 'if the browser tab has focus and conversation is active', ->
+      conversation_repository.active_conversation conversation_et
       document.hasFocus = ->
         true
+      system_notification_repository.notify conversation_et, message_et
+
+      expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
+
+    it 'if preference is set to none', ->
+      system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.NONE
       system_notification_repository.notify conversation_et, message_et
 
       expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
@@ -108,6 +115,8 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       system_notification_repository.notify conversation_et, message_et
 
       expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
+
+  describe 'shows an obfuscated message when option is selected', ->
 
   describe 'shows a well-formed call notification', ->
     describe 'for an incoming call', ->
@@ -194,6 +203,16 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         expect(result).toEqual JSON.stringify notification_content
         expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
 
+      it 'when preference is set to obfuscate', ->
+        system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.OBFUSCATE
+        system_notification_repository.notify conversation_et, message_et
+
+        notification_content.title = z.string.system_notification_obfuscated_title
+        notification_content.options.body = z.string.system_notification_obfuscated
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+
     describe 'for a picture', ->
       beforeEach ->
         message_et.assets.push new z.entity.MediumImage()
@@ -243,8 +262,8 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
     describe 'for ephemeral messages', ->
       beforeEach ->
         message_et.expire_after_millis 5000
-        notification_content.title = z.string.system_notification_ephemeral_title
-        notification_content.options.body = z.string.system_notification_ephemeral
+        notification_content.title = z.string.system_notification_obfuscated_title
+        notification_content.options.body = z.string.system_notification_obfuscated
 
       it 'that contains text', ->
         system_notification_repository.notify conversation_et, message_et
@@ -456,8 +475,8 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
     it 'as an ephemeral message', ->
       message_et.expire_after_millis 5000
-      notification_content.title = z.string.system_notification_ephemeral_title
-      notification_content.options.body = z.string.system_notification_ephemeral
+      notification_content.title = z.string.system_notification_obfuscated_title
+      notification_content.options.body = z.string.system_notification_obfuscated
       system_notification_repository.notify conversation_et, message_et
 
       result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
