@@ -137,9 +137,8 @@ class z.client.ClientService
       if client_record is undefined
         @logger.log @logger.levels.INFO, "Client with primary key '#{primary_key}' not found in database"
         return primary_key
-      else
-        @logger.log @logger.levels.INFO, "Loaded client record from database '#{primary_key}'", client_record
-        return client_record
+      @logger.log @logger.levels.INFO, "Loaded client record from database '#{primary_key}'", client_record
+      return client_record
 
   ###
   Loads a persisted clients from the database for given user id.
