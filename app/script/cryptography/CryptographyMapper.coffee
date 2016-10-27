@@ -82,9 +82,9 @@ class z.cryptography.CryptographyMapper
         throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
 
   _map_asset: (asset, event_nonce, event_id) ->
-    if asset.uploaded? and asset.uploaded.asset_id and asset.original?.image?
-      return @_map_image_asset_v3 asset, event_nonce
-    else if asset.uploaded?
+    if asset.uploaded?
+      if asset.uploaded.asset_id and asset.original?.image?
+        return @_map_image_asset_v3 asset, event_nonce
       return @_map_asset_uploaded asset.uploaded, event_id
     else if asset.not_uploaded?
       return @_map_asset_not_uploaded asset.not_uploaded
@@ -151,7 +151,7 @@ class z.cryptography.CryptographyMapper
       type: z.event.Client.CONVERSATION.ASSET_PREVIEW
     }
 
-  _map_asset_uploaded: (uploaded, event_id) ->
+    _map_asset_uploaded: (uploaded, event_id) ->
     return {
       data:
         id: event_id
