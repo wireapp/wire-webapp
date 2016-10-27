@@ -60,6 +60,18 @@ class z.assets.AssetRemoteData
     return remote_data
 
   ###
+  Static initializer for v1 assets
+
+  @deprecated
+  @param conversation_id [String]
+  @param asset_id [String]
+  ###
+  @v1: (conversation_id, asset_id) ->
+    remote_data = new z.assets.AssetRemoteData()
+    remote_data.generate_url = -> wire.app.service.asset.generate_asset_url asset_id, conversation_id
+    return remote_data
+
+  ###
   Loads and decrypts stored asset
 
   @returns [Blob]
@@ -70,7 +82,9 @@ class z.assets.AssetRemoteData
     @_load_buffer()
     .then (data) =>
       [buffer, type] = data
-      return z.assets.AssetCrypto.decrypt_aes_asset buffer, @otr_key.buffer, @sha256.buffer
+      if @otr_key? and @sha256?
+        return z.assets.AssetCrypto.decrypt_aes_asset buffer, @otr_key.buffer, @sha256.buffer
+      return buffer
     .then (buffer) ->
       return new Blob [new Uint8Array buffer], type: type
 

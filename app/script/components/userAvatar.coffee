@@ -57,22 +57,13 @@ class z.components.UserAvatar
       params.click? data.user, event.currentTarget.parentNode
 
     @picture_preview_subscription = ko.computed =>
-      image_url = @user.picture_preview_url()
-      image_was_already_loaded = false
-
-      if image_url?
+      @user.preview_picture_resource()?.load()
+      .then (blob) =>
         image = new Image()
-        image.onload = =>
-          @avatar_image = @element.find '.user-avatar-image'
-          @avatar_image.empty().append image
-
-          window.requestAnimationFrame =>
-            if not image_was_already_loaded
-              @element.addClass 'user-avatar-loading-transition'
-            @element.addClass 'user-avatar-image-loaded'
-
-        image.src = z.util.strip_url_wrapper image_url
-        image_was_already_loaded = image.complete
+        image.src = window.URL.createObjectURL blob
+        @avatar_image = @element.find '.user-avatar-image'
+        @avatar_image.empty().append image
+        @element.addClass 'user-avatar-image-loaded user-avatar-loading-transition'
 
   dispose: =>
     @picture_preview_subscription.dispose()

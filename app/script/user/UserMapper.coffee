@@ -89,7 +89,11 @@ class z.user.UserMapper
       user_et.accent_id data.accent_id
 
     if data.picture?
-      user_et.raw_pictures data.picture
+
+      if data.picture[0]?
+        user_et.preview_picture_resource z.assets.AssetRemoteData.v1 user_et.id, data.picture[0].id
+      if data.picture[1]?
+        user_et.medium_picture_resource z.assets.AssetRemoteData.v1 user_et.id, data.picture[1].id
 
     if data.picture?[0]?
       preview_picture = data.picture[0]

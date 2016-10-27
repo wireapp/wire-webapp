@@ -102,6 +102,9 @@ class z.entity.User
     @picture_medium = ko.observable ''
     @raw_pictures = ko.observable []
 
+    @preview_picture_resource = ko.observable()
+    @medium_picture_resource = ko.observable()
+
     # TODO: Quickfix for picture previews. Tiago thinks about a better solution!
     # TODO: Make sure that this function returns only an URL (without url('...'))
     @picture_preview_url = =>
