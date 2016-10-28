@@ -399,7 +399,6 @@ z.string.preferences_account_delete = 'Delete account'
 z.string.preferences_account_log_out = 'Log out'
 z.string.preferences_account_username_placeholder = 'Your full name'
 
-
 z.string.preferences_devices_activated_in = 'in %location'
 z.string.preferences_devices_activated_on = 'Activated on %time'
 z.string.preferences_devices_active = 'Active'
@@ -416,7 +415,6 @@ z.string.preferences_devices_session_detail = 'If fingerprints don’t match, re
 z.string.preferences_devices_session_reset = 'Reset session'
 z.string.preferences_devices_session_ongoing = 'Resetting session…'
 z.string.preferences_devices_verification = 'Verified'
-
 
 z.string.preferences_options_audio = 'Sound alerts'
 z.string.preferences_options_audio_all = 'All'
@@ -436,11 +434,8 @@ z.string.preferences_options_data_detail = 'Make Wire better by sending anonymou
 z.string.preferences_options_microphone = 'Microphone'
 z.string.preferences_options_notifications = 'Notifications'
 z.string.preferences_options_notifications_none = 'Off'
-z.string.preferences_options_notifications_none_detail = 'No notifications'
-z.string.preferences_options_notifications_obfuscate = 'Obfuscate message'
-z.string.preferences_options_notifications_obfuscate_detail = 'Hide sender and message'
-z.string.preferences_options_notifications_on = 'Message preview'
-z.string.preferences_options_notifications_on_detail = 'Show sender and message'
+z.string.preferences_options_notifications_obfuscate = 'Hide message details'
+z.string.preferences_options_notifications_on = 'Show sender and message'
 z.string.preferences_options_speakers = 'Speakers'
 
 # Search

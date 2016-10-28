@@ -54,10 +54,9 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
       window.Notification =
         permission:
-          z.util.BrowserPermissionType.GRANTED
+          z.system_notification.PermissionStatusState.GRANTED
 
-      document.hasFocus = ->
-        false
+      document.hasFocus = -> return false
 
       spyOn system_notification_repository, '_show_notification'
       spyOn system_notification_repository, '_notify_sound'
@@ -77,15 +76,14 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
 
     it 'if the user permission was denied', ->
-      window.Notification.permission = z.util.BrowserPermissionType.DENIED
+      window.Notification.permission = z.system_notification.PermissionStatusState.DENIED
       system_notification_repository.notify conversation_et, message_et
 
       expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
 
     it 'if the browser tab has focus and conversation is active', ->
       conversation_repository.active_conversation conversation_et
-      document.hasFocus = ->
-        true
+      document.hasFocus = -> return true
       system_notification_repository.notify conversation_et, message_et
 
       expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
@@ -115,8 +113,6 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       system_notification_repository.notify conversation_et, message_et
 
       expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
-
-  describe 'shows an obfuscated message when option is selected', ->
 
   describe 'shows a well-formed call notification', ->
     describe 'for an incoming call', ->
@@ -236,6 +232,16 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         expect(result).toEqual JSON.stringify notification_content
         expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
 
+      it 'when preference is set to obfuscate', ->
+        system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.OBFUSCATE
+        system_notification_repository.notify conversation_et, message_et
+
+        notification_content.title = z.string.system_notification_obfuscated_title
+        notification_content.options.body = z.string.system_notification_obfuscated
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+
     describe 'for a location', ->
       beforeEach ->
         message_et.assets.push new z.entity.Location()
@@ -255,6 +261,16 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
         title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
         notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+
+      it 'when preference is set to obfuscate', ->
+        system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.OBFUSCATE
+        system_notification_repository.notify conversation_et, message_et
+
+        notification_content.title = z.string.system_notification_obfuscated_title
+        notification_content.options.body = z.string.system_notification_obfuscated
         result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
         expect(result).toEqual JSON.stringify notification_content
         expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1

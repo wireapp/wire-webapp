@@ -83,16 +83,36 @@ class z.ViewModel.content.PreferencesOptionsViewModel
 
   initiate_audio_meter: (audio_stream) =>
     @audio_context = @call_center.audio_repository.get_audio_context()
-    @audio_script = @audio_context.createScriptProcessor 2048, 1, 1
 
-    @audio_script.onaudioprocess = (audio_processing_event) =>
+    @audio_analyser = @audio_context.createAnalyser()
+    @audio_analyser.fftSize = 1024
+    @audio_analyser.smoothingTimeConstant = 0.1
+
+    @audio_script = @audio_context.createScriptProcessor 1024, 1, 1
+
+    @audio_script.onaudioprocess = =>
+      ###
       inputs = audio_processing_event.inputBuffer.getChannelData 0
       level = 0.0
       for input in inputs
         level += input * input
-      @audio_level (Math.sqrt level / inputs.length) * 3
+      current_level = (Math.sqrt level / inputs.length) * 3
+      new_audio_level = 0.9 * @audio_level() + 0.1 * current_level
+      @audio_level new_audio_level
+      ###
+      data_array = new Float32Array @audio_analyser.frequencyBinCount
+      @audio_analyser.getFloatTimeDomainData data_array
+      console.log data_array.length
+
+      max_value = 0
+      max_value = Math.max data, max_value for data in data_array
+      new_audio_level = 0.9 * @audio_level() + 0.1 * max_value
+      console.log new_audio_level
+
+      @audio_level new_audio_level
 
     @audio_source = @audio_context.createMediaStreamSource audio_stream
+    @audio_source.connect @audio_analyser
     @audio_source.connect @audio_script
     @audio_script.connect @audio_context.destination
 
