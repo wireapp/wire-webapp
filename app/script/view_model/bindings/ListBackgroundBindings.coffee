@@ -24,11 +24,6 @@ ko.bindingHandlers.switch_background = do ->
     return if not image_resource?
 
     background_images = $(element).find('.background')
-
-    # clean up background images
-    if background_images.length > 1
-      background_images.slice(0, -1).remove()
-
     background_last = background_images.last()
     background_next = background_last.clone()
     background_next.css 'opacity': '0'
@@ -39,8 +34,7 @@ ko.bindingHandlers.switch_background = do ->
       background_next
       .find '.background-image'
       .css 'background-image': "url(#{window.URL.createObjectURL blob})"
-
-      window.requestAnimationFrame ->
-        background_next
-        .css 'opacity': '1'
-        .one z.util.alias.animationend, background_last.remove
+    .then ->
+      background_next
+      .css 'opacity': '1'
+      .one z.util.alias.animationend, background_last.remove
