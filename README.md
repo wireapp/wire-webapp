@@ -24,26 +24,19 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 
 ### Requirements
 
-- Install [Node.js](https://nodejs.org/)
-- Install [Grunt](http://gruntjs.com/): `npm install -g grunt-cli`
+1. Install [Node.js](https://nodejs.org/)
+1. Run `npm init`
+1. Run `grunt`
 
 ### Run Wire for Web locally
 
-The first time you run the project you should install the dependencies by
-executing the following from your terminal:
-
-```bash
-npm install
-```
-
-To run the actual server:
+To run the development server execute:
 
 ```bash
 grunt
 ```
 
-If everything went well the app will be available on
-[`localhost:8888`](http://localhost:8888).
+If everything went well the app will be available on [`localhost:8888`](http://localhost:8888).
 
 ### Generate code coverage
 
