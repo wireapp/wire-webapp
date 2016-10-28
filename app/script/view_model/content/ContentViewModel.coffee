@@ -63,6 +63,7 @@ class z.ViewModel.content.ContentViewModel
           @preferences_devices.update_fingerprint()
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
           @preferences_options.initiate_media_stream()
+          .then (audio_stream) => @preferences_options.initiate_audio_meter audio_stream
         else
           @conversation_input.removed_from_view()
           @conversation_titlebar.removed_from_view()

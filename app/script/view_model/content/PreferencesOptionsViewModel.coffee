@@ -33,6 +33,13 @@ class z.ViewModel.content.PreferencesOptionsViewModel
     @audio_stream = @media_stream_handler.local_media_streams.audio
     @video_stream = @media_stream_handler.local_media_streams.video
 
+    @audio_stream.subscribe (audio_stream) =>
+      @initiate_audio_meter audio_stream if audio_stream
+
+    @audio_context = undefined
+    @audio_level = ko.observable 0
+    @audio_script = undefined
+
     @option_data = ko.observable()
     @option_data.subscribe (data_preference) => @user_properties_repository.save_preference_data data_preference
 
@@ -61,18 +68,40 @@ class z.ViewModel.content.PreferencesOptionsViewModel
 
   # Initiate the MediaStream.
   initiate_media_stream: =>
-    return if @audio_stream() and @video_stream()
+    return Promise.resolve @audio_stream() if @audio_stream() and @video_stream()
+
     @media_stream_handler.get_media_stream_constraints @available_devices.audio_input().length, @available_devices.video_input().length
     .then ([media_type, media_stream_constraints]) =>
       return @media_stream_handler.request_media_stream media_type, media_stream_constraints
     .then (media_stream_info) =>
       @media_stream_handler.local_media_type z.calling.enum.MediaType.VIDEO if @available_devices.video_input().length
-      return @media_stream_handler.set_local_media_stream media_stream_info
+      @media_stream_handler.set_local_media_stream media_stream_info
+      return @audio_stream()
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Requesting MediaStream failed: #{error.name}", error
       throw error
 
+  initiate_audio_meter: (audio_stream) =>
+    @audio_context = @call_center.audio_repository.get_audio_context()
+    @audio_script = @audio_context.createScriptProcessor 2048, 1, 1
+
+    @audio_script.onaudioprocess = (audio_processing_event) =>
+      inputs = audio_processing_event.inputBuffer.getChannelData 0
+      level = 0.0
+      for input in inputs
+        level += input * input
+      @audio_level (Math.sqrt level / inputs.length) * 3
+
+    @audio_source = @audio_context.createMediaStreamSource audio_stream
+    @audio_source.connect @audio_script
+    @audio_script.connect @audio_context.destination
+
+  release_audio_meter: =>
+    @audio_source.disconnect()
+    @audio_script.disconnect()
+
   release_media_streams: =>
+    @release_audio_meter()
     @media_stream_handler.reset_media_streams()
 
   update_properties: (properties) =>
