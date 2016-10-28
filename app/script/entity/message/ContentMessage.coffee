@@ -94,7 +94,7 @@ class z.entity.ContentMessage extends z.entity.Message
 
     if reactions isnt @reactions
       @reactions reactions
-      @increment_version()
+      @version = @version + 1
       return {reactions: @reactions(), version: @version}
 
   ###

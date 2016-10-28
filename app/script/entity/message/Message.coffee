@@ -215,9 +215,6 @@ class z.entity.Message
   is_reactable: ->
     return @is_content() and @status() isnt z.message.StatusType.SENDING and not @is_ephemeral()
 
-  increment_version: =>
-    @version = @version + 1
-
   ###
   Update the status of a message.
   @param update_status [z.message.StatusType] New status of message
