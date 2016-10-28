@@ -98,14 +98,10 @@ class z.assets.AssetRemoteData
   @returns [String] url
   ###
   get_object_url: =>
-    object_url = z.assets.AssetObjectURLCache.get_url @identifier
+    object_url = z.assets.AssetURLCache.get_url @identifier
     return Promise.resolve object_url if object_url?
 
-    @load()
-    .then (blob) =>
-      object_url = window.URL.createObjectURL blob
-      z.assets.AssetObjectURLCache.set_url @identifier, object_url
-      return object_url
+    @load().then (blob) => z.assets.AssetURLCache.set_url @identifier, window.URL.createObjectURL(blob)
 
   _load_buffer: =>
     z.util.load_url_buffer @generate_url(), (xhr) =>

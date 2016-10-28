@@ -19,18 +19,19 @@
 window.z ?= {}
 z.assets ?= {}
 
-# TODO use a more elaborated cache
-z.assets.AssetObjectURLCache = do ->
-  url_cache = {}
+z.assets.AssetURLCache = do ->
+  lru_cache = new LRUCache 100
 
   set_url = (identifier, url) ->
-    url_cache[identifier] = url
+    removed_entry = lru_cache.put identifier, url
+    if removed_entry?
+      window.URL.revokeObjectURL removed_entry.value
+    return url
 
   get_url = (identifier) ->
-    return url_cache[identifier]
+    return lru_cache.get identifier
 
   return {
     get_url: get_url
     set_url: set_url
   }
-
