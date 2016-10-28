@@ -57,10 +57,10 @@ class z.components.UserAvatar
       params.click? data.user, event.currentTarget.parentNode
 
     @picture_preview_subscription = ko.computed =>
-      @user.preview_picture_resource()?.load()
-      .then (blob) =>
+      @user.preview_picture_resource()?.get_object_url()
+      .then (url) =>
         image = new Image()
-        image.src = window.URL.createObjectURL blob
+        image.src = url
         @avatar_image = @element.find '.user-avatar-image'
         @avatar_image.empty().append image
         @element.addClass 'user-avatar-image-loaded user-avatar-loading-transition'

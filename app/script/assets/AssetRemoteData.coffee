@@ -32,6 +32,7 @@ class z.assets.AssetRemoteData
     @download_progress = ko.observable()
     @cancel_download = undefined
     @generate_url = undefined
+    @identifier = undefined
 
   ###
   Static initializer for v3 assets
@@ -44,6 +45,7 @@ class z.assets.AssetRemoteData
   @v3: (asset_key, otr_key, sha256, asset_token) ->
     remote_data = new z.assets.AssetRemoteData otr_key, sha256
     remote_data.generate_url = -> wire.app.service.asset.generate_asset_url_v3 asset_key, asset_token
+    remote_data.identifier = "#{asset_key}"
     return remote_data
 
   ###
@@ -57,6 +59,7 @@ class z.assets.AssetRemoteData
   @v2: (conversation_id, asset_id, otr_key, sha256) ->
     remote_data = new z.assets.AssetRemoteData otr_key, sha256
     remote_data.generate_url = -> wire.app.service.asset.generate_asset_url_v2 asset_id, conversation_id
+    remote_data.identifier = "#{conversation_id}#{asset_id}"
     return remote_data
 
   ###
@@ -69,6 +72,7 @@ class z.assets.AssetRemoteData
   @v1: (conversation_id, asset_id) ->
     remote_data = new z.assets.AssetRemoteData()
     remote_data.generate_url = -> wire.app.service.asset.generate_asset_url asset_id, conversation_id
+    remote_data.identifier = "#{conversation_id}#{asset_id}"
     return remote_data
 
   ###
@@ -87,6 +91,21 @@ class z.assets.AssetRemoteData
       return buffer
     .then (buffer) ->
       return new Blob [new Uint8Array buffer], type: type
+
+  ###
+  Get object url for asset remote data. URLs are cached in memory
+
+  @returns [String] url
+  ###
+  get_object_url: =>
+    object_url = z.assets.AssetObjectURLCache.get_url @identifier
+    return Promise.resolve object_url if object_url?
+
+    @load()
+    .then (blob) =>
+      object_url = window.URL.createObjectURL blob
+      z.assets.AssetObjectURLCache.set_url @identifier, object_url
+      return object_url
 
   _load_buffer: =>
     z.util.load_url_buffer @generate_url(), (xhr) =>
