@@ -95,22 +95,4 @@ class z.user.UserMapper
       if data.picture[1]?
         user_et.medium_picture_resource z.assets.AssetRemoteData.v1 user_et.id, data.picture[1].id
 
-    if data.picture?[0]?
-      preview_picture = data.picture[0]
-
-      if preview_picture.info.public isnt true
-        @logger.log @logger.levels.WARN, "User ID \"#{user_et.id}\" has a private profile picture."
-
-      url = @asset_service.generate_asset_url preview_picture.id, user_et.id
-      user_et.picture_preview "url('#{url}')"
-
-    if data.picture?[1]?
-      medium_picture = data.picture[1]
-
-      if medium_picture.info.public isnt true
-        @logger.log @logger.levels.WARN, "User ID \"#{user_et.id}\" has a private medium picture."
-
-      url = @asset_service.generate_asset_url medium_picture.id, user_et.id
-      user_et.picture_medium "url('#{url}')"
-
     return user_et

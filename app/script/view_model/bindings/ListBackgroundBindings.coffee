@@ -18,12 +18,6 @@
 
 ko.bindingHandlers.switch_background = do ->
 
-  # next background image element that will be displayed
-  next_image = undefined
-
-  # url of the current background
-  current_image_url = undefined
-
   animation = (last, next) ->
     window.requestAnimationFrame ->
       next
@@ -31,9 +25,9 @@ ko.bindingHandlers.switch_background = do ->
         .one z.util.alias.animationend, last.remove
 
   update: (element, valueAccessor) ->
-    user_image = ko.unwrap valueAccessor()
+    image_resource = ko.unwrap valueAccessor()
 
-    return if not user_image? or user_image is current_image_url
+    return if not image_resource?
 
     background_images = $(element).find('.background')
 
@@ -45,23 +39,15 @@ ko.bindingHandlers.switch_background = do ->
     background_next = background_last.clone()
     background_next.css 'opacity': '0'
     background_next.insertAfter background_last
-    next_image = background_next
 
-    if user_image
-      image = new Image()
-      image.onload = ->
-        # check if it was the last scheduled image
-        if next_image is background_next
-          current_image_url = user_image
-          background_next
-            .removeClass 'no-background-image'
-            .find '.background-image'
-            .css 'background-image': user_image
-          animation background_last, background_next
-        else
-          background_next.remove()
-
-      image.src = z.util.strip_url_wrapper user_image
+    if image_resource
+      image_resource.load()
+      .then (blob) ->
+        background_next
+          .removeClass 'no-background-image'
+          .find '.background-image'
+          .css 'background-image': "url(#{window.URL.createObjectURL blob})"
+        animation background_last, background_next
     else
       background_next.addClass 'no-background-image'
       animation background_last, background_next
