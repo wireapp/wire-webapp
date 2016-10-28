@@ -249,11 +249,7 @@ class z.main.App
           .then =>
             if not user_et.picture_medium().length
               @view.list.first_run true
-              z.util.load_url_blob z.config.UNSPLASH_URL, (blob) =>
-                @repository.user.change_picture blob, ->
-                  amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
-                    source: 'unsplash'
-                    outcome: 'success'
+              @repository.user.set_default_picture()
             resolve user_et
       .catch (error) =>
         if not error instanceof z.storage.StorageError
