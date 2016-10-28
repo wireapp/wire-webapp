@@ -44,10 +44,8 @@ ko.bindingHandlers.switch_background = do ->
       image_resource.load()
       .then (blob) ->
         background_next
-          .removeClass 'no-background-image'
           .find '.background-image'
           .css 'background-image': "url(#{window.URL.createObjectURL blob})"
         animation background_last, background_next
     else
-      background_next.addClass 'no-background-image'
       animation background_last, background_next
