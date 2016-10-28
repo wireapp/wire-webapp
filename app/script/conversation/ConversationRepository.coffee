@@ -1873,7 +1873,7 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation entity that a message was reacted upon in
   @param event_json [Object] JSON data of 'conversation.reaction' event
   ###
-  _on_reaction: (conversation_et, event_json) ->
+  _on_reaction: (conversation_et, event_json, attempt = 1) ->
     @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
     .then (message_et) =>
       changes = message_et.update_reactions event_json
@@ -1884,9 +1884,14 @@ class z.conversation.ConversationRepository
         return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
     .catch (error) =>
       if error.type is z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
-        @_on_reaction conversation_et, event_json
+        if attempt < 10
+          window.setTimeout =>
+            @_on_reaction conversation_et, event_json
+          , 10 * attempt
+        else
+          @logger.log @logger.levels.INFO, "Failed to update reaction of message in conversation '#{conversation_et.id}'", error
       else if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-        @logger.log "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
+        @logger.log @logger.levels.INFO, "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
         throw error
 
   ###
