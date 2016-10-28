@@ -25,9 +25,11 @@
 
       <!-- ko if: tab_index() === 0 -->
         <div class="user-profile-details">
-          <div class="user-profile-avatar round-bordered-image" data-bind="style: {'backgroundImage': user().picture_preview_url()}, css: {'grayscale': show_gray_image()}" data-uie-name="status-profile-picture"></div>
+          <!-- ko if: render_avatar -->
+            <user-avatar class="image user-avatar-lg cursor-default" params="user: user" data-uie-name="status-profile-picture"></user-avatar>
+          <!-- /ko -->
           <!-- ko if: render_common_contacts() -->
-            <common-contacts class="user-profile-contacts" params="{user: user}"></common-contacts>
+            <common-contacts class="user-profile-contacts" params="user: user"></common-contacts>
           <!-- /ko -->
         </div>
       <!-- /ko -->
