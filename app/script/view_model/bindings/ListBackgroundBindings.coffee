@@ -18,12 +18,6 @@
 
 ko.bindingHandlers.switch_background = do ->
 
-  animation = (last, next) ->
-    window.requestAnimationFrame ->
-      next
-        .css 'opacity': '1'
-        .one z.util.alias.animationend, last.remove
-
   update: (element, valueAccessor) ->
     image_resource = ko.unwrap valueAccessor()
 
@@ -40,12 +34,13 @@ ko.bindingHandlers.switch_background = do ->
     background_next.css 'opacity': '0'
     background_next.insertAfter background_last
 
-    if image_resource
-      image_resource.load()
-      .then (blob) ->
+    image_resource.load()
+    .then (blob) ->
+      background_next
+      .find '.background-image'
+      .css 'background-image': "url(#{window.URL.createObjectURL blob})"
+
+      window.requestAnimationFrame ->
         background_next
-          .find '.background-image'
-          .css 'background-image': "url(#{window.URL.createObjectURL blob})"
-        animation background_last, background_next
-    else
-      animation background_last, background_next
+        .css 'opacity': '1'
+        .one z.util.alias.animationend, background_last.remove
