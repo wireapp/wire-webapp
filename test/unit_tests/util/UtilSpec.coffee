@@ -916,3 +916,19 @@ describe 'z.util.add_http', ->
   it 'does not add https if present', ->
     url = 'https://wire.com/'
     expect(z.util.add_http url).toBe 'https://wire.com/'
+
+describe 'z.util.compare_names', ->
+  it 'René equals Rene', ->
+    expect(z.util.compare_names('René', 'Rene')).toBeTruthy()
+
+  it 'Παναγιὡτα equals Panagiota', ->
+    expect(z.util.compare_names('Παναγιὡτα', 'Panagiota')).toBeTruthy()
+
+  it 'ΠΑΝΑΓΙΩΤΑ equals PANAGIOTA', ->
+    expect(z.util.compare_names('ΠΑΝΑΓΙΩΤΑ', 'PANAGIOTA')).toBeTruthy()
+
+  it 'Björn equals Bjorn', ->
+    expect(z.util.compare_names('Björn', 'Bjorn')).toBeTruthy()
+
+  it 'Bjørn equals Bjorn', ->
+    expect(z.util.compare_names('Bjørn', 'Bjorn')).toBeTruthy()
