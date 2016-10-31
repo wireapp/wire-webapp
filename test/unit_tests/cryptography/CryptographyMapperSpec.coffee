@@ -92,7 +92,9 @@ describe 'z.cryptography.CryptographyMapper', ->
       uploaded =
         otr_key: new Uint8Array [1, 2]
         sha256: new Uint8Array [3, 4]
-      uploaded_asset = new z.proto.Asset.RemoteData uploaded.otr_key, uploaded.sha256
+        key: z.util.create_random_uuid()
+        token: z.util.create_random_uuid()
+      uploaded_asset = new z.proto.Asset.RemoteData uploaded.otr_key, uploaded.sha256, uploaded.key, uploaded.token
       asset = new z.proto.Asset()
       asset.set 'uploaded', uploaded_asset
 
@@ -108,6 +110,8 @@ describe 'z.cryptography.CryptographyMapper', ->
         expect(event_json.time).toBe event.time
         expect(event_json.id).toBe generic_message.message_id
         expect(event_json.data.id).toBe event.data.id
+        expect(event_json.data.key).toBe uploaded.key
+        expect(event_json.data.token).toBe uploaded.token
         done()
       .catch done.fail
 
