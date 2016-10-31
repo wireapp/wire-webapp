@@ -411,20 +411,20 @@ class z.conversation.EventMapper
 
   @return [z.entity.MediumImage] File asset entity
   ###
-  _map_asset_file: (data) ->
-    asset_et = new z.entity.File data.data.id
-    asset_et.correlation_id = data.data.info.correlation_id
-    asset_et.conversation_id = data.conversation
+  _map_asset_file: (event) ->
+    asset_et = new z.entity.File event.data.id
+    asset_et.correlation_id = event.data.info.correlation_id
+    asset_et.conversation_id = event.conversation
 
     # original
-    asset_et.file_size = data.data.content_length
-    asset_et.file_type = data.data.content_type
-    asset_et.file_name = data.data.info.name
-    asset_et.meta = data.data.meta
-    asset_et.original_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, asset_et.id, data.data.otr_key, data.data.sha256,
-    if data.data.preview_id?
-      asset_et.preview_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, data.data.preview_id, data.data.preview_otr_key, data.data.preview_sha256
-    asset_et.status data.data.status or z.assets.AssetTransferState.UPLOADING # TODO
+    asset_et.file_size = event.data.content_length
+    asset_et.file_type = event.data.content_type
+    asset_et.file_name = event.data.info.name
+    asset_et.meta = event.data.meta
+    asset_et.original_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, asset_et.id, event.data.otr_key, event.data.sha256,
+    if event.data.preview_id?
+      asset_et.preview_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, event.data.preview_id, event.data.preview_otr_key, event.data.preview_sha256
+    asset_et.status event.data.status or z.assets.AssetTransferState.UPLOADING # TODO
     return asset_et
 
   ###
