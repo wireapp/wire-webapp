@@ -577,6 +577,15 @@ class z.user.UserRepository
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Error during profile image upload: #{error.message}", error
 
+  ###
+  Set users default profile image.
+  ###
+  set_default_picture: ->
+    z.util.load_url_blob z.config.UNSPLASH_URL, (blob) =>
+      @change_picture blob, ->
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
+          source: 'unsplash'
+          outcome: 'success'
 
   ###############################################################################
   # Properties

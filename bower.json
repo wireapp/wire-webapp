@@ -11,6 +11,7 @@
     "iframeTracker-jquery": "https://github.com/vincepare/iframeTracker-jquery.git#1.1.0",
     "jquery": "https://github.com/jquery/jquery.git#2.1.4",
     "keyboardjs": "https://github.com/RobertWHurst/KeyboardJS.git#2.2.1",
+    "lru-ts": "https://github.com/wireapp/lru-ts.git#321024a90dd82a3379864382f4e16908c3ff8467",
     "knockout": "https://github.com/knockout/knockout.git#3.4.0",
     "moment": "https://github.com/moment/moment.git#2.13.0",
     "normalize-css": "https://github.com/necolas/normalize.css.git#3.0.3",
@@ -79,6 +80,9 @@
     },
     "knockout": {
       "js": "dist/knockout.debug.js"
+    },
+    "lru-ts": {
+      "js": "dist/global/lru-ts.js"
     },
     "moment": {
       "js": ["moment.js", "locale/de.js"]
