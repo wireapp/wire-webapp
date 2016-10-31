@@ -79,9 +79,11 @@ describe 'z.announce.AnnounceService', ->
       server.restore()
 
     it 'can fetch an announcement', (done) ->
-      announce_service.fetch (result) ->
+      announce_service.get_announcements()
+      .then (result) ->
         expect(result.length).toBe 2
         done()
+      .catch done.fail
 
   describe 'Failed calls', ->
     beforeEach ->
@@ -93,6 +95,8 @@ describe 'z.announce.AnnounceService', ->
       server.restore()
 
     it 'cannot fetch an announcement', (done) ->
-      announce_service.fetch (result) ->
-        expect(result).toBe undefined
+      announce_service.get_announcements()
+      .then done.fail
+      .catch (error) ->
+        expect(error.message).toBe 'Not Found'
         done()
