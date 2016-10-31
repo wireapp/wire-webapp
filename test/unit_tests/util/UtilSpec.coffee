@@ -921,8 +921,8 @@ describe 'z.util.compare_names', ->
   it 'René equals Rene', ->
     expect(z.util.compare_names('René', 'Rene')).toBeTruthy()
 
-  it 'Παναγιὡτα equals Panagiota', ->
-    expect(z.util.compare_names('Παναγιὡτα', 'Panagiota')).toBeTruthy()
+  it 'Παναγιώτα equals Panagiota', ->
+    expect(z.util.compare_names('Παναγιώτα', 'Panagiota')).toBeTruthy()
 
   it 'ΠΑΝΑΓΙΩΤΑ equals PANAGIOTA', ->
     expect(z.util.compare_names('ΠΑΝΑΓΙΩΤΑ', 'PANAGIOTA')).toBeTruthy()
