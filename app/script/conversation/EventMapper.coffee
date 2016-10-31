@@ -422,16 +422,19 @@ class z.conversation.EventMapper
     asset_et.file_name = event.data.info.name
     asset_et.meta = event.data.meta
 
-    # remote data
+    # remote data - full
     if event.data.key
       {key, otr_key, sha256, token} = event.data
-      asset_et.original_resource z.assets.AssetRemoteData.v3 key, otr_key, sha256, token,
-      if event.data.preview_id?
-        {preview_key, preview_otr_key, preview_sha256, preview_token} = event.data
-        asset_et.preview_resource z.assets.AssetRemoteData.v3 preview_key, preview_otr_key, preview_sha256, preview_token
+      asset_et.original_resource z.assets.AssetRemoteData.v3 key, otr_key, sha256, token
     else
       asset_et.original_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, asset_et.id, event.data.otr_key, event.data.sha256,
-      if event.data.preview_id?
+
+    # remote data - preview
+    if event.data.preview_id?
+      if event.data.key
+        {preview_key, preview_otr_key, preview_sha256, preview_token} = event.data
+        asset_et.preview_resource z.assets.AssetRemoteData.v3 preview_key, preview_otr_key, preview_sha256, preview_token
+      else
         asset_et.preview_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, event.data.preview_id, event.data.preview_otr_key, event.data.preview_sha256
 
     asset_et.status event.data.status or z.assets.AssetTransferState.UPLOADING # TODO
