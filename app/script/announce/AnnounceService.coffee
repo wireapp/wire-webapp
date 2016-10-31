@@ -26,10 +26,10 @@ class z.announce.AnnounceService
     @url += '&production=true' if z.util.Environment.frontend.is_production()
     return @
 
-  fetch: (callback) ->
-    $.get @url
-    .done (data, textStatus, jqXHR) ->
-      callback? data['result']
-    .fail (jqXHR, textStatus, errorThrown) =>
-      @logger.log @logger.levels.ERROR, 'Failed to fetch announcements', errorThrown
-      callback?()
+  get_announcements: ->
+    return new Promise (resolve, reject) =>
+      $.get @url
+      .done (data) ->
+        resolve data['result']
+      .fail (jqXHR, textStatus, errorThrown) ->
+        reject new Error errorThrown
