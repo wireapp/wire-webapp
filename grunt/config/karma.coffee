@@ -27,7 +27,7 @@ module.exports =
       {pattern: 'worker/*.js', included: false, served: true, nocache: true}
       # helper files
       '../node_modules/jasmine-ajax/lib/mock-ajax.js'
-      '../node_modules/sinon/pkg/sinon-1.17.6.js'
+      '../node_modules/sinon/pkg/sinon.js'
       '../test/api/environment.js'
       '../test/api/payloads.js'
       '../test/api/SDP_payloads.js'
