@@ -43,6 +43,7 @@ class z.conversation.ConversationRepository
     @block_event_handling = true
     @fetching_conversations = {}
     @has_initialized_participants = false
+    @use_v3_api = false
 
     @self_conversation = ko.pureComputed =>
       return @find_conversation_by_id @user_repository.self().id if @user_repository.self()
@@ -868,6 +869,8 @@ class z.conversation.ConversationRepository
 
   ###
   Sends image asset in specified conversation.
+
+  @deprecated # TODO: remove once support for v2 ends
   @param conversation_et [z.entity.Conversation] Conversation to send image in
   @param image [File, Blob]
   ###
@@ -897,6 +900,25 @@ class z.conversation.ConversationRepository
           throw error
 
         return saved_event
+
+  ###
+  Sends image asset in specified conversation using v3 api.
+  @param conversation_et [z.entity.Conversation] Conversation to send image in
+  @param image [File, Blob]
+  ###
+  send_image_asset_v3: (conversation_et, image) =>
+    @asset_service.upload_image_asset image
+    .then (asset) =>
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'asset', asset
+      if conversation_et.ephemeral_timer()
+        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
+      @_send_and_inject_generic_message conversation_et, generic_message
+      .then =>
+        @_track_completed_media_action conversation_et, generic_message
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Failed to upload otr asset for conversation #{conversation_et.id}", error
+      throw error
 
   ###
   Send knock in specified conversation.
@@ -1246,6 +1268,7 @@ class z.conversation.ConversationRepository
   ###
   Sends otr asset to a conversation.
 
+  @deprecated # TODO: remove once support for v2 ends
   @private
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
@@ -1294,7 +1317,11 @@ class z.conversation.ConversationRepository
   ###
   upload_images: (conversation_et, images) =>
     return if not @_can_upload_assets_to_conversation conversation_et
-    @send_image_asset conversation_et, image for image in images
+    for image in images
+      if @use_v3_api
+        @send_image_asset_v3 conversation_et, image
+      else
+        @send_image_asset conversation_et, image
 
   ###
   Post files to a conversation.

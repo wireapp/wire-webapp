@@ -212,7 +212,7 @@ class z.assets.AssetService
   ###
   Post assets to a conversation.
 
-  @deprecated
+  @deprecated # TODO: remove once support for v2 ends
   @param conversation_id [String] ID of the self conversation
   @param json_payload [Object] First part of the multipart message
   @param image_data [Uint8Array|ArrayBuffer] encrypted image data

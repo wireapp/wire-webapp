@@ -27,3 +27,4 @@ z.auth.URLParameter =
   INVITE: 'invite'
   LOCALE: 'hl'
   LOCALYTICS: 'localytics'
+  V3: 'v3'
