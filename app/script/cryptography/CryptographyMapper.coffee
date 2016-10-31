@@ -146,6 +146,8 @@ class z.cryptography.CryptographyMapper
         id: event_id
         otr_key: new Uint8Array preview.remote.otr_key?.toArrayBuffer()
         sha256: new Uint8Array preview.remote.sha256?.toArrayBuffer()
+        key: preview.remote.asset_id
+        token: preview.remote.asset_token
       type: z.event.Client.CONVERSATION.ASSET_PREVIEW
     }
 
@@ -155,6 +157,8 @@ class z.cryptography.CryptographyMapper
         id: event_id
         otr_key: new Uint8Array uploaded.otr_key?.toArrayBuffer()
         sha256: new Uint8Array uploaded.sha256?.toArrayBuffer()
+        key: uploaded.asset_id
+        token: uploaded.asset_token
       type: z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE
     }
 

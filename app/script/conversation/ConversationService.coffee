@@ -214,6 +214,8 @@ class z.conversation.ConversationService
       record.data.id = asset_data.id
       record.data.otr_key = asset_data.otr_key
       record.data.sha256 = asset_data.sha256
+      record.data.key = asset_data.key
+      record.data.token = asset_data.token
       record.data.status = z.assets.AssetTransferState.UPLOADED
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
@@ -229,6 +231,8 @@ class z.conversation.ConversationService
       record.data.preview_id = asset_data.id
       record.data.preview_otr_key = asset_data.otr_key
       record.data.preview_sha256 = asset_data.sha256
+      record.data.preview_key = asset_data.key
+      record.data.preview_token = asset_data.token
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
       @logger.log 'Updated asset message_et (preview)', primary_key
