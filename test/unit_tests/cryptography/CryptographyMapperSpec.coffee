@@ -93,8 +93,8 @@ describe 'z.cryptography.CryptographyMapper', ->
         otr_key: new Uint8Array [1, 2]
         sha256: new Uint8Array [3, 4]
         key: z.util.create_random_uuid()
-        token: z.util.create_random_uuid
-      uploaded_asset = new z.proto.Asset.RemoteData uploaded.otr_key, uploaded.sha256, key, token
+        token: z.util.create_random_uuid()
+      uploaded_asset = new z.proto.Asset.RemoteData uploaded.otr_key, uploaded.sha256, uploaded.key, uploaded.token
       asset = new z.proto.Asset()
       asset.set 'uploaded', uploaded_asset
 
