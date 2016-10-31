@@ -25,10 +25,11 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 ## Build instructions
 
 1. Install [Node.js](https://nodejs.org/)
-1. Run `npm init`
-1. Run `grunt`
+2. Run `npm init`
+3. Run `grunt`
 
-After executing `grunt`, Wire's web app will be available at [`localhost:8888`](http://localhost:8888).
+After executing `grunt`, Wire's web app will be available at:
+- [http://localhost:8888/auth/?env=prod#login](http://localhost:8888/auth/?env=prod#login)
 
 ### Generate code coverage
 
