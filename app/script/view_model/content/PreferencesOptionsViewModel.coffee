@@ -38,7 +38,7 @@ class z.ViewModel.content.PreferencesOptionsViewModel
 
     @audio_context = undefined
     @audio_level = ko.observable 0
-    @audio_script = undefined
+    @audio_interval = undefined
 
     @option_data = ko.observable()
     @option_data.subscribe (data_preference) => @user_properties_repository.save_preference_data data_preference
@@ -86,39 +86,28 @@ class z.ViewModel.content.PreferencesOptionsViewModel
 
     @audio_analyser = @audio_context.createAnalyser()
     @audio_analyser.fftSize = 1024
-    @audio_analyser.smoothingTimeConstant = 0.1
+    @audio_analyser.smoothingTimeConstant = 0.2
 
-    @audio_script = @audio_context.createScriptProcessor 1024, 1, 1
-
-    @audio_script.onaudioprocess = =>
-      ###
-      inputs = audio_processing_event.inputBuffer.getChannelData 0
-      level = 0.0
-      for input in inputs
-        level += input * input
-      current_level = (Math.sqrt level / inputs.length) * 3
-      new_audio_level = 0.9 * @audio_level() + 0.1 * current_level
-      @audio_level new_audio_level
-      ###
+    @audio_interval = window.setInterval =>
       data_array = new Float32Array @audio_analyser.frequencyBinCount
-      @audio_analyser.getFloatTimeDomainData data_array
-      console.log data_array.length
+      @audio_analyser.getFloatFrequencyData data_array
+      volume = 0
+      # Data is in the db range of -100 to -30, but can also be -Infinity. We normalize the value up to -50 to the range of 0, 1.
+      for data in data_array
+        volume += Math.abs(Math.max(data, -100) + 100) / 50
 
-      max_value = 0
-      max_value = Math.max data, max_value for data in data_array
-      new_audio_level = 0.9 * @audio_level() + 0.1 * max_value
-      console.log new_audio_level
+      average_volume = volume / data_array.length
 
-      @audio_level new_audio_level
+      @audio_level average_volume - 0.075
+    , 100
 
     @audio_source = @audio_context.createMediaStreamSource audio_stream
     @audio_source.connect @audio_analyser
-    @audio_source.connect @audio_script
-    @audio_script.connect @audio_context.destination
 
   release_audio_meter: =>
     @audio_source.disconnect()
-    @audio_script.disconnect()
+    window.clearInterval @audio_interval
+    @audio_interval = undefined
 
   release_media_streams: =>
     @release_audio_meter()
