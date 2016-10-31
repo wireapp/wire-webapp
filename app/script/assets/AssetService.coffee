@@ -118,12 +118,27 @@ class z.assets.AssetService
     .then ([key_bytes, sha256, ciphertext]) =>
       return @post_asset_v3 ciphertext, options
       .then ({key, token}) ->
-        return [key_bytes, sha256, key, token]
+        asset = new z.proto.Asset()
+        asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token
+        return asset
 
   ###
-  Upload image the new asset api v3. Promise will resolve with z.proto.Asset instance.
-  In case of an successful upload the uploaded property is set. Otherwise it will be marked as not
-  uploaded.
+  Upload file using the new asset api v3. Promise will resolve with z.proto.Asset instance.
+  In case of an successful upload the uploaded property is set.
+
+  @param file [File, Blob]
+  @param options [Object]
+  @option public [Boolean]
+  @option retention [z.assets.AssetRetentionPolicy]
+  ###
+  upload_asset: (file, options) ->
+    z.util.load_file_buffer file
+    .then (buffer) =>
+      @_upload_asset buffer, options
+
+  ###
+  Upload image using the new asset api v3. Promise will resolve with z.proto.Asset instance.
+  In case of an successful upload the uploaded property is set.
 
   @param image [File, Blob]
   @param options [Object]
