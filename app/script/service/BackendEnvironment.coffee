@@ -20,6 +20,5 @@ window.z ?= {}
 z.service ?= {}
 
 z.service.BackendEnvironment =
-  EDGE: 'edge'
   PRODUCTION: 'production'
   STAGING: 'staging'
