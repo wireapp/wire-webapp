@@ -29,7 +29,7 @@ $ ->
     settings.parameter = '?env=staging' if env?
   else
     settings =
-      environment: z.service.BackendEnvironment.PRODUCTIONRem
+      environment: z.service.BackendEnvironment.PRODUCTION
       rest_url: 'https://prod-nginz-https.wire.com'
       web_socket_url: 'wss://prod-nginz-ssl.wire.com'
 
