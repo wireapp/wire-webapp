@@ -18,7 +18,26 @@
 
 describe 'z.assets.AssetRemoteData', ->
 
-  describe 'load', ->
+  describe 'load unencrypted asset', ->
+
+    remote_data = null
+    video_bytes = new Uint8Array([1,2,3,4])
+    video_type = 'video/mp4'
+
+    beforeEach ->
+      conversation_id = z.util.create_random_uuid()
+      asset_id = z.util.create_random_uuid()
+      remote_data = z.assets.AssetRemoteData.v1 conversation_id, asset_id
+      spyOn(remote_data, '_load_buffer').and.returnValue Promise.resolve video_bytes.buffer
+
+    it 'should load and decrypt asset', (done) ->
+      remote_data.load()
+      .then (blob) ->
+        expect(new Blob [video_bytes], type: video_type).toEqual blob
+        done()
+      .catch done.fail
+
+  describe 'load encrypted asset', ->
 
     remote_data = null
     video_bytes = new Uint8Array([1,2,3,4])
