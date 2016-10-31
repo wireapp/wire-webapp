@@ -24,7 +24,7 @@ class z.main.Auth
   Constructs objects needed for app authentication.
 
   @param [Object] settings Collection of URL settings
-  @option settings [String] environment Handle of the backend environment (staging, edge, etc.)
+  @option settings [String] environment Handle of the backend environment (staging, etc.)
   @option settings [String] web_socket_url URL to the backend's WebSocket
   @option settings [String] rest_url URL to the backend's REST service
   @option settings [String] parameter Additional parameters for the webapp's login URL

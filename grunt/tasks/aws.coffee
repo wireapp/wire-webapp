@@ -31,8 +31,6 @@ module.exports = (grunt) ->
         grunt.task.run 'prepare_prod'
       when 'staging'
         grunt.task.run 'prepare_staging'
-      else
-        grunt.task.run 'prepare_edge'
 
     version = grunt.option 'version'
 
