@@ -35,6 +35,7 @@ class z.user.UserRepository
 
     @connection_mapper = new z.user.UserConnectionMapper()
     @user_mapper = new z.user.UserMapper @asset_service
+    @use_v3_api = false
 
     @self = ko.observable()
     @users = ko.observableArray []
@@ -565,24 +566,52 @@ class z.user.UserRepository
   ###
   Change the profile image.
   @param picture [String, Object] New user picture
-  @param on_success [Function] Function to be executed on success
   ###
-  change_picture: (picture, on_success) ->
+  change_picture: (picture) ->
+    if @use_v3_api
+      @_set_picture_v3 picture
+    else
+      @_set_picture_v2 picture
+
+  ###
+  Set the profile image using v2 api.
+  @deprecated
+  @param picture [String, Object] New user picture
+  ###
+  _set_picture_v2: (picture) ->
     @asset_service.upload_profile_image @self().id, picture
     .then (upload_response) =>
       @user_service.update_own_user_profile {picture: upload_response}
       .then =>
         @user_update {user: {id: @self().id, picture: upload_response}}
-        on_success?()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Error during profile image upload: #{error.message}", error
+      throw new Error "Error during profile image upload: #{error.message}"
+
+  ###
+  Set the profile image using v3 api.
+  @deprecated
+  @param picture [String, Object] New user picture
+  ###
+  _set_picture_v3: (picture) ->
+    @asset_service.upload_profile_image_v3 picture
+    .then ([small_key, medium_key]) =>
+      assets = [
+        {key: small_key, type: 'image', size: 'preview'},
+        {key: medium_key, type: 'image', size: 'complete'}
+      ]
+      @user_service.update_own_user_profile assets: assets
+      .then =>
+        @user_update {user: {id: @self().id, assets: assets}}
+    .catch (error) =>
+      throw new Error "Error during profile image upload: #{error.message}"
 
   ###
   Set users default profile image.
   ###
   set_default_picture: ->
     z.util.load_url_blob z.config.UNSPLASH_URL, (blob) =>
-      @change_picture blob, ->
+      @change_picture blob
+      .then ->
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
           source: 'unsplash'
           outcome: 'success'

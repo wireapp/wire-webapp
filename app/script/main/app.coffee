@@ -266,6 +266,7 @@ class z.main.App
     v3_support = z.util.get_url_parameter z.auth.URLParameter.V3
     if v3_support
       @repository.conversation.use_v3_api = v3_support
+      @repository.user.use_v3_api = v3_support
 
   ###
   Check whether the page has been reloaded.

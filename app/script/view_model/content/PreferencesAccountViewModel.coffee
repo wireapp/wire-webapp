@@ -97,7 +97,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
     max_height = z.config.MINIMUM_PROFILE_IMAGE_SIZE.HEIGHT
     z.util.valid_profile_image_size input_picture, max_width, max_height, (valid) =>
       if valid
-        @user_repository.change_picture input_picture, callback
+        @user_repository.change_picture(input_picture).then callback
       else
         @_show_upload_warning warning_min_size, callback
 
