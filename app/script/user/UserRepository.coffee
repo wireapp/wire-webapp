@@ -584,7 +584,7 @@ class z.user.UserRepository
       @user_service.update_own_user_profile {picture: upload_response}
       .then =>
         @user_update {user: {id: @self().id, picture: upload_response}}
-    .catch (error) =>
+    .catch (error) ->
       throw new Error "Error during profile image upload: #{error.message}"
 
   ###
@@ -602,7 +602,7 @@ class z.user.UserRepository
       @user_service.update_own_user_profile assets: assets
       .then =>
         @user_update {user: {id: @self().id, assets: assets}}
-    .catch (error) =>
+    .catch (error) ->
       throw new Error "Error during profile image upload: #{error.message}"
 
   ###
