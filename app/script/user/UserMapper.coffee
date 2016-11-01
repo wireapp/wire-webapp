@@ -88,14 +88,14 @@ class z.user.UserMapper
     if data.accent_id? and data.accent_id isnt 0
       user_et.accent_id data.accent_id
 
-    if data.assets?
+    if data.assets?.length > 0
 
       if data.assets[0]?
         user_et.preview_picture_resource z.assets.AssetRemoteData.v3 data.assets[0].key
       if data.assets[1]?
         user_et.medium_picture_resource z.assets.AssetRemoteData.v3 data.assets[1].key
 
-    else if data.picture?
+    else if data.picture?.length > 0
 
       if data.picture[0]?
         user_et.preview_picture_resource z.assets.AssetRemoteData.v1 user_et.id, data.picture[0].id
