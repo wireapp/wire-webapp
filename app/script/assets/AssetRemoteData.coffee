@@ -90,7 +90,7 @@ class z.assets.AssetRemoteData
         return z.assets.AssetCrypto.decrypt_aes_asset buffer, @otr_key.buffer, @sha256.buffer
       return buffer
     .then (buffer) ->
-      return new Blob [new Uint8Array buffer], type: 'image/jpg'
+      return new Blob [new Uint8Array buffer], type: type
 
   ###
   Get object url for asset remote data. URLs are cached in memory

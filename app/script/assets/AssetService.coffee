@@ -180,6 +180,7 @@ class z.assets.AssetService
   ###
   Generates the URL an asset can be downloaded from.
 
+  @deprecated
   @param asset_id [String] ID of the asset
   @param conversation_id [String] ID of the conversation the asset belongs to
   @return [String] Asset URL
@@ -192,6 +193,7 @@ class z.assets.AssetService
   ###
   Generates the URL for asset api v2.
 
+  @deprecated
   @param asset_id [String] ID of the asset
   @param conversation_id [String] ID of the conversation the asset belongs to
   @return [String] Asset URL
@@ -243,7 +245,7 @@ class z.assets.AssetService
   ###
   Post assets to a conversation.
 
-  @deprecated # TODO: remove once support for v2 ends
+  @deprecated
   @param conversation_id [String] ID of the self conversation
   @param json_payload [Object] First part of the multipart message
   @param image_data [Uint8Array|ArrayBuffer] encrypted image data
@@ -325,6 +327,8 @@ class z.assets.AssetService
 
   ###
   Create image proto message.
+
+  @deprecated
   @param image [File, Blob]
   ###
   create_image_proto: (image) ->
@@ -346,6 +350,8 @@ class z.assets.AssetService
 
   ###
   Create asset proto message.
+
+  @deprecated
   @param asset [File, Blob]
   ###
   create_asset_proto: (asset) ->
