@@ -122,8 +122,6 @@ class z.assets.AssetService
         @_upload_asset small_image_bytes, {public: true}
         @_upload_asset medium_image_bytes, {public: true}
       ])
-    .then ([small_asset, medium_asset]) ->
-      return [small_asset.uploaded.asset_id, medium_asset.uploaded.asset_id]
 
   ###
   Upload arbitrary binary data using the new asset api v3.
