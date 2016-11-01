@@ -50,7 +50,6 @@ module.exports = (grunt) ->
   grunt.registerTask 'prepare_dist', [
     'clean:dist'
     'coffee:dist'
-    'coffee:dist_init'
     'less:dist'
     'postcss:distribution'
     'copy:dist'
@@ -72,7 +71,6 @@ module.exports = (grunt) ->
     'clean:deploy'
     'coffeelint:deploy'
     'coffee:deploy'
-    'coffee:staging'
     'less:deploy'
     'postcss:deploy'
     'copy:deploy'
@@ -89,7 +87,6 @@ module.exports = (grunt) ->
   grunt.registerTask 'prepare_prod', [
     'clean:deploy'
     'coffee:deploy'
-    'coffee:prod'
     'less:deploy'
     'postcss:deploy'
     'copy:deploy'
@@ -115,12 +112,8 @@ module.exports = (grunt) ->
     if file isnt undefined
       files = [file]
       grunt.config 'coffeelint.deploy.files.src', files
-      grunt.config 'todo.src', files
 
-    grunt.task.run [
-      'coffeelint:deploy'
-      'todo'
-    ]
+    grunt.task.run ['coffeelint:deploy']
 
   grunt.registerTask 'host', (port, open = true) ->
     if port isnt undefined
