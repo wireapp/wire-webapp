@@ -44,8 +44,6 @@ describe 'User Mapper', ->
       user_payload.picture[1].info.public = false
       user_et = mapper.map_user_from_object user_payload
       expect(user_et.name()).toBe 'John Doe'
-      expect(user_et.picture_preview()).toBe "url('FooBarURL')"
-      expect(user_et.picture_medium()).toBe "url('FooBarURL')"
 
     it 'will return default accent color if null/undefined', ->
       user_payload = payload.self.get

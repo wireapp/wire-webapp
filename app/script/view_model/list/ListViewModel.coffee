@@ -49,7 +49,7 @@ class z.ViewModel.list.ListViewModel
 
     @actions       = new z.ViewModel.list.ActionsViewModel 'actions-bubble', @, @conversations, @conversation_repository, @user_repository
 
-    @self_user = ko.pureComputed => @user_repository.self()?.picture_medium_url() if @webapp_loaded()
+    @self_user = ko.pureComputed => @user_repository.self()?.medium_picture_resource() if @webapp_loaded()
 
     @_init_subscriptions()
 

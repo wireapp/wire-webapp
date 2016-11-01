@@ -43,6 +43,7 @@ class z.conversation.ConversationRepository
     @block_event_handling = true
     @fetching_conversations = {}
     @has_initialized_participants = false
+    @use_v3_api = false
 
     @self_conversation = ko.pureComputed =>
       return @find_conversation_by_id @user_repository.self().id if @user_repository.self()
@@ -826,6 +827,39 @@ class z.conversation.ConversationRepository
       return @_on_asset_upload_complete conversation_et, event
 
   ###
+  Send assets to specified conversation using v3 api. Used for file transfers.
+  @param conversation_id [String] Conversation ID
+  @return [Object] Collection with User IDs which hold their Client IDs in an Array
+  ###
+  send_asset_v3: (conversation_et, file, nonce) =>
+    @asset_service.upload_asset file
+    .then (asset) =>
+      message_et = conversation_et.get_message_by_id nonce
+      asset_et = message_et.assets()[0]
+      asset_et.upload_id nonce # TODO combine
+      asset_et.uploaded_on_this_client true
+
+      generic_message = new z.proto.GenericMessage nonce
+      generic_message.set 'asset', asset
+      if conversation_et.ephemeral_timer()
+        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
+      @_add_to_sending_queue conversation_et.id, generic_message
+      .then =>
+        event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
+
+        if conversation_et.ephemeral_timer()
+          asset = generic_message.ephemeral.asset
+        else
+          asset = generic_message.asset
+
+        event.data.otr_key = asset.uploaded.otr_key
+        event.data.sha256 = asset.uploaded.sha256
+        event.data.key = asset.uploaded.asset_id
+        event.data.token = asset.uploaded.asset_token
+        event.id = message_et.id
+        return @_on_asset_upload_complete conversation_et, event
+
+  ###
   Send asset metadata message to specified conversation.
   @param conversation_et [z.entity.Conversation] Conversation that should receive the file
   @param file [File] File to send
@@ -868,6 +902,8 @@ class z.conversation.ConversationRepository
 
   ###
   Sends image asset in specified conversation.
+
+  @deprecated # TODO: remove once support for v2 ends
   @param conversation_et [z.entity.Conversation] Conversation to send image in
   @param image [File, Blob]
   ###
@@ -897,6 +933,25 @@ class z.conversation.ConversationRepository
           throw error
 
         return saved_event
+
+  ###
+  Sends image asset in specified conversation using v3 api.
+  @param conversation_et [z.entity.Conversation] Conversation to send image in
+  @param image [File, Blob]
+  ###
+  send_image_asset_v3: (conversation_et, image) =>
+    @asset_service.upload_image_asset image
+    .then (asset) =>
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'asset', asset
+      if conversation_et.ephemeral_timer()
+        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
+      @_send_and_inject_generic_message conversation_et, generic_message
+      .then =>
+        @_track_completed_media_action conversation_et, generic_message
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Failed to upload otr asset for conversation #{conversation_et.id}", error
+      throw error
 
   ###
   Send knock in specified conversation.
@@ -1246,6 +1301,7 @@ class z.conversation.ConversationRepository
   ###
   Sends otr asset to a conversation.
 
+  @deprecated # TODO: remove once support for v2 ends
   @private
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
@@ -1294,7 +1350,11 @@ class z.conversation.ConversationRepository
   ###
   upload_images: (conversation_et, images) =>
     return if not @_can_upload_assets_to_conversation conversation_et
-    @send_image_asset conversation_et, image for image in images
+    for image in images
+      if @use_v3_api
+        @send_image_asset_v3 conversation_et, image
+      else
+        @send_image_asset conversation_et, image
 
   ###
   Post files to a conversation.
@@ -1303,7 +1363,11 @@ class z.conversation.ConversationRepository
   ###
   upload_files: (conversation_et, files) =>
     return if not @_can_upload_assets_to_conversation conversation_et
-    @upload_file conversation_et, file for file in files
+    for file in files
+      if @use_v3_api
+        @upload_file_v3 conversation_et, file
+      else
+        @upload_file conversation_et, file
 
   ###
   Post file to a conversation.
@@ -1328,6 +1392,41 @@ class z.conversation.ConversationRepository
     .then (record) =>
       message_et = conversation_et.get_message_by_id record.id
       @send_asset conversation_et, file, record.id
+    .then =>
+      upload_duration = (Date.now() - upload_started) / 1000
+      @logger.log "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
+        $.extend tracking_data, {time: upload_duration}
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
+      if message_et.id
+        @send_asset_upload_failed conversation_et, message_et.id
+        @update_message_as_upload_failed message_et
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
+
+  ###
+  Post file to a conversation using v3
+
+  @param conversation_et [z.entity.Conversation] Conversation to post the file
+  @param file [Object] File object
+  ###
+  upload_file_v3: (conversation_et, file) =>
+    return if not @_can_upload_assets_to_conversation conversation_et
+    message_et = null
+
+    upload_started = Date.now()
+    tracking_data =
+      size_bytes: file.size
+      size_mb: z.util.bucket_values (file.size / 1024 / 1024), [0, 5, 10, 15, 20, 25]
+      type: z.util.get_file_extension file.name
+    conversation_type = z.tracking.helpers.get_conversation_type conversation_et
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED,
+      $.extend tracking_data, {conversation_type: conversation_type}
+
+    @send_asset_metadata conversation_et, file
+    .then (record) =>
+      message_et = conversation_et.get_message_by_id record.id
+      @send_asset_v3 conversation_et, file, record.id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
       @logger.log "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
@@ -2089,7 +2188,10 @@ class z.conversation.ConversationRepository
   @option sha256 [Uint8Array] hash of the encrypted asset
   ###
   update_message_as_upload_complete: (conversation_et, message_et, asset_data) =>
-    resource = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
+    if asset_data.key
+      resource = z.assets.AssetRemoteData.v3 asset_data.key, asset_data.otr_key, asset_data.sha256, asset_data.token
+    else
+      resource = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
     asset_et = message_et.get_first_asset()
     asset_et.original_resource resource
     asset_et.status z.assets.AssetTransferState.UPLOADED
@@ -2106,7 +2208,10 @@ class z.conversation.ConversationRepository
   @option sha256 [Uint8Array] hash of the encrypted asset
   ###
   update_message_with_asset_preview: (conversation_et, message_et, asset_data) =>
-    resource = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
+    if asset_data.key
+      resource = z.assets.AssetRemoteData.v3 asset_data.key, asset_data.otr_key, asset_data.sha256, asset_data.token
+    else
+      resource = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
     asset_et = message_et.get_first_asset()
     asset_et.preview_resource resource
     @conversation_service.update_asset_preview_in_db message_et.primary_key, asset_data

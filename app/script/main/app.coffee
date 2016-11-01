@@ -247,13 +247,9 @@ class z.main.App
         else
           @service.storage.init user_et.id
           .then =>
-            if not user_et.picture_medium().length
+            if not user_et.medium_picture_resource()
               @view.list.first_run true
-              z.util.load_url_blob z.config.UNSPLASH_URL, (blob) =>
-                @repository.user.change_picture blob, ->
-                  amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
-                    source: 'unsplash'
-                    outcome: 'success'
+              @repository.user.set_default_picture()
             resolve user_et
       .catch (error) =>
         if not error instanceof z.storage.StorageError
@@ -267,6 +263,9 @@ class z.main.App
     if bot_name
       @logger.log @logger.levels.INFO, "Found bot token '#{bot_name}'"
       @repository.bot.add_bot bot_name
+    v3_support = z.util.get_url_parameter z.auth.URLParameter.V3
+    if v3_support
+      @repository.conversation.use_v3_api = v3_support
 
   ###
   Check whether the page has been reloaded.
