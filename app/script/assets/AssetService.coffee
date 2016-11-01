@@ -105,6 +105,25 @@ class z.assets.AssetService
       return [small_response.data, medium_response.data]
 
   ###
+  Update the user profile image by first making it usable, transforming it and then uploading the asset pair.
+
+  @param conversation_id [String] ID of self conversation
+  @param image [File, Blob]
+  ###
+  upload_profile_image_v3: (image) ->
+    Promise.all([
+      @_compress_profile_image image
+      @_compress_image image
+    ]).then ([small, medium]) =>
+      [small_image, small_image_bytes] = small
+      [medium_image, medium_image_bytes] = medium
+
+      return Promise.all([
+        @_upload_asset small_image_bytes, {public: true}
+        @_upload_asset medium_image_bytes, {public: true}
+      ])
+
+  ###
   Upload arbitrary binary data using the new asset api v3.
   The data is AES encrypted before uploading.
 
@@ -118,9 +137,7 @@ class z.assets.AssetService
     .then ([key_bytes, sha256, ciphertext]) =>
       return @post_asset_v3 ciphertext, options
       .then ({key, token}) ->
-        asset = new z.proto.Asset()
-        asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token
-        return asset
+        return [key_bytes, sha256, key, token]
 
   ###
   Upload file using the new asset api v3. Promise will resolve with z.proto.Asset instance.
@@ -135,6 +152,10 @@ class z.assets.AssetService
     z.util.load_file_buffer file
     .then (buffer) =>
       @_upload_asset buffer, options
+    .then ([key_bytes, sha256, key, token]) ->
+      asset = new z.proto.Asset()
+      asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token
+      return asset
 
   ###
   Upload image using the new asset api v3. Promise will resolve with z.proto.Asset instance.
@@ -155,15 +176,11 @@ class z.assets.AssetService
         asset.set 'original', new z.proto.Asset.Original image.type, compressed_bytes.length, null, image_meta_data
         asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token
         return asset
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, error
-      asset = new z.proto.Asset()
-      asset.set 'not_uploaded', z.proto.Asset.NotUploaded.FAILED
-      return asset
 
   ###
   Generates the URL an asset can be downloaded from.
 
+  @deprecated
   @param asset_id [String] ID of the asset
   @param conversation_id [String] ID of the conversation the asset belongs to
   @return [String] Asset URL
@@ -176,6 +193,7 @@ class z.assets.AssetService
   ###
   Generates the URL for asset api v2.
 
+  @deprecated
   @param asset_id [String] ID of the asset
   @param conversation_id [String] ID of the conversation the asset belongs to
   @return [String] Asset URL
@@ -227,7 +245,7 @@ class z.assets.AssetService
   ###
   Post assets to a conversation.
 
-  @deprecated # TODO: remove once support for v2 ends
+  @deprecated
   @param conversation_id [String] ID of the self conversation
   @param json_payload [Object] First part of the multipart message
   @param image_data [Uint8Array|ArrayBuffer] encrypted image data
@@ -309,6 +327,8 @@ class z.assets.AssetService
 
   ###
   Create image proto message.
+
+  @deprecated
   @param image [File, Blob]
   ###
   create_image_proto: (image) ->
@@ -330,6 +350,8 @@ class z.assets.AssetService
 
   ###
   Create asset proto message.
+
+  @deprecated
   @param asset [File, Blob]
   ###
   create_asset_proto: (asset) ->
