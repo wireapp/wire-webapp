@@ -108,4 +108,3 @@ class z.user.UserMapper
           user_et.preview_picture_resource z.assets.AssetRemoteData.v3 asset.key
         when 'complete'
           user_et.medium_picture_resource z.assets.AssetRemoteData.v3 asset.key
-
