@@ -64,6 +64,7 @@ module.exports = (grunt) ->
     aws_s3:           require "./grunt/config/aws_s3"
     bower:            require "./grunt/config/bower"
     clean:            require "./grunt/config/clean"
+    codo:             require './grunt/config/codo'
     coffee:           require "./grunt/config/coffee"
     coffeelint:       require "./grunt/config/coffeelint"
     compress:         require "./grunt/config/compress"
@@ -75,6 +76,7 @@ module.exports = (grunt) ->
     open:             require "./grunt/config/open"
     path:             require "path"
     shell:            require "./grunt/config/shell"
+    todo:             require "./grunt/config/todo"
     uglify:           require "./grunt/config/uglify"
     watch:            require "./grunt/config/watch"
     postcss:          require "./grunt/config/postcss"
