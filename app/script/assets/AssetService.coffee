@@ -105,6 +105,27 @@ class z.assets.AssetService
       return [small_response.data, medium_response.data]
 
   ###
+  Update the user profile image by first making it usable, transforming it and then uploading the asset pair.
+
+  @param conversation_id [String] ID of self conversation
+  @param image [File, Blob]
+  ###
+  upload_profile_image_v3: (image) ->
+    Promise.all([
+      @_compress_profile_image image
+      @_compress_image image
+    ]).then ([small, medium]) =>
+      [small_image, small_image_bytes] = small
+      [medium_image, medium_image_bytes] = medium
+
+      return Promise.all([
+        @_upload_asset small_image_bytes, {public: true}
+        @_upload_asset medium_image_bytes, {public: true}
+      ])
+    .then ([small_asset, medium_asset]) ->
+      return [small_asset, medium_asset]
+
+  ###
   Upload arbitrary binary data using the new asset api v3.
   The data is AES encrypted before uploading.
 
