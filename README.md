@@ -37,9 +37,3 @@ After executing `grunt`, Wire's web app will be available at:
 ### Status
 
 [![Build Status](https://travis-ci.org/wireapp/wire-webapp.svg?branch=dev)](https://travis-ci.org/wireapp/wire-webapp)
-
-### Generate code coverage
-
-```bash
-grunt test:coverage
-```
