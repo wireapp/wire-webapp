@@ -23,13 +23,12 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 ### Installation
 
 1. Install [Node.js](https://nodejs.org/)
-2. Install [Grunt](http://gruntjs.com): `npm install -g grunt-cli`
-3. Install [Yarn](https://yarnpkg.com): `npm install -g yarn`
+2. Install [Yarn](https://yarnpkg.com): `npm install -g yarn`
 
 ### Execution
 
 1. Run `yarn`
-2. Run `grunt`
+2. Run `yarn start`
 
 After executing `grunt`, Wire's web app will be available at:
 - [http://localhost:8888/auth/?env=prod#login](http://localhost:8888/auth/?env=prod#login)

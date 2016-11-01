@@ -36,11 +36,12 @@
     "sinon": "1.17.6"
   },
   "scripts": {
-    "postinstall": "grunt init",
-    "test": "grunt check && grunt test",
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
+    "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
-    "deploy-travis-prod": "grunt app_deploy_travis:prod"
+    "postinstall": "grunt init",
+    "start": "grunt",
+    "test": "grunt check && grunt test"
   },
   "repository": {
     "type": "git",
