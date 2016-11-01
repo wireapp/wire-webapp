@@ -22,28 +22,14 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 
 [![Build Status](https://travis-ci.org/wireapp/wire-webapp.svg?branch=dev)](https://travis-ci.org/wireapp/wire-webapp)
 
-### Requirements
+## Build instructions
 
-- Install [Node.js](https://nodejs.org/)
-- Install [Grunt](http://gruntjs.com/): `npm install -g grunt-cli`
+1. Install [Node.js](https://nodejs.org/)
+2. Run `npm init`
+3. Run `grunt`
 
-### Run Wire for Web locally
-
-The first time you run the project you should install the dependencies by
-executing the following from your terminal:
-
-```bash
-npm install
-```
-
-To run the actual server:
-
-```bash
-grunt
-```
-
-If everything went well the app will be available on
-[`localhost:8888`](http://localhost:8888).
+After executing `grunt`, Wire's web app will be available at:
+- [http://localhost:8888/auth/?env=prod#login](http://localhost:8888/auth/?env=prod#login)
 
 ### Generate code coverage
 
