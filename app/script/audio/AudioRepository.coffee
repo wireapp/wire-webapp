@@ -31,10 +31,10 @@ class z.audio.AudioRepository
 
     @audio_elements = {}
     @currently_looping = {}
-    @sound_setting = ko.observable z.audio.AudioSetting.ALL
+    @audio_preference = ko.observable z.audio.AudioPreference.ALL
 
-    @sound_setting.subscribe (sound_setting) =>
-      @_stop_all() if sound_setting is z.audio.AudioSetting.NONE
+    @audio_preference.subscribe (audio_preference) =>
+      @_stop_all() if audio_preference is z.audio.AudioPreference.NONE
 
     @_subscribe_to_audio_properties()
 
@@ -116,9 +116,9 @@ class z.audio.AudioRepository
   ###
   _check_sound_setting: (audio_id) ->
     return new Promise (resolve, reject) =>
-      if @sound_setting() is z.audio.AudioSetting.NONE and audio_id not in z.audio.AudioPlayingType.NONE
+      if @audio_preference() is z.audio.AudioPreference.NONE and audio_id not in z.audio.AudioPlayingType.NONE
         reject new z.audio.AudioError z.audio.AudioError::TYPE.IGNORED_SOUND
-      else if @sound_setting() is z.audio.AudioSetting.SOME and audio_id not in z.audio.AudioPlayingType.SOME
+      else if @audio_preference() is z.audio.AudioPreference.SOME and audio_id not in z.audio.AudioPlayingType.SOME
         reject new z.audio.AudioError z.audio.AudioError::TYPE.IGNORED_SOUND
       else
         resolve()
@@ -211,7 +211,7 @@ class z.audio.AudioRepository
   # Use Amplify to subscribe to all audio properties related events.
   _subscribe_to_audio_properties: ->
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, (properties) =>
-      @sound_setting properties.settings.sound.alerts
+      @audio_preference properties.settings.sound.alerts
 
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, (value) =>
-      @sound_setting value
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, (audio_preference) =>
+      @audio_preference audio_preference

@@ -44,8 +44,10 @@
 .preferences-content {
   color: @graphite-dark;
   height: 100%;
+  min-width: 560px;
   padding: 32px 32px 32px 72px;
   position: absolute;
+  width: 100%;
 }
 
 .preferences-button {
@@ -86,35 +88,38 @@
 }
 
 .preferences-option {
-  margin: 0 0 0 -34px;
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.preferences-option-pointer {
+  cursor: pointer;
 }
 
 .preferences-option-icon {
-  display: flex;
-  height: @line-height-xl;
   font-size: @font-size-sm;
+  height: @line-height-sm;
   line-height: @line-height-sm;
-  padding: 0 0 8px 0;
-
-  label {
-    cursor: pointer;
-    display: inline;
-    height: @line-height-sm;
-    line-height: @line-height-sm;
-  }
+  margin: 0 18px 0 -34px;
 
   div,
   svg {
-    cursor: pointer;
     display: inline;
     width: @line-height-sm;
     height: @line-height-sm;
-    margin-right: 18px;
   }
+}
+
+.preferences-option-label {
+  cursor: pointer;
+  display: inline;
+  height: @line-height-sm;
+  line-height: @line-height-sm;
 }
 
 .preferences-section {
   margin-bottom: 32px;
+  width: 560px;
 }
 
 .preferences-separator {

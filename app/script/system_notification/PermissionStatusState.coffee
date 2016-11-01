@@ -17,23 +17,14 @@
 #
 
 window.z ?= {}
-z.user ?= {}
+z.system_notification ?= {}
 
-class z.user.UserProperties
-  constructor: ->
-    @version = 1
-    @settings =
-      call:
-        mute: false
-      permissions:
-        notifications: z.util.BrowserPermissionType.DEFAULT
-      privacy:
-        report_errors: true
-        improve_wire: true
-      sound:
-        alerts: z.audio.AudioSetting.ALL
-    @contact_import =
-      google: undefined
-      macos: undefined
-    @has_created_conversation = false
-    @enable_debugging = false
+
+# https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/state
+z.system_notification.PermissionStatusState =
+  DEFAULT: 'default'
+  DENIED: 'denied'
+  GRANTED: 'granted'
+  IGNORED: 'ignored'
+  PROMPT: 'prompt'
+  UNSUPPORTED: 'unsupported'

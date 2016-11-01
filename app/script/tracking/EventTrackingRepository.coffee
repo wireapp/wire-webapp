@@ -55,7 +55,7 @@ class z.tracking.EventTrackingRepository
     @localytics = undefined # Localytics
     @interval = undefined # Interval to track the Localytics session
     @tracking_id = undefined # Tracking ID of the self user
-    @user_properties = undefined # Reference to the current user properties / settings
+    @properties = undefined # Reference to the properties
 
     @reported_errors = ko.observableArray()
     @reported_errors.subscribe => @reported_errors [] if @reported_errors().length > 999
@@ -74,12 +74,12 @@ class z.tracking.EventTrackingRepository
     amplify.subscribe z.event.WebApp.ANALYTICS.INIT, @init
 
   ###
-  @param user_properties [z.user.UserProperties]
+  @param properties [z.properties.Properties]
   @param user_et [z.entity.User]
   ###
-  init: (user_properties, user_et) =>
+  init: (properties, user_et) =>
     @logger.log @logger.levels.INFO, 'Initialize tracking and error reporting'
-    @user_properties = user_properties
+    @properties = properties
     @tracking_id = user_et.tracking_id
     @_start_session()
     @_enable_error_reporting() if @_has_permission()
@@ -140,9 +140,9 @@ class z.tracking.EventTrackingRepository
   @return [Boolean] true when "improve_wire" is set to "true".
   ###
   _has_permission: ->
-    return false if @user_properties is undefined
+    return false if @properties is undefined
     return false if @tracking_id is undefined
-    return @user_properties.settings.privacy.improve_wire
+    return @properties.settings.privacy.improve_wire
 
   _log_event: (event_name, attributes) =>
     if attributes

@@ -237,9 +237,14 @@ class z.calling.handler.MediaStreamHandler
   replace_media_stream: (media_stream_info) =>
     @logger.log @logger.levels.DEBUG, "Received new MediaStream with '#{media_stream_info.stream.getTracks().length}' MediaStreamTrack(s)",
       {stream: media_stream_info.stream, audio_tracks: media_stream_info.stream.getAudioTracks(), video_tracks: media_stream_info.stream.getVideoTracks()}
-    @_set_stream_state media_stream_info
-    return Promise.all (flow_et.update_media_stream media_stream_info for flow_et in @call_center.joined_call().get_flows())
-    .then (resolve_array) =>
+
+    if @call_center.joined_call()
+      @_set_stream_state media_stream_info
+      update_promise = Promise.all (flow_et.update_media_stream media_stream_info for flow_et in @call_center.joined_call().get_flows())
+    else
+      update_promise = Promise.resolve [media_stream_info]
+
+    update_promise.then (resolve_array) =>
       media_stream_info = resolve_array[0]
       if media_stream_info.type is z.calling.enum.MediaType.AUDIO
         @_release_media_stream @local_media_streams.audio(), z.calling.enum.MediaType.AUDIO
@@ -252,8 +257,6 @@ class z.calling.handler.MediaStreamHandler
   @param type [z.calling.enum.MediaType] Media type of device that was replaced
   ###
   replace_input_source: (media_type) =>
-    return if not @needs_media_stream()
-
     switch media_type
       when z.calling.enum.MediaType.AUDIO
         constraints_promise = @get_media_stream_constraints true, false

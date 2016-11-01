@@ -17,10 +17,20 @@
 #
 
 window.z ?= {}
-z.audio ?= {}
+z.properties ?= {}
 
-# Enum of audio settings.
-z.audio.AudioSetting =
-  ALL: 'all'
-  NONE: 'none'
-  SOME: 'some'
+class z.properties.Properties
+  constructor: ->
+    @version = 1
+    @settings =
+      notifications: z.system_notification.SystemNotificationPreference.ON
+      privacy:
+        report_errors: true
+        improve_wire: true
+      sound:
+        alerts: z.audio.AudioPreference.ALL
+    @contact_import =
+      google: undefined
+      macos: undefined
+    @has_created_conversation = false
+    @enable_debugging = false

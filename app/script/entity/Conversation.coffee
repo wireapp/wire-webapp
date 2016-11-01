@@ -30,9 +30,9 @@ class z.entity.Conversation
     @creator = undefined
     @type = ko.observable()
     @name = ko.observable()
-    @input = ko.observable z.storage.get_value("#{z.storage.StorageKey.CONVERSATION.INPUT}|#{@id}") or ''
+    @input = ko.observable z.util.StorageUtil.get_value("#{z.storage.StorageKey.CONVERSATION.INPUT}|#{@id}") or ''
     @input.subscribe (text) =>
-      z.storage.set_value "#{z.storage.StorageKey.CONVERSATION.INPUT}|#{@id}", text
+      z.util.StorageUtil.set_value "#{z.storage.StorageKey.CONVERSATION.INPUT}|#{@id}", text
 
     @is_pending = ko.observable false
     @is_loaded = ko.observable false
