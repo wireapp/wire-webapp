@@ -139,9 +139,7 @@ class z.assets.AssetService
     .then ([key_bytes, sha256, ciphertext]) =>
       return @post_asset_v3 ciphertext, options
       .then ({key, token}) ->
-        asset = new z.proto.Asset()
-        asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token
-        return asset
+        return [key_bytes, sha256, key, token]
 
   ###
   Upload file using the new asset api v3. Promise will resolve with z.proto.Asset instance.
@@ -156,6 +154,10 @@ class z.assets.AssetService
     z.util.load_file_buffer file
     .then (buffer) =>
       @_upload_asset buffer, options
+    .then ([key_bytes, sha256, key, token]) ->
+      asset = new z.proto.Asset()
+      asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token
+      return asset
 
   ###
   Upload image using the new asset api v3. Promise will resolve with z.proto.Asset instance.
@@ -176,11 +178,6 @@ class z.assets.AssetService
         asset.set 'original', new z.proto.Asset.Original image.type, compressed_bytes.length, null, image_meta_data
         asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token
         return asset
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, error
-      asset = new z.proto.Asset()
-      asset.set 'not_uploaded', z.proto.Asset.NotUploaded.FAILED
-      return asset
 
   ###
   Generates the URL an asset can be downloaded from.
