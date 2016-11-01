@@ -1444,8 +1444,9 @@ class z.conversation.ConversationRepository
 
   @param conversation_et [z.entity.Conversation]
   @param message_et [z.entity.Message]
+  @param user_ids [Array<String>] Optional array of user IDs to limit sending to
   ###
-  delete_message_everyone: (conversation_et, message_et) =>
+  delete_message_everyone: (conversation_et, message_et, user_ids) =>
     Promise.resolve()
     .then ->
       if not message_et.user().is_me and not message_et.expire_after_millis()
@@ -1454,7 +1455,7 @@ class z.conversation.ConversationRepository
       generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
       return generic_message
     .then (generic_message) =>
-      @_add_to_sending_queue conversation_et.id, generic_message
+      @_add_to_sending_queue conversation_et.id, generic_message, user_ids
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE
     .then =>
@@ -1522,7 +1523,11 @@ class z.conversation.ConversationRepository
         else
           @logger.log 'Unsupported ephemeral type', message_et.type
     else
-      @delete_message_everyone conversation_et, message_et
+      if conversation_et.is_group()
+        user_ids = _.union [@user_repository.self().id], [message_et.from]
+        @delete_message_everyone conversation_et, message_et, user_ids
+      else
+        @delete_message_everyone conversation_et, message_et
 
   _obfuscate_text_message: (conversation_et, message_id) =>
     @get_message_in_conversation_by_id conversation_et, message_id
