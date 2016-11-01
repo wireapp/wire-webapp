@@ -17,37 +17,47 @@
 #
 
 window.z ?= {}
-z.user_properties ?= {}
+z.properties ?= {}
 
-# User properties service for all user property calls to the backend REST API.
-class z.user_properties.UserPropertiesService
+# Properties service for all user property calls to the backend REST API.
+class z.properties.PropertiesService
   URL_PROPERTIES: '/properties'
 
   ###
-  Construct a new User Service.
+  Construct a new Properties Service.
   @param client [z.service.Client] Client for the API calls
   ###
   constructor: (@client) ->
-    @logger = new z.util.Logger 'z.user_properties.UserPropertiesService', z.config.LOGGER.OPTIONS
-
-  ###
-  List all property keys stored for the user.
-  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/listPropertyKeys
-  @return [Promise] Promise that resolves with a list of the property keys stored for the user
-  ###
-  get_user_properties: ->
-    @client.send_request
-      type: 'GET'
-      url: @client.create_url @URL_PROPERTIES
+    @logger = new z.util.Logger 'z.properties.PropertiesService', z.config.LOGGER.OPTIONS
 
   ###
   Clear all properties store for the user.
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/clearProperties
   @return [Promise] Promise that resolves when properties for user have been cleared
   ###
-  clear_user_properties: ->
+  delete_properties: ->
     @client.send_request
       type: 'DELETE'
+      url: @client.create_url @URL_PROPERTIES
+
+  ###
+  Delete a property.
+  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/deleteProperty
+  @param key [String] Key used to store user properties
+  ###
+  delete_properties_by_key: (key) ->
+    @client.send_request
+      type: 'DELETE'
+      url: @client.create_url "/properties/#{key}"
+
+  ###
+  List all property keys stored for the user.
+  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/listPropertyKeys
+  @return [Promise] Promise that resolves with a list of the property keys stored for the user
+  ###
+  get_properties: ->
+    @client.send_request
+      type: 'GET'
       url: @client.create_url @URL_PROPERTIES
 
   ###
@@ -57,11 +67,10 @@ class z.user_properties.UserPropertiesService
   @param key [String] Key used to store user properties
   @return [Promise] Promise that resolves with the properties for the given key
   ###
-  get_user_properties_by_key: (key) ->
+  get_properties_by_key: (key) ->
     @client.send_request
       type: 'GET'
       url: @client.create_url "/properties/#{key}"
-
 
   ###
   Set a property value for a key.
@@ -70,21 +79,8 @@ class z.user_properties.UserPropertiesService
   @param key [String] Key used to store user properties
   @param properties [Object] Payload to be stored
   ###
-  change_user_properties_by_key: (key, properties) ->
+  put_properties_by_key: (key, properties) ->
     @client.send_json
       type: 'PUT'
       url: @client.create_url "/properties/#{key}"
       data: properties
-
-  ###
-  Delete a property.
-  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/deleteProperty
-
-  @param key [String] Key used to store user properties
-  @param callback [Function] Function to be called on server return
-  ###
-  delete_user_properties_by_key: (key) ->
-    @client.send_request
-      type: 'DELETE'
-      url: @client.create_url "/properties/#{key}"
-      callback: callback

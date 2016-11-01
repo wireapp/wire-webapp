@@ -60,7 +60,7 @@ class z.main.App
     service.search                  = new z.search.SearchService @auth.client
     service.storage                 = new z.storage.StorageService()
     service.user                    = new z.user.UserService @auth.client
-    service.user_properties         = new z.user_properties.UserPropertiesService @auth.client
+    service.properties              = new z.properties.PropertiesService @auth.client
     service.web_socket              = new z.event.WebSocketService @auth.client
 
     service.client                  = new z.client.ClientService @auth.client, service.storage
@@ -85,8 +85,8 @@ class z.main.App
     repository.user                = new z.user.UserRepository @service.user, @service.asset, @service.search, repository.client, repository.cryptography
     repository.event               = new z.event.EventRepository @service.web_socket, @service.notification, repository.cryptography, repository.user
     repository.search              = new z.search.SearchRepository @service.search, repository.user
-    repository.user_properties     = new z.user_properties.UserPropertiesRepository @service.user_properties
-    repository.connect             = new z.connect.ConnectRepository @service.connect, @service.connect_google, repository.user_properties
+    repository.properties          = new z.properties.PropertiesRepository @service.properties
+    repository.connect             = new z.connect.ConnectRepository @service.connect, @service.connect_google, repository.properties
     repository.links               = new z.links.LinkPreviewRepository @service.asset
 
     repository.conversation        = new z.conversation.ConversationRepository(
@@ -110,8 +110,8 @@ class z.main.App
     view = {}
 
     view.main                      = new z.ViewModel.MainViewModel 'wire-main', @repository.user
-    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.search, @repository.user, @repository.user_properties
-    view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user, @repository.user_properties
+    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.search, @repository.user, @repository.properties
+    view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user, @repository.properties
     view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
     view.modals                    = new z.ViewModel.ModalsViewModel 'modals'
@@ -155,7 +155,7 @@ class z.main.App
       @view.loading.switch_message z.string.init_received_self_user, true
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER
       @repository.client.init self_user_et
-      @repository.user_properties.init self_user_et
+      @repository.properties.init self_user_et
       return @repository.storage.init false
     .then =>
       @view.loading.switch_message z.string.init_initialized_storage, true
@@ -441,12 +441,12 @@ class z.main.App
   # Disable debugging on any environment.
   disable_debugging: ->
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = -> 0
-    @repository.user_properties.save_preference_enable_debugging false
+    @repository.properties.save_preference_enable_debugging false
 
   # Enable debugging on any environment.
   enable_debugging: ->
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = -> 300
-    @repository.user_properties.save_preference_enable_debugging true
+    @repository.properties.save_preference_enable_debugging true
 
   # Report call telemetry to Raygun for analysis.
   report_call: =>

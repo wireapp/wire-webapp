@@ -17,20 +17,22 @@
 #
 
 window.z ?= {}
-z.user_properties ?= {}
+z.system_notification ?= {}
 
-class z.user_properties.UserProperties
-  constructor: ->
-    @version = 1
-    @settings =
-      notifications: z.system_notification.SystemNotificationPreference.ON
-      privacy:
-        report_errors: true
-        improve_wire: true
-      sound:
-        alerts: z.audio.AudioPreference.ALL
-    @contact_import =
-      google: undefined
-      macos: undefined
-    @has_created_conversation = false
-    @enable_debugging = false
+class z.system_notification.SystemNotificationError
+  constructor: (type) ->
+    @name = @constructor.name
+    @stack = (new Error()).stack
+    @type = type or z.system_notification.SystemNotificationError::TYPE.UNKNOWN
+
+    @message = switch @type
+      when z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION
+        'Do not show notification for this message'
+      else
+        'Unknown SystemNotificationError'
+
+  @:: = new Error()
+  @::constructor = @
+  @::TYPE =
+    HIDE_NOTIFICATION: 'z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION'
+    UNKNOWN: 'z.system_notification.SystemNotificationError::TYPE.UNKNOWN'

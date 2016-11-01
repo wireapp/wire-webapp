@@ -22,7 +22,7 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.PreferencesOptionsViewModel
-  constructor: (element_id, @call_center, @user_properties_repository) ->
+  constructor: (element_id, @call_center, @properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS
 
     @media_devices_handler = @call_center.media_devices_handler
@@ -41,7 +41,7 @@ class z.ViewModel.content.PreferencesOptionsViewModel
     @audio_interval = undefined
 
     @option_data = ko.observable()
-    @option_data.subscribe (data_preference) => @user_properties_repository.save_preference_data data_preference
+    @option_data.subscribe (data_preference) => @properties_repository.save_preference_data data_preference
 
     @option_audio = ko.observable()
     @option_audio.subscribe (audio_preference) =>
@@ -50,11 +50,11 @@ class z.ViewModel.content.PreferencesOptionsViewModel
         when z.audio.AudioPreference.SOME then 'firstMessageOnly'
         when z.audio.AudioPreference.NONE then 'neverPlay'
 
-      @user_properties_repository.save_preference_sound_alerts audio_preference
+      @properties_repository.save_preference_sound_alerts audio_preference
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SOUND_SETTINGS_CHANGED, value: tracking_value
 
     @option_notifications = ko.observable()
-    @option_notifications.subscribe (notifications_preference) => @user_properties_repository.save_preference_notifications notifications_preference
+    @option_notifications.subscribe (notifications_preference) => @properties_repository.save_preference_notifications notifications_preference
 
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @update_properties
 
@@ -87,16 +87,16 @@ class z.ViewModel.content.PreferencesOptionsViewModel
     @audio_analyser = @audio_context.createAnalyser()
     @audio_analyser.fftSize = 1024
     @audio_analyser.smoothingTimeConstant = 0.2
+    @audio_data_array = new Float32Array @audio_analyser.frequencyBinCount
 
     @audio_interval = window.setInterval =>
-      data_array = new Float32Array @audio_analyser.frequencyBinCount
-      @audio_analyser.getFloatFrequencyData data_array
+      @audio_analyser.getFloatFrequencyData @audio_data_array
       volume = 0
       # Data is in the db range of -100 to -30, but can also be -Infinity. We normalize the value up to -50 to the range of 0, 1.
-      for data in data_array
+      for data in @audio_data_array
         volume += Math.abs(Math.max(data, -100) + 100) / 50
 
-      average_volume = volume / data_array.length
+      average_volume = volume / @audio_data_array.length
 
       @audio_level average_volume - 0.075
     , 100

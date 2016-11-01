@@ -17,30 +17,30 @@
 #
 
 window.z ?= {}
-z.user_properties ?= {}
+z.properties ?= {}
 
-# User properties repository for all user property interactions with the user property service.
-class z.user_properties.UserPropertiesRepository
+# Properties repository for all property interactions with the user property service.
+class z.properties.PropertiesRepository
   ###
   Construct a new User properties repository.
-  @param user_properties_service [z.user_properties.UserPropertiesService] Backend REST API user properties service implementation
+  @param properties_service [z.properties.PropertiesService] Backend REST API properties service implementation
   @param self [ko.observable] Backend REST API user properties service implementation
   ###
-  constructor: (@user_properties_service) ->
-    @logger = new z.util.Logger 'z.user_properties.UserPropertiesRepository', z.config.LOGGER.OPTIONS
+  constructor: (@properties_service) ->
+    @logger = new z.util.Logger 'z.properties.PropertiesRepository', z.config.LOGGER.OPTIONS
 
-    @properties = new z.user_properties.UserProperties()
+    @properties = new z.properties.Properties()
     @self = ko.observable()
 
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @properties_updated
 
   # Initialize properties on app startup.
   init: (self_user_et) =>
-    @user_properties_service.get_user_properties()
+    @properties_service.get_properties()
     .then (response) =>
       @self self_user_et
       if response.includes z.config.PROPERTIES_KEY
-        @user_properties_service.get_user_properties_by_key z.config.PROPERTIES_KEY
+        @properties_service.get_properties_by_key z.config.PROPERTIES_KEY
         .then (response) =>
           $.extend true, @properties, response
           @logger.log @logger.levels.INFO, 'Loaded user properties', @properties
@@ -133,6 +133,6 @@ class z.user_properties.UserPropertiesRepository
   @param value
   ###
   _save_properties: (key, value) ->
-    @user_properties_service.change_user_properties_by_key z.config.PROPERTIES_KEY, @properties
+    @properties_service.put_properties_by_key z.config.PROPERTIES_KEY, @properties
     .then =>
       @logger.log @logger.levels.INFO, "Saved updated settings: '#{key}' - '#{value}'"
