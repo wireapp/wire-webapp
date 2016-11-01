@@ -89,17 +89,23 @@ class z.user.UserMapper
       user_et.accent_id data.accent_id
 
     if data.assets?.length > 0
-
-      if data.assets[0]?
-        user_et.preview_picture_resource z.assets.AssetRemoteData.v3 data.assets[0].key
-      if data.assets[1]?
-        user_et.medium_picture_resource z.assets.AssetRemoteData.v3 data.assets[1].key
-
+      @_map_profile_assets user_et, data.assets
     else if data.picture?.length > 0
-
-      if data.picture[0]?
-        user_et.preview_picture_resource z.assets.AssetRemoteData.v1 user_et.id, data.picture[0].id
-      if data.picture[1]?
-        user_et.medium_picture_resource z.assets.AssetRemoteData.v1 user_et.id, data.picture[1].id
+      @_map_profile_pictures user_et, data.picture
 
     return user_et
+
+  _map_profile_pictures: (user_et, picture) ->
+    if picture[0]?
+      user_et.preview_picture_resource z.assets.AssetRemoteData.v1 user_et.id, picture[0].id
+    if picture[1]?
+      user_et.medium_picture_resource z.assets.AssetRemoteData.v1 user_et.id, picture[1].id
+
+  _map_profile_assets: (user_et, assets) ->
+    for asset in assets when asset.type is 'image'
+      switch asset.size
+        when 'preview'
+          user_et.preview_picture_resource z.assets.AssetRemoteData.v3 asset.key
+        when 'complete'
+          user_et.medium_picture_resource z.assets.AssetRemoteData.v3 asset.key
+
