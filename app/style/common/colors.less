@@ -47,6 +47,7 @@
 .text-graphite {.text(@graphite)}
 .text-graphite-dark {.text(@graphite-dark)}
 .text-white {.text(#fff)}
+.text-ephemeral {.accent-color();}
 
 // fonts
 .font-size(@size) {
@@ -74,4 +75,8 @@
 // background colors
 .bg-color(@color) {
   background-color: @color !important;
+}
+
+.bg-color-ephemeral {
+  .accent-background-color();
 }
