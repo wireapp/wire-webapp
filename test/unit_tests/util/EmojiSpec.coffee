@@ -16,22 +16,25 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-# grunt test_init && grunt test_run:util/DebugUtil
+# grunt test_init && grunt test_run:util/Emoji
 
 describe 'z.util.emoji', ->
 
-  describe 'contains_only_emojies', ->
+  describe 'includes_only_emojies', ->
 
     it 'returns false for empty string', ->
-      expect(z.util.emoji.contains_only_emojies('')).toBeFalsy()
+      expect(z.util.emoji.includes_only_emojies('')).toBeFalsy()
 
     it 'returns false for undefined', ->
-      expect(z.util.emoji.contains_only_emojies('')).toBeFalsy()
+      expect(z.util.emoji.includes_only_emojies('')).toBeFalsy()
 
     it 'returns true for text containing only emojies (Miscellaneous Symbols)', ->
-      expect(z.util.emoji.contains_only_emojies('☕')).toBeTruthy()
-      expect(z.util.emoji.contains_only_emojies('⛄')).toBeTruthy()
-      expect(z.util.emoji.contains_only_emojies('⚽')).toBeTruthy()
+      expect(z.util.emoji.includes_only_emojies('☕')).toBeTruthy()
+      expect(z.util.emoji.includes_only_emojies('⛄')).toBeTruthy()
+      expect(z.util.emoji.includes_only_emojies('⚽')).toBeTruthy()
+
+    it 'returns true for text containing only emojies and whitespaces (Miscellaneous Symbols)', ->
+      expect(z.util.emoji.includes_only_emojies('☕ ⚽')).toBeTruthy()
 
     it 'returns false for text containing only text and emojies', ->
-      expect(z.util.emoji.contains_only_emojies('Hey 💩')).toBeFalsy()
+      expect(z.util.emoji.includes_only_emojies('Hey 💩')).toBeFalsy()
