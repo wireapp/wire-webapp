@@ -21,9 +21,12 @@ z.string ?= {}
 z.string.de ?= {}
 z.string.es ?= {}
 z.string.fi ?= {}
+z.string.fr ?= {}
 z.string.hr ?= {}
 z.string.ro ?= {}
 z.string.ru ?= {}
+z.string.tr ?= {}
+z.string.uk ?= {}
 
 z.string.Declension =
   ACCUSATIVE: 'accusative'
