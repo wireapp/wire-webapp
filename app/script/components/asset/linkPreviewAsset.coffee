@@ -64,7 +64,7 @@ ko.components.register 'link-preview-asset',
               </div>
             <!-- /ko -->
             <!-- ko if: expired()-->
-              <div class="link-preview-container">
+              <div class="link-preview-container ephemeral-link-preview">
                 <!-- ko if: preview.image_resource()-->
                   <span class="link-preview-image bg-color-ephemeral"></span>
                 <!-- /ko -->
