@@ -19,7 +19,7 @@
 
 @font-face {
   font-family: 'Wire';
-  src: url('/font/Wire.ttf?44yqdv') format('truetype');
+  src: url('/font/Wire.ttf?niiwne') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -105,6 +105,9 @@
 .icon-ping:before {
   content: "\e137";
 }
+.icon-ping-timed:before {
+  content: "\e637";
+}
 .icon-exit-fullscreen:before {
   content: "\e138";
 }
@@ -123,6 +126,9 @@
 .icon-library:before {
   content: "\e145";
 }
+.icon-library-timed:before {
+  content: "\e645";
+}
 .icon-movie:before {
   content: "\e146";
 }
@@ -137,6 +143,9 @@
 }
 .icon-attachment:before {
   content: "\e154";
+}
+.icon-attachment-timed:before {
+  content: "\e654";
 }
 .icon-speaker:before {
   content: "\e158";
@@ -210,6 +219,9 @@
 .icon-gif:before {
   content: "\e219";
 }
+.icon-gif-timed:before {
+  content: "\e719";
+}
 .icon-end-call:before {
   content: "\e222";
 }
@@ -228,6 +240,9 @@
 .icon-hourglass:before {
   content: "\e239";
 }
+.icon-av:before {
+  content: "\e261";
+}
 .icon-checkbox:before {
   content: "\e600";
 }
@@ -237,3 +252,4 @@
 .icon-contacts:before {
   content: "\e602";
 }
+
