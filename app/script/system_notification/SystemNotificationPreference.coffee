@@ -17,18 +17,10 @@
 #
 
 window.z ?= {}
-z.string ?= {}
-z.string.de ?= {}
-z.string.es ?= {}
-z.string.fi ?= {}
-z.string.fr ?= {}
-z.string.hr ?= {}
-z.string.ro ?= {}
-z.string.ru ?= {}
-z.string.tr ?= {}
-z.string.uk ?= {}
+z.system_notification ?= {}
 
-z.string.Declension =
-  ACCUSATIVE: 'accusative'
-  DATIVE: 'dative'
-  NOMINATIVE: 'nominative'
+# Enum of notification preferences.
+z.system_notification.SystemNotificationPreference =
+  NONE: 'none'
+  OBFUSCATE: 'obfuscate'
+  ON: 'on'

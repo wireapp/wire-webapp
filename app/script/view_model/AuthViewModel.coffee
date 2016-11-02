@@ -234,7 +234,7 @@ class z.ViewModel.AuthViewModel
       z.auth.AuthView.MODE.VERIFY_PASSWORD
     ]
 
-    if @_has_no_hash() and z.storage.get_value z.storage.StorageKey.AUTH.SHOW_LOGIN
+    if @_has_no_hash() and z.util.StorageUtil.get_value z.storage.StorageKey.AUTH.SHOW_LOGIN
       @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
     else if @_get_hash() in modes_to_block
       @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
@@ -1267,6 +1267,8 @@ class z.ViewModel.AuthViewModel
     url = "/#{@auth.settings.parameter}" if @auth.settings.parameter?
     bot_name = z.util.get_url_parameter z.auth.URLParameter.BOT
     url = z.util.append_url_parameter url, "#{z.auth.URLParameter.BOT}=#{bot_name}" if bot_name
+    use_v3_api = z.util.get_url_parameter z.auth.URLParameter.V3
+    url = z.util.append_url_parameter url, "#{z.auth.URLParameter.V3}=#{use_v3_api}" if use_v3_api
     window.location.replace url
 
   _register_client: =>

@@ -60,8 +60,8 @@ class z.auth.AuthRepository
       @auth_service.post_login login, persist
       .then (response) =>
         @save_access_token response
-        z.storage.set_value z.storage.StorageKey.AUTH.PERSIST, persist
-        z.storage.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
+        z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.PERSIST, persist
+        z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
         resolve response
       .catch (error) -> reject error
 
@@ -92,9 +92,9 @@ class z.auth.AuthRepository
   register: (new_user) =>
     @auth_service.post_register new_user
     .then (response) =>
-      z.storage.set_value z.storage.StorageKey.AUTH.PERSIST, true
-      z.storage.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
-      z.storage.set_value new_user.label_key, new_user.label
+      z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.PERSIST, true
+      z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
+      z.util.StorageUtil.set_value new_user.label_key, new_user.label
       @logger.log @logger.levels.INFO,
         "COOKIE::'#{new_user.label}' Saved cookie label with key '#{new_user.label_key}' in Local Storage",
           key: new_user.label_key,
@@ -146,13 +146,13 @@ class z.auth.AuthRepository
   # Get the cached access token from the Amplify store.
   get_cached_access_token: ->
     return new Promise (resolve, reject) =>
-      access_token = z.storage.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE
-      access_token_type = z.storage.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE
+      access_token = z.util.StorageUtil.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE
+      access_token_type = z.util.StorageUtil.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE
 
       if access_token
         @logger.log @logger.levels.INFO, 'Cached access token found in Local Storage', {access_token: access_token}
         @auth_service.save_access_token_in_client access_token_type, access_token
-        @_schedule_token_refresh z.storage.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION
+        @_schedule_token_refresh z.util.StorageUtil.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION
         resolve()
       else
         reject new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE
@@ -193,10 +193,10 @@ class z.auth.AuthRepository
     expires_in_millis = 1000 * access_token_data.expires_in
     expiration_timestamp = Date.now() + expires_in_millis
 
-    z.storage.set_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE, access_token_data.access_token, access_token_data.expires_in
-    z.storage.set_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expiration_timestamp, access_token_data.expires_in
-    z.storage.set_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL, expires_in_millis, access_token_data.expires_in
-    z.storage.set_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE, access_token_data.token_type, access_token_data.expires_in
+    z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE, access_token_data.access_token, access_token_data.expires_in
+    z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expiration_timestamp, access_token_data.expires_in
+    z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL, expires_in_millis, access_token_data.expires_in
+    z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE, access_token_data.token_type, access_token_data.expires_in
 
     @logger.log @logger.levels.LEVEL_1, 'Saved access token.', access_token_data
     @_log_access_token_expiration expiration_timestamp
@@ -206,10 +206,10 @@ class z.auth.AuthRepository
 
   # Deletes all access token data stored on the client.
   delete_access_token: ->
-    z.storage.reset_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE
-    z.storage.reset_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION
-    z.storage.reset_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL
-    z.storage.reset_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE
+    z.util.StorageUtil.reset_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE
+    z.util.StorageUtil.reset_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION
+    z.util.StorageUtil.reset_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL
+    z.util.StorageUtil.reset_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE
 
   ###
   Logs the expiration time of the access token.

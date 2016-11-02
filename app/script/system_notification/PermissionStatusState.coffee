@@ -17,23 +17,14 @@
 #
 
 window.z ?= {}
-z.storage ?= {}
-
-###
-# BIG TODO: Turn this into a "z.util.StorageUtil" because the "z.storage" namespace is already occupied!
-###
-
-z.storage.get_value = (key) ->
-  amplify.store key
+z.system_notification ?= {}
 
 
-z.storage.reset_value = (key) ->
-  z.storage.set_value key, null
-
-
-z.storage.set_value = (key, value, seconds_to_expire) ->
-  if seconds_to_expire
-    amplify.store key, value,
-      expires: seconds_to_expire * 1000
-  else
-    amplify.store key, value
+# https://developer.mozilla.org/en-US/docs/Web/API/PermissionStatus/state
+z.system_notification.PermissionStatusState =
+  DEFAULT: 'default'
+  DENIED: 'denied'
+  GRANTED: 'granted'
+  IGNORED: 'ignored'
+  PROMPT: 'prompt'
+  UNSUPPORTED: 'unsupported'

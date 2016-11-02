@@ -16,13 +16,22 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-# https://github.com/frostney/grunt-codo
+window.z ?= {}
+z.util ?= {}
+z.util.StorageUtil ?= {}
 
-module.exports =
-  options:
-    name: '<%= pkg.name %>'
-    output: '<%= dir.docs.api %>'
-    stats: true
-    undocumented: false
-  app:
-    src: '<%= dir.app.script %>'
+
+z.util.StorageUtil.get_value = (key) ->
+  amplify.store key
+
+
+z.util.StorageUtil.reset_value = (key) ->
+  z.util.StorageUtil.set_value key, null
+
+
+z.util.StorageUtil.set_value = (key, value, seconds_to_expire) ->
+  if seconds_to_expire
+    amplify.store key, value,
+      expires: seconds_to_expire * 1000
+  else
+    amplify.store key, value

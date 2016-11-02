@@ -18,22 +18,19 @@ No license is granted to the Wire trademark and its associated logos, all of whi
 
 # How to build the open source client
 
-## Build Status
+## Build
 
-[![Build Status](https://travis-ci.org/wireapp/wire-webapp.svg?branch=dev)](https://travis-ci.org/wireapp/wire-webapp)
-
-## Build instructions
+### Installation
 
 1. Install [Node.js](https://nodejs.org/)
-2. Install [Grunt](http://gruntjs.com): `npm install -g grunt-cli`
-3. Run `npm install`
-4. Run `grunt`
+2. Install [Yarn](https://yarnpkg.com): `npm install -g yarn`
+3. Run `yarn`
 
-After executing `grunt`, Wire's web app will be available at:
-- [http://localhost:8888/auth/?env=prod#login](http://localhost:8888/auth/?env=prod#login)
+### Execution
 
-### Generate code coverage
+Run `yarn start` and Wire's web app will be available at:
+ [localhost:8888/auth/#login](http://localhost:8888/auth/#login)
 
-```bash
-grunt test:coverage
-```
+### Status
+
+[![Build Status](https://travis-ci.org/wireapp/wire-webapp.svg?branch=dev)](https://travis-ci.org/wireapp/wire-webapp)
