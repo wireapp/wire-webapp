@@ -26,8 +26,11 @@ SUPPORTED_LOCALE = [
   'es',
   'hr',
   'fi',
+  'fr',
   'ro',
   'ru',
+  'tr',
+  'uk',
 ]
 home_dir = os.path.expanduser('~')
 
