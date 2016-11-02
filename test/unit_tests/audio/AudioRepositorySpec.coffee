@@ -30,7 +30,7 @@ describe 'z.audio.AudioRepository', ->
 
   describe '_check_sound_setting', ->
     beforeAll ->
-      audio_repository.sound_setting z.audio.AudioSetting.SOME
+      audio_repository.audio_preference z.audio.AudioPreference.SOME
 
     it 'plays a sound that should be played', (done) ->
       audio_repository._check_sound_setting z.audio.AudioType.NETWORK_INTERRUPTION

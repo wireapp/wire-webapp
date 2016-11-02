@@ -67,7 +67,7 @@ class z.storage.StorageService
   ###
   init: (user_id = @user_id) =>
     return new Promise (resolve, reject) =>
-      is_permanent = z.storage.get_value z.storage.StorageKey.AUTH.PERSIST
+      is_permanent = z.util.StorageUtil.get_value z.storage.StorageKey.AUTH.PERSIST
       client_type = if is_permanent then z.client.ClientType.PERMANENT else z.client.ClientType.TEMPORARY
 
       @user_id = user_id
