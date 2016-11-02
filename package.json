@@ -8,7 +8,6 @@
     "grunt-aws-s3": "0.14.5",
     "grunt-bower-task": "0.4.0",
     "grunt-cli": "1.2.0",
-    "grunt-codo": "0.3.0",
     "grunt-coffeelint": "0.0.16",
     "grunt-contrib-clean": "1.0.0",
     "grunt-contrib-coffee": "1.0.0",
@@ -37,11 +36,12 @@
     "sinon": "1.17.6"
   },
   "scripts": {
-    "postinstall": "grunt init",
-    "test": "grunt check && grunt test",
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
+    "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
-    "deploy-travis-prod": "grunt app_deploy_travis:prod"
+    "postinstall": "grunt init",
+    "start": "grunt",
+    "test": "grunt check && grunt test"
   },
   "repository": {
     "type": "git",
