@@ -75,8 +75,8 @@ class z.ViewModel.content.PreferencesOptionsViewModel
       @media_stream_handler.local_media_type z.calling.enum.MediaType.VIDEO if @available_devices.video_input().length
       @media_stream_handler.set_local_media_stream media_stream_info
       return @audio_stream()
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Requesting MediaStream failed: #{error.name}", error
+    .catch ([error, media_type]) =>
+      @logger.log @logger.levels.ERROR, "Requesting MediaStream failed: #{error.message}", error
       throw error
 
   initiate_audio_meter: (audio_stream) =>
