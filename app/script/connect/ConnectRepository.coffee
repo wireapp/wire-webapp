@@ -42,6 +42,7 @@ class z.connect.ConnectRepository
         @logger.log @logger.levels.INFO, 'Google Contacts SDK error', error
         throw new z.connect.ConnectError z.connect.ConnectError::TYPE.GOOGLE_DOWNLOAD
       .then (response) =>
+        amplify.publish z.event.WebApp.SEARCH.SHOW
         return @_parse_google_contacts response
       .then (phone_book) =>
         if phone_book.cards.length is 0
@@ -82,6 +83,7 @@ class z.connect.ConnectRepository
         @logger.log @logger.levels.WARN, 'No contacts found for upload'
         reject new z.connect.ConnectError z.connect.ConnectError::TYPE.NO_CONTACTS
       else
+        amplify.publish z.event.WebApp.SEARCH.SHOW
         @logger.log @logger.levels.INFO, "Uploading hashes of '#{phone_book.cards.length}' contacts for matching", phone_book
         @connect_service.post_onboarding phone_book
         .then (response) =>
