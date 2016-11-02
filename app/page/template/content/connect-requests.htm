@@ -5,7 +5,7 @@
         <div class="name popover-title" data-bind="text: name()"></div>
         <div class="mail popover-meta text-theme" data-bind="text: email()"></div>
         <div class="connect-request-content">
-          <div class="image round-bordered-image" data-bind="load_image: picture_preview_url()"></div>
+          <user-avatar class="image user-avatar-xxl user-avatar-no-badge user-avatar-no-filter cursor-default" params="user: $data"></user-avatar>
           <common-contacts class="contacts common-contacts-labeled" params="{user: $data}"></common-contacts>
         </div>
         <div class="button-group">

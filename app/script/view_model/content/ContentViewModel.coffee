@@ -22,7 +22,7 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.ContentViewModel
-  constructor: (element_id, @call_center, @client_repository, @conversation_repository, @cryptography_repository, @giphy_repository, @search_repository, @user_repository) ->
+  constructor: (element_id, @call_center, @client_repository, @conversation_repository, @cryptography_repository, @giphy_repository, @search_repository, @user_repository, @properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS
 
     # state
@@ -46,7 +46,7 @@ class z.ViewModel.content.ContentViewModel
     @preferences_account =        new z.ViewModel.content.PreferencesAccountViewModel 'preferences-account', @client_repository, @user_repository
     @preferences_device_details = new z.ViewModel.content.PreferencesDeviceDetailsViewModel 'preferences-devices', @client_repository, @conversation_repository, @cryptography_repository
     @preferences_devices =        new z.ViewModel.content.PreferencesDevicesViewModel 'preferences-devices', @preferences_device_details, @client_repository, @conversation_repository, @cryptography_repository
-    @preferences_options =        new z.ViewModel.content.PreferencesOptionsViewModel 'preferences-options', @user_repository
+    @preferences_options =        new z.ViewModel.content.PreferencesOptionsViewModel 'preferences-options', @call_center, @properties_repository
 
     @previous_state = undefined
     @previous_conversation = undefined
@@ -61,6 +61,9 @@ class z.ViewModel.content.ContentViewModel
           @preferences_devices.update_fingerprint()
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
           @preferences_devices.update_fingerprint()
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
+          @preferences_options.initiate_media_stream()
+          .then (audio_stream) => @preferences_options.initiate_audio_meter audio_stream if not @preferences_options.audio_interval
         else
           @conversation_input.removed_from_view()
           @conversation_titlebar.removed_from_view()
@@ -114,8 +117,8 @@ class z.ViewModel.content.ContentViewModel
     conversation_et = @conversation_repository.get_conversation_by_id conversation_et if not conversation_et.id
     return if conversation_et is @conversation_repository.active_conversation()
 
-    @content_state z.ViewModel.content.CONTENT_STATE.CONVERSATION
     @_release_content()
+    @content_state z.ViewModel.content.CONTENT_STATE.CONVERSATION
     @conversation_repository.active_conversation conversation_et
     @message_list.change_conversation conversation_et, =>
       @_show_content z.ViewModel.content.CONTENT_STATE.CONVERSATION
@@ -168,6 +171,8 @@ class z.ViewModel.content.ContentViewModel
     if @previous_state is z.ViewModel.content.CONTENT_STATE.CONVERSATION
       @conversation_repository.active_conversation null
       @message_list.release_conversation()
+    else if @previous_state is z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
+      @preferences_options.release_media_streams()
 
   _show_content: (new_content_state) ->
     @content_state new_content_state

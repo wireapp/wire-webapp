@@ -54,7 +54,7 @@ class z.search.SearchRepository
   ###
   get_suggestions: ->
     return new Promise (resolve, reject) =>
-      @suggested_search_ets = z.storage.get_value(z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS) or []
+      @suggested_search_ets = z.util.StorageUtil.get_value(z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS) or []
 
       if @suggested_search_ets.length > 0
         @_prepare_search_result @suggested_search_ets, z.search.SEARCH_MODE.SUGGESTIONS
@@ -69,7 +69,7 @@ class z.search.SearchRepository
         .then (search_ets) =>
           # store suggested user ids
           @suggested_search_ets = search_ets
-          z.storage.set_value z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS, @suggested_search_ets, 15 * 60
+          z.util.StorageUtil.set_value z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS, @suggested_search_ets, 15 * 60
           resolve search_ets
         .catch (error) ->
           reject error
@@ -99,7 +99,7 @@ class z.search.SearchRepository
       # remove ignored user from the suggested user ids
       user_id_index = @suggested_search_ets.indexOf search_et
       @suggested_search_ets.splice user_id_index, 1 if user_id_index > -1
-      z.storage.set_value z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS, @suggested_search_ets, 30
+      z.util.StorageUtil.set_value z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS, @suggested_search_ets, 30
 
   ###
   Search for users on the backend by name.

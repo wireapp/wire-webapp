@@ -38,6 +38,8 @@ class z.storage.StorageError
         'Missing sender ID'
       when z.storage.StorageError::TYPE.NO_TIME
         'Missing time'
+      when z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
+        'Update is non sequential'
       when z.storage.StorageError::TYPE.INVALID_TIME
         'Event time needs to be ISO 8601'
       when z.storage.StorageError::TYPE.SKIP_LOADING
@@ -50,11 +52,12 @@ class z.storage.StorageError
   @::TYPE = {
     DATA_STORE_NOT_FOUND: 'z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND'
     FAILED_TO_OPEN: 'z.storage.StorageError::TYPE.FAILED_TO_OPEN'
+    INVALID_TIME: 'z.storage.StorageError::TYPE.INVALID_TIME'
     INVALID_TIMESTAMP: 'z.storage.StorageError::TYPE.INVALID_TIMESTAMP'
     NO_CONVERSATION_ID: 'z.storage.StorageError::TYPE.NO_CONVERSATION_ID'
     NO_SENDER_ID: 'z.storage.StorageError::TYPE.NO_SENDER_ID'
     NO_TIME: 'z.storage.StorageError::TYPE.NO_TIME'
-    INVALID_TIME: 'z.storage.StorageError::TYPE.INVALID_TIME'
+    NON_SEQUENTIAL_UPDATE: 'z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE'
     SKIP_LOADING: 'z.storage.StorageError:TYPE.SKIP_SESSIONS'
     UNKNOWN: 'z.storage.StorageError::TYPE.UNKNOWN'
   }

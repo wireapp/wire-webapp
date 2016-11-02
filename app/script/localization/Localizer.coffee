@@ -24,8 +24,8 @@ class Localizer
   # Construct a new Localizer.
   constructor: ->
     param = z.util.get_url_parameter z.auth.URLParameter.LOCALE
-    z.storage.set_value z.storage.StorageKey.LOCALIZATION.LOCALE, param if param
-    @locale = z.storage.get_value(z.storage.StorageKey.LOCALIZATION.LOCALE) or navigator.language.substr(0, 2) or 'en'
+    z.util.StorageUtil.set_value z.storage.StorageKey.LOCALIZATION.LOCALE, param if param
+    @locale = z.util.StorageUtil.get_value(z.storage.StorageKey.LOCALIZATION.LOCALE) or navigator.language.substr(0, 2) or 'en'
     # Moment defaults to the language loaded last. Thus we need to set the fallback to English until we use all locales.
     # @see http://momentjs.com/docs/#/i18n/changing-locale/
     moment.locale [@locale, 'en']

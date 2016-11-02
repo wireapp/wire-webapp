@@ -94,7 +94,7 @@ class z.ViewModel.WarningsViewModel
           action: -> z.util.safe_window_open z.localization.Localizer.get_text z.string.url_support_mic_access_denied
       when z.ViewModel.WarningType.REQUEST_NOTIFICATION
       # We block subsequent permission requests for notifications when the user ignores the request.
-        amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.REQUEST_PERMISSION, false
+        amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.PERMISSION_STATE, z.system_notification.PermissionStatusState.IGNORED
 
   dismiss_warning: (type) =>
     type = @top_warning() if not type

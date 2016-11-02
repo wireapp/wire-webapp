@@ -92,7 +92,9 @@ describe 'z.cryptography.CryptographyMapper', ->
       uploaded =
         otr_key: new Uint8Array [1, 2]
         sha256: new Uint8Array [3, 4]
-      uploaded_asset = new z.proto.Asset.RemoteData uploaded.otr_key, uploaded.sha256
+        key: z.util.create_random_uuid()
+        token: z.util.create_random_uuid()
+      uploaded_asset = new z.proto.Asset.RemoteData uploaded.otr_key, uploaded.sha256, uploaded.key, uploaded.token
       asset = new z.proto.Asset()
       asset.set 'uploaded', uploaded_asset
 
@@ -108,6 +110,8 @@ describe 'z.cryptography.CryptographyMapper', ->
         expect(event_json.time).toBe event.time
         expect(event_json.id).toBe generic_message.message_id
         expect(event_json.data.id).toBe event.data.id
+        expect(event_json.data.key).toBe uploaded.key
+        expect(event_json.data.token).toBe uploaded.token
         done()
       .catch done.fail
 
@@ -265,9 +269,43 @@ describe 'z.cryptography.CryptographyMapper', ->
         expect(event_json.data.info.width).toBe image.width
         expect(event_json.data.info.height).toBe image.height
         expect(event_json.data.info.nonce).toBe event.data.id
-        expect(event_json.data.info.original_width).toBe image.original_width
-        expect(event_json.data.info.original_height).toBe image.original_height
         expect(event_json.data.info.public).toBeFalsy()
+        done()
+      .catch done.fail
+
+    it 'resolves with a mapped medium image message when receiving v3', (done) ->
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+
+      image_meta_data = new z.proto.Asset.ImageMetaData 1280, 640
+      original = new z.proto.Asset.Original 'image/jpg', 1024, null, image_meta_data
+
+      remote_data = new z.proto.Asset.RemoteData()
+      remote_data.set 'otr_key', new Uint8Array [1, 2]
+      remote_data.set 'sha256', new Uint8Array [3, 4]
+      remote_data.set 'asset_id', z.util.create_random_uuid()
+      remote_data.set 'asset_token', z.util.create_random_uuid()
+
+      asset = new z.proto.Asset()
+      asset.set 'original', original
+      asset.set 'uploaded', remote_data
+      generic_message.set 'asset', asset
+
+      mapper.map_generic_message generic_message, event
+      .then (event_json) ->
+        expect(_.isObject event_json).toBeTruthy()
+        expect(event_json.type).toBe z.event.Backend.CONVERSATION.ASSET_ADD
+        expect(event_json.conversation).toBe event.conversation
+        expect(event_json.from).toBe event.from
+        expect(event_json.time).toBe event.time
+        expect(event_json.id).toBe generic_message.message_id
+        expect(event_json.data.content_length).toBe original.size.toNumber()
+        expect(event_json.data.content_type).toBe original.mime_type
+        expect(event_json.data.key).toBe remote_data.asset_id
+        expect(event_json.data.token).toBe remote_data.asset_token
+        expect(event_json.data.info.tag).toBe 'medium'
+        expect(event_json.data.info.width).toBe image_meta_data.width
+        expect(event_json.data.info.height).toBe image_meta_data.height
+        expect(event_json.data.info.nonce).toBe generic_message.message_id
         done()
       .catch done.fail
 
@@ -302,8 +340,6 @@ describe 'z.cryptography.CryptographyMapper', ->
         expect(event_json.data.info.width).toBe image.width
         expect(event_json.data.info.height).toBe image.height
         expect(event_json.data.info.nonce).toBeDefined()
-        expect(event_json.data.info.original_width).toBe image.original_width
-        expect(event_json.data.info.original_height).toBe image.original_height
         expect(event_json.data.info.public).toBeFalsy()
         done()
       .catch done.fail

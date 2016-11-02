@@ -26,9 +26,9 @@ class z.connect.ConnectRepository
 
   @param connect_service [z.connect.ConnectService] Backend REST API service implementation
   @param connect_google_service [z.connect.ConnectGoogleService] Google REST API implementation
-  @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
+  @param properties_repository [z.properties.PropertiesRepository] Repository for all user property interactions
   ###
-  constructor: (@connect_service, @connect_google_service, @user_repository) ->
+  constructor: (@connect_service, @connect_google_service, @properties_repository) ->
     @logger = new z.util.Logger 'z.connect.ConnectRepository', z.config.LOGGER.OPTIONS
 
   ###
@@ -42,6 +42,7 @@ class z.connect.ConnectRepository
         @logger.log @logger.levels.INFO, 'Google Contacts SDK error', error
         throw new z.connect.ConnectError z.connect.ConnectError::TYPE.GOOGLE_DOWNLOAD
       .then (response) =>
+        amplify.publish z.event.WebApp.SEARCH.SHOW
         return @_parse_google_contacts response
       .then (phone_book) =>
         if phone_book.cards.length is 0
@@ -53,7 +54,7 @@ class z.connect.ConnectRepository
       .then (response) =>
         @logger.log @logger.levels.INFO,
           "Gmail contacts upload successful: #{response.results.length} matches, #{response['auto-connects'].length} auto connects", response
-        @user_repository.save_property_contact_import_google Date.now()
+        @properties_repository.save_preference_contact_import_google Date.now()
         resolve response
       .catch (error) =>
         if error instanceof z.connect.ConnectError
@@ -82,12 +83,13 @@ class z.connect.ConnectRepository
         @logger.log @logger.levels.WARN, 'No contacts found for upload'
         reject new z.connect.ConnectError z.connect.ConnectError::TYPE.NO_CONTACTS
       else
+        amplify.publish z.event.WebApp.SEARCH.SHOW
         @logger.log @logger.levels.INFO, "Uploading hashes of '#{phone_book.cards.length}' contacts for matching", phone_book
         @connect_service.post_onboarding phone_book
         .then (response) =>
           @logger.log @logger.levels.INFO,
             "macOS contacts upload successful: #{response.results.length} matches, #{response['auto-connects'].length} auto connects", response
-          @user_repository.save_property_contact_import_macos Date.now()
+          @properties_repository.save_preference_contact_import_macos Date.now()
           resolve response
         .catch (error) =>
           if error.code is z.service.BackendClientError::STATUS_CODE.TOO_MANY_REQUESTS
@@ -124,7 +126,7 @@ class z.connect.ConnectRepository
     return if not window.zAddressBook
 
     address_book = window.zAddressBook()
-    phone_book = new z.connect.PhoneBook @user_repository.self()
+    phone_book = new z.connect.PhoneBook @properties_repository.self()
 
     me = address_book.getMe()
     for email in me.emails
@@ -156,13 +158,13 @@ class z.connect.ConnectRepository
   @return [z.connect.PhoneBook] Encoded phone book data
   ###
   _parse_google_contacts: (response) ->
-    phone_book = new z.connect.PhoneBook @user_repository.self()
+    phone_book = new z.connect.PhoneBook @properties_repository.self()
 
     # Add self info from Google
     if response.feed.author?
       self = response.feed.author
       google_email = self[0].email.$t.toLowerCase().trim()
-      if not @user_repository.self().email() is google_email
+      if not @properties_repository.self().email() is google_email
         phone_book.self.push google_email
 
     # Add Google contacts

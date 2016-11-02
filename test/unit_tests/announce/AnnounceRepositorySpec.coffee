@@ -78,5 +78,6 @@ describe 'z.announce.AnnounceRepository', ->
     server.restore()
 
   it 'can fetch an announcement', (done) ->
-    announce_repository.fetch()
+    announce_repository.fetch_announcements()
     .then done
+    .catch done.fail

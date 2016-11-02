@@ -16,16 +16,25 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+@input-level-bullet-size: 16px;
 
-// Set of common styles
-
-.popover-title {
-  font-weight: 500;
-  line-height: @line-height-md;
-  margin-bottom: 4px;
+.input-level {
+  display: flex;
+  justify-content: space-between;
+  list-style: none;
+  padding: 0
 }
 
-.popover-meta {
-  .label-xs();
-  line-height: @line-height-sm;
+.input-level-bullet:before {
+  .circle(@input-level-bullet-size);
+  display: block;
+  content: "";
+  background-color: #fff;
+  border-radius: @input-level-bullet-size / 2;
+  border: 1px solid @seperator-color;
 }
+
+.input-level-bullet-active:before {
+  background-color: currentColor;
+}
+

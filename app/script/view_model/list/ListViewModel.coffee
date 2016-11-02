@@ -31,7 +31,7 @@ class z.ViewModel.list.ListViewModel
   @param search_repository [z.search.SearchRepository] Search repository
   @param user_repository [z.user.UserRepository] User repository
   ###
-  constructor: (element_id, @content_view_model, @call_center, @connect_repository, @conversation_repository, @search_repository, @user_repository) ->
+  constructor: (element_id, @content_view_model, @call_center, @connect_repository, @conversation_repository, @search_repository, @user_repository, @properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.list.ListViewModel', z.config.LOGGER.OPTIONS
 
     # state
@@ -45,11 +45,11 @@ class z.ViewModel.list.ListViewModel
     @archive       = new z.ViewModel.list.ArchiveViewModel 'archive', @, @conversation_repository
     @conversations = new z.ViewModel.list.ConversationListViewModel 'conversations', @, @content_view_model, @call_center, @conversation_repository, @user_repository
     @preferences   = new z.ViewModel.list.PreferencesListViewModel 'preferences', @, @content_view_model
-    @start_ui      = new z.ViewModel.list.StartUIViewModel 'start-ui', @, @connect_repository, @conversation_repository, @search_repository, @user_repository
+    @start_ui      = new z.ViewModel.list.StartUIViewModel 'start-ui', @, @connect_repository, @conversation_repository, @search_repository, @user_repository, @properties_repository
 
     @actions       = new z.ViewModel.list.ActionsViewModel 'actions-bubble', @, @conversations, @conversation_repository, @user_repository
 
-    @self_user = ko.pureComputed => @user_repository.self()?.picture_medium_url() if @webapp_loaded()
+    @self_user = ko.pureComputed => @user_repository.self()?.medium_picture_resource() if @webapp_loaded()
 
     @_init_subscriptions()
 
@@ -61,6 +61,7 @@ class z.ViewModel.list.ListViewModel
     amplify.subscribe z.event.WebApp.PROFILE.SETTINGS.SHOW, @open_preferences_account # @todo remove when user base of wrappers version >= 2.11 is large enough
     amplify.subscribe z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, @open_preferences_account
     amplify.subscribe z.event.WebApp.PREFERENCES.MANAGE_DEVICES, @open_preferences_devices
+    amplify.subscribe z.event.WebApp.SEARCH.SHOW, @open_start_ui
 
   click_on_actions: (conversation_et, event) =>
     @actions.click_on_actions conversation_et, event

@@ -17,23 +17,10 @@
 #
 
 window.z ?= {}
-z.entity ?= {}
+z.audio ?= {}
 
-# Medium image asset entity.
-class z.entity.MediumImage extends z.entity.Asset
-  ###
-  Construct a new medium image asset.
-
-  @param id [String] Asset ID
-  ###
-  constructor: (id) ->
-    super id
-    @type = z.assets.AssetType.IMAGE
-
-    @correlation_id = ''
-
-    @width = '0px'
-    @height = '0px'
-
-    # z.assets.AssetRemoteData
-    @resource = ko.observable()
+# Enum of audio preferences.
+z.audio.AudioPreference =
+  ALL: 'all'
+  NONE: 'none'
+  SOME: 'some'

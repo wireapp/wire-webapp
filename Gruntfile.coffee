@@ -64,7 +64,6 @@ module.exports = (grunt) ->
     aws_s3:           require "./grunt/config/aws_s3"
     bower:            require "./grunt/config/bower"
     clean:            require "./grunt/config/clean"
-    codo:             require './grunt/config/codo'
     coffee:           require "./grunt/config/coffee"
     coffeelint:       require "./grunt/config/coffeelint"
     compress:         require "./grunt/config/compress"
@@ -132,15 +131,5 @@ module.exports = (grunt) ->
   grunt.registerTask 'test_run', (test_name) ->
     grunt.config 'karma.options.reporters', ['progress']
     grunt.task.run ['scripts', 'newer:coffee:dist', 'newer:coffee:test', "test_prepare:#{test_name}", 'karma:test']
-
-###############################################################################
-# Documentation
-###############################################################################
-  grunt.registerTask 'generate_docs', (command) ->
-    switch command
-      when 'all'
-        grunt.task.run ['clean:docs', 'codo:app', 'test:coverage']
-      else
-        grunt.task.run ['clean:docs', 'codo:app']
 
 # @formatter:on

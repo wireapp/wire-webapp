@@ -23,6 +23,28 @@ user-avatar {
   cursor: pointer;
   transform: translateZ(0);
 
+  &.user-avatar-xxl {
+    .square(@avatar-diameter-xxl);
+
+    .user-avatar-initials {
+      font-size: @avatar-initials-xxl;
+      line-height: @avatar-diameter-xxl;
+    }
+
+    .user-avatar-border {
+      border-width: @avatar-border-xxl;
+      border-color: fade(#000, 8%);
+    }
+
+    .user-avatar-background {
+      transform: scale(.9916);
+    }
+
+    .user-avatar-badge:before {
+      font-size: @font-size-xxl;
+    }
+  }
+
   &.user-avatar-xl {
     .square(@avatar-diameter-xl);
 
@@ -120,6 +142,12 @@ user-avatar {
   &.user-avatar-no-badge {
     .user-avatar-badge {
       opacity: 0;
+    }
+  }
+
+  &.user-avatar-no-filter {
+    .user-avatar-image {
+      filter: none !important;
     }
   }
 }
