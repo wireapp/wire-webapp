@@ -56,6 +56,10 @@
     color: fade(@graphite, 48%);
     padding-left: 8px;
   }
+
+  &.ephemeral-input::placeholder {
+    .accent-color();
+  }
 }
 
 .controls-left {
@@ -98,9 +102,18 @@
   outline: 0;
 }
 
+.ephemeral-mode,
+.bubble-menu .ephemeral-mode {
+  .accent-color();
+}
+
 .ephemeral-timer-button {
   .circle(@avatar-diameter-xs);
+  .accent-color();
+  .accent-border-color(40%);
   position: relative;
+  border-width: 1px;
+  border-style: solid;
   font-size: @font-size-xs;
   font-weight: 600;
   line-height: @avatar-diameter-xs - 2;
