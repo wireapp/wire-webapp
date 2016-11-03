@@ -402,7 +402,7 @@ z.string.preferences_account_username_placeholder = 'Your full name'
 
 z.string.preferences_av_camera = 'Camera'
 z.string.preferences_av_microphone = 'Microphone'
-z.string.preferences_av_permission_detail = 'Enable from your browser Settings.'
+z.string.preferences_av_permission_detail = 'Enable from your browser Preferences.'
 z.string.preferences_av_speakers = 'Speakers'
 
 z.string.preferences_devices_activated_in = 'in %location'
