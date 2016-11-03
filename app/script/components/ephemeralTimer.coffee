@@ -69,7 +69,7 @@ ko.components.register 'ephemeral-timer',
   viewModel: z.components.EphemeralTimer
   template: """
             <ul class="ephemeral-timer" data-bind="attr: {'title': title_caption()}">
-              <!-- ko foreach : bullet_count -->
+              <!-- ko foreach: bullet_count -->
                <li class="ephemeral-timer-bullet" data-bind="css: $parent.is_bullet_active($data)"></li>
               <!-- /ko -->
             </ul>

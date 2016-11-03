@@ -104,24 +104,6 @@ class z.conversation.ConversationService
         users: user_ids
         name: name
 
-  ###
-  Create a One:One conversation.
-
-  @note Do not include the requestor
-  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createOne2OneConversation
-
-  @param user_ids [Array<String>] IDs of users (excluding the requestor) to be part of the conversation
-  @param name [String] User defined name for the Conversation (optional)
-  @param callback [Function] Function to be called on server return
-  ###
-  create_one_to_one_conversation: (user_ids, name, callback) ->
-    @client.send_json
-      url: @client.create_url '/conversations/one2one'
-      type: 'POST'
-      data:
-        users: user_ids
-        name: name
-      callback: callback
 
   ###############################################################################
   # Get conversations
@@ -157,19 +139,6 @@ class z.conversation.ConversationService
       type: 'GET'
       callback: callback
 
-  ###
-  Get the last (i.e. most current) event ID per conversation.
-
-  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/lastEvents
-  @todo Implement paging for this endpoint
-
-  @param callback [Function] Function to be called on server return
-  ###
-  get_last_events: (callback) ->
-    @client.send_request
-      url: @client.create_url '/conversations/last-events'
-      type: 'GET'
-      callback: callback
 
   ###############################################################################
   # Send events
@@ -184,11 +153,10 @@ class z.conversation.ConversationService
   @param user_id [String] ID of member to be removed from the the conversation
   @param callback [Function] Function to be called on server return
   ###
-  delete_members: (conversation_id, user_id, callback) ->
+  delete_members: (conversation_id, user_id) ->
     @client.send_request
       url: @client.create_url "/conversations/#{conversation_id}/members/#{user_id}"
       type: 'DELETE'
-      callback: callback
 
   ###
   Delete a message from a conversation with the given primary.
@@ -229,11 +197,18 @@ class z.conversation.ConversationService
   @param message_et [z.entity.Message] Message event to update in the database
   @param changes [Object] Changes to update message with
   ###
-  update_message_in_db: (message_et, changes) ->
+  update_message_in_db: (message_et, changes, conversation_id) ->
     Promise.resolve message_et.primary_key or z.storage.StorageService.construct_primary_key message_et
     .then (primary_key) =>
       if _.isObject(changes) and changes[Object.keys(changes)[0]]?
-        return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
+        return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes if not changes.version
+
+        return @storage_service.db.transaction 'rw', @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, =>
+          @load_event_from_db conversation_id, message_et.id
+          .then (record) =>
+            if record and changes.version is (record.version or 1) + 1
+              return @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, changes
+            throw new z.storage.StorageError z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
       throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NO_CHANGES
 
   ###
@@ -246,6 +221,8 @@ class z.conversation.ConversationService
       record.data.id = asset_data.id
       record.data.otr_key = asset_data.otr_key
       record.data.sha256 = asset_data.sha256
+      record.data.key = asset_data.key
+      record.data.token = asset_data.token
       record.data.status = z.assets.AssetTransferState.UPLOADED
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
@@ -261,6 +238,8 @@ class z.conversation.ConversationService
       record.data.preview_id = asset_data.id
       record.data.preview_otr_key = asset_data.otr_key
       record.data.preview_sha256 = asset_data.sha256
+      record.data.preview_key = asset_data.key
+      record.data.preview_token = asset_data.token
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
       @logger.log 'Updated asset message_et (preview)', primary_key
@@ -413,15 +392,13 @@ class z.conversation.ConversationService
 
   @param conversation_id [String] ID of conversation to rename
   @param name [String] New conversation name
-  @param callback [Function] Function to be called on server return
   ###
-  update_conversation_properties: (conversation_id, name, callback) ->
+  update_conversation_properties: (conversation_id, name) ->
     @client.send_json
       url: @client.create_url "/conversations/#{conversation_id}"
       type: 'PUT'
       data:
         name: name
-      callback: callback
 
   ###
   Update self membership properties.
@@ -430,16 +407,9 @@ class z.conversation.ConversationService
 
   @param conversation_id [String] ID of conversation to update
   @param payload [Object] Updated properties
-  @param callback [Function] Function to be called on server return
   ###
-  update_member_properties: (conversation_id, payload, callback) ->
+  update_member_properties: (conversation_id, payload) ->
     @client.send_json
       url: @client.create_url "/conversations/#{conversation_id}/self"
       type: 'PUT'
       data: payload
-      callback: (response, error) ->
-        if callback?
-          callback
-            conversation: conversation_id
-            data: data
-          , error

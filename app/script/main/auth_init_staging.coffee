@@ -27,12 +27,6 @@ $ ->
       rest_url: 'https://prod-nginz-https.wire.com'
       web_socket_url: 'wss://prod-nginz-ssl.wire.com'
     settings.parameter = '?env=prod' if env?
-  else if env? and env is z.service.BackendEnvironment.EDGE
-    settings =
-      environment: z.service.BackendEnvironment.EDGE
-      rest_url: 'https://edge-nginz-https.zinfra.io'
-      web_socket_url: 'wss://edge-nginz-ssl.zinfra.io'
-    settings.parameter = '?env=edge' if env?
   else
     settings =
       environment: z.service.BackendEnvironment.STAGING

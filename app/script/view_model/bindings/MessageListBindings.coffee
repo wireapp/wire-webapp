@@ -92,7 +92,7 @@ ko.bindingHandlers.fit_to_viewport = do ->
   process_image = (element, asset) ->
     message_list_width ?= $('.messages').width()
     content_element = element.parent()
-    content_element.toggleClass 'image-widescreen', message_list_width < asset.original_width and asset.ratio < 1
+    content_element.toggleClass 'image-widescreen', message_list_width < asset.width and asset.ratio < 1
 
   on_resize = _.throttle ->
     message_list_width = undefined

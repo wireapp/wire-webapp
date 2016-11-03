@@ -44,7 +44,7 @@ ko.components.register 'group-list',
                   <user-avatar class="user-avatar-sm" params="user: $data.participating_user_ets()[0]"></user-avatar>
                 <!-- /ko  -->
                 <!-- ko if: $parent.avatar === false -->
-                   <div class="search-list-item-image" data-bind="style: {backgroundImage: group.picture_preview}"></div>
+                   <div class="search-list-item-image"></div>
                 <!-- /ko  -->
                 <div class="search-list-item-header" data-bind="text: group.display_name"></div>
               </div>

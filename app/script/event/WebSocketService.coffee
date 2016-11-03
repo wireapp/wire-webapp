@@ -110,7 +110,7 @@ class z.event.WebSocketService
   @param trigger [z.event.WebSocketService::CHANGE_TRIGGER] Trigger of the reconnect
   ###
   reconnect: (trigger) =>
-    if not z.storage.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION
+    if not z.util.StorageUtil.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION
       @logger.log @logger.levels.INFO, "Access token has to be refreshed before reconnecting the WebSocket triggered by '#{trigger}'"
       amplify.unsubscribeAll z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED
       amplify.subscribe z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED, => @pending_reconnect trigger

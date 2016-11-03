@@ -32,6 +32,7 @@ class z.assets.AssetRemoteData
     @download_progress = ko.observable()
     @cancel_download = undefined
     @generate_url = undefined
+    @identifier = undefined
 
   ###
   Static initializer for v3 assets
@@ -44,6 +45,7 @@ class z.assets.AssetRemoteData
   @v3: (asset_key, otr_key, sha256, asset_token) ->
     remote_data = new z.assets.AssetRemoteData otr_key, sha256
     remote_data.generate_url = -> wire.app.service.asset.generate_asset_url_v3 asset_key, asset_token
+    remote_data.identifier = "#{asset_key}"
     return remote_data
 
   ###
@@ -57,6 +59,20 @@ class z.assets.AssetRemoteData
   @v2: (conversation_id, asset_id, otr_key, sha256) ->
     remote_data = new z.assets.AssetRemoteData otr_key, sha256
     remote_data.generate_url = -> wire.app.service.asset.generate_asset_url_v2 asset_id, conversation_id
+    remote_data.identifier = "#{conversation_id}#{asset_id}"
+    return remote_data
+
+  ###
+  Static initializer for v1 assets
+
+  @deprecated
+  @param conversation_id [String]
+  @param asset_id [String]
+  ###
+  @v1: (conversation_id, asset_id) ->
+    remote_data = new z.assets.AssetRemoteData()
+    remote_data.generate_url = -> wire.app.service.asset.generate_asset_url asset_id, conversation_id
+    remote_data.identifier = "#{conversation_id}#{asset_id}"
     return remote_data
 
   ###
@@ -70,9 +86,22 @@ class z.assets.AssetRemoteData
     @_load_buffer()
     .then (data) =>
       [buffer, type] = data
-      return z.assets.AssetCrypto.decrypt_aes_asset buffer, @otr_key.buffer, @sha256.buffer
+      if @otr_key? and @sha256?
+        return z.assets.AssetCrypto.decrypt_aes_asset buffer, @otr_key.buffer, @sha256.buffer
+      return buffer
     .then (buffer) ->
       return new Blob [new Uint8Array buffer], type: type
+
+  ###
+  Get object url for asset remote data. URLs are cached in memory
+
+  @returns [String] url
+  ###
+  get_object_url: =>
+    object_url = z.assets.AssetURLCache.get_url @identifier
+    return Promise.resolve object_url if object_url?
+
+    @load().then (blob) => z.assets.AssetURLCache.set_url @identifier, window.URL.createObjectURL(blob)
 
   _load_buffer: =>
     z.util.load_url_buffer @generate_url(), (xhr) =>

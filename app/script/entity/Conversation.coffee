@@ -30,9 +30,9 @@ class z.entity.Conversation
     @creator = undefined
     @type = ko.observable()
     @name = ko.observable()
-    @input = ko.observable z.storage.get_value("#{z.storage.StorageKey.CONVERSATION.INPUT}|#{@id}") or ''
+    @input = ko.observable z.util.StorageUtil.get_value("#{z.storage.StorageKey.CONVERSATION.INPUT}|#{@id}") or ''
     @input.subscribe (text) =>
-      z.storage.set_value "#{z.storage.StorageKey.CONVERSATION.INPUT}|#{@id}", text
+      z.util.StorageUtil.set_value "#{z.storage.StorageKey.CONVERSATION.INPUT}|#{@id}", text
 
     @is_pending = ko.observable false
     @is_loaded = ko.observable false
@@ -305,16 +305,6 @@ class z.entity.Conversation
     @messages_unordered.removeAll()
 
   ###
-  Replace a message in the conversation.
-
-  @param old_message_et [z.entity.Message] Message to be replaced
-  @param new_message_et [z.entity.Message] Message replacing the old one
-  ###
-  replace_message: (old_message_et, new_message_et) ->
-    @messages()[@messages.indexOf old_message_et] = new_message_et
-    @messages.valueHasMutated()
-
-  ###
   Checks for message duplicates by nonce and returns the message.
 
   @private
@@ -405,14 +395,6 @@ class z.entity.Conversation
   ###############################################################################
 
   ###
-  Update information about last activity from multiple messages.
-  @param message_ets [z.entity.Message[]] Array of messages to be added to conversation
-  ###
-  update_latest_from_messages: (message_ets) ->
-    last_message = message_ets[message_ets.length - 1]
-    @update_latest_from_message last_message
-
-  ###
   Update information about last activity from single message.
   @param message_et [z.entity.Message] Message to be added to conversation
   ###
@@ -439,18 +421,6 @@ class z.entity.Conversation
   ###
   get_all_messages: ->
     return @messages()
-
-  ###
-  Returns a message with an image if found by correlation ID and image type.
-
-  @param message_et [z.entity.Message] Message with image for which a correlating message should be found
-  @param message_ets [Array<z.entity.Message>] Pool of message to search in first
-  @return [z.entity.ContentMessage] Correlating content message containing image
-  ###
-  get_correlating_image_message: (message_et, message_ets) =>
-    image_message_et = @_get_correlating_image_message message_et, message_ets if message_ets?.length > 0
-    image_message_et = @_get_correlating_image_message message_et, @messages() if not image_message_et?
-    return image_message_et
 
   ###
   Get the first message of the conversation.
@@ -498,22 +468,6 @@ class z.entity.Conversation
   ###
   get_message_by_id: (id) ->
     return message_et for message_et in @messages() when message_et.id is id
-
-  ###
-  Returns a message with an image if found by correlation ID and image type.
-
-  @private
-  @param message_et [z.entity.Message] Message with image for which a correlating message should be found
-  @param message_ets [Array<z.entity.Message>] Pool of message to search in
-  @return [z.entity.ContentMessage] Correlating content message containing image
-  ###
-  _get_correlating_image_message: (input_message_et, message_ets) ->
-    input_asset_et = input_message_et.get_first_asset()
-    for other_message_et in message_ets when other_message_et.has_asset_image()
-      continue if other_message_et.id is input_message_et.id
-      other_asset_et = other_message_et.get_first_asset()
-      if other_asset_et.correlation_id is input_asset_et.correlation_id
-        return other_message_et if input_asset_et.is_medium_image() is other_asset_et.is_preview_image()
 
   ###
   Get Number of pending uploads for this conversation.

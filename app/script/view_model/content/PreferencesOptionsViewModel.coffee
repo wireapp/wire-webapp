@@ -22,32 +22,34 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.PreferencesOptionsViewModel
-  constructor: (element_id, @user_repository) ->
+  constructor: (element_id, @properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS
 
     @option_data = ko.observable()
-    @option_data.subscribe (data_preference) => @user_repository.save_property_data_settings data_preference
+    @option_data.subscribe (data_preference) => @properties_repository.save_preference_data data_preference
 
-    @option_sound = ko.observable()
-    @option_sound.subscribe (sound_preference) =>
-      tracking_value = switch sound_preference
-        when z.audio.AudioSetting.ALL then 'alwaysPlay'
-        when z.audio.AudioSetting.SOME then 'firstMessageOnly'
-        when z.audio.AudioSetting.NONE then 'neverPlay'
+    @option_audio = ko.observable()
+    @option_audio.subscribe (audio_preference) =>
+      tracking_value = switch audio_preference
+        when z.audio.AudioPreference.ALL then 'alwaysPlay'
+        when z.audio.AudioPreference.SOME then 'firstMessageOnly'
+        when z.audio.AudioPreference.NONE then 'neverPlay'
 
-      @user_repository.save_property_sound_alerts sound_preference
+      @properties_repository.save_preference_sound_alerts audio_preference
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SOUND_SETTINGS_CHANGED, value: tracking_value
+
+    @option_notifications = ko.observable()
+    @option_notifications.subscribe (notifications_preference) => @properties_repository.save_preference_notifications notifications_preference
 
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @update_properties
 
-  connect_google: ->
+  connect_google_contacts: ->
     amplify.publish z.event.WebApp.CONNECT.IMPORT_CONTACTS, z.connect.ConnectSource.GMAIL, z.connect.ConnectTrigger.SETTINGS
-    amplify.publish z.event.WebApp.SEARCH.SHOW
 
   connect_macos_contacts: ->
     amplify.publish z.event.WebApp.CONNECT.IMPORT_CONTACTS, z.connect.ConnectSource.ICLOUD, z.connect.ConnectTrigger.SETTINGS
-    amplify.publish z.event.WebApp.SEARCH.SHOW
 
   update_properties: (properties) =>
+    @option_audio properties.settings.sound.alerts
     @option_data properties.settings.privacy.report_errors
-    @option_sound properties.settings.sound.alerts
+    @option_notifications properties.settings.notifications

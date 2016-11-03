@@ -16,13 +16,22 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-# https://github.com/frostney/grunt-codo
+window.z ?= {}
+z.assets ?= {}
 
-module.exports =
-  options:
-    name: '<%= pkg.name %>'
-    output: '<%= dir.docs.api %>'
-    stats: true
-    undocumented: false
-  app:
-    src: '<%= dir.app.script %>'
+z.assets.AssetURLCache = do ->
+  lru_cache = new LRUCache 100
+
+  set_url = (identifier, url) ->
+    removed_entry = lru_cache.put identifier, url
+    if removed_entry?
+      window.URL.revokeObjectURL removed_entry.value
+    return url
+
+  get_url = (identifier) ->
+    return lru_cache.get identifier
+
+  return {
+    get_url: get_url
+    set_url: set_url
+  }

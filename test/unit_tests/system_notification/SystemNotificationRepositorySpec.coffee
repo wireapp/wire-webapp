@@ -50,14 +50,9 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         timeout: z.config.BROWSER_NOTIFICATION.TIMEOUT
 
       # Mocks
+      document.hasFocus = -> return false
       z.util.Environment.browser.supports.notifications = true
-
-      window.Notification =
-        permission:
-          z.util.BrowserPermissionType.GRANTED
-
-      document.hasFocus = ->
-        false
+      system_notification_repository.permission_state = z.system_notification.PermissionStatusState.GRANTED
 
       spyOn system_notification_repository, '_show_notification'
       spyOn system_notification_repository, '_notify_sound'
@@ -70,44 +65,71 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       message_et.user user_et
       notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
 
-    it 'if the browser does not support them', ->
+    it 'if the browser does not support them', (done) ->
       z.util.Environment.browser.supports.notifications = false
+
       system_notification_repository.notify conversation_et, message_et
+      .then ->
+        expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
+        done()
+      .catch done.fail
 
-      expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
+    it 'if the browser tab has focus and conversation is active', (done) ->
+      conversation_repository.active_conversation conversation_et
+      document.hasFocus = -> return true
 
-    it 'if the user permission was denied', ->
-      window.Notification.permission = z.util.BrowserPermissionType.DENIED
       system_notification_repository.notify conversation_et, message_et
+      .then ->
+        expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
+        done()
+      .catch done.fail
 
-      expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
-
-    it 'if the browser tab has focus', ->
-      document.hasFocus = ->
-        true
-      system_notification_repository.notify conversation_et, message_et
-
-      expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
-
-    it 'if the event was triggered by the user', ->
+    it 'if the event was triggered by the user', (done) ->
       message_et.user().is_me = true
+
       system_notification_repository.notify conversation_et, message_et
+      .then ->
+        expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
+        done()
+      .catch done.fail
 
-      expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
-
-    it 'if the conversation is muted', ->
+    it 'if the conversation is muted', (done) ->
       conversation_et.muted_state true
+
       system_notification_repository.notify conversation_et, message_et
+      .then ->
+        expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
+        done()
+      .catch done.fail
 
-      expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
-
-    it 'for a successfully completed call', ->
+    it 'for a successfully completed call', (done) ->
       message_et = new z.entity.CallMessage()
       message_et.call_message_type = z.message.CallMessageType.DEACTIVATED
       message_et.finished_reason = z.calling.enum.CallFinishedReason.COMPLETED
-      system_notification_repository.notify conversation_et, message_et
 
-      expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
+      system_notification_repository.notify conversation_et, message_et
+      .then ->
+        expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
+        done()
+      .catch done.fail
+
+    it 'if preference is set to none', (done) ->
+      system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.NONE
+
+      system_notification_repository.notify conversation_et, message_et
+      .then ->
+        expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
+        done()
+      .catch done.fail
+
+    it 'if the user permission was denied', (done) ->
+      system_notification_repository.permission_state = z.system_notification.PermissionStatusState.DENIED
+
+      system_notification_repository.notify conversation_et, message_et
+      .then ->
+        expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
+        done()
+      .catch done.fail
 
   describe 'shows a well-formed call notification', ->
     describe 'for an incoming call', ->
@@ -118,23 +140,30 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         notification_content.options.body = z.string.system_notification_voice_channel_activate
         notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
 
-      it 'in a 1:1 conversation', ->
+      it 'in a 1:1 conversation', (done) ->
         conversation_et.type z.conversation.ConversationType.ONE2ONE
-        notification_content.title = z.string.truncation
+
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          notification_content.title = z.string.truncation
 
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
-      it 'in a group conversation', ->
+      it 'in a group conversation', (done) ->
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
+          notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
-        title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-        notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
     describe 'for a missed call', ->
       beforeEach ->
@@ -145,23 +174,30 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         notification_content.options.body = z.string.system_notification_voice_channel_deactivate
         notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
 
-      it 'in a 1:1 conversation', ->
+      it 'in a 1:1 conversation', (done) ->
         conversation_et.type z.conversation.ConversationType.ONE2ONE
-        notification_content.title = z.string.truncation
+
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          notification_content.title = z.string.truncation
 
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
-      it 'in a group conversation', ->
+      it 'in a group conversation', (done) ->
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
+          notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
-        title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-        notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
   describe 'shows a well-formed content notification', ->
     beforeEach ->
@@ -176,98 +212,170 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         message_et.assets.push asset_et
         notification_content.options.body = asset_et.text
 
-      it 'in a 1:1 conversation', ->
+      it 'in a 1:1 conversation', (done) ->
         conversation_et.type z.conversation.ConversationType.ONE2ONE
-        notification_content.title = z.string.truncation
+
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          notification_content.title = z.string.truncation
 
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
-      it 'in a group conversation', ->
+      it 'in a group conversation', (done) ->
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
+          notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
-        title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-        notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
+
+      it 'when preference is set to obfuscate',(done) ->
+        system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.OBFUSCATE
+
+        system_notification_repository.notify conversation_et, message_et
+        .then ->
+          notification_content.title = z.string.system_notification_obfuscated_title
+          notification_content.options.body = z.string.system_notification_obfuscated
+
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
     describe 'for a picture', ->
       beforeEach ->
         message_et.assets.push new z.entity.MediumImage()
         notification_content.options.body = z.string.system_notification_asset_add
 
-      it 'in a 1:1 conversation', ->
+      it 'in a 1:1 conversation', (done) ->
         conversation_et.type z.conversation.ConversationType.ONE2ONE
-        notification_content.title = z.string.truncation
+
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          notification_content.title = z.string.truncation
 
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
-      it 'in a group conversation', ->
+      it 'in a group conversation', (done) ->
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
+          notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
-        title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-        notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
+
+      it 'when preference is set to obfuscate', (done) ->
+        system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.OBFUSCATE
+
+        system_notification_repository.notify conversation_et, message_et
+        .then ->
+          notification_content.title = z.string.system_notification_obfuscated_title
+          notification_content.options.body = z.string.system_notification_obfuscated
+
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
     describe 'for a location', ->
       beforeEach ->
         message_et.assets.push new z.entity.Location()
         notification_content.options.body = z.string.system_notification_shared_location
 
-      it 'in a 1:1 conversation', ->
+      it 'in a 1:1 conversation', (done) ->
         conversation_et.type z.conversation.ConversationType.ONE2ONE
-        notification_content.title = z.string.truncation
+
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          notification_content.title = z.string.truncation
 
-        expectation = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(expectation).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
-      it 'in a group conversation', ->
+      it 'in a group conversation', (done) ->
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
+          notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
-        title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-        notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
+
+      it 'when preference is set to obfuscate', (done) ->
+        system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.OBFUSCATE
+
+        system_notification_repository.notify conversation_et, message_et
+        .then ->
+          notification_content.title = z.string.system_notification_obfuscated_title
+          notification_content.options.body = z.string.system_notification_obfuscated
+
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
     describe 'for ephemeral messages', ->
       beforeEach ->
         message_et.expire_after_millis 5000
-        notification_content.title = z.string.system_notification_ephemeral_title
-        notification_content.options.body = z.string.system_notification_ephemeral
+        notification_content.title = z.string.system_notification_obfuscated_title
+        notification_content.options.body = z.string.system_notification_obfuscated
 
-      it 'that contains text', ->
+      it 'that contains text', (done) ->
+        message_et.assets.push new z.entity.Text 'Hello world!'
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
-
-      it 'that contains an image', ->
+      it 'that contains an image', (done) ->
         message_et.assets.push new z.entity.Location()
+
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
-
-      it 'that contains a location', ->
+      it 'that contains a location', (done) ->
         message_et.assets.push new z.entity.MediumImage()
-        system_notification_repository.notify conversation_et, message_et
 
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        system_notification_repository.notify conversation_et, message_et
+        .then ->
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
   describe 'shows a well-formed group notification', ->
     beforeEach ->
@@ -275,28 +383,36 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
       notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
 
-    it 'if a group is created', ->
+    it 'if a group is created', (done) ->
       conversation_et.from = payload.users.get.one[0].id
       message_et = new z.entity.MemberMessage()
       message_et.user user_et
       message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE
+
       system_notification_repository.notify conversation_et, message_et
+      .then ->
+        notification_content.options.body = "#{first_name} started a conversation"
 
-      notification_content.options.body = "#{first_name} started a conversation"
-      result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-      expect(result).toEqual JSON.stringify notification_content
-      expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        done()
+      .catch done.fail
 
-    it 'if a group is renamed', ->
+    it 'if a group is renamed', (done) ->
       message_et = new z.entity.RenameMessage()
       message_et.user user_et
       message_et.name = 'Lorem Ipsum Conversation'
-      system_notification_repository.notify conversation_et, message_et
 
-      notification_content.options.body = "#{first_name} renamed the conversation to #{message_et.name}"
-      result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-      expect(result).toEqual JSON.stringify notification_content
-      expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+      system_notification_repository.notify conversation_et, message_et
+      .then ->
+        notification_content.options.body = "#{first_name} renamed the conversation to #{message_et.name}"
+
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        done()
+      .catch done.fail
 
   describe 'shows a well-formed member notification', ->
     other_user_et = undefined
@@ -315,35 +431,47 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
         notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
 
-      it 'with one user being added to the conversation', ->
+      it 'with one user being added to the conversation', (done) ->
         message_et.user_ets [other_user_et]
+
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          first_name_added = "#{entities.user.jane_roe.name.split(' ')[0]}"
+          notification_content.options.body = "#{first_name} added #{first_name_added} to the conversation"
 
-        first_name_added = "#{entities.user.jane_roe.name.split(' ')[0]}"
-        notification_content.options.body = "#{first_name} added #{first_name_added} to the conversation"
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
-      it 'with you being added to the conversation', ->
+      it 'with you being added to the conversation', (done) ->
         other_user_et.is_me = true
         message_et.user_ets [other_user_et]
+
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          notification_content.options.body = "#{first_name} added you to the conversation"
 
-        notification_content.options.body = "#{first_name} added you to the conversation"
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
-      it 'with multiple users being added to the conversation', ->
+      it 'with multiple users being added to the conversation', (done) ->
         user_ids = [entities.user.john_doe.id, entities.user.jane_roe.id]
         message_et.user_ids user_ids
-        system_notification_repository.notify conversation_et, message_et
 
-        notification_content.options.body = "#{first_name} added 2 people to the conversation"
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        system_notification_repository.notify conversation_et, message_et
+        .then ->
+          notification_content.options.body = "#{first_name} added 2 people to the conversation"
+
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
     describe 'if people are removed', ->
       beforeEach ->
@@ -352,44 +480,60 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
         notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
 
-      it 'with one user being removed from the conversation', ->
+      it 'with one user being removed from the conversation', (done) ->
         message_et.user_ets [other_user_et]
+
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          first_name_removed = "#{entities.user.jane_roe.name.split(' ')[0]}"
+          notification_content.options.body = "#{first_name} removed #{first_name_removed} from the conversation"
 
-        first_name_removed = "#{entities.user.jane_roe.name.split(' ')[0]}"
-        notification_content.options.body = "#{first_name} removed #{first_name_removed} from the conversation"
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
-      it 'with you being removed from the conversation', ->
+      it 'with you being removed from the conversation', (done) ->
         other_user_et.is_me = true
         message_et.user_ets [other_user_et]
+
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          notification_content.options.body = "#{first_name} removed you from the conversation"
 
-        notification_content.options.body = "#{first_name} removed you from the conversation"
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
-      it 'with multiple users being removed from the conversation', ->
+      it 'with multiple users being removed from the conversation', (done) ->
         user_ets = user_repository.user_mapper.map_users_from_object payload.users.get.many
         message_et.user_ets user_ets
+
         system_notification_repository.notify conversation_et, message_et
+        .then ->
+          notification_content.options.body = "#{first_name} removed 2 people from the conversation"
 
-        notification_content.options.body = "#{first_name} removed 2 people from the conversation"
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
-      it 'with someone leaving the conversation by himself', ->
+      it 'with someone leaving the conversation by himself', (done) ->
         message_et.user_ets [message_et.user()]
-        system_notification_repository.notify conversation_et, message_et
 
-        notification_content.options.body = "#{first_name} left the conversation"
-        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-        expect(result).toEqual JSON.stringify notification_content
-        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        system_notification_repository.notify conversation_et, message_et
+        .then ->
+          notification_content.options.body = "#{first_name} left the conversation"
+
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
 
   describe 'shows a well-formed request notification', ->
     connection_et = null
@@ -406,25 +550,32 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       notification_content.options.tag = connection_et.conversation_id
       notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
 
-    it 'if a connection request is incoming', ->
+    it 'if a connection request is incoming', (done) ->
       connection_et.status = 'pending'
       message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST
+
       system_notification_repository.notify connection_et, message_et
+      .then ->
+        notification_content.options.body = z.string.system_notification_connection_request
 
-      notification_content.options.body = z.string.system_notification_connection_request
-      result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-      expect(result).toEqual JSON.stringify notification_content
-      expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        done()
+      .catch done.fail
 
-    it 'if your connection request was accepted', ->
+    it 'if your connection request was accepted', (done) ->
       message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED
+
       system_notification_repository.notify connection_et, message_et
+      .then ->
+        notification_content.options.body = z.string.system_notification_connection_accepted
 
-      notification_content.options.body = z.string.system_notification_connection_accepted
-      result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-      expect(result).toEqual JSON.stringify notification_content
-      expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
-
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        done()
+      .catch done.fail
 
   describe 'shows a well-formed ping notification', ->
     beforeAll ->
@@ -436,30 +587,41 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
       notification_content.options.body = z.string.system_notification_ping
 
-    it 'in a 1:1 conversation', ->
+    it 'in a 1:1 conversation', (done) ->
       conversation_et.type z.conversation.ConversationType.ONE2ONE
-      notification_content.title = z.string.truncation
+
       system_notification_repository.notify conversation_et, message_et
+      .then ->
+        notification_content.title = z.string.truncation
 
-      expectation = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-      expect(expectation).toEqual JSON.stringify notification_content
-      expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        done()
+      .catch done.fail
 
-    it 'in a group conversation', ->
+    it 'in a group conversation', (done) ->
       system_notification_repository.notify conversation_et, message_et
+      .then ->
+        title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
+        notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
-      title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
-      notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
-      result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-      expect(result).toEqual JSON.stringify notification_content
-      expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        done()
+      .catch done.fail
 
-    it 'as an ephemeral message', ->
+    it 'as an ephemeral message', (done) ->
       message_et.expire_after_millis 5000
-      notification_content.title = z.string.system_notification_ephemeral_title
-      notification_content.options.body = z.string.system_notification_ephemeral
-      system_notification_repository.notify conversation_et, message_et
 
-      result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
-      expect(result).toEqual JSON.stringify notification_content
-      expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+      system_notification_repository.notify conversation_et, message_et
+      .then ->
+        notification_content.title = z.string.system_notification_obfuscated_title
+        notification_content.options.body = z.string.system_notification_obfuscated
+
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        done()
+      .catch done.fail

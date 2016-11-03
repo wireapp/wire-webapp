@@ -92,6 +92,7 @@ class z.conversation.EventMapper
     message_et.timestamp = new Date(event.time).getTime()
     message_et.primary_key = z.storage.StorageService.construct_primary_key event
     message_et.type = event.type
+    message_et.version = event.version or 1
 
     if message_et.is_reactable()
       message_et.reactions event.reactions or {}
@@ -121,8 +122,6 @@ class z.conversation.EventMapper
   ###
   _map_event_asset_add: (event) ->
     message_et = new z.entity.ContentMessage()
-    if event.data?.info.tag is z.assets.ImageSizeType.PREVIEW
-      message_et.assets.push @_map_asset_preview_image event.data
     if event.data?.info.tag is z.assets.ImageSizeType.MEDIUM
       message_et.assets.push @_map_asset_medium_image event
     message_et.nonce = event.data.info.nonce
@@ -384,26 +383,6 @@ class z.conversation.EventMapper
         return link_preview_et
 
   ###
-  Maps JSON data of preview image asset into asset entity
-
-  @private
-
-  @param data [Object] Asset data received as JSON
-
-  @return [z.entity.PreviewImage] Preview image asset entity
-  ###
-  _map_asset_preview_image: (data) ->
-    asset_et = new z.entity.PreviewImage data.id
-    asset_et.correlation_id = data.info.correlation_id
-    asset_et.content_type = data.content_type
-    asset_et.encoded_data = data.data
-    asset_et.width = data.info.original_width
-    asset_et.height = data.info.original_height
-    asset_et.original_width = data.info.original_width
-    asset_et.original_height = data.info.original_height
-    return asset_et
-
-  ###
   Maps JSON data of medium image asset into asset entity
 
   @private
@@ -412,17 +391,16 @@ class z.conversation.EventMapper
 
   @return [z.entity.MediumImage] Medium image asset entity
   ###
-  _map_asset_medium_image: (data) ->
-    asset_et = new z.entity.MediumImage data.data.id
-    asset_et.correlation_id = data.data.info.correlation_id
-    asset_et.width = data.data.info.width
-    asset_et.height = data.data.info.height
-    asset_et.original_width = data.data.info.original_width
-    asset_et.original_height = data.data.info.original_height
-    asset_et.ratio = asset_et.original_height / asset_et.original_width
-    if asset_et.id
-      asset_et.resource z.assets.AssetRemoteData.v2 data.conversation, asset_et.id, data.data.otr_key, data.data.sha256
-    asset_et.dummy_url = z.util.dummy_image asset_et.original_width, asset_et.original_height
+  _map_asset_medium_image: (event) ->
+    asset_et = new z.entity.MediumImage event.data.id
+    asset_et.width = event.data.info.width
+    asset_et.height = event.data.info.height
+    asset_et.ratio = asset_et.height / asset_et.width
+    if event.data.key
+      asset_et.resource z.assets.AssetRemoteData.v3 event.data.key, event.data.otr_key, event.data.sha256, event.data.token
+    else
+      asset_et.resource z.assets.AssetRemoteData.v2 event.conversation, asset_et.id, event.data.otr_key, event.data.sha256
+    asset_et.dummy_url = z.util.dummy_image asset_et.width, asset_et.height
     return asset_et
 
   ###
@@ -434,20 +412,33 @@ class z.conversation.EventMapper
 
   @return [z.entity.MediumImage] File asset entity
   ###
-  _map_asset_file: (data) ->
-    asset_et = new z.entity.File data.data.id
-    asset_et.correlation_id = data.data.info.correlation_id
-    asset_et.conversation_id = data.conversation
+  _map_asset_file: (event) ->
+    asset_et = new z.entity.File event.data.id
+    asset_et.correlation_id = event.data.info.correlation_id
+    asset_et.conversation_id = event.conversation
 
     # original
-    asset_et.file_size = data.data.content_length
-    asset_et.file_type = data.data.content_type
-    asset_et.file_name = data.data.info.name
-    asset_et.meta = data.data.meta
-    asset_et.original_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, asset_et.id, data.data.otr_key, data.data.sha256,
-      if data.data.preview_id?
-        asset_et.preview_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, data.data.preview_id, data.data.preview_otr_key, data.data.preview_sha256
-    asset_et.status data.data.status or z.assets.AssetTransferState.UPLOADING # TODO
+    asset_et.file_size = event.data.content_length
+    asset_et.file_type = event.data.content_type
+    asset_et.file_name = event.data.info.name
+    asset_et.meta = event.data.meta
+
+    # remote data - full
+    if event.data.key
+      {key, otr_key, sha256, token} = event.data
+      asset_et.original_resource z.assets.AssetRemoteData.v3 key, otr_key, sha256, token
+    else
+      asset_et.original_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, asset_et.id, event.data.otr_key, event.data.sha256,
+
+    # remote data - preview
+    if event.data.preview_id?
+      if event.data.key
+        {preview_key, preview_otr_key, preview_sha256, preview_token} = event.data
+        asset_et.preview_resource z.assets.AssetRemoteData.v3 preview_key, preview_otr_key, preview_sha256, preview_token
+      else
+        asset_et.preview_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, event.data.preview_id, event.data.preview_otr_key, event.data.preview_sha256
+
+    asset_et.status event.data.status or z.assets.AssetTransferState.UPLOADING # TODO
     return asset_et
 
   ###

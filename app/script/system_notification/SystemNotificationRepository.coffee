@@ -47,12 +47,56 @@ class z.SystemNotification.SystemNotificationRepository
 
     @muted = true
     @subscribe_to_events()
+    @notifications_preference = ko.observable z.system_notification.SystemNotificationPreference.ON
+    @notifications_preference.subscribe (notifications_preference) =>
+      @check_permission() unless notifications_preference is z.system_notification.SystemNotificationPreference.NONE
+
+    @permission_state = z.system_notification.PermissionStatusState.PROMPT
+    @permission_status = undefined
 
   subscribe_to_events: =>
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_muted_state
     amplify.subscribe z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, @, @notify
+    amplify.subscribe z.event.WebApp.SYSTEM_NOTIFICATION.PERMISSION_STATE, @, @set_permission_state
     amplify.subscribe z.event.WebApp.SYSTEM_NOTIFICATION.REMOVE_READ, @, @remove_read_notifications
-    amplify.subscribe z.event.WebApp.SYSTEM_NOTIFICATION.REQUEST_PERMISSION, @, @should_request
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @, @updated_properties
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, @, @updated_notifications_property
+
+  ###
+  Check for browser permission if we have not yet asked.
+  @return [Promise] Promise that resolves with the permission state
+  ###
+  check_permission: =>
+    if @permission_state in [
+      z.system_notification.PermissionStatusState.GRANTED
+      z.system_notification.PermissionStatusState.IGNORED
+      z.system_notification.PermissionStatusState.UNSUPPORTED
+    ]
+      return Promise.resolve @permission_state
+
+    if not z.util.Environment.browser.supports.notifications
+      @set_permission_state z.system_notification.PermissionStatusState.UNSUPPORTED
+      return Promise.resolve @permission_state
+
+    if navigator.permissions?
+      return navigator.permissions.query {name: 'notifications'}
+      .then (permission_status) =>
+        @permission_status = permission_status
+        @permission_status.onchange = =>
+          @set_permission_state @permission_status.state
+
+        switch permission_status.state
+          when z.system_notification.PermissionStatusState.PROMPT
+            return @_request_permission()
+          else
+            return @set_permission_state permission_status.state
+    else
+      switch window.Notification.permission
+        when z.system_notification.PermissionStatusState.DEFAULT
+          return @_request_permission()
+        else
+          @set_permission_state window.Notification.permission
+          return Promise.resolve @permission_state
 
   ###
   Display browser notification and play sound notification.
@@ -60,9 +104,14 @@ class z.SystemNotification.SystemNotificationRepository
   @param message_et [z.entity.Message] Message entity
   ###
   notify: (conversation_et, message_et) =>
-    return if @muted or message_et.super_type not in @EVENTS_TO_NOTIFY
-    @_notify_sound conversation_et, message_et
-    @_notify_banner conversation_et, message_et
+    Promise.resolve()
+    .then =>
+      return if @muted or message_et.super_type not in @EVENTS_TO_NOTIFY
+      return if conversation_et.is_muted?()
+      return if message_et.was_edited?()
+
+      @_notify_sound conversation_et, message_et
+      @_notify_banner conversation_et, message_et
 
   ###
   Remove notifications from the queue that are no longer unread
@@ -77,29 +126,6 @@ class z.SystemNotification.SystemNotificationRepository
         @logger.log @logger.levels.INFO, "Removed read notification for '#{message_id}' in '#{conversation_id}'."
 
   ###
-  Request browser permission for notifications.
-  @param on_permission_granted [Function] Function to be called when permission is granted
-  @param on_permission_denied [Function] Function to be called when permission is denied
-  ###
-  request_permission: (on_permission_granted, on_permission_denied) ->
-    return if not z.util.Environment.browser.supports.notifications
-    if window.Notification.permission is z.util.BrowserPermissionType.DEFAULT
-      amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_NOTIFICATION
-      # Note: The callback will be only triggered in Chrome.
-      # If you ignore a permission request on Firefox, then the callback will not be triggered.
-      window.Notification.requestPermission? (permission) ->
-        amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_NOTIFICATION
-        if permission is z.util.BrowserPermissionType.GRANTED
-          amplify.publish z.event.WebApp.ANALYTICS.EVENT,
-            z.tracking.EventName.PERMISSION.ALLOW_NOTIFICATIONS, value: 'allow'
-          on_permission_granted?()
-        else
-          amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.REQUEST_PERMISSION, false
-          amplify.publish z.event.WebApp.ANALYTICS.EVENT,
-            z.tracking.EventName.PERMISSION.ALLOW_NOTIFICATIONS, value: 'block'
-          on_permission_denied?()
-
-  ###
   Set the muted state.
   @note Temporarily mute notifications on recovery from Notification Stream
   @param handling_notifications [z.event.NotificationHandlingState] Updated notification handling state
@@ -109,36 +135,17 @@ class z.SystemNotification.SystemNotificationRepository
     @logger.log @logger.levels.INFO, "Set muted state to: #{@muted}"
 
   ###
-  @param should_request [Boolean] True, when permission should be requested
+  Set the permission state.
+  @param permission_state [z.system_notification.PermissionStatusState] State of browser permission
   ###
-  should_request: (should_request) ->
-    @ask_for_permission = should_request
+  set_permission_state: (permission_state) =>
+    @permission_state = permission_state
 
-  ###
-  Sending the browser notification.
+  updated_properties: (properties) =>
+    @notifications_preference properties.settings.notifications
 
-  @param notification_content [Object]
-  @option notification_content [String] title
-  @option notification_content [Object] options
-  @option notification_content [Function] trigger
-  @option notification_content [Integer] timeout
-  ###
-  show: (notification_content) ->
-    amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.SHOW, notification_content
-    @_show_notification notification_content
-
-  ###
-  Check for browser permission if we have not yet asked.
-
-  @param success_callback [Function] Function to be called if permission is granted
-  ###
-  _check_permission: (success_callback) =>
-    if @ask_for_permission is true
-      switch window.Notification.permission
-        when z.util.BrowserPermissionType.DEFAULT
-          @request_permission success_callback
-        when z.util.BrowserPermissionType.GRANTED
-          success_callback()
+  updated_notifications_property: (notification_preference) =>
+    @notifications_preference notification_preference
 
   ###
   Creates the notification body for calls.
@@ -163,7 +170,7 @@ class z.SystemNotification.SystemNotificationRepository
     if message_et.has_asset_text()
       for asset_et in message_et.assets() when asset_et.is_text()
         return z.util.truncate_text asset_et.text, z.config.BROWSER_NOTIFICATION.BODY_LENGTH if not asset_et.previews().length
-    else if message_et.has_asset_medium_image()
+    else if message_et.has_asset_image()
       return  z.localization.Localizer.get_text z.string.system_notification_asset_add
     else if message_et.has_asset_location()
       return z.localization.Localizer.get_text z.string.system_notification_shared_location
@@ -190,14 +197,6 @@ class z.SystemNotification.SystemNotificationRepository
         placeholder: '%name'
         content: message_et.name
       ]
-
-  ###
-  Creates the notification body.
-  @private
-  @return [String] Notification message body
-  ###
-  _create_body_ephemeral: ->
-    return z.localization.Localizer.get_text z.string.system_notification_ephemeral
 
   ###
   Creates the notification body for people being added to a group conversation.
@@ -294,6 +293,14 @@ class z.SystemNotification.SystemNotificationRepository
             content: message_et.user().first_name()
 
   ###
+  Creates the notification body for obfuscated messages.
+  @private
+  @return [String] Notification message body
+  ###
+  _create_body_obfuscated: ->
+    return z.localization.Localizer.get_text z.string.system_notification_obfuscated
+
+  ###
   Creates the notification body for ping.
   @private
   @return [String] Notification message body
@@ -323,10 +330,36 @@ class z.SystemNotification.SystemNotificationRepository
   @param conversation_type [z.conversation.ConversationType] Type of the conversation
   @return [String] Notification message body
   ###
-  _create_body_system: (message_et) =>
-    switch message_et.system_message_type
-      when z.message.SystemMessageType.CONVERSATION_RENAME
-        return @_create_body_conversation_rename
+  _create_body_system: (message_et) ->
+    if message_et.system_message_type is z.message.SystemMessageType.CONVERSATION_RENAME
+      return @_create_body_conversation_rename
+
+  ###
+  Create notification content.
+  @private
+  @param conversation_et [z.entity.Conversation] Conversation entity
+  @param message_et [z.entity.MemberMessage] Member message entity
+  @param notification_body [String] Unobfuscated notification body
+  ###
+  _create_notification_content: (conversation_et, message_et, notification_body) ->
+    notification_body = @_create_options_body conversation_et, message_et
+
+    throw new z.system_notification.SystemNotificationError z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION if not notification_body?
+
+    should_obfuscate = @_should_obfuscate_notification message_et
+
+    return {
+      title: if should_obfuscate then @_create_title_obfuscated() else @_create_title conversation_et, message_et
+      options:
+        body: if should_obfuscate then @_create_body_obfuscated() else notification_body
+        data: @_create_options_data conversation_et, message_et
+        icon: if z.util.Environment.electron and z.util.Environment.os.mac then '' else window.notification_icon or '/image/logo/notification.png'
+        tag: @_create_options_tag conversation_et
+        silent: true #@note When Firefox supports this we can remove the fix for WEBAPP-731
+      timeout: z.config.BROWSER_NOTIFICATION.TIMEOUT
+      trigger: @_create_trigger conversation_et, message_et
+    }
+
   ###
   Selects the type of message that the notification body needs to be created for.
 
@@ -335,9 +368,7 @@ class z.SystemNotification.SystemNotificationRepository
   @param message_et [z.entity.Message] Message entity
   @return [String] Notification message body
   ###
-  _create_options_body: (conversation_et, message_et) =>
-    return @_create_body_ephemeral() if message_et.is_ephemeral()
-
+  _create_options_body: (conversation_et, message_et) ->
     switch message_et.super_type
       when z.message.SuperType.CALL
         return @_create_body_call message_et
@@ -385,14 +416,20 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Notification message title
   ###
   _create_title: (conversation_et, message_et) ->
-    if message_et.is_ephemeral()
-      return z.util.truncate_text z.localization.Localizer.get_text(z.string.system_notification_ephemeral_title), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
     if conversation_et.display_name?()
       if conversation_et.is_group()
         return  z.util.truncate_text "#{message_et.user().first_name()} in #{conversation_et.display_name()}", z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
       return z.util.truncate_text conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
     return Raygun.send new Error 'Message does not contain user info' if not message_et.user()
     return z.util.truncate_text message_et.user().name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+
+  ###
+  Create obfuscated title.
+  @private
+  @return [String] Obfuscated notification message title
+  ###
+  _create_title_obfuscated: ->
+    return z.util.truncate_text z.localization.Localizer.get_text(z.string.system_notification_obfuscated_title), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
   ###
   Creates the notification trigger.
@@ -420,27 +457,16 @@ class z.SystemNotification.SystemNotificationRepository
   @param message_et [z.entity.Message] Message entity
   ###
   _notify_banner: (conversation_et, message_et) ->
-    return if not z.util.Environment.browser.supports.notifications
-    return if window.Notification.permission is z.util.BrowserPermissionType.DENIED
-    return if document.hasFocus()
-    return if message_et.user()?.is_me
-    return if conversation_et.is_muted?()
-    return if message_et.was_edited?()
-
-    notification_content =
-      title: @_create_title conversation_et, message_et
-      options:
-        body: @_create_options_body conversation_et, message_et
-        data: @_create_options_data conversation_et, message_et
-        icon: if z.util.Environment.electron and z.util.Environment.os.mac then '' else window.notification_icon or '/image/logo/notification.png'
-        tag: @_create_options_tag conversation_et
-        silent: true #@note When Firefox supports this we can remove the fix for WEBAPP-731
-      timeout: z.config.BROWSER_NOTIFICATION.TIMEOUT
-      trigger: @_create_trigger conversation_et, message_et
-
-    return if not notification_content.options.body?
-
-    @_check_permission => @show notification_content
+    @_should_hide_notification conversation_et, message_et
+    .then =>
+      @_create_notification_content conversation_et, message_et
+    .then (notification_content) =>
+      @check_permission()
+      .then (permission_state) =>
+        @_show_notification notification_content if permission_state is z.system_notification.PermissionStatusState.GRANTED
+    .catch (error) ->
+      if error.type isnt z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION
+        throw error
 
   ###
   Plays the sound from the audio repository.
@@ -450,20 +476,72 @@ class z.SystemNotification.SystemNotificationRepository
   @param message_et [z.entity.Message] Message entity
   ###
   _notify_sound: (conversation_et, message_et) ->
-    return if conversation_et.is_muted?()
-    return if message_et.was_edited?()
     return if not document.hasFocus() and z.util.Environment.browser.firefox and z.util.Environment.os.mac
     switch message_et.super_type
       when z.message.SuperType.CONTENT
         return if message_et.user().is_me
-        return if message_et.has_asset_preview_image()
-        unless document.hasFocus() and conversation_et.id is @conversation_repository.active_conversation()?.id
-          amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.NEW_MESSAGE
+        amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.NEW_MESSAGE
       when z.message.SuperType.PING
         if message_et.user().is_me
           amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING
         else
           amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING
+
+  # Request browser permission for notifications.
+  _request_permission: ->
+    return new Promise (resolve) ->
+      amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_NOTIFICATION
+      # Note: The callback will be only triggered in Chrome.
+      # If you ignore a permission request on Firefox, then the callback will not be triggered.
+      window.Notification.requestPermission? (permission_state) =>
+        amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_NOTIFICATION
+        @set_permission_state permission_state
+        if permission_state is z.system_notification.PermissionStatusState.GRANTED
+          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PERMISSION.ALLOW_NOTIFICATIONS, value: 'allow'
+        else
+          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PERMISSION.ALLOW_NOTIFICATIONS, value: 'block'
+        resolve @permission_state
+
+  ###
+  Should notification content be obfuscated.
+  @private
+  @param message_et [z.entity.Message]
+  ###
+  _should_obfuscate_notification: (message_et) ->
+    return @notifications_preference() is z.system_notification.SystemNotificationPreference.OBFUSCATE or message_et.is_ephemeral()
+
+  ###
+  Should hide notification.
+  @private
+  @param conversation_et [z.entity.Conversation] Conversation entity
+  @param message_et [z.entity.Message]
+  ###
+  _should_hide_notification: (conversation_et, message_et) ->
+    Promise.resolve()
+    .then =>
+      hide_notification = false
+
+      hide_notification = true if @notifications_preference() is z.system_notification.SystemNotificationPreference.NONE
+      hide_notification = true if not z.util.Environment.browser.supports.notifications
+      hide_notification = true if @permission_state is z.system_notification.PermissionStatusState.DENIED
+      hide_notification = true if document.hasFocus() and conversation_et.id is @conversation_repository.active_conversation()?.id
+      hide_notification = true if message_et.user()?.is_me
+
+      if hide_notification
+        throw new z.system_notification.SystemNotificationError z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION
+
+  ###
+  Sending the notification.
+
+  @param notification_content [Object]
+  @option notification_content [String] title
+  @option notification_content [Object] options
+  @option notification_content [Function] trigger
+  @option notification_content [Integer] timeout
+  ###
+  _show_notification: (notification_content) ->
+    amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.SHOW, notification_content
+    @_show_notification_in_browser notification_content
 
   ###
   Sending the browser notification.
@@ -475,7 +553,7 @@ class z.SystemNotification.SystemNotificationRepository
   @option notification_content [Function] trigger
   @option notification_content [Integer] timeout
   ###
-  _show_notification: (notification_content) ->
+  _show_notification_in_browser: (notification_content) ->
     ###
     @note Notification.data is only supported on Chrome
     @see https://developer.mozilla.org/en-US/docs/Web/API/Notification/data

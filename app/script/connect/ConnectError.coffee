@@ -35,7 +35,7 @@ class z.connect.ConnectError
       when z.connect.ConnectError::TYPE.UPLOAD
         'Address book upload failed'
       else
-
+        'Unknown ConnectError'
 
   @:: = new Error()
   @::constructor = @
@@ -43,4 +43,5 @@ class z.connect.ConnectError
     GOOGLE_CLIENT: 'z.connect.ConnectError::TYPE.GOOGLE_CLIENT'
     GOOGLE_DOWNLOAD: 'z.connect.ConnectError::TYPE.GOOGLE_DOWNLOAD'
     NO_CONTACTS: 'z.connect.ConnectError::TYPE.NO_CONTACTS'
+    UNKNOWN: 'z.connect.ConnectError::TYPE.UNKNOWN'
     UPLOAD: 'z.connect.ConnectError::TYPE.UPLOAD'

@@ -214,29 +214,6 @@ describe 'Conversation', ->
 
       expect(conversation_et._subscribe_to_states_updates.calls.count()).toEqual(1)
 
-  describe '_get_correlating_image_message', ->
-
-    beforeEach ->
-      asset_one = new z.entity.PreviewImage()
-      asset_one.correlation_id = '123456'
-      message_one = new z.entity.ContentMessage()
-      message_one.id = '1'
-      message_one.assets.push asset_one
-      conversation_et.add_message message_one
-
-      asset_two = new z.entity.MediumImage()
-      asset_two.correlation_id = '123456'
-      message_two = new z.entity.ContentMessage()
-      message_two.id = '2'
-      message_two.assets.push asset_two
-      conversation_et.add_message message_two
-
-    it 'can find a message with a medium image', ->
-      message_et = conversation_et.get_correlating_image_message conversation_et.messages()[0]
-      expect(message_et).not.toBeNull()
-      expect(message_et.has_asset_medium_image()).toBeTruthy()
-      expect(message_et.get_first_asset().correlation_id).toBe '123456'
-
   describe 'message sorting', ->
 
     reference_timestamp = Date.now()

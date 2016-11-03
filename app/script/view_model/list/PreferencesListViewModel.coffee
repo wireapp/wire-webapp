@@ -36,6 +36,7 @@ class z.ViewModel.list.PreferencesListViewModel
 
     @selected_about = ko.pureComputed => @preferences_state() is z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
     @selected_account = ko.pureComputed => @preferences_state() is z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+    @selected_av = ko.pureComputed => @preferences_state() is z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
     @selected_devices = ko.pureComputed => @preferences_state() in [z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS, z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES]
     @selected_options = ko.pureComputed => @preferences_state() is z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
 
@@ -47,6 +48,9 @@ class z.ViewModel.list.PreferencesListViewModel
 
   click_on_account: =>
     @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+
+  click_on_av: =>
+    @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
 
   click_on_devices: =>
     @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES

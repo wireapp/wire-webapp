@@ -57,6 +57,7 @@ class z.entity.Message
     @type = ''
     @user = ko.observable new z.entity.User()
     @visible = ko.observable true
+    @version = 1
 
     @display_timestamp_short = =>
       date = moment.unix @timestamp / 1000
@@ -93,7 +94,7 @@ class z.entity.Message
   ###
   has_asset_image: ->
     if @is_content()
-      return true for asset_et in @assets() when asset_et.is_medium_image() or asset_et.is_preview_image()
+      return true for asset_et in @assets() when asset_et.is_image()
     return false
 
   ###
@@ -103,24 +104,6 @@ class z.entity.Message
   has_asset_location: ->
     if @is_content()
       return true for asset_et in @assets() when asset_et.is_location()
-    return false
-
-  ###
-  Check if message contains a medium image asset.
-  @return [Boolean] Message contains a medium image
-  ###
-  has_asset_medium_image: ->
-    if @is_content()
-      return true for asset_et in @assets() when asset_et.is_medium_image()
-    return false
-
-  ###
-  Check if message contains a preview image asset.
-  @return [Boolean] Message contains a preview image
-  ###
-  has_asset_preview_image: ->
-    if @is_content()
-      return true for asset_et in @assets() when asset_et.is_preview_image()
     return false
 
   ###

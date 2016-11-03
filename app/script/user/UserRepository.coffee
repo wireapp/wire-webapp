@@ -35,11 +35,11 @@ class z.user.UserRepository
 
     @connection_mapper = new z.user.UserConnectionMapper()
     @user_mapper = new z.user.UserMapper @asset_service
+    @use_v3_api = false
 
     @self = ko.observable()
     @users = ko.observableArray []
     @connections = ko.observableArray []
-    @properties = new z.user.UserProperties()
 
     @connect_requests = ko.pureComputed =>
       user_ets = []
@@ -52,8 +52,6 @@ class z.user.UserRepository
     amplify.subscribe z.event.Backend.USER.UPDATE, @user_update
     amplify.subscribe z.event.WebApp.CLIENT.ADD, @add_client_to_user
     amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @remove_client_from_user
-    amplify.subscribe z.event.WebApp.PROPERTIES.CHANGE.DEBUG, @save_property_enable_debugging
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @properties_updated
 
 
   ###############################################################################
@@ -565,118 +563,55 @@ class z.user.UserRepository
   ###
   Change the profile image.
   @param picture [String, Object] New user picture
-  @param on_success [Function] Function to be executed on success
   ###
-  change_picture: (picture, on_success) ->
+  change_picture: (picture) ->
+    if @use_v3_api
+      @_set_picture_v3 picture
+    else
+      @_set_picture_v2 picture
+
+  ###
+  Set the profile image using v2 api.
+  @deprecated
+  @param picture [String, Object] New user picture
+  ###
+  _set_picture_v2: (picture) ->
     @asset_service.upload_profile_image @self().id, picture
     .then (upload_response) =>
       @user_service.update_own_user_profile {picture: upload_response}
       .then =>
         @user_update {user: {id: @self().id, picture: upload_response}}
-        on_success?()
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Error during profile image upload: #{error.message}", error
-
-
-  ###############################################################################
-  # Properties
-  ###############################################################################
+    .catch (error) ->
+      throw new Error "Error during profile image upload: #{error.message}"
 
   ###
-  Initialize properties on app startup.
+  Set the profile image using v3 api.
+  @deprecated
+  @param picture [String, Object] New user picture
   ###
-  init_properties: =>
-    return new Promise (resolve, reject) =>
-      @user_service.get_user_properties()
-      .then (response) =>
-        if response.includes z.config.PROPERTIES_KEY
-          @user_service.get_user_properties_by_key z.config.PROPERTIES_KEY
-          .then (response) =>
-            $.extend true, @properties, response
-            @logger.log @logger.levels.INFO, 'Loaded user properties', @properties
-        else
-          @logger.log @logger.levels.INFO, 'User has no saved properties, using defaults'
+  _set_picture_v3: (picture) ->
+    @asset_service.upload_profile_image_v3 picture
+    .then ([small_key, medium_key]) =>
+      assets = [
+        {key: small_key, type: 'image', size: 'preview'},
+        {key: medium_key, type: 'image', size: 'complete'}
+      ]
+      @user_service.update_own_user_profile assets: assets
       .then =>
-        amplify.publish z.event.WebApp.PROPERTIES.UPDATED, @properties
-        amplify.publish z.event.WebApp.ANALYTICS.INIT, @properties, @self()
-        resolve @properties
-      .catch (error) =>
-        error = new Error "Failed to initialize user properties: #{error}"
-        @logger.log @logger.levels.ERROR, error.message, error
-        reject @properties
-
-  properties_updated: (properties) ->
-    if properties.enable_debugging
-      amplify.publish z.util.Logger::LOG_ON_DEBUG, properties.enable_debugging
-    return true
+        @user_update {user: {id: @self().id, assets: assets}}
+    .catch (error) ->
+      throw new Error "Error during profile image upload: #{error.message}"
 
   ###
-  Save the user properties.
+  Set users default profile image.
   ###
-  save_properties: (key, value) =>
-    @user_service.change_user_properties_by_key z.config.PROPERTIES_KEY, @properties
-    .then =>
-      @logger.log @logger.levels.INFO, "Saved updated settings: '#{key}' - '#{value}'"
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, 'Saving updated settings failed', error
-
-  ###
-  Save timestamp for Google Contacts import.
-  @param timestamp [String] Timestamp to be saved
-  ###
-  save_property_contact_import_google: (timestamp) =>
-    @properties.contact_import.google = timestamp
-    @save_properties 'contact_import.google', timestamp
-    .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_GOOGLE, timestamp
-
-  ###
-  Save timestamp for macOS Contacts import.
-  @param timestamp [String] Timestamp to be saved
-  ###
-  save_property_contact_import_macos: (timestamp) =>
-    @properties.contact_import.macos = timestamp
-    @save_properties 'contact_import.macos', timestamp
-    .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_MACOS, timestamp
-
-  ###
-  Save data settings.
-  @param is_enabled [String] Data setting to be saved
-  ###
-  save_property_data_settings: (is_enabled) =>
-    return if @properties.settings.privacy.report_errors is is_enabled
-    @properties.settings.privacy.report_errors = is_enabled
-    @properties.settings.privacy.improve_wire = is_enabled
-    @save_properties 'settings.privacy', is_enabled
-    .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.SEND_DATA, is_enabled
-
-  ###
-  Save debug logging setting.
-  @param is_enabled [Boolean] Should debug logging be enabled despite domain
-  ###
-  save_property_enable_debugging: (is_enabled) =>
-    return if @properties.enable_debugging is is_enabled
-    @properties.enable_debugging = is_enabled
-    @save_properties 'enable_debugging', is_enabled
-    .then -> amplify.publish z.util.Logger::LOG_ON_DEBUG, is_enabled
-
-  ###
-  Save timestamp for Google Contacts import.
-  ###
-  save_property_has_created_conversation: =>
-    @properties.has_created_conversation = true
-    @save_properties 'has_created_conversation', @properties.has_created_conversation
-    .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION
-
-  ###
-  Save audio settings.
-  @param sound_alerts [String] Audio setting to be saved
-  ###
-  save_property_sound_alerts: (sound_alerts) =>
-    if @properties.settings.sound.alerts isnt sound_alerts
-      @properties.settings.sound.alerts = sound_alerts
-      @save_properties 'settings.sound.alerts', @properties.settings.sound.alerts
-      .then -> amplify.publish z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, sound_alerts
-
+  set_default_picture: ->
+    z.util.load_url_blob z.config.UNSPLASH_URL, (blob) =>
+      @change_picture blob
+      .then ->
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
+          source: 'unsplash'
+          outcome: 'success'
 
   ###############################################################################
   # Tracking helpers

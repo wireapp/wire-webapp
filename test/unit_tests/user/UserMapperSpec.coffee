@@ -44,8 +44,6 @@ describe 'User Mapper', ->
       user_payload.picture[1].info.public = false
       user_et = mapper.map_user_from_object user_payload
       expect(user_et.name()).toBe 'John Doe'
-      expect(user_et.picture_preview()).toBe "url('FooBarURL')"
-      expect(user_et.picture_medium()).toBe "url('FooBarURL')"
 
     it 'will return default accent color if null/undefined', ->
       user_payload = payload.self.get
@@ -100,3 +98,18 @@ describe 'User Mapper', ->
       data = {'name': entities.user.jane_roe.name, 'id': entities.user.jane_roe.id}
       func = -> mapper.update_user_from_object user_et, data
       expect(func).toThrow()
+
+    it 'can update user with v3 assets', ->
+      user_et = new z.entity.User()
+      user_et.id = entities.user.john_doe.id
+      data = {
+        'name': entities.user.jane_roe.name,
+        'id': entities.user.john_doe.id
+        'assets': [
+          {key: z.util.create_random_uuid(), size: 'preview', type: 'image'},
+          {key: z.util.create_random_uuid(), size: 'complete', type: 'image'},
+        ]
+      }
+      updated_user_et = mapper.update_user_from_object user_et, data
+      expect(updated_user_et.preview_picture_resource()).toBeDefined()
+      expect(updated_user_et.medium_picture_resource()).toBeDefined()

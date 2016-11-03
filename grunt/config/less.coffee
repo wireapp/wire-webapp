@@ -28,7 +28,6 @@ module.exports =
     files: [
       '<%= dir.dist %>/style/main.css': '<%= dir.app.style %>/main.less'
       '<%= dir.dist %>/style/auth.css': '<%= dir.app.style %>/auth/auth.less'
-      '<%= dir.dist %>/style/support.css': '<%= dir.app.style %>/support.less'
     ]
 
 ###############################################################################
@@ -41,5 +40,4 @@ module.exports =
     files: [
       '<%= dir.deploy %>/style/main.css': '<%= dir.app.style %>/main.less'
       '<%= dir.deploy %>/style/auth.css': '<%= dir.app.style %>/auth/auth.less'
-      '<%= dir.deploy %>/style/support.css': '<%= dir.app.style %>/support.less'
     ]

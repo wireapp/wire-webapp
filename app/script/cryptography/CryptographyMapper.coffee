@@ -83,6 +83,8 @@ class z.cryptography.CryptographyMapper
 
   _map_asset: (asset, event_nonce, event_id) ->
     if asset.uploaded?
+      if asset.uploaded.asset_id and asset.original?.image?
+        return @_map_image_asset_v3 asset, event_nonce
       return @_map_asset_uploaded asset.uploaded, event_id
     else if asset.not_uploaded?
       return @_map_asset_not_uploaded asset.not_uploaded
@@ -94,6 +96,23 @@ class z.cryptography.CryptographyMapper
       error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
       @logger.log @logger.levels.INFO, error.message
       throw error
+
+  _map_image_asset_v3: (asset, event_nonce) ->
+    return {
+      data:
+        content_length: asset.original.size.toNumber()
+        content_type: asset.original.mime_type
+        info:
+          width: asset.original.image.width
+          height: asset.original.image.height
+          nonce: event_nonce
+          tag: 'medium'
+        key: asset.uploaded.asset_id
+        token: asset.uploaded.asset_token
+        otr_key: new Uint8Array asset.uploaded.otr_key.toArrayBuffer()
+        sha256: new Uint8Array asset.uploaded.sha256.toArrayBuffer()
+      type: z.event.Backend.CONVERSATION.ASSET_ADD
+    }
 
   _map_asset_meta_data: (original) ->
     if original.audio?
@@ -127,6 +146,8 @@ class z.cryptography.CryptographyMapper
         id: event_id
         otr_key: new Uint8Array preview.remote.otr_key?.toArrayBuffer()
         sha256: new Uint8Array preview.remote.sha256?.toArrayBuffer()
+        key: preview.remote.asset_id
+        token: preview.remote.asset_token
       type: z.event.Client.CONVERSATION.ASSET_PREVIEW
     }
 
@@ -136,6 +157,8 @@ class z.cryptography.CryptographyMapper
         id: event_id
         otr_key: new Uint8Array uploaded.otr_key?.toArrayBuffer()
         sha256: new Uint8Array uploaded.sha256?.toArrayBuffer()
+        key: uploaded.asset_id
+        token: uploaded.asset_token
       type: z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE
     }
 
@@ -228,9 +251,6 @@ class z.cryptography.CryptographyMapper
           width: image.width
           height: image.height
           nonce: event_id or z.util.create_random_uuid() # set nonce even if asset id is missing
-          original_width: image.original_width
-          original_height: image.original_height
-          public: false
         otr_key: new Uint8Array image.otr_key?.toArrayBuffer()
         sha256: new Uint8Array image.sha256?.toArrayBuffer()
       type: z.event.Backend.CONVERSATION.ASSET_ADD

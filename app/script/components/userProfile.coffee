@@ -187,6 +187,9 @@ class z.components.UserProfileViewModel
     @render_common_contacts = ko.pureComputed =>
       return @user()?.id and not @user().connected() and not @user().is_me
 
+    @render_avatar = ko.pureComputed =>
+      return @user()?.id
+
     # footer
     @get_footer_template = ko.pureComputed =>
       return 'user-profile-footer-empty' if not @user()?

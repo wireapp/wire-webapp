@@ -170,8 +170,6 @@ def get_url():
     host = 'wire-webapp-prod-next.wire.com'
   elif 'staging' in host:
     host = 'wire-webapp-staging.zinfra.io'
-  elif 'edge' in host:
-    host = 'wire-webapp-edge.zinfra.io'
 
   url = '%s%s%s' % (protocol, host, flask.request.path)
   return url

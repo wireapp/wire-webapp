@@ -76,6 +76,8 @@ class z.links.LinkPreviewRepository
       .then (asset) ->
         link_preview.article.set 'image', asset
         return link_preview
+      .catch ->
+        return link_preview
     else
       return link_preview
 

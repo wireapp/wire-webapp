@@ -17,11 +17,22 @@
 #
 
 window.z ?= {}
-z.util ?= {}
+z.system_notification ?= {}
 
+class z.system_notification.SystemNotificationError
+  constructor: (type) ->
+    @name = @constructor.name
+    @stack = (new Error()).stack
+    @type = type or z.system_notification.SystemNotificationError::TYPE.UNKNOWN
 
-# https://developer.mozilla.org/en-US/docs/Web/API/Notification.permission#Return_Value
-z.util.BrowserPermissionType =
-  DEFAULT: 'default'
-  DENIED: 'denied'
-  GRANTED: 'granted'
+    @message = switch @type
+      when z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION
+        'Do not show notification for this message'
+      else
+        'Unknown SystemNotificationError'
+
+  @:: = new Error()
+  @::constructor = @
+  @::TYPE =
+    HIDE_NOTIFICATION: 'z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION'
+    UNKNOWN: 'z.system_notification.SystemNotificationError::TYPE.UNKNOWN'

@@ -54,14 +54,6 @@ module.exports =
     ext: '.js'
     src: ['**/*.coffee', '!**/auth_init*.coffee']
 
-  edge:
-    cwd: '<%= dir.app_ %>'
-    dest: '<%= dir.deploy %>'
-    expand: true
-    ext: '.js'
-    src: '**/auth_init_edge.coffee'
-    rename: (dest, src) -> return "#{dest}/script/main/auth_init.js"
-
   staging:
     cwd: '<%= dir.app_ %>'
     dest: '<%= dir.deploy %>'

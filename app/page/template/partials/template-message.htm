@@ -59,7 +59,7 @@
   <div class="message-body">
 
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
-      <!-- ko if: asset.is_medium_image() -->
+      <!-- ko if: asset.is_image() -->
         <div class="message-asset-image" data-bind="fit_to_viewport: asset">
           <div class="image image-loading" data-bind="
             attr: {'data-uie-visible': $parent.visible},
@@ -86,7 +86,7 @@
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(), css: {'text-graphite': $parent.is_editing, 'text-large': z.util.emoji.contains_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.is_expired()}"></div>
+          <div class="text" data-bind="html: asset.render(), css: {'text-graphite': $parent.is_editing, 'text-large': z.util.emoji.includes_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.is_expired()}"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset params="expired: message.is_expired(), preview: $data, viewport_changed: $parents[2].viewport_changed"></link-preview-asset>
@@ -176,7 +176,7 @@
     <div class="message-connected">
       <span class="message-connected-header" data-bind='text: other_user().name()'></span>
       <span class="label-xs" data-bind="text: caption"></span>
-      <user-avatar class="message-connected-avatar user-avatar-xl user-avatar-no-badge"
+      <user-avatar class="message-connected-avatar user-avatar-xl user-avatar-no-badge cursor-default"
                    data-bind="css: {'user-avatar-no-badge': other_user().sent()}"
                    params="user: other_user()"></user-avatar>
       <!-- ko if: other_user().sent() -->

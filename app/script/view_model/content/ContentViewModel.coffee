@@ -22,7 +22,7 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.ContentViewModel
-  constructor: (element_id, @call_center, @client_repository, @conversation_repository, @cryptography_repository, @giphy_repository, @search_repository, @user_repository) ->
+  constructor: (element_id, @call_center, @client_repository, @conversation_repository, @cryptography_repository, @giphy_repository, @search_repository, @user_repository, @properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS
 
     # state
@@ -44,9 +44,10 @@ class z.ViewModel.content.ContentViewModel
     @detail_view =                new z.ViewModel.ImageDetailViewViewModel 'detail-view'
 
     @preferences_account =        new z.ViewModel.content.PreferencesAccountViewModel 'preferences-account', @client_repository, @user_repository
+    @preferences_av =             new z.ViewModel.content.PreferencesAVViewModel 'preferences-av', @call_center
     @preferences_device_details = new z.ViewModel.content.PreferencesDeviceDetailsViewModel 'preferences-devices', @client_repository, @conversation_repository, @cryptography_repository
     @preferences_devices =        new z.ViewModel.content.PreferencesDevicesViewModel 'preferences-devices', @preferences_device_details, @client_repository, @conversation_repository, @cryptography_repository
-    @preferences_options =        new z.ViewModel.content.PreferencesOptionsViewModel 'preferences-options', @user_repository
+    @preferences_options =        new z.ViewModel.content.PreferencesOptionsViewModel 'preferences-options', @properties_repository
 
     @previous_state = undefined
     @previous_conversation = undefined
@@ -59,6 +60,8 @@ class z.ViewModel.content.ContentViewModel
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
           @preferences_account.check_new_clients()
           @preferences_devices.update_fingerprint()
+        when z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
+          @preferences_av.initiate_devices()
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
           @preferences_devices.update_fingerprint()
         else
@@ -114,8 +117,8 @@ class z.ViewModel.content.ContentViewModel
     conversation_et = @conversation_repository.get_conversation_by_id conversation_et if not conversation_et.id
     return if conversation_et is @conversation_repository.active_conversation()
 
-    @content_state z.ViewModel.content.CONTENT_STATE.CONVERSATION
     @_release_content()
+    @content_state z.ViewModel.content.CONTENT_STATE.CONVERSATION
     @conversation_repository.active_conversation conversation_et
     @message_list.change_conversation conversation_et, =>
       @_show_content z.ViewModel.content.CONTENT_STATE.CONVERSATION
@@ -157,6 +160,7 @@ class z.ViewModel.content.ContentViewModel
       when z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS then '.connect-requests'
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT then '.preferences-about'
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT then '.preferences-account'
+      when z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV then '.preferences-av'
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS then '.preferences-device-details'
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES then '.preferences-devices'
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS then '.preferences-options'
@@ -168,6 +172,8 @@ class z.ViewModel.content.ContentViewModel
     if @previous_state is z.ViewModel.content.CONTENT_STATE.CONVERSATION
       @conversation_repository.active_conversation null
       @message_list.release_conversation()
+    else if @previous_state is z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
+      @preferences_av.release_devices()
 
   _show_content: (new_content_state) ->
     @content_state new_content_state
