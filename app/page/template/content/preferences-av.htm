@@ -11,14 +11,14 @@
               <a rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_text: z.string.preferences_av_permission_detail, l10n_href: z.string.url_support_device_access_denied"></a>
             </div>
           <!-- /ko -->
-          <div class="preferences-option" data-bind="css: {'preferences-av-disabled': permission_denied}">
+          <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': permission_denied}">
             <div class="preferences-option-icon preferences-av-select-icon">
               <div class="icon-microphone"></div>
             </div>
             <div class="input-select">
               <select class="preferences-av-select" name="select"
                       data-bind="attr: {'disabled': available_devices.audio_input().length < 2 || permission_denied},
-                                 css: {'preferences-av-disabled': permission_denied},
+                                 css: {'preferences-av-select-disabled': permission_denied},
                                  options: available_devices.audio_input,
                                  optionsText: function(item) {return item.label || z.string.preferences_av_microphone},
                                  optionsValue: 'deviceId',
@@ -62,14 +62,14 @@
               <a rel="nofollow noopener noreferrer" target="_blank" data-bind="l10n_text: z.string.preferences_av_permission_detail, l10n_href: z.string.url_support_device_access_denied"></a>
             </div>
           <!-- /ko -->
-          <div class="preferences-option" data-bind="css: {'preferences-av-disabled': permission_denied}">
+          <div class="preferences-option" data-bind="css: {'preferences-av-select-disabled': permission_denied}">
             <div class="preferences-option-icon preferences-av-select-icon">
               <div class="icon-video"></div>
             </div>
             <div class="input-select">
               <select class="preferences-av-select" name="select"
                       data-bind="attr: {'disabled': available_devices.audio_input().length < 2 || permission_denied},
-                                 css: {'preferences-av-disabled': permission_denied},
+                                 css: {'preferences-av-select-disabled': permission_denied},
                                  options: available_devices.video_input,
                                  optionsText: function(item) {return item.label || z.string.preferences_av_camera},
                                  optionsValue: 'deviceId',
