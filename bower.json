@@ -7,7 +7,7 @@
     "cryptojs": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/crypto-js/CryptoJS%20v3.1.2.zip",
     "dexie": "https://github.com/dfahlander/Dexie.js.git#1.4.1",
     "generic-message-proto": "https://github.com/wireapp/generic-message-proto.git#1.18.0",
-    "highlight.js": "https://github.com/isagalaev/highlight.js.git#9.4.0",
+    "highlightjs": "https://github.com/components/highlightjs.git#9.7.0",
     "iframeTracker-jquery": "https://github.com/vincepare/iframeTracker-jquery.git#1.1.0",
     "jquery": "https://github.com/jquery/jquery.git#2.1.4",
     "keyboardjs": "https://github.com/RobertWHurst/KeyboardJS.git#2.2.1",
@@ -64,8 +64,9 @@
     "generic-message-proto": {
       "proto": "proto/messages.proto"
     },
-    "highlight.js": {
-      "css": "src/styles/github.css"
+    "highlightjs": {
+      "js": "highlight.pack.js",
+      "css": "styles/github.css"
     },
     "jquery": {
       "js": "dist/jquery.js"

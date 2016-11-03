@@ -668,31 +668,31 @@ describe 'Markdown for code snippets', ->
   it 'doesn’t render links within code blocks', ->
     code = '```xml\n<dependency>\n  <groupId>com.ibm.icu</groupId>\n  <artifactId>icu4j</artifactId>\n  <version>53.1</version>\n</dependency>\n```'
     actual = z.util.render_message code
-    expected = "<pre><code class=\"lang-xml\"><span class=\"hljs-tag\">&lt;<span class=\"hljs-title\">dependency</span>&gt;</span><br />  <span class=\"hljs-tag\">&lt;<span class=\"hljs-title\">groupId</span>&gt;</span>com.ibm.icu<span class=\"hljs-tag\">&lt;/<span class=\"hljs-title\">groupId</span>&gt;</span><br />  <span class=\"hljs-tag\">&lt;<span class=\"hljs-title\">artifactId</span>&gt;</span>icu4j<span class=\"hljs-tag\">&lt;/<span class=\"hljs-title\">artifactId</span>&gt;</span><br />  <span class=\"hljs-tag\">&lt;<span class=\"hljs-title\">version</span>&gt;</span>53.1<span class=\"hljs-tag\">&lt;/<span class=\"hljs-title\">version</span>&gt;</span><br /><span class=\"hljs-tag\">&lt;/<span class=\"hljs-title\">dependency</span>&gt;</span><br /></code></pre>"
+    expected = "<pre><code class=\"lang-xml\"><span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">dependency</span>&gt;</span><br />  <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">groupId</span>&gt;</span>com.ibm.icu<span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">groupId</span>&gt;</span><br />  <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">artifactId</span>&gt;</span>icu4j<span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">artifactId</span>&gt;</span><br />  <span class=\"hljs-tag\">&lt;<span class=\"hljs-name\">version</span>&gt;</span>53.1<span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">version</span>&gt;</span><br /><span class=\"hljs-tag\">&lt;/<span class=\"hljs-name\">dependency</span>&gt;</span><br /></code></pre>"
     expect(actual).toEqual expected
 
   it 'renders escaped Ruby code blocks', ->
     code = "```ruby\nrequire 'redcarpet'\nmarkdown = Redcarpet.new(\"Hello World!\")\nputs markdown.to_html\n```"
     actual = z.util.render_message code
-    expected = "<pre><code class=\"lang-ruby\">require <span class=\"hljs-string\">'redcarpet'</span><br />markdown = Redcarpet.<span class=\"hljs-function\"><span class=\"hljs-title\">new</span><span class=\"hljs-params\">(<span class=\"hljs-string\">\"Hello World!\"</span>)</span></span><br />puts markdown.to_html<br /></code></pre>"
+    expected = "<pre><code class=\"lang-ruby\"><span class=\"hljs-built_in\">require</span> <span class=\"hljs-string\">'redcarpet'</span><br />markdown = Redcarpet.<span class=\"hljs-keyword\">new</span>(<span class=\"hljs-string\">\"Hello World!\"</span>)<br />puts markdown.to_html<br /></code></pre>"
     expect(actual).toEqual expected
 
   it 'renders escaped JavaScript code blocks', ->
     code = "```js\n$(document).ready(function() {\n  $('pre code').each(function(i, block) {\n    hljs.highlightBlock(block);\n  });\n});```"
     actual = z.util.render_message code
-    expected = "<pre><code class=\"lang-js\">$(<span class=\"hljs-built_in\">document</span>).ready(<span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span><span class=\"hljs-params\">()</span> </span>{<br />  $(<span class=\"hljs-string\">'pre code'</span>).each(<span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span><span class=\"hljs-params\">(i, block)</span> </span>{<br />    hljs.highlightBlock(block);<br />  });<br />});<br /></code></pre>"
+    expected = "<pre><code class=\"lang-js\">$(<span class=\"hljs-built_in\">document</span>).ready(<span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span>(<span class=\"hljs-params\"></span>) </span>{<br />  $(<span class=\"hljs-string\">'pre code'</span>).each(<span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span>(<span class=\"hljs-params\">i, block</span>) </span>{<br />    hljs.highlightBlock(block);<br />  });<br />});<br /></code></pre>"
     expect(actual).toEqual expected
 
   it 'renders escaped CoffeeScript code blocks', ->
     code = "```coffeescript\n# TODO: This is not a general utility:\n# It should be part of a view model as it's UI related.\n  z.util.convert_timestamps = ->\n    if $('time').length > 0\n      recalculate = ->```"
     actual = z.util.render_message code
-    expected = "<pre><code class=\"lang-coffeescript\"><span class=\"hljs-comment\"># TODO: This is not a general utility:</span><br /><span class=\"hljs-comment\"># It should be part of a view model as it's UI related.</span><br />  z.util.convert_timestamps = <span class=\"hljs-function\">-&gt;</span><br />    <span class=\"hljs-keyword\">if</span> $(<span class=\"hljs-string\">'time'</span>).length &gt; <span class=\"hljs-number\">0</span><br /><span class=\"hljs-function\">      <span class=\"hljs-title\">recalculate</span> = -&gt;</span><br /></code></pre>"
+    expected = "<pre><code class=\"lang-coffeescript\"><span class=\"hljs-comment\"># <span class=\"hljs-doctag\">TODO:</span> This is not a general utility:</span><br /><span class=\"hljs-comment\"># It should be part of a view model as it's UI related.</span><br />  z.util.convert_timestamps = <span class=\"hljs-function\">-&gt;</span><br />    <span class=\"hljs-keyword\">if</span> $(<span class=\"hljs-string\">'time'</span>).length &gt; <span class=\"hljs-number\">0</span><br /><span class=\"hljs-function\">      <span class=\"hljs-title\">recalculate</span> = -&gt;</span><br /></code></pre>"
     expect(actual).toEqual expected
 
   it 'renders escaped HTML code blocks', ->
     code = "```html\n<a href=\"javascript:wire.app.logout()\">This is a trick</a>\n```"
     actual = z.util.render_message code
-    expected = "<pre><code class=\"lang-html\">&lt;<span class=\"hljs-tag\">a</span> href=<span class=\"hljs-string\">\"javascript:wire.app.logout()\"</span>&gt;This is <span class=\"hljs-tag\">a</span> trick&lt;/a&gt;<br /></code></pre>"
+    expected = "<pre><code class=\"lang-html\">&lt;<span class=\"hljs-selector-tag\">a</span> href=<span class=\"hljs-string\">\"javascript:wire.app.logout()\"</span>&gt;This is <span class=\"hljs-selector-tag\">a</span> trick&lt;/a&gt;<br /></code></pre>"
     expect(actual).toEqual expected
 
   it 'renders escaped HTML code spans', ->

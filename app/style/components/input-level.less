@@ -32,9 +32,13 @@
   background-color: #fff;
   border-radius: @input-level-bullet-size / 2;
   border: 1px solid @seperator-color;
+  transition: all .16s;
 }
 
 .input-level-bullet-active:before {
   background-color: currentColor;
 }
 
+.input-level-bullet-disabled:before {
+  background-color: @seperator-color;
+}
