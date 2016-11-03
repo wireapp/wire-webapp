@@ -1,4 +1,4 @@
-<script type="text/html" id="all-verified">
+  <script type="text/html" id="all-verified">
   <div class="message-header">
     <div class="message-header-icon">
       <svg width="16" height="16">
@@ -99,7 +99,7 @@
         <audio-asset data-bind="css: {'bg-color-ephemeral icon-microphone text-white flex-center': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_file() -->
-        <file-asset data-bind="css: {'bg-color-ephemeral icon-file text-white flex-center': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></file-asset>
+        <file-asset params="asset: asset, expired: message.is_expired()"></file-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_location() -->
         <location-asset params="asset: asset"></location-asset>
