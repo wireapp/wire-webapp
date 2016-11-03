@@ -93,13 +93,13 @@
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.is_video() -->
-        <video-asset data-bind="css: {'bg-color-ephemeral': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></video-asset>
+        <video-asset data-bind="css: {'bg-color-ephemeral icon-movie text-white flex-center': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></video-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_audio() -->
-        <audio-asset data-bind="css: {'bg-color-ephemeral': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></audio-asset>
+        <audio-asset data-bind="css: {'bg-color-ephemeral icon-microphone text-white flex-center': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_file() -->
-        <file-asset data-bind="css: {'bg-color-ephemeral': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></file-asset>
+        <file-asset data-bind="css: {'bg-color-ephemeral icon-file text-white flex-center': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></file-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_location() -->
         <location-asset params="asset: asset"></location-asset>
