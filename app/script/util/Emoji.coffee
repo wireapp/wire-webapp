@@ -28,9 +28,12 @@ z.util.emoji = do ->
   remove_emojies = (text) ->
     return text.replace emoji_regex, ''
 
-  contains_only_emojies = (text) ->
-    return is_valid_string(text) and remove_emojies(text).length is 0
+  remove_whitespace = (text) ->
+    return text.replace /\s/g, ''
+
+  includes_only_emojies = (text) ->
+    return is_valid_string(text) and remove_emojies(remove_whitespace(text)).length is 0
 
   return {
-    contains_only_emojies: contains_only_emojies
+    includes_only_emojies: includes_only_emojies
   }
