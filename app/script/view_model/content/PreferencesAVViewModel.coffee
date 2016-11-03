@@ -34,7 +34,7 @@ class z.ViewModel.content.PreferencesAVViewModel
     @video_stream = @media_stream_handler.local_media_streams.video
 
     @audio_stream.subscribe (audio_stream) =>
-      @release_audio_meter() if @audio_interval
+      @_release_audio_meter() if @audio_interval
       @_initiate_audio_meter audio_stream if audio_stream
 
     @audio_context = undefined
@@ -48,6 +48,11 @@ class z.ViewModel.content.PreferencesAVViewModel
     @_get_media_stream()
     .then (audio_stream) =>
       @_initiate_audio_meter audio_stream if not @audio_interval
+
+  # Release devices.
+  release_devices: =>
+    @_release_audio_meter()
+    @_release_media_streams()
 
   ###
   Get current MediaStream or initiate it.
@@ -98,12 +103,11 @@ class z.ViewModel.content.PreferencesAVViewModel
     @audio_source = @audio_context.createMediaStreamSource audio_stream
     @audio_source.connect @audio_analyser
 
-  release_audio_meter: =>
+  _release_audio_meter: =>
     window.clearInterval @audio_interval
     @audio_interval = undefined
     @audio_source.disconnect()
 
-  release_media_streams: =>
-    @release_audio_meter()
+  _release_media_streams: =>
     @media_stream_handler.reset_media_streams()
     @permission_denied false

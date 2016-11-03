@@ -173,7 +173,7 @@ class z.ViewModel.content.ContentViewModel
       @conversation_repository.active_conversation null
       @message_list.release_conversation()
     else if @previous_state is z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
-      @preferences_av.release_media_streams()
+      @preferences_av.release_devices()
 
   _show_content: (new_content_state) ->
     @content_state new_content_state
