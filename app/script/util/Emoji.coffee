@@ -29,7 +29,7 @@ z.util.emoji = do ->
     return text.replace emoji_regex, ''
 
   remove_whitespace = (text) ->
-    return text.replace ' ', ''
+    return text.replace /\s/g, ''
 
   includes_only_emojies = (text) ->
     return is_valid_string(text) and remove_emojies(remove_whitespace(text)).length is 0

@@ -35,6 +35,7 @@ describe 'z.util.emoji', ->
 
     it 'returns true for text containing only emojies and whitespaces (Miscellaneous Symbols)', ->
       expect(z.util.emoji.includes_only_emojies('☕ ⚽')).toBeTruthy()
+      expect(z.util.emoji.includes_only_emojies('☕  ⚽')).toBeTruthy()
 
     it 'returns false for text containing only text and emojies', ->
       expect(z.util.emoji.includes_only_emojies('Hey 💩')).toBeFalsy()
