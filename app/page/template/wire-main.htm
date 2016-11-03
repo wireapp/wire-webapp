@@ -25,6 +25,9 @@
         <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT -->
           #include('content/preferences-account.htm')
         <!-- /ko -->
+        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV -->
+          #include('content/preferences-av.htm')
+        <!-- /ko -->
         <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS -->
           #include('content/preferences-device-details.htm')
         <!-- /ko -->
