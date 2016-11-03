@@ -22,6 +22,7 @@ z.components ?= {}
 class z.components.InputLevel
   constructor: (params) ->
     @input_level = params.level
+    @disabled = params.disabled
 
     @level_in_view = ko.pureComputed =>
       return @input_level()
@@ -30,6 +31,8 @@ class z.components.InputLevel
     @bullet_count = [0..19]
 
   is_bullet_active: (index) =>
+    if @disabled()
+      return 'input-level-bullet-disabled'
     threshold_passed = @level_in_view() > (index + 1) / @bullet_count.length
     return 'input-level-bullet-active' if threshold_passed
 
