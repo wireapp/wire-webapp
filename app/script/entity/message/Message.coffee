@@ -236,7 +236,7 @@ class z.entity.Message
     return if @ephemeral_timer
     @ephemeral_remaining new Date(@ephemeral_expires()) - Date.now()
 
-    ephemeral_interval = window.setInterval =>
+    @ephemeral_interval_id = window.setInterval =>
       @ephemeral_remaining new Date(@ephemeral_expires()) - Date.now()
 
       moment_duration = moment.duration @ephemeral_remaining()
@@ -259,5 +259,5 @@ class z.entity.Message
 
     window.setTimeout =>
       amplify.publish z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @
-      window.clearInterval ephemeral_interval
+      window.clearInterval @ephemeral_interval_id
     , @ephemeral_remaining()

@@ -1502,7 +1502,7 @@ class z.conversation.ConversationRepository
 
     switch message_et.ephemeral_status()
       when z.message.EphemeralStatusType.TIMED_OUT
-        amplify.publish z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, message_et
+        @timeout_ephemeral_message message_et
       when z.message.EphemeralStatusType.ACTIVE
         message_et.start_ephemeral_timer()
       when z.message.EphemeralStatusType.INACTIVE

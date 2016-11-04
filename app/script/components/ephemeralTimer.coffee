@@ -30,7 +30,7 @@ class z.components.EphemeralTimer
     @progress = ko.observable 0
     @remaining_time = ko.observable 0
 
-    message_et.ephemeral_remaining.subscribe (remaining_time) =>
+    @remaining_subscription = message_et.ephemeral_remaining.subscribe (remaining_time) =>
       if Date.now() >= ephemeral_expires
         @progress 1
       else
@@ -42,6 +42,10 @@ class z.components.EphemeralTimer
   is_bullet_active: (index) =>
     passed_index = @progress() > (index + 1) / @bullet_count.length
     return 'ephemeral-timer-bullet-inactive' if passed_index
+
+  destroy: =>
+    @remaining_subscription.dispose()
+    window.clearInterval message_et.ephemeral_interval_id
 
 ko.components.register 'ephemeral-timer',
   viewModel: z.components.EphemeralTimer
