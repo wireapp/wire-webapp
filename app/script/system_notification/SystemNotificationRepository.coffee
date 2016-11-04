@@ -496,10 +496,6 @@ class z.SystemNotification.SystemNotificationRepository
       window.Notification.requestPermission? (permission_state) =>
         amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_NOTIFICATION
         @set_permission_state permission_state
-        if permission_state is z.system_notification.PermissionStatusState.GRANTED
-          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PERMISSION.ALLOW_NOTIFICATIONS, value: 'allow'
-        else
-          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PERMISSION.ALLOW_NOTIFICATIONS, value: 'block'
         resolve @permission_state
 
   ###
