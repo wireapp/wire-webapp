@@ -354,7 +354,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
     describe 'for ephemeral messages', ->
       beforeEach ->
-        message_et.expire_after_millis 5000
+        message_et.ephemeral_expires 5000
         notification_content.title = z.string.system_notification_obfuscated_title
         notification_content.options.body = z.string.system_notification_obfuscated
 
@@ -626,7 +626,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       .catch done.fail
 
     it 'as an ephemeral message', (done) ->
-      message_et.expire_after_millis 5000
+      message_et.ephemeral_expires 5000
 
       system_notification_repository.notify conversation_et, message_et
       .then ->

@@ -30,9 +30,13 @@ class z.entity.Message
 
   # Construct a new base message entity.
   constructor: (@id = '0', @super_type = '') ->
-    @expire_after_millis = ko.observable false
+    @ephemeral_caption = ko.observable ''
+    @ephemeral_duration = ko.observable 0
+    @ephemeral_remaining = ko.observable 0
+    @ephemeral_expires = ko.observable false
+    @ephemeral_started = ko.observable ''
     @ephemeral_status = ko.computed =>
-      expiration = @expire_after_millis()
+      expiration = @ephemeral_expires()
 
       if expiration is true
         return z.message.EphemeralStatusType.TIMED_OUT
@@ -49,6 +53,7 @@ class z.entity.Message
       else
         return z.message.EphemeralStatusType.NONE
 
+    @conversation_id = ''
     @from = ''
     @is_editing = ko.observable false
     @primary_key = undefined
@@ -199,14 +204,14 @@ class z.entity.Message
   @return [Boolean]
   ###
   is_ephemeral: ->
-    return @expire_after_millis() isnt false
+    return @ephemeral_expires() isnt false
 
   ###
   Check if ephemeral message is expired.
   @return [Boolean]
   ###
   is_expired: ->
-    return @expire_after_millis() is true
+    return @ephemeral_expires() is true
 
   ###
   Check if message can be reacted to.
@@ -226,3 +231,33 @@ class z.entity.Message
     else if @status() isnt updated_status
       return @status updated_status
     return false
+
+  start_ephemeral_timer: =>
+    return if @ephemeral_timer
+    @ephemeral_remaining new Date(@ephemeral_expires()) - Date.now()
+
+    ephemeral_interval = window.setInterval =>
+      @ephemeral_remaining new Date(@ephemeral_expires()) - Date.now()
+
+      moment_duration = moment.duration @ephemeral_remaining()
+      if moment_duration.asHours() is 1
+        title = "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hour}, "
+      else if moment_duration.asHours() > 1
+        title = "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hours}, "
+
+      if moment_duration.asMinutes() is 1
+        title = "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minute} #{z.localization.Localizer.get_text z.string.and} "
+      else if moment_duration.asMinutes() > 1
+        title = "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minutes} #{z.localization.Localizer.get_text z.string.and} "
+
+      if moment_duration.asSeconds() is 1
+        title = "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_second}"
+      else if moment_duration.asSeconds() > 1
+        title = "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_seconds}"
+      @ephemeral_caption if title then title else ''
+    , 250
+
+    window.setTimeout =>
+      amplify.publish z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @
+      window.clearInterval ephemeral_interval
+    , @ephemeral_remaining()
