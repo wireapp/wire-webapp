@@ -397,16 +397,16 @@ class z.conversation.ConversationRepository
   @return [Boolean] Is the message marked as read
   ###
   is_message_read: (conversation_id, message_id) =>
-    return false if not conversation_id or not message_id
+    return Promise.resolve false if not conversation_id or not message_id
 
-    conversation_et = @get_conversation_by_id conversation_id
-    message_et = conversation_et.get_message_by_id message_id
-
-    if not message_et
-      @logger.log @logger.levels.WARN, "Message ID '#{message_id}' not found for conversation ID '#{conversation_id}'"
-      return true
-
-    return conversation_et.last_read_timestamp() >= message_et.timestamp
+    @get_conversation_by_id conversation_id, (conversation_et) =>
+      @get_message_in_conversation_by_id conversation_et, message_id
+      .then (message_et) ->
+        return conversation_et.last_read_timestamp() >= message_et.timestamp
+      .catch (error) ->
+        if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+          return true
+        throw error
 
   ###
   Load the conversation states from the store.
@@ -799,9 +799,8 @@ class z.conversation.ConversationRepository
   ###
   send_asset: (conversation_et, file, nonce) =>
     generic_message = null
-    Promise.resolve()
-    .then =>
-      message_et = conversation_et.get_message_by_id nonce
+    @get_message_in_conversation_by_id conversation_et, nonce
+    .then (message_et) =>
       asset_et = message_et.assets()[0]
       asset_et.upload_id nonce # TODO combine
       asset_et.uploaded_on_this_client true
@@ -834,30 +833,31 @@ class z.conversation.ConversationRepository
   send_asset_v3: (conversation_et, file, nonce) =>
     @asset_service.upload_asset file
     .then (asset) =>
-      message_et = conversation_et.get_message_by_id nonce
-      asset_et = message_et.assets()[0]
-      asset_et.upload_id nonce # TODO combine
-      asset_et.uploaded_on_this_client true
+      @get_message_in_conversation_by_id conversation_et, nonce
+      .then (message_et) =>
+        asset_et = message_et.assets()[0]
+        asset_et.upload_id nonce # TODO combine
+        asset_et.uploaded_on_this_client true
 
-      generic_message = new z.proto.GenericMessage nonce
-      generic_message.set 'asset', asset
-      if conversation_et.ephemeral_timer()
-        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
-      @_add_to_sending_queue conversation_et.id, generic_message
-      .then =>
-        event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
-
+        generic_message = new z.proto.GenericMessage nonce
+        generic_message.set 'asset', asset
         if conversation_et.ephemeral_timer()
-          asset = generic_message.ephemeral.asset
-        else
-          asset = generic_message.asset
+          generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
+        @_add_to_sending_queue conversation_et.id, generic_message
+        .then =>
+          event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
 
-        event.data.otr_key = asset.uploaded.otr_key
-        event.data.sha256 = asset.uploaded.sha256
-        event.data.key = asset.uploaded.asset_id
-        event.data.token = asset.uploaded.asset_token
-        event.id = message_et.id
-        return @_on_asset_upload_complete conversation_et, event
+          if conversation_et.ephemeral_timer()
+            asset = generic_message.ephemeral.asset
+          else
+            asset = generic_message.asset
+
+          event.data.otr_key = asset.uploaded.otr_key
+          event.data.sha256 = asset.uploaded.sha256
+          event.data.key = asset.uploaded.asset_id
+          event.data.token = asset.uploaded.asset_token
+          event.id = message_et.id
+          return @_on_asset_upload_complete conversation_et, event
 
   ###
   Send asset metadata message to specified conversation.
@@ -1377,7 +1377,7 @@ class z.conversation.ConversationRepository
   ###
   upload_file: (conversation_et, file) =>
     return if not @_can_upload_assets_to_conversation conversation_et
-    message_et = null
+    message_id = null
 
     upload_started = Date.now()
     tracking_data =
@@ -1390,7 +1390,7 @@ class z.conversation.ConversationRepository
 
     @send_asset_metadata conversation_et, file
     .then (record) =>
-      message_et = conversation_et.get_message_by_id record.id
+      message_id = record.id
       @send_asset conversation_et, file, record.id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
@@ -1398,11 +1398,12 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: upload_duration}
     .catch (error) =>
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
       @logger.log @logger.levels.ERROR, "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
-      if message_et.id
+      @get_message_in_conversation_by_id conversation_et, message_id
+      .then (message_et) =>
         @send_asset_upload_failed conversation_et, message_et.id
         @update_message_as_upload_failed message_et
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
 
   ###
   Post file to a conversation using v3
@@ -1412,7 +1413,7 @@ class z.conversation.ConversationRepository
   ###
   upload_file_v3: (conversation_et, file) =>
     return if not @_can_upload_assets_to_conversation conversation_et
-    message_et = null
+    message_id = null
 
     upload_started = Date.now()
     tracking_data =
@@ -1425,7 +1426,7 @@ class z.conversation.ConversationRepository
 
     @send_asset_metadata conversation_et, file
     .then (record) =>
-      message_et = conversation_et.get_message_by_id record.id
+      message_id = record.id
       @send_asset_v3 conversation_et, file, record.id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
@@ -1433,11 +1434,12 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: upload_duration}
     .catch (error) =>
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
       @logger.log @logger.levels.ERROR, "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
-      if message_et.id
+      @get_message_in_conversation_by_id conversation_et, message_id
+      .then (message_et) =>
         @send_asset_upload_failed conversation_et, message_et.id
         @update_message_as_upload_failed message_et
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
 
   ###
   Delete message for everyone.
@@ -1681,12 +1683,13 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] The conversation that was created
   ###
   _on_asset_preview: (conversation_et, event_json) ->
-    message_et = conversation_et.get_message_by_id event_json.id
-
-    if not message_et?
-      return @logger.log @logger.levels.ERROR, "Asset preview: Could not find message with id '#{event_json.id}'", event_json
-
-    @update_message_with_asset_preview conversation_et, message_et, event_json.data
+    @get_message_in_conversation_by_id conversation_et, event_json.id
+    .then (message_et) =>
+      @update_message_with_asset_preview conversation_et, message_et, event_json.data
+    .catch (error) =>
+      if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+        return @logger.log @logger.levels.ERROR, "Asset preview: Could not find message with id '#{event_json.id}'", event_json
+      throw error
 
   ###
   An asset was uploaded.
@@ -1695,12 +1698,13 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] The conversation that was created
   ###
   _on_asset_upload_complete: (conversation_et, event_json) ->
-    message_et = conversation_et.get_message_by_id event_json.id
-
-    if not message_et?
-      return @logger.log @logger.levels.ERROR, "Upload complete: Could not find message with id '#{event_json.id}'", event_json
-
-    @update_message_as_upload_complete conversation_et, message_et, event_json.data
+    @get_message_in_conversation_by_id conversation_et, event_json.id
+    .then (message_et) =>
+      @update_message_as_upload_complete conversation_et, message_et, event_json.data
+    .catch (error) =>
+      if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+        return @logger.log @logger.levels.ERROR, "Upload complete: Could not find message with id '#{event_json.id}'", event_json
+      throw error
 
   ###
   An asset failed.
@@ -1709,15 +1713,16 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] The conversation that was created
   ###
   _on_asset_upload_failed: (conversation_et, event_json) ->
-    message_et = conversation_et.get_message_by_id event_json.id
-
-    if not message_et?
-      return @logger.log @logger.levels.ERROR, "Upload failed: Could not find message with id '#{event_json.id}'", event_json
-
-    if event_json.data.reason is z.assets.AssetUploadFailedReason.CANCELLED
-      @_delete_message_by_id conversation_et, message_et.id
-    else
-      @update_message_as_upload_failed message_et
+    @get_message_in_conversation_by_id conversation_et, event_json.id
+    .then (message_et) =>
+      if event_json.data.reason is z.assets.AssetUploadFailedReason.CANCELLED
+        @_delete_message_by_id conversation_et, message_et.id
+      else
+        @update_message_as_upload_failed message_et
+    .catch (error) =>
+      if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+        return @logger.log @logger.levels.ERROR, "Upload failed: Could not find message with id '#{event_json.id}'", event_json
+      throw error
 
   ###
   Confirmation for to message received.
