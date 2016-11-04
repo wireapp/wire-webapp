@@ -31,11 +31,6 @@ user-avatar {
       line-height: @avatar-diameter-xxl;
     }
 
-    .user-avatar-border {
-      border-width: @avatar-border-xxl;
-      border-color: fade(#000, 8%);
-    }
-
     .user-avatar-background {
       transform: scale(.9916);
     }
@@ -53,11 +48,6 @@ user-avatar {
       line-height: @avatar-diameter-xl;
     }
 
-    .user-avatar-border {
-      border-width: @avatar-border-xl;
-      border-color: fade(#000, 8%);
-    }
-
     .user-avatar-background {
       transform: scale(.9916);
     }
@@ -73,11 +63,6 @@ user-avatar {
     .user-avatar-initials {
       font-size: @avatar-initials-lg;
       line-height: @avatar-diameter-lg;
-    }
-
-    .user-avatar-border {
-      border-width: @avatar-border-lg;
-      border-color: fade(#000, 8%);
     }
 
     .user-avatar-background {
@@ -117,11 +102,6 @@ user-avatar {
     .user-avatar-initials {
       font-size: @avatar-initials-xs;
       line-height: @avatar-diameter-xs;
-    }
-
-    .user-avatar-border {
-      border-width: @avatar-border-xs;
-      border-color: fade(#000, 8%);
     }
 
     .user-avatar-image {
@@ -167,7 +147,7 @@ user-avatar {
     }
 
     .user-avatar-border {
-      border: none;
+      display: none;
     }
   }
 
@@ -238,7 +218,7 @@ user-avatar {
 .user-avatar-border {
   .full-screen();
   border-radius: 50%;
-  border-style: solid;
+  border: 1px solid fade(#000, 8%);
 }
 
 .user-avatar-initials {
