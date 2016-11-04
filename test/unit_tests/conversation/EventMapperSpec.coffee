@@ -45,7 +45,8 @@ describe 'Event Mapper', ->
         type: z.event.Backend.CONVERSATION.MESSAGE_ADD
 
       message_et = event_mapper.map_json_event event, conversation_et
-      expect(message_et.get_first_asset().text).toBe 'foo'
+      expect(message_et.get_first_asset().text).toBe event.data.content
+      expect(message_et.get_first_asset().nonce).toBe event.data.nonce
       expect(message_et).toBeDefined()
 
     it 'maps text messages with link previews', ->
@@ -66,7 +67,8 @@ describe 'Event Mapper', ->
         type: z.event.Backend.CONVERSATION.MESSAGE_ADD
 
       message_et = event_mapper.map_json_event event, conversation_et
-      expect(message_et.get_first_asset().text).toBe 'test.com'
+      expect(message_et.get_first_asset().text).toBe event.data.content
+      expect(message_et.get_first_asset().nonce).toBe event.data.nonce
       expect(message_et.get_first_asset().previews().length).toBe 1
       expect(message_et.get_first_asset().previews()[0].original_url).toBe 'test.com'
       expect(message_et).toBeDefined()
