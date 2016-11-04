@@ -1506,8 +1506,8 @@ class z.conversation.ConversationRepository
       when z.message.EphemeralStatusType.ACTIVE
         message_et.start_ephemeral_timer()
       when z.message.EphemeralStatusType.INACTIVE
-        message_et.ephemeral_expires new Date(Date.now() + millis).toISOString()
-        message_et.ephemeral_started new Date(Date.now()).toISOString()
+        message_et.ephemeral_expires new Date(Date.now() + millis).getTime.toString()
+        message_et.ephemeral_started new Date(Date.now()).getTime().toString()
         return @conversation_service.update_message_in_db message_et, {ephemeral_expires: message_et.ephemeral_expires(), ephemeral_started: message_et.ephemeral_started()}
         .then -> message_et.start_ephemeral_timer()
 

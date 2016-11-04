@@ -34,7 +34,7 @@ class z.entity.Message
     @ephemeral_duration = ko.observable 0
     @ephemeral_remaining = ko.observable 0
     @ephemeral_expires = ko.observable false
-    @ephemeral_started = ko.observable ''
+    @ephemeral_started = ko.observable '0'
     @ephemeral_status = ko.computed =>
       expiration = @ephemeral_expires()
 

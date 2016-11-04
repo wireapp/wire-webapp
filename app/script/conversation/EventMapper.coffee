@@ -100,11 +100,10 @@ class z.conversation.EventMapper
       message_et.reactions event.reactions or {}
       message_et.status event.status if event.status
 
+    # todo Remove deprecated expire_after_millis with subsequent release
     if event.ephemeral_expires or event.expire_after_millis
       message_et.ephemeral_expires event.ephemeral_expires or event.expire_after_millis
-
-    if event.ephemeral_started
-      message_et.ephemeral_started event.ephemeral_started
+      message_et.ephemeral_started event.ephemeral_started or '0'
 
     if window.isNaN message_et.timestamp
       @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event

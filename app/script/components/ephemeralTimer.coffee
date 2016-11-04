@@ -22,20 +22,18 @@ z.components ?= {}
 class z.components.EphemeralTimer
   constructor: (params) ->
     message_et = params.message
-    ephemeral_expires = new Date(message_et.ephemeral_expires()).getTime()
-    ephemeral_started = new Date(message_et.ephemeral_started()).getTime()
 
-    ephemeral_duration = ephemeral_expires - ephemeral_started
+    @ephemeral_duration = ko.computed => message_et.ephemeral_expires() - message_et.ephemeral_started()
 
     @progress = ko.observable 0
     @remaining_time = ko.observable 0
 
     @remaining_subscription = message_et.ephemeral_remaining.subscribe (remaining_time) =>
-      if Date.now() >= ephemeral_expires
+      if Date.now() >= message_et.ephemeral_expires()
         @progress 1
       else
-        elapsed_time = ephemeral_duration - remaining_time
-        @progress elapsed_time / ephemeral_duration
+        elapsed_time = @ephemeral_duration() - remaining_time
+        @progress elapsed_time / @ephemeral_duration()
 
     @bullet_count = [0..4]
 
