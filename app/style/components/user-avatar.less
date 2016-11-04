@@ -94,7 +94,7 @@ user-avatar {
     }
 
     .user-avatar-border {
-      border-width: @avatar-border-md;
+      display: none;
     }
   }
 
@@ -107,7 +107,7 @@ user-avatar {
     }
 
     .user-avatar-border {
-      border-width: @avatar-border-sm;
+      display: none;
     }
   }
 
@@ -213,16 +213,8 @@ user-avatar {
 .user-avatar-background {
   .full-screen;
   transform: scale(.9687);
+  background-color: currentColor;
   border-radius: 50%;
-
-  .accent-color-0 & {background-color: @accent_colors-1;}
-  .accent-color-1 & {background-color: @accent_colors-1;}
-  .accent-color-2 & {background-color: @accent_colors-2;}
-  .accent-color-3 & {background-color: @accent_colors-3;}
-  .accent-color-4 & {background-color: @accent_colors-4;}
-  .accent-color-5 & {background-color: @accent_colors-5;}
-  .accent-color-6 & {background-color: @accent_colors-6;}
-  .accent-color-7 & {background-color: @accent_colors-7;}
 }
 
 .user-avatar-image {
@@ -247,15 +239,6 @@ user-avatar {
   .full-screen();
   border-radius: 50%;
   border-style: solid;
-
-  .accent-color-0 & {border-color: @accent_colors-1;}
-  .accent-color-1 & {border-color: @accent_colors-1;}
-  .accent-color-2 & {border-color: @accent_colors-2;}
-  .accent-color-3 & {border-color: @accent_colors-3;}
-  .accent-color-4 & {border-color: @accent_colors-4;}
-  .accent-color-5 & {border-color: @accent_colors-5;}
-  .accent-color-6 & {border-color: @accent_colors-6;}
-  .accent-color-7 & {border-color: @accent_colors-7;}
 }
 
 .user-avatar-initials {
