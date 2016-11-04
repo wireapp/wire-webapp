@@ -113,17 +113,17 @@ class z.SystemNotification.SystemNotificationRepository
       @_notify_sound conversation_et, message_et
       @_notify_banner conversation_et, message_et
 
-  ###
-  Remove notifications from the queue that are no longer unread
-  ###
+  # Remove notifications from the queue that are no longer unread
   remove_read_notifications: =>
     for notification in @notifications
       return if not notification.data?
       conversation_id = notification.data.conversation_id
       message_id = notification.data.message_id
-      if @conversation_repository.is_message_read conversation_id, message_id
-        notification.close()
-        @logger.log @logger.levels.INFO, "Removed read notification for '#{message_id}' in '#{conversation_id}'."
+      @conversation_repository.is_message_read conversation_id, message_id
+      .then (is_read) =>
+        if is_read
+          notification.close()
+          @logger.log @logger.levels.INFO, "Removed read notification for '#{message_id}' in '#{conversation_id}'."
 
   ###
   Set the muted state.
