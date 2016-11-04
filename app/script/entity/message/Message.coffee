@@ -238,23 +238,7 @@ class z.entity.Message
 
     @ephemeral_interval_id = window.setInterval =>
       @ephemeral_remaining new Date(@ephemeral_expires()) - Date.now()
-
-      moment_duration = moment.duration @ephemeral_remaining()
-      if moment_duration.asHours() is 1
-        title = "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hour}, "
-      else if moment_duration.asHours() > 1
-        title = "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hours}, "
-
-      if moment_duration.asMinutes() is 1
-        title = "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minute} #{z.localization.Localizer.get_text z.string.and} "
-      else if moment_duration.asMinutes() > 1
-        title = "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minutes} #{z.localization.Localizer.get_text z.string.and} "
-
-      if moment_duration.asSeconds() is 1
-        title = "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_second}"
-      else if moment_duration.asSeconds() > 1
-        title = "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_seconds}"
-      @ephemeral_caption if title then title else ''
+      @ephemeral_caption z.util.format_time_remaining @ephemeral_remaining()
     , 250
 
     window.setTimeout =>
