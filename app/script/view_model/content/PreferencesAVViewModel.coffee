@@ -106,7 +106,7 @@ class z.ViewModel.content.PreferencesAVViewModel
   _release_audio_meter: =>
     window.clearInterval @audio_interval
     @audio_interval = undefined
-    @audio_source.disconnect()
+    @audio_source.disconnect() if @audio_source
 
   _release_media_streams: =>
     @media_stream_handler.reset_media_streams()
