@@ -383,7 +383,7 @@ class z.ViewModel.MessageListViewModel
 
     @_track_context_menu message_et
 
-    if message_et.has_asset() and not message_et.is_expired()
+    if message_et.has_asset() and message_et.ephemeral_status() is z.message.EphemeralStatusType.NONE
       entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
 
     if message_et.is_reactable() and not @conversation().removed_from_conversation()
