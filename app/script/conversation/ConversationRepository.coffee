@@ -2341,7 +2341,9 @@ class z.conversation.ConversationRepository
       is_ephemeral = false
 
     action_type = switch message_content_type
-      when 'asset' then 'file' if message.asset.original?
+      when 'asset'
+        if message.asset.original?
+          if message.asset.original.image? then 'photo' else 'file'
       when 'image' then 'photo'
       when 'knock' then 'ping'
       when 'text' then 'text' if not message.text.link_preview.length
