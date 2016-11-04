@@ -17,6 +17,8 @@
 #
 
 # grunt test_init && grunt test_run:system_notification/SystemNotificationRepository
+window.wire ?= {}
+window.wire.app ?= {}
 
 describe 'z.SystemNotification.SystemNotificationRepository', ->
   test_factory = new TestFactory()
@@ -51,8 +53,13 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
       # Mocks
       document.hasFocus = -> return false
-      z.util.Environment.browser.supports.notifications = true
       system_notification_repository.permission_state = z.system_notification.PermissionStatusState.GRANTED
+      z.util.Environment.browser.supports.notifications = true
+      window.wire.app =
+          view:
+            content:
+              multitasking:
+                is_minimized: -> return true
 
       spyOn system_notification_repository, '_show_notification'
       spyOn system_notification_repository, '_notify_sound'
@@ -81,7 +88,13 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       system_notification_repository.notify conversation_et, message_et
       .then ->
         expect(system_notification_repository._show_notification).not.toHaveBeenCalled()
-        done()
+
+        window.wire.app.view.content.multitasking.is_minimized = -> return false
+
+        system_notification_repository.notify conversation_et, message_et
+        .then ->
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
       .catch done.fail
 
     it 'if the event was triggered by the user', (done) ->

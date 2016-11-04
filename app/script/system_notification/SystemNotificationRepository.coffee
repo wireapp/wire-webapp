@@ -524,7 +524,7 @@ class z.SystemNotification.SystemNotificationRepository
       hide_notification = true if @notifications_preference() is z.system_notification.SystemNotificationPreference.NONE
       hide_notification = true if not z.util.Environment.browser.supports.notifications
       hide_notification = true if @permission_state is z.system_notification.PermissionStatusState.DENIED
-      hide_notification = true if document.hasFocus() and conversation_et.id is @conversation_repository.active_conversation()?.id
+      hide_notification = true if document.hasFocus() and conversation_et.id is @conversation_repository.active_conversation()?.id and wire.app.view.content.multitasking.is_minimized()
       hide_notification = true if message_et.user()?.is_me
 
       if hide_notification
@@ -566,6 +566,7 @@ class z.SystemNotification.SystemNotificationRepository
     notification.onclick = =>
       amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.CLICK
       window.focus()
+      wire.app.view.content.multitasking.is_minimized true
       notification_content.trigger()
       @logger.log @logger.levels.INFO, "Notification for '#{message_id} in '#{conversation_id}' closed by click."
       notification.close()
