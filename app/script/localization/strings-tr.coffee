@@ -378,6 +378,7 @@ z.string.tr.people_button_yes = 'Evet'
 # Settings
 z.string.tr.preferences_about = 'Hakkında'
 z.string.tr.preferences_account = 'Hesap'
+z.string.tr.preferences_av = 'Ses / Görüntü'
 z.string.tr.preferences_device_details = 'Cihaz Detayları'
 z.string.tr.preferences_devices = 'Cihazlar'
 z.string.tr.preferences_headline = 'Seçenekler'
@@ -399,6 +400,7 @@ z.string.tr.preferences_account_username_placeholder = 'Tam adınız'
 
 z.string.tr.preferences_av_camera = 'Kamera'
 z.string.tr.preferences_av_microphone = 'Mikrofon'
+z.string.tr.preferences_av_permission_detail = 'Tarayıcı Seçeneklerinizden aktifleştirin'
 z.string.tr.preferences_av_speakers = 'Hoparlörler'
 
 z.string.tr.preferences_devices_activated_in = '%location ’de'

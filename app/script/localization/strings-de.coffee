@@ -402,6 +402,7 @@ z.string.de.preferences_account_username_placeholder = 'Dein vollständiger Name
 
 z.string.de.preferences_av_camera = 'Kamera'
 z.string.de.preferences_av_microphone = 'Mikrofon'
+z.string.de.preferences_av_permission_detail = 'In deinen Browser-Einstellungen aktivieren'
 z.string.de.preferences_av_speakers = 'Lautsprecher'
 
 z.string.de.preferences_devices_activated_in = 'in %location'
@@ -414,7 +415,7 @@ z.string.de.preferences_devices_fingerprint_detail = 'Wire gibt jedem Gerät ein
 z.string.de.preferences_devices_id = 'ID: '
 z.string.de.preferences_devices_remove = 'Entfernen'
 z.string.de.preferences_devices_remove_cancel = 'Abbrechen'
-z.string.de.preferences_devices_remove_detail = 'Entferne das Gerät, wenn du es nicht mehr nutzt. Der Nachrichtenverlauf wird auf diesem Gerät gelöscht und du wirst abgemeldet.'
+z.string.de.preferences_devices_remove_detail = 'Entferne das Gerät, wenn du es nicht mehr nutzt. Du wirst auf diesem Gerät umgehend abgemeldet.'
 z.string.de.preferences_devices_session_confirmation = 'Die Session wurde zurückgesetzt.'
 z.string.de.preferences_devices_session_detail = 'Falls die Fingerabdrücke nicht übereinstimmen, setze die Session zurück um neue Verschlüsselungs-Schlüssel auf beiden Seiten zu erstellen.'
 z.string.de.preferences_devices_session_reset = 'Session zurücksetzen'
