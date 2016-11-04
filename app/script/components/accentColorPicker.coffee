@@ -42,9 +42,11 @@ class z.components.AccentColorPicker
 ko.components.register 'accent-color-picker',
   viewModel: z.components.AccentColorPicker
   template: """
-    <!-- ko foreach : accent_color_ids -->
-      <input type="radio" name="accent"
-             data-bind="attr: {'id': 'accent' + $data, 'checked': $parent.user.accent_id() === $data}, click: $parent.on_select">
-      <label data-bind="attr: {'for': 'accent' + $data},css: 'accent-color-' + $data"></label>
+    <!-- ko foreach: accent_color_ids -->
+      <!-- ko ifnot: $data === 3 -->
+        <input type="radio" name="accent"
+               data-bind="attr: {'id': 'accent' + $data, 'checked': $parent.user.accent_id() === $data}, click: $parent.on_select">
+        <label data-bind="attr: {'for': 'accent' + $data},css: 'accent-color-' + $data"></label>
+      <!-- /ko -->
     <!-- /ko -->
   """
