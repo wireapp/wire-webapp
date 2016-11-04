@@ -650,12 +650,12 @@ Returns bucket for given value based on the specified bucket limits
 @return [String] bucket
 ###
 z.util.bucket_values = (value, bucket_limits) ->
-  return '0' if value is 0
+  return '0' if value < bucket_limits[0] + 1
 
   for limit, i in bucket_limits
-    if value <= limit
+    if value < limit + 1
       previous_limit = bucket_limits[i - 1]
-      return "#{previous_limit+1}-#{limit}"
+      return "#{previous_limit + 1}-#{limit}"
 
   last_limit = bucket_limits[bucket_limits.length - 1]
   return "#{last_limit+1}-"
