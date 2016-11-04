@@ -21,40 +21,19 @@ z.components ?= {}
 
 class z.components.EphemeralTimer
   constructor: (params) ->
-    scheduled_time = new Date(params.expires()).getTime()
-    starting_time = Date.now()
-    timer = scheduled_time - starting_time
-    update_interval = 1000 / 10
+    message_et = params.message
+
+    @ephemeral_duration = ko.computed => message_et.ephemeral_expires() - message_et.ephemeral_started()
 
     @progress = ko.observable 0
     @remaining_time = ko.observable 0
 
-    @title_caption = ko.pureComputed =>
-      title = ''
-      moment_duration = moment.duration(@remaining_time())
-      if moment_duration.asHours() is 1
-        title += "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hour}, "
-      else if moment_duration.asHours() > 1
-        title += "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hours}, "
-
-      if moment_duration.asMinutes() is 1
-        title += "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minute} #{z.localization.Localizer.get_text z.string.and} "
-      else if moment_duration.asMinutes() > 1
-        title += "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minutes} #{z.localization.Localizer.get_text z.string.and} "
-
-      if moment_duration.asSeconds() is 1
-        title += "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_second}"
-      else if moment_duration.asSeconds() > 1
-        title += "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_seconds}"
-
-    @interval_id = window.setInterval =>
-      if Date.now() >= scheduled_time
-        window.clearInterval @interval_id
+    @remaining_subscription = message_et.ephemeral_remaining.subscribe (remaining_time) =>
+      if Date.now() >= message_et.ephemeral_expires()
+        @progress 1
       else
-        @remaining_time scheduled_time - Date.now()
-        elapsed_time = timer - @remaining_time()
-        @progress elapsed_time / timer
-    , update_interval
+        elapsed_time = @ephemeral_duration() - remaining_time
+        @progress elapsed_time / @ephemeral_duration()
 
     @bullet_count = [0..4]
 
@@ -63,12 +42,16 @@ class z.components.EphemeralTimer
     return 'ephemeral-timer-bullet-inactive' if passed_index
 
   destroy: =>
-    window.clearInterval @interval_id
+    @remaining_subscription.dispose()
+    window.clearInterval message_et.ephemeral_interval_id
+    message_et.ephemeral_interval_id = undefined
+    window.clearTimeout message_et.ephemeral_timeout_id
+    message_et.ephemeral_timeout_id = undefined
 
 ko.components.register 'ephemeral-timer',
   viewModel: z.components.EphemeralTimer
   template: """
-            <ul class="ephemeral-timer" data-bind="attr: {'title': title_caption()}">
+            <ul class="ephemeral-timer">
               <!-- ko foreach: bullet_count -->
                <li class="ephemeral-timer-bullet" data-bind="css: $parent.is_bullet_active($data)"></li>
               <!-- /ko -->
