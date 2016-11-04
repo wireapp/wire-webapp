@@ -23,7 +23,7 @@
     "grunt-newer": "1.2.0",
     "grunt-open": "0.2.3",
     "grunt-postcss": "0.8.0",
-    "grunt-shell": "2.0.0",
+    "grunt-shell": "2.1.0",
     "grunt-todo": "0.5.0",
     "jasmine-ajax": "3.2.0",
     "jasmine-core": "2.5.2",
