@@ -118,36 +118,42 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       expected_title = "(1) · #{selected_conversation.name()} · #{suffix}"
       expect(window.document.title).toBe expected_title
 
-    it 'sets the name of the self user when opening the preferences about page', ->
+    it 'sets the name when opening the preferences about page', ->
       title_view_model.content_state z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
 
       expected_title = "#{z.string.preferences_about} · #{suffix}"
       title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
 
-    it 'sets the name of the self user when opening the preferences account page', ->
+    it 'sets the name when opening the preferences account page', ->
       title_view_model.content_state z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
 
       expected_title = "#{z.string.preferences_account} · #{suffix}"
       title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
 
+    it 'sets the name when opening the preferences av page', ->
+      title_view_model.content_state z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
 
-    it 'sets the name of the self user when opening the preferences device details page', ->
+      expected_title = "#{z.string.preferences_av} · #{suffix}"
+      title_view_model.initiate_title_updates()
+      expect(window.document.title).toBe expected_title
+
+    it 'sets the name when opening the preferences device details page', ->
       title_view_model.content_state z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS
 
       expected_title = "#{z.string.preferences_device_details} · #{suffix}"
       title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
 
-    it 'sets the name of the self user when opening the preferences devices page', ->
+    it 'sets the name when opening the preferences devices page', ->
       title_view_model.content_state z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
 
       expected_title = "#{z.string.preferences_devices} · #{suffix}"
       title_view_model.initiate_title_updates()
       expect(window.document.title).toBe expected_title
 
-    it 'sets the name of the self user when opening the preferences options page', ->
+    it 'sets the name when opening the preferences options page', ->
       title_view_model.content_state z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
 
       expected_title = "#{z.string.preferences_options} · #{suffix}"

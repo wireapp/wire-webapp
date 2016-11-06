@@ -68,10 +68,9 @@ z.tracking.EventName =
     OPENED_TERMS: 'navigation.opened_terms'
   ONBOARDING:
     ADDED_PHOTO: 'onboarding.added_photo'
-    IMPORTED_CONTACTS: 'onboarding.imported_contacts'
   PASSWORD_RESET: 'resetPassword'
-  PERMISSION:
-    ALLOW_NOTIFICATIONS: 'allowNotifications'
+  PREFERENCES:
+    IMPORTED_CONTACTS: 'preferences.imported_contacts'
   PROFILE_PICTURE_CHANGED: 'changedProfilePicture'
   REGISTRATION:
     ENTERED_CREDENTIALS: 'registration.entered_credentials'
@@ -79,7 +78,6 @@ z.tracking.EventName =
     RESENT_EMAIL_VERIFICATION: 'registration.resent_email_verification'
     SUCCEEDED: 'registration.succeeded'
   SETTINGS:
-    IMPORTED_CONTACTS: 'settings.imported_contacts'
     VIEWED_DEVICE: 'settings.viewed_device'
     REMOVED_DEVICE: 'settings.removed_device'
   SOUND_SETTINGS_CHANGED: 'soundIntensityPreference'

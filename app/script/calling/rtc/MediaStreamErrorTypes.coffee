@@ -36,6 +36,7 @@ z.calling.rtc.MediaStreamErrorTypes =
     z.calling.rtc.MediaStreamError.TYPE_ERROR
   ]
   PERMISSION: [
+    z.calling.rtc.MediaStreamError.NOT_ALLOWED_ERROR
     z.calling.rtc.MediaStreamError.PERMISSION_DENIED_ERROR
     z.calling.rtc.MediaStreamError.PERMISSION_DISMISSED_ERROR
     z.calling.rtc.MediaStreamError.SECURITY_ERROR

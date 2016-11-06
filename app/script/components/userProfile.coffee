@@ -187,8 +187,13 @@ class z.components.UserProfileViewModel
     @render_common_contacts = ko.pureComputed =>
       return @user()?.id and not @user().connected() and not @user().is_me
 
-    @render_avatar = ko.pureComputed =>
-      return @user()?.id
+    @render_avatar = ko.observable false
+    @render_avatar_computed = ko.computed =>
+      user_id = @user()?.id
+      @render_avatar false # swap value to rerender avatar
+      setTimeout =>
+        @render_avatar user_id?
+      , 0
 
     # footer
     @get_footer_template = ko.pureComputed =>
@@ -275,6 +280,7 @@ class z.components.UserProfileViewModel
 
   dispose: =>
     @cleanup_computed.dispose()
+    @render_avatar_computed.dispose()
     @selected_device_subscription.dispose()
 
 ko.components.register 'user-profile',

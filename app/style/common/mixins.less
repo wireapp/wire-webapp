@@ -275,14 +275,14 @@
   .main-accent-color-7 & { background-color: fade(@accent_colors-7, @fade) }
 }
 
-.accent-border-color() {
-  .main-accent-color-1 & { border-color: @accent_colors-1 }
-  .main-accent-color-2 & { border-color: @accent_colors-2 }
-  .main-accent-color-3 & { border-color: @accent_colors-3 }
-  .main-accent-color-4 & { border-color: @accent_colors-4 }
-  .main-accent-color-5 & { border-color: @accent_colors-5 }
-  .main-accent-color-6 & { border-color: @accent_colors-6 }
-  .main-accent-color-7 & { border-color: @accent_colors-7 }
+.accent-border-color(@fade: 100%) {
+  .main-accent-color-1 & { border-color: fade(@accent_colors-1, @fade) }
+  .main-accent-color-2 & { border-color: fade(@accent_colors-2, @fade) }
+  .main-accent-color-3 & { border-color: fade(@accent_colors-3, @fade) }
+  .main-accent-color-4 & { border-color: fade(@accent_colors-4, @fade) }
+  .main-accent-color-5 & { border-color: fade(@accent_colors-5, @fade) }
+  .main-accent-color-6 & { border-color: fade(@accent_colors-6, @fade) }
+  .main-accent-color-7 & { border-color: fade(@accent_colors-7, @fade) }
 }
 
 .accent-color-selection-mixin(@accent_id) when (@accent_id > 0){

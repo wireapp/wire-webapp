@@ -79,6 +79,7 @@
               </span>
             <!-- /ko -->
             <!-- ko if: message.is_expired() -->
+              <div class="icon-library flex-center full-screen text-white"></div>
               <img class="image-element image-ephemeral" data-bind="attr: {src: asset.dummy_url}"/>
             <!-- /ko -->
           </div>
@@ -86,20 +87,20 @@
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(), css: {'text-graphite': $parent.is_editing, 'text-large': z.util.emoji.contains_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.is_expired()}"></div>
+          <div class="text" data-bind="html: asset.render(), css: {'text-graphite': $parent.is_editing, 'text-large': z.util.emoji.includes_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.is_expired()}"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset params="expired: message.is_expired(), preview: $data, viewport_changed: $parents[2].viewport_changed"></link-preview-asset>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.is_video() -->
-        <video-asset data-bind="css: {'bg-color-ephemeral': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></video-asset>
+        <video-asset data-bind="css: {'bg-color-ephemeral icon-movie text-white flex-center': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></video-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_audio() -->
-        <audio-asset data-bind="css: {'bg-color-ephemeral': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></audio-asset>
+        <audio-asset data-bind="css: {'bg-color-ephemeral icon-microphone text-white flex-center': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_file() -->
-        <file-asset data-bind="css: {'bg-color-ephemeral': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></file-asset>
+        <file-asset params="asset: asset, expired: message.is_expired()"></file-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_location() -->
         <location-asset params="asset: asset"></location-asset>
