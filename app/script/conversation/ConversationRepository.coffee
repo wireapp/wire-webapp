@@ -394,19 +394,22 @@ class z.conversation.ConversationRepository
 
   @param conversation_id [String] Conversation ID
   @param message_id [String] Message ID
-  @return [Boolean] Is the message marked as read
+  @return [Promise] Resolves with true if message is marked as read
   ###
   is_message_read: (conversation_id, message_id) =>
-    return Promise.resolve false if not conversation_id or not message_id
+    return new Promise (resolve, reject) =>
+      if not conversation_id or not message_id
+        return resolve false
 
-    @get_conversation_by_id conversation_id, (conversation_et) =>
-      @get_message_in_conversation_by_id conversation_et, message_id
-      .then (message_et) ->
-        return conversation_et.last_read_timestamp() >= message_et.timestamp
-      .catch (error) ->
-        if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-          return true
-        throw error
+      @get_conversation_by_id conversation_id, (conversation_et) =>
+        @get_message_in_conversation_by_id conversation_et, message_id
+        .then (message_et) ->
+          resolve conversation_et.last_read_timestamp() >= message_et.timestamp
+        .catch (error) ->
+          if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+            resolve true
+          else
+            reject error
 
   ###
   Load the conversation states from the store.
@@ -2341,7 +2344,9 @@ class z.conversation.ConversationRepository
       is_ephemeral = false
 
     action_type = switch message_content_type
-      when 'asset' then 'file' if message.asset.original?
+      when 'asset'
+        if message.asset.original?
+          if message.asset.original.image? then 'photo' else 'file'
       when 'image' then 'photo'
       when 'knock' then 'ping'
       when 'text' then 'text' if not message.text.link_preview.length

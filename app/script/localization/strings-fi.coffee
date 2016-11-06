@@ -378,6 +378,7 @@ z.string.fi.people_button_yes = 'Kyllä'
 # Settings
 z.string.fi.preferences_about = 'Tietoja meistä'
 z.string.fi.preferences_account = 'Tili'
+z.string.fi.preferences_av = 'Audio / Video'
 z.string.fi.preferences_device_details = 'Laitteen yksityiskohdat'
 z.string.fi.preferences_devices = 'Laitteet'
 z.string.fi.preferences_headline = 'Asetukset'
@@ -399,6 +400,7 @@ z.string.fi.preferences_account_username_placeholder = 'Koko nimesi'
 
 z.string.fi.preferences_av_camera = 'Kamera'
 z.string.fi.preferences_av_microphone = 'Mikrofoni'
+z.string.fi.preferences_av_permission_detail = 'Salli selaimesi asetuksista'
 z.string.fi.preferences_av_speakers = 'Kaiuttimet'
 
 z.string.fi.preferences_devices_activated_in = '%location: ssa'
