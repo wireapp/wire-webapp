@@ -19,6 +19,9 @@
 window.z ?= {}
 z.entity ?= {}
 
+# cache processed text including media embeds, link highlight and markdown
+text_cache = new LRUCache 1000
+
 # Text asset entity.
 class z.entity.Text extends z.entity.Asset
   ###
@@ -29,15 +32,13 @@ class z.entity.Text extends z.entity.Asset
   constructor: (id) ->
     super id
     @type = z.assets.AssetType.TEXT
+    @nonce = undefined
 
     # Raw message text
     @text = ''
 
     # Can be used to theme media embeds
     @theme_color = undefined
-
-    # Processed text including media embeds, link highlight and markdown
-    @processed_text = undefined
 
     # Array of z.entity.LinkPreview instances
     @previews = ko.observableArray()
@@ -49,5 +50,8 @@ class z.entity.Text extends z.entity.Asset
 
   # Process text before rendering it.
   render: ->
-    @processed_text ?= z.util.render_message @text, @theme_color
-    return @processed_text
+    processed_text = text_cache.get @nonce
+    if not processed_text?
+      processed_text = z.util.render_message @text, @theme_color
+      text_cache.put @nonce, processed_text
+    return processed_text

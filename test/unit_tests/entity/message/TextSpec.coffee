@@ -16,10 +16,26 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-window.z ?= {}
-z.connect ?= {}
+# grunt test_init && grunt test_run:entity/message/File
 
-z.connect.ConnectTrigger =
-  ONBOARDING: 'registration'
-  SEARCH: 'search'
-  SETTINGS: 'settings'
+describe 'z.entity.Text', ->
+
+  text = null
+
+  beforeEach ->
+    text = new z.entity.Text()
+    text.text = 'foo'
+    text.none = z.util.create_random_uuid()
+
+    spyOn(z.util, 'render_message').and.callThrough()
+
+  describe 'cached processed text', ->
+
+    it 'should cache processed tect', ->
+      processed_text = text.render()
+      expect(text.text).toBe processed_text
+
+      processed_text = text.render()
+      expect(text.text).toBe processed_text
+      expect(z.util.render_message.calls.count()).toBe 1
+

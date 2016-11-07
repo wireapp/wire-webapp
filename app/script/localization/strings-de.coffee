@@ -402,6 +402,7 @@ z.string.de.preferences_account_username_placeholder = 'Dein vollständiger Name
 
 z.string.de.preferences_av_camera = 'Kamera'
 z.string.de.preferences_av_microphone = 'Mikrofon'
+z.string.de.preferences_av_permission_detail = 'In deinen Browser-Einstellungen aktivieren'
 z.string.de.preferences_av_speakers = 'Lautsprecher'
 
 z.string.de.preferences_devices_activated_in = 'in %location'
@@ -414,7 +415,7 @@ z.string.de.preferences_devices_fingerprint_detail = 'Wire gibt jedem Gerät ein
 z.string.de.preferences_devices_id = 'ID: '
 z.string.de.preferences_devices_remove = 'Entfernen'
 z.string.de.preferences_devices_remove_cancel = 'Abbrechen'
-z.string.de.preferences_devices_remove_detail = 'Entferne das Gerät, wenn du es nicht mehr nutzt. Der Nachrichtenverlauf wird auf diesem Gerät gelöscht und du wirst abgemeldet.'
+z.string.de.preferences_devices_remove_detail = 'Entferne das Gerät, wenn du es nicht mehr nutzt. Du wirst auf diesem Gerät umgehend abgemeldet.'
 z.string.de.preferences_devices_session_confirmation = 'Die Session wurde zurückgesetzt.'
 z.string.de.preferences_devices_session_detail = 'Falls die Fingerabdrücke nicht übereinstimmen, setze die Session zurück um neue Verschlüsselungs-Schlüssel auf beiden Seiten zu erstellen.'
 z.string.de.preferences_devices_session_reset = 'Session zurücksetzen'
@@ -500,7 +501,7 @@ z.string.de.warning_not_found_camera = 'Du kannst nicht anrufen, da dein Compute
 z.string.de.warning_not_found_microphone = 'Du kannst nicht anrufen, da dein Computer kein Mikrofon hat.'
 z.string.de.warning_permission_denied_camera = 'Du kannst nicht anrufen, da dein Browser keinen Zugriff auf die Kamera hat.'
 z.string.de.warning_permission_denied_microphone = 'Du kannst nicht anrufen, da dein Browser keinen Zugriff auf das Mikrofon hat.'
-z.string.de.warning_permission_denied_screen = 'Du kannst deinen Bildschirm nicht teilen, da dein Browser keinen Zugriff auf den Bildschirm hat.'
+z.string.de.warning_permission_denied_screen = 'Der Browser braucht die Berechtigung deinen Bildschirm zu teilen.'
 z.string.de.warning_permission_request_camera = '%icon Zugriff auf Kamera gewähren'
 z.string.de.warning_permission_request_microphone = '%icon Zugriff auf Mikrofon gewähren'
 z.string.de.warning_permission_request_notification = '%icon Benachrichtigungen zulassen'

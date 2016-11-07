@@ -333,7 +333,7 @@ class z.conversation.EventMapper
   ###
   _map_asset_text: (data) ->
     asset_et = new z.entity.Text data.id
-    asset_et.key = "text##{data.nonce}"
+    asset_et.nonce = data.nonce
     asset_et.text = data.content or data.message
     asset_et.previews @_map_link_previews data.previews
     return asset_et
