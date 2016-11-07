@@ -31,11 +31,6 @@ user-avatar {
       line-height: @avatar-diameter-xxl;
     }
 
-    .user-avatar-border {
-      border-width: @avatar-border-xxl;
-      border-color: fade(#000, 8%);
-    }
-
     .user-avatar-background {
       transform: scale(.9916);
     }
@@ -51,11 +46,6 @@ user-avatar {
     .user-avatar-initials {
       font-size: @avatar-initials-xl;
       line-height: @avatar-diameter-xl;
-    }
-
-    .user-avatar-border {
-      border-width: @avatar-border-xl;
-      border-color: fade(#000, 8%);
     }
 
     .user-avatar-background {
@@ -75,11 +65,6 @@ user-avatar {
       line-height: @avatar-diameter-lg;
     }
 
-    .user-avatar-border {
-      border-width: @avatar-border-lg;
-      border-color: fade(#000, 8%);
-    }
-
     .user-avatar-background {
       transform: scale(.9916);
     }
@@ -94,7 +79,7 @@ user-avatar {
     }
 
     .user-avatar-border {
-      border-width: @avatar-border-md;
+      display: none;
     }
   }
 
@@ -107,7 +92,7 @@ user-avatar {
     }
 
     .user-avatar-border {
-      border-width: @avatar-border-sm;
+      display: none;
     }
   }
 
@@ -117,11 +102,6 @@ user-avatar {
     .user-avatar-initials {
       font-size: @avatar-initials-xs;
       line-height: @avatar-diameter-xs;
-    }
-
-    .user-avatar-border {
-      border-width: @avatar-border-xs;
-      border-color: fade(#000, 8%);
     }
 
     .user-avatar-image {
@@ -167,7 +147,7 @@ user-avatar {
     }
 
     .user-avatar-border {
-      border: none;
+      display: none;
     }
   }
 
@@ -213,16 +193,8 @@ user-avatar {
 .user-avatar-background {
   .full-screen;
   transform: scale(.9687);
+  background-color: currentColor;
   border-radius: 50%;
-
-  .accent-color-0 & {background-color: @accent_colors-1;}
-  .accent-color-1 & {background-color: @accent_colors-1;}
-  .accent-color-2 & {background-color: @accent_colors-2;}
-  .accent-color-3 & {background-color: @accent_colors-3;}
-  .accent-color-4 & {background-color: @accent_colors-4;}
-  .accent-color-5 & {background-color: @accent_colors-5;}
-  .accent-color-6 & {background-color: @accent_colors-6;}
-  .accent-color-7 & {background-color: @accent_colors-7;}
 }
 
 .user-avatar-image {
@@ -246,16 +218,7 @@ user-avatar {
 .user-avatar-border {
   .full-screen();
   border-radius: 50%;
-  border-style: solid;
-
-  .accent-color-0 & {border-color: @accent_colors-1;}
-  .accent-color-1 & {border-color: @accent_colors-1;}
-  .accent-color-2 & {border-color: @accent_colors-2;}
-  .accent-color-3 & {border-color: @accent_colors-3;}
-  .accent-color-4 & {border-color: @accent_colors-4;}
-  .accent-color-5 & {border-color: @accent_colors-5;}
-  .accent-color-6 & {border-color: @accent_colors-6;}
-  .accent-color-7 & {border-color: @accent_colors-7;}
+  border: 1px solid fade(#000, 8%);
 }
 
 .user-avatar-initials {
