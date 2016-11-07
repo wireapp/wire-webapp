@@ -175,7 +175,7 @@ class z.ViewModel.list.StartUIViewModel
   click_on_close: =>
     @_close_list()
 
-  _track_import: (source, ui_identifier, error) ->
+  _track_import: (source, error) ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PREFERENCES.IMPORTED_CONTACTS,
       source: source
       outcome: if error then 'fail' else 'success'
@@ -183,7 +183,6 @@ class z.ViewModel.list.StartUIViewModel
   ###
   Connect with contacts.
   @param source [z.connect.ConnectSource] Source for the contacts import
-  @param ui_identifier [String] UI component that triggered the event (used for Analytics)
   ###
   import_contacts: (source) =>
     @show_spinner true
@@ -198,10 +197,10 @@ class z.ViewModel.list.StartUIViewModel
       if error.type isnt z.connect.ConnectError::TYPE.NO_CONTACTS
         @logger.log @logger.levels.ERROR, "Importing contacts from '#{source}' failed: #{error.message}", error
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONTACTS, action: =>
-          @import_contacts source, ui_identifier
+          @import_contacts source
     .then (error) =>
       @show_spinner false
-      @_track_import source, ui_identifier, error
+      @_track_import source, error
 
   _show_onboarding_results: (response) =>
     @search_repository.show_onboarding response
