@@ -113,17 +113,17 @@ class z.SystemNotification.SystemNotificationRepository
       @_notify_sound conversation_et, message_et
       @_notify_banner conversation_et, message_et
 
-  ###
-  Remove notifications from the queue that are no longer unread
-  ###
+  # Remove notifications from the queue that are no longer unread
   remove_read_notifications: =>
     for notification in @notifications
       return if not notification.data?
       conversation_id = notification.data.conversation_id
       message_id = notification.data.message_id
-      if @conversation_repository.is_message_read conversation_id, message_id
-        notification.close()
-        @logger.log @logger.levels.INFO, "Removed read notification for '#{message_id}' in '#{conversation_id}'."
+      @conversation_repository.is_message_read conversation_id, message_id
+      .then (is_read) =>
+        if is_read
+          notification.close()
+          @logger.log @logger.levels.INFO, "Removed read notification for '#{message_id}' in '#{conversation_id}'."
 
   ###
   Set the muted state.
@@ -489,17 +489,13 @@ class z.SystemNotification.SystemNotificationRepository
 
   # Request browser permission for notifications.
   _request_permission: ->
-    return new Promise (resolve) ->
+    return new Promise (resolve) =>
       amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_NOTIFICATION
       # Note: The callback will be only triggered in Chrome.
       # If you ignore a permission request on Firefox, then the callback will not be triggered.
       window.Notification.requestPermission? (permission_state) =>
         amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_NOTIFICATION
         @set_permission_state permission_state
-        if permission_state is z.system_notification.PermissionStatusState.GRANTED
-          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PERMISSION.ALLOW_NOTIFICATIONS, value: 'allow'
-        else
-          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PERMISSION.ALLOW_NOTIFICATIONS, value: 'block'
         resolve @permission_state
 
   ###
@@ -524,7 +520,7 @@ class z.SystemNotification.SystemNotificationRepository
       hide_notification = true if @notifications_preference() is z.system_notification.SystemNotificationPreference.NONE
       hide_notification = true if not z.util.Environment.browser.supports.notifications
       hide_notification = true if @permission_state is z.system_notification.PermissionStatusState.DENIED
-      hide_notification = true if document.hasFocus() and conversation_et.id is @conversation_repository.active_conversation()?.id
+      hide_notification = true if document.hasFocus() and conversation_et.id is @conversation_repository.active_conversation()?.id and wire.app.view.content.multitasking.is_minimized()
       hide_notification = true if message_et.user()?.is_me
 
       if hide_notification
@@ -566,6 +562,7 @@ class z.SystemNotification.SystemNotificationRepository
     notification.onclick = =>
       amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.CLICK
       window.focus()
+      wire.app.view.content.multitasking.is_minimized true
       notification_content.trigger()
       @logger.log @logger.levels.INFO, "Notification for '#{message_id} in '#{conversation_id}' closed by click."
       notification.close()

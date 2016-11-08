@@ -378,6 +378,7 @@ z.string.ru.people_button_yes = 'Да'
 # Settings
 z.string.ru.preferences_about = 'О программе'
 z.string.ru.preferences_account = 'Аккаунт'
+z.string.ru.preferences_av = 'Аудио / Видео'
 z.string.ru.preferences_device_details = 'Настройки устройства'
 z.string.ru.preferences_devices = 'Устройства'
 z.string.ru.preferences_headline = 'Настройки'
@@ -399,6 +400,7 @@ z.string.ru.preferences_account_username_placeholder = 'Ваше полное и
 
 z.string.ru.preferences_av_camera = 'Камера'
 z.string.ru.preferences_av_microphone = 'Микрофон'
+z.string.ru.preferences_av_permission_detail = 'Включите в настройках вашего браузера'
 z.string.ru.preferences_av_speakers = 'Динамики'
 
 z.string.ru.preferences_devices_activated_in = 'в %location'

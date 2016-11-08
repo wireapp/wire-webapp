@@ -499,7 +499,7 @@ describe 'z.conversation.ConversationRepository', ->
     afterEach ->
       conversation_et.remove_messages()
 
-    it 'should update original asset when asset upload is complete', ->
+    it 'should update original asset when asset upload is complete', (done) ->
       # mocked event response
       event =
         data:
@@ -513,13 +513,15 @@ describe 'z.conversation.ConversationRepository', ->
         conversation: conversation_et.id
 
       conversation_repository._on_asset_upload_complete conversation_et, event
+      .then ->
+        expect(conversation_service.update_asset_as_uploaded_in_db).toHaveBeenCalled()
+        expect(message_et.assets()[0].original_resource().otr_key).toBe event.data.otr_key
+        expect(message_et.assets()[0].original_resource().sha256).toBe event.data.sha256
+        expect(message_et.assets()[0].status()).toBe z.assets.AssetTransferState.UPLOADED
+        done()
+      .catch done.fail
 
-      expect(conversation_service.update_asset_as_uploaded_in_db).toHaveBeenCalled()
-      expect(message_et.assets()[0].original_resource().otr_key).toBe event.data.otr_key
-      expect(message_et.assets()[0].original_resource().sha256).toBe event.data.sha256
-      expect(message_et.assets()[0].status()).toBe z.assets.AssetTransferState.UPLOADED
-
-    it 'should update original asset when asset upload is complete', ->
+    it 'should update original asset when asset upload is complete', (done) ->
       # mocked event response
       event =
         data:
@@ -533,13 +535,15 @@ describe 'z.conversation.ConversationRepository', ->
         conversation: conversation_et.id
 
       conversation_repository._on_asset_preview conversation_et, event
+      .then ->
+        expect(conversation_service.update_asset_preview_in_db).toHaveBeenCalled()
+        expect(message_et.assets()[0].preview_resource().otr_key).toBe event.data.otr_key
+        expect(message_et.assets()[0].preview_resource().sha256).toBe event.data.sha256
+        expect(message_et.assets()[0].status()).toBe z.assets.AssetTransferState.UPLOADING
+        done()
+      .catch done.fail
 
-      expect(conversation_service.update_asset_preview_in_db).toHaveBeenCalled()
-      expect(message_et.assets()[0].preview_resource().otr_key).toBe event.data.otr_key
-      expect(message_et.assets()[0].preview_resource().sha256).toBe event.data.sha256
-      expect(message_et.assets()[0].status()).toBe z.assets.AssetTransferState.UPLOADING
-
-    it 'should update original asset when asset upload failed', ->
+    it 'should update original asset when asset upload failed', (done) ->
       # mocked event response
       event =
         data:
@@ -551,12 +555,14 @@ describe 'z.conversation.ConversationRepository', ->
         conversation: conversation_et.id
 
       conversation_repository._on_asset_upload_failed conversation_et, event
+      .then ->
+        expect(conversation_service.update_asset_as_failed_in_db).toHaveBeenCalled()
+        expect(message_et.assets()[0].status()).toBe z.assets.AssetTransferState.UPLOAD_FAILED
+        expect(message_et.assets()[0].upload_failed_reason()).toBe z.assets.AssetUploadFailedReason.FAILED
+        done()
+      .catch done.fail
 
-      expect(conversation_service.update_asset_as_failed_in_db).toHaveBeenCalled()
-      expect(message_et.assets()[0].status()).toBe z.assets.AssetTransferState.UPLOAD_FAILED
-      expect(message_et.assets()[0].upload_failed_reason()).toBe z.assets.AssetUploadFailedReason.FAILED
-
-    it 'should remove original asset message when asset upload was cancelled', ->
+    it 'should remove original asset message when asset upload was cancelled', (done) ->
       # mocked event response
       event =
         data:
@@ -568,9 +574,11 @@ describe 'z.conversation.ConversationRepository', ->
         conversation: conversation_et.id
 
       conversation_repository._on_asset_upload_failed conversation_et, event
-
-      expect(conversation_service.delete_message_from_db).toHaveBeenCalledWith conversation_et.id, message_et.id
-      expect(conversation_et.get_message_by_id message_et.id).toBeUndefined()
+      .then ->
+        expect(conversation_service.delete_message_from_db).toHaveBeenCalledWith conversation_et.id, message_et.id
+        expect(conversation_et.get_message_by_id message_et.id).toBeUndefined()
+        done()
+      .catch done.fail
 
   #@formatter:on
 

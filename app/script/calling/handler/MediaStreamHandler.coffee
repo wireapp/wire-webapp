@@ -391,10 +391,10 @@ class z.calling.handler.MediaStreamHandler
   _initiate_media_stream_failure: (error, media_type, conversation_id) =>
     if error.name in z.calling.rtc.MediaStreamErrorTypes.PERMISSION
       @_show_permission_denied_hint media_type
-    else if error.name in z.calling.rtc.MediaStreamErrorTypes.MISC
-      @_show_permission_denied_hint media_type
     else if error.name in z.calling.rtc.MediaStreamErrorTypes.DEVICE
       @_show_device_not_found_hint media_type, conversation_id
+    else
+      @_show_permission_denied_hint media_type
 
   ###
   Release the MediaStream.

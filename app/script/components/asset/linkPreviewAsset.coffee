@@ -64,9 +64,9 @@ ko.components.register 'link-preview-asset',
               </div>
             <!-- /ko -->
             <!-- ko if: expired()-->
-              <div class="link-preview-container">
+              <div class="link-preview-container ephemeral-link-preview">
                 <!-- ko if: preview.image_resource()-->
-                  <span class="link-preview-image bg-color-ephemeral"></span>
+                  <span class="link-preview-image bg-color-ephemeral icon-link text-white"></span>
                 <!-- /ko -->
                 <div class="link-preview-title ephemeral-message-obfuscated" data-bind="text: z.util.StringUtil.obfuscate(preview.title)"></div>
                 <div class="link-preview-site ephemeral-message-obfuscated ellipsis" data-bind="text: z.util.StringUtil.obfuscate(url)"></div>

@@ -48,7 +48,7 @@ ko.components.register 'file-asset',
     return new z.components.FileAssetComponent params, component_info
   template: """
             <!-- ko if: expired() -->
-              <div class="file bg-color-ephemeral"></div>
+              <div class="file bg-color-ephemeral icon-file text-white flex-center"></div>
             <!-- /ko -->
             <!-- ko ifnot: expired() -->
               <div class="file"

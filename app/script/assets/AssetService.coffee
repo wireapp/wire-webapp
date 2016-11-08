@@ -122,6 +122,8 @@ class z.assets.AssetService
         @_upload_asset small_image_bytes, {public: true}
         @_upload_asset medium_image_bytes, {public: true}
       ])
+    .then ([small_credentials, medium_credentials]) ->
+      return [small_credentials.key, medium_credentials.key]
 
   ###
   Upload arbitrary binary data using the new asset api v3.

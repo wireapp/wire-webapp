@@ -378,6 +378,7 @@ z.string.uk.people_button_yes = 'Так'
 # Settings
 z.string.uk.preferences_about = 'Про програму'
 z.string.uk.preferences_account = 'Акаунт'
+z.string.uk.preferences_av = 'Аудіо / Відео'
 z.string.uk.preferences_device_details = 'Подробиці пристрою'
 z.string.uk.preferences_devices = 'Пристрої'
 z.string.uk.preferences_headline = 'Параметри'
@@ -399,6 +400,7 @@ z.string.uk.preferences_account_username_placeholder = 'Ваше повне ім
 
 z.string.uk.preferences_av_camera = 'Камера'
 z.string.uk.preferences_av_microphone = 'Мікрофон'
+z.string.uk.preferences_av_permission_detail = 'Увімкніть в налаштуваннях свого браузера'
 z.string.uk.preferences_av_speakers = 'Гучномовець'
 
 z.string.uk.preferences_devices_activated_in = 'в %location'
