@@ -805,7 +805,7 @@ class z.conversation.ConversationRepository
     @get_message_in_conversation_by_id conversation_et, nonce
     .then (message_et) =>
       asset_et = message_et.assets()[0]
-      asset_et.upload_id nonce # TODO combine
+      asset_et.upload_id nonce # TODO deprecated
       asset_et.uploaded_on_this_client true
       return @asset_service.create_asset_proto file
     .then ([asset, ciphertext]) =>
@@ -834,33 +834,29 @@ class z.conversation.ConversationRepository
   @return [Object] Collection with User IDs which hold their Client IDs in an Array
   ###
   send_asset_v3: (conversation_et, file, nonce) =>
-    @asset_service.upload_asset file
+    generic_message = null
+    @get_message_in_conversation_by_id conversation_et, nonce
+    .then (message_et) =>
+      asset_et = message_et.get_first_asset()
+      asset_et.uploaded_on_this_client true
+      @asset_service.upload_asset file, null, (xhr) ->
+        xhr.upload.onprogress = (event) -> asset_et.upload_progress Math.round(event.loaded / event.total * 100)
     .then (asset) =>
-      @get_message_in_conversation_by_id conversation_et, nonce
-      .then (message_et) =>
-        asset_et = message_et.assets()[0]
-        asset_et.upload_id nonce # TODO combine
-        asset_et.uploaded_on_this_client true
+      generic_message = new z.proto.GenericMessage nonce
+      generic_message.set 'asset', asset
+      if conversation_et.ephemeral_timer()
+        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
+      @_add_to_sending_queue conversation_et.id, generic_message
+    .then =>
+      event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
+      asset = if conversation_et.ephemeral_timer() then generic_message.ephemeral.asset else generic_message.asset
 
-        generic_message = new z.proto.GenericMessage nonce
-        generic_message.set 'asset', asset
-        if conversation_et.ephemeral_timer()
-          generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
-        @_add_to_sending_queue conversation_et.id, generic_message
-        .then =>
-          event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
-
-          if conversation_et.ephemeral_timer()
-            asset = generic_message.ephemeral.asset
-          else
-            asset = generic_message.asset
-
-          event.data.otr_key = asset.uploaded.otr_key
-          event.data.sha256 = asset.uploaded.sha256
-          event.data.key = asset.uploaded.asset_id
-          event.data.token = asset.uploaded.asset_token
-          event.id = message_et.id
-          return @_on_asset_upload_complete conversation_et, event
+      event.data.otr_key = asset.uploaded.otr_key
+      event.data.sha256 = asset.uploaded.sha256
+      event.data.key = asset.uploaded.asset_id
+      event.data.token = asset.uploaded.asset_token
+      event.id = nonce
+      return @_on_asset_upload_complete conversation_et, event
 
   ###
   Send asset metadata message to specified conversation.
