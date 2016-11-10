@@ -659,3 +659,22 @@ z.util.bucket_values = (value, bucket_limits) ->
 
   last_limit = bucket_limits[bucket_limits.length - 1]
   return "#{last_limit+1}-"
+
+z.util.format_time_remaining = (time_remaining) ->
+  moment_duration = moment.duration time_remaining
+  if moment_duration.asHours() is 1
+    title = "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hour}, "
+  else if moment_duration.asHours() > 1
+    title = "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hours}, "
+
+  if moment_duration.asMinutes() is 1
+    title = "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minute} #{z.localization.Localizer.get_text z.string.and} "
+  else if moment_duration.asMinutes() > 1
+    title = "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minutes} #{z.localization.Localizer.get_text z.string.and} "
+
+  if moment_duration.asSeconds() is 1
+    title = "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_second}"
+  else if moment_duration.asSeconds() > 1
+    title = "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_seconds}"
+
+  return title or ''

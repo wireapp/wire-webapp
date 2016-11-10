@@ -198,7 +198,7 @@ class z.cryptography.CryptographyMapper
     millis_as_number = generic_message.ephemeral.expire_after_millis.toNumber()
     generic_message.ephemeral.message_id = generic_message.message_id
     embedded_message = @_map_generic_message generic_message.ephemeral, event
-    embedded_message.expire_after_millis = z.ephemeral.timings.map_to_closest_timing millis_as_number
+    embedded_message.ephemeral_expires = z.ephemeral.timings.map_to_closest_timing millis_as_number
     return embedded_message
 
   ###
