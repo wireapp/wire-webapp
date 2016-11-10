@@ -110,12 +110,12 @@
     <!-- ko if: !message.other_likes().length && message.is_reactable() -->
       <div class="message-body-like">
         <span class="message-body-like-icon like-button message-show-on-hover" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: $parent.click_on_like">
-          <span class="icon-liked"></span>
+          <span class="icon-like"></span>
           <span class="icon-liked"></span>
         </span>
       </div>
     <!-- /ko -->
-
+ve
     <div class="message-body-actions">
       <context-menu params="entries: function() {return $parent.get_context_menu_entries(message)}, tag: 'message', data: message.id"
                     class="context-menu icon-more font-size-xs"
