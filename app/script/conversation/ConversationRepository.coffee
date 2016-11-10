@@ -1940,7 +1940,8 @@ class z.conversation.ConversationRepository
   ###
   _add_event_to_conversation: (json, conversation_et, callback) ->
     message_et = @event_mapper.map_json_event json, conversation_et
-    @_update_user_ets message_et, (message_et) =>
+    @_update_user_ets message_et
+    .then (message_et) =>
       if conversation_et
         conversation_et.add_message message_et
       else
@@ -2061,32 +2062,32 @@ class z.conversation.ConversationRepository
   ###
   Updates the user entities that are part of a message.
   @param message_et [z.entity.Message] Message to be updated
-  @param callback [Function] Function to be called on return
   ###
   _update_user_ets: (message_et, callback) =>
-    @user_repository.get_user_by_id message_et.from, (user_et) =>
-      message_et.user user_et
+    return new Promise (resolve) =>
+      @user_repository.get_user_by_id message_et.from, (user_et) =>
+        message_et.user user_et
 
-      if message_et.is_member()
-        @user_repository.get_users_by_id message_et.user_ids(), (user_ets) ->
-          message_et.user_ets user_ets
+        if message_et.is_member()
+          @user_repository.get_users_by_id message_et.user_ids(), (user_ets) ->
+            message_et.user_ets user_ets
 
-      if message_et.reactions
-        if Object.keys(message_et.reactions()).length
-          user_ids = (user_id for user_id of message_et.reactions())
-          @user_repository.get_users_by_id user_ids, (user_ets) ->
-            message_et.reactions_user_ets user_ets
-        else
-          message_et.reactions_user_ets.removeAll()
-
-      if message_et.has_asset_text()
-        for asset_et in message_et.assets() when asset_et.is_text()
-          if not message_et.user()
-            Raygun.send new Error 'Message does not contain user when updating'
+        if message_et.reactions
+          if Object.keys(message_et.reactions()).length
+            user_ids = (user_id for user_id of message_et.reactions())
+            @user_repository.get_users_by_id user_ids, (user_ets) ->
+              message_et.reactions_user_ets user_ets
           else
-            asset_et.theme_color = message_et.user().accent_color()
+            message_et.reactions_user_ets.removeAll()
 
-      return callback? message_et
+        if message_et.has_asset_text()
+          for asset_et in message_et.assets() when asset_et.is_text()
+            if not message_et.user()
+              Raygun.send new Error 'Message does not contain user when updating'
+            else
+              asset_et.theme_color = message_et.user().accent_color()
+
+        resolve message_et
 
   ###
   Cancel asset upload.
