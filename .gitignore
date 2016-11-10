@@ -12,6 +12,7 @@
 !/aws/templates/error.html
 /aws/templates/auth
 /aws/version
+/bower_components
 /deploy
 /dist
 /docs
