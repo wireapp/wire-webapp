@@ -115,7 +115,7 @@
         </span>
       </div>
     <!-- /ko -->
-ve
+
     <div class="message-body-actions">
       <context-menu params="entries: function() {return $parent.get_context_menu_entries(message)}, tag: 'message', data: message.id"
                     class="context-menu icon-more font-size-xs"
@@ -190,7 +190,7 @@ ve
   <!-- /ko -->
   <!-- ko ifnot: show_large_avatar() -->
     <div class="message-header">
-      <div class="message-header-icon">
+      <div class="message-header-icon text-graphite">
         <span class="icon-chat" data-bind="visible: message.member_message_type === z.message.SystemMessageType.CONVERSATION_CREATE || message.member_message_type === z.message.SystemMessageType.CONVERSATION_RESUME"></span>
         <span class="icon-minus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE"></span>
         <span class="icon-plus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN"></span>
@@ -241,8 +241,8 @@ ve
 
 <script type="text/html" id="system">
   <div class="message-header">
-    <div class="message-header-icon">
-      <span class="icon-edit text-graphite-dark"></span>
+    <div class="message-header-icon text-graphite">
+      <span class="icon-edit"></span>
     </div>
     <div class="message-header-label">
       <span class="label-bold" data-bind='text: message.sender_name()'></span>
