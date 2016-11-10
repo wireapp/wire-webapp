@@ -62,11 +62,11 @@ class z.cryptography.CryptographyRepository
   @return [Promise] Promise that resolves with an array of last resort key, pre-keys, and signaling keys
   ###
   generate_client_keys: =>
-    return Promise.all [
+    return Promise.all([
       @_generate_last_resort_key()
       @_generate_pre_keys()
       @_generate_signaling_keys()
-    ].catch (error) ->
+    ]).catch (error) ->
       throw new Error "Failed to generate client keys: #{error.message}"
 
   ###
