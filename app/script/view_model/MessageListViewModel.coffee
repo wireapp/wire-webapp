@@ -97,10 +97,6 @@ class z.ViewModel.MessageListViewModel
       amplify.publish z.event.WebApp.LIST.SCROLL, scrolled_bottom
     , 100
 
-    # Init highlighting with Prism.js for Marked.js
-    marked.setOptions highlight: (code, lang, callback) ->
-      Prism.highlight code, Prism.languages.javascript
-
     $(window)
     .on 'resize', =>
       @viewport_changed not @viewport_changed()
