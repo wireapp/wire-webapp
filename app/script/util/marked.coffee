@@ -22,5 +22,5 @@ custom_renderer.paragraph = (text) ->
   return "#{text.replace(/\n$/, '')}\n"
 
 marked.setOptions
-  highlight: (code, lang, callback) -> Prism.highlight code, Prism.languages.javascript
+  highlight: (code) -> Prism.highlight code, Prism.languages.javascript
   renderer: custom_renderer
