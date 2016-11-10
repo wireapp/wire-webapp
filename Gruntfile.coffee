@@ -91,10 +91,8 @@ module.exports = (grunt) ->
 # Deploy to different environments
 ###############################################################################
   grunt.registerTask 'app_deploy',         ['gitinfo', 'aws_deploy']
-  grunt.registerTask 'app_deploy_edge',    ['gitinfo', 'set_version:edge', 'aws_deploy']
   grunt.registerTask 'app_deploy_staging', ['gitinfo', 'set_version:staging', 'aws_deploy']
   grunt.registerTask 'app_deploy_prod',    ['gitinfo', 'set_version:prod', 'aws_deploy']
-  grunt.registerTask 'app_deploy_taco',    ['gitinfo', 'set_version:taco', 'aws_deploy']
 
   grunt.registerTask 'app_deploy_travis', (target) ->
     if target in ['prod', 'staging']
