@@ -44,7 +44,7 @@ ko.components.register 'link-preview-asset',
   viewModel: createViewModel: (params, component_info) ->
     return new z.components.LinkPreviewAssetComponent params, component_info
   template: """
-            <div class="link-preview-icon icon-link"></div>
+            <div class="link-preview-icon icon-link text-graphite"></div>
             <!-- ko ifnot: expired()-->
               <div class="link-preview-container" data-bind="click: on_link_preview_click">
                 <!-- ko if: preview.image_resource()-->
