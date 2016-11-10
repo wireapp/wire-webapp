@@ -13,6 +13,7 @@
     "keyboardjs": "https://github.com/RobertWHurst/KeyboardJS.git#2.2.1",
     "knockout": "https://github.com/knockout/knockout.git#3.4.0",
     "lru-ts": "https://github.com/wireapp/lru-ts.git#321024a90dd82a3379864382f4e16908c3ff8467",
+    "marked": "https://github.com/wireapp/marked.git#0f932d79aab362846eab11354f783db02f30cec6",
     "moment": "https://github.com/moment/moment.git#2.13.0",
     "normalize-css": "https://github.com/necolas/normalize.css.git#3.0.3",
     "object-hash": "https://github.com/puleos/object-hash.git#1.1.2",
@@ -27,7 +28,6 @@
     "underscore": "https://github.com/jashkenas/underscore.git#1.8.3",
     "uuid": "https://github.com/LiosK/UUID.js.git#v3.3.0",
     "webapp-module-bubble": "https://github.com/wireapp/webapp-module-bubble.git#1.0.0",
-    "webapp-module-external": "https://github.com/wireapp/webapp-module-external.git#1.0.1",
     "webapp-module-logger": "https://github.com/wireapp/webapp-module-logger.git#1.0.0",
     "webapp-module-modal": "https://github.com/wireapp/webapp-module-modal.git#1.0.0",
     "webapp-module-namespace": "https://github.com/wireapp/webapp-module-namespace.git#1.0.0",
@@ -85,6 +85,9 @@
     },
     "lru-ts": {
       "js": "dist/global/lru-ts.js"
+    },
+    "marked": {
+      "js": "lib/marked.js"
     },
     "moment": {
       "js": [
