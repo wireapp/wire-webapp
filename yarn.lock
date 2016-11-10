@@ -224,12 +224,12 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
-autoprefixer@6.5.2:
-  version "6.5.2"
-  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-6.5.2.tgz#37cc910c5e1139ad341a006d5f6d441a380b742b"
+autoprefixer@6.5.3:
+  version "6.5.3"
+  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-6.5.3.tgz#2d853af66d04449fcf50db3066279ab54c3e4b01"
   dependencies:
     browserslist "~1.4.0"
-    caniuse-db "^1.0.30000576"
+    caniuse-db "^1.0.30000578"
     normalize-range "^0.1.2"
     num2fraction "^1.2.2"
     postcss "^5.2.5"
@@ -537,7 +537,7 @@ caniuse-db@^1.0.30000539:
   version "1.0.30000572"
   resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000572.tgz#81d0aa6b7de2d785c8dcab135502983276cc707d"
 
-caniuse-db@^1.0.30000576:
+caniuse-db@^1.0.30000578:
   version "1.0.30000578"
   resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30000578.tgz#fc4106bda3ca19df4bd9f35e491063f3d498ff31"
 

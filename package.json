@@ -2,7 +2,7 @@
   "name": "wire-webapp",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
-    "autoprefixer": "6.5.2",
+    "autoprefixer": "6.5.3",
     "coffeelint": "1.16.0",
     "grunt": "1.0.1",
     "grunt-aws-s3": "0.14.5",
