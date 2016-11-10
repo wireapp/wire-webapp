@@ -24,5 +24,4 @@ custom_renderer.paragraph = (text) ->
 marked.setOptions
   highlight: (code) => hljs.highlightAuto(code).value
   renderer: custom_renderer
-  sanitize: true
 
