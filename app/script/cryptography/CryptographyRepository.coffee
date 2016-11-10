@@ -66,7 +66,7 @@ class z.cryptography.CryptographyRepository
       @_generate_last_resort_key()
       @_generate_pre_keys()
       @_generate_signaling_keys()
-    ].catch (error) =>
+    ].catch (error) ->
       throw new Error "Failed to generate client keys: #{error.message}"
 
   ###
