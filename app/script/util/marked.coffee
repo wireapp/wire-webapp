@@ -22,6 +22,5 @@ custom_renderer.paragraph = (text) ->
   return "#{text.replace(/\n$/, '')}\n"
 
 marked.setOptions
-  highlight: (code) => hljs.highlightAuto(code).value
+  highlight: (code) -> hljs.highlightAuto(code).value
   renderer: custom_renderer
-
