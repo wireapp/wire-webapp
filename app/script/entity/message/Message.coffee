@@ -30,13 +30,9 @@ class z.entity.Message
 
   # Construct a new base message entity.
   constructor: (@id = '0', @super_type = '') ->
-    @ephemeral_caption = ko.observable ''
-    @ephemeral_duration = ko.observable 0
-    @ephemeral_remaining = ko.observable 0
-    @ephemeral_expires = ko.observable false
-    @ephemeral_started = ko.observable '0'
+    @expire_after_millis = ko.observable false
     @ephemeral_status = ko.computed =>
-      expiration = @ephemeral_expires()
+      expiration = @expire_after_millis()
 
       if expiration is true
         return z.message.EphemeralStatusType.TIMED_OUT
@@ -53,7 +49,6 @@ class z.entity.Message
       else
         return z.message.EphemeralStatusType.NONE
 
-    @conversation_id = ''
     @from = ''
     @is_editing = ko.observable false
     @primary_key = undefined
@@ -204,14 +199,14 @@ class z.entity.Message
   @return [Boolean]
   ###
   is_ephemeral: ->
-    return @ephemeral_expires() isnt false
+    return @expire_after_millis() isnt false
 
   ###
   Check if ephemeral message is expired.
   @return [Boolean]
   ###
   is_expired: ->
-    return @ephemeral_expires() is true
+    return @expire_after_millis() is true
 
   ###
   Check if message can be reacted to.
@@ -231,17 +226,3 @@ class z.entity.Message
     else if @status() isnt updated_status
       return @status updated_status
     return false
-
-  start_ephemeral_timer: =>
-    return if @ephemeral_timer
-    @ephemeral_remaining new Date(@ephemeral_expires()) - Date.now()
-
-    @ephemeral_interval_id = window.setInterval =>
-      @ephemeral_remaining new Date(@ephemeral_expires()) - Date.now()
-      @ephemeral_caption z.util.format_time_remaining @ephemeral_remaining()
-    , 250
-
-    window.setTimeout =>
-      amplify.publish z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @
-      window.clearInterval @ephemeral_interval_id
-    , @ephemeral_remaining()
