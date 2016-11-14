@@ -110,7 +110,7 @@
     <!-- ko if: !message.other_likes().length && message.is_reactable() -->
       <div class="message-body-like">
         <span class="message-body-like-icon like-button message-show-on-hover" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: $parent.click_on_like">
-          <span class="icon-liked"></span>
+          <span class="icon-like"></span>
           <span class="icon-liked"></span>
         </span>
       </div>
@@ -120,17 +120,12 @@
       <context-menu params="entries: function() {return $parent.get_context_menu_entries(message)}, tag: 'message', data: message.id"
                     class="context-menu icon-more font-size-xs"
                     tabindex="-1"></context-menu>
-      <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}"></time>
-      <!-- /ko -->
-      <!-- ko ifnot: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}"></time>
-      <!-- /ko -->
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
       <!-- ko if: $parent.is_last_delivered_message(message) -->
         <span class="message-status" data-bind="l10n_text: z.string.conversation_message_delivered"></span>
       <!-- /ko -->
       <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <ephemeral-timer class="message-ephemeral-timer" data-bind="attr: {'title': message.ephemeral_caption()}" params="message: message"></ephemeral-timer>
+        <ephemeral-timer class="message-ephemeral-timer" params="expires: message.expire_after_millis()"></ephemeral-timer>
       <!-- /ko -->
     </div>
 
@@ -139,7 +134,7 @@
     <div class="message-footer">
       <div class="message-footer-icon">
         <span class="like-button" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: $parent.click_on_like">
-          <span class="icon-liked"></span>
+          <span class="icon-like"></span>
           <span class="icon-liked"></span>
         </span>
       </div>
@@ -195,7 +190,7 @@
   <!-- /ko -->
   <!-- ko ifnot: show_large_avatar() -->
     <div class="message-header">
-      <div class="message-header-icon">
+      <div class="message-header-icon text-graphite">
         <span class="icon-chat" data-bind="visible: message.member_message_type === z.message.SystemMessageType.CONVERSATION_CREATE || message.member_message_type === z.message.SystemMessageType.CONVERSATION_RESUME"></span>
         <span class="icon-minus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE"></span>
         <span class="icon-plus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN"></span>
@@ -236,13 +231,9 @@
       <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
                     class="context-menu icon-more font-size-xs"
                     tabindex="-1"></context-menu>
-        <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-          <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}"></time>
-          <ephemeral-timer class="message-ephemeral-timer" data-bind="attr: {'title': message.ephemeral_caption()}" params="message: message"></ephemeral-timer>
-        <!-- /ko -->
-        <!-- ko ifnot: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-          <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
-        <!-- /ko -->
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+      <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
+      <ephemeral-timer class="message-ephemeral-timer" params="expires: message.expire_after_millis()"></ephemeral-timer>
       <!-- /ko -->
     </div>
   </div>
@@ -250,8 +241,8 @@
 
 <script type="text/html" id="system">
   <div class="message-header">
-    <div class="message-header-icon">
-      <span class="icon-edit text-graphite-dark"></span>
+    <div class="message-header-icon text-graphite">
+      <span class="icon-edit"></span>
     </div>
     <div class="message-header-label">
       <span class="label-bold" data-bind='text: message.sender_name()'></span>
