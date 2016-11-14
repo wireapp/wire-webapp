@@ -46,6 +46,6 @@ describe 'AssetsCrypto', ->
 
     z.assets.AssetCrypto.encrypt_aes_asset bytes.buffer
     .then ([key_bytes, sha256, ciphertext]) ->
-      z.assets.AssetCrypto.decrypt_aes_asset ciphertext, key_bytes, null
+      z.assets.AssetCrypto.decrypt_aes_asset ciphertext, key_bytes, new Uint8Array([])
     .then done.fail
     .catch done
