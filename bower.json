@@ -7,7 +7,6 @@
     "cryptojs": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/crypto-js/CryptoJS%20v3.1.2.zip",
     "dexie": "https://github.com/dfahlander/Dexie.js.git#1.4.1",
     "generic-message-proto": "https://github.com/wireapp/generic-message-proto.git#1.18.0",
-    "highlightjs": "https://github.com/components/highlightjs.git#9.7.0",
     "iframeTracker-jquery": "https://github.com/vincepare/iframeTracker-jquery.git#1.1.0",
     "jquery": "https://github.com/jquery/jquery.git#2.1.4",
     "keyboardjs": "https://github.com/RobertWHurst/KeyboardJS.git#2.2.1",
@@ -20,6 +19,7 @@
     "pako": "https://github.com/nodeca/pako.git#1.0.1",
     "phone-format": "https://github.com/albeebe/phoneformat.js.git#v1.0.3",
     "platform.js": "https://github.com/bestiejs/platform.js.git#0870795f0c277a33cc2078a96e74434f89aa11d8",
+    "prism": "https://github.com/PrismJS/prism.git#v1.5.1",
     "protobuf": "https://github.com/gregor/protobuf.js.git#32ada41d3c963bd5f43d7cdadced2d6d2ccd082a",
     "raygun4js": "https://github.com/MindscapeHQ/raygun4js.git#2.3.4",
     "speakingurl": "https://github.com/wireapp/speakingurl.git#2638eaf5e267d476b918f5a817a627ddf56255c1",
@@ -64,10 +64,6 @@
     "generic-message-proto": {
       "proto": "proto/messages.proto"
     },
-    "highlightjs": {
-      "js": "highlight.pack.js",
-      "css": "styles/github.css"
-    },
     "jquery": {
       "js": "dist/jquery.js"
     },
@@ -109,6 +105,10 @@
     },
     "platform.js": {
       "js": "platform.js"
+    },
+    "prism": {
+      "js": "prism.js",
+      "css": "themes/prism.css"
     },
     "protobuf": {
       "js": "dist/protobuf.js"
