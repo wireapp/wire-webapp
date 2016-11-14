@@ -119,8 +119,8 @@ class z.assets.AssetService
       [medium_image, medium_image_bytes] = medium
 
       return Promise.all([
-        @_upload_asset small_image_bytes, {public: true}
-        @_upload_asset medium_image_bytes, {public: true}
+        @post_asset_v3 small_image_bytes, {public: true}
+        @post_asset_v3 medium_image_bytes, {public: true}
       ])
     .then ([small_credentials, medium_credentials]) ->
       return [small_credentials.key, medium_credentials.key]
