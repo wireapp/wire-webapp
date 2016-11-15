@@ -858,6 +858,9 @@ describe 'bucket_values', ->
     expect(z.util.bucket_values 0, [0, 5, 10, 15, 20, 25]).toBe '0'
 
   it 'returns the correct bucket if value is inside the given limits', ->
+    expect(z.util.bucket_values 0.1, [0, 5, 10, 15, 20, 25]).toBe '0'
+    expect(z.util.bucket_values 1, [0, 5, 10, 15, 20, 25]).toBe '1-5'
+    expect(z.util.bucket_values 5.5, [0, 5, 10, 15, 20, 25]).toBe '1-5'
     expect(z.util.bucket_values 13, [0, 5, 10, 15, 20, 25]).toBe '11-15'
     expect(z.util.bucket_values 1023, [0, 100, 200, 500, 1000, 2000]).toBe '1001-2000'
 
