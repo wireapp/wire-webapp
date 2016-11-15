@@ -67,7 +67,8 @@ class z.event.EventRepository
         @notifications_blocked = true
         @_handle_notification notification
         .catch (error) =>
-          @logger.log @logger.levels.WARN, 'We failed to handle a notification but will continue with queue', error
+          if error.type isnt z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+            @logger.log @logger.levels.WARN, 'We failed to handle a notification but will continue with queue', error
         .then =>
           @notifications_blocked = false
           @notifications_queue.shift()
@@ -330,7 +331,7 @@ class z.event.EventRepository
     Promise.resolve()
     .then =>
       if event.type in z.event.EventTypeHandling.DECRYPT
-        return @cryptography_repository.decrypt_event(event)
+        return @cryptography_repository.decrypt_event event
         .then (generic_message) =>
           @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
       return event

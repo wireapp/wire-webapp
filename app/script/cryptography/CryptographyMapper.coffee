@@ -78,7 +78,7 @@ class z.cryptography.CryptographyMapper
       when 'text'
         return @_map_text generic_message.text, generic_message.message_id
       else
-        @logger.log @logger.levels.WARN, "Skipped event '#{generic_message.message_id}' of unhandled type '#{generic_message.content}'"
+        @logger.log @logger.levels.DEBUG, "Skipped event '#{generic_message.message_id}' of unhandled type '#{generic_message.content}'", {event: event, generic_message: generic_message}
         throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
 
   _map_asset: (asset, event_nonce, event_id) ->
