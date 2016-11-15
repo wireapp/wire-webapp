@@ -167,9 +167,9 @@ class z.service.Client
           url: config.url
           xhrFields: xhrFields
         .done (data, textStatus, jqXHR) =>
-          @logger.log @logger.levels.OFF, "Server Response '#{jqXHR.wire.request_id}' from '#{config.url}':", data
           config.callback? data
           resolve data
+          @logger.log @logger.levels.OFF, "Server Response '#{jqXHR.wire?.request_id}' from '#{config.url}':", data
         .fail (jqXHR, textStatus, errorThrown) =>
           switch jqXHR.status
             when z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
