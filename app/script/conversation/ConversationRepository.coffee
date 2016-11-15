@@ -105,6 +105,7 @@ class z.conversation.ConversationRepository
   _init_subscriptions: ->
     amplify.subscribe z.event.WebApp.CONVERSATION.ASSET.CANCEL, @cancel_asset_upload
     amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
+    amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTION, @map_connection
     amplify.subscribe z.event.WebApp.CONVERSATION.STORE, @save_conversation_in_db
     amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_self_client_add
@@ -1450,7 +1451,7 @@ class z.conversation.ConversationRepository
   delete_message_everyone: (conversation_et, message_et, user_ids) =>
     Promise.resolve()
     .then ->
-      if not message_et.user().is_me and not message_et.expire_after_millis()
+      if not message_et.user().is_me and not message_et.ephemeral_expires()
         throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
@@ -1489,46 +1490,43 @@ class z.conversation.ConversationRepository
 
   ###
   Get remaining lifetime for give message.
-
   @param message_et [z.entity.Message]
+  @return [Promise] Promise that resolves with milliseconds when the message expires
   ###
   get_ephemeral_timer: (message_et) =>
-    millis = message_et.expire_after_millis()
+    millis = message_et.ephemeral_expires()
 
     switch message_et.ephemeral_status()
       when z.message.EphemeralStatusType.TIMED_OUT
-        return Promise.resolve 0
+        @timeout_ephemeral_message message_et
       when z.message.EphemeralStatusType.ACTIVE
-        expiration_timestamp = new Date(millis).getTime()
-        expires_in = expiration_timestamp - Date.now()
-        return Promise.resolve expires_in
+        message_et.start_ephemeral_timer()
       when z.message.EphemeralStatusType.INACTIVE
-        expiration_date_iso = new Date(Date.now() + millis).toISOString()
-        message_et.expire_after_millis expiration_date_iso
-        return @conversation_service.update_message_in_db message_et, {expire_after_millis: expiration_date_iso}
-        .then -> return millis
-      else
-        Promise.resolve()
+        message_et.ephemeral_expires new Date(Date.now() + millis).getTime.toString()
+        message_et.ephemeral_started new Date(Date.now()).getTime().toString()
+        return @conversation_service.update_message_in_db message_et, {ephemeral_expires: message_et.ephemeral_expires(), ephemeral_started: message_et.ephemeral_started()}
+        .then -> message_et.start_ephemeral_timer()
 
-  timeout_ephemeral_message: (conversation_et, message_et) =>
-    if message_et.user().is_me
-      switch
-        when message_et.has_asset_text()
-          @_obfuscate_text_message conversation_et, message_et.id
-        when message_et.is_ping()
-          @_obfuscate_ping_message conversation_et, message_et.id
-        when message_et.has_asset()
-          @_obfuscate_asset_message conversation_et, message_et.id
-        when message_et.has_asset_image()
-          @_obfuscate_image_message conversation_et, message_et.id
-        else
-          @logger.log 'Unsupported ephemeral type', message_et.type
-    else
-      if conversation_et.is_group()
-        user_ids = _.union [@user_repository.self().id], [message_et.from]
-        @delete_message_everyone conversation_et, message_et, user_ids
+  timeout_ephemeral_message: (message_et) =>
+    @get_conversation_by_id message_et.conversation_id, (conversation_et) =>
+      if message_et.user().is_me
+        switch
+          when message_et.has_asset_text()
+            @_obfuscate_text_message conversation_et, message_et.id
+          when message_et.is_ping()
+            @_obfuscate_ping_message conversation_et, message_et.id
+          when message_et.has_asset()
+            @_obfuscate_asset_message conversation_et, message_et.id
+          when message_et.has_asset_image()
+            @_obfuscate_image_message conversation_et, message_et.id
+          else
+            @logger.log @logger.log.levels.WARN, "Unsupported ephemeral type: #{message_et.type}"
       else
-        @delete_message_everyone conversation_et, message_et
+        if conversation_et.is_group()
+          user_ids = _.union [@user_repository.self().id], [message_et.from]
+          @delete_message_everyone conversation_et, message_et, user_ids
+        else
+          @delete_message_everyone conversation_et, message_et
 
   _obfuscate_text_message: (conversation_et, message_id) =>
     @get_message_in_conversation_by_id conversation_et, message_id
@@ -1538,10 +1536,10 @@ class z.conversation.ConversationRepository
       obfuscated.previews asset.previews()
       obfuscated.text = z.util.StringUtil.obfuscate asset.text if obfuscated.previews().length is 0
       message_et.assets [obfuscated]
-      message_et.expire_after_millis true
+      message_et.ephemeral_expires true
 
       @conversation_service.update_message_in_db message_et,
-        expire_after_millis: true
+        ephemeral_expires: true
         data:
           content: obfuscated.text
           nonce: obfuscated.id
@@ -1551,8 +1549,8 @@ class z.conversation.ConversationRepository
   _obfuscate_ping_message: (conversation_et, message_id) =>
     @get_message_in_conversation_by_id conversation_et, message_id
     .then (message_et) =>
-      message_et.expire_after_millis true
-      @conversation_service.update_message_in_db message_et, {expire_after_millis: true}
+      message_et.ephemeral_expires true
+      @conversation_service.update_message_in_db message_et, {ephemeral_expires: true}
     .then =>
       @logger.log 'Obfuscated ping message'
 
@@ -1560,14 +1558,14 @@ class z.conversation.ConversationRepository
     @get_message_in_conversation_by_id conversation_et, message_id
     .then (message_et) =>
       asset = message_et.get_first_asset()
-      message_et.expire_after_millis true
+      message_et.ephemeral_expires true
       @conversation_service.update_message_in_db message_et,
         data:
           content_type: asset.file_type
           info:
             nonce: message_et.nonce
           meta: {}
-        expire_after_millis: true
+        ephemeral_expires: true
     .then =>
       @logger.log 'Obfuscated asset message'
 
@@ -1575,7 +1573,7 @@ class z.conversation.ConversationRepository
     @get_message_in_conversation_by_id conversation_et, message_id
     .then (message_et) =>
       asset = message_et.get_first_asset()
-      message_et.expire_after_millis true
+      message_et.ephemeral_expires true
       @conversation_service.update_message_in_db message_et,
         data:
           info:
@@ -1583,7 +1581,7 @@ class z.conversation.ConversationRepository
             height: asset.height
             width: asset.width
             tag: 'medium'
-        expire_after_millis: true
+        ephemeral_expires: true
     .then =>
       @logger.log 'Obfuscated image message'
 
@@ -1846,7 +1844,7 @@ class z.conversation.ConversationRepository
   _on_message_deleted: (conversation_et, event_json) =>
     @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
     .then (message_to_delete_et) =>
-      if message_to_delete_et.expire_after_millis()
+      if message_to_delete_et.ephemeral_expires()
         return
       if event_json.from isnt message_to_delete_et.from
         throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
