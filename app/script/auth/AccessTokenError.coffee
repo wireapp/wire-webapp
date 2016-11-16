@@ -30,6 +30,8 @@ class z.auth.AccessTokenError
         'No cached access token found in Local Storage'
       when z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
         'Access Token request already in progress'
+      when z.auth.AccessTokenError::TYPE.RETRIES_EXCEEDED
+        'No. of retries to get Access Token exceeded'
       when z.auth.AccessTokenError::TYPE.REQUEST_FAILED
         'Request to POST for access token failed'
       when z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
@@ -40,6 +42,7 @@ class z.auth.AccessTokenError
   @::TYPE = {
     NOT_FOUND_IN_CACHE: 'z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE'
     REFRESH_IN_PROGRESS: 'z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS'
+    RETRIES_EXCEEDED: 'z.auth.AccessTokenError::TYPE.RETRIES_EXCEEDED'
     REQUEST_FAILED: 'z.auth.AccessTokenError::TYPE.REQUEST_FAILED'
     REQUEST_FORBIDDEN: 'z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN'
   }
