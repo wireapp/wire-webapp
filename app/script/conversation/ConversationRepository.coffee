@@ -210,7 +210,7 @@ class z.conversation.ConversationRepository
           @logger.log @logger.levels.INFO,
             "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
         return @_add_events_to_conversation events: events, conversation_et
-      .then (mapped_messages) =>
+      .then (mapped_messages) ->
         conversation_et.is_pending false
         resolve mapped_messages
       .catch (error) =>
@@ -1963,7 +1963,7 @@ class z.conversation.ConversationRepository
     return Promise.resolve().then =>
       message_ets = @event_mapper.map_json_events json, conversation_et
       return Promise.all (@_update_user_ets message_et for message_et in message_ets)
-    .then (message_ets) =>
+    .then (message_ets) ->
       if prepend and conversation_et.messages().length > 0
         conversation_et.prepend_messages message_ets
       else
