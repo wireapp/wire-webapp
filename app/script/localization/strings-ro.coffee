@@ -333,7 +333,8 @@ z.string.ro.people_tabs_device_detail_headline = 'Verifică dacă aceasta se pot
 z.string.ro.people_tabs_device_detail_how_to = 'Cum fac asta?'
 z.string.ro.people_tabs_device_detail_reset_session = 'Resetează sesiunea'
 z.string.ro.people_tabs_device_detail_show_my_device = 'Arată amprenta dispozitivului'
-z.string.ro.people_tabs_device_detail_verified = 'Verificat'
+z.string.ro.people_tabs_device_detail_verify = 'Verificat'
+z.string.ro.people_verified = 'Verificat'
 
 # Block user
 z.string.ro.people_block_headline = 'Blochează?'

@@ -333,7 +333,8 @@ z.string.tr.people_tabs_device_detail_headline = 'Bunun %bold%%@.names’in ayg�
 z.string.tr.people_tabs_device_detail_how_to = 'Bunu nasıl yapıyoruz?'
 z.string.tr.people_tabs_device_detail_reset_session = 'Oturumu Sıfırla'
 z.string.tr.people_tabs_device_detail_show_my_device = 'Cihaz parmak izimi göster'
-z.string.tr.people_tabs_device_detail_verified = 'Doğrulanmış'
+z.string.tr.people_tabs_device_detail_verify = 'Doğrulanmış'
+z.string.tr.people_verified = 'Doğrulanmış'
 
 # Block user
 z.string.tr.people_block_headline = 'Engelle?'

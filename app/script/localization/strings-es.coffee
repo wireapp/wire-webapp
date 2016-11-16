@@ -333,7 +333,8 @@ z.string.es.people_tabs_device_detail_headline = 'Verifica que esta coincida con
 z.string.es.people_tabs_device_detail_how_to = '¿Cómo lo hago?'
 z.string.es.people_tabs_device_detail_reset_session = 'Restablecer sesión'
 z.string.es.people_tabs_device_detail_show_my_device = 'Mostrar la huella digital de mi dispositivo'
-z.string.es.people_tabs_device_detail_verified = 'Verificado'
+z.string.es.people_tabs_device_detail_verify = 'Verificado'
+z.string.es.people_verified = 'Verificado'
 
 # Block user
 z.string.es.people_block_headline = '¿Bloquear?'

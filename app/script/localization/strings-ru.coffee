@@ -333,7 +333,8 @@ z.string.ru.people_tabs_device_detail_headline = 'Убедитесь, что э�
 z.string.ru.people_tabs_device_detail_how_to = 'Как это сделать?'
 z.string.ru.people_tabs_device_detail_reset_session = 'Сбросить сессию'
 z.string.ru.people_tabs_device_detail_show_my_device = 'Показать отпечаток моего устройства'
-z.string.ru.people_tabs_device_detail_verified = 'Подтверждён'
+z.string.ru.people_tabs_device_detail_verify = 'Подтверждён'
+z.string.ru.people_verified = 'Подтверждён'
 
 # Block user
 z.string.ru.people_block_headline = 'Заблокировать?'

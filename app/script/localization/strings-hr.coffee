@@ -334,7 +334,8 @@ z.string.hr.people_tabs_device_detail_headline = 'Provjerite da je otisak prikaz
 z.string.hr.people_tabs_device_detail_how_to = 'Kako to da učinim?'
 z.string.hr.people_tabs_device_detail_reset_session = 'Resetiraj sesiju'
 z.string.hr.people_tabs_device_detail_show_my_device = 'Pokaži otisak mog uređaja'
-z.string.hr.people_tabs_device_detail_verified = 'Verificirano'
+z.string.hr.people_tabs_device_detail_verify = 'Verificirano'
+z.string.hr.people_verified = 'Verificirano'
 
 # Block user
 z.string.hr.people_block_headline = 'Blokirati?'

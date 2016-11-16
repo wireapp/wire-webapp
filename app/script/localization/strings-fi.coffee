@@ -334,6 +334,7 @@ z.string.fi.people_tabs_device_detail_how_to = 'Miten teen sen?'
 z.string.fi.people_tabs_device_detail_reset_session = 'Nollaa istunto'
 z.string.fi.people_tabs_device_detail_show_my_device = 'Näytä laitteeni sormenjälki'
 z.string.fi.people_tabs_device_detail_verified = 'Vahvistettu'
+z.string.fi.people_tabs_device_detail_verify = 'Vahvistettu'
 
 # Block user
 z.string.fi.people_block_headline = 'Estä?'

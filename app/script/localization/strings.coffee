@@ -335,7 +335,8 @@ z.string.people_tabs_device_detail_headline = 'Verify that this matches the fing
 z.string.people_tabs_device_detail_how_to = 'How do I do that?'
 z.string.people_tabs_device_detail_reset_session = 'Reset session'
 z.string.people_tabs_device_detail_show_my_device = 'Show my device fingerprint'
-z.string.people_tabs_device_detail_verified = 'Verified'
+z.string.people_tabs_device_detail_verify = 'Verified'
+z.string.people_verified = 'Verified'
 
 # Block user
 z.string.people_block_headline = 'Block?'

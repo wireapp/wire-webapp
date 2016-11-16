@@ -333,7 +333,8 @@ z.string.fr.people_tabs_device_detail_headline = 'Vérifiez que cela correspond 
 z.string.fr.people_tabs_device_detail_how_to = 'Comment faire ?'
 z.string.fr.people_tabs_device_detail_reset_session = 'Réinitialiser la session'
 z.string.fr.people_tabs_device_detail_show_my_device = 'Afficher l’empreinte de mon appareil'
-z.string.fr.people_tabs_device_detail_verified = 'Vérifié'
+z.string.fr.people_tabs_device_detail_verify = 'Vérifié'
+z.string.fr.people_verified = 'Vérifié'
 
 # Block user
 z.string.fr.people_block_headline = 'Bloquer ?'
