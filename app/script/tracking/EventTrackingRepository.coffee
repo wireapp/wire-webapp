@@ -255,10 +255,10 @@ class z.tracking.EventTrackingRepository
       return if not window.onerror
 
       error = event.reason
-      if _.isObject error
-        window.onerror.call @, error.message, error.fileName, error.lineNumber, error.columnNumber, error
-      else
+      if _.isString error
         window.onerror.call @, error, null, null, null
+      else if error?.message
+        window.onerror.call @, error.message, error.fileName, error.lineNumber, error.columnNumber, error
 
       rejected_promise = event.promise
       if rejected_promise
