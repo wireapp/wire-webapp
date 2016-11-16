@@ -1960,17 +1960,14 @@ class z.conversation.ConversationRepository
   @return [Array<z.entity.Message>] Array of mapped messages
   ###
   _add_events_to_conversation: (json, conversation_et, prepend = true) ->
-    message_ets = null
     return Promise.resolve().then =>
-      return if not json?
       message_ets = @event_mapper.map_json_events json, conversation_et
       return Promise.all (@_update_user_ets message_et for message_et in message_ets)
-    .then =>
+    .then (message_ets) =>
       if prepend and conversation_et.messages().length > 0
         conversation_et.prepend_messages message_ets
       else
         conversation_et.add_messages message_ets
-
       return message_ets
 
   ###
