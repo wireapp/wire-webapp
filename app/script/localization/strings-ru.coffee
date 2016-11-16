@@ -269,7 +269,7 @@ z.string.ru.conversation_edit_timestamp = 'Изменено %@timestamp'
 z.string.ru.conversation_likes_caption = '%@number участникам'
 
 # Archive
-z.string.ru.archive_header = 'Архивировать'
+z.string.ru.archive_header = 'Архив'
 
 # Conversations
 z.string.ru.conversations_all_archived = 'Все разговоры отправлены в архив'
@@ -283,8 +283,8 @@ z.string.ru.conversations_popover_block = 'Заблокировать'
 z.string.ru.conversations_popover_cancel = 'Отклонить запрос'
 z.string.ru.conversations_popover_clear = 'Удалить'
 z.string.ru.conversations_popover_leave = 'Покинуть'
-z.string.ru.conversations_popover_notify = 'Вкл. звук'
-z.string.ru.conversations_popover_silence = 'Выкл. звук'
+z.string.ru.conversations_popover_notify = 'Включить уведомления'
+z.string.ru.conversations_popover_silence = 'Выключить уведомления'
 z.string.ru.conversations_popover_unarchive = 'Разархивировать'
 
 # Invites
@@ -333,7 +333,8 @@ z.string.ru.people_tabs_device_detail_headline = 'Убедитесь, что э�
 z.string.ru.people_tabs_device_detail_how_to = 'Как это сделать?'
 z.string.ru.people_tabs_device_detail_reset_session = 'Сбросить сессию'
 z.string.ru.people_tabs_device_detail_show_my_device = 'Показать отпечаток моего устройства'
-z.string.ru.people_tabs_device_detail_verified = 'Подтверждён'
+z.string.ru.people_tabs_device_detail_verify = 'Подтверждён'
+z.string.ru.people_verified = 'Подтверждён'
 
 # Block user
 z.string.ru.people_block_headline = 'Заблокировать?'
@@ -413,7 +414,7 @@ z.string.ru.preferences_devices_fingerprint_detail = 'Wire присваивае�
 z.string.ru.preferences_devices_id = 'ID: '
 z.string.ru.preferences_devices_remove = 'Удалить'
 z.string.ru.preferences_devices_remove_cancel = 'Отменить'
-z.string.ru.preferences_devices_remove_detail = 'Удалите это устройство, если вы перестали им пользоваться. История сообщений на нём будет стёрта, и вы выйдите из аккаунта.'
+z.string.ru.preferences_devices_remove_detail = 'Удалите это устройство, если вы перестали им пользоваться. На этом устройстве сразу же будет осуществлён выход из аккаунта.'
 z.string.ru.preferences_devices_session_confirmation = 'Сессия была сброшена.'
 z.string.ru.preferences_devices_session_detail = 'Если отпечатки не совпадают, сбросьте сессию для создания новых ключей шифрования на обеих сторонах.'
 z.string.ru.preferences_devices_session_reset = 'Сбросить сессию'
@@ -435,9 +436,9 @@ z.string.ru.preferences_options_data = 'Отчеты о сбоях и испол
 z.string.ru.preferences_options_data_checkbox = 'Отчеты о сбоях и использовании'
 z.string.ru.preferences_options_data_detail = 'Сделайте Wire лучше, отправляя анонимную информацию.'
 z.string.ru.preferences_options_notifications = 'Уведомления'
-z.string.ru.preferences_options_notifications_none = 'Выключен'
+z.string.ru.preferences_options_notifications_none = 'Выключены'
 z.string.ru.preferences_options_notifications_obfuscate = 'Скрывать подробности сообщения'
-z.string.ru.preferences_options_notifications_on = 'Показывать отправителя и текст сообщения'
+z.string.ru.preferences_options_notifications_on = 'Показывать имя отправителя и текст сообщения'
 
 # Search
 z.string.ru.search_group_hint = 'Продолжите ввод или выберите больше людей для создания группы'
@@ -499,7 +500,7 @@ z.string.ru.warning_not_found_camera = 'Не удается совершить �
 z.string.ru.warning_not_found_microphone = 'Не удается совершить звонок, потому что микрофон не подключен к компьютеру.'
 z.string.ru.warning_permission_denied_camera = 'Не удается совершить звонок, потому что ваш браузер не имеет доступа к камере.'
 z.string.ru.warning_permission_denied_microphone = 'Не удается совершить звонок, потому что ваш браузер не имеет доступа к микрофону.'
-z.string.ru.warning_permission_denied_screen = 'Не удаётся начать демонстрацию экрана, потому что у браузера нет к нему доступа.'
+z.string.ru.warning_permission_denied_screen = 'Разрешите доступ к экрану для вашего браузера.'
 z.string.ru.warning_permission_request_camera = '%icon Разрешить доступ к камере'
 z.string.ru.warning_permission_request_microphone = '%icon Разрешить доступ к микрофону'
 z.string.ru.warning_permission_request_notification = '%icon Разрешить уведомления'
@@ -521,7 +522,7 @@ z.string.ru.system_notification_member_join_one = '%s.first_name добавил 
 z.string.ru.system_notification_member_leave_left = '%s.first_name покинул разговор'
 z.string.ru.system_notification_member_leave_removed_many = '%s.first_name удалил %no человек из разговора'
 z.string.ru.system_notification_member_leave_removed_one = '%s.first_name удалил %@.first_name из разговора'
-z.string.ru.system_notification_obfuscated = 'Отправил(а) Вам сообщение'
+z.string.ru.system_notification_obfuscated = 'Отправил(-а) Вам сообщение'
 z.string.ru.system_notification_obfuscated_title = 'Кто-то'
 z.string.ru.system_notification_ping = 'Отправил(а) пинг'
 z.string.ru.system_notification_reaction = '%s Ваше сообщение'

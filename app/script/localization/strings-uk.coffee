@@ -333,7 +333,8 @@ z.string.uk.people_tabs_device_detail_headline = 'Переконайтеся, щ
 z.string.uk.people_tabs_device_detail_how_to = 'Як це зробити?'
 z.string.uk.people_tabs_device_detail_reset_session = 'Скидання сесії'
 z.string.uk.people_tabs_device_detail_show_my_device = 'Показати ідентиф. мого пристрою'
-z.string.uk.people_tabs_device_detail_verified = 'Верифікований'
+z.string.uk.people_tabs_device_detail_verify = 'Верифікований'
+z.string.uk.people_verified = 'Верифікований'
 
 # Block user
 z.string.uk.people_block_headline = 'Заблокувати?'
