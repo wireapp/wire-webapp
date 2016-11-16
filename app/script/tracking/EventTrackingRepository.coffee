@@ -257,7 +257,7 @@ class z.tracking.EventTrackingRepository
       error = event.reason
       if _.isString error
         window.onerror.call @, error, null, null, null
-      else if _.isObject(error) and error.message
+      else if error?.message
         window.onerror.call @, error.message, error.fileName, error.lineNumber, error.columnNumber, error
 
       rejected_promise = event.promise
