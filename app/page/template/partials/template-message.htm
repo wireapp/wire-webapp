@@ -120,12 +120,17 @@
       <context-menu params="entries: function() {return $parent.get_context_menu_entries(message)}, tag: 'message', data: message.id"
                     class="context-menu icon-more font-size-xs"
                     tabindex="-1"></context-menu>
-      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}" data-uie-name="item-message-timestamp"></time>
+      <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
+        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}"></time>
+      <!-- /ko -->
+      <!-- ko ifnot: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
+        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id}"></time>
+      <!-- /ko -->
       <!-- ko if: $parent.is_last_delivered_message(message) -->
         <span class="message-status" data-bind="l10n_text: z.string.conversation_message_delivered"></span>
       <!-- /ko -->
       <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-        <ephemeral-timer class="message-ephemeral-timer" params="expires: message.expire_after_millis()"></ephemeral-timer>
+        <ephemeral-timer class="message-ephemeral-timer" data-bind="attr: {'title': message.ephemeral_caption()}" params="message: message"></ephemeral-timer>
       <!-- /ko -->
     </div>
 
@@ -231,9 +236,12 @@
       <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
                     class="context-menu icon-more font-size-xs"
                     tabindex="-1"></context-menu>
-      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
       <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
-      <ephemeral-timer class="message-ephemeral-timer" params="expires: message.expire_after_millis()"></ephemeral-timer>
+        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}"></time>
+        <ephemeral-timer class="message-ephemeral-timer" data-bind="attr: {'title': message.ephemeral_caption()}" params="message: message"></ephemeral-timer>
+      <!-- /ko -->
+      <!-- ko ifnot: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
+        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
       <!-- /ko -->
     </div>
   </div>

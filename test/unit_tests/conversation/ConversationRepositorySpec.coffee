@@ -436,7 +436,7 @@ describe 'z.conversation.ConversationRepository', ->
     it 'deletes message and skips delete message if message is ephemeral', (done) ->
       other_user_id = z.util.create_random_uuid()
       message_to_delete_et.from = other_user_id
-      message_to_delete_et.expire_after_millis true
+      message_to_delete_et.ephemeral_expires true
 
       event =
         conversation: conversation_et.id

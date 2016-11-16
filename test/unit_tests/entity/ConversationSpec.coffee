@@ -630,7 +630,7 @@ describe 'Conversation', ->
       ephemeral_message_et.add_asset new z.entity.Text()
       ephemeral_message_et.id = z.util.create_random_uuid()
       ephemeral_message_et.user self_user_et
-      ephemeral_message_et.expire_after_millis true
+      ephemeral_message_et.ephemeral_expires true
       conversation_et.add_message ephemeral_message_et
 
       expect(conversation_et.get_last_editable_message()).toBeDefined()
