@@ -152,7 +152,10 @@
       <!-- ko if: message.show_likes() -->
         <div class="message-footer-bottom" data-uie-name="message-liked-avatars">
           <!-- ko foreach: message.reactions_user_ets() -->
-            <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+            <user-avatar class="user-avatar-xs"
+                         data-bubble="#participants-bubble"
+                         data-placement="vertical"
+                         params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
           <!-- /ko -->
           <span class="icon-close button-icon font-size-xs flex-center user-avatar-box-xs" data-bind="click: function() { $data.show_likes(false) }"></span>
         </div>
@@ -209,13 +212,17 @@
     <div class="message-body">
       <!-- ko foreach: remote_user_ets -->
         <!-- ko if: message.member_message_type === z.message.SystemMessageType.CONVERSATION_CREATE || message.member_message_type === z.message.SystemMessageType.CONVERSATION_RESUME -->
-          <user-avatar class="user-avatar-sm user-avatar-no-border" data-bubble="#participants-bubble" data-placement="vertical" params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+          <user-avatar class="user-avatar-sm user-avatar-no-border"
+                       data-bubble="#participants-bubble"
+                       data-placement="vertical"
+                       params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
         <!-- /ko -->
-        <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN -->
-          <user-avatar class="user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
-        <!-- /ko -->
-        <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE -->
-          <user-avatar class="user-avatar-xs translucent" data-bubble="#participants-bubble" data-placement="vertical" params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
+        <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN || message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE -->
+          <user-avatar class="user-avatar-xs"
+                       data-bind="css: {'translucent': message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE}"
+                       data-bubble="#participants-bubble"
+                       data-placement="vertical"
+                       params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
         <!-- /ko -->
       <!-- /ko -->
     </div>
