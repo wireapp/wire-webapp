@@ -35,7 +35,7 @@ class z.conversation.SendingQueue
   @param fn [Function] Conversation ID
   @return [Promise] Promise that resolves when the message was sent
   ###
-  add_to_sending_queue: (fn) =>
+  push: (fn) =>
     return new Promise (resolve, reject) =>
       queue_entry =
         function: fn
