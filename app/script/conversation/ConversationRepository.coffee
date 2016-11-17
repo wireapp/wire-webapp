@@ -211,6 +211,7 @@ class z.conversation.ConversationRepository
             "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
         return @_add_events_to_conversation events: events, conversation_et
       .then (mapped_messages) ->
+        console.log 'get_events done'
         conversation_et.is_pending false
         resolve mapped_messages
       .catch (error) =>
@@ -1964,6 +1965,7 @@ class z.conversation.ConversationRepository
       message_ets = @event_mapper.map_json_events json, conversation_et
       return Promise.all (@_update_user_ets message_et for message_et in message_ets)
     .then (message_ets) ->
+      console.log '_add_events_to_conversation messages ', message_ets
       if prepend and conversation_et.messages().length > 0
         conversation_et.prepend_messages message_ets
       else
@@ -2060,7 +2062,7 @@ class z.conversation.ConversationRepository
   Updates the user entities that are part of a message.
   @param message_et [z.entity.Message] Message to be updated
   ###
-  _update_user_ets: (message_et, callback) =>
+  _update_user_ets: (message_et) =>
     return new Promise (resolve) =>
       @user_repository.get_user_by_id message_et.from, (user_et) =>
         message_et.user user_et
