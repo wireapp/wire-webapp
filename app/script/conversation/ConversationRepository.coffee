@@ -63,12 +63,7 @@ class z.conversation.ConversationRepository
     @sorted_conversations = ko.pureComputed =>
       @filtered_conversations().sort z.util.sort_groups_by_last_event
 
-    @sending_promises = []
-    @sending_queue = ko.observableArray []
-    @sending_blocked = false
-    @sending_interval = undefined
-
-    @sending_queue.subscribe @_execute_from_sending_queue
+    @sending_queue = new z.conversation.SendingQueue()
 
     @conversations_archived = ko.observableArray []
     @conversations_call = ko.observableArray []
@@ -111,53 +106,6 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
-
-  ###
-  Adds a generic message to a the sending queue.
-
-  @private
-  @param conversation_id [String] Conversation ID
-  @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
-  @param user_ids [Array<String>] Optional array of user IDs to limit sending to
-  @param native_push [Boolean] Optional if message should enforce native push
-  @return [Promise] Promise that resolves when the message was sent
-  ###
-  _add_to_sending_queue: (conversation_id, generic_message, user_ids, native_push) =>
-    return new Promise (resolve, reject) =>
-      queue_entry =
-        function: => @_send_generic_message conversation_id, generic_message, user_ids, native_push
-        resolve: resolve
-        reject: reject
-
-      @sending_queue.push queue_entry
-
-  ###
-  Sends a generic message from the sending queue.
-  @private
-  ###
-  _execute_from_sending_queue: =>
-    return if @block_event_handling or @sending_blocked
-
-    queue_entry = @sending_queue()[0]
-    if queue_entry
-      @sending_blocked = true
-      @sending_interval = window.setInterval =>
-        return if @conversation_service.client.request_queue_blocked_state() isnt z.service.RequestQueueBlockedState.NONE
-        @sending_blocked = false
-        window.clearInterval @sending_interval
-        @logger.log @logger.levels.ERROR, 'Sending of message from queue failed, unblocking queue', @sending_queue()
-        @_execute_from_sending_queue()
-      , z.config.SENDING_QUEUE_UNBLOCK_INTERVAL
-
-      queue_entry.function()
-      .catch (error) ->
-        queue_entry.reject error
-      .then (response) =>
-        queue_entry.resolve response if response
-        window.clearInterval @sending_interval
-        @sending_blocked = false
-        @sending_queue.shift()
-
 
   ###############################################################################
   # Conversation service interactions
@@ -503,7 +451,7 @@ class z.conversation.ConversationRepository
   ###
   set_notification_handling_state: (handling_state) =>
     @block_event_handling = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
-    @_execute_from_sending_queue()
+    @sending_queue.execute_from_sending_queue()
     @logger.log @logger.levels.INFO, "Block handling of conversation events: #{@block_event_handling}"
 
   ###
@@ -610,7 +558,7 @@ class z.conversation.ConversationRepository
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'cleared', message_content
 
-      @_add_to_sending_queue @self_conversation().id, generic_message
+      @sending_queue.add_to_sending_queue => @_send_generic_message @self_conversation().id, generic_message
       .then =>
         @logger.log @logger.levels.INFO,
           "Cleared conversation '#{conversation_et.id}' as read on '#{new Date(cleared_timestamp).toISOString()}'"
@@ -791,7 +739,7 @@ class z.conversation.ConversationRepository
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'lastRead', message_content
 
-      @_add_to_sending_queue @self_conversation().id, generic_message
+      @sending_queue.add_to_sending_queue => @_send_generic_message @self_conversation().id, generic_message
       .then =>
         @logger.log @logger.levels.INFO,
           "Marked conversation '#{conversation_et.id}' as read on '#{new Date(timestamp).toISOString()}'"
@@ -856,7 +804,7 @@ class z.conversation.ConversationRepository
       generic_message.set 'asset', asset
       if conversation_et.ephemeral_timer()
         generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
-      @_add_to_sending_queue conversation_et.id, generic_message
+      @sending_queue.add_to_sending_queue => @_send_generic_message conversation_et.id, generic_message
     .then =>
       event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
       asset = if conversation_et.ephemeral_timer() then generic_message.ephemeral.asset else generic_message.asset
@@ -907,7 +855,7 @@ class z.conversation.ConversationRepository
 
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
-    @_add_to_sending_queue conversation_et.id, generic_message, [message_et.user().id], false
+    @sending_queue.add_to_sending_queue => @_send_generic_message conversation_et.id, generic_message, [message_et.user().id], false
 
   ###
   Sends image asset in specified conversation.
@@ -1156,10 +1104,6 @@ class z.conversation.ConversationRepository
     user_client_map[user_id] = [client_id]
     return user_client_map
 
-  _execute_message_queue: ->
-    @send_confirmation_status conversation_et, message_et for [conversation_et, message_et] in @sending_queue
-    @sending_queue = []
-
   ###
   Update image message with given event data
   @param conversation_et [z.entity.Conversation] Conversation image was sent in
@@ -1194,7 +1138,7 @@ class z.conversation.ConversationRepository
       @on_conversation_event saved_event
 
       # we don't need to wait for the sending to resolve
-      @_add_to_sending_queue conversation_et.id, generic_message
+      @sending_queue.add_to_sending_queue => @_send_generic_message conversation_et.id, generic_message
       .then =>
         if saved_event.type in z.event.EventTypeHandling.STORE
           @_update_message_sent_status conversation_et, saved_event.id
@@ -1476,7 +1420,7 @@ class z.conversation.ConversationRepository
       generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
       return generic_message
     .then (generic_message) =>
-      @_add_to_sending_queue conversation_et.id, generic_message, user_ids
+      @sending_queue.add_to_sending_queue => @_send_generic_message conversation_et.id, generic_message, user_ids
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE
     .then =>
@@ -1498,7 +1442,7 @@ class z.conversation.ConversationRepository
       generic_message.set 'hidden', new z.proto.MessageHide conversation_et.id, message_et.id
       return generic_message
     .then (generic_message) =>
-      @_add_to_sending_queue @self_conversation().id, generic_message
+      @sending_queue.add_to_sending_queue => @_send_generic_message @self_conversation().id, generic_message
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL
     .then =>
