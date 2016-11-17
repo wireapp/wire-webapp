@@ -27,7 +27,8 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
     @self_user = @user_repository.self
     @new_clients = ko.observableArray()
-    @username = ko.pureComputed => @self_user().name()
+    @name = ko.pureComputed => @self_user().name()
+    @username = ko.pureComputed => return 'username'
 
     @_init_subscriptions()
 
@@ -39,15 +40,18 @@ class z.ViewModel.content.PreferencesAccountViewModel
   change_accent_color: (id) =>
     @user_repository.change_accent_color id
 
-  change_username: (name, e) =>
-    new_username = e.target.value
+  change_name: (name, e) =>
+    new_name = e.target.value
 
-    if new_username and new_username isnt @self_user().name()
-      @user_repository.change_username new_username
+    if new_name and new_name isnt @self_user().name()
+      @user_repository.change_username new_name
     else
-      @username.notifySubscribers() # render old value
+      @name.notifySubscribers() # render old value
 
     e.target.blur()
+
+  change_username: (username, e) =>
+    console.debug 'change_username'
 
   check_new_clients: =>
     return if not @new_clients().length
