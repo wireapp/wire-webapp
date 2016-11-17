@@ -199,8 +199,9 @@ class z.ViewModel.ConversationInputViewModel
     if message.length > z.config.MAXIMUM_MESSAGE_LENGTH
       amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_LONG_MESSAGE,
         data: z.config.MAXIMUM_MESSAGE_LENGTH
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CHARACTER_LIMIT_REACHED,
-        characters: message.length
+        close: ->
+          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CHARACTER_LIMIT_REACHED,
+            characters: message.length
       return
 
     if @is_editing()
