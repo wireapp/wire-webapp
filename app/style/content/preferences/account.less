@@ -76,10 +76,13 @@
   line-height: @line-height-lg;
 }
 
-.preferences-account-username {
+.preferences-account-name {
+  font-weight: bold;
+}
+
+.preferences-account-input {
   .reset-textarea;
   background: transparent;
-  font-weight: bold;
   height: @line-height-xl;
   line-height: @line-height-xl;
   margin-left: -4px;
@@ -87,7 +90,7 @@
   padding-left: 4px;
   padding-right: 4px;
 
-  &:hover + .preferences-account-username-label:after {
+  &:hover + .preferences-account-input-icon:after {
     .icon-mixin("\e177"); // icon-edit
     margin-left: 8px;
   }
@@ -97,7 +100,7 @@
     width: 256px;
   }
 
-  &:focus + .preferences-account-username-label:after {
+  &:focus + .preferences-account-input-icon:after {
     content: "";
     display: none;
   }
