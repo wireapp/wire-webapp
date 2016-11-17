@@ -209,7 +209,7 @@ class z.conversation.ConversationRepository
         else
           @logger.log @logger.levels.INFO,
             "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
-        return @_add_events_to_conversation events: events, conversation_et
+        return @_add_events_to_conversation events, conversation_et
       .then (mapped_messages) ->
         console.log 'get_events done'
         conversation_et.is_pending false
@@ -1955,14 +1955,14 @@ class z.conversation.ConversationRepository
   ###
   Convert multiple JSON events into entities and add them to a given conversation.
 
-  @param json [Object] Event data
+  @param events [Array] Event data
   @param conversation_et [z.entity.Conversation] Conversation entity the events will be added to
   @param prepend [Boolean] Should existing messages be prepended
   @return [Array<z.entity.Message>] Array of mapped messages
   ###
-  _add_events_to_conversation: (json, conversation_et, prepend = true) ->
+  _add_events_to_conversation: (events, conversation_et, prepend = true) ->
     return Promise.resolve().then =>
-      message_ets = @event_mapper.map_json_events json, conversation_et
+      message_ets = @event_mapper.map_json_events events, conversation_et
       return Promise.all (@_update_user_ets message_et for message_et in message_ets)
     .then (message_ets) ->
       console.log '_add_events_to_conversation messages ', message_ets

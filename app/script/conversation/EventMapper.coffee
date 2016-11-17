@@ -32,13 +32,13 @@ class z.conversation.EventMapper
   ###
   Convert multiple JSON events into message entities.
 
-  @param json [Object] Event data
+  @param events [Object] Event data
   @param conversation_et [z.entity.Conversation] Conversation entity the events belong to
 
   @return [Array<z.entity.Message>] Mapped message entities
   ###
-  map_json_events: (json, conversation_et) ->
-    events = (@map_json_event event, conversation_et for event in json.events.reverse() when event isnt undefined)
+  map_json_events: (events, conversation_et) ->
+    events = (@map_json_event event, conversation_et for event in events.reverse() when event isnt undefined)
     return events.filter (x) -> x isnt undefined
 
   map_json_event: (event, conversation_et) =>
