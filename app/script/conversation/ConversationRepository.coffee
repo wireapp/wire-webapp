@@ -1964,7 +1964,6 @@ class z.conversation.ConversationRepository
       message_ets = @event_mapper.map_json_events events, conversation_et
       return Promise.all (@_update_user_ets message_et for message_et in message_ets)
     .then (message_ets) ->
-      console.log '_add_events_to_conversation messages ', message_ets
       if prepend and conversation_et.messages().length > 0
         conversation_et.prepend_messages message_ets
       else
