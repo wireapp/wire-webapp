@@ -64,6 +64,10 @@ class z.conversation.ConversationRepository
       @filtered_conversations().sort z.util.sort_groups_by_last_event
 
     @sending_queue = new z.conversation.SendingQueue()
+    @sending_queue.pause()
+
+    @conversation_service.client.request_queue_blocked_state.subscribe (state) =>
+      @sending_queue.pause state isnt z.service.RequestQueueBlockedState.NONE
 
     @conversations_archived = ko.observableArray []
     @conversations_call = ko.observableArray []
@@ -451,7 +455,8 @@ class z.conversation.ConversationRepository
   ###
   set_notification_handling_state: (handling_state) =>
     @block_event_handling = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
-    @sending_queue.execute_from_sending_queue()
+    @sending_queue.pause @block_event_handling
+    @sending_queue.execute()
     @logger.log @logger.levels.INFO, "Block handling of conversation events: #{@block_event_handling}"
 
   ###

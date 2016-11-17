@@ -16,18 +16,21 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
+SENDING_QUEUE_UNBLOCK_INTERVAL = 60 * 1000
+
 window.z ?= {}
 z.conversation ?= {}
 
 class z.conversation.SendingQueue
 
   constructor: ->
-    @sending_promises = []
-    @sending_queue = ko.observableArray []
-    @sending_blocked = false
-    @sending_interval = undefined
+    @_promises = []
+    @_queue = ko.observableArray []
+    @_blocked = false
+    @_interval = undefined
+    @_paused = false
 
-    @sending_queue.subscribe @execute_from_sending_queue
+    @_queue.subscribe @execute
 
   ###
   Adds a generic message to a the sending queue.
@@ -41,30 +44,39 @@ class z.conversation.SendingQueue
         function: fn
         resolve: resolve
         reject: reject
-      @sending_queue.push queue_entry
+      @_queue.push queue_entry
 
   ###
   Sends a generic message from the sending queue.
   ###
-  execute_from_sending_queue: =>
-    return if @block_event_handling or @sending_blocked
+  execute: =>
+    return if @_paused or @_blocked
 
-    queue_entry = @sending_queue()[0]
+    queue_entry = @_queue()[0]
     if queue_entry
-      @sending_blocked = true
-      @sending_interval = window.setInterval =>
-        return if @conversation_service.client.request_queue_blocked_state() isnt z.service.RequestQueueBlockedState.NONE
-        @sending_blocked = false
-        window.clearInterval @sending_interval
-        @logger.log @logger.levels.ERROR, 'Sending of message from queue failed, unblocking queue', @sending_queue()
-        @execute_from_sending_queue()
-      , z.config.SENDING_QUEUE_UNBLOCK_INTERVAL
+      @_blocked = true
+      @_interval = window.setInterval =>
+        return if @_paused
+        @_blocked = false
+        window.clearInterval @_interval
+        @logger.log @logger.levels.ERROR, 'Sending of message from queue failed, unblocking queue', @_queue()
+        @execute()
+      , SENDING_QUEUE_UNBLOCK_INTERVAL
 
       queue_entry.function()
       .catch (error) ->
         queue_entry.reject error
       .then (response) =>
+        # TODO if response is null/undefined/false/0 promise will not resolve
         queue_entry.resolve response if response
-        window.clearInterval @sending_interval
-        @sending_blocked = false
-        @sending_queue.shift()
+        window.clearInterval @_interval
+        @_blocked = false
+        @_queue.shift()
+
+  ###
+  Pause or resume the execution.
+
+  @param should_pause [Boolean]
+  ###
+  pause: (should_pause) =>
+    @_paused should_pause
