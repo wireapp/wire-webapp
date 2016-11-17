@@ -80,3 +80,4 @@ class z.conversation.SendingQueue
   ###
   pause: (should_pause) =>
     @_paused = should_pause
+    @execute() if @_paused is false

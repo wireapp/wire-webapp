@@ -456,7 +456,6 @@ class z.conversation.ConversationRepository
   set_notification_handling_state: (handling_state) =>
     @block_event_handling = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
     @sending_queue.pause @block_event_handling
-    @sending_queue.execute()
     @logger.log @logger.levels.INFO, "Block handling of conversation events: #{@block_event_handling}"
 
   ###
