@@ -211,7 +211,6 @@ class z.conversation.ConversationRepository
             "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
         return @_add_events_to_conversation events, conversation_et
       .then (mapped_messages) ->
-        console.log 'get_events done'
         conversation_et.is_pending false
         resolve mapped_messages
       .catch (error) =>
