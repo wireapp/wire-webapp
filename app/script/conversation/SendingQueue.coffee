@@ -71,6 +71,7 @@ class z.conversation.SendingQueue
         window.clearInterval @_interval
         @_blocked = false
         @_queue.shift()
+        @execute()
 
   ###
   Pause or resume the execution.
