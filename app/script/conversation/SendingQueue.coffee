@@ -25,12 +25,10 @@ class z.conversation.SendingQueue
 
   constructor: ->
     @_promises = []
-    @_queue = ko.observableArray []
+    @_queue = []
     @_blocked = false
     @_interval = undefined
     @_paused = false
-
-    @_queue.subscribe @execute
 
   ###
   Adds a generic message to a the sending queue.
@@ -45,6 +43,7 @@ class z.conversation.SendingQueue
         resolve: resolve
         reject: reject
       @_queue.push queue_entry
+      @execute()
 
   ###
   Sends a generic message from the sending queue.
@@ -52,14 +51,14 @@ class z.conversation.SendingQueue
   execute: =>
     return if @_paused or @_blocked
 
-    queue_entry = @_queue()[0]
+    queue_entry = @_queue[0]
     if queue_entry
       @_blocked = true
       @_interval = window.setInterval =>
         return if @_paused
         @_blocked = false
         window.clearInterval @_interval
-        @logger.log @logger.levels.ERROR, 'Sending of message from queue failed, unblocking queue', @_queue()
+        @logger.log @logger.levels.ERROR, 'Sending of message from queue failed, unblocking queue', @_queue
         @execute()
       , SENDING_QUEUE_UNBLOCK_INTERVAL
 
@@ -79,4 +78,4 @@ class z.conversation.SendingQueue
   @param should_pause [Boolean]
   ###
   pause: (should_pause) =>
-    @_paused should_pause
+    @_paused = should_pause
