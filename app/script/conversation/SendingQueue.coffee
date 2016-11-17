@@ -31,10 +31,10 @@ class z.conversation.SendingQueue
     @_paused = false
 
   ###
-  Adds a generic message to a the sending queue.
+  Queued function is executed when queue is empty or previous functions are executed.
 
-  @param fn [Function] Conversation ID
-  @return [Promise] Promise that resolves when the message was sent
+  @param fn [Function]
+  @return [Promise] Promise that resolves function was executed
   ###
   push: (fn) =>
     return new Promise (resolve, reject) =>
@@ -46,7 +46,7 @@ class z.conversation.SendingQueue
       @execute()
 
   ###
-  Sends a generic message from the sending queue.
+  Executes first function in the Queue.
   ###
   execute: =>
     return if @_paused or @_blocked
