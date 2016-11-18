@@ -1,12 +1,12 @@
-<div id="takeover" class="takeover">
+<div id="takeover" class="takeover" data-bind="with: $root.takeover">
   <div class="takeover-names">
-    <span class="takeover-names-name" data-uie-name="takeover-name">Rene Herrmann Dos Santos Vega</span>
-    <span class="takeover-names-username" data-uie-name="takeover-username">@reneherrmanndossa1234</span>
+    <span class="takeover-names-name" data-bind="text: name" data-uie-name="takeover-name"></span>
+    <span class="takeover-names-username" data-bind="text: username" data-uie-name="takeover-username"></span>
   </div>
   <div class="takeover-actions">
-    <span class="takeover-actions-head">Your username on Wire</span>
-    <span class="takeover-actions-sub">People can use this to find you more easily</span>
-    <button class="button button-fluid" data-uie-name="do-takeover-choose">Choose your own</button>
-    <button class="button button-fluid button-inverted text-white" data-uie-name="do-takeover-keep">Keep this one</button>
+    <span class="takeover-actions-head" data-bind="l10n_text: z.string.takeover_headline"></span>
+    <span class="takeover-actions-sub" data-bind="l10n_text: z.string.takeover_sub"></span>
+    <button class="button button-fluid" data-bind="click: choose_username, l10n_text: z.string.takeover_button_choose" data-uie-name="do-takeover-choose"></button>
+    <button class="button button-fluid button-inverted text-white" data-bind="click: keep_username, l10n_text: z.string.takeover_button_keep" data-uie-name="do-takeover-keep"></button>
   </div>
 </div>

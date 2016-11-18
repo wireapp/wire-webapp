@@ -289,6 +289,12 @@ z.string.conversations_popover_notify = 'Unmute'
 z.string.conversations_popover_silence = 'Mute'
 z.string.conversations_popover_unarchive = 'Unarchive'
 
+# Takeover
+z.string.takeover_headline = 'Your username on Wire'
+z.string.takeover_sub = 'People can use this to find you more easily'
+z.string.takeover_button_choose = 'Choose your own'
+z.string.takeover_button_keep = 'Keep this one'
+
 # Invites
 z.string.invite_meta_key_mac = 'Cmd'
 z.string.invite_meta_key_pc = 'Ctrl'

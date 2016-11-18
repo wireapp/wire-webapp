@@ -46,6 +46,7 @@ class z.ViewModel.list.ListViewModel
     @conversations = new z.ViewModel.list.ConversationListViewModel 'conversations', @, @content_view_model, @call_center, @conversation_repository, @user_repository
     @preferences   = new z.ViewModel.list.PreferencesListViewModel 'preferences', @, @content_view_model
     @start_ui      = new z.ViewModel.list.StartUIViewModel 'start-ui', @, @connect_repository, @conversation_repository, @search_repository, @user_repository, @properties_repository
+    @takeover      = new z.ViewModel.list.TakeOverViewModel 'takeover', @user_repository
 
     @actions       = new z.ViewModel.list.ActionsViewModel 'actions-bubble', @, @conversations, @conversation_repository, @user_repository
 
