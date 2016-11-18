@@ -17,7 +17,7 @@
  *
  */
 
-.left-list {
+.left-list-container {
   bottom: 0;
   display: flex;
   flex-direction: column;
@@ -25,6 +25,10 @@
   right: 0;
   top: 0;
   width: @left-width;
+}
+
+.left-list {
+  .left-list-container;
 
   &:not(.left-list-is-visible) {
     .start-ui-transition-fadeout();
@@ -33,6 +37,8 @@
   &.left-list-is-visible {
     .start-ui-transition-fadein();
   }
+
+  display: none !important;
 }
 
 .left-list-header {
