@@ -35,12 +35,7 @@ RAYGUN =
 
 if z.util.Environment.frontend.is_production()
   RAYGUN.API_KEY = 'lAkLCPLx3ysnsXktajeHmw=='
-  LOCALYTICS.APP_KEY = 'b929419faf17d843c16649c-f5cc4c44-ccb3-11e4-2efd-004a77f8b47f'
-  if z.util.Environment.electron
-    if z.util.Environment.os.mac
-      LOCALYTICS.APP_KEY = 'ad0b57c3c46d92daea395e0-146bc33e-6100-11e5-09e1-00deb82fd81f'
-    else if z.util.Environment.os.win
-      LOCALYTICS.APP_KEY = 'dfb424ad373e18163f25bc6-aa01a13c-6100-11e5-fb56-008b20abc1fa'
+  LOCALYTICS.APP_KEY = 'f19c50ccf7bff11992798f0-59fac3b8-ad88-11e6-ff9e-00ae30fe7875'
 
 ###
 Tracker for user actions which uses Localytics as a reference implementation but can be easily used with other services.
@@ -101,7 +96,16 @@ class z.tracking.EventTrackingRepository
     script_node = document.createElement node_type
     script_node.src = 'https://web.localytics.com/v3/localytics.min.js'
     (c = document.getElementsByTagName(node_type)[0]).parentNode.insertBefore script_node, c
+
+    _get_plaform = ->
+      if z.util.Environment.electron
+        return 'win' if z.util.Environment.os.win
+        return 'mac' if z.util.Environment.os.mac
+        return 'linux'
+      return 'web'
+
     @localytics 'init', LOCALYTICS.APP_KEY, options
+    @localytics 'setCustomDimension', 0, _get_plaform()
     @logger.log @logger.levels.INFO, 'Localytics reporting is enabled'
 
   _localytics_disabled: ->
