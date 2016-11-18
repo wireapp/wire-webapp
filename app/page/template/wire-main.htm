@@ -6,12 +6,16 @@
     <div id="app" class="app">
       <div id="left" class="left">
         #include('list/background.htm')
-        #include('list/archive.htm')
-        #include('list/conversations.htm')
-        #include('list/preferences.htm')
-        #include('list/start-ui.htm')
-        #include('list/actions.htm')
-        #include('list/takeover.htm')
+        <!-- ko if: list_modal() === undefined -->
+          #include('list/archive.htm')
+          #include('list/conversations.htm')
+          #include('list/preferences.htm')
+          #include('list/start-ui.htm')
+          #include('list/actions.htm')
+        <!-- /ko -->
+        <!-- ko if: list_modal() === 'takeover' -->
+          #include('list/takeover.htm')
+        <!-- /ko -->
       </div>
       <div id="right" class="right">
         <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS -->

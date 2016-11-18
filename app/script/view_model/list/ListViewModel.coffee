@@ -37,6 +37,7 @@ class z.ViewModel.list.ListViewModel
     # state
     @list_state = ko.observable z.ViewModel.list.LIST_STATE.CONVERSATIONS
     @last_update = ko.observable()
+    @list_modal = ko.observable()
     @webapp_loaded = ko.observable false
 
     @first_run = ko.observable false
@@ -63,6 +64,8 @@ class z.ViewModel.list.ListViewModel
     amplify.subscribe z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, @open_preferences_account
     amplify.subscribe z.event.WebApp.PREFERENCES.MANAGE_DEVICES, @open_preferences_devices
     amplify.subscribe z.event.WebApp.SEARCH.SHOW, @open_start_ui
+    amplify.subscribe z.event.WebApp.TAKEOVER.SHOW, @show_takeover
+    amplify.subscribe z.event.WebApp.TAKEOVER.DISMISS, @dismiss_takeover
 
   click_on_actions: (conversation_et, event) =>
     @actions.click_on_actions conversation_et, event
@@ -118,3 +121,9 @@ class z.ViewModel.list.ListViewModel
       when z.ViewModel.list.LIST_STATE.PREFERENCES then 'preferences'
       when z.ViewModel.list.LIST_STATE.START_UI then 'start-ui'
       else 'conversations'
+
+  show_takeover: =>
+    @list_modal 'takeover'
+
+  dismiss_takeover: =>
+    @list_modal undefined

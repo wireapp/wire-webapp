@@ -324,7 +324,7 @@ class z.main.App
   _show_ui: ->
     @logger.log @logger.levels.INFO, 'Showing application UI'
     if true # should choose username
-      # TODO show username modal
+      amplify.publish z.event.WebApp.TAKEOVER.SHOW
     else if conversation_et = @repository.conversation.get_most_recent_conversation()
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
     else if @repository.user.connect_requests().length
