@@ -51,10 +51,11 @@ class z.calling.CallCenter
 
   @param call_service [z.calling.CallService] Backend REST API call service implementation
   @param conversation_repository [z.conversation.ConversationRepository] Repository for conversation interactions
+  @param media_repository [z.media.MediaRepository] Repository for media interactions
   @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
   @param audio_repository [z.audio.AudioRepository] Repository for all audio interactions
   ###
-  constructor: (@call_service, @conversation_repository, @user_repository, @audio_repository) ->
+  constructor: (@call_service, @audio_repository, @conversation_repository, @media_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.calling.CallCenter', z.config.LOGGER.OPTIONS
 
     # Telemetry
@@ -63,19 +64,23 @@ class z.calling.CallCenter
     @timings = ko.observable()
 
     # Media Handler
-    @media_devices_handler = new z.calling.handler.MediaDevicesHandler @
-    @media_stream_handler = new z.calling.handler.MediaStreamHandler @
-    @media_element_handler = new z.calling.handler.MediaElementHandler @
+    @media_devices_handler = @media_repository.devices_handler
+    @media_stream_handler = @media_repository.stream_handler
+    @media_element_handler = @media_repository.element_handler
 
     # Call Handler
     @state_handler = new z.calling.handler.CallStateHandler @
     @signaling_handler = new z.calling.handler.CallSignalingHandler @
 
-    #Calls
+    @share_call_states()
+    @subscribe_to_events()
+
+  share_call_states: =>
     @calls = @state_handler.calls
     @joined_call = @state_handler.joined_call
 
-    @subscribe_to_events()
+    @media_stream_handler.calls = @calls
+    @media_stream_handler.joined_call = @joined_call
 
   # Subscribe to amplify topics.
   subscribe_to_events: =>

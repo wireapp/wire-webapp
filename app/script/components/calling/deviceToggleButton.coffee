@@ -23,7 +23,7 @@ class z.components.DeviceToggleButton
   constructor: (params) ->
     @current_device_index = params.index
     @number_of_devices = params.length
-    @icon_class = if params.type is z.calling.enum.MediaDeviceType.VIDEO_INPUT then 'icon-video' else 'icon-screensharing'
+    @icon_class = if params.type is z.media.MediaDeviceType.VIDEO_INPUT then 'icon-video' else 'icon-screensharing'
 
 
 ko.components.register 'device-toggle-button',

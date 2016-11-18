@@ -17,12 +17,8 @@
 #
 
 window.z ?= {}
-z.calling ?= {}
-z.calling.enum ?= {}
+z.media ?= {}
 
-z.calling.enum.MediaType =
-  AUDIO: 'audio'
-  AUDIO_VIDEO: 'audio/video'
-  NONE: 'none'
-  SCREEN: 'screen'
-  VIDEO: 'video'
+z.media.MediaStreamSource =
+  LOCAL: 'local'
+  REMOTE: 'remote'

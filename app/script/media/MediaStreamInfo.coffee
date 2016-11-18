@@ -17,17 +17,16 @@
 #
 
 window.z ?= {}
-z.calling ?= {}
-z.calling.payloads ?= {}
+z.media ?= {}
 
-class z.calling.payloads.MediaStreamInfo
+class z.media.MediaStreamInfo
   constructor: (@source, @flow_id, @stream, @call_et) ->
-    @type = z.calling.enum.MediaType.NONE
+    @type = z.media.MediaType.NONE
 
     @conversation_id = @call_et?.id
     @update_stream_type()
     return @
 
   update_stream_type: =>
-    @stream = z.calling.handler.MediaStreamHandler.detect_media_stream_type @stream
+    @stream = z.media.MediaStreamHandler.detect_media_stream_type @stream
     @type = @stream.type

@@ -91,7 +91,7 @@
                                                 'device-toggle-button-dark': show_remote_participant()}"
                                 params="index: current_device_index.video_input,
                                         length: number_of_video_devices,
-                                        type: z.calling.enum.MediaDeviceType.VIDEO_INPUT"></device-toggle-button>
+                                        type: z.media.MediaDeviceType.VIDEO_INPUT"></device-toggle-button>
         <!-- /ko -->
         <!-- ko if: show_switch_screen()-->
           <device-toggle-button class="device-toggle-button"
@@ -100,7 +100,7 @@
                                                 'device-toggle-button-dark': show_remote_participant()}"
                                 params="index: current_device_index.screen_input,
                                         length: number_of_screen_devices,
-                                        type: z.calling.enum.MediaDeviceType.SCREEN_INPUT"></device-toggle-button>
+                                        type: z.media.MediaDeviceType.SCREEN_INPUT"></device-toggle-button>
         <!-- /ko -->
       </div>
     <!-- /ko -->

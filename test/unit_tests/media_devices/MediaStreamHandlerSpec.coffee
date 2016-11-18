@@ -38,7 +38,7 @@ describe 'z.calling.handler.MediaStreamHandler', ->
 
     it 'toggles the video stream if available and in video mode', (done) ->
       call_center.media_stream_handler.local_media_streams.video true
-      call_center.media_stream_handler.local_media_type z.calling.enum.MediaType.VIDEO
+      call_center.media_stream_handler.local_media_type z.media.MediaType.VIDEO
 
       call_center.media_stream_handler.toggle_camera_paused()
       .then ->
@@ -49,23 +49,23 @@ describe 'z.calling.handler.MediaStreamHandler', ->
 
     it 'turns on the video stream if it does not exist', (done) ->
       call_center.media_stream_handler.local_media_streams.video undefined
-      call_center.media_stream_handler.local_media_type z.calling.enum.MediaType.VIDEO
+      call_center.media_stream_handler.local_media_type z.media.MediaType.VIDEO
 
       call_center.media_stream_handler.toggle_camera_paused()
       .then ->
         expect(call_center.media_stream_handler._toggle_video_enabled).not.toHaveBeenCalled()
-        expect(call_center.media_stream_handler.replace_input_source).toHaveBeenCalledWith z.calling.enum.MediaType.VIDEO
+        expect(call_center.media_stream_handler.replace_input_source).toHaveBeenCalledWith z.media.MediaType.VIDEO
         done()
       .catch done.fail
 
     it 'turns on the video stream if not in video mode', (done) ->
       call_center.media_stream_handler.local_media_streams.video true
-      call_center.media_stream_handler.local_media_type z.calling.enum.MediaType.SCREEN
+      call_center.media_stream_handler.local_media_type z.media.MediaType.SCREEN
 
       call_center.media_stream_handler.toggle_camera_paused()
       .then ->
         expect(call_center.media_stream_handler._toggle_video_enabled).not.toHaveBeenCalled()
-        expect(call_center.media_stream_handler.replace_input_source).toHaveBeenCalledWith z.calling.enum.MediaType.VIDEO
+        expect(call_center.media_stream_handler.replace_input_source).toHaveBeenCalledWith z.media.MediaType.VIDEO
         done()
       .catch done.fail
 
@@ -89,8 +89,8 @@ describe 'z.calling.handler.MediaStreamHandler', ->
       call_center.media_stream_handler.toggle_microphone_muted()
       .then done.fail
       .catch (error) ->
-        expect(error).toEqual jasmine.any z.calling.CallError
-        expect(error.type).toBe z.calling.CallError::TYPE.NO_AUDIO_STREAM_FOUND
+        expect(error).toEqual jasmine.any z.media.MediaError
+        expect(error.type).toBe z.media.MediaError::TYPE.NO_AUDIO_STREAM_FOUND
         done()
 
 
@@ -101,7 +101,7 @@ describe 'z.calling.handler.MediaStreamHandler', ->
 
     it 'toggles screen sharing if available and in screen sharing mode', (done) ->
       call_center.media_stream_handler.local_media_streams.video true
-      call_center.media_stream_handler.local_media_type z.calling.enum.MediaType.SCREEN
+      call_center.media_stream_handler.local_media_type z.media.MediaType.SCREEN
 
       call_center.media_stream_handler.toggle_screen_shared()
       .then ->
@@ -112,22 +112,22 @@ describe 'z.calling.handler.MediaStreamHandler', ->
 
     it 'turns on the screen sharing stream if it does not exist', (done) ->
       call_center.media_stream_handler.local_media_streams.video undefined
-      call_center.media_stream_handler.local_media_type z.calling.enum.MediaType.SCREEN
+      call_center.media_stream_handler.local_media_type z.media.MediaType.SCREEN
 
       call_center.media_stream_handler.toggle_screen_shared()
       .then ->
         expect(call_center.media_stream_handler._toggle_screen_enabled).not.toHaveBeenCalled()
-        expect(call_center.media_stream_handler.replace_input_source).toHaveBeenCalledWith z.calling.enum.MediaType.SCREEN
+        expect(call_center.media_stream_handler.replace_input_source).toHaveBeenCalledWith z.media.MediaType.SCREEN
         done()
       .catch done.fail
 
     it 'turns on the video stream if not in screen sharing mode', (done) ->
       call_center.media_stream_handler.local_media_streams.video true
-      call_center.media_stream_handler.local_media_type z.calling.enum.MediaType.VIDEO
+      call_center.media_stream_handler.local_media_type z.media.MediaType.VIDEO
 
       call_center.media_stream_handler.toggle_screen_shared()
       .then ->
         expect(call_center.media_stream_handler._toggle_screen_enabled).not.toHaveBeenCalled()
-        expect(call_center.media_stream_handler.replace_input_source).toHaveBeenCalledWith z.calling.enum.MediaType.SCREEN
+        expect(call_center.media_stream_handler.replace_input_source).toHaveBeenCalledWith z.media.MediaType.SCREEN
         done()
       .catch done.fail

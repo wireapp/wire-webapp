@@ -22,14 +22,14 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.PreferencesAVViewModel
-  constructor: (element_id, @call_center) ->
+  constructor: (element_id, @audio_repository, @media_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesAVViewModel', z.config.LOGGER.OPTIONS
 
-    @media_devices_handler = @call_center.media_devices_handler
+    @media_devices_handler = @media_repository.devices_handler
     @available_devices = @media_devices_handler.available_devices
     @current_device_id = @media_devices_handler.current_device_id
 
-    @media_stream_handler = @call_center.media_stream_handler
+    @media_stream_handler = @media_repository.stream_handler
     @audio_stream = @media_stream_handler.local_media_streams.audio
     @video_stream = @media_stream_handler.local_media_streams.video
 
@@ -69,13 +69,13 @@ class z.ViewModel.content.PreferencesAVViewModel
     .then ([media_type, media_stream_constraints]) =>
       return @media_stream_handler.request_media_stream media_type, media_stream_constraints
     .then (media_stream_info) =>
-      @media_stream_handler.local_media_type z.calling.enum.MediaType.VIDEO if @available_devices.video_input().length
+      @media_stream_handler.local_media_type z.media.MediaType.VIDEO if @available_devices.video_input().length
       @media_stream_handler.set_local_media_stream media_stream_info
       return @audio_stream()
     .catch (error) =>
       error = error[0] if _.isArray error
       @logger.log @logger.levels.ERROR, "Requesting MediaStream failed: #{error.message}", error
-      if error.name in z.calling.rtc.MediaStreamErrorTypes.DEVICE or error.name in z.calling.rtc.MediaStreamErrorTypes.PERMISSION
+      if error.type in [z.media.MediaError::TYPE.MEDIA_STREAM_DEVICE, z.media.MediaError::TYPE.MEDIA_STREAM_PERMISSION]
         @permission_denied true
         return false
       throw error
@@ -87,7 +87,7 @@ class z.ViewModel.content.PreferencesAVViewModel
   ###
   _initiate_audio_meter: (audio_stream) =>
     @logger.log @logger.levels.INFO, 'Initiating new audio meter', audio_stream
-    @audio_context = @call_center.audio_repository.get_audio_context()
+    @audio_context = @audio_repository.get_audio_context()
 
     @audio_analyser = @audio_context.createAnalyser()
     @audio_analyser.fftSize = 1024

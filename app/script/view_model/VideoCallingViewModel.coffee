@@ -21,19 +21,19 @@ z.ViewModel ?= {}
 
 
 class z.ViewModel.VideoCallingViewModel
-  constructor: (element_id, @call_center, @user_repository, @conversation_repository, @multitasking) ->
+  constructor: (element_id, @call_center, @conversation_repository, @media_repository, @user_repository, @multitasking) ->
     @logger = new z.util.Logger 'z.ViewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS
 
     @self_user = @user_repository.self
 
-    @available_devices = @call_center.media_devices_handler.available_devices
-    @current_device_id = @call_center.media_devices_handler.current_device_id
-    @current_device_index = @call_center.media_devices_handler.current_device_index
+    @available_devices = @media_repository.devices_handler.available_devices
+    @current_device_id = @media_repository.devices_handler.current_device_id
+    @current_device_index = @media_repository.devices_handler.current_device_index
 
-    @local_video_stream = @call_center.media_stream_handler.local_media_streams.video
-    @remote_video_stream = @call_center.media_stream_handler.remote_media_streams.video
+    @local_video_stream = @media_repository.stream_handler.local_media_streams.video
+    @remote_video_stream = @media_repository.stream_handler.remote_media_streams.video
 
-    @self_stream_state = @call_center.media_stream_handler.self_stream_state
+    @self_stream_state = @media_repository.stream_handler.self_stream_state
 
     @is_choosing_screen = ko.observable false
 
@@ -140,7 +140,7 @@ class z.ViewModel.VideoCallingViewModel
         conversation_type: if @joined_call().is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
         kind_of_call_when_sharing: if @joined_call().is_remote_videod() then 'video' else 'audio'
 
-      @call_center.media_devices_handler.get_screen_sources()
+      @media_repository.devices_handler.get_screen_sources()
       .then (screen_sources) =>
         if screen_sources.length > 1
           @is_choosing_screen true
@@ -179,10 +179,10 @@ class z.ViewModel.VideoCallingViewModel
     @call_center.state_handler.toggle_video @joined_call()?.id
 
   clicked_on_toggle_camera: =>
-    @call_center.media_devices_handler.toggle_next_camera()
+    @media_repository.devices_handler.toggle_next_camera()
 
   clicked_on_toggle_screen: =>
-    @call_center.media_devices_handler.toggle_next_screen()
+    @media_repository.devices_handler.toggle_next_screen()
 
   clicked_on_minimize: =>
     @multitasking.is_minimized true
