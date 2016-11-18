@@ -28,7 +28,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
     @self_user = @user_repository.self
     @new_clients = ko.observableArray()
     @name = ko.pureComputed => @self_user().name()
-    @username = ko.pureComputed => return 'username'
+    @username = ko.pureComputed => @self_user().username()
 
     @_init_subscriptions()
 
@@ -44,14 +44,25 @@ class z.ViewModel.content.PreferencesAccountViewModel
     new_name = e.target.value
 
     if new_name and new_name isnt @self_user().name()
-      @user_repository.change_username new_name
+      @user_repository.change_name new_name
     else
       @name.notifySubscribers() # render old value
 
     e.target.blur()
 
   change_username: (username, e) =>
-    console.debug 'change_username'
+    new_username = e.target.value
+
+    if new_username and new_username isnt @self_user().username()
+      @user_repository.change_username new_username
+      .then ->
+        e.target.classList.remove 'error'
+      .catch (error) ->
+        e.target.classList.add 'error'
+    else
+      @username.notifySubscribers() # render old value
+
+    e.target.blur()
 
   check_new_clients: =>
     return if not @new_clients().length

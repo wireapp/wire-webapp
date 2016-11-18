@@ -76,10 +76,6 @@
   line-height: @line-height-lg;
 }
 
-.preferences-account-name {
-  font-weight: bold;
-}
-
 .preferences-account-input {
   .reset-textarea;
   background: transparent;
@@ -105,3 +101,33 @@
     display: none;
   }
 }
+
+.preferences-account-name {
+  font-weight: bold;
+}
+
+.preferences-account-username-wrapper {
+  position: relative;
+  min-height: @line-height-xl * 2;
+}
+
+.preferences-account-username-addsign {
+  position: absolute;
+  top: 0;
+  left: 0;
+  line-height: @line-height-xl;
+  color: @graphite;
+}
+
+.preferences-account-username.error {
+  & ~ .preferences-account-username-error {display: block;}
+}
+
+.preferences-account-username {
+  padding-left: 22px;
+  &:focus ~ .preferences-account-username-hint {display: block;}
+  &:focus ~ .preferences-account-username-error {display: none;}
+}
+
+.preferences-account-username-hint,
+.preferences-account-username-error {display: none;}

@@ -12,14 +12,16 @@
                    maxlength="64"/>
             <span class="preferences-account-input-icon"></span>
           </div>
-          <div>
+          <div class="preferences-account-username-wrapper">
+            <span class="preferences-account-username-addsign">@</span>
             <input class="preferences-account-username preferences-account-input"
                    id="username" type="text"
-                   data-bind="attr: {size: username().length}, value: username, enter: change_username, l10n_placeholder: z.string.preferences_account_username_placeholder"
+                   data-bind="attr: {size: username().length}, value: username, enter: change_username"
                    data-uie-name="enter-username"
                    maxlength="21"/>
             <span class="preferences-account-input-icon"></span>
-            <div class="preferences-account-input-label text-graphite font-size-xs">You can use the a-z, 0-9 characters and the underscore</div>
+            <div class="preferences-account-username-hint text-graphite font-size-xs" data-bind="l10n_text: z.string.preferences_account_username_hint"></div>
+            <div class="preferences-account-username-error text-red font-size-xs" data-bind="l10n_text: z.string.preferences_account_username_error"></div>
           </div>
           <div class="preferences-account-mail" data-bind="text: self_user().email()" data-uie-name="enter-email"></div>
           <div class="preferences-account-phone" data-bind="text: self_user().phone()" data-uie-name="enter-phone"></div>

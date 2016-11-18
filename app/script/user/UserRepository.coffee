@@ -553,12 +553,20 @@ class z.user.UserRepository
     @user_service.update_own_user_profile({accent_id: accent_id}).then => @self().accent_id accent_id
 
   ###
+  Change name.
+  @param name [String] New name
+  ###
+  change_name: (name) ->
+    if name.length >= z.config.MINIMUM_USERNAME_LENGTH
+      @user_service.update_own_user_profile({name: name}).then => @self().name name
+
+  ###
   Change username.
   @param name [String] New user name
   ###
-  change_username: (name) ->
-    if name.length >= z.config.MINIMUM_USERNAME_LENGTH
-      @user_service.update_own_user_profile({name: name}).then => @self().name name
+  change_username: (username) ->
+    @self().username username
+    return Promise.resolve()
 
   ###
   Change the profile image.
