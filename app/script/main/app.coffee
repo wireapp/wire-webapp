@@ -294,23 +294,21 @@ class z.main.App
 
       token_promise.catch (error) =>
         if is_reload
-          if error.type is z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
+          if error.type in [z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN, z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE]
             @logger.log @logger.levels.ERROR, "Session expired on page reload: #{error.message}", error
             Raygun.send new Error ('Session expired on page reload'), error
             @_redirect_to_login true
-          else if error.type isnt z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE
+          else
             @logger.log @logger.levels.WARN, 'Connectivity issues. Trigger reload on regained connectivity.', error
             @auth.client.execute_on_connectivity().then -> window.location.reload false
         else if navigator.onLine
-          if error.type is z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE
-            @logger.log @logger.levels.WARN, 'No access token found in cache. Redirecting to login.', error
-            @_redirect_to_login false
-          else if error.type is z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
-            @logger.log @logger.levels.WARN, 'Access token request forbidden. Redirecting to login.', error
-            @_redirect_to_login false
-          else
-            @logger.log @logger.levels.ERROR, "Could not get access token: #{error.message}. Logging out user.", error
-            @logout 'init_app'
+          switch error.type
+            when z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE, z.auth.AccessTokenError::TYPE.RETRIES_EXCEEDED, z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
+              @logger.log @logger.levels.WARN, "Redirecting to login: #{error.message}", error
+              @_redirect_to_login false
+            else
+              @logger.log @logger.levels.ERROR, "Could not get access token: #{error.message}. Logging out user.", error
+              @logout 'init_app'
         else
           @logger.log @logger.levels.WARN, 'No connectivity. Trigger reload on regained connectivity.', error
           @_watch_online_status()

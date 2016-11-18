@@ -83,7 +83,7 @@ class z.service.Client
 
   ###
   Request backend status.
-  @return [$.Promise] jquery ajax promise
+  @return [$.Promise] jquery AJAX promise
   ###
   status: =>
     $.ajax
@@ -93,24 +93,25 @@ class z.service.Client
 
   ###
   Delay a function call until backend connectivity is guaranteed.
-  @return [Promise] Promise that is resolved when connectivity is verified
+  @return [Promise] Promise that resolves once the connectivity is verified
   ###
   execute_on_connectivity: =>
     return new Promise (resolve) =>
-      check_status = =>
-        @logger.log @logger.levels.INFO, 'Checking connectivity status'
+
+      _check_status = =>
         @status()
-        .done =>
-          @logger.log @logger.levels.INFO, 'Connectivity verified.'
+        .done (jqXHR) =>
+          @logger.log @logger.levels.INFO, 'Connectivity verified', jqXHR
           resolve()
         .fail (jqXHR) =>
           if jqXHR.readyState is 4
-            @logger.log @logger.levels.INFO, "Connectivity verified by server error: #{jqXHR.statusText}"
+            @logger.log @logger.levels.INFO, "Connectivity verified by server error '#{jqXHR.status}'", jqXHR
             resolve()
           else
-            window.setTimeout check_status, 2000
+            @logger.log @logger.levels.WARN, 'Connectivity could not be verified... retrying'
+            window.setTimeout _check_status, 2000
 
-      check_status()
+      _check_status()
 
   # Execute queued requests.
   execute_request_queue: =>
