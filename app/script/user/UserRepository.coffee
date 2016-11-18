@@ -562,11 +562,25 @@ class z.user.UserRepository
 
   ###
   Change username.
-  @param name [String] New user name
+  @param name [String] New username
   ###
   change_username: (username) ->
     @self().username username
     return Promise.resolve()
+
+  ###
+  Verify that username is unique.
+  @param username [String] New user name
+  ###
+  verify_username: (username) ->
+    return Promise.resolve()
+
+  ###
+  Validate that username to match the specified characteristics.
+  @param username [String] New user name
+  ###
+  validate_username: (username) ->
+    return true
 
   ###
   Change the profile image.
