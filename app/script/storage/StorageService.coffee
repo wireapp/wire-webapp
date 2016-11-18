@@ -122,15 +122,6 @@ class z.storage.StorageService
       @db.on 'blocked', =>
         @logger.log @logger.levels.ERROR, 'Database is blocked'
 
-      # @see https://github.com/dfahlander/Dexie.js/issues/189#issuecomment-196304545
-      # @see https://github.com/dfahlander/Dexie.js/wiki/Dexie.UpgradeError
-      Dexie.Promise.on 'error', (error) =>
-        switch error.name
-          when Dexie.errnames.Upgrade
-            @logger.log @logger.levels.ERROR, "Failed to open database '#{@db_name}': #{error.message}", error
-          else
-            @logger.log @logger.levels.ERROR, "Database error (#{error.name}): #{error.message}", error
-
       # @see https://github.com/dfahlander/Dexie.js/wiki/Version.upgrade()
       # @see https://github.com/dfahlander/Dexie.js/wiki/WriteableCollection.modify()
       @db.version(1).stores version_1
