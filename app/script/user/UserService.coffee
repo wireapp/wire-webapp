@@ -50,15 +50,13 @@ class z.user.UserService
   @return [Promise] Promise that resolves when the connection request was created
   ###
   create_connection: (user_id, name, message) ->
-    payload =
-      user: user_id
-      name: name
-      message: message
-
     @client.send_json
       type: 'POST'
       url: @client.create_url @URL_CONNECTIONS
-      data: payload
+      data:
+        user: user_id
+        name: name
+        message: message
 
   ###
   Retrieves a list of connections to other users.
@@ -74,10 +72,10 @@ class z.user.UserService
   get_own_connections: (limit = 500, user_id = undefined) ->
     @client.send_request
       type: 'GET'
+      url: @client.create_url @URL_CONNECTIONS
       data:
         size: limit
         start: user_id
-      url: @client.create_url @URL_CONNECTIONS
 
   ###
   Updates a connection to another user.
@@ -160,6 +158,19 @@ class z.user.UserService
         email: email
 
   ###
+  Change username.
+
+  @param username [String] New username for the user
+  @return [Promise] Promise that resolves when username changing process has been started on backend
+  ###
+  change_own_username: (username) ->
+    @client.send_json
+      type: 'PUT'
+      url: @client.create_url '/self/handle'
+      data:
+        handle: username
+
+  ###
   Change user password.
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/changePassword
 
@@ -204,6 +215,20 @@ class z.user.UserService
       url: @client.create_url @URL_SELF
       data:
         todo: 'Change this to normal request!'
+
+  ###
+  Check if a user ID exists.
+  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/userExists
+  @example "496d0d21-0b05-49b5-8087-de94f3465b7b"
+
+  @param user_id [String] User ID
+  @param callback [Function] Function to be called on server return
+  ###
+  is_existing_user: (user_id, callback) ->
+    @client.send_request
+      type: 'HEAD'
+      url: @client.create_url "/users/#{user_id}"
+      callback: callback
 
   ###
   Get a set of users.
