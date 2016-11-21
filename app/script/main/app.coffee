@@ -466,6 +466,7 @@ class z.main.App
     document.body.appendChild live_reload
     $('html').addClass 'development'
 
+
 ###############################################################################
 # Setting up the App
 ###############################################################################
