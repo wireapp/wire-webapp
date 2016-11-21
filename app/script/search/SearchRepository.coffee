@@ -31,8 +31,6 @@ class z.search.SearchRepository
 
     @search_result_mapper = new z.search.SearchResultMapper @user_repository
 
-    @suggested_search_ets = []
-
     amplify.subscribe z.event.WebApp.SEARCH.ONBOARDING, @show_onboarding
 
   ###
@@ -53,26 +51,11 @@ class z.search.SearchRepository
   @return [Promise] Promise that resolves with suggestions
   ###
   get_suggestions: ->
-    return new Promise (resolve, reject) =>
-      @suggested_search_ets = z.util.StorageUtil.get_value(z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS) or []
-
-      if @suggested_search_ets.length > 0
-        @_prepare_search_result @suggested_search_ets, z.search.SEARCH_MODE.SUGGESTIONS
-        .then (user_ets) -> resolve user_ets
-        .catch (error) -> reject error
-      else
-        @search_service.get_suggestions z.config.SUGGESTIONS_FETCH_LIMIT
-        .then (response) =>
-          return @search_result_mapper.map_results response.documents, z.search.SEARCH_MODE.SUGGESTIONS
-        .then ([search_ets, mode]) =>
-          return @_prepare_search_result search_ets, mode
-        .then (search_ets) =>
-          # store suggested user ids
-          @suggested_search_ets = search_ets
-          z.util.StorageUtil.set_value z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS, @suggested_search_ets, 15 * 60
-          resolve search_ets
-        .catch (error) ->
-          reject error
+    return @search_service.get_suggestions z.config.SUGGESTIONS_FETCH_LIMIT
+    .then (response) =>
+      return @search_result_mapper.map_results response.documents, z.search.SEARCH_MODE.SUGGESTIONS
+    .then ([search_ets, mode]) =>
+      return @_prepare_search_result search_ets, mode
 
   ###
   Get top people.
@@ -92,14 +75,6 @@ class z.search.SearchRepository
   ###
   ignore_suggestion: (user_id) ->
     @search_service.put_suggestions_ignore user_id
-    .then =>
-      search_et = ko.utils.arrayFirst @suggested_search_ets, (search_et) ->
-        search_et.id is user_id
-
-      # remove ignored user from the suggested user ids
-      user_id_index = @suggested_search_ets.indexOf search_et
-      @suggested_search_ets.splice user_id_index, 1 if user_id_index > -1
-      z.util.StorageUtil.set_value z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS, @suggested_search_ets, 30
 
   ###
   Search for users on the backend by name.
