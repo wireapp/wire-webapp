@@ -46,18 +46,6 @@ class z.search.SearchRepository
       return @_prepare_search_result search_ets, mode
 
   ###
-  Get "People you may know" (PYMK).
-  @param size [Integer] Number of requested user
-  @return [Promise] Promise that resolves with suggestions
-  ###
-  get_suggestions: ->
-    return @search_service.get_suggestions z.config.SUGGESTIONS_FETCH_LIMIT
-    .then (response) =>
-      return @search_result_mapper.map_results response.documents, z.search.SEARCH_MODE.SUGGESTIONS
-    .then ([search_ets, mode]) =>
-      return @_prepare_search_result search_ets, mode
-
-  ###
   Get top people.
   @return [Function] Promise that resolves with the top connections
   ###

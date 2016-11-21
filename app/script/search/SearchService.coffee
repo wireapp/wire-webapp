@@ -53,16 +53,6 @@ class z.search.SearchService
       url: @client.create_url "/search/contacts?q=#{encodeURIComponent(query)}&size=#{size}&l=#{level}&d=#{directory}"
 
   ###
-  Get "People you may know" (PYMK).
-  @param size [Integer] Number of requested user
-  @return [Promise] Promise that resolves with the contact suggestions
-  ###
-  get_suggestions: (size) ->
-    @client.send_request
-      type: 'GET'
-      url: @client.create_url "/search/suggestions?size=#{size}"
-
-  ###
   Get top people.
   @param [Integer] size number of requested user
   @return [Promise] Promise that resolves with the top connections

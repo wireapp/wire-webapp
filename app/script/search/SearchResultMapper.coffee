@@ -39,8 +39,7 @@ class z.search.SearchResultMapper
       for search_result in search_results
         search_et = {}
         search_et.id = search_result.id
-        if mode in [z.search.SEARCH_MODE.CONTACTS, z.search.SEARCH_MODE.SUGGESTIONS]
-          search_et.mutual_friends_total = search_result.total_mutual_friends
-          search_et.mutual_friend_ids = search_result.mutual_friends
+        search_et.mutual_friends_total = search_result.total_mutual_friends
+        search_et.mutual_friend_ids = search_result.mutual_friends
         search_ets.push search_et
       resolve [search_ets, mode]
