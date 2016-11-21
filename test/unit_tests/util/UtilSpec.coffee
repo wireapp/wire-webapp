@@ -173,6 +173,22 @@ describe 'z.util.create_random_uuid', ->
     expected = true
     expect(actual).toBe expected
 
+describe 'z.util.is_uuid', ->
+  it 'returns true for v4 uuid', ->
+    for i in [0..10]
+      expect(z.util.is_uuid(z.util.create_random_uuid())).toBeTruthy()
+
+  it 'returns false for v1 uuid', ->
+    for i in [0..10]
+      expect(z.util.is_uuid(UUID.genV1())).toBeFalsy()
+
+  it 'returns false for non uuid values', ->
+    expect(z.util.is_uuid()).toBeFalsy()
+    expect(z.util.is_uuid(null)).toBeFalsy()
+    expect(z.util.is_uuid(1)).toBeFalsy()
+    expect(z.util.is_uuid("test")).toBeFalsy()
+    expect(z.util.is_uuid({})).toBeFalsy()
+
 describe 'z.util.format_bytes', ->
   it 'renders 0 bytes', ->
     actual = z.util.format_bytes 0

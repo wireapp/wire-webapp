@@ -255,6 +255,14 @@ z.util.phone_number_to_e164 = (phone_number, country_code) ->
 z.util.create_random_uuid = ->
   return UUID.genV4().hexString
 
+###
+Checks if input is a version 4 UUID
+
+@param uuid [String]
+###
+z.util.is_uuid = (uuid) ->
+  uuid = UUID.parse uuid
+  return uuid && uuid.version is 4
 
 z.util.encode_base64 = (text) ->
   return window.btoa text
