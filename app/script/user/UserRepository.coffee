@@ -566,6 +566,13 @@ class z.user.UserRepository
       @user_service.update_own_user_profile({name: name}).then => @self().name name
 
   ###
+  Generate username based on users full name.
+  @param full_name [String] users full name
+  ###
+  generate_username: (full_name) ->
+    return Promise.resolve 'username'
+
+  ###
   Change username.
   @param name [String] New username
   ###
