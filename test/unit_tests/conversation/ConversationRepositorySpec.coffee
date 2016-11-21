@@ -150,7 +150,7 @@ describe 'z.conversation.ConversationRepository', ->
       expect(conversation_repository._on_member_join).not.toHaveBeenCalled()
 
     # @todo Cached conversation events are not properly reset anymore
-    xit 'caches events while getting the conversation from the backend', ->
+    xit 'caches events while getting the conversation from the backend', (done) ->
       expect(conversation_repository.conversations().length).toBe 1
       conversation_repository.conversations.removeAll()
       expect(conversation_repository.conversations().length).toBe 0
@@ -164,10 +164,12 @@ describe 'z.conversation.ConversationRepository', ->
 
       server.respond()
       expect(conversation_repository.fetching_conversations[conversation_et.id]).toBeUndefined()
-      conversation = conversation_repository.get_conversation_by_id conversation_et.id
-      expect(conversation.messages().length).toBe 2
-      expect(conversation.messages()[0].type).toBe z.event.Backend.CONVERSATION.MEMBER_JOIN
-      expect(conversation.messages()[1].type).toBe z.event.Backend.CONVERSATION.MESSAGE_ADD
+      conversation_repository.get_conversation_by_id conversation_et.id
+      .then (conversation_et) ->
+        expect(conversation_et.messages().length).toBe 2
+        expect(conversation_et.messages()[0].type).toBe z.event.Backend.CONVERSATION.MEMBER_JOIN
+        expect(conversation_et.messages()[1].type).toBe z.event.Backend.CONVERSATION.MESSAGE_ADD
+        done()
 
   describe 'map connection', ->
     connection_et = undefined

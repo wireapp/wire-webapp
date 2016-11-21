@@ -180,24 +180,26 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation to be saved
   @return [Boolean] Is the conversation active
   ###
-  fetch_conversation_by_id: (conversation_id, callback) ->
-    for id, callbacks of @fetching_conversations when id is conversation_id
-      callbacks.push callback
-      return
-
-    @fetching_conversations[conversation_id] = [callback]
-
-    @conversation_service.get_conversation_by_id conversation_id, (response, error) =>
-      if response
-        conversation_et = @conversation_mapper.map_conversation response
-        @save_conversation conversation_et
-        @logger.log @logger.levels.INFO, "Conversation with ID '#{conversation_id}' fetched from backend"
-        callbacks = @fetching_conversations[conversation_id]
-        for callback in callbacks
-          callback? conversation_et
-        delete @fetching_conversations[conversation_id]
+  fetch_conversation_by_id: (conversation_id) ->
+    return new Promise (resolve, reject) =>
+      if @fetching_conversations[conversation_id]
+        promises.push {resolve: resolve, reject: reject}
+        return
       else
-        @logger.log @logger.levels.ERROR, "Conversation with ID '#{conversation_id}' could not be fetched from backend"
+        @fetching_conversations[conversation_id] = [{resolve: resolve, reject: reject}]
+
+        @conversation_service.get_conversation_by_id conversation_id
+        .then (response) =>
+          conversation_et = @conversation_mapper.map_conversation response
+          @save_conversation conversation_et
+          @logger.log @logger.levels.INFO, "Conversation with ID '#{conversation_id}' fetched from backend"
+          promise.resolve conversation_et for promise in @fetching_conversations[conversation_id]
+          delete @fetching_conversations[conversation_id]
+        .catch (error) =>
+          @logger.log @logger.levels.ERROR, "Failed to get conversation  '#{conversation_id}' from backend: #{error.message}", error
+          reject_error = new z.conversation.ConversationError z.conversation.ConversationError::TYPE.REQUEST_FAILED
+          promise.reject reject_error for promise in @fetching_conversations[conversation_id]
+          delete @fetching_conversations[conversation_id]
 
   ###
   Retrieve all conversations using paging.
@@ -317,13 +319,14 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] Conversation
   ###
   find_conversation_by_id: (conversation_id) ->
+    throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NO_CONVERSATION_ID if not conversation_id
     return conversation for conversation in @conversations() when conversation.id is conversation_id
+    throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NOT_FOUND
 
-  get_all_users_in_conversation: (conversation_id) ->
-    return new Promise (resolve) =>
-      @get_conversation_by_id conversation_id, (conversation_et) =>
-        others = conversation_et.participating_user_ets()
-        resolve others.concat [@user_repository.self()]
+  get_all_users_in_conversation: (conversation_id) =>
+    @get_conversation_by_id conversation_id
+    .then (conversation_et) =>
+      return [@user_repository.self()].concat conversation_et.participating_user_ets()
 
   ###
   Check for conversation locally and fetch it from the server otherwise.
@@ -331,18 +334,23 @@ class z.conversation.ConversationRepository
   @param callback [Function] Function to be called on server return
   ###
   get_conversation_by_id: (conversation_id, callback) ->
-    if not conversation_id
-      throw new Error 'Trying to get conversation without ID'
-      return
+    # Deprecated legacy method, remove once dependency in https://github.com/wireapp/wire-desktop/blob/master/electron/js/menu/context.js#L158 is resolved
+    if _.isFunction callback
+      return @_get_conversation_by_id callback
 
-    conversation_et = @find_conversation_by_id conversation_id
-    if callback
-      if conversation_et?
-        callback? conversation_et
+    Promise.resolve()
+    .then =>
+      return @find_conversation_by_id conversation_id
+    .catch (error) =>
+      if error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
+        return @fetch_conversation_by_id conversation_id
+      throw error
+    .catch (error) =>
+      if error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
+        @logger.log @logger.levels.WARN, "Conversation '#{conversation_id}' was not found"
       else
-        @fetch_conversation_by_id conversation_id, callback
-
-    return conversation_et
+        @logger.log @logger.levels.ERROR, "Failed to get conversation '#{conversation_id}': #{error.message}", error
+        throw error
 
   ###
   Get group conversations by name
@@ -402,15 +410,16 @@ class z.conversation.ConversationRepository
       if not conversation_id or not message_id
         return resolve false
 
-      @get_conversation_by_id conversation_id, (conversation_et) =>
+      @get_conversation_by_id conversation_id
+      .then (conversation_et) =>
         @get_message_in_conversation_by_id conversation_et, message_id
-        .then (message_et) ->
-          resolve conversation_et.last_read_timestamp() >= message_et.timestamp
-        .catch (error) ->
-          if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-            resolve true
-          else
-            reject error
+      .then (message_et) ->
+        resolve conversation_et.last_read_timestamp() >= message_et.timestamp
+      .catch (error) ->
+        if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+          resolve true
+        else
+          reject error
 
   ###
   Load the conversation states from the store.
@@ -419,7 +428,7 @@ class z.conversation.ConversationRepository
     @conversation_service.load_conversation_states_from_db()
     .then (conversation_states) =>
       for state in conversation_states
-        conversation_et = @get_conversation_by_id state.id
+        conversation_et = @find_conversation_by_id state.id
         @conversation_mapper.update_self_status conversation_et, state
 
       @logger.log @logger.levels.INFO, "Updated '#{conversation_states.length}' conversation states"
@@ -436,22 +445,31 @@ class z.conversation.ConversationRepository
   ###
   map_connection: (connection_ets, show_conversation = false) =>
     for connection_et in connection_ets
-      conversation_et = @get_conversation_by_id connection_et.conversation_id
-
-      # We either accepted a pending connection request or send new connection request
-      states_to_fetch = [z.user.ConnectionStatus.ACCEPTED, z.user.ConnectionStatus.SENT]
-      if not conversation_et and connection_et.status() in states_to_fetch
-        @fetch_conversation_by_id connection_et.conversation_id, (conversation_et) =>
-          if conversation_et
-            @save_conversation conversation_et
-            conversation_et.connection connection_et
-            @update_participating_user_ets conversation_et, (conversation_et) ->
-              amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et if show_conversation
-      else if conversation_et?
+      Promise.resolve()
+      .then =>
+        return @find_conversation_by_id connection_et.conversation_id
+      .then (conversation_et) =>
         conversation_et.connection connection_et
         @update_participating_user_ets conversation_et, (conversation_et) ->
           if connection_et.status() is z.user.ConnectionStatus.ACCEPTED
             conversation_et.type z.conversation.ConversationType.ONE2ONE
+      .catch (error) =>
+        if error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
+          # We either accepted a pending connection request or send new connection request
+          states_to_fetch = [z.user.ConnectionStatus.ACCEPTED, z.user.ConnectionStatus.SENT]
+          if connection_et.status() in states_to_fetch
+            @fetch_conversation_by_id connection_et.conversation_id
+            .then (conversation_et) =>
+              @save_conversation conversation_et
+              conversation_et.connection connection_et
+              @update_participating_user_ets conversation_et, (conversation_et) ->
+                amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et if show_conversation
+      .catch (error) =>
+        if error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
+          @logger.log @logger.levels.WARN, "Could not map connection '#{connection_et.id}' as conversation '#{connection_et.conversation_id}' does not exist", connection_et
+        else
+          @logger.log @logger.levels.ERROR, "Failed to map connection '#{connection_et.id}' to its conversation", connection_et
+          throw error
 
     if not @has_initialized_participants
       @logger.log @logger.levels.INFO, 'Updating group participants offline'
@@ -479,9 +497,12 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation to be saved in the repository
   ###
   save_conversation: (conversation_et) =>
-    if not @get_conversation_by_id conversation_et.id
-      @conversations.push conversation_et
-      @save_conversation_in_db conversation_et
+    try
+      @find_conversation_by_id conversation_et.id
+    catch error
+      if error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
+        @conversations.push conversation_et
+        @save_conversation_in_db conversation_et
 
   save_conversation_in_db: (conversation_et, updated_field) =>
     @conversation_service.save_conversation_in_db conversation_et, updated_field
@@ -1620,7 +1641,8 @@ class z.conversation.ConversationRepository
       return if connection_et?.status() is z.user.ConnectionStatus.PENDING
 
     # Check if conversation was archived
-    @get_conversation_by_id event.conversation, (conversation_et) =>
+    @get_conversation_by_id event.conversation
+    .then (conversation_et) =>
       previously_archived = conversation_et.is_archived()
 
       switch event.type
@@ -1632,10 +1654,10 @@ class z.conversation.ConversationRepository
           @_on_member_leave conversation_et, event
         when z.event.Backend.CONVERSATION.MEMBER_UPDATE
           @_on_member_update conversation_et, event
-        when z.event.Backend.CONVERSATION.RENAME
-          @_on_rename conversation_et, event
         when z.event.Backend.CONVERSATION.MESSAGE_ADD
           @_on_message_add conversation_et, event
+        when z.event.Backend.CONVERSATION.RENAME
+          @_on_rename conversation_et, event
         when z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE
           @_on_asset_upload_complete conversation_et, event
         when z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED
@@ -1645,7 +1667,7 @@ class z.conversation.ConversationRepository
         when z.event.Client.CONVERSATION.CONFIRMATION
           @_on_confirmation conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_DELETE
-          @_on_message_deleted conversation_et, event
+          @_on_message_delete conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_HIDDEN
           @_on_message_hidden event
         when z.event.Client.CONVERSATION.REACTION
@@ -1741,15 +1763,16 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] The conversation that was created
   ###
   _on_create: (event_json) ->
-    conversation_et = @find_conversation_by_id event_json.id
-
-    if not conversation_et?
-      conversation_et = @conversation_mapper.map_conversation event_json
-      @update_participating_user_ets conversation_et, (conversation_et) =>
-        @_send_conversation_create_notification conversation_et
-      @save_conversation conversation_et
-
-    return conversation_et
+    try
+      return @find_conversation_by_id event_json.id
+    catch error
+      if error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
+        conversation_et = @conversation_mapper.map_conversation event_json
+        @update_participating_user_ets conversation_et, (conversation_et) =>
+          @_send_conversation_create_notification conversation_et
+        @save_conversation conversation_et
+        return conversation_et
+      throw error
 
   ###
   User were added to a group conversation.
