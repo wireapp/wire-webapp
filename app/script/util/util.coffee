@@ -77,12 +77,11 @@ z.util.load_url_buffer = (url, xhr_accessor_function) ->
     xhr.send()
 
 
-z.util.load_url_blob = (url, callback) ->
+z.util.load_url_blob = (url) ->
   z.util.load_url_buffer url
   .then (value) ->
     [buffer, type] = value
-    image_as_blob = new Blob [new Uint8Array buffer], type: type
-    callback? image_as_blob
+    return new Blob [new Uint8Array buffer], type: type
 
 
 z.util.append_url_parameter = (url, param) ->

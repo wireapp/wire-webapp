@@ -708,6 +708,7 @@ class z.conversation.ConversationRepository
     z.util.load_url_blob url, (blob) =>
       @send_message message, conversation_et
       @upload_images conversation_et, [blob]
+    .then ->
       callback?()
 
   ###

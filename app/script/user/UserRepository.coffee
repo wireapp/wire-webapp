@@ -640,12 +640,13 @@ class z.user.UserRepository
   Set users default profile image.
   ###
   set_default_picture: ->
-    z.util.load_url_blob z.config.UNSPLASH_URL, (blob) =>
+    z.util.load_url_blob z.config.UNSPLASH_URL
+    .then (blob) =>
       @change_picture blob
-      .then ->
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
-          source: 'unsplash'
-          outcome: 'success'
+    .then ->
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
+        source: 'unsplash'
+        outcome: 'success'
 
   ###############################################################################
   # Tracking helpers
