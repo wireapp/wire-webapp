@@ -106,7 +106,7 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.ASSET.CANCEL, @cancel_asset_upload
     amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
-    amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTION, @map_connection
+    amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
     amplify.subscribe z.event.WebApp.CONVERSATION.STORE, @save_conversation_in_db
     amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
@@ -191,13 +191,14 @@ class z.conversation.ConversationRepository
       if response
         conversation_et = @conversation_mapper.map_conversation response
         @save_conversation conversation_et
-        @logger.log @logger.levels.INFO, "Conversation with ID '#{conversation_id}' fetched from backend"
+        @logger.log @logger.levels.INFO, "Fetched conversation '#{conversation_id}' from backend"
         callbacks = @fetching_conversations[conversation_id]
         for callback in callbacks
           callback? conversation_et
         delete @fetching_conversations[conversation_id]
       else
-        @logger.log @logger.levels.ERROR, "Conversation with ID '#{conversation_id}' could not be fetched from backend"
+        @logger.log @logger.levels.ERROR, "Failed to fetch conversation '#{conversation_id}' from backend: #{error.message}", error
+        throw error
 
   ###
   Retrieve all conversations using paging.
@@ -207,24 +208,23 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves when all conversations have been retrieved and saved
   ###
   get_conversations: (limit = 500, conversation_id) =>
-    return new Promise (resolve, reject) =>
-      @conversation_service.get_conversations limit, conversation_id
-      .then (response) =>
-        if response.has_more
-          last_conversation_et = response.conversations[response.conversations.length - 1]
-          @get_conversations limit, last_conversation_et.id
-          .then => resolve @conversations()
+    @conversation_service.get_conversations limit, conversation_id
+    .then (response) =>
+      if response.has_more
+        last_conversation_et = response.conversations[response.conversations.length - 1]
+        @get_conversations limit, last_conversation_et.id
+        .then => return @conversations()
 
-        if response.conversations.length > 0
-          conversation_ets = @conversation_mapper.map_conversations response.conversations
-          @save_conversations conversation_ets
+      if response.conversations.length > 0
+        conversation_ets = @conversation_mapper.map_conversations response.conversations
+        @save_conversations conversation_ets
 
-        if not response?.has_more
-          @load_conversation_states()
-          resolve @conversations()
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Failed to retrieve conversations from backend: #{error.message}", error
-        reject error
+      if not response?.has_more
+        @load_conversation_states()
+        return @conversations()
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Failed to retrieve conversations from backend: #{error.message}", error
+      throw error
 
   ###
   Get Message with given ID from the database.
@@ -286,8 +286,9 @@ class z.conversation.ConversationRepository
   @param user_et [z.entity.User] User you unblocked
   ###
   unblocked_user: (user_et) =>
-    conversation_et = @get_one_to_one_conversation user_et.id
-    conversation_et?.removed_from_conversation false
+    @get_one_to_one_conversation user_et
+    .then (conversation_et) ->
+      conversation_et.removed_from_conversation false
 
   ###
   Get users and events for conversations.
@@ -374,13 +375,18 @@ class z.conversation.ConversationRepository
 
   ###
   Get conversation with a user.
-  @param user_id [String] ID of user for whom to get the conversation
+  @param user_et [z.entity.User] User entity for whom to get the conversation
   @return [z.entity.Conversation] Conversation with requested user
   ###
-  get_one_to_one_conversation: (user_id) =>
-    for conversation_et in @conversations()
-      if conversation_et.type() in [z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.CONNECT]
-        return conversation_et if user_id is conversation_et.participating_user_ids()[0]
+  get_one_to_one_conversation: (user_et) =>
+    return new Promise (resolve) =>
+      for conversation_et in @conversations() when conversation_et.type() in [z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.CONNECT]
+        return resolve conversation_et if user_et.id is conversation_et.participating_user_ids()[0]
+
+      return @fetch_conversation_by_id user_et.connection().conversation_id, (conversation_et) =>
+        conversation_et.connection user_et.connection()
+        @update_participating_user_ets conversation_et, (conversation_et) ->
+          resolve conversation_et
 
   ###
   Check whether conversation is currently displayed.
@@ -428,25 +434,24 @@ class z.conversation.ConversationRepository
       @logger.log @logger.levels.ERROR, 'Failed to update conversation states', error
 
   ###
-  Maps a connection to the corresponding conversation
+  Maps user connection to the corresponding conversation.
 
   @note If there is no conversation it will request it from the backend
   @param [Array<z.entity.Connection>] Connections
   @param [Boolean] open the new conversation
   ###
-  map_connection: (connection_ets, show_conversation = false) =>
+  map_connections: (connection_ets, show_conversation = false) =>
+    @logger.log @logger.levels.INFO, "Mapping '#{connection_ets.length}' user connection(s) to conversations", connection_ets
     for connection_et in connection_ets
-      conversation_et = @get_conversation_by_id connection_et.conversation_id
+      conversation_et = @find_conversation_by_id connection_et.conversation_id
 
       # We either accepted a pending connection request or send new connection request
       states_to_fetch = [z.user.ConnectionStatus.ACCEPTED, z.user.ConnectionStatus.SENT]
       if not conversation_et and connection_et.status() in states_to_fetch
         @fetch_conversation_by_id connection_et.conversation_id, (conversation_et) =>
-          if conversation_et
-            @save_conversation conversation_et
-            conversation_et.connection connection_et
-            @update_participating_user_ets conversation_et, (conversation_et) ->
-              amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et if show_conversation
+          conversation_et.connection connection_et
+          @update_participating_user_ets conversation_et, (conversation_et) ->
+            amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et if show_conversation
       else if conversation_et?
         conversation_et.connection connection_et
         @update_participating_user_ets conversation_et, (conversation_et) ->
@@ -479,7 +484,7 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation to be saved in the repository
   ###
   save_conversation: (conversation_et) =>
-    if not @get_conversation_by_id conversation_et.id
+    if not @find_conversation_by_id conversation_et.id
       @conversations.push conversation_et
       @save_conversation_in_db conversation_et
 
@@ -686,11 +691,17 @@ class z.conversation.ConversationRepository
     @logger.log @logger.levels.INFO, "Resetting '#{Object.keys(sessions).length}' sessions"
     for session_id, session of sessions
       ids = z.client.Client.dismantle_user_client_id session_id
+
+      _reset_session = (conversation_et) =>
+        @reset_session ids.user_id, ids.client_id, conversation_et.id
+
       if ids.user_id is @user_repository.self().id
-        conversation_et = @self_conversation()
-      else
-        conversation_et = @get_one_to_one_conversation ids.user_id
-      @reset_session ids.user_id, ids.client_id, conversation_et.id
+        return _reset_session @self_conversation()
+
+      @user_repository.get_user_by_id ids.user_id, (user_et) =>
+        return @get_one_to_one_conversation user_et
+        .then (conversation_et) ->
+          _reset_session conversation_et
 
   ###
   Send a specific GIF to a conversation.

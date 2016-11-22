@@ -183,13 +183,13 @@ describe 'z.conversation.ConversationRepository', ->
       spyOn(client, 'send_request').and.callThrough()
 
     it 'maps connection to existing conversation', ->
-      conversation_repository.map_connection [connection_et]
+      conversation_repository.map_connections [connection_et]
       expect(conversation_et.connection()).toBe connection_et
 
     it 'maps connection to a new conversation', ->
       connection_et.status z.user.ConnectionStatus.ACCEPTED
       conversation_repository.conversations.removeAll()
-      conversation_repository.map_connection [connection_et]
+      conversation_repository.map_connections [connection_et]
 
       expect(conversation_repository.fetch_conversation_by_id).toHaveBeenCalled()
       expect(conversation_service.get_conversation_by_id).toHaveBeenCalled()
@@ -201,7 +201,7 @@ describe 'z.conversation.ConversationRepository', ->
 
     it 'maps cancelled connections to exiting conversation and filters it correctly', ->
       connection_et.status z.user.ConnectionStatus.CANCELLED
-      conversation_repository.map_connection [connection_et]
+      conversation_repository.map_connections [connection_et]
       expect(_find_conversation(conversation_et, conversation_repository.conversations)).not.toBeNull()
       expect(_find_conversation(conversation_et, conversation_repository.filtered_conversations)).toBeNull()
 
