@@ -156,7 +156,7 @@ describe 'z.conversation.ConversationService', ->
         expect(events[0].time).toBe 7
         done()
 
-    it 'loads events with start and end timestamp', (done) ->
+    it 'loads events with start and end timestamp and a fetch limit', (done) ->
       conversation_service.load_events_from_db conversation_id, 8, 1, 2
       .then (events) =>
         expect(events.length).toBe 2
