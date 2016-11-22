@@ -590,7 +590,11 @@ class z.user.UserRepository
   @param username [String] New user name
   ###
   validate_username: (username) ->
-    return true
+    if not _.isString username
+      return false
+    if username.length < 2 or username.length > 21 # TODO size may change
+      return false
+    return /^[a-zA-Z0-9_]*$/.test username
 
   ###
   Change the profile image.
