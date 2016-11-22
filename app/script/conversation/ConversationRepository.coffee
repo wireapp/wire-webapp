@@ -246,7 +246,9 @@ class z.conversation.ConversationRepository
     return new Promise (resolve, reject) =>
       conversation_et.is_pending true
       timestamp = conversation_et.get_first_message()?.timestamp
-      @conversation_service.load_events_from_db conversation_et.id, timestamp, null, z.config.MESSAGES_FETCH_LIMIT
+      end = null
+      end = new Date(0).toISOString() if timestamp
+      @conversation_service.load_events_from_db conversation_et.id, timestamp, end, z.config.MESSAGES_FETCH_LIMIT
       .then (events) =>
         if events.length < z.config.MESSAGES_FETCH_LIMIT
           conversation_et.has_further_messages false
