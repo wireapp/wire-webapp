@@ -407,19 +407,17 @@ class z.user.UserRepository
   @return [Promise] Promise that will resolve with the self user entity
   ###
   get_me: =>
-    return new Promise (resolve, reject) =>
-      @user_service.get_own_user()
-      .then (response) =>
-        user_et = @user_mapper.map_user_from_object response
-        # TODO: This needs to be represented by a SelfUser class!
-        # Only the "self / own" user has a tracking ID & locale
-        user_et.tracking_id = response.tracking_id
-        user_et.locale = response.locale
-        @save_user user_et, true
-        resolve user_et
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Unable to load self user: #{error}"
-        reject error
+    @user_service.get_own_user()
+    .then (response) =>
+      user_et = @user_mapper.map_user_from_object response
+      # TODO: This needs to be represented by a SelfUser class!
+      # Only the "self / own" user has a tracking ID & locale
+      user_et.tracking_id = response.tracking_id
+      user_et.locale = response.locale
+      return @save_user user_et, true
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Unable to load self user: #{error}"
+      throw error
 
   ###
   Check for user locally and fetch it from the server otherwise.
