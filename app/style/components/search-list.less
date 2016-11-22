@@ -159,20 +159,20 @@
 }
 
 .search-list-item-content-info {
-  display: none;
-
-  .search-list-lg & {
-    .ellipsis;
-    font-size: @font-size-xs;
-    color: fade(#fff, 56%);
-    display: block;
-    height: 17px;
-    width: 100%;
-  }
+  display: flex;
+  font-size: @font-size-xs;
+  color: fade(#fff, 56%);
+  height: 16px;
 }
 
 .search-list-item-content-username:before {
   content: "@";
+}
+
+.search-list-item-content-friends:before {
+  content: "-";
+  margin-left: 4px;
+  margin-right: 4px;
 }
 
 .search-list-item-connect {

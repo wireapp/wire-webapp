@@ -120,9 +120,10 @@ ko.components.register 'user-list',
                   </div>
                   <div class="search-list-item-content">
                     <div class="search-list-item-content-name" data-bind="text: name"></div>
-                    <!-- ko if: $parent.mode === z.components.UserListMode.INFO -->
-                      <div class="search-list-item-content-username search-list-item-content-info" data-bind="text: $data.username"></div>
-                    <!-- /ko -->
+                    <div class="search-list-item-content-info">
+                      <span class="search-list-item-content-username" data-bind="text: $data.username"></span>
+                      <span class="search-list-item-content-friends">0 friends in common</span>
+                    </div>
                   </div>
                   <div class="search-list-item-connect" data-bind="visible: $parent.show_buttons()">
                     <span class="icon-dismiss icon-button" data-bind="click: $parent.on_dismiss"></span>
