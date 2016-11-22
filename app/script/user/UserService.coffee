@@ -21,7 +21,6 @@ z.user ?= {}
 
 ###
 User service for all user and connection calls to the backend REST API.
-@todo move everything that is not users or self (e.g. login,register,activate) to AuthService?
 ###
 class z.user.UserService
   URL_CONNECTIONS: '/connections'
@@ -217,18 +216,14 @@ class z.user.UserService
         todo: 'Change this to normal request!'
 
   ###
-  Check if a user ID exists.
-  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/userExists
-  @example "496d0d21-0b05-49b5-8087-de94f3465b7b"
+  Check if a username exists.
 
-  @param user_id [String] User ID
-  @param callback [Function] Function to be called on server return
+  @param username [String]
   ###
-  is_existing_user: (user_id, callback) ->
+  is_existing_username: (username) ->
     @client.send_request
       type: 'HEAD'
-      url: @client.create_url "/users/#{user_id}"
-      callback: callback
+      url: @client.create_url "/users/#{username}" # TODO or /users/handle
 
   ###
   Get a set of users.
