@@ -663,8 +663,11 @@ describe 'z.conversation.ConversationRepository', ->
         done()
       .catch done.fail
 
-    describe '412 handling', ->
+    describe 'handling a client mismatch response', ->
+      client_mismatch = undefined
       generic_message = undefined
+      payload = undefined
+
       john_doe = undefined
       jane_roe = undefined
 
@@ -680,15 +683,7 @@ describe 'z.conversation.ConversationRepository', ->
           user_id: entities.user.jane_roe.id
 
       beforeEach ->
-
-      it 'can remove the payload of deleted clients', (done) ->
         spyOn(user_repository, 'remove_client_from_user').and.returnValue Promise.resolve()
-        error_response =
-          missing: {}
-          deleted:
-            "#{jane_roe.user_id}": ["#{jane_roe.client_id}"]
-          redundant: {}
-          time: '2016-04-29T10:38:23.002Z'
 
         payload =
           sender: '43619b6a2ec22e24'
@@ -696,28 +691,52 @@ describe 'z.conversation.ConversationRepository', ->
             "#{jane_roe.user_id}":
               "#{jane_roe.client_id}": '💣'
 
-        conversation_repository._update_payload_for_changed_clients error_response, generic_message, payload
-        .then (updated_payload) ->
-          expect(Object.keys(updated_payload.recipients).length).toBe 0
-          done()
-        .catch done.fail
-
-      it 'can encrypt a generic message for a missing clients', (done) ->
+      it 'adds missing clients to the payload', (done) ->
         session = new cryptobox.CryptoboxSession "#{john_doe.user_id}@#{john_doe.client_id}"
         spyOn(cryptography_repository, 'load_session').and.returnValue session
         spyOn(user_repository, 'add_client_to_user').and.returnValue Promise.resolve()
 
-        error_response =
+        client_mismatch =
           missing:
             "#{john_doe.user_id}": ["#{john_doe.client_id}"]
           deleted: {}
           redundant: {}
           time: '2016-04-29T10:38:23.002Z'
 
-        conversation_repository._update_payload_for_changed_clients error_response, generic_message
+        conversation_repository._handle_client_mismatch conversation_et.id, client_mismatch, generic_message, payload
+          .then (updated_payload) ->
+            expect(Object.keys(updated_payload.recipients).length).toBe 2
+            expect(Object.keys(updated_payload.recipients[john_doe.user_id]).length).toBe 1
+            done()
+          .catch done.fail
+
+      it 'removes the payload of deleted clients', (done) ->
+        client_mismatch =
+          missing: {}
+          deleted:
+            "#{jane_roe.user_id}": ["#{jane_roe.client_id}"]
+          redundant: {}
+          time: '2016-04-29T10:38:23.002Z'
+
+        conversation_repository._handle_client_mismatch conversation_et.id, client_mismatch, generic_message, payload
         .then (updated_payload) ->
-          expect(Object.keys(updated_payload.recipients).length).toBe 1
-          expect(Object.keys(updated_payload.recipients[john_doe.user_id]).length).toBe 1
+          expect(user_repository.remove_client_from_user).toHaveBeenCalled()
+          expect(Object.keys(updated_payload.recipients).length).toBe 0
+          done()
+        .catch done.fail
+
+      it 'removes the payload of redundant clients', (done) ->
+        client_mismatch =
+          missing: {}
+          deleted: {}
+          redundant:
+            "#{jane_roe.user_id}": ["#{jane_roe.client_id}"]
+          time: '2016-04-29T10:38:23.002Z'
+
+        conversation_repository._handle_client_mismatch conversation_et.id, client_mismatch, generic_message, payload
+        .then (updated_payload) ->
+          expect(user_repository.remove_client_from_user).not.toHaveBeenCalled()
+          expect(Object.keys(updated_payload.recipients).length).toBe 0
           done()
         .catch done.fail
 
