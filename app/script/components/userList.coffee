@@ -122,7 +122,9 @@ ko.components.register 'user-list',
                     <div class="search-list-item-content-name" data-bind="text: name"></div>
                     <div class="search-list-item-content-info">
                       <span class="search-list-item-content-username" data-bind="text: $data.username"></span>
-                      <span class="search-list-item-content-friends">0 friends in common</span>
+                      <!-- ko ifnot: $data.connected() -->
+                        <span class="search-list-item-content-friends">0 friends in common</span>
+                      <!-- /ko -->
                     </div>
                   </div>
                   <div class="search-list-item-connect" data-bind="visible: $parent.show_buttons()">
