@@ -463,6 +463,7 @@ z.string.search_others = 'Connect'
 z.string.search_suggestion_one = 'Knows %@.first_name'
 z.string.search_suggestion_two = 'Knows %@.first_name and %@.other_name'
 z.string.search_suggestion_many = 'Knows %@.first_name and %no others'
+z.string.search_friends_in_common = '%no friends in common'
 
 # Picture upload
 z.string.upload_welcome = 'Wire is so much nicer with a picture.'
