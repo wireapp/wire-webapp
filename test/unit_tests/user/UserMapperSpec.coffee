@@ -92,6 +92,13 @@ describe 'User Mapper', ->
       updated_user_et = mapper.update_user_from_object user_et, data
       expect(updated_user_et.name()).toBe entities.user.jane_roe.name
 
+    it 'can update the user handle', ->
+      user_et = new z.entity.User()
+      user_et.id = entities.user.john_doe.id
+      data = {'handle': entities.user.jane_roe.handle, 'id': entities.user.john_doe.id}
+      updated_user_et = mapper.update_user_from_object user_et, data
+      expect(updated_user_et.username()).toBe entities.user.jane_roe.handle
+
     it 'cannot update the user name of a wrong user', ->
       user_et = new z.entity.User()
       user_et.id = entities.user.john_doe.id
