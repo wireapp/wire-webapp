@@ -379,7 +379,7 @@ class z.ViewModel.list.StartUIViewModel
       @invite_message z.localization.Localizer.get_text
         id: z.string.invite_message
         replace: [
-          {placeholder: '%mail', content: self.email()}
+          {placeholder: '%username', content: "@#{self.username()}"}
         ]
     else
       @invite_message z.localization.Localizer.get_text z.string.invite_message_no_email
