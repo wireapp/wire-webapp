@@ -291,23 +291,15 @@ class z.conversation.ConversationService
   @return [Promise] Promise that resolves with the retrieved records
   ###
   load_events_from_db: (conversation_id, start, end, limit) ->
+    start = new Date(0).toISOString() if not start
+    end = new Date().toISOString() if not end
+
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-    .where 'conversation'
-    .equals conversation_id
+    .where '[conversation+time]'
+    .between [conversation_id, start], [conversation_id, end]
     .reverse()
-    .sortBy 'time'
-    .then (records) ->
-      return records.filter (record) ->
-        timestamp = new Date(record.time).getTime()
-        return false if start and timestamp >= start
-        return false if end and timestamp <= end
-        return true
-    .then (records) ->
-      return records.slice 0, limit
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR,
-        "Failed to get events for conversation '#{conversation_id}': #{error.message}", error
-      throw error
+    .limit limit
+    .toArray()
 
   ###
   Add a bot to an existing conversation.
