@@ -291,8 +291,12 @@ class z.conversation.ConversationService
   @return [Promise] Promise that resolves with the retrieved records
   ###
   load_events_from_db: (conversation_id, start, end, limit) ->
-    start = new Date(0).toISOString() if not start
-    end = new Date().toISOString() if not end
+    if not end
+      if start
+        end = new Date(0).toISOString()
+      else
+        start = new Date(0).toISOString() if not start
+        end = new Date().toISOString() if not end
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
