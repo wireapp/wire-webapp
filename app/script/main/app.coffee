@@ -323,7 +323,7 @@ class z.main.App
   # Hide the loading spinner and show the application UI.
   _show_ui: ->
     @logger.log @logger.levels.INFO, 'Showing application UI'
-    if true # should choose username
+    if @repository.user.should_change_username()
       amplify.publish z.event.WebApp.TAKEOVER.SHOW
     else if conversation_et = @repository.conversation.get_most_recent_conversation()
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et

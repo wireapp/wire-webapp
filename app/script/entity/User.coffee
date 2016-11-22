@@ -94,7 +94,7 @@ class z.entity.User
         initials = @first_name().slice 0, 2
       return initials.toUpperCase()
 
-    @username  = ko.observable ''
+    @username  = ko.observable 'username'
 
     @mutual_friend_ets = ko.observableArray []
     @mutual_friend_ids = ko.observableArray []

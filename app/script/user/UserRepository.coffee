@@ -564,6 +564,12 @@ class z.user.UserRepository
       @user_service.update_own_user_profile({name: name}).then => @self().name name
 
   ###
+  Whether the user needs to set a username.
+  ###
+  should_change_username: ->
+    return true
+
+  ###
   Generate username based on users full name.
   @param full_name [String] users full name
   ###
