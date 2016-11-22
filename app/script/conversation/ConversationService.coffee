@@ -280,6 +280,15 @@ class z.conversation.ConversationService
         "Failed to get event for conversation '#{conversation_id}': #{error.message}", error
       throw error
 
+  _load_all_conversation_events_from_db:(conversation_id, limit) ->
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+      .where 'conversation'
+      .equals conversation_id
+      .reverse()
+      .sortBy 'time'
+      .then (records) ->
+        return records.slice 0, limit
+
   ###
   Load conversation events. Start and end are not included.
   Events are always sorted beginning with the newest timestamp.
@@ -290,13 +299,12 @@ class z.conversation.ConversationService
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
   ###
-  load_events_from_db: (conversation_id, start, end, limit) ->
+  load_events_from_db: (conversation_id, start, end, limit = z.config.MESSAGES_FETCH_LIMIT) ->
     if not end
       if start
         end = new Date(0).toISOString()
       else
-        start = new Date(0).toISOString()
-        end = new Date().toISOString()
+        return @_load_all_conversation_events_from_db conversation_id, limit
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
