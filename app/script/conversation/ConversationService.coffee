@@ -280,15 +280,6 @@ class z.conversation.ConversationService
         "Failed to get event for conversation '#{conversation_id}': #{error.message}", error
       throw error
 
-  _load_all_conversation_events_from_db:(conversation_id, limit) ->
-    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where 'conversation'
-      .equals conversation_id
-      .reverse()
-      .sortBy 'time'
-      .then (records) ->
-        return records.slice 0, limit
-
   ###
   Load conversation events. Start and end are not included.
   Events are always sorted beginning with the newest timestamp.
@@ -317,6 +308,21 @@ class z.conversation.ConversationService
     .reverse()
     .limit limit
     .toArray()
+
+  ###
+  Load all conversation events.
+
+  @param conversation_id [String] ID of conversation
+  @param limit [Number] Amount of events to load
+  @return [Promise] Promise that resolves with the retrieved records
+  ###
+  _load_all_conversation_events_from_db: (conversation_id, limit) ->
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where 'conversation'
+    .equals conversation_id
+    .reverse()
+    .sortBy 'time'
+    .then (records) -> return records.slice 0, limit
 
   ###
   Add a bot to an existing conversation.
