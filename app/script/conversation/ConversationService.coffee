@@ -295,8 +295,8 @@ class z.conversation.ConversationService
       if start
         end = new Date(0).toISOString()
       else
-        start = new Date(0).toISOString() if not start
-        end = new Date().toISOString() if not end
+        start = new Date(0).toISOString()
+        end = new Date().toISOString()
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
