@@ -304,7 +304,7 @@ class z.conversation.ConversationService
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
-    .between [conversation_id, start], [conversation_id, end]
+    .between [conversation_id, start], [conversation_id, end], true, false
     .reverse()
     .limit limit
     .toArray()
