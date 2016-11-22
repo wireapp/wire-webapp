@@ -567,14 +567,36 @@ class z.user.UserRepository
   Whether the user needs to set a username.
   ###
   should_change_username: ->
-    return true
+    has_username = @has_username()
+    should_change_username = not has_username
+
+    if should_change_username
+      generated_username = @generate_username @self().name()
+      @change_username generated_username
+
+    return should_change_username
+
+  ###
+  Self user has username
+  ###
+  has_username: ->
+    return _.isString(@self().username()) and @self().username().length > 1
 
   ###
   Generate username based on users full name.
-  @param full_name [String] users full name
+  @param name [String] users full name
   ###
-  generate_username: (full_name) ->
-    return Promise.resolve 'username'
+  generate_username: (name) ->
+    generated_username = window.getSlug name
+      .replace /[^a-zA-Z0-9_]/, ''
+      .substring 0, 17
+
+    # if generated_username.length is 0
+      # TODO add random characters
+
+    generated_username = "#{generated_username}#{z.util.get_random_int(0, 10000)}"
+
+    return generated_username
 
   ###
   Change username.
@@ -589,7 +611,7 @@ class z.user.UserRepository
   @param username [String] New user name
   ###
   verify_username: (username) ->
-    return Promise.resolve()
+    return Promise.resolve @validate_username(username)
 
   ###
   Validate that username to match the specified characteristics.

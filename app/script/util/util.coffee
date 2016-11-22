@@ -255,6 +255,14 @@ z.util.create_random_uuid = ->
   return UUID.genV4().hexString
 
 ###
+Returns a random integer between min (included) and max (excluded)
+###
+z.util.get_random_int = (min, max) ->
+  min = Math.ceil min
+  max = Math.floor max
+  return Math.floor Math.random() * (max - min) + min;
+
+###
 Checks if input is a version 4 UUID
 
 @param uuid [String]

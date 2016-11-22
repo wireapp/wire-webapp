@@ -119,15 +119,9 @@
   color: @graphite;
 }
 
-.preferences-account-username.error {
-  & ~ .preferences-account-username-error {display: block;}
-}
-
 .preferences-account-username {
   padding-left: 22px;
   &:focus ~ .preferences-account-username-hint {display: block;}
-  &:focus ~ .preferences-account-username-error {display: none;}
 }
 
-.preferences-account-username-hint,
-.preferences-account-username-error {display: none;}
+.preferences-account-username-hint {display: none;}

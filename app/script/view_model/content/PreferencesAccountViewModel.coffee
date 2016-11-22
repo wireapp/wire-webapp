@@ -30,6 +30,8 @@ class z.ViewModel.content.PreferencesAccountViewModel
     @name = ko.pureComputed => @self_user().name()
     @username = ko.pureComputed => @self_user().username()
 
+    @username_error = ko.observable()
+
     @_init_subscriptions()
 
   _init_subscriptions: =>
@@ -55,14 +57,25 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
     if new_username and new_username isnt @self_user().username()
       @user_repository.change_username new_username
-      .then ->
-        e.target.classList.remove 'error'
-      .catch (error) ->
-        e.target.classList.add 'error'
+      .then =>
+        @username_error null
+      .catch =>
+        @username_error true
     else
       @username.notifySubscribers() # render old value
 
     e.target.blur()
+
+  # TODO throttle
+  verify_username: (username, e) =>
+    new_username = e.target.value
+
+    @user_repository.verify_username new_username
+    .then (verified) =>
+      if verified
+        @username_error null
+      else
+        @username_error true
 
   check_new_clients: =>
     return if not @new_clients().length
