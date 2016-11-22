@@ -306,6 +306,11 @@ class z.conversation.ConversationService
       else
         return @_load_all_conversation_events_from_db conversation_id, limit
 
+    if start > end
+      temp = start
+      start = end
+      end = temp
+
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
     .between [conversation_id, start], [conversation_id, end]
