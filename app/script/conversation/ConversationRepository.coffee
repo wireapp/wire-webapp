@@ -1847,21 +1847,22 @@ class z.conversation.ConversationRepository
     @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
     .then (message_et) =>
       changes = message_et.update_reactions event_json
-      if changes
-        @_update_user_ets message_et
-        @_send_reaction_notification conversation_et, message_et, event_json
-        @logger.log @logger.levels.DEBUG, "Updated reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
-        return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
-    .catch (error) =>
-      if error.type is z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
+      return if not changes
+
+      @_update_user_ets message_et
+      @_send_reaction_notification conversation_et, message_et, event_json
+      @logger.log @logger.levels.DEBUG, "Updated reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
+      return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
+      .catch (error) =>
+        throw error is error.type isnt z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
         if attempt < 10
-          window.setTimeout =>
-            @_on_reaction conversation_et, event_json
+          return window.setTimeout =>
+            @_on_reaction conversation_et, event_json, attempt + 1
           , 10 * attempt
-        else
-          @logger.log @logger.levels.INFO, "Failed to update reaction of message in conversation '#{conversation_et.id}'", error
-      else if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-        @logger.log @logger.levels.INFO, "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
+        @logger.log @logger.levels.ERROR, "Too many attempts to update reaction to message '#{message_et.id}' in conversation '#{conversation_et.id}'", error
+    .catch (error) =>
+      if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+        @logger.log @logger.levels.ERROR, "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
         throw error
 
   ###
