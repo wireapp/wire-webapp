@@ -322,9 +322,8 @@ class z.conversation.ConversationService
     if z.util.Environment.browser.edge or not end
       return @_load_events_from_db_deprecated conversation_id, start, end, limit
 
-    include_minimum = true
-    if start > end
-      include_minimum = false
+    include_minimum = start < end
+    if not include_minimum
       [start, end] = [end, start]
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
