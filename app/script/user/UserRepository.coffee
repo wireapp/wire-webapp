@@ -143,25 +143,24 @@ class z.user.UserRepository
   @return [Promise] Promise that resolves when all connections have been retrieved and mapped
   ###
   get_connections: (limit = 500, user_id, connection_ets = []) =>
-    return new Promise (resolve, reject) =>
-      @user_service.get_own_connections limit, user_id
-      .then (response) =>
-        if response.connections.length > 0
-          new_connection_ets = @connection_mapper.map_user_connections_from_json response.connections
-          connection_ets = connection_ets.concat new_connection_ets
+    @user_service.get_own_connections limit, user_id
+    .then (response) =>
+      if response.connections.length
+        new_connection_ets = @connection_mapper.map_user_connections_from_json response.connections
+        connection_ets = connection_ets.concat new_connection_ets
 
-        if response.has_more
-          last_connection_et = connection_ets[connection_ets.length - 1]
-          @get_connections limit, last_connection_et.to, connection_ets
-          .then => resolve @connections()
-        else if connection_ets.length > 0
-          @update_user_connections connection_ets, true
-          .then => resolve @connections()
-        else
-          resolve @connections()
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Failed to retrieve connections from backend: #{error.message}", error
-        reject error
+      if response.has_more
+        last_connection_et = connection_ets[connection_ets.length - 1]
+        return @get_connections limit, last_connection_et.to, connection_ets
+
+      if connection_ets.length
+        return @update_user_connections connection_ets, true
+        .then => return @connections()
+
+      return @connections()
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Failed to retrieve connections from backend: #{error.message}", error
+      throw error
 
   ###
   Ignore connection request.
