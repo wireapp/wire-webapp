@@ -133,24 +133,26 @@ class z.components.UserProfileViewModel
           else
             @user_repository.cancel_connection_request @user()
 
-          conversation_et = @conversation_repository.get_one_to_one_conversation @user().id
-          if @conversation_repository.is_active_conversation conversation_et
-            amplify.publish z.event.WebApp.CONVERSATION.PEOPLE.HIDE
-            next_conversation_et = @conversation_repository.get_next_conversation conversation_et
-            setTimeout ->
-              amplify.publish z.event.WebApp.CONVERSATION.SHOW, next_conversation_et
-            , 550
+          @conversation_repository.get_one_to_one_conversation @user()
+          .then (conversation_et) =>
+            if @conversation_repository.is_active_conversation conversation_et
+              amplify.publish z.event.WebApp.CONVERSATION.PEOPLE.HIDE
+              next_conversation_et = @conversation_repository.get_next_conversation conversation_et
+              window.setTimeout ->
+                amplify.publish z.event.WebApp.CONVERSATION.SHOW, next_conversation_et
+              , 550
 
-          params.cancel_request? @user()
+            params.cancel_request? @user()
 
     @on_open = =>
       amplify.publish z.event.WebApp.CONVERSATION.PEOPLE.HIDE
-      conversation_et = @conversation_repository.get_one_to_one_conversation @user().id
-      @conversation_repository.unarchive_conversation conversation_et if conversation_et.is_archived()
-      setTimeout =>
-        amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
-        params.open? @user()
-      , 550
+      @conversation_repository.get_one_to_one_conversation @user()
+      .then (conversation_et) =>
+        @conversation_repository.unarchive_conversation conversation_et if conversation_et.is_archived()
+        window.setTimeout =>
+          amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
+          params.open? @user()
+        ,   550
 
     @on_connect = =>
       @user_repository.create_connection @user(), true

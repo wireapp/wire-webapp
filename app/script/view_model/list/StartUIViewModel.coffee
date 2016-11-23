@@ -427,16 +427,15 @@ class z.ViewModel.list.StartUIViewModel
   ###############################################################################
 
   on_submit_search: (callback) =>
+    return if @selected_people().length is 0
+
+    if @selected_people().length is 1
+      return @conversation_repository.get_one_to_one_conversation @selected_people()[0]
+      .then (conversation_et) =>
+        @click_on_group conversation_et
+        callback conversation_et if _.isFunction callback
+
     user_ids = (user_et.id for user_et in @selected_people())
-
-    if user_ids.length is 0
-      return
-
-    if user_ids.length is 1
-      conversation_et = @conversation_repository.get_one_to_one_conversation user_ids[0]
-      @click_on_group conversation_et
-      callback conversation_et if _.isFunction callback
-      return
 
     @conversation_repository.create_new_conversation user_ids, null
     .then (conversation_et) =>

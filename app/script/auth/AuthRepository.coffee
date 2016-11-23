@@ -56,28 +56,23 @@ class z.auth.AuthRepository
   @return [Promise] Promise that resolves with the received access token
   ###
   login: (login, persist) =>
-    return new Promise (resolve, reject) =>
-      @auth_service.post_login login, persist
-      .then (response) =>
-        @save_access_token response
-        z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.PERSIST, persist
-        z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
-        resolve response
-      .catch (error) -> reject error
+    @auth_service.post_login login, persist
+    .then (response) =>
+      @save_access_token response
+      z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.PERSIST, persist
+      z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
+      return response
 
   ###
   Logout the user on the backend.
   @return [Promise] Promise that will always resolve
   ###
   logout: =>
-    return new Promise (resolve) =>
-      @auth_service.post_logout()
-      .then =>
-        @logger.log @logger.levels.INFO, 'Log out on backend successful'
-        resolve()
-      .catch (error) =>
-        @logger.log @logger.levels.WARN, "Log out on backend failed: #{error.message}", error
-        resolve()
+    @auth_service.post_logout()
+    .then =>
+      @logger.log @logger.levels.INFO, 'Log out on backend successful'
+    .catch (error) =>
+      @logger.log @logger.levels.WARN, "Log out on backend failed: #{error.message}", error
 
   ###
   Register a new user (with email).
