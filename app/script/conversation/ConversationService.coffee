@@ -311,6 +311,8 @@ class z.conversation.ConversationService
   Load conversation events. Start and end are not included.
   Events are always sorted beginning with the newest timestamp.
 
+  TODO: Make sure that only valid values (no Strings, No timestamps but Dates(!), ...) are passed to this function!
+
   @param conversation_id [String] ID of conversation
   @param start [Number|undefined] starting from this timestamp
   @param end [Number|undefined] stop when reaching timestamp
@@ -319,10 +321,11 @@ class z.conversation.ConversationService
   @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
   load_events_from_db: (conversation_id, start, end, limit = z.config.MESSAGES_FETCH_LIMIT) ->
-    return @_load_events_from_db_deprecated if z.util.Environment.browser.edge
+    if z.util.Environment.browser.edge
+      return @_load_events_from_db_deprecated conversation_id, start, end, limit
 
-    start = new Date(start).toISOString() if start
-    end = new Date(end).toISOString() if end
+    start = new Date(window.parseInt(start, 10)).toISOString() if start
+    end = new Date(window.parseInt(end, 10)).toISOString() if end
 
     if not end
       if start
@@ -336,11 +339,13 @@ class z.conversation.ConversationService
       [start, end] = [end, start]
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-    .where '[conversation+time]'
-    .between [conversation_id, start], [conversation_id, end], include_minimum, false
-    .reverse()
-    .limit limit
-    .toArray()
+      .where '[conversation+time]'
+      .between [conversation_id, start], [conversation_id, end], include_minimum, false
+      .reverse()
+      .limit limit
+      .toArray()
+      .catch =>
+        @_load_events_from_db_deprecated conversation_id, start, end, limit
 
   ###
   Add a bot to an existing conversation.
