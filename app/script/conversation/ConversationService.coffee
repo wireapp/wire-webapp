@@ -328,14 +328,16 @@ class z.conversation.ConversationService
       else
         return @_load_events_from_db_deprecated conversation_id, start, end, limit
 
+    include = true
     if start > end
+      include = false
       temp = start
       start = end
       end = temp
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
-    .between [conversation_id, start], [conversation_id, end], true, false
+    .between [conversation_id, start], [conversation_id, end], include, false
     .reverse()
     .limit limit
     .toArray()
