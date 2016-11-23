@@ -210,18 +210,16 @@ class z.conversation.ConversationRepository
   get_conversations: (limit = 500, conversation_id) =>
     @conversation_service.get_conversations limit, conversation_id
     .then (response) =>
-      if response.has_more
-        last_conversation_et = response.conversations[response.conversations.length - 1]
-        @get_conversations limit, last_conversation_et.id
-        .then => return @conversations()
-
-      if response.conversations.length > 0
+      if response.conversations.length
         conversation_ets = @conversation_mapper.map_conversations response.conversations
         @save_conversations conversation_ets
 
-      if not response?.has_more
-        @load_conversation_states()
-        return @conversations()
+      if response.has_more
+        last_conversation_et = response.conversations[response.conversations.length - 1]
+        return @get_conversations limit, last_conversation_et.id
+
+      @load_conversation_states()
+      return @conversations()
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Failed to retrieve conversations from backend: #{error.message}", error
       throw error
