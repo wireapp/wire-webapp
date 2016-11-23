@@ -319,25 +319,17 @@ class z.conversation.ConversationService
   @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
   load_events_from_db: (conversation_id, start, end, limit = z.config.MESSAGES_FETCH_LIMIT) ->
-    if z.util.Environment.browser.edge
+    if z.util.Environment.browser.edge or not end
       return @_load_events_from_db_deprecated conversation_id, start, end, limit
 
-    if not end
-      if start
-        end = new Date(0).toISOString()
-      else
-        return @_load_events_from_db_deprecated conversation_id, start, end, limit
-
-    include = true
+    include_minimum = true
     if start > end
-      include = false
-      temp = start
-      start = end
-      end = temp
+      include_minimum = false
+      [start, end] = [end, start]
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
-    .between [conversation_id, start], [conversation_id, end], include, false
+    .between [conversation_id, start], [conversation_id, end], include_minimum, false
     .reverse()
     .limit limit
     .toArray()

@@ -91,7 +91,7 @@ describe 'z.conversation.ConversationService', ->
     # @formatter:on
 
     it 'updated event in the database', (done) ->
-      event.time = new Date(Date.now()).toISOString()
+      event.time = new Date().toISOString()
       conversation_service.update_message_in_db event, {time: event.time}
       .then done
       .catch done.fail
