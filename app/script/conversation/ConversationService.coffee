@@ -312,14 +312,17 @@ class z.conversation.ConversationService
   Events are always sorted beginning with the newest timestamp.
 
   @param conversation_id [String] ID of conversation
-  @param start [Number] starting from this timestamp
-  @param end [Number] stop when reaching timestamp
+  @param start [Number|undefined] starting from this timestamp
+  @param end [Number|undefined] stop when reaching timestamp
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
   @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
   load_events_from_db: (conversation_id, start, end, limit = z.config.MESSAGES_FETCH_LIMIT) ->
     return @_load_events_from_db_deprecated if z.util.Environment.browser.edge
+
+    start = new Date(start).toISOString() if start
+    end = new Date(end).toISOString() if end
 
     if not end
       if start

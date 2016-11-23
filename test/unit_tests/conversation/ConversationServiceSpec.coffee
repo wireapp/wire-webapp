@@ -123,7 +123,7 @@ describe 'z.conversation.ConversationService', ->
       .catch done.fail
 
     it 'doesn\'t load events for invalid conversation id', (done) ->
-      conversation_service.load_events_from_db 'invalid_id', 9, 30
+      conversation_service.load_events_from_db 'invalid_id', 1479903546808, 30
       .then (events) =>
         expect(events.length).toBe 0
         done()
@@ -141,7 +141,7 @@ describe 'z.conversation.ConversationService', ->
         done()
 
     it 'loads events with start timestamp', (done) ->
-      conversation_service.load_events_from_db conversation_id, '2016-11-23T12:19:06.803Z'
+      conversation_service.load_events_from_db conversation_id, 1479903546803
       .then (events) =>
         expect(events.length).toBe 4
         expect(events[0].time).toBe '2016-11-23T12:19:06.802Z'
@@ -151,14 +151,14 @@ describe 'z.conversation.ConversationService', ->
         done()
 
     it 'loads events with start and end timestamp', (done) ->
-      conversation_service.load_events_from_db conversation_id, '2016-11-23T12:19:06.807Z', '2016-11-23T12:19:06.805Z'
+      conversation_service.load_events_from_db conversation_id, 1479903546807, 1479903546805
       .then (events) =>
         expect(events.length).toBe 1
         expect(events[0].time).toBe '2016-11-23T12:19:06.806Z'
         done()
 
     it 'loads events with start and end timestamp and a fetch limit', (done) ->
-      conversation_service.load_events_from_db conversation_id, '2016-11-23T12:19:06.807Z', '2016-11-23T12:19:06.800Z', 2
+      conversation_service.load_events_from_db conversation_id, 1479903546807, 1479903546800, 2
       .then (events) =>
         expect(events.length).toBe 2
         expect(events[0].time).toBe '2016-11-23T12:19:06.806Z'
