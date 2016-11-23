@@ -43,7 +43,7 @@ class z.ViewModel.ConversationInputViewModel
       else
         window.removeEventListener 'click', @on_window_click
 
-    @ephemeral_timer = @conversation_et.ephemeral_timer
+    @has_ephemeral_timer = ko.pureComputed => @conversation_et()?.ephemeral_timer()
 
     @conversation_has_focus = ko.observable(true).extend notify: 'always'
     @browser_has_focus = ko.observable true
