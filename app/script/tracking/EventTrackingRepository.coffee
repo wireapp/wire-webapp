@@ -79,30 +79,27 @@ class z.tracking.EventTrackingRepository
     @_subscribe_to_events()
 
   init_without_user_tracking: =>
-    if @_localytics_disabled()
-      amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, (event_name, attributes) => @_log_event event_name, attributes
-      return
-
-    if not @localytics
-      @_init_localytics window, document, 'script', @localytics
-
     @_enable_error_reporting()
-    @_start_session()
-    amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
+
+    if not @_localytics_disabled()
+      if not @localytics
+        @_init_localytics window, document, 'script', @localytics
+      @_start_session()
+      amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
 
   updated_send_data: (send_data) =>
-    return if @_localytics_disabled()
-
     if send_data
       @_enable_error_reporting()
-      @start_session()
-      amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.TRACKING.OPT_IN
+      if not @_localytics_disabled()
+        @start_session()
+        amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.TRACKING.OPT_IN
     else
-      amplify.unsubscribeAll z.event.WebApp.ANALYTICS.EVENT
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.TRACKING.OPT_OUT
-      @_set_empty_session_data()
-      @_disable_localytics()
+      if not @_localytics_disabled()
+        amplify.unsubscribeAll z.event.WebApp.ANALYTICS.EVENT
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.TRACKING.OPT_OUT
+        @_set_empty_session_data()
+        @_disable_localytics()
       @_disable_error_reporting()
 
   # @return [Boolean] true when "improve_wire" is set to "true".
