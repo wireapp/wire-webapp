@@ -117,6 +117,15 @@ class z.storage.StorageService
         "#{@OBJECT_STORE_PREKEYS}": ''
         "#{@OBJECT_STORE_SESSIONS}": ''
 
+      version_9 =
+        "#{@OBJECT_STORE_AMPLIFY}": ''
+        "#{@OBJECT_STORE_CLIENTS}": ', meta.primary_key'
+        "#{@OBJECT_STORE_CONVERSATION_EVENTS}": ', conversation, time, type, [conversation+time]'
+        "#{@OBJECT_STORE_CONVERSATIONS}": ', id, last_event_timestamp'
+        "#{@OBJECT_STORE_KEYS}": ''
+        "#{@OBJECT_STORE_PREKEYS}": ''
+        "#{@OBJECT_STORE_SESSIONS}": ''
+
       @db = new Dexie @db_name
 
       @db.on 'blocked', =>
@@ -129,7 +138,7 @@ class z.storage.StorageService
       @db.version(3).stores version_3
       @db.version(4).stores version_4
       .upgrade (transaction) =>
-        @logger.log @logger.levels.WARN, 'Database upgrade to version 4', transaction
+        @logger.log @logger.levels.WARN, "Database upgrade to version #{@db.verno}", transaction
         transaction[@OBJECT_STORE_CLIENTS].toCollection().modify (client) =>
           client.meta =
             is_verified: true
@@ -138,7 +147,7 @@ class z.storage.StorageService
       @db.version(5).stores version_4
       @db.version(6).stores version_4
       .upgrade (transaction) =>
-        @logger.log @logger.levels.WARN, 'Database upgrade to version 6', transaction
+        @logger.log @logger.levels.WARN, "Database upgrade to version #{@db.verno}", transaction
         transaction[@OBJECT_STORE_CONVERSATIONS].toCollection().eachKey (key) =>
           @db[@OBJECT_STORE_CONVERSATIONS].update key, {id: key}
         transaction[@OBJECT_STORE_SESSIONS].toCollection().eachKey (key) =>
@@ -147,7 +156,7 @@ class z.storage.StorageService
           @db[@OBJECT_STORE_PREKEYS].update key, {id: key}
       @db.version(7).stores version_5
       .upgrade (transaction) =>
-        @logger.log @logger.levels.WARN, 'Database upgrade to version 7', transaction
+        @logger.log @logger.levels.WARN, "Database upgrade to version #{@db.verno}", transaction
         transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
           mapped_event = event.mapped or event.raw
           delete event.mapped
@@ -156,9 +165,11 @@ class z.storage.StorageService
           $.extend event, mapped_event
       @db.version(8).stores version_5
       .upgrade (transaction) =>
+        @logger.log @logger.levels.WARN, "Database upgrade to version #{@db.verno}", transaction
         transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
           if event.type is z.event.Client.CONVERSATION.DELETE_EVERYWHERE
             event.time = new Date(event.time).toISOString()
+      @db.version(9).stores version_9
 
       @db.open()
       .then =>

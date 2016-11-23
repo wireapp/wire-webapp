@@ -281,6 +281,33 @@ class z.conversation.ConversationService
       throw error
 
   ###
+  Load conversation events. Start and end are not included. Events are always sorted beginning with the newest timestamp.
+
+  TODO: This function can be removed once Microsoft Edge's IndexedDB supports compound indices:
+  - https://developer.microsoft.com/en-us/microsoft-edge/platform/status/indexeddbarraysandmultientrysupport/
+
+  @param conversation_id [String] ID of conversation
+  @param start [Number] starting from this timestamp
+  @param end [Number] stop when reaching timestamp
+  @param limit [Number] Amount of events to load
+  @return [Promise] Promise that resolves with the retrieved records
+  ###
+  _load_events_from_db_deprecated: (conversation_id, start, end, limit) ->
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+      .where 'conversation'
+      .equals conversation_id
+      .reverse()
+      .sortBy 'time'
+      .then (records) ->
+        return records.filter (record) ->
+          timestamp = new Date(record.time).getTime()
+          return false if start and timestamp >= start
+          return false if end and timestamp <= end
+          return true
+      .then (records) ->
+        return records.slice 0, limit
+
+  ###
   Load conversation events. Start and end are not included.
   Events are always sorted beginning with the newest timestamp.
 
@@ -289,25 +316,28 @@ class z.conversation.ConversationService
   @param end [Number] stop when reaching timestamp
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
+  @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
-  load_events_from_db: (conversation_id, start, end, limit) ->
+  load_events_from_db: (conversation_id, start, end, limit = z.config.MESSAGES_FETCH_LIMIT) ->
+    return @_load_events_from_db_deprecated if z.util.Environment.browser.edge
+
+    if not end
+      if start
+        end = new Date(0).toISOString()
+      else
+        start = new Date(0).toISOString()
+        end = new Date().toISOString()
+
+    include_minimum = start < end
+    if not include_minimum
+      [start, end] = [end, start]
+
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-    .where 'conversation'
-    .equals conversation_id
+    .where '[conversation+time]'
+    .between [conversation_id, start], [conversation_id, end], include_minimum, false
     .reverse()
-    .sortBy 'time'
-    .then (records) ->
-      return records.filter (record) ->
-        timestamp = new Date(record.time).getTime()
-        return false if start and timestamp >= start
-        return false if end and timestamp <= end
-        return true
-    .then (records) ->
-      return records.slice 0, limit
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR,
-        "Failed to get events for conversation '#{conversation_id}': #{error.message}", error
-      throw error
+    .limit limit
+    .toArray()
 
   ###
   Add a bot to an existing conversation.
