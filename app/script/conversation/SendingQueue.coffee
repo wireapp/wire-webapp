@@ -66,8 +66,7 @@ class z.conversation.SendingQueue
       .catch (error) ->
         queue_entry.reject error
       .then (response) =>
-        # TODO if response is null/undefined/false/0 promise will not resolve
-        queue_entry.resolve response if response
+        queue_entry.resolve response
         window.clearInterval @_interval
         @_blocked = false
         @_queue.shift()
