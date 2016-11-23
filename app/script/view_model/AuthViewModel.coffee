@@ -1277,14 +1277,10 @@ class z.ViewModel.AuthViewModel
     @client_repository.register_client @password()
     .then (client_observable) =>
       @event_repository.current_client = client_observable
-      @event_repository.get_last_notification_id()
-    .then (last_notification_id) =>
-      @event_repository.last_notification_id last_notification_id
-      @logger.log @logger.levels.INFO, "Set starting point on notification stream to '#{last_notification_id}'"
+      @event_repository.initialize_last_notification_id()
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
-        @logger.log @logger.levels.WARN,
-          "Cannot set starting point on notification stream: #{error.message}", error
+        @logger.log @logger.levels.WARN, "Cannot set starting point on notification stream: #{error.message}", error
       else
         throw error
     .then =>
