@@ -1269,6 +1269,8 @@ class z.ViewModel.AuthViewModel
     url = z.util.append_url_parameter url, "#{z.auth.URLParameter.BOT}=#{bot_name}" if bot_name
     use_v3_api = z.util.get_url_parameter z.auth.URLParameter.V3
     url = z.util.append_url_parameter url, "#{z.auth.URLParameter.V3}=#{use_v3_api}" if use_v3_api
+    localytics = z.util.get_url_parameter z.auth.URLParameter.LOCALYTICS
+    url = z.util.append_url_parameter url, "#{z.auth.URLParameter.LOCALYTICS}" if localytics
     window.location.replace url
 
   _register_client: =>
