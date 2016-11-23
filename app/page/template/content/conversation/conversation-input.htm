@@ -19,7 +19,7 @@
                   class="conversation-input-text border-theme"
                   data-bind="event: {'keydown': on_input_key_down},
                              focus_on_keydown: true,
-                             css: {'ephemeral-input': conversation_et().ephemeral_timer()},
+                             css: {'ephemeral-input': has_ephemeral_timer()},
                              enter: on_input_enter,
                              hasFocus: blinking_cursor,
                              textInput: input,
@@ -27,17 +27,18 @@
                              resize_callback: scroll_message_list,
                              click: on_input_click,
                              attr: {'placeholder': input_tooltip}"
-                  data-uie-name="input-message">
+                  data-uie-name="input-message"
+                  dir="auto">
         </textarea>
       </div>
 
-      <div class="controls-right" data-bind="css:{'text-ephemeral': conversation_et().ephemeral_timer()}">
+      <div class="controls-right" data-bind="css:{'text-ephemeral': has_ephemeral_timer()}">
 
         <!-- ko ifnot: is_editing -->
 
           <!-- ko if: show_giphy_button -->
             <span class="controls-right-button button-icon-large"
-                  data-bind="click: toggle_extensions_menu, l10n_tooltip: z.string.extensions_bubble_button_gif, css:{'icon-gif-timed': conversation_et().ephemeral_timer(), 'icon-gif': !conversation_et().ephemeral_timer()}"
+                  data-bind="click: toggle_extensions_menu, l10n_tooltip: z.string.extensions_bubble_button_gif, css: has_ephemeral_timer() ? 'icon-gif-timed': 'icon-gif'"
                   data-uie-name="do-giphy-popover">
             </span>
           <!-- /ko -->
@@ -48,13 +49,13 @@
                   class="controls-right-button conversation-input-ephemeral"
                   data-bind="l10n_tooltip: z.string.tooltip_conversation_ephemeral"
                   data-uie-name="do-set-ephemeral-timer">
-              <!-- ko if: conversation_et().ephemeral_timer() -->
+              <!-- ko if: has_ephemeral_timer() && conversation_et()-->
                 <div class="ephemeral-timer-button">
                   <span class="ephemeral-timer-button-unit" data-bind="text: z.util.format_milliseconds_short(conversation_et().ephemeral_timer())[1]"></span>
                   <span class="full-screen" data-bind="text: z.util.format_milliseconds_short(conversation_et().ephemeral_timer())[0]"></span>
                 </div>
               <!-- /ko -->
-              <!-- ko ifnot: conversation_et().ephemeral_timer() -->
+              <!-- ko ifnot: has_ephemeral_timer() -->
                 <span class="button-icon-large icon-hourglass"></span>
               <!-- /ko -->
                 <context-menu class="controls-right-button-ephemeral-context"
@@ -64,20 +65,20 @@
 
             <label id="conversation-input-photo"
                    class="controls-right-button button-icon-large"
-                   data-bind="attr: {'title': picture_tooltip}, css:{'icon-library-timed': conversation_et().ephemeral_timer(), 'icon-library': !conversation_et().ephemeral_timer()}">
+                   data-bind="attr: {'title': picture_tooltip}, css: has_ephemeral_timer() ? 'icon-library-timed': 'icon-library'">
               <input data-bind="file_select: upload_images" type="file" multiple="multiple"
                      accept=".jpg-large, image/jpeg, image/png, image/bmp, image/gif" data-uie-name="do-share-image"/>
             </label>
 
             <label id="conversation-input-files"
                      class="controls-right-button button-icon-large"
-                     data-bind="attr: {'title': file_tooltip}, css:{'icon-attachment-timed': conversation_et().ephemeral_timer(), 'icon-attachment': !conversation_et().ephemeral_timer()}">
+                     data-bind="attr: {'title': file_tooltip}, css: has_ephemeral_timer() ? 'icon-attachment-timed': 'icon-attachment'">
               <input data-bind="file_select: upload_files" type="file" multiple="multiple"
                        accept="*" data-uie-name="do-share-file"/>
             </label>
 
             <span class="controls-right-button button-icon-large"
-                  data-bind="click: ping, attr: {'title': ping_tooltip}, css:{'disabled': ping_disabled, 'icon-ping-timed': conversation_et().ephemeral_timer(), 'icon-ping': !conversation_et().ephemeral_timer()}"
+                  data-bind="click: ping, attr: {'title': ping_tooltip}, css:{'disabled': ping_disabled, 'icon-ping-timed': has_ephemeral_timer(), 'icon-ping': !has_ephemeral_timer()}"
                   data-uie-name="do-ping">
             </span>
           <!-- /ko -->
