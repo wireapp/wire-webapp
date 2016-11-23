@@ -23,6 +23,7 @@ z.string.es ?= {}
 z.string.fi ?= {}
 z.string.fr ?= {}
 z.string.hr ?= {}
+z.string.it ?= {}
 z.string.ro ?= {}
 z.string.ru ?= {}
 z.string.tr ?= {}
