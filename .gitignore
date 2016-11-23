@@ -36,3 +36,4 @@ npm-debug.log
 /.idea/**/*.xml
 !/.idea/codeStyleSettings.xml
 !/.idea/modules.xml
+/debug.log
