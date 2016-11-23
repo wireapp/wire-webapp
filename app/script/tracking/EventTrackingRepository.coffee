@@ -163,8 +163,6 @@ class z.tracking.EventTrackingRepository
     @_tag_and_upload_event 'session', @session_values
 
   track_event: (event_name, attributes) =>
-    return if not @_has_permission()
-
     @_log_event event_name, attributes
     if @session_values[event_name] isnt undefined
       if attributes is undefined
