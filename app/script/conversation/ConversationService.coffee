@@ -321,6 +321,9 @@ class z.conversation.ConversationService
   load_events_from_db: (conversation_id, start, end, limit = z.config.MESSAGES_FETCH_LIMIT) ->
     return @_load_events_from_db_deprecated if z.util.Environment.browser.edge
 
+    start = new Date(start).toISOString() if start
+    end = new Date(end).toISOString() if end
+
     if not end
       if start
         end = new Date(0).toISOString()
