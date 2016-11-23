@@ -1302,8 +1302,13 @@ class z.conversation.ConversationRepository
     @logger.log @logger.levels.INFO,
       "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
     @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
-    .catch (error_response) =>
-      return @_update_payload_for_changed_clients error_response, generic_message, payload
+    .then (response) =>
+      @_handle_client_mismatch conversation_id, response
+      return response
+    .catch (error) =>
+      throw error if not error.missing
+
+      return @_handle_client_mismatch conversation_id, error, generic_message, payload
       .then (updated_payload) =>
         @logger.log @logger.levels.INFO,
           "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
@@ -1332,8 +1337,13 @@ class z.conversation.ConversationRepository
     .then (payload) =>
       payload.inline = false
       @asset_service.post_asset_v2 conversation_id, payload, image_data, precondition_option, nonce
-      .catch (error_response) =>
-        return @_update_payload_for_changed_clients error_response, generic_message, payload
+      .then (response) =>
+        @_handle_client_mismatch conversation_id, response
+        return response
+      .catch (error) =>
+        throw error if not error.missing
+
+        return @_handle_client_mismatch conversation_id, error, generic_message, payload
         .then (updated_payload) =>
           @asset_service.post_asset_v2 conversation_id, updated_payload, image_data, true, nonce
 
@@ -2090,56 +2100,77 @@ class z.conversation.ConversationRepository
     @asset_service.cancel_asset_upload message_et.assets()[0].upload_id()
     @send_asset_upload_failed @active_conversation(), message_et.id, z.assets.AssetUploadFailedReason.CANCELLED
 
-  _handle_deleted_clients: (deleted_client_map, payload) ->
-    return Promise.resolve()
+  ###
+  Handle client mismatch response from backend.
+
+  @note As part of 412 or general response when sending encrypted message
+  @param conversation_id [String] ID of conversation message was sent int
+  @param client_mismatch [Object] Client mismatch object containing client user maps for deleted, missing and obsolete clients
+  @param generic_message [z.proto.GenericMessage] Optionally the GenericMessage that was sent
+  @param payload [Object] Optionally the initial payload that was sent resulting in a 412
+  ###
+  _handle_client_mismatch: (conversation_id, client_mismatch, generic_message, payload) =>
+    Promise.resolve()
     .then =>
-      if _.isEmpty deleted_client_map
-        @logger.log @logger.levels.INFO, 'No obsolete clients that need to be removed'
-        return payload
+      if not _.isEmpty client_mismatch.redundant
+        @logger.log @logger.levels.DEBUG, 'Message contains redundant clients', client_mismatch.redundant
+        return @_handle_client_mismatch_obsolete client_mismatch.redundant, conversation_id, payload
+      return payload
+    .then (updated_payload) =>
+      if not _.isEmpty client_mismatch.deleted
+        @logger.log @logger.levels.DEBUG, 'Message contains deleted clients', client_mismatch.deleted
+        return @_handle_client_mismatch_obsolete client_mismatch.deleted, false, updated_payload
+      return updated_payload
+    .then (updated_payload) =>
+      if payload and not _.isEmpty client_mismatch.missing
+        @logger.log @logger.levels.DEBUG, 'Message is missing payload for clients', client_mismatch.missing
+        return @_handle_client_mismatch_missing client_mismatch.missing, generic_message, updated_payload
+      return updated_payload
+
+  _handle_client_mismatch_missing: (user_client_map, generic_message, payload) ->
+    if _.isEmpty user_client_map
+      @logger.log @logger.levels.INFO, 'No missing clients that need to be added'
+      return Promise.resolve payload
+
+    @logger.log @logger.levels.INFO, "Adding payload for missing clients of '#{Object.keys(user_client_map).length}' users", user_client_map
+    save_promises = []
+
+    @cryptography_repository.encrypt_generic_message user_client_map, generic_message, payload
+    .then (updated_payload) =>
+      payload = updated_payload
+      for user_id, client_ids of user_client_map
+        for client_id in client_ids
+          save_promises.push @user_repository.add_client_to_user user_id, new z.client.Client {id: client_id}
+
+      return Promise.all save_promises
+    .then ->
+      return payload
+
+  _handle_client_mismatch_obsolete: (user_client_map, conversation_id, payload) ->
+    if _.isEmpty user_client_map
+      @logger.log @logger.levels.INFO, 'No obsolete clients that need to be removed'
+      return Promise.resolve payload
+
+    conversation_et = @get_conversation_by_id conversation_id if conversation_id
+
+    delete_promises = []
+    for user_id, client_ids of user_client_map
+      if conversation_et
+        conversation_et.participating_user_ids.remove user_id
       else
-        @logger.log @logger.levels.INFO, 'Removing payload for deleted clients', deleted_client_map
-        delete_promises = []
-        for user_id, client_ids of deleted_client_map
-          for client_id in client_ids
-            delete payload.recipients[user_id][client_id]
-            delete_promises.push @user_repository.remove_client_from_user user_id, client_id
-          delete payload.recipients[user_id] if Object.keys(payload.recipients[user_id]).length is 0
+        for client_id in client_ids
+          delete payload.recipients[user_id][client_id] if payload
+          delete_promises.push @user_repository.remove_client_from_user user_id, client_id
 
-        Promise.all delete_promises
-        .then ->
-          return payload
+      if payload and (conversation_id or Object.keys(payload.recipients[user_id]).length is 0)
+        delete payload.recipients[user_id]
 
-  _handle_missing_clients: (missing_client_map, generic_message, payload) ->
-    return Promise.resolve()
-    .then =>
-      if _.isEmpty missing_client_map
-        @logger.log @logger.levels.INFO, 'No missing clients that need to be added'
-        return payload
-      else
-        @logger.log @logger.levels.INFO, "Adding payload for missing clients of '#{Object.keys(missing_client_map).length}' users", missing_client_map
-        save_promises = []
+    if conversation_et
+      @update_participating_user_ets conversation_et
 
-        @cryptography_repository.encrypt_generic_message missing_client_map, generic_message, payload
-        .then (updated_payload) =>
-          payload = updated_payload
-          for user_id, client_ids of missing_client_map
-            for client_id in client_ids
-              save_promises.push @user_repository.add_client_to_user user_id, new z.client.Client {id: client_id}
-
-          return Promise.all save_promises
-        .then ->
-          return payload
-
-  _update_payload_for_changed_clients: (error_response, generic_message, payload) =>
-    return Promise.resolve()
-    .then =>
-      if error_response.missing
-        @logger.log @logger.levels.WARN, 'Payload for clients was missing', error_response
-        @_handle_deleted_clients error_response.deleted, payload
-        .then (updated_payload) =>
-          return @_handle_missing_clients error_response.missing, generic_message, updated_payload
-      else
-        throw error_response
+    return Promise.all delete_promises
+    .then ->
+      return payload
 
   ###
   Delete message from UI and database. Primary key is used to delete message in database.
