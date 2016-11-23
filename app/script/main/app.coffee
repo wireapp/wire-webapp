@@ -188,9 +188,7 @@ class z.main.App
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS, conversation_ets.length, 50
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS, connection_ets.length, 50
       @repository.user.self().devices client_ets
-
-      @logger.log @logger.levels.INFO, 'Mapping user connections to conversations'
-      amplify.publish z.event.WebApp.CONVERSATION.MAP_CONNECTION, @repository.user.connections()
+      @repository.conversation.map_connections @repository.user.connections()
       @_subscribe_to_beforeunload()
       return @repository.event.update_from_notification_stream()
     .then (notifications_count) =>
