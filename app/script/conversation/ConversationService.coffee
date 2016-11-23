@@ -281,6 +281,33 @@ class z.conversation.ConversationService
       throw error
 
   ###
+  Load conversation events. Start and end are not included. Events are always sorted beginning with the newest timestamp.
+
+  TODO: This function can be removed once Microsoft Edge's IndexedDB supports compound indices:
+  - https://developer.microsoft.com/en-us/microsoft-edge/platform/status/indexeddbarraysandmultientrysupport/
+
+  @param conversation_id [String] ID of conversation
+  @param start [Number] starting from this timestamp
+  @param end [Number] stop when reaching timestamp
+  @param limit [Number] Amount of events to load
+  @return [Promise] Promise that resolves with the retrieved records
+  ###
+  _load_events_from_db_deprecated: (conversation_id, start, end, limit) ->
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+      .where 'conversation'
+      .equals conversation_id
+      .reverse()
+      .sortBy 'time'
+      .then (records) ->
+        return records.filter (record) ->
+          timestamp = new Date(record.time).getTime()
+          return false if start and timestamp >= start
+          return false if end and timestamp <= end
+          return true
+      .then (records) ->
+        return records.slice 0, limit
+
+  ###
   Load conversation events. Start and end are not included.
   Events are always sorted beginning with the newest timestamp.
 
@@ -289,13 +316,17 @@ class z.conversation.ConversationService
   @param end [Number] stop when reaching timestamp
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
+  @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
   load_events_from_db: (conversation_id, start, end, limit = z.config.MESSAGES_FETCH_LIMIT) ->
+    if z.util.Environment.browser.edge
+      return @_load_events_from_db_deprecated conversation_id, start, end, limit
+
     if not end
       if start
         end = new Date(0).toISOString()
       else
-        return @_load_all_conversation_events_from_db conversation_id, limit
+        return @_load_events_from_db_deprecated conversation_id, start, end, limit
 
     if start > end
       temp = start
@@ -308,21 +339,6 @@ class z.conversation.ConversationService
     .reverse()
     .limit limit
     .toArray()
-
-  ###
-  Load all conversation events.
-
-  @param conversation_id [String] ID of conversation
-  @param limit [Number] Amount of events to load
-  @return [Promise] Promise that resolves with the retrieved records
-  ###
-  _load_all_conversation_events_from_db: (conversation_id, limit) ->
-    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-    .where 'conversation'
-    .equals conversation_id
-    .reverse()
-    .sortBy 'time'
-    .then (records) -> return records.slice 0, limit
 
   ###
   Add a bot to an existing conversation.
