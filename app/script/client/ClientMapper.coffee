@@ -53,8 +53,7 @@ class z.client.ClientMapper
   ###
   update_client: (client, update_payload) ->
     contains_update = false
-    for member of update_payload
-      if client[member] isnt update_payload[member]
-        contains_update = true
-        client[member] = update_payload[member]
+    for member of update_payload when JSON.stringify(client[member]) isnt JSON.stringify update_payload[member]
+      contains_update = true
+      client[member] = update_payload[member]
     return [client, contains_update]
