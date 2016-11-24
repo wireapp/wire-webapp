@@ -566,10 +566,8 @@ class z.user.UserRepository
   @param picture [String, Object] New user picture
   ###
   change_picture: (picture) ->
-    if @use_v3_api
-      @_set_picture_v3 picture
-    else
-      @_set_picture_v2 picture
+    @_set_picture_v2 picture
+    @_set_picture_v3 picture
 
   ###
   Set the profile image using v2 api.
