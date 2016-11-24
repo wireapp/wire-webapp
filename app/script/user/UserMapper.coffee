@@ -37,8 +37,25 @@ class z.user.UserMapper
   @return [z.entity.User] Mapped user entity
   ###
   map_user_from_object: (data) ->
-    user = new z.entity.User()
-    return @update_user_from_object user, data
+    return @update_user_from_object new z.entity.User(), data
+
+  ###
+  Converts JSON self user into user entity.
+
+  @param data [Object] User data
+
+  @return [z.entity.User] Mapped user entity
+  ###
+  map_self_user_from_object: (data) ->
+    user_et = @update_user_from_object new z.entity.SelfUser(), data
+
+    if data.tracking_id
+      user_et.tracking_id = data.tracking_id
+
+    if data.locale
+      user_et.locale = data.locale
+
+    return user_et
 
   ###
   Convert multiple JSON users into user entities.

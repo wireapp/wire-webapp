@@ -192,6 +192,16 @@ describe 'z.user.UserRepository', ->
         expect(user_repository.find_user user.id).toBe user
         expect(user_repository.user_exists user.id).toBeTruthy()
 
+      it 'saves self user', ->
+        user = new z.entity.User()
+        user.id = entities.user.jane_roe.id
+
+        user_repository.save_user user, true
+
+        expect(user_repository.find_user user.id).toBe user
+        expect(user_repository.user_exists user.id).toBeTruthy()
+        expect(user_repository.self()).toBe user
+
     describe 'user_exists', ->
       user = null
 

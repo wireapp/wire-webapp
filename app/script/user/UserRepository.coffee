@@ -409,11 +409,7 @@ class z.user.UserRepository
   get_me: =>
     @user_service.get_own_user()
     .then (response) =>
-      user_et = @user_mapper.map_user_from_object response
-      # TODO: This needs to be represented by a SelfUser class!
-      # Only the "self / own" user has a tracking ID & locale
-      user_et.tracking_id = response.tracking_id
-      user_et.locale = response.locale
+      user_et = @user_mapper.map_self_user_from_object response
       return @save_user user_et, true
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Unable to load self user: #{error}"
@@ -487,6 +483,7 @@ class z.user.UserRepository
     return @self().id is user_id
 
   ###
+  TODO use SelfUser
   Save a user.
   @param user_et [z.entity.User] User entity to be stored
   @param is_me [Boolean] Is the user entity the self user

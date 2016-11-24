@@ -20,7 +20,6 @@ window.z ?= {}
 z.entity ?= {}
 
 # User entity.
-# Please note: The own user has a "tracking_id" & "locale"
 class z.entity.User
 
 
@@ -94,10 +93,8 @@ class z.entity.User
         initials = @first_name().slice 0, 2
       return initials.toUpperCase()
 
-    @username  = ko.observable ''
+    @username  = ko.observable()
 
-    @mutual_friend_ets = ko.observableArray []
-    @mutual_friend_ids = ko.observableArray []
     @mutual_friends_total = ko.observable 0
 
     @preview_picture_resource = ko.observable()
