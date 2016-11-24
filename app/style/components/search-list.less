@@ -162,14 +162,14 @@
   display: flex;
   font-size: @font-size-xs;
   color: fade(#fff, 56%);
-  height: 16px;
+  line-height: 16px;
 }
 
 .search-list-item-content-username:before {
   content: "@";
 }
 
-.search-list-item-content-friends:before {
+.search-list-item-content-username + .search-list-item-content-friends:before {
   content: "-";
   margin-left: 4px;
   margin-right: 4px;
