@@ -39,11 +39,7 @@ class z.search.SearchRepository
   @return [Promise<Array<z.entity.User>>] Promise that will resolve with an array containing the users common contacts
   ###
   get_common_contacts: (user_id) =>
-    @search_service.get_common user_id
-    .then (response) =>
-      return @search_result_mapper.map_results response.documents, z.search.SEARCH_MODE.COMMON_CONNECTIONS
-    .then ([search_ets, mode]) =>
-      return @_prepare_search_result search_ets, mode
+    @search_service.get_common(user_id).then (response) => response.returned
 
   ###
   Get top people.

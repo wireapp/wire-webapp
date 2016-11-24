@@ -28,9 +28,7 @@ class z.components.CommonContactsViewModel
 
     @common_contacts_total = ko.observable 0
 
-    @search_repository.get_common_contacts @user.id
-    .then (user_ets) =>
-      @common_contacts_total user_ets.length
+    @search_repository.get_common_contacts(@user.id).then (total) => @common_contacts_total total
 
 ko.components.register 'common-contacts',
   viewModel: createViewModel: (params, component_info) ->
