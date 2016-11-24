@@ -39,7 +39,7 @@ class z.search.SearchRepository
   @return [Promise<Array<z.entity.User>>] Promise that will resolve with an array containing the users common contacts
   ###
   get_common_contacts: (user_id) =>
-    @search_service.get_common(user_id).then (response) => response.returned
+    @search_service.get_common(user_id).then (response) -> response.returned
 
   ###
   Get top people.
@@ -97,7 +97,7 @@ class z.search.SearchRepository
       user_ids = []
       user_ids.push user_et.id for user_et in search_ets
 
-      @user_repository.get_users_by_id user_ids, (user_ets) =>
+      @user_repository.get_users_by_id user_ids, (user_ets) ->
         result_user_ets = []
         for user_et in user_ets
           ###
@@ -108,17 +108,12 @@ class z.search.SearchRepository
           Only show unknown or cancelled people in suggestions.
           ###
           switch mode
-            when z.search.SEARCH_MODE.COMMON_CONNECTIONS
-              result_user_ets.push user_et
             when z.search.SEARCH_MODE.CONTACTS
               if not user_et.connected()
                 user_et.connection_level z.user.ConnectionLevel.NO_CONNECTION
                 result_user_ets.push user_et
             when z.search.SEARCH_MODE.ONBOARDING
               result_user_ets.push user_et if not user_et.connected()
-            when z.search.SEARCH_MODE.SUGGESTIONS
-              states_to_suggest = [z.user.ConnectionStatus.UNKNOWN, z.user.ConnectionStatus.CANCELLED]
-              result_user_ets.push user_et if user_et.connection().status() in states_to_suggest
             when z.search.SEARCH_MODE.TOP_PEOPLE
               result_user_ets.push user_et if user_et.connected()
             else
