@@ -91,18 +91,16 @@ class z.calling.entities.FlowAudio
       @pan_node.pan.value = panning_value
 
   wrap_microphone_stream: (media_stream) =>
-    wrapped_stream = media_stream
     if @audio_context
       @audio_source = @audio_context.createMediaStreamSource media_stream
       @gain_node = @audio_context.createGain()
       @audio_remote = @audio_context.createMediaStreamDestination()
       @_hookup_audio()
-      wrapped_stream = @audio_remote.stream
-      @logger.log @logger.levels.INFO, 'Wrapped audio stream from microphone', wrapped_stream
-    return wrapped_stream
+      $.extend true, media_stream, @audio_remote.stream
+      @logger.log @logger.levels.INFO, 'Wrapped audio stream from microphone', media_stream
+    return media_stream
 
   wrap_speaker_stream: (media_stream) =>
-    wrapped_stream = media_stream
     if z.util.Environment.browser.firefox
       if @audio_context
         remote_source = @audio_context.createMediaStreamSource media_stream
@@ -111,9 +109,9 @@ class z.calling.entities.FlowAudio
         speaker = @audio_context.createMediaStreamDestination()
         remote_source.connect @pan_node
         @pan_node.connect speaker
-        wrapped_stream = speaker.stream
-        @logger.log @logger.levels.INFO, "Wrapped audio stream to speaker to create stereo. Initial panning set to '#{@panning()}'.", wrapped_stream
-    return wrapped_stream
+        $.extend true, media_stream, speaker.stream
+        @logger.log @logger.levels.INFO, "Wrapped audio stream to speaker to create stereo. Initial panning set to '#{@panning()}'.", media_stream
+    return media_stream
 
   _hookup_audio: =>
     @audio_source.connect @gain_node if @audio_source
