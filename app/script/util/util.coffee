@@ -260,7 +260,7 @@ Returns a random integer between min (included) and max (excluded)
 z.util.get_random_int = (min, max) ->
   min = Math.ceil min
   max = Math.floor max
-  return Math.floor Math.random() * (max - min) + min;
+  return Math.floor Math.random() * (max - min) + min
 
 ###
 Checks if input is a version 4 UUID
