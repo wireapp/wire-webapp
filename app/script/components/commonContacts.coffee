@@ -36,5 +36,7 @@ ko.components.register 'common-contacts',
   viewModel: createViewModel: (params, component_info) ->
     return new z.components.CommonContactsViewModel params, component_info
   template: """
-            <span data-bind="l10n_text: {'id': z.string.search_friends_in_common, 'replace': {'placeholder': '%no', 'content': common_contacts_total()}}"></span>
+            <!-- ko if: common_contacts_total -->
+              <span data-bind="l10n_text: {'id': z.string.search_friends_in_common, 'replace': {'placeholder': '%no', 'content': common_contacts_total()}}"></span>
+            <!-- /ko -->
             """
