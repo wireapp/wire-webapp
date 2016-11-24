@@ -309,7 +309,7 @@ z.util.safe_window_open = (url, focus = true) ->
 
 z.util.auto_link_emails = (text) ->
   email_pattern = /([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)/gim
-  return text.replace email_pattern, '<a href="mailto:$1">$1</a>'
+  return text.replace email_pattern, '<a href="mailto:$1" target="prevent-onbeforeunload">$1</a>'
 
 
 z.util.get_last_characters = (message, amount) ->
