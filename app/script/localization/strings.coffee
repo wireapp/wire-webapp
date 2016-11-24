@@ -460,9 +460,6 @@ z.string.search_top_people = 'Top people'
 z.string.search_try_search = 'Find people by name or\nfull email address'
 z.string.search_no_contacts_on_wire = 'You have no contacts on Wire.\nTry finding people by name or\nfull email address'
 z.string.search_others = 'Connect'
-z.string.search_suggestion_one = 'Knows %@.first_name'
-z.string.search_suggestion_two = 'Knows %@.first_name and %@.other_name'
-z.string.search_suggestion_many = 'Knows %@.first_name and %no others'
 z.string.search_friends_in_common = '%no friends in common'
 
 # Picture upload

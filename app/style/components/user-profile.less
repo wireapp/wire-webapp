@@ -57,6 +57,8 @@ user-profile {
 
 // user-profile-default
 .user-profile-header {
+  display: flex;
+  flex-direction: column;
   padding-top: 21px;
   padding-left: 56px;
   padding-right: 56px;
@@ -68,16 +70,8 @@ user-profile {
     }
   }
 
-  > .name,
-  > .email {
-    .ellipsis;
-    position: relative;
-  }
-
-  > .email {
-    display: block;
-    text-decoration: none;
-    cursor: pointer;
+  > .username:before {
+    content: "@";
   }
 }
 
