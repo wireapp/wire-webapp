@@ -184,10 +184,10 @@
   <!-- ko if: show_large_avatar() -->
     <div class="message-connected">
       <span class="message-connected-header" data-bind='text: other_user().name()'></span>
-      <!-- ko if: other_user().sent() -->
-        <span class="message-connected-username" data-bind='text: other_user().username()'></span>
+      <span class="message-connected-username" data-bind='text: other_user().username()'></span>
+      <!-- ko if: !other_user().connected() -->
+        <common-contacts class="message-connected-contacts" params="user: other_user()"></common-contacts>
       <!-- /ko -->
-      <common-contacts class="message-connected-contacts" params="user: other_user()"></common-contacts>
       <span class="label-xs" data-bind="text: caption"></span>
       <user-avatar class="message-connected-avatar user-avatar-xl user-avatar-no-badge cursor-default"
                    data-bind="css: {'user-avatar-no-badge': other_user().sent()}"
