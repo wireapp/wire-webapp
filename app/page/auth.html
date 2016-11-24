@@ -52,9 +52,9 @@
             </div>
             <form id="login-method-password" class="method" data-bind="submit: login_password">
               <div id="wire-login-username-container" class="form-control">
-                <input class="input username" id="wire-login-username" type="text"
+                <input class="input username" id="wire-login-username" type="text" spellcheck="false"
                        data-bind="css: {'input-error': failed_validation_email}, event: {input: clear_error}, l10n_tooltip: z.string.auth_placeholder_email, l10n_placeholder: z.string.auth_placeholder_email, textInput: username"
-                       data-uie-name="enter-email" spellcheck="false">
+                       data-uie-name="enter-email">
               </div>
               <div id="wire-login-password-container" class="form-control">
                 <input class="input password" id="wire-login-password" type="password"
@@ -104,12 +104,12 @@
               </div>
               <div class="form-control">
                 <div class="input-group" data-bind="css: {'input-error': failed_validation_phone}">
-                  <input class="input phone" id="wire-login-country-code" type="tel" autocomplete="off" maxlength="5"
+                  <input class="input phone" id="wire-login-country-code" type="tel" autocomplete="off" maxlength="5" spellcheck="false"
                          data-bind="event: {change: changed_country_code, input: clear_error}, l10n_tooltip: z.string.auth_account_country_code, textInput: country_code"
-                         data-uie-name="enter-county-code" spellcheck="false">
-                  <input class="input phone" id="wire-login-phone" type="tel" autocomplete="off" maxlength="15"
+                         data-uie-name="enter-county-code">
+                  <input class="input phone" id="wire-login-phone" type="tel" autocomplete="off" maxlength="15" spellcheck="false"
                          data-bind="event: {change: changed_phone_number, input: clear_error}, l10n_tooltip: z.string.auth_placeholder_phone, l10n_placeholder: z.string.auth_placeholder_phone, textInput: phone_number"
-                         data-uie-name="enter-phone" spellcheck="false">
+                         data-uie-name="enter-phone">
                 </div>
               </div>
               <ul class="error-list" data-uie-name="status-error">
@@ -133,14 +133,14 @@
 
           <form id="form-account-register" class="form" data-bind="submit: register">
             <div id="wire-register-name-container" class="form-control">
-              <input class="input name" id="wire-register-name" type="text" autocomplete="off" maxlength="64"
+              <input class="input name" id="wire-register-name" type="text" autocomplete="off" maxlength="64" spellcheck="false"
                      data-bind="css: {'input-error': failed_validation_name}, event: {input: clear_error}, l10n_tooltip: z.string.auth_placeholder_name, l10n_placeholder: z.string.auth_placeholder_name, textInput: name"
-                     data-uie-name="enter-name" tabindex="1" dir="auto" spellcheck="false">
+                     data-uie-name="enter-name" tabindex="1" dir="auto">
             </div>
             <div id="wire-register-email-container" class="form-control">
-              <input class="input email" id="wire-register-email" type="text" autocomplete="off" maxlength="128"
+              <input class="input email" id="wire-register-email" type="text" autocomplete="off" maxlength="128" spellcheck="false"
                      data-bind="css: {'input-error': failed_validation_email}, event: {input: clear_error}, l10n_tooltip: z.string.auth_placeholder_email, l10n_placeholder: z.string.auth_placeholder_email, textInput: username"
-                     data-uie-name="enter-email" tabindex="2" spellcheck="false">
+                     data-uie-name="enter-email" tabindex="2">
             </div>
             <div id="wire-register-password-container" class="form-control">
               <input class="input password" id="wire-register-password" type="password" autocomplete="off" maxlength="1024"
@@ -180,9 +180,9 @@
             <div class="auth-headline" data-bind="l10n_text: z.string.auth_verify_account_headline"></div>
             <div class="auth-headline-sub" data-bind="l10n_text: z.string.auth_verify_account_detail"></div>
             <div id="wire-verify-account-email-container" class="form-control">
-              <input class="input email" id="wire-verify-account-email" type="text" autocomplete="off" maxlength="128"
+              <input class="input email" id="wire-verify-account-email" type="text" autocomplete="off" maxlength="128" spellcheck="false"
                      data-bind="css: {'input-error': failed_validation_email}, event: {input: clear_error}, l10n_tooltip: z.string.auth_placeholder_email, l10n_placeholder: z.string.auth_placeholder_email, textInput: username"
-                     data-uie-name="enter-email" spellcheck="false">
+                     data-uie-name="enter-email">
             </div>
             <div id="wire-verify-account-password-container" class="form-control">
               <input class="input password" id="wire-verify-account-password" type="password" maxlength="1024" autocomplete="off"
