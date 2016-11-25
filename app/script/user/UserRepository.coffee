@@ -592,14 +592,7 @@ class z.user.UserRepository
   @param username [String] New user name
   ###
   verify_username: (username) ->
-    return Promise.resolve @validate_username(username)
-
-  ###
-  Validate that username to match the specified characteristics.
-  @param username [String] New user name
-  ###
-  validate_username: (username) ->
-    return _.isString(username) and /^[a-zA-Z0-9_]{2,21}$/.test username
+    return Promise.resolve z.user.UserHandleGenerator.validate(username)
 
   ###
   Change the profile image.

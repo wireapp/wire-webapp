@@ -29,9 +29,7 @@ z.user.UserHandleGenerator = do ->
   @param name [String]
   ###
   normalize_name = (name) ->
-    return window.getSlug name
-    .replace new RegExp(/[^a-zA-Z0-9_]/, 'g'), ''
-    .substring 0, 21
+    return window.getSlug(name).replace new RegExp(/[^a-zA-Z0-9_]{2,21}/, 'g'), ''
 
   ###
   Create user handle variations.
@@ -40,6 +38,14 @@ z.user.UserHandleGenerator = do ->
   create_handle_variations = (name) ->
 
 
+  ###
+  Validate user handle.
+  @param handle [String]
+  ###
+  validate = (handle) ->
+    return _.isString(handle) and /^[a-zA-Z0-9_]{2,21}$/.test handle
+
   return {} =
-    normalize_name: normalize_name
     create_handle_variations: create_handle_variations
+    normalize_name: normalize_name
+    validate: validate
