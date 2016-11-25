@@ -15,7 +15,7 @@
     "lru-ts": "https://github.com/wireapp/lru-ts.git#321024a90dd82a3379864382f4e16908c3ff8467",
     "marked": "https://github.com/wireapp/marked.git#0f932d79aab362846eab11354f783db02f30cec6",
     "moment": "https://github.com/moment/moment.git#2.16.0",
-    "normalize-css": "https://github.com/necolas/normalize.css.git#5.0.0",
+    "normalize-css": "https://github.com/necolas/normalize.css.git#3.0.3",
     "object-hash": "https://github.com/puleos/object-hash.git#1.1.5",
     "pako": "https://github.com/nodeca/pako.git#1.0.3",
     "phone-format": "https://github.com/albeebe/phoneformat.js.git#v1.0.3",
