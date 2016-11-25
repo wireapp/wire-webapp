@@ -307,7 +307,7 @@ z.util.safe_mailto_open = (email) ->
 
   new_window = window.open "mailto:#{email}"
   if new_window
-    new_window.close()
+    window.setTimeout new_window.close, 10
 
 
 z.util.auto_link_emails = (text) ->
