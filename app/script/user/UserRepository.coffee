@@ -571,7 +571,7 @@ class z.user.UserRepository
   Checks whether the user needs to set a username and generates a suggestion
   ###
   check_username: ->
-    @sshould_set_username = true
+    @should_set_username = true
     generated_username = z.user.UserHandleGenerator.normalize_name @self().name()
     @change_username generated_username
 
