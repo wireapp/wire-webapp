@@ -237,25 +237,28 @@ class z.main.App
   @return [Promise<z.entity.User>] Promise that resolves with the self user entity
   ###
   _get_user_self: ->
-    return new Promise (resolve, reject) =>
-      @repository.user.get_me()
-      .then (user_et) =>
-        @logger.log @logger.levels.INFO, "Loaded self user with ID '#{user_et.id}'"
+    @repository.user.get_me()
+    .then (user_et) =>
+      @logger.log @logger.levels.INFO, "Loaded self user with ID '#{user_et.id}'"
+      if not user_et.email() and not user_et.phone()
+        throw new Error 'User does not have a verified identity'
+      @service.storage.init user_et.id
+      .then =>
+        @_check_user_information user_et
+        return user_et
+    .catch (error) =>
+      throw new Error "Loading self user failed: #{error.message}"
 
-        if not user_et.email() and not user_et.phone()
-          reject new Error 'User does not have a verified identity'
-        else
-          @service.storage.init user_et.id
-          .then =>
-            if not user_et.medium_picture_resource()
-              @view.list.first_run true
-              @repository.user.set_default_picture()
-            resolve user_et
-      .catch (error) =>
-        if not error instanceof z.storage.StorageError
-          error = new Error "Loading self user failed: #{error}"
-          @logger.log @logger.levels.ERROR, error.message
-        reject error
+  ###
+  Check whether we need to set different user information (picture, username).
+  @param user_et [z.entity.User]
+  ###
+  _check_user_information: (user_et) ->
+    if not user_et.medium_picture_resource()
+      @view.list.first_run true
+      @repository.user.set_default_picture()
+    if not user_et.username()
+      @repository.user.check_username()
 
   # Handle URL params
   _handle_url_params: ->

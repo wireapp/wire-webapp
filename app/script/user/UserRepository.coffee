@@ -36,6 +36,7 @@ class z.user.UserRepository
     @connection_mapper = new z.user.UserConnectionMapper()
     @user_mapper = new z.user.UserMapper @asset_service
     @use_v3_api = false
+    @should_set_username = false
 
     @self = ko.observable()
     @users = ko.observableArray []
@@ -564,14 +565,15 @@ class z.user.UserRepository
   Whether the user needs to set a username.
   ###
   should_change_username: ->
-    has_username = @has_username()
-    should_change_username = not has_username
+    return @should_set_username
 
-    if should_change_username
-      generated_username = z.user.UserHandleGenerator.normalize_name @self().name()
-      @change_username generated_username
-
-    return should_change_username
+  ###
+  Checks whether the user needs to set a username and generates a suggestion
+  ###
+  check_username: ->
+    @sshould_set_username = true
+    generated_username = z.user.UserHandleGenerator.normalize_name @self().name()
+    @change_username generated_username
 
   ###
   Self user has username
