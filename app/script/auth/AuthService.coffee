@@ -79,6 +79,8 @@ class z.auth.AuthService
 
       $.ajax
         crossDomain: true
+        headers:
+          Authorization: "Bearer #{window.decodeURIComponent(@client.access_token)}" if @client.access_token
         type: 'POST'
         url: @client.create_url "#{@URL_ACCESS}"
         xhrFields:
