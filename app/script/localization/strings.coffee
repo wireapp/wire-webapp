@@ -400,6 +400,8 @@ z.string.preferences_account_reset_password = 'Reset password'
 z.string.preferences_account_delete = 'Delete account'
 z.string.preferences_account_log_out = 'Log out'
 z.string.preferences_account_username_placeholder = 'Your full name'
+z.string.preferences_account_username_hint = 'You can use the a-z, 0-9 characters and the underscore'
+z.string.preferences_account_username_error = 'Already taken'
 
 z.string.preferences_av_camera = 'Camera'
 z.string.preferences_av_microphone = 'Microphone'

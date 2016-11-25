@@ -76,10 +76,9 @@
   line-height: @line-height-lg;
 }
 
-.preferences-account-username {
+.preferences-account-input {
   .reset-textarea;
   background: transparent;
-  font-weight: bold;
   height: @line-height-xl;
   line-height: @line-height-xl;
   margin-left: -4px;
@@ -87,7 +86,7 @@
   padding-left: 4px;
   padding-right: 4px;
 
-  &:hover + .preferences-account-username-label:after {
+  &:hover + .preferences-account-input-icon:after {
     .icon-mixin("\e177"); // icon-edit
     margin-left: 8px;
   }
@@ -97,8 +96,38 @@
     width: 256px;
   }
 
-  &:focus + .preferences-account-username-label:after {
+  &:focus + .preferences-account-input-icon:after {
     content: "";
     display: none;
   }
 }
+
+.preferences-account-name {
+  font-weight: bold;
+}
+
+.preferences-account-username-wrapper {
+  position: relative;
+  min-height: @line-height-xl * 2;
+}
+
+.preferences-account-username-addsign {
+  position: absolute;
+  top: 0;
+  left: 0;
+  line-height: @line-height-xl;
+  color: @graphite;
+}
+
+.preferences-account-username.error {
+  & ~ .preferences-account-username-error {display: block;}
+}
+
+.preferences-account-username {
+  padding-left: 22px;
+  &:focus ~ .preferences-account-username-hint {display: block;}
+  &:focus ~ .preferences-account-username-error {display: none;}
+}
+
+.preferences-account-username-hint,
+.preferences-account-username-error {display: none;}
