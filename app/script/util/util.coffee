@@ -293,23 +293,26 @@ Opens a new browser tab (target="_blank") with a given URL in a safe environment
 @param url [String] URL you want to open in a new browser tab
 ###
 z.util.safe_window_open = (url, focus = true) ->
-  url = z.util.add_http url
+  new_window = window.open z.util.add_http url
 
-  if navigator.userAgent.indexOf('Electron') > -1
-    window.open url
-  else
-    new_window = window.open()
+  if new_window
     new_window.opener = null
-    new_window.location = url
-
-  if new_window and focus
-    new_window.focus()
+    new_window.focus() if focus
 
   return new_window
 
+
+z.util.safe_mailto_open = (email) ->
+  return if not z.util.is_valid_email email
+
+  new_window = window.open "mailto:#{email}"
+  if new_window
+    new_window.close()
+
+
 z.util.auto_link_emails = (text) ->
   email_pattern = /([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)/gim
-  return text.replace email_pattern, '<a href="mailto:$1" target="prevent-onbeforeunload">$1</a>'
+  return text.replace email_pattern, '<a onclick="z.util.safe_mailto_open(\'$1\')" href="#">$1</a>'
 
 
 z.util.get_last_characters = (message, amount) ->
