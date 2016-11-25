@@ -288,11 +288,13 @@ class z.tracking.EventTrackingRepository
   _disable_error_reporting: ->
     @logger.log @logger.levels.DEBUG, 'Disabling Raygun error reporting'
     Raygun.detach()
+    Raygun.init RAYGUN.API_KEY, {disableErrorTracking: true}
     @_detach_promise_rejection_handler()
 
   _enable_error_reporting: ->
     @logger.log @logger.levels.DEBUG, 'Enabling Raygun error reporting'
     options =
+      disableErrorTracking: false
       ignoreAjaxAbort: true
       ignoreAjaxError: true
       excludedHostnames: [
