@@ -568,7 +568,7 @@ class z.user.UserRepository
     should_change_username = not has_username
 
     if should_change_username
-      generated_username = @generate_username @self().name()
+      generated_username = z.user.UserHandleGenerator.normalize_name @self().name()
       @change_username generated_username
 
     return should_change_username
@@ -578,22 +578,6 @@ class z.user.UserRepository
   ###
   has_username: ->
     return _.isString(@self().username()) and @self().username().length > 1
-
-  ###
-  Generate username based on users full name.
-  @param name [String] users full name
-  ###
-  generate_username: (name) ->
-    generated_username = window.getSlug name
-      .replace /[^a-zA-Z0-9_]/, ''
-      .substring 0, 17
-
-    # if generated_username.length is 0
-      # TODO add random characters
-
-    generated_username = "#{generated_username}#{z.util.get_random_int(0, 10000)}"
-
-    return generated_username
 
   ###
   Change username.
