@@ -262,14 +262,6 @@ z.util.get_random_int = (min, max) ->
   max = Math.floor max
   return Math.floor Math.random() * (max - min) + min
 
-###
-Checks if input is a version 4 UUID
-
-@param uuid [String]
-###
-z.util.is_uuid = (uuid) ->
-  uuid = UUID.parse uuid
-  return uuid and uuid.version is 4
 
 z.util.encode_base64 = (text) ->
   return window.btoa text
