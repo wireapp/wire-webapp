@@ -24,6 +24,8 @@ z.conversation ?= {}
 class z.conversation.SendingQueue
 
   constructor: ->
+    @logger = new z.util.Logger 'z.conversation.SendingQueue', z.config.LOGGER.OPTIONS
+
     @_promises = []
     @_queue = []
     @_blocked = false
