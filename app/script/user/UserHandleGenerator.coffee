@@ -29,14 +29,9 @@ z.user.UserHandleGenerator = do ->
   @param name [String]
   ###
   normalize_name = (name) ->
-    generated_username = window.getSlug name
-    .replace /[^a-zA-Z0-9_]/, ''
-    .substring 0, 17
-
-    # if generated_username.length is 0
-      # TODO add random characters
-
-    return generated_username
+    return window.getSlug name
+    .replace new RegExp(/[^a-zA-Z0-9_]/, 'g'), ''
+    .substring 0, 21
 
   ###
   Create user handle variations.
