@@ -16,26 +16,11 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-# grunt test_init && grunt test_run:entity/message/File
+custom_renderer = new marked.Renderer()
 
-describe 'z.entity.Text', ->
+custom_renderer.paragraph = (text) ->
+  return "#{text.replace(/\n$/, '')}\n"
 
-  text = null
-
-  beforeEach ->
-    text = new z.entity.Text()
-    text.text = 'foo'
-    text.none = z.util.create_random_uuid()
-
-    spyOn(z.util, 'render_message').and.callThrough()
-
-  describe 'cached processed text', ->
-
-    it 'should cache processed tect', ->
-      processed_text = text.render()
-      expect(text.text).toBe processed_text
-
-      processed_text = text.render()
-      expect(text.text).toBe processed_text
-      expect(z.util.render_message.calls.count()).toBe 1
-
+marked.setOptions
+  highlight: (code) -> hljs.highlightAuto(code).value
+  renderer: custom_renderer

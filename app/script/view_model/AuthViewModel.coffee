@@ -1269,20 +1269,18 @@ class z.ViewModel.AuthViewModel
     url = z.util.append_url_parameter url, "#{z.auth.URLParameter.BOT}=#{bot_name}" if bot_name
     use_v3_api = z.util.get_url_parameter z.auth.URLParameter.V3
     url = z.util.append_url_parameter url, "#{z.auth.URLParameter.V3}=#{use_v3_api}" if use_v3_api
+    localytics = z.util.get_url_parameter z.auth.URLParameter.LOCALYTICS
+    url = z.util.append_url_parameter url, "#{z.auth.URLParameter.LOCALYTICS}" if localytics
     window.location.replace url
 
   _register_client: =>
     @client_repository.register_client @password()
     .then (client_observable) =>
       @event_repository.current_client = client_observable
-      @event_repository.get_last_notification_id()
-    .then (last_notification_id) =>
-      @event_repository.last_notification_id last_notification_id
-      @logger.log @logger.levels.INFO, "Set starting point on notification stream to '#{last_notification_id}'"
+      @event_repository.initialize_last_notification_id()
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
-        @logger.log @logger.levels.WARN,
-          "Cannot set starting point on notification stream: #{error.message}", error
+        @logger.log @logger.levels.WARN, "Cannot set starting point on notification stream: #{error.message}", error
       else
         throw error
     .then =>

@@ -20,13 +20,32 @@ describe 'AssetsCrypto', ->
 
   it 'should encrypt and decrypt arraybuffer', (done) ->
     bytes = new Uint8Array 16
-    window.crypto.getRandomValues(bytes);
+    window.crypto.getRandomValues bytes
 
     z.assets.AssetCrypto.encrypt_aes_asset bytes.buffer
-    .then (data) ->
-      [key_bytes, sha256, ciphertext] = data
+    .then ([key_bytes, sha256, ciphertext]) ->
       z.assets.AssetCrypto.decrypt_aes_asset ciphertext, key_bytes, sha256
     .then (buffer) ->
       expect(buffer).toEqual bytes.buffer
       done()
     .catch done.fail
+
+  it 'should not decrypt when hash is missing', (done) ->
+    bytes = new Uint8Array 16
+    window.crypto.getRandomValues bytes
+
+    z.assets.AssetCrypto.encrypt_aes_asset bytes.buffer
+    .then ([key_bytes, sha256, ciphertext]) ->
+      z.assets.AssetCrypto.decrypt_aes_asset ciphertext, key_bytes, null
+    .then done.fail
+    .catch done
+
+  it 'should not decrypt when hash is an empty array', (done) ->
+    bytes = new Uint8Array 16
+    window.crypto.getRandomValues bytes
+
+    z.assets.AssetCrypto.encrypt_aes_asset bytes.buffer
+    .then ([key_bytes, sha256, ciphertext]) ->
+      z.assets.AssetCrypto.decrypt_aes_asset ciphertext, key_bytes, new Uint8Array([])
+    .then done.fail
+    .catch done

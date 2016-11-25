@@ -43,7 +43,7 @@ class z.ViewModel.ConversationInputViewModel
       else
         window.removeEventListener 'click', @on_window_click
 
-    @ephemeral_timer = @conversation_et.ephemeral_timer
+    @has_ephemeral_timer = ko.pureComputed => @conversation_et()?.ephemeral_timer()
 
     @conversation_has_focus = ko.observable(true).extend notify: 'always'
     @browser_has_focus = ko.observable true
@@ -199,8 +199,9 @@ class z.ViewModel.ConversationInputViewModel
     if message.length > z.config.MAXIMUM_MESSAGE_LENGTH
       amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_LONG_MESSAGE,
         data: z.config.MAXIMUM_MESSAGE_LENGTH
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CHARACTER_LIMIT_REACHED,
-        characters: message.length
+        close: ->
+          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CHARACTER_LIMIT_REACHED,
+            characters: message.length
       return
 
     if @is_editing()

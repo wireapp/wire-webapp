@@ -118,7 +118,7 @@ class z.ViewModel.ModalsViewModel
         else
           options.action?()
 
-    @logger.log @logger.levels.INFO, "Show modal of type '#{type}'"
+    @logger.log @logger.levels.INFO, "Show modal of type '#{type}'" if not modal.is_shown()
     modal.toggle()
 
   _show_modal_block: (content, title_element, message_element) ->

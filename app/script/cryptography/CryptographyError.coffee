@@ -30,8 +30,6 @@ class z.cryptography.CryptographyError
         'Failed to map external message'
       when z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
         'Ignored asset preview'
-      when z.cryptography.CryptographyError::TYPE.IGNORED_HOT_KNOCK
-        'Ignored hot knock'
       when z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
         'Ignored image preview'
       when z.cryptography.CryptographyError::TYPE.NO_DATA_CONTENT
@@ -50,7 +48,6 @@ class z.cryptography.CryptographyError
   @::TYPE =
     BROKEN_EXTERNAL: 'z.cryptography.CryptographyError::TYPE.BROKEN_EXTERNAL'
     IGNORED_ASSET: 'z.cryptography.CryptographyError::TYPE.IGNORED_ASSET'
-    IGNORED_HOT_KNOCK: 'z.cryptography.CryptographyError::TYPE.IGNORED_HOT_KNOCK'
     IGNORED_PREVIEW: 'z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW'
     NO_DATA_CONTENT: 'z.cryptography.CryptographyError::TYPE.NO_DATA_CONTENT'
     NO_GENERIC_MESSAGE: 'z.cryptography.CryptographyError::TYPE.NO_GENERIC_MESSAGE'

@@ -206,8 +206,9 @@ class z.ViewModel.ParticipantsViewModel
         @user_repository.unblock_user user_et
         .then =>
           @participants_bubble.hide()
-          conversation_et = @conversation_repository.get_one_to_one_conversation user_et.id
-          @conversation_repository.update_participating_user_ets conversation_et
+          @conversation_repository.get_one_to_one_conversation user_et
+          .then (conversation_et) =>
+            @conversation_repository.update_participating_user_ets conversation_et
 
   block: (user_et) =>
     amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT

@@ -62,27 +62,12 @@ class z.cryptography.CryptographyRepository
   @return [Promise] Promise that resolves with an array of last resort key, pre-keys, and signaling keys
   ###
   generate_client_keys: =>
-    return new Promise (resolve, reject) =>
-      last_resort_key = undefined
-      pre_keys = undefined
-      signaling_keys = undefined
-
+    return Promise.all([
       @_generate_last_resort_key()
-      .then (key) =>
-        last_resort_key = key
-        @logger.log @logger.levels.INFO, 'Generated last resort key', last_resort_key
-        return @_generate_pre_keys()
-      .then (keys) =>
-        pre_keys = keys
-        @logger.log @logger.levels.INFO, "Number of generated pre-keys: #{pre_keys.length}", pre_keys
-        return @_generate_signaling_keys()
-      .then (keys) =>
-        signaling_keys = keys
-        @logger.log @logger.levels.INFO, 'Generated signaling keys', signaling_keys
-        resolve [last_resort_key, pre_keys, signaling_keys]
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Failed to generate client keys: #{error.message}", error
-        reject error
+      @_generate_pre_keys()
+      @_generate_signaling_keys()
+    ]).catch (error) ->
+      throw new Error "Failed to generate client keys: #{error.message}"
 
   ###
   Get the fingerprint of the local identity.
@@ -124,8 +109,6 @@ class z.cryptography.CryptographyRepository
   ###
   get_users_pre_keys: (user_client_map) ->
     @cryptography_service.get_users_pre_keys user_client_map
-    .then (response) ->
-      return response
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Failed to get pre-key from backend: #{error.message}"
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
@@ -332,7 +315,6 @@ class z.cryptography.CryptographyRepository
           @logger.log @logger.levels.WARN, "Failed to request pre-key for client '#{client_id}' of user '#{user_id}'': #{error.message}", error
         else
           @logger.log @logger.levels.ERROR, "Failed to initialize session from pre-key for client '#{client_id}' of user '#{user_id}': #{error.message}", error
-      return undefined
 
   ###
   Initiate new sessions for a given map.
@@ -473,16 +455,11 @@ class z.cryptography.CryptographyRepository
         reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.NO_DATA_CONTENT
         return
 
-      if event.type is z.event.Backend.CONVERSATION.OTR_ASSET_ADD
-        ciphertext = event.data.key
-      else if event.type is z.event.Backend.CONVERSATION.OTR_MESSAGE_ADD
-        ciphertext = event.data.text
-
       primary_key = z.storage.StorageService.construct_primary_key event
       @storage_repository.load_event_for_conversation primary_key
       .then (loaded_event) =>
         if loaded_event is undefined
-          resolve @_decrypt_message event, ciphertext
+          resolve @_decrypt_message event
         else
           @logger.log @logger.levels.INFO, "Skipped decryption of event '#{event.type}' (#{primary_key}) because it was previously stored"
           reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
@@ -556,9 +533,10 @@ class z.cryptography.CryptographyRepository
   ###
   @return [z.proto.GenericMessage] Decrypted message in ProtocolBuffer format
   ###
-  _decrypt_message: (event, ciphertext) =>
+  _decrypt_message: (event) =>
     user_id = event.from
     client_id = event.data.sender
+    ciphertext = event.data.text or event.data.key
 
     session = @load_session user_id, client_id
     msg_bytes = sodium.from_base64(ciphertext).buffer

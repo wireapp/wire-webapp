@@ -334,7 +334,8 @@ z.string.hr.people_tabs_device_detail_headline = 'Provjerite da je otisak prikaz
 z.string.hr.people_tabs_device_detail_how_to = 'Kako to da učinim?'
 z.string.hr.people_tabs_device_detail_reset_session = 'Resetiraj sesiju'
 z.string.hr.people_tabs_device_detail_show_my_device = 'Pokaži otisak mog uređaja'
-z.string.hr.people_tabs_device_detail_verified = 'Verificirano'
+z.string.hr.people_tabs_device_detail_verify = 'Verificirano'
+z.string.hr.people_verified = 'Verificirano'
 
 # Block user
 z.string.hr.people_block_headline = 'Blokirati?'
@@ -379,6 +380,7 @@ z.string.hr.people_button_yes = 'Da'
 # Settings
 z.string.hr.preferences_about = 'O programu'
 z.string.hr.preferences_account = 'Račun'
+z.string.hr.preferences_av = 'Audio / Video'
 z.string.hr.preferences_device_details = 'Detalji o uređaju'
 z.string.hr.preferences_devices = 'Uređaji'
 z.string.hr.preferences_headline = 'Osobne postavke'
@@ -400,6 +402,7 @@ z.string.hr.preferences_account_username_placeholder = 'Vaše puno ime'
 
 z.string.hr.preferences_av_camera = 'Kamera'
 z.string.hr.preferences_av_microphone = 'Mikrofon'
+z.string.hr.preferences_av_permission_detail = 'Omogućite iz opcija preglednika'
 z.string.hr.preferences_av_speakers = 'Zvučnici'
 
 z.string.hr.preferences_devices_activated_in = 'u %location'
@@ -412,7 +415,7 @@ z.string.hr.preferences_devices_fingerprint_detail = 'Wire daje svakom uređaju 
 z.string.hr.preferences_devices_id = 'ID: '
 z.string.hr.preferences_devices_remove = 'Ukloni'
 z.string.hr.preferences_devices_remove_cancel = 'Odustani'
-z.string.hr.preferences_devices_remove_detail = 'Uklonite ovaj uređaj ako ste ga prestali koristiti. Vaša povijest poruka će biti izbrisana na ovom uređaju i biti ćete izlogirani.'
+z.string.hr.preferences_devices_remove_detail = 'Uklonite ovaj uređaj ako ste ga prestali koristiti. Odmah ćete biti automatski odjavljeni.'
 z.string.hr.preferences_devices_session_confirmation = 'Sesija je resetirana.'
 z.string.hr.preferences_devices_session_detail = 'Ako otisci prstiju ne odgovaraju, resetirajte sesiju da bi generirali nove ključeve za šifriranje na obje strane.'
 z.string.hr.preferences_devices_session_reset = 'Resetiraj sesiju'
@@ -498,7 +501,7 @@ z.string.hr.warning_not_found_camera = 'Poziv nije moguć jer računalo nema kam
 z.string.hr.warning_not_found_microphone = 'Poziv nije moguć jer računalo nema mikrofon.'
 z.string.hr.warning_permission_denied_camera = 'Poziv nije moguć jer računalo nema pristup kameri.'
 z.string.hr.warning_permission_denied_microphone = 'Poziv nije moguć jer računalo nema pristup mikrofonu.'
-z.string.hr.warning_permission_denied_screen = 'Ne možete zajednički koristiti vaš zaslon jer preglednik nema pristup.'
+z.string.hr.warning_permission_denied_screen = 'Vaš preglednik treba dozvolu za zajedničko korištenje vašeg zaslona.'
 z.string.hr.warning_permission_request_camera = '%icon dopusti pristup kameri'
 z.string.hr.warning_permission_request_microphone = '%icon dopusti pristup mikrofonu'
 z.string.hr.warning_permission_request_notification = '%icon Dopusti notifikacije'

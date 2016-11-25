@@ -29,9 +29,7 @@
           <div class="calls-controls-row calls-controls-row-participants"
                data-bind="click: $parent.click_on_conversation">
             <!-- ko foreach: call().participants() -->
-              <user-avatar class="user-avatar-xs"
-                           params="user: $data.user"
-                           data-bind="attr: {title: $data.user.name}"></user-avatar>
+              <user-avatar class="user-avatar-xs" params="user: $data.user"></user-avatar>
             <!-- /ko -->
           </div>
         <!-- /ko -->
@@ -108,6 +106,7 @@
                   <div class="calls-controls-action calls-controls-action-screensharing">
                     <div class="up">
                       <div class="button-round button-round-dark icon-screensharing"
+                           data-uie-name="do-call-screenshare"
                            data-bind="click: $parent.on_toggle_screen, css: {'toggled': $parent.self_stream_state.screen_shared(), 'disabled': $parent.disable_toggle_screen()}">
                       </div>
                     </div>
@@ -125,6 +124,7 @@
                   <div class="calls-controls-action calls-controls-action-video">
                     <div class="up">
                       <div class="button-round button-round-dark icon-video"
+                           data-uie-name="do-call-video"
                            data-bind="click: $parent.on_toggle_video, css: {'toggled': $parent.self_stream_state.videod()}"></div>
                     </div>
                     <div class="down">

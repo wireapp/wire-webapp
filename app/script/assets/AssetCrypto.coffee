@@ -66,10 +66,10 @@ z.assets.AssetCrypto =
       a = new Uint32Array reference_sha256
       b = new Uint32Array computed_sha256
 
-      if not a.every((x, i) -> x is b[i])
-        throw new Error 'Encrypted asset does not match its SHA-256 hash'
+      if a.length is b.length and a.every((x, i) -> x is b[i])
+        return window.crypto.subtle.importKey 'raw', key_bytes, 'AES-CBC', false, ['decrypt']
 
-      return window.crypto.subtle.importKey 'raw', key_bytes, 'AES-CBC', false, ['decrypt']
+      throw new Error 'Encrypted asset does not match its SHA-256 hash'
     .then (key) ->
       iv = ciphertext.slice 0, 16
       img_ciphertext = ciphertext.slice 16

@@ -19,9 +19,6 @@
 window.z ?= {}
 z.entity ?= {}
 
-# cache processed text including media embeds, link highlight and markdown
-text_cache = new LRUCache 1000
-
 # Text asset entity.
 class z.entity.Text extends z.entity.Asset
   ###
@@ -50,8 +47,4 @@ class z.entity.Text extends z.entity.Asset
 
   # Process text before rendering it.
   render: ->
-    processed_text = text_cache.get @nonce
-    if not processed_text?
-      processed_text = z.util.render_message @text, @theme_color
-      text_cache.put @nonce, processed_text
-    return processed_text
+    return z.util.render_message @text, @theme_color

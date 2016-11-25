@@ -67,8 +67,9 @@ z.event.WebApp =
   CONVERSATION:
     DEBUG: 'wire.webapp.conversation.debug'
     EVENT_FROM_BACKEND: 'wire.webapp.conversation.event-from-backend'
+    EPHEMERAL_MESSAGE_TIMEOUT: 'wire.webapp.conversation.ephemeral-message-timeout'
     LOADED_STATES: 'wire.webapp.conversation.loaded-states'
-    MAP_CONNECTION: 'wire.webapp.conversation.map-connection'
+    MAP_CONNECTIONS: 'wire.webapp.conversation.map-connections'
     PEOPLE:
       HIDE: 'wire.webapp.conversation.people.hide'
     SHOW: 'wire.webapp.conversation.show'

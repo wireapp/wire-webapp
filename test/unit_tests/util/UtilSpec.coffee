@@ -29,7 +29,7 @@ describe 'z.util.render_message', ->
     expected = 'Check this: <a href="http://wire.com/about/" target="_blank" rel="nofollow noopener noreferrer">wire.com/about/</a>'
     expect(actual).toBe expected
 
-  it 'renders complicated image links', ->
+  xit 'renders complicated image links', ->
     link = 'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&crop=(0,27,848,506.0960451977401)&cropxunits=848&cropyunits=595&format=jpg&quality=90&width=752&maxheight=42'
     actual = z.util.render_message link
     expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>"
@@ -42,7 +42,7 @@ describe 'z.util.render_message', ->
     expected = "Stormtroopers: <a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a> !!!"
     expect(actual).toBe expected
 
-  it 'renders links with multiple underscores', ->
+  xit 'renders links with multiple underscores', ->
     link = 'https://www.nike.com/events-registration/event?id=6245&languageLocale=de_de&cp=EUNS_KW_DE_&s_kwcid=AL!2799!3!46005237943!b!!g!!womens%20running'
     actual = z.util.render_message link
     expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>"
@@ -74,22 +74,22 @@ describe 'z.util.render_message', ->
 
   it 'renders an email address', ->
     actual = z.util.render_message "send it over to hello@wire.com"
-    expected = 'send it over to <a href="mailto:hello@wire.com">hello@wire.com</a>'
+    expected = 'send it over to <a href="mailto:hello@wire.com" target="prevent-onbeforeunload">hello@wire.com</a>'
     expect(actual).toBe expected
 
   it 'renders an email address with pluses', ->
     actual = z.util.render_message "send it over to hello+world@wire.com"
-    expected = 'send it over to <a href="mailto:hello+world@wire.com">hello+world@wire.com</a>'
+    expected = 'send it over to <a href="mailto:hello+world@wire.com" target="prevent-onbeforeunload">hello+world@wire.com</a>'
     expect(actual).toBe expected
 
   it 'renders an email long domains', ->
     actual = z.util.render_message "send it over to janedoe@school.university.edu"
-    expected = 'send it over to <a href="mailto:janedoe@school.university.edu">janedoe@school.university.edu</a>'
+    expected = 'send it over to <a href="mailto:janedoe@school.university.edu" target="prevent-onbeforeunload">janedoe@school.university.edu</a>'
     expect(actual).toBe expected
 
   it 'renders an email with multiple subdomains', ->
     actual = z.util.render_message "send it over to bla@foo.co.uk"
-    expected = 'send it over to <a href="mailto:bla@foo.co.uk">bla@foo.co.uk</a>'
+    expected = 'send it over to <a href="mailto:bla@foo.co.uk" target="prevent-onbeforeunload">bla@foo.co.uk</a>'
     expect(actual).toBe expected
 
   # The tag "<br />" is preferred for compatibility sake.
@@ -858,6 +858,9 @@ describe 'bucket_values', ->
     expect(z.util.bucket_values 0, [0, 5, 10, 15, 20, 25]).toBe '0'
 
   it 'returns the correct bucket if value is inside the given limits', ->
+    expect(z.util.bucket_values 0.1, [0, 5, 10, 15, 20, 25]).toBe '0'
+    expect(z.util.bucket_values 1, [0, 5, 10, 15, 20, 25]).toBe '1-5'
+    expect(z.util.bucket_values 5.5, [0, 5, 10, 15, 20, 25]).toBe '1-5'
     expect(z.util.bucket_values 13, [0, 5, 10, 15, 20, 25]).toBe '11-15'
     expect(z.util.bucket_values 1023, [0, 100, 200, 500, 1000, 2000]).toBe '1001-2000'
 

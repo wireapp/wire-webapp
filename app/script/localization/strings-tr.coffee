@@ -333,7 +333,8 @@ z.string.tr.people_tabs_device_detail_headline = 'Bunun %bold%%@.names’in ayg�
 z.string.tr.people_tabs_device_detail_how_to = 'Bunu nasıl yapıyoruz?'
 z.string.tr.people_tabs_device_detail_reset_session = 'Oturumu Sıfırla'
 z.string.tr.people_tabs_device_detail_show_my_device = 'Cihaz parmak izimi göster'
-z.string.tr.people_tabs_device_detail_verified = 'Doğrulanmış'
+z.string.tr.people_tabs_device_detail_verify = 'Doğrulanmış'
+z.string.tr.people_verified = 'Doğrulanmış'
 
 # Block user
 z.string.tr.people_block_headline = 'Engelle?'
@@ -413,7 +414,7 @@ z.string.tr.preferences_devices_fingerprint_detail = 'Wire her cihaza kendine ha
 z.string.tr.preferences_devices_id = 'ID: '
 z.string.tr.preferences_devices_remove = 'Kaldır'
 z.string.tr.preferences_devices_remove_cancel = 'İptal'
-z.string.tr.preferences_devices_remove_detail = 'Eğer bu cihazı kullanmayı bıraktıysanız, cihazı kaldırın. Konuşma geçmişinizden cihazdan silinecek ve otomatik olarak çıkış yapılacak.'
+z.string.tr.preferences_devices_remove_detail = 'Eğer bu cihazı kullanmayı bıraktıysanız, cihazı kaldırın. Ardından cihazdan otomatik olarak çıkış yapılacaktır.'
 z.string.tr.preferences_devices_session_confirmation = 'Oturum sıfırlandı.'
 z.string.tr.preferences_devices_session_detail = 'Parmak izleri eşleşmezse, her iki tarafta da yeni şifreleme anahtarları oluşturmak için oturumu sıfırlayın.'
 z.string.tr.preferences_devices_session_reset = 'Oturumu Sıfırla'
@@ -499,7 +500,7 @@ z.string.tr.warning_not_found_camera = 'Arama yapamıyorsunuz çünkü bilgisaya
 z.string.tr.warning_not_found_microphone = 'Arama yapamıyorsunuz çünkü bilgisayarınızda bir mikrofon bulunmamaktadır.'
 z.string.tr.warning_permission_denied_camera = 'Arama yapamıyorsunuz çünkü tarayıcınızın kameraya erişim izni bulunmamaktadır.'
 z.string.tr.warning_permission_denied_microphone = 'Arama yapamıyorsunuz çünkü tarayıcınızın mikrofona erişim izni bulunmamaktadır.'
-z.string.tr.warning_permission_denied_screen = 'Ekranınızı paylaşamıyorsunuz çünkü tarayıcınız gerekli izinlere sahip değil.'
+z.string.tr.warning_permission_denied_screen = 'Tarayıcınız ekranınızı paylaşmak için gerekli izinleri sağlamalıdır.'
 z.string.tr.warning_permission_request_camera = '%icon Kameraya erişime izin ver'
 z.string.tr.warning_permission_request_microphone = '%icon Mikrofona erişime izin ver'
 z.string.tr.warning_permission_request_notification = '%icon Bildirimlere izin ver'

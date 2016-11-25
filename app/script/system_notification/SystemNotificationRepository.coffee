@@ -227,8 +227,6 @@ class z.SystemNotification.SystemNotificationRepository
         content: message_et.user_ids().length
       ]
 
-
-
   ###
   Creates the notification body for people being removed from or leaving a group conversation.
 
@@ -307,7 +305,6 @@ class z.SystemNotification.SystemNotificationRepository
   ###
   _create_body_ping: ->
     return z.localization.Localizer.get_text z.string.system_notification_ping
-
 
   ###
   Creates the notification body for reaction.
@@ -567,14 +564,14 @@ class z.SystemNotification.SystemNotificationRepository
       @logger.log @logger.levels.INFO, "Notification for '#{message_id} in '#{conversation_id}' closed by click."
       notification.close()
     notification.onclose = =>
-      clearTimeout timeout_trigger_id
+      window.clearTimeout timeout_trigger_id
       @notifications.splice @notifications.indexOf(notification), 1
       @logger.log @logger.levels.INFO, "Removed notification for '#{message_id}' in '#{conversation_id}' locally."
     notification.onerror = =>
       @logger.log @logger.levels.ERROR, "Notification for '#{message_id}' in '#{conversation_id}' closed by error."
       notification.close()
     notification.onshow = =>
-      timeout_trigger_id = setTimeout =>
+      timeout_trigger_id = window.setTimeout =>
         @logger.log @logger.levels.INFO, "Notification for '#{message_id}' in '#{conversation_id}' closed by timeout."
         notification.close()
       , notification_content.timeout

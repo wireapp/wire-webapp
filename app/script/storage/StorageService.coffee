@@ -117,19 +117,19 @@ class z.storage.StorageService
         "#{@OBJECT_STORE_PREKEYS}": ''
         "#{@OBJECT_STORE_SESSIONS}": ''
 
+      version_9 =
+        "#{@OBJECT_STORE_AMPLIFY}": ''
+        "#{@OBJECT_STORE_CLIENTS}": ', meta.primary_key'
+        "#{@OBJECT_STORE_CONVERSATION_EVENTS}": ', conversation, time, type, [conversation+time]'
+        "#{@OBJECT_STORE_CONVERSATIONS}": ', id, last_event_timestamp'
+        "#{@OBJECT_STORE_KEYS}": ''
+        "#{@OBJECT_STORE_PREKEYS}": ''
+        "#{@OBJECT_STORE_SESSIONS}": ''
+
       @db = new Dexie @db_name
 
       @db.on 'blocked', =>
         @logger.log @logger.levels.ERROR, 'Database is blocked'
-
-      # @see https://github.com/dfahlander/Dexie.js/issues/189#issuecomment-196304545
-      # @see https://github.com/dfahlander/Dexie.js/wiki/Dexie.UpgradeError
-      Dexie.Promise.on 'error', (error) =>
-        switch error.name
-          when Dexie.errnames.Upgrade
-            @logger.log @logger.levels.ERROR, "Failed to open database '#{@db_name}': #{error.message}", error
-          else
-            @logger.log @logger.levels.ERROR, "Database error (#{error.name}): #{error.message}", error
 
       # @see https://github.com/dfahlander/Dexie.js/wiki/Version.upgrade()
       # @see https://github.com/dfahlander/Dexie.js/wiki/WriteableCollection.modify()
@@ -138,7 +138,7 @@ class z.storage.StorageService
       @db.version(3).stores version_3
       @db.version(4).stores version_4
       .upgrade (transaction) =>
-        @logger.log @logger.levels.WARN, 'Database upgrade to version 4', transaction
+        @logger.log @logger.levels.WARN, "Database upgrade to version #{@db.verno}", transaction
         transaction[@OBJECT_STORE_CLIENTS].toCollection().modify (client) =>
           client.meta =
             is_verified: true
@@ -147,7 +147,7 @@ class z.storage.StorageService
       @db.version(5).stores version_4
       @db.version(6).stores version_4
       .upgrade (transaction) =>
-        @logger.log @logger.levels.WARN, 'Database upgrade to version 6', transaction
+        @logger.log @logger.levels.WARN, "Database upgrade to version #{@db.verno}", transaction
         transaction[@OBJECT_STORE_CONVERSATIONS].toCollection().eachKey (key) =>
           @db[@OBJECT_STORE_CONVERSATIONS].update key, {id: key}
         transaction[@OBJECT_STORE_SESSIONS].toCollection().eachKey (key) =>
@@ -156,7 +156,7 @@ class z.storage.StorageService
           @db[@OBJECT_STORE_PREKEYS].update key, {id: key}
       @db.version(7).stores version_5
       .upgrade (transaction) =>
-        @logger.log @logger.levels.WARN, 'Database upgrade to version 7', transaction
+        @logger.log @logger.levels.WARN, "Database upgrade to version #{@db.verno}", transaction
         transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
           mapped_event = event.mapped or event.raw
           delete event.mapped
@@ -165,9 +165,11 @@ class z.storage.StorageService
           $.extend event, mapped_event
       @db.version(8).stores version_5
       .upgrade (transaction) =>
+        @logger.log @logger.levels.WARN, "Database upgrade to version #{@db.verno}", transaction
         transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
           if event.type is z.event.Client.CONVERSATION.DELETE_EVERYWHERE
             event.time = new Date(event.time).toISOString()
+      @db.version(9).stores version_9
 
       @db.open()
       .then =>
@@ -192,15 +194,14 @@ class z.storage.StorageService
   delete: (store_name, primary_key) =>
     return new Dexie.Promise (resolve, reject) =>
       if @db[store_name]?
-        @db[store_name].delete primary_key
+        return @db[store_name].delete primary_key
         .then =>
           @logger.log "Deleted '#{primary_key}' from object store '#{store_name}'"
           resolve primary_key
         .catch (error) =>
           @logger.log @logger.levels.ERROR, "Failed to delete '#{primary_key}' from store '#{store_name}'", error
           reject error
-      else
-        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
+      reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   clear_all_stores: =>
     promises = (@delete_store store_name for store_name of @db._dbSchema)
@@ -220,16 +221,15 @@ class z.storage.StorageService
   delete_everything: =>
     return new Dexie.Promise (resolve, reject) =>
       if @db?
-        @db.delete()
+        return @db.delete()
         .then =>
           @logger.log @logger.levels.INFO, "Clearing IndexedDB '#{@db_name}' successful"
           resolve true
         .catch (error) =>
           @logger.log @logger.levels.ERROR, "Clearing IndexedDB '#{@db_name}' failed"
           reject error
-      else
-        @logger.log @logger.levels.ERROR, "IndexedDB '#{@db_name}' not found"
-        resolve true
+      @logger.log @logger.levels.ERROR, "IndexedDB '#{@db_name}' not found"
+      resolve true
 
   ###
   Returns an array of all records for a given object store.
@@ -240,14 +240,12 @@ class z.storage.StorageService
   get_all: (store_name) =>
     return new Dexie.Promise (resolve, reject) =>
       if @db[store_name]?
-        @db[store_name]
-        .toArray()
+        return @db[store_name].toArray()
         .then (records) -> resolve records
         .catch (error) =>
           @logger.log @logger.levels.ERROR, "Could not load objects from store '#{store_name}'", error
           reject error
-      else
-        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
+      reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   ###
   Returns an array of all keys in a given object store.
@@ -258,8 +256,7 @@ class z.storage.StorageService
   get_keys: (store_name, regex_string) =>
     return new Dexie.Promise (resolve, reject) =>
       if @db[store_name]?
-        @db[store_name]
-        .toCollection()
+        return @db[store_name].toCollection()
         .keys()
         .then (keys) ->
           if regex_string is undefined
@@ -269,8 +266,7 @@ class z.storage.StorageService
             accepted_keys = keys.filter (key) -> key.match regex
             resolve accepted_keys
         .catch (error) -> reject error
-      else
-        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
+      reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   ###
   Loads persisted data via a promise.
@@ -283,14 +279,13 @@ class z.storage.StorageService
   ###
   load: (store_name, primary_key) =>
     return new Dexie.Promise (resolve, reject) =>
-      if @db[store_name]?
-        @db[store_name].get primary_key
+      return if @db[store_name]?
+        return @db[store_name].get primary_key
         .then (record) -> resolve record
         .catch (error) =>
           @logger.log @logger.levels.ERROR, "Failed to load '#{primary_key}' from store '#{store_name}'", error
           reject error
-      else
-        reject new Error z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
+      reject new Error z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   ###
   Loads all objects from an object store and returns them with their keys and values.
@@ -338,15 +333,12 @@ class z.storage.StorageService
   save: (store_name, primary_key, entity) =>
     return new Dexie.Promise (resolve, reject) =>
       if @db[store_name]?
-        @db[store_name].put entity, primary_key
-        .then (key) =>
-          @logger.log @logger.levels.INFO, "Saved '#{key}' into store '#{store_name}'", entity
-          resolve key
+        return @db[store_name].put entity, primary_key
+        .then resolve
         .catch (error) =>
           @logger.log @logger.levels.ERROR, "Failed to put '#{primary_key}' into store '#{store_name}'", error
           reject error
-      else
-        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
+      reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
   ###
   Closes the database. This operation completes immediately and there is no returned Promise.
@@ -368,7 +360,7 @@ class z.storage.StorageService
   update: (store_name, primary_key, changes) =>
     return new Dexie.Promise (resolve, reject) =>
       if @db[store_name]?
-        @db[store_name].update primary_key, changes
+        return @db[store_name].update primary_key, changes
         .then (number_of_updates) =>
           @logger.log @logger.levels.INFO,
             "Updated #{number_of_updates} record(s) with key '#{primary_key}' in store '#{store_name}'", changes
@@ -376,5 +368,4 @@ class z.storage.StorageService
         .catch (error) =>
           @logger.log @logger.levels.ERROR, "Failed to update '#{primary_key}' in store '#{store_name}'", error
           reject error
-      else
-        reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
+      reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND

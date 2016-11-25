@@ -91,7 +91,7 @@ describe 'z.conversation.ConversationService', ->
     # @formatter:on
 
     it 'updated event in the database', (done) ->
-      event.time = new Date(Date.now()).toISOString()
+      event.time = new Date().toISOString()
       conversation_service.update_message_in_db event, {time: event.time}
       .then done
       .catch done.fail
@@ -110,10 +110,11 @@ describe 'z.conversation.ConversationService', ->
     messages = undefined
 
     beforeEach (done) ->
+      timestamp = 1479903546799
       messages = [0...10].map (index) ->
         return {
           key: "#{conversation_id}@#{sender_id}@#{index}"
-          object: {"conversation": conversation_id, "time": index}
+          object: {"conversation": conversation_id, "time": new Date(timestamp + index).toISOString()}
         }
 
       Promise.all messages.map (message) ->
@@ -121,8 +122,8 @@ describe 'z.conversation.ConversationService', ->
       .then done
       .catch done.fail
 
-    it 'doesnt load events for invalid conversation id', (done) ->
-      conversation_service.load_events_from_db 'invalid_id', 9, 30
+    it 'doesn\'t load events for invalid conversation id', (done) ->
+      conversation_service.load_events_from_db 'invalid_id', 1479903546808, 30
       .then (events) =>
         expect(events.length).toBe 0
         done()
@@ -140,28 +141,28 @@ describe 'z.conversation.ConversationService', ->
         done()
 
     it 'loads events with start timestamp', (done) ->
-      conversation_service.load_events_from_db conversation_id, 4
+      conversation_service.load_events_from_db conversation_id, 1479903546803
       .then (events) =>
         expect(events.length).toBe 4
-        expect(events[0].time).toBe 3
-        expect(events[1].time).toBe 2
-        expect(events[2].time).toBe 1
-        expect(events[3].time).toBe 0
+        expect(events[0].time).toBe '2016-11-23T12:19:06.802Z'
+        expect(events[1].time).toBe '2016-11-23T12:19:06.801Z'
+        expect(events[2].time).toBe '2016-11-23T12:19:06.800Z'
+        expect(events[3].time).toBe '2016-11-23T12:19:06.799Z'
         done()
 
     it 'loads events with start and end timestamp', (done) ->
-      conversation_service.load_events_from_db conversation_id, 8, 6
+      conversation_service.load_events_from_db conversation_id, 1479903546807, 1479903546805
       .then (events) =>
         expect(events.length).toBe 1
-        expect(events[0].time).toBe 7
+        expect(events[0].time).toBe '2016-11-23T12:19:06.806Z'
         done()
 
-    it 'loads events with start and end timestamp', (done) ->
-      conversation_service.load_events_from_db conversation_id, 8, 1, 2
+    it 'loads events with start and end timestamp and a fetch limit', (done) ->
+      conversation_service.load_events_from_db conversation_id, 1479903546807, 1479903546800, 2
       .then (events) =>
         expect(events.length).toBe 2
-        expect(events[0].time).toBe 7
-        expect(events[1].time).toBe 6
+        expect(events[0].time).toBe '2016-11-23T12:19:06.806Z'
+        expect(events[1].time).toBe '2016-11-23T12:19:06.805Z'
         done()
 
   describe 'save_conversation_in_db', ->

@@ -119,8 +119,8 @@ class z.assets.AssetService
       [medium_image, medium_image_bytes] = medium
 
       return Promise.all([
-        @_upload_asset small_image_bytes, {public: true}
-        @_upload_asset medium_image_bytes, {public: true}
+        @post_asset_v3 small_image_bytes, {public: true}
+        @post_asset_v3 medium_image_bytes, {public: true}
       ])
     .then ([small_credentials, medium_credentials]) ->
       return [small_credentials.key, medium_credentials.key]
@@ -133,11 +133,12 @@ class z.assets.AssetService
   @param options [Object]
   @option public [Boolean]
   @option retention [z.assets.AssetRetentionPolicy]
+  @param xhr_accessor_function [Function] Function will get a reference to the underlying XMLHTTPRequest
   ###
-  _upload_asset: (bytes, options) ->
+  _upload_asset: (bytes, options, xhr_accessor_function) ->
     z.assets.AssetCrypto.encrypt_aes_asset bytes
     .then ([key_bytes, sha256, ciphertext]) =>
-      return @post_asset_v3 ciphertext, options
+      return @post_asset_v3 ciphertext, options, xhr_accessor_function
       .then ({key, token}) ->
         return [key_bytes, sha256, key, token]
 
@@ -149,11 +150,12 @@ class z.assets.AssetService
   @param options [Object]
   @option public [Boolean]
   @option retention [z.assets.AssetRetentionPolicy]
+  @param xhr_accessor_function [Function] Function will get a reference to the underlying XMLHTTPRequest
   ###
-  upload_asset: (file, options) ->
+  upload_asset: (file, options, xhr_accessor_function) ->
     z.util.load_file_buffer file
     .then (buffer) =>
-      @_upload_asset buffer, options
+      @_upload_asset buffer, options, xhr_accessor_function
     .then ([key_bytes, sha256, key, token]) ->
       asset = new z.proto.Asset()
       asset.set 'uploaded', new z.proto.Asset.RemoteData key_bytes, sha256, key, token

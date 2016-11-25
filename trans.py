@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# coding: utf-8
 #
 # Wire
 # Copyright (C) 2016 Wire Swiss GmbH
@@ -20,15 +21,21 @@
 import os
 import shutil
 import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 SUPPORTED_LOCALE = [
+  'cs',
   'de',
   'es',
-  'hr',
   'fi',
   'fr',
+  'hr',
+  'it',
+  'pt',
   'ro',
   'ru',
+  'sl',
   'tr',
   'uk',
 ]
@@ -54,6 +61,20 @@ def get_locale(filename):
   return locale if len(locale) == 2 else None
 
 
+def fix_apostrophe(text):
+  if not text:
+    return text
+  text = unicode(text, errors='ignore')
+  first = text.find(u"'")
+  last = text.rfind(u"'")
+  if first != last:
+    pre = text[0:first + 1]
+    string = text[first + 1:last]
+    post = text[last:]
+    return '%s%s%s' % (pre, string.replace(u"'", u'’'), post)
+  return text
+
+
 for filename in os.listdir(root):
   remove_country(filename)
   locale = get_locale(filename)
@@ -74,5 +95,5 @@ for filename in os.listdir(root):
       source = source.replace(zstrl, zstr).replace(zstr, zstrl)
       source = source.replace("='", " = '")
       source = source.replace('\:', ':')
-      source = source[:source.rfind('\n')]
+      source = '\n'.join(map(fix_apostrophe, source.splitlines()))
       f.write(source)

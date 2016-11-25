@@ -73,7 +73,6 @@ z.util.load_url_buffer = (url, xhr_accessor_function) ->
       else
         reject new Error "Requesting arraybuffer failed with status #{xhr.status}"
     xhr.onerror = reject
-    xhr.onabort = reject
     xhr_accessor_function? xhr
     xhr.send()
 
@@ -310,7 +309,7 @@ z.util.safe_window_open = (url, focus = true) ->
 
 z.util.auto_link_emails = (text) ->
   email_pattern = /([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)/gim
-  return text.replace email_pattern, '<a href="mailto:$1">$1</a>'
+  return text.replace email_pattern, '<a href="mailto:$1" target="prevent-onbeforeunload">$1</a>'
 
 
 z.util.get_last_characters = (message, amount) ->
@@ -651,12 +650,31 @@ Returns bucket for given value based on the specified bucket limits
 @return [String] bucket
 ###
 z.util.bucket_values = (value, bucket_limits) ->
-  return '0' if value is 0
+  return '0' if value < bucket_limits[0] + 1
 
   for limit, i in bucket_limits
-    if value <= limit
+    if value < limit + 1
       previous_limit = bucket_limits[i - 1]
-      return "#{previous_limit+1}-#{limit}"
+      return "#{previous_limit + 1}-#{limit}"
 
   last_limit = bucket_limits[bucket_limits.length - 1]
   return "#{last_limit+1}-"
+
+z.util.format_time_remaining = (time_remaining) ->
+  moment_duration = moment.duration time_remaining
+  if moment_duration.asHours() is 1
+    title = "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hour}, "
+  else if moment_duration.asHours() > 1
+    title = "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hours}, "
+
+  if moment_duration.asMinutes() is 1
+    title = "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minute} #{z.localization.Localizer.get_text z.string.and} "
+  else if moment_duration.asMinutes() > 1
+    title = "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minutes} #{z.localization.Localizer.get_text z.string.and} "
+
+  if moment_duration.asSeconds() is 1
+    title = "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_second}"
+  else if moment_duration.asSeconds() > 1
+    title = "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_seconds}"
+
+  return title or ''
