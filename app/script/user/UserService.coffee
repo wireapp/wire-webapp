@@ -206,20 +206,6 @@ class z.user.UserService
         todo: 'Change this to normal request!'
 
   ###
-  Check if a user ID exists.
-  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/userExists
-  @example "496d0d21-0b05-49b5-8087-de94f3465b7b"
-
-  @param user_id [String] User ID
-  @param callback [Function] Function to be called on server return
-  ###
-  is_existing_user: (user_id, callback) ->
-    @client.send_request
-      type: 'HEAD'
-      url: @client.create_url "/users/#{user_id}"
-      callback: callback
-
-  ###
   Get a set of users.
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
   @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
