@@ -572,22 +572,20 @@ class z.user.UserRepository
   ###
   check_username: ->
     @should_set_username = true
-    generated_username = z.user.UserHandleGenerator.normalize_name @self().name()
-    @change_username generated_username
+    generated_username = z.user.UserHandleGenerator.normalize_name @self().name() + Date.now()
 
-  ###
-  Self user has username
-  ###
-  has_username: ->
-    return _.isString(@self().username()) and @self().username().length > 1
+    @user_service.check_username generated_username
+    .catch =>
+      @self().username generated_username
+    .then  =>
+      # TODO retry
 
   ###
   Change username.
   @param name [String] New username
   ###
   change_username: (username) ->
-    @self().username username
-    return Promise.resolve()
+    @user_service.change_own_username username
 
   ###
   Verify that username is unique.

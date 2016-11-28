@@ -217,13 +217,14 @@ class z.user.UserService
 
   ###
   Check if a username exists.
+  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandle
 
   @param username [String]
   ###
-  is_existing_username: (username) ->
+  check_username: (username) ->
     @client.send_request
       type: 'HEAD'
-      url: @client.create_url "/users/#{username}" # TODO or /users/handle
+      url: @client.create_url "/users/handles/#{username}"
 
   ###
   Get a set of users.
