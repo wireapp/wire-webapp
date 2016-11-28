@@ -334,6 +334,8 @@ class z.conversation.ConversationService
         start = new Date(0).toISOString()
         end = new Date().toISOString()
 
+    start = new Date().toISOString() if not start
+
     include_minimum = start < end
     if not include_minimum
       [start, end] = [end, start]
@@ -345,6 +347,7 @@ class z.conversation.ConversationService
       .limit limit
       .toArray()
       .catch =>
+        @logger.log @logger.levels.ERROR, "Unexpected set of parameters. 'conversation_id': #{conversation_id}, 'start': #{start}, 'end': #{end}", new Error 'Unexpected set of parameters.'
         @_load_events_from_db_deprecated conversation_id, start, end, limit
 
   ###
