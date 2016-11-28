@@ -590,7 +590,16 @@ class z.user.UserRepository
   @param username [String] New user name
   ###
   verify_username: (username) ->
-    return Promise.resolve z.user.UserHandleGenerator.validate(username)
+    Promise.resolve().then =>
+      if z.user.UserHandleGenerator.validate username
+        return @user_service.check_username username
+        .catch ->
+          return true
+        .then (not_taken) ->
+          if not_taken
+            return true
+          throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
+      throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
 
   ###
   Change the profile image.

@@ -9,7 +9,8 @@
                    id="name" type="text"
                    data-bind="attr: {size: name().length}, value: name, enter: change_name, l10n_placeholder: z.string.preferences_account_username_placeholder"
                    data-uie-name="enter-name"
-                   maxlength="64"/>
+                   maxlength="64"
+                   spellcheck="false" />
             <span class="preferences-account-input-icon"></span>
           </div>
           <div class="preferences-account-username-wrapper">
@@ -18,13 +19,17 @@
                    id="username" type="text"
                    data-bind="attr: {size: username().length}, textInput: username, event: {input: verify_username}, enter: change_username"
                    data-uie-name="enter-username"
-                   maxlength="21"/>
+                   maxlength="21"
+                   spellcheck="false" />
             <span class="preferences-account-input-icon"></span>
             <!-- ko ifnot: username_error() -->
               <div class="preferences-account-username-hint text-graphite font-size-xs" data-bind="l10n_text: z.string.preferences_account_username_hint"></div>
             <!-- /ko -->
-            <!-- ko if: username_error() -->
-              <div class="preferences-account-username-error text-red font-size-xs" data-bind="l10n_text: z.string.preferences_account_username_error"></div>
+            <!-- ko if: username_error() === 'taken' -->
+              <div class="preferences-account-username-error text-red font-size-xs" data-bind="l10n_text: z.string.preferences_account_username_error_taken"></div>
+            <!-- /ko -->
+            <!-- ko if: username_error() === 'invalid' -->
+              <div class="preferences-account-username-error text-red font-size-xs" data-bind="l10n_text: z.string.preferences_account_username_error_invalid"></div>
             <!-- /ko -->
           </div>
           <div class="preferences-account-mail" data-bind="text: self_user().email()" data-uie-name="enter-email"></div>

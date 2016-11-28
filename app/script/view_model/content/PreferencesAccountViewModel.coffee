@@ -28,7 +28,9 @@ class z.ViewModel.content.PreferencesAccountViewModel
     @self_user = @user_repository.self
     @new_clients = ko.observableArray()
     @name = ko.pureComputed => @self_user().name()
+
     @username = ko.pureComputed => @self_user().username()
+    @submitted_username = undefined
 
     @username_error = ko.observable()
 
@@ -66,16 +68,21 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
     e.target.blur()
 
-  # TODO throttle
   verify_username: (username, e) =>
     new_username = e.target.value
 
+    @submitted_username = new_username
     @user_repository.verify_username new_username
-    .then (verified) =>
-      if verified
+    .then =>
+      if @submitted_username is new_username
         @username_error null
-      else
-        @username_error true
+    .catch (error) =>
+      if @submitted_username isnt new_username
+        return
+      if error.type is z.user.UserError::TYPE.USERNAME_TAKEN
+        @username_error 'taken'
+      else if error.type is z.user.UserError::TYPE.USERNAME_INVALID
+        @username_error 'invalid'
 
   check_new_clients: =>
     return if not @new_clients().length
