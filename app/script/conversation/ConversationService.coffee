@@ -331,7 +331,6 @@ class z.conversation.ConversationService
     if not include_minimum
       [from, to] = [to, from]
 
-    console.log "WE ARE HERE!"
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
       .where '[conversation+time]'
       .between [conversation_id, from.toISOString()], [conversation_id, to.toISOString()], include_minimum, false
