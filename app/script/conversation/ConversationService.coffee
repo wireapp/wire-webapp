@@ -321,7 +321,7 @@ class z.conversation.ConversationService
   @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
   load_events_from_db: (conversation_id, start, end, limit = z.config.MESSAGES_FETCH_LIMIT) ->
-    if not start or not end
+    if not _.isNumber(start) or not _.isNumber(end)
       return @_load_events_from_db_deprecated conversation_id, start, end, limit
 
     from = new Date start
@@ -331,6 +331,7 @@ class z.conversation.ConversationService
     if not include_minimum
       [from, to] = [to, from]
 
+    console.log "WE ARE HERE!"
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
       .where '[conversation+time]'
       .between [conversation_id, from.toISOString()], [conversation_id, to.toISOString()], include_minimum, false
