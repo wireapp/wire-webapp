@@ -484,7 +484,6 @@ class z.user.UserRepository
     return @self().id is user_id
 
   ###
-  TODO use SelfUser
   Save a user.
   @param user_et [z.entity.User] User entity to be stored
   @param is_me [Boolean] Is the user entity the self user
@@ -572,13 +571,12 @@ class z.user.UserRepository
   ###
   check_username: ->
     @should_set_username = true
-    generated_username = z.user.UserHandleGenerator.normalize_name @self().name() + Date.now()
+    generated_username = z.user.UserHandleGenerator.normalize_name @self().name()
 
+    # TODO retry
     @user_service.check_username generated_username
     .catch =>
       @self().username generated_username
-    .then  =>
-      # TODO retry
 
   ###
   Change username.

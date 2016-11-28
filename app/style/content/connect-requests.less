@@ -41,8 +41,6 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  height: 584px;
-  width: 384px;
 
   & + .connect-request {
     border-top: 1px solid fade(#000, 8%);
@@ -51,30 +49,13 @@
   > .name {
     margin-top: 40px;
   }
-
-  > .button-group {
-    margin-bottom: 40px;
-  }
-
 }
 
-.connect-request-content {
-  align-items: center;
-  display: flex;
-  flex: 1 1;
-  flex-direction: column;
-  justify-content: center;
+.connect-request-avatar {
+  margin-bottom: 32px;
+  margin-top: 24px;
+}
 
-  > .image {
-    margin-bottom: 32px;
-    margin-top: 24px;
-  }
-
-  > .contacts {
-    margin-bottom: 40px;
-  }
-
-  > .contacts[data-contacts="0"] {
-    margin-bottom: 0;
-  }
+.connect-request-buttons {
+  margin-bottom: 40px;
 }

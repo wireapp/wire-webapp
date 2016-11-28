@@ -47,7 +47,8 @@ class z.user.UserMapper
   @return [z.entity.User] Mapped user entity
   ###
   map_self_user_from_object: (data) ->
-    user_et = @update_user_from_object new z.entity.SelfUser(), data
+    user_et = @update_user_from_object new z.entity.User(), data
+    user_et.is_me = true
 
     if data.tracking_id
       user_et.tracking_id = data.tracking_id

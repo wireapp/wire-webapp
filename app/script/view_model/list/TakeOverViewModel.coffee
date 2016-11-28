@@ -25,9 +25,10 @@ class z.ViewModel.list.TakeOverViewModel
 
   ###
   @param element_id [String] HTML selector
+  @param conversation_repository [z.conversation.ConversationRepository] Conversation repository
   @param user_repository [z.user.UserRepository] User repository
   ###
-  constructor: (element_id, @user_repository) ->
+  constructor: (element_id, @conversation_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.list.TakeOverViewModel', z.config.LOGGER.OPTIONS
 
     @self_user = @user_repository.self
@@ -36,6 +37,11 @@ class z.ViewModel.list.TakeOverViewModel
 
   keep_username: ->
     @user_repository.change_username @username()
+    .then =>
+      if conversation_et = @conversation_repository.get_most_recent_conversation()
+        amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
+      else if @user_repository.connect_requests().length
+        amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
     .catch ->
       amplify.publish z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT
     .then ->

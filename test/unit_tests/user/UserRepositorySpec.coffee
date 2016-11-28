@@ -218,29 +218,6 @@ describe 'z.user.UserRepository', ->
       it 'cannot find an unknown user', ->
         expect(user_repository.user_exists '1').toBeFalsy()
 
-    describe 'validate_username', ->
-
-      it 'returns false if username length is outside the specific range', ->
-        expect(user_repository.validate_username '').toBeFalsy()
-        expect(user_repository.validate_username 'a').toBeFalsy()
-        expect(user_repository.validate_username 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa').toBeFalsy()
-
-      it 'returns false if username is not a string', ->
-        expect(user_repository.validate_username()).toBeFalsy()
-        expect(user_repository.validate_username(null)).toBeFalsy()
-        expect(user_repository.validate_username({})).toBeFalsy()
-        expect(user_repository.validate_username(1)).toBeFalsy()
-
-      it 'returns false if username contains other than alphanumeric characters and underscores', ->
-        expect(user_repository.validate_username('太陽')).toBeFalsy()
-        expect(user_repository.validate_username('شمس')).toBeFalsy()
-        expect(user_repository.validate_username('!"§$%&/()=?')).toBeFalsy()
-
-      it 'returns true if username only contains alphanumeric characters and underscores', ->
-        expect(user_repository.validate_username('foobla')).toBeTruthy()
-        expect(user_repository.validate_username('foo_bla')).toBeTruthy()
-        expect(user_repository.validate_username('foo_bla_83')).toBeTruthy()
-
     describe '_assign_all_clients', ->
       user_jane_roe = null
       user_john_doe = null

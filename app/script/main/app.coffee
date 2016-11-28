@@ -246,7 +246,7 @@ class z.main.App
       .then =>
         @_check_user_information user_et
         return user_et
-    .catch (error) =>
+    .catch (error) ->
       throw new Error "Loading self user failed: #{error.message}"
 
   ###

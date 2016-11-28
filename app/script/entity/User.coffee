@@ -93,7 +93,7 @@ class z.entity.User
         initials = @first_name().slice 0, 2
       return initials.toUpperCase()
 
-    @username  = ko.observable()
+    @username = ko.observable()
 
     @mutual_friends_total = ko.observable 0
 
