@@ -196,7 +196,15 @@ class z.conversation.ConversationRepository
     return new Promise (resolve, reject) =>
       conversation_et.is_pending true
       timestamp = conversation_et.get_first_message()?.timestamp
-      @conversation_service.load_events_from_db conversation_et.id, timestamp, null, z.config.MESSAGES_FETCH_LIMIT
+
+      if timestamp
+        from = timestamp
+        to = 0
+      else
+        from = 0
+        to = Date.now()
+
+      @conversation_service.load_events_from_db conversation_et.id, from, to, z.config.MESSAGES_FETCH_LIMIT
       .then (events) =>
         if events.length < z.config.MESSAGES_FETCH_LIMIT
           conversation_et.has_further_messages false
@@ -222,8 +230,13 @@ class z.conversation.ConversationRepository
   ###
   _get_unread_events: (conversation_et) ->
     conversation_et.is_pending true
-    timestamp = conversation_et.get_first_message()?.timestamp
-    @conversation_service.load_events_from_db conversation_et.id, timestamp, conversation_et.last_read_timestamp()
+    start = conversation_et.get_first_message()?.timestamp
+    end = conversation_et.last_read_timestamp()
+
+    from = if start then start else 0
+    to = if end then end else Date.now()
+
+    @conversation_service.load_events_from_db conversation_et.id, from, to
     .then (events) =>
       if events.length
         @_add_events_to_conversation events: events, conversation_et

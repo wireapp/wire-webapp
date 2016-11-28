@@ -321,33 +321,21 @@ class z.conversation.ConversationService
   @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
   load_events_from_db: (conversation_id, start, end, limit = z.config.MESSAGES_FETCH_LIMIT) ->
-    if z.util.Environment.browser.edge
-      return @_load_events_from_db_deprecated conversation_id, start, end, limit
+    from = new Date start
+    to = new Date end
 
-    start = new Date(window.parseInt(start, 10)).toISOString() if start
-    end = new Date(window.parseInt(end, 10)).toISOString() if end
-
-    if not end
-      if start
-        end = new Date(0).toISOString()
-      else
-        start = new Date(0).toISOString()
-        end = new Date().toISOString()
-
-    start = new Date().toISOString() if not start
-
-    include_minimum = start < end
+    include_minimum = from.getTime() < to.getTime()
     if not include_minimum
-      [start, end] = [end, start]
+      [from, to] = [to, from]
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
       .where '[conversation+time]'
-      .between [conversation_id, start], [conversation_id, end], include_minimum, false
+      .between [conversation_id, from.toISOString()], [conversation_id, to.toISOString()], include_minimum, false
       .reverse()
       .limit limit
       .toArray()
       .catch =>
-        @logger.log @logger.levels.ERROR, "Unexpected set of parameters. 'conversation_id': #{conversation_id}, 'start': #{start}, 'end': #{end}", new Error 'Unexpected set of parameters.'
+        @logger.log @logger.levels.ERROR, "Unexpected set of parameters. 'start': #{start}, 'end': #{end}, Trace: #{new Error().stack}"
         @_load_events_from_db_deprecated conversation_id, start, end, limit
 
   ###

@@ -216,7 +216,7 @@ describe 'z.conversation.ConversationService', ->
         done()
       .catch done.fail
 
-    it 'does not delete if event if key is wrong', (done) ->
+    it 'does not delete the event if key is wrong', (done) ->
       conversation_service.delete_message_with_key_from_db conversation_id, 'wrongKey'
       .then ->
         conversation_service.load_events_from_db conversation_id
