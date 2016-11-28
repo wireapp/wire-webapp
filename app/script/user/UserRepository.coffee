@@ -378,7 +378,8 @@ class z.user.UserRepository
     number_of_loaded_chunks = 0
 
     for chunk in chunks
-      @user_service.get_users chunk, (response, error) =>
+      @user_service.get_users chunk
+      .then (response) =>
         number_of_loaded_chunks += 1
         if response
           user_ets = @user_mapper.map_users_from_object response
@@ -390,6 +391,8 @@ class z.user.UserRepository
             fetched_user_ets = @_add_suspended_users user_ids, fetched_user_ets
           @save_users fetched_user_ets
           callback? fetched_user_ets
+      .catch (error) ->
+        throw error if error.code isnt z.service.BackendClientError::STATUS_CODE.NOT_FOUND
 
   ###
   Find a local user.
@@ -514,7 +517,8 @@ class z.user.UserRepository
   ###
   update_user_by_id: (user_id) =>
     @get_user_by_id user_id, (old_user_et) =>
-      @user_service.get_user_by_id user_id, (new_user_et) =>
+      @user_service.get_user_by_id user_id
+      .then (new_user_et) =>
         @user_mapper.update_user_from_object old_user_et, new_user_et
 
   ###

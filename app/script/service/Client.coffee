@@ -130,7 +130,6 @@ class z.service.Client
   Send jQuery AJAX request.
   @see http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings
   @param config [Object]
-  @option config [Function] callback DEPRECATED: use Promises
   @option config [String] contentType
   @option config [Object] data
   @option config [Object] headers
@@ -163,7 +162,6 @@ class z.service.Client
         url: config.url
         xhrFields: config.xhrFields
       .done (data, textStatus, jqXHR) =>
-        config.callback? data
         resolve data
         @logger.log @logger.levels.OFF, "Server Response '#{jqXHR.wire?.request_id}' from '#{config.url}':", data
       .fail (jqXHR, textStatus, errorThrown) =>
@@ -192,10 +190,7 @@ class z.service.Client
             if jqXHR.status not in IGNORED_BACKEND_ERRORS
               Raygun.send new Error "Server request failed: #{jqXHR.status}"
 
-        if _.isFunction config.callback
-          config.callback null, jqXHR.responseJSON or new z.service.BackendClientError errorThrown
-        else
-          reject jqXHR.responseJSON or new z.service.BackendClientError jqXHR.status
+        reject jqXHR.responseJSON or new z.service.BackendClientError jqXHR.status
 
   ###
   Send AJAX request with compressed JSON body.

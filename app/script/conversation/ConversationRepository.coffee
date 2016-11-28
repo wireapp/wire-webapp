@@ -139,18 +139,18 @@ class z.conversation.ConversationRepository
 
     @fetching_conversations[conversation_id] = [callback]
 
-    @conversation_service.get_conversation_by_id conversation_id, (response, error) =>
-      if response
-        conversation_et = @conversation_mapper.map_conversation response
-        @save_conversation conversation_et
-        @logger.log @logger.levels.INFO, "Fetched conversation '#{conversation_id}' from backend"
-        callbacks = @fetching_conversations[conversation_id]
-        for callback in callbacks
-          callback? conversation_et
-        delete @fetching_conversations[conversation_id]
-      else
-        @logger.log @logger.levels.ERROR, "Failed to fetch conversation '#{conversation_id}' from backend: #{error.message}", error
-        throw error
+    @conversation_service.get_conversation_by_id conversation_id
+    .then (response) =>
+      conversation_et = @conversation_mapper.map_conversation response
+      @save_conversation conversation_et
+      @logger.log @logger.levels.INFO, "Fetched conversation '#{conversation_id}' from backend"
+      callbacks = @fetching_conversations[conversation_id]
+      for callback in callbacks
+        callback? conversation_et
+      delete @fetching_conversations[conversation_id]
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Failed to fetch conversation '#{conversation_id}' from backend: #{error.message}", error
+      throw error
 
   ###
   Retrieve all conversations using paging.

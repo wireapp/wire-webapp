@@ -127,17 +127,13 @@ class z.conversation.ConversationService
 
   ###
   Get a conversation by ID.
-
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
-
   @param conversation_id [String] ID of conversation to get
-  @param callback [Function] Function to be called on server return
   ###
-  get_conversation_by_id: (conversation_id, callback) ->
+  get_conversation_by_id: (conversation_id) ->
     @client.send_request
       url: @client.create_url "/conversations/#{conversation_id}"
       type: 'GET'
-      callback: callback
 
 
   ###############################################################################
