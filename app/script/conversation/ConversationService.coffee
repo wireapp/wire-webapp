@@ -324,6 +324,9 @@ class z.conversation.ConversationService
     if not start or not end
       return @_load_events_from_db_deprecated conversation_id, start, end, limit
 
+    from = new Date start
+    to = new Date end
+
     include_minimum = from.getTime() < to.getTime()
     if not include_minimum
       [from, to] = [to, from]
