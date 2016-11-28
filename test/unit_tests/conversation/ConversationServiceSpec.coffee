@@ -20,15 +20,9 @@
 
 describe 'z.conversation.ConversationService', ->
   conversation_mapper = null
-  server = null
-
-  urls =
-    rest_url: 'http://localhost'
-    websocket_url: 'wss://localhost'
-
   conversation_service = null
+  server = null
   storage_service = null
-
   test_factory = new TestFactory()
 
   beforeAll (done) ->

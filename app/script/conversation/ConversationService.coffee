@@ -321,8 +321,8 @@ class z.conversation.ConversationService
   @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
   load_events_from_db: (conversation_id, start, end, limit = z.config.MESSAGES_FETCH_LIMIT) ->
-    from = new Date start
-    to = new Date end
+    if not start or not end
+      return @_load_events_from_db_deprecated conversation_id, start, end, limit
 
     include_minimum = from.getTime() < to.getTime()
     if not include_minimum
