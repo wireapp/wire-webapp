@@ -593,8 +593,10 @@ class z.user.UserRepository
     Promise.resolve().then =>
       if z.user.UserHandleGenerator.validate username
         return @user_service.check_username username
-        .catch ->
-          return true
+        .catch (error)->
+          if error.code is 404
+            return true
+          throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
         .then (not_taken) ->
           if not_taken
             return true
