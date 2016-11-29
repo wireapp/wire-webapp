@@ -223,12 +223,12 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation to start from
   ###
   _get_unread_events: (conversation_et) ->
-    conversation_et.is_pending true
-
     first_message = conversation_et.get_first_message()
     upper_bound = if first_message then new Date first_message.timestamp else new Date()
     lower_bound = new Date conversation_et.last_read_timestamp()
+    return if lower_bound >= upper_bound
 
+    conversation_et.is_pending true
     @conversation_service.load_events_from_db conversation_et.id, lower_bound, upper_bound
     .then (events) =>
       if events.length
