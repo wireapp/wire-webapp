@@ -245,3 +245,4 @@ class z.auth.AuthService
     @client.access_token_type = type
     @client.access_token = value
     @client.request_queue_blocked_state z.service.RequestQueueBlockedState.NONE
+    @client.execute_request_queue()

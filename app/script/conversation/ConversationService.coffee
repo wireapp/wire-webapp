@@ -314,38 +314,29 @@ class z.conversation.ConversationService
   TODO: Make sure that only valid values (no Strings, No timestamps but Dates(!), ...) are passed to this function!
 
   @param conversation_id [String] ID of conversation
-  @param start [Number|undefined] starting from this timestamp
-  @param end [Number|undefined] stop when reaching timestamp
+  @param lower_bound [Date] Load from this date (included)
+  @param upper_bound [Date] Load until this date (excluded)
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
   @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
-  load_events_from_db: (conversation_id, start, end, limit = z.config.MESSAGES_FETCH_LIMIT) ->
-    if z.util.Environment.browser.edge
-      return @_load_events_from_db_deprecated conversation_id, start, end, limit
-
-    start = new Date(window.parseInt(start, 10)).toISOString() if start
-    end = new Date(window.parseInt(end, 10)).toISOString() if end
-
-    if not end
-      if start
-        end = new Date(0).toISOString()
-      else
-        start = new Date(0).toISOString()
-        end = new Date().toISOString()
-
-    include_minimum = start < end
-    if not include_minimum
-      [start, end] = [end, start]
+  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = z.config.MESSAGES_FETCH_LIMIT) ->
+    if not _.isDate(lower_bound) or not _.isDate upper_bound
+      throw new Error "Lower bound (#{typeof lower_bound}) and upper bound (#{typeof upper_bound}) must be of type 'Date'."
+    else if lower_bound.getTime() > upper_bound.getTime()
+      throw new Error "Lower bound (#{lower_bound.getTime()}) cannot be greater than upper bound (#{upper_bound.getTime()})."
+    else if z.util.Environment.browser.edge
+      return @_load_events_from_db_deprecated conversation_id, lower_bound.getTime(), upper_bound.getTime(), limit
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where '[conversation+time]'
-      .between [conversation_id, start], [conversation_id, end], include_minimum, false
-      .reverse()
-      .limit limit
-      .toArray()
-      .catch =>
-        @_load_events_from_db_deprecated conversation_id, start, end, limit
+    .where '[conversation+time]'
+    .between [conversation_id, lower_bound.toISOString()], [conversation_id, upper_bound.toISOString()], true, false
+    .reverse()
+    .limit limit
+    .toArray()
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Failed to load events for conversation '#{conversation_id}' from database: '#{error.message}'"
+      throw error
 
   ###
   Add a bot to an existing conversation.

@@ -308,7 +308,7 @@ z.util.safe_mailto_open = (email) ->
   new_window = window.open "mailto:#{email}"
   if new_window
     window.setTimeout ->
-      new_window.close
+      new_window.close()
     , 10
 
 

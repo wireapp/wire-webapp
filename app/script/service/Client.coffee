@@ -52,9 +52,6 @@ class z.service.Client
 
     @request_queue = []
     @request_queue_blocked_state = ko.observable z.service.RequestQueueBlockedState.NONE
-    @request_queue_blocked_state.subscribe (blocked_state) =>
-      if blocked_state is z.service.RequestQueueBlockedState.NONE and @access_token and @request_queue.length
-        @execute_request_queue()
 
     @access_token = ''
     @access_token_type = ''
@@ -115,17 +112,19 @@ class z.service.Client
 
   # Execute queued requests.
   execute_request_queue: =>
+    return if not @access_token or not @request_queue.length
+
     @logger.log @logger.levels.INFO, "Executing '#{@request_queue.length}' queued requests"
     for request in @request_queue
-      [config, request_resolve, request_reject] = @request_queue.shift()
+      [config, resolve_fn, reject_fn] = request
+      @logger.log @logger.levels.INFO, "Queued '#{config.type}' request to '#{config.url}' executed"
       @send_request config
-      .then (response) =>
-        @logger.log @logger.levels.INFO, "Queued '#{config.type}' request to '#{config.url}' executed", response
-        request_resolve response
+      .then resolve_fn
       .catch (error) =>
-        @logger.log @logger.levels.INFO,
-          "Failed to execute queued '#{config.type}' request to '#{config.url}'", error
-        request_reject error
+        @logger.log @logger.levels.INFO, "Failed to execute queued '#{config.type}' request to '#{config.url}'", error
+        reject_fn error
+
+    @request_queue.length = 0
 
   ###
   Send jQuery AJAX request.
@@ -144,71 +143,64 @@ class z.service.Client
   send_request: (config) ->
     return new Promise (resolve, reject) =>
       if @request_queue_blocked_state() isnt z.service.RequestQueueBlockedState.NONE
-        @logger.log @logger.levels.INFO, 'Request queued for later execution', config
-        @request_queue.push [config, resolve, reject]
-      else
-        headers = config.headers or {}
-        xhrFields = {}
+        return @_push_to_request_queue [config, resolve, reject], @request_queue_blocked_state()
 
-        if @access_token
-          headers['Authorization'] = "#{@access_token_type} #{@access_token}"
+      if @access_token
+        config.headers = $.extend Authorization: "#{@access_token_type} #{@access_token}", config.headers
 
-        if config.withCredentials
-          xhrFields['withCredentials'] = true
+      if config.withCredentials
+        config.xhrFields = withCredentials: true
 
-        @number_of_requests @number_of_requests() + 1
+      @number_of_requests @number_of_requests() + 1
 
-        $.ajax
-          contentType: config.contentType
-          data: config.data
-          headers: headers
-          processData: config.processData
-          timeout: config.timeout
-          type: config.type
-          url: config.url
-          xhrFields: xhrFields
-        .done (data, textStatus, jqXHR) =>
-          config.callback? data
-          resolve data
-          @logger.log @logger.levels.OFF, "Server Response '#{jqXHR.wire?.request_id}' from '#{config.url}':", data
-        .fail (jqXHR, textStatus, errorThrown) =>
-          switch jqXHR.status
-            when z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
-              @logger.log @logger.levels.WARN, 'Request failed due to connectivity problem.', config
-              @request_queue_blocked_state z.service.RequestQueueBlockedState.CONNECTIVITY_PROBLEM
-              @request_queue.push [config, resolve, reject]
-              @execute_on_connectivity()
-              .then =>
-                @request_queue_blocked_state z.service.RequestQueueBlockedState.NONE
-                @execute_request_queue()
-              return
-            when z.service.BackendClientError::STATUS_CODE.UNAUTHORIZED
-              @request_queue.push [config, resolve, reject]
-              @logger.log @logger.levels.WARN, "Request failed as access token (#{@access_token}) is invalid.", config
-              amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW
-              return
-            when z.service.BackendClientError::STATUS_CODE.FORBIDDEN
-              switch jqXHR.responseJSON?.label
-                when z.service.BackendClientError::LABEL.INVALID_CREDENTIALS
-                  Raygun.send new Error 'Server request failed: Invalid credentials'
-                when z.service.BackendClientError::LABEL.TOO_MANY_CLIENTS, z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
-                  @logger.log @logger.levels.WARN, "Server request failed: '#{jqXHR.responseJSON.label}'"
-                else
-                  Raygun.send new Error 'Server request failed'
-            else
-              if jqXHR.status not in IGNORED_BACKEND_ERRORS
-                Raygun.send new Error "Server request failed: #{jqXHR.status}"
-
-          if _.isFunction config.callback
-            config.callback null, jqXHR.responseJSON or new z.service.BackendClientError errorThrown
+      $.ajax
+        contentType: config.contentType
+        data: config.data
+        headers: config.headers
+        processData: config.processData
+        timeout: config.timeout
+        type: config.type
+        url: config.url
+        xhrFields: config.xhrFields
+      .done (data, textStatus, jqXHR) =>
+        config.callback? data
+        resolve data
+        @logger.log @logger.levels.OFF, "Server Response '#{jqXHR.wire?.request_id}' from '#{config.url}':", data
+      .fail (jqXHR, textStatus, errorThrown) =>
+        switch jqXHR.status
+          when z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
+            @request_queue_blocked_state z.service.RequestQueueBlockedState.CONNECTIVITY_PROBLEM
+            @_push_to_request_queue [config, resolve, reject], @request_queue_blocked_state()
+            @execute_on_connectivity()
+            .then =>
+              @request_queue_blocked_state z.service.RequestQueueBlockedState.NONE
+              @execute_request_queue()
+            return
+          when z.service.BackendClientError::STATUS_CODE.UNAUTHORIZED
+            @_push_to_request_queue [config, resolve, reject], z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
+            amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW
+            return
+          when z.service.BackendClientError::STATUS_CODE.FORBIDDEN
+            switch jqXHR.responseJSON?.label
+              when z.service.BackendClientError::LABEL.INVALID_CREDENTIALS
+                Raygun.send new Error 'Server request failed: Invalid credentials'
+              when z.service.BackendClientError::LABEL.TOO_MANY_CLIENTS, z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
+                @logger.log @logger.levels.WARN, "Server request failed: '#{jqXHR.responseJSON.label}'"
+              else
+                Raygun.send new Error 'Server request failed'
           else
-            reject jqXHR.responseJSON or new z.service.BackendClientError jqXHR.status
+            if jqXHR.status not in IGNORED_BACKEND_ERRORS
+              Raygun.send new Error "Server request failed: #{jqXHR.status}"
+
+        if _.isFunction config.callback
+          config.callback null, jqXHR.responseJSON or new z.service.BackendClientError errorThrown
+        else
+          reject jqXHR.responseJSON or new z.service.BackendClientError jqXHR.status
 
   ###
   Send AJAX request with compressed JSON body.
 
-  Note that contentType will be overwritten with 'application/json; charset=utf-8'
-
+  @note ContentType will be overwritten with 'application/json; charset=utf-8'
   @see send_request for valid parameters
   ###
   send_json: (config) ->
@@ -219,3 +211,7 @@ class z.service.Client
         'Content-Encoding': 'gzip'
       processData: false
     @send_request $.extend config, json_config, true
+
+  _push_to_request_queue: ([config, resolve_fn, reject_fn], reason) ->
+    @logger.log @logger.levels.INFO, "Adding '#{config.type}' request to #{config.url}' to queue due to #{reason}", config
+    @request_queue.push [config, resolve_fn, reject_fn]

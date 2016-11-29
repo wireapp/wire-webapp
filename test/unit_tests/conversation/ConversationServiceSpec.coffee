@@ -20,15 +20,9 @@
 
 describe 'z.conversation.ConversationService', ->
   conversation_mapper = null
-  server = null
-
-  urls =
-    rest_url: 'http://localhost'
-    websocket_url: 'wss://localhost'
-
   conversation_service = null
+  server = null
   storage_service = null
-
   test_factory = new TestFactory()
 
   beforeAll (done) ->
@@ -123,7 +117,7 @@ describe 'z.conversation.ConversationService', ->
       .catch done.fail
 
     it 'doesn\'t load events for invalid conversation id', (done) ->
-      conversation_service.load_events_from_db 'invalid_id', 1479903546808, 30
+      conversation_service.load_events_from_db 'invalid_id', new Date(30), new Date 1479903546808
       .then (events) =>
         expect(events.length).toBe 0
         done()
@@ -132,16 +126,30 @@ describe 'z.conversation.ConversationService', ->
       conversation_service.load_events_from_db conversation_id
       .then (events) =>
         expect(events.length).toBe 10
+        expect(events[0].time).toBe '2016-11-23T12:19:06.808Z'
+        expect(events[9].time).toBe '2016-11-23T12:19:06.799Z'
         done()
 
     it 'loads all events with limit', (done) ->
-      conversation_service.load_events_from_db conversation_id, null, null, 5
+      conversation_service.load_events_from_db conversation_id, undefined, undefined, 5
       .then (events) =>
         expect(events.length).toBe 5
+        expect(events[0].time).toBe '2016-11-23T12:19:06.808Z'
+        expect(events[4].time).toBe '2016-11-23T12:19:06.804Z'
         done()
 
-    it 'loads events with start timestamp', (done) ->
-      conversation_service.load_events_from_db conversation_id, 1479903546803
+    it 'loads events with lower bound', (done) ->
+      conversation_service.load_events_from_db conversation_id, new Date 1479903546805
+      .then (events) =>
+        expect(events.length).toBe 4
+        expect(events[0].time).toBe '2016-11-23T12:19:06.808Z'
+        expect(events[1].time).toBe '2016-11-23T12:19:06.807Z'
+        expect(events[2].time).toBe '2016-11-23T12:19:06.806Z'
+        expect(events[3].time).toBe '2016-11-23T12:19:06.805Z'
+        done()
+
+    it 'loads events with upper bound', (done) ->
+      conversation_service.load_events_from_db conversation_id, undefined, new Date 1479903546803
       .then (events) =>
         expect(events.length).toBe 4
         expect(events[0].time).toBe '2016-11-23T12:19:06.802Z'
@@ -150,15 +158,15 @@ describe 'z.conversation.ConversationService', ->
         expect(events[3].time).toBe '2016-11-23T12:19:06.799Z'
         done()
 
-    it 'loads events with start and end timestamp', (done) ->
-      conversation_service.load_events_from_db conversation_id, 1479903546807, 1479903546805
+    it 'loads events with upper and lower bound', (done) ->
+      conversation_service.load_events_from_db conversation_id, new Date(1479903546806), new Date 1479903546807
       .then (events) =>
         expect(events.length).toBe 1
         expect(events[0].time).toBe '2016-11-23T12:19:06.806Z'
         done()
 
-    it 'loads events with start and end timestamp and a fetch limit', (done) ->
-      conversation_service.load_events_from_db conversation_id, 1479903546807, 1479903546800, 2
+    it 'loads events with upper and lower bound and a fetch limit', (done) ->
+      conversation_service.load_events_from_db conversation_id, new Date(1479903546800), new Date(1479903546807), 2
       .then (events) =>
         expect(events.length).toBe 2
         expect(events[0].time).toBe '2016-11-23T12:19:06.806Z'
@@ -216,7 +224,7 @@ describe 'z.conversation.ConversationService', ->
         done()
       .catch done.fail
 
-    it 'does not delete if event if key is wrong', (done) ->
+    it 'does not delete the event if key is wrong', (done) ->
       conversation_service.delete_message_with_key_from_db conversation_id, 'wrongKey'
       .then ->
         conversation_service.load_events_from_db conversation_id
