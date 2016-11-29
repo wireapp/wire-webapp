@@ -31,6 +31,15 @@ z.user.UserHandleGenerator = do ->
     return "#{z.util.ArrayUtil.random_element(RANDOM_WORDS_1)}#{z.util.ArrayUtil.random_element(RANDOM_WORDS_2)}"
 
   ###
+  Appends random digits from 1 to 9 to the end of the string.
+  @param str [String]
+  @param number [Number] number of digits to append
+  ###
+  append_random_digits = (str, number) ->
+    random_digits = [0...number].map( -> z.util.get_random_int(1, 9)).join('')
+    return "#{str}#{random_digits}"
+
+  ###
   Create handle  based on the users name.
   @param name [String]
   ###
@@ -56,5 +65,6 @@ z.user.UserHandleGenerator = do ->
     normalized_name = if normalized_name then normalized_name else get_random_word_compination()
 
   return {} =
+    append_random_digits: append_random_digits
     normalize_name: normalize_name
     validate: validate
