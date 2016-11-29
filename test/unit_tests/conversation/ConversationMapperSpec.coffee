@@ -166,3 +166,10 @@ describe 'Conversation Mapper', ->
 
       expect(updated_conversation_et.last_event_timestamp()).toBe time
       expect(updated_conversation_et.muted_state()).toBe true
+
+    it 'accepts string values which must be parsed later on', ->
+      conversation_et.last_read_timestamp 0
+      self_status = {"last_read_timestamp":"1480339377099"}
+      last_read_timestamp_number = window.parseInt self_status.last_read_timestamp, 10
+      updated_conversation_et = conversation_mapper.update_self_status conversation_et, self_status
+      expect(updated_conversation_et.last_read_timestamp()).toBe last_read_timestamp_number
