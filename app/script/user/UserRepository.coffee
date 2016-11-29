@@ -579,6 +579,21 @@ class z.user.UserRepository
       @self().username generated_username
 
   ###
+  Verify usernames against the backend.
+  Return a list with usernames that are not taken.
+  @param username [Array] New user name
+  ###
+  verify_usernames: (usernames) ->
+    @user_service.get_users_by_username usernames
+    .then (response) =>
+      taken_names = (user.handle for user in response)
+      return _.difference usernames, taken_names
+    .catch (error) ->
+      if error.code is 404
+        return usernames
+      throw new Error "Failed to verify usernames with error: #{error.message}"
+
+  ###
   Change username.
   @param name [String] New username
   ###
