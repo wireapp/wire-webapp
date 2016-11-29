@@ -335,7 +335,7 @@ class z.conversation.ConversationService
     .limit limit
     .toArray()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Unexpected set of parameters. 'start': #{lower_bound}, 'end': #{end}, Trace: #{new Error().stack}"
+      @logger.log @logger.levels.ERROR, "Failed to load events from database: '#{error.message}'"
       throw error
 
   ###
