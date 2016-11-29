@@ -126,12 +126,16 @@ describe 'z.conversation.ConversationService', ->
       conversation_service.load_events_from_db conversation_id
       .then (events) =>
         expect(events.length).toBe 10
+        expect(events[0].time).toBe '2016-11-23T12:19:06.808Z'
+        expect(events[9].time).toBe '2016-11-23T12:19:06.799Z'
         done()
 
     it 'loads all events with limit', (done) ->
       conversation_service.load_events_from_db conversation_id, undefined, undefined, 5
       .then (events) =>
         expect(events.length).toBe 5
+        expect(events[0].time).toBe '2016-11-23T12:19:06.808Z'
+        expect(events[4].time).toBe '2016-11-23T12:19:06.804Z'
         done()
 
     it 'loads events with lower bound', (done) ->

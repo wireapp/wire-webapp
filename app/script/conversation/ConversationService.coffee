@@ -322,12 +322,11 @@ class z.conversation.ConversationService
   ###
   load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = z.config.MESSAGES_FETCH_LIMIT) ->
     if not _.isDate(lower_bound) or not _.isDate upper_bound
-      throw new Error 'False parameters for load events'
+      throw new Error "Lower bound (#{typeof lower_bound}) and upper bound (#{typeof upper_bound}) must be of type 'Date'."
     else if lower_bound.getTime() > upper_bound.getTime()
-      throw new Error 'Lower bound should not be greater than upper bound'
+      throw new Error "Lower bound (#{lower_bound.getTime()}) cannot be greater than upper bound (#{upper_bound.getTime()})."
     else if z.util.Environment.browser.edge
-      # fallback
-      @_load_events_from_db_deprecated conversation_id, lower_bound.getTime(), upper_bound.getTime(), limit
+      return @_load_events_from_db_deprecated conversation_id, lower_bound.getTime(), upper_bound.getTime(), limit
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
