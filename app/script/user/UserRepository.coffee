@@ -567,31 +567,22 @@ class z.user.UserRepository
     return @should_set_username
 
   ###
-  Checks whether the user needs to set a username and generates a suggestion
+  Tries to generate a username suggestion
   ###
-  check_username: ->
+  get_username_suggestion: ->
     @should_set_username = true
-    generated_username = z.user.UserHandleGenerator.normalize_name @self().name()
+    suggestions = null
 
-    # TODO retry
-    @user_service.check_username generated_username
-    .catch =>
-      @self().username generated_username
-
-  ###
-  Verify usernames against the backend.
-  Return a list with usernames that are not taken.
-  @param username [Array] New user name
-  ###
-  verify_usernames: (usernames) ->
-    @user_service.get_users_by_username usernames
-    .then (response) =>
-      taken_names = (user.handle for user in response)
-      return _.difference usernames, taken_names
-    .catch (error) ->
+    Promise.resolve().then =>
+      suggestions = z.user.UserHandleGenerator.create_suggestions @self().name()
+      @verify_usernames suggestions
+    .then (valid_suggestions) =>
+      @self().username valid_suggestions[0]
+    .catch (error) =>
       if error.code is 404
-        return usernames
-      throw new Error "Failed to verify usernames with error: #{error.message}"
+        @self().username suggestions[0]
+      else
+        throw new Error "Failed to get a suggestion: #{error.message}"
 
   ###
   Change username.
@@ -601,20 +592,36 @@ class z.user.UserRepository
     @user_service.change_own_username username
 
   ###
+  Verify usernames against the backend.
+  Return a list with usernames that are not taken.
+  @param username [Array] New user name
+  ###
+  verify_usernames: (usernames) ->
+    @user_service.get_users_by_username usernames
+    .then (response) ->
+      taken_usernames = (user.handle for user in response)
+      return _.difference usernames, taken_usernames
+    .catch (error) ->
+      if error.code is 404
+        return usernames
+      throw new Error "Failed to verify usernames with error: #{error.message}"
+
+  ###
   Verify that username is unique.
+  Returns the username if it is not taken.
   @param username [String] New user name
   ###
   verify_username: (username) ->
     Promise.resolve().then =>
       if z.user.UserHandleGenerator.validate username
         return @user_service.check_username username
-        .catch (error)->
+        .catch (error) ->
           if error.code is 404
-            return true
+            return username
           throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
-        .then (not_taken) ->
-          if not_taken
-            return true
+        .then (username) ->
+          if username
+            return username
           throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
       throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
 

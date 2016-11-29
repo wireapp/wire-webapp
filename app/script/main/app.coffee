@@ -258,7 +258,7 @@ class z.main.App
       @view.list.first_run true
       @repository.user.set_default_picture()
     if not user_et.username()
-      @repository.user.check_username()
+      @repository.user.get_username_suggestion()
 
   # Handle URL params
   _handle_url_params: ->

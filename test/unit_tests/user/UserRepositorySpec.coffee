@@ -249,3 +249,49 @@ describe 'z.user.UserRepository', ->
           expect(user_john_doe.devices()[1].id).toBe entities.clients.john_doe.temporary.id
           done()
         .catch done.fail
+
+    describe 'verify_usernames', ->
+
+      it 'resolves with username when username is not taken', (done) ->
+        usernames = ['john_doe']
+        server.respondWith 'GET', "#{test_factory.settings.connection.rest_url}/users?handles=#{usernames[0]}", [404, {}, '']
+
+        user_repository.verify_usernames usernames
+        .then (_usernames) ->
+          expect(_usernames).toBe usernames
+          done()
+        .catch done.fail
+
+      it 'rejects when username is taken', (done) ->
+        usernames = ['john_doe']
+        server.respondWith 'GET', "#{test_factory.settings.connection.rest_url}/users?handles=#{usernames[0]}", [
+          200,
+          {'Content-Type': 'application/json'},
+          JSON.stringify([{handle: usernames[0]}])
+        ]
+
+        user_repository.verify_usernames usernames
+        .then (_usernames) ->
+          expect(_usernames.length).toBe 0
+          done()
+        .catch done.fail
+
+    describe 'verify_username', ->
+
+      it 'resolves with username when username is not taken', (done) ->
+        username = 'john_doe'
+        server.respondWith 'HEAD', "#{test_factory.settings.connection.rest_url}/users/handles/#{username}", [404, {}, '']
+
+        user_repository.verify_username username
+        .then (_username) ->
+          expect(_username).toBe username
+          done()
+        .catch done.fail
+
+      it 'rejects when username is taken', (done) ->
+        username = 'john_doe'
+        server.respondWith 'HEAD', "#{test_factory.settings.connection.rest_url}/users/handles/#{username}", [200, {}, '']
+
+        user_repository.verify_username username
+        .then done.fail
+        .catch done
