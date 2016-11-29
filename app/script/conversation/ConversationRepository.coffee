@@ -67,7 +67,7 @@ class z.conversation.ConversationRepository
     @sending_queue.pause()
 
     @conversation_service.client.request_queue_blocked_state.subscribe (state) =>
-      @sending_queue.pause state isnt z.service.RequestQueueBlockedState.NONE
+      @sending_queue.pause state isnt z.service.RequestQueueBlockedState.NONE and not @block_event_handling
 
     @conversations_archived = ko.observableArray []
     @conversations_call = ko.observableArray []
