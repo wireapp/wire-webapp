@@ -195,25 +195,19 @@ class z.conversation.ConversationRepository
   get_events: (conversation_et) ->
     return new Promise (resolve, reject) =>
       conversation_et.is_pending true
-      timestamp = conversation_et.get_first_message()?.timestamp
 
-      if timestamp
-        from = timestamp
-        to = 0
-      else
-        from = 0
-        to = Date.now()
+      first_message = conversation_et.get_first_message()
+      upper_bound = if first_message then new Date first_message.timestamp else new Date()
 
-      @conversation_service.load_events_from_db conversation_et.id, from, to, z.config.MESSAGES_FETCH_LIMIT
+      @conversation_service.load_events_from_db conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT
       .then (events) =>
         if events.length < z.config.MESSAGES_FETCH_LIMIT
           conversation_et.has_further_messages false
         if events.length is 0
           @logger.log @logger.levels.INFO, "No events for conversation '#{conversation_et.id}' found", events
-        else if timestamp
-          date = new Date(timestamp).toISOString()
+        else if first_message
           @logger.log @logger.levels.INFO,
-            "Loaded #{events.length} event(s) starting at '#{date}' for conversation '#{conversation_et.id}'", events
+            "Loaded #{events.length} event(s) starting at '#{upper_bound.toISOString()}' for conversation '#{conversation_et.id}'", events
         else
           @logger.log @logger.levels.INFO,
             "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
@@ -230,13 +224,12 @@ class z.conversation.ConversationRepository
   ###
   _get_unread_events: (conversation_et) ->
     conversation_et.is_pending true
-    start = conversation_et.get_first_message()?.timestamp
-    end = conversation_et.last_read_timestamp()
 
-    from = if start then start else 0
-    to = if end then end else Date.now()
+    first_message = conversation_et.get_first_message()
+    upper_bound = if first_message then new Date first_message.timestamp else new Date()
+    lower_bound = new Date conversation_et.last_read_timestamp()
 
-    @conversation_service.load_events_from_db conversation_et.id, from, to
+    @conversation_service.load_events_from_db conversation_et.id, lower_bound, upper_bound
     .then (events) =>
       if events.length
         @_add_events_to_conversation events: events, conversation_et

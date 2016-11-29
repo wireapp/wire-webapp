@@ -320,26 +320,24 @@ class z.conversation.ConversationService
   @return [Promise] Promise that resolves with the retrieved records
   @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
-  load_events_from_db: (conversation_id, start, end, limit = z.config.MESSAGES_FETCH_LIMIT) ->
-    if not _.isNumber(start) or not _.isNumber(end)
-      return @_load_events_from_db_deprecated conversation_id, start, end, limit
-
-    from = new Date start
-    to = new Date end
-
-    include_minimum = from.getTime() < to.getTime()
-    if not include_minimum
-      [from, to] = [to, from]
+  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = z.config.MESSAGES_FETCH_LIMIT) ->
+    if not _.isDate(lower_bound) or not _.isDate upper_bound
+      throw new Error 'False parameters for load events'
+    else if lower_bound.getTime() > upper_bound.getTime()
+      throw new Error 'Lower bound should not be greater than upper bound'
+    else if z.util.Environment.browser.edge
+      # fallback
+      @_load_events_from_db_deprecated conversation_id, lower_bound.getTime(), upper_bound.getTime(), limit
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where '[conversation+time]'
-      .between [conversation_id, from.toISOString()], [conversation_id, to.toISOString()], include_minimum, false
-      .reverse()
-      .limit limit
-      .toArray()
-      .catch =>
-        @logger.log @logger.levels.ERROR, "Unexpected set of parameters. 'start': #{start}, 'end': #{end}, Trace: #{new Error().stack}"
-        @_load_events_from_db_deprecated conversation_id, start, end, limit
+    .where '[conversation+time]'
+    .between [conversation_id, lower_bound.toISOString()], [conversation_id, upper_bound.toISOString()], true, false
+    .reverse()
+    .limit limit
+    .toArray()
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Unexpected set of parameters. 'start': #{lower_bound}, 'end': #{end}, Trace: #{new Error().stack}"
+      throw error
 
   ###
   Add a bot to an existing conversation.
