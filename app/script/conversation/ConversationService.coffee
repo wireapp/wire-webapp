@@ -335,7 +335,7 @@ class z.conversation.ConversationService
     .limit limit
     .toArray()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to load events from database: '#{error.message}'"
+      @logger.log @logger.levels.ERROR, "Failed to load events for conversation '#{conversation_id}' from database: '#{error.message}'"
       throw error
 
   ###
