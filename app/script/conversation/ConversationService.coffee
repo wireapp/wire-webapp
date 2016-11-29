@@ -314,8 +314,8 @@ class z.conversation.ConversationService
   TODO: Make sure that only valid values (no Strings, No timestamps but Dates(!), ...) are passed to this function!
 
   @param conversation_id [String] ID of conversation
-  @param start [Number|undefined] starting from this timestamp
-  @param end [Number|undefined] stop when reaching timestamp
+  @param lower_bound [Date] Load from this date (included)
+  @param upper_bound [Date] Load until this date (excluded)
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
   @see https://github.com/dfahlander/Dexie.js/issues/366
