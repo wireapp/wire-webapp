@@ -36,7 +36,8 @@ z.user.UserHandleGenerator = do ->
   ###
   normalize_name = (name) ->
     return window.getSlug name
-      .replace new RegExp(/[^a-zA-Z0-9_]/, 'g'), ''
+      .toLowerCase()
+      .replace new RegExp(/[^a-z0-9_]/, 'g'), ''
       .substring 0, 21
 
   ###
@@ -44,7 +45,7 @@ z.user.UserHandleGenerator = do ->
   @param handle [String]
   ###
   validate = (handle) ->
-    return _.isString(handle) and /^[a-zA-Z0-9_]{2,21}$/.test handle
+    return _.isString(handle) and /^[a-z0-9_]{2,21}$/.test handle
 
   ###
   Create a set of suggestions based on the name

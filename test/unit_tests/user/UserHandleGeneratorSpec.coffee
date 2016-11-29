@@ -45,6 +45,10 @@ describe 'UserHandleGenerator', ->
       expect(z.user.UserHandleGenerator.validate 'a').toBeFalsy()
       expect(z.user.UserHandleGenerator.validate 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa').toBeFalsy()
 
+    it 'returns false if username contains uppercase characters', ->
+      expect(z.user.UserHandleGenerator.validate 'AAA').toBeFalsy()
+      expect(z.user.UserHandleGenerator.validate 'Aaa').toBeFalsy()
+
     it 'returns false if username is not a string', ->
       expect(z.user.UserHandleGenerator.validate()).toBeFalsy()
       expect(z.user.UserHandleGenerator.validate(null)).toBeFalsy()
