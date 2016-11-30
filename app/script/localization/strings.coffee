@@ -406,7 +406,7 @@ z.string.preferences_account_reset_password = 'Reset password'
 z.string.preferences_account_delete = 'Delete account'
 z.string.preferences_account_log_out = 'Log out'
 z.string.preferences_account_username_placeholder = 'Your full name'
-z.string.preferences_account_username_hint = 'You can use the a-z, 0-9 characters and the underscore'
+z.string.preferences_account_username_hint = 'At least 2 characters. a—z, 0—9 and _ only.'
 z.string.preferences_account_username_available = 'Available'
 z.string.preferences_account_username_error_taken = 'Already taken'
 
