@@ -61,11 +61,11 @@ z.user.UserHandleGenerator = do ->
       .substring 0, MAX_HANDLE_LENGTH
 
   ###
-  Validate user handle.
-  @param handle [String]
+  Validate that character can be used for handle.
+  @param character [String]
   ###
-  validate = (handle) ->
-    return _.isString(handle) and /^[a-z0-9_]{2,21}$/.test handle
+  validate_character = (character) ->
+    return _.isString(character) and character.length is 1 and /[a-z0-9_]/.test character
 
   ###
   Create a set of suggestions based on the name
@@ -92,4 +92,4 @@ z.user.UserHandleGenerator = do ->
     create_suggestions: create_suggestions
     generate_handle_variations: generate_handle_variations
     normalize_name: normalize_name
-    validate: validate
+    validate_character: validate_character

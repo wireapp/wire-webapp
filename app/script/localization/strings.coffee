@@ -409,7 +409,6 @@ z.string.preferences_account_username_placeholder = 'Your full name'
 z.string.preferences_account_username_hint = 'You can use the a-z, 0-9 characters and the underscore'
 z.string.preferences_account_username_available = 'Available'
 z.string.preferences_account_username_error_taken = 'Already taken'
-z.string.preferences_account_username_error_invalid = 'Invalid username'
 
 z.string.preferences_av_camera = 'Camera'
 z.string.preferences_av_microphone = 'Microphone'

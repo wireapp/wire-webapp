@@ -38,32 +38,26 @@ describe 'UserHandleGenerator', ->
       expect(z.user.UserHandleGenerator.normalize_name('🐙☀️')).toBe ''
       expect(z.user.UserHandleGenerator.normalize_name('name@mail.com')).toBe 'namemailcom'
 
-  describe 'validate', ->
+  describe 'validate_character', ->
 
-    it 'returns false if username length is outside the specific range', ->
-      expect(z.user.UserHandleGenerator.validate '').toBeFalsy()
-      expect(z.user.UserHandleGenerator.validate 'a').toBeFalsy()
-      expect(z.user.UserHandleGenerator.validate 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa').toBeFalsy()
+    it 'returns true character is valid', ->
+      latin_alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+      numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+      allow_characters = ['_']
 
-    it 'returns false if username contains uppercase characters', ->
-      expect(z.user.UserHandleGenerator.validate 'AAA').toBeFalsy()
-      expect(z.user.UserHandleGenerator.validate 'Aaa').toBeFalsy()
+      latin_alphabet.concat(numbers, allow_characters).forEach (character) ->
+        expect(z.user.UserHandleGenerator.validate_character character).toBeTruthy()
 
-    it 'returns false if username is not a string', ->
-      expect(z.user.UserHandleGenerator.validate()).toBeFalsy()
-      expect(z.user.UserHandleGenerator.validate(null)).toBeFalsy()
-      expect(z.user.UserHandleGenerator.validate({})).toBeFalsy()
-      expect(z.user.UserHandleGenerator.validate(1)).toBeFalsy()
+    it 'returns false if character is not a string', ->
+      expect(z.user.UserHandleGenerator.validate_character()).toBeFalsy()
+      expect(z.user.UserHandleGenerator.validate_character(null)).toBeFalsy()
+      expect(z.user.UserHandleGenerator.validate_character({})).toBeFalsy()
+      expect(z.user.UserHandleGenerator.validate_character(1)).toBeFalsy()
 
-    it 'returns false if username contains other than alphanumeric characters and underscores', ->
-      expect(z.user.UserHandleGenerator.validate('太陽')).toBeFalsy()
-      expect(z.user.UserHandleGenerator.validate('شمس')).toBeFalsy()
-      expect(z.user.UserHandleGenerator.validate('!"§$%&/()=?')).toBeFalsy()
-
-    it 'returns true if username only contains alphanumeric characters and underscores', ->
-      expect(z.user.UserHandleGenerator.validate('foobla')).toBeTruthy()
-      expect(z.user.UserHandleGenerator.validate('foo_bla')).toBeTruthy()
-      expect(z.user.UserHandleGenerator.validate('foo_bla_83')).toBeTruthy()
+    it 'returns false if character contains other than alphanumeric characters and underscores', ->
+      expect(z.user.UserHandleGenerator.validate_character('太')).toBeFalsy()
+      expect(z.user.UserHandleGenerator.validate_character('شمس')).toBeFalsy()
+      expect(z.user.UserHandleGenerator.validate_character('!')).toBeFalsy()
 
   describe 'append_random_digits', ->
 

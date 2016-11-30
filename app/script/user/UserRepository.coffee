@@ -610,7 +610,7 @@ class z.user.UserRepository
     .catch (error) ->
       if error.code is 404
         return usernames
-      throw new Error "Failed to verify usernames with error: #{error.message}"
+      throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
   ###
   Verify that username is unique.
@@ -618,18 +618,17 @@ class z.user.UserRepository
   @param username [String] New user name
   ###
   verify_username: (username) ->
-    Promise.resolve().then =>
-      if z.user.UserHandleGenerator.validate username
-        return @user_service.check_username username
-        .catch (error) ->
-          if error.code is 404
-            return username
-          throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
-        .then (username) ->
-          if username
-            return username
-          throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
-      throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
+    return @user_service.check_username username
+    .catch (error) ->
+      if error.code is 404
+        return username
+      if error.code is 400
+        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
+      throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
+    .then (username) ->
+      if username
+        return username
+      throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
 
   ###
   Change the profile image.

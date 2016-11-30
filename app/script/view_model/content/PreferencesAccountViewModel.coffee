@@ -34,7 +34,8 @@ class z.ViewModel.content.PreferencesAccountViewModel
     @submitted_username = ko.observable()
     @username_error = ko.observable()
 
-    @show_username_checkmark = ko.observable()
+    @name_saved = ko.observable()
+    @username_saved = ko.observable()
 
     @_init_subscriptions()
 
@@ -51,6 +52,11 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
     if new_name and new_name isnt @self_user().name()
       @user_repository.change_name new_name
+      .then =>
+        @name_saved true
+        window.setTimeout =>
+          @name_saved false
+        , 3000
     else
       @name.notifySubscribers() # render old value
 
@@ -58,6 +64,9 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
   should_focus_username: =>
     return @user_repository.should_set_username
+
+  check_username_input: (username, e) ->
+    return z.user.UserHandleGenerator.validate_character e.key
 
   change_username: (username, e) =>
     entered_username = e.target.value
@@ -74,9 +83,9 @@ class z.ViewModel.content.PreferencesAccountViewModel
     .then =>
       @username_error null
       e.target.blur()
-      @show_username_checkmark true
+      @username_saved true
       window.setTimeout =>
-        @show_username_checkmark false
+        @username_saved false
       , 3000
     .catch (error) =>
       if @entered_username() isnt @submitted_username()
@@ -101,8 +110,6 @@ class z.ViewModel.content.PreferencesAccountViewModel
         return
       if error.type is z.user.UserError::TYPE.USERNAME_TAKEN
         @username_error 'taken'
-      else if error.type is z.user.UserError::TYPE.USERNAME_INVALID
-        @username_error 'invalid'
 
   check_new_clients: =>
     return if not @new_clients().length
