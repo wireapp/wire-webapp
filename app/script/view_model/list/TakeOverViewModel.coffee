@@ -49,4 +49,4 @@ class z.ViewModel.list.TakeOverViewModel
 
   choose_username: ->
     amplify.publish z.event.WebApp.TAKEOVER.DISMISS
-    amplify.publish z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT
+    window.requestAnimationFrame -> amplify.publish z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT

@@ -30,9 +30,11 @@ class z.ViewModel.content.PreferencesAccountViewModel
     @name = ko.pureComputed => @self_user().name()
 
     @username = ko.pureComputed => @self_user().username()
-    @submitted_username = undefined
-
+    @entered_username = ko.observable()
+    @submitted_username = ko.observable()
     @username_error = ko.observable()
+
+    @show_username_checkmark = ko.observable()
 
     @_init_subscriptions()
 
@@ -54,30 +56,48 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
     e.target.blur()
 
+  should_focus_username: =>
+    return @user_repository.should_set_username
+
   change_username: (username, e) =>
-    new_username = e.target.value
+    entered_username = e.target.value
 
-    if new_username and new_username isnt @self_user().username()
-      @user_repository.change_username new_username
-      .then =>
-        @username_error null
-      .catch =>
-        @username_error true
-    else
-      @username.notifySubscribers() # render old value
+    if entered_username.length < 2
+      @username_error null
+      return
 
-    e.target.blur()
+    if entered_username is @self_user().username()
+      e.target.blur()
+
+    @submitted_username entered_username
+    @user_repository.change_username entered_username
+    .then =>
+      @username_error null
+      e.target.blur()
+      @show_username_checkmark true
+      window.setTimeout =>
+        @show_username_checkmark false
+      , 3000
+    .catch (error) =>
+      if @entered_username() isnt @submitted_username()
+        return
+      if error.type is z.user.UserError::TYPE.USERNAME_TAKEN
+        @username_error 'taken'
 
   verify_username: (username, e) =>
-    new_username = e.target.value
+    entered_username = e.target.value
 
-    @submitted_username = new_username
-    @user_repository.verify_username new_username
+    if entered_username.length < 2 or entered_username is @self_user().username()
+      @username_error null
+      return
+
+    @entered_username entered_username
+    @user_repository.verify_username entered_username
     .then =>
-      if @submitted_username is new_username
-        @username_error null
+      if @entered_username() is entered_username
+        @username_error 'available'
     .catch (error) =>
-      if @submitted_username isnt new_username
+      if @entered_username() isnt entered_username
         return
       if error.type is z.user.UserError::TYPE.USERNAME_TAKEN
         @username_error 'taken'

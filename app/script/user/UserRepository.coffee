@@ -590,6 +590,12 @@ class z.user.UserRepository
   ###
   change_username: (username) ->
     @user_service.change_own_username username
+    .then ->
+      @should_set_username = false
+    .catch (error) ->
+      if error.code is 409
+        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
+      throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
   ###
   Verify usernames against the backend.
