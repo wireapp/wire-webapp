@@ -247,7 +247,9 @@ class z.main.App
         @_check_user_information user_et
         return user_et
     .catch (error) ->
-      throw new Error "Loading self user failed: #{error.message}"
+      if not error instanceof z.storage.StorageError
+        error = new Error "Loading self user failed: #{error.message}"
+      throw error
 
   ###
   Check whether we need to set different user information (picture, username).

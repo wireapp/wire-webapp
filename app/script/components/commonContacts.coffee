@@ -28,6 +28,14 @@ class z.components.CommonContactsViewModel
 
     @common_contacts_total = ko.observable 0
 
+    @common_contacts_caption = ko.pureComputed =>
+      locale_id = if @common_contacts_total() > 1 then z.string.search_friends_in_common else z.string.search_friend_in_common
+      return z.localization.Localizer.get_text
+        id: locale_id
+        replace:
+          placeholder: '%no',
+          content: @common_contacts_total()
+
     @search_repository.get_common_contacts(@user.id).then (total) => @common_contacts_total total
 
 ko.components.register 'common-contacts',
@@ -35,6 +43,6 @@ ko.components.register 'common-contacts',
     return new z.components.CommonContactsViewModel params, component_info
   template: """
             <!-- ko if: common_contacts_total -->
-              <span data-bind="l10n_text: {'id': z.string.search_friends_in_common, 'replace': {'placeholder': '%no', 'content': common_contacts_total()}}"></span>
+              <span data-bind="text: common_contacts_caption"></span>
             <!-- /ko -->
             """

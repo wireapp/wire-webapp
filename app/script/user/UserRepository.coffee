@@ -579,7 +579,7 @@ class z.user.UserRepository
     .then (valid_suggestions) =>
       @self().username valid_suggestions[0]
     .catch (error) =>
-      if error.code is 404
+      if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         @self().username suggestions[0]
       else
         throw new Error "Failed to get a suggestion: #{error.message}"
@@ -593,7 +593,7 @@ class z.user.UserRepository
     .then ->
       @should_set_username = false
     .catch (error) ->
-      if error.code is 409
+      if error.code is z.service.BackendClientError::STATUS_CODE.CONFLICT
         throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
@@ -608,7 +608,7 @@ class z.user.UserRepository
       taken_usernames = (user.handle for user in response)
       return _.difference usernames, taken_usernames
     .catch (error) ->
-      if error.code is 404
+      if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         return usernames
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
@@ -620,9 +620,9 @@ class z.user.UserRepository
   verify_username: (username) ->
     return @user_service.check_username username
     .catch (error) ->
-      if error.code is 404
+      if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         return username
-      if error.code is 400
+      if error.code is z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
         throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
     .then (username) ->

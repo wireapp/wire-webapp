@@ -47,7 +47,7 @@ z.user.UserHandleGenerator = do ->
   @param number [Number] number of digits to append
   ###
   append_random_digits = (str, number) ->
-    random_digits = [0...number].map -> z.util.get_random_int(1, 9)
+    random_digits = [0...number].map -> z.util.get_random_int 1, 9
     return "#{str}#{random_digits.join('')}"
 
   ###

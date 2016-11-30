@@ -3,7 +3,7 @@
     <div class="connect-requests-inner" data-bind="foreach: {data: connect_requests, afterRender: after_render}">
       <div class="connect-request" data-uie-name="connect-request" data-bind="attr: {'data-uie-uid': id}">
         <div class="popover-title ellipsis" data-bind="text: name()"></div>
-        <div class="popover-meta label-username" data-bind="text: username()">username</div>
+        <div class="popover-meta label-username" data-bind="text: username()"></div>
         <common-contacts class="popover-meta" params="user: $data"></common-contacts>
         <user-avatar class="connect-request-avatar user-avatar-lg user-avatar-no-badge user-avatar-no-filter cursor-default" params="user: $data"></user-avatar>
         <div class="connect-request-buttons button-group">
