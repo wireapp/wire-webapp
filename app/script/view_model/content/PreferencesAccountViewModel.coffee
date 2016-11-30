@@ -44,6 +44,11 @@ class z.ViewModel.content.PreferencesAccountViewModel
     amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @on_client_remove
     amplify.subscribe z.event.WebApp.PREFERENCES.UPLOAD_PICTURE, @set_picture
 
+  removed_from_view: =>
+    @username_error null
+    @entered_username null
+    @submitted_username null
+
   change_accent_color: (id) =>
     @user_repository.change_accent_color id
 
