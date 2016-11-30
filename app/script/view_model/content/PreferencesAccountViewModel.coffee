@@ -81,12 +81,13 @@ class z.ViewModel.content.PreferencesAccountViewModel
     @submitted_username entered_username
     @user_repository.change_username entered_username
     .then =>
-      @username_error null
-      e.target.blur()
-      @username_saved true
-      window.setTimeout =>
-        @username_saved false
-      , 3000
+      if @entered_username() is @submitted_username()
+        @username_error null
+        e.target.blur()
+        @username_saved true
+        window.setTimeout =>
+          @username_saved false
+        , 3000
     .catch (error) =>
       if @entered_username() isnt @submitted_username()
         return
