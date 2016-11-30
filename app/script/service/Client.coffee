@@ -178,7 +178,7 @@ class z.service.Client
             return
           when z.service.BackendClientError::STATUS_CODE.UNAUTHORIZED
             @_push_to_request_queue [config, resolve, reject], z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
-            amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW
+            amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, 'Unauthorized backend request'
             return
           when z.service.BackendClientError::STATUS_CODE.FORBIDDEN
             switch jqXHR.responseJSON?.label
