@@ -6,14 +6,14 @@
     <div id="app" class="app">
       <div id="left" class="left">
         #include('list/background.htm')
-        <!-- ko if: list_modal() === undefined -->
+        <!-- ko ifnot: list_modal() -->
           #include('list/archive.htm')
           #include('list/conversations.htm')
           #include('list/preferences.htm')
           #include('list/start-ui.htm')
           #include('list/actions.htm')
         <!-- /ko -->
-        <!-- ko if: list_modal() === 'takeover' -->
+        <!-- ko if: list_modal() === z.ViewModel.list.LIST_MODAL_TYPE.TAKEOVER -->
           #include('list/takeover.htm')
         <!-- /ko -->
       </div>

@@ -123,7 +123,7 @@ class z.ViewModel.list.ListViewModel
       else 'conversations'
 
   show_takeover: =>
-    @list_modal 'takeover'
+    @list_modal z.ViewModel.list.LIST_MODAL_TYPE.TAKEOVER
 
   dismiss_takeover: =>
     @list_modal undefined
