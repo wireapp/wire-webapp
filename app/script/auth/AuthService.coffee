@@ -86,6 +86,7 @@ class z.auth.AuthService
         xhrFields:
           withCredentials: true
         success: (data) =>
+          @client.request_queue_blocked_state z.service.RequestQueueBlockedState.NONE
           @save_access_token_in_client data.token_type, data.access_token
           resolve data
         error: (jqXHR, textStatus, errorThrown) =>
@@ -110,6 +111,7 @@ class z.auth.AuthService
             , POST_ACCESS.RETRY_TIMEOUT
 
           else
+            @client.request_queue_blocked_state z.service.RequestQueueBlockedState.NONE
             @save_access_token_in_client()
             return reject new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.RETRIES_EXCEEDED
 
@@ -244,5 +246,3 @@ class z.auth.AuthService
   save_access_token_in_client: (type = '', value = '') =>
     @client.access_token_type = type
     @client.access_token = value
-    @client.request_queue_blocked_state z.service.RequestQueueBlockedState.NONE
-    @client.execute_request_queue()
