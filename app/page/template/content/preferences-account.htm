@@ -11,7 +11,7 @@
                    data-uie-name="enter-name"
                    maxlength="64"
                    spellcheck="false" />
-            <span data-bind="css: name_saved() ? 'icon-check' : 'preferences-account-input-icon'"></span>
+            <span data-bind="css: name_saved() ? 'checkmark' : 'preferences-account-input-icon'"></span>
           </div>
           <div class="preferences-account-username-wrapper">
             <span class="preferences-account-username-addsign">@</span>
@@ -21,7 +21,7 @@
                    data-uie-name="enter-username"
                    maxlength="21"
                    spellcheck="false" />
-            <span data-bind="css: username_saved() ? 'icon-check' : 'preferences-account-input-icon'"></span>
+            <span data-bind="css: username_saved() ? 'checkmark' : 'preferences-account-input-icon'"></span>
             <!-- ko ifnot: username_error() -->
               <div class="preferences-account-username-hint text-graphite font-size-xs"
                    data-bind="l10n_text: z.string.preferences_account_username_hint"></div>
