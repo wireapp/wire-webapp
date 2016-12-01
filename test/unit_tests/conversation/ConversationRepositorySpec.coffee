@@ -197,8 +197,6 @@ describe 'z.conversation.ConversationRepository', ->
 
       server.respond()
 
-      expect(conversation_repository.save_conversation).toHaveBeenCalled()
-
     it 'maps cancelled connections to exiting conversation and filters it correctly', ->
       connection_et.status z.user.ConnectionStatus.CANCELLED
       conversation_repository.map_connections [connection_et]

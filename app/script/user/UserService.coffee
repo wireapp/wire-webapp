@@ -211,25 +211,20 @@ class z.user.UserService
   @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
 
   @param users [Array<String>] ID of users to be fetched
-  @param callback [Function] Function to be called on server return
   ###
-  get_users: (users, callback) ->
+  get_users: (users) ->
     @client.send_request
       type: 'GET'
       url: @client.create_url @URL_USERS
       data:
         ids: users.join ','
-      callback: callback
 
   ###
   Get a user by ID.
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
-
   @param user_id [String] User ID
-  @param callback [Function] Function to be called on server return
   ###
-  get_user_by_id: (user_id, callback) ->
+  get_user_by_id: (user_id) ->
     @client.send_request
       type: 'GET'
       url: @client.create_url "/users/#{user_id}"
-      callback: callback
