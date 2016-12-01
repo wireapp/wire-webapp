@@ -371,17 +371,6 @@ describe 'z.cryptography.CryptographyMapper', ->
         done()
       .catch done.fail
 
-    it 'rejects with an error for a hot knock message', (done) ->
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'knock', new z.proto.Knock true
-
-      mapper.map_generic_message generic_message, event
-      .then done.fail
-      .catch (error) ->
-        expect(error instanceof z.cryptography.CryptographyError).toBeTruthy()
-        expect(error.type).toBe z.cryptography.CryptographyError::TYPE.IGNORED_HOT_KNOCK
-        done()
-
     it 'resolves with a mapped last read message', (done) ->
       date = Date.now().toString()
       conversation_id = z.util.create_random_uuid()

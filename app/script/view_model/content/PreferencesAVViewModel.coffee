@@ -33,9 +33,11 @@ class z.ViewModel.content.PreferencesAVViewModel
     @audio_stream = @media_stream_handler.local_media_streams.audio
     @video_stream = @media_stream_handler.local_media_streams.video
 
+    @is_visible = false
+
     @audio_stream.subscribe (audio_stream) =>
       @_release_audio_meter() if @audio_interval
-      @_initiate_audio_meter audio_stream if audio_stream
+      @_initiate_audio_meter audio_stream if @is_visible and audio_stream
 
     @audio_context = undefined
     @audio_level = ko.observable 0
@@ -45,12 +47,14 @@ class z.ViewModel.content.PreferencesAVViewModel
 
   # Initiate devices.
   initiate_devices: =>
+    @is_visible = true
     @_get_media_stream()
     .then (audio_stream) =>
-      @_initiate_audio_meter audio_stream if not @audio_interval
+      @_initiate_audio_meter audio_stream if audio_stream and not @audio_interval
 
   # Release devices.
   release_devices: =>
+    @is_visible = false
     @_release_audio_meter()
     @_release_media_streams()
 
@@ -70,8 +74,10 @@ class z.ViewModel.content.PreferencesAVViewModel
       return @audio_stream()
     .catch (error) =>
       error = error[0] if _.isArray error
-      @permission_denied true
       @logger.log @logger.levels.ERROR, "Requesting MediaStream failed: #{error.message}", error
+      if error.name in z.calling.rtc.MediaStreamErrorTypes.DEVICE or error.name in z.calling.rtc.MediaStreamErrorTypes.PERMISSION
+        @permission_denied true
+        return false
       throw error
 
   ###

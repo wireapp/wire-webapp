@@ -74,22 +74,22 @@ describe 'z.util.render_message', ->
 
   it 'renders an email address', ->
     actual = z.util.render_message "send it over to hello@wire.com"
-    expected = 'send it over to <a href="mailto:hello@wire.com">hello@wire.com</a>'
+    expected = 'send it over to <a onclick="z.util.safe_mailto_open(\'hello@wire.com\')" href="#">hello@wire.com</a>'
     expect(actual).toBe expected
 
   it 'renders an email address with pluses', ->
     actual = z.util.render_message "send it over to hello+world@wire.com"
-    expected = 'send it over to <a href="mailto:hello+world@wire.com">hello+world@wire.com</a>'
+    expected = 'send it over to <a onclick="z.util.safe_mailto_open(\'hello+world@wire.com\')" href="#">hello+world@wire.com</a>'
     expect(actual).toBe expected
 
   it 'renders an email long domains', ->
     actual = z.util.render_message "send it over to janedoe@school.university.edu"
-    expected = 'send it over to <a href="mailto:janedoe@school.university.edu">janedoe@school.university.edu</a>'
+    expected = 'send it over to <a onclick="z.util.safe_mailto_open(\'janedoe@school.university.edu\')" href="#">janedoe@school.university.edu</a>'
     expect(actual).toBe expected
 
   it 'renders an email with multiple subdomains', ->
     actual = z.util.render_message "send it over to bla@foo.co.uk"
-    expected = 'send it over to <a href="mailto:bla@foo.co.uk">bla@foo.co.uk</a>'
+    expected = 'send it over to <a onclick="z.util.safe_mailto_open(\'bla@foo.co.uk\')" href="#">bla@foo.co.uk</a>'
     expect(actual).toBe expected
 
   # The tag "<br />" is preferred for compatibility sake.

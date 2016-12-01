@@ -96,7 +96,7 @@ def update_headers(response):
     "default-src 'self' data:",
     "connect-src 'self' blob: https://*.unsplash.com https://maps.googleapis.com https://*.giphy.com https://api.raygun.io https://www.google.com https://*.wire.com https://wire.com wss://prod-nginz-ssl.wire.com https://*.zinfra.io wss://*.zinfra.io",
     "font-src 'self' data:",
-    "frame-src 'self' https://accounts.google.com https://*.youtube.com https://*.soundcloud.com https://*.vimeo.com https://*.spotify.com",
+    "frame-src 'self' https://accounts.google.com https://*.soundcloud.com https://*.spotify.com https://*.vimeo.com https://*.youtube.com",
     "img-src 'self' blob: data: https://*.giphy.com https://1-ps.googleusercontent.com https://*.localytics.com https://*.wire.com https://*.cloudfront.net https://*.zinfra.io https://csi.gstatic.com",
     # Note: The "blob:" attribute needs to be explicitly set for Chrome 47+: https://code.google.com/p/chromium/issues/detail?id=473904
     "media-src blob: data: *",

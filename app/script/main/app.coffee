@@ -101,7 +101,7 @@ class z.main.App
     repository.bot                 = new z.bot.BotRepository @service.bot, repository.conversation
     repository.call_center         = new z.calling.CallCenter @service.call, repository.conversation, repository.user, repository.audio
     repository.event_tracker       = new z.tracking.EventTrackingRepository repository.user, repository.conversation
-    repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.conversation
+    repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.call_center, repository.conversation
 
     return repository
 
@@ -190,7 +190,7 @@ class z.main.App
       @repository.user.self().devices client_ets
       @repository.conversation.map_connections @repository.user.connections()
       @_subscribe_to_beforeunload()
-      return @repository.event.update_from_notification_stream()
+      return @repository.event.initialize_from_notification_stream()
     .then (notifications_count) =>
       @view.loading.switch_message z.string.init_updated_from_notifications, true
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS

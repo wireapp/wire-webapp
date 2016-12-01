@@ -84,6 +84,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
     it 'if the browser tab has focus and conversation is active', (done) ->
       conversation_repository.active_conversation conversation_et
       document.hasFocus = -> return true
+      call_center.joined_call = -> return true
 
       system_notification_repository.notify conversation_et, message_et
       .then ->

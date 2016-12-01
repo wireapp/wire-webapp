@@ -67,7 +67,7 @@ class z.conversation.ConversationRepository
     @sending_queue.pause()
 
     @conversation_service.client.request_queue_blocked_state.subscribe (state) =>
-      @sending_queue.pause state isnt z.service.RequestQueueBlockedState.NONE
+      @sending_queue.pause state isnt z.service.RequestQueueBlockedState.NONE and not @block_event_handling
 
     @conversations_archived = ko.observableArray []
     @conversations_call = ko.observableArray []
@@ -195,17 +195,19 @@ class z.conversation.ConversationRepository
   get_events: (conversation_et) ->
     return new Promise (resolve, reject) =>
       conversation_et.is_pending true
-      timestamp = conversation_et.get_first_message()?.timestamp
-      @conversation_service.load_events_from_db conversation_et.id, timestamp, null, z.config.MESSAGES_FETCH_LIMIT
+
+      first_message = conversation_et.get_first_message()
+      upper_bound = if first_message then new Date first_message.timestamp else new Date()
+
+      @conversation_service.load_events_from_db conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT
       .then (events) =>
         if events.length < z.config.MESSAGES_FETCH_LIMIT
           conversation_et.has_further_messages false
         if events.length is 0
           @logger.log @logger.levels.INFO, "No events for conversation '#{conversation_et.id}' found", events
-        else if timestamp
-          date = new Date(timestamp).toISOString()
+        else if first_message
           @logger.log @logger.levels.INFO,
-            "Loaded #{events.length} event(s) starting at '#{date}' for conversation '#{conversation_et.id}'", events
+            "Loaded #{events.length} event(s) starting at '#{upper_bound.toISOString()}' for conversation '#{conversation_et.id}'", events
         else
           @logger.log @logger.levels.INFO,
             "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
@@ -221,9 +223,13 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation to start from
   ###
   _get_unread_events: (conversation_et) ->
+    first_message = conversation_et.get_first_message()
+    upper_bound = if first_message then new Date first_message.timestamp else new Date()
+    lower_bound = new Date conversation_et.last_read_timestamp()
+    return if lower_bound >= upper_bound
+
     conversation_et.is_pending true
-    timestamp = conversation_et.get_first_message()?.timestamp
-    @conversation_service.load_events_from_db conversation_et.id, timestamp, conversation_et.last_read_timestamp()
+    @conversation_service.load_events_from_db conversation_et.id, lower_bound, upper_bound
     .then (events) =>
       if events.length
         @_add_events_to_conversation events: events, conversation_et
@@ -1847,21 +1853,22 @@ class z.conversation.ConversationRepository
     @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
     .then (message_et) =>
       changes = message_et.update_reactions event_json
-      if changes
-        @_update_user_ets message_et
-        @_send_reaction_notification conversation_et, message_et, event_json
-        @logger.log @logger.levels.DEBUG, "Updated reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
-        return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
-    .catch (error) =>
-      if error.type is z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
+      return if not changes
+
+      @_update_user_ets message_et
+      @_send_reaction_notification conversation_et, message_et, event_json
+      @logger.log @logger.levels.DEBUG, "Updated reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
+      return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
+      .catch (error) =>
+        throw error is error.type isnt z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
         if attempt < 10
-          window.setTimeout =>
-            @_on_reaction conversation_et, event_json
+          return window.setTimeout =>
+            @_on_reaction conversation_et, event_json, attempt + 1
           , 10 * attempt
-        else
-          @logger.log @logger.levels.INFO, "Failed to update reaction of message in conversation '#{conversation_et.id}'", error
-      else if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-        @logger.log @logger.levels.INFO, "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
+        @logger.log @logger.levels.ERROR, "Too many attempts to update reaction to message '#{message_et.id}' in conversation '#{conversation_et.id}'", error
+    .catch (error) =>
+      if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+        @logger.log @logger.levels.ERROR, "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
         throw error
 
   ###

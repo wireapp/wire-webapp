@@ -293,23 +293,28 @@ Opens a new browser tab (target="_blank") with a given URL in a safe environment
 @param url [String] URL you want to open in a new browser tab
 ###
 z.util.safe_window_open = (url, focus = true) ->
-  url = z.util.add_http url
+  new_window = window.open z.util.add_http url
 
-  if navigator.userAgent.indexOf('Electron') > -1
-    window.open url
-  else
-    new_window = window.open()
+  if new_window
     new_window.opener = null
-    new_window.location = url
-
-  if new_window and focus
-    new_window.focus()
+    new_window.focus() if focus
 
   return new_window
 
+
+z.util.safe_mailto_open = (email) ->
+  return if not z.util.is_valid_email email
+
+  new_window = window.open "mailto:#{email}"
+  if new_window
+    window.setTimeout ->
+      new_window.close()
+    , 10
+
+
 z.util.auto_link_emails = (text) ->
   email_pattern = /([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)/gim
-  return text.replace email_pattern, '<a href="mailto:$1">$1</a>'
+  return text.replace email_pattern, '<a onclick="z.util.safe_mailto_open(\'$1\')" href="#">$1</a>'
 
 
 z.util.get_last_characters = (message, amount) ->
@@ -662,19 +667,21 @@ z.util.bucket_values = (value, bucket_limits) ->
 
 z.util.format_time_remaining = (time_remaining) ->
   moment_duration = moment.duration time_remaining
+
+  title = ''
   if moment_duration.asHours() is 1
-    title = "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hour}, "
+    title += "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hour}, "
   else if moment_duration.asHours() > 1
-    title = "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hours}, "
+    title += "#{moment_duration.hours()} #{z.localization.Localizer.get_text z.string.ephememal_units_hours}, "
 
   if moment_duration.asMinutes() is 1
-    title = "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minute} #{z.localization.Localizer.get_text z.string.and} "
+    title += "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minute} #{z.localization.Localizer.get_text z.string.and} "
   else if moment_duration.asMinutes() > 1
-    title = "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minutes} #{z.localization.Localizer.get_text z.string.and} "
+    title += "#{moment_duration.minutes()} #{z.localization.Localizer.get_text z.string.ephememal_units_minutes} #{z.localization.Localizer.get_text z.string.and} "
 
   if moment_duration.asSeconds() is 1
-    title = "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_second}"
+    title += "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_second}"
   else if moment_duration.asSeconds() > 1
-    title = "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_seconds}"
+    title += "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_seconds}"
 
   return title or ''

@@ -72,7 +72,7 @@ describe 'Event Repository', ->
 
     it 'should skip fetching notifications if last notification ID not found in storage', (done) ->
       event_repository.connect_web_socket()
-      event_repository.update_from_notification_stream()
+      event_repository.initialize_from_notification_stream()
       .then ->
         expect(notification_service.get_last_notification_id_from_db).toHaveBeenCalled()
         expect(notification_service.get_notifications).not.toHaveBeenCalled()
@@ -96,8 +96,8 @@ describe 'Event Repository', ->
       websocket_service_mock.publish {id: z.util.create_random_uuid(), payload: []}
 
       websocket_service_mock.publish {id: last_published_notification_id, payload: []}
-      event_repository.update_from_notification_stream()
-      .then () ->
+      event_repository.initialize_from_notification_stream()
+      .then ->
         expect(event_repository._handle_buffered_notifications).toHaveBeenCalled()
         expect(event_repository.web_socket_buffer.length).toBe 0
         expect(event_repository.last_notification_id()).toBe last_published_notification_id
