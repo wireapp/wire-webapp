@@ -590,11 +590,14 @@ class z.user.UserRepository
   ###
   change_username: (username) ->
     @user_service.change_own_username username
-    .then ->
+    .then =>
       @should_set_username = false
+      @self().username username
     .catch (error) ->
       if error.code is z.service.BackendClientError::STATUS_CODE.CONFLICT
         throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
+      if error.code is z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
+        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
   ###
