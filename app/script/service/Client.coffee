@@ -146,7 +146,7 @@ class z.service.Client
         return @_push_to_request_queue [config, resolve, reject], @request_queue_blocked_state()
 
       if @access_token
-        config.headers = $.extend Authorization: "#{@access_token_type} #{@access_token}", config.headers
+        config.headers = $.extend config.headers or {}, Authorization: "#{@access_token_type} #{@access_token}"
 
       if config.withCredentials
         config.xhrFields = withCredentials: true
