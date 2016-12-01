@@ -106,7 +106,7 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
-    amplify.subscribe z.event.WebApp.CONVERSATION.STORE, @save_conversation_in_db
+    amplify.subscribe z.event.WebApp.CONVERSATION.PERSIST_STATE, @save_conversation_state_in_db
     amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
@@ -139,18 +139,18 @@ class z.conversation.ConversationRepository
 
     @fetching_conversations[conversation_id] = [callback]
 
-    @conversation_service.get_conversation_by_id conversation_id, (response, error) =>
-      if response
-        conversation_et = @conversation_mapper.map_conversation response
-        @save_conversation conversation_et
-        @logger.log @logger.levels.INFO, "Fetched conversation '#{conversation_id}' from backend"
-        callbacks = @fetching_conversations[conversation_id]
-        for callback in callbacks
-          callback? conversation_et
-        delete @fetching_conversations[conversation_id]
-      else
-        @logger.log @logger.levels.ERROR, "Failed to fetch conversation '#{conversation_id}' from backend: #{error.message}", error
-        throw error
+    @conversation_service.get_conversation_by_id conversation_id
+    .then (response) =>
+      conversation_et = @conversation_mapper.map_conversation response
+      @save_conversation conversation_et
+      @logger.log @logger.levels.INFO, "Fetched conversation '#{conversation_id}' from backend"
+      callbacks = @fetching_conversations[conversation_id]
+      for callback in callbacks
+        callback? conversation_et
+      delete @fetching_conversations[conversation_id]
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Failed to fetch conversation '#{conversation_id}' from backend: #{error.message}", error
+      throw error
 
   ###
   Retrieve all conversations using paging.
@@ -442,10 +442,39 @@ class z.conversation.ConversationRepository
   save_conversation: (conversation_et) =>
     if not @find_conversation_by_id conversation_et.id
       @conversations.push conversation_et
-      @save_conversation_in_db conversation_et
+      @save_conversation_state_in_db conversation_et
 
-  save_conversation_in_db: (conversation_et, updated_field) =>
-    @conversation_service.save_conversation_in_db conversation_et, updated_field
+  ###
+  Persists a conversation state in the database.
+  @param conversation_et [z.entity.Conversation] Conversation of which the state should be persisted
+  @param updated_field [z.conversation.ConversationUpdateType] Optional type of updated state information
+  ###
+  save_conversation_state_in_db: (conversation_et, updated_field) =>
+    if updated_field
+      changes = switch updated_field
+        when z.conversation.ConversationUpdateType.ARCHIVED_STATE
+          {
+            archived_state: conversation_et.archived_state()
+            archived_timestamp: conversation_et.archived_timestamp()
+          }
+        when z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
+          cleared_timestamp: conversation_et.cleared_timestamp()
+        when z.conversation.ConversationUpdateType.EPHEMERAL_TIMER
+          ephemeral_timer: conversation_et.ephemeral_timer()
+        when z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
+          last_event_timestamp: conversation_et.last_event_timestamp()
+        when z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
+          last_read_timestamp: conversation_et.last_read_timestamp()
+        when z.conversation.ConversationUpdateType.MUTED_STATE
+          {
+            muted_state: conversation_et.muted_state()
+            muted_timestamp: conversation_et.muted_timestamp()
+          }
+      return @conversation_service.update_conversation_state_in_db conversation_et, changes
+      .then =>
+        @logger.log @logger.levels.INFO, "Persisted update of '#{updated_field}' to conversation '#{conversation_et.id}'"
+
+    return @conversation_service.save_conversation_state_in_db conversation_et
 
   ###
   Save conversations in the repository.

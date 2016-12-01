@@ -130,7 +130,6 @@ class z.service.Client
   Send jQuery AJAX request.
   @see http://api.jquery.com/jquery.ajax/#jQuery-ajax-settings
   @param config [Object]
-  @option config [Function] callback DEPRECATED: use Promises
   @option config [String] contentType
   @option config [Object] data
   @option config [Object] headers
@@ -146,7 +145,7 @@ class z.service.Client
         return @_push_to_request_queue [config, resolve, reject], @request_queue_blocked_state()
 
       if @access_token
-        config.headers = $.extend Authorization: "#{@access_token_type} #{@access_token}", config.headers
+        config.headers = $.extend config.headers or {}, Authorization: "#{@access_token_type} #{@access_token}"
 
       if config.withCredentials
         config.xhrFields = withCredentials: true
@@ -163,7 +162,6 @@ class z.service.Client
         url: config.url
         xhrFields: config.xhrFields
       .done (data, textStatus, jqXHR) =>
-        config.callback? data
         resolve data
         @logger.log @logger.levels.OFF, "Server Response '#{jqXHR.wire?.request_id}' from '#{config.url}':", data
       .fail (jqXHR, textStatus, errorThrown) =>
@@ -192,10 +190,7 @@ class z.service.Client
             if jqXHR.status not in IGNORED_BACKEND_ERRORS
               Raygun.send new Error "Server request failed: #{jqXHR.status}"
 
-        if _.isFunction config.callback
-          config.callback null, jqXHR.responseJSON or new z.service.BackendClientError errorThrown
-        else
-          reject jqXHR.responseJSON or new z.service.BackendClientError jqXHR.status
+        reject jqXHR.responseJSON or new z.service.BackendClientError jqXHR.status
 
   ###
   Send AJAX request with compressed JSON body.
@@ -213,5 +208,5 @@ class z.service.Client
     @send_request $.extend config, json_config, true
 
   _push_to_request_queue: ([config, resolve_fn, reject_fn], reason) ->
-    @logger.log @logger.levels.INFO, "Adding '#{config.type}' request to #{config.url}' to queue due to #{reason}", config
+    @logger.log @logger.levels.INFO, "Adding '#{config.type}' request to '#{config.url}' to queue due to '#{reason}'", config
     @request_queue.push [config, resolve_fn, reject_fn]

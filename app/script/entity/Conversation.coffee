@@ -181,15 +181,20 @@ class z.entity.Conversation
 
   _subscribe_to_states_updates: =>
     @archived_state.subscribe =>
-      amplify.publish z.event.WebApp.CONVERSATION.STORE, @, z.conversation.ConversationUpdateType.ARCHIVED_STATE
+      @_persist_state_update z.conversation.ConversationUpdateType.ARCHIVED_STATE
     @cleared_timestamp.subscribe =>
-      amplify.publish z.event.WebApp.CONVERSATION.STORE, @, z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
+      @_persist_state_update z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
+    @ephemeral_timer.subscribe =>
+      @_persist_state_update z.conversation.ConversationUpdateType.EPHEMERAL_TIMER
     @last_event_timestamp.subscribe =>
-      amplify.publish z.event.WebApp.CONVERSATION.STORE, @, z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
+      @_persist_state_update z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
     @last_read_timestamp.subscribe =>
-      amplify.publish z.event.WebApp.CONVERSATION.STORE, @, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
+      @_persist_state_update z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
     @muted_state.subscribe =>
-      amplify.publish z.event.WebApp.CONVERSATION.STORE, @, z.conversation.ConversationUpdateType.MUTED_STATE
+      @_persist_state_update z.conversation.ConversationUpdateType.MUTED_STATE
+
+  _persist_state_update: (updated_field) ->
+    amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @, updated_field
 
   ###############################################################################
   # Lifecycle
@@ -499,6 +504,7 @@ class z.entity.Conversation
       archived_state: @archived_state()
       archived_timestamp: @archived_timestamp()
       cleared_timestamp: @cleared_timestamp()
+      ephemeral_timer: @ephemeral_timer()
       last_event_timestamp: @last_event_timestamp()
       last_read_timestamp: @last_read_timestamp()
       muted_state: @muted_state()

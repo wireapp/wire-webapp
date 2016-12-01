@@ -50,14 +50,14 @@ describe 'User Service', ->
       expect(response.has_more).toBeFalsy()
       expect(response.connections.length).toBe 2
       expect(response.connections[0].status).toEqual 'accepted'
-      expect(response.connections[1].conversation).toEqual '45c8f986-6c8f-465b-9ac9-bd5405e8c944'      
+      expect(response.connections[1].conversation).toEqual '45c8f986-6c8f-465b-9ac9-bd5405e8c944'
       done()
     .catch done.fail
 
     server.respond()
 
   describe 'get_users', ->
-    it 'can get a single existing user from the server', ->
+    it 'can get a single existing user from the server', (done) ->
       request_url = "#{urls.rest_url}/users?ids=7025598b-ffac-4993-8a81-af3f35b7147f"
       server.respondWith 'GET', request_url, [
         200
@@ -65,18 +65,17 @@ describe 'User Service', ->
         JSON.stringify payload.users.get.one
       ]
 
-      callback = sinon.spy()
-      user_service.get_users ['7025598b-ffac-4993-8a81-af3f35b7147f'], callback
-      server.respond()
-
-      expect(callback.called).toBeTruthy()
-      if callback.called
-        response = callback.getCall(0).args[0]
+      user_service.get_users ['7025598b-ffac-4993-8a81-af3f35b7147f']
+      .then (response) =>
         expect(response.length).toBe 1
         expect(response[0].id).toBe 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5'
         expect(response[0].email).toBe 'jd@wire.com'
+        done()
+      .catch done.fail
 
-    it 'cannot get a single fake user from the server', ->
+      server.respond()
+
+    it 'cannot get a single fake user from the server', (done) ->
       request_url = "#{urls.rest_url}/users?ids=7025598b-ffac-4993-8a81-af3f35b71414"
 
       server.respondWith 'GET', request_url, [
@@ -85,15 +84,15 @@ describe 'User Service', ->
         ''
       ]
 
-      callback = sinon.spy()
-      user_service.get_users ['7025598b-ffac-4993-8a81-af3f35b71414'], callback
+      user_service.get_users ['7025598b-ffac-4993-8a81-af3f35b71414']
+      .then done.fail
+      .catch (error) =>
+        expect(error.code).toBe z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+        done()
+
       server.respond()
 
-      expect(callback.called).toBeTruthy()
-      if callback.called
-        expect(callback.getCall(0).args[0]).toBeNull()
-
-    it 'can get multiple existing users from the server', ->
+    it 'can get multiple existing users from the server', (done) ->
       request_url = "#{urls.rest_url}/users?ids=7025598b-ffac-4993-8a81-af3f35b7147f%2C7025598b-ffac-4993-8a81-af3f35b71414"
       server.respondWith 'GET', request_url, [
         200
@@ -101,18 +100,17 @@ describe 'User Service', ->
         JSON.stringify payload.users.get.many
       ]
 
-      callback = sinon.spy()
-      user_service.get_users ['7025598b-ffac-4993-8a81-af3f35b7147f', '7025598b-ffac-4993-8a81-af3f35b71414'], callback
-      server.respond()
-
-      expect(callback.called).toBeTruthy()
-      if callback.called
-        response = callback.getCall(0).args[0]
+      user_service.get_users ['7025598b-ffac-4993-8a81-af3f35b7147f', '7025598b-ffac-4993-8a81-af3f35b71414']
+      .then (response) =>
         expect(response.length).toBe 2
         expect(response[0].id).toBe 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5'
         expect(response[1].email).toBe 'jr@wire.com'
+        done()
+      .catch done.fail
 
-    it 'cannot fetch multiple fake users from the server', ->
+      server.respond()
+
+    it 'cannot fetch multiple fake users from the server', (done) ->
       request_url = "#{urls.rest_url}/users?ids=7025598b-ffac-4993-8a81-af3f35b71488%2C7025598b-ffac-4993-8a81-af3f35b71414"
 
       server.respondWith 'GET', request_url, [
@@ -121,15 +119,15 @@ describe 'User Service', ->
         ''
       ]
 
-      callback = sinon.spy()
-      user_service.get_users ['7025598b-ffac-4993-8a81-af3f35b71488', '7025598b-ffac-4993-8a81-af3f35b71414'], callback
+      user_service.get_users ['7025598b-ffac-4993-8a81-af3f35b71488', '7025598b-ffac-4993-8a81-af3f35b71414']
+      .then done.fail
+      .catch (error) =>
+        expect(error.code).toBe z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+        done()
+
       server.respond()
 
-      expect(callback.called).toBeTruthy()
-      if callback.called
-        expect(callback.getCall(0).args[0]).toBeNull()
-
-    it 'can fetch the existing users from the servers in a group with fakes', ->
+    it 'can fetch the existing users from the servers in a group with fakes', (done) ->
       request_url = "#{urls.rest_url}/users?ids=d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5%2C7025598b-ffac-4993-8a81-af3f35b71425"
       server.respondWith 'GET', request_url, [
         200
@@ -137,13 +135,12 @@ describe 'User Service', ->
         JSON.stringify payload.users.get.one
       ]
 
-      callback = sinon.spy()
-      user_service.get_users ['d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5', '7025598b-ffac-4993-8a81-af3f35b71425'], callback
-      server.respond()
-
-      expect(callback.called).toBeTruthy()
-      if callback.called
-        response = callback.getCall(0).args[0]
+      user_service.get_users ['d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5', '7025598b-ffac-4993-8a81-af3f35b71425']
+      .then (response) =>
         expect(response.length).toBe 1
         expect(response[0].id).toBe 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5'
         expect(response[0].email).toBe 'jd@wire.com'
+        done()
+      .catch done.fail
+
+      server.respond()
