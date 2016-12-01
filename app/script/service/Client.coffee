@@ -146,7 +146,7 @@ class z.service.Client
         return @_push_to_request_queue [config, resolve, reject], @request_queue_blocked_state()
 
       if @access_token
-        config.headers = $.extend Authorization: "#{@access_token_type} #{@access_token}", config.headers
+        config.headers = $.extend config.headers or {}, Authorization: "#{@access_token_type} #{@access_token}"
 
       if config.withCredentials
         config.xhrFields = withCredentials: true
@@ -213,5 +213,5 @@ class z.service.Client
     @send_request $.extend config, json_config, true
 
   _push_to_request_queue: ([config, resolve_fn, reject_fn], reason) ->
-    @logger.log @logger.levels.INFO, "Adding '#{config.type}' request to #{config.url}' to queue due to #{reason}", config
+    @logger.log @logger.levels.INFO, "Adding '#{config.type}' request to '#{config.url}' to queue due to '#{reason}'", config
     @request_queue.push [config, resolve_fn, reject_fn]
