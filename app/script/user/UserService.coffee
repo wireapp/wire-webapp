@@ -45,17 +45,16 @@ class z.user.UserService
 
   @param user_id [String] User ID of the user to request a connection with
   @param name [String] Name of the conversation being initiated (1 - 256 characters)
-  @param message [String] The initial message in the request (1 - 256 characters)
   @return [Promise] Promise that resolves when the connection request was created
   ###
-  create_connection: (user_id, name, message) ->
+  create_connection: (user_id, name) ->
     @client.send_json
       type: 'POST'
       url: @client.create_url @URL_CONNECTIONS
       data:
         user: user_id
         name: name
-        message: message
+        message: ' '
 
   ###
   Retrieves a list of connections to other users.

@@ -213,7 +213,6 @@ z.string.modal_uploads_parallel = 'You can send up to %no files at once.'
 # Connection requests
 z.string.connection_request_connect = 'Connect'
 z.string.connection_request_ignore = 'Ignore'
-z.string.connection_request_message = 'Hi %@.first_name,\nLet’s connect on Wire.\n%s.first_name'
 
 # Conversation
 z.string.conversation_you_nominative = 'you'

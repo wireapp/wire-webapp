@@ -99,16 +99,7 @@ class z.user.UserRepository
   @return [Promise] Promise that resolves when the connection request was successfully created
   ###
   create_connection: (user_et, show_conversation = false) =>
-    return Promise.resolve()
-    .then =>
-      connect_message = z.localization.Localizer.get_text
-        id: z.string.connection_request_message
-        replace: [
-          {placeholder: '%@.first_name', content: user_et.name()}
-          {placeholder: '%s.first_name', content: @self().name()}
-        ]
-
-      @user_service.create_connection user_et.id, user_et.name(), connect_message
+    @user_service.create_connection user_et.id, user_et.name()
     .then (response) =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.CONNECT_REQUEST_SENT
       @user_connection response, show_conversation
