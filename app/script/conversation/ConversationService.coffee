@@ -30,59 +30,6 @@ class z.conversation.ConversationService
   constructor: (@client, @storage_service) ->
     @logger = new z.util.Logger 'z.conversation.ConversationService', z.config.LOGGER.OPTIONS
 
-  ###
-  Saves a conversation entity in the local database.
-
-  @param conversation_et [z.entity.Conversation] Conversation entity
-  @return [Promise<String>] Promise that will resolve with the primary key of the persisted conversation entity
-  ###
-  _save_conversation_in_db: (conversation_et) ->
-    @storage_service.save @storage_service.OBJECT_STORE_CONVERSATIONS, conversation_et.id, conversation_et.serialize()
-    .then (primary_key) =>
-      @logger.log @logger.levels.INFO, "Conversation '#{primary_key}' was stored for the first time"
-      return conversation_et
-    .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Conversation '#{conversation_et.id}' could not be stored", error
-      throw error
-
-  ###
-  Updates a conversation entity in the database.
-
-  @param updated_field [z.conversation.ConversationUpdateType] Property of the conversation entity which needs to be updated in the local database
-  @return [Promise<String|z.entity.Conversation>] Promise which resolves with the conversation entity (if update was successful) or the conversation entity (if it was a new entity)
-  ###
-  _update_conversation_in_db: (conversation_et, updated_field) ->
-    return new Promise (resolve, reject) =>
-      store_name = @storage_service.OBJECT_STORE_CONVERSATIONS
-
-      switch updated_field
-        when z.conversation.ConversationUpdateType.ARCHIVED_STATE
-          entity =
-            archived_state: conversation_et.archived_state()
-            archived_timestamp: conversation_et.archived_timestamp()
-        when z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
-          entity = cleared_timestamp: conversation_et.cleared_timestamp()
-        when z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
-          entity = last_event_timestamp: conversation_et.last_event_timestamp()
-        when z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
-          entity = last_read_timestamp: conversation_et.last_read_timestamp()
-        when z.conversation.ConversationUpdateType.MUTED_STATE
-          entity =
-            muted_state: conversation_et.muted_state()
-            muted_timestamp: conversation_et.muted_timestamp()
-
-      @storage_service.update store_name, conversation_et.id, entity
-      .then (number_of_updated_records) =>
-        if number_of_updated_records
-          @logger.log @logger.levels.INFO,
-            "Conversation '#{conversation_et.id}' got a persistent update for property '#{updated_field}'"
-          resolve conversation_et
-        else
-          @_save_conversation_in_db conversation_et
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Conversation '#{conversation_et.id}' could not be updated", error
-        reject error
-
   ###############################################################################
   # Create conversations
   ###############################################################################
@@ -402,17 +349,27 @@ class z.conversation.ConversationService
       data: payload
 
   ###
-  Saves or updates a conversation entity in the local database.
-
+  Saves a conversation state in the local database.
   @param conversation_et [z.entity.Conversation] Conversation entity
-  @param updated_field [z.conversation.ConversationUpdateType] Property of the conversation entity which needs to be updated in the local database
-  @return [Promise<String|z.entity.Conversation>] Promise which resolves with the conversation entity (if update was successful) or the conversation entity (if it was a new entity)
+  @return [Promise<String|z.entity.Conversation>] Promise which resolves with the conversation entity
   ###
-  save_conversation_in_db: (conversation_et, updated_field) =>
-    if updated_field
-      @_update_conversation_in_db conversation_et, updated_field
-    else
-      @_save_conversation_in_db conversation_et
+  save_conversation_state_in_db: (conversation_et) =>
+    @storage_service.save @storage_service.OBJECT_STORE_CONVERSATIONS, conversation_et.id, conversation_et.serialize()
+    .then =>
+      @logger.log @logger.levels.INFO, "State of conversation '#{conversation_et.id}' was stored for the first time"
+      return conversation_et
+
+  ###
+  Updates a conversation entity in the database.
+  @param changes [Object] Updates to be made to the stored conversation state
+  @return [Promise<String|z.entity.Conversation>] Promise which resolves with the conversation entity
+  ###
+  update_conversation_state_in_db: (conversation_et, changes) ->
+    @storage_service.update @storage_service.OBJECT_STORE_CONVERSATIONS, conversation_et.id, changes
+    .then (number_of_updated_records) =>
+      if number_of_updated_records
+        return conversation_et
+      @save_conversation_state_in_db conversation_et
 
   ###
   Update conversation properties.

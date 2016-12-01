@@ -72,8 +72,8 @@ z.event.WebApp =
     MAP_CONNECTIONS: 'wire.webapp.conversation.map-connections'
     PEOPLE:
       HIDE: 'wire.webapp.conversation.people.hide'
+    PERSIST_STATE: 'wire.webapp.conversation.persist-state'
     SHOW: 'wire.webapp.conversation.show'
-    STORE: 'wire.webapp.conversation.store'
     SWITCH: 'wire.webapp.conversation.switch'
     DETAIL_VIEW:
       SHOW: 'wire.webapp.conversation.detail-view.show'
