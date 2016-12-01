@@ -4,24 +4,24 @@
     <div class="preferences-content" data-bind="antiscroll">
       <section class="preferences-section preferences-section-account-profile">
         <div class="preferences-account-user-data">
-          <div>
+          <div class="preferences-account-name-wrapper">
             <input class="preferences-account-name preferences-account-input"
                    id="name" type="text"
-                   data-bind="input_autosize: true, attr: {size: name().length + 1}, value: name, enter: change_name, l10n_placeholder: z.string.preferences_account_username_placeholder"
+                   data-bind="value: name, event: {blur: reset_name_input}, enter: change_name, l10n_placeholder: z.string.preferences_account_username_placeholder"
                    data-uie-name="enter-name"
                    maxlength="64"
                    spellcheck="false" />
-            <span data-bind="css: name_saved() ? 'checkmark' : 'preferences-account-input-icon'"></span>
+            <span class="preferences-account-input-icon" data-bind="css: name_saved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
           </div>
           <div class="preferences-account-username-wrapper">
             <span class="preferences-account-username-addsign">@</span>
             <input class="preferences-account-username preferences-account-input"
                    id="username" type="text"
-                   data-bind="input_autosize: true, attr: {size: username().length +1}, textInput: username, event: {input: verify_username, keypress: check_username_input}, enter: change_username, hasFocus: should_focus_username()"
+                   data-bind="textInput: username, event: {input: verify_username, keypress: check_username_input, blur: reset_username_input}, enter: change_username, hasFocus: should_focus_username()"
                    data-uie-name="enter-username"
                    maxlength="21"
                    spellcheck="false" />
-            <span data-bind="css: username_saved() ? 'checkmark' : 'preferences-account-input-icon'"></span>
+            <span class="preferences-account-input-icon" data-bind="css: username_saved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
             <!-- ko ifnot: username_error() -->
               <div class="preferences-account-username-hint text-graphite font-size-xs"
                    data-bind="l10n_text: z.string.preferences_account_username_hint"></div>

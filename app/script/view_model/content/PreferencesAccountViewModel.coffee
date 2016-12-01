@@ -45,9 +45,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
     amplify.subscribe z.event.WebApp.PREFERENCES.UPLOAD_PICTURE, @set_picture
 
   removed_from_view: =>
-    @username_error null
-    @entered_username null
-    @submitted_username null
+    @_reset_username_input()
 
   change_accent_color: (id) =>
     @user_repository.change_accent_color id
@@ -61,16 +59,24 @@ class z.ViewModel.content.PreferencesAccountViewModel
         @name_saved true
         window.setTimeout =>
           @name_saved false
-        , 3000
+        , 750 * 2
     else
       @name.notifySubscribers() # render old value
 
     e.target.blur()
 
+  reset_name_input: =>
+    @name.notifySubscribers()
+
+  reset_username_input: =>
+    @_reset_username_input()
+    @username.notifySubscribers()
+
   should_focus_username: =>
     return @user_repository.should_set_username
 
   check_username_input: (username, e) ->
+    return true if e.charCode is 0 # FF sends charCode 0 when pressing backspace
     return z.user.UserHandleGenerator.validate_character e.key
 
   change_username: (username, e) =>
@@ -92,7 +98,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
         @username_saved true
         window.setTimeout =>
           @username_saved false
-        , 3000
+        , 750 * 2
     .catch (error) =>
       if @entered_username() isnt @submitted_username()
         return
@@ -186,3 +192,8 @@ class z.ViewModel.content.PreferencesAccountViewModel
     for client_et in @new_clients() when client_et.id is client_id
       @new_clients.remove client_et
     amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE if not @new_clients().length
+
+  _reset_username_input: =>
+    @username_error null
+    @entered_username null
+    @submitted_username null

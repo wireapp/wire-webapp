@@ -82,28 +82,38 @@
   height: @line-height-xl;
   line-height: @line-height-xl;
   margin-left: -4px;
-  max-width: 256px;
+  width: 256px;
   padding-left: 4px;
   padding-right: 4px;
 
-  &:hover + .preferences-account-input-icon:after {
+  &:hover + .preferences-account-input-icon-edit:after {
     .icon-mixin("\e177"); // icon-edit
     font-size: 12px;
   }
 
-  &:focus {
-    background-color: fade(@graphite, 12%);
-    width: 256px;
+  &:focus,
+  &:hover {
+    background-color: #fff;
   }
 
-  &:focus + .preferences-account-input-icon:after {
+  &:focus + .preferences-account-input-icon-edit:after {
     content: "";
     display: none;
   }
 }
 
+.preferences-account-input-icon {
+  position: absolute;
+  right: 12px;
+  top: 4px;
+}
+
 .preferences-account-name {
   font-weight: bold;
+}
+
+.preferences-account-name-wrapper {
+  position: relative;
 }
 
 .preferences-account-username-wrapper {
