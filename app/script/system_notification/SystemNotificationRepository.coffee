@@ -37,9 +37,10 @@ class z.SystemNotification.SystemNotificationRepository
 
   ###
   Construct a new System Notification Repository.
+  @param call_center [z.calling.CallCenter] Repository for all call interactions
   @param conversation_repository [z.conversation.ConversationService] Repository for all conversation interactions
   ###
-  constructor: (@conversation_repository) ->
+  constructor: (@call_center, @conversation_repository) ->
     @logger = new z.util.Logger 'z.SystemNotification.SystemNotificationRepository', z.config.LOGGER.OPTIONS
 
     @ask_for_permission = true
@@ -227,8 +228,6 @@ class z.SystemNotification.SystemNotificationRepository
         content: message_et.user_ids().length
       ]
 
-
-
   ###
   Creates the notification body for people being removed from or leaving a group conversation.
 
@@ -307,7 +306,6 @@ class z.SystemNotification.SystemNotificationRepository
   ###
   _create_body_ping: ->
     return z.localization.Localizer.get_text z.string.system_notification_ping
-
 
   ###
   Creates the notification body for reaction.
@@ -520,8 +518,11 @@ class z.SystemNotification.SystemNotificationRepository
       hide_notification = true if @notifications_preference() is z.system_notification.SystemNotificationPreference.NONE
       hide_notification = true if not z.util.Environment.browser.supports.notifications
       hide_notification = true if @permission_state is z.system_notification.PermissionStatusState.DENIED
-      hide_notification = true if document.hasFocus() and conversation_et.id is @conversation_repository.active_conversation()?.id and wire.app.view.content.multitasking.is_minimized()
       hide_notification = true if message_et.user()?.is_me
+
+      in_active_conversation = document.hasFocus() and conversation_et.id is @conversation_repository.active_conversation()?.id
+      in_maximized_call = @call_center.joined_call() and not wire.app.view.content.multitasking.is_minimized()
+      hide_notification = true if in_active_conversation and not in_maximized_call
 
       if hide_notification
         throw new z.system_notification.SystemNotificationError z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION
@@ -567,14 +568,14 @@ class z.SystemNotification.SystemNotificationRepository
       @logger.log @logger.levels.INFO, "Notification for '#{message_id} in '#{conversation_id}' closed by click."
       notification.close()
     notification.onclose = =>
-      clearTimeout timeout_trigger_id
+      window.clearTimeout timeout_trigger_id
       @notifications.splice @notifications.indexOf(notification), 1
       @logger.log @logger.levels.INFO, "Removed notification for '#{message_id}' in '#{conversation_id}' locally."
     notification.onerror = =>
       @logger.log @logger.levels.ERROR, "Notification for '#{message_id}' in '#{conversation_id}' closed by error."
       notification.close()
     notification.onshow = =>
-      timeout_trigger_id = setTimeout =>
+      timeout_trigger_id = window.setTimeout =>
         @logger.log @logger.levels.INFO, "Notification for '#{message_id}' in '#{conversation_id}' closed by timeout."
         notification.close()
       , notification_content.timeout

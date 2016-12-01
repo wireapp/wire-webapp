@@ -143,25 +143,24 @@ class z.user.UserRepository
   @return [Promise] Promise that resolves when all connections have been retrieved and mapped
   ###
   get_connections: (limit = 500, user_id, connection_ets = []) =>
-    return new Promise (resolve, reject) =>
-      @user_service.get_own_connections limit, user_id
-      .then (response) =>
-        if response.connections.length > 0
-          new_connection_ets = @connection_mapper.map_user_connections_from_json response.connections
-          connection_ets = connection_ets.concat new_connection_ets
+    @user_service.get_own_connections limit, user_id
+    .then (response) =>
+      if response.connections.length
+        new_connection_ets = @connection_mapper.map_user_connections_from_json response.connections
+        connection_ets = connection_ets.concat new_connection_ets
 
-        if response.has_more
-          last_connection_et = connection_ets[connection_ets.length - 1]
-          @get_connections limit, last_connection_et.to, connection_ets
-          .then => resolve @connections()
-        else if connection_ets.length > 0
-          @update_user_connections connection_ets
-          .then => resolve @connections()
-        else
-          resolve @connections()
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Failed to retrieve connections from backend: #{error.message}", error
-        reject error
+      if response.has_more
+        last_connection_et = connection_ets[connection_ets.length - 1]
+        return @get_connections limit, last_connection_et.to, connection_ets
+
+      if connection_ets.length
+        return @update_user_connections connection_ets, true
+        .then => return @connections()
+
+      return @connections()
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Failed to retrieve connections from backend: #{error.message}", error
+      throw error
 
   ###
   Ignore connection request.
@@ -184,9 +183,10 @@ class z.user.UserRepository
   ###
   Update the user connections and get the matching users.
   @param connection_ets [Array<z.entity.Connection>] Connection entities
+  @param assign_clients [Boolean] Retrieve locally known clients from database
   @return [Promise] Promise that resolves when all user connections have been updated
   ###
-  update_user_connections: (connection_ets) =>
+  update_user_connections: (connection_ets, assign_clients = false) =>
     return new Promise (resolve) =>
       z.util.ko_array_push_all @connections, connection_ets
 
@@ -196,8 +196,9 @@ class z.user.UserRepository
       if user_ids.length > 0
         @get_users_by_id user_ids, (user_ets) =>
           @_assign_connection user_et for user_et in user_ets
-          @_assign_all_clients()
-          .then -> resolve()
+          if assign_clients
+            @_assign_all_clients()
+            .then -> resolve()
 
   # Assign all locally stored clients to the users.
   _assign_all_clients: =>
@@ -267,7 +268,7 @@ class z.user.UserRepository
       if previous_status is z.user.ConnectionStatus.SENT and connection_et.status() is z.user.ConnectionStatus.ACCEPTED
         @update_user_by_id connection_et.to
       @_send_user_connection_notification connection_et, previous_status
-      amplify.publish z.event.WebApp.CONVERSATION.MAP_CONNECTION, [connection_et], show_conversation
+      amplify.publish z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, [connection_et], show_conversation
 
   ###
   Use a JSON event to update the matching user.
@@ -565,10 +566,8 @@ class z.user.UserRepository
   @param picture [String, Object] New user picture
   ###
   change_picture: (picture) ->
-    if @use_v3_api
-      @_set_picture_v3 picture
-    else
-      @_set_picture_v2 picture
+    @_set_picture_v2 picture
+    @_set_picture_v3 picture
 
   ###
   Set the profile image using v2 api.

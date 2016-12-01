@@ -213,9 +213,12 @@ class z.entity.Conversation
 
   @param timestamp [String] Timestamp to be set
   @param type [z.conversation.ConversationUpdateType] Type of timestamp to be updated
-  @return [String] Timestamp value
+  @return [Boolean|number] Timestamp value which can be 'false' (boolean) if there is no timestamp
   ###
   set_timestamp: (timestamp, type) =>
+    if _.isString timestamp
+      timestamp = window.parseInt timestamp, 10
+
     switch type
       when z.conversation.ConversationUpdateType.ARCHIVED_TIMESTAMP
         entity_timestamp = @archived_timestamp

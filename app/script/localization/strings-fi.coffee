@@ -333,7 +333,8 @@ z.string.fi.people_tabs_device_detail_headline = 'Vahvista että tämä vastaa s
 z.string.fi.people_tabs_device_detail_how_to = 'Miten teen sen?'
 z.string.fi.people_tabs_device_detail_reset_session = 'Nollaa istunto'
 z.string.fi.people_tabs_device_detail_show_my_device = 'Näytä laitteeni sormenjälki'
-z.string.fi.people_tabs_device_detail_verified = 'Vahvistettu'
+z.string.fi.people_tabs_device_detail_verify = 'Vahvistettu'
+z.string.fi.people_verified = 'Vahvistettu'
 
 # Block user
 z.string.fi.people_block_headline = 'Estä?'
@@ -413,7 +414,7 @@ z.string.fi.preferences_devices_fingerprint_detail = 'Wire antaa jokaiselle lait
 z.string.fi.preferences_devices_id = 'ID: '
 z.string.fi.preferences_devices_remove = 'Poista'
 z.string.fi.preferences_devices_remove_cancel = 'Peruuta'
-z.string.fi.preferences_devices_remove_detail = 'Poista tämä laite jos olet lopettanut sen käyttämisen. Viestihistoriasi poistetaan siitä laitteesta ja sinut kirjataan ulos.'
+z.string.fi.preferences_devices_remove_detail = 'Poista tämä laite jos olet lakannut käyttämästä sitä. Sinut kirjataan ulos tästä laitteesta välittömästi.'
 z.string.fi.preferences_devices_session_confirmation = 'Istunto on nollattu.'
 z.string.fi.preferences_devices_session_detail = 'Jos sormenjäljet eivät täsmää, nollaa istunto luodaksesi uudet salausavaimet molemmille osapuolille.'
 z.string.fi.preferences_devices_session_reset = 'Nollaa istunto'
@@ -499,7 +500,7 @@ z.string.fi.warning_not_found_camera = 'Et voi soittaa puhelua koska tietokonees
 z.string.fi.warning_not_found_microphone = 'Et voi soittaa puhelua koska tietokoneessasi ei ole mikrofonia.'
 z.string.fi.warning_permission_denied_camera = 'Et voi soittaa puhelua koska selaimellasi ei ole oikeutta käyttä kameraa.'
 z.string.fi.warning_permission_denied_microphone = 'Et voi soittaa puhelua koska selaimellasi ei ole oikeuta käyttää mikrofonia.'
-z.string.fi.warning_permission_denied_screen = 'Et voi jakaa näyttöäsi koska selaimella ei ole oikeutta siihen.'
+z.string.fi.warning_permission_denied_screen = 'Selaimesi tarvitsee luvan jakaa näyttösi.'
 z.string.fi.warning_permission_request_camera = '%icon Anna käyttöoikeus kameraan'
 z.string.fi.warning_permission_request_microphone = '%icon Anna käyttöoikeus mikrofoniin'
 z.string.fi.warning_permission_request_notification = '%icon Salli ilmoitukset'

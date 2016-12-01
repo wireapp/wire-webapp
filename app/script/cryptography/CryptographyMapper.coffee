@@ -78,7 +78,7 @@ class z.cryptography.CryptographyMapper
       when 'text'
         return @_map_text generic_message.text, generic_message.message_id
       else
-        @logger.log @logger.levels.WARN, "Skipped event '#{generic_message.message_id}' of unhandled type '#{generic_message.content}'"
+        @logger.log @logger.levels.DEBUG, "Skipped event '#{generic_message.message_id}' of unhandled type '#{generic_message.content}'", {event: event, generic_message: generic_message}
         throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
 
   _map_asset: (asset, event_nonce, event_id) ->
@@ -94,7 +94,7 @@ class z.cryptography.CryptographyMapper
       return @_map_asset_original asset.original, event_nonce
     else
       error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
-      @logger.log @logger.levels.INFO, error.message
+      @logger.log @logger.levels.INFO, "Skipped event '#{event_id}': #{error.message}"
       throw error
 
   _map_image_asset_v3: (asset, event_nonce) ->
@@ -198,7 +198,7 @@ class z.cryptography.CryptographyMapper
     millis_as_number = generic_message.ephemeral.expire_after_millis.toNumber()
     generic_message.ephemeral.message_id = generic_message.message_id
     embedded_message = @_map_generic_message generic_message.ephemeral, event
-    embedded_message.expire_after_millis = z.ephemeral.timings.map_to_closest_timing millis_as_number
+    embedded_message.ephemeral_expires = z.ephemeral.timings.map_to_closest_timing millis_as_number
     return embedded_message
 
   ###
@@ -237,7 +237,7 @@ class z.cryptography.CryptographyMapper
       return @_map_image_medium image, event_id
     else
       error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
-      @logger.log @logger.levels.INFO, error.message
+      @logger.log @logger.levels.INFO, "Skipped event '#{event_id}': #{error.message}"
       throw error
 
   _map_image_medium: (image, event_id = z.util.create_random_uuid()) ->
@@ -257,16 +257,11 @@ class z.cryptography.CryptographyMapper
     }
 
   _map_knock: (knock, event_id) ->
-    if knock.hot_knock
-      error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_HOT_KNOCK
-      @logger.log @logger.levels.INFO, error.message
-      throw error
-    else
-      return {
-        data:
-          nonce: event_id
-        type: z.event.Backend.CONVERSATION.KNOCK
-      }
+    return {
+      data:
+        nonce: event_id
+      type: z.event.Backend.CONVERSATION.KNOCK
+    }
 
   _map_last_read: (last_read) ->
     return {

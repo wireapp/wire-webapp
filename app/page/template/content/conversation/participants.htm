@@ -8,7 +8,7 @@
           <div class="participants-group-header">
             <div class="name popover-title">
               <div data-bind="visible: !editing(), text: conversation().display_name(), click: edit, l10n_tooltip: z.string.tooltip_people_rename" data-uie-name="status-name"></div>
-              <textarea data-bind="visible: editing, value: conversation().display_name(), enter: rename_conversation, hasFocus: editing, resize" data-uie-name="enter-name" maxlength="64"></textarea>
+              <textarea data-bind="visible: editing, value: conversation().display_name(), enter: rename_conversation, hasFocus: editing, resize" data-uie-name="enter-name" maxlength="64" dir="auto"></textarea>
             </div>
             <span class="edit icon-edit" data-bind="visible: !editing(), click: edit"></span>
             <div class="people popover-meta" data-bind="l10n_text: {'id': z.string.people_people, 'replace': {'placeholder': '%no', 'content': participants().length}}"></div>
@@ -21,7 +21,7 @@
                   <svg width="16" height="16">
                     <use xlink:href="#icon-verified"></use>
                   </svg>
-                  <span class="label-xs" data-bind="l10n_text: z.string.people_tabs_device_detail_verified"></span>
+                  <span class="label-xs" data-bind="l10n_text: z.string.people_verified"></span>
                   <hr>
                 </div>
                 <user-list params="user: participants_verified, click: show_participant, mode: z.components.UserListMode.COMPACT"></user-list>
@@ -60,7 +60,7 @@
     <!-- ko if: state() == 'search' -->
       <div class="participants-search">
         <div class="participants-search-header">
-          <user-input class="user-list-light" params="input: user_input, selected: user_selected, placeholder: z.string.people_search_placeholder, close: on_search_close"></user-input>
+          <user-input class="user-list-light" params="input: user_input, selected: user_selected, placeholder: z.string.people_search_placeholder, close: on_search_close" spellcheck="false"></user-input>
           <button class="search-button-open button button-medium button-full" data-bind="enable: user_selected().length > 0, click: on_search_add, l10n_text: z.string.people_confirm_label" data-uie-name="do-create"></button>
         </div >
         <div class="participants-search-list-wrapper">

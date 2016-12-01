@@ -335,7 +335,8 @@ z.string.de.people_tabs_device_detail_headline = 'Überprüfe, ob dieser Fingera
 z.string.de.people_tabs_device_detail_how_to = 'Wie mache ich das?'
 z.string.de.people_tabs_device_detail_reset_session = 'Session zurücksetzen'
 z.string.de.people_tabs_device_detail_show_my_device = 'Zeige meinen Fingerabdruck'
-z.string.de.people_tabs_device_detail_verified = 'Ok'
+z.string.de.people_tabs_device_detail_verify = 'Ok'
+z.string.de.people_verified = 'Verifiziert'
 
 # Block user
 z.string.de.people_block_headline = 'Blockieren?'

@@ -630,7 +630,7 @@ describe 'Conversation', ->
       ephemeral_message_et.add_asset new z.entity.Text()
       ephemeral_message_et.id = z.util.create_random_uuid()
       ephemeral_message_et.user self_user_et
-      ephemeral_message_et.expire_after_millis true
+      ephemeral_message_et.ephemeral_expires true
       conversation_et.add_message ephemeral_message_et
 
       expect(conversation_et.get_last_editable_message()).toBeDefined()
@@ -665,3 +665,13 @@ describe 'Conversation', ->
       next_delivered_message_et.status z.message.StatusType.DELIVERED
       conversation_et.add_message next_delivered_message_et
       expect(conversation_et.get_last_delivered_message()).toBe next_delivered_message_et
+
+  describe 'set_timestamp', ->
+    it 'turns strings into numbers', ->
+      lrt = conversation_et.last_read_timestamp()
+      expect(lrt).toBe 0
+      new_lrt_string = '1480338525243'
+      new_lrt_number = window.parseInt new_lrt_string, 10
+      conversation_et.set_timestamp new_lrt_string, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
+      expect(conversation_et.last_read_timestamp()).toBe new_lrt_number
+

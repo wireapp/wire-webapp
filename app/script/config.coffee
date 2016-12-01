@@ -90,9 +90,6 @@ z.config =
   # measured in pixel
   SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100
 
-  # Interval when to check whether to unblock the sending queue
-  SENDING_QUEUE_UNBLOCK_INTERVAL: 60 * 1000
-
   PROPERTIES_KEY: 'webapp'
 
   # bigger requests will be split in chunks with a maximum size as defined

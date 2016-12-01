@@ -5,7 +5,7 @@
     <div class="user-profile-default">
       <div class="user-profile-header">
         <div class="name popover-title" data-bind="text: user().name(), attr: {'data-uie-uid': user().id, 'data-uie-value': user().name()}" data-uie-name="status-user"></div>
-        <a class="email popover-meta" tabindex=-1 data-bind="text: user().email(), attr: {'href': 'mailto:' + user().email(),'data-uie-uid': user().id, 'data-uie-value': user().email()}" data-uie-name="status-user-email"></a>
+        <a class="email popover-meta" tabindex=-1 data-bind="click: function(){z.util.safe_mailto_open(user().email())}, text: user().email(), attr: {'data-uie-uid': user().id, 'data-uie-value': user().email()}" data-uie-name="status-user-email"></a>
         <!-- ko if: conversation && conversation().is_group() -->
           <div class="user-profile-back-button button-icon icon-back" data-bind="click: on_close, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back"></div>
         <!-- /ko -->
@@ -80,7 +80,7 @@
         <div class="user-profile-device-detail-footer">
           <div class="slider">
             <input class="slider-input" type="checkbox" name="toggle" id="toggle" data-bind="checked: selected_device().meta.is_verified">
-            <label class="button-label" for="toggle" data-bind="click: click_on_verify_client, l10n_text: z.string.people_tabs_device_detail_verified"></label>
+            <label class="button-label" for="toggle" data-bind="click: click_on_verify_client, l10n_text: z.string.people_tabs_device_detail_verify"></label>
           </div>
           <div class="user-profile-device-reset">
             <svg class="user-profile-device-reset-spinner svg-theme spin"

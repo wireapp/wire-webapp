@@ -19,6 +19,12 @@
 window.z ?= {}
 z.auth ?= {}
 
+
+POST_ACCESS =
+  RETRY_LIMIT: 10
+  RETRY_TIMEOUT: 500
+
+
 # Authentication Service for all authentication and registration calls to the backend REST API.
 class z.auth.AuthService
   URL_ACCESS: '/access'
@@ -66,66 +72,48 @@ class z.auth.AuthService
 
   @note Don't use our client wrapper here, because to query "/access" we need to set "withCredentials" to "true" in order to send the cookie.
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/authenticate
-
-  @param options [Object]
-  @option options [Boolean] should_retry Should we retry on error
-  @option options [Boolean] retry_limit Should we retry on error
   ###
-  post_access: (options) ->
+  post_access: (retry_attempt = 1) ->
     return new Promise (resolve, reject) =>
       @client.request_queue_blocked_state z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
 
-      options = $.extend
-        should_retry: true
-        retries: 0
-        retry_limit: 10
-      , options
-
-      settings =
+      $.ajax
         crossDomain: true
+        headers:
+          Authorization: "Bearer #{window.decodeURIComponent(@client.access_token)}" if @client.access_token
         type: 'POST'
         url: @client.create_url "#{@URL_ACCESS}"
         xhrFields:
           withCredentials: true
         success: (data) =>
-          @logger.log @logger.levels.INFO,
-            "Requesting access token successful after #{options.retries + 1} attempt(s)", data
+          @client.request_queue_blocked_state z.service.RequestQueueBlockedState.NONE
           @save_access_token_in_client data.token_type, data.access_token
           resolve data
         error: (jqXHR, textStatus, errorThrown) =>
-          options.retries++
-          should_retry = options.should_retry and options.retries < options.retry_limit
-          if not navigator.onLine
-            @logger.log @logger.levels.WARN, 'Access token refresh paused due to lack of internet connectivity'
-            $(window).on 'online', =>
-              @logger.log @logger.levels.INFO, 'Internet connectivity regained. Continuing access token refresh.'
-              $.ajax settings
-          else if should_retry and jqXHR.status isnt z.service.BackendClientError::STATUS_CODE.FORBIDDEN
-            window.setTimeout =>
-              @logger.log @logger.levels.INFO,
-                "Trying to get a new access token - attempt '#{options.retries}'"
-              $.ajax settings
-            , 500
+          if jqXHR.status is z.service.BackendClientError::STATUS_CODE.FORBIDDEN
+            @logger.log @logger.levels.ERROR, "Requesting access token failed after #{retry_attempt} attempt(s): #{errorThrown}", jqXHR
+            return reject new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
+
+          if retry_attempt <= POST_ACCESS.RETRY_LIMIT
+            retry_attempt++
+
+            _retry = => @post_access(retry_attempt).then(resolve).catch reject
+
+            if jqXHR.status is z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
+              @logger.log @logger.levels.WARN, 'Access token refresh delayed due to suspected connectivity issue'
+              return @client.execute_on_connectivity().then =>
+                @logger.log @logger.levels.INFO, 'Continuing access token refresh after verifying connectivity'
+                _retry()
+
+            return window.setTimeout =>
+              @logger.log @logger.levels.INFO, "Trying to get a new access token: '#{retry_attempt}' attempt"
+              _retry()
+            , POST_ACCESS.RETRY_TIMEOUT
+
           else
-            error_description = "Requesting access token failed: #{errorThrown}"
-
-            if jqXHR.responseJSON or jqXHR.responseText?.startsWith '{'
-              error = jqXHR.responseJSON or JSON.parse jqXHR.responseText
-              if error.code is z.service.BackendClientError::STATUS_CODE.FORBIDDEN
-                error = new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
-            else
-              error = new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REQUEST_FAILED
-              Raygun.send error
-
+            @client.request_queue_blocked_state z.service.RequestQueueBlockedState.NONE
             @save_access_token_in_client()
-            @logger.log @logger.levels.ERROR, "#{error_description} - '#{options.retries}' attempt(s)", jqXHR
-            reject error
-
-      if @client.access_token
-        settings.headers =
-          Authorization: "Bearer #{window.decodeURIComponent(@client.access_token)}"
-
-      $.ajax settings
+            return reject new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.RETRIES_EXCEEDED
 
   ###
   Resend an email or phone activation code.
@@ -258,4 +246,3 @@ class z.auth.AuthService
   save_access_token_in_client: (type = '', value = '') =>
     @client.access_token_type = type
     @client.access_token = value
-    @client.request_queue_blocked_state z.service.RequestQueueBlockedState.NONE

@@ -56,28 +56,23 @@ class z.auth.AuthRepository
   @return [Promise] Promise that resolves with the received access token
   ###
   login: (login, persist) =>
-    return new Promise (resolve, reject) =>
-      @auth_service.post_login login, persist
-      .then (response) =>
-        @save_access_token response
-        z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.PERSIST, persist
-        z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
-        resolve response
-      .catch (error) -> reject error
+    @auth_service.post_login login, persist
+    .then (response) =>
+      @save_access_token response
+      z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.PERSIST, persist
+      z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
+      return response
 
   ###
   Logout the user on the backend.
   @return [Promise] Promise that will always resolve
   ###
   logout: =>
-    return new Promise (resolve) =>
-      @auth_service.post_logout()
-      .then =>
-        @logger.log @logger.levels.INFO, 'Log out on backend successful'
-        resolve()
-      .catch (error) =>
-        @logger.log @logger.levels.WARN, "Log out on backend failed: #{error.message}", error
-        resolve()
+    @auth_service.post_logout()
+    .then =>
+      @logger.log @logger.levels.INFO, 'Log out on backend successful'
+    .catch (error) =>
+      @logger.log @logger.levels.WARN, "Log out on backend failed: #{error.message}", error
 
   ###
   Register a new user (with email).
@@ -128,19 +123,19 @@ class z.auth.AuthRepository
     @auth_service.post_login_send request_code
 
   # Renew access-token provided a valid cookie.
-  renew_access_token: =>
+  renew_access_token: (trigger) =>
+    @logger.log @logger.levels.INFO, "Access token renewal started. Source: #{trigger}"
     @get_access_token()
     .then =>
-      @logger.log @logger.levels.INFO, 'Refreshed Access Token successfully.'
+      @auth_service.client.execute_request_queue()
       amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED
     .catch (error) =>
-      if error.type is z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
+      if error.type is z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN or z.util.Environment.frontend.is_localhost()
         @logger.log @logger.levels.WARN, "Session expired on access token refresh: #{error.message}", error
         Raygun.send error
         amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.SESSION_EXPIRED, false, true
       else if error.type isnt z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
         @logger.log @logger.levels.ERROR, "Refreshing access token failed: '#{error.type}'", error
-        # @todo What do we do in this case?
         amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
 
   # Get the cached access token from the Amplify store.
@@ -162,18 +157,13 @@ class z.auth.AuthRepository
   @return [Promise] Returns a Promise that resolve with the access token data
   ###
   get_access_token: =>
-    return new Promise (resolve, reject) =>
-      if @auth_service.client.request_queue_blocked_state() is z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
-        error = new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
-        @logger.log @logger.levels.WARN, error.message
-        reject error
-      else
-        @auth_service.post_access()
-        .then (access_token) =>
-          @save_access_token access_token
-          resolve access_token
-        .catch (error) ->
-          reject error
+    if @auth_service.client.request_queue_blocked_state() is z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
+      return Promise.reject new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
+
+    return @auth_service.post_access()
+    .then (access_token) =>
+      @save_access_token access_token
+      return access_token
 
   ###
   Store the access token using Amplify.
@@ -198,11 +188,10 @@ class z.auth.AuthRepository
     z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL, expires_in_millis, access_token_data.expires_in
     z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE, access_token_data.token_type, access_token_data.expires_in
 
-    @logger.log @logger.levels.LEVEL_1, 'Saved access token.', access_token_data
-    @_log_access_token_expiration expiration_timestamp
-    @_schedule_token_refresh expiration_timestamp
-
     @auth_service.save_access_token_in_client access_token_data.token_type, access_token_data.access_token
+
+    @_log_access_token_update access_token_data, expiration_timestamp
+    @_schedule_token_refresh expiration_timestamp
 
   # Deletes all access token data stored on the client.
   delete_access_token: ->
@@ -212,13 +201,18 @@ class z.auth.AuthRepository
     z.util.StorageUtil.reset_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE
 
   ###
-  Logs the expiration time of the access token.
+  Logs the update of the access token.
+
   @private
+  @param access_token_data [Object, String] Access Token
+  @option access_token_data [String] access_token
+  @option access_token_data [String] expires_in
+  @option access_token_data [String] type
   @param expiration_timestamp [Integer] Timestamp when access token expires
   ###
-  _log_access_token_expiration: (expiration_timestamp) =>
+  _log_access_token_update: (access_token_data, expiration_timestamp) =>
     expiration_log = z.util.format_timestamp expiration_timestamp, false
-    @logger.log @logger.levels.INFO, "Your access token will expire on: #{expiration_log}"
+    @logger.log @logger.levels.INFO, "Saved updated access token. It will expire on: #{expiration_log}", access_token_data
 
   ###
   Refreshes the access token in time before it expires.
@@ -232,8 +226,7 @@ class z.auth.AuthRepository
     callback_timestamp = expiration_timestamp - 60000
 
     if callback_timestamp < Date.now()
-      @logger.log @logger.levels.INFO, 'Immediately executing access token refresh'
-      @renew_access_token()
+      @renew_access_token 'Immediate on scheduling'
     else
       time = z.util.format_timestamp callback_timestamp, false
       @logger.log @logger.levels.INFO, "Scheduling next access token refresh for '#{time}'"
@@ -242,8 +235,7 @@ class z.auth.AuthRepository
         if callback_timestamp > (Date.now() + 15000)
           @logger.log @logger.levels.INFO, "Access token refresh scheduled for '#{time}' skipped because it was executed late"
         else if navigator.onLine
-          @logger.log @logger.levels.INFO, "Access token refresh scheduled for '#{time}' executed"
-          @renew_access_token()
+          @renew_access_token "Schedule for '#{time}'"
         else
           @logger.log @logger.levels.INFO, "Access token refresh scheduled for '#{time}' skipped because we are offline"
       , callback_timestamp - Date.now()

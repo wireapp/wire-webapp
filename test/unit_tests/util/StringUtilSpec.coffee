@@ -35,3 +35,15 @@ describe 'z.util.StringUtil', ->
       obfuscated = z.util.StringUtil.obfuscate text
       expect(obfuscated).not.toBe text
       expect(obfuscated.length).toBe text.length
+
+    it 'obfuscates a text keeping its length (commas)', ->
+      text = ',,,,,,'
+      obfuscated = z.util.StringUtil.obfuscate text
+      expect(obfuscated).not.toBe text
+      expect(obfuscated.length).toBe text.length
+
+    it 'obfuscates a text keeping its length (dots)', ->
+      text = '......'
+      obfuscated = z.util.StringUtil.obfuscate text
+      expect(obfuscated).not.toBe text
+      expect(obfuscated.length).toBe text.length

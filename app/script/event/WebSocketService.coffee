@@ -114,7 +114,7 @@ class z.event.WebSocketService
       @logger.log @logger.levels.INFO, "Access token has to be refreshed before reconnecting the WebSocket triggered by '#{trigger}'"
       amplify.unsubscribeAll z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED
       amplify.subscribe z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED, => @pending_reconnect trigger
-      return amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW
+      return amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, 'Attempted WebSocket reconnect'
 
     @reconnect_count++
     reconnect = =>

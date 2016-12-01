@@ -333,7 +333,8 @@ z.string.ro.people_tabs_device_detail_headline = 'Verifică dacă aceasta se pot
 z.string.ro.people_tabs_device_detail_how_to = 'Cum fac asta?'
 z.string.ro.people_tabs_device_detail_reset_session = 'Resetează sesiunea'
 z.string.ro.people_tabs_device_detail_show_my_device = 'Arată amprenta dispozitivului'
-z.string.ro.people_tabs_device_detail_verified = 'Verificat'
+z.string.ro.people_tabs_device_detail_verify = 'Verificat'
+z.string.ro.people_verified = 'Verificat'
 
 # Block user
 z.string.ro.people_block_headline = 'Blochează?'
@@ -378,6 +379,7 @@ z.string.ro.people_button_yes = 'Da'
 # Settings
 z.string.ro.preferences_about = 'Despre'
 z.string.ro.preferences_account = 'Cont'
+z.string.ro.preferences_av = 'Audio / video'
 z.string.ro.preferences_device_details = 'Detalii dispozitiv'
 z.string.ro.preferences_devices = 'Dispozitive'
 z.string.ro.preferences_headline = 'Preferințe'
@@ -399,6 +401,7 @@ z.string.ro.preferences_account_username_placeholder = 'Numele tău complet'
 
 z.string.ro.preferences_av_camera = 'Cameră'
 z.string.ro.preferences_av_microphone = 'Microfon'
+z.string.ro.preferences_av_permission_detail = 'Activează din preferințele browserului'
 z.string.ro.preferences_av_speakers = 'Difuzoare'
 
 z.string.ro.preferences_devices_activated_in = 'în %location'
@@ -411,7 +414,7 @@ z.string.ro.preferences_devices_fingerprint_detail = 'Wire generează câte o am
 z.string.ro.preferences_devices_id = 'ID: '
 z.string.ro.preferences_devices_remove = 'Șterge'
 z.string.ro.preferences_devices_remove_cancel = 'Renunță'
-z.string.ro.preferences_devices_remove_detail = 'Elimină acest dispozitiv dacă nu-l mai folosești. Istoricul mesajelor tale va fi șters de pe acest dispozitiv și vei fi deconectat.'
+z.string.ro.preferences_devices_remove_detail = 'Elimină acest dispozitiv dacă nu-l mai folosești. Vei fi deconectat de pe acest dispozitiv imediat.'
 z.string.ro.preferences_devices_session_confirmation = 'Sesiunea a fost resetată.'
 z.string.ro.preferences_devices_session_detail = 'Dacă amprentele nu se potrivesc, resetează sesiunea pentru a genera un nou set de chei de criptare pentru ambele părți.'
 z.string.ro.preferences_devices_session_reset = 'Resetează sesiunea'
@@ -497,7 +500,7 @@ z.string.ro.warning_not_found_camera = 'Nu poți suna pentru că acest dispoziti
 z.string.ro.warning_not_found_microphone = 'Nu poți suna pentru că acest dispozitiv nu are un microfon.'
 z.string.ro.warning_permission_denied_camera = 'Nu poți suna pentru că browserul tău nu are acces la cameră.'
 z.string.ro.warning_permission_denied_microphone = 'Nu poți suna pentru că browserul tău nu are acces la microfon.'
-z.string.ro.warning_permission_denied_screen = 'Nu poți împărtăși ecranul pentru că browserul nu-l poate accesa.'
+z.string.ro.warning_permission_denied_screen = 'Browserul tău are nevoie de permisiuni pentru a partaja ecranul.'
 z.string.ro.warning_permission_request_camera = '%icon permite accesul la cameră'
 z.string.ro.warning_permission_request_microphone = '%icon permit accesul la microfon'
 z.string.ro.warning_permission_request_notification = '%icon permite notificările'

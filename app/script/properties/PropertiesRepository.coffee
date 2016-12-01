@@ -48,7 +48,7 @@ class z.properties.PropertiesRepository
         @logger.log @logger.levels.INFO, 'User has no saved properties, using defaults'
     .then =>
       amplify.publish z.event.WebApp.PROPERTIES.UPDATED, @properties
-      amplify.publish z.event.WebApp.ANALYTICS.INIT, @properties, @self()
+      amplify.publish z.event.WebApp.ANALYTICS.INIT, @properties
       return @properties
 
   properties_updated: (properties) ->

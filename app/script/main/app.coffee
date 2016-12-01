@@ -101,7 +101,7 @@ class z.main.App
     repository.bot                 = new z.bot.BotRepository @service.bot, repository.conversation
     repository.call_center         = new z.calling.CallCenter @service.call, repository.conversation, repository.user, repository.audio
     repository.event_tracker       = new z.tracking.EventTrackingRepository repository.user, repository.conversation
-    repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.conversation
+    repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.call_center, repository.conversation
 
     return repository
 
@@ -188,11 +188,9 @@ class z.main.App
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS, conversation_ets.length, 50
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS, connection_ets.length, 50
       @repository.user.self().devices client_ets
-
-      @logger.log @logger.levels.INFO, 'Mapping user connections to conversations'
-      amplify.publish z.event.WebApp.CONVERSATION.MAP_CONNECTION, @repository.user.connections()
+      @repository.conversation.map_connections @repository.user.connections()
       @_subscribe_to_beforeunload()
-      return @repository.event.update_from_notification_stream()
+      return @repository.event.initialize_from_notification_stream()
     .then (notifications_count) =>
       @view.loading.switch_message z.string.init_updated_from_notifications, true
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS
@@ -294,23 +292,21 @@ class z.main.App
 
       token_promise.catch (error) =>
         if is_reload
-          if error.type is z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
+          if error.type in [z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN, z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE]
             @logger.log @logger.levels.ERROR, "Session expired on page reload: #{error.message}", error
             Raygun.send new Error ('Session expired on page reload'), error
             @_redirect_to_login true
-          else if error.type isnt z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE
+          else
             @logger.log @logger.levels.WARN, 'Connectivity issues. Trigger reload on regained connectivity.', error
             @auth.client.execute_on_connectivity().then -> window.location.reload false
         else if navigator.onLine
-          if error.type is z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE
-            @logger.log @logger.levels.WARN, 'No access token found in cache. Redirecting to login.', error
-            @_redirect_to_login false
-          else if error.type is z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
-            @logger.log @logger.levels.WARN, 'Access token request forbidden. Redirecting to login.', error
-            @_redirect_to_login false
-          else
-            @logger.log @logger.levels.ERROR, "Could not get access token: #{error.message}. Logging out user.", error
-            @logout 'init_app'
+          switch error.type
+            when z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE, z.auth.AccessTokenError::TYPE.RETRIES_EXCEEDED, z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
+              @logger.log @logger.levels.WARN, "Redirecting to login: #{error.message}", error
+              @_redirect_to_login false
+            else
+              @logger.log @logger.levels.ERROR, "Could not get access token: #{error.message}. Logging out user.", error
+              @logout 'init_app'
         else
           @logger.log @logger.levels.WARN, 'No connectivity. Trigger reload on regained connectivity.', error
           @_watch_online_status()
@@ -467,6 +463,7 @@ class z.main.App
     live_reload.src = 'http://localhost:32123/livereload.js'
     document.body.appendChild live_reload
     $('html').addClass 'development'
+
 
 ###############################################################################
 # Setting up the App

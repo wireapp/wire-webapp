@@ -60,7 +60,7 @@ class z.audio.AudioRepository
 
   ###
   Initialize the repository.
-  @param pre_load [Boolean] Should sounds be pre-loadedwith false as default
+  @param pre_load [Boolean] Should sounds be pre-loaded with false as default
   ###
   init: (pre_load = false) =>
     @_init_sounds()

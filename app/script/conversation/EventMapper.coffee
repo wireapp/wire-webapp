@@ -94,12 +94,16 @@ class z.conversation.EventMapper
     message_et.type = event.type
     message_et.version = event.version or 1
 
+    message_et.conversation_id = conversation_et.id
+
     if message_et.is_reactable()
       message_et.reactions event.reactions or {}
       message_et.status event.status if event.status
 
-    if event.expire_after_millis
-      message_et.expire_after_millis event.expire_after_millis
+    # todo Remove deprecated expire_after_millis with subsequent release
+    if event.ephemeral_expires or event.expire_after_millis
+      message_et.ephemeral_expires event.ephemeral_expires or event.expire_after_millis
+      message_et.ephemeral_started event.ephemeral_started or '0'
 
     if window.isNaN message_et.timestamp
       @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event

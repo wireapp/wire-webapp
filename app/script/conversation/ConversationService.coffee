@@ -281,8 +281,10 @@ class z.conversation.ConversationService
       throw error
 
   ###
-  Load conversation events. Start and end are not included.
-  Events are always sorted beginning with the newest timestamp.
+  Load conversation events. Start and end are not included. Events are always sorted beginning with the newest timestamp.
+
+  TODO: This function can be removed once Microsoft Edge's IndexedDB supports compound indices:
+  - https://developer.microsoft.com/en-us/microsoft-edge/platform/status/indexeddbarraysandmultientrysupport/
 
   @param conversation_id [String] ID of conversation
   @param start [Number] starting from this timestamp
@@ -290,23 +292,50 @@ class z.conversation.ConversationService
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
   ###
-  load_events_from_db: (conversation_id, start, end, limit) ->
+  _load_events_from_db_deprecated: (conversation_id, start, end, limit) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-    .where 'conversation'
-    .equals conversation_id
+      .where 'conversation'
+      .equals conversation_id
+      .reverse()
+      .sortBy 'time'
+      .then (records) ->
+        return records.filter (record) ->
+          timestamp = new Date(record.time).getTime()
+          return false if start and timestamp >= start
+          return false if end and timestamp <= end
+          return true
+      .then (records) ->
+        return records.slice 0, limit
+
+  ###
+  Load conversation events. Start and end are not included.
+  Events are always sorted beginning with the newest timestamp.
+
+  TODO: Make sure that only valid values (no Strings, No timestamps but Dates(!), ...) are passed to this function!
+
+  @param conversation_id [String] ID of conversation
+  @param lower_bound [Date] Load from this date (included)
+  @param upper_bound [Date] Load until this date (excluded)
+  @param limit [Number] Amount of events to load
+  @return [Promise] Promise that resolves with the retrieved records
+  @see https://github.com/dfahlander/Dexie.js/issues/366
+  ###
+  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = z.config.MESSAGES_FETCH_LIMIT) ->
+    if not _.isDate(lower_bound) or not _.isDate upper_bound
+      throw new Error "Lower bound (#{typeof lower_bound}) and upper bound (#{typeof upper_bound}) must be of type 'Date'."
+    else if lower_bound.getTime() > upper_bound.getTime()
+      throw new Error "Lower bound (#{lower_bound.getTime()}) cannot be greater than upper bound (#{upper_bound.getTime()})."
+    else if z.util.Environment.browser.edge
+      return @_load_events_from_db_deprecated conversation_id, lower_bound.getTime(), upper_bound.getTime(), limit
+
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where '[conversation+time]'
+    .between [conversation_id, lower_bound.toISOString()], [conversation_id, upper_bound.toISOString()], true, false
     .reverse()
-    .sortBy 'time'
-    .then (records) ->
-      return records.filter (record) ->
-        timestamp = new Date(record.time).getTime()
-        return false if start and timestamp >= start
-        return false if end and timestamp <= end
-        return true
-    .then (records) ->
-      return records.slice 0, limit
+    .limit limit
+    .toArray()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR,
-        "Failed to get events for conversation '#{conversation_id}': #{error.message}", error
+      @logger.log @logger.levels.ERROR, "Failed to load events for conversation '#{conversation_id}' from database: '#{error.message}'"
       throw error
 
   ###

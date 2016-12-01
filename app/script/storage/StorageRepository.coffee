@@ -59,44 +59,38 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   @return [Promise] Promise that will resolve with the repository after initialization
   ###
   init: (skip_sessions) =>
-    return new Promise (resolve, reject) =>
-      @_load_identity()
-      .then (@identity) =>
-        if @identity
-          @logger.log @logger.levels.INFO, 'Loaded local identity key pair from database', @identity
-        else
-          @logger.log @logger.levels.INFO, 'We did not find a local identity. This is a new client.'
-        return @identity
-      .then (local_identity) =>
-        return {} if not local_identity
-        if skip_sessions
-          throw new z.storage.StorageError z.storage.StorageError::TYPE.SKIP_LOADING
-        else
-          return @_load_sessions()
-      .then =>
-        return @_load_pre_keys()
-      .then =>
-        @logger.log @logger.levels.INFO, 'Initialized repository'
-        resolve @
-      .catch (error) =>
-        if error.type is z.storage.StorageError::TYPE.SKIP_LOADING
-          @logger.log "Initialized repository with the following exception: #{error.message}"
-          resolve @
-        else
-          @logger.log @logger.levels.ERROR, "Storage Repository initialization failed: #{error?.message}", error
-          reject error
+    return @_load_identity()
+    .then (@identity) =>
+      if @identity
+        @logger.log @logger.levels.INFO, 'Loaded local identity key pair from database', @identity
+      else
+        @logger.log @logger.levels.INFO, 'We did not find a local identity. This is a new client.'
+      return @identity
+    .then (local_identity) =>
+      return {} if not local_identity
+      if skip_sessions
+        throw new z.storage.StorageError z.storage.StorageError::TYPE.SKIP_LOADING
+      return @_load_sessions()
+    .then =>
+      return @_load_pre_keys()
+    .then =>
+      @logger.log @logger.levels.INFO, 'Initialized repository'
+    .catch (error) =>
+      if error.type is z.storage.StorageError::TYPE.SKIP_LOADING
+        @logger.log "Initialized repository with the following exception: #{error.message}"
+      else
+        @logger.log @logger.levels.ERROR, "Storage Repository initialization failed: #{error?.message}", error
+        throw error
 
   _deserialize_session: (session) ->
     return Promise.resolve()
     .then =>
-      try
-        bytes = sodium.from_base64 session.serialised
-        @sessions[session.id] = Proteus.session.Session.deserialise @identity, bytes.buffer
-        return @sessions[session.id]
-      catch error
-        @logger.log @logger.levels.ERROR, "Session '#{session.id}' is corrupt.", error
-        # TODO: Consider deleting or repairing corrupt data (like broken sessions)
-        return undefined
+      bytes = sodium.from_base64 session.serialised
+      @sessions[session.id] = Proteus.session.Session.deserialise @identity, bytes.buffer
+      return @sessions[session.id]
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Session '#{session.id}' is corrupt.", error
+      # TODO: Consider deleting or repairing corrupt data (like broken sessions)
 
   ###
   Loads the user's identity key pair.
@@ -118,24 +112,26 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   @return [Promise] Promise that will resolve with the de-serialized pre-keys
   ###
   _load_pre_keys: =>
-    return new Promise (resolve, reject) =>
-      @storage_service.get_all @storage_service.OBJECT_STORE_PREKEYS
-      .then (pre_keys) =>
-        @logger.log @logger.levels.INFO, "Loaded '#{pre_keys.length}' pre-keys from database"
-        for pre_key in pre_keys
-          try
-            bytes = sodium.from_base64 pre_key.serialised
-            @prekeys[pre_key.id] = Proteus.keys.PreKey.deserialise bytes.buffer
-          catch error
-            @logger.log @logger.levels.ERROR, "Pre-key with primary key '#{pre_key.id}' is corrupt.", error
-            # TODO: Consider deleting or repairing corrupt data (like broken sessions)
-        @logger.log @logger.levels.INFO,
-          "Initialized '#{Object.keys(@prekeys).length}' pre-keys from database", @prekeys
-        resolve @prekeys
-      .catch (error) =>
-        @logger.log @logger.levels.WARN, "Failed to load pre-keys from storage: #{error.message}", error
-        reject error
+    return @storage_service.get_all @storage_service.OBJECT_STORE_PREKEYS
+    .then (pre_keys) =>
+      @logger.log @logger.levels.INFO, "Loaded '#{pre_keys.length}' pre-keys from database"
+      for pre_key in pre_keys
+        try
+          bytes = sodium.from_base64 pre_key.serialised
+          @prekeys[pre_key.id] = Proteus.keys.PreKey.deserialise bytes.buffer
+        catch error
+          @logger.log @logger.levels.ERROR, "Pre-key with primary key '#{pre_key.id}' is corrupt.", error
+          # TODO: Consider deleting or repairing corrupt data (like broken sessions)
+      @logger.log @logger.levels.INFO, "Initialized '#{Object.keys(@prekeys).length}' pre-keys from database", @prekeys
+      return @prekeys
+    .catch (error) ->
+      throw new Error "Failed to load pre-keys from storage: #{error.message}"
 
+  ###
+  Loads all sessions.
+  @private
+  @return [Promise] Promise that will resolve with the loaded sessions
+  ###
   _load_sessions: =>
     return new Promise (resolve, reject) =>
       @storage_service.get_all @storage_service.OBJECT_STORE_SESSIONS
@@ -197,12 +193,9 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   @return [Promise] Promise that resolves with the stored record
   ###
   save_conversation_event: (event) ->
-    return new Promise (resolve, reject) =>
+    return Promise.resolve().then =>
       primary_key = z.storage.StorageService.construct_primary_key event
-      store_name = @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
-      @storage_service.save store_name, primary_key, event
-      .then -> resolve event
-      .catch (error) -> reject error
+      @storage_service.save(@storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, event).then -> event
 
   ###
   Load a conversation event for a given primary key.
@@ -245,17 +238,10 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   @return [Promise] Promise that resolves with the saved record
   ###
   save_identity: (identity) ->
-    return new Promise (resolve, reject) =>
+    return Promise.resolve().then =>
       @identity = identity
-      payload = serialised: sodium.to_base64 new Uint8Array identity.serialise()
-
-      @storage_service.save @storage_service.OBJECT_STORE_KEYS, 'local_identity', payload
-      .then (primary_key) =>
-        message = "Saved local identity '#{identity.public_key.fingerprint()}' to db '#{@storage_service.db_name}'"
-        @logger.log @logger.levels.INFO, message, identity
-        resolve primary_key
-      .catch (error) -> reject error
-
+      @storage_service.save @storage_service.OBJECT_STORE_KEYS, 'local_identity',
+        serialised: sodium.to_base64 new Uint8Array identity.serialise()
 
   ###############################################################################
   # Pre-keys
@@ -269,15 +255,11 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   @return [Promise] Promise that resolves with the saved record
   ###
   add_prekey: (prekey) ->
-    return new Promise (resolve, reject) =>
+    return Promise.resolve().then =>
       @prekeys[prekey.key_id] = prekey
-      payload =
+      @storage_service.save @storage_service.OBJECT_STORE_PREKEYS, "#{prekey.key_id}",
         id: prekey.key_id
         serialised: sodium.to_base64 new Uint8Array prekey.serialise()
-
-      @storage_service.save @storage_service.OBJECT_STORE_PREKEYS, "#{prekey.key_id}", payload
-      .then (primary_key) -> resolve primary_key
-      .catch (error) -> reject error
 
   ###
   Delete a pre-key
@@ -339,16 +321,11 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   @return [Promise] Promise that resolves with the saved record
   ###
   save_session: (session_id, session) ->
-    return new Promise (resolve, reject) =>
+    return Promise.resolve().then =>
       @sessions[session_id] = session
-      payload =
+      @storage_service.save @storage_service.OBJECT_STORE_SESSIONS, session_id,
         id: session_id
         serialised: sodium.to_base64 new Uint8Array session.serialise()
-
-      @storage_service.save @storage_service.OBJECT_STORE_SESSIONS, session_id, payload
-      .then (primary_key) ->
-        resolve primary_key
-      .catch (error) -> reject error
 
   ###
   Nuke the database.
