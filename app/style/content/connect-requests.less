@@ -41,21 +41,31 @@
   align-items: center;
   display: flex;
   flex-direction: column;
+  padding-bottom: 40px;
+  padding-top: 40px;
 
-  & + .connect-request {
+  & + & {
     border-top: 1px solid fade(#000, 8%);
   }
 
-  > .name {
-    margin-top: 40px;
+  &:only-child {
+    height: 100vh;
+    justify-content: center;
   }
+}
+
+.connect-request-name {
+  font-size: @font-size-lg;
+  line-height: 42px;
+}
+
+.connect-request-username {
+  color: @graphite;
+  font-size: @font-size-xs;
+  line-height: @line-height-sm;
 }
 
 .connect-request-avatar {
   margin-bottom: 32px;
   margin-top: 24px;
-}
-
-.connect-request-buttons {
-  margin-bottom: 40px;
 }

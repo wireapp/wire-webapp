@@ -76,13 +76,25 @@
   line-height: @line-height-lg;
 }
 
+.preferences-account-name-wrapper {
+  position: relative;
+  width: 256px;
+
+}
+
+.preferences-account-username-wrapper {
+  position: relative;
+  width: 256px;
+  min-height: @line-height-xl * 2;
+}
+
 .preferences-account-input {
   .reset-textarea;
   background: transparent;
   height: @line-height-xl;
   line-height: @line-height-xl;
   margin-left: -4px;
-  width: 256px;
+  width: 100%;
   padding-left: 4px;
   padding-right: 4px;
 
@@ -110,15 +122,6 @@
 
 .preferences-account-name {
   font-weight: bold;
-}
-
-.preferences-account-name-wrapper {
-  position: relative;
-}
-
-.preferences-account-username-wrapper {
-  position: relative;
-  min-height: @line-height-xl * 2;
 }
 
 .preferences-account-username-addsign {
