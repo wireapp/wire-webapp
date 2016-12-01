@@ -50,7 +50,7 @@ class z.ViewModel.content.PreferencesAVViewModel
     @is_visible = true
     @_get_media_stream()
     .then (audio_stream) =>
-      @_initiate_audio_meter audio_stream if not @audio_interval
+      @_initiate_audio_meter audio_stream if audio_stream and not @audio_interval
 
   # Release devices.
   release_devices: =>
@@ -74,8 +74,10 @@ class z.ViewModel.content.PreferencesAVViewModel
       return @audio_stream()
     .catch (error) =>
       error = error[0] if _.isArray error
-      @permission_denied true
       @logger.log @logger.levels.ERROR, "Requesting MediaStream failed: #{error.message}", error
+      if error.name in z.calling.rtc.MediaStreamErrorTypes.DEVICE or error.name in z.calling.rtc.MediaStreamErrorTypes.PERMISSION
+        @permission_denied true
+        return false
       throw error
 
   ###
