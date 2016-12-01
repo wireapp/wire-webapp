@@ -101,7 +101,7 @@ class z.main.App
     repository.bot                 = new z.bot.BotRepository @service.bot, repository.conversation
     repository.call_center         = new z.calling.CallCenter @service.call, repository.conversation, repository.user, repository.audio
     repository.event_tracker       = new z.tracking.EventTrackingRepository repository.user, repository.conversation
-    repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.conversation
+    repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.call_center, repository.conversation
 
     return repository
 

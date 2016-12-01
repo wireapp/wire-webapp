@@ -276,9 +276,11 @@ window.TestFactory.prototype.exposeSystemNotificationActors = function () {
   var self = this;
   return new Promise(function (resolve) {
     self.exposeConversationActors().then(function () {
-      window.system_notification_repository = new z.SystemNotification.SystemNotificationRepository(window.conversation_repository);
-      window.system_notification_repository.logger.level = self.settings.logging_level;
-      resolve(window.system_notification_repository);
+      self.exposeCallingActors().then(function () {
+        window.system_notification_repository = new z.SystemNotification.SystemNotificationRepository(window.call_center, window.conversation_repository);
+        window.system_notification_repository.logger.level = self.settings.logging_level;
+        resolve(window.system_notification_repository)
+      });
     });
   });
 };
