@@ -29,9 +29,8 @@ node_js:
 
 # https://blog.travis-ci.com/2013-12-05-speed-up-your-builds-cache-your-dependencies
 cache:
+  yarn: true
   directories:
-    - $HOME/.npm
-    - $HOME/.yarn-cache
     - bower_components
     - node_modules
 
@@ -40,10 +39,6 @@ before_install:
   - export CHROME_BIN=/usr/bin/google-chrome
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - npm install -g yarn --cache-min 999999999
-
-install:
-  - yarn --ignore-engines
 
 notifications:
   email: false
