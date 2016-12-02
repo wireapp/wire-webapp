@@ -20,6 +20,8 @@ window.z ?= {}
 z.ViewModel ?= {}
 z.ViewModel.content ?= {}
 
+# remove save animation
+SAVED_ANIMATION_TIMEOUT = 750 * 2
 
 class z.ViewModel.content.PreferencesAccountViewModel
   constructor: (element_id, @client_repository, @user_repository) ->
@@ -53,22 +55,23 @@ class z.ViewModel.content.PreferencesAccountViewModel
   change_name: (name, e) =>
     new_name = e.target.value
 
-    if new_name and new_name isnt @self_user().name()
-      @user_repository.change_name new_name
-      .then =>
-        @name_saved true
-        window.setTimeout =>
-          @name_saved false
-        , 750 * 2
-    else
-      @name.notifySubscribers() # render old value
+    if new_name is @self_user().name()
+      e.target.blur()
 
-    e.target.blur()
+    @user_repository.change_name new_name
+    .then =>
+      @name_saved true
+      e.target.blur()
+      window.setTimeout =>
+        @name_saved false
+      , SAVED_ANIMATION_TIMEOUT
 
   reset_name_input: =>
+    return if @name_saved()
     @name.notifySubscribers()
 
   reset_username_input: =>
+    return if @username_saved()
     @_reset_username_input()
     @username.notifySubscribers()
 
@@ -94,11 +97,11 @@ class z.ViewModel.content.PreferencesAccountViewModel
     .then =>
       if @entered_username() is @submitted_username()
         @username_error null
-        e.target.blur()
         @username_saved true
+        e.target.blur()
         window.setTimeout =>
           @username_saved false
-        , 750 * 2
+        , SAVED_ANIMATION_TIMEOUT
     .catch (error) =>
       if @entered_username() isnt @submitted_username()
         return
