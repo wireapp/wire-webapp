@@ -197,9 +197,6 @@ describe 'Conversation', ->
       conversation_et.name conversation_name
       expect(conversation_et.display_name()).toBe conversation_name
 
-    it 'resolves with the conversation entity when setting the display name', ->
-      expect(conversation_et.display_name 'foo').toEqual conversation_et
-
   describe '_subscribe_to_states_updates', ->
 
     it 'creates subscribers to state updates', ->
