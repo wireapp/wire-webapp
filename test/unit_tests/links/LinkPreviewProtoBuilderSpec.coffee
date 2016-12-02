@@ -25,7 +25,7 @@ compare_article_with_mock = (url, offset, preview, mock) ->
   expect(preview.url_offset).toBe offset
   expect(preview.article.title).toBe mock.title
   expect(preview.article.permanent_url).toBe mock.url
-  expect(preview.article.summary).toBe mock.description
+  expect(preview.article.summary).toEqual mock.description or null
   expect(-> preview.toArrayBuffer()).not.toThrow()
 
 beforeAll (done) ->
