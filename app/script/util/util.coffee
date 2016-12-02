@@ -331,15 +331,14 @@ z.util.markup_links = (message) ->
 
 
 # Note: We are using "Underscore.js" to escape HTML in the original message
-z.util.render_message = (message, theme_color) ->
+z.util.render_message = (message) ->
   message = marked message
   message = z.util.auto_link_emails message
   message = message.replace /\n/g, '<br />'
   # Remove <br /> if it is the last thing in a message
   if z.util.get_last_characters(message, '<br />'.length) is '<br />'
     message = z.util.cut_last_characters message, '<br />'.length
-
-  return z.media.MediaParser.render_media_embeds message, theme_color
+  return message
 
 
 z.util.read_string_chars_as_hex = (text) ->
