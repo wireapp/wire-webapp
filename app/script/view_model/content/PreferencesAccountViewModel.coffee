@@ -77,7 +77,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
   check_username_input: (username, e) ->
     return true if e.charCode is 0 # FF sends charCode 0 when pressing backspace
-    return z.user.UserHandleGenerator.validate_character e.key
+    return z.user.UserHandleGenerator.validate_character String.fromCharCode(e.charCode) # automation is missing key prop
 
   change_username: (username, e) =>
     entered_username = e.target.value
