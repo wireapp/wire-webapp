@@ -49,5 +49,5 @@ class z.entity.Text extends z.entity.Asset
   render: ->
     message = z.util.render_message @text
     if @previews().length is 0
-      message = z.media.MediaParser.render_media_embeds message, theme_color
+      message = z.media.MediaParser.render_media_embeds message, @theme_color
     return message
