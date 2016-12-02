@@ -504,8 +504,7 @@ class z.conversation.ConversationRepository
     conversation_et.self = @user_repository.self()
     user_ids = conversation_et.participating_user_ids()
     @user_repository.get_users_by_id user_ids, (user_ets) ->
-      conversation_et.participating_user_ets.removeAll()
-      z.util.ko_array_push_all conversation_et.participating_user_ets, user_ets
+      conversation_et.participating_user_ets user_ets
       callback? conversation_et
     , offline
 
@@ -1621,13 +1620,15 @@ class z.conversation.ConversationRepository
       connection_et = @user_repository.get_connection_by_conversation_id event.conversation
       return if connection_et?.status() is z.user.ConnectionStatus.PENDING
 
+    # Handle conversation create event separately
+    if event.type is z.event.Backend.CONVERSATION.CREATE
+      return @_on_create event
+
     # Check if conversation was archived
     @get_conversation_by_id event.conversation, (conversation_et) =>
       previously_archived = conversation_et.is_archived()
 
       switch event.type
-        when z.event.Backend.CONVERSATION.CREATE
-          @_on_create event
         when z.event.Backend.CONVERSATION.MEMBER_JOIN
           @_on_member_join conversation_et, event
         when z.event.Backend.CONVERSATION.MEMBER_LEAVE
