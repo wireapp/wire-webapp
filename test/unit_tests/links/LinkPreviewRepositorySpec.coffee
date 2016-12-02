@@ -56,5 +56,6 @@ describe 'z.links.LinkPreviewRepository', ->
       .then ->
         done.fail
       .catch (error) ->
+        console.log error
         expect(error.type).toBe z.links.LinkPreviewError::TYPE.BLACKLISTED
         done()

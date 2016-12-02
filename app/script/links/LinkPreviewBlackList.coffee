@@ -4,7 +4,7 @@ z.links ?= {}
 z.links.LinkPreviewBlackList = do ->
 
   BLACKLIST = [
-    'youtube'
+    'youtu[.]?be'
     'spotify'
     'vimeo'
   ]

@@ -1,9 +1,13 @@
-# grunt test_init && grunt test_run:links/LinkPreviewHelpers
+# grunt test_init && grunt test_run:links/LinkPreviewBlackList
 
 describe 'is_blacklisted', ->
 
+  it 'should return true if link is youtu.be', ->
+    url = 'https://youtu.be/t4gjl-uwUHc'
+    expect(z.links.LinkPreviewBlackList.is_blacklisted(url)).toBeTruthy()
+
   it 'should return true if link is youtube', ->
-    url = 'youtube.com'
+    url = 'https://www.youtube.com/watch?v=t4gjl-uwUHc'
     expect(z.links.LinkPreviewBlackList.is_blacklisted(url)).toBeTruthy()
 
   it 'should return true if link is spotify', ->
