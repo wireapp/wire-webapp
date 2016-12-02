@@ -74,12 +74,6 @@ describe 'build_from_open_graph_data', ->
     link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url
     compare_article_with_mock url, 0, link_preview, mock
 
-  it 'returns undefined if type is unsupported', ->
-    url = 'https://open.spotify.com/track/2pucDx5Wyz9uHCou4wntHa'
-    mock = OpenGraphMocks.getSpotifyMock()
-    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url
-    expect(link_preview).not.toBeDefined()
-
   it 'returns a link preview even if there is no description', ->
     url = 'heise.de'
     mock = OpenGraphMocks.getHeiseMock()
