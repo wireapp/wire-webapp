@@ -38,6 +38,7 @@ class z.links.LinkPreviewError
   @:: = new Error()
   @::constructor = @
   @::TYPE =
+    BLACKLISTED: 'z.links.LinkPreviewError::TYPE.BLACKLISTED'
     NO_DATA_AVAILABLE: 'z.links.LinkPreviewError::TYPE.NO_DATA_AVAILABLE'
     NOT_SUPPORTED: 'z.links.LinkPreviewError::TYPE.NOT_SUPPORTED'
     UNSUPPORTED_TYPE: 'z.links.LinkPreviewError::TYPE.UNSUPPORTED_TYPE'
