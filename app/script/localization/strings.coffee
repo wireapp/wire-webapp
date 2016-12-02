@@ -460,8 +460,8 @@ z.string.search_top_people = 'Top people'
 z.string.search_try_search = 'Find people by name or\nfull email address'
 z.string.search_no_contacts_on_wire = 'You have no contacts on Wire.\nTry finding people by name or\nfull email address'
 z.string.search_others = 'Connect'
-z.string.search_friend_in_common = '%no friend in common'
-z.string.search_friends_in_common = '%no friends in common'
+z.string.search_friend_in_common = '%no person in common'
+z.string.search_friends_in_common = '%no people in common'
 
 # Picture upload
 z.string.upload_welcome = 'Wire is so much nicer with a picture.'
