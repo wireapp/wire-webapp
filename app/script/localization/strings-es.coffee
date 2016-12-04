@@ -99,14 +99,14 @@ z.string.es.auth_error_email_forbidden = 'Lo sentimos. Esta dirección de correo
 z.string.es.auth_error_email_malformed = 'Por favor, introduce una dirección de correo electrónico válida.'
 z.string.es.auth_error_email_missing = 'Por favor, introduce una dirección de correo electrónico.'
 z.string.es.auth_error_misc = 'Problemas con la conexión. Por favor, inténtelo de nuevo.'
-z.string.es.auth_error_name_short = 'Introduzca un nombre con al menos 2 caracteres'
+z.string.es.auth_error_name_short = 'Introduce un nombre con al menos 2 caracteres'
 z.string.es.auth_error_offline = 'No hay conexión a Internet'
-z.string.es.auth_error_password_short = 'Elija una contraseña con al menos 8 caracteres.'
+z.string.es.auth_error_password_short = 'Elige una contraseña con al menos 8 caracteres.'
 z.string.es.auth_error_password_wrong = 'Contraseña incorrecta. Por favor, inténtelo de nuevo.'
 z.string.es.auth_error_phone_number_forbidden = 'Lo sentimos. Este número de teléfono está prohibido.'
 z.string.es.auth_error_phone_number_invalid = 'Número de teléfono no válido'
 z.string.es.auth_error_phone_number_unknown = 'Número de Teléfono Desconocido'
-z.string.es.auth_error_sign_in = 'Por favor, verifique sus datos y vuelva a intentarlo.'
+z.string.es.auth_error_sign_in = 'Por favor, verifica tus datos y vuelve a intentarlo.'
 
 # Call stuff
 z.string.es.call_state_outgoing = 'Sonando…'
@@ -293,7 +293,7 @@ z.string.es.invite_meta_key_pc = 'Ctrl'
 z.string.es.invite_hint_selected = 'Pulse %meta_key + C para copiar'
 z.string.es.invite_hint_unselected = 'Seleccione y pulse %meta_key + C'
 z.string.es.invite_headline = 'Invitar amigos a Wire'
-z.string.es.invite_message = 'Estoy en Wire. Busca por %@email o visita https://get.wire.com para conectar conmigo.'
+z.string.es.invite_message = 'Estoy en Wire. Busca por %mail o visita https://get.wire.com para conectar conmigo.'
 z.string.es.invite_message_no_email = 'Estoy en Wire. Visita https://get.wire.com para conectar conmigo.'
 
 # Extensions
