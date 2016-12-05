@@ -30,9 +30,12 @@ class z.calling.handler.CallStateHandler
     @logger = new z.util.Logger 'z.calling.handler.CallStateHandler', z.config.LOGGER.OPTIONS
 
     @calls = ko.observableArray []
-    @joined_call = ko.pureComputed => return call_et for call_et in @calls() when call_et.self_client_joined()
+    @joined_call = ko.pureComputed =>
+      return if not @self_client_joined()
+      return call_et for call_et in @calls() when call_et.self_client_joined()
 
     @self_state = @call_center.media_stream_handler.self_stream_state
+    @self_client_joined = ko.observable false
 
     @block_event_handling = true
     @subscribe_to_events()
@@ -335,7 +338,7 @@ class z.calling.handler.CallStateHandler
       # Reset call and delete it afterwards
       call_et.state z.calling.enum.CallState.ENDED
       call_et.reset_call()
-      @calls.remove call_et
+      @_remove_call call_et.id
       @call_center.media_stream_handler.reset_media_streams()
     .catch (error) =>
       @logger.log @logger.levels.WARN, "No call found in conversation '#{conversation_id}' to delete", error
@@ -529,6 +532,13 @@ class z.calling.handler.CallStateHandler
       @logger.log @logger.levels.ERROR, "Joining call in '#{conversation_id}' failed: #{error.name}", error
 
   ###
+  Remove a call from the list.
+  @param conversation_id [String] ID of conversation for which to remove call
+  ###
+  _remove_call: (conversation_id) ->
+    @calls.remove (call_et) -> call_et.id is conversation_id
+
+  ###
   Update a call with new state.
 
   @private
@@ -557,6 +567,7 @@ class z.calling.handler.CallStateHandler
   _update_self: (call_et, self_user_joined, client_joined_change) ->
     call_et.self_user_joined self_user_joined
     if client_joined_change
+      @self_client_joined self_user_joined
       call_et.self_client_joined self_user_joined
 
     if call_et.self_user_joined() and not call_et.self_client_joined()
@@ -616,6 +627,7 @@ class z.calling.handler.CallStateHandler
         participant_ets = (new z.calling.entities.Participant user_et for user_et in remote_user_ets)
         call_et.update_participants participant_ets
         call_et.update_remote_state event.participants
+        @self_client_joined true
         call_et.self_client_joined true
         call_et.self_user_joined true
         @logger.log @logger.levels.DEBUG, "Connecting '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}' from this client", call_et
@@ -677,6 +689,7 @@ class z.calling.handler.CallStateHandler
     @_create_call event
     .then (call_et) =>
       call_et.state z.calling.enum.CallState.OUTGOING
+      @self_client_joined true
       call_et.self_client_joined true
       call_et.self_user_joined true
       call_et.set_creator @call_center.user_repository.self()
