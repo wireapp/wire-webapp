@@ -289,8 +289,9 @@ z.string.conversations_popover_silence = 'Mute'
 z.string.conversations_popover_unarchive = 'Unarchive'
 
 # Takeover
-z.string.takeover_headline = 'Your username on Wire'
-z.string.takeover_sub = 'People can use this to find you more easily'
+z.string.takeover_headline = 'Usernames are here'
+z.string.takeover_sub = 'Claim your unique name on Wire.'
+z.string.takeover_link = 'Learn more'
 z.string.takeover_button_choose = 'Choose your own'
 z.string.takeover_button_keep = 'Keep this one'
 
@@ -494,6 +495,7 @@ z.string.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/arti
 z.string.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
 z.string.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.url_support_usernames = 'https://wire.com/support/username'
 z.string.url_decrypt_error_1 = 'https://wire.com/privacy/error-1'
 z.string.url_decrypt_error_2 = 'https://wire.com/privacy/error-2'
 
