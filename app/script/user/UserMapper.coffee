@@ -103,8 +103,8 @@ class z.user.UserMapper
     if data.name?
       user_et.name data.name.trim()
 
-    # if data.handle?
-      # user_et.username data.handle
+    if data.handle?
+      user_et.username data.handle
 
     if data.accent_id? and data.accent_id isnt 0
       user_et.accent_id data.accent_id
