@@ -92,12 +92,19 @@ class z.ViewModel.content.PreferencesAccountViewModel
     if entered_username is @self_user().username()
       e.target.blur()
 
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.ENTERED_USERNAME
+      length: entered_username.length
+
     @submitted_username entered_username
     @user_repository.change_username entered_username
     .then =>
       if @entered_username() is @submitted_username()
         @username_error null
         @username_saved true
+
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.SET_USERNAME
+          length: @entered_username().length
+
         e.target.blur()
         window.setTimeout =>
           @username_saved false

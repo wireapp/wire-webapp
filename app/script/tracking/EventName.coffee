@@ -83,8 +83,10 @@ z.tracking.EventName =
     RESENT_EMAIL_VERIFICATION: 'registration.resent_email_verification'
     SUCCEEDED: 'registration.succeeded'
   SETTINGS:
-    VIEWED_DEVICE: 'settings.viewed_device'
+    ENTERED_USERNAME: 'settings.entered_username'
     REMOVED_DEVICE: 'settings.removed_device'
+    SET_USERNAME: 'settings.set_username'
+    VIEWED_DEVICE: 'settings.viewed_device'
   SOUND_SETTINGS_CHANGED: 'soundIntensityPreference'
   TELEMETRY:
     APP_INITIALIZATION: 'telemetry.app_initialization'
