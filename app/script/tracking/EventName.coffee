@@ -68,6 +68,11 @@ z.tracking.EventName =
     OPENED_TERMS: 'navigation.opened_terms'
   ONBOARDING:
     ADDED_PHOTO: 'onboarding.added_photo'
+    SEEN_USERNAME_SCREEN: 'onboarding.seen_username_screen'
+    KEPT_GENERATED_USERNAME: 'onboarding.kept_generated_username'
+    OPENED_USERNAME_SETTINGS: 'onboarding.opened_username_settings'
+    OPENED_USERNAME_FAQ: 'onboarding.opened_username_faq'
+    FAILED_GENERATING_USERNAME: 'onboarding.failed_generating_username'
   PASSWORD_RESET: 'resetPassword'
   PREFERENCES:
     IMPORTED_CONTACTS: 'preferences.imported_contacts'

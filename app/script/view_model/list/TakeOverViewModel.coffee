@@ -36,6 +36,7 @@ class z.ViewModel.list.TakeOverViewModel
     @username = ko.pureComputed => @self_user()?.username()
 
   keep_username: ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME
     @user_repository.change_username @username()
     .then =>
       if conversation_et = @conversation_repository.get_most_recent_conversation()
@@ -43,10 +44,19 @@ class z.ViewModel.list.TakeOverViewModel
       else if @user_repository.connect_requests().length
         amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
     .catch ->
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.FAILED_GENERATING_USERNAME
       amplify.publish z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT
     .then ->
       amplify.publish z.event.WebApp.TAKEOVER.DISMISS
 
   choose_username: ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.OPENED_USERNAME_SETTINGS
     amplify.publish z.event.WebApp.TAKEOVER.DISMISS
     window.requestAnimationFrame -> amplify.publish z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT
+
+  on_added_to_view: ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.SEEN_USERNAME_SCREEN
+
+  on_link_click: ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.OPENED_USERNAME_FAQ
+    return false
