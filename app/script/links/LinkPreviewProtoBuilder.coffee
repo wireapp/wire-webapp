@@ -22,11 +22,7 @@ z.links ?= {}
 z.links.LinkPreviewProtoBuilder = do ->
 
   has_valid_attributes = (data) ->
-    has_valid_title = true if data.title
-    has_valid_type = true if data.type in ['article', 'object', 'website']
-    has_valid_type = true if not data.type?
-    has_valid_url = true if data.url
-    return has_valid_title and has_valid_type and has_valid_url
+    return data.title and data.url
 
   ###
   Create Protocol Buffers message for link previews.

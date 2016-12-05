@@ -51,6 +51,8 @@ class z.links.LinkPreviewRepository
 
     Promise.resolve()
     .then =>
+      if z.links.LinkPreviewBlackList.is_blacklisted url
+        throw new z.links.LinkPreviewError z.links.LinkPreviewError::TYPE.BLACKLISTED
       if window.openGraph
         return @_fetch_open_graph_data url
       throw new z.links.LinkPreviewError z.links.LinkPreviewError::TYPE.NOT_SUPPORTED
