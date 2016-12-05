@@ -250,9 +250,15 @@ class z.ViewModel.list.StartUIViewModel
     @list_view_model.switch_list z.ViewModel.list.LIST_STATE.CONVERSATIONS
 
   click_on_group: (conversation_et) =>
-    @conversation_repository.unarchive_conversation conversation_et if conversation_et.is_archived()
-    @_close_list()
-    amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
+    Promise.resolve().then =>
+      if conversation_et instanceof z.entity.User
+        return @conversation_repository.get_one_to_one_conversation conversation_et
+      return conversation_et
+    .then (conversation_et) =>
+      if conversation_et.is_archived()
+        @conversation_repository.unarchive_conversation conversation_et
+      @_close_list()
+      amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
 
   click_on_other: (user_et, e) =>
 
@@ -424,7 +430,7 @@ class z.ViewModel.list.StartUIViewModel
 
 
   ###############################################################################
-  # H
+  # Header
   ###############################################################################
 
   on_submit_search: (callback) =>

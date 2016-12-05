@@ -93,13 +93,16 @@ class z.search.SearchRepository
   @return [Promise] Promise that will resolve with search results
   ###
   _prepare_search_result: (search_ets, mode) ->
-    return new Promise (resolve, reject) =>
-      user_ids = []
-      user_ids.push user_et.id for user_et in search_ets
+    return new Promise (resolve) =>
+      user_ids = (user_et.id for user_et in search_ets)
 
       @user_repository.get_users_by_id user_ids, (user_ets) ->
         result_user_ets = []
         for user_et in user_ets
+
+          search_et = ko.utils.arrayFirst search_ets, (search_et) -> search_et.id is user_et.id
+          user_et.mutual_friends_total search_et.mutual_friends_total
+
           ###
           Skipping some results to adjust for slow graph updates.
 
