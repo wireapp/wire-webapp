@@ -44,7 +44,6 @@ class z.ViewModel.list.TakeOverViewModel
       else if @user_repository.connect_requests().length
         amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
     .catch ->
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.FAILED_GENERATING_USERNAME
       amplify.publish z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT
     .then ->
       amplify.publish z.event.WebApp.TAKEOVER.DISMISS
