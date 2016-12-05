@@ -39,6 +39,8 @@ z.tracking.EventName =
     JOINED_CALL: 'calling.joined_call'
     RECEIVED_CALL: 'calling.received_call'
     SHARED_SCREEN: 'calling.shared_screen'
+  CONTACTS:
+    ENTERED_SEARCH: 'contacts.entered_search'
   CONVERSATION:
     ADD_TO_GROUP_CONVERSATION: 'addContactToGroupConversation'
     CHARACTER_LIMIT_REACHED: 'conversation.character_limit_reached'

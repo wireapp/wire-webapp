@@ -55,6 +55,8 @@ class z.ViewModel.list.StartUIViewModel
           @logger.log @logger.levels.ERROR, "Error searching for contacts: #{error.message}", error
 
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.BOOLEAN.SEARCHED_FOR_PEOPLE, true
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTACTS.ENTERED_SEARCH
+          by_username_only: query.startWith '@'
     , 300
 
     @user = @user_repository.self

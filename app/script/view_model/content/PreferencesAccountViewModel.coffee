@@ -103,7 +103,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
         @username_saved true
 
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.SET_USERNAME
-          length: @entered_username().length
+          length: entered_username.length
 
         e.target.blur()
         window.setTimeout =>
