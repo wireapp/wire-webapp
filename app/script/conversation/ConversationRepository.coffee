@@ -193,30 +193,30 @@ class z.conversation.ConversationRepository
       throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
 
   get_events: (conversation_et) ->
-    return new Promise (resolve, reject) =>
-      conversation_et.is_pending true
+    conversation_et.is_pending true
 
-      first_message = conversation_et.get_first_message()
-      upper_bound = if first_message then new Date first_message.timestamp else new Date()
+    first_message = conversation_et.get_first_message()
+    upper_bound = if first_message then new Date first_message.timestamp else new Date()
 
-      @conversation_service.load_events_from_db conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT
-      .then (events) =>
-        if events.length < z.config.MESSAGES_FETCH_LIMIT
-          conversation_et.has_further_messages false
-        if events.length is 0
-          @logger.log @logger.levels.INFO, "No events for conversation '#{conversation_et.id}' found", events
-        else if first_message
-          @logger.log @logger.levels.INFO,
-            "Loaded #{events.length} event(s) starting at '#{upper_bound.toISOString()}' for conversation '#{conversation_et.id}'", events
-        else
-          @logger.log @logger.levels.INFO,
-            "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
-        mapped_messages = @_add_events_to_conversation events: events, conversation_et
-        conversation_et.is_pending false
-        resolve mapped_messages
-      .catch (error) =>
-        @logger.log @logger.levels.INFO, "Could not load events for conversation: #{conversation_et.id}", error
-        reject error
+    @conversation_service.load_events_from_db conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT
+    .then (events) =>
+      if events.length < z.config.MESSAGES_FETCH_LIMIT
+        conversation_et.has_further_messages false
+
+      if not events.length
+        @logger.log @logger.levels.INFO, "No events for conversation '#{conversation_et.id}' found", events
+      else if first_message
+        @logger.log @logger.levels.INFO, "Loaded #{events.length} event(s) starting at '#{upper_bound.toISOString()}' for conversation '#{conversation_et.id}'", events
+      else
+        @logger.log @logger.levels.INFO, "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
+
+      mapped_messages = @_add_events_to_conversation events: events, conversation_et
+
+      conversation_et.is_pending false
+      return mapped_messages
+    .catch (error) =>
+      @logger.log @logger.levels.INFO, "Could not load events for conversation: #{conversation_et.id}", error
+      throw error
 
   ###
   Get conversation unread events.
