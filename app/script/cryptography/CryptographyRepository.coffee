@@ -209,16 +209,13 @@ class z.cryptography.CryptographyRepository
   @return [Promise<Array<cryptobox.CryptoboxSession>>] Promise that resolves with an array of sessions
   ###
   get_sessions: (user_client_map) =>
-    return new Promise (resolve, reject) =>
-      [cryptobox_session_map, missing_session_map] = @_get_sessions_local user_client_map
-      @logger.log @logger.levels.INFO, "Found local sessions for '#{Object.keys(cryptobox_session_map).length}' users", cryptobox_session_map
+    [cryptobox_session_map, missing_session_map] = @_get_sessions_local user_client_map
+    @logger.log @logger.levels.INFO, "Found local sessions for '#{Object.keys(cryptobox_session_map).length}' users", cryptobox_session_map
 
-      @_get_sessions_missing cryptobox_session_map, missing_session_map
-      .then (cryptobox_session_map) ->
-        resolve cryptobox_session_map
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Failed to get sessions: #{error.message}", [error, user_client_map]
-        reject error
+    @_get_sessions_missing cryptobox_session_map, missing_session_map
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Failed to get sessions: #{error.message}", [error, user_client_map]
+      throw error
 
   ###
   Loads the session from Cryptobox.

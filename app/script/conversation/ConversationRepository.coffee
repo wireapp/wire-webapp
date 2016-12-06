@@ -1124,7 +1124,7 @@ class z.conversation.ConversationRepository
       user_client_map = {}
 
       for user_et in user_ets
-        continue if user_et.is_me and skip_own_clients
+        continue if skip_own_clients and user_et.is_me
         user_client_map[user_et.id] = (client_et.id for client_et in user_et.devices())
 
       return user_client_map
@@ -1245,7 +1245,7 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves when the message was sent
   ###
   _send_generic_message: (conversation_id, generic_message, user_ids, native_push = true) =>
-    Promise.resolve @_send_as_external_message conversation_id, generic_message
+    Promise.resolve @_should_send_as_external conversation_id, generic_message
     .then (send_as_external) =>
       if send_as_external
         @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
@@ -1335,7 +1335,7 @@ class z.conversation.ConversationRepository
   @param generic_message [z.protobuf.GenericMessage] Generic message that will be send
   @return [Boolean] Is payload likely to be too big so that we switch to type external?
   ###
-  _send_as_external_message: (conversation_id, generic_message) ->
+  _should_send_as_external: (conversation_id, generic_message) ->
     return new Promise (resolve) =>
       @get_conversation_by_id conversation_id, (conversation_et) ->
         estimated_number_of_clients = conversation_et.number_of_participants() * 4
