@@ -286,3 +286,35 @@ ko.bindingHandlers.hide_controls =
       hide_timeout = window.setTimeout ->
         element.classList.add 'hide-controls'
       , timeout
+
+ko.bindingHandlers.in_viewport = do ->
+
+  listeners = []
+
+  window.addEventListener 'scroll', (e) ->
+    listener(e) for listener in listeners by -1 # listeners can be deleted during iteration
+  , true
+
+  init: (element, valueAccessor) ->
+
+    _in_view = (dom_element) ->
+      box = dom_element.getBoundingClientRect()
+      return box.right >= 0 and
+          box.bottom >= 0 and
+          box.left <= document.documentElement.clientWidth and
+          box.top <= document.documentElement.clientHeight
+
+    _dispose = ->
+      z.util.ArrayUtil.remove_element listeners, _check_element
+
+    _check_element = (e) ->
+      is_child = if e? then e.target.contains(element) else true
+      if is_child and _in_view element
+        dispose = valueAccessor()?()
+        _dispose() if dispose
+
+    listeners.push _check_element
+
+    window.setTimeout _check_element, 300
+
+    ko.utils.domNodeDisposal.addDisposeCallback element, _dispose

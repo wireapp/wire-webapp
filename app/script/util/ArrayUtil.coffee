@@ -29,6 +29,16 @@ Returns random element
 z.util.ArrayUtil.random_element = (array) ->
   array[Math.floor(Math.random() * array.length)]
 
+###
+Remove given element from array
+
+@param array [Array] source
+@return [Array|undefined] containing the removed element
+###
+z.util.ArrayUtil.remove_element = (array, element) ->
+  index = array.indexOf element
+  array.splice index, 1 if index > -1
+
 z.util.ArrayUtil.contains = (array, value) ->
   return array.indexOf(value) > -1
 
