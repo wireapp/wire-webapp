@@ -80,8 +80,8 @@ class z.entity.Conversation
       return @last_event_timestamp() <= @cleared_timestamp()
 
     @is_verified = ko.pureComputed =>
-      return false if @participating_user_ets().length is 0
-      return @participating_user_ets().every (user_et) -> user_et.is_verified()
+      all_users = [@self].concat @participating_user_ets()
+      return all_users.every (user_et) -> user_et.is_verified()
 
     @removed_from_conversation = ko.observable false
     @removed_from_conversation.subscribe (is_removed) =>

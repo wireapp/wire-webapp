@@ -1,5 +1,12 @@
 <div id="conversation-titlebar" class="conversation-titlebar" data-bind="with: $root.conversation_titlebar">
   <!-- ko if: conversation_et() -->
+
+    <!-- ko if: conversation_et().is_verified() -->
+      <svg class="conversation-verified-icon" width="16" height="16">
+        <use xlink:href="#icon-verified"></use>
+      </svg>
+    <!-- /ko -->
+
     <div id="show-participants"
           data-bind="click: click_on_participants, attr: {'title': people_tooltip}"
           data-bubble="#participants-bubble"
