@@ -299,13 +299,8 @@ ko.bindingHandlers.removed_from_view =
     callback = valueAccessor()
     ko.utils.domNodeDisposal.addDisposeCallback element, ->
       callback()
-    set_size(element)
 
-    ko.applyBindingsToNode element,
-      event:
-        input: (data, event) -> set_size event.target
-    , context
-
+# element is in viewport. return true within the callback to dispose the subscription
 ko.bindingHandlers.in_viewport = do ->
 
   listeners = []
