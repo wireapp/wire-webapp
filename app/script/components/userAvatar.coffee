@@ -56,7 +56,11 @@ class z.components.UserAvatar
     @on_click = (data, event) ->
       params.click? data.user, event.currentTarget.parentNode
 
-    @picture_preview_subscription = ko.computed =>
+    @on_in_viewport = =>
+      @_load_avatar_picture()
+      return true
+
+    @_load_avatar_picture = =>
       @user.preview_picture_resource()?.get_object_url()
       .then (url) =>
         image = new Image()
@@ -64,6 +68,8 @@ class z.components.UserAvatar
         @avatar_image = @element.find '.user-avatar-image'
         @avatar_image.empty().append image
         @element.addClass 'user-avatar-image-loaded user-avatar-loading-transition'
+
+    @picture_preview_subscription = ko.computed => @_load_avatar_picture
 
   dispose: =>
     @picture_preview_subscription.dispose()
@@ -74,7 +80,7 @@ ko.components.register 'user-avatar',
     createViewModel: (params, component_info) ->
       return new z.components.UserAvatar params, component_info
   template: """
-            <div class="user-avatar" data-bind="attr: {title: user.name}, css: css_classes(), click: on_click">
+            <div class="user-avatar" data-bind="attr: {title: user.name}, css: css_classes(), click: on_click, in_viewport: on_in_viewport">
               <div class="user-avatar-background"></div>
               <div class="user-avatar-initials" data-bind="text: initials"></div>
               <div class="user-avatar-image"></div>

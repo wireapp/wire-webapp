@@ -527,7 +527,8 @@ class z.ViewModel.MessageListViewModel
   @param message_et [z.entity.Message]
   ###
   message_in_viewport: (message_et) =>
-    return if not message_et.is_ephemeral()
+    if not message_et.is_ephemeral()
+      return true
 
     if document.hasFocus()
       @conversation_repository.check_ephemeral_timer message_et
@@ -536,3 +537,5 @@ class z.ViewModel.MessageListViewModel
 
       $(window).one 'focus', =>
         @conversation_repository.check_ephemeral_timer message_et if start_timer_on_focus is @conversation.id
+
+    return true
