@@ -213,7 +213,6 @@ z.string.modal_uploads_parallel = 'You can send up to %no files at once.'
 # Connection requests
 z.string.connection_request_connect = 'Connect'
 z.string.connection_request_ignore = 'Ignore'
-z.string.connection_request_message = 'Hi %@.first_name,\nLet’s connect on Wire.\n%s.first_name'
 
 # Conversation
 z.string.conversation_you_nominative = 'you'
@@ -289,13 +288,20 @@ z.string.conversations_popover_notify = 'Unmute'
 z.string.conversations_popover_silence = 'Mute'
 z.string.conversations_popover_unarchive = 'Unarchive'
 
+# Takeover
+z.string.takeover_headline = 'Usernames are here'
+z.string.takeover_sub = 'Claim your unique name on Wire.'
+z.string.takeover_link = 'Learn more'
+z.string.takeover_button_choose = 'Choose your own'
+z.string.takeover_button_keep = 'Keep this one'
+
 # Invites
 z.string.invite_meta_key_mac = 'Cmd'
 z.string.invite_meta_key_pc = 'Ctrl'
 z.string.invite_hint_selected = 'Press %meta_key + C to copy'
 z.string.invite_hint_unselected = 'Select and Press %meta_key + C'
 z.string.invite_headline = 'Invite people to Wire'
-z.string.invite_message = 'I’m on Wire. Search for %mail or visit https://get.wire.com to connect with me.'
+z.string.invite_message = 'I’m on Wire, search for %username or visit wire.com/download.'
 z.string.invite_message_no_email = 'I’m on Wire. Visit https://get.wire.com to connect with me.'
 
 # Extensions
@@ -400,6 +406,9 @@ z.string.preferences_account_reset_password = 'Reset password'
 z.string.preferences_account_delete = 'Delete account'
 z.string.preferences_account_log_out = 'Log out'
 z.string.preferences_account_username_placeholder = 'Your full name'
+z.string.preferences_account_username_hint = 'At least 2 characters. a—z, 0—9 and _ only.'
+z.string.preferences_account_username_available = 'Available'
+z.string.preferences_account_username_error_taken = 'Already taken'
 
 z.string.preferences_av_camera = 'Camera'
 z.string.preferences_av_microphone = 'Microphone'
@@ -452,9 +461,8 @@ z.string.search_top_people = 'Top people'
 z.string.search_try_search = 'Find people by name or\nfull email address'
 z.string.search_no_contacts_on_wire = 'You have no contacts on Wire.\nTry finding people by name or\nfull email address'
 z.string.search_others = 'Connect'
-z.string.search_suggestion_one = 'Knows %@.first_name'
-z.string.search_suggestion_two = 'Knows %@.first_name and %@.other_name'
-z.string.search_suggestion_many = 'Knows %@.first_name and %no others'
+z.string.search_friend_in_common = '%no person in common'
+z.string.search_friends_in_common = '%no people in common'
 
 # Picture upload
 z.string.upload_welcome = 'Wire is so much nicer with a picture.'
@@ -487,6 +495,7 @@ z.string.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/arti
 z.string.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
 z.string.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.url_support_usernames = 'https://wire.com/support/username'
 z.string.url_decrypt_error_1 = 'https://wire.com/privacy/error-1'
 z.string.url_decrypt_error_2 = 'https://wire.com/privacy/error-2'
 

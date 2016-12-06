@@ -120,8 +120,15 @@ ko.components.register 'user-list',
                   </div>
                   <div class="search-list-item-content">
                     <div class="search-list-item-content-name" data-bind="text: name"></div>
-                    <!-- ko if: $parent.mode === z.components.UserListMode.INFO && $data.relation_info -->
-                      <div class="search-list-item-content-info" data-bind="text: $data.relation_info"></div>
+                    <!-- ko if: $parent.mode === z.components.UserListMode.INFO -->
+                      <div class="search-list-item-content-info">
+                        <!-- ko if: $data.username() -->
+                          <span class="search-list-item-content-username label-username" data-bind="text: $data.username"></span>
+                        <!-- /ko -->
+                        <!-- ko if: !$data.connected() && $data.mutual_friends_total() > 0 -->
+                          <span class="search-list-item-content-friends" data-bind="l10n_text: {'id': z.string.search_friends_in_common, 'replace': {'placeholder': '%no', 'content': $data.mutual_friends_total()}}"></span>
+                        <!-- /ko -->
+                      </div>
                     <!-- /ko -->
                   </div>
                   <div class="search-list-item-connect" data-bind="visible: $parent.show_buttons()">

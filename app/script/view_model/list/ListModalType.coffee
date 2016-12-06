@@ -16,11 +16,5 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-window.z ?= {}
-z.search ?= {}
-
-# Enum of different search modes.
-z.search.SEARCH_MODE =
-  CONTACTS: 'contacts'
-  TOP_PEOPLE: 'top_people'
-  ONBOARDING: 'onboarding'
+z.ViewModel.list.LIST_MODAL_TYPE =
+  TAKEOVER: 'z.ViewModel.list.LIST_MODAL_TYPE.TAKEOVER'

@@ -41,46 +41,31 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  height: 584px;
-  width: 384px;
+  padding-bottom: 40px;
+  padding-top: 40px;
 
-  & + .connect-request {
+  & + & {
     border-top: 1px solid fade(#000, 8%);
   }
 
-  > .name,
-  > .mail {
-    .ellipsis();
-    width: 100%;
+  &:only-child {
+    height: 100vh;
+    justify-content: center;
   }
-
-  > .name {
-    margin-top: 40px;
-  }
-
-  > .button-group {
-    margin-bottom: 40px;
-  }
-
 }
 
-.connect-request-content {
-  align-items: center;
-  display: flex;
-  flex: 1 1;
-  flex-direction: column;
-  justify-content: center;
+.connect-request-name {
+  font-size: @font-size-lg;
+  line-height: 42px;
+}
 
-  > .image {
-    margin-bottom: 32px;
-    margin-top: 24px;
-  }
+.connect-request-username {
+  color: @graphite;
+  font-size: @font-size-xs;
+  line-height: @line-height-sm;
+}
 
-  > .contacts {
-    margin-bottom: 40px;
-  }
-
-  > .contacts[data-contacts="0"] {
-    margin-bottom: 0;
-  }
+.connect-request-avatar {
+  margin-bottom: 32px;
+  margin-top: 24px;
 }

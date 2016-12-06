@@ -287,6 +287,20 @@ ko.bindingHandlers.hide_controls =
         element.classList.add 'hide-controls'
       , timeout
 
+# element is added to view
+ko.bindingHandlers.added_to_view =
+  init: (element, valueAccessor) ->
+    callback = valueAccessor()
+    callback()
+
+# element is removed to view
+ko.bindingHandlers.removed_from_view =
+  init: (element, valueAccessor) ->
+    callback = valueAccessor()
+    ko.utils.domNodeDisposal.addDisposeCallback element, ->
+      callback()
+
+# element is in viewport. return true within the callback to dispose the subscription
 ko.bindingHandlers.in_viewport = do ->
 
   listeners = []

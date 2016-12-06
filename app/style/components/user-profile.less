@@ -57,27 +57,18 @@ user-profile {
 
 // user-profile-default
 .user-profile-header {
+  display: flex;
+  flex-direction: column;
   padding-top: 21px;
   padding-left: 56px;
   padding-right: 56px;
+  min-height: 80px;
   text-align: center;
 
   > .user-profile-back-button {
     .single-user-mode & {
       display: none;
     }
-  }
-
-  > .name,
-  > .email {
-    .ellipsis;
-    position: relative;
-  }
-
-  > .email {
-    display: block;
-    text-decoration: none;
-    cursor: pointer;
   }
 }
 
@@ -219,7 +210,6 @@ user-profile {
   margin-right: 12px;
 }
 
-
 .user-profile-device-detail-message {
   font-size: @font-size-xs;
   line-height: @line-height-sm;
@@ -285,4 +275,3 @@ user-profile {
   margin-left: -8px;
   margin-top: -8px;
 }
-

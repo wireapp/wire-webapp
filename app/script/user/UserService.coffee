@@ -21,7 +21,6 @@ z.user ?= {}
 
 ###
 User service for all user and connection calls to the backend REST API.
-@todo move everything that is not users or self (e.g. login,register,activate) to AuthService?
 ###
 class z.user.UserService
   URL_CONNECTIONS: '/connections'
@@ -46,19 +45,16 @@ class z.user.UserService
 
   @param user_id [String] User ID of the user to request a connection with
   @param name [String] Name of the conversation being initiated (1 - 256 characters)
-  @param message [String] The initial message in the request (1 - 256 characters)
   @return [Promise] Promise that resolves when the connection request was created
   ###
-  create_connection: (user_id, name, message) ->
-    payload =
-      user: user_id
-      name: name
-      message: message
-
+  create_connection: (user_id, name) ->
     @client.send_json
       type: 'POST'
       url: @client.create_url @URL_CONNECTIONS
-      data: payload
+      data:
+        user: user_id
+        name: name
+        message: ' '
 
   ###
   Retrieves a list of connections to other users.
@@ -74,10 +70,10 @@ class z.user.UserService
   get_own_connections: (limit = 500, user_id = undefined) ->
     @client.send_request
       type: 'GET'
+      url: @client.create_url @URL_CONNECTIONS
       data:
         size: limit
         start: user_id
-      url: @client.create_url @URL_CONNECTIONS
 
   ###
   Updates a connection to another user.
@@ -160,6 +156,19 @@ class z.user.UserService
         email: email
 
   ###
+  Change username.
+
+  @param username [String] New username for the user
+  @return [Promise] Promise that resolves when username changing process has been started on backend
+  ###
+  change_own_username: (username) ->
+    @client.send_json
+      type: 'PUT'
+      url: @client.create_url '/self/handle'
+      data:
+        handle: username
+
+  ###
   Change user password.
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/changePassword
 
@@ -204,6 +213,30 @@ class z.user.UserService
       url: @client.create_url @URL_SELF
       data:
         todo: 'Change this to normal request!'
+
+  ###
+  Check if a username exists.
+  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandle
+
+  @param username [String]
+  ###
+  check_username: (username) ->
+    @client.send_request
+      type: 'HEAD'
+      url: @client.create_url "/users/handles/#{username}"
+
+  ###
+  Get a set of users for the given usernames
+  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
+  @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
+  @param usernames [Array]
+  ###
+  get_users_by_username: (usernames) ->
+    @client.send_request
+      type: 'GET'
+      url: @client.create_url @URL_USERS
+      data:
+        handles: usernames.join ','
 
   ###
   Get a set of users.

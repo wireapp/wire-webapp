@@ -141,6 +141,9 @@ z.event.WebApp =
     PERMISSION_STATE: 'wire.webapp.system-notification.permission_state'
     REMOVE_READ: 'wire.webapp.system.notification.remove_read'
     SHOW: 'wire.webapp.system-notification.show'
+  TAKEOVER:
+    SHOW: 'wire.webapp.takeover.show'
+    DISMISS: 'wire.webapp.takeover.dismiss'
   TELEMETRY:
     BACKEND_REQUESTS: 'wire.webapp.telemetry.backend_requests'
   USER:

@@ -77,12 +77,11 @@ z.util.load_url_buffer = (url, xhr_accessor_function) ->
     xhr.send()
 
 
-z.util.load_url_blob = (url, callback) ->
+z.util.load_url_blob = (url) ->
   z.util.load_url_buffer url
   .then (value) ->
     [buffer, type] = value
-    image_as_blob = new Blob [new Uint8Array buffer], type: type
-    callback? image_as_blob
+    return new Blob [new Uint8Array buffer], type: type
 
 
 z.util.append_url_parameter = (url, param) ->
@@ -254,6 +253,14 @@ z.util.phone_number_to_e164 = (phone_number, country_code) ->
 
 z.util.create_random_uuid = ->
   return UUID.genV4().hexString
+
+###
+Returns a random integer between min (included) and max (excluded)
+###
+z.util.get_random_int = (min, max) ->
+  min = Math.ceil min
+  max = Math.floor max
+  return Math.floor Math.random() * (max - min) + min
 
 
 z.util.encode_base64 = (text) ->

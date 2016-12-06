@@ -1,21 +1,46 @@
-<div id="preferences-account" class="preferences-page preferences-account" data-bind="with: $root.preferences_account">
+<div id="preferences-account" class="preferences-page preferences-account" data-bind="with: $root.preferences_account, removed_from_view: $root.preferences_account.removed_from_view">
   <div class="preferences-titlebar" data-bind="l10n_text: z.string.preferences_account"></div>
   <div class="preferences-content-wrapper">
     <div class="preferences-content" data-bind="antiscroll">
       <section class="preferences-section preferences-section-account-profile">
         <div class="preferences-account-user-data">
-          <input class="preferences-account-username"
-                 id="username" type="text"
-                 data-bind="attr: {size: username().length}, value: username, enter: change_username, l10n_placeholder: z.string.preferences_account_username_placeholder"
-                 data-uie-name="enter-name"
-                 maxlength="64"/>
-          <label class="preferences-account-username-label" for="username"></label>
+          <div class="preferences-account-name-wrapper">
+            <input class="preferences-account-name preferences-account-input"
+                   id="name" type="text"
+                   data-bind="value: name, event: {blur: reset_name_input}, enter: change_name, l10n_placeholder: z.string.preferences_account_username_placeholder"
+                   data-uie-name="enter-name"
+                   maxlength="64"
+                   spellcheck="false" />
+            <span class="preferences-account-input-icon" data-bind="css: name_saved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
+          </div>
+          <div class="preferences-account-username-wrapper">
+            <span class="preferences-account-username-addsign">@</span>
+            <input class="preferences-account-username preferences-account-input"
+                   id="username" type="text"
+                   data-bind="textInput: username, event: {input: verify_username, keypress: check_username_input, blur: reset_username_input}, enter: change_username, hasFocus: should_focus_username()"
+                   data-uie-name="enter-username"
+                   maxlength="21"
+                   spellcheck="false" />
+            <span class="preferences-account-input-icon" data-bind="css: username_saved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
+            <!-- ko ifnot: username_error() -->
+              <div class="preferences-account-username-hint text-graphite font-size-xs"
+                   data-bind="l10n_text: z.string.preferences_account_username_hint"></div>
+            <!-- /ko -->
+            <!-- ko if: username_error() === 'available' -->
+              <div class="preferences-account-username-error font-size-xs"
+                   data-bind="l10n_text: z.string.preferences_account_username_available"></div>
+            <!-- /ko -->
+            <!-- ko if: username_error() === 'taken' -->
+              <div class="preferences-account-username-error font-size-xs"
+                   data-bind="l10n_text: z.string.preferences_account_username_error_taken, css: {'text-red': submitted_username() === entered_username()}"></div>
+            <!-- /ko -->
+          </div>
           <div class="preferences-account-mail" data-bind="text: self_user().email()" data-uie-name="enter-email"></div>
           <div class="preferences-account-phone" data-bind="text: self_user().phone()" data-uie-name="enter-phone"></div>
         </div>
 
         <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="l10n_tooltip: z.string.tooltip_preferences_picture">
-          <user-avatar class="user-avatar-xl" params="user: self_user()"></user-avatar>
+          <user-avatar class="user-avatar-lg" params="user: self_user()"></user-avatar>
           <input id="self-upload-file-input"
                  type="file" accept="image/jpg,image/jpeg,image/png,image/bmp"
                  data-bind="file_select: click_on_change_picture"

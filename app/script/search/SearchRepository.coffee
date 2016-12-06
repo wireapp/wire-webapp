@@ -31,8 +31,6 @@ class z.search.SearchRepository
 
     @search_result_mapper = new z.search.SearchResultMapper @user_repository
 
-    @suggested_search_ets = []
-
     amplify.subscribe z.event.WebApp.SEARCH.ONBOARDING, @show_onboarding
 
   ###
@@ -41,38 +39,7 @@ class z.search.SearchRepository
   @return [Promise<Array<z.entity.User>>] Promise that will resolve with an array containing the users common contacts
   ###
   get_common_contacts: (user_id) =>
-    @search_service.get_common user_id
-    .then (response) =>
-      return @search_result_mapper.map_results response.documents, z.search.SEARCH_MODE.COMMON_CONNECTIONS
-    .then ([search_ets, mode]) =>
-      return @_prepare_search_result search_ets, mode
-
-  ###
-  Get "People you may know" (PYMK).
-  @param size [Integer] Number of requested user
-  @return [Promise] Promise that resolves with suggestions
-  ###
-  get_suggestions: ->
-    return new Promise (resolve, reject) =>
-      @suggested_search_ets = z.util.StorageUtil.get_value(z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS) or []
-
-      if @suggested_search_ets.length > 0
-        @_prepare_search_result @suggested_search_ets, z.search.SEARCH_MODE.SUGGESTIONS
-        .then (user_ets) -> resolve user_ets
-        .catch (error) -> reject error
-      else
-        @search_service.get_suggestions z.config.SUGGESTIONS_FETCH_LIMIT
-        .then (response) =>
-          return @search_result_mapper.map_results response.documents, z.search.SEARCH_MODE.SUGGESTIONS
-        .then ([search_ets, mode]) =>
-          return @_prepare_search_result search_ets, mode
-        .then (search_ets) =>
-          # store suggested user ids
-          @suggested_search_ets = search_ets
-          z.util.StorageUtil.set_value z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS, @suggested_search_ets, 15 * 60
-          resolve search_ets
-        .catch (error) ->
-          reject error
+    @search_service.get_common(user_id).then (response) -> response.returned
 
   ###
   Get top people.
@@ -92,14 +59,6 @@ class z.search.SearchRepository
   ###
   ignore_suggestion: (user_id) ->
     @search_service.put_suggestions_ignore user_id
-    .then =>
-      search_et = ko.utils.arrayFirst @suggested_search_ets, (search_et) ->
-        search_et.id is user_id
-
-      # remove ignored user from the suggested user ids
-      user_id_index = @suggested_search_ets.indexOf search_et
-      @suggested_search_ets.splice user_id_index, 1 if user_id_index > -1
-      z.util.StorageUtil.set_value z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS, @suggested_search_ets, 30
 
   ###
   Search for users on the backend by name.
@@ -134,13 +93,16 @@ class z.search.SearchRepository
   @return [Promise] Promise that will resolve with search results
   ###
   _prepare_search_result: (search_ets, mode) ->
-    return new Promise (resolve, reject) =>
-      user_ids = []
-      user_ids.push user_et.id for user_et in search_ets
+    return new Promise (resolve) =>
+      user_ids = (user_et.id for user_et in search_ets)
 
-      @user_repository.get_users_by_id user_ids, (user_ets) =>
+      @user_repository.get_users_by_id user_ids, (user_ets) ->
         result_user_ets = []
         for user_et in user_ets
+
+          search_et = ko.utils.arrayFirst search_ets, (search_et) -> search_et.id is user_et.id
+          user_et.mutual_friends_total search_et.mutual_friends_total
+
           ###
           Skipping some results to adjust for slow graph updates.
 
@@ -149,78 +111,15 @@ class z.search.SearchRepository
           Only show unknown or cancelled people in suggestions.
           ###
           switch mode
-            when z.search.SEARCH_MODE.COMMON_CONNECTIONS
-              result_user_ets.push user_et
             when z.search.SEARCH_MODE.CONTACTS
               if not user_et.connected()
                 user_et.connection_level z.user.ConnectionLevel.NO_CONNECTION
                 result_user_ets.push user_et
             when z.search.SEARCH_MODE.ONBOARDING
               result_user_ets.push user_et if not user_et.connected()
-            when z.search.SEARCH_MODE.SUGGESTIONS
-              states_to_suggest = [z.user.ConnectionStatus.UNKNOWN, z.user.ConnectionStatus.CANCELLED]
-              result_user_ets.push user_et if user_et.connection().status() in states_to_suggest
             when z.search.SEARCH_MODE.TOP_PEOPLE
               result_user_ets.push user_et if user_et.connected()
             else
               result_user_ets.push user_et
 
-        if mode in [z.search.SEARCH_MODE.CONTACTS, z.search.SEARCH_MODE.SUGGESTIONS]
-          @_add_mutual_friends(result_user_ets, search_ets).then(resolve).catch(reject)
-        else
-          resolve result_user_ets
-
-  ###
-  Adding mutual friend entities to the search results.
-
-  @private
-
-  @param user_ets [Array<z.entity.User>] User entities
-  @param search_ets [Array<Object>] Search entities returned from the server
-  @return [Promise] Promise that resolves with search results that where mutual friends are added
-  ###
-  _add_mutual_friends: (user_ets, search_ets) ->
-    return new Promise (resolve) =>
-      mutual_friend_ids = _.flatten(search_et.mutual_friend_ids for search_et in search_ets when search_et.mutual_friend_ids?)
-
-      @user_repository.get_users_by_id mutual_friend_ids, (all_mutual_friend_ets) ->
-        for user_et in user_ets
-          search_et = ko.utils.arrayFirst search_ets, (search_et) ->
-            search_et.id is user_et.id
-          user_et.mutual_friends_total search_et.mutual_friends_total
-          if user_et.mutual_friends_total() > 0
-            user_et.mutual_friend_ids search_et.mutual_friend_ids
-            mutual_friend_ets = []
-            for mutual_friend_id in user_et.mutual_friend_ids()
-              mutual_friend_et = ko.utils.arrayFirst all_mutual_friend_ets, (user_et) ->
-                user_et.id is mutual_friend_id
-              mutual_friend_ets.push mutual_friend_et if mutual_friend_et?
-            user_et.mutual_friend_ets mutual_friend_ets
-
-            if user_et.mutual_friend_ets().length is 1
-              user_et.relation_info = z.localization.Localizer.get_text
-                id: z.string.search_suggestion_one
-                replace:
-                  placeholder: '%@.first_name'
-                  content: user_et.mutual_friend_ets()[0].first_name()
-            else if user_et.mutual_friend_ets().length is 2
-              user_et.relation_info = z.localization.Localizer.get_text
-                id: z.string.search_suggestion_two
-                replace: [
-                  placeholder: '%@.first_name'
-                  content: user_et.mutual_friend_ets()[0].first_name()
-                ,
-                  placeholder: '%@.other_name'
-                  content: user_et.mutual_friend_ets()[1].first_name()
-                ]
-            else if user_et.mutual_friend_ets().length > 2
-              user_et.relation_info = z.localization.Localizer.get_text
-                id: z.string.search_suggestion_many
-                replace: [
-                  placeholder: '%@.first_name'
-                  content: user_et.mutual_friend_ets()[0].first_name()
-                ,
-                  placeholder: '%no'
-                  content: user_et.mutual_friends_total() - 1
-                ]
-        resolve user_ets
+        resolve result_user_ets

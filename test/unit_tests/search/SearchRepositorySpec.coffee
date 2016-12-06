@@ -59,30 +59,3 @@ describe 'z.search.SearchRepository', ->
 
   afterEach ->
     server.restore()
-
-  describe 'suggestions', ->
-    it 'can cache suggestions', (done) ->
-
-      spyOn(search_service, 'get_suggestions').and.callThrough()
-
-      # First request should fetch suggestion from the server
-      search_repository.get_suggestions()
-      .then ->
-        # Second request should use the cached suggestions
-        search_repository.get_suggestions()
-      .then ->
-        expect(search_service.get_suggestions.calls.count()).toEqual 1
-        done()
-      .catch done.fail
-
-    it 'can ignore suggestions', (done) ->
-      spyOn(search_service, 'get_suggestions').and.callThrough()
-
-      search_repository.get_suggestions()
-      .then ->
-        expect(search_repository.suggested_search_ets.length).toBe 2
-        search_repository.ignore_suggestion entities.user.john_doe.id
-      .then ->
-        expect(search_repository.suggested_search_ets.length).toBe 1
-        done()
-      .catch done.fail
