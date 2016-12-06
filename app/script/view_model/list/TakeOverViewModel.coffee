@@ -21,7 +21,7 @@ z.ViewModel ?= {}
 z.ViewModel.list ?= {}
 
 
-class z.ViewModel.list.TakeOverViewModel
+class z.ViewModel.list.TakeoverViewModel
 
   ###
   @param element_id [String] HTML selector
@@ -29,7 +29,7 @@ class z.ViewModel.list.TakeOverViewModel
   @param user_repository [z.user.UserRepository] User repository
   ###
   constructor: (element_id, @conversation_repository, @user_repository) ->
-    @logger = new z.util.Logger 'z.ViewModel.list.TakeOverViewModel', z.config.LOGGER.OPTIONS
+    @logger = new z.util.Logger 'z.ViewModel.list.TakeoverViewModel', z.config.LOGGER.OPTIONS
 
     @self_user = @user_repository.self
     @name = ko.pureComputed => @self_user()?.name()
