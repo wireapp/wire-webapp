@@ -56,7 +56,7 @@ class z.ViewModel.list.StartUIViewModel
 
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.BOOLEAN.SEARCHED_FOR_PEOPLE, true
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTACTS.ENTERED_SEARCH
-          by_username_only: query.startWith '@'
+          by_username_only: query.startsWith '@'
     , 300
 
     @user = @user_repository.self
