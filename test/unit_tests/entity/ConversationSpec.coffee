@@ -78,6 +78,10 @@ describe 'Conversation', ->
       verified_client_et = new z.client.Client()
       verified_client_et.meta.is_verified true
 
+      self_user_et = new z.entity.User()
+      self_user_et.devices.push verified_client_et
+      conversation_et.self = self_user_et
+
       user_et = new z.entity.User()
       user_et.devices.push unverified_client_et
       user_et.devices.push verified_client_et
@@ -92,6 +96,10 @@ describe 'Conversation', ->
     it 'is verified when all users are verified', ->
       verified_client_et = new z.client.Client()
       verified_client_et.meta.is_verified true
+
+      self_user_et = new z.entity.User()
+      self_user_et.devices.push verified_client_et
+      conversation_et.self = self_user_et
 
       user_et = new z.entity.User()
       user_et.devices.push verified_client_et
