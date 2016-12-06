@@ -390,6 +390,8 @@ class z.ViewModel.list.StartUIViewModel
   show_invite_bubble: =>
     return if @invite_bubble?
 
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_GENERIC_INVITE_MENU
+
     self = @user_repository.self()
 
     if self.email()
@@ -450,6 +452,8 @@ class z.ViewModel.list.StartUIViewModel
     if @selected_people().length is 1
       return @conversation_repository.get_one_to_one_conversation @selected_people()[0]
       .then (conversation_et) =>
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_ONE_TO_ONE_CONVERSATION,
+          source: 'top_user'
         @click_on_group conversation_et
         callback conversation_et if _.isFunction callback
 
@@ -457,15 +461,14 @@ class z.ViewModel.list.StartUIViewModel
 
     @conversation_repository.create_new_conversation user_ids, null
     .then (conversation_et) =>
-      @logger.log @logger.levels.INFO, "Created new conversation with ID: #{conversation_et.id}"
       @properties_repository.save_preference_has_created_conversation()
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION,
         {creationContext: 'search', numberOfParticipants: user_ids.length}
       @click_on_group conversation_et
       callback conversation_et if _.isFunction callback
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "Unable to create conversation: #{error.message}"
       @_close_list()
+      throw new Error "Unable to create conversation: #{error.message}"
 
   on_audio_call: =>
     @on_submit_search (conversation_et) ->
