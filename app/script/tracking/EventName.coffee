@@ -39,6 +39,12 @@ z.tracking.EventName =
     JOINED_CALL: 'calling.joined_call'
     RECEIVED_CALL: 'calling.received_call'
     SHARED_SCREEN: 'calling.shared_screen'
+  CONNECT:
+    SENT_CONNECT_REQUEST: 'connect.sent_connect_request'
+    SELECTED_USER_FROM_SEARCH: 'connect.selected_user_from_search'
+    OPENED_ONE_TO_ONE_CONVERSATION: 'connect.opened_one_to_one_conversation'
+    OPENED_GROUP_CONVERSATION: 'connect.opened_group_conversation'
+    OPENED_GENERIC_INVITE_MENU: 'connect.opened_generic_invite_menu'
   CONTACTS:
     ENTERED_SEARCH: 'contacts.entered_search'
   CONVERSATION:

@@ -104,6 +104,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.SET_USERNAME,
           length: entered_username.length
+          num_of_attempts: 1
 
         e.target.blur()
         window.setTimeout =>

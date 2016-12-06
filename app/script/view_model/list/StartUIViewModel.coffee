@@ -254,7 +254,9 @@ class z.ViewModel.list.StartUIViewModel
   click_on_group: (conversation_et) =>
     Promise.resolve().then =>
       if conversation_et instanceof z.entity.User
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_ONE_TO_ONE_CONVERSATION, source: 'search'
         return @conversation_repository.get_one_to_one_conversation conversation_et
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_GROUP_CONVERSATION
       return conversation_et
     .then (conversation_et) =>
       if conversation_et.is_archived()
@@ -263,6 +265,9 @@ class z.ViewModel.list.StartUIViewModel
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
 
   click_on_other: (user_et, e) =>
+
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SELECTED_USER_FROM_SEARCH,
+      connection_type: 0 # TODO proper type
 
     create_bubble = (element_id) =>
       @user_profile user_et
@@ -340,8 +345,12 @@ class z.ViewModel.list.StartUIViewModel
     @_close_list()
     @user_repository.accept_connection_request user_et, true
 
-  on_user_connect: =>
+  on_user_connect: (user_et) =>
     @_close_list()
+
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST,
+      context: 'startui'
+      user_et.mutual_friends_total()
 
   on_user_ignore: (user_et) =>
     @user_repository.ignore_connection_request user_et

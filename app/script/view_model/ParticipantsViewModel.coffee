@@ -226,6 +226,10 @@ class z.ViewModel.ParticipantsViewModel
   connect: (user_et) =>
     @participants_bubble.hide()
 
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST,
+      context: 'participants'
+      user_et.mutual_friends_total()
+
   pending: (user_et) =>
     on_success = => @participants_bubble.hide()
 
