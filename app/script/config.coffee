@@ -74,11 +74,21 @@ z.config =
   # Maximum characters per message
   MAXIMUM_MESSAGE_LENGTH: 8000
 
-  SUPPORTED_IMAGE_TYPES: [
+  SUPPORTED_PROFILE_IMAGE_TYPES: [
+    '.jpg-large',
     'image/jpg',
     'image/jpeg',
     'image/png',
     'image/bmp'
+  ]
+
+  SUPPORTED_CONVERSATION_IMAGE_TYPES: [
+    '.jpg-large',
+    'image/jpg',
+    'image/jpeg',
+    'image/png',
+    'image/bmp',
+    'image/gif'
   ]
 
   MINIMUM_USERNAME_LENGTH: 2

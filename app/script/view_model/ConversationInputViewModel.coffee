@@ -166,7 +166,7 @@ class z.ViewModel.ConversationInputViewModel
 
     for file in dropped_files
       switch
-        when file.type in ['.jpg-large', 'image/jpeg', 'image/png', 'image/bmp', 'image/gif']
+        when file.type in z.config.SUPPORTED_CONVERSATION_IMAGE_TYPES
           images.push file
         else
           files.push file
