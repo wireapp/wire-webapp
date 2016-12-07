@@ -21,6 +21,7 @@ ko.bindingHandlers.drop_file =
   init: (element, valueAccessor, allBindings, data, context) ->
     fileDragOver = (data, e) ->
       e.preventDefault()
+      e.originalEvent.dataTransfer.dropEffect = 'copy'
       e.currentTarget.classList.add 'drag-hover'
 
     fileDragLeave = (data, e) ->
