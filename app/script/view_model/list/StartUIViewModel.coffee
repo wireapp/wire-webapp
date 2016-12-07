@@ -391,6 +391,7 @@ class z.ViewModel.list.StartUIViewModel
     return if @invite_bubble?
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_GENERIC_INVITE_MENU
+      context: 'banner'
 
     self = @user_repository.self()
 
