@@ -193,11 +193,13 @@ class z.ViewModel.ConversationInputViewModel
 
   _is_hitting_upload_limit: (files) =>
     pending_uploads = @conversation_repository.get_number_of_pending_uploads()
-    if pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS
+    is_hitting_upload_limit = pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS
+
+    if is_hitting_upload_limit
       amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_PARALLEL,
         data: z.config.MAXIMUM_ASSET_UPLOADS
-      return false
-    return true
+
+    return is_hitting_upload_limit
 
   scroll_message_list: (list_height_new, list_height_old) ->
     $('.message-list').data('antiscroll')?.rebuild()
