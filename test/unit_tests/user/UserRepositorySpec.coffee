@@ -254,20 +254,24 @@ describe 'z.user.UserRepository', ->
 
       it 'resolves with username when username is not taken', (done) ->
         usernames = ['john_doe']
-        server.respondWith 'GET', "#{test_factory.settings.connection.rest_url}/users?handles=#{usernames[0]}", [404, {}, '']
+        server.respondWith 'POST', "#{test_factory.settings.connection.rest_url}/users/handles", [
+          200,
+          'Content-Type': 'application/json',
+          JSON.stringify usernames
+        ]
 
         user_repository.verify_usernames usernames
         .then (_usernames) ->
-          expect(_usernames).toBe usernames
+          expect(_usernames).toEqual usernames
           done()
         .catch done.fail
 
       it 'rejects when username is taken', (done) ->
         usernames = ['john_doe']
-        server.respondWith 'GET', "#{test_factory.settings.connection.rest_url}/users?handles=#{usernames[0]}", [
+        server.respondWith 'POST', "#{test_factory.settings.connection.rest_url}/users/handles", [
           200,
-          {'Content-Type': 'application/json'},
-          JSON.stringify([{handle: usernames[0]}])
+          'Content-Type': 'application/json',
+          JSON.stringify []
         ]
 
         user_repository.verify_usernames usernames

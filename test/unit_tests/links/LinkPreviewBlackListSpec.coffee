@@ -14,10 +14,14 @@ describe 'is_blacklisted', ->
     url = 'spotify.com'
     expect(z.links.LinkPreviewBlackList.is_blacklisted(url)).toBeTruthy()
 
+  it 'should return true if link is soundcloud', ->
+    url = 'soundcloud.com'
+    expect(z.links.LinkPreviewBlackList.is_blacklisted(url)).toBeTruthy()
+
   it 'should return true if link is vimeo', ->
     url = 'vimeo.com'
     expect(z.links.LinkPreviewBlackList.is_blacklisted(url)).toBeTruthy()
 
-  it 'should return false if link is spotify', ->
+  it 'should return false if link is wire.com', ->
     url = 'wire.com'
     expect(z.links.LinkPreviewBlackList.is_blacklisted(url)).toBeFalsy()

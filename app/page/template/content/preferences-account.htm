@@ -20,7 +20,8 @@
                    data-bind="textInput: username, event: {input: verify_username, keypress: check_username_input, blur: reset_username_input}, enter: change_username, hasFocus: should_focus_username()"
                    data-uie-name="enter-username"
                    maxlength="21"
-                   spellcheck="false" />
+                   spellcheck="false"
+                   autocomplete="off" />
             <span class="preferences-account-input-icon" data-bind="css: username_saved() ? 'checkmark' : 'preferences-account-input-icon-edit'"></span>
             <!-- ko ifnot: username_error() -->
               <div class="preferences-account-username-hint text-graphite font-size-xs"
