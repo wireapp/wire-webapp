@@ -63,7 +63,7 @@ class z.conversation.ConversationRepository
     @sorted_conversations = ko.pureComputed =>
       @filtered_conversations().sort z.util.sort_groups_by_last_event
 
-    @sending_queue = new z.conversation.SendingQueue()
+    @sending_queue = new z.util.PromiseQueue()
     @sending_queue.pause()
 
     @conversation_service.client.request_queue_blocked_state.subscribe (state) =>

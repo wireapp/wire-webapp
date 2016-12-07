@@ -21,10 +21,10 @@ SENDING_QUEUE_UNBLOCK_INTERVAL = 60 * 1000
 window.z ?= {}
 z.conversation ?= {}
 
-class z.conversation.SendingQueue
+class z.util.PromiseQueue
 
   constructor: ->
-    @logger = new z.util.Logger 'z.conversation.SendingQueue', z.config.LOGGER.OPTIONS
+    @logger = new z.util.Logger 'z.util.PromiseQueue', z.config.LOGGER.OPTIONS
 
     @_promises = []
     @_queue = []
@@ -60,19 +60,21 @@ class z.conversation.SendingQueue
         return if @_paused
         @_blocked = false
         window.clearInterval @_interval
-        @logger.log @logger.levels.ERROR, 'Sending of message from queue failed, unblocking queue', @_queue
+        @logger.log @logger.levels.ERROR, 'Promise queue failed, unblocking queue', @_queue
         @execute()
       , SENDING_QUEUE_UNBLOCK_INTERVAL
 
-      queue_entry.function()
+      return queue_entry.function()
       .catch (error) ->
         queue_entry.reject error
       .then (response) =>
         queue_entry.resolve response
         window.clearInterval @_interval
         @_blocked = false
-        @_queue.shift()
-        @execute()
+        window.setTimeout =>
+          @_queue.shift()
+          @execute()
+        , 0
 
   ###
   Pause or resume the execution.

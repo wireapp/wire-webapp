@@ -27,27 +27,7 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
     @prekeys = {}
     @sessions = {}
 
-    @sessions_handled = 0
-    @sessions_promises = []
-    @sessions_total = 0
-    @sessions_queue = ko.observableArray []
-
-    @sessions_queue.subscribe (sessions) =>
-      if sessions.length > 0
-        @_deserialize_session @sessions_queue()[0]
-        .then (session) =>
-          if session
-            @logger.log @logger.levels.INFO, "De-serialized session '#{@sessions_queue()[0].id}'", session
-          @sessions_handled++
-          if @sessions_handled % 5 is 0
-            replace = [@sessions_handled, @sessions_total]
-            amplify.publish z.event.WebApp.APP.UPDATE_INIT,  z.string.init_sessions_progress, false, replace
-          window.setTimeout =>
-            @sessions_queue.shift()
-          , 0
-      else
-        @logger.log @logger.levels.INFO, "De-serialized '#{Object.keys(@sessions).length}' sessions", @sessions
-        @sessions_promises[0] @sessions
+    @sessions_queue = new z.util.PromiseQueue()
 
 
   ###############################################################################
@@ -136,15 +116,27 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
     return new Promise (resolve, reject) =>
       @storage_service.get_all @storage_service.OBJECT_STORE_SESSIONS
       .then (sessions) =>
-        @sessions_total = sessions.length
-        amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_sessions_expectation, true, [@sessions_total]
-        if @sessions_total > 0
-          @logger.log @logger.levels.INFO, "Loaded '#{@sessions_total}' sessions from storage"
-          @sessions_queue sessions
-          @sessions_promises = [resolve, reject]
-        else
-          @logger.log @logger.levels.INFO, 'No sessions found in storage'
-          resolve @sessions
+        amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_sessions_expectation, true, [sessions.length]
+        if sessions.length
+          @logger.log @logger.levels.INFO, "Loaded '#{sessions.length}' sessions from storage"
+          handled_sessions = 0
+
+          _push_session = (session) => @sessions_queue.push =>
+            @_deserialize_session session
+            .then (session) =>
+              if session
+                @logger.log @logger.levels.INFO, "De-serialized session '#{session.id}'", session
+              handled_sessions++
+              if handled_sessions % 5 is 0
+                amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_sessions_progress, false, [handled_sessions, sessions.length]
+
+        return Promise.all (_push_session session for session in sessions)
+          .then =>
+            @logger.log @logger.levels.INFO, "De-serialized '#{Object.keys(@sessions).length}' sessions", @sessions
+            resolve @sessions
+
+        @logger.log @logger.levels.INFO, 'No sessions found in storage'
+        resolve @sessions
       .catch (error) =>
         @logger.log @logger.levels.WARN, "Failed to load sessions from storage: #{error.message}", error
         reject error
