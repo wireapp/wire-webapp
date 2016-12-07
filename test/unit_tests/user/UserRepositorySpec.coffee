@@ -256,7 +256,7 @@ describe 'z.user.UserRepository', ->
         usernames = ['john_doe']
         server.respondWith 'POST', "#{test_factory.settings.connection.rest_url}/users/handles", [
           200,
-          {'Content-Type': 'application/json'},
+          'Content-Type': 'application/json',
           JSON.stringify usernames
         ]
 
@@ -270,7 +270,7 @@ describe 'z.user.UserRepository', ->
         usernames = ['john_doe']
         server.respondWith 'POST', "#{test_factory.settings.connection.rest_url}/users/handles", [
           200,
-          {'Content-Type': 'application/json'},
+          'Content-Type': 'application/json',
           JSON.stringify []
         ]
 
