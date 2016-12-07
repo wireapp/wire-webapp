@@ -174,7 +174,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
     if input_picture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE
       return @_show_upload_warning warning_file_size, callback
 
-    if not input_picture.type in z.config.SUPPORTED_IMAGE_TYPES
+    if not input_picture.type in z.config.SUPPORTED_PROFILE_IMAGE_TYPES
       return @_show_upload_warning warning_file_format, callback
 
     max_width = z.config.MINIMUM_PROFILE_IMAGE_SIZE.WIDTH
