@@ -80,6 +80,7 @@ class z.main.App
     repository.cache               = new z.cache.CacheRepository()
     repository.cryptography        = new z.cryptography.CryptographyRepository @service.cryptography, repository.storage
     repository.giphy               = new z.extension.GiphyRepository @service.giphy
+    repository.media               = new z.media.MediaRepository repository.audio
 
     repository.client              = new z.client.ClientRepository @service.client, repository.cryptography
     repository.user                = new z.user.UserRepository @service.user, @service.asset, @service.search, repository.client, repository.cryptography
@@ -99,7 +100,7 @@ class z.main.App
     )
 
     repository.bot                 = new z.bot.BotRepository @service.bot, repository.conversation
-    repository.call_center         = new z.calling.CallCenter @service.call, repository.conversation, repository.user, repository.audio
+    repository.call_center         = new z.calling.CallCenter @service.call, repository.audio, repository.conversation, repository.media, repository.user
     repository.event_tracker       = new z.tracking.EventTrackingRepository repository.user, repository.conversation
     repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.call_center, repository.conversation
 
@@ -110,7 +111,7 @@ class z.main.App
     view = {}
 
     view.main                      = new z.ViewModel.MainViewModel 'wire-main', @repository.user
-    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.search, @repository.user, @repository.properties
+    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.audio, @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.media, @repository.search, @repository.user, @repository.properties
     view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user, @repository.properties
     view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'

@@ -17,11 +17,22 @@
 #
 
 window.z ?= {}
-z.calling ?= {}
-z.calling.enum ?= {}
+z.media ?= {}
 
-z.calling.enum.MediaDeviceType =
-  AUDIO_INPUT: 'audioinput'
-  AUDIO_OUTPUT: 'audiooutput'
-  SCREEN_INPUT: 'screeninput'
-  VIDEO_INPUT: 'videoinput'
+# Media Repository
+class z.media.MediaRepository
+  ###
+  Extended check for MediaDevices support of browser.
+  @param conversation_id [String] Conversation ID
+  @return [Boolean] True if MediaDevices are supported
+  ###
+  @supports_media_devices: ->
+    return z.util.Environment.browser.supports.media_devices
+
+  # Construct a new MediaDevices repository.
+  constructor: (@audio_repository) ->
+    @logger = new z.util.Logger 'z.media.MediaRepository', z.config.LOGGER.OPTIONS
+
+    @devices_handler = new z.media.MediaDevicesHandler @
+    @element_handler = new z.media.MediaElementHandler()
+    @stream_handler = new z.media.MediaStreamHandler @, @audio_repository

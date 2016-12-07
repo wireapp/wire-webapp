@@ -40,14 +40,14 @@ class z.calling.entities.Call
     @timer_start = undefined
     @duration_time = ko.observable 0
     @finished_reason = z.calling.enum.CallFinishedReason.UNKNOWN
-    @remote_media_type = ko.observable z.calling.enum.MediaType.NONE
+    @remote_media_type = ko.observable z.media.MediaType.NONE
 
     @is_connected = ko.observable false
     @is_group = @conversation_et.is_group
     @is_remote_screen_shared = ko.pureComputed =>
-      return @remote_media_type() is z.calling.enum.MediaType.SCREEN
+      return @remote_media_type() is z.media.MediaType.SCREEN
     @is_remote_videod = ko.pureComputed =>
-      return @remote_media_type() is z.calling.enum.MediaType.VIDEO
+      return @remote_media_type() is z.media.MediaType.VIDEO
 
     @self_client_joined = ko.observable false
     @self_user_joined = ko.observable false
@@ -214,13 +214,13 @@ class z.calling.entities.Call
         participant_et.state.videod state.videod if state.videod?
 
         if state.screen_shared
-          @remote_media_type z.calling.enum.MediaType.SCREEN
+          @remote_media_type z.media.MediaType.SCREEN
           media_type_updated = true
         else if state.videod
-          @remote_media_type z.calling.enum.MediaType.VIDEO
+          @remote_media_type z.media.MediaType.VIDEO
           media_type_updated = true
 
-    @remote_media_type z.calling.enum.MediaType.AUDIO if not media_type_updated
+    @remote_media_type z.media.MediaType.AUDIO if not media_type_updated
 
   # Ignore a call.
   ignore: =>

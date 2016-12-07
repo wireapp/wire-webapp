@@ -22,7 +22,7 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.ContentViewModel
-  constructor: (element_id, @call_center, @client_repository, @conversation_repository, @cryptography_repository, @giphy_repository, @search_repository, @user_repository, @properties_repository) ->
+  constructor: (element_id, @audio_repository, @call_center, @client_repository, @conversation_repository, @cryptography_repository, @giphy_repository, @media_repository, @search_repository, @user_repository, @properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS
 
     # state
@@ -34,9 +34,9 @@ class z.ViewModel.content.ContentViewModel
 
     # nested view models
     @call_shortcuts =             new z.ViewModel.CallShortcutsViewModel @call_center
-    @video_calling =              new z.ViewModel.VideoCallingViewModel 'video-calling', @call_center, @user_repository, @conversation_repository, @multitasking
+    @video_calling =              new z.ViewModel.VideoCallingViewModel 'video-calling', @call_center, @conversation_repository, @media_repository, @user_repository, @multitasking
     @connect_requests =           new z.ViewModel.content.ConnectRequestsViewModel 'connect-requests', @user_repository
-    @conversation_titlebar =      new z.ViewModel.ConversationTitlebarViewModel 'conversation-titlebar', @conversation_repository, @call_center, @multitasking
+    @conversation_titlebar =      new z.ViewModel.ConversationTitlebarViewModel 'conversation-titlebar', @call_center, @conversation_repository, @multitasking
     @conversation_input =         new z.ViewModel.ConversationInputViewModel 'conversation-input', @conversation_repository, @user_repository
     @message_list =               new z.ViewModel.MessageListViewModel 'message-list', @conversation_repository, @user_repository
     @participants =               new z.ViewModel.ParticipantsViewModel 'participants', @user_repository, @conversation_repository, @search_repository
@@ -44,7 +44,7 @@ class z.ViewModel.content.ContentViewModel
     @detail_view =                new z.ViewModel.ImageDetailViewViewModel 'detail-view'
 
     @preferences_account =        new z.ViewModel.content.PreferencesAccountViewModel 'preferences-account', @client_repository, @user_repository
-    @preferences_av =             new z.ViewModel.content.PreferencesAVViewModel 'preferences-av', @call_center
+    @preferences_av =             new z.ViewModel.content.PreferencesAVViewModel 'preferences-av', @audio_repository, @media_repository
     @preferences_device_details = new z.ViewModel.content.PreferencesDeviceDetailsViewModel 'preferences-devices', @client_repository, @conversation_repository, @cryptography_repository
     @preferences_devices =        new z.ViewModel.content.PreferencesDevicesViewModel 'preferences-devices', @preferences_device_details, @client_repository, @conversation_repository, @cryptography_repository
     @preferences_options =        new z.ViewModel.content.PreferencesOptionsViewModel 'preferences-options', @properties_repository

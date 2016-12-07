@@ -17,23 +17,19 @@
 #
 
 window.z ?= {}
-z.calling ?= {}
-z.calling.handler ?= {}
+z.media ?= {}
 
 # MediaElement handler
-class z.calling.handler.MediaElementHandler
-  ###
-  Construct a new MediaElement handler.
-  @param call_center [z.calling.CallCenter] Call center with references to all other handlers
-  ###
-  constructor: (@call_center) ->
-    @logger = new z.util.Logger 'z.calling.handler.MediaElementHandler', z.config.LOGGER.OPTIONS
+class z.media.MediaElementHandler
+  # Construct a new MediaElement handler.
+  constructor: ->
+    @logger = new z.util.Logger 'z.media.MediaElementHandler', z.config.LOGGER.OPTIONS
 
     @remote_media_elements = ko.observableArray []
 
   ###
   Add MediaElement for new stream.
-  @param media_stream_info [z.calling.payload.MediaStreamInfo] MediaStream information
+  @param media_stream_info [z.media.MediaStreamInfo] MediaStream information
   ###
   add_media_element: (media_stream_info) =>
     remote_media_element = @_create_media_element media_stream_info
@@ -62,7 +58,7 @@ class z.calling.handler.MediaElementHandler
   Create a new media element.
 
   @private
-  @param media_stream_info [z.calling.payload.MediaStreamInfo] MediaStream information
+  @param media_stream_info [z.media.MediaStreamInfo] MediaStream information
   @return [HTMLMediaElement] HTMLMediaElement of type HTMLAudioElement that has the stream attached to it
   ###
   _create_media_element: (media_stream_info) ->

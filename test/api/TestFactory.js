@@ -42,6 +42,19 @@ window.TestFactory = function (logger_level) {
 
 /**
  *
+ * @returns {Promise<z.audio.AudioRepository>}
+ */
+window.TestFactory.prototype.exposeAudioActors = function () {
+  var self = this;
+  return new Promise(function (resolve) {
+    window.audio_repository = new z.audio.AudioRepository();
+    window.audio_repository.logger.level = self.settings.logging_level;
+    resolve(window.audio_repository);
+  });
+};
+
+/**
+ *
  * @returns {Promise<z.auth.AuthRepository>}
  */
 window.TestFactory.prototype.exposeAuthActors = function () {
@@ -246,24 +259,42 @@ window.TestFactory.prototype.exposeConversationActors = function () {
 
 /**
  *
+ * @returns {Promise<z.media.MediaRepository>}
+ */
+window.TestFactory.prototype.exposeMediaActors = function () {
+  var self = this;
+  return new Promise(function (resolve) {
+    self.exposeAudioActors().then(function () {
+      window.media_repository = new z.media.MediaRepository(window.audio_repository);
+      window.media_repository.logger.level = self.settings.logging_level;
+
+      window.media_repository.devices_handler.logger.level = self.settings.logging_level;
+      window.media_repository.stream_handler.logger.level = self.settings.logging_level;
+      window.media_repository.element_handler.logger.level = self.settings.logging_level;
+      resolve(window.call_center);
+    });
+  });
+};
+
+/**
+ *
  * @returns {Promise<z.calling.CallCenter>}
  */
 window.TestFactory.prototype.exposeCallingActors = function () {
   var self = this;
   return new Promise(function (resolve) {
-    self.exposeConversationActors().then(function () {
-      window.call_service = new z.calling.CallService(self.client);
-      window.call_service.logger.level = self.settings.logging_level;
+    self.exposeMediaActors().then(function() {
+      self.exposeConversationActors().then(function () {
+        window.call_service = new z.calling.CallService(self.client);
+        window.call_service.logger.level = self.settings.logging_level;
 
-      window.call_center = new z.calling.CallCenter(window.call_service, window.conversation_repository, window.user_repository);
-      window.call_center.logger.level = self.settings.logging_level;
+        window.call_center = new z.calling.CallCenter(window.call_service, window.audio_repository, window.conversation_repository, window.media_repository, window.user_repository);
+        window.call_center.logger.level = self.settings.logging_level;
 
-      window.call_center.media_devices_handler.logger.level = self.settings.logging_level;
-      window.call_center.media_stream_handler.logger.level = self.settings.logging_level;
-      window.call_center.media_element_handler.logger.level = self.settings.logging_level;
-      window.call_center.state_handler.logger.level = self.settings.logging_level;
-      window.call_center.signaling_handler.logger.level = self.settings.logging_level;
-      resolve(window.call_center);
+        window.call_center.state_handler.logger.level = self.settings.logging_level;
+        window.call_center.signaling_handler.logger.level = self.settings.logging_level;
+        resolve(window.call_center);
+      });
     });
   });
 };
@@ -313,18 +344,5 @@ window.TestFactory.prototype.exposeAnnounceActors = function () {
     window.announce_repository = new z.announce.AnnounceRepository(window.announce_service);
     window.announce_repository.logger.level = self.settings.logging_level;
     resolve(window.announce_repository);
-  });
-};
-
-/**
- *
- * @returns {Promise<z.audio.AudioRepository>}
- */
-window.TestFactory.prototype.exposeAudioActors = function () {
-  var self = this;
-  return new Promise(function (resolve) {
-    window.audio_repository = new z.audio.AudioRepository();
-    window.audio_repository.logger.level = self.settings.logging_level;
-    resolve(window.audio_repository);
   });
 };
