@@ -1144,6 +1144,20 @@ class z.conversation.ConversationRepository
     return user_client_map
 
   ###
+  Map a user client maps.
+
+  @private
+  @param user_client_map [Object]
+  @param callback [Function]
+  ###
+  _map_user_client_map: (user_client_map, callback) ->
+    result = []
+    for user_id, client_ids of user_client_map
+      for client_id in client_ids
+        result.push callback(user_id, client_id)
+    return result
+
+  ###
   Update image message with given event data
   @param conversation_et [z.entity.Conversation] Conversation image was sent in
   @param event_json [JSON] Image event containing updated information after sending
@@ -2117,16 +2131,11 @@ class z.conversation.ConversationRepository
       return Promise.resolve payload
 
     @logger.log @logger.levels.INFO, "Adding payload for missing clients of '#{Object.keys(user_client_map).length}' users", user_client_map
-    save_promises = []
-
     @cryptography_repository.encrypt_generic_message user_client_map, generic_message, payload
     .then (updated_payload) =>
       payload = updated_payload
-      for user_id, client_ids of user_client_map
-        for client_id in client_ids
-          save_promises.push @user_repository.add_client_to_user user_id, new z.client.Client {id: client_id}
-
-      return Promise.all save_promises
+      return Promise.all @_map_user_client_map user_client_map, (user_id, client_id) ->
+        return @user_repository.add_client_to_user user_id, new z.client.Client {id: client_id}
     .then ->
       return payload
 
