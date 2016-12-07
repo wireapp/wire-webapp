@@ -227,16 +227,18 @@ class z.user.UserService
 
   ###
   Get a set of users for the given usernames
-  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
+  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandles
   @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
   @param usernames [Array]
+  @param amount [Number] amount of usernames to return
   ###
-  get_users_by_username: (usernames) ->
-    @client.send_request
-      type: 'GET'
-      url: @client.create_url @URL_USERS
+  check_usernames: (usernames, amount = 1) ->
+    @client.send_json
+      type: 'POST'
+      url: @client.create_url '/users/handles'
       data:
-        handles: usernames.join ','
+        handles: usernames
+        'return': amount
 
   ###
   Get a set of users.

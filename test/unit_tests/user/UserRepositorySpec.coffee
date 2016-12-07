@@ -254,7 +254,11 @@ describe 'z.user.UserRepository', ->
 
       it 'resolves with username when username is not taken', (done) ->
         usernames = ['john_doe']
-        server.respondWith 'GET', "#{test_factory.settings.connection.rest_url}/users?handles=#{usernames[0]}", [404, {}, '']
+        server.respondWith 'GET', "#{test_factory.settings.connection.rest_url}/users?handles=#{usernames[0]}", [
+          200,
+          {'Content-Type': 'application/json'},
+          JSON.stringify(usernames)
+        ]
 
         user_repository.verify_usernames usernames
         .then (_usernames) ->
@@ -267,7 +271,7 @@ describe 'z.user.UserRepository', ->
         server.respondWith 'GET', "#{test_factory.settings.connection.rest_url}/users?handles=#{usernames[0]}", [
           200,
           {'Content-Type': 'application/json'},
-          JSON.stringify([{handle: usernames[0]}])
+          JSON.stringify([])
         ]
 
         user_repository.verify_usernames usernames

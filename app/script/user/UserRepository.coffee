@@ -561,19 +561,18 @@ class z.user.UserRepository
   Tries to generate a username suggestion
   ###
   get_username_suggestion: ->
-    @should_set_username = true
     suggestions = null
 
     Promise.resolve().then =>
       suggestions = z.user.UserHandleGenerator.create_suggestions @self().name()
       @verify_usernames suggestions
     .then (valid_suggestions) =>
+      @should_set_username = true
       @self().username valid_suggestions[0]
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
-        @self().username suggestions[0]
-      else
-        throw new Error "Failed to get a suggestion: #{error.message}"
+        @should_set_username = false
+      throw error
 
   ###
   Change username.
@@ -597,14 +596,7 @@ class z.user.UserRepository
   @param username [Array] New user name
   ###
   verify_usernames: (usernames) ->
-    @user_service.get_users_by_username usernames
-    .then (response) ->
-      taken_usernames = (user.handle for user in response)
-      return _.difference usernames, taken_usernames
-    .catch (error) ->
-      if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
-        return usernames
-      throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
+    @user_service.check_usernames usernames
 
   ###
   Verify that username is unique.
