@@ -1148,13 +1148,15 @@ class z.conversation.ConversationRepository
 
   @private
   @param user_client_map [Object]
-  @param callback [Function]
+  @param client_callback [Function] Function to be executed on clients first
+  @param user_callback [Function] Function to be executed on users at the end
   ###
-  _map_user_client_map: (user_client_map, callback) ->
+  _map_user_client_map: (user_client_map, client_callback, user_callback) ->
     result = []
     for user_id, client_ids of user_client_map
       for client_id in client_ids
-        result.push callback(user_id, client_id)
+        result.push client_callback user_id, client_id
+      result.push user_callback user_id if user_callback
     return result
 
   ###
@@ -2110,59 +2112,98 @@ class z.conversation.ConversationRepository
   _handle_client_mismatch: (conversation_id, client_mismatch, generic_message, payload) =>
     Promise.resolve()
     .then =>
-      if not _.isEmpty client_mismatch.redundant
-        @logger.log @logger.levels.DEBUG, 'Message contains redundant clients', client_mismatch.redundant
-        return @_handle_client_mismatch_obsolete client_mismatch.redundant, conversation_id, payload
-      return payload
+      return @_handle_client_mismatch_redundant client_mismatch.redundant, payload, conversation_id
     .then (updated_payload) =>
-      if not _.isEmpty client_mismatch.deleted
-        @logger.log @logger.levels.DEBUG, 'Message contains deleted clients', client_mismatch.deleted
-        return @_handle_client_mismatch_obsolete client_mismatch.deleted, false, updated_payload
-      return updated_payload
+      return @_handle_client_mismatch_deleted client_mismatch.deleted, updated_payload
     .then (updated_payload) =>
-      if payload and not _.isEmpty client_mismatch.missing
-        @logger.log @logger.levels.DEBUG, 'Message is missing payload for clients', client_mismatch.missing
-        return @_handle_client_mismatch_missing client_mismatch.missing, generic_message, updated_payload
-      return updated_payload
+      return @_handle_client_mismatch_missing client_mismatch.missing, updated_payload, generic_message
 
-  _handle_client_mismatch_missing: (user_client_map, generic_message, payload) ->
+  ###
+  Handle the deleted client mismatch.
+
+  @note Contains clients of which the backend is sure that they should not be recipient of a message and verified they no longer exist.
+  @private
+  @param user_client_map [Object] User client map containing redundant clients
+  @param payload [Object] Optional payload of the failed request
+  @return [Promise] Promise that resolves with the rewritten payload
+  ###
+  _handle_client_mismatch_deleted: (user_client_map, payload) ->
+    if _.isEmpty user_client_map
+      @logger.log @logger.levels.INFO, 'No deleted clients that need to be removed'
+      return Promise.resolve payload
+    @logger.log @logger.levels.DEBUG, "Message contains deleted clients of '#{Object.keys(user_client_map).length}' users", user_client_map
+
+    _remove_deleted_client = (user_id, client_id) =>
+      delete payload.recipients[user_id][client_id] if payload
+      return @user_repository.remove_client_from_user user_id, client_id
+
+    _remove_deleted_user = (user_id) ->
+      if payload and Object.keys(payload.recipients[user_id]).length is 0
+        delete payload.recipients[user_id]
+
+    return Promise.all @_map_user_client_map user_client_map, _remove_deleted_client, _remove_deleted_user
+    .then ->
+      return payload
+
+  ###
+  Handle the missing client mismatch.
+
+  @private
+  @param user_client_map [Object] User client map containing redundant clients
+  @param payload [Object] Optional payload of the failed request
+  @param generic_message [z.proto.GenericMessage] Protubuffer message to be sent
+  @return [Promise] Promise that resolves with the rewritten payload
+  ###
+  _handle_client_mismatch_missing: (user_client_map, payload, generic_message) ->
     if _.isEmpty user_client_map
       @logger.log @logger.levels.INFO, 'No missing clients that need to be added'
       return Promise.resolve payload
+    if not payload
+      return Promise.resolve payload
+    @logger.log @logger.levels.DEBUG, "Message is missing clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
-    @logger.log @logger.levels.INFO, "Adding payload for missing clients of '#{Object.keys(user_client_map).length}' users", user_client_map
     @cryptography_repository.encrypt_generic_message user_client_map, generic_message, payload
     .then (updated_payload) =>
       payload = updated_payload
-      return Promise.all @_map_user_client_map user_client_map, (user_id, client_id) ->
+
+      _add_missing_client = (user_id, client_id) =>
         return @user_repository.add_client_to_user user_id, new z.client.Client {id: client_id}
+
+      return Promise.all @_map_user_client_map user_client_map, _add_missing_client
     .then ->
       return payload
 
-  _handle_client_mismatch_obsolete: (user_client_map, conversation_id, payload) ->
+  ###
+  Handle the redundant client mismatch.
+
+  @note Contains clients of which the backend is sure that they should not be recipient of a message but cannot say whether they exist.
+    Normally only contains clients of users no longer participating in a conversation.
+    Sometimes clients of the self user are listed. Thus we cannot remove the payload for all the clients of a user without checking.
+  @private
+  @param user_client_map [Object] User client map containing redundant clients
+  @param payload [Object] Optional payload of the failed request
+  @param conversation_id [String] ID of conversation the message was sent in
+  @return [Promise] Promise that resolves with the rewritten payload
+  ###
+  _handle_client_mismatch_redundant: (user_client_map, payload, conversation_id) ->
     if _.isEmpty user_client_map
-      @logger.log @logger.levels.INFO, 'No obsolete clients that need to be removed'
+      @logger.log @logger.levels.INFO, 'No redundant clients that need to be removed'
       return Promise.resolve payload
+    @logger.log @logger.levels.DEBUG, "Message contains redundant clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
     conversation_et = @get_conversation_by_id conversation_id if conversation_id
 
-    delete_promises = []
-    for user_id, client_ids of user_client_map
-      if conversation_et
-        conversation_et.participating_user_ids.remove user_id
-      else
-        for client_id in client_ids
-          delete payload.recipients[user_id][client_id] if payload
-          delete_promises.push @user_repository.remove_client_from_user user_id, client_id
+    _remove_redundant_client = (user_id, client_id) ->
+      delete payload.recipients[user_id][client_id] if payload
 
-      if payload and (conversation_id or Object.keys(payload.recipients[user_id]).length is 0)
+    _remove_redundant_user = (user_id) ->
+      conversation_et.participating_user_ids.remove user_id if conversation_et
+      if payload and Object.keys(payload.recipients[user_id]).length is 0
         delete payload.recipients[user_id]
 
-    if conversation_et
-      @update_participating_user_ets conversation_et
-
-    return Promise.all delete_promises
-    .then ->
+    return Promise.all @_map_user_client_map user_client_map, _remove_redundant_client, _remove_redundant_user
+    .then =>
+      @update_participating_user_ets conversation_et if conversation_et
       return payload
 
   ###
