@@ -460,7 +460,7 @@ class z.user.UserRepository
     return @users()
       .filter (user_et) ->
         return false if not user_et.connected()
-        return z.util.compare_names(user_et.name(), query) or user_et.username() is query or user_et.email() is query
+        return user_et.matches query
       .sort (user_a, user_b) ->
         name_a = user_a.name().toLowerCase()
         name_b = user_b.name().toLowerCase()

@@ -125,3 +125,10 @@ class z.entity.User
 
   remove_client: (client_id) =>
     @devices.remove (client_et) -> client_et.id is client_id
+
+  ###
+  Check whether username, name or email matches the given query
+  @param query [String]
+  ###
+  matches: (query) =>
+    return z.util.compare_names(@name(), query) or @username() is query or @email() is query
