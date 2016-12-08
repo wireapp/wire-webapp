@@ -58,4 +58,4 @@ class z.ViewModel.list.TakeoverViewModel
 
   on_link_click: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.OPENED_USERNAME_FAQ
-    return false
+    return true

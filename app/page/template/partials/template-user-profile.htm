@@ -6,7 +6,7 @@
       <div class="user-profile-header">
         <div class="name popover-title ellipsis" data-bind="text: user().name(), attr: {'data-uie-uid': user().id, 'data-uie-value': user().name()}" data-uie-name="status-user"></div>
         <div class="username popover-meta label-username" data-bind="text: user().username(), attr: {'data-uie-value': user().name()}" data-uie-name="status-username"></div>
-        <!-- ko if: !user().connected() && user().id-->
+        <!-- ko if: !user().connected() && user().id && !user().is_me -->
           <common-contacts class="popover-meta" data-uie-name="status-user-contacts" params="user: user()"></common-contacts>
         <!-- /ko -->
         <!-- ko if: conversation && conversation().is_group() -->
