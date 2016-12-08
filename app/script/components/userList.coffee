@@ -93,7 +93,8 @@ class z.components.UserListViewModel
       @is_selected = (user_et) =>
         return user_et in @user_selected()
 
-    @get_common_contacts_caption = (total) ->
+    @get_common_contacts_caption = (user_et) ->
+      total = user_et.mutual_friends_total()
       locale_id = if total > 1 then z.string.search_friends_in_common else z.string.search_friend_in_common
       return z.localization.Localizer.get_text
         id: locale_id
@@ -128,7 +129,7 @@ ko.components.register 'user-list',
                           <span class="search-list-item-content-username label-username" data-bind="text: $data.username"></span>
                         <!-- /ko -->
                         <!-- ko if: !$data.connected() && $data.mutual_friends_total() > 0 -->
-                          <span class="search-list-item-content-friends" data-bind="function() {$parent.get_common_contacts_caption($data.mutual_friends_total())}"></span>
+                          <span class="search-list-item-content-friends" data-bind="text: $parent.get_common_contacts_caption($data)"></span>
                         <!-- /ko -->
                       </div>
                     <!-- /ko -->
