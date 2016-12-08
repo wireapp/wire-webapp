@@ -141,16 +141,6 @@ class z.client.ClientService
       return client_record
 
   ###
-  Loads a persisted clients from the database for given user id.
-  @param user_id [String]
-  @return [Promise<Array>] Promise that resolves with an array of client records
-  ###
-  load_clients_from_db_by_user_id: (user_id) ->
-    return @storage_service.get_keys @storage_service.OBJECT_STORE_CLIENTS, user_id
-    .then (primary_keys) =>
-      return @load_clients_from_db primary_keys
-
-  ###
   Loads persisted clients from the database.
   @param primary_keys [Array<String>] Primary keys used to find clients in the database
   @return [Promise<JSON|String>] Promise that resolves with the clients' payloads or the primary keys if not found
