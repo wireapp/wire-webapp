@@ -434,14 +434,6 @@ z.util.sort_user_by_first_name = (user_a, user_b) ->
   return 0
 
 
-z.util.sort_user_by_name = (user_a, user_b) ->
-  name_a = user_a.name().toLowerCase()
-  name_b = user_b.name().toLowerCase()
-  return -1 if name_a < name_b
-  return 1 if name_a > name_b
-  return 0
-
-
 z.util.remove_line_breaks = (string) ->
   string.replace /(\r\n|\n|\r)/gm, ''
 

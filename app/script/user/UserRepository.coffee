@@ -452,18 +452,21 @@ class z.user.UserRepository
         callback? known_user_ets.concat user_ets
 
   ###
-  Get user by name.
-  @param name [String] Name to search user for
+  Search for user.
+  @param query [String] Find user using name, username or email
   @return [Array<z.entity.User>] Matching users
   ###
-  get_user_by_name: (name) =>
-    user_ets = []
-
-    for user_et in @users()
-      if user_et.connected() and (user_et.email() is name or z.util.compare_names user_et.name(), name)
-        user_ets.push user_et
-
-    return user_ets.sort z.util.sort_user_by_name
+  search_for_connected_users: (query) =>
+    return @users()
+      .filter (user_et) ->
+        return false if not user_et.connected()
+        return z.util.compare_names(user_et.name(), query) or user_et.username() is query or user_et.email() is query
+      .sort (user_a, user_b) ->
+        name_a = user_a.name().toLowerCase()
+        name_b = user_b.name().toLowerCase()
+        return -1 if name_a < name_b
+        return 1 if name_a > name_b
+        return 0
 
   ###
   Is the user the logged in user.
