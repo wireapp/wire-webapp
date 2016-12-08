@@ -34,12 +34,12 @@ class z.ViewModel.list.StartUIViewModel
     @logger = new z.util.Logger 'z.ViewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS
 
     @search = _.debounce (query) =>
-      query = query.trim()
+      query = query.trim().replace /^[@]/, ''
       if query
         @clear_search_results()
 
         # contacts
-        @search_results.contacts @user_repository.get_user_by_name query
+        @search_results.contacts @user_repository.search_for_connected_users query
 
         # search for groups
         @search_results.groups @conversation_repository.get_groups_by_name query
