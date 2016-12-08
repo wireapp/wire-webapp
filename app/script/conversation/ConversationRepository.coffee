@@ -705,7 +705,8 @@ class z.conversation.ConversationRepository
         placeholder: '%tag'
         content: tag
 
-    z.util.load_url_blob url, (blob) =>
+    z.util.load_url_blob url
+    .then (blob) =>
       @send_message message, conversation_et
       @upload_images conversation_et, [blob]
     .then ->
