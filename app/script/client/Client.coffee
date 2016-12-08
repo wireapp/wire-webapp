@@ -23,6 +23,7 @@ class z.client.Client
   constructor: (payload) ->
     # Preserved data from the backend
     @[member] = payload[member] for member of payload
+    @model = payload.model or '?'
 
     # Maintained meta data by us
     @meta =
