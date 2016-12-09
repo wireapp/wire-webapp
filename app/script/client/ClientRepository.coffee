@@ -81,17 +81,6 @@ class z.client.ClientRepository
     @client_service.get_client_by_id client_id
 
   ###
-  Load all clients of a given user from the database.
-  @param user_id [String] ID of user to retrieve clients for
-  @return [Promise] Promise that resolves with all the known client entities for that user
-  ###
-  get_clients_from_db: (user_id) =>
-    @client_service.load_clients_from_db_by_user_id user_id
-    .then (clients_payload) =>
-      client_ets = @client_mapper.map_clients clients_payload
-      return client_ets
-
-  ###
   Loads a client from the database (if it exists).
   @return [Promise<z.client.Client>] Promise that resolves with the local client
   ###
