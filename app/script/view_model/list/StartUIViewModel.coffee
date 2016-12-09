@@ -57,6 +57,7 @@ class z.ViewModel.list.StartUIViewModel
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.BOOLEAN.SEARCHED_FOR_PEOPLE, true
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTACTS.ENTERED_SEARCH,
           by_username_only: query.startsWith '@'
+          context: 'startui'
     , 300
 
     @user = @user_repository.self
@@ -254,9 +255,9 @@ class z.ViewModel.list.StartUIViewModel
   click_on_group: (conversation_et) =>
     Promise.resolve().then =>
       if conversation_et instanceof z.entity.User
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_ONE_TO_ONE_CONVERSATION, source: 'search'
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, conversation_type: 'one_to_one'
         return @conversation_repository.get_one_to_one_conversation conversation_et
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_GROUP_CONVERSATION
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, conversation_type: 'group'
       return conversation_et
     .then (conversation_et) =>
       if conversation_et.is_archived()
@@ -267,7 +268,12 @@ class z.ViewModel.list.StartUIViewModel
   click_on_other: (user_et, e) =>
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SELECTED_USER_FROM_SEARCH,
-      connection_type: 0 # TODO proper type
+      connection_type: switch user_et.connection().status()
+        when z.user.ConnectionStatus.ACCEPTED then 'connected'
+        when z.user.ConnectionStatus.UNKNOWN then 'unconnected'
+        when z.user.ConnectionStatus.PENDING then 'pending_incoming'
+        when z.user.ConnectionStatus.SENT then 'pending_outgoing'
+      context: 'startui'
 
     create_bubble = (element_id) =>
       @user_profile user_et
@@ -350,7 +356,7 @@ class z.ViewModel.list.StartUIViewModel
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST,
       context: 'startui'
-      user_et.mutual_friends_total()
+      common_users_count: user_et.mutual_friends_total()
 
   on_user_ignore: (user_et) =>
     @user_repository.ignore_connection_request user_et
