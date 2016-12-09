@@ -39,6 +39,7 @@ before_install:
   - export CHROME_BIN=/usr/bin/google-chrome
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
+  - npm install -g wire-webapp-core@0.1.0
 
 notifications:
   email: false
@@ -103,6 +104,5 @@ deploy:
       branch: prod
 
 after_script:
-  - npm install wire-webapp-core@0.1.0
   - chmod ugo+x ./bin/deployment_notification.js
   - node ./bin/deployment_notification.js
