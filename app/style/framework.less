@@ -24,7 +24,7 @@
   left: 0;
   bottom: 0;
   width: 100%;
-  min-width: @screen-md-min;
+  min-width: @screen-xs;
   background-color: @app-bg;
 
   .left {
@@ -39,6 +39,11 @@
     @media (min-width: @screen-lg-min) {
       width: @left-fluid-width;
     }
+
+    // Small
+    @media (max-width: @screen-sm-max) {
+      display: none;
+    }
   }
 
   .right {
@@ -51,6 +56,11 @@
     // Large
     @media (min-width: @screen-lg-min) {
       left: @left-fluid-width;
+    }
+
+    // Small
+    @media (max-width: @screen-sm-max) {
+      left: 0;
     }
   }
 }
