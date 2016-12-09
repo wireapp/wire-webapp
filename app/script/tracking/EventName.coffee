@@ -91,7 +91,7 @@ z.tracking.EventName =
     RESENT_EMAIL_VERIFICATION: 'registration.resent_email_verification'
     SUCCEEDED: 'registration.succeeded'
   SETTINGS:
-    ENTERED_USERNAME: 'settings.entered_username'
+    EDITED_USERNAME: 'settings.edited_username'
     REMOVED_DEVICE: 'settings.removed_device'
     SET_USERNAME: 'settings.set_username'
     VIEWED_DEVICE: 'settings.viewed_device'

@@ -82,6 +82,9 @@ class z.ViewModel.content.PreferencesAccountViewModel
     return true if e.charCode is 0 # FF sends charCode 0 when pressing backspace
     return z.user.UserHandleGenerator.validate_character String.fromCharCode(e.charCode) # automation is missing key prop
 
+  click_on_username: ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.EDITED_USERNAME
+
   change_username: (username, e) =>
     entered_username = e.target.value
 
@@ -91,9 +94,6 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
     if entered_username is @self_user().username()
       e.target.blur()
-
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.ENTERED_USERNAME,
-      length: entered_username.length
 
     @submitted_username entered_username
     @user_repository.change_username entered_username
