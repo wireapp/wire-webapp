@@ -617,7 +617,7 @@ class z.media.MediaStreamHandler
   ###
   _toggle_stream_enabled: (media_type, media_stream, state_observable) ->
     Promise.resolve()
-    .then ->
+    .then =>
       state_observable not state_observable()
       media_stream_track = (@_get_media_tracks media_stream, media_type)[0]
       if media_type is z.media.MediaType.AUDIO
