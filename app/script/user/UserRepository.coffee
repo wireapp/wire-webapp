@@ -624,20 +624,21 @@ class z.user.UserRepository
   @param picture [String, Object] New user picture
   ###
   change_picture: (picture) ->
-    @_set_picture_v2 picture
+    @_set_picture_v2 picture, false
     @_set_picture_v3 picture
 
   ###
   Set the profile image using v2 api.
   @deprecated
   @param picture [String, Object] New user picture
+  @param update [Boolean] update user entity
   ###
-  _set_picture_v2: (picture) ->
+  _set_picture_v2: (picture, update = true) ->
     @asset_service.upload_profile_image @self().id, picture
     .then (upload_response) =>
       @user_service.update_own_user_profile {picture: upload_response}
       .then =>
-        @user_update {user: {id: @self().id, picture: upload_response}}
+        @user_update {user: {id: @self().id, picture: upload_response}} if update
     .catch (error) ->
       throw new Error "Error during profile image upload: #{error.message}"
 
