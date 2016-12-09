@@ -572,9 +572,18 @@ class z.user.UserRepository
     .then (valid_suggestions) =>
       @should_set_username = true
       @self().username valid_suggestions[0]
+
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME,
+        outcome: 'success'
+        num_of_attempts: 1
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         @should_set_username = false
+
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME,
+        outcome: 'faile'
+        num_of_attempts: 1
+
       throw error
 
   ###
