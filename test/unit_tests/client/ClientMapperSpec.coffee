@@ -97,10 +97,19 @@ describe 'z.client.ClientMapper', ->
         meta:
           is_verified: true
 
+      serialized_payload =
+        client_payload =
+          class: 'desktop'
+          id: '66d0515a23a0ef25'
+          meta:
+            is_verified: true
+          label: '?'
+          model: '?'
+
       client_et = mapper.map_client client_payload
       client_json = client_et.to_json()
 
-      expect(client_json).toEqual client_payload
+      expect(client_json).toEqual serialized_payload
 
   describe 'map_clients', ->
     it 'can map a multiple clients at once', ->
@@ -113,7 +122,7 @@ describe 'z.client.ClientMapper', ->
       expect(client_ets[1].is_permanent()).toBeTruthy()
 
   describe 'update_client', ->
-    it 'can map changes into a client', ->   
+    it 'can map changes into a client', ->
       initial_client_et = mapper.map_client entities.clients.john_doe.plain
       client_payload = entities.clients.john_doe.permanent
 
