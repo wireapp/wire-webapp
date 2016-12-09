@@ -581,7 +581,7 @@ class z.user.UserRepository
         @should_set_username = false
 
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME,
-        outcome: 'faile'
+        outcome: 'fail'
         num_of_attempts: 1
 
       throw error
