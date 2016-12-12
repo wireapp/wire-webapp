@@ -54,10 +54,14 @@ class z.ViewModel.list.StartUIViewModel
         .catch (error) =>
           @logger.log @logger.levels.ERROR, "Error searching for contacts: #{error.message}", error
 
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.BOOLEAN.SEARCHED_FOR_PEOPLE, true
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTACTS.ENTERED_SEARCH,
-          by_username_only: query.startsWith '@'
+        @searched_for_user query
     , 300
+
+    @searched_for_user = _.once (query) ->
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.BOOLEAN.SEARCHED_FOR_PEOPLE, true
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTACTS.ENTERED_SEARCH,
+        by_username_only: query.startsWith '@'
+        context: 'startui'
 
     @user = @user_repository.self
 
@@ -254,7 +258,9 @@ class z.ViewModel.list.StartUIViewModel
   click_on_group: (conversation_et) =>
     Promise.resolve().then =>
       if conversation_et instanceof z.entity.User
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, conversation_type: 'one_to_one'
         return @conversation_repository.get_one_to_one_conversation conversation_et
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, conversation_type: 'group'
       return conversation_et
     .then (conversation_et) =>
       if conversation_et.is_archived()
@@ -263,6 +269,14 @@ class z.ViewModel.list.StartUIViewModel
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
 
   click_on_other: (user_et, e) =>
+
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SELECTED_USER_FROM_SEARCH,
+      connection_type: switch user_et.connection().status()
+        when z.user.ConnectionStatus.ACCEPTED then 'connected'
+        when z.user.ConnectionStatus.UNKNOWN then 'unconnected'
+        when z.user.ConnectionStatus.PENDING then 'pending_incoming'
+        when z.user.ConnectionStatus.SENT then 'pending_outgoing'
+      context: 'startui'
 
     create_bubble = (element_id) =>
       @user_profile user_et
@@ -340,8 +354,12 @@ class z.ViewModel.list.StartUIViewModel
     @_close_list()
     @user_repository.accept_connection_request user_et, true
 
-  on_user_connect: =>
+  on_user_connect: (user_et) =>
     @_close_list()
+
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST,
+      context: 'startui'
+      common_users_count: user_et.mutual_friends_total()
 
   on_user_ignore: (user_et) =>
     @user_repository.ignore_connection_request user_et
@@ -380,6 +398,9 @@ class z.ViewModel.list.StartUIViewModel
 
   show_invite_bubble: =>
     return if @invite_bubble?
+
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_GENERIC_INVITE_MENU
+      context: 'banner'
 
     self = @user_repository.self()
 
@@ -441,6 +462,8 @@ class z.ViewModel.list.StartUIViewModel
     if @selected_people().length is 1
       return @conversation_repository.get_one_to_one_conversation @selected_people()[0]
       .then (conversation_et) =>
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_ONE_TO_ONE_CONVERSATION,
+          source: 'top_user'
         @click_on_group conversation_et
         callback conversation_et if _.isFunction callback
 
@@ -448,15 +471,14 @@ class z.ViewModel.list.StartUIViewModel
 
     @conversation_repository.create_new_conversation user_ids, null
     .then (conversation_et) =>
-      @logger.log @logger.levels.INFO, "Created new conversation with ID: #{conversation_et.id}"
       @properties_repository.save_preference_has_created_conversation()
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION,
         {creationContext: 'search', numberOfParticipants: user_ids.length}
       @click_on_group conversation_et
       callback conversation_et if _.isFunction callback
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "Unable to create conversation: #{error.message}"
       @_close_list()
+      throw new Error "Unable to create conversation: #{error.message}"
 
   on_audio_call: =>
     @on_submit_search (conversation_et) ->
