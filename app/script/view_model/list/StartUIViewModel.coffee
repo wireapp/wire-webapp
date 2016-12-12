@@ -81,6 +81,7 @@ class z.ViewModel.list.StartUIViewModel
       @conversation_repository.sorted_conversations()
       .filter (conversation_et) -> conversation_et.type() is z.conversation.ConversationType.ONE2ONE
       .map (conversation_et) -> conversation_et.participating_user_ets()[0]
+      .filter (user_et) -> user_et?
     @connections.extend rateLimit: 500
 
     @search_results =
