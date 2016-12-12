@@ -40,6 +40,25 @@ ko.bindingHandlers.drop_file =
         drop: fileSelectHandler
     , context
 
+# capture pasted files
+ko.bindingHandlers.paste_file =
+  init: (element, valueAccessor, allBindings, data, context) ->
+
+    on_paste = (data, event) ->
+      # TODO detect feature
+      files = [].slice.call event.originalEvent.clipboardData.items
+        .filter (item) -> item.type isnt 'text/plain'
+        .map (item) -> item.getAsFile()
+
+      if files.length > 0
+        valueAccessor() files
+        event.preventDefault()
+
+    ko.applyBindingsToNode window,
+      event:
+        paste: on_paste
+    , context
+
 # blockes the default behaviour when dropping a file on the element
 # if an element inside that element is listening to drag events, than this will be triggered after
 ko.bindingHandlers.ignore_drop_file =
