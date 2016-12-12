@@ -1108,12 +1108,14 @@ class z.ViewModel.AuthViewModel
   @private
   ###
   _validate_email: (mode) ->
-    if not @username().length
+    username = @username().trim().toLowerCase()
+
+    if not username.length
       @_add_error z.string.auth_error_email_missing, z.auth.AuthView.TYPE.EMAIL
     else if mode is z.auth.AuthView.MODE.ACCOUNT_PASSWORD
-      if not z.util.is_valid_email(@username()) and not z.util.is_valid_phone_number @username()
+      if not z.util.is_valid_email(username) and not z.util.is_valid_phone_number username
         @_add_error z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL
-    else if not z.util.is_valid_email @username()
+    else if not z.util.is_valid_email username
       @_add_error z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL
 
   ###
