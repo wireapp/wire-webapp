@@ -160,8 +160,8 @@ class z.ViewModel.ConversationInputViewModel
     @conversation_repository.upload_files @conversation_et(), files
 
   on_paste_files: (pasted_files) =>
-    @show_paste_dialog true
     @pasted_file pasted_files[0]
+    @show_paste_dialog true
 
   on_send_pasted_files: =>
     pasted_file = @pasted_file()

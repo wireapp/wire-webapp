@@ -45,12 +45,14 @@ ko.bindingHandlers.paste_file =
   init: (element, valueAccessor, allBindings, data, context) ->
 
     on_paste = (data, event) ->
-      # TODO detect feature
-      files = [].slice.call event.originalEvent.clipboardData.items
-        .filter (item) -> item.type isnt 'text/plain'
-        .map (item) -> item.getAsFile()
+      items = [].slice.call event.originalEvent.clipboardData.items
 
-      console.debug files
+      # TODO detect feature, get file name, type (always 'image/png' in Chrome?!?!)
+      files = items
+        .filter (item) -> item.kind is 'file'
+        .map (item) -> new File [item.getAsFile()], 'dummy', type: item.type or 'application/octet-stream'
+        .filter (item) -> item?
+
       if files.length > 0
         valueAccessor() files
         event.preventDefault()

@@ -102,13 +102,13 @@
   <!-- ko if: show_paste_dialog -->
     <div class="conversation-input-paste-modal">
       <div class="controls-left"></div>
-      <div class="controls-center label-xs">
-        <span class="controls-right-button icon-file"></span>
-        <span data-bind=""></span>
+      <div class="controls-center">
+        <span class="conversation-input-paste-icon icon-file"></span>
+        <span data-bind="text: pasted_file().name"></span>
       </div>
       <div class="controls-right">
-        <span class="icon-close" data-bind="click: on_send_pasted_files"></span>
-        <span class="icon-check" data-bind="click: on_cancel_pasted_files"></span>
+        <span class="controls-right-button icon-close" data-bind="click: on_cancel_pasted_files"></span>
+        <span class="controls-right-button icon-check" data-bind="click: on_send_pasted_files"></span>
       </div>
     </div>
   <!-- /ko -->
