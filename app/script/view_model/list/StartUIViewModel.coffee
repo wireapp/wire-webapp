@@ -258,15 +258,15 @@ class z.ViewModel.list.StartUIViewModel
   click_on_group: (conversation_et) =>
     Promise.resolve().then =>
       if conversation_et instanceof z.entity.User
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, conversation_type: 'one_to_one'
         return @conversation_repository.get_one_to_one_conversation conversation_et
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, conversation_type: 'group'
       return conversation_et
     .then (conversation_et) =>
       if conversation_et.is_archived()
         @conversation_repository.unarchive_conversation conversation_et
       @_close_list()
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION,
+        conversation_type: if conversation_et.is_group() then 'group' else 'one_to_one'
 
   click_on_other: (user_et, e) =>
 
