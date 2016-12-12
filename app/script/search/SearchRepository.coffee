@@ -86,7 +86,7 @@ class z.search.SearchRepository
   Trim and remove @.
   @param query [String]
   ###
-  normalize_search_query: (query) =>
+  normalize_search_query: (query) ->
     return query.trim().replace /^[@]/, ''
 
   ###
