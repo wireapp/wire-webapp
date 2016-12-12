@@ -213,7 +213,6 @@ z.string.de.modal_uploads_parallel = 'Du kannst bis zu %no Dateien auf einmal se
 # Connection requests
 z.string.de.connection_request_connect = 'Kontakt hinzufügen'
 z.string.de.connection_request_ignore = 'Ignorieren'
-z.string.de.connection_request_message = 'Hallo %@.first_name,\nbitte füge mich als Kontakt hinzu.\n%s.first_name'
 
 # Conversation
 z.string.de.conversation_you_nominative = 'du'
@@ -289,13 +288,20 @@ z.string.de.conversations_popover_notify = 'Benachrichtigen'
 z.string.de.conversations_popover_silence = 'Stummschalten'
 z.string.de.conversations_popover_unarchive = 'Dearchivieren'
 
+# Takeover
+z.string.de.takeover_headline = 'Benutzernamen sind da.'
+z.string.de.takeover_sub = 'Sichere dir deinen persönlichen Benutzernamen auf Wire.'
+z.string.de.takeover_link = 'Erfahre mehr'
+z.string.de.takeover_button_choose = 'Wähle deinen eigenen'
+z.string.de.takeover_button_keep = 'Behalte diesen'
+
 # Invites
 z.string.de.invite_meta_key_mac = 'Cmd'
 z.string.de.invite_meta_key_pc = 'Strg'
 z.string.de.invite_hint_selected = 'Zum Kopieren %meta_key + C drücken'
 z.string.de.invite_hint_unselected = 'Markieren und %meta_key + C drücken'
 z.string.de.invite_headline = 'Lade Freunde zu Wire ein'
-z.string.de.invite_message = 'Ich bin bei Wire. Suche nach %mail \noder gehe auf https://get.wire.com, um mich als Kontakt hinzuzufügen.'
+z.string.de.invite_message = 'Ich benutze Wire. Suche nach %username oder gehe auf wire.com/download.'
 z.string.de.invite_message_no_email = 'Ich bin bei Wire. Gehe auf https://get.wire.com, um mich als Kontakt hinzuzufügen.'
 
 # Extensions
@@ -400,6 +406,9 @@ z.string.de.preferences_account_reset_password = 'Passwort zurücksetzen'
 z.string.de.preferences_account_delete = 'Benutzerkonto löschen'
 z.string.de.preferences_account_log_out = 'Abmelden'
 z.string.de.preferences_account_username_placeholder = 'Dein vollständiger Name'
+z.string.de.preferences_account_username_hint = 'Mindestens zwei Zeichen. a—z, 0—9, und _.'
+z.string.de.preferences_account_username_available = 'Verfügbar'
+z.string.de.preferences_account_username_error_taken = 'Bereits vergeben'
 
 z.string.de.preferences_av_camera = 'Kamera'
 z.string.de.preferences_av_microphone = 'Mikrofon'
@@ -452,9 +461,8 @@ z.string.de.search_top_people = 'Top Kontakte'
 z.string.de.search_try_search = 'Finde Kontakte nach Namen oder\nihrer vollständigen E-Mail-Adresse'
 z.string.de.search_no_contacts_on_wire = 'Du hast keine Kontakte auf Wire.\nSuch nach Namen oder vollständigen\nE-Mail-Adressen'
 z.string.de.search_others = 'Suchergebnisse'
-z.string.de.search_suggestion_one = 'Kennt %@.first_name'
-z.string.de.search_suggestion_two = 'Kennt %@.first_name und %@.other_name'
-z.string.de.search_suggestion_many = 'Kennt %@.first_name und %no weitere'
+z.string.de.search_friend_in_common = '%no gemeinsamer Freund'
+z.string.de.search_friends_in_common = '%no gemeinsame Freunde'
 
 # Picture upload
 z.string.de.upload_welcome = 'Wire ist so viel schöner mit einem Bild.'
@@ -487,6 +495,7 @@ z.string.de.url_support_mic_access_denied = 'https://support.wire.com/hc/de/arti
 z.string.de.url_support_mic_not_found = 'https://support.wire.com/hc/de/articles/202970662'
 z.string.de.url_support_screen_access_denied = 'https://support.wire.com/hc/de/articles/202935412'
 z.string.de.url_support_screen_whitelist = 'https://support.wire.com/hc/de/articles/209423889'
+z.string.de.url_support_usernames = 'https://wire.com/support/username'
 z.string.de.url_decrypt_error_1 = 'https://wire.com/privacy/error-1/?hl=de'
 z.string.de.url_decrypt_error_2 = 'https://wire.com/privacy/error-2/?hl=de'
 

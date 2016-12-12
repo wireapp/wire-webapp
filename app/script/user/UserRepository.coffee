@@ -597,10 +597,8 @@ class z.user.UserRepository
       @should_set_username = false
       @self().username username
     .catch (error) ->
-      if error.code is z.service.BackendClientError::STATUS_CODE.CONFLICT
+      if error.code in [z.service.BackendClientError::STATUS_CODE.CONFLICT, z.service.BackendClientError::STATUS_CODE.BAD_REQUEST]
         throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
-      if error.code is z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
-        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
   ###
@@ -622,7 +620,7 @@ class z.user.UserRepository
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         return username
       if error.code is z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
-        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
+        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
     .then (username) ->
       if username

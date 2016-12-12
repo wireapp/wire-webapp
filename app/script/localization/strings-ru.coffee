@@ -211,7 +211,6 @@ z.string.ru.modal_uploads_parallel = 'Вы можете отправить до 
 # Connection requests
 z.string.ru.connection_request_connect = 'Связаться'
 z.string.ru.connection_request_ignore = 'Игнорировать'
-z.string.ru.connection_request_message = 'Привет, %@.first_name.\nДавай свяжемся в Wire.\n%s.first_name'
 
 # Conversation
 z.string.ru.conversation_you_nominative = 'вы'
@@ -287,13 +286,15 @@ z.string.ru.conversations_popover_notify = 'Включить уведомлен�
 z.string.ru.conversations_popover_silence = 'Выключить уведомления'
 z.string.ru.conversations_popover_unarchive = 'Разархивировать'
 
+# Takeover
+z.string.ru.takeover_link = 'Подробнее'
+
 # Invites
 z.string.ru.invite_meta_key_mac = 'Cmd'
 z.string.ru.invite_meta_key_pc = 'Ctrl'
 z.string.ru.invite_hint_selected = 'Нажмите %meta_key + C для копирования'
 z.string.ru.invite_hint_unselected = 'Выделите и нажмите %meta_key + C'
 z.string.ru.invite_headline = 'Пригласите людей в Wire'
-z.string.ru.invite_message = 'Я использую Wire. Введи в поиске %mail или перейди на https://get.wire.com, чтобы связаться со мной.'
 z.string.ru.invite_message_no_email = 'Я использую Wire. Перейди на https://get.wire.com, чтобы связаться со мной.'
 
 # Extensions
@@ -450,9 +451,6 @@ z.string.ru.search_top_people = 'Топ-контакты'
 z.string.ru.search_try_search = 'Ищите людей по имени\nили адресу электронной почты'
 z.string.ru.search_no_contacts_on_wire = 'У вас нет контактов в Wire.\nПопробуйте найти людей по имени\nили адресу электронной почты'
 z.string.ru.search_others = 'Подключиться'
-z.string.ru.search_suggestion_one = 'Знает %@.first_name'
-z.string.ru.search_suggestion_two = 'Знает %@.first_name и %@.other_name'
-z.string.ru.search_suggestion_many = 'Знает %@.first_name и %no других'
 
 # Picture upload
 z.string.ru.upload_welcome = 'Wire выглядит лучше с вашей фотографией.'

@@ -287,13 +287,16 @@ z.string.cs.conversations_popover_notify = 'Zapnout zvuk'
 z.string.cs.conversations_popover_silence = 'Ztlumit'
 z.string.cs.conversations_popover_unarchive = 'Obnovit'
 
+# Takeover
+z.string.cs.takeover_link = 'Dozvědět se více'
+
 # Invites
 z.string.cs.invite_meta_key_mac = 'Cmd'
 z.string.cs.invite_meta_key_pc = 'Ctrl'
 z.string.cs.invite_hint_selected = 'Stiskněte %meta_key + C pro kopírování'
 z.string.cs.invite_hint_unselected = 'Vybrat a stisknout %meta_key + C'
 z.string.cs.invite_headline = 'Pozvat lidi do aplikace Wire'
-z.string.cs.invite_message = 'Jsem k zastižení na síti Wire. Najdete mne pod %mail nebo navštivte https://get.wire.com.'
+z.string.cs.invite_message = 'Jsem k zastižení na síti Wire. Najdete mne pod %username nebo navštivte https://get.wire.com.'
 z.string.cs.invite_message_no_email = 'Jsem k zastižení na síti Wire. K navázání kontaktu navštivte https://get.wire.com.'
 
 # Extensions
