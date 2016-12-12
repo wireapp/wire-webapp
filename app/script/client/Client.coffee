@@ -20,7 +20,7 @@ window.z ?= {}
 z.client ?= {}
 
 class z.client.Client
-  constructor: (payload) ->
+  constructor: (payload = {}) ->
     if payload.address
       @class = payload.class or '?'
       @label = payload.label or '?'
