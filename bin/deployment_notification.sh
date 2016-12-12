@@ -26,5 +26,5 @@ SECRETS[0]="${JENKINSBOT_SECRET_FOR_RELEASES}" # ω Webapp Releases
 # Post message to conversations
 for SECRET in "${SECRETS[@]}"
 do
-  curl -XPOST -H 'Content-Type: text/plain' ${JENKINSBOT_URL}${SECRET} -d "${MESSAGE_CONTENT}" > /dev/null
+  curl -k -XPOST -H 'Content-Type: text/plain' ${JENKINSBOT_URL}${SECRET} -d "${MESSAGE_CONTENT}" > /dev/null
 done
