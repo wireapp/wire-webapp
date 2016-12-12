@@ -108,34 +108,6 @@
 .button-round-theme-purple  {.button-round-theme-color(@w-purple);}
 
 // example:
-// <div class="button-round button-round-theme icon-plus"></div>
-//
-.button-round-theme-light {
-  .accent-background-color(12%);
-  line-height: @button-round-size;
-  border: none;
-
-  &.hover,
-  &:hover {
-    .accent-background-color(16%);
-  }
-
-  &.disabled {
-    .accent-background-color(12%);
-    border: none;
-    color: fade(@graphite-dark, 40%);
-
-    > svg {
-      .translucent;
-    }
-  }
-
-  &.toggled {
-    color: inherit;
-  }
-}
-
-// example:
 // <div class="button-round button-round-dark icon-plus"></div>
 //
 .button-round-dark {
@@ -206,9 +178,4 @@
 .button-round-lg {
   .square(@button-round-size-lg);
   line-height: @button-round-size-lg;
-}
-
-.button-round-xl {
-  .square(@button-round-size-xl);
-  line-height: @button-round-size-xl;
 }

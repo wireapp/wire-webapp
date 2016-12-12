@@ -21,7 +21,7 @@ z.ViewModel ?= {}
 
 # Parent: z.ViewModel.ConversationTitlebarViewModel
 class z.ViewModel.ConversationTitlebarViewModel
-  constructor: (element_id, @conversation_repository, @call_center, @multitasking) ->
+  constructor: (element_id, @call_center, @conversation_repository, @multitasking) ->
     @logger = new z.util.Logger 'z.ViewModel.ConversationTitlebarViewModel', z.config.LOGGER.OPTIONS
 
     # TODO remove this for now to ensure that buttons are clickable in macOS wrappers

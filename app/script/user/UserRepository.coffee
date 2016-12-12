@@ -36,6 +36,7 @@ class z.user.UserRepository
     @connection_mapper = new z.user.UserConnectionMapper()
     @user_mapper = new z.user.UserMapper @asset_service
     @use_v3_api = false
+    @should_set_username = false
 
     @self = ko.observable()
     @users = ko.observableArray []
@@ -98,16 +99,7 @@ class z.user.UserRepository
   @return [Promise] Promise that resolves when the connection request was successfully created
   ###
   create_connection: (user_et, show_conversation = false) =>
-    return Promise.resolve()
-    .then =>
-      connect_message = z.localization.Localizer.get_text
-        id: z.string.connection_request_message
-        replace: [
-          {placeholder: '%@.first_name', content: user_et.name()}
-          {placeholder: '%s.first_name', content: @self().name()}
-        ]
-
-      @user_service.create_connection user_et.id, user_et.name(), connect_message
+    @user_service.create_connection user_et.id, user_et.name()
     .then (response) =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.CONNECT_REQUEST_SENT
       @user_connection response, show_conversation
@@ -208,7 +200,8 @@ class z.user.UserRepository
       user_ids = (user_id for user_id, client_ets of user_client_map)
       @get_users_by_id user_ids, (user_ets) =>
         for user_et in user_ets
-          @logger.log "Found '#{user_client_map[user_et.id].length}' clients for '#{user_et.name()}'", user_client_map[user_et.id]
+          log_level = if user_client_map[user_et.id].length > 8 then @logger.levels.WARN else @logger.levels.INFO
+          @logger.log log_level, "Found '#{user_client_map[user_et.id].length}' clients for '#{user_et.name()}'", user_client_map[user_et.id]
           user_et.devices user_client_map[user_et.id]
 
   # Assign connections to the users.
@@ -378,7 +371,8 @@ class z.user.UserRepository
     number_of_loaded_chunks = 0
 
     for chunk in chunks
-      @user_service.get_users chunk, (response, error) =>
+      @user_service.get_users chunk
+      .then (response) =>
         number_of_loaded_chunks += 1
         if response
           user_ets = @user_mapper.map_users_from_object response
@@ -390,6 +384,8 @@ class z.user.UserRepository
             fetched_user_ets = @_add_suspended_users user_ids, fetched_user_ets
           @save_users fetched_user_ets
           callback? fetched_user_ets
+      .catch (error) ->
+        throw error if error.code isnt z.service.BackendClientError::STATUS_CODE.NOT_FOUND
 
   ###
   Find a local user.
@@ -404,19 +400,13 @@ class z.user.UserRepository
   @return [Promise] Promise that will resolve with the self user entity
   ###
   get_me: =>
-    return new Promise (resolve, reject) =>
-      @user_service.get_own_user()
-      .then (response) =>
-        user_et = @user_mapper.map_user_from_object response
-        # TODO: This needs to be represented by a SelfUser class!
-        # Only the "self / own" user has a tracking ID & locale
-        user_et.tracking_id = response.tracking_id
-        user_et.locale = response.locale
-        @save_user user_et, true
-        resolve user_et
-      .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Unable to load self user: #{error}"
-        reject error
+    @user_service.get_own_user()
+    .then (response) =>
+      user_et = @user_mapper.map_self_user_from_object response
+      return @save_user user_et, true
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Unable to load self user: #{error}"
+      throw error
 
   ###
   Check for user locally and fetch it from the server otherwise.
@@ -463,18 +453,21 @@ class z.user.UserRepository
         callback? known_user_ets.concat user_ets
 
   ###
-  Get user by name.
-  @param name [String] Name to search user for
+  Search for user.
+  @param query [String] Find user using name, username or email
   @return [Array<z.entity.User>] Matching users
   ###
-  get_user_by_name: (name) =>
-    user_ets = []
-
-    for user_et in @users()
-      if user_et.connected() and (user_et.email() is name or z.util.compare_names user_et.name(), name)
-        user_ets.push user_et
-
-    return user_ets.sort z.util.sort_user_by_name
+  search_for_connected_users: (query) =>
+    return @users()
+      .filter (user_et) ->
+        return false if not user_et.connected()
+        return user_et.matches query
+      .sort (user_a, user_b) ->
+        name_a = user_a.name().toLowerCase()
+        name_b = user_b.name().toLowerCase()
+        return -1 if name_a < name_b
+        return 1 if name_a > name_b
+        return 0
 
   ###
   Is the user the logged in user.
@@ -514,7 +507,8 @@ class z.user.UserRepository
   ###
   update_user_by_id: (user_id) =>
     @get_user_by_id user_id, (old_user_et) =>
-      @user_service.get_user_by_id user_id, (new_user_et) =>
+      @user_service.get_user_by_id user_id
+      .then (new_user_et) =>
         @user_mapper.update_user_from_object old_user_et, new_user_et
 
   ###
@@ -554,32 +548,107 @@ class z.user.UserRepository
     @user_service.update_own_user_profile({accent_id: accent_id}).then => @self().accent_id accent_id
 
   ###
-  Change username.
-  @param name [String] New user name
+  Change name.
+  @param name [String] New name
   ###
-  change_username: (name) ->
+  change_name: (name) ->
     if name.length >= z.config.MINIMUM_USERNAME_LENGTH
       @user_service.update_own_user_profile({name: name}).then => @self().name name
+
+  ###
+  Whether the user needs to set a username.
+  ###
+  should_change_username: ->
+    return @should_set_username
+
+  ###
+  Tries to generate a username suggestion
+  ###
+  get_username_suggestion: ->
+    suggestions = null
+
+    Promise.resolve().then =>
+      suggestions = z.user.UserHandleGenerator.create_suggestions @self().name()
+      @verify_usernames suggestions
+    .then (valid_suggestions) =>
+      @should_set_username = true
+      @self().username valid_suggestions[0]
+
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME,
+        outcome: 'success'
+        num_of_attempts: 1
+    .catch (error) =>
+      if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+        @should_set_username = false
+
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME,
+        outcome: 'fail'
+        num_of_attempts: 1
+
+      throw error
+
+  ###
+  Change username.
+  @param name [String] New username
+  ###
+  change_username: (username) ->
+    @user_service.change_own_username username
+    .then =>
+      @should_set_username = false
+      @self().username username
+    .catch (error) ->
+      if error.code is z.service.BackendClientError::STATUS_CODE.CONFLICT
+        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
+      if error.code is z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
+        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
+      throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
+
+  ###
+  Verify usernames against the backend.
+  Return a list with usernames that are not taken.
+  @param username [Array] New user name
+  ###
+  verify_usernames: (usernames) ->
+    @user_service.check_usernames usernames
+
+  ###
+  Verify that username is unique.
+  Returns the username if it is not taken.
+  @param username [String] New user name
+  ###
+  verify_username: (username) ->
+    return @user_service.check_username username
+    .catch (error) ->
+      if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+        return username
+      if error.code is z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
+        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
+      throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
+    .then (username) ->
+      if username
+        return username
+      throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
 
   ###
   Change the profile image.
   @param picture [String, Object] New user picture
   ###
   change_picture: (picture) ->
-    @_set_picture_v2 picture
+    @_set_picture_v2 picture, false
     @_set_picture_v3 picture
 
   ###
   Set the profile image using v2 api.
   @deprecated
   @param picture [String, Object] New user picture
+  @param update [Boolean] update user entity
   ###
-  _set_picture_v2: (picture) ->
+  _set_picture_v2: (picture, update = true) ->
     @asset_service.upload_profile_image @self().id, picture
     .then (upload_response) =>
       @user_service.update_own_user_profile {picture: upload_response}
       .then =>
-        @user_update {user: {id: @self().id, picture: upload_response}}
+        @user_update {user: {id: @self().id, picture: upload_response}} if update
     .catch (error) ->
       throw new Error "Error during profile image upload: #{error.message}"
 
@@ -605,12 +674,13 @@ class z.user.UserRepository
   Set users default profile image.
   ###
   set_default_picture: ->
-    z.util.load_url_blob z.config.UNSPLASH_URL, (blob) =>
+    z.util.load_url_blob z.config.UNSPLASH_URL
+    .then (blob) =>
       @change_picture blob
-      .then ->
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
-          source: 'unsplash'
-          outcome: 'success'
+    .then ->
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
+        source: 'unsplash'
+        outcome: 'success'
 
   ###############################################################################
   # Tracking helpers

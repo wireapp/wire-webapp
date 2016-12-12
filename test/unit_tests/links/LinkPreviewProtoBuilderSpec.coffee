@@ -25,7 +25,7 @@ compare_article_with_mock = (url, offset, preview, mock) ->
   expect(preview.url_offset).toBe offset
   expect(preview.article.title).toBe mock.title
   expect(preview.article.permanent_url).toBe mock.url
-  expect(preview.article.summary).toBe mock.description
+  expect(preview.article.summary).toEqual mock.description or null
   expect(-> preview.toArrayBuffer()).not.toThrow()
 
 beforeAll (done) ->
@@ -41,38 +41,6 @@ describe 'build_from_open_graph_data', ->
     link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data {}
     expect(link_preview).not.toBeDefined()
 
-  it 'returns a link preview if type is "website" and title is present', ->
-    url = 'wire.com'
-    mock = OpenGraphMocks.getWireMock()
-    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url
-    compare_article_with_mock url, 0, link_preview, mock
-
-  it 'returns a link preview if type is "website" and title is present but without an image', ->
-    url = 'wire.com'
-    mock = OpenGraphMocks.getWireMock()
-    delete mock.image
-    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url
-    compare_article_with_mock url, 0, link_preview, mock
-
-  it 'returns a link preview if type is "website" and title is present', ->
-    url = 'wire.com'
-    mock = OpenGraphMocks.getWireMock()
-    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url, 12
-    compare_article_with_mock url, 12, link_preview, mock
-
-  it 'returns a link preview if type is "article" and title is present', ->
-    url = 'heise.de'
-    mock = OpenGraphMocks.getHeiseMock()
-    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url
-    compare_article_with_mock url, 0, link_preview, mock
-
-  it 'returns a link preview if type is unspecified and title is present', ->
-    url = 'heise.de'
-    mock = OpenGraphMocks.getHeiseMock()
-    delete mock.type
-    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url
-    compare_article_with_mock url, 0, link_preview, mock
-
   it 'returns undefined if title is missing', ->
     url = 'wire.com'
     mock = OpenGraphMocks.getWireMock()
@@ -80,35 +48,35 @@ describe 'build_from_open_graph_data', ->
     link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url
     expect(link_preview).not.toBeDefined()
 
-  it 'returns undefined if type is unsupported', ->
-    url = 'https://open.spotify.com/track/2pucDx5Wyz9uHCou4wntHa'
-    mock = OpenGraphMocks.getSpotifyMock()
+  it 'returns a link preview if type is "website" and title is present', ->
+    url = 'wire.com'
+    mock = OpenGraphMocks.getWireMock()
     link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url
-    expect(link_preview).not.toBeDefined()
+    compare_article_with_mock url, 0, link_preview, mock
 
-  it 'returns a link preview if type is "object"', ->
-    data =
-      description: 'wire-webapp - 👽 Wire for Web'
-      image:
-        url: 'data:image/png;base64,PLACEHOLDER'
-      site_name: 'GitHub'
-      title: 'wireapp/wire-webapp'
-      type: 'object'
-      url: 'https://github.com/wireapp/wire-webapp'
+  it 'returns a link preview if type is image is missing', ->
+    url = 'wire.com'
+    mock = OpenGraphMocks.getWireMock()
+    delete mock.image
+    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url
+    compare_article_with_mock url, 0, link_preview, mock
 
-    link = data.link
-    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data data, link
-    expect(link_preview.article.title).toBe data.title
+  it 'returns a link preview if title is present and offset is given', ->
+    url = 'wire.com'
+    mock = OpenGraphMocks.getWireMock()
+    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url, 12
+    compare_article_with_mock url, 12, link_preview, mock
+
+  it 'returns a link preview if type is missing and title is present', ->
+    url = 'heise.de'
+    mock = OpenGraphMocks.getHeiseMock()
+    delete mock.type
+    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url
+    compare_article_with_mock url, 0, link_preview, mock
 
   it 'returns a link preview even if there is no description', ->
-    data =
-      description: ''
-      image:
-        url: 'data:image/png;base64,PLACEHOLDER'
-      title: 'Superstar & Star'
-      type: 'website'
-      url: 'http://superstar.com/index.html'
-
-    link = data.link
-    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data data, link
-    expect(link_preview.article.title).toBe data.title
+    url = 'heise.de'
+    mock = OpenGraphMocks.getHeiseMock()
+    delete mock.description
+    link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data mock, url
+    compare_article_with_mock url, 0, link_preview, mock

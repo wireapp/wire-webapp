@@ -73,6 +73,9 @@ class z.conversation.ConversationMapper
   update_self_status: (conversation_et, self) ->
     return if not conversation_et?
 
+    if self.ephemeral_timer?
+      conversation_et.ephemeral_timer self.ephemeral_timer
+
     if self.status?
       conversation_et.removed_from_conversation self.status is z.conversation.ConversationStatus.PAST_MEMBER
 

@@ -63,7 +63,7 @@ class z.conversation.ConversationRepository
     @sorted_conversations = ko.pureComputed =>
       @filtered_conversations().sort z.util.sort_groups_by_last_event
 
-    @sending_queue = new z.conversation.SendingQueue()
+    @sending_queue = new z.util.PromiseQueue()
     @sending_queue.pause()
 
     @conversation_service.client.request_queue_blocked_state.subscribe (state) =>
@@ -106,7 +106,7 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
-    amplify.subscribe z.event.WebApp.CONVERSATION.STORE, @save_conversation_in_db
+    amplify.subscribe z.event.WebApp.CONVERSATION.PERSIST_STATE, @save_conversation_state_in_db
     amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
@@ -139,18 +139,18 @@ class z.conversation.ConversationRepository
 
     @fetching_conversations[conversation_id] = [callback]
 
-    @conversation_service.get_conversation_by_id conversation_id, (response, error) =>
-      if response
-        conversation_et = @conversation_mapper.map_conversation response
-        @save_conversation conversation_et
-        @logger.log @logger.levels.INFO, "Fetched conversation '#{conversation_id}' from backend"
-        callbacks = @fetching_conversations[conversation_id]
-        for callback in callbacks
-          callback? conversation_et
-        delete @fetching_conversations[conversation_id]
-      else
-        @logger.log @logger.levels.ERROR, "Failed to fetch conversation '#{conversation_id}' from backend: #{error.message}", error
-        throw error
+    @conversation_service.get_conversation_by_id conversation_id
+    .then (response) =>
+      conversation_et = @conversation_mapper.map_conversation response
+      @save_conversation conversation_et
+      @logger.log @logger.levels.INFO, "Fetched conversation '#{conversation_id}' from backend"
+      callbacks = @fetching_conversations[conversation_id]
+      for callback in callbacks
+        callback? conversation_et
+      delete @fetching_conversations[conversation_id]
+    .catch (error) =>
+      @logger.log @logger.levels.ERROR, "Failed to fetch conversation '#{conversation_id}' from backend: #{error.message}", error
+      throw error
 
   ###
   Retrieve all conversations using paging.
@@ -193,30 +193,30 @@ class z.conversation.ConversationRepository
       throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
 
   get_events: (conversation_et) ->
-    return new Promise (resolve, reject) =>
-      conversation_et.is_pending true
+    conversation_et.is_pending true
 
-      first_message = conversation_et.get_first_message()
-      upper_bound = if first_message then new Date first_message.timestamp else new Date()
+    first_message = conversation_et.get_first_message()
+    upper_bound = if first_message then new Date first_message.timestamp else new Date()
 
-      @conversation_service.load_events_from_db conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT
-      .then (events) =>
-        if events.length < z.config.MESSAGES_FETCH_LIMIT
-          conversation_et.has_further_messages false
-        if events.length is 0
-          @logger.log @logger.levels.INFO, "No events for conversation '#{conversation_et.id}' found", events
-        else if first_message
-          @logger.log @logger.levels.INFO,
-            "Loaded #{events.length} event(s) starting at '#{upper_bound.toISOString()}' for conversation '#{conversation_et.id}'", events
-        else
-          @logger.log @logger.levels.INFO,
-            "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
-        mapped_messages = @_add_events_to_conversation events: events, conversation_et
-        conversation_et.is_pending false
-        resolve mapped_messages
-      .catch (error) =>
-        @logger.log @logger.levels.INFO, "Could not load events for conversation: #{conversation_et.id}", error
-        reject error
+    @conversation_service.load_events_from_db conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT
+    .then (events) =>
+      if events.length < z.config.MESSAGES_FETCH_LIMIT
+        conversation_et.has_further_messages false
+
+      if not events.length
+        @logger.log @logger.levels.INFO, "No events for conversation '#{conversation_et.id}' found", events
+      else if first_message
+        @logger.log @logger.levels.INFO, "Loaded #{events.length} event(s) starting at '#{upper_bound.toISOString()}' for conversation '#{conversation_et.id}'", events
+      else
+        @logger.log @logger.levels.INFO, "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
+
+      mapped_messages = @_add_events_to_conversation events: events, conversation_et
+
+      conversation_et.is_pending false
+      return mapped_messages
+    .catch (error) =>
+      @logger.log @logger.levels.INFO, "Could not load events for conversation: #{conversation_et.id}", error
+      throw error
 
   ###
   Get conversation unread events.
@@ -442,10 +442,39 @@ class z.conversation.ConversationRepository
   save_conversation: (conversation_et) =>
     if not @find_conversation_by_id conversation_et.id
       @conversations.push conversation_et
-      @save_conversation_in_db conversation_et
+      @save_conversation_state_in_db conversation_et
 
-  save_conversation_in_db: (conversation_et, updated_field) =>
-    @conversation_service.save_conversation_in_db conversation_et, updated_field
+  ###
+  Persists a conversation state in the database.
+  @param conversation_et [z.entity.Conversation] Conversation of which the state should be persisted
+  @param updated_field [z.conversation.ConversationUpdateType] Optional type of updated state information
+  ###
+  save_conversation_state_in_db: (conversation_et, updated_field) =>
+    if updated_field
+      changes = switch updated_field
+        when z.conversation.ConversationUpdateType.ARCHIVED_STATE
+          {
+            archived_state: conversation_et.archived_state()
+            archived_timestamp: conversation_et.archived_timestamp()
+          }
+        when z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
+          cleared_timestamp: conversation_et.cleared_timestamp()
+        when z.conversation.ConversationUpdateType.EPHEMERAL_TIMER
+          ephemeral_timer: conversation_et.ephemeral_timer()
+        when z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
+          last_event_timestamp: conversation_et.last_event_timestamp()
+        when z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
+          last_read_timestamp: conversation_et.last_read_timestamp()
+        when z.conversation.ConversationUpdateType.MUTED_STATE
+          {
+            muted_state: conversation_et.muted_state()
+            muted_timestamp: conversation_et.muted_timestamp()
+          }
+      return @conversation_service.update_conversation_state_in_db conversation_et, changes
+      .then =>
+        @logger.log @logger.levels.INFO, "Persisted update of '#{updated_field}' to conversation '#{conversation_et.id}'"
+
+    return @conversation_service.save_conversation_state_in_db conversation_et
 
   ###
   Save conversations in the repository.
@@ -475,8 +504,7 @@ class z.conversation.ConversationRepository
     conversation_et.self = @user_repository.self()
     user_ids = conversation_et.participating_user_ids()
     @user_repository.get_users_by_id user_ids, (user_ets) ->
-      conversation_et.participating_user_ets.removeAll()
-      z.util.ko_array_push_all conversation_et.participating_user_ets, user_ets
+      conversation_et.participating_user_ets user_ets
       callback? conversation_et
     , offline
 
@@ -677,9 +705,11 @@ class z.conversation.ConversationRepository
         placeholder: '%tag'
         content: tag
 
-    z.util.load_url_blob url, (blob) =>
+    z.util.load_url_blob url
+    .then (blob) =>
       @send_message message, conversation_et
       @upload_images conversation_et, [blob]
+    .then ->
       callback?()
 
   ###
@@ -1096,7 +1126,7 @@ class z.conversation.ConversationRepository
       user_client_map = {}
 
       for user_et in user_ets
-        continue if user_et.is_me and skip_own_clients
+        continue if skip_own_clients and user_et.is_me
         user_client_map[user_et.id] = (client_et.id for client_et in user_et.devices())
 
       return user_client_map
@@ -1113,6 +1143,22 @@ class z.conversation.ConversationRepository
     user_client_map = {}
     user_client_map[user_id] = [client_id]
     return user_client_map
+
+  ###
+  Map a user client maps.
+
+  @private
+  @param user_client_map [Object]
+  @param client_callback [Function] Function to be executed on clients first
+  @param user_callback [Function] Function to be executed on users at the end
+  ###
+  _map_user_client_map: (user_client_map, client_callback, user_callback) ->
+    result = []
+    for user_id, client_ids of user_client_map
+      for client_id in client_ids
+        result.push client_callback user_id, client_id
+      result.push user_callback user_id if user_callback
+    return result
 
   ###
   Update image message with given event data
@@ -1217,7 +1263,7 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves when the message was sent
   ###
   _send_generic_message: (conversation_id, generic_message, user_ids, native_push = true) =>
-    Promise.resolve @_send_as_external_message conversation_id, generic_message
+    Promise.resolve @_should_send_as_external conversation_id, generic_message
     .then (send_as_external) =>
       if send_as_external
         @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
@@ -1307,7 +1353,7 @@ class z.conversation.ConversationRepository
   @param generic_message [z.protobuf.GenericMessage] Generic message that will be send
   @return [Boolean] Is payload likely to be too big so that we switch to type external?
   ###
-  _send_as_external_message: (conversation_id, generic_message) ->
+  _should_send_as_external: (conversation_id, generic_message) ->
     return new Promise (resolve) =>
       @get_conversation_by_id conversation_id, (conversation_et) ->
         estimated_number_of_clients = conversation_et.number_of_participants() * 4
@@ -1592,13 +1638,15 @@ class z.conversation.ConversationRepository
       connection_et = @user_repository.get_connection_by_conversation_id event.conversation
       return if connection_et?.status() is z.user.ConnectionStatus.PENDING
 
+    # Handle conversation create event separately
+    if event.type is z.event.Backend.CONVERSATION.CREATE
+      return @_on_create event
+
     # Check if conversation was archived
     @get_conversation_by_id event.conversation, (conversation_et) =>
       previously_archived = conversation_et.is_archived()
 
       switch event.type
-        when z.event.Backend.CONVERSATION.CREATE
-          @_on_create event
         when z.event.Backend.CONVERSATION.MEMBER_JOIN
           @_on_member_join conversation_et, event
         when z.event.Backend.CONVERSATION.MEMBER_LEAVE
@@ -2065,64 +2113,98 @@ class z.conversation.ConversationRepository
   _handle_client_mismatch: (conversation_id, client_mismatch, generic_message, payload) =>
     Promise.resolve()
     .then =>
-      if not _.isEmpty client_mismatch.redundant
-        @logger.log @logger.levels.DEBUG, 'Message contains redundant clients', client_mismatch.redundant
-        return @_handle_client_mismatch_obsolete client_mismatch.redundant, conversation_id, payload
-      return payload
+      return @_handle_client_mismatch_redundant client_mismatch.redundant, payload, conversation_id
     .then (updated_payload) =>
-      if not _.isEmpty client_mismatch.deleted
-        @logger.log @logger.levels.DEBUG, 'Message contains deleted clients', client_mismatch.deleted
-        return @_handle_client_mismatch_obsolete client_mismatch.deleted, false, updated_payload
-      return updated_payload
+      return @_handle_client_mismatch_deleted client_mismatch.deleted, updated_payload
     .then (updated_payload) =>
-      if payload and not _.isEmpty client_mismatch.missing
-        @logger.log @logger.levels.DEBUG, 'Message is missing payload for clients', client_mismatch.missing
-        return @_handle_client_mismatch_missing client_mismatch.missing, generic_message, updated_payload
-      return updated_payload
+      return @_handle_client_mismatch_missing client_mismatch.missing, updated_payload, generic_message
 
-  _handle_client_mismatch_missing: (user_client_map, generic_message, payload) ->
+  ###
+  Handle the deleted client mismatch.
+
+  @note Contains clients of which the backend is sure that they should not be recipient of a message and verified they no longer exist.
+  @private
+  @param user_client_map [Object] User client map containing redundant clients
+  @param payload [Object] Optional payload of the failed request
+  @return [Promise] Promise that resolves with the rewritten payload
+  ###
+  _handle_client_mismatch_deleted: (user_client_map, payload) ->
+    if _.isEmpty user_client_map
+      @logger.log @logger.levels.INFO, 'No deleted clients that need to be removed'
+      return Promise.resolve payload
+    @logger.log @logger.levels.DEBUG, "Message contains deleted clients of '#{Object.keys(user_client_map).length}' users", user_client_map
+
+    _remove_deleted_client = (user_id, client_id) =>
+      delete payload.recipients[user_id][client_id] if payload
+      return @user_repository.remove_client_from_user user_id, client_id
+
+    _remove_deleted_user = (user_id) ->
+      if payload and Object.keys(payload.recipients[user_id]).length is 0
+        delete payload.recipients[user_id]
+
+    return Promise.all @_map_user_client_map user_client_map, _remove_deleted_client, _remove_deleted_user
+    .then ->
+      return payload
+
+  ###
+  Handle the missing client mismatch.
+
+  @private
+  @param user_client_map [Object] User client map containing redundant clients
+  @param payload [Object] Optional payload of the failed request
+  @param generic_message [z.proto.GenericMessage] Protubuffer message to be sent
+  @return [Promise] Promise that resolves with the rewritten payload
+  ###
+  _handle_client_mismatch_missing: (user_client_map, payload, generic_message) ->
     if _.isEmpty user_client_map
       @logger.log @logger.levels.INFO, 'No missing clients that need to be added'
       return Promise.resolve payload
-
-    @logger.log @logger.levels.INFO, "Adding payload for missing clients of '#{Object.keys(user_client_map).length}' users", user_client_map
-    save_promises = []
+    if not payload
+      return Promise.resolve payload
+    @logger.log @logger.levels.DEBUG, "Message is missing clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
     @cryptography_repository.encrypt_generic_message user_client_map, generic_message, payload
     .then (updated_payload) =>
       payload = updated_payload
-      for user_id, client_ids of user_client_map
-        for client_id in client_ids
-          save_promises.push @user_repository.add_client_to_user user_id, new z.client.Client {id: client_id}
 
-      return Promise.all save_promises
+      _add_missing_client = (user_id, client_id) =>
+        return @user_repository.add_client_to_user user_id, new z.client.Client {id: client_id}
+
+      return Promise.all @_map_user_client_map user_client_map, _add_missing_client
     .then ->
       return payload
 
-  _handle_client_mismatch_obsolete: (user_client_map, conversation_id, payload) ->
+  ###
+  Handle the redundant client mismatch.
+
+  @note Contains clients of which the backend is sure that they should not be recipient of a message but cannot say whether they exist.
+    Normally only contains clients of users no longer participating in a conversation.
+    Sometimes clients of the self user are listed. Thus we cannot remove the payload for all the clients of a user without checking.
+  @private
+  @param user_client_map [Object] User client map containing redundant clients
+  @param payload [Object] Optional payload of the failed request
+  @param conversation_id [String] ID of conversation the message was sent in
+  @return [Promise] Promise that resolves with the rewritten payload
+  ###
+  _handle_client_mismatch_redundant: (user_client_map, payload, conversation_id) ->
     if _.isEmpty user_client_map
-      @logger.log @logger.levels.INFO, 'No obsolete clients that need to be removed'
+      @logger.log @logger.levels.INFO, 'No redundant clients that need to be removed'
       return Promise.resolve payload
+    @logger.log @logger.levels.DEBUG, "Message contains redundant clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
     conversation_et = @get_conversation_by_id conversation_id if conversation_id
 
-    delete_promises = []
-    for user_id, client_ids of user_client_map
-      if conversation_et
-        conversation_et.participating_user_ids.remove user_id
-      else
-        for client_id in client_ids
-          delete payload.recipients[user_id][client_id] if payload
-          delete_promises.push @user_repository.remove_client_from_user user_id, client_id
+    _remove_redundant_client = (user_id, client_id) ->
+      delete payload.recipients[user_id][client_id] if payload
 
-      if payload and (conversation_id or Object.keys(payload.recipients[user_id]).length is 0)
+    _remove_redundant_user = (user_id) ->
+      conversation_et.participating_user_ids.remove user_id if conversation_et
+      if payload and Object.keys(payload.recipients[user_id]).length is 0
         delete payload.recipients[user_id]
 
-    if conversation_et
-      @update_participating_user_ets conversation_et
-
-    return Promise.all delete_promises
-    .then ->
+    return Promise.all @_map_user_client_map user_client_map, _remove_redundant_client, _remove_redundant_user
+    .then =>
+      @update_participating_user_ets conversation_et if conversation_et
       return payload
 
   ###

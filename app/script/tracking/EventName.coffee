@@ -39,6 +39,13 @@ z.tracking.EventName =
     JOINED_CALL: 'calling.joined_call'
     RECEIVED_CALL: 'calling.received_call'
     SHARED_SCREEN: 'calling.shared_screen'
+  CONNECT:
+    SENT_CONNECT_REQUEST: 'connect.sent_connect_request'
+    SELECTED_USER_FROM_SEARCH: 'connect.selected_user_from_search'
+    OPENED_CONVERSATION: 'connect.opened_conversation'
+    OPENED_GENERIC_INVITE_MENU: 'connect.opened_generic_invite_menu'
+  CONTACTS:
+    ENTERED_SEARCH: 'contacts.entered_search'
   CONVERSATION:
     ADD_TO_GROUP_CONVERSATION: 'addContactToGroupConversation'
     CHARACTER_LIMIT_REACHED: 'conversation.character_limit_reached'
@@ -68,6 +75,11 @@ z.tracking.EventName =
     OPENED_TERMS: 'navigation.opened_terms'
   ONBOARDING:
     ADDED_PHOTO: 'onboarding.added_photo'
+    SEEN_USERNAME_SCREEN: 'onboarding.seen_username_screen'
+    KEPT_GENERATED_USERNAME: 'onboarding.kept_generated_username'
+    OPENED_USERNAME_SETTINGS: 'onboarding.opened_username_settings'
+    OPENED_USERNAME_FAQ: 'onboarding.opened_username_faq'
+    GENERATED_USERNAME: 'onboarding.generated_username'
   PASSWORD_RESET: 'resetPassword'
   PREFERENCES:
     IMPORTED_CONTACTS: 'preferences.imported_contacts'
@@ -78,8 +90,10 @@ z.tracking.EventName =
     RESENT_EMAIL_VERIFICATION: 'registration.resent_email_verification'
     SUCCEEDED: 'registration.succeeded'
   SETTINGS:
-    VIEWED_DEVICE: 'settings.viewed_device'
+    EDITED_USERNAME: 'settings.edited_username'
     REMOVED_DEVICE: 'settings.removed_device'
+    SET_USERNAME: 'settings.set_username'
+    VIEWED_DEVICE: 'settings.viewed_device'
   SOUND_SETTINGS_CHANGED: 'soundIntensityPreference'
   TELEMETRY:
     APP_INITIALIZATION: 'telemetry.app_initialization'

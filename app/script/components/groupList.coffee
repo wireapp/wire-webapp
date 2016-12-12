@@ -30,7 +30,6 @@ class z.components.GroupListViewModel
   constructor: (params) ->
     # parameter list
     @groups = params.groups
-    @avatar = params.avatar or false
     @on_select = params.click
 
 
@@ -40,12 +39,7 @@ ko.components.register 'group-list',
   template: """
             <div class="search-list search-list-md" data-bind="foreach: {data: groups, as: 'group'}">
               <div class="search-list-item" data-bind="click: $parent.on_select, attr: {'data-uie-uid': group.id, 'data-uie-value': group.display_name" data-uie-name="item-group">
-                <!-- ko if: $parent.avatar === true -->
-                  <user-avatar class="user-avatar-sm" params="user: $data.participating_user_ets()[0]"></user-avatar>
-                <!-- /ko  -->
-                <!-- ko if: $parent.avatar === false -->
-                   <div class="search-list-item-image"></div>
-                <!-- /ko  -->
+                <div class="search-list-item-image"></div>
                 <div class="search-list-item-header" data-bind="text: group.display_name"></div>
               </div>
             </div>

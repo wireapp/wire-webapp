@@ -23,7 +23,6 @@ z.extension ?= {}
 class z.extension.GiphyRepository
   ###
   Construct a new Giphy Repository.
-
   @param giphy_service [z.extension.GiphyService] Giphy REST API implementation
   ###
   constructor: (@giphy_service) ->
@@ -49,9 +48,9 @@ class z.extension.GiphyRepository
         if options.retry is retries
           reject new Error "Unable to fetch a proper gif within #{options.retry} retries"
 
-        @giphy_service.get_random tag: options.tag
+        @giphy_service.get_random options.tag
         .then (response) =>
-          @giphy_service.get_by_id ids: response.data.id
+          @giphy_service.get_by_id response.data.id
         .then (response) =>
           images = response.data.images
           static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL]

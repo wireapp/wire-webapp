@@ -30,9 +30,12 @@ class z.calling.handler.CallStateHandler
     @logger = new z.util.Logger 'z.calling.handler.CallStateHandler', z.config.LOGGER.OPTIONS
 
     @calls = ko.observableArray []
-    @joined_call = ko.pureComputed => return call_et for call_et in @calls() when call_et.self_client_joined()
+    @joined_call = ko.pureComputed =>
+      return if not @self_client_joined()
+      return call_et for call_et in @calls() when call_et.self_client_joined()
 
     @self_state = @call_center.media_stream_handler.self_stream_state
+    @self_client_joined = ko.observable false
 
     @block_event_handling = true
     @subscribe_to_events()
@@ -131,9 +134,9 @@ class z.calling.handler.CallStateHandler
       return if not event
 
       if joined_count >= 1
-        @_update_call event, participant_ids
+        @_update_participants event, participant_ids
         .then =>
-          @_update_self call_et, self_user_joined, client_joined_change
+          @_update_state call_et, self_user_joined, client_joined_change
       else
         # ...which has ended
         @delete_call call_et.id
@@ -335,7 +338,7 @@ class z.calling.handler.CallStateHandler
       # Reset call and delete it afterwards
       call_et.state z.calling.enum.CallState.ENDED
       call_et.reset_call()
-      @calls.remove call_et
+      @_remove_call call_et.id
       @call_center.media_stream_handler.reset_media_streams()
     .catch (error) =>
       @logger.log @logger.levels.WARN, "No call found in conversation '#{conversation_id}' to delete", error
@@ -394,6 +397,7 @@ class z.calling.handler.CallStateHandler
     @call_center.media_stream_handler.release_media_streams()
     @call_center.get_call_by_id conversation_id
     .then (call_et) =>
+      call_et.state z.calling.enum.CallState.DISCONNECTING
       if has_call_dropped
         call_et.finished_reason = z.calling.enum.CallFinishedReason.CONNECTION_DROPPED
       else
@@ -522,11 +526,20 @@ class z.calling.handler.CallStateHandler
       if @call_center.media_stream_handler.has_media_streams()
         @logger.log @logger.levels.INFO, 'MediaStream has already been initialized', @call_center.media_stream_handler.local_media_streams
       else
+        @call_center.timings().time_step z.telemetry.calling.CallSetupSteps.STREAM_REQUESTED if @call_center.timings()
         return @call_center.media_stream_handler.initiate_media_stream conversation_id, is_videod
     .then =>
+      @call_center.timings().time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED if @call_center.timings()
       return @_put_state_to_join conversation_id, @_create_state_payload(z.calling.enum.ParticipantState.JOINED), true
     .catch (error) =>
       @logger.log @logger.levels.ERROR, "Joining call in '#{conversation_id}' failed: #{error.name}", error
+
+  ###
+  Remove a call from the list.
+  @param conversation_id [String] ID of conversation for which to remove call
+  ###
+  _remove_call: (conversation_id) ->
+    @calls.remove (call_et) -> call_et.id is conversation_id
 
   ###
   Update a call with new state.
@@ -535,7 +548,7 @@ class z.calling.handler.CallStateHandler
   @param event [Object] 'call.state' event containing info to update call
   @param joined_participant_ids [Array<String>] User IDs of joined participants
   ###
-  _update_call: (event, joined_participant_ids) ->
+  _update_participants: (event, joined_participant_ids) ->
     @call_center.get_call_by_id event.conversation
     .then (call_et) =>
       @call_center.user_repository.get_users_by_id joined_participant_ids, (participant_ets) ->
@@ -554,9 +567,10 @@ class z.calling.handler.CallStateHandler
   @param user_joined_change [Boolean] Is the self user joined in the call
   @param client_joined_change [Boolean] Was the state of the client changed
   ###
-  _update_self: (call_et, self_user_joined, client_joined_change) ->
+  _update_state: (call_et, self_user_joined, client_joined_change) ->
     call_et.self_user_joined self_user_joined
     if client_joined_change
+      @self_client_joined self_user_joined
       call_et.self_client_joined self_user_joined
 
     if call_et.self_user_joined() and not call_et.self_client_joined()
@@ -568,6 +582,8 @@ class z.calling.handler.CallStateHandler
         call_et.state z.calling.enum.CallState.CONNECTING
     else if call_et.state() is z.calling.enum.CallState.CONNECTING
       call_et.state z.calling.enum.CallState.ONGOING if not call_et.self_client_joined()
+    else if call_et.state() is z.calling.enum.CallState.DISCONNECTING
+      call_et.state z.calling.enum.CallState.ONGOING if call_et.participants_count() >= 2
 
     if call_et.is_remote_videod() and call_et.is_ongoing_on_another_client()
       @call_center.media_stream_handler.release_media_streams()
@@ -616,6 +632,7 @@ class z.calling.handler.CallStateHandler
         participant_ets = (new z.calling.entities.Participant user_et for user_et in remote_user_ets)
         call_et.update_participants participant_ets
         call_et.update_remote_state event.participants
+        @self_client_joined true
         call_et.self_client_joined true
         call_et.self_user_joined true
         @logger.log @logger.levels.DEBUG, "Connecting '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}' from this client", call_et
@@ -677,6 +694,7 @@ class z.calling.handler.CallStateHandler
     @_create_call event
     .then (call_et) =>
       call_et.state z.calling.enum.CallState.OUTGOING
+      @self_client_joined true
       call_et.self_client_joined true
       call_et.self_user_joined true
       call_et.set_creator @call_center.user_repository.self()

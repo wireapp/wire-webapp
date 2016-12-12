@@ -100,7 +100,7 @@ class z.telemetry.calling.FlowTelemetry
   ###
   Check stream for flowing bytes.
 
-  @param media_type [z.calling.enum.MediaType] Media type of stream
+  @param media_type [z.media.MediaType] Media type of stream
   @param timeout [Number] Time in milliseconds since the check was scheduled
   @param attempt [Number] Attempt of stream check
   ###
@@ -130,8 +130,8 @@ class z.telemetry.calling.FlowTelemetry
   ###
   schedule_check: (timeout) ->
     window.setTimeout =>
-      @check_stream z.calling.enum.MediaType.AUDIO, timeout
-      @check_stream z.calling.enum.MediaType.VIDEO, timeout if @call_et.is_remote_screen_shared() or @call_et.is_remote_videod()
+      @check_stream z.media.MediaType.AUDIO, timeout
+      @check_stream z.media.MediaType.VIDEO, timeout if @call_et.is_remote_screen_shared() or @call_et.is_remote_videod()
     , timeout
 
   ###
@@ -287,7 +287,7 @@ class z.telemetry.calling.FlowTelemetry
   @return [z.telemetry.calling.ConnectionStats] updated_stats
   ###
   _update_from_inbound_rtp: (report, stats) ->
-    if report.mediaType in [z.calling.enum.MediaType.AUDIO, z.calling.enum.MediaType.VIDEO]
+    if report.mediaType in [z.media.MediaType.AUDIO, z.media.MediaType.VIDEO]
       stats[report.mediaType].bytes_received += report.bytesReceived if report.bytesReceived
       stats[report.mediaType].frame_rate_received = window.parseInt report.framerateMean, 10 if report.framerateMean
     return stats
@@ -300,7 +300,7 @@ class z.telemetry.calling.FlowTelemetry
   @return [z.telemetry.calling.ConnectionStats] updated_stats
   ###
   _update_from_outbound_rtp: (report, stats) ->
-    if report.mediaType in [z.calling.enum.MediaType.AUDIO, z.calling.enum.MediaType.VIDEO]
+    if report.mediaType in [z.media.MediaType.AUDIO, z.media.MediaType.VIDEO]
       stats[report.mediaType].bytes_sent += report.bytesSent if report.bytesSent
       stats[report.mediaType].frame_rate_sent = window.parseInt report.framerateMean, 10 if report.framerateMean
     return stats
@@ -416,12 +416,12 @@ class z.telemetry.calling.FlowTelemetry
           @logger.force_log "-- Bytes sent: #{value.bytes_sent}"
           @logger.force_log "-- Bytes received: #{value.bytes_received}"
           @logger.force_log "-- Rtt: #{value.rtt}"
-          media_types = [z.calling.enum.MediaType.AUDIO, z.calling.enum.MediaType.VIDEO]
+          media_types = [z.media.MediaType.AUDIO, z.media.MediaType.VIDEO]
           if z.util.Environment.browser.chrome and key in media_types
             @logger.force_log "-- Codec received: #{value.codec_received}"
             @logger.force_log "-- Codec sent: #{value.codec_sent}"
             @logger.force_log "-- Delay in ms: #{value.delay}"
-          if key is z.calling.enum.MediaType.VIDEO
+          if key is z.media.MediaType.VIDEO
             @logger.force_log "-- Frame rate received: #{value.frame_rate_received}"
             @logger.force_log "-- Frame rate sent: #{value.frame_rate_sent}"
             continue if not z.util.Environment.browser.chrome
@@ -429,7 +429,7 @@ class z.telemetry.calling.FlowTelemetry
             sent_resolution = "#{value.frame_width_sent}x#{value.frame_height_sent}"
             @logger.force_log "-- Frame resolution received: #{received_resolution}"
             @logger.force_log "-- Frame resolution sent: #{sent_resolution}"
-          else if key is z.calling.enum.MediaType.AUDIO
+          else if key is z.media.MediaType.AUDIO
             @logger.force_log "-- Volume received: #{value.volume_received}"
             @logger.force_log "-- Volume sent: #{value.volume_sent}"
 

@@ -375,10 +375,10 @@ class z.calling.entities.Flow
   _on_add_stream: (event) =>
     @logger.log @logger.levels.DEBUG, 'Remote MediaStream added to PeerConnection',
       {stream: event.stream, audio_tracks: event.stream.getAudioTracks(), video_tracks: event.stream.getVideoTracks()}
-    media_stream = z.calling.handler.MediaStreamHandler.detect_media_stream_type event.stream
-    if media_stream.type is z.calling.enum.MediaType.AUDIO
+    media_stream = z.media.MediaStreamHandler.detect_media_stream_type event.stream
+    if media_stream.type is z.media.MediaType.AUDIO
       media_stream = @audio.wrap_speaker_stream event.stream
-    media_stream_info = new z.calling.payloads.MediaStreamInfo z.calling.enum.MediaStreamSource.REMOTE, @id, media_stream, @call_et
+    media_stream_info = new z.media.MediaStreamInfo z.media.MediaStreamSource.REMOTE, @id, media_stream, @call_et
     amplify.publish z.event.WebApp.CALL.MEDIA.ADD_STREAM, media_stream_info
 
   ###
@@ -423,7 +423,7 @@ class z.calling.entities.Flow
   # ICE connection state has changed.
   _on_ice_connection_state_change: (event) =>
     @logger.log @logger.levels.DEBUG, 'State changed - ICE connection', event
-    return if not @peer_connection or @call_et.state() is z.calling.enum.CallState.ENDED
+    return if not @peer_connection or @call_et.state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ENDED]
 
     @logger.log @logger.levels.LEVEL_1, "ICE connection state: #{@peer_connection.iceConnectionState}"
     @logger.log @logger.levels.LEVEL_1, "ICE gathering state: #{@peer_connection.iceGatheringState}"
@@ -773,7 +773,7 @@ class z.calling.entities.Flow
 
   ###
   Update the local MediaStream.
-  @param media_stream_info [z.calling.payloads.MediaStreamInfo] Object containing the required MediaStream information
+  @param media_stream_info [z.media.MediaStreamInfo] Object containing the required MediaStream information
   @return [Promise] Promise that resolves when the updated MediaStream is used
   ###
   update_media_stream: (media_stream_info) =>
@@ -790,13 +790,14 @@ class z.calling.entities.Flow
   @param media_stream [MediaStream] MediaStream to add to the PeerConnection
   ###
   _add_media_stream: (media_stream) ->
-    if media_stream.type is z.calling.enum.MediaType.AUDIO
+    if media_stream.type is z.media.MediaType.AUDIO
       media_stream = @audio.wrap_microphone_stream media_stream
 
     if @peer_connection.addTrack
       for media_stream_track in media_stream.getTracks()
         @peer_connection.addTrack media_stream_track, media_stream
         @logger.log @logger.levels.INFO, "Added local MediaStreamTrack of type '#{media_stream_track.kind}' to PeerConnection",
+          {stream: media_stream, audio_tracks: media_stream.getAudioTracks(), video_tracks: media_stream.getVideoTracks()}
     else
       @peer_connection.addStream media_stream
       @logger.log @logger.levels.INFO, "Added local MediaStream of type '#{media_stream.type}' to PeerConnection",
@@ -824,7 +825,7 @@ class z.calling.entities.Flow
   ###
   Replace the MediaStream attached to the PeerConnection.
   @private
-  @param media_stream_info [z.calling.payloads.MediaStreamInfo] Object containing the required MediaStream information
+  @param media_stream_info [z.media.MediaStreamInfo] Object containing the required MediaStream information
   ###
   _replace_media_stream: (media_stream_info) ->
     Promise.resolve()
@@ -844,7 +845,7 @@ class z.calling.entities.Flow
   ###
   Replace the a MediaStreamTrack attached to the MediaStream of the PeerConnection.
   @private
-  @param media_stream_info [z.calling.payloads.MediaStreamInfo] Object containing the required MediaStream information
+  @param media_stream_info [z.media.MediaStreamInfo] Object containing the required MediaStream information
   ###
   _replace_media_track: (media_stream_info) ->
     Promise.resolve()
@@ -886,18 +887,18 @@ class z.calling.entities.Flow
   ###
   Reset the flows MediaStream and media elements.
   @private
-  @param media_type [z.calling.enum.MediaType] Optional media type of MediaStreams to be removed
+  @param media_type [z.media.MediaType] Optional media type of MediaStreams to be removed
   ###
-  _remove_media_streams: (media_type = z.calling.enum.MediaType.AUDIO_VIDEO) ->
+  _remove_media_streams: (media_type = z.media.MediaType.AUDIO_VIDEO) ->
     switch media_type
-      when z.calling.enum.MediaType.AUDIO_VIDEO
+      when z.media.MediaType.AUDIO_VIDEO
         media_streams_identical = @_compare_local_media_streams()
 
         @_remove_media_stream @audio_stream() if @audio_stream()
         @_remove_media_stream @video_stream() if @video_stream() and not media_streams_identical
-      when z.calling.enum.MediaType.AUDIO
+      when z.media.MediaType.AUDIO
         @_remove_media_stream @audio_stream() if @audio_stream()
-      when z.calling.enum.MediaType.VIDEO
+      when z.media.MediaType.VIDEO
         @_remove_media_stream @video_stream() if @video_stream()
 
 

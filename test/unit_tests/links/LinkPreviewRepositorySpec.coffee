@@ -48,3 +48,14 @@ describe 'z.links.LinkPreviewRepository', ->
         expect(link_preview_repository._fetch_open_graph_data).toHaveBeenCalled()
         expect(error.type).toBe z.links.LinkPreviewError::TYPE.NO_DATA_AVAILABLE
         done()
+
+    it 'should reject if link is blacklisted', (done) ->
+      window.openGraph = {}
+
+      link_preview_repository.get_link_preview 'youtube.com'
+      .then ->
+        done.fail
+      .catch (error) ->
+        console.log error
+        expect(error.type).toBe z.links.LinkPreviewError::TYPE.BLACKLISTED
+        done()

@@ -64,10 +64,13 @@ z.util.Environment = do ->
       return false if document.visibilityState is undefined
       return true
     supports_calling: ->
+      return false if not @supports_media_devices()
       return false if window.WebSocket is undefined
-      return false if not navigator.mediaDevices?.getUserMedia
       return false if @is_edge()
       return @is_chrome() or @is_firefox() or @is_opera()
+    supports_media_devices: ->
+      return true if navigator.mediaDevices?.getUserMedia
+      return false
     supports_screen_sharing: ->
       return true if window.desktopCapturer
       return @is_firefox() and @get_version() >= 48
@@ -114,6 +117,7 @@ z.util.Environment = do ->
 
     supports:
       calling: _check.supports_calling()
+      media_devices: _check.supports_media_devices()
       notifications: _check.supports_notifications()
       screen_sharing: _check.supports_screen_sharing()
     requires:

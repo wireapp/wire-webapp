@@ -197,8 +197,6 @@ describe 'z.conversation.ConversationRepository', ->
 
       server.respond()
 
-      expect(conversation_repository.save_conversation).toHaveBeenCalled()
-
     it 'maps cancelled connections to exiting conversation and filters it correctly', ->
       connection_et.status z.user.ConnectionStatus.CANCELLED
       conversation_repository.map_connections [connection_et]
@@ -740,7 +738,7 @@ describe 'z.conversation.ConversationRepository', ->
           done()
         .catch done.fail
 
-  describe '_send_as_external_message', ->
+  describe '_should_send_as_external', ->
 
     it 'should return true for big payload', (done) ->
       external_conversation_et = _generate_conversation()
@@ -750,7 +748,7 @@ describe 'z.conversation.ConversationRepository', ->
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'text', new z.proto.Text 'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message'
 
-      conversation_repository._send_as_external_message conversation_et.id, generic_message
+      conversation_repository._should_send_as_external conversation_et.id, generic_message
       .then (should_send_as_external) ->
         expect(should_send_as_external).toBeTruthy()
         done()
@@ -764,7 +762,7 @@ describe 'z.conversation.ConversationRepository', ->
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'text', new z.proto.Text 'Test'
 
-      conversation_repository._send_as_external_message conversation_et.id, generic_message
+      conversation_repository._should_send_as_external conversation_et.id, generic_message
       .then (should_send_as_external) ->
         expect(should_send_as_external).toBeFalsy()
         done()

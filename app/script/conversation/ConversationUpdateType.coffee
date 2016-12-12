@@ -23,6 +23,7 @@ z.conversation.ConversationUpdateType =
   ARCHIVED_STATE: 'archived_state'
   ARCHIVED_TIMESTAMP: 'archived_timestamp'
   CLEARED_TIMESTAMP: 'cleared_timestamp'
+  EPHEMERAL_TIMER: 'ephemeral_timer'
   LAST_EVENT_TIMESTAMP: 'last_event_timestamp'
   LAST_READ_TIMESTAMP: 'last_read_timestamp'
   MUTED_STATE: 'mute_state'

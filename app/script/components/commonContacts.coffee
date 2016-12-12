@@ -26,37 +26,25 @@ class z.components.CommonContactsViewModel
     @element = component_info.element
     @search_repository = wire.app.repository.search
 
-    @displayed_contacts = ko.observableArray()
-    @more_contacts = ko.observable 0
-    @_set_contacts_data 0
+    @common_contacts_total = ko.observable 0
 
-    @search_repository.get_common_contacts @user.id
-    .then (user_ets) =>
-      @_display_contacts user_ets
+    @common_contacts_caption = ko.pureComputed =>
+      locale_id = if @common_contacts_total() > 1 then z.string.search_friends_in_common else z.string.search_friend_in_common
+      return z.localization.Localizer.get_text
+        id: locale_id
+        replace:
+          placeholder: '%no',
+          content: @common_contacts_total()
 
-  _set_contacts_data: (value) ->
-    $(@element).attr 'data-contacts', value
-
-  _display_contacts: (contacts) =>
-    number_of_contacts = contacts.length
-    number_to_show = if number_of_contacts is 4 then 4 else 3
-    @displayed_contacts contacts.slice 0, number_to_show
-    @more_contacts number_of_contacts - number_to_show
-    @_set_contacts_data number_of_contacts
-
+    @search_repository.get_common_contacts(@user.id).then (total) =>
+      @user.mutual_friends_total total
+      @common_contacts_total total
 
 ko.components.register 'common-contacts',
   viewModel: createViewModel: (params, component_info) ->
     return new z.components.CommonContactsViewModel params, component_info
   template: """
-              <div class="common-contacts-title label-xs" data-bind="l10n_text: z.string.people_common_contacts"></div>
-              <div class="common-contacts-items" data-bind="foreach: displayed_contacts">
-                <div class="common-contacts-item" data-bind="attr: {'data-uie-uid': id, 'data-uie-value': first_name}" data-uie-name="item-you-both-know" >
-                  <user-avatar class="user-avatar-sm" params="user: $data"></user-avatar>
-                  <div class="common-contacts-label label-xs" data-bind="text: first_name"></div>
-                </div>
-              </div>
-              <!-- ko if: more_contacts() > 0 -->
-                <span class="common-contacts-more" data-bind="text: '+' + more_contacts()" data-uie-name="item-you-both-know" data-uie-value="others"></span>
-              <!-- /ko -->
+            <!-- ko if: common_contacts_total -->
+              <span data-bind="text: common_contacts_caption"></span>
+            <!-- /ko -->
             """

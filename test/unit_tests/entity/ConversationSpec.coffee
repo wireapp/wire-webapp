@@ -78,6 +78,10 @@ describe 'Conversation', ->
       verified_client_et = new z.client.Client()
       verified_client_et.meta.is_verified true
 
+      self_user_et = new z.entity.User()
+      self_user_et.devices.push verified_client_et
+      conversation_et.self = self_user_et
+
       user_et = new z.entity.User()
       user_et.devices.push unverified_client_et
       user_et.devices.push verified_client_et
@@ -92,6 +96,10 @@ describe 'Conversation', ->
     it 'is verified when all users are verified', ->
       verified_client_et = new z.client.Client()
       verified_client_et.meta.is_verified true
+
+      self_user_et = new z.entity.User()
+      self_user_et.devices.push verified_client_et
+      conversation_et.self = self_user_et
 
       user_et = new z.entity.User()
       user_et.devices.push verified_client_et
@@ -196,9 +204,6 @@ describe 'Conversation', ->
       conversation_name = 'My favorite music band'
       conversation_et.name conversation_name
       expect(conversation_et.display_name()).toBe conversation_name
-
-    it 'resolves with the conversation entity when setting the display name', ->
-      expect(conversation_et.display_name 'foo').toEqual conversation_et
 
   describe '_subscribe_to_states_updates', ->
 

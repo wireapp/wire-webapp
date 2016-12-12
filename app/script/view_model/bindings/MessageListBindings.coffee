@@ -179,8 +179,3 @@ ko.bindingHandlers.relative_timestamp = do ->
     ko.utils.domNodeDisposal.addDisposeCallback element, ->
       timestamp_index = timestamps.indexOf timestamp_func
       timestamps.splice timestamp_index, 1
-
-ko.bindingHandlers.message_in_viewport =
-  init: (element, valueAccessor, allBindingsAccessor) ->
-    callback = valueAccessor()
-    callback()
