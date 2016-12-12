@@ -103,6 +103,6 @@ deploy:
       branch: prod
 
 after_script:
-  - npm install wire-webapp-core@0.1.1
+  - npm install wire-webapp-core@0.1.2
   - chmod ugo+x ./bin/deployment_notification.js
   - node ./bin/deployment_notification.js
