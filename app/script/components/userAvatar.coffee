@@ -69,7 +69,7 @@ class z.components.UserAvatar
         @avatar_image.empty().append image
         @element.addClass 'user-avatar-image-loaded user-avatar-loading-transition'
 
-    @picture_preview_subscription = ko.computed => @_load_avatar_picture
+    @picture_preview_subscription = ko.computed @_load_avatar_picture
 
   dispose: =>
     @picture_preview_subscription.dispose()

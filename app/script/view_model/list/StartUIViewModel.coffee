@@ -34,7 +34,7 @@ class z.ViewModel.list.StartUIViewModel
     @logger = new z.util.Logger 'z.ViewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS
 
     @search = _.debounce (query) =>
-      query = query.trim().replace /^[@]/, ''
+      query = @search_repository.normalize_search_query query
       if query
         @clear_search_results()
 
@@ -47,7 +47,7 @@ class z.ViewModel.list.StartUIViewModel
         # search for others
         @search_repository.search_by_name query
         .then (user_ets) =>
-          if query is @search_input().trim()
+          if query is @search_repository.normalize_search_query @search_input()
             @search_results.others user_ets
           else
             @logger.log @logger.levels.INFO, "Resolved Search query #{query} is outdated"
@@ -399,7 +399,7 @@ class z.ViewModel.list.StartUIViewModel
   show_invite_bubble: =>
     return if @invite_bubble?
 
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_GENERIC_INVITE_MENU
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_GENERIC_INVITE_MENU,
       context: 'banner'
 
     self = @user_repository.self()
