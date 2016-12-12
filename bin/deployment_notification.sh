@@ -8,12 +8,14 @@ AUTHOR_OF_LAST_COMMIT=$(git log | grep Author: | cut -d' ' -f2- | uniq | head -n
 SUMMARY_OF_LAST_COMMIT=$(git log -1 --pretty=%s)
 WEBAPP_URL="https://app.wire.com/"
 
-if [ "$TRAVIS_BRANCH" = "staging" ]; then
-  WEBAPP_URL="https://wire-webapp-staging.zinfra.io/auth/?env=prod#login"
+if [ "$TRAVIS_BRANCH" = "dev" ]; then
+  WEBAPP_URL="https://wire-webapp-dev.zinfra.io/auth/?env=prod#login"
 elif [ "$TRAVIS_BRANCH" = "edge" ]; then
   WEBAPP_URL="https://wire-webapp-edge.zinfra.io/auth/?env=prod#login"
 elif [ "$TRAVIS_BRANCH" = "prod" ]; then
   WEBAPP_URL="https://wire-webapp-prod-next.wire.com/auth/#login"
+elif [ "$TRAVIS_BRANCH" = "staging" ]; then
+  WEBAPP_URL="https://wire-webapp-staging.zinfra.io/auth/?env=prod#login"
 fi;
 
 # Message
