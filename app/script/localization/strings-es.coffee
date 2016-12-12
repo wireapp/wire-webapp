@@ -211,7 +211,6 @@ z.string.es.modal_uploads_parallel = 'Puede enviar hasta %no archivos a la vez.'
 # Connection requests
 z.string.es.connection_request_connect = 'Conectar'
 z.string.es.connection_request_ignore = 'Ignorar'
-z.string.es.connection_request_message = 'Hola %@.first_name,\nHablemos por Wire.\n%s.first_name'
 
 # Conversation
 z.string.es.conversation_you_nominative = 'tú'
@@ -286,6 +285,9 @@ z.string.es.conversations_popover_leave = 'Abandonar'
 z.string.es.conversations_popover_notify = 'Sonido'
 z.string.es.conversations_popover_silence = 'Silenciar'
 z.string.es.conversations_popover_unarchive = 'Desarchivar'
+
+# Takeover
+z.string.es.takeover_link = 'Aprender más'
 
 # Invites
 z.string.es.invite_meta_key_mac = 'Cmd'
@@ -450,9 +452,6 @@ z.string.es.search_top_people = 'Personas más importantes'
 z.string.es.search_try_search = 'Encuentra personas por nombre o dirección de email'
 z.string.es.search_no_contacts_on_wire = 'No tienes ningún contacto en Wire. Trata de encontrar personas por nombre o dirección de correo electronico'
 z.string.es.search_others = 'Conectar'
-z.string.es.search_suggestion_one = 'Conoce a %@.first_name'
-z.string.es.search_suggestion_two = 'Conoce a %@.first_name y %@.other_name'
-z.string.es.search_suggestion_many = 'Conoce a %@.first_name y %no más personas'
 
 # Picture upload
 z.string.es.upload_welcome = 'Wire es mucho mejor con una foto.'

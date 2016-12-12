@@ -202,7 +202,7 @@ z.string.sl.modal_too_many_members_headline = 'Polna hiša'
 z.string.sl.modal_too_many_members_message = 'Do %max oseb se lahko pridruži pogovoru. Tukaj je prostora še za %no oseb.'
 # Whitelist screensharing
 z.string.sl.modal_whitelist_screensharing_headline = 'Wire potrebuje dovoljenje za deljenje vašega zaslona'
-z.string.sl.modal_whitelist_screensharing_message_1 = 'Odpri about:config (chrome:config v Chrome) in dodaj *.wire.com na seznam dovoljenih domen za deljenje zaslona. Glej'
+z.string.sl.modal_whitelist_screensharing_message_1 = 'Odpri about:config in dodaj *.wire.com na seznam dovoljenih domen za deljenje zaslona. Glej'
 z.string.sl.modal_whitelist_screensharing_message_link = 'Pogosto zastavljena vprašanja'
 z.string.sl.modal_whitelist_screensharing_message_2 = 'za podrobnosti.'
 # Parallel uploads
@@ -211,7 +211,6 @@ z.string.sl.modal_uploads_parallel = 'Lahko pošljete do %no zbirk naenkrat.'
 # Connection requests
 z.string.sl.connection_request_connect = 'Poveži'
 z.string.sl.connection_request_ignore = 'Ignoriraj'
-z.string.sl.connection_request_message = 'Hej %@.first_name,\nPoveživa se na Wire.\n%s.first_name'
 
 # Conversation
 z.string.sl.conversation_you_nominative = 'ti'
@@ -287,13 +286,15 @@ z.string.sl.conversations_popover_notify = 'Povrni glasnost'
 z.string.sl.conversations_popover_silence = 'Utišaj'
 z.string.sl.conversations_popover_unarchive = 'Dearhiviraj'
 
+# Takeover
+z.string.sl.takeover_link = 'Nauči se več'
+
 # Invites
 z.string.sl.invite_meta_key_mac = 'Cmd'
 z.string.sl.invite_meta_key_pc = 'Ctrl'
 z.string.sl.invite_hint_selected = 'Pritisnite %meta_key + C za kopiranje'
 z.string.sl.invite_hint_unselected = 'Izberite in pritisnite %meta_key + C'
 z.string.sl.invite_headline = 'Povabite osebe na Wire'
-z.string.sl.invite_message = 'Sem na Wire. Poišči %mail ali obišči https://get.wire.com za povezavo z mano.'
 z.string.sl.invite_message_no_email = 'Sem na Wire. Obišči https://get.wire.com za povezavo z mano.'
 
 # Extensions
@@ -449,9 +450,6 @@ z.string.sl.search_top_people = 'Top osebe'
 z.string.sl.search_try_search = 'Najdi osebe po imenu ali\npolnem e-poštnem naslovu'
 z.string.sl.search_no_contacts_on_wire = 'Nimate nobenih stikov na Wire.\nPoizkusite najti osebe po imenu\nali polnem e-poštnem naslovu'
 z.string.sl.search_others = 'Poveži'
-z.string.sl.search_suggestion_one = 'Pozna %@.first_name'
-z.string.sl.search_suggestion_two = 'Pozna %@.first_name in %@.other_name'
-z.string.sl.search_suggestion_many = 'Pozna %@.first_name in %no others'
 
 # Picture upload
 z.string.sl.upload_welcome = 'Wire je lepši s sliko.'

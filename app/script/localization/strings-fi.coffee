@@ -211,7 +211,6 @@ z.string.fi.modal_uploads_parallel = 'Voit lähettää jopa %no tiedostoa samaan
 # Connection requests
 z.string.fi.connection_request_connect = 'Yhdistä'
 z.string.fi.connection_request_ignore = 'Hylkää'
-z.string.fi.connection_request_message = 'Hei %@.first_name, Lisää minut kontakteihisi Wire:ssä. %s.first_name'
 
 # Conversation
 z.string.fi.conversation_you_nominative = 'sinä'
@@ -287,13 +286,15 @@ z.string.fi.conversations_popover_notify = 'Poista mykistys'
 z.string.fi.conversations_popover_silence = 'Mykistä'
 z.string.fi.conversations_popover_unarchive = 'Palauta arkistosta'
 
+# Takeover
+z.string.fi.takeover_link = 'Lue lisää'
+
 # Invites
 z.string.fi.invite_meta_key_mac = 'Cmd'
 z.string.fi.invite_meta_key_pc = 'Ctrl'
 z.string.fi.invite_hint_selected = 'Paina %meta_key + C kopioidaksesi'
 z.string.fi.invite_hint_unselected = 'Valitse ja paina %meta_key + C'
 z.string.fi.invite_headline = 'Kutsu ihmisiä Wireen'
-z.string.fi.invite_message = 'Olen Wiressä. Etsi %mail tai mene osoitteeseen https://get.wire.com ottaaksesi yhteyden minuun.'
 z.string.fi.invite_message_no_email = 'Olen Wiressä. Mene osoitteeseen https://get.wire.com ottaaksesi yhteyttä minuun.'
 
 # Extensions
@@ -450,9 +451,6 @@ z.string.fi.search_top_people = 'Eniten käytetyt kontaktit'
 z.string.fi.search_try_search = 'Etsi ihmisiä nimellä tai sähköpostiosoitteella'
 z.string.fi.search_no_contacts_on_wire = 'Sinulla ei ole kontakteja Wiressä. Yritä etsiä ihmisiä nimellä tai sähköpostiosoitteella'
 z.string.fi.search_others = 'Yhdistä'
-z.string.fi.search_suggestion_one = 'Tuntee %@.first_name'
-z.string.fi.search_suggestion_two = 'Tuntee %@.first_name ja %@.other_name'
-z.string.fi.search_suggestion_many = 'Tuntee %@.first_name ja %no muita'
 
 # Picture upload
 z.string.fi.upload_welcome = 'Wire on niin paljon mukavampi kuvalla.'

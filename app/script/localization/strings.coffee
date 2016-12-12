@@ -289,7 +289,7 @@ z.string.conversations_popover_silence = 'Mute'
 z.string.conversations_popover_unarchive = 'Unarchive'
 
 # Takeover
-z.string.takeover_headline = 'Usernames are here'
+z.string.takeover_headline = 'Usernames are here.'
 z.string.takeover_sub = 'Claim your unique name on Wire.'
 z.string.takeover_link = 'Learn more'
 z.string.takeover_button_choose = 'Choose your own'

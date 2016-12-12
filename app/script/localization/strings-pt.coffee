@@ -211,7 +211,6 @@ z.string.pt.modal_uploads_parallel = 'Você pode enviar até %no arquivos de uma
 # Connection requests
 z.string.pt.connection_request_connect = 'Conectar'
 z.string.pt.connection_request_ignore = 'Ignorar'
-z.string.pt.connection_request_message = 'Olá %@.first_name,\nVamos nos conectar no Wire.\n%s.first_name'
 
 # Conversation
 z.string.pt.conversation_you_nominative = 'você'
@@ -287,13 +286,15 @@ z.string.pt.conversations_popover_notify = 'Notificar'
 z.string.pt.conversations_popover_silence = 'Sem som'
 z.string.pt.conversations_popover_unarchive = 'Desarquivar'
 
+# Takeover
+z.string.pt.takeover_link = 'Mais informação'
+
 # Invites
 z.string.pt.invite_meta_key_mac = 'Cmd'
 z.string.pt.invite_meta_key_pc = 'Ctrl'
 z.string.pt.invite_hint_selected = 'Pressione % meta_key + C para copiar'
 z.string.pt.invite_hint_unselected = 'Selecione e pressione % meta_key + C'
 z.string.pt.invite_headline = 'Convidar pessoas para o Wire'
-z.string.pt.invite_message = 'Estou no Wire. Pesquise por %mail ou visite https://get.wire.com para se conectar comigo.'
 z.string.pt.invite_message_no_email = 'Estou no Wire. Visite https://get.wire.com para se conectar comigo.'
 
 # Extensions
@@ -450,9 +451,6 @@ z.string.pt.search_top_people = 'Contatos frequentes'
 z.string.pt.search_try_search = 'Encontre pessoa por nome ou\nendereço de e-mail completo'
 z.string.pt.search_no_contacts_on_wire = 'Você não tem nenhum contato no Wire. \nTente encontrar pessoas pelo nome ou \nendereço de e-mail completo'
 z.string.pt.search_others = 'Conectar'
-z.string.pt.search_suggestion_one = 'Conhece %@.first_name'
-z.string.pt.search_suggestion_two = 'Conhece %@.first_name e %@.other_name'
-z.string.pt.search_suggestion_many = 'Conhece %@.first_name e %no outros'
 
 # Picture upload
 z.string.pt.upload_welcome = 'O Wire é muito mais legal com uma foto.'
