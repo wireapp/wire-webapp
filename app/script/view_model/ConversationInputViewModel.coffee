@@ -32,10 +32,12 @@ class z.ViewModel.ConversationInputViewModel
     @self = @user_repository.self
     @list_not_bottom = ko.observable true
 
+    @show_paste_dialog = ko.observable false
+    @pasted_file = ko.observable()
+
     @edit_message_et = ko.observable()
     @edit_input = ko.observable ''
-    @is_editing = ko.pureComputed =>
-      return @edit_message_et()?
+    @is_editing = ko.pureComputed => @edit_message_et()?
 
     @is_editing.subscribe (is_editing) =>
       if is_editing
@@ -156,6 +158,20 @@ class z.ViewModel.ConversationInputViewModel
         return
 
     @conversation_repository.upload_files @conversation_et(), files
+
+  on_paste_files: (pasted_files) =>
+    @show_paste_dialog true
+    @pasted_file pasted_files[0]
+
+  on_send_pasted_files: =>
+    pasted_file = @pasted_file()
+    @show_paste_dialog false
+    @on_drop_files [pasted_file]
+    @pasted_file null
+
+  on_cancel_pasted_files: =>
+    @show_paste_dialog false
+    @pasted_file null
 
   on_drop_files: (dropped_files) =>
     images = []

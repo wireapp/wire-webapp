@@ -23,6 +23,7 @@
   width: 100%;
   min-height: @conversation-input-min-height;
   background-color: #fff;
+  position: relative;
 }
 
 .conversation-input-editing {
@@ -60,6 +61,12 @@
   &.ephemeral-input::placeholder {
     .accent-color();
   }
+}
+
+.conversation-input-paste-modal {
+  .full-screen;
+  display: flex;
+  background-color: #fff;
 }
 
 .controls-left {

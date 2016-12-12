@@ -50,6 +50,7 @@ ko.bindingHandlers.paste_file =
         .filter (item) -> item.type isnt 'text/plain'
         .map (item) -> item.getAsFile()
 
+      console.debug files
       if files.length > 0
         valueAccessor() files
         event.preventDefault()
