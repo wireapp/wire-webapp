@@ -97,19 +97,10 @@ describe 'z.client.ClientMapper', ->
         meta:
           is_verified: true
 
-      serialized_payload =
-        client_payload =
-          class: 'desktop'
-          id: '66d0515a23a0ef25'
-          meta:
-            is_verified: true
-          label: '?'
-          model: '?'
-
       client_et = mapper.map_client client_payload
       client_json = client_et.to_json()
 
-      expect(client_json).toEqual serialized_payload
+      expect(client_json).toEqual client_payload
 
   describe 'map_clients', ->
     it 'can map a multiple clients at once', ->
