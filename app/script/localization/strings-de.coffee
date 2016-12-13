@@ -456,18 +456,13 @@ z.string.de.search_group_hint = 'Tippe weiter oder wähle weitere Kontakte aus, 
 z.string.de.search_connect = 'Vorschläge'
 z.string.de.search_connections = 'Kontakte'
 z.string.de.search_groups = 'Gruppen'
-z.string.de.search_placeholder = 'Namen oder E-Mail-Adresse suchen'
+z.string.de.search_placeholder = 'Name oder Benutzername suchen'
 z.string.de.search_top_people = 'Top Kontakte'
-z.string.de.search_try_search = 'Finde Kontakte nach Namen oder\nihrer vollständigen E-Mail-Adresse'
-z.string.de.search_no_contacts_on_wire = 'Du hast keine Kontakte auf Wire.\nSuch nach Namen oder vollständigen\nE-Mail-Adressen'
+z.string.de.search_try_search = 'Finde Kontakte anhand ihres\nNamens oder Benutzernamens'
+z.string.de.search_no_contacts_on_wire = 'Du hast keine Kontakte auf Wire.\nSuche nach Namen\noder Benutzernamen.'
 z.string.de.search_others = 'Suchergebnisse'
 z.string.de.search_friend_in_common = '%no gemeinsamer Freund'
 z.string.de.search_friends_in_common = '%no gemeinsame Freunde'
-
-# Picture upload
-z.string.de.upload_welcome = 'Wire ist so viel schöner mit einem Bild.'
-z.string.de.upload_welcome_keep = 'Behalte dieses'
-z.string.de.upload_welcome_choose = 'Wähle dein eigenes'
 
 # Google contacts upload
 z.string.de.upload_google_headline = 'Finde Kontakte \nauf Wire.'
