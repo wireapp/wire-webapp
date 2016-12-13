@@ -30,7 +30,7 @@ class z.bot.BotRepository
     @bot_service.fetch_bot bot_name
     .then (result) =>
       bot_result = result
-      @logger.log @logger.levels.INFO, "Info for bot '#{bot_name}' retrieved", bot_result
+      @logger.info "Info for bot '#{bot_name}' retrieved", bot_result
       if create_conversation
         @conversation_repository.create_new_conversation [], bot_result.name or bot_name
     .then (conversation_et) =>

@@ -169,7 +169,7 @@ class z.conversation.ConversationService
       record.data.status = z.assets.AssetTransferState.UPLOADED
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
-      @logger.log 'Updated asset message_et (uploaded)', primary_key
+      @logger.info 'Updated asset message_et (uploaded)', primary_key
 
   ###
   Update asset with preview in database.
@@ -185,7 +185,7 @@ class z.conversation.ConversationService
       record.data.preview_token = asset_data.token
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
-      @logger.log 'Updated asset message_et (preview)', primary_key
+      @logger.info 'Updated asset message_et (preview)', primary_key
 
   ###
   Update asset as failed in database.
@@ -198,7 +198,7 @@ class z.conversation.ConversationService
       record.data.reason = reason
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
-      @logger.log 'Updated asset message_et (failed)', primary_key
+      @logger.info 'Updated asset message_et (failed)', primary_key
 
   ###
   Loads conversation states from the local database.
@@ -219,8 +219,7 @@ class z.conversation.ConversationService
     .filter (record) -> record.id is message_id
     .first()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR,
-        "Failed to get event for conversation '#{conversation_id}': #{error.message}", error
+      @logger.error "Failed to get event for conversation '#{conversation_id}': #{error.message}", error
       throw error
 
   ###
@@ -278,7 +277,7 @@ class z.conversation.ConversationService
     .limit limit
     .toArray()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to load events for conversation '#{conversation_id}' from database: '#{error.message}'"
+      @logger.error "Failed to load events for conversation '#{conversation_id}' from database: '#{error.message}'"
       throw error
 
   ###
@@ -352,7 +351,7 @@ class z.conversation.ConversationService
   save_conversation_state_in_db: (conversation_et) =>
     @storage_service.save @storage_service.OBJECT_STORE_CONVERSATIONS, conversation_et.id, conversation_et.serialize()
     .then =>
-      @logger.log @logger.levels.INFO, "State of conversation '#{conversation_et.id}' was stored for the first time"
+      @logger.info "State of conversation '#{conversation_et.id}' was stored for the first time"
       return conversation_et
 
   ###

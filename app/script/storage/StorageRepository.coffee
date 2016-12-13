@@ -42,10 +42,10 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
     return @_load_identity()
     .then (@identity) =>
       if not @identity
-        @logger.log @logger.levels.INFO, 'We did not find a local identity. This is a new client.'
+        @logger.info 'We did not find a local identity. This is a new client.'
         return {}
 
-      @logger.log @logger.levels.INFO, 'Loaded local identity key pair from database', @identity
+      @logger.info 'Loaded local identity key pair from database', @identity
       if skip_sessions
         throw new z.storage.StorageError z.storage.StorageError::TYPE.SKIP_LOADING
 
@@ -53,12 +53,12 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
     .then =>
       return @_load_pre_keys()
     .then =>
-      @logger.log @logger.levels.INFO, 'Initialized repository'
+      @logger.info 'Initialized repository'
     .catch (error) =>
       if error.type is z.storage.StorageError::TYPE.SKIP_LOADING
-        @logger.log "Initialized repository with the following exception: #{error.message}"
+        @logger.info "Initialized repository with the following exception: #{error.message}"
       else
-        @logger.log @logger.levels.ERROR, "Storage Repository initialization failed: #{error?.message}", error
+        @logger.error "Storage Repository initialization failed: #{error?.message}", error
         throw error
 
   _deserialize_session: (session) ->
@@ -68,7 +68,7 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
       @sessions[session.id] = Proteus.session.Session.deserialise @identity, bytes.buffer
       return @sessions[session.id]
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Session '#{session.id}' is corrupt.", error
+      @logger.error "Session '#{session.id}' is corrupt.", error
       # TODO: Consider deleting or repairing corrupt data (like broken sessions)
 
   ###
@@ -93,15 +93,15 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   _load_pre_keys: =>
     return @storage_service.get_all @storage_service.OBJECT_STORE_PREKEYS
     .then (pre_keys) =>
-      @logger.log @logger.levels.INFO, "Loaded '#{pre_keys.length}' pre-keys from database"
+      @logger.info "Loaded '#{pre_keys.length}' pre-keys from database"
       for pre_key in pre_keys
         try
           bytes = sodium.from_base64 pre_key.serialised
           @prekeys[pre_key.id] = Proteus.keys.PreKey.deserialise bytes.buffer
         catch error
-          @logger.log @logger.levels.ERROR, "Pre-key with primary key '#{pre_key.id}' is corrupt.", error
+          @logger.error "Pre-key with primary key '#{pre_key.id}' is corrupt.", error
           # TODO: Consider deleting or repairing corrupt data (like broken sessions)
-      @logger.log @logger.levels.INFO, "Initialized '#{Object.keys(@prekeys).length}' pre-keys from database", @prekeys
+      @logger.info "Initialized '#{Object.keys(@prekeys).length}' pre-keys from database", @prekeys
       return @prekeys
     .catch (error) ->
       throw new Error "Failed to load pre-keys from storage: #{error.message}"
@@ -117,27 +117,27 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
       .then (sessions) =>
         amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_sessions_expectation, true, [sessions.length]
         if sessions.length
-          @logger.log @logger.levels.INFO, "Loaded '#{sessions.length}' sessions from storage"
+          @logger.info "Loaded '#{sessions.length}' sessions from storage"
           handled_sessions = 0
 
           _push_session = (serialized_session) => @sessions_queue.push =>
             @_deserialize_session serialized_session
             .then (session) =>
               if not session
-                @logger.log @logger.levels.WARN, "Failed to de-serialized session '#{serialized_session.id}'"
+                @logger.warn "Failed to de-serialized session '#{serialized_session.id}'"
               handled_sessions++
               if handled_sessions % 5 is 0
                 amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_sessions_progress, false, [handled_sessions, sessions.length]
 
         return Promise.all (_push_session session for session in sessions)
           .then =>
-            @logger.log @logger.levels.INFO, "De-serialized '#{Object.keys(@sessions).length}' sessions", @sessions
+            @logger.info "De-serialized '#{Object.keys(@sessions).length}' sessions", @sessions
             resolve @sessions
 
-        @logger.log @logger.levels.INFO, 'No sessions found in storage'
+        @logger.info 'No sessions found in storage'
         resolve @sessions
       .catch (error) =>
-        @logger.log @logger.levels.WARN, "Failed to load sessions from storage: #{error.message}", error
+        @logger.warn "Failed to load sessions from storage: #{error.message}", error
         reject error
 
   ###############################################################################
@@ -275,7 +275,7 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
 
   clear_all_stores: =>
     @storage_service.clear_all_stores()
-    .then => @logger.log "Cleared database '#{@storage_service.db_name}'"
+    .then => @logger.info "Cleared database '#{@storage_service.db_name}'"
 
   ###############################################################################
   # Sessions
@@ -322,5 +322,5 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   Nuke the database.
   ###
   delete_everything: =>
-    @logger.log @logger.levels.WARN, "Deleting database '#{@storage_service.db_name}'"
+    @logger.warn "Deleting database '#{@storage_service.db_name}'"
     return @storage_service.delete_everything()

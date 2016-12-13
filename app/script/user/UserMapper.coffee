@@ -71,7 +71,7 @@ class z.user.UserMapper
     if data?
       return (@map_user_from_object user for user in data when user isnt undefined)
     else
-      @logger.log @logger.levels.WARN, 'We got no user data from the backend'
+      @logger.warn 'We got no user data from the backend'
       return []
 
   ###

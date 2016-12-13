@@ -109,16 +109,16 @@ class z.telemetry.calling.FlowTelemetry
     if stats
       seconds = attempt * timeout / 1000
       if stats.bytes_received is 0 and stats.bytes_sent is 0
-        @logger.log @logger.levels.ERROR, "No '#{media_type}' flowing in either direction after #{seconds} seconds"
+        @logger.error "No '#{media_type}' flowing in either direction after #{seconds} seconds"
       else if stats.bytes_received is 0
-        @logger.log @logger.levels.ERROR, "No incoming '#{media_type}' received after #{seconds} seconds"
+        @logger.error "No incoming '#{media_type}' received after #{seconds} seconds"
       else if stats.bytes_sent is 0
-        @logger.log @logger.levels.ERROR, "No outgoing '#{media_type}' sent after #{seconds} seconds"
+        @logger.error "No outgoing '#{media_type}' sent after #{seconds} seconds"
       else
-        @logger.log @logger.levels.DEBUG, "Stream has '#{media_type}' flowing properly both ways"
+        @logger.debug "Stream has '#{media_type}' flowing properly both ways"
     else
       if @is_answer
-        @logger.log @logger.levels.INFO, "Check stream statistics of type '#{media_type}' delayed as we created this flow"
+        @logger.info "Check stream statistics of type '#{media_type}' delayed as we created this flow"
       else
         window.setTimeout =>
           @check_stream media_type, timeout, attempt++
@@ -173,7 +173,7 @@ class z.telemetry.calling.FlowTelemetry
         resolve @statistics
         @statistics = {}
       .catch (error) =>
-        @logger.log @logger.levels.WARN, "Failed to update flow networks stats: #{error.message}"
+        @logger.warn "Failed to update flow networks stats: #{error.message}"
         reject error
       window.clearInterval @stats_poller
       @stats_poller = undefined
@@ -192,13 +192,12 @@ class z.telemetry.calling.FlowTelemetry
       # Report calling stats within specified interval
       window.setTimeout =>
         @_update_statistics()
-        .then => @logger.log @logger.levels.INFO, 'Flow network stats updated for the first time', @statistics
-        .catch (error) => @logger.log @logger.levels.WARN, "Failed to update flow networks stats: #{error.message}"
+        .then => @logger.info 'Flow network stats updated for the first time', @statistics
+        .catch (error) => @logger.warn "Failed to update flow networks stats: #{error.message}"
       , 50
       @stats_poller = window.setInterval =>
         @_update_statistics()
-        .then => @logger.log @logger.levels.OFF, 'Flow network stats updated', @statistics
-        .catch (error) => @logger.log @logger.levels.WARN, "Flow networks stats not updated: #{error.message}"
+        .catch (error) => @logger.warn "Flow networks stats not updated: #{error.message}"
       , 2000
 
     if ice_connection_state is z.calling.rtc.ICEConnectionState.COMPLETED
@@ -212,8 +211,6 @@ class z.telemetry.calling.FlowTelemetry
   _update_statistics: =>
     @peer_connection.getStats null
     .then (rtc_statistics) =>
-      @logger.log @logger.levels.OFF, 'Received new statistics report for flow', rtc_statistics
-
       updated_statistics = new z.telemetry.calling.ConnectionStats()
 
       for key, report of rtc_statistics
@@ -246,9 +243,8 @@ class z.telemetry.calling.FlowTelemetry
           updated_statistics[key].bit_rate_current_sent = _calc_rate key, @statistics.timestamp, 'bytes_sent'
 
       $.extend @statistics, updated_statistics
-      @logger.log @logger.levels.OFF, 'Update of network stats for flow successful', @statistics
     .catch (error) =>
-      @logger.log @logger.levels.WARN, 'Update of network stats for flow failed', error
+      @logger.warn 'Update of network stats for flow failed', error
 
   ###
   Update from z.calling.rtc.StatsType.CANDIDATE_PAIR report.
@@ -453,16 +449,15 @@ class z.telemetry.calling.FlowTelemetry
     if payload
       custom_data.payload = payload
 
-    @logger.log @logger.levels.ERROR, description, custom_data
+    @logger.error description, custom_data
     Raygun.send raygun_error, custom_data
 
   report_status: =>
     custom_data = @create_report()
-    @logger.log @logger.levels.INFO, 'Created flow status for call failure report', custom_data
+    @logger.info 'Created flow status for call failure report', custom_data
     return custom_data
 
   report_timings: =>
     custom_data = @timings.log()
     Raygun.send new Error('Call setup step timings'), custom_data
-    @logger.log @logger.levels.INFO,
-      "Reported setup step timings of flow id '#{@id}' for call analysis", custom_data
+    @logger.info "Reported setup step timings of flow id '#{@id}' for call analysis", custom_data

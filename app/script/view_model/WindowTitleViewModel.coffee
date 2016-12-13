@@ -25,7 +25,7 @@ class z.ViewModel.WindowTitleViewModel
     amplify.subscribe z.event.WebApp.LOADED, @initiate_title_updates
 
   initiate_title_updates: =>
-    @logger.log @logger.levels.INFO, 'Starting to update window title'
+    @logger.info 'Starting to update window title'
     ko.computed =>
 
       window_title = ''

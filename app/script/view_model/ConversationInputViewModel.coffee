@@ -126,10 +126,10 @@ class z.ViewModel.ConversationInputViewModel
   set_ephemeral_timer: (millis) =>
     if not millis
       @conversation_et().ephemeral_timer false
-      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' turned off."
+      @logger.info "Ephemeral timer for conversation '#{@conversation_et().display_name()}' turned off."
     else
       @conversation_et().ephemeral_timer millis
-      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer().toString()}'."
+      @logger.info "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer().toString()}'."
 
   upload_images: (images) =>
     if @_is_hitting_upload_limit images

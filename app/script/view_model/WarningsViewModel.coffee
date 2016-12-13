@@ -98,12 +98,12 @@ class z.ViewModel.WarningsViewModel
 
   dismiss_warning: (type) =>
     type = @top_warning() if not type
-    @logger.log @logger.levels.WARN, "Dismissed warning of type '#{type}'"
+    @logger.warn "Dismissed warning of type '#{type}'"
     @warnings.remove type
 
   show_warning: (type, info) =>
     @dismiss_warning() if @top_warning() and type in [z.ViewModel.WarningType.CONNECTIVITY_RECONNECT, z.ViewModel.WarningType.NO_INTERNET]
-    @logger.log @logger.levels.WARN, "Showing warning of type '#{type}'"
+    @logger.warn "Showing warning of type '#{type}'"
     if info?
       @first_name info.first_name
       @call_id = info.call_id

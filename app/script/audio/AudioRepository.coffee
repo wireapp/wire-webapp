@@ -43,19 +43,19 @@ class z.audio.AudioRepository
     if @audio_context
       @audio_context.close()
       @audio_context = undefined
-      @logger.log @logger.levels.INFO, 'Closed existing AudioContext'
+      @logger.info 'Closed existing AudioContext'
 
   # Initialize the AudioContext.
   get_audio_context: =>
     if @audio_context
-      @logger.log @logger.levels.INFO, 'Reusing existing AudioContext', @audio_context
+      @logger.info 'Reusing existing AudioContext', @audio_context
       return @audio_context
     else if window.AudioContext and window.AudioContext::createMediaStreamSource
       @audio_context = new window.AudioContext()
-      @logger.log @logger.levels.INFO, 'Initialized a new AudioContext', @audio_context
+      @logger.info 'Initialized a new AudioContext', @audio_context
       return @audio_context
     else
-      @logger.log @logger.levels.ERROR, 'The flow audio cannot use the Web Audio API as it is unavailable.'
+      @logger.error 'The flow audio cannot use the Web Audio API as it is unavailable.'
       return undefined
 
   ###
@@ -87,10 +87,10 @@ class z.audio.AudioRepository
     .then (audio_element) =>
       @_play audio_id, audio_element, play_in_loop
     .then (audio_element) =>
-      @logger.log @logger.levels.INFO, "Playing sound '#{audio_id}' (loop: '#{play_in_loop}')", audio_element
+      @logger.info "Playing sound '#{audio_id}' (loop: '#{play_in_loop}')", audio_element
     .catch (error) =>
       if error not instanceof z.audio.AudioError
-        @logger.log @logger.levels.ERROR, "Failed playing sound '#{audio_id}': #{error.message}"
+        @logger.error "Failed playing sound '#{audio_id}': #{error.message}"
         throw error
 
   ###
@@ -101,11 +101,11 @@ class z.audio.AudioRepository
     @_get_sound_by_id audio_id
     .then (audio_element) =>
       if not audio_element.paused
-        @logger.log @logger.levels.INFO, "Stopping sound '#{audio_id}'", audio_element
+        @logger.info "Stopping sound '#{audio_id}'", audio_element
         audio_element.pause()
       delete @currently_looping[audio_id] if @currently_looping[audio_id]
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed stopping sound '#{audio_id}': #{error.message}", audio_element
+      @logger.error "Failed stopping sound '#{audio_id}': #{error.message}", audio_element
       throw error
 
   ###
@@ -153,7 +153,7 @@ class z.audio.AudioRepository
   ###
   _init_sounds: ->
     @audio_elements[audio_id] = @_create_audio_element "#{@AUDIO_PATH}/#{audio_id}.mp3" for type, audio_id of z.audio.AudioType
-    @logger.log @logger.levels.INFO, 'Initialized sounds'
+    @logger.info 'Initialized sounds'
 
   ###
   Start playback of a sound.
@@ -193,7 +193,7 @@ class z.audio.AudioRepository
     for audio_id, audio_element of @audio_elements
       audio_element.preload = 'auto'
       audio_element.load()
-    @logger.log @logger.levels.INFO, 'Pre-loading audio files for immediate playback'
+    @logger.info 'Pre-loading audio files for immediate playback'
 
   ###
   Stop all sounds playing in loop.

@@ -101,7 +101,7 @@ class z.telemetry.calling.CallTelemetry
   track_duration: (call_et) =>
     duration = Math.floor (Date.now() - call_et.timer_start) / 1000
     if not window.isNaN duration
-      @logger.log @logger.levels.INFO, "Call duration: #{duration} seconds.", call_et.duration_time()
+      @logger.info "Call duration: #{duration} seconds.", call_et.duration_time()
 
       if duration <= 15
         duration_bucket = '0s-15s'

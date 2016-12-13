@@ -50,9 +50,9 @@ class z.ViewModel.list.StartUIViewModel
           if query is @search_repository.normalize_search_query @search_input()
             @search_results.others user_ets
           else
-            @logger.log @logger.levels.INFO, "Resolved Search query #{query} is outdated"
+            @logger.info "Resolved Search query #{query} is outdated"
         .catch (error) =>
-          @logger.log @logger.levels.ERROR, "Error searching for contacts: #{error.message}", error
+          @logger.error "Error searching for contacts: #{error.message}", error
 
         @searched_for_user query
     , 300
@@ -203,7 +203,7 @@ class z.ViewModel.list.StartUIViewModel
       @_show_onboarding_results response
     .catch (error) =>
       if error.type isnt z.connect.ConnectError::TYPE.NO_CONTACTS
-        @logger.log @logger.levels.ERROR, "Importing contacts from '#{source}' failed: #{error.message}", error
+        @logger.error "Importing contacts from '#{source}' failed: #{error.message}", error
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONTACTS, action: =>
           @import_contacts source
     .then (error) =>
@@ -224,14 +224,14 @@ class z.ViewModel.list.StartUIViewModel
         else
           @show_no_contacts_on_wire true
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Could not show the on-boarding results: #{error.message}", error
+      @logger.error "Could not show the on-boarding results: #{error.message}", error
 
   update_list: =>
     @search_repository.get_top_people()
     .then (user_ets) =>
       @top_users user_ets if user_ets.length > 0
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Could not update the top people: #{error.message}", error
+      @logger.error "Could not update the top people: #{error.message}", error
 
     @show_spinner false
 
@@ -332,7 +332,7 @@ class z.ViewModel.list.StartUIViewModel
       .then =>
         @suggestions.remove user_et
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Failed to ignore suggestions: '#{error.message}'", error
+        @logger.error "Failed to ignore suggestions: '#{error.message}'", error
 
   click_on_connect: (user_et, event) =>
     search_list_item = $(event.currentTarget.parentElement.parentElement)

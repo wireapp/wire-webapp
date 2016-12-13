@@ -74,7 +74,7 @@ class z.ViewModel.content.PreferencesAVViewModel
       return @audio_stream()
     .catch (error) =>
       error = error[0] if _.isArray error
-      @logger.log @logger.levels.ERROR, "Requesting MediaStream failed: #{error.message}", error
+      @logger.error "Requesting MediaStream failed: #{error.message}", error
       if error.type in [z.media.MediaError::TYPE.MEDIA_STREAM_DEVICE, z.media.MediaError::TYPE.MEDIA_STREAM_PERMISSION]
         @permission_denied true
         return false
@@ -86,7 +86,7 @@ class z.ViewModel.content.PreferencesAVViewModel
   @param audio_stream []
   ###
   _initiate_audio_meter: (audio_stream) =>
-    @logger.log @logger.levels.INFO, 'Initiating new audio meter', audio_stream
+    @logger.info 'Initiating new audio meter', audio_stream
     @audio_context = @audio_repository.get_audio_context()
 
     @audio_analyser = @audio_context.createAnalyser()
