@@ -99,16 +99,21 @@
     <!-- /ko -->
   <!-- /ko -->
 
-  <!-- ko if: show_paste_dialog -->
+  <!-- ko if: pasted_file() -->
     <div class="conversation-input-paste-modal">
       <div class="controls-left"></div>
       <div class="controls-center">
-        <span class="conversation-input-paste-icon icon-file"></span>
+        <!-- ko ifnot: pasted_file_preview_url() -->
+          <span class="conversation-input-paste-icon icon-file"></span>
+        <!-- /ko -->
+        <!-- ko if: pasted_file_preview_url() -->
+          <img class="conversation-input-paste-image conversation-input-paste-icon" data-bind="attr: {'src': pasted_file_preview_url()}">
+        <!-- /ko -->
         <span data-bind="text: pasted_file().name"></span>
       </div>
       <div class="controls-right">
-        <span class="controls-right-button icon-close" data-bind="click: on_cancel_pasted_files"></span>
-        <span class="controls-right-button icon-check" data-bind="click: on_send_pasted_files"></span>
+        <span class="conversation-input-paste-cancel button-icon-large icon-close" data-bind="click: on_cancel_pasted_files"></span>
+        <span class="conversation-input-paste-send bg-theme icon-check" data-bind="click: on_send_pasted_files"></span>
       </div>
     </div>
   <!-- /ko -->

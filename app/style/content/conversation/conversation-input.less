@@ -63,17 +63,6 @@
   }
 }
 
-.conversation-input-paste-modal {
-  .full-screen;
-  display: flex;
-  background-color: #fff;
-}
-
-.conversation-input-paste-icon {
-  color: @graphite;
-  margin-right: 16px;
-}
-
 .controls-left {
   .flex-center;
   width: @conversation-message-sender-width;
@@ -140,4 +129,43 @@
   top: -2px;
   background-color: #fff;
   line-height: 14px;
+}
+
+// paste modal
+@keyframes paste-fade-in {
+  to {opacity:1}
+}
+
+.conversation-input-paste-modal {
+  .full-screen;
+  display: flex;
+  background-color: #fff;
+  opacity: 0;
+  animation-name: paste-fade-in;
+  animation-duration: @animation-timing-slow;
+  animation-timing-function: @ease-out-expo;
+  animation-fill-mode: forwards;
+}
+
+.conversation-input-paste-icon {
+  color: @graphite;
+  margin-right: 16px;
+}
+
+.conversation-input-paste-image {
+  width: 16px;
+  height: 16px;
+}
+
+.conversation-input-paste-send {
+  .circle(32px);
+  color: #fff;
+  cursor: pointer;
+  line-height: 32px;
+  margin-right: 16px;
+  text-align: center;
+}
+
+.conversation-input-paste-cancel {
+  margin-right: 32px;
 }

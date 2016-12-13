@@ -32,8 +32,13 @@ class z.ViewModel.ConversationInputViewModel
     @self = @user_repository.self
     @list_not_bottom = ko.observable true
 
-    @show_paste_dialog = ko.observable false
     @pasted_file = ko.observable()
+    @pasted_file_preview_url = ko.observable()
+    @pasted_file.subscribe (blob) =>
+      if blob?.type is 'image/png'
+        @pasted_file_preview_url URL.createObjectURL blob
+      else
+        @pasted_file_preview_url null
 
     @edit_message_et = ko.observable()
     @edit_input = ko.observable ''
@@ -161,16 +166,13 @@ class z.ViewModel.ConversationInputViewModel
 
   on_paste_files: (pasted_files) =>
     @pasted_file pasted_files[0]
-    @show_paste_dialog true
 
   on_send_pasted_files: =>
     pasted_file = @pasted_file()
-    @show_paste_dialog false
     @on_drop_files [pasted_file]
     @pasted_file null
 
   on_cancel_pasted_files: =>
-    @show_paste_dialog false
     @pasted_file null
 
   on_drop_files: (dropped_files) =>

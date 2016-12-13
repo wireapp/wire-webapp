@@ -50,7 +50,7 @@ ko.bindingHandlers.paste_file =
       # TODO detect feature, get file name, type (always 'image/png' in Chrome?!?!)
       files = items
         .filter (item) -> item.kind is 'file'
-        .map (item) -> new File [item.getAsFile()], 'dummy', type: item.type or 'application/octet-stream'
+        .map (item) -> new File [item.getAsFile()], null, type: item.type
         .filter (item) -> item?
 
       if files.length > 0
