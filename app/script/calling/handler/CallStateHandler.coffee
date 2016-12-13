@@ -336,6 +336,8 @@ class z.calling.handler.CallStateHandler
     .then (call_et) =>
       @logger.log @logger.levels.INFO, "Delete call in conversation '#{conversation_id}'"
       # Reset call and delete it afterwards
+      if call_et.self_client_joined() and call_et.state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
+        amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP
       call_et.state z.calling.enum.CallState.ENDED
       call_et.reset_call()
       @_remove_call call_et.id

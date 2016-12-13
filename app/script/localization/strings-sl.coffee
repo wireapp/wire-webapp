@@ -287,7 +287,11 @@ z.string.sl.conversations_popover_silence = 'Utišaj'
 z.string.sl.conversations_popover_unarchive = 'Dearhiviraj'
 
 # Takeover
+z.string.sl.takeover_headline = 'Uporabniška imena so tukaj.'
+z.string.sl.takeover_sub = 'Zavzemite vaše unikatno ime na Wire.'
 z.string.sl.takeover_link = 'Nauči se več'
+z.string.sl.takeover_button_choose = 'Izberi svojo'
+z.string.sl.takeover_button_keep = 'Obdrži to'
 
 # Invites
 z.string.sl.invite_meta_key_mac = 'Cmd'
@@ -295,6 +299,7 @@ z.string.sl.invite_meta_key_pc = 'Ctrl'
 z.string.sl.invite_hint_selected = 'Pritisnite %meta_key + C za kopiranje'
 z.string.sl.invite_hint_unselected = 'Izberite in pritisnite %meta_key + C'
 z.string.sl.invite_headline = 'Povabite osebe na Wire'
+z.string.sl.invite_message = 'Sem na Wire, poišči %username ali obišči wire.com/download.'
 z.string.sl.invite_message_no_email = 'Sem na Wire. Obišči https://get.wire.com za povezavo z mano.'
 
 # Extensions
@@ -398,6 +403,9 @@ z.string.sl.preferences_account_reset_password = 'Resetiraj geslo'
 z.string.sl.preferences_account_delete = 'Izbriši račun'
 z.string.sl.preferences_account_log_out = 'Odjava'
 z.string.sl.preferences_account_username_placeholder = 'Vaše polno ime'
+z.string.sl.preferences_account_username_hint = 'Vsaj 2 znaka. Le a—z, 0—9 in _.'
+z.string.sl.preferences_account_username_available = 'Na voljo'
+z.string.sl.preferences_account_username_error_taken = 'Že zasedeno'
 
 z.string.sl.preferences_av_camera = 'Kamera'
 z.string.sl.preferences_av_microphone = 'Mikrofon'
@@ -450,6 +458,8 @@ z.string.sl.search_top_people = 'Top osebe'
 z.string.sl.search_try_search = 'Najdi osebe po imenu ali\npolnem e-poštnem naslovu'
 z.string.sl.search_no_contacts_on_wire = 'Nimate nobenih stikov na Wire.\nPoizkusite najti osebe po imenu\nali polnem e-poštnem naslovu'
 z.string.sl.search_others = 'Poveži'
+z.string.sl.search_friend_in_common = '%no skupna oseba'
+z.string.sl.search_friends_in_common = '%no skupnih oseb'
 
 # Picture upload
 z.string.sl.upload_welcome = 'Wire je lepši s sliko.'
@@ -474,6 +484,7 @@ z.string.sl.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/a
 z.string.sl.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.sl.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
 z.string.sl.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.sl.url_support_usernames = 'https://wire.com/support/username'
 z.string.sl.url_decrypt_error_1 = 'https://wire.com/privacy/error-1'
 z.string.sl.url_decrypt_error_2 = 'https://wire.com/privacy/error-2'
 

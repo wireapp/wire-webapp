@@ -101,7 +101,7 @@ class z.calling.entities.Call
         amplify.publish z.event.WebApp.CALL.SIGNALING.POST_FLOWS, @id if @get_number_of_participants()
       else
         @is_connected false
-        amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP if @state() is z.calling.enum.CallState.ONGOING
+        amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP if @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
         @telemetry.track_duration @
         @_reset_timer()
         @_reset_flows()
@@ -324,7 +324,7 @@ class z.calling.entities.Call
       for participant_et in delete_participants_ets when @delete_participant participant_et
         participant_left = true
         break if sequential_event
-      if participant_left and @self_client_joined() and @state() is z.calling.enum.CallState.ONGOING
+      if participant_left and @self_client_joined() and @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP
 
     @_sort_participants_by_panning()
