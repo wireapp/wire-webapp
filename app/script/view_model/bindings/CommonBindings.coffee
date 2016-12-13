@@ -322,14 +322,14 @@ ko.bindingHandlers.in_viewport = do ->
     _dispose = ->
       z.util.ArrayUtil.remove_element listeners, _check_element
 
-    _check_element = (e) ->
+    _check_element = _.debounce (e) ->
       is_child = if e? then e.target.contains(element) else true
       if is_child and _in_view element
         dispose = valueAccessor()?()
         _dispose() if dispose
+    , 100
 
     listeners.push _check_element
-
-    window.setTimeout _check_element, 300
+    _check_element()
 
     ko.utils.domNodeDisposal.addDisposeCallback element, _dispose

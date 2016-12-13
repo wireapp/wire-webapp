@@ -25,6 +25,8 @@ class z.components.UserAvatar
     @badge = params.badge or false
     @element = $(component_info.element)
 
+    @avatar_loading_blocked = false
+
     if not @user?
       @user = new z.entity.User()
 
@@ -57,10 +59,12 @@ class z.components.UserAvatar
       params.click? data.user, event.currentTarget.parentNode
 
     @on_in_viewport = =>
+      return true if @avatar_loading_blocked
       @_load_avatar_picture()
       return true
 
     @_load_avatar_picture = =>
+      @avatar_loading_blocked = true
       @user.preview_picture_resource()?.get_object_url()
       .then (url) =>
         image = new Image()
@@ -68,8 +72,11 @@ class z.components.UserAvatar
         @avatar_image = @element.find '.user-avatar-image'
         @avatar_image.empty().append image
         @element.addClass 'user-avatar-image-loaded user-avatar-loading-transition'
+        @avatar_loading_blocked = false
 
-    @picture_preview_subscription = ko.computed @_load_avatar_picture
+    @picture_preview_subscription = ko.computed =>
+      return if @avatar_loading_blocked
+      @_load_avatar_picture()
 
   dispose: =>
     @picture_preview_subscription.dispose()
