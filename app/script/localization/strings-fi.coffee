@@ -287,7 +287,11 @@ z.string.fi.conversations_popover_silence = 'Mykistä'
 z.string.fi.conversations_popover_unarchive = 'Palauta arkistosta'
 
 # Takeover
+z.string.fi.takeover_headline = 'Käyttäjänimet ovat täällä.'
+z.string.fi.takeover_sub = 'Valtaa yksilöllinen nimesi Wiressä.'
 z.string.fi.takeover_link = 'Lue lisää'
+z.string.fi.takeover_button_choose = 'Valitse omasi'
+z.string.fi.takeover_button_keep = 'Pidä tämä'
 
 # Invites
 z.string.fi.invite_meta_key_mac = 'Cmd'
@@ -295,6 +299,7 @@ z.string.fi.invite_meta_key_pc = 'Ctrl'
 z.string.fi.invite_hint_selected = 'Paina %meta_key + C kopioidaksesi'
 z.string.fi.invite_hint_unselected = 'Valitse ja paina %meta_key + C'
 z.string.fi.invite_headline = 'Kutsu ihmisiä Wireen'
+z.string.fi.invite_message = 'Olen Wiressä, etsi %username tai mene osoitteeseen wire.com/download.'
 z.string.fi.invite_message_no_email = 'Olen Wiressä. Mene osoitteeseen https://get.wire.com ottaaksesi yhteyttä minuun.'
 
 # Extensions
@@ -399,6 +404,9 @@ z.string.fi.preferences_account_reset_password = 'Vaihda salasana'
 z.string.fi.preferences_account_delete = 'Poista tili'
 z.string.fi.preferences_account_log_out = 'Kirjaudu ulos'
 z.string.fi.preferences_account_username_placeholder = 'Koko nimesi'
+z.string.fi.preferences_account_username_hint = 'Vähintään 2 merkkiä, vain a - z, 0 - 9 ja _.'
+z.string.fi.preferences_account_username_available = 'Saatavilla'
+z.string.fi.preferences_account_username_error_taken = 'On jo käytössä'
 
 z.string.fi.preferences_av_camera = 'Kamera'
 z.string.fi.preferences_av_microphone = 'Mikrofoni'
@@ -451,6 +459,8 @@ z.string.fi.search_top_people = 'Eniten käytetyt kontaktit'
 z.string.fi.search_try_search = 'Etsi ihmisiä nimellä tai sähköpostiosoitteella'
 z.string.fi.search_no_contacts_on_wire = 'Sinulla ei ole kontakteja Wiressä. Yritä etsiä ihmisiä nimellä tai sähköpostiosoitteella'
 z.string.fi.search_others = 'Yhdistä'
+z.string.fi.search_friend_in_common = '%n yhteinen käyttäjä molemmilla'
+z.string.fi.search_friends_in_common = '%n yhteistä käyttäjää molemmilla'
 
 # Picture upload
 z.string.fi.upload_welcome = 'Wire on niin paljon mukavampi kuvalla.'
@@ -483,6 +493,7 @@ z.string.fi.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/a
 z.string.fi.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.fi.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
 z.string.fi.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.fi.url_support_usernames = 'https://wire.com/support/username'
 z.string.fi.url_decrypt_error_1 = 'https://wire.com/privacy/error-1'
 z.string.fi.url_decrypt_error_2 = 'https://wire.com/privacy/error-2'
 

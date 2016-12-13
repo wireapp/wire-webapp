@@ -287,7 +287,11 @@ z.string.ru.conversations_popover_silence = 'Выключить уведомле
 z.string.ru.conversations_popover_unarchive = 'Разархивировать'
 
 # Takeover
+z.string.ru.takeover_headline = 'Имена пользователей уже здесь.'
+z.string.ru.takeover_sub = 'Зарегистрируйте своё уникальное имя в Wire.'
 z.string.ru.takeover_link = 'Подробнее'
+z.string.ru.takeover_button_choose = 'Выбрать своё'
+z.string.ru.takeover_button_keep = 'Оставить это'
 
 # Invites
 z.string.ru.invite_meta_key_mac = 'Cmd'
@@ -295,6 +299,7 @@ z.string.ru.invite_meta_key_pc = 'Ctrl'
 z.string.ru.invite_hint_selected = 'Нажмите %meta_key + C для копирования'
 z.string.ru.invite_hint_unselected = 'Выделите и нажмите %meta_key + C'
 z.string.ru.invite_headline = 'Пригласите людей в Wire'
+z.string.ru.invite_message = 'Я использую Wire, введи в поиске %username или перейди на wire.com/download.'
 z.string.ru.invite_message_no_email = 'Я использую Wire. Перейди на https://get.wire.com, чтобы связаться со мной.'
 
 # Extensions
@@ -399,6 +404,9 @@ z.string.ru.preferences_account_reset_password = 'Сбросить пароль'
 z.string.ru.preferences_account_delete = 'Удалить аккаунт'
 z.string.ru.preferences_account_log_out = 'Выход'
 z.string.ru.preferences_account_username_placeholder = 'Ваше полное имя'
+z.string.ru.preferences_account_username_hint = 'Минимум 2 символа. Только a–z, 0–9 и _'
+z.string.ru.preferences_account_username_available = 'Доступно'
+z.string.ru.preferences_account_username_error_taken = 'Уже занято'
 
 z.string.ru.preferences_av_camera = 'Камера'
 z.string.ru.preferences_av_microphone = 'Микрофон'
@@ -451,6 +459,8 @@ z.string.ru.search_top_people = 'Топ-контакты'
 z.string.ru.search_try_search = 'Ищите людей по имени\nили адресу электронной почты'
 z.string.ru.search_no_contacts_on_wire = 'У вас нет контактов в Wire.\nПопробуйте найти людей по имени\nили адресу электронной почты'
 z.string.ru.search_others = 'Подключиться'
+z.string.ru.search_friend_in_common = '%no общий знакомый'
+z.string.ru.search_friends_in_common = '%no общих знакомых'
 
 # Picture upload
 z.string.ru.upload_welcome = 'Wire выглядит лучше с вашей фотографией.'
@@ -483,6 +493,7 @@ z.string.ru.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/a
 z.string.ru.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.ru.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
 z.string.ru.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.ru.url_support_usernames = 'https://wire.com/support/username'
 z.string.ru.url_decrypt_error_1 = 'https://wire.com/privacy/error-1'
 z.string.ru.url_decrypt_error_2 = 'https://wire.com/privacy/error-2'
 
