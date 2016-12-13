@@ -159,7 +159,7 @@ class z.client.ClientRepository
   @param client_payload [Object] Client data to be stored in database
   @return [Promise] Promise that resolves with the record stored in database
   ###
-  _update_client_schema_in_db = (user_id, client_payload) =>
+  _update_client_schema_in_db: (user_id, client_payload) =>
     client_payload.meta =
       is_verified: false
       primary_key: @_construct_primary_key user_id, client_payload.id
