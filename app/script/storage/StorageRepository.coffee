@@ -124,8 +124,8 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
           _push_session = (serialized_session) => @sessions_queue.push =>
             @_deserialize_session serialized_session
             .then (session) =>
-              if session
-                @logger.log @logger.levels.INFO, "De-serialized session '#{serialized_session.id}'", session
+              if not session
+                @logger.log @logger.levels.WARN, "Failed to de-serialized session '#{serialized_session.id}'"
               handled_sessions++
               if handled_sessions % 5 is 0
                 amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_sessions_progress, false, [handled_sessions, sessions.length]
