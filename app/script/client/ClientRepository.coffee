@@ -100,6 +100,19 @@ class z.client.ClientRepository
         return @current_client()
 
   ###
+  Construct the primary key to store clients in database.
+  @private
+
+  @param user_id [String] User ID from the owner of the client
+  @param client_id [String] Client ID
+  @return [String] Primary key
+  ###
+  _construct_primary_key: (user_id, client_id) ->
+    throw new z.client.ClientError z.client.ClientError::TYPE.NO_USER_ID if not user_id
+    throw new z.client.ClientError z.client.ClientError::TYPE.NO_CLIENT_ID if not client_id
+    return "#{user_id}@#{client_id}"
+
+  ###
   Save the a client into the database.
 
   @private
@@ -125,19 +138,6 @@ class z.client.ClientRepository
     # Preserve primary key on update
     changes.meta.primary_key = primary_key
     return @client_service.update_client_in_db primary_key, changes
-
-  ###
-  Construct the primary key to store clients in database.
-  @private
-
-  @param user_id [String] User ID from the owner of the client
-  @param client_id [String] Client ID
-  @return [String] Primary key
-  ###
-  _construct_primary_key: (user_id, client_id) ->
-    throw new z.client.ClientError z.client.ClientError::TYPE.NO_USER_ID if not user_id
-    throw new z.client.ClientError z.client.ClientError::TYPE.NO_CLIENT_ID if not client_id
-    return "#{user_id}@#{client_id}"
 
   ###
   Save the local client into the database.
