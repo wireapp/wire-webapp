@@ -151,6 +151,19 @@ class z.client.ClientRepository
       is_verified: true
     return @client_service.save_client_in_db @PRIMARY_KEY_CURRENT_CLIENT, client_payload
 
+  ###
+  Updates a client payload if it does not fit the current database structure.
+
+  @private
+  @param user_id [String] User ID of the client owner
+  @param client_payload [Object] Client data to be stored in database
+  @return [Promise] Promise that resolves with the record stored in database
+  ###
+  _update_client_schema_in_db = (user_id, client_payload) =>
+    client_payload.meta =
+      is_verified: false
+      primary_key: @_construct_primary_key user_id, client_payload.id
+    return @save_client_in_db user_id, client_payload
 
   ###############################################################################
   # Login and registration
@@ -458,13 +471,6 @@ class z.client.ClientRepository
         # Save new clients and cache existing ones
         promises = []
 
-        # Updates a client payload if it does not fit the current database structure
-        update_client_schema = (user_id, client_payload) =>
-          client_payload.meta =
-            is_verified: false
-            primary_key: @_construct_primary_key user_id, client_payload.id
-          return @save_client_in_db user_id, client_payload
-
         # Known clients will be returned as object, unknown clients will resolve with their expected primary key
         for result in results
 
@@ -475,7 +481,7 @@ class z.client.ClientRepository
 
             @logger.log @logger.levels.INFO, "New client '#{ids.client_id}' will be stored locally"
             client_payload = clients_from_backend[ids.client_id]
-            promises.push update_client_schema user_id, client_payload
+            promises.push @_update_client_schema_in_db user_id, client_payload
             continue
 
           if clients_from_backend[result.id]
