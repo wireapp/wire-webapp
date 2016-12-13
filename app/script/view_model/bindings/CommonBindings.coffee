@@ -21,6 +21,7 @@ ko.bindingHandlers.drop_file =
   init: (element, valueAccessor, allBindings, data, context) ->
     fileDragOver = (data, e) ->
       e.preventDefault()
+      e.originalEvent.dataTransfer.dropEffect = 'copy'
       e.currentTarget.classList.add 'drag-hover'
 
     fileDragLeave = (data, e) ->
@@ -286,3 +287,49 @@ ko.bindingHandlers.hide_controls =
       hide_timeout = window.setTimeout ->
         element.classList.add 'hide-controls'
       , timeout
+
+# element is added to view
+ko.bindingHandlers.added_to_view =
+  init: (element, valueAccessor) ->
+    callback = valueAccessor()
+    callback()
+
+# element is removed to view
+ko.bindingHandlers.removed_from_view =
+  init: (element, valueAccessor) ->
+    callback = valueAccessor()
+    ko.utils.domNodeDisposal.addDisposeCallback element, ->
+      callback()
+
+# element is in viewport. return true within the callback to dispose the subscription
+ko.bindingHandlers.in_viewport = do ->
+
+  listeners = []
+
+  window.addEventListener 'scroll', (e) ->
+    listener(e) for listener in listeners by -1 # listeners can be deleted during iteration
+  , true
+
+  init: (element, valueAccessor) ->
+
+    _in_view = (dom_element) ->
+      box = dom_element.getBoundingClientRect()
+      return box.right >= 0 and
+          box.bottom >= 0 and
+          box.left <= document.documentElement.clientWidth and
+          box.top <= document.documentElement.clientHeight
+
+    _dispose = ->
+      z.util.ArrayUtil.remove_element listeners, _check_element
+
+    _check_element = _.debounce (e) ->
+      is_child = if e? then e.target.contains(element) else true
+      if is_child and _in_view element
+        dispose = valueAccessor()?()
+        _dispose() if dispose
+    , 100
+
+    listeners.push _check_element
+    _check_element()
+
+    ko.utils.domNodeDisposal.addDisposeCallback element, _dispose

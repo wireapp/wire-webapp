@@ -21,8 +21,6 @@ z.search ?= {}
 
 # Enum of different search modes.
 z.search.SEARCH_MODE =
-  COMMON_CONNECTIONS: 'common_connections'
   CONTACTS: 'contacts'
-  SUGGESTIONS: 'suggestions'
   TOP_PEOPLE: 'top_people'
   ONBOARDING: 'onboarding'

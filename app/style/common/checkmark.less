@@ -1,0 +1,39 @@
+@keyframes show {
+  to {transform: scaleY(1);}
+}
+
+.checkmark {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  position: relative;
+  transform: rotate(45deg);
+
+  &:before,
+  &:after {
+    content: "";
+
+    position: absolute;
+    left: 50%;
+    right: 0;
+    bottom: 0;
+    top: 0;
+
+    transform: scaleY(0);
+    animation-name: show;
+    animation-fill-mode: forwards;
+  }
+
+  &:before {
+    border-bottom: 2px solid currentColor;
+    transform-origin: 0 0;
+    animation-duration: @animation-timing-faster;
+  }
+
+  &:after {
+    border-right: 2px solid currentColor;
+    transform-origin: 0 100%;
+    animation-duration: @animation-timing-fast;
+    animation-delay: @animation-timing-faster;
+  }
+}

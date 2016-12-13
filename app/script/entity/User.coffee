@@ -94,8 +94,8 @@ class z.entity.User
         initials = @first_name().slice 0, 2
       return initials.toUpperCase()
 
-    @mutual_friend_ets = ko.observableArray []
-    @mutual_friend_ids = ko.observableArray []
+    @username = ko.observable()
+
     @mutual_friends_total = ko.observable 0
 
     @preview_picture_resource = ko.observable()
@@ -125,3 +125,10 @@ class z.entity.User
 
   remove_client: (client_id) =>
     @devices.remove (client_et) -> client_et.id is client_id
+
+  ###
+  Check whether username, name or email matches the given query
+  @param query [String]
+  ###
+  matches: (query) =>
+    return z.util.compare_names(@name(), query) or @username() is query or @email() is query

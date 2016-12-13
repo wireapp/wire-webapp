@@ -44,3 +44,7 @@
   .label-semibold;
   font-size: @font-size-xs;
 }
+
+.label-username:not(:empty):before {
+  content: "@";
+}

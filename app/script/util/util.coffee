@@ -77,12 +77,11 @@ z.util.load_url_buffer = (url, xhr_accessor_function) ->
     xhr.send()
 
 
-z.util.load_url_blob = (url, callback) ->
+z.util.load_url_blob = (url) ->
   z.util.load_url_buffer url
   .then (value) ->
     [buffer, type] = value
-    image_as_blob = new Blob [new Uint8Array buffer], type: type
-    callback? image_as_blob
+    return new Blob [new Uint8Array buffer], type: type
 
 
 z.util.append_url_parameter = (url, param) ->
@@ -255,6 +254,14 @@ z.util.phone_number_to_e164 = (phone_number, country_code) ->
 z.util.create_random_uuid = ->
   return UUID.genV4().hexString
 
+###
+Returns a random integer between min (included) and max (excluded)
+###
+z.util.get_random_int = (min, max) ->
+  min = Math.ceil min
+  max = Math.floor max
+  return Math.floor Math.random() * (max - min) + min
+
 
 z.util.encode_base64 = (text) ->
   return window.btoa text
@@ -331,15 +338,14 @@ z.util.markup_links = (message) ->
 
 
 # Note: We are using "Underscore.js" to escape HTML in the original message
-z.util.render_message = (message, theme_color) ->
+z.util.render_message = (message) ->
   message = marked message
   message = z.util.auto_link_emails message
   message = message.replace /\n/g, '<br />'
   # Remove <br /> if it is the last thing in a message
   if z.util.get_last_characters(message, '<br />'.length) is '<br />'
     message = z.util.cut_last_characters message, '<br />'.length
-
-  return z.media.MediaParser.render_media_embeds message, theme_color
+  return message
 
 
 z.util.read_string_chars_as_hex = (text) ->
@@ -423,14 +429,6 @@ z.util.sort_object_by_keys = (object, reverse) ->
 z.util.sort_user_by_first_name = (user_a, user_b) ->
   name_a = user_a.first_name().toLowerCase()
   name_b = user_b.first_name().toLowerCase()
-  return -1 if name_a < name_b
-  return 1 if name_a > name_b
-  return 0
-
-
-z.util.sort_user_by_name = (user_a, user_b) ->
-  name_a = user_a.name().toLowerCase()
-  name_b = user_b.name().toLowerCase()
   return -1 if name_a < name_b
   return 1 if name_a > name_b
   return 0

@@ -11,6 +11,7 @@
 <script src="/script/util/KeyUtil.js"></script>
 <script src="/script/util/marked.js"></script>
 <script src="/script/util/confirm.js"></script>
+<script src="/script/util/PromiseQueue.js"></script>
 <script src="/script/util/scroll-helpers.js"></script>
 <script src="/script/util/Statistics.js"></script>
 <script src="/script/util/StorageUtil.js"></script>
@@ -63,8 +64,17 @@
 <script src="/script/localization/strings.js"></script>
 <script src="/script/localization/Localizer.js"></script>
 <!-- Media -->
+<script src="/script/media/MediaDevicesHandler.js"></script>
+<script src="/script/media/MediaDeviceType.js"></script>
+<script src="/script/media/MediaElementHandler.js"></script>
 <script src="/script/media/MediaEmbeds.js"></script>
+<script src="/script/media/MediaError.js"></script>
 <script src="/script/media/MediaParser.js"></script>
+<script src="/script/media/MediaRepository.js"></script>
+<script src="/script/media/MediaStreamHandler.js"></script>
+<script src="/script/media/MediaStreamSource.js"></script>
+<script src="/script/media/MediaStreamInfo.js"></script>
+<script src="/script/media/MediaType.js"></script>
 <!-- Audio -->
 <script src="/script/audio/AudioError.js"></script>
 <script src="/script/audio/AudioRepository.js"></script>
@@ -103,6 +113,7 @@
 <script src="/script/user/UserMapper.js"></script>
 <script src="/script/user/UserConnectionMapper.js"></script>
 <script src="/script/user/UserRepository.js"></script>
+<script src="/script/user/UserHandleGenerator.js"></script>
 <!-- User Properties -->
 <script src="/script/properties/Properties.js"></script>
 <script src="/script/properties/PropertiesService.js"></script>
@@ -128,7 +139,6 @@
 <script src="/script/conversation/EventMapper.js"></script>
 <script src="/script/conversation/ConversationMapper.js"></script>
 <script src="/script/conversation/ConversationRepository.js"></script>
-<script src="/script/conversation/SendingQueue.js"></script>
 <!-- Extensions -->
 <script src="/script/extension/GiphyService.js"></script>
 <script src="/script/extension/GiphyRepository.js"></script>
@@ -138,6 +148,7 @@
 <script src="/script/links/LinkPreviewHelpers.js"></script>
 <script src="/script/links/LinkPreviewProtoBuilder.js"></script>
 <script src="/script/links/LinkPreviewRepository.js"></script>
+<script src="/script/links/LinkPreviewBlackList.js"></script>
 <!-- Search -->
 <script src="/script/search/SearchMode.js"></script>
 <script src="/script/search/SearchLevel.js"></script>
@@ -193,10 +204,12 @@
 <script src="/script/view_model/list/ActionsViewModel.js"></script>
 <script src="/script/view_model/list/ArchiveViewModel.js"></script>
 <script src="/script/view_model/list/ConversationListViewModel.js"></script>
+<script src="/script/view_model/list/ListModalType.js"></script>
 <script src="/script/view_model/list/ListState.js"></script>
 <script src="/script/view_model/list/ListViewModel.js"></script>
 <script src="/script/view_model/list/PreferencesListViewModel.js"></script>
 <script src="/script/view_model/list/StartUIViewModel.js"></script>
+<script src="/script/view_model/list/TakeoverViewModel.js"></script>
 <!-- Bindings -->
 <script src="/script/view_model/bindings/CommonBindings.js"></script>
 <script src="/script/view_model/bindings/ConversationListBindings.js"></script>
@@ -279,16 +292,12 @@
 <script src="/script/calling/enum/CallState.js"></script>
 <script src="/script/calling/enum/CallStateEventCause.js"></script>
 <script src="/script/calling/enum/CallStateGroups.js"></script>
-<script src="/script/calling/enum/MediaDeviceType.js"></script>
-<script src="/script/calling/enum/MediaStreamSource.js"></script>
-<script src="/script/calling/enum/MediaType.js"></script>
 <script src="/script/calling/enum/ParticipantState.js"></script>
 <script src="/script/calling/enum/SDPNegotiationMode.js"></script>
 <script src="/script/calling/enum/SDPSource.js"></script>
 <script src="/script/calling/enum/VideoOrientation.js"></script>
 <script src="/script/calling/payloads/FlowDeletionInfo.js"></script>
 <script src="/script/calling/payloads/ICECandidateInfo.js"></script>
-<script src="/script/calling/payloads/MediaStreamInfo.js"></script>
 <script src="/script/calling/payloads/SDPInfo.js"></script>
 <script src="/script/calling/rtc/ICEConnectionState.js"></script>
 <script src="/script/calling/rtc/ICEGatheringState.js"></script>
@@ -299,9 +308,6 @@
 <script src="/script/calling/rtc/StatsType.js"></script>
 <script src="/script/calling/handler/CallSignalingHandler.js"></script>
 <script src="/script/calling/handler/CallStateHandler.js"></script>
-<script src="/script/calling/handler/MediaDevicesHandler.js"></script>
-<script src="/script/calling/handler/MediaElementHandler.js"></script>
-<script src="/script/calling/handler/MediaStreamHandler.js"></script>
 <script src="/script/calling/mapper/ICECandidateMapper.js"></script>
 <script src="/script/calling/mapper/SDPMapper.js"></script>
 <script src="/script/calling/entities/Call.js"></script>

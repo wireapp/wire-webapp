@@ -23,7 +23,7 @@ z.telemetry.calling ?= {}
 class z.telemetry.calling.VideoStreamStats extends z.telemetry.calling.MediaStreamStats
   constructor: (timestamp) ->
     super timestamp
-    @media_type = z.calling.enum.MediaType.VIDEO
+    @media_type = z.media.MediaType.VIDEO
     @frame_height_received = 0
     @frame_height_sent = 0
     @frame_rate_received = 0

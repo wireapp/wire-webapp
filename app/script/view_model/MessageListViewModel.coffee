@@ -139,14 +139,10 @@ class z.ViewModel.MessageListViewModel
 
     if not conversation_et.is_loaded()
       @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
-
-        # release any event that are not unread
-        conversation_et.release()
-
         @conversation_repository.get_events conversation_et
         .then =>
-          @_set_conversation conversation_et, callback
           conversation_et.is_loaded true
+          @_set_conversation conversation_et, callback
     else
       @_set_conversation conversation_et, callback
 
@@ -531,7 +527,8 @@ class z.ViewModel.MessageListViewModel
   @param message_et [z.entity.Message]
   ###
   message_in_viewport: (message_et) =>
-    return if not message_et.is_ephemeral()
+    if not message_et.is_ephemeral()
+      return true
 
     if document.hasFocus()
       @conversation_repository.check_ephemeral_timer message_et
@@ -540,3 +537,5 @@ class z.ViewModel.MessageListViewModel
 
       $(window).one 'focus', =>
         @conversation_repository.check_ephemeral_timer message_et if start_timer_on_focus is @conversation.id
+
+    return true

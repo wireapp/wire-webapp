@@ -80,6 +80,7 @@ class z.main.App
     repository.cache               = new z.cache.CacheRepository()
     repository.cryptography        = new z.cryptography.CryptographyRepository @service.cryptography, repository.storage
     repository.giphy               = new z.extension.GiphyRepository @service.giphy
+    repository.media               = new z.media.MediaRepository repository.audio
 
     repository.client              = new z.client.ClientRepository @service.client, repository.cryptography
     repository.user                = new z.user.UserRepository @service.user, @service.asset, @service.search, repository.client, repository.cryptography
@@ -99,7 +100,7 @@ class z.main.App
     )
 
     repository.bot                 = new z.bot.BotRepository @service.bot, repository.conversation
-    repository.call_center         = new z.calling.CallCenter @service.call, repository.conversation, repository.user, repository.audio
+    repository.call_center         = new z.calling.CallCenter @service.call, repository.audio, repository.conversation, repository.media, repository.user
     repository.event_tracker       = new z.tracking.EventTrackingRepository repository.user, repository.conversation
     repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.call_center, repository.conversation
 
@@ -110,7 +111,7 @@ class z.main.App
     view = {}
 
     view.main                      = new z.ViewModel.MainViewModel 'wire-main', @repository.user
-    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.search, @repository.user, @repository.properties
+    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.audio, @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.media, @repository.search, @repository.user, @repository.properties
     view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user, @repository.properties
     view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
@@ -237,25 +238,30 @@ class z.main.App
   @return [Promise<z.entity.User>] Promise that resolves with the self user entity
   ###
   _get_user_self: ->
-    return new Promise (resolve, reject) =>
-      @repository.user.get_me()
-      .then (user_et) =>
-        @logger.log @logger.levels.INFO, "Loaded self user with ID '#{user_et.id}'"
+    @repository.user.get_me()
+    .then (user_et) =>
+      @logger.log @logger.levels.INFO, "Loaded self user with ID '#{user_et.id}'"
+      if not user_et.email() and not user_et.phone()
+        throw new Error 'User does not have a verified identity'
+      @service.storage.init user_et.id
+      .then =>
+        @_check_user_information user_et
+        return user_et
+    .catch (error) ->
+      if not error instanceof z.storage.StorageError
+        error = new Error "Loading self user failed: #{error.message}"
+      throw error
 
-        if not user_et.email() and not user_et.phone()
-          reject new Error 'User does not have a verified identity'
-        else
-          @service.storage.init user_et.id
-          .then =>
-            if not user_et.medium_picture_resource()
-              @view.list.first_run true
-              @repository.user.set_default_picture()
-            resolve user_et
-      .catch (error) =>
-        if not error instanceof z.storage.StorageError
-          error = new Error "Loading self user failed: #{error}"
-          @logger.log @logger.levels.ERROR, error.message
-        reject error
+  ###
+  Check whether we need to set different user information (picture, username).
+  @param user_et [z.entity.User]
+  ###
+  _check_user_information: (user_et) ->
+    if not user_et.medium_picture_resource()
+      @view.list.first_run true
+      @repository.user.set_default_picture()
+    if not user_et.username()
+      @repository.user.get_username_suggestion()
 
   # Handle URL params
   _handle_url_params: ->
@@ -323,8 +329,8 @@ class z.main.App
   # Hide the loading spinner and show the application UI.
   _show_ui: ->
     @logger.log @logger.levels.INFO, 'Showing application UI'
-    if @view.list.first_run() or not @repository.user.users().length
-      amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.WATERMARK
+    if @repository.user.should_change_username()
+      amplify.publish z.event.WebApp.TAKEOVER.SHOW
     else if conversation_et = @repository.conversation.get_most_recent_conversation()
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
     else if @repository.user.connect_requests().length

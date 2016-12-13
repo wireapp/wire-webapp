@@ -44,7 +44,7 @@
           <!-- ko if: show_connections() && connections().length -->
             <div class="start-ui-list-connections">
               <span class="start-ui-list-header" data-uie-name="status-connect" data-bind="l10n_text: z.string.search_connections"></span>
-              <group-list params="groups: connections, click: click_on_group, avatar: true"></group-list>
+              <user-list class="search-list-theme-black" params="user: connections, click: click_on_group, mode: z.components.UserListMode.INFO"></user-list>
             </div>
           <!-- /ko  -->
         <!-- /ko  -->
@@ -53,7 +53,7 @@
           <div class="start-ui-list-search-results">
             <div class="contacts" data-bind="visible: search_results.contacts().length > 0">
               <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_connections"></span>
-              <user-list class="search-list-theme-black" params="user: search_results.contacts, selected: selected_people"></user-list>
+              <user-list class="search-list-theme-black" params="user: search_results.contacts, selected: selected_people, mode: z.components.UserListMode.INFO"></user-list>
             </div>
             <div class="start-ui-groups" data-bind="visible: search_results.groups().length > 0">
               <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_groups"></span>

@@ -23,6 +23,6 @@ z.telemetry.calling ?= {}
 class z.telemetry.calling.AudioStreamStats extends z.telemetry.calling.MediaStreamStats
   constructor: (timestamp) ->
     super timestamp
-    @media_type = z.calling.enum.MediaType.AUDIO
+    @media_type = z.media.MediaType.AUDIO
     @volume_received = 0
     @volume_sent = 0

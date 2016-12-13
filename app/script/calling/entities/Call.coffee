@@ -40,14 +40,14 @@ class z.calling.entities.Call
     @timer_start = undefined
     @duration_time = ko.observable 0
     @finished_reason = z.calling.enum.CallFinishedReason.UNKNOWN
-    @remote_media_type = ko.observable z.calling.enum.MediaType.NONE
+    @remote_media_type = ko.observable z.media.MediaType.NONE
 
     @is_connected = ko.observable false
     @is_group = @conversation_et.is_group
     @is_remote_screen_shared = ko.pureComputed =>
-      return @remote_media_type() is z.calling.enum.MediaType.SCREEN
+      return @remote_media_type() is z.media.MediaType.SCREEN
     @is_remote_videod = ko.pureComputed =>
-      return @remote_media_type() is z.calling.enum.MediaType.VIDEO
+      return @remote_media_type() is z.media.MediaType.VIDEO
 
     @self_client_joined = ko.observable false
     @self_user_joined = ko.observable false
@@ -101,7 +101,7 @@ class z.calling.entities.Call
         amplify.publish z.event.WebApp.CALL.SIGNALING.POST_FLOWS, @id if @get_number_of_participants()
       else
         @is_connected false
-        amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP
+        amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP if @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
         @telemetry.track_duration @
         @_reset_timer()
         @_reset_flows()
@@ -130,8 +130,8 @@ class z.calling.entities.Call
           @_on_state_connecting()
         when z.calling.enum.CallState.INCOMING
           @_on_state_incoming()
-        when z.calling.enum.CallState.ENDED
-          @_on_state_ended()
+        when z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ENDED
+          @_on_state_disconnecting()
         when z.calling.enum.CallState.IGNORED
           @_on_state_ignored()
         when z.calling.enum.CallState.ONGOING
@@ -155,7 +155,7 @@ class z.calling.entities.Call
     @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
     @is_declined false
 
-  _on_state_ended: =>
+  _on_state_disconnecting: =>
     if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
       @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
     @is_declined false
@@ -214,13 +214,13 @@ class z.calling.entities.Call
         participant_et.state.videod state.videod if state.videod?
 
         if state.screen_shared
-          @remote_media_type z.calling.enum.MediaType.SCREEN
+          @remote_media_type z.media.MediaType.SCREEN
           media_type_updated = true
         else if state.videod
-          @remote_media_type z.calling.enum.MediaType.VIDEO
+          @remote_media_type z.media.MediaType.VIDEO
           media_type_updated = true
 
-    @remote_media_type z.calling.enum.MediaType.AUDIO if not media_type_updated
+    @remote_media_type z.media.MediaType.AUDIO if not media_type_updated
 
   # Ignore a call.
   ignore: =>
@@ -324,7 +324,7 @@ class z.calling.entities.Call
       for participant_et in delete_participants_ets when @delete_participant participant_et
         participant_left = true
         break if sequential_event
-      if participant_left and @self_client_joined()
+      if participant_left and @self_client_joined() and @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP
 
     @_sort_participants_by_panning()

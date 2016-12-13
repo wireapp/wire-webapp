@@ -22,6 +22,7 @@ z.calling.enum ?= {}
 
 z.calling.enum.CallState =
   CONNECTING: 'connecting'
+  DISCONNECTING: 'disconnecting'
   ENDED: 'ended'
   IGNORED: 'ignored'
   INCOMING: 'incoming'

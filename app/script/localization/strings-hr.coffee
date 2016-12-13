@@ -212,7 +212,6 @@ z.string.hr.modal_uploads_parallel = 'Možete poslati %no datoteke odjednom.'
 # Connection requests
 z.string.hr.connection_request_connect = 'Poveži se'
 z.string.hr.connection_request_ignore = 'Ignoriraj'
-z.string.hr.connection_request_message = 'Bok %@.first_name, povežimo se na Wire.%s.First_NAME'
 
 # Conversation
 z.string.hr.conversation_you_nominative = 'ti'
@@ -288,13 +287,15 @@ z.string.hr.conversations_popover_notify = 'Uključi zvuk'
 z.string.hr.conversations_popover_silence = 'Isključi zvuk'
 z.string.hr.conversations_popover_unarchive = 'Dearhiviraj'
 
+# Takeover
+z.string.hr.takeover_link = 'Saznaj više'
+
 # Invites
 z.string.hr.invite_meta_key_mac = 'Cmd'
 z.string.hr.invite_meta_key_pc = 'Ctrl'
 z.string.hr.invite_hint_selected = 'Pritisnite % meta_key + C za kopiranje'
 z.string.hr.invite_hint_unselected = 'Odaberite i pritisnite % meta_key + C'
 z.string.hr.invite_headline = 'Pozvati ljude na Wire'
-z.string.hr.invite_message = 'Na Wire sam. Traži % mail ili posjeti https://get.wire.com da bi se povezali.'
 z.string.hr.invite_message_no_email = 'Na Wire sam. Posjeti https://get.wire.com da bi se povezali.'
 
 # Extensions
@@ -451,9 +452,6 @@ z.string.hr.search_top_people = 'Top veze'
 z.string.hr.search_try_search = 'Traži veze pomoću pune e-mail adrese ili imena'
 z.string.hr.search_no_contacts_on_wire = 'Nemate veza na Wire. Pokušajte pronaći ljude po imenu ili potpunoj email adresi'
 z.string.hr.search_others = 'Poveži se'
-z.string.hr.search_suggestion_one = 'Zna %@.first_name'
-z.string.hr.search_suggestion_two = 'Zna %@.first_name i %@.other_name'
-z.string.hr.search_suggestion_many = 'Zna %@.first_name i %no drugih'
 
 # Picture upload
 z.string.hr.upload_welcome = 'Wire je ljepši sa slikom.'

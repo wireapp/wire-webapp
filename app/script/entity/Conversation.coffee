@@ -80,8 +80,8 @@ class z.entity.Conversation
       return @last_event_timestamp() <= @cleared_timestamp()
 
     @is_verified = ko.pureComputed =>
-      return false if @participating_user_ets().length is 0
-      return @participating_user_ets().every (user_et) -> user_et.is_verified()
+      all_users = [@self].concat @participating_user_ets()
+      return all_users.every (user_et) -> user_et?.is_verified()
 
     @removed_from_conversation = ko.observable false
     @removed_from_conversation.subscribe (is_removed) =>
@@ -162,34 +162,36 @@ class z.entity.Conversation
       - Join the user's first names to a comma separated list or uses the user's first name if only one user participating
       - "..." if the user entities have not yet been attached yet
     ###
-    @display_name = ko.pureComputed
-      read: ->
-        if @type() in [z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE]
-          return @participating_user_ets()[0].name() if @participating_user_ets()[0]?.name()
-          return z.localization.Localizer.get_text z.string.truncation
-        else if @is_group()
-          return @name() if @name()
-          return (@participating_user_ets().map (user_et) -> user_et.first_name()).join ', ' if @participating_user_ets().length > 0
-          return z.localization.Localizer.get_text z.string.conversations_empty_conversation if @participating_user_ids().length is 0
-          return z.localization.Localizer.get_text z.string.truncation
-        else
-          return @name()
-      write: (value) -> return
-      owner: @
+    @display_name = ko.pureComputed =>
+      if @type() in [z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE]
+        return @participating_user_ets()[0].name() if @participating_user_ets()[0]?.name()
+        return z.localization.Localizer.get_text z.string.truncation
+      else if @is_group()
+        return @name() if @name()
+        return (@participating_user_ets().map (user_et) -> user_et.first_name()).join ', ' if @participating_user_ets().length > 0
+        return z.localization.Localizer.get_text z.string.conversations_empty_conversation if @participating_user_ids().length is 0
+        return z.localization.Localizer.get_text z.string.truncation
+      else
+        return @name()
 
     amplify.subscribe z.event.WebApp.CONVERSATION.LOADED_STATES, @_subscribe_to_states_updates
 
   _subscribe_to_states_updates: =>
     @archived_state.subscribe =>
-      amplify.publish z.event.WebApp.CONVERSATION.STORE, @, z.conversation.ConversationUpdateType.ARCHIVED_STATE
+      @_persist_state_update z.conversation.ConversationUpdateType.ARCHIVED_STATE
     @cleared_timestamp.subscribe =>
-      amplify.publish z.event.WebApp.CONVERSATION.STORE, @, z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
+      @_persist_state_update z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
+    @ephemeral_timer.subscribe =>
+      @_persist_state_update z.conversation.ConversationUpdateType.EPHEMERAL_TIMER
     @last_event_timestamp.subscribe =>
-      amplify.publish z.event.WebApp.CONVERSATION.STORE, @, z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
+      @_persist_state_update z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
     @last_read_timestamp.subscribe =>
-      amplify.publish z.event.WebApp.CONVERSATION.STORE, @, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
+      @_persist_state_update z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
     @muted_state.subscribe =>
-      amplify.publish z.event.WebApp.CONVERSATION.STORE, @, z.conversation.ConversationUpdateType.MUTED_STATE
+      @_persist_state_update z.conversation.ConversationUpdateType.MUTED_STATE
+
+  _persist_state_update: (updated_field) ->
+    amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @, updated_field
 
   ###############################################################################
   # Lifecycle
@@ -499,6 +501,7 @@ class z.entity.Conversation
       archived_state: @archived_state()
       archived_timestamp: @archived_timestamp()
       cleared_timestamp: @cleared_timestamp()
+      ephemeral_timer: @ephemeral_timer()
       last_event_timestamp: @last_event_timestamp()
       last_read_timestamp: @last_read_timestamp()
       muted_state: @muted_state()

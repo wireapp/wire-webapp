@@ -132,10 +132,47 @@ class z.ViewModel.ConversationInputViewModel
       @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer().toString()}'."
 
   upload_images: (images) =>
+    if @_is_hitting_upload_limit images
+      return
+
     for image in images
       return @_show_upload_warning image if image.size > z.config.MAXIMUM_IMAGE_FILE_SIZE
 
     @conversation_repository.upload_images @conversation_et(), images
+
+  upload_files: (files) =>
+    if @_is_hitting_upload_limit files
+      return
+
+    for file in files
+      if file.size > z.config.MAXIMUM_ASSET_FILE_SIZE
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_TOO_BIG,
+          {size: file.size, type: file.type}
+        amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT
+        window.setTimeout ->
+          amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_TOO_LARGE,
+            data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE)
+        , 200
+        return
+
+    @conversation_repository.upload_files @conversation_et(), files
+
+  on_drop_files: (dropped_files) =>
+    images = []
+    files = []
+
+    if @_is_hitting_upload_limit dropped_files
+      return
+
+    for file in dropped_files
+      switch
+        when file.type in z.config.SUPPORTED_CONVERSATION_IMAGE_TYPES
+          images.push file
+        else
+          files.push file
+
+    @upload_images images
+    @upload_files files
 
   _show_upload_warning: (image) ->
     warning = z.localization.Localizer.get_text
@@ -154,25 +191,15 @@ class z.ViewModel.ConversationInputViewModel
       window.alert warning
     , 200
 
-  upload_files: (files) =>
+  _is_hitting_upload_limit: (files) =>
     pending_uploads = @conversation_repository.get_number_of_pending_uploads()
-    if pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS
+    is_hitting_upload_limit = pending_uploads + files.length > z.config.MAXIMUM_ASSET_UPLOADS
+
+    if is_hitting_upload_limit
       amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_PARALLEL,
         data: z.config.MAXIMUM_ASSET_UPLOADS
-      return
 
-    for file in files
-      if file.size > z.config.MAXIMUM_ASSET_FILE_SIZE
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_TOO_BIG,
-          {size: file.size, type: file.type}
-        amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT
-        window.setTimeout ->
-          amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.UPLOAD_TOO_LARGE,
-            data: z.util.format_bytes(z.config.MAXIMUM_ASSET_FILE_SIZE)
-        , 200
-        return
-
-    @conversation_repository.upload_files @conversation_et(), files
+    return is_hitting_upload_limit
 
   scroll_message_list: (list_height_new, list_height_old) ->
     $('.message-list').data('antiscroll')?.rebuild()

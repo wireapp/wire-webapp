@@ -160,27 +160,48 @@ describe 'z.user.UserRepository', ->
       it 'cannot find an unknown user', ->
         expect(user_repository.find_user '1').toBeFalsy()
 
-    describe 'get_user_by_name', ->
+    describe 'search_for_connected_users', ->
+      user_et_a = null
+      user_et_b = null
+
       beforeEach ->
-        user_et_a = new z.entity.User()
+        connection_et = new z.entity.Connection()
+        connection_et.status z.user.ConnectionStatus.ACCEPTED
+
+        user_et_a = new z.entity.User z.util.create_random_uuid()
         user_et_a.name 'René'
+        user_et_a.username 'foo'
+        user_et_a.connection connection_et
         user_repository.save_user user_et_a
 
-        user_et_b = new z.entity.User()
+        user_et_b = new z.entity.User z.util.create_random_uuid()
         user_et_b.name 'Gregor'
+        user_et_b.connection connection_et
         user_repository.save_user user_et_b
 
-        it 'finds the correct user by searching for the full name', ->
-          result = user_repository.get_user_by_name 'Gregor'
-          expect(result.length).toBe 1
+      afterEach ->
+        user_repository.users []
 
-        it 'finds the correct user by searching for the full name (transliteration)', ->
-          result = user_repository.get_user_by_name 'Rene'
-          expect(result.length).toBe 1
+      it 'finds the correct user by searching for the full name', ->
+        result = user_repository.search_for_connected_users 'Gregor'
+        expect(result.length).toBe 1
+        expect(result[0].id).toBe user_et_b.id
 
-        it 'finds the correct users', ->
-          result = user_repository.get_user_by_name 'e'
-          expect(result.length).toBe 2
+      it 'finds the correct user by searching for the full name (transliteration)', ->
+        result = user_repository.search_for_connected_users 'Rene'
+        expect(result.length).toBe 1
+        expect(result[0].id).toBe user_et_a.id
+
+      it 'finds the correct user by searching for the username', ->
+        result = user_repository.search_for_connected_users 'foo'
+        expect(result.length).toBe 1
+        expect(result[0].id).toBe user_et_a.id
+
+      it 'finds the correct users', ->
+        result = user_repository.search_for_connected_users 'e'
+        expect(result.length).toBe 2
+        expect(result[0].id).toBe user_et_b.id
+        expect(result[1].id).toBe user_et_a.id
 
     describe 'save_user', ->
       it 'saves a user', ->
@@ -191,6 +212,16 @@ describe 'z.user.UserRepository', ->
 
         expect(user_repository.find_user user.id).toBe user
         expect(user_repository.user_exists user.id).toBeTruthy()
+
+      it 'saves self user', ->
+        user = new z.entity.User()
+        user.id = entities.user.jane_roe.id
+
+        user_repository.save_user user, true
+
+        expect(user_repository.find_user user.id).toBe user
+        expect(user_repository.user_exists user.id).toBeTruthy()
+        expect(user_repository.self()).toBe user
 
     describe 'user_exists', ->
       user = null
@@ -239,3 +270,53 @@ describe 'z.user.UserRepository', ->
           expect(user_john_doe.devices()[1].id).toBe entities.clients.john_doe.temporary.id
           done()
         .catch done.fail
+
+    describe 'verify_usernames', ->
+
+      it 'resolves with username when username is not taken', (done) ->
+        usernames = ['john_doe']
+        server.respondWith 'POST', "#{test_factory.settings.connection.rest_url}/users/handles", [
+          200,
+          'Content-Type': 'application/json',
+          JSON.stringify usernames
+        ]
+
+        user_repository.verify_usernames usernames
+        .then (_usernames) ->
+          expect(_usernames).toEqual usernames
+          done()
+        .catch done.fail
+
+      it 'rejects when username is taken', (done) ->
+        usernames = ['john_doe']
+        server.respondWith 'POST', "#{test_factory.settings.connection.rest_url}/users/handles", [
+          200,
+          'Content-Type': 'application/json',
+          JSON.stringify []
+        ]
+
+        user_repository.verify_usernames usernames
+        .then (_usernames) ->
+          expect(_usernames.length).toBe 0
+          done()
+        .catch done.fail
+
+    describe 'verify_username', ->
+
+      it 'resolves with username when username is not taken', (done) ->
+        username = 'john_doe'
+        server.respondWith 'HEAD', "#{test_factory.settings.connection.rest_url}/users/handles/#{username}", [404, {}, '']
+
+        user_repository.verify_username username
+        .then (_username) ->
+          expect(_username).toBe username
+          done()
+        .catch done.fail
+
+      it 'rejects when username is taken', (done) ->
+        username = 'john_doe'
+        server.respondWith 'HEAD', "#{test_factory.settings.connection.rest_url}/users/handles/#{username}", [200, {}, '']
+
+        user_repository.verify_username username
+        .then done.fail
+        .catch done

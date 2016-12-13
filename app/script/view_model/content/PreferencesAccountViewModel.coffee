@@ -20,6 +20,8 @@ window.z ?= {}
 z.ViewModel ?= {}
 z.ViewModel.content ?= {}
 
+# remove save animation
+SAVED_ANIMATION_TIMEOUT = 750 * 2
 
 class z.ViewModel.content.PreferencesAccountViewModel
   constructor: (element_id, @client_repository, @user_repository) ->
@@ -27,7 +29,15 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
     @self_user = @user_repository.self
     @new_clients = ko.observableArray()
-    @username = ko.pureComputed => @self_user().name()
+    @name = ko.pureComputed => @self_user().name()
+
+    @username = ko.pureComputed => @self_user().username()
+    @entered_username = ko.observable()
+    @submitted_username = ko.observable()
+    @username_error = ko.observable()
+
+    @name_saved = ko.observable()
+    @username_saved = ko.observable()
 
     @_init_subscriptions()
 
@@ -36,18 +46,92 @@ class z.ViewModel.content.PreferencesAccountViewModel
     amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @on_client_remove
     amplify.subscribe z.event.WebApp.PREFERENCES.UPLOAD_PICTURE, @set_picture
 
+  removed_from_view: =>
+    @_reset_username_input()
+
   change_accent_color: (id) =>
     @user_repository.change_accent_color id
 
-  change_username: (name, e) =>
-    new_username = e.target.value
+  change_name: (name, e) =>
+    new_name = e.target.value
 
-    if new_username and new_username isnt @self_user().name()
-      @user_repository.change_username new_username
-    else
-      @username.notifySubscribers() # render old value
+    if new_name is @self_user().name()
+      e.target.blur()
 
-    e.target.blur()
+    @user_repository.change_name new_name
+    .then =>
+      @name_saved true
+      e.target.blur()
+      window.setTimeout =>
+        @name_saved false
+      , SAVED_ANIMATION_TIMEOUT
+
+  reset_name_input: =>
+    return if @name_saved()
+    @name.notifySubscribers()
+
+  reset_username_input: =>
+    return if @username_saved()
+    @_reset_username_input()
+    @username.notifySubscribers()
+
+  should_focus_username: =>
+    return @user_repository.should_set_username
+
+  check_username_input: (username, e) ->
+    return true if e.charCode is 0 # FF sends charCode 0 when pressing backspace
+    return z.user.UserHandleGenerator.validate_character String.fromCharCode(e.charCode) # automation is missing key prop
+
+  click_on_username: ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.EDITED_USERNAME
+
+  change_username: (username, e) =>
+    entered_username = e.target.value
+
+    if entered_username.length < 2
+      @username_error null
+      return
+
+    if entered_username is @self_user().username()
+      e.target.blur()
+
+    @submitted_username entered_username
+    @user_repository.change_username entered_username
+    .then =>
+      if @entered_username() is @submitted_username()
+        @username_error null
+        @username_saved true
+
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.SET_USERNAME,
+          length: entered_username.length
+
+        e.target.blur()
+        window.setTimeout =>
+          @username_saved false
+        , SAVED_ANIMATION_TIMEOUT
+    .catch (error) =>
+      if @entered_username() isnt @submitted_username()
+        return
+      if error.type is z.user.UserError::TYPE.USERNAME_TAKEN
+        @username_error 'taken'
+
+  verify_username: (username, e) =>
+    entered_username = e.target.value
+
+    if entered_username.length < 2 or entered_username is @self_user().username()
+      @username_error null
+      return
+
+    @entered_username entered_username
+    @user_repository.verify_username entered_username
+    .then =>
+      if @entered_username() is entered_username
+        @username_error 'available'
+    .catch (error) =>
+      if @entered_username() isnt entered_username
+        return
+      if error.type is z.user.UserError::TYPE.USERNAME_TAKEN
+        @username_error 'taken'
 
   check_new_clients: =>
     return if not @new_clients().length
@@ -90,7 +174,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
     if input_picture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE
       return @_show_upload_warning warning_file_size, callback
 
-    if not input_picture.type in z.config.SUPPORTED_IMAGE_TYPES
+    if not input_picture.type in z.config.SUPPORTED_PROFILE_IMAGE_TYPES
       return @_show_upload_warning warning_file_format, callback
 
     max_width = z.config.MINIMUM_PROFILE_IMAGE_SIZE.WIDTH
@@ -118,3 +202,8 @@ class z.ViewModel.content.PreferencesAccountViewModel
     for client_et in @new_clients() when client_et.id is client_id
       @new_clients.remove client_et
     amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE if not @new_clients().length
+
+  _reset_username_input: =>
+    @username_error null
+    @entered_username null
+    @submitted_username null

@@ -26,12 +26,18 @@ describe 'User Mapper', ->
   mapper = new z.user.UserMapper(asset_service)
   mapper.logger.level = z.util.Logger::levels.ERROR
 
+  self_user_payload = null
+
+  beforeEach ->
+    self_user_payload = JSON.parse(JSON.stringify(payload.self.get))
+
   describe 'map_user_from_object', ->
     it 'can convert JSON into a single user entity', ->
-      user_et = mapper.map_user_from_object payload.self.get
+      user_et = mapper.map_user_from_object self_user_payload
       expect(user_et.email()).toBe 'jd@wire.com'
       expect(user_et.name()).toBe 'John Doe'
       expect(user_et.phone()).toBe '+49177123456'
+      expect(user_et.is_me).toBeFalsy()
       expect(user_et.accent_id()).toBe z.config.ACCENT_ID.YELLOW
 
     it 'returns undefined if input was undefined', ->
@@ -39,26 +45,34 @@ describe 'User Mapper', ->
       expect(user).toBeUndefined()
 
     it 'can convert users with profile images marked as non public', ->
-      user_payload = payload.self.get
-      user_payload.picture[0].info.public = false
-      user_payload.picture[1].info.public = false
-      user_et = mapper.map_user_from_object user_payload
+      self_user_payload.picture[0].info.public = false
+      self_user_payload.picture[1].info.public = false
+      user_et = mapper.map_user_from_object self_user_payload
       expect(user_et.name()).toBe 'John Doe'
 
     it 'will return default accent color if null/undefined', ->
-      user_payload = payload.self.get
-      user_payload.accent_id = null
-      user_et = mapper.map_user_from_object user_payload
+      self_user_payload.accent_id = null
+      user_et = mapper.map_user_from_object self_user_payload
       expect(user_et.name()).toBe 'John Doe'
       expect(user_et.accent_id()).toBe z.config.ACCENT_ID.BLUE
 
     it 'will return default accent color if backend returns 0', ->
-      user_payload = payload.self.get
-      user_payload.accent_id = 0
-      user_et = mapper.map_user_from_object user_payload
+      self_user_payload.accent_id = 0
+      user_et = mapper.map_user_from_object self_user_payload
       expect(user_et.name()).toBe 'John Doe'
       expect(user_et.joaat_hash).toBe 526273169
       expect(user_et.accent_id()).toBe z.config.ACCENT_ID.BLUE
+
+  describe 'map_self_user_from_object', ->
+    it 'can convert JSON into a single user entity', ->
+      user_et = mapper.map_self_user_from_object self_user_payload
+      expect(user_et.email()).toBe 'jd@wire.com'
+      expect(user_et.name()).toBe 'John Doe'
+      expect(user_et.phone()).toBe '+49177123456'
+      expect(user_et.is_me).toBeTruthy()
+      expect(user_et.tracking_id).toBe '50e65001-7a96-4468-9e76-c31784ab2eba'
+      expect(user_et.locale).toBe 'en'
+      expect(user_et.accent_id()).toBe z.config.ACCENT_ID.YELLOW
 
   describe 'map_users_from_object', ->
     it 'can convert JSON into multiple user entities', ->
@@ -91,6 +105,13 @@ describe 'User Mapper', ->
       data = {'name': entities.user.jane_roe.name, 'id': entities.user.john_doe.id}
       updated_user_et = mapper.update_user_from_object user_et, data
       expect(updated_user_et.name()).toBe entities.user.jane_roe.name
+
+    it 'can update the user handle', ->
+      user_et = new z.entity.User()
+      user_et.id = entities.user.john_doe.id
+      data = {'handle': entities.user.jane_roe.handle, 'id': entities.user.john_doe.id}
+      updated_user_et = mapper.update_user_from_object user_et, data
+      expect(updated_user_et.username()).toBe entities.user.jane_roe.handle
 
     it 'cannot update the user name of a wrong user', ->
       user_et = new z.entity.User()

@@ -81,17 +81,6 @@ class z.client.ClientRepository
     @client_service.get_client_by_id client_id
 
   ###
-  Load all clients of a given user from the database.
-  @param user_id [String] ID of user to retrieve clients for
-  @return [Promise] Promise that resolves with all the known client entities for that user
-  ###
-  get_clients_from_db: (user_id) =>
-    @client_service.load_clients_from_db_by_user_id user_id
-    .then (clients_payload) =>
-      client_ets = @client_mapper.map_clients clients_payload
-      return client_ets
-
-  ###
   Loads a client from the database (if it exists).
   @return [Promise<z.client.Client>] Promise that resolves with the local client
   ###
@@ -478,33 +467,35 @@ class z.client.ClientRepository
 
         # Known clients will be returned as object, unknown clients will resolve with their expected primary key
         for result in results
+
           # Handle new data which was not stored already in our local database
           if _.isString result
             ids = z.client.Client.dismantle_user_client_id result
-            if expect_current_client and @_is_current_client user_id, ids.client_id
-              @logger.log @logger.levels.INFO, "Current client '#{ids.client_id}' will not be changed in database"
-              continue
-            @logger.log @logger.levels.INFO, "Client '#{ids.client_id}' was not previously stored in database"
+            continue if expect_current_client and @_is_current_client user_id, ids.client_id
+
+            @logger.log @logger.levels.INFO, "New client '#{ids.client_id}' will be stored locally"
             client_payload = clients_from_backend[ids.client_id]
             promises.push update_client_schema user_id, client_payload
-          else
-            # Update existing clients with backend information
-            @logger.log @logger.levels.INFO, "Client '#{result.id}' was previously stored in database", result
+            continue
+
+          if clients_from_backend[result.id]
             [client_payload, contains_update] = @client_mapper.update_client result, clients_from_backend[result.id]
+
+            # Known clients with updated backend information
             if contains_update
-              @logger.log @logger.levels.INFO, "Client '#{result.id}' will be overwritten with update in database", client_payload
               promises.push @save_client_in_db user_id, client_payload
-            else
-              clients_stored_in_db.push client_payload
+              continue
+
+            # Known clients with no changes
+            clients_stored_in_db.push client_payload
+            continue
+
+          @logger.log @logger.levels.WARN, "Deleted client '#{result.id}' will be removed locally"
+          @remove_client user_id, result.id
 
         return Promise.all promises
-      .then (new_records) ->
-        # Cache new clients
-        return clients_stored_in_db.concat new_records
-      .then (all_clients) =>
-        # Map clients to entities
-        client_ets = @client_mapper.map_clients all_clients
-        resolve client_ets
+      .then (new_records) =>
+        resolve @client_mapper.map_clients clients_stored_in_db.concat new_records
       .catch (error) =>
         @logger.log @logger.levels.ERROR, "Unable to retrieve clients for user '#{user_id}': #{error.message}", error
         reject error
