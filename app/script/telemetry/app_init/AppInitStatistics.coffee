@@ -39,11 +39,11 @@ class z.telemetry.app_init.AppInitStatistics
     return statistics
 
   log: =>
-    @logger.log @logger.levels.DEBUG, 'App initialization statistics'
+    @logger.debug 'App initialization statistics'
     for key, value of @ when _.isNumber(value) or _.isString value
       placeholder_key = Array(Math.max 17 - key.length, 1).join ' '
       placeholder_value = Array(Math.max 11 - value.toString().length, 1).join ' '
-      @logger.log @logger.levels.INFO, "#{placeholder_key}'#{key}':#{placeholder_value}#{value}"
+      @logger.info "#{placeholder_key}'#{key}':#{placeholder_value}#{value}"
 
   update_backend_requests: (number_of_requests) =>
     @[z.telemetry.app_init.AppInitStatisticsValue.BACKEND_REQUESTS] = number_of_requests

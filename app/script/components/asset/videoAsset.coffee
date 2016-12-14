@@ -62,7 +62,7 @@ class z.components.VideoAssetComponent
 
   on_error: (component, jquery_event) =>
     @video_playback_error true
-    @logger.log @logger.levels.ERROR, 'Video cannot be played', jquery_event
+    @logger.error 'Video cannot be played', jquery_event
 
   on_play_button_clicked: =>
     if @video_src()?
@@ -74,7 +74,7 @@ class z.components.VideoAssetComponent
         @video_element?.play()
         @show_bottom_controls true
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, 'Failed to load video asset ', error
+        @logger.error 'Failed to load video asset ', error
 
   on_pause_button_clicked: =>
     @video_element?.pause()

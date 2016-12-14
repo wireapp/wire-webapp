@@ -45,7 +45,7 @@ class z.conversation.EventMapper
     try
       return @_map_json_event event, conversation_et
     catch error
-      @logger.log @logger.levels.ERROR, "Failed to map event: #{error.message}", {error: error, event: event}
+      @logger.error "Failed to map event: #{error.message}", {error: error, event: event}
       return undefined
 
   ###
@@ -106,7 +106,7 @@ class z.conversation.EventMapper
       message_et.ephemeral_started event.ephemeral_started or '0'
 
     if window.isNaN message_et.timestamp
-      @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
+      @logger.warn "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
       message_et = undefined
 
     return message_et

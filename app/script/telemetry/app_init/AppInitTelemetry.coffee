@@ -45,8 +45,8 @@ class z.telemetry.app_init.AppInitTelemetry
     statistics = @get_statistics()
     statistics.loading_time = @timings.get_app_load()
     statistics.app_version = z.util.Environment.version false
-    @logger.log @logger.levels.DEBUG, 'App initialization telemetry'
-    @logger.log @logger.levels.INFO, "App version '#{statistics.app_version}' initialized within #{statistics.loading_time}s"
+    @logger.debug 'App initialization telemetry'
+    @logger.info "App version '#{statistics.app_version}' initialized within #{statistics.loading_time}s"
     @log_statistics()
     @log_timings()
 

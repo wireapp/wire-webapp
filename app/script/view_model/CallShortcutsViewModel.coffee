@@ -47,7 +47,7 @@ class z.ViewModel.CallShortcutsViewModel
         @_subscribe_shortcuts_incoming()
 
     conversation_name = call_et.conversation_et.display_name()
-    @logger.log @logger.levels.DEBUG, "Updated call shortcuts for '#{call_et.state()}' call in conversation '#{call_et.id}' (#{conversation_name})"
+    @logger.debug "Updated call shortcuts for '#{call_et.state()}' call in conversation '#{call_et.id}' (#{conversation_name})"
 
   _subscribe_shortcuts_incoming: =>
     amplify.subscribe z.event.WebApp.SHORTCUT.CALL_IGNORE, @on_ignore_call
