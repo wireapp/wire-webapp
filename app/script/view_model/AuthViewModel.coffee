@@ -23,6 +23,13 @@ TIMEOUT =
   SHORT: 500
   LONG: 2000
 
+FORWARDED_URL_PARAMETERS = [
+  z.auth.URLParameter.ASSETS_V3
+  z.auth.URLParameter.BOT
+  z.auth.URLParameter.ENVIRONMENT
+  z.auth.URLParameter.LOCALYTICS
+]
+
 ###
 View model for the auth page.
 
@@ -1207,6 +1214,17 @@ class z.ViewModel.AuthViewModel
     @_authentication_successful()
 
   ###
+  Append parameter to URL if exists.
+  @param url [String] Previous URL string
+  @return [String] Updated URL
+  ###
+  _append_existing_parameters: (url) ->
+    for parameter_name in FORWARDED_URL_PARAMETERS
+      parameter_value = z.util.get_url_parameter parameter_name
+      url = z.util.append_url_parameter url, "#{parameter_name}=#{parameter_value}" if parameter_value
+    return url
+
+  ###
   User successfully authenticated on the backend side
   @note Gets the client and forwards the user to the login.
   @private
@@ -1266,13 +1284,7 @@ class z.ViewModel.AuthViewModel
   ###
   _redirect_to_app: =>
     url = '/'
-    url = "/#{@auth.settings.parameter}" if @auth.settings.parameter?
-    bot_name = z.util.get_url_parameter z.auth.URLParameter.BOT
-    url = z.util.append_url_parameter url, "#{z.auth.URLParameter.BOT}=#{bot_name}" if bot_name
-    use_v3_api = z.util.get_url_parameter z.auth.URLParameter.V3
-    url = z.util.append_url_parameter url, "#{z.auth.URLParameter.V3}=#{use_v3_api}" if use_v3_api
-    localytics = z.util.get_url_parameter z.auth.URLParameter.LOCALYTICS
-    url = z.util.append_url_parameter url, "#{z.auth.URLParameter.LOCALYTICS}" if localytics
+    url = @_append_existing_parameters url
     window.location.replace url
 
   _register_client: =>
