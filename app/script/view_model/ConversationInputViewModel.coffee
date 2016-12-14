@@ -34,11 +34,19 @@ class z.ViewModel.ConversationInputViewModel
 
     @pasted_file = ko.observable()
     @pasted_file_preview_url = ko.observable()
+    @pasted_file_name = ko.observable()
     @pasted_file.subscribe (blob) =>
-      if blob?.type is 'image/png'
-        @pasted_file_preview_url URL.createObjectURL blob
+      if blob?
+        if blob.type in z.config.SUPPORTED_CONVERSATION_IMAGE_TYPES
+          @pasted_file_preview_url URL.createObjectURL blob
+        @pasted_file_name z.localization.Localizer.get_text
+          id: z.string.conversation_send_pasted_file
+          replace:
+            placeholder: '%date'
+            content: moment(blob.lastModifiedDate).format 'MMMM Do YYYY, h:mm:ss a'
       else
         @pasted_file_preview_url null
+        @pasted_file_name null
 
     @edit_message_et = ko.observable()
     @edit_input = ko.observable ''
@@ -262,7 +270,7 @@ class z.ViewModel.ConversationInputViewModel
       when z.util.KEYCODE.ARROW_UP
         @edit_message @conversation_et().get_last_editable_message(), event.target if @input().length is 0
       when z.util.KEYCODE.ESC
-        @cancel_edit()
+        if @pasted_file()? then @pasted_file null else @cancel_edit()
       when z.util.KEYCODE.ENTER
         if event.altKey
           z.util.KeyUtil.insert_at_caret event.target, '\n'
