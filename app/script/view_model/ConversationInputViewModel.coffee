@@ -27,6 +27,7 @@ class z.ViewModel.ConversationInputViewModel
     @conversation_et = @conversation_repository.active_conversation
     @conversation_et.subscribe =>
       @conversation_has_focus true
+      @pasted_file null
       @cancel_edit()
 
     @self = @user_repository.self
