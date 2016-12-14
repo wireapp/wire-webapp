@@ -147,9 +147,6 @@ class z.conversation.ConversationMapper
 
     conversation_et = @update_self_status conversation_et, self
 
-    # all users ( with all status codes )
-    conversation_et.all_user_ids others.map (value) -> value.id
-
     # all users that are still active
     participating_user_ids = []
     others.forEach (other) ->

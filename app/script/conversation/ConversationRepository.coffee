@@ -251,7 +251,7 @@ class z.conversation.ConversationRepository
   @param conversation_ets [Array<z.entity.Conversation>] Array of conversation entities to be updated
   ###
   update_conversations: (conversation_ets) =>
-    user_ids = _.flatten(conversation_et.all_user_ids() for conversation_et in conversation_ets)
+    user_ids = _.flatten(conversation_et.participating_user_ids() for conversation_et in conversation_ets)
     @user_repository.get_users_by_id user_ids, =>
       @_fetch_users_and_events conversation_et for conversation_et in conversation_ets
 
