@@ -57,7 +57,7 @@ class z.extension.GiphyRepository
           animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED]
 
           if animation_gif.size > options.max_size
-            @logger.log "Gif size (#{animation_gif.size}) is over maximum size (#{animation_gif.size})"
+            @logger.info "Gif size (#{animation_gif.size}) is over maximum size (#{animation_gif.size})"
             _get_random_gif retries + 1
           else
             resolve
@@ -93,7 +93,7 @@ class z.extension.GiphyRepository
 
       if not options.query
         error = new Error 'No query specified'
-        @logger.log @logger.levels.ERROR, error.message, error
+        @logger.error error.message, error
         reject error
 
       if options.random
@@ -138,5 +138,5 @@ class z.extension.GiphyRepository
 
         resolve result
       .catch (error) =>
-        @logger.log "Unable to fetch gif for query: #{options.query}", error
+        @logger.info "Unable to fetch gif for query: #{options.query}", error
         reject error

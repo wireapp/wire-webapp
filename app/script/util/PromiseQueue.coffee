@@ -68,7 +68,7 @@ class z.util.PromiseQueue
         return if @_paused
         @_blocked = false
         window.clearInterval @_interval
-        @logger.log @logger.levels.ERROR, 'Promise queue failed, unblocking queue', @_queue
+        @logger.error 'Promise queue failed, unblocking queue', @_queue
         @execute()
       , @_timeout
 

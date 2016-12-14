@@ -29,8 +29,8 @@ module.exports = (grunt) ->
 
     options =
       auth:
-        username: process.env.RAYGUN_USERNAME
-        password: process.env.RAYGUN_PASSWORD
+        username: 'webapp@wire.com'
+        password: 'B8uwFwy8hDZqf'
       uri: 'https://app.raygun.io/upload/jssymbols/cmhb9p'
 
     if env is 'prod'
@@ -72,6 +72,7 @@ module.exports = (grunt) ->
         if pending_upload_count is 0
           number_of_files = (files.length - failed_upload_count).toString()
           file_string = grunt.util.pluralize files.length, 'file/files'
+          grunt.log.writeln ''
           grunt.log.ok "#{number_of_files['cyan']} #{file_string} uploaded to Raygun."
           done()
         else
