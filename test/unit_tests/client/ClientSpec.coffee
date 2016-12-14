@@ -19,14 +19,6 @@
 # grunt test_init && grunt test_run:client/Client
 
 describe 'z.client.Client', ->
-  describe 'constructor', ->
-    it 'sets default properties for client details', ->
-      backend_playload = '{"cookie": "webapp@1224301118@temporary@1472638149000", "time": "2016-12-09T10:50:53.307Z", "location": { "lat": 52.5233, "lon": 13.4138 }, "address": "62.96.148.44", "id": "8401c66e23781197", "type": "temporary"}'
-      client = new z.client.Client backend_playload
-      expect(client.class).toBe '?'
-      expect(client.label).toBe '?'
-      expect(client.model).toBe '?'
-
   describe 'dismantle_user_client_id', ->
     it 'can get the user ID and client ID from a session ID', ->
       session_id = '034060fe-8406-476e-b29d-f0a214c0345b@4b0a0fbf418d264c'

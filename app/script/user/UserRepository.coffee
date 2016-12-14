@@ -200,8 +200,8 @@ class z.user.UserRepository
       user_ids = (user_id for user_id, client_ets of user_client_map)
       @get_users_by_id user_ids, (user_ets) =>
         for user_et in user_ets
-          log_level = if user_client_map[user_et.id].length > 8 then @logger.levels.WARN else @logger.levels.INFO
-          @logger.log log_level, "Found '#{user_client_map[user_et.id].length}' clients for '#{user_et.name()}'", user_client_map[user_et.id]
+          if user_client_map[user_et.id].length > 8
+            @logger.log @logger.levels.WARN, "Found '#{user_client_map[user_et.id].length}' clients for '#{user_et.name()}'", user_client_map[user_et.id]
           user_et.devices user_client_map[user_et.id]
 
   # Assign connections to the users.
@@ -597,10 +597,8 @@ class z.user.UserRepository
       @should_set_username = false
       @self().username username
     .catch (error) ->
-      if error.code is z.service.BackendClientError::STATUS_CODE.CONFLICT
+      if error.code in [z.service.BackendClientError::STATUS_CODE.CONFLICT, z.service.BackendClientError::STATUS_CODE.BAD_REQUEST]
         throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
-      if error.code is z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
-        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
   ###
@@ -622,7 +620,7 @@ class z.user.UserRepository
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         return username
       if error.code is z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
-        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
+        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
     .then (username) ->
       if username

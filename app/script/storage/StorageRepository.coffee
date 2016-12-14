@@ -41,15 +41,14 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   init: (skip_sessions) =>
     return @_load_identity()
     .then (@identity) =>
-      if @identity
-        @logger.log @logger.levels.INFO, 'Loaded local identity key pair from database', @identity
-      else
+      if not @identity
         @logger.log @logger.levels.INFO, 'We did not find a local identity. This is a new client.'
-      return @identity
-    .then (local_identity) =>
-      return {} if not local_identity
+        return {}
+
+      @logger.log @logger.levels.INFO, 'Loaded local identity key pair from database', @identity
       if skip_sessions
         throw new z.storage.StorageError z.storage.StorageError::TYPE.SKIP_LOADING
+
       return @_load_sessions()
     .then =>
       return @_load_pre_keys()
@@ -121,11 +120,11 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
           @logger.log @logger.levels.INFO, "Loaded '#{sessions.length}' sessions from storage"
           handled_sessions = 0
 
-          _push_session = (session) => @sessions_queue.push =>
-            @_deserialize_session session
+          _push_session = (serialized_session) => @sessions_queue.push =>
+            @_deserialize_session serialized_session
             .then (session) =>
-              if session
-                @logger.log @logger.levels.INFO, "De-serialized session '#{session.id}'", session
+              if not session
+                @logger.log @logger.levels.WARN, "Failed to de-serialized session '#{serialized_session.id}'"
               handled_sessions++
               if handled_sessions % 5 is 0
                 amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_sessions_progress, false, [handled_sessions, sessions.length]

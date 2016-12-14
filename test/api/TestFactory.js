@@ -118,9 +118,7 @@ window.TestFactory.prototype.exposeClientActors = function () {
   var self = this;
   return new Promise(function (resolve) {
     self.exposeCryptographyActors().then(function () {
-      var client = new z.client.Client();
-      client.id = '60aee26b7f55a99f';
-      client.class = 'desktop';
+      var client = new z.client.Client({'address': '192.168.0.1', 'id': '60aee26b7f55a99f', 'class': 'desktop'});
 
       var user = new z.entity.User(entities.user.john_doe.id);
       user.devices.push(client);

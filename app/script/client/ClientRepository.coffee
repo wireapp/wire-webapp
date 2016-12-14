@@ -100,6 +100,19 @@ class z.client.ClientRepository
         return @current_client()
 
   ###
+  Construct the primary key to store clients in database.
+  @private
+
+  @param user_id [String] User ID from the owner of the client
+  @param client_id [String] Client ID
+  @return [String] Primary key
+  ###
+  _construct_primary_key: (user_id, client_id) ->
+    throw new z.client.ClientError z.client.ClientError::TYPE.NO_USER_ID if not user_id
+    throw new z.client.ClientError z.client.ClientError::TYPE.NO_CLIENT_ID if not client_id
+    return "#{user_id}@#{client_id}"
+
+  ###
   Save the a client into the database.
 
   @private
@@ -127,19 +140,6 @@ class z.client.ClientRepository
     return @client_service.update_client_in_db primary_key, changes
 
   ###
-  Construct the primary key to store clients in database.
-  @private
-
-  @param user_id [String] User ID from the owner of the client
-  @param client_id [String] Client ID
-  @return [String] Primary key
-  ###
-  _construct_primary_key: (user_id, client_id) ->
-    throw new z.client.ClientError z.client.ClientError::TYPE.NO_USER_ID if not user_id
-    throw new z.client.ClientError z.client.ClientError::TYPE.NO_CLIENT_ID if not client_id
-    return "#{user_id}@#{client_id}"
-
-  ###
   Save the local client into the database.
 
   @private
@@ -151,6 +151,19 @@ class z.client.ClientRepository
       is_verified: true
     return @client_service.save_client_in_db @PRIMARY_KEY_CURRENT_CLIENT, client_payload
 
+  ###
+  Updates a client payload if it does not fit the current database structure.
+
+  @private
+  @param user_id [String] User ID of the client owner
+  @param client_payload [Object] Client data to be stored in database
+  @return [Promise] Promise that resolves with the record stored in database
+  ###
+  _update_client_schema_in_db: (user_id, client_payload) =>
+    client_payload.meta =
+      is_verified: false
+      primary_key: @_construct_primary_key user_id, client_payload.id
+    return @save_client_in_db user_id, client_payload
 
   ###############################################################################
   # Login and registration
@@ -458,42 +471,37 @@ class z.client.ClientRepository
         # Save new clients and cache existing ones
         promises = []
 
-        # Updates a client payload if it does not fit the current database structure
-        update_client_schema = (user_id, client_payload) =>
-          client_payload.meta =
-            is_verified: false
-            primary_key: @_construct_primary_key user_id, client_payload.id
-          return @save_client_in_db user_id, client_payload
-
         # Known clients will be returned as object, unknown clients will resolve with their expected primary key
         for result in results
+
           # Handle new data which was not stored already in our local database
           if _.isString result
             ids = z.client.Client.dismantle_user_client_id result
-            if expect_current_client and @_is_current_client user_id, ids.client_id
-              @logger.log @logger.levels.INFO, "Current client '#{ids.client_id}' will not be changed in database"
-              continue
-            @logger.log @logger.levels.INFO, "Client '#{ids.client_id}' was not previously stored in database"
+            continue if expect_current_client and @_is_current_client user_id, ids.client_id
+
+            @logger.log @logger.levels.INFO, "New client '#{ids.client_id}' will be stored locally"
             client_payload = clients_from_backend[ids.client_id]
-            promises.push update_client_schema user_id, client_payload
-          else
-            # Update existing clients with backend information
-            @logger.log @logger.levels.INFO, "Client '#{result.id}' was previously stored in database", result
+            promises.push @_update_client_schema_in_db user_id, client_payload
+            continue
+
+          if clients_from_backend[result.id]
             [client_payload, contains_update] = @client_mapper.update_client result, clients_from_backend[result.id]
+
+            # Known clients with updated backend information
             if contains_update
-              @logger.log @logger.levels.INFO, "Client '#{result.id}' will be overwritten with update in database", client_payload
               promises.push @save_client_in_db user_id, client_payload
-            else
-              clients_stored_in_db.push client_payload
+              continue
+
+            # Known clients with no changes
+            clients_stored_in_db.push client_payload
+            continue
+
+          @logger.log @logger.levels.WARN, "Deleted client '#{result.id}' will be removed locally"
+          @remove_client user_id, result.id
 
         return Promise.all promises
-      .then (new_records) ->
-        # Cache new clients
-        return clients_stored_in_db.concat new_records
-      .then (all_clients) =>
-        # Map clients to entities
-        client_ets = @client_mapper.map_clients all_clients
-        resolve client_ets
+      .then (new_records) =>
+        resolve @client_mapper.map_clients clients_stored_in_db.concat new_records
       .catch (error) =>
         @logger.log @logger.levels.ERROR, "Unable to retrieve clients for user '#{user_id}': #{error.message}", error
         reject error
