@@ -111,6 +111,12 @@ class z.calling.handler.CallStateHandler
   # Call states
   ###############################################################################
 
+  handled_by_v3: (conversation_id) =>
+    if @call_center.use_v3_api
+      conversation_et = @call_center.conversation_repository.get_conversation_by_id conversation_id
+      return not conversation_et.is_group()
+    return false
+
   ###
   Handling of 'call.state' events.
   @param event [Object] Event payload
@@ -177,9 +183,9 @@ class z.calling.handler.CallStateHandler
     else
       self_state =
         state: z.calling.enum.ParticipantState.JOINED
-        muted: @self_state.muted()
-        screen_shared: @self_state.screen_shared()
-        videod: @self_state.videod()
+        muted: not @self_state.audio_send()
+        screen_shared: @self_state.screen_send()
+        videod: @self_state.video_send()
 
     return self_state
 
@@ -328,6 +334,8 @@ class z.calling.handler.CallStateHandler
   @param conversation_id [String] Conversation ID of call to be deleted
   ###
   delete_call: (conversation_id) =>
+    return true if @handled_by_v3 conversation_id
+
     @call_center.get_call_by_id conversation_id
     .then (call_et) =>
       @logger.info "Delete call in conversation '#{conversation_id}'"
@@ -346,6 +354,8 @@ class z.calling.handler.CallStateHandler
   @param conversation_id [String] Conversation ID of call to be joined
   ###
   ignore_call: (conversation_id) =>
+    return true if @handled_by_v3 conversation_id
+
     @call_center.get_call_by_id conversation_id
     .then (call_et) =>
       call_et.ignore()
@@ -361,6 +371,7 @@ class z.calling.handler.CallStateHandler
   @param is_videod [Boolean] Is this a video call
   ###
   join_call: (conversation_id, is_videod) =>
+    return true if @handled_by_v3 conversation_id
     @call_center.timings new z.telemetry.calling.CallSetupTimings conversation_id
 
     @call_center.get_call_by_id conversation_id
@@ -392,6 +403,8 @@ class z.calling.handler.CallStateHandler
   @param has_call_dropped [Boolean] Optional information whether the call has dropped
   ###
   leave_call: (conversation_id, has_call_dropped = false) =>
+    return true if @handled_by_v3 conversation_id
+
     @call_center.media_stream_handler.release_media_streams()
     @call_center.get_call_by_id conversation_id
     .then (call_et) =>
@@ -418,6 +431,8 @@ class z.calling.handler.CallStateHandler
   @param user_id [String] ID of user to be removed
   ###
   remove_participant: (conversation_id, user_id) =>
+    return true if @handled_by_v3 conversation_id
+
     @call_center.get_call_by_id conversation_id
     .then (call_et) ->
       if participant_et = call_et.get_participant_by_id user_id
@@ -430,7 +445,7 @@ class z.calling.handler.CallStateHandler
   @param conversation_id [String] Conversation ID of call
   ###
   toggle_audio: (conversation_id) =>
-    @call_center.media_stream_handler.toggle_microphone_muted()
+    @call_center.media_stream_handler.toggle_audio_send()
     .then =>
       return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
     .catch (error) =>
@@ -442,6 +457,8 @@ class z.calling.handler.CallStateHandler
   @param is_videod [Boolean] Is this a video call
   ###
   toggle_joined: (conversation_id, is_videod) =>
+    return true if @handled_by_v3 conversation_id
+
     if @_self_client_on_a_call() is conversation_id
       @leave_call conversation_id
     else
@@ -452,7 +469,7 @@ class z.calling.handler.CallStateHandler
   @param conversation_id [String] Conversation ID of call
   ###
   toggle_screen: (conversation_id) =>
-    @call_center.media_stream_handler.toggle_screen_shared()
+    @call_center.media_stream_handler.toggle_screen_send()
     .then =>
       return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
     .catch (error) =>
@@ -463,7 +480,7 @@ class z.calling.handler.CallStateHandler
   @param conversation_id [String] Conversation ID of call
   ###
   toggle_video: (conversation_id) =>
-    @call_center.media_stream_handler.toggle_camera_paused()
+    @call_center.media_stream_handler.toggle_video_send()
     .then =>
       return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
     .catch (error) =>
@@ -583,7 +600,7 @@ class z.calling.handler.CallStateHandler
     else if call_et.state() is z.calling.enum.CallState.DISCONNECTING
       call_et.state z.calling.enum.CallState.ONGOING if call_et.participants_count() >= 2
 
-    if call_et.is_remote_videod() and call_et.is_ongoing_on_another_client()
+    if call_et.is_remote_video_send() and call_et.is_ongoing_on_another_client()
       @call_center.media_stream_handler.release_media_streams()
 
 
@@ -656,7 +673,7 @@ class z.calling.handler.CallStateHandler
         call_et.state z.calling.enum.CallState.INCOMING
         @call_center.telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, call_et
         @logger.debug "Incoming '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}'", call_et
-        if call_et.is_remote_videod()
+        if call_et.is_remote_video_send()
           @call_center.media_stream_handler.initiate_media_stream call_et.id, true
           .catch (error) =>
             @logger.error "Failed to start self video for incoming call: #{error.message}", error

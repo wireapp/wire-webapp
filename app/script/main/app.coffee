@@ -57,6 +57,7 @@ class z.main.App
     service.connect                 = new z.connect.ConnectService @auth.client
     service.connect_google          = new z.connect.ConnectGoogleService @auth.client
     service.cryptography            = new z.cryptography.CryptographyService @auth.client
+    service.e_call                  = new z.e_call.ECallService @auth.client
     service.giphy                   = new z.extension.GiphyService @auth.client
     service.search                  = new z.search.SearchService @auth.client
     service.storage                 = new z.storage.StorageService()
@@ -106,6 +107,7 @@ class z.main.App
 
     repository.bot                 = new z.bot.BotRepository @service.bot, repository.conversation
     repository.call_center         = new z.calling.CallCenter @service.call, repository.audio, repository.conversation, repository.media, repository.user
+    repository.e_call              = new z.e_call.ECallCenter @service.e_call, repository.conversation, repository.media, repository.user
     repository.event_tracker       = new z.tracking.EventTrackingRepository repository.user, repository.conversation
     repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.call_center, repository.conversation
 
@@ -283,10 +285,16 @@ class z.main.App
     if bot_name
       @logger.info "Found bot token '#{bot_name}'"
       @repository.bot.add_bot bot_name
-    v3_support = z.util.get_url_parameter z.auth.URLParameter.ASSETS_V3
-    if v3_support
-      @repository.conversation.use_v3_api = v3_support
-      @repository.user.use_v3_api = v3_support
+
+    assets_v3 = z.util.get_url_parameter z.auth.URLParameter.ASSETS_V3
+    if assets_v3
+      @repository.conversation.use_v3_api = assets_v3
+      @repository.user.use_v3_api = assets_v3
+
+    calling_v3 = z.util.get_url_parameter z.auth.URLParameter.CALLING_V3
+    if calling_v3
+      @repository.call_center.use_v3_api = calling_v3
+      @repository.e_call.use_v3_api = calling_v3
 
   ###
   Check whether the page has been reloaded.

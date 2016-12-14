@@ -17,21 +17,17 @@
 #
 
 window.z ?= {}
-z.event ?= {}
+z.e_call ?= {}
 
-z.event.Client =
-  CALL:
-    E_CALL: 'call.e-call'
-  CONVERSATION:
-    ALL_VERIFIED: 'conversation.all-verified'
-    ASSET_META: 'conversation.asset-meta'
-    ASSET_PREVIEW: 'conversation.asset-preview'
-    ASSET_UPLOAD_COMPLETE: 'conversation.asset-upload-complete'
-    ASSET_UPLOAD_FAILED: 'conversation.asset-upload-failed'
-    CONFIRMATION: 'conversation.confirmation'
-    DELETE_EVERYWHERE: 'conversation.delete-everywhere'
-    LOCATION: 'conversation.location'
-    MESSAGE_DELETE: 'conversation.message-delete'
-    MESSAGE_HIDDEN: 'conversation.message-hidden'
-    REACTION: 'conversation.reaction'
-    UNABLE_TO_DECRYPT: 'conversation.unable-to-decrypt'
+class z.e_call.ECallService
+  constructor: (@client) ->
+    @logger = new z.util.Logger 'z.e_call.ECallService', z.config.LOGGER.OPTIONS
+
+  ###
+  Retrieves a call config from the backend.
+  @param [Promise] Promise which resolve with call config information
+  ###
+  get_config: ->
+    @client.send_request
+      type: 'GET'
+      url: @client.create_url '/calls/config'

@@ -928,6 +928,11 @@ class z.conversation.ConversationRepository
     generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
     @sending_queue.push => @_send_generic_message conversation_et.id, generic_message, [message_et.user().id], false
 
+  send_e_call: (message_content, conversation_et) =>
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'calling', new z.proto.Calling message_content
+    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
+
   ###
   Sends image asset in specified conversation.
 
@@ -2230,7 +2235,6 @@ class z.conversation.ConversationRepository
   ###
   _handle_client_mismatch_deleted: (user_client_map, payload) ->
     if _.isEmpty user_client_map
-      @logger.info 'No deleted clients that need to be removed'
       return Promise.resolve payload
     @logger.debug "Message contains deleted clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
@@ -2257,7 +2261,6 @@ class z.conversation.ConversationRepository
   ###
   _handle_client_mismatch_missing: (user_client_map, payload, generic_message) ->
     if _.isEmpty user_client_map
-      @logger.info 'No missing clients that need to be added'
       return Promise.resolve payload
     if not payload
       return Promise.resolve payload
@@ -2288,7 +2291,6 @@ class z.conversation.ConversationRepository
   ###
   _handle_client_mismatch_redundant: (user_client_map, payload, conversation_id) ->
     if _.isEmpty user_client_map
-      @logger.info 'No redundant clients that need to be removed'
       return Promise.resolve payload
     @logger.debug "Message contains redundant clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 

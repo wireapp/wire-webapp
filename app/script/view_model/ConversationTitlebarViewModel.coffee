@@ -43,8 +43,8 @@ class z.ViewModel.ConversationTitlebarViewModel
 
     @show_maximize_control = ko.pureComputed =>
       return false if not @joined_call()
-      has_local_video = @call_self_state.videod() or @call_self_state.screen_shared()
-      has_remote_video = (@joined_call().is_remote_screen_shared() or @joined_call().is_remote_videod()) and @call_center.media_stream_handler.remote_media_streams.video()
+      has_local_video = @call_self_state.video_send() or @call_self_state.screen_send()
+      has_remote_video = (@joined_call().is_remote_screen_send() or @joined_call().is_remote_video_send()) and @call_center.media_stream_handler.remote_media_streams.video()
       return @has_ongoing_call() and @multitasking.is_minimized() and has_local_video and not has_remote_video
 
     @show_call_controls = ko.computed =>

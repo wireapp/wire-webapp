@@ -51,6 +51,8 @@ class z.cryptography.CryptographyMapper
     switch generic_message.content
       when 'asset'
         return @_map_asset generic_message.asset, generic_message.message_id, event.data?.id
+      when 'calling'
+        return @_map_calling generic_message.calling
       when 'cleared'
         return @_map_cleared generic_message.cleared
       when 'confirmation'
@@ -96,6 +98,13 @@ class z.cryptography.CryptographyMapper
       error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
       @logger.info "Skipped event '#{event_id}': #{error.message}"
       throw error
+
+  _map_calling: (calling) ->
+    @logger.warn 'INBOUND E-call message', calling.content
+    return {
+      content: JSON.parse calling.content
+      type: z.event.Client.CALL.E_CALL
+    }
 
   _map_image_asset_v3: (asset, event_nonce) ->
     return {

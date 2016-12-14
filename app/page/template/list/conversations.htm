@@ -66,7 +66,7 @@
                  data-uie-name="do-call-controls-call-decline"
                  data-bind="click: $parent.on_ignore_call, l10n_text: z.string.call_decline">
             </div>
-            <!-- ko if: call().is_remote_videod() -->
+            <!-- ko if: call().is_remote_video_send() -->
               <div class="button button-pill button-full button-small button-theme-green"
                    data-uie-name="do-call-controls-call-accept"
                    data-bind="click: $parent.on_accept_video">
@@ -74,7 +74,7 @@
                 <span data-bind="l10n_text: z.string.call_accept"></span>
               </div>
             <!-- /ko -->
-            <!-- ko ifnot: call().is_remote_videod() -->
+            <!-- ko ifnot: call().is_remote_video_send() -->
               <div class="button button-pill button-full button-small button-theme-green"
                    data-uie-name="do-call-controls-call-accept"
                    data-bind="click: $parent.on_accept_call">
@@ -92,7 +92,7 @@
                 <div class="up">
                   <div class="button-round button-round-dark icon-mute"
                        data-uie-name="do-call-mute"
-                       data-bind="click: $parent.on_toggle_audio, css: {'toggled': $parent.self_stream_state.muted()}"></div>
+                       data-bind="click: $parent.on_toggle_audio, css: {'toggled': !$parent.self_stream_state.audio_send()}"></div>
                 </div>
                 <div class="down">
                   <span class="beta-label hidden">&nbsp;</span>
@@ -105,7 +105,7 @@
                     <div class="up">
                       <div class="button-round button-round-dark icon-screensharing"
                            data-uie-name="do-call-screenshare"
-                           data-bind="click: $parent.on_toggle_screen, css: {'toggled': $parent.self_stream_state.screen_shared(), 'disabled': $parent.disable_toggle_screen()}">
+                           data-bind="click: $parent.on_toggle_screen, css: {'toggled': $parent.self_stream_state.screen_send(), 'disabled': $parent.disable_toggle_screen()}">
                       </div>
                     </div>
                     <div class="down">
@@ -123,7 +123,7 @@
                     <div class="up">
                       <div class="button-round button-round-dark icon-video"
                            data-uie-name="do-call-video"
-                           data-bind="click: $parent.on_toggle_video, css: {'toggled': $parent.self_stream_state.videod()}"></div>
+                           data-bind="click: $parent.on_toggle_video, css: {'toggled': $parent.self_stream_state.video_send()}"></div>
                     </div>
                     <div class="down">
                       <span class="beta-label hidden">&nbsp;</span>

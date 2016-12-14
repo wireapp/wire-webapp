@@ -33,7 +33,6 @@ SUPPORTED_EVENTS = [
 class z.calling.CallCenter
   ###
   Extended check for calling support of browser.
-  @param conversation_id [String] Conversation ID
   @return [Boolean] True if calling is supported
   ###
   @supports_calling: ->
@@ -72,6 +71,8 @@ class z.calling.CallCenter
     @state_handler = new z.calling.handler.CallStateHandler @
     @signaling_handler = new z.calling.handler.CallSignalingHandler @
 
+    @use_v3_api = false
+
     @share_call_states()
     @subscribe_to_events()
 
@@ -79,8 +80,8 @@ class z.calling.CallCenter
     @calls = @state_handler.calls
     @joined_call = @state_handler.joined_call
 
-    @media_stream_handler.calls = @calls
-    @media_stream_handler.joined_call = @joined_call
+    @media_stream_handler.v2_calls = @calls
+    @media_stream_handler.joined_v2_call = @joined_call
 
   # Subscribe to amplify topics.
   subscribe_to_events: =>
@@ -122,6 +123,10 @@ class z.calling.CallCenter
   @param event [Object] Event payload
   ###
   _on_event_in_supported_browsers: (event) ->
+    if @use_v3_api
+      conversation_et = @conversation_repository.get_conversation_by_id event.conversation
+      @logger.warn "Received outdated calling v2 event in conversation '#{event.conversation}'" if conversation_et.is_one2one()
+
     switch event.type
       when z.event.Backend.CALL.FLOW_ADD
         @signaling_handler.on_flow_add_event event
@@ -175,8 +180,7 @@ class z.calling.CallCenter
   get_creator_id: (event) ->
     if creator_id = event.creator or event.from
       return creator_id
-    else
-      return user_id for user_id, device_info of event.participants when device_info.state is z.calling.enum.ParticipantState.JOINED
+    return user_id for user_id, device_info of event.participants when device_info.state is z.calling.enum.ParticipantState.JOINED
 
 
   ###############################################################################

@@ -46,8 +46,16 @@ class z.media.MediaStreamHandler
   constructor: (@media_repository, @audio_repository) ->
     @logger = new z.util.Logger 'z.media.MediaDevicesHandler', z.config.LOGGER.OPTIONS
 
-    @calls = -> return undefined
-    @joined_call = -> return undefined
+    @e_calls = -> return undefined
+    @v2_calls = -> return undefined
+    @joined_e_call = -> return undefined
+    @joined_v2_call = -> return undefined
+
+    @calls = ko.pureComputed =>
+      return @v2_calls().concat @e_calls()
+    @joined_call = ko.pureComputed =>
+      return @joined_e_call() if @joined_e_call()
+      return @joined_v2_call() if @joined_v2_call()
 
     @local_media_streams =
       audio: ko.observable()
@@ -58,9 +66,9 @@ class z.media.MediaStreamHandler
       video: ko.observable()
 
     @self_stream_state =
-      muted: ko.observable false
-      screen_shared: ko.observable false
-      videod: ko.observable false
+      audio_send: ko.observable true
+      screen_send: ko.observable false
+      video_send: ko.observable false
 
     @local_media_type = ko.observable z.media.MediaType.AUDIO
 
@@ -68,15 +76,6 @@ class z.media.MediaStreamHandler
       return @local_media_streams.audio() or @local_media_streams.video()
 
     @request_hint_timeout = undefined
-
-    @local_media_streams.audio.subscribe (media_stream) =>
-      if media_stream instanceof MediaStream
-        @logger.debug "Local MediaStream contains MediaStreamTrack of kind 'audio'",
-          {stream: media_stream, audio_tracks: media_stream.getAudioTracks()}
-    @local_media_streams.video.subscribe (media_stream) =>
-      if media_stream instanceof MediaStream
-        @logger.debug "Local MediaStream contains MediaStreamTrack of kind 'video'",
-          {stream: media_stream, video_tracks: media_stream.getVideoTracks()}
 
     @current_device_id = @media_repository.devices_handler.current_device_id
 
@@ -101,7 +100,6 @@ class z.media.MediaStreamHandler
       constraints =
         audio: if request_audio then @_get_audio_stream_constraints @current_device_id.audio_input() else undefined
         video: if request_video then @_get_video_stream_constraints @current_device_id.video_input() else undefined
-      @logger.info 'Set constraints for MediaStream', constraints
       media_type = if request_video then z.media.MediaType.VIDEO else z.media.MediaType.AUDIO
       return [media_type, constraints]
 
@@ -191,22 +189,22 @@ class z.media.MediaStreamHandler
   @param is_videod [Boolean] Should MediaStreamContain video
   @return [Promise] Promise that resolve when the MediaStream has been initiated
   ###
-  initiate_media_stream: (conversation_id, is_videod) =>
-    @media_repository.devices_handler.update_current_devices is_videod
+  initiate_media_stream: (conversation_id, video_send) =>
+    @media_repository.devices_handler.update_current_devices video_send
     .then =>
-      return @get_media_stream_constraints true, is_videod
+      return @get_media_stream_constraints true, video_send
     .then ([media_type, media_stream_constraints]) =>
       return @request_media_stream media_type, media_stream_constraints
     .then (media_stream_info) =>
-      @self_stream_state.videod is_videod
-      @local_media_type z.media.MediaType.VIDEO if is_videod
+      @self_stream_state.video_send video_send
+      @local_media_type z.media.MediaType.VIDEO if video_send
       @_initiate_media_stream_success media_stream_info
     .catch (error) =>
       if _.isArray error
         [error, media_type] = error
         @_initiate_media_stream_failure error, media_type, conversation_id
       @logger.error "Requesting MediaStream failed: #{error.message or error.name}", error
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA, {cause: error.name or error.message, video: is_videod}
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA, {cause: error.name or error.message, video: video_send}
       throw error
 
   # Release the MediaStreams.
@@ -507,35 +505,35 @@ class z.media.MediaStreamHandler
   ###
   needs_media_stream: ->
     for call_et in @calls()
-      return true if call_et.is_remote_videod() and call_et.state() is z.calling.enum.CallState.INCOMING
+      return true if call_et.is_remote_video_send() and call_et.state() is z.calling.enum.CallState.INCOMING
       return true if call_et.self_client_joined()
     return false
 
   # Toggle the camera.
-  toggle_camera_paused: =>
+  toggle_video_send: =>
     if @local_media_streams.video() and @local_media_type() is z.media.MediaType.VIDEO
       return @_toggle_video_enabled()
     return @replace_input_source z.media.MediaType.VIDEO
 
   # Toggle the mute state of the microphone.
-  toggle_microphone_muted: =>
+  toggle_audio_send: =>
     Promise.resolve()
     .then =>
       if @local_media_streams.audio()
-        return @_toggle_audio_enabled()
+        return @_toggle_audio_send()
       throw new z.media.MediaError z.media.MediaError::TYPE.NO_AUDIO_STREAM_FOUND
 
   # Toggle the screen.
-  toggle_screen_shared: =>
+  toggle_screen_send: =>
     if @local_media_streams.video() and @local_media_type() is z.media.MediaType.SCREEN
-      return @_toggle_screen_enabled()
+      return @_toggle_screen_send()
     return @replace_input_source z.media.MediaType.SCREEN
 
   # Reset the enabled states of media types.
   reset_self_states: =>
-    @self_stream_state.muted false
-    @self_stream_state.screen_shared false
-    @self_stream_state.videod false
+    @self_stream_state.audio_send true
+    @self_stream_state.screen_send false
+    @self_stream_state.video_send false
     @local_media_type z.media.MediaType.AUDIO
 
   # Reset the MediaStreams and states.
@@ -552,14 +550,14 @@ class z.media.MediaStreamHandler
   _set_self_stream_state: (media_type) ->
     switch media_type
       when z.media.MediaType.AUDIO
-        @self_stream_state.muted false
+        @self_stream_state.audio_send true
       when z.media.MediaType.SCREEN
-        @self_stream_state.videod false
-        @self_stream_state.screen_shared true
+        @self_stream_state.video_send false
+        @self_stream_state.screen_send true
         @local_media_type z.media.MediaType.SCREEN
       when z.media.MediaType.VIDEO
-        @self_stream_state.videod true
-        @self_stream_state.screen_shared false
+        @self_stream_state.video_send true
+        @self_stream_state.screen_send false
         @local_media_type z.media.MediaType.VIDEO
 
   ###
@@ -570,41 +568,41 @@ class z.media.MediaStreamHandler
   _set_stream_state: (media_stream_info) ->
     if media_stream_info.type in [z.media.MediaType.AUDIO, z.media.MediaType.AUDIO_VIDEO]
       audio_stream_tracks = @_get_media_tracks media_stream_info.stream, z.media.MediaType.AUDIO
-      audio_stream_tracks[0].enabled = not @self_stream_state.muted()
+      audio_stream_tracks[0].enabled = @self_stream_state.audio_send()
 
     if media_stream_info.type in [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO]
       video_stream_tracks = @_get_media_tracks media_stream_info.stream, z.media.MediaType.VIDEO
-      video_stream_tracks[0].enabled = @self_stream_state.screen_shared() or @self_stream_state.videod()
+      video_stream_tracks[0].enabled = @self_stream_state.screen_send() or @self_stream_state.video_send()
 
   ###
   Toggle the audio stream.
   @private
   ###
-  _toggle_audio_enabled: ->
-    @_toggle_stream_enabled z.media.MediaType.AUDIO, @local_media_streams.audio(), @self_stream_state.muted
+  _toggle_audio_send: ->
+    @_toggle_stream_enabled z.media.MediaType.AUDIO, @local_media_streams.audio(), @self_stream_state.audio_send
     .then (audio_track) =>
-      @logger.info "Microphone muted: #{@self_stream_state.muted()}", audio_track
-      return @self_stream_state.muted()
+      @logger.info "Microphone enabled: #{@self_stream_state.audio_send()}", audio_track
+      return @self_stream_state.audio_send()
 
   ###
   Toggle the screen stream.
   @private
   ###
-  _toggle_screen_enabled: ->
-    @_toggle_stream_enabled z.media.MediaType.VIDEO, @local_media_streams.video(), @self_stream_state.screen_shared
+  _toggle_screen_send: ->
+    @_toggle_stream_enabled z.media.MediaType.VIDEO, @local_media_streams.video(), @self_stream_state.screen_send
     .then (video_track) =>
-      @logger.info "Screen enabled: #{@self_stream_state.screen_shared()}", video_track
-      return @self_stream_state.screen_shared()
+      @logger.info "Screen enabled: #{@self_stream_state.screen_send()}", video_track
+      return @self_stream_state.screen_send()
 
   ###
   Toggle the video stream.
   @private
   ###
-  _toggle_video_enabled: ->
-    @_toggle_stream_enabled z.media.MediaType.VIDEO, @local_media_streams.video(), @self_stream_state.videod
+  _toggle_video_send: ->
+    @_toggle_stream_enabled z.media.MediaType.VIDEO, @local_media_streams.video(), @self_stream_state.video_send
     .then (video_track) =>
-      @logger.info "Camera enabled: #{@self_stream_state.videod()}", video_track
-      return @self_stream_state.videod()
+      @logger.info "Camera enabled: #{@self_stream_state.video_send()}", video_track
+      return @self_stream_state.video_send()
 
   ###
   Toggle the enabled state of a MediaStream.
@@ -621,9 +619,7 @@ class z.media.MediaStreamHandler
       state_observable not state_observable()
       media_stream_track = (@_get_media_tracks media_stream, media_type)[0]
       if media_type is z.media.MediaType.AUDIO
-        enabled_state = not state_observable()
-        amplify.publish z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, state_observable()
-      else
-        enabled_state = state_observable()
+        amplify.publish z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, not state_observable()
+      enabled_state = state_observable()
       media_stream_track.enabled = enabled_state
       return media_stream_track

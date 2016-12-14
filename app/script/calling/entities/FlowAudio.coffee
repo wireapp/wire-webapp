@@ -25,7 +25,7 @@ class z.calling.entities.FlowAudio
     @logger = new z.util.Logger "z.calling.FlowAudio (#{@flow_et.id})", z.config.LOGGER.OPTIONS
 
     # Panning
-    @panning = @flow_et.participant_et.panning
+    @panning = @flow_et.participant_et?.panning or @flow_et.e_participant_et.panning
     @panning.subscribe (new_value) =>
       @logger.info "Panning of #{@flow_et.remote_user.name()} changed to '#{new_value}'"
       @set_pan new_value
@@ -42,9 +42,8 @@ class z.calling.entities.FlowAudio
   ###
   hookup: (is_active) =>
     if is_active is true
-      @_hookup_audio()
-    else
-      @audio_source.disconnect() if @audio_source?
+      return @_hookup_audio()
+    @audio_source.disconnect() if @audio_source?
 
   inject_audio_file: (audio_file_path, callback) =>
     return if not @audio_context?

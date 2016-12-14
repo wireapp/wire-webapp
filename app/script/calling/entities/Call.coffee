@@ -44,9 +44,9 @@ class z.calling.entities.Call
 
     @is_connected = ko.observable false
     @is_group = @conversation_et.is_group
-    @is_remote_screen_shared = ko.pureComputed =>
+    @is_remote_screen_send = ko.pureComputed =>
       return @remote_media_type() is z.media.MediaType.SCREEN
-    @is_remote_videod = ko.pureComputed =>
+    @is_remote_video_send = ko.pureComputed =>
       return @remote_media_type() is z.media.MediaType.VIDEO
 
     @self_client_joined = ko.observable false
@@ -209,9 +209,9 @@ class z.calling.entities.Call
     for participant_id, state of participants when participant_id isnt @self_user.id
       participant_et = @get_participant_by_id participant_id
       if participant_et
-        participant_et.state.muted state.muted if state.muted?
-        participant_et.state.screen_shared state.screen_shared if state.screen_shared?
-        participant_et.state.videod state.videod if state.videod?
+        participant_et.state.audio_send not state.muted if state.muted?
+        participant_et.state.screen_send state.screen_shared if state.screen_shared?
+        participant_et.state.video_send state.videod if state.videod?
 
         if state.screen_shared
           @remote_media_type z.media.MediaType.SCREEN

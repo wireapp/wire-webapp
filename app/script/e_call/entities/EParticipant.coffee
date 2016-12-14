@@ -17,17 +17,20 @@
 #
 
 window.z ?= {}
-z.calling ?= {}
-z.calling.entities ?= {}
+z.e_call ?= {}
+z.e_call.entities ?= {}
 
-# Participant entity.
-class z.calling.entities.Participant
+# E-Participant entity.
+class z.e_call.entities.EParticipant
   ###
-  Construct a new participant.
+  Construct a new e-participant.
+  @param e_call [z.e_call.entities.ECall] E-call entity
   @param user [z.entity.User] User entity to base the participant on
+  @param e_call_message [Object] E-call message content payload
   ###
-  constructor: (@user) ->
-    @flow = ko.observable()
+  constructor: (@e_call_et, @user, e_call_message) ->
+    @id = @user.id
+
     @is_connected = ko.observable false
     @panning = ko.observable 0.0
     @was_connected = false
@@ -37,22 +40,20 @@ class z.calling.entities.Participant
       screen_send: ko.observable false
       video_send: ko.observable false
 
+    @e_flow = new z.e_call.entities.EFlow @e_call_et, @, e_call_message
+    @update_properties e_call_message.props if e_call_message
+
     @is_connected.subscribe (is_connected) ->
       if is_connected and not @was_connected
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.READY_TO_TALK
         @was_connected = true
 
-  ###
-  Add a new flow to the participant.
-  @param flow_et [z.calling.Flow] Flow entity to be added to the flow
-  ###
-  add_flow: (flow_et) =>
-    @flow flow_et unless @flow()?.id is flow_et.id
+  update_flow: (e_call_message) =>
+    @update_properties e_call_message.props
+    @e_flow.save_remote_sdp e_call_message
 
-
-  ###
-  Get the flow of the participant.
-  @return [z.calling.Flow] Flow entity of participant
-  ###
-  get_flow: =>
-    return @flow()
+  update_properties: (properties) =>
+    if properties
+      @state.audio_send properties.audio_send is 'true' if properties.audiosend?
+      @state.screen_send properties.screen_send is 'true' if properties.screensend?
+      @state.video_send properties.video_send is 'true 'if properties.videosend?

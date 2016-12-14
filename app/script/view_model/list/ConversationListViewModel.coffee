@@ -87,7 +87,7 @@ class z.ViewModel.list.ConversationListViewModel
     @show_toggle_screen = ko.pureComputed ->
       return z.calling.CallCenter.supports_screen_sharing()
     @disable_toggle_screen = ko.pureComputed =>
-      return @joined_call()?.is_remote_screen_shared()
+      return @joined_call()?.is_remote_screen_send()
 
     @_init_subscriptions()
 
@@ -135,17 +135,17 @@ class z.ViewModel.list.ConversationListViewModel
   # Call stuff
   ###############################################################################
 
-  on_accept_call: (conversation_et) =>
-    @call_center.state_handler.join_call conversation_et.id, false
+  on_accept_call: (conversation_et) ->
+    amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id, false
 
-  on_accept_video: (conversation_et) =>
-    @call_center.state_handler.join_call conversation_et.id, true
+  on_accept_video: (conversation_et) ->
+    amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id, true
 
-  on_cancel_call: (conversation_et) =>
-    @call_center.state_handler.leave_call conversation_et.id
+  on_cancel_call: (conversation_et) ->
+    amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id
 
-  on_ignore_call: (conversation_et) =>
-    @call_center.state_handler.ignore_call conversation_et.id
+  on_ignore_call: (conversation_et) ->
+    amplify.publish z.event.WebApp.CALL.STATE.IGNORE, conversation_et.id
 
   on_toggle_audio: (conversation_et) =>
     @call_center.state_handler.toggle_audio conversation_et.id
