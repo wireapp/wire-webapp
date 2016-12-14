@@ -232,7 +232,7 @@ class z.conversation.ConversationRepository
     @conversation_service.load_events_from_db conversation_et.id, lower_bound, upper_bound
     .then (events) =>
       if events.length
-        @_add_events_to_conversation events: events, conversation_et
+        @_add_events_to_conversation events, conversation_et
       conversation_et.is_pending false
     .catch (error) =>
       @logger.info "Could not load unread events for conversation: #{conversation_et.id}", error
