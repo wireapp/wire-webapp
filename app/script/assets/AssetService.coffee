@@ -192,6 +192,7 @@ class z.assets.AssetService
   generate_asset_url: (asset_id, conversation_id) ->
     url = @client.create_url "/assets/#{asset_id}"
     asset_url = "#{url}?access_token=#{@client.access_token}&conv_id=#{conversation_id}"
+    asset_url = "#{asset_url}&forceCaching=true"
     return asset_url
 
   ###
@@ -205,6 +206,7 @@ class z.assets.AssetService
   generate_asset_url_v2: (asset_id, conversation_id) ->
     url = @client.create_url "/conversations/#{conversation_id}/otr/assets/#{asset_id}"
     asset_url = "#{url}?access_token=#{@client.access_token}"
+    asset_url = "#{asset_url}&forceCaching=true"
     return asset_url
 
   ###
@@ -218,6 +220,7 @@ class z.assets.AssetService
     url = @client.create_url "/assets/v3/#{asset_key}/"
     asset_url = "#{url}?access_token=#{@client.access_token}"
     asset_url = "#{asset_url}&asset_token=#{asset_token}" if asset_token
+    asset_url = "#{asset_url}&forceCaching=true"
     return asset_url
 
   ###

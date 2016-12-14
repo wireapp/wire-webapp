@@ -1167,7 +1167,7 @@ class z.conversation.ConversationRepository
     @get_message_in_conversation_by_id conversation_et, event_json.id
     .then (message_et) =>
       asset_data = event_json.data
-      remote_data = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
+      remote_data = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256, true
       message_et.get_first_asset().resource remote_data
       message_et.status z.message.StatusType.SENT
       @conversation_service.update_message_in_db message_et, {data: asset_data, status: z.message.StatusType.SENT}
@@ -2292,9 +2292,9 @@ class z.conversation.ConversationRepository
   ###
   update_message_with_asset_preview: (conversation_et, message_et, asset_data) =>
     if asset_data.key
-      resource = z.assets.AssetRemoteData.v3 asset_data.key, asset_data.otr_key, asset_data.sha256, asset_data.token
+      resource = z.assets.AssetRemoteData.v3 asset_data.key, asset_data.otr_key, asset_data.sha256, asset_data.token, true
     else
-      resource = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
+      resource = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256, true
     asset_et = message_et.get_first_asset()
     asset_et.preview_resource resource
     @conversation_service.update_asset_preview_in_db message_et.primary_key, asset_data

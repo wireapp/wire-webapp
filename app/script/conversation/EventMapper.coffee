@@ -382,7 +382,7 @@ class z.conversation.EventMapper
           {asset_token, asset_id, otr_key, sha256} = article.image.uploaded
           otr_key = new Uint8Array otr_key.toArrayBuffer()
           sha256 = new Uint8Array sha256.toArrayBuffer()
-          link_preview_et.image_resource z.assets.AssetRemoteData.v3 asset_id, otr_key, sha256, asset_token
+          link_preview_et.image_resource z.assets.AssetRemoteData.v3 asset_id, otr_key, sha256, asset_token, true
 
         return link_preview_et
 
@@ -401,9 +401,9 @@ class z.conversation.EventMapper
     asset_et.height = event.data.info.height
     asset_et.ratio = asset_et.height / asset_et.width
     if event.data.key
-      asset_et.resource z.assets.AssetRemoteData.v3 event.data.key, event.data.otr_key, event.data.sha256, event.data.token
+      asset_et.resource z.assets.AssetRemoteData.v3 event.data.key, event.data.otr_key, event.data.sha256, event.data.token, true
     else
-      asset_et.resource z.assets.AssetRemoteData.v2 event.conversation, asset_et.id, event.data.otr_key, event.data.sha256
+      asset_et.resource z.assets.AssetRemoteData.v2 event.conversation, asset_et.id, event.data.otr_key, event.data.sha256, true
     asset_et.dummy_url = z.util.dummy_image asset_et.width, asset_et.height
     return asset_et
 
@@ -438,9 +438,9 @@ class z.conversation.EventMapper
     if event.data.preview_id?
       if event.data.key
         {preview_key, preview_otr_key, preview_sha256, preview_token} = event.data
-        asset_et.preview_resource z.assets.AssetRemoteData.v3 preview_key, preview_otr_key, preview_sha256, preview_token
+        asset_et.preview_resource z.assets.AssetRemoteData.v3 preview_key, preview_otr_key, preview_sha256, preview_token, true
       else
-        asset_et.preview_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, event.data.preview_id, event.data.preview_otr_key, event.data.preview_sha256
+        asset_et.preview_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, event.data.preview_id, event.data.preview_otr_key, event.data.preview_sha256, true
 
     asset_et.status event.data.status or z.assets.AssetTransferState.UPLOADING # TODO
     return asset_et
