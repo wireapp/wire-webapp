@@ -45,9 +45,10 @@ ko.bindingHandlers.paste_file =
   init: (element, valueAccessor, allBindings, data, context) ->
 
     on_paste = (data, event) ->
-      items = [].slice.call event.originalEvent.clipboardData.items
+      clipboard_data = event.originalEvent.clipboardData
+      items = [].slice.call clipboard_data.items or clipboard_data.files
 
-      # TODO detect feature, get file name, type (always 'image/png' in Chrome?!?!)
+      # TODO cross browser, get file name, type (always 'image/png' in Chrome?!?!)
       files = items
         .filter (item) -> item.kind is 'file'
         .map (item) -> new File [item.getAsFile()], null, type: item.type

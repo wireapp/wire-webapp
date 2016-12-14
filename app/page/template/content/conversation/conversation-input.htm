@@ -109,7 +109,7 @@
         <!-- ko if: pasted_file_preview_url() -->
           <img class="conversation-input-paste-image conversation-input-paste-icon" data-bind="attr: {'src': pasted_file_preview_url()}">
         <!-- /ko -->
-        <span data-bind="text: pasted_file().name"></span>
+        <span data-bind="l10n_text: z.string.conversation_send_pasted_file"></span>
       </div>
       <div class="controls-right">
         <span class="conversation-input-paste-cancel button-icon-large icon-close" data-bind="click: on_cancel_pasted_files"></span>
