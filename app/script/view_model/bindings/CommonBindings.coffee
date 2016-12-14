@@ -56,7 +56,8 @@ ko.bindingHandlers.paste_file =
 
       if files.length > 0
         valueAccessor() files
-        event.preventDefault()
+        return false
+      return true
 
     ko.applyBindingsToNode window,
       event:
