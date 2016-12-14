@@ -268,7 +268,7 @@ class z.main.App
     if bot_name
       @logger.info "Found bot token '#{bot_name}'"
       @repository.bot.add_bot bot_name
-    v3_support = z.util.get_url_parameter z.auth.URLParameter.V3
+    v3_support = z.util.get_url_parameter z.auth.URLParameter.ASSETS_V3
     if v3_support
       @repository.conversation.use_v3_api = v3_support
       @repository.user.use_v3_api = v3_support
