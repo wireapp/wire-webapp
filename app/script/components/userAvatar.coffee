@@ -26,6 +26,7 @@ class z.components.UserAvatar
     @element = $(component_info.element)
 
     @avatar_loading_blocked = false
+    @avatar_entered_viewport = false
 
     if not @user?
       @user = new z.entity.User()
@@ -60,11 +61,13 @@ class z.components.UserAvatar
 
     @on_in_viewport = =>
       return true if @avatar_loading_blocked
+      @avatar_entered_viewport = true
       @_load_avatar_picture()
       return true
 
     @_load_avatar_picture = =>
       @avatar_loading_blocked = true
+      @avatar_entered_viewport = true
       @user.preview_picture_resource()?.get_object_url()
       .then (url) =>
         image = new Image()
@@ -75,7 +78,7 @@ class z.components.UserAvatar
         @avatar_loading_blocked = false
 
     @picture_preview_subscription = ko.computed =>
-      return if @avatar_loading_blocked
+      return if @avatar_loading_blocked or not @avatar_entered_viewport
       @_load_avatar_picture()
 
   dispose: =>

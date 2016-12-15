@@ -351,7 +351,7 @@ ko.bindingHandlers.in_viewport = do ->
       if is_child and _in_view element
         dispose = valueAccessor()?()
         _dispose() if dispose
-    , 100
+    , 300
 
     listeners.push _check_element
     _check_element()
