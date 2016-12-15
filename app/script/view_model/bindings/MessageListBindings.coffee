@@ -67,6 +67,7 @@ ko.bindingHandlers.background_image =
           $(element).removeClass 'image-loading'
           object_url = window.URL.createObjectURL blob
           image_element[0].src = object_url
+          image_element[0].onload = -> window.URL.revokeObjectURL object_url
           viewport_subscription.dispose()
         .catch -> return
     , 500
