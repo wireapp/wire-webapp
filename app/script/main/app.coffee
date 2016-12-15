@@ -234,11 +234,11 @@ class z.main.App
         @_watch_online_status()
 
   init_service_worker: ->
-    navigator.serviceWorker?.register('/sw.js')
+    navigator.serviceWorker?.register '/sw.js'
     .then (registration) =>
-      @logger.log 'ServiceWorker registration successful with scope: ', registration.scope
+      @logger.info 'ServiceWorker registration successful with scope: ', registration.scope
     .catch (error) ->
-      @logger.log 'ServiceWorker registration failed: ', error
+      @logger.error 'ServiceWorker registration failed: ', error
 
   ###
   Get the self user from the backend.

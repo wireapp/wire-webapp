@@ -16,11 +16,14 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-ASSET_CACHE_NAME = 'assets'
+CACHE_VERSION = 1
+CURRENT_CACHES =
+  asset: 'asset-cache-v' + CACHE_VERSION
+
 ASSET_CACHE_MAX_ITEMS = 1000
 
 cache_add = (cache, request) ->
-  fetch(request.clone())
+  fetch request.clone()
   .then (response) ->
     if not response.ok
       throw new TypeError 'bad response status'
@@ -37,16 +40,27 @@ add_to_lru = (cache, maxItems, request) ->
     return cache.delete(keys[0]).then ->
       return cache_add cache, request
 
-self.addEventListener 'install', ->
+self.addEventListener 'activate', (event) ->
   # coffeelint: disable
-  console.log 'service worker installed'
+  console.debug 'service worker activated'
   # coffeelint: enable
 
-self.addEventListener 'fetch', (event) ->
+  expectedCacheNames = Object.keys(CURRENT_CACHES).map (key) -> CURRENT_CACHES[key]
 
-  if should_cache_request(event.request)
+  event.waitUntil caches.keys().then((cacheNames) ->
+    Promise.all cacheNames.map((cacheName) ->
+      if expectedCacheNames.indexOf(cacheName) is -1
+        # coffeelint: disable
+        console.debug 'Deleting out of date cache:', cacheName
+        # coffeelint: enable
+        return caches.delete(cacheName)
+    )
+  )
+
+self.addEventListener 'fetch', (event) ->
+  if should_cache_request event.request
     event.respondWith(
-      caches.open(ASSET_CACHE_NAME).then (cache) ->
+      caches.open(CURRENT_CACHES.asset).then (cache) ->
         cache.match(event.request, {ignoreSearch: true})
         .then (response) ->
 
@@ -57,4 +71,4 @@ self.addEventListener 'fetch', (event) ->
           return add_to_lru cache, ASSET_CACHE_MAX_ITEMS, event.request
     )
   else
-    event.respondWith(fetch(event.request))
+    event.respondWith fetch(event.request)

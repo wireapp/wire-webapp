@@ -187,12 +187,13 @@ class z.assets.AssetService
   @deprecated
   @param asset_id [String] ID of the asset
   @param conversation_id [String] ID of the conversation the asset belongs to
+  @param force_caching [Boolean]
   @return [String] Asset URL
   ###
-  generate_asset_url: (asset_id, conversation_id) ->
+  generate_asset_url: (asset_id, conversation_id, force_caching) ->
     url = @client.create_url "/assets/#{asset_id}"
     asset_url = "#{url}?access_token=#{@client.access_token}&conv_id=#{conversation_id}"
-    asset_url = "#{asset_url}&forceCaching=true"
+    asset_url = "#{asset_url}&forceCaching=true" if force_caching
     return asset_url
 
   ###
@@ -201,12 +202,13 @@ class z.assets.AssetService
   @deprecated
   @param asset_id [String] ID of the asset
   @param conversation_id [String] ID of the conversation the asset belongs to
+  @param force_caching [Boolean]
   @return [String] Asset URL
   ###
-  generate_asset_url_v2: (asset_id, conversation_id) ->
+  generate_asset_url_v2: (asset_id, conversation_id, force_caching) ->
     url = @client.create_url "/conversations/#{conversation_id}/otr/assets/#{asset_id}"
     asset_url = "#{url}?access_token=#{@client.access_token}"
-    asset_url = "#{asset_url}&forceCaching=true"
+    asset_url = "#{asset_url}&forceCaching=true" if force_caching
     return asset_url
 
   ###
@@ -214,13 +216,14 @@ class z.assets.AssetService
 
   @param asset_key [String]
   @param asset_token [String]
+  @param force_caching [Boolean]
   @return [String] Asset URL
   ###
-  generate_asset_url_v3: (asset_key, asset_token) ->
+  generate_asset_url_v3: (asset_key, asset_token, force_caching) ->
     url = @client.create_url "/assets/v3/#{asset_key}/"
     asset_url = "#{url}?access_token=#{@client.access_token}"
     asset_url = "#{asset_url}&asset_token=#{asset_token}" if asset_token
-    asset_url = "#{asset_url}&forceCaching=true"
+    asset_url = "#{asset_url}&forceCaching=true" if force_caching
     return asset_url
 
   ###
