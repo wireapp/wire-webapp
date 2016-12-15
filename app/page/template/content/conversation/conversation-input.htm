@@ -26,7 +26,8 @@
                              resize: input,
                              resize_callback: scroll_message_list,
                              click: on_input_click,
-                             attr: {'placeholder': input_tooltip}"
+                             attr: {'placeholder': input_tooltip},
+                             paste_file: on_paste_files"
                   data-uie-name="input-message"
                   dir="auto">
         </textarea>
@@ -96,6 +97,25 @@
 
       </div>
     <!-- /ko -->
+  <!-- /ko -->
+
+  <!-- ko if: pasted_file() -->
+    <div class="conversation-input-paste-modal">
+      <div class="controls-left"></div>
+      <div class="controls-center">
+        <!-- ko ifnot: pasted_file_preview_url() -->
+          <span class="conversation-input-paste-icon icon-file"></span>
+        <!-- /ko -->
+        <!-- ko if: pasted_file_preview_url() -->
+          <img class="conversation-input-paste-image conversation-input-paste-icon" data-bind="attr: {'src': pasted_file_preview_url()}">
+        <!-- /ko -->
+        <span data-bind="text: pasted_file_name"></span>
+      </div>
+      <div class="controls-right">
+        <span class="conversation-input-paste-cancel button-icon-large icon-close" data-bind="click: on_cancel_pasted_files"></span>
+        <span class="conversation-input-paste-send bg-theme icon-send" data-bind="click: on_send_pasted_files"></span>
+      </div>
+    </div>
   <!-- /ko -->
 </div>
 <!--@formatter:on-->
