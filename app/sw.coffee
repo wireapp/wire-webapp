@@ -40,6 +40,13 @@ add_to_lru = (cache, maxItems, request) ->
     return cache.delete(keys[0]).then ->
       return cache_add cache, request
 
+self.addEventListener 'install', (event) ->
+  # coffeelint: disable
+  console.debug 'service worker installed'
+  # coffeelint: enable
+
+  event.waitUntil(self.skipWaiting())
+
 self.addEventListener 'activate', (event) ->
   # coffeelint: disable
   console.debug 'service worker activated'
@@ -48,13 +55,14 @@ self.addEventListener 'activate', (event) ->
   expectedCacheNames = Object.keys(CURRENT_CACHES).map (key) -> CURRENT_CACHES[key]
 
   event.waitUntil caches.keys().then((cacheNames) ->
-    Promise.all cacheNames.map((cacheName) ->
+    Promise.all(cacheNames.map((cacheName) ->
       if expectedCacheNames.indexOf(cacheName) is -1
         # coffeelint: disable
         console.debug 'Deleting out of date cache:', cacheName
         # coffeelint: enable
         return caches.delete(cacheName)
-    )
+    )).then ->
+      self.clients.claim()
   )
 
 self.addEventListener 'fetch', (event) ->
