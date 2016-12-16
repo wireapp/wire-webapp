@@ -104,7 +104,7 @@ class z.media.MediaDevicesHandler
     @current_device_id.audio_output.subscribe (media_device_id) =>
       z.util.StorageUtil.set_value z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id
       if media_device_id
-        @media_element_handler.switch_media_element_output media_device_id
+        @media_repository.element_handler.switch_media_element_output media_device_id
         @_update_current_index_from_id z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id
 
     @current_device_id.screen_input.subscribe (media_device_id) =>
