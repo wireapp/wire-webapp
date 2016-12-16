@@ -248,6 +248,9 @@ class z.ViewModel.ConversationInputViewModel
       $('.messages-wrap').scroll_to_bottom()
 
   on_input_enter: (data, event) =>
+    if @pasted_file()?
+      return @on_send_pasted_files()
+
     message = z.util.trim_line_breaks @input()
 
     if message.length > z.config.MAXIMUM_MESSAGE_LENGTH
