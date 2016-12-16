@@ -48,11 +48,10 @@ ko.bindingHandlers.paste_file =
       clipboard_data = event.originalEvent.clipboardData
       items = [].slice.call clipboard_data.items or clipboard_data.files
 
-      # TODO cross browser, get file name, type (always 'image/png' in Chrome?!?!)
       files = items
         .filter (item) -> item.kind is 'file'
         .map (item) -> new File [item.getAsFile()], null, type: item.type
-        .filter (item) -> item?
+        .filter (item) -> item? and item.size isnt 4 # Pasted files result in 4 byte blob (OSX)
 
       if files.length > 0
         valueAccessor() files
