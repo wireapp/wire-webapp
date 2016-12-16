@@ -268,6 +268,7 @@ z.string.conversation_context_menu_unlike = 'Unlike'
 z.string.conversation_delete_timestamp = 'Deleted on %@timestamp'
 z.string.conversation_edit_timestamp = 'Edited on %@timestamp'
 z.string.conversation_likes_caption = '%@number people'
+z.string.conversation_send_pasted_file = 'Pasted image at %date'
 
 # Archive
 z.string.archive_header = 'Archive'

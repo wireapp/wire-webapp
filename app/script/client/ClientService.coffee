@@ -135,9 +135,9 @@ class z.client.ClientService
     .first()
     .then (client_record) =>
       if client_record is undefined
-        @logger.log @logger.levels.INFO, "Client with primary key '#{primary_key}' not found in database"
+        @logger.info "Client with primary key '#{primary_key}' not found in database"
         return primary_key
-      @logger.log @logger.levels.INFO, "Loaded client record from database '#{primary_key}'", client_record
+      @logger.info "Loaded client record from database '#{primary_key}'", client_record
       return client_record
 
   ###
@@ -162,8 +162,7 @@ class z.client.ClientService
 
     return @storage_service.save @storage_service.OBJECT_STORE_CLIENTS, primary_key, client_payload
     .then (primary_key) =>
-      @logger.log @logger.levels.INFO,
-        "Client '#{client_payload.id}' stored with primary key '#{primary_key}'", client_payload
+      @logger.info "Client '#{client_payload.id}' stored with primary key '#{primary_key}'", client_payload
       return client_payload
 
   ###

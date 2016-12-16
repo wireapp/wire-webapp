@@ -27,7 +27,7 @@ class z.calling.entities.FlowAudio
     # Panning
     @panning = @flow_et.participant_et.panning
     @panning.subscribe (new_value) =>
-      @logger.log @logger.levels.INFO, "Panning of #{@flow_et.remote_user.name()} changed to '#{new_value}'"
+      @logger.info "Panning of #{@flow_et.remote_user.name()} changed to '#{new_value}'"
       @set_pan new_value
 
     @pan_node = undefined
@@ -55,7 +55,7 @@ class z.calling.entities.FlowAudio
     request.responseType = 'arraybuffer'
     request.onload = =>
       load = (buffer) =>
-        @logger.log @logger.levels.INFO, "Loaded audio from '#{audio_file_path}'"
+        @logger.info "Loaded audio from '#{audio_file_path}'"
         # Play audio file
         audio_buffer = buffer
         file_source = @audio_context.createBufferSource()
@@ -63,18 +63,18 @@ class z.calling.entities.FlowAudio
         @audio_source.disconnect()
         file_source.connect @audio_remote
         file_source.onended = =>
-          @logger.log @logger.levels.INFO, 'Finished playing audio file'
+          @logger.info 'Finished playing audio file'
           file_source.disconnect @audio_remote
           @_hookup_audio()
 
           if callback?
-            @logger.log @logger.levels.INFO, 'Invoking callback after playing audio file'
+            @logger.info 'Invoking callback after playing audio file'
             callback()
 
-        @logger.log @logger.levels.INFO, 'Playing audio file'
+        @logger.info 'Playing audio file'
         file_source.start()
       fail = =>
-        @logger.log @logger.levels.ERROR, "Failed to load audio from '#{audio_file_path}'"
+        @logger.error "Failed to load audio from '#{audio_file_path}'"
       @audio_context.decodeAudioData request.response, load, fail
     request.send()
 
@@ -84,7 +84,7 @@ class z.calling.entities.FlowAudio
         @gain_node.gain.value = 0
       else
         @gain_node.gain.value = 1
-      @logger.log @logger.levels.INFO, "Outgoing audio on flow muted '#{is_muted}'"
+      @logger.info "Outgoing audio on flow muted '#{is_muted}'"
 
   set_pan: (panning_value) =>
     if @pan_node
@@ -97,7 +97,7 @@ class z.calling.entities.FlowAudio
       @audio_remote = @audio_context.createMediaStreamDestination()
       @_hookup_audio()
       $.extend true, media_stream, @audio_remote.stream
-      @logger.log @logger.levels.INFO, 'Wrapped audio stream from microphone', media_stream
+      @logger.info 'Wrapped audio stream from microphone', media_stream
     return media_stream
 
   wrap_speaker_stream: (media_stream) =>
@@ -110,7 +110,7 @@ class z.calling.entities.FlowAudio
         remote_source.connect @pan_node
         @pan_node.connect speaker
         $.extend true, media_stream, speaker.stream
-        @logger.log @logger.levels.INFO, "Wrapped audio stream to speaker to create stereo. Initial panning set to '#{@panning()}'.", media_stream
+        @logger.info "Wrapped audio stream to speaker to create stereo. Initial panning set to '#{@panning()}'.", media_stream
     return media_stream
 
   _hookup_audio: =>

@@ -54,11 +54,11 @@ class z.telemetry.calling.CallSetupTimings
       @[step] = window.parseInt window.performance.now() - @started
 
   log: =>
-    @logger.log @logger.levels.INFO, "Call setup duration for flow ID '#{@flow_id}' of call ID '#{@call_id}'"
+    @logger.info "Call setup duration for flow ID '#{@flow_id}' of call ID '#{@call_id}'"
     for step in @_steps_order()
       placeholder_key = Array(Math.max 26 - step.length, 1).join ' '
       placeholder_value = Array(Math.max 6 - @[step].toString().length, 1).join ' '
-      @logger.log @logger.levels.INFO, "Step#{placeholder_key}'#{step}':#{placeholder_value}#{@[step]}ms"
+      @logger.info "Step#{placeholder_key}'#{step}':#{placeholder_value}#{@[step]}ms"
 
   _steps_order: ->
     if @is_answer

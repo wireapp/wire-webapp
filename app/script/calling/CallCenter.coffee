@@ -108,9 +108,9 @@ class z.calling.CallCenter
     return if event.type not in SUPPORTED_EVENTS
 
     if @state_handler.block_event_handling
-      @logger.log @logger.levels.INFO, "Skipping '#{event.type}' event", {event_object: event, event_json: JSON.stringify event}
+      @logger.info "Skipping '#{event.type}' event", {event_object: event, event_json: JSON.stringify event}
     else
-      @logger.log @logger.levels.INFO, "Handling '#{event.type}' event", {event_object: event, event_json: JSON.stringify event}
+      @logger.info "Handling '#{event.type}' event", {event_object: event, event_json: JSON.stringify event}
       if z.calling.CallCenter.supports_calling()
         @_on_event_in_supported_browsers event
       else
@@ -197,12 +197,12 @@ class z.calling.CallCenter
         act = counting.pop()
         return if not act
         user_name = act.flow.remote_user.name()
-        @logger.log @logger.levels.INFO, "Sending audio file '#{act.sound}' to flow '#{act.flow.id}' (#{user_name})"
+        @logger.info "Sending audio file '#{act.sound}' to flow '#{act.flow.id}' (#{user_name})"
         act.flow.inject_audio_file act.sound, _count_flow
 
       _count_flow()
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "No call for conversation '#{conversation_id}' found to count into flows", error
+      @logger.warn "No call for conversation '#{conversation_id}' found to count into flows", error
 
 
   ###
@@ -215,7 +215,7 @@ class z.calling.CallCenter
     .then (call_et) ->
       flow_et.inject_audio_file file_path for flow_et in call_et.get_flows()
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "No call for conversation '#{conversation_id}' found to inject audio into flows", error
+      @logger.warn "No call for conversation '#{conversation_id}' found to inject audio into flows", error
 
 
   ###############################################################################
@@ -237,8 +237,7 @@ class z.calling.CallCenter
   report_call: =>
     send_report = (custom_data) =>
       Raygun.send new Error('Call failure report'), custom_data
-      @logger.log @logger.levels.INFO,
-        "Reported status of flow id '#{custom_data.meta.flow_id}' for call analysis", custom_data
+      @logger.info "Reported status of flow id '#{custom_data.meta.flow_id}' for call analysis", custom_data
 
     call_et = @_find_ongoing_call()
     if call_et
@@ -246,11 +245,11 @@ class z.calling.CallCenter
     else if @flow_status
       send_report @flow_status
     else
-      @logger.log @logger.levels.WARN, 'Could not find flows to report for call analysis'
+      @logger.warn 'Could not find flows to report for call analysis'
 
   # Set logging on adapter.js
   set_logging: (is_logging_enabled) =>
-    @logger.log @logger.levels.INFO, "Set logging for webRTC Adapter: #{is_logging_enabled}"
+    @logger.info "Set logging for webRTC Adapter: #{is_logging_enabled}"
     adapter?.disableLog = not is_logging_enabled
 
   # Store last flow status

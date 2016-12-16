@@ -38,7 +38,7 @@ class z.announce.AnnounceRepository
     @announce_service.get_announcements()
     .then @process_announce_list
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to fetch announcements: #{error}"
+      @logger.error "Failed to fetch announcements: #{error}"
 
 
 
@@ -57,7 +57,7 @@ class z.announce.AnnounceRepository
           return if not z.util.Environment.browser.supports.notifications
           return if window.Notification.permission is z.system_notification.PermissionStatusState.DENIED
 
-          if not (z.localization.Localizer.locale is 'en')
+          if z.localization.Localizer.locale isnt 'en'
             announcement.title = announcement["title_#{z.localization.Localizer.locale}"] or announcement.title
             announcement.message = announcement["message_#{z.localization.Localizer.locale}"] or announcement.message
 
@@ -68,11 +68,11 @@ class z.announce.AnnounceRepository
             requireInteraction: true
 
           amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.SENT, campaign: announcement.campaign
-          @logger.log @logger.levels.INFO, "Announcement '#{announcement.title}' shown"
+          @logger.info "Announcement '#{announcement.title}' shown"
 
           notification.onclick = =>
             amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.CLICKED, campaign: announcement.campaign
-            @logger.log @logger.levels.INFO, "Announcement '#{announcement.title}' clicked"
+            @logger.info "Announcement '#{announcement.title}' clicked"
             if announcement.link
               z.util.safe_window_open announcement.link
             if announcement.refresh

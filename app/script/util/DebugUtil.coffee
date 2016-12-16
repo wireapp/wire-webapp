@@ -55,7 +55,7 @@ class z.util.DebugUtil
       .then (user_et) =>
         debug_information.user = user_et
         log_message = "Hey #{@user_repository.self().name()}, this is for you:"
-        @logger.log @logger.levels.WARN, log_message, debug_information
-        @logger.log @logger.levels.WARN, "Conversation: #{debug_information.conversation.name()}", debug_information.conversation
-        @logger.log @logger.levels.WARN, "From: #{debug_information.user.name()}", debug_information.user
+        @logger.warn log_message, debug_information
+        @logger.warn "Conversation: #{debug_information.conversation.name()}", debug_information.conversation
+        @logger.warn "From: #{debug_information.user.name()}", debug_information.user
         resolve debug_information

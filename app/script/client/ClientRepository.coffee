@@ -38,7 +38,7 @@ class z.client.ClientRepository
 
   init: (self_user) ->
     @self_user self_user
-    @logger.log @logger.levels.INFO, "Initialized repository with user ID '#{@self_user().id}'"
+    @logger.info "Initialized repository with user ID '#{@self_user().id}'"
 
 
   ###############################################################################
@@ -90,14 +90,26 @@ class z.client.ClientRepository
       throw new z.client.ClientError z.client.ClientError::TYPE.DATABASE_FAILURE
     .then (client_payload) =>
       if _.isString client_payload
-        @logger.log @logger.levels.INFO, "No current local client connected to '#{@PRIMARY_KEY_CURRENT_CLIENT}' found in database"
+        @logger.info "No current local client connected to '#{@PRIMARY_KEY_CURRENT_CLIENT}' found in database"
         throw new z.client.ClientError z.client.ClientError::TYPE.NO_LOCAL_CLIENT
       else
         client_et = @client_mapper.map_client client_payload
         @current_client client_et
-        @logger.log @logger.levels.INFO,
-          "Loaded local client '#{client_et.id}' connected to '#{@PRIMARY_KEY_CURRENT_CLIENT}'", @current_client()
+        @logger.info "Loaded local client '#{client_et.id}' connected to '#{@PRIMARY_KEY_CURRENT_CLIENT}'", @current_client()
         return @current_client()
+
+  ###
+  Construct the primary key to store clients in database.
+  @private
+
+  @param user_id [String] User ID from the owner of the client
+  @param client_id [String] Client ID
+  @return [String] Primary key
+  ###
+  _construct_primary_key: (user_id, client_id) ->
+    throw new z.client.ClientError z.client.ClientError::TYPE.NO_USER_ID if not user_id
+    throw new z.client.ClientError z.client.ClientError::TYPE.NO_CLIENT_ID if not client_id
+    return "#{user_id}@#{client_id}"
 
   ###
   Save the a client into the database.
@@ -127,19 +139,6 @@ class z.client.ClientRepository
     return @client_service.update_client_in_db primary_key, changes
 
   ###
-  Construct the primary key to store clients in database.
-  @private
-
-  @param user_id [String] User ID from the owner of the client
-  @param client_id [String] Client ID
-  @return [String] Primary key
-  ###
-  _construct_primary_key: (user_id, client_id) ->
-    throw new z.client.ClientError z.client.ClientError::TYPE.NO_USER_ID if not user_id
-    throw new z.client.ClientError z.client.ClientError::TYPE.NO_CLIENT_ID if not client_id
-    return "#{user_id}@#{client_id}"
-
-  ###
   Save the local client into the database.
 
   @private
@@ -151,6 +150,19 @@ class z.client.ClientRepository
       is_verified: true
     return @client_service.save_client_in_db @PRIMARY_KEY_CURRENT_CLIENT, client_payload
 
+  ###
+  Updates a client payload if it does not fit the current database structure.
+
+  @private
+  @param user_id [String] User ID of the client owner
+  @param client_payload [Object] Client data to be stored in database
+  @return [Promise] Promise that resolves with the record stored in database
+  ###
+  _update_client_schema_in_db: (user_id, client_payload) =>
+    client_payload.meta =
+      is_verified: false
+      primary_key: @_construct_primary_key user_id, client_payload.id
+    return @save_client_in_db user_id, client_payload
 
   ###############################################################################
   # Login and registration
@@ -186,7 +198,7 @@ class z.client.ClientRepository
     .then (client_et) =>
       return @get_client_by_id_from_backend client_et.id
     .then (client) =>
-      @logger.log @logger.levels.INFO, "Client with ID '#{client.id}' (#{client.type}) validated on backend"
+      @logger.info "Client with ID '#{client.id}' (#{client.type}) validated on backend"
       return @current_client
     .catch (error) =>
       client_et = @current_client()
@@ -195,17 +207,17 @@ class z.client.ClientRepository
 
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         error_message = "Local client '#{client_et.id}' (#{client_et.type}) no longer exists on the backend"
-        @logger.log @logger.levels.WARN, error_message, error
+        @logger.warn error_message, error
         @cryptography_repository.storage_repository.delete_everything()
         .catch (error) =>
-          @logger.log @logger.levels.ERROR, "Deleting database after failed client validation unsuccessful: #{error.message}", error
+          @logger.error "Deleting database after failed client validation unsuccessful: #{error.message}", error
           throw new z.client.ClientError z.client.ClientError::TYPE.DATABASE_FAILURE
         .then ->
           throw new z.client.ClientError z.client.ClientError::TYPE.MISSING_ON_BACKEND
       else if error.type is z.client.ClientError::TYPE.NO_LOCAL_CLIENT
         throw error
       else
-        @logger.log @logger.levels.ERROR, "Getting valid local client failed: #{error_message}", error
+        @logger.error "Getting valid local client failed: #{error_message}", error
         throw error
 
   ###
@@ -227,11 +239,10 @@ class z.client.ClientRepository
         if error.label is z.service.BackendClientError::LABEL.TOO_MANY_CLIENTS
           throw new z.client.ClientError z.client.ClientError::TYPE.TOO_MANY_CLIENTS
         else
-          @logger.log @logger.levels.ERROR, "Client registration request failed: #{error.message}", error
+          @logger.error "Client registration request failed: #{error.message}", error
           throw new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FAILURE
       .then (response) =>
-        @logger.log @logger.levels.INFO,
-          "Registered '#{response.type}' client '#{response.id}' with cookie label '#{response.cookie}'", response
+        @logger.info "Registered '#{response.type}' client '#{response.id}' with cookie label '#{response.cookie}'", response
         @current_client @client_mapper.map_client response
         # Save client
         return @_save_current_client_in_db response
@@ -239,7 +250,7 @@ class z.client.ClientRepository
         if error.type in [z.client.ClientError::TYPE.REQUEST_FAILURE, z.client.ClientError::TYPE.TOO_MANY_CLIENTS]
           throw error
         else
-          @logger.log @logger.levels.ERROR, "Failed to save client: #{error.message}", error
+          @logger.error "Failed to save client: #{error.message}", error
           throw new z.client.ClientError z.client.ClientError::TYPE.DATABASE_FAILURE
       .then (client_payload) =>
         # Update cookie
@@ -247,7 +258,7 @@ class z.client.ClientRepository
       .then =>
         resolve @current_client
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Client registration failed: #{error.message}", error
+        @logger.error "Client registration failed: #{error.message}", error
         reject error
 
   ###
@@ -312,13 +323,12 @@ class z.client.ClientRepository
 
     if cookie_label is undefined
       cookie_label = @construct_cookie_label @self_user().email() or @self_user().phone(), client_type
-      @logger.log @logger.levels.WARN, "Cookie label is in an invalid state. We created a new one: '#{cookie_label}'"
+      @logger.warn "Cookie label is in an invalid state. We created a new one: '#{cookie_label}'"
       z.util.StorageUtil.set_value local_storage_key, cookie_label
 
-    @logger.log "Saving cookie label '#{cookie_label}' in IndexedDB", {
+    @logger.info "Saving cookie label '#{cookie_label}' in IndexedDB",
       key: local_storage_key
       value: cookie_label
-    }
 
     return @cryptography_repository.storage_repository.save_value indexed_db_key, cookie_label
 
@@ -348,7 +358,7 @@ class z.client.ClientRepository
   ###
   delete_client: (client_id, password) =>
     if not password
-      @logger.log @logger.levels.ERROR, "Could not delete client '#{client_id}' because password is missing"
+      @logger.error "Could not delete client '#{client_id}' because password is missing"
       Promise.reject new z.client.ClientError z.client.ClientError::TYPE.REQUEST_FORBIDDEN
 
     @client_service.delete_client client_id, password
@@ -359,7 +369,7 @@ class z.client.ClientRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, outcome: 'success'
       return @clients()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Unable to delete client '#{client_id}': #{error.message}", error
+      @logger.error "Unable to delete client '#{client_id}': #{error.message}", error
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, outcome: 'fail'
 
       if error.code is z.service.BackendClientError::STATUS_CODE.FORBIDDEN
@@ -407,7 +417,7 @@ class z.client.ClientRepository
   @return [Promise] Promise that resolves with the retrieved information about the clients
   ###
   get_clients_for_self: (expect_current_client = true) ->
-    @logger.log @logger.levels.INFO, "Retrieving all clients for the self user '#{@self_user().id}'"
+    @logger.info "Retrieving all clients for the self user '#{@self_user().id}'"
     @client_service.get_clients()
     .then (response) =>
       return @_get_clients_by_user_id response, @self_user().id, expect_current_client
@@ -415,7 +425,7 @@ class z.client.ClientRepository
       @self_user().add_client client_et for client_et in client_ets
       return @self_user().devices()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Unable to retrieve clients data: #{error}"
+      @logger.error "Unable to retrieve clients data: #{error}"
       throw error
 
   ###
@@ -458,13 +468,6 @@ class z.client.ClientRepository
         # Save new clients and cache existing ones
         promises = []
 
-        # Updates a client payload if it does not fit the current database structure
-        update_client_schema = (user_id, client_payload) =>
-          client_payload.meta =
-            is_verified: false
-            primary_key: @_construct_primary_key user_id, client_payload.id
-          return @save_client_in_db user_id, client_payload
-
         # Known clients will be returned as object, unknown clients will resolve with their expected primary key
         for result in results
 
@@ -473,9 +476,9 @@ class z.client.ClientRepository
             ids = z.client.Client.dismantle_user_client_id result
             continue if expect_current_client and @_is_current_client user_id, ids.client_id
 
-            @logger.log @logger.levels.INFO, "New client '#{ids.client_id}' will be stored locally"
+            @logger.info "New client '#{ids.client_id}' will be stored locally"
             client_payload = clients_from_backend[ids.client_id]
-            promises.push update_client_schema user_id, client_payload
+            promises.push @_update_client_schema_in_db user_id, client_payload
             continue
 
           if clients_from_backend[result.id]
@@ -490,14 +493,14 @@ class z.client.ClientRepository
             clients_stored_in_db.push client_payload
             continue
 
-          @logger.log @logger.levels.WARN, "Deleted client '#{result.id}' will be removed locally"
+          @logger.warn "Deleted client '#{result.id}' will be removed locally"
           @remove_client user_id, result.id
 
         return Promise.all promises
       .then (new_records) =>
         resolve @client_mapper.map_clients clients_stored_in_db.concat new_records
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Unable to retrieve clients for user '#{user_id}': #{error.message}", error
+        @logger.error "Unable to retrieve clients for user '#{user_id}': #{error.message}", error
         reject error
 
   ###
@@ -524,7 +527,7 @@ class z.client.ClientRepository
   @param event_json [Object] JSON data of 'user.client-add' event
   ###
   on_client_add: (event_json) =>
-    @logger.log @logger.levels.INFO, 'Client of self user added', event_json
+    @logger.info 'Client of self user added', event_json
     client_et = @client_mapper.map_client event_json.client
     amplify.publish z.event.WebApp.CLIENT.ADD, @self_user().id, client_et
 

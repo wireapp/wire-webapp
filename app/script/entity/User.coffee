@@ -112,7 +112,7 @@ class z.entity.User
     # e2ee
     @devices = ko.observableArray()
     @is_verified = ko.pureComputed =>
-      return false if @devices().length is 0
+      return false if @devices().length is 0 and not @is_me
       return @devices().every (client_et) -> client_et.meta.is_verified()
 
   add_client: (new_client_et) =>

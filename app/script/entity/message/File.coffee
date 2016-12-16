@@ -109,11 +109,11 @@ class z.entity.File extends z.entity.Asset
       return z.util.download_blob blob, @file_name
     .then =>
       download_duration = (Date.now() - download_started) / 1000
-      @logger.log "Downloaded asset in #{download_duration} seconds"
+      @logger.info "Downloaded asset in #{download_duration} seconds"
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.DOWNLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: download_duration}
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, 'Failed to download asset', error
+      @logger.error 'Failed to download asset', error
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.DOWNLOAD_FAILED, tracking_data
 
   cancel: (message_et) =>
@@ -125,4 +125,4 @@ class z.entity.File extends z.entity.Asset
       type: z.util.get_file_extension @file_name
 
   reload: =>
-    @logger.log 'Restart upload'
+    @logger.info 'Restart upload'
