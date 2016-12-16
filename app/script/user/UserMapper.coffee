@@ -118,14 +118,14 @@ class z.user.UserMapper
 
   _map_profile_pictures: (user_et, picture) ->
     if picture[0]?
-      user_et.preview_picture_resource z.assets.AssetRemoteData.v1 user_et.id, picture[0].id
+      user_et.preview_picture_resource z.assets.AssetRemoteData.v1 user_et.id, picture[0].id, true
     if picture[1]?
-      user_et.medium_picture_resource z.assets.AssetRemoteData.v1 user_et.id, picture[1].id
+      user_et.medium_picture_resource z.assets.AssetRemoteData.v1 user_et.id, picture[1].id, true
 
   _map_profile_assets: (user_et, assets) ->
     for asset in assets when asset.type is 'image'
       switch asset.size
         when 'preview'
-          user_et.preview_picture_resource z.assets.AssetRemoteData.v3 asset.key
+          user_et.preview_picture_resource z.assets.AssetRemoteData.v3 asset.key, true
         when 'complete'
-          user_et.medium_picture_resource z.assets.AssetRemoteData.v3 asset.key
+          user_et.medium_picture_resource z.assets.AssetRemoteData.v3 asset.key, true
