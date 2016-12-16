@@ -67,11 +67,11 @@ ko.bindingHandlers.background_image =
           $(element).removeClass 'image-loading'
           object_url = window.URL.createObjectURL blob
           image_element[0].src = object_url
-          image_element[0].onload = -> window.URL.revokeObjectURL object_url
           viewport_subscription.dispose()
         .catch -> return
     , 500
 
+    object_url = undefined
     image_element = $(element).find 'img'
     asset_remote_data = valueAccessor()
 
@@ -84,6 +84,7 @@ ko.bindingHandlers.background_image =
     ko.utils.domNodeDisposal.addDisposeCallback element, ->
       viewport_subscription.dispose()
       asset_subscription.dispose()
+      window.URL.revokeObjectURL object_url if object_url?
 
 # Fit image to viewport
 #
