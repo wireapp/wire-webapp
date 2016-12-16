@@ -40,6 +40,7 @@ class z.main.App
 
     @init_debugging()
     @init_app()
+    @init_service_worker()
 
 
   ###############################################################################
@@ -231,6 +232,13 @@ class z.main.App
       else
         @logger.warn 'No connectivity. Trigger reload on regained connectivity.', error
         @_watch_online_status()
+
+  init_service_worker: ->
+    navigator.serviceWorker?.register '/sw.js'
+    .then (registration) =>
+      @logger.info 'ServiceWorker registration successful with scope: ', registration.scope
+    .catch (error) ->
+      @logger.error 'ServiceWorker registration failed: ', error
 
   ###
   Get the self user from the backend.
