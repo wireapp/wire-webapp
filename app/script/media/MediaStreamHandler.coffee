@@ -517,11 +517,8 @@ class z.media.MediaStreamHandler
 
   # Toggle the mute state of the microphone.
   toggle_audio_send: =>
-    Promise.resolve()
-    .then =>
-      if @local_media_streams.audio()
-        return @_toggle_audio_send()
-      throw new z.media.MediaError z.media.MediaError::TYPE.NO_AUDIO_STREAM_FOUND
+    return @_toggle_audio_send() if @local_media_streams.audio()
+    return Promise.reject new z.media.MediaError z.media.MediaError::TYPE.NO_AUDIO_STREAM_FOUND
 
   # Toggle the screen.
   toggle_screen_send: =>

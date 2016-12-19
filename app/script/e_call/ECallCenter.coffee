@@ -95,6 +95,7 @@ class z.e_call.ECallCenter
 
   # Subscribe to amplify topics.
   subscribe_to_state_events: =>
+    amplify.subscribe z.event.WebApp.CALL.MEDIA.TOGGLE, @toggle_media
     amplify.subscribe z.event.WebApp.CALL.STATE.DELETE, @delete_call
     amplify.subscribe z.event.WebApp.CALL.STATE.IGNORE, @ignore_call
     amplify.subscribe z.event.WebApp.CALL.STATE.JOIN, @join_call
@@ -380,16 +381,6 @@ class z.e_call.ECallCenter
       throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
   ###
-  User action to toggle the audio state of an e-call.
-  @param conversation_id [String] ID of conversation with e-call
-  ###
-  toggle_audio: (conversation_id) =>
-    @media_stream_handler.toggle_audio_send()
-    .then =>
-      @logger.error 'not yet implemented'
-      # @todo send info via datachannel
-
-  ###
   User action to toggle the e-call state.
   @param conversation_id [String] ID conversation to toggle the join state of the e-call in
   @param video_send [Boolean] Video enabled for this e-call
@@ -400,29 +391,24 @@ class z.e_call.ECallCenter
     return @join_call conversation_id, video_send
 
   ###
-  User action to toggle the screen sharing state of an e-call.
+  User action to toggle one of the media stats of an e-call
   @param conversation_id [String] ID of conversation with e-call
+  @param media_type [z.media.MediaType] MediaType of requested change
   ###
-  toggle_screen: (conversation_id) =>
-    @media_stream_handler.toggle_screen_send()
-    .then =>
-      @logger.error 'not yet implemented'
-      # @todo send info via datachannel
-
-  ###
-  User action to toggle the video state of an e-call.
-  @param conversation_id [String] ID of conversation with e-call
-  ###
-  toggle_video: (conversation_id) =>
+  toggle_media: (conversation_id, media_type) =>
     @get_e_call_by_id conversation_id
-    .then e_call_et =>
-      @media_stream_handler.toggle_video_send()
-      .then =>
+    .then (e_call_et) =>
+      toggle_promise = switch media_type
+        when z.media.MediaType.AUDIO
+          @media_stream_handler.toggle_audio_send()
+        when z.media.MediaType.SCREEN
+          @media_stream_handler.toggle_video_send()
+        when z.media.MediaType.VIDEO
+          @media_stream_handler.toggle_video_send()
+      toggle_promise.then =>
         @send_e_call_event e_call_et.conversation_et, @create_setup_event e_call_et, false, props: @_create_properties_payload @self_state.video_send()
     .catch (error) ->
       throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
-      @logger.error 'not yet implemented'
-      # @todo send info via datachannel
 
   ###
   Check whether we are actively participating in a e-call.

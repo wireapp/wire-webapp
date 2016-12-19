@@ -43,6 +43,7 @@ class z.calling.handler.CallStateHandler
 
   # Subscribe to amplify topics.
   subscribe_to_events: =>
+    amplify.subscribe z.event.WebApp.CALL.MEDIA.TOGGLE, @toggle_media
     amplify.subscribe z.event.WebApp.CALL.STATE.CHECK, @check_state
     amplify.subscribe z.event.WebApp.CALL.STATE.DELETE, @delete_call
     amplify.subscribe z.event.WebApp.CALL.STATE.IGNORE, @ignore_call
@@ -441,15 +442,23 @@ class z.calling.handler.CallStateHandler
       @logger.warn "No call found in conversation '#{conversation_id}' to remove participant from", error
 
   ###
-  User action to toggle the audio muted state of a call.
+  User action to toggle a media state of a call.
   @param conversation_id [String] Conversation ID of call
+  @param media_type [z.media.MediaType] MediaType of requested change
   ###
-  toggle_audio: (conversation_id) =>
-    @call_center.media_stream_handler.toggle_audio_send()
-    .then =>
+  toggle_media: (conversation_id, media_type) =>
+    toggle_promise = switch media_type
+      when z.media.MediaType.AUDIO
+        @media_stream_handler.toggle_audio_send()
+      when z.media.MediaType.SCREEN
+        @media_stream_handler.toggle_video_send()
+      when z.media.MediaType.VIDEO
+        @media_stream_handler.toggle_video_send()
+
+    toggle_promise.then =>
       return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
     .catch (error) =>
-      @logger.error "Failed to toggle audio state: #{error.message}", error
+      @logger.error "Failed to toggle '#{media_type}' state: #{error.message}", error
 
   ###
   User action to toggle the call state.
@@ -463,28 +472,6 @@ class z.calling.handler.CallStateHandler
       @leave_call conversation_id
     else
       @join_call conversation_id, is_videod
-
-  ###
-  User action to toggle the screen sharing state of a call.
-  @param conversation_id [String] Conversation ID of call
-  ###
-  toggle_screen: (conversation_id) =>
-    @call_center.media_stream_handler.toggle_screen_send()
-    .then =>
-      return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
-    .catch (error) =>
-      @logger.error "Failed to toggle screen sharing state: #{error.message}", error
-
-  ###
-  User action to toggle the video state of a call.
-  @param conversation_id [String] Conversation ID of call
-  ###
-  toggle_video: (conversation_id) =>
-    @call_center.media_stream_handler.toggle_video_send()
-    .then =>
-      return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
-    .catch (error) =>
-      @logger.error "Failed to toggle video state: #{error.message}", error
 
   ###
   Check whether we are actively participating in a call.
