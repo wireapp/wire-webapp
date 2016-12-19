@@ -19,11 +19,12 @@
 window.z ?= {}
 z.components ?= {}
 
+
 class z.components.EphemeralTimer
   constructor: (params) ->
     message_et = params.message
 
-    @ephemeral_duration = ko.computed => message_et.ephemeral_expires() - message_et.ephemeral_started()
+    @ephemeral_duration = ko.computed -> message_et.ephemeral_expires() - message_et.ephemeral_started()
 
     @progress = ko.observable 0
     @remaining_time = ko.observable 0
@@ -47,6 +48,7 @@ class z.components.EphemeralTimer
     message_et.ephemeral_interval_id = undefined
     window.clearTimeout message_et.ephemeral_timeout_id
     message_et.ephemeral_timeout_id = undefined
+
 
 ko.components.register 'ephemeral-timer',
   viewModel: z.components.EphemeralTimer
