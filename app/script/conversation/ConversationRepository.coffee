@@ -219,6 +219,19 @@ class z.conversation.ConversationRepository
       throw error
 
   ###
+  # TODO handle Edge
+  Get messages for given category. Category param acts as lower bound
+  @param conversation_id [String]
+  @param catogory [z.message.MessageCategory.NONE]
+  @return [Promise] Array of z.entity.Message entities
+  ###
+  get_events_for_category: (conversation_et, catogory = z.message.MessageCategory.NONE) =>
+    @conversation_service.load_events_with_category_from_db conversation_et.id, catogory
+    .then (events) =>
+      message_ets = @event_mapper.map_json_events events, conversation_et
+      return Promise.all (@_update_user_ets message_et for message_et in message_ets)
+
+  ###
   Get conversation unread events.
   @param conversation_et [z.entity.Conversation] Conversation to start from
   ###
@@ -1945,6 +1958,8 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves with the message entity for the event
   ###
   _add_event_to_conversation: (json, conversation_et) ->
+    message_et = @event_mapper.map_json_event json, conversation_et, true
+  _add_event_to_conversation: (json, conversation_et) ->
     message_et = @event_mapper.map_json_event json, conversation_et
     @_update_user_ets message_et
     .then (message_et) =>
@@ -1968,7 +1983,7 @@ class z.conversation.ConversationRepository
   ###
   _add_events_to_conversation: (events, conversation_et, prepend = true) ->
     return Promise.resolve().then =>
-      message_ets = @event_mapper.map_json_events events, conversation_et
+      message_ets = @event_mapper.map_json_events events, conversation_et, true
       return Promise.all (@_update_user_ets message_et for message_et in message_ets)
     .then (message_ets) ->
       if prepend and conversation_et.messages().length > 0

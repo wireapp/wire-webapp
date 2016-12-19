@@ -24,8 +24,14 @@
         <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION -->
           #include('content/conversation.htm')
         <!-- /ko -->
+        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.COLLECTION -->
+          #include('content/collection.htm')
+        <!-- /ko -->
+        <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS -->
+          #include('content/collection-details.htm')
+        <!-- /ko -->
         <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT -->
-         #include('content/preferences-about.htm')
+          #include('content/preferences-about.htm')
         <!-- /ko -->
         <!-- ko if: content_state() === z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT -->
           #include('content/preferences-account.htm')

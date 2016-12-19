@@ -35,6 +35,8 @@ class z.ViewModel.content.ContentViewModel
     # nested view models
     @call_shortcuts =             new z.ViewModel.CallShortcutsViewModel @call_center
     @video_calling =              new z.ViewModel.VideoCallingViewModel 'video-calling', @call_center, @conversation_repository, @media_repository, @user_repository, @multitasking
+    @collection_details =         new z.ViewModel.content.CollectionDetailsViewModel 'collection-details'
+    @collection =                 new z.ViewModel.content.CollectionViewModel 'collection', @conversation_repository, @collection_details
     @connect_requests =           new z.ViewModel.content.ConnectRequestsViewModel 'connect-requests', @user_repository
     @conversation_titlebar =      new z.ViewModel.ConversationTitlebarViewModel 'conversation-titlebar', @call_center, @conversation_repository, @multitasking
     @conversation_input =         new z.ViewModel.ConversationInputViewModel 'conversation-input', @conversation_repository, @user_repository
@@ -64,6 +66,8 @@ class z.ViewModel.content.ContentViewModel
           @preferences_av.initiate_devices()
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
           @preferences_devices.update_fingerprint()
+        when z.ViewModel.content.CONTENT_STATE.COLLECTION
+          @collection.set_conversation @previous_conversation
         else
           @conversation_input.removed_from_view()
           @conversation_titlebar.removed_from_view()
@@ -156,6 +160,8 @@ class z.ViewModel.content.ContentViewModel
 
   _get_element_of_content: (content_state) ->
     switch content_state
+      when z.ViewModel.content.CONTENT_STATE.COLLECTION then '.collection'
+      when z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS then '.collection-details'
       when z.ViewModel.content.CONTENT_STATE.CONVERSATION then '.conversation'
       when z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS then '.connect-requests'
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT then '.preferences-about'

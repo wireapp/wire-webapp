@@ -1,0 +1,64 @@
+<div id="collection-details"
+     class="collection content-wrapper"
+     data-bind="with: $root.collection_details, removed_from_view: $root.collection_details.removed_from_view">
+
+  <!-- ko if: conversation_et() -->
+
+    <div class="content-titlebar">
+
+      <div class="content-titlebar-items-left">
+        <span class="content-titlebar-icon icon-back" data-bind="click: click_on_back_button"></span>
+      </div>
+
+      <span class="content-titlebar-items-center">
+        <span><span class="label-bold-xs">Pictures</span> <span class="text-graphite">in</span> <span class="text-graphite" data-bind="text: conversation_et().display_name()"></span></span>
+      </span>
+
+    </div>
+
+    <div class="content-list">
+
+      <div class="collection-images">
+
+        <!-- ko if: template() === 'images' -->
+          <!-- ko foreach: {data: items(), as: 'message_et'} -->
+            <image-component class="collection-image" params="asset: message_et.get_first_asset().resource"></image-component>
+          <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko if: template() === 'links' -->
+          <!-- ko foreach: {data: items(), as: 'message_et'} -->
+            <header class="collection-link-header">
+              <user-avatar class="user-avatar-xs" params="user: message_et.user"></user-avatar>
+              <span class="label-bold-xs" data-bind="text: message_et.sender_name()"></span>
+              <span class="collection-link-timestamp label-xs text-graphite" data-bind="text: moment(message_et.timestamp).format('D.M HH:MM')"></span>
+            </header>
+            <link-preview-asset class="collection-link" params="preview: message_et.get_first_asset().previews()[0]"></link-preview-asset>
+          <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko if: template() === 'files' -->
+          <!-- ko foreach: {data: items(), as: 'message_et'} -->
+            <file-asset class="collection-file" params="asset: message_et.get_first_asset()"></file-asset>
+          <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko if: template() === 'audio' -->
+          <!-- ko foreach: {data: items(), as: 'message_et'} -->
+            <audio-asset class="collection-file" params="asset: message_et.get_first_asset()"></audio-asset>
+          <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko if: template() === 'video' -->
+          <!-- ko foreach: {data: items(), as: 'message_et'} -->
+            <video-asset class="collection-file" params="asset: message_et.get_first_asset()"></video-asset>
+          <!-- /ko -->
+        <!-- /ko -->
+
+      </div>
+
+    </div>
+
+  <!-- /ko -->
+
+</div>

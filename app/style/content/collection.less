@@ -1,0 +1,88 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// Sections
+
+.collection-section {
+  display: inline-block;
+
+  > header {
+    align-items: center;
+    border-bottom: 1px solid @seperator-color;
+    display: flex;
+    height: 40px;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    margin-top: 16px;
+    padding-left: @conversation-message-sender-width;
+  }
+}
+
+// Images
+
+.collection-images {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: @conversation-message-sender-width;
+  width: 120px * 4;
+}
+
+.collection-image {
+  width: 120px;
+  height: 120px;
+}
+
+// Files
+.collection-file {
+  width: 100%;
+
+  & + & {
+    margin-top: 16px;
+  }
+
+  .file {
+    margin: 0;
+  }
+}
+
+// Links
+.collection-link-header {
+  align-items: center;
+  display: flex;
+
+  > user-avatar {
+    margin: 0 (@conversation-message-sender-width - @avatar-diameter-xs) / 2;
+  }
+}
+
+.collection-link-timestamp {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+.collection-link {
+  margin-left: @conversation-message-sender-width;
+}
+
+// No Items
+.collection-no-items-icon {
+  color: fade(@graphite, 40%);
+  font-size: 120px;
+  margin-bottom: 32px;
+}

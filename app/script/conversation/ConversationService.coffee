@@ -292,6 +292,12 @@ class z.conversation.ConversationService
       @logger.error "Failed to load events for conversation '#{conversation_id}' from database: '#{error.message}'"
       throw error
 
+  load_events_with_category_from_db: (conversation_id, category) ->
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where '[conversation+category]'
+    .between [conversation_id, category], [conversation_id, z.message.MessageCategory.LIKED], true, true
+    .toArray()
+
   ###
   Add a bot to an existing conversation.
 

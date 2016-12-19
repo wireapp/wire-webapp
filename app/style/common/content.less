@@ -17,25 +17,26 @@
  *
  */
 
-.conversation-titlebar {
-  align-items: center;
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+// Titlebar
+.content-titlebar {
+  .label-bold-xs;
+  .flex-center;
   background-color: @app-bg;
   border-bottom: 1px solid fade(@graphite, 12%);
-  display: flex;
   height: @content-title-bar-height;
-  justify-content: center;
   position: relative;
   width: 100%;
+  flex: 0 0 auto;
 }
 
-.conversation-titlebar-name {
-  cursor: pointer;
-  display: flex;
-  max-width: 50%;
-  padding: 8px 16px;
-}
-
-.conversation-titlebar-library {
+.content-titlebar-items-left {
   align-items: center;
   display: flex;
   height: 100%;
@@ -44,7 +45,12 @@
   top: 0;
 }
 
-.conversation-titlebar-icons {
+.content-titlebar-items-center {
+  .flex-center;
+  flex-direction: column;
+}
+
+.content-titlebar-items-right {
   align-items: center;
   display: flex;
   height: 100%;
@@ -53,31 +59,15 @@
   top: 0;
 }
 
-.conversation-titlebar-icon {
+.content-titlebar-icon {
+  .button-icon-large;
   flex: 0 0 auto;
   margin-left: 12px;
   margin-right: 12px;
 }
 
-.conversation-titlebar-name-label {
-  margin-right: 8px;
-}
-
-.conversation-titlebar-name-icon {
-  font-size: @font-size-xxs;
-  line-height: @line-height-sm;
-}
-
-@keyframes pulsate-animation {to {opacity: .32}}
-.conversation-titlebar-icon-status {
-  color: @w-red;
-  cursor: default;
-}
-
-.conversation-titlebar-icon-status:before {
-  animation: pulsate-animation;
-  animation-direction: alternate;
-  animation-duration: @animation-timing-slower * 2;
-  animation-iteration-count: infinite;
-  animation-timing-function: @ease-in-cubic;
+// List TODO antiscroll
+.content-list {
+  flex: 1 1;
+  overflow-y: scroll
 }

@@ -28,8 +28,8 @@ class z.components.VideoAssetComponent
   ###
   constructor: (params, component_info) ->
     @logger = new z.util.Logger 'VideoAssetComponent', z.config.LOGGER.OPTIONS
-    @asset = params.asset
-    @expired = params.expired
+    @asset = ko.unwrap params.asset
+    @expired = params.expired or ko.observable false
     @preview_subscription = undefined
 
     @video_element = $(component_info.element).find('video')[0]

@@ -88,5 +88,8 @@ class z.ViewModel.ConversationTitlebarViewModel
     else
       amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, @conversation_et().id, true
 
+  click_on_collection_button: ->
+    amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION
+
   show_participants: (add_people) ->
     amplify.publish z.event.WebApp.PEOPLE.TOGGLE, add_people

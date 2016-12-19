@@ -126,6 +126,15 @@ class z.storage.StorageService
         "#{@OBJECT_STORE_PREKEYS}": ''
         "#{@OBJECT_STORE_SESSIONS}": ''
 
+      version_10 =
+        "#{@OBJECT_STORE_AMPLIFY}": ''
+        "#{@OBJECT_STORE_CLIENTS}": ', meta.primary_key'
+        "#{@OBJECT_STORE_CONVERSATION_EVENTS}": ', category, conversation, time, type, [conversation+time], [conversation+category]'
+        "#{@OBJECT_STORE_CONVERSATIONS}": ', id, last_event_timestamp'
+        "#{@OBJECT_STORE_KEYS}": ''
+        "#{@OBJECT_STORE_PREKEYS}": ''
+        "#{@OBJECT_STORE_SESSIONS}": ''
+
       @db = new Dexie @db_name
 
       @db.on 'blocked', =>
@@ -170,6 +179,7 @@ class z.storage.StorageService
           if event.type is z.event.Client.CONVERSATION.DELETE_EVERYWHERE
             event.time = new Date(event.time).toISOString()
       @db.version(9).stores version_9
+      @db.version(10).stores version_10
 
       @db.open()
       .then =>

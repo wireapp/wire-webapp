@@ -28,8 +28,8 @@ class z.components.AudioAssetComponent
   ###
   constructor: (params, component_info) ->
     @logger = new z.util.Logger 'AudioAssetComponent', z.config.LOGGER.OPTIONS
-    @asset = params.asset
-    @expired = params.expired
+    @asset = ko.unwrap params.asset
+    @expired = params.expired or ko.observable false
 
     @audio_src = ko.observable()
     @audio_element = $(component_info.element).find('audio')[0]
