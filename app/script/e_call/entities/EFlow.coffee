@@ -432,13 +432,9 @@ class z.e_call.entities.EFlow
 
     @logger.debug "session:", @e_call_et.session_id
     @logger.info "Sending local SDP of type '#{@local_sdp().type}' for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
-    @e_call_et.send_e_call_event
-      props:
-        videosend: false
-      resp: @local_sdp().type is z.calling.rtc.SDPType.ANSWER
+    @e_call_et.send_e_call_event @create_setup_event e_call_et, @local_sdp().type is z.calling.rtc.SDPType.ANSWER,
+      props: @_create_properties_payload @self_state.video_send()
       sdp: @local_sdp().sdp
-      sessid: 'FR4d'
-      type: 'SETUP'
     .then =>
       @has_sent_local_sdp true
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful", @local_sdp()
