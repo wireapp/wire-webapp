@@ -20,10 +20,8 @@ window.z ?= {}
 z.components ?= {}
 
 class z.components.Image
-  constructor: (params, component_info) ->
+  constructor: (params) ->
     @asset = ko.unwrap params.asset
-    console.debug @asset
-
     @asset_src = ko.observable()
 
     @on_entered_viewport = =>
@@ -31,11 +29,7 @@ class z.components.Image
       return true
 
     @load_image_asset = =>
-      @asset.load()
-      .then (blob) =>
-        @asset_src window.URL.createObjectURL blob
-      .catch (error) ->
-        console.debug 'failed to load image ', error.message
+      @asset.load().then (blob) => @asset_src window.URL.createObjectURL blob
 
   dispose: =>
     window.URL.revokeObjectURL @asset_src
