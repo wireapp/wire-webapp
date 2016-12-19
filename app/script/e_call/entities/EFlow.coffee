@@ -21,8 +21,10 @@ z.e_call ?= {}
 z.e_call.entities ?= {}
 
 # Static array of where to put people in the stereo scape.
-AUDIO_BITRATE = '30'
-AUDIO_PTIME = '60'
+CONFIG =
+  AUDIO_BITRATE: '30'
+  AUDIO_PTIME: '60'
+  RTC_DATA_CHANNEL_LABEL: 'calling-3.0'
 
 # E-Flow entity.
 class z.e_call.entities.EFlow
@@ -396,6 +398,11 @@ class z.e_call.entities.EFlow
 
   _on_message: (event) =>
     @logger.debug "Received message on data channel: #{event.data}", event
+    amplify.subscribe z.event.WebApp.CALL.EVENT_FROM_BACKEND,
+      conversation: @conversation_id
+      from: @id
+      content: event.data
+      type: z.event.Client.CALL.E_CALL
 
   _on_open: (event) =>
     data_channel = event.target
@@ -523,30 +530,14 @@ class z.e_call.entities.EFlow
       else if sdp_line.startsWith 'm=audio'
         if @negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and @is_group())
           outlines.push sdp_line
-          outline = "b=AS:#{AUDIO_BITRATE}"
+          outline = "b=AS:#{CONFIG.AUDIO_BITRATE}"
           @logger.info "Limited audio bit-rate in local SDP: #{outline}"
 
-      else if sdp_line.startsWith 'm=video'
-        if sdp_source is z.calling.enum.SDPSource.LOCAL and @_should_rewrite_codecs()
-          outline = sdp_line.replace(' 98', '').replace ' 116', ''
-          @logger.warn 'Removed video codecs to prevent video freeze due to issue in Chrome 50 and 51' if outline isnt sdp_line
-
-      else if sdp_line.startsWith 'a=fmtp'
-        if sdp_source is z.calling.enum.SDPSource.LOCAL and @_should_rewrite_codecs()
-          if sdp_line.endsWith '98 apt=116'
-            @logger.warn 'Removed FMTP line to prevent video freeze due to issue in Chrome 50 and 51'
-            outline = undefined
-
       else if sdp_line.startsWith 'a=rtpmap'
-        if sdp_source is z.calling.enum.SDPSource.LOCAL and @_should_rewrite_codecs()
-          if sdp_line.endsWith('98 rtx/90000') or sdp_line.endsWith '116 red/90000'
-            @logger.warn 'Removed RTPMAP line to prevent video freeze due to issue in Chrome 50 and 51'
-            outline = undefined
-
         if @negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and @is_group())
           if z.util.contains sdp_line, 'opus'
             outlines.push sdp_line
-            outline = "a=ptime:#{AUDIO_PTIME}"
+            outline = "a=ptime:#{CONFIG.AUDIO_PTIME}"
             @logger.info "Changed audio p-time in local SDP: #{outline}"
 
       if outline isnt undefined
@@ -591,14 +582,6 @@ class z.e_call.entities.EFlow
       @should_add_remote_sdp false
     .catch (error) =>
       @logger.error "Setting remote SDP of type '#{@remote_sdp().type}' failed: #{error.name} - #{error.message}", error
-
-  ###
-  Should a local SDP be rewritten to prevent frozen video.
-  @note All sections that rewrite the SDP for this can be removed once we require Chrome 52
-  @return [Boolean] Should SDP be rewritten
-  ###
-  _should_rewrite_codecs: ->
-    return z.util.Environment.browser.requires.calling_codec_rewrite
 
 
   ###############################################################################

@@ -181,13 +181,16 @@ class z.e_call.ECallCenter
   @param event [Object] Event payload
   ###
   _on_event_in_unsupported_browsers: (event) ->
-    switch event.type
-      when z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
-        @user_repository.get_user_by_id event.from, (creator_et) ->
+    e_call_message = event.content
+    return if e_call_message.resp is true
+
+    switch e_call_message.type
+      when z.e_call.enum.E_CALL_MESSAGE_TYPE.SETUP
+        @user_repository.get_user_by_id event.from, (user_et) ->
           amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL,
-            first_name: creator_et.name()
+            first_name: user_et.name()
             call_id: event.conversation
-      when z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
+      else
         amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL
 
   ###
@@ -205,21 +208,21 @@ class z.e_call.ECallCenter
       throw new z.e_call.ECallError z.e_call.ECallError::TYPE.UNSUPPORTED_VERSION
 
     switch e_call_message.type
-      when z.e_call.enum.E_CALL_MESSAGE_TYPE.CANCEL
-        @_on_e_call_cancel_event conversation_id, user_id, e_call_message
+      when z.e_call.enum.E_CALL_MESSAGE_TYPE.CANCEL, z.e_call.enum.E_CALL_MESSAGE_TYPE.HANGUP
+        @_on_e_call_hangup_event conversation_id, user_id, e_call_message
       when z.e_call.enum.E_CALL_MESSAGE_TYPE.SETUP
         @_on_e_call_setup_event conversation_id, user_id, e_call_message
       else
         throw new z.e_call.ECallError z.e_call.ECallError::TYPE.UNKNOWN_EVENT_TYPE
 
   ###
-  E-call cancel event handling.
+  E-call cancel and hangup event handling.
   @private
   @param conversation_id [String] ID of Conversation related to e-call event
   @param user_id [String] ID of user which is source of event
-  @param e_call_message [Object] E-call evemt payload
+  @param e_call_message [Object] E-call event payload
   ###
-  _on_e_call_cancel_event: (conversation_id, user_id, e_call_message) =>
+  _on_e_call_hangup_event: (conversation_id, user_id, e_call_message) =>
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @user_repository.get_user_by_id user_id, (user_et) =>

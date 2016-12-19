@@ -554,23 +554,7 @@ class z.calling.entities.Flow
           outline = "b=AS:#{AUDIO_BITRATE}"
           @logger.info "Limited audio bit-rate in local SDP: #{outline}"
 
-      else if sdp_line.startsWith 'm=video'
-        if sdp_source is z.calling.enum.SDPSource.LOCAL and @_should_rewrite_codecs()
-          outline = sdp_line.replace(' 98', '').replace ' 116', ''
-          @logger.warn 'Removed video codecs to prevent video freeze due to issue in Chrome 50 and 51' if outline isnt sdp_line
-
-      else if sdp_line.startsWith 'a=fmtp'
-        if sdp_source is z.calling.enum.SDPSource.LOCAL and @_should_rewrite_codecs()
-          if sdp_line.endsWith '98 apt=116'
-            @logger.warn 'Removed FMTP line to prevent video freeze due to issue in Chrome 50 and 51'
-            outline = undefined
-
       else if sdp_line.startsWith 'a=rtpmap'
-        if sdp_source is z.calling.enum.SDPSource.LOCAL and @_should_rewrite_codecs()
-          if sdp_line.endsWith('98 rtx/90000') or sdp_line.endsWith '116 red/90000'
-            @logger.warn 'Removed RTPMAP line to prevent video freeze due to issue in Chrome 50 and 51'
-            outline = undefined
-
         if @negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and @is_group())
           if z.util.StringUtil.includes sdp_line, 'opus'
             outlines.push sdp_line
@@ -734,14 +718,6 @@ class z.calling.entities.Flow
       ice_info = new z.calling.payloads.ICECandidateInfo @conversation_id, @id, ice_candidate
       @logger.info 'Sending ICE candidate', ice_info
       amplify.publish z.event.WebApp.CALL.SIGNALING.SEND_ICE_CANDIDATE_INFO, ice_info
-
-  ###
-  Should a local SDP be rewritten to prevent frozen video.
-  @note All sections that rewrite the SDP for this can be removed once we require Chrome 52
-  @return [Boolean] Should SDP be rewritten
-  ###
-  _should_rewrite_codecs: ->
-    return z.util.Environment.browser.requires.calling_codec_rewrite
 
 
   ###############################################################################
