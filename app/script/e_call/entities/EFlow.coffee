@@ -419,7 +419,7 @@ class z.e_call.entities.EFlow
     @_clear_send_sdp_timeout()
     @local_sdp @_rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL
 
-    console.log "session:", @e_call_et.session_id
+    @logger.debug "session:", @e_call_et.session_id
     @logger.info "Sending local SDP of type '#{@local_sdp().type}' for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
     @e_call_et.send_e_call_event
       props:
@@ -438,8 +438,6 @@ class z.e_call.entities.EFlow
   @private
   ###
   _create_answer: ->
-    @_initialize_data_channel 'calling-3.0'
-
     @logger.info "Creating '#{z.calling.rtc.SDPType.ANSWER}' for flow with '#{@remote_user.name()}'"
     @peer_connection.createAnswer()
     .then (sdp_answer) =>
@@ -456,6 +454,8 @@ class z.e_call.entities.EFlow
   @param restart [Boolean] Is ICE restart negotiation
   ###
   _create_offer: (restart) ->
+    @_initialize_data_channel 'calling-3.0'
+
     offer_options =
       iceRestart: restart
       offerToReceiveAudio: true
