@@ -139,16 +139,24 @@ class z.e_call.ECallCenter
   @param e_call_message [Object] Content payload for e-call message
   @param conversation_et [z.entity] Conversation to send message in
   ###
-  send_e_call_event: (e_call_message, conversation_et) =>
+  send_e_call_event: (conversation_et, e_call_message) =>
     throw new z.e_call.ECallError z.e_call.ECallError::TYPE.NOT_ENABLED if not @use_v3_api
     throw new z.e_call.ECallError z.e_call.ECallError::TYPE.NOT_SUPPORTED if not conversation_et.is_one2one()
     throw new z.e_call.ECallError z.e_call.ECallError::TYPE.WRONG_PAYLOAD_FORMAT if not _.isObject e_call_message
 
     e_call_message = $.extend version: '3.0', e_call_message
-    @logger.debug "Sending e-call event of type '#{e_call_message.type}' to conversation '#{conversation_et.id}'", e_call_message
-    message = JSON.stringify(e_call_message)
-    @logger.warn "OUTBOUND e-call message", message
-    @conversation_repository.send_e_call JSON.stringify(e_call_message), conversation_et
+
+    @get_e_call_by_id conversation_et.id
+    .then (e_call_et) =>
+      if e_call_et.data_channel_openend
+        return e_flow_et.send_message e_call_message for e_flow_et in e_call_et.get_flows()
+      throw new z.e_call.ECallError z.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED
+    .catch (error) =>
+      throw error if error.type not in [z.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED , z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND]
+      @logger.debug "Sending e-call event of type '#{e_call_message.type}' to conversation '#{conversation_et.id}'", e_call_message
+      message = JSON.stringify(e_call_message)
+      @logger.warn "OUTBOUND e-call message", message
+      @conversation_repository.send_e_call JSON.stringify(e_call_message), conversation_et
 
   ###
   Handle incoming calling events from backend.
@@ -329,6 +337,10 @@ class z.e_call.ECallCenter
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
       # @todo send cancel event, tear down e-call
+      @send_e_call_event e_call_et.conversation_et,
+        resp: false
+        sessid: 'XXXX'
+        type: z.e_call.enum.E_CALL_MESSAGE_TYPE.HANGUP
     .catch (error) ->
       throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
@@ -390,8 +402,17 @@ class z.e_call.ECallCenter
   @param conversation_id [String] ID of conversation with e-call
   ###
   toggle_video: (conversation_id) =>
-    @media_stream_handler.toggle_video_send()
-    .then =>
+    @get_e_call_by_id conversation_id
+    .then e_call_et =>
+      @media_stream_handler.toggle_video_send()
+      .then =>
+        @send_e_call_event e_call_et.conversation_et,
+          props: @_create_properties_payload @self_state.video_send()
+          resp: false
+          sessid: e_call_et.session_id or 'xyzt'
+          type: z.e_call.enum.E_CALL_MESSAGE_TYPE.SETUP
+    .catch (error) ->
+      throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
       @logger.error 'not yet implemented'
       # @todo send info via datachannel
 

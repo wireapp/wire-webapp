@@ -42,6 +42,7 @@ class z.e_call.entities.ECall
     @timer_start = undefined
     @duration_time = ko.observable 0
     @remote_media_type = ko.observable z.media.MediaType.NONE
+    @data_channel_opened = false
 
     @is_connected = ko.observable false
     @is_group = @conversation_et.is_group
@@ -132,7 +133,7 @@ class z.e_call.entities.ECall
   ###############################################################################
 
   send_e_call_event: (message_content) =>
-    @e_call_center.send_e_call_event message_content, @conversation_et
+    @e_call_center.send_e_call_event @conversation_et, message_content
 
   start_negotiation: =>
     participant_et.e_flow.start_negotiation() for participant_et in @participants() when participant_et.e_flow
@@ -252,6 +253,13 @@ class z.e_call.entities.ECall
   ###############################################################################
   # Panning
   ###############################################################################
+
+  ###
+  Get all flows of the call.
+  @return [Array<z.calling.Flow>] Array of flows
+  ###
+  get_flows: =>
+    return (participant_et.e_flow() for participant_et in @participants() when participant_et.e_flow())
 
   ###
   Calculates the panning (from left to right) to position a user in a group call.

@@ -369,6 +369,9 @@ class z.e_call.entities.EFlow
   # Data channel handling
   ###############################################################################
 
+  send_message: (e_call_message) =>
+    @data_channels[CONFIG.RTC_DATA_CHANNEL_LABEL].send e_call_message
+
   _initialize_data_channel: (data_channel_label) ->
     if @peer_connection.createDataChannel
       if @data_channels[data_channel_label]
@@ -401,12 +404,13 @@ class z.e_call.entities.EFlow
     amplify.subscribe z.event.WebApp.CALL.EVENT_FROM_BACKEND,
       conversation: @conversation_id
       from: @id
-      content: event.data
+      content: JSON.parse event.data
       type: z.event.Client.CALL.E_CALL
 
   _on_open: (event) =>
     data_channel = event.target
     @logger.debug "Data channel '#{data_channel.label}' was opened and can be used", data_channel
+    @e_call_et.data_channel_opened = true
 
 
   ###############################################################################
@@ -461,7 +465,7 @@ class z.e_call.entities.EFlow
   @param restart [Boolean] Is ICE restart negotiation
   ###
   _create_offer: (restart) ->
-    @_initialize_data_channel 'calling-3.0'
+    @_initialize_data_channel CONFIG.RTC_DATA_CHANNEL_LABEL
 
     offer_options =
       iceRestart: restart

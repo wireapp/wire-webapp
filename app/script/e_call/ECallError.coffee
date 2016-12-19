@@ -26,6 +26,8 @@ class z.e_call.ECallError
     @type = type or z.e_call.ECallError::TYPE.UNKNOWN
 
     @message = switch @type
+      when z.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED
+        'E-call has not yet established data channel'
       when z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
         'No e-call for conversation ID found'
       when z.e_call.ECallError::TYPE.NO_CONVERSATION_ID
@@ -48,6 +50,7 @@ class z.e_call.ECallError
   @:: = new Error()
   @::constructor = @
   @::TYPE = {
+    DATA_CHANNEL_NOT_OPENED: 'z.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED'
     E_CALL_NOT_FOUND: 'z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND'
     NO_CONVERSATION_ID: 'z.e_call.ECallError::TYPE.NO_CONVERSATION_ID'
     NOT_ENABLED: 'z.e_call.ECallError::TYPE.NOT_ENABLED'
