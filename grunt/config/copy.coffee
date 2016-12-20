@@ -92,4 +92,4 @@ module.exports =
     cwd: '<%= dir.aws.static %>/'
     dest: '<%= dir.aws.templates %>'
     expand: true
-    src: '**/*.html'
+    src: ['**/*.html', 'sw.js']

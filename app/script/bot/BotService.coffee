@@ -31,4 +31,4 @@ class z.bot.BotService
       .done (data, textStatus, jqXHR) ->
         resolve data.result
       .fail (jqXHR, textStatus, errorThrown) =>
-        @logger.log @logger.levels.WARNING, "Could not find information for bot '#{bot_name}': #{errorThrown}"
+        @logger.warn "Could not find information for bot '#{bot_name}': #{errorThrown}"

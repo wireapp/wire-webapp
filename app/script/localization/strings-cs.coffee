@@ -211,7 +211,6 @@ z.string.cs.modal_uploads_parallel = 'Najednou můžete poslat až %no souborů.
 # Connection requests
 z.string.cs.connection_request_connect = 'Připojit'
 z.string.cs.connection_request_ignore = 'Ignorovat'
-z.string.cs.connection_request_message = 'Ahoj,\npojď se připojit na Wire.\n%s.first_name'
 
 # Conversation
 z.string.cs.conversation_you_nominative = 'jste'
@@ -287,13 +286,16 @@ z.string.cs.conversations_popover_notify = 'Zapnout zvuk'
 z.string.cs.conversations_popover_silence = 'Ztlumit'
 z.string.cs.conversations_popover_unarchive = 'Obnovit'
 
+# Takeover
+z.string.cs.takeover_link = 'Dozvědět se více'
+
 # Invites
 z.string.cs.invite_meta_key_mac = 'Cmd'
 z.string.cs.invite_meta_key_pc = 'Ctrl'
 z.string.cs.invite_hint_selected = 'Stiskněte %meta_key + C pro kopírování'
 z.string.cs.invite_hint_unselected = 'Vybrat a stisknout %meta_key + C'
 z.string.cs.invite_headline = 'Pozvat lidi do aplikace Wire'
-z.string.cs.invite_message = 'Jsem k zastižení na síti Wire. Najdete mne pod %mail nebo navštivte https://get.wire.com.'
+z.string.cs.invite_message = 'Jsem k zastižení na síti Wire. Najdete mne pod %username nebo navštivte https://get.wire.com.'
 z.string.cs.invite_message_no_email = 'Jsem k zastižení na síti Wire. K navázání kontaktu navštivte https://get.wire.com.'
 
 # Extensions
@@ -449,9 +451,6 @@ z.string.cs.search_top_people = 'Nejaktivnější kontakty'
 z.string.cs.search_try_search = 'Najít lidi podle jména nebo\nemailové adresy'
 z.string.cs.search_no_contacts_on_wire = 'V aplikaci Wire nemáte žádné kontakty.\nZkuste vyhledat kontakty podle jména nebo\nemailové adresy'
 z.string.cs.search_others = 'Připojit'
-z.string.cs.search_suggestion_one = 'Zná %@.first_name'
-z.string.cs.search_suggestion_two = 'Zná %@.first_name a %@.other_name'
-z.string.cs.search_suggestion_many = 'Zná %@.first_name a %no dalších'
 
 # Picture upload
 z.string.cs.upload_welcome = 'Wire je o tolik hezčí s obrázkem.'

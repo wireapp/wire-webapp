@@ -20,11 +20,15 @@ window.z ?= {}
 z.client ?= {}
 
 class z.client.Client
-  constructor: (payload) ->
-    # Preserved data from the backend
+  constructor: (payload = {}) ->
+    if payload.address
+      @class = payload.class or '?'
+      @label = payload.label or '?'
+      @model = payload.model or '?'
+
     @[member] = payload[member] for member of payload
 
-    # Maintained meta data by us
+    # Metadata maintained by us
     @meta =
       is_verified: ko.observable false
       primary_key: undefined

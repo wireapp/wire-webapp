@@ -273,13 +273,23 @@
 
 .message-footer-bottom {
   display: flex;
+  flex-wrap: wrap;
   margin-top: 4px;
   margin-left: @conversation-message-sender-width;
+  margin-right: @conversation-message-timestamp-width;
   width: 100%;
 
-  > * + * {
-    margin-left: 8px;
+  > *:not(:last-child) {
+    margin-right: 8px;
+    margin-bottom: 8px;
   }
+}
+
+.message-footer-close-button {
+  .square(@avatar-diameter-xs);
+  .flex-center;
+  cursor: pointer;
+  font-size: @font-size-xs;
 }
 
 // hover

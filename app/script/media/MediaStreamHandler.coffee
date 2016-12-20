@@ -71,11 +71,11 @@ class z.media.MediaStreamHandler
 
     @local_media_streams.audio.subscribe (media_stream) =>
       if media_stream instanceof MediaStream
-        @logger.log @logger.levels.DEBUG, "Local MediaStream contains MediaStreamTrack of kind 'audio'",
+        @logger.debug "Local MediaStream contains MediaStreamTrack of kind 'audio'",
           {stream: media_stream, audio_tracks: media_stream.getAudioTracks()}
     @local_media_streams.video.subscribe (media_stream) =>
       if media_stream instanceof MediaStream
-        @logger.log @logger.levels.DEBUG, "Local MediaStream contains MediaStreamTrack of kind 'video'",
+        @logger.debug "Local MediaStream contains MediaStreamTrack of kind 'video'",
           {stream: media_stream, video_tracks: media_stream.getVideoTracks()}
 
     @current_device_id = @media_repository.devices_handler.current_device_id
@@ -101,7 +101,7 @@ class z.media.MediaStreamHandler
       constraints =
         audio: if request_audio then @_get_audio_stream_constraints @current_device_id.audio_input() else undefined
         video: if request_video then @_get_video_stream_constraints @current_device_id.video_input() else undefined
-      @logger.log @logger.levels.INFO, 'Set constraints for MediaStream', constraints
+      @logger.info 'Set constraints for MediaStream', constraints
       media_type = if request_video then z.media.MediaType.VIDEO else z.media.MediaType.AUDIO
       return [media_type, constraints]
 
@@ -112,7 +112,7 @@ class z.media.MediaStreamHandler
   get_screen_stream_constraints: =>
     return new Promise (resolve, reject) =>
       if window.desktopCapturer
-        @logger.log @logger.levels.INFO, 'Enabling screen sharing from Electron'
+        @logger.info 'Enabling screen sharing from Electron'
 
         constraints =
           audio: false
@@ -128,7 +128,7 @@ class z.media.MediaStreamHandler
         resolve [z.media.MediaType.SCREEN, constraints]
 
       else if z.util.Environment.browser.firefox
-        @logger.log @logger.levels.INFO, 'Enabling screen sharing from Firefox'
+        @logger.info 'Enabling screen sharing from Firefox'
 
         constraints =
           audio: false
@@ -205,7 +205,7 @@ class z.media.MediaStreamHandler
       if _.isArray error
         [error, media_type] = error
         @_initiate_media_stream_failure error, media_type, conversation_id
-      @logger.log @logger.levels.ERROR, "Requesting MediaStream failed: #{error.message or error.name}", error
+      @logger.error "Requesting MediaStream failed: #{error.message or error.name}", error
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA, {cause: error.name or error.message, video: is_videod}
       throw error
 
@@ -221,7 +221,7 @@ class z.media.MediaStreamHandler
   @param media_stream_info [z.media.MediaStreamInfo] Info about new MediaStream
   ###
   replace_media_stream: (media_stream_info) =>
-    @logger.log @logger.levels.DEBUG, "Received new MediaStream with '#{media_stream_info.stream.getTracks().length}' MediaStreamTrack(s)",
+    @logger.debug "Received new MediaStream with '#{media_stream_info.stream.getTracks().length}' MediaStreamTrack(s)",
       {stream: media_stream_info.stream, audio_tracks: media_stream_info.stream.getAudioTracks(), video_tracks: media_stream_info.stream.getVideoTracks()}
 
     if @joined_call()
@@ -274,7 +274,7 @@ class z.media.MediaStreamHandler
       else if not @media_repository.devices_handler.has_camera() and media_type is z.media.MediaType.VIDEO
         reject [new z.media.MediaError(z.media.MediaError::TYPE.MEDIA_STREAM_DEVICE), z.media.MediaType.VIDEO]
       else
-        @logger.log @logger.levels.INFO, "Requesting MediaStream access for '#{media_type}'", media_stream_constraints
+        @logger.info "Requesting MediaStream access for '#{media_type}'", media_stream_constraints
         @request_hint_timeout = window.setTimeout =>
           @_hide_permission_failed_hint media_type
           @_show_permission_request_hint media_type
@@ -377,7 +377,7 @@ class z.media.MediaStreamHandler
   ###
   _initiate_media_stream_success: (media_stream_info) =>
     return if not media_stream_info
-    @logger.log @logger.levels.DEBUG, "Received initial MediaStream with '#{media_stream_info.stream.getTracks().length}' MediaStreamTrack(s)",
+    @logger.debug "Received initial MediaStream with '#{media_stream_info.stream.getTracks().length}' MediaStreamTrack(s)",
       {stream: media_stream_info.stream, audio_tracks: media_stream_info.stream.getAudioTracks(), video_tracks: media_stream_info.stream.getVideoTracks()}
     @_set_stream_state media_stream_info
     @set_local_media_stream media_stream_info
@@ -414,9 +414,9 @@ class z.media.MediaStreamHandler
       for media_stream_track in media_stream_tracks
         media_stream.removeTrack media_stream_track
         media_stream_track.stop()
-        @logger.log @logger.levels.INFO, "Stopping MediaStreamTrack of kind '#{media_stream_track.kind}' successful", media_stream_track
+        @logger.info "Stopping MediaStreamTrack of kind '#{media_stream_track.kind}' successful", media_stream_track
       return true
-    @logger.log @logger.levels.WARN, 'No MediaStreamTrack found to stop', media_stream
+    @logger.warn 'No MediaStreamTrack found to stop', media_stream
     return false
 
   ###
@@ -429,12 +429,12 @@ class z.media.MediaStreamHandler
   _replace_input_source_failure: (error, media_type) ->
     if media_type is z.media.MediaType.SCREEN
       if z.util.Environment.browser.firefox and error.type is z.media.MediaError::TYPE.MEDIA_STREAM_PERMISSION
-        @logger.log @logger.levels.WARN, 'We are not on the white list. Manually add the current domain to media.getusermedia.screensharing.allowed_domains on about:config'
+        @logger.warn 'We are not on the white list. Manually add the current domain to media.getusermedia.screensharing.allowed_domains on about:config'
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.WHITELIST_SCREENSHARING
       else
-        @logger.log @logger.levels.ERROR, "Failed to enable screen sharing: #{error.message}", error
+        @logger.error "Failed to enable screen sharing: #{error.message}", error
     else
-      @logger.log @logger.levels.ERROR, "Failed to replace '#{media_type}' input source: #{error.message}", error
+      @logger.error "Failed to replace '#{media_type}' input source: #{error.message}", error
 
   ###
   Show microphone not found hin banner.
@@ -583,7 +583,7 @@ class z.media.MediaStreamHandler
   _toggle_audio_enabled: ->
     @_toggle_stream_enabled z.media.MediaType.AUDIO, @local_media_streams.audio(), @self_stream_state.muted
     .then (audio_track) =>
-      @logger.log @logger.levels.INFO, "Microphone muted: #{@self_stream_state.muted()}", audio_track
+      @logger.info "Microphone muted: #{@self_stream_state.muted()}", audio_track
       return @self_stream_state.muted()
 
   ###
@@ -593,7 +593,7 @@ class z.media.MediaStreamHandler
   _toggle_screen_enabled: ->
     @_toggle_stream_enabled z.media.MediaType.VIDEO, @local_media_streams.video(), @self_stream_state.screen_shared
     .then (video_track) =>
-      @logger.log @logger.levels.INFO, "Screen enabled: #{@self_stream_state.screen_shared()}", video_track
+      @logger.info "Screen enabled: #{@self_stream_state.screen_shared()}", video_track
       return @self_stream_state.screen_shared()
 
   ###
@@ -603,7 +603,7 @@ class z.media.MediaStreamHandler
   _toggle_video_enabled: ->
     @_toggle_stream_enabled z.media.MediaType.VIDEO, @local_media_streams.video(), @self_stream_state.videod
     .then (video_track) =>
-      @logger.log @logger.levels.INFO, "Camera enabled: #{@self_stream_state.videod()}", video_track
+      @logger.info "Camera enabled: #{@self_stream_state.videod()}", video_track
       return @self_stream_state.videod()
 
   ###
@@ -617,7 +617,7 @@ class z.media.MediaStreamHandler
   ###
   _toggle_stream_enabled: (media_type, media_stream, state_observable) ->
     Promise.resolve()
-    .then ->
+    .then =>
       state_observable not state_observable()
       media_stream_track = (@_get_media_tracks media_stream, media_type)[0]
       if media_type is z.media.MediaType.AUDIO

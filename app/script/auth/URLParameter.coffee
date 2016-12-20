@@ -20,6 +20,7 @@ window.z ?= {}
 z.auth ?= {}
 
 z.auth.URLParameter =
+  ASSETS_V3: 'assets_v3'
   BOT: 'bot'
   CONNECT: 'connect'
   ENVIRONMENT: 'env'
@@ -27,4 +28,3 @@ z.auth.URLParameter =
   INVITE: 'invite'
   LOCALE: 'hl'
   LOCALYTICS: 'localytics'
-  V3: 'v3'

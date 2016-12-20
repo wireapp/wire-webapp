@@ -104,7 +104,7 @@ class z.user.UserRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.CONNECT_REQUEST_SENT
       @user_connection response, show_conversation
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to send connection request to user '#{user_et.id}': #{error.message}", error
+      @logger.error "Failed to send connection request to user '#{user_et.id}': #{error.message}", error
 
   ###
   Get a connection for a user ID.
@@ -151,7 +151,7 @@ class z.user.UserRepository
 
       return @connections()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to retrieve connections from backend: #{error.message}", error
+      @logger.error "Failed to retrieve connections from backend: #{error.message}", error
       throw error
 
   ###
@@ -196,11 +196,12 @@ class z.user.UserRepository
   _assign_all_clients: =>
     @client_repository.get_all_clients_from_db()
     .then (user_client_map) =>
-      @logger.log "Found locally stored clients for '#{Object.keys(user_client_map).length}' users", user_client_map
+      @logger.info "Found locally stored clients for '#{Object.keys(user_client_map).length}' users", user_client_map
       user_ids = (user_id for user_id, client_ets of user_client_map)
       @get_users_by_id user_ids, (user_ets) =>
         for user_et in user_ets
-          @logger.log "Found '#{user_client_map[user_et.id].length}' clients for '#{user_et.name()}'", user_client_map[user_et.id]
+          if user_client_map[user_et.id].length > 8
+            @logger.warn "Found '#{user_client_map[user_et.id].length}' clients for '#{user_et.name()}'", user_client_map[user_et.id]
           user_et.devices user_client_map[user_et.id]
 
   # Assign connections to the users.
@@ -225,8 +226,7 @@ class z.user.UserRepository
     .then (response) =>
       @user_connection response, show_conversation
     .catch (error) =>
-      @logger.log @logger.levels.ERROR,
-        "Connection status change to '#{status}' for user '#{user_et.id}' failed: #{error.message}", error
+      @logger.error "Connection status change to '#{status}' for user '#{user_et.id}' failed: #{error.message}", error
       custom_data =
         current_status: user_et.connection().status()
         failed_action: status
@@ -338,9 +338,9 @@ class z.user.UserRepository
   delete_me: =>
     @user_service.delete_self()
     .then =>
-      @logger.log @logger.levels.INFO, 'Account deletion initiated'
+      @logger.info 'Account deletion initiated'
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Unable to delete self: #{error}"
+      @logger.error "Unable to delete self: #{error}"
 
   ###
   Get a user from the backend.
@@ -404,7 +404,7 @@ class z.user.UserRepository
       user_et = @user_mapper.map_self_user_from_object response
       return @save_user user_et, true
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Unable to load self user: #{error}"
+      @logger.error "Unable to load self user: #{error}"
       throw error
 
   ###
@@ -596,10 +596,8 @@ class z.user.UserRepository
       @should_set_username = false
       @self().username username
     .catch (error) ->
-      if error.code is z.service.BackendClientError::STATUS_CODE.CONFLICT
+      if error.code in [z.service.BackendClientError::STATUS_CODE.CONFLICT, z.service.BackendClientError::STATUS_CODE.BAD_REQUEST]
         throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
-      if error.code is z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
-        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
   ###
@@ -621,7 +619,7 @@ class z.user.UserRepository
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         return username
       if error.code is z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
-        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_INVALID
+        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
     .then (username) ->
       if username
@@ -633,20 +631,21 @@ class z.user.UserRepository
   @param picture [String, Object] New user picture
   ###
   change_picture: (picture) ->
-    @_set_picture_v2 picture
+    @_set_picture_v2 picture, false
     @_set_picture_v3 picture
 
   ###
   Set the profile image using v2 api.
   @deprecated
   @param picture [String, Object] New user picture
+  @param update [Boolean] update user entity
   ###
-  _set_picture_v2: (picture) ->
+  _set_picture_v2: (picture, update = true) ->
     @asset_service.upload_profile_image @self().id, picture
     .then (upload_response) =>
       @user_service.update_own_user_profile {picture: upload_response}
       .then =>
-        @user_update {user: {id: @self().id, picture: upload_response}}
+        @user_update {user: {id: @self().id, picture: upload_response}} if update
     .catch (error) ->
       throw new Error "Error during profile image upload: #{error.message}"
 

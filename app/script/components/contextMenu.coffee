@@ -76,7 +76,7 @@ class z.components.ContextMenuViewModel
     amplify.publish z.event.WebApp.CONTEXT_MENU, @tag, entry.action, @data
     @bubble.hide()
 
-  on_context_menu_button_click: () =>
+  on_context_menu_button_click: =>
     @get_entries()
     @element.dispatchEvent new Event z.components.ContextMenuEvent.CONTEXT_MENU
 

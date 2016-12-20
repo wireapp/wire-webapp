@@ -143,13 +143,13 @@ class z.conversation.ConversationRepository
     .then (response) =>
       conversation_et = @conversation_mapper.map_conversation response
       @save_conversation conversation_et
-      @logger.log @logger.levels.INFO, "Fetched conversation '#{conversation_id}' from backend"
+      @logger.info "Fetched conversation '#{conversation_id}' from backend"
       callbacks = @fetching_conversations[conversation_id]
       for callback in callbacks
         callback? conversation_et
       delete @fetching_conversations[conversation_id]
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to fetch conversation '#{conversation_id}' from backend: #{error.message}", error
+      @logger.error "Failed to fetch conversation '#{conversation_id}' from backend: #{error.message}", error
       throw error
 
   ###
@@ -173,7 +173,7 @@ class z.conversation.ConversationRepository
       @load_conversation_states()
       return @conversations()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to retrieve conversations from backend: #{error.message}", error
+      @logger.error "Failed to retrieve conversations from backend: #{error.message}", error
       throw error
 
   ###
@@ -204,18 +204,18 @@ class z.conversation.ConversationRepository
         conversation_et.has_further_messages false
 
       if not events.length
-        @logger.log @logger.levels.INFO, "No events for conversation '#{conversation_et.id}' found", events
+        @logger.info "No events for conversation '#{conversation_et.id}' found", events
       else if first_message
-        @logger.log @logger.levels.INFO, "Loaded #{events.length} event(s) starting at '#{upper_bound.toISOString()}' for conversation '#{conversation_et.id}'", events
+        @logger.info "Loaded #{events.length} event(s) starting at '#{upper_bound.toISOString()}' for conversation '#{conversation_et.id}'", events
       else
-        @logger.log @logger.levels.INFO, "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
+        @logger.info "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
 
       mapped_messages = @_add_events_to_conversation events: events, conversation_et
 
       conversation_et.is_pending false
       return mapped_messages
     .catch (error) =>
-      @logger.log @logger.levels.INFO, "Could not load events for conversation: #{conversation_et.id}", error
+      @logger.info "Could not load events for conversation: #{conversation_et.id}", error
       throw error
 
   ###
@@ -235,7 +235,7 @@ class z.conversation.ConversationRepository
         @_add_events_to_conversation events: events, conversation_et
       conversation_et.is_pending false
     .catch (error) =>
-      @logger.log @logger.levels.INFO, "Could not load unread events for conversation: #{conversation_et.id}", error
+      @logger.info "Could not load unread events for conversation: #{conversation_et.id}", error
 
   ###
   Update conversation with a user you just unblocked
@@ -384,10 +384,10 @@ class z.conversation.ConversationRepository
         conversation_et = @get_conversation_by_id state.id
         @conversation_mapper.update_self_status conversation_et, state
 
-      @logger.log @logger.levels.INFO, "Updated '#{conversation_states.length}' conversation states"
+      @logger.info "Updated '#{conversation_states.length}' conversation states"
       amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, 'Failed to update conversation states', error
+      @logger.error 'Failed to update conversation states', error
 
   ###
   Maps user connection to the corresponding conversation.
@@ -397,7 +397,7 @@ class z.conversation.ConversationRepository
   @param [Boolean] open the new conversation
   ###
   map_connections: (connection_ets, show_conversation = false) =>
-    @logger.log @logger.levels.INFO, "Mapping '#{connection_ets.length}' user connection(s) to conversations", connection_ets
+    @logger.info "Mapping '#{connection_ets.length}' user connection(s) to conversations", connection_ets
     for connection_et in connection_ets
       conversation_et = @find_conversation_by_id connection_et.conversation_id
 
@@ -415,7 +415,7 @@ class z.conversation.ConversationRepository
             conversation_et.type z.conversation.ConversationType.ONE2ONE
 
     if not @has_initialized_participants
-      @logger.log @logger.levels.INFO, 'Updating group participants offline'
+      @logger.info 'Updating group participants offline'
       @_init_state_updates()
       @update_conversations_offline @conversations_unarchived()
       @update_conversations_offline @conversations_archived()
@@ -472,7 +472,7 @@ class z.conversation.ConversationRepository
           }
       return @conversation_service.update_conversation_state_in_db conversation_et, changes
       .then =>
-        @logger.log @logger.levels.INFO, "Persisted update of '#{updated_field}' to conversation '#{conversation_et.id}'"
+        @logger.info "Persisted update of '#{updated_field}' to conversation '#{conversation_et.id}'"
 
     return @conversation_service.save_conversation_state_in_db conversation_et
 
@@ -491,7 +491,7 @@ class z.conversation.ConversationRepository
   set_notification_handling_state: (handling_state) =>
     @block_event_handling = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
     @sending_queue.pause @block_event_handling
-    @logger.log @logger.levels.INFO, "Block handling of conversation events: #{@block_event_handling}"
+    @logger.info "Block handling of conversation events: #{@block_event_handling}"
 
   ###
   Update participating users in a conversation.
@@ -524,7 +524,7 @@ class z.conversation.ConversationRepository
     @conversation_service.post_bots conversation_et.id, provider_id, service_id
     .then (response) =>
       amplify.publish z.event.WebApp.EVENT.INJECT, response.event
-      @logger.log @logger.levels.DEBUG, "Successfully added bot to conversation '#{conversation_et.display_name()}'", response
+      @logger.debug "Successfully added bot to conversation '#{conversation_et.display_name()}'", response
 
   ###
   Add users to an existing conversation.
@@ -562,9 +562,9 @@ class z.conversation.ConversationRepository
     @conversation_service.update_member_properties conversation_et.id, payload
     .then =>
       @_on_member_update conversation_et, {data: payload}, next_conversation_et
-      @logger.log @logger.levels.INFO, "Archived conversation '#{conversation_et.id}' on '#{payload.otr_archived_ref}'"
+      @logger.info "Archived conversation '#{conversation_et.id}' on '#{payload.otr_archived_ref}'"
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Conversation '#{conversation_et.id}' could not be archived: #{error.code}\r\nPayload: #{JSON.stringify(payload)}", error
+      @logger.error "Conversation '#{conversation_et.id}' could not be archived: #{error.code}\r\nPayload: #{JSON.stringify(payload)}", error
 
   ###
   Clear conversation content and archive the conversation.
@@ -598,10 +598,9 @@ class z.conversation.ConversationRepository
 
       @sending_queue.push => @_send_generic_message @self_conversation().id, generic_message
       .then =>
-        @logger.log @logger.levels.INFO,
-          "Cleared conversation '#{conversation_et.id}' as read on '#{new Date(cleared_timestamp).toISOString()}'"
+        @logger.info "Cleared conversation '#{conversation_et.id}' as read on '#{new Date(cleared_timestamp).toISOString()}'"
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Error (#{error.label}): #{error.message}"
+        @logger.error "Error (#{error.label}): #{error.message}"
         error = new Error 'Event response is undefined'
         Raygun.send error, source: 'Sending encrypted last read'
 
@@ -623,7 +622,7 @@ class z.conversation.ConversationRepository
       else
         @archive_conversation conversation_et, next_conversation_et
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to leave conversation (#{conversation_et.id}): #{error}"
+      @logger.error "Failed to leave conversation (#{conversation_et.id}): #{error}"
 
   ###
   Remove member from conversation.
@@ -638,7 +637,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.EVENT.INJECT, response
       callback?()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to remove member from conversation (#{conversation_et.id}): #{error}"
+      @logger.error "Failed to remove member from conversation (#{conversation_et.id}): #{error}"
 
   ###
   Rename conversation.
@@ -655,24 +654,24 @@ class z.conversation.ConversationRepository
     .then ->
       callback?()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to rename conversation (#{conversation_et.id}): #{error.message}"
+      @logger.error "Failed to rename conversation (#{conversation_et.id}): #{error.message}"
 
   reset_session: (user_id, client_id, conversation_id) =>
-    @logger.log @logger.levels.INFO, "Resetting session with client '#{client_id}' of user '#{user_id}'"
+    @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'"
     @cryptography_repository.delete_session user_id, client_id
     .then (session_id) =>
       if session_id
-        @logger.log @logger.levels.INFO, "Deleted session with client '#{client_id}' of user '#{user_id}'"
+        @logger.info "Deleted session with client '#{client_id}' of user '#{user_id}'"
       else
-        @logger.log @logger.levels.WARN, 'No local session found to delete'
+        @logger.warn 'No local session found to delete'
       return @send_session_reset user_id, client_id, conversation_id
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "Failed to reset session for client '#{client_id}' of user '#{user_id}': #{error.message}", error
+      @logger.warn "Failed to reset session for client '#{client_id}' of user '#{user_id}': #{error.message}", error
       throw error
 
   reset_all_sessions: =>
     sessions = @cryptography_repository.storage_repository.sessions
-    @logger.log @logger.levels.INFO, "Resetting '#{Object.keys(sessions).length}' sessions"
+    @logger.info "Resetting '#{Object.keys(sessions).length}' sessions"
     for session_id, session of sessions
       ids = z.client.Client.dismantle_user_client_id session_id
 
@@ -732,11 +731,11 @@ class z.conversation.ConversationRepository
     .then =>
       response = {data: payload}
       @_on_member_update conversation_et, response
-      @logger.log @logger.levels.INFO, "Toggle silence to '#{payload.otr_muted}' for conversation '#{conversation_et.id}' on '#{payload.otr_muted_ref}'"
+      @logger.info "Toggle silence to '#{payload.otr_muted}' for conversation '#{conversation_et.id}' on '#{payload.otr_muted_ref}'"
       return response
     .catch (error) =>
       reject_error = new Error "Conversation '#{conversation_et.id}' could not be muted: #{error.code}"
-      @logger.log @logger.levels.WARN, reject_error.message, error
+      @logger.warn reject_error.message, error
       throw reject_error
 
   ###
@@ -755,12 +754,12 @@ class z.conversation.ConversationRepository
     .then =>
       response = {data: payload}
       @_on_member_update conversation_et, response
-      @logger.log @logger.levels.INFO, "Unarchived conversation '#{conversation_et.id}' on '#{payload.otr_archived_ref}'"
+      @logger.info "Unarchived conversation '#{conversation_et.id}' on '#{payload.otr_archived_ref}'"
       callback?()
       return response
     .catch (error) =>
       reject_error = new Error "Conversation '#{conversation_et.id}' could not be unarchived: #{error.code}"
-      @logger.log @logger.levels.WARN, reject_error.message, error
+      @logger.warn reject_error.message, error
       callback?()
       throw reject_error
 
@@ -781,10 +780,9 @@ class z.conversation.ConversationRepository
 
       @sending_queue.push => @_send_generic_message @self_conversation().id, generic_message
       .then =>
-        @logger.log @logger.levels.INFO,
-          "Marked conversation '#{conversation_et.id}' as read on '#{new Date(timestamp).toISOString()}'"
+        @logger.info "Marked conversation '#{conversation_et.id}' as read on '#{new Date(timestamp).toISOString()}'"
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Error (#{error.label}): #{error.message}"
+        @logger.error "Error (#{error.label}): #{error.message}"
         error = new Error 'Event response is undefined'
         Raygun.send error, source: 'Sending encrypted last read'
 
@@ -926,7 +924,7 @@ class z.conversation.ConversationRepository
           saved_event.data.info.nonce = asset_id
           @_update_image_as_sent conversation_et, saved_event
         .catch (error) =>
-          @logger.log @logger.levels.ERROR, "Failed to upload otr asset for conversation #{conversation_et.id}", error
+          @logger.error "Failed to upload otr asset for conversation #{conversation_et.id}", error
           throw error
 
         return saved_event
@@ -947,7 +945,7 @@ class z.conversation.ConversationRepository
       .then =>
         @_track_completed_media_action conversation_et, generic_message
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to upload otr asset for conversation #{conversation_et.id}", error
+      @logger.error "Failed to upload otr asset for conversation #{conversation_et.id}", error
       throw error
 
   ###
@@ -962,7 +960,7 @@ class z.conversation.ConversationRepository
       generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
 
     @_send_and_inject_generic_message conversation_et, generic_message
-    .catch (error) => @logger.log @logger.levels.ERROR, "#{error.message}"
+    .catch (error) => @logger.error "#{error.message}"
 
   ###
   Send link preview in specified conversation.
@@ -1035,7 +1033,7 @@ class z.conversation.ConversationRepository
       @_track_edit_message conversation_et, original_message_et
       @send_link_preview message, conversation_et, generic_message
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Error while editing message: #{error.message}", error
+      @logger.error "Error while editing message: #{error.message}", error
       throw error
 
   ###
@@ -1051,7 +1049,7 @@ class z.conversation.ConversationRepository
       @_track_rich_media_content message
       @send_link_preview message, conversation_et, generic_message
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Error while sending text message: #{error.message}", error
+      @logger.error "Error while sending text message: #{error.message}", error
       throw error
 
   ###
@@ -1089,10 +1087,10 @@ class z.conversation.ConversationRepository
       .then (payload) =>
         return @conversation_service.post_encrypted_message conversation_id, payload, true
       .then (response) =>
-        @logger.log @logger.levels.INFO, "Sent info about session reset to client '#{client_id}' of user '#{user_id}'"
+        @logger.info "Sent info about session reset to client '#{client_id}' of user '#{user_id}'"
         resolve response
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Sending conversation reset failed: #{error.message}", error
+        @logger.error "Sending conversation reset failed: #{error.message}", error
         reject error
 
   ###
@@ -1169,7 +1167,7 @@ class z.conversation.ConversationRepository
     @get_message_in_conversation_by_id conversation_et, event_json.id
     .then (message_et) =>
       asset_data = event_json.data
-      remote_data = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
+      remote_data = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256, true
       message_et.get_first_asset().resource remote_data
       message_et.status z.message.StatusType.SENT
       @conversation_service.update_message_in_db message_et, {data: asset_data, status: z.message.StatusType.SENT}
@@ -1225,7 +1223,7 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the external message
   ###
   _send_external_generic_message: (conversation_id, generic_message, user_ids, native_push = true) =>
-    @logger.log @logger.levels.INFO, "Sending external message of type '#{generic_message.content}'", generic_message
+    @logger.info "Sending external message of type '#{generic_message.content}'", generic_message
 
     key_bytes = null
     sha256 = null
@@ -1249,7 +1247,7 @@ class z.conversation.ConversationRepository
       payload.native_push = native_push
       @_send_encrypted_message conversation_id, generic_message, payload, user_ids
     .catch (error) =>
-      @logger.log @logger.levels.INFO, 'Failed sending external message', error
+      @logger.info 'Failed sending external message', error
       throw error
 
   ###
@@ -1297,8 +1295,7 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
   _send_encrypted_message: (conversation_id, generic_message, payload, precondition_option = false) =>
-    @logger.log @logger.levels.INFO,
-      "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
+    @logger.info "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
     @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
     .then (response) =>
       @_handle_client_mismatch conversation_id, response
@@ -1308,8 +1305,7 @@ class z.conversation.ConversationRepository
 
       return @_handle_client_mismatch conversation_id, error, generic_message, payload
       .then (updated_payload) =>
-        @logger.log @logger.levels.INFO,
-          "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
+        @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
         return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
 
   ###
@@ -1413,12 +1409,12 @@ class z.conversation.ConversationRepository
       @send_asset conversation_et, file, record.id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
-      @logger.log "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
+      @logger.info "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: upload_duration}
     .catch (error) =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
-      @logger.log @logger.levels.ERROR, "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
+      @logger.error "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
       @get_message_in_conversation_by_id conversation_et, message_id
       .then (message_et) =>
         @send_asset_upload_failed conversation_et, message_et.id
@@ -1449,12 +1445,12 @@ class z.conversation.ConversationRepository
       @send_asset_v3 conversation_et, file, record.id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
-      @logger.log "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
+      @logger.info "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: upload_duration}
     .catch (error) =>
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
-      @logger.log @logger.levels.ERROR, "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
+      @logger.error "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
       @get_message_in_conversation_by_id conversation_et, message_id
       .then (message_et) =>
         @send_asset_upload_failed conversation_et, message_et.id
@@ -1482,7 +1478,7 @@ class z.conversation.ConversationRepository
     .then =>
       return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
-      @logger.log "Failed to send delete message for everyone with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
+      @logger.info "Failed to send delete message for everyone with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
       throw error
 
   ###
@@ -1504,7 +1500,7 @@ class z.conversation.ConversationRepository
     .then =>
       return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
-      @logger.log "Failed to send delete message with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
+      @logger.info "Failed to send delete message with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
       throw error
 
   ###
@@ -1536,7 +1532,7 @@ class z.conversation.ConversationRepository
           when message_et.has_asset_image()
             @_obfuscate_image_message conversation_et, message_et.id
           else
-            @logger.log @logger.log.levels.WARN, "Ephemeral message of unsupported type: #{message_et.type}"
+            @logger.warn "Ephemeral message of unsupported type: #{message_et.type}"
       else
         if conversation_et.is_group()
           user_ids = _.union [@user_repository.self().id], [message_et.from]
@@ -1560,7 +1556,7 @@ class z.conversation.ConversationRepository
           content: obfuscated.text
           nonce: obfuscated.id
     .then =>
-      @logger.log @logger.levels.INFO, "Obfuscated text message '#{message_id}'"
+      @logger.info "Obfuscated text message '#{message_id}'"
 
   _obfuscate_ping_message: (conversation_et, message_id) =>
     @get_message_in_conversation_by_id conversation_et, message_id
@@ -1568,7 +1564,7 @@ class z.conversation.ConversationRepository
       message_et.ephemeral_expires true
       @conversation_service.update_message_in_db message_et, {ephemeral_expires: true}
     .then =>
-      @logger.log @logger.levels.INFO, "Obfuscated ping message '#{message_id}'"
+      @logger.info "Obfuscated ping message '#{message_id}'"
 
   _obfuscate_asset_message: (conversation_et, message_id) =>
     @get_message_in_conversation_by_id conversation_et, message_id
@@ -1583,7 +1579,7 @@ class z.conversation.ConversationRepository
           meta: {}
         ephemeral_expires: true
     .then =>
-      @logger.log @logger.levels.INFO, "Obfuscated asset message '#{message_id}'"
+      @logger.info "Obfuscated asset message '#{message_id}'"
 
   _obfuscate_image_message: (conversation_et, message_id) =>
     @get_message_in_conversation_by_id conversation_et, message_id
@@ -1599,7 +1595,7 @@ class z.conversation.ConversationRepository
             tag: 'medium'
         ephemeral_expires: true
     .then =>
-      @logger.log @logger.levels.INFO, "Obfuscated image message '#{message_id}'"
+      @logger.info "Obfuscated image message '#{message_id}'"
 
   ###
   Can user upload assets to conversation.
@@ -1631,7 +1627,7 @@ class z.conversation.ConversationRepository
         source: 'WebSocket'
       Raygun.send error, custom_data
 
-    @logger.log "»» Event: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
+    @logger.info "»» Event: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
 
     # Ignore member join if we join a one2one conversation (accept a connection request)
     if event.type is z.event.Backend.CONVERSATION.MEMBER_JOIN
@@ -1676,7 +1672,7 @@ class z.conversation.ConversationRepository
 
       # Un-archive it also on the backend side
       if not @block_event_handling and previously_archived and not conversation_et.is_archived()
-        @logger.log @logger.levels.INFO, "Unarchiving conversation '#{conversation_et.id}' with new event"
+        @logger.info "Unarchiving conversation '#{conversation_et.id}' with new event"
         @unarchive_conversation conversation_et
 
   ###
@@ -1702,7 +1698,7 @@ class z.conversation.ConversationRepository
       @update_message_with_asset_preview conversation_et, message_et, event_json.data
     .catch (error) =>
       if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-        return @logger.log @logger.levels.ERROR, "Asset preview: Could not find message with id '#{event_json.id}'", event_json
+        return @logger.error "Asset preview: Could not find message with id '#{event_json.id}'", event_json
       throw error
 
   ###
@@ -1717,7 +1713,7 @@ class z.conversation.ConversationRepository
       @update_message_as_upload_complete conversation_et, message_et, event_json.data
     .catch (error) =>
       if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-        return @logger.log @logger.levels.ERROR, "Upload complete: Could not find message with id '#{event_json.id}'", event_json
+        return @logger.error "Upload complete: Could not find message with id '#{event_json.id}'", event_json
       throw error
 
   ###
@@ -1735,7 +1731,7 @@ class z.conversation.ConversationRepository
         @update_message_as_upload_failed message_et
     .catch (error) =>
       if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-        return @logger.log @logger.levels.ERROR, "Upload failed: Could not find message with id '#{event_json.id}'", event_json
+        return @logger.error "Upload failed: Could not find message with id '#{event_json.id}'", event_json
       throw error
 
   ###
@@ -1752,7 +1748,7 @@ class z.conversation.ConversationRepository
         return @conversation_service.update_message_in_db message_et, {status: message_et.status()}
     .catch (error) =>
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-        @logger.log "Failed to handle status update of a message in conversation '#{conversation_et.id}'", error
+        @logger.info "Failed to handle status update of a message in conversation '#{conversation_et.id}'", error
         throw error
 
   ###
@@ -1871,7 +1867,7 @@ class z.conversation.ConversationRepository
       return @_delete_message_by_id conversation_et, event_json.data.message_id
     .catch (error) =>
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-        @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
+        @logger.info "Failed to delete message for conversation '#{conversation_et.id}'", error
         throw error
 
   ###
@@ -1888,7 +1884,7 @@ class z.conversation.ConversationRepository
     .then (conversation_et) =>
       return @_delete_message_by_id conversation_et, event_json.data.message_id
     .catch (error) =>
-      @logger.log "Failed to delete message for conversation '#{conversation_et.id}'", error
+      @logger.info "Failed to delete message for conversation '#{conversation_et.id}'", error
       throw error
 
   ###
@@ -1905,7 +1901,7 @@ class z.conversation.ConversationRepository
 
       @_update_user_ets message_et
       @_send_reaction_notification conversation_et, message_et, event_json
-      @logger.log @logger.levels.DEBUG, "Updated reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
+      @logger.debug "Updated reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
       return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
       .catch (error) =>
         throw error is error.type isnt z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
@@ -1913,10 +1909,10 @@ class z.conversation.ConversationRepository
           return window.setTimeout =>
             @_on_reaction conversation_et, event_json, attempt + 1
           , 10 * attempt
-        @logger.log @logger.levels.ERROR, "Too many attempts to update reaction to message '#{message_et.id}' in conversation '#{conversation_et.id}'", error
+        @logger.error "Too many attempts to update reaction to message '#{message_et.id}' in conversation '#{conversation_et.id}'", error
     .catch (error) =>
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-        @logger.log @logger.levels.ERROR, "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
+        @logger.error "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
         throw error
 
   ###
@@ -1948,8 +1944,7 @@ class z.conversation.ConversationRepository
       if conversation_et
         conversation_et.add_message message_et
       else
-        @logger.log @logger.levels.ERROR,
-          "Message cannot be added to unloaded conversation. Message type: #{message_et.type}"
+        @logger.error "Message cannot be added to unloaded conversation. Message type: #{message_et.type}"
         error = new Error 'Conversation not loaded, message cannot be added'
         custom_data =
           message_type: message_et.type
@@ -1993,7 +1988,7 @@ class z.conversation.ConversationRepository
       # @todo Maybe we need to reset "@processed_event_nonces" someday to save some memory, until now it's fine.
       return false
     else
-      @logger.log @logger.levels.WARN, "Event with nonce '#{event_nonce}' has been already processed.", message_et
+      @logger.warn "Event with nonce '#{event_nonce}' has been already processed.", message_et
       amplify.publish z.event.WebApp.ANALYTICS.EVENT,
         z.tracking.SessionEventName.INTEGER.EVENT_HIDDEN_DUE_TO_DUPLICATE_NONCE
       return true
@@ -2130,9 +2125,9 @@ class z.conversation.ConversationRepository
   ###
   _handle_client_mismatch_deleted: (user_client_map, payload) ->
     if _.isEmpty user_client_map
-      @logger.log @logger.levels.INFO, 'No deleted clients that need to be removed'
+      @logger.info 'No deleted clients that need to be removed'
       return Promise.resolve payload
-    @logger.log @logger.levels.DEBUG, "Message contains deleted clients of '#{Object.keys(user_client_map).length}' users", user_client_map
+    @logger.debug "Message contains deleted clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
     _remove_deleted_client = (user_id, client_id) =>
       delete payload.recipients[user_id][client_id] if payload
@@ -2157,11 +2152,11 @@ class z.conversation.ConversationRepository
   ###
   _handle_client_mismatch_missing: (user_client_map, payload, generic_message) ->
     if _.isEmpty user_client_map
-      @logger.log @logger.levels.INFO, 'No missing clients that need to be added'
+      @logger.info 'No missing clients that need to be added'
       return Promise.resolve payload
     if not payload
       return Promise.resolve payload
-    @logger.log @logger.levels.DEBUG, "Message is missing clients of '#{Object.keys(user_client_map).length}' users", user_client_map
+    @logger.debug "Message is missing clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
     @cryptography_repository.encrypt_generic_message user_client_map, generic_message, payload
     .then (updated_payload) =>
@@ -2188,9 +2183,9 @@ class z.conversation.ConversationRepository
   ###
   _handle_client_mismatch_redundant: (user_client_map, payload, conversation_id) ->
     if _.isEmpty user_client_map
-      @logger.log @logger.levels.INFO, 'No redundant clients that need to be removed'
+      @logger.info 'No redundant clients that need to be removed'
       return Promise.resolve payload
-    @logger.log @logger.levels.DEBUG, "Message contains redundant clients of '#{Object.keys(user_client_map).length}' users", user_client_map
+    @logger.debug "Message contains redundant clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
     conversation_et = @get_conversation_by_id conversation_id if conversation_id
 
@@ -2297,9 +2292,9 @@ class z.conversation.ConversationRepository
   ###
   update_message_with_asset_preview: (conversation_et, message_et, asset_data) =>
     if asset_data.key
-      resource = z.assets.AssetRemoteData.v3 asset_data.key, asset_data.otr_key, asset_data.sha256, asset_data.token
+      resource = z.assets.AssetRemoteData.v3 asset_data.key, asset_data.otr_key, asset_data.sha256, asset_data.token, true
     else
-      resource = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256
+      resource = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256, true
     asset_et = message_et.get_first_asset()
     asset_et.preview_resource resource
     @conversation_service.update_asset_preview_in_db message_et.primary_key, asset_data

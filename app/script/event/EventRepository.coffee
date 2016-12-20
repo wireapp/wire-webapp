@@ -41,7 +41,6 @@ class z.event.EventRepository
 
     @notification_handling_state = ko.observable z.event.NotificationHandlingState.STREAM
     @notification_handling_state.subscribe (handling_state) =>
-      @logger.log @logger.levels.OFF, "Changed notification handling state to '#{handling_state}'"
       amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, handling_state
 
       if handling_state is z.event.NotificationHandlingState.WEB_SOCKET
@@ -67,7 +66,7 @@ class z.event.EventRepository
         @notifications_blocked = true
         @_handle_notification notification
         .catch (error) =>
-          @logger.log @logger.levels.WARN, "We failed to handle a notification but will continue with queue: #{error.message}", error
+          @logger.warn "We failed to handle a notification but will continue with queue: #{error.message}", error
         .then =>
           @notifications_blocked = false
           @notifications_queue.shift()
@@ -78,7 +77,7 @@ class z.event.EventRepository
             amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_events_progress, false, replace
 
       else if @notifications_loaded() and @notification_handling_state() isnt z.event.NotificationHandlingState.WEB_SOCKET
-        @logger.log @logger.levels.INFO, "Done handling '#{@notifications_total}' notifications from the stream"
+        @logger.info "Done handling '#{@notifications_total}' notifications from the stream"
         @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET
         @_find_ongoing_calls()
         @notifications_loaded false
@@ -132,7 +131,7 @@ class z.event.EventRepository
 
   # Handle buffered notifications.
   _handle_buffered_notifications: =>
-    @logger.log @logger.levels.INFO, "Received '#{@web_socket_buffer.length}' notifications via WebSocket while handling stream"
+    @logger.info "Received '#{@web_socket_buffer.length}' notifications via WebSocket while handling stream"
     if @web_socket_buffer.length
       z.util.ko_array_push_all @notifications_queue, @web_socket_buffer
       @web_socket_buffer.length = 0
@@ -154,7 +153,7 @@ class z.event.EventRepository
           notification_id = response.notifications[response.notifications.length - 1].id
 
           notifications = (notification for notification in response.notifications)
-          @logger.log @logger.levels.INFO, "Added '#{notifications.length}' notifications to the queue"
+          @logger.info "Added '#{notifications.length}' notifications to the queue"
           z.util.ko_array_push_all @notifications_queue, notifications
 
           if @notifications_promises.length is 0
@@ -166,11 +165,11 @@ class z.event.EventRepository
             @get_notifications notification_id, 5000
           else
             @notifications_loaded true
-            @logger.log @logger.levels.INFO, "Fetched '#{@notifications_total}' notifications from the backend"
+            @logger.info "Fetched '#{@notifications_total}' notifications from the backend"
             amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_events_expectation, true, [@notifications_total]
 
         else
-          @logger.log @logger.levels.INFO, "No notifications found since '#{notification_id}'", response
+          @logger.info "No notifications found since '#{notification_id}'", response
           reject new z.event.EventError z.event.EventError::TYPE.NO_NOTIFICATIONS
 
       @notification_service.get_notifications @current_client().id, notification_id, limit
@@ -181,10 +180,10 @@ class z.event.EventRepository
         if error_response.notifications
           _got_notifications error_response
         else if error_response.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
-          @logger.log @logger.levels.INFO, "No notifications found since '#{notification_id}'", error_response
+          @logger.info "No notifications found since '#{notification_id}'", error_response
           reject new z.event.EventError z.event.EventError::TYPE.NO_NOTIFICATIONS
         else
-          @logger.log @logger.levels.ERROR, "Failed to get notifications: #{error_response.message}", error_response
+          @logger.error "Failed to get notifications: #{error_response.message}", error_response
           reject new z.event.EventError z.event.EventError::TYPE.REQUEST_FAILURE
 
   ###
@@ -205,7 +204,7 @@ class z.event.EventRepository
     @notification_service.get_notifications_last @current_client?().id
     .then (response) =>
       @_update_last_notification_id response.id
-      @logger.log @logger.levels.INFO, "Set starting point on notification stream to '#{@last_notification_id()}'"
+      @logger.info "Set starting point on notification stream to '#{@last_notification_id()}'"
 
   # Initialize from notification stream.
   initialize_from_notification_stream: =>
@@ -215,7 +214,7 @@ class z.event.EventRepository
     .catch (error) =>
       @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET
       if error.type is z.event.EventError::TYPE.NO_LAST_ID
-        @logger.log @logger.levels.INFO, 'No notifications found for this user', error
+        @logger.info 'No notifications found for this user', error
         return 0
 
   # Retrieve missed notifications from the stream after a connectivity loss.
@@ -225,10 +224,10 @@ class z.event.EventRepository
     @_update_from_notification_stream @_get_last_known_notification_id()
     .then (number_of_notifications) =>
       @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET if number_of_notifications is 0
-      @logger.log @logger.levels.INFO, "Retrieved '#{number_of_notifications}' notifications from stream after connectivity loss"
+      @logger.info "Retrieved '#{number_of_notifications}' notifications from stream after connectivity loss"
     .catch (error) =>
       if error.type isnt z.event.EventError::TYPE.NO_NOTIFICATIONS
-        @logger.log @logger.levels.ERROR, "Failed to recover from notification stream: #{error.message}", error
+        @logger.error "Failed to recover from notification stream: #{error.message}", error
         @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET
         # @todo What do we do in this case?
         amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
@@ -258,7 +257,7 @@ class z.event.EventRepository
             delete filtered_conversations[conversation_id]
         resolve Object.keys filtered_conversations
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Something failed: #{error?.message}", error
+        @logger.error "Something failed: #{error?.message}", error
         reject error
 
   ###
@@ -267,13 +266,13 @@ class z.event.EventRepository
   @return [Promise] Promise that resolves when conversation that could contain a call have been identified
   ###
   _find_ongoing_calls: ->
-    @logger.log @logger.levels.INFO, 'Checking for ongoing calls'
+    @logger.info 'Checking for ongoing calls'
     @get_conversation_ids_with_active_events [z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE], [z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE]
     .then (response) =>
-      @logger.log @logger.levels.INFO, "Identified '#{response.length}' conversations that possibly have an ongoing call", response
+      @logger.info "Identified '#{response.length}' conversations that possibly have an ongoing call", response
       amplify.publish z.event.WebApp.CALL.STATE.CHECK, conversation_id for conversation_id in response
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, 'Could not check for active calls', error
+      @logger.error 'Could not check for active calls', error
 
   ###
   Get the ID of the last known notification.
@@ -296,15 +295,15 @@ class z.event.EventRepository
     return @get_notifications last_notification_id, 500
     .then (last_notification_id) =>
       if last_notification_id
-        @logger.log @logger.levels.INFO, "ID of last notification fetched from stream is '#{last_notification_id}'"
+        @logger.info "ID of last notification fetched from stream is '#{last_notification_id}'"
       return @notifications_total
     .catch (error) =>
       @notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET
       if error.type is z.event.EventError::TYPE.NO_NOTIFICATIONS
         @_find_ongoing_calls()
-        @logger.log @logger.levels.INFO, 'No notifications found for this user', error
+        @logger.info 'No notifications found for this user', error
         return 0
-      @logger.log @logger.levels.ERROR, "Failed to handle notification stream: #{error.message}", error
+      @logger.error "Failed to handle notification stream: #{error.message}", error
       throw error
 
   _update_last_notification_id: (last_notification_id) ->
@@ -325,7 +324,7 @@ class z.event.EventRepository
   ###
   inject_event: (event) =>
     if event.conversation isnt @user_repository.self().id
-      @logger.log "Injected event ID '#{event.id}' of type '#{event.type}'", event
+      @logger.info "Injected event ID '#{event.id}' of type '#{event.type}'", event
       @_handle_event event, @NOTIFICATION_SOURCE.INJECTION
 
   ###
@@ -334,9 +333,9 @@ class z.event.EventRepository
   ###
   _distribute_event: (event) ->
     if event.conversation
-      @logger.log @logger.levels.INFO, "Distributed '#{event.type}' event for conversation '#{event.conversation}'", event
+      @logger.info "Distributed '#{event.type}' event for conversation '#{event.conversation}'", event
     else
-      @logger.log @logger.levels.INFO, "Distributed '#{event.type}' event", event
+      @logger.info "Distributed '#{event.type}' event", event
 
     switch event.type.split('.')[0]
       when 'call'
@@ -353,7 +352,7 @@ class z.event.EventRepository
   ###
   _handle_event: (event) ->
     if event.type in z.event.EventTypeHandling.IGNORE
-      @logger.log "Event ignored: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
+      @logger.info "Event ignored: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
       return Promise.resolve true
 
     Promise.resolve()
@@ -394,11 +393,10 @@ class z.event.EventRepository
         else
           @NOTIFICATION_SOURCE.STREAM
 
-      @logger.log @logger.levels.INFO,
-        "Handling notification '#{notification.id}' from '#{source}' containing '#{events.length}' events", notification
+      @logger.info "Handling notification '#{notification.id}' from '#{source}' containing '#{events.length}' events", notification
 
       if events.length is 0
-        @logger.log @logger.levels.WARN, 'Notification payload does not contain any events'
+        @logger.warn 'Notification payload does not contain any events'
         @_update_last_notification_id notification.id
         resolve @last_notification_id()
       else
@@ -407,5 +405,5 @@ class z.event.EventRepository
           @_update_last_notification_id notification.id
           resolve @last_notification_id()
         .catch (error) =>
-          @logger.log @logger.levels.ERROR, "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
+          @logger.error "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
           reject error
