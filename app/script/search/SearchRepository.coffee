@@ -83,6 +83,13 @@ class z.search.SearchRepository
       return @_prepare_search_result search_ets, mode
 
   ###
+  Trim and remove @.
+  @param query [String]
+  ###
+  normalize_search_query: (query) ->
+    return query.trim().replace /^[@]/, ''
+
+  ###
   Preparing the search results for display.
 
   @note We skip a few results as connection changes need a while to reflect on the graph.

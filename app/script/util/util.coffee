@@ -93,7 +93,8 @@ z.util.get_url_parameter = (name) ->
   params = window.location.search.substring(1).split '&'
   for param in params
     value = param.split '='
-    return unescape value[1] if value[0] is name
+    if value[0] is name
+      return if value[1] then unescape value[1] else 'true'
   return null
 
 

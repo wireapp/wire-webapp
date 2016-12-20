@@ -132,7 +132,7 @@
   },
   "no_unnecessary_double_quotes": {
     "name": "no_unnecessary_double_quotes",
-    "level": "warn"
+    "level": "ignore"
   },
   "no_unnecessary_fat_arrows": {
     "name": "no_unnecessary_fat_arrows",

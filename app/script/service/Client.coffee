@@ -98,14 +98,14 @@ class z.service.Client
       _check_status = =>
         @status()
         .done (jqXHR) =>
-          @logger.log @logger.levels.INFO, 'Connectivity verified', jqXHR
+          @logger.info 'Connectivity verified', jqXHR
           resolve()
         .fail (jqXHR) =>
           if jqXHR.readyState is 4
-            @logger.log @logger.levels.INFO, "Connectivity verified by server error '#{jqXHR.status}'", jqXHR
+            @logger.info "Connectivity verified by server error '#{jqXHR.status}'", jqXHR
             resolve()
           else
-            @logger.log @logger.levels.WARN, 'Connectivity could not be verified... retrying'
+            @logger.warn 'Connectivity could not be verified... retrying'
             window.setTimeout _check_status, 2000
 
       _check_status()
@@ -114,14 +114,14 @@ class z.service.Client
   execute_request_queue: =>
     return if not @access_token or not @request_queue.length
 
-    @logger.log @logger.levels.INFO, "Executing '#{@request_queue.length}' queued requests"
+    @logger.info "Executing '#{@request_queue.length}' queued requests"
     for request in @request_queue
       [config, resolve_fn, reject_fn] = request
-      @logger.log @logger.levels.INFO, "Queued '#{config.type}' request to '#{config.url}' executed"
+      @logger.info "Queued '#{config.type}' request to '#{config.url}' executed"
       @send_request config
       .then resolve_fn
       .catch (error) =>
-        @logger.log @logger.levels.INFO, "Failed to execute queued '#{config.type}' request to '#{config.url}'", error
+        @logger.info "Failed to execute queued '#{config.type}' request to '#{config.url}'", error
         reject_fn error
 
     @request_queue.length = 0
@@ -163,7 +163,7 @@ class z.service.Client
         xhrFields: config.xhrFields
       .done (data, textStatus, jqXHR) =>
         resolve data
-        @logger.log @logger.levels.OFF, "Server Response '#{jqXHR.wire?.request_id}' from '#{config.url}':", data
+        @logger.debug @logger.levels.OFF, "Server Response '#{jqXHR.wire?.request_id}' from '#{config.url}':", data
       .fail (jqXHR, textStatus, errorThrown) =>
         switch jqXHR.status
           when z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
@@ -183,7 +183,7 @@ class z.service.Client
               when z.service.BackendClientError::LABEL.INVALID_CREDENTIALS
                 Raygun.send new Error 'Server request failed: Invalid credentials'
               when z.service.BackendClientError::LABEL.TOO_MANY_CLIENTS, z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
-                @logger.log @logger.levels.WARN, "Server request failed: '#{jqXHR.responseJSON.label}'"
+                @logger.warn "Server request failed: '#{jqXHR.responseJSON.label}'"
               else
                 Raygun.send new Error 'Server request failed'
           else
@@ -208,5 +208,5 @@ class z.service.Client
     @send_request $.extend config, json_config, true
 
   _push_to_request_queue: ([config, resolve_fn, reject_fn], reason) ->
-    @logger.log @logger.levels.INFO, "Adding '#{config.type}' request to '#{config.url}' to queue due to '#{reason}'", config
+    @logger.info "Adding '#{config.type}' request to '#{config.url}' to queue due to '#{reason}'", config
     @request_queue.push [config, resolve_fn, reject_fn]

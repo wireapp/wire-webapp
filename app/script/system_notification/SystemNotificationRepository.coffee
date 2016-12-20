@@ -124,7 +124,7 @@ class z.SystemNotification.SystemNotificationRepository
       .then (is_read) =>
         if is_read
           notification.close()
-          @logger.log @logger.levels.INFO, "Removed read notification for '#{message_id}' in '#{conversation_id}'."
+          @logger.info "Removed read notification for '#{message_id}' in '#{conversation_id}'."
 
   ###
   Set the muted state.
@@ -133,7 +133,7 @@ class z.SystemNotification.SystemNotificationRepository
   ###
   set_muted_state: (handling_notifications) =>
     @muted = handling_notifications isnt z.event.NotificationHandlingState.WEB_SOCKET
-    @logger.log @logger.levels.INFO, "Set muted state to: #{@muted}"
+    @logger.info "Set muted state to: #{@muted}"
 
   ###
   Set the permission state.
@@ -565,23 +565,23 @@ class z.SystemNotification.SystemNotificationRepository
       window.focus()
       wire.app.view.content.multitasking.is_minimized true
       notification_content.trigger()
-      @logger.log @logger.levels.INFO, "Notification for '#{message_id} in '#{conversation_id}' closed by click."
+      @logger.info "Notification for '#{message_id} in '#{conversation_id}' closed by click."
       notification.close()
     notification.onclose = =>
       window.clearTimeout timeout_trigger_id
       @notifications.splice @notifications.indexOf(notification), 1
-      @logger.log @logger.levels.INFO, "Removed notification for '#{message_id}' in '#{conversation_id}' locally."
+      @logger.info "Removed notification for '#{message_id}' in '#{conversation_id}' locally."
     notification.onerror = =>
-      @logger.log @logger.levels.ERROR, "Notification for '#{message_id}' in '#{conversation_id}' closed by error."
+      @logger.error "Notification for '#{message_id}' in '#{conversation_id}' closed by error."
       notification.close()
     notification.onshow = =>
       timeout_trigger_id = window.setTimeout =>
-        @logger.log @logger.levels.INFO, "Notification for '#{message_id}' in '#{conversation_id}' closed by timeout."
+        @logger.info "Notification for '#{message_id}' in '#{conversation_id}' closed by timeout."
         notification.close()
       , notification_content.timeout
 
     @notifications.push notification
-    @logger.log @logger.levels.INFO, "Added notification for '#{message_id}' in '#{conversation_id}' to queue."
+    @logger.info "Added notification for '#{message_id}' in '#{conversation_id}' to queue."
     window.onunload = =>
       for notification in @notifications
         notification.close()
@@ -589,4 +589,4 @@ class z.SystemNotification.SystemNotificationRepository
         return if not notification.data?
         conversation_id = notification.data.conversation_id
         message_id = notification.data.message_id
-        @logger.log @logger.levels.INFO, "Notification for '#{message_id}' in '#{conversation_id}' closed by redirect."
+        @logger.info "Notification for '#{message_id}' in '#{conversation_id}' closed by redirect."

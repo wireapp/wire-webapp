@@ -39,21 +39,20 @@ class z.connect.ConnectRepository
     return new Promise (resolve, reject) =>
       @connect_google_service.get_contacts()
       .catch (error) =>
-        @logger.log @logger.levels.INFO, 'Google Contacts SDK error', error
+        @logger.info 'Google Contacts SDK error', error
         throw new z.connect.ConnectError z.connect.ConnectError::TYPE.GOOGLE_DOWNLOAD
       .then (response) =>
         amplify.publish z.event.WebApp.SEARCH.SHOW
         return @_parse_google_contacts response
       .then (phone_book) =>
         if phone_book.cards.length is 0
-          @logger.log @logger.levels.WARN, 'No contacts found for upload'
+          @logger.warn 'No contacts found for upload'
           throw new z.connect.ConnectError z.connect.ConnectError::TYPE.NO_CONTACTS
         else
-          @logger.log @logger.levels.INFO, "Uploading hashes of '#{phone_book.cards.length}' contacts for matching", phone_book
+          @logger.info "Uploading hashes of '#{phone_book.cards.length}' contacts for matching", phone_book
           return @connect_service.post_onboarding phone_book
       .then (response) =>
-        @logger.log @logger.levels.INFO,
-          "Gmail contacts upload successful: #{response.results.length} matches, #{response['auto-connects'].length} auto connects", response
+        @logger.info "Gmail contacts upload successful: #{response.results.length} matches, #{response['auto-connects'].length} auto connects", response
         @properties_repository.save_preference_contact_import_google Date.now()
         resolve response
       .catch (error) =>
@@ -66,9 +65,9 @@ class z.connect.ConnectRepository
         else
           if error.code is z.service.BackendClientError::STATUS_CODE.TOO_MANY_REQUESTS
             error_message = 'Backend refused Gmail contacts upload: Endpoint used too frequent'
-            @logger.log @logger.levels.ERROR, error_message
+            @logger.error error_message
           else
-            @logger.log @logger.levels.ERROR, 'Gmail contacts upload failed', error
+            @logger.error 'Gmail contacts upload failed', error
           reject new z.connect.ConnectError z.connect.ConnectError::TYPE.UPLOAD
 
   ###
@@ -80,23 +79,22 @@ class z.connect.ConnectRepository
       phone_book = @_parse_macos_contacts()
 
       if phone_book.cards.length is 0
-        @logger.log @logger.levels.WARN, 'No contacts found for upload'
+        @logger.warn 'No contacts found for upload'
         reject new z.connect.ConnectError z.connect.ConnectError::TYPE.NO_CONTACTS
       else
         amplify.publish z.event.WebApp.SEARCH.SHOW
-        @logger.log @logger.levels.INFO, "Uploading hashes of '#{phone_book.cards.length}' contacts for matching", phone_book
+        @logger.info "Uploading hashes of '#{phone_book.cards.length}' contacts for matching", phone_book
         @connect_service.post_onboarding phone_book
         .then (response) =>
-          @logger.log @logger.levels.INFO,
-            "macOS contacts upload successful: #{response.results.length} matches, #{response['auto-connects'].length} auto connects", response
+          @logger.info "macOS contacts upload successful: #{response.results.length} matches, #{response['auto-connects'].length} auto connects", response
           @properties_repository.save_preference_contact_import_macos Date.now()
           resolve response
         .catch (error) =>
           if error.code is z.service.BackendClientError::STATUS_CODE.TOO_MANY_REQUESTS
             error_message = 'Backend refused macOS contacts upload: Endpoint used too frequent'
-            @logger.log @logger.levels.ERROR, error_message
+            @logger.error error_message
           else
-            @logger.log @logger.levels.ERROR, 'macOS contacts upload failed', error
+            @logger.error 'macOS contacts upload failed', error
           reject new z.connect.ConnectError z.connect.ConnectError::TYPE.UPLOAD
 
   ###

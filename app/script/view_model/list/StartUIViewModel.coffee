@@ -34,7 +34,7 @@ class z.ViewModel.list.StartUIViewModel
     @logger = new z.util.Logger 'z.ViewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS
 
     @search = _.debounce (query) =>
-      query = query.trim().replace /^[@]/, ''
+      query = @search_repository.normalize_search_query query
       if query
         @clear_search_results()
 
@@ -47,17 +47,21 @@ class z.ViewModel.list.StartUIViewModel
         # search for others
         @search_repository.search_by_name query
         .then (user_ets) =>
-          if query is @search_input().trim()
+          if query is @search_repository.normalize_search_query @search_input()
             @search_results.others user_ets
           else
-            @logger.log @logger.levels.INFO, "Resolved Search query #{query} is outdated"
+            @logger.info "Resolved Search query #{query} is outdated"
         .catch (error) =>
-          @logger.log @logger.levels.ERROR, "Error searching for contacts: #{error.message}", error
+          @logger.error "Error searching for contacts: #{error.message}", error
 
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.BOOLEAN.SEARCHED_FOR_PEOPLE, true
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTACTS.ENTERED_SEARCH,
-          by_username_only: query.startsWith '@'
+        @searched_for_user query
     , 300
+
+    @searched_for_user = _.once (query) ->
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.BOOLEAN.SEARCHED_FOR_PEOPLE, true
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTACTS.ENTERED_SEARCH,
+        by_username_only: query.startsWith '@'
+        context: 'startui'
 
     @user = @user_repository.self
 
@@ -77,6 +81,7 @@ class z.ViewModel.list.StartUIViewModel
       @conversation_repository.sorted_conversations()
       .filter (conversation_et) -> conversation_et.type() is z.conversation.ConversationType.ONE2ONE
       .map (conversation_et) -> conversation_et.participating_user_ets()[0]
+      .filter (user_et) -> user_et?
     @connections.extend rateLimit: 500
 
     @search_results =
@@ -198,7 +203,7 @@ class z.ViewModel.list.StartUIViewModel
       @_show_onboarding_results response
     .catch (error) =>
       if error.type isnt z.connect.ConnectError::TYPE.NO_CONTACTS
-        @logger.log @logger.levels.ERROR, "Importing contacts from '#{source}' failed: #{error.message}", error
+        @logger.error "Importing contacts from '#{source}' failed: #{error.message}", error
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONTACTS, action: =>
           @import_contacts source
     .then (error) =>
@@ -219,14 +224,14 @@ class z.ViewModel.list.StartUIViewModel
         else
           @show_no_contacts_on_wire true
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Could not show the on-boarding results: #{error.message}", error
+      @logger.error "Could not show the on-boarding results: #{error.message}", error
 
   update_list: =>
     @search_repository.get_top_people()
     .then (user_ets) =>
       @top_users user_ets if user_ets.length > 0
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Could not update the top people: #{error.message}", error
+      @logger.error "Could not update the top people: #{error.message}", error
 
     @show_spinner false
 
@@ -261,8 +266,18 @@ class z.ViewModel.list.StartUIViewModel
         @conversation_repository.unarchive_conversation conversation_et
       @_close_list()
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION,
+        conversation_type: if conversation_et.is_group() then 'group' else 'one_to_one'
 
   click_on_other: (user_et, e) =>
+
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SELECTED_USER_FROM_SEARCH,
+      connection_type: switch user_et.connection().status()
+        when z.user.ConnectionStatus.ACCEPTED then 'connected'
+        when z.user.ConnectionStatus.UNKNOWN then 'unconnected'
+        when z.user.ConnectionStatus.PENDING then 'pending_incoming'
+        when z.user.ConnectionStatus.SENT then 'pending_outgoing'
+      context: 'startui'
 
     create_bubble = (element_id) =>
       @user_profile user_et
@@ -317,7 +332,7 @@ class z.ViewModel.list.StartUIViewModel
       .then =>
         @suggestions.remove user_et
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Failed to ignore suggestions: '#{error.message}'", error
+        @logger.error "Failed to ignore suggestions: '#{error.message}'", error
 
   click_on_connect: (user_et, event) =>
     search_list_item = $(event.currentTarget.parentElement.parentElement)
@@ -340,8 +355,12 @@ class z.ViewModel.list.StartUIViewModel
     @_close_list()
     @user_repository.accept_connection_request user_et, true
 
-  on_user_connect: =>
+  on_user_connect: (user_et) =>
     @_close_list()
+
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST,
+      context: 'startui'
+      common_users_count: user_et.mutual_friends_total()
 
   on_user_ignore: (user_et) =>
     @user_repository.ignore_connection_request user_et
@@ -380,6 +399,9 @@ class z.ViewModel.list.StartUIViewModel
 
   show_invite_bubble: =>
     return if @invite_bubble?
+
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_GENERIC_INVITE_MENU,
+      context: 'banner'
 
     self = @user_repository.self()
 
@@ -441,6 +463,8 @@ class z.ViewModel.list.StartUIViewModel
     if @selected_people().length is 1
       return @conversation_repository.get_one_to_one_conversation @selected_people()[0]
       .then (conversation_et) =>
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_ONE_TO_ONE_CONVERSATION,
+          source: 'top_user'
         @click_on_group conversation_et
         callback conversation_et if _.isFunction callback
 
@@ -448,15 +472,14 @@ class z.ViewModel.list.StartUIViewModel
 
     @conversation_repository.create_new_conversation user_ids, null
     .then (conversation_et) =>
-      @logger.log @logger.levels.INFO, "Created new conversation with ID: #{conversation_et.id}"
       @properties_repository.save_preference_has_created_conversation()
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION,
         {creationContext: 'search', numberOfParticipants: user_ids.length}
       @click_on_group conversation_et
       callback conversation_et if _.isFunction callback
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "Unable to create conversation: #{error.message}"
       @_close_list()
+      throw new Error "Unable to create conversation: #{error.message}"
 
   on_audio_call: =>
     @on_submit_search (conversation_et) ->

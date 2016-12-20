@@ -36,15 +36,19 @@ class z.ViewModel.list.TakeoverViewModel
     @username = ko.pureComputed => @self_user()?.username()
 
   keep_username: ->
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME
     @user_repository.change_username @username()
     .then =>
       if conversation_et = @conversation_repository.get_most_recent_conversation()
         amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et
       else if @user_repository.connect_requests().length
         amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
+
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME,
+        outcome: 'success'
     .catch ->
       amplify.publish z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.KEPT_GENERATED_USERNAME,
+        outcome: 'fail'
     .then ->
       amplify.publish z.event.WebApp.TAKEOVER.DISMISS
 

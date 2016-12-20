@@ -45,17 +45,19 @@
 </script>
 
 <script type="text/html" id="normal">
-  <div class="message-header" data-bind="visible: !$parent.should_hide_user_avatar($data)">
-    <div class="message-header-icon">
-      <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+  <!-- ko if: !$parent.should_hide_user_avatar($data) -->
+    <div class="message-header">
+      <div class="message-header-icon">
+        <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+      </div>
+      <div class="message-header-label label-bold">
+        <span data-bind='text: message.user().first_name()'></span>
+        <!-- ko if: was_edited() -->
+          <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
+        <!-- /ko -->
+      </div>
     </div>
-    <div class="message-header-label label-bold">
-      <span data-bind='text: message.user().first_name()'></span>
-      <!-- ko if: was_edited() -->
-        <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
-      <!-- /ko -->
-    </div>
-  </div>
+  <!-- /ko -->
   <div class="message-body">
 
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
@@ -157,7 +159,7 @@
                          data-placement="vertical"
                          params="user: $data, click: $parents[1].on_message_user_click"></user-avatar>
           <!-- /ko -->
-          <span class="icon-close button-icon font-size-xs flex-center user-avatar-box-xs" data-bind="click: function() { $data.show_likes(false) }"></span>
+          <span class="message-footer-close-button icon-close" data-bind="click: function() { $data.show_likes(false) }"></span>
         </div>
       <!-- /ko -->
     </div>

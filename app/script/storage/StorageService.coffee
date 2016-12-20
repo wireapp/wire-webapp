@@ -129,7 +129,7 @@ class z.storage.StorageService
       @db = new Dexie @db_name
 
       @db.on 'blocked', =>
-        @logger.log @logger.levels.ERROR, 'Database is blocked'
+        @logger.error 'Database is blocked'
 
       # @see https://github.com/dfahlander/Dexie.js/wiki/Version.upgrade()
       # @see https://github.com/dfahlander/Dexie.js/wiki/WriteableCollection.modify()
@@ -138,16 +138,16 @@ class z.storage.StorageService
       @db.version(3).stores version_3
       @db.version(4).stores version_4
       .upgrade (transaction) =>
-        @logger.log @logger.levels.WARN, "Database upgrade to version #{@db.verno}", transaction
+        @logger.warn "Database upgrade to version #{@db.verno}", transaction
         transaction[@OBJECT_STORE_CLIENTS].toCollection().modify (client) =>
           client.meta =
             is_verified: true
             primary_key: 'local_identity'
-          @logger.log 'Updated client', client
+          @logger.info 'Updated client', client
       @db.version(5).stores version_4
       @db.version(6).stores version_4
       .upgrade (transaction) =>
-        @logger.log @logger.levels.WARN, "Database upgrade to version #{@db.verno}", transaction
+        @logger.warn "Database upgrade to version #{@db.verno}", transaction
         transaction[@OBJECT_STORE_CONVERSATIONS].toCollection().eachKey (key) =>
           @db[@OBJECT_STORE_CONVERSATIONS].update key, {id: key}
         transaction[@OBJECT_STORE_SESSIONS].toCollection().eachKey (key) =>
@@ -156,7 +156,7 @@ class z.storage.StorageService
           @db[@OBJECT_STORE_PREKEYS].update key, {id: key}
       @db.version(7).stores version_5
       .upgrade (transaction) =>
-        @logger.log @logger.levels.WARN, "Database upgrade to version #{@db.verno}", transaction
+        @logger.warn "Database upgrade to version #{@db.verno}", transaction
         transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
           mapped_event = event.mapped or event.raw
           delete event.mapped
@@ -165,7 +165,7 @@ class z.storage.StorageService
           $.extend event, mapped_event
       @db.version(8).stores version_5
       .upgrade (transaction) =>
-        @logger.log @logger.levels.WARN, "Database upgrade to version #{@db.verno}", transaction
+        @logger.warn "Database upgrade to version #{@db.verno}", transaction
         transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
           if event.type is z.event.Client.CONVERSATION.DELETE_EVERYWHERE
             event.time = new Date(event.time).toISOString()
@@ -173,10 +173,10 @@ class z.storage.StorageService
 
       @db.open()
       .then =>
-        @logger.log @logger.levels.LEVEL_1, "Storage Service initialized with database '#{@db_name}'"
+        @logger.info "Storage Service initialized with database '#{@db_name}'"
         resolve @db_name
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Failed to initialize database '#{@db_name}' for Storage Service: #{error?.message or error}", {error: error}
+        @logger.error "Failed to initialize database '#{@db_name}' for Storage Service: #{error?.message or error}", {error: error}
         reject new z.storage.StorageError z.storage.StorageError::TYPE.FAILED_TO_OPEN
 
 
@@ -196,10 +196,10 @@ class z.storage.StorageService
       if @db[store_name]?
         return @db[store_name].delete primary_key
         .then =>
-          @logger.log "Deleted '#{primary_key}' from object store '#{store_name}'"
+          @logger.info "Deleted '#{primary_key}' from object store '#{store_name}'"
           resolve primary_key
         .catch (error) =>
-          @logger.log @logger.levels.ERROR, "Failed to delete '#{primary_key}' from store '#{store_name}'", error
+          @logger.error "Failed to delete '#{primary_key}' from store '#{store_name}'", error
           reject error
       reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
@@ -211,7 +211,7 @@ class z.storage.StorageService
   @return [Promise]
   ###
   delete_store: (store_name) =>
-    @logger.log "Clearing object store '#{store_name}' in database '#{@db_name}'"
+    @logger.info "Clearing object store '#{store_name}' in database '#{@db_name}'"
     return @db[store_name].clear()
 
   ###
@@ -223,12 +223,12 @@ class z.storage.StorageService
       if @db?
         return @db.delete()
         .then =>
-          @logger.log @logger.levels.INFO, "Clearing IndexedDB '#{@db_name}' successful"
+          @logger.info "Clearing IndexedDB '#{@db_name}' successful"
           resolve true
         .catch (error) =>
-          @logger.log @logger.levels.ERROR, "Clearing IndexedDB '#{@db_name}' failed"
+          @logger.error "Clearing IndexedDB '#{@db_name}' failed"
           reject error
-      @logger.log @logger.levels.ERROR, "IndexedDB '#{@db_name}' not found"
+      @logger.error "IndexedDB '#{@db_name}' not found"
       resolve true
 
   ###
@@ -243,7 +243,7 @@ class z.storage.StorageService
         return @db[store_name].toArray()
         .then (records) -> resolve records
         .catch (error) =>
-          @logger.log @logger.levels.ERROR, "Could not load objects from store '#{store_name}'", error
+          @logger.error "Could not load objects from store '#{store_name}'", error
           reject error
       reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
@@ -283,7 +283,7 @@ class z.storage.StorageService
         return @db[store_name].get primary_key
         .then (record) -> resolve record
         .catch (error) =>
-          @logger.log @logger.levels.ERROR, "Failed to load '#{primary_key}' from store '#{store_name}'", error
+          @logger.error "Failed to load '#{primary_key}' from store '#{store_name}'", error
           reject error
       reject new Error z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
@@ -336,7 +336,7 @@ class z.storage.StorageService
         return @db[store_name].put entity, primary_key
         .then resolve
         .catch (error) =>
-          @logger.log @logger.levels.ERROR, "Failed to put '#{primary_key}' into store '#{store_name}'", error
+          @logger.error "Failed to put '#{primary_key}' into store '#{store_name}'", error
           reject error
       reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
 
@@ -346,7 +346,7 @@ class z.storage.StorageService
   @param reason [String] Cause for the termination
   ###
   terminate: (reason = 'unknown reason') ->
-    @logger.log "Closing database connection with '#{@db.name}' because of '#{reason}'."
+    @logger.info "Closing database connection with '#{@db.name}' because of '#{reason}'."
     @db.close()
 
   ###
@@ -362,10 +362,9 @@ class z.storage.StorageService
       if @db[store_name]?
         return @db[store_name].update primary_key, changes
         .then (number_of_updates) =>
-          @logger.log @logger.levels.INFO,
-            "Updated #{number_of_updates} record(s) with key '#{primary_key}' in store '#{store_name}'", changes
+          @logger.info "Updated #{number_of_updates} record(s) with key '#{primary_key}' in store '#{store_name}'", changes
           resolve number_of_updates
         .catch (error) =>
-          @logger.log @logger.levels.ERROR, "Failed to update '#{primary_key}' in store '#{store_name}'", error
+          @logger.error "Failed to update '#{primary_key}' in store '#{store_name}'", error
           reject error
       reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND

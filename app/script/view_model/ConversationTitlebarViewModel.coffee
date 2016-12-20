@@ -76,7 +76,7 @@ class z.ViewModel.ConversationTitlebarViewModel
   click_on_maximize: =>
     @multitasking.auto_minimize false
     @multitasking.is_minimized false
-    @logger.log @logger.levels.INFO, "Maximizing call '#{@joined_call().id}' on user click"
+    @logger.info "Maximizing call '#{@joined_call().id}' on user click"
 
   click_on_participants: =>
     @show_participants()

@@ -135,20 +135,10 @@ class z.client.ClientService
     .first()
     .then (client_record) =>
       if client_record is undefined
-        @logger.log @logger.levels.INFO, "Client with primary key '#{primary_key}' not found in database"
+        @logger.info "Client with primary key '#{primary_key}' not found in database"
         return primary_key
-      @logger.log @logger.levels.INFO, "Loaded client record from database '#{primary_key}'", client_record
+      @logger.info "Loaded client record from database '#{primary_key}'", client_record
       return client_record
-
-  ###
-  Loads a persisted clients from the database for given user id.
-  @param user_id [String]
-  @return [Promise<Array>] Promise that resolves with an array of client records
-  ###
-  load_clients_from_db_by_user_id: (user_id) ->
-    return @storage_service.get_keys @storage_service.OBJECT_STORE_CLIENTS, user_id
-    .then (primary_keys) =>
-      return @load_clients_from_db primary_keys
 
   ###
   Loads persisted clients from the database.
@@ -172,8 +162,7 @@ class z.client.ClientService
 
     return @storage_service.save @storage_service.OBJECT_STORE_CLIENTS, primary_key, client_payload
     .then (primary_key) =>
-      @logger.log @logger.levels.INFO,
-        "Client '#{client_payload.id}' stored with primary key '#{primary_key}'", client_payload
+      @logger.info "Client '#{client_payload.id}' stored with primary key '#{primary_key}'", client_payload
       return client_payload
 
   ###
