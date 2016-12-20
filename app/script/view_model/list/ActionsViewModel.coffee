@@ -143,4 +143,4 @@ class z.ViewModel.list.ActionsViewModel
         @selected_conversation null
         resolve conversation_et
       else
-        @logger.log @logger.levels.ERROR, 'Cannot complete menu actions as there is no active conversation'
+        @logger.error 'Cannot complete menu actions as there is no active conversation'

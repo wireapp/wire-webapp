@@ -211,7 +211,6 @@ z.string.tr.modal_uploads_parallel = 'Tek seferde en fazla %no boyutunda dosya g
 # Connection requests
 z.string.tr.connection_request_connect = 'Bağlan'
 z.string.tr.connection_request_ignore = 'Görmezden gel'
-z.string.tr.connection_request_message = 'Merhaba %@.first_name,\nHaydi Wire üzerinden bağlanalım!\n%s.first.name'
 
 # Conversation
 z.string.tr.conversation_you_nominative = 'sen'
@@ -287,13 +286,15 @@ z.string.tr.conversations_popover_notify = 'Susturmayı Aç'
 z.string.tr.conversations_popover_silence = 'Sustur'
 z.string.tr.conversations_popover_unarchive = 'Arşivden Çıkar'
 
+# Takeover
+z.string.tr.takeover_link = 'Daha fazla bilgi'
+
 # Invites
 z.string.tr.invite_meta_key_mac = 'Cmd'
 z.string.tr.invite_meta_key_pc = 'Ctrl'
 z.string.tr.invite_hint_selected = 'Kopyalamak için %meta_key + C'
 z.string.tr.invite_hint_unselected = 'Seç ve %meta_key + C tuşlarına bas'
 z.string.tr.invite_headline = 'İnsanların Wire’a davet et'
-z.string.tr.invite_message = 'Wire’dayım. %mail ile aratabilir veya https://get.wire.com adresini ziyaret edip bana bağlanabilirsin.'
 z.string.tr.invite_message_no_email = 'Wire’dayım. https://get.wire.com ’u ziyaret ederek bana bağlanabilirsin.'
 
 # Extensions
@@ -450,9 +451,6 @@ z.string.tr.search_top_people = 'Enler'
 z.string.tr.search_try_search = 'İnsanları isim veya tam e-posta adreslerine göre bulun'
 z.string.tr.search_no_contacts_on_wire = 'Wire’da hiç kişiniz yok.\nİnsanları isimlerini kullanarak ya da\ne-posta adresleriyle bulmayı deneyin'
 z.string.tr.search_others = 'Bağlan'
-z.string.tr.search_suggestion_one = '%@.first_name’i tanıyor'
-z.string.tr.search_suggestion_two = '%@.first_name ve %@.other_name’i tanıyor'
-z.string.tr.search_suggestion_many = '%@.first_name ve diğer %no kişiyi tanıyor'
 
 # Picture upload
 z.string.tr.upload_welcome = 'Wire bir fotoğrafla çok daha iyi.'

@@ -70,9 +70,9 @@ class z.auth.AuthRepository
   logout: =>
     @auth_service.post_logout()
     .then =>
-      @logger.log @logger.levels.INFO, 'Log out on backend successful'
+      @logger.info 'Log out on backend successful'
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "Log out on backend failed: #{error.message}", error
+      @logger.warn "Log out on backend failed: #{error.message}", error
 
   ###
   Register a new user (with email).
@@ -90,8 +90,7 @@ class z.auth.AuthRepository
       z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.PERSIST, true
       z.util.StorageUtil.set_value z.storage.StorageKey.AUTH.SHOW_LOGIN, true
       z.util.StorageUtil.set_value new_user.label_key, new_user.label
-      @logger.log @logger.levels.INFO,
-        "COOKIE::'#{new_user.label}' Saved cookie label with key '#{new_user.label_key}' in Local Storage",
+      @logger.info "COOKIE::'#{new_user.label}' Saved cookie label with key '#{new_user.label_key}' in Local Storage",
           key: new_user.label_key,
           value: new_user.label
       return response
@@ -124,18 +123,18 @@ class z.auth.AuthRepository
 
   # Renew access-token provided a valid cookie.
   renew_access_token: (trigger) =>
-    @logger.log @logger.levels.INFO, "Access token renewal started. Source: #{trigger}"
+    @logger.info "Access token renewal started. Source: #{trigger}"
     @get_access_token()
     .then =>
       @auth_service.client.execute_request_queue()
       amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED
     .catch (error) =>
       if error.type is z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN or z.util.Environment.frontend.is_localhost()
-        @logger.log @logger.levels.WARN, "Session expired on access token refresh: #{error.message}", error
+        @logger.warn "Session expired on access token refresh: #{error.message}", error
         Raygun.send error
         amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.SESSION_EXPIRED, false, true
       else if error.type isnt z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
-        @logger.log @logger.levels.ERROR, "Refreshing access token failed: '#{error.type}'", error
+        @logger.error "Refreshing access token failed: '#{error.type}'", error
         amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
 
   # Get the cached access token from the Amplify store.
@@ -145,7 +144,7 @@ class z.auth.AuthRepository
       access_token_type = z.util.StorageUtil.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE
 
       if access_token
-        @logger.log @logger.levels.INFO, 'Cached access token found in Local Storage', {access_token: access_token}
+        @logger.info 'Cached access token found in Local Storage', {access_token: access_token}
         @auth_service.save_access_token_in_client access_token_type, access_token
         @_schedule_token_refresh z.util.StorageUtil.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION
         resolve()
@@ -212,7 +211,7 @@ class z.auth.AuthRepository
   ###
   _log_access_token_update: (access_token_data, expiration_timestamp) =>
     expiration_log = z.util.format_timestamp expiration_timestamp, false
-    @logger.log @logger.levels.INFO, "Saved updated access token. It will expire on: #{expiration_log}", access_token_data
+    @logger.info "Saved updated access token. It will expire on: #{expiration_log}", access_token_data
 
   ###
   Refreshes the access token in time before it expires.
@@ -229,13 +228,13 @@ class z.auth.AuthRepository
       @renew_access_token 'Immediate on scheduling'
     else
       time = z.util.format_timestamp callback_timestamp, false
-      @logger.log @logger.levels.INFO, "Scheduling next access token refresh for '#{time}'"
+      @logger.info "Scheduling next access token refresh for '#{time}'"
 
       @access_token_refresh = window.setTimeout =>
         if callback_timestamp > (Date.now() + 15000)
-          @logger.log @logger.levels.INFO, "Access token refresh scheduled for '#{time}' skipped because it was executed late"
+          @logger.info "Access token refresh scheduled for '#{time}' skipped because it was executed late"
         else if navigator.onLine
           @renew_access_token "Schedule for '#{time}'"
         else
-          @logger.log @logger.levels.INFO, "Access token refresh scheduled for '#{time}' skipped because we are offline"
+          @logger.info "Access token refresh scheduled for '#{time}' skipped because we are offline"
       , callback_timestamp - Date.now()

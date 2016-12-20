@@ -264,7 +264,7 @@ class z.components.UserProfileViewModel
         is_verified: toggle_verified
     }
     .then => @selected_device().meta.is_verified toggle_verified
-    .catch (error) => @logger.log @logger.levels.WARN, "Client cannot be updated: #{error.message}"
+    .catch (error) => @logger.warn "Client cannot be updated: #{error.message}"
 
   on_tab_index_changed: (index) =>
     if index is 1
@@ -278,7 +278,7 @@ class z.components.UserProfileViewModel
         else
           @devices_found false
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Unable to retrieve clients data for user '#{user_id}': #{error}"
+        @logger.error "Unable to retrieve clients data for user '#{user_id}': #{error}"
 
   dispose: =>
     @cleanup_computed.dispose()

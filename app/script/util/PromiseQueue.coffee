@@ -23,8 +23,16 @@ z.conversation ?= {}
 
 class z.util.PromiseQueue
 
-  constructor: ->
+  ###
+  Process Promises sequentially.
+
+  @param options [Object]
+  @option timeout [Number] timeout in ms
+  ###
+  constructor: (options = {}) ->
     @logger = new z.util.Logger 'z.util.PromiseQueue', z.config.LOGGER.OPTIONS
+
+    @_timeout = options.timeout or SENDING_QUEUE_UNBLOCK_INTERVAL
 
     @_promises = []
     @_queue = []
@@ -60,9 +68,9 @@ class z.util.PromiseQueue
         return if @_paused
         @_blocked = false
         window.clearInterval @_interval
-        @logger.log @logger.levels.ERROR, 'Promise queue failed, unblocking queue', @_queue
+        @logger.error 'Promise queue failed, unblocking queue', @_queue
         @execute()
-      , SENDING_QUEUE_UNBLOCK_INTERVAL
+      , @_timeout
 
       return queue_entry.function()
       .catch (error) ->

@@ -34,7 +34,7 @@ class z.media.MediaElementHandler
   add_media_element: (media_stream_info) =>
     remote_media_element = @_create_media_element media_stream_info
     @remote_media_elements.push remote_media_element
-    @logger.log @logger.levels.INFO, "Created MediaElement of type '#{remote_media_element.nodeName.toLowerCase()}' for MediaStream of flow '#{media_stream_info.flow_id}'", remote_media_element
+    @logger.info "Created MediaElement of type '#{remote_media_element.nodeName.toLowerCase()}' for MediaStream of flow '#{media_stream_info.flow_id}'", remote_media_element
 
   ###
   Destroy the remote media element of a flow.
@@ -45,7 +45,7 @@ class z.media.MediaElementHandler
     for media_element in @_get_media_elements flow_id
       @_destroy_media_element media_element
       @remote_media_elements.remove media_element
-      @logger.log @logger.levels.INFO, "Deleted MediaElement of type '#{media_element.tagName.toLocaleLowerCase()}' for flow '#{flow_id}'"
+      @logger.info "Deleted MediaElement of type '#{media_element.tagName.toLocaleLowerCase()}' for flow '#{flow_id}'"
 
   ###
   Switch the output device used for all MediaElements.
@@ -71,8 +71,7 @@ class z.media.MediaElementHandler
       media_element.setAttribute 'autoplay', true
       return media_element
     catch error
-      @logger.log @logger.levels.ERROR,
-        "Unable to create AudioElement for flow '#{media_stream_info.flow_id}'", error
+      @logger.error "Unable to create AudioElement for flow '#{media_stream_info.flow_id}'", error
 
   ###
   Stop the media element.
@@ -99,7 +98,6 @@ class z.media.MediaElementHandler
   _set_media_element_output: (media_element, sink_id) ->
     media_element.setSinkId sink_id
     .then =>
-      @logger.log @logger.levels.INFO, "Audio output device attached to flow '#{media_element.dataset['flow_id']} changed to '#{sink_id}'", media_element
+      @logger.info "Audio output device attached to flow '#{media_element.dataset['flow_id']} changed to '#{sink_id}'", media_element
     .catch (error) =>
-      @logger.log @logger.levels.INFO,
-        "Failed to attach audio output device '#{sink_id}' to flow '#{media_element.dataset['flow_id']}: #{error.message}", error
+      @logger.warn "Failed to attach audio output device '#{sink_id}' to flow '#{media_element.dataset['flow_id']}: #{error.message}", error

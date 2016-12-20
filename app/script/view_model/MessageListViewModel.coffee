@@ -179,7 +179,7 @@ class z.ViewModel.MessageListViewModel
     window.requestAnimationFrame =>
       is_current_conversation = conversation_et is @conversation()
       if not is_current_conversation
-        @logger.log @logger.levels.INFO, 'Skipped loading conversation', conversation_et.display_name()
+        @logger.info 'Skipped loading conversation', conversation_et.display_name()
         return
 
       # reset scroll position

@@ -78,7 +78,7 @@ class z.cryptography.CryptographyMapper
       when 'text'
         return @_map_text generic_message.text, generic_message.message_id
       else
-        @logger.log @logger.levels.DEBUG, "Skipped event '#{generic_message.message_id}' of unhandled type '#{generic_message.content}'", {event: event, generic_message: generic_message}
+        @logger.debug "Skipped event '#{generic_message.message_id}' of unhandled type '#{generic_message.content}'", {event: event, generic_message: generic_message}
         throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
 
   _map_asset: (asset, event_nonce, event_id) ->
@@ -94,7 +94,7 @@ class z.cryptography.CryptographyMapper
       return @_map_asset_original asset.original, event_nonce
     else
       error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
-      @logger.log @logger.levels.INFO, "Skipped event '#{event_id}': #{error.message}"
+      @logger.info "Skipped event '#{event_id}': #{error.message}"
       throw error
 
   _map_image_asset_v3: (asset, event_nonce) ->
@@ -218,10 +218,10 @@ class z.cryptography.CryptographyMapper
     .then (external_message_buffer) ->
       return z.proto.GenericMessage.decode external_message_buffer
     .then (generic_message) =>
-      @logger.log @logger.levels.INFO, "Received external message of type '#{generic_message.content}'", generic_message
+      @logger.info "Received external message of type '#{generic_message.content}'", generic_message
       return @_map_generic_message generic_message, event
     .catch (error) ->
-      @logger.log @logger.levels.ERROR, "Failed to map external message: #{error.message}", error
+      @logger.error "Failed to map external message: #{error.message}", error
       throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.BROKEN_EXTERNAL
 
   _map_hidden: (hidden) ->
@@ -237,7 +237,7 @@ class z.cryptography.CryptographyMapper
       return @_map_image_medium image, event_id
     else
       error = new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
-      @logger.log @logger.levels.INFO, "Skipped event '#{event_id}': #{error.message}"
+      @logger.info "Skipped event '#{event_id}': #{error.message}"
       throw error
 
   _map_image_medium: (image, event_id = z.util.create_random_uuid()) ->
