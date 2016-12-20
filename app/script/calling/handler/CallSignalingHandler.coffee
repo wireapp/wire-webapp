@@ -71,7 +71,7 @@ class z.calling.handler.CallSignalingHandler
     .then (call_et) =>
       @_add_flow call_et, flow for flow in event.flows
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "Ignored 'call.flow-add' in '#{event.conversation}' that has no call", error
+      @logger.warn "Ignored 'call.flow-add' in '#{event.conversation}' that has no call", error
 
   ###
   Handling of 'call.flow-delete' events.
@@ -82,7 +82,7 @@ class z.calling.handler.CallSignalingHandler
     .then (call_et) =>
       @_add_flow call_et, event.flow
     .catch =>
-      @logger.log @logger.levels.WARN, "Ignored 'call.flow-delete' in '#{event.conversation}' that has no call", event
+      @logger.warn "Ignored 'call.flow-delete' in '#{event.conversation}' that has no call", event
 
   ###
   Handling of 'call.remote-candidates-add' and 'call.remote-candidates-update' events.
@@ -95,14 +95,14 @@ class z.calling.handler.CallSignalingHandler
     .then (call_et) =>
       # And either add
       if flow_et = call_et.get_flow_by_id event.flow
-        @logger.log @logger.levels.INFO, "Received '#{mapped_candidates.length}' ICE candidates for existing flow '#{event.flow}'", mapped_candidates
+        @logger.info "Received '#{mapped_candidates.length}' ICE candidates for existing flow '#{event.flow}'", mapped_candidates
         for ice_candidate in mapped_candidates
           flow_et.add_remote_ice_candidate ice_candidate
       else
         throw new z.calling.CallError z.calling.CallError::TYPE.FLOW_NOT_FOUND
     .catch =>
       # Or cache them
-      @logger.log @logger.levels.INFO, "Cached '#{mapped_candidates.length}' ICE candidates for unknown flow '#{event.flow}'", mapped_candidates
+      @logger.info "Cached '#{mapped_candidates.length}' ICE candidates for unknown flow '#{event.flow}'", mapped_candidates
       for ice_candidate in mapped_candidates
         @_cache_ice_candidate event.flow, ice_candidate
 
@@ -116,7 +116,7 @@ class z.calling.handler.CallSignalingHandler
     @call_center.get_call_by_id event.conversation
     .then (call_et) =>
       if flow_et = call_et.get_flow_by_id event.flow
-        @logger.log @logger.levels.INFO, "Received remote SDP for existing flow '#{event.flow}'", remote_sdp
+        @logger.info "Received remote SDP for existing flow '#{event.flow}'", remote_sdp
         flow_et.save_remote_sdp remote_sdp
       else
         throw new z.calling.CallError z.calling.CallError::TYPE.FLOW_NOT_FOUND
@@ -124,11 +124,11 @@ class z.calling.handler.CallSignalingHandler
       if error.type is z.calling.CallError::TYPE.FLOW_NOT_FOUND
         if event.state is z.calling.rtc.SDPType.OFFER
           @_cache_remote_sdp event.flow, remote_sdp
-          @logger.log @logger.levels.INFO, "Cached remote SDP for unknown flow '#{event.flow}'", remote_sdp
+          @logger.info "Cached remote SDP for unknown flow '#{event.flow}'", remote_sdp
         else
-          @logger.log @logger.levels.WARN, "Ignored remote SDP non-offer before call for flow '#{event.flow}'", remote_sdp
+          @logger.warn "Ignored remote SDP non-offer before call for flow '#{event.flow}'", remote_sdp
       else
-        @logger.log @logger.levels.ERROR, "Failed to handle remote SDP: #{error.message}", error
+        @logger.error "Failed to handle remote SDP: #{error.message}", error
 
 
   ###############################################################################
@@ -143,20 +143,20 @@ class z.calling.handler.CallSignalingHandler
   delete_flow: (flow_info) =>
     Promise.resolve @call_center.media_element_handler.remove_media_element flow_info.flow_id
     .then =>
-      @logger.log @logger.levels.INFO, "DELETEing flow '#{flow_info.flow_id}'"
+      @logger.info "DELETEing flow '#{flow_info.flow_id}'"
       return @call_center.call_service.delete_flow flow_info
     .then (response) =>
-      @logger.log @logger.levels.DEBUG, "DELETEing flow '#{flow_info.flow_id}' successful"
+      @logger.debug "DELETEing flow '#{flow_info.flow_id}' successful"
       if flow_info.reason is z.calling.payloads.FlowDeletionReason.RELEASED
-        @logger.log @logger.levels.DEBUG, 'Flow was released - We need implement posting for flows to renegotiate'
+        @logger.debug 'Flow was released - We need implement posting for flows to renegotiate'
       return response
     .catch (error) =>
       if error.label is z.service.BackendClientError::LABEL.IN_USE
-        @logger.log @logger.levels.WARN, "DELETEing flow '#{flow_info.flow_id}' would have to be forced"
+        @logger.warn "DELETEing flow '#{flow_info.flow_id}' would have to be forced"
         flow_info.reason = z.calling.payloads.FlowDeletionReason.RELEASED
         return @delete_flow flow_info
       else
-        @logger.log @logger.levels.ERROR, "DELETEing flow '#{flow_info.flow_id}' failed: #{error.message}", error
+        @logger.error "DELETEing flow '#{flow_info.flow_id}' failed: #{error.message}", error
         attributes = {cause: error.label or error.name, method: 'delete', request: 'flows'}
         @call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
 
@@ -165,19 +165,18 @@ class z.calling.handler.CallSignalingHandler
   @param conversation_id [String] Conversation ID of call to be posted for flows
   ###
   post_for_flows: (conversation_id) =>
-    @logger.log @logger.levels.INFO, "POSTing for flows in conversation '#{conversation_id}'"
+    @logger.info "POSTing for flows in conversation '#{conversation_id}'"
     @call_center.call_service.post_flows conversation_id
     .then (response) =>
       return @call_center.get_call_by_id conversation_id
       .then (call_et) =>
-        @logger.log @logger.levels.DEBUG, "POSTing for flows in '#{conversation_id}' successful", response
+        @logger.debug "POSTing for flows in '#{conversation_id}' successful", response
         @_add_flow call_et, flow for flow in response.flows when flow.active is true
     .catch (error) =>
       if error.type is z.calling.CallError::TYPE.CALL_NOT_FOUND
-        @logger.log @logger.levels.WARN, "POSTing for flows in '#{conversation_id}' successful, call gone", error
+        @logger.warn "POSTing for flows in '#{conversation_id}' successful, call gone", error
       else
-        @logger.log @logger.levels.ERROR,
-          "POSTing for flows in conversation '#{conversation_id}' failed: #{error.message}", error
+        @logger.error "POSTing for flows in conversation '#{conversation_id}' failed: #{error.message}", error
         attributes = {cause: error.label or error.name, method: 'post', request: 'flows'}
         @call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
 
@@ -213,16 +212,16 @@ class z.calling.handler.CallSignalingHandler
   @param conversation_id [String] Conversation ID to get and delete all flows for
   ###
   _delete_flows: (conversation_id) ->
-    @logger.log @logger.levels.WARN, "Deleting all flows for '#{conversation_id}'"
+    @logger.warn "Deleting all flows for '#{conversation_id}'"
     @_get_flows conversation_id
     .then (flows) =>
       flows_to_delete = flows.length
 
       if flows_to_delete is 0
-        @logger.log @logger.levels.INFO, "No flows for conversation '#{conversation_id}' to delete"
+        @logger.info "No flows for conversation '#{conversation_id}' to delete"
         return
 
-      @logger.log @logger.levels.INFO, "We will cleanup '#{flows.length}' flows from conversation '#{conversation_id}'"
+      @logger.info "We will cleanup '#{flows.length}' flows from conversation '#{conversation_id}'"
 
       deletions = 0
       for flow in flows
@@ -231,7 +230,7 @@ class z.calling.handler.CallSignalingHandler
         .then =>
           deletions += 1
           if deletions is flows_to_delete
-            @logger.log @logger.levels.INFO, "We deleted all '#{deletions}' flows for conversation '#{conversation_id}'"
+            @logger.info "We deleted all '#{deletions}' flows for conversation '#{conversation_id}'"
 
   ###
   Get flows from backend.
@@ -239,14 +238,14 @@ class z.calling.handler.CallSignalingHandler
   @param conversation_id [String] Conversation ID of call to get flows for
   ###
   _get_flows: (conversation_id) ->
-    @logger.log @logger.levels.INFO, "GETting flows for '#{conversation_id}'"
+    @logger.info "GETting flows for '#{conversation_id}'"
     return @call_center.call_service.get_flows conversation_id
     .then (response_array) =>
       [response, jqXHR] = response_array
-      @logger.log @logger.levels.DEBUG, "GETting flows for '#{conversation_id}' successful"
+      @logger.debug "GETting flows for '#{conversation_id}' successful"
       return response.flows
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "GETting flows for '#{conversation_id}' failed: #{error.message}", error
+      @logger.error "GETting flows for '#{conversation_id}' failed: #{error.message}", error
       attributes = {cause: error.label or error.name, method: 'get', request: 'flows'}
       @call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
 
@@ -263,14 +262,13 @@ class z.calling.handler.CallSignalingHandler
   @param on_error [Function] Function to be called on failure
   ###
   put_local_sdp: (sdp_info, on_success, on_failure) =>
-    @logger.log @logger.levels.INFO, "PUTting local SDP for flow '#{sdp_info.flow_id}'", sdp_info
+    @logger.info "PUTting local SDP for flow '#{sdp_info.flow_id}'", sdp_info
     @call_center.call_service.put_local_sdp sdp_info.conversation_id, sdp_info.flow_id, sdp_info.sdp
     .then (response) =>
-      @logger.log @logger.levels.DEBUG, "PUTting local SDP for flow '#{sdp_info.flow_id}' successful"
+      @logger.debug "PUTting local SDP for flow '#{sdp_info.flow_id}' successful"
       on_success? response
     .catch (error) =>
-      @logger.log @logger.levels.ERROR,
-        "PUTting local SDP for flow '#{sdp_info.flow_id}' failed: #{error.message}", error
+      @logger.error "PUTting local SDP for flow '#{sdp_info.flow_id}' failed: #{error.message}", error
       attributes = {cause: error.label or error.name, method: 'put', request: 'sdp', sdp_type: sdp_info.sdp.type}
       @call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
       on_failure? error
@@ -300,13 +298,12 @@ class z.calling.handler.CallSignalingHandler
   post_ice_candidate: (ice_info) =>
     candidate = @ice_mapper.map_ice_object_to_message ice_info.ice_candidate
 
-    @logger.log @logger.levels.INFO, "POSTing local ICE candidate for flow '#{ice_info.flow_id}'", candidate
+    @logger.info "POSTing local ICE candidate for flow '#{ice_info.flow_id}'", candidate
     @call_center.call_service.post_local_candidates ice_info.conversation_id, ice_info.flow_id, candidate
     .then =>
-      @logger.log @logger.levels.INFO, "POSTing local ICE candidate for flow '#{ice_info.flow_id}' successful"
+      @logger.info "POSTing local ICE candidate for flow '#{ice_info.flow_id}' successful"
     .catch (error) =>
-      @logger.log @logger.levels.ERROR,
-        "POSTing local ICE candidate for flow '#{ice_info.flow_id}' failed: #{error.message}", error
+      @logger.error "POSTing local ICE candidate for flow '#{ice_info.flow_id}' failed: #{error.message}", error
       attributes = {cause: error.label or error.name, method: 'put', request: 'ice_candidate'}
       @call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
 

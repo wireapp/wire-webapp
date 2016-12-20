@@ -101,7 +101,7 @@ class z.calling.entities.Call
         amplify.publish z.event.WebApp.CALL.SIGNALING.POST_FLOWS, @id if @get_number_of_participants()
       else
         @is_connected false
-        amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP if @state() is z.calling.enum.CallState.ONGOING
+        amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP if @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
         @telemetry.track_duration @
         @_reset_timer()
         @_reset_flows()
@@ -121,7 +121,7 @@ class z.calling.entities.Call
         amplify.publish z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION
 
     @state.subscribe (state) =>
-      @logger.log @logger.levels.DEBUG, "Call state changed to '#{state}'"
+      @logger.debug "Call state changed to '#{state}'"
 
       @_clear_join_timer() if @is_group()
 
@@ -240,7 +240,7 @@ class z.calling.entities.Call
   add_participant: (participant_et) =>
     if not @get_participant_by_id participant_et.user.id
       @participants.push participant_et
-      @logger.log @logger.levels.DEBUG, "Participants updated: '#{participant_et.user.name()}' added'"
+      @logger.debug "Participants updated: '#{participant_et.user.name()}' added'"
       return true
     return false
 
@@ -252,7 +252,7 @@ class z.calling.entities.Call
   @return [Boolean] Has the participant been removed
   ###
   delete_participant: (participant_et, delete_on_backend = true) =>
-    @interrupted_participants.remove @participant_et
+    @interrupted_participants.remove participant_et
     return false if not @get_participant_by_id participant_et.user.id
 
     # Delete participant
@@ -262,7 +262,7 @@ class z.calling.entities.Call
     if flow_et
       @_delete_flow_by_id flow_et, delete_on_backend
 
-    @logger.log @logger.levels.DEBUG, "Participants updated: '#{participant_et.user.name()}' removed"
+    @logger.debug "Participants updated: '#{participant_et.user.name()}' removed"
     if not @get_number_of_participants()
       amplify.publish z.event.WebApp.CALL.STATE.DELETE, @id
     return true
@@ -288,7 +288,7 @@ class z.calling.entities.Call
   ###
   set_creator: (user_et) =>
     if not @creator()
-      @logger.log @logger.levels.INFO, "Call created by: #{user_et.name()}"
+      @logger.info "Call created by: #{user_et.name()}"
       @creator user_et
 
   ###
@@ -305,7 +305,7 @@ class z.calling.entities.Call
   update_participants: (participant_ets = [], sequential_event = false) =>
     sequential_event = false if @state() in z.calling.enum.CallStateGroups.IS_RINGING
     if sequential_event
-      @logger.log @logger.levels.INFO, 'Sequential event by request: Only one participant change will be applied'
+      @logger.info 'Sequential event by request: Only one participant change will be applied'
 
     # Add active participants
     for participant_et in participant_ets when @add_participant participant_et
@@ -324,7 +324,7 @@ class z.calling.entities.Call
       for participant_et in delete_participants_ets when @delete_participant participant_et
         participant_left = true
         break if sequential_event
-      if participant_left and @self_client_joined() and @state() is z.calling.enum.CallState.ONGOING
+      if participant_left and @self_client_joined() and @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP
 
     @_sort_participants_by_panning()
@@ -357,14 +357,14 @@ class z.calling.entities.Call
     if participant_et
       # We have to update the user info
       if @get_flow_by_id flow_id
-        @logger.log @logger.levels.WARN, "Not adding flow '#{flow_id}' as it already exists"
+        @logger.warn "Not adding flow '#{flow_id}' as it already exists"
       else
-        @logger.log @logger.levels.DEBUG, "Adding flow '#{flow_id}' to participant '#{participant_et.user.name()}'"
+        @logger.debug "Adding flow '#{flow_id}' to participant '#{participant_et.user.name()}'"
         create_flow flow_id, participant_et
     else
       participant_et = new z.calling.entities.Participant user_et
       @add_participant participant_et
-      @logger.log @logger.levels.DEBUG, "Adding flow '#{flow_id}' to new participant '#{participant_et.user.name()}'"
+      @logger.debug "Adding flow '#{flow_id}' to new participant '#{participant_et.user.name()}'"
       create_flow flow_id, participant_et
 
   ###
@@ -460,12 +460,10 @@ class z.calling.entities.Call
 
     for participant_et, i in @participants()
       panning = @_calculate_panning i, @participants().length
-      @logger.log @logger.levels.INFO,
-        "Panning for '#{participant_et.user.name()}' recalculated to '#{panning}'"
+      @logger.info "Panning for '#{participant_et.user.name()}' recalculated to '#{panning}'"
       participant_et.panning panning
 
-    panning_info = (participant_et.user.name() for participant_et in @participants()).join ', '
-    @logger.log @logger.levels.INFO, "New panning order: #{panning_info}"
+    @logger.info "New panning order: #{(participant_et.user.name() for participant_et in @participants()).join ', '}"
 
 
   ###############################################################################

@@ -48,15 +48,7 @@ ko.components.register 'link-preview-asset',
             <!-- ko ifnot: expired()-->
               <div class="link-preview-container" data-bind="click: on_link_preview_click">
                 <!-- ko if: preview.image_resource()-->
-                  <span class="link-preview-image image-placeholder-icon image-loading"
-                        data-bind="background_image: preview.image_resource, viewport_changed: viewport_changed">
-                    <img />
-                    <div class="three-dots">
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                    </div>
-                  </span>
+                  <image-component class="link-preview-image" params="asset: preview.image_resource"></image-component>
                 <!-- /ko -->
                 <div class="link-preview-title" data-bind="text: preview.title"></div>
                 <a class="link-preview-site text-graphite ellipsis" target="_blank" rel="nofollow noopener noreferrer"

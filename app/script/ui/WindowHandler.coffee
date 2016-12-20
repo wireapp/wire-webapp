@@ -40,14 +40,14 @@ class z.ui.WindowHandler
     @_listen_to_window_resize()
     @_listen_to_visibility_change =>
       if document.visibilityState is 'visible'
-        @logger.log 'Webapp is visible'
+        @logger.info 'Webapp is visible'
         @is_visible = true
         window.clearInterval @lost_focus_interval
         @lost_focus_interval = undefined
         @lost_focus_on = undefined
         amplify.publish z.event.WebApp.ANALYTICS.SESSION.START
       else
-        @logger.log 'Webapp is hidden'
+        @logger.info 'Webapp is hidden'
         @is_visible = false
         if @lost_focus_interval is undefined
           @lost_focus_on = Date.now()

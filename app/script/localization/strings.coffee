@@ -268,6 +268,7 @@ z.string.conversation_context_menu_unlike = 'Unlike'
 z.string.conversation_delete_timestamp = 'Deleted on %@timestamp'
 z.string.conversation_edit_timestamp = 'Edited on %@timestamp'
 z.string.conversation_likes_caption = '%@number people'
+z.string.conversation_send_pasted_file = 'Pasted image at %date'
 
 # Archive
 z.string.archive_header = 'Archive'
@@ -456,18 +457,13 @@ z.string.search_group_hint = 'Keep typing or pick more people to create a group'
 z.string.search_connect = 'Connect'
 z.string.search_connections = 'Connections'
 z.string.search_groups = 'Groups'
-z.string.search_placeholder = 'Search by name or email'
+z.string.search_placeholder = 'Search by name or username'
 z.string.search_top_people = 'Top people'
-z.string.search_try_search = 'Find people by name or\nfull email address'
-z.string.search_no_contacts_on_wire = 'You have no contacts on Wire.\nTry finding people by name or\nfull email address'
+z.string.search_try_search = 'Find people by\nname or username'
+z.string.search_no_contacts_on_wire = 'You have no contacts on Wire.\nTry finding people by\nname or username.'
 z.string.search_others = 'Connect'
 z.string.search_friend_in_common = '%no person in common'
 z.string.search_friends_in_common = '%no people in common'
-
-# Picture upload
-z.string.upload_welcome = 'Wire is so much nicer with a picture.'
-z.string.upload_welcome_keep = 'keep this one'
-z.string.upload_welcome_choose = 'choose your own'
 
 # Google contacts upload
 z.string.upload_google_headline = 'Find people\nto talk to.'

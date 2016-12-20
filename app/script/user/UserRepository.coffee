@@ -104,7 +104,7 @@ class z.user.UserRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.CONNECT_REQUEST_SENT
       @user_connection response, show_conversation
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to send connection request to user '#{user_et.id}': #{error.message}", error
+      @logger.error "Failed to send connection request to user '#{user_et.id}': #{error.message}", error
 
   ###
   Get a connection for a user ID.
@@ -151,7 +151,7 @@ class z.user.UserRepository
 
       return @connections()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to retrieve connections from backend: #{error.message}", error
+      @logger.error "Failed to retrieve connections from backend: #{error.message}", error
       throw error
 
   ###
@@ -196,12 +196,12 @@ class z.user.UserRepository
   _assign_all_clients: =>
     @client_repository.get_all_clients_from_db()
     .then (user_client_map) =>
-      @logger.log "Found locally stored clients for '#{Object.keys(user_client_map).length}' users", user_client_map
+      @logger.info "Found locally stored clients for '#{Object.keys(user_client_map).length}' users", user_client_map
       user_ids = (user_id for user_id, client_ets of user_client_map)
       @get_users_by_id user_ids, (user_ets) =>
         for user_et in user_ets
-          log_level = if user_client_map[user_et.id].length > 8 then @logger.levels.WARN else @logger.levels.INFO
-          @logger.log log_level, "Found '#{user_client_map[user_et.id].length}' clients for '#{user_et.name()}'", user_client_map[user_et.id]
+          if user_client_map[user_et.id].length > 8
+            @logger.warn "Found '#{user_client_map[user_et.id].length}' clients for '#{user_et.name()}'", user_client_map[user_et.id]
           user_et.devices user_client_map[user_et.id]
 
   # Assign connections to the users.
@@ -226,8 +226,7 @@ class z.user.UserRepository
     .then (response) =>
       @user_connection response, show_conversation
     .catch (error) =>
-      @logger.log @logger.levels.ERROR,
-        "Connection status change to '#{status}' for user '#{user_et.id}' failed: #{error.message}", error
+      @logger.error "Connection status change to '#{status}' for user '#{user_et.id}' failed: #{error.message}", error
       custom_data =
         current_status: user_et.connection().status()
         failed_action: status
@@ -339,9 +338,9 @@ class z.user.UserRepository
   delete_me: =>
     @user_service.delete_self()
     .then =>
-      @logger.log @logger.levels.INFO, 'Account deletion initiated'
+      @logger.info 'Account deletion initiated'
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Unable to delete self: #{error}"
+      @logger.error "Unable to delete self: #{error}"
 
   ###
   Get a user from the backend.
@@ -405,7 +404,7 @@ class z.user.UserRepository
       user_et = @user_mapper.map_self_user_from_object response
       return @save_user user_et, true
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Unable to load self user: #{error}"
+      @logger.error "Unable to load self user: #{error}"
       throw error
 
   ###

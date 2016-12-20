@@ -73,6 +73,19 @@ describe 'Conversation', ->
     it 'is not verified when nothing is set', ->
       expect(conversation_et.is_verified()).toBeFalsy()
 
+    it 'is verified when self user has no remote clients', ->
+      verified_client_et = new z.client.Client()
+      verified_client_et.meta.is_verified true
+
+      self_user_et = new z.entity.User()
+      conversation_et.self = self_user_et
+
+      user_et = new z.entity.User()
+      user_et.devices.push verified_client_et
+      conversation_et.participating_user_ets.push user_et
+
+      expect(conversation_et.is_verified()).toBeFalsy()
+
     it 'is not verified when participant has unverified device', ->
       unverified_client_et = new z.client.Client()
       verified_client_et = new z.client.Client()

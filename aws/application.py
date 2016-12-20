@@ -120,6 +120,12 @@ def demo():
     'demo/index.html',
   ))
 
+@application.route('/sw.js')
+def service_worker():
+ response = flask.make_response(flask.render_template('sw.js'))
+ response.headers['Content-Type'] = 'application/javascript'
+ response.headers['Cache-Control'] = 'no-cache'
+ return response
 
 ###############################################################################
 # Error Stuff
