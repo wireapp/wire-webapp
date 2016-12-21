@@ -40,6 +40,29 @@ ko.bindingHandlers.drop_file =
         drop: fileSelectHandler
     , context
 
+# capture pasted files
+ko.bindingHandlers.paste_file =
+  init: (element, valueAccessor, allBindings, data, context) ->
+
+    on_paste = (data, event) ->
+      clipboard_data = event.originalEvent.clipboardData
+      items = [].slice.call clipboard_data.items or clipboard_data.files
+
+      files = items
+        .filter (item) -> item.kind is 'file'
+        .map (item) -> new File [item.getAsFile()], null, type: item.type
+        .filter (item) -> item? and item.size isnt 4 # Pasted files result in 4 byte blob (OSX)
+
+      if files.length > 0
+        valueAccessor() files
+        return false
+      return true
+
+    ko.applyBindingsToNode window,
+      event:
+        paste: on_paste
+    , context
+
 # blockes the default behaviour when dropping a file on the element
 # if an element inside that element is listening to drag events, than this will be triggered after
 ko.bindingHandlers.ignore_drop_file =
@@ -322,14 +345,14 @@ ko.bindingHandlers.in_viewport = do ->
     _dispose = ->
       z.util.ArrayUtil.remove_element listeners, _check_element
 
-    _check_element = (e) ->
+    _check_element = _.debounce (e) ->
       is_child = if e? then e.target.contains(element) else true
       if is_child and _in_view element
         dispose = valueAccessor()?()
         _dispose() if dispose
+    , 300
 
     listeners.push _check_element
-
-    window.setTimeout _check_element, 300
+    _check_element()
 
     ko.utils.domNodeDisposal.addDisposeCallback element, _dispose

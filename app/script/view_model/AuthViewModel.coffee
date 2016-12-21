@@ -23,6 +23,13 @@ TIMEOUT =
   SHORT: 500
   LONG: 2000
 
+FORWARDED_URL_PARAMETERS = [
+  z.auth.URLParameter.ASSETS_V3
+  z.auth.URLParameter.BOT
+  z.auth.URLParameter.ENVIRONMENT
+  z.auth.URLParameter.LOCALYTICS
+]
+
 ###
 View model for the auth page.
 
@@ -367,7 +374,7 @@ class z.ViewModel.AuthViewModel
     @pending_server_request true
     @user_service.change_own_password @password()
     .catch (error) =>
-      @logger.log @logger.levels.WARN, 'Could not change user password', error
+      @logger.warn 'Could not change user password', error
       if error.code isnt z.service.BackendClientError::STATUS_CODE.FORBIDDEN
         throw error
     .then =>
@@ -659,7 +666,7 @@ class z.ViewModel.AuthViewModel
       @device_modal.toggle()
     .catch (error) =>
       @remove_form_error true
-      @logger.log @logger.levels.ERROR, "Unable to replace device: #{error?.message}", error
+      @logger.error "Unable to replace device: #{error?.message}", error
 
   click_on_history_confirm: => @_redirect_to_app()
 
@@ -719,18 +726,18 @@ class z.ViewModel.AuthViewModel
     , TIMEOUT.LONG
 
   _wait_for_activate: =>
-    @logger.log 'Opened WebSocket connection to wait for account activation'
+    @logger.info 'Opened WebSocket connection to wait for account activation'
     @web_socket_service.connect (notification) =>
       event = notification.payload[0]
-      @logger.log "»» Event: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
+      @logger.info "»» Event: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
       if event.type is z.event.Backend.USER.ACTIVATE
         @_account_verified()
 
   _wait_for_update: =>
-    @logger.log 'Opened WebSocket connection to wait for user update'
+    @logger.info 'Opened WebSocket connection to wait for user update'
     @web_socket_service.connect (notification) =>
       event = notification.payload[0]
-      @logger.log "»» Event: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
+      @logger.info "»» Event: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
       if event.type is z.event.Backend.USER.UPDATE and event.user.email
         @_account_verified false
 
@@ -1108,12 +1115,14 @@ class z.ViewModel.AuthViewModel
   @private
   ###
   _validate_email: (mode) ->
-    if not @username().length
+    username = @username().trim().toLowerCase()
+
+    if not username.length
       @_add_error z.string.auth_error_email_missing, z.auth.AuthView.TYPE.EMAIL
     else if mode is z.auth.AuthView.MODE.ACCOUNT_PASSWORD
-      if not z.util.is_valid_email(@username()) and not z.util.is_valid_phone_number @username()
+      if not z.util.is_valid_email(username) and not z.util.is_valid_phone_number username
         @_add_error z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL
-    else if not z.util.is_valid_email @username()
+    else if not z.util.is_valid_email username
       @_add_error z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL
 
   ###
@@ -1199,10 +1208,21 @@ class z.ViewModel.AuthViewModel
   @param registration [Boolean] Verification from registration
   ###
   _account_verified: (registration = true) =>
-    @logger.log @logger.levels.INFO, 'User account verified. User can now login.'
+    @logger.info 'User account verified. User can now login.'
     if registration
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.REGISTRATION.SUCCEEDED, content: @registration_context
     @_authentication_successful()
+
+  ###
+  Append parameter to URL if exists.
+  @param url [String] Previous URL string
+  @return [String] Updated URL
+  ###
+  _append_existing_parameters: (url) ->
+    for parameter_name in FORWARDED_URL_PARAMETERS
+      parameter_value = z.util.get_url_parameter parameter_name
+      url = z.util.append_url_parameter url, "#{parameter_name}=#{parameter_value}" if parameter_value
+    return url
 
   ###
   User successfully authenticated on the backend side
@@ -1210,14 +1230,14 @@ class z.ViewModel.AuthViewModel
   @private
   ###
   _authentication_successful: =>
-    @logger.log @logger.levels.INFO, 'Logging in'
+    @logger.info 'Logging in'
     @_get_self_user()
     .then =>
       return @client_repository.get_valid_local_client()
     .catch (error) =>
-      @logger.log @logger.levels.INFO, "No valid local client found: #{error.message}", error
+      @logger.info "No valid local client found: #{error.message}", error
       if error.type is z.client.ClientError::TYPE.MISSING_ON_BACKEND
-        @logger.log @logger.levels.INFO, 'Local client rejected as invalid by backend. Reinitializing storage.'
+        @logger.info 'Local client rejected as invalid by backend. Reinitializing storage.'
         @storage_service.init @self_user().id
     .then =>
       return @storage_repository.init true
@@ -1225,13 +1245,13 @@ class z.ViewModel.AuthViewModel
       return @cryptography_repository.init()
     .then =>
       if @client_repository.current_client()
-        @logger.log @logger.levels.INFO, 'Active client found. Redirecting to app...'
+        @logger.info 'Active client found. Redirecting to app...'
         @_redirect_to_app()
       else
-        @logger.log @logger.levels.INFO, 'No active client found. We need to register one...'
+        @logger.info 'No active client found. We need to register one...'
         @_register_client()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Login failed: #{error?.message}", error
+      @logger.error "Login failed: #{error?.message}", error
       @_add_error z.string.auth_error_misc
       @_has_errors()
       @_set_hash z.auth.AuthView.MODE.ACCOUNT_LOGIN
@@ -1246,7 +1266,7 @@ class z.ViewModel.AuthViewModel
       @user_repository.get_me()
       .then (user_et) =>
         @self_user user_et
-        @logger.log @logger.levels.INFO, "Got self user: #{@self_user().id}"
+        @logger.info "Got self user: #{@self_user().id}"
         @pending_server_request false
 
         if @self_user().email()?
@@ -1264,13 +1284,7 @@ class z.ViewModel.AuthViewModel
   ###
   _redirect_to_app: =>
     url = '/'
-    url = "/#{@auth.settings.parameter}" if @auth.settings.parameter?
-    bot_name = z.util.get_url_parameter z.auth.URLParameter.BOT
-    url = z.util.append_url_parameter url, "#{z.auth.URLParameter.BOT}=#{bot_name}" if bot_name
-    use_v3_api = z.util.get_url_parameter z.auth.URLParameter.V3
-    url = z.util.append_url_parameter url, "#{z.auth.URLParameter.V3}=#{use_v3_api}" if use_v3_api
-    localytics = z.util.get_url_parameter z.auth.URLParameter.LOCALYTICS
-    url = z.util.append_url_parameter url, "#{z.auth.URLParameter.LOCALYTICS}" if localytics
+    url = @_append_existing_parameters url
     window.location.replace url
 
   _register_client: =>
@@ -1280,13 +1294,13 @@ class z.ViewModel.AuthViewModel
       @event_repository.initialize_last_notification_id()
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
-        @logger.log @logger.levels.WARN, "Cannot set starting point on notification stream: #{error.message}", error
+        @logger.warn "Cannot set starting point on notification stream: #{error.message}", error
       else
         throw error
     .then =>
       return @client_repository.get_clients_for_self()
     .then (client_ets) =>
-      @logger.log @logger.levels.INFO, "User has '#{client_ets?.length}' registered clients", client_ets
+      @logger.info "User has '#{client_ets?.length}' registered clients", client_ets
 
       # Show history screen if there are already registered clients
       if client_ets?.length > 0
@@ -1299,10 +1313,10 @@ class z.ViewModel.AuthViewModel
         @_redirect_to_app()
     .catch (error) =>
       if error.type is z.client.ClientError::TYPE.TOO_MANY_CLIENTS
-        @logger.log @logger.levels.WARN, 'User has already registered the maximum number of clients', error
+        @logger.warn 'User has already registered the maximum number of clients', error
         window.location.hash = z.auth.AuthView.MODE.LIMIT
       else
-        @logger.log @logger.levels.ERROR, "Failed to register a new client: #{error.message}", error
+        @logger.error "Failed to register a new client: #{error.message}", error
 
   ###
   Track app launch for Localytics

@@ -100,14 +100,14 @@ class z.ViewModel.VideoCallingViewModel
       if joined_call
         if @show_local_video() or @show_remote_video()
           @multitasking.is_minimized false
-          @logger.log @logger.levels.INFO, "Displaying call '#{joined_call.id}' full-screen", joined_call
+          @logger.info "Displaying call '#{joined_call.id}' full-screen", joined_call
         else
           @multitasking.is_minimized true
-        @logger.log @logger.levels.INFO, "Minimizing call '#{joined_call.id}' that is not videod", joined_call
+        @logger.info "Minimizing call '#{joined_call.id}' that is not videod", joined_call
       else
         @multitasking.auto_minimize true
         @multitasking.is_minimized false
-        @logger.log @logger.levels.INFO, 'Resetting full-screen calling to maximize'
+        @logger.info 'Resetting full-screen calling to maximize'
 
     @available_devices.screen_input.subscribe (media_devices) =>
       if _.isArray media_devices then @number_of_screen_devices media_devices.length else @number_of_screen_devices 0
@@ -119,10 +119,10 @@ class z.ViewModel.VideoCallingViewModel
         @minimize_timeout = undefined
 
       if show_remote_participant and @multitasking.auto_minimize() and @videod_call() and not @is_choosing_screen()
-        @logger.log @logger.levels.INFO, "Scheduled minimizing call '#{@videod_call().id}' on timeout as remote user '#{@remote_user()?.name()}' is not videod"
+        @logger.info "Scheduled minimizing call '#{@videod_call().id}' on timeout as remote user '#{@remote_user()?.name()}' is not videod"
         @minimize_timeout = window.setTimeout =>
           @multitasking.is_minimized true if not @is_choosing_screen()
-          @logger.log @logger.levels.INFO, "Minimizing call '#{@videod_call().id}' on timeout as remote user '#{@remote_user()?.name()}' is not videod"
+          @logger.info "Minimizing call '#{@videod_call().id}' on timeout as remote user '#{@remote_user()?.name()}' is not videod"
         , 4000
 
     amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE_SCREEN, @choose_shared_screen
@@ -150,7 +150,7 @@ class z.ViewModel.VideoCallingViewModel
         else
           @call_center.state_handler.toggle_screen conversation_id
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, 'Unable to get screens sources for sharing', error
+        @logger.error 'Unable to get screens sources for sharing', error
 
   clicked_on_cancel_call: =>
     @call_center.state_handler.leave_call @joined_call()?.id
@@ -166,14 +166,14 @@ class z.ViewModel.VideoCallingViewModel
 
   clicked_on_choose_screen: (screen_source) =>
     @current_device_id.screen_input ''
-    @logger.log @logger.levels.INFO, "Selected '#{screen_source.name}' for screen sharing", screen_source
+    @logger.info "Selected '#{screen_source.name}' for screen sharing", screen_source
     @is_choosing_screen false
     @current_device_id.screen_input screen_source.id
     @call_center.state_handler.toggle_screen @joined_call().id
     if @multitasking.reset_minimize()
       @multitasking.is_minimized true
       @multitasking.reset_minimize false
-      @logger.log @logger.levels.INFO, "Minimizing call '#{@joined_call().id}' on screen selection to return to previous state"
+      @logger.info "Minimizing call '#{@joined_call().id}' on screen selection to return to previous state"
 
   clicked_on_stop_video: =>
     @call_center.state_handler.toggle_video @joined_call()?.id
@@ -186,15 +186,15 @@ class z.ViewModel.VideoCallingViewModel
 
   clicked_on_minimize: =>
     @multitasking.is_minimized true
-    @logger.log @logger.levels.INFO, "Minimizing call '#{@videod_call().id}' on user click"
+    @logger.info "Minimizing call '#{@videod_call().id}' on user click"
 
   clicked_on_maximize: =>
     @multitasking.is_minimized false
-    @logger.log @logger.levels.INFO, "Maximizing call '#{@videod_call().id}' on user click"
+    @logger.info "Maximizing call '#{@videod_call().id}' on user click"
 
   double_clicked_on_remote_video: =>
     @remote_video_element_contain not @remote_video_element_contain()
-    @logger.log @logger.levels.INFO, "Switched remote video object-fit. Contain is '#{@remote_video_element_contain()}'"
+    @logger.info "Switched remote video object-fit. Contain is '#{@remote_video_element_contain()}'"
 
   # Detect the aspect ratio of a MediaElement and set the video mode.
   on_loadedmetadata: (view_model, event) =>
@@ -205,7 +205,7 @@ class z.ViewModel.VideoCallingViewModel
     else
       @remote_video_element_contain false
       detected_video_mode = z.calling.enum.VideoOrientation.LANDSCAPE
-    @logger.log @logger.levels.INFO, "Remote video is in '#{detected_video_mode}' mode"
+    @logger.info "Remote video is in '#{detected_video_mode}' mode"
 
 
 # http://stackoverflow.com/questions/28762211/unable-to-mute-html5-video-tag-in-firefox

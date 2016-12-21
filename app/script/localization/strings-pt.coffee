@@ -211,7 +211,6 @@ z.string.pt.modal_uploads_parallel = 'Você pode enviar até %no arquivos de uma
 # Connection requests
 z.string.pt.connection_request_connect = 'Conectar'
 z.string.pt.connection_request_ignore = 'Ignorar'
-z.string.pt.connection_request_message = 'Olá %@.first_name,\nVamos nos conectar no Wire.\n%s.first_name'
 
 # Conversation
 z.string.pt.conversation_you_nominative = 'você'
@@ -287,13 +286,20 @@ z.string.pt.conversations_popover_notify = 'Notificar'
 z.string.pt.conversations_popover_silence = 'Sem som'
 z.string.pt.conversations_popover_unarchive = 'Desarquivar'
 
+# Takeover
+z.string.pt.takeover_headline = 'Nomes de usuário estão aqui.'
+z.string.pt.takeover_sub = 'Revindicar seu nome único no Wire.'
+z.string.pt.takeover_link = 'Mais informação'
+z.string.pt.takeover_button_choose = 'Escolha o seu'
+z.string.pt.takeover_button_keep = 'Manter esse'
+
 # Invites
 z.string.pt.invite_meta_key_mac = 'Cmd'
 z.string.pt.invite_meta_key_pc = 'Ctrl'
 z.string.pt.invite_hint_selected = 'Pressione % meta_key + C para copiar'
 z.string.pt.invite_hint_unselected = 'Selecione e pressione % meta_key + C'
 z.string.pt.invite_headline = 'Convidar pessoas para o Wire'
-z.string.pt.invite_message = 'Estou no Wire. Pesquise por %mail ou visite https://get.wire.com para se conectar comigo.'
+z.string.pt.invite_message = 'Eu estou no Wire, pesquise por %username ou visite wire.com/download.'
 z.string.pt.invite_message_no_email = 'Estou no Wire. Visite https://get.wire.com para se conectar comigo.'
 
 # Extensions
@@ -398,6 +404,9 @@ z.string.pt.preferences_account_reset_password = 'Alterar senha'
 z.string.pt.preferences_account_delete = 'Excluir conta'
 z.string.pt.preferences_account_log_out = 'Sair'
 z.string.pt.preferences_account_username_placeholder = 'Seu nome completo'
+z.string.pt.preferences_account_username_hint = 'Ao menos 2 caracteres. a—z, 0—9 e _ apenas.'
+z.string.pt.preferences_account_username_available = 'Disponível'
+z.string.pt.preferences_account_username_error_taken = 'Já está sendo usado'
 
 z.string.pt.preferences_av_camera = 'Câmera'
 z.string.pt.preferences_av_microphone = 'Microfone'
@@ -450,9 +459,8 @@ z.string.pt.search_top_people = 'Contatos frequentes'
 z.string.pt.search_try_search = 'Encontre pessoa por nome ou\nendereço de e-mail completo'
 z.string.pt.search_no_contacts_on_wire = 'Você não tem nenhum contato no Wire. \nTente encontrar pessoas pelo nome ou \nendereço de e-mail completo'
 z.string.pt.search_others = 'Conectar'
-z.string.pt.search_suggestion_one = 'Conhece %@.first_name'
-z.string.pt.search_suggestion_two = 'Conhece %@.first_name e %@.other_name'
-z.string.pt.search_suggestion_many = 'Conhece %@.first_name e %no outros'
+z.string.pt.search_friend_in_common = '%no pessoa em comum'
+z.string.pt.search_friends_in_common = '%no pessoas em comum'
 
 # Picture upload
 z.string.pt.upload_welcome = 'O Wire é muito mais legal com uma foto.'
@@ -485,6 +493,7 @@ z.string.pt.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/a
 z.string.pt.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.pt.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
 z.string.pt.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.pt.url_support_usernames = 'https://wire.com/support/username/'
 z.string.pt.url_decrypt_error_1 = 'https://wire.com/privacy/error-1'
 z.string.pt.url_decrypt_error_2 = 'https://wire.com/privacy/error-2'
 

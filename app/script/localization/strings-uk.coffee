@@ -211,7 +211,6 @@ z.string.uk.modal_uploads_parallel = 'Ви можете надіслати до 
 # Connection requests
 z.string.uk.connection_request_connect = 'Додати до контактів'
 z.string.uk.connection_request_ignore = 'Ігнорувати'
-z.string.uk.connection_request_message = 'Привіт %@.first_name, \nдодай мене до своїх контактів в Wire.\n%s.first_name'
 
 # Conversation
 z.string.uk.conversation_you_nominative = 'ви'
@@ -287,13 +286,15 @@ z.string.uk.conversations_popover_notify = 'Увімкнути звук'
 z.string.uk.conversations_popover_silence = 'Вимкнути звук'
 z.string.uk.conversations_popover_unarchive = 'Розархівувати'
 
+# Takeover
+z.string.uk.takeover_link = 'Дізнатися більше'
+
 # Invites
 z.string.uk.invite_meta_key_mac = 'Cmd'
 z.string.uk.invite_meta_key_pc = 'Ctrl'
 z.string.uk.invite_hint_selected = 'Натисніть %meta_key + C, щоб скопіювати'
 z.string.uk.invite_hint_unselected = 'Виділіть та натисніть %meta_key + C'
 z.string.uk.invite_headline = 'Запросити людей в Wire'
-z.string.uk.invite_message = 'Я уже в Wire. Шукайте %mail\nабо відвідайте https://get.wire.com, щоб додати мене.'
 z.string.uk.invite_message_no_email = 'Я уже в Wire. Відвідайте https://get.wire.com, щоб додати мене.'
 
 # Extensions
@@ -414,6 +415,7 @@ z.string.uk.preferences_devices_fingerprint_detail = 'Wire присвоює ко
 z.string.uk.preferences_devices_id = 'Ідентифікатор: '
 z.string.uk.preferences_devices_remove = 'Видалити'
 z.string.uk.preferences_devices_remove_cancel = 'Скасувати'
+z.string.uk.preferences_devices_remove_detail = 'Видаліть цей пристрій, якщо ви припинили його використовувати. Ви вийдете відразу, як тільки пристрій буде видалено.'
 z.string.uk.preferences_devices_session_confirmation = 'Сесія була скинута.'
 z.string.uk.preferences_devices_session_detail = 'Якщо ідентифікатори не збігаються, виконайте скидання сесії, щоб згенерувати нові ключі шифрування з обидвох сторін.'
 z.string.uk.preferences_devices_session_reset = 'Скидання сесії'
@@ -449,9 +451,6 @@ z.string.uk.search_top_people = 'Топ-контакти'
 z.string.uk.search_try_search = 'Знайти людей за іменем\nабо повною email-адресою'
 z.string.uk.search_no_contacts_on_wire = 'У вас поки що немає контактів у Wire.\nСпробуйте знайти людей за іменем\nабо повною email-адресою'
 z.string.uk.search_others = 'Додати до контактів'
-z.string.uk.search_suggestion_one = 'Знає %@.first_name'
-z.string.uk.search_suggestion_two = 'Знає %@.first_name та %@.other_name'
-z.string.uk.search_suggestion_many = 'Знає %@.first_name та %no інших'
 
 # Picture upload
 z.string.uk.upload_welcome = 'Wire виглядає краще з вашою фотографією.'
@@ -476,6 +475,7 @@ z.string.uk.url_wire = 'https://wire.com'
 z.string.uk.url_wire_for_web = 'https://app.wire.com'
 z.string.uk.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412'
 z.string.uk.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
+z.string.uk.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545'
 z.string.uk.url_support_contact = 'https://support.wire.com/hc/en-us/requests/new'
 z.string.uk.url_support_contact_bug = 'https://support.wire.com/hc/en-us/requests/new?ticket_form_id=101615'
 z.string.uk.url_support_history = 'https://support.wire.com/hc/en-us/articles/207834645'
@@ -498,6 +498,7 @@ z.string.uk.warning_not_found_camera = 'Ви не можете подзвони�
 z.string.uk.warning_not_found_microphone = 'Ви не можете подзвонити, тому що мікрофон не підключений до вашого комп’ютера.'
 z.string.uk.warning_permission_denied_camera = 'Ви не можете подзвонити, тому що ви не надали доступу до камери для вашого браузера.'
 z.string.uk.warning_permission_denied_microphone = 'Ви не можете подзвонити, тому що ви не надали доступу до мікрофона для вашого браузера.'
+z.string.uk.warning_permission_denied_screen = 'Для Wire необхідний дозвіл, щоб ви могли поділитись скріншотами робочого столу.'
 z.string.uk.warning_permission_request_camera = '%icon Дозволити доступ до камери'
 z.string.uk.warning_permission_request_microphone = '%icon Дозволити доступ до мікрофону'
 z.string.uk.warning_permission_request_notification = '%icon Дозволити сповіщення'

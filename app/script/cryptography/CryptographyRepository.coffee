@@ -47,9 +47,9 @@ class z.cryptography.CryptographyRepository
   init: =>
     return Promise.resolve()
     .then =>
-      @logger.log @logger.levels.INFO, "Initialize Cryptobox with our storage repository on '#{@storage_repository.storage_service.db_name}'", @storage_repository
+      @logger.info "Initialize Cryptobox with our storage repository on '#{@storage_repository.storage_service.db_name}'", @storage_repository
       @cryptobox = new cryptobox.Cryptobox @storage_repository
-      @logger.log @logger.levels.INFO, 'Initialized repository'
+      @logger.info 'Initialized repository'
       return @
 
 
@@ -99,7 +99,7 @@ class z.cryptography.CryptographyRepository
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         throw new z.user.UserError z.user.UserError::TYPE.PRE_KEY_NOT_FOUND
       else
-        @logger.log @logger.levels.ERROR, "Failed to get pre-key from backend: #{error.message}"
+        @logger.error "Failed to get pre-key from backend: #{error.message}"
         throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
   ###
@@ -110,7 +110,7 @@ class z.cryptography.CryptographyRepository
   get_users_pre_keys: (user_client_map) ->
     @cryptography_service.get_users_pre_keys user_client_map
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to get pre-key from backend: #{error.message}"
+      @logger.error "Failed to get pre-key from backend: #{error.message}"
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
   ###
@@ -171,6 +171,19 @@ class z.cryptography.CryptographyRepository
   ###############################################################################
 
   ###
+  Create a map of all local sessions.
+  @return [Object] Object of users each containing an array of local sessions
+  ###
+  create_user_session_map: =>
+    user_session_map = {}
+    for session_id, session of sessions
+      ids = z.client.Client.dismantle_user_client_id session_id
+      user_session_map[ids.user_id] ?= []
+      user_session_map[ids.user_id].push ids.client_id
+    @logger.info "Created user session map for '#{Object.keys(user_session_map).length}' users", user_session_map
+    return user_session_map
+
+  ###
   Deletes a session.
 
   @param user_id [String] User ID of our chat partner
@@ -183,11 +196,11 @@ class z.cryptography.CryptographyRepository
       cryptobox_session = @load_session user_id, client_id
 
       if cryptobox_session
-        @logger.log @logger.levels.INFO, "Deleting session for client '#{client_id}' of user '#{user_id}'", cryptobox_session
+        @logger.info "Deleting session for client '#{client_id}' of user '#{user_id}'", cryptobox_session
         @cryptobox.session_delete cryptobox_session.id
         .then -> return cryptobox_session.id
       else
-        @logger.log @logger.levels.INFO, "We cannot delete the session for client '#{client_id}' of user '#{user_id}' because it was not found"
+        @logger.info "We cannot delete the session for client '#{client_id}' of user '#{user_id}' because it was not found"
         return undefined
 
   ###
@@ -201,7 +214,7 @@ class z.cryptography.CryptographyRepository
     .then =>
       return @load_session(user_id, client_id) or @_initiate_new_session user_id, client_id
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to get session for client '#{client_id}' of user '#{user_id}': #{error.message}", error
+      @logger.error "Failed to get session for client '#{client_id}' of user '#{user_id}': #{error.message}", error
 
   ###
   Get sessions.
@@ -210,11 +223,11 @@ class z.cryptography.CryptographyRepository
   ###
   get_sessions: (user_client_map) =>
     [cryptobox_session_map, missing_session_map] = @_get_sessions_local user_client_map
-    @logger.log @logger.levels.INFO, "Found local sessions for '#{Object.keys(cryptobox_session_map).length}' users", cryptobox_session_map
+    @logger.info "Found local sessions for '#{Object.keys(cryptobox_session_map).length}' users", cryptobox_session_map
 
     @_get_sessions_missing cryptobox_session_map, missing_session_map
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to get sessions: #{error.message}", [error, user_client_map]
+      @logger.error "Failed to get sessions: #{error.message}", [error, user_client_map]
       throw error
 
   ###
@@ -234,7 +247,7 @@ class z.cryptography.CryptographyRepository
   @param session [cryptobox.CryptoboxSession] Session to be saved
   ###
   save_session: (cryptobox_session) =>
-    @logger.log @logger.levels.INFO, "Persisting session '#{cryptobox_session.id}'", cryptobox_session
+    @logger.info "Persisting session '#{cryptobox_session.id}'", cryptobox_session
     return @cryptobox.session_save cryptobox_session
 
   ###
@@ -287,7 +300,7 @@ class z.cryptography.CryptographyRepository
   ###
   _get_sessions_missing: (cryptobox_session_map, missing_session_map) ->
     if Object.keys(missing_session_map).length > 0
-      @logger.log @logger.levels.INFO, "Missing sessions for '#{Object.keys(missing_session_map).length}' users", missing_session_map
+      @logger.info "Missing sessions for '#{Object.keys(missing_session_map).length}' users", missing_session_map
       return @_initiate_new_sessions cryptobox_session_map, missing_session_map
     else
       return Promise.resolve cryptobox_session_map
@@ -309,9 +322,9 @@ class z.cryptography.CryptographyRepository
         when z.user.UserError::TYPE.PRE_KEY_NOT_FOUND
           amplify.publish z.event.WebApp.CLIENT.REMOVE, user_id, client_id
         when z.user.UserError::TYPE.REQUEST_FAILURE
-          @logger.log @logger.levels.WARN, "Failed to request pre-key for client '#{client_id}' of user '#{user_id}'': #{error.message}", error
+          @logger.warn "Failed to request pre-key for client '#{client_id}' of user '#{user_id}'': #{error.message}", error
         else
-          @logger.log @logger.levels.ERROR, "Failed to initialize session from pre-key for client '#{client_id}' of user '#{user_id}': #{error.message}", error
+          @logger.error "Failed to initialize session from pre-key for client '#{client_id}' of user '#{user_id}': #{error.message}", error
 
   ###
   Initiate new sessions for a given map.
@@ -324,7 +337,7 @@ class z.cryptography.CryptographyRepository
   _initiate_new_sessions: (cryptobox_session_map, user_client_map) ->
     @get_users_pre_keys user_client_map
     .then (user_pre_key_map) =>
-      @logger.log @logger.levels.INFO, "Fetched pre-keys for '#{Object.keys(user_pre_key_map).length}' users", user_pre_key_map
+      @logger.info "Fetched pre-keys for '#{Object.keys(user_pre_key_map).length}' users", user_pre_key_map
       for user_id, client_pre_keys of user_pre_key_map
         cryptobox_session_map[user_id] ?= {}
         for client_id, pre_key of client_pre_keys
@@ -332,13 +345,13 @@ class z.cryptography.CryptographyRepository
             try
               cryptobox_session_map[user_id][client_id] = @_session_from_prekey user_id, client_id, pre_key.key
             catch error
-              @logger.log @logger.levels.ERROR, "Problem initiating a session for client ID '#{client_id}' from user ID '#{user_id}': #{error.message} — Skipping session.", error
+              @logger.error "Problem initiating a session for client ID '#{client_id}' from user ID '#{user_id}': #{error.message} — Skipping session.", error
           else
             amplify.publish z.event.WebApp.CLIENT.REMOVE, user_id, client_id
       return cryptobox_session_map
     .catch (error) =>
       if error.type is z.user.UserError::TYPE.REQUEST_FAILURE
-        @logger.log @logger.levels.WARN, "Failed to request pre-keys for user '#{user_id}'': #{error.message}", error
+        @logger.warn "Failed to request pre-keys for user '#{user_id}'': #{error.message}", error
       throw error
 
   ###
@@ -433,8 +446,7 @@ class z.cryptography.CryptographyRepository
     catch error
       ids = z.client.Client.dismantle_user_client_id cryptobox_session.id
       # Note: We created the convention that whenever we fail to encrypt for a specific client, we send a bomb emoji (no fun!)
-      @logger.log @logger.levels.ERROR,
-        "Could not encrypt OTR message of type '#{generic_message.content}' for user ID '#{ids.user_id}' with client ID '#{ids.client_id}': #{error.message}", error
+      @logger.error "Failed encrypting '#{generic_message.content}' message for client '#{ids.client_id}' of user '#{ids.user_id}': #{error.message}", error
       return '💣'
 
 
@@ -448,7 +460,7 @@ class z.cryptography.CryptographyRepository
   decrypt_event: (event) =>
     return new Promise (resolve, reject) =>
       if not event.data
-        @logger.log @logger.levels.ERROR, "Encrypted event with ID '#{event.id}' does not contain its data payload", event
+        @logger.error "Encrypted event with ID '#{event.id}' does not contain its data payload", event
         reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.NO_DATA_CONTENT
         return
 
@@ -458,7 +470,7 @@ class z.cryptography.CryptographyRepository
         if loaded_event is undefined
           resolve @_decrypt_message event
         else
-          @logger.log @logger.levels.INFO, "Skipped decryption of event '#{event.type}' (#{primary_key}) because it was previously stored"
+          @logger.info "Skipped decryption of event '#{event.type}' (#{primary_key}) because it was previously stored"
           reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
       .catch (decrypt_error) =>
         # Get error information
@@ -474,13 +486,11 @@ class z.cryptography.CryptographyRepository
         else if decrypt_error instanceof Proteus.errors.DecryptError.InvalidMessage or decrypt_error instanceof Proteus.errors.DecryptError.InvalidSignature
           # Session is broken, let's see what's really causing it...
           session_id = @_construct_session_id remote_user_id, remote_client_id
-          @logger.log @logger.levels.ERROR,
-            "Session '#{session_id}' broken or out of sync. Reset the session and decryption is likely to work again.\r\n" +
+          @logger.error "Session '#{session_id}' broken or out of sync. Reset the session and decryption is likely to work again.\r\n" +
               "Try: wire.app.repository.cryptography.reset_session('#{remote_user_id}', '#{remote_client_id}');"
 
           if decrypt_error instanceof Proteus.errors.DecryptError.InvalidMessage
-            @logger.log @logger.levels.ERROR,
-              "Message is for client ID '#{receiving_client_id}' and we have client ID '#{@current_client().id}'."
+            @logger.error "Received message is for client '#{receiving_client_id}' while our ID is '#{@current_client().id}'."
 
         else if decrypt_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged
           # Remote identity changed... Is there a man in the middle or do we mess up with clients?
@@ -488,14 +498,12 @@ class z.cryptography.CryptographyRepository
           remote_fingerprint = session.session.remote_identity.public_key.fingerprint()
 
           message = "Fingerprints do not match: We expect this fingerprint '#{remote_fingerprint}' from user ID '#{remote_user_id}' with client ID '#{remote_client_id}'"
-          @logger.log @logger.levels.ERROR, message, session
+          @logger.error message, session
 
         # Show error in JS console
-        @logger.log @logger.levels.ERROR,
-          "Decryption of '#{event.type}' (#{primary_key}) failed: #{decrypt_error.message}", {
-            error: decrypt_error,
-            event: event
-          }
+        @logger.error "Decryption of '#{event.type}' (#{primary_key}) failed: #{decrypt_error.message}",
+          error: decrypt_error,
+          event: event
 
         # Report error to Localytics and Raygun
         hashed_error_message = z.util.murmurhash3 decrypt_error.message, 42
@@ -524,7 +532,7 @@ class z.cryptography.CryptographyRepository
   save_unencrypted_event: (event) ->
     @storage_repository.save_conversation_event event
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Saving unencrypted message failed: #{error.message}", error
+      @logger.error "Saving unencrypted message failed: #{error.message}", error
       throw error
 
   ###
@@ -544,6 +552,7 @@ class z.cryptography.CryptographyRepository
       decrypted_message = session.decrypt msg_bytes
     else
       [session, decrypted_message] = @_session_from_message user_id, client_id, msg_bytes
+      amplify.publish z.event.WebApp.CLIENT.ADD, user_id, new z.client.Client id: client_id
 
     generic_message = z.proto.GenericMessage.decode decrypted_message
     @save_session session

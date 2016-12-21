@@ -65,10 +65,10 @@ class z.calling.entities.Flow
 
     @creator_user_id.subscribe (user_id) =>
       if user_id is @self_user_id
-        @logger.log @logger.levels.INFO, "Creator: We are the official '#{z.calling.rtc.SDPType.OFFER}'"
+        @logger.info "Creator: We are the official '#{z.calling.rtc.SDPType.OFFER}'"
         @is_answer false
       else
-        @logger.log @logger.levels.INFO, "Creator: We are the official '#{z.calling.rtc.SDPType.ANSWER}'"
+        @logger.info "Creator: We are the official '#{z.calling.rtc.SDPType.ANSWER}'"
         @is_answer true
 
 
@@ -125,7 +125,7 @@ class z.calling.entities.Flow
       switch signaling_state
         when z.calling.rtc.SignalingState.CLOSED
           return if @converted_own_sdp_state()
-          @logger.log @logger.levels.DEBUG, "PeerConnection with '#{@remote_user.name()}' was closed"
+          @logger.debug "PeerConnection with '#{@remote_user.name()}' was closed"
           @call_et.delete_participant @participant_et
           @_remove_media_streams()
           if not @is_group()
@@ -141,10 +141,10 @@ class z.calling.entities.Flow
     @negotiation_needed = ko.observable false
 
     @negotiation_mode.subscribe (negotiation_mode) =>
-      @logger.log @logger.levels.DEBUG, "Negotiation mode changed: #{negotiation_mode}"
+      @logger.debug "Negotiation mode changed: #{negotiation_mode}"
 
     @negotiation_needed.subscribe (negotiation_needed) =>
-      @logger.log @logger.levels.DEBUG, 'State changed - negotiation needed: true' if negotiation_needed
+      @logger.debug 'State changed - negotiation needed: true' if negotiation_needed
 
 
     ###############################################################################
@@ -180,7 +180,7 @@ class z.calling.entities.Flow
 
     @can_set_local_sdp.subscribe (can_set) =>
       if can_set
-        @logger.log @logger.levels.DEBUG, "State changed - can_set_local_sdp: #{can_set}"
+        @logger.debug "State changed - can_set_local_sdp: #{can_set}"
         @_set_local_sdp()
 
 
@@ -208,7 +208,7 @@ class z.calling.entities.Flow
 
     @can_set_remote_sdp.subscribe (can_set) =>
       if can_set
-        @logger.log @logger.levels.DEBUG, "State changed - can_set_remote_sdp: '#{can_set}'"
+        @logger.debug "State changed - can_set_remote_sdp: '#{can_set}'"
         @_set_remote_sdp()
         .then =>
           if @has_sent_local_sdp() and @remote_sdp().type is z.calling.rtc.SDPType.OFFER
@@ -222,58 +222,53 @@ class z.calling.entities.Flow
     @can_create_sdp = ko.pureComputed =>
       in_state_for_creation = @negotiation_needed() and @signaling_state() isnt z.calling.rtc.SignalingState.CLOSED
       can_create = @pc_initialized() and in_state_for_creation
-      @logger.log @logger.levels.OFF, "State recalculated - can_create_answer: #{can_create}"
       return can_create
 
     @can_create_sdp.subscribe (can_create) =>
       if can_create
-        @logger.log @logger.levels.DEBUG, "State changed - can_create_sdp: #{can_create}"
+        @logger.debug "State changed - can_create_sdp: #{can_create}"
 
     @can_create_answer = ko.pureComputed =>
       answer_state = @is_answer() and @signaling_state() is z.calling.rtc.SignalingState.REMOTE_OFFER
       can_create = @can_create_sdp() and answer_state
-      @logger.log @logger.levels.OFF, "State recalculated - can_create_answer: #{can_create}"
       return can_create
 
     @can_create_answer.subscribe (can_create) =>
       if can_create
-        @logger.log @logger.levels.DEBUG, "State changed - can_create_answer: #{can_create}"
+        @logger.debug "State changed - can_create_answer: #{can_create}"
         @negotiation_needed false
         @_create_answer()
 
     @can_create_offer = ko.pureComputed =>
       offer_state = not @is_answer() and @signaling_state() is z.calling.rtc.SignalingState.STABLE
       can_create = @can_create_sdp() and offer_state
-      @logger.log @logger.levels.OFF, "State recalculated - can_create_offer: #{can_create}"
       return can_create
 
     @can_create_offer.subscribe (can_create) =>
       if can_create
-        @logger.log @logger.levels.DEBUG, "State changed - can_create_offer: #{can_create}"
+        @logger.debug "State changed - can_create_offer: #{can_create}"
         @negotiation_needed false
         @_create_offer()
 
     @can_initialize_peer_connection = ko.pureComputed =>
       can_initialize = @has_media_stream() and @payload() and not @pc_initialized()
-      @logger.log @logger.levels.OFF, "State recalculated - can_initialize_peer_connection: #{can_initialize}"
       return can_initialize
 
     @can_initialize_peer_connection.subscribe (can_initialize) =>
       if can_initialize
-        @logger.log @logger.levels.DEBUG, "State changed - can_initialize_peer_connection: #{can_initialize}"
+        @logger.debug "State changed - can_initialize_peer_connection: #{can_initialize}"
         @_initialize_peer_connection()
 
     @can_set_ice_candidates = ko.pureComputed =>
       can_set = @local_sdp() and @remote_sdp() and @signaling_state() is z.calling.rtc.SignalingState.STABLE
-      @logger.log @logger.levels.OFF, "State recalculated - can_set_ice_candidates: #{can_set}"
       return can_set
 
     @can_set_ice_candidates.subscribe (can_set) =>
       if can_set
-        @logger.log @logger.levels.DEBUG, "State changed - can_set_ice_candidates: #{can_set}"
+        @logger.debug "State changed - can_set_ice_candidates: #{can_set}"
         @_add_cached_ice_candidates()
 
-    @logger.log @logger.levels.INFO, "Flow has an initial panning of '#{@participant_et.panning()}'"
+    @logger.info "Flow has an initial panning of '#{@participant_et.panning()}'"
 
 
   ###############################################################################
@@ -286,16 +281,16 @@ class z.calling.entities.Flow
   @param payload [RTCConfiguration] Configuration to be used to set up the PeerConnection
   ###
   add_payload: (payload) =>
-    @logger.log @logger.levels.INFO, "Setting payload to be used for flow with '#{@remote_user.name()}'"
-    return @logger.log @logger.levels.WARN, 'Payload already set' if @payload()
+    @logger.info "Setting payload to be used for flow with '#{@remote_user.name()}'"
+    return @logger.warn 'Payload already set' if @payload()
 
     @creator_user_id payload.creator
     @payload @_rewrite_payload payload
     if payload.remote_user isnt payload.creator
-      @logger.log @logger.levels.INFO, "We are the creator of flow with user '#{@remote_user.name()}'"
+      @logger.info "We are the creator of flow with user '#{@remote_user.name()}'"
       @is_answer false
     else
-      @logger.log @logger.levels.INFO, "We are not the creator of flow with user '#{@remote_user.name()}'"
+      @logger.info "We are not the creator of flow with user '#{@remote_user.name()}'"
       @is_answer true
 
     @is_active payload.active
@@ -323,12 +318,12 @@ class z.calling.entities.Flow
   @private
   ###
   _close_peer_connection: ->
-    @logger.log @logger.levels.INFO, "Closing PeerConnection with '#{@remote_user.name()}'"
+    @logger.info "Closing PeerConnection with '#{@remote_user.name()}'"
     if @peer_connection?
       @peer_connection.onsignalingstatechange = =>
-        @logger.log @logger.levels.DEBUG, "State change ignored - signaling state: #{@peer_connection.signalingState}"
+        @logger.debug "State change ignored - signaling state: #{@peer_connection.signalingState}"
       @peer_connection.close()
-    @logger.log @logger.levels.DEBUG, 'Closing PeerConnection successful'
+    @logger.debug 'Closing PeerConnection successful'
 
   ###
   Create the PeerConnection configuration.
@@ -351,7 +346,7 @@ class z.calling.entities.Flow
     @peer_connection = new window.RTCPeerConnection @_configure_peer_connection()
     @telemetry.time_step z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED
     @signaling_state @peer_connection.signalingState
-    @logger.log @logger.levels.DEBUG, "PeerConnection with '#{@remote_user.name()}' created", @payload().ice_servers
+    @logger.debug "PeerConnection with '#{@remote_user.name()}' created", @payload().ice_servers
 
     @peer_connection.onaddstream = @_on_add_stream
     @peer_connection.onaddtrack = @_on_add_track
@@ -373,7 +368,7 @@ class z.calling.entities.Flow
   @param event [MediaStreamEvent] Event that contains the newly added MediaStream
   ###
   _on_add_stream: (event) =>
-    @logger.log @logger.levels.DEBUG, 'Remote MediaStream added to PeerConnection',
+    @logger.debug 'Remote MediaStream added to PeerConnection',
       {stream: event.stream, audio_tracks: event.stream.getAudioTracks(), video_tracks: event.stream.getVideoTracks()}
     media_stream = z.media.MediaStreamHandler.detect_media_stream_type event.stream
     if media_stream.type is z.media.MediaType.AUDIO
@@ -386,43 +381,43 @@ class z.calling.entities.Flow
   @param event [MediaStreamTrackEvent] Event that contains the newly added MediaStreamTrack
   ###
   _on_add_track: (event) =>
-    @logger.log @logger.levels.DEBUG, 'Remote MediaStreamTrack added to PeerConnection', event
+    @logger.debug 'Remote MediaStreamTrack added to PeerConnection', event
 
   ###
   A MediaStream was removed from the PeerConnection.
   @param event [MediaStreamEvent] Event that a MediaStream has been removed
   ###
   _on_remove_stream: (event) =>
-    @logger.log @logger.levels.DEBUG, 'Remote MediaStream removed from PeerConnection', event
+    @logger.debug 'Remote MediaStream removed from PeerConnection', event
 
   ###
   A MediaStreamTrack was removed from the PeerConnection.
   @param event [MediaStreamTrackEvent] Event that a MediaStreamTrack has been removed
   ###
   _on_remove_track: (event) =>
-    @logger.log @logger.levels.DEBUG, 'Remote MediaStreamTrack removed from PeerConnection', event
+    @logger.debug 'Remote MediaStreamTrack removed from PeerConnection', event
 
   ###
   A local ICE candidates is available.
   @param event [RTCPeerConnectionIceEvent] Event that contains the generated ICE candidate
   ###
   _on_ice_candidate: (event) =>
-    @logger.log @logger.levels.INFO, 'New ICE candidate generated', event
+    @logger.info 'New ICE candidate generated', event
     @telemetry.time_step z.telemetry.calling.CallSetupSteps.ICE_GATHERING_STARTED
     if @has_sent_local_sdp()
       if event.candidate
         @_send_ice_candidate event.candidate
       else
-        @logger.log @logger.levels.INFO, 'End of ICE candidates - trickling end candidate'
+        @logger.info 'End of ICE candidates - trickling end candidate'
         @_send_ice_candidate @_fake_ice_candidate 'a=end-of-candidates'
     else if not event.candidate
-      @logger.log @logger.levels.INFO, 'End of ICE candidates - sending SDP'
+      @logger.info 'End of ICE candidates - sending SDP'
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.ICE_GATHERING_COMPLETED
       @send_local_sdp()
 
   # ICE connection state has changed.
   _on_ice_connection_state_change: (event) =>
-    @logger.log @logger.levels.DEBUG, 'State changed - ICE connection', event
+    @logger.debug 'State changed - ICE connection', event
     return if not @peer_connection or @call_et.state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ENDED]
 
     @logger.log @logger.levels.LEVEL_1, "ICE connection state: #{@peer_connection.iceConnectionState}"
@@ -434,11 +429,11 @@ class z.calling.entities.Flow
   # SDP negotiation needed.
   _on_negotiation_needed: (event) =>
     if not @negotiation_needed()
-      @logger.log @logger.levels.DEBUG, 'State changed - negotiation needed: true', event
+      @logger.debug 'State changed - negotiation needed: true', event
 
   # Signaling state has changed.
   _on_signaling_state_change: (event) =>
-    @logger.log @logger.levels.DEBUG, "State changed - signaling state: #{@peer_connection.signalingState}", event
+    @logger.debug "State changed - signaling state: #{@peer_connection.signalingState}", event
     @signaling_state @peer_connection.signalingState
 
 
@@ -451,7 +446,7 @@ class z.calling.entities.Flow
   @param remote_sdp [RTCSessionDescription] Remote Session Description Protocol
   ###
   save_remote_sdp: (remote_sdp) =>
-    @logger.log @logger.levels.DEBUG, "Saving remote SDP of type '#{remote_sdp.type}'"
+    @logger.debug "Saving remote SDP of type '#{remote_sdp.type}'"
     @telemetry.time_step z.telemetry.calling.CallSetupSteps.REMOTE_SDP_RECEIVED
     @remote_sdp @_rewrite_sdp remote_sdp, z.calling.enum.SDPSource.REMOTE
 
@@ -462,15 +457,15 @@ class z.calling.entities.Flow
 
     on_success = =>
       @has_sent_local_sdp true
-      @logger.log @logger.levels.INFO, "Sending local SDP of type '#{@local_sdp().type}' successful"
+      @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful"
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
 
     on_failure = (error) =>
-      @logger.log @logger.levels.WARN, "Failed to send local SDP of type '#{@local_sdp().type}'"
+      @logger.warn "Failed to send local SDP of type '#{@local_sdp().type}'"
       @reset_flow() if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
 
     @_clear_send_sdp_timeout()
-    @logger.log @logger.levels.INFO, "Sending local SDP for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
+    @logger.info "Sending local SDP for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
     amplify.publish z.event.WebApp.CALL.SIGNALING.SEND_LOCAL_SDP_INFO, sdp_info, on_success, on_failure
 
   ###
@@ -479,14 +474,14 @@ class z.calling.entities.Flow
   @private
   ###
   _create_answer: ->
-    @logger.log @logger.levels.INFO, "Creating '#{z.calling.rtc.SDPType.ANSWER}' for flow with '#{@remote_user.name()}'"
+    @logger.info "Creating '#{z.calling.rtc.SDPType.ANSWER}' for flow with '#{@remote_user.name()}'"
     @peer_connection.createAnswer()
     .then (sdp_answer) =>
-      @logger.log @logger.levels.DEBUG, "Creating '#{z.calling.rtc.SDPType.ANSWER}' successful", sdp_answer
+      @logger.debug "Creating '#{z.calling.rtc.SDPType.ANSWER}' successful", sdp_answer
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_CREATED
       @local_sdp @_rewrite_sdp sdp_answer, z.calling.enum.SDPSource.LOCAL
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Creating '#{z.calling.rtc.SDPType.ANSWER}' failed: #{error.name} - #{error.message}", error
+      @logger.error "Creating '#{z.calling.rtc.SDPType.ANSWER}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'create_sdp', type: z.calling.rtc.SDPType.ANSWER}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
 
@@ -504,14 +499,14 @@ class z.calling.entities.Flow
       offerToReceiveVideo: true
       voiceActivityDetection: true
 
-    @logger.log @logger.levels.INFO, "Creating '#{z.calling.rtc.SDPType.OFFER}' for flow with '#{@remote_user.name()}'"
+    @logger.info "Creating '#{z.calling.rtc.SDPType.OFFER}' for flow with '#{@remote_user.name()}'"
     @peer_connection.createOffer offer_options
     .then (sdp_offer) =>
-      @logger.log @logger.levels.DEBUG, "Creating '#{z.calling.rtc.SDPType.OFFER}' successful", sdp_offer
+      @logger.debug "Creating '#{z.calling.rtc.SDPType.OFFER}' successful", sdp_offer
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_CREATED
       @local_sdp @_rewrite_sdp sdp_offer, z.calling.enum.SDPSource.LOCAL
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Creating '#{z.calling.rtc.SDPType.OFFER}' failed: #{error.name} - #{error.message}", error
+      @logger.error "Creating '#{z.calling.rtc.SDPType.OFFER}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'create_sdp', type: z.calling.rtc.SDPType.OFFER}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
       @_solve_colliding_states()
@@ -544,7 +539,7 @@ class z.calling.entities.Flow
             outline = "a=tool:electron #{z.util.Environment.version()} #{z.util.Environment.version false} (#{browser_string})"
           else
             outline = "a=tool:webapp #{z.util.Environment.version false} (#{browser_string})"
-          @logger.log @logger.levels.INFO, "Added tool version to local SDP: #{outline}"
+          @logger.info "Added tool version to local SDP: #{outline}"
 
       else if sdp_line.startsWith 'a=candidate'
         ice_candidates.push sdp_line
@@ -552,49 +547,48 @@ class z.calling.entities.Flow
       else if sdp_line.startsWith 'a=group'
         if @negotiation_mode() is z.calling.enum.SDPNegotiationMode.STREAM_CHANGE and sdp_source is z.calling.enum.SDPSource.LOCAL
           outlines.push 'a=x-streamchange'
-          @logger.log @logger.levels.INFO, 'Added stream renegotiation flag to local SDP'
+          @logger.info 'Added stream renegotiation flag to local SDP'
 
       # Code to nail in bit-rate and ptime settings for improved performance and experience
       else if sdp_line.startsWith 'm=audio'
         if @negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and @is_group())
           outlines.push sdp_line
           outline = "b=AS:#{AUDIO_BITRATE}"
-          @logger.log @logger.levels.INFO, "Limited audio bit-rate in local SDP: #{outline}"
+          @logger.info "Limited audio bit-rate in local SDP: #{outline}"
 
       else if sdp_line.startsWith 'm=video'
         if sdp_source is z.calling.enum.SDPSource.LOCAL and @_should_rewrite_codecs()
           outline = sdp_line.replace(' 98', '').replace ' 116', ''
-          @logger.log @logger.levels.WARN, 'Removed video codecs to prevent video freeze due to issue in Chrome 50 and 51' if outline isnt sdp_line
+          @logger.warn 'Removed video codecs to prevent video freeze due to issue in Chrome 50 and 51' if outline isnt sdp_line
 
       else if sdp_line.startsWith 'a=fmtp'
         if sdp_source is z.calling.enum.SDPSource.LOCAL and @_should_rewrite_codecs()
           if sdp_line.endsWith '98 apt=116'
-            @logger.log @logger.levels.WARN, 'Removed FMTP line to prevent video freeze due to issue in Chrome 50 and 51'
+            @logger.warn 'Removed FMTP line to prevent video freeze due to issue in Chrome 50 and 51'
             outline = undefined
 
       else if sdp_line.startsWith 'a=rtpmap'
         if sdp_source is z.calling.enum.SDPSource.LOCAL and @_should_rewrite_codecs()
           if sdp_line.endsWith('98 rtx/90000') or sdp_line.endsWith '116 red/90000'
-            @logger.log @logger.levels.WARN, 'Removed RTPMAP line to prevent video freeze due to issue in Chrome 50 and 51'
+            @logger.warn 'Removed RTPMAP line to prevent video freeze due to issue in Chrome 50 and 51'
             outline = undefined
 
         if @negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and @is_group())
           if z.util.contains sdp_line, 'opus'
             outlines.push sdp_line
             outline = "a=ptime:#{AUDIO_PTIME}"
-            @logger.log @logger.levels.INFO, "Changed audio p-time in local SDP: #{outline}"
+            @logger.info "Changed audio p-time in local SDP: #{outline}"
 
       if outline isnt undefined
         outlines.push outline
 
-    @logger.log @logger.levels.INFO,
-      "'#{sdp_source.charAt(0).toUpperCase()}#{sdp_source.slice 1}' SDP contains '#{ice_candidates.length}' ICE candidate(s)", ice_candidates
+    @logger.info "'#{sdp_source.charAt(0).toUpperCase()}#{sdp_source.slice 1}' SDP contains '#{ice_candidates.length}' ICE candidate(s)", ice_candidates
 
     rewritten_sdp = outlines.join '\r\n'
 
     if rtc_sdp.sdp isnt rewritten_sdp
       rtc_sdp.sdp = rewritten_sdp
-      @logger.log @logger.levels.INFO, "Rewrote '#{sdp_source}' SDP of type '#{rtc_sdp.type}'", rtc_sdp
+      @logger.info "Rewrote '#{sdp_source}' SDP of type '#{rtc_sdp.type}'", rtc_sdp
 
     return rtc_sdp
 
@@ -603,16 +597,15 @@ class z.calling.entities.Flow
   @private
   ###
   _set_local_sdp: ->
-    @logger.log @logger.levels.INFO, "Setting local SDP of type '#{@local_sdp().type}'", @local_sdp()
+    @logger.info "Setting local SDP of type '#{@local_sdp().type}'", @local_sdp()
     @peer_connection.setLocalDescription @local_sdp()
     .then =>
-      @logger.log @logger.levels.DEBUG,
-        "Setting local SDP of type '#{@local_sdp().type}' successful", @peer_connection.localDescription
+      @logger.debug "Setting local SDP of type '#{@local_sdp().type}' successful", @peer_connection.localDescription
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET
       @should_add_local_sdp false
       @send_sdp_timeout = window.setTimeout @send_local_sdp, 1000
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Setting local SDP of type '#{@local_sdp().type}' failed: #{error.name} - #{error.message}", error
+      @logger.error "Setting local SDP of type '#{@local_sdp().type}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'set_sdp', location: 'local', type: @local_sdp()?.type}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
 
@@ -621,15 +614,14 @@ class z.calling.entities.Flow
   @private
   ###
   _set_remote_sdp: ->
-    @logger.log @logger.levels.INFO, "Setting remote SDP of type '#{@remote_sdp().type}'\n#{@remote_sdp().sdp}"
+    @logger.info "Setting remote SDP of type '#{@remote_sdp().type}'\n#{@remote_sdp().sdp}"
     @peer_connection.setRemoteDescription @remote_sdp()
     .then =>
-      @logger.log @logger.levels.DEBUG,
-        "Setting remote SDP of type '#{@remote_sdp().type}' successful", @peer_connection.remoteDescription
+      @logger.debug "Setting remote SDP of type '#{@remote_sdp().type}' successful", @peer_connection.remoteDescription
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET
       @should_add_remote_sdp false
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Setting remote SDP of type '#{@remote_sdp().type}' failed: #{error.name} - #{error.message}", error
+      @logger.error "Setting remote SDP of type '#{@remote_sdp().type}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'set_sdp', location: 'remote', type: @remote_sdp()?.type}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
 
@@ -641,13 +633,11 @@ class z.calling.entities.Flow
   _solve_colliding_states: ->
     we_switched_state = false
     if @self_user_id < @remote_user_id
-      @logger.log @logger.levels.WARN,
-        "We need to switch state of flow with '#{@remote_user.name()}'. Local SDP needs to be changed."
+      @logger.warn "We need to switch state of flow with '#{@remote_user.name()}'. Local SDP needs to be changed."
       we_switched_state = true
       @_switch_local_sdp_state()
     else
-      @logger.log @logger.levels.WARN,
-        "Remote side needs to switch state of flow with '#{@remote_user.name()}'. Waiting for new remote SDP."
+      @logger.warn "Remote side needs to switch state of flow with '#{@remote_user.name()}'. Waiting for new remote SDP."
 
     return we_switched_state
 
@@ -662,10 +652,7 @@ class z.calling.entities.Flow
   @private
   ###
   _switch_local_sdp_state: ->
-    @logger.log @logger.levels.DEBUG, '_switch_local_sdp_state'
-
-    @logger.log @logger.levels.LEVEL_2,
-      "Switching from local #{@local_sdp_type()} to local '#{z.calling.rtc.SDPType.ANSWER}'"
+    @logger.debug "Switching SDP type locally from #{@local_sdp_type()} to '#{z.calling.rtc.SDPType.ANSWER}'"
 
     @converted_own_sdp_state true
     @is_answer true
@@ -688,7 +675,7 @@ class z.calling.entities.Flow
   ###
   add_remote_ice_candidate: (ice_candidate) =>
     if z.util.contains ice_candidate.candidate, 'end-of-candidates'
-      @logger.log @logger.levels.INFO, 'Ignoring remote non-candidate'
+      @logger.info 'Ignoring remote non-candidate'
       return
 
     if @can_set_ice_candidates()
@@ -696,7 +683,7 @@ class z.calling.entities.Flow
       @ice_candidates_cache.push ice_candidate
     else
       @ice_candidates_cache.push ice_candidate
-      @logger.log @logger.levels.INFO, 'Cached ICE candidate for flow'
+      @logger.info 'Cached ICE candidate for flow'
 
   ###
   Add all cached ICE candidates to the flow.
@@ -704,10 +691,10 @@ class z.calling.entities.Flow
   ###
   _add_cached_ice_candidates: ->
     if @ice_candidates_cache.length
-      @logger.log @logger.levels.INFO, "Adding '#{@ice_candidates_cache.length}' cached ICE candidates"
+      @logger.info "Adding '#{@ice_candidates_cache.length}' cached ICE candidates"
       @_add_ice_candidate ice_candidate for ice_candidate in @ice_candidates_cache
     else
-      @logger.log @logger.levels.INFO, 'No cached ICE candidates found'
+      @logger.info 'No cached ICE candidates found'
 
   ###
   Add a remote ICE candidate to the flow directly.
@@ -715,12 +702,12 @@ class z.calling.entities.Flow
   @param ice_candidate [RTCICECandidate] Received remote ICE candidate
   ###
   _add_ice_candidate: (ice_candidate) ->
-    @logger.log @logger.levels.INFO, "Adding ICE candidate to flow with '#{@remote_user.name()}'", ice_candidate
+    @logger.info "Adding ICE candidate to flow with '#{@remote_user.name()}'", ice_candidate
     @peer_connection.addIceCandidate ice_candidate
     .then =>
-      @logger.log @logger.levels.DEBUG, 'Adding ICE candidate successful'
+      @logger.debug 'Adding ICE candidate successful'
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "Adding ICE candidate failed: #{error.name}", error
+      @logger.warn "Adding ICE candidate failed: #{error.name}", error
       attributes = {cause: error.name, step: 'add_candidate', type: z.calling.rtc.SDPType.OFFER}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
 
@@ -743,11 +730,11 @@ class z.calling.entities.Flow
   ###
   _send_ice_candidate: (ice_candidate) ->
     if not z.util.contains ice_candidate.candidate, 'UDP'
-      return @logger.log @logger.levels.INFO, "Local ICE candidate ignored as it is not of type 'UDP'"
+      return @logger.info "Local ICE candidate ignored as it is not of type 'UDP'"
 
     if @conversation_id and @id
       ice_info = new z.calling.payloads.ICECandidateInfo @conversation_id, @id, ice_candidate
-      @logger.log @logger.levels.INFO, 'Sending ICE candidate', ice_info
+      @logger.info 'Sending ICE candidate', ice_info
       amplify.publish z.event.WebApp.CALL.SIGNALING.SEND_ICE_CANDIDATE_INFO, ice_info
 
   ###
@@ -780,7 +767,7 @@ class z.calling.entities.Flow
     @_replace_media_track media_stream_info
     .catch (error) =>
       if error.type in [z.calling.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
-        @logger.log @logger.levels.INFO, "Replacement of MediaStream and renegotiation necessary: #{error.message}", error
+        @logger.info "Replacement of MediaStream and renegotiation necessary: #{error.message}", error
         return @_replace_media_stream media_stream_info
       throw error
 
@@ -796,11 +783,11 @@ class z.calling.entities.Flow
     if @peer_connection.addTrack
       for media_stream_track in media_stream.getTracks()
         @peer_connection.addTrack media_stream_track, media_stream
-        @logger.log @logger.levels.INFO, "Added local MediaStreamTrack of type '#{media_stream_track.kind}' to PeerConnection",
+        @logger.info "Added local MediaStreamTrack of type '#{media_stream_track.kind}' to PeerConnection",
           {stream: media_stream, audio_tracks: media_stream.getAudioTracks(), video_tracks: media_stream.getVideoTracks()}
     else
       @peer_connection.addStream media_stream
-      @logger.log @logger.levels.INFO, "Added local MediaStream of type '#{media_stream.type}' to PeerConnection",
+      @logger.info "Added local MediaStream of type '#{media_stream.type}' to PeerConnection",
         {stream: media_stream, audio_tracks: media_stream.getAudioTracks(), video_tracks: media_stream.getVideoTracks()}
 
   ###
@@ -836,10 +823,10 @@ class z.calling.entities.Flow
       @_add_media_stream media_stream_info.stream
       @is_answer false
       @negotiation_needed true
-      @logger.log @logger.levels.INFO, 'Replaced the MediaStream successfully', media_stream_info.stream
+      @logger.info 'Replaced the MediaStream successfully', media_stream_info.stream
       return media_stream_info
     .catch (error) =>
-      @logger.log @logger.log.levels.ERROR, "Failed to replace local MediaStream: #{error.message}", error
+      @logger.error "Failed to replace local MediaStream: #{error.message}", error
       throw error
 
   ###
@@ -859,11 +846,11 @@ class z.calling.entities.Flow
     .then (rtp_sender) ->
       return rtp_sender.replaceTrack media_stream_info.stream.getTracks()[0]
     .then =>
-      @logger.log @logger.levels.INFO, "Replaced the '#{media_stream_info.type}' track"
+      @logger.info "Replaced the '#{media_stream_info.type}' track"
       return media_stream_info
     .catch (error) =>
       if error.type not in [z.calling.CallError::TYPE.NOT_SUPPORTED, z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
-        @logger.log @logger.levels.ERROR, "Failed to replace the '#{media_stream_info.type}' track: #{error.name} - #{error.message}", error
+        @logger.error "Failed to replace the '#{media_stream_info.type}' track: #{error.name} - #{error.message}", error
       throw error
 
   ###
@@ -872,16 +859,16 @@ class z.calling.entities.Flow
   @param media_stream [MediaStream] Local MediaStream to remove from the PeerConnection
   ###
   _remove_media_stream: (media_stream) ->
-    return @logger.log @logger.levels.INFO, 'No PeerConnection found to remove MediaStream from' if not @peer_connection
+    return @logger.info 'No PeerConnection found to remove MediaStream from' if not @peer_connection
 
     if @peer_connection.getSenders and @peer_connection.removeTrack
       for media_stream_track in media_stream.getTracks()
         for rtp_sender in @peer_connection.getSenders() when rtp_sender.track.id is media_stream_track.id
           @peer_connection.removeTrack rtp_sender
-          @logger.log @logger.levels.INFO, "Removed local MediaStreamTrack of type '#{media_stream_track.kind}' from PeerConnection"
+          @logger.info "Removed local MediaStreamTrack of type '#{media_stream_track.kind}' from PeerConnection"
     else if @peer_connection.signalingState isnt z.calling.rtc.SignalingState.CLOSED
       @peer_connection.removeStream media_stream
-      @logger.log @logger.levels.INFO, "Removed local MediaStream of type '#{media_stream.type}' from PeerConnection",
+      @logger.info "Removed local MediaStream of type '#{media_stream.type}' from PeerConnection",
         {stream: media_stream, audio_tracks: media_stream.getAudioTracks(), video_tracks: media_stream.getVideoTracks()}
 
   ###
@@ -912,24 +899,24 @@ class z.calling.entities.Flow
   ###
   reset_flow: =>
     @_clear_send_sdp_timeout()
-    @logger.log @logger.levels.INFO, "Resetting flow '#{@id}'"
+    @logger.info "Resetting flow '#{@id}'"
     @telemetry.reset_statistics()
     .then (statistics) =>
-      @logger.log @logger.levels.INFO, 'Flow network stats updated for the last time', statistics
+      @logger.info 'Flow network stats updated for the last time', statistics
       amplify.publish z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, @telemetry.create_report()
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "Failed to reset flow networks stats: #{error.message}"
+      @logger.warn "Failed to reset flow networks stats: #{error.message}"
     try
       if @peer_connection?.signalingState isnt z.calling.rtc.SignalingState.CLOSED
         @_close_peer_connection()
     catch error
-      @logger.log @logger.levels.ERROR, "We caught the #{error.name}: #{error.message}", error
+      @logger.error "We caught the #{error.name}: #{error.message}", error
     @_remove_media_streams()
     @_reset_signaling_states()
     @ice_candidates_cache = []
     @payload undefined
     @pc_initialized false
-    @logger.log @logger.levels.DEBUG, "Resetting flow '#{@id}' with user '#{@remote_user.name()}' successful"
+    @logger.debug "Resetting flow '#{@id}' with user '#{@remote_user.name()}' successful"
 
   ###
   Clear the SDP send timeout.

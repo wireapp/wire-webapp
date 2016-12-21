@@ -46,7 +46,7 @@ class z.connect.ConnectGoogleService
     .then (access_token) =>
       @_get_contacts access_token
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to import contacts from Google: #{error.message}", error
+      @logger.error "Failed to import contacts from Google: #{error.message}", error
 
   ###
   Authenticate before getting the contacts.
@@ -55,14 +55,14 @@ class z.connect.ConnectGoogleService
   ###
   _authenticate: =>
     return new Promise (resolve, reject) =>
-      @logger.log @logger.levels.INFO, 'Authenticating with Google for contacts access'
+      @logger.info 'Authenticating with Google for contacts access'
 
       on_response = (response) =>
         if not response?.error
-          @logger.log @logger.levels.INFO, 'Received access token from Google', response
+          @logger.info 'Received access token from Google', response
           resolve response.access_token
         else
-          @logger.log @logger.levels.ERROR, 'Failed to authenticate with Google', response
+          @logger.error 'Failed to authenticate with Google', response
           reject response?.error
 
       window.gapi.auth.authorize {client_id: @client_id, scope: @scopes, immediate: false}, on_response
@@ -75,12 +75,12 @@ class z.connect.ConnectGoogleService
     return new Promise (resolve, reject) =>
       if window.gapi.auth
         if auth_token = window.gapi.auth.getToken()
-          @logger.log @logger.levels.INFO, 'Using cached access token to access Google contacts', auth_token
+          @logger.info 'Using cached access token to access Google contacts', auth_token
           resolve auth_token.access_token
         else
           @_authenticate().then(resolve).catch reject
       else
-        @logger.log @logger.levels.WARN, 'Google Auth Client for JavaScript not loaded'
+        @logger.warn 'Google Auth Client for JavaScript not loaded'
         error = new z.connect.ConnectError z.connect.ConnectError::TYPE.GOOGLE_CLIENT
         Raygun.send error
         reject error
@@ -92,15 +92,15 @@ class z.connect.ConnectGoogleService
   ###
   _get_contacts: (access_token) ->
     return new Promise (resolve, reject) =>
-      @logger.log @logger.levels.INFO, 'Fetching address book from Google'
+      @logger.info 'Fetching address book from Google'
       api_endpoint = 'https://www.google.com/m8/feeds/contacts/default/full'
       $.get "#{api_endpoint}?access_token=#{access_token}&alt=json&max-results=15000&v=3.0"
       .always (data_or_jqXHR, textStatus) =>
         if textStatus isnt 'error'
-          @logger.log @logger.levels.INFO, 'Received address book from Google', data_or_jqXHR
+          @logger.info 'Received address book from Google', data_or_jqXHR
           resolve data_or_jqXHR
         else
-          @logger.log @logger.levels.ERROR, 'Failed to fetch address book from Google', data_or_jqXHR
+          @logger.error 'Failed to fetch address book from Google', data_or_jqXHR
           reject data_or_jqXHR.responseJSON or new z.service.BackendClientError data_or_jqXHR.status
 
   ###
@@ -121,7 +121,7 @@ class z.connect.ConnectGoogleService
     return new Promise (resolve) =>
       window.gapi_loaded = resolve
 
-      @logger.log @logger.levels.INFO, 'Lazy loading Google Auth API'
+      @logger.info 'Lazy loading Google Auth API'
       script_node = document.createElement 'script'
       script_node.src = 'https://apis.google.com/js/auth.js?onload=gapi_loaded'
       script_element = document.getElementsByTagName('script')[0]

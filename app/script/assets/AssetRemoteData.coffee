@@ -41,10 +41,11 @@ class z.assets.AssetRemoteData
   @param otr_key [Uint8Array]
   @param sha256 [Uint8Array]
   @param asset_token [String] token is optional
+  @param force_caching [Boolean]
   ###
-  @v3: (asset_key, otr_key, sha256, asset_token) ->
+  @v3: (asset_key, otr_key, sha256, asset_token, force_caching = false) ->
     remote_data = new z.assets.AssetRemoteData otr_key, sha256
-    remote_data.generate_url = -> wire.app.service.asset.generate_asset_url_v3 asset_key, asset_token
+    remote_data.generate_url = -> wire.app.service.asset.generate_asset_url_v3 asset_key, asset_token, force_caching
     remote_data.identifier = "#{asset_key}"
     return remote_data
 
@@ -55,10 +56,11 @@ class z.assets.AssetRemoteData
   @param asset_id [String]
   @param otr_key [Uint8Array]
   @param sha256 [Uint8Array]
+  @param force_caching [Boolean]
   ###
-  @v2: (conversation_id, asset_id, otr_key, sha256) ->
+  @v2: (conversation_id, asset_id, otr_key, sha256, force_caching = false) ->
     remote_data = new z.assets.AssetRemoteData otr_key, sha256
-    remote_data.generate_url = -> wire.app.service.asset.generate_asset_url_v2 asset_id, conversation_id
+    remote_data.generate_url = -> wire.app.service.asset.generate_asset_url_v2 asset_id, conversation_id, force_caching
     remote_data.identifier = "#{conversation_id}#{asset_id}"
     return remote_data
 
@@ -68,10 +70,11 @@ class z.assets.AssetRemoteData
   @deprecated
   @param conversation_id [String]
   @param asset_id [String]
+  @param force_caching [Boolean]
   ###
-  @v1: (conversation_id, asset_id) ->
+  @v1: (conversation_id, asset_id, force_caching = false) ->
     remote_data = new z.assets.AssetRemoteData()
-    remote_data.generate_url = -> wire.app.service.asset.generate_asset_url asset_id, conversation_id
+    remote_data.generate_url = -> wire.app.service.asset.generate_asset_url asset_id, conversation_id, force_caching
     remote_data.identifier = "#{conversation_id}#{asset_id}"
     return remote_data
 

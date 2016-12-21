@@ -21,12 +21,11 @@
 ###############################################################################
 $ ->
   env = z.util.get_url_parameter z.auth.URLParameter.ENVIRONMENT
-  if env? and env is 'prod'
+  if env is 'prod'
     settings =
       environment: z.service.BackendEnvironment.PRODUCTION
       rest_url: 'https://prod-nginz-https.wire.com'
       web_socket_url: 'wss://prod-nginz-ssl.wire.com'
-    settings.parameter = '?env=prod' if env?
   else
     settings =
       environment: z.service.BackendEnvironment.STAGING

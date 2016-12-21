@@ -211,7 +211,6 @@ z.string.ro.modal_uploads_parallel = 'Poți trimite maxim %no fișiere simultan.
 # Connection requests
 z.string.ro.connection_request_connect = 'Conectare'
 z.string.ro.connection_request_ignore = 'Ignoră'
-z.string.ro.connection_request_message = 'Bună %@.first_name,\nHai să ne conectăm pe Wire.\n%s.first_name'
 
 # Conversation
 z.string.ro.conversation_you_nominative = 'tu'
@@ -287,13 +286,15 @@ z.string.ro.conversations_popover_notify = 'Demutizează'
 z.string.ro.conversations_popover_silence = 'Mutizează'
 z.string.ro.conversations_popover_unarchive = 'Dezarhivează'
 
+# Takeover
+z.string.ro.takeover_link = 'Află mai multe'
+
 # Invites
 z.string.ro.invite_meta_key_mac = 'Cmd'
 z.string.ro.invite_meta_key_pc = 'Ctrl'
 z.string.ro.invite_hint_selected = 'Apasă %meta_key + C pentru a copia'
 z.string.ro.invite_hint_unselected = 'Selectează și apasă %meta_key + C'
 z.string.ro.invite_headline = 'Invită persoane pe Wire'
-z.string.ro.invite_message = 'Sunt pe Wire. Caută după %mail sau vizitează https://get.wire.com pentru a te conecta cu mine.'
 z.string.ro.invite_message_no_email = 'Sunt pe Wire. Vizitează https://get.wire.com pentru a te conecta cu mine.'
 
 # Extensions
@@ -450,9 +451,6 @@ z.string.ro.search_top_people = 'Top persoane'
 z.string.ro.search_try_search = 'Caută persoane după nule sau\ndupă adresa de e-mail completă'
 z.string.ro.search_no_contacts_on_wire = 'Nu ai contacte cu Wire.\nÎncearcă să găsești persoane după nume\nsau adresa de e-mail completă'
 z.string.ro.search_others = 'Conectare'
-z.string.ro.search_suggestion_one = 'Cunoaște pe %@.first_name'
-z.string.ro.search_suggestion_two = 'Cunoaște pe %@.first_name și %@.other_name'
-z.string.ro.search_suggestion_many = 'Cunoaște pe %@.first_name și %no alții'
 
 # Picture upload
 z.string.ro.upload_welcome = 'Wire arată mult mai bine cu o poză.'

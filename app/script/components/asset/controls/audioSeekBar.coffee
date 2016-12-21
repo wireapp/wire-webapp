@@ -19,6 +19,7 @@
 window.z ?= {}
 z.components ?= {}
 
+
 class z.components.AudioSeekBarComponent
   ###
   Construct a audio seek bar that renders audio levels

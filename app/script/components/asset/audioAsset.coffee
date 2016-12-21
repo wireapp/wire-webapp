@@ -62,7 +62,7 @@ class z.components.AudioAssetComponent
         @audio_is_loaded true
         @audio_element?.play()
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, 'Failed to load audio asset ', error
+        @logger.error 'Failed to load audio asset ', error
 
   on_pause_button_clicked: =>
     @audio_element?.pause()

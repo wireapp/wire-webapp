@@ -123,7 +123,7 @@ class z.ViewModel.GiphyViewModel
       @selected_gif @gif()
       @state STATE.RESULTS
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "No gif found for query: #{@query()}", error
+      @logger.error "No gif found for query: #{@query()}", error
       @state STATE.ERROR
 
   _get_random_gifs: =>
@@ -139,5 +139,5 @@ class z.ViewModel.GiphyViewModel
       @selected_gif(gifs[0]) if gifs.length is 1
       @state STATE.RESULTS
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "No gifs found for query: #{@query()}", error
+      @logger.error "No gifs found for query: #{@query()}", error
       @state STATE.ERROR

@@ -91,7 +91,7 @@ class z.auth.AuthService
           resolve data
         error: (jqXHR, textStatus, errorThrown) =>
           if jqXHR.status is z.service.BackendClientError::STATUS_CODE.FORBIDDEN
-            @logger.log @logger.levels.ERROR, "Requesting access token failed after #{retry_attempt} attempt(s): #{errorThrown}", jqXHR
+            @logger.error "Requesting access token failed after #{retry_attempt} attempt(s): #{errorThrown}", jqXHR
             return reject new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
 
           if retry_attempt <= POST_ACCESS.RETRY_LIMIT
@@ -100,13 +100,13 @@ class z.auth.AuthService
             _retry = => @post_access(retry_attempt).then(resolve).catch reject
 
             if jqXHR.status is z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
-              @logger.log @logger.levels.WARN, 'Access token refresh delayed due to suspected connectivity issue'
+              @logger.warn 'Access token refresh delayed due to suspected connectivity issue'
               return @client.execute_on_connectivity().then =>
-                @logger.log @logger.levels.INFO, 'Continuing access token refresh after verifying connectivity'
+                @logger.info 'Continuing access token refresh after verifying connectivity'
                 _retry()
 
             return window.setTimeout =>
-              @logger.log @logger.levels.INFO, "Trying to get a new access token: '#{retry_attempt}' attempt"
+              @logger.info "Trying to get a new access token: '#{retry_attempt}' attempt"
               _retry()
             , POST_ACCESS.RETRY_TIMEOUT
 
