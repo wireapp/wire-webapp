@@ -176,11 +176,10 @@ class z.cryptography.CryptographyRepository
   ###
   create_user_session_map: =>
     user_session_map = {}
-    for session_id, session of sessions
+    for session_id, session of @storage_repository.sessions
       ids = z.client.Client.dismantle_user_client_id session_id
       user_session_map[ids.user_id] ?= []
       user_session_map[ids.user_id].push ids.client_id
-    @logger.info "Created user session map for '#{Object.keys(user_session_map).length}' users", user_session_map
     return user_session_map
 
   ###
