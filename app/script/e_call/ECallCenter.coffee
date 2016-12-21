@@ -448,6 +448,7 @@ class z.e_call.ECallCenter
         when z.calling.enum.CallState.OUTGOING
           e_call.participants.push new z.e_call.entities.EParticipant e_call, e_call.conversation_et.participating_user_ets()[0]
 
+      @self_client_joined true
       e_call.local_audio_stream @media_stream_handler.local_media_streams.audio()
       e_call.local_video_stream @media_stream_handler.local_media_streams.video()
       e_call.start_negotiation()
@@ -521,9 +522,6 @@ class z.e_call.ECallCenter
     .then (e_call_et) =>
       @logger.debug "Outgoing '#{@_get_media_type_from_properties e_call_message.props}' e-call in conversation '#{e_call_et.conversation_et.display_name()}'", e_call_et
       e_call_et.state z.calling.enum.CallState.OUTGOING
-      @self_client_joined true
-      e_call_et.self_client_joined true
-      e_call_et.self_user_joined true
       return e_call_et
 
 

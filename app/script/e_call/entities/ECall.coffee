@@ -136,6 +136,8 @@ class z.e_call.entities.ECall
     @e_call_center.send_e_call_event @conversation_et, e_call_message
 
   start_negotiation: =>
+    @self_client_joined true
+    @self_user_joined true
     participant_et.e_flow.start_negotiation() for participant_et in @participants() when participant_et.e_flow
 
   _on_state_stop_ringing: =>
