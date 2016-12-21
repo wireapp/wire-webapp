@@ -447,6 +447,7 @@ z.string.pt.preferences_options_data_detail = 'Faça o Wire melhorar mandando in
 z.string.pt.preferences_options_notifications = 'Notificações'
 z.string.pt.preferences_options_notifications_none = 'Desligar'
 z.string.pt.preferences_options_notifications_obfuscate = 'Esconder detalhes da mensagem'
+z.string.pt.preferences_options_notifications_obfuscate_message = 'TODO: Show only sender'
 z.string.pt.preferences_options_notifications_on = 'Mostrar o remetente e a mensagem'
 
 # Search

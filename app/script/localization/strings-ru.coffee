@@ -447,6 +447,7 @@ z.string.ru.preferences_options_data_detail = 'Сделайте Wire лучше,
 z.string.ru.preferences_options_notifications = 'Уведомления'
 z.string.ru.preferences_options_notifications_none = 'Выключены'
 z.string.ru.preferences_options_notifications_obfuscate = 'Скрывать подробности сообщения'
+z.string.ru.preferences_options_notifications_obfuscate_message = 'TODO: Show only sender'
 z.string.ru.preferences_options_notifications_on = 'Показывать имя отправителя и текст сообщения'
 
 # Search

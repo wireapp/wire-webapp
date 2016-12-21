@@ -450,6 +450,7 @@ z.string.preferences_options_data_detail = 'Make Wire better by sending anonymou
 z.string.preferences_options_notifications = 'Notifications'
 z.string.preferences_options_notifications_none = 'Off'
 z.string.preferences_options_notifications_obfuscate = 'Hide message details'
+z.string.preferences_options_notifications_obfuscate_message = 'Show only sender'
 z.string.preferences_options_notifications_on = 'Show sender and message'
 
 # Search

@@ -251,6 +251,21 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
           done()
         .catch done.fail
 
+      it 'when preference is set to obfuscate-message',(done) ->
+        system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.OBFUSCATE_MESSAGE
+
+        system_notification_repository.notify conversation_et, message_et
+        .then ->
+          title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
+          notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+          notification_content.options.body = z.string.system_notification_obfuscated
+
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
+
       it 'when preference is set to obfuscate',(done) ->
         system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.OBFUSCATE
 
@@ -295,6 +310,21 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
           done()
         .catch done.fail
 
+      it 'when preference is set to obfuscate-message', (done) ->
+        system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.OBFUSCATE_MESSAGE
+
+        system_notification_repository.notify conversation_et, message_et
+        .then ->
+          title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
+          notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+          notification_content.options.body = z.string.system_notification_obfuscated
+
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
+
       it 'when preference is set to obfuscate', (done) ->
         system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.OBFUSCATE
 
@@ -332,6 +362,21 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         .then ->
           title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
           notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+
+          result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+          expect(result).toEqual JSON.stringify notification_content
+          expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+          done()
+        .catch done.fail
+
+      it 'when preference is set to obfuscate-message', (done) =>
+        system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.OBFUSCATE_MESSAGE
+
+        system_notification_repository.notify conversation_et, message_et
+        .then ->
+          title = "#{message_et.user().first_name()} in #{conversation_et.display_name()}"
+          notification_content.title = z.util.truncate_text title, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+          notification_content.options.body = z.string.system_notification_obfuscated
 
           result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
           expect(result).toEqual JSON.stringify notification_content

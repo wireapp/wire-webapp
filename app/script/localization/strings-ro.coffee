@@ -439,6 +439,7 @@ z.string.ro.preferences_options_data_detail = 'Ajută la îmbunătățirea Wire 
 z.string.ro.preferences_options_notifications = 'Notificări'
 z.string.ro.preferences_options_notifications_none = 'Închis'
 z.string.ro.preferences_options_notifications_obfuscate = 'Ascunde detaliile mesajelor'
+z.string.ro.preferences_options_notifications_obfuscate_message = 'TODO: Show only sender'
 z.string.ro.preferences_options_notifications_on = 'Arată expeditorul și mesajul'
 
 # Search

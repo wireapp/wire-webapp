@@ -440,6 +440,7 @@ z.string.hr.preferences_options_data_detail = 'Poboljšaj Wire slanjem anonimnih
 z.string.hr.preferences_options_notifications = 'Obavijesti'
 z.string.hr.preferences_options_notifications_none = 'Isključi'
 z.string.hr.preferences_options_notifications_obfuscate = 'Sakrij detalje poruke'
+z.string.hr.preferences_options_notifications_obfuscate_message = 'TODO: Show only sender'
 z.string.hr.preferences_options_notifications_on = 'Prikaži pošiljatelja i poruku'
 
 # Search
