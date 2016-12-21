@@ -259,7 +259,7 @@ class z.e_call.entities.ECall
   @return [Array<z.calling.Flow>] Array of flows
   ###
   get_flows: =>
-    return (participant_et.e_flow() for participant_et in @participants() when participant_et.e_flow())
+    return (participant_et.e_flow for participant_et in @participants() when participant_et.e_flow)
 
   ###
   Calculates the panning (from left to right) to position a user in a group call.
