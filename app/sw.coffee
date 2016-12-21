@@ -78,5 +78,3 @@ self.addEventListener 'fetch', (event) ->
 
           return add_to_lru cache, ASSET_CACHE_MAX_ITEMS, event.request
     )
-  else
-    event.respondWith fetch(event.request)
