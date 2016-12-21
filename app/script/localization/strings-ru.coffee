@@ -324,6 +324,7 @@ z.string.ru.people_no_matches = 'Совпадений не найдено.\nПо
 z.string.ru.people_invite = 'Пригласить людей'
 z.string.ru.people_share = 'Поделиться контактами'
 z.string.ru.people_bring_your_friends = 'Приведите друзей в Wire'
+z.string.ru.people_invite_detail = 'Предоставление доступа к вашим контактам поможет вам связаться с другими людьми. Вся информация анонимна, мы не предоставляем её третьим лицам.'
 z.string.ru.people_invite_button_contacts = 'Из контактов'
 z.string.ru.people_invite_button_gmail = 'Из Gmail'
 z.string.ru.people_invite_headline = 'Приведите друзей'
