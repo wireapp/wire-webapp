@@ -1,13 +1,11 @@
-var wire = require('wire-webapp-core');
+const wire = require('wire-webapp-core');
 
+var branch = process.env.TRAVIS_BRANCH;
+var commitAuthor = process.argv[2];
+var commitMessage = process.argv[3];
 var conversationId = '9fe8b359-b9e0-4624-b63c-71747664e4fa';
 var email = process.env.WIRE_WEBAPP_BOT_EMAIL;
 var password = process.env.WIRE_WEBAPP_BOT_PASSWORD;
-
-var commitAuthor = process.argv[2];
-var commitMessage = process.argv[3];
-var branch = process.env.TRAVIS_BRANCH;
-
 var webAppUrl = 'https://app.wire.com/';
 
 switch (branch) {
