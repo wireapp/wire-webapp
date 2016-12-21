@@ -40,14 +40,12 @@ ko.components.register 'image-component',
     createViewModel: (params, component_info) ->
       return new z.components.Image params, component_info
   template: """
-              <div class="image-component-wrapper" data-bind="in_viewport: on_entered_viewport">
-                <!-- ko if: asset_src() -->
-                  <img data-bind="attr:{src: asset_src}"/>
-                <!-- /ko -->
-                <!-- ko ifnot: asset_src() -->
-                  <div class="three-dots">
-                    <span></span><span></span><span></span>
-                  </div>
-                <!-- /ko -->
-              </div>
+              <!-- ko if: asset_src() -->
+                <img data-bind="attr:{src: asset_src}"/>
+              <!-- /ko -->
+              <!-- ko ifnot: asset_src() -->
+                <div class="three-dots" data-bind="in_viewport: on_entered_viewport">
+                  <span></span><span></span><span></span>
+                </div>
+              <!-- /ko -->
             """

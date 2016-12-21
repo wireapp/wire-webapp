@@ -350,6 +350,19 @@ class z.client.ClientRepository
   ###############################################################################
 
   ###
+  Cleanup local sessions.
+
+  @note If quick_clean parameter is set to false, there will be one backend request per user that has a session.
+  @param quick_clean [Boolean] Optional value defaulting to true whether to check all users with local sessions or the ones with too many sessions
+  ###
+  cleanup_clients_and_sessions: (quick_clean = true) =>
+    for user_id, client_ids of @cryptography_repository.create_user_session_map()
+      log_level = if client_ids > 8 then @logger.levels.WARN else @logger.levels.INFO
+      unless quick_clean and client_ids.length < 8
+        @logger.log log_level, "User '#{user_id}' has session with '#{client_ids.length}' clients locally"
+        @_remove_obsolete_client_for_user_by_id user_id, client_ids
+
+  ###
   Delete client of a user on backend and removes it locally.
 
   @param client_id [String] ID of the client that should be deleted
@@ -439,6 +452,28 @@ class z.client.ClientRepository
     else
       is_permanent = @current_client().is_permanent()
     return is_permanent
+
+  ###
+  Remove obsolete clients and sessions for given user.
+
+  @private
+  @param user_id [String] ID of user to check clients and sessions off
+  @param client_ids [Array<String>] Array of strings containing IDs of local sessions for user
+  ###
+  _remove_obsolete_client_for_user_by_id: (user_id, client_ids) ->
+    @get_clients_by_user_id user_id
+    .then (client_ets) =>
+      @logger.info "For user '#{user_id}' backend found '#{client_ets.length}' active clients. Locally there are sessions for '#{client_ids.length}' clients",
+        clients: client_ets
+        sessions: client_ids
+      for client_id in client_ids
+        deleted_client = true
+        for client_et in client_ets when client_et.id is client_id
+          deleted_client = false
+          break
+        if deleted_client
+          @logger.log "Client '#{client_id}' of user '#{user_id}' is obsolete and will be removed"
+          @remove_client user_id, client_id
 
   ###
   Match backend client response with locally stored ones.
