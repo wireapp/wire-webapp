@@ -21,7 +21,7 @@ z.ViewModel ?= {}
 
 # Parent: z.ViewModel.ConversationTitlebarViewModel
 class z.ViewModel.ConversationTitlebarViewModel
-  constructor: (element_id, @call_center, @conversation_repository, @multitasking) ->
+  constructor: (element_id, @call_view_model, @conversation_repository, @multitasking) ->
     @logger = new z.util.Logger 'z.ViewModel.ConversationTitlebarViewModel', z.config.LOGGER.OPTIONS
 
     # TODO remove this for now to ensure that buttons are clickable in macOS wrappers
@@ -30,8 +30,10 @@ class z.ViewModel.ConversationTitlebarViewModel
     , 1000
 
     @conversation_et = @conversation_repository.active_conversation
-    @call_self_state = @call_center.media_stream_handler.self_stream_state
-    @joined_call = @call_center.joined_call
+
+    @joined_call = @call_view_model.joined_call
+    @remote_media_streams = @call_view_model.remote_media_streams
+    @self_stream_state = @call_view_model.self_stream_state
 
     @has_call = ko.pureComputed =>
       return false if not @conversation_et() or not @joined_call()
@@ -43,8 +45,8 @@ class z.ViewModel.ConversationTitlebarViewModel
 
     @show_maximize_control = ko.pureComputed =>
       return false if not @joined_call()
-      has_local_video = @call_self_state.video_send() or @call_self_state.screen_send()
-      has_remote_video = (@joined_call().is_remote_screen_send() or @joined_call().is_remote_video_send()) and @call_center.media_stream_handler.remote_media_streams.video()
+      has_local_video = @self_stream_state.video_send() or @self_stream_state.screen_send()
+      has_remote_video = (@joined_call().is_remote_screen_send() or @joined_call().is_remote_video_send()) and @remote_media_streams.video()
       return @has_ongoing_call() and @multitasking.is_minimized() and has_local_video and not has_remote_video
 
     @show_call_controls = ko.computed =>

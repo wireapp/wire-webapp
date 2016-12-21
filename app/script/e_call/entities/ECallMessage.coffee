@@ -27,12 +27,27 @@ E_CALL_MESSAGE_CONFIG =
 class z.e_call.entities.ECallMessage
   ###
   Construct a new e-call message entity.
-  @param e_call_et [z.e_call.entities.ECall] E-call the message relates to
   @param type [z.e_call.enum.ECallMessageType] Type of e-call message
   @param response [Boolean] Is message a response, defaults to false
+  @param e_call_et [z.e_call.entities.ECall] Optional e-call the e-call message relates to
   ###
-  constructor: (e_call_et, @type, @response = false) ->
-    @session_id = e_call_et.session_id
+  constructor: (@type, @response = false, e_call_et) ->
+    @sessid = e_call_et?.session_id or @create_session_id()
+
+  ###
+  Create a session ID.
+  @return [String] Random four char session ID
+  ###
+  create_session_id: ->
+    in_range = (value, lower_bound, upper_bound) ->
+      return value >= lower_bound and value <= upper_bound
+
+    get_random_char = ->
+      until in_range(char_index, 1, 9) or in_range(char_index, 65, 90) or in_range char_index, 97, 122
+        char_index = Math.floor Math.random() * 122
+      return if char_index <= 9 then char_index else String.fromCharCode char_index
+
+    return "#{get_random_char()}#{get_random_char()}#{get_random_char()}#{get_random_char()}"
 
   to_JSON: =>
     return {

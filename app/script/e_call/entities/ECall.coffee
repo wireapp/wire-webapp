@@ -27,7 +27,7 @@ class z.e_call.entities.ECall
   @param conversation_et [z.entity.Conversation] Conversation the call takes place in
   @param self_user [z.entity.User] Self user entity
   ###
-  constructor: (@conversation_et, @creating_user, @session_id = 'YYYY', @e_call_center) ->
+  constructor: (@conversation_et, @creating_user, @session_id = @create_session_id(), @e_call_center) ->
     @logger = new z.util.Logger "z.e_call.ECall (#{@conversation_et.id})", z.config.LOGGER.OPTIONS
 
     # IDs and references
@@ -250,7 +250,7 @@ class z.e_call.entities.ECall
 
 
   ###############################################################################
-  # Panning
+  # Misc
   ###############################################################################
 
   ###

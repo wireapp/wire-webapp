@@ -26,12 +26,14 @@ class z.ViewModel.list.ConversationListViewModel
   @param element_id [String] HTML selector
   @param list_view_model [z.ViewModel.list.ListViewModel] List view model
   @param content_view_model [z.ViewModel.ContentViewModel] Content view model
-  @param call_center [z.calling.CallCenter] Call center
+  @param call_view_model [z.ViewModel.CallViewModel] Call view model
   @param conversation_repository [z.conversation.ConversationRepository] Conversation repository
   @param user_repository [z.user.UserRepository] User repository
   ###
-  constructor: (element_id, @list_view_model, @content_view_model, @call_center, @conversation_repository, @user_repository) ->
+  constructor: (element_id, @list_view_model, @call_view_model, @content_view_model, @conversation_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS
+
+    @joined_call = @call_view_model.joined_call
 
     @content_state = @content_view_model.content_state
     @selected_conversation = ko.observable()
@@ -53,8 +55,6 @@ class z.ViewModel.list.ConversationListViewModel
     @conversations_calls = @conversation_repository.conversations_call
     @conversations_archived = @conversation_repository.conversations_archived
     @conversations_unarchived = @conversation_repository.conversations_unarchived
-
-    @joined_call = @call_center.joined_call
 
     @webapp_is_loaded = ko.observable false
 
@@ -82,7 +82,7 @@ class z.ViewModel.list.ConversationListViewModel
         placeholder: '%shortcut'
         content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.START
 
-    @self_stream_state = @call_center.media_stream_handler.self_stream_state
+    @self_stream_state = @call_view_model.self_stream_state
 
     @show_toggle_screen = ko.pureComputed ->
       return z.calling.CallCenter.supports_screen_sharing()

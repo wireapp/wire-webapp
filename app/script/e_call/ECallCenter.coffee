@@ -346,8 +346,7 @@ class z.e_call.ECallCenter
       else
         message_type = z.e_call.enum.E_CALL_MESSAGE_TYPE.CANCEL
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
-      # @todo send appropriate leave event, tear down e-call
-      @send_e_call_event e_call_et.conversation_et, new z.e_call.entities.ECallMessage e_call_et, message_type, false
+      @send_e_call_event e_call_et.conversation_et, new z.e_call.entities.ECallMessage message_type, false, e_call_et
     .catch (error) ->
       throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
@@ -395,8 +394,8 @@ class z.e_call.ECallCenter
         when z.media.MediaType.VIDEO
           @media_stream_handler.toggle_video_send()
       toggle_promise.then =>
-        @send_e_call_event e_call_et.conversation_et, new z.e_call.entities.ECallSetupMessage e_call_et, false, props: @_create_properties_payload @self_state.video_send()
-    .catch (error) ->
+        @send_e_call_event e_call_et.conversation_et, new z.e_call.entities.ECallSetupMessage false, @_create_properties_payload(@self_state.video_send()), e_call_et
+      .catch (error) ->
       throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
   ###
@@ -433,7 +432,7 @@ class z.e_call.ECallCenter
     @get_e_call_by_id conversation_id
     .catch (error) =>
       throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
-      @_create_outgoing_e_call conversation_id, props: @_create_properties_payload video_send
+      @_create_outgoing_e_call conversation_id, new z.e_call.entities.ECallSetupMessage false, @_create_properties_payload video_send
     .then (e_call_et) =>
       @logger.debug "Joining e-call in conversation '#{conversation_id}'", e_call_et
       e_call = e_call_et
@@ -469,7 +468,7 @@ class z.e_call.ECallCenter
     @get_e_call_by_id conversation_id
     .catch =>
       conversation_et = @conversation_repository.get_conversation_by_id conversation_id
-      e_call_et = new z.e_call.entities.ECall conversation_et, creating_user_et, e_call_message.sessid or @create_session_id(), @
+      e_call_et = new z.e_call.entities.ECall conversation_et, creating_user_et, e_call_message.sessid, @
       @e_calls.push e_call_et
       return e_call_et
 
@@ -526,21 +525,6 @@ class z.e_call.ECallCenter
   ###############################################################################
   # Helper functions
   ###############################################################################
-
-  ###
-  Create a session ID.
-  @return [String] Random four char session ID
-  ###
-  create_session_id: ->
-    in_range = (value, lower_bound, upper_bound) ->
-      return value >= lower_bound and value <= upper_bound
-
-    get_random_char = ->
-      until in_range(char_index, 1, 9) or in_range(char_index, 65, 90) or in_range char_index, 97, 122
-        char_index = Math.floor Math.random() * 122
-      return if char_index <= 9 then char_index else String.fromCharCode char_index
-
-    return "#{get_random_char()}#{get_random_char()}#{get_random_char()}#{get_random_char()}"
 
   ###
   Get an e-call entity for a given conversation ID.

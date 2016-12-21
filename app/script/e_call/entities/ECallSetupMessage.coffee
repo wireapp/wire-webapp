@@ -27,13 +27,13 @@ E_CALL_MESSAGE_CONFIG =
 class z.e_call.entities.ECallSetupMessage extends z.e_call.entities.ECallMessage
   ###
   Construct a new e-call setup message entity.
-  @param e_call_et [z.e_call.entities.ECall] E-call the message relates to
   @param response [Boolean] Is message a response, defaults to false
   @param sdp [String] RTCSessionDescriptionProtocol information
   @param props [Object] Additional properties
+  @param e_call_et [z.e_call.entities.ECall] Optional e-call the e-call message relates to
   ###
-  constructor: (e_call_et, @response = false, @sdp, @props) ->
-    super e_call_et, z.e_call.enum.E_CALL_MESSAGE_TYPE.SETUP, @response
+  constructor: (@response = false, @sdp, @props, e_call_et) ->
+    super z.e_call.enum.E_CALL_MESSAGE_TYPE.SETUP, @response, e_call_et
 
   to_JSON: =>
     return {
@@ -41,7 +41,7 @@ class z.e_call.entities.ECallSetupMessage extends z.e_call.entities.ECallMessage
       props: @props
       resp: @response
       sdp: @sdp
-      sessid: @session_id
+      sessid: @sessid
       type: @type
     }
 

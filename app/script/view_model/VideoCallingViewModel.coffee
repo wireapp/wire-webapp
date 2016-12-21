@@ -21,7 +21,7 @@ z.ViewModel ?= {}
 
 
 class z.ViewModel.VideoCallingViewModel
-  constructor: (element_id, @call_center, @conversation_repository, @media_repository, @user_repository, @multitasking) ->
+  constructor: (element_id, @call_view_model, @conversation_repository, @media_repository, @user_repository, @multitasking) ->
     @logger = new z.util.Logger 'z.ViewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS
 
     @self_user = @user_repository.self
@@ -44,10 +44,11 @@ class z.ViewModel.VideoCallingViewModel
     @number_of_screen_devices = ko.observable 0
     @number_of_video_devices = ko.observable 0
 
-    @joined_call = @call_center.joined_call
+    @calls = @call_view_model.calls
+    @joined_call = @call_view_model.joined_call
 
     @videod_call = ko.pureComputed =>
-      for call_et in @call_center.calls()
+      for call_et in @calls()
         is_active = call_et.state() in z.calling.enum.CallStateGroups.IS_ACTIVE
         self_video_send = call_et.self_client_joined() and @self_stream_state.screen_send() or @self_stream_state.video_send()
         remote_video_send = (call_et.is_remote_screen_send() or call_et.is_remote_video_send()) and not call_et.is_ongoing_on_another_client()

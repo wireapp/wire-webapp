@@ -432,7 +432,7 @@ class z.e_call.entities.EFlow
     @local_sdp @_rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL
 
     @logger.info "Sending local SDP of type '#{@local_sdp().type}' for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
-    @e_call_et.send_e_call_event new z.e_call.entities.ECallSetupMessage @e_call_et, @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @local_sdp().sdp, videosend: false
+    @e_call_et.send_e_call_event new z.e_call.entities.ECallSetupMessage @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @local_sdp().sdp, videosend: false, @e_call_et
     .then =>
       @has_sent_local_sdp true
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful", @local_sdp()

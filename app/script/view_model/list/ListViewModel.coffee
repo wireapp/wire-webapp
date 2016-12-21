@@ -25,13 +25,13 @@ class z.ViewModel.list.ListViewModel
   ###
   @param element_id [String] HTML selector
   @param content_view_model [z.ViewModel.ContentViewModel] Content view model
-  @param call_center [z.calling.CallCenter] Call center
+  @param call_view_model [z.ViewModel.CallViewModel] Call view model
   @param connect_repository [z.connect.ConnectRepository] Connect repository
   @param conversation_repository [z.conversation.ConversationRepository] Conversation repository
   @param search_repository [z.search.SearchRepository] Search repository
   @param user_repository [z.user.UserRepository] User repository
   ###
-  constructor: (element_id, @content_view_model, @call_center, @connect_repository, @conversation_repository, @search_repository, @user_repository, @properties_repository) ->
+  constructor: (element_id, @call_view_model, @content_view_model, @connect_repository, @conversation_repository, @search_repository, @user_repository, @properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.list.ListViewModel', z.config.LOGGER.OPTIONS
 
     # state
@@ -44,7 +44,7 @@ class z.ViewModel.list.ListViewModel
 
     # nested view models
     @archive       = new z.ViewModel.list.ArchiveViewModel 'archive', @, @conversation_repository
-    @conversations = new z.ViewModel.list.ConversationListViewModel 'conversations', @, @content_view_model, @call_center, @conversation_repository, @user_repository
+    @conversations = new z.ViewModel.list.ConversationListViewModel 'conversations', @, @call_view_model, @content_view_model, @conversation_repository, @user_repository
     @preferences   = new z.ViewModel.list.PreferencesListViewModel 'preferences', @, @content_view_model
     @start_ui      = new z.ViewModel.list.StartUIViewModel 'start-ui', @, @connect_repository, @conversation_repository, @search_repository, @user_repository, @properties_repository
     @takeover      = new z.ViewModel.list.TakeoverViewModel 'takeover', @conversation_repository, @user_repository
