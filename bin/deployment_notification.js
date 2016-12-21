@@ -11,7 +11,7 @@ var branch = process.env.TRAVIS_BRANCH;
 var webAppUrl = 'https://app.wire.com/';
 
 switch (branch) {
-  case 'dev:
+  case 'dev':
     webAppUrl = 'https://wire-webapp-dev.zinfra.io/auth/?env=prod#login';
     break;
   case 'edge':
