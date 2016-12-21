@@ -26,7 +26,7 @@ class z.e_call.entities.EParticipant
   Construct a new e-participant.
   @param e_call [z.e_call.entities.ECall] E-call entity
   @param user [z.entity.User] User entity to base the participant on
-  @param e_call_message [Object] E-call message content payload
+  @param e_call_message [z.e_call.entities.ECallMessage] E-call setup message entity
   ###
   constructor: (@e_call_et, @user, e_call_message) ->
     @id = @user.id

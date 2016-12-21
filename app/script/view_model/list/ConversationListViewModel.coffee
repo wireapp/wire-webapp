@@ -147,13 +147,13 @@ class z.ViewModel.list.ConversationListViewModel
   on_ignore_call: (conversation_et) ->
     amplify.publish z.event.WebApp.CALL.STATE.IGNORE, conversation_et.id
 
-  on_toggle_audio: (conversation_et) =>
+  on_toggle_audio: (conversation_et) ->
     amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_et.id, z.media.MediaDeviceType.AUDIO
 
   on_toggle_screen: (conversation_et) ->
     amplify.publish z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, conversation_et.id
 
-  on_toggle_video: (conversation_et) =>
+  on_toggle_video: (conversation_et) ->
     amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_et.id, z.media.MediaDeviceType.VIDEO
 
 

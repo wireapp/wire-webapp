@@ -118,7 +118,7 @@ class z.e_call.entities.ECall
       if state in z.calling.enum.CallStateGroups.STOP_RINGING
         @_on_state_stop_ringing()
       else if state in z.calling.enum.CallStateGroups.IS_RINGING
-        @_on_state_is_ringing state is z.calling.enum.CallState.INCOMING
+        @_on_state_start_ringing state is z.calling.enum.CallState.INCOMING
 
       @previous_state = state
 
@@ -138,15 +138,15 @@ class z.e_call.entities.ECall
   start_negotiation: =>
     @self_client_joined true
     @self_user_joined true
-    participant_et.e_flow.start_negotiation() for participant_et in @participants() when participant_et.e_flow
+    e_participant_et.e_flow.start_negotiation() for e_participant_et in @participants() when e_participant_et.e_flow
+
+  _on_state_start_ringing: (is_incoming) =>
+    @_play_call_sound is_incoming
+    @_group_call_timeout is_incoming if @is_group()
 
   _on_state_stop_ringing: =>
     if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
       @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
-
-  _on_state_is_ringing: (is_incoming) =>
-    @_play_call_sound is_incoming
-    @_group_call_timeout is_incoming if @is_group()
 
   _clear_join_timer: =>
     window.clearTimeout @is_declined_timer
@@ -169,11 +169,11 @@ class z.e_call.entities.ECall
   _update_remote_state: ->
     media_type_changed = false
 
-    for participant_et in @participants()
-      if participant_et.state.screen_send()
+    for e_participant_et in @participants()
+      if e_participant_et.state.screen_send()
         @remote_media_type z.media.MediaType.SCREEN
         media_type_changed = true
-      else if participant_et.state.video_send()
+      else if e_participant_et.state.video_send()
         @remote_media_type z.media.MediaType.VIDEO
         media_type_changed = true
     @remote_media_type z.media.MediaType.AUDIO if not media_type_changed
@@ -184,8 +184,9 @@ class z.e_call.entities.ECall
   ###############################################################################
 
   ###
-  Add a participant to the call.
-  @param participant_et [z.calling.Participant] Participant entity to be added to the call
+  Add an e-participant to the e-call.
+  @param e_participant_et [z.e_call.entities.EParticipant] E-participant entity to be added to the e-call
+  @param e_call_message [z.e_call.entities.ECallSetupMessage] E-call setup message entity
   ###
   add_participant: (user_et, e_call_message) =>
     @get_participant_by_id user_et.id
@@ -198,22 +199,17 @@ class z.e_call.entities.ECall
       return @
 
   ###
-  Remove a participant from the call.
-  @param participant_et [z.e_call.EParticipant] E-Participant entity to be removed from the e-call
+  Remove an e-participant from the call.
+  @param e_participant_et [z.e_call.entities.EParticipant] E-Participant entity to be removed from the e-call
+  @return [z.e_call.entities.ECall] E-call entity
   ###
-  delete_participant: (participant_et) =>
-    @get_participant_by_id participant_et.id
-    .then (participant_et) =>
-      @interrupted_participants.remove participant_et
-      @participants.remove participant_et
+  delete_participant: (e_participant_et) =>
+    @get_participant_by_id e_participant_et.id
+    .then (e_participant_et) =>
+      @interrupted_participants.remove e_participant_et
+      @participants.remove e_participant_et
       @_update_remote_state()
-      @logger.debug "Removed e-call participant '#{participant_et.user.name()}'"
-
-      ### Delete flows from participant (if any left)
-      if participant_et.e_flow?.reset_flow()
-
-      amplify.publish z.event.WebApp.CALL.STATE.DELETE, @id if not @get_number_of_participants()
-      ###
+      @logger.debug "Removed e-call participant '#{e_participant_et.user.name()}'"
       return @
     .catch (error) ->
       throw error if error.type isnt z.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
@@ -229,7 +225,7 @@ class z.e_call.entities.ECall
   ###
   Get a call participant by his id.
   @param user_id [String] User ID of participant to be returned
-  @return [z.calling.Participant] Participant that matches given user ID
+  @return [z.e_call.entities.EParticipant] E-call participant that matches given user ID
   ###
   get_participant_by_id: (user_id) =>
     for e_participant_et in @participants() when e_participant_et.id is user_id
@@ -237,8 +233,9 @@ class z.e_call.entities.ECall
     return Promise.reject new z.e_call.ECallError z.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
 
   ###
-  Check whether this call is a video call
-  @todo update docs
+  Update e-call participant with e-call message.
+  @param user_et [z.entity.User] User to be updated
+  @param e_call_message [z.e_call.entities.ECallMessage] E-call message to update user with
   ###
   update_participant: (user_et, e_call_message) =>
     @get_participant_by_id user_et.id
@@ -261,7 +258,7 @@ class z.e_call.entities.ECall
   @return [Array<z.calling.Flow>] Array of flows
   ###
   get_flows: =>
-    return (participant_et.e_flow for participant_et in @participants() when participant_et.e_flow)
+    return (e_participant_et.e_flow for e_participant_et in @participants() when e_participant_et.e_flow)
 
   ###
   Calculates the panning (from left to right) to position a user in a group call.
@@ -290,12 +287,12 @@ class z.e_call.entities.ECall
     @participants.sort (participant_a, participant_b) ->
       return participant_a.user.joaat_hash - participant_b.user.joaat_hash
 
-    for participant_et, i in @participants()
+    for e_participant_et, i in @participants()
       panning = @_calculate_panning i, @participants().length
-      @logger.info "Panning for '#{participant_et.user.name()}' recalculated to '#{panning}'"
-      participant_et.panning panning
+      @logger.info "Panning for '#{e_participant_et.user.name()}' recalculated to '#{panning}'"
+      e_participant_et.panning panning
 
-    @logger.info "New panning order: #{(participant_et.user.name() for participant_et in @participants()).join ', '}"
+    @logger.info "New panning order: #{(e_participant_et.user.name() for e_participant_et in @participants()).join ', '}"
 
 
   ###############################################################################
@@ -327,4 +324,4 @@ class z.e_call.entities.ECall
   @private
   ###
   _reset_e_flows: ->
-    participant_et.e_flow.reset_flow() for participant_et in @participants() when participant_et.e_flow
+    e_participant_et.e_flow.reset_flow() for e_participant_et in @participants() when e_participant_et.e_flow

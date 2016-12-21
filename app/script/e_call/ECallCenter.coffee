@@ -167,7 +167,7 @@ class z.e_call.ECallCenter
   ###
   _on_event_in_unsupported_browsers: (event) ->
     e_call_message = event.content
-    return if e_call_message.resp is true
+    return if e_call_message.resp in [true, 'true']
 
     switch e_call_message.type
       when z.e_call.enum.E_CALL_MESSAGE_TYPE.SETUP
@@ -205,14 +205,17 @@ class z.e_call.ECallCenter
   @private
   @param conversation_id [String] ID of Conversation related to e-call event
   @param user_id [String] ID of user which is source of event
-  @param e_call_message [Object] E-call event payload
+  @param e_call_message [z.e_call.entities.ECallMessage] E-call message entity
   ###
   _on_e_call_hangup_event: (conversation_id, user_id, e_call_message) =>
+    return if e_call_message?.response
+
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @user_repository.get_user_by_id user_id, (user_et) =>
-        e_call_et.delete_participant user_et, e_call_message
+        e_call_et.delete_participant user_et
         .then (e_call_et) =>
+          @media_element_handler.remove_media_element user_et.id
           @delete_call conversation_id if not e_call_et.participants().length
     .catch (error) ->
       throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
@@ -222,13 +225,13 @@ class z.e_call.ECallCenter
   @private
   @param conversation_id [String] ID of Conversation related to e-call event
   @param user_id [String] ID of user which is source of event
-  @param e_call_message [Object] E-call event payload
+  @param e_call_message [z.e_call.entities.ECallSetupMessage] E-call setup message entity
   ###
   _on_e_call_setup_event: (conversation_id, user_id, e_call_message) =>
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @user_repository.get_user_by_id user_id, (user_et) ->
-        if e_call_message.resp
+        if e_call_message.resp in [true, 'true']
           return e_call_et.update_participant user_et, e_call_message
         return e_call_et.add_participant user_et, e_call_message
     .catch (error) =>
@@ -254,7 +257,7 @@ class z.e_call.ECallCenter
     throw new z.e_call.ECallError z.e_call.ECallError::TYPE.WRONG_PAYLOAD_FORMAT if not _.isObject e_call_message
 
     @get_e_call_by_id conversation_et.id
-    .then (e_call_et) =>
+    .then (e_call_et) ->
       if e_call_et.data_channel_opened
         return e_flow_et.send_message e_call_message.to_content_string() for e_flow_et in e_call_et.get_flows()
       throw new z.e_call.ECallError z.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED
@@ -364,12 +367,7 @@ class z.e_call.ECallCenter
   remove_participant: (conversation_id, user_id) =>
     return true if not @handled_by_v3 conversation_id
 
-    @get_e_call_by_id conversation_id
-    .then (e_call_et) =>
-      @user_repository.get_user_by_id user_id, (user_et) ->
-        e_call_et.delete_participant user_et
-    .catch (error) ->
-      throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+    @_on_e_call_hangup_event conversation_id, user_id
 
   ###
   User action to toggle the e-call state.
@@ -463,7 +461,7 @@ class z.e_call.ECallCenter
 
   @private
   @param conversation_id [String] ID of Conversation with e-call
-  @param e_call_message [Object] E-call message
+  @param e_call_message [z.e_call.entities.ECallSetupMessage] E-call setup message entity
   @param creating_user_et [z.entity.User] User that created e-call
   @return [z.e_call.entities.ECall] E-call entity
   ###
@@ -480,7 +478,7 @@ class z.e_call.ECallCenter
 
   @private
   @param conversation_id [String] ID of Conversation with e-call
-  @param e_call_message [Object] E-call message
+  @param e_call_message [z.e_call.entities.ECallSetupMessage] E-call setup message entity
   @param user_id [String] ID of user ID that created e-call
   ###
   _create_incoming_e_call: (conversation_id, e_call_message, user_id) ->
@@ -498,7 +496,7 @@ class z.e_call.ECallCenter
 
   @private
   @param conversation_id [String] ID of Conversation with e-call
-  @param e_call_message [Object] E-call message
+  @param e_call_message [z.e_call.entities.ECallSetupMessage] E-call setup message entity
   @param user_id [String] ID of user ID that created e-call
   ###
   _create_ongoing_e_call: (conversation_id, e_call_message, user_id) ->
@@ -515,7 +513,7 @@ class z.e_call.ECallCenter
 
   @private
   @param conversation_id [String] ID of Conversation with e-call
-  @param e_call_message [Object] E-call message
+  @param e_call_message [z.e_call.entities.ECallSetupMessage] E-call setup message entity
   ###
   _create_outgoing_e_call: (conversation_id, e_call_message) ->
     @_create_e_call conversation_id, e_call_message, @user_repository.self()
@@ -598,26 +596,3 @@ class z.e_call.ECallCenter
     .then (config) =>
       @logger.info 'Updated e-call configuration', config
       @config config
-
-
-  ###############################################################################
-  # @todo flow stuff
-  ###############################################################################
-
-  ###
-  Delete a flow on the backend.
-  @private
-  @param delete_flow_info [z.calling.payloads.FlowDeletionInfo] Contains Conversation ID, Flow ID and Reason for flow deletion
-  ###
-  delete_flow: (flow_info) =>
-    Promise.resolve @media_element_handler.remove_media_element flow_info.flow_id
-
-  ###
-  Delete all flows from an e-call.
-  ###
-  _delete_flows: (conversation_id) ->
-    return (participant_et.e_flow for participant_et in @participants() when participant_et.e_flow)
-    @logger.warn "Deleting all flows for '#{conversation_id}'"
-    @_get_flows conversation_id
-    .then (flows) =>
-      @delete_flow flow_deletion_info
