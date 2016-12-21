@@ -395,6 +395,7 @@ class z.e_call.entities.EFlow
     data_channel = event.target
     @logger.debug "Data channel '#{data_channel.label}' was closed", data_channel
     delete @data_channels[data_channel.label]
+    @e_call_et.data_channel_opened = false
 
   _on_error: (error) =>
     @logger.error "Data channel error: #{error.message}", event
