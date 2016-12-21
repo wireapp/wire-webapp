@@ -261,7 +261,7 @@ class z.e_call.ECallCenter
     .catch (error) =>
       throw error if error.type not in [z.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED , z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND]
       @logger.debug "Sending e-call event of type '#{e_call_message.type}' to conversation '#{conversation_et.id}'", e_call_message.to_JSON()
-      @logger.warn "OUTBOUND e-call message", e_call_message.to_content_string()
+      @logger.warn "OUTBOUND e-call message\n\n#{e_call_message.to_content_string()}"
       @conversation_repository.send_e_call conversation_et, e_call_message.to_content_string()
 
   ###
@@ -338,7 +338,7 @@ class z.e_call.ECallCenter
     .then (e_call_et) =>
       @media_stream_handler.release_media_streams()
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
-      if e_call_et.state is z.calling.enum.CallState.ONGOING
+      if e_call_et.state() is z.calling.enum.CallState.ONGOING
         message_type = z.e_call.enum.E_CALL_MESSAGE_TYPE.HANGUP
       else
         message_type = z.e_call.enum.E_CALL_MESSAGE_TYPE.CANCEL
@@ -533,22 +533,18 @@ class z.e_call.ECallCenter
 
   ###
   Create a session ID.
-  @return [String] Random faked session ID
+  @return [String] Random four char session ID
   ###
   create_session_id: ->
-    between = (value, lower_bound, upper_bound) ->
-      btw = value > lower_bound and value < upper_bound
-      console.log value, btw
+    in_range = (value, lower_bound, upper_bound) ->
+      return value >= lower_bound and value <= upper_bound
+
     get_random_char = ->
-      while not char_index or between(char_index, 9, 65) or between(char_index, 90, 97)
+      until in_range(char_index, 1, 9) or in_range(char_index, 65, 90) or in_range char_index, 97, 122
         char_index = Math.floor Math.random() * 122
-        console.log 'created', char_index
-      console.log 'picked', char_index
       return if char_index <= 9 then char_index else String.fromCharCode char_index
 
-    session_id = "#{get_random_char()}#{get_random_char()}#{get_random_char()}#{get_random_char()}"
-    console.log session_id
-    return 'XXXX'
+    return "#{get_random_char()}#{get_random_char()}#{get_random_char()}#{get_random_char()}"
 
   ###
   Get an e-call entity for a given conversation ID.

@@ -401,7 +401,7 @@ class z.e_call.entities.EFlow
 
   _on_message: (event) =>
     @logger.debug "Received message on data channel: #{event.data}", event
-    amplify.subscribe z.event.WebApp.CALL.EVENT_FROM_BACKEND,
+    amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND,
       conversation: @conversation_id
       from: @id
       content: JSON.parse event.data
@@ -481,10 +481,9 @@ class z.e_call.entities.EFlow
   @return [RTCSessionDescription] webRTC standard compliant RTCSessionDescription
   ###
   _map_sdp: (e_call_message) ->
-    @logger.warn "E-call message response type: #{ e_call_message.resp}", e_call_message
     return new window.RTCSessionDescription
       sdp: e_call_message.sdp
-      type: if e_call_message.resp in ['true', true] then z.calling.rtc.SDPType.ANSWER else z.calling.rtc.SDPType.OFFER
+      type: if e_call_message.resp in [true, 'true'] then z.calling.rtc.SDPType.ANSWER else z.calling.rtc.SDPType.OFFER
 
   ###
   Rewrite the SDP for compatibility reasons.
