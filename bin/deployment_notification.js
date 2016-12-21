@@ -2,7 +2,7 @@ var wire = require('wire-webapp-core');
 
 var conversationId = '9fe8b359-b9e0-4624-b63c-71747664e4fa';
 var email = process.env.WIRE_WEBAPP_BOT_EMAIL;
-var message = 'Hello Sven!';
+var message = process.argv[2];
 var password = process.env.WIRE_WEBAPP_BOT_PASSWORD;
 
 var user = new wire.User(email, password).login(false)
