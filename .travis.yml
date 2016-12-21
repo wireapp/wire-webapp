@@ -103,7 +103,7 @@ deploy:
       branch: prod
 
 after_script:
-  - AUTHOR_OF_LAST_COMMIT=$(git log | grep Author: | cut -d' ' -f2- | uniq | head -n1)
+  - "AUTHOR_OF_LAST_COMMIT=$(git log | grep Author: | cut -d' ' -f2- | uniq | head -n1)"
   - SUMMARY_OF_LAST_COMMIT=$(git log -1 --pretty=%s)
   - npm install wire-webapp-core@0.1.2
   - chmod ugo+x ./bin/deployment_notification.js
