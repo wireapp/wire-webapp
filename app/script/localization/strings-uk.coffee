@@ -319,7 +319,6 @@ z.string.uk.people_no_matches = 'Співпадіння відсутні.\nСп�
 z.string.uk.people_invite = 'Запросити людей'
 z.string.uk.people_share = 'Поділитись контактами'
 z.string.uk.people_bring_your_friends = 'Запросіть ваших друзів до Wire'
-z.string.uk.people_invite_detail = 'Поділившись контактами, ви зможете зв’язатись в Wire з людьми, з якими ви, можливо, знайомі. Вся інформація анонімна та не передається третім особам.'
 z.string.uk.people_invite_button_contacts = 'З контактів'
 z.string.uk.people_invite_button_gmail = 'З Gmail'
 z.string.uk.people_invite_headline = 'Приведіть друзів'
@@ -446,16 +445,8 @@ z.string.uk.search_group_hint = 'Спробуйте ще раз або вибе�
 z.string.uk.search_connect = 'Додати до контактів'
 z.string.uk.search_connections = 'Контакти'
 z.string.uk.search_groups = 'Групи'
-z.string.uk.search_placeholder = 'Шукайте за іменем або email'
 z.string.uk.search_top_people = 'Топ-контакти'
-z.string.uk.search_try_search = 'Знайти людей за іменем\nабо повною email-адресою'
-z.string.uk.search_no_contacts_on_wire = 'У вас поки що немає контактів у Wire.\nСпробуйте знайти людей за іменем\nабо повною email-адресою'
 z.string.uk.search_others = 'Додати до контактів'
-
-# Picture upload
-z.string.uk.upload_welcome = 'Wire виглядає краще з вашою фотографією.'
-z.string.uk.upload_welcome_keep = 'Залишити це'
-z.string.uk.upload_welcome_choose = 'Вибрати власне фото'
 
 # Google contacts upload
 z.string.uk.upload_google_headline = 'Знайдіть людей,\nщоб порозмовляти.'

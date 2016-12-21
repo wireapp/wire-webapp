@@ -324,7 +324,6 @@ z.string.pt.people_no_matches = 'Nenhum resultado correspondente. \nTente digita
 z.string.pt.people_invite = 'Convidar pessoas'
 z.string.pt.people_share = 'Compartilhar Contatos'
 z.string.pt.people_bring_your_friends = 'Traga seus amigos para o Wire'
-z.string.pt.people_invite_detail = 'Compartilhar seus contatos ajuda a conectar-se com outras pessoas. Nós tornamos anônimas todas as informações e não compartilhamos com ninguém.'
 z.string.pt.people_invite_button_contacts = 'Dos contatos'
 z.string.pt.people_invite_button_gmail = 'Do Gmail'
 z.string.pt.people_invite_headline = 'Traga os seus amigos'
@@ -454,18 +453,13 @@ z.string.pt.search_group_hint = 'Continue digitando ou escolha mais pessoas para
 z.string.pt.search_connect = 'Conectar'
 z.string.pt.search_connections = 'Conexões'
 z.string.pt.search_groups = 'Grupos'
-z.string.pt.search_placeholder = 'Pesquisar por nome ou e-mail'
+z.string.pt.search_placeholder = 'Procurar por nome ou nome de usuário'
 z.string.pt.search_top_people = 'Contatos frequentes'
-z.string.pt.search_try_search = 'Encontre pessoa por nome ou\nendereço de e-mail completo'
-z.string.pt.search_no_contacts_on_wire = 'Você não tem nenhum contato no Wire. \nTente encontrar pessoas pelo nome ou \nendereço de e-mail completo'
+z.string.pt.search_try_search = 'Encontre pessoas pelo \nnome ou nome de usuário'
+z.string.pt.search_no_contacts_on_wire = 'Você não tem nenhum contato no Wire. \nTente encontrar pessoas pelo\nnome ou nome de usuário.'
 z.string.pt.search_others = 'Conectar'
 z.string.pt.search_friend_in_common = '%no pessoa em comum'
 z.string.pt.search_friends_in_common = '%no pessoas em comum'
-
-# Picture upload
-z.string.pt.upload_welcome = 'O Wire é muito mais legal com uma foto.'
-z.string.pt.upload_welcome_keep = 'manter essa'
-z.string.pt.upload_welcome_choose = 'escolha sua imagem'
 
 # Google contacts upload
 z.string.pt.upload_google_headline = 'Encontre pessoas \npara conversar.'

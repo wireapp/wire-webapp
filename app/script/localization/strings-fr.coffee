@@ -319,7 +319,6 @@ z.string.fr.people_no_matches = 'Pas de résultats.\nEssayez avec un nom différ
 z.string.fr.people_invite = 'Inviter des personnes'
 z.string.fr.people_share = 'Partagez vos contacts'
 z.string.fr.people_bring_your_friends = 'Amenez vos amis sur Wire'
-z.string.fr.people_invite_detail = 'Partager vos contacts vous aide à vous connecter avec d’autres personnes. Nous anonymisons toutes les informations et ne les partageons pas avec qui que ce soit.'
 z.string.fr.people_invite_button_contacts = 'Depuis vos Contacts'
 z.string.fr.people_invite_button_gmail = 'Depuis Gmail'
 z.string.fr.people_invite_headline = 'Amenez vos amis'
@@ -446,16 +445,8 @@ z.string.fr.search_group_hint = 'Continuez d’écrire ou ajoutez plus de person
 z.string.fr.search_connect = 'Connecter'
 z.string.fr.search_connections = 'Connexions'
 z.string.fr.search_groups = 'Groupes'
-z.string.fr.search_placeholder = 'Rechercher par nom ou par email'
 z.string.fr.search_top_people = 'Personnes favorites'
-z.string.fr.search_try_search = 'Trouvez des personnes par leur nom ou\nleur adresse email complète'
-z.string.fr.search_no_contacts_on_wire = 'Vous n’avez pas de contacts sur Wire.\nEssayez de trouver des gens par leur nom\nou leur adresse email complète'
 z.string.fr.search_others = 'Connecter'
-
-# Picture upload
-z.string.fr.upload_welcome = 'Wire est tellement plus beau avec une photo.'
-z.string.fr.upload_welcome_keep = 'garder celle-là'
-z.string.fr.upload_welcome_choose = 'choisissez la vôtre'
 
 # Google contacts upload
 z.string.fr.upload_google_headline = 'Trouvez des personnes\nà qui parler.'

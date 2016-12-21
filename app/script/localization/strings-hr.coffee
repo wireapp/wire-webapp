@@ -320,7 +320,6 @@ z.string.hr.people_no_matches = 'Nema odgovarajućih rezultata. Pokušajte unije
 z.string.hr.people_invite = 'Pozovi ljude'
 z.string.hr.people_share = 'Podijeli kontakte'
 z.string.hr.people_bring_your_friends = 'Pozovi prijatelje na Wire'
-z.string.hr.people_invite_detail = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.'
 z.string.hr.people_invite_button_contacts = 'Iz kontakata'
 z.string.hr.people_invite_button_gmail = 'Iz Gmaila'
 z.string.hr.people_invite_headline = 'Pozovi prijatelje'
@@ -447,16 +446,8 @@ z.string.hr.search_group_hint = 'Nastavi pisati ili odaberi više ljudi za stvar
 z.string.hr.search_connect = 'Poveži se'
 z.string.hr.search_connections = 'Veze'
 z.string.hr.search_groups = 'Grupe'
-z.string.hr.search_placeholder = 'Pretraga po imenu ili emailu'
 z.string.hr.search_top_people = 'Top veze'
-z.string.hr.search_try_search = 'Traži veze pomoću pune e-mail adrese ili imena'
-z.string.hr.search_no_contacts_on_wire = 'Nemate veza na Wire. Pokušajte pronaći ljude po imenu ili potpunoj email adresi'
 z.string.hr.search_others = 'Poveži se'
-
-# Picture upload
-z.string.hr.upload_welcome = 'Wire je ljepši sa slikom.'
-z.string.hr.upload_welcome_keep = 'zadrži ovaj'
-z.string.hr.upload_welcome_choose = 'odaberite vlastitu'
 
 # Google contacts upload
 z.string.hr.upload_google_headline = 'Pronađi ljude za razgovor.'

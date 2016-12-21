@@ -324,7 +324,6 @@ z.string.sl.people_no_matches = 'Brez ujemanja rezultatov. \nPoizkusite vnesti d
 z.string.sl.people_invite = 'Povabite osebe'
 z.string.sl.people_share = 'Deli Stike'
 z.string.sl.people_bring_your_friends = 'Pripeljite svoje prijatelje na Wire'
-z.string.sl.people_invite_detail = 'Deljenje vaših stikov pomaga pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.'
 z.string.sl.people_invite_button_contacts = 'Iz imenika stikov'
 z.string.sl.people_invite_button_gmail = 'Iz Gmail'
 z.string.sl.people_invite_headline = 'Pripeljite vaše prijatelje'
@@ -453,18 +452,13 @@ z.string.sl.search_group_hint = 'Nadaljujte s tipkanjem ali izberite več oseb z
 z.string.sl.search_connect = 'Poveži'
 z.string.sl.search_connections = 'Povezave'
 z.string.sl.search_groups = 'Skupine'
-z.string.sl.search_placeholder = 'Iskanje po imenu ali e-pošti uporabnika'
+z.string.sl.search_placeholder = 'Iskanje po imenu ali uporabniškem imenu'
 z.string.sl.search_top_people = 'Top osebe'
-z.string.sl.search_try_search = 'Najdi osebe po imenu ali\npolnem e-poštnem naslovu'
-z.string.sl.search_no_contacts_on_wire = 'Nimate nobenih stikov na Wire.\nPoizkusite najti osebe po imenu\nali polnem e-poštnem naslovu'
+z.string.sl.search_try_search = 'Najdi osebe po imenu ali uporabniškem imenu'
+z.string.sl.search_no_contacts_on_wire = 'Nimate nobenih stikov na Wire.\nPoizkusite najti osebe po imenu\nali uporabniškem imenu.'
 z.string.sl.search_others = 'Poveži'
 z.string.sl.search_friend_in_common = '%no skupna oseba'
 z.string.sl.search_friends_in_common = '%no skupnih oseb'
-
-# Picture upload
-z.string.sl.upload_welcome = 'Wire je lepši s sliko.'
-z.string.sl.upload_welcome_keep = 'obdrži to'
-z.string.sl.upload_welcome_choose = 'izberi svojo'
 
 # Google contacts upload
 z.string.sl.upload_google_headline = 'Poiščite osebe\nza pogovor.'
