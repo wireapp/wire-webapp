@@ -401,11 +401,17 @@ class z.e_call.entities.EFlow
     @logger.error "Data channel error: #{error.message}", event
 
   _on_message: (event) =>
-    @logger.debug "Received message on data channel: #{event.data}", event
+    e_call_message = JSON.parse event.data
+
+    if e_call_message.resp in [true, 'true']
+      @logger.debug "Received confirmation for e-call message of type '#{e_call_message.type}' via data channel", e_call_message
+    else
+      @logger.debug "Received e-call message of type '#{e_call_message.type}' via data channel", e_call_message
+
     amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND,
       conversation: @conversation_id
       from: @id
-      content: JSON.parse event.data
+      content: e_call_message
       type: z.event.Client.CALL.E_CALL
 
   _on_open: (event) =>
@@ -432,7 +438,7 @@ class z.e_call.entities.EFlow
     @local_sdp @_rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL
 
     @logger.info "Sending local SDP of type '#{@local_sdp().type}' for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
-    @e_call_et.send_e_call_event new z.e_call.entities.ECallSetupMessage @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @local_sdp().sdp, videosend: false, @e_call_et
+    @e_call_et.send_e_call_event new z.e_call.entities.ECallSetupMessage @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @local_sdp().sdp, videosend: @e_call_et.self_state.video_send(), @e_call_et
     .then =>
       @has_sent_local_sdp true
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful", @local_sdp()
@@ -725,10 +731,6 @@ class z.e_call.entities.EFlow
   reset_flow: =>
     @_clear_send_sdp_timeout()
     @logger.info "Resetting flow with user '#{@remote_user.id}'"
-    .then (statistics) =>
-      @logger.info 'Flow network stats updated for the last time', statistics
-    .catch (error) =>
-      @logger.warn "Failed to reset flow networks stats: #{error.message}"
     try
       if @peer_connection?.signalingState isnt z.calling.rtc.SignalingState.CLOSED
         @_close_peer_connection()

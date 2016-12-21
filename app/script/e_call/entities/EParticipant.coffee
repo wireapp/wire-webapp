@@ -48,9 +48,10 @@ class z.e_call.entities.EParticipant
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.READY_TO_TALK
         @was_connected = true
 
-  update_flow: (e_call_message) =>
+  update_state: (e_call_message) =>
     @update_properties e_call_message.props
-    @e_flow.save_remote_sdp e_call_message
+    if e_call_message.type is z.e_call.enum.E_CALL_MESSAGE_TYPE.SETUP
+      @e_flow.save_remote_sdp e_call_message
 
   update_properties: (properties) =>
     if properties

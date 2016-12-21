@@ -23,4 +23,5 @@ z.e_call.enum ?= {}
 z.e_call.enum.E_CALL_MESSAGE_TYPE =
   CANCEL: 'CANCEL'
   HANGUP: 'HANGUP'
+  PROP_SYNC: 'PROPSYNC'
   SETUP: 'SETUP'

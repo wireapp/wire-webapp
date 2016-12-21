@@ -36,6 +36,7 @@ class z.e_call.entities.ECall
     @audio_repository = @e_call_center.media_repository.audio_repository
     @config = @e_call_center.config
     @self_user = @e_call_center.user_repository.self()
+    @self_state = @e_call_center.self_state
 
     # States
     @call_timer_interval = undefined
@@ -241,9 +242,8 @@ class z.e_call.entities.ECall
     @get_participant_by_id user_et.id
     .then (e_participant_et) =>
       @logger.debug "Updating e-call participant '#{user_et.name()}'", e_call_message
-      if e_call_message.props
-        e_participant_et.update_flow e_call_message
-        @_update_remote_state()
+      e_participant_et.update_state e_call_message
+      @_update_remote_state()
       return @
     .catch (error) ->
       throw error if error.type isnt z.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND

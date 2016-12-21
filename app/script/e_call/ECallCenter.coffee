@@ -188,13 +188,15 @@ class z.e_call.ECallCenter
     e_call_message = event.content
     user_id = event.from
 
-    @logger.debug "Received e-call event of type '#{e_call_message.type}' from user '#{user_id}' in conversation '#{conversation_id}'", event
+    @logger.debug "Received e-call message of type '#{e_call_message.type}' from user '#{user_id}' in conversation '#{conversation_id}'", event
     if e_call_message.version not in E_CALL_CONFIG.SUPPORTED_VERSIONS
       throw new z.e_call.ECallError z.e_call.ECallError::TYPE.UNSUPPORTED_VERSION
 
     switch e_call_message.type
       when z.e_call.enum.E_CALL_MESSAGE_TYPE.CANCEL, z.e_call.enum.E_CALL_MESSAGE_TYPE.HANGUP
         @_on_e_call_hangup_event conversation_id, user_id, e_call_message
+      when z.e_call.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
+        @_on_e_call_prop_sync_event conversation_id, user_id, e_call_message
       when z.e_call.enum.E_CALL_MESSAGE_TYPE.SETUP
         @_on_e_call_setup_event conversation_id, user_id, e_call_message
       else
@@ -217,6 +219,22 @@ class z.e_call.ECallCenter
         .then (e_call_et) =>
           @media_element_handler.remove_media_element user_et.id
           @delete_call conversation_id if not e_call_et.participants().length
+    .catch (error) ->
+      throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+
+  ###
+  E-call cancel event handling.
+  @private
+  @param conversation_id [String] ID of Conversation related to e-call event
+  @param user_id [String] ID of user which is source of event
+  @param e_call_message [z.e_call.entities.ECallSetupMessage] E-call setup message entity
+  ###
+  _on_e_call_prop_sync_event: (conversation_id, user_id, e_call_message) =>
+    @get_e_call_by_id conversation_id
+    .then (e_call_et) =>
+      @user_repository.get_user_by_id user_id, (user_et) ->
+        if e_call_message.resp in [false, 'false']
+          return e_call_et.update_participant user_et, e_call_message
     .catch (error) ->
       throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
@@ -270,11 +288,14 @@ class z.e_call.ECallCenter
   ###
   Create properties payload for e-call events.
   @private
+  @param media_type [z.media.MediaType] MediaType of properties update
   @return [Object] Properties object
   ###
-  _create_properties_payload: (video_send) ->
+  _create_properties_payload: (media_type) ->
     return {
-      videosend: video_send
+      audiosend: @self_state.audio_send() if media_type is z.media.MediaType.AUDIO
+      screensend: @self_state.screen_send() if media_type in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
+      videosend: @self_state.video_send() if media_type in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
     }
 
   ###############################################################################
@@ -317,7 +338,7 @@ class z.e_call.ECallCenter
   @param conversation_id [String] ID of conversation to join e-call in
   @param video_send [Boolean] Send video for this e-call
   ###
-  join_call: (conversation_id, video_send) =>
+  join_call: (conversation_id, video_send = false) =>
     @get_e_call_by_id conversation_id
     .then (e_call_et) ->
       return e_call_et.state()
@@ -347,6 +368,7 @@ class z.e_call.ECallCenter
         message_type = z.e_call.enum.E_CALL_MESSAGE_TYPE.CANCEL
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
       @send_e_call_event e_call_et.conversation_et, new z.e_call.entities.ECallMessage message_type, false, e_call_et
+      @delete_call conversation_id if e_call_et.participants().length < 2
     .catch (error) ->
       throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
@@ -390,12 +412,13 @@ class z.e_call.ECallCenter
         when z.media.MediaType.AUDIO
           @media_stream_handler.toggle_audio_send()
         when z.media.MediaType.SCREEN
-          @media_stream_handler.toggle_video_send()
+          @media_stream_handler.toggle_screen_send()
         when z.media.MediaType.VIDEO
           @media_stream_handler.toggle_video_send()
+
       toggle_promise.then =>
-        @send_e_call_event e_call_et.conversation_et, new z.e_call.entities.ECallSetupMessage false, @_create_properties_payload(@self_state.video_send()), e_call_et
-      .catch (error) ->
+        @send_e_call_event e_call_et.conversation_et, new z.e_call.entities.ECallPropSyncMessage false, @_create_properties_payload(media_type), e_call_et
+    .catch (error) ->
       throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
   ###
@@ -432,7 +455,7 @@ class z.e_call.ECallCenter
     @get_e_call_by_id conversation_id
     .catch (error) =>
       throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
-      @_create_outgoing_e_call conversation_id, new z.e_call.entities.ECallSetupMessage false, @_create_properties_payload video_send
+      @_create_outgoing_e_call conversation_id, new z.e_call.entities.ECallPropSyncMessage false, videosend: video_send
     .then (e_call_et) =>
       @logger.debug "Joining e-call in conversation '#{conversation_id}'", e_call_et
       e_call = e_call_et
@@ -512,7 +535,7 @@ class z.e_call.ECallCenter
 
   @private
   @param conversation_id [String] ID of Conversation with e-call
-  @param e_call_message [z.e_call.entities.ECallSetupMessage] E-call setup message entity
+  @param e_call_message [z.e_call.entities.ECallPropSyncMessage] E-call properties sync message entity
   ###
   _create_outgoing_e_call: (conversation_id, e_call_message) ->
     @_create_e_call conversation_id, e_call_message, @user_repository.self()

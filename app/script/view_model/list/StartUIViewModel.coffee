@@ -482,7 +482,7 @@ class z.ViewModel.list.StartUIViewModel
   on_audio_call: =>
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
-        amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id
+        amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id, false
       , 1000
 
   on_video_call: =>

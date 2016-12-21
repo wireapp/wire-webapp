@@ -447,11 +447,13 @@ class z.calling.handler.CallStateHandler
   @param media_type [z.media.MediaType] MediaType of requested change
   ###
   toggle_media: (conversation_id, media_type) =>
+    return true if @handled_by_v3 conversation_id
+
     toggle_promise = switch media_type
       when z.media.MediaType.AUDIO
         @media_stream_handler.toggle_audio_send()
       when z.media.MediaType.SCREEN
-        @media_stream_handler.toggle_video_send()
+        @media_stream_handler.toggle_screen_send()
       when z.media.MediaType.VIDEO
         @media_stream_handler.toggle_video_send()
 

@@ -186,10 +186,10 @@ class z.media.MediaStreamHandler
   ###
   Initiate the MediaStream.
   @param conversation_id [String] Conversation ID of call
-  @param is_videod [Boolean] Should MediaStreamContain video
+  @param video_send [Boolean] Should MediaStream contain video
   @return [Promise] Promise that resolve when the MediaStream has been initiated
   ###
-  initiate_media_stream: (conversation_id, video_send) =>
+  initiate_media_stream: (conversation_id, video_send = false) =>
     @media_repository.devices_handler.update_current_devices video_send
     .then =>
       return @get_media_stream_constraints true, video_send
@@ -512,7 +512,7 @@ class z.media.MediaStreamHandler
   # Toggle the camera.
   toggle_video_send: =>
     if @local_media_streams.video() and @local_media_type() is z.media.MediaType.VIDEO
-      return @_toggle_video_enabled()
+      return @_toggle_video_send()
     return @replace_input_source z.media.MediaType.VIDEO
 
   # Toggle the mute state of the microphone.

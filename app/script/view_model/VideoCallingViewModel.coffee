@@ -134,7 +134,7 @@ class z.ViewModel.VideoCallingViewModel
     return if @disable_toggle_screen()
 
     if @self_stream_state.screen_send() or z.util.Environment.browser.firefox
-      amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaDeviceType.SCREEN
+      amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN
 
     else if z.util.Environment.electron
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN,
@@ -149,18 +149,18 @@ class z.ViewModel.VideoCallingViewModel
             @multitasking.reset_minimize true
             @multitasking.is_minimized false
         else
-          amplify.publish z.event.WebApp.CALL.STATE.MEDIA.TOGGLE, conversation_id, z.media.MediaDeviceType.SCREEN
+          amplify.publish z.event.WebApp.CALL.STATE.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN
       .catch (error) =>
         @logger.error 'Unable to get screens sources for sharing', error
 
   clicked_on_cancel_call: =>
-    amplify.subscribe z.event.WebApp.CALL.STATE.LEAVE, @joined_call()?.id
+    amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @joined_call()?.id
 
   clicked_on_cancel_screen: =>
     @is_choosing_screen false
 
   clicked_on_mute_audio: =>
-    amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call()?.id, z.media.MediaDeviceType.AUDIO
+    amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call()?.id, z.media.MediaType.AUDIO
 
   clicked_on_share_screen: =>
     @choose_shared_screen @joined_call().id
@@ -170,14 +170,14 @@ class z.ViewModel.VideoCallingViewModel
     @logger.info "Selected '#{screen_source.name}' for screen sharing", screen_source
     @is_choosing_screen false
     @current_device_id.screen_input screen_source.id
-    amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call().id, z.media.MediaDeviceType.SCREEN
+    amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call().id, z.media.MediaType.SCREEN
     if @multitasking.reset_minimize()
       @multitasking.is_minimized true
       @multitasking.reset_minimize false
       @logger.info "Minimizing call '#{@joined_call().id}' on screen selection to return to previous state"
 
   clicked_on_stop_video: =>
-    amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call()?.id, z.media.MediaDeviceType.VIDEO
+    amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call()?.id, z.media.MediaType.VIDEO
 
   clicked_on_toggle_camera: =>
     @media_repository.devices_handler.toggle_next_camera()
