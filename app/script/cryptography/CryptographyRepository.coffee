@@ -171,6 +171,19 @@ class z.cryptography.CryptographyRepository
   ###############################################################################
 
   ###
+  Create a map of all local sessions.
+  @return [Object] Object of users each containing an array of local sessions
+  ###
+  create_user_session_map: =>
+    user_session_map = {}
+    for session_id, session of sessions
+      ids = z.client.Client.dismantle_user_client_id session_id
+      user_session_map[ids.user_id] ?= []
+      user_session_map[ids.user_id].push ids.client_id
+    @logger.info "Created user session map for '#{Object.keys(user_session_map).length}' users", user_session_map
+    return user_session_map
+
+  ###
   Deletes a session.
 
   @param user_id [String] User ID of our chat partner
@@ -539,6 +552,7 @@ class z.cryptography.CryptographyRepository
       decrypted_message = session.decrypt msg_bytes
     else
       [session, decrypted_message] = @_session_from_message user_id, client_id, msg_bytes
+      amplify.publish z.event.WebApp.CLIENT.ADD, user_id, new z.client.Client id: client_id
 
     generic_message = z.proto.GenericMessage.decode decrypted_message
     @save_session session
