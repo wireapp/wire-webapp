@@ -36,7 +36,7 @@ switch (commit.branch) {
 }
 
 content.message =
-  `**Travis build ${build.number} deployed on '${commit.branch}' environment.** ᕦ(￣ ³￣)ᕤ`
+  `**Travis build '${build.number}' deployed on '${commit.branch}' environment.** ᕦ(￣ ³￣)ᕤ`
   + `\r\n- Link: ${build.url}`
   + `\r\n- Last commit from: ${commit.author}`
   + `\r\n- Last commit message: ${commit.message}`;
