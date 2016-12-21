@@ -770,6 +770,9 @@ describe 'z.conversation.ConversationRepository', ->
 
   describe 'get_events', ->
     it 'gets messages which are not broken by design', (done) ->
+      spyOn(user_repository, 'get_user_by_id').and.callFake (message_id, callback) ->
+        callback new z.entity.User()
+
       conversation_et = new z.entity.Conversation z.util.create_random_uuid()
       #@formatter:off
       bad_message = {"conversation":"#{conversation_et.id}","id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Hello World :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"}
@@ -785,8 +788,9 @@ describe 'z.conversation.ConversationRepository', ->
       save_messages.push storage_service.save object_store, good_message_key, good_message
 
       Promise.all save_messages
-      .then =>
+      .then ->
         return conversation_repository.get_events conversation_et
-      .then (loaded_events) =>
+      .then (loaded_events) ->
         expect(loaded_events.length).toBe 1
         done()
+      .catch done.fail

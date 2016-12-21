@@ -37,7 +37,6 @@ class z.entity.Conversation
     @is_pending = ko.observable false
     @is_loaded = ko.observable false
 
-    @all_user_ids = ko.observableArray []
     @participating_user_ets = ko.observableArray [] # Does not include us
     @participating_user_ids = ko.observableArray []
     @self = undefined
