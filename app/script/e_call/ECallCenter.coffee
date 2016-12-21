@@ -243,39 +243,26 @@ class z.e_call.ECallCenter
   # Inbound e-call events
   ###############################################################################
 
-  create_setup_event: (e_call_et, response = false, additional_payload) =>
-    return $.extend @_create_e_call_event(e_call_et, z.e_call.enum.E_CALL_MESSAGE_TYPE.SETUP, response), additional_payload
-
   ###
   Send an e-call event.
-  @param e_call_message [Object] Content payload for e-call message
   @param conversation_et [z.entity] Conversation to send message in
+  @param e_call_message [z.e_call.entities.ECallMessage] E-call message entity
   ###
   send_e_call_event: (conversation_et, e_call_message) =>
     throw new z.e_call.ECallError z.e_call.ECallError::TYPE.NOT_ENABLED if not @use_v3_api
     throw new z.e_call.ECallError z.e_call.ECallError::TYPE.NOT_SUPPORTED if not conversation_et.is_one2one()
     throw new z.e_call.ECallError z.e_call.ECallError::TYPE.WRONG_PAYLOAD_FORMAT if not _.isObject e_call_message
 
-    e_call_message = $.extend version: '3.0', e_call_message
-
     @get_e_call_by_id conversation_et.id
     .then (e_call_et) =>
       if e_call_et.data_channel_openend
-        return e_flow_et.send_message e_call_message for e_flow_et in e_call_et.get_flows()
+        return e_flow_et.send_message e_call_message.to_content_string() for e_flow_et in e_call_et.get_flows()
       throw new z.e_call.ECallError z.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED
     .catch (error) =>
       throw error if error.type not in [z.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED , z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND]
-      @logger.debug "Sending e-call event of type '#{e_call_message.type}' to conversation '#{conversation_et.id}'", e_call_message
-      message = JSON.stringify(e_call_message)
-      @logger.warn "OUTBOUND e-call message", message
-      @conversation_repository.send_e_call JSON.stringify(e_call_message), conversation_et
-
-  _create_e_call_event: (e_call_et, type, response = false) ->
-    return {
-      resp: response
-      sessid: e_call_et.session_id
-      type: type
-    }
+      @logger.debug "Sending e-call event of type '#{e_call_message.type}' to conversation '#{conversation_et.id}'", e_call_message.to_JSON()
+      @logger.warn "OUTBOUND e-call message", e_call_message.to_content_string()
+      @conversation_repository.send_e_call conversation_et, e_call_message.to_content_string()
 
   ###
   Create properties payload for e-call events.
@@ -351,9 +338,13 @@ class z.e_call.ECallCenter
     .then (e_call_et) =>
       @media_stream_handler.release_media_streams()
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
+      if e_call_et.state is z.calling.enum.CallState.ONGOING
+        message_type = z.e_call.enum.E_CALL_MESSAGE_TYPE.HANGUP
+      else
+        message_type = z.e_call.enum.E_CALL_MESSAGE_TYPE.CANCEL
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
-      # @todo send cancel event, tear down e-call
-      @send_e_call_event e_call_et.conversation_et, @_create_e_call_event e_call_et, z.e_call.enum.E_CALL_MESSAGE_TYPE.HANGUP
+      # @todo send appropriate leave event, tear down e-call
+      @send_e_call_event e_call_et.conversation_et, new z.e_call.entities.ECallMessage e_call_et, message_type, false
     .catch (error) ->
       throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
@@ -406,7 +397,7 @@ class z.e_call.ECallCenter
         when z.media.MediaType.VIDEO
           @media_stream_handler.toggle_video_send()
       toggle_promise.then =>
-        @send_e_call_event e_call_et.conversation_et, @create_setup_event e_call_et, false, props: @_create_properties_payload @self_state.video_send()
+        @send_e_call_event e_call_et.conversation_et, new z.e_call.entities.ECallSetupMessage e_call_et, false, props: @_create_properties_payload @self_state.video_send()
     .catch (error) ->
       throw error if error.type isnt z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
@@ -541,6 +532,25 @@ class z.e_call.ECallCenter
   ###############################################################################
 
   ###
+  Create a session ID.
+  @return [String] Random faked session ID
+  ###
+  create_session_id: ->
+    between = (value, lower_bound, upper_bound) ->
+      btw = value > lower_bound and value < upper_bound
+      console.log value, btw
+    get_random_char = ->
+      while not char_index or between(char_index, 9, 65) or between(char_index, 90, 122)
+        char_index = Math.floor Math.random() * 122
+        console.log 'created', char_index
+      console.log 'picked', char_index
+      return if char_index <= 9 then char_index else String.fromCharCode char_index
+
+    session_id = "#{get_random_char()}#{get_random_char()}#{get_random_char()}#{get_random_char()}"
+    console.log session_id
+    return 'XXXX'
+
+  ###
   Get an e-call entity for a given conversation ID.
   @param conversation_id [String] ID of Conversation of requested e-call
   @return [z.e_call.entities.ECall] E-call entity for conversation ID
@@ -558,15 +568,6 @@ class z.e_call.ECallCenter
   set_logging: (is_enabled) =>
     @logger.info "Set logging for webRTC Adapter: #{is_enabled}"
     adapter?.disableLog = not is_enabled
-
-  ###
-  Create a session ID.
-  @private
-  @return [String] Random faked session ID
-  ###
-  _create_session_id: ->
-    # @todo implement AVS like session id
-    return 'XXXX'
 
   ###
   Get the MediaType from given e-call event properties.

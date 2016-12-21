@@ -918,7 +918,7 @@ class z.conversation.ConversationRepository
 
   ###
   Send confirmation for a content message in specified conversation.
-  @param conversation [z.entity.Conversation] Conversation that content message was received in
+  @param conversation_et [z.entity.Conversation] Conversation that content message was received in
   @param message_et [String] ID of message for which to acknowledge receipt
   ###
   send_confirmation_status: (conversation_et, message_et) =>
@@ -928,9 +928,14 @@ class z.conversation.ConversationRepository
     generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
     @sending_queue.push => @_send_generic_message conversation_et.id, generic_message, [message_et.user().id], false
 
-  send_e_call: (message_content, conversation_et) =>
+  ###
+  Send e-call message in specified conversation.
+  @param conversation_et [z.entity.Conversation] Conversation to send e-call message to
+  @param content [String] Content for e-call message
+  ###
+  send_e_call: (conversation_et, content) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'calling', new z.proto.Calling message_content
+    generic_message.set 'calling', new z.proto.Calling content
     @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
 
   ###

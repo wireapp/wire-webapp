@@ -20,7 +20,7 @@ window.z ?= {}
 z.e_call ?= {}
 z.e_call.entities ?= {}
 
-# E-Call entity.
+# E-call entity.
 class z.e_call.entities.ECall
   ###
   Construct a new e-call entity.
@@ -132,8 +132,8 @@ class z.e_call.entities.ECall
   # Call states
   ###############################################################################
 
-  send_e_call_event: (message_content) =>
-    @e_call_center.send_e_call_event @conversation_et, message_content
+  send_e_call_event: (e_call_message) =>
+    @e_call_center.send_e_call_event @conversation_et, e_call_message
 
   start_negotiation: =>
     participant_et.e_flow.start_negotiation() for participant_et in @participants() when participant_et.e_flow

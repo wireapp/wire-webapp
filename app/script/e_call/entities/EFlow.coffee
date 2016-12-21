@@ -425,16 +425,14 @@ class z.e_call.entities.EFlow
     @remote_sdp @_rewrite_sdp @_map_sdp(e_call_message), z.calling.enum.SDPSource.REMOTE
     @logger.info "Saved remote SDP of type '#{@remote_sdp().type}'", @remote_sdp()
 
-  # Initiates sending the local Session Description Protocol to the backend.
+  # Initiates sending the local RTCSessionDescriptionProtocol to the remote user.
   send_local_sdp: =>
     @_clear_send_sdp_timeout()
     @local_sdp @_rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL
 
     @logger.debug "session:", @e_call_et.session_id
     @logger.info "Sending local SDP of type '#{@local_sdp().type}' for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
-    @e_call_et.send_e_call_event @create_setup_event e_call_et, @local_sdp().type is z.calling.rtc.SDPType.ANSWER,
-      props: @_create_properties_payload @self_state.video_send()
-      sdp: @local_sdp().sdp
+    @e_call_et.send_e_call_event new z.calling.entities.ECallSetupMessage @e_call_et, @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @local_sdp().sdp, videosend: false
     .then =>
       @has_sent_local_sdp true
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful", @local_sdp()
