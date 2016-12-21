@@ -20,7 +20,7 @@ window.z ?= {}
 z.e_call ?= {}
 
 E_CALL_CONFIG =
-  CONFIG_UPDATE_INTERVAL: 120000 #21600000
+  CONFIG_UPDATE_INTERVAL: 6 * 60 * 60 * 1000 # 6 hours
   SUPPORTED_EVENTS: [
     z.event.Client.CALL.E_CALL
   ]
@@ -470,7 +470,7 @@ class z.e_call.ECallCenter
     @get_e_call_by_id conversation_id
     .catch =>
       conversation_et = @conversation_repository.get_conversation_by_id conversation_id
-      e_call_et = new z.e_call.entities.ECall conversation_et, creating_user_et, e_call_message.sessid or @_create_session_id(), @
+      e_call_et = new z.e_call.entities.ECall conversation_et, creating_user_et, e_call_message.sessid or @create_session_id(), @
       @e_calls.push e_call_et
       return e_call_et
 
@@ -540,7 +540,7 @@ class z.e_call.ECallCenter
       btw = value > lower_bound and value < upper_bound
       console.log value, btw
     get_random_char = ->
-      while not char_index or between(char_index, 9, 65) or between(char_index, 90, 122)
+      while not char_index or between(char_index, 9, 65) or between(char_index, 90, 97)
         char_index = Math.floor Math.random() * 122
         console.log 'created', char_index
       console.log 'picked', char_index
