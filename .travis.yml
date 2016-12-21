@@ -102,7 +102,7 @@ deploy:
       repo: wireapp/wire-webapp
       branch: prod
 
-after_script:
+after_deploy:
   - "AUTHOR_OF_LAST_COMMIT=$(git log | grep Author: | cut -d' ' -f2- | uniq | head -n1)"
   - "SUMMARY_OF_LAST_COMMIT=$(git log -1 --pretty=%s)"
   - npm install wire-webapp-core@0.1.2
