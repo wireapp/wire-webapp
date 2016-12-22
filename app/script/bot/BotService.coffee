@@ -19,10 +19,12 @@
 window.z ?= {}
 z.bot ?= {}
 
+BOT_SERVICE_URL = 'api/v1/bot/'
+
 class z.bot.BotService
   constructor: ->
     @logger = new z.util.Logger 'z.bot.BotService', z.config.LOGGER.OPTIONS
-    @url = "#{z.config.BOT_URL}"
+    @url = "#{z.util.Environment.backend.website_url()}#{BOT_SERVICE_URL}"
     return @
 
   fetch_bot: (bot_name) ->

@@ -98,7 +98,16 @@ z.util.Environment = do ->
   # "backend.current" is "undefined" when you are not connected to the backend (for example, if you are on the login page).
   # In such situations use methods like "is_staging" to detect environments.
   #
-  backend: current: undefined
+  backend:
+    account_url: ->
+      if z.util.Environment.backend.current is z.service.BackendEnvironment.PRODUCTION
+        return z.config.ACCOUNT_PRODUCTION_URL
+      return z.config.ACCOUNT_STAGING_URL
+    current: undefined
+    website_url: ->
+      if z.util.Environment.backend.current is z.service.BackendEnvironment.PRODUCTION
+        return z.config.WEBSITE_PRODUCTION_URL
+      return z.config.WEBSITE_STAGING_URL
 
   frontend:
     is_localhost: ->
