@@ -621,23 +621,30 @@ class z.conversation.ConversationRepository
         callback next_conversation_et
       else
         @archive_conversation conversation_et, next_conversation_et
-    .catch (error) =>
-      @logger.error "Failed to leave conversation (#{conversation_et.id}): #{error}"
+
+  ###
+  Remove bot from conversation.
+  @param conversation_et [z.entity.Conversation] Conversation to remove member from
+  @param user_id [String] ID of bot to be removed from the the conversation
+  ###
+  remove_bot: (conversation_et, user_id) =>
+    @conversation_service.delete_bots conversation_et.id, user_id
+    .then (response) ->
+      if response
+        amplify.publish z.event.WebApp.EVENT.INJECT, response
+        return response
 
   ###
   Remove member from conversation.
-
   @param conversation_et [z.entity.Conversation] Conversation to remove member from
   @param user_id [String] ID of member to be removed from the the conversation
-  @param callback [Function] Function to be called on server return
   ###
-  remove_member: (conversation_et, user_id, callback) =>
+  remove_member: (conversation_et, user_id) =>
     @conversation_service.delete_members conversation_et.id, user_id
     .then (response) ->
-      amplify.publish z.event.WebApp.EVENT.INJECT, response
-      callback?()
-    .catch (error) =>
-      @logger.error "Failed to remove member from conversation (#{conversation_et.id}): #{error}"
+      if response
+        amplify.publish z.event.WebApp.EVENT.INJECT, response
+        return response
 
   ###
   Rename conversation.
@@ -653,8 +660,6 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.EVENT.INJECT, response
     .then ->
       callback?()
-    .catch (error) =>
-      @logger.error "Failed to rename conversation (#{conversation_et.id}): #{error.message}"
 
   reset_session: (user_id, client_id, conversation_id) =>
     @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'"

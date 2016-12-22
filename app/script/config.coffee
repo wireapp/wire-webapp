@@ -107,5 +107,8 @@ z.config =
 
   UNSPLASH_URL: 'https://source.unsplash.com/1200x1200/?landscape'
 
+  ACCOUNT_PRODUCTION_URL: 'https://account-wire.com/'
+  ACCOUNT_STAGING_URL: 'https://wire-account-staging.zinfra.io/'
+
   WEBSITE_PRODUCTION_URL: 'https://wire.com/'
   WEBSITE_STAGING_URL: 'https://staging-website.zinfra.io/'

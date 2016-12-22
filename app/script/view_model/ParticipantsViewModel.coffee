@@ -191,8 +191,12 @@ class z.ViewModel.ParticipantsViewModel
       data:
         user: user_et
       confirm: =>
-        @conversation_repository.remove_member @conversation(), user_et.id, (response) =>
-          @reset_view() if response
+        if user_et.is_bot()
+          remove_promise = @conversation_repository.remove_bot @conversation(), user_et.id
+        else
+          remove_promise = @conversation_repository.remove_member @conversation(), user_et.id
+
+        remove_promise.then (response) => @reset_view() if response
 
   show_preferences_account: ->
     amplify.publish z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT
