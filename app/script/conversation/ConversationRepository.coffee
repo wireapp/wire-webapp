@@ -652,7 +652,7 @@ class z.conversation.ConversationRepository
   @param user_et [z.entity.User] User to be removed from the conversation
   ###
   remove_participant: (conversation_et, user_et) =>
-    if user_et.is_bot()
+    if user_et.is_bot
       return @conversation_repository.remove_bot @conversation(), user_et.id
     return @conversation_repository.remove_member @conversation(), user_et
 
