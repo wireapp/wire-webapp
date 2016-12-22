@@ -536,7 +536,7 @@ class z.ViewModel.AuthViewModel
 
   clicked_on_password: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, value: 'fromSignIn'
-    z.util.safe_window_open z.localization.Localizer.get_text z.string.url_password_reset
+    z.util.safe_window_open "#{z.util.Environment.backend.website_url()}#{z.localization.Localizer.get_text z.string.url_password_reset}"
 
   clicked_on_register: => @_set_hash z.auth.AuthView.MODE.ACCOUNT_REGISTER
 

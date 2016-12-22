@@ -49,6 +49,7 @@ class z.entity.User
   ###
   constructor: (@id = '') ->
     @is_me = false
+    @is_bot = false
 
     @joaat_hash = -1
 
