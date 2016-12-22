@@ -625,7 +625,7 @@ class z.conversation.ConversationRepository
   ###
   Remove bot from conversation.
   @param conversation_et [z.entity.Conversation] Conversation to remove member from
-  @param user_id [String] ID of bot to be removed from the the conversation
+  @param user_id [String] ID of bot to be removed from the conversation
   ###
   remove_bot: (conversation_et, user_id) =>
     @conversation_service.delete_bots conversation_et.id, user_id
@@ -637,7 +637,7 @@ class z.conversation.ConversationRepository
   ###
   Remove member from conversation.
   @param conversation_et [z.entity.Conversation] Conversation to remove member from
-  @param user_id [String] ID of member to be removed from the the conversation
+  @param user_id [String] ID of member to be removed from the conversation
   ###
   remove_member: (conversation_et, user_id) =>
     @conversation_service.delete_members conversation_et.id, user_id
@@ -645,6 +645,16 @@ class z.conversation.ConversationRepository
       if response
         amplify.publish z.event.WebApp.EVENT.INJECT, response
         return response
+
+  ###
+  Remove participant from conversation.
+  @param conversation_et [z.entity.Conversation] Conversation to remove participant from
+  @param user_et [z.entity.User] User to be removed from the conversation
+  ###
+  remove_participant: (conversation_et, user_et) =>
+    if user_et.is_bot()
+      return @conversation_repository.remove_bot @conversation(), user_et.id
+    return @conversation_repository.remove_member @conversation(), user_et
 
   ###
   Rename conversation.
