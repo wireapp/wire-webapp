@@ -350,7 +350,7 @@ class z.SystemNotification.SystemNotificationRepository
       icon = ''
     else
       try
-        icon = unless should_obfuscate then message_et.user().preview_picture_resource().generate_url()
+        icon = message_et.user().preview_picture_resource().generate_url() unless should_obfuscate
       catch err
         @logger.error "Unable to generate a sender's picture url for the notification: #{err}"
       finally
