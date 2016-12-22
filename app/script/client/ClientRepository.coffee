@@ -358,7 +358,7 @@ class z.client.ClientRepository
   cleanup_clients_and_sessions: (quick_clean = true) =>
     for user_id, client_ids of @cryptography_repository.create_user_session_map()
       log_level = if client_ids > 8 then @logger.levels.WARN else @logger.levels.INFO
-      unless quick_clean and client_ids.length < 8
+      unless quick_clean and client_ids.length <= 8
         @logger.log log_level, "User '#{user_id}' has session with '#{client_ids.length}' clients locally"
         @_remove_obsolete_client_for_user_by_id user_id, client_ids
 
