@@ -251,7 +251,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
           done()
         .catch done.fail
 
-      it 'when preference is set to obfuscate-message',(done) ->
+      it 'when preference is set to obfuscate-message', (done) ->
         system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.OBFUSCATE_MESSAGE
 
         system_notification_repository.notify conversation_et, message_et
@@ -266,7 +266,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
           done()
         .catch done.fail
 
-      it 'when preference is set to obfuscate',(done) ->
+      it 'when preference is set to obfuscate', (done) ->
         system_notification_repository.notifications_preference z.system_notification.SystemNotificationPreference.OBFUSCATE
 
         system_notification_repository.notify conversation_et, message_et

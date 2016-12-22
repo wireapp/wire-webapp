@@ -344,13 +344,12 @@ class z.SystemNotification.SystemNotificationRepository
 
     throw new z.system_notification.SystemNotificationError z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION if not notification_body?
 
-    should_obfuscate_message = @_should_obfuscate_notification_message message_et
     should_obfuscate_sender = @_should_obfuscate_notification_sender message_et
 
     return {
       title: if should_obfuscate_sender then @_create_title_obfuscated() else @_create_title conversation_et, message_et
       options:
-        body: if should_obfuscate_message then @_create_body_obfuscated() else notification_body
+        body: if @_should_obfuscate_notification_message message_et then @_create_body_obfuscated() else notification_body
         data: @_create_options_data conversation_et, message_et
         icon: if z.util.Environment.electron and z.util.Environment.os.mac then '' else window.notification_icon or '/image/logo/notification.png'
         tag: @_create_options_tag conversation_et
@@ -504,7 +503,7 @@ class z.SystemNotification.SystemNotificationRepository
   ###
   _should_obfuscate_notification_message: (message_et) ->
     return message_et.is_ephemeral() or @notifications_preference() in [
-      z.system_notification.SystemNotificationPreference.OBFUSCATE,
+      z.system_notification.SystemNotificationPreference.OBFUSCATE
       z.system_notification.SystemNotificationPreference.OBFUSCATE_MESSAGE
     ]
 
