@@ -439,7 +439,6 @@ z.string.tr.preferences_options_data_detail = 'Anonim bilgiler göndererek Wire�
 z.string.tr.preferences_options_notifications = 'Bildirimler'
 z.string.tr.preferences_options_notifications_none = 'Yok'
 z.string.tr.preferences_options_notifications_obfuscate = 'Mesaj detaylarını gizle'
-z.string.tr.preferences_options_notifications_obfuscate_message = 'TODO: Show only sender'
 z.string.tr.preferences_options_notifications_on = 'Göndereni ve mesajı göster'
 
 # Search

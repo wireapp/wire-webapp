@@ -439,7 +439,6 @@ z.string.uk.preferences_options_data_detail = 'Зробіть Wire кращим,
 z.string.uk.preferences_options_notifications = 'Сповіщення'
 z.string.uk.preferences_options_notifications_none = 'Вимкнений'
 z.string.uk.preferences_options_notifications_obfuscate = 'Приховувати деталі повідомлення'
-z.string.uk.preferences_options_notifications_obfuscate_message = 'TODO: Show only sender'
 z.string.uk.preferences_options_notifications_on = 'Показувати відправника та повідомлення'
 
 # Search

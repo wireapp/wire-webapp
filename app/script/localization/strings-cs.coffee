@@ -439,7 +439,6 @@ z.string.cs.preferences_options_data_detail = 'Přispějte k vylepšení aplikac
 z.string.cs.preferences_options_notifications = 'Upozornění'
 z.string.cs.preferences_options_notifications_none = 'Vypnout'
 z.string.cs.preferences_options_notifications_obfuscate = 'Skrýt podrobnosti zprávy'
-z.string.cs.preferences_options_notifications_obfuscate_message = 'TODO: Show only sender'
 z.string.cs.preferences_options_notifications_on = 'Zobrazit odesílatele a zprávu'
 
 # Search

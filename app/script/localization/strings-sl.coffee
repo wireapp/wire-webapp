@@ -446,7 +446,6 @@ z.string.sl.preferences_options_data_detail = 'Izboljšajte Wire s pošiljanjem 
 z.string.sl.preferences_options_notifications = 'Obvestila'
 z.string.sl.preferences_options_notifications_none = 'Izklopljeno'
 z.string.sl.preferences_options_notifications_obfuscate = 'Skrij podrobnosti sporočila'
-z.string.sl.preferences_options_notifications_obfuscate_message = 'TODO: Show only sender'
 z.string.sl.preferences_options_notifications_on = 'Pokaži pošiljatelja in sporočilo'
 
 # Search

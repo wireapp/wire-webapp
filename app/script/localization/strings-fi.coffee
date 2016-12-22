@@ -447,7 +447,6 @@ z.string.fi.preferences_options_data_detail = 'Tee Wirestä parempi lähetämäl
 z.string.fi.preferences_options_notifications = 'Ilmoitukset'
 z.string.fi.preferences_options_notifications_none = 'Pois päältä'
 z.string.fi.preferences_options_notifications_obfuscate = 'Piilota viestin tiedot'
-z.string.fi.preferences_options_notifications_obfuscate_message = 'TODO: Show only sender'
 z.string.fi.preferences_options_notifications_on = 'Näytä lähettäjä ja viesti'
 
 # Search
