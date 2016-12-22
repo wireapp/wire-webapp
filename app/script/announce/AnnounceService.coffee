@@ -19,10 +19,12 @@
 window.z ?= {}
 z.announce ?= {}
 
+ANNOUNCE_SERVICE_URL = 'api/v1/announce/'
+
 class z.announce.AnnounceService
   constructor: ->
     @logger = new z.util.Logger 'z.announce.AnnounceService', z.config.LOGGER.OPTIONS
-    @url = "#{z.config.ANNOUNCE_URL}?order=created&active=true"
+    @url = "#{z.util.Environment.backend.website_url()}#{ANNOUNCE_SERVICE_URL}?order=created&active=true"
     @url += '&production=true' if z.util.Environment.frontend.is_production()
     return @
 
