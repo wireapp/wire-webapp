@@ -19,7 +19,7 @@
 window.z ?= {}
 z.storage ?= {}
 
-class z.storage.StorageRepository extends cryptobox.CryptoboxStore
+class z.storage.StorageRepository
   constructor: (@storage_service) ->
     @logger = new z.util.Logger 'z.storage.StorageRepository', z.config.LOGGER.OPTIONS
 
