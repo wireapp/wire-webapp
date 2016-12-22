@@ -252,7 +252,7 @@ class z.calling.entities.Call
   @return [Boolean] Has the participant been removed
   ###
   delete_participant: (participant_et, delete_on_backend = true) =>
-    @interrupted_participants.remove @participant_et
+    @interrupted_participants.remove participant_et
     return false if not @get_participant_by_id participant_et.user.id
 
     # Delete participant
