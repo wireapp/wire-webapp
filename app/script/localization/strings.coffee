@@ -449,8 +449,8 @@ z.string.preferences_options_data_checkbox = 'Usage and crash reports'
 z.string.preferences_options_data_detail = 'Make Wire better by sending anonymous information.'
 z.string.preferences_options_notifications = 'Notifications'
 z.string.preferences_options_notifications_none = 'Off'
-z.string.preferences_options_notifications_obfuscate = 'Hide message details'
-z.string.preferences_options_notifications_obfuscate_message = 'Show only sender'
+z.string.preferences_options_notifications_obfuscate = 'Hide details'
+z.string.preferences_options_notifications_obfuscate_message = 'Show sender'
 z.string.preferences_options_notifications_on = 'Show sender and message'
 
 # Search

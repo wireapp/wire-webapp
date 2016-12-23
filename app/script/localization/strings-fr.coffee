@@ -452,11 +452,6 @@ z.string.fr.search_try_search = 'Trouvez des personnes par leur nom ou\nleur adr
 z.string.fr.search_no_contacts_on_wire = 'Vous n’avez pas de contacts sur Wire.\nEssayez de trouver des gens par leur nom\nou leur adresse email complète'
 z.string.fr.search_others = 'Connecter'
 
-# Picture upload
-z.string.fr.upload_welcome = 'Wire est tellement plus beau avec une photo.'
-z.string.fr.upload_welcome_keep = 'garder celle-là'
-z.string.fr.upload_welcome_choose = 'choisissez la vôtre'
-
 # Google contacts upload
 z.string.fr.upload_google_headline = 'Trouvez des personnes\nà qui parler.'
 z.string.fr.upload_google_message = 'Nous utilisons les informations de vos contacts afin de vous connecter avec d’autres personnes. Nous anonymisons toutes les informations et ne les partageons pas avec qui que ce soit.'
@@ -465,7 +460,6 @@ z.string.fr.upload_google_message_error = 'Nous n’avons pas reçu votre inform
 z.string.fr.upload_google_button_again = 'Retenter'
 
 # URLs
-z.string.fr.url_password_reset = 'https://wire.com/forgot/?hl=fr'
 z.string.fr.url_legal = 'https://wire.com/legal/?hl=fr'
 z.string.fr.url_privacy = 'https://wire.com/privacy/?hl=fr'
 z.string.fr.url_privacy_why = 'https://wire.com/privacy/why/?hl=fr'
