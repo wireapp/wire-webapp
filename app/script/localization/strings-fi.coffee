@@ -466,7 +466,6 @@ z.string.fi.upload_google_message_error = 'Emme vastaanottaneet tietojasi. Ole h
 z.string.fi.upload_google_button_again = 'Yritä uudelleen'
 
 # URLs
-z.string.fi.url_password_reset = 'https://wire.com/forgot/'
 z.string.fi.url_legal = 'https://wire.com/legal/'
 z.string.fi.url_privacy = 'https://wire.com/privacy/'
 z.string.fi.url_privacy_why = 'https://wire.com/privacy/why/'

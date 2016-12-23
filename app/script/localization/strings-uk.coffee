@@ -456,7 +456,6 @@ z.string.uk.upload_google_message_error = 'Ми не отримали вашу �
 z.string.uk.upload_google_button_again = 'Спробувати ще раз'
 
 # URLs
-z.string.uk.url_password_reset = 'https://wire.com/forgot/'
 z.string.uk.url_legal = 'https://wire.com/legal/'
 z.string.uk.url_privacy = 'https://wire.com/privacy/'
 z.string.uk.url_privacy_why = 'https://wire.com/privacy/why/'

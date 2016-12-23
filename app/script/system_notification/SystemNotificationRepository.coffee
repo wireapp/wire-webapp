@@ -344,22 +344,22 @@ class z.SystemNotification.SystemNotificationRepository
 
     throw new z.system_notification.SystemNotificationError z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION if not notification_body?
 
-    should_obfuscate = @_should_obfuscate_notification message_et
+    should_obfuscate_sender = @_should_obfuscate_notification_sender message_et
 
     if z.util.Environment.electron and z.util.Environment.os.mac
       icon = ''
     else
       try
-        icon = message_et.user().preview_picture_resource().generate_url() unless should_obfuscate
+        icon = message_et.user().preview_picture_resource().generate_url() unless should_obfuscate_sender
       catch err
         @logger.error "Unable to generate a sender's picture url for the notification: #{err}"
       finally
         icon = icon or '/image/logo/notification.png'
 
     return {
-      title: if should_obfuscate then @_create_title_obfuscated() else @_create_title conversation_et, message_et
+      title: if should_obfuscate_sender then @_create_title_obfuscated() else @_create_title conversation_et, message_et
       options:
-        body: if should_obfuscate then @_create_body_obfuscated() else notification_body
+        body: if @_should_obfuscate_notification_message message_et then @_create_body_obfuscated() else notification_body
         data: @_create_options_data conversation_et, message_et
         icon: icon
         tag: @_create_options_tag conversation_et
@@ -507,12 +507,23 @@ class z.SystemNotification.SystemNotificationRepository
         resolve @permission_state
 
   ###
-  Should notification content be obfuscated.
+  Should message in a notification be obfuscated.
   @private
   @param message_et [z.entity.Message]
   ###
-  _should_obfuscate_notification: (message_et) ->
-    return @notifications_preference() is z.system_notification.SystemNotificationPreference.OBFUSCATE or message_et.is_ephemeral()
+  _should_obfuscate_notification_message: (message_et) ->
+    return message_et.is_ephemeral() or @notifications_preference() in [
+      z.system_notification.SystemNotificationPreference.OBFUSCATE
+      z.system_notification.SystemNotificationPreference.OBFUSCATE_MESSAGE
+    ]
+
+  ###
+  Should sender in a notification be obfuscated.
+  @private
+  @param message_et [z.entity.Message]
+  ###
+  _should_obfuscate_notification_sender: (message_et) ->
+    return message_et.is_ephemeral() or @notifications_preference() is z.system_notification.SystemNotificationPreference.OBFUSCATE
 
   ###
   Should hide notification.

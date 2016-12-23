@@ -449,7 +449,8 @@ z.string.de.preferences_options_data_checkbox = 'Nutzungs- und Fehlerberichte'
 z.string.de.preferences_options_data_detail = 'Hilf uns, Wire durch das Senden anonymisierter Informationen zu verbessern.'
 z.string.de.preferences_options_notifications = 'Benachrichtigungen'
 z.string.de.preferences_options_notifications_none = 'Aus'
-z.string.de.preferences_options_notifications_obfuscate = 'Nachrichteninhalt verbergen'
+z.string.de.preferences_options_notifications_obfuscate = 'Details verbergen'
+z.string.de.preferences_options_notifications_obfuscate_message = 'Absendername zeigen'
 z.string.de.preferences_options_notifications_on = 'Zeige Absendername und Nachricht'
 
 # Search

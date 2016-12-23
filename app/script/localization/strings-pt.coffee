@@ -266,6 +266,7 @@ z.string.pt.conversation_context_menu_unlike = 'Descurtir'
 z.string.pt.conversation_delete_timestamp = 'Excluído em %@timestamp'
 z.string.pt.conversation_edit_timestamp = 'Editado em %@timestamp'
 z.string.pt.conversation_likes_caption = '%@number pessoas'
+z.string.pt.conversation_send_pasted_file = 'Imagem postada em %date'
 
 # Archive
 z.string.pt.archive_header = 'Arquivar'
@@ -469,7 +470,6 @@ z.string.pt.upload_google_message_error = 'Nós não recebemos suas informaçõe
 z.string.pt.upload_google_button_again = 'Tente novamente'
 
 # URLs
-z.string.pt.url_password_reset = 'https://wire.com/forgot/'
 z.string.pt.url_legal = 'https://wire.com/legal/'
 z.string.pt.url_privacy = 'https://wire.com/privacy/'
 z.string.pt.url_privacy_why = 'https://wire.com/privacy/why/'

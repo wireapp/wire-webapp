@@ -266,6 +266,7 @@ z.string.tr.conversation_context_menu_unlike = 'Beğenme'
 z.string.tr.conversation_delete_timestamp = '%@timestamp ’da silinmiş'
 z.string.tr.conversation_edit_timestamp = '%@timestamp ’da düzenlenmiş'
 z.string.tr.conversation_likes_caption = '%@number kişi'
+z.string.tr.conversation_send_pasted_file = 'Yapıştırılmış resim, %date ’de'
 
 # Archive
 z.string.tr.archive_header = 'Arşivle'
@@ -469,7 +470,6 @@ z.string.tr.upload_google_message_error = 'Bilgilerinzi alamadık. Lütfen kişi
 z.string.tr.upload_google_button_again = 'Tekrar deneyin'
 
 # URLs
-z.string.tr.url_password_reset = 'https://wire.com/forgot/'
 z.string.tr.url_legal = 'https://wire.com/legal/'
 z.string.tr.url_privacy = 'https://wire.com/privacy/'
 z.string.tr.url_privacy_why = 'https://wire.com/privacy/why/'

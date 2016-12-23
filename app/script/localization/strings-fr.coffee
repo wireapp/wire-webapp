@@ -456,7 +456,6 @@ z.string.fr.upload_google_message_error = 'Nous n’avons pas reçu votre inform
 z.string.fr.upload_google_button_again = 'Retenter'
 
 # URLs
-z.string.fr.url_password_reset = 'https://wire.com/forgot/?hl=fr'
 z.string.fr.url_legal = 'https://wire.com/legal/?hl=fr'
 z.string.fr.url_privacy = 'https://wire.com/privacy/?hl=fr'
 z.string.fr.url_privacy_why = 'https://wire.com/privacy/why/?hl=fr'

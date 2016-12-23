@@ -266,6 +266,7 @@ z.string.sl.conversation_context_menu_unlike = 'Ni mi všeč'
 z.string.sl.conversation_delete_timestamp = 'Izbrisan ob %@timestamp'
 z.string.sl.conversation_edit_timestamp = 'Urejen ob %@timestamp'
 z.string.sl.conversation_likes_caption = '%@number oseb'
+z.string.sl.conversation_send_pasted_file = 'Prilepljena slika ob %date'
 
 # Archive
 z.string.sl.archive_header = 'Arhiviraj'

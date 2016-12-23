@@ -466,7 +466,6 @@ z.string.es.upload_google_message_error = 'No recibimos tu información. Por fav
 z.string.es.upload_google_button_again = 'Vuelve a intentarlo'
 
 # URLs
-z.string.es.url_password_reset = 'https://wire.com/forgot/'
 z.string.es.url_legal = 'https://wire.com/legal/'
 z.string.es.url_privacy = 'https://wire.com/privacy/'
 z.string.es.url_privacy_why = 'https://wire.com/privacy/why/'

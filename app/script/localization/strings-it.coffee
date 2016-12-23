@@ -266,6 +266,7 @@ z.string.it.conversation_context_menu_unlike = 'Non mi piace più'
 z.string.it.conversation_delete_timestamp = 'Cancellato il %@timestamp'
 z.string.it.conversation_edit_timestamp = 'Modificato il %@timestamp'
 z.string.it.conversation_likes_caption = '%@number persone'
+z.string.it.conversation_send_pasted_file = 'Immagine incollata alle %date'
 
 # Archive
 z.string.it.archive_header = 'Archivia'

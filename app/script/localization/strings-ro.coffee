@@ -266,6 +266,7 @@ z.string.ro.conversation_context_menu_unlike = 'Nu-mi mai place'
 z.string.ro.conversation_delete_timestamp = 'A fost șters la %@timestamp'
 z.string.ro.conversation_edit_timestamp = 'A fost editat la %@timestamp'
 z.string.ro.conversation_likes_caption = '%@number persoane'
+z.string.ro.conversation_send_pasted_file = 'A postat o imagine pe %date'
 
 # Archive
 z.string.ro.archive_header = 'Arhivă'
@@ -469,7 +470,6 @@ z.string.ro.upload_google_message_error = 'Nu am primit nicio informație. Înce
 z.string.ro.upload_google_button_again = 'Reîncearcă'
 
 # URLs
-z.string.ro.url_password_reset = 'https://wire.com/forgot/'
 z.string.ro.url_legal = 'https://wire.com/legal/'
 z.string.ro.url_privacy = 'https://wire.com/privacy/'
 z.string.ro.url_privacy_why = 'https://wire.com/privacy/why/'

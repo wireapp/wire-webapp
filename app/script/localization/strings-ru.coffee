@@ -470,7 +470,6 @@ z.string.ru.upload_google_message_error = 'Мы не получили вашу �
 z.string.ru.upload_google_button_again = 'Повторить'
 
 # URLs
-z.string.ru.url_password_reset = 'https://wire.com/forgot/'
 z.string.ru.url_legal = 'https://wire.com/legal/'
 z.string.ru.url_privacy = 'https://wire.com/privacy/'
 z.string.ru.url_privacy_why = 'https://wire.com/privacy/why/'
