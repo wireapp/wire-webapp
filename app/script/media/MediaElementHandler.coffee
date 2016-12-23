@@ -32,6 +32,7 @@ class z.media.MediaElementHandler
   @param media_stream_info [z.media.MediaStreamInfo] MediaStream information
   ###
   add_media_element: (media_stream_info) =>
+    return if media_stream_info.type is z.media.MediaType.VIDEO
     remote_media_element = @_create_media_element media_stream_info
     @remote_media_elements.push remote_media_element
     @logger.info "Created MediaElement of type '#{remote_media_element.nodeName.toLowerCase()}' for MediaStream of flow '#{media_stream_info.flow_id}'", remote_media_element
@@ -98,6 +99,6 @@ class z.media.MediaElementHandler
   _set_media_element_output: (media_element, sink_id) ->
     media_element.setSinkId sink_id
     .then =>
-      @logger.info "Audio output device attached to flow '#{media_element.dataset['flow_id']} changed to '#{sink_id}'", media_element
+      @logger.info "Audio output device '#{sink_id}' attached to flow '#{media_element.dataset['flow_id']}", media_element
     .catch (error) =>
-      @logger.warn "Failed to attach audio output device '#{sink_id}' to flow '#{media_element.dataset['flow_id']}: #{error.message}", error
+      @logger.warn "Failed to attach audio output device '#{sink_id}' to flow '#{media_element.dataset['flow_id']}': #{error.message}", error

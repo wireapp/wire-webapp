@@ -473,7 +473,7 @@ z.string.upload_google_message_error = 'We did not receive your information. Ple
 z.string.upload_google_button_again = 'Try again'
 
 # URLs
-z.string.url_password_reset = 'https://wire.com/forgot/'
+z.string.url_password_reset = 'forgot/'
 z.string.url_legal = 'https://wire.com/legal/'
 z.string.url_privacy = 'https://wire.com/privacy/'
 z.string.url_privacy_why = 'https://wire.com/privacy/why/'
