@@ -39,6 +39,12 @@ class z.storage.StorageRepository
   @return [Promise] Promise that will resolve with the repository after initialization
   ###
   init: (skip_sessions) =>
+    cryptobox_store = new window.cryptobox.store.IndexedDB @storage_service.db
+    cryptobox = new window.cryptobox.Cryptobox cryptobox_store, 1
+    cryptobox.init().then (initial_prekeys) ->
+      console.warn 'PREKEYS', initial_prekeys
+
+    ###
     return @_load_identity()
     .then (@identity) =>
       if not @identity
@@ -60,6 +66,7 @@ class z.storage.StorageRepository
       else
         @logger.error "Storage Repository initialization failed: #{error?.message}", error
         throw error
+      ###
 
   _deserialize_session: (session) ->
     return Promise.resolve()
