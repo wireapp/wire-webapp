@@ -266,6 +266,7 @@ z.string.sl.conversation_context_menu_unlike = 'Ni mi všeč'
 z.string.sl.conversation_delete_timestamp = 'Izbrisan ob %@timestamp'
 z.string.sl.conversation_edit_timestamp = 'Urejen ob %@timestamp'
 z.string.sl.conversation_likes_caption = '%@number oseb'
+z.string.sl.conversation_send_pasted_file = 'Prilepljena slika ob %date'
 
 # Archive
 z.string.sl.archive_header = 'Arhiviraj'
@@ -453,18 +454,13 @@ z.string.sl.search_group_hint = 'Nadaljujte s tipkanjem ali izberite več oseb z
 z.string.sl.search_connect = 'Poveži'
 z.string.sl.search_connections = 'Povezave'
 z.string.sl.search_groups = 'Skupine'
-z.string.sl.search_placeholder = 'Iskanje po imenu ali e-pošti uporabnika'
+z.string.sl.search_placeholder = 'Iskanje po imenu ali uporabniškem imenu'
 z.string.sl.search_top_people = 'Top osebe'
-z.string.sl.search_try_search = 'Najdi osebe po imenu ali\npolnem e-poštnem naslovu'
-z.string.sl.search_no_contacts_on_wire = 'Nimate nobenih stikov na Wire.\nPoizkusite najti osebe po imenu\nali polnem e-poštnem naslovu'
+z.string.sl.search_try_search = 'Najdi osebe po imenu ali uporabniškem imenu'
+z.string.sl.search_no_contacts_on_wire = 'Nimate nobenih stikov na Wire.\nPoizkusite najti osebe po imenu\nali uporabniškem imenu.'
 z.string.sl.search_others = 'Poveži'
 z.string.sl.search_friend_in_common = '%no skupna oseba'
 z.string.sl.search_friends_in_common = '%no skupnih oseb'
-
-# Picture upload
-z.string.sl.upload_welcome = 'Wire je lepši s sliko.'
-z.string.sl.upload_welcome_keep = 'obdrži to'
-z.string.sl.upload_welcome_choose = 'izberi svojo'
 
 # Google contacts upload
 z.string.sl.upload_google_headline = 'Poiščite osebe\nza pogovor.'

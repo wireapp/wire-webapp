@@ -45,6 +45,6 @@ ko.components.register 'common-contacts',
     return new z.components.CommonContactsViewModel params, component_info
   template: """
             <!-- ko if: common_contacts_total -->
-              <span data-bind="text: common_contacts_caption"></span>
+              <span data-bind="text: common_contacts_caption" data-uie="common-contacts"></span>
             <!-- /ko -->
             """

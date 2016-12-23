@@ -462,11 +462,6 @@ z.string.es.search_others = 'Conectar'
 z.string.es.search_friend_in_common = '%no persona en común'
 z.string.es.search_friends_in_common = '%no personas en común'
 
-# Picture upload
-z.string.es.upload_welcome = 'Wire es mucho mejor con una foto.'
-z.string.es.upload_welcome_keep = 'conservar esta'
-z.string.es.upload_welcome_choose = 'eligir la tuya'
-
 # Google contacts upload
 z.string.es.upload_google_headline = 'Buscar con quien hablar.'
 z.string.es.upload_google_message = 'Compartir tus contactos te ayuda a conectarte con otros. Toda la información es anónima y no será compartida con nadie más.'
@@ -475,7 +470,6 @@ z.string.es.upload_google_message_error = 'No recibimos tu información. Por fav
 z.string.es.upload_google_button_again = 'Vuelve a intentarlo'
 
 # URLs
-z.string.es.url_password_reset = 'https://wire.com/forgot/'
 z.string.es.url_legal = 'https://wire.com/legal/'
 z.string.es.url_privacy = 'https://wire.com/privacy/'
 z.string.es.url_privacy_why = 'https://wire.com/privacy/why/'

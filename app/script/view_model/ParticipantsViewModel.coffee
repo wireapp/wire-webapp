@@ -191,7 +191,8 @@ class z.ViewModel.ParticipantsViewModel
       data:
         user: user_et
       confirm: =>
-        @conversation_repository.remove_member @conversation(), user_et.id, (response) =>
+        @conversation_repository.remove_participant @conversation(), user_et
+        .then (response) =>
           @reset_view() if response
 
   show_preferences_account: ->

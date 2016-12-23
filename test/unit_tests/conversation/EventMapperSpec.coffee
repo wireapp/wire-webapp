@@ -79,5 +79,5 @@ describe 'Event Mapper', ->
       bad_message = {"conversation":conversation_et.id,"id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Knock, are you there? :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"}
       # @formatter:on
 
-      message_ets = event_mapper.map_json_events events: [good_message, bad_message], conversation_et
+      message_ets = event_mapper.map_json_events [good_message, bad_message], conversation_et
       expect(message_ets.length).toBe 1
