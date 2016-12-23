@@ -472,7 +472,7 @@ z.string.de.upload_google_message_error = 'Wir haben die Informationen nicht erh
 z.string.de.upload_google_button_again = 'Erneut versuchen'
 
 # URLs
-z.string.de.url_password_reset = 'https://wire.com/forgot/?hl=de'
+z.string.de.url_password_reset = 'forgot/?hl=de'
 z.string.de.url_legal = 'https://wire.com/legal/?hl=de'
 z.string.de.url_privacy = 'https://wire.com/privacy/?hl=de'
 z.string.de.url_privacy_why = 'https://wire.com/privacy/why/'

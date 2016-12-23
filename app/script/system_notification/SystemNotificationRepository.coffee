@@ -346,12 +346,22 @@ class z.SystemNotification.SystemNotificationRepository
 
     should_obfuscate_sender = @_should_obfuscate_notification_sender message_et
 
+    if z.util.Environment.electron and z.util.Environment.os.mac
+      icon = ''
+    else
+      try
+        icon = message_et.user().preview_picture_resource().generate_url() unless should_obfuscate
+      catch err
+        @logger.error "Unable to generate a sender's picture url for the notification: #{err}"
+      finally
+        icon = icon or '/image/logo/notification.png'
+
     return {
       title: if should_obfuscate_sender then @_create_title_obfuscated() else @_create_title conversation_et, message_et
       options:
         body: if @_should_obfuscate_notification_message message_et then @_create_body_obfuscated() else notification_body
         data: @_create_options_data conversation_et, message_et
-        icon: if z.util.Environment.electron and z.util.Environment.os.mac then '' else window.notification_icon or '/image/logo/notification.png'
+        icon: icon
         tag: @_create_options_tag conversation_et
         silent: true #@note When Firefox supports this we can remove the fix for WEBAPP-731
       timeout: z.config.BROWSER_NOTIFICATION.TIMEOUT
