@@ -266,6 +266,7 @@ z.string.pt.conversation_context_menu_unlike = 'Descurtir'
 z.string.pt.conversation_delete_timestamp = 'Excluído em %@timestamp'
 z.string.pt.conversation_edit_timestamp = 'Editado em %@timestamp'
 z.string.pt.conversation_likes_caption = '%@number pessoas'
+z.string.pt.conversation_send_pasted_file = 'Imagem postada em %date'
 
 # Archive
 z.string.pt.archive_header = 'Arquivar'
@@ -454,18 +455,13 @@ z.string.pt.search_group_hint = 'Continue digitando ou escolha mais pessoas para
 z.string.pt.search_connect = 'Conectar'
 z.string.pt.search_connections = 'Conexões'
 z.string.pt.search_groups = 'Grupos'
-z.string.pt.search_placeholder = 'Pesquisar por nome ou e-mail'
+z.string.pt.search_placeholder = 'Procurar por nome ou nome de usuário'
 z.string.pt.search_top_people = 'Contatos frequentes'
-z.string.pt.search_try_search = 'Encontre pessoa por nome ou\nendereço de e-mail completo'
-z.string.pt.search_no_contacts_on_wire = 'Você não tem nenhum contato no Wire. \nTente encontrar pessoas pelo nome ou \nendereço de e-mail completo'
+z.string.pt.search_try_search = 'Encontre pessoas pelo \nnome ou nome de usuário'
+z.string.pt.search_no_contacts_on_wire = 'Você não tem nenhum contato no Wire. \nTente encontrar pessoas pelo\nnome ou nome de usuário.'
 z.string.pt.search_others = 'Conectar'
 z.string.pt.search_friend_in_common = '%no pessoa em comum'
 z.string.pt.search_friends_in_common = '%no pessoas em comum'
-
-# Picture upload
-z.string.pt.upload_welcome = 'O Wire é muito mais legal com uma foto.'
-z.string.pt.upload_welcome_keep = 'manter essa'
-z.string.pt.upload_welcome_choose = 'escolha sua imagem'
 
 # Google contacts upload
 z.string.pt.upload_google_headline = 'Encontre pessoas \npara conversar.'
@@ -475,7 +471,6 @@ z.string.pt.upload_google_message_error = 'Nós não recebemos suas informaçõe
 z.string.pt.upload_google_button_again = 'Tente novamente'
 
 # URLs
-z.string.pt.url_password_reset = 'https://wire.com/forgot/'
 z.string.pt.url_legal = 'https://wire.com/legal/'
 z.string.pt.url_privacy = 'https://wire.com/privacy/'
 z.string.pt.url_privacy_why = 'https://wire.com/privacy/why/'

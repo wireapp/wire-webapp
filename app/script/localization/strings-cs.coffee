@@ -452,11 +452,6 @@ z.string.cs.search_try_search = 'Najít lidi podle jména nebo\nemailové adresy
 z.string.cs.search_no_contacts_on_wire = 'V aplikaci Wire nemáte žádné kontakty.\nZkuste vyhledat kontakty podle jména nebo\nemailové adresy'
 z.string.cs.search_others = 'Připojit'
 
-# Picture upload
-z.string.cs.upload_welcome = 'Wire je o tolik hezčí s obrázkem.'
-z.string.cs.upload_welcome_keep = 'ponechat tento'
-z.string.cs.upload_welcome_choose = 'vybrat vlastní'
-
 # Google contacts upload
 z.string.cs.upload_google_headline = 'Najít kontakty\npro konverzaci.'
 z.string.cs.upload_google_message = 'Vaše údaje o kontaktech používáme k propojení s ostatními uživateli. Všechny informace anonymizujeme a nesdílíme je s nikým dalším.'

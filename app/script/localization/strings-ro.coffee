@@ -266,6 +266,7 @@ z.string.ro.conversation_context_menu_unlike = 'Nu-mi mai place'
 z.string.ro.conversation_delete_timestamp = 'A fost șters la %@timestamp'
 z.string.ro.conversation_edit_timestamp = 'A fost editat la %@timestamp'
 z.string.ro.conversation_likes_caption = '%@number persoane'
+z.string.ro.conversation_send_pasted_file = 'A postat o imagine pe %date'
 
 # Archive
 z.string.ro.archive_header = 'Arhivă'
@@ -287,7 +288,11 @@ z.string.ro.conversations_popover_silence = 'Mutizează'
 z.string.ro.conversations_popover_unarchive = 'Dezarhivează'
 
 # Takeover
+z.string.ro.takeover_headline = 'Numele de utilizator sunt aici.'
+z.string.ro.takeover_sub = 'Obține numele tău unic pe Wire.'
 z.string.ro.takeover_link = 'Află mai multe'
+z.string.ro.takeover_button_choose = 'Alege propriul nume'
+z.string.ro.takeover_button_keep = 'Păstrează acest nume'
 
 # Invites
 z.string.ro.invite_meta_key_mac = 'Cmd'
@@ -295,6 +300,7 @@ z.string.ro.invite_meta_key_pc = 'Ctrl'
 z.string.ro.invite_hint_selected = 'Apasă %meta_key + C pentru a copia'
 z.string.ro.invite_hint_unselected = 'Selectează și apasă %meta_key + C'
 z.string.ro.invite_headline = 'Invită persoane pe Wire'
+z.string.ro.invite_message = 'Sunt pe Wire, caută pe %username sau vizitează wire.com/download.'
 z.string.ro.invite_message_no_email = 'Sunt pe Wire. Vizitează https://get.wire.com pentru a te conecta cu mine.'
 
 # Extensions
@@ -399,6 +405,9 @@ z.string.ro.preferences_account_reset_password = 'Resetează parola'
 z.string.ro.preferences_account_delete = 'Șterge contul'
 z.string.ro.preferences_account_log_out = 'Deconectare'
 z.string.ro.preferences_account_username_placeholder = 'Numele tău complet'
+z.string.ro.preferences_account_username_hint = 'Cel puțin două caractere. Doar a—z, 0—9 și _ sunt permise.'
+z.string.ro.preferences_account_username_available = 'Disponibil'
+z.string.ro.preferences_account_username_error_taken = 'Deja folosit'
 
 z.string.ro.preferences_av_camera = 'Cameră'
 z.string.ro.preferences_av_microphone = 'Microfon'
@@ -446,16 +455,13 @@ z.string.ro.search_group_hint = 'Mai încearcă sau alege persoanele cu care să
 z.string.ro.search_connect = 'Conectare'
 z.string.ro.search_connections = 'Conexiuni'
 z.string.ro.search_groups = 'Grupuri'
-z.string.ro.search_placeholder = 'Caută după nume sau e-mail'
+z.string.ro.search_placeholder = 'Caută după nume sau nume utilizator'
 z.string.ro.search_top_people = 'Top persoane'
-z.string.ro.search_try_search = 'Caută persoane după nule sau\ndupă adresa de e-mail completă'
-z.string.ro.search_no_contacts_on_wire = 'Nu ai contacte cu Wire.\nÎncearcă să găsești persoane după nume\nsau adresa de e-mail completă'
+z.string.ro.search_try_search = 'Caută oameni după\nnume sau nume utilizator'
+z.string.ro.search_no_contacts_on_wire = 'Nu ai contacte pe Wire.\nÎncearcă să găsește oameni după\nnume sau nume utilizator.'
 z.string.ro.search_others = 'Conectare'
-
-# Picture upload
-z.string.ro.upload_welcome = 'Wire arată mult mai bine cu o poză.'
-z.string.ro.upload_welcome_keep = 'păstrează poza aceasta'
-z.string.ro.upload_welcome_choose = 'alege poza proprie'
+z.string.ro.search_friend_in_common = '%no persoană în conum'
+z.string.ro.search_friends_in_common = '%no persoane în conum'
 
 # Google contacts upload
 z.string.ro.upload_google_headline = 'Caută persoane\ncu care să vorbești.'
@@ -465,7 +471,6 @@ z.string.ro.upload_google_message_error = 'Nu am primit nicio informație. Înce
 z.string.ro.upload_google_button_again = 'Reîncearcă'
 
 # URLs
-z.string.ro.url_password_reset = 'https://wire.com/forgot/'
 z.string.ro.url_legal = 'https://wire.com/legal/'
 z.string.ro.url_privacy = 'https://wire.com/privacy/'
 z.string.ro.url_privacy_why = 'https://wire.com/privacy/why/'
@@ -483,6 +488,7 @@ z.string.ro.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/a
 z.string.ro.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.ro.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
 z.string.ro.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.ro.url_support_usernames = 'https://wire.com/support/username'
 z.string.ro.url_decrypt_error_1 = 'https://wire.com/privacy/error-1'
 z.string.ro.url_decrypt_error_2 = 'https://wire.com/privacy/error-2'
 

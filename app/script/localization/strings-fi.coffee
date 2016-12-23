@@ -462,11 +462,6 @@ z.string.fi.search_others = 'Yhdistä'
 z.string.fi.search_friend_in_common = '%n yhteinen käyttäjä molemmilla'
 z.string.fi.search_friends_in_common = '%n yhteistä käyttäjää molemmilla'
 
-# Picture upload
-z.string.fi.upload_welcome = 'Wire on niin paljon mukavampi kuvalla.'
-z.string.fi.upload_welcome_keep = 'pidä tämä'
-z.string.fi.upload_welcome_choose = 'valitse omasi'
-
 # Google contacts upload
 z.string.fi.upload_google_headline = 'Etsi ihmisiä joiden kanssa jutella.'
 z.string.fi.upload_google_message = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.'
@@ -475,7 +470,6 @@ z.string.fi.upload_google_message_error = 'Emme vastaanottaneet tietojasi. Ole h
 z.string.fi.upload_google_button_again = 'Yritä uudelleen'
 
 # URLs
-z.string.fi.url_password_reset = 'https://wire.com/forgot/'
 z.string.fi.url_legal = 'https://wire.com/legal/'
 z.string.fi.url_privacy = 'https://wire.com/privacy/'
 z.string.fi.url_privacy_why = 'https://wire.com/privacy/why/'
