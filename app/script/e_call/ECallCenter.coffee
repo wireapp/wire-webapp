@@ -275,8 +275,9 @@ class z.e_call.ECallCenter
     throw new z.e_call.ECallError z.e_call.ECallError::TYPE.WRONG_PAYLOAD_FORMAT if not _.isObject e_call_message
 
     @get_e_call_by_id conversation_et.id
-    .then (e_call_et) ->
+    .then (e_call_et) =>
       if e_call_et.data_channel_opened
+        @logger.debug "Sending e-call event of type '#{e_call_message.type}' to conversation '#{conversation_et.id}' via data channel", e_call_message.to_JSON()
         return e_flow_et.send_message e_call_message.to_content_string() for e_flow_et in e_call_et.get_flows()
       throw new z.e_call.ECallError z.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED
     .catch (error) =>

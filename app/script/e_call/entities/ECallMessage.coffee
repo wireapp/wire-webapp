@@ -53,7 +53,7 @@ class z.e_call.entities.ECallMessage
     return {
       version: E_CALL_MESSAGE_CONFIG.VERSION
       resp: @response
-      sessid: @session_id
+      sessid: @sessid
       type: @type
     }
 
