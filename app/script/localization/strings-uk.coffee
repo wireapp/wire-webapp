@@ -445,10 +445,7 @@ z.string.uk.search_group_hint = 'Спробуйте ще раз або вибе�
 z.string.uk.search_connect = 'Додати до контактів'
 z.string.uk.search_connections = 'Контакти'
 z.string.uk.search_groups = 'Групи'
-z.string.uk.search_placeholder = 'Шукайте за іменем або email'
 z.string.uk.search_top_people = 'Топ-контакти'
-z.string.uk.search_try_search = 'Знайти людей за іменем\nабо повною email-адресою'
-z.string.uk.search_no_contacts_on_wire = 'У вас поки що немає контактів у Wire.\nСпробуйте знайти людей за іменем\nабо повною email-адресою'
 z.string.uk.search_others = 'Додати до контактів'
 
 # Google contacts upload

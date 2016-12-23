@@ -325,7 +325,6 @@ z.string.tr.people_no_matches = 'Eşleşen sonuç yok.\nBaşka bir isim girmeyi 
 z.string.tr.people_invite = 'İnsanları davet et'
 z.string.tr.people_share = 'Kişileri Paylaş'
 z.string.tr.people_bring_your_friends = 'Arkadaşlarını Wire’a getir'
-z.string.tr.people_invite_detail = 'Kişileriniz paylaşmak, başkalarıyla bağlanmanızı kolaylaştırır. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.'
 z.string.tr.people_invite_button_contacts = 'Kişilerden'
 z.string.tr.people_invite_button_gmail = 'Gmail’den'
 z.string.tr.people_invite_headline = 'Arkadaşlarınızı getirin'

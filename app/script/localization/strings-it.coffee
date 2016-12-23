@@ -325,7 +325,6 @@ z.string.it.people_no_matches = 'Nessun risultato corrispondente. Provare ad ins
 z.string.it.people_invite = 'Invita persone'
 z.string.it.people_share = 'Condividi contatti'
 z.string.it.people_bring_your_friends = 'Porta i tuoi amici su Wire'
-z.string.it.people_invite_detail = 'Condividere i contatti dalla rubrica ti aiuta a connetterti con gli altri. Rendiamo tutte le informazioni dei contatti anonime e non sono cedute a nessun altro.'
 z.string.it.people_invite_button_contacts = 'Dalla rubrica'
 z.string.it.people_invite_button_gmail = 'Da Gmail'
 z.string.it.people_invite_headline = 'Invita i tuoi amici'

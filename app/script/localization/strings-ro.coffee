@@ -325,7 +325,6 @@ z.string.ro.people_no_matches = 'Nu s-a găsit nimic.\nÎncearcă să scrii un a
 z.string.ro.people_invite = 'Invită persoane'
 z.string.ro.people_share = 'Împărtășește contacte'
 z.string.ro.people_bring_your_friends = 'Invită prietenii pe Wire'
-z.string.ro.people_invite_detail = 'Împărtășirea contactelor ne ajută să te conectăm cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu nimeni altcineva.'
 z.string.ro.people_invite_button_contacts = 'Din Contacte'
 z.string.ro.people_invite_button_gmail = 'Din Gmail'
 z.string.ro.people_invite_headline = 'Invită prietenii'

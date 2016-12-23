@@ -295,7 +295,6 @@ z.string.cs.invite_meta_key_pc = 'Ctrl'
 z.string.cs.invite_hint_selected = 'Stiskněte %meta_key + C pro kopírování'
 z.string.cs.invite_hint_unselected = 'Vybrat a stisknout %meta_key + C'
 z.string.cs.invite_headline = 'Pozvat lidi do aplikace Wire'
-z.string.cs.invite_message = 'Jsem k zastižení na síti Wire. Najdete mne pod %username nebo navštivte https://get.wire.com.'
 z.string.cs.invite_message_no_email = 'Jsem k zastižení na síti Wire. K navázání kontaktu navštivte https://get.wire.com.'
 
 # Extensions
@@ -320,7 +319,6 @@ z.string.cs.people_no_matches = 'Žádné odpovídající výsledky.\nZkuste jin
 z.string.cs.people_invite = 'Pozvat další'
 z.string.cs.people_share = 'Sdílet kontakty'
 z.string.cs.people_bring_your_friends = 'Přiveďte své přátele do aplikace Wire'
-z.string.cs.people_invite_detail = 'Sdílením svých kontaktů si zjednodušíte propojení s ostatními. Všechny informace anonymizujeme a nikdy je neposkytujeme nikomu dalšímu.'
 z.string.cs.people_invite_button_contacts = 'Z kontaktů'
 z.string.cs.people_invite_button_gmail = 'Z Gmailu'
 z.string.cs.people_invite_headline = 'Přiveďte své přátele'
@@ -446,10 +444,7 @@ z.string.cs.search_group_hint = 'Pokračujte v psaní nebo vyberte více lidí p
 z.string.cs.search_connect = 'Připojit'
 z.string.cs.search_connections = 'Kontakty'
 z.string.cs.search_groups = 'Skupiny'
-z.string.cs.search_placeholder = 'Hledat podle jména nebo emailu'
 z.string.cs.search_top_people = 'Nejaktivnější kontakty'
-z.string.cs.search_try_search = 'Najít lidi podle jména nebo\nemailové adresy'
-z.string.cs.search_no_contacts_on_wire = 'V aplikaci Wire nemáte žádné kontakty.\nZkuste vyhledat kontakty podle jména nebo\nemailové adresy'
 z.string.cs.search_others = 'Připojit'
 
 # Google contacts upload

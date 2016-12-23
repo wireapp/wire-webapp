@@ -325,7 +325,6 @@ z.string.sl.people_no_matches = 'Brez ujemanja rezultatov. \nPoizkusite vnesti d
 z.string.sl.people_invite = 'Povabite osebe'
 z.string.sl.people_share = 'Deli Stike'
 z.string.sl.people_bring_your_friends = 'Pripeljite svoje prijatelje na Wire'
-z.string.sl.people_invite_detail = 'Deljenje vaših stikov pomaga pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.'
 z.string.sl.people_invite_button_contacts = 'Iz imenika stikov'
 z.string.sl.people_invite_button_gmail = 'Iz Gmail'
 z.string.sl.people_invite_headline = 'Pripeljite vaše prijatelje'

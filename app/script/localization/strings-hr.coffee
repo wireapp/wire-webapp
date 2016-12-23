@@ -326,7 +326,6 @@ z.string.hr.people_no_matches = 'Nema odgovarajućih rezultata. Pokušajte unije
 z.string.hr.people_invite = 'Pozovi ljude'
 z.string.hr.people_share = 'Podijeli kontakte'
 z.string.hr.people_bring_your_friends = 'Pozovi prijatelje na Wire'
-z.string.hr.people_invite_detail = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.'
 z.string.hr.people_invite_button_contacts = 'Iz kontakata'
 z.string.hr.people_invite_button_gmail = 'Iz Gmaila'
 z.string.hr.people_invite_headline = 'Pozovi prijatelje'
