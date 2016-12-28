@@ -88,13 +88,12 @@ class z.calling.belfry.CallCenter
     return if event.type not in SUPPORTED_EVENTS
 
     if @state_handler.block_event_handling
-      @logger.info "Skipping '#{event.type}' event", {event_object: event, event_json: JSON.stringify event}
-    else
-      @logger.info "Handling '#{event.type}' event", {event_object: event, event_json: JSON.stringify event}
-      if z.calling.CallingRepository.supports_calling()
-        @_on_event_in_supported_browsers event
-      else
-        @_on_event_in_unsupported_browsers event
+      return @logger.info "Skipping '#{event.type}' event in conversation '#{event.conversation}'", {event_object: event, event_json: JSON.stringify event}
+
+    @logger.info "Handling '#{event.type}' event in conversation '#{event.conversation}", {event_object: event, event_json: JSON.stringify event}
+    if z.calling.CallingRepository.supports_calling()
+      return @_on_event_in_supported_browsers event
+    return @_on_event_in_unsupported_browsers event
 
   ###
   Backend calling event handling for browsers supporting calling.
@@ -102,7 +101,7 @@ class z.calling.belfry.CallCenter
   @param event [Object] Event payload
   ###
   _on_event_in_supported_browsers: (event) ->
-    if @use_v3_api
+    if @calling_config().use_v3_api
       conversation_et = @conversation_repository.get_conversation_by_id event.conversation
       @logger.warn "Received outdated calling v2 event in conversation '#{event.conversation}'" if conversation_et.is_one2one()
 

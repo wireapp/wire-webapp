@@ -52,7 +52,7 @@ class z.calling.entities.ECall
     @self_user_joined = ko.observable false
     @state = ko.observable z.calling.enum.CallState.UNKNOWN
     @previous_state = undefined
-    @is_declined_timer = undefined
+    @state_timer = undefined
 
     @participants = ko.observableArray []
     @max_number_of_participants = 0
@@ -114,7 +114,7 @@ class z.calling.entities.ECall
     @state.subscribe (state) =>
       @logger.debug "E-call state '#{@id}' changed to '#{state}'"
 
-      @_clear_join_timer() if @is_group()
+      @_clear_state_timeout()
 
       if state in z.calling.enum.CallStateGroups.STOP_RINGING
         @_on_state_stop_ringing()
@@ -143,25 +143,29 @@ class z.calling.entities.ECall
 
   _on_state_start_ringing: (is_incoming) =>
     @_play_call_sound is_incoming
-    @_group_call_timeout is_incoming if @is_group()
+    @_set_state_timeout is_incoming
 
   _on_state_stop_ringing: =>
     if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
       @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
 
-  _clear_join_timer: =>
-    window.clearTimeout @is_declined_timer
-    @is_declined_timer = undefined
-
-  _group_call_timeout: (is_incoming) =>
-    @is_declined_timer = window.setTimeout =>
-      @_stop_call_sound is_incoming
-      @state z.calling.enum.CallState.IGNORED if is_incoming
-    , 30000
+  _clear_state_timeout: =>
+    window.clearTimeout @state_timeout
+    @state_timeout = undefined
 
   _play_call_sound: (is_incoming) ->
     sound_id = if is_incoming then z.audio.AudioType.INCOMING_CALL else z.audio.AudioType.OUTGOING_CALL
     amplify.publish z.event.WebApp.AUDIO.PLAY_IN_LOOP, sound_id
+
+  _set_state_timeout: (is_incoming) =>
+    @state_timeout = window.setTimeout =>
+      @_stop_call_sound is_incoming
+      if is_incoming
+        return @state z.calling.enum.CallState.IGNORED if @is_group()
+        amplify.publish z.event.WebApp.CALL.STATE.DELETE, @id
+      else
+        amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @id
+    , 30000
 
   _stop_call_sound: (is_incoming) ->
     sound_id = if is_incoming then z.audio.AudioType.INCOMING_CALL else z.audio.AudioType.OUTGOING_CALL

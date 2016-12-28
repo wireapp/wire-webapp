@@ -432,17 +432,6 @@ describe 'z.cryptography.CryptographyMapper', ->
         expect(error.type).toBe z.cryptography.CryptographyError::TYPE.NO_GENERIC_MESSAGE
         done()
 
-    it 'rejects with an error for an unhandled generic message type', (done) ->
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'calling', new z.proto.Calling 'Test'
-
-      mapper.map_generic_message generic_message, {id: 'ABC'}
-      .then done.fail
-      .catch (error) ->
-        expect(error instanceof z.cryptography.CryptographyError).toBeTruthy()
-        expect(error.type).toBe z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
-        done()
-
     it 'can map a text wrapped inside an external message', (done) ->
       plaintext = 'Test'
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
@@ -528,5 +517,27 @@ describe 'z.cryptography.CryptographyMapper', ->
         expect(event_json.id).toBe generic_message.message_id
         expect(event_json.data.message_id).toBe generic_message.message_id
         expect(event_json.data.reaction).toBe z.message.ReactionType.LIKE
+        done()
+      .catch done.fail
+
+    it 'resolves with a mapped calling message', (done) ->
+      content_message =
+        version: "3.0"
+        type: "CANCEL"
+        resp: false
+        sessid: 'asd2'
+
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'calling', new z.proto.Calling JSON.stringify content_message
+
+      mapper.map_generic_message generic_message, {id: 'ABC'}
+      .then (event_json) ->
+        expect(_.isObject event_json).toBeTruthy()
+        expect(event_json.type).toBe z.event.Client.CALL.E_CALL
+        expect(event_json.conversation).toBe event.conversation
+        expect(event_json.from).toBe event.from
+        expect(event_json.time).toBe event.time
+        expect(event_json.id).toBe generic_message.message_id
+        expect(event_json.content).toBe content_message
         done()
       .catch done.fail

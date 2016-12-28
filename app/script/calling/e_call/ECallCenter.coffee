@@ -21,6 +21,7 @@ z.calling ?= {}
 z.calling.e_call ?= {}
 
 E_CALL_CONFIG =
+  EVENT_LIFETIME: 30 * 1000 # 30 seconds
   SUPPORTED_EVENTS: [
     z.event.Client.CALL.E_CALL
   ]
@@ -54,8 +55,6 @@ class z.calling.e_call.ECallCenter
     @self_state = @media_stream_handler.self_stream_state
     @self_client_joined = ko.observable false
 
-    @block_event_handling = true
-
     @subscribe_to_events()
 
   # Subscribe to amplify topics.
@@ -75,12 +74,10 @@ class z.calling.e_call.ECallCenter
   on_event: (event) =>
     return if event.type not in E_CALL_CONFIG.SUPPORTED_EVENTS
 
-    # @todo implement skipping on notification stream
-    # @todo implement skipping if message too old - timeout 30s?
-    if false is true
-      return @logger.info "Skipping '#{event.type}' event", {event_object: event, event_json: JSON.stringify event}
+    if Date.now() > E_CALL_CONFIG.EVENT_LIFETIME + new Date(event.time).getTime()
+      return @logger.info "Ignored outdated '#{event.type}' event in conversation '#{event.conversation}'", {event_object: event, event_json: JSON.stringify event}
 
-    @logger.info "Handling '#{event.type}' event", {event_object: event, event_json: JSON.stringify event}
+    @logger.info "Handling '#{event.type}' event in conversation '#{event.conversation}'", {event_object: event, event_json: JSON.stringify event}
     if z.calling.CallingRepository.supports_calling()
       return @_on_event_in_supported_browsers event
     return @_on_event_in_unsupported_browsers event
