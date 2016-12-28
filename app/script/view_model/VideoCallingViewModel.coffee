@@ -21,7 +21,7 @@ z.ViewModel ?= {}
 
 
 class z.ViewModel.VideoCallingViewModel
-  constructor: (element_id, @call_view_model, @conversation_repository, @media_repository, @user_repository, @multitasking) ->
+  constructor: (element_id, @calling_repository, @conversation_repository, @media_repository, @user_repository, @multitasking) ->
     @logger = new z.util.Logger 'z.ViewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS
 
     @self_user = @user_repository.self
@@ -44,8 +44,8 @@ class z.ViewModel.VideoCallingViewModel
     @number_of_screen_devices = ko.observable 0
     @number_of_video_devices = ko.observable 0
 
-    @calls = @call_view_model.calls
-    @joined_call = @call_view_model.joined_call
+    @calls = @calling_repository.calls
+    @joined_call = @calling_repository.joined_call
 
     @videod_call = ko.pureComputed =>
       for call_et in @calls()

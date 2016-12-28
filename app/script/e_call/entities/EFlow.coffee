@@ -103,7 +103,7 @@ class z.e_call.entities.EFlow
           @logger.debug "PeerConnection with '#{@remote_user.name()}' was closed"
           @e_call_et.delete_participant @e_participant_et
           @_remove_media_streams()
-          if not @is_group()
+          unless @is_group()
             @e_call_et.finished_reason = z.calling.enum.CallFinishedReason.CONNECTION_DROPPED
 
         when z.calling.rtc.SignalingState.REMOTE_OFFER
@@ -336,7 +336,7 @@ class z.e_call.entities.EFlow
   @param event [RTCPeerConnectionIceEvent] Event that contains the generated ICE candidate
   ###
   _on_ice_candidate: (event) =>
-    if not event.candidate
+    unless event.candidate
       if @has_sent_local_sdp()
         return @logger.info 'Generation of ICE candidates completed - SDP was already sent'
       @logger.debug 'Generation of ICE candidates completed - sending SDP'
@@ -356,7 +356,7 @@ class z.e_call.entities.EFlow
 
   # SDP negotiation needed.
   _on_negotiation_needed: (event) =>
-    if not @negotiation_needed()
+    unless @negotiation_needed()
       @logger.debug 'State changed - negotiation needed: true', event
 
   # Signaling state has changed.

@@ -43,27 +43,8 @@ class z.calling.handler.CallStateHandler
 
   # Subscribe to amplify topics.
   subscribe_to_events: =>
-    amplify.subscribe z.event.WebApp.CALL.MEDIA.TOGGLE, @toggle_media
     amplify.subscribe z.event.WebApp.CALL.STATE.CHECK, @check_state
-    amplify.subscribe z.event.WebApp.CALL.STATE.DELETE, @delete_call
-    amplify.subscribe z.event.WebApp.CALL.STATE.IGNORE, @ignore_call
-    amplify.subscribe z.event.WebApp.CALL.STATE.JOIN, @join_call
-    amplify.subscribe z.event.WebApp.CALL.STATE.LEAVE, @leave_call
-    amplify.subscribe z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, @remove_participant
-    amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE, @toggle_joined
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
-
-  # Un-subscribe from amplify topics.
-  un_subscribe: ->
-    subscriptions = [
-      z.event.WebApp.CALL.STATE.CHECK
-      z.event.WebApp.CALL.STATE.DELETE
-      z.event.WebApp.CALL.STATE.JOIN
-      z.event.WebApp.CALL.STATE.LEAVE
-      z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT
-      z.event.WebApp.CALL.STATE.TOGGLE
-    ]
-    amplify.unsubscribeAll topic for topic in subscriptions
 
 
   ###############################################################################
@@ -111,12 +92,6 @@ class z.calling.handler.CallStateHandler
   ###############################################################################
   # Call states
   ###############################################################################
-
-  handled_by_v3: (conversation_id) =>
-    if @call_center.use_v3_api
-      conversation_et = @call_center.conversation_repository.get_conversation_by_id conversation_id
-      return not conversation_et.is_group()
-    return false
 
   ###
   Handling of 'call.state' events.
@@ -335,8 +310,6 @@ class z.calling.handler.CallStateHandler
   @param conversation_id [String] Conversation ID of call to be deleted
   ###
   delete_call: (conversation_id) =>
-    return true if @handled_by_v3 conversation_id
-
     @call_center.get_call_by_id conversation_id
     .then (call_et) =>
       @logger.info "Delete call in conversation '#{conversation_id}'"
@@ -355,8 +328,6 @@ class z.calling.handler.CallStateHandler
   @param conversation_id [String] Conversation ID of call to be joined
   ###
   ignore_call: (conversation_id) =>
-    return true if @handled_by_v3 conversation_id
-
     @call_center.get_call_by_id conversation_id
     .then (call_et) =>
       call_et.ignore()
@@ -372,13 +343,13 @@ class z.calling.handler.CallStateHandler
   @param is_videod [Boolean] Is this a video call
   ###
   join_call: (conversation_id, is_videod) =>
-    return true if @handled_by_v3 conversation_id
     @call_center.timings new z.telemetry.calling.CallSetupTimings conversation_id
 
     @call_center.get_call_by_id conversation_id
     .then (call_et) ->
       return call_et.state()
-    .catch ->
+    .catch =>
+      throw new z.calling.CallError z.calling.CallError::TYPE.NOT_ENABLED if @call_center.calling_config().use_v3_api
       return z.calling.enum.CallState.OUTGOING
     .then (call_state) =>
       if call_state is z.calling.enum.CallState.OUTGOING and not z.calling.CallCenter.supports_calling()
@@ -404,8 +375,6 @@ class z.calling.handler.CallStateHandler
   @param has_call_dropped [Boolean] Optional information whether the call has dropped
   ###
   leave_call: (conversation_id, has_call_dropped = false) =>
-    return true if @handled_by_v3 conversation_id
-
     @call_center.media_stream_handler.release_media_streams()
     @call_center.get_call_by_id conversation_id
     .then (call_et) =>
@@ -432,8 +401,6 @@ class z.calling.handler.CallStateHandler
   @param user_id [String] ID of user to be removed
   ###
   remove_participant: (conversation_id, user_id) =>
-    return true if @handled_by_v3 conversation_id
-
     @call_center.get_call_by_id conversation_id
     .then (call_et) ->
       if participant_et = call_et.get_participant_by_id user_id
@@ -447,15 +414,13 @@ class z.calling.handler.CallStateHandler
   @param media_type [z.media.MediaType] MediaType of requested change
   ###
   toggle_media: (conversation_id, media_type) =>
-    return true if @handled_by_v3 conversation_id
-
     toggle_promise = switch media_type
       when z.media.MediaType.AUDIO
-        @media_stream_handler.toggle_audio_send()
+        @call_center.media_stream_handler.toggle_audio_send()
       when z.media.MediaType.SCREEN
-        @media_stream_handler.toggle_screen_send()
+        @call_center.media_stream_handler.toggle_screen_send()
       when z.media.MediaType.VIDEO
-        @media_stream_handler.toggle_video_send()
+        @call_center.media_stream_handler.toggle_video_send()
 
     toggle_promise.then =>
       return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
@@ -468,8 +433,6 @@ class z.calling.handler.CallStateHandler
   @param is_videod [Boolean] Is this a video call
   ###
   toggle_joined: (conversation_id, is_videod) =>
-    return true if @handled_by_v3 conversation_id
-
     if @_self_client_on_a_call() is conversation_id
       @leave_call conversation_id
     else

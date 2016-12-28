@@ -29,7 +29,7 @@ SUPPORTED_EVENTS = [
   z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
 ]
 
-# User repository for all call interactions with the call service.
+# Call center for all call interactions with the call service.
 class z.calling.CallCenter
   ###
   Extended check for calling support of browser.
@@ -46,15 +46,14 @@ class z.calling.CallCenter
     return z.util.Environment.browser.supports.screen_sharing
 
   ###
-  Construct a new Call Center repository.
+  Construct a new call center.
 
   @param call_service [z.calling.CallService] Backend REST API call service implementation
   @param conversation_repository [z.conversation.ConversationRepository] Repository for conversation interactions
   @param media_repository [z.media.MediaRepository] Repository for media interactions
   @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
-  @param audio_repository [z.audio.AudioRepository] Repository for all audio interactions
   ###
-  constructor: (@call_service, @audio_repository, @conversation_repository, @media_repository, @user_repository) ->
+  constructor: (@calling_config, @call_service, @conversation_repository, @media_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.calling.CallCenter', z.config.LOGGER.OPTIONS
 
     # Telemetry
@@ -71,17 +70,10 @@ class z.calling.CallCenter
     @state_handler = new z.calling.handler.CallStateHandler @
     @signaling_handler = new z.calling.handler.CallSignalingHandler @
 
-    @use_v3_api = false
-
-    @share_call_states()
-    @subscribe_to_events()
-
-  share_call_states: =>
     @calls = @state_handler.calls
     @joined_call = @state_handler.joined_call
 
-    @media_stream_handler.v2_calls = @calls
-    @media_stream_handler.joined_v2_call = @joined_call
+    @subscribe_to_events()
 
   # Subscribe to amplify topics.
   subscribe_to_events: =>

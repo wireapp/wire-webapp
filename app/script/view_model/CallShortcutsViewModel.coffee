@@ -24,10 +24,10 @@ Last remainder of the CallBannerViewModel.
 @todo Move functionality elsewhere and remove
 ###
 class z.ViewModel.CallShortcutsViewModel
-  constructor: (@call_view_model) ->
+  constructor: (@calling_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.CallShortcutsViewModel', z.config.LOGGER.OPTIONS
 
-    @joined_call = @call_view_model.joined_call
+    @joined_call = @calling_repository.joined_call
 
     @joined_call.subscribe (call_et) =>
       @_update_shortcut_subscription call_et

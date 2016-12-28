@@ -22,7 +22,7 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.ContentViewModel
-  constructor: (element_id, @call_view_model, @audio_repository, @client_repository, @conversation_repository, @cryptography_repository, @giphy_repository, @media_repository, @search_repository, @user_repository, @properties_repository) ->
+  constructor: (element_id, @audio_repository, @calling_repository, @client_repository, @conversation_repository, @cryptography_repository, @giphy_repository, @media_repository, @search_repository, @user_repository, @properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS
 
     # state
@@ -33,12 +33,12 @@ class z.ViewModel.content.ContentViewModel
       reset_minimize: ko.observable false
 
     # nested view models
-    @call_shortcuts =             new z.ViewModel.CallShortcutsViewModel @call_view_model
-    @video_calling =              new z.ViewModel.VideoCallingViewModel 'video-calling',@call_view_model, @conversation_repository, @media_repository, @user_repository, @multitasking
+    @call_shortcuts =             new z.ViewModel.CallShortcutsViewModel @calling_repository
+    @video_calling =              new z.ViewModel.VideoCallingViewModel 'video-calling',@calling_repository, @conversation_repository, @media_repository, @user_repository, @multitasking
     @collection_details =         new z.ViewModel.content.CollectionDetailsViewModel 'collection-details'
     @collection =                 new z.ViewModel.content.CollectionViewModel 'collection', @conversation_repository, @collection_details
     @connect_requests =           new z.ViewModel.content.ConnectRequestsViewModel 'connect-requests', @user_repository
-    @conversation_titlebar =      new z.ViewModel.ConversationTitlebarViewModel 'conversation-titlebar', @call_view_model, @conversation_repository, @multitasking
+    @conversation_titlebar =      new z.ViewModel.ConversationTitlebarViewModel 'conversation-titlebar', @calling_repository, @conversation_repository, @multitasking
     @conversation_input =         new z.ViewModel.ConversationInputViewModel 'conversation-input', @conversation_repository, @user_repository
     @message_list =               new z.ViewModel.MessageListViewModel 'message-list', @conversation_repository, @user_repository
     @participants =               new z.ViewModel.ParticipantsViewModel 'participants', @user_repository, @conversation_repository, @search_repository
@@ -72,9 +72,9 @@ class z.ViewModel.content.ContentViewModel
           @conversation_titlebar.removed_from_view()
 
     @multitasking.is_minimized.subscribe (is_minimized) =>
-      if is_minimized and @call_view_model.joined_call()
+      if is_minimized and @calling_repository.joined_call()
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.MINIMIZED_FROM_FULLSCREEN,
-        conversation_type: if @call_view_model.joined_call().is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
+        conversation_type: if @calling_repository.joined_call().is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
 
     @user_repository.connect_requests.subscribe (requests) =>
       if @content_state() is z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS and requests.length is 0

@@ -17,13 +17,9 @@
 #
 
 window.z ?= {}
-z.ViewModel ?= {}
+z.e_call ?= {}
+z.e_call.enum ?= {}
 
-
-class z.ViewModel.CallViewModel
-  constructor: (element_id, @call_center, @e_call_center, @media_repository) ->
-    @calls = @media_repository.stream_handler.calls
-    @joined_call = @media_repository.stream_handler.joined_call
-
-    @remote_media_streams = @media_repository.stream_handler.remote_media_streams
-    @self_stream_state = @media_repository.stream_handler.self_stream_state
+z.e_call.enum.E_CALL_VERSION =
+  BELFRY: '2.0'
+  E_CALL: '3.0'

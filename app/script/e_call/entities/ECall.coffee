@@ -34,7 +34,7 @@ class z.e_call.entities.ECall
     @id = @conversation_et.id
 
     @audio_repository = @e_call_center.media_repository.audio_repository
-    @config = @e_call_center.config
+    @config = @e_call_center.calling_config
     @self_user = @e_call_center.user_repository.self()
     @self_state = @e_call_center.self_state
 
@@ -88,7 +88,7 @@ class z.e_call.entities.ECall
 
     # Observable subscriptions
     @is_connected.subscribe (is_connected) =>
-      return if not is_connected
+      return unless is_connected
       @timer_start = Date.now() - 100
       @call_timer_interval = window.setInterval =>
         @update_timer_duration()
@@ -177,7 +177,7 @@ class z.e_call.entities.ECall
       else if e_participant_et.state.video_send()
         @remote_media_type z.media.MediaType.VIDEO
         media_type_changed = true
-    @remote_media_type z.media.MediaType.AUDIO if not media_type_changed
+    @remote_media_type z.media.MediaType.AUDIO unless media_type_changed
 
 
   ###############################################################################

@@ -2522,6 +2522,8 @@ class z.conversation.ConversationRepository
       when 'asset'
         if message.asset.original?
           if message.asset.original.image? then 'photo' else 'file'
+      when 'calling'
+        if (JSON.parse generic_message.calling.content).props.videosend then 'video_call' else 'audio_call'
       when 'image' then 'photo'
       when 'knock' then 'ping'
       when 'text' then 'text' if not message.text.link_preview.length

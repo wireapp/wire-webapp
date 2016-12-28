@@ -21,7 +21,7 @@ z.ViewModel ?= {}
 
 # Parent: z.ViewModel.ConversationTitlebarViewModel
 class z.ViewModel.ConversationTitlebarViewModel
-  constructor: (element_id, @call_view_model, @conversation_repository, @multitasking) ->
+  constructor: (element_id, @calling_repository, @conversation_repository, @multitasking) ->
     @logger = new z.util.Logger 'z.ViewModel.ConversationTitlebarViewModel', z.config.LOGGER.OPTIONS
 
     # TODO remove this for now to ensure that buttons are clickable in macOS wrappers
@@ -31,9 +31,9 @@ class z.ViewModel.ConversationTitlebarViewModel
 
     @conversation_et = @conversation_repository.active_conversation
 
-    @joined_call = @call_view_model.joined_call
-    @remote_media_streams = @call_view_model.remote_media_streams
-    @self_stream_state = @call_view_model.self_stream_state
+    @joined_call = @calling_repository.joined_call
+    @remote_media_streams = @calling_repository.remote_media_streams
+    @self_stream_state = @calling_repository.self_stream_state
 
     @has_call = ko.pureComputed =>
       return false if not @conversation_et() or not @joined_call()
@@ -73,7 +73,7 @@ class z.ViewModel.ConversationTitlebarViewModel
 
   click_on_call_button: =>
     return if not @conversation_et()
-    amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, @conversation_et().id
+    amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, @conversation_et().id, false
 
   click_on_maximize: =>
     @multitasking.auto_minimize false

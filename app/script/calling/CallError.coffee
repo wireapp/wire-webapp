@@ -38,6 +38,8 @@ class z.calling.CallError
         'No conversation ID given'
       when z.calling.CallError::TYPE.NO_REPLACEABLE_TRACK
         'No replaceable MediaStreamTrack found'
+      when z.calling.CallError::TYPE.NOT_ENABLED
+        'Tried to use calling v2 API with it being disabled'
       when z.calling.CallError::TYPE.NOT_SUPPORTED
         'Not supported'
       when z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
@@ -56,6 +58,7 @@ class z.calling.CallError
     FLOW_NOT_FOUND: 'z.calling.CallError::TYPE.FLOW_NOT_FOUND'
     NO_CONVERSATION_ID: 'z.calling.CallError::TYPE.NO_CONVERSATION_ID'
     NO_REPLACEABLE_TRACK: 'z.calling.CallError::TYPE.NO_REPLACEABLE_TRACK'
+    NOT_ENABLED: 'z.calling.CallError::TYPE.NOT_ENABLED'
     NOT_SUPPORTED: 'z.calling.CallError::TYPE.NOT_SUPPORTED'
     RTP_SENDER_NOT_SUPPORTED: 'z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED'
     UNKNOWN: 'z.calling.CallError::TYPE.UNKNOWN'

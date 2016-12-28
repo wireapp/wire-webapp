@@ -482,13 +482,13 @@ class z.ViewModel.list.StartUIViewModel
   on_audio_call: =>
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
-        amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id, false
+        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, false
       , 1000
 
   on_video_call: =>
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
-        amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id, true
+        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, true
       , 1000
 
   on_photo: (images) =>

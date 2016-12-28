@@ -54,10 +54,10 @@ class z.main.App
     service.asset                   = new z.assets.AssetService @auth.client
     service.bot                     = new z.bot.BotService()
     service.call                    = new z.calling.CallService @auth.client
+    service.calling                 = new z.e_call.CallingService @auth.client
     service.connect                 = new z.connect.ConnectService @auth.client
     service.connect_google          = new z.connect.ConnectGoogleService @auth.client
     service.cryptography            = new z.cryptography.CryptographyService @auth.client
-    service.e_call                  = new z.e_call.ECallService @auth.client
     service.giphy                   = new z.extension.GiphyService @auth.client
     service.search                  = new z.search.SearchService @auth.client
     service.storage                 = new z.storage.StorageService()
@@ -106,10 +106,9 @@ class z.main.App
     )
 
     repository.bot                 = new z.bot.BotRepository @service.bot, repository.conversation
-    repository.call_center         = new z.calling.CallCenter @service.call, repository.audio, repository.conversation, repository.media, repository.user
-    repository.e_call_center       = new z.e_call.ECallCenter @service.e_call, repository.conversation, repository.media, repository.user
+    repository.calling             = new z.e_call.CallingRepository @service.call, @service.calling, repository.conversation, repository.media, repository.user
     repository.event_tracker       = new z.tracking.EventTrackingRepository repository.user, repository.conversation
-    repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.call_center, repository.conversation
+    repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.calling, repository.conversation
 
     return repository
 
@@ -118,9 +117,8 @@ class z.main.App
     view = {}
 
     view.main                      = new z.ViewModel.MainViewModel 'wire-main', @repository.user
-    view.call                      = new z.ViewModel.CallViewModel 'call', @repository.call_center, @repository.e_call_center, @repository.media
-    view.content                   = new z.ViewModel.content.ContentViewModel 'right', view.call, @repository.audio, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.media, @repository.search, @repository.user, @repository.properties
-    view.list                      = new z.ViewModel.list.ListViewModel 'left', view.call, view.content, @repository.connect, @repository.conversation, @repository.search, @repository.user, @repository.properties
+    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.audio, @repository.calling, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.media, @repository.search, @repository.user, @repository.properties
+    view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.calling, @repository.connect, @repository.conversation, @repository.search, @repository.user, @repository.properties
     view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
     view.lightbox                  = new z.ViewModel.ImageDetailViewViewModel 'detail-view', @repository.conversation
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
@@ -294,8 +292,7 @@ class z.main.App
 
     calling_v3 = z.util.get_url_parameter z.auth.URLParameter.CALLING_V3
     if calling_v3
-      @repository.call_center.use_v3_api = calling_v3
-      @repository.e_call_center.use_v3_api = calling_v3
+      @repository.calling.use_v3_api = calling_v3
 
   ###
   Check whether the page has been reloaded.
@@ -344,8 +341,7 @@ class z.main.App
     $(window).on 'beforeunload', =>
       @logger.info "'window.onbeforeunload' was triggered, so we will disconnect from the backend."
       @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.PAGE_NAVIGATION
-      @repository.call_center.state_handler.leave_call_on_beforeunload()
-      @repository.e_call_center.leave_call_on_beforeunload()
+      @repository.calling.leave_call_on_beforeunload()
       @repository.storage.terminate 'window.onbeforeunload'
       return undefined
 
@@ -485,7 +481,7 @@ class z.main.App
 
   # Report call telemetry to Raygun for analysis.
   report_call: =>
-    @repository.call_center.report_call()
+    @repository.calling.call_center.report_call()
 
   # Reset all known sessions at once.
   reset_all_sessions: =>

@@ -18,16 +18,13 @@
 
 window.z ?= {}
 z.e_call ?= {}
+z.e_call.enum ?= {}
 
-class z.e_call.ECallService
-  constructor: (@client) ->
-    @logger = new z.util.Logger 'z.e_call.ECallService', z.config.LOGGER.OPTIONS
-
-  ###
-  Retrieves a call config from the backend.
-  @param [Promise] Promise which resolve with call config information
-  ###
-  get_config: ->
-    @client.send_request
-      type: 'GET'
-      url: @client.create_url '/calls/config'
+z.e_call.enum.E_CALL_ACTION =
+  DELETE: 'delete_call'
+  IGNORE: 'ignore_call'
+  JOIN: 'join_call'
+  LEAVE: 'leave_call'
+  REMOVE_PARTICIPANT: 'remove_participant'
+  TOGGLE_MEDIA: 'toggle_media'
+  TOGGLE_STATE: 'toggle_joined'

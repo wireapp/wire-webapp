@@ -46,16 +46,8 @@ class z.media.MediaStreamHandler
   constructor: (@media_repository, @audio_repository) ->
     @logger = new z.util.Logger 'z.media.MediaDevicesHandler', z.config.LOGGER.OPTIONS
 
-    @e_calls = -> return undefined
-    @v2_calls = -> return undefined
-    @joined_e_call = -> return undefined
-    @joined_v2_call = -> return undefined
-
-    @calls = ko.pureComputed =>
-      return @v2_calls().concat @e_calls()
-    @joined_call = ko.pureComputed =>
-      return @joined_e_call() if @joined_e_call()
-      return @joined_v2_call() if @joined_v2_call()
+    @calls = -> return []
+    @joined_call = -> return undefined
 
     @local_media_streams =
       audio: ko.observable()
