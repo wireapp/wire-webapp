@@ -301,18 +301,23 @@
 <script src="/script/telemetry/calling/ConnectionStats.js"></script>
 <script src="/script/telemetry/calling/FlowTelemetry.js"></script>
 <script src="/script/telemetry/calling/CallTelemetry.js"></script>
-<!-- Calling -->
+<!-- Calling/Enums -->
 <script src="/script/calling/enum/CallFinishedReason.js"></script>
 <script src="/script/calling/enum/CallState.js"></script>
 <script src="/script/calling/enum/CallStateEventCause.js"></script>
 <script src="/script/calling/enum/CallStateGroups.js"></script>
+<script src="/script/calling/enum/ECallAction.js"></script>
+<script src="/script/calling/enum/ECallMessageType.js"></script>
 <script src="/script/calling/enum/ParticipantState.js"></script>
+<script src="/script/calling/enum/ProtocolVersion.js"></script>
 <script src="/script/calling/enum/SDPNegotiationMode.js"></script>
 <script src="/script/calling/enum/SDPSource.js"></script>
 <script src="/script/calling/enum/VideoOrientation.js"></script>
+<!-- Calling/Payloads -->
 <script src="/script/calling/payloads/FlowDeletionInfo.js"></script>
 <script src="/script/calling/payloads/ICECandidateInfo.js"></script>
 <script src="/script/calling/payloads/SDPInfo.js"></script>
+<!-- Calling/Rtc -->
 <script src="/script/calling/rtc/ICEConnectionState.js"></script>
 <script src="/script/calling/rtc/ICEGatheringState.js"></script>
 <script src="/script/calling/rtc/MediaStreamError.js"></script>
@@ -320,32 +325,34 @@
 <script src="/script/calling/rtc/SDPType.js"></script>
 <script src="/script/calling/rtc/SignalingState.js"></script>
 <script src="/script/calling/rtc/StatsType.js"></script>
+<!-- Calling/Handler -->
 <script src="/script/calling/handler/CallSignalingHandler.js"></script>
 <script src="/script/calling/handler/CallStateHandler.js"></script>
+<!-- Calling/Mapper -->
 <script src="/script/calling/mapper/ICECandidateMapper.js"></script>
 <script src="/script/calling/mapper/SDPMapper.js"></script>
+<!-- Calling/Entities -->
 <script src="/script/calling/entities/Call.js"></script>
+<script src="/script/calling/entities/ECall.js"></script>
+<script src="/script/calling/entities/ECallMessage.js"></script>
+<script src="/script/calling/entities/ECallPropsyncMessage.js"></script>
+<script src="/script/calling/entities/ECallSetupMessage.js"></script>
+<script src="/script/calling/entities/EFlow.js"></script>
+<script src="/script/calling/entities/EParticipant.js"></script>
 <script src="/script/calling/entities/Flow.js"></script>
 <script src="/script/calling/entities/FlowAudio.js"></script>
 <script src="/script/calling/entities/Participant.js"></script>
-<script src="/script/calling/CallCenter.js"></script>
-<script src="/script/calling/CallError.js"></script>
-<script src="/script/calling/CallService.js"></script>
-<script src="/script/calling/CallTrackingInfo.js"></script>
-<!-- ECall -->
-<script src="/script/e_call/enum/ECallAction.js"></script>
-<script src="/script/e_call/enum/ECallMessageType.js"></script>
-<script src="/script/e_call/enum/ECallVersion.js"></script>
-<script src="/script/e_call/entities/ECall.js"></script>
-<script src="/script/e_call/entities/ECallMessage.js"></script>
-<script src="/script/e_call/entities/ECallPropsyncMessage.js"></script>
-<script src="/script/e_call/entities/ECallSetupMessage.js"></script>
-<script src="/script/e_call/entities/EFlow.js"></script>
-<script src="/script/e_call/entities/EParticipant.js"></script>
-<script src="/script/e_call/ECallCenter.js"></script>
-<script src="/script/e_call/ECallError.js"></script>
-<script src="/script/e_call/CallingRepository.js"></script>
-<script src="/script/e_call/CallingService.js"></script>
+<!-- Calling/Belfry -->
+<script src="/script/calling/belfry/CallCenter.js"></script>
+<script src="/script/calling/belfry/CallError.js"></script>
+<script src="/script/calling/belfry/CallService.js"></script>
+<script src="/script/calling/belfry/CallTrackingInfo.js"></script>
+<!-- Calling/ECall -->
+<script src="/script/calling/e_call/ECallCenter.js"></script>
+<script src="/script/calling/e_call/ECallError.js"></script>
+<!-- Calling -->
+<script src="/script/calling/CallingRepository.js"></script>
+<script src="/script/calling/CallingService.js"></script>
 <!-- View -->
 <script src="/script/ui/Shortcut.js"></script>
 <script src="/script/ui/WindowHandler.js"></script>

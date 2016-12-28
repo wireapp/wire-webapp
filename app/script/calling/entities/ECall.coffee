@@ -17,18 +17,18 @@
 #
 
 window.z ?= {}
-z.e_call ?= {}
-z.e_call.entities ?= {}
+z.calling ?= {}
+z.calling.entities ?= {}
 
 # E-call entity.
-class z.e_call.entities.ECall
+class z.calling.entities.ECall
   ###
   Construct a new e-call entity.
   @param conversation_et [z.entity.Conversation] Conversation the call takes place in
   @param self_user [z.entity.User] Self user entity
   ###
   constructor: (@conversation_et, @creating_user, @session_id, @e_call_center) ->
-    @logger = new z.util.Logger "z.e_call.ECall (#{@conversation_et.id})", z.config.LOGGER.OPTIONS
+    @logger = new z.util.Logger "z.calling.entities.ECall (#{@conversation_et.id})", z.config.LOGGER.OPTIONS
 
     # IDs and references
     @id = @conversation_et.id
@@ -186,23 +186,23 @@ class z.e_call.entities.ECall
 
   ###
   Add an e-participant to the e-call.
-  @param e_participant_et [z.e_call.entities.EParticipant] E-participant entity to be added to the e-call
-  @param e_call_message [z.e_call.entities.ECallSetupMessage] E-call setup message entity
+  @param e_participant_et [z.calling.entities.EParticipant] E-participant entity to be added to the e-call
+  @param e_call_message [z.calling.entities.ECallSetupMessage] E-call setup message entity
   ###
   add_participant: (user_et, e_call_message) =>
     @get_participant_by_id user_et.id
     .catch (error) =>
-      throw error if error.type isnt z.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
+      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
 
       @logger.debug "Adding e-call participant '#{user_et.name()}'"
-      @participants.push new z.e_call.entities.EParticipant @, user_et, e_call_message
+      @participants.push new z.calling.entities.EParticipant @, user_et, e_call_message
       @_update_remote_state()
       return @
 
   ###
   Remove an e-participant from the call.
-  @param e_participant_et [z.e_call.entities.EParticipant] E-Participant entity to be removed from the e-call
-  @return [z.e_call.entities.ECall] E-call entity
+  @param e_participant_et [z.calling.entities.EParticipant] E-Participant entity to be removed from the e-call
+  @return [z.calling.entities.ECall] E-call entity
   ###
   delete_participant: (e_participant_et) =>
     @get_participant_by_id e_participant_et.id
@@ -213,7 +213,7 @@ class z.e_call.entities.ECall
       @logger.debug "Removed e-call participant '#{e_participant_et.user.name()}'"
       return @
     .catch (error) ->
-      throw error if error.type isnt z.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
+      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
 
 
   ###
@@ -226,17 +226,17 @@ class z.e_call.entities.ECall
   ###
   Get a call participant by his id.
   @param user_id [String] User ID of participant to be returned
-  @return [z.e_call.entities.EParticipant] E-call participant that matches given user ID
+  @return [z.calling.entities.EParticipant] E-call participant that matches given user ID
   ###
   get_participant_by_id: (user_id) =>
     for e_participant_et in @participants() when e_participant_et.id is user_id
       return Promise.resolve e_participant_et
-    return Promise.reject new z.e_call.ECallError z.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
+    return Promise.reject new z.calling.e_call.ECallError z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
 
   ###
   Update e-call participant with e-call message.
   @param user_et [z.entity.User] User to be updated
-  @param e_call_message [z.e_call.entities.ECallMessage] E-call message to update user with
+  @param e_call_message [z.calling.entities.ECallMessage] E-call message to update user with
   ###
   update_participant: (user_et, e_call_message) =>
     @get_participant_by_id user_et.id
@@ -246,7 +246,7 @@ class z.e_call.entities.ECall
       @_update_remote_state()
       return @
     .catch (error) ->
-      throw error if error.type isnt z.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
+      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
 
 
   ###############################################################################

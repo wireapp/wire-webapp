@@ -93,7 +93,7 @@ class z.ViewModel.VideoCallingViewModel
       is_visible = @show_remote_video() or @show_remote_participant() and not @multitasking.is_minimized()
       return @is_ongoing() and is_visible
     @show_toggle_screen = ko.pureComputed ->
-      return z.calling.CallCenter.supports_screen_sharing()
+      return z.calling.CallingRepository.supports_screen_sharing()
     @disable_toggle_screen = ko.pureComputed =>
       return @joined_call()?.is_remote_screen_send()
 

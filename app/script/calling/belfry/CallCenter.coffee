@@ -18,6 +18,7 @@
 
 window.z ?= {}
 z.calling ?= {}
+z.calling.belfry ?= {}
 
 SUPPORTED_EVENTS = [
   z.event.Backend.CALL.FLOW_ADD
@@ -30,31 +31,17 @@ SUPPORTED_EVENTS = [
 ]
 
 # Call center for all call interactions with the call service.
-class z.calling.CallCenter
-  ###
-  Extended check for calling support of browser.
-  @return [Boolean] True if calling is supported
-  ###
-  @supports_calling: ->
-    return z.util.Environment.browser.supports.calling
-
-  ###
-  Extended check for screen sharing support of browser.
-  @return [Boolean] True if screen sharing is supported
-  ###
-  @supports_screen_sharing: ->
-    return z.util.Environment.browser.supports.screen_sharing
-
+class z.calling.belfry.CallCenter
   ###
   Construct a new call center.
 
-  @param call_service [z.calling.CallService] Backend REST API call service implementation
+  @param call_service [z.calling.belfry.CallService] Backend REST API call service implementation
   @param conversation_repository [z.conversation.ConversationRepository] Repository for conversation interactions
   @param media_repository [z.media.MediaRepository] Repository for media interactions
   @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
   ###
   constructor: (@calling_config, @call_service, @conversation_repository, @media_repository, @user_repository) ->
-    @logger = new z.util.Logger 'z.calling.CallCenter', z.config.LOGGER.OPTIONS
+    @logger = new z.util.Logger 'z.calling.belfry.CallCenter', z.config.LOGGER.OPTIONS
 
     # Telemetry
     @telemetry = new z.telemetry.calling.CallTelemetry()
@@ -104,7 +91,7 @@ class z.calling.CallCenter
       @logger.info "Skipping '#{event.type}' event", {event_object: event, event_json: JSON.stringify event}
     else
       @logger.info "Handling '#{event.type}' event", {event_object: event, event_json: JSON.stringify event}
-      if z.calling.CallCenter.supports_calling()
+      if z.calling.CallingRepository.supports_calling()
         @_on_event_in_supported_browsers event
       else
         @_on_event_in_unsupported_browsers event
@@ -161,8 +148,8 @@ class z.calling.CallCenter
       if conversation_id
         for call_et in @calls() when call_et.id is conversation_id
           return call_et
-        throw new z.calling.CallError z.calling.CallError::TYPE.CALL_NOT_FOUND
-      throw new z.calling.CallError z.calling.CallError::TYPE.NO_CONVERSATION_ID
+        throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.CALL_NOT_FOUND
+      throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.NO_CONVERSATION_ID
 
   ###
   Helper to identify the creator of a call or choose the first joined one.

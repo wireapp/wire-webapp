@@ -17,11 +17,9 @@
 #
 
 window.z ?= {}
-z.e_call ?= {}
-z.e_call.enum ?= {}
+z.calling ?= {}
+z.calling.enum ?= {}
 
-z.e_call.enum.E_CALL_MESSAGE_TYPE =
-  CANCEL: 'CANCEL'
-  HANGUP: 'HANGUP'
-  PROP_SYNC: 'PROPSYNC'
-  SETUP: 'SETUP'
+z.calling.enum.PROTOCOL_VERSION =
+  BELFRY: '2.0'
+  E_CALL: '3.0'

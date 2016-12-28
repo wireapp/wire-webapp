@@ -18,10 +18,11 @@
 
 window.z ?= {}
 z.calling ?= {}
+z.calling.belfry ?= {}
 
-class z.calling.CallService
+class z.calling.belfry.CallService
   constructor: (@client) ->
-    @logger = new z.util.Logger 'z.calling.CallService', z.config.LOGGER.OPTIONS
+    @logger = new z.util.Logger 'z.calling.belfry.CallService', z.config.LOGGER.OPTIONS
 
   ###
   Deletes a flow on the backend.

@@ -402,8 +402,8 @@ describe 'z.calling.CallCenter', ->
       call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
       .then done.fail
       .catch (error) ->
-        expect(error).toEqual jasmine.any z.calling.CallError
-        expect(error.type).toBe z.calling.CallError::TYPE.CONVERSATION_TOO_BIG
+        expect(error).toEqual jasmine.any z.calling.belfry.CallError
+        expect(error.type).toBe z.calling.belfry.CallError::TYPE.CONVERSATION_TOO_BIG
         expect(call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
         done()
       server.requests[0].respond 409, 'Content-Type': 'application/json', JSON.stringify error_payload
@@ -420,8 +420,8 @@ describe 'z.calling.CallCenter', ->
       call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
       .then done.fail
       .catch (error) ->
-        expect(error).toEqual jasmine.any z.calling.CallError
-        expect(error.type).toBe z.calling.CallError::TYPE.VOICE_CHANNEL_FULL
+        expect(error).toEqual jasmine.any z.calling.belfry.CallError
+        expect(error.type).toBe z.calling.belfry.CallError::TYPE.VOICE_CHANNEL_FULL
         expect(call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
         done()
       server.requests[0].respond 409, 'Content-Type': 'application/json', JSON.stringify error_payload
@@ -437,8 +437,8 @@ describe 'z.calling.CallCenter', ->
       call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
       .then done.fail
       .catch (error) ->
-        expect(error).toEqual jasmine.any z.calling.CallError
-        expect(error.type).toBe z.calling.CallError::TYPE.CONVERSATION_EMPTY
+        expect(error).toEqual jasmine.any z.calling.belfry.CallError
+        expect(error.type).toBe z.calling.belfry.CallError::TYPE.CONVERSATION_EMPTY
         expect(call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
         done()
       server.requests[0].respond 400, 'Content-Type': 'application/json', JSON.stringify error_payload

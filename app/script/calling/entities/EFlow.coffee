@@ -17,8 +17,8 @@
 #
 
 window.z ?= {}
-z.e_call ?= {}
-z.e_call.entities ?= {}
+z.calling ?= {}
+z.calling.entities ?= {}
 
 # Static array of where to put people in the stereo scape.
 CONFIG =
@@ -27,16 +27,16 @@ CONFIG =
   RTC_DATA_CHANNEL_LABEL: 'calling-3.0'
 
 # E-Flow entity.
-class z.e_call.entities.EFlow
+class z.calling.entities.EFlow
   ###
   Construct a new e-flow entity.
 
-  @param e_call_et [z.e_call.ECall] E-Call entity that the e-flow belongs to
-  @param e_participant_et [z.e_call.entities.EParticipant] E-Participant entity that the e-flow belongs to
-  @param e_call_message [z.e_call.entities.ECallSetupMessage] Optional e-call setup message entity
+  @param e_call_et [z.calling.entities.ECall] E-Call entity that the e-flow belongs to
+  @param e_participant_et [z.calling.entities.EParticipant] E-Participant entity that the e-flow belongs to
+  @param e_call_message [z.calling.entities.ECallSetupMessage] Optional e-call setup message entity
   ###
   constructor: (@e_call_et, @e_participant_et, e_call_message) ->
-    @logger = new z.util.Logger "z.e_call.EFlow (#{@e_participant_et.id})", z.config.LOGGER.OPTIONS
+    @logger = new z.util.Logger "z.calling.entities.EFlow (#{@e_participant_et.id})", z.config.LOGGER.OPTIONS
 
     @id = @e_participant_et.id
     @conversation_id = @e_call_et.id
@@ -230,7 +230,7 @@ class z.e_call.entities.EFlow
   ###
   Initialize the e-flow.
   @note Magic here is that if an e_call_message is present, the remote user is the creator of the flow
-  @param e_call_message [z.e_call.entities.ECallSetupMessage] Optional e-call setup message entity
+  @param e_call_message [z.calling.entities.ECallSetupMessage] Optional e-call setup message entity
   ###
   initialize_e_flow: (e_call_message) =>
     if e_call_message
@@ -426,7 +426,7 @@ class z.e_call.entities.EFlow
 
   ###
   Save the remote SDP received via an e-call message within the e-flow.
-  @param e_call_message [z.e_call.entities.ECallSetupMessage] E-call setup message entity
+  @param e_call_message [z.calling.entities.ECallSetupMessage] E-call setup message entity
   ###
   save_remote_sdp: (e_call_message) =>
     @remote_sdp @_rewrite_sdp @_map_sdp(e_call_message), z.calling.enum.SDPSource.REMOTE
@@ -438,7 +438,7 @@ class z.e_call.entities.EFlow
     @local_sdp @_rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL
 
     @logger.info "Sending local SDP of type '#{@local_sdp().type}' for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
-    @e_call_et.send_e_call_event new z.e_call.entities.ECallSetupMessage @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @local_sdp().sdp, videosend: @e_call_et.self_state.video_send(), @e_call_et
+    @e_call_et.send_e_call_event new z.calling.entities.ECallSetupMessage @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @local_sdp().sdp, videosend: @e_call_et.self_state.video_send(), @e_call_et
     .then =>
       @has_sent_local_sdp true
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful", @local_sdp()
@@ -483,7 +483,7 @@ class z.e_call.entities.EFlow
 
   ###
   Map e-call setup message to RTCSessionDescription.
-  @param e_call_message [z.e_call.entities.ECallSetupMessage] E-call setup message entity
+  @param e_call_message [z.calling.entities.ECallSetupMessage] E-call setup message entity
   @return [RTCSessionDescription] webRTC standard compliant RTCSessionDescription
   ###
   _map_sdp: (e_call_message) ->
@@ -599,7 +599,7 @@ class z.e_call.entities.EFlow
   update_media_stream: (media_stream_info) =>
     @_replace_media_track media_stream_info
     .catch (error) =>
-      if error.type in [z.calling.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
+      if error.type in [z.calling.belfry.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.belfry.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
         @logger.info "Replacement of MediaStream and renegotiation necessary: #{error.message}", error
         return @_replace_media_stream media_stream_info
       throw error
@@ -671,16 +671,16 @@ class z.e_call.entities.EFlow
       if @peer_connection.getSenders
         for rtp_sender in @peer_connection.getSenders() when rtp_sender.track.kind is media_stream_info.type
           return rtp_sender
-        throw new z.calling.CallError z.calling.CallError::TYPE.NO_REPLACEABLE_TRACK
+        throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.NO_REPLACEABLE_TRACK
       else
-        throw new z.calling.CallError z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
+        throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
     .then (rtp_sender) ->
       return rtp_sender.replaceTrack media_stream_info.stream.getTracks()[0]
     .then =>
       @logger.info "Replaced the '#{media_stream_info.type}' track"
       return media_stream_info
     .catch (error) =>
-      if error.type not in [z.calling.CallError::TYPE.NOT_SUPPORTED, z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
+      if error.type not in [z.calling.belfry.CallError::TYPE.NOT_SUPPORTED, z.calling.belfry.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
         @logger.error "Failed to replace the '#{media_stream_info.type}' track: #{error.name} - #{error.message}", error
       throw error
 

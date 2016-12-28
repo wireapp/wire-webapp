@@ -123,7 +123,7 @@ class z.calling.handler.CallStateHandler
         # ...which has ended
         @delete_call call_et.id
     .catch (error) =>
-      if error.type is z.calling.CallError::TYPE.CALL_NOT_FOUND
+      if error.type is z.calling.belfry.CallError::TYPE.CALL_NOT_FOUND
         # Call with us joined
         if self_user_joined
           # ...from this device
@@ -231,15 +231,15 @@ class z.calling.handler.CallStateHandler
       when z.service.BackendClientError::LABEL.CONVERSATION_TOO_BIG
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_FULL_CONVERSATION,
           data: error.max_members
-        throw new z.calling.CallError z.calling.CallError::TYPE.CONVERSATION_TOO_BIG
+        throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.CONVERSATION_TOO_BIG
       when z.service.BackendClientError::LABEL.INVALID_OPERATION
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION
         @delete_call conversation_id
-        throw new z.calling.CallError z.calling.CallError::TYPE.CONVERSATION_EMPTY
+        throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.CONVERSATION_EMPTY
       when z.service.BackendClientError::LABEL.VOICE_CHANNEL_FULL
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_FULL_VOICE_CHANNEL,
           data: error.max_joined
-        throw new z.calling.CallError z.calling.CallError::TYPE.VOICE_CHANNEL_FULL
+        throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.VOICE_CHANNEL_FULL
       # User has been removed from conversation, call should be deleted
       else
         @call_center.telemetry.report_error "PUTting the state to '#{payload.state}' failed: #{error.message}", error
@@ -349,10 +349,10 @@ class z.calling.handler.CallStateHandler
     .then (call_et) ->
       return call_et.state()
     .catch =>
-      throw new z.calling.CallError z.calling.CallError::TYPE.NOT_ENABLED if @call_center.calling_config().use_v3_api
+      throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.NOT_ENABLED if @call_center.calling_config().use_v3_api
       return z.calling.enum.CallState.OUTGOING
     .then (call_state) =>
-      if call_state is z.calling.enum.CallState.OUTGOING and not z.calling.CallCenter.supports_calling()
+      if call_state is z.calling.enum.CallState.OUTGOING and not z.calling.CallingRepository.supports_calling()
         amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL
       else
         @call_center.conversation_repository.get_conversation_by_id conversation_id, (conversation_et) =>
@@ -488,7 +488,7 @@ class z.calling.handler.CallStateHandler
   _join_call: (conversation_id, is_videod) ->
     @call_center.get_call_by_id conversation_id
     .catch (error) ->
-      throw error if error.type isnt z.calling.CallError::TYPE.CALL_NOT_FOUND
+      throw error if error.type isnt z.calling.belfry.CallError::TYPE.CALL_NOT_FOUND
     .then =>
       if @call_center.media_stream_handler.has_media_streams()
         @logger.info 'MediaStream has already been initialized', @call_center.media_stream_handler.local_media_streams

@@ -26,7 +26,7 @@ class z.ViewModel.list.ListViewModel
   @param element_id [String] HTML selector
   @param content_view_model [z.ViewModel.ContentViewModel] Content view model
   @param connect_repository [z.connect.ConnectRepository] Connect repository
-  @param calling_repository [z.e_call.CallingRepository] Calling repository
+  @param calling_repository [z.calling.CallingRepository] Calling repository
   @param conversation_repository [z.conversation.ConversationRepository] Conversation repository
   @param search_repository [z.search.SearchRepository] Search repository
   @param user_repository [z.user.UserRepository] User repository

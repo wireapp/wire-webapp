@@ -19,16 +19,15 @@
 window.z ?= {}
 z.calling ?= {}
 
-class z.calling.CallTrackingInfo
-  constructor: (params) ->
-    @conversation_id = params.conversation_id
-    @session_id = params.session_id
-    @time_started = new Date()
-    @participants_joined = {}
+class z.calling.CallingService
+  constructor: (@client) ->
+    @logger = new z.util.Logger 'z.calling.CallingService', z.config.LOGGER.OPTIONS
 
-  add_participant: (participant_et) ->
-    @participants_joined[participant_et.user.name()] = true
-
-  to_string: ->
-    participants = Object.keys(@participants_joined).join ', '
-    return "#{@session_id} in #{@conversation_id} | #{@time_started.toUTCString()} | To: #{participants}"
+  ###
+  Retrieves a calling config from the backend.
+  @param [Promise] Promise which resolve with call config information
+  ###
+  get_config: ->
+    @client.send_request
+      type: 'GET'
+      url: @client.create_url '/calls/config'

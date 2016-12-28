@@ -26,7 +26,7 @@ class z.ViewModel.list.ConversationListViewModel
   @param element_id [String] HTML selector
   @param list_view_model [z.ViewModel.list.ListViewModel] List view model
   @param content_view_model [z.ViewModel.ContentViewModel] Content view model
-  @param calling_repository [z.e_call.CallingRepository] Calling repository
+  @param calling_repository [z.calling.CallingRepository] Calling repository
   @param conversation_repository [z.conversation.ConversationRepository] Conversation repository
   @param user_repository [z.user.UserRepository] User repository
   ###
@@ -85,7 +85,7 @@ class z.ViewModel.list.ConversationListViewModel
     @self_stream_state = @calling_repository.self_stream_state
 
     @show_toggle_screen = ko.pureComputed ->
-      return z.calling.CallCenter.supports_screen_sharing()
+      return z.calling.CallingRepository.supports_screen_sharing()
     @disable_toggle_screen = ko.pureComputed =>
       return @joined_call()?.is_remote_screen_send()
 

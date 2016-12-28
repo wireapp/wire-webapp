@@ -17,30 +17,44 @@
 #
 
 window.z ?= {}
-z.e_call ?= {}
+z.calling ?= {}
 
 CALLING_CONFIG =
   CONFIG_UPDATE_INTERVAL: 6 * 60 * 60 * 1000 # 6 hours
 
 # Call repository for all calling interactions.
-class z.e_call.CallingRepository
+class z.calling.CallingRepository
   ###
-  Construct a new E-Call Center repository.
+  Extended check for calling support of browser.
+  @return [Boolean] True if calling is supported
+  ###
+  @supports_calling: ->
+    return z.util.Environment.browser.supports.calling
 
-  @param call_service [z.calling.CallService] Backend REST API call service implementation
-  @param calling_service [z.e_call.CallingService] Backend REST API calling service implementation
+  ###
+  Extended check for screen sharing support of browser.
+  @return [Boolean] True if screen sharing is supported
+  ###
+  @supports_screen_sharing: ->
+    return z.util.Environment.browser.supports.screen_sharing
+
+  ###
+  Construct a new Calling repository.
+
+  @param call_service [z.calling.belfry.CallService] Backend REST API call service implementation
+  @param calling_service [z.calling.CallingService] Backend REST API calling service implementation
   @param conversation_repository [z.conversation.ConversationRepository] Repository for conversation interactions
   @param media_repository [z.media.MediaRepository] Repository for media interactions
   @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
   ###
   constructor: (@call_service, @calling_service, @conversation_repository, @media_repository, @user_repository) ->
-    @logger = new z.util.Logger 'z.e_call.CallingRepository', z.config.LOGGER.OPTIONS
+    @logger = new z.util.Logger 'z.calling.CallingRepository', z.config.LOGGER.OPTIONS
 
     @calling_config = ko.observable()
     @use_v3_api = false
 
-    @call_center = new z.calling.CallCenter @calling_config, @call_service, @conversation_repository, @media_repository, @user_repository
-    @e_call_center = new z.e_call.ECallCenter @calling_config, @conversation_repository, @media_repository, @user_repository
+    @call_center = new z.calling.belfry.CallCenter @calling_config, @call_service, @conversation_repository, @media_repository, @user_repository
+    @e_call_center = new z.calling.e_call.ECallCenter @calling_config, @conversation_repository, @media_repository, @user_repository
 
     @calls = ko.pureComputed =>
       return @call_center.calls().concat @e_call_center.e_calls()
@@ -60,27 +74,27 @@ class z.e_call.CallingRepository
 
   # Subscribe to amplify topics.
   subscribe_to_events: =>
-    amplify.subscribe z.event.WebApp.CALL.MEDIA.TOGGLE, => @switch_call_center z.e_call.enum.E_CALL_ACTION.TOGGLE_MEDIA, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.DELETE, => @switch_call_center z.e_call.enum.E_CALL_ACTION.DELETE, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.IGNORE, => @switch_call_center z.e_call.enum.E_CALL_ACTION.IGNORE, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.JOIN, => @switch_call_center z.e_call.enum.E_CALL_ACTION.JOIN, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.LEAVE, => @switch_call_center z.e_call.enum.E_CALL_ACTION.LEAVE, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, => @switch_call_center z.e_call.enum.E_CALL_ACTION.REMOVE_PARTICIPANT, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE, => @switch_call_center z.e_call.enum.E_CALL_ACTION.TOGGLE_STATE, arguments
+    amplify.subscribe z.event.WebApp.CALL.MEDIA.TOGGLE, => @switch_call_center z.calling.enum.E_CALL_ACTION.TOGGLE_MEDIA, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.DELETE, => @switch_call_center z.calling.enum.E_CALL_ACTION.DELETE, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.IGNORE, => @switch_call_center z.calling.enum.E_CALL_ACTION.IGNORE, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.JOIN, => @switch_call_center z.calling.enum.E_CALL_ACTION.JOIN, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.LEAVE, => @switch_call_center z.calling.enum.E_CALL_ACTION.LEAVE, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, => @switch_call_center z.calling.enum.E_CALL_ACTION.REMOVE_PARTICIPANT, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE, => @switch_call_center z.calling.enum.E_CALL_ACTION.TOGGLE_STATE, arguments
     amplify.subscribe z.event.WebApp.LOADED, @initiate_config
 
   get_version_of_call: (conversation_id) =>
     @call_center.get_call_by_id conversation_id
     .then ->
-      return z.e_call.enum.E_CALL_VERSION.BELFRY
+      return z.calling.enum.PROTOCOL_VERSION.BELFRY
     .catch (error) =>
-      throw error unless error.type is z.calling.CallError::TYPE.CALL_NOT_FOUND
+      throw error unless error.type is z.calling.belfry.CallError::TYPE.CALL_NOT_FOUND
 
       @e_call_center.get_e_call_by_id conversation_id
       .then ->
-        return z.e_call.enum.E_CALL_VERSION.E_CALL
+        return z.calling.enum.PROTOCOL_VERSION.E_CALL
       .catch (error) ->
-        throw error unless error.type is z.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+        throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
   # Initiate calling config update.
   initiate_config: =>
@@ -93,13 +107,13 @@ class z.e_call.CallingRepository
   switch_call_center: (fn_name, args) =>
     @get_version_of_call args[0]
     .then (call_version) =>
-      if not call_version and fn_name is z.e_call.enum.E_CALL_ACTION.TOGGLE_STATE
-        call_version = if @use_v3_api then z.e_call.enum.E_CALL_VERSION.E_CALL else z.e_call.enum.E_CALL_VERSION.BELFRY
+      if not call_version and fn_name is z.calling.enum.E_CALL_ACTION.TOGGLE_STATE
+        call_version = if @use_v3_api then z.calling.enum.PROTOCOL_VERSION.E_CALL else z.calling.enum.PROTOCOL_VERSION.BELFRY
 
       switch call_version
-        when z.e_call.enum.E_CALL_VERSION.BELFRY
+        when z.calling.enum.PROTOCOL_VERSION.BELFRY
           @call_center.state_handler[fn_name].apply @, args
-        when z.e_call.enum.E_CALL_VERSION.E_CALL
+        when z.calling.enum.PROTOCOL_VERSION.E_CALL
           @e_call_center[fn_name].apply @, args
 
   leave_call_on_beforeunload: =>

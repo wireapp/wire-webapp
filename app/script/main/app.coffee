@@ -53,8 +53,8 @@ class z.main.App
 
     service.asset                   = new z.assets.AssetService @auth.client
     service.bot                     = new z.bot.BotService()
-    service.call                    = new z.calling.CallService @auth.client
-    service.calling                 = new z.e_call.CallingService @auth.client
+    service.call                    = new z.calling.belfry.CallService @auth.client
+    service.calling                 = new z.calling.CallingService @auth.client
     service.connect                 = new z.connect.ConnectService @auth.client
     service.connect_google          = new z.connect.ConnectGoogleService @auth.client
     service.cryptography            = new z.cryptography.CryptographyService @auth.client
@@ -106,7 +106,7 @@ class z.main.App
     )
 
     repository.bot                 = new z.bot.BotRepository @service.bot, repository.conversation
-    repository.calling             = new z.e_call.CallingRepository @service.call, @service.calling, repository.conversation, repository.media, repository.user
+    repository.calling             = new z.calling.CallingRepository @service.call, @service.calling, repository.conversation, repository.media, repository.user
     repository.event_tracker       = new z.tracking.EventTrackingRepository repository.user, repository.conversation
     repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.calling, repository.conversation
 

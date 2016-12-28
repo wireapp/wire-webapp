@@ -101,7 +101,7 @@ class z.calling.handler.CallSignalingHandler
         for ice_candidate in mapped_candidates
           flow_et.add_remote_ice_candidate ice_candidate
       else
-        throw new z.calling.CallError z.calling.CallError::TYPE.FLOW_NOT_FOUND
+        throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.FLOW_NOT_FOUND
     .catch =>
       # Or cache them
       @logger.info "Cached '#{mapped_candidates.length}' ICE candidates for unknown flow '#{event.flow}'", mapped_candidates
@@ -121,9 +121,9 @@ class z.calling.handler.CallSignalingHandler
         @logger.info "Received remote SDP for existing flow '#{event.flow}'", remote_sdp
         flow_et.save_remote_sdp remote_sdp
       else
-        throw new z.calling.CallError z.calling.CallError::TYPE.FLOW_NOT_FOUND
+        throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.FLOW_NOT_FOUND
     .catch (error) =>
-      if error.type is z.calling.CallError::TYPE.FLOW_NOT_FOUND
+      if error.type is z.calling.belfry.CallError::TYPE.FLOW_NOT_FOUND
         if event.state is z.calling.rtc.SDPType.OFFER
           @_cache_remote_sdp event.flow, remote_sdp
           @logger.info "Cached remote SDP for unknown flow '#{event.flow}'", remote_sdp
@@ -175,7 +175,7 @@ class z.calling.handler.CallSignalingHandler
         @logger.debug "POSTing for flows in '#{conversation_id}' successful", response
         @_add_flow call_et, flow for flow in response.flows when flow.active is true
     .catch (error) =>
-      if error.type is z.calling.CallError::TYPE.CALL_NOT_FOUND
+      if error.type is z.calling.belfry.CallError::TYPE.CALL_NOT_FOUND
         @logger.warn "POSTing for flows in '#{conversation_id}' successful, call gone", error
       else
         @logger.error "POSTing for flows in conversation '#{conversation_id}' failed: #{error.message}", error

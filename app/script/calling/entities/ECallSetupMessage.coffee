@@ -17,28 +17,30 @@
 #
 
 window.z ?= {}
-z.e_call ?= {}
-z.e_call.entities ?= {}
+z.calling ?= {}
+z.calling.entities ?= {}
 
 E_CALL_MESSAGE_CONFIG =
   VERSION: '3.0'
 
 # E-call message entity.
-class z.e_call.entities.ECallPropSyncMessage extends z.e_call.entities.ECallMessage
+class z.calling.entities.ECallSetupMessage extends z.calling.entities.ECallMessage
   ###
   Construct a new e-call setup message entity.
   @param response [Boolean] Is message a response, defaults to false
+  @param sdp [String] RTCSessionDescriptionProtocol information
   @param props [Object] Additional properties
-  @param e_call_et [z.e_call.entities.ECall] Optional e-call the e-call message relates to
+  @param e_call_et [z.calling.entities.ECall] Optional e-call the e-call message relates to
   ###
-  constructor: (@response = false, @props, e_call_et) ->
-    super z.e_call.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, @response, e_call_et
+  constructor: (@response = false, @sdp, @props, e_call_et) ->
+    super z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, @response, e_call_et
 
   to_JSON: =>
     return {
       version: E_CALL_MESSAGE_CONFIG.VERSION
       props: @props
       resp: @response
+      sdp: @sdp
       sessid: @sessid
       type: @type
     }

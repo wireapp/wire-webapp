@@ -17,9 +17,19 @@
 #
 
 window.z ?= {}
-z.e_call ?= {}
-z.e_call.enum ?= {}
+z.calling ?= {}
+z.calling.belfry ?= {}
 
-z.e_call.enum.E_CALL_VERSION =
-  BELFRY: '2.0'
-  E_CALL: '3.0'
+class z.calling.belfry.CallTrackingInfo
+  constructor: (params) ->
+    @conversation_id = params.conversation_id
+    @session_id = params.session_id
+    @time_started = new Date()
+    @participants_joined = {}
+
+  add_participant: (participant_et) ->
+    @participants_joined[participant_et.user.name()] = true
+
+  to_string: ->
+    participants = Object.keys(@participants_joined).join ', '
+    return "#{@session_id} in #{@conversation_id} | #{@time_started.toUTCString()} | To: #{participants}"

@@ -17,16 +17,16 @@
 #
 
 window.z ?= {}
-z.e_call ?= {}
-z.e_call.entities ?= {}
+z.calling ?= {}
+z.calling.entities ?= {}
 
 # E-Participant entity.
-class z.e_call.entities.EParticipant
+class z.calling.entities.EParticipant
   ###
   Construct a new e-participant.
-  @param e_call [z.e_call.entities.ECall] E-call entity
+  @param e_call [z.calling.entities.ECall] E-call entity
   @param user [z.entity.User] User entity to base the participant on
-  @param e_call_message [z.e_call.entities.ECallMessage] E-call setup message entity
+  @param e_call_message [z.calling.entities.ECallMessage] E-call setup message entity
   ###
   constructor: (@e_call_et, @user, e_call_message) ->
     @id = @user.id
@@ -40,7 +40,7 @@ class z.e_call.entities.EParticipant
       screen_send: ko.observable false
       video_send: ko.observable false
 
-    @e_flow = new z.e_call.entities.EFlow @e_call_et, @, e_call_message
+    @e_flow = new z.calling.entities.EFlow @e_call_et, @, e_call_message
     @update_properties e_call_message.props if e_call_message
 
     @is_connected.subscribe (is_connected) ->
@@ -50,7 +50,7 @@ class z.e_call.entities.EParticipant
 
   update_state: (e_call_message) =>
     @update_properties e_call_message.props
-    if e_call_message.type is z.e_call.enum.E_CALL_MESSAGE_TYPE.SETUP
+    if e_call_message.type is z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
       @e_flow.save_remote_sdp e_call_message
 
   update_properties: (properties) =>

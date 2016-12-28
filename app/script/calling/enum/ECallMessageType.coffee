@@ -17,14 +17,11 @@
 #
 
 window.z ?= {}
-z.e_call ?= {}
-z.e_call.enum ?= {}
+z.calling ?= {}
+z.calling.enum ?= {}
 
-z.e_call.enum.E_CALL_ACTION =
-  DELETE: 'delete_call'
-  IGNORE: 'ignore_call'
-  JOIN: 'join_call'
-  LEAVE: 'leave_call'
-  REMOVE_PARTICIPANT: 'remove_participant'
-  TOGGLE_MEDIA: 'toggle_media'
-  TOGGLE_STATE: 'toggle_joined'
+z.calling.enum.E_CALL_MESSAGE_TYPE =
+  CANCEL: 'CANCEL'
+  HANGUP: 'HANGUP'
+  PROP_SYNC: 'PROPSYNC'
+  SETUP: 'SETUP'

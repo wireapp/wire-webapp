@@ -17,41 +17,27 @@
 #
 
 window.z ?= {}
-z.e_call ?= {}
-z.e_call.entities ?= {}
+z.calling ?= {}
+z.calling.entities ?= {}
 
 E_CALL_MESSAGE_CONFIG =
   VERSION: '3.0'
 
 # E-call message entity.
-class z.e_call.entities.ECallMessage
+class z.calling.entities.ECallPropSyncMessage extends z.calling.entities.ECallMessage
   ###
-  Construct a new e-call message entity.
-  @param type [z.e_call.enum.ECallMessageType] Type of e-call message
+  Construct a new e-call setup message entity.
   @param response [Boolean] Is message a response, defaults to false
-  @param e_call_et [z.e_call.entities.ECall] Optional e-call the e-call message relates to
+  @param props [Object] Additional properties
+  @param e_call_et [z.calling.entities.ECall] Optional e-call the e-call message relates to
   ###
-  constructor: (@type, @response = false, e_call_et) ->
-    @sessid = e_call_et?.session_id or @create_session_id()
-
-  ###
-  Create a session ID.
-  @return [String] Random four char session ID
-  ###
-  create_session_id: ->
-    in_range = (value, lower_bound, upper_bound) ->
-      return value >= lower_bound and value <= upper_bound
-
-    get_random_char = ->
-      until in_range(char_index, 1, 9) or in_range(char_index, 65, 90) or in_range char_index, 97, 122
-        char_index = Math.floor Math.random() * 122
-      return if char_index <= 9 then char_index else String.fromCharCode char_index
-
-    return "#{get_random_char()}#{get_random_char()}#{get_random_char()}#{get_random_char()}"
+  constructor: (@response = false, @props, e_call_et) ->
+    super z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, @response, e_call_et
 
   to_JSON: =>
     return {
       version: E_CALL_MESSAGE_CONFIG.VERSION
+      props: @props
       resp: @response
       sessid: @sessid
       type: @type

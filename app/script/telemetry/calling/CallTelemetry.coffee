@@ -45,7 +45,7 @@ class z.telemetry.calling.CallTelemetry
   @param event [JSON] Call event from backend
   ###
   track_session: (conversation_id, event) =>
-    @sessions[event.session] = new z.calling.CallTrackingInfo {
+    @sessions[event.session] = new z.calling.belfry.CallTrackingInfo {
       conversation_id: conversation_id
       session_id: event.session
     }
