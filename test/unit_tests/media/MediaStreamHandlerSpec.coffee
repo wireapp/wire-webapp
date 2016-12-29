@@ -33,7 +33,7 @@ describe 'z.media.MediaStreamHandler', ->
 
   describe 'toggle_audio_send', ->
     beforeEach ->
-      spyOn media_repository.stream_handler, '_toggle_audio_enabled'
+      spyOn(media_repository.stream_handler, '_toggle_audio_send').and.returnValue Promise.resolve()
 
     it 'toggles the audio stream if available', (done) ->
       media_repository.stream_handler.local_media_streams.audio true
@@ -57,7 +57,7 @@ describe 'z.media.MediaStreamHandler', ->
 
   describe 'toggle_video_send', ->
     beforeEach ->
-      spyOn(media_repository.stream_handler, '_toggle_video_enabled').and.returnValue Promise.resolve()
+      spyOn(media_repository.stream_handler, '_toggle_video_send').and.returnValue Promise.resolve()
       spyOn(media_repository.stream_handler, 'replace_input_source').and.returnValue Promise.resolve()
 
     it 'toggles the video stream if available and in video mode', (done) ->
@@ -96,7 +96,7 @@ describe 'z.media.MediaStreamHandler', ->
 
   describe 'toggle_screen_send', ->
     beforeEach ->
-      spyOn(media_repository.stream_handler, '_toggle_screen_enabled').and.returnValue Promise.resolve()
+      spyOn(media_repository.stream_handler, '_toggle_screen_send').and.returnValue Promise.resolve()
       spyOn(media_repository.stream_handler, 'replace_input_source').and.returnValue Promise.resolve()
 
     it 'toggles screen sharing if available and in screen sharing mode', (done) ->

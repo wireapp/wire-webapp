@@ -20,7 +20,7 @@ window.z ?= {}
 z.calling ?= {}
 
 CALLING_CONFIG =
-  CONFIG_UPDATE_INTERVAL: 6 * 60 * 60 * 1000 # 6 hours
+  CONFIG_UPDATE_INTERVAL: 30 * 60 * 1000 # 30 minutes
 
 # Call repository for all calling interactions.
 class z.calling.CallingRepository

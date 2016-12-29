@@ -530,7 +530,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'calling', new z.proto.Calling JSON.stringify content_message
 
-      mapper.map_generic_message generic_message, {id: 'ABC'}
+      mapper.map_generic_message generic_message, event
       .then (event_json) ->
         expect(_.isObject event_json).toBeTruthy()
         expect(event_json.type).toBe z.event.Client.CALL.E_CALL
@@ -538,6 +538,6 @@ describe 'z.cryptography.CryptographyMapper', ->
         expect(event_json.from).toBe event.from
         expect(event_json.time).toBe event.time
         expect(event_json.id).toBe generic_message.message_id
-        expect(event_json.content).toBe content_message
+        expect(event_json.content).toEqual content_message
         done()
       .catch done.fail
