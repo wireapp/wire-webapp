@@ -303,7 +303,7 @@ z.string.invite_hint_selected = 'Press %meta_key + C to copy'
 z.string.invite_hint_unselected = 'Select and Press %meta_key + C'
 z.string.invite_headline = 'Invite people to Wire'
 z.string.invite_message = 'I’m on Wire, search for %username or visit get.wire.com.'
-z.string.invite_message_no_email = 'I’m on Wire. Visit https://get.wire.com to connect with me.'
+z.string.invite_message_no_email = 'I’m on Wire. Visit get.wire.com to connect with me.'
 
 # Extensions
 z.string.extensions_bubble_button_gif = 'Gif'
