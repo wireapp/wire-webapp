@@ -210,8 +210,8 @@ class z.conversation.ConversationRepository
       else
         @logger.info "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
 
-      mapped_messages = @_add_events_to_conversation events: events, conversation_et
-
+      return @_add_events_to_conversation events, conversation_et
+    .then (mapped_messages) ->
       conversation_et.is_pending false
       return mapped_messages
     .catch (error) =>
@@ -232,7 +232,7 @@ class z.conversation.ConversationRepository
     @conversation_service.load_events_from_db conversation_et.id, lower_bound, upper_bound
     .then (events) =>
       if events.length
-        @_add_events_to_conversation events: events, conversation_et
+        @_add_events_to_conversation events, conversation_et
       conversation_et.is_pending false
     .catch (error) =>
       @logger.info "Could not load unread events for conversation: #{conversation_et.id}", error
@@ -252,7 +252,7 @@ class z.conversation.ConversationRepository
   @param conversation_ets [Array<z.entity.Conversation>] Array of conversation entities to be updated
   ###
   update_conversations: (conversation_ets) =>
-    user_ids = _.flatten(conversation_et.all_user_ids() for conversation_et in conversation_ets)
+    user_ids = _.flatten(conversation_et.participating_user_ids() for conversation_et in conversation_ets)
     @user_repository.get_users_by_id user_ids, =>
       @_fetch_users_and_events conversation_et for conversation_et in conversation_ets
 
@@ -621,23 +621,40 @@ class z.conversation.ConversationRepository
         callback next_conversation_et
       else
         @archive_conversation conversation_et, next_conversation_et
-    .catch (error) =>
-      @logger.error "Failed to leave conversation (#{conversation_et.id}): #{error}"
+
+  ###
+  Remove bot from conversation.
+  @param conversation_et [z.entity.Conversation] Conversation to remove member from
+  @param user_id [String] ID of bot to be removed from the conversation
+  ###
+  remove_bot: (conversation_et, user_id) =>
+    @conversation_service.delete_bots conversation_et.id, user_id
+    .then (response) ->
+      if response
+        amplify.publish z.event.WebApp.EVENT.INJECT, response
+        return response
 
   ###
   Remove member from conversation.
-
   @param conversation_et [z.entity.Conversation] Conversation to remove member from
-  @param user_id [String] ID of member to be removed from the the conversation
-  @param callback [Function] Function to be called on server return
+  @param user_id [String] ID of member to be removed from the conversation
   ###
-  remove_member: (conversation_et, user_id, callback) =>
+  remove_member: (conversation_et, user_id) =>
     @conversation_service.delete_members conversation_et.id, user_id
     .then (response) ->
-      amplify.publish z.event.WebApp.EVENT.INJECT, response
-      callback?()
-    .catch (error) =>
-      @logger.error "Failed to remove member from conversation (#{conversation_et.id}): #{error}"
+      if response
+        amplify.publish z.event.WebApp.EVENT.INJECT, response
+        return response
+
+  ###
+  Remove participant from conversation.
+  @param conversation_et [z.entity.Conversation] Conversation to remove participant from
+  @param user_et [z.entity.User] User to be removed from the conversation
+  ###
+  remove_participant: (conversation_et, user_et) =>
+    if user_et.is_bot
+      return @conversation_repository.remove_bot @conversation(), user_et.id
+    return @conversation_repository.remove_member @conversation(), user_et
 
   ###
   Rename conversation.
@@ -653,8 +670,6 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.EVENT.INJECT, response
     .then ->
       callback?()
-    .catch (error) =>
-      @logger.error "Failed to rename conversation (#{conversation_et.id}): #{error.message}"
 
   reset_session: (user_id, client_id, conversation_id) =>
     @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'"
@@ -1940,7 +1955,8 @@ class z.conversation.ConversationRepository
   ###
   _add_event_to_conversation: (json, conversation_et, callback) ->
     message_et = @event_mapper.map_json_event json, conversation_et
-    @_update_user_ets message_et, (message_et) =>
+    @_update_user_ets message_et
+    .then (message_et) =>
       if conversation_et
         conversation_et.add_message message_et
       else
@@ -1954,23 +1970,21 @@ class z.conversation.ConversationRepository
   ###
   Convert multiple JSON events into entities and add them to a given conversation.
 
-  @param json [Object] Event data
+  @param events [Array] Event data
   @param conversation_et [z.entity.Conversation] Conversation entity the events will be added to
   @param prepend [Boolean] Should existing messages be prepended
   @return [Array<z.entity.Message>] Array of mapped messages
   ###
-  _add_events_to_conversation: (json, conversation_et, prepend = true) ->
-    return if not json?
-
-    message_ets = @event_mapper.map_json_events json, conversation_et
-    for message_et in message_ets
-      @_update_user_ets message_et
-    if prepend and conversation_et.messages().length > 0
-      conversation_et.prepend_messages message_ets
-    else
-      conversation_et.add_messages message_ets
-
-    return message_ets
+  _add_events_to_conversation: (events, conversation_et, prepend = true) ->
+    return Promise.resolve().then =>
+      message_ets = @event_mapper.map_json_events events, conversation_et
+      return Promise.all (@_update_user_ets message_et for message_et in message_ets)
+    .then (message_ets) ->
+      if prepend and conversation_et.messages().length > 0
+        conversation_et.prepend_messages message_ets
+      else
+        conversation_et.add_messages message_ets
+      return message_ets
 
   ###
   Check for duplicates by event IDs and cache the event ID.
@@ -2061,32 +2075,32 @@ class z.conversation.ConversationRepository
   ###
   Updates the user entities that are part of a message.
   @param message_et [z.entity.Message] Message to be updated
-  @param callback [Function] Function to be called on return
   ###
-  _update_user_ets: (message_et, callback) =>
-    @user_repository.get_user_by_id message_et.from, (user_et) =>
-      message_et.user user_et
+  _update_user_ets: (message_et) =>
+    return new Promise (resolve) =>
+      @user_repository.get_user_by_id message_et.from, (user_et) =>
+        message_et.user user_et
 
-      if message_et.is_member()
-        @user_repository.get_users_by_id message_et.user_ids(), (user_ets) ->
-          message_et.user_ets user_ets
+        if message_et.is_member()
+          @user_repository.get_users_by_id message_et.user_ids(), (user_ets) ->
+            message_et.user_ets user_ets
 
-      if message_et.reactions
-        if Object.keys(message_et.reactions()).length
-          user_ids = (user_id for user_id of message_et.reactions())
-          @user_repository.get_users_by_id user_ids, (user_ets) ->
-            message_et.reactions_user_ets user_ets
-        else
-          message_et.reactions_user_ets.removeAll()
-
-      if message_et.has_asset_text()
-        for asset_et in message_et.assets() when asset_et.is_text()
-          if not message_et.user()
-            Raygun.send new Error 'Message does not contain user when updating'
+        if message_et.reactions
+          if Object.keys(message_et.reactions()).length
+            user_ids = (user_id for user_id of message_et.reactions())
+            @user_repository.get_users_by_id user_ids, (user_ets) ->
+              message_et.reactions_user_ets user_ets
           else
-            asset_et.theme_color = message_et.user().accent_color()
+            message_et.reactions_user_ets.removeAll()
 
-      return callback? message_et
+        if message_et.has_asset_text()
+          for asset_et in message_et.assets() when asset_et.is_text()
+            if not message_et.user()
+              Raygun.send new Error 'Message does not contain user when updating'
+            else
+              asset_et.theme_color = message_et.user().accent_color()
+
+        resolve message_et
 
   ###
   Cancel asset upload.

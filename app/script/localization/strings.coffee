@@ -327,7 +327,7 @@ z.string.people_no_matches = 'No matching results.\nTry entering a different nam
 z.string.people_invite = 'Invite people'
 z.string.people_share = 'Share Contacts'
 z.string.people_bring_your_friends = 'Bring your Friends to Wire'
-z.string.people_invite_detail = 'Sharing your contacts helps you connect with others. We anonymize all the information and do not share it with anoyone else.'
+z.string.people_invite_detail = 'Sharing your contacts helps you connect with others. We anonymize all the information and do not share it with anyone else.'
 z.string.people_invite_button_contacts = 'From Contacts'
 z.string.people_invite_button_gmail = 'From Gmail'
 z.string.people_invite_headline = 'Bring your friends'
@@ -449,7 +449,8 @@ z.string.preferences_options_data_checkbox = 'Usage and crash reports'
 z.string.preferences_options_data_detail = 'Make Wire better by sending anonymous information.'
 z.string.preferences_options_notifications = 'Notifications'
 z.string.preferences_options_notifications_none = 'Off'
-z.string.preferences_options_notifications_obfuscate = 'Hide message details'
+z.string.preferences_options_notifications_obfuscate = 'Hide details'
+z.string.preferences_options_notifications_obfuscate_message = 'Show sender'
 z.string.preferences_options_notifications_on = 'Show sender and message'
 
 # Search
@@ -473,7 +474,7 @@ z.string.upload_google_message_error = 'We did not receive your information. Ple
 z.string.upload_google_button_again = 'Try again'
 
 # URLs
-z.string.url_password_reset = 'https://wire.com/forgot/'
+z.string.url_password_reset = 'forgot/'
 z.string.url_legal = 'https://wire.com/legal/'
 z.string.url_privacy = 'https://wire.com/privacy/'
 z.string.url_privacy_why = 'https://wire.com/privacy/why/'

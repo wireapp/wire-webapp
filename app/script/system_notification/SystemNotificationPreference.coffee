@@ -23,4 +23,5 @@ z.system_notification ?= {}
 z.system_notification.SystemNotificationPreference =
   NONE: 'none'
   OBFUSCATE: 'obfuscate'
+  OBFUSCATE_MESSAGE: 'obfuscate-message'
   ON: 'on'

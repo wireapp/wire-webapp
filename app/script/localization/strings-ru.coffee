@@ -324,7 +324,7 @@ z.string.ru.people_no_matches = 'Совпадений не найдено.\nПо
 z.string.ru.people_invite = 'Пригласить людей'
 z.string.ru.people_share = 'Поделиться контактами'
 z.string.ru.people_bring_your_friends = 'Приведите друзей в Wire'
-z.string.ru.people_invite_detail = 'Предоставление доступа к вашим контактам поможет вам связаться с другими людьми. Мы анонимизируем всю информацию и не делимся ей с кем-либо ещё.'
+z.string.ru.people_invite_detail = 'Предоставление доступа к вашим контактам поможет вам связаться с другими людьми. Вся информация анонимна, мы не предоставляем её третьим лицам.'
 z.string.ru.people_invite_button_contacts = 'Из контактов'
 z.string.ru.people_invite_button_gmail = 'Из Gmail'
 z.string.ru.people_invite_headline = 'Приведите друзей'
@@ -454,18 +454,13 @@ z.string.ru.search_group_hint = 'Продолжите ввод или выбер
 z.string.ru.search_connect = 'Подключиться'
 z.string.ru.search_connections = 'Контакты'
 z.string.ru.search_groups = 'Группы'
-z.string.ru.search_placeholder = 'Поиск по имени или адресу электронной почты'
+z.string.ru.search_placeholder = 'Поиск по имени или имени пользователя'
 z.string.ru.search_top_people = 'Топ-контакты'
-z.string.ru.search_try_search = 'Ищите людей по имени\nили адресу электронной почты'
-z.string.ru.search_no_contacts_on_wire = 'У вас нет контактов в Wire.\nПопробуйте найти людей по имени\nили адресу электронной почты'
+z.string.ru.search_try_search = 'Найдите людей по имени\nили имени пользователя'
+z.string.ru.search_no_contacts_on_wire = 'У вас нет контактов в Wire.\nПопробуйте найти людей по имени\nили имени пользователя.'
 z.string.ru.search_others = 'Подключиться'
 z.string.ru.search_friend_in_common = '%no общий знакомый'
 z.string.ru.search_friends_in_common = '%no общих знакомых'
-
-# Picture upload
-z.string.ru.upload_welcome = 'Wire выглядит лучше с вашей фотографией.'
-z.string.ru.upload_welcome_keep = 'оставить эту'
-z.string.ru.upload_welcome_choose = 'Выберите свою'
 
 # Google contacts upload
 z.string.ru.upload_google_headline = 'Найти людей,\nчтобы поговорить.'
@@ -475,7 +470,6 @@ z.string.ru.upload_google_message_error = 'Мы не получили вашу �
 z.string.ru.upload_google_button_again = 'Повторить'
 
 # URLs
-z.string.ru.url_password_reset = 'https://wire.com/forgot/'
 z.string.ru.url_legal = 'https://wire.com/legal/'
 z.string.ru.url_privacy = 'https://wire.com/privacy/'
 z.string.ru.url_privacy_why = 'https://wire.com/privacy/why/'
@@ -534,7 +528,7 @@ z.string.ru.system_notification_member_leave_removed_one = '%s.first_name уда
 z.string.ru.system_notification_obfuscated = 'Отправил(-а) Вам сообщение'
 z.string.ru.system_notification_obfuscated_title = 'Кто-то'
 z.string.ru.system_notification_ping = 'Отправил(а) пинг'
-z.string.ru.system_notification_reaction = '%s Ваше сообщение'
+z.string.ru.system_notification_reaction = '%reaction Ваше сообщение'
 z.string.ru.system_notification_shared_audio = 'Поделился(-лась) аудио сообщением'
 z.string.ru.system_notification_shared_file = 'Поделился(-лась) файлом'
 z.string.ru.system_notification_shared_location = 'Поделился(-лась) местоположением'
