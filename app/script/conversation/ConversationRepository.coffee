@@ -653,8 +653,8 @@ class z.conversation.ConversationRepository
   ###
   remove_participant: (conversation_et, user_et) =>
     if user_et.is_bot
-      return @conversation_repository.remove_bot @conversation(), user_et.id
-    return @conversation_repository.remove_member @conversation(), user_et
+      return @remove_bot @conversation(), user_et.id
+    return @remove_member @conversation(), user_et
 
   ###
   Rename conversation.

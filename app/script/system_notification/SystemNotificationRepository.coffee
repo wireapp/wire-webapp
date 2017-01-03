@@ -19,6 +19,8 @@
 window.z ?= {}
 z.SystemNotification ?= {}
 
+NOTIFICATION_ICON_URL = '/image/logo/notification.png'
+
 ###
 System notification repository to trigger browser and audio notifications.
 
@@ -337,36 +339,27 @@ class z.SystemNotification.SystemNotificationRepository
   @private
   @param conversation_et [z.entity.Conversation] Conversation entity
   @param message_et [z.entity.MemberMessage] Member message entity
-  @param notification_body [String] Unobfuscated notification body
   ###
-  _create_notification_content: (conversation_et, message_et, notification_body) ->
-    notification_body = @_create_options_body conversation_et, message_et
+  _create_notification_content: (conversation_et, message_et) ->
+    options_body = undefined
 
-    throw new z.system_notification.SystemNotificationError z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION if not notification_body?
-
-    should_obfuscate_sender = @_should_obfuscate_notification_sender message_et
-
-    if z.util.Environment.electron and z.util.Environment.os.mac
-      icon = ''
-    else
-      try
-        icon = message_et.user().preview_picture_resource().generate_url() unless should_obfuscate_sender
-      catch err
-        @logger.error "Unable to generate a sender's picture url for the notification: #{err}"
-      finally
-        icon = icon or '/image/logo/notification.png'
-
-    return {
-      title: if should_obfuscate_sender then @_create_title_obfuscated() else @_create_title conversation_et, message_et
-      options:
-        body: if @_should_obfuscate_notification_message message_et then @_create_body_obfuscated() else notification_body
-        data: @_create_options_data conversation_et, message_et
-        icon: icon
-        tag: @_create_options_tag conversation_et
-        silent: true #@note When Firefox supports this we can remove the fix for WEBAPP-731
-      timeout: z.config.BROWSER_NOTIFICATION.TIMEOUT
-      trigger: @_create_trigger conversation_et, message_et
-    }
+    @_create_options_body conversation_et, message_et
+    .then (body) =>
+      options_body = body
+      throw new z.system_notification.SystemNotificationError z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION if not options_body?
+      @_should_obfuscate_notification_sender message_et
+    .then (should_obfuscate_sender) =>
+      return {
+        title: if should_obfuscate_sender then @_create_title_obfuscated() else @_create_title conversation_et, message_et
+        options:
+          body: if @_should_obfuscate_notification_message message_et then @_create_body_obfuscated() else options_body
+          data: @_create_options_data conversation_et, message_et
+          icon: @_create_options_icon should_obfuscate_sender, message_et.user()
+          tag: @_create_options_tag conversation_et
+          silent: true #@note When Firefox supports this we can remove the fix for WEBAPP-731
+        timeout: z.config.BROWSER_NOTIFICATION.TIMEOUT
+        trigger: @_create_trigger conversation_et, message_et
+      }
 
   ###
   Selects the type of message that the notification body needs to be created for.
@@ -377,19 +370,21 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Notification message body
   ###
   _create_options_body: (conversation_et, message_et) ->
-    switch message_et.super_type
-      when z.message.SuperType.CALL
-        return @_create_body_call message_et
-      when z.message.SuperType.CONTENT
-        return @_create_body_content message_et
-      when z.message.SuperType.MEMBER
-        return @_create_body_member_update message_et, conversation_et.is_group?()
-      when z.message.SuperType.PING
-        return @_create_body_ping()
-      when z.message.SuperType.REACTION
-        return @_create_body_reaction message_et
-      when z.message.SuperType.SYSTEM
-        return @_create_body_conversation_rename message_et
+    Promise.resolve()
+    .then =>
+      switch message_et.super_type
+        when z.message.SuperType.CALL
+          return @_create_body_call message_et
+        when z.message.SuperType.CONTENT
+          return @_create_body_content message_et
+        when z.message.SuperType.MEMBER
+          return @_create_body_member_update message_et, conversation_et.is_group?()
+        when z.message.SuperType.PING
+          return @_create_body_ping()
+        when z.message.SuperType.REACTION
+          return @_create_body_reaction message_et
+        when z.message.SuperType.SYSTEM
+          return @_create_body_conversation_rename message_et
 
   ###
   Creates the notification data to help check its content.
@@ -404,6 +399,22 @@ class z.SystemNotification.SystemNotificationRepository
       conversation_id: input.id or input.conversation_id
       message_id: message_et.id
     }
+
+  ###
+  Creates the notification icon.
+
+  @private
+  @param should_obfuscate_sender [Boolean] Sender visible in notification
+  @param user_et [z.entity.User] Sender of message
+  @return [String] Icon URL
+  ###
+  _create_options_icon: (should_obfuscate_sender, user_et) ->
+    try
+      return '' if z.util.Environment.electron and z.util.Environment.os.mac
+      return NOTIFICATION_ICON_URL if should_obfuscate_sender
+      return user_et.preview_picture_resource().generate_url()
+    catch
+      return NOTIFICATION_ICON_URL
 
   ###
   Creates the notification tag.
@@ -473,8 +484,8 @@ class z.SystemNotification.SystemNotificationRepository
       .then (permission_state) =>
         @_show_notification notification_content if permission_state is z.system_notification.PermissionStatusState.GRANTED
     .catch (error) ->
-      if error.type isnt z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION
-        throw error
+      throw error unless error.type is z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION
+
 
   ###
   Plays the sound from the audio repository.
