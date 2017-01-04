@@ -44,11 +44,14 @@ class z.cryptography.CryptographyRepository
   Initialize the repository.
   @return [Promise] Promise that will resolve with the repository after initialization
   ###
-  init: =>
+  init: (db) =>
     return Promise.resolve()
     .then =>
-      @logger.info "Initialize Cryptobox with our storage repository on '#{@storage_repository.storage_service.db_name}'", @storage_repository
-      @cryptobox = new cryptobox.Cryptobox @storage_repository
+      @logger.info "Initialize Cryptobox with database...", db
+      cryptobox_store = new window.cryptobox.store.IndexedDB db
+      @cryptobox = new window.cryptobox.Cryptobox cryptobox_store, 1
+      return @cryptobox.init()
+    .then =>
       @logger.info 'Initialized repository'
       return @
 
