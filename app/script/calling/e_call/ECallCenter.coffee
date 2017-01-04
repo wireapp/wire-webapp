@@ -148,7 +148,10 @@ class z.calling.e_call.ECallCenter
         e_call_et.delete_participant user_et
         .then (e_call_et) =>
           @media_element_handler.remove_media_element user_et.id
-          @delete_call conversation_id if not e_call_et.participants().length
+          if not e_call_et.participants().length
+            if e_call_et.state() is z.calling.enum.CallState.INCOMING and e_call_message.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+              @_send_call_notification e_call_et, user_id
+            @delete_call conversation_id
     .catch (error) ->
       throw error if error.type isnt z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
@@ -187,11 +190,11 @@ class z.calling.e_call.ECallCenter
 
       if @user_repository.self().id is user_id
         return @_create_ongoing_e_call conversation_id, e_call_message, user_id
-      return @_create_incoming_e_call conversation_id, e_call_message, user_id
+      @_create_incoming_e_call conversation_id, e_call_message, user_id
 
 
   ###############################################################################
-  # Inbound e-call events
+  # Outbound e-call events
   ###############################################################################
 
   ###
@@ -227,6 +230,7 @@ class z.calling.e_call.ECallCenter
       screensend: @self_state.screen_send() if media_type in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
       videosend: @self_state.video_send() if media_type in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
     }
+
 
   ###############################################################################
   # E-call actions
@@ -395,7 +399,7 @@ class z.calling.e_call.ECallCenter
         when z.calling.enum.CallState.INCOMING
           e_call.state z.calling.enum.CallState.CONNECTING
         when z.calling.enum.CallState.OUTGOING
-          e_call.participants.push new z.calling.entities.EParticipant e_call, e_call.conversation_et.participating_user_ets()[0]
+          e_call.participants.push new z.calling.entities.EParticipant e_call, e_call.conversation_et.participating_user_ets()[0], e_call.timings
 
       @self_client_joined true
       e_call.local_audio_stream @media_stream_handler.local_media_streams.audio()
@@ -441,6 +445,8 @@ class z.calling.e_call.ECallCenter
         e_call_et.add_participant remote_user_et, e_call_message
       .then (e_call_et) =>
         @media_stream_handler.initiate_media_stream e_call_et.id, true if e_call_et.is_remote_video_send()
+        @_send_call_notification e_call_et, user_id, z.calling.enum.CallState.INCOMING
+
 
   ###
   Constructs an ongoing e-call entity.
@@ -473,6 +479,37 @@ class z.calling.e_call.ECallCenter
       e_call_et.state z.calling.enum.CallState.OUTGOING
       return e_call_et
 
+
+  ###############################################################################
+  # Notifications
+  ###############################################################################
+
+  _create_voice_channel_activated_message: (e_call_et, user_id) ->
+    message_et = new z.entity.CallMessage()
+    message_et.call_message_type = z.message.CallMessageType.ACTIVATED
+    message_et.conversation_id = e_call_et.id
+    message_et.id = z.util.create_random_uuid()
+    message_et.from = user_id
+    message_et.timestamp = Date.now()
+    message_et.type = z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
+    return message_et
+
+  _create_voice_channel_deactivated_event: (e_call_et, user_id) ->
+    return {
+      conversation: e_call_et.id
+      data:
+        reason: z.calling.enum.CallFinishedReason.MISSED
+      from: user_id
+      id: z.util.create_random_uuid()
+      time: new Date().toISOString()
+      type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
+    }
+
+  _send_call_notification: (e_call_et, user_id, state) ->
+    if state is z.calling.enum.CallState.INCOMING
+      amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, e_call_et.conversation_et, @_create_voice_channel_activated_message e_call_et, user_id
+    else
+      amplify.publish z.event.WebApp.EVENT.INJECT, @_create_voice_channel_deactivated_event e_call_et, user_id
 
   ###############################################################################
   # Helper functions

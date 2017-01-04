@@ -94,9 +94,6 @@ class z.calling.entities.Flow
 
     @connection_state.subscribe (ice_connection_state) =>
       switch ice_connection_state
-        when z.calling.rtc.ICEConnectionState.CHECKING
-          @telemetry.time_step z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CHECKING
-
         when z.calling.rtc.ICEConnectionState.COMPLETED, z.calling.rtc.ICEConnectionState.CONNECTED
           @telemetry.start_statistics ice_connection_state
           @call_et.is_connected true
@@ -401,7 +398,6 @@ class z.calling.entities.Flow
   ###
   _on_ice_candidate: (event) =>
     @logger.info 'Generated additional ICE candidate', event
-    @telemetry.time_step z.telemetry.calling.CallSetupSteps.ICE_GATHERING_STARTED
     if @has_sent_local_sdp()
       if event.candidate
         @_send_ice_candidate event.candidate
@@ -445,7 +441,6 @@ class z.calling.entities.Flow
   ###
   save_remote_sdp: (remote_sdp) =>
     @logger.debug "Saving remote SDP of type '#{remote_sdp.type}'"
-    @telemetry.time_step z.telemetry.calling.CallSetupSteps.REMOTE_SDP_RECEIVED
     @remote_sdp @_rewrite_sdp remote_sdp, z.calling.enum.SDPSource.REMOTE
 
   # Initiates sending the local Session Description Protocol to the backend.
@@ -476,7 +471,6 @@ class z.calling.entities.Flow
     @peer_connection.createAnswer()
     .then (sdp_answer) =>
       @logger.debug "Creating '#{z.calling.rtc.SDPType.ANSWER}' successful", sdp_answer
-      @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_CREATED
       @local_sdp @_rewrite_sdp sdp_answer, z.calling.enum.SDPSource.LOCAL
     .catch (error) =>
       @logger.error "Creating '#{z.calling.rtc.SDPType.ANSWER}' failed: #{error.name} - #{error.message}", error
@@ -501,7 +495,6 @@ class z.calling.entities.Flow
     @peer_connection.createOffer offer_options
     .then (sdp_offer) =>
       @logger.debug "Creating '#{z.calling.rtc.SDPType.OFFER}' successful", sdp_offer
-      @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_CREATED
       @local_sdp @_rewrite_sdp sdp_offer, z.calling.enum.SDPSource.LOCAL
     .catch (error) =>
       @logger.error "Creating '#{z.calling.rtc.SDPType.OFFER}' failed: #{error.name} - #{error.message}", error
@@ -723,14 +716,6 @@ class z.calling.entities.Flow
   ###############################################################################
   # Media stream handling
   ###############################################################################
-
-  ###
-  Inject an audio file into the flow.
-  @param audio_file_path [String] Path to the audio file
-  @param callback [Function] Function to be called when completed
-  ###
-  inject_audio_file: (audio_file_path, callback) =>
-    @audio.inject_audio_file audio_file_path, callback
 
   ###
   Update the local MediaStream.

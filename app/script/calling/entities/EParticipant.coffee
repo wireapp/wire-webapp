@@ -26,9 +26,10 @@ class z.calling.entities.EParticipant
   Construct a new e-participant.
   @param e_call [z.calling.entities.ECall] E-call entity
   @param user [z.entity.User] User entity to base the participant on
+  @param timings [z.telemetry.calling.CallSetupTimings] Timing statistics of call setup steps
   @param e_call_message [z.calling.entities.ECallMessage] E-call setup message entity
   ###
-  constructor: (@e_call_et, @user, e_call_message) ->
+  constructor: (@e_call_et, @user, timings, e_call_message) ->
     @id = @user.id
 
     @is_connected = ko.observable false
@@ -40,7 +41,7 @@ class z.calling.entities.EParticipant
       screen_send: ko.observable false
       video_send: ko.observable false
 
-    @e_flow = new z.calling.entities.EFlow @e_call_et, @, e_call_message
+    @e_flow_et = new z.calling.entities.EFlow @e_call_et, @, timings, e_call_message
     @update_properties e_call_message.props if e_call_message
 
     @is_connected.subscribe (is_connected) ->
@@ -51,7 +52,7 @@ class z.calling.entities.EParticipant
   update_state: (e_call_message) =>
     @update_properties e_call_message.props
     if e_call_message.type is z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
-      @e_flow.save_remote_sdp e_call_message
+      @e_flow_et.save_remote_sdp e_call_message
 
   update_properties: (properties) =>
     if properties

@@ -269,7 +269,6 @@ class z.calling.handler.CallStateHandler
   _put_state_to_join: (conversation_id, self_state, client_joined_change = false) ->
     @_put_state conversation_id, self_state
     .then (response) =>
-      @call_center.timings().time_step z.telemetry.calling.CallSetupSteps.STATE_PUT
       event = @_fake_on_state_event response, conversation_id
       event.session = @_fake_session_id() if not event.session
 
@@ -493,7 +492,6 @@ class z.calling.handler.CallStateHandler
       if @call_center.media_stream_handler.has_media_streams()
         @logger.info 'MediaStream has already been initialized', @call_center.media_stream_handler.local_media_streams
       else
-        @call_center.timings().time_step z.telemetry.calling.CallSetupSteps.STREAM_REQUESTED if @call_center.timings()
         return @call_center.media_stream_handler.initiate_media_stream conversation_id, is_videod
     .then =>
       @call_center.timings().time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED if @call_center.timings()

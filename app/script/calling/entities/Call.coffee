@@ -346,11 +346,7 @@ class z.calling.entities.Call
     participant_et = @get_participant_by_id user_et.id
 
     create_flow = (flow_id, participant_et) =>
-      if call_timings
-        flow_timings = $.extend new z.telemetry.calling.CallSetupTimings(@id), call_timings.get()
-        flow_timings.time_step z.telemetry.calling.CallSetupSteps.FLOW_RECEIVED
-        flow_timings.flow_id = flow_id
-      flow_et = new z.calling.entities.Flow flow_id, @, participant_et, audio_context, flow_timings
+      flow_et = new z.calling.entities.Flow flow_id, @, participant_et, audio_context, call_timings
       participant_et.add_flow flow_et
       return flow_et
 
@@ -392,7 +388,7 @@ class z.calling.entities.Call
 
   ###
   Get full flow telemetry report of the call.
-  @return [Array<z.calling.Flow>] Array of flows
+  @return [Array<Object>] Array of flow telemetry reports for calling service automation
   ###
   get_flow_telemetry: =>
     return (participant.get_flow()?.get_telemetry() for participant in @participants() when participant.get_flow())
@@ -426,6 +422,7 @@ class z.calling.entities.Call
     # Delete flow on backend
     flow_deletion_info = new z.calling.payloads.FlowDeletionInfo @id, flow_et.id
     amplify.publish z.event.WebApp.CALL.SIGNALING.DELETE_FLOW, flow_deletion_info
+
 
   ###############################################################################
   # Panning

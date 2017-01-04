@@ -139,7 +139,7 @@ class z.calling.entities.ECall
   start_negotiation: =>
     @self_client_joined true
     @self_user_joined true
-    e_participant_et.e_flow.start_negotiation() for e_participant_et in @participants() when e_participant_et.e_flow
+    e_participant_et.e_flow_et.start_negotiation() for e_participant_et in @participants() when e_participant_et.e_flow_et
 
   _on_state_start_ringing: (is_incoming) =>
     @_play_call_sound is_incoming
@@ -199,7 +199,7 @@ class z.calling.entities.ECall
       throw error if error.type isnt z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
 
       @logger.debug "Adding e-call participant '#{user_et.name()}'"
-      @participants.push new z.calling.entities.EParticipant @, user_et, e_call_message
+      @participants.push new z.calling.entities.EParticipant @, user_et, @timings, e_call_message
       @_update_remote_state()
       return @
 
@@ -262,7 +262,14 @@ class z.calling.entities.ECall
   @return [Array<z.calling.Flow>] Array of flows
   ###
   get_flows: =>
-    return (e_participant_et.e_flow for e_participant_et in @participants() when e_participant_et.e_flow)
+    return (e_participant_et.e_flow_et for e_participant_et in @participants() when e_participant_et.e_flow_et)
+
+  ###
+  Get full flow telemetry report of the call.
+  @return [Array<Object>] Array of flow telemetry reports for calling service automation
+  ###
+  get_flow_telemetry: =>
+    return (e_participant_et.e_flow_et.get_telemetry() for e_participant_et in @participants() when participant.e_flow_et)
 
   ###
   Calculates the panning (from left to right) to position a user in a group call.
@@ -328,4 +335,17 @@ class z.calling.entities.ECall
   @private
   ###
   _reset_e_flows: ->
-    e_participant_et.e_flow.reset_flow() for e_participant_et in @participants() when e_participant_et.e_flow
+    e_participant_et.e_flow_et.reset_flow() for e_participant_et in @participants() when e_participant_et.e_flow_et
+
+
+  ###############################################################################
+  # Logging
+  ###############################################################################
+
+  # Log flow status to console.
+  log_status: =>
+    flow_et.log_status() for flow_et in @get_flows()
+
+  # Log flow setup step timings to console.
+  log_timings: =>
+    flow_et.log_timings() for flow_et in @get_flows()

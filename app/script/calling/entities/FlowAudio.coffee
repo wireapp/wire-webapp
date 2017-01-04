@@ -45,38 +45,6 @@ class z.calling.entities.FlowAudio
       return @_hookup_audio()
     @audio_source.disconnect() if @audio_source?
 
-  inject_audio_file: (audio_file_path, callback) =>
-    return if not @audio_context?
-
-    # Load audio file
-    request = new XMLHttpRequest()
-    request.open 'GET', audio_file_path, true
-    request.responseType = 'arraybuffer'
-    request.onload = =>
-      load = (buffer) =>
-        @logger.info "Loaded audio from '#{audio_file_path}'"
-        # Play audio file
-        audio_buffer = buffer
-        file_source = @audio_context.createBufferSource()
-        file_source.buffer = audio_buffer
-        @audio_source.disconnect()
-        file_source.connect @audio_remote
-        file_source.onended = =>
-          @logger.info 'Finished playing audio file'
-          file_source.disconnect @audio_remote
-          @_hookup_audio()
-
-          if callback?
-            @logger.info 'Invoking callback after playing audio file'
-            callback()
-
-        @logger.info 'Playing audio file'
-        file_source.start()
-      fail = =>
-        @logger.error "Failed to load audio from '#{audio_file_path}'"
-      @audio_context.decodeAudioData request.response, load, fail
-    request.send()
-
   set_gain_node: (is_muted) =>
     if @gain_node
       if is_muted

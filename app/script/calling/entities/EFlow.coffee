@@ -21,10 +21,11 @@ z.calling ?= {}
 z.calling.entities ?= {}
 
 # Static array of where to put people in the stereo scape.
-CONFIG =
+E_FLOW_CONFIG =
   AUDIO_BITRATE: '30'
   AUDIO_PTIME: '60'
   RTC_DATA_CHANNEL_LABEL: 'calling-3.0'
+  SDP_SEND_TIMEOUT: 1000
 
 # E-Flow entity.
 class z.calling.entities.EFlow
@@ -33,9 +34,10 @@ class z.calling.entities.EFlow
 
   @param e_call_et [z.calling.entities.ECall] E-Call entity that the e-flow belongs to
   @param e_participant_et [z.calling.entities.EParticipant] E-Participant entity that the e-flow belongs to
+  @param timings [z.telemetry.calling.CallSetupTimings] Timing statistics of call setup steps
   @param e_call_message [z.calling.entities.ECallSetupMessage] Optional e-call setup message entity
   ###
-  constructor: (@e_call_et, @e_participant_et, e_call_message) ->
+  constructor: (@e_call_et, @e_participant_et, timings, e_call_message) ->
     @logger = new z.util.Logger "z.calling.entities.EFlow (#{@e_participant_et.id})", z.config.LOGGER.OPTIONS
 
     @id = @e_participant_et.id
@@ -53,6 +55,9 @@ class z.calling.entities.EFlow
     @remote_user_id = @remote_user.id
     @self_user_id = @e_call_et.self_user.id
 
+    # Telemetry
+    @telemetry = new z.telemetry.calling.FlowTelemetry @id, @remote_user_id, @e_call_et, timings
+
 
     ###############################################################################
     # PeerConnection
@@ -60,6 +65,9 @@ class z.calling.entities.EFlow
 
     @peer_connection = undefined
     @pc_initialized = ko.observable false
+    @pc_initialized.subscribe (is_initialized) =>
+      @telemetry.set_peer_connection @peer_connection
+      @telemetry.schedule_check 5000 if is_initialized
 
     @audio_stream = @e_call_et.local_audio_stream
     @video_stream = @e_call_et.local_video_stream
@@ -284,6 +292,7 @@ class z.calling.entities.EFlow
   ###
   _create_peer_connection: ->
     @peer_connection = new window.RTCPeerConnection @_create_peer_connection_configuration()
+    @telemetry.time_step z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED
     @signaling_state @peer_connection.signalingState
     @logger.debug "PeerConnection with '#{@remote_user.name()}' created", @e_call_et.config().ice_servers
 
@@ -340,10 +349,11 @@ class z.calling.entities.EFlow
       if @has_sent_local_sdp()
         return @logger.info 'Generation of ICE candidates completed - SDP was already sent'
       @logger.debug 'Generation of ICE candidates completed - sending SDP'
+      @telemetry.time_step z.telemetry.calling.CallSetupSteps.ICE_GATHERING_COMPLETED
       return @send_local_sdp()
     @logger.info 'Generated additional ICE candidate', event
 
-# ICE connection state has changed.
+  # ICE connection state has changed.
   _on_ice_connection_state_change: (event) =>
     return if not @peer_connection or @e_call_et.state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ENDED]
 
@@ -370,7 +380,7 @@ class z.calling.entities.EFlow
   ###############################################################################
 
   send_message: (e_call_message) =>
-    @data_channels[CONFIG.RTC_DATA_CHANNEL_LABEL].send e_call_message
+    @data_channels[E_FLOW_CONFIG.RTC_DATA_CHANNEL_LABEL].send e_call_message
 
   _initialize_data_channel: (data_channel_label) ->
     if @peer_connection.createDataChannel
@@ -441,6 +451,7 @@ class z.calling.entities.EFlow
     @e_call_et.send_e_call_event new z.calling.entities.ECallSetupMessage @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @local_sdp().sdp, videosend: @e_call_et.self_state.video_send(), @e_call_et
     .then =>
       @has_sent_local_sdp true
+      @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful", @local_sdp()
 
   ###
@@ -465,7 +476,7 @@ class z.calling.entities.EFlow
   @param restart [Boolean] Is ICE restart negotiation
   ###
   _create_offer: (restart) ->
-    @_initialize_data_channel CONFIG.RTC_DATA_CHANNEL_LABEL
+    @_initialize_data_channel E_FLOW_CONFIG.RTC_DATA_CHANNEL_LABEL
 
     offer_options =
       iceRestart: restart
@@ -533,14 +544,14 @@ class z.calling.entities.EFlow
       else if sdp_line.startsWith 'm=audio'
         if @negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and @is_group())
           outlines.push sdp_line
-          outline = "b=AS:#{CONFIG.AUDIO_BITRATE}"
+          outline = "b=AS:#{E_FLOW_CONFIG.AUDIO_BITRATE}"
           @logger.info "Limited audio bit-rate in local SDP: #{outline}"
 
       else if sdp_line.startsWith 'a=rtpmap'
         if @negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and @is_group())
           if z.util.contains sdp_line, 'opus'
             outlines.push sdp_line
-            outline = "a=ptime:#{CONFIG.AUDIO_PTIME}"
+            outline = "a=ptime:#{E_FLOW_CONFIG.AUDIO_PTIME}"
             @logger.info "Changed audio p-time in local SDP: #{outline}"
 
       if outline isnt undefined
@@ -565,11 +576,12 @@ class z.calling.entities.EFlow
     @peer_connection.setLocalDescription @local_sdp()
     .then =>
       @logger.debug "Setting local SDP of type '#{@local_sdp().type}' successful", @peer_connection.localDescription
+      @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET
       @should_add_local_sdp false
       @send_sdp_timeout = window.setTimeout =>
         @logger.debug 'Sending local SDP on timeout'
         @send_local_sdp()
-      , 1000
+      , E_FLOW_CONFIG.SDP_SEND_TIMEOUT
     .catch (error) =>
       @logger.error "Setting local SDP of type '#{@local_sdp().type}' failed: #{error.name} - #{error.message}", error
 
@@ -582,6 +594,7 @@ class z.calling.entities.EFlow
     @peer_connection.setRemoteDescription @remote_sdp()
     .then =>
       @logger.debug "Setting remote SDP of type '#{@remote_sdp().type}' successful", @peer_connection.remoteDescription
+      @telemetry.time_step z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET
       @should_add_remote_sdp false
     .catch (error) =>
       @logger.error "Setting remote SDP of type '#{@remote_sdp().type}' failed: #{error.name} - #{error.message}", error
@@ -730,6 +743,7 @@ class z.calling.entities.EFlow
   ###
   reset_flow: =>
     @_clear_send_sdp_timeout()
+    @telemetry.reset_statistics()
     @logger.info "Resetting flow with user '#{@remote_user.id}'"
     try
       if @peer_connection?.signalingState isnt z.calling.rtc.SignalingState.CLOSED
@@ -758,3 +772,28 @@ class z.calling.entities.EFlow
     @signaling_state z.calling.rtc.SignalingState.NEW
     @connection_state z.calling.rtc.ICEConnectionState.NEW
     @gathering_state z.calling.rtc.ICEGatheringState.NEW
+
+
+  ###############################################################################
+  # Logging
+  ###############################################################################
+
+  # Get full telemetry report for automation.
+  get_telemetry: =>
+    @telemetry.get_automation_report()
+
+  # Log flow status to console.
+  log_status: =>
+    @telemetry.log_status @participant_et
+
+  # Log flow setup step timings to console.
+  log_timings: =>
+    @telemetry.log_timings()
+
+  # Report flow status to Raygun.
+  report_status: =>
+    @telemetry.report_status()
+
+  # Report flow setup step timings to Raygun.
+  report_timings: =>
+    @telemetry.report_timings()

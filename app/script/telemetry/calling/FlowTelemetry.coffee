@@ -37,7 +37,7 @@ class z.telemetry.calling.FlowTelemetry
     @is_answer = false
     @peer_connection = undefined
 
-    @timings = timings
+    @timings = $.extend new z.telemetry.calling.CallSetupTimings(@id), timings.get()
     @statistics = new z.telemetry.calling.ConnectionStats()
 
     @stats_poller = undefined

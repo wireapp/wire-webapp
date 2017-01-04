@@ -45,7 +45,6 @@ class z.calling.belfry.CallCenter
 
     # Telemetry
     @telemetry = new z.telemetry.calling.CallTelemetry()
-    @flow_status = undefined
     @timings = ko.observable()
 
     # Media Handler
@@ -66,8 +65,6 @@ class z.calling.belfry.CallCenter
   subscribe_to_events: =>
     amplify.subscribe z.event.WebApp.CALL.EVENT_FROM_BACKEND, @on_event
     amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_event
-    amplify.subscribe z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, @store_flow_status
-    amplify.subscribe z.util.Logger::LOG_ON_DEBUG, @set_logging
 
   # Un-subscribe from amplify topics.
   un_subscribe: ->
@@ -159,95 +156,3 @@ class z.calling.belfry.CallCenter
     if creator_id = event.creator or event.from
       return creator_id
     return user_id for user_id, device_info of event.participants when device_info.state is z.calling.enum.ParticipantState.JOINED
-
-
-  ###############################################################################
-  # Util functions
-  ###############################################################################
-
-  ###
-  Count into the flows of a call.
-  @param conversation_id [String] Conversation ID
-  ###
-  count_flows: (conversation_id) =>
-    @get_call_by_id conversation_id
-    .then (call_et) =>
-      counting = ({flow: flow_et, sound: "/audio/digits/#{i}.mp3"} for flow_et, i in call_et.get_flows())
-      counting.reverse()
-
-      _count_flow = =>
-        act = counting.pop()
-        return if not act
-        user_name = act.flow.remote_user.name()
-        @logger.info "Sending audio file '#{act.sound}' to flow '#{act.flow.id}' (#{user_name})"
-        act.flow.inject_audio_file act.sound, _count_flow
-
-      _count_flow()
-    .catch (error) =>
-      @logger.warn "No call for conversation '#{conversation_id}' found to count into flows", error
-
-
-  ###
-  Inject audio into all flows of a call.
-  @param conversation_id [String] Conversation ID
-  @param file_path [String] Path to audio file
-  ###
-  inject_audio: (conversation_id, file_path) =>
-    @get_call_by_id conversation_id
-    .then (call_et) ->
-      flow_et.inject_audio_file file_path for flow_et in call_et.get_flows()
-    .catch (error) =>
-      @logger.warn "No call for conversation '#{conversation_id}' found to inject audio into flows", error
-
-
-  ###############################################################################
-  # Logging
-  ###############################################################################
-
-  # Log call sessions
-  log_sessions: =>
-    @telemetry.log_sessions()
-
-  print_call_states: =>
-    session_id = 'unknown'
-    for call_et in @calls()
-      @logger.force_log "Call state for conversation: #{call_et.id}\n"
-      session_id = call_et.log_state()
-    return "session id is : #{session_id}"
-
-  # Report a call for call analysis
-  report_call: =>
-    send_report = (custom_data) =>
-      Raygun.send new Error('Call failure report'), custom_data
-      @logger.info "Reported status of flow id '#{custom_data.meta.flow_id}' for call analysis", custom_data
-
-    call_et = @_find_ongoing_call()
-    if call_et
-      send_report flow_et.report_status() for flow_et in call_et.get_flows()
-    else if @flow_status
-      send_report @flow_status
-    else
-      @logger.warn 'Could not find flows to report for call analysis'
-
-  # Set logging on adapter.js
-  set_logging: (is_logging_enabled) =>
-    @logger.info "Set logging for webRTC Adapter: #{is_logging_enabled}"
-    adapter?.disableLog = not is_logging_enabled
-
-  # Store last flow status
-  store_flow_status: (flow_status) =>
-    @flow_status = flow_status if flow_status
-
-  ###
-  Please solely use this method for logging purposes! It's not intended to do actual work / heavy lifting.
-
-  @private
-  @param conversation_id [String] Conversation ID
-  @return [z.calling.Call] Returns an ongoing call entity
-  ###
-  _find_ongoing_call: (conversation_id) ->
-    @get_call_by_id conversation_id
-    .then (call_et) ->
-      return call_et
-    .catch =>
-      return call_et for call in @calls() when call.state() not in z.calling.enum.CallStateGroups.IS_ENDED

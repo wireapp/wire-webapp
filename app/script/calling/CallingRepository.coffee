@@ -65,6 +65,8 @@ class z.calling.CallingRepository
     @remote_media_streams = @media_repository.stream_handler.remote_media_streams
     @self_stream_state = @media_repository.stream_handler.self_stream_state
 
+    @flow_status = undefined
+
     @share_call_states()
     @subscribe_to_events()
 
@@ -81,7 +83,9 @@ class z.calling.CallingRepository
     amplify.subscribe z.event.WebApp.CALL.STATE.LEAVE, => @switch_call_center z.calling.enum.E_CALL_ACTION.LEAVE, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, => @switch_call_center z.calling.enum.E_CALL_ACTION.REMOVE_PARTICIPANT, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE, => @switch_call_center z.calling.enum.E_CALL_ACTION.TOGGLE_STATE, arguments
+    amplify.subscribe z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, @store_flow_status
     amplify.subscribe z.event.WebApp.LOADED, @initiate_config
+    amplify.subscribe z.util.Logger::LOG_ON_DEBUG, @set_logging
 
   get_version_of_call: (conversation_id) =>
     @call_center.get_call_by_id conversation_id
@@ -129,3 +133,34 @@ class z.calling.CallingRepository
     .then (calling_config) =>
       @logger.info 'Updated calling configuration', calling_config
       @calling_config $.extend use_v3_api: @use_v3_api, calling_config
+
+
+  ###############################################################################
+  # Logging
+  ###############################################################################
+
+  # Set logging on adapter.js
+  set_logging: (is_logging_enabled) =>
+    @logger.info "Set logging for webRTC Adapter: #{is_logging_enabled}"
+    adapter?.disableLog = not is_logging_enabled
+
+  # Store last flow status
+  store_flow_status: (flow_status) =>
+    @flow_status = flow_status if flow_status
+
+  # Report a call for call analysis
+  report_call: =>
+    send_report = (custom_data) =>
+      Raygun.send new Error('Call failure report'), custom_data
+      @logger.info "Reported status of flow id '#{custom_data.meta.flow_id}' for call analysis", custom_data
+
+    @get_call_by_id conversation_id
+    .catch =>
+      return call_et for call_et in @calls() when call_et.state() not in z.calling.enum.CallStateGroups.IS_ENDED
+    .then (call_et) ->
+      if call_et
+        send_report (flow_et.report_status() for flow_et in call_et.get_flows())
+      else if @flow_status
+        send_report @flow_status
+      else
+        @logger.warn 'Could not find flows to report for call analysis'
