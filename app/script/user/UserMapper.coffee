@@ -23,7 +23,6 @@ z.user ?= {}
 class z.user.UserMapper
   ###
   Construct a new User Mapper.
-
   @param asset_service [z.assets.AssetService] Backend REST API asset service implementation
   ###
   constructor: (@asset_service) ->
@@ -31,9 +30,7 @@ class z.user.UserMapper
 
   ###
   Converts JSON user into user entity.
-
   @param data [Object] User data
-
   @return [z.entity.User] Mapped user entity
   ###
   map_user_from_object: (data) ->
@@ -41,9 +38,7 @@ class z.user.UserMapper
 
   ###
   Converts JSON self user into user entity.
-
   @param data [Object] User data
-
   @return [z.entity.User] Mapped user entity
   ###
   map_self_user_from_object: (data) ->
@@ -62,30 +57,26 @@ class z.user.UserMapper
   Convert multiple JSON users into user entities.
 
   @note Return an empty array in any case to prevent crashes.
-
   @param json [Object] User data
-
   @return [Array<z.entity.User>] Mapped user entities
   ###
   map_users_from_object: (data) ->
     if data?
       return (@map_user_from_object user for user in data when user isnt undefined)
-    else
-      @logger.warn 'We got no user data from the backend'
-      return []
+    @logger.warn 'We got no user data from the backend'
+    return []
 
   ###
   Maps JSON user into a blank user entity or updates an existing one.
 
   @note Mapping of single properties to an existing user happens when the user changes his name or accent color.
-
   @param user_et [z.entity.User] User entity that the info shall be mapped to
   @param data [Object] User data
-
   @return [z.entity.User] Mapped user entity
   ###
   update_user_from_object: (user_et, data) ->
     return if not data?
+
     # It's a new user
     if data.id? and user_et.id is ''
       user_et.id = data.id
@@ -94,18 +85,6 @@ class z.user.UserMapper
     else if user_et.id isnt '' and data.id isnt user_et.id
       throw new Error('updating wrong user_et')
 
-    if data.email?
-      user_et.email data.email
-
-    if data.phone?
-      user_et.phone data.phone
-
-    if data.name?
-      user_et.name data.name.trim()
-
-    if data.handle?
-      user_et.username data.handle
-
     if data.accent_id? and data.accent_id isnt 0
       user_et.accent_id data.accent_id
 
@@ -113,6 +92,23 @@ class z.user.UserMapper
       @_map_profile_assets user_et, data.assets
     else if data.picture?.length > 0
       @_map_profile_pictures user_et, data.picture
+
+    if data.email?
+      user_et.email data.email
+
+    if data.handle?
+      user_et.username data.handle
+
+    if data.name?
+      user_et.name data.name.trim()
+
+    if data.phone?
+      user_et.phone data.phone
+
+    if data.service?
+      user_et.is_bot = true
+      user_et.provider_id = data.service.provider
+      user_et.service_id = data.service.id
 
     return user_et
 
