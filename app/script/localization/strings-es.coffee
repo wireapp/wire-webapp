@@ -324,7 +324,6 @@ z.string.es.people_no_matches = 'No hay resultados coincidentes. Intente con un 
 z.string.es.people_invite = 'Invitar gente'
 z.string.es.people_share = 'Compartir contactos'
 z.string.es.people_bring_your_friends = 'Invita a tus amigos a Wire'
-z.string.es.people_invite_detail = 'Compartir tus contactos le ayuda a conectarse con otros. Toda la información es anónima y no será compartida con nadie más.'
 z.string.es.people_invite_button_contacts = 'Desde los contactos'
 z.string.es.people_invite_button_gmail = 'Desde Gmail'
 z.string.es.people_invite_headline = 'Tráete a tus amigos'
@@ -454,18 +453,10 @@ z.string.es.search_group_hint = 'Seguir intentando o elegir más personas para c
 z.string.es.search_connect = 'Conectar'
 z.string.es.search_connections = 'Conexiones'
 z.string.es.search_groups = 'Grupos'
-z.string.es.search_placeholder = 'Buscar por nombre o correo electrónico'
 z.string.es.search_top_people = 'Personas más importantes'
-z.string.es.search_try_search = 'Encuentra personas por nombre o dirección de email'
-z.string.es.search_no_contacts_on_wire = 'No tienes ningún contacto en Wire. Trata de encontrar personas por nombre o dirección de correo electronico'
 z.string.es.search_others = 'Conectar'
 z.string.es.search_friend_in_common = '%no persona en común'
 z.string.es.search_friends_in_common = '%no personas en común'
-
-# Picture upload
-z.string.es.upload_welcome = 'Wire es mucho mejor con una foto.'
-z.string.es.upload_welcome_keep = 'conservar esta'
-z.string.es.upload_welcome_choose = 'eligir la tuya'
 
 # Google contacts upload
 z.string.es.upload_google_headline = 'Buscar con quien hablar.'
@@ -475,7 +466,6 @@ z.string.es.upload_google_message_error = 'No recibimos tu información. Por fav
 z.string.es.upload_google_button_again = 'Vuelve a intentarlo'
 
 # URLs
-z.string.es.url_password_reset = 'https://wire.com/forgot/'
 z.string.es.url_legal = 'https://wire.com/legal/'
 z.string.es.url_privacy = 'https://wire.com/privacy/'
 z.string.es.url_privacy_why = 'https://wire.com/privacy/why/'

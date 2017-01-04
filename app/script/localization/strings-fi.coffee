@@ -324,7 +324,6 @@ z.string.fi.people_no_matches = 'Ei vastaavia tuloksia. Yritä toisella nimellä
 z.string.fi.people_invite = 'Kutsu ihmisiä'
 z.string.fi.people_share = 'Jaa yhteystietoja'
 z.string.fi.people_bring_your_friends = 'Tuo ystäväsi Wireen'
-z.string.fi.people_invite_detail = 'Yhteystietojesi jakaminen auttaa sinua löytämään uusia kontakteja. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.'
 z.string.fi.people_invite_button_contacts = 'Kontakteista'
 z.string.fi.people_invite_button_gmail = 'Gmailista'
 z.string.fi.people_invite_headline = 'Kutsu kavereitasi'
@@ -454,18 +453,10 @@ z.string.fi.search_group_hint = 'Jatka kirjoittamista tai valitse lisää ihmisi
 z.string.fi.search_connect = 'Yhdistä'
 z.string.fi.search_connections = 'Yhteydet'
 z.string.fi.search_groups = 'Ryhmät'
-z.string.fi.search_placeholder = 'Etsi nimellä tai sähköpostiosoitteella'
 z.string.fi.search_top_people = 'Eniten käytetyt kontaktit'
-z.string.fi.search_try_search = 'Etsi ihmisiä nimellä tai sähköpostiosoitteella'
-z.string.fi.search_no_contacts_on_wire = 'Sinulla ei ole kontakteja Wiressä. Yritä etsiä ihmisiä nimellä tai sähköpostiosoitteella'
 z.string.fi.search_others = 'Yhdistä'
 z.string.fi.search_friend_in_common = '%n yhteinen käyttäjä molemmilla'
 z.string.fi.search_friends_in_common = '%n yhteistä käyttäjää molemmilla'
-
-# Picture upload
-z.string.fi.upload_welcome = 'Wire on niin paljon mukavampi kuvalla.'
-z.string.fi.upload_welcome_keep = 'pidä tämä'
-z.string.fi.upload_welcome_choose = 'valitse omasi'
 
 # Google contacts upload
 z.string.fi.upload_google_headline = 'Etsi ihmisiä joiden kanssa jutella.'
@@ -475,7 +466,6 @@ z.string.fi.upload_google_message_error = 'Emme vastaanottaneet tietojasi. Ole h
 z.string.fi.upload_google_button_again = 'Yritä uudelleen'
 
 # URLs
-z.string.fi.url_password_reset = 'https://wire.com/forgot/'
 z.string.fi.url_legal = 'https://wire.com/legal/'
 z.string.fi.url_privacy = 'https://wire.com/privacy/'
 z.string.fi.url_privacy_why = 'https://wire.com/privacy/why/'

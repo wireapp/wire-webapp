@@ -267,6 +267,7 @@ z.string.hr.conversation_context_menu_unlike = 'Ne sviđa mi se'
 z.string.hr.conversation_delete_timestamp = 'Izbrisano na %@timestamp'
 z.string.hr.conversation_edit_timestamp = 'Promijenjeno na %@timestamp'
 z.string.hr.conversation_likes_caption = '%@number ljudi'
+z.string.hr.conversation_send_pasted_file = 'Slika zaljepljena na %date'
 
 # Archive
 z.string.hr.archive_header = 'Arhiviraj'
@@ -288,7 +289,11 @@ z.string.hr.conversations_popover_silence = 'Isključi zvuk'
 z.string.hr.conversations_popover_unarchive = 'Dearhiviraj'
 
 # Takeover
+z.string.hr.takeover_headline = 'Korisnička imena su ovdje.'
+z.string.hr.takeover_sub = 'Zatražite svoje jedinstveno ime na Wire.'
 z.string.hr.takeover_link = 'Saznaj više'
+z.string.hr.takeover_button_choose = 'Odaberite vlastitu'
+z.string.hr.takeover_button_keep = 'Zadrži ovu'
 
 # Invites
 z.string.hr.invite_meta_key_mac = 'Cmd'
@@ -296,6 +301,7 @@ z.string.hr.invite_meta_key_pc = 'Ctrl'
 z.string.hr.invite_hint_selected = 'Pritisnite % meta_key + C za kopiranje'
 z.string.hr.invite_hint_unselected = 'Odaberite i pritisnite % meta_key + C'
 z.string.hr.invite_headline = 'Pozvati ljude na Wire'
+z.string.hr.invite_message = 'Ja sam na Wireu, potraži %username ili posjeti wire.com/download.'
 z.string.hr.invite_message_no_email = 'Na Wire sam. Posjeti https://get.wire.com da bi se povezali.'
 
 # Extensions
@@ -320,7 +326,6 @@ z.string.hr.people_no_matches = 'Nema odgovarajućih rezultata. Pokušajte unije
 z.string.hr.people_invite = 'Pozovi ljude'
 z.string.hr.people_share = 'Podijeli kontakte'
 z.string.hr.people_bring_your_friends = 'Pozovi prijatelje na Wire'
-z.string.hr.people_invite_detail = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.'
 z.string.hr.people_invite_button_contacts = 'Iz kontakata'
 z.string.hr.people_invite_button_gmail = 'Iz Gmaila'
 z.string.hr.people_invite_headline = 'Pozovi prijatelje'
@@ -400,6 +405,9 @@ z.string.hr.preferences_account_reset_password = 'Resetiraj lozinku'
 z.string.hr.preferences_account_delete = 'Brisanje računa'
 z.string.hr.preferences_account_log_out = 'Odjava'
 z.string.hr.preferences_account_username_placeholder = 'Vaše puno ime'
+z.string.hr.preferences_account_username_hint = 'Najmanje 2 znaka. Samo a-z, 0-9, i _.'
+z.string.hr.preferences_account_username_available = 'Dostupno'
+z.string.hr.preferences_account_username_error_taken = 'Već uzeto'
 
 z.string.hr.preferences_av_camera = 'Kamera'
 z.string.hr.preferences_av_microphone = 'Mikrofon'
@@ -447,16 +455,13 @@ z.string.hr.search_group_hint = 'Nastavi pisati ili odaberi više ljudi za stvar
 z.string.hr.search_connect = 'Poveži se'
 z.string.hr.search_connections = 'Veze'
 z.string.hr.search_groups = 'Grupe'
-z.string.hr.search_placeholder = 'Pretraga po imenu ili emailu'
+z.string.hr.search_placeholder = 'Pretraži po imenu ili korisničkom imenu'
 z.string.hr.search_top_people = 'Top veze'
-z.string.hr.search_try_search = 'Traži veze pomoću pune e-mail adrese ili imena'
-z.string.hr.search_no_contacts_on_wire = 'Nemate veza na Wire. Pokušajte pronaći ljude po imenu ili potpunoj email adresi'
+z.string.hr.search_try_search = 'Traženje ljudi po imenu ili korisničkom imenu'
+z.string.hr.search_no_contacts_on_wire = 'Nemate veza na Wire. Pokušajte pronaći ljude po imenu ili korisničkom imenu.'
 z.string.hr.search_others = 'Poveži se'
-
-# Picture upload
-z.string.hr.upload_welcome = 'Wire je ljepši sa slikom.'
-z.string.hr.upload_welcome_keep = 'zadrži ovaj'
-z.string.hr.upload_welcome_choose = 'odaberite vlastitu'
+z.string.hr.search_friend_in_common = '%no osoba zajedničko'
+z.string.hr.search_friends_in_common = '%no ljudi zajedničko'
 
 # Google contacts upload
 z.string.hr.upload_google_headline = 'Pronađi ljude za razgovor.'
@@ -466,7 +471,6 @@ z.string.hr.upload_google_message_error = 'Nismo dobili podatke. Pokušajte pono
 z.string.hr.upload_google_button_again = 'Pokušaj ponovno'
 
 # URLs
-z.string.hr.url_password_reset = 'https://Wire.com/Forgot/'
 z.string.hr.url_legal = 'https://Wire.com/legal/'
 z.string.hr.url_privacy = 'https://Wire.com/privacy/'
 z.string.hr.url_privacy_why = 'https://Wire.com/privacy/Why/'
@@ -484,6 +488,7 @@ z.string.hr.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/a
 z.string.hr.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.hr.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202969412'
 z.string.hr.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.hr.url_support_usernames = 'https://wire.com/support/username'
 z.string.hr.url_decrypt_error_1 = 'https://wire.com/privacy/error-1'
 z.string.hr.url_decrypt_error_2 = 'https://wire.com/privacy/error-2'
 
