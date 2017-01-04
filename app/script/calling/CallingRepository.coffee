@@ -87,7 +87,7 @@ class z.calling.CallingRepository
     amplify.subscribe z.event.WebApp.LOADED, @initiate_config
     amplify.subscribe z.util.Logger::LOG_ON_DEBUG, @set_logging
 
-  get_version_of_call: (conversation_id) =>
+  get_protocol_of_call: (conversation_id) =>
     @call_center.get_call_by_id conversation_id
     .then ->
       return z.calling.enum.PROTOCOL_VERSION.BELFRY
@@ -97,8 +97,11 @@ class z.calling.CallingRepository
       @e_call_center.get_e_call_by_id conversation_id
       .then ->
         return z.calling.enum.PROTOCOL_VERSION.E_CALL
-      .catch (error) ->
-        throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+
+  handled_by_v3: (conversation_id) =>
+    conversation_et = @conversation_repository.get_conversation_by_id conversation_id
+    return z.calling.enum.PROTOCOL_VERSION.BELFRY unless @use_v3_api and not conversation_et?.is_group()
+    return z.calling.enum.PROTOCOL_VERSION.E_CALL
 
   # Initiate calling config update.
   initiate_config: =>
@@ -109,12 +112,16 @@ class z.calling.CallingRepository
 
   # Forward user action to with a call to the appropriate call center.
   switch_call_center: (fn_name, args) =>
-    @get_version_of_call args[0]
-    .then (call_version) =>
-      if not call_version and fn_name is z.calling.enum.E_CALL_ACTION.TOGGLE_STATE
-        call_version = if @use_v3_api then z.calling.enum.PROTOCOL_VERSION.E_CALL else z.calling.enum.PROTOCOL_VERSION.BELFRY
+    conversation_id = args[0]
 
-      switch call_version
+    @get_protocol_of_call conversation_id
+    .catch (error) =>
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+
+      if fn_name is z.calling.enum.E_CALL_ACTION.TOGGLE_STATE
+        return @handled_by_v3 conversation_id
+    .then (protocol_version) =>
+      switch protocol_version
         when z.calling.enum.PROTOCOL_VERSION.BELFRY
           @call_center.state_handler[fn_name].apply @, args
         when z.calling.enum.PROTOCOL_VERSION.E_CALL
