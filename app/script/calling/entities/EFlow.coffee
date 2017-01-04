@@ -84,6 +84,7 @@ class z.calling.entities.EFlow
           @logger.info 'Checking for ICE candidates on PeerConnection'
 
         when z.calling.rtc.ICEConnectionState.COMPLETED, z.calling.rtc.ICEConnectionState.CONNECTED
+          @telemetry.start_statistics()
           @e_call_et.is_connected true
           @e_participant_et.is_connected true
           @e_call_et.interrupted_participants.remove @participant_et

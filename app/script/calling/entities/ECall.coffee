@@ -32,6 +32,7 @@ class z.calling.entities.ECall
 
     # IDs and references
     @id = @conversation_et.id
+    @timings = undefined
 
     @audio_repository = @e_call_center.media_repository.audio_repository
     @config = @e_call_center.calling_config
@@ -196,7 +197,7 @@ class z.calling.entities.ECall
   add_participant: (user_et, e_call_message) =>
     @get_participant_by_id user_et.id
     .catch (error) =>
-      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
 
       @logger.debug "Adding e-call participant '#{user_et.name()}'"
       @participants.push new z.calling.entities.EParticipant @, user_et, @timings, e_call_message
@@ -217,7 +218,7 @@ class z.calling.entities.ECall
       @logger.debug "Removed e-call participant '#{e_participant_et.user.name()}'"
       return @
     .catch (error) ->
-      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
 
 
   ###
@@ -250,7 +251,7 @@ class z.calling.entities.ECall
       @_update_remote_state()
       return @
     .catch (error) ->
-      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
 
 
   ###############################################################################
@@ -270,6 +271,9 @@ class z.calling.entities.ECall
   ###
   get_flow_telemetry: =>
     return (e_participant_et.e_flow_et.get_telemetry() for e_participant_et in @participants() when participant.e_flow_et)
+
+  start_timings: =>
+    @timings = new z.telemetry.calling.CallSetupTimings @id
 
   ###
   Calculates the panning (from left to right) to position a user in a group call.

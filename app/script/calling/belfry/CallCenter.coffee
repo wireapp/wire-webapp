@@ -45,7 +45,6 @@ class z.calling.belfry.CallCenter
 
     # Telemetry
     @telemetry = new z.telemetry.calling.CallTelemetry()
-    @timings = ko.observable()
 
     # Media Handler
     @media_devices_handler = @media_repository.devices_handler

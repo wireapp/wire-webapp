@@ -32,7 +32,8 @@ class z.calling.entities.Call
 
     # IDs and references
     @id = @conversation_et.id
-    @session_id = ko.observable undefined
+    @session_id = undefined
+    @timings = undefined
     @event_sequence = 0
 
     # States
@@ -407,6 +408,9 @@ class z.calling.entities.Call
   get_number_of_active_flows: =>
     return (flow_et for flow_et in @get_flows() when flow_et.is_active).length or 0
 
+  start_timings: =>
+    @timings = new z.telemetry.calling.CallSetupTimings @id
+
   ###
   Delete a flow with a given ID.
 
@@ -476,7 +480,7 @@ class z.calling.entities.Call
     @event_sequence = 0
     @finished_reason = z.calling.enum.CallFinishedReason.UNKNOWN
     @is_connected false
-    @session_id undefined
+    @session_id = undefined
     @self_user_joined false
     @is_declined false
     amplify.publish z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION

@@ -37,7 +37,7 @@ class z.telemetry.calling.FlowTelemetry
     @is_answer = false
     @peer_connection = undefined
 
-    @timings = $.extend new z.telemetry.calling.CallSetupTimings(@id), timings.get()
+    @timings = $.extend new z.telemetry.calling.CallSetupTimings(@id), timings?.get()
     @statistics = new z.telemetry.calling.ConnectionStats()
 
     @stats_poller = undefined
@@ -69,7 +69,7 @@ class z.telemetry.calling.FlowTelemetry
         flow_id: @id
         id: @call_et.id
         is_answer: @is_answer
-        session_id: @call_et.session_id()
+        session_id: @call_et.session_id
       telemetry:
         statistics: @get_statistics()
         timings: @get_timings()
@@ -182,7 +182,7 @@ class z.telemetry.calling.FlowTelemetry
   Start statistics polling.
   @param ice_connection_state [RTCIceConnectionState] Current state of ICE connection
   ###
-  start_statistics: (ice_connection_state) =>
+  start_statistics: =>
     if not @stats_poller
       # Track call stats
       @time_step z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED
@@ -199,9 +199,6 @@ class z.telemetry.calling.FlowTelemetry
         @_update_statistics()
         .catch (error) => @logger.warn "Flow networks stats not updated: #{error.message}"
       , 2000
-
-    if ice_connection_state is z.calling.rtc.ICEConnectionState.COMPLETED
-      @time_step z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_COMPLETED
 
   ###
   Get current statistics from PeerConnection.

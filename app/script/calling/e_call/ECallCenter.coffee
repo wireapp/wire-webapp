@@ -42,6 +42,9 @@ class z.calling.e_call.ECallCenter
   constructor: (@calling_config, @conversation_repository, @media_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.calling.e_call.ECallCenter', z.config.LOGGER.OPTIONS
 
+    # Telemetry
+    @telemetry = new z.telemetry.calling.CallTelemetry()
+
     # Media Handler
     @media_devices_handler = @media_repository.devices_handler
     @media_stream_handler = @media_repository.stream_handler
@@ -153,7 +156,7 @@ class z.calling.e_call.ECallCenter
               @_send_call_notification e_call_et, user_id
             @delete_call conversation_id
     .catch (error) ->
-      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
   ###
   E-call cancel event handling.
@@ -169,7 +172,7 @@ class z.calling.e_call.ECallCenter
         if e_call_message.resp in [false, 'false']
           return e_call_et.update_participant user_et, e_call_message
     .catch (error) ->
-      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
   ###
   E-call cancel event handling.
@@ -186,7 +189,7 @@ class z.calling.e_call.ECallCenter
           return e_call_et.update_participant user_et, e_call_message
         return e_call_et.add_participant user_et, e_call_message
     .catch (error) =>
-      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
       if @user_repository.self().id is user_id
         return @_create_ongoing_e_call conversation_id, e_call_message, user_id
@@ -252,7 +255,7 @@ class z.calling.e_call.ECallCenter
       @e_calls.remove (e_call_et) -> e_call_et.id is conversation_id
       @media_stream_handler.reset_media_streams()
     .catch (error) ->
-      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
   ###
   User action to ignore incoming e-call.
@@ -265,7 +268,7 @@ class z.calling.e_call.ECallCenter
       e_call_et.state z.calling.enum.CallState.IGNORED
       @media_stream_handler.reset_media_streams()
     .catch (error) ->
-      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
   ###
   User action to join an e-call.
@@ -304,7 +307,7 @@ class z.calling.e_call.ECallCenter
       @send_e_call_event e_call_et.conversation_et, new z.calling.entities.ECallMessage message_type, false, e_call_et
       @delete_call conversation_id if e_call_et.participants().length < 2
     .catch (error) ->
-      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
   ###
   Leave a e-call we are joined immediately in case the browser window is closed.
@@ -351,7 +354,7 @@ class z.calling.e_call.ECallCenter
       toggle_promise.then =>
         @send_e_call_event e_call_et.conversation_et, new z.calling.entities.ECallPropSyncMessage false, @_create_properties_payload(media_type), e_call_et
     .catch (error) ->
-      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
   ###
   Check whether we are actively participating in a e-call.
@@ -382,29 +385,33 @@ class z.calling.e_call.ECallCenter
   @param video_send [Boolean] Video enabled for this e-call
   ###
   _join_call: (conversation_id, video_send) ->
-    e_call = undefined
+    e_call_et = undefined
 
     @get_e_call_by_id conversation_id
     .catch (error) =>
-      throw error if error.type isnt z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
       throw new z.calling.e_call.ECallError z.calling.e_call.ECallError::TYPE.NOT_ENABLED unless @calling_config().use_v3_api
+
       @_create_outgoing_e_call conversation_id, new z.calling.entities.ECallPropSyncMessage false, videosend: video_send
-    .then (e_call_et) =>
+    .then (e_call) =>
+      e_call_et = e_call
       @logger.debug "Joining e-call in conversation '#{conversation_id}'", e_call_et
-      e_call = e_call_et
+      e_call_et.start_timings()
       unless @media_stream_handler.has_media_streams()
         @media_stream_handler.initiate_media_stream conversation_id, video_send
     .then =>
-      switch e_call.state()
+      e_call_et.timings.time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED
+
+      switch e_call_et.state()
         when z.calling.enum.CallState.INCOMING
-          e_call.state z.calling.enum.CallState.CONNECTING
+          e_call_et.state z.calling.enum.CallState.CONNECTING
         when z.calling.enum.CallState.OUTGOING
-          e_call.participants.push new z.calling.entities.EParticipant e_call, e_call.conversation_et.participating_user_ets()[0], e_call.timings
+          e_call_et.participants.push new z.calling.entities.EParticipant e_call, e_call.conversation_et.participating_user_ets()[0], e_call.timings
 
       @self_client_joined true
-      e_call.local_audio_stream @media_stream_handler.local_media_streams.audio()
-      e_call.local_video_stream @media_stream_handler.local_media_streams.video()
-      e_call.start_negotiation()
+      e_call_et.local_audio_stream @media_stream_handler.local_media_streams.audio()
+      e_call_et.local_video_stream @media_stream_handler.local_media_streams.video()
+      e_call_et.start_negotiation()
 
 
   ###############################################################################
@@ -510,6 +517,7 @@ class z.calling.e_call.ECallCenter
       amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, e_call_et.conversation_et, @_create_voice_channel_activated_message e_call_et, user_id
     else
       amplify.publish z.event.WebApp.EVENT.INJECT, @_create_voice_channel_deactivated_event e_call_et, user_id
+
 
   ###############################################################################
   # Helper functions

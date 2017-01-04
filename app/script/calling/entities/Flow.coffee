@@ -95,7 +95,7 @@ class z.calling.entities.Flow
     @connection_state.subscribe (ice_connection_state) =>
       switch ice_connection_state
         when z.calling.rtc.ICEConnectionState.COMPLETED, z.calling.rtc.ICEConnectionState.CONNECTED
-          @telemetry.start_statistics ice_connection_state
+          @telemetry.start_statistics()
           @call_et.is_connected true
           @participant_et.is_connected true
           @call_et.interrupted_participants.remove @participant_et

@@ -342,8 +342,6 @@ class z.calling.handler.CallStateHandler
   @param is_videod [Boolean] Is this a video call
   ###
   join_call: (conversation_id, is_videod) =>
-    @call_center.timings new z.telemetry.calling.CallSetupTimings conversation_id
-
     @call_center.get_call_by_id conversation_id
     .then (call_et) ->
       return call_et.state()
@@ -485,16 +483,19 @@ class z.calling.handler.CallStateHandler
   @param is_videod [Boolean] Is call a video call
   ###
   _join_call: (conversation_id, is_videod) ->
+    call_et = undefined
     @call_center.get_call_by_id conversation_id
     .catch (error) ->
-      throw error if error.type isnt z.calling.belfry.CallError::TYPE.CALL_NOT_FOUND
-    .then =>
+      throw error unless error.type is z.calling.belfry.CallError::TYPE.CALL_NOT_FOUND
+    .then (call) =>
+      call_et = call
+      call_et.start_timings()
       if @call_center.media_stream_handler.has_media_streams()
         @logger.info 'MediaStream has already been initialized', @call_center.media_stream_handler.local_media_streams
       else
         return @call_center.media_stream_handler.initiate_media_stream conversation_id, is_videod
     .then =>
-      @call_center.timings().time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED if @call_center.timings()
+      call_et.timings.time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED
       return @_put_state_to_join conversation_id, @_create_state_payload(z.calling.enum.ParticipantState.JOINED), true
     .catch (error) =>
       @logger.error "Joining call in '#{conversation_id}' failed: #{error.name}", error
@@ -575,7 +576,7 @@ class z.calling.handler.CallStateHandler
       call_et = new z.calling.entities.Call conversation_et, @call_center.user_repository.self(), @call_center.telemetry
       call_et.local_audio_stream = @call_center.media_stream_handler.local_media_streams.audio
       call_et.local_video_stream = @call_center.media_stream_handler.local_media_streams.video
-      call_et.session_id event.session or @_fake_session_id()
+      call_et.session_id = event.session or @_fake_session_id()
       call_et.event_sequence = event.sequence
       conversation_et.call call_et
       @calls.push call_et
