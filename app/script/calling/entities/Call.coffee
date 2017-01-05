@@ -33,7 +33,6 @@ class z.calling.entities.Call
     # IDs and references
     @id = @conversation_et.id
     @session_id = undefined
-    @timings = undefined
     @event_sequence = 0
 
     # States
@@ -407,9 +406,6 @@ class z.calling.entities.Call
   ###
   get_number_of_active_flows: =>
     return (flow_et for flow_et in @get_flows() when flow_et.is_active).length or 0
-
-  start_timings: =>
-    @timings = new z.telemetry.calling.CallSetupTimings @id
 
   ###
   Delete a flow with a given ID.

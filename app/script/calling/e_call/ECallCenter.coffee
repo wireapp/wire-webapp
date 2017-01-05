@@ -406,7 +406,7 @@ class z.calling.e_call.ECallCenter
         when z.calling.enum.CallState.INCOMING
           e_call_et.state z.calling.enum.CallState.CONNECTING
         when z.calling.enum.CallState.OUTGOING
-          e_call_et.participants.push new z.calling.entities.EParticipant e_call, e_call.conversation_et.participating_user_ets()[0], e_call.timings
+          e_call_et.participants.push new z.calling.entities.EParticipant e_call_et, e_call_et.conversation_et.participating_user_ets()[0], e_call_et.timings
 
       @self_client_joined true
       e_call_et.local_audio_stream @media_stream_handler.local_media_streams.audio()

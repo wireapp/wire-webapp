@@ -483,19 +483,17 @@ class z.calling.handler.CallStateHandler
   @param is_videod [Boolean] Is call a video call
   ###
   _join_call: (conversation_id, is_videod) ->
-    call_et = undefined
     @call_center.get_call_by_id conversation_id
     .catch (error) ->
       throw error unless error.type is z.calling.belfry.CallError::TYPE.CALL_NOT_FOUND
-    .then (call) =>
-      call_et = call
-      call_et.start_timings()
+    .then =>
+      @call_center.timings = new z.telemetry.calling.CallSetupTimings conversation_id
       if @call_center.media_stream_handler.has_media_streams()
         @logger.info 'MediaStream has already been initialized', @call_center.media_stream_handler.local_media_streams
       else
         return @call_center.media_stream_handler.initiate_media_stream conversation_id, is_videod
     .then =>
-      call_et.timings.time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED
+      @call_center.timings.time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED
       return @_put_state_to_join conversation_id, @_create_state_payload(z.calling.enum.ParticipantState.JOINED), true
     .catch (error) =>
       @logger.error "Joining call in '#{conversation_id}' failed: #{error.name}", error
