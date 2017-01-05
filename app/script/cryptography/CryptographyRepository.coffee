@@ -237,6 +237,16 @@ class z.cryptography.CryptographyRepository
   _construct_session_id: (user_id, client_id) ->
     return "#{user_id}@#{client_id}"
 
+  _construct_session_ids: (user_client_map) =>
+    session_ids = []
+
+    for user_id, client_ids  of user_client_map
+      client_ids.forEach (client_id) =>
+        session_id = @_construct_session_id user_id, client_id
+        session_ids.push session_id
+
+    return session_ids
+
   ###
   Get local session for a user client map.
 
@@ -337,7 +347,7 @@ class z.cryptography.CryptographyRepository
     return cryptobox_session
 
   ###
-  Create a session from a pre-key.
+  Create a session from a pre-key (encoded PreKey bundle).
   @private
   @param user_id [String] User ID
   @param client_id [String] ID of client to initialize session for
@@ -363,8 +373,22 @@ class z.cryptography.CryptographyRepository
   @return [Promise] Promise that resolves with the encrypted payload
   ###
   encrypt_generic_message: (user_client_map, generic_message, payload = @_construct_payload @current_client().id) =>
+    session_ids = @_construct_session_ids user_client_map
+
+    # Migrated "@_add_payload_recipients" & "_encrypt_payload_for_session"
+
+    for user_id, client_ids  of user_client_map
+      payload.recipients[user_id] ?= {}
+      client_ids.forEach (client_id) =>
+        session_id = @_construct_session_id user_id, client_id
+        payload.recipients[user_id][client_id] ?= {}
+        payload.recipients[user_id][client_id] = @_encrypt_payload_for_session session_id, generic_message
+
+    return # TODO
+
     @get_sessions user_client_map
     .then (cryptobox_session_map) =>
+      # Note: deprecated!
       return @_add_payload_recipients payload, generic_message, cryptobox_session_map
 
   ###
@@ -399,23 +423,22 @@ class z.cryptography.CryptographyRepository
 
   ###
   Encrypt the generic message for a given session.
-  @note We created the convention that whenever we fail to encrypt for a specific client, we send a bomb emoji (no fun!)
+  @note We created the convention that whenever we fail to encrypt for a specific client, we send a Bomb Emoji (no fun!)
 
   @private
   @param cryptobox_session [cryptobox.CryptoboxSession] Cryptographic session
   @param generic_message [z.proto.GenericMessage] ProtoBuffer message
   @return [String] Encrypted message as BASE64 encoded string
   ###
-  _encrypt_payload_for_session: (cryptobox_session, generic_message) ->
+  _encrypt_payload_for_session: (session_id, generic_message) ->
     try
-      generic_message_encrypted = cryptobox_session.encrypt generic_message.toArrayBuffer()
+      generic_message_encrypted = @cryptobox.encrypt session_id, generic_message.toArrayBuffer()
       generic_message_encrypted_base64 = z.util.array_to_base64 generic_message_encrypted
-      @save_session cryptobox_session
       return generic_message_encrypted_base64
     catch error
-      ids = z.client.Client.dismantle_user_client_id cryptobox_session.id
+      ids = session_id.split '@'
       # Note: We created the convention that whenever we fail to encrypt for a specific client, we send a bomb emoji (no fun!)
-      @logger.error "Failed encrypting '#{generic_message.content}' message for client '#{ids.client_id}' of user '#{ids.user_id}': #{error.message}", error
+      @logger.error "Failed encrypting '#{generic_message.content}' message for client '#{ids[1]}' of user '#{ids[0]}': #{error.message}", error
       return '💣'
 
 
