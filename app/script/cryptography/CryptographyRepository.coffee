@@ -56,8 +56,13 @@ class z.cryptography.CryptographyRepository
         channel: cryptobox.Cryptobox.prototype.CHANNEL_CRYPTOBOX
         topic: cryptobox.Cryptobox.prototype.TOPIC_NEW_PREKEYS
         callback: (data) =>
-          @logger.log "Received '#{data.length}' PreKeys via '#{channelName}:#{topicName}')."
-          # TODO: Upload PreKeys to backend
+          @logger.log "Received '#{data.length}' new PreKeys."
+          serialized_prekeys = []
+          data.forEach (pre_key) =>
+            json_pre_key = @cryptobox.serialize_prekey pre_key
+            serialized_prekeys.push json_pre_key
+            # TODO: Upload PreKeys to backend
+
       postal.subscribe config
       return @
 
@@ -204,17 +209,6 @@ class z.cryptography.CryptographyRepository
     .catch (error) =>
       @logger.error "Failed to get sessions: #{error.message}", [error, user_client_map]
       throw error
-
-  ###
-  Loads the session from Cryptobox.
-
-  @param user_id [String] ID of user
-  @param client_id [String] ID of client to retrieve session for
-  @return [cryptobox.CryptoboxSession] Retrieved session
-  ###
-  load_session: (user_id, client_id) =>
-    session_id = @_construct_session_id user_id, client_id
-    return @cryptobox.session_load session_id
 
   ###
   Save a session.
