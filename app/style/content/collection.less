@@ -17,48 +17,72 @@
  *
  */
 
+// Variables
+@image-size: 104px;
+@image-items-per-row: 5;
+
 // Sections
 
 .collection-section {
   display: inline-block;
+  padding-top: 24px;
+  margin-bottom: 16px;
 
   > header {
     align-items: center;
-    border-bottom: 1px solid @seperator-color;
     display: flex;
-    height: 40px;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    margin-top: 16px;
-    padding-left: @conversation-message-sender-width;
+    height: 32px;
+    padding-bottom: 8px;
   }
 }
 
-// Images
+.collection-header-icon {
+  text-align: center;
+  width: @conversation-message-sender-width;
+}
 
+.collection-header-all {
+  .font-size-xs;
+  .cursor-pointer;
+  font-weight: bold;
+  margin-right: 0;
+  margin-left: auto;
+}
+
+// Images
 .collection-images {
+  border-radius: 4px;
   display: flex;
   flex-wrap: wrap;
   margin-left: @conversation-message-sender-width;
-  width: 120px * 4;
+  overflow: hidden;
+  width: @image-size * @image-items-per-row;
 }
 
 .collection-image {
-  width: 120px;
-  height: 120px;
+  .square(@image-size);
+  outline: 1px solid #fff;
 }
 
 // Files
 .collection-file {
   width: 100%;
+  margin: 0;
 
   & + & {
     margin-top: 16px;
   }
 
   .file {
-    margin: 0;
+    margin: 0; // TODO remove margin
   }
+}
+
+// Videos
+.collection-video {
+  .square(@image-size);
+  margin: 0; // TODO remove margin
+  outline: 1px solid #fff;
 }
 
 // Links
