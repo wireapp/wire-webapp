@@ -53,15 +53,15 @@
           </section>
         <!-- /ko -->
 
-        <!-- ko if: files().length -->
-          <section class="collection-section" data-uie-name="collection-section-file">
+        <!-- ko if: video().length -->
+          <section class="collection-section" data-uie-name="collection-section-video">
             <header>
-              <span class="label-bold-xs">Files</span>
-              <span class="label-xs" data-bind="click: function() { click_on_section('files', files()) }">All <span data-bind="text: files().length" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
+              <span class="label-bold-xs">Videos</span>
+              <span class="label-xs" data-bind="click: function() { click_on_section('video', video()) }">All <span data-bind="text: video().length" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
             </header>
             <div class="collection-images">
-              <!-- ko foreach: {data: files.slice(0,2), as: 'message_et'} -->
-                <file-asset class="collection-file" params="asset: message_et.get_first_asset()"></file-asset>
+              <!-- ko foreach: {data: video.slice(0,5), as: 'message_et'} -->
+                <video-asset class="collection-image" params="asset: message_et.get_first_asset()"></video-asset>
               <!-- /ko -->
             </div>
           </section>
@@ -81,15 +81,15 @@
           </section>
         <!-- /ko -->
 
-        <!-- ko if: video().length -->
-          <section class="collection-section" data-uie-name="collection-section-video">
+        <!-- ko if: files().length -->
+          <section class="collection-section" data-uie-name="collection-section-file">
             <header>
-              <span class="label-bold-xs">Videos</span>
-              <span class="label-xs" data-bind="click: function() { click_on_section('video', video()) }">All <span data-bind="text: video().length" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
+              <span class="label-bold-xs">Files</span>
+              <span class="label-xs" data-bind="click: function() { click_on_section('files', files()) }">All <span data-bind="text: files().length" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
             </header>
             <div class="collection-images">
-              <!-- ko foreach: {data: video.slice(0,2), as: 'message_et'} -->
-                <video-asset class="collection-file" params="asset: message_et.get_first_asset()"></video-asset>
+              <!-- ko foreach: {data: files.slice(0,2), as: 'message_et'} -->
+                <file-asset class="collection-file" params="asset: message_et.get_first_asset()"></file-asset>
               <!-- /ko -->
             </div>
           </section>
