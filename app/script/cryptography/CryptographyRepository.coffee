@@ -52,9 +52,14 @@ class z.cryptography.CryptographyRepository
       @cryptobox = new window.cryptobox.Cryptobox cryptobox_store, 2
       return @cryptobox.init()
     .then =>
-      @logger.info 'Initialized repository'
+      config =
+        channel: cryptobox.Cryptobox.prototype.CHANNEL_CRYPTOBOX
+        topic: cryptobox.Cryptobox.prototype.TOPIC_NEW_PREKEYS
+        callback: (data) =>
+          @logger.log "Received '#{data.length}' PreKeys via '#{channelName}:#{topicName}')."
+          # TODO: Upload PreKeys to backend
+      postal.subscribe config
       return @
-
 
   ###############################################################################
   # Pre-keys
