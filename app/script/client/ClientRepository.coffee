@@ -68,7 +68,7 @@ class z.client.ClientRepository
         continue if not ids.user_id or ids.user_id in [@self_user().id, @PRIMARY_KEY_CURRENT_CLIENT]
         user_client_map[ids.user_id] ?= []
         client_et = @client_mapper.map_client client
-        client_et.session = @cryptography_repository.load_session ids.user_id, ids.client_id
+        # client_et.session = @cryptography_repository.load_session ids.user_id, ids.client_id
         user_client_map[ids.user_id].push client_et
       return user_client_map
 
