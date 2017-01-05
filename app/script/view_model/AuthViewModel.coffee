@@ -1285,7 +1285,6 @@ class z.ViewModel.AuthViewModel
     url = @_append_existing_parameters url
     window.location.replace url
 
-  # TODO: !
   _register_client: =>
     @client_repository.register_client @password()
     .then (client_observable) =>

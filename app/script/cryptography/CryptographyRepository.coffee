@@ -49,7 +49,7 @@ class z.cryptography.CryptographyRepository
     .then =>
       @logger.info "Initialize Cryptobox with database...", db
       cryptobox_store = new window.cryptobox.store.IndexedDB db
-      @cryptobox = new window.cryptobox.Cryptobox cryptobox_store, 1
+      @cryptobox = new window.cryptobox.Cryptobox cryptobox_store, 2
       return @cryptobox.init()
     .then =>
       @logger.info 'Initialized repository'
@@ -66,8 +66,8 @@ class z.cryptography.CryptographyRepository
   ###
   generate_client_keys: =>
     return Promise.all([
-      @_generate_last_resort_key()
-      @_generate_pre_keys()
+      @cryptobox.get_serialized_last_resort_prekey()
+      @cryptobox.get_serialized_standard_prekeys()
       @_generate_signaling_keys()
     ]).catch (error) ->
       throw new Error "Failed to generate client keys: #{error.message}"
@@ -115,38 +115,6 @@ class z.cryptography.CryptographyRepository
     .catch (error) =>
       @logger.error "Failed to get pre-key from backend: #{error.message}"
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
-
-  ###
-  Construct the pre-key.
-
-  @private
-  @param id [String] ID of pre-key to be constructed
-  @return [Promise} Promise that will resolve with the new pre-key as object
-  ###
-  _construct_pre_key_promise: (id) =>
-    @cryptobox.new_prekey id
-    .then (pre_key_bundle) ->
-      pre_key_model =
-        id: id
-        key: z.util.array_to_base64 pre_key_bundle
-      return pre_key_model
-
-  ###
-  Construct the last resort pre-key.
-  @private
-  @return [Promise} Promise that will resolve with the new pre-key as object
-  ###
-  _generate_last_resort_key: =>
-    return @_construct_pre_key_promise Proteus.keys.PreKey.MAX_PREKEY_ID
-
-  ###
-  Generate the pre-keys.
-
-  @private
-  @return [Promise} Promise that will resolve with an arrays of all the generated new pre-keys as object
-  ###
-  _generate_pre_keys: =>
-    return Promise.all (@_construct_pre_key_promise i for i in [0...1])
 
   ###
   Generate the signaling keys
