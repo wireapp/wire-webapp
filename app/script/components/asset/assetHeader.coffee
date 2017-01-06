@@ -24,6 +24,8 @@ class z.components.AssetHeader
   constructor: (params) ->
     @message = params.message
 
+    # TODO moment(message_et.timestamp).format('D.M HH:MM')
+
 
 ko.components.register 'asset-header',
   viewModel: z.components.AssetHeader

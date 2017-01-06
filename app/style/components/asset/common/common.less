@@ -21,12 +21,11 @@
 @border-radius: 4px;
 
 .asset-container-style {
-  position: relative;
+  background-color: fade(@graphite, 12%);
   display: flex;
   min-height: 64px;
-  padding: 12px;
-  flex-wrap: wrap;
-  background-color: fade(@graphite, 12%);
+  overflow: hidden;
+  position: relative;
 
   & + & {
     margin-top: 1px;

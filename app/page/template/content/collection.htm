@@ -40,14 +40,9 @@
               <span class="label-bold-xs">Links</span>
               <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('links', links()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': links().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
             </header>
-            <div>
+            <div class="collection-images">
               <!-- ko foreach: {data: links.slice(0,4), as: 'message_et'} -->
-                <header class="collection-link-header">
-                  <user-avatar class="user-avatar-xs" params="user: message_et.user"></user-avatar>
-                  <span class="label-bold-xs" data-bind="text: message_et.sender_name()"></span>
-                  <span class="collection-link-timestamp label-xs text-graphite" data-bind="text: moment(message_et.timestamp).format('D.M HH:MM')"></span>
-                </header>
-                <link-preview-asset class="collection-link" params="preview: message_et.get_first_asset().previews()[0]"></link-preview-asset>
+                <link-preview-compact-asset params="message: message_et"></link-preview-compact-asset>
               <!-- /ko -->
             </div>
           </section>

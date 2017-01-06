@@ -46,9 +46,9 @@ class z.ViewModel.content.CollectionViewModel
       # TODO intermediate arrays or rateLimit
       for message_et, i in message_ets
         switch
-          when (message_et.category & z.message.MessageCategory.IMAGE) is z.message.MessageCategory.IMAGE
+          when message_et.category & z.message.MessageCategory.IMAGE
             @images.push message_et
-          when (message_et.category & z.message.MessageCategory.FILE) is z.message.MessageCategory.FILE
+          when message_et.category & z.message.MessageCategory.FILE
             asset_et = message_et.get_first_asset()
             switch
               when asset_et.is_video()
@@ -57,7 +57,7 @@ class z.ViewModel.content.CollectionViewModel
                 @audio.push message_et
               else
                 @files.push message_et
-          when (message_et.category & z.message.MessageCategory.LINK_PREVIEW) is z.message.MessageCategory.LINK_PREVIEW
+          when message_et.category & z.message.MessageCategory.LINK_PREVIEW
             @links.push message_et
 
   removed_from_view: =>
