@@ -63,7 +63,7 @@ class z.announce.AnnounceRepository
 
           notification = new window.Notification announcement.title,
             body: announcement.message
-            icon: if z.util.Environment.electron and z.util.Environment.os.mac then '' else window.notification_icon or '/image/logo/notification.png'
+            icon: if z.util.Environment.electron and z.util.Environment.os.mac then '' else '/image/logo/notification.png'
             sticky: true
             requireInteraction: true
 

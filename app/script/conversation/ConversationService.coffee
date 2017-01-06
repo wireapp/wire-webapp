@@ -88,6 +88,18 @@ class z.conversation.ConversationService
   ###############################################################################
 
   ###
+  Remove bot from conversation.
+
+  @param conversation_id [String] ID of conversation to remove bot from
+  @param user_id [String] ID of bot to be removed from the the conversation
+  @param callback [Function] Function to be called on server return
+  ###
+  delete_bots: (conversation_id, user_id) ->
+    @client.send_request
+      url: @client.create_url "/conversations/#{conversation_id}/bots/#{user_id}"
+      type: 'DELETE'
+
+  ###
   Remove member from conversation.
 
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/removeMember

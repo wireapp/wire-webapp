@@ -266,6 +266,7 @@ z.string.tr.conversation_context_menu_unlike = 'Beğenme'
 z.string.tr.conversation_delete_timestamp = '%@timestamp ’da silinmiş'
 z.string.tr.conversation_edit_timestamp = '%@timestamp ’da düzenlenmiş'
 z.string.tr.conversation_likes_caption = '%@number kişi'
+z.string.tr.conversation_send_pasted_file = 'Yapıştırılmış resim, %date ’de'
 
 # Archive
 z.string.tr.archive_header = 'Arşivle'
@@ -287,7 +288,11 @@ z.string.tr.conversations_popover_silence = 'Sustur'
 z.string.tr.conversations_popover_unarchive = 'Arşivden Çıkar'
 
 # Takeover
+z.string.tr.takeover_headline = 'Kullanıcı adları burada.'
+z.string.tr.takeover_sub = 'Wire üzerinden size özel isminizi hemen alın.'
 z.string.tr.takeover_link = 'Daha fazla bilgi'
+z.string.tr.takeover_button_choose = 'Kendininkini seç'
+z.string.tr.takeover_button_keep = 'Bunu sakla'
 
 # Invites
 z.string.tr.invite_meta_key_mac = 'Cmd'
@@ -295,6 +300,7 @@ z.string.tr.invite_meta_key_pc = 'Ctrl'
 z.string.tr.invite_hint_selected = 'Kopyalamak için %meta_key + C'
 z.string.tr.invite_hint_unselected = 'Seç ve %meta_key + C tuşlarına bas'
 z.string.tr.invite_headline = 'İnsanların Wire’a davet et'
+z.string.tr.invite_message = 'Wire’dayım, %username olarak arat ya da wire.com/download bu adresi ziyaret et.'
 z.string.tr.invite_message_no_email = 'Wire’dayım. https://get.wire.com ’u ziyaret ederek bana bağlanabilirsin.'
 
 # Extensions
@@ -319,7 +325,6 @@ z.string.tr.people_no_matches = 'Eşleşen sonuç yok.\nBaşka bir isim girmeyi 
 z.string.tr.people_invite = 'İnsanları davet et'
 z.string.tr.people_share = 'Kişileri Paylaş'
 z.string.tr.people_bring_your_friends = 'Arkadaşlarını Wire’a getir'
-z.string.tr.people_invite_detail = 'Kişileriniz paylaşmak, başkalarıyla bağlanmanızı kolaylaştırır. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.'
 z.string.tr.people_invite_button_contacts = 'Kişilerden'
 z.string.tr.people_invite_button_gmail = 'Gmail’den'
 z.string.tr.people_invite_headline = 'Arkadaşlarınızı getirin'
@@ -399,6 +404,9 @@ z.string.tr.preferences_account_reset_password = 'Şifreni sıfırla'
 z.string.tr.preferences_account_delete = 'Hesabı Sil'
 z.string.tr.preferences_account_log_out = 'Çıkış yap'
 z.string.tr.preferences_account_username_placeholder = 'Tam adınız'
+z.string.tr.preferences_account_username_hint = 'En az 2 karakter. a—z, 0—9, ve yalnızca _.'
+z.string.tr.preferences_account_username_available = 'Alınabilir'
+z.string.tr.preferences_account_username_error_taken = 'Çoktan alınmış'
 
 z.string.tr.preferences_av_camera = 'Kamera'
 z.string.tr.preferences_av_microphone = 'Mikrofon'
@@ -446,16 +454,13 @@ z.string.tr.search_group_hint = 'Yazmaya devam edin ya da bir grup oluşturmak i
 z.string.tr.search_connect = 'Bağlan'
 z.string.tr.search_connections = 'Bağlantılar'
 z.string.tr.search_groups = 'Gruplar'
-z.string.tr.search_placeholder = 'İsme veya e-postaya göre ara'
+z.string.tr.search_placeholder = 'İsim veya kullanıcı adına göre ara'
 z.string.tr.search_top_people = 'Enler'
-z.string.tr.search_try_search = 'İnsanları isim veya tam e-posta adreslerine göre bulun'
-z.string.tr.search_no_contacts_on_wire = 'Wire’da hiç kişiniz yok.\nİnsanları isimlerini kullanarak ya da\ne-posta adresleriyle bulmayı deneyin'
+z.string.tr.search_try_search = 'İnsanları isimlerine veya kullanıcı adlarına göre bul'
+z.string.tr.search_no_contacts_on_wire = 'Wire’da hiç kişiniz yok. İnsanları isimlerine veya kullanıcı adlarına göre bulmayı deneyin.'
 z.string.tr.search_others = 'Bağlan'
-
-# Picture upload
-z.string.tr.upload_welcome = 'Wire bir fotoğrafla çok daha iyi.'
-z.string.tr.upload_welcome_keep = 'bunu sakla'
-z.string.tr.upload_welcome_choose = 'kendininkini seç'
+z.string.tr.search_friend_in_common = '%no ortak kişi'
+z.string.tr.search_friends_in_common = '%no ortak kişi'
 
 # Google contacts upload
 z.string.tr.upload_google_headline = 'Konuşmak için\ninsanları bul.'
@@ -465,7 +470,6 @@ z.string.tr.upload_google_message_error = 'Bilgilerinzi alamadık. Lütfen kişi
 z.string.tr.upload_google_button_again = 'Tekrar deneyin'
 
 # URLs
-z.string.tr.url_password_reset = 'https://wire.com/forgot/'
 z.string.tr.url_legal = 'https://wire.com/legal/'
 z.string.tr.url_privacy = 'https://wire.com/privacy/'
 z.string.tr.url_privacy_why = 'https://wire.com/privacy/why/'
@@ -483,6 +487,7 @@ z.string.tr.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/a
 z.string.tr.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.tr.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
 z.string.tr.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.tr.url_support_usernames = 'https://wire.com/support/username'
 z.string.tr.url_decrypt_error_1 = 'https://wire.com/privacy/error-1'
 z.string.tr.url_decrypt_error_2 = 'https://wire.com/privacy/error-2'
 

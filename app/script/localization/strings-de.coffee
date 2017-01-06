@@ -268,6 +268,7 @@ z.string.de.conversation_context_menu_unlike = 'Gefällt mir nicht mehr'
 z.string.de.conversation_delete_timestamp = 'Gelöscht um %@timestamp'
 z.string.de.conversation_edit_timestamp = 'Editiert um %@timestamp'
 z.string.de.conversation_likes_caption = '%@number Personen'
+z.string.de.conversation_send_pasted_file = 'Bild eingefügt am %date'
 
 # Archive
 z.string.de.archive_header = 'Archivieren'
@@ -448,7 +449,8 @@ z.string.de.preferences_options_data_checkbox = 'Nutzungs- und Fehlerberichte'
 z.string.de.preferences_options_data_detail = 'Hilf uns, Wire durch das Senden anonymisierter Informationen zu verbessern.'
 z.string.de.preferences_options_notifications = 'Benachrichtigungen'
 z.string.de.preferences_options_notifications_none = 'Aus'
-z.string.de.preferences_options_notifications_obfuscate = 'Nachrichteninhalt verbergen'
+z.string.de.preferences_options_notifications_obfuscate = 'Details verbergen'
+z.string.de.preferences_options_notifications_obfuscate_message = 'Absendername zeigen'
 z.string.de.preferences_options_notifications_on = 'Zeige Absendername und Nachricht'
 
 # Search
@@ -472,7 +474,7 @@ z.string.de.upload_google_message_error = 'Wir haben die Informationen nicht erh
 z.string.de.upload_google_button_again = 'Erneut versuchen'
 
 # URLs
-z.string.de.url_password_reset = 'https://wire.com/forgot/?hl=de'
+z.string.de.url_password_reset = 'forgot/?hl=de'
 z.string.de.url_legal = 'https://wire.com/legal/?hl=de'
 z.string.de.url_privacy = 'https://wire.com/privacy/?hl=de'
 z.string.de.url_privacy_why = 'https://wire.com/privacy/why/'
