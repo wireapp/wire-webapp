@@ -2349,7 +2349,8 @@ class z.conversation.ConversationRepository
   _update_link_preview: (conversation_et, event_json) =>
     @get_message_in_conversation_by_id conversation_et, event_json.id
     .then (original_message_et) =>
-      @_delete_message conversation_et, original_message_et
+      if original_message_et.get_first_asset().previews().length is 0
+        @_delete_message conversation_et, original_message_et
     .then ->
       return event_json
 
