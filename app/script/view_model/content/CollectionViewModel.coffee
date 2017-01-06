@@ -46,7 +46,7 @@ class z.ViewModel.content.CollectionViewModel
       # TODO intermediate arrays or rateLimit
       for message_et, i in message_ets
         switch
-          when message_et.category & z.message.MessageCategory.IMAGE
+          when message_et.category & z.message.MessageCategory.IMAGE and not (message_et.category & z.message.MessageCategory.GIF)
             @images.push message_et
           when message_et.category & z.message.MessageCategory.FILE
             asset_et = message_et.get_first_asset()
