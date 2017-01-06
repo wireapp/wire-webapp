@@ -39,19 +39,19 @@
 
         <!-- ko if: template() === 'files' -->
           <!-- ko foreach: {data: items(), as: 'message_et'} -->
-            <file-asset class="collection-file" params="asset: message_et.get_first_asset()"></file-asset>
+            <file-asset class="collection-file" params="message: message_et"></file-asset>
           <!-- /ko -->
         <!-- /ko -->
 
         <!-- ko if: template() === 'audio' -->
           <!-- ko foreach: {data: items(), as: 'message_et'} -->
-            <audio-asset class="collection-file" params="asset: message_et.get_first_asset()"></audio-asset>
+            <audio-asset class="collection-file" params="message: message_et"></audio-asset>
           <!-- /ko -->
         <!-- /ko -->
 
         <!-- ko if: template() === 'video' -->
           <!-- ko foreach: {data: items(), as: 'message_et'} -->
-            <video-asset class="collection-file" params="asset: message_et.get_first_asset()"></video-asset>
+            <video-asset class="collection-file" params="message: message_et"></video-asset>
           <!-- /ko -->
         <!-- /ko -->
 

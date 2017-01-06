@@ -294,8 +294,8 @@ class z.conversation.ConversationService
 
   load_events_with_category_from_db: (conversation_id, category) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-    .where '[conversation+category]'
-    .between [conversation_id, category], [conversation_id, z.message.MessageCategory.LIKED], true, true
+    .where '[conversation+time+category]'
+    .between [conversation_id, new Date(0).toISOString(), category], [conversation_id, new Date().toISOString(), z.message.MessageCategory.LIKED], true, true
     .toArray()
 
   ###
