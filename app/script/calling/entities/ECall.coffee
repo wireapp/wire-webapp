@@ -90,6 +90,7 @@ class z.calling.entities.ECall
     # Observable subscriptions
     @is_connected.subscribe (is_connected) =>
       return unless is_connected
+      @telemetry.track_event z.tracking.EventName.CALLING.ESTABLISHED_CALL, @
       @timer_start = Date.now() - 100
       @call_timer_interval = window.setInterval =>
         @update_timer_duration()
@@ -109,6 +110,7 @@ class z.calling.entities.ECall
       return if is_joined
       @is_connected false
       amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP if @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
+      @telemetry.track_duration @
       @_reset_timer()
       @_reset_e_flows()
 
@@ -121,6 +123,10 @@ class z.calling.entities.ECall
         @_on_state_stop_ringing()
       else if state in z.calling.enum.CallStateGroups.IS_RINGING
         @_on_state_start_ringing state is z.calling.enum.CallState.INCOMING
+
+      if state is z.calling.enum.CallState.CONNECTING
+        attributes = direction: if @previous_state is z.calling.enum.CallState.OUTGOING then z.calling.enum.CallState.OUTGOING else z.calling.enum.CallState.INCOMING
+        @telemetry.track_event z.tracking.EventName.CALLING.JOINED_CALL, @, attributes
 
       @previous_state = state
 

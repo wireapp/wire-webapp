@@ -44,7 +44,7 @@ class z.calling.belfry.CallCenter
     @logger = new z.util.Logger 'z.calling.belfry.CallCenter', z.config.LOGGER.OPTIONS
 
     # Telemetry
-    @telemetry = new z.telemetry.calling.CallTelemetry()
+    @telemetry = new z.telemetry.calling.CallTelemetry z.calling.enum.PROTOCOL_VERSION.BELFRY
     @timings = undefined
 
     # Media Handler

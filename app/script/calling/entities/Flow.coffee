@@ -739,8 +739,7 @@ class z.calling.entities.Flow
         for rtp_sender in @peer_connection.getSenders() when rtp_sender.track.kind is media_stream_info.type
           return rtp_sender
         throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.NO_REPLACEABLE_TRACK
-      else
-        throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
+      throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
     .then (rtp_sender) ->
       return rtp_sender.replaceTrack media_stream_info.stream.getTracks()[0]
     .then =>

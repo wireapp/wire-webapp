@@ -22,10 +22,11 @@ z.telemetry.calling ?= {}
 
 # Call traces entity.
 class z.telemetry.calling.CallTelemetry
-  constructor: ->
+  constructor: (protocol_version) ->
     @logger = new z.util.Logger 'z.telemetry.calling.CallTelemetry', z.config.LOGGER.OPTIONS
 
     @sessions = {}
+    @protocol_version = if protocol_version is z.calling.enum.PROTOCOL_VERSION.BELFRY then 'C2' else 'C3'
 
 
   ###############################################################################
@@ -87,6 +88,7 @@ class z.telemetry.calling.CallTelemetry
         conversation_participants: call_et.conversation_et.number_of_participants()
         conversation_participants_in_call: call_et.max_number_of_participants
         conversation_type: if call_et.is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
+        version: @protocol_version
         with_bot: call_et.conversation_et.is_with_bot()
       , attributes
 
@@ -126,6 +128,7 @@ class z.telemetry.calling.CallTelemetry
         duration: duration_bucket
         duration_sec: duration
         reason: call_et.finished_reason
+        version: @protocol_version
         with_bot: call_et.conversation_et.is_with_bot()
 
       event_name = z.tracking.EventName.CALLING.ENDED_CALL

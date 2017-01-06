@@ -43,7 +43,7 @@ class z.calling.e_call.ECallCenter
     @logger = new z.util.Logger 'z.calling.e_call.ECallCenter', z.config.LOGGER.OPTIONS
 
     # Telemetry
-    @telemetry = new z.telemetry.calling.CallTelemetry()
+    @telemetry = new z.telemetry.calling.CallTelemetry z.calling.enum.PROTOCOL_VERSION.E_CALL
 
     # Media Handler
     @media_devices_handler = @media_repository.devices_handler
@@ -450,6 +450,7 @@ class z.calling.e_call.ECallCenter
         e_call_et.add_participant remote_user_et, e_call_message
       .then (e_call_et) =>
         @media_stream_handler.initiate_media_stream e_call_et.id, true if e_call_et.is_remote_video_send()
+        @telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, e_call_et
         @_send_call_notification e_call_et, user_id, z.calling.enum.CallState.INCOMING
 
 
@@ -482,6 +483,7 @@ class z.calling.e_call.ECallCenter
     .then (e_call_et) =>
       @logger.debug "Outgoing '#{@_get_media_type_from_properties e_call_message.props}' e-call in conversation '#{e_call_et.conversation_et.display_name()}'", e_call_et
       e_call_et.state z.calling.enum.CallState.OUTGOING
+      @telemetry.track_event z.tracking.EventName.CALLING.INITIATED_CALL, e_call_et
       return e_call_et
 
 
