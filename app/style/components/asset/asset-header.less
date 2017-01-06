@@ -17,33 +17,19 @@
  *
  */
 
-// Variables
-@border-radius: 4px;
-
-.asset-container-style {
-  position: relative;
+asset-header {
   display: flex;
-  min-height: 64px;
-  padding: 12px;
-  flex-wrap: wrap;
-  background-color: fade(@graphite, 12%);
-
-  & + & {
-    margin-top: 1px;
-  }
-
-  &:last-child {
-    border-bottom-left-radius: @border-radius;
-    border-bottom-right-radius: @border-radius;
-  }
-
-  &:first-child {
-    border-top-left-radius: @border-radius;
-    border-top-right-radius: @border-radius;
-  }
+  font-size: @font-size-xs;
+  justify-content: space-between;
+  line-height: @line-height-sm;
+  margin-bottom: 8px;
+  width: 100%;
 }
 
-.asset-placeholder {
-  .full-screen;
-  .flex-center;
+.asset-header-name {
+  font-weight: 500;
+}
+
+.asset-header-time {
+  color: @graphite;
 }

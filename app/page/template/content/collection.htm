@@ -10,9 +10,7 @@
         <span class="content-titlebar-icon icon-back" data-bind="click: click_on_back_button"></span>
       </div>
 
-      <span class="content-titlebar-items-center">
-        <span><span class="label-bold-xs">Collection</span> <span class="text-graphite">in</span> <span class="text-graphite" data-bind="text: conversation_et().display_name()"></span></span>
-      </span>
+      <span class="content-titlebar-items-center" data-bind="text: conversation_et().display_name()"></span>
 
     </div>
 
@@ -43,7 +41,7 @@
               <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('links', links()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': links().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
             </header>
             <div>
-              <!-- ko foreach: {data: links.slice(0,2), as: 'message_et'} -->
+              <!-- ko foreach: {data: links.slice(0,4), as: 'message_et'} -->
                 <header class="collection-link-header">
                   <user-avatar class="user-avatar-xs" params="user: message_et.user"></user-avatar>
                   <span class="label-bold-xs" data-bind="text: message_et.sender_name()"></span>
@@ -63,7 +61,7 @@
               <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('video', video()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': video().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
             </header>
             <div class="collection-images">
-              <!-- ko foreach: {data: video.slice(0,5), as: 'message_et'} -->
+              <!-- ko foreach: {data: video.slice(0,4), as: 'message_et'} -->
                 <video-asset class="collection-video" params="asset: message_et.get_first_asset()"></video-asset>
               <!-- /ko -->
             </div>
@@ -78,8 +76,8 @@
               <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('audio', audio()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': audio().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
             </header>
             <div class="collection-images">
-              <!-- ko foreach: {data: audio.slice(0,2), as: 'message_et'} -->
-                <audio-asset class="collection-file" params="asset: message_et.get_first_asset()"></audio-asset>
+              <!-- ko foreach: {data: audio.slice(0,4), as: 'message_et'} -->
+                <audio-asset class="collection-file" params="asset: message_et.get_first_asset(), header: true"></audio-asset>
               <!-- /ko -->
             </div>
           </section>
@@ -93,8 +91,8 @@
               <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('files', files()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': files().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
             </header>
             <div class="collection-images">
-              <!-- ko foreach: {data: files.slice(0,2), as: 'message_et'} -->
-                <file-asset class="collection-file" params="asset: message_et.get_first_asset()"></file-asset>
+              <!-- ko foreach: {data: files.slice(0,4), as: 'message_et'} -->
+                <file-asset class="collection-file" params="asset: message_et.get_first_asset(), header: true"></file-asset>
               <!-- /ko -->
             </div>
           </section>

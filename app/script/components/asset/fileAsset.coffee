@@ -28,6 +28,7 @@ class z.components.FileAssetComponent
   ###
   constructor: (params, component_info) ->
     @asset = ko.unwrap params.asset
+    @header = params.header or false
     @expired = params.expired or ko.observable false
 
     @circle_upload_progress = ko.pureComputed =>
@@ -51,6 +52,9 @@ ko.components.register 'file-asset',
               <div class="file bg-color-ephemeral icon-file text-white flex-center"></div>
             <!-- /ko -->
             <!-- ko ifnot: expired() -->
+              <!-- ko if: header -->
+                <asset-header></asset-header>
+              <!-- /ko -->
               <div class="file"
                  data-uie-name="file"
                  data-bind="attr: {'data-uie-value': asset.file_name},
