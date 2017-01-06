@@ -100,7 +100,6 @@ class z.cryptography.CryptographyMapper
       throw error
 
   _map_calling: (calling) ->
-    @logger.warn "INBOUND e-call message\n\n#{calling.content}"
     return {
       content: JSON.parse calling.content
       type: z.event.Client.CALL.E_CALL

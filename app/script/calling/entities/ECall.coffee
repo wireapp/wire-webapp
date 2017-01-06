@@ -196,6 +196,8 @@ class z.calling.entities.ECall
   ###
   add_participant: (user_et, e_call_message) =>
     @get_participant_by_id user_et.id
+    .then =>
+      @update_participant user_et, e_call_message
     .catch (error) =>
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
 

@@ -77,9 +77,6 @@ class z.calling.entities.EFlow
 
     @connection_state.subscribe (ice_connection_state) =>
       switch ice_connection_state
-        when z.calling.rtc.ICEConnectionState.CHECKING
-          @logger.info 'Checking for ICE candidates on PeerConnection'
-
         when z.calling.rtc.ICEConnectionState.COMPLETED, z.calling.rtc.ICEConnectionState.CONNECTED
           @telemetry.start_statistics()
           @e_call_et.is_connected true
@@ -124,9 +121,6 @@ class z.calling.entities.EFlow
     @negotiation_mode.subscribe (negotiation_mode) =>
       @logger.debug "Negotiation mode changed: #{negotiation_mode}"
 
-    @negotiation_needed.subscribe (negotiation_needed) =>
-      @logger.debug 'State changed - negotiation needed: true' if negotiation_needed
-
 
     ###############################################################################
     # Local SDP
@@ -137,12 +131,11 @@ class z.calling.entities.EFlow
     @local_sdp.subscribe (sdp) =>
       if sdp
         @local_sdp_type sdp.type
-        if @has_sent_local_sdp()
-          @has_sent_local_sdp false
-          @should_add_local_sdp true
+        @has_sent_local_sdp false
+        @should_set_local_sdp true
 
     @has_sent_local_sdp = ko.observable false
-    @should_add_local_sdp = ko.observable true
+    @should_set_local_sdp = ko.observable false
 
     @send_sdp_timeout = undefined
 
@@ -157,12 +150,10 @@ class z.calling.entities.EFlow
       in_stable_state = @signaling_state() is z.calling.rtc.SignalingState.STABLE
       in_proper_state = (is_offer and in_stable_state) or (is_answer and in_remote_offer_state)
 
-      return @local_sdp() and @should_add_local_sdp() and in_proper_state and not in_progress
+      return @local_sdp() and @should_set_local_sdp() and in_proper_state and not in_progress
 
     @can_set_local_sdp.subscribe (can_set) =>
-      if can_set
-        @logger.debug "State changed - can_set_local_sdp: #{can_set}"
-        @_set_local_sdp()
+      @_set_local_sdp() if can_set
 
 
     ###############################################################################
@@ -174,9 +165,9 @@ class z.calling.entities.EFlow
     @remote_sdp.subscribe (sdp) =>
       if sdp
         @remote_sdp_type sdp.type
-        @should_add_remote_sdp true
+        @should_set_remote_sdp true
 
-    @should_add_remote_sdp = ko.observable false
+    @should_set_remote_sdp = ko.observable false
 
     @can_set_remote_sdp = ko.pureComputed =>
       is_answer = @remote_sdp_type() is z.calling.rtc.SDPType.ANSWER
@@ -185,15 +176,10 @@ class z.calling.entities.EFlow
       in_stable_state = @signaling_state() is z.calling.rtc.SignalingState.STABLE
       in_proper_state = (is_offer and in_stable_state) or (is_answer and in_local_offer_state)
 
-      return @pc_initialized() and @should_add_remote_sdp() and in_proper_state
+      return @pc_initialized() and @should_set_remote_sdp() and in_proper_state
 
     @can_set_remote_sdp.subscribe (can_set) =>
-      if can_set
-        @logger.debug "State changed - can_set_remote_sdp: #{can_set}"
-        @_set_remote_sdp()
-        .then =>
-          if @has_sent_local_sdp() and @remote_sdp().type is z.calling.rtc.SDPType.OFFER
-            @is_answer true
+      @_set_remote_sdp() if can_set
 
 
     ###############################################################################
@@ -205,20 +191,13 @@ class z.calling.entities.EFlow
       can_create = @pc_initialized() and in_state_for_creation
       return can_create
 
-    @can_create_sdp.subscribe (can_create) =>
-      if can_create
-        @logger.debug "State changed - can_create_sdp: #{can_create}"
-
     @can_create_answer = ko.pureComputed =>
       answer_state = @is_answer() and @signaling_state() is z.calling.rtc.SignalingState.REMOTE_OFFER
       can_create = @can_create_sdp() and answer_state
       return can_create
 
     @can_create_answer.subscribe (can_create) =>
-      if can_create
-        @logger.debug "State changed - can_create_answer: #{can_create}"
-        @negotiation_needed false
-        @_create_answer()
+      @_create_answer() if can_create
 
     @can_create_offer = ko.pureComputed =>
       offer_state = not @is_answer() and @signaling_state() is z.calling.rtc.SignalingState.STABLE
@@ -226,10 +205,7 @@ class z.calling.entities.EFlow
       return can_create
 
     @can_create_offer.subscribe (can_create) =>
-      if can_create
-        @logger.debug "State changed - can_create_offer: #{can_create}"
-        @negotiation_needed false
-        @_create_offer()
+      @_create_offer() if can_create
 
     @initialize_e_flow e_call_message
 
@@ -240,12 +216,9 @@ class z.calling.entities.EFlow
   ###
   initialize_e_flow: (e_call_message) =>
     if e_call_message
-      @logger.info "We are not the creator of flow with user '#{@remote_user.name()}'"
       @is_answer true
-      @save_remote_sdp e_call_message
-    else
-      @logger.info "We are the creator of flow with user '#{@remote_user.name()}'"
-      @is_answer false
+      return @save_remote_sdp e_call_message
+    @is_answer false
 
   start_negotiation: =>
     @audio.hookup true
@@ -264,12 +237,11 @@ class z.calling.entities.EFlow
   @private
   ###
   _close_peer_connection: ->
-    @logger.info "Closing PeerConnection with '#{@remote_user.name()}'"
     if @peer_connection?
-      @peer_connection.onsignalingstatechange = =>
-        @logger.debug "State change ignored - signaling state: #{@peer_connection.signalingState}"
+      @peer_connection.oniceconnectionstatechange = => @logger.log @logger.levels.off, 'State change ignored - ICE connection'
+      @peer_connection.onsignalingstatechange = => @logger.log @logger.levels.off, "State change ignored - signaling state: #{@peer_connection.signalingState}"
       @peer_connection.close()
-    @logger.debug 'Closing PeerConnection successful'
+      @logger.debug "Closing PeerConnection '#{@remote_user.name()}' successful"
 
   ###
   Create the PeerConnection configuration.
@@ -292,14 +264,13 @@ class z.calling.entities.EFlow
     @peer_connection = new window.RTCPeerConnection @_create_peer_connection_configuration()
     @telemetry.time_step z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED
     @signaling_state @peer_connection.signalingState
-    @logger.debug "PeerConnection with '#{@remote_user.name()}' created", @e_call_et.config().ice_servers
+    @logger.debug "PeerConnection with '#{@remote_user.name()}' created - is_answer' #{@is_answer()}", @e_call_et.config().ice_servers
 
     @peer_connection.onaddstream = @_on_add_stream
     @peer_connection.onaddtrack = @_on_add_track
     @peer_connection.ondatachannel = @_on_data_channel
     @peer_connection.onicecandidate = @_on_ice_candidate
     @peer_connection.oniceconnectionstatechange = @_on_ice_connection_state_change
-    @peer_connection.onnegotiationneeded = @_on_negotiation_needed
     @peer_connection.onremovestream = @_on_remove_stream
     @peer_connection.onremovetrack = @_on_remove_track
     @peer_connection.onsignalingstatechange = @_on_signaling_state_change
@@ -344,12 +315,10 @@ class z.calling.entities.EFlow
   ###
   _on_ice_candidate: (event) =>
     unless event.candidate
-      if @has_sent_local_sdp()
-        return @logger.info 'Generation of ICE candidates completed - SDP was already sent'
+      return if @has_sent_local_sdp()
       @logger.debug 'Generation of ICE candidates completed - sending SDP'
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.ICE_GATHERING_COMPLETED
       return @send_local_sdp()
-    @logger.info 'Generated additional ICE candidate', event
 
   # ICE connection state has changed.
   _on_ice_connection_state_change: (event) =>
@@ -361,11 +330,6 @@ class z.calling.entities.EFlow
 
     @gathering_state @peer_connection.iceGatheringState
     @connection_state @peer_connection.iceConnectionState
-
-  # SDP negotiation needed.
-  _on_negotiation_needed: (event) =>
-    unless @negotiation_needed()
-      @logger.debug 'State changed - negotiation needed: true', event
 
   # Signaling state has changed.
   _on_signaling_state_change: (event) =>
@@ -382,12 +346,10 @@ class z.calling.entities.EFlow
 
   _initialize_data_channel: (data_channel_label) ->
     if @peer_connection.createDataChannel
-      if @data_channels[data_channel_label]
-        return @logger.warn "Data channel '#{data_channel_label}' already exists"
+      return if @data_channels[data_channel_label]
       @_setup_data_channel @peer_connection.createDataChannel data_channel_label, {ordered: true}
 
   _setup_data_channel: (data_channel) ->
-    @logger.debug "Data channel '#{data_channel.label}' created", data_channel
     @data_channels[data_channel.label] = data_channel
     data_channel.onclose = @_on_close
     data_channel.onerror = @_on_error
@@ -395,9 +357,7 @@ class z.calling.entities.EFlow
     data_channel.onopen = @_on_open
 
   _on_data_channel: (event) =>
-    data_channel = event.channel
-    @logger.debug "Data channel '#{data_channel.label}' was received", data_channel
-    @_setup_data_channel data_channel
+    @_setup_data_channel event.channel
 
   _on_close: (event) =>
     data_channel = event.target
@@ -405,8 +365,7 @@ class z.calling.entities.EFlow
     delete @data_channels[data_channel.label]
     @e_call_et.data_channel_opened = false
 
-  _on_error: (error) =>
-    @logger.error "Data channel error: #{error.message}", event
+  _on_error: (error) -> throw error
 
   _on_message: (event) =>
     e_call_message = JSON.parse event.data
@@ -441,6 +400,9 @@ class z.calling.entities.EFlow
     .then ([ice_candidates, remote_sdp]) =>
       @remote_sdp remote_sdp
       @logger.info "Saved remote SDP of type '#{@remote_sdp().type}'", @remote_sdp()
+    .then =>
+      if @remote_sdp().type is z.calling.rtc.SDPType.OFFER and @signaling_state() is z.calling.rtc.SignalingState.LOCAL_OFFER
+        @_solve_colliding_states()
 
   # Initiates sending the local RTCSessionDescriptionProtocol to the remote user.
   send_local_sdp: =>
@@ -461,11 +423,21 @@ class z.calling.entities.EFlow
         @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful", @local_sdp()
 
   ###
+  Clear the SDP send timeout.
+  @private
+  ###
+  _clear_send_sdp_timeout: ->
+    if @send_sdp_timeout
+      window.clearTimeout @send_sdp_timeout
+      @send_sdp_timeout = undefined
+
+  ###
   Create a local SDP of type 'answer'.
   @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createAnswer
   @private
   ###
   _create_answer: ->
+    @negotiation_needed false
     @logger.info "Creating '#{z.calling.rtc.SDPType.ANSWER}' for flow with '#{@remote_user.name()}'"
     @peer_connection.createAnswer()
     .then (sdp_answer) =>
@@ -482,6 +454,7 @@ class z.calling.entities.EFlow
   @param restart [Boolean] Is ICE restart negotiation
   ###
   _create_offer: (restart) ->
+    @negotiation_needed false
     @_initialize_data_channel E_FLOW_CONFIG.RTC_DATA_CHANNEL_LABEL
 
     offer_options =
@@ -518,7 +491,7 @@ class z.calling.entities.EFlow
     .then =>
       @logger.debug "Setting local SDP of type '#{@local_sdp().type}' successful", @peer_connection.localDescription
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET
-      @should_add_local_sdp false
+      @should_set_local_sdp false
       @_set_send_sdp_timeout()
     .catch (error) =>
       @logger.error "Setting local SDP of type '#{@local_sdp().type}' failed: #{error.name} - #{error.message}", error
@@ -533,24 +506,40 @@ class z.calling.entities.EFlow
     .then =>
       @logger.debug "Setting remote SDP of type '#{@remote_sdp().type}' successful", @peer_connection.remoteDescription
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET
-      @should_add_remote_sdp false
+      @should_set_remote_sdp false
     .catch (error) =>
       @logger.error "Setting remote SDP of type '#{@remote_sdp().type}' failed: #{error.name} - #{error.message}", error
 
   ###
-  Clear the SDP send timeout.
+  Set the SDP send timeout.
   @private
   ###
-  _clear_send_sdp_timeout: ->
-    if @send_sdp_timeout
-      window.clearTimeout @send_sdp_timeout
-      @send_sdp_timeout = undefined
-
   _set_send_sdp_timeout: ->
     @send_sdp_timeout = window.setTimeout =>
       @logger.debug 'Sending local SDP on timeout'
       @send_local_sdp()
     , E_FLOW_CONFIG.SDP_SEND_TIMEOUT
+
+
+  ###############################################################################
+  # SDP state collision handling
+  ###############################################################################
+
+
+  ###
+  Solve colliding SDP states.
+  @note If we receive a remote offer while we have a local offer, we need to check who needs to switch his SDP type.
+  @private
+  ###
+  _solve_colliding_states: ->
+    if @self_user_id < @remote_user_id
+      @logger.warn "We need to switch SDP state of flow with '#{@remote_user.name()}' to answer."
+      @_close_peer_connection()
+      @_clear_send_sdp_timeout()
+      @_reset_signaling_states()
+      @is_answer true
+      return @start_negotiation()
+    @logger.warn "Remote side needs to switch SDP state of flow with '#{@remote_user.name()}' to answer."
 
 
   ###############################################################################
@@ -656,7 +645,7 @@ class z.calling.entities.EFlow
   @param media_stream [MediaStream] Local MediaStream to remove from the PeerConnection
   ###
   _remove_media_stream: (media_stream) ->
-    return @logger.info 'No PeerConnection found to remove MediaStream from' if not @peer_connection
+    return if not @peer_connection
 
     if @peer_connection.getSenders and @peer_connection.removeTrack
       for media_stream_track in media_stream.getTracks()
@@ -698,15 +687,10 @@ class z.calling.entities.EFlow
     @_clear_send_sdp_timeout()
     @telemetry.reset_statistics()
     @logger.info "Resetting flow with user '#{@remote_user.id}'"
-    try
-      if @peer_connection?.signalingState isnt z.calling.rtc.SignalingState.CLOSED
-        @_close_peer_connection()
-    catch error
-      @logger.error "We caught the #{error.name}: #{error.message}", error
+    @_close_peer_connection() if @peer_connection?.signalingState isnt z.calling.rtc.SignalingState.CLOSED
     @_remove_media_streams()
     @_reset_signaling_states()
     @pc_initialized false
-    @logger.debug "Resetting flow '#{@remote_user.id}' with user '#{@remote_user.name()}' successful"
 
   ###
   Reset the signaling states.

@@ -80,7 +80,6 @@ class z.calling.e_call.ECallCenter
     if Date.now() > E_CALL_CONFIG.EVENT_LIFETIME + new Date(event.time).getTime()
       return @logger.info "Ignored outdated '#{event.type}' event in conversation '#{event.conversation}'", {event_object: event, event_json: JSON.stringify event}
 
-    @logger.info "Handling '#{event.type}' event in conversation '#{event.conversation}'", {event_object: event, event_json: JSON.stringify event}
     if z.calling.CallingRepository.supports_calling()
       return @_on_event_in_supported_browsers event
     return @_on_event_in_unsupported_browsers event
@@ -218,7 +217,6 @@ class z.calling.e_call.ECallCenter
     .catch (error) =>
       throw error if error.type not in [z.calling.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED , z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND]
       @logger.debug "Sending e-call event of type '#{e_call_message.type}' to conversation '#{conversation_et.id}'", e_call_message.to_JSON()
-      @logger.warn "OUTBOUND e-call message\n\n#{e_call_message.to_content_string()}"
       @conversation_repository.send_e_call conversation_et, e_call_message.to_content_string()
 
   ###

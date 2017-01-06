@@ -155,10 +155,10 @@ class z.calling.entities.Flow
         @local_sdp_type sdp.type
         if @has_sent_local_sdp()
           @has_sent_local_sdp false
-          @should_add_local_sdp true
+          @should_set_local_sdp true
 
     @has_sent_local_sdp = ko.observable false
-    @should_add_local_sdp = ko.observable true
+    @should_set_local_sdp = ko.observable true
 
     @send_sdp_timeout = undefined
 
@@ -173,7 +173,7 @@ class z.calling.entities.Flow
       in_stable_state = @signaling_state() is z.calling.rtc.SignalingState.STABLE
       in_proper_state = (is_offer and in_stable_state) or (is_answer and in_remote_offer_state)
 
-      return @local_sdp() and @should_add_local_sdp() and in_proper_state and not in_progress
+      return @local_sdp() and @should_set_local_sdp() and in_proper_state and not in_progress
 
     @can_set_local_sdp.subscribe (can_set) =>
       if can_set
@@ -190,9 +190,9 @@ class z.calling.entities.Flow
     @remote_sdp.subscribe (sdp) =>
       if sdp
         @remote_sdp_type sdp.type
-        @should_add_remote_sdp true
+        @should_set_remote_sdp true
 
-    @should_add_remote_sdp = ko.observable false
+    @should_set_remote_sdp = ko.observable false
 
     @can_set_remote_sdp = ko.pureComputed =>
       is_answer = @remote_sdp_type() is z.calling.rtc.SDPType.ANSWER
@@ -201,15 +201,12 @@ class z.calling.entities.Flow
       in_stable_state = @signaling_state() is z.calling.rtc.SignalingState.STABLE
       in_proper_state = (is_offer and in_stable_state) or (is_answer and in_local_offer_state)
 
-      return @pc_initialized() and @should_add_remote_sdp() and in_proper_state
+      return @pc_initialized() and @should_set_remote_sdp() and in_proper_state
 
     @can_set_remote_sdp.subscribe (can_set) =>
       if can_set
         @logger.debug "State changed - can_set_remote_sdp: #{can_set}"
         @_set_remote_sdp()
-        .then =>
-          if @has_sent_local_sdp() and @remote_sdp().type is z.calling.rtc.SDPType.OFFER
-            @is_answer true
 
 
     ###############################################################################
@@ -472,6 +469,15 @@ class z.calling.entities.Flow
       amplify.publish z.event.WebApp.CALL.SIGNALING.SEND_LOCAL_SDP_INFO, sdp_info, on_success, on_failure
 
   ###
+  Clear the SDP send timeout.
+  @private
+  ###
+  _clear_send_sdp_timeout: ->
+    if @send_sdp_timeout
+      window.clearTimeout @send_sdp_timeout
+      @send_sdp_timeout = undefined
+
+  ###
   Create a local SDP of type 'answer'.
   @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createAnswer
   @private
@@ -526,7 +532,7 @@ class z.calling.entities.Flow
     .then =>
       @logger.debug "Setting local SDP of type '#{@local_sdp().type}' successful", @peer_connection.localDescription
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET
-      @should_add_local_sdp false
+      @should_set_local_sdp false
       @_set_send_sdp_timeout()
     .catch (error) =>
       @logger.error "Setting local SDP of type '#{@local_sdp().type}' failed: #{error.name} - #{error.message}", error
@@ -543,11 +549,23 @@ class z.calling.entities.Flow
     .then =>
       @logger.debug "Setting remote SDP of type '#{@remote_sdp().type}' successful", @peer_connection.remoteDescription
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET
-      @should_add_remote_sdp false
+      @should_set_remote_sdp false
     .catch (error) =>
       @logger.error "Setting remote SDP of type '#{@remote_sdp().type}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'set_sdp', location: 'remote', type: @remote_sdp()?.type}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
+
+  ###
+  Set the SDP send timeout.
+  @private
+  ###
+  _set_send_sdp_timeout: ->
+    @send_sdp_timeout = window.setTimeout @send_local_sdp, 1000
+
+
+  ###############################################################################
+  # SDP state collision handling
+  ###############################################################################
 
   ###
   Solve colliding SDP states.
@@ -555,50 +573,10 @@ class z.calling.entities.Flow
   @private
   ###
   _solve_colliding_states: ->
-    we_switched_state = false
     if @self_user_id < @remote_user_id
       @logger.warn "We need to switch state of flow with '#{@remote_user.name()}'. Local SDP needs to be changed."
-      we_switched_state = true
-      @_switch_local_sdp_state()
-    else
-      @logger.warn "Remote side needs to switch state of flow with '#{@remote_user.name()}'. Waiting for new remote SDP."
-
-    return we_switched_state
-
-  ###
-  Clear the SDP send timeout.
-  @private
-  ###
-  _clear_send_sdp_timeout: ->
-    if @send_sdp_timeout
-      window.clearTimeout @send_sdp_timeout
-      @send_sdp_timeout = undefined
-
-  _set_send_sdp_timeout: ->
-    @send_sdp_timeout = window.setTimeout @send_local_sdp, 1000
-
-
-  ###############################################################################
-  # SDP sate collision handling
-  ###############################################################################
-
-  ###
-  Switch the local SDP state.
-  @note Set converted flag first, because it influences the tear-down of the PeerConnection
-  @private
-  ###
-  _switch_local_sdp_state: ->
-    @logger.debug "Switching SDP type locally from #{@local_sdp_type()} to '#{z.calling.rtc.SDPType.ANSWER}'"
-
-    @converted_own_sdp_state true
-    @is_answer true
-    remote_sdp_cache = @remote_sdp()
-    @_close_peer_connection()
-    @_reset_signaling_states()
-    @_initialize_peer_connection()
-    @remote_sdp remote_sdp_cache
-    @_set_remote_sdp()
-    @converted_own_sdp_state false
+      return @_switch_local_sdp_state()
+    @logger.warn "Remote side needs to switch state of flow with '#{@remote_user.name()}'. Waiting for new remote SDP."
 
 
   ###############################################################################
