@@ -43,7 +43,6 @@ class z.ViewModel.content.ContentViewModel
     @message_list =               new z.ViewModel.MessageListViewModel 'message-list', @conversation_repository, @user_repository
     @participants =               new z.ViewModel.ParticipantsViewModel 'participants', @user_repository, @conversation_repository, @search_repository
     @giphy =                      new z.ViewModel.GiphyViewModel 'giphy-modal', @conversation_repository, @giphy_repository
-    @detail_view =                new z.ViewModel.ImageDetailViewViewModel 'detail-view'
 
     @preferences_account =        new z.ViewModel.content.PreferencesAccountViewModel 'preferences-account', @client_repository, @user_repository
     @preferences_av =             new z.ViewModel.content.PreferencesAVViewModel 'preferences-av', @audio_repository, @media_repository

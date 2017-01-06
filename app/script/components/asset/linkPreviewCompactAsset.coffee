@@ -34,6 +34,8 @@ class z.components.LinkPreviewCompactAssetComponent
     @element = component_info.element
     @url = @preview.original_url
 
+    @element.addEventListener 'click', @on_link_preview_click
+
   on_link_preview_click: =>
     z.util.safe_window_open @url
 
