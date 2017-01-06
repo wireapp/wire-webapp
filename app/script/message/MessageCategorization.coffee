@@ -51,6 +51,20 @@ z.message.MessagaCategorization = do ->
 
     return category
 
+  check_ping = (event) ->
+    category = z.message.MessageCategory.NONE
+
+    # TODO check ping
+
+    return category
+
+  check_location = (event) ->
+    category = z.message.MessageCategory.NONE
+
+    # TODO check location
+
+    return category
+
   category_from_event = (event) ->
 
     if event.ephemeral_expires # String, Number, true
@@ -61,6 +75,8 @@ z.message.MessagaCategorization = do ->
       check_text
       check_image
       check_file
+      check_ping
+      check_location
     ].map (check_fn) ->
       check_fn event
     .reduce (current, next) ->

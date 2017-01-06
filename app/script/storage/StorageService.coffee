@@ -180,6 +180,10 @@ class z.storage.StorageService
             event.time = new Date(event.time).toISOString()
       @db.version(9).stores version_9
       @db.version(10).stores version_10
+      .upgrade (transaction) =>
+        @logger.warn "Database upgrade to version #{@db.verno}", transaction
+        transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
+          event.category = z.message.MessagaCategorization.category_from_event event
 
       @db.open()
       .then =>
