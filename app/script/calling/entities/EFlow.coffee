@@ -131,11 +131,12 @@ class z.calling.entities.EFlow
     @local_sdp.subscribe (sdp) =>
       if sdp
         @local_sdp_type sdp.type
-        @has_sent_local_sdp false
-        @should_set_local_sdp true
+        if @has_sent_local_sdp()
+          @has_sent_local_sdp false
+          @should_set_local_sdp true
 
     @has_sent_local_sdp = ko.observable false
-    @should_set_local_sdp = ko.observable false
+    @should_set_local_sdp = ko.observable true
 
     @send_sdp_timeout = undefined
 
@@ -538,6 +539,7 @@ class z.calling.entities.EFlow
       @_clear_send_sdp_timeout()
       @_reset_signaling_states()
       @is_answer true
+      @local_sdp undefined
       return @start_negotiation()
     @logger.warn "Remote side needs to switch SDP state of flow with '#{@remote_user.name()}' to answer."
 

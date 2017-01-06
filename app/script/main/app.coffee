@@ -289,12 +289,12 @@ class z.main.App
       @repository.bot.add_bot bot_name
 
     assets_v3 = z.util.get_url_parameter z.auth.URLParameter.ASSETS_V3
-    if assets_v3
+    if assets_v3 is true
       @repository.conversation.use_v3_api = assets_v3
       @repository.user.use_v3_api = assets_v3
 
     calling_v3 = z.util.get_url_parameter z.auth.URLParameter.CALLING_V3
-    if calling_v3
+    if calling_v3 is true
       @repository.calling.use_v3_api = calling_v3
 
   ###

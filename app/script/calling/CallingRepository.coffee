@@ -50,7 +50,7 @@ class z.calling.CallingRepository
   constructor: (@call_service, @calling_service, @conversation_repository, @media_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.calling.CallingRepository', z.config.LOGGER.OPTIONS
 
-    @calling_config = ko.observable()
+    @calling_config = ko.observable {}
     @use_v3_api = false
 
     @call_center = new z.calling.belfry.CallCenter @calling_config, @call_service, @conversation_repository, @media_repository, @user_repository
@@ -100,7 +100,8 @@ class z.calling.CallingRepository
 
   handled_by_v3: (conversation_id) =>
     conversation_et = @conversation_repository.get_conversation_by_id conversation_id
-    return z.calling.enum.PROTOCOL_VERSION.BELFRY unless @use_v3_api and not conversation_et?.is_group()
+    v3_api_enabled = @use_v3_api or @calling_config().protocol_version is z.calling.enum.PROTOCOL_VERSION.E_CALL
+    return z.calling.enum.PROTOCOL_VERSION.BELFRY unless v3_api_enabled and not conversation_et?.is_group()
     return z.calling.enum.PROTOCOL_VERSION.E_CALL
 
   # Initiate calling config update.

@@ -82,7 +82,7 @@ z.util.get_url_parameter = (name) ->
   for param in params
     value = param.split '='
     if value[0] is name
-      return if value[1] then unescape value[1] else 'true'
+      return if value[1] then unescape value[1] else true
   return null
 
 
