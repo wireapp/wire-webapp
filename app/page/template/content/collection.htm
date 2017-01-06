@@ -23,7 +23,9 @@
             <header>
               <span class="collection-header-icon icon-library"></span>
               <span class="label-bold-xs">Pictures</span>
-              <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('images', images()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': images().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
+              <!-- ko if: images().length > 10 -->
+                <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('images', images()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': images().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
+              <!-- /ko -->
             </header>
             <div class="collection-images">
               <!-- ko foreach: {data: images.slice(0,10), as: 'message_et'} -->
@@ -38,7 +40,9 @@
             <header>
               <span class="collection-header-icon icon-link"></span>
               <span class="label-bold-xs">Links</span>
-              <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('links', links()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': links().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
+              <!-- ko if: links().length > 4 -->
+                <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('links', links()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': links().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
+              <!-- /ko -->
             </header>
             <div class="collection-images">
               <!-- ko foreach: {data: links.slice(0,4), as: 'message_et'} -->
@@ -53,7 +57,9 @@
             <header>
               <span class="collection-header-icon icon-video"></span>
               <span class="label-bold-xs">Videos</span>
-              <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('video', video()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': video().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
+              <!-- ko if: video().length > 4 -->
+                <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('video', video()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': video().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
+              <!-- /ko -->
             </header>
             <div class="collection-images">
               <!-- ko foreach: {data: video.slice(0,4), as: 'message_et'} -->
@@ -68,7 +74,9 @@
             <header>
               <span class="collection-header-icon icon-microphone"></span>
               <span class="label-bold-xs">Audio messages</span>
-              <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('audio', audio()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': audio().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
+              <!-- ko if: audio().length > 4 -->
+                <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('audio', audio()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': audio().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
+              <!-- /ko -->
             </header>
             <div class="collection-images">
               <!-- ko foreach: {data: audio.slice(0,4), as: 'message_et'} -->
@@ -83,7 +91,9 @@
             <header>
               <span class="collection-header-icon icon-file"></span>
               <span class="label-bold-xs">files</span>
-              <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('files', files()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': files().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
+              <!-- ko if: files().length > 4 -->
+                <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('files', files()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': files().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
+              <!-- /ko -->
             </header>
             <div class="collection-images">
               <!-- ko foreach: {data: files.slice(0,4), as: 'message_et'} -->
