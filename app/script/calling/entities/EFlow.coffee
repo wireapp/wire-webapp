@@ -63,13 +63,11 @@ class z.calling.entities.EFlow
     @peer_connection = undefined
     @pc_initialized = ko.observable false
     @pc_initialized.subscribe (is_initialized) =>
-      @telemetry.set_peer_connection @peer_connection
-      @telemetry.schedule_check 5000 if is_initialized
+      @telemetry.set_peer_connection @peer_connection if is_initialized
 
     @audio_stream = @e_call_et.local_audio_stream
     @video_stream = @e_call_et.local_video_stream
     @data_channels = {}
-
 
     @connection_state = ko.observable z.calling.rtc.ICEConnectionState.NEW
     @gathering_state = ko.observable z.calling.rtc.ICEGatheringState.NEW
@@ -165,6 +163,7 @@ class z.calling.entities.EFlow
     @remote_sdp = ko.observable undefined
     @remote_sdp.subscribe (sdp) =>
       if sdp
+        @telemetry.schedule_check 5000
         @remote_sdp_type sdp.type
         @should_set_remote_sdp true
 
@@ -372,9 +371,9 @@ class z.calling.entities.EFlow
     e_call_message = JSON.parse event.data
 
     if e_call_message.resp in [true, 'true']
-      @logger.debug "Received confirmation for e-call message of type '#{e_call_message.type}' via data channel", e_call_message
+      @logger.info "Received confirmation for e-call message of type '#{e_call_message.type}' via data channel", e_call_message
     else
-      @logger.debug "Received e-call message of type '#{e_call_message.type}' via data channel", e_call_message
+      @logger.info "Received e-call message of type '#{e_call_message.type}' via data channel", e_call_message
 
     amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND,
       conversation: @conversation_id
