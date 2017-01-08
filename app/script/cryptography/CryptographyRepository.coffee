@@ -198,20 +198,6 @@ class z.cryptography.CryptographyRepository
       @logger.error "Failed to get session for client '#{client_id}' of user '#{user_id}': #{error.message}", error
 
   ###
-  Get sessions.
-  @param user_client_map [Object] User client map to get sessions for
-  @return [Promise<Array<cryptobox.CryptoboxSession>>] Promise that resolves with an array of sessions
-  ###
-  get_sessions: (user_client_map) =>
-    [cryptobox_session_map, missing_session_map] = @_get_sessions_local user_client_map
-    @logger.info "Found local sessions for '#{Object.keys(cryptobox_session_map).length}' users", cryptobox_session_map
-
-    @_get_sessions_missing cryptobox_session_map, missing_session_map
-    .catch (error) =>
-      @logger.error "Failed to get sessions: #{error.message}", [error, user_client_map]
-      throw error
-
-  ###
   Save a session.
   @note Sessions MUST be saved AFTER encrypting messages, but BEFORE sending the encrypted message across the network.
   @param session [cryptobox.CryptoboxSession] Session to be saved
@@ -249,92 +235,6 @@ class z.cryptography.CryptographyRepository
     return session_ids
 
   ###
-  Get local session for a user client map.
-
-  @private
-  @param user_client_map [Object] User client map
-  @return [Array<Object, Object>] An array containing two user client maps. The first contains the found sessions.
-  ###
-  _get_sessions_local: (user_client_map) ->
-    cryptobox_session_map = {}
-    missing_session_map = {}
-    for user_id, client_ids of user_client_map
-      cryptobox_session_map[user_id] = {}
-      for client_id in client_ids
-        session = @load_session user_id, client_id
-
-        if session
-          cryptobox_session_map[user_id][client_id] = session
-        else
-          missing_session_map[user_id] ?= []
-          missing_session_map[user_id].push client_id
-    return [cryptobox_session_map, missing_session_map]
-
-  ###
-  Get missing session for a user client map.
-
-  @private
-  @param user_client_map [Object] User client map
-  @param missing_session_map [Object] Client session map
-  @return [Promise] Promise that resolves with a client session map
-  ###
-  _get_sessions_missing: (cryptobox_session_map, missing_session_map) ->
-    if Object.keys(missing_session_map).length > 0
-      @logger.info "Missing sessions for '#{Object.keys(missing_session_map).length}' users", missing_session_map
-      return @_initiate_new_sessions cryptobox_session_map, missing_session_map
-    else
-      return Promise.resolve cryptobox_session_map
-
-  ###
-  Initiate a new session for a given client.
-
-  @private
-  @param user_id [String] User ID for the remote participant
-  @param client_id [String] Client ID of the remote participant
-  @return [Promise<cryptobox.CryptoboxSession>] Promise that resolves with the new session
-  ###
-  _initiate_new_session: (user_id, client_id) ->
-    @get_user_pre_key user_id, client_id
-    .then (pre_key) =>
-      return @_session_from_prekey user_id, client_id, pre_key.key
-    .catch (error) =>
-      switch error.type
-        when z.user.UserError::TYPE.PRE_KEY_NOT_FOUND
-          amplify.publish z.event.WebApp.CLIENT.REMOVE, user_id, client_id
-        when z.user.UserError::TYPE.REQUEST_FAILURE
-          @logger.warn "Failed to request pre-key for client '#{client_id}' of user '#{user_id}'': #{error.message}", error
-        else
-          @logger.error "Failed to initialize session from pre-key for client '#{client_id}' of user '#{user_id}': #{error.message}", error
-
-  ###
-  Initiate new sessions for a given map.
-
-  @private
-  @param cryptobox_session_map [Object] User client map of containing the known sessions
-  @param user_client_map [Object] User client map of missing sessions
-  @return [Promise] Promise that resolves with a user client map containing the new sessions
-  ###
-  _initiate_new_sessions: (cryptobox_session_map, user_client_map) ->
-    @get_users_pre_keys user_client_map
-    .then (user_pre_key_map) =>
-      @logger.info "Fetched pre-keys for '#{Object.keys(user_pre_key_map).length}' users", user_pre_key_map
-      for user_id, client_pre_keys of user_pre_key_map
-        cryptobox_session_map[user_id] ?= {}
-        for client_id, pre_key of client_pre_keys
-          if pre_key
-            try
-              cryptobox_session_map[user_id][client_id] = @_session_from_prekey user_id, client_id, pre_key.key
-            catch error
-              @logger.error "Problem initiating a session for client ID '#{client_id}' from user ID '#{user_id}': #{error.message} — Skipping session.", error
-          else
-            amplify.publish z.event.WebApp.CLIENT.REMOVE, user_id, client_id
-      return cryptobox_session_map
-    .catch (error) =>
-      if error.type is z.user.UserError::TYPE.REQUEST_FAILURE
-        @logger.warn "Failed to request pre-keys for user '#{user_id}'': #{error.message}", error
-      throw error
-
-  ###
   Create a session from a message.
   @private
   @param user_id [String] User ID
@@ -346,21 +246,6 @@ class z.cryptography.CryptographyRepository
     session_id = @_construct_session_id user_id, client_id
     cryptobox_session = @cryptobox.session_from_message session_id, message
     return cryptobox_session
-
-  ###
-  Create a session from a pre-key (encoded PreKey bundle).
-  @private
-  @param user_id [String] User ID
-  @param client_id [String] ID of client to initialize session for
-  @param serialized_pre_key_bundle [String] Base 64-encoded and serialized pre-key bundle
-  @return [cryptobox.CryptoboxSession] New cryptography session
-  ###
-  _session_from_prekey: (user_id, client_id, encoded_pre_key_bundle) =>
-    decoded_pre_key_bundle = sodium.from_base64 encoded_pre_key_bundle
-    session_id = @_construct_session_id user_id, client_id
-    cryptobox_session = @cryptobox.session_from_prekey session_id, decoded_pre_key_bundle.buffer
-    return cryptobox_session
-
 
   ###############################################################################
   # Encryption
@@ -425,22 +310,6 @@ class z.cryptography.CryptographyRepository
             Promise.all(future_payloads).then resolve
       else
         resolve []
-
-  ###
-  Add the encrypted message for recipients to the payload message.
-
-  @private
-  @param payload [Object] Payload to add encrypted message for recipients to
-  @param cryptobox_sessions [Array<cryptobox.CryptoboxSession>] Sessions for all the recipients of message
-  @param generic_message [z.proto.GenericMessage] ProtoBuffer message to be send
-  @return [Object] Payload to send to backend
-  ###
-  _add_payload_recipients: (payload, generic_message, cryptobox_session_map) ->
-    for user_id, client_session_map of cryptobox_session_map
-      payload.recipients[user_id] ?= {}
-      for client_id, cryptobox_session of client_session_map
-        payload.recipients[user_id][client_id] = @_encrypt_payload_for_session cryptobox_session, generic_message
-    return payload
 
   ###
   Construct the payload for an encrypted message.
