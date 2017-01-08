@@ -87,7 +87,7 @@ class z.cryptography.CryptographyRepository
   @return [String] Fingerprint of local identity public key
   ###
   get_local_fingerprint: =>
-    return @storage_repository.identity.public_key.fingerprint()
+    return @cryptobox.identity.public_key.fingerprint()
 
   ###
   Get the fingerprint of a remote identity.
@@ -95,6 +95,7 @@ class z.cryptography.CryptographyRepository
   @param device_id [String] ID of device
   ###
   get_remote_fingerprint: (user_id, device_id) =>
+    # TODO: Switch to "cryptobox"
     return @get_session(user_id, device_id).then (cryptobox_session) -> cryptobox_session.fingerprint_remote()
 
   ###
@@ -373,23 +374,57 @@ class z.cryptography.CryptographyRepository
   @return [Promise] Promise that resolves with the encrypted payload
   ###
   encrypt_generic_message: (user_client_map, generic_message, payload = @_construct_payload @current_client().id) =>
-    session_ids = @_construct_session_ids user_client_map
-
-    # Migrated "@_add_payload_recipients" & "_encrypt_payload_for_session"
+    future_cipher_payloads = []
 
     for user_id, client_ids  of user_client_map
       payload.recipients[user_id] ?= {}
       client_ids.forEach (client_id) =>
         session_id = @_construct_session_id user_id, client_id
-        payload.recipients[user_id][client_id] ?= {}
-        payload.recipients[user_id][client_id] = @_encrypt_payload_for_session session_id, generic_message
+        future_cipher_payloads.push @_encrypt_payload_for_session session_id, generic_message
 
-    return # TODO
+    z.util.PromiseUtil.execute_all future_cipher_payloads
+    .then (future_cipher_payloads) =>
+      user_client_map_for_missing_sessions = {}
 
-    @get_sessions user_client_map
-    .then (cryptobox_session_map) =>
-      # Note: deprecated!
-      return @_add_payload_recipients payload, generic_message, cryptobox_session_map
+      future_cipher_payloads.results.forEach (result) ->
+        if result.encrypted
+          payload.recipients[result.user_id][result.client_id] = result.encrypted
+        else
+          user_client_map_for_missing_sessions[result.user_id] ?= []
+          user_client_map_for_missing_sessions[result.user_id].push result.client_id
+
+      return @_encrypt_generic_message_for_new_sessions user_client_map_for_missing_sessions, generic_message
+    .then (additional_cipher_payloads) =>
+      additional_cipher_payloads.forEach (result) ->
+        payload.recipients[result.user_id][result.client_id] = result.encrypted
+      return payload
+
+  _encrypt_generic_message_for_new_sessions: (user_client_map_for_missing_sessions, generic_message) =>
+    return new Promise (resolve) =>
+      if Object.keys(user_client_map_for_missing_sessions).length
+        @get_users_pre_keys user_client_map_for_missing_sessions
+        .then (user_pre_key_map) =>
+          @logger.info "Fetched pre-keys for '#{Object.keys(user_pre_key_map).length}' users.", user_pre_key_map
+
+          future_sessions = []
+
+          for user_id of user_pre_key_map
+            for client_id of user_pre_key_map[user_id]
+              remote_pre_key = user_pre_key_map[user_id][client_id]
+              @logger.log "Initializing session with Client ID '#{client_id}' from User ID '#{user_id}' with remote PreKey ID '#{remote_pre_key.id}'."
+              session_id = @_construct_session_id user_id, client_id
+              decoded_prekey_bundle = sodium.from_base64 remote_pre_key.key
+              future_sessions.push @cryptobox.session_from_prekey session_id, decoded_prekey_bundle.buffer
+
+          Promise.all(future_sessions).then (cryptobox_sessions) =>
+            future_payloads = []
+
+            for cryptobox_session in cryptobox_sessions
+              future_payloads.push @_encrypt_payload_for_session cryptobox_session.id, generic_message
+
+            Promise.all(future_payloads).then resolve
+      else
+        resolve []
 
   ###
   Add the encrypted message for recipients to the payload message.
@@ -426,21 +461,24 @@ class z.cryptography.CryptographyRepository
   @note We created the convention that whenever we fail to encrypt for a specific client, we send a Bomb Emoji (no fun!)
 
   @private
-  @param cryptobox_session [cryptobox.CryptoboxSession] Cryptographic session
   @param generic_message [z.proto.GenericMessage] ProtoBuffer message
   @return [String] Encrypted message as BASE64 encoded string
   ###
   _encrypt_payload_for_session: (session_id, generic_message) ->
-    try
-      generic_message_encrypted = @cryptobox.encrypt session_id, generic_message.toArrayBuffer()
-      generic_message_encrypted_base64 = z.util.array_to_base64 generic_message_encrypted
-      return generic_message_encrypted_base64
-    catch error
-      ids = session_id.split '@'
-      # Note: We created the convention that whenever we fail to encrypt for a specific client, we send a bomb emoji (no fun!)
-      @logger.error "Failed encrypting '#{generic_message.content}' message for client '#{ids[1]}' of user '#{ids[0]}': #{error.message}", error
-      return '💣'
-
+    return Promise.resolve().then =>
+      values = z.client.Client.dismantle_user_client_id session_id
+      @cryptobox.encrypt session_id, generic_message.toArrayBuffer()
+      .then (generic_message_encrypted) =>
+        values.encrypted = z.util.array_to_base64 generic_message_encrypted
+        return values
+      .catch (error) =>
+        if error instanceof cryptobox.store.RecordNotFoundError
+          @logger.warn "Session '#{session_id}' needs to get initialized..."
+          return values
+        else
+          @logger.error "Failed encrypting '#{generic_message.content}' message for session '#{session_id}': #{error.message}", error
+          values.encrypted = '💣'
+          return values
 
   ###############################################################################
   # Decryption
