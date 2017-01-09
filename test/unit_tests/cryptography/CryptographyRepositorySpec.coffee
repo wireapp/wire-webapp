@@ -46,6 +46,20 @@ describe 'z.cryptography.CryptographyRepository', ->
           phone_id: '55cdd1dbe3c2ed74'
 
     it 'encrypts a generic message', (done) ->
+      spyOn(cryptography_repository.cryptography_service, 'get_users_pre_keys').and.callFake (user_client_map) ->
+        return Promise.resolve().then () ->
+          prekey_map = {}
+
+          for user_id of user_client_map
+            prekey_map[user_id] ?= {}
+            for client_id in user_client_map[user_id]
+              prekey_map[user_id][client_id] = {
+                key: 'pQABARn//wKhAFgg3OpuTCUwDZMt1fklZB4M+fjDx/3fyx78gJ6j3H3dM2YDoQChAFggQU1orulueQHLv5YDYqEYl3D4O0zA9d+TaGGXXaBJmK0E9g=='
+                id: 65535
+              }
+
+          return prekey_map
+
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'text', new z.proto.Text 'Unit test'
 
