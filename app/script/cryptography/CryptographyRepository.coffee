@@ -92,11 +92,11 @@ class z.cryptography.CryptographyRepository
   ###
   Get the fingerprint of a remote identity.
   @param user_id [String] ID of user
-  @param device_id [String] ID of device
+  @param client_id [String] ID of client
   ###
-  get_remote_fingerprint: (user_id, device_id) =>
-    # TODO: Switch to "cryptobox"
-    return @get_session(user_id, device_id).then (cryptobox_session) -> cryptobox_session.fingerprint_remote()
+  get_remote_fingerprint: (user_id, client_id) =>
+    session_id = @_construct_session_id user_id, client_id
+    return @cryptobox.session_load(session_id).then (cryptobox_session) -> cryptobox_session.fingerprint_remote()
 
   ###
   Get a pre-key for a user client.
@@ -165,55 +165,6 @@ class z.cryptography.CryptographyRepository
     return user_session_map
 
   ###
-  Deletes a session.
-
-  @param user_id [String] User ID of our chat partner
-  @param client_id [String] Client ID of our chat partner
-  @return [Promise] Promise that will resolve with the ID of the reset session
-  ###
-  delete_session: (user_id, client_id) =>
-    return Promise.resolve()
-    .then =>
-      cryptobox_session = @load_session user_id, client_id
-
-      if cryptobox_session
-        @logger.info "Deleting session for client '#{client_id}' of user '#{user_id}'", cryptobox_session
-        @cryptobox.session_delete cryptobox_session.id
-        .then -> return cryptobox_session.id
-      else
-        @logger.info "We cannot delete the session for client '#{client_id}' of user '#{user_id}' because it was not found"
-        return undefined
-
-  ###
-  Get session.
-  @param user_id [String] User ID
-  @param client_id [String] ID of client to retrieve session for
-  @return [Promise<cryptobox.CryptoboxSession>] Promise that resolves with the session
-  ###
-  get_session: (user_id, client_id) ->
-    return Promise.resolve()
-    .then =>
-      return @load_session(user_id, client_id) or @_initiate_new_session user_id, client_id
-    .catch (error) =>
-      @logger.error "Failed to get session for client '#{client_id}' of user '#{user_id}': #{error.message}", error
-
-  ###
-  Save a session.
-  @note Sessions MUST be saved AFTER encrypting messages, but BEFORE sending the encrypted message across the network.
-  @param session [cryptobox.CryptoboxSession] Session to be saved
-  ###
-  save_session: (cryptobox_session) =>
-    @logger.info "Persisting session '#{cryptobox_session.id}'", cryptobox_session
-    return @cryptobox.session_save cryptobox_session
-
-  ###
-  Save sessions.
-  @param session [Array<cryptobox.CryptoboxSession>] Array of sessions to be saved
-  ###
-  save_sessions: (cryptobox_sessions) =>
-    cryptobox_sessions.forEach (cryptobox_session) => @save_session cryptobox_session
-
-  ###
   Construct a session ID.
 
   @private
@@ -233,19 +184,6 @@ class z.cryptography.CryptographyRepository
         session_ids.push session_id
 
     return session_ids
-
-  ###
-  Create a session from a message.
-  @private
-  @param user_id [String] User ID
-  @param client_id [String] ID of client to initialize session for
-  @param message [ArrayBuffer] Serialised OTR message
-  @return [cryptobox.CryptoboxSession] New cryptography session
-  ###
-  _session_from_message: (user_id, client_id, message) =>
-    session_id = @_construct_session_id user_id, client_id
-    cryptobox_session = @cryptobox.session_from_message session_id, message
-    return cryptobox_session
 
   ###############################################################################
   # Encryption
@@ -342,7 +280,7 @@ class z.cryptography.CryptographyRepository
         return values
       .catch (error) =>
         if error instanceof cryptobox.store.RecordNotFoundError
-          @logger.warn "Session '#{session_id}' needs to get initialized..."
+          @logger.log "Session '#{session_id}' needs to get initialized..."
           return values
         else
           @logger.error "Failed encrypting '#{generic_message.content}' message for session '#{session_id}': #{error.message}", error
@@ -359,7 +297,7 @@ class z.cryptography.CryptographyRepository
   decrypt_event: (event) =>
     return new Promise (resolve, reject) =>
       if not event.data
-        @logger.error "Encrypted event with ID '#{event.id}' does not contain its data payload", event
+        @logger.error "Encrypted event with ID '#{event.id}' does not contain it's data payload", event
         reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.NO_DATA_CONTENT
         return
 
@@ -438,24 +376,14 @@ class z.cryptography.CryptographyRepository
   @return [z.proto.GenericMessage] Decrypted message in ProtocolBuffer format
   ###
   _decrypt_message: (event) =>
-    user_id = event.from
-    client_id = event.data.sender
-    ciphertext = event.data.text or event.data.key
+    session_id = @_construct_session_id event.from, event.data.sender
 
-    session = @load_session user_id, client_id
+    ciphertext = event.data.text or event.data.key
     msg_bytes = sodium.from_base64(ciphertext).buffer
 
-    decrypted_message = undefined
-
-    if session
-      decrypted_message = session.decrypt msg_bytes
-    else
-      [session, decrypted_message] = @_session_from_message user_id, client_id, msg_bytes
-      amplify.publish z.event.WebApp.CLIENT.ADD, user_id, new z.client.Client id: client_id
-
-    generic_message = z.proto.GenericMessage.decode decrypted_message
-    @save_session session
-    return generic_message
+    return @cryptobox.decrypt session_id, msg_bytes
+    .then (decrypted_message) ->
+      return z.proto.GenericMessage.decode decrypted_message
 
   ###
   Report decryption error to Localytics and stack traces to Raygun.
