@@ -22,14 +22,12 @@ z.components ?= {}
 class z.components.AssetHeader
 
   constructor: (params) ->
-    @message = params.message
-
-    # TODO moment(message_et.timestamp).format('D.M HH:MM')
+    @message_et = params.message
 
 
 ko.components.register 'asset-header',
   viewModel: z.components.AssetHeader
   template: """
-            <span class="asset-header-name text-orange">Marcello</span>
-            <span class="asset-header-time">18.1 11:11</span>
+            <span data-bind="text: message_et.sender_name(), css: message_et.accent_color" class="asset-header-name"></span>
+            <span data-bind="text: moment(message_et.timestamp).format('D.M H:mm')" class="asset-header-time"></span>
             """
