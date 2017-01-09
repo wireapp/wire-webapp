@@ -103,7 +103,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function () {
       window.cryptography_repository.current_client = ko.observable(current_client);
       window.cryptography_repository.logger.level = self.settings.logging_level;
 
-      window.cryptography_repository.init().then(function () {
+      window.cryptography_repository.init(window.storage_service.db).then(function () {
         resolve(window.cryptography_repository);
       });
     });
