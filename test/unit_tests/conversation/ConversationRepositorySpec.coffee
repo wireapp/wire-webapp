@@ -635,6 +635,8 @@ describe 'z.conversation.ConversationRepository', ->
         session_load: -> true
         session_save: -> true
 
+      cryptography_repository.load_session = (session_id) -> return Promise.resolve session_id
+
     it 'knows all users participating in a conversation (including the self user)', (done) ->
       dudes = conversation_repository.conversations()[1]
       conversation_repository.get_all_users_in_conversation dudes.id
