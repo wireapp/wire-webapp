@@ -22,71 +22,49 @@ z.message ?= {}
 z.message.MessagaCategorization = do ->
 
   check_text = (event) ->
-    category = z.message.MessageCategory.NONE
-
-    if event.data.content?.length > 0
+    if event.type is z.event.Backend.CONVERSATION.MESSAGE_ADD
       category = z.message.MessageCategory.TEXT
 
       if event.data.previews?.length > 0
         category = category | z.message.MessageCategory.LINK | z.message.MessageCategory.LINK_PREVIEW
 
-    return category
+      return category
 
   check_image = (event) ->
-    category = z.message.MessageCategory.NONE
-
-    if event.data.info?.tag is z.assets.ImageSizeType.MEDIUM
+    if event.type is z.event.Backend.CONVERSATION.ASSET_ADD
       category = z.message.MessageCategory.IMAGE
 
       if event.data.content_type is 'image/gif'
         category = category | z.message.MessageCategory.GIF
 
-    return category
+      return category
 
   check_file = (event) ->
-    category = z.message.MessageCategory.NONE
-
-    if event.data.info?.name? # TODO only uploaded?
-      category = z.message.MessageCategory.FILE
-
-    return category
+    if event.type is z.event.Client.CONVERSATION.ASSET_META
+      return z.message.MessageCategory.FILE
 
   check_ping = (event) ->
-    category = z.message.MessageCategory.NONE
-
-    # TODO check ping
-
-    return category
+    if event.type is z.event.Backend.CONVERSATION.KNOCK
+      return z.message.MessageCategory.KNOCK
 
   check_location = (event) ->
-    category = z.message.MessageCategory.NONE
-
-    # TODO check location
-
-    return category
+    if event.type is z.event.Client.CONVERSATION.LOCATION
+      return z.message.MessageCategory.LOCATION
 
   category_from_event = (event) ->
-
     try
+      category = z.message.MessageCategory.NONE
+
       if event.ephemeral_expires # String, Number, true
         return z.message.MessageCategory.NONE
 
-      # TODO improvement avoid unnecessary checking
-      category = [
-        check_text
-        check_image
-        check_file
-        check_ping
-        check_location
-      ].map (check_fn) ->
-        check_fn event
-      .reduce (current, next) ->
-        if next? and next isnt z.message.MessageCategory.NONE
-          return current | next
-        return current
-      , z.message.MessageCategory.NONE
+      for check in [check_text, check_image, check_file, check_ping, check_location]
+        temp_category = check(event)
+        if temp_category?
+          category = temp_category
+          break
 
-      if Object.keys(event.reactions?).length > 0
+      if event.reactions? and Object.keys(event.reactions).length > 0
         category = category | z.message.MessageCategory.LIKED
 
       return category
@@ -95,5 +73,5 @@ z.message.MessagaCategorization = do ->
       return z.message.MessageCategory.UNDEFINED
 
   return {
-    category_from_message: category_from_event
+    category_from_event: category_from_event
   }

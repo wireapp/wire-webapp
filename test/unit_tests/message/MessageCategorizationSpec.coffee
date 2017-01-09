@@ -18,37 +18,60 @@
 
 # grunt test_init && grunt test_run:message/MessageCategorization
 
-describe 'z.message.MessageCategorization.category_from_message', ->
+describe 'z.message.MessageCategorization.category_from_event', ->
 
-  it 'default message should have category of type NONE', ->
-    message_et = new z.entity.Message()
-    expect(z.message.MessagaCategorization.category_from_message(message_et)).toBe z.message.MessageCategory.NONE
+  it 'malformed events should have category of type UNDEFINED', ->
+    expect(z.message.MessagaCategorization.category_from_event()).toBe z.message.MessageCategory.UNDEFINED
 
   it 'ephemeral message should have category of type NONE', ->
-    message_et = new z.entity.Message()
-    message_et.ephemeral_expires Date.now() + 1000
-    expect(message_et.is_ephemeral()).toBeTruthy()
-    expect(z.message.MessagaCategorization.category_from_message(message_et)).toBe z.message.MessageCategory.NONE
+    event = '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"0004ebd7-1ba9-4747-b880-e63504595cc7","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:31:01.003Z","status":2,"data":{"content":"test","nonce":"0004ebd7-1ba9-4747-b880-e63504595cc7","previews":[]},"type":"conversation.message-add","ephemeral_expires":"1483968961027","ephemeral_started":"1483968661027"}'
+    category = z.message.MessagaCategorization.category_from_event JSON.parse event
+    expect(category).toBe z.message.MessageCategory.NONE
 
   it 'expired message should have category of type NONE', ->
-    message_et = new z.entity.Message()
-    message_et.ephemeral_expires true
-    expect(message_et.is_expired()).toBeTruthy()
-    expect(z.message.MessagaCategorization.category_from_message(message_et)).toBe z.message.MessageCategory.NONE
+    event = '{"conversation":"c499f282-2d79-4188-9808-8b63444194f8","id":"9ba0f061-0159-492b-8e6f-ba31d37ad962","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:07:47.096Z","status":2,"data":{"content":"aqgxjp","nonce":"9ba0f061-0159-492b-8e6f-ba31d37ad962"},"type":"conversation.message-add","ephemeral_expires":true,"ephemeral_started":"1483967267134"}'
+    category = z.message.MessagaCategorization.category_from_event JSON.parse event
+    expect(category).toBe z.message.MessageCategory.NONE
 
   it 'text message should have category of type TEXT', ->
-    message_et = new z.entity.ContentMessage()
-    message_et.assets.push new z.entity.Text()
-    expect(message_et.has_asset_text()).toBeTruthy()
-    expect(z.message.MessagaCategorization.category_from_message(message_et)).toBe z.message.MessageCategory.TEXT
+    event = '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"b6498d81-92e8-4da7-afd2-054239595da7","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:11:15.632Z","status":2,"data":{"content":"test","nonce":"b6498d81-92e8-4da7-afd2-054239595da7","previews":[]},"type":"conversation.message-add"}'
+    category = z.message.MessagaCategorization.category_from_event JSON.parse event
+    expect(category).toBe z.message.MessageCategory.TEXT
 
   it 'text message with link should have category of type TEXT and LINK', ->
-    asset_et = new z.entity.Text()
-    asset_et.previews.push new z.entity.LinkPreview()
-    message_et = new z.entity.ContentMessage()
-    message_et.assets.push asset_et
-    expect(message_et.has_asset_text()).toBeTruthy()
-
-    category = z.message.MessagaCategorization.category_from_message(message_et)
+    event = '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"f7adaa16-38f5-483e-b621-72ff1dbd2276","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"2017-01-09T13:11:15.051Z","data":{"content":"https://wire.com","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2276","previews":["CjZodHRwczovL3dpcmUuY29tLz81ZDczNDQ0OC00NDZiLTRmYTItYjMwMy1lYTJhNzhiY2NhMDgQABpWCjZodHRwczovL3dpcmUuY29tLz81ZDczNDQ0OC00NDZiLTRmYTItYjMwMy1lYTJhNzhiY2NhMDgSHFdpcmUgwrcgTW9kZXJuIGNvbW11bmljYXRpb24="]},"type":"conversation.message-add"}'
+    category = z.message.MessagaCategorization.category_from_event JSON.parse event
     expect(category & z.message.MessageCategory.TEXT).toBe z.message.MessageCategory.TEXT
     expect(category & z.message.MessageCategory.LINK).toBe z.message.MessageCategory.LINK
+
+  it 'text message with like should have category of type TEXT and LIKED', ->
+    event = '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"b2a9bf4f-f912-4c0c-9f8b-aea290fe53e3","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:53:27.965Z","status":2,"data":{"content":"test","nonce":"b2a9bf4f-f912-4c0c-9f8b-aea290fe53e3","previews":[]},"type":"conversation.message-add","reactions":{"9b47476f-974d-481c-af64-13f82ed98a5f":"❤️"},"version":2}'
+    category = z.message.MessagaCategorization.category_from_event JSON.parse event
+    expect(category & z.message.MessageCategory.TEXT).toBe z.message.MessageCategory.TEXT
+    expect(category & z.message.MessageCategory.LIKED).toBe z.message.MessageCategory.LIKED
+
+  it 'image message should have category of type IMAGE', ->
+    event = '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"da7930dd-4c30-4378-846d-b29e1452bdfb","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:37:31.941Z","status":1,"data":{"content_length":47527,"content_type":"image/jpeg","id":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d","info":{"tag":"medium","width":1448,"height":905,"nonce":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d"},"otr_key":{},"sha256":{}},"type":"conversation.asset-add"}'
+    category = z.message.MessagaCategorization.category_from_event JSON.parse event
+    expect(category).toBe z.message.MessageCategory.IMAGE
+
+  it 'image (gif) message should have category of type IMAGE and GIF', ->
+    event = '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"1846af80-7755-4b61-885d-4e37ce77e5ff","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:41:50.170Z","status":2,"data":{"content_length":9953127,"content_type":"image/gif","id":"8cc946e4-e450-47c0-87a8-584d5c18b79b","info":{"tag":"medium","width":450,"height":450,"nonce":"8cc946e4-e450-47c0-87a8-584d5c18b79b"},"otr_key":{},"sha256":{}},"type":"conversation.asset-add"}'
+    category = z.message.MessagaCategorization.category_from_event JSON.parse event
+    expect(category & z.message.MessageCategory.IMAGE).toBe z.message.MessageCategory.IMAGE
+    expect(category & z.message.MessageCategory.GIF).toBe z.message.MessageCategory.GIF
+
+  it 'file message should have category of type FILE', ->
+    event = '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"95377495-d203-4071-a02a-5221b75644fa","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:46:14.855Z","status":2,"data":{"content_length":199580,"content_type":"image/jpeg","info":{"name":"6642.jpg","nonce":"95377495-d203-4071-a02a-5221b75644fa"},"id":"aed78bfd-7c98-475b-badd-2c11fd150a63","otr_key":{},"sha256":{},"status":"uploaded"},"type":"conversation.asset-meta"}'
+    category = z.message.MessagaCategorization.category_from_event JSON.parse event
+    expect(category).toBe z.message.MessageCategory.FILE
+
+  it 'ping message should have category of type KNOCK', ->
+    event = '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"6cb452b4-6ae3-496d-90a8-8d7af6d756c8","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:51:00.960Z","status":2,"data":{"nonce":"6cb452b4-6ae3-496d-90a8-8d7af6d756c8"},"type":"conversation.knock"}'
+    category = z.message.MessagaCategorization.category_from_event JSON.parse event
+    expect(category).toBe z.message.MessageCategory.KNOCK
+
+  xit 'location message should have category of type LOCATION', ->
+    event = '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"6cb452b4-6ae3-496d-90a8-8d7af6d756c8","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:51:00.960Z","status":2,"data":{"nonce":"6cb452b4-6ae3-496d-90a8-8d7af6d756c8"},"type":"conversation.knock"}'
+    category = z.message.MessagaCategorization.category_from_event JSON.parse event
+    expect(category).toBe z.message.MessageCategory.KNOCK
