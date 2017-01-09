@@ -11,7 +11,6 @@
     "jquery": "https://github.com/jquery/jquery.git#2.1.4",
     "keyboardjs": "https://github.com/RobertWHurst/KeyboardJS.git#2.3.3",
     "knockout": "https://github.com/knockout/knockout.git#3.4.1",
-    "lru-ts": "https://github.com/wireapp/lru-ts.git#321024a90dd82a3379864382f4e16908c3ff8467",
     "marked": "https://github.com/wireapp/marked.git#0f932d79aab362846eab11354f783db02f30cec6",
     "moment": "https://github.com/moment/moment.git#2.16.0",
     "normalize-css": "https://github.com/necolas/normalize.css.git#3.0.3",
@@ -88,9 +87,6 @@
     },
     "logdown": {
       "js/": "dist/*.js"
-    },
-    "lru-ts": {
-      "js": "dist/global/lru-ts.js"
     },
     "marked": {
       "js": "lib/marked.js"
