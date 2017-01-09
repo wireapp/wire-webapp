@@ -217,7 +217,7 @@ class z.cryptography.CryptographyRepository
           user_client_map_for_missing_sessions[result.user_id].push result.client_id
 
       return @_encrypt_generic_message_for_new_sessions user_client_map_for_missing_sessions, generic_message
-    .then (additional_cipher_payloads) =>
+    .then (additional_cipher_payloads) ->
       additional_cipher_payloads.forEach (result) ->
         payload.recipients[result.user_id][result.client_id] = result.encrypted
       return payload
@@ -275,7 +275,7 @@ class z.cryptography.CryptographyRepository
     return Promise.resolve().then =>
       values = z.client.Client.dismantle_user_client_id session_id
       @cryptobox.encrypt session_id, generic_message.toArrayBuffer()
-      .then (generic_message_encrypted) =>
+      .then (generic_message_encrypted) ->
         values.encrypted = z.util.array_to_base64 generic_message_encrypted
         return values
       .catch (error) =>
