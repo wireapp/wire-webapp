@@ -55,16 +55,13 @@ class z.components.AudioAssetComponent
     @audio_time @audio_element.currentTime
 
   on_play_button_clicked: =>
-    if @audio_src()?
-      @audio_element?.play()
-    else
-      @asset.load()
-      .then (blob) =>
-        @audio_src window.URL.createObjectURL blob
-        @audio_is_loaded true
-        @audio_element?.play()
-      .catch (error) =>
-        @logger.error 'Failed to load audio asset ', error
+    Promise.resolve().then =>
+      if not @audio_src()?
+        @asset.load().then (blob) => @audio_src window.URL.createObjectURL blob
+    .then =>
+      @audio_element.play()
+    .catch (error) =>
+      @logger.error 'Failed to load audio asset ', error
 
   on_pause_button_clicked: =>
     @audio_element?.pause()
@@ -111,11 +108,11 @@ ko.components.register 'audio-asset',
             </span>
             <!-- ko if: show_loudness_preview -->
               <audio-seek-bar data-uie-name="status-audio-seekbar"
-                              params="src: audio_element, asset: asset, disabled: !audio_is_loaded()"></audio-seek-bar>
+                              params="src: audio_element, asset: asset, disabled: !audio_src()"></audio-seek-bar>
             <!-- /ko -->
             <!-- ko ifnot: show_loudness_preview -->
               <seek-bar data-uie-name="status-audio-seekbar"
-                        params="src: audio_element, dark: true, disabled: !audio_is_loaded()"></seek-bar>
+                        params="src: audio_element, dark: true, disabled: !audio_src()"></seek-bar>
             <!-- /ko -->
           <!-- /ko -->
         </div>
