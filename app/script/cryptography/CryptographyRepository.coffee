@@ -166,7 +166,7 @@ class z.cryptography.CryptographyRepository
 
   ###
   Construct a session ID.
-
+  @todo Make public
   @private
   @param user_id [String] User ID for the remote participant
   @param client_id [String] Client ID of the remote participant
@@ -219,6 +219,7 @@ class z.cryptography.CryptographyRepository
       return @_encrypt_generic_message_for_new_sessions user_client_map_for_missing_sessions, generic_message
     .then (additional_cipher_payloads) ->
       additional_cipher_payloads.forEach (result) ->
+        payload.recipients[result.user_id] ?= {}
         payload.recipients[result.user_id][result.client_id] = result.encrypted
       return payload
 
