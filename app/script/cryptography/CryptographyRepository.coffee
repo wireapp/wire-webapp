@@ -128,22 +128,16 @@ class z.cryptography.CryptographyRepository
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
   ###
-  Generate the signaling keys
-
+  Generate the signaling keys (which are used for mobile push notifications).
+  @note Signaling Keys are unimportant for the webapp (because they are used for iOS or Android push notifications) but required by the backend.
+  Thus this method returns a static Signaling Key Pair.
   @private
   @return [Object] Object containing the signaling keys
   ###
   _generate_signaling_keys: ->
-    random_bytes = new Uint8Array sodium.crypto_auth_hmacsha256_KEYBYTES
-    crypto.getRandomValues random_bytes
-
-    hmac = sodium.crypto_auth_hmacsha256 random_bytes, sodium.crypto_hash_sha256 'salt'
-    encryption_key = sodium.to_base64 hmac
-    mac_key = sodium.to_base64 hmac
-
     signaling_keys =
-      enckey: encryption_key
-      mackey: mac_key
+      enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0='
+      mackey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0='
 
     return signaling_keys
 
