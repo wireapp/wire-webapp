@@ -24,21 +24,20 @@
   }
 
   &.modal-show {
-    display: block;
+    .flex-center
   }
 }
 
 .detail-view-image {
-  position: absolute;
   max-width: 84%;
   max-height: 84%;
-  height: auto;
   width: auto;
 }
 
 .detail-view-close-button {
   .circle(40px);
   .flex-center;
+  background-color: fade(#fff, 24%);
   position: absolute;
   right: 24px;
   top: 24px;
@@ -47,7 +46,4 @@
   > span {
     position: relative;
   }
-}
-.detail-view-close-button-fullscreen {
-  background-color: fade(#000, 88%);
 }

@@ -67,28 +67,32 @@ z.message.MessagaCategorization = do ->
 
   category_from_event = (event) ->
 
-    if event.ephemeral_expires # String, Number, true
-      return z.message.MessageCategory.NONE
+    try
+      if event.ephemeral_expires # String, Number, true
+        return z.message.MessageCategory.NONE
 
-    # TODO improvement avoid unnecessary checking
-    category = [
-      check_text
-      check_image
-      check_file
-      check_ping
-      check_location
-    ].map (check_fn) ->
-      check_fn event
-    .reduce (current, next) ->
-      if next? and next isnt z.message.MessageCategory.NONE
-        return current | next
-      return current
-    , z.message.MessageCategory.NONE
+      # TODO improvement avoid unnecessary checking
+      category = [
+        check_text
+        check_image
+        check_file
+        check_ping
+        check_location
+      ].map (check_fn) ->
+        check_fn event
+      .reduce (current, next) ->
+        if next? and next isnt z.message.MessageCategory.NONE
+          return current | next
+        return current
+      , z.message.MessageCategory.NONE
 
-    if Object.keys(event.reactions?).length > 0
-      category = category | z.message.MessageCategory.LIKED
+      if Object.keys(event.reactions?).length > 0
+        category = category | z.message.MessageCategory.LIKED
 
-    return category
+      return category
+
+    catch error
+      return z.message.MessageCategory.UNDEFINED
 
   return {
     category_from_message: category_from_event

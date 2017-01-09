@@ -33,7 +33,7 @@ class z.ViewModel.content.CollectionDetailsViewModel
   set_conversation: (conversation_et, category, items) =>
     @template category
     @conversation_et conversation_et
-    @items items
+    @push_deferred @items, items
 
   removed_from_view: =>
     @conversation_et null
@@ -41,3 +41,14 @@ class z.ViewModel.content.CollectionDetailsViewModel
 
   click_on_back_button: ->
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION
+
+  # helper
+  push_deferred: (target, src, number = 100, delay = 300) ->
+    interval = window.setInterval ->
+      chunk = src.splice 0, number
+      z.util.ko_array_push_all target, chunk
+
+      if src.length is 0
+        window.clearInterval interval
+
+    , delay
