@@ -190,7 +190,7 @@ Function will remove data uri if present
 @return [UInt8Array]
 ###
 z.util.base64_to_array = (base64) ->
-  return bazinga64.Encoder.toBase64(z.util.strip_data_uri base64).asString
+  return bazinga64.Decoder.fromBase64(z.util.strip_data_uri base64).asBytes
 
 ###
 Convert ArrayBuffer or UInt8Array to base64 string
