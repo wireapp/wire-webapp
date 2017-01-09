@@ -454,10 +454,6 @@ class z.main.App
   report_call: =>
     @repository.call_center.report_call()
 
-  # Reset all known sessions at once.
-  reset_all_sessions: =>
-    @repository.conversation.reset_all_sessions()
-
   # Initialize debugging features.
   init_debugging: =>
     @_attach_live_reload() if z.util.Environment.frontend.is_localhost()

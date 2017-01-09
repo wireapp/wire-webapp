@@ -686,24 +686,6 @@ class z.conversation.ConversationRepository
       @logger.warn "Failed to reset session for client '#{client_id}' of user '#{user_id}': #{error.message}", error
       throw error
 
-  reset_all_sessions: =>
-    # TODO: We need to work on this!
-    sessions = @cryptography_repository.storage_repository.sessions
-    @logger.info "Resetting '#{Object.keys(sessions).length}' sessions"
-    for session_id, session of sessions
-      ids = z.client.Client.dismantle_user_client_id session_id
-
-      _reset_session = (conversation_et) =>
-        @reset_session ids.user_id, ids.client_id, conversation_et.id
-
-      if ids.user_id is @user_repository.self().id
-        return _reset_session @self_conversation()
-
-      @user_repository.get_user_by_id ids.user_id, (user_et) =>
-        return @get_one_to_one_conversation user_et
-        .then (conversation_et) ->
-          _reset_session conversation_et
-
   ###
   Send a specific GIF to a conversation.
 
