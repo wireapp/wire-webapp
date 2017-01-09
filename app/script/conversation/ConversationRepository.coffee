@@ -672,6 +672,7 @@ class z.conversation.ConversationRepository
       callback?()
 
   reset_session: (user_id, client_id, conversation_id) =>
+    # TODO: We need to work on this!
     @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'"
     @cryptography_repository.delete_session user_id, client_id
     .then (session_id) =>
@@ -685,6 +686,7 @@ class z.conversation.ConversationRepository
       throw error
 
   reset_all_sessions: =>
+    # TODO: We need to work on this!
     sessions = @cryptography_repository.storage_repository.sessions
     @logger.info "Resetting '#{Object.keys(sessions).length}' sessions"
     for session_id, session of sessions
