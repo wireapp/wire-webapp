@@ -672,14 +672,15 @@ class z.conversation.ConversationRepository
       callback?()
 
   reset_session: (user_id, client_id, conversation_id) =>
-    # TODO: We need to work on this!
-    @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'"
-    @cryptography_repository.delete_session user_id, client_id
+    @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'."
+    session_id = @cryptography_repository._construct_session_id user_id, client_id
+
+    @cryptography_repository.cryptobox.session_delete session_id
     .then (session_id) =>
       if session_id
-        @logger.info "Deleted session with client '#{client_id}' of user '#{user_id}'"
+        @logger.info "Deleted session with client '#{client_id}' of user '#{user_id}'."
       else
-        @logger.warn 'No local session found to delete'
+        @logger.warn 'No local session found to delete.'
       return @send_session_reset user_id, client_id, conversation_id
     .catch (error) =>
       @logger.warn "Failed to reset session for client '#{client_id}' of user '#{user_id}': #{error.message}", error
