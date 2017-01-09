@@ -2145,7 +2145,7 @@ class z.conversation.ConversationRepository
   @private
   @param user_client_map [Object] User client map containing redundant clients
   @param payload [Object] Optional payload of the failed request
-  @param generic_message [z.proto.GenericMessage] Protubuffer message to be sent
+  @param generic_message [z.proto.GenericMessage] Protobuffer message to be sent
   @return [Promise] Promise that resolves with the rewritten payload
   ###
   _handle_client_mismatch_missing: (user_client_map, payload, generic_message) ->

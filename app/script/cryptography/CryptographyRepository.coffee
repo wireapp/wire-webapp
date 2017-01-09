@@ -197,7 +197,7 @@ class z.cryptography.CryptographyRepository
   encrypt_generic_message: (user_client_map, generic_message, payload = @_construct_payload @current_client().id) =>
     future_cipher_payloads = []
 
-    for user_id, client_ids  of user_client_map
+    for user_id, client_ids of user_client_map
       payload.recipients[user_id] ?= {}
       client_ids.forEach (client_id) =>
         session_id = @_construct_session_id user_id, client_id
