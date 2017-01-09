@@ -673,9 +673,8 @@ class z.conversation.ConversationRepository
 
   reset_session: (user_id, client_id, conversation_id) =>
     @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'."
-    session_id = @cryptography_repository._construct_session_id user_id, client_id
 
-    @cryptography_repository.cryptobox.session_delete session_id
+    @cryptography_repository.delete_session user_id, client_id
     .then (session_id) =>
       if session_id
         @logger.info "Deleted session with client '#{client_id}' of user '#{user_id}'."
