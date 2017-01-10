@@ -27,11 +27,11 @@ class z.ViewModel.content.CollectionViewModel
 
     @conversation_et = ko.observable()
 
-    @images = ko.observableArray()
-    @files = ko.observableArray()
     @audio = ko.observableArray()
-    @video = ko.observableArray()
+    @files = ko.observableArray()
+    @images = ko.observableArray()
     @links = ko.observableArray()
+    @video = ko.observableArray()
 
     @no_items_found = ko.observable false
 

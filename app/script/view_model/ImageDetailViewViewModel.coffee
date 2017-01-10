@@ -39,7 +39,7 @@ class z.ViewModel.ImageDetailViewViewModel
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_DETAIL_VIEW_OPENED
 
     @image_src src
-    setTimeout =>
+    window.setTimeout =>
       @image_visible true
     , 10
 
