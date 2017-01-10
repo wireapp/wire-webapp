@@ -1,6 +1,12 @@
 <div id="conversation-titlebar" class="conversation-titlebar" data-bind="with: $root.conversation_titlebar">
   <!-- ko if: conversation_et() -->
 
+    <div class="conversation-titlebar-library">
+      <span class="conversation-titlebar-icon button-icon-large icon-collection"
+            data-bind="click: click_on_collection_button"
+            data-uie-name="do-collections"></span>
+    </div>
+
     <!-- ko if: conversation_et().is_verified() -->
       <svg class="conversation-verified-icon" width="16" height="16">
         <use xlink:href="#icon-verified"></use>
@@ -35,7 +41,7 @@
     <!-- ko if: has_ongoing_call() -->
       <div class="conversation-titlebar-icons">
         <!-- ko if: show_maximize_control() -->
-          <span class="conversation-titlebar-icon button-icon-large icon-fullscreen "
+          <span class="conversation-titlebar-icon button-icon-large icon-fullscreen"
                 data-bind="click: click_on_maximize"
                 data-uie-name="do-maximize-call">
           </span>

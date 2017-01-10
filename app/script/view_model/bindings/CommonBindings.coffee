@@ -345,12 +345,11 @@ ko.bindingHandlers.in_viewport = do ->
     _dispose = ->
       z.util.ArrayUtil.remove_element listeners, _check_element
 
-    _check_element = _.debounce (e) ->
+    _check_element = ->
       is_child = if e? then e.target.contains(element) else true
       if is_child and _in_view element
         dispose = valueAccessor()?()
         _dispose() if dispose
-    , 300
 
     listeners.push _check_element
     _check_element()

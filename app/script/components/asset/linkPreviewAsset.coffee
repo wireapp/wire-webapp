@@ -27,11 +27,11 @@ class z.components.LinkPreviewAssetComponent
   @option params [z.entity.LinkPreview] preview
   ###
   constructor: (params, component_info) ->
-    @preview = params.preview
+    @preview = ko.unwrap params.preview
     @viewport_changed = params.viewport_changed
     @element = component_info.element
     @url = @preview.original_url
-    @expired = params.expired
+    @expired = params.expired or ko.observable false
 
   on_link_preview_click: =>
     z.util.safe_window_open @url
