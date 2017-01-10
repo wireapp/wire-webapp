@@ -82,6 +82,7 @@ ko.components.register 'audio-asset',
   viewModel: createViewModel: (params, component_info) ->
     return new z.components.AudioAssetComponent params, component_info
   template: """
+    <audio data-bind="attr: {src: audio_src}, event: {loadedmetadata: on_loadedmetadata, timeupdate: on_timeupdate}"></audio>
     <!-- ko ifnot: expired() -->
       <!-- ko if: header -->
         <asset-header></asset-header>
@@ -95,9 +96,6 @@ ko.components.register 'audio-asset',
       <!-- /ko -->
       <!-- ko ifnot: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
         <div class="audio-controls">
-          <audio data-bind="attr: {src: audio_src},
-                        event: {loadedmetadata: on_loadedmetadata, timeupdate: on_timeupdate}">
-          </audio>
           <media-button params="src: audio_element,
                                 asset: asset,
                                 play: on_play_button_clicked,
