@@ -56,7 +56,7 @@ class z.ViewModel.content.CollectionViewModel
     video = []
     links = []
 
-    for message_et, i in message_ets
+    for message_et in message_ets
       switch
         when message_et.category & z.message.MessageCategory.IMAGE and not (message_et.category & z.message.MessageCategory.GIF)
           images.push message_et

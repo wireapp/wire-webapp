@@ -183,7 +183,7 @@ class z.storage.StorageService
       .upgrade (transaction) =>
         @logger.warn "Database upgrade to version #{@db.verno}", transaction
         transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
-          event.category = z.message.MessagaCategorization.category_from_event event
+          event.category = z.message.MessageCategorization.category_from_event event
 
       @db.open()
       .then =>

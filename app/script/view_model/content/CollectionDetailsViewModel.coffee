@@ -22,7 +22,7 @@ z.ViewModel.content ?= {}
 
 # Parent: z.ViewModel.CollectionViewModel
 class z.ViewModel.content.CollectionDetailsViewModel
-  constructor: (element_id) ->
+  constructor: ->
     @logger = new z.util.Logger 'z.ViewModel.CollectionDetailsViewModel', z.config.LOGGER.OPTIONS
 
     @template = ko.observable()

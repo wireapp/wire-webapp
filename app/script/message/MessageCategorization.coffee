@@ -19,7 +19,7 @@
 window.z ?= {}
 z.message ?= {}
 
-z.message.MessagaCategorization = do ->
+z.message.MessageCategorization = do ->
 
   check_text = (event) ->
     if event.type is z.event.Backend.CONVERSATION.MESSAGE_ADD
