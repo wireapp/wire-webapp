@@ -16,9 +16,9 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-# grunt test_init && grunt test_run:conversation/ConversationService
+# grunt test_init && grunt test_run:conversation/ConversationServiceNoCompound
 
-describe 'z.conversation.ConversationService', ->
+describe 'z.conversation.ConversationServiceNoCompound', ->
   conversation_mapper = null
   conversation_service = null
   server = null
@@ -30,7 +30,7 @@ describe 'z.conversation.ConversationService', ->
     .then (storage_repository) ->
       client = test_factory.client
       storage_service = storage_repository.storage_service
-      conversation_service = new z.conversation.ConversationServiceEdge client, storage_service
+      conversation_service = new z.conversation.ConversationServiceNoCompound client, storage_service
 
       conversation_mapper = new z.conversation.ConversationMapper()
       server = sinon.fakeServer.create()

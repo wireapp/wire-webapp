@@ -47,13 +47,12 @@ class z.conversation.ConversationServiceNoCompound extends z.conversation.Conver
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where 'conversation'
     .equals conversation_id
+    .reverse()
     .sortBy 'time'
     .then (records) ->
       return records.filter (record) ->
         timestamp = new Date(record.time).getTime()
-        return false if lower_bound and timestamp >= lower_bound
-        return false if upper_bound and timestamp <= upper_bound
-        return true
+        return timestamp >= lower_bound and timestamp < upper_bound
     .then (records) ->
       return records.slice 0, limit
 
@@ -68,5 +67,5 @@ class z.conversation.ConversationServiceNoCompound extends z.conversation.Conver
     .where 'conversation'
     .equals conversation_id
     .sortBy 'time'
-    .then (records) -> records.filter (record) -> record.category > category
-    .toArray()
+    .then (records) ->
+      records.filter (record) -> record.category >= category

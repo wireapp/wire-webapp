@@ -68,7 +68,7 @@ class z.main.App
     service.notification            = new z.event.NotificationService @auth.client, service.storage
     service.announce                = new z.announce.AnnounceService()
 
-    if z.util.Environment.browser.edge
+    if true # z.util.Environment.browser.edge
       service.conversation            = new z.conversation.ConversationServiceNoCompound @auth.client, service.storage
     else
       service.conversation            = new z.conversation.ConversationService @auth.client, service.storage
