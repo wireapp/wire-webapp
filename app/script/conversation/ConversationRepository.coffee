@@ -1958,8 +1958,6 @@ class z.conversation.ConversationRepository
   ###
   _add_event_to_conversation: (json, conversation_et) ->
     message_et = @event_mapper.map_json_event json, conversation_et, true
-  _add_event_to_conversation: (json, conversation_et) ->
-    message_et = @event_mapper.map_json_event json, conversation_et
     @_update_user_ets message_et
     .then (message_et) =>
       if conversation_et
