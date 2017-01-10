@@ -28,12 +28,7 @@
 
         <!-- ko if: template() === 'links' -->
           <!-- ko foreach: {data: items(), as: 'message_et'} -->
-            <header class="collection-link-header">
-              <user-avatar class="user-avatar-xs" params="user: message_et.user"></user-avatar>
-              <span class="label-bold-xs" data-bind="text: message_et.sender_name()"></span>
-              <span class="collection-link-timestamp label-xs text-graphite" data-bind="text: moment(message_et.timestamp).format('D.M HH:MM')"></span>
-            </header>
-            <link-preview-asset class="collection-link" params="preview: message_et.get_first_asset().previews()[0]"></link-preview-asset>
+            <link-preview-compact-asset params="message: message_et, header: true"></link-preview-compact-asset>
           <!-- /ko -->
         <!-- /ko -->
 
