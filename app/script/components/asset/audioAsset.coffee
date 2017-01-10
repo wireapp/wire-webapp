@@ -74,6 +74,9 @@ class z.components.AudioAssetComponent
       duration_actual: duration
       type: z.util.get_file_extension @asset.file_name
 
+  dispose: =>
+    window.URL.revokeObjectURL @audio_src()
+
 
 ko.components.register 'audio-asset',
   viewModel: createViewModel: (params, component_info) ->

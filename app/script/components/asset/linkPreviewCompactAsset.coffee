@@ -29,6 +29,7 @@ class z.components.LinkPreviewCompactAssetComponent
   constructor: (params, component_info) ->
 
     @message_et = ko.unwrap params.message
+    @header = params.header or false
 
     @preview = @message_et.get_first_asset().previews()[0]
     @element = component_info.element
@@ -47,19 +48,33 @@ ko.components.register 'link-preview-compact-asset',
   viewModel: createViewModel: (params, component_info) ->
     return new z.components.LinkPreviewCompactAssetComponent params, component_info
   template: """
-            <div class="link-preview-compact-image-container">
-              <!-- ko ifnot: preview.image_resource() -->
-                <div class="link-preview-compact-image-placeholder icon-link"></div>
-              <!-- /ko -->
-              <!-- ko if: preview.image_resource() -->
-                <image-component class="link-preview-compact-image" params="asset: preview.image_resource"></image-component>
-              <!-- /ko -->
-            </div>
+            <!-- ko ifnot: message_et.is_expired() -->
+              <div class="link-preview-compact-image-container">
+                <!-- ko ifnot: preview.image_resource() -->
+                  <div class="link-preview-compact-image-placeholder icon-link"></div>
+                <!-- /ko -->
+                <!-- ko if: preview.image_resource() -->
+                  <image-component class="link-preview-compact-image" params="asset: preview.image_resource"></image-component>
+                <!-- /ko -->
+              </div>
 
-            <div class="link-preview-compact-info">
-              <asset-header class="link-preview-compact-info-header" params="message: message_et"></asset-header>
-              <div class="link-preview-compact-info-title ellipsis" data-bind="text: preview.title"></div>
-              <a class="link-preview-compact-info-link text-graphite ellipsis" target="_blank" rel="nofollow noopener noreferrer"
-                     data-bind="text: z.util.naked_url(url), attr: {href: z.util.add_http(url), title: url}"></a>
-            </div>
+              <div class="link-preview-compact-info">
+                <!-- ko if: header -->
+                  <asset-header class="link-preview-compact-info-header" params="message: message_et"></asset-header>
+                <!-- /ko -->
+                <div class="link-preview-compact-info-title ellipsis" data-bind="text: preview.title"></div>
+                <a class="link-preview-compact-info-link text-graphite ellipsis" target="_blank" rel="nofollow noopener noreferrer"
+                   data-bind="text: z.util.naked_url(url), attr: {href: z.util.add_http(url), title: url}"></a>
+              </div>
+            <!-- /ko -->
+            <!-- ko if: message_et.is_expired() -->
+              <div class="link-preview-compact-image-container">
+                <div class="link-preview-compact-image-placeholder icon-link bg-color-ephemeral text-white"></div>
+              </div>
+              <div class="link-preview-compact-info">
+                <div class="link-preview-compact-info-title ephemeral-message-obfuscated ellipsis" data-bind="text: z.util.StringUtil.obfuscate(preview.title)"></div>
+                <a class="link-preview-compact-info-link ephemeral-message-obfuscated ellipsis" target="_blank" rel="nofollow noopener noreferrer"
+                   data-bind="text: z.util.StringUtil.obfuscate(url)"></a>
+              </div>
+            <!-- /ko -->
             """
