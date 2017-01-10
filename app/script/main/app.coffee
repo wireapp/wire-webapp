@@ -110,9 +110,6 @@ class z.main.App
     repository.event_tracker       = new z.tracking.EventTrackingRepository repository.user, repository.conversation
     repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.calling, repository.conversation
 
-    # @todo Hack for calling service - remove when https://github.com/wearezeta/callingservice/pull/59 is deployed
-    repository.call_center         = repository.calling.call_center
-
     return repository
 
   # Create all app view models.
