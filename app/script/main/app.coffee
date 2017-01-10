@@ -65,9 +65,13 @@ class z.main.App
     service.web_socket              = new z.event.WebSocketService @auth.client
 
     service.client                  = new z.client.ClientService @auth.client, service.storage
-    service.conversation            = new z.conversation.ConversationService @auth.client, service.storage
     service.notification            = new z.event.NotificationService @auth.client, service.storage
     service.announce                = new z.announce.AnnounceService()
+
+    if z.util.Environment.browser.edge
+      service.conversation            = new z.conversation.ConversationServiceNoCompound @auth.client, service.storage
+    else
+      service.conversation            = new z.conversation.ConversationService @auth.client, service.storage
 
     return service
 

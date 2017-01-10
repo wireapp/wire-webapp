@@ -30,7 +30,7 @@ describe 'z.conversation.ConversationService', ->
     .then (storage_repository) ->
       client = test_factory.client
       storage_service = storage_repository.storage_service
-      conversation_service = new z.conversation.ConversationService client, storage_service
+      conversation_service = new z.conversation.ConversationServiceEdge client, storage_service
 
       conversation_mapper = new z.conversation.ConversationMapper()
       server = sinon.fakeServer.create()
@@ -107,8 +107,8 @@ describe 'z.conversation.ConversationService', ->
       timestamp = 1479903546799
       messages = [0...10].map (index) ->
         return {
-          key: "#{conversation_id}@#{sender_id}@#{index}"
-          object: {"conversation": conversation_id, "time": new Date(timestamp + index).toISOString()}
+        key: "#{conversation_id}@#{sender_id}@#{index}"
+        object: {"conversation": conversation_id, "time": new Date(timestamp + index).toISOString()}
         }
 
       Promise.all messages.map (message) ->
