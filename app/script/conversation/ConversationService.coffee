@@ -297,7 +297,6 @@ class z.conversation.ConversationService
   @return [Promise]
   ###
   load_events_with_category_from_db: (conversation_id, category) ->
-    console.log conversation_id, category
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+category]'
     .between [conversation_id, category], [conversation_id, z.message.MessageCategory.LIKED], true, true
