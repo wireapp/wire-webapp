@@ -34,7 +34,7 @@ class z.ViewModel.content.ContentViewModel
 
     # nested view models
     @call_shortcuts =             new z.ViewModel.CallShortcutsViewModel @calling_repository
-    @video_calling =              new z.ViewModel.VideoCallingViewModel 'video-calling',@calling_repository, @conversation_repository, @media_repository, @user_repository, @multitasking
+    @video_calling =              new z.ViewModel.VideoCallingViewModel 'video-calling', @calling_repository, @conversation_repository, @media_repository, @user_repository, @multitasking
     @collection_details =         new z.ViewModel.content.CollectionDetailsViewModel 'collection-details'
     @collection =                 new z.ViewModel.content.CollectionViewModel 'collection', @conversation_repository, @collection_details
     @connect_requests =           new z.ViewModel.content.ConnectRequestsViewModel 'connect-requests', @user_repository

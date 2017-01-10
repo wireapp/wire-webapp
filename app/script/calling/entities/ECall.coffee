@@ -38,6 +38,7 @@ class z.calling.entities.ECall
     @config = @e_call_center.calling_config
     @self_user = @e_call_center.user_repository.self()
     @self_state = @e_call_center.self_state
+    @telemetry = @e_call_center.telemetry
 
     # States
     @call_timer_interval = undefined
