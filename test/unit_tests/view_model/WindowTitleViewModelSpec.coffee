@@ -18,7 +18,7 @@
 
 # grunt test_init && grunt test_run:view_model/WindowTitleViewModel
 
-xdescribe 'z.ViewModel.WindowTitleViewModel', ->
+describe 'z.ViewModel.WindowTitleViewModel', ->
   suffix = z.localization.Localizer.get_text z.string.wire
   test_factory = new TestFactory()
   title_view_model = undefined
@@ -27,7 +27,7 @@ xdescribe 'z.ViewModel.WindowTitleViewModel', ->
     test_factory.exposeConversationActors()
     .then (conversation_repository) ->
       content_state = ko.observable z.ViewModel.content.CONTENT_STATE.CONVERSATION
-      title_view_model = new z.ViewModel.WindowTitleViewModel content_state, window.user_repository, conversation_repository
+      title_view_model = new z.ViewModel.WindowTitleViewModel content_state, user_repository, conversation_repository
       title_view_model.logger.level = z.util.Logger::levels.ERROR
       done()
     .catch done.fail
