@@ -96,7 +96,18 @@ class z.cryptography.CryptographyRepository
   ###
   get_remote_fingerprint: (user_id, client_id) =>
     session_id = @_construct_session_id user_id, client_id
-    return @cryptobox.session_load(session_id).then (cryptobox_session) -> cryptobox_session.fingerprint_remote()
+    @cryptobox.session_load(session_id)
+    .catch =>
+      return Promise.resolve().then =>
+        @get_users_pre_keys({"#{user_id}": [client_id]})
+        .then (user_pre_key_map) =>
+          remote_pre_key = user_pre_key_map[user_id][client_id]
+          @logger.log "Initializing session with Client ID '#{client_id}' from User ID '#{user_id}' with remote PreKey ID '#{remote_pre_key.id}'."
+          session_id = @_construct_session_id user_id, client_id
+          decoded_prekey_bundle_buffer = bazinga64.Decoder.fromBase64(remote_pre_key.key).asBytes.buffer
+          return @cryptobox.session_from_prekey session_id, decoded_prekey_bundle_buffer
+    .then (cryptobox_session) ->
+      return cryptobox_session.fingerprint_remote()
 
   ###
   Get a pre-key for a user client.
