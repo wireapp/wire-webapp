@@ -27,7 +27,7 @@ cache_add = (cache, request) ->
   .then (response) ->
     if not response.ok
       throw new TypeError 'bad response status'
-    return cache.put(request, response.clone()).then -> response
+    return cache.set(request, response.clone()).then -> response
 
 should_cache_request = (request) ->
   return request.url.includes 'forceCaching=true'
@@ -73,7 +73,7 @@ self.addEventListener 'fetch', (event) ->
         .then (response) ->
 
           if response
-            cache.put event.request, response.clone()
+            cache.set event.request, response.clone()
             return response
 
           return add_to_lru cache, ASSET_CACHE_MAX_ITEMS, event.request
