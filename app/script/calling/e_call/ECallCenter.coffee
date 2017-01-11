@@ -99,7 +99,7 @@ class z.calling.e_call.ECallCenter
   ###
   _on_event_in_unsupported_browsers: (event) ->
     e_call_message = event.content
-    return if e_call_message.resp in [true, 'true']
+    return if e_call_message.resp is true
 
     switch e_call_message.type
       when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
@@ -184,7 +184,7 @@ class z.calling.e_call.ECallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @user_repository.get_user_by_id user_id, (user_et) ->
-        if e_call_message.resp in [true, 'true']
+        if e_call_message.resp is true
           return e_call_et.update_participant user_et, e_call_message
         return e_call_et.add_participant user_et, e_call_message
     .catch (error) =>
@@ -227,9 +227,9 @@ class z.calling.e_call.ECallCenter
   ###
   _create_properties_payload: (media_type) ->
     return {
-      audiosend: @self_state.audio_send() if media_type is z.media.MediaType.AUDIO
-      screensend: @self_state.screen_send() if media_type in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
-      videosend: @self_state.video_send() if media_type in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
+      audiosend: "#{@self_state.audio_send()}" if media_type is z.media.MediaType.AUDIO
+      screensend: "#{@self_state.screen_send()}" if media_type in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
+      videosend: "#{@self_state.video_send()}" if media_type in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
     }
 
 
@@ -390,7 +390,7 @@ class z.calling.e_call.ECallCenter
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
       throw new z.calling.e_call.ECallError z.calling.e_call.ECallError::TYPE.NOT_ENABLED unless @calling_config().use_v3_api
 
-      @_create_outgoing_e_call conversation_id, new z.calling.entities.ECallPropSyncMessage false, videosend: video_send
+      @_create_outgoing_e_call conversation_id, new z.calling.entities.ECallPropSyncMessage false, videosend: "#{video_send}"
     .then (e_call) =>
       e_call_et = e_call
       @logger.debug "Joining e-call in conversation '#{conversation_id}'", e_call_et

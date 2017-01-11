@@ -370,7 +370,7 @@ class z.calling.entities.EFlow
   _on_message: (event) =>
     e_call_message = JSON.parse event.data
 
-    if e_call_message.resp in [true, 'true']
+    if e_call_message.resp is true
       @logger.info "Received confirmation for e-call message of type '#{e_call_message.type}' via data channel", e_call_message
     else
       @logger.info "Received e-call message of type '#{e_call_message.type}' via data channel", e_call_message
@@ -416,7 +416,7 @@ class z.calling.entities.EFlow
         return @_set_send_sdp_timeout()
 
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' containing '#{ice_candidates}' ICE candidates for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
-      return @e_call_et.send_e_call_event new z.calling.entities.ECallSetupMessage @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @local_sdp().sdp, videosend: @e_call_et.self_state.video_send(), @e_call_et
+      return @e_call_et.send_e_call_event new z.calling.entities.ECallSetupMessage @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @local_sdp().sdp, videosend: "#{@e_call_et.self_state.video_send()}", @e_call_et
       .then =>
         @has_sent_local_sdp true
         @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
@@ -479,7 +479,7 @@ class z.calling.entities.EFlow
   _map_sdp: (e_call_message) ->
     return new window.RTCSessionDescription
       sdp: e_call_message.sdp
-      type: if e_call_message.resp in [true, 'true'] then z.calling.rtc.SDPType.ANSWER else z.calling.rtc.SDPType.OFFER
+      type: if e_call_message.resp is true then z.calling.rtc.SDPType.ANSWER else z.calling.rtc.SDPType.OFFER
 
   ###
   Sets the local Session Description Protocol on the PeerConnection.

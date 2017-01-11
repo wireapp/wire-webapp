@@ -56,6 +56,6 @@ class z.calling.entities.EParticipant
 
   update_properties: (properties) =>
     if properties
-      @state.audio_send properties.audiosend in [true, 'true'] if properties.audiosend?
-      @state.screen_send properties.screensend in [true, 'true'] if properties.screensend?
-      @state.video_send properties.videosend in [true, 'true'] if properties.videosend?
+      @state.audio_send properties.audiosend is 'true' if properties.audiosend?
+      @state.screen_send properties.screensend is 'true' if properties.screensend?
+      @state.video_send properties.videosend is 'true' if properties.videosend?
