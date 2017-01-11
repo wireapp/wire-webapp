@@ -274,7 +274,7 @@ class z.conversation.ConversationService
   @return [Promise] Promise that resolves with the retrieved records
   @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
-  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = z.config.MESSAGES_FETCH_LIMIT) ->
+  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = Number.MAX_SAFE_INTEGER) ->
     if not _.isDate(lower_bound) or not _.isDate upper_bound
       throw new Error "Lower bound (#{typeof lower_bound}) and upper bound (#{typeof upper_bound}) must be of type 'Date'."
     else if lower_bound.getTime() > upper_bound.getTime()
