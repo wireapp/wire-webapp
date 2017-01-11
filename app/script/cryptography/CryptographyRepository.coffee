@@ -132,11 +132,6 @@ class z.cryptography.CryptographyRepository
 
     return signaling_keys
 
-
-  ###############################################################################
-  # Sessions
-  ###############################################################################
-
   ###
   Create a map of all local sessions.
   @return [Object] Object of users each containing an array of local sessions
@@ -173,10 +168,6 @@ class z.cryptography.CryptographyRepository
   delete_session: (user_id, client_id) =>
     session_id = @_construct_session_id user_id, client_id
     return @cryptobox.session_delete session_id
-
-  ###############################################################################
-  # Encryption
-  ###############################################################################
 
   ###
   Bundles and encrypts the generic message for all given clients.
@@ -276,10 +267,6 @@ class z.cryptography.CryptographyRepository
           @logger.error "Failed encrypting '#{generic_message.content}' message for session '#{session_id}': #{error.message}", error
           values.encrypted = '💣'
           return values
-
-  ###############################################################################
-  # Decryption
-  ###############################################################################
 
   ###
   @return [cryptobox.CryptoboxSession, z.proto.GenericMessage] Cryptobox session along with the decrypted message in ProtocolBuffer format
