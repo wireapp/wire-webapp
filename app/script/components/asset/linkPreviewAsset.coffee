@@ -48,10 +48,10 @@ ko.components.register 'link-preview-asset',
             <!-- ko ifnot: expired()-->
               <div class="link-preview-container" data-bind="click: on_link_preview_click">
                 <!-- ko if: preview.image_resource()-->
-                  <image-component class="link-preview-image" params="asset: preview.image_resource"></image-component>
+                  <image-component class="link-preview-image" data-uie-name="link-preview-image" params="asset: preview.image_resource"></image-component>
                 <!-- /ko -->
-                <div class="link-preview-title" data-bind="text: preview.title"></div>
-                <a class="link-preview-site text-graphite ellipsis" target="_blank" rel="nofollow noopener noreferrer"
+                <div class="link-preview-title" data-uie-name="link-preview-title" data-bind="text: preview.title"></div>
+                <a class="link-preview-site text-graphite ellipsis" data-uie-name="link-preview-url" target="_blank" rel="nofollow noopener noreferrer"
                    data-bind="text: z.util.naked_url(url), attr: {href: z.util.add_http(url), title: url}"></a>
               </div>
             <!-- /ko -->
