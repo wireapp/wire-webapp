@@ -63,7 +63,7 @@
             </header>
             <div class="collection-images">
               <!-- ko foreach: {data: video.slice(0,4), as: 'message_et'} -->
-                <video-asset class="collection-video" params="asset: message_et.get_first_asset()"></video-asset>
+                <video-asset class="collection-video" params="message: message_et"></video-asset>
               <!-- /ko -->
             </div>
           </section>
@@ -80,7 +80,7 @@
             </header>
             <div class="collection-images">
               <!-- ko foreach: {data: audio.slice(0,4), as: 'message_et'} -->
-                <audio-asset class="collection-file" params="asset: message_et.get_first_asset(), header: true"></audio-asset>
+                <audio-asset class="collection-file" params="message: message_et, header: true"></audio-asset>
               <!-- /ko -->
             </div>
           </section>
@@ -97,7 +97,7 @@
             </header>
             <div class="collection-images">
               <!-- ko foreach: {data: files.slice(0,4), as: 'message_et'} -->
-                <file-asset class="collection-file" params="asset: message_et.get_first_asset(), header: true"></file-asset>
+                <file-asset class="collection-file" params="message: message_et, header: true"></file-asset>
               <!-- /ko -->
             </div>
           </section>

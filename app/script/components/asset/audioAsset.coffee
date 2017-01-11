@@ -29,9 +29,10 @@ class z.components.AudioAssetComponent
   constructor: (params, component_info) ->
     @logger = new z.util.Logger 'AudioAssetComponent', z.config.LOGGER.OPTIONS
 
-    @asset = ko.unwrap params.asset
+    @message = ko.unwrap params.message
+    @asset = @message.get_first_asset()
+    @expired = @message.is_expired
     @header = params.header or false
-    @expired = params.expired or ko.observable false
 
     @audio_src = ko.observable()
     @audio_element = $(component_info.element).find('audio')[0]
@@ -85,7 +86,7 @@ ko.components.register 'audio-asset',
     <audio data-bind="attr: {src: audio_src}, event: {loadedmetadata: on_loadedmetadata, timeupdate: on_timeupdate}"></audio>
     <!-- ko ifnot: expired() -->
       <!-- ko if: header -->
-        <asset-header></asset-header>
+        <asset-header params="message: message"></asset-header>
       <!-- /ko -->
       <!-- ko if: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
         <div class="asset-placeholder">
