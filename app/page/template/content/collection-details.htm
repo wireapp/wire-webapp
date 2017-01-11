@@ -25,7 +25,7 @@
             <image-component class="collection-image" params="asset: message_et.get_first_asset().resource"></image-component>
           <!-- /ko -->
           <!-- ko if: $parent. template() === 'links' -->
-            <link-preview-compact-asset params="message: message_et, header: true"></link-preview-compact-asset>
+            <link-preview-asset params="message: message_et, header: true"></link-preview-asset>
           <!-- /ko -->
           <!-- ko if: $parent.template() === 'files' -->
             <file-asset class="collection-file" params="message: message_et, header: true"></file-asset>
