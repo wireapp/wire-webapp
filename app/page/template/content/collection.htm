@@ -6,11 +6,11 @@
 
     <div class="content-titlebar">
 
-      <span class="content-titlebar-items-center" data-bind="text: conversation_et().display_name()"></span>
-
-      <div class="content-titlebar-items-right">
+      <div class="content-titlebar-items-left">
         <span class="content-titlebar-icon icon-close" data-bind="click: click_on_back_button"></span>
       </div>
+
+      <span class="content-titlebar-items-center" data-bind="text: conversation_et().display_name()"></span>
 
     </div>
 
@@ -23,12 +23,12 @@
             <header>
               <span class="collection-header-icon icon-library"></span>
               <span class="label-bold-xs">Pictures</span>
-              <!-- ko if: images().length > 10 -->
+              <!-- ko if: images().length > 12 -->
                 <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('images', images()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': images().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
               <!-- /ko -->
             </header>
             <div class="collection-images">
-              <!-- ko foreach: {data: images.slice(0,10), as: 'message_et'} -->
+              <!-- ko foreach: {data: images.slice(0, 12), as: 'message_et'} -->
                 <image-component class="collection-image" data-bind="click: $parent.click_on_image" params="asset: message_et.get_first_asset().resource"></image-component>
               <!-- /ko -->
             </div>
@@ -45,7 +45,7 @@
               <!-- /ko -->
             </header>
             <div class="collection-images">
-              <!-- ko foreach: {data: links.slice(0,4), as: 'message_et'} -->
+              <!-- ko foreach: {data: links.slice(0, 4), as: 'message_et'} -->
                 <link-preview-compact-asset params="message: message_et, header: true"></link-preview-compact-asset>
               <!-- /ko -->
             </div>
@@ -62,7 +62,7 @@
               <!-- /ko -->
             </header>
             <div class="collection-images">
-              <!-- ko foreach: {data: video.slice(0,4), as: 'message_et'} -->
+              <!-- ko foreach: {data: video.slice(0, 4), as: 'message_et'} -->
                 <video-asset class="collection-video" params="message: message_et"></video-asset>
               <!-- /ko -->
             </div>
@@ -79,7 +79,7 @@
               <!-- /ko -->
             </header>
             <div class="collection-images">
-              <!-- ko foreach: {data: audio.slice(0,4), as: 'message_et'} -->
+              <!-- ko foreach: {data: audio.slice(0, 4), as: 'message_et'} -->
                 <audio-asset class="collection-file" params="message: message_et, header: true"></audio-asset>
               <!-- /ko -->
             </div>
@@ -96,7 +96,7 @@
               <!-- /ko -->
             </header>
             <div class="collection-images">
-              <!-- ko foreach: {data: files.slice(0,4), as: 'message_et'} -->
+              <!-- ko foreach: {data: files.slice(0, 4), as: 'message_et'} -->
                 <file-asset class="collection-file" params="message: message_et, header: true"></file-asset>
               <!-- /ko -->
             </div>
