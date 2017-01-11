@@ -210,7 +210,7 @@ class z.entity.Message
   Check if ephemeral message is expired.
   @return [Boolean]
   ###
-  is_expired: ->
+  is_expired: =>
     return @ephemeral_expires() is true
 
   ###

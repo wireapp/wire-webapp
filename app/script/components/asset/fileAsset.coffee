@@ -26,10 +26,12 @@ class z.components.FileAssetComponent
   @param params [Object]
   @option params [ko.observableArray] asset
   ###
-  constructor: (params, component_info) ->
-    @asset = ko.unwrap params.asset
+  constructor: (params) ->
+
+    @message = ko.unwrap params.message
+    @asset = @message.get_first_asset()
+    @expired = @message.is_expired
     @header = params.header or false
-    @expired = params.expired or ko.observable false
 
     @circle_upload_progress = ko.pureComputed =>
       size = if @large then '200' else '100'
@@ -50,7 +52,7 @@ ko.components.register 'file-asset',
   template: """
             <!-- ko ifnot: expired() -->
               <!-- ko if: header -->
-                <asset-header></asset-header>
+                <asset-header params="message: message"></asset-header>
               <!-- /ko -->
               <div class="file"
                  data-uie-name="file"
