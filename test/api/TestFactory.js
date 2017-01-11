@@ -23,6 +23,8 @@
  * @constructor
  */
 window.TestFactory = function (logger_level) {
+  Logdown.disable('*');
+
   if (!logger_level) {
     logger_level = z.util.Logger.prototype.levels.ERROR;
   }

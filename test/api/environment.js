@@ -23,5 +23,4 @@ navigator.__defineGetter__('language', function () {
 
 // Removing the log noise in Travis CI Build logs
 if(window.location.port == 9877) {
-  Logdown.disable('*');
 }
