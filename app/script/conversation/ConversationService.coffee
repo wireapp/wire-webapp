@@ -274,13 +274,11 @@ class z.conversation.ConversationService
   @return [Promise] Promise that resolves with the retrieved records
   @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
-  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = z.config.MESSAGES_FETCH_LIMIT) ->
+  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = Number.MAX_SAFE_INTEGER) ->
     if not _.isDate(lower_bound) or not _.isDate upper_bound
       throw new Error "Lower bound (#{typeof lower_bound}) and upper bound (#{typeof upper_bound}) must be of type 'Date'."
     else if lower_bound.getTime() > upper_bound.getTime()
       throw new Error "Lower bound (#{lower_bound.getTime()}) cannot be greater than upper bound (#{upper_bound.getTime()})."
-    else if z.util.Environment.browser.edge
-      return @_load_events_from_db_deprecated conversation_id, lower_bound.getTime(), upper_bound.getTime(), limit
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
@@ -291,6 +289,18 @@ class z.conversation.ConversationService
     .catch (error) =>
       @logger.error "Failed to load events for conversation '#{conversation_id}' from database: '#{error.message}'"
       throw error
+
+  ###
+  Get events with given category.
+  @param conversation_id [String] ID of conversation to add users to
+  @param category [z.message.MessageCategory] will be used as lower bound
+  @return [Promise]
+  ###
+  load_events_with_category_from_db: (conversation_id, category) ->
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where '[conversation+category]'
+    .between [conversation_id, category], [conversation_id, z.message.MessageCategory.LIKED], true, true
+    .sortBy 'time'
 
   ###
   Add a bot to an existing conversation.

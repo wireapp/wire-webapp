@@ -28,8 +28,11 @@ class z.components.VideoAssetComponent
   ###
   constructor: (params, component_info) ->
     @logger = new z.util.Logger 'VideoAssetComponent', z.config.LOGGER.OPTIONS
-    @asset = params.asset
-    @expired = params.expired
+
+    @message = ko.unwrap params.message
+    @asset = @message.get_first_asset()
+    @expired = @message.is_expired
+
     @preview_subscription = undefined
 
     @video_element = $(component_info.element).find('video')[0]
@@ -91,14 +94,12 @@ class z.components.VideoAssetComponent
 
   dispose: =>
     @preview_subscription?.dispose()
+    window.URL.revokeObjectURL @video_src()
 
 ko.components.register 'video-asset',
   viewModel: createViewModel: (params, component_info) ->
     return new z.components.VideoAssetComponent params, component_info
   template: """
-            <!-- ko if: expired() -->
-              <div class="video-asset-container"></div>
-            <!-- /ko -->
             <!-- ko ifnot: expired() -->
               <div class="video-asset-container" data-uie-name="video-asset" data-bind="hide_controls: 2000, attr: {'data-uie-value': asset.file_name}">
                 <video data-bind="attr: {src: video_src},
@@ -115,9 +116,7 @@ ko.components.register 'video-asset',
                   <!-- ko if: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
                     <div class="asset-placeholder">
                       <div class="three-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                        <span></span><span></span><span></span>
                       </div>
                     </div>
                   <!-- /ko -->

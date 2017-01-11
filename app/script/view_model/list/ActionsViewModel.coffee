@@ -130,7 +130,8 @@ class z.ViewModel.list.ActionsViewModel
   click_on_unarchive_action: =>
     @_click_on_action()
     .then (conversation_et) =>
-      @conversation_repository.unarchive_conversation conversation_et, =>
+      @conversation_repository.unarchive_conversation conversation_et
+      .then =>
         if not @conversation_repository.conversations_archived().length
           @list_view_model.switch_list z.ViewModel.list.LIST_STATE.CONVERSATIONS
 

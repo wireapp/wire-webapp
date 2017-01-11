@@ -167,7 +167,8 @@ class z.ViewModel.ParticipantsViewModel
     @participants_bubble.hide()
 
     if @conversation().is_group()
-      @conversation_repository.add_members @conversation(), user_ids, =>
+      @conversation_repository.add_members @conversation(), user_ids
+      .then =>
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.ADD_TO_GROUP_CONVERSATION,
           {numberOfParticipantsAdded: user_ids.length, numberOfGroupParticipants: @conversation().number_of_participants()}
     else
