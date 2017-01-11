@@ -361,7 +361,10 @@ class z.event.EventRepository
         return @cryptography_repository.decrypt_event event
         .then (generic_message) =>
           @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
-      return event
+        .catch (error) =>
+          return @_map_error_message event, error
+      else
+        return event
     .then (mapped_event) =>
       if mapped_event.type in z.event.EventTypeHandling.STORE
         return @cryptography_repository.save_unencrypted_event mapped_event
@@ -407,3 +410,18 @@ class z.event.EventRepository
         .catch (error) =>
           @logger.error "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
           reject error
+
+  _map_error_message: (event, decrypt_error) ->
+    hashed_error_message = z.util.murmurhash3 decrypt_error.message, 42
+    error_code = hashed_error_message.toString().substr 0, 4
+
+    unable_to_decrypt_event =
+      conversation: event.conversation
+      id: z.util.create_random_uuid()
+      type: z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
+      from: event.from
+      time: event.time
+      error: "#{decrypt_error.message} (#{event.data.sender})"
+      error_code: "#{error_code} (#{event.data.sender})"
+
+    return unable_to_decrypt_event

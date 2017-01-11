@@ -286,58 +286,6 @@ class z.cryptography.CryptographyRepository
         else
           @logger.info "Skipped decryption of event '#{event.type}' (#{primary_key}) because it was previously stored"
           reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
-      .catch (decrypt_error) =>
-        # Get error information
-        receiving_client_id = event.data.recipient
-        remote_client_id = event.data.sender
-        remote_user_id = event.from
-
-        # Handle error
-        if decrypt_error instanceof Proteus.errors.DecryptError.DuplicateMessage or decrypt_error instanceof Proteus.errors.DecryptError.OutdatedMessage
-          # We don't need to show duplicate message errors to the user
-          return resolve [undefined, undefined]
-
-        else if decrypt_error instanceof Proteus.errors.DecryptError.InvalidMessage or decrypt_error instanceof Proteus.errors.DecryptError.InvalidSignature
-          # Session is broken, let's see what's really causing it...
-          session_id = @_construct_session_id remote_user_id, remote_client_id
-          @logger.error "Session '#{session_id}' broken or out of sync. Reset the session and decryption is likely to work again.\r\n" +
-              "Try: wire.app.repository.cryptography.reset_session('#{remote_user_id}', '#{remote_client_id}');"
-
-          if decrypt_error instanceof Proteus.errors.DecryptError.InvalidMessage
-            @logger.error "Received message is for client '#{receiving_client_id}' while our ID is '#{@current_client().id}'."
-
-        else if decrypt_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged
-          # Remote identity changed... Is there a man in the middle or do we mess up with clients?
-          # TODO: This will not work anymore!
-          session = @load_session remote_user_id, remote_client_id
-          remote_fingerprint = session.session.remote_identity.public_key.fingerprint()
-
-          message = "Fingerprints do not match: We expect this fingerprint '#{remote_fingerprint}' from user ID '#{remote_user_id}' with client ID '#{remote_client_id}'"
-          @logger.error message, session
-
-        # Show error in JS console
-        @logger.error "Decryption of '#{event.type}' (#{primary_key}) failed: #{decrypt_error.message}",
-          error: decrypt_error,
-          event: event
-
-        # Report error to Localytics and Raygun
-        hashed_error_message = z.util.murmurhash3 decrypt_error.message, 42
-        error_code = hashed_error_message.toString().substr 0, 4
-        @_report_decrypt_error event, decrypt_error, error_code
-
-        unable_to_decrypt_event =
-          conversation: event.conversation
-          id: z.util.create_random_uuid()
-          type: z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
-          from: remote_user_id
-          time: event.time
-          error: "#{decrypt_error.message} (#{remote_client_id})"
-          error_code: "#{error_code} (#{remote_client_id})"
-
-        # Show error message in message view
-        amplify.publish z.event.WebApp.EVENT.INJECT, unable_to_decrypt_event
-
-        resolve [undefined, undefined]
 
   ###
   Save an unencrypted event.
@@ -364,28 +312,3 @@ class z.cryptography.CryptographyRepository
     return @cryptobox.decrypt session_id, msg_bytes
     .then (decrypted_message) ->
       return z.proto.GenericMessage.decode decrypted_message
-
-  ###
-  Report decryption error to Localytics and stack traces to Raygun.
-  @note We currently do not want to report duplicate message errors.
-  ###
-  _report_decrypt_error: (event, decrypt_error, error_code) =>
-    remote_client_id = event.data.sender
-    remote_user_id = event.from
-    session_id = @_construct_session_id remote_user_id, remote_client_id
-
-    attributes =
-      cause: "#{error_code}: #{decrypt_error.message}"
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE, attributes
-
-    if decrypt_error not instanceof Proteus.errors.DecryptError.DuplicateMessage and decrypt_error not instanceof Proteus.errors.DecryptError.TooDistantFuture
-      custom_data =
-        client_local_class: @current_client().class
-        client_local_type: @current_client().type
-        error_code: error_code
-        event_type: event.type
-        session_id: session_id
-
-      raygun_error = new Error "Decryption failed: #{decrypt_error.message}"
-      raygun_error.stack = decrypt_error.stack
-      Raygun.send raygun_error, custom_data
