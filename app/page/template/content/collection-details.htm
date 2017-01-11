@@ -5,48 +5,36 @@
   <!-- ko if: conversation_et() -->
 
     <div class="content-titlebar">
-
       <div class="content-titlebar-items-left">
         <span class="content-titlebar-icon icon-back" data-bind="click: click_on_back_button"></span>
       </div>
-
       <span class="content-titlebar-items-center">
         <span><span class="label-bold-xs">Pictures</span> <span class="text-graphite">in</span> <span class="text-graphite" data-bind="text: conversation_et().display_name()"></span></span>
       </span>
-
     </div>
 
     <div class="content-list">
 
       <div class="collection-images">
 
-        <!-- ko if: template() === 'images' -->
-          <!-- ko foreach: {data: items(), as: 'message_et'} -->
+        <!-- ko foreach: {data: items(), as: 'message_et'} -->
+          <!-- ko if: $parent.should_show_header($data) -->
+            <div class="collection-details-header label-bold-xs">today</div>
+          <!-- /ko -->
+          <!-- ko if: $parent.template() === 'images' -->
             <image-component class="collection-image" params="asset: message_et.get_first_asset().resource"></image-component>
           <!-- /ko -->
-        <!-- /ko -->
-
-        <!-- ko if: template() === 'links' -->
-          <!-- ko foreach: {data: items(), as: 'message_et'} -->
+          <!-- ko if: $parent. template() === 'links' -->
             <link-preview-compact-asset params="message: message_et, header: true"></link-preview-compact-asset>
           <!-- /ko -->
-        <!-- /ko -->
-
-        <!-- ko if: template() === 'files' -->
-          <!-- ko foreach: {data: items(), as: 'message_et'} -->
+          <!-- ko if: $parent.template() === 'files' -->
             <file-asset class="collection-file" params="message: message_et, header: true"></file-asset>
           <!-- /ko -->
-        <!-- /ko -->
-
-        <!-- ko if: template() === 'audio' -->
-          <!-- ko foreach: {data: items(), as: 'message_et'} -->
+          <!-- ko if: $parent.template() === 'audio' -->
             <audio-asset class="collection-file" params="message: message_et, header: true"></audio-asset>
           <!-- /ko -->
-        <!-- /ko -->
-
-        <!-- ko if: template() === 'video' -->
-          <!-- ko foreach: {data: items(), as: 'message_et'} -->
-            <video-asset class="collection-file" params="message: message_et"></video-asset>
+          <!-- ko if: $parent.template() === 'video' -->
+              <video-asset class="collection-file" params="message: message_et"></video-asset>
           <!-- /ko -->
         <!-- /ko -->
 
