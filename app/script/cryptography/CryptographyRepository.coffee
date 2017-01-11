@@ -377,7 +377,9 @@ class z.cryptography.CryptographyRepository
   @return [Promise] Promise that will resolve with the saved record
   ###
   save_unencrypted_event: (event) ->
-    @storage_repository.save_conversation_event event
+    Promise.resolve().then =>
+      event.category = z.message.MessageCategorization.category_from_event event
+      @storage_repository.save_conversation_event event
     .catch (error) =>
       @logger.error "Saving unencrypted message failed: #{error.message}", error
       throw error

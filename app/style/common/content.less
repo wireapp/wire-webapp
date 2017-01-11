@@ -17,22 +17,57 @@
  *
  */
 
-audio-asset {
-  .asset-container-style;
-  margin-top: 16px;
-  padding: 12px;
-  flex-wrap: wrap;
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
-.audio-controls {
-  align-items: center;
-  display: flex;
+// Titlebar
+.content-titlebar {
+  .label-bold-xs;
+  .flex-center;
+  background-color: @app-bg;
+  border-bottom: 1px solid fade(@graphite, 12%);
+  height: @content-title-bar-height;
   position: relative;
   width: 100%;
+  flex: 0 0 auto;
 }
 
-.audio-controls-time {
+.content-titlebar-items-left {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.content-titlebar-items-center {
+  .flex-center;
+  flex-direction: column;
+}
+
+.content-titlebar-items-right {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.content-titlebar-icon {
+  .button-icon-large;
+  flex: 0 0 auto;
   margin-left: 12px;
   margin-right: 12px;
-  min-width: 32px;
+}
+
+// List TODO antiscroll
+.content-list {
+  flex: 1 1;
+  overflow-y: scroll
 }

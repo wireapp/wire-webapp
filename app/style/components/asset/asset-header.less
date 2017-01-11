@@ -17,22 +17,19 @@
  *
  */
 
-audio-asset {
-  .asset-container-style;
-  margin-top: 16px;
-  padding: 12px;
-  flex-wrap: wrap;
-}
-
-.audio-controls {
-  align-items: center;
+asset-header {
   display: flex;
-  position: relative;
+  font-size: @font-size-xs;
+  justify-content: space-between;
+  line-height: @line-height-sm;
+  margin-bottom: 8px;
   width: 100%;
 }
 
-.audio-controls-time {
-  margin-left: 12px;
-  margin-right: 12px;
-  min-width: 32px;
+.asset-header-name {
+  font-weight: 500;
+}
+
+.asset-header-time {
+  color: @graphite;
 }

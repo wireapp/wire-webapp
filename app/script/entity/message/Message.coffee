@@ -61,6 +61,9 @@ class z.entity.Message
     @visible = ko.observable true
     @version = 1
 
+    # z.message.MessageCategory
+    @category = undefined
+
     @display_timestamp_short = =>
       date = moment.unix @timestamp / 1000
       return date.local().format 'HH:mm'

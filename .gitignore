@@ -12,6 +12,7 @@
 /aws/templates/**/*.html
 /aws/templates/sw.js
 /aws/templates/auth
+/aws/templates/sw.js
 /aws/version
 /bower_components
 /deploy

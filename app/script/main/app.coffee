@@ -65,9 +65,13 @@ class z.main.App
     service.web_socket              = new z.event.WebSocketService @auth.client
 
     service.client                  = new z.client.ClientService @auth.client, service.storage
-    service.conversation            = new z.conversation.ConversationService @auth.client, service.storage
     service.notification            = new z.event.NotificationService @auth.client, service.storage
     service.announce                = new z.announce.AnnounceService()
+
+    if z.util.Environment.browser.edge
+      service.conversation            = new z.conversation.ConversationServiceNoCompound @auth.client, service.storage
+    else
+      service.conversation            = new z.conversation.ConversationService @auth.client, service.storage
 
     return service
 
@@ -115,6 +119,7 @@ class z.main.App
     view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.audio, @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.media, @repository.search, @repository.user, @repository.properties
     view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user, @repository.properties
     view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
+    view.lightbox                  = new z.ViewModel.ImageDetailViewViewModel 'detail-view'
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
     view.modals                    = new z.ViewModel.ModalsViewModel 'modals'
 

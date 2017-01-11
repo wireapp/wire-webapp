@@ -19,7 +19,7 @@
 
 @font-face {
   font-family: 'Wire';
-  src: url('/font/Wire.ttf?8t0ru7') format('truetype');
+  src: url('/font/Wire.ttf?2m763t') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -242,6 +242,9 @@
 }
 .icon-hourglass:before {
   content: "\e239";
+}
+.icon-collection:before {
+  content: "\e260";
 }
 .icon-av:before {
   content: "\e261";
