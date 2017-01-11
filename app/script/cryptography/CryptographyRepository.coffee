@@ -27,18 +27,13 @@ class z.cryptography.CryptographyRepository
   @param storage_repository [z.storage.StorageRepository] Repository for all storage interactions
   ###
   constructor: (@cryptography_service, @storage_repository) ->
-    @logger = new z.util.Logger 'z.cryptography.CryptographyRepository', z.config.LOGGER.OPTIONS
+    @logger = new Logdown {alignOutput: true, prefix: 'z.cryptography.CryptographyRepository'}
 
     @cryptography_mapper = new z.cryptography.CryptographyMapper()
 
     @current_client = undefined
     @cryptobox = undefined
     return @
-
-
-  ###############################################################################
-  # Initialization
-  ###############################################################################
 
   ###
   Initialize the repository.
@@ -66,10 +61,6 @@ class z.cryptography.CryptographyRepository
       postal.subscribe config
       return @
 
-  ###############################################################################
-  # Pre-keys
-  ###############################################################################
-
   ###
   Generate all keys need for client registration.
   @return [Promise] Promise that resolves with an array of last resort key, pre-keys, and signaling keys
@@ -95,37 +86,9 @@ class z.cryptography.CryptographyRepository
   @param client_id [String] ID of client
   ###
   get_remote_fingerprint: (user_id, client_id) =>
-    session_id = @_construct_session_id user_id, client_id
-    @cryptobox.session_load(session_id)
-    .catch =>
-      return Promise.resolve().then =>
-        @get_users_pre_keys({"#{user_id}": [client_id]})
-        .then (user_pre_key_map) =>
-          remote_pre_key = user_pre_key_map[user_id][client_id]
-          @logger.log "Initializing session with Client ID '#{client_id}' from User ID '#{user_id}' with remote PreKey ID '#{remote_pre_key.id}'."
-          session_id = @_construct_session_id user_id, client_id
-          decoded_prekey_bundle_buffer = bazinga64.Decoder.fromBase64(remote_pre_key.key).asBytes.buffer
-          return @cryptobox.session_from_prekey session_id, decoded_prekey_bundle_buffer
+    return @_load_session(user_id, client_id)
     .then (cryptobox_session) ->
       return cryptobox_session.fingerprint_remote()
-
-  ###
-  Get a pre-key for a user client.
-
-  @param user_id [String] ID of user
-  @param client_id [String] ID of client to request pre-key for
-  @return [Promise] Promise that resolves with a pre-key for the client
-  ###
-  get_user_pre_key: (user_id, client_id) ->
-    @cryptography_service.get_user_pre_key user_id, client_id
-    .then (response) ->
-      return response.prekey
-    .catch (error) =>
-      if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
-        throw new z.user.UserError z.user.UserError::TYPE.PRE_KEY_NOT_FOUND
-      else
-        @logger.error "Failed to get pre-key from backend: #{error.message}"
-        throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
   ###
   Get a pre-key for client of in the user client map.
@@ -135,8 +98,25 @@ class z.cryptography.CryptographyRepository
   get_users_pre_keys: (user_client_map) ->
     @cryptography_service.get_users_pre_keys user_client_map
     .catch (error) =>
-      @logger.error "Failed to get pre-key from backend: #{error.message}"
-      throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
+      if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+        throw new z.user.UserError z.user.UserError::TYPE.PRE_KEY_NOT_FOUND
+      else
+        @logger.error "Failed to get pre-key from backend: #{error.message}"
+        throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
+
+  _load_session: (user_id, client_id) ->
+    return Promise.resolve()
+    .then =>
+      session_id = @_construct_session_id user_id, client_id
+      return @cryptobox.session_load(session_id)
+      .catch =>
+        @get_users_pre_keys({"#{user_id}": [client_id]})
+        .then (user_pre_key_map) =>
+          remote_pre_key = user_pre_key_map[user_id][client_id]
+          @logger.log "Initializing session with Client ID '#{client_id}' from User ID '#{user_id}' with remote PreKey ID '#{remote_pre_key.id}'."
+          session_id = @_construct_session_id user_id, client_id
+          decoded_prekey_bundle_buffer = bazinga64.Decoder.fromBase64(remote_pre_key.key).asBytes.buffer
+          return @cryptobox.session_from_prekey session_id, decoded_prekey_bundle_buffer
 
   ###
   Generate the signaling keys (which are used for mobile push notifications).
@@ -341,6 +321,7 @@ class z.cryptography.CryptographyRepository
 
         else if decrypt_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged
           # Remote identity changed... Is there a man in the middle or do we mess up with clients?
+          # TODO: This will not work anymore!
           session = @load_session remote_user_id, remote_client_id
           remote_fingerprint = session.session.remote_identity.public_key.fingerprint()
 

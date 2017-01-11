@@ -29,19 +29,6 @@ class z.cryptography.CryptographyService
     @logger = new z.util.Logger 'z.cryptography.CryptographyService', z.config.LOGGER.OPTIONS
 
   ###
-  Gets a pre-key for a client of a user
-  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getPrekey
-
-  @param user_id [String] User ID
-  @param client_id [String] Client ID
-  @return [Promise] Promise that resolves with a pre-key for the given client of the a user
-  ###
-  get_user_pre_key: (user_id, client_id) ->
-    @client.send_request
-      type: 'GET'
-      url: @client.create_url "/users/#{user_id}/prekeys/#{client_id}"
-
-  ###
   Gets a pre-key for each client of a user client map
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getMultiPrekeyBundles
 
