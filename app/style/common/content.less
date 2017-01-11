@@ -17,54 +17,57 @@
  *
  */
 
-file-asset {
-  .asset-container-style;
-  margin-top: 16px;
-  padding: 12px;
-  flex-wrap: wrap;
-}
-
-.file {
-  position: relative;
+.content-wrapper {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
-.file-icon {
-  font-size: @font-size-xl;
+// Titlebar
+.content-titlebar {
+  .label-bold-xs;
+  .flex-center;
+  background-color: @app-bg;
+  border-bottom: 1px solid fade(@graphite, 12%);
+  height: @content-title-bar-height;
   position: relative;
+  width: 100%;
+  flex: 0 0 auto;
 }
 
-.file-icon-ext {
-  bottom: 4px;
-  color: #fff;
-  font-family: @font-family-base;
-  font-size: @font-size-xs;
+.content-titlebar-items-left {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  position: absolute;
   left: 0;
+  top: 0;
+}
+
+.content-titlebar-items-center {
+  .flex-center;
+  flex-direction: column;
+}
+
+.content-titlebar-items-right {
+  align-items: center;
+  display: flex;
+  height: 100%;
   position: absolute;
   right: 0;
-  text-align: center;
+  top: 0;
 }
 
-.file-desc {
-  flex: 1 1 auto;
-  line-height: @line-height-sm;
-  min-width: 0;
+.content-titlebar-icon {
+  .button-icon-large;
+  flex: 0 0 auto;
   margin-left: 12px;
+  margin-right: 12px;
 }
 
-.file-desc-meta {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-
-  & > li:not(:first-child):before {
-    content: "\b7"; // middot
-    padding-right: 4px;
-  }
-
-  & > li:not(:last-child) {
-    margin-right: 4px;
-  }
+// List TODO antiscroll
+.content-list {
+  flex: 1 1;
+  overflow-y: scroll
 }

@@ -270,6 +270,9 @@ z.string.conversation_edit_timestamp = 'Edited on %@timestamp'
 z.string.conversation_likes_caption = '%@number people'
 z.string.conversation_send_pasted_file = 'Pasted image at %date'
 
+# Collection
+z.string.collection_show_all = 'Show all %no'
+
 # Archive
 z.string.archive_header = 'Archive'
 
@@ -302,8 +305,8 @@ z.string.invite_meta_key_pc = 'Ctrl'
 z.string.invite_hint_selected = 'Press %meta_key + C to copy'
 z.string.invite_hint_unselected = 'Select and Press %meta_key + C'
 z.string.invite_headline = 'Invite people to Wire'
-z.string.invite_message = 'I’m on Wire, search for %username or visit wire.com/download.'
-z.string.invite_message_no_email = 'I’m on Wire. Visit https://get.wire.com to connect with me.'
+z.string.invite_message = 'I’m on Wire, search for %username or visit get.wire.com.'
+z.string.invite_message_no_email = 'I’m on Wire. Visit get.wire.com to connect with me.'
 
 # Extensions
 z.string.extensions_bubble_button_gif = 'Gif'

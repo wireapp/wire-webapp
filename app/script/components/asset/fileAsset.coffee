@@ -26,9 +26,12 @@ class z.components.FileAssetComponent
   @param params [Object]
   @option params [ko.observableArray] asset
   ###
-  constructor: (params, component_info) ->
-    @asset = params.asset
-    @expired = params.expired
+  constructor: (params) ->
+
+    @message = ko.unwrap params.message
+    @asset = @message.get_first_asset()
+    @expired = @message.is_expired
+    @header = params.header or false
 
     @circle_upload_progress = ko.pureComputed =>
       size = if @large then '200' else '100'
@@ -47,10 +50,10 @@ ko.components.register 'file-asset',
   viewModel: createViewModel: (params, component_info) ->
     return new z.components.FileAssetComponent params, component_info
   template: """
-            <!-- ko if: expired() -->
-              <div class="file bg-color-ephemeral icon-file text-white flex-center"></div>
-            <!-- /ko -->
             <!-- ko ifnot: expired() -->
+              <!-- ko if: header -->
+                <asset-header params="message: message"></asset-header>
+              <!-- /ko -->
               <div class="file"
                  data-uie-name="file"
                  data-bind="attr: {'data-uie-value': asset.file_name},
@@ -59,9 +62,7 @@ ko.components.register 'file-asset',
                 <!-- ko if: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
                   <div class="asset-placeholder">
                     <div class="three-dots">
-                      <span></span>
-                      <span></span>
-                      <span></span>
+                      <span></span><span></span><span></span>
                     </div>
                   </div>
                 <!-- /ko -->

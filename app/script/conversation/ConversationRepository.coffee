@@ -219,6 +219,18 @@ class z.conversation.ConversationRepository
       throw error
 
   ###
+  Get messages for given category. Category param acts as lower bound
+  @param conversation_id [String]
+  @param catogory [z.message.MessageCategory.NONE]
+  @return [Promise] Array of z.entity.Message entities
+  ###
+  get_events_for_category: (conversation_et, catogory = z.message.MessageCategory.NONE) =>
+    @conversation_service.load_events_with_category_from_db conversation_et.id, catogory
+    .then (events) =>
+      message_ets = @event_mapper.map_json_events events, conversation_et
+      return Promise.all (@_update_user_ets message_et for message_et in message_ets)
+
+  ###
   Get conversation unread events.
   @param conversation_et [z.entity.Conversation] Conversation to start from
   ###
@@ -528,18 +540,15 @@ class z.conversation.ConversationRepository
 
   ###
   Add users to an existing conversation.
-
   @param conversation_et [z.entity.Conversation] Conversation to add users to
   @param user_ids [Array<String>] IDs of users to be added to the conversation
-  @param callback [Function] Function to be called on server return
   ###
-  add_members: (conversation_et, users_ids, callback) =>
+  add_members: (conversation_et, users_ids) =>
     @conversation_service.post_members conversation_et.id, users_ids
     .then (response) ->
       amplify.publish z.event.WebApp.ANALYTICS.EVENT,
         z.tracking.SessionEventName.INTEGER.USERS_ADDED_TO_CONVERSATIONS, users_ids.length
       amplify.publish z.event.WebApp.EVENT.INJECT, response
-      callback?()
     .catch (error_response) ->
       if error_response.label is z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS,
@@ -653,23 +662,19 @@ class z.conversation.ConversationRepository
   ###
   remove_participant: (conversation_et, user_et) =>
     if user_et.is_bot
-      return @conversation_repository.remove_bot @conversation(), user_et.id
-    return @conversation_repository.remove_member @conversation(), user_et
+      return @remove_bot conversation_et, user_et.id
+    return @remove_member conversation_et, user_et.id
 
   ###
   Rename conversation.
-
   @param conversation_et [z.entity.Conversation] Conversation to rename
   @param name [String] New conversation name
-  @param callback [Function] Function to be called on server return
   ###
-  rename_conversation: (conversation_et, name, callback) =>
+  rename_conversation: (conversation_et, name) =>
     @conversation_service.update_conversation_properties conversation_et.id, name
     .then (response) ->
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.CONVERSATION_RENAMED
       amplify.publish z.event.WebApp.EVENT.INJECT, response
-    .then ->
-      callback?()
 
   reset_session: (user_id, client_id, conversation_id) =>
     @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'"
@@ -707,9 +712,8 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation to send message in
   @param url [String] URL of giphy image
   @param tag [String] tag tag used for gif search
-  @param callback [Function] Function to be called on server return
   ###
-  send_gif: (conversation_et, url, tag, callback) =>
+  send_gif: (conversation_et, url, tag) =>
     if not tag
       tag = z.localization.Localizer.get_text z.string.extensions_giphy_random
 
@@ -723,8 +727,6 @@ class z.conversation.ConversationRepository
     .then (blob) =>
       @send_message message, conversation_et
       @upload_images conversation_et, [blob]
-    .then ->
-      callback?()
 
   ###
   Toggle a conversation between silence and notify.
@@ -756,9 +758,8 @@ class z.conversation.ConversationRepository
   ###
   Un-archive a conversation.
   @param conversation_et [z.entity.Conversation] Conversation to rename
-  @param callback [Function] Function to be called on return
   ###
-  unarchive_conversation: (conversation_et, callback) =>
+  unarchive_conversation: (conversation_et) =>
     return Promise.reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.CONVERSATION_NOT_FOUND if not conversation_et
 
     payload =
@@ -770,12 +771,10 @@ class z.conversation.ConversationRepository
       response = {data: payload}
       @_on_member_update conversation_et, response
       @logger.info "Unarchived conversation '#{conversation_et.id}' on '#{payload.otr_archived_ref}'"
-      callback?()
       return response
     .catch (error) =>
       reject_error = new Error "Conversation '#{conversation_et.id}' could not be unarchived: #{error.code}"
       @logger.warn reject_error.message, error
-      callback?()
       throw reject_error
 
   ###
@@ -1697,7 +1696,8 @@ class z.conversation.ConversationRepository
   @param event_json [Object] JSON data of 'conversation.message-add' or 'conversation.knock' event
   ###
   _on_add_event: (conversation_et, event_json) ->
-    @_add_event_to_conversation event_json, conversation_et, (message_et) =>
+    @_add_event_to_conversation event_json, conversation_et
+    .then (message_et) =>
       @send_confirmation_status conversation_et, message_et
       @_send_event_notification conversation_et, message_et
 
@@ -1798,7 +1798,8 @@ class z.conversation.ConversationRepository
       conversation_et.removed_from_conversation false
 
     @update_participating_user_ets conversation_et, =>
-      @_add_event_to_conversation event_json, conversation_et, (message_et) ->
+      @_add_event_to_conversation event_json, conversation_et
+      .then (message_et) ->
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
 
   ###
@@ -1808,7 +1809,8 @@ class z.conversation.ConversationRepository
   @param event_json [Object] JSON data of 'conversation.member-leave' event
   ###
   _on_member_leave: (conversation_et, event_json) ->
-    @_add_event_to_conversation event_json, conversation_et, (message_et) =>
+    @_add_event_to_conversation event_json, conversation_et
+    .then (message_et) =>
       for user_et in message_et.user_ets()
         if conversation_et.call()
           if user_et.is_me
@@ -1937,7 +1939,8 @@ class z.conversation.ConversationRepository
   @param event_json [Object] JSON data of 'conversation.rename' event
   ###
   _on_rename: (conversation_et, event_json) ->
-    @_add_event_to_conversation event_json, conversation_et, (message_et) =>
+    @_add_event_to_conversation event_json, conversation_et
+    .then (message_et) =>
       @conversation_mapper.update_properties conversation_et, event_json.data
       amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
 
@@ -1951,10 +1954,10 @@ class z.conversation.ConversationRepository
 
   @param json [Object] Event data
   @param conversation_et [z.entity.Conversation] Conversation entity the event will be added to
-  @param callback [Function] Function to be called on return
+  @return [Promise] Promise that resolves with the message entity for the event
   ###
-  _add_event_to_conversation: (json, conversation_et, callback) ->
-    message_et = @event_mapper.map_json_event json, conversation_et
+  _add_event_to_conversation: (json, conversation_et) ->
+    message_et = @event_mapper.map_json_event json, conversation_et, true
     @_update_user_ets message_et
     .then (message_et) =>
       if conversation_et
@@ -1965,7 +1968,7 @@ class z.conversation.ConversationRepository
         custom_data =
           message_type: message_et.type
         Raygun.send error, custom_data
-      callback? message_et
+      return message_et
 
   ###
   Convert multiple JSON events into entities and add them to a given conversation.
@@ -1977,7 +1980,7 @@ class z.conversation.ConversationRepository
   ###
   _add_events_to_conversation: (events, conversation_et, prepend = true) ->
     return Promise.resolve().then =>
-      message_ets = @event_mapper.map_json_events events, conversation_et
+      message_ets = @event_mapper.map_json_events events, conversation_et, true
       return Promise.all (@_update_user_ets message_et for message_et in message_ets)
     .then (message_ets) ->
       if prepend and conversation_et.messages().length > 0
@@ -2343,7 +2346,8 @@ class z.conversation.ConversationRepository
   _update_link_preview: (conversation_et, event_json) =>
     @get_message_in_conversation_by_id conversation_et, event_json.id
     .then (original_message_et) =>
-      @_delete_message conversation_et, original_message_et
+      if original_message_et.get_first_asset().previews().length is 0
+        @_delete_message conversation_et, original_message_et
     .then ->
       return event_json
 

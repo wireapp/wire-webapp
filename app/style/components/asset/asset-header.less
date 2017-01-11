@@ -17,54 +17,19 @@
  *
  */
 
-file-asset {
-  .asset-container-style;
-  margin-top: 16px;
-  padding: 12px;
-  flex-wrap: wrap;
-}
-
-.file {
-  position: relative;
+asset-header {
   display: flex;
-  align-items: center;
-}
-
-.file-icon {
-  font-size: @font-size-xl;
-  position: relative;
-}
-
-.file-icon-ext {
-  bottom: 4px;
-  color: #fff;
-  font-family: @font-family-base;
   font-size: @font-size-xs;
-  left: 0;
-  position: absolute;
-  right: 0;
-  text-align: center;
-}
-
-.file-desc {
-  flex: 1 1 auto;
+  justify-content: space-between;
   line-height: @line-height-sm;
-  min-width: 0;
-  margin-left: 12px;
+  margin-bottom: 8px;
+  width: 100%;
 }
 
-.file-desc-meta {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.asset-header-name {
+  font-weight: 500;
+}
 
-  & > li:not(:first-child):before {
-    content: "\b7"; // middot
-    padding-right: 4px;
-  }
-
-  & > li:not(:last-child) {
-    margin-right: 4px;
-  }
+.asset-header-time {
+  color: @graphite;
 }

@@ -17,14 +17,32 @@
  *
  */
 
+// Variables
+@border-radius: 4px;
+
 .asset-container-style {
-  border-radius: 4px;
   background-color: fade(@graphite, 12%);
+  display: flex;
+  min-height: 64px;
+  overflow: hidden;
+  position: relative;
+
+  & + & {
+    margin-top: 1px;
+  }
+
+  &:last-of-type {
+    border-bottom-left-radius: @border-radius;
+    border-bottom-right-radius: @border-radius;
+  }
+
+  &:first-of-type {
+    border-top-left-radius: @border-radius;
+    border-top-right-radius: @border-radius;
+  }
 }
 
 .asset-placeholder {
   .full-screen;
-  align-items: center;
-  display: flex;
-  justify-content: center;
+  .flex-center;
 }
