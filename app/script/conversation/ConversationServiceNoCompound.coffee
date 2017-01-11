@@ -35,7 +35,7 @@ class z.conversation.ConversationServiceNoCompound extends z.conversation.Conver
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
   ###
-  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = z.config.MESSAGES_FETCH_LIMIT) ->
+  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit) ->
     if not _.isDate(lower_bound) or not _.isDate upper_bound
       throw new Error "Lower bound (#{typeof lower_bound}) and upper bound (#{typeof upper_bound}) must be of type 'Date'."
     else if lower_bound.getTime() > upper_bound.getTime()
