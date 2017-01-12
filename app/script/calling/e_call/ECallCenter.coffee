@@ -388,7 +388,6 @@ class z.calling.e_call.ECallCenter
     @get_e_call_by_id conversation_id
     .catch (error) =>
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
-      throw new z.calling.e_call.ECallError z.calling.e_call.ECallError::TYPE.NOT_ENABLED unless @calling_config().use_v3_api
 
       @_create_outgoing_e_call conversation_id, new z.calling.entities.ECallPropSyncMessage false, videosend: "#{video_send}"
     .then (e_call) =>

@@ -51,7 +51,7 @@ class z.calling.CallingRepository
     @logger = new z.util.Logger 'z.calling.CallingRepository', z.config.LOGGER.OPTIONS
 
     @calling_config = ko.observable()
-    @use_v3_api = false
+    @use_v3_api = undefined
 
     @call_center = new z.calling.belfry.CallCenter @calling_config, @call_service, @conversation_repository, @media_repository, @user_repository
     @e_call_center = new z.calling.e_call.ECallCenter @calling_config, @conversation_repository, @media_repository, @user_repository
@@ -103,7 +103,7 @@ class z.calling.CallingRepository
 
   handled_by_v3: (conversation_id) =>
     conversation_et = @conversation_repository.get_conversation_by_id conversation_id
-    v3_api_enabled = @use_v3_api or @protocol_version_1to1 is z.calling.enum.PROTOCOL_VERSION.E_CALL
+    v3_api_enabled = @use_v3_api is true or (@protocol_version_1to1() is z.calling.enum.PROTOCOL_VERSION.E_CALL and @use_v3_api isnt false)
     return z.calling.enum.PROTOCOL_VERSION.BELFRY unless v3_api_enabled and not conversation_et?.is_group()
     return z.calling.enum.PROTOCOL_VERSION.E_CALL
 

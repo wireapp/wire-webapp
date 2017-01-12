@@ -33,8 +33,6 @@ class z.calling.e_call.ECallError
         'No e-call for conversation ID found'
       when z.calling.e_call.ECallError::TYPE.NO_CONVERSATION_ID
         'No conversation ID given'
-      when z.calling.e_call.ECallError::TYPE.NOT_ENABLED
-        'Tried to use calling v3 API without it being enabled'
       when z.calling.e_call.ECallError::TYPE.NOT_SUPPORTED
         'Tried to use calling v3 API in group conversation'
       when z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
@@ -54,7 +52,6 @@ class z.calling.e_call.ECallError
     DATA_CHANNEL_NOT_OPENED: 'z.calling.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED'
     E_CALL_NOT_FOUND: 'z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND'
     NO_CONVERSATION_ID: 'z.calling.e_call.ECallError::TYPE.NO_CONVERSATION_ID'
-    NOT_ENABLED: 'z.calling.e_call.ECallError::TYPE.NOT_ENABLED'
     PARTICIPANT_NOT_FOUND: 'z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND'
     UNKNOWN: 'z.calling.e_call.ECallError::TYPE.UNKNOWN'
     UNKNOWN_EVENT_TYPE: 'z.calling.e_call.ECallError::TYPE.UNKNOWN_EVENT_TYPE'
