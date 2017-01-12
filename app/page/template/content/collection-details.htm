@@ -17,9 +17,6 @@
         <div class="collection-images">
 
           <!-- ko foreach: {data: items(), as: 'message_et'} -->
-            <!-- ko if: $parent.should_show_header($data) -->
-              <div class="collection-details-header label-bold-xs">today</div>
-            <!-- /ko -->
             <!-- ko if: message_et.category & z.message.MessageCategory.IMAGE -->
               <image-component class="collection-image" data-bind="click_on_image" params="asset: message_et.get_first_asset().resource"></image-component>
             <!-- /ko -->

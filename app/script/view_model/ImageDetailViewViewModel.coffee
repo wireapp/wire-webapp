@@ -27,8 +27,10 @@ class z.ViewModel.ImageDetailViewViewModel
     @visible = ko.observable false
     @image_src = ko.observable()
 
-    @conversation_et = @conversation_repository.active_conversation
+    @conversation_et = ko.observable()
     @message_et = ko.observable()
+    @message_et.subscribe (message_et) =>
+      @conversation_et @conversation_repository.find_conversation_by_id message_et.conversation_id
 
     amplify.subscribe z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, @show
 
@@ -59,26 +61,16 @@ class z.ViewModel.ImageDetailViewViewModel
   click_on_close: =>
     @image_modal.hide()
 
-  click_on_download: (message_et) ->
+  click_on_download: ->
     message_et?.get_first_asset()?.download()
 
-  click_on_like: (message_et) =>
-    # TODO create api for like
-    return if @conversation_et().removed_from_conversation()
+  click_on_like: =>
+    @conversation_repository.toggle_like @conversation_et(), @message_et()
 
-    message_et = @message_et()
-    reaction = if message_et.is_liked() then z.message.ReactionType.NONE else z.message.ReactionType.LIKE
-    message_et.is_liked not message_et.is_liked()
-
-    window.setTimeout =>
-      @conversation_repository.send_reaction @conversation_et(), message_et, reaction
-      # @_track_reaction @conversation(), message_et, reaction, button
-    , 50
-
-  click_on_delete: (message_et) =>
-    @conversation_repository.delete_message @conversation_et(), message_et
+  click_on_delete: =>
+    @conversation_repository.delete_message @conversation_et(), @message_et()
     @image_modal.hide()
 
-  click_on_delete_for_everyone: (message_et) =>
-    @conversation_repository.delete_message_everyone @conversation_et(), message_et
+  click_on_delete_for_everyone: =>
+    @conversation_repository.delete_message_everyone @conversation_et(), @message_et()
     @image_modal.hide()

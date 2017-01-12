@@ -1067,9 +1067,21 @@ class z.conversation.ConversationRepository
       throw error
 
   ###
+  Toggle like status of message.
+  @param conversation [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  ###
+  toggle_like: (conversation_et, message_et) =>
+    return if conversation_et.removed_from_conversation()
+
+    reaction = if message_et.is_liked() then z.message.ReactionType.NONE else z.message.ReactionType.LIKE
+    message_et.is_liked not message_et.is_liked()
+    @send_reaction conversation_et, message_et, reaction
+
+  ###
   Send reaction to a content message in specified conversation.
   @param conversation [z.entity.Conversation] Conversation to send reaction in
-  @param message_et [String] ID of message for react to
+  @param message_et [z.entity.Message]
   @param reaction [z.message.ReactionType]
   ###
   send_reaction: (conversation_et, message_et, reaction) =>
