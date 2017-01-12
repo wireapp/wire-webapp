@@ -19,7 +19,11 @@
 
 @font-face {
   font-family: 'Wire';
-  src: url('/font/Wire.ttf?2m763t') format('truetype');
+  src:
+  url('fonts/Wire.woff2?1k0say') format('woff2'),
+  url('fonts/Wire.ttf?1k0say') format('truetype'),
+  url('fonts/Wire.woff?1k0say') format('woff'),
+  url('fonts/Wire.svg?1k0say#Wire') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -194,6 +198,12 @@
 }
 .icon-trash-small:before {
   content: "\e1860";
+}
+.icon-delete-for-me:before {
+  content: "\e1861";
+}
+.icon-delete-for-everyone:before {
+  content: "\e1862";
 }
 .icon-download:before {
   content: "\e197";

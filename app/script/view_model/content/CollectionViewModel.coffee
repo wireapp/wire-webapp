@@ -27,18 +27,16 @@ class z.ViewModel.content.CollectionViewModel
 
     @conversation_et = ko.observable()
 
-    @files = ko.observableArray().extend 'notifyWhenChangesStop': true
-    @images = ko.observableArray().extend 'notifyWhenChangesStop': true
-    @links = ko.observableArray().extend 'notifyWhenChangesStop': true
-
-    @images.subscribe -> LOG 'added image'
+    @files = ko.observableArray().extend 'rateLimit': 1
+    @images = ko.observableArray().extend 'rateLimit': 1
+    @links = ko.observableArray().extend 'rateLimit': 1
 
     @no_items_found = ko.observable false
 
   removed_from_view: =>
     @no_items_found false
     @conversation_et null
-    [@images, @files, @links, @audio, @video].forEach (array) -> array.removeAll()
+    [@images, @files, @links].forEach (array) -> array.removeAll()
 
   set_conversation: (conversation_et) =>
     @conversation_et conversation_et
@@ -68,6 +66,3 @@ class z.ViewModel.content.CollectionViewModel
 
   click_on_image: (message_et) ->
     amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW,  message_et
-
-  push_deferred: (array, items) ->
-    # TODO

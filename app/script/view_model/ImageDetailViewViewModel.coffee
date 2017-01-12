@@ -26,13 +26,15 @@ class z.ViewModel.ImageDetailViewViewModel
 
     @visible = ko.observable false
     @image_src = ko.observable()
+
+    @conversation_et = @conversation_repository.active_conversation
     @message_et = ko.observable()
 
-    amplify.subscribe z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, @show_detail_view
+    amplify.subscribe z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, @show
 
     ko.applyBindings @, document.getElementById @element_id
 
-  show_detail_view: (message_et) =>
+  show: (message_et) =>
     @message_et message_et
 
     @image_modal.destroy() if @image_modal?
@@ -47,12 +49,37 @@ class z.ViewModel.ImageDetailViewViewModel
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_DETAIL_VIEW_OPENED
 
-  hide_detail_view: =>
-    @image_modal.hide()
-
   _hide_callback: =>
     @image_src undefined
     window.URL.revokeObjectURL @image_src()
 
   _before_hide_callback: =>
     @visible false
+
+  click_on_close: =>
+    @image_modal.hide()
+
+  click_on_download: (message_et) =>
+    message_et?.get_first_asset()?.download()
+
+  click_on_like: (message_et) =>
+    # TODO create api for like
+    return if @conversation_et().removed_from_conversation()
+
+    message_et = @message_et()
+    reaction = if message_et.is_liked() then z.message.ReactionType.NONE else z.message.ReactionType.LIKE
+    message_et.is_liked not message_et.is_liked()
+
+    window.setTimeout =>
+      @conversation_repository.send_reaction @conversation_et(), message_et, reaction
+      # @_track_reaction @conversation(), message_et, reaction, button
+    , 50
+
+  click_on_delete: (message_et) =>
+    @conversation_repository.delete_message @conversation_et(), message_et
+    @image_modal.hide()
+
+  click_on_delete_for_everyone: (message_et) =>
+    @conversation_repository.delete_message_everyone @conversation_et(), message_et
+    @image_modal.hide()
+
