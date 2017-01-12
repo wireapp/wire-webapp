@@ -1,6 +1,6 @@
 <div id="detail-view" class="modal detail-view">
   <!-- ko if: message_et() && conversation_et() -->
-    <div class="detail-view-content modal-content-anim-close" data-bind="css: {'modal-content-anim-open': image_src()}">
+    <div class="detail-view-content modal-content-anim-close" data-bind="css: {'modal-content-anim-open': visible()}">
       <header class="detail-view-header">
           <div class="text-center">
             <div class="label-bold-xs" data-bind="text: message_et().sender_name()"></div>
