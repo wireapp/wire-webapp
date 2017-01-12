@@ -446,7 +446,8 @@ z.string.ro.preferences_options_data_checkbox = 'Rapoarte de folosire și de ava
 z.string.ro.preferences_options_data_detail = 'Ajută la îmbunătățirea Wire prin trimiterea de informații anonime.'
 z.string.ro.preferences_options_notifications = 'Notificări'
 z.string.ro.preferences_options_notifications_none = 'Închis'
-z.string.ro.preferences_options_notifications_obfuscate = 'Ascunde detaliile mesajelor'
+z.string.ro.preferences_options_notifications_obfuscate = 'Ascunde detaliile'
+z.string.ro.preferences_options_notifications_obfuscate_message = 'Arată expeditorul'
 z.string.ro.preferences_options_notifications_on = 'Arată expeditorul și mesajul'
 
 # Search
