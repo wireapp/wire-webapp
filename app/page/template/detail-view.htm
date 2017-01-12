@@ -1,6 +1,19 @@
 <div id="detail-view" class="modal detail-view">
-  <img class="detail-view-image modal-content-anim-close" data-bind="attr: {src: image_src()}, css: {'modal-content-anim-open': image_visible()}" data-uie-name="status-picture"/>
-  <div class="detail-view-close-button">
-    <span class="icon-close icon-button" data-bind="click: hide_detail_view" data-uie-name="do-close-detail-view"></span>
-  </div>
+  <!-- ko: if message_et -->
+    <div class="detail-view-content modal-content-anim-close" data-bind="css: {'modal-content-anim-open': visible()}">
+      <header class="detail-view-header">
+        <span class="label-bold-xs" data-bind="text: message_et.sender_name"></span>
+        <span class="label-xs" data-bind="text: moment(message_et.timestamp).format('DD/MM/YYYY')"></span>
+      </header>
+      <img class="detail-view-image" data-bind="attr: {src: image_src()}" data-uie-name="status-picture"/>
+      <div class="detail-view-close-button">
+        <span class="icon-close icon-button" data-bind="click: hide_detail_view" data-uie-name="do-close-detail-view"></span>
+      </div>
+      <footer>
+        <span>Like</span>
+        <span>Delete</span>
+        <span>Delete for everyone</span>
+      </footer>
+    </div>
+  <!-- /ko -->
 </div>
