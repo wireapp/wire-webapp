@@ -446,7 +446,8 @@ z.string.pt.preferences_options_data_checkbox = 'Relatórios de uso e erro'
 z.string.pt.preferences_options_data_detail = 'Faça o Wire melhorar mandando informações de uso anônimas.'
 z.string.pt.preferences_options_notifications = 'Notificações'
 z.string.pt.preferences_options_notifications_none = 'Desligar'
-z.string.pt.preferences_options_notifications_obfuscate = 'Esconder detalhes da mensagem'
+z.string.pt.preferences_options_notifications_obfuscate = 'Ocultar detalhes'
+z.string.pt.preferences_options_notifications_obfuscate_message = 'Mostrar remetente'
 z.string.pt.preferences_options_notifications_on = 'Mostrar o remetente e a mensagem'
 
 # Search

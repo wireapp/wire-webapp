@@ -30,6 +30,8 @@ class z.ViewModel.content.CollectionDetailsViewModel
 
     @items = ko.observableArray()
 
+    @last_message_timestamp = undefined
+
   set_conversation: (conversation_et, category, items) =>
     @template category
     @conversation_et conversation_et
@@ -39,8 +41,16 @@ class z.ViewModel.content.CollectionDetailsViewModel
     @conversation_et null
     @items.removeAll()
 
+  should_show_header: (message_et) =>
+    if not @last_message_timestamp? or moment(message_et.timestamp).format('M') isnt moment(@last_message_timestamp).format('M')
+      @last_message_timestamp = message_et.timestamp
+      return true
+
   click_on_back_button: ->
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION
+
+  click_on_image: (message_et) ->
+    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et
 
   # helper
   push_deferred: (target, src, number = 100, delay = 300) ->

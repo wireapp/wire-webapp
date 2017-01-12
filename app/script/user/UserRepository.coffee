@@ -290,7 +290,10 @@ class z.user.UserRepository
         when z.user.ConnectionStatus.PENDING
           message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST
         when z.user.ConnectionStatus.ACCEPTED
-          message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED
+          if previous_status is z.user.ConnectionStatus.SENT
+            message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED
+          else
+            message_et.member_message_type = z.message.SystemMessageType.CONNECTION_CONNECTED
       amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, connection_et, message_et
 
 

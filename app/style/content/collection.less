@@ -19,20 +19,20 @@
 
 // Variables
 @image-size: 104px;
-@image-items-per-row: 5;
+@image-items-per-row: 6;
 
 // Sections
 
 .collection-section {
   display: inline-block;
-  padding-top: 24px;
   margin-bottom: 16px;
+  padding-top: 24px;
 
   > header {
     align-items: center;
     display: flex;
-    height: 32px;
-    padding-bottom: 8px;
+    height: 24px;
+    margin-bottom: 8px;
   }
 }
 
@@ -66,13 +66,7 @@
 
 // Files
 .collection-file {
-  border-radius: 0;
   width: 100%;
-  margin: 0;
-
-  & + & {
-    margin-top: 1px;
-  }
 }
 
 // Videos
@@ -92,4 +86,14 @@
   color: fade(@graphite, 40%);
   font-size: 120px;
   margin-bottom: 32px;
+}
+
+// Details
+.collection-details-header {
+  align-items: center;
+  display: flex;
+  height: 24px;
+  margin-bottom: 8px;
+  margin-top: 24px;
+  width: 100%;
 }

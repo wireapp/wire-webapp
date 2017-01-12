@@ -378,7 +378,7 @@ class z.ViewModel.MessageListViewModel
 
     @_track_context_menu message_et
 
-    if message_et.has_asset() and not message_et.is_ephemeral()
+    if message_et.get_first_asset()?.download? and not message_et.is_ephemeral()
       entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
 
     if message_et.is_reactable() and not @conversation().removed_from_conversation()
@@ -427,7 +427,9 @@ class z.ViewModel.MessageListViewModel
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
           action: => @conversation_repository.delete_message_everyone @conversation(), message_et
       when 'download'
-        message_et?.get_first_asset()?.download()
+        date = moment message_et.timestamp
+        name = "Wire #{date.format('YYYY-MM-DD')} at #{date.format('h.mm.ss')}"
+        message_et?.get_first_asset()?.download name
       when 'edit'
         amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.EDIT, message_et
       when 'react'
@@ -435,14 +437,12 @@ class z.ViewModel.MessageListViewModel
 
   ###
   Shows detail image view.
-  @param asset_et [z.assets.Asset] Asset to be displayed
+  @param message_et [z.entity.Message] Message with asset to be displayed
   @param event [UIEvent] Actual scroll event
   ###
-  show_detail: (asset_et, event) ->
-    target_element = $(event.currentTarget)
-    return if target_element.hasClass 'bg-color-ephemeral'
-    return if target_element.hasClass 'image-loading'
-    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, target_element.find('img')[0].src
+  show_detail: (message_et, event) ->
+    return if message_et.is_expired() or $(event.currentTarget).hasClass 'image-loading'
+    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et
 
   get_timestamp_class: (message_et) ->
     last_message = @conversation().get_previous_message message_et
@@ -494,33 +494,7 @@ class z.ViewModel.MessageListViewModel
     @user_repository.cancel_connection_request message_et.other_user(), next_conversation_et
 
   click_on_like: (message_et, button = true) =>
-    return if @conversation().removed_from_conversation()
-
-    reaction = if message_et.is_liked() then z.message.ReactionType.NONE else z.message.ReactionType.LIKE
-    message_et.is_liked not message_et.is_liked()
-
-    window.setTimeout =>
-      @conversation_repository.send_reaction @conversation(), message_et, reaction
-      @_track_reaction @conversation(), message_et, reaction, button
-    , 50
-
-  ###
-  Track reaction action.
-
-  @param conversation_et [z.entity.Conversation]
-  @param message_et [z.entity.Message]
-  @param reaction [z.message.ReactionType]
-  @param button [Boolean]
-  ###
-  _track_reaction: (conversation_et, message_et, reaction, button = true) ->
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.REACTED_TO_MESSAGE,
-      conversation_type: z.tracking.helpers.get_conversation_type conversation_et
-      action: if reaction then 'like' else 'unlike'
-      with_bot: conversation_et.is_with_bot()
-      method: if button then 'button' else 'menu'
-      user: if message_et.user().is_me then 'sender' else 'receiver'
-      type: z.tracking.helpers.get_message_type message_et
-      reacted_to_last_message: conversation_et.get_last_message() is message_et
+    @conversation_repository.toggle_like @conversation(), message_et, button
 
   ###
   Message appeared in viewport.

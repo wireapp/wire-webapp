@@ -27,6 +27,13 @@
   text-overflow: ellipsis;
 }
 
+.ellipsis-multiline(@lines) {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: @lines;
+  -webkit-box-orient: vertical;
+}
+
 .text-nowrap {
   white-space: nowrap;
 }
@@ -45,6 +52,10 @@
 
 .text-uppercase {
   text-transform: uppercase;
+}
+
+.text-capitalize {
+  text-transform: capitalize
 }
 
 .text-underline {

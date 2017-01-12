@@ -35,5 +35,23 @@ class z.entity.MediumImage extends z.entity.Asset
     @width = '0px'
     @height = '0px'
 
+    @file_name = ''
+    @file_size = ''
+    @file_type = ''
+
     # z.assets.AssetRemoteData
     @resource = ko.observable()
+
+  ###
+  # TODO combine with file
+  Loads and decrypts otr asset as initiates download
+  @return [Promise] Returns a promise that resolves with the asset as blob
+  ###
+  download: (file_name) =>
+    @resource()?.load().then (blob) =>
+      if file_name? or not @file_name
+        file_extension = @file_type.split('/').pop()
+        file_name = "#{file_name}.#{file_extension}"
+      else
+        file_name = @file_name
+      return z.util.download_blob blob, file_name
