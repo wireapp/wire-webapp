@@ -516,50 +516,38 @@ describe 'Conversation', ->
       expect(newer_message_et.visible()).toBeFalsy()
 
   describe 'is_with_bot', ->
-    it 'detects bot conversations by the email of the remote participant', ->
+    it 'detects bot conversations by the username of the remote participant', ->
       user_et = new z.entity.User z.util.create_random_uuid()
 
       conversation_et = new z.entity.Conversation z.util.create_random_uuid()
       conversation_et.participating_user_ets.push user_et
 
-      user_et.email 'anna+123@wire.com'
+      user_et.username 'ottothebot'
       conversation_et.type z.conversation.ConversationType.SELF
       expect(conversation_et.is_with_bot()).toBe false
 
       conversation_et.type z.conversation.ConversationType.ONE2ONE
       expect(conversation_et.is_with_bot()).toBe true
 
-      user_et.email undefined
+      user_et.username 'annathebot'
+      expect(conversation_et.is_with_bot()).toBe true
+
+      user_et.username undefined
       expect(conversation_et.is_with_bot()).toBe false
 
-      user_et.email ''
+      user_et.username ''
       expect(conversation_et.is_with_bot()).toBe false
 
-      user_et.email 'anne@wire.com'
+      user_et.username 'bob'
       expect(conversation_et.is_with_bot()).toBe false
 
-      user_et.email 'anna+123@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
+      user_et.username 'bobthebot'
+      expect(conversation_et.is_with_bot()).toBe false
 
-      user_et.email 'anna+quiz@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
+      user_et.username 'bot'
+      expect(conversation_et.is_with_bot()).toBe false
 
-      user_et.email 'welcome@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
-
-      user_et.email 'welcome+123@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
-
-      user_et.email 'welcome+chef@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
-
-      user_et.email 'welcome+@@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
-
-      user_et.email 'ottobot@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
-
-      user_et.email 'hello@wire.com'
+      user_et.username 'wire'
       expect(conversation_et.is_with_bot()).toBe false
 
   describe 'get_last_editable_message', ->
