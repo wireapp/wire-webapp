@@ -1067,9 +1067,26 @@ class z.conversation.ConversationRepository
       throw error
 
   ###
+  Toggle like status of message.
+  @param conversation [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  @param button [Boolean]
+  ###
+  toggle_like: (conversation_et, message_et, button) =>
+    return if conversation_et.removed_from_conversation()
+
+    reaction = if message_et.is_liked() then z.message.ReactionType.NONE else z.message.ReactionType.LIKE
+    message_et.is_liked not message_et.is_liked()
+
+    window.setTimeout =>
+      @send_reaction conversation_et, message_et, reaction
+      @_track_reaction conversation_et, message_et, reaction, button
+    , 50
+
+  ###
   Send reaction to a content message in specified conversation.
   @param conversation [z.entity.Conversation] Conversation to send reaction in
-  @param message_et [String] ID of message for react to
+  @param message_et [z.entity.Message]
   @param reaction [z.message.ReactionType]
   ###
   send_reaction: (conversation_et, message_et, reaction) =>
@@ -2480,6 +2497,25 @@ class z.conversation.ConversationRepository
     youtube_links = message.match z.media.MediaEmbeds.regex.youtube
     if youtube_links
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.YOUTUBE_LINKS_SENT, youtube_links.length
+
+
+  ###
+  Track reaction action.
+
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  @param reaction [z.message.ReactionType]
+  @param button [Boolean]
+  ###
+  _track_reaction: (conversation_et, message_et, reaction, button = true) ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.REACTED_TO_MESSAGE,
+      conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+      action: if reaction then 'like' else 'unlike'
+      with_bot: conversation_et.is_with_bot()
+      method: if button then 'button' else 'menu'
+      user: if message_et.user().is_me then 'sender' else 'receiver'
+      type: z.tracking.helpers.get_message_type message_et
+      reacted_to_last_message: conversation_et.get_last_message() is message_et
 
   ###
   Add new device message to conversations.

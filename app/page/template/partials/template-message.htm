@@ -62,11 +62,11 @@
 
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
       <!-- ko if: asset.is_image() -->
-        <div class="message-asset-image" data-bind="fit_to_viewport: asset">
+        <div class="message-asset-image">
           <div class="image image-loading" data-bind="
             attr: {'data-uie-visible': $parent.visible},
             background_image: asset.resource,
-            click: $parents[1].show_detail,
+            click: function() {$parents[1].show_detail(message, event)},
             css: {'bg-color-ephemeral': message.is_expired()},
             viewport_changed: $parents[1].viewport_changed
             " data-uie-name="go-image-detail">
@@ -92,7 +92,7 @@
           <div class="text" data-bind="html: asset.render(), css: {'text-graphite': $parent.is_editing, 'text-large': z.util.emoji.includes_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.is_expired()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
-          <link-preview-compact-asset data-bind="css: {'ephemeral-asset-expired': message.is_expired()}" params="message: message"></link-preview-compact-asset>
+          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.is_expired()}" params="message: message"></link-preview-asset>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.is_video() -->
