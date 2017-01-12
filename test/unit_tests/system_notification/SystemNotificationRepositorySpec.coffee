@@ -636,6 +636,19 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         done()
       .catch done.fail
 
+    it 'if you are automatically connected', (done) ->
+      message_et.member_message_type = z.message.SystemMessageType.CONNECTION_CONNECTED
+
+      system_notification_repository.notify connection_et, message_et
+      .then ->
+        notification_content.options.body = z.string.system_notification_connection_connected
+
+        result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
+        expect(result).toEqual JSON.stringify notification_content
+        expect(system_notification_repository._show_notification).toHaveBeenCalledTimes 1
+        done()
+        .catch done.fail
+
   describe 'shows a well-formed ping notification', ->
     beforeAll ->
       user_et = user_repository.user_mapper.map_user_from_object payload.users.get.one[0]

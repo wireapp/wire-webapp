@@ -266,6 +266,9 @@ z.string.uk.conversation_context_menu_unlike = 'Не подобається'
 z.string.uk.conversation_delete_timestamp = 'Видалене: %@timestamp'
 z.string.uk.conversation_edit_timestamp = 'Відредаговане: %@timestamp'
 z.string.uk.conversation_likes_caption = '%@number учасників'
+z.string.uk.conversation_send_pasted_file = 'Надіслав(-ла) зображення %date'
+
+# Collection
 
 # Archive
 z.string.uk.archive_header = 'Архівувати'
@@ -287,7 +290,11 @@ z.string.uk.conversations_popover_silence = 'Вимкнути звук'
 z.string.uk.conversations_popover_unarchive = 'Розархівувати'
 
 # Takeover
+z.string.uk.takeover_headline = 'Ніки вже тут.'
+z.string.uk.takeover_sub = 'Зарезервуйте свій унікальний нік в Wire.'
 z.string.uk.takeover_link = 'Дізнатися більше'
+z.string.uk.takeover_button_choose = 'Вибрати власний'
+z.string.uk.takeover_button_keep = 'Залишити цей'
 
 # Invites
 z.string.uk.invite_meta_key_mac = 'Cmd'
@@ -398,6 +405,9 @@ z.string.uk.preferences_account_reset_password = 'Виконати скидан�
 z.string.uk.preferences_account_delete = 'Видалити акаунт'
 z.string.uk.preferences_account_log_out = 'Вийти'
 z.string.uk.preferences_account_username_placeholder = 'Ваше повне ім’я'
+z.string.uk.preferences_account_username_hint = 'Мінімум 2 символи з множини a—z, 0—9, та _.'
+z.string.uk.preferences_account_username_available = 'Доступний'
+z.string.uk.preferences_account_username_error_taken = 'Уже зарезервований'
 
 z.string.uk.preferences_av_camera = 'Камера'
 z.string.uk.preferences_av_microphone = 'Мікрофон'
@@ -437,7 +447,8 @@ z.string.uk.preferences_options_data_checkbox = 'Статистика викор
 z.string.uk.preferences_options_data_detail = 'Зробіть Wire кращим, відправляючи анонімну інформацію.'
 z.string.uk.preferences_options_notifications = 'Сповіщення'
 z.string.uk.preferences_options_notifications_none = 'Вимкнений'
-z.string.uk.preferences_options_notifications_obfuscate = 'Приховувати деталі повідомлення'
+z.string.uk.preferences_options_notifications_obfuscate = 'Приховати деталі'
+z.string.uk.preferences_options_notifications_obfuscate_message = 'Показувати відправника'
 z.string.uk.preferences_options_notifications_on = 'Показувати відправника та повідомлення'
 
 # Search
@@ -445,8 +456,13 @@ z.string.uk.search_group_hint = 'Спробуйте ще раз або вибе�
 z.string.uk.search_connect = 'Додати до контактів'
 z.string.uk.search_connections = 'Контакти'
 z.string.uk.search_groups = 'Групи'
+z.string.uk.search_placeholder = 'Пошук за іменем або ніком'
 z.string.uk.search_top_people = 'Топ-контакти'
+z.string.uk.search_try_search = 'Шукайте людай\nза іменем або ніком'
+z.string.uk.search_no_contacts_on_wire = 'У вас поки що немає контактів в Wire.\nСпробуйте знайти людей\nза їхніми іменами або ніками.'
 z.string.uk.search_others = 'Додати до контактів'
+z.string.uk.search_friend_in_common = '%no спільний знайомий'
+z.string.uk.search_friends_in_common = '%no спільних знайомих'
 
 # Google contacts upload
 z.string.uk.upload_google_headline = 'Знайдіть людей,\nщоб порозмовляти.'
@@ -456,6 +472,7 @@ z.string.uk.upload_google_message_error = 'Ми не отримали вашу �
 z.string.uk.upload_google_button_again = 'Спробувати ще раз'
 
 # URLs
+z.string.uk.url_password_reset = 'forgot/'
 z.string.uk.url_legal = 'https://wire.com/legal/'
 z.string.uk.url_privacy = 'https://wire.com/privacy/'
 z.string.uk.url_privacy_why = 'https://wire.com/privacy/why/'
@@ -473,6 +490,7 @@ z.string.uk.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/a
 z.string.uk.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.uk.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
 z.string.uk.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.uk.url_support_usernames = 'https://wire.com/support/username'
 z.string.uk.url_decrypt_error_1 = 'https://wire.com/privacy/error-1'
 z.string.uk.url_decrypt_error_2 = 'https://wire.com/privacy/error-2'
 

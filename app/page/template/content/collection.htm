@@ -22,11 +22,10 @@
                 <span class="label-bold-xs">Pictures</span>
                 <!-- ko if: images().length > 12 -->
                 <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('images', images()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': images().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
-                <!-- /ko -->
               </header>
               <div class="collection-images">
                 <!-- ko foreach: {data: images.slice(0, 12), as: 'message_et'} -->
-                <image-component class="collection-image" data-bind="click: $parent.click_on_image" params="asset: message_et.get_first_asset().resource"></image-component>
+                  <image-component class="collection-image" data-bind="click: $parent.click_on_image" params="asset: message_et.get_first_asset().resource"></image-component>
                 <!-- /ko -->
               </div>
             </section>
