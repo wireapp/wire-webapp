@@ -24,7 +24,6 @@ class z.ViewModel.ImageDetailViewViewModel
 
     @image_modal = undefined
 
-    @visible = ko.observable false
     @image_src = ko.observable()
 
     @conversation_et = ko.observable()
@@ -43,11 +42,7 @@ class z.ViewModel.ImageDetailViewViewModel
     @image_modal = new zeta.webapp.module.Modal '#detail-view', @_hide_callback, @_before_hide_callback
     @image_modal.show()
 
-    message_et.get_first_asset().resource().load()
-    .then (blob) =>
-      @image_src window.URL.createObjectURL blob
-    .then  =>
-      @visible true
+    message_et.get_first_asset().resource().load().then (blob) => @image_src window.URL.createObjectURL blob
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_DETAIL_VIEW_OPENED
 
