@@ -25,7 +25,7 @@ class z.ViewModel.ImageDetailViewViewModel
     @image_modal = undefined
 
     @image_src = ko.observable()
-    @visible = ko.observable false
+    @image_visible = ko.observable false
 
     @conversation_et = ko.observable()
     @message_et = ko.observable()
@@ -45,7 +45,7 @@ class z.ViewModel.ImageDetailViewViewModel
 
     message_et.get_first_asset().resource().load().then (blob) =>
       @image_src window.URL.createObjectURL blob
-      @visible true
+      @image_visible true
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_DETAIL_VIEW_OPENED
 
@@ -54,7 +54,7 @@ class z.ViewModel.ImageDetailViewViewModel
     @image_src undefined
 
   _before_hide_callback: =>
-    @visible false
+    @image_visible false
 
   click_on_close: =>
     @image_modal.hide()

@@ -50,7 +50,7 @@ class z.ViewModel.content.CollectionDetailsViewModel
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION
 
   click_on_image: (message_et) ->
-    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW,  message_et
+    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et
 
   # helper
   push_deferred: (target, src, number = 100, delay = 300) ->
