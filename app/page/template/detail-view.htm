@@ -12,7 +12,7 @@
         <img class="detail-view-image" data-bind="attr: {src: image_src()}" data-uie-name="status-picture"/>
       </div>
       <footer class="detail-view-footer">
-        <!-- ko if: message_et().has_asset() && !message_et().is_ephemeral() -->
+        <!-- ko if: message_et().get_first_asset().download && !message_et().is_ephemeral() -->
           <span class="detail-view-action-button" data-bind="click: click_on_download">
             <span class="icon-download"></span>
             <span data-bind="l10n_text: z.string.conversation_context_menu_download"></span>
@@ -30,7 +30,7 @@
             <span data-bind="l10n_text: z.string.conversation_context_menu_delete"></span>
           </span>
         <!-- /ko -->
-        <!-- ko if: message_et().user().is_me && message_et.status() !== z.message.StatusType.SENDING && !conversation_et().removed_from_conversation() -->
+        <!-- ko if: message_et().user().is_me && message_et().status() !== z.message.StatusType.SENDING && !conversation_et().removed_from_conversation() -->
           <span class="detail-view-action-button" data-bind="click: click_on_delete_for_everyone">
             <span class="icon-delete-for-everyone"></span>
             <span data-bind="l10n_text: z.string.conversation_context_menu_delete_everyone"></span>

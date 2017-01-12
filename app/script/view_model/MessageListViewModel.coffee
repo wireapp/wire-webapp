@@ -378,7 +378,7 @@ class z.ViewModel.MessageListViewModel
 
     @_track_context_menu message_et
 
-    if message_et.has_asset() and not message_et.is_ephemeral()
+    if message_et.get_first_asset()?.download? and not message_et.is_ephemeral()
       entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
 
     if message_et.is_reactable() and not @conversation().removed_from_conversation()
@@ -427,7 +427,9 @@ class z.ViewModel.MessageListViewModel
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
           action: => @conversation_repository.delete_message_everyone @conversation(), message_et
       when 'download'
-        message_et?.get_first_asset()?.download()
+        date = moment message_et.timestamp
+        name = "Wire #{date.format('YYYY-MM-DD')} at #{date.format('h.mm.ss')}"
+        message_et?.get_first_asset()?.download name
       when 'edit'
         amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.EDIT, message_et
       when 'react'
