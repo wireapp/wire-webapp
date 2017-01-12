@@ -85,6 +85,5 @@ class z.ViewModel.content.CollectionViewModel
     @collection_details.set_conversation @conversation_et(), category, [].concat items
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS
 
-  click_on_image: (message_et, event) ->
-    target_element = $(event.currentTarget)
-    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, target_element.find('img')[0].src
+  click_on_image: (message_et) ->
+    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW,  message_et

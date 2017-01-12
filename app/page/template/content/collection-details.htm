@@ -1,5 +1,5 @@
 <div id="collection-details"
-     class="collection content-wrapper"
+     class="collection-details content"
      data-bind="with: $root.collection_details, removed_from_view: $root.collection_details.removed_from_view">
 
   <!-- ko if: conversation_et() -->
@@ -8,9 +8,7 @@
       <div class="content-titlebar-items-left">
         <span class="content-titlebar-icon icon-back" data-bind="click: click_on_back_button"></span>
       </div>
-      <span class="content-titlebar-items-center">
-        <span><span class="label-bold-xs">Pictures</span> <span class="text-graphite">in</span> <span class="text-graphite" data-bind="text: conversation_et().display_name()"></span></span>
-      </span>
+      <span class="content-titlebar-items-center" data-bind="text: conversation_et().display_name()"></span>
     </div>
 
     <div class="content-list-wrapper">

@@ -435,14 +435,12 @@ class z.ViewModel.MessageListViewModel
 
   ###
   Shows detail image view.
-  @param asset_et [z.assets.Asset] Asset to be displayed
+  @param message_et [z.entity.Message] Message with asset to be displayed
   @param event [UIEvent] Actual scroll event
   ###
-  show_detail: (asset_et, event) ->
-    target_element = $(event.currentTarget)
-    return if target_element.hasClass 'bg-color-ephemeral'
-    return if target_element.hasClass 'image-loading'
-    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, target_element.find('img')[0].src
+  show_detail: (message_et, event) ->
+    return if message_et.is_expired() or $(event.currentTarget).hasClass 'image-loading'
+    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et
 
   get_timestamp_class: (message_et) ->
     last_message = @conversation().get_previous_message message_et

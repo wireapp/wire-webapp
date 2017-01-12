@@ -31,21 +31,23 @@ class z.ViewModel.ImageDetailViewViewModel
 
     ko.applyBindings @, document.getElementById @element_id
 
-  show_detail_view: (src) =>
+  show_detail_view: (message_et) =>
     @image_modal.destroy() if @image_modal?
     @image_modal = new zeta.webapp.module.Modal '#detail-view', undefined, @_before_hide_callback
     @image_modal.show()
 
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_DETAIL_VIEW_OPENED
+    message_et.get_first_asset().resource().load().then (blob) =>
+      @image_src window.URL.createObjectURL blob
+      window.setTimeout =>
+        @image_visible true
+      , 10
 
-    @image_src src
-    window.setTimeout =>
-      @image_visible true
-    , 10
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_DETAIL_VIEW_OPENED
 
   hide_detail_view: =>
     @image_modal.hide()
     @image_src undefined
+    window.URL.removeObjectURL @image_src()
 
   _before_hide_callback: =>
     @image_visible false
