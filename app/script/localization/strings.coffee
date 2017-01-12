@@ -272,6 +272,9 @@ z.string.conversation_send_pasted_file = 'Pasted image at %date'
 
 # Collection
 z.string.collection_show_all = 'Show all %no'
+z.string.collection_section_links = 'Links'
+z.string.collection_section_images = 'Pictures'
+z.string.collection_section_files = 'Files'
 
 # Archive
 z.string.archive_header = 'Archive'
