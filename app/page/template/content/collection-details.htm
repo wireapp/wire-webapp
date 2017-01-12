@@ -20,20 +20,14 @@
             <!-- ko if: $parent.should_show_header($data) -->
               <div class="collection-details-header label-bold-xs">today</div>
             <!-- /ko -->
-            <!-- ko if: $parent.template() === 'images' -->
+            <!-- ko if: message_et.category & z.message.MessageCategory.IMAGE -->
               <image-component class="collection-image" params="asset: message_et.get_first_asset().resource"></image-component>
             <!-- /ko -->
-            <!-- ko if: $parent. template() === 'links' -->
+            <!-- ko if: message_et.category & z.message.MessageCategory.LINK -->
               <link-preview-asset params="message: message_et, header: true"></link-preview-asset>
             <!-- /ko -->
-            <!-- ko if: $parent.template() === 'files' -->
+            <!-- ko if: message_et.category & z.message.MessageCategory.FILE -->
               <file-asset class="collection-file" params="message: message_et, header: true"></file-asset>
-            <!-- /ko -->
-            <!-- ko if: $parent.template() === 'audio' -->
-              <audio-asset class="collection-file" params="message: message_et, header: true"></audio-asset>
-            <!-- /ko -->
-            <!-- ko if: $parent.template() === 'video' -->
-              <video-asset class="collection-file" params="message: message_et"></video-asset>
             <!-- /ko -->
           <!-- /ko -->
 

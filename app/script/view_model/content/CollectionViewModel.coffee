@@ -27,11 +27,11 @@ class z.ViewModel.content.CollectionViewModel
 
     @conversation_et = ko.observable()
 
-    @audio = ko.observableArray()
-    @files = ko.observableArray()
-    @images = ko.observableArray()
-    @links = ko.observableArray()
-    @video = ko.observableArray()
+    @files = ko.observableArray().extend 'notifyWhenChangesStop': true
+    @images = ko.observableArray().extend 'notifyWhenChangesStop': true
+    @links = ko.observableArray().extend 'notifyWhenChangesStop': true
+
+    @images.subscribe -> LOG 'added image'
 
     @no_items_found = ko.observable false
 
@@ -50,33 +50,14 @@ class z.ViewModel.content.CollectionViewModel
         @populate_items message_ets
 
   populate_items: (message_ets) =>
-    images = []
-    files = []
-    audio = []
-    video = []
-    links = []
-
     for message_et in message_ets
       switch
         when message_et.category & z.message.MessageCategory.IMAGE and not (message_et.category & z.message.MessageCategory.GIF)
-          images.push message_et
+          @images.push message_et
         when message_et.category & z.message.MessageCategory.FILE
-          asset_et = message_et.get_first_asset()
-          switch
-            when asset_et.is_video()
-              video.push message_et
-            when asset_et.is_audio()
-              audio.push message_et
-            else
-              files.push message_et
+          @files.push message_et
         when message_et.category & z.message.MessageCategory.LINK_PREVIEW
-          links.push message_et
-
-    @images images
-    @files files
-    @audio audio
-    @video video
-    @links links
+          @links.push message_et
 
   click_on_back_button: =>
     amplify.publish z.event.WebApp.CONVERSATION.SHOW, @conversation_et()
@@ -87,3 +68,6 @@ class z.ViewModel.content.CollectionViewModel
 
   click_on_image: (message_et) ->
     amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW,  message_et
+
+  push_deferred: (array, items) ->
+    # TODO
