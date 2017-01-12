@@ -18,7 +18,7 @@
 
           <!-- ko foreach: {data: items(), as: 'message_et'} -->
             <!-- ko if: message_et.category & z.message.MessageCategory.IMAGE -->
-              <image-component class="collection-image" data-bind="$parent.click_on_image" params="asset: message_et.get_first_asset().resource"></image-component>
+              <image-component class="collection-image" data-bind="click: $parent.click_on_image" params="asset: message_et.get_first_asset().resource"></image-component>
             <!-- /ko -->
             <!-- ko if: message_et.category & z.message.MessageCategory.LINK -->
               <link-preview-asset params="message: message_et, header: true"></link-preview-asset>
