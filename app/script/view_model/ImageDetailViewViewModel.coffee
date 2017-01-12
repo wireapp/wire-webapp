@@ -59,7 +59,7 @@ class z.ViewModel.ImageDetailViewViewModel
   click_on_close: =>
     @image_modal.hide()
 
-  click_on_download: (message_et) =>
+  click_on_download: (message_et) ->
     message_et?.get_first_asset()?.download()
 
   click_on_like: (message_et) =>
@@ -82,4 +82,3 @@ class z.ViewModel.ImageDetailViewViewModel
   click_on_delete_for_everyone: (message_et) =>
     @conversation_repository.delete_message_everyone @conversation_et(), message_et
     @image_modal.hide()
-

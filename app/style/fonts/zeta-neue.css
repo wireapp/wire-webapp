@@ -19,11 +19,7 @@
 
 @font-face {
   font-family: 'Wire';
-  src:
-  url('fonts/Wire.woff2?1k0say') format('woff2'),
-  url('fonts/Wire.ttf?1k0say') format('truetype'),
-  url('fonts/Wire.woff?1k0say') format('woff'),
-  url('fonts/Wire.svg?1k0say#Wire') format('svg');
+  src: url('/font/Wire.ttf?1k0say') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
