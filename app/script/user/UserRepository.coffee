@@ -457,13 +457,14 @@ class z.user.UserRepository
   ###
   Search for user.
   @param query [String] Find user using name, username or email
+  @param is_username [Boolean] Query string is username
   @return [Array<z.entity.User>] Matching users
   ###
-  search_for_connected_users: (query) =>
+  search_for_connected_users: (query, is_username) =>
     return @users()
       .filter (user_et) ->
         return false if not user_et.connected()
-        return user_et.matches query
+        return user_et.matches query, is_username
       .sort (user_a, user_b) ->
         name_a = user_a.name().toLowerCase()
         name_b = user_b.name().toLowerCase()

@@ -130,6 +130,9 @@ class z.entity.User
   ###
   Check whether username, name or email matches the given query
   @param query [String]
+  @param is_username [Boolean] Query string is username
   ###
-  matches: (query) =>
+  matches: (query, is_username) =>
+    if is_username
+      return @username()?.startsWith query
     return z.util.compare_names(@name(), query) or @username() is query or @email() is query

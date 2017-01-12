@@ -73,7 +73,8 @@ class z.components.UserListViewModel
     # filter all list items if a filter is provided
     if @user_filter?
       @filtered_user_ets = ko.pureComputed =>
-        ko.utils.arrayFilter @user_ets(), (user_et) => user_et.matches @user_filter()
+        normalized_query = z.search.SearchRepository.normalize_query @user_filter()
+        ko.utils.arrayFilter(@user_ets(), (user_et) => user_et.matches normalized_query, @user_filter().trim().startsWith '@').slice 0, 30
 
     # check every list item before selection if selected_filter is provided
     if @user_selected_filter?
