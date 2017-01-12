@@ -284,6 +284,8 @@ class z.SystemNotification.SystemNotificationRepository
           return @_create_body_member_leave message_et
       when z.message.SystemMessageType.CONNECTION_ACCEPTED
         return z.localization.Localizer.get_text z.string.system_notification_connection_accepted
+      when z.message.SystemMessageType.CONNECTION_CONNECTED
+        return z.localization.Localizer.get_text z.string.system_notification_connection_connected
       when z.message.SystemMessageType.CONNECTION_REQUEST
         return z.localization.Localizer.get_text z.string.system_notification_connection_request
       when z.message.SystemMessageType.CONVERSATION_CREATE
