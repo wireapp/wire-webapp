@@ -456,7 +456,7 @@ class z.user.UserRepository
 
   ###
   Search for user.
-  @param query [String] Find user using name, username or email
+  @param query [String] Find user using name or username
   @param is_username [Boolean] Query string is username
   @return [Array<z.entity.User>] Matching users
   ###

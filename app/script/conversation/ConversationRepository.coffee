@@ -320,17 +320,22 @@ class z.conversation.ConversationRepository
   @return [Array<z.entity.Conversation>] Matching group conversations
   ###
   get_groups_by_name: (query, is_username) =>
-    @sorted_conversations().filter (conversation_et) ->
-      return false if not conversation_et.is_group()
-      if is_username
-        return true if z.util.compare_names conversation_et.display_name(), "@#{query}"
-        for user_et in conversation_et.participating_user_ets()
-          return true if user_et.username()?.startsWith query
-      else
-        return true if z.util.compare_names conversation_et.display_name(), query
-        for user_et in conversation_et.participating_user_ets()
-          return true if z.util.compare_names user_et.name(), query
-      return false
+    return @sorted_conversations()
+      .filter (conversation_et) ->
+        return false if not conversation_et.is_group()
+        if is_username
+          return true if z.util.compare_names conversation_et.display_name(), "@#{query}"
+          return true for user_et in conversation_et.participating_user_ets() when user_et.username()?.startsWith query
+        else
+          return true if z.util.compare_names conversation_et.display_name(), query
+          return true for user_et in conversation_et.participating_user_ets() when z.util.compare_names user_et.name(), query
+        return false
+      .sort (conversation_a, conversation_b) ->
+        name_a = conversation_a.display_name().toLowerCase()
+        name_b = conversation_b.display_name().toLowerCase()
+        return -1 if name_a < name_b
+        return 1 if name_a > name_b
+        return 0
 
   ###
   Get the next unarchived conversation.

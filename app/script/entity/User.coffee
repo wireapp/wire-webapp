@@ -128,11 +128,11 @@ class z.entity.User
     @devices.remove (client_et) -> client_et.id is client_id
 
   ###
-  Check whether username, name or email matches the given query
+  Check whether username or name matches the given query
   @param query [String]
   @param is_username [Boolean] Query string is username
   ###
   matches: (query, is_username) =>
     if is_username
       return @username()?.startsWith query
-    return z.util.compare_names(@name(), query) or @username() is query or @email() is query
+    return z.util.compare_names(@name(), query) or @username() is query
