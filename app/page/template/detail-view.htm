@@ -1,5 +1,5 @@
 <div id="detail-view" class="modal detail-view">
-  <!-- ko if: message_et() -->
+  <!-- ko if: message_et() && conversation_et() -->
     <div class="detail-view-content modal-content-anim-close" data-bind="css: {'modal-content-anim-open': visible()}">
       <header class="detail-view-header">
           <div class="text-center">
@@ -20,14 +20,8 @@
         <!-- /ko -->
         <!-- ko if: message_et().is_reactable() && !conversation_et().removed_from_conversation() -->
           <span class="detail-view-action-button" data-bind="click: click_on_like">
-            <!-- ko if: message_et().is_liked() -->
-              <span class="icon-liked"></span>
-              <span data-bind="l10n_text: z.string.conversation_context_menu_unlike"></span>
-            <!-- /ko -->
-            <!-- ko ifnot: message_et().is_liked() -->
-              <span class="icon-like"></span>
-              <span data-bind="l10n_text: z.string.conversation_context_menu_like"></span>
-            <!-- /ko -->
+            <span data-bind="css: message_et().is_liked() ? 'icon-liked text-red' : 'icon-like'"></span>
+            <span data-bind="l10n_text: z.string.conversation_context_menu_like"></span>
           </span>
         <!-- /ko -->
         <!-- ko if: message_et().is_deletable() -->
