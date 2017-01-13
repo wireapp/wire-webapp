@@ -134,5 +134,5 @@ class z.entity.User
   ###
   matches: (query, is_username) =>
     if is_username
-      return @username()?.startsWith query
+      return z.util.name_starts_with @username(), query
     return z.util.compare_names(@name(), query) or @username() is query

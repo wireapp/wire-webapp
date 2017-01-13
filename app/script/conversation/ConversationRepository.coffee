@@ -325,17 +325,13 @@ class z.conversation.ConversationRepository
         return false if not conversation_et.is_group()
         if is_username
           return true if z.util.compare_names conversation_et.display_name(), "@#{query}"
-          return true for user_et in conversation_et.participating_user_ets() when user_et.username()?.startsWith query
+          return true for user_et in conversation_et.participating_user_ets() when z.util.name_starts_with user_et.username(), query
         else
           return true if z.util.compare_names conversation_et.display_name(), query
           return true for user_et in conversation_et.participating_user_ets() when z.util.compare_names user_et.name(), query
         return false
       .sort (conversation_a, conversation_b) ->
-        name_a = conversation_a.display_name().toLowerCase()
-        name_b = conversation_b.display_name().toLowerCase()
-        return -1 if name_a < name_b
-        return 1 if name_a > name_b
-        return 0
+        return z.util.sort_names conversation_a.display_name(), conversation_b.display_name()
 
   ###
   Get the next unarchived conversation.

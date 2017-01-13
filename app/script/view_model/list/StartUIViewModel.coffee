@@ -45,7 +45,7 @@ class z.ViewModel.list.StartUIViewModel
       .then (user_ets) =>
         return unless normalized_query is z.search.SearchRepository.normalize_query @search_input()
         if is_username
-          user_ets = user_ets.filter (user_et) -> return user_et.username()?.startsWith normalized_query
+          user_ets = user_ets.filter (user_et) -> return z.util.name_starts_with user_et.username(), normalized_query
         @search_results.others user_ets
       .catch (error) =>
         @logger.error "Error searching for contacts: #{error.message}", error

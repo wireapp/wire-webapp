@@ -466,11 +466,7 @@ class z.user.UserRepository
         return false if not user_et.connected()
         return user_et.matches query, is_username
       .sort (user_a, user_b) ->
-        name_a = user_a.name().toLowerCase()
-        name_b = user_b.name().toLowerCase()
-        return -1 if name_a < name_b
-        return 1 if name_a > name_b
-        return 0
+        return z.util.sort_names user_a.name(), user_b.name()
 
   ###
   Is the user the logged in user.

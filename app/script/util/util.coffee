@@ -628,8 +628,25 @@ z.util.get_first_name = (user_et, declension = z.string.Declension.NOMINATIVE) -
   return user_et.first_name()
 
 
+z.util.name_starts_with = (name = '', query) ->
+  return name.toLowerCase().startsWith query.toLowerCase()
+
+
 z.util.compare_names = (name_a, name_b) ->
-  z.util.contains window.getSlug(name_a), window.getSlug(name_b)
+  return z.util.contains window.getSlug(name_a), window.getSlug(name_b)
+
+
+z.util.sort_names = (name_a, name_b) ->
+  name_a = name_a.toLowerCase()
+  name_b = name_b.toLowerCase()
+
+  if z.util.name_starts_with name_a, query
+    return -1 unless z.util.name_starts_with name_b, query
+  else if z.util.name_starts_with name_b, query
+    return 1 unless z.util.name_starts_with name_a, query
+  return -1 if name_a < name_b
+  return 1 if name_a > name_b
+  return 0
 
 
 z.util.capitalize_first_char = (s) ->
