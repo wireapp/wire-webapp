@@ -66,6 +66,9 @@ class z.conversation.ConversationRepository
     @sending_queue = new z.util.PromiseQueue()
     @sending_queue.pause()
 
+    @receiving_queue = new z.util.PromiseQueue()
+    @receiving_queue.pause()
+
     @conversation_service.client.request_queue_blocked_state.subscribe (state) =>
       @sending_queue.pause state isnt z.service.RequestQueueBlockedState.NONE and not @block_event_handling
 
@@ -1704,13 +1707,20 @@ class z.conversation.ConversationRepository
   ###############################################################################
 
   ###
-  Listener for incoming events from the WebSocket.
+  Add incoming events to the receiving queue.
+  @param event [Object] JSON data for event
+  ###
+  on_conversation_event: (event) =>
+    @receiving_queue.push => @_on_conversation_event event
+
+  ###
+  Handle incoming events.
 
   @private
   @note We check for events received multiple times via the WebSocket by event id here
   @param event [Object] JSON data for event
   ####
-  on_conversation_event: (event) =>
+  _on_conversation_event: (event) ->
     if not event
       error = new Error('Event response is undefined')
       custom_data =
@@ -1997,14 +2007,14 @@ class z.conversation.ConversationRepository
       @logger.debug "Updated reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
       return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
       .catch (error) =>
-        throw error is error.type isnt z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
+        throw error unless error.type is z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
         if attempt < 10
           return window.setTimeout =>
             @_on_reaction conversation_et, event_json, attempt + 1
           , 10 * attempt
         @logger.error "Too many attempts to update reaction to message '#{message_et.id}' in conversation '#{conversation_et.id}'", error
     .catch (error) =>
-      if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+      unless error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         @logger.error "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
         throw error
 
