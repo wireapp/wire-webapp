@@ -18,7 +18,32 @@
 
 window.z ?= {}
 z.util ?= {}
+
+
 z.util.StringUtil =
+  capitalize_first_char: (string = '') ->
+    return "#{string.charAt(0).toUpperCase()}#{string.substring 1}"
+
+  compare_transliteration: (name_a, name_b) ->
+    return z.util.StringUtil.includes window.getSlug(name_a), window.getSlug name_b
+
+  format: ->
+    string = arguments[0]
+    for index in [0...arguments.length]
+      reg = new RegExp "\\{#{index}\\}", 'gm'
+      string = string.replace reg, arguments[++index]
+    return string
+
+  get_first_character: (string) ->
+    reg = new RegExp /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/
+    find_emoji_in_string = reg.exec string
+    if find_emoji_in_string and find_emoji_in_string.index is 0
+      return find_emoji_in_string[0]
+    return string[0]
+
+  includes: (string = '', query = '') ->
+    return string.toLowerCase().includes query.toLowerCase()
+
   obfuscate: (text) ->
     alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z']
     obfuscated = ''
@@ -30,3 +55,33 @@ z.util.StringUtil =
         obfuscated += z.util.ArrayUtil.random_element alphabet
 
     return obfuscated
+
+  remove_line_breaks: (string = '') ->
+    return string.replace /(\r\n|\n|\r)/gm, ''
+
+  sort_by_priority: (string_a = '', string_b = '', query) ->
+    string_a = string_a.toLowerCase()
+    string_b = string_b.toLowerCase()
+
+    if query
+      if z.util.StringUtil.starts_with string_a, query
+        return -1 unless z.util.StringUtil.starts_with string_b, query
+      else if z.util.StringUtil.starts_with string_b, query
+        return 1 unless z.util.StringUtil.starts_with string_a, query
+    return -1 if string_a < string_b
+    return 1 if string_a > string_b
+    return 0
+
+  starts_with: (string = '', query) ->
+    return string.toLowerCase().startsWith query.toLowerCase()
+
+  trim_line_breaks: (string = '') ->
+    return string.replace /^\s+|\s+$/g, ''
+
+  truncate: (string, output_length, word_boundary = true) ->
+    if string.length > output_length
+      trunc_index = output_length - 1
+      if word_boundary and string.lastIndexOf(' ', output_length - 1) > output_length - 25
+        trunc_index = string.lastIndexOf ' ', output_length - 1
+      string = "#{string.substr 0, trunc_index}#{z.localization.Localizer.get_text z.string.truncation}"
+    return string

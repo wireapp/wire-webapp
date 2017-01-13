@@ -37,7 +37,7 @@ class z.components.UserAvatar
 
     @initials = ko.pureComputed =>
       if @element.hasClass 'user-avatar-xs'
-        return z.util.get_first_character @user.initials()
+        return z.util.StringUtil.get_first_character @user.initials()
       else
         return @user.initials()
 

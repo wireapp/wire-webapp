@@ -369,7 +369,7 @@ class z.user.UserRepository
 
     # create chunks
     fetched_user_ets = []
-    chunks = z.util.array_chunks user_ids, z.config.MAXIMUM_USERS_PER_REQUEST
+    chunks = z.util.ArrayUtil.chunk user_ids, z.config.MAXIMUM_USERS_PER_REQUEST
     number_of_loaded_chunks = 0
 
     for chunk in chunks
@@ -466,7 +466,9 @@ class z.user.UserRepository
         return false if not user_et.connected()
         return user_et.matches query, is_username
       .sort (user_a, user_b) ->
-        return z.util.sort_names user_a.name(), user_b.name()
+        if is_username
+          return z.util.StringUtil.sort_by_priority user_a.username(), user_b.username(), query
+        return z.util.StringUtil.sort_by_priority user_a.name(), user_b.name(), query
 
   ###
   Is the user the logged in user.

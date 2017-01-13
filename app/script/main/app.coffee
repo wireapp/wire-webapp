@@ -409,7 +409,7 @@ class z.main.App
         amplify_objects = amplify.store()
         for amplify_key, amplify_value of amplify_objects
           continue if amplify_key is cookie_label_key and clear_data
-          do_not_delete.push amplify_key if z.util.contains amplify_key, z.storage.StorageKey.AUTH.COOKIE_LABEL
+          do_not_delete.push amplify_key if z.util.StringUtil.includes amplify_key, z.storage.StorageKey.AUTH.COOKIE_LABEL
 
         @repository.cache.clear_cache session_expired, do_not_delete
 

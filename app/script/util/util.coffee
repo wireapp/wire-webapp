@@ -37,12 +37,6 @@ z.util.is_same_location = (past_location, current_location) ->
   return past_location isnt '' and current_location.startsWith past_location
 
 
-z.util.iterate_array_index = (array, current_index) ->
-  return undefined if not _.isArray(array) or not _.isNumber current_index
-  return undefined if not array.length
-  return (current_index + 1) % array.length
-
-
 z.util.load_image = (blob) ->
   return new Promise (resolve, reject) ->
     object_url = window.URL.createObjectURL blob
@@ -85,7 +79,7 @@ z.util.load_url_blob = (url) ->
 
 
 z.util.append_url_parameter = (url, param) ->
-  separator = if z.util.contains url, '?' then '&' else '?'
+  separator = if z.util.StringUtil.includes url, '?' then '&' else '?'
   return "#{url}#{separator}#{param}"
 
 
@@ -427,57 +421,6 @@ z.util.sort_object_by_keys = (object, reverse) ->
 
   return sorted_object
 
-z.util.sort_user_by_first_name = (user_a, user_b) ->
-  name_a = user_a.first_name().toLowerCase()
-  name_b = user_b.first_name().toLowerCase()
-  return -1 if name_a < name_b
-  return 1 if name_a > name_b
-  return 0
-
-
-z.util.remove_line_breaks = (string) ->
-  string.replace /(\r\n|\n|\r)/gm, ''
-
-
-z.util.trim_line_breaks = (string) ->
-  string.replace /^\s+|\s+$/g, ''
-
-
-z.util.contains = (string = '', query) ->
-  string = string.toLowerCase()
-  query = query.toLowerCase()
-  return string.indexOf(query) isnt -1
-
-
-z.util.array_get_next = (array, item, filter) ->
-  index = array.indexOf item
-  next_index = index + 1
-
-  # couldn't find the item
-  return null if index is -1
-
-  # item is last item in the array
-  return array[index - 1] if next_index is array.length and index > 0
-
-  return if next_index >= array.length
-
-  for i in [next_index..array.length]
-    current_item = array[i]
-    return current_item unless filter? and not filter current_item
-
-
-z.util.array_is_last = (array, item) ->
-  return array.indexOf(item) is array.length - 1
-
-
-# returns chunks of the given size
-z.util.array_chunks = (array, size) ->
-  chunks = []
-  temp_array = [].concat array
-  while temp_array.length
-    chunks.push temp_array.splice 0, size
-  return chunks
-
 
 # This will remove url(' and url(" from the beginning of the string.
 # It will also remove ") and ') from the end if present.
@@ -504,15 +447,6 @@ z.util.valid_profile_image_size = (file, min_width, min_height, callback) ->
   image.src = window.URL.createObjectURL file
 
 
-z.util.truncate_text = (text, output_length, word_boundary = true) ->
-  if text.length > output_length
-    trunc_index = output_length - 1
-    if word_boundary and text.lastIndexOf(' ', output_length - 1) > output_length - 25
-      trunc_index = text.lastIndexOf ' ', output_length - 1
-    text = "#{text.substr 0, trunc_index}#{z.localization.Localizer.get_text z.string.truncation}"
-  return text
-
-
 z.util.is_valid_email = (email) ->
   re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   return re.test email
@@ -533,22 +467,6 @@ z.util.is_valid_phone_number = (phone_number) ->
     regular_expression = /^\+[0-9]\d{1,14}$/
   return regular_expression.test phone_number
 
-
-z.util.get_first_character = (string) ->
-  re = new RegExp /([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/
-  find_emoji_in_string = re.exec string
-  if find_emoji_in_string and find_emoji_in_string.index is 0
-    return find_emoji_in_string[0]
-  else
-    return string[0]
-
-
-z.util.string_format = ->
-  s = arguments[0]
-  for i in [0...arguments.length]
-    reg = new RegExp "\\{#{i}\\}", 'gm'
-    s = s.replace reg, arguments[++i]
-  return s
 
 ###
 JS Implementation of MurmurHash3 (r136) (as of May 20, 2011)
@@ -626,31 +544,6 @@ z.util.get_first_name = (user_et, declension = z.string.Declension.NOMINATIVE) -
     else if declension is z.string.Declension.ACCUSATIVE
       return z.localization.Localizer.get_text z.string.conversation_you_accusative
   return user_et.first_name()
-
-
-z.util.name_starts_with = (name = '', query) ->
-  return name.toLowerCase().startsWith query.toLowerCase()
-
-
-z.util.compare_names = (name_a, name_b) ->
-  return z.util.contains window.getSlug(name_a), window.getSlug(name_b)
-
-
-z.util.sort_names = (name_a, name_b) ->
-  name_a = name_a.toLowerCase()
-  name_b = name_b.toLowerCase()
-
-  if z.util.name_starts_with name_a, query
-    return -1 unless z.util.name_starts_with name_b, query
-  else if z.util.name_starts_with name_b, query
-    return 1 unless z.util.name_starts_with name_a, query
-  return -1 if name_a < name_b
-  return 1 if name_a > name_b
-  return 0
-
-
-z.util.capitalize_first_char = (s) ->
-  return "#{s.charAt(0).toUpperCase()}#{s.substring 1}"
 
 
 z.util.print_devices_id = (id) ->

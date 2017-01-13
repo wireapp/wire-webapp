@@ -324,14 +324,16 @@ class z.conversation.ConversationRepository
       .filter (conversation_et) ->
         return false if not conversation_et.is_group()
         if is_username
-          return true if z.util.compare_names conversation_et.display_name(), "@#{query}"
-          return true for user_et in conversation_et.participating_user_ets() when z.util.name_starts_with user_et.username(), query
+          return true if z.util.StringUtil.compare_transliteration conversation_et.display_name(), "@#{query}"
+          return true for user_et in conversation_et.participating_user_ets() when z.util.StringUtil.starts_with user_et.username(), query
         else
-          return true if z.util.compare_names conversation_et.display_name(), query
-          return true for user_et in conversation_et.participating_user_ets() when z.util.compare_names user_et.name(), query
+          return true if z.util.StringUtil.compare_transliteration conversation_et.display_name(), query
+          return true for user_et in conversation_et.participating_user_ets() when z.util.StringUtil.compare_transliteration user_et.name(), query
         return false
       .sort (conversation_a, conversation_b) ->
-        return z.util.sort_names conversation_a.display_name(), conversation_b.display_name()
+        if is_username
+          return z.util.StringUtil.sort_by_priority conversation_a.display_name(), conversation_b.display_name(), "#{@query}"
+        return z.util.StringUtil.sort_by_priority conversation_a.display_name(), conversation_b.display_name(), query
 
   ###
   Get the next unarchived conversation.
@@ -339,7 +341,7 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] Next conversation
   ###
   get_next_conversation: (conversation_et) ->
-    return z.util.array_get_next @conversations_unarchived(), conversation_et
+    return z.util.ArrayUtil.get_next_item @conversations_unarchived(), conversation_et
 
   ###
   Get unarchived conversation with the most recent event.
