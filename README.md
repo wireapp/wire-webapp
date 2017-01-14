@@ -34,3 +34,7 @@ Run `yarn start` and Wire's web app will be available at:
 ### Status
 
 [![Build Status](https://travis-ci.org/wireapp/wire-webapp.svg?branch=dev)](https://travis-ci.org/wireapp/wire-webapp)
+
+### Translations
+
+All Wire translations are crowdsourced via CrowdIn: https://crowdin.com/projects/wire
