@@ -427,9 +427,7 @@ class z.ViewModel.MessageListViewModel
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
           action: => @conversation_repository.delete_message_everyone @conversation(), message_et
       when 'download'
-        date = moment message_et.timestamp
-        name = "Wire #{date.format('YYYY-MM-DD')} at #{date.format('h.mm.ss')}"
-        message_et?.get_first_asset()?.download name
+        message_et.download()
       when 'edit'
         amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.EDIT, message_et
       when 'react'

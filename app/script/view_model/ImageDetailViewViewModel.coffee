@@ -60,9 +60,7 @@ class z.ViewModel.ImageDetailViewViewModel
     @image_modal.hide()
 
   click_on_download: ->
-    date = moment @message_et().timestamp
-    name = "Wire #{date.format('YYYY-MM-DD')} at #{date.format('h.mm.ss')}"
-    @message_et().get_first_asset().download name
+    @message_et().download()
 
   click_on_like: =>
     @conversation_repository.toggle_like @conversation_et(), @message_et()

@@ -33,7 +33,12 @@ class z.ViewModel.content.CollectionViewModel
 
     @no_items_found = ko.observable false
 
+  added_to_view: =>
+    $(document).on 'keydown.collection', (event) =>
+      amplify.publish z.event.WebApp.CONVERSATION.SHOW, @conversation_et() if event.keyCode is z.util.KEYCODE.ESC
+
   removed_from_view: =>
+    $(document).off 'keydown.collection'
     @no_items_found false
     @conversation_et null
     [@images, @files, @links].forEach (array) -> array.removeAll()
@@ -42,10 +47,9 @@ class z.ViewModel.content.CollectionViewModel
     @conversation_et conversation_et
     @conversation_repository.get_events_for_category conversation_et, z.message.MessageCategory.LINK_PREVIEW
     .then (message_ets) =>
-      if message_ets.length is 0
+      @populate_items message_ets
+      if @images().length is 0 and @files().length is 0 and @links().length is 0
         @no_items_found true
-      else
-        @populate_items message_ets
 
   populate_items: (message_ets) =>
     for message_et in message_ets
