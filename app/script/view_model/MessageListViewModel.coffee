@@ -378,7 +378,7 @@ class z.ViewModel.MessageListViewModel
 
     @_track_context_menu message_et
 
-    if message_et.get_first_asset()?.download? and not message_et.is_ephemeral()
+    if message_et.is_downloadable() and not message_et.is_ephemeral()
       entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
 
     if message_et.is_reactable() and not @conversation().removed_from_conversation()
