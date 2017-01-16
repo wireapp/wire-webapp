@@ -1358,11 +1358,12 @@ class z.conversation.ConversationRepository
           data: 'Lipis'
           action: ->
             send_anyway = true
-            console.log 'action', send_anyway
             resolve()
           close: ->
-            console.log 'close', send_anyway
-            reject() if not send_anyway
+            if not send_anyway
+              window.setTimeout ->
+                reject new Error 'Sending to degraded conversation was denied by user'
+              , 200
 
   ###
   Sends otr asset to a conversation.
