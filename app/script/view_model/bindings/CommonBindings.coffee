@@ -329,9 +329,11 @@ ko.bindingHandlers.in_viewport = do ->
 
   listeners = []
 
-  window.addEventListener 'scroll', (e) ->
+  notify_listeners = _.throttle (e) ->
     listener(e) for listener in listeners by -1 # listeners can be deleted during iteration
-  , true
+  , 300
+
+  window.addEventListener 'scroll', notify_listeners, true
 
   init: (element, valueAccessor) ->
 
