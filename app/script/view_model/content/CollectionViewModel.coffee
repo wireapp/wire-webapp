@@ -48,7 +48,7 @@ class z.ViewModel.content.CollectionViewModel
     @conversation_repository.get_events_for_category conversation_et, z.message.MessageCategory.LINK_PREVIEW
     .then (message_ets) =>
       @populate_items message_ets
-      if @images().length is 0 and @files().length is 0 and @links().length is 0
+      if @images().length + @files().length + @links().length is 0
         @no_items_found true
 
   populate_items: (message_ets) =>
