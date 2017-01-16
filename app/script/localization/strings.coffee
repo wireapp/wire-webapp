@@ -186,7 +186,7 @@ z.string.modal_logout_headline = 'Clear Data?'
 z.string.modal_logout_message = 'Delete all your personal information and conversations on this device.'
 z.string.modal_logout_button = 'Log out'
 # New device
-z.string.modal_new_device_headline = '"%@.name" started using a new device'
+z.string.modal_new_device_headline = '%@.name started using a new device'
 z.string.modal_new_device_message = 'Do you still want to send your messages?'
 z.string.modal_new_device_show_device = 'show device'
 z.string.modal_new_device_send_anyway = 'send anyway'
