@@ -34,12 +34,12 @@ class z.entity.File extends z.entity.Asset
     # z.assets.AssetTransferState
     @status = ko.observable()
 
-    # contains asset meta data as object
-    @meta = {}
-
     @file_name = ''
     @file_size = ''
     @file_type = ''
+
+    # contains asset meta data as object
+    @meta = {}
 
     # asset url, instance of an otr asset this has to be decrypted
     @original_resource  = ko.observable()

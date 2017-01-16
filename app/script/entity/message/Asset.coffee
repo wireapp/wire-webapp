@@ -31,10 +31,6 @@ class z.entity.Asset
     @key = ''
     @type = ''
 
-    @file_name = ''
-    @file_size = ''
-    @file_type = ''
-
   ###
   Check if asset is a medium image.
 
