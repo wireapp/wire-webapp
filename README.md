@@ -37,4 +37,4 @@ Run `yarn start` and Wire's web app will be available at:
 
 ### Translations
 
-All Wire translations are crowdsourced via CrowdIn: https://crowdin.com/projects/wire
+All Wire translations are crowdsourced via [Crowdin](https://crowdin.com/projects/wire).
