@@ -28,6 +28,6 @@ class z.components.AssetHeader
 ko.components.register 'asset-header',
   viewModel: z.components.AssetHeader
   template: """
-            <span class="text-capitalize" data-bind="text: message_et.user().first_name(), css: message_et.accent_color" class="asset-header-name"></span>
-            <span data-bind="text: moment(message_et.timestamp).format('D.M H:mm')" class="asset-header-time"></span>
+            <span class="asset-header-name" data-bind="text: message_et.user().first_name(), css: message_et.accent_color"></span>
+            <span class="asset-header-time" data-bind="text: moment(message_et.timestamp).format('D.M H:mm')"></span>
             """

@@ -97,7 +97,7 @@ class z.ViewModel.content.ContentViewModel
   @param content_selector [String] dom element to apply slide in animation
   ###
   _shift_content: (content_selector) ->
-    incoming_css_class = 'content-animation-incoming'
+    incoming_css_class = 'content-animation-incoming-horizontal-left'
 
     $(content_selector)
       .removeClass incoming_css_class
@@ -118,7 +118,7 @@ class z.ViewModel.content.ContentViewModel
     return @switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS if not conversation_et
 
     conversation_et = @conversation_repository.get_conversation_by_id conversation_et if not conversation_et.id
-    return if conversation_et is @conversation_repository.active_conversation()
+    return if conversation_et is @conversation_repository.active_conversation() and @content_state() is z.ViewModel.content.CONTENT_STATE.CONVERSATION
 
     @_release_content()
     @content_state z.ViewModel.content.CONTENT_STATE.CONVERSATION
@@ -131,7 +131,7 @@ class z.ViewModel.content.ContentViewModel
   switch_content: (new_content_state) =>
     return false if @content_state() is new_content_state
 
-    @_release_content()
+    @_release_content new_content_state
     @_show_content @_check_content_availability new_content_state
 
   ###
@@ -171,11 +171,13 @@ class z.ViewModel.content.ContentViewModel
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS then '.preferences-options'
       else '.watermark'
 
-  _release_content: ->
+  _release_content: (new_content_state) ->
     @previous_state = @content_state()
 
-    if @previous_state is z.ViewModel.content.CONTENT_STATE.CONVERSATION
+    if @previous_state is z.ViewModel.content.CONTENT_STATE.CONVERSATION and not new_content_state in [z.ViewModel.content.CONTENT_STATE.COLLECTION, z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS]
       @conversation_repository.active_conversation null
+
+    if @previous_state is z.ViewModel.content.CONTENT_STATE.CONVERSATION
       @message_list.release_conversation()
     else if @previous_state is z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
       @preferences_av.release_devices()

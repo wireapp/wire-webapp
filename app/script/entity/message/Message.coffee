@@ -142,6 +142,13 @@ class z.entity.Message
     return @super_type is z.message.SuperType.CONTENT
 
   ###
+  Check if the message content can be downloaded
+  @return [Boolean] Is message of type content
+  ###
+  is_downloadable: ->
+    return @get_first_asset?().download?
+
+  ###
   Check if message is a member message.
   @return [Boolean] Is message of type member
   ###

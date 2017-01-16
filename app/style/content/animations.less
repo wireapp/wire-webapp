@@ -17,26 +17,14 @@
  *
  */
 
-.label {
-  text-transform: uppercase;
-}
+@keyframes content-incoming-horizontal-left {0%{ opacity: 0; transform: translateX(24px); } 100%{ opacity: 1; transform: translateX(0);}}
+@keyframes content-incoming-vertical-top {0%{ opacity: 0; transform: translateY(24px); } 100%{ opacity: 1; transform: translateY(0);}}
 
-.label-xs {
-  .label;
-  font-size: @font-size-xs;
-  font-weight: @font-weight-regular;
-}
+.content-animation-incoming-horizontal-left {animation-name: content-incoming-horizontal-left;}
+.content-animation-incoming-vertical-top {animation-name: content-incoming-vertical-top;}
 
-.label-bold {
-  .label;
-  font-weight: @font-weight-bold;
-}
-
-.label-bold-xs {
-  .label-bold;
-  font-size: @font-size-xs;
-}
-
-.label-username:not(:empty):before {
-  content: "@";
+.content-animation-incoming-horizontal-left,
+.content-animation-incoming-vertical-top {
+  animation-duration: @animation-timing-slow;
+  animation-timing-function: @ease-out-expo;
 }
