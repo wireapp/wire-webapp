@@ -168,7 +168,7 @@ class z.calling.e_call.ECallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @user_repository.get_user_by_id user_id, (user_et) ->
-        if e_call_message.resp in [false, 'false']
+        if e_call_message.resp is false
           return e_call_et.update_participant user_et, e_call_message
     .catch (error) ->
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
