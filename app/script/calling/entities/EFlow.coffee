@@ -75,6 +75,9 @@ class z.calling.entities.EFlow
 
     @connection_state.subscribe (ice_connection_state) =>
       switch ice_connection_state
+        when z.calling.rtc.ICEConnectionState.CHECKING
+          @telemetry.schedule_check 5000
+
         when z.calling.rtc.ICEConnectionState.COMPLETED, z.calling.rtc.ICEConnectionState.CONNECTED
           @telemetry.start_statistics()
           @e_call_et.is_connected true
@@ -129,12 +132,12 @@ class z.calling.entities.EFlow
     @local_sdp.subscribe (sdp) =>
       if sdp
         @local_sdp_type sdp.type
-        if @has_sent_local_sdp()
-          @has_sent_local_sdp false
+        unless @should_send_local_sdp()
+          @should_send_local_sdp true
           @should_set_local_sdp true
 
-    @has_sent_local_sdp = ko.observable false
-    @should_set_local_sdp = ko.observable true
+    @should_send_local_sdp = ko.observable false
+    @should_set_local_sdp = ko.observable false
 
     @send_sdp_timeout = undefined
 
@@ -163,7 +166,6 @@ class z.calling.entities.EFlow
     @remote_sdp = ko.observable undefined
     @remote_sdp.subscribe (sdp) =>
       if sdp
-        @telemetry.schedule_check 5000
         @remote_sdp_type sdp.type
         @should_set_remote_sdp true
 
@@ -224,9 +226,14 @@ class z.calling.entities.EFlow
     @audio.hookup true
     @_create_peer_connection()
     @_add_media_streams()
+    @_set_sdp_states()
     @negotiation_needed true
     @pc_initialized true
 
+  _set_sdp_states: ->
+    @should_set_remote_sdp true
+    @should_set_local_sdp true
+    @should_send_local_sdp true
 
   ###############################################################################
   # PeerConnection handling
@@ -315,7 +322,7 @@ class z.calling.entities.EFlow
   ###
   _on_ice_candidate: (event) =>
     unless event.candidate
-      return if @has_sent_local_sdp()
+      return unless @should_send_local_sdp()
       @logger.debug 'Generation of ICE candidates completed - sending SDP'
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.ICE_GATHERING_COMPLETED
       return @send_local_sdp()
@@ -418,7 +425,7 @@ class z.calling.entities.EFlow
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' containing '#{ice_candidates}' ICE candidates for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
       return @e_call_et.send_e_call_event new z.calling.entities.ECallSetupMessage @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @local_sdp().sdp, videosend: "#{@e_call_et.self_state.video_send()}", @e_call_et
       .then =>
-        @has_sent_local_sdp true
+        @should_send_local_sdp true
         @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
         @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful", @local_sdp()
 
