@@ -1357,11 +1357,10 @@ class z.conversation.ConversationRepository
 
         user_ids = Object.keys missing
         @user_repository.get_users_by_id user_ids, (user_ets) ->
-          usernames = user_ets.map (user_et) ->
-            return user_et.name()
+          joined_usernames = z.util.LocalizerUtil.join_names user_ets
 
           amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
-            data: usernames.join ', '
+            data: joined_usernames
             action: ->
               send_anyway = true
               resolve()
