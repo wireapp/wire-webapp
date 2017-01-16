@@ -29,8 +29,8 @@ module.exports = (grunt) ->
 
     options =
       auth:
-        username: 'webapp@wire.com'
-        password: 'B8uwFwy8hDZqf'
+        username: process.env.RAYGUN_USERNAME
+        password: process.env.RAYGUN_PASSWORD
       uri: 'https://app.raygun.io/upload/jssymbols/cmhb9p'
 
     if env is 'prod'
