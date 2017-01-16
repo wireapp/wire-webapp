@@ -37,7 +37,7 @@
              data-bind="click: $parent.click_on_conversation">
           <div class="name"
                data-bind="attr: {'data-uie-uid': id, 'data-uie-value': display_name()},
-                          css: {'text-theme': $parent.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION && id === $parent.active_conversation_id()},
+                          css: {'text-theme': $parent.is_selected_conversation($data)},
                           text: display_name()"
                data-uie-name="item-call"></div>
           <!-- ko ifnot: call().is_declined() -->
@@ -174,7 +174,7 @@
 
       <!-- ko foreach: conversations_unarchived -->
         <li class="left-list-item"
-          data-bind="css: {'text-theme': $parent.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION && id === $parent.active_conversation_id()}">
+          data-bind="css: {'text-theme': $parent.is_selected_conversation($data)}">
           <div class="overlay"></div>
           <div class="left-column">
             <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.UNREAD -->

@@ -106,7 +106,7 @@ class z.ViewModel.list.ConversationListViewModel
     @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
 
   click_on_conversation: (conversation_et) =>
-    return if @_is_selected_conversation conversation_et
+    return if @is_selected_conversation conversation_et
     @content_view_model.show_conversation conversation_et
 
   _init_subscriptions: =>
@@ -129,8 +129,14 @@ class z.ViewModel.list.ConversationListViewModel
     prev_conversation_et = conversations[index]
     amplify.publish z.event.WebApp.CONVERSATION.SHOW, prev_conversation_et if prev_conversation_et
 
-  _is_selected_conversation: (conversation_et) =>
-    @content_state() is z.ViewModel.content.CONTENT_STATE.CONVERSATION and conversation_et.id is @active_conversation_id()
+  is_selected_conversation: (conversation_et) =>
+    is_selected_conversation = conversation_et.id is @active_conversation_id()
+    is_selected_state = @content_state() in [
+      z.ViewModel.content.CONTENT_STATE.COLLECTION
+      z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS
+      z.ViewModel.content.CONTENT_STATE.CONVERSATION
+    ]
+    return is_selected_conversation and is_selected_state
 
   on_webapp_loaded: =>
     @webapp_is_loaded true
