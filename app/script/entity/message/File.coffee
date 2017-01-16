@@ -37,6 +37,10 @@ class z.entity.File extends z.entity.Asset
     # contains asset meta data as object
     @meta = {}
 
+    @file_name = ''
+    @file_size = ''
+    @file_type = ''
+
     # asset url, instance of an otr asset this has to be decrypted
     @original_resource  = ko.observable()
     @preview_resource = ko.observable()

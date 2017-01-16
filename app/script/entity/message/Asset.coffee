@@ -89,10 +89,3 @@ class z.entity.Asset
       can_play = document.createElement('audio').canPlayType @file_type
       return true if can_play isnt ''
     return false
-
-  ###
-  Loads and decrypts otr asset as initiates download
-  @return [Promise] Returns a promise that resolves with the asset as blob
-  ###
-  download: (file_name) =>
-    @resource()?.load().then (blob) -> z.util.download_blob blob, file_name
