@@ -97,7 +97,7 @@ class z.ViewModel.content.ContentViewModel
   @param content_selector [String] dom element to apply slide in animation
   ###
   _shift_content: (content_selector) ->
-    incoming_css_class = 'content-animation-incoming'
+    incoming_css_class = 'content-incoming-horizontal-left'
 
     $(content_selector)
       .removeClass incoming_css_class
