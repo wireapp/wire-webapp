@@ -57,6 +57,7 @@ class z.entity.Conversation
 
     @archived_state = ko.observable false
     @muted_state = ko.observable false
+    @verification_state = ko.observable z.conversation.ConversationVerificationState.UNVERIFIED
 
     @archived_timestamp = ko.observable 0
     @cleared_timestamp = ko.observable 0
@@ -80,7 +81,17 @@ class z.entity.Conversation
 
     @is_verified = ko.pureComputed =>
       all_users = [@self].concat @participating_user_ets()
-      return all_users.every (user_et) -> user_et?.is_verified()
+      is_verified = all_users.every (user_et) -> user_et?.is_verified()
+      if is_verified
+        @verification_state z.conversation.ConversationVerificationState.VERIFIED
+      else
+        if @verification_state() is z.conversation.ConversationVerificationState.VERIFIED
+          @verification_state z.conversation.ConversationVerificationState.DEGRADED
+        else
+          @verification_state z.conversation.ConversationVerificationState.UNVERIFIED
+      console.warn 'is_verified: ' + is_verified
+      console.warn 'verification_state: ' + @verification_state()
+      return is_verified
 
     @removed_from_conversation = ko.observable false
     @removed_from_conversation.subscribe (is_removed) =>
@@ -188,6 +199,8 @@ class z.entity.Conversation
       @_persist_state_update z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
     @muted_state.subscribe =>
       @_persist_state_update z.conversation.ConversationUpdateType.MUTED_STATE
+    @verification_state.subscribe =>
+      @_persist_state_update z.conversation.ConversationUpdateType.VERIFICATION_STATE
 
   _persist_state_update: (updated_field) ->
     amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @, updated_field
@@ -504,4 +517,5 @@ class z.entity.Conversation
       last_read_timestamp: @last_read_timestamp()
       muted_state: @muted_state()
       muted_timestamp: @muted_timestamp()
+      verification_state: @verification_state()
     }

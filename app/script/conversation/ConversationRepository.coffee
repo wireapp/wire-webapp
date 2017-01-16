@@ -482,6 +482,8 @@ class z.conversation.ConversationRepository
             muted_state: conversation_et.muted_state()
             muted_timestamp: conversation_et.muted_timestamp()
           }
+        when z.conversation.ConversationUpdateType.VERIFICATION_STATE
+          verification_state: conversation_et.verification_state()
       return @conversation_service.update_conversation_state_in_db conversation_et, changes
       .then =>
         @logger.info "Persisted update of '#{updated_field}' to conversation '#{conversation_et.id}'"
@@ -1309,7 +1311,7 @@ class z.conversation.ConversationRepository
           payload.native_push = native_push
           @_send_encrypted_message conversation_id, generic_message, payload, user_ids
     .catch (error) =>
-      if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
+      if error?.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
         return @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
       throw error
 
@@ -1332,12 +1334,33 @@ class z.conversation.ConversationRepository
       @_handle_client_mismatch conversation_id, response
       return response
     .catch (error) =>
-      throw error if not error.missing
+      updated_payload = undefined
 
-      return @_handle_client_mismatch conversation_id, error, generic_message, payload
-      .then (updated_payload) =>
-        @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
-        return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
+      if error.missing
+        return @_handle_client_mismatch conversation_id, error, generic_message, payload
+        .then (payload_with_missing_clients) =>
+          updated_payload = payload_with_missing_clients
+          return @_grant_outgoing_message conversation_id, generic_message, error.missing
+        .then =>
+          @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
+          return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
+      else
+        throw error
+
+  _grant_outgoing_message: (conversation_id, generic_message, missing) =>
+    conversation_et = @find_conversation_by_id conversation_id
+    return new Promise (resolve, reject) ->
+      if conversation_et.verification_state() is z.conversation.ConversationVerificationState.UNVERIFIED
+        resolve()
+      else
+        send_anyway = false
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
+          data: 'Lipis'
+          action: ->
+            send_anyway = true
+            resolve()
+          close: ->
+            reject() if not send_anyway
 
   ###
   Sends otr asset to a conversation.
