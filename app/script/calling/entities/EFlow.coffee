@@ -32,13 +32,14 @@ class z.calling.entities.EFlow
   @param e_call_et [z.calling.entities.ECall] E-Call entity that the e-flow belongs to
   @param e_participant_et [z.calling.entities.EParticipant] E-Participant entity that the e-flow belongs to
   @param timings [z.telemetry.calling.CallSetupTimings] Timing statistics of call setup steps
-  @param e_call_message [z.calling.entities.ECallSetupMessage] Optional e-call setup message entity
+  @param e_call_message [z.calling.entities.ECallMessage] Optional e-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
   constructor: (@e_call_et, @e_participant_et, timings, e_call_message) ->
     @logger = new z.util.Logger "z.calling.entities.EFlow (#{@e_participant_et.id})", z.config.LOGGER.OPTIONS
 
     @id = @e_participant_et.id
     @conversation_id = @e_call_et.id
+    @e_call_center = @e_call_et.e_call_center
 
     # States
     @is_answer = ko.observable undefined
@@ -214,7 +215,7 @@ class z.calling.entities.EFlow
   ###
   Initialize the e-flow.
   @note Magic here is that if an e_call_message is present, the remote user is the creator of the flow
-  @param e_call_message [z.calling.entities.ECallSetupMessage] Optional e-call setup message entity
+  @param e_call_message  [z.calling.entities.ECallMessage] Optional e-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
   initialize_e_flow: (e_call_message) =>
     if e_call_message
@@ -400,7 +401,7 @@ class z.calling.entities.EFlow
 
   ###
   Save the remote SDP received via an e-call message within the e-flow.
-  @param e_call_message [z.calling.entities.ECallSetupMessage] E-call setup message entity
+  @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
   save_remote_sdp: (e_call_message) =>
     z.calling.mapper.SDPRewriteMapper.rewrite_sdp @_map_sdp(e_call_message), z.calling.enum.SDPSource.REMOTE, @
@@ -423,7 +424,8 @@ class z.calling.entities.EFlow
         return @_set_send_sdp_timeout()
 
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' containing '#{ice_candidates}' ICE candidates for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
-      return @e_call_et.send_e_call_event new z.calling.entities.ECallSetupMessage @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @local_sdp().sdp, videosend: "#{@e_call_et.self_state.video_send()}", @e_call_et
+      e_call_message_et = new z.calling.entities.ECallMessage @e_call_et, z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_center.create_setup_payload @local_sdp().sdp
+      return @e_call_et.send_e_call_event e_call_message_et
       .then =>
         @should_send_local_sdp true
         @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
@@ -480,7 +482,7 @@ class z.calling.entities.EFlow
 
   ###
   Map e-call setup message to RTCSessionDescription.
-  @param e_call_message [z.calling.entities.ECallSetupMessage] E-call setup message entity
+  @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   @return [RTCSessionDescription] webRTC standard compliant RTCSessionDescription
   ###
   _map_sdp: (e_call_message) ->

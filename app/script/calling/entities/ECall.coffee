@@ -199,7 +199,7 @@ class z.calling.entities.ECall
   ###
   Add an e-participant to the e-call.
   @param e_participant_et [z.calling.entities.EParticipant] E-participant entity to be added to the e-call
-  @param e_call_message [z.calling.entities.ECallSetupMessage] E-call setup message entity
+  @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
   add_participant: (user_et, e_call_message) =>
     @get_participant_by_id user_et.id
