@@ -21,7 +21,7 @@ z.components ?= {}
 
 class z.components.FileAssetComponent
   ###
-  Construct a new audio asset.
+  Construct a new file asset.
 
   @param params [Object]
   @option params [ko.observableArray] asset
