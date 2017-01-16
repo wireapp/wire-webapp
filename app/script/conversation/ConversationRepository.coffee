@@ -1349,20 +1349,25 @@ class z.conversation.ConversationRepository
 
   _grant_outgoing_message: (conversation_id, generic_message, missing) =>
     conversation_et = @find_conversation_by_id conversation_id
-    return new Promise (resolve, reject) ->
+    return new Promise (resolve, reject) =>
       if conversation_et.verification_state() is z.conversation.ConversationVerificationState.UNVERIFIED
         resolve()
       else
         send_anyway = false
-        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
-          data: 'Lipis'
-          action: ->
-            send_anyway = true
-            resolve()
-          close: ->
-            if not send_anyway
+
+        user_ids = Object.keys missing
+        @user_repository.get_users_by_id user_ids, (user_ets) ->
+          usernames = user_ets.map (user_et) ->
+            return user_et.name()
+
+          amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
+            data: usernames.join ', '
+            action: ->
+              send_anyway = true
+              resolve()
+            close: ->
               window.setTimeout ->
-                reject new Error 'Sending to degraded conversation was denied by user'
+                reject new Error 'Sending to degraded conversation was denied by user.' if not send_anyway
               , 200
 
   ###
