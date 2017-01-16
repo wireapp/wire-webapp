@@ -95,4 +95,4 @@ class z.entity.Asset
   @return [Promise] Returns a promise that resolves with the asset as blob
   ###
   download: (file_name) =>
-    @resource()?.load().then (blob) => z.util.download_blob blob, file_name
+    @resource()?.load().then (blob) -> z.util.download_blob blob, file_name
