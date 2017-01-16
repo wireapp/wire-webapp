@@ -96,7 +96,7 @@ ko.components.register 'file-asset',
                   <div class="file-desc">
                     <div data-uie-name="file-name"
                          data-bind="text: z.util.trim_file_extension(asset.file_name)"
-                         class="label-xs label-semibold ellipsis"></div>
+                         class="label-bold-xs ellipsis"></div>
                     <ul class="file-desc-meta label-xs text-graphite">
                       <li data-uie-name="file-size" data-bind="text: z.util.format_bytes(asset.file_size)"></li>
                       <!-- ko if: z.util.get_file_extension(asset.file_name) -->
