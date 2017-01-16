@@ -133,17 +133,17 @@
 
           <form id="form-account-register" class="form" data-bind="submit: register">
             <div id="wire-register-name-container" class="form-control">
-              <input class="input name" id="wire-register-name" type="text" autocomplete="off" maxlength="64" spellcheck="false"
+              <input class="input name" id="wire-register-name" type="text" maxlength="64" spellcheck="false"
                      data-bind="css: {'input-error': failed_validation_name}, event: {input: clear_error}, l10n_tooltip: z.string.auth_placeholder_name, l10n_placeholder: z.string.auth_placeholder_name, textInput: name"
                      data-uie-name="enter-name" tabindex="1" dir="auto">
             </div>
             <div id="wire-register-email-container" class="form-control">
-              <input class="input email" id="wire-register-email" type="text" autocomplete="off" maxlength="128" spellcheck="false"
+              <input class="input email" id="wire-register-email" type="text" maxlength="128" spellcheck="false"
                      data-bind="css: {'input-error': failed_validation_email}, event: {input: clear_error}, l10n_tooltip: z.string.auth_placeholder_email, l10n_placeholder: z.string.auth_placeholder_email, textInput: username"
                      data-uie-name="enter-email" tabindex="2">
             </div>
             <div id="wire-register-password-container" class="form-control">
-              <input class="input password" id="wire-register-password" type="password" autocomplete="off" maxlength="1024"
+              <input class="input password" id="wire-register-password" type="password" maxlength="1024"
                      data-bind="css: {'input-error': failed_validation_password}, event: {input: clear_error_password}, l10n_tooltip: z.string.auth_placeholder_password_set, l10n_placeholder: z.string.auth_placeholder_password_set, textInput: password"
                      data-uie-name="enter-password" tabindex="3">
             </div>
@@ -180,12 +180,12 @@
             <div class="auth-headline" data-bind="l10n_text: z.string.auth_verify_account_headline"></div>
             <div class="auth-headline-sub" data-bind="l10n_text: z.string.auth_verify_account_detail"></div>
             <div id="wire-verify-account-email-container" class="form-control">
-              <input class="input email" id="wire-verify-account-email" type="text" autocomplete="off" maxlength="128" spellcheck="false"
+              <input class="input email" id="wire-verify-account-email" type="text" maxlength="128" spellcheck="false"
                      data-bind="css: {'input-error': failed_validation_email}, event: {input: clear_error}, l10n_tooltip: z.string.auth_placeholder_email, l10n_placeholder: z.string.auth_placeholder_email, textInput: username"
                      data-uie-name="enter-email">
             </div>
             <div id="wire-verify-account-password-container" class="form-control">
-              <input class="input password" id="wire-verify-account-password" type="password" maxlength="1024" autocomplete="off"
+              <input class="input password" id="wire-verify-account-password" type="password" maxlength="1024"
                      data-bind="css: {'input-error': failed_validation_password}, event: {input: clear_error_password}, l10n_tooltip: z.string.auth_placeholder_password_set, l10n_placeholder: z.string.auth_placeholder_password_set, textInput: password"
                      data-uie-name="enter-password">
             </div>
@@ -262,7 +262,7 @@
           <form id="form-verify-phone-password" class="form" data-bind="submit: verify_password">
             <div class="auth-headline verify-password-text" data-bind="l10n_text: z.string.auth_verify_password_headline"></div>
             <div id="wire-verify-phone-password-container" class="form-control">
-              <input class="input password" id="wire-verify-password-input" type="password" maxlength="1024" autocomplete="off"
+              <input class="input password" id="wire-verify-password-input" type="password" maxlength="1024"
                      data-bind="css: {'input-error': failed_validation_password}, event: {input: clear_error_password}, l10n_tooltip: z.string.auth_placeholder_password_put, l10n_placeholder: z.string.auth_placeholder_password_put, textInput: password"
                      data-uie-name="enter-password">
             </div>
