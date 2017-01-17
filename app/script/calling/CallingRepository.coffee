@@ -59,8 +59,7 @@ class z.calling.CallingRepository
     @calls = ko.pureComputed =>
       return @call_center.calls().concat @e_call_center.e_calls()
     @joined_call = ko.pureComputed =>
-      return @e_call_center.joined_e_call() if @e_call_center.joined_e_call()
-      return @call_center.joined_call() if @call_center.joined_call()
+      return @e_call_center.joined_e_call() or @call_center.joined_call()
 
     @remote_media_streams = @media_repository.stream_handler.remote_media_streams
     @self_stream_state = @media_repository.stream_handler.self_stream_state
@@ -161,17 +160,21 @@ class z.calling.CallingRepository
 
   # Report a call for call analysis
   report_call: =>
-    send_report = (custom_data) =>
-      Raygun.send new Error('Call failure report'), custom_data
-      @logger.info "Reported status of flow id '#{custom_data.meta.flow_id}' for call analysis", custom_data
-
     @get_call_by_id conversation_id
     .catch =>
       return call_et for call_et in @calls() when call_et.state() not in z.calling.enum.CallStateGroups.IS_ENDED
     .then (call_et) ->
       if call_et
-        send_report (flow_et.report_status() for flow_et in call_et.get_flows())
+        @_send_report (flow_et.report_status() for flow_et in call_et.get_flows())
       else if @flow_status
-        send_report @flow_status
+        @_send_report @flow_status
       else
         @logger.warn 'Could not find flows to report for call analysis'
+
+  ###
+  Send Raygun report.
+  @private
+  ###
+  _send_report = (custom_data) =>
+    Raygun.send new Error('Call failure report'), custom_data
+    @logger.info "Reported status of flow id '#{custom_data.meta.flow_id}' for call analysis", custom_data
