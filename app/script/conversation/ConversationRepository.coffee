@@ -1352,6 +1352,8 @@ class z.conversation.ConversationRepository
     return new Promise (resolve, reject) =>
       if conversation_et.verification_state() is z.conversation.ConversationVerificationState.UNVERIFIED
         resolve()
+      else if generic_message.content in ['cleared', 'confirmation', 'lastRead']
+        resolve()
       else
         send_anyway = false
 
