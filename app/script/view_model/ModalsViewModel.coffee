@@ -108,15 +108,15 @@ class z.ViewModel.ModalsViewModel
       modal.hide -> options.secondary?()
 
     $(type).find('.modal-action').click ->
-      modal.hide ->
-        if (checkbox = $(type).find('.modal-checkbox')).length
-          options.action checkbox.is ':checked'
-          checkbox.prop 'checked', false
-        else if (input = $(type).find('.modal-input')).length
-          options.action input.val()
-          input.val ''
-        else
-          options.action?()
+      if (checkbox = $(type).find('.modal-checkbox')).length
+        options.action checkbox.is ':checked'
+        checkbox.prop 'checked', false
+      else if (input = $(type).find('.modal-input')).length
+        options.action input.val()
+        input.val ''
+      else
+        options.action?()
+      modal.hide()
 
     @logger.log @logger.levels.INFO, "Show modal of type '#{type}'" if not modal.is_shown()
     modal.toggle()

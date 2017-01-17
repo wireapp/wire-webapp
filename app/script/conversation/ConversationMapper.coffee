@@ -111,6 +111,9 @@ class z.conversation.ConversationMapper
       conversation_et.set_timestamp self.muted_timestamp, z.conversation.ConversationUpdateType.MUTED_TIMESTAMP
       conversation_et.muted_state self.muted_state
 
+    if self.verification_state
+      conversation_et.verification_state self.verification_state
+
     return conversation_et
 
   ###

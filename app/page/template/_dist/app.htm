@@ -9,6 +9,7 @@
 <script src="/script/util/protobuf.js"></script>
 <script src="/script/util/keycode.js"></script>
 <script src="/script/util/KeyUtil.js"></script>
+<script src="/script/util/LocalizerUtil.js"></script>
 <script src="/script/util/marked.js"></script>
 <script src="/script/util/confirm.js"></script>
 <script src="/script/util/PromiseQueue.js"></script>
@@ -49,6 +50,7 @@
 <!-- Localization -->
 <script src="/script/localization/strings-init.js"></script>
 <script src="/script/localization/strings-cs.js"></script>
+<script src="/script/localization/strings-da.js"></script>
 <script src="/script/localization/strings-de.js"></script>
 <script src="/script/localization/strings-es.js"></script>
 <script src="/script/localization/strings-fi.js"></script>
@@ -131,14 +133,17 @@
 <script src="/script/location/GeoLocation.js"></script>
 <!-- Conversation -->
 <script src="/script/conversation/ConversationError.js"></script>
-<script src="/script/conversation/ConversationType.js"></script>
+<script src="/script/conversation/ConversationMapper.js"></script>
+<script src="/script/conversation/ConversationRepository.js"></script>
+<script src="/script/conversation/ConversationService.js"></script>
+<script src="/script/conversation/ConversationServiceNoCompound.js"></script>
 <script src="/script/conversation/ConversationStatus.js"></script>
+<script src="/script/conversation/ConversationType.js"></script>
 <script src="/script/conversation/ConversationUnreadType.js"></script>
 <script src="/script/conversation/ConversationUpdateType.js"></script>
 <script src="/script/conversation/ConversationService.js"></script>
+<script src="/script/conversation/ConversationServiceNoCompound.js"></script>
 <script src="/script/conversation/EventMapper.js"></script>
-<script src="/script/conversation/ConversationMapper.js"></script>
-<script src="/script/conversation/ConversationRepository.js"></script>
 <!-- Extensions -->
 <script src="/script/extension/GiphyService.js"></script>
 <script src="/script/extension/GiphyRepository.js"></script>
@@ -193,6 +198,8 @@
 <script src="/script/view_model/GiphyViewModel.js"></script>
 <script src="/script/view_model/ImageDetailViewViewModel.js"></script>
 <script src="/script/view_model/VideoCallingViewModel.js"></script>
+<script src="/script/view_model/content/CollectionViewModel.js"></script>
+<script src="/script/view_model/content/CollectionDetailsViewModel.js"></script>
 <script src="/script/view_model/content/ConnectRequestsViewModel.js"></script>
 <script src="/script/view_model/content/ContentState.js"></script>
 <script src="/script/view_model/content/ContentViewModel.js"></script>
@@ -224,6 +231,7 @@
 <script src="/script/components/deviceRemove.js"></script>
 <script src="/script/components/ephemeralTimer.js"></script>
 <script src="/script/components/groupList.js"></script>
+<script src="/script/components/image.js"></script>
 <script src="/script/components/inputElement.js"></script>
 <script src="/script/components/inputLevel.js"></script>
 <script src="/script/components/topPeople.js"></script>
@@ -231,6 +239,7 @@
 <script src="/script/components/userProfile.js"></script>
 <script src="/script/components/userInput.js"></script>
 <script src="/script/components/userList.js"></script>
+<script src="/script/components/asset/assetHeader.js"></script>
 <script src="/script/components/asset/videoAsset.js"></script>
 <script src="/script/components/asset/audioAsset.js"></script>
 <script src="/script/components/asset/fileAsset.js"></script>
@@ -243,6 +252,8 @@
 <script src="/script/components/calling/deviceToggleButton.js"></script>
 <!-- Entities -->
 <script src="/script/message/CallMessageType.js"></script>
+<script src="/script/message/MessageCategory.js"></script>
+<script src="/script/message/MessageCategorization.js"></script>
 <script src="/script/message/EphemeralStatusType.js"></script>
 <script src="/script/message/StatusType.js"></script>
 <script src="/script/message/PingMessageType.js"></script>
