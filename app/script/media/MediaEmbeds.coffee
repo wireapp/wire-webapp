@@ -51,7 +51,7 @@ z.media.MediaEmbeds = do ->
     if z.util.Environment.electron
       opt.allowfullscreen = ''
 
-    return z.util.string_format iframe_container, opt.class, opt.width, opt.height, opt.src, opt.frameborder, opt.allowfullscreen
+    return z.util.StringUtil.format iframe_container, opt.class, opt.width, opt.height, opt.src, opt.frameborder, opt.allowfullscreen
 
   # Enum of different regex for the supported services.
   _regex =
@@ -155,7 +155,7 @@ z.media.MediaEmbeds = do ->
         video: false
         height: height
 
-      embed = z.util.string_format iframe, height, link_src
+      embed = z.util.StringUtil.format iframe, height, link_src
       message = _append_iframe link, message, embed
 
     return message
@@ -200,7 +200,7 @@ z.media.MediaEmbeds = do ->
     vimeo_color = theme_color?.replace '#', ''
 
     if link_src.match _regex.vimeo
-      return message if z.util.contains link_src, '/user'
+      return message if z.util.StringUtil.includes link_src, '/user'
 
       iframe = _create_iframe_container
         src: "https://player.vimeo.com/video/$1?portrait=0&color=#{vimeo_color}&badge=0"

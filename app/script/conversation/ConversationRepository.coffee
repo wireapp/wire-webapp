@@ -315,16 +315,24 @@ class z.conversation.ConversationRepository
 
   ###
   Get group conversations by name
-  @param group_name [String] Query to be searched in group conversation names
+  @param query [String] Query to be searched in group conversation names
+  @param is_username [Boolean] Query string is username
   @return [Array<z.entity.Conversation>] Matching group conversations
   ###
-  get_groups_by_name: (group_name) =>
-    @sorted_conversations().filter (conversation_et) ->
-      return false if not conversation_et.is_group()
-      return true if z.util.compare_names conversation_et.display_name(), group_name
-      for user_et in conversation_et.participating_user_ets()
-        return true if z.util.compare_names user_et.name(), group_name
-      return false
+  get_groups_by_name: (query, is_username) =>
+    return @sorted_conversations()
+      .filter (conversation_et) ->
+        return false if not conversation_et.is_group()
+        if is_username
+          return true if z.util.StringUtil.compare_transliteration conversation_et.display_name(), "@#{query}"
+          return true for user_et in conversation_et.participating_user_ets() when z.util.StringUtil.starts_with user_et.username(), query
+        else
+          return true if z.util.StringUtil.compare_transliteration conversation_et.display_name(), query
+          return true for user_et in conversation_et.participating_user_ets() when z.util.StringUtil.compare_transliteration user_et.name(), query
+        return false
+      .sort (conversation_a, conversation_b) ->
+        sort_query = if is_username then "@#{@query}" else query
+        return z.util.StringUtil.sort_by_priority conversation_a.display_name(), conversation_b.display_name(), sort_query
 
   ###
   Get the next unarchived conversation.
@@ -332,7 +340,7 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] Next conversation
   ###
   get_next_conversation: (conversation_et) ->
-    return z.util.array_get_next @conversations_unarchived(), conversation_et
+    return z.util.ArrayUtil.get_next_item @conversations_unarchived(), conversation_et
 
   ###
   Get unarchived conversation with the most recent event.

@@ -251,7 +251,7 @@ class z.ViewModel.ConversationInputViewModel
     if @pasted_file()?
       return @on_send_pasted_files()
 
-    message = z.util.trim_line_breaks @input()
+    message = z.util.StringUtil.trim_line_breaks @input()
 
     if message.length > z.config.MAXIMUM_MESSAGE_LENGTH
       amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_LONG_MESSAGE,

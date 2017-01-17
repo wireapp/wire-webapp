@@ -574,7 +574,7 @@ class z.calling.entities.Flow
             outline = undefined
 
         if @negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and @is_group())
-          if z.util.contains sdp_line, 'opus'
+          if z.util.StringUtil.includes sdp_line, 'opus'
             outlines.push sdp_line
             outline = "a=ptime:#{AUDIO_PTIME}"
             @logger.info "Changed audio p-time in local SDP: #{outline}"
@@ -674,7 +674,7 @@ class z.calling.entities.Flow
   @param ice_candidate [RTCIceCandidate] Received remote ICE candidate
   ###
   add_remote_ice_candidate: (ice_candidate) =>
-    if z.util.contains ice_candidate.candidate, 'end-of-candidates'
+    if z.util.StringUtil.includes ice_candidate.candidate, 'end-of-candidates'
       @logger.info 'Ignoring remote non-candidate'
       return
 
@@ -729,7 +729,7 @@ class z.calling.entities.Flow
   @param ice_candidate [RTCICECandidate] Local ICE candidate to be send
   ###
   _send_ice_candidate: (ice_candidate) ->
-    if not z.util.contains ice_candidate.candidate, 'UDP'
+    unless z.util.StringUtil.includes ice_candidate.candidate, 'UDP'
       return @logger.info "Local ICE candidate ignored as it is not of type 'UDP'"
 
     if @conversation_id and @id
