@@ -1360,10 +1360,7 @@ class z.conversation.ConversationRepository
             send_anyway = true
             resolve()
           close: ->
-            if not send_anyway
-              window.setTimeout ->
-                reject new Error 'Sending to degraded conversation was denied by user'
-              , 200
+            reject new Error 'Sending to degraded conversation was denied by user' if not send_anyway
 
   ###
   Sends otr asset to a conversation.
