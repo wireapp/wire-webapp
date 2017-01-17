@@ -39,10 +39,6 @@ class z.calling.belfry.CallError
         'No conversation ID given'
       when z.calling.belfry.CallError::TYPE.NO_REPLACEABLE_TRACK
         'No replaceable MediaStreamTrack found'
-      when z.calling.belfry.CallError::TYPE.NOT_ENABLED
-        'Tried to use calling v2 API with it being disabled'
-      when z.calling.belfry.CallError::TYPE.NOT_SUPPORTED
-        'Not supported'
       when z.calling.belfry.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
         'PeerConnection does not support getSenders()'
       when z.calling.belfry.CallError::TYPE.VOICE_CHANNEL_FULL
@@ -59,8 +55,6 @@ class z.calling.belfry.CallError
     FLOW_NOT_FOUND: 'z.calling.belfry.CallError::TYPE.FLOW_NOT_FOUND'
     NO_CONVERSATION_ID: 'z.calling.belfry.CallError::TYPE.NO_CONVERSATION_ID'
     NO_REPLACEABLE_TRACK: 'z.calling.belfry.CallError::TYPE.NO_REPLACEABLE_TRACK'
-    NOT_ENABLED: 'z.calling.belfry.CallError::TYPE.NOT_ENABLED'
-    NOT_SUPPORTED: 'z.calling.belfry.CallError::TYPE.NOT_SUPPORTED'
     RTP_SENDER_NOT_SUPPORTED: 'z.calling.belfry.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED'
     UNKNOWN: 'z.calling.belfry.CallError::TYPE.UNKNOWN'
     VOICE_CHANNEL_FULL: 'z.calling.belfry.CallError::TYPE.VOICE_CHANNEL_FULL'

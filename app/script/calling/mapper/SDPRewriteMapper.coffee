@@ -68,7 +68,7 @@ z.calling.mapper.SDPRewriteMapper =
 
       else if sdp_line.startsWith 'a=rtpmap'
         if flow_et.negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and flow_et.is_group())
-          if z.util.contains sdp_line, 'opus'
+          if z.util.StringUtil.includes sdp_line, 'opus'
             sdp_lines.push sdp_line
             outline = "a=ptime:#{SDP_REWRITE_MAPPER_CONFIG.AUDIO_PTIME}"
 
