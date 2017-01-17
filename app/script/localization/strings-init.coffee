@@ -18,6 +18,7 @@
 
 window.z ?= {}
 z.string ?= {}
+z.string.da ?= {}
 z.string.cs ?= {}
 z.string.de ?= {}
 z.string.es ?= {}
