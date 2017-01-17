@@ -1359,8 +1359,6 @@ class z.conversation.ConversationRepository
         .then =>
           @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
           return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
-        .catch (error) ->
-          throw error
 
   _grant_outgoing_message: (conversation_et, generic_message, user_ids) =>
     return new Promise (resolve, reject) =>
@@ -1386,7 +1384,7 @@ class z.conversation.ConversationRepository
               resolve()
             close: ->
               if not send_anyway
-                reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELATION
+                reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   ###
   Sends otr asset to a conversation.
