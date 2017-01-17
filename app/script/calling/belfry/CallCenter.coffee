@@ -121,10 +121,9 @@ class z.calling.belfry.CallCenter
     switch event.type
       when z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
         @user_repository.get_user_by_id @get_creator_id(event), (creator_et) ->
-          amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL, {
+          amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL,
             first_name: creator_et.name()
             call_id: event.conversation
-          }
       when z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
         amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL
 

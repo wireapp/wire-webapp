@@ -522,8 +522,8 @@ describe 'z.cryptography.CryptographyMapper', ->
 
     it 'resolves with a mapped calling message', (done) ->
       content_message =
-        version: "3.0"
-        type: "CANCEL"
+        version: '3.0'
+        type: 'CANCEL'
         resp: false
         sessid: 'asd2'
 

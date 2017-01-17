@@ -77,8 +77,10 @@ class z.calling.e_call.ECallCenter
   on_event: (event) =>
     return if event.type not in E_CALL_CONFIG.SUPPORTED_EVENTS
 
-    if Date.now() > E_CALL_CONFIG.EVENT_LIFETIME + new Date(event.time).getTime()
-      return @logger.info "Ignored outdated '#{event.type}' event in conversation '#{event.conversation}'", {event_object: event, event_json: JSON.stringify event}
+    current_timestamp = Date.now()
+    event_timestamp = new Date(event.time).getTime()
+    if Date.now() > E_CALL_CONFIG.EVENT_LIFETIME + event_timestamp
+      return @logger.info "Ignored outdated '#{event.type}' event in conversation '#{event.conversation}' - Event: '#{event_timestamp}', Now: '#{current_timestamp}'", {event_object: event, event_json: JSON.stringify event}
 
     if z.calling.CallingRepository.supports_calling()
       return @_on_event_in_supported_browsers event
@@ -169,7 +171,7 @@ class z.calling.e_call.ECallCenter
     .then (e_call_et) =>
       @user_repository.get_user_by_id user_id, (user_et) -> e_call_et.update_participant user_et, e_call_message
       if e_call_message.resp is false
-        e_call_message_et = new z.calling.entities.ECallMessage e_call_et, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, true, @create_prop_sync_payload false, z.media.MediaType.VIDEO
+        e_call_message_et = new z.calling.entities.ECallMessage e_call_et, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, true, @create_prop_sync_payload undefined, z.media.MediaType.VIDEO
         @send_e_call_event e_call_et.conversation_et, e_call_message_et
     .catch (error) ->
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
@@ -227,7 +229,15 @@ class z.calling.e_call.ECallCenter
   @return [Object] E-call message props object
   ###
   create_prop_sync_payload: (forced_video_state, media_type) ->
-    _create_video_send = ->
+    _create_audio_send = =>
+      if media_type is z.media.MediaType.AUDIO
+        return "#{@self_state.audio_send()}"
+
+    _create_screen_send = =>
+      if media_type in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
+        return "#{@self_state.screen_send()}"
+
+    _create_video_send = =>
       if forced_video_state?
         return "#{forced_video_state}"
       if media_type in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
@@ -235,8 +245,8 @@ class z.calling.e_call.ECallCenter
 
     return {
       props:
-        audiosend: "#{@self_state.audio_send()}" if media_type is z.media.MediaType.AUDIO
-        screensend: "#{@self_state.screen_send()}" if media_type in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
+        audiosend: _create_audio_send()
+        screensend: _create_screen_send()
         videosend: _create_video_send()
     }
 
@@ -361,7 +371,7 @@ class z.calling.e_call.ECallCenter
           @media_stream_handler.toggle_video_send()
 
       toggle_promise.then =>
-        e_call_message_et = new z.calling.entities.ECallMessage e_call_et, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, false, @create_prop_sync_payload false, media_type
+        e_call_message_et = new z.calling.entities.ECallMessage e_call_et, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, false, @create_prop_sync_payload undefined, media_type
         @send_e_call_event e_call_et.conversation_et, e_call_message_et
     .catch (error) ->
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
@@ -401,7 +411,7 @@ class z.calling.e_call.ECallCenter
     .catch (error) =>
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
-      e_call_message_et = new z.calling.entities.ECallMessage undefined, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, false, @create_prop_sync_payload videosend
+      e_call_message_et = new z.calling.entities.ECallMessage undefined, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, false, @create_prop_sync_payload video_send
       @_create_outgoing_e_call conversation_id, e_call_message_et
     .then (e_call) =>
       e_call_et = e_call

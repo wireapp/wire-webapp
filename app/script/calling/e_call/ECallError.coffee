@@ -48,7 +48,7 @@ class z.calling.e_call.ECallError
 
   @:: = new Error()
   @::constructor = @
-  @::TYPE = {
+  @::TYPE =
     DATA_CHANNEL_NOT_OPENED: 'z.calling.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED'
     E_CALL_NOT_FOUND: 'z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND'
     NO_CONVERSATION_ID: 'z.calling.e_call.ECallError::TYPE.NO_CONVERSATION_ID'
@@ -57,4 +57,3 @@ class z.calling.e_call.ECallError
     UNKNOWN_EVENT_TYPE: 'z.calling.e_call.ECallError::TYPE.UNKNOWN_EVENT_TYPE'
     UNSUPPORTED_VERSION: 'z.calling.e_call.ECallError::TYPE.UNSUPPORTED_VERSION'
     WRONG_PAYLOAD_FORMAT: 'z.calling.e_call.ECallError::TYPE.WRONG_PAYLOAD_FORMAT'
-  }

@@ -52,7 +52,7 @@ class z.calling.belfry.CallError
 
   @:: = new Error()
   @::constructor = @
-  @::TYPE = {
+  @::TYPE =
     CALL_NOT_FOUND: 'z.calling.belfry.CallError::TYPE.CALL_NOT_FOUND'
     CONVERSATION_EMPTY: 'z.calling.belfry.CallError::TYPE.CONVERSATION_EMPTY'
     CONVERSATION_TOO_BIG: 'z.calling.belfry.CallError::TYPE.CONVERSATION_TOO_BIG'
@@ -64,4 +64,3 @@ class z.calling.belfry.CallError
     RTP_SENDER_NOT_SUPPORTED: 'z.calling.belfry.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED'
     UNKNOWN: 'z.calling.belfry.CallError::TYPE.UNKNOWN'
     VOICE_CHANNEL_FULL: 'z.calling.belfry.CallError::TYPE.VOICE_CHANNEL_FULL'
-  }

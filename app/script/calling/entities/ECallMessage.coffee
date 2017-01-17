@@ -54,8 +54,8 @@ class z.calling.entities.ECallMessage
     return "#{get_random_char()}#{get_random_char()}#{get_random_char()}#{get_random_char()}"
 
   to_JSON: =>
-    _create_message_payload = (message_type) ->
-      switch message_type
+    _create_message_payload = =>
+      switch @type
         when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
           return {
             props: @props
@@ -73,7 +73,7 @@ class z.calling.entities.ECallMessage
       type: @type
 
     if @type in [z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP]
-      $.extend json_payload, _create_message_payload @type
+      $.extend json_payload, _create_message_payload()
 
     return json_payload
 
