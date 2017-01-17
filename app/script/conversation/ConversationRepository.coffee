@@ -1342,15 +1342,16 @@ class z.conversation.ConversationRepository
       .catch (error) =>
         updated_payload = undefined
 
-        if error.missing
-          return @_handle_client_mismatch conversation_id, error, generic_message, payload
-          .then (payload_with_missing_clients) =>
-            updated_payload = payload_with_missing_clients
-            return @_grant_outgoing_message conversation_et, generic_message, Object.keys(error.missing)
-          .then =>
-            @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
-            return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
-        else
+        throw error unless error.missing
+
+        return @_handle_client_mismatch conversation_id, error, generic_message, payload
+        .then (payload_with_missing_clients) =>
+          updated_payload = payload_with_missing_clients
+          return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
+        .then =>
+          @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
+          return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
+        .catch (error) ->
           throw error
 
   _grant_outgoing_message: (conversation_et, generic_message, user_ids) =>
