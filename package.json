@@ -27,13 +27,13 @@
     "grunt-todo": "0.5.0",
     "jasmine-ajax": "3.2.0",
     "jasmine-core": "2.5.2",
-    "karma": "1.3.0",
+    "karma": "1.4.0",
     "karma-chrome-launcher": "2.0.0",
     "karma-coverage": "1.1.1",
     "karma-jasmine": "1.1.0",
     "load-grunt-tasks": "3.5.2",
     "request": "2.79.0",
-    "sinon": "1.17.6"
+    "sinon": "1.17.7"
   },
   "scripts": {
     "deploy-travis-dev": "grunt app_deploy_travis:dev",

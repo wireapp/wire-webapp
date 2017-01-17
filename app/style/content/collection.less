@@ -21,18 +21,25 @@
 @image-size: 104px;
 @image-items-per-row: 6;
 
-// Sections
+.collection-list {
+  padding-bottom: 64px;
+  padding-top: 24px;
+  max-width: @conversation-max-width;
+}
 
+// Sections
 .collection-section {
   display: inline-block;
-  margin-bottom: 16px;
-  padding-top: 24px;
 
   > header {
     align-items: center;
     display: flex;
     height: 24px;
     margin-bottom: 8px;
+  }
+
+  & + & {
+    margin-top: 32px;
   }
 }
 
@@ -44,7 +51,7 @@
 .collection-header-all {
   .font-size-xs;
   .cursor-pointer;
-  font-weight: bold;
+  font-weight: @font-weight-bold;
   margin-right: 0;
   margin-left: auto;
 }
@@ -61,6 +68,7 @@
 
 .collection-image {
   .square(@image-size);
+  cursor: pointer;
   outline: 1px solid #fff;
 }
 

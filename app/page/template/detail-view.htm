@@ -4,15 +4,15 @@
       <header class="detail-view-header">
           <div class="text-center">
             <div class="label-bold-xs" data-bind="text: message_et().sender_name()"></div>
-            <div class="label-xs" data-bind="text: moment(message_et().timestamp).format('DD/MM/YYYY h:mm')"></div>
+            <div class="label-xs" data-bind="text: moment(message_et().timestamp).format('DD/MM/YYYY H:mm')"></div>
           </div>
         <span class="detail-view-header-close-button icon-close icon-button" data-bind="click: click_on_close" data-uie-name="do-close-detail-view"></span>
       </header>
-      <div class="detail-view-main">
+      <div class="detail-view-main" data-bind="click: click_on_close">
         <img class="detail-view-image" data-bind="attr: {src: image_src()}" data-uie-name="status-picture"/>
       </div>
       <footer class="detail-view-footer">
-        <!-- ko if: message_et().get_first_asset().download && !message_et().is_ephemeral() -->
+        <!-- ko if: message_et().is_downloadable() && !message_et().is_ephemeral() -->
           <span class="detail-view-action-button" data-bind="click: click_on_download">
             <span class="icon-download"></span>
             <span data-bind="l10n_text: z.string.conversation_context_menu_download"></span>
