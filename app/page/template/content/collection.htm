@@ -16,7 +16,7 @@
 
         <!-- ko ifnot: no_items_found() -->
           <!-- ko if: images().length -->
-            <section class="collection-section" data-uie-name="collection-section-image" data-bind="attr: {'data-ui-collection-size': images().length}">
+            <section class="collection-section" data-uie-name="collection-section-image" data-bind="attr: {'data-uie-collection-size': images().length}">
               <header>
                 <span class="collection-header-icon icon-library"></span>
                 <span class="label-bold-xs" data-bind="l10n_text: z.string.collection_section_images"></span>
@@ -33,7 +33,7 @@
           <!-- /ko -->
 
           <!-- ko if: links().length -->
-            <section class="collection-section" data-uie-name="collection-section-link" data-bind="attr: {'data-ui-collection-size': links().length}">
+            <section class="collection-section" data-uie-name="collection-section-link" data-bind="attr: {'data-uie-collection-size': links().length}">
               <header>
                 <span class="collection-header-icon icon-link"></span>
                 <span class="label-bold-xs" data-bind="l10n_text: z.string.collection_section_links"></span>
@@ -50,7 +50,7 @@
           <!-- /ko -->
 
           <!-- ko if: files().length -->
-            <section class="collection-section" data-uie-name="collection-section-file" data-bind="attr: {'data-ui-collection-size': files().length}">
+            <section class="collection-section" data-uie-name="collection-section-file" data-bind="attr: {'data-uie-collection-size': files().length}">
               <header>
                 <span class="collection-header-icon icon-file"></span>
                 <span class="label-bold-xs" data-bind="l10n_text: z.string.collection_section_files"></span>
