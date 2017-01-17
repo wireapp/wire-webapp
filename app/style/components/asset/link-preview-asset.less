@@ -17,6 +17,9 @@
  *
  */
 
+// variables
+@link-preview-height: 88px;
+
 link-preview-asset {
   .asset-container-style;
   cursor: pointer;
@@ -24,7 +27,7 @@ link-preview-asset {
 }
 
 .link-preview-image-container {
-  .square(88px);
+  .square(@link-preview-height);
   background-color: fade(@graphite, 24%);
   flex: 0 0 auto;
 }
@@ -42,11 +45,12 @@ link-preview-asset {
 }
 
 .link-preview-info {
-  flex: 1 1 auto;
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  padding: 12px;
+  height: @link-preview-height;
   justify-content: center;
+  padding: 12px;
   width: 0;
 }
 
@@ -55,9 +59,16 @@ link-preview-asset {
 }
 
 .link-preview-info-title {
-  font-weight: 500; // semi-bold
+  font-weight: @font-weight-bold;
   line-height: @line-height-lg;
   margin-bottom: 4px;
+}
+
+.link-preview-info-title-singleline {
+  .ellipsis;
+}
+.link-preview-info-title-multiline {
+  .ellipsis-multiline(2);
 }
 
 .link-preview-info-link {

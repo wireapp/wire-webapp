@@ -34,8 +34,8 @@
     <div class="message-header-icon">
       <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
     </div>
-    <div class="message-header-label label-bold">
-      <span data-bind='text: message.sender_name()'></span>
+    <div class="message-header-label">
+      <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
     </div>
     <div class="message-body-actions message-body-actions-large">
@@ -50,8 +50,8 @@
       <div class="message-header-icon">
         <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
       </div>
-      <div class="message-header-label label-bold">
-        <span data-bind='text: message.user().first_name()'></span>
+      <div class="message-header-label">
+        <span class="label-bold" data-bind='text: message.user().first_name()'></span>
         <!-- ko if: was_edited() -->
           <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
         <!-- /ko -->
@@ -270,7 +270,7 @@
       <hr class="message-header-line" />
     </div>
   </div>
-  <div class="message-body label-semibold" data-bind="text: message.name"></div>
+  <div class="message-body label-bold" data-bind="text: message.name"></div>
 </script>
 
 <script type="text/html" id="unable-to-decrypt">

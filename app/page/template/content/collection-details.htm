@@ -6,13 +6,13 @@
 
     <div class="content-titlebar">
       <div class="content-titlebar-items-left">
-        <span class="content-titlebar-icon icon-back" data-bind="click: click_on_back_button"></span>
+        <span class="content-titlebar-icon icon-back" data-uie-name="do-collection-details-close" data-bind="click: click_on_back_button"></span>
       </div>
-      <span class="content-titlebar-items-center" data-bind="text: conversation_et().display_name()"></span>
+      <span class="content-titlebar-items-center" data-uie-name="collection-details-conversation-name" data-bind="text: conversation_et().display_name()"></span>
     </div>
 
     <div class="content-list-wrapper">
-      <div class="content-list" data-bind="antiscroll: true">
+      <div class="content-list collection-list" data-bind="antiscroll: true">
 
         <div class="collection-images">
 

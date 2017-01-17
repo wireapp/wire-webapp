@@ -17,19 +17,14 @@
  *
  */
 
-.location-asset {
-  display: block;
-  margin-top: 16px;
-  position: relative;
-}
+@keyframes content-incoming-horizontal-left {0%{ opacity: 0; transform: translateX(24px); } 100%{ opacity: 1; transform: translateX(0);}}
+@keyframes content-incoming-vertical-top {0%{ opacity: 0; transform: translateY(24px); } 100%{ opacity: 1; transform: translateY(0);}}
 
-.location-asset-icon {
-  left: -@conversation-message-sender-width;
-  position: absolute;
-  text-align: center;
-  width: @conversation-message-sender-width;
-}
+.content-animation-incoming-horizontal-left {animation-name: content-incoming-horizontal-left;}
+.content-animation-incoming-vertical-top {animation-name: content-incoming-vertical-top;}
 
-.location-asset-title {
-  font-weight: @font-weight-bold;
+.content-animation-incoming-horizontal-left,
+.content-animation-incoming-vertical-top {
+  animation-duration: @animation-timing-slow;
+  animation-timing-function: @ease-out-expo;
 }
