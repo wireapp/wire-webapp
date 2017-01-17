@@ -331,9 +331,8 @@ class z.conversation.ConversationRepository
           return true for user_et in conversation_et.participating_user_ets() when z.util.StringUtil.compare_transliteration user_et.name(), query
         return false
       .sort (conversation_a, conversation_b) ->
-        if is_username
-          return z.util.StringUtil.sort_by_priority conversation_a.display_name(), conversation_b.display_name(), "#{@query}"
-        return z.util.StringUtil.sort_by_priority conversation_a.display_name(), conversation_b.display_name(), query
+        sort_query = if is_username then "@#{@query}" else query
+        return z.util.StringUtil.sort_by_priority conversation_a.display_name(), conversation_b.display_name(), sort_query
 
   ###
   Get the next unarchived conversation.
