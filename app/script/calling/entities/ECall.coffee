@@ -279,7 +279,7 @@ class z.calling.entities.ECall
   @return [Array<Object>] Array of flow telemetry reports for calling service automation
   ###
   get_flow_telemetry: =>
-    return (e_participant_et.e_flow_et.get_telemetry() for e_participant_et in @participants() when participant.e_flow_et)
+    return (e_participant_et.e_flow_et.get_telemetry() for e_participant_et in @participants() when e_participant_et.e_flow_et)
 
   start_timings: =>
     @timings = new z.telemetry.calling.CallSetupTimings @id
