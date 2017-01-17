@@ -492,13 +492,7 @@ class z.entity.Conversation
     return pending_uploads.length
 
   get_users_with_unverified_clients: ->
-    users_with_unverified_clients = []
-
-    all_users = [@self].concat @participating_user_ets()
-    all_users.forEach (user_et) ->
-      users_with_unverified_clients.push user_et if not user_et.is_verified()
-
-    return users_with_unverified_clients
+    return (user_et for user_et in [@self].concat(@participating_user_ets()) when not user_et.is_verified())
 
   ###
   Check whether the conversation is held with a Wire welcome bot like Anna or Otto.

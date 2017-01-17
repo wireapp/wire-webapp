@@ -1377,7 +1377,8 @@ class z.conversation.ConversationRepository
               conversation_et.verification_state z.conversation.ConversationVerificationState.UNVERIFIED
               resolve()
             close: ->
-              reject new Error 'Sending to degraded conversation was denied by user' if not send_anyway
+              if not send_anyway
+                reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELATION
 
   ###
   Sends otr asset to a conversation.
