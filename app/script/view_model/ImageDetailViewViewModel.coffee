@@ -67,7 +67,7 @@ class z.ViewModel.ImageDetailViewViewModel
 
   click_on_delete: =>
     amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
-      action: => 
+      action: =>
         @conversation_repository.delete_message @conversation_et(), @message_et()
         @image_modal.hide()
 
