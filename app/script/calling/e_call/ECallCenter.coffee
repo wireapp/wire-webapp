@@ -535,9 +535,12 @@ class z.calling.e_call.ECallCenter
     }
 
   _send_call_notification: (e_call_et, user_id, state) ->
+    console.log 'state', state
     if state is z.calling.enum.CallState.INCOMING
+      console.log 1
       amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, e_call_et.conversation_et, @_create_voice_channel_activated_message e_call_et, user_id
     else
+      console.log 2
       amplify.publish z.event.WebApp.EVENT.INJECT, @_create_voice_channel_deactivated_event e_call_et, user_id
 
 

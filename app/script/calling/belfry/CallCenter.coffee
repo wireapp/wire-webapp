@@ -20,15 +20,18 @@ window.z ?= {}
 z.calling ?= {}
 z.calling.belfry ?= {}
 
-SUPPORTED_EVENTS = [
-  z.event.Backend.CALL.FLOW_ADD
-  z.event.Backend.CALL.REMOTE_CANDIDATES_ADD
-  z.event.Backend.CALL.REMOTE_CANDIDATES_UPDATE
-  z.event.Backend.CALL.REMOTE_SDP
-  z.event.Backend.CALL.STATE
-  z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
-  z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
-]
+CONFIG =
+  SUPPORTED_CALL_EVENTS: [
+    z.event.Backend.CALL.FLOW_ADD
+    z.event.Backend.CALL.REMOTE_CANDIDATES_ADD
+    z.event.Backend.CALL.REMOTE_CANDIDATES_UPDATE
+    z.event.Backend.CALL.REMOTE_SDP
+    z.event.Backend.CALL.STATE
+  ]
+  SUPPORTED_CONVERSATION_EVENTS: [
+    z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
+    z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
+  ]
 
 # Call center for all call interactions with the call service.
 class z.calling.belfry.CallCenter
@@ -63,8 +66,8 @@ class z.calling.belfry.CallCenter
 
   # Subscribe to amplify topics.
   subscribe_to_events: =>
-    amplify.subscribe z.event.WebApp.CALL.EVENT_FROM_BACKEND, @on_event
-    amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_event
+    amplify.subscribe z.event.WebApp.CALL.EVENT_FROM_BACKEND, @on_call_event
+    amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
 
   # Un-subscribe from amplify topics.
   un_subscribe: ->
@@ -78,26 +81,34 @@ class z.calling.belfry.CallCenter
   ###############################################################################
 
   ###
-  Handle incoming backend events.
+  Handle incoming backend calling events.
   @param event [Object] Event payload
   ###
-  on_event: (event) =>
-    return if event.type not in SUPPORTED_EVENTS
+  on_call_event: (event) =>
+    return if event.type not in CONFIG.SUPPORTED_CALL_EVENTS
 
     if @state_handler.block_event_handling
       return @logger.info "Skipping '#{event.type}' event in conversation '#{event.conversation}'", {event_object: event, event_json: JSON.stringify event}
-
     @logger.info "Handling '#{event.type}' event in conversation '#{event.conversation}", {event_object: event, event_json: JSON.stringify event}
-    if z.calling.CallingRepository.supports_calling()
-      return @_on_event_in_supported_browsers event
-    return @_on_event_in_unsupported_browsers event
+
+    @_on_handled_call_event event if z.calling.CallingRepository.supports_calling()
 
   ###
-  Backend calling event handling for browsers supporting calling.
+  Handle incoming backend conversation events.
+  @param event [Object] Event payload
+  ###
+  on_conversation_event: (event) =>
+    return if event.type not in CONFIG.SUPPORTED_CONVERSATION_EVENTS
+    @_on_handled_conversation_event event unless z.calling.CallingRepository.supports_calling()
+
+  ###
+  Backend call event handling.
+
+  @note For browsers supporting calling
   @private
   @param event [Object] Event payload
   ###
-  _on_event_in_supported_browsers: (event) ->
+  _on_handled_call_event: (event) ->
     if @calling_config().use_v3_api
       conversation_et = @conversation_repository.get_conversation_by_id event.conversation
       @logger.warn "Received outdated calling v2 event in conversation '#{event.conversation}'" if conversation_et.is_one2one()
@@ -113,11 +124,13 @@ class z.calling.belfry.CallCenter
         @state_handler.on_call_state event
 
   ###
-  Backend calling event handling for browsers not supporting calling.
+  Backend conversation event handling.
+
+  @note For browsers not supporting calling
   @private
   @param event [Object] Event payload
   ###
-  _on_event_in_unsupported_browsers: (event) ->
+  _on_handled_conversation_event: (event) ->
     switch event.type
       when z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
         @user_repository.get_user_by_id @get_creator_id(event), (creator_et) ->
