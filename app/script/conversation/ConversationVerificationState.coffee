@@ -19,13 +19,7 @@
 window.z ?= {}
 z.conversation ?= {}
 
-z.conversation.ConversationUpdateType =
-  ARCHIVED_STATE: 'archived_state'
-  ARCHIVED_TIMESTAMP: 'archived_timestamp'
-  CLEARED_TIMESTAMP: 'cleared_timestamp'
-  EPHEMERAL_TIMER: 'ephemeral_timer'
-  LAST_EVENT_TIMESTAMP: 'last_event_timestamp'
-  LAST_READ_TIMESTAMP: 'last_read_timestamp'
-  MUTED_STATE: 'mute_state'
-  MUTED_TIMESTAMP: 'muted_timestamp'
-  VERIFICATION_STATE: 'verification_state'
+z.conversation.ConversationVerificationState =
+  UNVERIFIED: 0
+  VERIFIED: 1
+  DEGRADED: 2
