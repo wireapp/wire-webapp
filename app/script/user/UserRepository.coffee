@@ -311,9 +311,8 @@ class z.user.UserRepository
   add_client_to_user: (user_id, client_et) =>
     @client_repository.save_client_in_db user_id, client_et.to_json()
     .then =>
-      @find_user user_id
-    .then (user_et) ->
-      user_et.add_client client_et
+      @get_user_by_id user_id, (user_et) ->
+        user_et.add_client client_et
 
   ###
   Removes a stored client and the session connected with it.
@@ -325,9 +324,8 @@ class z.user.UserRepository
   remove_client_from_user: (user_id, client_id) =>
     @client_repository.remove_client user_id, client_id
     .then =>
-      @find_user user_id
-    .then (user_et) ->
-      user_et.remove_client client_id
+      @get_user_by_id user_id, (user_et) ->
+        user_et.remove_client client_id
 
 
   ###############################################################################
