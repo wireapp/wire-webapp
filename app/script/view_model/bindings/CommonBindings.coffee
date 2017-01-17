@@ -335,7 +335,7 @@ ko.bindingHandlers.in_viewport = do ->
 
   window.addEventListener 'scroll', notify_listeners, true
 
-  init: (element, valueAccessor) ->
+  init: (element, valueAccessor, allBindingsAccessor) ->
 
     _in_view = (dom_element) ->
       box = dom_element.getBoundingClientRect()
@@ -354,6 +354,6 @@ ko.bindingHandlers.in_viewport = do ->
         _dispose() if dispose
 
     listeners.push _check_element
-    _check_element()
+    window.setTimeout _check_element, allBindingsAccessor.get('delay') or 0
 
     ko.utils.domNodeDisposal.addDisposeCallback element, _dispose
