@@ -26,7 +26,7 @@
               </header>
               <div class="collection-images">
                 <!-- ko foreach: {data: images.slice(0, 12), as: 'message_et'} -->
-                  <image-component class="collection-image" params="asset: message_et.get_first_asset().resource, click: function() {$parent.click_on_image(message_et)}"></image-component>
+                  <image-component class="collection-image" params="asset: message_et.get_first_asset(), click: function() {$parent.click_on_image(message_et)}"></image-component>
                 <!-- /ko -->
               </div>
             </section>

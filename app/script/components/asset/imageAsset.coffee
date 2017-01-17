@@ -31,10 +31,11 @@ class z.components.ImageAssetComponent
     @asset = @message.get_first_asset()
     @expired = @message.is_expired
 
+    @on_click = =>
+      params.click? @message
+
 ko.components.register 'image-asset',
   viewModel: z.components.ImageAssetComponent
   template: """
-            <!-- ko ifnot: expired() -->
-              <image-component params="asset: asset.resource"></image-component>
-            <!-- /ko -->
+            <image-component data-bind="style: {'opacity': expired() ? 0 : 1}" params="asset: asset, click: on_click"></image-component>
             """

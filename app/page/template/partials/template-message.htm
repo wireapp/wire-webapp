@@ -99,7 +99,7 @@
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.is_image() -->
-        <image-asset class="message-asset-image" data-bind="css: {'ephemeral-asset-expired icon-library': message.is_expired()}" params="message: message"></image-asset>
+        <image-asset class="message-asset-image" data-bind="css: {'ephemeral-asset-expired icon-library': message.is_expired()}" params="message: message, click: $parents[1].show_detail"></image-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_video() -->
         <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': message.is_expired()}" params="message: message"></video-asset>
