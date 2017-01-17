@@ -172,7 +172,7 @@ class z.SystemNotification.SystemNotificationRepository
   _create_body_content: (message_et) ->
     if message_et.has_asset_text()
       for asset_et in message_et.assets() when asset_et.is_text()
-        return z.util.truncate_text asset_et.text, z.config.BROWSER_NOTIFICATION.BODY_LENGTH if not asset_et.previews().length
+        return z.util.StringUtil.truncate asset_et.text, z.config.BROWSER_NOTIFICATION.BODY_LENGTH if not asset_et.previews().length
     else if message_et.has_asset_image()
       return  z.localization.Localizer.get_text z.string.system_notification_asset_add
     else if message_et.has_asset_location()
@@ -439,10 +439,10 @@ class z.SystemNotification.SystemNotificationRepository
   _create_title: (conversation_et, message_et) ->
     if conversation_et.display_name?()
       if conversation_et.is_group()
-        return  z.util.truncate_text "#{message_et.user().first_name()} in #{conversation_et.display_name()}", z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
-      return z.util.truncate_text conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        return z.util.StringUtil.truncate "#{message_et.user().first_name()} in #{conversation_et.display_name()}", z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+      return z.util.StringUtil.truncate conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
     return Raygun.send new Error 'Message does not contain user info' if not message_et.user()
-    return z.util.truncate_text message_et.user().name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+    return z.util.StringUtil.truncate message_et.user().name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
   ###
   Create obfuscated title.
@@ -450,7 +450,7 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Obfuscated notification message title
   ###
   _create_title_obfuscated: ->
-    return z.util.truncate_text z.localization.Localizer.get_text(z.string.system_notification_obfuscated_title), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+    return z.util.StringUtil.truncate z.localization.Localizer.get_text(z.string.system_notification_obfuscated_title), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
   ###
   Creates the notification trigger.

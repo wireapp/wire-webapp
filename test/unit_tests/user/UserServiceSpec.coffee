@@ -69,7 +69,6 @@ describe 'User Service', ->
       .then (response) =>
         expect(response.length).toBe 1
         expect(response[0].id).toBe 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5'
-        expect(response[0].email).toBe 'jd@wire.com'
         done()
       .catch done.fail
 
@@ -104,7 +103,6 @@ describe 'User Service', ->
       .then (response) =>
         expect(response.length).toBe 2
         expect(response[0].id).toBe 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5'
-        expect(response[1].email).toBe 'jr@wire.com'
         done()
       .catch done.fail
 
@@ -139,7 +137,6 @@ describe 'User Service', ->
       .then (response) =>
         expect(response.length).toBe 1
         expect(response[0].id).toBe 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5'
-        expect(response[0].email).toBe 'jd@wire.com'
         done()
       .catch done.fail
 
