@@ -454,7 +454,7 @@ class z.entity.Conversation
     return @messages()[@messages().length - 1]
 
   ###
-  Get the previous message for give message.
+  Get the message before a given message.
   @return [z.entity.Message, undefined]
   ###
   get_previous_message: (message_et) ->
@@ -492,6 +492,15 @@ class z.entity.Conversation
   get_number_of_pending_uploads: ->
     pending_uploads = (message_et for message_et in @messages() when message_et.assets?()[0]?.pending_upload?())
     return pending_uploads.length
+
+  get_users_with_unverified_clients: ->
+    users_with_unverified_clients = []
+
+    all_users = [@self].concat @participating_user_ets()
+    all_users.forEach (user_et) ->
+      users_with_unverified_clients.push user_et if not user_et.is_verified()
+
+    return users_with_unverified_clients
 
   ###
   Check whether the conversation is held with a Wire welcome bot like Anna or Otto.
