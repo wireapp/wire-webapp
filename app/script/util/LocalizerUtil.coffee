@@ -20,6 +20,6 @@ window.z ?= {}
 z.util ?= {}
 z.util.LocalizerUtil ?= {}
 
-z.util.LocalizerUtil.join_names = (user_ets, declension = z.string.Declension.ACCUSATIVE) =>
+z.util.LocalizerUtil.join_names = (user_ets, declension = z.string.Declension.ACCUSATIVE) ->
   names_string = (z.util.get_first_name user_et, declension for user_et in user_ets).join ', '
   return names_string.replace /,(?=[^,]*$)/, " #{z.localization.Localizer.get_text z.string.and}"
