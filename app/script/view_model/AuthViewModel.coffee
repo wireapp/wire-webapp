@@ -220,8 +220,6 @@ class z.ViewModel.AuthViewModel
       .on 'hashchange', @_on_hash_change
       .on 'keydown', @keydown_auth
 
-    $("[id^='wire-login'], [id^='wire-register'], [id^='wire-verify']").prevent_prefill()
-
     # Select country based on location of user IP
     @country_code (z.util.CountryCodes.get_country_code($('[name=geoip]').attr 'country') or 1).toString()
     @changed_country_code()
@@ -1342,12 +1340,3 @@ $.fn.extend
       window.setTimeout =>
         $(@).focus()
       , 0
-
-  # FIX to prevent unwanted auto form fill on Chrome
-  prevent_prefill: ->
-    if z.util.Environment.browser.chrome or z.util.Environment.browser.opera
-      @each ->
-        $(@)
-          .attr 'readonly', true
-          .on 'focus', ->
-            $(@).removeAttr 'readonly'
