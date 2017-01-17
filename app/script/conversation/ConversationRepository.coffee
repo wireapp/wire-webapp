@@ -1329,38 +1329,55 @@ class z.conversation.ConversationRepository
   ###
   _send_encrypted_message: (conversation_id, generic_message, payload, precondition_option = false) =>
     @logger.info "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
-    @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
-    .then (response) =>
-      @_handle_client_mismatch conversation_id, response
-      return response
-    .catch (error) =>
-      updated_payload = undefined
+    return Promise.resolve()
+      .then =>
+        conversation_et = @find_conversation_by_id conversation_id
+        if conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
+          users_with_unverified_clients = conversation_et.get_users_with_unverified_clients()
+          console.warn 'users_with_unverified_clients', users_with_unverified_clients
+          user_ids_with_unverified_clients = users_with_unverified_clients.map (user_et) ->
+            return user_et.id
+          console.warn 'user_ids_with_unverified_clients', user_ids_with_unverified_clients
+          return @_grant_outgoing_message conversation_id, generic_message, user_ids_with_unverified_clients
+      .then =>
+        return @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
+      .then (response) =>
+        @_handle_client_mismatch conversation_id, response
+        return response
+      .catch (error) =>
+        updated_payload = undefined
 
-      if error.missing
-        return @_handle_client_mismatch conversation_id, error, generic_message, payload
-        .then (payload_with_missing_clients) =>
-          updated_payload = payload_with_missing_clients
-          return @_grant_outgoing_message conversation_id, generic_message, error.missing
-        .then =>
-          @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
-          return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
-      else
-        throw error
+        if error.missing
+          return @_handle_client_mismatch conversation_id, error, generic_message, payload
+          .then (payload_with_missing_clients) =>
+            updated_payload = payload_with_missing_clients
+            return @_grant_outgoing_message conversation_id, generic_message, Object.keys(error.missing)
+          .then =>
+            @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
+            return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
+        else
+          throw error
 
-  _grant_outgoing_message: (conversation_id, generic_message, missing) =>
+  _grant_outgoing_message: (conversation_id, generic_message, user_ids) =>
     conversation_et = @find_conversation_by_id conversation_id
-    return new Promise (resolve, reject) ->
+    return new Promise (resolve, reject) =>
       if conversation_et.verification_state() is z.conversation.ConversationVerificationState.UNVERIFIED
+        resolve()
+      else if generic_message.content in ['cleared', 'confirmation', 'lastRead']
         resolve()
       else
         send_anyway = false
-        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
-          data: 'Lipis'
-          action: ->
-            send_anyway = true
-            resolve()
-          close: ->
-            reject new Error 'Sending to degraded conversation was denied by user' if not send_anyway
+
+        @user_repository.get_users_by_id user_ids, (user_ets) ->
+          joined_usernames = z.util.LocalizerUtil.join_names user_ets
+
+          amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
+            data: joined_usernames
+            action: ->
+              send_anyway = true
+              resolve()
+            close: ->
+              reject new Error 'Sending to degraded conversation was denied by user' if not send_anyway
 
   ###
   Sends otr asset to a conversation.
