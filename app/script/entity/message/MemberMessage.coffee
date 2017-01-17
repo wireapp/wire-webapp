@@ -42,6 +42,9 @@ class z.entity.MemberMessage extends z.entity.SystemMessage
     @remote_user_ets = ko.pureComputed =>
       return (user_et for user_et in @user_ets() when not user_et.is_me)
 
+    @_generate_name_string = (declension = z.string.Declension.ACCUSATIVE) =>
+      return z.util.LocalizerUtil.join_names @joined_user_ets(), declension
+
     @_get_caption_connection = (connection_status) ->
       switch connection_status
         when z.user.ConnectionStatus.BLOCKED
@@ -56,7 +59,7 @@ class z.entity.MemberMessage extends z.entity.SystemMessage
         id: key
         replace:
           placeholder: '%@names'
-          content: z.util.LocalizerUtil.join_names @joined_user_ets(), declension
+          content: @_generate_name_string declension
 
     @show_large_avatar = =>
       large_avatar_types = [
