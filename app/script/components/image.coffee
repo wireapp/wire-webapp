@@ -25,6 +25,9 @@ class z.components.Image
     @asset_src = ko.observable()
     @asset_is_loading = ko.observable false
 
+    @on_click = =>
+      params.click? @asset
+
     @on_entered_viewport = =>
       @load_image_asset()
       return true
@@ -45,7 +48,7 @@ ko.components.register 'image-component',
       return new z.components.Image params, component_info
   template: """
               <!-- ko if: asset_src() -->
-                <img data-bind="attr:{src: asset_src}"/>
+                <img data-bind="attr:{src: asset_src}, click: on_click"/>
               <!-- /ko -->
               <!-- ko ifnot: asset_src() -->
                 <div data-bind="in_viewport: on_entered_viewport, css: {'three-dots': asset_is_loading()}">
