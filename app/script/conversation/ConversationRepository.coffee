@@ -1359,6 +1359,8 @@ class z.conversation.ConversationRepository
         .then =>
           @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
           return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
+        .catch (error) ->
+          throw error unless error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   _grant_outgoing_message: (conversation_et, generic_message, user_ids) =>
     return new Promise (resolve, reject) =>
