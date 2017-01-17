@@ -17,15 +17,9 @@
 #
 
 window.z ?= {}
-z.conversation ?= {}
+z.util ?= {}
+z.util.LocalizerUtil ?= {}
 
-z.conversation.ConversationUpdateType =
-  ARCHIVED_STATE: 'archived_state'
-  ARCHIVED_TIMESTAMP: 'archived_timestamp'
-  CLEARED_TIMESTAMP: 'cleared_timestamp'
-  EPHEMERAL_TIMER: 'ephemeral_timer'
-  LAST_EVENT_TIMESTAMP: 'last_event_timestamp'
-  LAST_READ_TIMESTAMP: 'last_read_timestamp'
-  MUTED_STATE: 'mute_state'
-  MUTED_TIMESTAMP: 'muted_timestamp'
-  VERIFICATION_STATE: 'verification_state'
+z.util.LocalizerUtil.join_names = (user_ets, declension = z.string.Declension.ACCUSATIVE) ->
+  names_string = (z.util.get_first_name user_et, declension for user_et in user_ets).join ', '
+  return names_string.replace /,(?=[^,]*$)/, " #{z.localization.Localizer.get_text z.string.and}"
