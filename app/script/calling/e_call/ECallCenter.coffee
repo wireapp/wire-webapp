@@ -318,10 +318,11 @@ class z.calling.e_call.ECallCenter
     .then (e_call_et) =>
       @media_stream_handler.release_media_streams()
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
-      if e_call_et.state() is z.calling.enum.CallState.ONGOING
-        e_call_message_type = z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
-      else
+      if e_call_et.state() is z.calling.enum.CallState.OUTGOING
         e_call_message_type = z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+        @_send_call_notification e_call_et, @user_repository.self().id
+      else
+        e_call_message_type = z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
       @send_e_call_event e_call_et.conversation_et, new z.calling.entities.ECallMessage e_call_et, e_call_message_type, false
       @delete_call conversation_id if e_call_et.participants().length < 2
@@ -535,12 +536,9 @@ class z.calling.e_call.ECallCenter
     }
 
   _send_call_notification: (e_call_et, user_id, state) ->
-    console.log 'state', state
     if state is z.calling.enum.CallState.INCOMING
-      console.log 1
       amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, e_call_et.conversation_et, @_create_voice_channel_activated_message e_call_et, user_id
     else
-      console.log 2
       amplify.publish z.event.WebApp.EVENT.INJECT, @_create_voice_channel_deactivated_event e_call_et, user_id
 
 
