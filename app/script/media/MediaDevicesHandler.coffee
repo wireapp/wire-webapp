@@ -171,7 +171,7 @@ class z.media.MediaDevicesHandler
     @get_media_devices()
     .then =>
       [current_device, current_index] = @_get_current_device @available_devices.video_input(), @current_device_id.video_input()
-      next_device = @available_devices.video_input()[z.util.iterate_array_index(@available_devices.video_input(), @current_device_index.video_input()) or 0]
+      next_device = @available_devices.video_input()[z.util.ArrayUtil.iterate_index(@available_devices.video_input(), @current_device_index.video_input()) or 0]
       @current_device_id.video_input next_device.deviceId
       @logger.info "Switching the active camera from '#{current_device.label or current_device.deviceId}' to '#{next_device.label or next_device.deviceId}'"
 
@@ -180,7 +180,7 @@ class z.media.MediaDevicesHandler
     @get_screen_sources()
     .then =>
       [current_device, current_index] = @_get_current_device @available_devices.screen_input(), @current_device_id.screen_input()
-      next_device = @available_devices.screen_input()[z.util.iterate_array_index(@available_devices.screen_input(), @current_device_index.screen_input()) or 0]
+      next_device = @available_devices.screen_input()[z.util.ArrayUtil.iterate_index(@available_devices.screen_input(), @current_device_index.screen_input()) or 0]
       @current_device_id.screen_input next_device.id
       @logger.info "Switching the active screen from '#{current_device.name or current_device.id}' to '#{next_device.name or next_device.id}'"
 

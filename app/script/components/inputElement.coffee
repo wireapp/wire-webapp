@@ -25,7 +25,7 @@ class z.components.InputElement
     @value = params.value
 
     @change = (data, event) =>
-      new_name = z.util.remove_line_breaks event.target.value.trim()
+      new_name = z.util.StringUtil.remove_line_breaks event.target.value.trim()
       old_name = @value().trim()
       event.target.value = old_name
       @editing false

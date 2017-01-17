@@ -369,7 +369,7 @@ class z.user.UserRepository
 
     # create chunks
     fetched_user_ets = []
-    chunks = z.util.array_chunks user_ids, z.config.MAXIMUM_USERS_PER_REQUEST
+    chunks = z.util.ArrayUtil.chunk user_ids, z.config.MAXIMUM_USERS_PER_REQUEST
     number_of_loaded_chunks = 0
 
     for chunk in chunks
@@ -456,20 +456,19 @@ class z.user.UserRepository
 
   ###
   Search for user.
-  @param query [String] Find user using name, username or email
+  @param query [String] Find user using name or username
+  @param is_username [Boolean] Query string is username
   @return [Array<z.entity.User>] Matching users
   ###
-  search_for_connected_users: (query) =>
+  search_for_connected_users: (query, is_username) =>
     return @users()
       .filter (user_et) ->
         return false if not user_et.connected()
-        return user_et.matches query
+        return user_et.matches query, is_username
       .sort (user_a, user_b) ->
-        name_a = user_a.name().toLowerCase()
-        name_b = user_b.name().toLowerCase()
-        return -1 if name_a < name_b
-        return 1 if name_a > name_b
-        return 0
+        if is_username
+          return z.util.StringUtil.sort_by_priority user_a.username(), user_b.username(), query
+        return z.util.StringUtil.sort_by_priority user_a.name(), user_b.name(), query
 
   ###
   Is the user the logged in user.

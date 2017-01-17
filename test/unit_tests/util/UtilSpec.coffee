@@ -241,25 +241,6 @@ describe 'z.util.ko_array_unshift_all', ->
     expected = [1, 2, 3, 4]
     expect(actual()).toEqual expected
 
-describe 'z.util.contains', ->
-  string = 'Club Zeta'
-
-  it 'finds "ub" in Club Zeta', ->
-    actual = z.util.contains string, 'ub'
-    expect(actual).toBeTruthy()
-
-  it 'finds "Club Z" in Club Zeta', ->
-    actual = z.util.contains string, 'Club Z'
-    expect(actual).toBeTruthy()
-
-  it 'finds "club z" in Club Zeta', ->
-    actual = z.util.contains string, 'club z'
-    expect(actual).toBeTruthy()
-
-  it 'doesn\'t find "wurst" in Club Zeta', ->
-    actual = z.util.contains string, 'wurst'
-    expect(actual).toBeFalsy()
-
 describe 'z.util.base64_to_array', ->
   it 'can convert a gif', ->
     actual = z.util.base64_to_array 'data:image/gif;base64,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'
@@ -376,89 +357,6 @@ describe 'z.util.sort_groups_by_last_event', ->
 
     expect(actual).toEqual expected
 
-xdescribe 'z.util.sort_user_by_first_name', ->
-  it 'can sort a list of users', ->
-    user_a = new z.entity.User()
-    user_a.name = 'a a'
-    user_b = new z.entity.User()
-    user_b.name = 'b b'
-    user_c = new z.entity.User()
-    user_c.name = 'c c'
-    users = [user_c, user_b, user_a]
-
-    actual = users.sort z.util.sort_user_by_first_name
-    expected = [user_a, user_b, user_c]
-
-    expect(actual).toEqual expected
-
-describe 'z.util.array_get_next', ->
-  a = 'a'
-  b = 'b'
-  c = 'c'
-  d = 'd'
-  array = [a, b, c]
-  filter = (item) -> item isnt 'b'
-
-  it 'can return the second item when first item was given', ->
-    actual = z.util.array_get_next array, a
-    expected = b
-    expect(actual).toEqual expected
-
-  it 'can return the third item when first item was given and filter skips the second item', ->
-    actual = z.util.array_get_next array, a, filter
-    expected = c
-    expect(actual).toEqual expected
-
-  it 'can return the second item when last item was given', ->
-    actual = z.util.array_get_next array, c
-    expected = b
-    expect(actual).toEqual expected
-
-  it 'can return undefined when item is not in the array', ->
-    actual = z.util.array_get_next array, d
-    expected = null
-    expect(actual).toEqual expected
-
-describe 'z.util.array_is_last', ->
-  a = 'a'
-  b = 'b'
-  c = 'c'
-  d = 'd'
-  array = [a, b, c]
-
-  it 'returns true for the last item', ->
-    actual = z.util.array_is_last array, c
-    expect(actual).toBeTruthy()
-
-  it 'returns false for any item that is not the last', ->
-    actual = z.util.array_is_last array, a
-    expect(actual).toBeFalsy()
-
-  it 'returns false for an item that is not in the array', ->
-    actual = z.util.array_is_last array, d
-    expect(actual).toBeFalsy()
-
-describe 'z.util.truncate_text', ->
-  it 'returns the full string if it is shorter than the target length', ->
-    text = z.util.truncate_text "#{lorem_ipsum.substr 0, 80}", 90
-    expect(text.length).toBe 80
-    expect(text.charAt 79).not.toBe '…'
-
-  it 'returns a truncated string of correct length if it is longer than the target length', ->
-    text = z.util.truncate_text "#{lorem_ipsum.substr 0, 80}", 70
-    expect(text.length).toBe 64
-    expect(text.charAt 63).toBe '…'
-
-  it 'returns a truncated string of correct length if word boundary is disabled', ->
-    text = z.util.truncate_text "#{lorem_ipsum.substr 0, 80}", 70, false
-    expect(text.length).toBe 70
-    expect(text.charAt 69).toBe '…'
-
-  it 'returns a truncated string of correct length if word boundary is disabled and there are no whitespaces in the string', ->
-    text = z.util.truncate_text "#{lorem_ipsum.replace(/\s/g, '').substr 0, 80}", 70
-    expect(text.length).toBe 70
-    expect(text.charAt 69).toBe '…'
-
 describe 'z.util.strip_url_wrapper', ->
   it 'return the string without url wrapper (single quotes)', ->
     text = z.util.strip_url_wrapper "url('/path/to/image/image.png')"
@@ -499,63 +397,6 @@ describe 'z.util.naked_url', ->
 
   it 'returns empty string if url is not set', ->
     expect(z.util.naked_url()).toBe ''
-
-describe 'z.util.string_format', ->
-  it 'returns string with replaced placeholder', ->
-    actual = z.util.string_format 'foo={0}&bar={1}', 1, 2
-    expect(actual).toBe 'foo=1&bar=2'
-
-describe 'z.util.array_chunks', ->
-  arr = null
-
-  beforeEach ->
-    arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-  it 'returns one chunk with all items when the size is bigger than the array', ->
-    actual = z.util.array_chunks arr, 10
-    expect(actual.length).toBe 1
-    expect(actual[0].length).toBe 10
-    expect(actual[0][0]).toBe 1
-    expect(actual[0][9]).toBe 10
-
-  it 'returns the correct chunks', ->
-    actual = z.util.array_chunks arr, 3
-    expect(actual.length).toBe 4
-    expect(actual[0].length).toBe 3
-    expect(actual[1].length).toBe 3
-    expect(actual[2].length).toBe 3
-    expect(actual[3].length).toBe 1
-
-  it 'does not effect the original array', ->
-    actual = z.util.array_chunks arr, 3
-    expect(actual.length).toBe 4
-    expect(actual[0].length).toBe 3
-    expect(actual[1].length).toBe 3
-    expect(actual[2].length).toBe 3
-    expect(actual[3].length).toBe 1
-    expect(arr.length).toBe 10
-
-describe 'z.util.remove_line_breaks', ->
-  it 'removes all the line breaks', ->
-    actual = z.util.remove_line_breaks 'A\nB\nC\nD'
-    expect(actual).toBe 'ABCD'
-
-describe 'z.util.trim_line_breaks', ->
-  it 'does not remove line breaks in between', ->
-    actual = z.util.trim_line_breaks 'A\nB\nC\nD'
-    expect(actual).toBe 'A\nB\nC\nD'
-
-  it 'removes line breaks at the beginning', ->
-    actual = z.util.trim_line_breaks '\n\n\n\n\nB\nC\nD'
-    expect(actual).toBe 'B\nC\nD'
-
-  it 'removes line breaks at the end', ->
-    actual = z.util.trim_line_breaks 'B\nC\nD\n\n\n\n\n'
-    expect(actual).toBe 'B\nC\nD'
-
-  it 'removes all line breaks at the beginning and the end', ->
-    actual = z.util.trim_line_breaks '\n\n\n\nB\nC\n\n\n\n\n'
-    expect(actual).toBe 'B\nC'
 
 describe 'z.util.append_url_parameter', ->
   it 'append param with & when url contains param', ->
@@ -868,19 +709,6 @@ describe 'bucket_values', ->
     expect(z.util.bucket_values 100, [0, 5, 10, 15, 20, 25]).toBe '26-'
     expect(z.util.bucket_values 10023, [0, 100, 200, 500, 1000, 2000]).toBe '2001-'
 
-describe 'iterate_array_index', ->
-  it 'returns undefined in case of wrong input parameters', ->
-    expect(z.util.iterate_array_index 'Test', 0).toBe undefined
-    expect(z.util.iterate_array_index [1, 2, 3], 'Test').toBe undefined
-    expect(z.util.iterate_array_index [], 0).toBe undefined
-
-  it 'should iterate through the array index', ->
-    expect(z.util.iterate_array_index [1, 2, 3, 4, 5], 0).toBe 1
-    expect(z.util.iterate_array_index [1, 2, 3, 4, 5], 1).toBe 2
-    expect(z.util.iterate_array_index [1, 2, 3, 4, 5], 2).toBe 3
-    expect(z.util.iterate_array_index [1, 2, 3, 4, 5], 3).toBe 4
-    expect(z.util.iterate_array_index [1, 2, 3, 4, 5], 4).toBe 0
-
 describe 'z.util.zero_padding', ->
   it 'can add one zero to 6', ->
     actual = z.util.zero_padding 6
@@ -919,19 +747,3 @@ describe 'z.util.add_http', ->
   it 'does not add https if present', ->
     url = 'https://wire.com/'
     expect(z.util.add_http url).toBe 'https://wire.com/'
-
-describe 'z.util.compare_names', ->
-  it 'René equals Rene', ->
-    expect(z.util.compare_names('René', 'Rene')).toBeTruthy()
-
-  it 'Παναγιώτα equals Panagiota', ->
-    expect(z.util.compare_names('Παναγιώτα', 'Panagiota')).toBeTruthy()
-
-  it 'ΠΑΝΑΓΙΩΤΑ equals PANAGIOTA', ->
-    expect(z.util.compare_names('ΠΑΝΑΓΙΩΤΑ', 'PANAGIOTA')).toBeTruthy()
-
-  it 'Björn equals Bjoern', ->
-    expect(z.util.compare_names('Björn', 'Bjoern')).toBeTruthy()
-
-  it 'Bjørn equals Bjorn', ->
-    expect(z.util.compare_names('Bjørn', 'Bjorn')).toBeTruthy()

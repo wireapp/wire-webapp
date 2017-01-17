@@ -21,7 +21,6 @@ z.string.de.wire = 'Wire'
 z.string.de.wire_macos = 'Wire für macOS'
 z.string.de.wire_windows = 'Wire für Windows'
 z.string.de.wire_linux = 'Wire für Linux'
-z.string.de.truncation = '…'
 z.string.de.nonexistent_user = 'Gelöschte Person'
 z.string.de.and = 'und'
 
