@@ -164,12 +164,12 @@ class z.entity.Conversation
     @display_name = ko.pureComputed =>
       if @type() in [z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE]
         return @participating_user_ets()[0].name() if @participating_user_ets()[0]?.name()
-        return z.localization.Localizer.get_text z.string.truncation
+        return '…'
       else if @is_group()
         return @name() if @name()
         return (@participating_user_ets().map (user_et) -> user_et.first_name()).join ', ' if @participating_user_ets().length > 0
         return z.localization.Localizer.get_text z.string.conversations_empty_conversation if @participating_user_ids().length is 0
-        return z.localization.Localizer.get_text z.string.truncation
+        return '…'
       else
         return @name()
 

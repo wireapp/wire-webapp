@@ -159,7 +159,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
         system_notification_repository.notify conversation_et, message_et
         .then ->
-          notification_content.title = z.string.truncation
+          notification_content.title = '…'
 
           result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
           expect(result).toEqual JSON.stringify notification_content
@@ -193,7 +193,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
         system_notification_repository.notify conversation_et, message_et
         .then ->
-          notification_content.title = z.string.truncation
+          notification_content.title = '…'
 
           result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
           expect(result).toEqual JSON.stringify notification_content
@@ -231,7 +231,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
         system_notification_repository.notify conversation_et, message_et
         .then ->
-          notification_content.title = z.string.truncation
+          notification_content.title = '…'
 
           result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
           expect(result).toEqual JSON.stringify notification_content
@@ -290,7 +290,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
         system_notification_repository.notify conversation_et, message_et
         .then ->
-          notification_content.title = z.string.truncation
+          notification_content.title = '…'
 
           result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
           expect(result).toEqual JSON.stringify notification_content
@@ -349,7 +349,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
         system_notification_repository.notify conversation_et, message_et
         .then ->
-          notification_content.title = z.string.truncation
+          notification_content.title = '…'
 
           result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
           expect(result).toEqual JSON.stringify notification_content
@@ -664,7 +664,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
       system_notification_repository.notify conversation_et, message_et
       .then ->
-        notification_content.title = z.string.truncation
+        notification_content.title = '…'
 
         result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
         expect(result).toEqual JSON.stringify notification_content

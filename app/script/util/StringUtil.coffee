@@ -83,5 +83,5 @@ z.util.StringUtil =
       trunc_index = output_length - 1
       if word_boundary and string.lastIndexOf(' ', output_length - 1) > output_length - 25
         trunc_index = string.lastIndexOf ' ', output_length - 1
-      string = "#{string.substr 0, trunc_index}#{z.localization.Localizer.get_text z.string.truncation}"
+      string = "#{string.substr 0, trunc_index}…"
     return string
