@@ -19,35 +19,9 @@
 
 image-asset {
   display: inline-block;
-  max-width: 100%;
-}
 
-.image {
-  display: inline-block;
-  position: relative;
-  max-width: 100%;
-}
-
-.image-loading {
-  .image-element          {cursor: default}
-  .image-placeholder-icon {display: flex}
-}
-
-.image-element {
-  cursor: pointer;
-  max-width: 100%;
-  max-height: 80vh;
-
-  &.image-ephemeral {
-    cursor: default;
-    opacity: 0;
+  img {
+    max-width: 100%;
+    max-height: 80vh;
   }
-}
-
-.image-placeholder-icon {
-  .asset-container-style;
-  .full-screen;
-  align-items: center;
-  display: none;
-  justify-content: center;
 }

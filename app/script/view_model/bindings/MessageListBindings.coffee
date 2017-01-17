@@ -49,43 +49,6 @@ ko.bindingHandlers.show_all_timestamps =
       show_timestamps = e.clientX > rect.right - 64 and e.clientX < rect.right
       $('.time').toggleClass 'show-timestamp', show_timestamps
 
-# Start loading image once they are in the viewport
-#
-ko.bindingHandlers.background_image =
-  init: (element, valueAccessor, allBindingsAccessor) ->
-    _in_view = (dom_element) ->
-      box = dom_element.getBoundingClientRect()
-      return box.right >= 0 and
-          box.bottom >= 0 and
-          box.left <= document.documentElement.clientWidth and
-          box.top <= document.documentElement.clientHeight
-
-    _on_viewport_change = _.debounce ->
-      if _in_view element
-        asset_remote_data()?.load()
-        .then (blob) ->
-          $(element).removeClass 'image-loading'
-          object_url = window.URL.createObjectURL blob
-          image_element[0].src = object_url
-          viewport_subscription.dispose()
-        .catch -> return
-    , 500
-
-    object_url = undefined
-    image_element = $(element).find 'img'
-    asset_remote_data = valueAccessor()
-
-    viewport_changed = allBindingsAccessor.get 'viewport_changed'
-    viewport_subscription = viewport_changed.subscribe _on_viewport_change
-    asset_subscription = asset_remote_data.subscribe _on_viewport_change
-
-    _on_viewport_change()
-
-    ko.utils.domNodeDisposal.addDisposeCallback element, ->
-      viewport_subscription.dispose()
-      asset_subscription.dispose()
-      window.URL.revokeObjectURL object_url if object_url?
-
 # Generate message timestamp
 #
 ko.bindingHandlers.relative_timestamp = do ->
