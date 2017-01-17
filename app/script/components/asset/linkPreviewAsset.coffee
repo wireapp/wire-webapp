@@ -62,7 +62,7 @@ ko.components.register 'link-preview-asset',
                 <!-- ko if: header -->
                   <asset-header class="link-preview-info-header" params="message: message_et"></asset-header>
                 <!-- /ko -->
-                <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-sigleline' : 'link-preview-info-title-multiline'"></div>
+                <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
                 <a class="link-preview-info-link text-graphite ellipsis" data-uie-name="link-preview-url" target="_blank" rel="nofollow noopener noreferrer"
                    data-bind="text: z.util.naked_url(url), attr: {href: z.util.add_http(url), title: url}"></a>
               </div>
@@ -72,7 +72,7 @@ ko.components.register 'link-preview-asset',
                 <div class="link-preview-image-placeholder icon-link bg-color-ephemeral text-white"></div>
               </div>
               <div class="link-preview-info">
-                <div class="link-preview-info-title ephemeral-message-obfuscated" data-bind="text: z.util.StringUtil.obfuscate(preview.title), css: header ? 'link-preview-info-title-sigleline' : 'link-preview-info-title-multiline'"></div>
+                <div class="link-preview-info-title ephemeral-message-obfuscated" data-bind="text: z.util.StringUtil.obfuscate(preview.title), css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
                 <a class="link-preview-info-link ephemeral-message-obfuscated ellipsis" target="_blank" rel="nofollow noopener noreferrer"
                    data-bind="text: z.util.StringUtil.obfuscate(url)"></a>
               </div>
