@@ -1329,14 +1329,11 @@ class z.conversation.ConversationRepository
   ###
   _send_encrypted_message: (conversation_id, generic_message, payload, precondition_option = false) =>
     @logger.info "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
+    conversation_et = @find_conversation_by_id conversation_id
     return Promise.resolve()
       .then =>
-        conversation_et = @find_conversation_by_id conversation_id
         if conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
-          users_with_unverified_clients = conversation_et.get_users_with_unverified_clients()
-          user_ids_with_unverified_clients = users_with_unverified_clients.map (user_et) ->
-            return user_et.id
-          return @_grant_outgoing_message conversation_id, generic_message, user_ids_with_unverified_clients
+          return @_grant_outgoing_message conversation_et, generic_message
       .then =>
         return @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
       .then (response) =>
@@ -1349,15 +1346,14 @@ class z.conversation.ConversationRepository
           return @_handle_client_mismatch conversation_id, error, generic_message, payload
           .then (payload_with_missing_clients) =>
             updated_payload = payload_with_missing_clients
-            return @_grant_outgoing_message conversation_id, generic_message, Object.keys(error.missing)
+            return @_grant_outgoing_message conversation_et, generic_message, Object.keys(error.missing)
           .then =>
             @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
             return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
         else
           throw error
 
-  _grant_outgoing_message: (conversation_id, generic_message, user_ids) =>
-    conversation_et = @find_conversation_by_id conversation_id
+  _grant_outgoing_message: (conversation_et, generic_message, user_ids) =>
     return new Promise (resolve, reject) =>
       if conversation_et.verification_state() is z.conversation.ConversationVerificationState.UNVERIFIED
         resolve()
@@ -1365,6 +1361,10 @@ class z.conversation.ConversationRepository
         resolve()
       else
         send_anyway = false
+
+        if not user_ids
+          users_with_unverified_clients = conversation_et.get_users_with_unverified_clients()
+          user_ids = users_with_unverified_clients.map (user_et) -> user_et.id
 
         @user_repository.get_users_by_id user_ids, (user_ets) ->
           joined_usernames = z.util.LocalizerUtil.join_names user_ets
