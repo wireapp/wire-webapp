@@ -1334,10 +1334,8 @@ class z.conversation.ConversationRepository
         conversation_et = @find_conversation_by_id conversation_id
         if conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
           users_with_unverified_clients = conversation_et.get_users_with_unverified_clients()
-          console.warn 'users_with_unverified_clients', users_with_unverified_clients
           user_ids_with_unverified_clients = users_with_unverified_clients.map (user_et) ->
             return user_et.id
-          console.warn 'user_ids_with_unverified_clients', user_ids_with_unverified_clients
           return @_grant_outgoing_message conversation_id, generic_message, user_ids_with_unverified_clients
       .then =>
         return @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
@@ -1375,6 +1373,7 @@ class z.conversation.ConversationRepository
             data: joined_usernames
             action: ->
               send_anyway = true
+              conversation_et.verification_state z.conversation.ConversationVerificationState.UNVERIFIED
               resolve()
             close: ->
               reject new Error 'Sending to degraded conversation was denied by user' if not send_anyway
