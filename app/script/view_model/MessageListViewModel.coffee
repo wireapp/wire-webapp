@@ -149,33 +149,13 @@ class z.ViewModel.MessageListViewModel
 
     @conversation_is_changing = false
 
-    if @conversation().messages_visible().length is 0
-      # return immediately if nothing to render
-      @_initial_rendering conversation_et, callback
-    else
-      window.setTimeout =>
-        @_initial_rendering conversation_et, callback
-      , 200
-
-  ###
-  Registers for mouse wheel events and incoming messages.
-
-  @note Call this once after changing conversation.
-  @param conversation_et [z.entity.Conversation] Conversation entity to render
-  @param callback [Function] Executed when message list is ready to fade in
-  ###
-  _initial_rendering: (conversation_et, callback) =>
     messages_container = $('.messages-wrap')
     messages_container.on 'mousewheel', @on_mouse_wheel
 
     window.requestAnimationFrame =>
-      is_current_conversation = conversation_et is @conversation()
-      if not is_current_conversation
+      if conversation_et isnt @conversation()
         @logger.info 'Skipped loading conversation', conversation_et.display_name()
         return
-
-      # reset scroll position
-      messages_container.scrollTop 0
 
       @capture_scrolling_event = true
 
