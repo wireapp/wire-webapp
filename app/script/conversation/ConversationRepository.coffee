@@ -1299,7 +1299,7 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
   _send_encrypted_message: (conversation_id, generic_message, payload, precondition_option = false) =>
-    @logger.info "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
+    @logger.log @logger.levels.INFO, "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
     conversation_et = @find_conversation_by_id conversation_id
     return Promise.resolve()
       .then =>
@@ -1320,7 +1320,7 @@ class z.conversation.ConversationRepository
           updated_payload = payload_with_missing_clients
           return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
         .then =>
-          @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
+          @logger.log @logger.levels.INFO, "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
           return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
         .catch (error) ->
           throw error unless error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
