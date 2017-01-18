@@ -21,7 +21,6 @@ z.calling ?= {}
 z.calling.e_call ?= {}
 
 E_CALL_CONFIG =
-  EVENT_LIFETIME: 30 * 1000 # 30 seconds
   SUPPORTED_EVENTS: [
     z.event.Client.CALL.E_CALL
   ]
@@ -76,11 +75,6 @@ class z.calling.e_call.ECallCenter
   ###
   on_event: (event) =>
     return if event.type not in E_CALL_CONFIG.SUPPORTED_EVENTS
-
-    current_timestamp = Date.now()
-    event_timestamp = new Date(event.time).getTime()
-    if Date.now() > E_CALL_CONFIG.EVENT_LIFETIME + event_timestamp
-      return @logger.info "Ignored outdated '#{event.type}' event in conversation '#{event.conversation}' - Event: '#{event_timestamp}', Now: '#{current_timestamp}'", {event_object: event, event_json: JSON.stringify event}
 
     if z.calling.CallingRepository.supports_calling()
       return @_on_event_in_supported_browsers event

@@ -19,6 +19,9 @@
 window.z ?= {}
 z.event ?= {}
 
+EVENT_CONFIG =
+  E_CALL_EVENT_LIFETIME: 30 * 1000 # 30 seconds
+
 # Event repository to handle all backend event channels.
 class z.event.EventRepository
   @::NOTIFICATION_SOURCE =
@@ -367,6 +370,7 @@ class z.event.EventRepository
         return @cryptography_repository.save_unencrypted_event mapped_event
       return mapped_event
     .then (saved_event) =>
+      @_validate_call_event_lifetime event if event.type is z.event.Client.CALL.E_CALL
       @_distribute_event saved_event
       return saved_event
     .catch (error) ->
@@ -375,9 +379,9 @@ class z.event.EventRepository
         z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
         z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
         z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+        z.event.EventError::TYPE.OUTDATED_E_CALL_EVENT
       ]
-      return if error.type in ignored_errors
-      throw error
+      throw error unless error.type in ignored_errors
 
   ###
   Handle all events from the payload of an incoming notification.
@@ -407,3 +411,18 @@ class z.event.EventRepository
         .catch (error) =>
           @logger.error "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
           reject error
+
+    ###
+    Check if call event is handled within its valid lifespan.
+    @todo Includes correction of time for possible local clock drift.
+    @return [Boolean] Returns true if event is handled within is lifetime, otherwise throws error
+    ###
+    _validate_call_event_lifetime: (event) ->
+      return true if @notification_handling_state() is z.event.NotificationHandlingState.WEB_SOCKET
+
+      current_timestamp = Date.now()
+      event_timestamp = new Date(event.time).getTime()
+      if Date.now() > EVENT_CONFIG.E_CALL_EVENT_LIFETIME + event_timestamp
+        @logger.info "Ignored outdated '#{event.type}' event in conversation '#{event.conversation}' - Event: '#{event_timestamp}', Now: '#{current_timestamp}'", {event_object: event, event_json: JSON.stringify event}
+        throw new z.event.EventError z.event.EventError::TYPE.OUTDATED_E_CALL_EVENT
+      return true
