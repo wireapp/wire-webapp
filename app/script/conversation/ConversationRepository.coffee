@@ -1194,15 +1194,14 @@ class z.conversation.ConversationRepository
       return mapped_event
     .then (saved_event) =>
       @on_conversation_event saved_event
-
-      # we don't need to wait for the sending to resolve
-      @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
+      @sending_queue.push =>
+        @_send_generic_message conversation_et.id, generic_message
       .then =>
         if saved_event.type in z.event.EventTypeHandling.STORE
           @_update_message_sent_status conversation_et, saved_event.id
         @_track_completed_media_action conversation_et, generic_message
-
-      return saved_event
+      .then =>
+        return saved_event
 
   ###
   Update message as sent in db and view
@@ -1326,8 +1325,10 @@ class z.conversation.ConversationRepository
   _grant_outgoing_message: (conversation_et, generic_message, user_ids) =>
     return new Promise (resolve, reject) =>
       if conversation_et.verification_state() is z.conversation.ConversationVerificationState.UNVERIFIED
+        console.warn 'A'
         resolve()
       else if generic_message.content in ['cleared', 'confirmation', 'lastRead']
+        console.warn 'B'
         resolve()
       else
         send_anyway = false
@@ -1339,18 +1340,22 @@ class z.conversation.ConversationRepository
         @user_repository.get_users_by_id user_ids, (user_ets) ->
           joined_usernames = z.util.LocalizerUtil.join_names user_ets
 
+          console.warn 'z.ViewModel.ModalType.NEW_DEVICE'
           amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
             data: joined_usernames
             action: ->
               send_anyway = true
               conversation_et.verification_state z.conversation.ConversationVerificationState.UNVERIFIED
+              console.warn 'C'
               resolve()
             close: ->
+              console.warn 'D'
               if not send_anyway
+                console.warn 'E'
                 reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   ###
-  Sends otr asset to a conversation.
+  Sends an OTR asset to a conversation.
 
   @deprecated # TODO: remove once support for v2 ends
   @private
@@ -1361,26 +1366,43 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
   _send_encrypted_asset: (conversation_id, generic_message, image_data, nonce) =>
+    @logger.log @logger.levels.INFO, "Sending encrypted '#{generic_message.content}' asset to conversation '#{conversation_id}'", image_data
     skip_own_clients = generic_message.content is 'ephemeral'
     precondition_option = false
+    image_payload = undefined
 
-    @_create_user_client_map conversation_id, skip_own_clients
-    .then (user_client_map) =>
-      if skip_own_clients
-        precondition_option = Object.keys user_client_map
-      return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
-    .then (payload) =>
-      payload.inline = false
-      @asset_service.post_asset_v2 conversation_id, payload, image_data, precondition_option, nonce
+    conversation_et = @find_conversation_by_id conversation_id
+    return Promise.resolve()
+      .then =>
+        if conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
+          console.warn 'grant_1'
+          return @_grant_outgoing_message conversation_et, generic_message
+      .then =>
+        return @_create_user_client_map conversation_id, skip_own_clients
+      .then (user_client_map) =>
+        if skip_own_clients
+          precondition_option = Object.keys user_client_map
+        return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+      .then (payload) =>
+        payload.inline = false
+        image_payload = payload
+        return @asset_service.post_asset_v2 conversation_id, image_payload, image_data, precondition_option, nonce
       .then (response) =>
         @_handle_client_mismatch conversation_id, response
         return response
       .catch (error) =>
+        updated_payload = undefined
+
         throw error if not error.missing
 
-        return @_handle_client_mismatch conversation_id, error, generic_message, payload
-        .then (updated_payload) =>
-          @asset_service.post_asset_v2 conversation_id, updated_payload, image_data, true, nonce
+        return @_handle_client_mismatch conversation_id, error, generic_message, image_payload
+        .then (payload_with_missing_clients) =>
+          updated_payload = payload_with_missing_clients
+          console.warn 'grant_2'
+          return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
+        .then =>
+          @logger.log @logger.levels.INFO, "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
+          return @asset_service.post_asset_v2 conversation_id, updated_payload, image_data, true, nonce
 
   ###
   Estimate whether message should be send as type external.
