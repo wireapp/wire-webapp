@@ -34,6 +34,7 @@ class z.components.ImageAssetComponent
     @on_click = =>
       params.click? @message
 
+
 ko.components.register 'image-asset',
   viewModel: z.components.ImageAssetComponent
   template: """
