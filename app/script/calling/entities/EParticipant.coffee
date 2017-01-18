@@ -27,9 +27,9 @@ class z.calling.entities.EParticipant
   @param e_call [z.calling.entities.ECall] E-call entity
   @param user [z.entity.User] User entity to base the participant on
   @param timings [z.telemetry.calling.CallSetupTimings] Timing statistics of call setup steps
-  @param e_call_message [z.calling.entities.ECallMessage] E-call setup message entity
+  @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
-  constructor: (@e_call_et, @user, timings, e_call_message) ->
+  constructor: (@e_call_et, @user, timings, e_call_message_et) ->
     @id = @user.id
 
     @is_connected = ko.observable false
@@ -41,18 +41,18 @@ class z.calling.entities.EParticipant
       screen_send: ko.observable false
       video_send: ko.observable false
 
-    @e_flow_et = new z.calling.entities.EFlow @e_call_et, @, timings, e_call_message
-    @update_properties e_call_message.props if e_call_message
+    @e_flow_et = new z.calling.entities.EFlow @e_call_et, @, timings, e_call_message_et
+    @update_properties e_call_message_et.props if e_call_message_et
 
     @is_connected.subscribe (is_connected) ->
       if is_connected and not @was_connected
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.READY_TO_TALK
         @was_connected = true
 
-  update_state: (e_call_message) =>
-    @update_properties e_call_message.props
-    if e_call_message.type is z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
-      @e_flow_et.save_remote_sdp e_call_message
+  update_state: (e_call_message_et) =>
+    @update_properties e_call_message_et.props
+    if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+      @e_flow_et.save_remote_sdp e_call_message_et
 
   update_properties: (properties) =>
     if properties

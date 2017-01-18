@@ -27,29 +27,30 @@ E_CALL_MESSAGE_CONFIG =
 class z.calling.entities.ECallMessage
   ###
   Construct a new e-call message entity.
-  @param e_call_et [z.calling.entities.ECall] Optional e-call the e-call message relates to
   @param type [z.calling.enum.ECallMessageType] Type of e-call message
   @param response [Boolean] Is message a response, defaults to false
+  @param session_id [String] Optional session ID
   @param content [Object] Optional object containing additional message payload
   ###
-  constructor: (e_call_et, @type, @response = false, content) ->
-    @sessid = e_call_et?.session_id or @create_session_id()
+  constructor: (@type, @response = false, session_id, content) ->
+    @session_id = session_id or @_create_session_id()
 
     if content
       @[key] = value for key, value of content
 
   ###
   Create a session ID.
+  @private
   @return [String] Random four char session ID
   ###
-  create_session_id: ->
+  _create_session_id: ->
     return (z.util.StringUtil.get_random_character() for [0..3]).join ''
 
   to_JSON: =>
     json_payload =
       version: E_CALL_MESSAGE_CONFIG.VERSION
       resp: @response
-      sessid: @sessid
+      sessid: @session_id
       type: @type
 
     if @type in [z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP]

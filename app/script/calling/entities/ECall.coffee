@@ -25,7 +25,9 @@ class z.calling.entities.ECall
   ###
   Construct a new e-call entity.
   @param conversation_et [z.entity.Conversation] Conversation the call takes place in
-  @param self_user [z.entity.User] Self user entity
+  @param creating_user [z.entity.User] Entity of user starting the call
+  @param session_id [String] Session ID to identify call
+  @param e_call_center [z.calling.e_call.ECallCenter] E-call center
   ###
   constructor: (@conversation_et, @creating_user, @session_id, @e_call_center) ->
     @logger = new z.util.Logger "z.calling.entities.ECall (#{@conversation_et.id})", z.config.LOGGER.OPTIONS
@@ -141,8 +143,8 @@ class z.calling.entities.ECall
   # Call states
   ###############################################################################
 
-  send_e_call_event: (e_call_message) =>
-    @e_call_center.send_e_call_event @conversation_et, e_call_message
+  send_e_call_event: (e_call_message_et) =>
+    @e_call_center.send_e_call_event @conversation_et, e_call_message_et
 
   start_negotiation: =>
     @self_client_joined true
@@ -199,17 +201,17 @@ class z.calling.entities.ECall
   ###
   Add an e-participant to the e-call.
   @param e_participant_et [z.calling.entities.EParticipant] E-participant entity to be added to the e-call
-  @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+  @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
-  add_participant: (user_et, e_call_message) =>
+  add_participant: (user_et, e_call_message_et) =>
     @get_participant_by_id user_et.id
     .then =>
-      @update_participant user_et, e_call_message
+      @update_participant user_et, e_call_message_et
     .catch (error) =>
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
 
       @logger.debug "Adding e-call participant '#{user_et.name()}'"
-      @participants.push new z.calling.entities.EParticipant @, user_et, @timings, e_call_message
+      @participants.push new z.calling.entities.EParticipant @, user_et, @timings, e_call_message_et
       @_update_remote_state()
       return @
 
@@ -250,13 +252,13 @@ class z.calling.entities.ECall
   ###
   Update e-call participant with e-call message.
   @param user_et [z.entity.User] User to be updated
-  @param e_call_message [z.calling.entities.ECallMessage] E-call message to update user with
+  @param e_call_message_et [z.calling.entities.ECallMessage] E-call message to update user with
   ###
-  update_participant: (user_et, e_call_message) =>
+  update_participant: (user_et, e_call_message_et) =>
     @get_participant_by_id user_et.id
     .then (e_participant_et) =>
-      @logger.debug "Updating e-call participant '#{user_et.name()}'", e_call_message
-      e_participant_et.update_state e_call_message
+      @logger.debug "Updating e-call participant '#{user_et.name()}'", e_call_message_et
+      e_participant_et.update_state e_call_message_et
       @_update_remote_state()
       return @
     .catch (error) ->

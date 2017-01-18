@@ -27,7 +27,6 @@ SDP_REWRITE_MAPPER_CONFIG =
 ###
 Rewrite the SDP for compatibility reasons.
 
-@private
 @param rtc_sdp [RTCSessionDescription] Session Description Protocol to be rewritten
 @param sdp_source [z.calling.enum.SDPSource] Source of the SDP - local or remote
 @param flow_et [z.calling.entities.EFlow|z.calling.entities.Flow] Flow entity

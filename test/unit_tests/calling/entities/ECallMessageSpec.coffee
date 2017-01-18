@@ -19,8 +19,8 @@
 # grunt test_init && grunt test_run:calling/entities/ECallMessage
 
 describe 'z.calling.entities.ECallMessage', ->
-  describe 'create_session_id', ->
-    e_call_message = new z.calling.entities.ECallMessage()
+  describe '_create_session_id', ->
+    e_call_message_et = new z.calling.entities.ECallMessage()
 
     it 'always returns an alphanumeric string of length four', ->
-      expect(e_call_message.create_session_id()).toMatch(/(\w|\d){4}/) for [0...100]
+      expect(e_call_message_et._create_session_id()).toMatch(/(\w|\d){4}/) for [0...100]
