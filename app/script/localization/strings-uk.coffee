@@ -185,6 +185,8 @@ z.string.uk.modal_logout_message = 'Видалити всі ваші особи�
 z.string.uk.modal_logout_button = 'Вийти'
 # New device
 z.string.uk.modal_new_device_headline = '%@.name почав(-ла) використовувати новий пристрій'
+z.string.uk.modal_new_device_headline_many = '%@.names почав(-ла) використовувати новий пристрій'
+z.string.uk.modal_new_device_headline_you = '%@.name почав(-ла) використовувати новий пристрій'
 z.string.uk.modal_new_device_message = 'Все одно надіслати ваші повідомлення?'
 z.string.uk.modal_new_device_show_device = 'Показати пристрій'
 z.string.uk.modal_new_device_send_anyway = 'Все одно надіслати'
