@@ -120,7 +120,7 @@ class z.ViewModel.MessageListViewModel
     @conversation_is_changing = true
 
     # clean up old conversation
-    @release_conversation @conversation() if @conversation()
+    @release_conversation conversation_et if @conversation()
 
     # update new conversation
     @conversation conversation_et
@@ -131,7 +131,7 @@ class z.ViewModel.MessageListViewModel
 
     if not conversation_et.is_loaded()
       @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
-        @conversation_repository.get_events conversation_et
+        @conversation_repository.get_events cixonversation_et
         .then =>
           conversation_et.is_loaded true
           @_set_conversation conversation_et, callback
