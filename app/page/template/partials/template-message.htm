@@ -64,32 +64,6 @@
   <div class="message-body">
 
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
-      <!-- ko if: asset.is_image() -->
-        <div class="message-asset-image">
-          <div class="image image-loading" data-bind="
-            attr: {'data-uie-visible': $parent.visible() && !message.is_expired()},
-            background_image: asset.resource,
-            click: function() {$parents[1].show_detail(message, event)},
-            css: {'bg-color-ephemeral': message.is_expired()},
-            viewport_changed: $parents[1].viewport_changed
-            " data-uie-name="go-image-detail">
-            <!-- ko ifnot: message.is_expired() -->
-              <img class="image-element" data-bind="attr: {src: asset.dummy_url}"/>
-              <span class="image-placeholder-icon">
-                <div class="three-dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </span>
-            <!-- /ko -->
-            <!-- ko if: message.is_expired() -->
-              <div class="icon-library flex-center full-screen text-white"></div>
-              <img class="image-element image-ephemeral" data-bind="attr: {src: asset.dummy_url}"/>
-            <!-- /ko -->
-          </div>
-        </div>
-      <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
           <div class="text" data-bind="html: asset.render(), css: {'text-graphite': $parent.is_editing, 'text-large': z.util.emoji.includes_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.is_expired()}" dir="auto"></div>
