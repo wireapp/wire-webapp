@@ -185,6 +185,8 @@ z.string.pt.modal_logout_message = 'Excluir todas as informações pessoais e co
 z.string.pt.modal_logout_button = 'Sair'
 # New device
 z.string.pt.modal_new_device_headline = '%@.name começou a usar um novo dispositivo'
+z.string.pt.modal_new_device_headline_many = '%@.names começou a usar um novo dispositivo'
+z.string.pt.modal_new_device_headline_you = '%@.name começou a usar um novo dispositivo'
 z.string.pt.modal_new_device_message = 'Ainda quer enviar suas mensagens?'
 z.string.pt.modal_new_device_show_device = 'mostrar dispositivo'
 z.string.pt.modal_new_device_send_anyway = 'enviar assim mesmo'

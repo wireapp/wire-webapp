@@ -185,6 +185,8 @@ z.string.sl.modal_logout_message = 'Izbriši vse vaše osebne podatke in pogovor
 z.string.sl.modal_logout_button = 'Odjava'
 # New device
 z.string.sl.modal_new_device_headline = '%@.name je začel(-a) z uporabo nove naprave'
+z.string.sl.modal_new_device_headline_many = '%@.names je začel(-a) z uporabo nove naprave'
+z.string.sl.modal_new_device_headline_you = '%@.name je začel(-a) z uporabo nove naprave'
 z.string.sl.modal_new_device_message = 'Ali še vedno želite poslati vaša sporočila?'
 z.string.sl.modal_new_device_show_device = 'pokaži napravo'
 z.string.sl.modal_new_device_send_anyway = 'pošlji vseeno'

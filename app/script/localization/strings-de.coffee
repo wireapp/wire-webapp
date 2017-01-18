@@ -187,6 +187,8 @@ z.string.de.modal_logout_message = 'Deine persönlichen Daten und Unterhaltungen
 z.string.de.modal_logout_button = 'Abmelden'
 # New device
 z.string.de.modal_new_device_headline = '%@.name hat begonnen ein neues Gerät zu nutzen'
+z.string.de.modal_new_device_headline_many = '%@.names haben begonnen ein neues Gerät zu nutzen'
+z.string.de.modal_new_device_headline_you = '%@.name hast begonnen ein neues Gerät zu nutzen'
 z.string.de.modal_new_device_message = 'Möchtest du die Nachrichten noch senden?'
 z.string.de.modal_new_device_show_device = 'Gerät anzeigen'
 z.string.de.modal_new_device_send_anyway = 'Dennoch senden'

@@ -185,6 +185,8 @@ z.string.ru.modal_logout_message = 'Удалить все ваши личные 
 z.string.ru.modal_logout_button = 'Выход'
 # New device
 z.string.ru.modal_new_device_headline = '%@.name начал(а) использовать новое устройство'
+z.string.ru.modal_new_device_headline_many = '%@.names начал(а) использовать новое устройство'
+z.string.ru.modal_new_device_headline_you = '%@.name начал(а) использовать новое устройство'
 z.string.ru.modal_new_device_message = 'Вы всё ещё хотите отправить ваши сообщения?'
 z.string.ru.modal_new_device_show_device = 'показать устройство'
 z.string.ru.modal_new_device_send_anyway = 'отправить всё равно'

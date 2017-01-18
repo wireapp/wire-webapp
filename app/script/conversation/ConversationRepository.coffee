@@ -1336,10 +1336,8 @@ class z.conversation.ConversationRepository
           user_ids = users_with_unverified_clients.map (user_et) -> user_et.id
 
         @user_repository.get_users_by_id user_ids, (user_ets) ->
-          joined_usernames = z.util.LocalizerUtil.join_names user_ets
-
           amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
-            data: joined_usernames
+            data: user_ets
             action: ->
               send_anyway = true
               conversation_et.verification_state z.conversation.ConversationVerificationState.UNVERIFIED

@@ -185,6 +185,8 @@ z.string.es.modal_logout_message = 'Borrar todos sus datos personales y las conv
 z.string.es.modal_logout_button = 'Cerrar sesión'
 # New device
 z.string.es.modal_new_device_headline = '%@.name comenzó a usar un nuevo dispositivo'
+z.string.es.modal_new_device_headline_many = '%@.names comenzó a usar un nuevo dispositivo'
+z.string.es.modal_new_device_headline_you = '%@.name comenzó a usar un nuevo dispositivo'
 z.string.es.modal_new_device_message = '¿Desea enviar su mensaje?'
 z.string.es.modal_new_device_show_device = 'mostrar dispositivo'
 z.string.es.modal_new_device_send_anyway = 'enviar de todos modos'
