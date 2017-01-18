@@ -185,6 +185,8 @@ z.string.fr.modal_logout_message = 'Supprime toutes vos informations personnelle
 z.string.fr.modal_logout_button = 'Se déconnecter'
 # New device
 z.string.fr.modal_new_device_headline = '%@.name a commencé à utiliser un nouvel appareil'
+z.string.fr.modal_new_device_headline_many = '%@.names a commencé à utiliser un nouvel appareil'
+z.string.fr.modal_new_device_headline_you = '%@.name a commencé à utiliser un nouvel appareil'
 z.string.fr.modal_new_device_message = 'Voulez-vous toujours envoyer vos messages ?'
 z.string.fr.modal_new_device_show_device = 'afficher l’appareil'
 z.string.fr.modal_new_device_send_anyway = 'envoyer quand même'

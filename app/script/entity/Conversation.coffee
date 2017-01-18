@@ -89,6 +89,7 @@ class z.entity.Conversation
           @verification_state z.conversation.ConversationVerificationState.DEGRADED
         else
           @verification_state z.conversation.ConversationVerificationState.UNVERIFIED
+
       return is_verified
 
     @removed_from_conversation = ko.observable false

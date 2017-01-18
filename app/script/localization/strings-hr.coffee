@@ -185,6 +185,8 @@ z.string.hr.modal_logout_message = 'Izbriši sve osobne informacije i razgovore 
 z.string.hr.modal_logout_button = 'Odjava'
 # New device
 z.string.hr.modal_new_device_headline = '%@.name počela/o koristiti novi uređaj'
+z.string.hr.modal_new_device_headline_many = '%@.names počela/o koristiti novi uređaj'
+z.string.hr.modal_new_device_headline_you = '%@.name počela/o koristiti novi uređaj'
 z.string.hr.modal_new_device_message = 'Još uvijek želite poslati poruku?'
 z.string.hr.modal_new_device_show_device = 'prikaz uređaja'
 z.string.hr.modal_new_device_send_anyway = 'svejedno pošalji'

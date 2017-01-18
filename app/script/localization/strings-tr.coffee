@@ -185,6 +185,8 @@ z.string.tr.modal_logout_message = 'Bu cihazdaki tüm kişisel bilgileriniz ve g
 z.string.tr.modal_logout_button = 'Çıkış yap'
 # New device
 z.string.tr.modal_new_device_headline = '%@.name yeni bir cihaz kullanmaya başladı'
+z.string.tr.modal_new_device_headline_many = '%@.names yeni bir cihaz kullanmaya başladı'
+z.string.tr.modal_new_device_headline_you = '%@.name yeni bir cihaz kullanmaya başladı'
 z.string.tr.modal_new_device_message = 'Hâlâ mesajlarınızı göndermek istiyor musunuz?'
 z.string.tr.modal_new_device_show_device = 'cihazı göster'
 z.string.tr.modal_new_device_send_anyway = 'yine de gönder'
