@@ -66,7 +66,7 @@
           <div class="image image-loading" data-bind="
             attr: {'data-uie-visible': $parent.visible},
             background_image: asset.resource,
-            click: function() {$parents[1].show_detail(message, event)},
+            click: function(data, event) {$parents[1].show_detail(message, event)},
             css: {'bg-color-ephemeral': message.is_expired()},
             viewport_changed: $parents[1].viewport_changed
             " data-uie-name="go-image-detail">

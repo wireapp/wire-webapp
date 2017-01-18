@@ -59,6 +59,13 @@
   flex: 1 1;
 }
 
+// fix flexbox issue in FF
+@-moz-document url-prefix() {
+  .detail-view-main {
+    min-height: 0;
+  }
+}
+
 .detail-view-footer {
   .flex-center;
   flex: 0 0 auto;
