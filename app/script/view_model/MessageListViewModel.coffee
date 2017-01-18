@@ -131,7 +131,7 @@ class z.ViewModel.MessageListViewModel
 
     if not conversation_et.is_loaded()
       @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
-        @conversation_repository.get_events cixonversation_et
+        @conversation_repository.get_events conversation_et
         .then =>
           conversation_et.is_loaded true
           @_set_conversation conversation_et, callback
