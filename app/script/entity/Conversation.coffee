@@ -91,9 +91,6 @@ class z.entity.Conversation
         else
           @verification_state z.conversation.ConversationVerificationState.UNVERIFIED
 
-      console.warn 'verification_state', @verification_state()
-      console.warn 'is_verified', is_verified
-
       return is_verified
 
     @removed_from_conversation = ko.observable false
