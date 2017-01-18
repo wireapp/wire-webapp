@@ -43,15 +43,7 @@ class z.calling.entities.ECallMessage
   @return [String] Random four char session ID
   ###
   create_session_id: ->
-    in_range = (value, lower_bound, upper_bound) ->
-      return value >= lower_bound and value <= upper_bound
-
-    get_random_char = ->
-      until in_range(char_index, 1, 9) or in_range(char_index, 65, 90) or in_range char_index, 97, 122
-        char_index = Math.floor Math.random() * 122
-      return if char_index <= 9 then char_index else String.fromCharCode char_index
-
-    return "#{get_random_char()}#{get_random_char()}#{get_random_char()}#{get_random_char()}"
+    return (z.util.StringUtil.get_random_character() for [0..3]).join ''
 
   to_JSON: =>
     json_payload =

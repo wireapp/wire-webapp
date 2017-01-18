@@ -20,7 +20,7 @@
 # grunt test_init
 #
 # For all subsequent executions:
-# grunt test_run:calling/CallCenter
+# grunt test_run:calling/belfry/CallCenter
 #
 window.wire ?= {}
 window.wire.auth ?= {}
