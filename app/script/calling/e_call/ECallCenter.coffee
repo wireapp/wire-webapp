@@ -86,7 +86,25 @@ class z.calling.e_call.ECallCenter
   @param event [Object] Event payload
   ###
   _on_event_in_supported_browsers: (event) ->
-    @_on_e_call_event event if event.type is z.event.Client.CALL.E_CALL
+    return unless event.type is z.event.Client.CALL.E_CALL
+
+    conversation_id = event.conversation
+    e_call_message = event.content
+    user_id = event.from
+
+    @logger.debug "Received e-call message of type '#{e_call_message.type}' from user '#{user_id}' in conversation '#{conversation_id}'", event
+    if e_call_message.version not in E_CALL_CONFIG.SUPPORTED_VERSIONS
+      throw new z.calling.e_call.ECallError z.calling.e_call.ECallError::TYPE.UNSUPPORTED_VERSION
+
+    switch e_call_message.type
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL, z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
+        @_on_e_call_hangup_event conversation_id, user_id, e_call_message
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
+        @_on_e_call_prop_sync_event conversation_id, user_id, e_call_message
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+        @_on_e_call_setup_event conversation_id, user_id, e_call_message
+      else
+        throw new z.calling.e_call.ECallError z.calling.e_call.ECallError::TYPE.UNKNOWN_EVENT_TYPE
 
   ###
   E-call event handling for browsers not supporting calling.
@@ -107,30 +125,6 @@ class z.calling.e_call.ECallCenter
         amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL
 
   ###
-  E-call event handling.
-  @private
-  @param event [Object] Event payload
-  ###
-  _on_e_call_event: (event) =>
-    conversation_id = event.conversation
-    e_call_message = event.content
-    user_id = event.from
-
-    @logger.debug "Received e-call message of type '#{e_call_message.type}' from user '#{user_id}' in conversation '#{conversation_id}'", event
-    if e_call_message.version not in E_CALL_CONFIG.SUPPORTED_VERSIONS
-      throw new z.calling.e_call.ECallError z.calling.e_call.ECallError::TYPE.UNSUPPORTED_VERSION
-
-    switch e_call_message.type
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL, z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
-        @_on_e_call_hangup_event conversation_id, user_id, e_call_message
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
-        @_on_e_call_prop_sync_event conversation_id, user_id, e_call_message
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
-        @_on_e_call_setup_event conversation_id, user_id, e_call_message
-      else
-        throw new z.calling.e_call.ECallError z.calling.e_call.ECallError::TYPE.UNKNOWN_EVENT_TYPE
-
-  ###
   E-call cancel and hangup event handling.
   @private
   @param conversation_id [String] ID of Conversation related to e-call event
@@ -142,6 +136,8 @@ class z.calling.e_call.ECallCenter
 
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
+      @_verify_session_id e_call_et, e_call_message
+      @_confirm_e_call_message e_call_et, e_call_message
       @user_repository.get_user_by_id user_id, (user_et) =>
         e_call_et.delete_participant user_et
         .then (e_call_et) =>
@@ -163,10 +159,9 @@ class z.calling.e_call.ECallCenter
   _on_e_call_prop_sync_event: (conversation_id, user_id, e_call_message) =>
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
+      @_verify_session_id e_call_et, e_call_message
+      @_confirm_e_call_message e_call_et, e_call_message
       @user_repository.get_user_by_id user_id, (user_et) -> e_call_et.update_participant user_et, e_call_message
-      if e_call_message.resp is false
-        e_call_message_et = new z.calling.entities.ECallMessage e_call_et, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, true, @create_prop_sync_payload undefined, z.media.MediaType.VIDEO
-        @send_e_call_event e_call_et.conversation_et, e_call_message_et
     .catch (error) ->
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
 
@@ -180,16 +175,30 @@ class z.calling.e_call.ECallCenter
   _on_e_call_setup_event: (conversation_id, user_id, e_call_message) =>
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
+      @_verify_session_id e_call_et, e_call_message
       @user_repository.get_user_by_id user_id, (user_et) ->
         if e_call_message.resp is true
           return e_call_et.update_participant user_et, e_call_message
         return e_call_et.add_participant user_et, e_call_message
     .catch (error) =>
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+      return if e_call_message.resp is true
 
       if @user_repository.self().id is user_id
         return @_create_ongoing_e_call conversation_id, e_call_message, user_id
       @_create_incoming_e_call conversation_id, e_call_message, user_id
+
+  ###
+  Verify e-call message belongs to e-call by session id.
+
+  @private
+  @param e_call_et [z.calling.entities.ECall] E-call entity
+  @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity
+  @return [z.calling.entities.ECall] Returns an e-call if verification is passed, otherwise throws an error
+  ###
+  _verify_session_id: (e_call_et, e_call_message_et) =>
+    return e_call_et if e_call_message_et.sessid is e_call_et.session_id
+    throw new z.calling.e_call.ECallError z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND, 'Session IDs not matching'
 
 
   ###############################################################################
@@ -246,6 +255,16 @@ class z.calling.e_call.ECallCenter
 
   create_setup_payload: (local_sdp) ->
     return $.extend @create_prop_sync_payload(@self_state.video_send()), sdp: local_sdp
+
+  _confirm_e_call_message: (e_call_et, incoming_e_call_message) ->
+    return unless incoming_e_call_message.resp is false
+
+    if incoming_e_call_message.type in [z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL, z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP]
+      e_call_message_et = new z.calling.entities.ECallMessage e_call_et, incoming_e_call_message.type, true
+    else if incoming_e_call_message.type is z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
+      e_call_message_et = new z.calling.entities.ECallMessage e_call_et, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, true, @create_prop_sync_payload undefined, z.media.MediaType.VIDEO
+
+    @send_e_call_event e_call_et.conversation_et, e_call_message_et
 
 
   ###############################################################################

@@ -21,12 +21,12 @@ z.calling ?= {}
 z.calling.e_call ?= {}
 
 class z.calling.e_call.ECallError
-  constructor: (type) ->
+  constructor: (type, message) ->
     @name = @constructor.name
     @stack = (new Error()).stack
     @type = type or z.calling.e_call.ECallError::TYPE.UNKNOWN
 
-    @message = switch @type
+    @message = message or switch @type
       when z.calling.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED
         'E-call has not yet established data channel'
       when z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
