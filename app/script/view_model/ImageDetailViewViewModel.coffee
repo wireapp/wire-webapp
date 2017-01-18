@@ -66,9 +66,13 @@ class z.ViewModel.ImageDetailViewViewModel
     @conversation_repository.toggle_like @conversation_et(), @message_et()
 
   click_on_delete: =>
-    @conversation_repository.delete_message @conversation_et(), @message_et()
-    @image_modal.hide()
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
+      action: =>
+        @conversation_repository.delete_message @conversation_et(), @message_et()
+        @image_modal.hide()
 
   click_on_delete_for_everyone: =>
-    @conversation_repository.delete_message_everyone @conversation_et(), @message_et()
-    @image_modal.hide()
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
+      action: =>
+        @conversation_repository.delete_message_everyone @conversation_et(), @message_et()
+        @image_modal.hide()

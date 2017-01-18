@@ -315,16 +315,24 @@ class z.conversation.ConversationRepository
 
   ###
   Get group conversations by name
-  @param group_name [String] Query to be searched in group conversation names
+  @param query [String] Query to be searched in group conversation names
+  @param is_username [Boolean] Query string is username
   @return [Array<z.entity.Conversation>] Matching group conversations
   ###
-  get_groups_by_name: (group_name) =>
-    @sorted_conversations().filter (conversation_et) ->
-      return false if not conversation_et.is_group()
-      return true if z.util.compare_names conversation_et.display_name(), group_name
-      for user_et in conversation_et.participating_user_ets()
-        return true if z.util.compare_names user_et.name(), group_name
-      return false
+  get_groups_by_name: (query, is_username) =>
+    return @sorted_conversations()
+      .filter (conversation_et) ->
+        return false if not conversation_et.is_group()
+        if is_username
+          return true if z.util.StringUtil.compare_transliteration conversation_et.display_name(), "@#{query}"
+          return true for user_et in conversation_et.participating_user_ets() when z.util.StringUtil.starts_with user_et.username(), query
+        else
+          return true if z.util.StringUtil.compare_transliteration conversation_et.display_name(), query
+          return true for user_et in conversation_et.participating_user_ets() when z.util.StringUtil.compare_transliteration user_et.name(), query
+        return false
+      .sort (conversation_a, conversation_b) ->
+        sort_query = if is_username then "@#{@query}" else query
+        return z.util.StringUtil.sort_by_priority conversation_a.display_name(), conversation_b.display_name(), sort_query
 
   ###
   Get the next unarchived conversation.
@@ -332,7 +340,7 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] Next conversation
   ###
   get_next_conversation: (conversation_et) ->
-    return z.util.array_get_next @conversations_unarchived(), conversation_et
+    return z.util.ArrayUtil.get_next_item @conversations_unarchived(), conversation_et
 
   ###
   Get unarchived conversation with the most recent event.
@@ -482,6 +490,8 @@ class z.conversation.ConversationRepository
             muted_state: conversation_et.muted_state()
             muted_timestamp: conversation_et.muted_timestamp()
           }
+        when z.conversation.ConversationUpdateType.VERIFICATION_STATE
+          verification_state: conversation_et.verification_state()
       return @conversation_service.update_conversation_state_in_db conversation_et, changes
       .then =>
         @logger.info "Persisted update of '#{updated_field}' to conversation '#{conversation_et.id}'"
@@ -1309,7 +1319,7 @@ class z.conversation.ConversationRepository
           payload.native_push = native_push
           @_send_encrypted_message conversation_id, generic_message, payload, user_ids
     .catch (error) =>
-      if error.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
+      if error?.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
         return @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
       throw error
 
@@ -1327,17 +1337,56 @@ class z.conversation.ConversationRepository
   ###
   _send_encrypted_message: (conversation_id, generic_message, payload, precondition_option = false) =>
     @logger.info "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
-    @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
-    .then (response) =>
-      @_handle_client_mismatch conversation_id, response
-      return response
-    .catch (error) =>
-      throw error if not error.missing
+    conversation_et = @find_conversation_by_id conversation_id
+    return Promise.resolve()
+      .then =>
+        if conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
+          return @_grant_outgoing_message conversation_et, generic_message
+      .then =>
+        return @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
+      .then (response) =>
+        @_handle_client_mismatch conversation_id, response
+        return response
+      .catch (error) =>
+        updated_payload = undefined
 
-      return @_handle_client_mismatch conversation_id, error, generic_message, payload
-      .then (updated_payload) =>
-        @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
-        return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
+        throw error unless error.missing
+
+        return @_handle_client_mismatch conversation_id, error, generic_message, payload
+        .then (payload_with_missing_clients) =>
+          updated_payload = payload_with_missing_clients
+          return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
+        .then =>
+          @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
+          return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
+        .catch (error) ->
+          throw error unless error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
+
+  _grant_outgoing_message: (conversation_et, generic_message, user_ids) =>
+    return new Promise (resolve, reject) =>
+      if conversation_et.verification_state() is z.conversation.ConversationVerificationState.UNVERIFIED
+        resolve()
+      else if generic_message.content in ['cleared', 'confirmation', 'lastRead']
+        resolve()
+      else
+        send_anyway = false
+
+        if not user_ids
+          users_with_unverified_clients = conversation_et.get_users_with_unverified_clients()
+          user_ids = users_with_unverified_clients.map (user_et) -> user_et.id
+
+        @user_repository.get_users_by_id user_ids, (user_ets) ->
+          joined_usernames = z.util.LocalizerUtil.join_names user_ets
+
+          amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
+            data: joined_usernames
+            action: ->
+              send_anyway = true
+              conversation_et.verification_state z.conversation.ConversationVerificationState.UNVERIFIED
+              resolve()
+            close: ->
+              if not send_anyway
+                reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   ###
   Sends otr asset to a conversation.

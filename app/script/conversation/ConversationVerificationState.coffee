@@ -17,23 +17,9 @@
 #
 
 window.z ?= {}
-z.string ?= {}
-z.string.da ?= {}
-z.string.cs ?= {}
-z.string.de ?= {}
-z.string.es ?= {}
-z.string.fi ?= {}
-z.string.fr ?= {}
-z.string.hr ?= {}
-z.string.it ?= {}
-z.string.pt ?= {}
-z.string.ro ?= {}
-z.string.ru ?= {}
-z.string.sl ?= {}
-z.string.tr ?= {}
-z.string.uk ?= {}
+z.conversation ?= {}
 
-z.string.Declension =
-  ACCUSATIVE: 'accusative'
-  DATIVE: 'dative'
-  NOMINATIVE: 'nominative'
+z.conversation.ConversationVerificationState =
+  UNVERIFIED: 0
+  VERIFIED: 1
+  DEGRADED: 2

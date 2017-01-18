@@ -221,7 +221,7 @@ class z.tracking.EventTrackingRepository
 
   _localytics_disabled: ->
     if not z.util.get_url_parameter z.auth.URLParameter.LOCALYTICS
-      for domain in LOCALYTICS.DISABLED_DOMAINS when z.util.contains window.location.hostname, domain
+      for domain in LOCALYTICS.DISABLED_DOMAINS when z.util.StringUtil.includes window.location.hostname, domain
         @logger.debug 'Localytics reporting is disabled due to domain'
         return true
     return false

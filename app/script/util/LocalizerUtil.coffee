@@ -17,23 +17,9 @@
 #
 
 window.z ?= {}
-z.string ?= {}
-z.string.da ?= {}
-z.string.cs ?= {}
-z.string.de ?= {}
-z.string.es ?= {}
-z.string.fi ?= {}
-z.string.fr ?= {}
-z.string.hr ?= {}
-z.string.it ?= {}
-z.string.pt ?= {}
-z.string.ro ?= {}
-z.string.ru ?= {}
-z.string.sl ?= {}
-z.string.tr ?= {}
-z.string.uk ?= {}
+z.util ?= {}
+z.util.LocalizerUtil ?= {}
 
-z.string.Declension =
-  ACCUSATIVE: 'accusative'
-  DATIVE: 'dative'
-  NOMINATIVE: 'nominative'
+z.util.LocalizerUtil.join_names = (user_ets, declension = z.string.Declension.ACCUSATIVE) ->
+  names_string = (z.util.get_first_name user_et, declension for user_et in user_ets).join ', '
+  return names_string.replace /,(?=[^,]*$)/, " #{z.localization.Localizer.get_text z.string.and}"

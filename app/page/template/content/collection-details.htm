@@ -6,9 +6,9 @@
 
     <div class="content-titlebar">
       <div class="content-titlebar-items-left">
-        <span class="content-titlebar-icon icon-back" data-bind="click: click_on_back_button"></span>
+        <span class="content-titlebar-icon icon-back" data-uie-name="do-collection-details-close" data-bind="click: click_on_back_button"></span>
       </div>
-      <span class="content-titlebar-items-center" data-bind="text: conversation_et().display_name()"></span>
+      <span class="content-titlebar-items-center" data-uie-name="collection-details-conversation-name" data-bind="text: conversation_et().display_name()"></span>
     </div>
 
     <div class="content-list-wrapper">
@@ -18,7 +18,7 @@
 
           <!-- ko foreach: {data: items(), as: 'message_et'} -->
             <!-- ko if: message_et.category & z.message.MessageCategory.IMAGE -->
-              <image-component class="collection-image" data-bind="click: $parent.click_on_image" params="asset: message_et.get_first_asset().resource"></image-component>
+              <image-component class="collection-image" params="asset: message_et.get_first_asset().resource, click: function() {$parent.click_on_image(message_et)}"></image-component>
             <!-- /ko -->
             <!-- ko if: message_et.category & z.message.MessageCategory.LINK -->
               <link-preview-asset params="message: message_et, header: true"></link-preview-asset>

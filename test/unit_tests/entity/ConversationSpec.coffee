@@ -183,10 +183,10 @@ describe 'Conversation', ->
 
     it 'displays a fallback if no user name has been set', ->
       conversation_et.type z.conversation.ConversationType.ONE2ONE
-      expect(conversation_et.display_name()).toBe z.string.truncation
+      expect(conversation_et.display_name()).toBe '…'
 
       conversation_et.type z.conversation.ConversationType.CONNECT
-      expect(conversation_et.display_name()).toBe z.string.truncation
+      expect(conversation_et.display_name()).toBe '…'
 
     it 'displays a group conversation name with names from the participants', ->
       third_user = new z.entity.User z.util.create_random_uuid()
@@ -208,7 +208,7 @@ describe 'Conversation', ->
       conversation_et.participating_user_ids.push other_user.id
       conversation_et.participating_user_ids.push user.id
 
-      expect(conversation_et.display_name()).toBe z.string.truncation
+      expect(conversation_et.display_name()).toBe '…'
 
     it 'displays the conversation name for a self conversation', ->
       conversation_et.type z.conversation.ConversationType.SELF

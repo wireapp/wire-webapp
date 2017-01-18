@@ -20,7 +20,6 @@
 z.string.hr.wire_macos = 'Wire za macOS'
 z.string.hr.wire_windows = 'Wire za Windows'
 z.string.hr.wire_linux = 'Wire za Linux'
-z.string.hr.truncation = '…'
 z.string.hr.nonexistent_user = 'Izbrisani korisnik'
 z.string.hr.and = 'i'
 
@@ -185,7 +184,7 @@ z.string.hr.modal_logout_headline = 'Obriši podatke?'
 z.string.hr.modal_logout_message = 'Izbriši sve osobne informacije i razgovore na ovom uređaju.'
 z.string.hr.modal_logout_button = 'Odjava'
 # New device
-z.string.hr.modal_new_device_headline = '"%@.name" počela/o koristiti novi uređaj'
+z.string.hr.modal_new_device_headline = '%@.name počela/o koristiti novi uređaj'
 z.string.hr.modal_new_device_message = 'Još uvijek želite poslati poruku?'
 z.string.hr.modal_new_device_show_device = 'prikaz uređaja'
 z.string.hr.modal_new_device_send_anyway = 'svejedno pošalji'
