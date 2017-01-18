@@ -138,7 +138,7 @@
                      data-uie-name="enter-name" tabindex="1" dir="auto">
             </div>
             <div id="wire-register-email-container" class="form-control">
-              <input class="input email" id="wire-register-email" type="text" maxlength="128" spellcheck="false"
+              <input class="input email" id="wire-register-email" type="text" autocomplete="email" maxlength="128" spellcheck="false"
                      data-bind="css: {'input-error': failed_validation_email}, event: {input: clear_error}, l10n_tooltip: z.string.auth_placeholder_email, l10n_placeholder: z.string.auth_placeholder_email, textInput: username"
                      data-uie-name="enter-email" tabindex="2">
             </div>
@@ -180,7 +180,7 @@
             <div class="auth-headline" data-bind="l10n_text: z.string.auth_verify_account_headline"></div>
             <div class="auth-headline-sub" data-bind="l10n_text: z.string.auth_verify_account_detail"></div>
             <div id="wire-verify-account-email-container" class="form-control">
-              <input class="input email" id="wire-verify-account-email" type="text" maxlength="128" spellcheck="false"
+              <input class="input email" id="wire-verify-account-email" type="text" autocomplete="email" maxlength="128" spellcheck="false"
                      data-bind="css: {'input-error': failed_validation_email}, event: {input: clear_error}, l10n_tooltip: z.string.auth_placeholder_email, l10n_placeholder: z.string.auth_placeholder_email, textInput: username"
                      data-uie-name="enter-email">
             </div>
