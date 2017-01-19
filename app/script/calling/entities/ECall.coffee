@@ -227,6 +227,7 @@ class z.calling.entities.ECall
       @interrupted_participants.remove e_participant_et
       @participants.remove e_participant_et
       @_update_remote_state()
+      @e_call_center.media_element_handler.remove_media_element user_id
       @logger.debug "Removed e-call participant '#{e_participant_et.user.name()}'"
       return @
 

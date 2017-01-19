@@ -115,7 +115,9 @@ class z.calling.e_call.ECallCenter
     @logger.debug "Received e-call message of type '#{e_call_message_et.type}' from user '#{user_id}' in conversation '#{conversation_id}'", event
 
     switch e_call_message_et.type
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL, z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+        @_on_e_call_cancel_event conversation_id, user_id, e_call_message_et
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
         @_on_e_call_hangup_event conversation_id, user_id, e_call_message_et
       when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
         @_on_e_call_prop_sync_event conversation_id, user_id, e_call_message_et
@@ -143,27 +145,43 @@ class z.calling.e_call.ECallCenter
         amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL
 
   ###
-  E-call cancel and hangup event handling.
+  E-call cancel event handling.
   @private
   @param conversation_id [String] ID of Conversation related to e-call event
   @param user_id [String] ID of user which is source of event
-  @param e_call_message [z.calling.entities.ECallMessage] E-call message entity
+  @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
   ###
-  _on_e_call_hangup_event: (conversation_id, user_id, e_call_message_et) =>
+  _on_e_call_cancel_event: (conversation_id, user_id, e_call_message_et) =>
     return if e_call_message_et.response is true
 
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @_verify_session_id user_id, e_call_et, e_call_message_et
     .then (e_call_et) =>
+      e_call_et.delete_e_participant user_id
+    .then (e_call_et) =>
+      unless e_call_et.participants().length
+        @_send_call_notification e_call_et, user_id
+        @delete_call conversation_id
+    .catch (error) ->
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
+
+  ###
+  E-call hangup event handling.
+  @private
+  @param conversation_id [String] ID of Conversation related to e-call event
+  @param user_id [String] ID of user which is source of event
+  @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
+  ###
+  _on_e_call_hangup_event: (conversation_id, user_id, e_call_message_et) =>
+    return if e_call_message_et.response is true
+
+    @get_e_call_by_id conversation_id
+    .then (e_call_et) =>
       @_confirm_e_call_message e_call_et, e_call_message_et
       e_call_et.delete_e_participant user_id
     .then (e_call_et) =>
-      @media_element_handler.remove_media_element user_id
-      if not e_call_et.participants().length
-        if e_call_et.state() is z.calling.enum.CallState.INCOMING and e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
-          @_send_call_notification e_call_et, user_id
-        @delete_call conversation_id
+      @delete_call conversation_id unless e_call_et.participants().length
     .catch (error) ->
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
 
@@ -285,10 +303,11 @@ class z.calling.e_call.ECallCenter
   _confirm_e_call_message: (e_call_et, incoming_e_call_message_et) ->
     return unless incoming_e_call_message_et.response is false
 
-    if incoming_e_call_message_et.type in [z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL, z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP]
-      e_call_message_et = new z.calling.entities.ECallMessage incoming_e_call_message_et.type, true, e_call_et.session_id
-    else if incoming_e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
-      e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, true, e_call_et.session_id, @create_prop_sync_payload undefined, z.media.MediaType.VIDEO
+    switch incoming_e_call_message_et.type
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
+        e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, true, e_call_et.session_id
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
+        e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, true, e_call_et.session_id, @create_prop_sync_payload undefined, z.media.MediaType.VIDEO
 
     @send_e_call_event e_call_et.conversation_et, e_call_message_et
 
