@@ -184,7 +184,9 @@ z.string.es.modal_logout_headline = '¿Borrar los Datos?'
 z.string.es.modal_logout_message = 'Borrar todos sus datos personales y las conversaciones en este dispositivo.'
 z.string.es.modal_logout_button = 'Cerrar sesión'
 # New device
-z.string.es.modal_new_device_headline = '"%@.name" comenzó a usar un nuevo dispositivo'
+z.string.es.modal_new_device_headline = '%@.name comenzó a usar un nuevo dispositivo'
+z.string.es.modal_new_device_headline_many = '%@.names comenzó a usar un nuevo dispositivo'
+z.string.es.modal_new_device_headline_you = '%@.name comenzó a usar un nuevo dispositivo'
 z.string.es.modal_new_device_message = '¿Desea enviar su mensaje?'
 z.string.es.modal_new_device_show_device = 'mostrar dispositivo'
 z.string.es.modal_new_device_send_anyway = 'enviar de todos modos'
@@ -266,6 +268,9 @@ z.string.es.conversation_context_menu_unlike = 'No me gusta'
 z.string.es.conversation_delete_timestamp = 'Eliminados en %@fecha y hora'
 z.string.es.conversation_edit_timestamp = 'Editado %@fecha y hora'
 z.string.es.conversation_likes_caption = '%@numbero de personas'
+z.string.es.conversation_send_pasted_file = 'Imagen pegada el %date'
+
+# Collection
 
 # Archive
 z.string.es.archive_header = 'Archivar'
@@ -445,7 +450,8 @@ z.string.es.preferences_options_data_checkbox = 'Reportes de uso y fallas'
 z.string.es.preferences_options_data_detail = 'Ayudar a mejorar Wire enviando información anónima.'
 z.string.es.preferences_options_notifications = 'Notificaciones'
 z.string.es.preferences_options_notifications_none = 'Desactivar'
-z.string.es.preferences_options_notifications_obfuscate = 'Ocultar detalles del mensaje'
+z.string.es.preferences_options_notifications_obfuscate = 'Ocultar detalles'
+z.string.es.preferences_options_notifications_obfuscate_message = 'Mostrar remitente'
 z.string.es.preferences_options_notifications_on = 'Mostrar remitente y mensaje'
 
 # Search
@@ -453,7 +459,10 @@ z.string.es.search_group_hint = 'Seguir intentando o elegir más personas para c
 z.string.es.search_connect = 'Conectar'
 z.string.es.search_connections = 'Conexiones'
 z.string.es.search_groups = 'Grupos'
+z.string.es.search_placeholder = 'Buscar por nombre o usuario'
 z.string.es.search_top_people = 'Personas más importantes'
+z.string.es.search_try_search = 'Encontrar personas por nombre o usuario'
+z.string.es.search_no_contacts_on_wire = 'No tienes contactos en Wire. Trata de encontrar personas por nombre o usuario.'
 z.string.es.search_others = 'Conectar'
 z.string.es.search_friend_in_common = '%no persona en común'
 z.string.es.search_friends_in_common = '%no personas en común'

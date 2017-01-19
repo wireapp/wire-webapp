@@ -184,7 +184,9 @@ z.string.tr.modal_logout_headline = 'Veriyi Temizle?'
 z.string.tr.modal_logout_message = 'Bu cihazdaki tüm kişisel bilgileriniz ve görüşme kayıtlarınızı silin.'
 z.string.tr.modal_logout_button = 'Çıkış yap'
 # New device
-z.string.tr.modal_new_device_headline = '"%@.name" yeni bir cihaz kullanmaya başladı'
+z.string.tr.modal_new_device_headline = '%@.name yeni bir cihaz kullanmaya başladı'
+z.string.tr.modal_new_device_headline_many = '%@.names yeni bir cihaz kullanmaya başladı'
+z.string.tr.modal_new_device_headline_you = '%@.name yeni bir cihaz kullanmaya başladı'
 z.string.tr.modal_new_device_message = 'Hâlâ mesajlarınızı göndermek istiyor musunuz?'
 z.string.tr.modal_new_device_show_device = 'cihazı göster'
 z.string.tr.modal_new_device_send_anyway = 'yine de gönder'
@@ -446,7 +448,8 @@ z.string.tr.preferences_options_data_checkbox = 'Kullanım ve kilitlenme raporla
 z.string.tr.preferences_options_data_detail = 'Anonim bilgiler göndererek Wire’ın daha iyi olmasını sağlayabilirsiniz.'
 z.string.tr.preferences_options_notifications = 'Bildirimler'
 z.string.tr.preferences_options_notifications_none = 'Yok'
-z.string.tr.preferences_options_notifications_obfuscate = 'Mesaj detaylarını gizle'
+z.string.tr.preferences_options_notifications_obfuscate = 'Ayrıntıyı gizle'
+z.string.tr.preferences_options_notifications_obfuscate_message = 'Göndereni göster'
 z.string.tr.preferences_options_notifications_on = 'Göndereni ve mesajı göster'
 
 # Search
@@ -470,6 +473,7 @@ z.string.tr.upload_google_message_error = 'Bilgilerinzi alamadık. Lütfen kişi
 z.string.tr.upload_google_button_again = 'Tekrar deneyin'
 
 # URLs
+z.string.tr.url_password_reset = 'forgot/'
 z.string.tr.url_legal = 'https://wire.com/legal/'
 z.string.tr.url_privacy = 'https://wire.com/privacy/'
 z.string.tr.url_privacy_why = 'https://wire.com/privacy/why/'

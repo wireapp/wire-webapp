@@ -27,56 +27,39 @@ class z.ViewModel.content.CollectionViewModel
 
     @conversation_et = ko.observable()
 
-    @audio = ko.observableArray()
-    @files = ko.observableArray()
-    @images = ko.observableArray()
-    @links = ko.observableArray()
-    @video = ko.observableArray()
+    @files = ko.observableArray().extend 'rateLimit': 1
+    @images = ko.observableArray().extend 'rateLimit': 1
+    @links = ko.observableArray().extend 'rateLimit': 1
 
     @no_items_found = ko.observable false
 
+  added_to_view: =>
+    $(document).on 'keydown.collection', (event) =>
+      amplify.publish z.event.WebApp.CONVERSATION.SHOW, @conversation_et() if event.keyCode is z.util.KEYCODE.ESC
+
   removed_from_view: =>
+    $(document).off 'keydown.collection'
     @no_items_found false
     @conversation_et null
-    [@images, @files, @links, @audio, @video].forEach (array) -> array.removeAll()
+    [@images, @files, @links].forEach (array) -> array.removeAll()
 
   set_conversation: (conversation_et) =>
     @conversation_et conversation_et
     @conversation_repository.get_events_for_category conversation_et, z.message.MessageCategory.LINK_PREVIEW
     .then (message_ets) =>
-      if message_ets.length is 0
+      @populate_items message_ets
+      if @images().length + @files().length + @links().length is 0
         @no_items_found true
-      else
-        @populate_items message_ets
 
   populate_items: (message_ets) =>
-    images = []
-    files = []
-    audio = []
-    video = []
-    links = []
-
     for message_et in message_ets
       switch
         when message_et.category & z.message.MessageCategory.IMAGE and not (message_et.category & z.message.MessageCategory.GIF)
-          images.push message_et
+          @images.push message_et
         when message_et.category & z.message.MessageCategory.FILE
-          asset_et = message_et.get_first_asset()
-          switch
-            when asset_et.is_video()
-              video.push message_et
-            when asset_et.is_audio()
-              audio.push message_et
-            else
-              files.push message_et
+          @files.push message_et
         when message_et.category & z.message.MessageCategory.LINK_PREVIEW
-          links.push message_et
-
-    @images images
-    @files files
-    @audio audio
-    @video video
-    @links links
+          @links.push message_et
 
   click_on_back_button: =>
     amplify.publish z.event.WebApp.CONVERSATION.SHOW, @conversation_et()
@@ -85,6 +68,5 @@ class z.ViewModel.content.CollectionViewModel
     @collection_details.set_conversation @conversation_et(), category, [].concat items
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS
 
-  click_on_image: (message_et, event) ->
-    target_element = $(event.currentTarget)
-    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, target_element.find('img')[0].src
+  click_on_image: (message_et) ->
+    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW,  message_et

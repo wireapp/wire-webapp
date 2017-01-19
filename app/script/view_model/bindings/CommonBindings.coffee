@@ -329,11 +329,13 @@ ko.bindingHandlers.in_viewport = do ->
 
   listeners = []
 
-  window.addEventListener 'scroll', (e) ->
+  notify_listeners = _.throttle (e) ->
     listener(e) for listener in listeners by -1 # listeners can be deleted during iteration
-  , true
+  , 300
 
-  init: (element, valueAccessor) ->
+  window.addEventListener 'scroll', notify_listeners, true
+
+  init: (element, valueAccessor, allBindingsAccessor) ->
 
     _in_view = (dom_element) ->
       box = dom_element.getBoundingClientRect()
@@ -352,6 +354,6 @@ ko.bindingHandlers.in_viewport = do ->
         _dispose() if dispose
 
     listeners.push _check_element
-    _check_element()
+    window.setTimeout _check_element, allBindingsAccessor.get('delay') or 0
 
     ko.utils.domNodeDisposal.addDisposeCallback element, _dispose

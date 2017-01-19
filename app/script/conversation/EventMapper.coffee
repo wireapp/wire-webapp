@@ -398,6 +398,8 @@ class z.conversation.EventMapper
   ###
   _map_asset_medium_image: (event, should_create_dummy_image) ->
     asset_et = new z.entity.MediumImage event.data.id
+    asset_et.file_size = event.data.content_length
+    asset_et.file_type = event.data.content_type
     asset_et.width = event.data.info.width
     asset_et.height = event.data.info.height
     asset_et.ratio = asset_et.height / asset_et.width

@@ -119,7 +119,7 @@ class z.main.App
     view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.audio, @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.media, @repository.search, @repository.user, @repository.properties
     view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user, @repository.properties
     view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
-    view.lightbox                  = new z.ViewModel.ImageDetailViewViewModel 'detail-view'
+    view.lightbox                  = new z.ViewModel.ImageDetailViewViewModel 'detail-view', @repository.conversation
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
     view.modals                    = new z.ViewModel.ModalsViewModel 'modals'
 
@@ -403,7 +403,7 @@ class z.main.App
         amplify_objects = amplify.store()
         for amplify_key, amplify_value of amplify_objects
           continue if amplify_key is cookie_label_key and clear_data
-          do_not_delete.push amplify_key if z.util.contains amplify_key, z.storage.StorageKey.AUTH.COOKIE_LABEL
+          do_not_delete.push amplify_key if z.util.StringUtil.includes amplify_key, z.storage.StorageKey.AUTH.COOKIE_LABEL
 
         @repository.cache.clear_cache session_expired, do_not_delete
 

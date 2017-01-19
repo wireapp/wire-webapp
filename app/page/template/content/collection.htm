@@ -1,119 +1,80 @@
 <div id="collection"
-     class="collection content-wrapper"
-     data-bind="with: $root.collection, removed_from_view: $root.collection.removed_from_view">
+     class="collection content"
+     data-bind="with: $root.collection, added_to_view: $root.collection.added_to_view, removed_from_view: $root.collection.removed_from_view">
 
   <!-- ko if: conversation_et() -->
 
     <div class="content-titlebar">
-
-      <span class="content-titlebar-items-center" data-bind="text: conversation_et().display_name()"></span>
-
-      <div class="content-titlebar-items-right">
+      <div class="content-titlebar-items-left">
         <span class="content-titlebar-icon icon-close" data-bind="click: click_on_back_button"></span>
       </div>
-
+      <span class="content-titlebar-items-center" data-bind="text: conversation_et().display_name()"></span>
     </div>
 
-    <div class="content-list collection-list">
+    <div class="content-list-wrapper">
+      <div class="content-list collection-list" data-bind="antiscroll: true">
 
-      <!-- ko ifnot: no_items_found() -->
+        <!-- ko ifnot: no_items_found() -->
+          <!-- ko if: images().length -->
+            <section class="collection-section" data-uie-name="collection-section-image" data-bind="attr: {'data-uie-collection-size': images().length}">
+              <header>
+                <span class="collection-header-icon icon-library"></span>
+                <span class="label-bold-xs" data-bind="l10n_text: z.string.collection_section_images"></span>
+                <!-- ko if: images().length > 12 -->
+                  <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('images', images()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': images().length}}" data-uie-name="collection-show-all"></span> <span class="icon-forward font-size-xxs"></span></span>
+                <!-- /ko -->
+              </header>
+              <div class="collection-images">
+                <!-- ko foreach: {data: images.slice(0, 12), as: 'message_et'} -->
+                  <image-component class="collection-image" data-bind="click: $parent.click_on_image" params="asset: message_et.get_first_asset().resource"></image-component>
+                <!-- /ko -->
+              </div>
+            </section>
+          <!-- /ko -->
 
-        <!-- ko if: images().length -->
-          <section class="collection-section" data-uie-name="collection-section-image">
-            <header>
-              <span class="collection-header-icon icon-library"></span>
-              <span class="label-bold-xs">Pictures</span>
-              <!-- ko if: images().length > 10 -->
-                <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('images', images()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': images().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
-              <!-- /ko -->
-            </header>
-            <div class="collection-images">
-              <!-- ko foreach: {data: images.slice(0, 10), as: 'message_et'} -->
-                <image-component class="collection-image" data-bind="click: $parent.click_on_image" params="asset: message_et.get_first_asset().resource"></image-component>
-              <!-- /ko -->
-            </div>
-          </section>
+          <!-- ko if: links().length -->
+            <section class="collection-section" data-uie-name="collection-section-link" data-bind="attr: {'data-uie-collection-size': links().length}">
+              <header>
+                <span class="collection-header-icon icon-link"></span>
+                <span class="label-bold-xs" data-bind="l10n_text: z.string.collection_section_links"></span>
+                <!-- ko if: links().length > 4 -->
+                  <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('links', links()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': links().length}}" data-uie-name="collection-show-all"></span> <span class="icon-forward font-size-xxs"></span></span>
+                <!-- /ko -->
+              </header>
+              <div class="collection-images">
+                <!-- ko foreach: {data: links.slice(0, 4), as: 'message_et'} -->
+                  <link-preview-asset params="message: message_et, header: true"></link-preview-asset>
+                <!-- /ko -->
+              </div>
+            </section>
+          <!-- /ko -->
+
+          <!-- ko if: files().length -->
+            <section class="collection-section" data-uie-name="collection-section-file" data-bind="attr: {'data-uie-collection-size': files().length}">
+              <header>
+                <span class="collection-header-icon icon-file"></span>
+                <span class="label-bold-xs" data-bind="l10n_text: z.string.collection_section_files"></span>
+                <!-- ko if: files().length > 4 -->
+                  <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('files', files()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': files().length}}" data-uie-name="collection-show-all"></span> <span class="icon-forward font-size-xxs"></span></span>
+                <!-- /ko -->
+              </header>
+              <div class="collection-images">
+                <!-- ko foreach: {data: files.slice(0, 4), as: 'message_et'} -->
+                  <file-asset class="collection-file" params="message: message_et, header: true"></file-asset>
+                <!-- /ko -->
+              </div>
+            </section>
+          <!-- /ko -->
         <!-- /ko -->
 
-        <!-- ko if: links().length -->
-          <section class="collection-section" data-uie-name="collection-section-link">
-            <header>
-              <span class="collection-header-icon icon-link"></span>
-              <span class="label-bold-xs">Links</span>
-              <!-- ko if: links().length > 4 -->
-                <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('links', links()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': links().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
-              <!-- /ko -->
-            </header>
-            <div class="collection-images">
-              <!-- ko foreach: {data: links.slice(0,4), as: 'message_et'} -->
-                <link-preview-compact-asset params="message: message_et, header: true"></link-preview-compact-asset>
-              <!-- /ko -->
-            </div>
-          </section>
+        <!-- ko if: no_items_found() -->
+          <div class="absolute-center" data-uie-name="collection-no-items">
+            <div class="collection-no-items-icon icon-collection"></div>
+            <div class="label-bold-xs text-graphite text-center">No items</div>
+          </div>
         <!-- /ko -->
 
-        <!-- ko if: video().length -->
-          <section class="collection-section" data-uie-name="collection-section-video">
-            <header>
-              <span class="collection-header-icon icon-video"></span>
-              <span class="label-bold-xs">Videos</span>
-              <!-- ko if: video().length > 4 -->
-                <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('video', video()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': video().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
-              <!-- /ko -->
-            </header>
-            <div class="collection-images">
-              <!-- ko foreach: {data: video.slice(0,4), as: 'message_et'} -->
-                <video-asset class="collection-video" params="message: message_et"></video-asset>
-              <!-- /ko -->
-            </div>
-          </section>
-        <!-- /ko -->
-
-        <!-- ko if: audio().length -->
-          <section class="collection-section" data-uie-name="collection-section-audio">
-            <header>
-              <span class="collection-header-icon icon-microphone"></span>
-              <span class="label-bold-xs">Audio messages</span>
-              <!-- ko if: audio().length > 4 -->
-                <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('audio', audio()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': audio().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
-              <!-- /ko -->
-            </header>
-            <div class="collection-images">
-              <!-- ko foreach: {data: audio.slice(0,4), as: 'message_et'} -->
-                <audio-asset class="collection-file" params="message: message_et, header: true"></audio-asset>
-              <!-- /ko -->
-            </div>
-          </section>
-        <!-- /ko -->
-
-        <!-- ko if: files().length -->
-          <section class="collection-section" data-uie-name="collection-section-file">
-            <header>
-              <span class="collection-header-icon icon-file"></span>
-              <span class="label-bold-xs">files</span>
-              <!-- ko if: files().length > 4 -->
-                <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('files', files()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': files().length}}" data-uie-name="collection-size"></span> <span class="icon-forward font-size-xxs"></span></span>
-              <!-- /ko -->
-            </header>
-            <div class="collection-images">
-              <!-- ko foreach: {data: files.slice(0,4), as: 'message_et'} -->
-                <file-asset class="collection-file" params="message: message_et, header: true"></file-asset>
-              <!-- /ko -->
-            </div>
-          </section>
-        <!-- /ko -->
-
-      <!-- /ko -->
-
-      <!-- ko if: no_items_found() -->
-
-        <div class="absolute-center" data-uie-name="collection-no-items">
-          <div class="collection-no-items-icon icon-collection"></div>
-          <div class="label-bold-xs text-graphite text-center">No items</div>
-        </div>
-
-      <!-- /ko -->
-
+      </div>
     </div>
 
   <!-- /ko -->

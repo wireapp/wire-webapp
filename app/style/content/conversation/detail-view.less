@@ -17,6 +17,7 @@
  *
  */
 
+// modal
 .detail-view {
 
   &.modal:before {
@@ -28,22 +29,68 @@
   }
 }
 
+// wrapper
+.detail-view-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  width: 100%;
+}
+
+// layout
+.detail-view-header {
+  .flex-center;
+  flex: 0 0 auto;
+  height: 72px;
+  line-height: @line-height-sm;
+}
+
+.detail-view-header-close-button {
+  .circle(40px);
+  .flex-center;
+  right: 24px;
+  cursor: pointer;
+  position: absolute;
+}
+
+.detail-view-main {
+  .flex-center;
+  flex: 1 1;
+}
+
+// fix flexbox issue in FF
+@-moz-document url-prefix() {
+  .detail-view-main {
+    min-height: 0;
+  }
+}
+
+.detail-view-footer {
+  .flex-center;
+  flex: 0 0 auto;
+  height: 72px;
+
+  .detail-view-action-button + .detail-view-action-button {
+    margin-left: 40px;
+  }
+}
+
+// TODO generic butotn
+.detail-view-action-button {
+  .label-bold-xs;
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+
+  & > span:first-child {
+    margin-right: 12px;
+  }
+}
+
 .detail-view-image {
   max-width: 84%;
   max-height: 84%;
   width: auto;
-}
-
-.detail-view-close-button {
-  .circle(40px);
-  .flex-center;
-  background-color: fade(#fff, 24%);
-  position: absolute;
-  right: 24px;
-  top: 24px;
-  cursor: pointer;
-
-  > span {
-    position: relative;
-  }
+  height: auto;
 }

@@ -21,7 +21,6 @@ z.string.de.wire = 'Wire'
 z.string.de.wire_macos = 'Wire für macOS'
 z.string.de.wire_windows = 'Wire für Windows'
 z.string.de.wire_linux = 'Wire für Linux'
-z.string.de.truncation = '…'
 z.string.de.nonexistent_user = 'Gelöschte Person'
 z.string.de.and = 'und'
 
@@ -186,7 +185,9 @@ z.string.de.modal_logout_headline = 'Daten löschen?'
 z.string.de.modal_logout_message = 'Deine persönlichen Daten und Unterhaltungen vollständig von diesem Gerät entfernen.'
 z.string.de.modal_logout_button = 'Abmelden'
 # New device
-z.string.de.modal_new_device_headline = '"%@.name" hat begonnen ein neues Gerät zu nutzen'
+z.string.de.modal_new_device_headline = '%@.name hat begonnen ein neues Gerät zu nutzen'
+z.string.de.modal_new_device_headline_many = '%@.names haben begonnen ein neues Gerät zu nutzen'
+z.string.de.modal_new_device_headline_you = '%@.name hast begonnen ein neues Gerät zu nutzen'
 z.string.de.modal_new_device_message = 'Möchtest du die Nachrichten noch senden?'
 z.string.de.modal_new_device_show_device = 'Gerät anzeigen'
 z.string.de.modal_new_device_send_anyway = 'Dennoch senden'
@@ -270,6 +271,9 @@ z.string.de.conversation_edit_timestamp = 'Editiert um %@timestamp'
 z.string.de.conversation_likes_caption = '%@number Personen'
 z.string.de.conversation_send_pasted_file = 'Bild eingefügt am %date'
 
+# Collection
+z.string.de.collection_show_all = 'Zeige alle %no'
+
 # Archive
 z.string.de.archive_header = 'Archivieren'
 
@@ -302,8 +306,8 @@ z.string.de.invite_meta_key_pc = 'Strg'
 z.string.de.invite_hint_selected = 'Zum Kopieren %meta_key + C drücken'
 z.string.de.invite_hint_unselected = 'Markieren und %meta_key + C drücken'
 z.string.de.invite_headline = 'Lade Freunde zu Wire ein'
-z.string.de.invite_message = 'Ich benutze Wire. Suche nach %username oder gehe auf wire.com/download.'
-z.string.de.invite_message_no_email = 'Ich bin bei Wire. Gehe auf https://get.wire.com, um mich als Kontakt hinzuzufügen.'
+z.string.de.invite_message = 'Ich benutze Wire. Suche nach %username oder gehe auf get.wire.com.'
+z.string.de.invite_message_no_email = 'Ich benutze Wire. Gehe auf get.wire.com, um mich als Kontakt hinzuzufügen.'
 
 # Extensions
 z.string.de.extensions_bubble_button_gif = 'Gif'
@@ -522,6 +526,7 @@ z.string.de.warning_connectivity_no_internet = 'Keine Internetverbindung. Du kan
 # Browser notifications
 z.string.de.system_notification_asset_add = 'Hat ein Bild geteilt'
 z.string.de.system_notification_connection_accepted = 'Hat deine Kontaktanfrage akzeptiert'
+z.string.de.system_notification_connection_connected = 'Ist jetzt ein Kontakt von dir'
 z.string.de.system_notification_connection_request = 'Möchte dich als Kontakt hinzufügen'
 z.string.de.system_notification_conversation_create = '%s.first_name hat eine Unterhaltung begonnen'
 z.string.de.system_notification_conversation_rename = '%s.first_name hat die Unterhaltung in %name umbenannt'

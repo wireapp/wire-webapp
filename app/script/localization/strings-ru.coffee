@@ -184,7 +184,9 @@ z.string.ru.modal_logout_headline = 'Удалить данные?'
 z.string.ru.modal_logout_message = 'Удалить все ваши личные данные и разговоры на этом устройстве.'
 z.string.ru.modal_logout_button = 'Выход'
 # New device
-z.string.ru.modal_new_device_headline = '"%@.name" начал(а) использовать новое устройство'
+z.string.ru.modal_new_device_headline = '%@.name начал(а) использовать новое устройство'
+z.string.ru.modal_new_device_headline_many = '%@.names начал(а) использовать новое устройство'
+z.string.ru.modal_new_device_headline_you = '%@.name начал(а) использовать новое устройство'
 z.string.ru.modal_new_device_message = 'Вы всё ещё хотите отправить ваши сообщения?'
 z.string.ru.modal_new_device_show_device = 'показать устройство'
 z.string.ru.modal_new_device_send_anyway = 'отправить всё равно'
@@ -266,6 +268,9 @@ z.string.ru.conversation_context_menu_unlike = 'Не нравится'
 z.string.ru.conversation_delete_timestamp = 'Удалено %@timestamp'
 z.string.ru.conversation_edit_timestamp = 'Изменено %@timestamp'
 z.string.ru.conversation_likes_caption = '%@number участникам'
+z.string.ru.conversation_send_pasted_file = 'Изображение добавлено %date'
+
+# Collection
 
 # Archive
 z.string.ru.archive_header = 'Архив'
@@ -324,7 +329,6 @@ z.string.ru.people_no_matches = 'Совпадений не найдено.\nПо
 z.string.ru.people_invite = 'Пригласить людей'
 z.string.ru.people_share = 'Поделиться контактами'
 z.string.ru.people_bring_your_friends = 'Приведите друзей в Wire'
-z.string.ru.people_invite_detail = 'Предоставление доступа к вашим контактам поможет вам связаться с другими людьми. Вся информация анонимна, мы не предоставляем её третьим лицам.'
 z.string.ru.people_invite_button_contacts = 'Из контактов'
 z.string.ru.people_invite_button_gmail = 'Из Gmail'
 z.string.ru.people_invite_headline = 'Приведите друзей'
@@ -446,7 +450,8 @@ z.string.ru.preferences_options_data_checkbox = 'Отчеты о сбоях и �
 z.string.ru.preferences_options_data_detail = 'Сделайте Wire лучше, отправляя анонимную информацию.'
 z.string.ru.preferences_options_notifications = 'Уведомления'
 z.string.ru.preferences_options_notifications_none = 'Выключены'
-z.string.ru.preferences_options_notifications_obfuscate = 'Скрывать подробности сообщения'
+z.string.ru.preferences_options_notifications_obfuscate = 'Скрывать содержание сообщения'
+z.string.ru.preferences_options_notifications_obfuscate_message = 'Показывать имя отправителя'
 z.string.ru.preferences_options_notifications_on = 'Показывать имя отправителя и текст сообщения'
 
 # Search

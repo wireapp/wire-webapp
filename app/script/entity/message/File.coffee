@@ -46,7 +46,6 @@ class z.entity.File extends z.entity.Asset
     @preview_resource = ko.observable()
 
     @download_progress = ko.pureComputed => @original_resource()?.download_progress()
-    @cancel_download = => @original_resource()?.cancel_download()
 
     @upload_id = ko.observable()
     @upload_progress = ko.observable()
@@ -115,6 +114,10 @@ class z.entity.File extends z.entity.Asset
     .catch (error) =>
       @logger.error 'Failed to download asset', error
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.DOWNLOAD_FAILED, tracking_data
+
+  cancel_download: =>
+    @status z.assets.AssetTransferState.UPLOADED
+    @original_resource()?.cancel_download()
 
   cancel: (message_et) =>
     amplify.publish z.event.WebApp.CONVERSATION.ASSET.CANCEL, message_et

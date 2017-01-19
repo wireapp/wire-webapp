@@ -21,7 +21,6 @@ z.string.wire = 'Wire'
 z.string.wire_macos = 'Wire for macOS'
 z.string.wire_windows = 'Wire for Windows'
 z.string.wire_linux = 'Wire for Linux'
-z.string.truncation = '…'
 z.string.nonexistent_user = 'Deleted User'
 z.string.and = 'and'
 
@@ -186,7 +185,9 @@ z.string.modal_logout_headline = 'Clear Data?'
 z.string.modal_logout_message = 'Delete all your personal information and conversations on this device.'
 z.string.modal_logout_button = 'Log out'
 # New device
-z.string.modal_new_device_headline = '"%@.name" started using a new device'
+z.string.modal_new_device_headline = '%@.name started using a new device'
+z.string.modal_new_device_headline_many = '%@.names started using a new device'
+z.string.modal_new_device_headline_you = '%@.name started using a new device'
 z.string.modal_new_device_message = 'Do you still want to send your messages?'
 z.string.modal_new_device_show_device = 'show device'
 z.string.modal_new_device_send_anyway = 'send anyway'
@@ -272,6 +273,9 @@ z.string.conversation_send_pasted_file = 'Pasted image at %date'
 
 # Collection
 z.string.collection_show_all = 'Show all %no'
+z.string.collection_section_links = 'Links'
+z.string.collection_section_images = 'Pictures'
+z.string.collection_section_files = 'Files'
 
 # Archive
 z.string.archive_header = 'Archive'
@@ -525,6 +529,7 @@ z.string.warning_connectivity_no_internet = 'No Internet. You won’t be able to
 # Browser notifications
 z.string.system_notification_asset_add = 'Shared a picture'
 z.string.system_notification_connection_accepted = 'Accepted your connection request'
+z.string.system_notification_connection_connected = 'Are now connected'
 z.string.system_notification_connection_request = 'Wants to connect'
 z.string.system_notification_conversation_create = '%s.first_name started a conversation'
 z.string.system_notification_conversation_rename = '%s.first_name renamed the conversation to %name'

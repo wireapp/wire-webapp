@@ -17,17 +17,9 @@
 #
 
 window.z ?= {}
-z.components ?= {}
+z.util ?= {}
+z.util.LocalizerUtil ?= {}
 
-class z.components.AssetHeader
-
-  constructor: (params) ->
-    @message_et = params.message
-
-
-ko.components.register 'asset-header',
-  viewModel: z.components.AssetHeader
-  template: """
-            <span class="asset-header-name" data-bind="text: message_et.user().first_name(), css: message_et.accent_color"></span>
-            <span class="asset-header-time" data-bind="text: moment(message_et.timestamp).format('D.M H:mm')"></span>
-            """
+z.util.LocalizerUtil.join_names = (user_ets, declension = z.string.Declension.ACCUSATIVE) ->
+  names_string = (z.util.get_first_name user_et, declension for user_et in user_ets).join ', '
+  return names_string.replace /,(?=[^,]*$)/, " #{z.localization.Localizer.get_text z.string.and}"

@@ -184,7 +184,9 @@ z.string.ro.modal_logout_headline = 'Curăță datele?'
 z.string.ro.modal_logout_message = 'Șterge toate informațiile personale și conversațiile de pe acest dispozitiv.'
 z.string.ro.modal_logout_button = 'Deconectare'
 # New device
-z.string.ro.modal_new_device_headline = '„%@.name” a început să folosească un nou dispozitiv'
+z.string.ro.modal_new_device_headline = '%@.name a început să folosească un nou dispozitiv'
+z.string.ro.modal_new_device_headline_many = '%@.names a început să folosească un nou dispozitiv'
+z.string.ro.modal_new_device_headline_you = '%@.name a început să folosească un nou dispozitiv'
 z.string.ro.modal_new_device_message = 'Încă dorești să fie trimise mesajele?'
 z.string.ro.modal_new_device_show_device = 'arată dispozitivul'
 z.string.ro.modal_new_device_send_anyway = 'trimite oricum'
@@ -446,7 +448,8 @@ z.string.ro.preferences_options_data_checkbox = 'Rapoarte de folosire și de ava
 z.string.ro.preferences_options_data_detail = 'Ajută la îmbunătățirea Wire prin trimiterea de informații anonime.'
 z.string.ro.preferences_options_notifications = 'Notificări'
 z.string.ro.preferences_options_notifications_none = 'Închis'
-z.string.ro.preferences_options_notifications_obfuscate = 'Ascunde detaliile mesajelor'
+z.string.ro.preferences_options_notifications_obfuscate = 'Ascunde detaliile'
+z.string.ro.preferences_options_notifications_obfuscate_message = 'Arată expeditorul'
 z.string.ro.preferences_options_notifications_on = 'Arată expeditorul și mesajul'
 
 # Search

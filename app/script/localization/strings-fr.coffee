@@ -184,7 +184,9 @@ z.string.fr.modal_logout_headline = 'Supprimer les données ?'
 z.string.fr.modal_logout_message = 'Supprime toutes vos informations personnelles et conversations de cet appareil.'
 z.string.fr.modal_logout_button = 'Se déconnecter'
 # New device
-z.string.fr.modal_new_device_headline = '"%@.name" a commencé à utiliser un nouvel appareil'
+z.string.fr.modal_new_device_headline = '%@.name a commencé à utiliser un nouvel appareil'
+z.string.fr.modal_new_device_headline_many = '%@.names a commencé à utiliser un nouvel appareil'
+z.string.fr.modal_new_device_headline_you = '%@.name a commencé à utiliser un nouvel appareil'
 z.string.fr.modal_new_device_message = 'Voulez-vous toujours envoyer vos messages ?'
 z.string.fr.modal_new_device_show_device = 'afficher l’appareil'
 z.string.fr.modal_new_device_send_anyway = 'envoyer quand même'
@@ -266,6 +268,9 @@ z.string.fr.conversation_context_menu_unlike = 'Je n’aime plus'
 z.string.fr.conversation_delete_timestamp = 'Supprimé le %@timestamp'
 z.string.fr.conversation_edit_timestamp = 'Édité le %@timestamp'
 z.string.fr.conversation_likes_caption = '%@number personnes'
+z.string.fr.conversation_send_pasted_file = 'Image copiée le %date'
+
+# Collection
 
 # Archive
 z.string.fr.archive_header = 'Archiver'
@@ -287,7 +292,11 @@ z.string.fr.conversations_popover_silence = 'Désactiver le micro'
 z.string.fr.conversations_popover_unarchive = 'Désarchiver'
 
 # Takeover
+z.string.fr.takeover_headline = 'Les noms sont ici.'
+z.string.fr.takeover_sub = 'Choisissez votre nom unique sur Wire.'
 z.string.fr.takeover_link = 'En savoir plus '
+z.string.fr.takeover_button_choose = 'Choisissez le vôtre'
+z.string.fr.takeover_button_keep = 'Garder celui-là'
 
 # Invites
 z.string.fr.invite_meta_key_mac = 'Cmd'
@@ -398,6 +407,9 @@ z.string.fr.preferences_account_reset_password = 'Réinitialiser le mot de passe
 z.string.fr.preferences_account_delete = 'Supprimer le compte'
 z.string.fr.preferences_account_log_out = 'Se déconnecter'
 z.string.fr.preferences_account_username_placeholder = 'Votre nom complet'
+z.string.fr.preferences_account_username_hint = 'Au moins 2 caractères. a — z, 0 — 9 et _ seulement.'
+z.string.fr.preferences_account_username_available = 'Disponible'
+z.string.fr.preferences_account_username_error_taken = 'Déjà pris'
 
 z.string.fr.preferences_av_camera = 'Caméra'
 z.string.fr.preferences_av_microphone = 'Microphone'
@@ -437,7 +449,8 @@ z.string.fr.preferences_options_data_checkbox = 'Rapports d’utilisation et de 
 z.string.fr.preferences_options_data_detail = 'Améliorez Wire en envoyant des informations anonymes.'
 z.string.fr.preferences_options_notifications = 'Notifications'
 z.string.fr.preferences_options_notifications_none = 'Désactivé'
-z.string.fr.preferences_options_notifications_obfuscate = 'Masquer les détails du message'
+z.string.fr.preferences_options_notifications_obfuscate = 'Cacher les détails'
+z.string.fr.preferences_options_notifications_obfuscate_message = 'Afficher l’expéditeur'
 z.string.fr.preferences_options_notifications_on = 'Afficher l’expéditeur et le message'
 
 # Search
@@ -445,8 +458,13 @@ z.string.fr.search_group_hint = 'Continuez d’écrire ou ajoutez plus de person
 z.string.fr.search_connect = 'Connecter'
 z.string.fr.search_connections = 'Connexions'
 z.string.fr.search_groups = 'Groupes'
+z.string.fr.search_placeholder = 'Rechercher par nom ou par identifiant'
 z.string.fr.search_top_people = 'Personnes favorites'
+z.string.fr.search_try_search = 'Trouver des personnes par\nnom ou nom d’utilisateur'
+z.string.fr.search_no_contacts_on_wire = 'Vous n’avez pas de contacts sur Wire.\nEssayez de trouver des gens par\nleur nom ou leur nom d’utilisateur.'
 z.string.fr.search_others = 'Connecter'
+z.string.fr.search_friend_in_common = '%no personne en commun'
+z.string.fr.search_friends_in_common = '%no personnes en commun'
 
 # Google contacts upload
 z.string.fr.upload_google_headline = 'Trouvez des personnes\nà qui parler.'
@@ -473,6 +491,7 @@ z.string.fr.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/a
 z.string.fr.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.fr.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
 z.string.fr.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.fr.url_support_usernames = 'https://wire.com/support/username'
 z.string.fr.url_decrypt_error_1 = 'https://wire.com/privacy/error-1'
 z.string.fr.url_decrypt_error_2 = 'https://wire.com/privacy/error-2'
 

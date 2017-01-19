@@ -17,17 +17,9 @@
 #
 
 window.z ?= {}
-z.components ?= {}
+z.conversation ?= {}
 
-class z.components.AssetHeader
-
-  constructor: (params) ->
-    @message_et = params.message
-
-
-ko.components.register 'asset-header',
-  viewModel: z.components.AssetHeader
-  template: """
-            <span class="asset-header-name" data-bind="text: message_et.user().first_name(), css: message_et.accent_color"></span>
-            <span class="asset-header-time" data-bind="text: moment(message_et.timestamp).format('D.M H:mm')"></span>
-            """
+z.conversation.ConversationVerificationState =
+  UNVERIFIED: 0
+  VERIFIED: 1
+  DEGRADED: 2

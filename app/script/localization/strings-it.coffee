@@ -184,7 +184,9 @@ z.string.it.modal_logout_headline = 'Cancella dati?'
 z.string.it.modal_logout_message = 'Elimina tutti i tuoi dati personali e le conversazioni su questo dispositivo.'
 z.string.it.modal_logout_button = 'Logout'
 # New device
-z.string.it.modal_new_device_headline = '"%@.name" ha iniziato a utilizzare un nuovo dispositivo'
+z.string.it.modal_new_device_headline = '%@.name ha iniziato a utilizzare un nuovo dispositivo'
+z.string.it.modal_new_device_headline_many = '%@.names ha iniziato a utilizzare un nuovo dispositivo'
+z.string.it.modal_new_device_headline_you = '%@.name ha iniziato a utilizzare un nuovo dispositivo'
 z.string.it.modal_new_device_message = 'Vuoi comunque mandare il messaggio?'
 z.string.it.modal_new_device_show_device = 'visualizza dispositivo'
 z.string.it.modal_new_device_send_anyway = 'invia comunque'
@@ -300,8 +302,6 @@ z.string.it.invite_meta_key_pc = 'Ctrl'
 z.string.it.invite_hint_selected = 'Premere %meta_key + C per copiare'
 z.string.it.invite_hint_unselected = 'Selezionare e premere % meta_key + C'
 z.string.it.invite_headline = 'Invita amici ad usare Wire'
-z.string.it.invite_message = 'Sono su Wire, cerca %username o visita wire.com/download.'
-z.string.it.invite_message_no_email = 'Sono su Wire. Visita https://get.wire.com per connetterti con me.'
 
 # Extensions
 z.string.it.extensions_bubble_button_gif = 'Gif'
@@ -445,7 +445,8 @@ z.string.it.preferences_options_data_checkbox = 'Segnalazioni di crash e dati di
 z.string.it.preferences_options_data_detail = 'Migliora Wire con l’invio di informazioni anonime.'
 z.string.it.preferences_options_notifications = 'Notifiche'
 z.string.it.preferences_options_notifications_none = 'Off'
-z.string.it.preferences_options_notifications_obfuscate = 'Nascondi i dettagli messaggio'
+z.string.it.preferences_options_notifications_obfuscate = 'Nascondi dettagli'
+z.string.it.preferences_options_notifications_obfuscate_message = 'Mostra mittente'
 z.string.it.preferences_options_notifications_on = 'Mostra mittente e messaggio'
 
 # Search

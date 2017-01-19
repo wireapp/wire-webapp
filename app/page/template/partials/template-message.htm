@@ -34,8 +34,8 @@
     <div class="message-header-icon">
       <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
     </div>
-    <div class="message-header-label label-bold">
-      <span data-bind='text: message.sender_name()'></span>
+    <div class="message-header-label">
+      <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
     </div>
     <div class="message-body-actions message-body-actions-large">
@@ -50,8 +50,8 @@
       <div class="message-header-icon">
         <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
       </div>
-      <div class="message-header-label label-bold">
-        <span data-bind='text: message.user().first_name()'></span>
+      <div class="message-header-label">
+        <span class="label-bold" data-bind='text: message.user().first_name()'></span>
         <!-- ko if: was_edited() -->
           <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
         <!-- /ko -->
@@ -62,11 +62,11 @@
 
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
       <!-- ko if: asset.is_image() -->
-        <div class="message-asset-image" data-bind="fit_to_viewport: asset">
+        <div class="message-asset-image">
           <div class="image image-loading" data-bind="
             attr: {'data-uie-visible': $parent.visible},
             background_image: asset.resource,
-            click: $parents[1].show_detail,
+            click: function(data, event) {$parents[1].show_detail(message, event)},
             css: {'bg-color-ephemeral': message.is_expired()},
             viewport_changed: $parents[1].viewport_changed
             " data-uie-name="go-image-detail">
@@ -92,7 +92,7 @@
           <div class="text" data-bind="html: asset.render(), css: {'text-graphite': $parent.is_editing, 'text-large': z.util.emoji.includes_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.is_expired()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
-          <link-preview-compact-asset data-bind="css: {'ephemeral-asset-expired': message.is_expired()}" params="message: message"></link-preview-compact-asset>
+          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.is_expired()}" params="message: message"></link-preview-asset>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.is_video() -->
@@ -270,7 +270,7 @@
       <hr class="message-header-line" />
     </div>
   </div>
-  <div class="message-body label-semibold" data-bind="text: message.name"></div>
+  <div class="message-body label-bold" data-bind="text: message.name"></div>
 </script>
 
 <script type="text/html" id="unable-to-decrypt">

@@ -22,9 +22,16 @@
 // ----------------------------------------------------------------------------
 
 .ellipsis {
-  white-space: pre;
+  white-space: pre; // TODO should be nowrap
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.ellipsis-multiline(@lines) {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: @lines;
+  -webkit-box-orient: vertical;
 }
 
 .text-nowrap {
@@ -45,6 +52,10 @@
 
 .text-uppercase {
   text-transform: uppercase;
+}
+
+.text-capitalize {
+  text-transform: capitalize
 }
 
 .text-underline {

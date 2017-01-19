@@ -184,7 +184,9 @@ z.string.sl.modal_logout_headline = 'Počisti podatke?'
 z.string.sl.modal_logout_message = 'Izbriši vse vaše osebne podatke in pogovore na tej napravi.'
 z.string.sl.modal_logout_button = 'Odjava'
 # New device
-z.string.sl.modal_new_device_headline = '"%@.name" je začel(-a) z uporabo nove naprave'
+z.string.sl.modal_new_device_headline = '%@.name je začel(-a) z uporabo nove naprave'
+z.string.sl.modal_new_device_headline_many = '%@.names je začel(-a) z uporabo nove naprave'
+z.string.sl.modal_new_device_headline_you = '%@.name je začel(-a) z uporabo nove naprave'
 z.string.sl.modal_new_device_message = 'Ali še vedno želite poslati vaša sporočila?'
 z.string.sl.modal_new_device_show_device = 'pokaži napravo'
 z.string.sl.modal_new_device_send_anyway = 'pošlji vseeno'
@@ -445,7 +447,8 @@ z.string.sl.preferences_options_data_checkbox = 'Podatki o uporabi in poročila 
 z.string.sl.preferences_options_data_detail = 'Izboljšajte Wire s pošiljanjem anonimnih informacij.'
 z.string.sl.preferences_options_notifications = 'Obvestila'
 z.string.sl.preferences_options_notifications_none = 'Izklopljeno'
-z.string.sl.preferences_options_notifications_obfuscate = 'Skrij podrobnosti sporočila'
+z.string.sl.preferences_options_notifications_obfuscate = 'Skrij podrobnosti'
+z.string.sl.preferences_options_notifications_obfuscate_message = 'Pokaži pošiljatelja'
 z.string.sl.preferences_options_notifications_on = 'Pokaži pošiljatelja in sporočilo'
 
 # Search
@@ -469,6 +472,7 @@ z.string.sl.upload_google_message_error = 'Nismo prejeli vaših podatkov. Prosim
 z.string.sl.upload_google_button_again = 'Poskusite ponovno'
 
 # URLs
+z.string.sl.url_password_reset = 'forgot/'
 z.string.sl.url_terms_of_use = 'https://wire.com/legal/terms/'
 z.string.sl.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412'
 z.string.sl.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
