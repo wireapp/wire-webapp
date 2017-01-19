@@ -35,16 +35,11 @@ class z.ViewModel.content.CollectionDetailsViewModel
   set_conversation: (conversation_et, category, items) =>
     @template category
     @conversation_et conversation_et
-    @push_deferred @items, items
+    z.util.ko_push_deferred @items, items
 
   removed_from_view: =>
     @conversation_et null
     @items.removeAll()
-
-  should_show_header: (message_et) =>
-    if not @last_message_timestamp? or moment(message_et.timestamp).format('M') isnt moment(@last_message_timestamp).format('M')
-      @last_message_timestamp = message_et.timestamp
-      return true
 
   click_on_back_button: ->
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION
@@ -52,13 +47,26 @@ class z.ViewModel.content.CollectionDetailsViewModel
   click_on_image: (message_et) ->
     amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et
 
-  # helper
-  push_deferred: (target, src, number = 100, delay = 300) ->
-    interval = window.setInterval ->
-      chunk = src.splice 0, number
-      z.util.ko_array_push_all target, chunk
+  should_show_header: (message_et) =>
+    if not @last_message_timestamp? # first message
+      @last_message_timestamp = message_et.timestamp
+      return true
 
-      if src.length is 0
-        window.clearInterval interval
+    # we passed today
+    if not moment(message_et.timestamp).isSame(@last_message_timestamp, 'd') and moment(@last_message_timestamp).isSame new Date(), 'd'
+      @last_message_timestamp = message_et.timestamp
+      return true
 
-    , delay
+    # we passed the month
+    if not moment(message_et.timestamp).isSame(@last_message_timestamp, 'M')
+      @last_message_timestamp = message_et.timestamp
+      return true
+
+  get_title_for_header: (message_et) =>
+    message_date = moment(message_et.timestamp)
+    if message_date.isSame new Date(), 'd' # today
+      return z.localization.Localizer.get_text z.string.conversation_today
+    if message_date.isSame new Date(), 'y'# same year
+      return message_date.format 'MMMM'
+    return message_date.format 'MMMM Y'
+
