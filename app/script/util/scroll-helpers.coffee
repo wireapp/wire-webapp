@@ -28,9 +28,6 @@ $.fn.scroll_to_bottom = ->
   $element = $(@)
   return if $element.length is 0
   $element.scrollTop $element[0].scrollHeight
-  window.setTimeout =>
-    $element.scrollTop $element[0].scrollHeight if not $(@).is_scrolled_bottom()
-  , 200
 
 $.fn.scroll_by = (distance) ->
   $element = $(@)

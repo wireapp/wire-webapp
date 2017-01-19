@@ -147,16 +147,15 @@ class z.ViewModel.MessageListViewModel
     # hide conversation until everything is processed
     $('.conversation').css opacity: 0
 
-    @conversation_is_changing = false
-
-    messages_container = $('.messages-wrap')
-    messages_container.on 'mousewheel', @on_mouse_wheel
-
     window.requestAnimationFrame =>
       if conversation_et isnt @conversation()
         @logger.info 'Skipped loading conversation', conversation_et.display_name()
         return
 
+      messages_container = $('.messages-wrap')
+      messages_container.on 'mousewheel', @on_mouse_wheel
+
+      @conversation_is_changing = false
       @capture_scrolling_event = true
 
       if not messages_container.is_scrollable()
