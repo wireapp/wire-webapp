@@ -29,14 +29,10 @@ class z.calling.e_call.ECallError
     @message = message or switch @type
       when z.calling.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED
         'E-call has not yet established data channel'
-      when z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
-        'No e-call for conversation ID found'
       when z.calling.e_call.ECallError::TYPE.NO_CONVERSATION_ID
         'No conversation ID given'
-      when z.calling.e_call.ECallError::TYPE.NOT_SUPPORTED
-        'Tried to use calling v3 API in group conversation'
-      when z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
-        'No participant for given ID'
+      when z.calling.e_call.ECallError::TYPE.NOT_FOUND
+        'No e-call for conversation ID found'
       when z.calling.e_call.ECallError::TYPE.UNKNOWN_EVENT_TYPE
         'E-call event of unknown type was ignored'
       when z.calling.e_call.ECallError::TYPE.UNSUPPORTED_VERSION
@@ -50,9 +46,8 @@ class z.calling.e_call.ECallError
   @::constructor = @
   @::TYPE =
     DATA_CHANNEL_NOT_OPENED: 'z.calling.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED'
-    E_CALL_NOT_FOUND: 'z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND'
     NO_CONVERSATION_ID: 'z.calling.e_call.ECallError::TYPE.NO_CONVERSATION_ID'
-    PARTICIPANT_NOT_FOUND: 'z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND'
+    NOT_FOUND: 'z.calling.e_call.ECallError::TYPE.NOT_FOUND'
     UNKNOWN: 'z.calling.e_call.ECallError::TYPE.UNKNOWN'
     UNKNOWN_EVENT_TYPE: 'z.calling.e_call.ECallError::TYPE.UNKNOWN_EVENT_TYPE'
     UNSUPPORTED_VERSION: 'z.calling.e_call.ECallError::TYPE.UNSUPPORTED_VERSION'

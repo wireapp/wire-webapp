@@ -31,6 +31,7 @@ class z.calling.entities.EParticipant
   ###
   constructor: (@e_call_et, @user, timings, e_call_message_et) ->
     @id = @user.id
+    @session_id = undefined
 
     @is_connected = ko.observable false
     @panning = ko.observable 0.0

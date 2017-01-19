@@ -200,36 +200,35 @@ class z.calling.entities.ECall
 
   ###
   Add an e-participant to the e-call.
-  @param e_participant_et [z.calling.entities.EParticipant] E-participant entity to be added to the e-call
+  @param user_et [z.entities.User] User entity to be added to the e-call
   @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
-  add_participant: (user_et, e_call_message_et) =>
-    @get_participant_by_id user_et.id
+  add_e_participant: (user_et, e_call_message_et) =>
+    @get_e_participant_by_id user_et.id
     .then =>
-      @update_participant user_et, e_call_message_et
+      @update_e_participant user_et.id, e_call_message_et
     .catch (error) =>
-      throw error unless error.type is z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
 
       @logger.debug "Adding e-call participant '#{user_et.name()}'"
       @participants.push new z.calling.entities.EParticipant @, user_et, @timings, e_call_message_et
       @_update_remote_state()
+    .then =>
       return @
 
   ###
   Remove an e-participant from the call.
-  @param e_participant_et [z.calling.entities.EParticipant] E-Participant entity to be removed from the e-call
+  @param user_id [String] ID of user to be removed from the e-call
   @return [z.calling.entities.ECall] E-call entity
   ###
-  delete_participant: (e_participant_et) =>
-    @get_participant_by_id e_participant_et.id
+  delete_e_participant: (user_id) =>
+    @get_e_participant_by_id user_id
     .then (e_participant_et) =>
       @interrupted_participants.remove e_participant_et
       @participants.remove e_participant_et
       @_update_remote_state()
       @logger.debug "Removed e-call participant '#{e_participant_et.user.name()}'"
       return @
-    .catch (error) ->
-      throw error unless error.type is z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
 
 
   ###
@@ -244,25 +243,23 @@ class z.calling.entities.ECall
   @param user_id [String] User ID of participant to be returned
   @return [z.calling.entities.EParticipant] E-call participant that matches given user ID
   ###
-  get_participant_by_id: (user_id) =>
+  get_e_participant_by_id: (user_id) =>
     for e_participant_et in @participants() when e_participant_et.id is user_id
       return Promise.resolve e_participant_et
-    return Promise.reject new z.calling.e_call.ECallError z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
+    return Promise.reject new z.calling.e_call.ECallError z.calling.e_call.ECallError::TYPE.NOT_FOUND, 'No participant for given user ID found'
 
   ###
   Update e-call participant with e-call message.
-  @param user_et [z.entity.User] User to be updated
+  @param user_id [String] ID of user to be updated
   @param e_call_message_et [z.calling.entities.ECallMessage] E-call message to update user with
   ###
-  update_participant: (user_et, e_call_message_et) =>
-    @get_participant_by_id user_et.id
+  update_e_participant: (user_id, e_call_message_et) =>
+    @get_e_participant_by_id user_id
     .then (e_participant_et) =>
-      @logger.debug "Updating e-call participant '#{user_et.name()}'", e_call_message_et
+      @logger.debug "Updating e-call participant '#{e_participant_et.user.name()}'", e_call_message_et
       e_participant_et.update_state e_call_message_et
       @_update_remote_state()
-      return @
-    .catch (error) ->
-      throw error unless error.type is z.calling.e_call.ECallError::TYPE.PARTICIPANT_NOT_FOUND
+      return e_participant_et
 
 
   ###############################################################################

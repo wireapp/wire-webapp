@@ -119,7 +119,7 @@ class z.calling.CallingRepository
 
     @get_protocol_of_call conversation_id
     .catch (error) =>
-      throw error unless error.type is z.calling.e_call.ECallError::TYPE.E_CALL_NOT_FOUND
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
 
       if fn_name is z.calling.enum.E_CALL_ACTION.TOGGLE_STATE
         return @handled_by_v3 conversation_id
@@ -175,6 +175,6 @@ class z.calling.CallingRepository
   Send Raygun report.
   @private
   ###
-  _send_report = (custom_data) =>
+  _send_report = (custom_data) ->
     Raygun.send new Error('Call failure report'), custom_data
     @logger.info "Reported status of flow id '#{custom_data.meta.flow_id}' for call analysis", custom_data
