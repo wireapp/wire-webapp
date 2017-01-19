@@ -34,9 +34,6 @@
     "wire-theme": "https://github.com/wireapp/wire-theme.git#1.0.0",
     "wire-webapp-cryptobox": "https://github.com/wireapp/wire-webapp-cryptobox.git#2.0.5"
   },
-  "resolutions": {
-    "bazinga64": "5.0.0"
-  },
   "exportsOverride": {
     "amplify": {
       "js": "lib/amplify.js"
