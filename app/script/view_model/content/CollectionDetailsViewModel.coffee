@@ -48,7 +48,7 @@ class z.ViewModel.content.CollectionDetailsViewModel
     amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et
 
   should_show_header: (message_et) =>
-    if not @last_message_timestamp? # first message
+    if not @last_message_timestamp?
       @last_message_timestamp = message_et.timestamp
       return true
 
