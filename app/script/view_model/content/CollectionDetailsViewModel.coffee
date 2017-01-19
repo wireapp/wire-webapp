@@ -53,20 +53,20 @@ class z.ViewModel.content.CollectionDetailsViewModel
       return true
 
     # we passed today
-    if not moment(message_et.timestamp).isSame(@last_message_timestamp, 'd') and moment(@last_message_timestamp).isSame new Date(), 'd'
+    if not moment(message_et.timestamp).is_same_day(@last_message_timestamp) and moment(@last_message_timestamp).is_today()
       @last_message_timestamp = message_et.timestamp
       return true
 
     # we passed the month
-    if not moment(message_et.timestamp).isSame(@last_message_timestamp, 'M')
+    if not moment(message_et.timestamp).is_same_month @last_message_timestamp
       @last_message_timestamp = message_et.timestamp
       return true
 
   get_title_for_header: (message_et) =>
     message_date = moment(message_et.timestamp)
-    if message_date.isSame new Date(), 'd' # today
+    if message_date.is_today()
       return z.localization.Localizer.get_text z.string.conversation_today
-    if message_date.isSame new Date(), 'y'# same year
+    if message_date.is_current_year()
       return message_date.format 'MMMM'
     return message_date.format 'MMMM Y'
 
