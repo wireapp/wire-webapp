@@ -75,27 +75,26 @@ class z.connect.ConnectRepository
   @return [Promise] Promise that resolves with the user's address book contacts that match on Wire
   ###
   get_macos_contacts: ->
-    return new Promise (resolve, reject) =>
-      phone_book = @_parse_macos_contacts()
-
+    @_parse_macos_contacts()
+    .then (phone_book) =>
       if phone_book.cards.length is 0
         @logger.warn 'No contacts found for upload'
-        reject new z.connect.ConnectError z.connect.ConnectError::TYPE.NO_CONTACTS
+        throw new z.connect.ConnectError z.connect.ConnectError::TYPE.NO_CONTACTS
       else
         amplify.publish z.event.WebApp.SEARCH.SHOW
         @logger.info "Uploading hashes of '#{phone_book.cards.length}' contacts for matching", phone_book
-        @connect_service.post_onboarding phone_book
-        .then (response) =>
-          @logger.info "macOS contacts upload successful: #{response.results.length} matches, #{response['auto-connects'].length} auto connects", response
-          @properties_repository.save_preference_contact_import_macos Date.now()
-          resolve response
-        .catch (error) =>
-          if error.code is z.service.BackendClientError::STATUS_CODE.TOO_MANY_REQUESTS
-            error_message = 'Backend refused macOS contacts upload: Endpoint used too frequent'
-            @logger.error error_message
-          else
-            @logger.error 'macOS contacts upload failed', error
-          reject new z.connect.ConnectError z.connect.ConnectError::TYPE.UPLOAD
+        return @connect_service.post_onboarding phone_book
+    .then (response) =>
+      @logger.info "macOS contacts upload successful: #{response.results.length} matches, #{response['auto-connects'].length} auto connects", response
+      @properties_repository.save_preference_contact_import_macos Date.now()
+      return response
+    .catch (error) =>
+      if error.code is z.service.BackendClientError::STATUS_CODE.TOO_MANY_REQUESTS
+        error_message = 'Backend refused macOS contacts upload: Endpoint used too frequent'
+        @logger.error error_message
+      else
+        @logger.error 'macOS contacts upload failed', error
+        throw new z.connect.ConnectError z.connect.ConnectError::TYPE.UPLOAD
 
   ###
   Encode phone book
@@ -121,33 +120,33 @@ class z.connect.ConnectRepository
   @return [z.connect.PhoneBook] Encoded phone book data
   ###
   _parse_macos_contacts: ->
-    return if not window.zAddressBook
+    return new Promise (resolve, reject) =>
+      return resolve undefined if not window.zAddressBook
+      address_book = window.zAddressBook
+      phone_book = new z.connect.PhoneBook @properties_repository.self()
 
-    address_book = window.zAddressBook()
-    phone_book = new z.connect.PhoneBook @properties_repository.self()
+      me = address_book.getMe()
+      for email in me.emails
+        phone_book.self.push email
+      for number in me.numbers
+        phone_book.self.push number
 
-    me = address_book.getMe()
-    for email in me.emails
-      phone_book.self.push email
-    for number in me.numbers
-      phone_book.self.push number
+      address_book.getContacts ((percentage) =>
+        @logger.info 'Importing Contacts', percentage
+      ), (contacts) =>
+        for contact in contacts
+          card =
+            contact: []
+            card_id: CryptoJS.MD5("#{contact.firstName}#{contact.lastName}").toString()
+          for email in contact.emails
+            card.contact.push email.toLowerCase().trim()
+          for number in contact.numbers
+            card.contact.push z.util.phone_number_to_e164 number, navigator.language
 
-    x = 0
-    while x < address_book.contactCount()
-      contact = address_book.getContact x
-      card =
-        contact: []
-        card_id: CryptoJS.MD5("#{contact.firstName}#{contact.lastName}").toString()
-      for email in contact.emails
-        card.contact.push email.toLowerCase().trim()
-      for number in contact.numbers
-        card.contact.push z.util.phone_number_to_e164 number, navigator.language
+          if card.contact.length > 0
+            phone_book.cards.push card
+        resolve @_encode_phone_book phone_book
 
-      if card.contact.length > 0
-        phone_book.cards.push card
-      x++
-
-    return @_encode_phone_book phone_book
 
   ###
   Parse a user's Google Contacts.
