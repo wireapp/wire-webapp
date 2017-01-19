@@ -56,6 +56,9 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       system_notification_repository.permission_state = z.system_notification.PermissionStatusState.GRANTED
       z.util.Environment.browser.supports.notifications = true
       window.wire.app =
+          service:
+            asset:
+              generate_asset_url: -> '/image/logo/notification.png'
           view:
             content:
               multitasking:
