@@ -17,13 +17,13 @@
 #
 
 moment.fn.is_today = ->
-  this.isSame new Date(), 'd'
+  @isSame new Date(), 'd'
 
 moment.fn.is_current_year = ->
-  this.isSame new Date(), 'y'
+  @isSame new Date(), 'y'
 
 moment.fn.is_same_day = (date) ->
-  this.isSame date, 'd'
+  @isSame date, 'd'
 
 moment.fn.is_same_month = (date) ->
-  this.isSame date, 'M'
+  @isSame date, 'M'
