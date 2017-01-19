@@ -419,6 +419,7 @@ class z.event.EventRepository
     ###
     _validate_call_event_lifetime: (event) ->
       return true if @notification_handling_state() is z.event.NotificationHandlingState.WEB_SOCKET
+      return true if event.content.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
 
       current_timestamp = Date.now()
       event_timestamp = new Date(event.time).getTime()

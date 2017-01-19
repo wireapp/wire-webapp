@@ -157,7 +157,7 @@ class z.calling.e_call.ECallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @_verify_session_id user_id, e_call_et, e_call_message_et
-    .then (e_call_et) =>
+    .then (e_call_et) ->
       e_call_et.delete_e_participant user_id
     .then (e_call_et) =>
       unless e_call_et.participants().length
