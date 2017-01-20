@@ -448,26 +448,29 @@
 }
 
 // MESSAGE SPACING
-.message-rename,
+.message-asset {
+  margin-top: 16px;
+}
+
+.message-call,
+.message-ping  {
+  padding-top: 16px;
+  margin-bottom: 24px;
+}
+
 .message-member,
-.message-ping {
+.message-rename {
   padding-top: 16px;
   margin-bottom: 32px;
 }
 
-.message-ping {
+.message-call,
+.message-member,
+.message-ping,
+.message-rename {
   .message-body-actions {
     position: relative;
   }
-}
-
-.message-call {
-  margin-bottom: 40px;
-  padding-top: 16px;
-}
-
-.message-asset {
-  margin-top: 16px;
 }
 
 // TODO make generic class
