@@ -271,6 +271,7 @@ z.string.uk.conversation_likes_caption = '%@number учасників'
 z.string.uk.conversation_send_pasted_file = 'Надіслав(-ла) зображення %date'
 
 # Collection
+z.string.uk.collection_show_all = 'Показати всі %no'
 
 # Archive
 z.string.uk.archive_header = 'Архівувати'
@@ -304,7 +305,8 @@ z.string.uk.invite_meta_key_pc = 'Ctrl'
 z.string.uk.invite_hint_selected = 'Натисніть %meta_key + C, щоб скопіювати'
 z.string.uk.invite_hint_unselected = 'Виділіть та натисніть %meta_key + C'
 z.string.uk.invite_headline = 'Запросити людей в Wire'
-z.string.uk.invite_message_no_email = 'Я уже в Wire. Відвідайте https://get.wire.com, щоб додати мене.'
+z.string.uk.invite_message = 'Я в Wire. Шукайте мене як %username або відвідайте get.wire.com.'
+z.string.uk.invite_message_no_email = 'Я уже в Wire. Відвідайте get.wire.com, щоб додати мене.'
 
 # Extensions
 z.string.uk.extensions_bubble_button_gif = 'Gif'
@@ -328,6 +330,7 @@ z.string.uk.people_no_matches = 'Співпадіння відсутні.\nСп�
 z.string.uk.people_invite = 'Запросити людей'
 z.string.uk.people_share = 'Поділитись контактами'
 z.string.uk.people_bring_your_friends = 'Запросіть ваших друзів до Wire'
+z.string.uk.people_invite_detail = 'Поділившись контактами, ви зможете зв’язатись в Wire з людьми, з якими ви, можливо, знайомі. Вся інформація анонімна та не передається третім особам.'
 z.string.uk.people_invite_button_contacts = 'З контактів'
 z.string.uk.people_invite_button_gmail = 'З Gmail'
 z.string.uk.people_invite_headline = 'Приведіть друзів'
@@ -522,6 +525,7 @@ z.string.uk.warning_connectivity_no_internet = 'Відсутнє підключ�
 # Browser notifications
 z.string.uk.system_notification_asset_add = 'Поділився(-лась) картинкою'
 z.string.uk.system_notification_connection_accepted = 'Прийняв(-ла) ваш запит на додавання до контактів'
+z.string.uk.system_notification_connection_connected = 'Уже у вашому списку контактів'
 z.string.uk.system_notification_connection_request = 'Хоче бути доданим(-ою) до ваших контактів'
 z.string.uk.system_notification_conversation_create = '%s.first_name почав(-ла) розмову'
 z.string.uk.system_notification_conversation_rename = '%s.first_name перейменував(-ла) розмову на %name'

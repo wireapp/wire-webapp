@@ -270,6 +270,9 @@ z.string.pt.conversation_edit_timestamp = 'Editado em %@timestamp'
 z.string.pt.conversation_likes_caption = '%@number pessoas'
 z.string.pt.conversation_send_pasted_file = 'Imagem postada em %date'
 
+# Collection
+z.string.pt.collection_show_all = 'Mostrar todas %no'
+
 # Archive
 z.string.pt.archive_header = 'Arquivar'
 
@@ -302,8 +305,8 @@ z.string.pt.invite_meta_key_pc = 'Ctrl'
 z.string.pt.invite_hint_selected = 'Pressione % meta_key + C para copiar'
 z.string.pt.invite_hint_unselected = 'Selecione e pressione % meta_key + C'
 z.string.pt.invite_headline = 'Convidar pessoas para o Wire'
-z.string.pt.invite_message = 'Eu estou no Wire, pesquise por %username ou visite wire.com/download.'
-z.string.pt.invite_message_no_email = 'Estou no Wire. Visite https://get.wire.com para se conectar comigo.'
+z.string.pt.invite_message = 'Eu estou no Wire, pesquise por %username ou visite get.wire.com.'
+z.string.pt.invite_message_no_email = 'Estou no Wire. Visite get.wire.com para se conectar comigo.'
 
 # Extensions
 z.string.pt.extensions_bubble_button_gif = 'Gif'
@@ -327,6 +330,7 @@ z.string.pt.people_no_matches = 'Nenhum resultado correspondente. \nTente digita
 z.string.pt.people_invite = 'Convidar pessoas'
 z.string.pt.people_share = 'Compartilhar Contatos'
 z.string.pt.people_bring_your_friends = 'Traga seus amigos para o Wire'
+z.string.pt.people_invite_detail = 'Compartilhar seus contatos ajuda a se conectar com outras pessoas. Nós tornamos anônimas todas as informações e não compartilhamos com ninguém.'
 z.string.pt.people_invite_button_contacts = 'Dos contatos'
 z.string.pt.people_invite_button_gmail = 'Do Gmail'
 z.string.pt.people_invite_headline = 'Traga os seus amigos'
@@ -520,6 +524,7 @@ z.string.pt.warning_connectivity_no_internet = 'Sem Internet. Não será capaz d
 # Browser notifications
 z.string.pt.system_notification_asset_add = 'Compartilhou uma imagem'
 z.string.pt.system_notification_connection_accepted = 'Aceitou seu pedido de conexão'
+z.string.pt.system_notification_connection_connected = 'Agora estão conectados'
 z.string.pt.system_notification_connection_request = 'Quer se conectar'
 z.string.pt.system_notification_conversation_create = '%s.first_name começou uma conversa'
 z.string.pt.system_notification_conversation_rename = '%s.first_name mudou o nome da conversa para %name'
