@@ -50,6 +50,7 @@ class z.ViewModel.content.CollectionViewModel
       @populate_items message_ets
       if @images().length + @files().length + @links().length is 0
         @no_items_found true
+      @_track_opened_collection conversation_et, @no_items_found()
 
   populate_items: (message_ets) =>
     for message_et in message_ets
@@ -68,5 +69,18 @@ class z.ViewModel.content.CollectionViewModel
     @collection_details.set_conversation @conversation_et(), category, [].concat items
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS
 
-  click_on_image: (message_et) ->
-    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW,  message_et
+  click_on_image: (message_et) =>
+    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et, 'collection'
+    @_track_opened_item @conversation_et(), 'image'
+
+  _track_opened_collection: (conversation_et, is_empty) ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.OPENED_COLLECTIONS,
+      is_empty: is_empty
+      conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+      with_bot: conversation_et.is_with_bot()
+
+  _track_opened_item: (conversation_et, type) ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.OPENED_ITEM,
+      type: type
+      conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+      with_bot: conversation_et.is_with_bot()
