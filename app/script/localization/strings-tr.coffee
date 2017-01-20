@@ -270,6 +270,12 @@ z.string.tr.conversation_edit_timestamp = '%@timestamp ’da düzenlenmiş'
 z.string.tr.conversation_likes_caption = '%@number kişi'
 z.string.tr.conversation_send_pasted_file = 'Yapıştırılmış resim, %date ’de'
 
+# Collection
+z.string.tr.collection_show_all = '%no’nun tümünü göster'
+z.string.tr.collection_section_links = 'Bağlantılar'
+z.string.tr.collection_section_images = 'Resimler'
+z.string.tr.collection_section_files = 'Dosyalar'
+
 # Archive
 z.string.tr.archive_header = 'Arşivle'
 
@@ -302,8 +308,8 @@ z.string.tr.invite_meta_key_pc = 'Ctrl'
 z.string.tr.invite_hint_selected = 'Kopyalamak için %meta_key + C'
 z.string.tr.invite_hint_unselected = 'Seç ve %meta_key + C tuşlarına bas'
 z.string.tr.invite_headline = 'İnsanların Wire’a davet et'
-z.string.tr.invite_message = 'Wire’dayım, %username olarak arat ya da wire.com/download bu adresi ziyaret et.'
-z.string.tr.invite_message_no_email = 'Wire’dayım. https://get.wire.com ’u ziyaret ederek bana bağlanabilirsin.'
+z.string.tr.invite_message = 'Wire’dayım, %username olarak arat ya da get.wire.com adresini ziyaret et.'
+z.string.tr.invite_message_no_email = 'Wire’dayım. get.wire.com ’u ziyaret ederek bana bağlanabilirsin.'
 
 # Extensions
 z.string.tr.extensions_bubble_button_gif = 'Gif'
@@ -327,6 +333,7 @@ z.string.tr.people_no_matches = 'Eşleşen sonuç yok.\nBaşka bir isim girmeyi 
 z.string.tr.people_invite = 'İnsanları davet et'
 z.string.tr.people_share = 'Kişileri Paylaş'
 z.string.tr.people_bring_your_friends = 'Arkadaşlarını Wire’a getir'
+z.string.tr.people_invite_detail = 'Kişileriniz paylaşmak, başkalarıyla bağlanmanızı kolaylaştırır. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.'
 z.string.tr.people_invite_button_contacts = 'Kişilerden'
 z.string.tr.people_invite_button_gmail = 'Gmail’den'
 z.string.tr.people_invite_headline = 'Arkadaşlarınızı getirin'
@@ -521,6 +528,7 @@ z.string.tr.warning_connectivity_no_internet = 'İnternet bağlantısı yok. Mes
 # Browser notifications
 z.string.tr.system_notification_asset_add = 'Bir resim paylaştı'
 z.string.tr.system_notification_connection_accepted = 'Bağlantı isteğinizi kabul etti'
+z.string.tr.system_notification_connection_connected = 'Şimdi bağlı'
 z.string.tr.system_notification_connection_request = 'Bağlanmak istiyor'
 z.string.tr.system_notification_conversation_create = '%s.first_name bir konuşma başlattı'
 z.string.tr.system_notification_conversation_rename = '%s.first_name, konuşma ismini %name olarak değiştirdi'

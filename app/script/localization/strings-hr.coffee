@@ -270,6 +270,8 @@ z.string.hr.conversation_edit_timestamp = 'Promijenjeno na %@timestamp'
 z.string.hr.conversation_likes_caption = '%@number ljudi'
 z.string.hr.conversation_send_pasted_file = 'Slika zaljepljena na %date'
 
+# Collection
+
 # Archive
 z.string.hr.archive_header = 'Arhiviraj'
 

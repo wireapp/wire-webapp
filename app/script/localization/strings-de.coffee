@@ -186,7 +186,7 @@ z.string.de.modal_logout_message = 'Deine persönlichen Daten und Unterhaltungen
 z.string.de.modal_logout_button = 'Abmelden'
 # New device
 z.string.de.modal_new_device_headline = '%@.name hat begonnen ein neues Gerät zu nutzen'
-z.string.de.modal_new_device_headline_many = '%@.names haben begonnen ein neues Gerät zu nutzen'
+z.string.de.modal_new_device_headline_many = '%@.names haben begonnen neue Geräte zu nutzen'
 z.string.de.modal_new_device_headline_you = '%@.name hast begonnen ein neues Gerät zu nutzen'
 z.string.de.modal_new_device_message = 'Möchtest du die Nachrichten noch senden?'
 z.string.de.modal_new_device_show_device = 'Gerät anzeigen'
@@ -273,6 +273,9 @@ z.string.de.conversation_send_pasted_file = 'Bild eingefügt am %date'
 
 # Collection
 z.string.de.collection_show_all = 'Zeige alle %no'
+z.string.de.collection_section_links = 'Links'
+z.string.de.collection_section_images = 'Bilder'
+z.string.de.collection_section_files = 'Dateien'
 
 # Archive
 z.string.de.archive_header = 'Archivieren'

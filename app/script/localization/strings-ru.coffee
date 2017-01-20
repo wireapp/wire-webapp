@@ -271,6 +271,10 @@ z.string.ru.conversation_likes_caption = '%@number участникам'
 z.string.ru.conversation_send_pasted_file = 'Изображение добавлено %date'
 
 # Collection
+z.string.ru.collection_show_all = 'Показать все %no'
+z.string.ru.collection_section_links = 'Ссылки'
+z.string.ru.collection_section_images = 'Изображения'
+z.string.ru.collection_section_files = 'Файлы'
 
 # Archive
 z.string.ru.archive_header = 'Архив'
@@ -304,8 +308,8 @@ z.string.ru.invite_meta_key_pc = 'Ctrl'
 z.string.ru.invite_hint_selected = 'Нажмите %meta_key + C для копирования'
 z.string.ru.invite_hint_unselected = 'Выделите и нажмите %meta_key + C'
 z.string.ru.invite_headline = 'Пригласите людей в Wire'
-z.string.ru.invite_message = 'Я использую Wire, введи в поиске %username или перейди на wire.com/download.'
-z.string.ru.invite_message_no_email = 'Я использую Wire. Перейди на https://get.wire.com, чтобы связаться со мной.'
+z.string.ru.invite_message = 'Я использую Wire, ищите меня там по имени %username или посетите сайт get.wire.com.'
+z.string.ru.invite_message_no_email = 'Я использую Wire. Перейдите на get.wire.com, чтобы связаться со мной.'
 
 # Extensions
 z.string.ru.extensions_bubble_button_gif = 'Gif'
@@ -329,6 +333,7 @@ z.string.ru.people_no_matches = 'Совпадений не найдено.\nПо
 z.string.ru.people_invite = 'Пригласить людей'
 z.string.ru.people_share = 'Поделиться контактами'
 z.string.ru.people_bring_your_friends = 'Приведите друзей в Wire'
+z.string.ru.people_invite_detail = 'Предоставление доступа к вашим контактам поможет вам связаться с другими людьми. Вся информация анонимна, мы не предоставляем её третьим лицам.'
 z.string.ru.people_invite_button_contacts = 'Из контактов'
 z.string.ru.people_invite_button_gmail = 'Из Gmail'
 z.string.ru.people_invite_headline = 'Приведите друзей'
@@ -475,6 +480,7 @@ z.string.ru.upload_google_message_error = 'Мы не получили вашу �
 z.string.ru.upload_google_button_again = 'Повторить'
 
 # URLs
+z.string.ru.url_password_reset = 'forgot/?hl=ru'
 z.string.ru.url_legal = 'https://wire.com/legal/'
 z.string.ru.url_privacy = 'https://wire.com/privacy/'
 z.string.ru.url_privacy_why = 'https://wire.com/privacy/why/'

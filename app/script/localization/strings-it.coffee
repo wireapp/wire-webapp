@@ -270,6 +270,8 @@ z.string.it.conversation_edit_timestamp = 'Modificato il %@timestamp'
 z.string.it.conversation_likes_caption = '%@number persone'
 z.string.it.conversation_send_pasted_file = 'Immagine incollata alle %date'
 
+# Collection
+
 # Archive
 z.string.it.archive_header = 'Archivia'
 
