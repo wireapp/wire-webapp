@@ -35,7 +35,7 @@
       <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
     </div>
     <div class="message-header-label">
-      <span class="label-bold" data-bind='text: message.sender_name()'></span>
+      <span class="message-header-label-sender" data-bind='text: message.sender_name()'></span>
       <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
     </div>
     <div class="message-body-actions message-body-actions-large">
@@ -51,7 +51,7 @@
         <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
       </div>
       <div class="message-header-label">
-        <span class="label-bold" data-bind='text: message.user().first_name()'></span>
+        <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.user().first_name()'></span>
         <!-- ko if: was_edited() -->
           <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
         <!-- /ko -->
