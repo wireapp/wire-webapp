@@ -125,7 +125,7 @@ z.string.de.modal_button_send = 'Senden'
 
 # Block a user
 z.string.de.modal_block_conversation_headline = '%@.name blockieren?'
-z.string.de.modal_block_conversation_message = '%@.name wird dich auf Wire nicht finden können.'
+z.string.de.modal_block_conversation_message = '%@.name wird dich nicht länger kontaktieren oder zu Gruppen hinzufügen können.'
 z.string.de.modal_block_conversation_button = 'Blockieren'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.de.modal_call_conversation_empty_headline = 'Niemand um anzurufen'
@@ -354,7 +354,7 @@ z.string.de.people_verified = 'Verifiziert'
 
 # Block user
 z.string.de.people_block_headline = 'Blockieren?'
-z.string.de.people_block_message = '%@.first_name wird dich auf Wire nicht finden können.'
+z.string.de.people_block_message = '%@.first_name wird dich nicht länger kontaktieren oder zu Gruppen hinzufügen können.'
 
 # Accept a pending connection dialogue
 z.string.de.people_connect_headline = 'Annehmen?'
@@ -374,7 +374,7 @@ z.string.de.people_remove_message = '%@.first_name wird in dieser Unterhaltung k
 
 # Unblock user
 z.string.de.people_unblock_headline = 'Freigeben?'
-z.string.de.people_unblock_message = '%@.first_name wird dich über Wire wieder finden und kontaktieren können. Du empfängst alle Nachrichten die verschickt wurden, während der Kontakt blockiert war.'
+z.string.de.people_unblock_message = '%@.first_name wird dich wieder kontaktieren und zu Gruppen hinzufügen können.'
 
 # Button labels for the actions
 z.string.de.people_button_add = 'Kontakte hinzufügen'
