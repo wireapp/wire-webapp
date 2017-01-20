@@ -365,6 +365,16 @@ z.util.ko_array_unshift_all = (ko_array, values_to_shift) ->
   Array.prototype.unshift.apply underlyingArray, values_to_shift
   ko_array.valueHasMutated()
 
+# push array deferred to knockout observableArray
+z.util.ko_push_deferred = (target, src, number = 100, delay = 300) ->
+  interval = window.setInterval ->
+    chunk = src.splice 0, number
+    z.util.ko_array_push_all target, chunk
+
+    if src.length is 0
+      window.clearInterval interval
+
+  , delay
 
 ###
 Add zero padding until limit is reached
