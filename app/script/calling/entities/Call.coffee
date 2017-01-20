@@ -39,7 +39,7 @@ class z.calling.entities.Call
     @call_timer_interval = undefined
     @timer_start = undefined
     @duration_time = ko.observable 0
-    @finished_reason = z.calling.enum.CallFinishedReason.UNKNOWN
+    @finished_reason = z.calling.enum.CALL_FINISHED_REASON.UNKNOWN
     @remote_media_type = ko.observable z.media.MediaType.NONE
 
     @is_connected = ko.observable false

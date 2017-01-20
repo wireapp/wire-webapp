@@ -20,7 +20,7 @@ window.z ?= {}
 z.calling ?= {}
 z.calling.enum ?= {}
 
-z.calling.enum.CallFinishedReason =
+z.calling.enum.CALL_FINISHED_REASON =
   CONNECTION_DROPPED: 'connection_dropped'
   COMPLETED: 'completed'
   MISSED: 'missed'

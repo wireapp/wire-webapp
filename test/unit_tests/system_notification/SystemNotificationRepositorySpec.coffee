@@ -121,8 +121,8 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
     it 'for a successfully completed call', (done) ->
       message_et = new z.entity.CallMessage()
-      message_et.call_message_type = z.message.CallMessageType.DEACTIVATED
-      message_et.finished_reason = z.calling.enum.CallFinishedReason.COMPLETED
+      message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED
+      message_et.finished_reason = z.calling.enum.CALL_FINISHED_REASON.COMPLETED
 
       system_notification_repository.notify conversation_et, message_et
       .then ->
@@ -152,7 +152,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
     describe 'for an incoming call', ->
       beforeEach ->
         message_et = new z.entity.CallMessage()
-        message_et.call_message_type = z.message.CallMessageType.ACTIVATED
+        message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED
         message_et.user user_et
         notification_content.options.body = z.string.system_notification_voice_channel_activate
         notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et
@@ -185,8 +185,8 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
     describe 'for a missed call', ->
       beforeEach ->
         message_et = new z.entity.CallMessage()
-        message_et.call_message_type = z.message.CallMessageType.DEACTIVATED
-        message_et.finished_reason = z.calling.enum.CallFinishedReason.MISSED
+        message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED
+        message_et.finished_reason = z.calling.enum.CALL_FINISHED_REASON.MISSED
         message_et.user user_et
         notification_content.options.body = z.string.system_notification_voice_channel_deactivate
         notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et

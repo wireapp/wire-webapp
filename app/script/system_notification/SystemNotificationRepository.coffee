@@ -159,7 +159,7 @@ class z.SystemNotification.SystemNotificationRepository
     if message_et.is_activation()
       return z.localization.Localizer.get_text z.string.system_notification_voice_channel_activate
     else if message_et.is_deactivation()
-      return if message_et.finished_reason isnt z.calling.enum.CallFinishedReason.MISSED
+      return if message_et.finished_reason isnt z.calling.enum.CALL_FINISHED_REASON.MISSED
       return z.localization.Localizer.get_text z.string.system_notification_voice_channel_deactivate
 
   ###

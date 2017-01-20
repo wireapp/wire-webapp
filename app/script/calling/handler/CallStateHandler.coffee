@@ -376,9 +376,9 @@ class z.calling.handler.CallStateHandler
     .then (call_et) =>
       call_et.state z.calling.enum.CallState.DISCONNECTING
       if has_call_dropped
-        call_et.finished_reason = z.calling.enum.CallFinishedReason.CONNECTION_DROPPED
+        call_et.finished_reason = z.calling.enum.CALL_FINISHED_REASON.CONNECTION_DROPPED
       else
-        call_et.finished_reason = z.calling.enum.CallFinishedReason.SELF_USER
+        call_et.finished_reason = z.calling.enum.CALL_FINISHED_REASON.SELF_USER
       @_put_state_to_idle conversation_id
     .catch (error) =>
       @logger.warn "No call found in conversation '#{conversation_id}' to leave", error

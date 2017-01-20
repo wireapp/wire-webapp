@@ -152,7 +152,7 @@ class z.entity.Conversation
       unread_type = z.conversation.ConversationUnreadType.UNREAD
       return unread_type if @unread_message_count() <= 0
       for message in @unread_events() by -1
-        return z.conversation.ConversationUnreadType.CALL if message.finished_reason is z.calling.enum.CallFinishedReason.MISSED
+        return z.conversation.ConversationUnreadType.CALL if message.finished_reason is z.calling.enum.CALL_FINISHED_REASON.MISSED
         if message.is_ping()
           @unread_accent_color message.accent_color()
           return z.conversation.ConversationUnreadType.PING

@@ -126,7 +126,7 @@ class z.calling.entities.Flow
           @call_et.delete_participant @participant_et
           @_remove_media_streams()
           if not @is_group()
-            @call_et.finished_reason = z.calling.enum.CallFinishedReason.CONNECTION_DROPPED
+            @call_et.finished_reason = z.calling.enum.CALL_FINISHED_REASON.CONNECTION_DROPPED
 
         when z.calling.rtc.SignalingState.REMOTE_OFFER
           @negotiation_needed true
