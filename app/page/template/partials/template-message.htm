@@ -64,7 +64,7 @@
       <!-- ko if: asset.is_image() -->
         <div class="message-asset-image">
           <div class="image image-loading" data-bind="
-            attr: {'data-uie-visible': $parent.visible},
+            attr: {'data-uie-visible': $parent.visible() && !message.is_expired()},
             background_image: asset.resource,
             click: function(data, event) {$parents[1].show_detail(message, event)},
             css: {'bg-color-ephemeral': message.is_expired()},
