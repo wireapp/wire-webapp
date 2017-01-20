@@ -108,8 +108,7 @@ user-avatar {
   &.unknown,
   &.ignored {
     .user-avatar-image {
-      .grayscale();
-      tranform: translateZ(0);
+      filter: grayscale(100%);
     }
 
     .user-avatar-border {
