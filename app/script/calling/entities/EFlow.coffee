@@ -618,6 +618,7 @@ class z.calling.entities.EFlow
       @negotiation_mode z.calling.enum.SDPNegotiationMode.STREAM_CHANGE
       @_add_media_stream media_stream_info.stream
       @is_answer false
+      @_set_sdp_states()
       @negotiation_needed true
       @logger.info 'Replaced the MediaStream successfully', media_stream_info.stream
       return media_stream_info
