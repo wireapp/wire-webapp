@@ -157,7 +157,8 @@ class z.calling.e_call.ECallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @_verify_session_id user_id, e_call_et, e_call_message_et
-    .then (e_call_et) ->
+    .then (e_call_et) =>
+      @_confirm_e_call_message e_call_et, e_call_message_et
       e_call_et.delete_e_participant user_id
     .then (e_call_et) =>
       unless e_call_et.participants().length
@@ -304,6 +305,8 @@ class z.calling.e_call.ECallCenter
     return unless incoming_e_call_message_et.response is false
 
     switch incoming_e_call_message_et.type
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+        e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL, true, e_call_et.session_id
       when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
         e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, true, e_call_et.session_id
       when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
@@ -574,7 +577,7 @@ class z.calling.e_call.ECallCenter
 
   _create_voice_channel_activated_message: (e_call_et, user_id) ->
     message_et = new z.entity.CallMessage()
-    message_et.call_message_type = z.message.CallMessageType.ACTIVATED
+    message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED
     message_et.conversation_id = e_call_et.id
     message_et.id = z.util.create_random_uuid()
     message_et.from = user_id
@@ -586,7 +589,7 @@ class z.calling.e_call.ECallCenter
     return {
       conversation: e_call_et.id
       data:
-        reason: z.calling.enum.CallFinishedReason.MISSED
+        reason: z.calling.enum.CALL_FINISHED_REASON.MISSED
       from: user_id
       id: z.util.create_random_uuid()
       time: new Date().toISOString()
