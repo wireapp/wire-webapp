@@ -168,7 +168,8 @@ class z.calling.entities.EFlow
     @remote_sdp.subscribe (sdp) =>
       if sdp
         @remote_sdp_type sdp.type
-        @should_set_remote_sdp true
+        return @should_set_remote_sdp true
+      @remote_sdp_type undefined
 
     @should_set_remote_sdp = ko.observable false
 
@@ -618,6 +619,7 @@ class z.calling.entities.EFlow
       @negotiation_mode z.calling.enum.SDPNegotiationMode.STREAM_CHANGE
       @_add_media_stream media_stream_info.stream
       @is_answer false
+      @remote_sdp undefined
       @_set_sdp_states()
       @negotiation_needed true
       @logger.info 'Replaced the MediaStream successfully', media_stream_info.stream
