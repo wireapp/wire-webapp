@@ -125,7 +125,7 @@ z.string.modal_button_send = 'Send'
 
 # Block a user
 z.string.modal_block_conversation_headline = 'Block %@.name?'
-z.string.modal_block_conversation_message = '%@.name wont be able to contact you or invite you to a group conversation.'
+z.string.modal_block_conversation_message = '%@.name won’t be able to contact you or add you to group conversations.'
 z.string.modal_block_conversation_button = 'Block'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.modal_call_conversation_empty_headline = 'No one to call'
@@ -354,7 +354,7 @@ z.string.people_verified = 'Verified'
 
 # Block user
 z.string.people_block_headline = 'Block?'
-z.string.people_block_message = '%@.first_name won’t be able to find or contact you on Wire.'
+z.string.people_block_message = '%@.first_name won’t be able to contact you or add you to group conversations.'
 
 # Accept a pending connection dialogue
 z.string.people_connect_headline = 'Accept?'
@@ -374,7 +374,7 @@ z.string.people_remove_message = '%@.first_name won’t be able to send or recei
 
 # Unblock user
 z.string.people_unblock_headline = 'Unblock?'
-z.string.people_unblock_message = '%@.first_name will be able to find and contact you on Wire again. You’ll also receive messages they sent while blocked.'
+z.string.people_unblock_message = '%@.first_name will be able to contact you and add you to group conversations again.'
 
 # Button labels for the actions
 z.string.people_button_add = 'Add people'
