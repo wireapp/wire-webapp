@@ -185,6 +185,8 @@ class z.cryptography.CryptographyRepository
         session_id = @_construct_session_id user_id, client_id
         future_cipher_payloads.push @_encrypt_payload_for_session session_id, generic_message
 
+    @logger.log "Encrypting message of type '#{generic_message.content}' for '#{Object.keys(payload.recipients).length}' users.", payload.recipients
+
     z.util.PromiseUtil.execute_all future_cipher_payloads
     .then (future_cipher_payloads) =>
       user_client_map_for_missing_sessions = {}

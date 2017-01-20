@@ -363,30 +363,21 @@ class z.event.EventRepository
           @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
         .catch (decrypt_error) =>
           # Get error information
-          receiving_client_id = event.data.recipient
           remote_client_id = event.data.sender
           remote_user_id = event.from
 
           # Handle error
           if decrypt_error instanceof Proteus.errors.DecryptError.DuplicateMessage or decrypt_error instanceof Proteus.errors.DecryptError.OutdatedMessage
             # We don't need to show duplicate message errors to the user
-            return [undefined, undefined]
+            throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
           else if decrypt_error instanceof Proteus.errors.DecryptError.InvalidMessage or decrypt_error instanceof Proteus.errors.DecryptError.InvalidSignature
             # Session is broken, let's see what's really causing it...
             session_id = @cryptography_repository._construct_session_id remote_user_id, remote_client_id
-            @logger.error "Session '#{session_id}' broken or out of sync. Reset the session and decryption is likely to work again.\r\n" +
-              "Try: wire.app.repository.cryptography.reset_session('#{remote_user_id}', '#{remote_client_id}');"
-            if decrypt_error instanceof Proteus.errors.DecryptError.InvalidMessage
-              @logger.error "Received message is for client '#{receiving_client_id}' while our ID is '#{@cryptography_repository.current_client().id}'."
+            @logger.error "Session '#{session_id}' with user '#{remote_user_id}' is broken or out of sync (#{decrypt_error.constructor.name}). Reset the session and decryption is likely to work again.", decrypt_error
           else if decrypt_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged
             # Remote identity changed
             message = "Fingerprints do not match. We expect a different fingerprint from user ID '#{remote_user_id}' with client ID '#{remote_client_id}' (Remote identity changed)."
             @logger.error message, decrypt_error
-
-          # Show error in JS console
-          @logger.error "Decryption of '#{event.type}' (#{primary_key}) failed: #{decrypt_error.message}",
-            error: decrypt_error,
-            event: event
 
           return @_map_error_message event, decrypt_error
       else
