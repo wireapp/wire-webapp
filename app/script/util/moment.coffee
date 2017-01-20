@@ -16,24 +16,14 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-window.z ?= {}
-z.string ?= {}
-z.string.da ?= {}
-z.string.cs ?= {}
-z.string.de ?= {}
-z.string.es ?= {}
-z.string.fi ?= {}
-z.string.fr ?= {}
-z.string.hr ?= {}
-z.string.it ?= {}
-z.string.pt ?= {}
-z.string.ro ?= {}
-z.string.ru ?= {}
-z.string.sl ?= {}
-z.string.tr ?= {}
-z.string.uk ?= {}
+moment.fn.is_today = ->
+  @isSame new Date(), 'd'
 
-z.string.Declension =
-  ACCUSATIVE: 'accusative'
-  DATIVE: 'dative'
-  NOMINATIVE: 'nominative'
+moment.fn.is_current_year = ->
+  @isSame new Date(), 'y'
+
+moment.fn.is_same_day = (date) ->
+  @isSame date, 'd'
+
+moment.fn.is_same_month = (date) ->
+  @isSame date, 'M'

@@ -54,5 +54,5 @@ class z.ViewModel.content.ConnectRequestsViewModel
   @param request [z.entity.User] Rendered connection request
   ###
   after_render: (elements, request) =>
-    if z.util.array_is_last @connect_requests(), request
+    if z.util.ArrayUtil.is_last_item @connect_requests(), request
       window.requestAnimationFrame -> $('.connect-requests').scroll_to_bottom()

@@ -22,6 +22,14 @@ z.search ?= {}
 # Search repository for all interactions with the search service.
 class z.search.SearchRepository
   ###
+  Trim and remove @.
+  @param query [String] Search string
+  ###
+  @normalize_query: (query) ->
+    return '' unless _.isString query
+    return query.trim().replace /^[@]/, ''
+
+  ###
   Construct a new Conversation Repository.
   @param search_service [z.search.SearchService] Backend REST API search service implementation
   @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
@@ -81,13 +89,6 @@ class z.search.SearchRepository
     @search_result_mapper.map_results response.results, z.search.SEARCH_MODE.ONBOARDING
     .then ([search_ets, mode]) =>
       return @_prepare_search_result search_ets, mode
-
-  ###
-  Trim and remove @.
-  @param query [String]
-  ###
-  normalize_search_query: (query) ->
-    return query.trim().replace /^[@]/, ''
 
   ###
   Preparing the search results for display.

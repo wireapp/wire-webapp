@@ -57,6 +57,7 @@ class z.entity.Conversation
 
     @archived_state = ko.observable false
     @muted_state = ko.observable false
+    @verification_state = ko.observable z.conversation.ConversationVerificationState.UNVERIFIED
 
     @archived_timestamp = ko.observable 0
     @cleared_timestamp = ko.observable 0
@@ -80,7 +81,16 @@ class z.entity.Conversation
 
     @is_verified = ko.pureComputed =>
       all_users = [@self].concat @participating_user_ets()
-      return all_users.every (user_et) -> user_et?.is_verified()
+      is_verified = all_users.every (user_et) -> user_et?.is_verified()
+      if is_verified
+        @verification_state z.conversation.ConversationVerificationState.VERIFIED
+      else
+        if @verification_state() is z.conversation.ConversationVerificationState.VERIFIED
+          @verification_state z.conversation.ConversationVerificationState.DEGRADED
+        else
+          @verification_state z.conversation.ConversationVerificationState.UNVERIFIED
+
+      return is_verified
 
     @removed_from_conversation = ko.observable false
     @removed_from_conversation.subscribe (is_removed) =>
@@ -164,12 +174,12 @@ class z.entity.Conversation
     @display_name = ko.pureComputed =>
       if @type() in [z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE]
         return @participating_user_ets()[0].name() if @participating_user_ets()[0]?.name()
-        return z.localization.Localizer.get_text z.string.truncation
+        return '…'
       else if @is_group()
         return @name() if @name()
         return (@participating_user_ets().map (user_et) -> user_et.first_name()).join ', ' if @participating_user_ets().length > 0
         return z.localization.Localizer.get_text z.string.conversations_empty_conversation if @participating_user_ids().length is 0
-        return z.localization.Localizer.get_text z.string.truncation
+        return '…'
       else
         return @name()
 
@@ -188,6 +198,8 @@ class z.entity.Conversation
       @_persist_state_update z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
     @muted_state.subscribe =>
       @_persist_state_update z.conversation.ConversationUpdateType.MUTED_STATE
+    @verification_state.subscribe =>
+      @_persist_state_update z.conversation.ConversationUpdateType.VERIFICATION_STATE
 
   _persist_state_update: (updated_field) ->
     amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @, updated_field
@@ -441,7 +453,7 @@ class z.entity.Conversation
     return @messages()[@messages().length - 1]
 
   ###
-  Get the previous message for give message.
+  Get the message before a given message.
   @return [z.entity.Message, undefined]
   ###
   get_previous_message: (message_et) ->
@@ -480,6 +492,9 @@ class z.entity.Conversation
     pending_uploads = (message_et for message_et in @messages() when message_et.assets?()[0]?.pending_upload?())
     return pending_uploads.length
 
+  get_users_with_unverified_clients: ->
+    return (user_et for user_et in [@self].concat(@participating_user_ets()) when not user_et.is_verified())
+
   ###
   Check whether the conversation is held with a Wire welcome bot like Anna or Otto.
   @return [Boolean] True, if conversation with a bot
@@ -504,4 +519,5 @@ class z.entity.Conversation
       last_read_timestamp: @last_read_timestamp()
       muted_state: @muted_state()
       muted_timestamp: @muted_timestamp()
+      verification_state: @verification_state()
     }

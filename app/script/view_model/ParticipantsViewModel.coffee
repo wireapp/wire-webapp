@@ -42,7 +42,7 @@ class z.ViewModel.ParticipantsViewModel
     ko.computed =>
       conversation_et = @conversation()
       participants = [].concat conversation_et.participating_user_ets()
-      participants.sort z.util.sort_user_by_first_name
+      participants.sort (user_a, user_b) -> z.util.StringUtil.sort_by_priority user_a.first_name(), user_b.first_name()
 
       @participants participants
       @participants_verified (user_et for user_et in participants when user_et.is_verified())
@@ -80,7 +80,7 @@ class z.ViewModel.ParticipantsViewModel
         is_participant = ko.utils.arrayFirst @participants(), (participant) -> user_et.id is participant.id
         is_connected = user_et.connection().status() is z.user.ConnectionStatus.ACCEPTED
         return is_participant is null and is_connected
-      connected_users.sort z.util.sort_user_by_first_name
+      connected_users.sort (user_a, user_b) -> z.util.StringUtil.sort_by_priority user_a.first_name(), user_b.first_name()
     , @, deferEvaluation: true
 
     @add_people_tooltip = z.localization.Localizer.get_text
@@ -155,7 +155,7 @@ class z.ViewModel.ParticipantsViewModel
     @user_profile user_et
 
   rename_conversation: (data, event) =>
-    new_name = z.util.remove_line_breaks event.target.value.trim()
+    new_name = z.util.StringUtil.remove_line_breaks event.target.value.trim()
     old_name = @conversation().display_name().trim()
     event.target.value = old_name
     @editing false
