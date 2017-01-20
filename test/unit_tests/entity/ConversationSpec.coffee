@@ -164,7 +164,7 @@ describe 'Conversation', ->
       call_message.finished_reason = z.calling.enum.CallFinishedReason.MISSED
       conversation_et.add_message call_message
       conversation_et.add_message new z.entity.Message()
-      expect(conversation_et.unread_type()).toBe z.conversation.ConversationUnreadType.MISSED_CALL
+      expect(conversation_et.unread_type()).toBe z.conversation.ConversationUnreadType.CALL
 
     it 'shows unread type "CONNECT" if connection is still pending', ->
       conversation_et.connection().status z.user.ConnectionStatus.SENT
@@ -465,10 +465,10 @@ describe 'Conversation', ->
       conversation_et.add_message message_et
 
       expect(conversation_et.messages().length).toBe 1
-      expect(conversation_et.number_of_unread_events()).toBe 1
+      expect(conversation_et.unread_event_count()).toBe 1
       conversation_et.release()
       expect(conversation_et.messages().length).toBe 1
-      expect(conversation_et.number_of_unread_events()).toBe 1
+      expect(conversation_et.unread_event_count()).toBe 1
 
     it 'should release messages if conversation has no unread messages', ->
       last_message_timestamp = new Date('December 24, 2000 18:01:00').getTime()
@@ -480,7 +480,7 @@ describe 'Conversation', ->
 
       conversation_et.last_read_timestamp last_message_timestamp
 
-      expect(conversation_et.number_of_unread_events()).toBe 0
+      expect(conversation_et.unread_event_count()).toBe 0
       expect(conversation_et.messages().length).toBe 1
       conversation_et.release()
       expect(conversation_et.messages().length).toBe 0

@@ -35,17 +35,6 @@ class z.ViewModel.list.ConversationListViewModel
 
     @content_state = @content_view_model.content_state
     @selected_conversation = ko.observable()
-    @status =
-      call: ko.pureComputed =>
-        call_et = @call_center.joined_call()
-        call_status = 'none'
-
-        if call_et?.self_user_joined()
-          call_status = 'participating-in-group-call'
-        else
-          call_status = 'not-participating-in-group-call'
-
-        return call_status
 
     @user = @user_repository.self
     @show_badge = ko.observable false
