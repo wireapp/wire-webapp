@@ -186,7 +186,7 @@ z.string.modal_logout_message = 'Delete all your personal information and conver
 z.string.modal_logout_button = 'Log out'
 # New device
 z.string.modal_new_device_headline = '%@.name started using a new device'
-z.string.modal_new_device_headline_many = '%@.names started using a new device'
+z.string.modal_new_device_headline_many = '%@.names started using new devices'
 z.string.modal_new_device_headline_you = '%@.name started using a new device'
 z.string.modal_new_device_message = 'Do you still want to send your messages?'
 z.string.modal_new_device_show_device = 'show device'
