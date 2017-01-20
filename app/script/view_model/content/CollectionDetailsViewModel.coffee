@@ -38,6 +38,7 @@ class z.ViewModel.content.CollectionDetailsViewModel
     z.util.ko_push_deferred @items, items
 
   removed_from_view: =>
+    @last_message_timestamp = undefined
     @conversation_et null
     @items.removeAll()
 
