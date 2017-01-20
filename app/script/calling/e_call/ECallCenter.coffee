@@ -212,6 +212,8 @@ class z.calling.e_call.ECallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       if e_call_message_et.response is true
+        if e_call_et.state() is z.calling.enum.CallState.INCOMING
+          return @delete_call conversation_id
         return e_call_et.update_e_participant user_id, e_call_message_et
 
       return new Promise (resolve) =>
@@ -220,7 +222,7 @@ class z.calling.e_call.ECallCenter
           .then ->
             resolve e_call_et.get_e_participant_by_id user_id
     .then (e_participant_et) ->
-      e_participant_et.session_id = e_call_message_et.session_id
+      e_participant_et.session_id = e_call_message_et.session_id if e_participant_et
     .catch (error) =>
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
       return if e_call_message_et.response is true
@@ -324,6 +326,7 @@ class z.calling.e_call.ECallCenter
       e_call_et.reset_call()
       @e_calls.remove (e_call_et) -> e_call_et.id is conversation_id
       @media_stream_handler.reset_media_streams()
+      return undefined
     .catch (error) ->
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
 
