@@ -273,30 +273,20 @@ class z.calling.e_call.ECallCenter
   ###
   Create properties payload for e-call events.
   @param force_video_send [Boolean] Video send state to be forced to true
-  @param media_type [z.media.MediaType.SCREEN] Optional type of property change
+  @param media_type [z.media.MediaType.SCREEN|Boolean] Media type of property change or forced videosend state
   @return [Object] E-call message props object
   ###
-  create_prop_sync_payload: (forced_video_state, media_type) ->
-    _create_audio_send = =>
-      if media_type is z.media.MediaType.AUDIO
-        return "#{@self_state.audio_send()}"
-
-    _create_screen_send = =>
-      if media_type in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
-        return "#{@self_state.screen_send()}"
-
-    _create_video_send = =>
-      if forced_video_state?
-        return "#{forced_video_state}"
-      if media_type in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
-        return  "#{@self_state.video_send()}"
-
-    return {
-      props:
-        audiosend: _create_audio_send()
-        screensend: _create_screen_send()
-        videosend: _create_video_send()
-    }
+  create_prop_sync_payload: (payload_type) ->
+    if _.isBoolean payload_type
+      return props: videosend: "#{payload_type}"
+    else
+      switch payload_type
+        when z.media.MediaType.AUDIO
+          return props: audiosend: "#{@self_state.audio_send()}"
+        when z.media.MediaType.SCREEN, z.media.MediaType.VIDEO
+          return props:
+            screensend: "#{@self_state.screen_send()}"
+            videosend: "#{@self_state.video_send()}"
 
   create_setup_payload: (local_sdp) ->
     return $.extend @create_prop_sync_payload(@self_state.video_send()), sdp: local_sdp
@@ -310,7 +300,7 @@ class z.calling.e_call.ECallCenter
       when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
         e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, true, e_call_et.session_id
       when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
-        e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, true, e_call_et.session_id, @create_prop_sync_payload undefined, z.media.MediaType.VIDEO
+        e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, true, e_call_et.session_id, @create_prop_sync_payload z.media.MediaType.VIDEO
 
     @send_e_call_event e_call_et.conversation_et, e_call_message_et
 
@@ -433,7 +423,7 @@ class z.calling.e_call.ECallCenter
           @media_stream_handler.toggle_video_send()
 
       toggle_promise.then =>
-        e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, false, e_call_et.session_id, @create_prop_sync_payload undefined, media_type
+        e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, false, e_call_et.session_id, @create_prop_sync_payload media_type
         @send_e_call_event e_call_et.conversation_et, e_call_message_et
     .catch (error) ->
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
