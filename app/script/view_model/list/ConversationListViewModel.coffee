@@ -99,12 +99,12 @@ class z.ViewModel.list.ConversationListViewModel
     @content_view_model.show_conversation conversation_et
 
   _init_subscriptions: =>
+    amplify.subscribe z.event.WebApp.LIFECYCLE.LOADED, @on_webapp_loaded
     amplify.subscribe z.event.WebApp.SEARCH.BADGE.SHOW, => @show_badge true
     amplify.subscribe z.event.WebApp.SEARCH.BADGE.HIDE, => @show_badge false
     amplify.subscribe z.event.WebApp.SHORTCUT.NEXT, @_go_to_next_conversation
     amplify.subscribe z.event.WebApp.SHORTCUT.PREV, @_go_to_prev_conversation
     amplify.subscribe z.event.WebApp.SHORTCUT.START, @click_on_people_button
-    amplify.subscribe z.event.WebApp.LIFECYCLE.LOADED, @on_webapp_loaded
 
   _go_to_next_conversation: =>
     conversations = @conversation_repository.conversations_unarchived()

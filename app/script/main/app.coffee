@@ -137,9 +137,9 @@ class z.main.App
 
   # Subscribe to amplify events.
   _subscribe_to_events: ->
-    amplify.subscribe z.event.WebApp.LIFECYCLE.UPDATE, @update
     amplify.subscribe z.event.WebApp.LIFECYCLE.REFRESH, @refresh
     amplify.subscribe z.event.WebApp.LIFECYCLE.SIGN_OUT, @logout
+    amplify.subscribe z.event.WebApp.LIFECYCLE.UPDATE, @update
 
 
   ###############################################################################
@@ -214,9 +214,8 @@ class z.main.App
       @_show_ui()
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.SHOWING_UI
       @telemetry.report()
-      # todo: deprecated - remove after update of supporting wrappers
-      amplify.publish z.event.WebApp.LOADED
       amplify.publish z.event.WebApp.LIFECYCLE.LOADED
+      amplify.publish z.event.WebApp.LOADED # todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.APP_LOADED
       return @repository.conversation.update_conversations @repository.conversation.conversations_unarchived()
     .then =>

@@ -42,4 +42,4 @@ module.exports = (grunt) ->
     grunt.file.write path.join('aws', 'version'), grunt.option 'version'
 
   grunt.registerTask 'aws_prepare',      ['aws_version_file', 'clean:aws', 'copy:aws', 'copy:aws_templates', 'clean:aws_app', 'clean:aws_s3', 'compress:aws']
-  grunt.registerTask 'aws_run',          ['init', 'prepare_prod', 'aws_prepare', 'open:aws', 'shell:aws', 'watch']
+  grunt.registerTask 'aws_run',          ['init', 'prepare_prod', 'aws_prepare', 'open:aws', 'shell:aws']
