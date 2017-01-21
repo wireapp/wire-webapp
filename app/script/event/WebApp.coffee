@@ -82,6 +82,7 @@ z.event.WebApp =
       CANCEL: 'wire.webapp.conversation.asset.cancel'
     MESSAGE:
       EDIT: 'wire.webapp.conversation.message.edit'
+      REMOVED: 'wire.webapp.conversation.message.removed'
     IMAGE:
       SEND: 'wire.webapp.conversation.image.send'
   CONTENT:
