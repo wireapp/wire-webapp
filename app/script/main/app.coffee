@@ -137,7 +137,9 @@ class z.main.App
 
   # Subscribe to amplify events.
   _subscribe_to_events: ->
-    amplify.subscribe z.event.WebApp.SIGN_OUT, @logout
+    amplify.subscribe z.event.WebApp.LIFECYCLE.REFRESH, @refresh
+    amplify.subscribe z.event.WebApp.LIFECYCLE.SIGN_OUT, @logout
+    amplify.subscribe z.event.WebApp.LIFECYCLE.UPDATE, @update
 
 
   ###############################################################################
@@ -212,7 +214,8 @@ class z.main.App
       @_show_ui()
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.SHOWING_UI
       @telemetry.report()
-      amplify.publish z.event.WebApp.LOADED
+      amplify.publish z.event.WebApp.LIFECYCLE.LOADED
+      amplify.publish z.event.WebApp.LOADED # todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.APP_LOADED
       return @repository.conversation.update_conversations @repository.conversation.conversations_unarchived()
     .then =>
@@ -380,7 +383,7 @@ class z.main.App
 
 
   ###############################################################################
-  # Logout
+  # Lifecycle
   ###############################################################################
 
   ###
@@ -436,6 +439,15 @@ class z.main.App
     else
       @logger.warn 'No internet access. Continuing when internet connectivity regained.'
       $(window).on 'online', -> _logout_on_backend()
+
+  refresh: ->
+    if z.util.Environment.electron and z.util.Environment.os.win
+      amplify.publish z.event.WebApp.LIFECYCLE.RESTART
+    window.location.reload true
+    window.focus()
+
+  update: ->
+    amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.LIFECYCLE_UPDATE
 
   # Redirect to the login page after internet connectivity has been verified.
   _redirect_to_login: (session_expired) ->

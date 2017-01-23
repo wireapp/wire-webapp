@@ -22,7 +22,7 @@ z.ViewModel ?= {}
 class z.ViewModel.WindowTitleViewModel
   constructor: (@content_state, @user_repository, @conversation_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS
-    amplify.subscribe z.event.WebApp.LOADED, @initiate_title_updates
+    amplify.subscribe z.event.WebApp.LIFECYCLE.LOADED, @initiate_title_updates
 
   initiate_title_updates: =>
     @logger.info 'Starting to update window title'

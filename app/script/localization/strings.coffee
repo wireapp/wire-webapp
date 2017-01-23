@@ -526,6 +526,10 @@ z.string.warning_tell_me_how = 'Tell me how'
 z.string.warning_connectivity_connection_lost = 'Trying to connect. Wire may not be able to deliver messages.'
 z.string.warning_connectivity_no_internet = 'No Internet. You won’t be able to send or receive messages.'
 
+# Warnings: Desktop Update
+z.string.warning_lifecycle_update = 'A new version of Wire is available.'
+z.string.warning_lifecycle_update_link = 'Update now'
+
 # Browser notifications
 z.string.system_notification_asset_add = 'Shared a picture'
 z.string.system_notification_connection_accepted = 'Accepted your connection request'
