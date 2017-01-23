@@ -41,6 +41,7 @@ class z.event.EventRepository
     @logger = new z.util.Logger 'z.event.EventRepository', z.config.LOGGER.OPTIONS
 
     @current_client = undefined
+    @clock_drift = 0
 
     @notification_handling_state = ko.observable z.event.NotificationHandlingState.STREAM
     @notification_handling_state.subscribe (handling_state) =>
@@ -152,6 +153,7 @@ class z.event.EventRepository
   get_notifications: (notification_id, limit = 10000) ->
     return new Promise (resolve, reject) =>
       _got_notifications = (response) =>
+        @_update_baseline_clock response.time if response.time
         if response.notifications.length > 0
           notification_id = response.notifications[response.notifications.length - 1].id
 
@@ -309,6 +311,10 @@ class z.event.EventRepository
       @logger.error "Failed to handle notification stream: #{error.message}", error
       throw error
 
+  _update_baseline_clock: (backend_time) ->
+    @clock_drift = new Date() - new Date backend_time
+    @logger.log "Clock drift set to '#{@clock_drift}' ms"
+
   _update_last_notification_id: (last_notification_id) ->
     return if not last_notification_id
 
@@ -414,16 +420,15 @@ class z.event.EventRepository
 
     ###
     Check if call event is handled within its valid lifespan.
-    @todo Includes correction of time for possible local clock drift.
     @return [Boolean] Returns true if event is handled within is lifetime, otherwise throws error
     ###
     _validate_call_event_lifetime: (event) ->
       return true if @notification_handling_state() is z.event.NotificationHandlingState.WEB_SOCKET
       return true if event.content.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
 
-      current_timestamp = Date.now()
+      corrected_timestamp = Date.now() - @clock_drift
       event_timestamp = new Date(event.time).getTime()
-      if Date.now() > EVENT_CONFIG.E_CALL_EVENT_LIFETIME + event_timestamp
-        @logger.info "Ignored outdated '#{event.type}' event in conversation '#{event.conversation}' - Event: '#{event_timestamp}', Now: '#{current_timestamp}'", {event_object: event, event_json: JSON.stringify event}
+      if corrected_timestamp > event_timestamp + EVENT_CONFIG.E_CALL_EVENT_LIFETIME
+        @logger.info "Ignored outdated '#{event.type}' event in conversation '#{event.conversation}' - Event: '#{event_timestamp}', Local: '#{corrected_timestamp}'", {event_object: event, event_json: JSON.stringify event}
         throw new z.event.EventError z.event.EventError::TYPE.OUTDATED_E_CALL_EVENT
       return true
