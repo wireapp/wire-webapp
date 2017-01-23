@@ -43,9 +43,9 @@ class z.properties.PropertiesRepository
         @properties_service.get_properties_by_key z.config.PROPERTIES_KEY
         .then (response) =>
           $.extend true, @properties, response
-          @logger.log @logger.levels.INFO, 'Loaded user properties', @properties
+          @logger.info 'Loaded user properties', @properties
       else
-        @logger.log @logger.levels.INFO, 'User has no saved properties, using defaults'
+        @logger.info 'User has no saved properties, using defaults'
     .then =>
       amplify.publish z.event.WebApp.PROPERTIES.UPDATED, @properties
       amplify.publish z.event.WebApp.ANALYTICS.INIT, @properties
@@ -135,4 +135,4 @@ class z.properties.PropertiesRepository
   _save_properties: (key, value) ->
     @properties_service.put_properties_by_key z.config.PROPERTIES_KEY, @properties
     .then =>
-      @logger.log @logger.levels.INFO, "Saved updated settings: '#{key}' - '#{value}'"
+      @logger.info "Saved updated settings: '#{key}' - '#{value}'"

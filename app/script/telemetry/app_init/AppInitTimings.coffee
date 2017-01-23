@@ -35,11 +35,11 @@ class z.telemetry.app_init.AppInitTimings
     return bucket_size * (Math.floor(@[z.telemetry.app_init.AppInitTimingsStep.SHOWING_UI] / bucket_size / 1000) + 1)
 
   log: =>
-    @logger.log @logger.levels.DEBUG, 'App initialization step durations'
+    @logger.debug 'App initialization step durations'
     for key, value of @ when key.toString() isnt 'init' and _.isNumber value
       placeholder_key = Array(Math.max 27 - key.length, 1).join ' '
       placeholder_value = Array(Math.max 6 - value.toString().length, 1).join ' '
-      @logger.log @logger.levels.INFO, "#{placeholder_key}'#{key}':#{placeholder_value}#{value}ms"
+      @logger.info "#{placeholder_key}'#{key}':#{placeholder_value}#{value}ms"
 
   time_step: (step) =>
     if not @[step]

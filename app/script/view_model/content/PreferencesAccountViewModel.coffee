@@ -159,7 +159,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
   click_on_reset_password: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, value: 'fromProfile'
-    z.util.safe_window_open z.string.url_password_reset
+    z.util.safe_window_open "#{z.util.Environment.backend.website_url()}#{z.localization.Localizer.get_text z.string.url_password_reset}"
 
   set_picture: (files, callback) =>
     input_picture = files[0]

@@ -104,3 +104,30 @@ class z.entity.ContentMessage extends z.entity.Message
   ###
   was_edited: ->
     return @replacing_message_id?
+
+  ###
+  Download message content.
+  ###
+  download: ->
+    asset_et = @get_first_asset()
+    file_name = @get_content_name()
+    asset_et.download file_name
+
+  ###
+  Get content name.
+
+  @return [Boolean]
+  ###
+  get_content_name: ->
+    asset_et = @get_first_asset()
+    file_name = asset_et.file_name
+
+    if not file_name
+      date = moment @timestamp
+      file_name = "Wire #{date.format('YYYY-MM-DD')} at #{date.format('H.mm.ss')}"
+
+    if asset_et.file_type
+      file_extension = asset_et.file_type.split('/').pop()
+      file_name = "#{file_name}.#{file_extension}"
+
+    return file_name

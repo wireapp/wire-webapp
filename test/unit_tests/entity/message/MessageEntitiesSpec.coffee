@@ -22,6 +22,23 @@ describe 'Message Entities', ->
 
   message_et = null
 
+  describe 'is_downloadable', ->
+
+    it 'message with asset text should not be downloadable', ->
+      message_et = new z.entity.ContentMessage()
+      message_et.assets.push new z.entity.Text()
+      expect(message_et.is_downloadable()).toBeFalsy()
+
+    it 'message with asset image should be downloadable', ->
+      message_et = new z.entity.ContentMessage()
+      message_et.assets.push new z.entity.MediumImage()
+      expect(message_et.is_downloadable()).toBeTruthy()
+
+    it 'message with asset file should be downloadable', ->
+      message_et = new z.entity.ContentMessage()
+      message_et.assets.push new z.entity.File()
+      expect(message_et.is_downloadable()).toBeTruthy()
+
   describe 'ContentMessage', ->
     beforeEach ->
       message_et = new z.entity.ContentMessage()

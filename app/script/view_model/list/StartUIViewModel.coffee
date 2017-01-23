@@ -34,27 +34,25 @@ class z.ViewModel.list.StartUIViewModel
     @logger = new z.util.Logger 'z.ViewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS
 
     @search = _.debounce (query) =>
-      query = @search_repository.normalize_search_query query
-      if query
-        @clear_search_results()
+      normalized_query = z.search.SearchRepository.normalize_query query
+      return unless normalized_query
+      @clear_search_results()
 
-        # contacts
-        @search_results.contacts @user_repository.search_for_connected_users query
+      # Contacts, groups and others
+      is_username = query.trim().startsWith '@'
 
-        # search for groups
-        @search_results.groups @conversation_repository.get_groups_by_name query
+      @search_repository.search_by_name normalized_query
+      .then (user_ets) =>
+        return unless normalized_query is z.search.SearchRepository.normalize_query @search_input()
+        if is_username
+          user_ets = user_ets.filter (user_et) -> return z.util.StringUtil.starts_with user_et.username(), normalized_query
+        @search_results.others user_ets
+      .catch (error) =>
+        @logger.error "Error searching for contacts: #{error.message}", error
+      @search_results.contacts @user_repository.search_for_connected_users normalized_query, is_username
+      @search_results.groups @conversation_repository.get_groups_by_name normalized_query, is_username
 
-        # search for others
-        @search_repository.search_by_name query
-        .then (user_ets) =>
-          if query is @search_repository.normalize_search_query @search_input()
-            @search_results.others user_ets
-          else
-            @logger.log @logger.levels.INFO, "Resolved Search query #{query} is outdated"
-        .catch (error) =>
-          @logger.log @logger.levels.ERROR, "Error searching for contacts: #{error.message}", error
-
-        @searched_for_user query
+      @searched_for_user query
     , 300
 
     @searched_for_user = _.once (query) ->
@@ -203,7 +201,7 @@ class z.ViewModel.list.StartUIViewModel
       @_show_onboarding_results response
     .catch (error) =>
       if error.type isnt z.connect.ConnectError::TYPE.NO_CONTACTS
-        @logger.log @logger.levels.ERROR, "Importing contacts from '#{source}' failed: #{error.message}", error
+        @logger.error "Importing contacts from '#{source}' failed: #{error.message}", error
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONTACTS, action: =>
           @import_contacts source
     .then (error) =>
@@ -224,14 +222,14 @@ class z.ViewModel.list.StartUIViewModel
         else
           @show_no_contacts_on_wire true
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Could not show the on-boarding results: #{error.message}", error
+      @logger.error "Could not show the on-boarding results: #{error.message}", error
 
   update_list: =>
     @search_repository.get_top_people()
     .then (user_ets) =>
       @top_users user_ets if user_ets.length > 0
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Could not update the top people: #{error.message}", error
+      @logger.error "Could not update the top people: #{error.message}", error
 
     @show_spinner false
 
@@ -332,7 +330,7 @@ class z.ViewModel.list.StartUIViewModel
       .then =>
         @suggestions.remove user_et
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Failed to ignore suggestions: '#{error.message}'", error
+        @logger.error "Failed to ignore suggestions: '#{error.message}'", error
 
   click_on_connect: (user_et, event) =>
     search_list_item = $(event.currentTarget.parentElement.parentElement)

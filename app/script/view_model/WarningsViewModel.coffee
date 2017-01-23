@@ -26,7 +26,7 @@ z.ViewModel.WarningType =
   REQUEST_MICROPHONE: 'request_microphone'
   REQUEST_NOTIFICATION: 'request_notification'
   REQUEST_SCREEN: 'request_screen'
-# Permission callbacks: !dimmed screen, warning bar
+  # Permission callbacks: !dimmed screen, warning bar
   DENIED_CAMERA: 'camera_access_denied'
   DENIED_MICROPHONE: 'mic_access_denied'
   DENIED_SCREEN: 'screen_access_denied'
@@ -93,17 +93,17 @@ class z.ViewModel.WarningsViewModel
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALLING,
           action: -> z.util.safe_window_open z.localization.Localizer.get_text z.string.url_support_mic_access_denied
       when z.ViewModel.WarningType.REQUEST_NOTIFICATION
-      # We block subsequent permission requests for notifications when the user ignores the request.
+        # We block subsequent permission requests for notifications when the user ignores the request.
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.PERMISSION_STATE, z.system_notification.PermissionStatusState.IGNORED
 
   dismiss_warning: (type) =>
     type = @top_warning() if not type
-    @logger.log @logger.levels.WARN, "Dismissed warning of type '#{type}'"
+    @logger.warn "Dismissed warning of type '#{type}'"
     @warnings.remove type
 
   show_warning: (type, info) =>
     @dismiss_warning() if @top_warning() and type in [z.ViewModel.WarningType.CONNECTIVITY_RECONNECT, z.ViewModel.WarningType.NO_INTERNET]
-    @logger.log @logger.levels.WARN, "Showing warning of type '#{type}'"
+    @logger.warn "Showing warning of type '#{type}'"
     if info?
       @first_name info.first_name
       @call_id = info.call_id

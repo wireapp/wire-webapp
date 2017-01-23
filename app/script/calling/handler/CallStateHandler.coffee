@@ -91,7 +91,7 @@ class z.calling.handler.CallStateHandler
   set_notification_handling_state: (handling_state) =>
     @block_event_handling = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
     @_update_ongoing_calls() if not @block_event_handling
-    @logger.log @logger.levels.INFO, "Block handling of call events: #{@block_event_handling}"
+    @logger.info "Block handling of call events: #{@block_event_handling}"
 
   ###
   Update state of currently ongoing calls.
@@ -103,7 +103,7 @@ class z.calling.handler.CallStateHandler
       .then ([is_call_ongoing, response]) =>
         if not is_call_ongoing
           event = @_fake_on_state_event response, call_et.id
-          @logger.log @logger.levels.DEBUG, "Call in '#{call_et.id}' ended during while connectivity was lost", event
+          @logger.debug "Call in '#{call_et.id}' ended during while connectivity was lost", event
           @on_call_state event, true
 
 
@@ -117,7 +117,7 @@ class z.calling.handler.CallStateHandler
   @param client_joined_change [Boolean] Client joined state change triggered by client action
   ###
   on_call_state: (event, client_joined_change = false) ->
-    @logger.log @logger.levels.DEBUG, "Handling call state event with self client change: #{client_joined_change}", event
+    @logger.debug "Handling call state event with self client change: #{client_joined_change}", event
     participant_ids = @_get_remote_participant_ids event.participants
     self_user_joined = @_is_self_user_joined event.participants
     participants_count = participant_ids.length
@@ -158,7 +158,7 @@ class z.calling.handler.CallStateHandler
         else if participants_count > 0
           @_create_incoming_call event, participant_ids
       else
-        @logger.log @logger.levels.ERROR, "Failed to handle state event: #{error.message}", error
+        @logger.error "Failed to handle state event: #{error.message}", error
 
   ###
   Create the payload for to be set as call state.
@@ -192,18 +192,18 @@ class z.calling.handler.CallStateHandler
     if not conversation_id
       error_description = 'GETting the call state not possible without conversation ID'
       Raygun.send new Error error_description
-      @logger.log @logger.levels.ERROR, error_description
+      @logger.error error_description
       return Promise.reject new Error error_description
 
-    @logger.log @logger.levels.INFO, "GETting call state for '#{conversation_id}'"
+    @logger.info "GETting call state for '#{conversation_id}'"
     @call_center.call_service.get_state conversation_id
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "GETting call state for '#{conversation_id}' failed: #{error.message}", error
+      @logger.error "GETting call state for '#{conversation_id}' failed: #{error.message}", error
       attributes = {cause: error.label or error.name, method: 'get', request: 'state'}
       @call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
       throw error
     .then (response) =>
-      @logger.log @logger.levels.DEBUG, "GETting call state for '#{conversation_id}' successful", response
+      @logger.debug "GETting call state for '#{conversation_id}' successful", response
       return response
 
   ###
@@ -219,14 +219,12 @@ class z.calling.handler.CallStateHandler
       @call_center.telemetry.report_error error_description
       return Promise.reject new Error error_description
 
-    @logger.log @logger.levels.INFO,
-      "PUTting the state to '#{payload.state}' in '#{conversation_id}'", payload
+    @logger.info "PUTting the state to '#{payload.state}' in '#{conversation_id}'", payload
     @call_center.call_service.put_state conversation_id, payload
     .catch (error) =>
       @_put_state_failure error, conversation_id, payload
     .then (response) =>
-      @logger.log @logger.levels.DEBUG,
-        "PUTting the state to '#{payload.state}' in '#{conversation_id}' successful", response
+      @logger.debug "PUTting the state to '#{payload.state}' in '#{conversation_id}' successful", response
       return response
 
   ###
@@ -243,8 +241,7 @@ class z.calling.handler.CallStateHandler
   @param payload [Object] Participant payload to be set
   ###
   _put_state_failure: (error, conversation_id, payload) ->
-    @logger.log @logger.levels.ERROR,
-      "PUTting the state to '#{payload.state}' in '#{conversation_id}' failed: #{error.message}", error
+    @logger.error "PUTting the state to '#{payload.state}' in '#{conversation_id}' failed: #{error.message}", error
     attributes = {cause: error.label or error.name, method: 'put', request: 'state', video: payload.videod}
     @call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
     @call_center.media_stream_handler.release_media_streams()
@@ -277,7 +274,7 @@ class z.calling.handler.CallStateHandler
     .then (response) =>
       @on_call_state @_fake_on_state_event(response, conversation_id), true
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to change state for call '#{conversation_id}': #{error.message}"
+      @logger.error "Failed to change state for call '#{conversation_id}': #{error.message}"
 
   ###
   Put the clients call state for a conversation to z.calling.enum.ParticipantState.JOINED.
@@ -297,7 +294,7 @@ class z.calling.handler.CallStateHandler
       @call_center.telemetry.track_session conversation_id, event
       @on_call_state event, client_joined_change
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to change state for call '#{conversation_id}': #{error.message}"
+      @logger.error "Failed to change state for call '#{conversation_id}': #{error.message}"
 
   ###
   Check sequence number of event and decide if it will be processed.
@@ -310,15 +307,14 @@ class z.calling.handler.CallStateHandler
   ###
   _should_ignore_state: (event, call_et, client_joined_change) ->
     if event.sequence > call_et.event_sequence
-      @logger.log @logger.levels.INFO, "State processed: Sequence '#{event.sequence}' > '#{call_et.event_sequence}'"
+      @logger.info "State processed: Sequence '#{event.sequence}' > '#{call_et.event_sequence}'"
       event.is_sequential = event.sequence is call_et.event_sequence + 1
       call_et.event_sequence = event.sequence
     else if client_joined_change
-      @logger.log @logger.levels.INFO,
-        "State processed: Contains self client change but '#{event.sequence}' <= '#{call_et.event_sequence}'"
+      @logger.info "State processed: Contains self client change but '#{event.sequence}' <= '#{call_et.event_sequence}'"
       call_et.event_sequence = event.sequence
     else if event.sequence <= call_et.event_sequence
-      @logger.log @logger.levels.WARN, "State ignored: Sequence '#{event.sequence}' <= '#{call_et.event_sequence}'"
+      @logger.warn "State ignored: Sequence '#{event.sequence}' <= '#{call_et.event_sequence}'"
       event = undefined
     return event
 
@@ -334,7 +330,7 @@ class z.calling.handler.CallStateHandler
   delete_call: (conversation_id) =>
     @call_center.get_call_by_id conversation_id
     .then (call_et) =>
-      @logger.log @logger.levels.INFO, "Delete call in conversation '#{conversation_id}'"
+      @logger.info "Delete call in conversation '#{conversation_id}'"
       # Reset call and delete it afterwards
       if call_et.self_client_joined() and call_et.state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP
@@ -343,7 +339,7 @@ class z.calling.handler.CallStateHandler
       @_remove_call call_et.id
       @call_center.media_stream_handler.reset_media_streams()
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "No call found in conversation '#{conversation_id}' to delete", error
+      @logger.warn "No call found in conversation '#{conversation_id}' to delete", error
 
   ###
   User action to ignore incoming call.
@@ -354,10 +350,10 @@ class z.calling.handler.CallStateHandler
     .then (call_et) =>
       call_et.ignore()
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.INCOMING_CALL_MUTED
-      @logger.log @logger.levels.INFO, "Call in '#{conversation_id}' ignored"
+      @logger.info "Call in '#{conversation_id}' ignored"
       @call_center.media_stream_handler.reset_media_streams()
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "No call found in conversation '#{conversation_id}' to ignore", error
+      @logger.warn "No call found in conversation '#{conversation_id}' to ignore", error
 
   ###
   User action to join a call.
@@ -406,7 +402,7 @@ class z.calling.handler.CallStateHandler
         call_et.finished_reason = z.calling.enum.CallFinishedReason.SELF_USER
       @_put_state_to_idle conversation_id
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "No call found in conversation '#{conversation_id}' to leave", error
+      @logger.warn "No call found in conversation '#{conversation_id}' to leave", error
 
   ###
   Leave a call we are joined immediately in case the browser window is closed.
@@ -427,7 +423,7 @@ class z.calling.handler.CallStateHandler
       if participant_et = call_et.get_participant_by_id user_id
         call_et.delete_participant participant_et, false
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "No call found in conversation '#{conversation_id}' to remove participant from", error
+      @logger.warn "No call found in conversation '#{conversation_id}' to remove participant from", error
 
   ###
   User action to toggle the audio muted state of a call.
@@ -438,7 +434,7 @@ class z.calling.handler.CallStateHandler
     .then =>
       return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to toggle audio state: #{error.message}", error
+      @logger.error "Failed to toggle audio state: #{error.message}", error
 
   ###
   User action to toggle the call state.
@@ -460,7 +456,7 @@ class z.calling.handler.CallStateHandler
     .then =>
       return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to toggle screen sharing state: #{error.message}", error
+      @logger.error "Failed to toggle screen sharing state: #{error.message}", error
 
   ###
   User action to toggle the video state of a call.
@@ -471,7 +467,7 @@ class z.calling.handler.CallStateHandler
     .then =>
       return @_put_state_to_join conversation_id, @_create_state_payload z.calling.enum.ParticipantState.JOINED if conversation_id
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to toggle video state: #{error.message}", error
+      @logger.error "Failed to toggle video state: #{error.message}", error
 
   ###
   Check whether we are actively participating in a call.
@@ -485,7 +481,7 @@ class z.calling.handler.CallStateHandler
     return new Promise (resolve) =>
       ongoing_call_id = @_self_participant_on_a_call()
       if ongoing_call_id
-        @logger.log @logger.levels.WARN, 'You cannot start a second call while already participating in another one.'
+        @logger.warn 'You cannot start a second call while already participating in another one.'
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_START_ANOTHER,
           action: =>
             @leave_call ongoing_call_id
@@ -507,11 +503,11 @@ class z.calling.handler.CallStateHandler
     @_get_state conversation_id
     .then (response) =>
       for id, participant of response.participants when participant.state is z.calling.enum.ParticipantState.JOINED
-        @logger.log @logger.levels.DEBUG, "Detected ongoing call in '#{conversation_id}'"
+        @logger.debug "Detected ongoing call in '#{conversation_id}'"
         return [true, response]
       return [false, response]
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "Detecting ongoing call in '#{conversation_id}' failed: #{error.message}", error
+      @logger.warn "Detecting ongoing call in '#{conversation_id}' failed: #{error.message}", error
 
   ###
   Join a call and get a MediaStream.
@@ -526,7 +522,7 @@ class z.calling.handler.CallStateHandler
       throw error if error.type isnt z.calling.CallError::TYPE.CALL_NOT_FOUND
     .then =>
       if @call_center.media_stream_handler.has_media_streams()
-        @logger.log @logger.levels.INFO, 'MediaStream has already been initialized', @call_center.media_stream_handler.local_media_streams
+        @logger.info 'MediaStream has already been initialized', @call_center.media_stream_handler.local_media_streams
       else
         @call_center.timings().time_step z.telemetry.calling.CallSetupSteps.STREAM_REQUESTED if @call_center.timings()
         return @call_center.media_stream_handler.initiate_media_stream conversation_id, is_videod
@@ -534,7 +530,7 @@ class z.calling.handler.CallStateHandler
       @call_center.timings().time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED if @call_center.timings()
       return @_put_state_to_join conversation_id, @_create_state_payload(z.calling.enum.ParticipantState.JOINED), true
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Joining call in '#{conversation_id}' failed: #{error.name}", error
+      @logger.error "Joining call in '#{conversation_id}' failed: #{error.name}", error
 
   ###
   Remove a call from the list.
@@ -559,7 +555,7 @@ class z.calling.handler.CallStateHandler
         call_et.update_participants (new z.calling.entities.Participant user_et for user_et in participant_ets), limit
         call_et.update_remote_state event.participants
     .catch (error) =>
-      @logger.log @logger.levels.WARN, "No call found in conversation '#{event.conversation}' to update", error
+      @logger.warn "No call found in conversation '#{event.conversation}' to update", error
 
   ###
   Update the self states of the call.
@@ -605,7 +601,7 @@ class z.calling.handler.CallStateHandler
   _create_call: (event) ->
     @call_center.get_call_by_id event.conversation
     .then (call_et) =>
-      @logger.log @logger.levels.WARN, "Call entity for '#{event.conversation}' already exists", call_et
+      @logger.warn "Call entity for '#{event.conversation}' already exists", call_et
       return call_et
     .catch =>
       conversation_et = @call_center.conversation_repository.get_conversation_by_id event.conversation
@@ -637,7 +633,7 @@ class z.calling.handler.CallStateHandler
         @self_client_joined true
         call_et.self_client_joined true
         call_et.self_user_joined true
-        @logger.log @logger.levels.DEBUG, "Connecting '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}' from this client", call_et
+        @logger.debug "Connecting '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}' from this client", call_et
 
   ###
   Constructs an incoming call entity.
@@ -659,12 +655,11 @@ class z.calling.handler.CallStateHandler
         call_et.update_remote_state event.participants
         call_et.state z.calling.enum.CallState.INCOMING
         @call_center.telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, call_et
-        @logger.log @logger.levels.DEBUG,
-          "Incoming '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}'", call_et
+        @logger.debug "Incoming '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}'", call_et
         if call_et.is_remote_videod()
           @call_center.media_stream_handler.initiate_media_stream call_et.id, true
           .catch (error) =>
-            @logger.log @logger.levels.ERROR, "Failed to start self video for incoming call: #{error.message}", error
+            @logger.error "Failed to start self video for incoming call: #{error.message}", error
 
   ###
   Constructs an ongoing call entity.
@@ -683,7 +678,7 @@ class z.calling.handler.CallStateHandler
         participant_ets = (new z.calling.entities.Participant user_et for user_et in remote_user_ets)
         call_et.update_participants participant_ets
         call_et.update_remote_state event.participants
-        @logger.log @logger.levels.DEBUG, "Ongoing '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}' from another client", call_et
+        @logger.debug "Ongoing '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}' from another client", call_et
 
   ###
   Constructs an outgoing call entity.
@@ -700,8 +695,7 @@ class z.calling.handler.CallStateHandler
       call_et.self_client_joined true
       call_et.self_user_joined true
       call_et.set_creator @call_center.user_repository.self()
-      @logger.log @logger.levels.DEBUG,
-        "Outgoing '#{@call_center.media_stream_handler.local_media_type()}' call to '#{call_et.conversation_et.display_name()}'", call_et
+      @logger.debug "Outgoing '#{@call_center.media_stream_handler.local_media_type()}' call to '#{call_et.conversation_et.display_name()}'", call_et
       @call_center.telemetry.track_event z.tracking.EventName.CALLING.INITIATED_CALL, call_et
       return call_et
 
@@ -731,7 +725,7 @@ class z.calling.handler.CallStateHandler
   @return [String] Random faked session ID
   ###
   _fake_session_id: ->
-    @logger.log @logger.levels.WARN, 'There is no session ID. We faked one.'
+    @logger.warn 'There is no session ID. We faked one.'
     return "FAKE-#{z.util.create_random_uuid()}"
 
   ###

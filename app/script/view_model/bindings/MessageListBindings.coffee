@@ -71,6 +71,7 @@ ko.bindingHandlers.background_image =
         .catch -> return
     , 500
 
+    object_url = undefined
     image_element = $(element).find 'img'
     asset_remote_data = valueAccessor()
 
@@ -83,33 +84,7 @@ ko.bindingHandlers.background_image =
     ko.utils.domNodeDisposal.addDisposeCallback element, ->
       viewport_subscription.dispose()
       asset_subscription.dispose()
-
-# Fit image to viewport
-#
-ko.bindingHandlers.fit_to_viewport = do ->
-  message_list_width = undefined
-
-  process_image = (element, asset) ->
-    message_list_width ?= $('.messages').width()
-    content_element = element.parent()
-    content_element.toggleClass 'image-widescreen', message_list_width < asset.width and asset.ratio < 1
-
-  on_resize = _.throttle ->
-    message_list_width = undefined
-    image_func() for image_func in images()
-  , 250
-
-  images = ko.observableArray()
-  images.subscribe (array) ->
-    $(window).off 'resize.viewport'
-    $(window).on 'resize.viewport', on_resize if array.length > 0
-
-  init: (element, valueAccessor, allBindingsAccessor) ->
-    func = -> process_image $(element), ko.unwrap valueAccessor()
-    func()
-
-    images.push func
-    ko.utils.domNodeDisposal.addDisposeCallback element, -> images.remove func
+      window.URL.revokeObjectURL object_url if object_url?
 
 # Generate message timestamp
 #

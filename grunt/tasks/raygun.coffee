@@ -17,7 +17,7 @@
 #
 
 ###############################################################################
-# Raygun Sourcefile upload
+# Raygun Source Map Upload
 ###############################################################################
 
 fs = require 'fs'
@@ -72,6 +72,7 @@ module.exports = (grunt) ->
         if pending_upload_count is 0
           number_of_files = (files.length - failed_upload_count).toString()
           file_string = grunt.util.pluralize files.length, 'file/files'
+          grunt.log.writeln ''
           grunt.log.ok "#{number_of_files['cyan']} #{file_string} uploaded to Raygun."
           done()
         else

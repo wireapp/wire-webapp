@@ -69,7 +69,7 @@ class z.tracking.EventTrackingRepository
   init: (properties) =>
     @properties = properties
     @tracking_id = @user_repository.self().tracking_id
-    @logger.log @logger.levels.INFO, 'Initialize tracking and error reporting'
+    @logger.info 'Initialize tracking and error reporting'
 
     if not @_localytics_disabled() and @_has_permission()
       @_enable_error_reporting()
@@ -120,7 +120,7 @@ class z.tracking.EventTrackingRepository
 
   close_session: =>
     return if @localytics is undefined or not @_has_permission()
-    @logger.log @logger.levels.INFO, 'Closing Localytics session'
+    @logger.info 'Closing Localytics session'
 
     session_ended = Date.now()
     session_duration = session_ended - @session_started
@@ -159,7 +159,7 @@ class z.tracking.EventTrackingRepository
       delete @session_values[key]
 
     # Log data
-    @logger.log @logger.levels.INFO, 'Uploading session data...', @session_values
+    @logger.info 'Uploading session data...', @session_values
     @_tag_and_upload_event 'session', @session_values
 
   track_event: (event_name, attributes) =>
@@ -191,7 +191,7 @@ class z.tracking.EventTrackingRepository
     @localytics 'close'
     window.ll = undefined
     @localytics = undefined
-    @logger.log @logger.levels.DEBUG, 'Localytics reporting was disabled due to user preferences'
+    @logger.debug 'Localytics reporting was disabled due to user preferences'
 
   # @see http://docs.localytics.com/#Dev/Integrate/web-options.html
   _init_localytics: (window, document, node_type, @localytics, c, script_node) ->
@@ -217,25 +217,25 @@ class z.tracking.EventTrackingRepository
     (c = document.getElementsByTagName(node_type)[0]).parentNode.insertBefore script_node, c
 
     @localytics 'init', LOCALYTICS.APP_KEY, options
-    @logger.log @logger.levels.DEBUG, 'Localytics reporting is enabled'
+    @logger.debug 'Localytics reporting is enabled'
 
   _localytics_disabled: ->
     if not z.util.get_url_parameter z.auth.URLParameter.LOCALYTICS
-      for domain in LOCALYTICS.DISABLED_DOMAINS when z.util.contains window.location.hostname, domain
-        @logger.log @logger.levels.DEBUG, 'Localytics reporting is disabled due to domain'
+      for domain in LOCALYTICS.DISABLED_DOMAINS when z.util.StringUtil.includes window.location.hostname, domain
+        @logger.debug 'Localytics reporting is disabled due to domain'
         return true
     return false
 
   _log_event: (event_name, attributes) ->
     if attributes
-      @logger.log "Localytics event '#{event_name}' with attributes: #{JSON.stringify(attributes)}"
+      @logger.info "Localytics event '#{event_name}' with attributes: #{JSON.stringify(attributes)}"
     else
-      @logger.log "Localytics event '#{event_name}' without attributes"
+      @logger.info "Localytics event '#{event_name}' without attributes"
 
   _start_session: =>
     return if not @localytics
 
-    @logger.log @logger.levels.INFO, 'Starting new Localytics session'
+    @logger.info 'Starting new Localytics session'
     @localytics 'open'
     @localytics 'upload'
 
@@ -286,13 +286,13 @@ class z.tracking.EventTrackingRepository
     window.onunhandledrejection = undefined
 
   _disable_error_reporting: ->
-    @logger.log @logger.levels.DEBUG, 'Disabling Raygun error reporting'
+    @logger.debug 'Disabling Raygun error reporting'
     Raygun.detach()
     Raygun.init RAYGUN.API_KEY, {disableErrorTracking: true}
     @_detach_promise_rejection_handler()
 
   _enable_error_reporting: ->
-    @logger.log @logger.levels.DEBUG, 'Enabling Raygun error reporting'
+    @logger.debug 'Enabling Raygun error reporting'
     options =
       disableErrorTracking: false
       ignoreAjaxAbort: true

@@ -24,8 +24,10 @@ class z.components.UserAvatar
     @user = ko.unwrap params.user
     @badge = params.badge or false
     @element = $(component_info.element)
+    @delay = params.delay
 
     @avatar_loading_blocked = false
+    @avatar_entered_viewport = false
 
     if not @user?
       @user = new z.entity.User()
@@ -36,7 +38,7 @@ class z.components.UserAvatar
 
     @initials = ko.pureComputed =>
       if @element.hasClass 'user-avatar-xs'
-        return z.util.get_first_character @user.initials()
+        return z.util.StringUtil.get_first_character @user.initials()
       else
         return @user.initials()
 
@@ -59,11 +61,12 @@ class z.components.UserAvatar
       params.click? data.user, event.currentTarget.parentNode
 
     @on_in_viewport = =>
-      return true if @avatar_loading_blocked
+      @avatar_entered_viewport = true
       @_load_avatar_picture()
       return true
 
     @_load_avatar_picture = =>
+      return true if @avatar_loading_blocked
       @avatar_loading_blocked = true
       @user.preview_picture_resource()?.get_object_url()
       .then (url) =>
@@ -74,8 +77,8 @@ class z.components.UserAvatar
         @element.addClass 'user-avatar-image-loaded user-avatar-loading-transition'
         @avatar_loading_blocked = false
 
-    @picture_preview_subscription = ko.computed =>
-      return if @avatar_loading_blocked
+    @picture_preview_subscription = @user.preview_picture_resource.subscribe =>
+      return if not @avatar_entered_viewport
       @_load_avatar_picture()
 
   dispose: =>
@@ -87,7 +90,7 @@ ko.components.register 'user-avatar',
     createViewModel: (params, component_info) ->
       return new z.components.UserAvatar params, component_info
   template: """
-            <div class="user-avatar" data-bind="attr: {title: user.name}, css: css_classes(), click: on_click, in_viewport: on_in_viewport">
+            <div class="user-avatar" data-bind="attr: {title: user.name}, css: css_classes(), click: on_click, in_viewport: on_in_viewport, delay: delay">
               <div class="user-avatar-background"></div>
               <div class="user-avatar-initials" data-bind="text: initials"></div>
               <div class="user-avatar-image"></div>

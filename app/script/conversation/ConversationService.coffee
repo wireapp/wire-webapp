@@ -88,6 +88,18 @@ class z.conversation.ConversationService
   ###############################################################################
 
   ###
+  Remove bot from conversation.
+
+  @param conversation_id [String] ID of conversation to remove bot from
+  @param user_id [String] ID of bot to be removed from the the conversation
+  @param callback [Function] Function to be called on server return
+  ###
+  delete_bots: (conversation_id, user_id) ->
+    @client.send_request
+      url: @client.create_url "/conversations/#{conversation_id}/bots/#{user_id}"
+      type: 'DELETE'
+
+  ###
   Remove member from conversation.
 
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/removeMember
@@ -169,7 +181,7 @@ class z.conversation.ConversationService
       record.data.status = z.assets.AssetTransferState.UPLOADED
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
-      @logger.log 'Updated asset message_et (uploaded)', primary_key
+      @logger.info 'Updated asset message_et (uploaded)', primary_key
 
   ###
   Update asset with preview in database.
@@ -185,7 +197,7 @@ class z.conversation.ConversationService
       record.data.preview_token = asset_data.token
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
-      @logger.log 'Updated asset message_et (preview)', primary_key
+      @logger.info 'Updated asset message_et (preview)', primary_key
 
   ###
   Update asset as failed in database.
@@ -198,7 +210,7 @@ class z.conversation.ConversationService
       record.data.reason = reason
       @storage_service.update @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, record
     .then =>
-      @logger.log 'Updated asset message_et (failed)', primary_key
+      @logger.info 'Updated asset message_et (failed)', primary_key
 
   ###
   Loads conversation states from the local database.
@@ -219,36 +231,8 @@ class z.conversation.ConversationService
     .filter (record) -> record.id is message_id
     .first()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR,
-        "Failed to get event for conversation '#{conversation_id}': #{error.message}", error
+      @logger.error "Failed to get event for conversation '#{conversation_id}': #{error.message}", error
       throw error
-
-  ###
-  Load conversation events. Start and end are not included. Events are always sorted beginning with the newest timestamp.
-
-  TODO: This function can be removed once Microsoft Edge's IndexedDB supports compound indices:
-  - https://developer.microsoft.com/en-us/microsoft-edge/platform/status/indexeddbarraysandmultientrysupport/
-
-  @param conversation_id [String] ID of conversation
-  @param start [Number] starting from this timestamp
-  @param end [Number] stop when reaching timestamp
-  @param limit [Number] Amount of events to load
-  @return [Promise] Promise that resolves with the retrieved records
-  ###
-  _load_events_from_db_deprecated: (conversation_id, start, end, limit) ->
-    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where 'conversation'
-      .equals conversation_id
-      .reverse()
-      .sortBy 'time'
-      .then (records) ->
-        return records.filter (record) ->
-          timestamp = new Date(record.time).getTime()
-          return false if start and timestamp >= start
-          return false if end and timestamp <= end
-          return true
-      .then (records) ->
-        return records.slice 0, limit
 
   ###
   Load conversation events. Start and end are not included.
@@ -263,13 +247,11 @@ class z.conversation.ConversationService
   @return [Promise] Promise that resolves with the retrieved records
   @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
-  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = z.config.MESSAGES_FETCH_LIMIT) ->
+  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = Number.MAX_SAFE_INTEGER) ->
     if not _.isDate(lower_bound) or not _.isDate upper_bound
       throw new Error "Lower bound (#{typeof lower_bound}) and upper bound (#{typeof upper_bound}) must be of type 'Date'."
     else if lower_bound.getTime() > upper_bound.getTime()
       throw new Error "Lower bound (#{lower_bound.getTime()}) cannot be greater than upper bound (#{upper_bound.getTime()})."
-    else if z.util.Environment.browser.edge
-      return @_load_events_from_db_deprecated conversation_id, lower_bound.getTime(), upper_bound.getTime(), limit
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
@@ -278,8 +260,20 @@ class z.conversation.ConversationService
     .limit limit
     .toArray()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to load events for conversation '#{conversation_id}' from database: '#{error.message}'"
+      @logger.error "Failed to load events for conversation '#{conversation_id}' from database: '#{error.message}'"
       throw error
+
+  ###
+  Get events with given category.
+  @param conversation_id [String] ID of conversation to add users to
+  @param category [z.message.MessageCategory] will be used as lower bound
+  @return [Promise]
+  ###
+  load_events_with_category_from_db: (conversation_id, category) ->
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where '[conversation+category]'
+    .between [conversation_id, category], [conversation_id, z.message.MessageCategory.LIKED], true, true
+    .sortBy 'time'
 
   ###
   Add a bot to an existing conversation.
@@ -352,7 +346,7 @@ class z.conversation.ConversationService
   save_conversation_state_in_db: (conversation_et) =>
     @storage_service.save @storage_service.OBJECT_STORE_CONVERSATIONS, conversation_et.id, conversation_et.serialize()
     .then =>
-      @logger.log @logger.levels.INFO, "State of conversation '#{conversation_et.id}' was stored for the first time"
+      @logger.info "State of conversation '#{conversation_et.id}' was stored for the first time"
       return conversation_et
 
   ###

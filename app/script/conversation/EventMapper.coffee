@@ -32,20 +32,20 @@ class z.conversation.EventMapper
   ###
   Convert multiple JSON events into message entities.
 
-  @param json [Object] Event data
+  @param events [Object] Event data
   @param conversation_et [z.entity.Conversation] Conversation entity the events belong to
 
   @return [Array<z.entity.Message>] Mapped message entities
   ###
-  map_json_events: (json, conversation_et) ->
-    events = (@map_json_event event, conversation_et for event in json.events.reverse() when event isnt undefined)
+  map_json_events: (events, conversation_et, should_create_dummy_image) ->
+    events = (@map_json_event event, conversation_et, should_create_dummy_image for event in events.reverse() when event isnt undefined)
     return events.filter (x) -> x isnt undefined
 
-  map_json_event: (event, conversation_et) =>
+  map_json_event: (event, conversation_et, should_create_dummy_image) =>
     try
-      return @_map_json_event event, conversation_et
+      return @_map_json_event event, conversation_et, should_create_dummy_image
     catch error
-      @logger.log @logger.levels.ERROR, "Failed to map event: #{error.message}", {error: error, event: event}
+      @logger.error "Failed to map event: #{error.message}", {error: error, event: event}
       return undefined
 
   ###
@@ -56,10 +56,10 @@ class z.conversation.EventMapper
 
   @return [z.entity.Message] Mapped message entity
   ###
-  _map_json_event: (event, conversation_et) ->
+  _map_json_event: (event, conversation_et, should_create_dummy_image) ->
     switch event.type
       when z.event.Backend.CONVERSATION.ASSET_ADD
-        message_et = @_map_event_asset_add event
+        message_et = @_map_event_asset_add event, should_create_dummy_image
       when z.event.Backend.CONVERSATION.KNOCK
         message_et = @_map_event_ping event
       when z.event.Backend.CONVERSATION.MESSAGE_ADD
@@ -93,6 +93,7 @@ class z.conversation.EventMapper
     message_et.primary_key = z.storage.StorageService.construct_primary_key event
     message_et.type = event.type
     message_et.version = event.version or 1
+    message_et.category = event.category
 
     message_et.conversation_id = conversation_et.id
 
@@ -106,7 +107,7 @@ class z.conversation.EventMapper
       message_et.ephemeral_started event.ephemeral_started or '0'
 
     if window.isNaN message_et.timestamp
-      @logger.log @logger.levels.WARN, "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
+      @logger.warn "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
       message_et = undefined
 
     return message_et
@@ -124,10 +125,10 @@ class z.conversation.EventMapper
 
   @return [z.entity.NormalMessage] Normal message entity
   ###
-  _map_event_asset_add: (event) ->
+  _map_event_asset_add: (event, should_create_dummy_image) ->
     message_et = new z.entity.ContentMessage()
     if event.data?.info.tag is z.assets.ImageSizeType.MEDIUM
-      message_et.assets.push @_map_asset_medium_image event
+      message_et.assets.push @_map_asset_medium_image event, should_create_dummy_image
     message_et.nonce = event.data.info.nonce
     return message_et
 
@@ -382,7 +383,7 @@ class z.conversation.EventMapper
           {asset_token, asset_id, otr_key, sha256} = article.image.uploaded
           otr_key = new Uint8Array otr_key.toArrayBuffer()
           sha256 = new Uint8Array sha256.toArrayBuffer()
-          link_preview_et.image_resource z.assets.AssetRemoteData.v3 asset_id, otr_key, sha256, asset_token
+          link_preview_et.image_resource z.assets.AssetRemoteData.v3 asset_id, otr_key, sha256, asset_token, true
 
         return link_preview_et
 
@@ -395,16 +396,19 @@ class z.conversation.EventMapper
 
   @return [z.entity.MediumImage] Medium image asset entity
   ###
-  _map_asset_medium_image: (event) ->
+  _map_asset_medium_image: (event, should_create_dummy_image) ->
     asset_et = new z.entity.MediumImage event.data.id
+    asset_et.file_size = event.data.content_length
+    asset_et.file_type = event.data.content_type
     asset_et.width = event.data.info.width
     asset_et.height = event.data.info.height
     asset_et.ratio = asset_et.height / asset_et.width
     if event.data.key
-      asset_et.resource z.assets.AssetRemoteData.v3 event.data.key, event.data.otr_key, event.data.sha256, event.data.token
+      asset_et.resource z.assets.AssetRemoteData.v3 event.data.key, event.data.otr_key, event.data.sha256, event.data.token, true
     else
-      asset_et.resource z.assets.AssetRemoteData.v2 event.conversation, asset_et.id, event.data.otr_key, event.data.sha256
-    asset_et.dummy_url = z.util.dummy_image asset_et.width, asset_et.height
+      asset_et.resource z.assets.AssetRemoteData.v2 event.conversation, asset_et.id, event.data.otr_key, event.data.sha256, true
+    if should_create_dummy_image
+      asset_et.dummy_url = z.util.dummy_image asset_et.width, asset_et.height
     return asset_et
 
   ###
@@ -438,9 +442,9 @@ class z.conversation.EventMapper
     if event.data.preview_id?
       if event.data.key
         {preview_key, preview_otr_key, preview_sha256, preview_token} = event.data
-        asset_et.preview_resource z.assets.AssetRemoteData.v3 preview_key, preview_otr_key, preview_sha256, preview_token
+        asset_et.preview_resource z.assets.AssetRemoteData.v3 preview_key, preview_otr_key, preview_sha256, preview_token, true
       else
-        asset_et.preview_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, event.data.preview_id, event.data.preview_otr_key, event.data.preview_sha256
+        asset_et.preview_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, event.data.preview_id, event.data.preview_otr_key, event.data.preview_sha256, true
 
     asset_et.status event.data.status or z.assets.AssetTransferState.UPLOADING # TODO
     return asset_et

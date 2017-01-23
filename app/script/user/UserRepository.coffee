@@ -104,7 +104,7 @@ class z.user.UserRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.CONNECT_REQUEST_SENT
       @user_connection response, show_conversation
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to send connection request to user '#{user_et.id}': #{error.message}", error
+      @logger.error "Failed to send connection request to user '#{user_et.id}': #{error.message}", error
 
   ###
   Get a connection for a user ID.
@@ -151,7 +151,7 @@ class z.user.UserRepository
 
       return @connections()
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to retrieve connections from backend: #{error.message}", error
+      @logger.error "Failed to retrieve connections from backend: #{error.message}", error
       throw error
 
   ###
@@ -196,12 +196,12 @@ class z.user.UserRepository
   _assign_all_clients: =>
     @client_repository.get_all_clients_from_db()
     .then (user_client_map) =>
-      @logger.log "Found locally stored clients for '#{Object.keys(user_client_map).length}' users", user_client_map
+      @logger.info "Found locally stored clients for '#{Object.keys(user_client_map).length}' users", user_client_map
       user_ids = (user_id for user_id, client_ets of user_client_map)
       @get_users_by_id user_ids, (user_ets) =>
         for user_et in user_ets
           if user_client_map[user_et.id].length > 8
-            @logger.log @logger.levels.WARN, "Found '#{user_client_map[user_et.id].length}' clients for '#{user_et.name()}'", user_client_map[user_et.id]
+            @logger.warn "Found '#{user_client_map[user_et.id].length}' clients for '#{user_et.name()}'", user_client_map[user_et.id]
           user_et.devices user_client_map[user_et.id]
 
   # Assign connections to the users.
@@ -226,8 +226,7 @@ class z.user.UserRepository
     .then (response) =>
       @user_connection response, show_conversation
     .catch (error) =>
-      @logger.log @logger.levels.ERROR,
-        "Connection status change to '#{status}' for user '#{user_et.id}' failed: #{error.message}", error
+      @logger.error "Connection status change to '#{status}' for user '#{user_et.id}' failed: #{error.message}", error
       custom_data =
         current_status: user_et.connection().status()
         failed_action: status
@@ -291,7 +290,10 @@ class z.user.UserRepository
         when z.user.ConnectionStatus.PENDING
           message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST
         when z.user.ConnectionStatus.ACCEPTED
-          message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED
+          if previous_status is z.user.ConnectionStatus.SENT
+            message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED
+          else
+            message_et.member_message_type = z.message.SystemMessageType.CONNECTION_CONNECTED
       amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, connection_et, message_et
 
 
@@ -309,9 +311,8 @@ class z.user.UserRepository
   add_client_to_user: (user_id, client_et) =>
     @client_repository.save_client_in_db user_id, client_et.to_json()
     .then =>
-      @find_user user_id
-    .then (user_et) ->
-      user_et.add_client client_et
+      @get_user_by_id user_id, (user_et) ->
+        user_et.add_client client_et
 
   ###
   Removes a stored client and the session connected with it.
@@ -323,9 +324,8 @@ class z.user.UserRepository
   remove_client_from_user: (user_id, client_id) =>
     @client_repository.remove_client user_id, client_id
     .then =>
-      @find_user user_id
-    .then (user_et) ->
-      user_et.remove_client client_id
+      @get_user_by_id user_id, (user_et) ->
+        user_et.remove_client client_id
 
 
   ###############################################################################
@@ -339,9 +339,9 @@ class z.user.UserRepository
   delete_me: =>
     @user_service.delete_self()
     .then =>
-      @logger.log @logger.levels.INFO, 'Account deletion initiated'
+      @logger.info 'Account deletion initiated'
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Unable to delete self: #{error}"
+      @logger.error "Unable to delete self: #{error}"
 
   ###
   Get a user from the backend.
@@ -367,7 +367,7 @@ class z.user.UserRepository
 
     # create chunks
     fetched_user_ets = []
-    chunks = z.util.array_chunks user_ids, z.config.MAXIMUM_USERS_PER_REQUEST
+    chunks = z.util.ArrayUtil.chunk user_ids, z.config.MAXIMUM_USERS_PER_REQUEST
     number_of_loaded_chunks = 0
 
     for chunk in chunks
@@ -405,7 +405,7 @@ class z.user.UserRepository
       user_et = @user_mapper.map_self_user_from_object response
       return @save_user user_et, true
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Unable to load self user: #{error}"
+      @logger.error "Unable to load self user: #{error}"
       throw error
 
   ###
@@ -454,20 +454,19 @@ class z.user.UserRepository
 
   ###
   Search for user.
-  @param query [String] Find user using name, username or email
+  @param query [String] Find user using name or username
+  @param is_username [Boolean] Query string is username
   @return [Array<z.entity.User>] Matching users
   ###
-  search_for_connected_users: (query) =>
+  search_for_connected_users: (query, is_username) =>
     return @users()
       .filter (user_et) ->
         return false if not user_et.connected()
-        return user_et.matches query
+        return user_et.matches query, is_username
       .sort (user_a, user_b) ->
-        name_a = user_a.name().toLowerCase()
-        name_b = user_b.name().toLowerCase()
-        return -1 if name_a < name_b
-        return 1 if name_a > name_b
-        return 0
+        if is_username
+          return z.util.StringUtil.sort_by_priority user_a.username(), user_b.username(), query
+        return z.util.StringUtil.sort_by_priority user_a.name(), user_b.name(), query
 
   ###
   Is the user the logged in user.

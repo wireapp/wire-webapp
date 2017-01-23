@@ -27,15 +27,31 @@ class z.ViewModel.ConversationInputViewModel
     @conversation_et = @conversation_repository.active_conversation
     @conversation_et.subscribe =>
       @conversation_has_focus true
+      @pasted_file null
       @cancel_edit()
 
     @self = @user_repository.self
     @list_not_bottom = ko.observable true
 
+    @pasted_file = ko.observable()
+    @pasted_file_preview_url = ko.observable()
+    @pasted_file_name = ko.observable()
+    @pasted_file.subscribe (blob) =>
+      if blob?
+        if blob.type in z.config.SUPPORTED_CONVERSATION_IMAGE_TYPES
+          @pasted_file_preview_url URL.createObjectURL blob
+        @pasted_file_name z.localization.Localizer.get_text
+          id: z.string.conversation_send_pasted_file
+          replace:
+            placeholder: '%date'
+            content: moment(blob.lastModifiedDate).format 'MMMM Do YYYY, h:mm:ss a'
+      else
+        @pasted_file_preview_url null
+        @pasted_file_name null
+
     @edit_message_et = ko.observable()
     @edit_input = ko.observable ''
-    @is_editing = ko.pureComputed =>
-      return @edit_message_et()?
+    @is_editing = ko.pureComputed => @edit_message_et()?
 
     @is_editing.subscribe (is_editing) =>
       if is_editing
@@ -126,10 +142,10 @@ class z.ViewModel.ConversationInputViewModel
   set_ephemeral_timer: (millis) =>
     if not millis
       @conversation_et().ephemeral_timer false
-      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' turned off."
+      @logger.info "Ephemeral timer for conversation '#{@conversation_et().display_name()}' turned off."
     else
       @conversation_et().ephemeral_timer millis
-      @logger.log "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer().toString()}'."
+      @logger.info "Ephemeral timer for conversation '#{@conversation_et().display_name()}' is now at '#{@conversation_et().ephemeral_timer().toString()}'."
 
   upload_images: (images) =>
     if @_is_hitting_upload_limit images
@@ -156,6 +172,17 @@ class z.ViewModel.ConversationInputViewModel
         return
 
     @conversation_repository.upload_files @conversation_et(), files
+
+  on_paste_files: (pasted_files) =>
+    @pasted_file pasted_files[0]
+
+  on_send_pasted_files: =>
+    pasted_file = @pasted_file()
+    @on_drop_files [pasted_file]
+    @pasted_file null
+
+  on_cancel_pasted_files: =>
+    @pasted_file null
 
   on_drop_files: (dropped_files) =>
     images = []
@@ -221,7 +248,10 @@ class z.ViewModel.ConversationInputViewModel
       $('.messages-wrap').scroll_to_bottom()
 
   on_input_enter: (data, event) =>
-    message = z.util.trim_line_breaks @input()
+    if @pasted_file()?
+      return @on_send_pasted_files()
+
+    message = z.util.StringUtil.trim_line_breaks @input()
 
     if message.length > z.config.MAXIMUM_MESSAGE_LENGTH
       amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_LONG_MESSAGE,
@@ -244,7 +274,7 @@ class z.ViewModel.ConversationInputViewModel
       when z.util.KEYCODE.ARROW_UP
         @edit_message @conversation_et().get_last_editable_message(), event.target if @input().length is 0
       when z.util.KEYCODE.ESC
-        @cancel_edit()
+        if @pasted_file()? then @pasted_file null else @cancel_edit()
       when z.util.KEYCODE.ENTER
         if event.altKey
           z.util.KeyUtil.insert_at_caret event.target, '\n'

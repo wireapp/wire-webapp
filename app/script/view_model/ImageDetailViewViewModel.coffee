@@ -20,54 +20,74 @@ window.z ?= {}
 z.ViewModel ?= {}
 
 class z.ViewModel.ImageDetailViewViewModel
-  constructor: (@element_id) ->
+  constructor: (@element_id, @conversation_repository) ->
 
-    @image_element = undefined
-    @button_element = undefined
+    @source = undefined
+
     @image_modal = undefined
+    @image_src = ko.observable()
+    @image_visible = ko.observable false
 
-    amplify.subscribe z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, @show_detail_view
+    @conversation_et = ko.observable()
+    @message_et = ko.observable()
+    @message_et.subscribe (message_et) =>
+      @conversation_et @conversation_repository.find_conversation_by_id message_et.conversation_id
 
-  show_detail_view: (src) =>
-    element = $("##{@element_id}")
+    amplify.subscribe z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, @show
 
-    @image_element = element.find '.detail-view-image'
-    @image_element[0].src = src
+    ko.applyBindings @, document.getElementById @element_id
 
-    @button_element = element.find '.detail-view-close-button'
+  show: (message_et, source) =>
+    @source = source
+    @message_et message_et
 
     @image_modal.destroy() if @image_modal?
     @image_modal = new zeta.webapp.module.Modal '#detail-view', @_hide_callback, @_before_hide_callback
     @image_modal.show()
 
-    @_show_image()
+    message_et.get_first_asset().resource().load().then (blob) =>
+      @image_src window.URL.createObjectURL blob
+      @image_visible true
 
-  hide_detail_view: =>
-    @image_modal.hide()
-
-  _before_hide_callback: =>
-    @image_element.removeClass 'modal-content-anim-open'
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_DETAIL_VIEW_OPENED
 
   _hide_callback: =>
-    $(window).off 'resize', @_center_image
+    window.URL.revokeObjectURL @image_src()
+    @image_src undefined
+    @source = undefined
 
-  _show_image: =>
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_DETAIL_VIEW_OPENED
-    setTimeout =>
-      @_center_image()
-      @image_element
-        .addClass 'modal-content-anim-open'
-        .one z.util.alias.animationend, => @_check_close_button()
-    , 0
-    $(window).on 'resize', @_center_image
+  _before_hide_callback: =>
+    @image_visible false
 
-  _check_close_button: =>
-    rect_image = @image_element[0].getBoundingClientRect()
-    rect_button = @button_element[0].getBoundingClientRect()
-    is_overlapping = rect_button.left < rect_image.right and rect_button.bottom > rect_image.top
-    @button_element.toggleClass 'detail-view-close-button-fullscreen', is_overlapping
+  click_on_close: =>
+    @image_modal.hide()
 
-  _center_image: =>
-    @image_element.css
-      'margin-left': (window.innerWidth - @image_element.width()) / 2
-      'margin-top': (window.innerHeight - @image_element.height()) / 2
+  click_on_download: ->
+    @_track_item_action @conversation_et(), 'download', 'image' if @source is 'collection'
+    @message_et().download()
+
+  click_on_like: =>
+    like_action = if @message_et().is_liked() then 'unlike' else 'like'
+    @_track_item_action @conversation_et(), like_action, 'image' if @source is 'collection'
+    @conversation_repository.toggle_like @conversation_et(), @message_et()
+
+  click_on_delete: =>
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
+      action: =>
+        @_track_item_action @conversation_et(), 'delete_for_me', 'image' if @source is 'collection'
+        @conversation_repository.delete_message @conversation_et(), @message_et()
+        @image_modal.hide()
+
+  click_on_delete_for_everyone: =>
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
+      action: =>
+        @_track_item_action @conversation_et(), 'delete_for_everyone', 'image' if @source is 'collection'
+        @conversation_repository.delete_message_everyone @conversation_et(), @message_et()
+        @image_modal.hide()
+
+  _track_item_action: (conversation_et, action, type) ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.DID_ITEM_ACTION,
+      action: action
+      type: type
+      conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+      with_bot: conversation_et.is_with_bot()

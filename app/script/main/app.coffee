@@ -40,6 +40,7 @@ class z.main.App
 
     @init_debugging()
     @init_app()
+    @init_service_worker()
 
 
   ###############################################################################
@@ -64,9 +65,13 @@ class z.main.App
     service.web_socket              = new z.event.WebSocketService @auth.client
 
     service.client                  = new z.client.ClientService @auth.client, service.storage
-    service.conversation            = new z.conversation.ConversationService @auth.client, service.storage
     service.notification            = new z.event.NotificationService @auth.client, service.storage
     service.announce                = new z.announce.AnnounceService()
+
+    if z.util.Environment.browser.edge
+      service.conversation            = new z.conversation.ConversationServiceNoCompound @auth.client, service.storage
+    else
+      service.conversation            = new z.conversation.ConversationService @auth.client, service.storage
 
     return service
 
@@ -114,6 +119,7 @@ class z.main.App
     view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.audio, @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.media, @repository.search, @repository.user, @repository.properties
     view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user, @repository.properties
     view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
+    view.lightbox                  = new z.ViewModel.ImageDetailViewViewModel 'detail-view', @repository.conversation
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
     view.modals                    = new z.ViewModel.ModalsViewModel 'modals'
 
@@ -200,7 +206,7 @@ class z.main.App
     .then =>
       @view.loading.switch_message z.string.init_app_pre_loaded, true
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED
-      @logger.log @logger.levels.INFO, 'App pre-loading completed'
+      @logger.info 'App pre-loading completed'
       @_handle_url_params()
     .then =>
       @_show_ui()
@@ -213,25 +219,32 @@ class z.main.App
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS
       @repository.announce.init()
       @repository.audio.init true
-      @logger.log @logger.levels.INFO, 'App fully loaded'
+      @repository.client.cleanup_clients_and_sessions true
+      @logger.info 'App fully loaded'
     .catch (error) =>
       error_message = "Error during initialization of app version '#{z.util.Environment.version false}'"
       if z.util.Environment.electron
         error_message = "#{error_message} - Electron '#{platform.os.family}' '#{z.util.Environment.version()}'"
 
-      @logger.log @logger.levels.INFO, error_message, {error: error}
-      @logger.log @logger.levels.DEBUG,
-        "App reload: '#{is_reload}', Document referrer: '#{document.referrer}', Location: '#{window.location.href}'"
+      @logger.info error_message, {error: error}
+      @logger.debug "App reload: '#{is_reload}', Document referrer: '#{document.referrer}', Location: '#{window.location.href}'"
 
       if is_reload and error.type not in [z.client.ClientError::TYPE.MISSING_ON_BACKEND, z.client.ClientError::TYPE.NO_LOCAL_CLIENT]
         @auth.client.execute_on_connectivity().then -> window.location.reload false
       else if navigator.onLine
-        @logger.log @logger.levels.ERROR, "Caused by: #{error?.message or error}"
+        @logger.error "Caused by: #{error?.message or error}"
         Raygun.send error if error instanceof z.storage.StorageError
         @logout 'init_app'
       else
-        @logger.log @logger.levels.WARN, 'No connectivity. Trigger reload on regained connectivity.', error
+        @logger.warn 'No connectivity. Trigger reload on regained connectivity.', error
         @_watch_online_status()
+
+  init_service_worker: ->
+    navigator.serviceWorker?.register '/sw.js'
+    .then (registration) =>
+      @logger.info 'ServiceWorker registration successful with scope: ', registration.scope
+    .catch (error) ->
+      @logger.error 'ServiceWorker registration failed: ', error
 
   ###
   Get the self user from the backend.
@@ -240,7 +253,7 @@ class z.main.App
   _get_user_self: ->
     @repository.user.get_me()
     .then (user_et) =>
-      @logger.log @logger.levels.INFO, "Loaded self user with ID '#{user_et.id}'"
+      @logger.info "Loaded self user with ID '#{user_et.id}'"
       if not user_et.email() and not user_et.phone()
         throw new Error 'User does not have a verified identity'
       @service.storage.init user_et.id
@@ -267,9 +280,9 @@ class z.main.App
   _handle_url_params: ->
     bot_name = z.util.get_url_parameter z.auth.URLParameter.BOT
     if bot_name
-      @logger.log @logger.levels.INFO, "Found bot token '#{bot_name}'"
+      @logger.info "Found bot token '#{bot_name}'"
       @repository.bot.add_bot bot_name
-    v3_support = z.util.get_url_parameter z.auth.URLParameter.V3
+    v3_support = z.util.get_url_parameter z.auth.URLParameter.ASSETS_V3
     if v3_support
       @repository.conversation.use_v3_api = v3_support
       @repository.user.use_v3_api = v3_support
@@ -281,8 +294,7 @@ class z.main.App
   ###
   _is_reload: ->
     is_reload = z.util.is_same_location document.referrer, window.location.href
-    @logger.log @logger.levels.DEBUG,
-      "App reload: '#{is_reload}', Document referrer: '#{document.referrer}', Location: '#{window.location.href}'"
+    @logger.debug "App reload: '#{is_reload}', Document referrer: '#{document.referrer}', Location: '#{window.location.href}'"
     return is_reload
 
   ###
@@ -299,28 +311,28 @@ class z.main.App
       token_promise.catch (error) =>
         if is_reload
           if error.type in [z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN, z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE]
-            @logger.log @logger.levels.ERROR, "Session expired on page reload: #{error.message}", error
+            @logger.error "Session expired on page reload: #{error.message}", error
             Raygun.send new Error ('Session expired on page reload'), error
             @_redirect_to_login true
           else
-            @logger.log @logger.levels.WARN, 'Connectivity issues. Trigger reload on regained connectivity.', error
+            @logger.warn 'Connectivity issues. Trigger reload on regained connectivity.', error
             @auth.client.execute_on_connectivity().then -> window.location.reload false
         else if navigator.onLine
           switch error.type
             when z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE, z.auth.AccessTokenError::TYPE.RETRIES_EXCEEDED, z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
-              @logger.log @logger.levels.WARN, "Redirecting to login: #{error.message}", error
+              @logger.warn "Redirecting to login: #{error.message}", error
               @_redirect_to_login false
             else
-              @logger.log @logger.levels.ERROR, "Could not get access token: #{error.message}. Logging out user.", error
+              @logger.error "Could not get access token: #{error.message}. Logging out user.", error
               @logout 'init_app'
         else
-          @logger.log @logger.levels.WARN, 'No connectivity. Trigger reload on regained connectivity.', error
+          @logger.warn 'No connectivity. Trigger reload on regained connectivity.', error
           @_watch_online_status()
 
   # Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
   _subscribe_to_beforeunload: ->
     $(window).on 'beforeunload', =>
-      @logger.log '\'window.onbeforeunload\' was triggered, so we will disconnect from the backend.'
+      @logger.info "'window.onbeforeunload' was triggered, so we will disconnect from the backend."
       @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.PAGE_NAVIGATION
       @repository.call_center.state_handler.leave_call_on_beforeunload()
       @repository.storage.terminate 'window.onbeforeunload'
@@ -328,7 +340,7 @@ class z.main.App
 
   # Hide the loading spinner and show the application UI.
   _show_ui: ->
-    @logger.log @logger.levels.INFO, 'Showing application UI'
+    @logger.info 'Showing application UI'
     if @repository.user.should_change_username()
       amplify.publish z.event.WebApp.TAKEOVER.SHOW
     else if conversation_et = @repository.conversation.get_most_recent_conversation()
@@ -347,13 +359,13 @@ class z.main.App
 
   # Subscribe to 'navigator.onLine' related events.
   _watch_online_status: ->
-    @logger.log @logger.levels.INFO, 'Watching internet connectivity status'
+    @logger.info 'Watching internet connectivity status'
     $(window).on 'offline', @on_internet_connection_lost
     $(window).on 'online', @on_internet_connection_gained
 
   # Behavior when internet connection is re-established.
   on_internet_connection_gained: =>
-    @logger.log @logger.levels.INFO, 'Internet connection regained. Re-establishing WebSocket connection...'
+    @logger.info 'Internet connection regained. Re-establishing WebSocket connection...'
     @auth.client.execute_on_connectivity()
     .then =>
       amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.NO_INTERNET
@@ -362,7 +374,7 @@ class z.main.App
 
   # Reflect internet connection loss in the UI.
   on_internet_connection_lost: =>
-    @logger.log @logger.levels.WARN, 'Internet connection lost'
+    @logger.warn 'Internet connection lost'
     @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.OFFLINE
     amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NO_INTERNET
 
@@ -397,7 +409,7 @@ class z.main.App
         amplify_objects = amplify.store()
         for amplify_key, amplify_value of amplify_objects
           continue if amplify_key is cookie_label_key and clear_data
-          do_not_delete.push amplify_key if z.util.contains amplify_key, z.storage.StorageKey.AUTH.COOKIE_LABEL
+          do_not_delete.push amplify_key if z.util.StringUtil.includes amplify_key, z.storage.StorageKey.AUTH.COOKIE_LABEL
 
         @repository.cache.clear_cache session_expired, do_not_delete
 
@@ -405,14 +417,14 @@ class z.main.App
       if clear_data
         @repository.storage.delete_everything()
         .catch (error) =>
-          @logger.log @logger.levels.ERROR, 'Failed to delete database before logout', error
+          @logger.error 'Failed to delete database before logout', error
         .then =>
           @_redirect_to_login session_expired
       else
         @_redirect_to_login session_expired
 
     _logout_on_backend = =>
-      @logger.log @logger.levels.INFO, "Logout triggered by '#{cause}': Disconnecting user from the backend."
+      @logger.info "Logout triggered by '#{cause}': Disconnecting user from the backend."
       @auth.repository.logout()
       .then -> _logout()
       .catch => @_redirect_to_login false
@@ -422,13 +434,12 @@ class z.main.App
     else if navigator.onLine
       _logout_on_backend()
     else
-      @logger.log @logger.levels.WARN, 'No internet access. Continuing when internet connectivity regained.'
+      @logger.warn 'No internet access. Continuing when internet connectivity regained.'
       $(window).on 'online', -> _logout_on_backend()
 
   # Redirect to the login page after internet connectivity has been verified.
   _redirect_to_login: (session_expired) ->
-    @logger.log @logger.levels.INFO,
-      "Redirecting to login after connectivity verification. Session expired: #{session_expired}"
+    @logger.info "Redirecting to login after connectivity verification. Session expired: #{session_expired}"
     @auth.client.execute_on_connectivity()
     .then ->
       url = "/auth/#{location.search}"

@@ -27,11 +27,15 @@ class z.components.LinkPreviewAssetComponent
   @option params [z.entity.LinkPreview] preview
   ###
   constructor: (params, component_info) ->
-    @preview = params.preview
-    @viewport_changed = params.viewport_changed
+
+    @message_et = ko.unwrap params.message
+    @header = params.header or false
+
+    @preview = @message_et.get_first_asset().previews()[0]
     @element = component_info.element
     @url = @preview.original_url
-    @expired = params.expired
+
+    @element.addEventListener 'click', @on_link_preview_click
 
   on_link_preview_click: =>
     z.util.safe_window_open @url
@@ -44,32 +48,33 @@ ko.components.register 'link-preview-asset',
   viewModel: createViewModel: (params, component_info) ->
     return new z.components.LinkPreviewAssetComponent params, component_info
   template: """
-            <div class="link-preview-icon icon-link text-graphite"></div>
-            <!-- ko ifnot: expired()-->
-              <div class="link-preview-container" data-bind="click: on_link_preview_click">
-                <!-- ko if: preview.image_resource()-->
-                  <span class="link-preview-image image-placeholder-icon image-loading"
-                        data-bind="background_image: preview.image_resource, viewport_changed: viewport_changed">
-                    <img />
-                    <div class="three-dots">
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                    </div>
-                  </span>
+            <!-- ko ifnot: message_et.is_expired() -->
+              <div class="link-preview-image-container">
+                <!-- ko ifnot: preview.image_resource() -->
+                  <div class="link-preview-image-placeholder icon-link"></div>
                 <!-- /ko -->
-                <div class="link-preview-title" data-bind="text: preview.title"></div>
-                <a class="link-preview-site text-graphite ellipsis" target="_blank" rel="nofollow noopener noreferrer"
+                <!-- ko if: preview.image_resource() -->
+                  <image-component class="link-preview-image" data-uie-name="link-preview-image" params="asset: preview.image_resource"></image-component>
+                <!-- /ko -->
+              </div>
+
+              <div class="link-preview-info">
+                <!-- ko if: header -->
+                  <asset-header class="link-preview-info-header" params="message: message_et"></asset-header>
+                <!-- /ko -->
+                <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
+                <a class="link-preview-info-link text-graphite ellipsis" data-uie-name="link-preview-url" target="_blank" rel="nofollow noopener noreferrer"
                    data-bind="text: z.util.naked_url(url), attr: {href: z.util.add_http(url), title: url}"></a>
               </div>
             <!-- /ko -->
-            <!-- ko if: expired()-->
-              <div class="link-preview-container ephemeral-link-preview">
-                <!-- ko if: preview.image_resource()-->
-                  <span class="link-preview-image bg-color-ephemeral icon-link text-white"></span>
-                <!-- /ko -->
-                <div class="link-preview-title ephemeral-message-obfuscated" data-bind="text: z.util.StringUtil.obfuscate(preview.title)"></div>
-                <div class="link-preview-site ephemeral-message-obfuscated ellipsis" data-bind="text: z.util.StringUtil.obfuscate(url)"></div>
+            <!-- ko if: message_et.is_expired() -->
+              <div class="link-preview-image-container">
+                <div class="link-preview-image-placeholder icon-link bg-color-ephemeral text-white"></div>
+              </div>
+              <div class="link-preview-info">
+                <div class="link-preview-info-title ephemeral-message-obfuscated" data-bind="text: z.util.StringUtil.obfuscate(preview.title), css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
+                <a class="link-preview-info-link ephemeral-message-obfuscated ellipsis" target="_blank" rel="nofollow noopener noreferrer"
+                   data-bind="text: z.util.StringUtil.obfuscate(url)"></a>
               </div>
             <!-- /ko -->
             """

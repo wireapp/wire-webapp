@@ -23,14 +23,18 @@ class z.bot.BotRepository
   constructor: (@bot_service, @conversation_repository) ->
     @logger = new z.util.Logger 'z.bot.BotRepository', z.config.LOGGER.OPTIONS
 
-  # Add bot to conversation.
+  ###
+  Add bot to conversation.
+  @param bot_name [String] Bot name registered on backend
+  @param create_conversation [Boolean] A new conversation is created if true otherwise bot is added to active conversation, defaults to true
+  ###
   add_bot: (bot_name, create_conversation = true) =>
     bot_result = undefined
 
     @bot_service.fetch_bot bot_name
     .then (result) =>
       bot_result = result
-      @logger.log @logger.levels.INFO, "Info for bot '#{bot_name}' retrieved", bot_result
+      @logger.info "Info for bot '#{bot_name}' retrieved", bot_result
       if create_conversation
         @conversation_repository.create_new_conversation [], bot_result.name or bot_name
     .then (conversation_et) =>

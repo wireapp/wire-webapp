@@ -72,7 +72,7 @@ class z.event.NotificationService
         else
           reject new z.event.EventError z.event.EventError::TYPE.NO_LAST_ID
       .catch (error) =>
-        @logger.log @logger.levels.ERROR, "Failed to get last notification ID from storage: #{error.message}", error
+        @logger.error "Failed to get last notification ID from storage: #{error.message}", error
         reject new z.event.EventError z.event.EventError::TYPE.DATABASE_FAILURE
 
   ###

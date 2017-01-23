@@ -23,7 +23,4 @@ module.exports =
     options:
       configFile: 'coffeelint.json'
     files:
-      src: [
-        '<%= dir.app_ %>/**/*.coffee',
-        '!<%= dir.app_ %>/script/components/**/*.coffee',
-      ]
+      src: ['<%= dir.app_ %>/**/*.coffee']

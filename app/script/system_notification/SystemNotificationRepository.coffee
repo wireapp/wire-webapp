@@ -19,6 +19,8 @@
 window.z ?= {}
 z.SystemNotification ?= {}
 
+NOTIFICATION_ICON_URL = '/image/logo/notification.png'
+
 ###
 System notification repository to trigger browser and audio notifications.
 
@@ -124,7 +126,7 @@ class z.SystemNotification.SystemNotificationRepository
       .then (is_read) =>
         if is_read
           notification.close()
-          @logger.log @logger.levels.INFO, "Removed read notification for '#{message_id}' in '#{conversation_id}'."
+          @logger.info "Removed read notification for '#{message_id}' in '#{conversation_id}'."
 
   ###
   Set the muted state.
@@ -133,7 +135,7 @@ class z.SystemNotification.SystemNotificationRepository
   ###
   set_muted_state: (handling_notifications) =>
     @muted = handling_notifications isnt z.event.NotificationHandlingState.WEB_SOCKET
-    @logger.log @logger.levels.INFO, "Set muted state to: #{@muted}"
+    @logger.info "Set muted state to: #{@muted}"
 
   ###
   Set the permission state.
@@ -170,7 +172,7 @@ class z.SystemNotification.SystemNotificationRepository
   _create_body_content: (message_et) ->
     if message_et.has_asset_text()
       for asset_et in message_et.assets() when asset_et.is_text()
-        return z.util.truncate_text asset_et.text, z.config.BROWSER_NOTIFICATION.BODY_LENGTH if not asset_et.previews().length
+        return z.util.StringUtil.truncate asset_et.text, z.config.BROWSER_NOTIFICATION.BODY_LENGTH if not asset_et.previews().length
     else if message_et.has_asset_image()
       return  z.localization.Localizer.get_text z.string.system_notification_asset_add
     else if message_et.has_asset_location()
@@ -282,6 +284,8 @@ class z.SystemNotification.SystemNotificationRepository
           return @_create_body_member_leave message_et
       when z.message.SystemMessageType.CONNECTION_ACCEPTED
         return z.localization.Localizer.get_text z.string.system_notification_connection_accepted
+      when z.message.SystemMessageType.CONNECTION_CONNECTED
+        return z.localization.Localizer.get_text z.string.system_notification_connection_connected
       when z.message.SystemMessageType.CONNECTION_REQUEST
         return z.localization.Localizer.get_text z.string.system_notification_connection_request
       when z.message.SystemMessageType.CONVERSATION_CREATE
@@ -337,26 +341,27 @@ class z.SystemNotification.SystemNotificationRepository
   @private
   @param conversation_et [z.entity.Conversation] Conversation entity
   @param message_et [z.entity.MemberMessage] Member message entity
-  @param notification_body [String] Unobfuscated notification body
   ###
-  _create_notification_content: (conversation_et, message_et, notification_body) ->
-    notification_body = @_create_options_body conversation_et, message_et
+  _create_notification_content: (conversation_et, message_et) ->
+    options_body = undefined
 
-    throw new z.system_notification.SystemNotificationError z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION if not notification_body?
-
-    should_obfuscate = @_should_obfuscate_notification message_et
-
-    return {
-      title: if should_obfuscate then @_create_title_obfuscated() else @_create_title conversation_et, message_et
-      options:
-        body: if should_obfuscate then @_create_body_obfuscated() else notification_body
-        data: @_create_options_data conversation_et, message_et
-        icon: if z.util.Environment.electron and z.util.Environment.os.mac then '' else window.notification_icon or '/image/logo/notification.png'
-        tag: @_create_options_tag conversation_et
-        silent: true #@note When Firefox supports this we can remove the fix for WEBAPP-731
-      timeout: z.config.BROWSER_NOTIFICATION.TIMEOUT
-      trigger: @_create_trigger conversation_et, message_et
-    }
+    @_create_options_body conversation_et, message_et
+    .then (body) =>
+      options_body = body
+      throw new z.system_notification.SystemNotificationError z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION if not options_body?
+      @_should_obfuscate_notification_sender message_et
+    .then (should_obfuscate_sender) =>
+      return {
+        title: if should_obfuscate_sender then @_create_title_obfuscated() else @_create_title conversation_et, message_et
+        options:
+          body: if @_should_obfuscate_notification_message message_et then @_create_body_obfuscated() else options_body
+          data: @_create_options_data conversation_et, message_et
+          icon: @_create_options_icon should_obfuscate_sender, message_et.user()
+          tag: @_create_options_tag conversation_et
+          silent: true #@note When Firefox supports this we can remove the fix for WEBAPP-731
+        timeout: z.config.BROWSER_NOTIFICATION.TIMEOUT
+        trigger: @_create_trigger conversation_et, message_et
+      }
 
   ###
   Selects the type of message that the notification body needs to be created for.
@@ -367,19 +372,21 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Notification message body
   ###
   _create_options_body: (conversation_et, message_et) ->
-    switch message_et.super_type
-      when z.message.SuperType.CALL
-        return @_create_body_call message_et
-      when z.message.SuperType.CONTENT
-        return @_create_body_content message_et
-      when z.message.SuperType.MEMBER
-        return @_create_body_member_update message_et, conversation_et.is_group?()
-      when z.message.SuperType.PING
-        return @_create_body_ping()
-      when z.message.SuperType.REACTION
-        return @_create_body_reaction message_et
-      when z.message.SuperType.SYSTEM
-        return @_create_body_conversation_rename message_et
+    Promise.resolve()
+    .then =>
+      switch message_et.super_type
+        when z.message.SuperType.CALL
+          return @_create_body_call message_et
+        when z.message.SuperType.CONTENT
+          return @_create_body_content message_et
+        when z.message.SuperType.MEMBER
+          return @_create_body_member_update message_et, conversation_et.is_group?()
+        when z.message.SuperType.PING
+          return @_create_body_ping()
+        when z.message.SuperType.REACTION
+          return @_create_body_reaction message_et
+        when z.message.SuperType.SYSTEM
+          return @_create_body_conversation_rename message_et
 
   ###
   Creates the notification data to help check its content.
@@ -394,6 +401,19 @@ class z.SystemNotification.SystemNotificationRepository
       conversation_id: input.id or input.conversation_id
       message_id: message_et.id
     }
+
+  ###
+  Creates the notification icon.
+
+  @private
+  @param should_obfuscate_sender [Boolean] Sender visible in notification
+  @param user_et [z.entity.User] Sender of message
+  @return [String] Icon URL
+  ###
+  _create_options_icon: (should_obfuscate_sender, user_et) ->
+    return user_et.preview_picture_resource().generate_url() if user_et.preview_picture_resource() and not should_obfuscate_sender
+    return '' if z.util.Environment.electron and z.util.Environment.os.mac
+    return NOTIFICATION_ICON_URL
 
   ###
   Creates the notification tag.
@@ -416,10 +436,10 @@ class z.SystemNotification.SystemNotificationRepository
   _create_title: (conversation_et, message_et) ->
     if conversation_et.display_name?()
       if conversation_et.is_group()
-        return  z.util.truncate_text "#{message_et.user().first_name()} in #{conversation_et.display_name()}", z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
-      return z.util.truncate_text conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+        return z.util.StringUtil.truncate "#{message_et.user().first_name()} in #{conversation_et.display_name()}", z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+      return z.util.StringUtil.truncate conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
     return Raygun.send new Error 'Message does not contain user info' if not message_et.user()
-    return z.util.truncate_text message_et.user().name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+    return z.util.StringUtil.truncate message_et.user().name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
   ###
   Create obfuscated title.
@@ -427,7 +447,7 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Obfuscated notification message title
   ###
   _create_title_obfuscated: ->
-    return z.util.truncate_text z.localization.Localizer.get_text(z.string.system_notification_obfuscated_title), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
+    return z.util.StringUtil.truncate z.localization.Localizer.get_text(z.string.system_notification_obfuscated_title), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
   ###
   Creates the notification trigger.
@@ -463,8 +483,8 @@ class z.SystemNotification.SystemNotificationRepository
       .then (permission_state) =>
         @_show_notification notification_content if permission_state is z.system_notification.PermissionStatusState.GRANTED
     .catch (error) ->
-      if error.type isnt z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION
-        throw error
+      throw error unless error.type is z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION
+
 
   ###
   Plays the sound from the audio repository.
@@ -497,12 +517,23 @@ class z.SystemNotification.SystemNotificationRepository
         resolve @permission_state
 
   ###
-  Should notification content be obfuscated.
+  Should message in a notification be obfuscated.
   @private
   @param message_et [z.entity.Message]
   ###
-  _should_obfuscate_notification: (message_et) ->
-    return @notifications_preference() is z.system_notification.SystemNotificationPreference.OBFUSCATE or message_et.is_ephemeral()
+  _should_obfuscate_notification_message: (message_et) ->
+    return message_et.is_ephemeral() or @notifications_preference() in [
+      z.system_notification.SystemNotificationPreference.OBFUSCATE
+      z.system_notification.SystemNotificationPreference.OBFUSCATE_MESSAGE
+    ]
+
+  ###
+  Should sender in a notification be obfuscated.
+  @private
+  @param message_et [z.entity.Message]
+  ###
+  _should_obfuscate_notification_sender: (message_et) ->
+    return message_et.is_ephemeral() or @notifications_preference() is z.system_notification.SystemNotificationPreference.OBFUSCATE
 
   ###
   Should hide notification.
@@ -565,23 +596,23 @@ class z.SystemNotification.SystemNotificationRepository
       window.focus()
       wire.app.view.content.multitasking.is_minimized true
       notification_content.trigger()
-      @logger.log @logger.levels.INFO, "Notification for '#{message_id} in '#{conversation_id}' closed by click."
+      @logger.info "Notification for '#{message_id} in '#{conversation_id}' closed by click."
       notification.close()
     notification.onclose = =>
       window.clearTimeout timeout_trigger_id
       @notifications.splice @notifications.indexOf(notification), 1
-      @logger.log @logger.levels.INFO, "Removed notification for '#{message_id}' in '#{conversation_id}' locally."
+      @logger.info "Removed notification for '#{message_id}' in '#{conversation_id}' locally."
     notification.onerror = =>
-      @logger.log @logger.levels.ERROR, "Notification for '#{message_id}' in '#{conversation_id}' closed by error."
+      @logger.error "Notification for '#{message_id}' in '#{conversation_id}' closed by error."
       notification.close()
     notification.onshow = =>
       timeout_trigger_id = window.setTimeout =>
-        @logger.log @logger.levels.INFO, "Notification for '#{message_id}' in '#{conversation_id}' closed by timeout."
+        @logger.info "Notification for '#{message_id}' in '#{conversation_id}' closed by timeout."
         notification.close()
       , notification_content.timeout
 
     @notifications.push notification
-    @logger.log @logger.levels.INFO, "Added notification for '#{message_id}' in '#{conversation_id}' to queue."
+    @logger.info "Added notification for '#{message_id}' in '#{conversation_id}' to queue."
     window.onunload = =>
       for notification in @notifications
         notification.close()
@@ -589,4 +620,4 @@ class z.SystemNotification.SystemNotificationRepository
         return if not notification.data?
         conversation_id = notification.data.conversation_id
         message_id = notification.data.message_id
-        @logger.log @logger.levels.INFO, "Notification for '#{message_id}' in '#{conversation_id}' closed by redirect."
+        @logger.info "Notification for '#{message_id}' in '#{conversation_id}' closed by redirect."

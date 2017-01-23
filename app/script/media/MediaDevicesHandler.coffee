@@ -72,13 +72,13 @@ class z.media.MediaDevicesHandler
       @current_device_id.video_input @available_devices.video_input()[default_device_index].deviceId
       @current_device_index.video_input default_device_index
 
-    @logger.log @logger.levels.INFO, 'Set selected MediaDevice IDs'
+    @logger.info 'Set selected MediaDevice IDs'
 
   # Subscribe to MediaDevices updates if available.
   _subscribe_to_devices: =>
     if navigator.mediaDevices.ondevicechange?
       navigator.mediaDevices.ondevicechange = =>
-        @logger.log @logger.levels.INFO, 'List of available MediaDevices has changed'
+        @logger.info 'List of available MediaDevices has changed'
         @get_media_devices()
 
   # Subscribe to Knockout observables.
@@ -104,7 +104,7 @@ class z.media.MediaDevicesHandler
     @current_device_id.audio_output.subscribe (media_device_id) =>
       z.util.StorageUtil.set_value z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id
       if media_device_id
-        @media_element_handler.switch_media_element_output media_device_id
+        @media_repository.element_handler.switch_media_element_output media_device_id
         @_update_current_index_from_id z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id
 
     @current_device_id.screen_input.subscribe (media_device_id) =>
@@ -136,11 +136,11 @@ class z.media.MediaDevicesHandler
             when z.media.MediaDeviceType.VIDEO_INPUT
               @available_devices.video_input.push media_device
 
-        @logger.log @logger.levels.INFO, 'Updated MediaDevice list', media_devices
+        @logger.info 'Updated MediaDevice list', media_devices
         return media_devices
       throw new z.media.MediaError z.media.MediaError::TYPE.NO_MEDIA_DEVICES_FOUND
     .catch (error) =>
-      @logger.log @logger.levels.ERROR, "Failed to update MediaDevice list: #{error.message}", error
+      @logger.error "Failed to update MediaDevice list: #{error.message}", error
 
   ###
   Update list of available Screens.
@@ -158,11 +158,11 @@ class z.media.MediaDevicesHandler
         if error
           reject error
         else
-          @logger.log @logger.levels.INFO, "Found '#{screen_sources.length}' possible sources for screen sharing on Electron", screen_sources
+          @logger.info "Found '#{screen_sources.length}' possible sources for screen sharing on Electron", screen_sources
           @available_devices.screen_input screen_sources
           if screen_sources.length is 1
             @current_device_id.screen_input ''
-            @logger.log @logger.levels.INFO, "Selected '#{screen_sources[0].name}' for screen sharing", screen_sources[0]
+            @logger.info "Selected '#{screen_sources[0].name}' for screen sharing", screen_sources[0]
             @current_device_id.screen_input screen_sources[0].id
           resolve screen_sources
 
@@ -171,18 +171,18 @@ class z.media.MediaDevicesHandler
     @get_media_devices()
     .then =>
       [current_device, current_index] = @_get_current_device @available_devices.video_input(), @current_device_id.video_input()
-      next_device = @available_devices.video_input()[z.util.iterate_array_index(@available_devices.video_input(), @current_device_index.video_input()) or 0]
+      next_device = @available_devices.video_input()[z.util.ArrayUtil.iterate_index(@available_devices.video_input(), @current_device_index.video_input()) or 0]
       @current_device_id.video_input next_device.deviceId
-      @logger.log @logger.levels.INFO, "Switching the active camera from '#{current_device.label or current_device.deviceId}' to '#{next_device.label or next_device.deviceId}'"
+      @logger.info "Switching the active camera from '#{current_device.label or current_device.deviceId}' to '#{next_device.label or next_device.deviceId}'"
 
   # Toggle between the available screens.
   toggle_next_screen: =>
     @get_screen_sources()
     .then =>
       [current_device, current_index] = @_get_current_device @available_devices.screen_input(), @current_device_id.screen_input()
-      next_device = @available_devices.screen_input()[z.util.iterate_array_index(@available_devices.screen_input(), @current_device_index.screen_input()) or 0]
+      next_device = @available_devices.screen_input()[z.util.ArrayUtil.iterate_index(@available_devices.screen_input(), @current_device_index.screen_input()) or 0]
       @current_device_id.screen_input next_device.id
-      @logger.log @logger.levels.INFO, "Switching the active screen from '#{current_device.name or current_device.id}' to '#{next_device.name or next_device.id}'"
+      @logger.info "Switching the active screen from '#{current_device.name or current_device.id}' to '#{next_device.name or next_device.id}'"
 
   ###
   Check for availability of selected devices.
@@ -199,10 +199,9 @@ class z.media.MediaDevicesHandler
         if not media_device.deviceId
           if updated_device = @available_devices["#{device_type}"]()[0]
             device_id_observable updated_device.deviceId
-            @logger.log @logger.levels.WARN,
-              "Current '#{media_type}' device '#{device_id_observable()}' not found and replaced by '#{updated_device.label or updated_device.deviceId}'", media_devices
+            @logger.warn "Selected '#{media_type}' device '#{device_id_observable()}' not found and replaced by '#{updated_device.label or updated_device.deviceId}'", media_devices
           else
-            @logger.log @logger.levels.WARN, "Current '#{media_type}' device '#{device_id_observable()}' not found and reset'", media_devices
+            @logger.warn "Selected '#{media_type}' device '#{device_id_observable()}' not found and reset'", media_devices
             device_id_observable ''
 
       _check_device z.media.MediaType.AUDIO, z.media.MediaDeviceType.AUDIO_INPUT

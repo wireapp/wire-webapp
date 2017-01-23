@@ -40,6 +40,29 @@ ko.bindingHandlers.drop_file =
         drop: fileSelectHandler
     , context
 
+# capture pasted files
+ko.bindingHandlers.paste_file =
+  init: (element, valueAccessor, allBindings, data, context) ->
+
+    on_paste = (data, event) ->
+      clipboard_data = event.originalEvent.clipboardData
+      items = [].slice.call clipboard_data.items or clipboard_data.files
+
+      files = items
+        .filter (item) -> item.kind is 'file'
+        .map (item) -> new File [item.getAsFile()], null, type: item.type
+        .filter (item) -> item? and item.size isnt 4 # Pasted files result in 4 byte blob (OSX)
+
+      if files.length > 0
+        valueAccessor() files
+        return false
+      return true
+
+    ko.applyBindingsToNode window,
+      event:
+        paste: on_paste
+    , context
+
 # blockes the default behaviour when dropping a file on the element
 # if an element inside that element is listening to drag events, than this will be triggered after
 ko.bindingHandlers.ignore_drop_file =
@@ -306,11 +329,13 @@ ko.bindingHandlers.in_viewport = do ->
 
   listeners = []
 
-  window.addEventListener 'scroll', (e) ->
+  notify_listeners = _.throttle (e) ->
     listener(e) for listener in listeners by -1 # listeners can be deleted during iteration
-  , true
+  , 300
 
-  init: (element, valueAccessor) ->
+  window.addEventListener 'scroll', notify_listeners, true
+
+  init: (element, valueAccessor, allBindingsAccessor) ->
 
     _in_view = (dom_element) ->
       box = dom_element.getBoundingClientRect()
@@ -322,14 +347,13 @@ ko.bindingHandlers.in_viewport = do ->
     _dispose = ->
       z.util.ArrayUtil.remove_element listeners, _check_element
 
-    _check_element = _.debounce (e) ->
+    _check_element = ->
       is_child = if e? then e.target.contains(element) else true
       if is_child and _in_view element
         dispose = valueAccessor()?()
         _dispose() if dispose
-    , 100
 
     listeners.push _check_element
-    _check_element()
+    window.setTimeout _check_element, allBindingsAccessor.get('delay') or 0
 
     ko.utils.domNodeDisposal.addDisposeCallback element, _dispose

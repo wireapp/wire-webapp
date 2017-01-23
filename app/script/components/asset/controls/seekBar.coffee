@@ -19,6 +19,7 @@
 window.z ?= {}
 z.components ?= {}
 
+
 class z.components.SeekBarComponent
   ###
   Construct a seek bar.
@@ -90,6 +91,7 @@ class z.components.SeekBarComponent
     @seek_bar.removeEventListener 'change', @on_change
     @media_element.removeEventListener 'timeupdate', @on_timeupdate
     @media_element.removeEventListener 'ended', @on_ended
+
 
 ko.components.register 'seek-bar',
   viewModel: createViewModel: (params, component_info) ->

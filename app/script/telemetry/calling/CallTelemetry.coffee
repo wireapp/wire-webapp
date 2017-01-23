@@ -87,6 +87,7 @@ class z.telemetry.calling.CallTelemetry
         conversation_participants: call_et.conversation_et.number_of_participants()
         conversation_participants_in_call: call_et.max_number_of_participants
         conversation_type: if call_et.is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
+        with_bot: call_et.conversation_et.is_with_bot()
       , attributes
 
       if call_et.is_remote_screen_shared() or call_et.is_remote_videod()
@@ -101,7 +102,7 @@ class z.telemetry.calling.CallTelemetry
   track_duration: (call_et) =>
     duration = Math.floor (Date.now() - call_et.timer_start) / 1000
     if not window.isNaN duration
-      @logger.log @logger.levels.INFO, "Call duration: #{duration} seconds.", call_et.duration_time()
+      @logger.info "Call duration: #{duration} seconds.", call_et.duration_time()
 
       if duration <= 15
         duration_bucket = '0s-15s'
@@ -125,6 +126,7 @@ class z.telemetry.calling.CallTelemetry
         duration: duration_bucket
         duration_sec: duration
         reason: call_et.finished_reason
+        with_bot: call_et.conversation_et.is_with_bot()
 
       event_name = z.tracking.EventName.CALLING.ENDED_CALL
       if call_et.is_remote_screen_shared() or call_et.is_remote_videod()

@@ -19,10 +19,12 @@
 window.z ?= {}
 z.bot ?= {}
 
+BOT_SERVICE_URL = 'api/v1/bot/'
+
 class z.bot.BotService
   constructor: ->
     @logger = new z.util.Logger 'z.bot.BotService', z.config.LOGGER.OPTIONS
-    @url = "#{z.config.BOT_URL}"
+    @url = "#{z.util.Environment.backend.website_url()}#{BOT_SERVICE_URL}"
     return @
 
   fetch_bot: (bot_name) ->
@@ -31,4 +33,4 @@ class z.bot.BotService
       .done (data, textStatus, jqXHR) ->
         resolve data.result
       .fail (jqXHR, textStatus, errorThrown) =>
-        @logger.log @logger.levels.WARNING, "Could not find information for bot '#{bot_name}': #{errorThrown}"
+        @logger.warn "Could not find information for bot '#{bot_name}': #{errorThrown}"
