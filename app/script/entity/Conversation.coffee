@@ -57,7 +57,10 @@ class z.entity.Conversation
 
     @archived_state = ko.observable false
     @muted_state = ko.observable false
-    @verification_state = ko.observable z.conversation.ConversationVerificationState.UNVERIFIED
+    @verification_state = ko.observable()
+    @verification_state.subscribe_changed (state, old_state) =>
+      if old_state?
+        amplify.publish z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @
 
     @archived_timestamp = ko.observable 0
     @cleared_timestamp = ko.observable 0
@@ -89,9 +92,6 @@ class z.entity.Conversation
           @verification_state z.conversation.ConversationVerificationState.DEGRADED
         else
           @verification_state z.conversation.ConversationVerificationState.UNVERIFIED
-
-      amplify.publish z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @
-
       return is_verified
 
     @removed_from_conversation = ko.observable false

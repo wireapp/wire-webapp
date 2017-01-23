@@ -510,7 +510,7 @@ class z.conversation.ConversationRepository
   Handle conversation verification state change.
   @param conversation_et [z.entity.Conversation]
   ###
-  on_verification_state_changed: (conversation_et) =>
+  on_verification_state_changed: (conversation_et) ->
     if conversation_et.verification_state() is z.conversation.ConversationVerificationState.VERIFIED
       amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
 

@@ -147,9 +147,6 @@ describe 'Conversation', ->
       user_et.devices.push verified_client_et
       verified_conversation_et.participating_user_ets.push user_et
 
-    it 'default state should be UNVERIFIED', ->
-      expect(conversation_et.verification_state()).toBe z.conversation.ConversationVerificationState.UNVERIFIED
-
     it 'state should be VERIFIED when all clients are verified', ->
       expect(verified_conversation_et.is_verified()).toBeTruthy()
       expect(verified_conversation_et.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
