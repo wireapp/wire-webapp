@@ -246,8 +246,6 @@ class z.main.App
     navigator.serviceWorker?.register '/sw.js'
     .then (registration) =>
       @logger.info 'ServiceWorker registration successful with scope: ', registration.scope
-    .catch (error) ->
-      @logger.error 'ServiceWorker registration failed: ', error
 
   ###
   Get the self user from the backend.
