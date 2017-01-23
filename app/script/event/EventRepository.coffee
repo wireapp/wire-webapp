@@ -366,20 +366,26 @@ class z.event.EventRepository
           remote_client_id = event.data.sender
           remote_user_id = event.from
 
+          # Hashing error message to get the error code (not very reliable if Proteus error messages change! Needs to be revised in the future)
+          hashed_error_message = z.util.murmurhash3 decrypt_error.message, 42
+          error_code = hashed_error_message.toString().substr 0, 4
+
           # Handle error
           if decrypt_error instanceof Proteus.errors.DecryptError.DuplicateMessage or decrypt_error instanceof Proteus.errors.DecryptError.OutdatedMessage
             # We don't need to show duplicate message errors to the user
             throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
           else if decrypt_error instanceof Proteus.errors.DecryptError.InvalidMessage or decrypt_error instanceof Proteus.errors.DecryptError.InvalidSignature
             # Session is broken, let's see what's really causing it...
+            error_code = z.cryptography.CryptographyErrorType.INVALID_SIGNATURE
             session_id = @cryptography_repository._construct_session_id remote_user_id, remote_client_id
             @logger.error "Session '#{session_id}' with user '#{remote_user_id}' is broken or out of sync (#{decrypt_error.constructor.name}). Reset the session and decryption is likely to work again.", decrypt_error
           else if decrypt_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged
             # Remote identity changed
+            error_code = z.cryptography.CryptographyErrorType.REMOTE_IDENTITY_CHANGED
             message = "Fingerprints do not match. We expect a different fingerprint from user ID '#{remote_user_id}' with client ID '#{remote_client_id}' (Remote identity changed)."
             @logger.error message, decrypt_error
 
-          return @_map_error_message event, decrypt_error
+          return @_map_error_message event, decrypt_error, error_code
       else
         return event
     .then (mapped_event) =>
@@ -428,9 +434,7 @@ class z.event.EventRepository
           @logger.error "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
           reject error
 
-  _map_error_message: (event, decrypt_error) ->
-    hashed_error_message = z.util.murmurhash3 decrypt_error.message, 42
-    error_code = hashed_error_message.toString().substr 0, 4
+  _map_error_message: (event, decrypt_error, error_code) ->
     @_report_decrypt_error event, decrypt_error, error_code
 
     unable_to_decrypt_event =
