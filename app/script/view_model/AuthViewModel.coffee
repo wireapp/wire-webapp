@@ -132,7 +132,7 @@ class z.ViewModel.AuthViewModel
     @accepted_terms_of_use.subscribe => @clear_error z.auth.AuthView.TYPE.TERMS
 
     @can_login_password = ko.pureComputed =>
-      return not @disabled_by_animation() and @username().length and @password().length
+      return not @disabled_by_animation()
 
     @can_login_phone = ko.pureComputed =>
       return not @disabled_by_animation() and @country_code().length > 1 and @phone_number().length
