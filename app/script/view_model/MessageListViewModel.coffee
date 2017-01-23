@@ -120,7 +120,7 @@ class z.ViewModel.MessageListViewModel
     @conversation_is_changing = true
 
     # clean up old conversation
-    @release_conversation conversation_et if @conversation()
+    @release_conversation @conversation() if @conversation()
 
     # update new conversation
     @conversation conversation_et
