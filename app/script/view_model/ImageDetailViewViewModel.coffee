@@ -41,6 +41,7 @@ class z.ViewModel.ImageDetailViewViewModel
     @source = source
     @message_et message_et
 
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, @message_removed
     @image_modal.destroy() if @image_modal?
     @image_modal = new zeta.webapp.module.Modal '#detail-view', @_hide_callback, @_before_hide_callback
     @image_modal.show()
@@ -51,10 +52,14 @@ class z.ViewModel.ImageDetailViewViewModel
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_DETAIL_VIEW_OPENED
 
+  message_removed: (message_id) =>
+    @image_modal.hide() if @message_et()?.id is message_id
+
   _hide_callback: =>
     window.URL.revokeObjectURL @image_src()
     @image_src undefined
     @source = undefined
+    amplify.unsubscribe z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, @message_removed
 
   _before_hide_callback: =>
     @image_visible false

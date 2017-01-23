@@ -92,8 +92,7 @@ def update_headers(response):
   response.headers['X-XSS-Protection'] = '1; mode=block'
 
   csp_values = ';'.join([
-    # Firefox <35 need this data: attribute for the grayscale filter based on SVG to work https://bugzilla.mozilla.org/show_bug.cgi?id=878608; in newer FF versions we use the new grayscale filter
-    "default-src 'self' data:",
+    "default-src 'self'",
     "connect-src 'self' blob: https://*.unsplash.com https://maps.googleapis.com https://*.giphy.com https://api.raygun.io https://www.google.com https://*.wire.com https://wire.com wss://prod-nginz-ssl.wire.com https://*.zinfra.io wss://*.zinfra.io",
     "font-src 'self' data:",
     "frame-src 'self' https://accounts.google.com https://*.soundcloud.com https://*.spotify.com https://*.vimeo.com https://*.youtube.com",

@@ -130,7 +130,7 @@ ko.components.register 'user-list',
                           <span class="search-list-item-content-username label-username" data-bind="text: $data.username"></span>
                         <!-- /ko -->
                         <!-- ko if: !$data.connected() && $data.mutual_friends_total() > 0 -->
-                          <span class="search-list-item-content-friends ellipsis" data-bind="text: $parent.get_common_contacts_caption($data)"></span>
+                          <span class="search-list-item-content-friends ellipsis" data-bind="attr: {'data-uie-common-friends': mutual_friends_total()}, text: $parent.get_common_contacts_caption($data)"></span>
                         <!-- /ko -->
                       </div>
                     <!-- /ko -->

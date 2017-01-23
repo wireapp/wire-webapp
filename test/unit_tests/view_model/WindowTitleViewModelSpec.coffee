@@ -100,7 +100,7 @@ xdescribe 'z.ViewModel.WindowTitleViewModel', ->
       expect(muted_conversation.messages().length).toBe 2
       expect(muted_conversation.messages_unordered().length).toBe 2
       expect(muted_conversation.unread_events().length).toBe 2
-      expect(muted_conversation.number_of_unread_messages()).toBe 2
+      expect(muted_conversation.unread_message_count()).toBe 2
 
       # Check title when there are messages in the muted conversation
       title_view_model.initiate_title_updates()
