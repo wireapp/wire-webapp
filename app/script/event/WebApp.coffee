@@ -101,7 +101,6 @@ z.event.WebApp =
     NOTIFICATION_HANDLING_STATE: 'wire.webapp.event.notification_handling'
   LIST:
     SCROLL: 'wire.webapp.list.scroll'
-  LOADED: 'wire.webapp.loaded'
   PEOPLE:
     HIDE: 'wire.webapp.participant-et.hide'
     SHOW: 'wire.webapp.participant-et.show'
@@ -111,8 +110,16 @@ z.event.WebApp =
   LEFT:
     HIDE: 'wire.webapp.left.hide'
     FADE_IN: 'wire.webapp.left.fade-in'
+  LIFECYCLE:
+    ASK_TO_CLEAR_DATA: 'wire.webapp.lifecycle.ask_to_clear_data'
+    LOADED: 'wire.webapp.lifecycle.loaded'
+    REFRESH: 'wire.webapp.lifecycle.refresh'
+    RESTART: 'wire.webapp.lifecycle.restart'
+    SIGN_OUT: 'wire.webapp.lifecycle.sign_out'
+    UPDATE: 'wire.webapp.lifecycle.update'
+  LOADED: 'wire.webapp.loaded' # todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
   LOGOUT:
-    ASK_TO_CLEAR_DATA: 'wire.webapp.logout.ask-to-clear-data'
+    ASK_TO_CLEAR_DATA: 'wire.webapp.logout.ask-to-clear-data' # todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
   PREFERENCES:
     MANAGE_ACCOUNT: 'wire.webapp.preferences.manage-account'
     MANAGE_DEVICES: 'wire.webapp.preferences.manage-devices'

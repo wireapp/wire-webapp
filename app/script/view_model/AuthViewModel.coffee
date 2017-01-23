@@ -453,7 +453,13 @@ class z.ViewModel.AuthViewModel
           label_key: @client_repository.construct_cookie_label_key username, @client_type()
           password: @password()
 
-        if username.includes('@') then payload.email = username else payload.phone = username
+        phone = z.util.phone_number_to_e164 username, @country() or navigator.language
+        if z.util.is_valid_phone_number phone
+          payload.phone = phone
+        else if z.util.is_valid_email username
+          payload.email = username
+        else
+          payload.handle = username.replace '@', ''
 
         return payload
       when z.auth.AuthView.MODE.ACCOUNT_PHONE
@@ -1114,14 +1120,11 @@ class z.ViewModel.AuthViewModel
   Validate email input.
   @private
   ###
-  _validate_email: (mode) ->
+  _validate_email: ->
     username = @username().trim().toLowerCase()
 
     if not username.length
       @_add_error z.string.auth_error_email_missing, z.auth.AuthView.TYPE.EMAIL
-    else if mode is z.auth.AuthView.MODE.ACCOUNT_PASSWORD
-      if not z.util.is_valid_email(username) and not z.util.is_valid_phone_number username
-        @_add_error z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL
     else if not z.util.is_valid_email username
       @_add_error z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL
 
@@ -1138,11 +1141,10 @@ class z.ViewModel.AuthViewModel
     @_validate_name() if mode is z.auth.AuthView.MODE.ACCOUNT_REGISTER
 
     email_modes = [
-      z.auth.AuthView.MODE.ACCOUNT_PASSWORD
       z.auth.AuthView.MODE.ACCOUNT_REGISTER
       z.auth.AuthView.MODE.VERIFY_ACCOUNT
     ]
-    @_validate_email mode if mode in email_modes
+    @_validate_email() if mode in email_modes
 
     password_modes = [
       z.auth.AuthView.MODE.ACCOUNT_PASSWORD
@@ -1151,6 +1153,8 @@ class z.ViewModel.AuthViewModel
       z.auth.AuthView.MODE.VERIFY_PASSWORD
     ]
     @_validate_password mode if mode in password_modes
+
+    @_validate_username() if mode is z.auth.AuthView.MODE.ACCOUNT_PASSWORD
 
     phone_modes = [
       z.auth.AuthView.MODE.ACCOUNT_PHONE
@@ -1186,6 +1190,19 @@ class z.ViewModel.AuthViewModel
   _validate_phone: ->
     if not z.util.is_valid_phone_number @phone_number_e164()
       @_add_error z.string.auth_error_phone_number_invalid, z.auth.AuthView.TYPE.PHONE
+
+  ###
+  Validate username input.
+  @private
+  ###
+  _validate_username: ->
+    username = @username().trim().toLowerCase().replace '@', ''
+
+    unless username.length
+      return @_add_error z.string.auth_error_email_missing, z.auth.AuthView.TYPE.EMAIL
+
+    if username.length < 2
+      return @_add_error z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL
 
 
   ###############################################################################
