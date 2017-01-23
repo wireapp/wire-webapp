@@ -28,6 +28,28 @@ describe 'Conversation', ->
     conversation_et = new z.entity.Conversation()
     other_user = new z.entity.User entities.user.jane_roe.id
 
+    should_effect_conversation_timestamp
+
+  describe 'timestamp', ->
+
+    it 'adding a message should update the conversation timestamp', ->
+      message_et = new z.entity.Message()
+      message_et.timestamp = new Date('2014-12-15T09:21:14.225Z').getTime()
+      conversation_et.timestamp = new Date('2014-12-14T09:21:14.225Z').getTime()
+      conversation_et.add_message message_et
+      expect(conversation_et.timestamp).toBe message_et.timestamp
+
+    it 'adding a message should not update the conversation timestamp if should_effect_conversation_timestamp is false', ->
+      message_et = new z.entity.Message()
+      message_et.timestamp = new Date('2014-12-15T09:21:14.225Z').getTime()
+      conversation_et.add_message message_et
+
+      message_two_et = new z.entity.Message()
+      message_two_et.timestamp = new Date('2014-12-16T09:21:14.225Z').getTime()
+      message_two_et.should_effect_conversation_timestamp false
+      conversation_et.add_message message_two_et
+      expect(conversation_et.timestamp).toBe message_et.timestamp
+
   describe '_increment_time_only', ->
     first_date = new Date('2014-12-15T09:21:14.225Z').getTime()
     second_date = new Date('2014-12-15T09:22:14.225Z').getTime()

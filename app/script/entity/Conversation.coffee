@@ -395,7 +395,7 @@ class z.entity.Conversation
   @param message_et [z.entity.Message] Message to be added to conversation
   ###
   update_latest_from_message: (message_et) ->
-    if message_et? and message_et.visible()
+    if message_et? and message_et.visible() and message_et.should_effect_conversation_timestamp
       @set_timestamp message_et.timestamp, z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
 
   ###
