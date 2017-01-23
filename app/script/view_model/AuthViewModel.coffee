@@ -454,10 +454,10 @@ class z.ViewModel.AuthViewModel
           password: @password()
 
         phone = z.util.phone_number_to_e164 username, @country() or navigator.language
-        if z.util.is_valid_phone_number phone
-          payload.phone = phone
-        else if z.util.is_valid_email username
+        if z.util.is_valid_email username
           payload.email = username
+        else if z.util.is_valid_phone_number phone
+          payload.phone = phone
         else
           payload.handle = username.replace '@', ''
 
