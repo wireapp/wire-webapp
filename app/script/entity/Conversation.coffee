@@ -384,33 +384,6 @@ class z.entity.Conversation
           message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_RESUME
     return message_et
 
-  ###
-  Creates a E2EE message of type z.message.E2EEMessageType.ALL_VERIFIED.
-  @private
-  ###
-  _verified_message: ->
-    message_et = new z.entity.Message()
-    message_et.type = z.message.SuperType.ALL_VERIFIED
-    return message_et
-
-  ###
-  Creates a E2EE message of type z.message.E2EEMessageType.ALL_VERIFIED.
-  @private
-  ###
-  _new_device_message: ->
-    message_et = new z.entity.DeviceMessage()
-    return message_et
-
-  ###
-  Creates a E2EE message of type z.message.E2EEMessageType.ALL_VERIFIED.
-  @private
-  ###
-  _unverified_device_message: ->
-    message_et = new z.entity.DeviceMessage()
-    message_et.unverified true
-    return message_et
-
-
   ###############################################################################
   # Update last activity
   ###############################################################################
