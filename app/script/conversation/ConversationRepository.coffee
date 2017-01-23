@@ -1566,6 +1566,7 @@ class z.conversation.ConversationRepository
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE
     .then =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id
       return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
       @logger.info "Failed to send delete message for everyone with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
@@ -1573,7 +1574,6 @@ class z.conversation.ConversationRepository
 
   ###
   Delete message on your own clients.
-
   @param conversation_et [z.entity.Conversation]
   @param message_et [z.entity.Message]
   ###
@@ -1588,6 +1588,7 @@ class z.conversation.ConversationRepository
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL
     .then =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id
       return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
       @logger.info "Failed to send delete message with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
@@ -1957,6 +1958,7 @@ class z.conversation.ConversationRepository
       if event_json.from isnt @user_repository.self().id
         return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
     .then =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_json.data.message_id
       return @_delete_message_by_id conversation_et, event_json.data.message_id
     .catch (error) =>
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
@@ -1975,9 +1977,10 @@ class z.conversation.ConversationRepository
         throw new Error 'Sender is not self user'
       return @find_conversation_by_id event_json.data.conversation_id
     .then (conversation_et) =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_json.data.message_id
       return @_delete_message_by_id conversation_et, event_json.data.message_id
     .catch (error) =>
-      @logger.info "Failed to delete message for conversation '#{conversation_et.id}'", error
+      @logger.info "Failed to delete message for conversation '#{event_json.conversation}'", error
       throw error
 
   ###
