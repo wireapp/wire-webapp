@@ -90,6 +90,8 @@ class z.entity.Conversation
         else
           @verification_state z.conversation.ConversationVerificationState.UNVERIFIED
 
+      amplify.publish z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @
+
       return is_verified
 
     @removed_from_conversation = ko.observable false

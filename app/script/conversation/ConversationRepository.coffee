@@ -107,6 +107,7 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
     amplify.subscribe z.event.WebApp.CONVERSATION.PERSIST_STATE, @save_conversation_state_in_db
+    amplify.subscribe z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @on_verification_state_changed
     amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
@@ -494,8 +495,6 @@ class z.conversation.ConversationRepository
           verification_state: conversation_et.verification_state()
       return @conversation_service.update_conversation_state_in_db conversation_et, changes
       .then =>
-        if updated_field is z.conversation.ConversationUpdateType.VERIFICATION_STATE and conversation_et.verification_state() is z.conversation.ConversationVerificationState.VERIFIED
-          amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
         @logger.info "Persisted update of '#{updated_field}' to conversation '#{conversation_et.id}'"
 
     return @conversation_service.save_conversation_state_in_db conversation_et
@@ -506,6 +505,14 @@ class z.conversation.ConversationRepository
   ###
   save_conversations: (conversation_ets) =>
     z.util.ko_array_push_all @conversations, conversation_ets
+
+  ###
+  Handle conversation verification state change.
+  @param conversation_et [z.entity.Conversation]
+  ###
+  on_verification_state_changed: (conversation_et) =>
+    if conversation_et.verification_state() is z.conversation.ConversationVerificationState.VERIFIED
+      amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
 
   ###
   Set the notification handling state.
