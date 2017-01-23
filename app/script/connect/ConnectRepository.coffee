@@ -121,8 +121,8 @@ class z.connect.ConnectRepository
   ###
   _parse_macos_contacts: ->
     return new Promise (resolve, reject) =>
-      return resolve undefined if not window.zAddressBook
-      address_book = window.zAddressBook
+      return resolve undefined if not window.wAddressBook
+      address_book = window.wAddressBook
       phone_book = new z.connect.PhoneBook @properties_repository.self()
 
       me = address_book.getMe()
