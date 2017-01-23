@@ -34,9 +34,15 @@ class z.ViewModel.content.CollectionViewModel
     @no_items_found = ko.observable false
 
   added_to_view: =>
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.ADDED, @item_added
     amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, @item_removed
     $(document).on 'keydown.collection', (event) =>
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, @conversation_et() if event.keyCode is z.util.KEYCODE.ESC
+
+  item_added: (message_et) =>
+    return unless @conversation_et().id is message_et.conversation_id
+    @_populate_items [message_et]
+    @_check_items()
 
   item_removed: (removed_message_id) =>
     _remove_item = (message_et) -> message_et.id is removed_message_id
@@ -47,6 +53,7 @@ class z.ViewModel.content.CollectionViewModel
     @_check_items()
 
   removed_from_view: =>
+    amplify.unsubscribe z.event.WebApp.CONVERSATION.MESSAGE.ADDED, @item_added
     amplify.unsubscribe z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, @item_removed
     $(document).off 'keydown.collection'
     @no_items_found false
