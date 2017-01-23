@@ -494,6 +494,8 @@ class z.conversation.ConversationRepository
           verification_state: conversation_et.verification_state()
       return @conversation_service.update_conversation_state_in_db conversation_et, changes
       .then =>
+        if updated_field is z.conversation.ConversationUpdateType.VERIFICATION_STATE and conversation_et.verification_state() is z.conversation.ConversationVerificationState.VERIFIED
+          amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
         @logger.info "Persisted update of '#{updated_field}' to conversation '#{conversation_et.id}'"
 
     return @conversation_service.save_conversation_state_in_db conversation_et

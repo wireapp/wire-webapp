@@ -86,7 +86,6 @@ z.event.WebApp =
       REMOVED: 'wire.webapp.conversation.message.removed'
     IMAGE:
       SEND: 'wire.webapp.conversation.image.send'
-    VERIFICATION_STATE_CHANGED: 'wire.webapp.conversation.verification-state-changed'
   CONTENT:
     SWITCH: 'wire.webapp.content.switch'
   CONTEXT_MENU: 'wire.webapp.context-menu'
