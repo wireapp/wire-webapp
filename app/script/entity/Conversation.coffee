@@ -57,7 +57,10 @@ class z.entity.Conversation
 
     @archived_state = ko.observable false
     @muted_state = ko.observable false
-    @verification_state = ko.observable z.conversation.ConversationVerificationState.UNVERIFIED
+    @verification_state = ko.observable()
+    @verification_state.subscribe_changed (state, old_state) =>
+      if old_state?
+        amplify.publish z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @
 
     @archived_timestamp = ko.observable 0
     @cleared_timestamp = ko.observable 0
@@ -89,7 +92,6 @@ class z.entity.Conversation
           @verification_state z.conversation.ConversationVerificationState.DEGRADED
         else
           @verification_state z.conversation.ConversationVerificationState.UNVERIFIED
-
       return is_verified
 
     @removed_from_conversation = ko.observable false
@@ -383,33 +385,6 @@ class z.entity.Conversation
         else
           message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_RESUME
     return message_et
-
-  ###
-  Creates a E2EE message of type z.message.E2EEMessageType.ALL_VERIFIED.
-  @private
-  ###
-  _verified_message: ->
-    message_et = new z.entity.Message()
-    message_et.type = z.message.SuperType.ALL_VERIFIED
-    return message_et
-
-  ###
-  Creates a E2EE message of type z.message.E2EEMessageType.ALL_VERIFIED.
-  @private
-  ###
-  _new_device_message: ->
-    message_et = new z.entity.DeviceMessage()
-    return message_et
-
-  ###
-  Creates a E2EE message of type z.message.E2EEMessageType.ALL_VERIFIED.
-  @private
-  ###
-  _unverified_device_message: ->
-    message_et = new z.entity.DeviceMessage()
-    message_et.unverified true
-    return message_et
-
 
   ###############################################################################
   # Update last activity

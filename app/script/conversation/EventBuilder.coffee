@@ -17,19 +17,17 @@
 #
 
 window.z ?= {}
-z.event ?= {}
+z.conversation ?= {}
 
-z.event.Client =
-  CONVERSATION:
-    ALL_VERIFIED: 'conversation.all-verified'
-    ASSET_META: 'conversation.asset-meta'
-    ASSET_PREVIEW: 'conversation.asset-preview'
-    ASSET_UPLOAD_COMPLETE: 'conversation.asset-upload-complete'
-    ASSET_UPLOAD_FAILED: 'conversation.asset-upload-failed'
-    CONFIRMATION: 'conversation.confirmation'
-    DELETE_EVERYWHERE: 'conversation.delete-everywhere'
-    LOCATION: 'conversation.location'
-    MESSAGE_DELETE: 'conversation.message-delete'
-    MESSAGE_HIDDEN: 'conversation.message-hidden'
-    REACTION: 'conversation.reaction'
-    UNABLE_TO_DECRYPT: 'conversation.unable-to-decrypt'
+z.conversation.EventBuilder = do ->
+
+  build_all_verified = (conversation_et) ->
+    conversation: conversation_et.id
+    id: z.util.create_random_uuid()
+    type: z.event.Client.CONVERSATION.ALL_VERIFIED
+    from: conversation_et.self.id
+    time: new Date().toISOString()
+
+  return {
+    build_all_verified: build_all_verified
+  }

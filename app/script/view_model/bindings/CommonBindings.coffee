@@ -357,3 +357,13 @@ ko.bindingHandlers.in_viewport = do ->
     window.setTimeout _check_element, allBindingsAccessor.get('delay') or 0
 
     ko.utils.domNodeDisposal.addDisposeCallback element, _dispose
+
+
+ko.subscribable.fn.subscribe_changed = (callback) ->
+  old_value = undefined
+  @subscribe (_old_value) ->
+    old_value = _old_value
+  , @, 'beforeChange'
+
+  @subscribe (new_value) ->
+    callback new_value, old_value
