@@ -156,9 +156,9 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Notification message body
   ###
   _create_body_call: (message_et) ->
-    if message_et.is_call_activation()
+    if message_et.is_activation()
       return z.localization.Localizer.get_text z.string.system_notification_voice_channel_activate
-    else if message_et.is_call_deactivation()
+    else if message_et.is_deactivation()
       return if message_et.finished_reason isnt z.calling.enum.CallFinishedReason.MISSED
       return z.localization.Localizer.get_text z.string.system_notification_voice_channel_deactivate
 
@@ -411,12 +411,9 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Icon URL
   ###
   _create_options_icon: (should_obfuscate_sender, user_et) ->
-    try
-      return '' if z.util.Environment.electron and z.util.Environment.os.mac
-      return NOTIFICATION_ICON_URL if should_obfuscate_sender
-      return user_et.preview_picture_resource().generate_url()
-    catch
-      return NOTIFICATION_ICON_URL
+    return user_et.preview_picture_resource().generate_url() if user_et.preview_picture_resource() and not should_obfuscate_sender
+    return '' if z.util.Environment.electron and z.util.Environment.os.mac
+    return NOTIFICATION_ICON_URL
 
   ###
   Creates the notification tag.

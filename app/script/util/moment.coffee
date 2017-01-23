@@ -16,20 +16,14 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-window.z ?= {}
-z.entity ?= {}
+moment.fn.is_today = ->
+  @isSame new Date(), 'd'
 
-class z.entity.PingMessage extends z.entity.Message
-  constructor: ->
-    super()
-    @super_type = z.message.SuperType.PING
+moment.fn.is_current_year = ->
+  @isSame new Date(), 'y'
 
-    @caption = ko.pureComputed =>
-      string = if @user().is_me then z.string.conversation_ping_you else z.string.conversation_ping
-      return z.localization.Localizer.get_text string
-    , @, deferEvaluation: true
+moment.fn.is_same_day = (date) ->
+  @isSame date, 'd'
 
-    @get_icon_classes = ko.pureComputed =>
-      css_classes = if @is_expired() then 'ephemeral-message-obfuscated' else @accent_color()
-      css_classes += ' ping-animation ping-animation-soft' if Date.now() - @timestamp < 2000
-      return css_classes
+moment.fn.is_same_month = (date) ->
+  @isSame date, 'M'

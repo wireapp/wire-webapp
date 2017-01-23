@@ -184,7 +184,9 @@ z.string.ro.modal_logout_headline = 'Curăță datele?'
 z.string.ro.modal_logout_message = 'Șterge toate informațiile personale și conversațiile de pe acest dispozitiv.'
 z.string.ro.modal_logout_button = 'Deconectare'
 # New device
-z.string.ro.modal_new_device_headline = '„%@.name” a început să folosească un nou dispozitiv'
+z.string.ro.modal_new_device_headline = '%@.name a început să folosească un nou dispozitiv'
+z.string.ro.modal_new_device_headline_many = '%@.names a început să folosească un nou dispozitiv'
+z.string.ro.modal_new_device_headline_you = '%@.name a început să folosească un nou dispozitiv'
 z.string.ro.modal_new_device_message = 'Încă dorești să fie trimise mesajele?'
 z.string.ro.modal_new_device_show_device = 'arată dispozitivul'
 z.string.ro.modal_new_device_send_anyway = 'trimite oricum'
@@ -268,6 +270,12 @@ z.string.ro.conversation_edit_timestamp = 'A fost editat la %@timestamp'
 z.string.ro.conversation_likes_caption = '%@number persoane'
 z.string.ro.conversation_send_pasted_file = 'A postat o imagine pe %date'
 
+# Collection
+z.string.ro.collection_show_all = 'Arată toate %no'
+z.string.ro.collection_section_links = 'Legături'
+z.string.ro.collection_section_images = 'Imagini'
+z.string.ro.collection_section_files = 'Fișiere'
+
 # Archive
 z.string.ro.archive_header = 'Arhivă'
 
@@ -300,8 +308,8 @@ z.string.ro.invite_meta_key_pc = 'Ctrl'
 z.string.ro.invite_hint_selected = 'Apasă %meta_key + C pentru a copia'
 z.string.ro.invite_hint_unselected = 'Selectează și apasă %meta_key + C'
 z.string.ro.invite_headline = 'Invită persoane pe Wire'
-z.string.ro.invite_message = 'Sunt pe Wire, caută pe %username sau vizitează wire.com/download.'
-z.string.ro.invite_message_no_email = 'Sunt pe Wire. Vizitează https://get.wire.com pentru a te conecta cu mine.'
+z.string.ro.invite_message = 'Bună, sunt pe Wire. Caută-mă cu numele %username sau vizitează get.wire.com.'
+z.string.ro.invite_message_no_email = 'Sunt pe Wire. Vizitează get.wire.com pentru a te conecta cu mine.'
 
 # Extensions
 z.string.ro.extensions_bubble_button_gif = 'Gif'
@@ -325,6 +333,7 @@ z.string.ro.people_no_matches = 'Nu s-a găsit nimic.\nÎncearcă să scrii un a
 z.string.ro.people_invite = 'Invită persoane'
 z.string.ro.people_share = 'Împărtășește contacte'
 z.string.ro.people_bring_your_friends = 'Invită prietenii pe Wire'
+z.string.ro.people_invite_detail = 'Împărtășirea contactelor ne ajută să te conectăm cu alții. Noi anonimizăm toate informațiile și nu le împărtășim cu terți.'
 z.string.ro.people_invite_button_contacts = 'Din Contacte'
 z.string.ro.people_invite_button_gmail = 'Din Gmail'
 z.string.ro.people_invite_headline = 'Invită prietenii'
@@ -518,6 +527,7 @@ z.string.ro.warning_connectivity_no_internet = 'Nu este conexiune la internet. N
 # Browser notifications
 z.string.ro.system_notification_asset_add = 'A împărtășit o imagine'
 z.string.ro.system_notification_connection_accepted = 'A acceptat cererea de conectare a ta'
+z.string.ro.system_notification_connection_connected = 'Acum ești conectat'
 z.string.ro.system_notification_connection_request = 'Așteaptă conectarea'
 z.string.ro.system_notification_conversation_create = '%s.first_name a început o conversație'
 z.string.ro.system_notification_conversation_rename = '%s.first_name a redenumit conversația în %name'

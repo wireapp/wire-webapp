@@ -34,10 +34,27 @@ class z.ViewModel.content.CollectionViewModel
     @no_items_found = ko.observable false
 
   added_to_view: =>
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.ADDED, @item_added
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, @item_removed
     $(document).on 'keydown.collection', (event) =>
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, @conversation_et() if event.keyCode is z.util.KEYCODE.ESC
 
+  item_added: (message_et) =>
+    return unless @conversation_et().id is message_et.conversation_id
+    @_populate_items [message_et]
+    @_check_items()
+
+  item_removed: (removed_message_id) =>
+    _remove_item = (message_et) -> message_et.id is removed_message_id
+
+    @images.remove _remove_item
+    @files.remove _remove_item
+    @links.remove _remove_item
+    @_check_items()
+
   removed_from_view: =>
+    amplify.unsubscribe z.event.WebApp.CONVERSATION.MESSAGE.ADDED, @item_added
+    amplify.unsubscribe z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, @item_removed
     $(document).off 'keydown.collection'
     @no_items_found false
     @conversation_et null
@@ -47,11 +64,14 @@ class z.ViewModel.content.CollectionViewModel
     @conversation_et conversation_et
     @conversation_repository.get_events_for_category conversation_et, z.message.MessageCategory.LINK_PREVIEW
     .then (message_ets) =>
-      @populate_items message_ets
-      if @images().length + @files().length + @links().length is 0
-        @no_items_found true
+      @_populate_items message_ets
+      @_check_items()
+      @_track_opened_collection conversation_et, @no_items_found()
 
-  populate_items: (message_ets) =>
+  _check_items: ->
+    @no_items_found @images().length + @files().length + @links().length is 0
+
+  _populate_items: (message_ets) ->
     for message_et in message_ets
       switch
         when message_et.category & z.message.MessageCategory.IMAGE and not (message_et.category & z.message.MessageCategory.GIF)
@@ -68,5 +88,18 @@ class z.ViewModel.content.CollectionViewModel
     @collection_details.set_conversation @conversation_et(), category, [].concat items
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS
 
-  click_on_image: (message_et) ->
-    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW,  message_et
+  click_on_image: (message_et) =>
+    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et, 'collection'
+    @_track_opened_item @conversation_et(), 'image'
+
+  _track_opened_collection: (conversation_et, is_empty) ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.OPENED_COLLECTIONS,
+      is_empty: is_empty
+      conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+      with_bot: conversation_et.is_with_bot()
+
+  _track_opened_item: (conversation_et, type) ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.OPENED_ITEM,
+      type: type
+      conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+      with_bot: conversation_et.is_with_bot()

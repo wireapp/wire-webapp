@@ -185,6 +185,8 @@ z.string.fr.modal_logout_message = 'Supprime toutes vos informations personnelle
 z.string.fr.modal_logout_button = 'Se déconnecter'
 # New device
 z.string.fr.modal_new_device_headline = '%@.name a commencé à utiliser un nouvel appareil'
+z.string.fr.modal_new_device_headline_many = '%@.names a commencé à utiliser un nouvel appareil'
+z.string.fr.modal_new_device_headline_you = '%@.name a commencé à utiliser un nouvel appareil'
 z.string.fr.modal_new_device_message = 'Voulez-vous toujours envoyer vos messages ?'
 z.string.fr.modal_new_device_show_device = 'afficher l’appareil'
 z.string.fr.modal_new_device_send_anyway = 'envoyer quand même'
@@ -302,7 +304,8 @@ z.string.fr.invite_meta_key_pc = 'Ctrl'
 z.string.fr.invite_hint_selected = 'Appuyez sur %meta_key + C pour copier'
 z.string.fr.invite_hint_unselected = 'Sélectionnez et appuyez sur %meta_key + C'
 z.string.fr.invite_headline = 'Invitez des gens sur Wire'
-z.string.fr.invite_message_no_email = 'Je suis sur Wire. Visitez https://get.wire.com afin de vous connecter avec moi.'
+z.string.fr.invite_message = 'Je suis sur Wire, cherche %username ou va voir get.wire.com .'
+z.string.fr.invite_message_no_email = 'Je suis sur Wire. Va voir get.wire.com pour te connecter avec moi.'
 
 # Extensions
 z.string.fr.extensions_bubble_button_gif = 'Gif'
@@ -326,6 +329,7 @@ z.string.fr.people_no_matches = 'Pas de résultats.\nEssayez avec un nom différ
 z.string.fr.people_invite = 'Inviter des personnes'
 z.string.fr.people_share = 'Partagez vos contacts'
 z.string.fr.people_bring_your_friends = 'Amenez vos amis sur Wire'
+z.string.fr.people_invite_detail = 'Le fait de partager vos contacts vous aide à vous connecter à d’autres personnes. Nous gardons anonyme toute information et ne le partageons avec personne d’autre.'
 z.string.fr.people_invite_button_contacts = 'Depuis vos Contacts'
 z.string.fr.people_invite_button_gmail = 'Depuis Gmail'
 z.string.fr.people_invite_headline = 'Amenez vos amis'
@@ -456,7 +460,7 @@ z.string.fr.search_group_hint = 'Continuez d’écrire ou ajoutez plus de person
 z.string.fr.search_connect = 'Connecter'
 z.string.fr.search_connections = 'Connexions'
 z.string.fr.search_groups = 'Groupes'
-z.string.fr.search_placeholder = 'Rechercher par nom ou par identifiant'
+z.string.fr.search_placeholder = 'Chercher par nom ou par identifiant'
 z.string.fr.search_top_people = 'Personnes favorites'
 z.string.fr.search_try_search = 'Trouver des personnes par\nnom ou nom d’utilisateur'
 z.string.fr.search_no_contacts_on_wire = 'Vous n’avez pas de contacts sur Wire.\nEssayez de trouver des gens par\nleur nom ou leur nom d’utilisateur.'
@@ -519,6 +523,7 @@ z.string.fr.warning_connectivity_no_internet = 'Pas d’Internet. Vous ne pourre
 # Browser notifications
 z.string.fr.system_notification_asset_add = 'A partagé une photo'
 z.string.fr.system_notification_connection_accepted = 'A accepté votre demande de connexion'
+z.string.fr.system_notification_connection_connected = 'Sont maintenant connectés'
 z.string.fr.system_notification_connection_request = 'Souhaite se connecter'
 z.string.fr.system_notification_conversation_create = '%s.first_name a démarré une conversation'
 z.string.fr.system_notification_conversation_rename = '%s.first_name a renommé la conversation en %name'

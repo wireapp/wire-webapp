@@ -185,6 +185,8 @@ z.string.es.modal_logout_message = 'Borrar todos sus datos personales y las conv
 z.string.es.modal_logout_button = 'Cerrar sesión'
 # New device
 z.string.es.modal_new_device_headline = '%@.name comenzó a usar un nuevo dispositivo'
+z.string.es.modal_new_device_headline_many = '%@.names comenzó a usar un nuevo dispositivo'
+z.string.es.modal_new_device_headline_you = '%@.name comenzó a usar un nuevo dispositivo'
 z.string.es.modal_new_device_message = '¿Desea enviar su mensaje?'
 z.string.es.modal_new_device_show_device = 'mostrar dispositivo'
 z.string.es.modal_new_device_send_anyway = 'enviar de todos modos'
@@ -269,6 +271,7 @@ z.string.es.conversation_likes_caption = '%@numbero de personas'
 z.string.es.conversation_send_pasted_file = 'Imagen pegada el %date'
 
 # Collection
+z.string.es.collection_show_all = 'Mostrar los %no'
 
 # Archive
 z.string.es.archive_header = 'Archivar'
@@ -302,8 +305,8 @@ z.string.es.invite_meta_key_pc = 'Ctrl'
 z.string.es.invite_hint_selected = 'Pulse %meta_key + C para copiar'
 z.string.es.invite_hint_unselected = 'Seleccione y pulse %meta_key + C'
 z.string.es.invite_headline = 'Invitar amigos a Wire'
-z.string.es.invite_message = 'Estoy en Wire, búscame como %username o visita wire.com/download.'
-z.string.es.invite_message_no_email = 'Estoy en Wire. Visita https://get.wire.com para conectar conmigo.'
+z.string.es.invite_message = 'Estoy en Wire, búscame como %username o visita get.wire.com.'
+z.string.es.invite_message_no_email = 'Estoy en Wire. Visita get.wire.com para conectar conmigo.'
 
 # Extensions
 z.string.es.extensions_bubble_button_gif = 'Gif'
@@ -327,6 +330,7 @@ z.string.es.people_no_matches = 'No hay resultados coincidentes. Intente con un 
 z.string.es.people_invite = 'Invitar gente'
 z.string.es.people_share = 'Compartir contactos'
 z.string.es.people_bring_your_friends = 'Invita a tus amigos a Wire'
+z.string.es.people_invite_detail = 'Compartir tus contactos te ayuda a conectar con otros. Anonimizamos toda la información y no la compartimos con nadie.'
 z.string.es.people_invite_button_contacts = 'Desde los contactos'
 z.string.es.people_invite_button_gmail = 'Desde Gmail'
 z.string.es.people_invite_headline = 'Tráete a tus amigos'
@@ -473,6 +477,7 @@ z.string.es.upload_google_message_error = 'No recibimos tu información. Por fav
 z.string.es.upload_google_button_again = 'Vuelve a intentarlo'
 
 # URLs
+z.string.es.url_password_reset = 'forgot/?hl=es'
 z.string.es.url_legal = 'https://wire.com/legal/'
 z.string.es.url_privacy = 'https://wire.com/privacy/'
 z.string.es.url_privacy_why = 'https://wire.com/privacy/why/'
@@ -520,6 +525,7 @@ z.string.es.warning_connectivity_no_internet = 'No hay Internet. No podrás envi
 # Browser notifications
 z.string.es.system_notification_asset_add = 'Compartió una foto'
 z.string.es.system_notification_connection_accepted = 'Aceptó tu solicitud de conexión'
+z.string.es.system_notification_connection_connected = 'Están conectados'
 z.string.es.system_notification_connection_request = 'Quiere conectar'
 z.string.es.system_notification_conversation_create = '%s.first_name inició una conversación'
 z.string.es.system_notification_conversation_rename = '%s.first_name renombró la conversación a %name'

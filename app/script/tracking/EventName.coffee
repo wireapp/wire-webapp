@@ -46,6 +46,10 @@ z.tracking.EventName =
     OPENED_GENERIC_INVITE_MENU: 'connect.opened_generic_invite_menu'
   CONTACTS:
     ENTERED_SEARCH: 'contacts.entered_search'
+  COLLECTION:
+    DID_ITEM_ACTION: 'collections.did_item_action'
+    OPENED_COLLECTIONS: 'collections.opened_collections'
+    OPENED_ITEM: 'collections.opened_item'
   CONVERSATION:
     ADD_TO_GROUP_CONVERSATION: 'addContactToGroupConversation'
     CHARACTER_LIMIT_REACHED: 'conversation.character_limit_reached'

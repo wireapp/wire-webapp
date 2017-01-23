@@ -24,13 +24,7 @@ window.LOG = ->
 
 
 z.util.dummy_image = (width, height) ->
-  canvas = document.createElement 'canvas'
-  canvas.width = width
-  canvas.height = height
-  ctx = canvas.getContext '2d'
-  ctx.fillStyle = '#fff'
-  ctx.fillRect 0, 0, width, height
-  return canvas.toDataURL 'image/png'
+  return "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 #{width} #{height}' width='#{width}' height='#{height}'></svg>"
 
 
 z.util.is_same_location = (past_location, current_location) ->
@@ -365,6 +359,16 @@ z.util.ko_array_unshift_all = (ko_array, values_to_shift) ->
   Array.prototype.unshift.apply underlyingArray, values_to_shift
   ko_array.valueHasMutated()
 
+# push array deferred to knockout observableArray
+z.util.ko_push_deferred = (target, src, number = 100, delay = 300) ->
+  interval = window.setInterval ->
+    chunk = src.splice 0, number
+    z.util.ko_array_push_all target, chunk
+
+    if src.length is 0
+      window.clearInterval interval
+
+  , delay
 
 ###
 Add zero padding until limit is reached

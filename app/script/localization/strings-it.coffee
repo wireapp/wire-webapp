@@ -185,6 +185,8 @@ z.string.it.modal_logout_message = 'Elimina tutti i tuoi dati personali e le con
 z.string.it.modal_logout_button = 'Logout'
 # New device
 z.string.it.modal_new_device_headline = '%@.name ha iniziato a utilizzare un nuovo dispositivo'
+z.string.it.modal_new_device_headline_many = '%@.names ha iniziato a utilizzare un nuovo dispositivo'
+z.string.it.modal_new_device_headline_you = '%@.name ha iniziato a utilizzare un nuovo dispositivo'
 z.string.it.modal_new_device_message = 'Vuoi comunque mandare il messaggio?'
 z.string.it.modal_new_device_show_device = 'visualizza dispositivo'
 z.string.it.modal_new_device_send_anyway = 'invia comunque'
@@ -267,6 +269,8 @@ z.string.it.conversation_delete_timestamp = 'Cancellato il %@timestamp'
 z.string.it.conversation_edit_timestamp = 'Modificato il %@timestamp'
 z.string.it.conversation_likes_caption = '%@number persone'
 z.string.it.conversation_send_pasted_file = 'Immagine incollata alle %date'
+
+# Collection
 
 # Archive
 z.string.it.archive_header = 'Archivia'

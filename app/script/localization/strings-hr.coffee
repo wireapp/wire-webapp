@@ -185,6 +185,8 @@ z.string.hr.modal_logout_message = 'Izbriši sve osobne informacije i razgovore 
 z.string.hr.modal_logout_button = 'Odjava'
 # New device
 z.string.hr.modal_new_device_headline = '%@.name počela/o koristiti novi uređaj'
+z.string.hr.modal_new_device_headline_many = '%@.names počela/o koristiti novi uređaj'
+z.string.hr.modal_new_device_headline_you = '%@.name počela/o koristiti novi uređaj'
 z.string.hr.modal_new_device_message = 'Još uvijek želite poslati poruku?'
 z.string.hr.modal_new_device_show_device = 'prikaz uređaja'
 z.string.hr.modal_new_device_send_anyway = 'svejedno pošalji'
@@ -267,6 +269,8 @@ z.string.hr.conversation_delete_timestamp = 'Izbrisano na %@timestamp'
 z.string.hr.conversation_edit_timestamp = 'Promijenjeno na %@timestamp'
 z.string.hr.conversation_likes_caption = '%@number ljudi'
 z.string.hr.conversation_send_pasted_file = 'Slika zaljepljena na %date'
+
+# Collection
 
 # Archive
 z.string.hr.archive_header = 'Arhiviraj'

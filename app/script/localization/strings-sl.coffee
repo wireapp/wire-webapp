@@ -185,6 +185,8 @@ z.string.sl.modal_logout_message = 'Izbriši vse vaše osebne podatke in pogovor
 z.string.sl.modal_logout_button = 'Odjava'
 # New device
 z.string.sl.modal_new_device_headline = '%@.name je začel(-a) z uporabo nove naprave'
+z.string.sl.modal_new_device_headline_many = '%@.names je začel(-a) z uporabo nove naprave'
+z.string.sl.modal_new_device_headline_you = '%@.name je začel(-a) z uporabo nove naprave'
 z.string.sl.modal_new_device_message = 'Ali še vedno želite poslati vaša sporočila?'
 z.string.sl.modal_new_device_show_device = 'pokaži napravo'
 z.string.sl.modal_new_device_send_anyway = 'pošlji vseeno'
@@ -268,6 +270,12 @@ z.string.sl.conversation_edit_timestamp = 'Urejen ob %@timestamp'
 z.string.sl.conversation_likes_caption = '%@number oseb'
 z.string.sl.conversation_send_pasted_file = 'Prilepljena slika ob %date'
 
+# Collection
+z.string.sl.collection_show_all = 'Prikaži vse %no'
+z.string.sl.collection_section_links = 'Povezave'
+z.string.sl.collection_section_images = 'Slike'
+z.string.sl.collection_section_files = 'Zbirke'
+
 # Archive
 z.string.sl.archive_header = 'Arhiviraj'
 
@@ -300,8 +308,8 @@ z.string.sl.invite_meta_key_pc = 'Ctrl'
 z.string.sl.invite_hint_selected = 'Pritisnite %meta_key + C za kopiranje'
 z.string.sl.invite_hint_unselected = 'Izberite in pritisnite %meta_key + C'
 z.string.sl.invite_headline = 'Povabite osebe na Wire'
-z.string.sl.invite_message = 'Sem na Wire, poišči %username ali obišči wire.com/download.'
-z.string.sl.invite_message_no_email = 'Sem na Wire. Obišči https://get.wire.com za povezavo z mano.'
+z.string.sl.invite_message = 'Sem na Wire, poišči %username ali obišči get.wire.com.'
+z.string.sl.invite_message_no_email = 'Sem na Wire. Obišči get.wire.com za povezavo z mano.'
 
 # Extensions
 z.string.sl.extensions_bubble_button_gif = 'Gif'
@@ -325,6 +333,7 @@ z.string.sl.people_no_matches = 'Brez ujemanja rezultatov. \nPoizkusite vnesti d
 z.string.sl.people_invite = 'Povabite osebe'
 z.string.sl.people_share = 'Deli Stike'
 z.string.sl.people_bring_your_friends = 'Pripeljite svoje prijatelje na Wire'
+z.string.sl.people_invite_detail = 'Deljenje vaših stikov pomaga pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.'
 z.string.sl.people_invite_button_contacts = 'Iz imenika stikov'
 z.string.sl.people_invite_button_gmail = 'Iz Gmail'
 z.string.sl.people_invite_headline = 'Pripeljite vaše prijatelje'
@@ -511,6 +520,7 @@ z.string.sl.warning_connectivity_no_internet = 'Ni spletne povezave. Ne boste mo
 # Browser notifications
 z.string.sl.system_notification_asset_add = 'Je delil(-a) sliko'
 z.string.sl.system_notification_connection_accepted = 'Je sprejel(-a) vašo zahtevo po povezavi'
+z.string.sl.system_notification_connection_connected = 'Sta zdaj povezana'
 z.string.sl.system_notification_connection_request = 'Si želi povezati'
 z.string.sl.system_notification_conversation_create = '%s.first_name je začel(-a) pogovor'
 z.string.sl.system_notification_conversation_rename = '%s.first_name je preimenoval(-a) pogovor v %name'

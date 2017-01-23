@@ -15,16 +15,19 @@
 <script type="text/html" id="call">
   <div class="message-header">
     <div class="message-header-icon">
-      <svg class="message-icon-missed-call" width="40" height="40" viewBox="0 0 1024 1024" data-bind="css: accent_color">
-        <path d="M512 853.333v0c188.513 0 341.333-152.82 341.333-341.333s-152.82-341.333-341.333-341.333c-188.513 0-341.333 152.82-341.333 341.333s152.82 341.333 341.333 341.333v0zM512 874.667v0c-200.295 0-362.667-162.371-362.667-362.667s162.371-362.667 362.667-362.667c200.295 0 362.667 162.371 362.667 362.667s-162.371 362.667-362.667 362.667v0z"></path>
-        <path opacity="0.5600000023841858" d="M512 917.333v0c223.859 0 405.333-181.474 405.333-405.333s-181.474-405.333-405.333-405.333c-223.859 0-405.333 181.474-405.333 405.333s181.474 405.333 405.333 405.333v0zM512 938.667v0c-235.641 0-426.667-191.025-426.667-426.667s191.025-426.667 426.667-426.667c235.641 0 426.667 191.025 426.667 426.667s-191.025 426.667-426.667 426.667v0z"></path>
-        <path opacity="0.23999999463558197" d="M512 981.333v0c259.206 0 469.333-210.128 469.333-469.333s-210.128-469.333-469.333-469.333c-259.206 0-469.333 210.128-469.333 469.333s210.128 469.333 469.333 469.333v0zM512 1002.667v0c-270.988 0-490.667-219.679-490.667-490.667s219.679-490.667 490.667-490.667c270.988 0 490.667 219.679 490.667 490.667s-219.679 490.667-490.667 490.667v0z"></path>
-      </svg>
-      <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+      <!-- ko if: message.was_completed() -->
+        <div class="icon-call text-green"></div>
+      <!-- /ko -->
+      <!-- ko if: message.was_missed() -->
+        <div class="icon-end-call text-red"></div>
+      <!-- /ko -->
     </div>
     <div class="message-header-label">
       <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption()"></span>
+    </div>
+    <div class="message-body-actions">
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
     </div>
   </div>
 </script>
@@ -35,7 +38,7 @@
       <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
     </div>
     <div class="message-header-label">
-      <span class="label-bold" data-bind='text: message.sender_name()'></span>
+      <span class="message-header-label-sender" data-bind='text: message.sender_name()'></span>
       <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
     </div>
     <div class="message-body-actions message-body-actions-large">
@@ -51,7 +54,7 @@
         <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
       </div>
       <div class="message-header-label">
-        <span class="label-bold" data-bind='text: message.user().first_name()'></span>
+        <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.user().first_name()'></span>
         <!-- ko if: was_edited() -->
           <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
         <!-- /ko -->
@@ -64,7 +67,7 @@
       <!-- ko if: asset.is_image() -->
         <div class="message-asset-image">
           <div class="image image-loading" data-bind="
-            attr: {'data-uie-visible': $parent.visible},
+            attr: {'data-uie-visible': $parent.visible() && !message.is_expired()},
             background_image: asset.resource,
             click: function(data, event) {$parents[1].show_detail(message, event)},
             css: {'bg-color-ephemeral': message.is_expired()},
@@ -213,6 +216,11 @@
         <span class="ellipsis" data-bind="text: message.caption()"></span>
         <hr class="message-header-line" />
       </div>
+      <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN || message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE -->
+      <div class="message-body-actions">
+        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+      </div>
+      <!-- /ko -->
     </div>
     <div class="message-body">
       <!-- ko foreach: remote_user_ets -->
@@ -237,12 +245,11 @@
 <script type="text/html" id="ping">
   <div class="message-header">
     <div class="message-header-icon">
-      <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+      <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
     </div>
-    <div class="message-header-label" data-bind="css: message.ping_color">
+    <div class="message-header-label">
       <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption"></span>
-      <span class="message-icon-ping icon-ping" data-bind="css: message.animation()"></span>
     </div>
     <div class="message-body-actions">
       <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
@@ -268,6 +275,9 @@
       <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption()"></span>
       <hr class="message-header-line" />
+    </div>
+    <div class="message-body-actions">
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
     </div>
   </div>
   <div class="message-body label-bold" data-bind="text: message.name"></div>

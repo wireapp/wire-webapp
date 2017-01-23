@@ -120,12 +120,19 @@ def demo():
     'demo/index.html',
   ))
 
+
 @application.route('/sw.js')
 def service_worker():
  response = flask.make_response(flask.render_template('sw.js'))
  response.headers['Content-Type'] = 'application/javascript'
  response.headers['Cache-Control'] = 'no-cache'
  return response
+
+@application.route('/version/')
+@main.latest_browser_required
+def version():
+  return flask.jsonify({'version': config.CURRENT_VERSION_ID})
+
 
 ###############################################################################
 # Error Stuff

@@ -59,10 +59,10 @@ class z.ViewModel.list.ListViewModel
 
 
   _init_subscriptions: =>
-    amplify.subscribe z.event.WebApp.LOADED, => @webapp_loaded true
-    amplify.subscribe z.event.WebApp.PROFILE.SETTINGS.SHOW, @open_preferences_account # @todo remove when user base of wrappers version >= 2.11 is large enough
+    amplify.subscribe z.event.WebApp.LIFECYCLE.LOADED, => @webapp_loaded true
     amplify.subscribe z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, @open_preferences_account
     amplify.subscribe z.event.WebApp.PREFERENCES.MANAGE_DEVICES, @open_preferences_devices
+    amplify.subscribe z.event.WebApp.PROFILE.SETTINGS.SHOW, @open_preferences_account # todo: deprecated remove when user base of wrappers version >= 2.11 is large enough
     amplify.subscribe z.event.WebApp.SEARCH.SHOW, @open_start_ui
     amplify.subscribe z.event.WebApp.TAKEOVER.SHOW, @show_takeover
     amplify.subscribe z.event.WebApp.TAKEOVER.DISMISS, @dismiss_takeover

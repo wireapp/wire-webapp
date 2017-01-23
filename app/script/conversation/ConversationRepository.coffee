@@ -449,7 +449,7 @@ class z.conversation.ConversationRepository
   mark_as_read: (conversation_et) =>
     return if conversation_et is undefined
     return if @block_event_handling
-    return if conversation_et.number_of_unread_events() is 0
+    return if conversation_et.unread_event_count() is 0
     return if conversation_et.get_last_message()?.type is z.event.Backend.CONVERSATION.MEMBER_UPDATE
 
     @_update_last_read_timestamp conversation_et
@@ -1231,15 +1231,14 @@ class z.conversation.ConversationRepository
       return mapped_event
     .then (saved_event) =>
       @on_conversation_event saved_event
-
-      # we don't need to wait for the sending to resolve
-      @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
+      @sending_queue.push =>
+        @_send_generic_message conversation_et.id, generic_message
       .then =>
         if saved_event.type in z.event.EventTypeHandling.STORE
           @_update_message_sent_status conversation_et, saved_event.id
         @_track_completed_media_action conversation_et, generic_message
-
-      return saved_event
+      .then ->
+        return saved_event
 
   ###
   Update message as sent in db and view
@@ -1359,8 +1358,6 @@ class z.conversation.ConversationRepository
         .then =>
           @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
           return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
-        .catch (error) ->
-          throw error unless error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   _grant_outgoing_message: (conversation_et, generic_message, user_ids) =>
     return new Promise (resolve, reject) =>
@@ -1376,10 +1373,8 @@ class z.conversation.ConversationRepository
           user_ids = users_with_unverified_clients.map (user_et) -> user_et.id
 
         @user_repository.get_users_by_id user_ids, (user_ets) ->
-          joined_usernames = z.util.LocalizerUtil.join_names user_ets
-
           amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
-            data: joined_usernames
+            data: user_ets
             action: ->
               send_anyway = true
               conversation_et.verification_state z.conversation.ConversationVerificationState.UNVERIFIED
@@ -1389,7 +1384,7 @@ class z.conversation.ConversationRepository
                 reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   ###
-  Sends otr asset to a conversation.
+  Sends an OTR asset to a conversation.
 
   @deprecated # TODO: remove once support for v2 ends
   @private
@@ -1400,26 +1395,41 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the encrypted message
   ###
   _send_encrypted_asset: (conversation_id, generic_message, image_data, nonce) =>
+    @logger.log @logger.levels.INFO, "Sending encrypted '#{generic_message.content}' asset to conversation '#{conversation_id}'", image_data
     skip_own_clients = generic_message.content is 'ephemeral'
     precondition_option = false
+    image_payload = undefined
 
-    @_create_user_client_map conversation_id, skip_own_clients
-    .then (user_client_map) =>
-      if skip_own_clients
-        precondition_option = Object.keys user_client_map
-      return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
-    .then (payload) =>
-      payload.inline = false
-      @asset_service.post_asset_v2 conversation_id, payload, image_data, precondition_option, nonce
+    conversation_et = @find_conversation_by_id conversation_id
+    return Promise.resolve()
+      .then =>
+        if conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
+          return @_grant_outgoing_message conversation_et, generic_message
+      .then =>
+        return @_create_user_client_map conversation_id, skip_own_clients
+      .then (user_client_map) =>
+        if skip_own_clients
+          precondition_option = Object.keys user_client_map
+        return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+      .then (payload) =>
+        payload.inline = false
+        image_payload = payload
+        return @asset_service.post_asset_v2 conversation_id, image_payload, image_data, precondition_option, nonce
       .then (response) =>
         @_handle_client_mismatch conversation_id, response
         return response
       .catch (error) =>
+        updated_payload = undefined
+
         throw error if not error.missing
 
-        return @_handle_client_mismatch conversation_id, error, generic_message, payload
-        .then (updated_payload) =>
-          @asset_service.post_asset_v2 conversation_id, updated_payload, image_data, true, nonce
+        return @_handle_client_mismatch conversation_id, error, generic_message, image_payload
+        .then (payload_with_missing_clients) =>
+          updated_payload = payload_with_missing_clients
+          return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
+        .then =>
+          @logger.log @logger.levels.INFO, "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
+          return @asset_service.post_asset_v2 conversation_id, updated_payload, image_data, true, nonce
 
   ###
   Estimate whether message should be send as type external.
@@ -1556,6 +1566,7 @@ class z.conversation.ConversationRepository
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE
     .then =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id
       return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
       @logger.info "Failed to send delete message for everyone with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
@@ -1563,7 +1574,6 @@ class z.conversation.ConversationRepository
 
   ###
   Delete message on your own clients.
-
   @param conversation_et [z.entity.Conversation]
   @param message_et [z.entity.Message]
   ###
@@ -1578,6 +1588,7 @@ class z.conversation.ConversationRepository
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL
     .then =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id
       return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
       @logger.info "Failed to send delete message with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
@@ -1947,6 +1958,7 @@ class z.conversation.ConversationRepository
       if event_json.from isnt @user_repository.self().id
         return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
     .then =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_json.data.message_id
       return @_delete_message_by_id conversation_et, event_json.data.message_id
     .catch (error) =>
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
@@ -1965,9 +1977,10 @@ class z.conversation.ConversationRepository
         throw new Error 'Sender is not self user'
       return @find_conversation_by_id event_json.data.conversation_id
     .then (conversation_et) =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_json.data.message_id
       return @_delete_message_by_id conversation_et, event_json.data.message_id
     .catch (error) =>
-      @logger.info "Failed to delete message for conversation '#{conversation_et.id}'", error
+      @logger.info "Failed to delete message for conversation '#{event_json.conversation}'", error
       throw error
 
   ###
