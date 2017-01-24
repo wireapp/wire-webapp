@@ -35,7 +35,7 @@ z.conversation.EventBuilder = do ->
     from: conversation_et.self.id
     time: new Date().toISOString()
     data:
-      users: user_ids
+      user_ids: user_ids
 
   return {
     build_all_verified: build_all_verified

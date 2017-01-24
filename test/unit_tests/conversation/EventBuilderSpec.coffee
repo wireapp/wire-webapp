@@ -38,3 +38,13 @@ describe 'z.conversation.EventBuilder', ->
     expect(message_et.super_type).toBe z.message.SuperType.ALL_VERIFIED
     expect(message_et.from).toBe conversation_et.self.id
     expect(message_et.conversation_id).toBe conversation_et.id
+
+  it 'build_new_device', ->
+    user_ids = [z.util.create_random_uuid()]
+    event = z.conversation.EventBuilder.build_new_device conversation_et, user_ids
+    message_et = event_mapper.map_json_event event, conversation_et
+    expect(message_et).toBeDefined()
+    expect(message_et.super_type).toBe z.message.SuperType.NEW_DEVICE
+    expect(message_et.from).toBe conversation_et.self.id
+    expect(message_et.conversation_id).toBe conversation_et.id
+    expect(message_et.user_ids()).toEqual user_ids

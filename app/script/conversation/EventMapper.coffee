@@ -85,7 +85,7 @@ class z.conversation.EventMapper
       when z.event.Client.CONVERSATION.LOCATION
         message_et = @_map_event_location event
       when z.event.Client.CONVERSATION.NEW_DEVICE
-        message_et = @_map_new_device()
+        message_et = @_map_new_device event
       when z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
         message_et = @_map_system_event_unable_to_decrypt event
       else

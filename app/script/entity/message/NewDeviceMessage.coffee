@@ -26,6 +26,9 @@ class z.entity.NewDeviceMessage extends z.entity.Message
     @super_type = z.message.SuperType.NEW_DEVICE
     @should_effect_conversation_timestamp = false
 
+    @user_ets = ko.observableArray()
+    @user_ids = ko.observableArray()
+
     @caption_user = ko.pureComputed =>
       return z.util.LocalizerUtil.join_names @user_ets()
 
