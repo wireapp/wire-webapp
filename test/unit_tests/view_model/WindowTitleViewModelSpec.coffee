@@ -18,7 +18,7 @@
 
 # grunt test_init && grunt test_run:view_model/WindowTitleViewModel
 
-xdescribe 'z.ViewModel.WindowTitleViewModel', ->
+describe 'z.ViewModel.WindowTitleViewModel', ->
   suffix = z.localization.Localizer.get_text z.string.wire
   test_factory = new TestFactory()
   title_view_model = undefined
