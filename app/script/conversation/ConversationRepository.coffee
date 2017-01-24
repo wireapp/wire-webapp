@@ -2601,16 +2601,15 @@ class z.conversation.ConversationRepository
 
   ###
   Add new device message to conversations.
-  @param user_id [String] ID of user to add client to
-  @param client_et [z.client.Client] Client entity
+  @param user_ids [String|Array]
   ###
-  on_client_add: (user_id) =>
-    if not _.isString(user_id) and not _.isArray(user_id)
+  on_client_add: (user_ids) =>
+    if _.isString user_ids
+      user_ids = [user_ids]
+
+    if not user_ids?.length > 0
       @logger.warn "Failed to add new device message because of missing user ids"
       return
-
-    if _.isString user_id
-      user_id = [user_id]
 
     valid_conversation_ets = @filtered_conversations()
     .filter (conversation_et) ->
@@ -2623,6 +2622,6 @@ class z.conversation.ConversationRepository
       return
 
     for conversation_et in valid_conversation_ets
-      user_ids_in_conversation = _.intersection user_id, conversation_et.participating_user_ids()
+      user_ids_in_conversation = _.intersection user_ids, conversation_et.participating_user_ids()
       if user_ids_in_conversation.length
         amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_new_device conversation_et, user_ids_in_conversation
