@@ -108,7 +108,7 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
     amplify.subscribe z.event.WebApp.CONVERSATION.PERSIST_STATE, @save_conversation_state_in_db
     amplify.subscribe z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @on_verification_state_changed
-    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_self_client_add
+    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_client_add
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
 
@@ -2182,7 +2182,7 @@ class z.conversation.ConversationRepository
       @user_repository.get_user_by_id message_et.from, (user_et) =>
         message_et.user user_et
 
-        if message_et.is_member()
+        if message_et.is_member() or message_et.user_ets?
           @user_repository.get_users_by_id message_et.user_ids(), (user_ets) ->
             message_et.user_ets user_ets
 
@@ -2279,6 +2279,8 @@ class z.conversation.ConversationRepository
         return @user_repository.add_client_to_user user_id, new z.client.Client {id: client_id}
 
       return Promise.all @_map_user_client_map user_client_map, _add_missing_client
+    .then =>
+      @on_client_add Object.keys(user_client_map)
     .then ->
       return payload
 
@@ -2602,7 +2604,25 @@ class z.conversation.ConversationRepository
   @param user_id [String] ID of user to add client to
   @param client_et [z.client.Client] Client entity
   ###
-  on_self_client_add: (user_id, client_et) =>
-    for conversation_et in @filtered_conversations()
-      if conversation_et.type() in [z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.REGULAR]
-        amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_new_device conversation_et
+  on_client_add: (user_id) =>
+    if not _.isString(user) or not _.isArray(user)
+      @logger.warn "Failed to add new device message because of missing user ids"
+      return
+
+    if _.isString user_id
+      user_id = [user_id]
+
+    valid_conversation_ets = @filtered_conversations()
+    .filter (conversation_et) ->
+      not conversation_et.removed_from_conversation()
+    .filter (conversation_et) ->
+      conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
+
+    if valid_conversation_ets.length is 0
+      @logger.warn "No conversation found to add new device message"
+      return
+
+    for conversation_et in valid_conversation_ets
+      user_ids_in_conversation = _.intersection user_id, conversation_et.participant_ids
+      if user_ids_in_conversation.length
+        amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_new_device conversation_et, user_ids_in_conversation

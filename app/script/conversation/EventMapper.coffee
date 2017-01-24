@@ -129,8 +129,9 @@ class z.conversation.EventMapper
 
   @return [z.entity.NewDeviceMessage] Normal message entity
   ###
-  _map_new_device: ->
+  _map_new_device: (event) ->
     message_et = new z.entity.NewDeviceMessage()
+    message_et.user_ids event.data.user_ids
     return message_et
 
   ###
