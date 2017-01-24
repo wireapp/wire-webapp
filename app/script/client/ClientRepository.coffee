@@ -32,7 +32,8 @@ class z.client.ClientRepository
 
     amplify.subscribe z.event.Backend.USER.CLIENT_ADD, @on_client_add
     amplify.subscribe z.event.Backend.USER.CLIENT_REMOVE, @on_client_remove
-    amplify.subscribe z.event.WebApp.LOGOUT.ASK_TO_CLEAR_DATA, @logout_client
+    amplify.subscribe z.event.WebApp.LIFECYCLE.ASK_TO_CLEAR_DATA, @logout_client
+    amplify.subscribe z.event.WebApp.LOGOUT.ASK_TO_CLEAR_DATA, @logout_client # todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
 
     return @
 
@@ -395,10 +396,10 @@ class z.client.ClientRepository
     if @current_client().type is z.client.ClientType.PERMANENT
       amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT,
         action: (clear_data) ->
-          amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, clear_data
+          amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, clear_data
     else
       @delete_temporary_client()
-      .then -> amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, true
+      .then -> amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, true
 
   ###
   Removes a stored client and the session connected with it.
@@ -575,6 +576,6 @@ class z.client.ClientRepository
     return if not client_id
 
     if client_id is @current_client().id
-      amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.CLIENT_REMOVED, true
+      amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReasion.CLIENT_REMOVED, true
     else
       amplify.publish z.event.WebApp.CLIENT.REMOVE, @self_user().id, client_id

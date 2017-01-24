@@ -22,7 +22,7 @@ z.ViewModel ?= {}
 class z.ViewModel.WindowTitleViewModel
   constructor: (@content_state, @user_repository, @conversation_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS
-    amplify.subscribe z.event.WebApp.LOADED, @initiate_title_updates
+    amplify.subscribe z.event.WebApp.LIFECYCLE.LOADED, @initiate_title_updates
 
   initiate_title_updates: =>
     @logger.info 'Starting to update window title'
@@ -34,7 +34,7 @@ class z.ViewModel.WindowTitleViewModel
       number_of_connect_requests = @user_repository.connect_requests().length
 
       @conversation_repository.conversations_unarchived().forEach (conversation_et) ->
-        if not conversation_et.is_request() and not conversation_et.is_muted() and conversation_et.number_of_unread_messages()
+        if not conversation_et.is_request() and not conversation_et.is_muted() and conversation_et.unread_message_count()
           number_of_unread_conversations++
 
       badge_count = number_of_connect_requests + number_of_unread_conversations

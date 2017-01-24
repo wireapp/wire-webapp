@@ -17,24 +17,17 @@
 #
 
 window.z ?= {}
-z.string ?= {}
-z.string.da ?= {}
-z.string.cs ?= {}
-z.string.de ?= {}
-z.string.es ?= {}
-z.string.fi ?= {}
-z.string.fr ?= {}
-z.string.hr ?= {}
-z.string.hu ?= {}
-z.string.it ?= {}
-z.string.pt ?= {}
-z.string.ro ?= {}
-z.string.ru ?= {}
-z.string.sl ?= {}
-z.string.tr ?= {}
-z.string.uk ?= {}
+z.conversation ?= {}
 
-z.string.Declension =
-  ACCUSATIVE: 'accusative'
-  DATIVE: 'dative'
-  NOMINATIVE: 'nominative'
+z.conversation.EventBuilder = do ->
+
+  build_all_verified = (conversation_et) ->
+    conversation: conversation_et.id
+    id: z.util.create_random_uuid()
+    type: z.event.Client.CONVERSATION.ALL_VERIFIED
+    from: conversation_et.self.id
+    time: new Date().toISOString()
+
+  return {
+    build_all_verified: build_all_verified
+  }

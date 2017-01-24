@@ -24,13 +24,7 @@ window.LOG = ->
 
 
 z.util.dummy_image = (width, height) ->
-  canvas = document.createElement 'canvas'
-  canvas.width = width
-  canvas.height = height
-  ctx = canvas.getContext '2d'
-  ctx.fillStyle = '#fff'
-  ctx.fillRect 0, 0, width, height
-  return canvas.toDataURL 'image/png'
+  return "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 #{width} #{height}' width='#{width}' height='#{height}'></svg>"
 
 
 z.util.is_same_location = (past_location, current_location) ->

@@ -88,8 +88,12 @@ z.util.Environment = do ->
 
   app_version = ->
     if $("[property='wire:version']").attr('version')?
-      version = $("[property='wire:version']").attr('version').trim().split '-'
-      return "#{version[0]}.#{version[1]}.#{version[2]}.#{version[3]}#{version[4]}"
+      return $("[property='wire:version']").attr('version').trim()
+    return ''
+
+  formatted_app_version = ->
+    version = app_version().split '-'
+    return "#{version[0]}.#{version[1]}.#{version[2]}.#{version[3]}#{version[4]}"
 
   ################
   # PUBLIC METHODS
@@ -139,7 +143,8 @@ z.util.Environment = do ->
 
   electron: _check.is_electron()
 
-  version: (show_wrapper_version = true) ->
+  version: (show_wrapper_version = true, do_not_format = false) ->
     return 'dev' if z.util.Environment.frontend.is_localhost()
+    return app_version() if do_not_format
     return window.electron_version if window.electron_version and show_wrapper_version
-    return app_version()
+    return formatted_app_version()

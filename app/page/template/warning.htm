@@ -147,6 +147,14 @@
         </div>
       <!-- /ko -->
 
+      <!-- ko if: top_warning() === z.ViewModel.WarningType.LIFECYCLE_UPDATE -->
+        <div class="warning-bar warning-bar-connection warning-bar-click bg-theme" data-bind="click: function(){amplify.publish(z.event.WebApp.LIFECYCLE.REFRESH)}">
+          <div class="warning-bar-message">
+            <span data-bind="l10n_text: z.string.warning_lifecycle_update"></span>&nbsp;
+            <a class="warning-bar-link" data-bind="l10n_text: z.string.warning_lifecycle_update_link" rel="nofollow noopener noreferrer" target="_blank"></a>
+          </div>
+        </div>
+      <!-- /ko -->
     </div>
   <!-- /ko -->
 

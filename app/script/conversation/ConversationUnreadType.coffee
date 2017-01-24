@@ -21,7 +21,7 @@ z.conversation ?= {}
 
 # Enum of different types of unread indicators for a conversation.
 z.conversation.ConversationUnreadType =
-  UNREAD: 'unread'
-  PING: 'ping'
+  CALL: 'call'
   CONNECT: 'connect'
-  MISSED_CALL: 'missed-call'
+  PING: 'ping'
+  UNREAD: 'unread'

@@ -107,6 +107,7 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
     amplify.subscribe z.event.WebApp.CONVERSATION.PERSIST_STATE, @save_conversation_state_in_db
+    amplify.subscribe z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @on_verification_state_changed
     amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
@@ -449,7 +450,7 @@ class z.conversation.ConversationRepository
   mark_as_read: (conversation_et) =>
     return if conversation_et is undefined
     return if @block_event_handling
-    return if conversation_et.number_of_unread_events() is 0
+    return if conversation_et.unread_event_count() is 0
     return if conversation_et.get_last_message()?.type is z.event.Backend.CONVERSATION.MEMBER_UPDATE
 
     @_update_last_read_timestamp conversation_et
@@ -504,6 +505,14 @@ class z.conversation.ConversationRepository
   ###
   save_conversations: (conversation_ets) =>
     z.util.ko_array_push_all @conversations, conversation_ets
+
+  ###
+  Handle conversation verification state change.
+  @param conversation_et [z.entity.Conversation]
+  ###
+  on_verification_state_changed: (conversation_et) ->
+    if conversation_et.verification_state() is z.conversation.ConversationVerificationState.VERIFIED
+      amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
 
   ###
   Set the notification handling state.
@@ -1566,6 +1575,7 @@ class z.conversation.ConversationRepository
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE
     .then =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id
       return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
       @logger.info "Failed to send delete message for everyone with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
@@ -1573,7 +1583,6 @@ class z.conversation.ConversationRepository
 
   ###
   Delete message on your own clients.
-
   @param conversation_et [z.entity.Conversation]
   @param message_et [z.entity.Message]
   ###
@@ -1588,6 +1597,7 @@ class z.conversation.ConversationRepository
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL
     .then =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id
       return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
       @logger.info "Failed to send delete message with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
@@ -1957,6 +1967,7 @@ class z.conversation.ConversationRepository
       if event_json.from isnt @user_repository.self().id
         return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
     .then =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_json.data.message_id
       return @_delete_message_by_id conversation_et, event_json.data.message_id
     .catch (error) =>
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
@@ -1975,9 +1986,10 @@ class z.conversation.ConversationRepository
         throw new Error 'Sender is not self user'
       return @find_conversation_by_id event_json.data.conversation_id
     .then (conversation_et) =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_json.data.message_id
       return @_delete_message_by_id conversation_et, event_json.data.message_id
     .catch (error) =>
-      @logger.info "Failed to delete message for conversation '#{conversation_et.id}'", error
+      @logger.info "Failed to delete message for conversation '#{event_json.conversation}'", error
       throw error
 
   ###
