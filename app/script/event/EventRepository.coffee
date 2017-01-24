@@ -313,7 +313,7 @@ class z.event.EventRepository
 
   _update_baseline_clock: (backend_time) ->
     @clock_drift = new Date() - new Date backend_time
-    @logger.log "Clock drift set to '#{@clock_drift}' ms"
+    @logger.info "Clock drift set to '#{@clock_drift}' ms"
 
   _update_last_notification_id: (last_notification_id) ->
     return if not last_notification_id

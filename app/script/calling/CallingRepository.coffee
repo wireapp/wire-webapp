@@ -20,7 +20,7 @@ window.z ?= {}
 z.calling ?= {}
 
 CALLING_CONFIG =
-  CONFIG_UPDATE_INTERVAL: 30 * 60 * 1000 # 30 minutes
+  CONFIG_UPDATE_INTERVAL: 30 * 60 # 30 minutes in seconds
 
 # Call repository for all calling interactions.
 class z.calling.CallingRepository
@@ -112,9 +112,6 @@ class z.calling.CallingRepository
   # Initiate calling config update.
   initiate_config: =>
     @_update_calling_config()
-    window.setInterval =>
-      @_update_calling_config()
-    , CALLING_CONFIG.CONFIG_UPDATE_INTERVAL
 
   join_call: (conversation_id, video_send) =>
     @get_call_by_id conversation_id
@@ -212,8 +209,12 @@ class z.calling.CallingRepository
   _update_calling_config: ->
     @calling_service.get_config()
     .then (calling_config) =>
-      @logger.info 'Updated calling configuration', calling_config
+      timeout_in_seconds = calling_config.ttl or CALLING_CONFIG.CONFIG_UPDATE_INTERVAL
+      @logger.info "Updated calling configuration - next update in #{timeout_in_seconds}s", calling_config
       @calling_config $.extend use_v3_api: @use_v3_api, calling_config
+      window.setTimeout =>
+        @_update_calling_config()
+      , timeout_in_seconds * 1000
 
 
   ###############################################################################
