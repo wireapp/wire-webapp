@@ -76,6 +76,8 @@ class z.conversation.EventMapper
         message_et = @_map_event_voice_channel_activate()
       when z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
         message_et = @_map_event_voice_channel_deactivate event
+      when z.event.Client.CONVERSATION.ALL_VERIFIED
+        message_et = @_map_all_verified()
       when z.event.Client.CONVERSATION.ASSET_META
         message_et = @_map_event_asset_meta event
       when z.event.Client.CONVERSATION.DELETE_EVERYWHERE
@@ -115,6 +117,20 @@ class z.conversation.EventMapper
   ###############################################################################
   # Event mappers
   ###############################################################################
+
+  ###
+  Maps JSON data of conversation.all-verified message into message entity
+
+  @private
+
+  @param event [Object] Message data
+
+  @return [z.entity.NormalMessage] Normal message entity
+  ###
+  _map_all_verified: ->
+    message_et = new z.entity.Message()
+    message_et.super_type = z.message.SuperType.ALL_VERIFIED
+    return message_et
 
   ###
   Maps JSON data of conversation.asset_add message into message entity
