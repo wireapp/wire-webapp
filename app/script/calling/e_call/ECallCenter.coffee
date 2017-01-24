@@ -349,117 +349,6 @@ class z.calling.e_call.ECallCenter
   @param video_send [Boolean] Send video for this e-call
   ###
   join_call: (conversation_id, video_send = false) =>
-    @get_e_call_by_id conversation_id
-    .then (e_call_et) ->
-      return e_call_et.state()
-    .catch (error) ->
-      throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
-      return z.calling.enum.CallState.OUTGOING
-    .then (e_call_state) =>
-      if e_call_state is z.calling.enum.CallState.OUTGOING and not z.calling.CallingRepository.supports_calling()
-        return amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL
-
-      @_check_concurrent_joined_call conversation_id, e_call_state
-      .then =>
-        return @_join_call conversation_id, video_send
-
-  ###
-  User action to leave an e-call.
-  @param conversation_id [String] ID of conversation to leave e-call in
-  ###
-  leave_call: (conversation_id) =>
-    @get_e_call_by_id conversation_id
-    .then (e_call_et) =>
-      @media_stream_handler.release_media_streams()
-      @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
-      if e_call_et.state() is z.calling.enum.CallState.OUTGOING
-        e_call_message_type = z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
-        @_send_call_notification e_call_et, @user_repository.self().id
-      else
-        e_call_message_type = z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
-      e_call_et.state z.calling.enum.CallState.DISCONNECTING
-      @send_e_call_event e_call_et.conversation_et, new z.calling.entities.ECallMessage e_call_message_type, false, e_call_et.session_id
-      @delete_call conversation_id if e_call_et.participants().length < 2
-    .catch (error) ->
-      throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
-
-  ###
-  Leave a e-call we are joined immediately in case the browser window is closed.
-  @note Should only used by "window.onbeforeunload".
-  ###
-  leave_call_on_beforeunload: =>
-    conversation_id = @_self_client_on_a_call()
-    @leave_call conversation_id if conversation_id
-
-  ###
-  Remove a participant from an e-call if he was removed from the group.
-  @param conversation_id [String] ID of conversation for which the user should be removed from the e-call
-  @param user_id [String] ID of user to be removed
-  ###
-  remove_participant: (conversation_id, user_id) =>
-    @_on_e_call_hangup_event conversation_id, user_id
-
-  ###
-  User action to toggle the e-call state.
-  @param conversation_id [String] ID conversation to toggle the join state of the e-call in
-  @param video_send [Boolean] Video enabled for this e-call
-  ###
-  toggle_joined: (conversation_id, video_send) =>
-    if @_self_client_on_a_call() is conversation_id
-      return @leave_call conversation_id
-    return @join_call conversation_id, video_send
-
-  ###
-  User action to toggle one of the media stats of an e-call
-  @param conversation_id [String] ID of conversation with e-call
-  @param media_type [z.media.MediaType] MediaType of requested change
-  ###
-  toggle_media: (conversation_id, media_type) =>
-    @get_e_call_by_id conversation_id
-    .then (e_call_et) =>
-      toggle_promise = switch media_type
-        when z.media.MediaType.AUDIO
-          @media_stream_handler.toggle_audio_send()
-        when z.media.MediaType.SCREEN
-          @media_stream_handler.toggle_screen_send()
-        when z.media.MediaType.VIDEO
-          @media_stream_handler.toggle_video_send()
-
-      toggle_promise.then =>
-        e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, false, e_call_et.session_id, @create_prop_sync_payload media_type
-        @send_e_call_event e_call_et.conversation_et, e_call_message_et
-    .catch (error) ->
-      throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
-
-  ###
-  Check whether we are actively participating in a e-call.
-
-  @private
-  @param new_call_id [String] ID of conversation to join e-call in
-  @param e_call_state [z.calling.enum.CallState] State of new e-call
-  @return [Promise] Promise that resolves when the new e-call was joined
-  ###
-  _check_concurrent_joined_call: (new_call_id, e_call_state) =>
-    return new Promise (resolve) =>
-      ongoing_call_id = @_self_participant_on_a_call()
-      if ongoing_call_id
-        return amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_START_ANOTHER,
-          action: =>
-            @leave_call ongoing_call_id
-            window.setTimeout resolve, 1000
-          close: ->
-            amplify.publish z.event.WebApp.CALL.STATE.IGNORE, new_call_id if e_call_state is z.calling.enum.CallState.INCOMING
-          data: e_call_state
-      resolve()
-
-  ###
-  Join a e-call and get a MediaStream.
-
-  @private
-  @param conversation_id [String] ID of conversation to join e-call in
-  @param video_send [Boolean] Video enabled for this e-call
-  ###
-  _join_call: (conversation_id, video_send) ->
     e_call_et = undefined
 
     @get_e_call_by_id conversation_id
@@ -487,6 +376,56 @@ class z.calling.e_call.ECallCenter
       e_call_et.local_audio_stream @media_stream_handler.local_media_streams.audio()
       e_call_et.local_video_stream @media_stream_handler.local_media_streams.video()
       e_call_et.start_negotiation()
+
+  ###
+  User action to leave an e-call.
+  @param conversation_id [String] ID of conversation to leave e-call in
+  ###
+  leave_call: (conversation_id) =>
+    @get_e_call_by_id conversation_id
+    .then (e_call_et) =>
+      @media_stream_handler.release_media_streams()
+      @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
+      if e_call_et.state() is z.calling.enum.CallState.OUTGOING
+        e_call_message_type = z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+        @_send_call_notification e_call_et, @user_repository.self().id
+      else
+        e_call_message_type = z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
+      e_call_et.state z.calling.enum.CallState.DISCONNECTING
+      @send_e_call_event e_call_et.conversation_et, new z.calling.entities.ECallMessage e_call_message_type, false, e_call_et.session_id
+      @delete_call conversation_id if e_call_et.participants().length < 2
+    .catch (error) ->
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
+
+  ###
+  Remove a participant from an e-call if he was removed from the group.
+  @param conversation_id [String] ID of conversation for which the user should be removed from the e-call
+  @param user_id [String] ID of user to be removed
+  ###
+  remove_participant: (conversation_id, user_id) =>
+    @_on_e_call_hangup_event conversation_id, user_id
+
+  ###
+  User action to toggle one of the media stats of an e-call
+  @param conversation_id [String] ID of conversation with e-call
+  @param media_type [z.media.MediaType] MediaType of requested change
+  ###
+  toggle_media: (conversation_id, media_type) =>
+    @get_e_call_by_id conversation_id
+    .then (e_call_et) =>
+      toggle_promise = switch media_type
+        when z.media.MediaType.AUDIO
+          @media_stream_handler.toggle_audio_send()
+        when z.media.MediaType.SCREEN
+          @media_stream_handler.toggle_screen_send()
+        when z.media.MediaType.VIDEO
+          @media_stream_handler.toggle_video_send()
+
+      toggle_promise.then =>
+        e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, false, e_call_et.session_id, @create_prop_sync_payload media_type
+        @send_e_call_event e_call_et.conversation_et, e_call_message_et
+    .catch (error) ->
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
 
 
   ###############################################################################
@@ -628,19 +567,3 @@ class z.calling.e_call.ECallCenter
     if properties
       return z.media.MediaType.VIDEO if properties.videosend is 'true'
     return z.media.MediaType.AUDIO
-
-  ###
-  Check if self client is participating in an e-call.
-  @private
-  @return [String, Boolean] ID of conversation with joined e-call or false
-  ###
-  _self_client_on_a_call: ->
-    return e_call_et.id for e_call_et in @e_calls() when e_call_et.self_client_joined()
-
-  ###
-  Check if self participant is participating in an e-call.
-  @private
-  @return [String, Boolean] ID of conversation with joined e-call or false
-  ###
-  _self_participant_on_a_call: ->
-    return e_call_et.id for e_call_et in @e_calls() when e_call_et.self_user_joined()

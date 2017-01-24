@@ -81,23 +81,26 @@ class z.calling.CallingRepository
     amplify.subscribe z.event.WebApp.CALL.MEDIA.TOGGLE, => @switch_call_center z.calling.enum.E_CALL_ACTION.TOGGLE_MEDIA, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.DELETE, => @switch_call_center z.calling.enum.E_CALL_ACTION.DELETE, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.IGNORE, => @switch_call_center z.calling.enum.E_CALL_ACTION.IGNORE, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.JOIN, => @switch_call_center z.calling.enum.E_CALL_ACTION.JOIN, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.JOIN, @join_call
     amplify.subscribe z.event.WebApp.CALL.STATE.LEAVE, => @switch_call_center z.calling.enum.E_CALL_ACTION.LEAVE, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, => @switch_call_center z.calling.enum.E_CALL_ACTION.REMOVE_PARTICIPANT, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE, => @switch_call_center z.calling.enum.E_CALL_ACTION.TOGGLE_STATE, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE, @toggle_state
     amplify.subscribe z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, @store_flow_status
     amplify.subscribe z.event.WebApp.LOADED, @initiate_config
     amplify.subscribe z.util.Logger::LOG_ON_DEBUG, @set_logging
 
-  get_protocol_of_call: (conversation_id) =>
+  get_call_by_id: (conversation_id) =>
     @call_center.get_call_by_id conversation_id
-    .then ->
-      return z.calling.enum.PROTOCOL_VERSION.BELFRY
     .catch (error) =>
       throw error unless error.type is z.calling.belfry.CallError::TYPE.CALL_NOT_FOUND
+      return @e_call_center.get_e_call_by_id conversation_id
 
-      @e_call_center.get_e_call_by_id conversation_id
-      .then ->
+  get_protocol_of_call: (conversation_id) =>
+    @get_call_by_id conversation_id
+    .then (call) ->
+      if call instanceof z.calling.entities.Call
+        return z.calling.enum.PROTOCOL_VERSION.BELFRY
+      if call instanceof z.calling.entities.ECall
         return z.calling.enum.PROTOCOL_VERSION.E_CALL
 
   handled_by_v3: (conversation_id) =>
@@ -113,6 +116,20 @@ class z.calling.CallingRepository
       @_update_calling_config()
     , CALLING_CONFIG.CONFIG_UPDATE_INTERVAL
 
+  join_call: (conversation_id, video_send) =>
+    @get_call_by_id conversation_id
+    .then (call_et) ->
+      return call_et.state()
+    .catch (error) ->
+      throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
+      return z.calling.enum.CallState.OUTGOING
+    .then (call_state) =>
+      if call_state is z.calling.enum.CallState.OUTGOING and not z.calling.CallingRepository.supports_calling()
+        return amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL
+      @_check_concurrent_joined_call conversation_id, call_state
+      .then =>
+        @switch_call_center z.calling.enum.E_CALL_ACTION.JOIN, [conversation_id, video_send]
+
   # Forward user action to with a call to the appropriate call center.
   switch_call_center: (fn_name, args) =>
     conversation_id = args[0]
@@ -121,7 +138,7 @@ class z.calling.CallingRepository
     .catch (error) =>
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
 
-      if fn_name is z.calling.enum.E_CALL_ACTION.TOGGLE_STATE
+      if fn_name is z.calling.enum.E_CALL_ACTION.JOIN
         return @handled_by_v3 conversation_id
     .then (protocol_version) =>
       switch protocol_version
@@ -130,9 +147,63 @@ class z.calling.CallingRepository
         when z.calling.enum.PROTOCOL_VERSION.E_CALL
           @e_call_center[fn_name].apply @, args
 
+  ###
+  User action to toggle the call state.
+  @param conversation_id [String] Conversation ID of call for which state will be toggled
+  @param video_send [Boolean] Is this a video call
+  ###
+  toggle_state: (conversation_id, video_send) =>
+    if @_self_client_on_a_call() is conversation_id
+      @switch_call_center z.calling.enum.E_CALL_ACTION.LEAVE, [conversation_id]
+    else
+      @join_call conversation_id, video_send
+
+  ###
+  Leave a call we are joined immediately in case the browser window is closed.
+  @note Should only used by "window.onbeforeunload".
+  ###
   leave_call_on_beforeunload: =>
-    @call_center.state_handler.leave_call_on_beforeunload()
-    @e_call_center.leave_call_on_beforeunload()
+    conversation_id = @_self_client_on_a_call()
+    @switch_call_center z.calling.enum.E_CALL_ACTION.LEAVE, [conversation_id] if conversation_id
+
+  ###
+  Check whether we are actively participating in a call.
+
+  @private
+  @param new_call_id [String] Conversation ID of call about to be joined
+  @param call_state [z.calling.enum.CallState] Call state of new call
+  @return [Promise] Promise that resolves when the new call was joined
+  ###
+  _check_concurrent_joined_call: (new_call_id, call_state) =>
+    return new Promise (resolve) =>
+      ongoing_call_id = @_self_participant_on_a_call()
+      if ongoing_call_id
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_START_ANOTHER,
+          action: ->
+            amplify.publish z.event.WebApp.CALL.STATE.LEAVE, ongoing_call_id
+            window.setTimeout resolve, 1000
+          close: ->
+            amplify.publish z.event.WebApp.CALL.STATE.IGNORE, new_call_id if call_state is z.calling.enum.CallState.INCOMING
+          data: call_state
+        @logger.warn 'You cannot participate in a second call while on another one.'
+      else
+        resolve()
+
+  ###
+  Check if self client is participating in a call.
+  @private
+  @return [String, Boolean] Conversation ID of call or false
+  ###
+  _self_client_on_a_call: ->
+    return call_et.id for call_et in @calls() when call_et.self_client_joined()
+
+  ###
+  Check if self participant is participating in a call.
+  @private
+  @return [String, Boolean] Conversation ID of call or false
+  ###
+  _self_participant_on_a_call: ->
+    return call_et.id for call_et in @calls() when call_et.self_user_joined()
 
   ###
   Get the calling config from the backend and store it.

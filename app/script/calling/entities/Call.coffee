@@ -474,7 +474,7 @@ class z.calling.entities.Call
   reset_call: =>
     @self_client_joined false
     @event_sequence = 0
-    @finished_reason = z.calling.enum.CallFinishedReason.UNKNOWN
+    @finished_reason = z.calling.enum.CALL_FINISHED_REASON.UNKNOWN
     @is_connected false
     @session_id = undefined
     @self_user_joined false

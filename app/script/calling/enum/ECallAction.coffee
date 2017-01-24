@@ -27,4 +27,3 @@ z.calling.enum.E_CALL_ACTION =
   LEAVE: 'leave_call'
   REMOVE_PARTICIPANT: 'remove_participant'
   TOGGLE_MEDIA: 'toggle_media'
-  TOGGLE_STATE: 'toggle_joined'
