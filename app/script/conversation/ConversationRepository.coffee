@@ -2603,15 +2603,6 @@ class z.conversation.ConversationRepository
   @param client_et [z.client.Client] Client entity
   ###
   on_self_client_add: (user_id, client_et) =>
-    return
-    self = @user_repository.self()
-    return true if user_id isnt self.id
-    message_et = new z.entity.E2EEDeviceMessage()
-    message_et.user self
-    message_et.device client_et
-    message_et.device_owner self
-
-    # TODO save message
     for conversation_et in @filtered_conversations()
       if conversation_et.type() in [z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.REGULAR]
-        conversation_et.add_message message_et
+        amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_new_device conversation_et

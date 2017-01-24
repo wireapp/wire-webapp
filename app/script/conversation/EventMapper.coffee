@@ -84,6 +84,8 @@ class z.conversation.EventMapper
         message_et = @_map_system_event_delete_everywhere event
       when z.event.Client.CONVERSATION.LOCATION
         message_et = @_map_event_location event
+      when z.event.Client.CONVERSATION.NEW_DEVICE
+        message_et = @_map_new_device()
       when z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
         message_et = @_map_system_event_unable_to_decrypt event
       else
@@ -117,6 +119,19 @@ class z.conversation.EventMapper
   ###############################################################################
   # Event mappers
   ###############################################################################
+
+  ###
+  Maps JSON data of conversation.new-device message into message entity
+
+  @private
+
+  @param event [Object] Message data
+
+  @return [z.entity.NewDeviceMessage] Normal message entity
+  ###
+  _map_new_device: ->
+    message_et = new z.entity.NewDeviceMessage()
+    return message_et
 
   ###
   Maps JSON data of conversation.all-verified message into message entity

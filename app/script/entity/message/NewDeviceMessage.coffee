@@ -19,41 +19,23 @@
 window.z ?= {}
 z.entity ?= {}
 
-# E2EE new device message entity based on z.entity.Message.
 class z.entity.NewDeviceMessage extends z.entity.Message
-  # Construct a new content message.
+
   constructor: ->
     super()
-    @type = z.message.SuperType.NEW_DEVICE
-    @device = ko.observable()
-    @device_owner = ko.observable new z.entity.User()
+    @super_type = z.message.SuperType.NEW_DEVICE
 
-    @unverified = ko.observable false
-
-    # TODO
-    # You started using this device -> settings
-    # You started using a new device -> settings
-    # John started using a new device -> profile
-    # You unverified one of John's devices -> profile
-    # You unverified one of your devices -> settings
+    @should_ef
 
     @caption = ko.pureComputed =>
-      return z.localization.Localizer.get_text z.string.conversation_device_unverified if @unverified()
-      return z.localization.Localizer.get_text z.string.conversation_device_started_using_you if @device_owner().is_me
+      return z.localization.Localizer.get_text z.string.conversation_device_started_using_you if @user().is_me
       return z.localization.Localizer.get_text z.string.conversation_device_started_using
 
     @caption_device = ko.pureComputed =>
-      if @unverified()
-        return z.localization.Localizer.get_text z.string.conversation_device_your_devices if @device_owner().is_me
-        return  z.localization.Localizer.get_text
-          id: z.string.conversation_device_user_devices
-          replace:
-            placeholder: '%@name'
-            content: @device_owner().first_name()
       return z.localization.Localizer.get_text z.string.conversation_device_a_new_device
 
   click_on_device: =>
-    if @device_owner()?.is_me
-      amplify.publish z.event.WebApp.PREFERENCES.MANAGE_DEVICES, @device()
+    if @user()?.is_me
+      amplify.publish z.event.WebApp.PREFERENCES.MANAGE_DEVICES
     else
       amplify.subscribe z.event.WebApp.SHORTCUT.PEOPLE

@@ -368,6 +368,8 @@ class z.ViewModel.MessageListViewModel
           return 'message-system message-rename'
       when z.message.SuperType.ALL_VERIFIED
         return 'message-system all-verified'
+      when z.message.SuperType.NEW_DEVICE
+        return 'message-system new-device'
       when z.message.SuperType.UNABLE_TO_DECRYPT
         return 'message-system'
 

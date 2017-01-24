@@ -28,6 +28,14 @@ z.conversation.EventBuilder = do ->
     from: conversation_et.self.id
     time: new Date().toISOString()
 
+  build_new_device = (conversation_et, user_et) ->
+    conversation: conversation_et.id
+    id: z.util.create_random_uuid()
+    type: z.event.Client.CONVERSATION.NEW_DEVICE
+    from: user_et?.id or conversation_et.self.id
+    time: new Date().toISOString()
+
   return {
     build_all_verified: build_all_verified
+    build_new_device: build_new_device
   }

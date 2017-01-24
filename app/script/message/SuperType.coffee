@@ -30,6 +30,7 @@ z.message.SuperType =
   DEVICE: 'device'
   LOCATION: 'location'
   MEMBER: 'member'
+  NEW_DEVICE: 'new-device'
   PING: 'ping'
   REACTION: 'reaction'
   SPECIAL: 'special'

@@ -12,6 +12,22 @@
   </div>
 </script>
 
+<script type="text/html" id="new-device">
+  <div class="message-header">
+    <div class="message-header-icon">
+      <svg width="16" height="16">
+        <use xlink:href="#icon-not-verified"></use>
+      </svg>
+    </div>
+    <div class="message-header-label">
+      <span class="label-bold" data-bind='text: message.sender_name()'></span>
+      <span class="ellipsis" data-bind="text: message.caption"></span>
+      <span class="ellipsis text-theme" data-bind="click: click_on_device, text: message.caption_device"></span>
+      <hr class="message-header-line" />
+    </div>
+  </div>
+</script>
+
 <script type="text/html" id="call">
   <div class="message-header">
     <div class="message-header-icon">
