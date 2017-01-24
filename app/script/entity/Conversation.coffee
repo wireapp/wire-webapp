@@ -82,7 +82,7 @@ class z.entity.Conversation
     @is_cleared = ko.pureComputed =>
       return @last_event_timestamp() <= @cleared_timestamp()
 
-    @is_verified = ko.pureComputed =>
+    @is_verified = ko.computed =>
       all_users = [@self].concat @participating_user_ets()
       is_verified = all_users.every (user_et) -> user_et?.is_verified()
       if is_verified
