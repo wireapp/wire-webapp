@@ -9,16 +9,16 @@
         <li class="left-list-item">
           <div class="left-column">
             <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.CALL -->
-              <span class="icon-end-call text-red" data-uie-name="status-unread" data-ui-value="call"></span>
+              <span class="icon-end-call text-red" data-uie-name="status-unread" data-uie-value="call"></span>
             <!-- /ko -->
             <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.CONNECT -->
-              <span class="dot-md dot-outlined border-theme" data-uie-name="status-unread" data-ui-value="connect"></span>
+              <span class="dot-md dot-outlined border-theme" data-uie-name="status-unread" data-uie-value="connect"></span>
             <!-- /ko -->
             <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.PING -->
-              <span class="icon-ping" data-bind="css: unread_accent_color()" data-uie-name="status-unread" data-ui-value="ping"></span>
+              <span class="icon-ping" data-bind="css: unread_accent_color()" data-uie-name="status-unread" data-uie-value="ping"></span>
             <!-- /ko -->
             <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.UNREAD -->
-              <span data-bind="unread_indicator: unread_message_count" data-uie-name="status-unread" data-ui-value="message"></span>
+              <span data-bind="unread_indicator: unread_message_count" data-uie-name="status-unread" data-uie-value="message"></span>
             <!-- /ko -->
           </div>
           <div class="center-column"
