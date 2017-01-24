@@ -389,6 +389,8 @@ class z.event.EventRepository
             error_code = z.cryptography.CryptographyErrorType.REMOTE_IDENTITY_CHANGED
             message = "Fingerprints do not match. We expect a different fingerprint from user ID '#{remote_user_id}' with client ID '#{remote_client_id}' (Remote identity changed)."
             @logger.error message, decrypt_error
+          else
+            error_code = z.cryptography.CryptographyErrorType.INVALID_SIGNATURE
 
           return @_map_error_message event, decrypt_error, error_code
       else

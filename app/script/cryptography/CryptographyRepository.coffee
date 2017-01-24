@@ -266,7 +266,7 @@ class z.cryptography.CryptographyRepository
           @logger.log "Session '#{session_id}' needs to get initialized..."
           return values
         else
-          @logger.error "Failed encrypting '#{generic_message.content}' message for session '#{session_id}': #{error.message}", error
+          @logger.warn "Failed encrypting '#{generic_message.content}' message for session '#{session_id}': #{error.message}", error
           values.encrypted = '💣'
           return values
 
