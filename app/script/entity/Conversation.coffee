@@ -82,7 +82,7 @@ class z.entity.Conversation
     @is_cleared = ko.pureComputed =>
       return @last_event_timestamp() <= @cleared_timestamp()
 
-    @is_verified = ko.computed =>
+    @is_verified = ko.pureComputed =>
       all_users = [@self].concat @participating_user_ets()
       is_verified = all_users.every (user_et) -> user_et?.is_verified()
       if is_verified
@@ -404,7 +404,7 @@ class z.entity.Conversation
   @param message_et [z.entity.Message]
   ###
   _update_last_read_from_message: (message_et) ->
-    if message_et.user()?.is_me and message_et.timestamp
+    if message_et.user()?.is_me and message_et.timestamp and message_et.should_effect_conversation_timestamp
       @set_timestamp message_et.timestamp, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
 
   ###############################################################################

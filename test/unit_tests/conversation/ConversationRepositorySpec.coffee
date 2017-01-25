@@ -825,8 +825,10 @@ describe 'z.conversation.ConversationRepository', ->
       user_b.devices.push client_b
 
       conversation_ab.self = user_self
+      conversation_ab.participating_user_ids.push user_a.id, user_b.id
       conversation_ab.participating_user_ets.push user_a, user_b
       conversation_b.self = user_self
+      conversation_b.participating_user_ids.push user_b.id
       conversation_b.participating_user_ets.push user_b
       conversation_c.self = user_self
 
@@ -840,6 +842,8 @@ describe 'z.conversation.ConversationRepository', ->
       expect(conversation_b.is_verified()).toBeTruthy()
 
     it 'should add a new device message in all needed conversation', ->
+      spyOn z.conversation.EventBuilder, 'build_new_device'
+
       new_client_b = new z.client.Client()
       new_client_b.meta.is_verified false
       user_b.devices.push new_client_b
@@ -847,5 +851,9 @@ describe 'z.conversation.ConversationRepository', ->
       expect(conversation_ab.is_verified()).toBeFalsy()
       expect(conversation_b.is_verified()).toBeFalsy()
 
+      expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
+      expect(conversation_b.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
+
       conversation_repository.on_client_add user_b.id
       expect(conversation_ab.is_verified()).toBeFalsy()
+      expect(z.conversation.EventBuilder.build_new_device.calls.count()).toEqual 2

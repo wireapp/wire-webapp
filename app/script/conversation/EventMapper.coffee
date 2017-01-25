@@ -146,7 +146,7 @@ class z.conversation.EventMapper
   _map_all_verified: ->
     message_et = new z.entity.Message()
     message_et.super_type = z.message.SuperType.ALL_VERIFIED
-    message_et.should_update_timestamp = false
+    message_et.should_effect_conversation_timestamp = false
     return message_et
 
   ###
