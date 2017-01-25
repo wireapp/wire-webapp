@@ -1310,11 +1310,6 @@ class z.conversation.ConversationRepository
         .then (payload) =>
           payload.native_push = native_push
           @_send_encrypted_message conversation_id, generic_message, payload, user_ids
-          .catch (error) =>
-            if error?.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
-              @logger.log 'User aborted message sending.'
-            else
-              throw error
     .catch (error) =>
       if error?.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
         return @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
