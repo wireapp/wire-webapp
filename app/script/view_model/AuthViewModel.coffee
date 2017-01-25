@@ -132,7 +132,7 @@ class z.ViewModel.AuthViewModel
     @accepted_terms_of_use.subscribe => @clear_error z.auth.AuthView.TYPE.TERMS
 
     @can_login_password = ko.pureComputed =>
-      return not @disabled_by_animation() and @username().length and @password().length
+      return not @disabled_by_animation()
 
     @can_login_phone = ko.pureComputed =>
       return not @disabled_by_animation() and @country_code().length > 1 and @phone_number().length
@@ -219,8 +219,6 @@ class z.ViewModel.AuthViewModel
       .on 'dragover drop', -> false
       .on 'hashchange', @_on_hash_change
       .on 'keydown', @keydown_auth
-
-    $("[id^='wire-login'], [id^='wire-register'], [id^='wire-verify']").prevent_prefill()
 
     # Select country based on location of user IP
     @country_code (z.util.CountryCodes.get_country_code($('[name=geoip]').attr 'country') or 1).toString()
@@ -1357,12 +1355,3 @@ $.fn.extend
       window.setTimeout =>
         $(@).focus()
       , 0
-
-  # FIX to prevent unwanted auto form fill on Chrome
-  prevent_prefill: ->
-    if z.util.Environment.browser.chrome or z.util.Environment.browser.opera
-      @each ->
-        $(@)
-          .attr 'readonly', true
-          .on 'focus', ->
-            $(@).removeAttr 'readonly'

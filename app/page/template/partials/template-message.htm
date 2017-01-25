@@ -23,8 +23,8 @@
       <!-- /ko -->
     </div>
     <div class="message-header-label">
-      <span class="label-bold" data-bind='text: message.sender_name()'></span>
-      <span class="ellipsis" data-bind="text: message.caption()"></span>
+      <span class="label-nocase-bold-xs" data-bind='text: message.sender_name()'></span>
+      <span class="label-nocase-xs ellipsis" data-bind="text: message.caption()"></span>
     </div>
     <div class="message-body-actions">
       <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
@@ -149,7 +149,7 @@
         </span>
       </div>
       <div class="message-footer-label cursor-pointer" data-bind="click: function() {$data.show_likes(true)}">
-        <span class="font-size-xs text-graphite" data-uie-name="message-liked-names" data-bind="text: like_caption, attr: {'data-uie-value': reactions_user_ids()}" ></span>
+        <span class="label-nocase-xs text-graphite" data-uie-name="message-liked-names" data-bind="text: like_caption, attr: {'data-uie-value': reactions_user_ids()}" ></span>
         <!-- ko if: !message.show_likes() && message.other_likes().length > 5 -->
           <span class="icon-more font-size-xs"></span>
         <!-- /ko -->
@@ -212,8 +212,8 @@
         <span class="icon-plus" data-bind="visible: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN"></span>
       </div>
       <div class="message-header-label">
-        <span class="label-bold" data-bind='text: message.sender_name()'></span>
-        <span class="ellipsis" data-bind="text: message.caption()"></span>
+        <span class="label-nocase-bold-xs" data-bind='text: message.sender_name()'></span>
+        <span class="label-nocase-xs ellipsis" data-bind="text: message.caption()"></span>
         <hr class="message-header-line" />
       </div>
       <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN || message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE -->
@@ -248,8 +248,8 @@
       <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
     </div>
     <div class="message-header-label">
-      <span class="label-bold" data-bind='text: message.sender_name()'></span>
-      <span class="ellipsis" data-bind="text: message.caption"></span>
+      <span class="label-nocase-bold-xs" data-bind='text: message.sender_name()'></span>
+      <span class="label-nocase-xs ellipsis" data-bind="text: message.caption"></span>
     </div>
     <div class="message-body-actions">
       <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
@@ -272,8 +272,8 @@
       <span class="icon-edit"></span>
     </div>
     <div class="message-header-label">
-      <span class="label-bold" data-bind='text: message.sender_name()'></span>
-      <span class="ellipsis" data-bind="text: message.caption()"></span>
+      <span class="label-nocase-bold-xs" data-bind='text: message.sender_name()'></span>
+      <span class="label-nocase-xs ellipsis" data-bind="text: message.caption()"></span>
       <hr class="message-header-line" />
     </div>
     <div class="message-body-actions">
@@ -289,9 +289,9 @@
       <span class="icon-sysmsg-error text-red"></span>
     </div>
     <div class="message-header-label ellipsis">
-      <span data-bind="html: caption"></span>
+      <span class="label-nocase-xs" data-bind="html: caption"></span>
       <span>&nbsp;</span>
-      <a class="text-theme" data-bind="l10n_text: z.string.conversation_unable_to_decrypt_link, attr: {'href': link}" rel="nofollow noopener noreferrer" target="_blank"></a>
+      <a class="label-nocase-xs text-theme" data-bind="l10n_text: z.string.conversation_unable_to_decrypt_link, attr: {'href': link}" rel="nofollow noopener noreferrer" target="_blank"></a>
       <hr class="message-header-line" />
     </div>
   </div>
