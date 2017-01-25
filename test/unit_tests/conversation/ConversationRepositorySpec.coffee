@@ -837,12 +837,11 @@ describe 'z.conversation.ConversationRepository', ->
       conversation_repository.save_conversation conversation_b
       conversation_repository.save_conversation conversation_c
 
-    it 'test setup', ->
-      expect(conversation_ab.is_verified()).toBeTruthy()
-      expect(conversation_b.is_verified()).toBeTruthy()
-
     it 'should add a new device message in all needed conversation', ->
       spyOn z.conversation.EventBuilder, 'build_new_device'
+
+      expect(conversation_ab.is_verified()).toBeTruthy()
+      expect(conversation_b.is_verified()).toBeTruthy()
 
       new_client_b = new z.client.Client()
       new_client_b.meta.is_verified false
