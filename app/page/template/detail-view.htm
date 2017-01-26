@@ -10,6 +10,10 @@
       </header>
       <div class="detail-view-main" data-bind="click: click_on_close">
         <img class="detail-view-image" data-bind="attr: {src: image_src()}" data-uie-name="status-picture"/>
+        <!-- ko if: show_carousel_controls() -->
+          <div class="detail-view-arrow detail-view-backward icon-back" data-bind="click: click_on_show_previous"></div>
+          <div class="detail-view-arrow detail-view-forward icon-forward" data-bind="click: click_on_show_next"></div>
+        <!-- /ko -->
       </div>
       <footer class="detail-view-footer">
         <!-- ko if: message_et().is_downloadable() && !message_et().is_ephemeral() -->

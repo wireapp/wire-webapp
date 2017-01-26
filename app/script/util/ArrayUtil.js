@@ -51,6 +51,8 @@ z.util.ArrayUtil = {
       return null;
     }
 
+    const next_index = index + 1;
+
     // item is last item in the array
     if ((next_index === array.length) && (current_index > 0)) {
       return array[current_index - 1];
@@ -94,16 +96,18 @@ z.util.ArrayUtil = {
   is_last_item(array, item) {
     return array.indexOf(item) === (array.length - 1);
   },
-  iterate_index(array, current_index) {
-    if (!_.isArray(array) || !_.isNumber(current_index)) {
-      return undefined;
-    }
+  iterate_index(array, current_index, reverse = false) {
+    if (_.isArray(array) && array.length && _.isNumber(current_index)) {
+      if (reverse) {
+        if (current_index === 0) {
+          return array.length - 1;
+        }
 
-    if (!array.length) {
-      return undefined;
-    }
+        return (current_index - 1) % array.length;
+      }
 
-    return (current_index + 1) % array.length;
+      return (current_index + 1) % array.length;
+    }
   },
   /**
    * Returns random element

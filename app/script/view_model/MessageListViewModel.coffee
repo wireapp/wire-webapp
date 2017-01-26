@@ -424,7 +424,10 @@ class z.ViewModel.MessageListViewModel
   ###
   show_detail: (message_et, event) ->
     return if message_et.is_expired() or $(event.currentTarget).hasClass 'image-loading'
-    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et
+    @conversation_repository.get_events_for_category @conversation(), z.message.MessageCategory.IMAGE
+    .then (items) ->
+      message_ets = (item for item in items when item.category & z.message.MessageCategory.IMAGE and not (item.category & z.message.MessageCategory.GIF))
+      amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_ets, message_et
 
   get_timestamp_class: (message_et) ->
     last_message = @conversation().get_previous_message message_et
