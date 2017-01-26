@@ -370,7 +370,7 @@ class z.event.EventRepository
           hashed_error_message = z.util.murmurhash3 decrypt_error.message, 42
           error_code = hashed_error_message.toString().substr 0, 4
 
-          @logger.error "Decryption error '#{error_code}': #{decrypt_error.message}", decrypt_error
+          @logger.warn "Decryption error '#{error_code}': #{decrypt_error.message}", decrypt_error
 
           # Handle error
           if decrypt_error instanceof Proteus.errors.DecryptError.DuplicateMessage or decrypt_error instanceof Proteus.errors.DecryptError.OutdatedMessage
