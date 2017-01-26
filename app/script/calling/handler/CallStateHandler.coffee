@@ -343,8 +343,15 @@ class z.calling.handler.CallStateHandler
   ###
   join_call: (conversation_id, is_videod) =>
     @call_center.get_call_by_id conversation_id
-    .catch (error) ->
+    .catch (error) =>
       throw error unless error.type is z.calling.belfry.CallError::TYPE.CALL_NOT_FOUND
+
+      @call_center.conversation_repository.get_conversation_by_id conversation_id, (conversation_et) ->
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
+          action: if is_videod then 'video_call' else 'audio_call'
+          conversation_type: z.tracking.helpers.get_conversation_type conversation_et
+          is_ephemeral: false
+          with_bot: conversation_et.is_with_bot()
     .then =>
       @call_center.timings = new z.telemetry.calling.CallSetupTimings conversation_id
       if @call_center.media_stream_handler.has_media_streams()
@@ -354,15 +361,6 @@ class z.calling.handler.CallStateHandler
     .then =>
       @call_center.timings.time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED
       return @_put_state_to_join conversation_id, @_create_state_payload(z.calling.enum.ParticipantState.JOINED), true
-    .then =>
-      if call_state is z.calling.enum.CallState.OUTGOING
-        @call_center.conversation_repository.get_conversation_by_id conversation_id, (conversation_et) ->
-          media_action = if is_videod then 'video_call' else 'audio_call'
-          amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
-            action: media_action
-            conversation_type: z.tracking.helpers.get_conversation_type conversation_et
-            is_ephemeral: false
-            with_bot: conversation_et.is_with_bot()
     .catch (error) =>
       @logger.error "Joining call in '#{conversation_id}' failed: #{error.name}", error
 
