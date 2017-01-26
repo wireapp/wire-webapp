@@ -454,10 +454,10 @@ class z.ViewModel.AuthViewModel
         phone = z.util.phone_number_to_e164 username, @country() or navigator.language
         if z.util.is_valid_email username
           payload.email = username
+        else if z.util.is_valid_username username
+          payload.handle = username.replace '@', ''
         else if z.util.is_valid_phone_number phone
           payload.phone = phone
-        else
-          payload.handle = username.replace '@', ''
 
         return payload
       when z.auth.AuthView.MODE.ACCOUNT_PHONE
@@ -1186,7 +1186,7 @@ class z.ViewModel.AuthViewModel
   @private
   ###
   _validate_phone: ->
-    if not z.util.is_valid_phone_number @phone_number_e164()
+    unless z.util.is_valid_phone_number @phone_number_e164()
       @_add_error z.string.auth_error_phone_number_invalid, z.auth.AuthView.TYPE.PHONE
 
   ###
@@ -1199,7 +1199,8 @@ class z.ViewModel.AuthViewModel
     unless username.length
       return @_add_error z.string.auth_error_email_missing, z.auth.AuthView.TYPE.EMAIL
 
-    if username.length < 2
+    phone = z.util.phone_number_to_e164 username, @country() or navigator.language
+    if not z.util.is_valid_email(username) and not z.util.is_valid_username(username) and not z.util.is_valid_phone_number phone
       return @_add_error z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL
 
 

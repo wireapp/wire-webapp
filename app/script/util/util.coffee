@@ -471,6 +471,10 @@ z.util.is_valid_phone_number = (phone_number) ->
     regular_expression = /^\+[0-9]\d{1,14}$/
   return regular_expression.test phone_number
 
+z.util.is_valid_username = (username) ->
+  username = username.substring 1 if username.startsWith '@'
+  return /^[a-z_0-9]{2,21}$/.test username
+
 
 ###
 JS Implementation of MurmurHash3 (r136) (as of May 20, 2011)
