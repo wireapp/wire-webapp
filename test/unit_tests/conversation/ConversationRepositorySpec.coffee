@@ -847,9 +847,6 @@ describe 'z.conversation.ConversationRepository', ->
       new_client_b.meta.is_verified false
       user_b.devices.push new_client_b
 
-      expect(conversation_ab.is_verified()).toBeFalsy()
-      expect(conversation_b.is_verified()).toBeFalsy()
-
       expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
       expect(conversation_b.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
 
