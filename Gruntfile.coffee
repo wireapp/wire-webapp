@@ -120,10 +120,8 @@ module.exports = (grunt) ->
     component_files = prepare_file_names scripts.component
     vendor_files = prepare_file_names scripts.vendor
     test_files = if test_name then ["../test/js/#{test_name}Spec.js"] else [
-#      '../test/js/ui/**/*.js',
-#      '../test/js/user/**/*.js',
-      '../test/js/util/UtilSpec.js',
-      '../test/js/view_model/**/*.js'
+      '../test/js/util/UtilSpec.js'
+      '../test/js/view_model/WindowTitleViewModelSpec.js'
     ]
 
     files = [].concat helper_files, vendor_files, component_files, app_files, test_files
