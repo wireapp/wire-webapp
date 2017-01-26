@@ -40,7 +40,7 @@ class z.entity.NewDeviceMessage extends z.entity.Message
       return z.localization.Localizer.get_text z.string.conversation_device_a_new_device
 
   click_on_device: =>
-    if @user()?.is_me
-      amplify.publish z.event.WebApp.PREFERENCES.MANAGE_DEVICES
+    if @user_ids().length
+      amplify.publish z.event.WebApp.SHORTCUT.PEOPLE
     else
-      amplify.subscribe z.event.WebApp.SHORTCUT.PEOPLE
+      amplify.publish z.event.WebApp.PREFERENCES.MANAGE_DEVICES
