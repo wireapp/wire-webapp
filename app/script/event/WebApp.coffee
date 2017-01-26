@@ -160,6 +160,8 @@ z.event.WebApp =
   USER:
     EVENT_FROM_BACKEND: 'wire.webapp.user.event-from-backend'
     UNBLOCKED: 'wire.webapp.user.unblocked'
+    CLIENT_ADDED: 'wire.webapp.user.client-added'
+    CLIENT_REMOVED: 'wire.webapp.user.client-removed'
   WARNING:
     SHOW: 'wire.webapp.warning.show'
     DISMISS: 'wire.webapp.warning.dismiss'

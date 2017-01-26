@@ -108,9 +108,10 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
     amplify.subscribe z.event.WebApp.CONVERSATION.PERSIST_STATE, @save_conversation_state_in_db
     amplify.subscribe z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @on_verification_state_changed
-    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_client_add
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
+    amplify.subscribe z.event.WebApp.USER.CLIENT_ADDED, @on_client_add
+    amplify.subscribe z.event.WebApp.USER.CLIENT_REMOVED, @on_client_removed
 
   ###############################################################################
   # Conversation service interactions
@@ -2622,6 +2623,9 @@ class z.conversation.ConversationRepository
       return
 
     for conversation_et in valid_conversation_ets
-      user_ids_in_conversation = _.intersection user_ids, conversation_et.participating_user_ids()
+      user_ids_in_conversation = _.intersection user_ids, conversation_et.participating_user_ids().concat conversation_et.self.id
       if user_ids_in_conversation.length
         amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_new_device conversation_et, user_ids_in_conversation
+
+  on_client_removed: =>
+    LOG 'client removed'
