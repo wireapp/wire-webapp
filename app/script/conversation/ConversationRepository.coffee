@@ -102,6 +102,8 @@ class z.conversation.ConversationRepository
       @conversations_unarchived unarchived
 
   _init_subscriptions: ->
+    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_client_add, 11
+    amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @on_client_removed, 11
     amplify.subscribe z.event.WebApp.CONVERSATION.ASSET.CANCEL, @cancel_asset_upload
     amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
@@ -110,8 +112,6 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @on_verification_state_changed
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
-    amplify.subscribe z.event.WebApp.USER.CLIENT_ADDED, @on_client_add
-    amplify.subscribe z.event.WebApp.USER.CLIENT_REMOVED, @on_client_removed
 
   ###############################################################################
   # Conversation service interactions

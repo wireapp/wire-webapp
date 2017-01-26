@@ -29,18 +29,21 @@ class z.entity.NewDeviceMessage extends z.entity.Message
     @user_ets = ko.observableArray()
     @user_ids = ko.observableArray()
 
+    @is_self_device = ko.pureComputed =>
+      return @user_ids().length is 1 and @user_ids()[0].id is @user().id
+
     @caption_user = ko.pureComputed =>
-      return z.util.LocalizerUtil.join_names @user_ets()
+      return z.util.LocalizerUtil.join_names @user_ets(), z.string.Declension.NOMINATIVE
 
     @caption = ko.pureComputed =>
-      return z.localization.Localizer.get_text z.string.conversation_device_started_using_you if @user().is_me
+      return z.localization.Localizer.get_text z.string.conversation_device_started_using_you if @is_self_device()
       return z.localization.Localizer.get_text z.string.conversation_device_started_using
 
     @caption_device = ko.pureComputed ->
       return z.localization.Localizer.get_text z.string.conversation_device_a_new_device
 
   click_on_device: =>
-    if @user_ids().length
-      amplify.publish z.event.WebApp.SHORTCUT.PEOPLE
-    else
+    if @is_self_device()
       amplify.publish z.event.WebApp.PREFERENCES.MANAGE_DEVICES
+    else
+      amplify.publish z.event.WebApp.SHORTCUT.PEOPLE

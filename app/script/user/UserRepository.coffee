@@ -313,7 +313,6 @@ class z.user.UserRepository
     .then =>
       @get_user_by_id user_id, (user_et) ->
         user_et.add_client client_et
-        amplify.publish z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et
 
   ###
   Removes a stored client and the session connected with it.
@@ -327,7 +326,6 @@ class z.user.UserRepository
     .then =>
       @get_user_by_id user_id, (user_et) ->
         user_et.remove_client client_id
-        amplify.publish z.event.WebApp.USER.CLIENT_REMOVED, user_id, client_id
 
 
   ###############################################################################
