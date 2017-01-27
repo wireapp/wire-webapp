@@ -2627,5 +2627,5 @@ class z.conversation.ConversationRepository
       if user_ids_in_conversation.length
         amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_new_device conversation_et, user_ids_in_conversation
 
-  on_client_removed: =>
+  on_client_removed: ->
     LOG 'client removed'
