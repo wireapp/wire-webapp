@@ -45,7 +45,7 @@ class z.conversation.ConversationVerificationStateHandler
       user_ids = [user_ids]
 
     if not user_ids?.length > 0
-      throw new TypeError "Failed to add new device message because of missing user ids"
+      throw new TypeError 'Failed to add new device message because of missing user ids'
 
     valid_conversation_ets = @conversation_repository.filtered_conversations()
     .filter (conversation_et) ->
@@ -54,7 +54,7 @@ class z.conversation.ConversationVerificationStateHandler
       conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
 
     if valid_conversation_ets.length is 0
-      return @logger.info "No conversation found to add new device message"
+      return @logger.info 'No conversation found to add new device message'
 
     for conversation_et in valid_conversation_ets
       user_ids_in_conversation = _.intersection user_ids, conversation_et.participating_user_ids().concat conversation_et.self.id
