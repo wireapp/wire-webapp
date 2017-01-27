@@ -36,6 +36,7 @@ class z.conversation.ConversationRepository
 
     @conversation_mapper = new z.conversation.ConversationMapper()
     @event_mapper = new z.conversation.EventMapper @asset_service, @user_repository
+    @verification_state_handler = new ConversationVerificationStateHandler @
 
     @active_conversation = ko.observable()
     @conversations = ko.observableArray []
@@ -102,8 +103,6 @@ class z.conversation.ConversationRepository
       @conversations_unarchived unarchived
 
   _init_subscriptions: ->
-    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_client_add, 11
-    amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @on_client_removed, 11
     amplify.subscribe z.event.WebApp.CONVERSATION.ASSET.CANCEL, @cancel_asset_upload
     amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
@@ -2599,33 +2598,3 @@ class z.conversation.ConversationRepository
       user: if message_et.user().is_me then 'sender' else 'receiver'
       type: z.tracking.helpers.get_message_type message_et
       reacted_to_last_message: conversation_et.get_last_message() is message_et
-
-  ###
-  Add new device message to conversations.
-  @param user_ids [String|Array]
-  ###
-  on_client_add: (user_ids) =>
-    if _.isString user_ids
-      user_ids = [user_ids]
-
-    if not user_ids?.length > 0
-      throw new TypeError "Failed to add new device message because of missing user ids"
-      return
-
-    valid_conversation_ets = @filtered_conversations()
-    .filter (conversation_et) ->
-      not conversation_et.removed_from_conversation()
-    .filter (conversation_et) ->
-      conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
-
-    if valid_conversation_ets.length is 0
-      @logger.info "No conversation found to add new device message"
-      return
-
-    for conversation_et in valid_conversation_ets
-      user_ids_in_conversation = _.intersection user_ids, conversation_et.participating_user_ids().concat conversation_et.self.id
-      if user_ids_in_conversation.length
-        amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_new_device conversation_et, user_ids_in_conversation
-
-  on_client_removed: ->
-    LOG 'client removed'
