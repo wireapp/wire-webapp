@@ -319,10 +319,10 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
         serialised: sodium.to_base64 new Uint8Array session.serialise()
 
   ###
-  Delete crypto related information.
+  Delete cryptography related information.
   @note Retain history but clean other information.
   ###
-  delete_client_crypto: =>
+  delete_cryptography: =>
     @storage_service.delete_store @storage_service.OBJECT_STORE_AMPLIFY
     .then =>
       @storage_service.delete_store @storage_service.OBJECT_STORE_CLIENTS

@@ -1252,7 +1252,7 @@ class z.ViewModel.AuthViewModel
       return @client_repository.get_valid_local_client()
     .catch (error) =>
       @logger.info "No valid local client found: #{error.message}", error
-      @storage_repository.delete_client_crypto()
+      @storage_repository.delete_cryptography()
       if error.type is z.client.ClientError::TYPE.MISSING_ON_BACKEND
         @logger.info 'Local client rejected as invalid by backend. Reinitializing storage.'
         @storage_service.init @self_user().id
