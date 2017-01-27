@@ -217,6 +217,7 @@ class z.client.ClientRepository
         .then ->
           throw new z.client.ClientError z.client.ClientError::TYPE.MISSING_ON_BACKEND
       else if error.type is z.client.ClientError::TYPE.NO_LOCAL_CLIENT
+        @cryptography_repository.storage_repository.delete_cryptography()
         throw error
       else
         @logger.error "Getting valid local client failed: #{error_message}", error

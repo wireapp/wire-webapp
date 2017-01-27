@@ -198,8 +198,7 @@ class z.storage.StorageService
         primary_key_local_client = z.client.ClientRepository::PRIMARY_KEY_CURRENT_CLIENT
         transaction[@OBJECT_STORE_CLIENTS].toCollection().each (client) =>
           if client.meta.primary_key is primary_key_local_client and client.primary_key isnt primary_key_local_client
-            client.primary_key = primary_key_local_client
-            transaction[@OBJECT_STORE_CLIENTS].delete client.primary_key
+            transaction[@OBJECT_STORE_CLIENTS].delete primary_key_local_client
             transaction[@OBJECT_STORE_CLIENTS].put client, primary_key_local_client
 
       @db.open()
