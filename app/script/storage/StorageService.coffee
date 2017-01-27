@@ -135,6 +135,15 @@ class z.storage.StorageService
         "#{@OBJECT_STORE_PREKEYS}": ''
         "#{@OBJECT_STORE_SESSIONS}": ''
 
+      version_11 =
+        "#{@OBJECT_STORE_AMPLIFY}": ''
+        "#{@OBJECT_STORE_CLIENTS}": ', meta.primary_key'
+        "#{@OBJECT_STORE_CONVERSATION_EVENTS}": ', category, conversation, time, type, [conversation+time], [conversation+category]'
+        "#{@OBJECT_STORE_CONVERSATIONS}": ', id, last_event_timestamp'
+        "#{@OBJECT_STORE_KEYS}": ''
+        "#{@OBJECT_STORE_PREKEYS}": ''
+        "#{@OBJECT_STORE_SESSIONS}": ''
+
       @db = new Dexie @db_name
 
       @db.on 'blocked', =>
@@ -147,16 +156,15 @@ class z.storage.StorageService
       @db.version(3).stores version_3
       @db.version(4).stores version_4
       .upgrade (transaction) =>
-        @logger.warn "Database upgrade to version #{@db.verno}", transaction
+        @logger.warn 'Database upgrade to version 4', transaction
         transaction[@OBJECT_STORE_CLIENTS].toCollection().modify (client) =>
           client.meta =
             is_verified: true
             primary_key: 'local_identity'
-          @logger.info 'Updated client', client
       @db.version(5).stores version_4
       @db.version(6).stores version_4
       .upgrade (transaction) =>
-        @logger.warn "Database upgrade to version #{@db.verno}", transaction
+        @logger.warn 'Database upgrade to version 6', transaction
         transaction[@OBJECT_STORE_CONVERSATIONS].toCollection().eachKey (key) =>
           @db[@OBJECT_STORE_CONVERSATIONS].update key, {id: key}
         transaction[@OBJECT_STORE_SESSIONS].toCollection().eachKey (key) =>
@@ -165,7 +173,7 @@ class z.storage.StorageService
           @db[@OBJECT_STORE_PREKEYS].update key, {id: key}
       @db.version(7).stores version_5
       .upgrade (transaction) =>
-        @logger.warn "Database upgrade to version #{@db.verno}", transaction
+        @logger.warn 'Database upgrade to version 7', transaction
         transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
           mapped_event = event.mapped or event.raw
           delete event.mapped
@@ -174,20 +182,29 @@ class z.storage.StorageService
           $.extend event, mapped_event
       @db.version(8).stores version_5
       .upgrade (transaction) =>
-        @logger.warn "Database upgrade to version #{@db.verno}", transaction
+        @logger.warn 'Database upgrade to version 8', transaction
         transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
           if event.type is z.event.Client.CONVERSATION.DELETE_EVERYWHERE
             event.time = new Date(event.time).toISOString()
       @db.version(9).stores version_9
       @db.version(10).stores version_10
       .upgrade (transaction) =>
-        @logger.warn "Database upgrade to version #{@db.verno}", transaction
+        @logger.warn 'Database upgrade to version 10', transaction
         transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().modify (event) ->
           event.category = z.message.MessageCategorization.category_from_event event
+      @db.version(11).stores version_11
+      .upgrade (transaction) =>
+        @logger.warn 'Database upgrade to version 11', transaction
+        primary_key_local_client = z.client.ClientRepository::PRIMARY_KEY_CURRENT_CLIENT
+        transaction[@OBJECT_STORE_CLIENTS].toCollection().each (client) =>
+          if client.meta.primary_key is primary_key_local_client and client.primary_key isnt primary_key_local_client
+            client.primary_key = primary_key_local_client
+            transaction[@OBJECT_STORE_CLIENTS].delete client.primary_key
+            transaction[@OBJECT_STORE_CLIENTS].put client, primary_key_local_client
 
       @db.open()
       .then =>
-        @logger.info "Storage Service initialized with database '#{@db_name}'"
+        @logger.info "Storage Service initialized with database '#{@db_name}' version '#{@db.verno}'"
         resolve @db_name
       .catch (error) =>
         @logger.error "Failed to initialize database '#{@db_name}' for Storage Service: #{error?.message or error}", {error: error}
