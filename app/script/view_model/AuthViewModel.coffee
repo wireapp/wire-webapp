@@ -70,6 +70,7 @@ class z.ViewModel.AuthViewModel
 
     @get_wire = ko.observable false
     @session_expired = ko.observable false
+    @device_reused = ko.observable false
 
     @client_type = ko.observable z.client.ClientType.TEMPORARY
     @country_code = ko.observable ''
@@ -1292,6 +1293,15 @@ class z.ViewModel.AuthViewModel
           @_set_hash z.auth.AuthView.MODE.VERIFY_ACCOUNT
 
   ###
+  Check whether the device has a local history.
+  @return [Boolean] Returns true if there is at least one conversation event stored
+  ###
+  _has_local_history: =>
+    @storage_service.get_keys @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
+    .then (keys) ->
+      return keys.length > 0
+
+  ###
   Redirects to the app after successful login
   @private
   ###
@@ -1317,7 +1327,10 @@ class z.ViewModel.AuthViewModel
 
       # Show history screen if there are already registered clients
       if client_ets?.length > 0
-        @_set_hash z.auth.AuthView.MODE.HISTORY
+        @_has_local_history()
+        .then (has_history) =>
+          @device_reused has_history
+          @_set_hash z.auth.AuthView.MODE.HISTORY
       # Make sure client entities always see the history screen
       else if @client_repository.current_client().is_temporary()
         @_set_hash z.auth.AuthView.MODE.HISTORY

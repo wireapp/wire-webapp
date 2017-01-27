@@ -216,6 +216,7 @@ class z.main.App
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS
       @repository.announce.init()
       @repository.audio.init true
+      @repository.client.cleanup_clients_and_sessions true
       @logger.info 'App fully loaded'
     .catch (error) =>
       error_message = "Error during initialization of app version '#{z.util.Environment.version false}'"
