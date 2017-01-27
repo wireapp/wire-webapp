@@ -203,7 +203,7 @@ class z.cryptography.CryptographyRepository
   _session_from_encoded_prekey_payload: (remote_pre_key, user_id, client_id) =>
     @logger.log "Initializing session with Client ID '#{client_id}' from User ID '#{user_id}' with remote PreKey ID '#{remote_pre_key.id}'."
     session_id = @_construct_session_id user_id, client_id
-    decoded_prekey_bundle_buffer = bazinga64.Decoder.fromBase64(remote_pre_key.key).asBytes.buffer
+    decoded_prekey_bundle_buffer = z.util.base64_to_array(remote_pre_key.key).buffer
     return @cryptobox.session_from_prekey session_id, decoded_prekey_bundle_buffer
 
   _encrypt_generic_message_for_new_sessions: (user_client_map_for_missing_sessions, generic_message) =>
@@ -307,7 +307,7 @@ class z.cryptography.CryptographyRepository
     session_id = @_construct_session_id event.from, event.data.sender
 
     ciphertext = event.data.text or event.data.key
-    msg_bytes = bazinga64.Decoder.fromBase64(ciphertext).asBytes.buffer
+    msg_bytes = z.util.base64_to_array(ciphertext).buffer
 
     return @cryptobox.decrypt session_id, msg_bytes
     .then (decrypted_message) ->
