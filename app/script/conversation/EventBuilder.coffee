@@ -28,6 +28,16 @@ z.conversation.EventBuilder = do ->
     from: conversation_et.self.id
     time: new Date().toISOString()
 
+  build_unable_to_decrypt = (event, decrypt_error, error_code) ->
+    conversation: event.conversation
+    id: z.util.create_random_uuid()
+    type: z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
+    from: event.from
+    time: event.time
+    error: "#{decrypt_error.message} (#{event.data.sender})"
+    error_code: "#{error_code} (#{event.data.sender})"
+
   return {
     build_all_verified: build_all_verified
+    build_unable_to_decrypt: build_unable_to_decrypt
   }

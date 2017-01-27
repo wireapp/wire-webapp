@@ -392,6 +392,7 @@ class z.event.EventRepository
           else
             error_code = z.cryptography.CryptographyErrorType.INVALID_SIGNATURE
 
+          @_report_decrypt_error event, decrypt_error, error_code
           return @_map_error_message event, decrypt_error, error_code
       else
         return event
@@ -440,20 +441,6 @@ class z.event.EventRepository
         .catch (error) =>
           @logger.error "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
           reject error
-
-  _map_error_message: (event, decrypt_error, error_code) ->
-    @_report_decrypt_error event, decrypt_error, error_code
-
-    unable_to_decrypt_event =
-      conversation: event.conversation
-      id: z.util.create_random_uuid()
-      type: z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
-      from: event.from
-      time: event.time
-      error: "#{decrypt_error.message} (#{event.data.sender})"
-      error_code: "#{error_code} (#{event.data.sender})"
-
-    return unable_to_decrypt_event
 
   ###
   Report decryption error to Localytics and stack traces to Raygun.
