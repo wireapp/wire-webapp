@@ -51,6 +51,7 @@ class z.calling.CallingRepository
     @logger = new z.util.Logger 'z.calling.CallingRepository', z.config.LOGGER.OPTIONS
 
     @calling_config = ko.observable()
+    @calling_config_timeout = undefined
     @use_v3_api = undefined
 
     @call_center = new z.calling.belfry.CallCenter @call_service, @conversation_repository, @media_repository, @user_repository
@@ -212,9 +213,10 @@ class z.calling.CallingRepository
       timeout_in_seconds = calling_config.ttl or CALLING_CONFIG.CONFIG_UPDATE_INTERVAL
       @logger.info "Updated calling configuration - next update in #{timeout_in_seconds}s", calling_config
       @calling_config calling_config
-      window.setTimeout =>
+      window.clearTimeout @calling_config_timeout if @calling_config_timeout
+      @calling_config_timeout = window.setTimeout =>
         @_update_calling_config()
-      , timeout_in_seconds * 1000
+      , 1000 * timeout_in_seconds
 
 
   ###############################################################################

@@ -247,8 +247,8 @@ class z.calling.entities.EFlow
   ###
   _close_peer_connection: ->
     if @peer_connection?
-      @peer_connection.oniceconnectionstatechange = => @logger.log @logger.levels.off, 'State change ignored - ICE connection'
-      @peer_connection.onsignalingstatechange = => @logger.log @logger.levels.off, "State change ignored - signaling state: #{@peer_connection.signalingState}"
+      @peer_connection.oniceconnectionstatechange = => @logger.log @logger.levels.OFF, 'State change ignored - ICE connection'
+      @peer_connection.onsignalingstatechange = => @logger.log @logger.levels.OFF, "State change ignored - signaling state: #{@peer_connection.signalingState}"
       @peer_connection.close()
       @logger.debug "Closing PeerConnection '#{@remote_user.name()}' successful"
 

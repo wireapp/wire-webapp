@@ -84,7 +84,9 @@ z.util.get_url_parameter = (name) ->
     if value[0] is name
       if value[1]
         value = unescape value[1]
-        return if value is 'false' then false else value
+        return false if value is 'false'
+        return true if value is 'true'
+        return value
       return true
   return null
 
