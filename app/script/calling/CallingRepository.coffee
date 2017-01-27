@@ -53,7 +53,7 @@ class z.calling.CallingRepository
     @calling_config = ko.observable()
     @use_v3_api = undefined
 
-    @call_center = new z.calling.belfry.CallCenter @calling_config, @call_service, @conversation_repository, @media_repository, @user_repository
+    @call_center = new z.calling.belfry.CallCenter @call_service, @conversation_repository, @media_repository, @user_repository
     @e_call_center = new z.calling.e_call.ECallCenter @calling_config, @conversation_repository, @media_repository, @user_repository
 
     @calls = ko.pureComputed =>
@@ -211,7 +211,7 @@ class z.calling.CallingRepository
     .then (calling_config) =>
       timeout_in_seconds = calling_config.ttl or CALLING_CONFIG.CONFIG_UPDATE_INTERVAL
       @logger.info "Updated calling configuration - next update in #{timeout_in_seconds}s", calling_config
-      @calling_config $.extend use_v3_api: @use_v3_api, calling_config
+      @calling_config calling_config
       window.setTimeout =>
         @_update_calling_config()
       , timeout_in_seconds * 1000

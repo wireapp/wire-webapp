@@ -43,7 +43,7 @@ class z.calling.belfry.CallCenter
   @param media_repository [z.media.MediaRepository] Repository for media interactions
   @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
   ###
-  constructor: (@calling_config, @call_service, @conversation_repository, @media_repository, @user_repository) ->
+  constructor: (@call_service, @conversation_repository, @media_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.calling.belfry.CallCenter', z.config.LOGGER.OPTIONS
 
     # Telemetry
@@ -109,10 +109,6 @@ class z.calling.belfry.CallCenter
   @param event [Object] Event payload
   ###
   _on_handled_call_event: (event) ->
-    if @calling_config().use_v3_api
-      conversation_et = @conversation_repository.get_conversation_by_id event.conversation
-      @logger.warn "Received outdated calling v2 event in conversation '#{event.conversation}'" if conversation_et.is_one2one()
-
     switch event.type
       when z.event.Backend.CALL.FLOW_ADD
         @signaling_handler.on_flow_add_event event

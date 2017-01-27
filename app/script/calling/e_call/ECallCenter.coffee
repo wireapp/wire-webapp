@@ -33,7 +33,7 @@ class z.calling.e_call.ECallCenter
   ###
   Construct a new e-call center.
 
-  @param e_call_service [z.calling.e_call.ECallService] Backend REST API e-call service implementation
+  @param calling_config [ko.observable] Calling configuration from backend
   @param conversation_repository [z.conversation.ConversationRepository] Repository for conversation interactions
   @param media_repository [z.media.MediaRepository] Repository for media interactions
   @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
