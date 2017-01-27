@@ -111,10 +111,7 @@ class z.cryptography.CryptographyRepository
         @get_users_pre_keys({"#{user_id}": [client_id]})
         .then (user_pre_key_map) =>
           remote_pre_key = user_pre_key_map[user_id][client_id]
-          @logger.log "Initializing session with Client ID '#{client_id}' from User ID '#{user_id}' with remote PreKey ID '#{remote_pre_key.id}'."
-          session_id = @_construct_session_id user_id, client_id
-          decoded_prekey_bundle_buffer = bazinga64.Decoder.fromBase64(remote_pre_key.key).asBytes.buffer
-          return @cryptobox.session_from_prekey session_id, decoded_prekey_bundle_buffer
+          return @_session_from_encoded_prekey_payload remote_pre_key, user_id, client_id
 
   ###
   Generate the signaling keys (which are used for mobile push notifications).
@@ -203,6 +200,12 @@ class z.cryptography.CryptographyRepository
         payload.recipients[result.user_id][result.client_id] = result.encrypted
       return payload
 
+  _session_from_encoded_prekey_payload: (remote_pre_key, user_id, client_id) =>
+    @logger.log "Initializing session with Client ID '#{client_id}' from User ID '#{user_id}' with remote PreKey ID '#{remote_pre_key.id}'."
+    session_id = @_construct_session_id user_id, client_id
+    decoded_prekey_bundle_buffer = bazinga64.Decoder.fromBase64(remote_pre_key.key).asBytes.buffer
+    return @cryptobox.session_from_prekey session_id, decoded_prekey_bundle_buffer
+
   _encrypt_generic_message_for_new_sessions: (user_client_map_for_missing_sessions, generic_message) =>
     return new Promise (resolve) =>
       if Object.keys(user_client_map_for_missing_sessions).length
@@ -215,10 +218,7 @@ class z.cryptography.CryptographyRepository
           for user_id of user_pre_key_map
             for client_id of user_pre_key_map[user_id]
               remote_pre_key = user_pre_key_map[user_id][client_id]
-              @logger.log "Initializing session with Client ID '#{client_id}' from User ID '#{user_id}' with remote PreKey ID '#{remote_pre_key.id}'."
-              session_id = @_construct_session_id user_id, client_id
-              decoded_prekey_bundle_buffer = bazinga64.Decoder.fromBase64(remote_pre_key.key).asBytes.buffer
-              future_sessions.push @cryptobox.session_from_prekey session_id, decoded_prekey_bundle_buffer
+              future_sessions.push @_session_from_encoded_prekey_payload remote_pre_key, user_id, client_id
 
           Promise.all(future_sessions).then (cryptobox_sessions) =>
             future_payloads = []
