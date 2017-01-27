@@ -117,7 +117,7 @@ describe 'z.client.ClientRepository', ->
 
     it 'rejects with an error if database deletion fails', (done) ->
       spyOn(client_service, 'load_client_from_db').and.returnValue Promise.resolve client_payload_database
-      spyOn(storage_service, 'delete_cryptography').and.returnValue Promise.reject new Error 'Expected unit test error'
+      spyOn(storage_repository, 'delete_cryptography').and.returnValue Promise.reject new Error 'Expected unit test error'
 
       client_repository.get_valid_local_client()
       .then done.fail

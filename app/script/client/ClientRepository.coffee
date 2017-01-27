@@ -47,7 +47,6 @@ class z.client.ClientRepository
   ###############################################################################
 
   delete_client_from_db: (user_id, client_id) ->
-    return if @_is_current_client user_id, client_id
     return @client_service.delete_client_from_db @_construct_primary_key user_id, client_id
 
   ###
