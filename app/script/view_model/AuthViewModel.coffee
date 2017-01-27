@@ -1194,13 +1194,12 @@ class z.ViewModel.AuthViewModel
   @private
   ###
   _validate_username: ->
-    username = @username().trim().toLowerCase().replace '@', ''
-
+    username = @username().trim().toLowerCase()
     unless username.length
       return @_add_error z.string.auth_error_email_missing, z.auth.AuthView.TYPE.EMAIL
 
     phone = z.util.phone_number_to_e164 username, @country() or navigator.language
-    if not z.util.is_valid_email(username) and not z.util.is_valid_username(username) and not z.util.is_valid_phone_number phone
+    if not z.util.is_valid_email(username) and not z.util.is_valid_username(username.replace '@', '') and not z.util.is_valid_phone_number phone
       return @_add_error z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL
 
 
