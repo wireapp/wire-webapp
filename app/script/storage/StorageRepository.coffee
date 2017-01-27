@@ -319,8 +319,21 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
         serialised: sodium.to_base64 new Uint8Array session.serialise()
 
   ###
-  Nuke the database.
+  Delete crypto related information.
+  @note Retain history but clean other information.
   ###
+  delete_client_crypto: =>
+    @storage_service.delete_store @storage_service.OBJECT_STORE_AMPLIFY
+    .then =>
+      @storage_service.delete_store @storage_service.OBJECT_STORE_CLIENTS
+    .then =>
+      @storage_service.delete_store @storage_service.OBJECT_STORE_KEYS
+    .then =>
+      @storage_service.delete_store @storage_service.OBJECT_STORE_SESSIONS
+    .then =>
+      @storage_service.delete_store @storage_service.OBJECT_STORE_PREKEYS
+
+  # Nuke the database.
   delete_everything: =>
     @logger.warn "Deleting database '#{@storage_service.db_name}'"
     return @storage_service.delete_everything()

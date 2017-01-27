@@ -305,14 +305,22 @@
         </div>
 
         <div id="section-history" class="section">
-          <div class="auth-headline" data-bind="l10n_text: z.string.auth_history_headline"></div>
-          <div class="auth-headline-sub" data-bind="l10n_text: z.string.auth_history_description"></div>
+          <!-- ko if: device_reused -->
+            <div class="auth-headline" data-bind="l10n_text: z.string.auth_history_reused_headline"></div>
+            <div class="auth-headline-sub" data-bind="l10n_text: z.string.auth_history_reused_description"></div>
+          <!-- /ko -->
+          <!-- ko ifnot: device_reused -->
+            <div class="auth-headline" data-bind="l10n_text: z.string.auth_history_headline"></div>
+            <div class="auth-headline-sub" data-bind="l10n_text: z.string.auth_history_description"></div>
+          <!-- /ko -->
           <div class="footer">
             <div class="button-group">
-              <a class="button button-outline" rel="nofollow noopener noreferrer" target="_blank"
-                 data-bind="l10n_href: z.string.url_support_history, l10n_text: z.string.warning_learn_more"
-                 data-uie-name="do-history-learn-more"></a>
-            <span class="button button-white"
+              <!-- ko ifnot: device_reused -->
+                <a class="button button-outline" rel="nofollow noopener noreferrer" target="_blank"
+                   data-bind="l10n_href: z.string.url_support_history, l10n_text: z.string.warning_learn_more"
+                   data-uie-name="do-history-learn-more"></a>
+              <!-- /ko -->
+              <span class="button button-white"
                   data-bind="click: click_on_history_confirm, l10n_text: z.string.auth_history_button"
                   data-uie-name="do-history-confirm"></span>
             </div>

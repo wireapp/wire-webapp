@@ -70,6 +70,7 @@ class z.ViewModel.AuthViewModel
 
     @get_wire = ko.observable false
     @session_expired = ko.observable false
+    @device_reused = ko.observable false
 
     @client_type = ko.observable z.client.ClientType.TEMPORARY
     @country_code = ko.observable ''
@@ -1251,6 +1252,7 @@ class z.ViewModel.AuthViewModel
       return @client_repository.get_valid_local_client()
     .catch (error) =>
       @logger.info "No valid local client found: #{error.message}", error
+      @storage_repository.delete_client_crypto()
       if error.type is z.client.ClientError::TYPE.MISSING_ON_BACKEND
         @logger.info 'Local client rejected as invalid by backend. Reinitializing storage.'
         @storage_service.init @self_user().id
@@ -1294,6 +1296,15 @@ class z.ViewModel.AuthViewModel
           @_set_hash z.auth.AuthView.MODE.VERIFY_ACCOUNT
 
   ###
+  Check whether the device has a local history.
+  @return [Boolean] Returns true if there is at least one conversation event stored
+  ###
+  _has_local_history: =>
+    @storage_service.get_keys @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
+    .then (keys) ->
+      return keys.length > 0
+
+  ###
   Redirects to the app after successful login
   @private
   ###
@@ -1319,7 +1330,10 @@ class z.ViewModel.AuthViewModel
 
       # Show history screen if there are already registered clients
       if client_ets?.length > 0
-        @_set_hash z.auth.AuthView.MODE.HISTORY
+        @_has_local_history()
+        .then (has_history) =>
+          @device_reused has_history
+          @_set_hash z.auth.AuthView.MODE.HISTORY
       # Make sure client entities always see the history screen
       else if @client_repository.current_client().is_temporary()
         @_set_hash z.auth.AuthView.MODE.HISTORY

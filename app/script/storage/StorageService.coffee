@@ -157,7 +157,7 @@ class z.storage.StorageService
       @db.version(4).stores version_4
       .upgrade (transaction) =>
         @logger.warn 'Database upgrade to version 4', transaction
-        transaction[@OBJECT_STORE_CLIENTS].toCollection().modify (client) =>
+        transaction[@OBJECT_STORE_CLIENTS].toCollection().modify (client) ->
           client.meta =
             is_verified: true
             primary_key: 'local_identity'

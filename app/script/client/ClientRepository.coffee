@@ -210,7 +210,7 @@ class z.client.ClientRepository
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         error_message = "Local client '#{client_et.id}' (#{client_et.type}) no longer exists on the backend"
         @logger.warn error_message, error
-        @cryptography_repository.storage_repository.delete_everything()
+        @cryptography_repository.storage_repository.delete_client_crypto()
         .catch (error) =>
           @logger.error "Deleting database after failed client validation unsuccessful: #{error.message}", error
           throw new z.client.ClientError z.client.ClientError::TYPE.DATABASE_FAILURE
@@ -577,6 +577,7 @@ class z.client.ClientRepository
     return if not client_id
 
     if client_id is @current_client().id
-      amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReasion.CLIENT_REMOVED, true
+      @cryptography_repository.storage_repository.delete_client_crypto()
+      amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReasion.CLIENT_REMOVED
     else
       amplify.publish z.event.WebApp.CLIENT.REMOVE, @self_user().id, client_id
