@@ -108,7 +108,6 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
     amplify.subscribe z.event.WebApp.CONVERSATION.PERSIST_STATE, @save_conversation_state_in_db
-    amplify.subscribe z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @on_verification_state_changed
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
 
@@ -222,7 +221,7 @@ class z.conversation.ConversationRepository
   ###
   Get messages for given category. Category param acts as lower bound
   @param conversation_id [String]
-  @param catogory [z.message.MessageCategory.NONE]
+  @param category [z.message.MessageCategory.NONE]
   @return [Promise] Array of z.entity.Message entities
   ###
   get_events_for_category: (conversation_et, catogory = z.message.MessageCategory.NONE) =>
@@ -505,14 +504,6 @@ class z.conversation.ConversationRepository
   ###
   save_conversations: (conversation_ets) =>
     z.util.ko_array_push_all @conversations, conversation_ets
-
-  ###
-  Handle conversation verification state change.
-  @param conversation_et [z.entity.Conversation]
-  ###
-  on_verification_state_changed: (conversation_et) ->
-    # if conversation_et.verification_state() is z.conversation.ConversationVerificationState.VERIFIED
-      # amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
 
   ###
   Set the notification handling state.
