@@ -323,15 +323,13 @@ class z.storage.StorageRepository extends cryptobox.CryptoboxStore
   @note Retain history but clean other information.
   ###
   delete_cryptography: =>
-    @storage_service.delete_store @storage_service.OBJECT_STORE_AMPLIFY
-    .then =>
-      @storage_service.delete_store @storage_service.OBJECT_STORE_CLIENTS
-    .then =>
-      @storage_service.delete_store @storage_service.OBJECT_STORE_KEYS
-    .then =>
-      @storage_service.delete_store @storage_service.OBJECT_STORE_SESSIONS
-    .then =>
-      @storage_service.delete_store @storage_service.OBJECT_STORE_PREKEYS
+    @storage_service.delete_stores [
+      @storage_service.OBJECT_STORE_AMPLIFY
+      @storage_service.OBJECT_STORE_CLIENTS
+      @storage_service.OBJECT_STORE_KEYS
+      @storage_service.OBJECT_STORE_SESSIONS
+      @storage_service.OBJECT_STORE_PREKEYS
+    ]
 
   # Nuke the database.
   delete_everything: =>

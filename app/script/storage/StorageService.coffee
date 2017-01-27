@@ -239,11 +239,21 @@ class z.storage.StorageService
     return Promise.all promises
 
   ###
+  Delete a database store.
+  @param store_name [String] Name of database store to delete
   @return [Promise]
   ###
   delete_store: (store_name) =>
     @logger.info "Clearing object store '#{store_name}' in database '#{@db_name}'"
     return @db[store_name].clear()
+
+  ###
+  Delete multiple database stores.
+  @param store_names [Array<String>] Names of database stores to delete
+  @return [Promise]
+  ###
+  delete_stores: (store_names) =>
+    return Promise.all (@delete_store store_name for store_name in store_names)
 
   ###
   Delete the IndexedDB with all its stores.
