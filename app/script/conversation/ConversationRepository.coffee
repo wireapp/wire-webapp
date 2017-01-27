@@ -36,7 +36,7 @@ class z.conversation.ConversationRepository
 
     @conversation_mapper = new z.conversation.ConversationMapper()
     @event_mapper = new z.conversation.EventMapper @asset_service, @user_repository
-    @verification_state_handler = new ConversationVerificationStateHandler @
+    @verification_state_handler = new z.conversation.ConversationVerificationStateHandler @
 
     @active_conversation = ko.observable()
     @conversations = ko.observableArray []
