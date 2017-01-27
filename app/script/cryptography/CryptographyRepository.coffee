@@ -52,10 +52,8 @@ class z.cryptography.CryptographyRepository
         topic: cryptobox.Cryptobox.prototype.TOPIC_NEW_PREKEYS
         callback: (data) =>
           @logger.log "Received '#{data.length}' new PreKeys."
-          serialized_prekeys = []
-          data.forEach (pre_key) =>
-            json_pre_key = @cryptobox.serialize_prekey pre_key
-            serialized_prekeys.push json_pre_key
+          serialized_prekeys = data.map (pre_key) =>
+            return @cryptobox.serialize_prekey pre_key
             # TODO: Upload PreKeys to backend
 
       postal.subscribe config
@@ -158,7 +156,7 @@ class z.cryptography.CryptographyRepository
   _construct_session_ids: (user_client_map) =>
     session_ids = []
 
-    for user_id, client_ids  of user_client_map
+    for user_id, client_ids of user_client_map
       client_ids.forEach (client_id) =>
         session_id = @_construct_session_id user_id, client_id
         session_ids.push session_id
