@@ -117,8 +117,8 @@ class z.main.App
     view = {}
 
     view.main                      = new z.ViewModel.MainViewModel 'wire-main', @repository.user
-    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.audio, @repository.calling, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.media, @repository.search, @repository.user, @repository.properties
-    view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.calling, @repository.connect, @repository.conversation, @repository.search, @repository.user, @repository.properties
+    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.calling, @repository.client, @repository.conversation, @repository.media, @repository.search, @repository.properties
+    view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.calling, @repository.connect, @repository.conversation, @repository.search, @repository.properties
     view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
     view.lightbox                  = new z.ViewModel.ImageDetailViewViewModel 'detail-view', @repository.conversation
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'

@@ -31,8 +31,11 @@ class z.ViewModel.list.ListViewModel
   @param search_repository [z.search.SearchRepository] Search repository
   @param user_repository [z.user.UserRepository] User repository
   ###
-  constructor: (element_id, @content_view_model, @calling_repository, @connect_repository, @conversation_repository, @search_repository, @user_repository, @properties_repository) ->
+  constructor: (element_id, @content_view_model, @calling_repository, @connect_repository, @conversation_repository, @search_repository, @properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.list.ListViewModel', z.config.LOGGER.OPTIONS
+
+    #repositories
+    @user_repository = @conversation_repository.user_repository
 
     # state
     @list_state = ko.observable z.ViewModel.list.LIST_STATE.CONVERSATIONS

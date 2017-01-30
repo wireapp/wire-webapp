@@ -22,8 +22,14 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.ContentViewModel
-  constructor: (element_id, @audio_repository, @calling_repository, @client_repository, @conversation_repository, @cryptography_repository, @giphy_repository, @media_repository, @search_repository, @user_repository, @properties_repository) ->
+  constructor: (element_id, @calling_repository, @client_repository, @conversation_repository, @media_repository, @search_repository, @properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS
+
+    # repositories
+    @audio_repository = @media_repository.audio_repository
+    @cryptography_repository = @client_repository.cryptography_repository
+    @giphy_repository = @conversation_repository.giphy_repository
+    @user_repository = @conversation_repository.user_repository
 
     # state
     @content_state = ko.observable z.ViewModel.content.CONTENT_STATE.WATERMARK
