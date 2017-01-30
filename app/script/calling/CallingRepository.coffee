@@ -104,11 +104,12 @@ class z.calling.CallingRepository
       if call instanceof z.calling.entities.ECall
         return z.calling.enum.PROTOCOL_VERSION.E_CALL
 
-  handled_by_v3: (conversation_id) =>
+  outgoing_protocol_version: (conversation_id) =>
     conversation_et = @conversation_repository.get_conversation_by_id conversation_id
+    @logger.log "Select outgoing protocol version - 1to1 conversation: #{conversation_et?.is_one2one()}, backend protocol: #{@protocol_version_1to1()}, use_v3_api: #{@use_v3_api}"
     v3_api_enabled = @use_v3_api is true or (@protocol_version_1to1() is z.calling.enum.PROTOCOL_VERSION.E_CALL and @use_v3_api isnt false)
-    return z.calling.enum.PROTOCOL_VERSION.BELFRY unless v3_api_enabled and not conversation_et?.is_group()
-    return z.calling.enum.PROTOCOL_VERSION.E_CALL
+    return z.calling.enum.PROTOCOL_VERSION.E_CALL if v3_api_enabled and not conversation_et?.is_group()
+    return z.calling.enum.PROTOCOL_VERSION.BELFRY
 
   # Initiate calling config update.
   initiate_config: =>
@@ -137,7 +138,7 @@ class z.calling.CallingRepository
       throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
 
       if fn_name is z.calling.enum.E_CALL_ACTION.JOIN
-        return @handled_by_v3 conversation_id
+        return @outgoing_protocol_version conversation_id
     .then (protocol_version) =>
       switch protocol_version
         when z.calling.enum.PROTOCOL_VERSION.BELFRY

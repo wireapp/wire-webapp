@@ -26,7 +26,7 @@ window.wire ?= {}
 window.wire.auth ?= {}
 window.wire.auth.audio ?= {}
 
-describe 'z.calling.CallCenter', ->
+describe 'z.calling.belfry.CallCenter', ->
   test_factory = new TestFactory()
   conversation_et = undefined
   user_ets = undefined
