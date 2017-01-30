@@ -72,9 +72,16 @@ z.util.load_url_blob = (url) ->
     return new Blob [new Uint8Array buffer], type: type
 
 
-z.util.append_url_parameter = (url, param) ->
+z.util.append_url_parameter = (url, parameter) ->
   separator = if z.util.StringUtil.includes url, '?' then '&' else '?'
-  return "#{url}#{separator}#{param}"
+  return "#{url}#{separator}#{parameter}"
+
+
+z.util.forward_url_parameter = (url, parameter_name) ->
+  parameter_value = z.util.get_url_parameter parameter_name
+  if parameter_value?
+    return url = z.util.append_url_parameter url, "#{parameter_name}=#{parameter_value}"
+  return url
 
 
 z.util.get_url_parameter = (name) ->
