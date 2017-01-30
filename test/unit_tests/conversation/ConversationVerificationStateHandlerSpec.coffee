@@ -23,25 +23,20 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
   state_handler = undefined
   conversation_repository = undefined
 
+  conversation_ab = undefined
+  conversation_b = undefined
+  conversation_c = undefined
+
+  user_self = undefined
+  user_a = undefined
+  user_b = undefined
+
   beforeEach (done) ->
     test_factory.exposeConversationActors()
     .then (_conversation_repository) ->
       conversation_repository = _conversation_repository
       state_handler = new z.conversation.ConversationVerificationStateHandler conversation_repository
-      done()
-    .catch(done.fail)
 
-  describe 'on_client_add', ->
-
-    conversation_ab = undefined
-    conversation_b = undefined
-    conversation_c = undefined
-
-    user_self = undefined
-    user_a = undefined
-    user_b = undefined
-
-    beforeEach ->
       conversation_ab = new z.entity.Conversation z.util.create_random_uuid()
       conversation_b = new z.entity.Conversation z.util.create_random_uuid()
       conversation_c = new z.entity.Conversation z.util.create_random_uuid()
@@ -69,15 +64,17 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       conversation_b.verification_state z.conversation.ConversationVerificationState.VERIFIED
       conversation_b.participating_user_ets.push user_b
       conversation_c.self = user_self
+      conversation_c.verification_state z.conversation.ConversationVerificationState.VERIFIED
 
       conversation_repository.conversations []
       conversation_repository.save_conversation conversation_ab
       conversation_repository.save_conversation conversation_b
       conversation_repository.save_conversation conversation_c
 
-    it 'test setup', ->
-      expect(conversation_ab.is_verified()).toBeTruthy()
-      expect(conversation_b.is_verified()).toBeTruthy()
+      done()
+    .catch(done.fail)
+
+  describe 'on_client_add', ->
 
     it 'should change state to DEGRADED if new unverified client was added', ->
       spyOn z.conversation.EventBuilder, 'build_degraded'
@@ -92,8 +89,8 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       expect(conversation_ab.is_verified()).toBeFalsy()
       expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual 2
 
-    it 'should not change state if new verified client was added', ->
-      spyOn z.conversation.EventBuilder, 'build_degraded'
+    it 'should not change VERIFIED state if new verified client was added', ->
+      spyOn z.conversation.EventBuilder, 'build_all_verified'
 
       new_client_b = new z.client.Client()
       new_client_b.meta.is_verified true
@@ -102,10 +99,35 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       state_handler.on_client_add user_b.id
       expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
       expect(conversation_ab.is_verified()).toBeTruthy()
-      expect(z.conversation.EventBuilder.build_degraded).not.toHaveBeenCalled()
+      expect(z.conversation.EventBuilder.build_all_verified).not.toHaveBeenCalled()
+
+  describe 'on_client_removed', ->
+
+    it 'should change state from DEGRADED to VERIFIED if last unverified client was removed', ->
+      spyOn z.conversation.EventBuilder, 'build_degraded'
+      spyOn z.conversation.EventBuilder, 'build_all_verified'
+
+      new_client_b = new z.client.Client()
+      new_client_b.meta.is_verified false
+      user_self.devices.push new_client_b
+
+      state_handler.on_client_add user_self.id
+      expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
+      expect(conversation_b.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
+      expect(conversation_c.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
+      expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual 3
+
+      user_self.devices.remove new_client_b
+      state_handler.on_client_removed user_self.id
+      expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
+      expect(conversation_b.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
+      expect(conversation_c.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
+      expect(z.conversation.EventBuilder.build_all_verified.calls.count()).toEqual 3
+
+  describe 'on_member_joined', ->
 
     it 'should change state to DEGRADED if new user with unverified client was added to conversation', ->
-      spyOn z.conversation.EventBuilder, 'build_new_device'
+      spyOn z.conversation.EventBuilder, 'build_degraded'
 
       new_user = new z.entity.User z.util.create_random_uuid()
       new_client_b = new z.client.Client()
@@ -119,7 +141,7 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
 
       expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
       expect(conversation_ab.is_verified()).toBeFalsy()
-      expect(z.conversation.EventBuilder.build_new_device.calls.count()).toEqual 1
+      expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual 1
 
     it 'should not change state if new user with verified client was added to conversation', ->
       spyOn z.conversation.EventBuilder, 'build_degraded'

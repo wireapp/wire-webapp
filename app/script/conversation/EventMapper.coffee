@@ -130,7 +130,6 @@ class z.conversation.EventMapper
   @return [z.entity.NewDeviceMessage] Normal message entity
   ###
   _map_degraded: (event) ->
-    debugger
     message_et = new z.entity.DegradedMessage()
     message_et.user_ids event.data.user_ids
     message_et.degraded_message_type = event.data.type
