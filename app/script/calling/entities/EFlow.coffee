@@ -39,7 +39,7 @@ class z.calling.entities.EFlow
 
     @id = @e_participant_et.id
     @conversation_id = @e_call_et.id
-    @e_call_center = @e_call_et.e_call_center
+    @v3_call_center = @e_call_et.v3_call_center
 
     # States
     @is_answer = ko.observable undefined
@@ -425,7 +425,7 @@ class z.calling.entities.EFlow
         return @_set_send_sdp_timeout()
 
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' containing '#{ice_candidates}' ICE candidates for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
-      e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @e_call_center.create_setup_payload @local_sdp().sdp
+      e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @v3_call_center.create_setup_payload @local_sdp().sdp
       return @e_call_et.send_e_call_event e_call_message_et
       .then =>
         @should_send_local_sdp true
@@ -565,7 +565,7 @@ class z.calling.entities.EFlow
   update_media_stream: (media_stream_info) =>
     @_replace_media_track media_stream_info
     .catch (error) =>
-      if error.type in [z.calling.belfry.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.belfry.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
+      if error.type in [z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
         @logger.info "Replacement of MediaStream and renegotiation necessary: #{error.message}", error
         return @_replace_media_stream media_stream_info
       throw error
@@ -639,15 +639,15 @@ class z.calling.entities.EFlow
       if @peer_connection.getSenders
         for rtp_sender in @peer_connection.getSenders() when rtp_sender.track.kind is media_stream_info.type
           return rtp_sender
-        throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.NO_REPLACEABLE_TRACK
-      throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
+        throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK
+      throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
     .then (rtp_sender) ->
       return rtp_sender.replaceTrack media_stream_info.stream.getTracks()[0]
     .then =>
       @logger.info "Replaced the '#{media_stream_info.type}' track"
       return media_stream_info
     .catch (error) =>
-      unless error.type in [z.calling.belfry.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.belfry.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
+      unless error.type in [z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
         @logger.error "Failed to replace the '#{media_stream_info.type}' track: #{error.name} - #{error.message}", error
       throw error
 

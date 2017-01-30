@@ -20,6 +20,6 @@ window.z ?= {}
 z.calling ?= {}
 z.calling.enum ?= {}
 
-z.calling.enum.PROTOCOL_VERSION =
-  BELFRY: '2.0'
-  E_CALL: '3.0'
+z.calling.enum.PROTOCOL =
+  VERSION_2: '2.0'
+  VERSION_3: '3.0'

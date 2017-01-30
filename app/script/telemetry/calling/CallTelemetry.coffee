@@ -26,7 +26,7 @@ class z.telemetry.calling.CallTelemetry
     @logger = new z.util.Logger 'z.telemetry.calling.CallTelemetry', z.config.LOGGER.OPTIONS
 
     @sessions = {}
-    @protocol_version = if protocol_version is z.calling.enum.PROTOCOL_VERSION.BELFRY then 'C2' else 'C3'
+    @protocol_version = if protocol_version is z.calling.enum.PROTOCOL.VERSION_2 then 'C2' else 'C3'
 
 
   ###############################################################################
@@ -46,7 +46,7 @@ class z.telemetry.calling.CallTelemetry
   @param event [JSON] Call event from backend
   ###
   track_session: (conversation_id, event) =>
-    @sessions[event.session] = new z.calling.belfry.CallTrackingInfo {
+    @sessions[event.session] = new z.calling.v2.CallTrackingInfo {
       conversation_id: conversation_id
       session_id: event.session
     }

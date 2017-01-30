@@ -20,6 +20,9 @@ window.z ?= {}
 z.calling ?= {}
 z.calling.entities ?= {}
 
+E_CALL_CONFIG =
+  STATE_TIMEOUT: 30000
+
 # E-call entity.
 class z.calling.entities.ECall
   ###
@@ -27,20 +30,20 @@ class z.calling.entities.ECall
   @param conversation_et [z.entity.Conversation] Conversation the call takes place in
   @param creating_user [z.entity.User] Entity of user starting the call
   @param session_id [String] Session ID to identify call
-  @param e_call_center [z.calling.e_call.ECallCenter] E-call center
+  @param v3_call_center [z.calling.v3.CallCenter] V3 call center
   ###
-  constructor: (@conversation_et, @creating_user, @session_id, @e_call_center) ->
+  constructor: (@conversation_et, @creating_user, @session_id, @v3_call_center) ->
     @logger = new z.util.Logger "z.calling.entities.ECall (#{@conversation_et.id})", z.config.LOGGER.OPTIONS
 
     # IDs and references
     @id = @conversation_et.id
     @timings = undefined
 
-    @audio_repository = @e_call_center.media_repository.audio_repository
-    @config = @e_call_center.calling_config
-    @self_user = @e_call_center.user_repository.self()
-    @self_state = @e_call_center.self_state
-    @telemetry = @e_call_center.telemetry
+    @audio_repository = @v3_call_center.media_repository.audio_repository
+    @config = @v3_call_center.calling_config
+    @self_user = @v3_call_center.user_repository.self()
+    @self_state = @v3_call_center.self_state
+    @telemetry = @v3_call_center.telemetry
 
     # States
     @call_timer_interval = undefined
@@ -63,8 +66,8 @@ class z.calling.entities.ECall
     @interrupted_participants = ko.observableArray []
 
     # Media
-    @local_audio_stream = ko.observable @e_call_center.media_stream_handler.local_media_streams.audio
-    @local_video_stream = ko.observable @e_call_center.media_stream_handler.local_media_streams.video
+    @local_audio_stream = ko.observable @v3_call_center.media_stream_handler.local_media_streams.audio
+    @local_video_stream = ko.observable @v3_call_center.media_stream_handler.local_media_streams.video
 
     # Statistics
     @_reset_timer()
@@ -144,7 +147,7 @@ class z.calling.entities.ECall
   ###############################################################################
 
   send_e_call_event: (e_call_message_et) =>
-    @e_call_center.send_e_call_event @conversation_et, e_call_message_et
+    @v3_call_center.send_e_call_event @conversation_et, e_call_message_et
 
   start_negotiation: =>
     @self_client_joined true
@@ -175,7 +178,7 @@ class z.calling.entities.ECall
         amplify.publish z.event.WebApp.CALL.STATE.DELETE, @id
       else
         amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @id
-    , 30000
+    , E_CALL_CONFIG.STATE_TIMEOUT
 
   _stop_call_sound: (is_incoming) ->
     sound_id = if is_incoming then z.audio.AudioType.INCOMING_CALL else z.audio.AudioType.OUTGOING_CALL
@@ -208,7 +211,7 @@ class z.calling.entities.ECall
     .then =>
       @update_e_participant user_et.id, e_call_message_et
     .catch (error) =>
-      throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
       @logger.debug "Adding e-call participant '#{user_et.name()}'"
       @participants.push new z.calling.entities.EParticipant @, user_et, @timings, e_call_message_et
@@ -227,7 +230,7 @@ class z.calling.entities.ECall
       @interrupted_participants.remove e_participant_et
       @participants.remove e_participant_et
       @_update_remote_state()
-      @e_call_center.media_element_handler.remove_media_element user_id
+      @v3_call_center.media_element_handler.remove_media_element user_id
       @logger.debug "Removed e-call participant '#{e_participant_et.user.name()}'"
       return @
 
@@ -247,7 +250,7 @@ class z.calling.entities.ECall
   get_e_participant_by_id: (user_id) =>
     for e_participant_et in @participants() when e_participant_et.id is user_id
       return Promise.resolve e_participant_et
-    return Promise.reject new z.calling.e_call.ECallError z.calling.e_call.ECallError::TYPE.NOT_FOUND, 'No participant for given user ID found'
+    return Promise.reject new z.calling.v3.CallError z.calling.v3.CallError::TYPE.NOT_FOUND, 'No participant for given user ID found'
 
   ###
   Update e-call participant with e-call message.

@@ -20,7 +20,7 @@ window.z ?= {}
 z.calling ?= {}
 
 CALLING_CONFIG =
-  CONFIG_UPDATE_INTERVAL: 30 * 60 # 30 minutes in seconds
+  DEFAULT_UPDATE_INTERVAL: 30 * 60 # 30 minutes in seconds
 
 # Call repository for all calling interactions.
 class z.calling.CallingRepository
@@ -41,7 +41,7 @@ class z.calling.CallingRepository
   ###
   Construct a new Calling repository.
 
-  @param call_service [z.calling.belfry.CallService] Backend REST API call service implementation
+  @param call_service [z.calling.v2.CallService] Backend REST API call service implementation
   @param calling_service [z.calling.CallingService] Backend REST API calling service implementation
   @param conversation_repository [z.conversation.ConversationRepository] Repository for conversation interactions
   @param media_repository [z.media.MediaRepository] Repository for media interactions
@@ -54,13 +54,13 @@ class z.calling.CallingRepository
     @calling_config_timeout = undefined
     @use_v3_api = undefined
 
-    @call_center = new z.calling.belfry.CallCenter @call_service, @conversation_repository, @media_repository, @user_repository
-    @e_call_center = new z.calling.e_call.ECallCenter @calling_config, @conversation_repository, @media_repository, @user_repository
+    @v2_call_center = new z.calling.v2.CallCenter @call_service, @conversation_repository, @media_repository, @user_repository
+    @v3_call_center = new z.calling.v3.CallCenter @calling_config, @conversation_repository, @media_repository, @user_repository
 
     @calls = ko.pureComputed =>
-      return @call_center.calls().concat @e_call_center.e_calls()
+      return @v2_call_center.calls().concat @v3_call_center.e_calls()
     @joined_call = ko.pureComputed =>
-      return @e_call_center.joined_e_call() or @call_center.joined_call()
+      return @v3_call_center.joined_e_call() or @v2_call_center.joined_call()
 
     @remote_media_streams = @media_repository.stream_handler.remote_media_streams
     @self_stream_state = @media_repository.stream_handler.self_stream_state
@@ -79,37 +79,37 @@ class z.calling.CallingRepository
 
   # Subscribe to amplify topics.
   subscribe_to_events: =>
-    amplify.subscribe z.event.WebApp.CALL.MEDIA.TOGGLE, => @switch_call_center z.calling.enum.E_CALL_ACTION.TOGGLE_MEDIA, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.DELETE, => @switch_call_center z.calling.enum.E_CALL_ACTION.DELETE, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.IGNORE, => @switch_call_center z.calling.enum.E_CALL_ACTION.IGNORE, arguments
+    amplify.subscribe z.event.WebApp.CALL.MEDIA.TOGGLE, => @switch_call_center z.calling.enum.CALL_ACTION.TOGGLE_MEDIA, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.DELETE, => @switch_call_center z.calling.enum.CALL_ACTION.DELETE, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.IGNORE, => @switch_call_center z.calling.enum.CALL_ACTION.IGNORE, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.JOIN, @join_call
-    amplify.subscribe z.event.WebApp.CALL.STATE.LEAVE, => @switch_call_center z.calling.enum.E_CALL_ACTION.LEAVE, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, => @switch_call_center z.calling.enum.E_CALL_ACTION.REMOVE_PARTICIPANT, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.LEAVE, => @switch_call_center z.calling.enum.CALL_ACTION.LEAVE, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, => @switch_call_center z.calling.enum.CALL_ACTION.REMOVE_PARTICIPANT, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE, @toggle_state
     amplify.subscribe z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, @store_flow_status
     amplify.subscribe z.event.WebApp.LOADED, @initiate_config
     amplify.subscribe z.util.Logger::LOG_ON_DEBUG, @set_logging
 
   get_call_by_id: (conversation_id) =>
-    @call_center.get_call_by_id conversation_id
+    @v2_call_center.get_call_by_id conversation_id
     .catch (error) =>
-      throw error unless error.type is z.calling.belfry.CallError::TYPE.CALL_NOT_FOUND
-      return @e_call_center.get_e_call_by_id conversation_id
+      throw error unless error.type is z.calling.v2.CallError::TYPE.CALL_NOT_FOUND
+      return @v3_call_center.get_e_call_by_id conversation_id
 
   get_protocol_of_call: (conversation_id) =>
     @get_call_by_id conversation_id
     .then (call) ->
       if call instanceof z.calling.entities.Call
-        return z.calling.enum.PROTOCOL_VERSION.BELFRY
+        return z.calling.enum.PROTOCOL.VERSION_2
       if call instanceof z.calling.entities.ECall
-        return z.calling.enum.PROTOCOL_VERSION.E_CALL
+        return z.calling.enum.PROTOCOL.VERSION_3
 
   outgoing_protocol_version: (conversation_id) =>
     conversation_et = @conversation_repository.get_conversation_by_id conversation_id
     @logger.log "Select outgoing protocol version - 1to1 conversation: #{conversation_et?.is_one2one()}, backend protocol: #{@protocol_version_1to1()}, use_v3_api: #{@use_v3_api}"
-    v3_api_enabled = @use_v3_api is true or (@protocol_version_1to1() is z.calling.enum.PROTOCOL_VERSION.E_CALL and @use_v3_api isnt false)
-    return z.calling.enum.PROTOCOL_VERSION.E_CALL if v3_api_enabled and not conversation_et?.is_group()
-    return z.calling.enum.PROTOCOL_VERSION.BELFRY
+    v3_api_enabled = @use_v3_api is true or (@protocol_version_1to1() is z.calling.enum.PROTOCOL.VERSION_3 and @use_v3_api isnt false)
+    return z.calling.enum.PROTOCOL.VERSION_3 if v3_api_enabled and not conversation_et?.is_group()
+    return z.calling.enum.PROTOCOL.VERSION_2
 
   # Initiate calling config update.
   initiate_config: =>
@@ -120,14 +120,14 @@ class z.calling.CallingRepository
     .then (call_et) ->
       return call_et.state()
     .catch (error) ->
-      throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
       return z.calling.enum.CallState.OUTGOING
     .then (call_state) =>
       if call_state is z.calling.enum.CallState.OUTGOING and not z.calling.CallingRepository.supports_calling()
         return amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_OUTGOING_CALL
       @_check_concurrent_joined_call conversation_id, call_state
       .then =>
-        @switch_call_center z.calling.enum.E_CALL_ACTION.JOIN, [conversation_id, video_send]
+        @switch_call_center z.calling.enum.CALL_ACTION.JOIN, [conversation_id, video_send]
 
   # Forward user action to with a call to the appropriate call center.
   switch_call_center: (fn_name, args) =>
@@ -135,16 +135,16 @@ class z.calling.CallingRepository
 
     @get_protocol_of_call conversation_id
     .catch (error) =>
-      throw error unless error.type is z.calling.e_call.ECallError::TYPE.NOT_FOUND
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
-      if fn_name is z.calling.enum.E_CALL_ACTION.JOIN
+      if fn_name is z.calling.enum.CALL_ACTION.JOIN
         return @outgoing_protocol_version conversation_id
     .then (protocol_version) =>
       switch protocol_version
-        when z.calling.enum.PROTOCOL_VERSION.BELFRY
-          @call_center.state_handler[fn_name].apply @, args
-        when z.calling.enum.PROTOCOL_VERSION.E_CALL
-          @e_call_center[fn_name].apply @, args
+        when z.calling.enum.PROTOCOL.VERSION_2
+          @v2_call_center.state_handler[fn_name].apply @, args
+        when z.calling.enum.PROTOCOL.VERSION_3
+          @v3_call_center[fn_name].apply @, args
 
   ###
   User action to toggle the call state.
@@ -153,7 +153,7 @@ class z.calling.CallingRepository
   ###
   toggle_state: (conversation_id, video_send) =>
     if @_self_client_on_a_call() is conversation_id
-      @switch_call_center z.calling.enum.E_CALL_ACTION.LEAVE, [conversation_id]
+      @switch_call_center z.calling.enum.CALL_ACTION.LEAVE, [conversation_id]
     else
       @join_call conversation_id, video_send
 
@@ -163,7 +163,7 @@ class z.calling.CallingRepository
   ###
   leave_call_on_beforeunload: =>
     conversation_id = @_self_client_on_a_call()
-    @switch_call_center z.calling.enum.E_CALL_ACTION.LEAVE, [conversation_id] if conversation_id
+    @switch_call_center z.calling.enum.CALL_ACTION.LEAVE, [conversation_id] if conversation_id
 
   ###
   Check whether we are actively participating in a call.
@@ -184,7 +184,7 @@ class z.calling.CallingRepository
           close: ->
             amplify.publish z.event.WebApp.CALL.STATE.IGNORE, new_call_id if call_state is z.calling.enum.CallState.INCOMING
           data: call_state
-        @logger.warn 'You cannot participate in a second call while on another one.'
+        @logger.warn "You cannot join a second call while calling in conversation '#{ongoing_call_id}'."
       else
         resolve()
 
@@ -211,7 +211,7 @@ class z.calling.CallingRepository
   _update_calling_config: ->
     @calling_service.get_config()
     .then (calling_config) =>
-      timeout_in_seconds = calling_config.ttl or CALLING_CONFIG.CONFIG_UPDATE_INTERVAL
+      timeout_in_seconds = calling_config.ttl or CALLING_CONFIG.DEFAULT_UPDATE_INTERVAL
       @logger.info "Updated calling configuration - next update in #{timeout_in_seconds}s", calling_config
       @calling_config calling_config
       window.clearTimeout @calling_config_timeout if @calling_config_timeout

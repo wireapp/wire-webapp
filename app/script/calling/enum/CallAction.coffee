@@ -20,7 +20,7 @@ window.z ?= {}
 z.calling ?= {}
 z.calling.enum ?= {}
 
-z.calling.enum.E_CALL_ACTION =
+z.calling.enum.CALL_ACTION =
   DELETE: 'delete_call'
   IGNORE: 'ignore_call'
   JOIN: 'join_call'

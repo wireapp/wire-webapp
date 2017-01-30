@@ -18,7 +18,7 @@
 
 window.z ?= {}
 z.calling ?= {}
-z.calling.belfry ?= {}
+z.calling.v2 ?= {}
 
 CONFIG =
   SUPPORTED_CALL_EVENTS: [
@@ -34,20 +34,20 @@ CONFIG =
   ]
 
 # Call center for all call interactions with the call service.
-class z.calling.belfry.CallCenter
+class z.calling.v2.CallCenter
   ###
   Construct a new call center.
 
-  @param call_service [z.calling.belfry.CallService] Backend REST API call service implementation
+  @param call_service [z.calling.v2.CallService] Backend REST API call service implementation
   @param conversation_repository [z.conversation.ConversationRepository] Repository for conversation interactions
   @param media_repository [z.media.MediaRepository] Repository for media interactions
   @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
   ###
   constructor: (@call_service, @conversation_repository, @media_repository, @user_repository) ->
-    @logger = new z.util.Logger 'z.calling.belfry.CallCenter', z.config.LOGGER.OPTIONS
+    @logger = new z.util.Logger 'z.calling.v2.CallCenter', z.config.LOGGER.OPTIONS
 
     # Telemetry
-    @telemetry = new z.telemetry.calling.CallTelemetry z.calling.enum.PROTOCOL_VERSION.BELFRY
+    @telemetry = new z.telemetry.calling.CallTelemetry z.calling.enum.PROTOCOL.VERSION_2
     @timings = undefined
 
     # Media Handler
@@ -152,8 +152,8 @@ class z.calling.belfry.CallCenter
       if conversation_id
         for call_et in @calls() when call_et.id is conversation_id
           return call_et
-        throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.CALL_NOT_FOUND
-      throw new z.calling.belfry.CallError z.calling.belfry.CallError::TYPE.NO_CONVERSATION_ID
+        throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.CALL_NOT_FOUND
+      throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.NO_CONVERSATION_ID
 
   ###
   Helper to identify the creator of a call or choose the first joined one.

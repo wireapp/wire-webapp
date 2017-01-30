@@ -18,9 +18,9 @@
 
 window.z ?= {}
 z.calling ?= {}
-z.calling.belfry ?= {}
+z.calling.v2 ?= {}
 
-class z.calling.belfry.CallTrackingInfo
+class z.calling.v2.CallTrackingInfo
   constructor: (params) ->
     @conversation_id = params.conversation_id
     @session_id = params.session_id

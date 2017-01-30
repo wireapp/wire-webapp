@@ -53,7 +53,7 @@ class z.main.App
 
     service.asset                   = new z.assets.AssetService @auth.client
     service.bot                     = new z.bot.BotService()
-    service.call                    = new z.calling.belfry.CallService @auth.client
+    service.call                    = new z.calling.v2.CallService @auth.client
     service.calling                 = new z.calling.CallingService @auth.client
     service.connect                 = new z.connect.ConnectService @auth.client
     service.connect_google          = new z.connect.ConnectGoogleService @auth.client

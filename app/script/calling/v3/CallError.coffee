@@ -18,26 +18,26 @@
 
 window.z ?= {}
 z.calling ?= {}
-z.calling.e_call ?= {}
+z.calling.v3 ?= {}
 
-class z.calling.e_call.ECallError
+class z.calling.v3.CallError
   constructor: (type, message) ->
     @name = @constructor.name
     @stack = (new Error()).stack
-    @type = type or z.calling.e_call.ECallError::TYPE.UNKNOWN
+    @type = type or z.calling.v3.CallError::TYPE.UNKNOWN
 
     @message = message or switch @type
-      when z.calling.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED
+      when z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED
         'E-call has not yet established data channel'
-      when z.calling.e_call.ECallError::TYPE.NO_CONVERSATION_ID
+      when z.calling.v3.CallError::TYPE.NO_CONVERSATION_ID
         'No conversation ID given'
-      when z.calling.e_call.ECallError::TYPE.NOT_FOUND
+      when z.calling.v3.CallError::TYPE.NOT_FOUND
         'No e-call for conversation ID found'
-      when z.calling.e_call.ECallError::TYPE.UNKNOWN_EVENT_TYPE
+      when z.calling.v3.CallError::TYPE.UNKNOWN_EVENT_TYPE
         'E-call event of unknown type was ignored'
-      when z.calling.e_call.ECallError::TYPE.UNSUPPORTED_VERSION
+      when z.calling.v3.CallError::TYPE.UNSUPPORTED_VERSION
         'Unsupported version of the e-call protocol'
-      when z.calling.e_call.ECallError::TYPE.WRONG_PAYLOAD_FORMAT
+      when z.calling.v3.CallError::TYPE.WRONG_PAYLOAD_FORMAT
         'Payload for an e-call message is in wrong format'
       else
         'Unknown ECallError'
@@ -45,10 +45,10 @@ class z.calling.e_call.ECallError
   @:: = new Error()
   @::constructor = @
   @::TYPE =
-    DATA_CHANNEL_NOT_OPENED: 'z.calling.e_call.ECallError::TYPE.DATA_CHANNEL_NOT_OPENED'
-    NO_CONVERSATION_ID: 'z.calling.e_call.ECallError::TYPE.NO_CONVERSATION_ID'
-    NOT_FOUND: 'z.calling.e_call.ECallError::TYPE.NOT_FOUND'
-    UNKNOWN: 'z.calling.e_call.ECallError::TYPE.UNKNOWN'
-    UNKNOWN_EVENT_TYPE: 'z.calling.e_call.ECallError::TYPE.UNKNOWN_EVENT_TYPE'
-    UNSUPPORTED_VERSION: 'z.calling.e_call.ECallError::TYPE.UNSUPPORTED_VERSION'
-    WRONG_PAYLOAD_FORMAT: 'z.calling.e_call.ECallError::TYPE.WRONG_PAYLOAD_FORMAT'
+    DATA_CHANNEL_NOT_OPENED: 'z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED'
+    NO_CONVERSATION_ID: 'z.calling.v3.CallError::TYPE.NO_CONVERSATION_ID'
+    NOT_FOUND: 'z.calling.v3.CallError::TYPE.NOT_FOUND'
+    UNKNOWN: 'z.calling.v3.CallError::TYPE.UNKNOWN'
+    UNKNOWN_EVENT_TYPE: 'z.calling.v3.CallError::TYPE.UNKNOWN_EVENT_TYPE'
+    UNSUPPORTED_VERSION: 'z.calling.v3.CallError::TYPE.UNSUPPORTED_VERSION'
+    WRONG_PAYLOAD_FORMAT: 'z.calling.v3.CallError::TYPE.WRONG_PAYLOAD_FORMAT'
