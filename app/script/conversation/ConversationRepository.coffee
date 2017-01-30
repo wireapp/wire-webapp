@@ -1886,8 +1886,9 @@ class z.conversation.ConversationRepository
 
     @update_participating_user_ets conversation_et, =>
       @_add_event_to_conversation event_json, conversation_et
-      .then (message_et) ->
+      .then (message_et) =>
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
+        @verification_state_handler.on_member_joined conversation_et, event_json.data.user_ids
 
   ###
   Members of a group conversation were removed or left.
@@ -1911,8 +1912,9 @@ class z.conversation.ConversationRepository
         if conversation_et.call()
           amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id
 
-      @update_participating_user_ets conversation_et, ->
+      @update_participating_user_ets conversation_et, =>
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
+        @verification_state_handler.on_member_left conversation_et, message_et.user_ids()
 
   ###
   Membership properties for a conversation were updated.
@@ -2271,7 +2273,7 @@ class z.conversation.ConversationRepository
 
       return Promise.all @_map_user_client_map user_client_map, _add_missing_client
     .then =>
-      @on_client_add Object.keys(user_client_map)
+      @verification_state_handler.on_client_add Object.keys(user_client_map)
     .then ->
       return payload
 

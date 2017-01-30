@@ -24,42 +24,103 @@ class z.conversation.ConversationVerificationStateHandler
   constructor: (@conversation_repository) ->
     @logger = new z.util.Logger 'z.conversation.ConversationVerificationStateHandler', z.config.LOGGER.OPTIONS
 
-    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_client_add, 11
-    amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @on_client_removed, 11
-    amplify.subscribe z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @on_verification_state_changed
+    amplify.subscribe z.event.WebApp.USER.CLIENT_ADDED, @on_client_add
+    amplify.subscribe z.event.WebApp.USER.CLIENT_REMOVED, @on_client_removed
+    amplify.subscribe z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, @on_client_verification_changed
 
   ###
-  Handle conversation verification state change.
-  @param conversation_et [z.entity.Conversation]
+  Handle client verification state change.
+  @param user_id [String] Self user
+  @param client_id [String]
+  @param is_verified [Boolean]
   ###
-  on_verification_state_changed: (conversation_et) ->
-    if conversation_et.verification_state() is z.conversation.ConversationVerificationState.VERIFIED
-      amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
+  on_client_verification_changed: (user_id, client_id, is_verified) =>
+    @_get_active_conversations().forEach (conversation_et) =>
+      if @_will_change_to_degraded conversation_et
+        @logger.log 'Unverified client'
+      else if @_will_change_to_verified conversation_et
+        amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
 
   ###
-  Add new device message to conversations.
-  @param user_ids [String|Array]
+  Self user added a client or we got new clients for other participants
   ###
   on_client_add: (user_ids) =>
     if _.isString user_ids
       user_ids = [user_ids]
 
-    if not user_ids?.length > 0
-      throw new TypeError 'Failed to add new device message because of missing user ids'
-
-    valid_conversation_ets = @conversation_repository.filtered_conversations()
-    .filter (conversation_et) ->
-      not conversation_et.removed_from_conversation()
-    .filter (conversation_et) ->
-      conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
-
-    if valid_conversation_ets.length is 0
-      return @logger.info 'No conversation found to add new device message'
-
-    for conversation_et in valid_conversation_ets
+    @_get_active_conversations().filter (conversation_et) =>
+      return @_will_change_to_degraded conversation_et
+    .forEach (conversation_et) ->
       user_ids_in_conversation = _.intersection user_ids, conversation_et.participating_user_ids().concat conversation_et.self.id
       if user_ids_in_conversation.length
         amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_new_device conversation_et, user_ids_in_conversation
 
-  on_client_removed: ->
-    LOG 'client removed'
+  ###
+  Self user removed a client.
+  ###
+  on_client_removed: =>
+    @_get_active_conversations().forEach (conversation_et) =>
+      if @_will_change_to_verified conversation_et
+        amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
+
+  ###
+  New member(s) joined the conversation
+  @param conversation_et [z.entity.Conversation]
+  @param user_ids [Array]
+  ###
+  on_member_joined: (conversation_et, user_ids) ->
+    if @_will_change_to_degraded conversation_et
+      @logger.log "Degraded because of #{user_ids}" # which message?
+
+  ###
+  Member(s) left the conversation
+  @param conversation_et [z.entity.Conversation]
+  ###
+  on_member_left: (conversation_et) ->
+    if @_will_change_to_verified conversation_et
+      amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
+
+  ###
+  New conversation was created
+  @param conversation_et [z.entity.Conversation]
+  ###
+  on_conversation_created: (conversation_et) ->
+    if @_will_change_to_verified conversation_et
+      amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
+
+  ###
+  Get all conversation where self user is active
+  ###
+  _get_active_conversations: =>
+    @conversation_repository.filtered_conversations().filter (conversation_et) ->
+      not conversation_et.removed_from_conversation()
+
+  ###
+  Check whether to degrade conversation and set corresponding state
+  @param conversation_et [z.entity.Conversation]
+  ###
+  _will_change_to_degraded: (conversation_et) ->
+    state = conversation_et.verification_state()
+
+    if state is z.conversation.ConversationVerificationState.DEGRADED
+      return false
+
+    if state is z.conversation.ConversationVerificationState.VERIFIED and not conversation_et.is_verified()
+      conversation_et.verification_state z.conversation.ConversationVerificationState.DEGRADED
+      return true
+
+    return false
+
+  ###
+  Check whether to verify conversation and set corresponding state
+  @param conversation_et [z.entity.Conversation]
+  ###
+  _will_change_to_verified: (conversation_et) ->
+    if conversation_et.verification_state() is z.conversation.ConversationVerificationState.VERIFIED
+      return false
+
+    if conversation_et.is_verified()
+      conversation_et.verification_state z.conversation.ConversationVerificationState.VERIFIED
+      return true
+
+    return false
