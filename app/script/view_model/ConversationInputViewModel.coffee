@@ -70,9 +70,6 @@ class z.ViewModel.ConversationInputViewModel
     @has_text_input = ko.pureComputed =>
       return @conversation_et()?.input().length > 0
 
-    @show_giphy_button = ko.pureComputed =>
-      return @has_text_input() and @conversation_et()?.input().length <= 15
-
     @input = ko.pureComputed
       read: =>
         if @is_editing() then @edit_input() else @conversation_et()?.input?() or ''
