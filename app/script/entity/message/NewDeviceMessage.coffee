@@ -30,7 +30,7 @@ class z.entity.NewDeviceMessage extends z.entity.Message
     @user_ids = ko.observableArray()
 
     @is_self_device = ko.pureComputed =>
-      return @user_ids().length is 1 and @user_ids()[0].id is @user().id
+      return @user_ids().length is 1 and @user_ids()[0] is @user().id
 
     @caption_user = ko.pureComputed =>
       return z.util.LocalizerUtil.join_names @user_ets(), z.string.Declension.NOMINATIVE
