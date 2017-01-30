@@ -31,6 +31,9 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
   user_a = undefined
   user_b = undefined
 
+  client_a = undefined
+  client_b = undefined
+
   beforeEach (done) ->
     test_factory.exposeConversationActors()
     .then (_conversation_repository) ->
@@ -159,3 +162,13 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
       expect(conversation_ab.is_verified()).toBeTruthy()
       expect(z.conversation.EventBuilder.build_degraded).not.toHaveBeenCalled()
+
+  describe 'on_client_verification_changed', ->
+
+    it 'should change state to DEGRADED if user unverified client', ->
+      client_a.meta.is_verified false
+
+      state_handler.on_client_verification_changed user_a.id, client_a.id
+      expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
+      expect(conversation_b.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
+      expect(conversation_ab.is_verified()).toBeFalsy()
