@@ -658,7 +658,7 @@ class z.ViewModel.AuthViewModel
   clicked_on_manage_devices: =>
     @device_modal ?= new zeta.webapp.module.Modal '#modal-limit'
     if @device_modal.is_hidden()
-      @client_repository.get_clients_for_self false
+      @client_repository.get_clients_for_self()
     @device_modal.toggle()
 
   close_model_manage_devices: => @device_modal.toggle()
