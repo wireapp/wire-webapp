@@ -438,13 +438,15 @@ class z.main.App
       @logger.warn 'No internet access. Continuing when internet connectivity regained.'
       $(window).on 'online', -> _logout_on_backend()
 
-  refresh: ->
-    if z.util.Environment.electron and z.util.Environment.os.win
-      amplify.publish z.event.WebApp.LIFECYCLE.RESTART
-    window.location.reload true
-    window.focus()
+  refresh: =>
+    if z.util.Environment.electron
+      amplify.publish z.event.WebApp.LIFECYCLE.RESTART, @update_source
+    if @update_source is z.announce.UPDATE_SOURCE.WEBAPP
+      window.location.reload true
+      window.focus()
 
-  update: ->
+  update: (update_source) =>
+    @update_source update_source
     amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.LIFECYCLE_UPDATE
 
   # Redirect to the login page after internet connectivity has been verified.
