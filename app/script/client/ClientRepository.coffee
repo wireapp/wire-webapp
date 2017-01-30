@@ -208,9 +208,10 @@ class z.client.ClientRepository
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         error_message = "Local client '#{client_et.id}' (#{client_et.type}) no longer exists on the backend"
         @logger.warn error_message, error
-        deletion_promise = @_purge_data_on_removed_client client_et
-
-        deletion_promise.catch (error) =>
+        if client_et.is_temporary()
+          return @cryptography_repository.storage_repository.delete_everything()
+        return @cryptography_repository.storage_repository.delete_cryptography()
+        .catch (error) =>
           @logger.error "Deleting crypto database after failed client validation unsuccessful: #{error.message}", error
           throw new z.client.ClientError z.client.ClientError::TYPE.DATABASE_FAILURE
         .then ->
@@ -551,11 +552,6 @@ class z.client.ClientRepository
     throw new z.client.ClientError z.client.ClientError::TYPE.NO_CLIENT_ID if not client_id
     return user_id is @self_user().id and client_id is @current_client().id
 
-  _purge_data_on_removed_client: (client_et) ->
-    if client_et.is_temporary()
-      return @cryptography_repository.storage_repository.delete_everything()
-    return @cryptography_repository.storage_repository.delete_cryptography()
-
 
   ###############################################################################
   # Conversation Events
@@ -579,7 +575,7 @@ class z.client.ClientRepository
     return if not client_id
 
     if client_id is @current_client().id
-      @_purge_data_on_removed_client @current_client()
-      amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReasion.CLIENT_REMOVED
-    else
-      amplify.publish z.event.WebApp.CLIENT.REMOVE, @self_user().id, client_id
+      return @cryptography_repository.storage_repository.delete_cryptography()
+      .then =>
+        amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReasion.CLIENT_REMOVED, @current_client().is_temporary()
+    amplify.publish z.event.WebApp.CLIENT.REMOVE, @self_user().id, client_id
