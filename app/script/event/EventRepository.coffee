@@ -393,7 +393,7 @@ class z.event.EventRepository
             error_code = z.cryptography.CryptographyErrorType.INVALID_SIGNATURE
 
           @_report_decrypt_error event, decrypt_error, error_code
-          return @_map_error_message event, decrypt_error, error_code
+          return z.conversation.EventBuilder.build_unable_to_decrypt event, decrypt_error, error_code
       else
         return event
     .then (mapped_event) =>
