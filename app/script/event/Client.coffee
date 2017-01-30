@@ -33,6 +33,6 @@ z.event.Client =
     LOCATION: 'conversation.location'
     MESSAGE_DELETE: 'conversation.message-delete'
     MESSAGE_HIDDEN: 'conversation.message-hidden'
-    NEW_DEVICE: 'conversation.new-device'
+    DEGRADED: 'conversation.degraded'
     REACTION: 'conversation.reaction'
     UNABLE_TO_DECRYPT: 'conversation.unable-to-decrypt'

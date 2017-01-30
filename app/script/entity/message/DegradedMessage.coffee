@@ -19,11 +19,11 @@
 window.z ?= {}
 z.entity ?= {}
 
-class z.entity.NewDeviceMessage extends z.entity.Message
+class z.entity.DegradedMessage extends z.entity.Message
 
   constructor: ->
     super()
-    @super_type = z.message.SuperType.NEW_DEVICE
+    @super_type = z.message.SuperType.DEGRADED
     @should_effect_conversation_timestamp = false
 
     @user_ets = ko.observableArray()

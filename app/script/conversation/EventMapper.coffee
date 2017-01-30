@@ -84,8 +84,8 @@ class z.conversation.EventMapper
         message_et = @_map_system_event_delete_everywhere event
       when z.event.Client.CONVERSATION.LOCATION
         message_et = @_map_event_location event
-      when z.event.Client.CONVERSATION.NEW_DEVICE
-        message_et = @_map_new_device event
+      when z.event.Client.CONVERSATION.DEGRADED
+        message_et = @_map_degraded event
       when z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
         message_et = @_map_system_event_unable_to_decrypt event
       else
@@ -129,8 +129,8 @@ class z.conversation.EventMapper
 
   @return [z.entity.NewDeviceMessage] Normal message entity
   ###
-  _map_new_device: (event) ->
-    message_et = new z.entity.NewDeviceMessage()
+  _map_degraded: (event) ->
+    message_et = new z.entity.DegradedMessage()
     message_et.user_ids event.data.user_ids
     return message_et
 

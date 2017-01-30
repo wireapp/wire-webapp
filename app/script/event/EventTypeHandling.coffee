@@ -50,6 +50,6 @@ z.event.EventTypeHandling =
     z.event.Client.CONVERSATION.ASSET_META
     z.event.Client.CONVERSATION.DELETE_EVERYWHERE
     z.event.Client.CONVERSATION.LOCATION
-    z.event.Client.CONVERSATION.NEW_DEVICE
+    z.event.Client.CONVERSATION.DEGRADED
     z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
   ]
