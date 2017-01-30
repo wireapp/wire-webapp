@@ -187,7 +187,7 @@ class z.cryptography.CryptographyRepository
       user_client_map_for_missing_sessions = {}
 
       future_cipher_payloads.forEach ([session_id, ciphertext]) ->
-        [user_id, client_id] = z.client.Client.dismantle_user_client_id session_id
+        {user_id, client_id} = z.client.Client.dismantle_user_client_id session_id
         if ciphertext
           payload.recipients[user_id][client_id] = ciphertext
         else
@@ -197,7 +197,7 @@ class z.cryptography.CryptographyRepository
       return @_encrypt_generic_message_for_new_sessions user_client_map_for_missing_sessions, generic_message
     .then (additional_cipher_payloads) ->
       additional_cipher_payloads.forEach ([session_id, ciphertext]) ->
-        [user_id, client_id] = z.client.Client.dismantle_user_client_id session_id
+        {user_id, client_id} = z.client.Client.dismantle_user_client_id session_id
         payload.recipients[user_id] ?= {}
         payload.recipients[user_id][client_id] = ciphertext
       return payload
