@@ -461,7 +461,7 @@ class z.ViewModel.list.StartUIViewModel
     if @selected_people().length is 1
       return @conversation_repository.get_one_to_one_conversation @selected_people()[0]
       .then (conversation_et) =>
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_ONE_TO_ONE_CONVERSATION,
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION,
           source: 'top_user'
         @click_on_group conversation_et
         callback conversation_et if _.isFunction callback
