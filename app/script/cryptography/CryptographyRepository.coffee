@@ -47,16 +47,12 @@ class z.cryptography.CryptographyRepository
       @cryptobox = new window.cryptobox.Cryptobox cryptobox_store, 2
       return @cryptobox.init()
     .then =>
-      config =
-        channel: cryptobox.Cryptobox.prototype.CHANNEL_CRYPTOBOX
-        topic: cryptobox.Cryptobox.prototype.TOPIC_NEW_PREKEYS
-        callback: (data) =>
-          @logger.log "Received '#{data.length}' new PreKeys."
-          serialized_prekeys = data.map (pre_key) =>
-            return @cryptobox.serialize_prekey pre_key
-            # TODO: Upload PreKeys to backend
+      @cryptobox.on cryptobox.Cryptobox.prototype.TOPIC_NEW_PREKEYS, (data) =>
+        serialized_prekeys = data.map (pre_key) =>
+          return @cryptobox.serialize_prekey pre_key
+        # TODO: Upload PreKeys to backend
+        @logger.log "Received '#{data.length}' new PreKeys.", serialized_prekeys
 
-      postal.subscribe config
       return @
 
   ###
