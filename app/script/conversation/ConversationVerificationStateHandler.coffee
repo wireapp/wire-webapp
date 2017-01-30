@@ -43,6 +43,7 @@ class z.conversation.ConversationVerificationStateHandler
 
   ###
   Self user added a client or we got new clients for other participants
+  @param user_ids [String|Array] can include self user
   ###
   on_client_add: (user_ids) =>
     if _.isString user_ids
