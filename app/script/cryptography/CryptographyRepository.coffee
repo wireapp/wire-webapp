@@ -182,22 +182,24 @@ class z.cryptography.CryptographyRepository
 
     @logger.log "Encrypting message of type '#{generic_message.content}' for '#{Object.keys(payload.recipients).length}' users.", payload.recipients
 
-    z.util.PromiseUtil.execute_all future_cipher_payloads
+    Promise.all future_cipher_payloads
     .then (future_cipher_payloads) =>
       user_client_map_for_missing_sessions = {}
 
-      future_cipher_payloads.results.forEach (result) ->
-        if result.encrypted
-          payload.recipients[result.user_id][result.client_id] = result.encrypted
+      future_cipher_payloads.forEach ([session_id, ciphertext]) ->
+        [user_id, client_id] = z.client.Client.dismantle_user_client_id session_id
+        if ciphertext
+          payload.recipients[user_id][client_id] = ciphertext
         else
-          user_client_map_for_missing_sessions[result.user_id] ?= []
-          user_client_map_for_missing_sessions[result.user_id].push result.client_id
+          user_client_map_for_missing_sessions[user_id] ?= []
+          user_client_map_for_missing_sessions[user_id].push client_id
 
       return @_encrypt_generic_message_for_new_sessions user_client_map_for_missing_sessions, generic_message
     .then (additional_cipher_payloads) ->
-      additional_cipher_payloads.forEach (result) ->
-        payload.recipients[result.user_id] ?= {}
-        payload.recipients[result.user_id][result.client_id] = result.encrypted
+      additional_cipher_payloads.forEach ([session_id, ciphertext]) ->
+        [user_id, client_id] = z.client.Client.dismantle_user_client_id session_id
+        payload.recipients[user_id] ?= {}
+        payload.recipients[user_id][client_id] = ciphertext
       return payload
 
   _session_from_encoded_prekey_payload: (remote_pre_key, user_id, client_id) =>
@@ -254,19 +256,17 @@ class z.cryptography.CryptographyRepository
   ###
   _encrypt_payload_for_session: (session_id, generic_message) ->
     return Promise.resolve().then =>
-      values = z.client.Client.dismantle_user_client_id session_id
       @cryptobox.encrypt session_id, generic_message.toArrayBuffer()
       .then (generic_message_encrypted) ->
-        values.encrypted = z.util.array_to_base64 generic_message_encrypted
-        return values
+        ciphertext = z.util.array_to_base64 generic_message_encrypted
+        return [session_id, ciphertext]
       .catch (error) =>
         if error instanceof cryptobox.store.RecordNotFoundError
           @logger.log "Session '#{session_id}' needs to get initialized..."
-          return values
+          return [session_id, undefined ]
         else
           @logger.warn "Failed encrypting '#{generic_message.content}' message for session '#{session_id}': #{error.message}", error
-          values.encrypted = '💣'
-          return values
+          return [session_id, '💣']
 
   ###
   @return [cryptobox.CryptoboxSession, z.proto.GenericMessage] Cryptobox session along with the decrypted message in ProtocolBuffer format
