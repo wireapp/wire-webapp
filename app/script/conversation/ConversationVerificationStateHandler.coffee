@@ -70,6 +70,9 @@ class z.conversation.ConversationVerificationStateHandler
   @param user_ids [Array]
   ###
   on_member_joined: (conversation_et, user_ids) ->
+    if _.isString user_ids
+      user_ids = [user_ids]
+
     if @_will_change_to_degraded conversation_et
       # TODO Person joined
       amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_new_device conversation_et, user_ids

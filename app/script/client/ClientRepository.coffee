@@ -142,11 +142,9 @@ class z.client.ClientRepository
   ###
   Change verification state of client.
 
-  @todo Merge "meta" property before updating it, Object.assign(payload.meta, changes.meta)
   @param user_id [String] User ID of the client owner
   @param client_et [z.client.Clients] Client which needs to get updated
-  @param changes [String] New values which should be updated on the client
-  @return [Integer] Number of updated records
+  @param is_verified [Boolean] New state to apply
   ###
   verify_client: (user_id, client_et, is_verified) =>
     @update_client_in_db user_id, client_et.id, {meta: is_verified: is_verified}

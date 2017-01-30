@@ -148,49 +148,6 @@ describe 'Conversation', ->
 
       expect(conversation_et.is_verified()).toBeTruthy()
 
-
-  describe 'verification_state', ->
-
-    verified_conversation_et = undefined
-
-    beforeEach ->
-      verified_conversation_et = new z.entity.Conversation()
-
-      verified_client_et = new z.client.Client()
-      verified_client_et.meta.is_verified true
-
-      self_user_et = new z.entity.User()
-      self_user_et.is_me = true
-      verified_conversation_et.self = self_user_et
-
-      user_et = new z.entity.User()
-      user_et.devices.push verified_client_et
-      verified_conversation_et.participating_user_ets.push user_et
-
-    it 'state should be VERIFIED when all clients are verified', ->
-      expect(verified_conversation_et.is_verified()).toBeTruthy()
-      expect(verified_conversation_et.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
-
-    it 'state should change from VERIFIED to DEGRADED if new client gets added', ->
-      expect(verified_conversation_et.is_verified()).toBeTruthy()
-      expect(verified_conversation_et.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
-
-      verified_conversation_et.participating_user_ets()[0].devices.push new z.client.Client()
-
-      expect(verified_conversation_et.is_verified()).toBeFalsy()
-      expect(verified_conversation_et.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
-
-    it 'state should change from VERIFIED to DEGRADED if new user gets added', ->
-      expect(verified_conversation_et.is_verified()).toBeTruthy()
-      expect(verified_conversation_et.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
-
-      new_user_et = new z.entity.User()
-      new_user_et.devices.push new z.client.Client()
-      verified_conversation_et.participating_user_ets.push new_user_et
-
-      expect(verified_conversation_et.is_verified()).toBeFalsy()
-      expect(verified_conversation_et.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
-
   describe 'unread_type', ->
     beforeEach ->
       last_read_timestamp = Date.now() - 1000
