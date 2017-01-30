@@ -39,9 +39,6 @@ class z.entity.DegradedMessage extends z.entity.Message
       return z.localization.Localizer.get_text z.string.conversation_device_started_using_you if @is_self_device()
       return z.localization.Localizer.get_text z.string.conversation_device_started_using
 
-    @caption_device = ko.pureComputed ->
-      return z.localization.Localizer.get_text z.string.conversation_device_a_new_device
-
   click_on_device: =>
     if @is_self_device()
       amplify.publish z.event.WebApp.PREFERENCES.MANAGE_DEVICES

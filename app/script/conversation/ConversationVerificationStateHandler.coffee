@@ -54,7 +54,8 @@ class z.conversation.ConversationVerificationStateHandler
     .forEach (conversation_et) ->
       user_ids_in_conversation = _.intersection user_ids, conversation_et.participating_user_ids().concat conversation_et.self.id
       if user_ids_in_conversation.length
-        amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_new_device conversation_et, user_ids_in_conversation
+        event = z.conversation.EventBuilder.build_degraded conversation_et, user_ids, z.message.DegradedMessageType.NEW_DEVICE
+        amplify.publish z.event.WebApp.EVENT.INJECT, event
 
   ###
   Self user removed a client.
@@ -74,8 +75,8 @@ class z.conversation.ConversationVerificationStateHandler
       user_ids = [user_ids]
 
     if @_will_change_to_degraded conversation_et
-      # TODO Person joined
-      amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_new_device conversation_et, user_ids
+      event = z.conversation.EventBuilder.build_degraded conversation_et, user_ids, z.message.DegradedMessageType.NEW_MEMBER
+      amplify.publish z.event.WebApp.EVENT.INJECT, event
 
   ###
   Member(s) left the conversation

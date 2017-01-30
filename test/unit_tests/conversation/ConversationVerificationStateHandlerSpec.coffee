@@ -80,7 +80,7 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       expect(conversation_b.is_verified()).toBeTruthy()
 
     it 'should change state to DEGRADED if new unverified client was added', ->
-      spyOn z.conversation.EventBuilder, 'build_new_device'
+      spyOn z.conversation.EventBuilder, 'build_degraded'
 
       new_client_b = new z.client.Client()
       new_client_b.meta.is_verified false
@@ -90,10 +90,10 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
       expect(conversation_b.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
       expect(conversation_ab.is_verified()).toBeFalsy()
-      expect(z.conversation.EventBuilder.build_new_device.calls.count()).toEqual 2
+      expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual 2
 
     it 'should not change state if new verified client was added', ->
-      spyOn z.conversation.EventBuilder, 'build_new_device'
+      spyOn z.conversation.EventBuilder, 'build_degraded'
 
       new_client_b = new z.client.Client()
       new_client_b.meta.is_verified true
@@ -102,7 +102,7 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       state_handler.on_client_add user_b.id
       expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
       expect(conversation_ab.is_verified()).toBeTruthy()
-      expect(z.conversation.EventBuilder.build_new_device).not.toHaveBeenCalled()
+      expect(z.conversation.EventBuilder.build_degraded).not.toHaveBeenCalled()
 
     it 'should change state to DEGRADED if new user with unverified client was added to conversation', ->
       spyOn z.conversation.EventBuilder, 'build_new_device'
@@ -122,7 +122,7 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       expect(z.conversation.EventBuilder.build_new_device.calls.count()).toEqual 1
 
     it 'should not change state if new user with verified client was added to conversation', ->
-      spyOn z.conversation.EventBuilder, 'build_new_device'
+      spyOn z.conversation.EventBuilder, 'build_degraded'
 
       new_user = new z.entity.User z.util.create_random_uuid()
       new_client_b = new z.client.Client()
@@ -136,4 +136,4 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
 
       expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
       expect(conversation_ab.is_verified()).toBeTruthy()
-      expect(z.conversation.EventBuilder.build_new_device).not.toHaveBeenCalled()
+      expect(z.conversation.EventBuilder.build_degraded).not.toHaveBeenCalled()
