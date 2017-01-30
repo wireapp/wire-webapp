@@ -71,7 +71,8 @@ class z.conversation.ConversationVerificationStateHandler
   ###
   on_member_joined: (conversation_et, user_ids) ->
     if @_will_change_to_degraded conversation_et
-      @logger.log "Degraded because of #{user_ids}" # which message?
+      # TODO Person joined
+      amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_new_device conversation_et, user_ids
 
   ###
   Member(s) left the conversation
