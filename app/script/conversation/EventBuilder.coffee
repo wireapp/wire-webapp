@@ -28,16 +28,17 @@ z.conversation.EventBuilder = do ->
     from: conversation_et.self.id
     time: new Date().toISOString()
 
-  build_degraded = (conversation_et, user_ids) ->
+  build_degraded = (conversation_et, user_ids, type) ->
     conversation: conversation_et.id
     id: z.util.create_random_uuid()
     type: z.event.Client.CONVERSATION.DEGRADED
     from: conversation_et.self.id
     time: new Date().toISOString()
     data:
+      type: type
       user_ids: user_ids
 
   return {
     build_all_verified: build_all_verified
-  build_degraded: build_degraded
+    build_degraded: build_degraded
   }
