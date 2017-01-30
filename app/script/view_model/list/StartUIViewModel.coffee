@@ -483,16 +483,16 @@ class z.ViewModel.list.StartUIViewModel
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
         amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, false
-      , 1000
+      , 500
 
   on_video_call: =>
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
         amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, true
-      , 1000
+      , 500
 
   on_photo: (images) =>
     @on_submit_search ->
       window.setTimeout ->
         amplify.publish z.event.WebApp.CONVERSATION.IMAGE.SEND, images
-      , 1000
+      , 500
