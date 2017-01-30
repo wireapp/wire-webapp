@@ -42,26 +42,24 @@ class z.conversation.ConversationVerificationStateHandler
         amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
 
   ###
-  Self user added a client or we got new clients for other participants
+  Self user added a client or other participants added clients.
   @param user_ids [String|Array] can include self user
   ###
   on_client_add: (user_ids) =>
     if _.isString user_ids
       user_ids = [user_ids]
 
-    @_get_active_conversations().filter (conversation_et) =>
-      return @_will_change_to_degraded conversation_et
-    .forEach (conversation_et) ->
-      user_ids_in_conversation = _.intersection user_ids, conversation_et.participating_user_ids().concat conversation_et.self.id
-      if user_ids_in_conversation.length
-        event = z.conversation.EventBuilder.build_degraded conversation_et, user_ids, z.message.DegradedMessageType.NEW_DEVICE
-        amplify.publish z.event.WebApp.EVENT.INJECT, event
+    @_get_active_conversations().forEach (conversation_et) =>
+      if @_will_change_to_degraded conversation_et
+        user_ids_in_conversation = _.intersection user_ids, conversation_et.participating_user_ids().concat conversation_et.self.id
+        if user_ids_in_conversation.length
+          event = z.conversation.EventBuilder.build_degraded conversation_et, user_ids, z.message.DegradedMessageType.NEW_DEVICE
+          amplify.publish z.event.WebApp.EVENT.INJECT, event
 
   ###
-  Self user removed a client.
+  Self user removed a client or other participants deleted clients.
   ###
   on_client_removed: =>
-    # TODO handle remote clients
     @_get_active_conversations().forEach (conversation_et) =>
       if @_will_change_to_verified conversation_et
         amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et

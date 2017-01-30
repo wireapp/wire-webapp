@@ -2245,6 +2245,8 @@ class z.conversation.ConversationRepository
         delete payload.recipients[user_id]
 
     return Promise.all @_map_user_client_map user_client_map, _remove_deleted_client, _remove_deleted_user
+    .then =>
+      @verification_state_handler.on_client_removed Object.keys(user_client_map)
     .then ->
       return payload
 
