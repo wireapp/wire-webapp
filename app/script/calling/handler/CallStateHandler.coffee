@@ -595,7 +595,7 @@ class z.calling.handler.CallStateHandler
       call_et.self_user_joined true
       call_et.set_creator @v2_call_center.user_repository.self()
       @logger.debug "Outgoing '#{@v2_call_center.media_stream_handler.local_media_type()}' call to '#{call_et.conversation_et.display_name()}'", call_et
-      @v2_call_center.telemetry.track_event z.tracking.EventName.CALLING.INITIATED_CALL, call_et
+      @v2_call_center.telemetry.track_event z.tracking.EventName.CALLING.INITIATED_CALL, call_et, undefined, @self_state.video_send()
       return call_et
 
 

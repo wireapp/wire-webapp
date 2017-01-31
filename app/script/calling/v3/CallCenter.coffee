@@ -497,9 +497,10 @@ class z.calling.v3.CallCenter
   _create_outgoing_e_call: (conversation_id, e_call_message_et) ->
     @_create_e_call conversation_id, e_call_message_et, @user_repository.self()
     .then (e_call_et) =>
-      @logger.debug "Outgoing '#{@_get_media_type_from_properties e_call_message_et.props}' e-call in conversation '#{e_call_et.conversation_et.display_name()}'", e_call_et
+      media_type = @_get_media_type_from_properties e_call_message_et.props
+      @logger.debug "Outgoing '#{media_type}' e-call in conversation '#{e_call_et.conversation_et.display_name()}'", e_call_et
       e_call_et.state z.calling.enum.CallState.OUTGOING
-      @telemetry.track_event z.tracking.EventName.CALLING.INITIATED_CALL, e_call_et
+      @telemetry.track_event z.tracking.EventName.CALLING.INITIATED_CALL, e_call_et, undefined, media_type is z.media.MediaType.VIDEO
       return e_call_et
 
 
