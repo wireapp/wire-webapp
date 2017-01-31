@@ -30,13 +30,13 @@ z.tracking.EventName =
   APP_LAUNCH: 'appLaunch'
   CALLING:
     ENDED_CALL: 'calling.ended_call'
-    ESTABLISHED_CALL: 'calling.established_successful_call'
+    ESTABLISHED_CALL: 'calling.established_call'
     FAILED_REQUEST: 'calling.failed_request'
     FAILED_REQUESTING_MEDIA: 'calling.failed_requesting_media'
     FAILED_RTC: 'calling.failed_rtc'
     INITIATED_CALL: 'calling.initiated_call'
-    MINIMIZED_FROM_FULLSCREEN: 'calling.minimized_from_fullscreen'
     JOINED_CALL: 'calling.joined_call'
+    MINIMIZED_FROM_FULLSCREEN: 'calling.minimized_from_fullscreen'
     RECEIVED_CALL: 'calling.received_call'
     SHARED_SCREEN: 'calling.shared_screen'
   CONNECT:

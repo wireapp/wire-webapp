@@ -81,8 +81,9 @@ class z.telemetry.calling.CallTelemetry
   @param event_name [z.tracking.EventName] String for call event
   @param call_et [z.calling.Call] Call entity
   @param attributes [Object] Attributes for the event
+  @param video_send [Boolean] Is outgoing video call
   ###
-  track_event: (event_name, call_et, attributes = {}) ->
+  track_event: (event_name, call_et, attributes = {}, video_send = false) ->
     if call_et
       attributes = $.extend
         conversation_participants: call_et.conversation_et.number_of_participants()
@@ -92,7 +93,7 @@ class z.telemetry.calling.CallTelemetry
         with_bot: call_et.conversation_et.is_with_bot()
       , attributes
 
-      if call_et.is_remote_screen_send() or call_et.is_remote_video_send()
+      if call_et.is_remote_screen_send() or call_et.is_remote_video_send() or video_send
         event_name = event_name.replace '_call', '_video_call'
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name, attributes
