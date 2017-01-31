@@ -19,7 +19,8 @@
 window.z ?= {}
 z.message ?= {}
 
-z.message.DegradedMessageType =
+z.message.VerificationMessageType =
+  VERIFIED: 'verified'
   UNVERIFIED: 'unverified'
   NEW_DEVICE: 'new-device'
   NEW_MEMBER: 'new-member'

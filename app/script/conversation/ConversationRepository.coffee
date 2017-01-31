@@ -2247,7 +2247,6 @@ class z.conversation.ConversationRepository
     return Promise.all @_map_user_client_map user_client_map, _remove_deleted_client, _remove_deleted_user
     .then =>
       @verification_state_handler.on_client_removed Object.keys(user_client_map)
-    .then ->
       return payload
 
   ###
@@ -2276,7 +2275,6 @@ class z.conversation.ConversationRepository
       return Promise.all @_map_user_client_map user_client_map, _add_missing_client
     .then =>
       @verification_state_handler.on_client_add Object.keys(user_client_map)
-    .then ->
       return payload
 
   ###

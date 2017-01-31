@@ -53,7 +53,7 @@ class z.conversation.ConversationVerificationStateHandler
       if @_will_change_to_degraded conversation_et
         user_ids_in_conversation = _.intersection user_ids, conversation_et.participating_user_ids().concat conversation_et.self.id
         if user_ids_in_conversation.length
-          event = z.conversation.EventBuilder.build_degraded conversation_et, user_ids, z.message.DegradedMessageType.NEW_DEVICE
+          event = z.conversation.EventBuilder.build_degraded conversation_et, user_ids, z.message.VerificationMessageType.NEW_DEVICE
           amplify.publish z.event.WebApp.EVENT.INJECT, event
 
   ###
@@ -74,7 +74,7 @@ class z.conversation.ConversationVerificationStateHandler
       user_ids = [user_ids]
 
     if @_will_change_to_degraded conversation_et
-      event = z.conversation.EventBuilder.build_degraded conversation_et, user_ids, z.message.DegradedMessageType.NEW_MEMBER
+      event = z.conversation.EventBuilder.build_degraded conversation_et, user_ids, z.message.VerificationMessageType.NEW_MEMBER
       amplify.publish z.event.WebApp.EVENT.INJECT, event
 
   ###

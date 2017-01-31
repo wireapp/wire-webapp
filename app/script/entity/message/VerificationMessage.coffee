@@ -19,12 +19,13 @@
 window.z ?= {}
 z.entity ?= {}
 
-class z.entity.DegradedMessage extends z.entity.Message
+class z.entity.VerificationMessage extends z.entity.Message
 
   constructor: ->
     super()
-    @super_type = z.message.SuperType.DEGRADED
+    @super_type = z.message.SuperType.VERIFICATION
     @should_effect_conversation_timestamp = false
+    @verification_message_type = undefined
 
     @user_ets = ko.observableArray()
     @user_ids = ko.observableArray()

@@ -76,16 +76,14 @@ class z.conversation.EventMapper
         message_et = @_map_event_voice_channel_activate()
       when z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
         message_et = @_map_event_voice_channel_deactivate event
-      when z.event.Client.CONVERSATION.ALL_VERIFIED
-        message_et = @_map_all_verified()
       when z.event.Client.CONVERSATION.ASSET_META
         message_et = @_map_event_asset_meta event
       when z.event.Client.CONVERSATION.DELETE_EVERYWHERE
         message_et = @_map_system_event_delete_everywhere event
       when z.event.Client.CONVERSATION.LOCATION
         message_et = @_map_event_location event
-      when z.event.Client.CONVERSATION.DEGRADED
-        message_et = @_map_degraded event
+      when z.event.Client.CONVERSATION.VERIFICATION
+        message_et = @_map_verification event
       when z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
         message_et = @_map_system_event_unable_to_decrypt event
       else
@@ -129,25 +127,10 @@ class z.conversation.EventMapper
 
   @return [z.entity.NewDeviceMessage] Normal message entity
   ###
-  _map_degraded: (event) ->
-    message_et = new z.entity.DegradedMessage()
+  _map_verification: (event) ->
+    message_et = new z.entity.VerificationMessage()
     message_et.user_ids event.data.user_ids
-    message_et.degraded_message_type = event.data.type
-    return message_et
-
-  ###
-  Maps JSON data of conversation.all-verified message into message entity
-
-  @private
-
-  @param event [Object] Message data
-
-  @return [z.entity.NormalMessage] Normal message entity
-  ###
-  _map_all_verified: ->
-    message_et = new z.entity.Message()
-    message_et.super_type = z.message.SuperType.ALL_VERIFIED
-    message_et.should_effect_conversation_timestamp = false
+    message_et.verification_message_type = event.data.type
     return message_et
 
   ###
