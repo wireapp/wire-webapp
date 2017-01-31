@@ -30,6 +30,7 @@ class z.main.App
 
     @telemetry = new z.telemetry.app_init.AppInitTelemetry()
     @window_handler = new z.ui.WindowHandler().init()
+    @update_source = undefined
 
     @service = @_setup_services()
     @repository = @_setup_repositories()
@@ -452,7 +453,7 @@ class z.main.App
       window.focus()
 
   update: (update_source) =>
-    @update_source update_source
+    @update_source = update_source
     amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.LIFECYCLE_UPDATE
 
   # Redirect to the login page after internet connectivity has been verified.
