@@ -208,10 +208,13 @@ class z.client.ClientRepository
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         error_message = "Local client '#{client_et.id}' (#{client_et.type}) no longer exists on the backend"
         @logger.warn error_message, error
+
         if client_et.is_temporary()
-          return @cryptography_repository.storage_repository.delete_everything()
-        return @cryptography_repository.storage_repository.delete_cryptography()
-        .catch (error) =>
+          delete_promise =  @cryptography_repository.storage_repository.delete_everything()
+        else
+          delete_promise = @cryptography_repository.storage_repository.delete_cryptography()
+
+        delete_promise.catch (error) =>
           @logger.error "Deleting crypto database after failed client validation unsuccessful: #{error.message}", error
           throw new z.client.ClientError z.client.ClientError::TYPE.DATABASE_FAILURE
         .then ->

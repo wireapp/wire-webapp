@@ -21,7 +21,7 @@ z.ViewModel ?= {}
 
 # Parent: z.ViewModel.ConversationTitlebarViewModel
 class z.ViewModel.ConversationTitlebarViewModel
-  constructor: (element_id, @call_center, @conversation_repository, @multitasking) ->
+  constructor: (element_id, @calling_repository, @conversation_repository, @multitasking) ->
     @logger = new z.util.Logger 'z.ViewModel.ConversationTitlebarViewModel', z.config.LOGGER.OPTIONS
 
     # TODO remove this for now to ensure that buttons are clickable in macOS wrappers
@@ -30,8 +30,10 @@ class z.ViewModel.ConversationTitlebarViewModel
     , 1000
 
     @conversation_et = @conversation_repository.active_conversation
-    @call_self_state = @call_center.media_stream_handler.self_stream_state
-    @joined_call = @call_center.joined_call
+
+    @joined_call = @calling_repository.joined_call
+    @remote_media_streams = @calling_repository.remote_media_streams
+    @self_stream_state = @calling_repository.self_stream_state
 
     @has_call = ko.pureComputed =>
       return false if not @conversation_et() or not @joined_call()
@@ -43,8 +45,8 @@ class z.ViewModel.ConversationTitlebarViewModel
 
     @show_maximize_control = ko.pureComputed =>
       return false if not @joined_call()
-      has_local_video = @call_self_state.videod() or @call_self_state.screen_shared()
-      has_remote_video = (@joined_call().is_remote_screen_shared() or @joined_call().is_remote_videod()) and @call_center.media_stream_handler.remote_media_streams.video()
+      has_local_video = @self_stream_state.video_send() or @self_stream_state.screen_send()
+      has_remote_video = (@joined_call().is_remote_screen_send() or @joined_call().is_remote_video_send()) and @remote_media_streams.video()
       return @has_ongoing_call() and @multitasking.is_minimized() and has_local_video and not has_remote_video
 
     @show_call_controls = ko.computed =>
@@ -71,7 +73,7 @@ class z.ViewModel.ConversationTitlebarViewModel
 
   click_on_call_button: =>
     return if not @conversation_et()
-    amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, @conversation_et().id
+    amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, @conversation_et().id, false
 
   click_on_maximize: =>
     @multitasking.auto_minimize false

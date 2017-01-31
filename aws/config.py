@@ -28,9 +28,9 @@ DEBUG = DEVELOPMENT = not PRODUCTION
 SECRET_KEY = os.environ.get('SECRET_KEY', '3.14159265358979323846264338327950')
 
 SUPPORTED = {
-  'chrome': 51,
+  'chrome': 52,
   'firefox': 45,
-  'opera': 40,
+  'opera': 41,
   'msedge': 12,
 }
 

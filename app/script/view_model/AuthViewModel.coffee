@@ -26,6 +26,7 @@ TIMEOUT =
 FORWARDED_URL_PARAMETERS = [
   z.auth.URLParameter.ASSETS_V3
   z.auth.URLParameter.BOT
+  z.auth.URLParameter.CALLING_V3
   z.auth.URLParameter.ENVIRONMENT
   z.auth.URLParameter.LOCALYTICS
 ]
@@ -1236,8 +1237,7 @@ class z.ViewModel.AuthViewModel
   ###
   _append_existing_parameters: (url) ->
     for parameter_name in FORWARDED_URL_PARAMETERS
-      parameter_value = z.util.get_url_parameter parameter_name
-      url = z.util.append_url_parameter url, "#{parameter_name}=#{parameter_value}" if parameter_value
+      url = z.util.forward_url_parameter url, parameter_name
     return url
 
   ###

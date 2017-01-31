@@ -25,7 +25,6 @@ ANNOUNCE_CONFIG =
   UPDATE_INTERVAL: 6 * 60 * 60 * 1000
 
 class z.announce.AnnounceRepository
-  PRIMARY_KEY_CURRENT_announce: 'local_identity'
   constructor: (@announce_service) ->
     @logger = new z.util.Logger 'z.announce.AnnounceRepository', z.config.LOGGER.OPTIONS
     return @

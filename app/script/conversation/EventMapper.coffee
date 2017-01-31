@@ -320,7 +320,7 @@ class z.conversation.EventMapper
   ###
   _map_event_voice_channel_activate: ->
     message_et = new z.entity.CallMessage()
-    message_et.call_message_type = z.message.CallMessageType.ACTIVATED
+    message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED
     message_et.visible false
     return message_et
   ###
@@ -334,9 +334,9 @@ class z.conversation.EventMapper
   ###
   _map_event_voice_channel_deactivate: (event) ->
     message_et = new z.entity.CallMessage()
-    message_et.call_message_type = z.message.CallMessageType.DEACTIVATED
+    message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED
     message_et.finished_reason = event.data.reason
-    message_et.visible message_et.finished_reason is z.calling.enum.CallFinishedReason.MISSED
+    message_et.visible message_et.finished_reason is z.calling.enum.CALL_FINISHED_REASON.MISSED
     return message_et
 
   ###############################################################################

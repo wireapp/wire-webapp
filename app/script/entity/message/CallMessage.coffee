@@ -34,21 +34,21 @@ class z.entity.CallMessage extends z.entity.Message
     , @, deferEvaluation: true
 
   ###
-  Check if message is call activation.
+  Check if call message is call activation.
   @return [Boolean] Is message of type activate
   ###
   is_activation: ->
-    return @call_message_type is z.message.CallMessageType.ACTIVATED
+    return @call_message_type is z.message.CALL_MESSAGE_TYPE.ACTIVATED
 
   ###
-  Check if message is call activation.
+  Check if call message is call activation.
   @return [Boolean] Is message of type deactivate
   ###
   is_deactivation: ->
-    return @call_message_type is z.message.CallMessageType.DEACTIVATED
+    return @call_message_type is z.message.CALL_MESSAGE_TYPE.DEACTIVATED
 
   was_completed: ->
-    return @finished_reason is z.calling.enum.CallFinishedReason.COMPLETED
+    return @finished_reason is z.calling.enum.CALL_FINISHED_REASON.COMPLETED
 
   was_missed: ->
-    return @finished_reason is z.calling.enum.CallFinishedReason.MISSED
+    return @finished_reason is z.calling.enum.CALL_FINISHED_REASON.MISSED

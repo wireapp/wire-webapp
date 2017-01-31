@@ -19,6 +19,9 @@
 window.z ?= {}
 z.event ?= {}
 
+EVENT_CONFIG =
+  E_CALL_EVENT_LIFETIME: 30 * 1000 # 30 seconds
+
 # Event repository to handle all backend event channels.
 class z.event.EventRepository
   @::NOTIFICATION_SOURCE =
@@ -38,6 +41,7 @@ class z.event.EventRepository
     @logger = Logdown {alignOutput: true, prefix: 'z.event.EventRepository'}
 
     @current_client = undefined
+    @clock_drift = 0
 
     @notification_handling_state = ko.observable z.event.NotificationHandlingState.STREAM
     @notification_handling_state.subscribe (handling_state) =>
@@ -149,6 +153,7 @@ class z.event.EventRepository
   get_notifications: (notification_id, limit = 10000) ->
     return new Promise (resolve, reject) =>
       _got_notifications = (response) =>
+        @_update_baseline_clock response.time if response.time
         if response.notifications.length > 0
           notification_id = response.notifications[response.notifications.length - 1].id
 
@@ -306,6 +311,10 @@ class z.event.EventRepository
       @logger.error "Failed to handle notification stream: #{error.message}", error
       throw error
 
+  _update_baseline_clock: (backend_time) ->
+    @clock_drift = new Date() - new Date backend_time
+    @logger.info "Clock drift set to '#{@clock_drift}' ms"
+
   _update_last_notification_id: (last_notification_id) ->
     return if not last_notification_id
 
@@ -401,6 +410,7 @@ class z.event.EventRepository
         return @cryptography_repository.save_unencrypted_event mapped_event
       return mapped_event
     .then (saved_event) =>
+      @_validate_call_event_lifetime event if event.type is z.event.Client.CALL.E_CALL
       @_distribute_event saved_event
       return saved_event
     .catch (error) ->
@@ -409,9 +419,9 @@ class z.event.EventRepository
         z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
         z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
         z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+        z.event.EventError::TYPE.OUTDATED_E_CALL_EVENT
       ]
-      return if error.type in ignored_errors
-      throw error
+      throw error unless error.type in ignored_errors
 
   ###
   Handle all events from the payload of an incoming notification.
@@ -465,3 +475,18 @@ class z.event.EventRepository
       raygun_error = new Error "Decryption failed: #{decrypt_error.message}"
       raygun_error.stack = decrypt_error.stack
       Raygun.send raygun_error, custom_data
+
+    ###
+    Check if call event is handled within its valid lifespan.
+    @return [Boolean] Returns true if event is handled within is lifetime, otherwise throws error
+    ###
+    _validate_call_event_lifetime: (event) ->
+      return true if @notification_handling_state() is z.event.NotificationHandlingState.WEB_SOCKET
+      return true if event.content.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+
+      corrected_timestamp = Date.now() - @clock_drift
+      event_timestamp = new Date(event.time).getTime()
+      if corrected_timestamp > event_timestamp + EVENT_CONFIG.E_CALL_EVENT_LIFETIME
+        @logger.info "Ignored outdated '#{event.type}' event in conversation '#{event.conversation}' - Event: '#{event_timestamp}', Local: '#{corrected_timestamp}'", {event_object: event, event_json: JSON.stringify event}
+        throw new z.event.EventError z.event.EventError::TYPE.OUTDATED_E_CALL_EVENT
+      return true

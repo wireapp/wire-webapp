@@ -49,7 +49,7 @@ class z.client.ClientError
 
   @:: = new Error()
   @::constructor = @
-  @::TYPE = {
+  @::TYPE =
     CLIENT_NOT_SET: 'z.client.ClientError::TYPE.CLIENT_NOT_SET'
     DATABASE_FAILURE: 'z.client.ClientError::TYPE.DATABASE_FAILURE'
     MISSING_ON_BACKEND: 'z.client.ClientError::TYPE.MISSING_ON_BACKEND'
@@ -60,4 +60,3 @@ class z.client.ClientError
     REQUEST_FORBIDDEN: 'z.client.ClientError::TYPE.REQUEST_FORBIDDEN'
     TOO_MANY_CLIENTS: 'z.client.ClientError::TYPE.TOO_MANY_CLIENTS'
     UNKNOWN: 'z.client.ClientError::TYPE.UNKNOWN'
-  }

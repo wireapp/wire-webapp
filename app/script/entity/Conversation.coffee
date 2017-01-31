@@ -152,7 +152,7 @@ class z.entity.Conversation
       unread_type = z.conversation.ConversationUnreadType.UNREAD
       return unread_type if @unread_message_count() <= 0
       for message in @unread_events() by -1
-        return z.conversation.ConversationUnreadType.CALL if message.finished_reason is z.calling.enum.CallFinishedReason.MISSED
+        return z.conversation.ConversationUnreadType.CALL if message.finished_reason is z.calling.enum.CALL_FINISHED_REASON.MISSED
         if message.is_ping()
           @unread_accent_color message.accent_color()
           return z.conversation.ConversationUnreadType.PING
@@ -476,10 +476,11 @@ class z.entity.Conversation
     return (user_et for user_et in [@self].concat(@participating_user_ets()) when not user_et.is_verified())
 
   ###
-  Check whether the conversation is held with a Wire welcome bot like Anna or Otto.
+  Check whether the conversation is held with a bot like Anna or Otto.
   @return [Boolean] True, if conversation with a bot
   ###
   is_with_bot: =>
+    return true for user_et in @participating_user_ets() when user_et.is_bot
     return false if not @is_one2one()
     return false if not @participating_user_ets()[0]?.username()
     return @participating_user_ets()[0].username() in ['annathebot', 'ottothebot']
