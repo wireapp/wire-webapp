@@ -45,10 +45,11 @@ z.event.WebApp =
       LEAVE: 'wire.webapp.call.state.leave'
       REMOVE_PARTICIPANT: 'wire.webapp.call.state.remove-participant'
       TOGGLE: 'wire.webapp.call.state.toggle'
-      TOGGLE_SCREEN: 'wire.webapp.call.state.toggle-screen'
     MEDIA:
-      MUTE_AUDIO: 'wire.webapp.call.media.mute_audio'
       ADD_STREAM: 'wire.webapp.call.media.add_stream'
+      CHOOSE_SCREEN: 'wire.webapp.call.media.choose_screen'
+      MUTE_AUDIO: 'wire.webapp.call.media.mute_audio'
+      TOGGLE: 'wire.webapp.call.media.toggle'
     SIGNALING:
       DELETE_FLOW: 'wire.webapp.call.signaling.delete-flow'
       POST_FLOWS: 'wire.webapp.call.signaling.post-flows'

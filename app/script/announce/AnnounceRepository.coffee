@@ -25,7 +25,6 @@ ANNOUNCE_CONFIG =
   UPDATE_INTERVAL: 6 * 60 * 60 * 1000
 
 class z.announce.AnnounceRepository
-  PRIMARY_KEY_CURRENT_announce: 'local_identity'
   constructor: (@announce_service) ->
     @logger = new z.util.Logger 'z.announce.AnnounceRepository', z.config.LOGGER.OPTIONS
     return @
@@ -45,7 +44,7 @@ class z.announce.AnnounceRepository
   check_version: =>
     @announce_service.get_version()
     .then (server_version) ->
-      amplify.publish z.event.WebApp.LIFECYCLE.UPDATE if server_version > z.util.Environment.version false, true
+      amplify.publish z.event.WebApp.LIFECYCLE.UPDATE, z.announce.UPDATE_SOURCE.WEBAPP if server_version > z.util.Environment.version false, true
     .catch (error) =>
       @logger.error "Failed to fetch version: #{error}"
 

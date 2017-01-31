@@ -20,6 +20,8 @@ window.z ?= {}
 z.event ?= {}
 
 z.event.Client =
+  CALL:
+    E_CALL: 'call.e-call'
   CONVERSATION:
     ALL_VERIFIED: 'conversation.all-verified'
     ASSET_META: 'conversation.asset-meta'

@@ -67,6 +67,8 @@ z.string.auth_limit_devices_current = '(Current)'
 # Authentication: limit section
 z.string.auth_history_headline = 'It’s the first time you’re using Wire on this device.'
 z.string.auth_history_description = 'For privacy reasons, your conversation history will not appear here.'
+z.string.auth_history_reuse_headline = 'You’ve used Wire on this device before.'
+z.string.auth_history_reuse_description = 'Messages sent in the meantime will not appear here.'
 z.string.auth_history_button = 'OK'
 
 # Authentication: POSTED section

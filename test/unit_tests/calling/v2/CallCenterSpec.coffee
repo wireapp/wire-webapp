@@ -20,13 +20,13 @@
 # grunt test_init
 #
 # For all subsequent executions:
-# grunt test_run:calling/CallCenter
+# grunt test_run:calling/v2/CallCenter
 #
 window.wire ?= {}
 window.wire.auth ?= {}
 window.wire.auth.audio ?= {}
 
-describe 'z.calling.CallCenter', ->
+describe 'z.calling.v2.CallCenter', ->
   test_factory = new TestFactory()
   conversation_et = undefined
   user_ets = undefined
@@ -117,13 +117,13 @@ describe 'z.calling.CallCenter', ->
 
       # Overrides
       z.util.Environment.browser.supports.calling = true
-      call_center.request_media_stream = -> Promise.resolve()
+      v2_call_center.request_media_stream = -> Promise.resolve()
       done()
     .catch done.fail
 
   beforeEach ->
     jasmine.Ajax.install()
-    call_center.calls []
+    v2_call_center.calls []
 
   afterEach ->
     jasmine.Ajax.uninstall()
@@ -154,7 +154,7 @@ describe 'z.calling.CallCenter', ->
       # Create call entity
       conversation_et = conversation_repository.conversations()[0]
       conversation_id = conversation_et.id
-      call_center.state_handler._create_call scenario_1.event_1
+      v2_call_center.state_handler._create_call scenario_1.event_1
       .then (call_et) =>
         expect(call_et.id).toEqual conversation_id
         expect(conversation_repository.active_conversation().id).toEqual conversation_id
@@ -215,13 +215,13 @@ describe 'z.calling.CallCenter', ->
         "id": "2592f48d-af30-4183-a4d3-1c6ecb758b96"
       }
 
-      creator_id = call_center.get_creator_id call_state_event
+      creator_id = v2_call_center.get_creator_id call_state_event
       expect(creator_id).toEqual '36876ec6-9481-41db-a6a8-94f92953c538'
-      creator_id = call_center.get_creator_id post_for_flows_payload
+      creator_id = v2_call_center.get_creator_id post_for_flows_payload
       expect(creator_id).toEqual post_for_flows_payload.creator
 
     xit 'updates the call info when two remote users have a call in a group conversation with us', (done) ->
-      spyOn(call_center, '_on_event_in_supported_browsers').and.callThrough()
+      spyOn(v2_call_center, '_on_event_in_supported_browsers').and.callThrough()
 
       # @formatter:off
       events = [
@@ -234,12 +234,12 @@ describe 'z.calling.CallCenter', ->
       for event in events
         amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND, event
 
-      expect(call_center._on_event_in_supported_browsers.calls.count()).toBe 2
+      expect(v2_call_center._on_event_in_supported_browsers.calls.count()).toBe 2
 
       # Checking call entity states
-      expect(call_center.calls().length).toBe 1
+      expect(v2_call_center.calls().length).toBe 1
 
-      call_center.get_call_by_id conversation_et.id
+      v2_call_center.get_call_by_id conversation_et.id
       .then (call_et) =>
         expect(call_et.get_number_of_participants()).toBe 2
         # Check that the first user who set his/her state to "joined" is marked as the creator of the call
@@ -265,7 +265,7 @@ describe 'z.calling.CallCenter', ->
       expect(mock.process_request "#{test_factory.settings.connection.rest_url.rest_url}/conversations/#{conversation_et.id}/call/state", 'PUT', {"self":{"state":"joined"}}).toBe true
       #@formatter:on
 
-      call_center.get_call_by_id conversation_et.id
+      v2_call_center.get_call_by_id conversation_et.id
       .then (call_et) =>
         expect(call_et).toBeDefined()
         expect(call_et.creator().name()).toBe user_ets.homer.name()
@@ -278,7 +278,7 @@ describe 'z.calling.CallCenter', ->
     it 'recognizes an incoming 1-to-1 call which is ongoing on another client', (done) ->
       #@formatter:off
       amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND, {"sequence":20,"session":"54e1fd34-fc9f-4de5-85e6-8bd50e63534e","cause":"requested","self":null,"type":"call.state","conversation":"#{conversation_et.id}","participants":{"#{user_ets.marge.id}":{"state":"joined"},"#{user_ets.homer.id}":{"state":"idle"}}}
-      call_center.get_call_by_id conversation_et.id
+      v2_call_center.get_call_by_id conversation_et.id
       .then (call_et) =>
         expect(call_et.get_number_of_participants()).toEqual 1
         amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND, {"sequence":21,"session":"54e1fd34-fc9f-4de5-85e6-8bd50e63534e","cause":"requested","self":null,"type":"call.state","conversation":"#{conversation_et.id}","participants":{"#{user_ets.marge.id}":{"state":"joined"},"#{user_ets.homer.id}":{"state":"joined"}}}
@@ -297,7 +297,7 @@ describe 'z.calling.CallCenter', ->
       #@formatter:off
       amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND, {"sequence":14,"session":"9ec49daf-a28f-4778-8015-2de1e0147639","cause":"requested","self":null,"type":"call.state","conversation":"#{conversation_et.id}","participants":{"#{user_ets.marge.id}":{"state":"idle","quality":null},"#{user_ets.homer.id}":{"state":"joined","quality":null}}}
       #@formatter:on
-      call_center.get_call_by_id conversation_et.id
+      v2_call_center.get_call_by_id conversation_et.id
       .then (call_et) =>
         expect(call_et).toBeDefined()
         expect(call_et.self_user_joined()).toBeTruthy()
@@ -311,7 +311,7 @@ describe 'z.calling.CallCenter', ->
     it 'recognizes an incoming group call which is ongoing on another client', (done) ->
       #@formatter:off
       amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND, {"sequence":1285,"session":"ad31842f-1cc8-418c-aaa9-9847a8b2da4c","cause":"requested","self":null,"type":"call.state","conversation":"#{conversation_et.id}","participants":{"#{user_ets.marge.id}":{"state":"idle","quality":null},"#{user_ets.bart.id}":{"state":"idle","quality":null},"#{user_ets.lisa.id}":{"state":"idle","quality":null},"#{user_ets.maggie.id}":{"state":"joined","quality":null},"#{user_ets.flanders.id}":{"state":"idle","quality":null},"#{user_ets.burns.id}":{"state":"idle","quality":null},"#{user_ets.homer.id}":{"state":"idle","quality":null},"#{user_ets.wiggum.id}":{"state":"idle","quality":null},"#{user_ets.bob.id}":{"state":"idle","quality":null}}}
-      call_center.get_call_by_id conversation_et.id
+      v2_call_center.get_call_by_id conversation_et.id
       .then (call_et) =>
         expect(call_et.get_number_of_participants()).toEqual 1
         amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND, {"sequence":1286,"session":"ad31842f-1cc8-418c-aaa9-9847a8b2da4c","cause":"requested","self":null,"type":"call.state","conversation":"#{conversation_et.id}","participants":{"#{user_ets.marge.id}":{"state":"idle","quality":null},"#{user_ets.bart.id}":{"state":"idle","quality":null},"#{user_ets.lisa.id}":{"state":"idle","quality":null},"#{user_ets.maggie.id}":{"state":"joined","quality":null},"#{user_ets.flanders.id}":{"state":"idle","quality":null},"#{user_ets.burns.id}":{"state":"idle","quality":null},"#{user_ets.homer.id}":{"state":"idle","quality":null},"#{user_ets.wiggum.id}":{"state":"idle","quality":null},"#{user_ets.bob.id}":{"state":"joined","quality":null}}}
@@ -333,7 +333,7 @@ describe 'z.calling.CallCenter', ->
     it 'recognizes an outgoing group call which is ongoing on another client', (done) ->
       #@formatter:off
       amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND, {"sequence":1304,"session":"5b1b6e6e-d961-485d-9c57-b36965ec9254","cause":"requested","self":null,"type":"call.state","conversation":"#{conversation_et.id}","participants":{"#{user_ets.marge.id}":{"state":"idle","quality":null},"#{user_ets.bart.id}":{"state":"idle","quality":null},"#{user_ets.lisa.id}":{"state":"idle","quality":null},"#{user_ets.maggie.id}":{"state":"idle","quality":null},"#{user_ets.flanders.id}":{"state":"idle","quality":null},"#{user_ets.burns.id}":{"state":"idle","quality":null},"#{user_ets.homer.id}":{"state":"joined","quality":null},"#{user_ets.wiggum.id}":{"state":"idle","quality":null},"#{user_ets.bob.id}":{"state":"idle","quality":null}}}
-      call_center.get_call_by_id conversation_et.id
+      v2_call_center.get_call_by_id conversation_et.id
       .then (call_et) =>
         expect(call_et.get_number_of_participants()).toEqual 0
         amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND, {"sequence":1305,"session":"5b1b6e6e-d961-485d-9c57-b36965ec9254","cause":"requested","self":null,"type":"call.state","conversation":"#{conversation_et.id}","participants":{"#{user_ets.marge.id}":{"state":"idle","quality":null},"#{user_ets.bart.id}":{"state":"idle","quality":null},"#{user_ets.lisa.id}":{"state":"idle","quality":null},"#{user_ets.maggie.id}":{"state":"joined","quality":null},"#{user_ets.flanders.id}":{"state":"idle","quality":null},"#{user_ets.burns.id}":{"state":"idle","quality":null},"#{user_ets.homer.id}":{"state":"joined","quality":null},"#{user_ets.wiggum.id}":{"state":"idle","quality":null},"#{user_ets.bob.id}":{"state":"idle","quality":null}}}
@@ -382,7 +382,7 @@ describe 'z.calling.CallCenter', ->
         'session': 'b24dfebe-add9-4f2a-8953-3a1947a7b929'
       }
 
-      call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
+      v2_call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
       .then (response) ->
         expect(response).toEqual response_payload
         done()
@@ -397,14 +397,14 @@ describe 'z.calling.CallCenter', ->
         'member_count': 11
         'message': 'too many members for calling'
       }
-      spyOn call_center.media_stream_handler, 'release_media_streams'
+      spyOn v2_call_center.media_stream_handler, 'release_media_streams'
 
-      call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
+      v2_call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
       .then done.fail
       .catch (error) ->
-        expect(error).toEqual jasmine.any z.calling.CallError
-        expect(error.type).toBe z.calling.CallError::TYPE.CONVERSATION_TOO_BIG
-        expect(call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
+        expect(error).toEqual jasmine.any z.calling.v2.CallError
+        expect(error.type).toBe z.calling.v2.CallError::TYPE.CONVERSATION_TOO_BIG
+        expect(v2_call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
         done()
       server.requests[0].respond 409, 'Content-Type': 'application/json', JSON.stringify error_payload
 
@@ -415,14 +415,14 @@ describe 'z.calling.CallCenter', ->
         'max_joined': 5
         'message': 'the voice channel is full'
       }
-      spyOn call_center.media_stream_handler, 'release_media_streams'
+      spyOn v2_call_center.media_stream_handler, 'release_media_streams'
 
-      call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
+      v2_call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
       .then done.fail
       .catch (error) ->
-        expect(error).toEqual jasmine.any z.calling.CallError
-        expect(error.type).toBe z.calling.CallError::TYPE.VOICE_CHANNEL_FULL
-        expect(call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
+        expect(error).toEqual jasmine.any z.calling.v2.CallError
+        expect(error.type).toBe z.calling.v2.CallError::TYPE.VOICE_CHANNEL_FULL
+        expect(v2_call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
         done()
       server.requests[0].respond 409, 'Content-Type': 'application/json', JSON.stringify error_payload
 
@@ -432,13 +432,13 @@ describe 'z.calling.CallCenter', ->
         'label': 'invalid-op'
         'message': 'Nobody left to call'
       }
-      spyOn call_center.media_stream_handler, 'release_media_streams'
+      spyOn v2_call_center.media_stream_handler, 'release_media_streams'
 
-      call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
+      v2_call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
       .then done.fail
       .catch (error) ->
-        expect(error).toEqual jasmine.any z.calling.CallError
-        expect(error.type).toBe z.calling.CallError::TYPE.CONVERSATION_EMPTY
-        expect(call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
+        expect(error).toEqual jasmine.any z.calling.v2.CallError
+        expect(error.type).toBe z.calling.v2.CallError::TYPE.CONVERSATION_EMPTY
+        expect(v2_call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
         done()
       server.requests[0].respond 400, 'Content-Type': 'application/json', JSON.stringify error_payload

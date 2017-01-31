@@ -26,6 +26,7 @@ TIMEOUT =
 FORWARDED_URL_PARAMETERS = [
   z.auth.URLParameter.ASSETS_V3
   z.auth.URLParameter.BOT
+  z.auth.URLParameter.CALLING_V3
   z.auth.URLParameter.ENVIRONMENT
   z.auth.URLParameter.LOCALYTICS
 ]
@@ -70,6 +71,7 @@ class z.ViewModel.AuthViewModel
 
     @get_wire = ko.observable false
     @session_expired = ko.observable false
+    @device_reused = ko.observable false
 
     @client_type = ko.observable z.client.ClientType.TEMPORARY
     @country_code = ko.observable ''
@@ -132,7 +134,7 @@ class z.ViewModel.AuthViewModel
     @accepted_terms_of_use.subscribe => @clear_error z.auth.AuthView.TYPE.TERMS
 
     @can_login_password = ko.pureComputed =>
-      return not @disabled_by_animation() and @username().length and @password().length
+      return not @disabled_by_animation()
 
     @can_login_phone = ko.pureComputed =>
       return not @disabled_by_animation() and @country_code().length > 1 and @phone_number().length
@@ -219,8 +221,6 @@ class z.ViewModel.AuthViewModel
       .on 'dragover drop', -> false
       .on 'hashchange', @_on_hash_change
       .on 'keydown', @keydown_auth
-
-    $("[id^='wire-login'], [id^='wire-register'], [id^='wire-verify']").prevent_prefill()
 
     # Select country based on location of user IP
     @country_code (z.util.CountryCodes.get_country_code($('[name=geoip]').attr 'country') or 1).toString()
@@ -456,10 +456,10 @@ class z.ViewModel.AuthViewModel
         phone = z.util.phone_number_to_e164 username, @country() or navigator.language
         if z.util.is_valid_email username
           payload.email = username
+        else if z.util.is_valid_username username
+          payload.handle = username.replace '@', ''
         else if z.util.is_valid_phone_number phone
           payload.phone = phone
-        else
-          payload.handle = username.replace '@', ''
 
         return payload
       when z.auth.AuthView.MODE.ACCOUNT_PHONE
@@ -659,7 +659,7 @@ class z.ViewModel.AuthViewModel
   clicked_on_manage_devices: =>
     @device_modal ?= new zeta.webapp.module.Modal '#modal-limit'
     if @device_modal.is_hidden()
-      @client_repository.get_clients_for_self false
+      @client_repository.get_clients_for_self()
     @device_modal.toggle()
 
   close_model_manage_devices: => @device_modal.toggle()
@@ -1188,7 +1188,7 @@ class z.ViewModel.AuthViewModel
   @private
   ###
   _validate_phone: ->
-    if not z.util.is_valid_phone_number @phone_number_e164()
+    unless z.util.is_valid_phone_number @phone_number_e164()
       @_add_error z.string.auth_error_phone_number_invalid, z.auth.AuthView.TYPE.PHONE
 
   ###
@@ -1196,12 +1196,12 @@ class z.ViewModel.AuthViewModel
   @private
   ###
   _validate_username: ->
-    username = @username().trim().toLowerCase().replace '@', ''
-
+    username = @username().trim().toLowerCase()
     unless username.length
       return @_add_error z.string.auth_error_email_missing, z.auth.AuthView.TYPE.EMAIL
 
-    if username.length < 2
+    phone = z.util.phone_number_to_e164 username, @country() or navigator.language
+    if not z.util.is_valid_email(username) and not z.util.is_valid_username(username) and not z.util.is_valid_phone_number phone
       return @_add_error z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL
 
 
@@ -1237,8 +1237,7 @@ class z.ViewModel.AuthViewModel
   ###
   _append_existing_parameters: (url) ->
     for parameter_name in FORWARDED_URL_PARAMETERS
-      parameter_value = z.util.get_url_parameter parameter_name
-      url = z.util.append_url_parameter url, "#{parameter_name}=#{parameter_value}" if parameter_value
+      url = z.util.forward_url_parameter url, parameter_name
     return url
 
   ###
@@ -1296,6 +1295,15 @@ class z.ViewModel.AuthViewModel
           @_set_hash z.auth.AuthView.MODE.VERIFY_ACCOUNT
 
   ###
+  Check whether the device has a local history.
+  @return [Boolean] Returns true if there is at least one conversation event stored
+  ###
+  _has_local_history: =>
+    @storage_service.get_keys @storage_service.OBJECT_STORE_CONVERSATION_EVENTS
+    .then (keys) ->
+      return keys.length > 0
+
+  ###
   Redirects to the app after successful login
   @private
   ###
@@ -1321,7 +1329,10 @@ class z.ViewModel.AuthViewModel
 
       # Show history screen if there are already registered clients
       if client_ets?.length > 0
-        @_set_hash z.auth.AuthView.MODE.HISTORY
+        @_has_local_history()
+        .then (has_history) =>
+          @device_reused has_history
+          @_set_hash z.auth.AuthView.MODE.HISTORY
       # Make sure client entities always see the history screen
       else if @client_repository.current_client().is_temporary()
         @_set_hash z.auth.AuthView.MODE.HISTORY
@@ -1359,12 +1370,3 @@ $.fn.extend
       window.setTimeout =>
         $(@).focus()
       , 0
-
-  # FIX to prevent unwanted auto form fill on Chrome
-  prevent_prefill: ->
-    if z.util.Environment.browser.chrome or z.util.Environment.browser.opera
-      @each ->
-        $(@)
-          .attr 'readonly', true
-          .on 'focus', ->
-            $(@).removeAttr 'readonly'

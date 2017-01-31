@@ -511,8 +511,8 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation]
   ###
   on_verification_state_changed: (conversation_et) ->
-    if conversation_et.verification_state() is z.conversation.ConversationVerificationState.VERIFIED
-      amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
+    # if conversation_et.verification_state() is z.conversation.ConversationVerificationState.VERIFIED
+      # amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
 
   ###
   Set the notification handling state.
@@ -918,7 +918,7 @@ class z.conversation.ConversationRepository
 
   ###
   Send confirmation for a content message in specified conversation.
-  @param conversation [z.entity.Conversation] Conversation that content message was received in
+  @param conversation_et [z.entity.Conversation] Conversation that content message was received in
   @param message_et [String] ID of message for which to acknowledge receipt
   ###
   send_confirmation_status: (conversation_et, message_et) =>
@@ -927,6 +927,16 @@ class z.conversation.ConversationRepository
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
     @sending_queue.push => @_send_generic_message conversation_et.id, generic_message, [message_et.user().id], false
+
+  ###
+  Send e-call message in specified conversation.
+  @param conversation_et [z.entity.Conversation] Conversation to send e-call message to
+  @param content [String] Content for e-call message
+  ###
+  send_e_call: (conversation_et, content) =>
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'calling', new z.proto.Calling content
+    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
 
   ###
   Sends image asset in specified conversation.
@@ -2230,7 +2240,6 @@ class z.conversation.ConversationRepository
   ###
   _handle_client_mismatch_deleted: (user_client_map, payload) ->
     if _.isEmpty user_client_map
-      @logger.info 'No deleted clients that need to be removed'
       return Promise.resolve payload
     @logger.debug "Message contains deleted clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
@@ -2257,7 +2266,6 @@ class z.conversation.ConversationRepository
   ###
   _handle_client_mismatch_missing: (user_client_map, payload, generic_message) ->
     if _.isEmpty user_client_map
-      @logger.info 'No missing clients that need to be added'
       return Promise.resolve payload
     if not payload
       return Promise.resolve payload
@@ -2288,7 +2296,6 @@ class z.conversation.ConversationRepository
   ###
   _handle_client_mismatch_redundant: (user_client_map, payload, conversation_id) ->
     if _.isEmpty user_client_map
-      @logger.info 'No redundant clients that need to be removed'
       return Promise.resolve payload
     @logger.debug "Message contains redundant clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
@@ -2515,6 +2522,8 @@ class z.conversation.ConversationRepository
       when 'asset'
         if message.asset.original?
           if message.asset.original.image? then 'photo' else 'file'
+      when 'calling'
+        if (JSON.parse generic_message.calling.content).props.videosend then 'video_call' else 'audio_call'
       when 'image' then 'photo'
       when 'knock' then 'ping'
       when 'text' then 'text' if not message.text.link_preview.length

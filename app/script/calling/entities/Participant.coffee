@@ -33,9 +33,9 @@ class z.calling.entities.Participant
     @was_connected = false
 
     @state =
-      muted: ko.observable false
-      screen_shared: ko.observable false
-      videod: ko.observable false
+      audio_send: ko.observable true
+      screen_send: ko.observable false
+      video_send: ko.observable false
 
     @is_connected.subscribe (is_connected) ->
       if is_connected and not @was_connected

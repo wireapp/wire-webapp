@@ -57,9 +57,9 @@ class z.client.ClientRepository
     return @client_service.delete_temporary_client @current_client().id
 
   ###
-   Load all known clients from the database.
-   @return [Promise] Promise that resolves with all the clients found in the local database
-   ###
+  Load all known clients from the database.
+  @return [Promise] Promise that resolves with all the clients found in the local database
+  ###
   get_all_clients_from_db: =>
     return @client_service.load_all_clients_from_db()
     .then (clients) =>
@@ -209,13 +209,19 @@ class z.client.ClientRepository
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         error_message = "Local client '#{client_et.id}' (#{client_et.type}) no longer exists on the backend"
         @logger.warn error_message, error
-        @cryptography_repository.storage_repository.delete_everything()
-        .catch (error) =>
-          @logger.error "Deleting database after failed client validation unsuccessful: #{error.message}", error
+
+        if client_et.is_temporary()
+          delete_promise =  @cryptography_repository.storage_repository.delete_everything()
+        else
+          delete_promise = @cryptography_repository.storage_repository.delete_cryptography()
+
+        delete_promise.catch (error) =>
+          @logger.error "Deleting crypto database after failed client validation unsuccessful: #{error.message}", error
           throw new z.client.ClientError z.client.ClientError::TYPE.DATABASE_FAILURE
         .then ->
           throw new z.client.ClientError z.client.ClientError::TYPE.MISSING_ON_BACKEND
       else if error.type is z.client.ClientError::TYPE.NO_LOCAL_CLIENT
+        @cryptography_repository.storage_repository.delete_cryptography()
         throw error
       else
         @logger.error "Getting valid local client failed: #{error_message}", error
@@ -423,24 +429,25 @@ class z.client.ClientRepository
   get_clients_by_user_id: (user_id) =>
     @client_service.get_clients_by_user_id user_id
     .then (clients) =>
-      return @_get_clients_by_user_id clients, user_id
+      return @_update_clients_for_user user_id, clients
+
+  get_client_by_user_id_from_db: (user_id) =>
+    @client_service.load_all_clients_from_db()
+    .then (clients) ->
+      return (client for client in clients when (z.client.Client.dismantle_user_client_id client.meta.primary_key).user_id is user_id)
 
   ###
   Retrieves meta information about all the clients of the self user.
-  @param expect_current_client [Boolean] Should we check against the current local client
   @return [Promise] Promise that resolves with the retrieved information about the clients
   ###
-  get_clients_for_self: (expect_current_client = true) ->
+  get_clients_for_self: ->
     @logger.info "Retrieving all clients for the self user '#{@self_user().id}'"
     @client_service.get_clients()
     .then (response) =>
-      return @_get_clients_by_user_id response, @self_user().id, expect_current_client
+      return @_update_clients_for_user @self_user().id, response
     .then (client_ets) =>
       @self_user().add_client client_et for client_et in client_ets
       return @self_user().devices()
-    .catch (error) =>
-      @logger.error "Unable to retrieve clients data: #{error}"
-      throw error
 
   ###
   Is the current client permanent.
@@ -482,55 +489,51 @@ class z.client.ClientRepository
     Clients will then be updated with the backend payload in the database and mapped into entities.
 
   @private
-  @param clients [JSON] Payload from the backend
   @param user_id [String] User ID
-  @param expect_current_client [Boolean] Should we check against the current local client
+  @param clients [JSON] Payload from the backend
   @return [Promise<Array[z.client.Client]>] Client entities
   ###
-  _get_clients_by_user_id: (clients, user_id, expect_current_client) ->
+  _update_clients_for_user: (user_id, clients) ->
     return new Promise (resolve, reject) =>
       clients_from_backend = {}
+      clients_from_backend[client.id] = client for client in clients
+
       clients_stored_in_db = []
 
-      client_keys = []
-
-      for client in clients
-        client_keys.push @_construct_primary_key user_id, client.id
-        clients_from_backend[client.id] = client
-
       # Find clients in database
-      @client_service.load_clients_from_db client_keys
+      @get_client_by_user_id_from_db user_id
       .then (results) =>
-        # Save new clients and cache existing ones
         promises = []
 
-        # Known clients will be returned as object, unknown clients will resolve with their expected primary key
         for result in results
-
-          # Handle new data which was not stored already in our local database
-          if _.isString result
-            ids = z.client.Client.dismantle_user_client_id result
-            continue if expect_current_client and @_is_current_client user_id, ids.client_id
-
-            @logger.info "New client '#{ids.client_id}' will be stored locally"
-            client_payload = clients_from_backend[ids.client_id]
-            promises.push @_update_client_schema_in_db user_id, client_payload
-            continue
-
           if clients_from_backend[result.id]
             [client_payload, contains_update] = @client_mapper.update_client result, clients_from_backend[result.id]
+            delete clients_from_backend[result.id]
 
-            # Known clients with updated backend information
+            if @current_client() and @_is_current_client user_id, result.id
+              @logger.warn "Removing duplicate self client '#{result.id}' locally"
+              @remove_client user_id, result.id
+
+            # Locally known client changed on backend
             if contains_update
+              @logger.info "Updating client '#{result.id}' of user '#{user_id}' locally"
               promises.push @save_client_in_db user_id, client_payload
               continue
 
-            # Known clients with no changes
+            # Locally known client unchanged on backend
             clients_stored_in_db.push client_payload
             continue
 
-          @logger.warn "Deleted client '#{result.id}' will be removed locally"
+          # Locally known client deleted on backend
+          @logger.warn "Removing client '#{result.id}' of user '#{user_id}' locally"
           @remove_client user_id, result.id
+
+        for client_id, client_payload of clients_from_backend
+          continue if @current_client() and @_is_current_client user_id, client_id
+
+          # Locally unknown client new on backend
+          @logger.info "New client '#{client_id}' of user '#{user_id}' will be stored locally"
+          promises.push @_update_client_schema_in_db user_id, client_payload
 
         return Promise.all promises
       .then (new_records) =>
@@ -576,6 +579,7 @@ class z.client.ClientRepository
     return if not client_id
 
     if client_id is @current_client().id
-      amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReasion.CLIENT_REMOVED, true
-    else
-      amplify.publish z.event.WebApp.CLIENT.REMOVE, @self_user().id, client_id
+      return @cryptography_repository.storage_repository.delete_cryptography()
+      .then =>
+        amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReasion.CLIENT_REMOVED, @current_client().is_temporary()
+    amplify.publish z.event.WebApp.CLIENT.REMOVE, @self_user().id, client_id

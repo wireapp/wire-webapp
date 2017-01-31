@@ -181,7 +181,7 @@ describe 'Conversation', ->
 
       call_message = new z.entity.CallMessage()
       call_message.timestamp = last_read_timestamp - 1000
-      call_message.finished_reason = z.calling.enum.CallFinishedReason.MISSED
+      call_message.finished_reason = z.calling.enum.CALL_FINISHED_REASON.MISSED
 
       conversation_et.add_message ping_message
       conversation_et.add_message call_message
@@ -207,7 +207,7 @@ describe 'Conversation', ->
     it 'shows unread type "CALL" if there is a missed call message in the unread messages', ->
       call_message = new z.entity.CallMessage()
       call_message.timestamp = Date.now() - 500
-      call_message.finished_reason = z.calling.enum.CallFinishedReason.MISSED
+      call_message.finished_reason = z.calling.enum.CALL_FINISHED_REASON.MISSED
       conversation_et.add_message call_message
       conversation_et.add_message new z.entity.Message()
       expect(conversation_et.unread_type()).toBe z.conversation.ConversationUnreadType.CALL

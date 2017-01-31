@@ -36,6 +36,8 @@ class z.event.EventError
         'Last notification ID not found in storage'
       when z.event.EventError::TYPE.NO_NOTIFICATIONS
         'No notifications found'
+      when z.event.EventError::TYPE.OUTDATED_E_CALL_EVENT
+        'Ignoring outdated e-call event'
       when z.event.EventError::TYPE.REQUEST_FAILURE
         'Event related backend request failure'
       else
@@ -49,4 +51,5 @@ class z.event.EventError
     NO_CLIENT_ID: 'z.event.EventError::TYPE.NO_CLIENT_ID'
     NO_LAST_ID: 'z.event.EventError::TYPE.NO_LAST_ID'
     NO_NOTIFICATIONS: 'z.event.EventError::TYPE.NO_NOTIFICATIONS'
+    OUTDATED_E_CALL_EVENT: 'z.event.EventError::OUTDATED_E_CALL_EVENT'
     REQUEST_FAILURE: 'z.event.EventError::TYPE.REQUEST_FAILURE'

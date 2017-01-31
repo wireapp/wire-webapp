@@ -62,7 +62,5 @@ class z.telemetry.calling.CallSetupTimings
 
   _steps_order: ->
     if @is_answer
-      order = z.telemetry.calling.CallSetupStepsOrder.ANSWER
-    else
-      order = z.telemetry.calling.CallSetupStepsOrder.OFFER
-    return order
+      return z.telemetry.calling.CallSetupStepsOrder.ANSWER
+    return z.telemetry.calling.CallSetupStepsOrder.OFFER

@@ -91,7 +91,7 @@ class z.auth.AuthService
           resolve data
         error: (jqXHR, textStatus, errorThrown) =>
           if jqXHR.status is z.service.BackendClientError::STATUS_CODE.FORBIDDEN
-            @logger.error "Requesting access token failed after #{retry_attempt} attempt(s): #{errorThrown}", jqXHR
+            @logger.error "Requesting access token failed after #{retry_attempt} attempt(s): #{errorThrown} - #{jqXHR?.responseJSON?.label}", jqXHR
             return reject new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
 
           if retry_attempt <= POST_ACCESS.RETRY_LIMIT

@@ -28,7 +28,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesAccountViewModel', z.config.LOGGER.OPTIONS
 
     @self_user = @user_repository.self
-    @new_clients = ko.observableArray()
+    @new_clients = ko.observableArray []
     @name = ko.pureComputed => @self_user().name()
 
     @username = ko.pureComputed => @self_user().username()
@@ -200,7 +200,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
   on_client_remove: (user_id, client_id) =>
     return true if user_id isnt @self_user().id
     for client_et in @new_clients() when client_et.id is client_id
-      @new_clients.remove client_et
+      @new_clients.remove client_et if client_et.is_permanent()
     amplify.publish z.event.WebApp.SEARCH.BADGE.HIDE if not @new_clients().length
 
   _reset_username_input: =>

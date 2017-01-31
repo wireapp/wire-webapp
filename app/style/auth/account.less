@@ -131,4 +131,15 @@
       }
     }
   }
+
+  input {
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus {
+      border: none;
+      -webkit-text-fill-color: #fff;
+      -webkit-box-shadow: 0 0 0 1000px #265f82 inset;
+      -webkit-transition: background-color 5000s ease-in-out 0s;
+    }
+  }
 }
