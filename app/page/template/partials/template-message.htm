@@ -18,8 +18,8 @@
       <!-- /ko -->
       <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.NEW_DEVICE -->
         <span class="label-nocase-bold-xs" data-bind='text: message.caption_user'></span>
-        <span class="label-nocase-xs ellipsis" data-bind="text: message.caption"></span>
-        <span class="label-nocase-xs ellipsis text-theme" data-bind="click: click_on_device, l10n_text: z.string.conversation_device_a_new_device"></span>
+        <span class="label-nocase-xs ellipsis" data-bind="text: message.caption_started_using"></span>
+        <span class="label-nocase-xs ellipsis text-theme" data-bind="click: click_on_device, text: message.caption_new_device"></span>
       <!-- /ko -->
       <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.NEW_MEMBER -->
         <span class="label-nocase-xs ellipsis" data-bind="l10n_text: z.string.conversation_device_new_people_joined"></span>

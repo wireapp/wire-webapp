@@ -36,9 +36,13 @@ class z.entity.VerificationMessage extends z.entity.Message
     @caption_user = ko.pureComputed =>
       return z.util.LocalizerUtil.join_names @user_ets(), z.string.Declension.NOMINATIVE
 
-    @caption = ko.pureComputed =>
-      return z.localization.Localizer.get_text z.string.conversation_device_started_using_you if @is_self_device()
-      return z.localization.Localizer.get_text z.string.conversation_device_started_using
+    @caption_started_using = ko.pureComputed =>
+      return z.localization.Localizer.get_text z.string.conversation_device_started_using_many if @user_ids().length > 1
+      return z.localization.Localizer.get_text z.string.conversation_device_started_using_one
+
+    @caption_new_device = ko.pureComputed =>
+      return z.localization.Localizer.get_text z.string.conversation_device_new_device_may if @user_ids().length > 1
+      return z.localization.Localizer.get_text z.string.conversation_device_new_device_one
 
   click_on_device: =>
     if @is_self_device()
