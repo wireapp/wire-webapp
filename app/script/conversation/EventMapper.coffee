@@ -119,13 +119,13 @@ class z.conversation.EventMapper
   ###############################################################################
 
   ###
-  Maps JSON data of conversation.new-device message into message entity
+  Maps JSON data of conversation.verification message into message entity
 
   @private
 
   @param event [Object] Message data
 
-  @return [z.entity.NewDeviceMessage] Normal message entity
+  @return [z.entity.VerificationMessage] Normal message entity
   ###
   _map_verification: (event) ->
     message_et = new z.entity.VerificationMessage()
