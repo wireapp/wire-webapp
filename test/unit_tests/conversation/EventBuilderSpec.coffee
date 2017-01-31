@@ -42,7 +42,7 @@ describe 'z.conversation.EventBuilder', ->
 
   it 'build_degraded', ->
     user_ids = [z.util.create_random_uuid()]
-    event = z.conversation.EventBuilder.build_degraded conversation_et, user_ids
+    event = z.conversation.EventBuilder.build_degraded conversation_et, user_ids, z.message.VerificationMessageType.NEW_DEVICE
     message_et = event_mapper.map_json_event event, conversation_et
     expect(message_et).toBeDefined()
     expect(message_et.super_type).toBe z.message.SuperType.VERIFICATION
