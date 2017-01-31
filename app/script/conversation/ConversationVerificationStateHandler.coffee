@@ -37,7 +37,7 @@ class z.conversation.ConversationVerificationStateHandler
   on_client_verification_changed: (user_id, client_id, is_verified) =>
     @_get_active_conversations().forEach (conversation_et) =>
       if @_will_change_to_degraded conversation_et
-        @logger.log 'Unverified client'
+        amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_degraded conversation_et, [user_id], z.message.VerificationMessageType.UNVERIFIED
       else if @_will_change_to_verified conversation_et
         amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
 

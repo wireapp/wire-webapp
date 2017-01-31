@@ -44,6 +44,14 @@ class z.entity.VerificationMessage extends z.entity.Message
       return z.localization.Localizer.get_text z.string.conversation_device_new_device_may if @user_ids().length > 1
       return z.localization.Localizer.get_text z.string.conversation_device_new_device_one
 
+    @caption_unverified_device = ko.pureComputed =>
+      return z.localization.Localizer.get_text z.string.conversation_device_new_device_may if @is_self_device()
+      return z.localization.Localizer.get_text
+        id: z.string.conversation_device_user_devices
+        replace:
+          placeholder: '%@name'
+          content: @user_ets()[0].first_name()
+
   click_on_device: =>
     if @is_self_device()
       amplify.publish z.event.WebApp.PREFERENCES.MANAGE_DEVICES
