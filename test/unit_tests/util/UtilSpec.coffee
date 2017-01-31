@@ -398,21 +398,36 @@ describe 'z.util.naked_url', ->
   it 'returns empty string if url is not set', ->
     expect(z.util.naked_url()).toBe ''
 
+
 describe 'z.util.append_url_parameter', ->
   it 'append param with & when url contains param', ->
     url = 'foo.com?bar=true'
-    actual = z.util.append_url_parameter url, 'fum=true'
-    expect(actual).toBe 'foo.com?bar=true&fum=true'
+    expect(z.util.append_url_parameter url, 'fum=true').toBe 'foo.com?bar=true&fum=true'
 
   it 'append param with ? when url contains param', ->
     url = 'foo.com'
-    actual = z.util.append_url_parameter url, 'fum=true'
-    expect(actual).toBe 'foo.com?fum=true'
+    expect(z.util.append_url_parameter url, 'fum=true').toBe 'foo.com?fum=true'
+
 
 describe 'z.util.get_url_parameter', ->
   it 'get param with no arguments', ->
-    actual = z.util.get_url_parameter 'foo'
-    expect(actual).toBe null
+    expect(z.util.get_url_parameter 'foo').toBe null
+
+
+describe 'z.util.forward_url_parameter', ->
+  it 'forwards existing URL parameters', ->
+    z.util.get_url_parameter = (parameter_value)-> return true if parameter_value is z.auth.URLParameter.CALLING_V3
+    expect(z.util.forward_url_parameter 'foo.com', z.auth.URLParameter.CALLING_V3).toBe 'foo.com?calling_v3=true'
+
+    z.util.get_url_parameter = (parameter_value)-> return false if parameter_value is z.auth.URLParameter.CALLING_V3
+    expect(z.util.forward_url_parameter 'foo.com', z.auth.URLParameter.CALLING_V3).toBe 'foo.com?calling_v3=false'
+
+    z.util.get_url_parameter = (parameter_value)-> return 'bar' if parameter_value is z.auth.URLParameter.CALLING_V3
+    expect(z.util.forward_url_parameter 'foo.com', z.auth.URLParameter.CALLING_V3).toBe 'foo.com?calling_v3=bar'
+
+    z.util.get_url_parameter = (parameter_value)-> return null if parameter_value is z.auth.URLParameter.CALLING_V3
+    expect(z.util.forward_url_parameter 'foo.com', z.auth.URLParameter.CALLING_V3).toBe 'foo.com'
+
 
 describe 'Markdown for bold text', ->
   it 'renders bold text', ->

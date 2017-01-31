@@ -57,13 +57,13 @@
                  data-bind="click: clicked_on_minimize, css: {'button-round-dark': !show_remote_participant()}"></div>
             <div class="video-controls-button button-round button-round-md icon-mute"
                  data-uie-name="do-call-controls-video-call-mute"
-                 data-bind="click: clicked_on_mute_audio, css: {'toggled': self_stream_state.muted(), 'button-round-dark': !show_remote_participant()}"></div>
+                 data-bind="click: clicked_on_mute_audio, css: {'toggled': !self_stream_state.audio_send(), 'button-round-dark': !show_remote_participant()}"></div>
             <!-- ko if: show_toggle_screen() -->
               <div class="video-controls-button button-round button-round-md icon-screensharing"
-                   data-bind="click: clicked_on_share_screen, css: {'toggled': self_stream_state.screen_shared(), 'button-round-dark': !show_remote_participant(), 'disabled': disable_toggle_screen()}"></div>
+                   data-bind="click: clicked_on_share_screen, css: {'toggled': self_stream_state.screen_send(), 'button-round-dark': !show_remote_participant(), 'disabled': disable_toggle_screen()}"></div>
             <!-- /ko -->
             <div class="video-controls-button button-round button-round-md icon-video"
-                 data-bind="click: clicked_on_stop_video, css: {'toggled': self_stream_state.videod(), 'button-round-dark': !show_remote_participant()}"></div>
+                 data-bind="click: clicked_on_stop_video, css: {'toggled': self_stream_state.video_send(), 'button-round-dark': !show_remote_participant()}"></div>
             <div class="video-controls-button button-round button-round-md button-round-theme-red icon-end-call"
                  data-uie-name="do-call-controls-video-call-cancel"
                  data-bind="click: clicked_on_cancel_call"></div>
@@ -77,7 +77,7 @@
         <!-- ko if: show_local_video() -->
           <video class="video-element"
                  autoplay
-                 data-bind="css: {'mirror': !self_stream_state.screen_shared()},
+                 data-bind="css: {'mirror': !self_stream_state.screen_send()},
                             mute_media_element: local_video_stream(),
                             source_stream: local_video_stream()"></video>
         <!-- /ko -->

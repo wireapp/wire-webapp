@@ -17,7 +17,7 @@
         <div class="left-column icon-options"></div>
         <div class="center-column" data-bind="l10n_text: z.string.preferences_options"></div>
       </li>
-      <!-- ko if: z.calling.CallCenter.supports_calling() -->
+      <!-- ko if: z.calling.CallingRepository.supports_calling() -->
         <li class="left-list-item left-list-item-clickable" data-bind="click: click_on_av, css: {'text-theme': selected_av}" data-uie-name="go-audio-video">
           <div class="left-column icon-av"></div>
           <div class="center-column" data-bind="l10n_text: z.string.preferences_av"></div>

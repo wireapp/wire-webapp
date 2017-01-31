@@ -18,17 +18,10 @@
 
 window.z ?= {}
 z.calling ?= {}
+z.calling.enum ?= {}
 
-class z.calling.CallTrackingInfo
-  constructor: (params) ->
-    @conversation_id = params.conversation_id
-    @session_id = params.session_id
-    @time_started = new Date()
-    @participants_joined = {}
-
-  add_participant: (participant_et) ->
-    @participants_joined[participant_et.user.name()] = true
-
-  to_string: ->
-    participants = Object.keys(@participants_joined).join ', '
-    return "#{@session_id} in #{@conversation_id} | #{@time_started.toUTCString()} | To: #{participants}"
+z.calling.enum.E_CALL_MESSAGE_TYPE =
+  CANCEL: 'CANCEL'
+  HANGUP: 'HANGUP'
+  PROP_SYNC: 'PROPSYNC'
+  SETUP: 'SETUP'

@@ -32,21 +32,21 @@ class z.calling.entities.Call
 
     # IDs and references
     @id = @conversation_et.id
-    @session_id = ko.observable undefined
+    @session_id = undefined
     @event_sequence = 0
 
     # States
     @call_timer_interval = undefined
     @timer_start = undefined
     @duration_time = ko.observable 0
-    @finished_reason = z.calling.enum.CallFinishedReason.UNKNOWN
+    @finished_reason = z.calling.enum.CALL_FINISHED_REASON.UNKNOWN
     @remote_media_type = ko.observable z.media.MediaType.NONE
 
     @is_connected = ko.observable false
     @is_group = @conversation_et.is_group
-    @is_remote_screen_shared = ko.pureComputed =>
+    @is_remote_screen_send = ko.pureComputed =>
       return @remote_media_type() is z.media.MediaType.SCREEN
-    @is_remote_videod = ko.pureComputed =>
+    @is_remote_video_send = ko.pureComputed =>
       return @remote_media_type() is z.media.MediaType.VIDEO
 
     @self_client_joined = ko.observable false
@@ -209,9 +209,9 @@ class z.calling.entities.Call
     for participant_id, state of participants when participant_id isnt @self_user.id
       participant_et = @get_participant_by_id participant_id
       if participant_et
-        participant_et.state.muted state.muted if state.muted?
-        participant_et.state.screen_shared state.screen_shared if state.screen_shared?
-        participant_et.state.videod state.videod if state.videod?
+        participant_et.state.audio_send not state.muted if state.muted?
+        participant_et.state.screen_send state.screen_shared if state.screen_shared?
+        participant_et.state.video_send state.videod if state.videod?
 
         if state.screen_shared
           @remote_media_type z.media.MediaType.SCREEN
@@ -346,11 +346,7 @@ class z.calling.entities.Call
     participant_et = @get_participant_by_id user_et.id
 
     create_flow = (flow_id, participant_et) =>
-      if call_timings
-        flow_timings = $.extend new z.telemetry.calling.CallSetupTimings(@id), call_timings.get()
-        flow_timings.time_step z.telemetry.calling.CallSetupSteps.FLOW_RECEIVED
-        flow_timings.flow_id = flow_id
-      flow_et = new z.calling.entities.Flow flow_id, @, participant_et, audio_context, flow_timings
+      flow_et = new z.calling.entities.Flow flow_id, @, participant_et, audio_context, call_timings
       participant_et.add_flow flow_et
       return flow_et
 
@@ -392,7 +388,7 @@ class z.calling.entities.Call
 
   ###
   Get full flow telemetry report of the call.
-  @return [Array<z.calling.Flow>] Array of flows
+  @return [Array<Object>] Array of flow telemetry reports for calling service automation
   ###
   get_flow_telemetry: =>
     return (participant.get_flow()?.get_telemetry() for participant in @participants() when participant.get_flow())
@@ -426,6 +422,7 @@ class z.calling.entities.Call
     # Delete flow on backend
     flow_deletion_info = new z.calling.payloads.FlowDeletionInfo @id, flow_et.id
     amplify.publish z.event.WebApp.CALL.SIGNALING.DELETE_FLOW, flow_deletion_info
+
 
   ###############################################################################
   # Panning
@@ -477,9 +474,9 @@ class z.calling.entities.Call
   reset_call: =>
     @self_client_joined false
     @event_sequence = 0
-    @finished_reason = z.calling.enum.CallFinishedReason.UNKNOWN
+    @finished_reason = z.calling.enum.CALL_FINISHED_REASON.UNKNOWN
     @is_connected false
-    @session_id undefined
+    @session_id = undefined
     @self_user_joined false
     @is_declined false
     amplify.publish z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION

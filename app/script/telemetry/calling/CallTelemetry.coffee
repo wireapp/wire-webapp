@@ -22,10 +22,11 @@ z.telemetry.calling ?= {}
 
 # Call traces entity.
 class z.telemetry.calling.CallTelemetry
-  constructor: ->
+  constructor: (protocol_version) ->
     @logger = new z.util.Logger 'z.telemetry.calling.CallTelemetry', z.config.LOGGER.OPTIONS
 
     @sessions = {}
+    @protocol_version = if protocol_version is z.calling.enum.PROTOCOL.VERSION_2 then 'C2' else 'C3'
 
 
   ###############################################################################
@@ -45,7 +46,7 @@ class z.telemetry.calling.CallTelemetry
   @param event [JSON] Call event from backend
   ###
   track_session: (conversation_id, event) =>
-    @sessions[event.session] = new z.calling.CallTrackingInfo {
+    @sessions[event.session] = new z.calling.v2.CallTrackingInfo {
       conversation_id: conversation_id
       session_id: event.session
     }
@@ -87,10 +88,11 @@ class z.telemetry.calling.CallTelemetry
         conversation_participants: call_et.conversation_et.number_of_participants()
         conversation_participants_in_call: call_et.max_number_of_participants
         conversation_type: if call_et.is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
+        version: @protocol_version
         with_bot: call_et.conversation_et.is_with_bot()
       , attributes
 
-      if call_et.is_remote_screen_shared() or call_et.is_remote_videod()
+      if call_et.is_remote_screen_send() or call_et.is_remote_video_send()
         event_name = event_name.replace '_call', '_video_call'
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name, attributes
@@ -126,10 +128,11 @@ class z.telemetry.calling.CallTelemetry
         duration: duration_bucket
         duration_sec: duration
         reason: call_et.finished_reason
+        version: @protocol_version
         with_bot: call_et.conversation_et.is_with_bot()
 
       event_name = z.tracking.EventName.CALLING.ENDED_CALL
-      if call_et.is_remote_screen_shared() or call_et.is_remote_videod()
+      if call_et.is_remote_screen_send() or call_et.is_remote_video_send()
         event_name = event_name.replace '_call', '_video_call'
 
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name, attributes

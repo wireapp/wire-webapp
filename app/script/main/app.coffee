@@ -53,7 +53,8 @@ class z.main.App
 
     service.asset                   = new z.assets.AssetService @auth.client
     service.bot                     = new z.bot.BotService()
-    service.call                    = new z.calling.CallService @auth.client
+    service.call                    = new z.calling.v2.CallService @auth.client
+    service.calling                 = new z.calling.CallingService @auth.client
     service.connect                 = new z.connect.ConnectService @auth.client
     service.connect_google          = new z.connect.ConnectGoogleService @auth.client
     service.cryptography            = new z.cryptography.CryptographyService @auth.client
@@ -105,9 +106,9 @@ class z.main.App
     )
 
     repository.bot                 = new z.bot.BotRepository @service.bot, repository.conversation
-    repository.call_center         = new z.calling.CallCenter @service.call, repository.audio, repository.conversation, repository.media, repository.user
+    repository.calling             = new z.calling.CallingRepository @service.call, @service.calling, repository.conversation, repository.media, repository.user
     repository.event_tracker       = new z.tracking.EventTrackingRepository repository.user, repository.conversation
-    repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.call_center, repository.conversation
+    repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.calling, repository.conversation
 
     return repository
 
@@ -116,8 +117,8 @@ class z.main.App
     view = {}
 
     view.main                      = new z.ViewModel.MainViewModel 'wire-main', @repository.user
-    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.audio, @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.media, @repository.search, @repository.user, @repository.properties
-    view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user, @repository.properties
+    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.calling, @repository.client, @repository.conversation, @repository.media, @repository.search, @repository.properties
+    view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.calling, @repository.connect, @repository.conversation, @repository.search, @repository.properties
     view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
     view.lightbox                  = new z.ViewModel.ImageDetailViewViewModel 'detail-view', @repository.conversation
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
@@ -245,7 +246,7 @@ class z.main.App
   init_service_worker: ->
     navigator.serviceWorker?.register '/sw.js'
     .then (registration) =>
-      @logger.info 'ServiceWorker registration successful with scope: ', registration.scope
+      @logger.info "ServiceWorker registration successful with scope: #{registration.scope}"
 
   ###
   Get the self user from the backend.
@@ -283,10 +284,15 @@ class z.main.App
     if bot_name
       @logger.info "Found bot token '#{bot_name}'"
       @repository.bot.add_bot bot_name
-    v3_support = z.util.get_url_parameter z.auth.URLParameter.ASSETS_V3
-    if v3_support
-      @repository.conversation.use_v3_api = v3_support
-      @repository.user.use_v3_api = v3_support
+
+    assets_v3 = z.util.get_url_parameter z.auth.URLParameter.ASSETS_V3
+    if _.isBoolean assets_v3
+      @repository.conversation.use_v3_api = assets_v3
+      @repository.user.use_v3_api = assets_v3
+
+    calling_v3 = z.util.get_url_parameter z.auth.URLParameter.CALLING_V3
+    if _.isBoolean calling_v3
+      @repository.calling.use_v3_api = calling_v3
 
   ###
   Check whether the page has been reloaded.
@@ -335,7 +341,7 @@ class z.main.App
     $(window).on 'beforeunload', =>
       @logger.info "'window.onbeforeunload' was triggered, so we will disconnect from the backend."
       @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.PAGE_NAVIGATION
-      @repository.call_center.state_handler.leave_call_on_beforeunload()
+      @repository.calling.leave_call_on_beforeunload()
       @repository.storage.terminate 'window.onbeforeunload'
       return undefined
 
@@ -475,7 +481,7 @@ class z.main.App
 
   # Report call telemetry to Raygun for analysis.
   report_call: =>
-    @repository.call_center.report_call()
+    @repository.calling.report_call()
 
   # Reset all known sessions at once.
   reset_all_sessions: =>

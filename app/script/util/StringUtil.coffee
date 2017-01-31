@@ -41,6 +41,12 @@ z.util.StringUtil =
       return find_emoji_in_string[0]
     return string[0]
 
+  # @note Returns random alphanumeric character [A-Z, a-z, 0-9]
+  get_random_character: ->
+    until z.util.NumberUtil.in_range(char_index, 1, 9) or z.util.NumberUtil.in_range(char_index, 65, 90) or z.util.NumberUtil.in_range char_index, 97, 122
+      char_index = Math.floor Math.random() * 122
+    return if char_index <= 9 then char_index else String.fromCharCode char_index
+
   includes: (string = '', query = '') ->
     return string.toLowerCase().includes query.toLowerCase()
 
