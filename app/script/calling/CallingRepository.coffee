@@ -211,7 +211,7 @@ class z.calling.CallingRepository
   _update_calling_config: ->
     @calling_service.get_config()
     .then (calling_config) =>
-      timeout_in_seconds = calling_config.ttl or CALLING_CONFIG.DEFAULT_UPDATE_INTERVAL
+      timeout_in_seconds = CALLING_CONFIG.DEFAULT_UPDATE_INTERVAL # Removed reliance on "calling_config.ttl" until further notice
       @logger.info "Updated calling configuration - next update in #{timeout_in_seconds}s", calling_config
       @calling_config calling_config
       window.clearTimeout @calling_config_timeout if @calling_config_timeout
