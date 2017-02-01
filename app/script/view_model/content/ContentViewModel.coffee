@@ -77,11 +77,6 @@ class z.ViewModel.content.ContentViewModel
           @conversation_input.removed_from_view()
           @conversation_titlebar.removed_from_view()
 
-    @multitasking.is_minimized.subscribe (is_minimized) =>
-      if is_minimized and @calling_repository.joined_call()
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.MINIMIZED_FROM_FULLSCREEN,
-        conversation_type: if @calling_repository.joined_call().is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
-
     @user_repository.connect_requests.subscribe (requests) =>
       if @content_state() is z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS and requests.length is 0
         @show_conversation @conversation_repository.get_most_recent_conversation()

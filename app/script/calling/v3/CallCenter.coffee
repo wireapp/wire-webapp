@@ -212,8 +212,11 @@ class z.calling.v3.CallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       if e_call_message_et.response is true
-        if e_call_et.state() is z.calling.enum.CallState.INCOMING
-          return @delete_call conversation_id
+        switch e_call_et.state()
+          when z.calling.enum.CallState.INCOMING
+            return @delete_call conversation_id
+          when z.calling.enum.CallState.OUTGOING
+            e_call_et.state z.calling.enum.CallState.CONNECTING
         return e_call_et.update_e_participant user_id, e_call_message_et
 
       return new Promise (resolve) =>
