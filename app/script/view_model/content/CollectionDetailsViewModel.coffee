@@ -33,11 +33,32 @@ class z.ViewModel.content.CollectionDetailsViewModel
     @last_message_timestamp = undefined
 
   set_conversation: (conversation_et, category, items) =>
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.ADDED, @item_added
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, @item_removed
     @template category
     @conversation_et conversation_et
     z.util.ko_push_deferred @items, items
 
+  item_added: (message_et) =>
+    return unless @conversation_et().id is message_et.conversation_id
+
+    switch @category
+      when 'images'
+        return unless message_et.category & z.message.MessageCategory.IMAGE and not (message_et.category & z.message.MessageCategory.GIF)
+      when 'files'
+        return unless message_et.category & z.message.MessageCategory.FILE
+      when 'links'
+        return unless message_et.category & z.message.MessageCategory.LINK_PREVIEW
+
+    @items.push message_et
+
+  item_removed: (removed_message_id) =>
+    @items.remove (message_et) ->  message_et.id is removed_message_id
+    @click_on_back_button() unless @items().length
+
   removed_from_view: =>
+    amplify.unsubscribe z.event.WebApp.CONVERSATION.MESSAGE.ADDED, @item_added
+    amplify.unsubscribe z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, @item_removed
     @last_message_timestamp = undefined
     @conversation_et null
     @items.removeAll()

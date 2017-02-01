@@ -67,6 +67,8 @@ z.string.auth_limit_devices_current = '(Current)'
 # Authentication: limit section
 z.string.auth_history_headline = 'It’s the first time you’re using Wire on this device.'
 z.string.auth_history_description = 'For privacy reasons, your conversation history will not appear here.'
+z.string.auth_history_reuse_headline = 'You’ve used Wire on this device before.'
+z.string.auth_history_reuse_description = 'Messages sent in the meantime will not appear here.'
 z.string.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -525,6 +527,10 @@ z.string.warning_tell_me_how = 'Tell me how'
 # Warnings: Connectivity
 z.string.warning_connectivity_connection_lost = 'Trying to connect. Wire may not be able to deliver messages.'
 z.string.warning_connectivity_no_internet = 'No Internet. You won’t be able to send or receive messages.'
+
+# Warnings: Desktop Update
+z.string.warning_lifecycle_update = 'A new version of Wire is available.'
+z.string.warning_lifecycle_update_link = 'Update now'
 
 # Browser notifications
 z.string.system_notification_asset_add = 'Shared a picture'

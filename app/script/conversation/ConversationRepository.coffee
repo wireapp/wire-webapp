@@ -107,6 +107,7 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
     amplify.subscribe z.event.WebApp.CONVERSATION.PERSIST_STATE, @save_conversation_state_in_db
+    amplify.subscribe z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @on_verification_state_changed
     amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
@@ -449,7 +450,7 @@ class z.conversation.ConversationRepository
   mark_as_read: (conversation_et) =>
     return if conversation_et is undefined
     return if @block_event_handling
-    return if conversation_et.number_of_unread_events() is 0
+    return if conversation_et.unread_event_count() is 0
     return if conversation_et.get_last_message()?.type is z.event.Backend.CONVERSATION.MEMBER_UPDATE
 
     @_update_last_read_timestamp conversation_et
@@ -504,6 +505,14 @@ class z.conversation.ConversationRepository
   ###
   save_conversations: (conversation_ets) =>
     z.util.ko_array_push_all @conversations, conversation_ets
+
+  ###
+  Handle conversation verification state change.
+  @param conversation_et [z.entity.Conversation]
+  ###
+  on_verification_state_changed: (conversation_et) ->
+    # if conversation_et.verification_state() is z.conversation.ConversationVerificationState.VERIFIED
+      # amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
 
   ###
   Set the notification handling state.
@@ -909,7 +918,7 @@ class z.conversation.ConversationRepository
 
   ###
   Send confirmation for a content message in specified conversation.
-  @param conversation [z.entity.Conversation] Conversation that content message was received in
+  @param conversation_et [z.entity.Conversation] Conversation that content message was received in
   @param message_et [String] ID of message for which to acknowledge receipt
   ###
   send_confirmation_status: (conversation_et, message_et) =>
@@ -918,6 +927,16 @@ class z.conversation.ConversationRepository
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
     @sending_queue.push => @_send_generic_message conversation_et.id, generic_message, [message_et.user().id], false
+
+  ###
+  Send e-call message in specified conversation.
+  @param conversation_et [z.entity.Conversation] Conversation to send e-call message to
+  @param content [String] Content for e-call message
+  ###
+  send_e_call: (conversation_et, content) =>
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'calling', new z.proto.Calling content
+    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
 
   ###
   Sends image asset in specified conversation.
@@ -1566,6 +1585,7 @@ class z.conversation.ConversationRepository
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE
     .then =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id
       return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
       @logger.info "Failed to send delete message for everyone with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
@@ -1573,7 +1593,6 @@ class z.conversation.ConversationRepository
 
   ###
   Delete message on your own clients.
-
   @param conversation_et [z.entity.Conversation]
   @param message_et [z.entity.Message]
   ###
@@ -1588,6 +1607,7 @@ class z.conversation.ConversationRepository
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL
     .then =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, message_et.id
       return @_delete_message_by_id conversation_et, message_et.id
     .catch (error) =>
       @logger.info "Failed to send delete message with id '#{message_et.id}' for conversation '#{conversation_et.id}'", error
@@ -1957,6 +1977,7 @@ class z.conversation.ConversationRepository
       if event_json.from isnt @user_repository.self().id
         return @_add_delete_message conversation_et.id, event_json.id, event_json.time, message_to_delete_et
     .then =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_json.data.message_id
       return @_delete_message_by_id conversation_et, event_json.data.message_id
     .catch (error) =>
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
@@ -1975,9 +1996,10 @@ class z.conversation.ConversationRepository
         throw new Error 'Sender is not self user'
       return @find_conversation_by_id event_json.data.conversation_id
     .then (conversation_et) =>
+      amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_json.data.message_id
       return @_delete_message_by_id conversation_et, event_json.data.message_id
     .catch (error) =>
-      @logger.info "Failed to delete message for conversation '#{conversation_et.id}'", error
+      @logger.info "Failed to delete message for conversation '#{event_json.conversation}'", error
       throw error
 
   ###
@@ -2218,7 +2240,6 @@ class z.conversation.ConversationRepository
   ###
   _handle_client_mismatch_deleted: (user_client_map, payload) ->
     if _.isEmpty user_client_map
-      @logger.info 'No deleted clients that need to be removed'
       return Promise.resolve payload
     @logger.debug "Message contains deleted clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
@@ -2245,7 +2266,6 @@ class z.conversation.ConversationRepository
   ###
   _handle_client_mismatch_missing: (user_client_map, payload, generic_message) ->
     if _.isEmpty user_client_map
-      @logger.info 'No missing clients that need to be added'
       return Promise.resolve payload
     if not payload
       return Promise.resolve payload
@@ -2276,7 +2296,6 @@ class z.conversation.ConversationRepository
   ###
   _handle_client_mismatch_redundant: (user_client_map, payload, conversation_id) ->
     if _.isEmpty user_client_map
-      @logger.info 'No redundant clients that need to be removed'
       return Promise.resolve payload
     @logger.debug "Message contains redundant clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
@@ -2503,6 +2522,8 @@ class z.conversation.ConversationRepository
       when 'asset'
         if message.asset.original?
           if message.asset.original.image? then 'photo' else 'file'
+      when 'calling'
+        if (JSON.parse generic_message.calling.content).props.videosend then 'video_call' else 'audio_call'
       when 'image' then 'photo'
       when 'knock' then 'ping'
       when 'text' then 'text' if not message.text.link_preview.length

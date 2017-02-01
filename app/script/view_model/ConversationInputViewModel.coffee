@@ -71,7 +71,7 @@ class z.ViewModel.ConversationInputViewModel
       return @conversation_et()?.input().length > 0
 
     @show_giphy_button = ko.pureComputed =>
-      return @has_text_input() and @conversation_et()?.input().length <= 15
+      return @has_text_input() and @conversation_et()?.input().length <= 256
 
     @input = ko.pureComputed
       read: =>

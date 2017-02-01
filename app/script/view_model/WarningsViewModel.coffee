@@ -30,6 +30,7 @@ z.ViewModel.WarningType =
   DENIED_CAMERA: 'camera_access_denied'
   DENIED_MICROPHONE: 'mic_access_denied'
   DENIED_SCREEN: 'screen_access_denied'
+  LIFECYCLE_UPDATE: 'lifecycle_update'
   NOT_FOUND_CAMERA: 'not_found_camera'
   NOT_FOUND_MICROPHONE: 'not_found_microphone'
   UNSUPPORTED_INCOMING_CALL: 'unsupported_incoming_call'
@@ -37,6 +38,7 @@ z.ViewModel.WarningType =
   CONNECTIVITY_RECONNECT: 'connectivity_reconnect'
   CONNECTIVITY_RECOVERY: 'connectivity_recovery'
   NO_INTERNET: 'no_internet'
+
 
 class z.ViewModel.WarningsViewModel
   constructor: (element_id) ->
@@ -50,6 +52,7 @@ class z.ViewModel.WarningsViewModel
     @warnings.subscribe (warnings) ->
       mini_modes = [
         z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
+        z.ViewModel.WarningType.LIFECYCLE_UPDATE
         z.ViewModel.WarningType.NO_INTERNET
       ]
       if warnings.length is 0
@@ -102,7 +105,7 @@ class z.ViewModel.WarningsViewModel
     @warnings.remove type
 
   show_warning: (type, info) =>
-    @dismiss_warning() if @top_warning() and type in [z.ViewModel.WarningType.CONNECTIVITY_RECONNECT, z.ViewModel.WarningType.NO_INTERNET]
+    @dismiss_warning() if type in [z.ViewModel.WarningType.CONNECTIVITY_RECONNECT, z.ViewModel.WarningType.NO_INTERNET] and @top_warning() isnt z.ViewModel.WarningType.LIFECYCLE_UPDATE
     @logger.warn "Showing warning of type '#{type}'"
     if info?
       @first_name info.first_name

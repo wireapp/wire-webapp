@@ -24,13 +24,7 @@ window.LOG = ->
 
 
 z.util.dummy_image = (width, height) ->
-  canvas = document.createElement 'canvas'
-  canvas.width = width
-  canvas.height = height
-  ctx = canvas.getContext '2d'
-  ctx.fillStyle = '#fff'
-  ctx.fillRect 0, 0, width, height
-  return canvas.toDataURL 'image/png'
+  return "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 #{width} #{height}' width='#{width}' height='#{height}'></svg>"
 
 
 z.util.is_same_location = (past_location, current_location) ->
@@ -78,9 +72,16 @@ z.util.load_url_blob = (url) ->
     return new Blob [new Uint8Array buffer], type: type
 
 
-z.util.append_url_parameter = (url, param) ->
+z.util.append_url_parameter = (url, parameter) ->
   separator = if z.util.StringUtil.includes url, '?' then '&' else '?'
-  return "#{url}#{separator}#{param}"
+  return "#{url}#{separator}#{parameter}"
+
+
+z.util.forward_url_parameter = (url, parameter_name) ->
+  parameter_value = z.util.get_url_parameter parameter_name
+  if parameter_value?
+    return url = z.util.append_url_parameter url, "#{parameter_name}=#{parameter_value}"
+  return url
 
 
 z.util.get_url_parameter = (name) ->
@@ -88,7 +89,12 @@ z.util.get_url_parameter = (name) ->
   for param in params
     value = param.split '='
     if value[0] is name
-      return if value[1] then unescape value[1] else 'true'
+      if value[1]
+        value = unescape value[1]
+        return false if value is 'false'
+        return true if value is 'true'
+        return value
+      return true
   return null
 
 
@@ -476,6 +482,10 @@ z.util.is_valid_phone_number = (phone_number) ->
   else
     regular_expression = /^\+[0-9]\d{1,14}$/
   return regular_expression.test phone_number
+
+z.util.is_valid_username = (username) ->
+  username = username.substring 1 if username.startsWith '@'
+  return /^[a-z_0-9]{2,21}$/.test username
 
 
 ###

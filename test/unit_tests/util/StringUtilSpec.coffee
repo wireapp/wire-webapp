@@ -41,6 +41,11 @@ describe 'z.util.StringUtil', ->
       expect(z.util.StringUtil.format 'foo={0}&bar={1}', 1, 2).toBe 'foo=1&bar=2'
 
 
+  describe 'get_random_character', ->
+    it 'always returns an alphanumeric character', ->
+      expect(z.util.StringUtil.get_random_character()).toMatch(/(\w|\d){1}/) for [0...1000]
+
+
   describe 'includes', ->
     string = 'Club Zeta'
 

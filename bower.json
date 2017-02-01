@@ -31,7 +31,7 @@
     "webapp-module-logger": "https://github.com/wireapp/webapp-module-logger.git#1.1.0",
     "webapp-module-modal": "https://github.com/wireapp/webapp-module-modal.git#1.0.0",
     "webapp-module-namespace": "https://github.com/wireapp/webapp-module-namespace.git#1.0.0",
-    "webrtc-adapter": "https://github.com/webrtc/adapter.git#2.0.8",
+    "webrtc-adapter": "https://github.com/webrtc/adapter.git#2.1.0",
     "wire-audio-files": "https://github.com/wireapp/wire-audio-files.git#1.1.0",
     "wire-theme": "https://github.com/wireapp/wire-theme.git#1.0.0"
   },

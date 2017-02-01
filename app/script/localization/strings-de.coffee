@@ -67,6 +67,8 @@ z.string.de.auth_limit_devices_current = '(Aktuelles Gerät)'
 # Authentication: limit section
 z.string.de.auth_history_headline = 'Du benutzt Wire zum ersten Mal auf diesem Gerät.'
 z.string.de.auth_history_description = 'Aus Datenschutzgründen wird dein bisheriger Gesprächsverlauf nicht angezeigt.'
+z.string.de.auth_history_reuse_headline = 'Du hast Wire auf diesem Gerät bereits früher genutzt.'
+z.string.de.auth_history_reuse_description = 'In der Zwischenzeit gesendete Nachrichten werden nicht angezeigt.'
 z.string.de.auth_history_button = 'Verstanden'
 
 # Authentication: POSTED section
@@ -227,7 +229,7 @@ z.string.de.conversation_create = ' hat eine Unterhaltung mit %@names begonnen'
 z.string.de.conversation_create_you = ' hast eine Unterhaltung mit %@names begonnen'
 z.string.de.conversation_device_started_using = ' hat begonnen'
 z.string.de.conversation_device_started_using_you = ' hast begonnen'
-z.string.de.conversation_device_unverified = ' hast die Überprüfung von einem Gerät widerrufen für'
+z.string.de.conversation_device_unverified = ' hat die Überprüfung widerrufen für'
 z.string.de.conversation_device_your_devices = ' deine Geräte'
 z.string.de.conversation_device_user_devices = ' %@names Geräte'
 z.string.de.conversation_device_a_new_device = ' ein neues Gerät'
@@ -525,6 +527,10 @@ z.string.de.warning_tell_me_how = 'Zeig mir wie'
 # Warnings: Connectivity
 z.string.de.warning_connectivity_connection_lost = 'Verbindung wird wiederhergestellt. Wire kann Nachrichten möglicherweise nicht empfangen.'
 z.string.de.warning_connectivity_no_internet = 'Keine Internetverbindung. Du kannst keine Nachrichten senden und empfangen.'
+
+# Warnings: Desktop Update
+z.string.de.warning_lifecycle_update = 'Eine neue Version von Wire ist verfügbar.'
+z.string.de.warning_lifecycle_update_link = 'Jetzt aktualisieren'
 
 # Browser notifications
 z.string.de.system_notification_asset_add = 'Hat ein Bild geteilt'

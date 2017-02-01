@@ -19,31 +19,38 @@
 window.z ?= {}
 z.announce ?= {}
 
-CHECK_TIMEOUT = 5 * 60 * 1000
-CHECK_INTERVAL = 3 * 60 * 60 * 1000
+ANNOUNCE_CONFIG =
+  CHECK_TIMEOUT: 5 * 60 * 1000
+  CHECK_INTERVAL: 3 * 60 * 60 * 1000
+  UPDATE_INTERVAL: 6 * 60 * 60 * 1000
 
 class z.announce.AnnounceRepository
-  PRIMARY_KEY_CURRENT_announce: 'local_identity'
   constructor: (@announce_service) ->
     @logger = new z.util.Logger 'z.announce.AnnounceRepository', z.config.LOGGER.OPTIONS
     return @
 
   init: ->
     window.setTimeout =>
-      @fetch_announcements()
-      @schedule_check()
-    , CHECK_TIMEOUT
+      @check_announcements()
+      @schedule_checks()
+    , ANNOUNCE_CONFIG.CHECK_TIMEOUT
 
-  fetch_announcements: =>
+  check_announcements: =>
     @announce_service.get_announcements()
     .then @process_announce_list
     .catch (error) =>
       @logger.error "Failed to fetch announcements: #{error}"
 
+  check_version: =>
+    @announce_service.get_version()
+    .then (server_version) ->
+      amplify.publish z.event.WebApp.LIFECYCLE.UPDATE, z.announce.UPDATE_SOURCE.WEBAPP if server_version > z.util.Environment.version false, true
+    .catch (error) =>
+      @logger.error "Failed to fetch version: #{error}"
 
-
-  schedule_check: =>
-    window.setInterval @fetch_announcements, CHECK_INTERVAL
+  schedule_checks: =>
+    window.setInterval @check_announcements, ANNOUNCE_CONFIG.CHECK_INTERVAL
+    window.setInterval @check_version, ANNOUNCE_CONFIG.UPDATE_INTERVAL
 
   process_announce_list: (announcements_list) =>
     if announcements_list
@@ -76,7 +83,6 @@ class z.announce.AnnounceRepository
             if announcement.link
               z.util.safe_window_open announcement.link
             if announcement.refresh
-              window.location.reload true
-              window.focus()
+              amplify.publish z.event.WebApp.LIFECYCLE.REFRESH
             notification.close()
           break

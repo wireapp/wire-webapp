@@ -30,6 +30,7 @@ class z.main.App
 
     @telemetry = new z.telemetry.app_init.AppInitTelemetry()
     @window_handler = new z.ui.WindowHandler().init()
+    @update_source = undefined
 
     @service = @_setup_services()
     @repository = @_setup_repositories()
@@ -53,7 +54,8 @@ class z.main.App
 
     service.asset                   = new z.assets.AssetService @auth.client
     service.bot                     = new z.bot.BotService()
-    service.call                    = new z.calling.CallService @auth.client
+    service.call                    = new z.calling.v2.CallService @auth.client
+    service.calling                 = new z.calling.CallingService @auth.client
     service.connect                 = new z.connect.ConnectService @auth.client
     service.connect_google          = new z.connect.ConnectGoogleService @auth.client
     service.cryptography            = new z.cryptography.CryptographyService @auth.client
@@ -105,9 +107,9 @@ class z.main.App
     )
 
     repository.bot                 = new z.bot.BotRepository @service.bot, repository.conversation
-    repository.call_center         = new z.calling.CallCenter @service.call, repository.audio, repository.conversation, repository.media, repository.user
+    repository.calling             = new z.calling.CallingRepository @service.call, @service.calling, repository.conversation, repository.media, repository.user
     repository.event_tracker       = new z.tracking.EventTrackingRepository repository.user, repository.conversation
-    repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.call_center, repository.conversation
+    repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.calling, repository.conversation
 
     return repository
 
@@ -116,8 +118,8 @@ class z.main.App
     view = {}
 
     view.main                      = new z.ViewModel.MainViewModel 'wire-main', @repository.user
-    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.audio, @repository.call_center, @repository.client, @repository.conversation, @repository.cryptography, @repository.giphy, @repository.media, @repository.search, @repository.user, @repository.properties
-    view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.call_center, @repository.connect, @repository.conversation, @repository.search, @repository.user, @repository.properties
+    view.content                   = new z.ViewModel.content.ContentViewModel 'right', @repository.calling, @repository.client, @repository.conversation, @repository.media, @repository.search, @repository.properties
+    view.list                      = new z.ViewModel.list.ListViewModel 'left', view.content, @repository.calling, @repository.connect, @repository.conversation, @repository.search, @repository.properties
     view.title                     = new z.ViewModel.WindowTitleViewModel view.content.content_state, @repository.user, @repository.conversation
     view.lightbox                  = new z.ViewModel.ImageDetailViewViewModel 'detail-view', @repository.conversation
     view.warnings                  = new z.ViewModel.WarningsViewModel 'warnings'
@@ -137,7 +139,9 @@ class z.main.App
 
   # Subscribe to amplify events.
   _subscribe_to_events: ->
-    amplify.subscribe z.event.WebApp.SIGN_OUT, @logout
+    amplify.subscribe z.event.WebApp.LIFECYCLE.REFRESH, @refresh
+    amplify.subscribe z.event.WebApp.LIFECYCLE.SIGN_OUT, @logout
+    amplify.subscribe z.event.WebApp.LIFECYCLE.UPDATE, @update
 
 
   ###############################################################################
@@ -212,13 +216,15 @@ class z.main.App
       @_show_ui()
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.SHOWING_UI
       @telemetry.report()
-      amplify.publish z.event.WebApp.LOADED
+      amplify.publish z.event.WebApp.LIFECYCLE.LOADED
+      amplify.publish z.event.WebApp.LOADED # todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.APP_LOADED
       return @repository.conversation.update_conversations @repository.conversation.conversations_unarchived()
     .then =>
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.UPDATED_CONVERSATIONS
       @repository.announce.init()
       @repository.audio.init true
+      @repository.client.cleanup_clients_and_sessions true
       @logger.info 'App fully loaded'
     .catch (error) =>
       error_message = "Error during initialization of app version '#{z.util.Environment.version false}'"
@@ -241,9 +247,7 @@ class z.main.App
   init_service_worker: ->
     navigator.serviceWorker?.register '/sw.js'
     .then (registration) =>
-      @logger.info 'ServiceWorker registration successful with scope: ', registration.scope
-    .catch (error) ->
-      @logger.error 'ServiceWorker registration failed: ', error
+      @logger.info "ServiceWorker registration successful with scope: #{registration.scope}"
 
   ###
   Get the self user from the backend.
@@ -281,10 +285,15 @@ class z.main.App
     if bot_name
       @logger.info "Found bot token '#{bot_name}'"
       @repository.bot.add_bot bot_name
-    v3_support = z.util.get_url_parameter z.auth.URLParameter.ASSETS_V3
-    if v3_support
-      @repository.conversation.use_v3_api = v3_support
-      @repository.user.use_v3_api = v3_support
+
+    assets_v3 = z.util.get_url_parameter z.auth.URLParameter.ASSETS_V3
+    if _.isBoolean assets_v3
+      @repository.conversation.use_v3_api = assets_v3
+      @repository.user.use_v3_api = assets_v3
+
+    calling_v3 = z.util.get_url_parameter z.auth.URLParameter.CALLING_V3
+    if _.isBoolean calling_v3
+      @repository.calling.use_v3_api = calling_v3
 
   ###
   Check whether the page has been reloaded.
@@ -333,7 +342,7 @@ class z.main.App
     $(window).on 'beforeunload', =>
       @logger.info "'window.onbeforeunload' was triggered, so we will disconnect from the backend."
       @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.PAGE_NAVIGATION
-      @repository.call_center.state_handler.leave_call_on_beforeunload()
+      @repository.calling.leave_call_on_beforeunload()
       @repository.storage.terminate 'window.onbeforeunload'
       return undefined
 
@@ -379,7 +388,7 @@ class z.main.App
 
 
   ###############################################################################
-  # Logout
+  # Lifecycle
   ###############################################################################
 
   ###
@@ -436,6 +445,17 @@ class z.main.App
       @logger.warn 'No internet access. Continuing when internet connectivity regained.'
       $(window).on 'online', -> _logout_on_backend()
 
+  refresh: =>
+    if z.util.Environment.electron
+      amplify.publish z.event.WebApp.LIFECYCLE.RESTART, @update_source
+    if @update_source is z.announce.UPDATE_SOURCE.WEBAPP
+      window.location.reload true
+      window.focus()
+
+  update: (update_source) =>
+    @update_source = update_source
+    amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.LIFECYCLE_UPDATE
+
   # Redirect to the login page after internet connectivity has been verified.
   _redirect_to_login: (session_expired) ->
     @logger.info "Redirecting to login after connectivity verification. Session expired: #{session_expired}"
@@ -462,7 +482,7 @@ class z.main.App
 
   # Report call telemetry to Raygun for analysis.
   report_call: =>
-    @repository.call_center.report_call()
+    @repository.calling.report_call()
 
   # Reset all known sessions at once.
   reset_all_sessions: =>

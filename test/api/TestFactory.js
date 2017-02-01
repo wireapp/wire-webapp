@@ -269,7 +269,7 @@ window.TestFactory.prototype.exposeMediaActors = function () {
       window.media_repository.devices_handler.logger.level = self.settings.logging_level;
       window.media_repository.stream_handler.logger.level = self.settings.logging_level;
       window.media_repository.element_handler.logger.level = self.settings.logging_level;
-      resolve(window.call_center);
+      resolve(window.v2_call_center);
     });
   });
 };
@@ -283,15 +283,23 @@ window.TestFactory.prototype.exposeCallingActors = function () {
   return new Promise(function (resolve) {
     self.exposeMediaActors().then(function() {
       self.exposeConversationActors().then(function () {
-        window.call_service = new z.calling.CallService(self.client);
+        window.call_service = new z.calling.v2.CallService(self.client);
         window.call_service.logger.level = self.settings.logging_level;
 
-        window.call_center = new z.calling.CallCenter(window.call_service, window.audio_repository, window.conversation_repository, window.media_repository, window.user_repository);
-        window.call_center.logger.level = self.settings.logging_level;
+        window.calling_service = new z.calling.CallingService(self.client);
+        window.calling_service.logger.level = self.settings.logging_level;
 
-        window.call_center.state_handler.logger.level = self.settings.logging_level;
-        window.call_center.signaling_handler.logger.level = self.settings.logging_level;
-        resolve(window.call_center);
+        window.calling_repository = new z.calling.CallingRepository(window.call_service, window.calling_service, window.conversation_repository, window.media_repository, window.user_repository);
+        window.calling_repository.logger.level = self.settings.logging_level;
+
+        window.v2_call_center = window.calling_repository.v2_call_center;
+        window.v2_call_center.logger.level = self.settings.logging_level;
+        window.v2_call_center.state_handler.logger.level = self.settings.logging_level;
+        window.v2_call_center.signaling_handler.logger.level = self.settings.logging_level;
+
+        window.v3_call_center = window.calling_repository.v3_call_center;
+        window.v3_call_center.logger.level = self.settings.logging_level;
+        resolve(window.calling_repository);
       });
     });
   });
@@ -306,7 +314,7 @@ window.TestFactory.prototype.exposeSystemNotificationActors = function () {
   return new Promise(function (resolve) {
     self.exposeConversationActors().then(function () {
       self.exposeCallingActors().then(function () {
-        window.system_notification_repository = new z.SystemNotification.SystemNotificationRepository(window.call_center, window.conversation_repository);
+        window.system_notification_repository = new z.SystemNotification.SystemNotificationRepository(window.v2_call_center, window.conversation_repository);
         window.system_notification_repository.logger.level = self.settings.logging_level;
         resolve(window.system_notification_repository)
       });

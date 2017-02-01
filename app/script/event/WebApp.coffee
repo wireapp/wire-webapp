@@ -45,10 +45,11 @@ z.event.WebApp =
       LEAVE: 'wire.webapp.call.state.leave'
       REMOVE_PARTICIPANT: 'wire.webapp.call.state.remove-participant'
       TOGGLE: 'wire.webapp.call.state.toggle'
-      TOGGLE_SCREEN: 'wire.webapp.call.state.toggle-screen'
     MEDIA:
-      MUTE_AUDIO: 'wire.webapp.call.media.mute_audio'
       ADD_STREAM: 'wire.webapp.call.media.add_stream'
+      CHOOSE_SCREEN: 'wire.webapp.call.media.choose_screen'
+      MUTE_AUDIO: 'wire.webapp.call.media.mute_audio'
+      TOGGLE: 'wire.webapp.call.media.toggle'
     SIGNALING:
       DELETE_FLOW: 'wire.webapp.call.signaling.delete-flow'
       POST_FLOWS: 'wire.webapp.call.signaling.post-flows'
@@ -81,9 +82,12 @@ z.event.WebApp =
     ASSET:
       CANCEL: 'wire.webapp.conversation.asset.cancel'
     MESSAGE:
+      ADDED: 'wire.webapp.conversation.message.added'
       EDIT: 'wire.webapp.conversation.message.edit'
+      REMOVED: 'wire.webapp.conversation.message.removed'
     IMAGE:
       SEND: 'wire.webapp.conversation.image.send'
+    VERIFICATION_STATE_CHANGED: 'wire.webapp.conversation.verification_state_changed'
   CONTENT:
     SWITCH: 'wire.webapp.content.switch'
   CONTEXT_MENU: 'wire.webapp.context-menu'
@@ -99,7 +103,6 @@ z.event.WebApp =
     NOTIFICATION_HANDLING_STATE: 'wire.webapp.event.notification_handling'
   LIST:
     SCROLL: 'wire.webapp.list.scroll'
-  LOADED: 'wire.webapp.loaded'
   PEOPLE:
     HIDE: 'wire.webapp.participant-et.hide'
     SHOW: 'wire.webapp.participant-et.show'
@@ -109,8 +112,16 @@ z.event.WebApp =
   LEFT:
     HIDE: 'wire.webapp.left.hide'
     FADE_IN: 'wire.webapp.left.fade-in'
+  LIFECYCLE:
+    ASK_TO_CLEAR_DATA: 'wire.webapp.lifecycle.ask_to_clear_data'
+    LOADED: 'wire.webapp.lifecycle.loaded'
+    REFRESH: 'wire.webapp.lifecycle.refresh'
+    RESTART: 'wire.webapp.lifecycle.restart'
+    SIGN_OUT: 'wire.webapp.lifecycle.sign_out'
+    UPDATE: 'wire.webapp.lifecycle.update'
+  LOADED: 'wire.webapp.loaded' # todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
   LOGOUT:
-    ASK_TO_CLEAR_DATA: 'wire.webapp.logout.ask-to-clear-data'
+    ASK_TO_CLEAR_DATA: 'wire.webapp.logout.ask-to-clear-data' # todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
   PREFERENCES:
     MANAGE_ACCOUNT: 'wire.webapp.preferences.manage-account'
     MANAGE_DEVICES: 'wire.webapp.preferences.manage-devices'
