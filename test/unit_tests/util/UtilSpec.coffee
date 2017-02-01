@@ -254,12 +254,6 @@ describe 'z.util.base64_to_array', ->
       buffer_decoded = z.util.base64_to_array buffer_encoded
       expect(buffer_decoded).toEqual array
 
-describe 'z.util.phone_uri_to_e164', ->
-  it 'can convert a Google phone number uri', ->
-    actual = z.util.phone_uri_to_e164 'tel:+49-151-50304525'
-    expected = '+4915150304525'
-    expect(actual).toBe expected
-
 describe 'z.util.strip_data_uri', ->
   it 'can strip data uri', ->
     base64 = 'AAAAAAA'
