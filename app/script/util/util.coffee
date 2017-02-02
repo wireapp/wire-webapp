@@ -610,3 +610,19 @@ z.util.format_time_remaining = (time_remaining) ->
     title += "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_seconds}"
 
   return title or ''
+
+###
+Execute provided function on each item of the array with the given interval
+@param array [Array]
+@param fn [Function]
+@param interval [Number] Interval in ms
+###
+z.util.foreach_deferred = (array, fn, interval) ->
+  remaining_items = Array.prototype.slice.apply array
+  interval_id = window.setInterval ->
+    removed_element = remaining_items.shift()
+    if removed_element?
+      fn removed_element
+    else
+      window.clearInterval interval_id
+  , interval
