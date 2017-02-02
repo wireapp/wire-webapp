@@ -30,7 +30,7 @@ z.tracking.EventName =
   APP_LAUNCH: 'appLaunch'
   CALLING:
     ENDED_CALL: 'calling.ended_call'
-    ESTABLISHED_CALL: 'calling.established_call'
+    ESTABLISHED_CALL: 'calling.established_successful_call'
     FAILED_REQUEST: 'calling.failed_request'
     FAILED_REQUESTING_MEDIA: 'calling.failed_requesting_media'
     FAILED_RTC: 'calling.failed_rtc'
