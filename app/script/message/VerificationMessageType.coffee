@@ -19,19 +19,8 @@
 window.z ?= {}
 z.message ?= {}
 
-###
-Enum for different message super types.
-###
-z.message.SuperType =
-  CALL: 'call'
-  CONTENT: 'normal'
-  DELETE: 'delete'
-  DEVICE: 'device'
-  LOCATION: 'location'
-  MEMBER: 'member'
-  PING: 'ping'
-  REACTION: 'reaction'
-  SPECIAL: 'special'
-  SYSTEM: 'system'
-  UNABLE_TO_DECRYPT: 'unable-to-decrypt'
-  VERIFICATION: 'verification'
+z.message.VerificationMessageType =
+  VERIFIED: 'verified'
+  UNVERIFIED: 'unverified'
+  NEW_DEVICE: 'new-device'
+  NEW_MEMBER: 'new-member'

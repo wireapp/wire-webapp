@@ -139,6 +139,19 @@ class z.client.ClientRepository
     return @client_service.update_client_in_db primary_key, changes
 
   ###
+  Change verification state of client.
+
+  @param user_id [String] User ID of the client owner
+  @param client_et [z.client.Clients] Client which needs to get updated
+  @param is_verified [Boolean] New state to apply
+  ###
+  verify_client: (user_id, client_et, is_verified) =>
+    @update_client_in_db user_id, client_et.id, {meta: is_verified: is_verified}
+    .then ->
+      client_et.meta.is_verified is_verified
+      amplify.publish z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, user_id, client_et, is_verified
+
+  ###
   Save the local client into the database.
 
   @private
@@ -386,6 +399,7 @@ class z.client.ClientRepository
     .then =>
       @self_user().remove_client client_id
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, outcome: 'success'
+      amplify.publish z.event.WebApp.USER.CLIENT_REMOVED, @self_user().id, client_id
       return @clients()
     .catch (error) =>
       @logger.error "Unable to delete client '#{client_id}': #{error.message}", error

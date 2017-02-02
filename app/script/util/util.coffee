@@ -244,10 +244,6 @@ z.util.download_blob = (blob, filename) ->
   , 100
 
 
-z.util.phone_uri_to_e164 = (phone_number) ->
-  return phone_number.replace /tel:|-/g, ''
-
-
 z.util.phone_number_to_e164 = (phone_number, country_code) ->
   return window.PhoneFormat.formatE164 "#{country_code}".toUpperCase(), "#{phone_number}"
 

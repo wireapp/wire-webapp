@@ -36,6 +36,7 @@ class z.conversation.ConversationRepository
 
     @conversation_mapper = new z.conversation.ConversationMapper()
     @event_mapper = new z.conversation.EventMapper @asset_service, @user_repository
+    @verification_state_handler = new z.conversation.ConversationVerificationStateHandler @
 
     @active_conversation = ko.observable()
     @conversations = ko.observableArray []
@@ -107,8 +108,6 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
     amplify.subscribe z.event.WebApp.CONVERSATION.PERSIST_STATE, @save_conversation_state_in_db
-    amplify.subscribe z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @on_verification_state_changed
-    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
 
@@ -222,7 +221,7 @@ class z.conversation.ConversationRepository
   ###
   Get messages for given category. Category param acts as lower bound
   @param conversation_id [String]
-  @param catogory [z.message.MessageCategory.NONE]
+  @param category [z.message.MessageCategory.NONE]
   @return [Promise] Array of z.entity.Message entities
   ###
   get_events_for_category: (conversation_et, catogory = z.message.MessageCategory.NONE) =>
@@ -1872,8 +1871,9 @@ class z.conversation.ConversationRepository
 
     @update_participating_user_ets conversation_et, =>
       @_add_event_to_conversation event_json, conversation_et
-      .then (message_et) ->
+      .then (message_et) =>
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
+        @verification_state_handler.on_member_joined conversation_et, event_json.data.user_ids
 
   ###
   Members of a group conversation were removed or left.
@@ -1897,8 +1897,9 @@ class z.conversation.ConversationRepository
         if conversation_et.call()
           amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id
 
-      @update_participating_user_ets conversation_et, ->
+      @update_participating_user_ets conversation_et, =>
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
+        @verification_state_handler.on_member_left conversation_et, message_et.user_ids()
 
   ###
   Membership properties for a conversation were updated.
@@ -2159,7 +2160,7 @@ class z.conversation.ConversationRepository
       @user_repository.get_user_by_id message_et.from, (user_et) =>
         message_et.user user_et
 
-        if message_et.is_member()
+        if message_et.is_member() or message_et.user_ets?
           @user_repository.get_users_by_id message_et.user_ids(), (user_ets) ->
             message_et.user_ets user_ets
 
@@ -2229,7 +2230,8 @@ class z.conversation.ConversationRepository
         delete payload.recipients[user_id]
 
     return Promise.all @_map_user_client_map user_client_map, _remove_deleted_client, _remove_deleted_user
-    .then ->
+    .then =>
+      @verification_state_handler.on_client_removed Object.keys(user_client_map)
       return payload
 
   ###
@@ -2256,7 +2258,8 @@ class z.conversation.ConversationRepository
         return @user_repository.add_client_to_user user_id, new z.client.Client {id: client_id}
 
       return Promise.all @_map_user_client_map user_client_map, _add_missing_client
-    .then ->
+    .then =>
+      @verification_state_handler.on_client_add Object.keys(user_client_map)
       return payload
 
   ###
@@ -2573,22 +2576,3 @@ class z.conversation.ConversationRepository
       user: if message_et.user().is_me then 'sender' else 'receiver'
       type: z.tracking.helpers.get_message_type message_et
       reacted_to_last_message: conversation_et.get_last_message() is message_et
-
-  ###
-  Add new device message to conversations.
-  @param user_id [String] ID of user to add client to
-  @param client_et [z.client.Client] Client entity
-  ###
-  on_self_client_add: (user_id, client_et) =>
-    return
-    self = @user_repository.self()
-    return true if user_id isnt self.id
-    message_et = new z.entity.E2EEDeviceMessage()
-    message_et.user self
-    message_et.device client_et
-    message_et.device_owner self
-
-    # TODO save message
-    for conversation_et in @filtered_conversations()
-      if conversation_et.type() in [z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.REGULAR]
-        conversation_et.add_message message_et
