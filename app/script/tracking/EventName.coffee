@@ -35,7 +35,6 @@ z.tracking.EventName =
     FAILED_REQUESTING_MEDIA: 'calling.failed_requesting_media'
     FAILED_RTC: 'calling.failed_rtc'
     INITIATED_CALL: 'calling.initiated_call'
-    MINIMIZED_FROM_FULLSCREEN: 'calling.minimized_from_fullscreen'
     JOINED_CALL: 'calling.joined_call'
     RECEIVED_CALL: 'calling.received_call'
     SHARED_SCREEN: 'calling.shared_screen'
