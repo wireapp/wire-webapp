@@ -772,4 +772,4 @@ describe 'z.util.foreach_deferred', ->
       expect(result).toBe 6
       expect(spy.calls.count()).toBe 3
       done()
-    , 1000
+    , 2000
