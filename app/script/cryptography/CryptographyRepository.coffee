@@ -45,8 +45,6 @@ class z.cryptography.CryptographyRepository
       @logger.info "Initialize Cryptobox with database...", db
       cryptobox_store = new window.cryptobox.store.IndexedDB db
       @cryptobox = new window.cryptobox.Cryptobox cryptobox_store, 100
-      return @cryptobox.init()
-    .then =>
       @cryptobox.on cryptobox.Cryptobox.prototype.TOPIC_NEW_PREKEYS, (data) =>
         serialized_prekeys = data.map (pre_key) =>
           return @cryptobox.serialize_prekey pre_key
@@ -56,6 +54,8 @@ class z.cryptography.CryptographyRepository
         .then () =>
           @logger.log "Successfully uploaded '#{serialized_prekeys.length}' PreKeys."
 
+      return @cryptobox.init()
+    .then =>
       return @
 
   ###
