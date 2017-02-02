@@ -91,6 +91,11 @@ def update_headers(response):
   response.headers['X-Frame-Options'] = 'deny'
   response.headers['X-XSS-Protection'] = '1; mode=block'
 
+  if config.PUBLIC_KEY_PINS_REPORT_ONLY:
+    response.headers['Public-Key-Pins-Report-Only'] = config.PUBLIC_KEY_PINS_REPORT_ONLY
+  if config.PUBLIC_KEY_PINS:
+    response.headers['Public-Key-Pins'] = config.PUBLIC_KEY_PINS
+
   csp_values = ';'.join([
     "default-src 'self'",
     "connect-src 'self' blob: https://*.unsplash.com https://maps.googleapis.com https://*.giphy.com https://api.raygun.io https://www.google.com https://*.wire.com https://wire.com wss://prod-nginz-ssl.wire.com https://*.zinfra.io wss://*.zinfra.io",

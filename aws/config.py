@@ -18,7 +18,6 @@
 
 # coding: utf-8
 
-from uuid import uuid4
 import os
 
 ENV = os.environ.get('ENV', 'localhost')
@@ -26,6 +25,8 @@ PRODUCTION = ENV != 'localhost'
 DEBUG = DEVELOPMENT = not PRODUCTION
 
 SECRET_KEY = os.environ.get('SECRET_KEY', '3.14159265358979323846264338327950')
+PUBLIC_KEY_PINS_REPORT_ONLY = os.environ.get('PUBLIC_KEY_PINS_REPORT_ONLY', '')
+PUBLIC_KEY_PINS = os.environ.get('PUBLIC_KEY_PINS', '')
 
 SUPPORTED = {
   'chrome': 52,
