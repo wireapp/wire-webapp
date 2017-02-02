@@ -756,3 +756,20 @@ describe 'z.util.add_http', ->
   it 'does not add https if present', ->
     url = 'https://wire.com/'
     expect(z.util.add_http url).toBe 'https://wire.com/'
+
+describe 'z.util.foreach_deferred', ->
+  it 'should iterate over array', (done) ->
+
+    spy = jasmine.createSpy 'spy'
+    result = 0
+
+    z.util.foreach_deferred [1, 2, 3], (item) ->
+      result += item
+      spy()
+    , 10
+
+    window.setTimeout ->
+      expect(result).toBe 6
+      expect(spy.calls.count()).toBe 3
+      done()
+    , 1000
