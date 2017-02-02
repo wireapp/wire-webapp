@@ -16,7 +16,7 @@
 /bower_components
 /deploy
 /dist
-/docs
+/docs/coverage
 /keys
 /nbproject
 /node_modules
