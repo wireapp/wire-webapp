@@ -24,10 +24,23 @@ z.conversation.EventBuilder = do ->
   build_all_verified = (conversation_et) ->
     conversation: conversation_et.id
     id: z.util.create_random_uuid()
-    type: z.event.Client.CONVERSATION.ALL_VERIFIED
+    type: z.event.Client.CONVERSATION.VERIFICATION
     from: conversation_et.self.id
     time: new Date().toISOString()
+    data:
+      type: z.message.VerificationMessageType.VERIFIED
+
+  build_degraded = (conversation_et, user_ids, type) ->
+    conversation: conversation_et.id
+    id: z.util.create_random_uuid()
+    type: z.event.Client.CONVERSATION.VERIFICATION
+    from: conversation_et.self.id
+    time: new Date().toISOString()
+    data:
+      type: type
+      user_ids: user_ids
 
   return {
     build_all_verified: build_all_verified
+    build_degraded: build_degraded
   }

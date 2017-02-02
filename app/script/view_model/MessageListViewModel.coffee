@@ -366,9 +366,9 @@ class z.ViewModel.MessageListViewModel
       when z.message.SuperType.SYSTEM
         if message.system_message_type is z.message.SystemMessageType.CONVERSATION_RENAME
           return 'message-system message-rename'
-      when z.message.SuperType.ALL_VERIFIED
-        return 'message-system all-verified'
       when z.message.SuperType.UNABLE_TO_DECRYPT
+        return 'message-system'
+      when z.message.SuperType.VERIFICATION
         return 'message-system'
 
   ###
