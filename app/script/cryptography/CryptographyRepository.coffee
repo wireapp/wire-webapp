@@ -44,14 +44,17 @@ class z.cryptography.CryptographyRepository
     .then =>
       @logger.info "Initialize Cryptobox with database...", db
       cryptobox_store = new window.cryptobox.store.IndexedDB db
-      @cryptobox = new window.cryptobox.Cryptobox cryptobox_store, 2
+      @cryptobox = new window.cryptobox.Cryptobox cryptobox_store, 100
       return @cryptobox.init()
     .then =>
       @cryptobox.on cryptobox.Cryptobox.prototype.TOPIC_NEW_PREKEYS, (data) =>
         serialized_prekeys = data.map (pre_key) =>
           return @cryptobox.serialize_prekey pre_key
-        # TODO: Upload PreKeys to backend
+
         @logger.log "Received '#{data.length}' new PreKeys.", serialized_prekeys
+        @cryptography_service.put_client_prekeys @current_client().id, serialized_prekeys
+        .then () =>
+          @logger.log "Successfully uploaded '#{serialized_prekeys.length}' PreKeys."
 
       return @
 

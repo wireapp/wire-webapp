@@ -21,6 +21,9 @@ z.cryptography ?= {}
 
 # Cryptography service for all cryptography related calls to the backend REST API.
 class z.cryptography.CryptographyService
+  URL_CLIENTS: '/clients'
+  URL_USERS: '/users'
+
   ###
   Construct a new Cryptography Service.
   @param client [z.service.Client] Client for the API calls
@@ -38,5 +41,13 @@ class z.cryptography.CryptographyService
   get_users_pre_keys: (user_client_map) ->
     @client.send_json
       type: 'POST'
-      url: @client.create_url '/users/prekeys'
+      url: @client.create_url "#{@URL_USERS}/prekeys"
       data: user_client_map
+
+
+  put_client_prekeys: (client_id, serialized_prekeys) ->
+    @client.send_json
+      url: @client.create_url "#{@URL_CLIENTS}/#{client_id}"
+      type: 'PUT'
+      data:
+        prekeys: serialized_prekeys
