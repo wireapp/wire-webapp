@@ -51,7 +51,7 @@ class z.cryptography.CryptographyRepository
 
         @logger.log "Received '#{data.length}' new PreKeys.", serialized_prekeys
         @cryptography_service.put_client_prekeys @current_client().id, serialized_prekeys
-        .then () =>
+        .then =>
           @logger.log "Successfully uploaded '#{serialized_prekeys.length}' PreKeys."
 
       return @cryptobox.init()
