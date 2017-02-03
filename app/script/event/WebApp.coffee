@@ -58,6 +58,7 @@ z.event.WebApp =
   CLIENT:
     ADD: 'wire.webapp.user.client.add'
     REMOVE: 'wire.webapp.client.remove'
+    UPDATE: 'wire.webapp.client.update'
     VERIFICATION_STATE_CHANGED: 'wire.webapp.client.verification-state-changed'
   CONNECT:
     IMPORT_CONTACTS: 'wire.webapp.connect.import-contacts'
@@ -162,6 +163,7 @@ z.event.WebApp =
     UNBLOCKED: 'wire.webapp.user.unblocked'
     CLIENT_ADDED: 'wire.webapp.user.client-added'
     CLIENT_REMOVED: 'wire.webapp.user.client-removed'
+    CLIENTS_UPDATED: 'wire.webapp.user.clients-udpated'
   WARNING:
     SHOW: 'wire.webapp.warning.show'
     DISMISS: 'wire.webapp.warning.dismiss'

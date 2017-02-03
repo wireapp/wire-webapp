@@ -443,6 +443,9 @@ class z.client.ClientRepository
     @client_service.get_clients_by_user_id user_id
     .then (clients) =>
       return @_update_clients_for_user user_id, clients
+    .then (client_ets) ->
+      amplify.publish z.event.WebApp.CLIENT.UPDATE, user_id, client_ets
+      return client_ets
 
   get_client_by_user_id_from_db: (user_id) =>
     @client_service.load_all_clients_from_db()
