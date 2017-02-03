@@ -268,11 +268,7 @@ class z.components.UserProfileViewModel
       user_id = @user().id
       @client_repository.get_clients_by_user_id user_id
       .then (client_ets) =>
-        if client_ets?.length > 0
-          @user().devices client_ets
-          @devices_found true
-        else
-          @devices_found false
+        @devices_found client_ets?.length > 0
       .catch (error) =>
         @logger.error "Unable to retrieve clients data for user '#{user_id}': #{error}"
 

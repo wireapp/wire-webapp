@@ -26,6 +26,7 @@ class z.conversation.ConversationVerificationStateHandler
 
     amplify.subscribe z.event.WebApp.USER.CLIENT_ADDED, @on_client_add
     amplify.subscribe z.event.WebApp.USER.CLIENT_REMOVED, @on_client_removed
+    amplify.subscribe z.event.WebApp.USER.CLIENTS_UPDATED, @on_clients_updated
     amplify.subscribe z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, @on_client_verification_changed
 
   ###
@@ -62,6 +63,16 @@ class z.conversation.ConversationVerificationStateHandler
   on_client_removed: =>
     @_get_active_conversations().forEach (conversation_et) =>
       if @_will_change_to_verified conversation_et
+        amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
+
+  ###
+  Clients of a user where updated.
+  ###
+  on_clients_updated: (user_id) =>
+    @_get_active_conversations().forEach (conversation_et) =>
+      if @_will_change_to_degraded conversation_et
+        amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_degraded conversation_et, [user_id], z.message.VerificationMessageType.NEW_DEVICE
+      else if @_will_change_to_verified conversation_et
         amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
 
   ###
