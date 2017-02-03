@@ -42,7 +42,7 @@ class z.cryptography.CryptographyRepository
   init: (db) =>
     return Promise.resolve()
     .then =>
-      @logger.info "Initialize Cryptobox with database...", db
+      @logger.info "Initializing Cryptobox with database '#{db.name}'..."
       cryptobox_store = new window.cryptobox.store.IndexedDB db
       @cryptobox = new window.cryptobox.Cryptobox cryptobox_store, 100
       @cryptobox.on cryptobox.Cryptobox.prototype.TOPIC_NEW_PREKEYS, (data) =>
