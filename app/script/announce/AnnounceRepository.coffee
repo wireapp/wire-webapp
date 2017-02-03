@@ -43,7 +43,7 @@ class z.announce.AnnounceRepository
 
   check_version: =>
     @announce_service.get_version()
-    .then (server_version) ->
+    .then (server_version) =>
       @logger.info "Found new version #{server_version}"
       amplify.publish z.event.WebApp.LIFECYCLE.UPDATE, z.announce.UPDATE_SOURCE.WEBAPP if server_version > z.util.Environment.version false, true
     .catch (error) =>
