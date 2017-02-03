@@ -36,6 +36,7 @@ class z.conversation.ConversationRepository
 
     @conversation_mapper = new z.conversation.ConversationMapper()
     @event_mapper = new z.conversation.EventMapper @asset_service, @user_repository
+    @verification_state_handler = new z.conversation.ConversationVerificationStateHandler @
 
     @active_conversation = ko.observable()
     @conversations = ko.observableArray []
@@ -107,8 +108,6 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
     amplify.subscribe z.event.WebApp.CONVERSATION.PERSIST_STATE, @save_conversation_state_in_db
-    amplify.subscribe z.event.WebApp.CONVERSATION.VERIFICATION_STATE_CHANGED, @on_verification_state_changed
-    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_self_client_add
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
 
@@ -222,7 +221,7 @@ class z.conversation.ConversationRepository
   ###
   Get messages for given category. Category param acts as lower bound
   @param conversation_id [String]
-  @param catogory [z.message.MessageCategory.NONE]
+  @param category [z.message.MessageCategory.NONE]
   @return [Promise] Array of z.entity.Message entities
   ###
   get_events_for_category: (conversation_et, catogory = z.message.MessageCategory.NONE) =>
@@ -507,14 +506,6 @@ class z.conversation.ConversationRepository
     z.util.ko_array_push_all @conversations, conversation_ets
 
   ###
-  Handle conversation verification state change.
-  @param conversation_et [z.entity.Conversation]
-  ###
-  on_verification_state_changed: (conversation_et) ->
-    # if conversation_et.verification_state() is z.conversation.ConversationVerificationState.VERIFIED
-      # amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_all_verified conversation_et
-
-  ###
   Set the notification handling state.
   @note Temporarily do not unarchive conversations when handling the notification stream
   @param handling_state [z.event.NotificationHandlingState] State of the notifications stream handling
@@ -696,34 +687,18 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.EVENT.INJECT, response
 
   reset_session: (user_id, client_id, conversation_id) =>
-    @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'"
+    @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'."
+
     @cryptography_repository.delete_session user_id, client_id
     .then (session_id) =>
       if session_id
-        @logger.info "Deleted session with client '#{client_id}' of user '#{user_id}'"
+        @logger.info "Deleted session with client '#{client_id}' of user '#{user_id}'."
       else
-        @logger.warn 'No local session found to delete'
+        @logger.warn 'No local session found to delete.'
       return @send_session_reset user_id, client_id, conversation_id
     .catch (error) =>
       @logger.warn "Failed to reset session for client '#{client_id}' of user '#{user_id}': #{error.message}", error
       throw error
-
-  reset_all_sessions: =>
-    sessions = @cryptography_repository.storage_repository.sessions
-    @logger.info "Resetting '#{Object.keys(sessions).length}' sessions"
-    for session_id, session of sessions
-      ids = z.client.Client.dismantle_user_client_id session_id
-
-      _reset_session = (conversation_et) =>
-        @reset_session ids.user_id, ids.client_id, conversation_et.id
-
-      if ids.user_id is @user_repository.self().id
-        return _reset_session @self_conversation()
-
-      @user_repository.get_user_by_id ids.user_id, (user_et) =>
-        return @get_one_to_one_conversation user_et
-        .then (conversation_et) ->
-          _reset_session conversation_et
 
   ###
   Send a specific GIF to a conversation.
@@ -1470,7 +1445,7 @@ class z.conversation.ConversationRepository
   Post images to a conversation.
 
   @param conversation_et [z.entity.Conversation] Conversation to post the images
-  @param images [Object] Message content
+  @param images [Array|FileList]
   ###
   upload_images: (conversation_et, images) =>
     return if not @_can_upload_assets_to_conversation conversation_et
@@ -1483,15 +1458,17 @@ class z.conversation.ConversationRepository
   ###
   Post files to a conversation.
   @param conversation_et [z.entity.Conversation] Conversation to post the files
-  @param files [Object] File objects
+  @param files [Array|FileList] File objects
   ###
   upload_files: (conversation_et, files) =>
     return if not @_can_upload_assets_to_conversation conversation_et
-    for file in files
+
+    z.util.foreach_deferred files, (file) =>
       if @use_v3_api
         @upload_file_v3 conversation_et, file
       else
         @upload_file conversation_et, file
+    , 10
 
   ###
   Post file to a conversation.
@@ -1522,6 +1499,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: upload_duration}
     .catch (error) =>
+      throw error if error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
       @logger.error "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
       @get_message_in_conversation_by_id conversation_et, message_id
@@ -1895,8 +1873,9 @@ class z.conversation.ConversationRepository
 
     @update_participating_user_ets conversation_et, =>
       @_add_event_to_conversation event_json, conversation_et
-      .then (message_et) ->
+      .then (message_et) =>
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
+        @verification_state_handler.on_member_joined conversation_et, event_json.data.user_ids
 
   ###
   Members of a group conversation were removed or left.
@@ -1920,8 +1899,9 @@ class z.conversation.ConversationRepository
         if conversation_et.call()
           amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id
 
-      @update_participating_user_ets conversation_et, ->
+      @update_participating_user_ets conversation_et, =>
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
+        @verification_state_handler.on_member_left conversation_et, message_et.user_ids()
 
   ###
   Membership properties for a conversation were updated.
@@ -2182,7 +2162,7 @@ class z.conversation.ConversationRepository
       @user_repository.get_user_by_id message_et.from, (user_et) =>
         message_et.user user_et
 
-        if message_et.is_member()
+        if message_et.is_member() or message_et.user_ets?
           @user_repository.get_users_by_id message_et.user_ids(), (user_ets) ->
             message_et.user_ets user_ets
 
@@ -2252,7 +2232,8 @@ class z.conversation.ConversationRepository
         delete payload.recipients[user_id]
 
     return Promise.all @_map_user_client_map user_client_map, _remove_deleted_client, _remove_deleted_user
-    .then ->
+    .then =>
+      @verification_state_handler.on_client_removed Object.keys(user_client_map)
       return payload
 
   ###
@@ -2261,7 +2242,7 @@ class z.conversation.ConversationRepository
   @private
   @param user_client_map [Object] User client map containing redundant clients
   @param payload [Object] Optional payload of the failed request
-  @param generic_message [z.proto.GenericMessage] Protubuffer message to be sent
+  @param generic_message [z.proto.GenericMessage] Protobuffer message to be sent
   @return [Promise] Promise that resolves with the rewritten payload
   ###
   _handle_client_mismatch_missing: (user_client_map, payload, generic_message) ->
@@ -2279,7 +2260,8 @@ class z.conversation.ConversationRepository
         return @user_repository.add_client_to_user user_id, new z.client.Client {id: client_id}
 
       return Promise.all @_map_user_client_map user_client_map, _add_missing_client
-    .then ->
+    .then =>
+      @verification_state_handler.on_client_add Object.keys(user_client_map)
       return payload
 
   ###
@@ -2596,22 +2578,3 @@ class z.conversation.ConversationRepository
       user: if message_et.user().is_me then 'sender' else 'receiver'
       type: z.tracking.helpers.get_message_type message_et
       reacted_to_last_message: conversation_et.get_last_message() is message_et
-
-  ###
-  Add new device message to conversations.
-  @param user_id [String] ID of user to add client to
-  @param client_et [z.client.Client] Client entity
-  ###
-  on_self_client_add: (user_id, client_et) =>
-    return
-    self = @user_repository.self()
-    return true if user_id isnt self.id
-    message_et = new z.entity.E2EEDeviceMessage()
-    message_et.user self
-    message_et.device client_et
-    message_et.device_owner self
-
-    # TODO save message
-    for conversation_et in @filtered_conversations()
-      if conversation_et.type() in [z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.REGULAR]
-        conversation_et.add_message message_et

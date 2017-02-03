@@ -132,7 +132,7 @@ class z.calling.entities.ECall
 
       if state is z.calling.enum.CallState.CONNECTING
         attributes = direction: if @previous_state is z.calling.enum.CallState.OUTGOING then z.calling.enum.CallState.OUTGOING else z.calling.enum.CallState.INCOMING
-        @telemetry.track_event z.tracking.EventName.CALLING.JOINED_CALL, @, attributes
+        @telemetry.track_event z.tracking.EventName.CALLING.JOINED_CALL, @, attributes, @self_state.video_send()
 
       @previous_state = state
 
