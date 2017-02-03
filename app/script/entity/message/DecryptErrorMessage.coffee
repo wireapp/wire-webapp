@@ -46,7 +46,7 @@ class z.entity.DecryptErrorMessage extends z.entity.Message
           placeholder: '%@name', content: "<span class='label-bold-xs'>#{ z.util.escape_html @user().first_name()}</span>"
 
     @link = ko.pureComputed =>
-      return z.localization.Localizer.get_text z.string.url_decrypt_error_2 if @error_code is '3690'
+      return z.localization.Localizer.get_text z.string.url_decrypt_error_2 if @error_code is z.cryptography.CryptographyErrorType.REMOTE_IDENTITY_CHANGED
       return z.localization.Localizer.get_text z.string.url_decrypt_error_1
 
     @is_recoverable = ko.pureComputed =>

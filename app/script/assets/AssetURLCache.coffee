@@ -23,9 +23,15 @@ z.assets.AssetURLCache = do ->
   lru_cache = new LRUCache 100
 
   set_url = (identifier, url) ->
-    removed_entry = lru_cache.put identifier, url
-    if removed_entry?
-      window.URL.revokeObjectURL removed_entry.value
+    existing_url = get_url identifier
+    if existing_url
+      window.URL.revokeObjectURL url
+      return existing_url
+
+    outdated_url = lru_cache.set identifier, url
+    if outdated_url?
+      window.URL.revokeObjectURL outdated_url
+
     return url
 
   get_url = (identifier) ->

@@ -735,13 +735,11 @@ describe 'z.util.zero_padding', ->
     expect(actual).toEqual expected
 
 describe 'z.util.safe_window_open', ->
+  new_window = undefined
+  afterEach -> new_window?.close()
+
   it 'doesn\'t contain a reference to the opening tab', ->
-    url = 'https://wire.com/'
-
-    new_window = window.open url
-    expect(new_window.opener).not.toBeNull()
-
-    new_window = z.util.safe_window_open url
+    new_window = z.util.safe_window_open 'https://wire.com/'
     expect(new_window.opener).toBeNull()
 
 describe 'z.util.add_http', ->

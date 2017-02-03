@@ -687,34 +687,18 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.EVENT.INJECT, response
 
   reset_session: (user_id, client_id, conversation_id) =>
-    @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'"
+    @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'."
+
     @cryptography_repository.delete_session user_id, client_id
     .then (session_id) =>
       if session_id
-        @logger.info "Deleted session with client '#{client_id}' of user '#{user_id}'"
+        @logger.info "Deleted session with client '#{client_id}' of user '#{user_id}'."
       else
-        @logger.warn 'No local session found to delete'
+        @logger.warn 'No local session found to delete.'
       return @send_session_reset user_id, client_id, conversation_id
     .catch (error) =>
       @logger.warn "Failed to reset session for client '#{client_id}' of user '#{user_id}': #{error.message}", error
       throw error
-
-  reset_all_sessions: =>
-    sessions = @cryptography_repository.storage_repository.sessions
-    @logger.info "Resetting '#{Object.keys(sessions).length}' sessions"
-    for session_id, session of sessions
-      ids = z.client.Client.dismantle_user_client_id session_id
-
-      _reset_session = (conversation_et) =>
-        @reset_session ids.user_id, ids.client_id, conversation_et.id
-
-      if ids.user_id is @user_repository.self().id
-        return _reset_session @self_conversation()
-
-      @user_repository.get_user_by_id ids.user_id, (user_et) =>
-        return @get_one_to_one_conversation user_et
-        .then (conversation_et) ->
-          _reset_session conversation_et
 
   ###
   Send a specific GIF to a conversation.
@@ -1515,6 +1499,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: upload_duration}
     .catch (error) =>
+      throw error if error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
       @logger.error "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
       @get_message_in_conversation_by_id conversation_et, message_id
@@ -2257,7 +2242,7 @@ class z.conversation.ConversationRepository
   @private
   @param user_client_map [Object] User client map containing redundant clients
   @param payload [Object] Optional payload of the failed request
-  @param generic_message [z.proto.GenericMessage] Protubuffer message to be sent
+  @param generic_message [z.proto.GenericMessage] Protobuffer message to be sent
   @return [Promise] Promise that resolves with the rewritten payload
   ###
   _handle_client_mismatch_missing: (user_client_map, payload, generic_message) ->
