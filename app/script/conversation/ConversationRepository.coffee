@@ -1445,7 +1445,7 @@ class z.conversation.ConversationRepository
   Post images to a conversation.
 
   @param conversation_et [z.entity.Conversation] Conversation to post the images
-  @param images [Object] Message content
+  @param images [Array|FileList]
   ###
   upload_images: (conversation_et, images) =>
     return if not @_can_upload_assets_to_conversation conversation_et
@@ -1458,15 +1458,17 @@ class z.conversation.ConversationRepository
   ###
   Post files to a conversation.
   @param conversation_et [z.entity.Conversation] Conversation to post the files
-  @param files [Object] File objects
+  @param files [Array|FileList] File objects
   ###
   upload_files: (conversation_et, files) =>
     return if not @_can_upload_assets_to_conversation conversation_et
-    for file in files
+
+    z.util.foreach_deferred files, (file) =>
       if @use_v3_api
         @upload_file_v3 conversation_et, file
       else
         @upload_file conversation_et, file
+    , 10
 
   ###
   Post file to a conversation.
