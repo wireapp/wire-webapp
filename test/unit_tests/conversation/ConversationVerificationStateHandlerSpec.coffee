@@ -110,9 +110,9 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       spyOn z.conversation.EventBuilder, 'build_degraded'
       spyOn z.conversation.EventBuilder, 'build_all_verified'
 
-      new_client_b = new z.client.Client()
-      new_client_b.meta.is_verified false
-      user_self.devices.push new_client_b
+      new_client = new z.client.Client()
+      new_client.meta.is_verified false
+      user_self.devices.push new_client
 
       state_handler.on_client_add user_self.id
       expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
@@ -120,7 +120,7 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       expect(conversation_c.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
       expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual 3
 
-      user_self.devices.remove new_client_b
+      user_self.devices.remove new_client
       state_handler.on_client_removed user_self.id
       expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
       expect(conversation_b.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
@@ -133,9 +133,9 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       spyOn z.conversation.EventBuilder, 'build_degraded'
       spyOn z.conversation.EventBuilder, 'build_all_verified'
 
-      new_client_b = new z.client.Client()
-      new_client_b.meta.is_verified false
-      user_self.devices.push new_client_b
+      new_client = new z.client.Client()
+      new_client.meta.is_verified false
+      user_self.devices.push new_client
 
       state_handler.on_client_add user_self.id
       expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
@@ -143,7 +143,7 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       expect(conversation_c.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
       expect(z.conversation.EventBuilder.build_degraded.calls.count()).toEqual 3
 
-      user_self.devices.remove new_client_b
+      user_self.devices.remove new_client
       state_handler.on_clients_updated user_self.id
       expect(conversation_ab.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
       expect(conversation_b.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
