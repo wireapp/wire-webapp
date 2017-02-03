@@ -45,10 +45,6 @@ class z.ViewModel.LoadingViewModel
           if replace_content[0] > 200
             message_locator = z.string.init_events_expectation_long
           _create_message message_locator, [['%events', replace_content[0]]]
-        when z.string.init_sessions_expectation
-          if replace_content[0] > 100
-            message_locator = z.string.init_sessions_expectation_long
-          _create_message message_locator, [['%sessions', replace_content[0]]]
         else
           z.localization.Localizer.get_text message_locator
 
