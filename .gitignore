@@ -10,7 +10,6 @@
 /aws/s3
 /aws/static
 /aws/templates/**/*.html
-/aws/templates/sw.js
 /aws/templates/auth
 /aws/templates/sw.js
 /aws/version
