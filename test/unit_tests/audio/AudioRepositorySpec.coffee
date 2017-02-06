@@ -68,7 +68,7 @@ describe 'z.audio.AudioRepository', ->
     afterEach ->
       audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL].pause()
 
-    it 'plays an available sound', (done) ->
+    xit 'plays an available sound', (done) ->
       audio_repository._play z.audio.AudioType.OUTGOING_CALL, audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL], false
       .then (audio_element) ->
         expect(audio_element).toEqual jasmine.any HTMLAudioElement
@@ -76,7 +76,7 @@ describe 'z.audio.AudioRepository', ->
         done()
       .catch done.fail
 
-    it 'plays an available sound in loop', (done) ->
+    xit 'plays an available sound in loop', (done) ->
       audio_repository._play z.audio.AudioType.OUTGOING_CALL, audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL], true
       .then (audio_element) ->
         expect(audio_element).toEqual jasmine.any HTMLAudioElement
