@@ -105,7 +105,7 @@ class z.cryptography.CryptographyRepository
     return Promise.resolve()
     .then =>
       session_id = @_construct_session_id user_id, client_id
-      return @cryptobox.session_load(session_id)
+      return @cryptobox.session_load session_id
       .catch =>
         @get_users_pre_keys({"#{user_id}": [client_id]})
         .then (user_pre_key_map) =>
@@ -202,10 +202,14 @@ class z.cryptography.CryptographyRepository
       return payload
 
   _session_from_encoded_prekey_payload: (remote_pre_key, user_id, client_id) =>
-    @logger.log "Initializing session with Client ID '#{client_id}' from User ID '#{user_id}' with remote PreKey ID '#{remote_pre_key.id}'."
-    session_id = @_construct_session_id user_id, client_id
-    decoded_prekey_bundle_buffer = z.util.base64_to_array(remote_pre_key.key).buffer
-    return @cryptobox.session_from_prekey session_id, decoded_prekey_bundle_buffer
+    if remote_pre_key
+      @logger.log "Initializing session with Client ID '#{client_id}' from User ID '#{user_id}' with remote PreKey ID '#{remote_pre_key.id}'."
+      session_id = @_construct_session_id user_id, client_id
+      decoded_prekey_bundle_buffer = z.util.base64_to_array(remote_pre_key.key).buffer
+      return @cryptobox.session_from_prekey session_id, decoded_prekey_bundle_buffer
+    else
+      @logger.warn "No remote PreKey for User ID '#{user_id}' with Client ID '#{client_id}' found. The owner probably deleted the client already."
+      return undefined
 
   _encrypt_generic_message_for_new_sessions: (user_client_map_for_missing_sessions, generic_message) =>
     return new Promise (resolve) =>
@@ -224,7 +228,7 @@ class z.cryptography.CryptographyRepository
           Promise.all(future_sessions).then (cryptobox_sessions) =>
             future_payloads = []
 
-            for cryptobox_session in cryptobox_sessions
+            for cryptobox_session in cryptobox_sessions when cryptobox_session?
               future_payloads.push @_encrypt_payload_for_session cryptobox_session.id, generic_message
 
             Promise.all(future_payloads).then resolve
