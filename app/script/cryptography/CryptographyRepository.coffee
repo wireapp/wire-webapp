@@ -228,7 +228,7 @@ class z.cryptography.CryptographyRepository
           Promise.all(future_sessions).then (cryptobox_sessions) =>
             future_payloads = []
 
-            for cryptobox_session in cryptobox_sessions when cryptobox_session?
+            for cryptobox_session in cryptobox_sessions when cryptobox_session
               future_payloads.push @_encrypt_payload_for_session cryptobox_session.id, generic_message
 
             Promise.all(future_payloads).then resolve
