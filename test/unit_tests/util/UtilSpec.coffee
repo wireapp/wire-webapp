@@ -55,13 +55,13 @@ describe 'z.util.render_message', ->
     expected = "e.g. <a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>."
     expect(actual).toBe expected
 
-  it 'renders localhost links', ->
+  xit 'renders localhost links', ->
     link = 'http://localhost:8888/'
     actual = z.util.render_message link
     expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>"
     expect(actual).toBe expected
 
-  it 'renders links with IP addresses', ->
+  xit 'renders links with IP addresses', ->
     link = 'http://192.168.10.44:8080//job/webapp_atomic_test/4290/cucumber-html-reports'
     actual = z.util.render_message link
     expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>"
