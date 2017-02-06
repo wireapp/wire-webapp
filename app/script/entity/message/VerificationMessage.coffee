@@ -45,7 +45,7 @@ class z.entity.VerificationMessage extends z.entity.Message
       return z.localization.Localizer.get_text z.string.conversation_device_new_device_one
 
     @caption_unverified_device = ko.pureComputed =>
-      return z.localization.Localizer.get_text z.string.conversation_device_new_device_may if @is_self_device()
+      return z.localization.Localizer.get_text z.string.conversation_device_your_devices if @is_self_device()
       return z.localization.Localizer.get_text
         id: z.string.conversation_device_user_devices
         replace:
