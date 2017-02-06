@@ -60,7 +60,8 @@ class z.util.DebugUtil
         @logger.warn "From: #{debug_information.user.name()}", debug_information.user
         resolve debug_information
 
-  log_online_status: ->
+  log_connection_status: ->
     @logger.log 'Online Status'
-    @logger.log "-- Browser online status: #{window.navigator.onLine}"
+    @logger.log "-- Browser online: #{window.navigator.onLine}"
+    @logger.log "-- IndexedDB open: #{wire.app.repository.storage.storage_service.db.isOpen()}"
     @logger.log "-- WebSocket ready state: #{window.wire.app.service.web_socket.socket.readyState}"
