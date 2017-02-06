@@ -53,6 +53,7 @@ class z.user.UserRepository
     amplify.subscribe z.event.Backend.USER.UPDATE, @user_update
     amplify.subscribe z.event.WebApp.CLIENT.ADD, @add_client_to_user
     amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @remove_client_from_user
+    amplify.subscribe z.event.WebApp.CLIENT.UPDATE, @update_clients_from_user
 
 
   ###############################################################################
@@ -313,6 +314,7 @@ class z.user.UserRepository
     .then =>
       @get_user_by_id user_id, (user_et) ->
         user_et.add_client client_et
+        amplify.publish z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et
 
   ###
   Removes a stored client and the session connected with it.
@@ -326,7 +328,18 @@ class z.user.UserRepository
     .then =>
       @get_user_by_id user_id, (user_et) ->
         user_et.remove_client client_id
+        amplify.publish z.event.WebApp.USER.CLIENT_REMOVED, user_id, client_id
 
+  ###
+  Update clients for given user.
+
+  @param user_id [String] ID of user
+  @param client_ets [Array<z.client.Client>]
+  ###
+  update_clients_from_user: (user_id, client_ets) =>
+    @get_user_by_id user_id, (user_et) ->
+      user_et.devices client_ets
+      amplify.publish z.event.WebApp.USER.CLIENTS_UPDATED, user_id, client_ets
 
   ###############################################################################
   # Users

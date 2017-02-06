@@ -17,27 +17,10 @@
 #
 
 window.z ?= {}
-z.assets ?= {}
+z.message ?= {}
 
-z.assets.AssetURLCache = do ->
-  lru_cache = new LRUCache 100
-
-  set_url = (identifier, url) ->
-    existing_url = get_url identifier
-    if existing_url
-      window.URL.revokeObjectURL url
-      return existing_url
-
-    outdated_url = lru_cache.set identifier, url
-    if outdated_url?
-      window.URL.revokeObjectURL outdated_url
-
-    return url
-
-  get_url = (identifier) ->
-    return lru_cache.get identifier
-
-  return {
-    get_url: get_url
-    set_url: set_url
-  }
+z.message.VerificationMessageType =
+  VERIFIED: 'verified'
+  UNVERIFIED: 'unverified'
+  NEW_DEVICE: 'new-device'
+  NEW_MEMBER: 'new-member'

@@ -23,7 +23,6 @@ z.message ?= {}
 Enum for different message super types.
 ###
 z.message.SuperType =
-  ALL_VERIFIED: 'all-verified'
   CALL: 'call'
   CONTENT: 'normal'
   DELETE: 'delete'
@@ -35,3 +34,4 @@ z.message.SuperType =
   SPECIAL: 'special'
   SYSTEM: 'system'
   UNABLE_TO_DECRYPT: 'unable-to-decrypt'
+  VERIFICATION: 'verification'

@@ -149,7 +149,7 @@ class z.ViewModel.VideoCallingViewModel
             @multitasking.reset_minimize true
             @multitasking.is_minimized false
         else
-          amplify.publish z.event.WebApp.CALL.STATE.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN
+          amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN
       .catch (error) =>
         @logger.error 'Unable to get screens sources for sharing', error
 

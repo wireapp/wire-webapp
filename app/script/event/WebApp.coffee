@@ -58,6 +58,8 @@ z.event.WebApp =
   CLIENT:
     ADD: 'wire.webapp.user.client.add'
     REMOVE: 'wire.webapp.client.remove'
+    UPDATE: 'wire.webapp.client.update'
+    VERIFICATION_STATE_CHANGED: 'wire.webapp.client.verification-state-changed'
   CONNECT:
     IMPORT_CONTACTS: 'wire.webapp.connect.import-contacts'
   CONNECTION:
@@ -87,7 +89,6 @@ z.event.WebApp =
       REMOVED: 'wire.webapp.conversation.message.removed'
     IMAGE:
       SEND: 'wire.webapp.conversation.image.send'
-    VERIFICATION_STATE_CHANGED: 'wire.webapp.conversation.verification_state_changed'
   CONTENT:
     SWITCH: 'wire.webapp.content.switch'
   CONTEXT_MENU: 'wire.webapp.context-menu'
@@ -160,6 +161,9 @@ z.event.WebApp =
   USER:
     EVENT_FROM_BACKEND: 'wire.webapp.user.event-from-backend'
     UNBLOCKED: 'wire.webapp.user.unblocked'
+    CLIENT_ADDED: 'wire.webapp.user.client-added'
+    CLIENT_REMOVED: 'wire.webapp.user.client-removed'
+    CLIENTS_UPDATED: 'wire.webapp.user.clients-udpated'
   WARNING:
     SHOW: 'wire.webapp.warning.show'
     DISMISS: 'wire.webapp.warning.dismiss'
