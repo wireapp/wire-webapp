@@ -59,3 +59,8 @@ class z.util.DebugUtil
         @logger.warn "Conversation: #{debug_information.conversation.name()}", debug_information.conversation
         @logger.warn "From: #{debug_information.user.name()}", debug_information.user
         resolve debug_information
+
+  log_online_status: ->
+    @logger.log 'Online Status'
+    @logger.log "-- Browser online status: #{window.navigator.onLine}"
+    @logger.log "-- WebSocket ready state: #{window.wire.app.service.web_socket.socket.readyState}"
