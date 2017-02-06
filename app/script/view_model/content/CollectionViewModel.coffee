@@ -77,7 +77,7 @@ class z.ViewModel.content.CollectionViewModel
         when message_et.category & z.message.MessageCategory.FILE
           asset_et = message_et.get_first_asset()
           switch
-            when asset_et.is_audio
+            when asset_et.is_audio()
               @audio.push message_et
             else
               @files.push message_et
