@@ -55,13 +55,13 @@ describe 'z.util.render_message', ->
     expected = "e.g. <a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>."
     expect(actual).toBe expected
 
-  it 'renders localhost links', ->
+  xit 'renders localhost links', ->
     link = 'http://localhost:8888/'
     actual = z.util.render_message link
     expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>"
     expect(actual).toBe expected
 
-  it 'renders links with IP addresses', ->
+  xit 'renders links with IP addresses', ->
     link = 'http://192.168.10.44:8080//job/webapp_atomic_test/4290/cucumber-html-reports'
     actual = z.util.render_message link
     expected = "<a href=\"#{link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">#{link}</a>"
@@ -254,12 +254,6 @@ describe 'z.util.base64_to_array', ->
       buffer_decoded = z.util.base64_to_array buffer_encoded
       expect(buffer_decoded).toEqual array
 
-describe 'z.util.phone_uri_to_e164', ->
-  it 'can convert a Google phone number uri', ->
-    actual = z.util.phone_uri_to_e164 'tel:+49-151-50304525'
-    expected = '+4915150304525'
-    expect(actual).toBe expected
-
 describe 'z.util.strip_data_uri', ->
   it 'can strip data uri', ->
     base64 = 'AAAAAAA'
@@ -398,21 +392,36 @@ describe 'z.util.naked_url', ->
   it 'returns empty string if url is not set', ->
     expect(z.util.naked_url()).toBe ''
 
+
 describe 'z.util.append_url_parameter', ->
   it 'append param with & when url contains param', ->
     url = 'foo.com?bar=true'
-    actual = z.util.append_url_parameter url, 'fum=true'
-    expect(actual).toBe 'foo.com?bar=true&fum=true'
+    expect(z.util.append_url_parameter url, 'fum=true').toBe 'foo.com?bar=true&fum=true'
 
   it 'append param with ? when url contains param', ->
     url = 'foo.com'
-    actual = z.util.append_url_parameter url, 'fum=true'
-    expect(actual).toBe 'foo.com?fum=true'
+    expect(z.util.append_url_parameter url, 'fum=true').toBe 'foo.com?fum=true'
+
 
 describe 'z.util.get_url_parameter', ->
   it 'get param with no arguments', ->
-    actual = z.util.get_url_parameter 'foo'
-    expect(actual).toBe null
+    expect(z.util.get_url_parameter 'foo').toBe null
+
+
+describe 'z.util.forward_url_parameter', ->
+  it 'forwards existing URL parameters', ->
+    z.util.get_url_parameter = (parameter_value)-> return true if parameter_value is z.auth.URLParameter.CALLING_V3
+    expect(z.util.forward_url_parameter 'foo.com', z.auth.URLParameter.CALLING_V3).toBe 'foo.com?calling_v3=true'
+
+    z.util.get_url_parameter = (parameter_value)-> return false if parameter_value is z.auth.URLParameter.CALLING_V3
+    expect(z.util.forward_url_parameter 'foo.com', z.auth.URLParameter.CALLING_V3).toBe 'foo.com?calling_v3=false'
+
+    z.util.get_url_parameter = (parameter_value)-> return 'bar' if parameter_value is z.auth.URLParameter.CALLING_V3
+    expect(z.util.forward_url_parameter 'foo.com', z.auth.URLParameter.CALLING_V3).toBe 'foo.com?calling_v3=bar'
+
+    z.util.get_url_parameter = (parameter_value)-> return null if parameter_value is z.auth.URLParameter.CALLING_V3
+    expect(z.util.forward_url_parameter 'foo.com', z.auth.URLParameter.CALLING_V3).toBe 'foo.com'
+
 
 describe 'Markdown for bold text', ->
   it 'renders bold text', ->
@@ -726,13 +735,11 @@ describe 'z.util.zero_padding', ->
     expect(actual).toEqual expected
 
 describe 'z.util.safe_window_open', ->
+  new_window = undefined
+  afterEach -> new_window?.close()
+
   it 'doesn\'t contain a reference to the opening tab', ->
-    url = 'https://wire.com/'
-
-    new_window = window.open url
-    expect(new_window.opener).not.toBeNull()
-
-    new_window = z.util.safe_window_open url
+    new_window = z.util.safe_window_open 'https://wire.com/'
     expect(new_window.opener).toBeNull()
 
 describe 'z.util.add_http', ->
@@ -747,3 +754,20 @@ describe 'z.util.add_http', ->
   it 'does not add https if present', ->
     url = 'https://wire.com/'
     expect(z.util.add_http url).toBe 'https://wire.com/'
+
+describe 'z.util.foreach_deferred', ->
+  it 'should iterate over array', (done) ->
+
+    spy = jasmine.createSpy 'spy'
+    result = 0
+
+    z.util.foreach_deferred [1, 2, 3], (item) ->
+      result += item
+      spy()
+    , 10
+
+    window.setTimeout ->
+      expect(result).toBe 6
+      expect(spy.calls.count()).toBe 3
+      done()
+    , 2000

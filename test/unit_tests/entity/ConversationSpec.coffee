@@ -28,6 +28,26 @@ describe 'Conversation', ->
     conversation_et = new z.entity.Conversation()
     other_user = new z.entity.User entities.user.jane_roe.id
 
+  describe 'timestamp', ->
+
+    it 'adding a message should update the conversation timestamp', ->
+      message_et = new z.entity.Message()
+      message_et.timestamp = new Date('2014-12-15T09:21:14.225Z').getTime()
+      conversation_et.last_event_timestamp new Date('2014-12-14T09:21:14.225Z').getTime()
+      conversation_et.add_message message_et
+      expect(conversation_et.last_event_timestamp()).toBe message_et.timestamp
+
+    it 'adding a message should not update the conversation timestamp if should_effect_conversation_timestamp is false', ->
+      message_et = new z.entity.Message()
+      message_et.timestamp = new Date('2014-12-15T09:21:14.225Z').getTime()
+      conversation_et.add_message message_et
+
+      message_two_et = new z.entity.Message()
+      message_two_et.timestamp = new Date('2014-12-16T09:21:14.225Z').getTime()
+      message_two_et.should_effect_conversation_timestamp = false
+      conversation_et.add_message message_two_et
+      expect(conversation_et.last_event_timestamp()).toBe message_et.timestamp
+
   describe '_increment_time_only', ->
     first_date = new Date('2014-12-15T09:21:14.225Z').getTime()
     second_date = new Date('2014-12-15T09:22:14.225Z').getTime()
@@ -128,49 +148,6 @@ describe 'Conversation', ->
 
       expect(conversation_et.is_verified()).toBeTruthy()
 
-
-  describe 'verification_state', ->
-
-    verified_conversation_et = undefined
-
-    beforeEach ->
-      verified_conversation_et = new z.entity.Conversation()
-
-      verified_client_et = new z.client.Client()
-      verified_client_et.meta.is_verified true
-
-      self_user_et = new z.entity.User()
-      self_user_et.is_me = true
-      verified_conversation_et.self = self_user_et
-
-      user_et = new z.entity.User()
-      user_et.devices.push verified_client_et
-      verified_conversation_et.participating_user_ets.push user_et
-
-    it 'state should be VERIFIED when all clients are verified', ->
-      expect(verified_conversation_et.is_verified()).toBeTruthy()
-      expect(verified_conversation_et.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
-
-    it 'state should change from VERIFIED to DEGRADED if new client gets added', ->
-      expect(verified_conversation_et.is_verified()).toBeTruthy()
-      expect(verified_conversation_et.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
-
-      verified_conversation_et.participating_user_ets()[0].devices.push new z.client.Client()
-
-      expect(verified_conversation_et.is_verified()).toBeFalsy()
-      expect(verified_conversation_et.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
-
-    it 'state should change from VERIFIED to DEGRADED if new user gets added', ->
-      expect(verified_conversation_et.is_verified()).toBeTruthy()
-      expect(verified_conversation_et.verification_state()).toBe z.conversation.ConversationVerificationState.VERIFIED
-
-      new_user_et = new z.entity.User()
-      new_user_et.devices.push new z.client.Client()
-      verified_conversation_et.participating_user_ets.push new_user_et
-
-      expect(verified_conversation_et.is_verified()).toBeFalsy()
-      expect(verified_conversation_et.verification_state()).toBe z.conversation.ConversationVerificationState.DEGRADED
-
   describe 'unread_type', ->
     beforeEach ->
       last_read_timestamp = Date.now() - 1000
@@ -181,7 +158,7 @@ describe 'Conversation', ->
 
       call_message = new z.entity.CallMessage()
       call_message.timestamp = last_read_timestamp - 1000
-      call_message.finished_reason = z.calling.enum.CallFinishedReason.MISSED
+      call_message.finished_reason = z.calling.enum.CALL_FINISHED_REASON.MISSED
 
       conversation_et.add_message ping_message
       conversation_et.add_message call_message
@@ -207,7 +184,7 @@ describe 'Conversation', ->
     it 'shows unread type "CALL" if there is a missed call message in the unread messages', ->
       call_message = new z.entity.CallMessage()
       call_message.timestamp = Date.now() - 500
-      call_message.finished_reason = z.calling.enum.CallFinishedReason.MISSED
+      call_message.finished_reason = z.calling.enum.CALL_FINISHED_REASON.MISSED
       conversation_et.add_message call_message
       conversation_et.add_message new z.entity.Message()
       expect(conversation_et.unread_type()).toBe z.conversation.ConversationUnreadType.CALL

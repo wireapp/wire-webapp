@@ -32,6 +32,23 @@
             </section>
           <!-- /ko -->
 
+          <!-- ko if: audio().length -->
+            <section class="collection-section" data-uie-name="collection-section-link" data-bind="attr: {'data-uie-collection-size': audio().length}">
+              <header>
+                <span class="collection-header-icon icon-microphone"></span>
+                <span class="label-bold-xs" data-bind="l10n_text: z.string.collection_section_audio"></span>
+                <!-- ko if: audio().length > 4 -->
+                  <span class="collection-header-all text-theme" data-bind="click: function() { click_on_section('audio', audio()) }"><span data-bind="l10n_html: {'id': z.string.collection_show_all, 'replace': {'placeholder': '%no', 'content': audio().length}}" data-uie-name="collection-show-all"></span> <span class="icon-forward font-size-xxs"></span></span>
+                <!-- /ko -->
+              </header>
+              <div class="collection-images">
+                <!-- ko foreach: {data: audio.slice(0, 4), as: 'message_et'} -->
+                  <audio-asset class="collection-file" params="message: message_et, header: true"></audio-asset>
+                <!-- /ko -->
+              </div>
+            </section>
+          <!-- /ko -->
+
           <!-- ko if: links().length -->
             <section class="collection-section" data-uie-name="collection-section-link" data-bind="attr: {'data-uie-collection-size': links().length}">
               <header>

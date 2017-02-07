@@ -72,9 +72,16 @@ z.util.load_url_blob = (url) ->
     return new Blob [new Uint8Array buffer], type: type
 
 
-z.util.append_url_parameter = (url, param) ->
+z.util.append_url_parameter = (url, parameter) ->
   separator = if z.util.StringUtil.includes url, '?' then '&' else '?'
-  return "#{url}#{separator}#{param}"
+  return "#{url}#{separator}#{parameter}"
+
+
+z.util.forward_url_parameter = (url, parameter_name) ->
+  parameter_value = z.util.get_url_parameter parameter_name
+  if parameter_value?
+    return url = z.util.append_url_parameter url, "#{parameter_name}=#{parameter_value}"
+  return url
 
 
 z.util.get_url_parameter = (name) ->
@@ -82,7 +89,12 @@ z.util.get_url_parameter = (name) ->
   for param in params
     value = param.split '='
     if value[0] is name
-      return if value[1] then unescape value[1] else 'true'
+      if value[1]
+        value = unescape value[1]
+        return false if value is 'false'
+        return true if value is 'true'
+        return value
+      return true
   return null
 
 
@@ -178,7 +190,7 @@ Function will remove data uri if present
 @return [UInt8Array]
 ###
 z.util.base64_to_array = (base64) ->
-  return sodium.from_base64 z.util.strip_data_uri base64
+  return bazinga64.Decoder.fromBase64(z.util.strip_data_uri base64).asBytes
 
 ###
 Convert ArrayBuffer or UInt8Array to base64 string
@@ -187,7 +199,7 @@ Convert ArrayBuffer or UInt8Array to base64 string
 @return [String] base64 encoded string
 ###
 z.util.array_to_base64 = (array) ->
-  return sodium.to_base64 new Uint8Array(array), true
+  return bazinga64.Encoder.toBase64(new Uint8Array(array), true).asString
 
 ###
 Return base64 encoded md5 of the the given array
@@ -230,10 +242,6 @@ z.util.download_blob = (blob, filename) ->
     document.body.removeChild link
     window.URL.revokeObjectURL url
   , 100
-
-
-z.util.phone_uri_to_e164 = (phone_number) ->
-  return phone_number.replace /tel:|-/g, ''
 
 
 z.util.phone_number_to_e164 = (phone_number, country_code) ->
@@ -602,3 +610,19 @@ z.util.format_time_remaining = (time_remaining) ->
     title += "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_seconds}"
 
   return title or ''
+
+###
+Execute provided function on each item of the array with the given interval
+@param array [Array]
+@param fn [Function]
+@param interval [Number] Interval in ms
+###
+z.util.foreach_deferred = (array, fn, interval) ->
+  remaining_items = Array.prototype.slice.apply array
+  interval_id = window.setInterval ->
+    removed_element = remaining_items.shift()
+    if removed_element?
+      fn removed_element
+    else
+      window.clearInterval interval_id
+  , interval

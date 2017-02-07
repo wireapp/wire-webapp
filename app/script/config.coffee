@@ -27,7 +27,7 @@ z.config =
 
   LOGGER:
     OPTIONS:
-      name_length: 60
+      name_length: 65
       domains:
         'app.wire.com': -> 0
         'localhost': -> 300

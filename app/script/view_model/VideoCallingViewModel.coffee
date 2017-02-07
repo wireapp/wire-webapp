@@ -21,7 +21,7 @@ z.ViewModel ?= {}
 
 
 class z.ViewModel.VideoCallingViewModel
-  constructor: (element_id, @call_center, @conversation_repository, @media_repository, @user_repository, @multitasking) ->
+  constructor: (element_id, @calling_repository, @conversation_repository, @media_repository, @user_repository, @multitasking) ->
     @logger = new z.util.Logger 'z.ViewModel.VideoCallingViewModel', z.config.LOGGER.OPTIONS
 
     @self_user = @user_repository.self
@@ -44,23 +44,24 @@ class z.ViewModel.VideoCallingViewModel
     @number_of_screen_devices = ko.observable 0
     @number_of_video_devices = ko.observable 0
 
-    @joined_call = @call_center.joined_call
+    @calls = @calling_repository.calls
+    @joined_call = @calling_repository.joined_call
 
     @videod_call = ko.pureComputed =>
-      for call_et in @call_center.calls()
+      for call_et in @calls()
         is_active = call_et.state() in z.calling.enum.CallStateGroups.IS_ACTIVE
-        is_self_videod = call_et.self_client_joined() and @self_stream_state.screen_shared() or @self_stream_state.videod()
-        is_remote_videod = (call_et.is_remote_screen_shared() or call_et.is_remote_videod()) and not call_et.is_ongoing_on_another_client()
-        return call_et if is_active and (is_self_videod or is_remote_videod or @is_choosing_screen())
+        self_video_send = call_et.self_client_joined() and @self_stream_state.screen_send() or @self_stream_state.video_send()
+        remote_video_send = (call_et.is_remote_screen_send() or call_et.is_remote_video_send()) and not call_et.is_ongoing_on_another_client()
+        return call_et if is_active and (self_video_send or remote_video_send or @is_choosing_screen())
 
     @is_ongoing = ko.pureComputed =>
       return @videod_call()? and @joined_call()?.state() is z.calling.enum.CallState.ONGOING
 
     @overlay_icon_class = ko.pureComputed =>
       if @is_ongoing()
-        if @self_stream_state.muted()
+        if not @self_stream_state.audio_send()
           return 'icon-mute'
-        else if not @self_stream_state.screen_shared() and not @self_stream_state.videod()
+        else if not @self_stream_state.screen_send() and not @self_stream_state.video_send()
           return 'icon-video-off'
 
     @remote_user = ko.pureComputed =>
@@ -69,7 +70,7 @@ class z.ViewModel.VideoCallingViewModel
     @show_local = ko.pureComputed =>
       return (@show_local_video() or @overlay_icon_class()) and not @multitasking.is_minimized() and not @is_choosing_screen()
     @show_local_video = ko.pureComputed =>
-      is_visible = @self_stream_state.screen_shared() or @self_stream_state.videod() or @videod_call()?.state() isnt z.calling.enum.CallState.ONGOING
+      is_visible = @self_stream_state.screen_send() or @self_stream_state.video_send() or @videod_call()?.state() isnt z.calling.enum.CallState.ONGOING
       return is_visible and @local_video_stream()
 
     @show_remote = ko.pureComputed =>
@@ -78,23 +79,23 @@ class z.ViewModel.VideoCallingViewModel
       is_visible = @remote_user() and not @multitasking.is_minimized() and not @is_choosing_screen()
       return @is_ongoing() and not @show_remote_video() and is_visible
     @show_remote_video = ko.pureComputed =>
-      is_visible = (@joined_call()?.is_remote_screen_shared() or @joined_call()?.is_remote_videod()) and @remote_video_stream()
+      is_visible = (@joined_call()?.is_remote_screen_send() or @joined_call()?.is_remote_video_send()) and @remote_video_stream()
       return @is_ongoing() and is_visible
 
     @show_switch_camera = ko.pureComputed =>
-      is_visible = @local_video_stream() and @available_devices.video_input().length > 1 and @self_stream_state.videod()
+      is_visible = @local_video_stream() and @available_devices.video_input().length > 1 and @self_stream_state.video_send()
       return @is_ongoing() and is_visible
     @show_switch_screen = ko.pureComputed =>
-      is_visible = @local_video_stream() and @available_devices.screen_input().length > 1 and @self_stream_state.screen_shared()
+      is_visible = @local_video_stream() and @available_devices.screen_input().length > 1 and @self_stream_state.screen_send()
       return @is_ongoing() and is_visible
 
     @show_controls = ko.pureComputed =>
       is_visible = @show_remote_video() or @show_remote_participant() and not @multitasking.is_minimized()
       return @is_ongoing() and is_visible
     @show_toggle_screen = ko.pureComputed ->
-      return z.calling.CallCenter.supports_screen_sharing()
+      return z.calling.CallingRepository.supports_screen_sharing()
     @disable_toggle_screen = ko.pureComputed =>
-      return @joined_call()?.is_remote_screen_shared()
+      return @joined_call()?.is_remote_screen_send()
 
     @joined_call.subscribe (joined_call) =>
       if joined_call
@@ -125,20 +126,20 @@ class z.ViewModel.VideoCallingViewModel
           @logger.info "Minimizing call '#{@videod_call().id}' on timeout as remote user '#{@remote_user()?.name()}' is not videod"
         , 4000
 
-    amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE_SCREEN, @choose_shared_screen
+    amplify.subscribe z.event.WebApp.CALL.MEDIA.CHOOSE_SCREEN, @choose_shared_screen
 
     ko.applyBindings @, document.getElementById element_id
 
   choose_shared_screen: (conversation_id) =>
     return if @disable_toggle_screen()
 
-    if @self_stream_state.screen_shared() or z.util.Environment.browser.firefox
-      @call_center.state_handler.toggle_screen conversation_id
+    if @self_stream_state.screen_send() or z.util.Environment.browser.firefox
+      amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN
 
     else if z.util.Environment.electron
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.SHARED_SCREEN,
         conversation_type: if @joined_call().is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
-        kind_of_call_when_sharing: if @joined_call().is_remote_videod() then 'video' else 'audio'
+        kind_of_call_when_sharing: if @joined_call().is_remote_video_send() then 'video' else 'audio'
 
       @media_repository.devices_handler.get_screen_sources()
       .then (screen_sources) =>
@@ -148,18 +149,18 @@ class z.ViewModel.VideoCallingViewModel
             @multitasking.reset_minimize true
             @multitasking.is_minimized false
         else
-          @call_center.state_handler.toggle_screen conversation_id
+          amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_id, z.media.MediaType.SCREEN
       .catch (error) =>
         @logger.error 'Unable to get screens sources for sharing', error
 
   clicked_on_cancel_call: =>
-    @call_center.state_handler.leave_call @joined_call()?.id
+    amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @joined_call()?.id
 
   clicked_on_cancel_screen: =>
     @is_choosing_screen false
 
   clicked_on_mute_audio: =>
-    @call_center.state_handler.toggle_audio @joined_call()?.id
+    amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call()?.id, z.media.MediaType.AUDIO
 
   clicked_on_share_screen: =>
     @choose_shared_screen @joined_call().id
@@ -169,14 +170,14 @@ class z.ViewModel.VideoCallingViewModel
     @logger.info "Selected '#{screen_source.name}' for screen sharing", screen_source
     @is_choosing_screen false
     @current_device_id.screen_input screen_source.id
-    @call_center.state_handler.toggle_screen @joined_call().id
+    amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call().id, z.media.MediaType.SCREEN
     if @multitasking.reset_minimize()
       @multitasking.is_minimized true
       @multitasking.reset_minimize false
       @logger.info "Minimizing call '#{@joined_call().id}' on screen selection to return to previous state"
 
   clicked_on_stop_video: =>
-    @call_center.state_handler.toggle_video @joined_call()?.id
+    amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call()?.id, z.media.MediaType.VIDEO
 
   clicked_on_toggle_camera: =>
     @media_repository.devices_handler.toggle_next_camera()

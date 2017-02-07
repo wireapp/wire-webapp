@@ -35,9 +35,8 @@ class z.user.UserError
 
   @:: = new Error()
   @::constructor = @
-  @::TYPE = {
+  @::TYPE =
     PRE_KEY_NOT_FOUND: 'z.user.UserError::TYPE.PRE_KEY_NOT_FOUND'
     REQUEST_FAILURE: 'z.user.UserError::TYPE.REQUEST_FAILURE'
     UNKNOWN: 'z.user.UserError::TYPE.UNKNOWN'
     USERNAME_TAKEN: 'z.user.UserError::TYPE.USERNAME_TAKEN'
-  }

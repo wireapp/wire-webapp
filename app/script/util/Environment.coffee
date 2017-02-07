@@ -54,10 +54,6 @@ z.util.Environment = do ->
     get_version: ->
       return window.parseInt platform.version?.split('.')[0], 10
 
-    requires_codec_rewrite: ->
-      return false if not @supports_calling()
-      return @is_chrome() and @get_version() is 51
-
     supports_notifications: ->
       return false if window.Notification is undefined
       return false if window.Notification.requestPermission is undefined
@@ -133,8 +129,6 @@ z.util.Environment = do ->
       media_devices: _check.supports_media_devices()
       notifications: _check.supports_notifications()
       screen_sharing: _check.supports_screen_sharing()
-    requires:
-      calling_codec_rewrite: _check.requires_codec_rewrite()
 
   os:
     linux: not os.is_mac() and not os.is_windows()

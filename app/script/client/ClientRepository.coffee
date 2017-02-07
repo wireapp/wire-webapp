@@ -69,7 +69,6 @@ class z.client.ClientRepository
         continue if not ids.user_id or ids.user_id in [@self_user().id, @PRIMARY_KEY_CURRENT_CLIENT]
         user_client_map[ids.user_id] ?= []
         client_et = @client_mapper.map_client client
-        client_et.session = @cryptography_repository.load_session ids.user_id, ids.client_id
         user_client_map[ids.user_id].push client_et
       return user_client_map
 
@@ -138,6 +137,19 @@ class z.client.ClientRepository
     # Preserve primary key on update
     changes.meta.primary_key = primary_key
     return @client_service.update_client_in_db primary_key, changes
+
+  ###
+  Change verification state of client.
+
+  @param user_id [String] User ID of the client owner
+  @param client_et [z.client.Clients] Client which needs to get updated
+  @param is_verified [Boolean] New state to apply
+  ###
+  verify_client: (user_id, client_et, is_verified) =>
+    @update_client_in_db user_id, client_et.id, {meta: is_verified: is_verified}
+    .then ->
+      client_et.meta.is_verified is_verified
+      amplify.publish z.event.WebApp.CLIENT.VERIFICATION_STATE_CHANGED, user_id, client_et, is_verified
 
   ###
   Save the local client into the database.
@@ -209,10 +221,13 @@ class z.client.ClientRepository
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         error_message = "Local client '#{client_et.id}' (#{client_et.type}) no longer exists on the backend"
         @logger.warn error_message, error
+
         if client_et.is_temporary()
-          return @cryptography_repository.storage_repository.delete_everything()
-        return @cryptography_repository.storage_repository.delete_cryptography()
-        .catch (error) =>
+          delete_promise =  @cryptography_repository.storage_repository.delete_everything()
+        else
+          delete_promise = @cryptography_repository.storage_repository.delete_cryptography()
+
+        delete_promise.catch (error) =>
           @logger.error "Deleting crypto database after failed client validation unsuccessful: #{error.message}", error
           throw new z.client.ClientError z.client.ClientError::TYPE.DATABASE_FAILURE
         .then ->
@@ -384,6 +399,7 @@ class z.client.ClientRepository
     .then =>
       @self_user().remove_client client_id
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, outcome: 'success'
+      amplify.publish z.event.WebApp.USER.CLIENT_REMOVED, @self_user().id, client_id
       return @clients()
     .catch (error) =>
       @logger.error "Unable to delete client '#{client_id}': #{error.message}", error
@@ -427,6 +443,9 @@ class z.client.ClientRepository
     @client_service.get_clients_by_user_id user_id
     .then (clients) =>
       return @_update_clients_for_user user_id, clients
+    .then (client_ets) ->
+      amplify.publish z.event.WebApp.CLIENT.UPDATE, user_id, client_ets
+      return client_ets
 
   get_client_by_user_id_from_db: (user_id) =>
     @client_service.load_all_clients_from_db()

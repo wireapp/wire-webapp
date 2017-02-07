@@ -7,7 +7,7 @@
             data-uie-name="do-collections"></span>
     </div>
 
-    <!-- ko if: conversation_et().is_verified() -->
+    <!-- ko if: conversation_et().verification_state() === z.conversation.ConversationVerificationState.VERIFIED -->
       <svg class="conversation-verified-icon" width="16" height="16">
         <use xlink:href="#icon-verified"></use>
       </svg>
@@ -46,12 +46,12 @@
                 data-uie-name="do-maximize-call">
           </span>
         <!-- /ko -->
-        <!-- ko if: call_self_state.screen_shared() -->
+        <!-- ko if: self_stream_state.screen_send() -->
           <span class="conversation-titlebar-icon conversation-titlebar-icon-status button-icon-large icon-screensharing"
             data-uie-name="status-self-screensharing">
           </span>
         <!-- /ko -->
-        <!-- ko if: call_self_state.videod() -->
+        <!-- ko if: self_stream_state.video_send() -->
           <span class="conversation-titlebar-icon conversation-titlebar-icon-status button-icon-large icon-video"
                 data-uie-name="status-self-video">
           </span>

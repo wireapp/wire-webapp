@@ -21,19 +21,11 @@ z.telemetry ?= {}
 z.telemetry.calling ?= {}
 
 z.telemetry.calling.CallSetupSteps =
-  ICE_CONNECTION_COMPLETED: 'ice_connection_completed'
   ICE_CONNECTION_CONNECTED: 'ice_connection_connected'
-  ICE_CONNECTION_CHECKING: 'ice_connection_checking'
   ICE_GATHERING_COMPLETED: 'ice_gathering_completed'
-  ICE_GATHERING_STARTED: 'ice_gathering_started'
-  FLOW_RECEIVED: 'flow_received'
-  LOCAL_SDP_CREATED: 'local_sdp_created'
   LOCAL_SDP_SEND: 'local_sdp_send'
   LOCAL_SDP_SET: 'local_sdp_set'
   PEER_CONNECTION_CREATED: 'peer_connection_created'
-  REMOTE_SDP_RECEIVED: 'remote_sdp_received'
   REMOTE_SDP_SET: 'remote_sdp_set'
   STARTED: 'started'
-  STATE_PUT: 'state_put'
   STREAM_RECEIVED: 'stream_received'
-  STREAM_REQUESTED: 'stream_requested'
