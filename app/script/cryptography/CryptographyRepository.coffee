@@ -138,11 +138,11 @@ class z.cryptography.CryptographyRepository
       user_session_map[user_id].push client_id
     return user_session_map
 
-  _construct_session_ids: (user_client_map) =>
+  _construct_session_ids: (user_client_map) ->
     session_ids = []
 
     for user_id, client_ids of user_client_map
-      client_ids.forEach (client_id) =>
+      client_ids.forEach (client_id) ->
         session_id = z.cryptography.SessionID.compose user_id, client_id
         session_ids.push session_id
 
