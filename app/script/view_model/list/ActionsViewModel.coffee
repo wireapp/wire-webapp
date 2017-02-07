@@ -54,6 +54,7 @@ class z.ViewModel.list.ActionsViewModel
 
     # fix for older wrapper versions
     @conversations_view_model.click_on_archive_action = @click_on_archive_action
+    @conversations_view_model.click_on_unarchive_action = @click_on_unarchive_action
     @conversations_view_model.click_on_block_action = @click_on_block_action
     @conversations_view_model.click_on_cancel_action = @click_on_cancel_action
     @conversations_view_model.click_on_clear_action = @click_on_clear_action
@@ -130,7 +131,8 @@ class z.ViewModel.list.ActionsViewModel
   click_on_unarchive_action: =>
     @_click_on_action()
     .then (conversation_et) =>
-      @conversation_repository.unarchive_conversation conversation_et, =>
+      @conversation_repository.unarchive_conversation conversation_et
+      .then =>
         if not @conversation_repository.conversations_archived().length
           @list_view_model.switch_list z.ViewModel.list.LIST_STATE.CONVERSATIONS
 

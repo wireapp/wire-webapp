@@ -94,11 +94,8 @@ class z.calling.entities.Flow
 
     @connection_state.subscribe (ice_connection_state) =>
       switch ice_connection_state
-        when z.calling.rtc.ICEConnectionState.CHECKING
-          @telemetry.time_step z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CHECKING
-
         when z.calling.rtc.ICEConnectionState.COMPLETED, z.calling.rtc.ICEConnectionState.CONNECTED
-          @telemetry.start_statistics ice_connection_state
+          @telemetry.start_statistics()
           @call_et.is_connected true
           @participant_et.is_connected true
           @call_et.interrupted_participants.remove @participant_et
@@ -129,7 +126,7 @@ class z.calling.entities.Flow
           @call_et.delete_participant @participant_et
           @_remove_media_streams()
           if not @is_group()
-            @call_et.finished_reason = z.calling.enum.CallFinishedReason.CONNECTION_DROPPED
+            @call_et.finished_reason = z.calling.enum.CALL_FINISHED_REASON.CONNECTION_DROPPED
 
         when z.calling.rtc.SignalingState.REMOTE_OFFER
           @negotiation_needed true
@@ -158,10 +155,10 @@ class z.calling.entities.Flow
         @local_sdp_type sdp.type
         if @has_sent_local_sdp()
           @has_sent_local_sdp false
-          @should_add_local_sdp true
+          @should_set_local_sdp true
 
     @has_sent_local_sdp = ko.observable false
-    @should_add_local_sdp = ko.observable true
+    @should_set_local_sdp = ko.observable true
 
     @send_sdp_timeout = undefined
 
@@ -176,7 +173,7 @@ class z.calling.entities.Flow
       in_stable_state = @signaling_state() is z.calling.rtc.SignalingState.STABLE
       in_proper_state = (is_offer and in_stable_state) or (is_answer and in_remote_offer_state)
 
-      return @local_sdp() and @should_add_local_sdp() and in_proper_state and not in_progress
+      return @local_sdp() and @should_set_local_sdp() and in_proper_state and not in_progress
 
     @can_set_local_sdp.subscribe (can_set) =>
       if can_set
@@ -193,9 +190,9 @@ class z.calling.entities.Flow
     @remote_sdp.subscribe (sdp) =>
       if sdp
         @remote_sdp_type sdp.type
-        @should_add_remote_sdp true
+        @should_set_remote_sdp true
 
-    @should_add_remote_sdp = ko.observable false
+    @should_set_remote_sdp = ko.observable false
 
     @can_set_remote_sdp = ko.pureComputed =>
       is_answer = @remote_sdp_type() is z.calling.rtc.SDPType.ANSWER
@@ -204,15 +201,12 @@ class z.calling.entities.Flow
       in_stable_state = @signaling_state() is z.calling.rtc.SignalingState.STABLE
       in_proper_state = (is_offer and in_stable_state) or (is_answer and in_local_offer_state)
 
-      return @pc_initialized() and @should_add_remote_sdp() and in_proper_state
+      return @pc_initialized() and @should_set_remote_sdp() and in_proper_state
 
     @can_set_remote_sdp.subscribe (can_set) =>
       if can_set
-        @logger.debug "State changed - can_set_remote_sdp: '#{can_set}'"
+        @logger.debug "State changed - can_set_remote_sdp: #{can_set}"
         @_set_remote_sdp()
-        .then =>
-          if @has_sent_local_sdp() and @remote_sdp().type is z.calling.rtc.SDPType.OFFER
-            @is_answer true
 
 
     ###############################################################################
@@ -267,8 +261,6 @@ class z.calling.entities.Flow
       if can_set
         @logger.debug "State changed - can_set_ice_candidates: #{can_set}"
         @_add_cached_ice_candidates()
-
-    @logger.info "Flow has an initial panning of '#{@participant_et.panning()}'"
 
 
   ###############################################################################
@@ -402,8 +394,7 @@ class z.calling.entities.Flow
   @param event [RTCPeerConnectionIceEvent] Event that contains the generated ICE candidate
   ###
   _on_ice_candidate: (event) =>
-    @logger.info 'New ICE candidate generated', event
-    @telemetry.time_step z.telemetry.calling.CallSetupSteps.ICE_GATHERING_STARTED
+    @logger.info 'Generated additional ICE candidate', event
     if @has_sent_local_sdp()
       if event.candidate
         @_send_ice_candidate event.candidate
@@ -417,9 +408,9 @@ class z.calling.entities.Flow
 
   # ICE connection state has changed.
   _on_ice_connection_state_change: (event) =>
-    @logger.debug 'State changed - ICE connection', event
     return if not @peer_connection or @call_et.state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ENDED]
 
+    @logger.debug 'State changed - ICE connection', event
     @logger.log @logger.levels.LEVEL_1, "ICE connection state: #{@peer_connection.iceConnectionState}"
     @logger.log @logger.levels.LEVEL_1, "ICE gathering state: #{@peer_connection.iceGatheringState}"
 
@@ -447,26 +438,44 @@ class z.calling.entities.Flow
   ###
   save_remote_sdp: (remote_sdp) =>
     @logger.debug "Saving remote SDP of type '#{remote_sdp.type}'"
-    @telemetry.time_step z.telemetry.calling.CallSetupSteps.REMOTE_SDP_RECEIVED
-    @remote_sdp @_rewrite_sdp remote_sdp, z.calling.enum.SDPSource.REMOTE
+    z.calling.mapper.SDPRewriteMapper.rewrite_sdp remote_sdp, z.calling.enum.SDPSource.REMOTE, @
+    .then ([ice_candidates, remote_sdp]) =>
+      @remote_sdp remote_sdp
 
   # Initiates sending the local Session Description Protocol to the backend.
   send_local_sdp: =>
-    @local_sdp @_rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL
-    sdp_info = new z.calling.payloads.SDPInfo {conversation_id: @conversation_id, flow_id: @id, sdp: @local_sdp()}
-
-    on_success = =>
-      @has_sent_local_sdp true
-      @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful"
-      @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
-
-    on_failure = (error) =>
-      @logger.warn "Failed to send local SDP of type '#{@local_sdp().type}'"
-      @reset_flow() if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
-
     @_clear_send_sdp_timeout()
-    @logger.info "Sending local SDP for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
-    amplify.publish z.event.WebApp.CALL.SIGNALING.SEND_LOCAL_SDP_INFO, sdp_info, on_success, on_failure
+
+    z.calling.mapper.SDPRewriteMapper.rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL, @
+    .then ([ice_candidates, local_sdp]) =>
+      @local_sdp local_sdp
+
+      if not ice_candidates
+        @logger.warn 'Local SDP does not contain any ICE candidates, resetting timeout'
+        return @_set_send_sdp_timeout()
+
+      sdp_info = new z.calling.payloads.SDPInfo {conversation_id: @conversation_id, flow_id: @id, sdp: @local_sdp()}
+
+      on_success = =>
+        @has_sent_local_sdp true
+        @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful"
+        @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
+
+      on_failure = (error) =>
+        @logger.warn "Failed to send local SDP of type '#{@local_sdp().type}'"
+        @reset_flow() if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+
+      @logger.info "Sending local SDP of type '#{@local_sdp().type}' for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
+      amplify.publish z.event.WebApp.CALL.SIGNALING.SEND_LOCAL_SDP_INFO, sdp_info, on_success, on_failure
+
+  ###
+  Clear the SDP send timeout.
+  @private
+  ###
+  _clear_send_sdp_timeout: ->
+    if @send_sdp_timeout
+      window.clearTimeout @send_sdp_timeout
+      @send_sdp_timeout = undefined
 
   ###
   Create a local SDP of type 'answer'.
@@ -478,8 +487,9 @@ class z.calling.entities.Flow
     @peer_connection.createAnswer()
     .then (sdp_answer) =>
       @logger.debug "Creating '#{z.calling.rtc.SDPType.ANSWER}' successful", sdp_answer
-      @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_CREATED
-      @local_sdp @_rewrite_sdp sdp_answer, z.calling.enum.SDPSource.LOCAL
+      z.calling.mapper.SDPRewriteMapper.rewrite_sdp sdp_answer, z.calling.enum.SDPSource.LOCAL, @
+    .then ([ice_candidates, local_sdp]) =>
+      @local_sdp local_sdp
     .catch (error) =>
       @logger.error "Creating '#{z.calling.rtc.SDPType.ANSWER}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'create_sdp', type: z.calling.rtc.SDPType.ANSWER}
@@ -503,94 +513,14 @@ class z.calling.entities.Flow
     @peer_connection.createOffer offer_options
     .then (sdp_offer) =>
       @logger.debug "Creating '#{z.calling.rtc.SDPType.OFFER}' successful", sdp_offer
-      @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_CREATED
-      @local_sdp @_rewrite_sdp sdp_offer, z.calling.enum.SDPSource.LOCAL
+      z.calling.mapper.SDPRewriteMapper.rewrite_sdp sdp_offer, z.calling.enum.SDPSource.LOCAL, @
+    .then ([ice_candidates, local_sdp]) =>
+      @local_sdp local_sdp
     .catch (error) =>
       @logger.error "Creating '#{z.calling.rtc.SDPType.OFFER}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'create_sdp', type: z.calling.rtc.SDPType.OFFER}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
       @_solve_colliding_states()
-
-  ###
-  Rewrite the SDP for compatibility reasons.
-
-  @private
-  @param rtc_sdp [RTCSessionDescription] Session Description Protocol to be rewritten
-  @param sdp_source [z.calling.enum.SDPSource] Source of the SDP - local or remote
-  @return [RTCSessionDescription] Rewritten Session Description Protocol
-  ###
-  _rewrite_sdp: (rtc_sdp, sdp_source = z.calling.enum.SDPSource.REMOTE) ->
-    if sdp_source is z.calling.enum.SDPSource.LOCAL
-      rtc_sdp.sdp = rtc_sdp.sdp.replace 'UDP/TLS/', ''
-
-    sdp_lines = rtc_sdp.sdp.split '\r\n'
-    outlines = []
-
-    ice_candidates = []
-
-    for sdp_line in sdp_lines
-      outline = sdp_line
-
-      if sdp_line.startsWith 't='
-        if sdp_source is z.calling.enum.SDPSource.LOCAL and not z.util.Environment.frontend.is_localhost()
-          outlines.push sdp_line
-          browser_string = "#{z.util.Environment.browser.name} #{z.util.Environment.browser.version}"
-          if z.util.Environment.electron
-            outline = "a=tool:electron #{z.util.Environment.version()} #{z.util.Environment.version false} (#{browser_string})"
-          else
-            outline = "a=tool:webapp #{z.util.Environment.version false} (#{browser_string})"
-          @logger.info "Added tool version to local SDP: #{outline}"
-
-      else if sdp_line.startsWith 'a=candidate'
-        ice_candidates.push sdp_line
-
-      else if sdp_line.startsWith 'a=group'
-        if @negotiation_mode() is z.calling.enum.SDPNegotiationMode.STREAM_CHANGE and sdp_source is z.calling.enum.SDPSource.LOCAL
-          outlines.push 'a=x-streamchange'
-          @logger.info 'Added stream renegotiation flag to local SDP'
-
-      # Code to nail in bit-rate and ptime settings for improved performance and experience
-      else if sdp_line.startsWith 'm=audio'
-        if @negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and @is_group())
-          outlines.push sdp_line
-          outline = "b=AS:#{AUDIO_BITRATE}"
-          @logger.info "Limited audio bit-rate in local SDP: #{outline}"
-
-      else if sdp_line.startsWith 'm=video'
-        if sdp_source is z.calling.enum.SDPSource.LOCAL and @_should_rewrite_codecs()
-          outline = sdp_line.replace(' 98', '').replace ' 116', ''
-          @logger.warn 'Removed video codecs to prevent video freeze due to issue in Chrome 50 and 51' if outline isnt sdp_line
-
-      else if sdp_line.startsWith 'a=fmtp'
-        if sdp_source is z.calling.enum.SDPSource.LOCAL and @_should_rewrite_codecs()
-          if sdp_line.endsWith '98 apt=116'
-            @logger.warn 'Removed FMTP line to prevent video freeze due to issue in Chrome 50 and 51'
-            outline = undefined
-
-      else if sdp_line.startsWith 'a=rtpmap'
-        if sdp_source is z.calling.enum.SDPSource.LOCAL and @_should_rewrite_codecs()
-          if sdp_line.endsWith('98 rtx/90000') or sdp_line.endsWith '116 red/90000'
-            @logger.warn 'Removed RTPMAP line to prevent video freeze due to issue in Chrome 50 and 51'
-            outline = undefined
-
-        if @negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and @is_group())
-          if z.util.contains sdp_line, 'opus'
-            outlines.push sdp_line
-            outline = "a=ptime:#{AUDIO_PTIME}"
-            @logger.info "Changed audio p-time in local SDP: #{outline}"
-
-      if outline isnt undefined
-        outlines.push outline
-
-    @logger.info "'#{sdp_source.charAt(0).toUpperCase()}#{sdp_source.slice 1}' SDP contains '#{ice_candidates.length}' ICE candidate(s)", ice_candidates
-
-    rewritten_sdp = outlines.join '\r\n'
-
-    if rtc_sdp.sdp isnt rewritten_sdp
-      rtc_sdp.sdp = rewritten_sdp
-      @logger.info "Rewrote '#{sdp_source}' SDP of type '#{rtc_sdp.type}'", rtc_sdp
-
-    return rtc_sdp
 
   ###
   Sets the local Session Description Protocol on the PeerConnection.
@@ -602,8 +532,8 @@ class z.calling.entities.Flow
     .then =>
       @logger.debug "Setting local SDP of type '#{@local_sdp().type}' successful", @peer_connection.localDescription
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET
-      @should_add_local_sdp false
-      @send_sdp_timeout = window.setTimeout @send_local_sdp, 1000
+      @should_set_local_sdp false
+      @_set_send_sdp_timeout()
     .catch (error) =>
       @logger.error "Setting local SDP of type '#{@local_sdp().type}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'set_sdp', location: 'local', type: @local_sdp()?.type}
@@ -619,11 +549,23 @@ class z.calling.entities.Flow
     .then =>
       @logger.debug "Setting remote SDP of type '#{@remote_sdp().type}' successful", @peer_connection.remoteDescription
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET
-      @should_add_remote_sdp false
+      @should_set_remote_sdp false
     .catch (error) =>
       @logger.error "Setting remote SDP of type '#{@remote_sdp().type}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'set_sdp', location: 'remote', type: @remote_sdp()?.type}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
+
+  ###
+  Set the SDP send timeout.
+  @private
+  ###
+  _set_send_sdp_timeout: ->
+    @send_sdp_timeout = window.setTimeout @send_local_sdp, 1000
+
+
+  ###############################################################################
+  # SDP state collision handling
+  ###############################################################################
 
   ###
   Solve colliding SDP states.
@@ -631,38 +573,10 @@ class z.calling.entities.Flow
   @private
   ###
   _solve_colliding_states: ->
-    we_switched_state = false
     if @self_user_id < @remote_user_id
       @logger.warn "We need to switch state of flow with '#{@remote_user.name()}'. Local SDP needs to be changed."
-      we_switched_state = true
-      @_switch_local_sdp_state()
-    else
-      @logger.warn "Remote side needs to switch state of flow with '#{@remote_user.name()}'. Waiting for new remote SDP."
-
-    return we_switched_state
-
-
-  ###############################################################################
-  # SDP sate collision handling
-  ###############################################################################
-
-  ###
-  Switch the local SDP state.
-  @note Set converted flag first, because it influences the tear-down of the PeerConnection
-  @private
-  ###
-  _switch_local_sdp_state: ->
-    @logger.debug "Switching SDP type locally from #{@local_sdp_type()} to '#{z.calling.rtc.SDPType.ANSWER}'"
-
-    @converted_own_sdp_state true
-    @is_answer true
-    remote_sdp_cache = @remote_sdp()
-    @_close_peer_connection()
-    @_reset_signaling_states()
-    @_initialize_peer_connection()
-    @remote_sdp remote_sdp_cache
-    @_set_remote_sdp()
-    @converted_own_sdp_state false
+      return @_switch_local_sdp_state()
+    @logger.warn "Remote side needs to switch state of flow with '#{@remote_user.name()}'. Waiting for new remote SDP."
 
 
   ###############################################################################
@@ -674,7 +588,7 @@ class z.calling.entities.Flow
   @param ice_candidate [RTCIceCandidate] Received remote ICE candidate
   ###
   add_remote_ice_candidate: (ice_candidate) =>
-    if z.util.contains ice_candidate.candidate, 'end-of-candidates'
+    if z.util.StringUtil.includes ice_candidate.candidate, 'end-of-candidates'
       @logger.info 'Ignoring remote non-candidate'
       return
 
@@ -729,7 +643,7 @@ class z.calling.entities.Flow
   @param ice_candidate [RTCICECandidate] Local ICE candidate to be send
   ###
   _send_ice_candidate: (ice_candidate) ->
-    if not z.util.contains ice_candidate.candidate, 'UDP'
+    unless z.util.StringUtil.includes ice_candidate.candidate, 'UDP'
       return @logger.info "Local ICE candidate ignored as it is not of type 'UDP'"
 
     if @conversation_id and @id
@@ -737,26 +651,10 @@ class z.calling.entities.Flow
       @logger.info 'Sending ICE candidate', ice_info
       amplify.publish z.event.WebApp.CALL.SIGNALING.SEND_ICE_CANDIDATE_INFO, ice_info
 
-  ###
-  Should a local SDP be rewritten to prevent frozen video.
-  @note All sections that rewrite the SDP for this can be removed once we require Chrome 52
-  @return [Boolean] Should SDP be rewritten
-  ###
-  _should_rewrite_codecs: ->
-    return z.util.Environment.browser.requires.calling_codec_rewrite
-
 
   ###############################################################################
   # Media stream handling
   ###############################################################################
-
-  ###
-  Inject an audio file into the flow.
-  @param audio_file_path [String] Path to the audio file
-  @param callback [Function] Function to be called when completed
-  ###
-  inject_audio_file: (audio_file_path, callback) =>
-    @audio.inject_audio_file audio_file_path, callback
 
   ###
   Update the local MediaStream.
@@ -766,7 +664,7 @@ class z.calling.entities.Flow
   update_media_stream: (media_stream_info) =>
     @_replace_media_track media_stream_info
     .catch (error) =>
-      if error.type in [z.calling.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
+      if error.type in [z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
         @logger.info "Replacement of MediaStream and renegotiation necessary: #{error.message}", error
         return @_replace_media_stream media_stream_info
       throw error
@@ -840,16 +738,15 @@ class z.calling.entities.Flow
       if @peer_connection.getSenders
         for rtp_sender in @peer_connection.getSenders() when rtp_sender.track.kind is media_stream_info.type
           return rtp_sender
-        throw new z.calling.CallError z.calling.CallError::TYPE.NO_REPLACEABLE_TRACK
-      else
-        throw new z.calling.CallError z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
+        throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK
+      throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
     .then (rtp_sender) ->
       return rtp_sender.replaceTrack media_stream_info.stream.getTracks()[0]
     .then =>
       @logger.info "Replaced the '#{media_stream_info.type}' track"
       return media_stream_info
     .catch (error) =>
-      if error.type not in [z.calling.CallError::TYPE.NOT_SUPPORTED, z.calling.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
+      unless error.type in [z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
         @logger.error "Failed to replace the '#{media_stream_info.type}' track: #{error.name} - #{error.message}", error
       throw error
 
@@ -917,15 +814,6 @@ class z.calling.entities.Flow
     @payload undefined
     @pc_initialized false
     @logger.debug "Resetting flow '#{@id}' with user '#{@remote_user.name()}' successful"
-
-  ###
-  Clear the SDP send timeout.
-  @private
-  ###
-  _clear_send_sdp_timeout: ->
-    if @send_sdp_timeout
-      window.clearTimeout @send_sdp_timeout
-      @send_sdp_timeout = undefined
 
   ###
   Reset the signaling states.

@@ -232,3 +232,36 @@ describe 'z.conversation.ConversationService', ->
         expect(events.length).toBe 3
         done()
       .catch done.fail
+
+  describe 'load_events_with_category_from_db', ->
+
+    events = undefined
+
+    beforeEach ->
+      events = [
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"b6498d81-92e8-4da7-afd2-054239595da7","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:11:15.632Z","status":2,"data":{"content":"test","nonce":"b6498d81-92e8-4da7-afd2-054239595da7","previews":[]},"type":"conversation.message-add","category": 16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"da7930dd-4c30-4378-846d-b29e1452bdfb","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:37:31.941Z","status":1,"data":{"content_length":47527,"content_type":"image/jpeg","id":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d","info":{"tag":"medium","width":1448,"height":905,"nonce":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d"},"otr_key":{},"sha256":{}},"type":"conversation.asset-add","category": 128}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"da7930dd-4c30-4378-846d-b29e1452bdfa","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:47:31.941Z","status":1,"data":{"content_length":47527,"content_type":"image/jpeg","id":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d","info":{"tag":"medium","width":1448,"height":905,"nonce":"b77e8639-a32d-4ba7-88b9-7a0ae461e90d"},"otr_key":{},"sha256":{}},"type":"conversation.asset-add","category": 128}
+      ]
+
+    it 'should return no entry matches the given category', (done) ->
+      Promise.all events.slice(0,1).map (event) ->
+        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, z.storage.StorageService.construct_primary_key(event), event
+      .then ->
+        return conversation_service.load_events_with_category_from_db events[0].conversation, z.message.MessageCategory.IMAGE
+      .then (result) ->
+        expect(result.length).toBe 0
+        done()
+      .catch done.fail
+
+    it 'should get images in the correct order', (done) ->
+      Promise.all events.map (event) ->
+        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, z.storage.StorageService.construct_primary_key(event), event
+      .then ->
+        return conversation_service.load_events_with_category_from_db events[0].conversation, z.message.MessageCategory.IMAGE
+      .then (result) ->
+        expect(result.length).toBe 2
+        expect(result[0].id).toBe events[1].id
+        expect(result[1].id).toBe events[2].id
+        done()
+      .catch done.fail

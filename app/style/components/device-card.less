@@ -52,10 +52,11 @@ device-card {
 
 .device-label,
 .device-model {
-  font-weight: 600;
+  font-weight: @font-weight-bold;
 }
 
 .device-id-part {
+  .text-selection();
   display: inline-block;
 
   &+& {
@@ -63,6 +64,6 @@ device-card {
   }
 
   &:nth-child(odd) {
-    font-weight: 600;
+    font-weight: @font-weight-bold;
   }
 }

@@ -54,10 +54,6 @@ z.util.Environment = do ->
     get_version: ->
       return window.parseInt platform.version?.split('.')[0], 10
 
-    requires_codec_rewrite: ->
-      return false if not @supports_calling()
-      return @is_chrome() and @get_version() is 51
-
     supports_notifications: ->
       return false if window.Notification is undefined
       return false if window.Notification.requestPermission is undefined
@@ -88,8 +84,12 @@ z.util.Environment = do ->
 
   app_version = ->
     if $("[property='wire:version']").attr('version')?
-      version = $("[property='wire:version']").attr('version').trim().split '-'
-      return "#{version[0]}.#{version[1]}.#{version[2]}.#{version[3]}#{version[4]}"
+      return $("[property='wire:version']").attr('version').trim()
+    return ''
+
+  formatted_app_version = ->
+    version = app_version().split '-'
+    return "#{version[0]}.#{version[1]}.#{version[2]}.#{version[3]}#{version[4]}"
 
   ################
   # PUBLIC METHODS
@@ -98,7 +98,16 @@ z.util.Environment = do ->
   # "backend.current" is "undefined" when you are not connected to the backend (for example, if you are on the login page).
   # In such situations use methods like "is_staging" to detect environments.
   #
-  backend: current: undefined
+  backend:
+    account_url: ->
+      if z.util.Environment.backend.current is z.service.BackendEnvironment.PRODUCTION
+        return z.config.ACCOUNT_PRODUCTION_URL
+      return z.config.ACCOUNT_STAGING_URL
+    current: undefined
+    website_url: ->
+      if z.util.Environment.backend.current is z.service.BackendEnvironment.PRODUCTION
+        return z.config.WEBSITE_PRODUCTION_URL
+      return z.config.WEBSITE_STAGING_URL
 
   frontend:
     is_localhost: ->
@@ -120,8 +129,6 @@ z.util.Environment = do ->
       media_devices: _check.supports_media_devices()
       notifications: _check.supports_notifications()
       screen_sharing: _check.supports_screen_sharing()
-    requires:
-      calling_codec_rewrite: _check.requires_codec_rewrite()
 
   os:
     linux: not os.is_mac() and not os.is_windows()
@@ -130,7 +137,8 @@ z.util.Environment = do ->
 
   electron: _check.is_electron()
 
-  version: (show_wrapper_version = true) ->
+  version: (show_wrapper_version = true, do_not_format = false) ->
     return 'dev' if z.util.Environment.frontend.is_localhost()
+    return app_version() if do_not_format
     return window.electron_version if window.electron_version and show_wrapper_version
-    return app_version()
+    return formatted_app_version()

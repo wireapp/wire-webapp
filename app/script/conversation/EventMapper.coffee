@@ -32,18 +32,18 @@ class z.conversation.EventMapper
   ###
   Convert multiple JSON events into message entities.
 
-  @param json [Object] Event data
+  @param events [Object] Event data
   @param conversation_et [z.entity.Conversation] Conversation entity the events belong to
 
   @return [Array<z.entity.Message>] Mapped message entities
   ###
-  map_json_events: (json, conversation_et) ->
-    events = (@map_json_event event, conversation_et for event in json.events.reverse() when event isnt undefined)
+  map_json_events: (events, conversation_et, should_create_dummy_image) ->
+    events = (@map_json_event event, conversation_et, should_create_dummy_image for event in events.reverse() when event isnt undefined)
     return events.filter (x) -> x isnt undefined
 
-  map_json_event: (event, conversation_et) =>
+  map_json_event: (event, conversation_et, should_create_dummy_image) =>
     try
-      return @_map_json_event event, conversation_et
+      return @_map_json_event event, conversation_et, should_create_dummy_image
     catch error
       @logger.error "Failed to map event: #{error.message}", {error: error, event: event}
       return undefined
@@ -56,10 +56,10 @@ class z.conversation.EventMapper
 
   @return [z.entity.Message] Mapped message entity
   ###
-  _map_json_event: (event, conversation_et) ->
+  _map_json_event: (event, conversation_et, should_create_dummy_image) ->
     switch event.type
       when z.event.Backend.CONVERSATION.ASSET_ADD
-        message_et = @_map_event_asset_add event
+        message_et = @_map_event_asset_add event, should_create_dummy_image
       when z.event.Backend.CONVERSATION.KNOCK
         message_et = @_map_event_ping event
       when z.event.Backend.CONVERSATION.MESSAGE_ADD
@@ -82,6 +82,8 @@ class z.conversation.EventMapper
         message_et = @_map_system_event_delete_everywhere event
       when z.event.Client.CONVERSATION.LOCATION
         message_et = @_map_event_location event
+      when z.event.Client.CONVERSATION.VERIFICATION
+        message_et = @_map_verification event
       when z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
         message_et = @_map_system_event_unable_to_decrypt event
       else
@@ -93,6 +95,7 @@ class z.conversation.EventMapper
     message_et.primary_key = z.storage.StorageService.construct_primary_key event
     message_et.type = event.type
     message_et.version = event.version or 1
+    message_et.category = event.category
 
     message_et.conversation_id = conversation_et.id
 
@@ -116,6 +119,21 @@ class z.conversation.EventMapper
   ###############################################################################
 
   ###
+  Maps JSON data of conversation.verification message into message entity
+
+  @private
+
+  @param event [Object] Message data
+
+  @return [z.entity.VerificationMessage] Normal message entity
+  ###
+  _map_verification: (event) ->
+    message_et = new z.entity.VerificationMessage()
+    message_et.user_ids event.data.user_ids
+    message_et.verification_message_type = event.data.type
+    return message_et
+
+  ###
   Maps JSON data of conversation.asset_add message into message entity
 
   @private
@@ -124,10 +142,10 @@ class z.conversation.EventMapper
 
   @return [z.entity.NormalMessage] Normal message entity
   ###
-  _map_event_asset_add: (event) ->
+  _map_event_asset_add: (event, should_create_dummy_image) ->
     message_et = new z.entity.ContentMessage()
     if event.data?.info.tag is z.assets.ImageSizeType.MEDIUM
-      message_et.assets.push @_map_asset_medium_image event
+      message_et.assets.push @_map_asset_medium_image event, should_create_dummy_image
     message_et.nonce = event.data.info.nonce
     return message_et
 
@@ -303,7 +321,7 @@ class z.conversation.EventMapper
   ###
   _map_event_voice_channel_activate: ->
     message_et = new z.entity.CallMessage()
-    message_et.call_message_type = z.message.CallMessageType.ACTIVATED
+    message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED
     message_et.visible false
     return message_et
   ###
@@ -317,9 +335,9 @@ class z.conversation.EventMapper
   ###
   _map_event_voice_channel_deactivate: (event) ->
     message_et = new z.entity.CallMessage()
-    message_et.call_message_type = z.message.CallMessageType.DEACTIVATED
+    message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED
     message_et.finished_reason = event.data.reason
-    message_et.visible message_et.finished_reason is z.calling.enum.CallFinishedReason.MISSED
+    message_et.visible message_et.finished_reason is z.calling.enum.CALL_FINISHED_REASON.MISSED
     return message_et
 
   ###############################################################################
@@ -395,8 +413,10 @@ class z.conversation.EventMapper
 
   @return [z.entity.MediumImage] Medium image asset entity
   ###
-  _map_asset_medium_image: (event) ->
+  _map_asset_medium_image: (event, should_create_dummy_image) ->
     asset_et = new z.entity.MediumImage event.data.id
+    asset_et.file_size = event.data.content_length
+    asset_et.file_type = event.data.content_type
     asset_et.width = event.data.info.width
     asset_et.height = event.data.info.height
     asset_et.ratio = asset_et.height / asset_et.width
@@ -404,7 +424,8 @@ class z.conversation.EventMapper
       asset_et.resource z.assets.AssetRemoteData.v3 event.data.key, event.data.otr_key, event.data.sha256, event.data.token, true
     else
       asset_et.resource z.assets.AssetRemoteData.v2 event.conversation, asset_et.id, event.data.otr_key, event.data.sha256, true
-    asset_et.dummy_url = z.util.dummy_image asset_et.width, asset_et.height
+    if should_create_dummy_image
+      asset_et.dummy_url = z.util.dummy_image asset_et.width, asset_et.height
     return asset_et
 
   ###

@@ -79,14 +79,18 @@
   display: flex;
   flex: 1;
   min-width: 0; // fixes ellipsis not working with flexbox (FF)
+}
 
-  &.accent-color-1 {color: @accent_colors-1}
-  &.accent-color-2 {color: @accent_colors-2}
+.message-header-label-sender {
+  .label-nocase-bold-xs;
+
+  &.accent-color-1 {color: fade(@accent_colors-1, 80%)}
+  &.accent-color-2 {color: fade(@accent_colors-2, 72%)}
   &.accent-color-3 {color: @accent_colors-3}
-  &.accent-color-4 {color: @accent_colors-4}
-  &.accent-color-5 {color: @accent_colors-5}
-  &.accent-color-6 {color: @accent_colors-6}
-  &.accent-color-7 {color: @accent_colors-7}
+  &.accent-color-4 {color: fade(@accent_colors-4, 72%)}
+  &.accent-color-5 {color: fade(@accent_colors-5, 80%)}
+  &.accent-color-6 {color: fade(@accent_colors-6, 80%)}
+  &.accent-color-7 {color: fade(@accent_colors-7, 64%)}
 }
 
 .message-header-label-icon {
@@ -145,18 +149,6 @@
   padding-left: @conversation-message-sender-width;
   padding-right: @conversation-message-timestamp-width;
 
-  &.image-widescreen {
-
-    .message-asset-image {
-      margin-left: -@conversation-message-sender-width;
-      margin-right: -@conversation-message-timestamp-width;
-
-      @media (min-width: @screen-inline-images) {
-        margin-left: 0;
-      }
-    }
-  }
-
   .text {
     .text-selection();
     .accent-selection-color();
@@ -175,22 +167,16 @@
   .iframe-container {
     margin-bottom: 24px;
     margin-top: 16px;
+  }
 
-    &.iframe-container-video {
-      margin-left: -@conversation-message-sender-width;
-      margin-right: -@conversation-message-timestamp-width;
-      padding-bottom: 75%;
-      position: relative;
+  .iframe-container-video {
+    padding-bottom: 75%;
+    position: relative;
 
-      @media (min-width: @screen-inline-images) {
-        margin-left: 0;
-      }
-
-      iframe, embed, object {
-        position: absolute;
-        left: 0;
-        max-width: 100%;
-      }
+    iframe, embed, object {
+      position: absolute;
+      left: 0;
+      max-width: 100%;
     }
   }
 }
@@ -201,17 +187,6 @@
   bottom: 0;
   left: 0;
   width: @conversation-message-sender-width;
-
-  .image-widescreen & {
-    bottom: 8px;
-  }
-}
-
-.message-body-like-icon {
-
-  .image-widescreen & {
-    background-color: #fff;
-  }
 }
 
 .message-asset-image {
@@ -330,7 +305,7 @@
     justify-content: center;
     position: absolute;
     right: 72px;
-    top: 3px;
+    top: 4px;
 
     &:focus {
       opacity: 1 !important;
@@ -353,17 +328,6 @@
     position: absolute;
     right: 24px;
     top: 3px;
-  }
-
-  .image-widescreen & {
-    top: 24px;
-
-    .time,
-    .context-menu,
-    .message-status {
-      background-color: fade(#fff, 80%);
-      border-radius: 16px;
-    }
   }
 
   .message-ephemeral-timer {
@@ -476,26 +440,39 @@
 }
 
 // MESSAGE SPACING
-.message-rename,
+.message-asset {
+  margin-top: 16px;
+}
+
+.message-call,
+.message-ping  {
+  padding-top: 16px;
+  margin-bottom: 24px;
+}
+
 .message-member,
-.message-ping {
+.message-rename {
   padding-top: 16px;
   margin-bottom: 32px;
 }
 
-.message-ping {
+.message-call,
+.message-member,
+.message-ping,
+.message-rename {
   .message-body-actions {
     position: relative;
   }
-}
-
-.message-call {
-  margin-bottom: 40px;
-  padding-top: 16px;
 }
 
 // TODO make generic class
 .ephemeral-message-obfuscated {
   font-family: @font-family-ephemeral;
   .accent-color();
+}
+
+.ephemeral-asset-expired {
+  .bg-color-ephemeral;
+  .flex-center;
+  color: #fff;
 }

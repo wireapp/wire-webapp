@@ -1,12 +1,35 @@
-<script type="text/html" id="all-verified">
+<script type="text/html" id="verification">
   <div class="message-header">
     <div class="message-header-icon">
-      <svg width="16" height="16">
-        <use xlink:href="#icon-verified"></use>
-      </svg>
+      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.VERIFIED -->
+        <svg width="16" height="16">
+          <use xlink:href="#icon-verified"></use>
+        </svg>
+      <!-- /ko -->
+      <!-- ko ifnot: message.verification_message_type === z.message.VerificationMessageType.VERIFIED -->
+        <svg width="16" height="16">
+          <use xlink:href="#icon-not-verified"></use>
+        </svg>
+      <!-- /ko -->
     </div>
     <div class="message-header-label">
-      <span data-bind="l10n_text: z.string.tooltip_conversation_all_verified"></span>
+      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.VERIFIED -->
+        <span data-bind="l10n_text: z.string.tooltip_conversation_all_verified"></span>
+      <!-- /ko -->
+      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.UNVERIFIED -->
+        <span class="label-bold" data-bind="text: message.sender_name()"></span>
+        <span class="ellipsis" data-bind="l10n_text: z.string.conversation_device_unverified"></span>
+        <span class="ellipsis text-theme" data-bind="click: click_on_device, text: message.caption_unverified_device"></span>
+      <!-- /ko -->
+      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.NEW_DEVICE -->
+        <span class="label-bold" data-bind='text: message.caption_user'></span>
+        <span class="ellipsis" data-bind="text: message.caption_started_using"></span>
+        <span class="ellipsis text-theme" data-bind="click: click_on_device, text: message.caption_new_device"></span>
+      <!-- /ko -->
+      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.NEW_MEMBER -->
+        <span class="ellipsis" data-bind="l10n_text: z.string.conversation_device_new_people_joined"></span>
+        <span class="ellipsis text-theme" data-bind="click: click_on_device, l10n_text: z.string.conversation_device_new_people_joined_verify"></span>
+      <!-- /ko -->
       <hr class="message-header-line" />
     </div>
   </div>
@@ -15,16 +38,19 @@
 <script type="text/html" id="call">
   <div class="message-header">
     <div class="message-header-icon">
-      <svg class="message-icon-missed-call" width="40" height="40" viewBox="0 0 1024 1024" data-bind="css: accent_color">
-        <path d="M512 853.333v0c188.513 0 341.333-152.82 341.333-341.333s-152.82-341.333-341.333-341.333c-188.513 0-341.333 152.82-341.333 341.333s152.82 341.333 341.333 341.333v0zM512 874.667v0c-200.295 0-362.667-162.371-362.667-362.667s162.371-362.667 362.667-362.667c200.295 0 362.667 162.371 362.667 362.667s-162.371 362.667-362.667 362.667v0z"></path>
-        <path opacity="0.5600000023841858" d="M512 917.333v0c223.859 0 405.333-181.474 405.333-405.333s-181.474-405.333-405.333-405.333c-223.859 0-405.333 181.474-405.333 405.333s181.474 405.333 405.333 405.333v0zM512 938.667v0c-235.641 0-426.667-191.025-426.667-426.667s191.025-426.667 426.667-426.667c235.641 0 426.667 191.025 426.667 426.667s-191.025 426.667-426.667 426.667v0z"></path>
-        <path opacity="0.23999999463558197" d="M512 981.333v0c259.206 0 469.333-210.128 469.333-469.333s-210.128-469.333-469.333-469.333c-259.206 0-469.333 210.128-469.333 469.333s210.128 469.333 469.333 469.333v0zM512 1002.667v0c-270.988 0-490.667-219.679-490.667-490.667s219.679-490.667 490.667-490.667c270.988 0 490.667 219.679 490.667 490.667s-219.679 490.667-490.667 490.667v0z"></path>
-      </svg>
-      <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+      <!-- ko if: message.was_completed() -->
+        <div class="icon-call text-green"></div>
+      <!-- /ko -->
+      <!-- ko if: message.was_missed() -->
+        <div class="icon-end-call text-red"></div>
+      <!-- /ko -->
     </div>
     <div class="message-header-label">
       <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption()"></span>
+    </div>
+    <div class="message-body-actions">
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
     </div>
   </div>
 </script>
@@ -34,8 +60,8 @@
     <div class="message-header-icon">
       <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
     </div>
-    <div class="message-header-label label-bold">
-      <span data-bind='text: message.sender_name()'></span>
+    <div class="message-header-label">
+      <span class="message-header-label-sender" data-bind='text: message.sender_name()'></span>
       <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
     </div>
     <div class="message-body-actions message-body-actions-large">
@@ -50,8 +76,8 @@
       <div class="message-header-icon">
         <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
       </div>
-      <div class="message-header-label label-bold">
-        <span data-bind='text: message.user().first_name()'></span>
+      <div class="message-header-label">
+        <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.user().first_name()' data-uie-name="sender-name"></span>
         <!-- ko if: was_edited() -->
           <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
         <!-- /ko -->
@@ -62,11 +88,11 @@
 
     <!-- ko foreach: {data: message.assets, as: 'asset'} -->
       <!-- ko if: asset.is_image() -->
-        <div class="message-asset-image" data-bind="fit_to_viewport: asset">
+        <div class="message-asset-image">
           <div class="image image-loading" data-bind="
-            attr: {'data-uie-visible': $parent.visible},
+            attr: {'data-uie-visible': $parent.visible() && !message.is_expired()},
             background_image: asset.resource,
-            click: $parents[1].show_detail,
+            click: function(data, event) {$parents[1].show_detail(message, event)},
             css: {'bg-color-ephemeral': message.is_expired()},
             viewport_changed: $parents[1].viewport_changed
             " data-uie-name="go-image-detail">
@@ -92,17 +118,17 @@
           <div class="text" data-bind="html: asset.render(), css: {'text-graphite': $parent.is_editing, 'text-large': z.util.emoji.includes_only_emojies(asset.text), 'text-graphite': message.status() === z.message.StatusType.SENDING, 'ephemeral-message-obfuscated': message.is_expired()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
-          <link-preview-asset params="expired: message.is_expired(), preview: $data, viewport_changed: $parents[2].viewport_changed"></link-preview-asset>
+          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.is_expired()}" params="message: message"></link-preview-asset>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.is_video() -->
-        <video-asset data-bind="css: {'bg-color-ephemeral icon-movie text-white flex-center': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></video-asset>
+        <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': message.is_expired()}" params="message: message"></video-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_audio() -->
-        <audio-asset data-bind="css: {'bg-color-ephemeral icon-microphone text-white flex-center': message.is_expired()}" params="asset: asset, expired: message.is_expired()"></audio-asset>
+        <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-microphone': message.is_expired()}" params="message: message"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_file() -->
-        <file-asset params="asset: asset, expired: message.is_expired()"></file-asset>
+        <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': message.is_expired()}" params="message: message"></file-asset>
       <!-- /ko -->
       <!-- ko if: asset.is_location() -->
         <location-asset params="asset: asset"></location-asset>
@@ -213,6 +239,11 @@
         <span class="ellipsis" data-bind="text: message.caption()"></span>
         <hr class="message-header-line" />
       </div>
+      <!-- ko if: message.type === z.event.Backend.CONVERSATION.MEMBER_JOIN || message.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE -->
+      <div class="message-body-actions">
+        <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+      </div>
+      <!-- /ko -->
     </div>
     <div class="message-body">
       <!-- ko foreach: remote_user_ets -->
@@ -237,12 +268,11 @@
 <script type="text/html" id="ping">
   <div class="message-header">
     <div class="message-header-icon">
-      <user-avatar class="sender-avatar user-avatar-xs" data-bubble="#participants-bubble" data-placement="vertical" params="user: message.user(), click: $parent.on_message_user_click"></user-avatar>
+      <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
     </div>
-    <div class="message-header-label" data-bind="css: message.ping_color">
+    <div class="message-header-label">
       <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption"></span>
-      <span class="message-icon-ping icon-ping" data-bind="css: message.animation()"></span>
     </div>
     <div class="message-body-actions">
       <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
@@ -269,8 +299,11 @@
       <span class="ellipsis" data-bind="text: message.caption()"></span>
       <hr class="message-header-line" />
     </div>
+    <div class="message-body-actions">
+      <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
+    </div>
   </div>
-  <div class="message-body label-semibold" data-bind="text: message.name"></div>
+  <div class="message-body font-weight-bold" data-bind="text: message.name"></div>
 </script>
 
 <script type="text/html" id="unable-to-decrypt">

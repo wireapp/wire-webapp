@@ -111,6 +111,9 @@ class z.conversation.ConversationMapper
       conversation_et.set_timestamp self.muted_timestamp, z.conversation.ConversationUpdateType.MUTED_TIMESTAMP
       conversation_et.muted_state self.muted_state
 
+    if self.verification_state
+      conversation_et.verification_state self.verification_state
+
     return conversation_et
 
   ###
@@ -146,9 +149,6 @@ class z.conversation.ConversationMapper
     conversation_et.set_timestamp timestamp, z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
 
     conversation_et = @update_self_status conversation_et, self
-
-    # all users ( with all status codes )
-    conversation_et.all_user_ids others.map (value) -> value.id
 
     # all users that are still active
     participating_user_ids = []

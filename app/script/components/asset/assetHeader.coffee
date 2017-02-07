@@ -17,18 +17,17 @@
 #
 
 window.z ?= {}
-z.calling ?= {}
+z.components ?= {}
 
-class z.calling.CallTrackingInfo
+class z.components.AssetHeader
+
   constructor: (params) ->
-    @conversation_id = params.conversation_id
-    @session_id = params.session_id
-    @time_started = new Date()
-    @participants_joined = {}
+    @message_et = params.message
 
-  add_participant: (participant_et) ->
-    @participants_joined[participant_et.user.name()] = true
 
-  to_string: ->
-    participants = Object.keys(@participants_joined).join ', '
-    return "#{@session_id} in #{@conversation_id} | #{@time_started.toUTCString()} | To: #{participants}"
+ko.components.register 'asset-header',
+  viewModel: z.components.AssetHeader
+  template: """
+            <span class="asset-header-name" data-bind="text: message_et.user().first_name(), css: message_et.accent_color"></span>
+            <span class="asset-header-time" data-bind="text: moment(message_et.timestamp).format('D.M H:mm')"></span>
+            """

@@ -103,6 +103,4 @@ class z.ViewModel.content.PreferencesDeviceDetailsViewModel
 
   toggle_device_verification: =>
     toggle_verified = !!!@device().meta.is_verified()
-
-    @client_repository.update_client_in_db @self_user().id, @device().id, {meta: is_verified: toggle_verified}
-    .then => @device().meta.is_verified toggle_verified
+    @client_repository.verify_client @self_user().id, @device(), toggle_verified

@@ -184,7 +184,9 @@ z.string.tr.modal_logout_headline = 'Veriyi Temizle?'
 z.string.tr.modal_logout_message = 'Bu cihazdaki tüm kişisel bilgileriniz ve görüşme kayıtlarınızı silin.'
 z.string.tr.modal_logout_button = 'Çıkış yap'
 # New device
-z.string.tr.modal_new_device_headline = '"%@.name" yeni bir cihaz kullanmaya başladı'
+z.string.tr.modal_new_device_headline = '%@.name yeni bir cihaz kullanmaya başladı'
+z.string.tr.modal_new_device_headline_many = '%@.names yeni bir cihaz kullanmaya başladı'
+z.string.tr.modal_new_device_headline_you = '%@.name yeni bir cihaz kullanmaya başladı'
 z.string.tr.modal_new_device_message = 'Hâlâ mesajlarınızı göndermek istiyor musunuz?'
 z.string.tr.modal_new_device_show_device = 'cihazı göster'
 z.string.tr.modal_new_device_send_anyway = 'yine de gönder'
@@ -266,6 +268,13 @@ z.string.tr.conversation_context_menu_unlike = 'Beğenme'
 z.string.tr.conversation_delete_timestamp = '%@timestamp ’da silinmiş'
 z.string.tr.conversation_edit_timestamp = '%@timestamp ’da düzenlenmiş'
 z.string.tr.conversation_likes_caption = '%@number kişi'
+z.string.tr.conversation_send_pasted_file = 'Yapıştırılmış resim, %date ’de'
+
+# Collection
+z.string.tr.collection_show_all = '%no’nun tümünü göster'
+z.string.tr.collection_section_links = 'Bağlantılar'
+z.string.tr.collection_section_images = 'Resimler'
+z.string.tr.collection_section_files = 'Dosyalar'
 
 # Archive
 z.string.tr.archive_header = 'Arşivle'
@@ -287,7 +296,11 @@ z.string.tr.conversations_popover_silence = 'Sustur'
 z.string.tr.conversations_popover_unarchive = 'Arşivden Çıkar'
 
 # Takeover
+z.string.tr.takeover_headline = 'Kullanıcı adları burada.'
+z.string.tr.takeover_sub = 'Wire üzerinden size özel isminizi hemen alın.'
 z.string.tr.takeover_link = 'Daha fazla bilgi'
+z.string.tr.takeover_button_choose = 'Kendininkini seç'
+z.string.tr.takeover_button_keep = 'Bunu sakla'
 
 # Invites
 z.string.tr.invite_meta_key_mac = 'Cmd'
@@ -295,7 +308,8 @@ z.string.tr.invite_meta_key_pc = 'Ctrl'
 z.string.tr.invite_hint_selected = 'Kopyalamak için %meta_key + C'
 z.string.tr.invite_hint_unselected = 'Seç ve %meta_key + C tuşlarına bas'
 z.string.tr.invite_headline = 'İnsanların Wire’a davet et'
-z.string.tr.invite_message_no_email = 'Wire’dayım. https://get.wire.com ’u ziyaret ederek bana bağlanabilirsin.'
+z.string.tr.invite_message = 'Wire’dayım, %username olarak arat ya da get.wire.com adresini ziyaret et.'
+z.string.tr.invite_message_no_email = 'Wire’dayım. get.wire.com ’u ziyaret ederek bana bağlanabilirsin.'
 
 # Extensions
 z.string.tr.extensions_bubble_button_gif = 'Gif'
@@ -399,6 +413,9 @@ z.string.tr.preferences_account_reset_password = 'Şifreni sıfırla'
 z.string.tr.preferences_account_delete = 'Hesabı Sil'
 z.string.tr.preferences_account_log_out = 'Çıkış yap'
 z.string.tr.preferences_account_username_placeholder = 'Tam adınız'
+z.string.tr.preferences_account_username_hint = 'En az 2 karakter. a—z, 0—9, ve yalnızca _.'
+z.string.tr.preferences_account_username_available = 'Alınabilir'
+z.string.tr.preferences_account_username_error_taken = 'Çoktan alınmış'
 
 z.string.tr.preferences_av_camera = 'Kamera'
 z.string.tr.preferences_av_microphone = 'Mikrofon'
@@ -438,7 +455,8 @@ z.string.tr.preferences_options_data_checkbox = 'Kullanım ve kilitlenme raporla
 z.string.tr.preferences_options_data_detail = 'Anonim bilgiler göndererek Wire’ın daha iyi olmasını sağlayabilirsiniz.'
 z.string.tr.preferences_options_notifications = 'Bildirimler'
 z.string.tr.preferences_options_notifications_none = 'Yok'
-z.string.tr.preferences_options_notifications_obfuscate = 'Mesaj detaylarını gizle'
+z.string.tr.preferences_options_notifications_obfuscate = 'Ayrıntıyı gizle'
+z.string.tr.preferences_options_notifications_obfuscate_message = 'Göndereni göster'
 z.string.tr.preferences_options_notifications_on = 'Göndereni ve mesajı göster'
 
 # Search
@@ -446,16 +464,13 @@ z.string.tr.search_group_hint = 'Yazmaya devam edin ya da bir grup oluşturmak i
 z.string.tr.search_connect = 'Bağlan'
 z.string.tr.search_connections = 'Bağlantılar'
 z.string.tr.search_groups = 'Gruplar'
-z.string.tr.search_placeholder = 'İsme veya e-postaya göre ara'
+z.string.tr.search_placeholder = 'İsim veya kullanıcı adına göre ara'
 z.string.tr.search_top_people = 'Enler'
-z.string.tr.search_try_search = 'İnsanları isim veya tam e-posta adreslerine göre bulun'
-z.string.tr.search_no_contacts_on_wire = 'Wire’da hiç kişiniz yok.\nİnsanları isimlerini kullanarak ya da\ne-posta adresleriyle bulmayı deneyin'
+z.string.tr.search_try_search = 'İnsanları isimlerine veya kullanıcı adlarına göre bul'
+z.string.tr.search_no_contacts_on_wire = 'Wire’da hiç kişiniz yok. İnsanları isimlerine veya kullanıcı adlarına göre bulmayı deneyin.'
 z.string.tr.search_others = 'Bağlan'
-
-# Picture upload
-z.string.tr.upload_welcome = 'Wire bir fotoğrafla çok daha iyi.'
-z.string.tr.upload_welcome_keep = 'bunu sakla'
-z.string.tr.upload_welcome_choose = 'kendininkini seç'
+z.string.tr.search_friend_in_common = '%no ortak kişi'
+z.string.tr.search_friends_in_common = '%no ortak kişi'
 
 # Google contacts upload
 z.string.tr.upload_google_headline = 'Konuşmak için\ninsanları bul.'
@@ -465,7 +480,7 @@ z.string.tr.upload_google_message_error = 'Bilgilerinzi alamadık. Lütfen kişi
 z.string.tr.upload_google_button_again = 'Tekrar deneyin'
 
 # URLs
-z.string.tr.url_password_reset = 'https://wire.com/forgot/'
+z.string.tr.url_password_reset = 'forgot/'
 z.string.tr.url_legal = 'https://wire.com/legal/'
 z.string.tr.url_privacy = 'https://wire.com/privacy/'
 z.string.tr.url_privacy_why = 'https://wire.com/privacy/why/'
@@ -483,6 +498,7 @@ z.string.tr.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/a
 z.string.tr.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.tr.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
 z.string.tr.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.tr.url_support_usernames = 'https://wire.com/support/username'
 z.string.tr.url_decrypt_error_1 = 'https://wire.com/privacy/error-1'
 z.string.tr.url_decrypt_error_2 = 'https://wire.com/privacy/error-2'
 
@@ -512,6 +528,7 @@ z.string.tr.warning_connectivity_no_internet = 'İnternet bağlantısı yok. Mes
 # Browser notifications
 z.string.tr.system_notification_asset_add = 'Bir resim paylaştı'
 z.string.tr.system_notification_connection_accepted = 'Bağlantı isteğinizi kabul etti'
+z.string.tr.system_notification_connection_connected = 'Şimdi bağlı'
 z.string.tr.system_notification_connection_request = 'Bağlanmak istiyor'
 z.string.tr.system_notification_conversation_create = '%s.first_name bir konuşma başlattı'
 z.string.tr.system_notification_conversation_rename = '%s.first_name, konuşma ismini %name olarak değiştirdi'

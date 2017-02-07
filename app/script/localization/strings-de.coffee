@@ -21,7 +21,6 @@ z.string.de.wire = 'Wire'
 z.string.de.wire_macos = 'Wire für macOS'
 z.string.de.wire_windows = 'Wire für Windows'
 z.string.de.wire_linux = 'Wire für Linux'
-z.string.de.truncation = '…'
 z.string.de.nonexistent_user = 'Gelöschte Person'
 z.string.de.and = 'und'
 
@@ -68,6 +67,8 @@ z.string.de.auth_limit_devices_current = '(Aktuelles Gerät)'
 # Authentication: limit section
 z.string.de.auth_history_headline = 'Du benutzt Wire zum ersten Mal auf diesem Gerät.'
 z.string.de.auth_history_description = 'Aus Datenschutzgründen wird dein bisheriger Gesprächsverlauf nicht angezeigt.'
+z.string.de.auth_history_reuse_headline = 'Du hast Wire auf diesem Gerät bereits früher genutzt.'
+z.string.de.auth_history_reuse_description = 'In der Zwischenzeit gesendete Nachrichten werden nicht angezeigt.'
 z.string.de.auth_history_button = 'Verstanden'
 
 # Authentication: POSTED section
@@ -126,7 +127,7 @@ z.string.de.modal_button_send = 'Senden'
 
 # Block a user
 z.string.de.modal_block_conversation_headline = '%@.name blockieren?'
-z.string.de.modal_block_conversation_message = '%@.name wird dich auf Wire nicht finden können.'
+z.string.de.modal_block_conversation_message = '%@.name wird dich nicht länger kontaktieren oder zu Gruppen hinzufügen können.'
 z.string.de.modal_block_conversation_button = 'Blockieren'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.de.modal_call_conversation_empty_headline = 'Niemand um anzurufen'
@@ -186,7 +187,9 @@ z.string.de.modal_logout_headline = 'Daten löschen?'
 z.string.de.modal_logout_message = 'Deine persönlichen Daten und Unterhaltungen vollständig von diesem Gerät entfernen.'
 z.string.de.modal_logout_button = 'Abmelden'
 # New device
-z.string.de.modal_new_device_headline = '"%@.name" hat begonnen ein neues Gerät zu nutzen'
+z.string.de.modal_new_device_headline = '%@.name hat begonnen ein neues Gerät zu nutzen'
+z.string.de.modal_new_device_headline_many = '%@.names haben begonnen neue Geräte zu nutzen'
+z.string.de.modal_new_device_headline_you = '%@.name hast begonnen ein neues Gerät zu nutzen'
 z.string.de.modal_new_device_message = 'Möchtest du die Nachrichten noch senden?'
 z.string.de.modal_new_device_show_device = 'Gerät anzeigen'
 z.string.de.modal_new_device_send_anyway = 'Dennoch senden'
@@ -226,7 +229,7 @@ z.string.de.conversation_create = ' hat eine Unterhaltung mit %@names begonnen'
 z.string.de.conversation_create_you = ' hast eine Unterhaltung mit %@names begonnen'
 z.string.de.conversation_device_started_using = ' hat begonnen'
 z.string.de.conversation_device_started_using_you = ' hast begonnen'
-z.string.de.conversation_device_unverified = ' hast die Überprüfung von einem Gerät widerrufen für'
+z.string.de.conversation_device_unverified = ' hat die Überprüfung widerrufen für'
 z.string.de.conversation_device_your_devices = ' deine Geräte'
 z.string.de.conversation_device_user_devices = ' %@names Geräte'
 z.string.de.conversation_device_a_new_device = ' ein neues Gerät'
@@ -268,6 +271,13 @@ z.string.de.conversation_context_menu_unlike = 'Gefällt mir nicht mehr'
 z.string.de.conversation_delete_timestamp = 'Gelöscht um %@timestamp'
 z.string.de.conversation_edit_timestamp = 'Editiert um %@timestamp'
 z.string.de.conversation_likes_caption = '%@number Personen'
+z.string.de.conversation_send_pasted_file = 'Bild eingefügt am %date'
+
+# Collection
+z.string.de.collection_show_all = 'Zeige alle %no'
+z.string.de.collection_section_links = 'Links'
+z.string.de.collection_section_images = 'Bilder'
+z.string.de.collection_section_files = 'Dateien'
 
 # Archive
 z.string.de.archive_header = 'Archivieren'
@@ -301,8 +311,8 @@ z.string.de.invite_meta_key_pc = 'Strg'
 z.string.de.invite_hint_selected = 'Zum Kopieren %meta_key + C drücken'
 z.string.de.invite_hint_unselected = 'Markieren und %meta_key + C drücken'
 z.string.de.invite_headline = 'Lade Freunde zu Wire ein'
-z.string.de.invite_message = 'Ich benutze Wire. Suche nach %username oder gehe auf wire.com/download.'
-z.string.de.invite_message_no_email = 'Ich bin bei Wire. Gehe auf https://get.wire.com, um mich als Kontakt hinzuzufügen.'
+z.string.de.invite_message = 'Ich benutze Wire. Suche nach %username oder gehe auf get.wire.com.'
+z.string.de.invite_message_no_email = 'Ich benutze Wire. Gehe auf get.wire.com, um mich als Kontakt hinzuzufügen.'
 
 # Extensions
 z.string.de.extensions_bubble_button_gif = 'Gif'
@@ -346,7 +356,7 @@ z.string.de.people_verified = 'Verifiziert'
 
 # Block user
 z.string.de.people_block_headline = 'Blockieren?'
-z.string.de.people_block_message = '%@.first_name wird dich auf Wire nicht finden können.'
+z.string.de.people_block_message = '%@.first_name wird dich nicht länger kontaktieren oder zu Gruppen hinzufügen können.'
 
 # Accept a pending connection dialogue
 z.string.de.people_connect_headline = 'Annehmen?'
@@ -366,7 +376,7 @@ z.string.de.people_remove_message = '%@.first_name wird in dieser Unterhaltung k
 
 # Unblock user
 z.string.de.people_unblock_headline = 'Freigeben?'
-z.string.de.people_unblock_message = '%@.first_name wird dich über Wire wieder finden und kontaktieren können. Du empfängst alle Nachrichten die verschickt wurden, während der Kontakt blockiert war.'
+z.string.de.people_unblock_message = '%@.first_name wird dich wieder kontaktieren und zu Gruppen hinzufügen können.'
 
 # Button labels for the actions
 z.string.de.people_button_add = 'Kontakte hinzufügen'
@@ -448,7 +458,8 @@ z.string.de.preferences_options_data_checkbox = 'Nutzungs- und Fehlerberichte'
 z.string.de.preferences_options_data_detail = 'Hilf uns, Wire durch das Senden anonymisierter Informationen zu verbessern.'
 z.string.de.preferences_options_notifications = 'Benachrichtigungen'
 z.string.de.preferences_options_notifications_none = 'Aus'
-z.string.de.preferences_options_notifications_obfuscate = 'Nachrichteninhalt verbergen'
+z.string.de.preferences_options_notifications_obfuscate = 'Details verbergen'
+z.string.de.preferences_options_notifications_obfuscate_message = 'Absendername zeigen'
 z.string.de.preferences_options_notifications_on = 'Zeige Absendername und Nachricht'
 
 # Search
@@ -472,7 +483,7 @@ z.string.de.upload_google_message_error = 'Wir haben die Informationen nicht erh
 z.string.de.upload_google_button_again = 'Erneut versuchen'
 
 # URLs
-z.string.de.url_password_reset = 'https://wire.com/forgot/?hl=de'
+z.string.de.url_password_reset = 'forgot/?hl=de'
 z.string.de.url_legal = 'https://wire.com/legal/?hl=de'
 z.string.de.url_privacy = 'https://wire.com/privacy/?hl=de'
 z.string.de.url_privacy_why = 'https://wire.com/privacy/why/'
@@ -517,9 +528,14 @@ z.string.de.warning_tell_me_how = 'Zeig mir wie'
 z.string.de.warning_connectivity_connection_lost = 'Verbindung wird wiederhergestellt. Wire kann Nachrichten möglicherweise nicht empfangen.'
 z.string.de.warning_connectivity_no_internet = 'Keine Internetverbindung. Du kannst keine Nachrichten senden und empfangen.'
 
+# Warnings: Desktop Update
+z.string.de.warning_lifecycle_update = 'Eine neue Version von Wire ist verfügbar.'
+z.string.de.warning_lifecycle_update_link = 'Jetzt aktualisieren'
+
 # Browser notifications
 z.string.de.system_notification_asset_add = 'Hat ein Bild geteilt'
 z.string.de.system_notification_connection_accepted = 'Hat deine Kontaktanfrage akzeptiert'
+z.string.de.system_notification_connection_connected = 'Ist jetzt ein Kontakt von dir'
 z.string.de.system_notification_connection_request = 'Möchte dich als Kontakt hinzufügen'
 z.string.de.system_notification_conversation_create = '%s.first_name hat eine Unterhaltung begonnen'
 z.string.de.system_notification_conversation_rename = '%s.first_name hat die Unterhaltung in %name umbenannt'

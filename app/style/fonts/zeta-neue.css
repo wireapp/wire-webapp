@@ -19,7 +19,7 @@
 
 @font-face {
   font-family: 'Wire';
-  src: url('/font/Wire.ttf?8t0ru7') format('truetype');
+  src: url('/font/Wire.ttf?k1a0xh') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -195,6 +195,12 @@
 .icon-trash-small:before {
   content: "\e1860";
 }
+.icon-delete-for-me:before {
+  content: "\e1861";
+}
+.icon-delete-for-everyone:before {
+  content: "\e1862";
+}
 .icon-download:before {
   content: "\e197";
 }
@@ -242,6 +248,9 @@
 }
 .icon-hourglass:before {
   content: "\e239";
+}
+.icon-collection:before {
+  content: "\e260";
 }
 .icon-av:before {
   content: "\e261";

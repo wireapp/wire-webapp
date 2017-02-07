@@ -159,7 +159,7 @@ z.ui.Shortcut = do ->
   _register_event = (platform_specific_shortcut, event) ->
 
     # bind also 'command + alt + n' for start shortcut
-    if z.util.contains platform_specific_shortcut, 'graveaccent'
+    if z.util.StringUtil.includes platform_specific_shortcut, 'graveaccent'
       replaced_shortcut = platform_specific_shortcut.replace 'graveaccent', 'n'
       _register_event replaced_shortcut, event
 
@@ -167,7 +167,7 @@ z.ui.Shortcut = do ->
       keyboardJS.releaseKey e.keyCode
 
       # hotfix WEBAPP-1916
-      return if (z.util.contains(platform_specific_shortcut, 'command') and not e.metaKey)
+      return if z.util.StringUtil.includes(platform_specific_shortcut, 'command') and not e.metaKey
 
       e.preventDefault()
       amplify.publish event
@@ -189,7 +189,7 @@ z.ui.Shortcut = do ->
       .replace 'up', '↑'
       .replace 'down', '↓'
       .replace 'graveaccent', 'n'
-      .replace /\w+/g, (string) -> z.util.capitalize_first_char string
+      .replace /\w+/g, (string) -> z.util.StringUtil.capitalize_first_char string
 
   get_shortcut = (shortcut_name) ->
     platform = if z.util.Environment.electron then 'electron' else 'webapp'

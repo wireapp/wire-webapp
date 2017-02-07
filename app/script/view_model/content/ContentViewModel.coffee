@@ -22,8 +22,14 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.ContentViewModel
-  constructor: (element_id, @audio_repository, @call_center, @client_repository, @conversation_repository, @cryptography_repository, @giphy_repository, @media_repository, @search_repository, @user_repository, @properties_repository) ->
+  constructor: (element_id, @calling_repository, @client_repository, @conversation_repository, @media_repository, @search_repository, @properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS
+
+    # repositories
+    @audio_repository = @media_repository.audio_repository
+    @cryptography_repository = @client_repository.cryptography_repository
+    @giphy_repository = @conversation_repository.giphy_repository
+    @user_repository = @conversation_repository.user_repository
 
     # state
     @content_state = ko.observable z.ViewModel.content.CONTENT_STATE.WATERMARK
@@ -33,15 +39,16 @@ class z.ViewModel.content.ContentViewModel
       reset_minimize: ko.observable false
 
     # nested view models
-    @call_shortcuts =             new z.ViewModel.CallShortcutsViewModel @call_center
-    @video_calling =              new z.ViewModel.VideoCallingViewModel 'video-calling', @call_center, @conversation_repository, @media_repository, @user_repository, @multitasking
+    @call_shortcuts =             new z.ViewModel.CallShortcutsViewModel @calling_repository
+    @video_calling =              new z.ViewModel.VideoCallingViewModel 'video-calling', @calling_repository, @conversation_repository, @media_repository, @user_repository, @multitasking
+    @collection_details =         new z.ViewModel.content.CollectionDetailsViewModel 'collection-details'
+    @collection =                 new z.ViewModel.content.CollectionViewModel 'collection', @conversation_repository, @collection_details
     @connect_requests =           new z.ViewModel.content.ConnectRequestsViewModel 'connect-requests', @user_repository
-    @conversation_titlebar =      new z.ViewModel.ConversationTitlebarViewModel 'conversation-titlebar', @call_center, @conversation_repository, @multitasking
+    @conversation_titlebar =      new z.ViewModel.ConversationTitlebarViewModel 'conversation-titlebar', @calling_repository, @conversation_repository, @multitasking
     @conversation_input =         new z.ViewModel.ConversationInputViewModel 'conversation-input', @conversation_repository, @user_repository
     @message_list =               new z.ViewModel.MessageListViewModel 'message-list', @conversation_repository, @user_repository
     @participants =               new z.ViewModel.ParticipantsViewModel 'participants', @user_repository, @conversation_repository, @search_repository
     @giphy =                      new z.ViewModel.GiphyViewModel 'giphy-modal', @conversation_repository, @giphy_repository
-    @detail_view =                new z.ViewModel.ImageDetailViewViewModel 'detail-view'
 
     @preferences_account =        new z.ViewModel.content.PreferencesAccountViewModel 'preferences-account', @client_repository, @user_repository
     @preferences_av =             new z.ViewModel.content.PreferencesAVViewModel 'preferences-av', @audio_repository, @media_repository
@@ -64,14 +71,11 @@ class z.ViewModel.content.ContentViewModel
           @preferences_av.initiate_devices()
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
           @preferences_devices.update_fingerprint()
+        when z.ViewModel.content.CONTENT_STATE.COLLECTION
+          @collection.set_conversation @previous_conversation
         else
           @conversation_input.removed_from_view()
           @conversation_titlebar.removed_from_view()
-
-    @multitasking.is_minimized.subscribe (is_minimized) =>
-      if is_minimized and @call_center.joined_call()
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.MINIMIZED_FROM_FULLSCREEN,
-        conversation_type: if @call_center.joined_call().is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
 
     @user_repository.connect_requests.subscribe (requests) =>
       if @content_state() is z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS and requests.length is 0
@@ -94,7 +98,7 @@ class z.ViewModel.content.ContentViewModel
   @param content_selector [String] dom element to apply slide in animation
   ###
   _shift_content: (content_selector) ->
-    incoming_css_class = 'content-animation-incoming'
+    incoming_css_class = 'content-animation-incoming-horizontal-left'
 
     $(content_selector)
       .removeClass incoming_css_class
@@ -115,7 +119,7 @@ class z.ViewModel.content.ContentViewModel
     return @switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS if not conversation_et
 
     conversation_et = @conversation_repository.get_conversation_by_id conversation_et if not conversation_et.id
-    return if conversation_et is @conversation_repository.active_conversation()
+    return if conversation_et is @conversation_repository.active_conversation() and @content_state() is z.ViewModel.content.CONTENT_STATE.CONVERSATION
 
     @_release_content()
     @content_state z.ViewModel.content.CONTENT_STATE.CONVERSATION
@@ -128,7 +132,7 @@ class z.ViewModel.content.ContentViewModel
   switch_content: (new_content_state) =>
     return false if @content_state() is new_content_state
 
-    @_release_content()
+    @_release_content new_content_state
     @_show_content @_check_content_availability new_content_state
 
   ###
@@ -156,6 +160,8 @@ class z.ViewModel.content.ContentViewModel
 
   _get_element_of_content: (content_state) ->
     switch content_state
+      when z.ViewModel.content.CONTENT_STATE.COLLECTION then '.collection'
+      when z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS then '.collection-details'
       when z.ViewModel.content.CONTENT_STATE.CONVERSATION then '.conversation'
       when z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS then '.connect-requests'
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT then '.preferences-about'
@@ -166,11 +172,13 @@ class z.ViewModel.content.ContentViewModel
       when z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS then '.preferences-options'
       else '.watermark'
 
-  _release_content: ->
+  _release_content: (new_content_state) ->
     @previous_state = @content_state()
 
-    if @previous_state is z.ViewModel.content.CONTENT_STATE.CONVERSATION
+    if @previous_state is z.ViewModel.content.CONTENT_STATE.CONVERSATION and not new_content_state in [z.ViewModel.content.CONTENT_STATE.COLLECTION, z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS]
       @conversation_repository.active_conversation null
+
+    if @previous_state is z.ViewModel.content.CONTENT_STATE.CONVERSATION
       @message_list.release_conversation()
     else if @previous_state is z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
       @preferences_av.release_devices()

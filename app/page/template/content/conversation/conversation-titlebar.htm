@@ -1,7 +1,13 @@
 <div id="conversation-titlebar" class="conversation-titlebar" data-bind="with: $root.conversation_titlebar">
   <!-- ko if: conversation_et() -->
 
-    <!-- ko if: conversation_et().is_verified() -->
+    <div class="conversation-titlebar-library">
+      <span class="conversation-titlebar-icon button-icon-large icon-collection"
+            data-bind="click: click_on_collection_button"
+            data-uie-name="do-collections"></span>
+    </div>
+
+    <!-- ko if: conversation_et().verification_state() === z.conversation.ConversationVerificationState.VERIFIED -->
       <svg class="conversation-verified-icon" width="16" height="16">
         <use xlink:href="#icon-verified"></use>
       </svg>
@@ -35,17 +41,17 @@
     <!-- ko if: has_ongoing_call() -->
       <div class="conversation-titlebar-icons">
         <!-- ko if: show_maximize_control() -->
-          <span class="conversation-titlebar-icon button-icon-large icon-fullscreen "
+          <span class="conversation-titlebar-icon button-icon-large icon-fullscreen"
                 data-bind="click: click_on_maximize"
                 data-uie-name="do-maximize-call">
           </span>
         <!-- /ko -->
-        <!-- ko if: call_self_state.screen_shared() -->
+        <!-- ko if: self_stream_state.screen_send() -->
           <span class="conversation-titlebar-icon conversation-titlebar-icon-status button-icon-large icon-screensharing"
             data-uie-name="status-self-screensharing">
           </span>
         <!-- /ko -->
-        <!-- ko if: call_self_state.videod() -->
+        <!-- ko if: self_stream_state.video_send() -->
           <span class="conversation-titlebar-icon conversation-titlebar-icon-status button-icon-large icon-video"
                 data-uie-name="status-self-video">
           </span>

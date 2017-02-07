@@ -11,14 +11,16 @@
 /aws/static
 /aws/templates/**/*.html
 /aws/templates/auth
+/aws/templates/sw.js
 /aws/version
 /bower_components
 /deploy
 /dist
-/docs
+/docs/coverage
 /keys
 /nbproject
 /node_modules
+/tags
 /temp
 /test/_SpecRunner.html
 /test/coverage

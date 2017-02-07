@@ -58,7 +58,7 @@ ko.bindingHandlers.bordered_list = do ->
     $element.on 'scroll', -> calculate_borders $element
     $('.left').on 'click', -> calculate_borders $element
     $(window).on 'resize', -> calculate_borders $element
-    amplify.subscribe z.event.WebApp.LOADED, -> calculate_borders $element
+    amplify.subscribe z.event.WebApp.LIFECYCLE.LOADED, -> calculate_borders $element
 
   update: (element, valueAccessor) ->
     ko.unwrap valueAccessor()

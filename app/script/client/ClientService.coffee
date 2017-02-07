@@ -141,15 +141,6 @@ class z.client.ClientService
       return client_record
 
   ###
-  Loads persisted clients from the database.
-  @param primary_keys [Array<String>] Primary keys used to find clients in the database
-  @return [Promise<JSON|String>] Promise that resolves with the clients' payloads or the primary keys if not found
-  ###
-  load_clients_from_db: (primary_keys) ->
-    promises = (@load_client_from_db primary_key for primary_key in primary_keys)
-    return Promise.all promises
-
-  ###
   Persists a client.
 
   @param primary_key [String] Primary key used to find a client in the database

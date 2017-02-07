@@ -184,7 +184,9 @@ z.string.sl.modal_logout_headline = 'Počisti podatke?'
 z.string.sl.modal_logout_message = 'Izbriši vse vaše osebne podatke in pogovore na tej napravi.'
 z.string.sl.modal_logout_button = 'Odjava'
 # New device
-z.string.sl.modal_new_device_headline = '"%@.name" je začel(-a) z uporabo nove naprave'
+z.string.sl.modal_new_device_headline = '%@.name je začel(-a) z uporabo nove naprave'
+z.string.sl.modal_new_device_headline_many = '%@.names je začel(-a) z uporabo nove naprave'
+z.string.sl.modal_new_device_headline_you = '%@.name je začel(-a) z uporabo nove naprave'
 z.string.sl.modal_new_device_message = 'Ali še vedno želite poslati vaša sporočila?'
 z.string.sl.modal_new_device_show_device = 'pokaži napravo'
 z.string.sl.modal_new_device_send_anyway = 'pošlji vseeno'
@@ -266,6 +268,13 @@ z.string.sl.conversation_context_menu_unlike = 'Ni mi všeč'
 z.string.sl.conversation_delete_timestamp = 'Izbrisan ob %@timestamp'
 z.string.sl.conversation_edit_timestamp = 'Urejen ob %@timestamp'
 z.string.sl.conversation_likes_caption = '%@number oseb'
+z.string.sl.conversation_send_pasted_file = 'Prilepljena slika ob %date'
+
+# Collection
+z.string.sl.collection_show_all = 'Prikaži vse %no'
+z.string.sl.collection_section_links = 'Povezave'
+z.string.sl.collection_section_images = 'Slike'
+z.string.sl.collection_section_files = 'Zbirke'
 
 # Archive
 z.string.sl.archive_header = 'Arhiviraj'
@@ -299,8 +308,8 @@ z.string.sl.invite_meta_key_pc = 'Ctrl'
 z.string.sl.invite_hint_selected = 'Pritisnite %meta_key + C za kopiranje'
 z.string.sl.invite_hint_unselected = 'Izberite in pritisnite %meta_key + C'
 z.string.sl.invite_headline = 'Povabite osebe na Wire'
-z.string.sl.invite_message = 'Sem na Wire, poišči %username ali obišči wire.com/download.'
-z.string.sl.invite_message_no_email = 'Sem na Wire. Obišči https://get.wire.com za povezavo z mano.'
+z.string.sl.invite_message = 'Sem na Wire, poišči %username ali obišči get.wire.com.'
+z.string.sl.invite_message_no_email = 'Sem na Wire. Obišči get.wire.com za povezavo z mano.'
 
 # Extensions
 z.string.sl.extensions_bubble_button_gif = 'Gif'
@@ -445,7 +454,8 @@ z.string.sl.preferences_options_data_checkbox = 'Podatki o uporabi in poročila 
 z.string.sl.preferences_options_data_detail = 'Izboljšajte Wire s pošiljanjem anonimnih informacij.'
 z.string.sl.preferences_options_notifications = 'Obvestila'
 z.string.sl.preferences_options_notifications_none = 'Izklopljeno'
-z.string.sl.preferences_options_notifications_obfuscate = 'Skrij podrobnosti sporočila'
+z.string.sl.preferences_options_notifications_obfuscate = 'Skrij podrobnosti'
+z.string.sl.preferences_options_notifications_obfuscate_message = 'Pokaži pošiljatelja'
 z.string.sl.preferences_options_notifications_on = 'Pokaži pošiljatelja in sporočilo'
 
 # Search
@@ -453,18 +463,13 @@ z.string.sl.search_group_hint = 'Nadaljujte s tipkanjem ali izberite več oseb z
 z.string.sl.search_connect = 'Poveži'
 z.string.sl.search_connections = 'Povezave'
 z.string.sl.search_groups = 'Skupine'
-z.string.sl.search_placeholder = 'Iskanje po imenu ali e-pošti uporabnika'
+z.string.sl.search_placeholder = 'Iskanje po imenu ali uporabniškem imenu'
 z.string.sl.search_top_people = 'Top osebe'
-z.string.sl.search_try_search = 'Najdi osebe po imenu ali\npolnem e-poštnem naslovu'
-z.string.sl.search_no_contacts_on_wire = 'Nimate nobenih stikov na Wire.\nPoizkusite najti osebe po imenu\nali polnem e-poštnem naslovu'
+z.string.sl.search_try_search = 'Najdi osebe po imenu ali uporabniškem imenu'
+z.string.sl.search_no_contacts_on_wire = 'Nimate nobenih stikov na Wire.\nPoizkusite najti osebe po imenu\nali uporabniškem imenu.'
 z.string.sl.search_others = 'Poveži'
 z.string.sl.search_friend_in_common = '%no skupna oseba'
 z.string.sl.search_friends_in_common = '%no skupnih oseb'
-
-# Picture upload
-z.string.sl.upload_welcome = 'Wire je lepši s sliko.'
-z.string.sl.upload_welcome_keep = 'obdrži to'
-z.string.sl.upload_welcome_choose = 'izberi svojo'
 
 # Google contacts upload
 z.string.sl.upload_google_headline = 'Poiščite osebe\nza pogovor.'
@@ -474,6 +479,7 @@ z.string.sl.upload_google_message_error = 'Nismo prejeli vaših podatkov. Prosim
 z.string.sl.upload_google_button_again = 'Poskusite ponovno'
 
 # URLs
+z.string.sl.url_password_reset = 'forgot/'
 z.string.sl.url_terms_of_use = 'https://wire.com/legal/terms/'
 z.string.sl.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412'
 z.string.sl.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
@@ -514,6 +520,7 @@ z.string.sl.warning_connectivity_no_internet = 'Ni spletne povezave. Ne boste mo
 # Browser notifications
 z.string.sl.system_notification_asset_add = 'Je delil(-a) sliko'
 z.string.sl.system_notification_connection_accepted = 'Je sprejel(-a) vašo zahtevo po povezavi'
+z.string.sl.system_notification_connection_connected = 'Sta zdaj povezana'
 z.string.sl.system_notification_connection_request = 'Si želi povezati'
 z.string.sl.system_notification_conversation_create = '%s.first_name je začel(-a) pogovor'
 z.string.sl.system_notification_conversation_rename = '%s.first_name je preimenoval(-a) pogovor v %name'

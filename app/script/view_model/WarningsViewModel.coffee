@@ -26,10 +26,11 @@ z.ViewModel.WarningType =
   REQUEST_MICROPHONE: 'request_microphone'
   REQUEST_NOTIFICATION: 'request_notification'
   REQUEST_SCREEN: 'request_screen'
-# Permission callbacks: !dimmed screen, warning bar
+  # Permission callbacks: !dimmed screen, warning bar
   DENIED_CAMERA: 'camera_access_denied'
   DENIED_MICROPHONE: 'mic_access_denied'
   DENIED_SCREEN: 'screen_access_denied'
+  LIFECYCLE_UPDATE: 'lifecycle_update'
   NOT_FOUND_CAMERA: 'not_found_camera'
   NOT_FOUND_MICROPHONE: 'not_found_microphone'
   UNSUPPORTED_INCOMING_CALL: 'unsupported_incoming_call'
@@ -37,6 +38,7 @@ z.ViewModel.WarningType =
   CONNECTIVITY_RECONNECT: 'connectivity_reconnect'
   CONNECTIVITY_RECOVERY: 'connectivity_recovery'
   NO_INTERNET: 'no_internet'
+
 
 class z.ViewModel.WarningsViewModel
   constructor: (element_id) ->
@@ -50,6 +52,7 @@ class z.ViewModel.WarningsViewModel
     @warnings.subscribe (warnings) ->
       mini_modes = [
         z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
+        z.ViewModel.WarningType.LIFECYCLE_UPDATE
         z.ViewModel.WarningType.NO_INTERNET
       ]
       if warnings.length is 0
@@ -93,7 +96,7 @@ class z.ViewModel.WarningsViewModel
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALLING,
           action: -> z.util.safe_window_open z.localization.Localizer.get_text z.string.url_support_mic_access_denied
       when z.ViewModel.WarningType.REQUEST_NOTIFICATION
-      # We block subsequent permission requests for notifications when the user ignores the request.
+        # We block subsequent permission requests for notifications when the user ignores the request.
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.PERMISSION_STATE, z.system_notification.PermissionStatusState.IGNORED
 
   dismiss_warning: (type) =>
@@ -102,7 +105,7 @@ class z.ViewModel.WarningsViewModel
     @warnings.remove type
 
   show_warning: (type, info) =>
-    @dismiss_warning() if @top_warning() and type in [z.ViewModel.WarningType.CONNECTIVITY_RECONNECT, z.ViewModel.WarningType.NO_INTERNET]
+    @dismiss_warning() if type in [z.ViewModel.WarningType.CONNECTIVITY_RECONNECT, z.ViewModel.WarningType.NO_INTERNET] and @top_warning() isnt z.ViewModel.WarningType.LIFECYCLE_UPDATE
     @logger.warn "Showing warning of type '#{type}'"
     if info?
       @first_name info.first_name

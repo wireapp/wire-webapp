@@ -24,11 +24,12 @@
 .label-xs {
   .label;
   font-size: @font-size-xs;
+  font-weight: @font-weight-regular;
 }
 
 .label-bold {
   .label;
-  font-weight: 600;
+  font-weight: @font-weight-bold;
 }
 
 .label-bold-xs {
@@ -36,13 +37,15 @@
   font-size: @font-size-xs;
 }
 
-.label-semibold {
-  font-weight: 500;
+.label-nocase-xs {
+  font-size: 12px;
+  font-weight: @font-weight-regular;
+  text-transform: none;
 }
 
-.label-semibold-xs {
-  .label-semibold;
-  font-size: @font-size-xs;
+.label-nocase-bold-xs {
+  .label-nocase-xs;
+  font-weight: @font-weight-bold;
 }
 
 .label-username:not(:empty):before {

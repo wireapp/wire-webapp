@@ -184,7 +184,9 @@ z.string.it.modal_logout_headline = 'Cancella dati?'
 z.string.it.modal_logout_message = 'Elimina tutti i tuoi dati personali e le conversazioni su questo dispositivo.'
 z.string.it.modal_logout_button = 'Logout'
 # New device
-z.string.it.modal_new_device_headline = '"%@.name" ha iniziato a utilizzare un nuovo dispositivo'
+z.string.it.modal_new_device_headline = '%@.name ha iniziato a utilizzare un nuovo dispositivo'
+z.string.it.modal_new_device_headline_many = '%@.names ha iniziato a utilizzare un nuovo dispositivo'
+z.string.it.modal_new_device_headline_you = '%@.name ha iniziato a utilizzare un nuovo dispositivo'
 z.string.it.modal_new_device_message = 'Vuoi comunque mandare il messaggio?'
 z.string.it.modal_new_device_show_device = 'visualizza dispositivo'
 z.string.it.modal_new_device_send_anyway = 'invia comunque'
@@ -266,6 +268,9 @@ z.string.it.conversation_context_menu_unlike = 'Non mi piace più'
 z.string.it.conversation_delete_timestamp = 'Cancellato il %@timestamp'
 z.string.it.conversation_edit_timestamp = 'Modificato il %@timestamp'
 z.string.it.conversation_likes_caption = '%@number persone'
+z.string.it.conversation_send_pasted_file = 'Immagine incollata alle %date'
+
+# Collection
 
 # Archive
 z.string.it.archive_header = 'Archivia'
@@ -287,7 +292,11 @@ z.string.it.conversations_popover_silence = 'Silenzia'
 z.string.it.conversations_popover_unarchive = 'Disarchivia'
 
 # Takeover
+z.string.it.takeover_headline = 'Usernames sono qui.'
+z.string.it.takeover_sub = 'Rivendica il tuo username su Wire.'
 z.string.it.takeover_link = 'Ulteriori informazioni'
+z.string.it.takeover_button_choose = 'Scegli il tuo'
+z.string.it.takeover_button_keep = 'Tieni questo'
 
 # Invites
 z.string.it.invite_meta_key_mac = 'Cmd'
@@ -295,7 +304,6 @@ z.string.it.invite_meta_key_pc = 'Ctrl'
 z.string.it.invite_hint_selected = 'Premere %meta_key + C per copiare'
 z.string.it.invite_hint_unselected = 'Selezionare e premere % meta_key + C'
 z.string.it.invite_headline = 'Invita amici ad usare Wire'
-z.string.it.invite_message_no_email = 'Sono su Wire. Visita https://get.wire.com per connetterti con me.'
 
 # Extensions
 z.string.it.extensions_bubble_button_gif = 'Gif'
@@ -319,7 +327,6 @@ z.string.it.people_no_matches = 'Nessun risultato corrispondente. Provare ad ins
 z.string.it.people_invite = 'Invita persone'
 z.string.it.people_share = 'Condividi contatti'
 z.string.it.people_bring_your_friends = 'Porta i tuoi amici su Wire'
-z.string.it.people_invite_detail = 'Condividere i contatti dalla rubrica ti aiuta a connetterti con gli altri. Rendiamo tutte le informazioni dei contatti anonime e non sono cedute a nessun altro.'
 z.string.it.people_invite_button_contacts = 'Dalla rubrica'
 z.string.it.people_invite_button_gmail = 'Da Gmail'
 z.string.it.people_invite_headline = 'Invita i tuoi amici'
@@ -398,6 +405,9 @@ z.string.it.preferences_account_reset_password = 'Reimposta la password'
 z.string.it.preferences_account_delete = 'Elimina account'
 z.string.it.preferences_account_log_out = 'Logout'
 z.string.it.preferences_account_username_placeholder = 'Il tuo nome e cognome'
+z.string.it.preferences_account_username_hint = 'Almeno 2 caratteri. a-z, 0-9 e solo _.'
+z.string.it.preferences_account_username_available = 'Disponibile'
+z.string.it.preferences_account_username_error_taken = 'E’ già stato scelto'
 
 z.string.it.preferences_av_camera = 'Fotocamera'
 z.string.it.preferences_av_microphone = 'Microfono'
@@ -437,7 +447,8 @@ z.string.it.preferences_options_data_checkbox = 'Segnalazioni di crash e dati di
 z.string.it.preferences_options_data_detail = 'Migliora Wire con l’invio di informazioni anonime.'
 z.string.it.preferences_options_notifications = 'Notifiche'
 z.string.it.preferences_options_notifications_none = 'Off'
-z.string.it.preferences_options_notifications_obfuscate = 'Nascondi i dettagli messaggio'
+z.string.it.preferences_options_notifications_obfuscate = 'Nascondi dettagli'
+z.string.it.preferences_options_notifications_obfuscate_message = 'Mostra mittente'
 z.string.it.preferences_options_notifications_on = 'Mostra mittente e messaggio'
 
 # Search
@@ -445,16 +456,13 @@ z.string.it.search_group_hint = 'Digita o scegli più persone per creare un grup
 z.string.it.search_connect = 'Connetti'
 z.string.it.search_connections = 'Connessioni'
 z.string.it.search_groups = 'Gruppi'
-z.string.it.search_placeholder = 'Ricerca per nome o e-mail'
+z.string.it.search_placeholder = 'Ricerca per nome o username'
 z.string.it.search_top_people = 'Contattati frequenti'
-z.string.it.search_try_search = 'Trova persone per nome o indirizzo email completo'
-z.string.it.search_no_contacts_on_wire = 'Non hai nessun contatto sul Wire. Prova a trovare persone per nome o indirizzo email completo'
+z.string.it.search_try_search = 'Trova le persone per nome o username'
+z.string.it.search_no_contacts_on_wire = 'Non hai nessun contatto su Wire. Prova a trovare persone per nome o username.'
 z.string.it.search_others = 'Connetti'
-
-# Picture upload
-z.string.it.upload_welcome = 'Wire è meglio con una foto.'
-z.string.it.upload_welcome_keep = 'tieni questa'
-z.string.it.upload_welcome_choose = 'scegline una tua'
+z.string.it.search_friend_in_common = '%no persona in comune'
+z.string.it.search_friends_in_common = '%no persone in comune'
 
 # Google contacts upload
 z.string.it.upload_google_headline = 'Trova persone con cui parlare.'
@@ -474,6 +482,7 @@ z.string.it.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/a
 z.string.it.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662'
 z.string.it.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412'
 z.string.it.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889'
+z.string.it.url_support_usernames = 'https://wire.com/support/username'
 z.string.it.url_decrypt_error_1 = 'https://wire.com/privacy/error-1'
 z.string.it.url_decrypt_error_2 = 'https://wire.com/privacy/error-2'
 

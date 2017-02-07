@@ -108,15 +108,15 @@ class z.ViewModel.ModalsViewModel
       modal.hide -> options.secondary?()
 
     $(type).find('.modal-action').click ->
-      modal.hide ->
-        if (checkbox = $(type).find('.modal-checkbox')).length
-          options.action checkbox.is ':checked'
-          checkbox.prop 'checked', false
-        else if (input = $(type).find('.modal-input')).length
-          options.action input.val()
-          input.val ''
-        else
-          options.action?()
+      if (checkbox = $(type).find('.modal-checkbox')).length
+        options.action checkbox.is ':checked'
+        checkbox.prop 'checked', false
+      else if (input = $(type).find('.modal-input')).length
+        options.action input.val()
+        input.val ''
+      else
+        options.action?()
+      modal.hide()
 
     @logger.info "Show modal of type '#{type}'" if not modal.is_shown()
     modal.toggle()
@@ -191,11 +191,18 @@ class z.ViewModel.ModalsViewModel
         content: content
 
   _show_modal_new_device: (content, title_element) ->
+    joined_names = z.util.StringUtil.capitalize_first_char z.util.LocalizerUtil.join_names content, z.string.Declension.NOMINATIVE
+    string_id =
+      if content.length is 1
+        if content[0].is_me then z.string.modal_new_device_headline_you else z.string.modal_new_device_headline
+      else
+        z.string.modal_new_device_headline_many
+
     title_element.text z.localization.Localizer.get_text
-      id: z.string.modal_new_device_headline
+      id: string_id
       replace:
-        placeholder: '%@.name'
-        content: content
+        placeholder: if content.length is 1 then '%@.name' else '%@.names'
+        content: joined_names
 
   _show_modal_remove_device: (content, title_element) ->
     title_element.text z.localization.Localizer.get_text

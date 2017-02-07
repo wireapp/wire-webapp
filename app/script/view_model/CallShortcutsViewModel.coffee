@@ -24,10 +24,10 @@ Last remainder of the CallBannerViewModel.
 @todo Move functionality elsewhere and remove
 ###
 class z.ViewModel.CallShortcutsViewModel
-  constructor: (@call_center) ->
+  constructor: (@calling_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.CallShortcutsViewModel', z.config.LOGGER.OPTIONS
 
-    @joined_call = @call_center.joined_call
+    @joined_call = @calling_repository.joined_call
 
     @joined_call.subscribe (call_et) =>
       @_update_shortcut_subscription call_et
@@ -46,9 +46,6 @@ class z.ViewModel.CallShortcutsViewModel
       when z.calling.enum.CallState.INCOMING
         @_subscribe_shortcuts_incoming()
 
-    conversation_name = call_et.conversation_et.display_name()
-    @logger.debug "Updated call shortcuts for '#{call_et.state()}' call in conversation '#{call_et.id}' (#{conversation_name})"
-
   _subscribe_shortcuts_incoming: =>
     amplify.subscribe z.event.WebApp.SHORTCUT.CALL_IGNORE, @on_ignore_call
 
@@ -64,7 +61,7 @@ class z.ViewModel.CallShortcutsViewModel
   ###########################
 
   on_ignore_call: =>
-    @call_center.state_handler.ignore_call @joined_call()?.id
+    amplify.publish z.event.WebApp.CALL.STATE.IGNORE, @joined_call()?.id
 
   on_mute_call: =>
-    @call_center.state_handler.toggle_audio @joined_call()?.id
+    amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call()?.id, z.media.MediaType.AUDIO

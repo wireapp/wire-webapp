@@ -26,11 +26,13 @@ sys.setdefaultencoding('utf8')
 
 SUPPORTED_LOCALE = [
   'cs',
+  'da',
   'de',
   'es',
   'fi',
   'fr',
   'hr',
+  'hu',
   'it',
   'pt',
   'ro',

@@ -1,0 +1,80 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+// Content
+.content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+// Titlebar
+.content-titlebar {
+  .label-bold-xs;
+  .flex-center;
+  background-color: @app-bg;
+  border-bottom: 1px solid fade(@graphite, 12%);
+  height: @content-title-bar-height;
+  position: relative;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.content-titlebar-items-left {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.content-titlebar-items-center {
+  .flex-center;
+}
+
+.content-titlebar-items-right {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.content-titlebar-icon {
+  .button-icon-large;
+  flex: 0 0 auto;
+  margin-left: 12px;
+  margin-right: 12px;
+}
+
+// List
+.content-list-wrapper {
+  width: 100%;
+  flex: 1 1 auto;
+}
+
+.content-list {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 40px;
+}

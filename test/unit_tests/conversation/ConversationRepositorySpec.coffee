@@ -629,11 +629,7 @@ describe 'z.conversation.ConversationRepository', ->
       conversation_repository.save_conversation dudes
       conversation_repository.save_conversation gals
       conversation_repository.save_conversation mixed_group
-
-      cryptography_repository.cryptobox =
-        session_delete: -> return Promise.resolve()
-        session_load: -> true
-        session_save: -> true
+      cryptography_repository.load_session = (session_id) -> return Promise.resolve session_id
 
     it 'knows all users participating in a conversation (including the self user)', (done) ->
       dudes = conversation_repository.conversations()[1]
@@ -690,9 +686,21 @@ describe 'z.conversation.ConversationRepository', ->
               "#{jane_roe.client_id}": '💣'
 
       it 'adds missing clients to the payload', (done) ->
-        session = new cryptobox.CryptoboxSession "#{john_doe.user_id}@#{john_doe.client_id}"
-        spyOn(cryptography_repository, 'load_session').and.returnValue session
         spyOn(user_repository, 'add_client_to_user').and.returnValue Promise.resolve()
+        # TODO: Make this fake method available as a utility function for testing
+        spyOn(cryptography_repository.cryptography_service, 'get_users_pre_keys').and.callFake (user_client_map) ->
+          return Promise.resolve().then () ->
+            prekey_map = {}
+
+            for user_id of user_client_map
+              prekey_map[user_id] ?= {}
+              for client_id in user_client_map[user_id]
+                prekey_map[user_id][client_id] = {
+                  key: 'pQABARn//wKhAFgg3OpuTCUwDZMt1fklZB4M+fjDx/3fyx78gJ6j3H3dM2YDoQChAFggQU1orulueQHLv5YDYqEYl3D4O0zA9d+TaGGXXaBJmK0E9g=='
+                  id: 65535
+                }
+
+            return prekey_map
 
         client_mismatch =
           missing:
@@ -770,6 +778,9 @@ describe 'z.conversation.ConversationRepository', ->
 
   describe 'get_events', ->
     it 'gets messages which are not broken by design', (done) ->
+      spyOn(user_repository, 'get_user_by_id').and.callFake (message_id, callback) ->
+        callback new z.entity.User()
+
       conversation_et = new z.entity.Conversation z.util.create_random_uuid()
       #@formatter:off
       bad_message = {"conversation":"#{conversation_et.id}","id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Hello World :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"}
@@ -785,8 +796,9 @@ describe 'z.conversation.ConversationRepository', ->
       save_messages.push storage_service.save object_store, good_message_key, good_message
 
       Promise.all save_messages
-      .then =>
+      .then ->
         return conversation_repository.get_events conversation_et
-      .then (loaded_events) =>
+      .then (loaded_events) ->
         expect(loaded_events.length).toBe 1
         done()
+      .catch done.fail

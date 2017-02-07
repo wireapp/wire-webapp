@@ -184,7 +184,9 @@ z.string.es.modal_logout_headline = '¿Borrar los Datos?'
 z.string.es.modal_logout_message = 'Borrar todos sus datos personales y las conversaciones en este dispositivo.'
 z.string.es.modal_logout_button = 'Cerrar sesión'
 # New device
-z.string.es.modal_new_device_headline = '"%@.name" comenzó a usar un nuevo dispositivo'
+z.string.es.modal_new_device_headline = '%@.name comenzó a usar un nuevo dispositivo'
+z.string.es.modal_new_device_headline_many = '%@.names comenzó a usar un nuevo dispositivo'
+z.string.es.modal_new_device_headline_you = '%@.name comenzó a usar un nuevo dispositivo'
 z.string.es.modal_new_device_message = '¿Desea enviar su mensaje?'
 z.string.es.modal_new_device_show_device = 'mostrar dispositivo'
 z.string.es.modal_new_device_send_anyway = 'enviar de todos modos'
@@ -266,6 +268,10 @@ z.string.es.conversation_context_menu_unlike = 'No me gusta'
 z.string.es.conversation_delete_timestamp = 'Eliminados en %@fecha y hora'
 z.string.es.conversation_edit_timestamp = 'Editado %@fecha y hora'
 z.string.es.conversation_likes_caption = '%@numbero de personas'
+z.string.es.conversation_send_pasted_file = 'Imagen pegada el %date'
+
+# Collection
+z.string.es.collection_show_all = 'Mostrar los %no'
 
 # Archive
 z.string.es.archive_header = 'Archivar'
@@ -299,8 +305,8 @@ z.string.es.invite_meta_key_pc = 'Ctrl'
 z.string.es.invite_hint_selected = 'Pulse %meta_key + C para copiar'
 z.string.es.invite_hint_unselected = 'Seleccione y pulse %meta_key + C'
 z.string.es.invite_headline = 'Invitar amigos a Wire'
-z.string.es.invite_message = 'Estoy en Wire, búscame como %username o visita wire.com/download.'
-z.string.es.invite_message_no_email = 'Estoy en Wire. Visita https://get.wire.com para conectar conmigo.'
+z.string.es.invite_message = 'Estoy en Wire, búscame como %username o visita get.wire.com.'
+z.string.es.invite_message_no_email = 'Estoy en Wire. Visita get.wire.com para conectar conmigo.'
 
 # Extensions
 z.string.es.extensions_bubble_button_gif = 'Gif'
@@ -324,7 +330,7 @@ z.string.es.people_no_matches = 'No hay resultados coincidentes. Intente con un 
 z.string.es.people_invite = 'Invitar gente'
 z.string.es.people_share = 'Compartir contactos'
 z.string.es.people_bring_your_friends = 'Invita a tus amigos a Wire'
-z.string.es.people_invite_detail = 'Compartir tus contactos le ayuda a conectarse con otros. Toda la información es anónima y no será compartida con nadie más.'
+z.string.es.people_invite_detail = 'Compartir tus contactos te ayuda a conectar con otros. Anonimizamos toda la información y no la compartimos con nadie.'
 z.string.es.people_invite_button_contacts = 'Desde los contactos'
 z.string.es.people_invite_button_gmail = 'Desde Gmail'
 z.string.es.people_invite_headline = 'Tráete a tus amigos'
@@ -446,7 +452,8 @@ z.string.es.preferences_options_data_checkbox = 'Reportes de uso y fallas'
 z.string.es.preferences_options_data_detail = 'Ayudar a mejorar Wire enviando información anónima.'
 z.string.es.preferences_options_notifications = 'Notificaciones'
 z.string.es.preferences_options_notifications_none = 'Desactivar'
-z.string.es.preferences_options_notifications_obfuscate = 'Ocultar detalles del mensaje'
+z.string.es.preferences_options_notifications_obfuscate = 'Ocultar detalles'
+z.string.es.preferences_options_notifications_obfuscate_message = 'Mostrar remitente'
 z.string.es.preferences_options_notifications_on = 'Mostrar remitente y mensaje'
 
 # Search
@@ -454,18 +461,13 @@ z.string.es.search_group_hint = 'Seguir intentando o elegir más personas para c
 z.string.es.search_connect = 'Conectar'
 z.string.es.search_connections = 'Conexiones'
 z.string.es.search_groups = 'Grupos'
-z.string.es.search_placeholder = 'Buscar por nombre o correo electrónico'
+z.string.es.search_placeholder = 'Buscar por nombre o usuario'
 z.string.es.search_top_people = 'Personas más importantes'
-z.string.es.search_try_search = 'Encuentra personas por nombre o dirección de email'
-z.string.es.search_no_contacts_on_wire = 'No tienes ningún contacto en Wire. Trata de encontrar personas por nombre o dirección de correo electronico'
+z.string.es.search_try_search = 'Encontrar personas por nombre o usuario'
+z.string.es.search_no_contacts_on_wire = 'No tienes contactos en Wire. Trata de encontrar personas por nombre o usuario.'
 z.string.es.search_others = 'Conectar'
 z.string.es.search_friend_in_common = '%no persona en común'
 z.string.es.search_friends_in_common = '%no personas en común'
-
-# Picture upload
-z.string.es.upload_welcome = 'Wire es mucho mejor con una foto.'
-z.string.es.upload_welcome_keep = 'conservar esta'
-z.string.es.upload_welcome_choose = 'eligir la tuya'
 
 # Google contacts upload
 z.string.es.upload_google_headline = 'Buscar con quien hablar.'
@@ -475,7 +477,7 @@ z.string.es.upload_google_message_error = 'No recibimos tu información. Por fav
 z.string.es.upload_google_button_again = 'Vuelve a intentarlo'
 
 # URLs
-z.string.es.url_password_reset = 'https://wire.com/forgot/'
+z.string.es.url_password_reset = 'forgot/?hl=es'
 z.string.es.url_legal = 'https://wire.com/legal/'
 z.string.es.url_privacy = 'https://wire.com/privacy/'
 z.string.es.url_privacy_why = 'https://wire.com/privacy/why/'
@@ -523,6 +525,7 @@ z.string.es.warning_connectivity_no_internet = 'No hay Internet. No podrás envi
 # Browser notifications
 z.string.es.system_notification_asset_add = 'Compartió una foto'
 z.string.es.system_notification_connection_accepted = 'Aceptó tu solicitud de conexión'
+z.string.es.system_notification_connection_connected = 'Están conectados'
 z.string.es.system_notification_connection_request = 'Quiere conectar'
 z.string.es.system_notification_conversation_create = '%s.first_name inició una conversación'
 z.string.es.system_notification_conversation_rename = '%s.first_name renombró la conversación a %name'

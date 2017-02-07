@@ -76,7 +76,8 @@ class z.ViewModel.GiphyViewModel
     if @selected_gif() and not @sending_giphy_message
       conversation_et = @conversation_repository.active_conversation()
       @sending_giphy_message = true
-      @conversation_repository.send_gif conversation_et, @selected_gif().animated, @query(), ->
+      @conversation_repository.send_gif conversation_et, @selected_gif().animated, @query()
+      .then =>
         @sending_giphy_message = false
         event = new z.tracking.event.PictureTakenEvent 'conversation', 'giphy', 'button'
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, event.name, event.attributes

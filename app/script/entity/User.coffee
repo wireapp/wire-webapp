@@ -49,6 +49,7 @@ class z.entity.User
   ###
   constructor: (@id = '') ->
     @is_me = false
+    @is_bot = false
 
     @joaat_hash = -1
 
@@ -89,7 +90,7 @@ class z.entity.User
     @initials = ko.pureComputed =>
       initials = ''
       if @first_name()? and @last_name()?
-        initials = z.util.get_first_character(@first_name()) + z.util.get_first_character(@last_name())
+        initials = z.util.StringUtil.get_first_character(@first_name()) + z.util.StringUtil.get_first_character(@last_name())
       else
         initials = @first_name().slice 0, 2
       return initials.toUpperCase()
@@ -127,8 +128,11 @@ class z.entity.User
     @devices.remove (client_et) -> client_et.id is client_id
 
   ###
-  Check whether username, name or email matches the given query
+  Check whether username or name matches the given query
   @param query [String]
+  @param is_username [Boolean] Query string is username
   ###
-  matches: (query) =>
-    return z.util.compare_names(@name(), query) or @username() is query or @email() is query
+  matches: (query, is_username) =>
+    if is_username
+      return z.util.StringUtil.starts_with @username(), query
+    return z.util.StringUtil.compare_transliteration(@name(), query) or @username() is query

@@ -53,6 +53,7 @@ class z.user.UserRepository
     amplify.subscribe z.event.Backend.USER.UPDATE, @user_update
     amplify.subscribe z.event.WebApp.CLIENT.ADD, @add_client_to_user
     amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @remove_client_from_user
+    amplify.subscribe z.event.WebApp.CLIENT.UPDATE, @update_clients_from_user
 
 
   ###############################################################################
@@ -290,7 +291,10 @@ class z.user.UserRepository
         when z.user.ConnectionStatus.PENDING
           message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST
         when z.user.ConnectionStatus.ACCEPTED
-          message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED
+          if previous_status is z.user.ConnectionStatus.SENT
+            message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED
+          else
+            message_et.member_message_type = z.message.SystemMessageType.CONNECTION_CONNECTED
       amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, connection_et, message_et
 
 
@@ -308,9 +312,9 @@ class z.user.UserRepository
   add_client_to_user: (user_id, client_et) =>
     @client_repository.save_client_in_db user_id, client_et.to_json()
     .then =>
-      @find_user user_id
-    .then (user_et) ->
-      user_et.add_client client_et
+      @get_user_by_id user_id, (user_et) ->
+        user_et.add_client client_et
+        amplify.publish z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et
 
   ###
   Removes a stored client and the session connected with it.
@@ -322,10 +326,20 @@ class z.user.UserRepository
   remove_client_from_user: (user_id, client_id) =>
     @client_repository.remove_client user_id, client_id
     .then =>
-      @find_user user_id
-    .then (user_et) ->
-      user_et.remove_client client_id
+      @get_user_by_id user_id, (user_et) ->
+        user_et.remove_client client_id
+        amplify.publish z.event.WebApp.USER.CLIENT_REMOVED, user_id, client_id
 
+  ###
+  Update clients for given user.
+
+  @param user_id [String] ID of user
+  @param client_ets [Array<z.client.Client>]
+  ###
+  update_clients_from_user: (user_id, client_ets) =>
+    @get_user_by_id user_id, (user_et) ->
+      user_et.devices client_ets
+      amplify.publish z.event.WebApp.USER.CLIENTS_UPDATED, user_id, client_ets
 
   ###############################################################################
   # Users
@@ -366,7 +380,7 @@ class z.user.UserRepository
 
     # create chunks
     fetched_user_ets = []
-    chunks = z.util.array_chunks user_ids, z.config.MAXIMUM_USERS_PER_REQUEST
+    chunks = z.util.ArrayUtil.chunk user_ids, z.config.MAXIMUM_USERS_PER_REQUEST
     number_of_loaded_chunks = 0
 
     for chunk in chunks
@@ -453,20 +467,19 @@ class z.user.UserRepository
 
   ###
   Search for user.
-  @param query [String] Find user using name, username or email
+  @param query [String] Find user using name or username
+  @param is_username [Boolean] Query string is username
   @return [Array<z.entity.User>] Matching users
   ###
-  search_for_connected_users: (query) =>
+  search_for_connected_users: (query, is_username) =>
     return @users()
       .filter (user_et) ->
         return false if not user_et.connected()
-        return user_et.matches query
+        return user_et.matches query, is_username
       .sort (user_a, user_b) ->
-        name_a = user_a.name().toLowerCase()
-        name_b = user_b.name().toLowerCase()
-        return -1 if name_a < name_b
-        return 1 if name_a > name_b
-        return 0
+        if is_username
+          return z.util.StringUtil.sort_by_priority user_a.username(), user_b.username(), query
+        return z.util.StringUtil.sort_by_priority user_a.name(), user_b.name(), query
 
   ###
   Is the user the logged in user.

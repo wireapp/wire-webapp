@@ -36,6 +36,7 @@ RAYGUN =
 if z.util.Environment.frontend.is_production()
   RAYGUN.API_KEY = 'lAkLCPLx3ysnsXktajeHmw=='
   LOCALYTICS.APP_KEY = 'f19c50ccf7bff11992798f0-59fac3b8-ad88-11e6-ff9e-00ae30fe7875'
+  Logdown.disable '*'
 
 ###
 Tracker for user actions which uses Localytics as a reference implementation but can be easily used with other services.
@@ -221,7 +222,7 @@ class z.tracking.EventTrackingRepository
 
   _localytics_disabled: ->
     if not z.util.get_url_parameter z.auth.URLParameter.LOCALYTICS
-      for domain in LOCALYTICS.DISABLED_DOMAINS when z.util.contains window.location.hostname, domain
+      for domain in LOCALYTICS.DISABLED_DOMAINS when z.util.StringUtil.includes window.location.hostname, domain
         @logger.debug 'Localytics reporting is disabled due to domain'
         return true
     return false

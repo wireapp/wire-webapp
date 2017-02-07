@@ -37,7 +37,7 @@ class z.telemetry.calling.FlowTelemetry
     @is_answer = false
     @peer_connection = undefined
 
-    @timings = timings
+    @timings = $.extend new z.telemetry.calling.CallSetupTimings(@id), timings?.get()
     @statistics = new z.telemetry.calling.ConnectionStats()
 
     @stats_poller = undefined
@@ -69,7 +69,7 @@ class z.telemetry.calling.FlowTelemetry
         flow_id: @id
         id: @call_et.id
         is_answer: @is_answer
-        session_id: @call_et.session_id()
+        session_id: @call_et.session_id
       telemetry:
         statistics: @get_statistics()
         timings: @get_timings()
@@ -131,7 +131,7 @@ class z.telemetry.calling.FlowTelemetry
   schedule_check: (timeout) ->
     window.setTimeout =>
       @check_stream z.media.MediaType.AUDIO, timeout
-      @check_stream z.media.MediaType.VIDEO, timeout if @call_et.is_remote_screen_shared() or @call_et.is_remote_videod()
+      @check_stream z.media.MediaType.VIDEO, timeout if @call_et.is_remote_screen_send() or @call_et.is_remote_video_send()
     , timeout
 
   ###
@@ -182,7 +182,7 @@ class z.telemetry.calling.FlowTelemetry
   Start statistics polling.
   @param ice_connection_state [RTCIceConnectionState] Current state of ICE connection
   ###
-  start_statistics: (ice_connection_state) =>
+  start_statistics: =>
     if not @stats_poller
       # Track call stats
       @time_step z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED
@@ -199,9 +199,6 @@ class z.telemetry.calling.FlowTelemetry
         @_update_statistics()
         .catch (error) => @logger.warn "Flow networks stats not updated: #{error.message}"
       , 2000
-
-    if ice_connection_state is z.calling.rtc.ICEConnectionState.COMPLETED
-      @time_step z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_COMPLETED
 
   ###
   Get current statistics from PeerConnection.
@@ -334,7 +331,7 @@ class z.telemetry.calling.FlowTelemetry
       stream_stats = stats.audio
       stream_stats.volume_sent = window.parseInt report.audioInputLevel, 10
       stream_stats.codec_sent = codec
-    else if @call_et.is_remote_screen_shared() or @call_et.is_remote_videod()
+    else if @call_et.is_remote_screen_send() or @call_et.is_remote_video_send()
       stream_stats = stats.video
       if report.googFrameHeightReceived
         stream_stats.frame_height_received = window.parseInt report.googFrameHeightReceived, 10

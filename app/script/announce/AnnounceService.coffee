@@ -19,10 +19,12 @@
 window.z ?= {}
 z.announce ?= {}
 
+ANNOUNCE_SERVICE_URL = 'api/v1/announce/'
+
 class z.announce.AnnounceService
   constructor: ->
     @logger = new z.util.Logger 'z.announce.AnnounceService', z.config.LOGGER.OPTIONS
-    @url = "#{z.config.ANNOUNCE_URL}?order=created&active=true"
+    @url = "#{z.util.Environment.backend.website_url()}#{ANNOUNCE_SERVICE_URL}?order=created&active=true"
     @url += '&production=true' if z.util.Environment.frontend.is_production()
     return @
 
@@ -31,5 +33,13 @@ class z.announce.AnnounceService
       $.get @url
       .done (data) ->
         resolve data['result']
+      .fail (jqXHR, textStatus, errorThrown) ->
+        reject new Error errorThrown
+
+  get_version: ->
+    return new Promise (resolve, reject) ->
+      $.get 'version/'
+      .done (data) ->
+        resolve data.version
       .fail (jqXHR, textStatus, errorThrown) ->
         reject new Error errorThrown

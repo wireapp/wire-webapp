@@ -21,7 +21,6 @@ z.string.wire = 'Wire'
 z.string.wire_macos = 'Wire for macOS'
 z.string.wire_windows = 'Wire for Windows'
 z.string.wire_linux = 'Wire for Linux'
-z.string.truncation = '…'
 z.string.nonexistent_user = 'Deleted User'
 z.string.and = 'and'
 
@@ -68,6 +67,8 @@ z.string.auth_limit_devices_current = '(Current)'
 # Authentication: limit section
 z.string.auth_history_headline = 'It’s the first time you’re using Wire on this device.'
 z.string.auth_history_description = 'For privacy reasons, your conversation history will not appear here.'
+z.string.auth_history_reuse_headline = 'You’ve used Wire on this device before.'
+z.string.auth_history_reuse_description = 'Messages sent in the meantime will not appear here.'
 z.string.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -126,7 +127,7 @@ z.string.modal_button_send = 'Send'
 
 # Block a user
 z.string.modal_block_conversation_headline = 'Block %@.name?'
-z.string.modal_block_conversation_message = '%@.name wont be able to contact you or invite you to a group conversation.'
+z.string.modal_block_conversation_message = '%@.name won’t be able to contact you or add you to group conversations.'
 z.string.modal_block_conversation_button = 'Block'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.modal_call_conversation_empty_headline = 'No one to call'
@@ -186,7 +187,9 @@ z.string.modal_logout_headline = 'Clear Data?'
 z.string.modal_logout_message = 'Delete all your personal information and conversations on this device.'
 z.string.modal_logout_button = 'Log out'
 # New device
-z.string.modal_new_device_headline = '"%@.name" started using a new device'
+z.string.modal_new_device_headline = '%@.name started using a new device'
+z.string.modal_new_device_headline_many = '%@.names started using new devices'
+z.string.modal_new_device_headline_you = '%@.name started using a new device'
 z.string.modal_new_device_message = 'Do you still want to send your messages?'
 z.string.modal_new_device_show_device = 'show device'
 z.string.modal_new_device_send_anyway = 'send anyway'
@@ -224,12 +227,15 @@ z.string.conversation_connection_blocked = 'Blocked'
 z.string.conversation_connection_cancel_request = 'Cancel connection request'
 z.string.conversation_create = ' started a conversation with %@names'
 z.string.conversation_create_you = ' started a conversation with %@names'
-z.string.conversation_device_started_using = ' started using'
-z.string.conversation_device_started_using_you = ' started using'
+z.string.conversation_device_started_using_one = ' started using'
+z.string.conversation_device_started_using_many = ' started using'
 z.string.conversation_device_unverified = ' unverified one of'
 z.string.conversation_device_your_devices = ' your devices'
 z.string.conversation_device_user_devices = ' %@name´s devices'
-z.string.conversation_device_a_new_device = ' a new device'
+z.string.conversation_device_new_device_one = ' a new device'
+z.string.conversation_device_new_device_may = 'new devices'
+z.string.conversation_device_new_people_joined = 'new people joined.'
+z.string.conversation_device_new_people_joined_verify = ' verify devices'
 z.string.conversation_just_now = 'Just now'
 z.string.conversation_location_link = 'Open Map'
 z.string.conversation_member_join = ' added %@names'
@@ -270,6 +276,13 @@ z.string.conversation_edit_timestamp = 'Edited on %@timestamp'
 z.string.conversation_likes_caption = '%@number people'
 z.string.conversation_send_pasted_file = 'Pasted image at %date'
 
+# Collection
+z.string.collection_show_all = 'Show all %no'
+z.string.collection_section_links = 'Links'
+z.string.collection_section_images = 'Pictures'
+z.string.collection_section_files = 'Files'
+z.string.collection_section_audio = 'Audio messages'
+
 # Archive
 z.string.archive_header = 'Archive'
 
@@ -302,8 +315,8 @@ z.string.invite_meta_key_pc = 'Ctrl'
 z.string.invite_hint_selected = 'Press %meta_key + C to copy'
 z.string.invite_hint_unselected = 'Select and Press %meta_key + C'
 z.string.invite_headline = 'Invite people to Wire'
-z.string.invite_message = 'I’m on Wire, search for %username or visit wire.com/download.'
-z.string.invite_message_no_email = 'I’m on Wire. Visit https://get.wire.com to connect with me.'
+z.string.invite_message = 'I’m on Wire, search for %username or visit get.wire.com.'
+z.string.invite_message_no_email = 'I’m on Wire. Visit get.wire.com to connect with me.'
 
 # Extensions
 z.string.extensions_bubble_button_gif = 'Gif'
@@ -327,7 +340,7 @@ z.string.people_no_matches = 'No matching results.\nTry entering a different nam
 z.string.people_invite = 'Invite people'
 z.string.people_share = 'Share Contacts'
 z.string.people_bring_your_friends = 'Bring your Friends to Wire'
-z.string.people_invite_detail = 'Sharing your contacts helps you connect with others. We anonymize all the information and do not share it with anoyone else.'
+z.string.people_invite_detail = 'Sharing your contacts helps you connect with others. We anonymize all the information and do not share it with anyone else.'
 z.string.people_invite_button_contacts = 'From Contacts'
 z.string.people_invite_button_gmail = 'From Gmail'
 z.string.people_invite_headline = 'Bring your friends'
@@ -347,7 +360,7 @@ z.string.people_verified = 'Verified'
 
 # Block user
 z.string.people_block_headline = 'Block?'
-z.string.people_block_message = '%@.first_name won’t be able to find or contact you on Wire.'
+z.string.people_block_message = '%@.first_name won’t be able to contact you or add you to group conversations.'
 
 # Accept a pending connection dialogue
 z.string.people_connect_headline = 'Accept?'
@@ -367,7 +380,7 @@ z.string.people_remove_message = '%@.first_name won’t be able to send or recei
 
 # Unblock user
 z.string.people_unblock_headline = 'Unblock?'
-z.string.people_unblock_message = '%@.first_name will be able to find and contact you on Wire again. You’ll also receive messages they sent while blocked.'
+z.string.people_unblock_message = '%@.first_name will be able to contact you and add you to group conversations again.'
 
 # Button labels for the actions
 z.string.people_button_add = 'Add people'
@@ -449,7 +462,8 @@ z.string.preferences_options_data_checkbox = 'Usage and crash reports'
 z.string.preferences_options_data_detail = 'Make Wire better by sending anonymous information.'
 z.string.preferences_options_notifications = 'Notifications'
 z.string.preferences_options_notifications_none = 'Off'
-z.string.preferences_options_notifications_obfuscate = 'Hide message details'
+z.string.preferences_options_notifications_obfuscate = 'Hide details'
+z.string.preferences_options_notifications_obfuscate_message = 'Show sender'
 z.string.preferences_options_notifications_on = 'Show sender and message'
 
 # Search
@@ -473,7 +487,7 @@ z.string.upload_google_message_error = 'We did not receive your information. Ple
 z.string.upload_google_button_again = 'Try again'
 
 # URLs
-z.string.url_password_reset = 'https://wire.com/forgot/'
+z.string.url_password_reset = 'forgot/'
 z.string.url_legal = 'https://wire.com/legal/'
 z.string.url_privacy = 'https://wire.com/privacy/'
 z.string.url_privacy_why = 'https://wire.com/privacy/why/'
@@ -518,9 +532,14 @@ z.string.warning_tell_me_how = 'Tell me how'
 z.string.warning_connectivity_connection_lost = 'Trying to connect. Wire may not be able to deliver messages.'
 z.string.warning_connectivity_no_internet = 'No Internet. You won’t be able to send or receive messages.'
 
+# Warnings: Desktop Update
+z.string.warning_lifecycle_update = 'A new version of Wire is available.'
+z.string.warning_lifecycle_update_link = 'Update now'
+
 # Browser notifications
 z.string.system_notification_asset_add = 'Shared a picture'
 z.string.system_notification_connection_accepted = 'Accepted your connection request'
+z.string.system_notification_connection_connected = 'Are now connected'
 z.string.system_notification_connection_request = 'Wants to connect'
 z.string.system_notification_conversation_create = '%s.first_name started a conversation'
 z.string.system_notification_conversation_rename = '%s.first_name renamed the conversation to %name'

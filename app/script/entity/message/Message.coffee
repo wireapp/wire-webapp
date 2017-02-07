@@ -55,11 +55,16 @@ class z.entity.Message
     @is_editing = ko.observable false
     @primary_key = undefined
     @status = ko.observable z.message.StatusType.UNSPECIFIED
-    @timestamp = Date.now()
     @type = ''
     @user = ko.observable new z.entity.User()
     @visible = ko.observable true
     @version = 1
+
+    @timestamp = Date.now()
+    @should_effect_conversation_timestamp = true
+
+    # z.message.MessageCategory
+    @category = undefined
 
     @display_timestamp_short = =>
       date = moment.unix @timestamp / 1000
@@ -139,6 +144,13 @@ class z.entity.Message
     return @super_type is z.message.SuperType.CONTENT
 
   ###
+  Check if the message content can be downloaded
+  @return [Boolean] Is message of type content
+  ###
+  is_downloadable: ->
+    return @get_first_asset?().download?
+
+  ###
   Check if message is a member message.
   @return [Boolean] Is message of type member
   ###
@@ -207,7 +219,7 @@ class z.entity.Message
   Check if ephemeral message is expired.
   @return [Boolean]
   ###
-  is_expired: ->
+  is_expired: =>
     return @ephemeral_expires() is true
 
   ###

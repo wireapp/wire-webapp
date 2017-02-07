@@ -49,7 +49,7 @@ class z.storage.StorageError
 
   @:: = new Error()
   @::constructor = @
-  @::TYPE = {
+  @::TYPE =
     DATA_STORE_NOT_FOUND: 'z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND'
     FAILED_TO_OPEN: 'z.storage.StorageError::TYPE.FAILED_TO_OPEN'
     INVALID_TIME: 'z.storage.StorageError::TYPE.INVALID_TIME'
@@ -60,4 +60,3 @@ class z.storage.StorageError
     NON_SEQUENTIAL_UPDATE: 'z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE'
     SKIP_LOADING: 'z.storage.StorageError:TYPE.SKIP_SESSIONS'
     UNKNOWN: 'z.storage.StorageError::TYPE.UNKNOWN'
-  }

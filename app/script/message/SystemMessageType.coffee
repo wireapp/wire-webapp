@@ -31,5 +31,6 @@ z.message.SystemMessageType =
   CONVERSATION_CREATE: 'created-group'
   CONVERSATION_RENAME: 'rename'
   CONVERSATION_RESUME: 'resume'
-  CONNECTION_REQUEST: 'connecting'
   CONNECTION_ACCEPTED: 'created-one-to-one'
+  CONNECTION_CONNECTED: 'connected'
+  CONNECTION_REQUEST: 'connecting'

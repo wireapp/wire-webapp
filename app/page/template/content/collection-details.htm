@@ -1,0 +1,37 @@
+<div id="collection-details"
+     class="collection-details content"
+     data-bind="with: $root.collection_details, removed_from_view: $root.collection_details.removed_from_view">
+
+  <!-- ko if: conversation_et() -->
+
+    <div class="content-titlebar">
+      <div class="content-titlebar-items-left">
+        <span class="content-titlebar-icon icon-back" data-uie-name="do-collection-details-close" data-bind="click: click_on_back_button"></span>
+      </div>
+      <span class="content-titlebar-items-center" data-uie-name="collection-details-conversation-name" data-bind="text: conversation_et().display_name()"></span>
+    </div>
+
+    <div class="content-list-wrapper">
+      <div class="content-list collection-list" data-bind="antiscroll: true">
+        <div class="collection-images">
+          <!-- ko foreach: {data: items(), as: 'message_et'} -->
+            <!-- ko if: $parent.should_show_header(message_et) -->
+              <header class="collection-date-separator" data-bind="text: $parent.get_title_for_header(message_et)"></header>
+            <!-- /ko -->
+            <!-- ko if: message_et.category & z.message.MessageCategory.IMAGE -->
+              <image-component class="collection-image" params="asset: message_et.get_first_asset().resource, click: function() {$parent.click_on_image(message_et)}"></image-component>
+            <!-- /ko -->
+            <!-- ko if: message_et.category & z.message.MessageCategory.LINK -->
+              <link-preview-asset params="message: message_et, header: true"></link-preview-asset>
+            <!-- /ko -->
+            <!-- ko if: message_et.category & z.message.MessageCategory.FILE -->
+              <file-asset class="collection-file" params="message: message_et, header: true"></file-asset>
+            <!-- /ko -->
+          <!-- /ko -->
+        </div>
+      </div>
+    </div>
+
+  <!-- /ko -->
+
+</div>

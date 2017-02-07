@@ -34,27 +34,25 @@ class z.ViewModel.list.StartUIViewModel
     @logger = new z.util.Logger 'z.ViewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS
 
     @search = _.debounce (query) =>
-      query = @search_repository.normalize_search_query query
-      if query
-        @clear_search_results()
+      normalized_query = z.search.SearchRepository.normalize_query query
+      return unless normalized_query
+      @clear_search_results()
 
-        # contacts
-        @search_results.contacts @user_repository.search_for_connected_users query
+      # Contacts, groups and others
+      is_username = query.trim().startsWith '@'
 
-        # search for groups
-        @search_results.groups @conversation_repository.get_groups_by_name query
+      @search_repository.search_by_name normalized_query
+      .then (user_ets) =>
+        return unless normalized_query is z.search.SearchRepository.normalize_query @search_input()
+        if is_username
+          user_ets = user_ets.filter (user_et) -> return z.util.StringUtil.starts_with user_et.username(), normalized_query
+        @search_results.others user_ets
+      .catch (error) =>
+        @logger.error "Error searching for contacts: #{error.message}", error
+      @search_results.contacts @user_repository.search_for_connected_users normalized_query, is_username
+      @search_results.groups @conversation_repository.get_groups_by_name normalized_query, is_username
 
-        # search for others
-        @search_repository.search_by_name query
-        .then (user_ets) =>
-          if query is @search_repository.normalize_search_query @search_input()
-            @search_results.others user_ets
-          else
-            @logger.info "Resolved Search query #{query} is outdated"
-        .catch (error) =>
-          @logger.error "Error searching for contacts: #{error.message}", error
-
-        @searched_for_user query
+      @searched_for_user query
     , 300
 
     @searched_for_user = _.once (query) ->
@@ -463,7 +461,7 @@ class z.ViewModel.list.StartUIViewModel
     if @selected_people().length is 1
       return @conversation_repository.get_one_to_one_conversation @selected_people()[0]
       .then (conversation_et) =>
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_ONE_TO_ONE_CONVERSATION,
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION,
           source: 'top_user'
         @click_on_group conversation_et
         callback conversation_et if _.isFunction callback
@@ -484,17 +482,17 @@ class z.ViewModel.list.StartUIViewModel
   on_audio_call: =>
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
-        amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id
-      , 1000
+        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, false
+      , 500
 
   on_video_call: =>
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
-        amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id, true
-      , 1000
+        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, true
+      , 500
 
   on_photo: (images) =>
     @on_submit_search ->
       window.setTimeout ->
         amplify.publish z.event.WebApp.CONVERSATION.IMAGE.SEND, images
-      , 1000
+      , 500

@@ -28,6 +28,26 @@ describe 'Conversation', ->
     conversation_et = new z.entity.Conversation()
     other_user = new z.entity.User entities.user.jane_roe.id
 
+  describe 'timestamp', ->
+
+    it 'adding a message should update the conversation timestamp', ->
+      message_et = new z.entity.Message()
+      message_et.timestamp = new Date('2014-12-15T09:21:14.225Z').getTime()
+      conversation_et.last_event_timestamp new Date('2014-12-14T09:21:14.225Z').getTime()
+      conversation_et.add_message message_et
+      expect(conversation_et.last_event_timestamp()).toBe message_et.timestamp
+
+    it 'adding a message should not update the conversation timestamp if should_effect_conversation_timestamp is false', ->
+      message_et = new z.entity.Message()
+      message_et.timestamp = new Date('2014-12-15T09:21:14.225Z').getTime()
+      conversation_et.add_message message_et
+
+      message_two_et = new z.entity.Message()
+      message_two_et.timestamp = new Date('2014-12-16T09:21:14.225Z').getTime()
+      message_two_et.should_effect_conversation_timestamp = false
+      conversation_et.add_message message_two_et
+      expect(conversation_et.last_event_timestamp()).toBe message_et.timestamp
+
   describe '_increment_time_only', ->
     first_date = new Date('2014-12-15T09:21:14.225Z').getTime()
     second_date = new Date('2014-12-15T09:22:14.225Z').getTime()
@@ -78,13 +98,14 @@ describe 'Conversation', ->
       verified_client_et.meta.is_verified true
 
       self_user_et = new z.entity.User()
+      self_user_et.is_me = true
       conversation_et.self = self_user_et
 
       user_et = new z.entity.User()
       user_et.devices.push verified_client_et
       conversation_et.participating_user_ets.push user_et
 
-      expect(conversation_et.is_verified()).toBeFalsy()
+      expect(conversation_et.is_verified()).toBeTruthy()
 
     it 'is not verified when participant has unverified device', ->
       unverified_client_et = new z.client.Client()
@@ -92,6 +113,7 @@ describe 'Conversation', ->
       verified_client_et.meta.is_verified true
 
       self_user_et = new z.entity.User()
+      self_user_et.is_me = true
       self_user_et.devices.push verified_client_et
       conversation_et.self = self_user_et
 
@@ -111,6 +133,7 @@ describe 'Conversation', ->
       verified_client_et.meta.is_verified true
 
       self_user_et = new z.entity.User()
+      self_user_et.is_me = true
       self_user_et.devices.push verified_client_et
       conversation_et.self = self_user_et
 
@@ -135,7 +158,7 @@ describe 'Conversation', ->
 
       call_message = new z.entity.CallMessage()
       call_message.timestamp = last_read_timestamp - 1000
-      call_message.finished_reason = z.calling.enum.CallFinishedReason.MISSED
+      call_message.finished_reason = z.calling.enum.CALL_FINISHED_REASON.MISSED
 
       conversation_et.add_message ping_message
       conversation_et.add_message call_message
@@ -161,10 +184,10 @@ describe 'Conversation', ->
     it 'shows unread type "CALL" if there is a missed call message in the unread messages', ->
       call_message = new z.entity.CallMessage()
       call_message.timestamp = Date.now() - 500
-      call_message.finished_reason = z.calling.enum.CallFinishedReason.MISSED
+      call_message.finished_reason = z.calling.enum.CALL_FINISHED_REASON.MISSED
       conversation_et.add_message call_message
       conversation_et.add_message new z.entity.Message()
-      expect(conversation_et.unread_type()).toBe z.conversation.ConversationUnreadType.MISSED_CALL
+      expect(conversation_et.unread_type()).toBe z.conversation.ConversationUnreadType.CALL
 
     it 'shows unread type "CONNECT" if connection is still pending', ->
       conversation_et.connection().status z.user.ConnectionStatus.SENT
@@ -183,10 +206,10 @@ describe 'Conversation', ->
 
     it 'displays a fallback if no user name has been set', ->
       conversation_et.type z.conversation.ConversationType.ONE2ONE
-      expect(conversation_et.display_name()).toBe z.string.truncation
+      expect(conversation_et.display_name()).toBe '…'
 
       conversation_et.type z.conversation.ConversationType.CONNECT
-      expect(conversation_et.display_name()).toBe z.string.truncation
+      expect(conversation_et.display_name()).toBe '…'
 
     it 'displays a group conversation name with names from the participants', ->
       third_user = new z.entity.User z.util.create_random_uuid()
@@ -208,7 +231,7 @@ describe 'Conversation', ->
       conversation_et.participating_user_ids.push other_user.id
       conversation_et.participating_user_ids.push user.id
 
-      expect(conversation_et.display_name()).toBe z.string.truncation
+      expect(conversation_et.display_name()).toBe '…'
 
     it 'displays the conversation name for a self conversation', ->
       conversation_et.type z.conversation.ConversationType.SELF
@@ -465,10 +488,10 @@ describe 'Conversation', ->
       conversation_et.add_message message_et
 
       expect(conversation_et.messages().length).toBe 1
-      expect(conversation_et.number_of_unread_events()).toBe 1
+      expect(conversation_et.unread_event_count()).toBe 1
       conversation_et.release()
       expect(conversation_et.messages().length).toBe 1
-      expect(conversation_et.number_of_unread_events()).toBe 1
+      expect(conversation_et.unread_event_count()).toBe 1
 
     it 'should release messages if conversation has no unread messages', ->
       last_message_timestamp = new Date('December 24, 2000 18:01:00').getTime()
@@ -480,7 +503,7 @@ describe 'Conversation', ->
 
       conversation_et.last_read_timestamp last_message_timestamp
 
-      expect(conversation_et.number_of_unread_events()).toBe 0
+      expect(conversation_et.unread_event_count()).toBe 0
       expect(conversation_et.messages().length).toBe 1
       conversation_et.release()
       expect(conversation_et.messages().length).toBe 0
@@ -516,50 +539,38 @@ describe 'Conversation', ->
       expect(newer_message_et.visible()).toBeFalsy()
 
   describe 'is_with_bot', ->
-    it 'detects bot conversations by the email of the remote participant', ->
+    it 'detects bot conversations by the username of the remote participant', ->
       user_et = new z.entity.User z.util.create_random_uuid()
 
       conversation_et = new z.entity.Conversation z.util.create_random_uuid()
       conversation_et.participating_user_ets.push user_et
 
-      user_et.email 'anna+123@wire.com'
+      user_et.username 'ottothebot'
       conversation_et.type z.conversation.ConversationType.SELF
       expect(conversation_et.is_with_bot()).toBe false
 
       conversation_et.type z.conversation.ConversationType.ONE2ONE
       expect(conversation_et.is_with_bot()).toBe true
 
-      user_et.email undefined
+      user_et.username 'annathebot'
+      expect(conversation_et.is_with_bot()).toBe true
+
+      user_et.username undefined
       expect(conversation_et.is_with_bot()).toBe false
 
-      user_et.email ''
+      user_et.username ''
       expect(conversation_et.is_with_bot()).toBe false
 
-      user_et.email 'anne@wire.com'
+      user_et.username 'bob'
       expect(conversation_et.is_with_bot()).toBe false
 
-      user_et.email 'anna+123@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
+      user_et.username 'bobthebot'
+      expect(conversation_et.is_with_bot()).toBe false
 
-      user_et.email 'anna+quiz@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
+      user_et.username 'bot'
+      expect(conversation_et.is_with_bot()).toBe false
 
-      user_et.email 'welcome@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
-
-      user_et.email 'welcome+123@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
-
-      user_et.email 'welcome+chef@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
-
-      user_et.email 'welcome+@@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
-
-      user_et.email 'ottobot@wire.com'
-      expect(conversation_et.is_with_bot()).toBe true
-
-      user_et.email 'hello@wire.com'
+      user_et.username 'wire'
       expect(conversation_et.is_with_bot()).toBe false
 
   describe 'get_last_editable_message', ->

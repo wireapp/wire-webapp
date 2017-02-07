@@ -22,36 +22,20 @@ z.telemetry.calling ?= {}
 
 z.telemetry.calling.CallSetupStepsOrder =
   ANSWER: [
-    z.telemetry.calling.CallSetupSteps.STREAM_REQUESTED
     z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED
-    z.telemetry.calling.CallSetupSteps.STATE_PUT
-    z.telemetry.calling.CallSetupSteps.FLOW_RECEIVED
     z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED
-    z.telemetry.calling.CallSetupSteps.REMOTE_SDP_RECEIVED
     z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET
-    z.telemetry.calling.CallSetupSteps.LOCAL_SDP_CREATED
     z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET
-    z.telemetry.calling.CallSetupSteps.ICE_GATHERING_STARTED
     z.telemetry.calling.CallSetupSteps.ICE_GATHERING_COMPLETED
     z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
-    z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CHECKING
     z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED
-    z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_COMPLETED
   ]
   OFFER: [
-    z.telemetry.calling.CallSetupSteps.STREAM_REQUESTED
     z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED
-    z.telemetry.calling.CallSetupSteps.STATE_PUT
-    z.telemetry.calling.CallSetupSteps.FLOW_RECEIVED
     z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED
-    z.telemetry.calling.CallSetupSteps.LOCAL_SDP_CREATED
     z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET
-    z.telemetry.calling.CallSetupSteps.ICE_GATHERING_STARTED
     z.telemetry.calling.CallSetupSteps.ICE_GATHERING_COMPLETED
     z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
-    z.telemetry.calling.CallSetupSteps.REMOTE_SDP_RECEIVED
     z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET
-    z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CHECKING
     z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED
-    z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_COMPLETED
   ]

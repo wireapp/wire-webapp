@@ -132,7 +132,7 @@ class z.auth.AuthRepository
       if error.type is z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN or z.util.Environment.frontend.is_localhost()
         @logger.warn "Session expired on access token refresh: #{error.message}", error
         Raygun.send error
-        amplify.publish z.event.WebApp.SIGN_OUT, z.auth.SignOutReasion.SESSION_EXPIRED, false, true
+        amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReasion.SESSION_EXPIRED, false, true
       else if error.type isnt z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
         @logger.error "Refreshing access token failed: '#{error.type}'", error
         amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT

@@ -37,7 +37,6 @@ class z.entity.Conversation
     @is_pending = ko.observable false
     @is_loaded = ko.observable false
 
-    @all_user_ids = ko.observableArray []
     @participating_user_ets = ko.observableArray [] # Does not include us
     @participating_user_ids = ko.observableArray []
     @self = undefined
@@ -58,6 +57,7 @@ class z.entity.Conversation
 
     @archived_state = ko.observable false
     @muted_state = ko.observable false
+    @verification_state = ko.observable z.conversation.ConversationVerificationState.UNVERIFIED
 
     @archived_timestamp = ko.observable 0
     @cleared_timestamp = ko.observable 0
@@ -121,6 +121,11 @@ class z.entity.Conversation
       return false if not @call()
       return @call().state() not in z.calling.enum.CallStateGroups.IS_ENDED and not @call().is_ongoing_on_another_client()
 
+    @unread_accent_color = ko.observable ''
+
+    @unread_event_count = ko.pureComputed =>
+      return @unread_events().length
+
     @unread_events = ko.pureComputed =>
       unread_event = []
       for message_et in @messages() when message_et.visible() by -1
@@ -128,19 +133,18 @@ class z.entity.Conversation
         unread_event.push message_et
       return unread_event
 
-    @number_of_unread_events = ko.pureComputed =>
-      return @unread_events().length
-
-    @number_of_unread_messages = ko.pureComputed =>
+    @unread_message_count = ko.pureComputed =>
       return (message_et for message_et in @unread_events() when not message_et.user().is_me).length
 
     @unread_type = ko.pureComputed =>
       return z.conversation.ConversationUnreadType.CONNECT if @connection().status() is z.user.ConnectionStatus.SENT
       unread_type = z.conversation.ConversationUnreadType.UNREAD
-      return unread_type if @number_of_unread_messages() <= 0
+      return unread_type if @unread_message_count() <= 0
       for message in @unread_events() by -1
-        return z.conversation.ConversationUnreadType.MISSED_CALL if message.finished_reason is z.calling.enum.CallFinishedReason.MISSED
-        return z.conversation.ConversationUnreadType.PING if message.is_ping()
+        return z.conversation.ConversationUnreadType.CALL if message.finished_reason is z.calling.enum.CALL_FINISHED_REASON.MISSED
+        if message.is_ping()
+          @unread_accent_color message.accent_color()
+          return z.conversation.ConversationUnreadType.PING
       return unread_type
     @unread_type.extend rateLimit: 50
 
@@ -165,12 +169,12 @@ class z.entity.Conversation
     @display_name = ko.pureComputed =>
       if @type() in [z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE]
         return @participating_user_ets()[0].name() if @participating_user_ets()[0]?.name()
-        return z.localization.Localizer.get_text z.string.truncation
+        return '…'
       else if @is_group()
         return @name() if @name()
         return (@participating_user_ets().map (user_et) -> user_et.first_name()).join ', ' if @participating_user_ets().length > 0
         return z.localization.Localizer.get_text z.string.conversations_empty_conversation if @participating_user_ids().length is 0
-        return z.localization.Localizer.get_text z.string.truncation
+        return '…'
       else
         return @name()
 
@@ -189,6 +193,8 @@ class z.entity.Conversation
       @_persist_state_update z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
     @muted_state.subscribe =>
       @_persist_state_update z.conversation.ConversationUpdateType.MUTED_STATE
+    @verification_state.subscribe =>
+      @_persist_state_update z.conversation.ConversationUpdateType.VERIFICATION_STATE
 
   _persist_state_update: (updated_field) ->
     amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @, updated_field
@@ -197,9 +203,9 @@ class z.entity.Conversation
   # Lifecycle
   ###############################################################################
 
-  # Remove all message from conversation unless there are unread events
+  # Remove all message from conversation unless there are unread messages.
   release: =>
-    if @number_of_unread_events() is 0
+    unless @unread_message_count()
       @remove_messages()
       @is_loaded false
       @has_further_messages true
@@ -257,6 +263,7 @@ class z.entity.Conversation
   @param message_et [z.entity.Message] Message entity to be added to the conversation
   ###
   add_message: (message_et) ->
+    amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et
     @_update_last_read_from_message message_et
     @messages_unordered.push @_check_for_duplicate_nonce message_et, @get_last_message()
 
@@ -368,33 +375,6 @@ class z.entity.Conversation
           message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_RESUME
     return message_et
 
-  ###
-  Creates a E2EE message of type z.message.E2EEMessageType.ALL_VERIFIED.
-  @private
-  ###
-  _verified_message: ->
-    message_et = new z.entity.Message()
-    message_et.type = z.message.SuperType.ALL_VERIFIED
-    return message_et
-
-  ###
-  Creates a E2EE message of type z.message.E2EEMessageType.ALL_VERIFIED.
-  @private
-  ###
-  _new_device_message: ->
-    message_et = new z.entity.DeviceMessage()
-    return message_et
-
-  ###
-  Creates a E2EE message of type z.message.E2EEMessageType.ALL_VERIFIED.
-  @private
-  ###
-  _unverified_device_message: ->
-    message_et = new z.entity.DeviceMessage()
-    message_et.unverified true
-    return message_et
-
-
   ###############################################################################
   # Update last activity
   ###############################################################################
@@ -404,7 +384,7 @@ class z.entity.Conversation
   @param message_et [z.entity.Message] Message to be added to conversation
   ###
   update_latest_from_message: (message_et) ->
-    if message_et? and message_et.visible()
+    if message_et? and message_et.visible() and message_et.should_effect_conversation_timestamp
       @set_timestamp message_et.timestamp, z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
 
   ###
@@ -413,7 +393,7 @@ class z.entity.Conversation
   @param message_et [z.entity.Message]
   ###
   _update_last_read_from_message: (message_et) ->
-    if message_et.user()?.is_me and message_et.timestamp
+    if message_et.user()?.is_me and message_et.timestamp and message_et.should_effect_conversation_timestamp
       @set_timestamp message_et.timestamp, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
 
   ###############################################################################
@@ -442,7 +422,7 @@ class z.entity.Conversation
     return @messages()[@messages().length - 1]
 
   ###
-  Get the previous message for give message.
+  Get the message before a given message.
   @return [z.entity.Message, undefined]
   ###
   get_previous_message: (message_et) ->
@@ -481,15 +461,18 @@ class z.entity.Conversation
     pending_uploads = (message_et for message_et in @messages() when message_et.assets?()[0]?.pending_upload?())
     return pending_uploads.length
 
+  get_users_with_unverified_clients: ->
+    return (user_et for user_et in [@self].concat(@participating_user_ets()) when not user_et.is_verified())
+
   ###
-  Check whether the conversation is held with a Wire welcome bot like Anna or Otto.
+  Check whether the conversation is held with a bot like Anna or Otto.
   @return [Boolean] True, if conversation with a bot
   ###
   is_with_bot: =>
+    return true for user_et in @participating_user_ets() when user_et.is_bot
     return false if not @is_one2one()
-    return false if not @participating_user_ets()[0]
-    possible_bot_email = @participating_user_ets()[0].email()
-    return !!possible_bot_email?.match /(anna|ottobot|welcome)(\+\S+)?@wire.com/ig
+    return false if not @participating_user_ets()[0]?.username()
+    return @participating_user_ets()[0].username() in ['annathebot', 'ottothebot']
 
   ###############################################################################
   # Serialization
@@ -506,4 +489,5 @@ class z.entity.Conversation
       last_read_timestamp: @last_read_timestamp()
       muted_state: @muted_state()
       muted_timestamp: @muted_timestamp()
+      verification_state: @verification_state()
     }

@@ -39,10 +39,9 @@ class z.auth.AccessTokenError
 
   @:: = new Error()
   @::constructor = @
-  @::TYPE = {
+  @::TYPE =
     NOT_FOUND_IN_CACHE: 'z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE'
     REFRESH_IN_PROGRESS: 'z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS'
     RETRIES_EXCEEDED: 'z.auth.AccessTokenError::TYPE.RETRIES_EXCEEDED'
     REQUEST_FAILED: 'z.auth.AccessTokenError::TYPE.REQUEST_FAILED'
     REQUEST_FORBIDDEN: 'z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN'
-  }

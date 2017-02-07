@@ -184,7 +184,9 @@ z.string.ru.modal_logout_headline = 'Удалить данные?'
 z.string.ru.modal_logout_message = 'Удалить все ваши личные данные и разговоры на этом устройстве.'
 z.string.ru.modal_logout_button = 'Выход'
 # New device
-z.string.ru.modal_new_device_headline = '"%@.name" начал(а) использовать новое устройство'
+z.string.ru.modal_new_device_headline = '%@.name начал(а) использовать новое устройство'
+z.string.ru.modal_new_device_headline_many = '%@.names начал(а) использовать новое устройство'
+z.string.ru.modal_new_device_headline_you = '%@.name начал(а) использовать новое устройство'
 z.string.ru.modal_new_device_message = 'Вы всё ещё хотите отправить ваши сообщения?'
 z.string.ru.modal_new_device_show_device = 'показать устройство'
 z.string.ru.modal_new_device_send_anyway = 'отправить всё равно'
@@ -266,6 +268,13 @@ z.string.ru.conversation_context_menu_unlike = 'Не нравится'
 z.string.ru.conversation_delete_timestamp = 'Удалено %@timestamp'
 z.string.ru.conversation_edit_timestamp = 'Изменено %@timestamp'
 z.string.ru.conversation_likes_caption = '%@number участникам'
+z.string.ru.conversation_send_pasted_file = 'Изображение добавлено %date'
+
+# Collection
+z.string.ru.collection_show_all = 'Показать все %no'
+z.string.ru.collection_section_links = 'Ссылки'
+z.string.ru.collection_section_images = 'Изображения'
+z.string.ru.collection_section_files = 'Файлы'
 
 # Archive
 z.string.ru.archive_header = 'Архив'
@@ -299,8 +308,8 @@ z.string.ru.invite_meta_key_pc = 'Ctrl'
 z.string.ru.invite_hint_selected = 'Нажмите %meta_key + C для копирования'
 z.string.ru.invite_hint_unselected = 'Выделите и нажмите %meta_key + C'
 z.string.ru.invite_headline = 'Пригласите людей в Wire'
-z.string.ru.invite_message = 'Я использую Wire, введи в поиске %username или перейди на wire.com/download.'
-z.string.ru.invite_message_no_email = 'Я использую Wire. Перейди на https://get.wire.com, чтобы связаться со мной.'
+z.string.ru.invite_message = 'Я использую Wire, ищите меня там по имени %username или посетите сайт get.wire.com.'
+z.string.ru.invite_message_no_email = 'Я использую Wire. Перейдите на get.wire.com, чтобы связаться со мной.'
 
 # Extensions
 z.string.ru.extensions_bubble_button_gif = 'Gif'
@@ -324,7 +333,7 @@ z.string.ru.people_no_matches = 'Совпадений не найдено.\nПо
 z.string.ru.people_invite = 'Пригласить людей'
 z.string.ru.people_share = 'Поделиться контактами'
 z.string.ru.people_bring_your_friends = 'Приведите друзей в Wire'
-z.string.ru.people_invite_detail = 'Предоставление доступа к вашим контактам поможет вам связаться с другими людьми. Мы анонимизируем всю информацию и не делимся ей с кем-либо ещё.'
+z.string.ru.people_invite_detail = 'Предоставление доступа к вашим контактам поможет вам связаться с другими людьми. Вся информация анонимна, мы не предоставляем её третьим лицам.'
 z.string.ru.people_invite_button_contacts = 'Из контактов'
 z.string.ru.people_invite_button_gmail = 'Из Gmail'
 z.string.ru.people_invite_headline = 'Приведите друзей'
@@ -446,7 +455,8 @@ z.string.ru.preferences_options_data_checkbox = 'Отчеты о сбоях и �
 z.string.ru.preferences_options_data_detail = 'Сделайте Wire лучше, отправляя анонимную информацию.'
 z.string.ru.preferences_options_notifications = 'Уведомления'
 z.string.ru.preferences_options_notifications_none = 'Выключены'
-z.string.ru.preferences_options_notifications_obfuscate = 'Скрывать подробности сообщения'
+z.string.ru.preferences_options_notifications_obfuscate = 'Скрывать содержание сообщения'
+z.string.ru.preferences_options_notifications_obfuscate_message = 'Показывать имя отправителя'
 z.string.ru.preferences_options_notifications_on = 'Показывать имя отправителя и текст сообщения'
 
 # Search
@@ -454,18 +464,13 @@ z.string.ru.search_group_hint = 'Продолжите ввод или выбер
 z.string.ru.search_connect = 'Подключиться'
 z.string.ru.search_connections = 'Контакты'
 z.string.ru.search_groups = 'Группы'
-z.string.ru.search_placeholder = 'Поиск по имени или адресу электронной почты'
+z.string.ru.search_placeholder = 'Поиск по имени или имени пользователя'
 z.string.ru.search_top_people = 'Топ-контакты'
-z.string.ru.search_try_search = 'Ищите людей по имени\nили адресу электронной почты'
-z.string.ru.search_no_contacts_on_wire = 'У вас нет контактов в Wire.\nПопробуйте найти людей по имени\nили адресу электронной почты'
+z.string.ru.search_try_search = 'Найдите людей по имени\nили имени пользователя'
+z.string.ru.search_no_contacts_on_wire = 'У вас нет контактов в Wire.\nПопробуйте найти людей по имени\nили имени пользователя.'
 z.string.ru.search_others = 'Подключиться'
 z.string.ru.search_friend_in_common = '%no общий знакомый'
 z.string.ru.search_friends_in_common = '%no общих знакомых'
-
-# Picture upload
-z.string.ru.upload_welcome = 'Wire выглядит лучше с вашей фотографией.'
-z.string.ru.upload_welcome_keep = 'оставить эту'
-z.string.ru.upload_welcome_choose = 'Выберите свою'
 
 # Google contacts upload
 z.string.ru.upload_google_headline = 'Найти людей,\nчтобы поговорить.'
@@ -475,7 +480,7 @@ z.string.ru.upload_google_message_error = 'Мы не получили вашу �
 z.string.ru.upload_google_button_again = 'Повторить'
 
 # URLs
-z.string.ru.url_password_reset = 'https://wire.com/forgot/'
+z.string.ru.url_password_reset = 'forgot/?hl=ru'
 z.string.ru.url_legal = 'https://wire.com/legal/'
 z.string.ru.url_privacy = 'https://wire.com/privacy/'
 z.string.ru.url_privacy_why = 'https://wire.com/privacy/why/'
@@ -534,7 +539,7 @@ z.string.ru.system_notification_member_leave_removed_one = '%s.first_name уда
 z.string.ru.system_notification_obfuscated = 'Отправил(-а) Вам сообщение'
 z.string.ru.system_notification_obfuscated_title = 'Кто-то'
 z.string.ru.system_notification_ping = 'Отправил(а) пинг'
-z.string.ru.system_notification_reaction = '%s Ваше сообщение'
+z.string.ru.system_notification_reaction = '%reaction Ваше сообщение'
 z.string.ru.system_notification_shared_audio = 'Поделился(-лась) аудио сообщением'
 z.string.ru.system_notification_shared_file = 'Поделился(-лась) файлом'
 z.string.ru.system_notification_shared_location = 'Поделился(-лась) местоположением'

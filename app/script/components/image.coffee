@@ -23,16 +23,24 @@ class z.components.Image
   constructor: (params) ->
     @asset = ko.unwrap params.asset
     @asset_src = ko.observable()
+    @asset_is_loading = ko.observable false
+
+    @on_click = =>
+      return if @asset_is_loading()
+      params.click? @asset
 
     @on_entered_viewport = =>
       @load_image_asset()
       return true
 
     @load_image_asset = =>
-      @asset.load().then (blob) => @asset_src window.URL.createObjectURL blob
+      @asset_is_loading true
+      @asset.load().then (blob) =>
+        @asset_is_loading false
+        @asset_src window.URL.createObjectURL blob
 
   dispose: =>
-    window.URL.revokeObjectURL @asset_src
+    window.URL.revokeObjectURL @asset_src()
 
 
 ko.components.register 'image-component',
@@ -40,14 +48,12 @@ ko.components.register 'image-component',
     createViewModel: (params, component_info) ->
       return new z.components.Image params, component_info
   template: """
-              <div class="image-component-wrapper" data-bind="in_viewport: on_entered_viewport">
-                <!-- ko if: asset_src() -->
-                  <img data-bind="attr:{src: asset_src}"/>
-                <!-- /ko -->
-                <!-- ko ifnot: asset_src() -->
-                  <div class="three-dots">
-                    <span></span><span></span><span></span>
-                  </div>
-                <!-- /ko -->
-              </div>
+              <!-- ko if: asset_src() -->
+                <img data-bind="attr:{src: asset_src}, click: on_click"/>
+              <!-- /ko -->
+              <!-- ko ifnot: asset_src() -->
+                <div data-bind="in_viewport: on_entered_viewport, css: {'three-dots': asset_is_loading()}">
+                  <span></span><span></span><span></span>
+                </div>
+              <!-- /ko -->
             """
