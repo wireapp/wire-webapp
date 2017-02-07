@@ -27,8 +27,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
     test_factory.exposeConversationActors()
     .then (conversation_repository) ->
       content_state = ko.observable z.ViewModel.content.CONTENT_STATE.CONVERSATION
-      title_view_model = new z.ViewModel.WindowTitleViewModel content_state, window.user_repository, conversation_repository
-      title_view_model.logger.level = z.util.Logger::levels.ERROR
+      title_view_model = new z.ViewModel.WindowTitleViewModel content_state, user_repository, conversation_repository
       done()
     .catch done.fail
 
@@ -101,7 +100,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       expect(muted_conversation.messages().length).toBe 2
       expect(muted_conversation.messages_unordered().length).toBe 2
       expect(muted_conversation.unread_events().length).toBe 2
-      expect(muted_conversation.number_of_unread_messages()).toBe 2
+      expect(muted_conversation.unread_message_count()).toBe 2
 
       # Check title when there are messages in the muted conversation
       title_view_model.initiate_title_updates()

@@ -39,10 +39,9 @@ class z.audio.AudioError
 
   @:: = new Error()
   @::constructor = @
-  @::TYPE = {
+  @::TYPE =
     ALREADY_PLAYING: 'z.audio.AudioError::TYPE.ALREADY_PLAYING'
     FAILED_TO_PLAY: 'z.audio.AudioError::TYPE.FAILED_TO_PLAY'
     IGNORED_SOUND: 'z.audio.AudioError::TYPE.IGNORED_SOUND'
     NOT_FOUND: 'z.audio.AudioError::TYPE.NOT_FOUND'
     UNKNOWN: 'z.audio.AudioError::TYPE.UNKNOWN'
-  }

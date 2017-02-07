@@ -20,6 +20,6 @@ window.z ?= {}
 z.message ?= {}
 
 # Enum for different call message types.
-z.message.CallMessageType =
+z.message.CALL_MESSAGE_TYPE =
   ACTIVATED: 'activated'
   DEACTIVATED: 'deactivated'

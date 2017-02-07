@@ -29,8 +29,7 @@ class z.entity.PingMessage extends z.entity.Message
       return z.localization.Localizer.get_text string
     , @, deferEvaluation: true
 
-    @animation = ko.pureComputed =>
-      return 'ping-animation ping-animation-soft' if Date.now() - @timestamp < 2000
-
-    @ping_color = ko.pureComputed =>
-      return if @is_expired() then 'ephemeral-message-obfuscated' else @accent_color()
+    @get_icon_classes = ko.pureComputed =>
+      css_classes = if @is_expired() then 'ephemeral-message-obfuscated' else @accent_color()
+      css_classes += ' ping-animation ping-animation-soft' if Date.now() - @timestamp < 2000
+      return css_classes

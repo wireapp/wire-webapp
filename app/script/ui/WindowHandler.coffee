@@ -37,6 +37,7 @@ class z.ui.WindowHandler
   init: =>
     @width = $(window).width()
     @height = $(window).height()
+    @_listen_to_unhandled_promise_rejection()
     @_listen_to_window_resize()
     @_listen_to_visibility_change =>
       if document.visibilityState is 'visible'
@@ -67,6 +68,17 @@ class z.ui.WindowHandler
 
       @width = current_width
       @height = current_height
+
+  _listen_to_unhandled_promise_rejection: ->
+    $(window).on 'unhandledrejection', (event) =>
+      promise_rejection_event = event.originalEvent
+      promise_error = promise_rejection_event.reason
+
+      if promise_error?.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
+        @logger.log 'User has canceled sending a message to a degraded conversation.'
+        promise_rejection_event.preventDefault()
+        promise_rejection_event.stopPropagation()
+        return false
 
   _listen_to_visibility_change: (callback) ->
     property_hidden = undefined

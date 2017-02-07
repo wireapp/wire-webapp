@@ -461,7 +461,7 @@ class z.ViewModel.list.StartUIViewModel
     if @selected_people().length is 1
       return @conversation_repository.get_one_to_one_conversation @selected_people()[0]
       .then (conversation_et) =>
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_ONE_TO_ONE_CONVERSATION,
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION,
           source: 'top_user'
         @click_on_group conversation_et
         callback conversation_et if _.isFunction callback
@@ -482,17 +482,17 @@ class z.ViewModel.list.StartUIViewModel
   on_audio_call: =>
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
-        amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id
-      , 1000
+        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, false
+      , 500
 
   on_video_call: =>
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
-        amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id, true
-      , 1000
+        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, true
+      , 500
 
   on_photo: (images) =>
     @on_submit_search ->
       window.setTimeout ->
         amplify.publish z.event.WebApp.CONVERSATION.IMAGE.SEND, images
-      , 1000
+      , 500

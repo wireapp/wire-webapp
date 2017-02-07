@@ -33,32 +33,61 @@ class z.ViewModel.content.CollectionDetailsViewModel
     @last_message_timestamp = undefined
 
   set_conversation: (conversation_et, category, items) =>
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.ADDED, @item_added
+    amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, @item_removed
     @template category
     @conversation_et conversation_et
-    @push_deferred @items, items
+    z.util.ko_push_deferred @items, items
+
+  item_added: (message_et) =>
+    return unless @conversation_et().id is message_et.conversation_id
+
+    switch @category
+      when 'images'
+        return unless message_et.category & z.message.MessageCategory.IMAGE and not (message_et.category & z.message.MessageCategory.GIF)
+      when 'files'
+        return unless message_et.category & z.message.MessageCategory.FILE
+      when 'links'
+        return unless message_et.category & z.message.MessageCategory.LINK_PREVIEW
+
+    @items.push message_et
+
+  item_removed: (removed_message_id) =>
+    @items.remove (message_et) ->  message_et.id is removed_message_id
+    @click_on_back_button() unless @items().length
 
   removed_from_view: =>
+    amplify.unsubscribe z.event.WebApp.CONVERSATION.MESSAGE.ADDED, @item_added
+    amplify.unsubscribe z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, @item_removed
+    @last_message_timestamp = undefined
     @conversation_et null
     @items.removeAll()
-
-  should_show_header: (message_et) =>
-    if not @last_message_timestamp? or moment(message_et.timestamp).format('M') isnt moment(@last_message_timestamp).format('M')
-      @last_message_timestamp = message_et.timestamp
-      return true
 
   click_on_back_button: ->
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION
 
   click_on_image: (message_et) ->
-    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et
+    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et, 'collection'
 
-  # helper
-  push_deferred: (target, src, number = 100, delay = 300) ->
-    interval = window.setInterval ->
-      chunk = src.splice 0, number
-      z.util.ko_array_push_all target, chunk
+  should_show_header: (message_et) =>
+    if not @last_message_timestamp?
+      @last_message_timestamp = message_et.timestamp
+      return true
 
-      if src.length is 0
-        window.clearInterval interval
+    # we passed today
+    if not moment(message_et.timestamp).is_same_day(@last_message_timestamp) and moment(@last_message_timestamp).is_today()
+      @last_message_timestamp = message_et.timestamp
+      return true
 
-    , delay
+    # we passed the month
+    if not moment(message_et.timestamp).is_same_month @last_message_timestamp
+      @last_message_timestamp = message_et.timestamp
+      return true
+
+  get_title_for_header: (message_et) ->
+    message_date = moment(message_et.timestamp)
+    if message_date.is_today()
+      return z.localization.Localizer.get_text z.string.conversation_today
+    if message_date.is_current_year()
+      return message_date.format 'MMMM'
+    return message_date.format 'MMMM Y'

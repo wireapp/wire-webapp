@@ -191,7 +191,7 @@ class z.ViewModel.ModalsViewModel
         content: content
 
   _show_modal_new_device: (content, title_element) ->
-    joined_names = z.util.capitalize_first_char z.util.LocalizerUtil.join_names content, z.string.Declension.NOMINATIVE
+    joined_names = z.util.StringUtil.capitalize_first_char z.util.LocalizerUtil.join_names content, z.string.Declension.NOMINATIVE
     string_id =
       if content.length is 1
         if content[0].is_me then z.string.modal_new_device_headline_you else z.string.modal_new_device_headline

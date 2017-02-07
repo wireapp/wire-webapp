@@ -39,10 +39,10 @@ class z.SystemNotification.SystemNotificationRepository
 
   ###
   Construct a new System Notification Repository.
-  @param call_center [z.calling.CallCenter] Repository for all call interactions
+  @param calling_repository [z.calling.CallingRepository] Repository for all call interactions
   @param conversation_repository [z.conversation.ConversationService] Repository for all conversation interactions
   ###
-  constructor: (@call_center, @conversation_repository) ->
+  constructor: (@calling_repository, @conversation_repository) ->
     @logger = new z.util.Logger 'z.SystemNotification.SystemNotificationRepository', z.config.LOGGER.OPTIONS
 
     @ask_for_permission = true
@@ -156,10 +156,10 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Notification message body
   ###
   _create_body_call: (message_et) ->
-    if message_et.is_call_activation()
+    if message_et.is_activation()
       return z.localization.Localizer.get_text z.string.system_notification_voice_channel_activate
-    else if message_et.is_call_deactivation()
-      return if message_et.finished_reason isnt z.calling.enum.CallFinishedReason.MISSED
+    else if message_et.is_deactivation()
+      return if message_et.finished_reason isnt z.calling.enum.CALL_FINISHED_REASON.MISSED
       return z.localization.Localizer.get_text z.string.system_notification_voice_channel_deactivate
 
   ###
@@ -411,12 +411,9 @@ class z.SystemNotification.SystemNotificationRepository
   @return [String] Icon URL
   ###
   _create_options_icon: (should_obfuscate_sender, user_et) ->
-    try
-      return '' if z.util.Environment.electron and z.util.Environment.os.mac
-      return NOTIFICATION_ICON_URL if should_obfuscate_sender
-      return user_et.preview_picture_resource().generate_url()
-    catch
-      return NOTIFICATION_ICON_URL
+    return user_et.preview_picture_resource().generate_url() if user_et.preview_picture_resource() and not should_obfuscate_sender
+    return '' if z.util.Environment.electron and z.util.Environment.os.mac
+    return NOTIFICATION_ICON_URL
 
   ###
   Creates the notification tag.
@@ -555,7 +552,7 @@ class z.SystemNotification.SystemNotificationRepository
       hide_notification = true if message_et.user()?.is_me
 
       in_active_conversation = document.hasFocus() and conversation_et.id is @conversation_repository.active_conversation()?.id
-      in_maximized_call = @call_center.joined_call() and not wire.app.view.content.multitasking.is_minimized()
+      in_maximized_call = @calling_repository.joined_call() and not wire.app.view.content.multitasking.is_minimized()
       hide_notification = true if in_active_conversation and not in_maximized_call
 
       if hide_notification

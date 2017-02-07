@@ -268,6 +268,13 @@ z.string.fi.conversation_context_menu_unlike = 'Poista tykkäys'
 z.string.fi.conversation_delete_timestamp = 'Poistettu %@timestamp'
 z.string.fi.conversation_edit_timestamp = 'Muokattu %@timestamp'
 z.string.fi.conversation_likes_caption = '%@number henkeä'
+z.string.fi.conversation_send_pasted_file = 'Liitti kuvan %date'
+
+# Collection
+z.string.fi.collection_show_all = 'Näytä kaikki %no'
+z.string.fi.collection_section_links = 'Linkit'
+z.string.fi.collection_section_images = 'Kuvat'
+z.string.fi.collection_section_files = 'Tiedostot'
 
 # Archive
 z.string.fi.archive_header = 'Arkistoi'
@@ -301,8 +308,8 @@ z.string.fi.invite_meta_key_pc = 'Ctrl'
 z.string.fi.invite_hint_selected = 'Paina %meta_key + C kopioidaksesi'
 z.string.fi.invite_hint_unselected = 'Valitse ja paina %meta_key + C'
 z.string.fi.invite_headline = 'Kutsu ihmisiä Wireen'
-z.string.fi.invite_message = 'Olen Wiressä, etsi %username tai mene osoitteeseen wire.com/download.'
-z.string.fi.invite_message_no_email = 'Olen Wiressä. Mene osoitteeseen https://get.wire.com ottaaksesi yhteyttä minuun.'
+z.string.fi.invite_message = 'Olen Wiressä, etsi %username tai mene osoitteeseen get.wire.com.'
+z.string.fi.invite_message_no_email = 'Olen Wiressä. Mene osoitteeseen get.wire.com ottaaksesi minuun yhteyttä.'
 
 # Extensions
 z.string.fi.extensions_bubble_button_gif = 'Gif'
@@ -326,6 +333,7 @@ z.string.fi.people_no_matches = 'Ei vastaavia tuloksia. Yritä toisella nimellä
 z.string.fi.people_invite = 'Kutsu ihmisiä'
 z.string.fi.people_share = 'Jaa yhteystietoja'
 z.string.fi.people_bring_your_friends = 'Tuo ystäväsi Wireen'
+z.string.fi.people_invite_detail = 'Yhteystietojesi jakaminen auttaa sinua löytämään uusia kontakteja. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.'
 z.string.fi.people_invite_button_contacts = 'Kontakteista'
 z.string.fi.people_invite_button_gmail = 'Gmailista'
 z.string.fi.people_invite_headline = 'Kutsu kavereitasi'
@@ -447,7 +455,8 @@ z.string.fi.preferences_options_data_checkbox = 'Käyttö- ja vikaraportit'
 z.string.fi.preferences_options_data_detail = 'Tee Wirestä parempi lähetämällä anonyymiä tietoa.'
 z.string.fi.preferences_options_notifications = 'Ilmoitukset'
 z.string.fi.preferences_options_notifications_none = 'Pois päältä'
-z.string.fi.preferences_options_notifications_obfuscate = 'Piilota viestin tiedot'
+z.string.fi.preferences_options_notifications_obfuscate = 'Piilota yksityiskohdat'
+z.string.fi.preferences_options_notifications_obfuscate_message = 'Näytä lähettäjä'
 z.string.fi.preferences_options_notifications_on = 'Näytä lähettäjä ja viesti'
 
 # Search
@@ -455,7 +464,10 @@ z.string.fi.search_group_hint = 'Jatka kirjoittamista tai valitse lisää ihmisi
 z.string.fi.search_connect = 'Yhdistä'
 z.string.fi.search_connections = 'Yhteydet'
 z.string.fi.search_groups = 'Ryhmät'
+z.string.fi.search_placeholder = 'Etsi nimellä tai käyttäjänimellä'
 z.string.fi.search_top_people = 'Eniten käytetyt kontaktit'
+z.string.fi.search_try_search = 'Etsi käyttäjiä nimellä tai käyttäjänimellä'
+z.string.fi.search_no_contacts_on_wire = 'Sinulla ei ole kontakteja Wiressä. Yritä etsiä muita käyttäjiä nimellä tai käyttäjänimellä.'
 z.string.fi.search_others = 'Yhdistä'
 z.string.fi.search_friend_in_common = '%n yhteinen käyttäjä molemmilla'
 z.string.fi.search_friends_in_common = '%n yhteistä käyttäjää molemmilla'
@@ -515,6 +527,7 @@ z.string.fi.warning_connectivity_no_internet = 'Ei Internetiä. Et pysty lähett
 # Browser notifications
 z.string.fi.system_notification_asset_add = 'Jakoi kuvan'
 z.string.fi.system_notification_connection_accepted = 'Hyväksyi yhteyspyyntösi'
+z.string.fi.system_notification_connection_connected = 'Yhteys muodostettu'
 z.string.fi.system_notification_connection_request = 'Haluaa luoda kontaktin'
 z.string.fi.system_notification_conversation_create = '%s.first_name aloitti keskustelun'
 z.string.fi.system_notification_conversation_rename = '%s.first_name nimesi keskustelun uudelleen %nameksi'

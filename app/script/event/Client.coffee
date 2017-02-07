@@ -20,6 +20,8 @@ window.z ?= {}
 z.event ?= {}
 
 z.event.Client =
+  CALL:
+    E_CALL: 'call.e-call'
   CONVERSATION:
     ASSET_META: 'conversation.asset-meta'
     ASSET_PREVIEW: 'conversation.asset-preview'
@@ -32,3 +34,4 @@ z.event.Client =
     MESSAGE_HIDDEN: 'conversation.message-hidden'
     REACTION: 'conversation.reaction'
     UNABLE_TO_DECRYPT: 'conversation.unable-to-decrypt'
+    VERIFICATION: 'conversation.verification'

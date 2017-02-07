@@ -16,6 +16,8 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
+# grunt test_init && grunt test_run:util/ArrayUtil
+
 describe 'z.util.ArrayUtil', ->
   describe 'chunk', ->
     arr = null

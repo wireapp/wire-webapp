@@ -26,6 +26,7 @@ class z.components.Image
     @asset_is_loading = ko.observable false
 
     @on_click = =>
+      return if @asset_is_loading()
       params.click? @asset
 
     @on_entered_viewport = =>

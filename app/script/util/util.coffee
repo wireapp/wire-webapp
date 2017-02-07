@@ -24,13 +24,7 @@ window.LOG = ->
 
 
 z.util.dummy_image = (width, height) ->
-  canvas = document.createElement 'canvas'
-  canvas.width = width
-  canvas.height = height
-  ctx = canvas.getContext '2d'
-  ctx.fillStyle = '#fff'
-  ctx.fillRect 0, 0, width, height
-  return canvas.toDataURL 'image/png'
+  return "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 #{width} #{height}' width='#{width}' height='#{height}'></svg>"
 
 
 z.util.is_same_location = (past_location, current_location) ->
@@ -78,9 +72,16 @@ z.util.load_url_blob = (url) ->
     return new Blob [new Uint8Array buffer], type: type
 
 
-z.util.append_url_parameter = (url, param) ->
+z.util.append_url_parameter = (url, parameter) ->
   separator = if z.util.StringUtil.includes url, '?' then '&' else '?'
-  return "#{url}#{separator}#{param}"
+  return "#{url}#{separator}#{parameter}"
+
+
+z.util.forward_url_parameter = (url, parameter_name) ->
+  parameter_value = z.util.get_url_parameter parameter_name
+  if parameter_value?
+    return url = z.util.append_url_parameter url, "#{parameter_name}=#{parameter_value}"
+  return url
 
 
 z.util.get_url_parameter = (name) ->
@@ -88,7 +89,12 @@ z.util.get_url_parameter = (name) ->
   for param in params
     value = param.split '='
     if value[0] is name
-      return if value[1] then unescape value[1] else 'true'
+      if value[1]
+        value = unescape value[1]
+        return false if value is 'false'
+        return true if value is 'true'
+        return value
+      return true
   return null
 
 
@@ -184,7 +190,7 @@ Function will remove data uri if present
 @return [UInt8Array]
 ###
 z.util.base64_to_array = (base64) ->
-  return sodium.from_base64 z.util.strip_data_uri base64
+  return bazinga64.Decoder.fromBase64(z.util.strip_data_uri base64).asBytes
 
 ###
 Convert ArrayBuffer or UInt8Array to base64 string
@@ -193,7 +199,7 @@ Convert ArrayBuffer or UInt8Array to base64 string
 @return [String] base64 encoded string
 ###
 z.util.array_to_base64 = (array) ->
-  return sodium.to_base64 new Uint8Array(array), true
+  return bazinga64.Encoder.toBase64(new Uint8Array(array), true).asString
 
 ###
 Return base64 encoded md5 of the the given array
@@ -236,10 +242,6 @@ z.util.download_blob = (blob, filename) ->
     document.body.removeChild link
     window.URL.revokeObjectURL url
   , 100
-
-
-z.util.phone_uri_to_e164 = (phone_number) ->
-  return phone_number.replace /tel:|-/g, ''
 
 
 z.util.phone_number_to_e164 = (phone_number, country_code) ->
@@ -365,6 +367,16 @@ z.util.ko_array_unshift_all = (ko_array, values_to_shift) ->
   Array.prototype.unshift.apply underlyingArray, values_to_shift
   ko_array.valueHasMutated()
 
+# push array deferred to knockout observableArray
+z.util.ko_push_deferred = (target, src, number = 100, delay = 300) ->
+  interval = window.setInterval ->
+    chunk = src.splice 0, number
+    z.util.ko_array_push_all target, chunk
+
+    if src.length is 0
+      window.clearInterval interval
+
+  , delay
 
 ###
 Add zero padding until limit is reached
@@ -466,6 +478,10 @@ z.util.is_valid_phone_number = (phone_number) ->
   else
     regular_expression = /^\+[0-9]\d{1,14}$/
   return regular_expression.test phone_number
+
+z.util.is_valid_username = (username) ->
+  username = username.substring 1 if username.startsWith '@'
+  return /^[a-z_0-9]{2,21}$/.test username
 
 
 ###
@@ -594,3 +610,19 @@ z.util.format_time_remaining = (time_remaining) ->
     title += "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_seconds}"
 
   return title or ''
+
+###
+Execute provided function on each item of the array with the given interval
+@param array [Array]
+@param fn [Function]
+@param interval [Number] Interval in ms
+###
+z.util.foreach_deferred = (array, fn, interval) ->
+  remaining_items = Array.prototype.slice.apply array
+  interval_id = window.setInterval ->
+    removed_element = remaining_items.shift()
+    if removed_element?
+      fn removed_element
+    else
+      window.clearInterval interval_id
+  , interval

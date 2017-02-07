@@ -37,6 +37,17 @@
   font-size: @font-size-xs;
 }
 
+.label-nocase-xs {
+  font-size: 12px;
+  font-weight: @font-weight-regular;
+  text-transform: none;
+}
+
+.label-nocase-bold-xs {
+  .label-nocase-xs;
+  font-weight: @font-weight-bold;
+}
+
 .label-username:not(:empty):before {
   content: "@";
 }

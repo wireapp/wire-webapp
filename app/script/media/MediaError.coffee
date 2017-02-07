@@ -45,7 +45,7 @@ class z.media.MediaError
 
   @:: = new Error()
   @::constructor = @
-  @::TYPE = {
+  @::TYPE =
     MEDIA_STREAM_DEVICE: 'z.media.MediaError::TYPE.MEDIA_STREAM_DEVICE'
     MEDIA_STREAM_MISC: 'z.media.MediaError::TYPE.MEDIA_STREAM_MISC'
     MEDIA_STREAM_PERMISSION: 'z.media.MediaError::TYPE.MEDIA_STREAM_PERMISSION'
@@ -54,4 +54,3 @@ class z.media.MediaError
     NO_VIDEO_INPUT_DEVICE_FOUND: 'z.media.MediaError::TYPE.NO_VIDEO_INPUT_DEVICE_FOUND'
     SCREEN_NOT_SUPPORTED: 'z.media.MediaError::TYPE.SCREEN_NOT_SUPPORTED'
     UNKNOWN: 'z.media.MediaError::TYPE.UNKNOWN'
-  }

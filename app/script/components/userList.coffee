@@ -74,7 +74,7 @@ class z.components.UserListViewModel
     if @user_filter?
       @filtered_user_ets = ko.pureComputed =>
         normalized_query = z.search.SearchRepository.normalize_query @user_filter()
-        ko.utils.arrayFilter(@user_ets(), (user_et) => user_et.matches normalized_query, @user_filter().trim().startsWith '@').slice 0, 30
+        ko.utils.arrayFilter @user_ets(), (user_et) => user_et.matches normalized_query, @user_filter().trim().startsWith '@'
 
     # check every list item before selection if selected_filter is provided
     if @user_selected_filter?
@@ -130,7 +130,7 @@ ko.components.register 'user-list',
                           <span class="search-list-item-content-username label-username" data-bind="text: $data.username"></span>
                         <!-- /ko -->
                         <!-- ko if: !$data.connected() && $data.mutual_friends_total() > 0 -->
-                          <span class="search-list-item-content-friends ellipsis" data-bind="text: $parent.get_common_contacts_caption($data)"></span>
+                          <span class="search-list-item-content-friends ellipsis" data-bind="attr: {'data-uie-common-friends': mutual_friends_total()}, text: $parent.get_common_contacts_caption($data)"></span>
                         <!-- /ko -->
                       </div>
                     <!-- /ko -->

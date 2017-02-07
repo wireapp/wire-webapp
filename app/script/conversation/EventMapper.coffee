@@ -82,6 +82,8 @@ class z.conversation.EventMapper
         message_et = @_map_system_event_delete_everywhere event
       when z.event.Client.CONVERSATION.LOCATION
         message_et = @_map_event_location event
+      when z.event.Client.CONVERSATION.VERIFICATION
+        message_et = @_map_verification event
       when z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
         message_et = @_map_system_event_unable_to_decrypt event
       else
@@ -115,6 +117,21 @@ class z.conversation.EventMapper
   ###############################################################################
   # Event mappers
   ###############################################################################
+
+  ###
+  Maps JSON data of conversation.verification message into message entity
+
+  @private
+
+  @param event [Object] Message data
+
+  @return [z.entity.VerificationMessage] Normal message entity
+  ###
+  _map_verification: (event) ->
+    message_et = new z.entity.VerificationMessage()
+    message_et.user_ids event.data.user_ids
+    message_et.verification_message_type = event.data.type
+    return message_et
 
   ###
   Maps JSON data of conversation.asset_add message into message entity
@@ -304,7 +321,7 @@ class z.conversation.EventMapper
   ###
   _map_event_voice_channel_activate: ->
     message_et = new z.entity.CallMessage()
-    message_et.call_message_type = z.message.CallMessageType.ACTIVATED
+    message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.ACTIVATED
     message_et.visible false
     return message_et
   ###
@@ -318,9 +335,9 @@ class z.conversation.EventMapper
   ###
   _map_event_voice_channel_deactivate: (event) ->
     message_et = new z.entity.CallMessage()
-    message_et.call_message_type = z.message.CallMessageType.DEACTIVATED
+    message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED
     message_et.finished_reason = event.data.reason
-    message_et.visible message_et.finished_reason is z.calling.enum.CallFinishedReason.MISSED
+    message_et.visible message_et.finished_reason is z.calling.enum.CALL_FINISHED_REASON.MISSED
     return message_et
 
   ###############################################################################
