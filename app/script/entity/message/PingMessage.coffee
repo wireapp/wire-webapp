@@ -30,6 +30,6 @@ class z.entity.PingMessage extends z.entity.Message
     , @, deferEvaluation: true
 
     @get_icon_classes = ko.pureComputed =>
-      css_classes = if @is_expired() then 'ephemeral-message-obfuscated' else @accent_color()
-      css_classes += ' ping-animation ping-animation-soft' if Date.now() - @timestamp < 2000
+      css_classes = @accent_color()
+      css_classes = ' ping-animation ping-animation-soft' if Date.now() - @timestamp < 2000
       return css_classes
