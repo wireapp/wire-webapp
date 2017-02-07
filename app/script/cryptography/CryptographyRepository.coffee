@@ -164,7 +164,7 @@ class z.cryptography.CryptographyRepository
     for user_id, client_ids of user_client_map
       payload.recipients[user_id] ?= {}
       client_ids.forEach (client_id) =>
-        session_id = z.cryptography.SessionI user_id, client_id
+        session_id = z.cryptography.SessionID user_id, client_id
         future_cipher_payloads.push @_encrypt_payload_for_session session_id, generic_message
 
     @logger.log "Encrypting message of type '#{generic_message.content}' for '#{Object.keys(payload.recipients).length}' users.", payload.recipients
