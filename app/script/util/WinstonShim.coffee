@@ -1,2 +1,2 @@
 if window.winston and window.Logdown
-  console.warn 'Logdown=return winston'
+  window.Logdown = -> return window.winston
