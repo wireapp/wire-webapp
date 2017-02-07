@@ -61,14 +61,14 @@ describe 'z.audio.AudioRepository', ->
         expect(error.type).toBe z.audio.AudioError::TYPE.NOT_FOUND
         done()
 
-  describe '_play', ->
+  xdescribe '_play', ->
     beforeEach ->
       audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL] = new Audio "/audio/#{z.audio.AudioType.OUTGOING_CALL}.mp3"
 
     afterEach ->
       audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL].pause()
 
-    xit 'plays an available sound', (done) ->
+    it 'plays an available sound', (done) ->
       audio_repository._play z.audio.AudioType.OUTGOING_CALL, audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL], false
       .then (audio_element) ->
         expect(audio_element).toEqual jasmine.any HTMLAudioElement
@@ -76,7 +76,7 @@ describe 'z.audio.AudioRepository', ->
         done()
       .catch done.fail
 
-    xit 'plays an available sound in loop', (done) ->
+    it 'plays an available sound in loop', (done) ->
       audio_repository._play z.audio.AudioType.OUTGOING_CALL, audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL], true
       .then (audio_element) ->
         expect(audio_element).toEqual jasmine.any HTMLAudioElement
