@@ -270,7 +270,7 @@
     <div class="message-header-icon">
       <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
     </div>
-    <div class="message-header-label">
+    <div class="message-header-label" data-bind="css: {'ephemeral-message-obfuscated': message.is_expired()}">
       <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption"></span>
     </div>
