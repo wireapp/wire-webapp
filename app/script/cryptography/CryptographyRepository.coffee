@@ -43,9 +43,9 @@ class z.cryptography.CryptographyRepository
     return Promise.resolve()
     .then =>
       @logger.info "Initializing Cryptobox with database '#{db.name}'..."
-      cryptobox_store = new window.cryptobox.store.IndexedDB db
-      @cryptobox = new window.cryptobox.Cryptobox cryptobox_store, 10
-      @cryptobox.on cryptobox.Cryptobox.prototype.TOPIC_NEW_PREKEYS, (data) =>
+      cryptobox_store = new cryptobox.store.IndexedDB db
+      @cryptobox = new cryptobox.Cryptobox cryptobox_store, 10
+      @cryptobox.on cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, (data) =>
         serialized_prekeys = data.map (pre_key) =>
           return @cryptobox.serialize_prekey pre_key
 
