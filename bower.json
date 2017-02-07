@@ -3,7 +3,6 @@
   "dependencies": {
     "amplify": "https://github.com/wireapp/amplify.git#1.1.4",
     "antiscroll-2": "https://github.com/welovecoding/antiscroll-2.git#1.2.7",
-    "cryptobox": "https://github.com/wireapp/cryptobox-bower.git#v1.0.7",
     "cryptojs": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/crypto-js/CryptoJS%20v3.1.2.zip",
     "dexie": "https://github.com/dfahlander/Dexie.js.git#1.5.1",
     "generic-message-proto": "https://github.com/wireapp/generic-message-proto.git#1.18.0",
@@ -12,8 +11,7 @@
     "jquery": "https://github.com/jquery/jquery.git#2.1.4",
     "keyboardjs": "https://github.com/RobertWHurst/KeyboardJS.git#2.3.3",
     "knockout": "https://github.com/knockout/knockout.git#3.4.1",
-    "lru-ts": "https://github.com/wireapp/lru-ts.git#321024a90dd82a3379864382f4e16908c3ff8467",
-    "marked": "https://github.com/wireapp/marked.git#0f932d79aab362846eab11354f783db02f30cec6",
+    "marked": "https://github.com/wireapp/marked.git#3fb540777bd042e7284d0a960729169d9efee508",
     "moment": "https://github.com/moment/moment.git#2.16.0",
     "normalize-css": "https://github.com/necolas/normalize.css.git#3.0.3",
     "object-hash": "https://github.com/puleos/object-hash.git#1.1.5",
@@ -33,7 +31,8 @@
     "webapp-module-namespace": "https://github.com/wireapp/webapp-module-namespace.git#1.0.0",
     "webrtc-adapter": "https://github.com/webrtc/adapter.git#2.1.0",
     "wire-audio-files": "https://github.com/wireapp/wire-audio-files.git#1.1.0",
-    "wire-theme": "https://github.com/wireapp/wire-theme.git#1.0.0"
+    "wire-theme": "https://github.com/wireapp/wire-theme.git#1.0.0",
+    "wire-webapp-cryptobox": "https://github.com/wireapp/wire-webapp-cryptobox.git#2.1.0"
   },
   "exportsOverride": {
     "amplify": {
@@ -43,11 +42,11 @@
       "css": "dist/antiscroll-2.css",
       "js": "dist/antiscroll-2.js"
     },
+    "bazinga64": {
+      "js/": "dist/window/*.js"
+    },
     "bytebuffer": {
       "js": "dist/ByteBufferAB.js"
-    },
-    "cryptobox": {
-      "js": "dist/cryptobox.js"
     },
     "cryptojs": {
       "js/": [
@@ -83,8 +82,8 @@
     "knockout": {
       "js": "dist/knockout.debug.js"
     },
-    "lru-ts": {
-      "js": "dist/global/lru-ts.js"
+    "logdown": {
+      "js/": "dist/*.js"
     },
     "marked": {
       "js": "lib/marked.js"
@@ -160,6 +159,15 @@
     },
     "wire-theme": {
       "less": "app/style/{wire-theme,variables,input}.less"
+    },
+    "wire-webapp-cryptobox": {
+      "js/": "dist/window/*.js"
+    },
+    "wire-webapp-lru-cache": {
+      "js/": "dist/window/*.js"
+    },
+    "wire-webapp-proteus": {
+      "js/": "dist/window/*.js"
     }
   }
 }

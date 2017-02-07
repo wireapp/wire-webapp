@@ -21,25 +21,15 @@ z.cryptography ?= {}
 
 # Cryptography service for all cryptography related calls to the backend REST API.
 class z.cryptography.CryptographyService
+  URL_CLIENTS: '/clients'
+  URL_USERS: '/users'
+
   ###
   Construct a new Cryptography Service.
   @param client [z.service.Client] Client for the API calls
   ###
   constructor: (@client) ->
     @logger = new z.util.Logger 'z.cryptography.CryptographyService', z.config.LOGGER.OPTIONS
-
-  ###
-  Gets a pre-key for a client of a user
-  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getPrekey
-
-  @param user_id [String] User ID
-  @param client_id [String] Client ID
-  @return [Promise] Promise that resolves with a pre-key for the given client of the a user
-  ###
-  get_user_pre_key: (user_id, client_id) ->
-    @client.send_request
-      type: 'GET'
-      url: @client.create_url "/users/#{user_id}/prekeys/#{client_id}"
 
   ###
   Gets a pre-key for each client of a user client map
@@ -51,5 +41,13 @@ class z.cryptography.CryptographyService
   get_users_pre_keys: (user_client_map) ->
     @client.send_json
       type: 'POST'
-      url: @client.create_url '/users/prekeys'
+      url: @client.create_url "#{@URL_USERS}/prekeys"
       data: user_client_map
+
+
+  put_client_prekeys: (client_id, serialized_prekeys) ->
+    @client.send_json
+      url: @client.create_url "#{@URL_CLIENTS}/#{client_id}"
+      type: 'PUT'
+      data:
+        prekeys: serialized_prekeys

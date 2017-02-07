@@ -1256,9 +1256,7 @@ class z.ViewModel.AuthViewModel
         @logger.info 'Local client rejected as invalid by backend. Reinitializing storage.'
         @storage_service.init @self_user().id
     .then =>
-      return @storage_repository.init true
-    .then =>
-      return @cryptography_repository.init()
+      return @cryptography_repository.init @storage_service.db
     .then =>
       if @client_repository.current_client()
         @logger.info 'Active client found. Redirecting to app...'
