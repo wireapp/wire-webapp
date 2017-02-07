@@ -61,7 +61,7 @@ describe 'z.audio.AudioRepository', ->
         expect(error.type).toBe z.audio.AudioError::TYPE.NOT_FOUND
         done()
 
-  describe '_play', ->
+  xdescribe '_play', ->
     beforeEach ->
       audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL] = new Audio "/audio/#{z.audio.AudioType.OUTGOING_CALL}.mp3"
 
