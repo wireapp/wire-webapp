@@ -368,8 +368,6 @@ class z.event.EventRepository
     .then =>
       if event.type in z.event.EventTypeHandling.DECRYPT
         return @cryptography_repository.decrypt_event event
-        .then (generic_message) =>
-          @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
         .catch (decrypt_error) =>
           # Get error information
           remote_client_id = event.data.sender
@@ -385,9 +383,6 @@ class z.event.EventRepository
           if decrypt_error instanceof Proteus.errors.DecryptError.DuplicateMessage or decrypt_error instanceof Proteus.errors.DecryptError.OutdatedMessage
             # We don't need to show duplicate message errors to the user
             throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
-          else if decrypt_error instanceof z.cryptography.CryptographyError
-            if decrypt_error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
-              throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
           else if decrypt_error instanceof Proteus.errors.DecryptError.InvalidMessage or decrypt_error instanceof Proteus.errors.DecryptError.InvalidSignature
             # Session is broken, let's see what's really causing it...
             error_code = z.cryptography.CryptographyErrorType.INVALID_SIGNATURE
@@ -399,10 +394,14 @@ class z.event.EventRepository
             message = "Fingerprints do not match. We expect a different fingerprint from user ID '#{remote_user_id}' with client ID '#{remote_client_id}' (Remote identity changed)."
             @logger.error message, decrypt_error
           else
-            error_code = z.cryptography.CryptographyErrorType.INVALID_SIGNATURE
+            error_code = z.cryptography.CryptographyErrorType.UNKNOWN
 
           @_report_decrypt_error event, decrypt_error, error_code
           return z.conversation.EventBuilder.build_unable_to_decrypt event, decrypt_error, error_code
+        .then (message) =>
+          if (message instanceof z.proto.GenericMessage)
+            return @cryptography_repository.cryptography_mapper.map_generic_message message, event
+          return message
       else
         return event
     .then (mapped_event) =>
