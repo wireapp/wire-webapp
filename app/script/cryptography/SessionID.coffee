@@ -28,7 +28,9 @@ z.cryptography.SessionID =
   @return [String]
   ###
   compose: (user_id, client_id) ->
-    return "#{user_id}@#{client_id}"
+    if user_id? and client_id?
+      return "#{user_id}@#{client_id}"
+    throw new TypeError 'Missing argument. Unable to compose session id.'
 
   ###
   Decompose session id into user_id and client_id.
