@@ -27,7 +27,7 @@ class z.cryptography.CryptographyRepository
   @param storage_repository [z.storage.StorageRepository] Repository for all storage interactions
   ###
   constructor: (@cryptography_service, @storage_repository) ->
-    @logger = new Logdown {alignOutput: true, prefix: 'z.cryptography.CryptographyRepository'}
+    @logger = new z.util.Logger 'z.cryptography.CryptographyRepository', z.config.LOGGER.OPTIONS
 
     @cryptography_mapper = new z.cryptography.CryptographyMapper()
 
