@@ -66,6 +66,7 @@ z.string.hu.auth_limit_devices_current = '(Érvényes)'
 # Authentication: limit section
 z.string.hu.auth_history_headline = 'Első alkalommal használja a Wire-t ezen az eszközön.'
 z.string.hu.auth_history_description = 'Adatvédelmi okokból a beszélgetés előzményei nem jelennek meg.'
+z.string.hu.auth_history_reuse_headline = 'Már használta a Wire-t ezen az eszközön.'
 z.string.hu.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -224,12 +225,9 @@ z.string.hu.conversation_connection_blocked = 'Letiltva'
 z.string.hu.conversation_connection_cancel_request = 'Kapcsolódási kérelem visszavonása'
 z.string.hu.conversation_create = ' megkezdtél egy beszélgetést %@names'
 z.string.hu.conversation_create_you = ' megkezdtél egy beszélgetést %@names'
-z.string.hu.conversation_device_started_using = ' használatba véve'
-z.string.hu.conversation_device_started_using_you = ' használatba véve'
 z.string.hu.conversation_device_unverified = ' nincs megerősítve az egyik'
 z.string.hu.conversation_device_your_devices = ' eszközei'
 z.string.hu.conversation_device_user_devices = ' %@name eszközei'
-z.string.hu.conversation_device_a_new_device = ' egy új eszköz'
 z.string.hu.conversation_just_now = 'Épp most'
 z.string.hu.conversation_location_link = 'Térkép megnyitása'
 z.string.hu.conversation_member_join = ' felvetted %@names'
@@ -509,6 +507,8 @@ z.string.hu.warning_connectivity_connection_lost = 'Csatlakozni próbál. A Wire
 z.string.hu.warning_connectivity_no_internet = 'Nincs internet. Nem képes üzeneteket küldeni és fogadni.'
 
 # Warnings: Desktop Update
+z.string.hu.warning_lifecycle_update = 'Elérhető a Wire új verziója.'
+z.string.hu.warning_lifecycle_update_link = 'Frissítés most'
 
 # Browser notifications
 z.string.hu.system_notification_asset_add = 'Kép megosztása'
