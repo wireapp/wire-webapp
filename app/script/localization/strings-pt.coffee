@@ -66,6 +66,7 @@ z.string.pt.auth_limit_devices_current = '(Atual)'
 # Authentication: limit section
 z.string.pt.auth_history_headline = 'É a primeira vez que você está usando o Wire nesse dispositivo.'
 z.string.pt.auth_history_description = 'Por questões de privacidade, o seu histórico de conversa não aparecerá aqui.'
+z.string.pt.auth_history_reuse_headline = 'Você não usou o Wire nesse dispositivo antes.'
 z.string.pt.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -124,7 +125,7 @@ z.string.pt.modal_button_send = 'Enviar'
 
 # Block a user
 z.string.pt.modal_block_conversation_headline = 'Bloquear %@.name?'
-z.string.pt.modal_block_conversation_message = '%@.Name não será capaz de entrar em contato com você ou convidá-lo para uma conversa de grupo.'
+z.string.pt.modal_block_conversation_message = '%@.name não será capaz de entrar em contato com você ou convidá-lo para uma conversa em grupo.'
 z.string.pt.modal_block_conversation_button = 'Bloquear'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.pt.modal_call_conversation_empty_headline = 'Ninguém para ligar'
@@ -185,7 +186,7 @@ z.string.pt.modal_logout_message = 'Excluir todas as informações pessoais e co
 z.string.pt.modal_logout_button = 'Sair'
 # New device
 z.string.pt.modal_new_device_headline = '%@.name começou a usar um novo dispositivo'
-z.string.pt.modal_new_device_headline_many = '%@.names começou a usar um novo dispositivo'
+z.string.pt.modal_new_device_headline_many = '%@.name começou a usar novos dispositivos'
 z.string.pt.modal_new_device_headline_you = '%@.name começou a usar um novo dispositivo'
 z.string.pt.modal_new_device_message = 'Ainda quer enviar suas mensagens?'
 z.string.pt.modal_new_device_show_device = 'mostrar dispositivo'
@@ -224,16 +225,13 @@ z.string.pt.conversation_connection_blocked = 'Bloqueado'
 z.string.pt.conversation_connection_cancel_request = 'Cancelar a solicitação de conexão'
 z.string.pt.conversation_create = ' iniciou uma conversa com %@names'
 z.string.pt.conversation_create_you = ' iniciou uma conversa com %@names'
-z.string.pt.conversation_device_started_using = ' começou a usar'
-z.string.pt.conversation_device_started_using_you = ' começou a usar'
 z.string.pt.conversation_device_unverified = ' desautorizou um dos'
 z.string.pt.conversation_device_your_devices = ' seus dispositivos'
 z.string.pt.conversation_device_user_devices = ' dispositivos de %@name´s'
-z.string.pt.conversation_device_a_new_device = ' um novo dispositivo'
 z.string.pt.conversation_just_now = 'Agora'
 z.string.pt.conversation_location_link = 'Abrir Mapa'
-z.string.pt.conversation_member_join = ' adicionado %@names'
-z.string.pt.conversation_member_join_you = ' adicionado %@names'
+z.string.pt.conversation_member_join = ' adicionou %@names'
+z.string.pt.conversation_member_join_you = ' adicionou %@names'
 z.string.pt.conversation_member_leave_left = ' saiu'
 z.string.pt.conversation_member_leave_left_you = ' saiu'
 z.string.pt.conversation_member_leave_removed = ' removeu %@names'
@@ -272,6 +270,9 @@ z.string.pt.conversation_send_pasted_file = 'Imagem postada em %date'
 
 # Collection
 z.string.pt.collection_show_all = 'Mostrar todas %no'
+z.string.pt.collection_section_links = 'Links'
+z.string.pt.collection_section_images = 'Imagens'
+z.string.pt.collection_section_files = 'Arquivos'
 
 # Archive
 z.string.pt.archive_header = 'Arquivar'
@@ -350,7 +351,7 @@ z.string.pt.people_verified = 'Verificado'
 
 # Block user
 z.string.pt.people_block_headline = 'Bloquear?'
-z.string.pt.people_block_message = '%@.first_name não será capaz de encontrá-lo ou contatá-lo no Wire.'
+z.string.pt.people_block_message = '%@.first_name não será capaz de entrar em contato com você ou convidá-lo para uma conversa em grupo.'
 
 # Accept a pending connection dialogue
 z.string.pt.people_connect_headline = 'Aceitar?'
@@ -370,7 +371,7 @@ z.string.pt.people_remove_message = '%@.first_name não será capaz de enviar ou
 
 # Unblock user
 z.string.pt.people_unblock_headline = 'Desbloquear?'
-z.string.pt.people_unblock_message = '%@.first_name será capaz de encontra-lo e contatá-lo novamente no Wire. Você também receberá mensagens que eles enviaram enquanto bloqueado.'
+z.string.pt.people_unblock_message = '%@.first_name não será capaz de entrar em contato com você ou convidá-lo para uma conversa em grupo.'
 
 # Button labels for the actions
 z.string.pt.people_button_add = 'Adicionar pessoas'
@@ -520,6 +521,10 @@ z.string.pt.warning_tell_me_how = 'Diga-me como'
 # Warnings: Connectivity
 z.string.pt.warning_connectivity_connection_lost = 'Tentando-se conectar. Wire pode não ser capaz de entregar mensagens.'
 z.string.pt.warning_connectivity_no_internet = 'Sem Internet. Não será capaz de enviar ou receber mensagens.'
+
+# Warnings: Desktop Update
+z.string.pt.warning_lifecycle_update = 'Uma nova versão do Wire está disponível.'
+z.string.pt.warning_lifecycle_update_link = 'Atualizar agora'
 
 # Browser notifications
 z.string.pt.system_notification_asset_add = 'Compartilhou uma imagem'

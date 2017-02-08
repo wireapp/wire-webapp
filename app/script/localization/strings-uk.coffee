@@ -66,6 +66,7 @@ z.string.uk.auth_limit_devices_current = '(Поточний)'
 # Authentication: limit section
 z.string.uk.auth_history_headline = 'Це перший раз, коли ви використовуєте Wire на цьому пристрої.'
 z.string.uk.auth_history_description = 'З міркувань конфіденційності, історія ваших розмов тут не показується.'
+z.string.uk.auth_history_reuse_headline = 'Ви уже використовували Wire на цьому пристрої раніше.'
 z.string.uk.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -124,7 +125,7 @@ z.string.uk.modal_button_send = 'Надіслати'
 
 # Block a user
 z.string.uk.modal_block_conversation_headline = 'Заблокувати %@.name?'
-z.string.uk.modal_block_conversation_message = '%@.name не буде мати можливості зв’язатися з вами чи запросити вас в групову розмову.'
+z.string.uk.modal_block_conversation_message = '%@.name не буде мати можливості зв’язатися з вами або додати вас до групових розмов.'
 z.string.uk.modal_block_conversation_button = 'Заблокувати'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.uk.modal_call_conversation_empty_headline = 'Нікому дзвонити'
@@ -185,7 +186,7 @@ z.string.uk.modal_logout_message = 'Видалити всі ваші особи�
 z.string.uk.modal_logout_button = 'Вийти'
 # New device
 z.string.uk.modal_new_device_headline = '%@.name почав(-ла) використовувати новий пристрій'
-z.string.uk.modal_new_device_headline_many = '%@.names почав(-ла) використовувати новий пристрій'
+z.string.uk.modal_new_device_headline_many = '%@.names почали використовувати нові пристрої'
 z.string.uk.modal_new_device_headline_you = '%@.name почав(-ла) використовувати новий пристрій'
 z.string.uk.modal_new_device_message = 'Все одно надіслати ваші повідомлення?'
 z.string.uk.modal_new_device_show_device = 'Показати пристрій'
@@ -224,12 +225,9 @@ z.string.uk.conversation_connection_blocked = 'Заблокований(-на)'
 z.string.uk.conversation_connection_cancel_request = 'Скасувати запит на додавання до контактів'
 z.string.uk.conversation_create = ' почав(-ла) розмову з %@names'
 z.string.uk.conversation_create_you = ' почав(-ла) розмову з %@names'
-z.string.uk.conversation_device_started_using = ' почав(-ла) використовувати'
-z.string.uk.conversation_device_started_using_you = ' почав(-ла) використовувати'
 z.string.uk.conversation_device_unverified = ' скасував(-ла) верифікацію одного з'
 z.string.uk.conversation_device_your_devices = ' ваші пристрої'
 z.string.uk.conversation_device_user_devices = ' пристрої %@name'
-z.string.uk.conversation_device_a_new_device = ' новий пристрій'
 z.string.uk.conversation_just_now = 'Щойно'
 z.string.uk.conversation_location_link = 'Відкрити карту'
 z.string.uk.conversation_member_join = ' додав(-ла) %@names'
@@ -272,6 +270,9 @@ z.string.uk.conversation_send_pasted_file = 'Надіслав(-ла) зобра�
 
 # Collection
 z.string.uk.collection_show_all = 'Показати всі %no'
+z.string.uk.collection_section_links = 'Посилання'
+z.string.uk.collection_section_images = 'Картинки'
+z.string.uk.collection_section_files = 'Файли'
 
 # Archive
 z.string.uk.archive_header = 'Архівувати'
@@ -350,7 +351,7 @@ z.string.uk.people_verified = 'Верифікований'
 
 # Block user
 z.string.uk.people_block_headline = 'Заблокувати?'
-z.string.uk.people_block_message = '%@.first_name більше не зможе знайти вас або зв’язатися з вами у Wire.'
+z.string.uk.people_block_message = '%@.first_name не буде мати можливості зв’язатися з вами або додати вас до групових розмов.'
 
 # Accept a pending connection dialogue
 z.string.uk.people_connect_headline = 'Прийняти?'
@@ -370,7 +371,7 @@ z.string.uk.people_remove_message = '%@.first_name більше не зможе 
 
 # Unblock user
 z.string.uk.people_unblock_headline = 'Розблокувати?'
-z.string.uk.people_unblock_message = '%@.first_name не зможе знайти вас або надіслати вам повідомлення в Wire.'
+z.string.uk.people_unblock_message = '%@.first_name не буде мати можливості зв’язатися з вами або додати вас до групових розмов.'
 
 # Button labels for the actions
 z.string.uk.people_button_add = 'Додати учасників'
@@ -521,6 +522,10 @@ z.string.uk.warning_tell_me_how = 'Скажіть мені як'
 # Warnings: Connectivity
 z.string.uk.warning_connectivity_connection_lost = 'Намагаюся підключитись. Wire, можливо, не зможе доставляти повідомлення.'
 z.string.uk.warning_connectivity_no_internet = 'Відсутнє підключення до Internet. Ви не зможете надсилати чи отримувати повідомлення.'
+
+# Warnings: Desktop Update
+z.string.uk.warning_lifecycle_update = 'Доступна нова версія Wire.'
+z.string.uk.warning_lifecycle_update_link = 'Оновити зараз'
 
 # Browser notifications
 z.string.uk.system_notification_asset_add = 'Поділився(-лась) картинкою'
