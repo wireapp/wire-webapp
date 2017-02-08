@@ -124,7 +124,6 @@ z.string.it.modal_button_send = 'Invia'
 
 # Block a user
 z.string.it.modal_block_conversation_headline = 'Bloccare %@.name?'
-z.string.it.modal_block_conversation_message = '%@.name non è abilitato a contattarti o invitarti in una conversazione di gruppo.'
 z.string.it.modal_block_conversation_button = 'Blocca'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.it.modal_call_conversation_empty_headline = 'Nessuno da chiamare'
@@ -184,9 +183,6 @@ z.string.it.modal_logout_headline = 'Cancella dati?'
 z.string.it.modal_logout_message = 'Elimina tutti i tuoi dati personali e le conversazioni su questo dispositivo.'
 z.string.it.modal_logout_button = 'Logout'
 # New device
-z.string.it.modal_new_device_headline = '%@.name ha iniziato a utilizzare un nuovo dispositivo'
-z.string.it.modal_new_device_headline_many = '%@.names ha iniziato a utilizzare un nuovo dispositivo'
-z.string.it.modal_new_device_headline_you = '%@.name ha iniziato a utilizzare un nuovo dispositivo'
 z.string.it.modal_new_device_message = 'Vuoi comunque mandare il messaggio?'
 z.string.it.modal_new_device_show_device = 'visualizza dispositivo'
 z.string.it.modal_new_device_send_anyway = 'invia comunque'
@@ -224,12 +220,9 @@ z.string.it.conversation_connection_blocked = 'Bloccato'
 z.string.it.conversation_connection_cancel_request = 'Annulla la richiesta di connessione'
 z.string.it.conversation_create = ' ha iniziato una conversazione con %@names'
 z.string.it.conversation_create_you = ' ha iniziato una conversazione con %@names'
-z.string.it.conversation_device_started_using = ' ha iniziato ad usare'
-z.string.it.conversation_device_started_using_you = ' ha iniziato ad usare'
 z.string.it.conversation_device_unverified = ' hai tolto la verifica di'
 z.string.it.conversation_device_your_devices = ' i tuoi dispositivi'
 z.string.it.conversation_device_user_devices = ' Dispositivi di %@name’s'
-z.string.it.conversation_device_a_new_device = ' un nuovo dispositivo'
 z.string.it.conversation_just_now = 'Adesso'
 z.string.it.conversation_location_link = 'Apri mappa'
 z.string.it.conversation_member_join = ' ha aggiunto %@names'
@@ -346,7 +339,6 @@ z.string.it.people_verified = 'Verificato'
 
 # Block user
 z.string.it.people_block_headline = 'Blocca?'
-z.string.it.people_block_message = '%@.first_name non sarà in grado di trovarti o contattarti su Wire.'
 
 # Accept a pending connection dialogue
 z.string.it.people_connect_headline = 'Accettare?'
@@ -366,7 +358,6 @@ z.string.it.people_remove_message = '%@.first_name non sarà in grado di inviare
 
 # Unblock user
 z.string.it.people_unblock_headline = 'Sblocca?'
-z.string.it.people_unblock_message = '%@.first_name sarà in grado di trovarti e contattarti di nuovo sul Wire. Riceverai inoltre i messaggi che sono stati inviati nel frattempo.'
 
 # Button labels for the actions
 z.string.it.people_button_add = 'Aggiungi persone'
@@ -508,6 +499,8 @@ z.string.it.warning_tell_me_how = 'Dimmi come'
 # Warnings: Connectivity
 z.string.it.warning_connectivity_connection_lost = 'Tentativo di connessione. Wire non è in grado di consegnare i messaggi.'
 z.string.it.warning_connectivity_no_internet = 'Nessuna connessione. Non sarai in grado di inviare o ricevere messaggi.'
+
+# Warnings: Desktop Update
 
 # Browser notifications
 z.string.it.system_notification_asset_add = 'Ha condiviso un’immagine'
