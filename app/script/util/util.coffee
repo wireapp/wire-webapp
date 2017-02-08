@@ -190,7 +190,7 @@ Function will remove data uri if present
 @return [UInt8Array]
 ###
 z.util.base64_to_array = (base64) ->
-  return bazinga64.Decoder.fromBase64(z.util.strip_data_uri base64).asBytes
+  return sodium.from_base64 z.util.strip_data_uri base64
 
 ###
 Convert ArrayBuffer or UInt8Array to base64 string
@@ -199,7 +199,7 @@ Convert ArrayBuffer or UInt8Array to base64 string
 @return [String] base64 encoded string
 ###
 z.util.array_to_base64 = (array) ->
-  return bazinga64.Encoder.toBase64(new Uint8Array(array), true).asString
+  return sodium.to_base64 new Uint8Array(array), true
 
 ###
 Return base64 encoded md5 of the the given array
