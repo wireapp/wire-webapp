@@ -66,6 +66,7 @@ z.string.sl.auth_limit_devices_current = '(Trenutna)'
 # Authentication: limit section
 z.string.sl.auth_history_headline = 'Prvič uporabljate Wire na tej napravi.'
 z.string.sl.auth_history_description = 'Zaradi zasebnosti se vaša zgodovina pogovorov ne bo pojavila tukaj.'
+z.string.sl.auth_history_reuse_headline = 'Na tej napravi si že uporabljal(-a) Wire.'
 z.string.sl.auth_history_button = 'V redu'
 
 # Authentication: POSTED section
@@ -124,7 +125,7 @@ z.string.sl.modal_button_send = 'Pošlji'
 
 # Block a user
 z.string.sl.modal_block_conversation_headline = 'Blokiraj %@.name?'
-z.string.sl.modal_block_conversation_message = '%@.name vas ne bo mogel kontaktirati ali povabiti v skupinski pogovor.'
+z.string.sl.modal_block_conversation_message = '%@.name vas ne bo mogel kontaktirati ali dodati v skupinske pogovore.'
 z.string.sl.modal_block_conversation_button = 'Blokiraj'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.sl.modal_call_conversation_empty_headline = 'Ni nikogar za klic'
@@ -185,7 +186,7 @@ z.string.sl.modal_logout_message = 'Izbriši vse vaše osebne podatke in pogovor
 z.string.sl.modal_logout_button = 'Odjava'
 # New device
 z.string.sl.modal_new_device_headline = '%@.name je začel(-a) z uporabo nove naprave'
-z.string.sl.modal_new_device_headline_many = '%@.names je začel(-a) z uporabo nove naprave'
+z.string.sl.modal_new_device_headline_many = '%@.names so začeli z uporabo novih naprav'
 z.string.sl.modal_new_device_headline_you = '%@.name je začel(-a) z uporabo nove naprave'
 z.string.sl.modal_new_device_message = 'Ali še vedno želite poslati vaša sporočila?'
 z.string.sl.modal_new_device_show_device = 'pokaži napravo'
@@ -224,12 +225,9 @@ z.string.sl.conversation_connection_blocked = 'Blokiran'
 z.string.sl.conversation_connection_cancel_request = 'Prekliči zahtevo za povezavo'
 z.string.sl.conversation_create = ' začel pogovor s/z %@names'
 z.string.sl.conversation_create_you = ' začel pogovor s/z %@names'
-z.string.sl.conversation_device_started_using = ' začel(-a) uporabljati'
-z.string.sl.conversation_device_started_using_you = ' začel(-a) uporabljati'
 z.string.sl.conversation_device_unverified = ' odstranil(-a) preveritev ene izmed'
 z.string.sl.conversation_device_your_devices = ' vaših naprav'
 z.string.sl.conversation_device_user_devices = ' Naprave od %@name'
-z.string.sl.conversation_device_a_new_device = ' nova naprava'
 z.string.sl.conversation_just_now = 'Pravkar'
 z.string.sl.conversation_location_link = 'Odpri zemljevid'
 z.string.sl.conversation_member_join = ' dodal(-a) %@names'
@@ -353,7 +351,7 @@ z.string.sl.people_verified = 'Preverjena'
 
 # Block user
 z.string.sl.people_block_headline = 'Blokiraj?'
-z.string.sl.people_block_message = '%@.first_name vas ne bo mogel najti in kontaktirati na Wire.'
+z.string.sl.people_block_message = '%@.first_name vas ne bo mogel kontaktirati ali dodati v skupinske pogovore.'
 
 # Accept a pending connection dialogue
 z.string.sl.people_connect_headline = 'Sprejmi?'
@@ -373,7 +371,7 @@ z.string.sl.people_remove_message = '%@.first_name ne bo mogel pošiljati ali pr
 
 # Unblock user
 z.string.sl.people_unblock_headline = 'Odblokiraj?'
-z.string.sl.people_unblock_message = '%@.first_name vas bo lahko spet našel in kontaktiral na Wire. Prejeli boste tudi sporočila, ki so bila poslana med blokado.'
+z.string.sl.people_unblock_message = '%@.first_name vas ne bo mogel kontaktirati ali ponovno dodati v skupinske pogovore.'
 
 # Button labels for the actions
 z.string.sl.people_button_add = 'Dodaj osebe'
@@ -516,6 +514,10 @@ z.string.sl.warning_tell_me_how = 'Povej mi kako'
 # Warnings: Connectivity
 z.string.sl.warning_connectivity_connection_lost = 'Poizkus povezave. Wire morda ne bo mogel dostaviti sporočila.'
 z.string.sl.warning_connectivity_no_internet = 'Ni spletne povezave. Ne boste mogli pošiljati ali prejemati sporočil.'
+
+# Warnings: Desktop Update
+z.string.sl.warning_lifecycle_update = 'Na voljo je nova različica Wire.'
+z.string.sl.warning_lifecycle_update_link = 'Posodobi zdaj'
 
 # Browser notifications
 z.string.sl.system_notification_asset_add = 'Je delil(-a) sliko'

@@ -124,7 +124,7 @@ z.string.da.modal_button_send = 'Send'
 
 # Block a user
 z.string.da.modal_block_conversation_headline = 'Blokkér %@.name?'
-z.string.da.modal_block_conversation_message = '%@.name vil ikke være i stand til at kontakte eller invitere dig til en gruppe samtale.'
+z.string.da.modal_block_conversation_message = '%@.name vil ikke kunne kontakte dig eller tilføje dig til gruppesamtaler.'
 z.string.da.modal_block_conversation_button = 'Blokér'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.da.modal_call_conversation_empty_headline = 'Ingen at ringe til'
@@ -184,6 +184,9 @@ z.string.da.modal_logout_headline = 'Ryd Data?'
 z.string.da.modal_logout_message = 'Slet alle dine personlige informationer og samtaler på denne enhed.'
 z.string.da.modal_logout_button = 'Log ud'
 # New device
+z.string.da.modal_new_device_headline = '%@.name er begyndt at bruge en ny enhed'
+z.string.da.modal_new_device_headline_many = '%@.names er begyndt at bruge nye enheder'
+z.string.da.modal_new_device_headline_you = '%@.name er begyndt at bruge en ny enhed'
 z.string.da.modal_new_device_message = 'Vil du stadig sende dine beskeder?'
 z.string.da.modal_new_device_show_device = 'vis enhed'
 z.string.da.modal_new_device_send_anyway = 'send alligevel'
@@ -221,12 +224,9 @@ z.string.da.conversation_connection_blocked = 'Blokeret'
 z.string.da.conversation_connection_cancel_request = 'Annullér anmodning om forbindelse'
 z.string.da.conversation_create = ' startede en samtale med %@names'
 z.string.da.conversation_create_you = ' startede en samtale med %@names'
-z.string.da.conversation_device_started_using = ' begyndte at bruge'
-z.string.da.conversation_device_started_using_you = ' begyndte at bruge'
 z.string.da.conversation_device_unverified = ' har afbekræftet en af'
 z.string.da.conversation_device_your_devices = ' dine enheder'
 z.string.da.conversation_device_user_devices = ' %@name’s enheder'
-z.string.da.conversation_device_a_new_device = ' en ny enhed'
 z.string.da.conversation_just_now = 'Lige nu'
 z.string.da.conversation_location_link = 'Åben Kort'
 z.string.da.conversation_member_join = ' tilføjede %@names'
@@ -350,7 +350,7 @@ z.string.da.people_verified = 'Bekræftet'
 
 # Block user
 z.string.da.people_block_headline = 'Blokér?'
-z.string.da.people_block_message = '%@.first_name vil ikke være i stand til at finde eller kontakte dig på Wire.'
+z.string.da.people_block_message = '%@.first_name vil ikke kunne kontakte dig eller tilføje dig til gruppesamtaler.'
 
 # Accept a pending connection dialogue
 z.string.da.people_connect_headline = 'Acceptér?'
@@ -370,7 +370,7 @@ z.string.da.people_remove_message = '%@.first_name vil ikke være i stand til at
 
 # Unblock user
 z.string.da.people_unblock_headline = 'Fjern Blokering?'
-z.string.da.people_unblock_message = '%@.first_name vil være i stand til at finde og kontakte dig på Wire igen. Du vil også modtage beskeder de har sendt mens de var blokeret.'
+z.string.da.people_unblock_message = '%@.first_name vil igen kunne kontakte dig og tilføje dig til gruppesamtaler.'
 
 # Button labels for the actions
 z.string.da.people_button_add = 'Tilføj personer'
@@ -503,6 +503,10 @@ z.string.da.warning_tell_me_how = 'Fortæl mig hvordan'
 # Warnings: Connectivity
 z.string.da.warning_connectivity_connection_lost = 'Forsøger at forbinde. Wire kan muligvis ikke levere beskeder.'
 z.string.da.warning_connectivity_no_internet = 'Ingen Internet. Du vil ikke kunne sende eller modtage beskeder.'
+
+# Warnings: Desktop Update
+z.string.da.warning_lifecycle_update = 'En ny version af Wire er tilgængelig.'
+z.string.da.warning_lifecycle_update_link = 'Opdatér nu'
 
 # Browser notifications
 z.string.da.system_notification_asset_add = 'Delte et billede'

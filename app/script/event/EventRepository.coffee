@@ -465,6 +465,7 @@ class z.event.EventRepository
 
     if decrypt_error not instanceof Proteus.errors.DecryptError.DuplicateMessage and decrypt_error not instanceof Proteus.errors.DecryptError.TooDistantFuture
       custom_data =
+        cryptobox_version: cryptobox.version
         client_local_class: @current_client().class
         client_local_type: @current_client().type
         error_code: error_code
