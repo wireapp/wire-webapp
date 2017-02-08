@@ -55,7 +55,7 @@ class z.cryptography.CryptographyRepository
         .then =>
           @logger.log "Successfully uploaded '#{serialized_prekeys.length}' PreKeys."
 
-      @cryptobox.on cryptobox.Cryptobox.TOPIC.NEW_SESSION, (session_id) =>
+      @cryptobox.on cryptobox.Cryptobox.TOPIC.NEW_SESSION, (session_id) ->
         {user_id, client_id} = z.client.Client.dismantle_user_client_id session_id
         amplify.publish z.event.WebApp.CLIENT.ADD, user_id, new z.client.Client id: client_id
 
