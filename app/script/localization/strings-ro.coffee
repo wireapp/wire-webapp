@@ -66,6 +66,7 @@ z.string.ro.auth_limit_devices_current = '(Curent)'
 # Authentication: limit section
 z.string.ro.auth_history_headline = 'Folosești Wire pentru prima dată pe acest dispozitiv.'
 z.string.ro.auth_history_description = 'Din motive de confidențialitate, istoricul conversației nu va apărea aici.'
+z.string.ro.auth_history_reuse_headline = 'Ai mai folosit Wire pe acest dispozitiv.'
 z.string.ro.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -124,7 +125,7 @@ z.string.ro.modal_button_send = 'Trimite'
 
 # Block a user
 z.string.ro.modal_block_conversation_headline = 'Blochează pe %@.name?'
-z.string.ro.modal_block_conversation_message = '%@.name nu te va putea contacta sau invita într-o conversație de grup.'
+z.string.ro.modal_block_conversation_message = '%@.name nu te va putea contacta sau adăuga la conversații de grup.'
 z.string.ro.modal_block_conversation_button = 'Blochează'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.ro.modal_call_conversation_empty_headline = 'Nu ai pe cine apela'
@@ -185,7 +186,7 @@ z.string.ro.modal_logout_message = 'Șterge toate informațiile personale și co
 z.string.ro.modal_logout_button = 'Deconectare'
 # New device
 z.string.ro.modal_new_device_headline = '%@.name a început să folosească un nou dispozitiv'
-z.string.ro.modal_new_device_headline_many = '%@.names a început să folosească un nou dispozitiv'
+z.string.ro.modal_new_device_headline_many = '%@.names au început să folosească dispozitive noi'
 z.string.ro.modal_new_device_headline_you = '%@.name a început să folosească un nou dispozitiv'
 z.string.ro.modal_new_device_message = 'Încă dorești să fie trimise mesajele?'
 z.string.ro.modal_new_device_show_device = 'arată dispozitivul'
@@ -224,12 +225,9 @@ z.string.ro.conversation_connection_blocked = 'Blocat'
 z.string.ro.conversation_connection_cancel_request = 'Anulează cererea de conectare'
 z.string.ro.conversation_create = 'a început o conversație cu %@names'
 z.string.ro.conversation_create_you = ' a început o conversație cu %@names'
-z.string.ro.conversation_device_started_using = ' a început să folosească'
-z.string.ro.conversation_device_started_using_you = ' a început să folosească'
 z.string.ro.conversation_device_unverified = ' unul dintre dispozitivele'
 z.string.ro.conversation_device_your_devices = ' tale neverificate'
 z.string.ro.conversation_device_user_devices = ' dispozitivele lui %@name'
-z.string.ro.conversation_device_a_new_device = ' un nou dispozitiv'
 z.string.ro.conversation_just_now = 'Chiar acum'
 z.string.ro.conversation_location_link = 'Deschide harta'
 z.string.ro.conversation_member_join = ' ai adăuga pe %@names'
@@ -353,7 +351,7 @@ z.string.ro.people_verified = 'Verificat'
 
 # Block user
 z.string.ro.people_block_headline = 'Blochează?'
-z.string.ro.people_block_message = '%@.first_name nu te va putea găsi sau contacta pe Wire.'
+z.string.ro.people_block_message = '%@.first_name nu te va putea contacta sau adăuga la conversații de grup.'
 
 # Accept a pending connection dialogue
 z.string.ro.people_connect_headline = 'Acceptă?'
@@ -373,7 +371,7 @@ z.string.ro.people_remove_message = '%@.first_name nu va mai putea trimite sau p
 
 # Unblock user
 z.string.ro.people_unblock_headline = 'Deblochează?'
-z.string.ro.people_unblock_message = '%@.first_name te va putea găsi și contacta din nou pe Wire. Vei putea primi și mesajele pe care le-a trimis atunci când era blocat.'
+z.string.ro.people_unblock_message = '%@.first_name te va putea contacta și adăuga din nou la conversații de grup.'
 
 # Button labels for the actions
 z.string.ro.people_button_add = 'Adaugă persoane'
@@ -523,6 +521,10 @@ z.string.ro.warning_tell_me_how = 'Spune-mi cum'
 # Warnings: Connectivity
 z.string.ro.warning_connectivity_connection_lost = 'Se încearcă conectarea. Wire ar putea să nu trimită mesaje în acest timp.'
 z.string.ro.warning_connectivity_no_internet = 'Nu este conexiune la internet. Nu vei putea trimite sau primi mesaje.'
+
+# Warnings: Desktop Update
+z.string.ro.warning_lifecycle_update = 'Este disponibilă o nouă versiune de Wire.'
+z.string.ro.warning_lifecycle_update_link = 'Actualizează acum'
 
 # Browser notifications
 z.string.ro.system_notification_asset_add = 'A împărtășit o imagine'

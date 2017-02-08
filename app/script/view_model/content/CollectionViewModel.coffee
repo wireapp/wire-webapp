@@ -67,7 +67,7 @@ class z.ViewModel.content.CollectionViewModel
       @_track_opened_collection conversation_et, @no_items_found()
 
   _check_items: ->
-    @no_items_found @images().length + @files().length + @links().length is 0
+    @no_items_found @images().length + @files().length + @links().length + @audio().length is 0
 
   _populate_items: (message_ets) ->
     for message_et in message_ets
