@@ -124,7 +124,6 @@ z.string.fi.modal_button_send = 'Lähetä'
 
 # Block a user
 z.string.fi.modal_block_conversation_headline = 'Estä %@.name?'
-z.string.fi.modal_block_conversation_message = '%@.name ei pysty ottamaan sinuun yhteyttä tai kutsumaan sinua ryhmäkeskusteluihin.'
 z.string.fi.modal_block_conversation_button = 'Estä'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.fi.modal_call_conversation_empty_headline = 'Ei ketään kelle soittaa'
@@ -185,7 +184,6 @@ z.string.fi.modal_logout_message = 'Poista kaikki henkilökohtaiset tiedot ja ke
 z.string.fi.modal_logout_button = 'Kirjaudu ulos'
 # New device
 z.string.fi.modal_new_device_headline = '%@.name aloitti käyttämään uutta laitetta'
-z.string.fi.modal_new_device_headline_many = '%@.names aloitti käyttämään uutta laitetta'
 z.string.fi.modal_new_device_headline_you = '%@.name aloitti käyttämään uutta laitetta'
 z.string.fi.modal_new_device_message = 'Haluatko vielä silti lähettää viestisi?'
 z.string.fi.modal_new_device_show_device = 'näytä laite'
@@ -224,12 +222,9 @@ z.string.fi.conversation_connection_blocked = 'Estetty'
 z.string.fi.conversation_connection_cancel_request = 'Peruuta yhteyspyyntö'
 z.string.fi.conversation_create = ' aloitti keskustelun %@names kanssa'
 z.string.fi.conversation_create_you = ' aloitti keskustelun %@names kanssa'
-z.string.fi.conversation_device_started_using = ' aloitettiin käyttämään'
-z.string.fi.conversation_device_started_using_you = ' aloitettiin käyttämään'
 z.string.fi.conversation_device_unverified = ' vahvistamattomia yksi'
 z.string.fi.conversation_device_your_devices = ' sinun laitteet'
 z.string.fi.conversation_device_user_devices = ' %@name n laitteet'
-z.string.fi.conversation_device_a_new_device = ' uusi laite'
 z.string.fi.conversation_just_now = 'Juuri nyt'
 z.string.fi.conversation_location_link = 'Avaa kartta'
 z.string.fi.conversation_member_join = ' lisättiin %@names'
@@ -353,7 +348,6 @@ z.string.fi.people_verified = 'Vahvistettu'
 
 # Block user
 z.string.fi.people_block_headline = 'Estä?'
-z.string.fi.people_block_message = '%@.first_name ei voi löytää sinua tai ottaa sinuun yhteyttä Wiressä.'
 
 # Accept a pending connection dialogue
 z.string.fi.people_connect_headline = 'Hyväksy?'
@@ -373,7 +367,6 @@ z.string.fi.people_remove_message = '%@.first_name ei pysty lähettämään tai 
 
 # Unblock user
 z.string.fi.people_unblock_headline = 'Poista esto?'
-z.string.fi.people_unblock_message = '%@.first_name pystyy taas etsimään ja ottamaan sinuun yheyttä Wiressä. Tulet myös vastaanottamaan viestit jotka hän lähetti ollessaan estettynä.'
 
 # Button labels for the actions
 z.string.fi.people_button_add = 'Lisää ihmisiä'
@@ -523,6 +516,8 @@ z.string.fi.warning_tell_me_how = 'Kerro miten'
 # Warnings: Connectivity
 z.string.fi.warning_connectivity_connection_lost = 'Yritetään yhdistää. Wire ei mahdollisesti pysty toimitttamaan viestejä perille.'
 z.string.fi.warning_connectivity_no_internet = 'Ei Internetiä. Et pysty lähettämään tai vastaanottamaan viestejä.'
+
+# Warnings: Desktop Update
 
 # Browser notifications
 z.string.fi.system_notification_asset_add = 'Jakoi kuvan'
