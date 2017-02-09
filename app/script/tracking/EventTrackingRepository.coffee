@@ -36,7 +36,6 @@ RAYGUN =
 if z.util.Environment.frontend.is_production()
   RAYGUN.API_KEY = 'lAkLCPLx3ysnsXktajeHmw=='
   LOCALYTICS.APP_KEY = 'f19c50ccf7bff11992798f0-59fac3b8-ad88-11e6-ff9e-00ae30fe7875'
-  Logdown.disable '*'
 
 ###
 Tracker for user actions which uses Localytics as a reference implementation but can be easily used with other services.

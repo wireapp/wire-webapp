@@ -38,7 +38,7 @@ class z.event.EventRepository
   @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
   ###
   constructor: (@web_socket_service, @notification_service, @cryptography_repository, @user_repository) ->
-    @logger = Logdown {alignOutput: true, prefix: 'z.event.EventRepository'}
+    @logger = new z.util.Logger 'z.event.EventRepository', z.config.LOGGER.OPTIONS
 
     @current_client = undefined
     @clock_drift = 0
