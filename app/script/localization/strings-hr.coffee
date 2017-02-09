@@ -124,7 +124,6 @@ z.string.hr.modal_button_send = 'Pošalji'
 
 # Block a user
 z.string.hr.modal_block_conversation_headline = 'Blokiraj %@.name?'
-z.string.hr.modal_block_conversation_message = '%@.name neće biti u mogućnosti kontaktirati vas ili vas pozvati u grupnu konverzaciju.'
 z.string.hr.modal_block_conversation_button = 'Blokiraj'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.hr.modal_call_conversation_empty_headline = 'Nemam koga zvati'
@@ -184,9 +183,6 @@ z.string.hr.modal_logout_headline = 'Obriši podatke?'
 z.string.hr.modal_logout_message = 'Izbriši sve osobne informacije i razgovore na ovom uređaju.'
 z.string.hr.modal_logout_button = 'Odjava'
 # New device
-z.string.hr.modal_new_device_headline = '%@.name počela/o koristiti novi uređaj'
-z.string.hr.modal_new_device_headline_many = '%@.names počela/o koristiti novi uređaj'
-z.string.hr.modal_new_device_headline_you = '%@.name počela/o koristiti novi uređaj'
 z.string.hr.modal_new_device_message = 'Još uvijek želite poslati poruku?'
 z.string.hr.modal_new_device_show_device = 'prikaz uređaja'
 z.string.hr.modal_new_device_send_anyway = 'svejedno pošalji'
@@ -224,12 +220,9 @@ z.string.hr.conversation_connection_blocked = 'Blokiran'
 z.string.hr.conversation_connection_cancel_request = 'Odjavi zahtjev za vezu'
 z.string.hr.conversation_create = ' započela/o je razgovor s %@names'
 z.string.hr.conversation_create_you = ' započela/o je razgovor s %@names'
-z.string.hr.conversation_device_started_using = ' počela/o koristiti'
-z.string.hr.conversation_device_started_using_you = ' počela/o koristiti'
 z.string.hr.conversation_device_unverified = ' neverificirala/o je jedan od'
 z.string.hr.conversation_device_your_devices = ' tvojih uređaja'
 z.string.hr.conversation_device_user_devices = ' %@name uređaji'
-z.string.hr.conversation_device_a_new_device = ' novi uređaj'
 z.string.hr.conversation_just_now = 'Upravo'
 z.string.hr.conversation_location_link = 'Otvori kartu'
 z.string.hr.conversation_member_join = ' dodala/o %@names'
@@ -304,8 +297,6 @@ z.string.hr.invite_meta_key_pc = 'Ctrl'
 z.string.hr.invite_hint_selected = 'Pritisnite % meta_key + C za kopiranje'
 z.string.hr.invite_hint_unselected = 'Odaberite i pritisnite % meta_key + C'
 z.string.hr.invite_headline = 'Pozvati ljude na Wire'
-z.string.hr.invite_message = 'Ja sam na Wireu, potraži %username ili posjeti wire.com/download.'
-z.string.hr.invite_message_no_email = 'Na Wire sam. Posjeti https://get.wire.com da bi se povezali.'
 
 # Extensions
 z.string.hr.extensions_bubble_button_gif = 'Gif'
@@ -348,7 +339,6 @@ z.string.hr.people_verified = 'Verificirano'
 
 # Block user
 z.string.hr.people_block_headline = 'Blokirati?'
-z.string.hr.people_block_message = '%@.First_NAME Vas neće moći pronaći ili kontaktirati na Wire.'
 
 # Accept a pending connection dialogue
 z.string.hr.people_connect_headline = 'Prihvatiti?'
@@ -368,7 +358,6 @@ z.string.hr.people_remove_message = '%@.First_NAME neće moći slati ili primati
 
 # Unblock user
 z.string.hr.people_unblock_headline = 'Odblokirati?'
-z.string.hr.people_unblock_message = '%@.First_NAME će moći pronaći i ponovno Vas kontaktirati na Wire. Poruke koje su bile poslane tijekom blokade također će biti pokazane.'
 
 # Button labels for the actions
 z.string.hr.people_button_add = 'Dodaj osobe'
@@ -450,7 +439,6 @@ z.string.hr.preferences_options_data_checkbox = 'Izvješće o korištenju i ruš
 z.string.hr.preferences_options_data_detail = 'Poboljšaj Wire slanjem anonimnih informacija.'
 z.string.hr.preferences_options_notifications = 'Obavijesti'
 z.string.hr.preferences_options_notifications_none = 'Isključi'
-z.string.hr.preferences_options_notifications_obfuscate = 'Sakrij detalje poruke'
 z.string.hr.preferences_options_notifications_on = 'Prikaži pošiljatelja i poruku'
 
 # Search
@@ -517,6 +505,8 @@ z.string.hr.warning_tell_me_how = 'Recite mi kako'
 # Warnings: Connectivity
 z.string.hr.warning_connectivity_connection_lost = 'Povezivanje u tijeku. Postoji mogućnost da Wire neće moći isporučiti poruke.'
 z.string.hr.warning_connectivity_no_internet = 'Nema Interneta. Nećete moći slati ili primati poruke.'
+
+# Warnings: Desktop Update
 
 # Browser notifications
 z.string.hr.system_notification_asset_add = 'Podijelila/o sliku'

@@ -25,7 +25,6 @@
 window.TestFactory = function (logger_level) {
   if (!logger_level) {
     logger_level = z.util.Logger.prototype.levels.ERROR;
-    Logdown.disable('cryptobox.*');
   }
 
   this.settings = {

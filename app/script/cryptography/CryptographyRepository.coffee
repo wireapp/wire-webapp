@@ -27,7 +27,7 @@ class z.cryptography.CryptographyRepository
   @param storage_repository [z.storage.StorageRepository] Repository for all storage interactions
   ###
   constructor: (@cryptography_service, @storage_repository) ->
-    @logger = new Logdown {alignOutput: true, prefix: 'z.cryptography.CryptographyRepository'}
+    @logger = new z.util.Logger 'z.cryptography.CryptographyRepository', z.config.LOGGER.OPTIONS
 
     @cryptography_mapper = new z.cryptography.CryptographyMapper()
 
@@ -43,9 +43,10 @@ class z.cryptography.CryptographyRepository
     return Promise.resolve()
     .then =>
       @logger.info "Initializing Cryptobox with database '#{db.name}'..."
-      cryptobox_store = new window.cryptobox.store.IndexedDB db
-      @cryptobox = new window.cryptobox.Cryptobox cryptobox_store, 10
-      @cryptobox.on cryptobox.Cryptobox.prototype.TOPIC_NEW_PREKEYS, (data) =>
+      cryptobox_store = new cryptobox.store.IndexedDB db
+      @cryptobox = new cryptobox.Cryptobox cryptobox_store, 10
+
+      @cryptobox.on cryptobox.Cryptobox.TOPIC.NEW_PREKEYS, (data) =>
         serialized_prekeys = data.map (pre_key) =>
           return @cryptobox.serialize_prekey pre_key
 
@@ -53,6 +54,10 @@ class z.cryptography.CryptographyRepository
         @cryptography_service.put_client_prekeys @current_client().id, serialized_prekeys
         .then =>
           @logger.log "Successfully uploaded '#{serialized_prekeys.length}' PreKeys."
+
+      @cryptobox.on cryptobox.Cryptobox.TOPIC.NEW_SESSION, (session_id) ->
+        {user_id, client_id} = z.client.Client.dismantle_user_client_id session_id
+        amplify.publish z.event.WebApp.CLIENT.ADD, user_id, new z.client.Client id: client_id
 
       return @cryptobox.init()
     .then =>

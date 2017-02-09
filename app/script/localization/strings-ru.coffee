@@ -66,6 +66,7 @@ z.string.ru.auth_limit_devices_current = '(Текущее)'
 # Authentication: limit section
 z.string.ru.auth_history_headline = 'Вы впервые используете Wire на этом устройстве.'
 z.string.ru.auth_history_description = 'Из соображений конфиденциальности история ваших разговоров не будет показана здесь.'
+z.string.ru.auth_history_reuse_headline = 'Вы уже использовали Wire на этом устройстве.'
 z.string.ru.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -124,7 +125,7 @@ z.string.ru.modal_button_send = 'Отправить'
 
 # Block a user
 z.string.ru.modal_block_conversation_headline = 'Заблокировать %@.name?'
-z.string.ru.modal_block_conversation_message = '%@.name не сможет связаться с вами или пригласить вас в групповой разговор.'
+z.string.ru.modal_block_conversation_message = '%@.name больше не сможет связаться с вами или добавить вас в групповые разговоры.'
 z.string.ru.modal_block_conversation_button = 'Заблокировать'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.ru.modal_call_conversation_empty_headline = 'Некому звонить'
@@ -185,7 +186,7 @@ z.string.ru.modal_logout_message = 'Удалить все ваши личные 
 z.string.ru.modal_logout_button = 'Выход'
 # New device
 z.string.ru.modal_new_device_headline = '%@.name начал(а) использовать новое устройство'
-z.string.ru.modal_new_device_headline_many = '%@.names начал(а) использовать новое устройство'
+z.string.ru.modal_new_device_headline_many = '%@.names начали использовать новые устройства'
 z.string.ru.modal_new_device_headline_you = '%@.name начал(а) использовать новое устройство'
 z.string.ru.modal_new_device_message = 'Вы всё ещё хотите отправить ваши сообщения?'
 z.string.ru.modal_new_device_show_device = 'показать устройство'
@@ -224,12 +225,9 @@ z.string.ru.conversation_connection_blocked = 'Заблокирован(а)'
 z.string.ru.conversation_connection_cancel_request = 'Отменить запрос'
 z.string.ru.conversation_create = ' начал(а) разговор с %@names'
 z.string.ru.conversation_create_you = ' начал(а) разговор с %@names'
-z.string.ru.conversation_device_started_using = ' начал(а) использовать'
-z.string.ru.conversation_device_started_using_you = ' начал(а) использовать'
 z.string.ru.conversation_device_unverified = ' деверифицировал(а) одно из'
 z.string.ru.conversation_device_your_devices = ' ваши устройства'
 z.string.ru.conversation_device_user_devices = 'Устройства, принадлежащие %@name'
-z.string.ru.conversation_device_a_new_device = ' новое устройство'
 z.string.ru.conversation_just_now = 'Только что'
 z.string.ru.conversation_location_link = 'Открыть карту'
 z.string.ru.conversation_member_join = ' добавил(а) %@names'
@@ -353,7 +351,7 @@ z.string.ru.people_verified = 'Подтверждён'
 
 # Block user
 z.string.ru.people_block_headline = 'Заблокировать?'
-z.string.ru.people_block_message = '%@.first_name больше не сможет найти вас или связаться с вами в Wire.'
+z.string.ru.people_block_message = '%@.first_name больше не сможет связаться с вами или добавить вас в групповые разговоры.'
 
 # Accept a pending connection dialogue
 z.string.ru.people_connect_headline = 'Принять?'
@@ -373,7 +371,7 @@ z.string.ru.people_remove_message = '%@.first_name больше не сможе�
 
 # Unblock user
 z.string.ru.people_unblock_headline = 'Разблокировать?'
-z.string.ru.people_unblock_message = '%@.first_name сможет найти вас и снова связаться с вами в Wire.'
+z.string.ru.people_unblock_message = '%@.first_name вновь сможет связываться с вами и добавлять вас в групповые разговоры.'
 
 # Button labels for the actions
 z.string.ru.people_button_add = 'Добавить участников'
@@ -525,9 +523,14 @@ z.string.ru.warning_tell_me_how = 'Скажите мне, как'
 z.string.ru.warning_connectivity_connection_lost = 'Пытаемся подключиться. У Wire может не получиться доставить сообщения.'
 z.string.ru.warning_connectivity_no_internet = 'Отсутсвует подключение к интернету. Вы не сможете отправлять и получать сообщения.'
 
+# Warnings: Desktop Update
+z.string.ru.warning_lifecycle_update = 'Доступна новая версия Wire.'
+z.string.ru.warning_lifecycle_update_link = 'Обновить сейчас'
+
 # Browser notifications
 z.string.ru.system_notification_asset_add = 'Поделился(-лась) картинкой'
 z.string.ru.system_notification_connection_accepted = 'Принял(а) ваш запрос на добавление'
+z.string.ru.system_notification_connection_connected = 'Теперь в вашем списке контактов'
 z.string.ru.system_notification_connection_request = 'Хочет связаться'
 z.string.ru.system_notification_conversation_create = '%s.first_name начал разговор'
 z.string.ru.system_notification_conversation_rename = '%s.first_name переименовал разговор на %name'

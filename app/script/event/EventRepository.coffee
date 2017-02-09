@@ -38,7 +38,7 @@ class z.event.EventRepository
   @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
   ###
   constructor: (@web_socket_service, @notification_service, @cryptography_repository, @user_repository) ->
-    @logger = Logdown {alignOutput: true, prefix: 'z.event.EventRepository'}
+    @logger = new z.util.Logger 'z.event.EventRepository', z.config.LOGGER.OPTIONS
 
     @current_client = undefined
     @clock_drift = 0
@@ -393,8 +393,6 @@ class z.event.EventRepository
             error_code = z.cryptography.CryptographyErrorType.REMOTE_IDENTITY_CHANGED
             message = "Fingerprints do not match. We expect a different fingerprint from user ID '#{remote_user_id}' with client ID '#{remote_client_id}' (Remote identity changed)."
             @logger.error message, decrypt_error
-          else
-            error_code = z.cryptography.CryptographyErrorType.UNKNOWN
 
           @_report_decrypt_error event, decrypt_error, error_code
           return z.conversation.EventBuilder.build_unable_to_decrypt event, decrypt_error, error_code
@@ -465,6 +463,7 @@ class z.event.EventRepository
 
     if decrypt_error not instanceof Proteus.errors.DecryptError.DuplicateMessage and decrypt_error not instanceof Proteus.errors.DecryptError.TooDistantFuture
       custom_data =
+        cryptobox_version: cryptobox.version
         client_local_class: @current_client().class
         client_local_type: @current_client().type
         error_code: error_code

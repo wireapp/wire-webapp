@@ -66,6 +66,7 @@ z.string.tr.auth_limit_devices_current = '(Mevcut)'
 # Authentication: limit section
 z.string.tr.auth_history_headline = 'Wire’ı bu cihazda ilk kez kullanıyorsunuz.'
 z.string.tr.auth_history_description = 'Gizlilik sebeplerinden ötürü, mesaj geçmişiniz burada gösterilmemektedir.'
+z.string.tr.auth_history_reuse_headline = 'Bu cihazdan daha önce Wire kullanmışsınız.'
 z.string.tr.auth_history_button = 'TAMAM'
 
 # Authentication: POSTED section
@@ -124,7 +125,7 @@ z.string.tr.modal_button_send = 'Gönder'
 
 # Block a user
 z.string.tr.modal_block_conversation_headline = '%@.name engellensin mi?'
-z.string.tr.modal_block_conversation_message = '%@.name sizinle iletişim kuramayacak ve sizi grup görüşmelerine davet edemeyecek.'
+z.string.tr.modal_block_conversation_message = '%@.name sizinle iletişim kuramayacak ve sizi grup konuşmalarına ekleyemeyecek.'
 z.string.tr.modal_block_conversation_button = 'Engelle'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.tr.modal_call_conversation_empty_headline = 'Arayacak kimse yok'
@@ -185,7 +186,7 @@ z.string.tr.modal_logout_message = 'Bu cihazdaki tüm kişisel bilgileriniz ve g
 z.string.tr.modal_logout_button = 'Çıkış yap'
 # New device
 z.string.tr.modal_new_device_headline = '%@.name yeni bir cihaz kullanmaya başladı'
-z.string.tr.modal_new_device_headline_many = '%@.names yeni bir cihaz kullanmaya başladı'
+z.string.tr.modal_new_device_headline_many = '%@.names yeni cihazlar kullanmaya başladılar'
 z.string.tr.modal_new_device_headline_you = '%@.name yeni bir cihaz kullanmaya başladı'
 z.string.tr.modal_new_device_message = 'Hâlâ mesajlarınızı göndermek istiyor musunuz?'
 z.string.tr.modal_new_device_show_device = 'cihazı göster'
@@ -224,12 +225,9 @@ z.string.tr.conversation_connection_blocked = 'Engellendi'
 z.string.tr.conversation_connection_cancel_request = 'Bağlantı isteğini iptal et'
 z.string.tr.conversation_create = ' %@names ile bir konuşma başlattı'
 z.string.tr.conversation_create_you = ' %@names ile bir konuşma başlattın'
-z.string.tr.conversation_device_started_using = ' kullanmaya başladı'
-z.string.tr.conversation_device_started_using_you = ' kullanmaya başladın'
 z.string.tr.conversation_device_unverified = ' doğrulanmamışlardan bir tane'
 z.string.tr.conversation_device_your_devices = ' cihazların'
 z.string.tr.conversation_device_user_devices = ' %@name ’in cihazları'
-z.string.tr.conversation_device_a_new_device = ' yeni bir cihaz'
 z.string.tr.conversation_just_now = 'Şimdi'
 z.string.tr.conversation_location_link = 'Haritayı Aç'
 z.string.tr.conversation_member_join = ' %@names eklendi'
@@ -353,7 +351,7 @@ z.string.tr.people_verified = 'Doğrulanmış'
 
 # Block user
 z.string.tr.people_block_headline = 'Engelle?'
-z.string.tr.people_block_message = '%@.first_name sizi Wire üzerinden bulamayacak ve iletişime geçemeyecek.'
+z.string.tr.people_block_message = '%@.first_name sizinle iletişim kuramayacak ve sizi grup konuşmalarına ekleyemeyecek.'
 
 # Accept a pending connection dialogue
 z.string.tr.people_connect_headline = 'Kabul et?'
@@ -373,7 +371,7 @@ z.string.tr.people_remove_message = '%@.first_name bu konuşmaya mesaj gönderem
 
 # Unblock user
 z.string.tr.people_unblock_headline = 'Engeli kaldır?'
-z.string.tr.people_unblock_message = '%@.first_name artık sizi Wire’da bulup, iletişime geçebilir. Ayrıca kişinin engelliyken gönderdiği mesajları da alacaksınız.'
+z.string.tr.people_unblock_message = '%@.first_name sizinle tekrardan iletişim kurabilecek ve sizi grup konuşmalarına ekleyebilecek.'
 
 # Button labels for the actions
 z.string.tr.people_button_add = 'Kişileri Ekle'
@@ -524,6 +522,10 @@ z.string.tr.warning_tell_me_how = 'Anlat bana'
 # Warnings: Connectivity
 z.string.tr.warning_connectivity_connection_lost = 'Bağlanmaya çalışılıyor. Wire mesajlarınızı teslim etmekte sorun yaşayabilir.'
 z.string.tr.warning_connectivity_no_internet = 'İnternet bağlantısı yok. Mesaj gönderemez veya mesaj alamazsınız.'
+
+# Warnings: Desktop Update
+z.string.tr.warning_lifecycle_update = 'Wire’ın yeni bir versiyonu mevcut.'
+z.string.tr.warning_lifecycle_update_link = 'Şimdi güncelle'
 
 # Browser notifications
 z.string.tr.system_notification_asset_add = 'Bir resim paylaştı'
