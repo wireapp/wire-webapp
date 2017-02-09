@@ -28,4 +28,3 @@ z.cryptography.CryptographyErrorType =
   PRE_KEY_NOT_FOUND: '3337'
   REMOTE_IDENTITY_CHANGED: '3690'
   TOO_DISTANT_FUTURE: '1300'
-  UNKNOWN: '0000'
