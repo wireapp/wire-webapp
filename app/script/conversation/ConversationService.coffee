@@ -282,14 +282,13 @@ class z.conversation.ConversationService
   @return [Promise]
   ###
   search_in_conversation: (conversation_id, query) =>
-    console.time 'db'
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
       .where '[conversation+category]'
       .equals [conversation_id, z.message.MessageCategory.TEXT]
       .sortBy 'time'
-      .then (events) =>
-        console.timeEnd 'db'
-        return events.filter (event) => new RegExp(query.trim().split(' ').join('|'), 'gm').test(event.data.content)
+      .then (events) ->
+        return events.filter (event) ->
+          return new RegExp(query.trim().split(' ').join('|'), 'gm').test(event.data.content)
 
   ###
   Add a bot to an existing conversation.

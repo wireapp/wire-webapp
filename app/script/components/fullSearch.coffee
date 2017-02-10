@@ -37,6 +37,7 @@ class z.components.FullSearchViewModel
           @message_ets message_ets.splice(0, 20) # pagination
     , 100
 
+
 ko.components.register 'full-search',
   viewModel: z.components.FullSearchViewModel
   template: """

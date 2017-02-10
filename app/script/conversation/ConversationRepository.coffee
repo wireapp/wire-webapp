@@ -220,8 +220,8 @@ class z.conversation.ConversationRepository
 
   ###
   Get messages for given category. Category param acts as lower bound
-  @param conversation_id [String]
-  @param category [z.message.MessageCategory.NONE]
+  @param conversation_et [z.entity.Conversation]
+  @param category [z.message.MessageCategory]
   @return [Promise] Array of z.entity.Message entities
   ###
   get_events_for_category: (conversation_et, catogory = z.message.MessageCategory.NONE) =>
@@ -230,34 +230,21 @@ class z.conversation.ConversationRepository
       message_ets = @event_mapper.map_json_events events, conversation_et
       return Promise.all (@_update_user_ets message_et for message_et in message_ets)
 
-  _search_in_conversation: (conversation_et, query) =>
-    if query.length is 0
-      return Promise.resolve []
-
-    console.time 'db'
-    @conversation_service.load_events_with_category_from_db conversation_et.id, z.message.MessageCategory.TEXT
-    .then (events) =>
-      console.timeEnd 'db'
-      return events.filter (event) => new RegExp(query.trim().split(' ').join('|'), 'gm').test(event.data.content)
-    .then (events) =>
-      console.time 'mapping'
-      message_ets = @event_mapper.map_json_events events, conversation_et
-      return Promise.all (@_update_user_ets message_et for message_et in message_ets)
-    .then (message_ets) ->
-      console.timeEnd 'mapping'
-      return message_ets
-
+  ###
+  Search for given text in conversation.
+  @param conversation_id [z.entity.Conversation]
+  @param query [String]
+  @return [Promise] Array of z.entity.Message entities
+  ###
   search_in_conversation: (conversation_et, query) =>
     if query.length is 0
       return Promise.resolve []
 
     @conversation_service.search_in_conversation conversation_et.id, query
     .then (events) =>
-      console.time 'mapping'
       message_ets = @event_mapper.map_json_events events, conversation_et
       return Promise.all (@_update_user_ets message_et for message_et in message_ets)
     .then (message_ets) ->
-      console.timeEnd 'mapping'
       return [message_ets, query]
 
   ###
