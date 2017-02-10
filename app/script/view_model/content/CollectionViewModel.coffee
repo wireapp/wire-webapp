@@ -34,8 +34,7 @@ class z.ViewModel.content.CollectionViewModel
 
     @search_input = ko.observable ''
     @no_items_found = ko.pureComputed =>
-      no_items_found = @images().length + @files().length + @links().length + @audio().length is 0
-      return no_items_found and not @search_input().length
+      return @images().length + @files().length + @links().length + @audio().length is 0
 
   added_to_view: =>
     amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.ADDED, @item_added

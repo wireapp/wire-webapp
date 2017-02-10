@@ -288,7 +288,8 @@ class z.conversation.ConversationService
       .sortBy 'time'
       .then (events) ->
         return events.filter (event) ->
-          return new RegExp(query.trim().split(' ').join('|'), 'gm').test(event.data.content)
+          regex = query.trim().split(' ').map((word) -> "(#{word}\\w+)").join '|'
+          return new RegExp(regex, 'gmi').test(event.data.content)
 
   ###
   Add a bot to an existing conversation.

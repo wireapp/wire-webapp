@@ -40,6 +40,12 @@ class z.components.FullSearchViewModel
           @message_ets message_ets.splice(0, 20) # pagination
     , 100
 
+    @transform_text = (message_et) =>
+      query = @input()
+      text = message_et.get_first_asset().text
+      query.trim().split(' ').forEach (word) -> text = text.replace(word, "<mark>#{word}</mark>")
+      return text
+
 
 ko.components.register 'full-search',
   viewModel: z.components.FullSearchViewModel
@@ -56,7 +62,7 @@ ko.components.register 'full-search',
                   <user-avatar class="user-avatar-xs" params="user: user()"></user-avatar>
                 </div>
                 <div class="full-search-item-content">
-                  <div class="full-search-item-content-text" data-bind="text: get_first_asset().text"></div>
+                  <div class="full-search-item-content-text" data-bind="html: $parent.transform_text($data)"></div>
                   <div class="full-search-item-content-info">
                     <span class="font-weight-bold" data-bind="text: user().first_name()"></span>
                     <span data-bind="text: moment($data.timestamp).format('MMMM D, YYYY')"></span>
