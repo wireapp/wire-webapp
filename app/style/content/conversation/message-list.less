@@ -179,6 +179,16 @@
   }
 }
 
+// Smaller message font size on smaller screens
+@media screen and (max-width: @screen-lg-min) {
+  .message-body {
+    .text {
+      font-size: @font-size-xs;
+      line-height: @line-height-sm;
+    }
+  }
+}
+
 .message-body-like {
   .flex-center;
   position: absolute;
@@ -190,7 +200,7 @@
 .message-asset-image {
   margin-top: 16px;
   margin-bottom: 24px;
-	max-width: 320px;
+  max-width: 320px;
 
   .image {
     display: inline-block;
@@ -319,7 +329,7 @@
   .message-status {
     .action-pill-style;
     color: fade(#000, 40%);
-    font-size: @font-size-xs;
+    font-size: @font-size-xxs;
     padding-left: 6px;
     padding-right: 6px;
     pointer-events: none;
@@ -440,7 +450,7 @@
 // MESSAGE SPACING
 .message-asset {
   margin-top: 16px;
-	max-width: 320px;
+  max-width: 320px;
 }
 
 .message-call,
