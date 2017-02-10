@@ -43,7 +43,7 @@ describe 'z.calling.CallingRepository', ->
 
     it 'returns the expected protocol version if backend switch is not set', ->
       calling_repository.use_v3_api = undefined
-      expect(calling_repository.outgoing_protocol_version conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
+      expect(calling_repository.outgoing_protocol_version conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_3
       expect(calling_repository.outgoing_protocol_version group_conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
 
       calling_repository.use_v3_api = true

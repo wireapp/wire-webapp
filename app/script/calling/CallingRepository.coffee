@@ -107,7 +107,9 @@ class z.calling.CallingRepository
   outgoing_protocol_version: (conversation_id) =>
     conversation_et = @conversation_repository.get_conversation_by_id conversation_id
     @logger.log "Select outgoing protocol version - 1to1 conversation: #{conversation_et?.is_one2one()}, backend protocol: #{@protocol_version_1to1()}, use_v3_api: #{@use_v3_api}"
-    if @use_v3_api isnt false and not conversation_et?.is_group()
+    if @use_v3_api is true and not conversation_et?.is_group()
+      return z.calling.enum.PROTOCOL.VERSION_3
+    if @use_v3_api isnt false and not conversation_et?.is_group() and @protocol_version_1to1() isnt z.calling.enum.PROTOCOL.VERSION_2
       return z.calling.enum.PROTOCOL.VERSION_3
     return z.calling.enum.PROTOCOL.VERSION_2
 
