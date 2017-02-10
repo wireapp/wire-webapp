@@ -14,6 +14,8 @@
     <div class="content-list-wrapper">
       <div class="content-list collection-list" data-bind="antiscroll: true">
 
+        <full-search params="search_provider: search_in_conversation"></full-search>
+
         <!-- ko ifnot: no_items_found() -->
           <!-- ko if: images().length -->
             <section class="collection-section" data-uie-name="collection-section-image" data-bind="attr: {'data-uie-collection-size': images().length}">

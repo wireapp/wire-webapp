@@ -276,6 +276,22 @@ class z.conversation.ConversationService
     .sortBy 'time'
 
   ###
+  Get events with given category.
+  @param conversation_id [String] ID of conversation to add users to
+  @param category [z.message.MessageCategory] will be used as lower bound
+  @return [Promise]
+  ###
+  search_in_conversation: (conversation_id, query) =>
+    console.time 'db'
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+      .where '[conversation+category]'
+      .equals [conversation_id, z.message.MessageCategory.TEXT]
+      .sortBy 'time'
+      .then (events) =>
+        console.timeEnd 'db'
+        return events.filter (event) => new RegExp(query.trim().split(' ').join('|'), 'gm').test(event.data.content)
+
+  ###
   Add a bot to an existing conversation.
 
   @param conversation_id [String] ID of conversation to add users to

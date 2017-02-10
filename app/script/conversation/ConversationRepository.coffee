@@ -230,6 +230,36 @@ class z.conversation.ConversationRepository
       message_ets = @event_mapper.map_json_events events, conversation_et
       return Promise.all (@_update_user_ets message_et for message_et in message_ets)
 
+  _search_in_conversation: (conversation_et, query) =>
+    if query.length is 0
+      return Promise.resolve []
+
+    console.time 'db'
+    @conversation_service.load_events_with_category_from_db conversation_et.id, z.message.MessageCategory.TEXT
+    .then (events) =>
+      console.timeEnd 'db'
+      return events.filter (event) => new RegExp(query.trim().split(' ').join('|'), 'gm').test(event.data.content)
+    .then (events) =>
+      console.time 'mapping'
+      message_ets = @event_mapper.map_json_events events, conversation_et
+      return Promise.all (@_update_user_ets message_et for message_et in message_ets)
+    .then (message_ets) ->
+      console.timeEnd 'mapping'
+      return message_ets
+
+  search_in_conversation: (conversation_et, query) =>
+    if query.length is 0
+      return Promise.resolve []
+
+    @conversation_service.search_in_conversation conversation_et.id, query
+    .then (events) =>
+      console.time 'mapping'
+      message_ets = @event_mapper.map_json_events events, conversation_et
+      return Promise.all (@_update_user_ets message_et for message_et in message_ets)
+    .then (message_ets) ->
+      console.timeEnd 'mapping'
+      return [message_ets, query]
+
   ###
   Get conversation unread events.
   @param conversation_et [z.entity.Conversation] Conversation to start from

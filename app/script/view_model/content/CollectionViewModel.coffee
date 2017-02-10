@@ -40,6 +40,9 @@ class z.ViewModel.content.CollectionViewModel
     $(document).on 'keydown.collection', (event) =>
       amplify.publish z.event.WebApp.CONVERSATION.SHOW, @conversation_et() if event.keyCode is z.util.KEYCODE.ESC
 
+  search_in_conversation: (query) =>
+    @conversation_repository.search_in_conversation @conversation_et(), query
+
   item_added: (message_et) =>
     return unless @conversation_et().id is message_et.conversation_id
     @_populate_items [message_et]
