@@ -31,7 +31,6 @@
 .messages {
   transform: translateZ(0);
   height: 100%;
-  max-width: @conversation-max-width;
 }
 
 // MESSAGE
@@ -153,7 +152,6 @@
     .text-selection();
     .accent-selection-color();
     display: inline-block;
-    width: 100%;
     line-height: @line-height-lg;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -192,11 +190,11 @@
 .message-asset-image {
   margin-top: 16px;
   margin-bottom: 24px;
+	max-width: 320px;
 
   .image {
     display: inline-block;
     position: relative;
-    max-width: 100%;
   }
 
   .image-loading {
@@ -442,6 +440,7 @@
 // MESSAGE SPACING
 .message-asset {
   margin-top: 16px;
+	max-width: 320px;
 }
 
 .message-call,
