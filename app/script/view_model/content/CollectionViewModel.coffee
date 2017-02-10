@@ -32,7 +32,10 @@ class z.ViewModel.content.CollectionViewModel
     @images = ko.observableArray().extend 'rateLimit': 1
     @links = ko.observableArray().extend 'rateLimit': 1
 
-    @no_items_found = ko.observable false
+    @search_input = ko.observable ''
+    @no_items_found = ko.pureComputed =>
+      no_items_found = @images().length + @files().length + @links().length + @audio().length is 0
+      return no_items_found and not @search_input().length
 
   added_to_view: =>
     amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.ADDED, @item_added
@@ -43,21 +46,21 @@ class z.ViewModel.content.CollectionViewModel
   search_in_conversation: (query) =>
     @conversation_repository.search_in_conversation @conversation_et(), query
 
+  on_input_change: (input) =>
+    @search_input input or ''
+
   item_added: (message_et) =>
     return unless @conversation_et().id is message_et.conversation_id
     @_populate_items [message_et]
-    @_check_items()
 
   item_removed: (removed_message_id) =>
     _remove_item = (message_et) -> message_et.id is removed_message_id
     [@images, @files, @links, @audio].forEach (array) -> array.remove _remove_item
-    @_check_items()
 
   removed_from_view: =>
     amplify.unsubscribe z.event.WebApp.CONVERSATION.MESSAGE.ADDED, @item_added
     amplify.unsubscribe z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, @item_removed
     $(document).off 'keydown.collection'
-    @no_items_found false
     @conversation_et null
     [@images, @files, @links, @audio].forEach (array) -> array.removeAll()
 
@@ -66,11 +69,8 @@ class z.ViewModel.content.CollectionViewModel
     @conversation_repository.get_events_for_category conversation_et, z.message.MessageCategory.LINK_PREVIEW
     .then (message_ets) =>
       @_populate_items message_ets
-      @_check_items()
       @_track_opened_collection conversation_et, @no_items_found()
 
-  _check_items: ->
-    @no_items_found @images().length + @files().length + @links().length + @audio().length is 0
 
   _populate_items: (message_ets) ->
     for message_et in message_ets

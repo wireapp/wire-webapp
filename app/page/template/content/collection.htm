@@ -14,7 +14,7 @@
     <div class="content-list-wrapper">
       <div class="content-list collection-list" data-bind="antiscroll: true">
 
-        <full-search params="search_provider: search_in_conversation"></full-search>
+        <full-search params="search_provider: search_in_conversation, change: on_input_change"></full-search>
 
         <!-- ko ifnot: no_items_found() -->
           <!-- ko if: images().length -->

@@ -24,11 +24,14 @@ class z.components.FullSearchViewModel
   constructor: (params) ->
 
     @search_provider = params.search_provider
+    @on_change = params.change
 
     @message_ets = ko.observableArray()
 
     @input = ko.observable()
     @input.subscribe _.debounce (query) =>
+      @on_change query
+
       if query.length < 2
         return @message_ets []
 
