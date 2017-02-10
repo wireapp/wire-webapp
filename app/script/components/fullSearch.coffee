@@ -40,7 +40,7 @@ class z.components.FullSearchViewModel
 ko.components.register 'full-search',
   viewModel: z.components.FullSearchViewModel
   template: """
-            <header>
+            <header class="full-search-header">
               <span class="full-search-header-icon icon-search"></span>
               <div class="full-search-header-input">
                 <input type="text" data-bind="textInput: input"/>
@@ -52,10 +52,10 @@ ko.components.register 'full-search',
                   <user-avatar class="user-avatar-xs" params="user: user()"></user-avatar>
                 </div>
                 <div class="full-search-item-content">
-                  <div class="full-search-list-content-text" data-bind="text: get_first_asset().text"></div>
-                  <div class="full-search-list-content-info">
+                  <div class="full-search-item-content-text" data-bind="text: get_first_asset().text"></div>
+                  <div class="full-search-item-content-info">
                     <span class="font-weight-bold" data-bind="text: user().first_name()"></span>
-                    <span data-bind="text: moment($data.timestamp).format('D.M H:mm')"></span>
+                    <span data-bind="text: moment($data.timestamp).format('MMMM D, YYYY')"></span>
                   </div>
                 </div>
               </div>
