@@ -22,29 +22,38 @@ z.components ?= {}
 class z.components.FullSearchViewModel
 
   constructor: (params) ->
-
     @search_provider = params.search_provider
     @on_change = params.change
 
-    @message_ets = ko.observableArray()
+    @message_ets = []
+    @message_ets_rendered = ko.observableArray()
+    @number_of_message_to_render = 30
 
     @input = ko.observable()
     @input.subscribe _.debounce (query) =>
       @on_change query
 
       if query.length < 2
-        return @message_ets []
+        @message_ets = []
+        @message_ets_rendered []
+        return
 
       @search_provider(query).then ([message_ets, query]) =>
         if query is @input()
-          @message_ets message_ets.splice(0, 20) # pagination
+          @message_ets = message_ets
+          @message_ets_rendered @message_ets.splice(0, @number_of_message_to_render)
     , 100
 
     @transform_text = (message_et) =>
-      query = @input()
       text = message_et.get_first_asset().text
-      query.trim().split(' ').forEach (word) -> text = text.replace(word, "<mark>#{word}</mark>")
+      tokens = z.search.FullTextSearch.tokenize @input()
+      tokens.forEach (word) -> text = text.replace(new RegExp("#{word}", "gmi"), "<mark class='full-search-marked'>#{word}</mark>")
       return text
+
+    # binding?
+    $('.collection-list').on 'scroll', (event) =>
+      if $(event.currentTarget).is_scrolled_bottom() and @message_ets.length > 0
+        z.util.ko_array_push_all @message_ets_rendered, @message_ets.splice(0, @number_of_message_to_render)
 
 
 ko.components.register 'full-search',
@@ -56,7 +65,7 @@ ko.components.register 'full-search',
                 <input type="text" data-bind="textInput: input"/>
               </div>
             </header>
-            <div class="full-search-list" data-bind="foreach: {data: message_ets}">
+            <div class="full-search-list" data-bind="foreach: {data: message_ets_rendered}">
               <div class="full-search-item">
                 <div class="full-search-item-avatar">
                   <user-avatar class="user-avatar-xs" params="user: user()"></user-avatar>
