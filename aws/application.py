@@ -152,7 +152,7 @@ def error_handler(e):
     e.code = 500
     e.name = 'Internal Server Error'
 
-  if e.code not in [406]:
+  if e.code not in [404, 406]:
     handler = logging.StreamHandler()
     application.logger.addHandler(handler)
     application.logger.error('-=' * 40)
