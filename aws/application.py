@@ -154,9 +154,9 @@ def error_handler(e):
 
   handler = logging.StreamHandler()
   application.logger.addHandler(handler)
-  application.logger.error('Agent: %s\n IP: %s\n' % (
+  application.logger.error('IP: %s (agent: %s)' % (
+    flask.request.remote_addr,
     flask.request.headers['User-Agent'],
-    flask.request.url,
   ))
   application.logger.exception(e)
 
