@@ -152,13 +152,13 @@ def error_handler(e):
     e.code = 500
     e.name = 'Internal Server Error'
 
-  if e.code not in [404, 406]:
-    handler = logging.StreamHandler()
-    application.logger.addHandler(handler)
-    application.logger.error('-=' * 40)
-    application.logger.error(flask.request.url)
-    application.logger.error('-=' * 40)
-    application.logger.exception(e)
+  handler = logging.StreamHandler()
+  application.logger.addHandler(handler)
+  application.logger.error('Agent: %s\n IP: %s\n' % (
+    flask.request.headers['User-Agent'],
+    flask.request.url,
+  ))
+  application.logger.exception(e)
 
   if e.code == 406:
     return flask.redirect('https://wire.com/unsupported/')
