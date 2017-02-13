@@ -220,8 +220,8 @@ class z.conversation.ConversationRepository
 
   ###
   Get messages for given category. Category param acts as lower bound
-  @param conversation_id [String]
-  @param category [z.message.MessageCategory.NONE]
+  @param conversation_et [z.entity.Conversation]
+  @param category [z.message.MessageCategory]
   @return [Promise] Array of z.entity.Message entities
   ###
   get_events_for_category: (conversation_et, catogory = z.message.MessageCategory.NONE) =>
@@ -229,6 +229,23 @@ class z.conversation.ConversationRepository
     .then (events) =>
       message_ets = @event_mapper.map_json_events events, conversation_et
       return Promise.all (@_update_user_ets message_et for message_et in message_ets)
+
+  ###
+  Search for given text in conversation.
+  @param conversation_id [z.entity.Conversation]
+  @param query [String]
+  @return [Promise] Array of z.entity.Message entities
+  ###
+  search_in_conversation: (conversation_et, query) =>
+    if query.length is 0
+      return Promise.resolve []
+
+    @conversation_service.search_in_conversation conversation_et.id, query
+    .then (events) =>
+      message_ets = @event_mapper.map_json_events events, conversation_et
+      return Promise.all (@_update_user_ets message_et for message_et in message_ets)
+    .then (message_ets) ->
+      return [message_ets, query]
 
   ###
   Get conversation unread events.
