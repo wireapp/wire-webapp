@@ -42,8 +42,9 @@ class z.audio.AudioRepository
   close_audio_context: =>
     if @audio_context
       @audio_context.close()
-      @audio_context = undefined
-      @logger.info 'Closed existing AudioContext'
+      .then =>
+        @audio_context = undefined
+        @logger.info 'Closed existing AudioContext'
 
   # Initialize the AudioContext.
   get_audio_context: =>
