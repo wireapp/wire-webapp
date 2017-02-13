@@ -200,6 +200,18 @@ class z.storage.StorageService
           if client.meta.primary_key is primary_key_local_client and client.primary_key isnt primary_key_local_client
             transaction[@OBJECT_STORE_CLIENTS].delete cursor.primaryKey
             transaction[@OBJECT_STORE_CLIENTS].put client, primary_key_local_client
+      @db.version(12).stores version_11
+        .upgrade (transaction) =>
+          @logger.warn 'Database upgrade to version 12', transaction
+          transaction[@OBJECT_STORE_KEYS].toCollection().modify (record) ->
+            typed_array = z.util.base64_to_array record.serialised
+            record.serialised = typed_array.buffer
+          transaction[@OBJECT_STORE_PREKEYS].toCollection().modify (record) ->
+            typed_array = z.util.base64_to_array record.serialised
+            record.serialised = typed_array.buffer
+          transaction[@OBJECT_STORE_SESSIONS].toCollection().modify (record) ->
+            typed_array = z.util.base64_to_array record.serialised
+            record.serialised = typed_array.buffer
 
       @db.open()
       .then =>

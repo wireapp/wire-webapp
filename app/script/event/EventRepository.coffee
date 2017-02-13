@@ -38,7 +38,7 @@ class z.event.EventRepository
   @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
   ###
   constructor: (@web_socket_service, @notification_service, @cryptography_repository, @user_repository) ->
-    @logger = Logdown {alignOutput: true, prefix: 'z.event.EventRepository'}
+    @logger = new z.util.Logger 'z.event.EventRepository', z.config.LOGGER.OPTIONS
 
     @current_client = undefined
     @clock_drift = 0
@@ -383,6 +383,9 @@ class z.event.EventRepository
           if decrypt_error instanceof Proteus.errors.DecryptError.DuplicateMessage or decrypt_error instanceof Proteus.errors.DecryptError.OutdatedMessage
             # We don't need to show duplicate message errors to the user
             throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+          else if decrypt_error instanceof z.cryptography.CryptographyError
+            if decrypt_error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
+              throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
           else if decrypt_error instanceof Proteus.errors.DecryptError.InvalidMessage or decrypt_error instanceof Proteus.errors.DecryptError.InvalidSignature
             # Session is broken, let's see what's really causing it...
             error_code = z.cryptography.CryptographyErrorType.INVALID_SIGNATURE
