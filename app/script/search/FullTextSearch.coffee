@@ -24,7 +24,7 @@ z.search.FullTextSearch = do ->
   DELIMITER = ' '
 
   search: (text, query) ->
-    regex = query.trim().split(DELIMITER).map((word) -> "(#{word}\\w*)").join '|'
+    regex = query.trim().split(DELIMITER).map((word) -> "(\\b#{word})").join '|'
     return new RegExp(regex, 'gmi').test(text)
 
   tokenize: (text) ->
