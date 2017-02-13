@@ -57,7 +57,6 @@ def auth():
   return response
 
 
-
 @application.route('/robots.txt')
 def robots_txt():
   response = flask.make_response(flask.render_template('robots.txt'))
@@ -155,9 +154,10 @@ def error_handler(e):
 
   handler = logging.StreamHandler()
   application.logger.addHandler(handler)
-  application.logger.error('-=' * 40)
-  application.logger.error(flask.request.url)
-  application.logger.error('-=' * 40)
+  application.logger.error('IP: %s (agent: %s)' % (
+    flask.request.remote_addr,
+    flask.request.headers['User-Agent'],
+  ))
   application.logger.exception(e)
 
   if e.code == 406:
