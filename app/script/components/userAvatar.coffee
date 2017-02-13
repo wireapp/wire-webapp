@@ -90,7 +90,7 @@ ko.components.register 'user-avatar',
     createViewModel: (params, component_info) ->
       return new z.components.UserAvatar params, component_info
   template: """
-            <div class="user-avatar" data-bind="attr: {title: user.name}, css: css_classes(), click: on_click, in_viewport: on_in_viewport, delay: delay">
+            <div class="user-avatar" data-uie-name="user-avatar" data-bind="attr: {title: user.name}, css: css_classes(), click: on_click, in_viewport: on_in_viewport, delay: delay">
               <div class="user-avatar-background"></div>
               <div class="user-avatar-initials" data-bind="text: initials"></div>
               <div class="user-avatar-image"></div>
