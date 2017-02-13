@@ -46,7 +46,7 @@ class z.components.FullSearchViewModel
 
     @transform_text = (message_et) =>
       tokens = z.search.FullTextSearch.tokenize @input()
-      text = message_et.get_first_asset().text
+      text = _.escape message_et.get_first_asset().text
       return text.replace new RegExp(tokens.join '|', "gmi"), (match) -> "<mark class='full-search-marked'>#{match}</mark>"
 
     # binding?

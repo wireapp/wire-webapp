@@ -276,9 +276,9 @@ class z.conversation.ConversationService
     .sortBy 'time'
 
   ###
-  Get events with given category.
+  Search for text in given conversation.
   @param conversation_id [String] ID of conversation to add users to
-  @param category [z.message.MessageCategory] will be used as lower bound
+  @param query [String] will be checked in agains all text messages
   @return [Promise]
   ###
   search_in_conversation: (conversation_id, query) =>
