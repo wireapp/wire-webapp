@@ -55,6 +55,9 @@ class z.components.FullSearchViewModel
       if $(event.currentTarget).is_scrolled_bottom() and @message_ets.length > 0
         z.util.ko_array_push_all @message_ets_rendered, @message_ets.splice(0, @number_of_message_to_render)
 
+  dispose: =>
+    $('.collection-list').off 'scroll'
+
 
 ko.components.register 'full-search',
   viewModel: z.components.FullSearchViewModel
