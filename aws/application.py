@@ -164,11 +164,11 @@ def error_handler(e):
     return flask.redirect('https://wire.com/unsupported/')
 
   return flask.render_template(
-    'aws/error.html',
-    title='Error %d (%s)!!1' % (e.code, e.name),
-    error=e,
-    timestamp=datetime.utcnow(),
-  ), e.code
+      'aws/error.html',
+      title='Error %d (%s)!!1' % (e.code, e.name),
+      error=e,
+      timestamp=datetime.utcnow(),
+    ), e.code
 
 
 ###############################################################################
