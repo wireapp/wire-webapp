@@ -57,7 +57,6 @@ def auth():
   return response
 
 
-
 @application.route('/robots.txt')
 def robots_txt():
   response = flask.make_response(flask.render_template('robots.txt'))
@@ -153,22 +152,23 @@ def error_handler(e):
     e.code = 500
     e.name = 'Internal Server Error'
 
-  handler = logging.StreamHandler()
-  application.logger.addHandler(handler)
-  application.logger.error('-=' * 40)
-  application.logger.error(flask.request.url)
-  application.logger.error('-=' * 40)
-  application.logger.exception(e)
+  if e.code not in [406]:
+    handler = logging.StreamHandler()
+    application.logger.addHandler(handler)
+    application.logger.error('-=' * 40)
+    application.logger.error(flask.request.url)
+    application.logger.error('-=' * 40)
+    application.logger.exception(e)
 
   if e.code == 406:
     return flask.redirect('https://wire.com/unsupported/')
 
   return flask.render_template(
-      'aws/error.html',
-      title='Error %d (%s)!!1' % (e.code, e.name),
-      error=e,
-      timestamp=datetime.utcnow(),
-    ), e.code
+    'aws/error.html',
+    title='Error %d (%s)!!1' % (e.code, e.name),
+    error=e,
+    timestamp=datetime.utcnow(),
+  ), e.code
 
 
 ###############################################################################
