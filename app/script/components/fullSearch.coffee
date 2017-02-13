@@ -59,7 +59,7 @@ class z.components.FullSearchViewModel
     $('.collection-list').off 'scroll'
 
 
-ko.components.register 'Fifull-search',
+ko.components.register 'full-search',
   viewModel: z.components.FullSearchViewModel
   template: """
             <header class="full-search-header">
