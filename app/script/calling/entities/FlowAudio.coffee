@@ -58,15 +58,13 @@ class z.calling.entities.FlowAudio
       @pan_node.pan.value = panning_value
 
   wrap_microphone_stream: (media_stream) =>
-    if @audio_context?.state isnt 'closed'
+    if @audio_context
       @audio_source = @audio_context.createMediaStreamSource media_stream
       @gain_node = @audio_context.createGain()
       @audio_remote = @audio_context.createMediaStreamDestination()
       @_hookup_audio()
       $.extend true, media_stream, @audio_remote.stream
       @logger.info 'Wrapped audio stream from microphone', media_stream
-    else
-      @logger.warn 'AudioContext isn\'t available or has been already closed.', @audio_context
     return media_stream
 
   wrap_speaker_stream: (media_stream) =>
