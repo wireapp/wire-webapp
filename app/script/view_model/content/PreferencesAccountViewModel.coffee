@@ -42,7 +42,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
     @_init_subscriptions()
 
   _init_subscriptions: =>
-    amplify.subscribe z.event.WebApp.CLIENT.ADD, @on_client_add
+    amplify.subscribe z.event.WebApp.CLIENT.NEW_OWN_CLIENT, @on_client_add
     amplify.subscribe z.event.WebApp.CLIENT.REMOVE, @on_client_remove
     amplify.subscribe z.event.WebApp.PREFERENCES.UPLOAD_PICTURE, @set_picture
 
@@ -193,7 +193,6 @@ class z.ViewModel.content.PreferencesAccountViewModel
     , 200
 
   on_client_add: (user_id, client_et) =>
-    return true if user_id isnt @self_user().id
     amplify.publish z.event.WebApp.SEARCH.BADGE.SHOW
     @new_clients.push client_et
 

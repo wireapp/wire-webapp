@@ -118,11 +118,13 @@ class z.entity.User
 
   add_client: (new_client_et) =>
     for client_et in @devices() when client_et.id is new_client_et.id
-      return
+      return false
 
     @devices.push new_client_et
     if @is_me
-      @devices.sort (client_a, client_b) -> return new Date(client_b.time) - new Date(client_a.time)
+      @devices.sort (client_a, client_b) -> new Date(client_b.time) - new Date(client_a.time)
+
+    return true
 
   remove_client: (client_id) =>
     @devices.remove (client_et) -> client_et.id is client_id
