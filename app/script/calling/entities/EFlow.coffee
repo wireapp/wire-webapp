@@ -581,7 +581,7 @@ class z.calling.entities.EFlow
         media_stream = @audio.wrap_microphone_stream media_stream
       catch error
         @audio.audio_context = @e_call_et.audio_repository.get_audio_context()
-        @audio.wrap_microphone_stream media_stream
+        media_stream = @audio.wrap_microphone_stream media_stream
 
     if @peer_connection.addTrack
       for media_stream_track in media_stream.getTracks()
