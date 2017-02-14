@@ -45,9 +45,9 @@ class z.components.FullSearchViewModel
     , 100
 
     @transform_text = (message_et) =>
-      tokens = z.search.FullTextSearch.tokenize @input()
+      search_regex = z.search.FullTextSearch.get_search_regex @input()
       text = _.escape message_et.get_first_asset().text
-      return text.replace new RegExp(tokens.join '|', "gmi"), (match) -> "<mark class='full-search-marked'>#{match}</mark>"
+      return text.replace search_regex, (match) -> "<mark class='full-search-marked'>#{match}</mark>"
 
     # binding?
     $('.collection-list').on 'scroll', (event) =>

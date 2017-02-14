@@ -16,7 +16,7 @@
 
         <full-search params="search_provider: search_in_conversation, change: on_input_change"></full-search>
 
-        <!-- ko if: !no_items_found() && search_input().length === 0 -->
+        <!-- ko if: search_input().length === 0 -->
           <!-- ko if: images().length -->
             <section class="collection-section" data-uie-name="collection-section-image" data-bind="attr: {'data-uie-collection-size': images().length}">
               <header>
@@ -84,13 +84,6 @@
               </div>
             </section>
           <!-- /ko -->
-        <!-- /ko -->
-
-        <!-- ko if: no_items_found() -->
-          <div class="absolute-center" data-uie-name="collection-no-items">
-            <div class="collection-no-items-icon icon-collection"></div>
-            <div class="label-bold-xs text-graphite text-center">No items</div>
-          </div>
         <!-- /ko -->
 
       </div>
