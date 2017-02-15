@@ -68,6 +68,7 @@ class z.ViewModel.content.CollectionViewModel
     @conversation_repository.get_events_for_category conversation_et, z.message.MessageCategory.LINK_PREVIEW
     .then (message_ets) =>
       @_populate_items message_ets
+    .then () =>
       @_track_opened_collection conversation_et, @no_items_found()
 
 
