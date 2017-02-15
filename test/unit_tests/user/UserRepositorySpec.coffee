@@ -137,7 +137,7 @@ describe 'z.user.UserRepository', ->
 
           is_new_client = user_repository.add_client_to_user user_et.id, second_client
           expect(is_new_client).toBe false
-          
+
           expect(user_et.devices().length).toBe 2
 
     describe 'fetch_user_by_id', ->

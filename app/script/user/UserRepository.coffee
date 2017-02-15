@@ -317,7 +317,7 @@ class z.user.UserRepository
         is_new_client = user_et.add_client client_et
         if is_new_client
           @client_repository.save_client_in_db user_id, client_et.to_json()
-          .then =>
+          .then ->
             amplify.publish z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et
             amplify.publish z.event.WebApp.CLIENT.NEW_OWN_CLIENT, user_id, client_et if user.is_me
             resolve()
