@@ -303,18 +303,26 @@ class z.user.UserRepository
   ###############################################################################
 
   ###
-  Adds a new client to the database and the user.
+  Saves a new client for the first time to the database and adds it to a user's entity.
 
   @param user_id [String] ID of user
   @param client_id [String] ID of client to be deleted
   @return [Promise] Promise that resolves when a client and its session have been deleted
   ###
   add_client_to_user: (user_id, client_et) =>
-    @client_repository.save_client_in_db user_id, client_et.to_json()
-    .then =>
-      @get_user_by_id user_id, (user_et) ->
-        user_et.add_client client_et
-        amplify.publish z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et
+    user = undefined
+    return new Promise (resolve) =>
+      @get_user_by_id user_id, (user_et) =>
+        user = user_et
+        is_new_client = user_et.add_client client_et
+        if is_new_client
+          @client_repository.save_client_in_db user_id, client_et.to_json()
+          .then ->
+            amplify.publish z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et
+            amplify.publish z.event.WebApp.CLIENT.ADD_OWN_CLIENT, user_id, client_et if user.is_me
+            resolve()
+        else
+          resolve()
 
   ###
   Removes a stored client and the session connected with it.
