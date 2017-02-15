@@ -364,7 +364,7 @@ class z.calling.v3.CallCenter
       e_call_et = e_call
       @logger.debug "Joining e-call in conversation '#{conversation_id}'", e_call_et
       e_call_et.start_timings()
-      unless @media_stream_handler.has_media_streams()
+      if not @media_stream_handler.has_media_streams()
         @media_stream_handler.initiate_media_stream conversation_id, video_send
     .then =>
       e_call_et.timings.time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED
