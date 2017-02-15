@@ -549,6 +549,7 @@ class z.client.ClientRepository
 
           # Locally unknown client new on backend
           @logger.info "New client '#{client_id}' of user '#{user_id}' will be stored locally"
+          @on_client_add {client: client_payload} if @self_user().id is user_id
           promises.push @_update_client_schema_in_db user_id, client_payload
 
         return Promise.all promises
