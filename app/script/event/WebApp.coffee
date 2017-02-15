@@ -57,6 +57,7 @@ z.event.WebApp =
       SEND_LOCAL_SDP_INFO: 'wire.webapp.call.signaling.send-local-sdp-info'
   CLIENT:
     ADD: 'wire.webapp.user.client.add'
+    ADD_OWN_CLIENT: 'wire.webapp.user.client.new-own-client'
     REMOVE: 'wire.webapp.client.remove'
     UPDATE: 'wire.webapp.client.update'
     VERIFICATION_STATE_CHANGED: 'wire.webapp.client.verification-state-changed'
