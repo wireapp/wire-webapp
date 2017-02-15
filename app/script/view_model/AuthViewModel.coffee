@@ -53,14 +53,14 @@ class z.ViewModel.AuthViewModel
     @storage_service = new z.storage.StorageService()
     @storage_repository = new z.storage.StorageRepository @storage_service
 
-    @user_mapper = new z.user.UserMapper @asset_service
-    user_service = new z.user.UserService @auth.client
-    @user_repository = new z.user.UserRepository user_service, @asset_service
-
     @cryptography_service = new z.cryptography.CryptographyRepository @auth.client
     @cryptography_repository = new z.cryptography.CryptographyRepository @cryptography_service, @storage_repository
     @client_service = new z.client.ClientService @auth.client, @storage_service
     @client_repository = new z.client.ClientRepository @client_service, @cryptography_repository
+
+    @user_mapper = new z.user.UserMapper @asset_service
+    user_service = new z.user.UserService @auth.client
+    @user_repository = new z.user.UserRepository user_service, @asset_service, undefined, @client_repository
 
     @notification_service = new z.event.NotificationService @auth.client, @storage_service
     @web_socket_service = new z.event.WebSocketService @auth.client
