@@ -243,7 +243,6 @@ class z.conversation.ConversationService
   @param upper_bound [Date] Load until this date (excluded)
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
-  @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
   load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = Number.MAX_SAFE_INTEGER) ->
     if not _.isDate(lower_bound) or not _.isDate upper_bound
@@ -261,8 +260,18 @@ class z.conversation.ConversationService
       @logger.error "Failed to load events for conversation '#{conversation_id}' from database: '#{error.message}'"
       throw error
 
-  # TODO naming, comine with load_events_from_db, no compound?
+  ###
+  Load conversation events starting from the upper bound to the present until the limit is reached
+
+  @param conversation_id [String] ID of conversation
+  @param upper_bound [Date] Load until this date (excluded)
+  @param limit [Number] Amount of events to load
+  @return [Promise] Promise that resolves with the retrieved records
+  ###
   load_events_with_offset_from_db: (conversation_id, upper_bound, limit = Number.MAX_SAFE_INTEGER) =>
+    if not _.isDate upper_bound
+      throw new Error "Upper bound (#{typeof upper_bound}) must be of type 'Date'."
+
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
     .between [conversation_id, upper_bound.toISOString()], [conversation_id, new Date().toISOString()], false, false
