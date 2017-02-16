@@ -235,7 +235,8 @@ class z.conversation.ConversationService
       throw error
 
   ###
-  Load conversation events starting from the upper bound going back in history to the lower bound.
+  Load conversation events starting from the upper bound going back in history
+  until either limit or lower bound is reached.
 
   @param conversation_id [String] ID of conversation
   @param lower_bound [Date] Load from this date (included)
