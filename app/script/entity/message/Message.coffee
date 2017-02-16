@@ -77,6 +77,9 @@ class z.entity.Message
     @accent_color = ko.pureComputed =>
       return "accent-color-#{@user().accent_id()}"
 
+  equals: (message_et) =>
+    @id is message_et?.id
+
   ###
   Check if message contains an asset of type file.
   @return [Boolean] Message contains any file type asset

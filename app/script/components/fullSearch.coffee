@@ -24,6 +24,7 @@ class z.components.FullSearchViewModel
   constructor: (params) ->
     @search_provider = params.search_provider
     @on_change = params.change
+    @on_message_click = params.message_click
 
     @message_ets = []
     @message_ets_rendered = ko.observableArray()
@@ -78,7 +79,7 @@ ko.components.register 'full-search',
               </div>
             </header>
             <div class="full-search-list" data-uie-name="full-search-list" data-bind="foreach: {data: message_ets_rendered}">
-              <div class="full-search-item" data-uie-name="full-search-item">
+              <div class="full-search-item" data-uie-name="full-search-item" data-bind="click: $parent.on_message_click">
                 <div class="full-search-item-avatar">
                   <user-avatar class="user-avatar-xs" params="user: user()"></user-avatar>
                 </div>
