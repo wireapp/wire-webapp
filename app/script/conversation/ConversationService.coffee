@@ -235,10 +235,7 @@ class z.conversation.ConversationService
       throw error
 
   ###
-  Load conversation events. Start and end are not included.
-  Events are always sorted beginning with the newest timestamp.
-
-  TODO: Make sure that only valid values (no Strings, No timestamps but Dates(!), ...) are passed to this function!
+  Load conversation events starting from the upper bound going back in history to the lower bound.
 
   @param conversation_id [String] ID of conversation
   @param lower_bound [Date] Load from this date (included)
@@ -262,6 +259,14 @@ class z.conversation.ConversationService
     .catch (error) =>
       @logger.error "Failed to load events for conversation '#{conversation_id}' from database: '#{error.message}'"
       throw error
+
+  # TODO naming, comine with load_events_from_db, no compound?
+  load_events_with_offset_from_db: (conversation_id, upper_bound, limit = Number.MAX_SAFE_INTEGER) =>
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where '[conversation+time]'
+    .between [conversation_id, upper_bound.toISOString()], [conversation_id, new Date().toISOString()], false, false
+    .limit limit
+    .toArray()
 
   ###
   Get events with given category.

@@ -184,6 +184,29 @@ describe 'z.conversation.ConversationService', ->
         expect(conversation_record.name()).toBe conversation_payload.name
         done()
 
+  describe 'load_events_with_offset_from_db', ->
+    conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
+    sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
+    events = undefined
+
+    beforeEach (done) ->
+      timestamp = new Date('2016-11-23T12:19:06.808Z').getTime()
+      events = [0...10].map (index) ->
+        return {"conversation": conversation_id, "time": new Date(timestamp + index).toISOString(), "from": sender_id}
+
+      Promise.all events.map (event) ->
+        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, z.storage.StorageService.construct_primary_key(event), event
+      .then done
+      .catch done.fail
+
+    it 'loads all events', (done) ->
+      conversation_service.load_events_with_offset_from_db conversation_id, new Date('2016-11-23T12:19:06.808Z'), 2
+      .then (events) =>
+        expect(events.length).toBe 2
+        expect(events[0].time).toBe '2016-11-23T12:19:06.809Z'
+        expect(events[1].time).toBe '2016-11-23T12:19:06.810Z'
+        done()
+
   describe 'delete_message_with_key_from_db', ->
 
     conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
