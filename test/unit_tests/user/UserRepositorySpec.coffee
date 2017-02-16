@@ -128,9 +128,15 @@ describe 'z.user.UserRepository', ->
           second_client.id = '575b7a890cdb7635'
 
           user_repository.save_user user_et
-          user_repository.add_client_to_user user_et.id, first_client
-          user_repository.add_client_to_user user_et.id, second_client
-          user_repository.add_client_to_user user_et.id, second_client
+
+          is_new_client = user_repository.add_client_to_user user_et.id, first_client
+          expect(is_new_client).toBe true
+
+          is_new_client = user_repository.add_client_to_user user_et.id, second_client
+          expect(is_new_client).toBe true
+
+          is_new_client = user_repository.add_client_to_user user_et.id, second_client
+          expect(is_new_client).toBe false
 
           expect(user_et.devices().length).toBe 2
 

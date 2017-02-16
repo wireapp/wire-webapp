@@ -16,26 +16,19 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-window.z ?= {}
-z.search ?= {}
+# grunt test_init && grunt test_run:search/FullTextSearch
 
-z.search.FullTextSearch = do ->
+describe 'z.search.FullTextSearch', ->
 
-  get_search_regex = (query) ->
-    delimiter = ' '
-    flags = 'gmi'
+  describe 'search', ->
 
-    regex = query.trim().split(delimiter).map((word) ->
-      "(\\b#{word})").join '|'
+    it 'should return false if text is not found', ->
+      expect(z.search.FullTextSearch.search('aa', '')).toBeFalsy()
+      expect(z.search.FullTextSearch.search('aa', undefined)).toBeFalsy()
+      expect(z.search.FullTextSearch.search('aa', 'bb')).toBeFalsy()
 
-    return new RegExp(regex, flags)
+    it 'should return false if word does not start with the given query', ->
+      expect(z.search.FullTextSearch.search('Tree', 'ee')).toBeFalsy()
 
-  search = (text, query) ->
-    if query?.length > 0
-      return get_search_regex(query).test(text)
-    return false
-
-  return {
-    get_search_regex: get_search_regex
-    search: search
-  }
+    it 'should find text', ->
+      expect(z.search.FullTextSearch.search('aa bb', 'aa')).toBeTruthy()

@@ -45,9 +45,19 @@ class z.components.FullSearchViewModel
     , 100
 
     @transform_text = (message_et) =>
-      tokens = z.search.FullTextSearch.tokenize @input()
-      text = _.escape message_et.get_first_asset().text
-      return text.replace new RegExp(tokens.join '|', "gmi"), (match) -> "<mark class='full-search-marked'>#{match}</mark>"
+      search_regex = z.search.FullTextSearch.get_search_regex @input()
+      text = message_et.get_first_asset().text
+      first_offset = undefined
+
+      message_et.matches_count = 0
+
+      return _.escape(text).replace search_regex, (match) ->
+        message_et.matches_count += 1
+
+        if not first_offset?
+          first_offset = text.indexOf match
+
+        return "<mark class='full-search-marked' data-uie-name='full-search-item-mark'>#{match}</mark>"
 
     # binding?
     $('.collection-list').on 'scroll', (event) =>
@@ -64,21 +74,22 @@ ko.components.register 'full-search',
             <header class="full-search-header">
               <span class="full-search-header-icon icon-search"></span>
               <div class="full-search-header-input">
-                <input type="text" data-bind="textInput: input"/>
+                <input type="text" data-bind="l10n_placeholder: z.string.auth_placeholder_password_put, textInput: input" data-uie-name="full-search-header-input"/>
               </div>
             </header>
-            <div class="full-search-list" data-bind="foreach: {data: message_ets_rendered}">
-              <div class="full-search-item">
+            <div class="full-search-list" data-uie-name="full-search-list" data-bind="foreach: {data: message_ets_rendered}">
+              <div class="full-search-item" data-uie-name="full-search-item">
                 <div class="full-search-item-avatar">
                   <user-avatar class="user-avatar-xs" params="user: user()"></user-avatar>
                 </div>
                 <div class="full-search-item-content">
-                  <div class="full-search-item-content-text" data-bind="html: $parent.transform_text($data)"></div>
+                  <div class="full-search-item-content-text ellipsis" data-uie-name="full-search-item-text" data-bind="html: $parent.transform_text($data)"></div>
                   <div class="full-search-item-content-info">
-                    <span class="font-weight-bold" data-bind="text: user().first_name()"></span>
-                    <span data-bind="text: moment($data.timestamp).format('MMMM D, YYYY')"></span>
+                    <span class="font-weight-bold" data-uie-name="full-search-item-sender" data-bind="text: user().first_name()"></span>
+                    <span data-uie-name="full-search-item-timestamp" data-bind="text: moment($data.timestamp).format('MMMM D, YYYY')"></span>
                   </div>
                 </div>
+                <div class="badge" data-uie-name="full-search-item-badge" data-bind="text: matches_count, visible: matches_count > 1"></div>
               </div>
             </div>
             """
