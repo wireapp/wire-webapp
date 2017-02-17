@@ -394,7 +394,7 @@ class z.event.EventRepository
           else if decrypt_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged
             # Remote identity changed
             error_code = z.cryptography.CryptographyErrorType.REMOTE_IDENTITY_CHANGED
-            message = "Fingerprints do not match. We expect a different fingerprint from user ID '#{remote_user_id}' with client ID '#{remote_client_id}' (Remote identity changed)."
+            message = "Remote identity of client '#{remote_client_id}' from user '#{remote_user_id}' changed: #{decrypt_error.message}"
             @logger.error message, decrypt_error
 
           @_report_decrypt_error event, decrypt_error, error_code
