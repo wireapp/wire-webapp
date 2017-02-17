@@ -30,7 +30,7 @@ class z.client.ClientRepository
       if @self_user() then @self_user().devices() else []
     @current_client = ko.observable undefined
 
-    amplify.subscribe z.event.Backend.USER.CLIENT_ADD, @on_client_add
+    amplify.subscribe z.event.Backend.USER.CLIENT_ADD, @map_self_client
     amplify.subscribe z.event.Backend.USER.CLIENT_REMOVE, @on_client_remove
     amplify.subscribe z.event.WebApp.LIFECYCLE.ASK_TO_CLEAR_DATA, @logout_client
     amplify.subscribe z.event.WebApp.LOGOUT.ASK_TO_CLEAR_DATA, @logout_client # todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
@@ -549,6 +549,7 @@ class z.client.ClientRepository
 
           # Locally unknown client new on backend
           @logger.info "New client '#{client_id}' of user '#{user_id}' will be stored locally"
+          @map_self_client {client: client_payload} if @self_user().id is user_id
           promises.push @_update_client_schema_in_db user_id, client_payload
 
         return Promise.all promises
@@ -581,7 +582,7 @@ class z.client.ClientRepository
   A client was added by the self user.
   @param event_json [Object] JSON data of 'user.client-add' event
   ###
-  on_client_add: (event_json) =>
+  map_self_client: (event_json) =>
     @logger.info 'Client of self user added', event_json
     client_et = @client_mapper.map_client event_json.client
     amplify.publish z.event.WebApp.CLIENT.ADD, @self_user().id, client_et
