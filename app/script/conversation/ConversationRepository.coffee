@@ -202,21 +202,21 @@ class z.conversation.ConversationRepository
     .then (events) =>
       if events.length < z.config.MESSAGES_FETCH_LIMIT
         conversation_et.has_further_messages false
-
-      if not events.length
-        @logger.info "No events for conversation '#{conversation_et.id}' found", events
-      else if first_message
-        @logger.info "Loaded #{events.length} event(s) starting at '#{upper_bound.toISOString()}' for conversation '#{conversation_et.id}'", events
-      else
-        @logger.info "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
-
       return @_add_events_to_conversation events, conversation_et
     .then (mapped_messages) ->
       conversation_et.is_pending false
       return mapped_messages
-    .catch (error) =>
-      @logger.info "Could not load events for conversation: #{conversation_et.id}", error
-      throw error
+
+  get_events_with_offset: (conversation_et, message_et) ->
+    console.debug 'get_events_with_offset ', new Date(message_et.timestamp)
+    conversation_et.is_pending true
+    @conversation_service.load_events_with_offset_from_db conversation_et.id, new Date(message_et.timestamp), z.config.MESSAGES_FETCH_LIMIT
+    .then (events) =>
+      console.table events
+      return @_add_events_to_conversation events, conversation_et
+    .then (mapped_messages) ->
+      conversation_et.is_pending false
+      return mapped_messages
 
   ###
   Get messages for given category. Category param acts as lower bound

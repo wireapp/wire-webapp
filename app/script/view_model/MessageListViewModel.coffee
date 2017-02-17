@@ -88,6 +88,7 @@ class z.ViewModel.MessageListViewModel
 
       if scroll_position >= scroll_end
         scrolled_bottom = true
+        @_push_events()
 
         if document.hasFocus()
           @conversation_repository.mark_as_read @conversation()
@@ -144,10 +145,17 @@ class z.ViewModel.MessageListViewModel
 
     if not conversation_et.is_loaded()
       @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
-        @conversation_repository.get_events conversation_et, message_et
-        .then =>
-          conversation_et.is_loaded true
-          @_set_conversation conversation_et, callback
+        if @marked_message()
+          @conversation_repository.get_events_with_offset conversation_et, @marked_message()
+          .then =>
+            conversation_et.is_loaded true
+            @_set_conversation conversation_et, callback
+        else
+          @conversation_repository.get_events conversation_et
+          .then =>
+            conversation_et.is_loaded true
+            @_set_conversation conversation_et, callback
+
     else
       @_set_conversation conversation_et, callback
 
@@ -259,6 +267,12 @@ class z.ViewModel.MessageListViewModel
         new_list_height = inner_container.scrollHeight
         $('.messages-wrap').scrollTop new_list_height - old_list_height
         @capture_scrolling_event = true
+
+  _push_events: =>
+    @capture_scrolling_event = false
+    @conversation_repository.get_events_with_offset @conversation(), @conversation().get_last_message()
+    .then =>
+      @capture_scrolling_event = true
 
   scroll_height: (change_in_height) ->
     $('.messages-wrap').scroll_by change_in_height
