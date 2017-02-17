@@ -192,15 +192,13 @@ class z.conversation.ConversationRepository
         return @event_mapper.map_json_event event, conversation_et
       throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
 
-  get_events: (conversation_et, message_et) ->
+  get_events: (conversation_et) ->
     conversation_et.is_pending true
 
     first_message = conversation_et.get_first_message()
-    lower_bound = if message_et then new Date message_et.timestamp else new Date(0)
     upper_bound = if first_message then new Date first_message.timestamp else new Date()
-    fetch_limit = if not message_et then z.config.MESSAGES_FETCH_LIMIT
 
-    @conversation_service.load_events_from_db conversation_et.id, lower_bound, upper_bound, fetch_limit
+    @conversation_service.load_events_from_db conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT
     .then (events) =>
       if events.length < z.config.MESSAGES_FETCH_LIMIT
         conversation_et.has_further_messages false
