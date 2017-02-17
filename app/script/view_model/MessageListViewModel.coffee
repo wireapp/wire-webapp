@@ -36,6 +36,9 @@ class z.ViewModel.MessageListViewModel
 
     @conversation_is_changing = false
 
+    # message that should be focused
+    @marked_message = ko.observable undefined
+
     # store last read to show until user switches conversation
     @conversation_last_read_timestamp = ko.observable undefined
 
@@ -122,9 +125,10 @@ class z.ViewModel.MessageListViewModel
   ###
   Change conversation.
   @param conversation_et [z.entity.Conversation] Conversation entity to change to
+  @param message_et [z.entity.Message] message to be focused
   @param callback [Function] Executed when all events are loaded an conversation is ready to be displayed
   ###
-  change_conversation: (conversation_et, callback) =>
+  change_conversation: (conversation_et, message_et, callback) =>
     @conversation_is_changing = true
 
     # clean up old conversation
@@ -132,6 +136,7 @@ class z.ViewModel.MessageListViewModel
 
     # update new conversation
     @conversation conversation_et
+    @marked_message message_et
 
     # keep last read timestamp to render unread when entering conversation
     if @conversation().unread_message_count() > 0
@@ -139,7 +144,7 @@ class z.ViewModel.MessageListViewModel
 
     if not conversation_et.is_loaded()
       @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
-        @conversation_repository.get_events conversation_et
+        @conversation_repository.get_events conversation_et, message_et
         .then =>
           conversation_et.is_loaded true
           @_set_conversation conversation_et, callback
@@ -191,7 +196,10 @@ class z.ViewModel.MessageListViewModel
         @conversation_repository.mark_as_read conversation_et
       else
         unread_message = $ '.message-timestamp-unread'
-        if unread_message.length > 0
+        marked_message = $ '.message-marked'
+        if marked_message.length > 0
+          messages_container.scroll_by marked_message.parent().position().top
+        else if unread_message.length > 0
           messages_container.scroll_by unread_message.parent().parent().position().top
         else
           messages_container.scroll_to_bottom()
