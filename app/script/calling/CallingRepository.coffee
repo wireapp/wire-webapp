@@ -52,7 +52,7 @@ class z.calling.CallingRepository
 
     @calling_config = ko.observable()
     @calling_config_timeout = undefined
-    @use_v3_api = undefined
+    @use_v3_api = not z.util.Environment.frontend.is_production()
 
     @v2_call_center = new z.calling.v2.CallCenter @call_service, @conversation_repository, @media_repository, @user_repository
     @v3_call_center = new z.calling.v3.CallCenter @calling_config, @conversation_repository, @media_repository, @user_repository
@@ -107,8 +107,10 @@ class z.calling.CallingRepository
   outgoing_protocol_version: (conversation_id) =>
     conversation_et = @conversation_repository.get_conversation_by_id conversation_id
     @logger.log "Select outgoing protocol version - 1to1 conversation: #{conversation_et?.is_one2one()}, backend protocol: #{@protocol_version_1to1()}, use_v3_api: #{@use_v3_api}"
-    v3_api_enabled = @use_v3_api is true or (@protocol_version_1to1() is z.calling.enum.PROTOCOL.VERSION_3 and @use_v3_api isnt false)
-    return z.calling.enum.PROTOCOL.VERSION_3 if v3_api_enabled and not conversation_et?.is_group()
+    if @use_v3_api is true and not conversation_et?.is_group()
+      return z.calling.enum.PROTOCOL.VERSION_3
+    if @use_v3_api isnt false and not conversation_et?.is_group() and @protocol_version_1to1() isnt z.calling.enum.PROTOCOL.VERSION_2
+      return z.calling.enum.PROTOCOL.VERSION_3
     return z.calling.enum.PROTOCOL.VERSION_2
 
   # Initiate calling config update.

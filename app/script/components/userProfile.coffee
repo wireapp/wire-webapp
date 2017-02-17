@@ -259,11 +259,7 @@ class z.components.UserProfileViewModel
   click_on_verify_client: =>
     toggle_verified = !!!@selected_device().meta.is_verified()
 
-    @client_repository.update_client_in_db @user().id, @selected_device().id, {
-      meta:
-        is_verified: toggle_verified
-    }
-    .then => @selected_device().meta.is_verified toggle_verified
+    @client_repository.verify_client @user().id, @selected_device(), toggle_verified
     .catch (error) => @logger.warn "Client cannot be updated: #{error.message}"
 
   on_tab_index_changed: (index) =>
@@ -272,11 +268,7 @@ class z.components.UserProfileViewModel
       user_id = @user().id
       @client_repository.get_clients_by_user_id user_id
       .then (client_ets) =>
-        if client_ets?.length > 0
-          @user().devices client_ets
-          @devices_found true
-        else
-          @devices_found false
+        @devices_found client_ets?.length > 0
       .catch (error) =>
         @logger.error "Unable to retrieve clients data for user '#{user_id}': #{error}"
 

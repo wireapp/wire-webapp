@@ -167,13 +167,7 @@ class z.main.App
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER
       @repository.client.init self_user_et
       @repository.properties.init self_user_et
-      return @repository.storage.init false
-    .then =>
-      @view.loading.switch_message z.string.init_initialized_storage, true
-      @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_STORAGE
-      number_of_sessions = Object.keys(@repository.storage.sessions).length
-      @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.SESSIONS, number_of_sessions, 50
-      return @repository.cryptography.init()
+      return @repository.cryptography.init @service.storage.db
     .then =>
       @view.loading.switch_message z.string.init_initialized_cryptography, true
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY
@@ -483,10 +477,6 @@ class z.main.App
   # Report call telemetry to Raygun for analysis.
   report_call: =>
     @repository.calling.report_call()
-
-  # Reset all known sessions at once.
-  reset_all_sessions: =>
-    @repository.conversation.reset_all_sessions()
 
   # Initialize debugging features.
   init_debugging: =>

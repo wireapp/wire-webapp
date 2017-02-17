@@ -276,6 +276,20 @@ class z.conversation.ConversationService
     .sortBy 'time'
 
   ###
+  Search for text in given conversation.
+  @param conversation_id [String] ID of conversation to add users to
+  @param query [String] will be checked in agains all text messages
+  @return [Promise]
+  ###
+  search_in_conversation: (conversation_id, query) =>
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+      .where '[conversation+category]'
+      .equals [conversation_id, z.message.MessageCategory.TEXT]
+      .sortBy 'time'
+      .then (events) ->
+        return events.filter (event) -> z.search.FullTextSearch.search event.data.content, query
+
+  ###
   Add a bot to an existing conversation.
 
   @param conversation_id [String] ID of conversation to add users to

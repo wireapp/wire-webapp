@@ -37,6 +37,8 @@ window.TestFactory = function (logger_level) {
   };
 
   this.client = new z.service.Client(this.settings.connection);
+  this.logger = new z.util.Logger('TestFactory', z.config.LOGGER.OPTIONS);
+
   return this;
 };
 
@@ -46,10 +48,12 @@ window.TestFactory = function (logger_level) {
  */
 window.TestFactory.prototype.exposeAudioActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
+  self.logger.info('- exposeAudioActors');
+  return Promise.resolve()
+  .then(function() {
     window.audio_repository = new z.audio.AudioRepository();
     window.audio_repository.logger.level = self.settings.logging_level;
-    resolve(window.audio_repository);
+    return window.audio_repository;
   });
 };
 
@@ -59,13 +63,15 @@ window.TestFactory.prototype.exposeAudioActors = function () {
  */
 window.TestFactory.prototype.exposeAuthActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
+  self.logger.info('- exposeAuthActors');
+  return Promise.resolve()
+  .then(function() {
     window.auth_service = new z.auth.AuthService(self.client);
     window.auth_service.logger.level = self.settings.logging_level;
 
     window.auth_repository = new z.auth.AuthRepository(window.auth_service);
     window.auth_repository.logger.level = self.settings.logging_level;
-    resolve(window.auth_repository);
+    return window.auth_repository;
   });
 };
 
@@ -75,15 +81,17 @@ window.TestFactory.prototype.exposeAuthActors = function () {
  */
 window.TestFactory.prototype.exposeStorageActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
+  self.logger.info('- exposeStorageActors');
+  return Promise.resolve()
+  .then(function() {
     window.storage_service = new z.storage.StorageService();
     window.storage_service.logger.level = self.settings.logging_level;
-
-    window.storage_service.init(entities.user.john_doe.id).then(function () {
-      window.storage_repository = new z.storage.StorageRepository(window.storage_service);
-      window.storage_repository.logger.level = self.settings.logging_level;
-      resolve(window.storage_repository);
-    });
+    return window.storage_service.init(entities.user.john_doe.id);
+  })
+  .then(function() {
+    window.storage_repository = new z.storage.StorageRepository(window.storage_service);
+    window.storage_repository.logger.level = self.settings.logging_level;
+    return window.storage_repository;
   });
 };
 
@@ -93,20 +101,26 @@ window.TestFactory.prototype.exposeStorageActors = function () {
  */
 window.TestFactory.prototype.exposeCryptographyActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
-    self.exposeStorageActors().then(function () {
-      var current_client = new z.client.Client({"id": entities.clients.john_doe.permanent.id});
-      window.cryptography_service = new z.cryptography.CryptographyService(self.client);
-      window.cryptography_service.logger.level = self.settings.logging_level;
+  self.logger.info('- exposeCryptographyActors');
+  return Promise.resolve()
+  .then(function() {
+    return self.exposeStorageActors();
+  })
+  .then(function() {
+    self.logger.info('✓ exposedStorageActors');
 
-      window.cryptography_repository = new z.cryptography.CryptographyRepository(window.cryptography_service, window.storage_repository);
-      window.cryptography_repository.current_client = ko.observable(current_client);
-      window.cryptography_repository.logger.level = self.settings.logging_level;
+    var current_client = new z.client.Client({"id": entities.clients.john_doe.permanent.id});
+    window.cryptography_service = new z.cryptography.CryptographyService(self.client);
+    window.cryptography_service.logger.level = self.settings.logging_level;
 
-      window.cryptography_repository.init().then(function () {
-        resolve(window.cryptography_repository);
-      });
-    });
+    window.cryptography_repository = new z.cryptography.CryptographyRepository(window.cryptography_service, window.storage_repository);
+    window.cryptography_repository.current_client = ko.observable(current_client);
+    window.cryptography_repository.logger.level = self.settings.logging_level;
+
+    return window.cryptography_repository.init(window.storage_service.db);
+  })
+  .then(function() {
+    return window.cryptography_repository;
   });
 };
 
@@ -116,31 +130,36 @@ window.TestFactory.prototype.exposeCryptographyActors = function () {
  */
 window.TestFactory.prototype.exposeClientActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
-    self.exposeCryptographyActors().then(function () {
-      var client = new z.client.Client({'address': '192.168.0.1', 'id': '60aee26b7f55a99f', 'class': 'desktop'});
+  self.logger.info('- exposeClientActors');
+  return Promise.resolve()
+  .then(function() {
+    return self.exposeCryptographyActors();
+  })
+  .then(function() {
+    self.logger.info('✓ exposedCryptographyActors');
 
-      var user = new z.entity.User(entities.user.john_doe.id);
-      user.devices.push(client);
-      user.email(entities.user.john_doe.email);
-      user.is_me = true;
-      user.locale = entities.user.john_doe.locale;
-      user.name(entities.user.john_doe.name);
-      user.phone(entities.user.john_doe.phone);
-      user.tracking_id = entities.user.john_doe.tracking_id;
+    var client = new z.client.Client({'address': '192.168.0.1', 'id': '60aee26b7f55a99f', 'class': 'desktop'});
 
-      window.client_service = new z.client.ClientService(self.client, window.storage_service);
-      window.client_service.logger.level = self.settings.logging_level;
+    var user = new z.entity.User(entities.user.john_doe.id);
+    user.devices.push(client);
+    user.email(entities.user.john_doe.email);
+    user.is_me = true;
+    user.locale = entities.user.john_doe.locale;
+    user.name(entities.user.john_doe.name);
+    user.phone(entities.user.john_doe.phone);
+    user.tracking_id = entities.user.john_doe.tracking_id;
 
-      window.client_repository = new z.client.ClientRepository(client_service, window.cryptography_repository);
-      window.client_repository.logger.level = self.settings.logging_level;
-      window.client_repository.init(user);
-      var payload = {"cookie":"webapp@2153234453@temporary@1470926647664","time":"2016-10-07T16:01:42.133Z","location":{"lat":52.5233,"lon":13.4138},"address":"62.96.148.44","model":"Chrome (Temporary)","id":"132b3653b33f851f","type":"temporary","class":"desktop","label":"Windows 10","meta":{"is_verified":true,"primary_key":"local_identity"}};
-      var current_client = new z.client.Client(payload);
-      window.client_repository.current_client(current_client);
+    window.client_service = new z.client.ClientService(self.client, window.storage_service);
+    window.client_service.logger.level = self.settings.logging_level;
 
-      resolve(window.client_repository);
-    });
+    window.client_repository = new z.client.ClientRepository(client_service, window.cryptography_repository);
+    window.client_repository.logger.level = self.settings.logging_level;
+    window.client_repository.init(user);
+    var payload = {"cookie":"webapp@2153234453@temporary@1470926647664","time":"2016-10-07T16:01:42.133Z","location":{"lat":52.5233,"lon":13.4138},"address":"62.96.148.44","model":"Chrome (Temporary)","id":"132b3653b33f851f","type":"temporary","class":"desktop","label":"Windows 10","meta":{"is_verified":true,"primary_key":"local_identity"}};
+    var current_client = new z.client.Client(payload);
+    window.client_repository.current_client(current_client);
+
+    return window.client_repository;
   });
 };
 
@@ -150,20 +169,25 @@ window.TestFactory.prototype.exposeClientActors = function () {
  */
 window.TestFactory.prototype.exposeEventActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
-    self.exposeCryptographyActors().then(function () {
-      window.web_socket_service = new z.event.WebSocketService(self.client, window.storage_service);
-      window.web_socket_service.logger.level = self.settings.logging_level;
+  self.logger.info('- exposeEventActors');
+  return Promise.resolve()
+  .then(function() {
+    return self.exposeCryptographyActors();
+  })
+  .then(function () {
+    self.logger.info('✓ exposedCryptographyActors');
 
-      window.notification_service = new z.event.NotificationService(self.client, window.storage_service);
-      window.notification_service.logger.level = self.settings.logging_level;
+    window.web_socket_service = new z.event.WebSocketService(self.client, window.storage_service);
+    window.web_socket_service.logger.level = self.settings.logging_level;
 
-      window.event_repository = new z.event.EventRepository(web_socket_service, notification_service, window.cryptography_repository, undefined);
-      window.event_repository.logger.level = self.settings.logging_level;
-      window.event_repository.current_client = ko.observable(window.cryptography_repository.current_client());
+    window.notification_service = new z.event.NotificationService(self.client, window.storage_service);
+    window.notification_service.logger.level = self.settings.logging_level;
 
-      resolve(window.event_repository);
-    });
+    window.event_repository = new z.event.EventRepository(web_socket_service, notification_service, window.cryptography_repository, undefined);
+    window.event_repository.logger.level = self.settings.logging_level;
+    window.event_repository.current_client = ko.observable(window.cryptography_repository.current_client());
+
+    return window.event_repository;
   });
 };
 
@@ -173,22 +197,28 @@ window.TestFactory.prototype.exposeEventActors = function () {
  */
 window.TestFactory.prototype.exposeUserActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
-    self.exposeClientActors().then(function () {
-      window.asset_service = new z.assets.AssetService(self.client);
-      window.asset_service.logger.level = self.settings.logging_level;
+  self.logger.info('- exposeUserActors');
+  return Promise.resolve()
+  .then(function() {
+    return self.exposeClientActors();
+  })
+  .then(function() {
+    self.logger.info('✓ exposedClientActors');
 
-      window.search_service = new z.search.SearchService(self.client);
-      window.search_service.logger.level = self.settings.logging_level;
+    window.asset_service = new z.assets.AssetService(self.client);
+    window.asset_service.logger.level = self.settings.logging_level;
 
-      window.user_service = new z.user.UserService(self.client);
-      window.user_service.logger.level = self.settings.logging_level;
+    window.search_service = new z.search.SearchService(self.client);
+    window.search_service.logger.level = self.settings.logging_level;
 
-      window.user_repository = new z.user.UserRepository(user_service, asset_service, search_service, window.client_repository, window.cryptography_repository);
-      window.user_repository.logger.level = self.settings.logging_level;
-      window.user_repository.save_user(window.client_repository.self_user(), true);
-      resolve(window.user_repository);
-    });
+    window.user_service = new z.user.UserService(self.client);
+    window.user_service.logger.level = self.settings.logging_level;
+
+    window.user_repository = new z.user.UserRepository(user_service, asset_service, search_service, window.client_repository, window.cryptography_repository);
+    window.user_repository.logger.level = self.settings.logging_level;
+    window.user_repository.save_user(window.client_repository.self_user(), true);
+
+    return window.user_repository;
   });
 };
 
@@ -198,18 +228,24 @@ window.TestFactory.prototype.exposeUserActors = function () {
  */
 window.TestFactory.prototype.exposeConnectActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
-    self.exposeUserActors().then(function () {
-      window.connect_service = new z.connect.ConnectService(self.client);
-      window.connect_service.logger.level = self.settings.logging_level;
+  self.logger.info('- exposeConnectActors');
+  return Promise.resolve()
+  .then(function() {
+    return self.exposeUserActors();
+  })
+  .then(function() {
+    self.logger.info('✓ exposedUserActors');
 
-      window.connect_google_service = new z.connect.ConnectGoogleService(self.client);
-      window.connect_google_service.logger.level = self.settings.logging_level;
+    window.connect_service = new z.connect.ConnectService(self.client);
+    window.connect_service.logger.level = self.settings.logging_level;
 
-      window.connect_repository = new z.connect.ConnectRepository(window.connect_service, window.connect_google_service, window.user_repository);
-      window.connect_repository.logger.level = self.settings.logging_level;
-      resolve(window.connect_repository);
-    });
+    window.connect_google_service = new z.connect.ConnectGoogleService(self.client);
+    window.connect_google_service.logger.level = self.settings.logging_level;
+
+    window.connect_repository = new z.connect.ConnectRepository(window.connect_service, window.connect_google_service, window.user_repository);
+    window.connect_repository.logger.level = self.settings.logging_level;
+
+    return window.connect_repository;
   });
 };
 
@@ -219,15 +255,21 @@ window.TestFactory.prototype.exposeConnectActors = function () {
  */
 window.TestFactory.prototype.exposeSearchActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
-    self.exposeUserActors().then(function () {
-      window.search_service = new z.search.SearchService(self.client);
-      window.search_service.logger.level = self.settings.logging_level;
+  self.logger.info('- exposeSearchActors');
+  return Promise.resolve()
+  .then(function() {
+    return self.exposeUserActors();
+  })
+  .then(function() {
+    self.logger.info('✓ exposedUserActors');
 
-      window.search_repository = new z.search.SearchRepository(window.search_service, window.user_repository);
-      window.search_repository.logger.level = self.settings.logging_level;
-      resolve(window.search_repository);
-    });
+    window.search_service = new z.search.SearchService(self.client);
+    window.search_service.logger.level = self.settings.logging_level;
+
+    window.search_repository = new z.search.SearchRepository(window.search_service, window.user_repository);
+    window.search_repository.logger.level = self.settings.logging_level;
+
+    return window.search_repository;
   });
 };
 
@@ -237,21 +279,27 @@ window.TestFactory.prototype.exposeSearchActors = function () {
  */
 window.TestFactory.prototype.exposeConversationActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
-    self.exposeUserActors().then(function () {
-      window.conversation_service = new z.conversation.ConversationService(self.client, window.storage_service);
-      window.conversation_service.logger.level = self.settings.logging_level;
+  self.logger.info('- exposeConversationActors');
+  return Promise.resolve()
+  .then(function() {
+    return self.exposeUserActors();
+  })
+  .then(function() {
+    self.logger.info('✓ exposedUserActors');
 
-      window.conversation_repository = new z.conversation.ConversationRepository(
-        conversation_service,
-        window.asset_service,
-        window.user_repository,
-        undefined,
-        window.cryptography_repository
-      );
-      window.conversation_repository.logger.level = self.settings.logging_level;
-      resolve(window.conversation_repository);
-    });
+    window.conversation_service = new z.conversation.ConversationService(self.client, window.storage_service);
+    window.conversation_service.logger.level = self.settings.logging_level;
+
+    window.conversation_repository = new z.conversation.ConversationRepository(
+      conversation_service,
+      window.asset_service,
+      window.user_repository,
+      undefined,
+      window.cryptography_repository
+    );
+    window.conversation_repository.logger.level = self.settings.logging_level;
+
+    return window.conversation_repository;
   });
 };
 
@@ -261,16 +309,22 @@ window.TestFactory.prototype.exposeConversationActors = function () {
  */
 window.TestFactory.prototype.exposeMediaActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
-    self.exposeAudioActors().then(function () {
-      window.media_repository = new z.media.MediaRepository(window.audio_repository);
-      window.media_repository.logger.level = self.settings.logging_level;
+  self.logger.info('- exposeMediaActors');
+  return Promise.resolve()
+  .then(function() {
+    return self.exposeAudioActors();
+  })
+  .then(function(){
+    self.logger.info('✓ exposedAudioActors');
 
-      window.media_repository.devices_handler.logger.level = self.settings.logging_level;
-      window.media_repository.stream_handler.logger.level = self.settings.logging_level;
-      window.media_repository.element_handler.logger.level = self.settings.logging_level;
-      resolve(window.v2_call_center);
-    });
+    window.media_repository = new z.media.MediaRepository(window.audio_repository);
+    window.media_repository.logger.level = self.settings.logging_level;
+
+    window.media_repository.devices_handler.logger.level = self.settings.logging_level;
+    window.media_repository.stream_handler.logger.level = self.settings.logging_level;
+    window.media_repository.element_handler.logger.level = self.settings.logging_level;
+
+    return window.v2_call_center;
   });
 };
 
@@ -280,28 +334,36 @@ window.TestFactory.prototype.exposeMediaActors = function () {
  */
 window.TestFactory.prototype.exposeCallingActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
-    self.exposeMediaActors().then(function() {
-      self.exposeConversationActors().then(function () {
-        window.call_service = new z.calling.v2.CallService(self.client);
-        window.call_service.logger.level = self.settings.logging_level;
+  self.logger.info('- exposeCallingActors');
+  return Promise.resolve()
+  .then(function() {
+    return self.exposeMediaActors();
+  })
+  .then(function() {
+    self.logger.info('✓ exposedMediaActors');
+    return self.exposeConversationActors();
+  })
+  .then(function() {
+    self.logger.info('✓ exposedConversationActors');
 
-        window.calling_service = new z.calling.CallingService(self.client);
-        window.calling_service.logger.level = self.settings.logging_level;
+    window.call_service = new z.calling.v2.CallService(self.client);
+    window.call_service.logger.level = self.settings.logging_level;
 
-        window.calling_repository = new z.calling.CallingRepository(window.call_service, window.calling_service, window.conversation_repository, window.media_repository, window.user_repository);
-        window.calling_repository.logger.level = self.settings.logging_level;
+    window.calling_service = new z.calling.CallingService(self.client);
+    window.calling_service.logger.level = self.settings.logging_level;
 
-        window.v2_call_center = window.calling_repository.v2_call_center;
-        window.v2_call_center.logger.level = self.settings.logging_level;
-        window.v2_call_center.state_handler.logger.level = self.settings.logging_level;
-        window.v2_call_center.signaling_handler.logger.level = self.settings.logging_level;
+    window.calling_repository = new z.calling.CallingRepository(window.call_service, window.calling_service, window.conversation_repository, window.media_repository, window.user_repository);
+    window.calling_repository.logger.level = self.settings.logging_level;
 
-        window.v3_call_center = window.calling_repository.v3_call_center;
-        window.v3_call_center.logger.level = self.settings.logging_level;
-        resolve(window.calling_repository);
-      });
-    });
+    window.v2_call_center = window.calling_repository.v2_call_center;
+    window.v2_call_center.logger.level = self.settings.logging_level;
+    window.v2_call_center.state_handler.logger.level = self.settings.logging_level;
+    window.v2_call_center.signaling_handler.logger.level = self.settings.logging_level;
+
+    window.v3_call_center = window.calling_repository.v3_call_center;
+    window.v3_call_center.logger.level = self.settings.logging_level;
+
+    return window.calling_repository;
   });
 };
 
@@ -311,14 +373,22 @@ window.TestFactory.prototype.exposeCallingActors = function () {
  */
 window.TestFactory.prototype.exposeSystemNotificationActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
-    self.exposeConversationActors().then(function () {
-      self.exposeCallingActors().then(function () {
-        window.system_notification_repository = new z.SystemNotification.SystemNotificationRepository(window.v2_call_center, window.conversation_repository);
-        window.system_notification_repository.logger.level = self.settings.logging_level;
-        resolve(window.system_notification_repository)
-      });
-    });
+  self.logger.info('- exposeSystemNotificationActors');
+  return Promise.resolve()
+  .then(function() {
+    return self.exposeConversationActors();
+  })
+  .then(function() {
+    self.logger.info('✓ exposedConversationActors');
+    return self.exposeCallingActors();
+  })
+  .then(function() {
+    self.logger.info('✓ exposedCallingActors');
+
+    window.system_notification_repository = new z.SystemNotification.SystemNotificationRepository(window.v2_call_center, window.conversation_repository);
+    window.system_notification_repository.logger.level = self.settings.logging_level;
+
+    return window.system_notification_repository;
   });
 };
 
@@ -328,12 +398,18 @@ window.TestFactory.prototype.exposeSystemNotificationActors = function () {
  */
 window.TestFactory.prototype.exposeTrackingActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
-    self.exposeConversationActors().then(function () {
-      window.tracking_repository = new z.tracking.EventTrackingRepository(window.user_repository, window.conversation_repository);
-      window.tracking_repository.logger.level = self.settings.logging_level;
-      resolve(window.tracking_repository);
-    });
+  self.logger.info('- exposeTrackingActors');
+  return Promise.resolve()
+  .then(function() {
+    return self.exposeConversationActors();
+  })
+  .then(function() {
+    self.logger.info('✓ exposedConversationActors');
+
+    window.tracking_repository = new z.tracking.EventTrackingRepository(window.user_repository, window.conversation_repository);
+    window.tracking_repository.logger.level = self.settings.logging_level;
+
+    return window.tracking_repository;
   });
 };
 
@@ -343,12 +419,14 @@ window.TestFactory.prototype.exposeTrackingActors = function () {
  */
 window.TestFactory.prototype.exposeAnnounceActors = function () {
   var self = this;
-  return new Promise(function (resolve) {
+  self.logger.info('- exposeAnnounceActors');
+  return Promise.resolve()
+  .then(function() {
     window.announce_service = new z.announce.AnnounceService();
     window.announce_service.logger.level = self.settings.logging_level;
 
     window.announce_repository = new z.announce.AnnounceRepository(window.announce_service);
     window.announce_repository.logger.level = self.settings.logging_level;
-    resolve(window.announce_repository);
+    return window.announce_repository;
   });
 };
