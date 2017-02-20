@@ -214,9 +214,8 @@ class z.cryptography.CryptographyRepository
         session_id = @_construct_session_id user_id, client_id
         decoded_prekey_bundle_buffer = z.util.base64_to_array(remote_pre_key.key).buffer
         return @cryptobox.session_from_prekey session_id, decoded_prekey_bundle_buffer
-      else
-        @logger.warn "No remote PreKey for User ID '#{user_id}' with Client ID '#{client_id}' found. The owner probably deleted the client already."
-        return undefined
+      @logger.warn "No remote PreKey for User ID '#{user_id}' with Client ID '#{client_id}' found. The owner probably deleted the client already."
+      return undefined
     .catch (error) =>
       @logger.warn "Invalid remote PreKey for User ID '#{user_id}' with Client ID '#{client_id}' found. Skipping encryption. Reason: #{error.message}", error
       return undefined
