@@ -272,8 +272,6 @@ class z.conversation.ConversationService
     if not _.isDate upper_bound
       throw new Error "Upper bound (#{typeof upper_bound}) must be of type 'Date'."
 
-    console.debug 'upper bound ', upper_bound.toISOString()
-
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
     .between [conversation_id, upper_bound.toISOString()], [conversation_id, new Date().toISOString()], true, true
