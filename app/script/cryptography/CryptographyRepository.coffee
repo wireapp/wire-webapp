@@ -109,7 +109,7 @@ class z.cryptography.CryptographyRepository
   _load_session: (user_id, client_id) ->
     return Promise.resolve()
     .then =>
-      session_id = @_construct_session_id user_id, client_id
+      session_id = z.cryptography.SessionID.compose user_id, client_id
       return @cryptobox.session_load session_id
       .catch =>
         @get_users_pre_keys({"#{user_id}": [client_id]})
@@ -138,35 +138,23 @@ class z.cryptography.CryptographyRepository
   create_user_session_map: =>
     user_session_map = {}
     for session_id, session of @storage_repository.sessions
-      ids = z.client.Client.dismantle_user_client_id session_id
-      user_session_map[ids.user_id] ?= []
-      user_session_map[ids.user_id].push ids.client_id
+      {user_id, client_id} = z.cryptography.SessionID.decompose session_id
+      user_session_map[user_id] ?= []
+      user_session_map[user_id].push client_id
     return user_session_map
 
-  ###
-  Construct a session ID.
-  @todo Make public
-  @private
-  @param user_id [String] User ID for the remote participant
-  @param client_id [String] Client ID of the remote participant
-  @return [String] Client ID
-  ###
-  _construct_session_id: (user_id, client_id) ->
-    return "#{user_id}@#{client_id}"
-
-  _construct_session_ids: (user_client_map) =>
+  _construct_session_ids: (user_client_map) ->
     session_ids = []
 
     for user_id, client_ids of user_client_map
-      client_ids.forEach (client_id) =>
-        session_id = @_construct_session_id user_id, client_id
+      client_ids.forEach (client_id) ->
+        session_id = z.cryptography.SessionID.compose user_id, client_id
         session_ids.push session_id
 
     return session_ids
 
   delete_session: (user_id, client_id) =>
-    session_id = @_construct_session_id user_id, client_id
-    return @cryptobox.session_delete session_id
+    return @cryptobox.session_delete z.cryptography.SessionID.compose user_id, client_id
 
   ###
   Bundles and encrypts the generic message for all given clients.
@@ -181,7 +169,7 @@ class z.cryptography.CryptographyRepository
     for user_id, client_ids of user_client_map
       payload.recipients[user_id] ?= {}
       client_ids.forEach (client_id) =>
-        session_id = @_construct_session_id user_id, client_id
+        session_id = z.cryptography.SessionID user_id, client_id
         future_cipher_payloads.push @_encrypt_payload_for_session session_id, generic_message
 
     @logger.log "Encrypting message of type '#{generic_message.content}' for '#{Object.keys(payload.recipients).length}' users.", payload.recipients
@@ -209,7 +197,7 @@ class z.cryptography.CryptographyRepository
   _session_from_encoded_prekey_payload: (remote_pre_key, user_id, client_id) =>
     if remote_pre_key
       @logger.log "Initializing session with Client ID '#{client_id}' from User ID '#{user_id}' with remote PreKey ID '#{remote_pre_key.id}'."
-      session_id = @_construct_session_id user_id, client_id
+      session_id = z.cryptography.SessionID.compose user_id, client_id
       decoded_prekey_bundle_buffer = z.util.base64_to_array(remote_pre_key.key).buffer
       return @cryptobox.session_from_prekey session_id, decoded_prekey_bundle_buffer
     else
@@ -312,7 +300,7 @@ class z.cryptography.CryptographyRepository
   @return [z.proto.GenericMessage] Decrypted message in ProtocolBuffer format
   ###
   _decrypt_message: (event) =>
-    session_id = @_construct_session_id event.from, event.data.sender
+    session_id = z.cryptography.SessionID.compose event.from, event.data.sender
 
     ciphertext = event.data.text or event.data.key
     msg_bytes = z.util.base64_to_array(ciphertext).buffer
