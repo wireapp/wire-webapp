@@ -88,6 +88,7 @@ class z.ViewModel.MessageListViewModel
 
       if scroll_position >= scroll_end
         scrolled_bottom = true
+        console.debug 'push events because of scroll ', @capture_scrolling_event
         @_push_events()
 
         if document.hasFocus()

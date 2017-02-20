@@ -203,8 +203,8 @@ describe 'z.conversation.ConversationService', ->
       conversation_service.load_events_with_offset_from_db conversation_id, new Date('2016-11-23T12:19:06.808Z'), 2
       .then (events) =>
         expect(events.length).toBe 2
-        expect(events[0].time).toBe '2016-11-23T12:19:06.809Z'
-        expect(events[1].time).toBe '2016-11-23T12:19:06.810Z'
+        expect(events[0].time).toBe '2016-11-23T12:19:06.808Z'
+        expect(events[1].time).toBe '2016-11-23T12:19:06.809Z'
         done()
 
   describe 'delete_message_with_key_from_db', ->

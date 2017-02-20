@@ -208,11 +208,11 @@ class z.conversation.ConversationRepository
       return mapped_messages
 
   get_events_with_offset: (conversation_et, message_et) ->
-    console.debug 'get_events_with_offset ', new Date(message_et.timestamp)
+    console.debug 'get_events_with_offset ', new Date(message_et.timestamp).toISOString(), message_et.get_first_asset().text
     conversation_et.is_pending true
     @conversation_service.load_events_with_offset_from_db conversation_et.id, new Date(message_et.timestamp), z.config.MESSAGES_FETCH_LIMIT
     .then (events) =>
-      console.table events
+      console.debug 'get_events_with_offset event ', new Date(events[0].time).toISOString()
       return @_add_events_to_conversation events, conversation_et
     .then (mapped_messages) ->
       conversation_et.is_pending false

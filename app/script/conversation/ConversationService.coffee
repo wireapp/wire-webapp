@@ -276,7 +276,7 @@ class z.conversation.ConversationService
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
-    .between [conversation_id, upper_bound.toISOString()], [conversation_id, new Date().toISOString()], false, false
+    .between [conversation_id, upper_bound.toISOString()], [conversation_id, new Date().toISOString()], true, true
     .limit limit
     .toArray()
 
