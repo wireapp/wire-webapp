@@ -49,7 +49,6 @@ class z.tracking.EventTrackingRepository
 
     @localytics = undefined # Localytics
     @session_interval = undefined # Interval to track the Localytics session
-    @tracking_id = undefined # Tracking ID of the self user
     @properties = undefined # Reference to the properties
 
     @reported_errors = ko.observableArray()
@@ -68,7 +67,6 @@ class z.tracking.EventTrackingRepository
   ###
   init: (properties) =>
     @properties = properties
-    @tracking_id = @user_repository.self().tracking_id
     @logger.info 'Initialize tracking and error reporting'
 
     if not @_localytics_disabled() and @_has_permission()
@@ -105,7 +103,6 @@ class z.tracking.EventTrackingRepository
   # @return [Boolean] true when "improve_wire" is set to "true".
   _has_permission: ->
     return false if @properties is undefined
-    return false if @tracking_id is undefined
     return @properties.settings.privacy.improve_wire
 
   _subscribe_to_events: ->
@@ -135,7 +132,6 @@ class z.tracking.EventTrackingRepository
 
     if not @localytics
       @_init_localytics window, document, 'script', @localytics
-      @localytics 'setCustomerId', @tracking_id
 
     @_start_session()
     @session_interval = window.setInterval @tag_and_upload_session, LOCALYTICS.TRACKING_INTERVAL
@@ -312,7 +308,6 @@ class z.tracking.EventTrackingRepository
     @note We cannot use our own version string as it has to be in a certain format
     @see https://github.com/MindscapeHQ/raygun4js#version-filtering
     ###
-    Raygun.setUser @tracking_id
     Raygun.setVersion z.util.Environment.version false if not z.util.Environment.frontend.is_localhost()
     Raygun.withCustomData {electron_version: z.util.Environment.version true} if z.util.Environment.electron
     Raygun.onBeforeSend @_check_error_payload
