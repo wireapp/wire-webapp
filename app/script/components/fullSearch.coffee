@@ -75,7 +75,7 @@ ko.components.register 'full-search',
             <header class="full-search-header">
               <span class="full-search-header-icon icon-search"></span>
               <div class="full-search-header-input">
-                <input type="text" data-bind="l10n_placeholder: z.string.auth_placeholder_password_put, textInput: input" data-uie-name="full-search-header-input"/>
+                <input type="text" data-bind="hasFocus: true, l10n_placeholder: z.string.fullsearch_placeholder, textInput: input" data-uie-name="full-search-header-input"/>
               </div>
             </header>
             <div class="full-search-list" data-uie-name="full-search-list" data-bind="foreach: {data: message_ets_rendered}">

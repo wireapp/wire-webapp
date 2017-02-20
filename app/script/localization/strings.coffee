@@ -283,6 +283,9 @@ z.string.collection_section_images = 'Pictures'
 z.string.collection_section_files = 'Files'
 z.string.collection_section_audio = 'Audio messages'
 
+# Full Search
+z.string.fullsearch_placeholder = 'Search text messages'
+
 # Archive
 z.string.archive_header = 'Archive'
 

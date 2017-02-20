@@ -281,7 +281,6 @@ class z.ViewModel.MessageListViewModel
     @capture_scrolling_event = false
     @conversation_repository.get_events_with_offset @conversation(), @conversation().get_last_message(), false
     .then (message_ets) =>
-      console.debug 'pushed messages ', message_ets
       if message_ets.length is 0
         @conversation_reached_bottom = true
       @capture_scrolling_event = true
