@@ -230,10 +230,14 @@ class z.cryptography.CryptographyRepository
               remote_pre_key = user_pre_key_map[user_id][client_id]
               future_sessions.push @_session_from_encoded_prekey_payload remote_pre_key, user_id, client_id
 
-          Promise.all(future_sessions).then (cryptobox_sessions) =>
+          z.util.PromiseUtil.execute_all future_sessions
+          .then (cryptobox_sessions) =>
             future_payloads = []
 
-            for cryptobox_session in cryptobox_sessions when cryptobox_session
+            for error in cryptobox_sessions.errors
+              @logger.warn "Skipping decryption. Reason: #{error.message}", error
+
+            for cryptobox_session in cryptobox_sessions.results when cryptobox_session
               future_payloads.push @_encrypt_payload_for_session cryptobox_session.id, generic_message
 
             Promise.all(future_payloads).then resolve
