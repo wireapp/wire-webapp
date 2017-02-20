@@ -32,6 +32,12 @@ class z.util.DebugUtil
     return new Promise (resolve) =>
       @user_repository.get_user_by_id user_id, (user_et) -> resolve user_et
 
+  block_all_connections: ->
+    block_users = []
+    wire.app.repository.user.users().forEach (user_et) =>
+      block_users.push @user_repository.block_user user_et
+    return Promise.all block_users
+
   get_number_of_clients_in_conversation: ->
     user_ets = @conversation_repository.active_conversation().participating_user_ets()
 
