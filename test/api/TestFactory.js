@@ -147,7 +147,6 @@ window.TestFactory.prototype.exposeClientActors = function () {
     user.locale = entities.user.john_doe.locale;
     user.name(entities.user.john_doe.name);
     user.phone(entities.user.john_doe.phone);
-    user.tracking_id = entities.user.john_doe.tracking_id;
 
     window.client_service = new z.client.ClientService(self.client, window.storage_service);
     window.client_service.logger.level = self.settings.logging_level;

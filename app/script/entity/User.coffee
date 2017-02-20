@@ -20,7 +20,7 @@ window.z ?= {}
 z.entity ?= {}
 
 # User entity.
-# Please note: The own user has a "tracking_id" & "locale"
+# Please note: The own user has a "locale"
 class z.entity.User
 
 
