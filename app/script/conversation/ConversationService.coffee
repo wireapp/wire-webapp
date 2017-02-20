@@ -266,15 +266,16 @@ class z.conversation.ConversationService
   @param conversation_id [String] ID of conversation
   @param upper_bound [Date] Load until this date (excluded)
   @param limit [Number] Amount of events to load
+  @param include_upper_bound [Boolean] Should upper bound be part of the message
   @return [Promise] Promise that resolves with the retrieved records
   ###
-  load_events_with_offset_from_db: (conversation_id, upper_bound, limit = Number.MAX_SAFE_INTEGER) =>
+  load_events_with_offset_from_db: (conversation_id, upper_bound, limit = Number.MAX_SAFE_INTEGER, include_upper_bound = true) =>
     if not _.isDate upper_bound
       throw new Error "Upper bound (#{typeof upper_bound}) must be of type 'Date'."
 
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+time]'
-    .between [conversation_id, upper_bound.toISOString()], [conversation_id, new Date().toISOString()], true, true
+    .between [conversation_id, upper_bound.toISOString()], [conversation_id, new Date().toISOString()], include_upper_bound, true
     .limit limit
     .toArray()
 

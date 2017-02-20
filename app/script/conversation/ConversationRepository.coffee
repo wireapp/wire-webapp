@@ -207,9 +207,10 @@ class z.conversation.ConversationRepository
       conversation_et.is_pending false
       return mapped_messages
 
-  get_events_with_offset: (conversation_et, message_et) ->
+  # TODO naming
+  get_events_with_offset: (conversation_et, message_et, include_message) ->
     conversation_et.is_pending true
-    @conversation_service.load_events_with_offset_from_db conversation_et.id, new Date(message_et.timestamp), z.config.MESSAGES_FETCH_LIMIT
+    @conversation_service.load_events_with_offset_from_db conversation_et.id, new Date(message_et.timestamp), z.config.MESSAGES_FETCH_LIMIT, include_message
     .then (events) =>
       return @_add_events_to_conversation events, conversation_et
     .then (mapped_messages) ->

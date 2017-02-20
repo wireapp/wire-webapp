@@ -42,6 +42,9 @@ class z.ViewModel.MessageListViewModel
     # store last read to show until user switches conversation
     @conversation_last_read_timestamp = ko.observable undefined
 
+    # TODO we sould align this with has_further_messages
+    @conversation_reached_bottom = false
+
     # store conversation to mark as read when browser gets focus
     @mark_as_read_on_focus = undefined
 
@@ -88,13 +91,11 @@ class z.ViewModel.MessageListViewModel
 
       if scroll_position >= scroll_end
         scrolled_bottom = true
-        console.debug 'push events because of scroll ', @capture_scrolling_event
-        @_push_events()
 
-        if document.hasFocus()
-          @conversation_repository.mark_as_read @conversation()
-        else
-          @mark_as_read_on_focus = @conversation()
+        if not @conversation_reached_bottom
+          @_push_events()
+
+        @_mark_conversation_as_read_on_focus @conversation()
 
       @should_scroll_to_bottom = scroll_position > scroll_end - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD
 
@@ -115,6 +116,16 @@ class z.ViewModel.MessageListViewModel
     amplify.subscribe z.event.WebApp.CONTEXT_MENU, @on_context_menu_action
 
   ###
+  Mark conversation as read in window has focus
+  @param conversation_et [z.entity.Conversation] Conversation entity to mark as read
+  ###
+  _mark_conversation_as_read_on_focus: (conversation_et) =>
+    if document.hasFocus()
+      @conversation_repository.mark_as_read conversation_et
+    else
+      @mark_as_read_on_focus = conversation_et
+
+  ###
   Remove all subscriptions and reset states.
   @param conversation_et [z.entity.Conversation] Conversation entity to change to
   ###
@@ -123,6 +134,7 @@ class z.ViewModel.MessageListViewModel
     @messages_subscription?.dispose()
     @capture_scrolling_event = false
     @conversation_last_read_timestamp false
+    @conversation_reached_bottom = false
 
   ###
   Change conversation.
@@ -248,13 +260,8 @@ class z.ViewModel.MessageListViewModel
       window.requestAnimationFrame -> messages_container.scroll_to_bottom()
 
     # mark as read when conversation is not scrollable
-    is_scrollable = messages_container.is_scrollable()
-    is_browser_has_focus = document.hasFocus()
-    if not is_scrollable
-      if is_browser_has_focus
-        @conversation_repository.mark_as_read @conversation()
-      else
-        @mark_as_read_on_focus = @conversation()
+    if not messages_container.is_scrollable()
+      @_mark_conversation_as_read_on_focus @conversation()
 
   # Get previous messages from the backend.
   _pull_events: =>
@@ -270,9 +277,13 @@ class z.ViewModel.MessageListViewModel
         @capture_scrolling_event = true
 
   _push_events: =>
+    return if @conversation_reached_bottom
     @capture_scrolling_event = false
-    @conversation_repository.get_events_with_offset @conversation(), @conversation().get_last_message()
-    .then =>
+    @conversation_repository.get_events_with_offset @conversation(), @conversation().get_last_message(), false
+    .then (message_ets) =>
+      console.debug 'pushed messages ', message_ets
+      if message_ets.length is 0
+        @conversation_reached_bottom = true
       @capture_scrolling_event = true
 
   scroll_height: (change_in_height) ->
