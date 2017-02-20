@@ -42,7 +42,7 @@ class z.ViewModel.MessageListViewModel
     # store last read to show until user switches conversation
     @conversation_last_read_timestamp = ko.observable undefined
 
-    # TODO we sould align this with has_further_messages
+    # TODO we should align this with has_further_messages
     @conversation_reached_bottom = false
 
     # store conversation to mark as read when browser gets focus
@@ -114,6 +114,7 @@ class z.ViewModel.MessageListViewModel
 
     amplify.subscribe z.event.WebApp.CONVERSATION.PEOPLE.HIDE, @hide_bubble
     amplify.subscribe z.event.WebApp.CONTEXT_MENU, @on_context_menu_action
+    amplify.subscribe z.event.WebApp.CONVERSATION.INPUT.CLICK, @on_conversation_input_click
 
   ###
   Mark conversation as read in window has focus
@@ -156,53 +157,33 @@ class z.ViewModel.MessageListViewModel
     if @conversation().unread_message_count() > 0
       @conversation_last_read_timestamp @conversation().last_read_timestamp()
 
-    if not conversation_et.is_loaded()
-      @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
-        if @marked_message()
-          @conversation_repository.get_events_with_offset conversation_et, @marked_message()
-          .then =>
-            conversation_et.is_loaded true
-            @_set_conversation conversation_et, callback
-        else
-          @conversation_repository.get_events conversation_et
-          .then =>
-            conversation_et.is_loaded true
-            @_set_conversation conversation_et, callback
+    if conversation_et.is_loaded() # TODO rethink conversation.is_loaded
+      return @_render_conversation conversation_et, callback
 
-    else
-      @_set_conversation conversation_et, callback
+    @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
+      Promise.resolve().then =>
+        if @marked_message()
+          return @conversation_repository.get_events_with_offset conversation_et, @marked_message()
+        return @conversation_repository.get_events conversation_et
+      .then =>
+        conversation_et.is_loaded true
+        @_render_conversation conversation_et, callback
 
   ###
   Sets the conversation and waits for further processing until knockout has rendered the messages.
   @param conversation_et [z.entity.Conversation] Conversation entity to set
   @param callback [Function] Executed when message list is ready to fade in
   ###
-  _set_conversation: (conversation_et, callback) =>
+  _render_conversation: (conversation_et, callback) =>
     # hide conversation until everything is processed
     $('.conversation').css opacity: 0
 
     @conversation_is_changing = false
 
-    if @conversation().messages_visible().length is 0
-      # return immediately if nothing to render
-      @_initial_rendering conversation_et, callback
-    else
-      window.setTimeout =>
-        @_initial_rendering conversation_et, callback
-      , 200
-
-  ###
-  Registers for mouse wheel events and incoming messages.
-
-  @note Call this once after changing conversation.
-  @param conversation_et [z.entity.Conversation] Conversation entity to render
-  @param callback [Function] Executed when message list is ready to fade in
-  ###
-  _initial_rendering: (conversation_et, callback) =>
     messages_container = $('.messages-wrap')
     messages_container.on 'mousewheel', @on_mouse_wheel
 
-    window.requestAnimationFrame =>
+    window.setTimeout =>
       is_current_conversation = conversation_et is @conversation()
       if not is_current_conversation
         @logger.info 'Skipped loading conversation', conversation_et.display_name()
@@ -224,12 +205,14 @@ class z.ViewModel.MessageListViewModel
           messages_container.scroll_by unread_message.parent().parent().position().top
         else
           messages_container.scroll_to_bottom()
+
       $('.conversation').css opacity: 1
 
       # subscribe for incoming messages
       @messages_subscription = conversation_et.messages_visible.subscribe @_on_message_add, null, 'arrayChange'
       @_subscribe_to_iframe_clicks()
       callback?()
+    , 100
 
   ###
   Checks how to scroll message list and if conversation should be marked as unread.
@@ -287,6 +270,15 @@ class z.ViewModel.MessageListViewModel
 
   scroll_height: (change_in_height) ->
     $('.messages-wrap').scroll_by change_in_height
+
+  on_conversation_input_click: =>
+    if @conversation_reached_bottom
+      $('.messages-wrap').scroll_to_bottom()
+    else
+      @conversation().remove_messages()
+      @conversation_repository.get_events @conversation()
+      .then =>
+        $('.messages-wrap').scroll_to_bottom()
 
   ###
   Triggered when user clicks on an avatar in the message list.
