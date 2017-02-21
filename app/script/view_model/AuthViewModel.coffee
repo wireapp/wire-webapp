@@ -42,10 +42,9 @@ class z.ViewModel.AuthViewModel
   constructor: (element_id, @auth) ->
     @logger = new z.util.Logger 'z.ViewModel.AuthViewModel', z.config.LOGGER.OPTIONS
 
+    @audio_repository = @auth.audio
     @event_tracker = new z.tracking.EventTrackingRepository()
     @user_service = new z.user.UserService @auth.client
-
-    @audio_repository = @auth.audio
 
     # Cryptography
     @asset_service = new z.assets.AssetService @auth.client
