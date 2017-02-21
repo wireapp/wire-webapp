@@ -164,8 +164,8 @@ class z.ViewModel.MessageListViewModel
     @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
       Promise.resolve().then =>
         if @marked_message()
-          return @conversation_repository.get_events_with_message conversation_et, @marked_message()
-        return @conversation_repository.get_events conversation_et
+          return @conversation_repository.get_messages_with_offset conversation_et, @marked_message()
+        return @conversation_repository.get_preceding_messages conversation_et
       .then =>
         conversation_et.is_loaded true
         @_render_conversation conversation_et, callback
@@ -254,7 +254,7 @@ class z.ViewModel.MessageListViewModel
       old_list_height = inner_container.scrollHeight
 
       @capture_scrolling_event = false
-      @conversation_repository.get_events @conversation()
+      @conversation_repository.get_preceding_messages @conversation()
       .then =>
         new_list_height = inner_container.scrollHeight
         $('.messages-wrap').scrollTop new_list_height - old_list_height
@@ -270,7 +270,7 @@ class z.ViewModel.MessageListViewModel
       return
 
     @capture_scrolling_event = false
-    @conversation_repository.get_events_with_offset @conversation(), last_message, false
+    @conversation_repository.get_subsequent_messages @conversation(), last_message, false
     .then (message_ets) =>
       if message_ets.length is 0
         @conversation_reached_bottom = true
@@ -293,7 +293,7 @@ class z.ViewModel.MessageListViewModel
       $('.messages-wrap').scroll_to_bottom()
     else
       @conversation().remove_messages()
-      @conversation_repository.get_events @conversation()
+      @conversation_repository.get_preceding_messages @conversation()
       .then ->
         $('.messages-wrap').scroll_to_bottom()
 

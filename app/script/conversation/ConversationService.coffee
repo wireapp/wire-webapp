@@ -244,7 +244,7 @@ class z.conversation.ConversationService
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
   ###
-  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = Number.MAX_SAFE_INTEGER) ->
+  load_preceding_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = Number.MAX_SAFE_INTEGER) ->
     if not _.isDate(lower_bound) or not _.isDate upper_bound
       throw new Error "Lower bound (#{typeof lower_bound}) and upper bound (#{typeof upper_bound}) must be of type 'Date'."
     else if lower_bound.getTime() > upper_bound.getTime()
@@ -269,7 +269,7 @@ class z.conversation.ConversationService
   @param include_upper_bound [Boolean] Should upper bound be part of the message
   @return [Promise] Promise that resolves with the retrieved records
   ###
-  load_events_with_offset_from_db: (conversation_id, upper_bound, limit = Number.MAX_SAFE_INTEGER, include_upper_bound = true) =>
+  load_subsequent_events_from_db: (conversation_id, upper_bound, limit = Number.MAX_SAFE_INTEGER, include_upper_bound = true) =>
     if not _.isDate upper_bound
       throw new Error "Upper bound (#{typeof upper_bound}) must be of type 'Date'."
 
