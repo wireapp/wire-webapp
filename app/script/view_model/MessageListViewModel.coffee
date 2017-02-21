@@ -71,7 +71,7 @@ class z.ViewModel.MessageListViewModel
       is_not_scrollable = not $(e.currentTarget).is_scrollable()
       is_scrolling_up = e.deltaY > 0
       if is_not_scrollable and is_scrolling_up
-        @_pull_events()
+        @_pull_messages()
     , 200
 
     @on_scroll = _.throttle (data, e) =>
@@ -88,13 +88,13 @@ class z.ViewModel.MessageListViewModel
       scrolled_bottom = false
 
       if scroll_position is 0
-        @_pull_events()
+        @_pull_messages()
 
       if scroll_position >= scroll_end
         scrolled_bottom = true
 
         if not @conversation_reached_bottom
-          @_push_events()
+          @_push_messages()
 
         @_mark_conversation_as_read_on_focus @conversation()
 
@@ -118,7 +118,7 @@ class z.ViewModel.MessageListViewModel
     amplify.subscribe z.event.WebApp.CONVERSATION.INPUT.CLICK, @on_conversation_input_click
 
   ###
-  Mark conversation as read in window has focus
+  Mark conversation as read if window has focus
   @param conversation_et [z.entity.Conversation] Conversation entity to mark as read
   ###
   _mark_conversation_as_read_on_focus: (conversation_et) =>
@@ -246,8 +246,10 @@ class z.ViewModel.MessageListViewModel
     if not messages_container.is_scrollable()
       @_mark_conversation_as_read_on_focus @conversation()
 
-  # Get previous messages from the backend.
-  _pull_events: =>
+  ###
+  Fetch older messages beginning from the oldest message in view
+  ###
+  _pull_messages: =>
     if not @conversation().is_pending() and @conversation().has_further_messages()
       inner_container = $('.messages-wrap').children()[0]
       old_list_height = inner_container.scrollHeight
@@ -259,7 +261,10 @@ class z.ViewModel.MessageListViewModel
         $('.messages-wrap').scrollTop new_list_height - old_list_height
         @capture_scrolling_event = true
 
-  _push_events: =>
+  ###
+  Fetch newer messages beginning from the newest message in view
+  ###
+  _push_messages: =>
     return if @conversation_reached_bottom
     @capture_scrolling_event = false
     @conversation_repository.get_events_with_offset @conversation(), @conversation().get_last_message(), false
@@ -268,6 +273,10 @@ class z.ViewModel.MessageListViewModel
         @conversation_reached_bottom = true
       @capture_scrolling_event = true
 
+  ###
+  Scroll to given message in the list. Ideally message is centered horizontally
+  @param message_et [z.entity.Message]
+  ###
   _focus_message: (message_et) ->
     message_element = $(".message[data-uie-uid=\"#{message_et.id}\"]")
     message_list_element = $('.messages-wrap')
