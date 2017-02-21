@@ -456,8 +456,8 @@ class z.conversation.EventMapper
       asset_et.original_resource z.assets.AssetRemoteData.v2 asset_et.conversation_id, asset_et.id, event.data.otr_key, event.data.sha256,
 
     # remote data - preview
-    if event.data.preview_id?
-      if event.data.key
+    if event.data.preview_otr_key?
+      if event.data.preview_key
         {preview_key, preview_otr_key, preview_sha256, preview_token} = event.data
         asset_et.preview_resource z.assets.AssetRemoteData.v3 preview_key, preview_otr_key, preview_sha256, preview_token, true
       else

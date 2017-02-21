@@ -894,6 +894,24 @@ class z.conversation.ConversationRepository
     @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
+  Send asset preview message to specified conversation.
+  @param conversation_et [z.entity.Conversation] Conversation that should receive the preview
+  @param file [File] File to generate preview from
+  @param message_id [String] Message ID of the message to generate a preview for
+  ###
+  send_asset_preview: (conversation_et, file, message_id) =>
+    poster(file).then (img_blob) =>
+      @asset_service.upload_image_asset img_blob
+    .then (uploaded_image_asset) =>
+      asset = new z.proto.Asset()
+      asset.set 'preview', new z.proto.Asset.Preview uploaded_image_asset.original.mime_type, uploaded_image_asset.original.size, uploaded_image_asset.uploaded
+      generic_message = new z.proto.GenericMessage message_id
+      generic_message.set 'asset', asset
+      @_send_and_inject_generic_message conversation_et, generic_message
+    .catch (error) =>
+      @logger.warn "Failed to upload otr asset-preview for conversation #{conversation_et.id}", error
+
+  ###
   Send asset upload failed message to specified conversation.
 
   @param conversation_et [z.entity.Conversation] Conversation that should receive the file
@@ -1509,7 +1527,7 @@ class z.conversation.ConversationRepository
     @send_asset_metadata conversation_et, file
     .then (record) =>
       message_id = record.id
-      @send_asset conversation_et, file, record.id
+      @send_asset conversation_et, file, message_id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
       @logger.info "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
@@ -1546,7 +1564,9 @@ class z.conversation.ConversationRepository
     @send_asset_metadata conversation_et, file
     .then (record) =>
       message_id = record.id
-      @send_asset_v3 conversation_et, file, record.id
+      @send_asset_preview conversation_et, file, message_id
+    .then =>
+      @send_asset_v3 conversation_et, file, message_id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
       @logger.info "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
