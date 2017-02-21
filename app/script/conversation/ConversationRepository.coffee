@@ -573,8 +573,6 @@ class z.conversation.ConversationRepository
   add_members: (conversation_et, users_ids) =>
     @conversation_service.post_members conversation_et.id, users_ids
     .then (response) ->
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT,
-        z.tracking.SessionEventName.INTEGER.USERS_ADDED_TO_CONVERSATIONS, users_ids.length
       amplify.publish z.event.WebApp.EVENT.INJECT, response
     .catch (error_response) ->
       if error_response.label is z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
@@ -699,9 +697,7 @@ class z.conversation.ConversationRepository
   ###
   rename_conversation: (conversation_et, name) =>
     @conversation_service.update_conversation_properties conversation_et.id, name
-    .then (response) ->
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.CONVERSATION_RENAMED
-      amplify.publish z.event.WebApp.EVENT.INJECT, response
+    .then (response) -> amplify.publish z.event.WebApp.EVENT.INJECT, response
 
   reset_session: (user_id, client_id, conversation_id) =>
     @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'."
@@ -1099,7 +1095,6 @@ class z.conversation.ConversationRepository
   send_message_with_link_preview: (message, conversation_et) =>
     @send_message message, conversation_et
     .then (generic_message) =>
-      @_track_rich_media_content message
       @send_link_preview message, conversation_et, generic_message
     .catch (error) =>
       @logger.error "Error while sending text message: #{error.message}", error
@@ -2121,8 +2116,6 @@ class z.conversation.ConversationRepository
       return false
     else
       @logger.warn "Event with nonce '#{event_nonce}' has been already processed.", message_et
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT,
-        z.tracking.SessionEventName.INTEGER.EVENT_HIDDEN_DUE_TO_DUPLICATE_NONCE
       return true
 
   ###
@@ -2582,21 +2575,6 @@ class z.conversation.ConversationRepository
       conversation_type: z.tracking.helpers.get_conversation_type conversation
       time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
       time_elapsed_action: seconds_since_message_creation
-
-  ###
-  Track rich media content actions in text messages.
-  @private
-  @param message [String] Message content to be checked for rich media
-  ###
-  _track_rich_media_content: (message) ->
-    soundcloud_links = message.match z.media.MediaEmbeds.regex.soundcloud
-    if soundcloud_links
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.SOUNDCLOUD_LINKS_SENT, soundcloud_links.length
-
-    youtube_links = message.match z.media.MediaEmbeds.regex.youtube
-    if youtube_links
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.YOUTUBE_LINKS_SENT, youtube_links.length
-
 
   ###
   Track reaction action.

@@ -47,19 +47,15 @@ class z.tracking.EventTrackingRepository
   constructor: (@user_repository, @conversation_repository) ->
     @logger = new z.util.Logger 'z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS
 
-    @localytics = undefined # Localytics
-    @session_interval = undefined # Interval to track the Localytics session
+    @localytics = undefined
     @properties = undefined # Reference to the properties
 
     @reported_errors = ko.observableArray()
     @reported_errors.subscribe => @reported_errors [] if @reported_errors().length > 999
-    @session_values = {}
 
     if @user_repository is undefined and @conversation_repository is undefined
       @init_without_user_tracking()
     else
-      @session_started = Date.now()
-      @_set_empty_session_data()
       amplify.subscribe z.event.WebApp.ANALYTICS.INIT, @init
 
   ###
@@ -71,7 +67,6 @@ class z.tracking.EventTrackingRepository
 
     if not @_localytics_disabled() and @_has_permission()
       @_enable_error_reporting()
-      @start_session()
       amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
 
     @_subscribe_to_events()
@@ -82,106 +77,34 @@ class z.tracking.EventTrackingRepository
     if not @_localytics_disabled()
       if not @localytics
         @_init_localytics window, document, 'script', @localytics
-      @_start_session()
       amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
 
   updated_send_data: (send_data) =>
     if send_data
       @_enable_error_reporting()
       if not @_localytics_disabled()
-        @start_session()
         amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.TRACKING.OPT_IN
     else
       if not @_localytics_disabled()
         amplify.unsubscribeAll z.event.WebApp.ANALYTICS.EVENT
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.TRACKING.OPT_OUT
-        @_set_empty_session_data()
         @_disable_localytics()
       @_disable_error_reporting()
 
-  # @return [Boolean] true when "improve_wire" is set to "true".
   _has_permission: ->
     return false if @properties is undefined
     return @properties.settings.privacy.improve_wire
 
   _subscribe_to_events: ->
-    amplify.subscribe z.event.WebApp.ANALYTICS.SESSION.START, @start_session
-    amplify.subscribe z.event.WebApp.ANALYTICS.SESSION.CLOSE, @close_session
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.SEND_DATA, @updated_send_data
 
+  track_event: (event_name, attributes) =>
+    @_tag_and_upload_event event_name, attributes
 
   ###############################################################################
   # Localytics
   ###############################################################################
-
-  close_session: =>
-    return if @localytics is undefined or not @_has_permission()
-    @logger.info 'Closing Localytics session'
-
-    session_ended = Date.now()
-    session_duration = session_ended - @session_started
-    @session_values['sessionDuration'] = session_duration / 1000
-
-    @localytics 'upload'
-    @localytics 'close'
-    @_set_empty_session_data()
-
-  start_session: =>
-    return if not @_has_permission() or @session_interval
-
-    if not @localytics
-      @_init_localytics window, document, 'script', @localytics
-
-    @_start_session()
-    @session_interval = window.setInterval @tag_and_upload_session, LOCALYTICS.TRACKING_INTERVAL
-
-  # @note We need a fat arrow here, because this function is executed from "window.setInterval"
-  #
-  tag_and_upload_session: =>
-    return if not @_has_permission()
-
-    number_of_connections = @user_repository.get_number_of_connections()
-
-    @session_values[z.tracking.SessionEventName.INTEGER.TOTAL_CONTACTS] = @user_repository.connections().length
-    @session_values[z.tracking.SessionEventName.INTEGER.TOTAL_GROUP_CONVERSATIONS] = @conversation_repository.get_number_of_group_conversations()
-    @session_values[z.tracking.SessionEventName.INTEGER.TOTAL_INCOMING_CONNECTION_REQUESTS] = number_of_connections.incoming
-    @session_values[z.tracking.SessionEventName.INTEGER.TOTAL_OUTGOING_CONNECTION_REQUESTS] = number_of_connections.outgoing
-    @session_values[z.tracking.SessionEventName.INTEGER.TOTAL_ARCHIVED_CONVERSATIONS] = @conversation_repository.conversations_archived().length
-    @session_values[z.tracking.SessionEventName.INTEGER.TOTAL_SILENCED_CONVERSATIONS] = @conversation_repository.get_number_of_silenced_conversations()
-
-    # Sanitize logging data
-    for key of @session_values when key is 'undefined'
-      delete @session_values[key]
-
-    # Log data
-    @logger.info 'Uploading session data...', @session_values
-    @_tag_and_upload_event 'session', @session_values
-
-  track_event: (event_name, attributes) =>
-    @_log_event event_name, attributes
-    if @session_values[event_name] isnt undefined
-      if attributes is undefined
-        # Increment session event value
-        @session_values[event_name] += 1
-      else
-        if window.Number.isInteger attributes
-          @session_values[event_name] += attributes
-        else
-          @session_values[event_name] = attributes
-    else
-      # Logging events which are not bound to a session
-      @_tag_and_upload_event event_name, attributes
-
-  _set_empty_session_data: ->
-    window.clearInterval @session_interval if @session_interval
-    @session_interval = undefined
-
-    for index, event_name of z.tracking.SessionEventName.INTEGER
-      @session_values[event_name] = 0
-
-    for index, event_name of z.tracking.SessionEventName.BOOLEAN
-      @session_values[event_name] = false
 
   _disable_localytics: ->
     @localytics 'close'
@@ -222,25 +145,16 @@ class z.tracking.EventTrackingRepository
         return true
     return false
 
-  _log_event: (event_name, attributes) ->
+  _tag_and_upload_event: (event_name, attributes) =>
+    return if not @localytics
+
     if attributes
       @logger.info "Localytics event '#{event_name}' with attributes: #{JSON.stringify(attributes)}"
     else
       @logger.info "Localytics event '#{event_name}' without attributes"
 
-  _start_session: =>
-    return if not @localytics
-
-    @logger.info 'Starting new Localytics session'
-    @localytics 'open'
-    @localytics 'upload'
-
-  _tag_and_upload_event: (event_name, attributes) =>
-    return if not @localytics
-
     @localytics 'tagEvent', event_name, attributes
     @localytics 'upload'
-
 
   ###############################################################################
   # Raygun

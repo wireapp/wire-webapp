@@ -56,7 +56,6 @@ class z.ViewModel.list.StartUIViewModel
     , 300
 
     @searched_for_user = _.once (query) ->
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.BOOLEAN.SEARCHED_FOR_PEOPLE, true
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTACTS.ENTERED_SEARCH,
         by_username_only: query.startsWith '@'
         context: 'startui'
@@ -239,8 +238,6 @@ class z.ViewModel.list.StartUIViewModel
     @clear_search_results()
     @user_profile null
     $('user-input input').focus()
-
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.SEARCH_OPENED
 
   _close_list: ->
     @user_bubble?.hide()
