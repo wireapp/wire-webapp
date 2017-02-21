@@ -210,7 +210,6 @@ class z.ViewModel.MessageListViewModel
 
       # subscribe for incoming messages
       @messages_subscription = conversation_et.messages_visible.subscribe @_on_message_add, null, 'arrayChange'
-      @_subscribe_to_iframe_clicks()
       callback?()
     , 100
 
@@ -362,14 +361,6 @@ class z.ViewModel.MessageListViewModel
     @conversation_repository.reset_session message_et.from, message_et.client_id, @conversation().id
     .then -> reset_progress()
     .catch -> reset_progress()
-
-  # Subscribes to iFrame click events.
-  _subscribe_to_iframe_clicks: ->
-    $('iframe.soundcloud').iframeTracker blurCallback: ->
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.SOUNDCLOUD_CONTENT_CLICKED
-
-    $('iframe.youtube').iframeTracker blurCallback: ->
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.YOUTUBE_CONTENT_CLICKED
 
   # Hides participant bubble.
   hide_bubble: =>

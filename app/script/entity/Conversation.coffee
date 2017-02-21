@@ -329,7 +329,6 @@ class z.entity.Conversation
     return message_et if not message_et? or not other_message_et?
     if message_et.has_nonce() and other_message_et.has_nonce() and message_et.nonce is other_message_et.nonce
       sorted_messages = z.entity.Message.sort_by_timestamp [message_et, other_message_et]
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.EVENT_HIDDEN_DUE_TO_DUPLICATE_NONCE
       if message_et.type is z.event.Client.CONVERSATION.ASSET_META and other_message_et.type is z.event.Client.CONVERSATION.ASSET_META
         # android sends to meta messages with the same content. we would store both and but only update the first one
         # whenever we reload the conversation the nonce check would hide the older one and we would show the non updated message

@@ -30,15 +30,6 @@ describe 'z.tracking.EventTrackingRepository', ->
     .catch done.fail
 
   describe 'Initialization', ->
-    it 'initializes session values when parameters are supplied', ->
-      expect(Object.keys(tracking_repository.session_values).length).toBeGreaterThan 0
-      expect(tracking_repository.session_started).toBeTruthy()
-
-    it 'does not initialize session values when it is created without parameters', ->
-      repository = new z.tracking.EventTrackingRepository()
-      expect(Object.keys(repository.session_values).length).toBe 0
-      expect(repository.session_started).toBeFalsy()
-
     it 'initializes error reporting on an init event', ->
       spyOn(tracking_repository, 'init').and.callThrough()
       spyOn(tracking_repository, '_enable_error_reporting').and.callThrough()
@@ -49,56 +40,20 @@ describe 'z.tracking.EventTrackingRepository', ->
   describe 'Tracking', ->
     event_name = undefined
 
-    beforeAll ->
-      event_name = Object.keys(tracking_repository.session_values)[0]
-
     beforeEach ->
       amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, tracking_repository.track_event
 
     afterEach ->
       amplify.unsubscribeAll z.event.WebApp.ANALYTICS.EVENT
 
-    it 'counts up tracking values on incoming tracking events', ->
-      expect(tracking_repository.session_values[event_name]).toEqual 0
-
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name
-      expect(tracking_repository.session_values[event_name]).toEqual 1
-
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name
-      expect(tracking_repository.session_values[event_name]).toEqual 2
-
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name
-      expect(tracking_repository.session_values[event_name]).toEqual 3
-
-    it 'counts up tracking values on incoming tracking events with numbers', ->
-      expect(tracking_repository.session_values[event_name]).toEqual 0
-
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name, 10
-      expect(tracking_repository.session_values[event_name]).toEqual 10
-
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name, 10
-      expect(tracking_repository.session_values[event_name]).toEqual 20
-
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name, 10
-      expect(tracking_repository.session_values[event_name]).toEqual 30
-
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name
-      expect(tracking_repository.session_values[event_name]).toEqual 31
-
-    it 'immediately reports events (which are not session events)', ->
+    it 'immediately reports events', ->
       tracking_repository._tag_and_upload_event = jasmine.createSpy()
 
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, 'i_am_not_a_session_event'
+      amplify.publish z.event.WebApp.ANALYTICS.EVENT, 'i_am_an_event'
       expect(tracking_repository._tag_and_upload_event).toHaveBeenCalled()
       expect(tracking_repository._tag_and_upload_event).toHaveBeenCalledTimes 1
 
-    it 'collects session events to report them later (no immediate reporting)', ->
-      tracking_repository._tag_and_upload_event = jasmine.createSpy()
-
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name
-      expect(tracking_repository._tag_and_upload_event).not.toHaveBeenCalled()
-
-    it 'allows additional parameters for non-session events', ->
+    it 'allows additional parameters for events', ->
       tracking_repository._tag_and_upload_event = jasmine.createSpy()
 
       event_name = 'ArticleView'
