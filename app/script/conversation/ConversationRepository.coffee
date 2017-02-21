@@ -192,6 +192,7 @@ class z.conversation.ConversationRepository
         return @event_mapper.map_json_event event, conversation_et
       throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
 
+  # TODO naming
   get_events: (conversation_et) ->
     conversation_et.is_pending true
 
@@ -203,6 +204,20 @@ class z.conversation.ConversationRepository
       if events.length < z.config.MESSAGES_FETCH_LIMIT
         conversation_et.has_further_messages false
       return @_add_events_to_conversation events, conversation_et
+    .then (mapped_messages) ->
+      conversation_et.is_pending false
+      return mapped_messages
+
+  # TODO naming
+  get_events_with_message: (conversation_et, message_et) ->
+    message_date = new Date message_et.timestamp
+    conversation_et.is_pending true
+    Promise.all([
+      @conversation_service.load_events_from_db(conversation_et.id, new Date(0), message_date, 15)
+      @conversation_service.load_events_with_offset_from_db(conversation_et.id, message_date, 15, true)
+    ])
+    .then ([older_events, newer_events]) =>
+      return @_add_events_to_conversation older_events.concat(newer_events), conversation_et
     .then (mapped_messages) ->
       conversation_et.is_pending false
       return mapped_messages

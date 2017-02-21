@@ -163,7 +163,7 @@ class z.ViewModel.MessageListViewModel
     @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
       Promise.resolve().then =>
         if @marked_message()
-          return @conversation_repository.get_events_with_offset conversation_et, @marked_message()
+          return @conversation_repository.get_events_with_message conversation_et, @marked_message()
         return @conversation_repository.get_events conversation_et
       .then =>
         conversation_et.is_loaded true
@@ -198,9 +198,8 @@ class z.ViewModel.MessageListViewModel
         @conversation_repository.mark_as_read conversation_et
       else
         unread_message = $ '.message-timestamp-unread'
-        marked_message = $ '.message-marked'
-        if marked_message.length > 0
-          messages_container.scroll_by marked_message.parent().position().top
+        if @marked_message()?
+          @_focus_message @marked_message()
         else if unread_message.length > 0
           messages_container.scroll_by unread_message.parent().parent().position().top
         else
@@ -267,6 +266,12 @@ class z.ViewModel.MessageListViewModel
       if message_ets.length is 0
         @conversation_reached_bottom = true
       @capture_scrolling_event = true
+
+  _focus_message: (message_et) =>
+    debugger
+    message_element = $(".message[data-uie-uid=\"#{message_et.id}\"]")
+    message_list_element = $('.messages-wrap')
+    message_list_element.scroll_by message_element.offset().top - message_list_element.height() / 2
 
   scroll_height: (change_in_height) ->
     $('.messages-wrap').scroll_by change_in_height
