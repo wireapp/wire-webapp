@@ -264,9 +264,13 @@ class z.ViewModel.MessageListViewModel
   Fetch newer messages beginning from the newest message in view
   ###
   _push_messages: =>
-    return if @conversation_reached_bottom
+    last_message = @conversation().get_last_message()
+
+    if @conversation_reached_bottom or not last_message?
+      return
+
     @capture_scrolling_event = false
-    @conversation_repository.get_events_with_offset @conversation(), @conversation().get_last_message(), false
+    @conversation_repository.get_events_with_offset @conversation(), last_message, false
     .then (message_ets) =>
       if message_ets.length is 0
         @conversation_reached_bottom = true
