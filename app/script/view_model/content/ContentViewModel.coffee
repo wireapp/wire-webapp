@@ -115,7 +115,7 @@ class z.ViewModel.content.ContentViewModel
 
   @param conversation_et [z.entity.Conversation | String] Conversation entity or conversation ID
   ###
-  show_conversation: (conversation_et) =>
+  show_conversation: (conversation_et, message_et) =>
     return @switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS if not conversation_et
 
     conversation_et = @conversation_repository.get_conversation_by_id conversation_et if not conversation_et.id
@@ -124,7 +124,7 @@ class z.ViewModel.content.ContentViewModel
     @_release_content()
     @content_state z.ViewModel.content.CONTENT_STATE.CONVERSATION
     @conversation_repository.active_conversation conversation_et
-    @message_list.change_conversation conversation_et, =>
+    @message_list.change_conversation conversation_et, message_et, =>
       @_show_content z.ViewModel.content.CONTENT_STATE.CONVERSATION
       @participants.change_conversation conversation_et
       @previous_conversation = @conversation_repository.active_conversation()

@@ -36,8 +36,14 @@ class z.ViewModel.MessageListViewModel
 
     @conversation_is_changing = false
 
+    # message that should be focused
+    @marked_message = ko.observable undefined
+
     # store last read to show until user switches conversation
     @conversation_last_read_timestamp = ko.observable undefined
+
+    # TODO we should align this with has_further_messages
+    @conversation_reached_bottom = false
 
     # store conversation to mark as read when browser gets focus
     @mark_as_read_on_focus = undefined
@@ -57,6 +63,7 @@ class z.ViewModel.MessageListViewModel
 
     @recalculate_timeout = undefined
 
+    # should we scroll to bottom when new message comes in
     @should_scroll_to_bottom = true
 
     # Check if the message container is to small and then pull new events
@@ -64,7 +71,7 @@ class z.ViewModel.MessageListViewModel
       is_not_scrollable = not $(e.currentTarget).is_scrollable()
       is_scrolling_up = e.deltaY > 0
       if is_not_scrollable and is_scrolling_up
-        @_pull_events()
+        @_pull_messages()
     , 200
 
     @on_scroll = _.throttle (data, e) =>
@@ -81,15 +88,15 @@ class z.ViewModel.MessageListViewModel
       scrolled_bottom = false
 
       if scroll_position is 0
-        @_pull_events()
+        @_pull_messages()
 
       if scroll_position >= scroll_end
         scrolled_bottom = true
 
-        if document.hasFocus()
-          @conversation_repository.mark_as_read @conversation()
-        else
-          @mark_as_read_on_focus = @conversation()
+        if not @conversation_reached_bottom
+          @_push_messages()
+
+        @_mark_conversation_as_read_on_focus @conversation()
 
       @should_scroll_to_bottom = scroll_position > scroll_end - z.config.SCROLL_TO_LAST_MESSAGE_THRESHOLD
 
@@ -108,6 +115,17 @@ class z.ViewModel.MessageListViewModel
 
     amplify.subscribe z.event.WebApp.CONVERSATION.PEOPLE.HIDE, @hide_bubble
     amplify.subscribe z.event.WebApp.CONTEXT_MENU, @on_context_menu_action
+    amplify.subscribe z.event.WebApp.CONVERSATION.INPUT.CLICK, @on_conversation_input_click
+
+  ###
+  Mark conversation as read if window has focus
+  @param conversation_et [z.entity.Conversation] Conversation entity to mark as read
+  ###
+  _mark_conversation_as_read_on_focus: (conversation_et) =>
+    if document.hasFocus()
+      @conversation_repository.mark_as_read conversation_et
+    else
+      @mark_as_read_on_focus = conversation_et
 
   ###
   Remove all subscriptions and reset states.
@@ -118,13 +136,15 @@ class z.ViewModel.MessageListViewModel
     @messages_subscription?.dispose()
     @capture_scrolling_event = false
     @conversation_last_read_timestamp false
+    @conversation_reached_bottom = false
 
   ###
   Change conversation.
   @param conversation_et [z.entity.Conversation] Conversation entity to change to
+  @param message_et [z.entity.Message] message to be focused
   @param callback [Function] Executed when all events are loaded an conversation is ready to be displayed
   ###
-  change_conversation: (conversation_et, callback) =>
+  change_conversation: (conversation_et, message_et, callback) =>
     @conversation_is_changing = true
 
     # clean up old conversation
@@ -132,51 +152,39 @@ class z.ViewModel.MessageListViewModel
 
     # update new conversation
     @conversation conversation_et
+    @marked_message message_et
 
     # keep last read timestamp to render unread when entering conversation
     if @conversation().unread_message_count() > 0
       @conversation_last_read_timestamp @conversation().last_read_timestamp()
 
-    if not conversation_et.is_loaded()
-      @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
-        @conversation_repository.get_events conversation_et
-        .then =>
-          conversation_et.is_loaded true
-          @_set_conversation conversation_et, callback
-    else
-      @_set_conversation conversation_et, callback
+    if conversation_et.is_loaded() # TODO rethink conversation.is_loaded
+      return @_render_conversation conversation_et, callback
+
+    @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
+      Promise.resolve().then =>
+        if @marked_message()
+          return @conversation_repository.get_messages_with_offset conversation_et, @marked_message()
+        return @conversation_repository.get_preceding_messages conversation_et
+      .then =>
+        conversation_et.is_loaded true
+        @_render_conversation conversation_et, callback
 
   ###
   Sets the conversation and waits for further processing until knockout has rendered the messages.
   @param conversation_et [z.entity.Conversation] Conversation entity to set
   @param callback [Function] Executed when message list is ready to fade in
   ###
-  _set_conversation: (conversation_et, callback) =>
+  _render_conversation: (conversation_et, callback) =>
     # hide conversation until everything is processed
     $('.conversation').css opacity: 0
 
     @conversation_is_changing = false
 
-    if @conversation().messages_visible().length is 0
-      # return immediately if nothing to render
-      @_initial_rendering conversation_et, callback
-    else
-      window.setTimeout =>
-        @_initial_rendering conversation_et, callback
-      , 200
-
-  ###
-  Registers for mouse wheel events and incoming messages.
-
-  @note Call this once after changing conversation.
-  @param conversation_et [z.entity.Conversation] Conversation entity to render
-  @param callback [Function] Executed when message list is ready to fade in
-  ###
-  _initial_rendering: (conversation_et, callback) =>
     messages_container = $('.messages-wrap')
     messages_container.on 'mousewheel', @on_mouse_wheel
 
-    window.requestAnimationFrame =>
+    window.setTimeout =>
       is_current_conversation = conversation_et is @conversation()
       if not is_current_conversation
         @logger.info 'Skipped loading conversation', conversation_et.display_name()
@@ -191,15 +199,19 @@ class z.ViewModel.MessageListViewModel
         @conversation_repository.mark_as_read conversation_et
       else
         unread_message = $ '.message-timestamp-unread'
-        if unread_message.length > 0
+        if @marked_message()?
+          @_focus_message @marked_message()
+        else if unread_message.length > 0
           messages_container.scroll_by unread_message.parent().parent().position().top
         else
           messages_container.scroll_to_bottom()
+
       $('.conversation').css opacity: 1
 
       # subscribe for incoming messages
       @messages_subscription = conversation_et.messages_visible.subscribe @_on_message_add, null, 'arrayChange'
       callback?()
+    , 100
 
   ###
   Checks how to scroll message list and if conversation should be marked as unread.
@@ -230,29 +242,60 @@ class z.ViewModel.MessageListViewModel
       window.requestAnimationFrame -> messages_container.scroll_to_bottom()
 
     # mark as read when conversation is not scrollable
-    is_scrollable = messages_container.is_scrollable()
-    is_browser_has_focus = document.hasFocus()
-    if not is_scrollable
-      if is_browser_has_focus
-        @conversation_repository.mark_as_read @conversation()
-      else
-        @mark_as_read_on_focus = @conversation()
+    if not messages_container.is_scrollable()
+      @_mark_conversation_as_read_on_focus @conversation()
 
-  # Get previous messages from the backend.
-  _pull_events: =>
+  ###
+  Fetch older messages beginning from the oldest message in view
+  ###
+  _pull_messages: =>
     if not @conversation().is_pending() and @conversation().has_further_messages()
       inner_container = $('.messages-wrap').children()[0]
       old_list_height = inner_container.scrollHeight
 
       @capture_scrolling_event = false
-      @conversation_repository.get_events @conversation()
+      @conversation_repository.get_preceding_messages @conversation()
       .then =>
         new_list_height = inner_container.scrollHeight
         $('.messages-wrap').scrollTop new_list_height - old_list_height
         @capture_scrolling_event = true
 
+  ###
+  Fetch newer messages beginning from the newest message in view
+  ###
+  _push_messages: =>
+    last_message = @conversation().get_last_message()
+
+    if @conversation_reached_bottom or not last_message?
+      return
+
+    @capture_scrolling_event = false
+    @conversation_repository.get_subsequent_messages @conversation(), last_message, false
+    .then (message_ets) =>
+      if message_ets.length is 0
+        @conversation_reached_bottom = true
+      @capture_scrolling_event = true
+
+  ###
+  Scroll to given message in the list. Ideally message is centered horizontally
+  @param message_et [z.entity.Message]
+  ###
+  _focus_message: (message_et) ->
+    message_element = $(".message[data-uie-uid=\"#{message_et.id}\"]")
+    message_list_element = $('.messages-wrap')
+    message_list_element.scroll_by message_element.offset().top - message_list_element.height() / 2
+
   scroll_height: (change_in_height) ->
     $('.messages-wrap').scroll_by change_in_height
+
+  on_conversation_input_click: =>
+    if @conversation_reached_bottom
+      $('.messages-wrap').scroll_to_bottom()
+    else
+      @conversation().remove_messages()
+      @conversation_repository.get_preceding_messages @conversation()
+      .then ->
+        $('.messages-wrap').scroll_to_bottom()
 
   ###
   Triggered when user clicks on an avatar in the message list.

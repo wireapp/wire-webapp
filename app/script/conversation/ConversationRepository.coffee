@@ -192,31 +192,61 @@ class z.conversation.ConversationRepository
         return @event_mapper.map_json_event event, conversation_et
       throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
 
-  get_events: (conversation_et) ->
+  ###
+  Get preceding messages starting with the given message
+  @param conversation_et [z.entity.Conversation]
+  @return [Promise]
+  ###
+  get_preceding_messages: (conversation_et) ->
     conversation_et.is_pending true
 
     first_message = conversation_et.get_first_message()
     upper_bound = if first_message then new Date first_message.timestamp else new Date()
 
-    @conversation_service.load_events_from_db conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT
+    @conversation_service.load_preceding_events_from_db conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT
     .then (events) =>
       if events.length < z.config.MESSAGES_FETCH_LIMIT
         conversation_et.has_further_messages false
-
-      if not events.length
-        @logger.info "No events for conversation '#{conversation_et.id}' found", events
-      else if first_message
-        @logger.info "Loaded #{events.length} event(s) starting at '#{upper_bound.toISOString()}' for conversation '#{conversation_et.id}'", events
-      else
-        @logger.info "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
-
       return @_add_events_to_conversation events, conversation_et
     .then (mapped_messages) ->
       conversation_et.is_pending false
       return mapped_messages
-    .catch (error) =>
-      @logger.info "Could not load events for conversation: #{conversation_et.id}", error
-      throw error
+
+  ###
+  Get specified message and load number preceding and subsequent messages defined by padding.
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  @return [Promise]
+  ###
+  get_messages_with_offset: (conversation_et, message_et, padding = 15) ->
+    message_date = new Date message_et.timestamp
+    conversation_et.is_pending true
+    Promise.all([
+      @conversation_service.load_preceding_events_from_db(conversation_et.id, new Date(0), message_date, padding)
+      @conversation_service.load_subsequent_events_from_db(conversation_et.id, message_date, padding, true)
+    ])
+    .then ([older_events, newer_events]) =>
+      return @_add_events_to_conversation older_events.concat(newer_events), conversation_et
+    .then (mapped_messages) ->
+      conversation_et.is_pending false
+      return mapped_messages
+
+  ###
+  Get subsequent messages starting with the given message
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  @param include_message [Boolean] include given message in the results
+  @return [Promise]
+  ###
+  get_subsequent_messages: (conversation_et, message_et, include_message) ->
+    message_date = new Date message_et.timestamp
+    conversation_et.is_pending true
+    @conversation_service.load_subsequent_events_from_db conversation_et.id, message_date, z.config.MESSAGES_FETCH_LIMIT, include_message
+    .then (events) =>
+      return @_add_events_to_conversation events, conversation_et
+    .then (mapped_messages) ->
+      conversation_et.is_pending false
+      return mapped_messages
 
   ###
   Get messages for given category. Category param acts as lower bound
@@ -258,7 +288,7 @@ class z.conversation.ConversationRepository
     return if lower_bound >= upper_bound
 
     conversation_et.is_pending true
-    @conversation_service.load_events_from_db conversation_et.id, lower_bound, upper_bound
+    @conversation_service.load_preceding_events_from_db conversation_et.id, lower_bound, upper_bound
     .then (events) =>
       if events.length
         @_add_events_to_conversation events, conversation_et

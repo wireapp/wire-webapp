@@ -15,7 +15,7 @@
       <div class="content-list collection-list" data-bind="antiscroll: true">
 
         <!-- ko ifnot: z.util.Environment.frontend.is_production() -->
-          <full-search params="search_provider: search_in_conversation, change: on_input_change"></full-search>
+          <full-search params="search_provider: search_in_conversation, change: on_input_change, message_click: click_on_message"></full-search>
         <!-- /ko -->
 
         <!-- ko if: search_input().length === 0 -->
