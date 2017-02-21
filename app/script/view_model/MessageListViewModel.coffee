@@ -63,6 +63,7 @@ class z.ViewModel.MessageListViewModel
 
     @recalculate_timeout = undefined
 
+    # should we scroll to bottom when new message comes in
     @should_scroll_to_bottom = true
 
     # Check if the message container is to small and then pull new events
@@ -267,8 +268,7 @@ class z.ViewModel.MessageListViewModel
         @conversation_reached_bottom = true
       @capture_scrolling_event = true
 
-  _focus_message: (message_et) =>
-    debugger
+  _focus_message: (message_et) ->
     message_element = $(".message[data-uie-uid=\"#{message_et.id}\"]")
     message_list_element = $('.messages-wrap')
     message_list_element.scroll_by message_element.offset().top - message_list_element.height() / 2
@@ -282,7 +282,7 @@ class z.ViewModel.MessageListViewModel
     else
       @conversation().remove_messages()
       @conversation_repository.get_events @conversation()
-      .then =>
+      .then ->
         $('.messages-wrap').scroll_to_bottom()
 
   ###
