@@ -38,6 +38,7 @@ window.TestFactory = function (logger_level) {
 
   this.client = new z.service.Client(this.settings.connection);
   this.logger = new z.util.Logger('TestFactory', z.config.LOGGER.OPTIONS);
+  this.logger.level = logger_level;
 
   return this;
 };
