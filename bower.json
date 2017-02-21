@@ -7,7 +7,6 @@
     "dexie": "https://github.com/dfahlander/Dexie.js.git#1.5.1",
     "generic-message-proto": "https://github.com/wireapp/generic-message-proto.git#1.18.0",
     "highlightjs": "https://github.com/components/highlightjs.git#9.8.0",
-    "iframeTracker-jquery": "https://github.com/vincepare/iframeTracker-jquery.git#1.1.0",
     "jquery": "https://github.com/jquery/jquery.git#2.1.4",
     "keyboardjs": "https://github.com/RobertWHurst/KeyboardJS.git#2.3.3",
     "knockout": "https://github.com/knockout/knockout.git#3.4.1",
@@ -66,9 +65,6 @@
     },
     "jquery": {
       "js": "dist/jquery.js"
-    },
-    "iframeTracker-jquery": {
-      "js": "jquery.iframetracker.js"
     },
     "jquery-mousewheel": {
       "js": "jquery.mousewheel.js"
