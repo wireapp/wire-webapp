@@ -52,19 +52,33 @@ class z.components.FullSearchViewModel
     , 100
 
     @transform_text = (message_et) =>
-      search_regex = z.search.FullTextSearch.get_search_regex @input()
-      text = message_et.get_first_asset().text
-      first_offset = undefined
+      MAX_TEXT_LENGTH = 60
+      MAX_OFFSET_INDEX = 30
+      PRE_MARKED_OFFSET = 20
+
+      text = _.escape message_et.get_first_asset().text
 
       message_et.matches_count = 0
-
-      return _.escape(text).replace search_regex, (match) ->
+      transformed_text = text.replace z.search.FullTextSearch.get_search_regex(@input()), (match) ->
         message_et.matches_count += 1
-
-        if not first_offset?
-          first_offset = text.indexOf match
-
         return "<mark class='full-search-marked' data-uie-name='full-search-item-mark'>#{match}</mark>"
+
+      mark_offset = transformed_text.indexOf('<mark')
+      slice_offset = mark_offset
+
+      for index in [0...mark_offset].reverse()
+        if index < mark_offset - PRE_MARKED_OFFSET
+          break
+
+        char = transformed_text[index]
+
+        if char is ' '
+          slice_offset = index + 1
+
+      if mark_offset > MAX_OFFSET_INDEX and text.length > MAX_TEXT_LENGTH
+        transformed_text = "…#{transformed_text.slice(slice_offset)}"
+
+      return transformed_text
 
     # binding?
     $('.collection-list').on 'scroll', (event) =>
