@@ -32,3 +32,6 @@ describe 'z.search.FullTextSearch', ->
 
     it 'should find text', ->
       expect(z.search.FullTextSearch.search('aa bb', 'aa')).toBeTruthy()
+
+    it 'should ignore spaces', ->
+      expect(z.search.FullTextSearch.search('aa bb', '     ')).toBeFalsy()
