@@ -85,6 +85,9 @@ class z.components.FullSearchViewModel
       if $(event.currentTarget).is_scrolled_bottom() and @message_ets.length > 0
         z.util.ko_array_push_all @message_ets_rendered, @message_ets.splice(0, @number_of_message_to_render)
 
+  on_dismiss_button_click: =>
+    @input ''
+
   dispose: ->
     $('.collection-list').off 'scroll'
 
@@ -96,6 +99,7 @@ ko.components.register 'full-search',
               <span class="full-search-header-icon icon-search"></span>
               <div class="full-search-header-input">
                 <input type="text" data-bind="hasFocus: true, l10n_placeholder: z.string.fullsearch_placeholder, textInput: input" data-uie-name="full-search-header-input"/>
+                <span class="button-icon icon-dismiss" data-bind="click: on_dismiss_button_click, visible: input()"></span>
               </div>
             </header>
             <!-- ko if: show_no_results_text() -->
