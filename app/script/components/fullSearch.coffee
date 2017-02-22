@@ -34,6 +34,8 @@ class z.components.FullSearchViewModel
 
     @input = ko.observable()
     @input.subscribe _.debounce (query) =>
+      query = query.trim()
+
       @on_change query
 
       if query.length < 2
