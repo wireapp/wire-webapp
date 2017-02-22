@@ -158,7 +158,6 @@ class z.tracking.EventTrackingRepository
     return false
 
   _tag_and_upload_event: (event_name, attributes) =>
-    console.warn "BENNY", @localytics
     return if not @localytics
 
     if attributes
