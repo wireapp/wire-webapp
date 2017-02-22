@@ -32,3 +32,6 @@ describe 'z.search.FullTextSearch', ->
 
     it 'should find text', ->
       expect(z.search.FullTextSearch.search('aa bb', 'aa')).toBeTruthy()
+
+    it 'should handle special chars', ->
+      expect(z.search.FullTextSearch.search('youtube.com/watch?v=pQHX-Sj', 'youtube.com/watch?v=pQHX-Sj')).toBeTruthy()

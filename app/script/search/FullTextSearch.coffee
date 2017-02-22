@@ -26,7 +26,7 @@ z.search.FullTextSearch = do ->
     flags = 'gmi'
 
     regex = query.trim().split(delimiter).map((word) ->
-      "(\\b#{word})").join '|'
+      "(\\b#{z.util.escape_regex(word)})").join '|'
 
     return new RegExp(regex, flags)
 
