@@ -22,6 +22,7 @@ z.event ?= {}
 # Enum of different webapp events.
 z.event.WebApp =
   ANALYTICS:
+    DIMENSION: 'wire.webapp.analytics.dimension'
     EVENT: 'wire.webapp.analytics.event'
     INIT: 'wire.webapp.analytics.init'
     SESSION:

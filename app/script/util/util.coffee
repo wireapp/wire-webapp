@@ -271,6 +271,8 @@ z.util.encode_sha256_base64 = (text) ->
 z.util.escape_html = (html) ->
   return _.escape html
 
+z.util.escape_regex = (string) ->
+  return string.replace /[.*+?^${}()|[\]\\]/g, '\\$&'
 
 z.util.alias =
   # Note IE10 listens to "transitionend" instead of "animationend"
