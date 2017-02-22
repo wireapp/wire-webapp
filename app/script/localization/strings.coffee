@@ -285,6 +285,7 @@ z.string.collection_section_audio = 'Audio messages'
 
 # Full Search
 z.string.fullsearch_placeholder = 'Search text messages'
+z.string.fullsearch_no_results = 'No results.'
 
 # Archive
 z.string.archive_header = 'Archive'
