@@ -30,8 +30,10 @@ z.search.FullTextSearch = do ->
 
     return new RegExp(regex, flags)
 
-  search = (text, query) ->
-    if query?.length > 0
+  search = (text, query = '') ->
+    query = query.trim()
+
+    if query.length > 0
       return get_search_regex(query).test(text)
     return false
 
