@@ -147,6 +147,7 @@ class z.tracking.EventTrackingRepository
     (c = document.getElementsByTagName(node_type)[0]).parentNode.insertBefore script_node, c
 
     @localytics 'init', LOCALYTICS.APP_KEY, options
+    @_track_dimension z.tracking.DimensionName.CONTACTS, -1
     @logger.debug 'Localytics reporting is enabled'
 
   _localytics_disabled: ->
