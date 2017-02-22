@@ -16,25 +16,8 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-processors = [
-  require('autoprefixer')(
-    browsers: [
-      'Chrome >= 52'
-      'Edge >= 14'
-      'Firefox >= 45'
-      'Opera >= 41'
-    ]
-  )
-]
+window.z ?= {}
+z.tracking ?= {}
 
-module.exports =
-
-  distribution:
-    options:
-      processors: processors
-    src: '<%= dir.dist %>/**/*.css'
-
-  deploy:
-    options:
-      processors: processors
-    src: '<%= dir.deploy %>/**/*.css'
+z.tracking.DimensionName =
+  CONTACTS: 'contacts'

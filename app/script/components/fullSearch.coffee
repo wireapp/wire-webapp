@@ -24,10 +24,13 @@ class z.components.FullSearchViewModel
   constructor: (params) ->
     @search_provider = params.search_provider
     @on_change = params.change
+    @on_message_click = params.message_click
 
     @message_ets = []
     @message_ets_rendered = ko.observableArray()
     @number_of_message_to_render = 30
+
+    @show_no_results_text = ko.observable false
 
     @input = ko.observable()
     @input.subscribe _.debounce (query) =>
@@ -36,12 +39,14 @@ class z.components.FullSearchViewModel
       if query.length < 2
         @message_ets = []
         @message_ets_rendered []
+        @show_no_results_text false
         return
 
       @search_provider(query).then ([message_ets, query]) =>
-        if query is @input()
-          @message_ets = message_ets
-          @message_ets_rendered @message_ets.splice(0, @number_of_message_to_render)
+        return if query isnt @input()
+        @show_no_results_text message_ets.length is 0
+        @message_ets = message_ets
+        @message_ets_rendered @message_ets.splice(0, @number_of_message_to_render)
     , 100
 
     @transform_text = (message_et) =>
@@ -74,11 +79,14 @@ ko.components.register 'full-search',
             <header class="full-search-header">
               <span class="full-search-header-icon icon-search"></span>
               <div class="full-search-header-input">
-                <input type="text" data-bind="l10n_placeholder: z.string.auth_placeholder_password_put, textInput: input" data-uie-name="full-search-header-input"/>
+                <input type="text" data-bind="hasFocus: true, l10n_placeholder: z.string.fullsearch_placeholder, textInput: input" data-uie-name="full-search-header-input"/>
               </div>
             </header>
+            <!-- ko if: show_no_results_text() -->
+              <div class="full-search-no-result" data-uie-name="full-search-no-results" data-bind="l10n_text: z.string.fullsearch_no_results"></div>
+            <!-- /ko -->
             <div class="full-search-list" data-uie-name="full-search-list" data-bind="foreach: {data: message_ets_rendered}">
-              <div class="full-search-item" data-uie-name="full-search-item">
+              <div class="full-search-item" data-uie-name="full-search-item" data-bind="click: $parent.on_message_click">
                 <div class="full-search-item-avatar">
                   <user-avatar class="user-avatar-xs" params="user: user()"></user-avatar>
                 </div>

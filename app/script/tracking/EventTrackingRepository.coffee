@@ -68,6 +68,7 @@ class z.tracking.EventTrackingRepository
     if not @_localytics_disabled() and @_has_permission()
       @_enable_error_reporting()
       amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
+      amplify.subscribe z.event.WebApp.ANALYTICS.DIMENSION, @_track_dimension
 
     @_subscribe_to_events()
 
@@ -78,12 +79,14 @@ class z.tracking.EventTrackingRepository
       if not @localytics
         @_init_localytics window, document, 'script', @localytics
       amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
+      amplify.subscribe z.event.WebApp.ANALYTICS.DIMENSION, @_track_dimension
 
   updated_send_data: (send_data) =>
     if send_data
       @_enable_error_reporting()
       if not @_localytics_disabled()
         amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
+        amplify.subscribe z.event.WebApp.ANALYTICS.DIMENSION, @_track_dimension
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.TRACKING.OPT_IN
     else
       if not @_localytics_disabled()
@@ -101,6 +104,14 @@ class z.tracking.EventTrackingRepository
 
   track_event: (event_name, attributes) =>
     @_tag_and_upload_event event_name, attributes
+
+  _track_dimension: (name, value) =>
+    return if not @localytics
+
+    @logger.info "Tracking Localytics dimension '#{name}' of size '#{value}'"
+
+    @localytics 'setCustomDimension', value, name
+    @localytics 'upload'
 
   ###############################################################################
   # Localytics
@@ -136,6 +147,7 @@ class z.tracking.EventTrackingRepository
     (c = document.getElementsByTagName(node_type)[0]).parentNode.insertBefore script_node, c
 
     @localytics 'init', LOCALYTICS.APP_KEY, options
+    @_track_dimension z.tracking.DimensionName.CONTACTS, -1
     @logger.debug 'Localytics reporting is enabled'
 
   _localytics_disabled: ->

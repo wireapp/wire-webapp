@@ -87,6 +87,9 @@ class z.ViewModel.content.CollectionViewModel
         when message_et.category & z.message.MessageCategory.LINK_PREVIEW
           @links.push message_et
 
+  click_on_message: (message_et) =>
+    amplify.publish z.event.WebApp.CONVERSATION.SHOW, @conversation_et(), message_et
+
   click_on_back_button: =>
     amplify.publish z.event.WebApp.CONVERSATION.SHOW, @conversation_et()
 

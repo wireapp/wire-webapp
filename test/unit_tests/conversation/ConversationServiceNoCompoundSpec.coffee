@@ -41,7 +41,7 @@ describe 'z.conversation.ConversationServiceNoCompound', ->
     storage_service.clear_all_stores()
     server.restore()
 
-  describe 'load_events_from_db', ->
+  describe 'load_preceding_events_from_db', ->
 
     conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
     sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
@@ -98,7 +98,7 @@ describe 'z.conversation.ConversationServiceNoCompound', ->
         expect(error.type).toBe z.conversation.ConversationError::TYPE.NO_CHANGES
         done()
 
-  describe 'load_events_from_db', ->
+  describe 'load_preceding_events_from_db', ->
     conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
     sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
     messages = undefined
@@ -117,13 +117,13 @@ describe 'z.conversation.ConversationServiceNoCompound', ->
       .catch done.fail
 
     it 'doesn\'t load events for invalid conversation id', (done) ->
-      conversation_service.load_events_from_db 'invalid_id', new Date(30), new Date 1479903546808
+      conversation_service.load_preceding_events_from_db 'invalid_id', new Date(30), new Date 1479903546808
       .then (events) =>
         expect(events.length).toBe 0
         done()
 
     it 'loads all events', (done) ->
-      conversation_service.load_events_from_db conversation_id
+      conversation_service.load_preceding_events_from_db conversation_id
       .then (events) =>
         expect(events.length).toBe 10
         expect(events[0].time).toBe '2016-11-23T12:19:06.808Z'
@@ -131,7 +131,7 @@ describe 'z.conversation.ConversationServiceNoCompound', ->
         done()
 
     it 'loads all events with limit', (done) ->
-      conversation_service.load_events_from_db conversation_id, undefined, undefined, 5
+      conversation_service.load_preceding_events_from_db conversation_id, undefined, undefined, 5
       .then (events) =>
         expect(events.length).toBe 5
         expect(events[0].time).toBe '2016-11-23T12:19:06.808Z'
@@ -139,7 +139,7 @@ describe 'z.conversation.ConversationServiceNoCompound', ->
         done()
 
     it 'loads events with lower bound', (done) ->
-      conversation_service.load_events_from_db conversation_id, new Date 1479903546805
+      conversation_service.load_preceding_events_from_db conversation_id, new Date 1479903546805
       .then (events) =>
         expect(events.length).toBe 4
         expect(events[0].time).toBe '2016-11-23T12:19:06.808Z'
@@ -149,7 +149,7 @@ describe 'z.conversation.ConversationServiceNoCompound', ->
         done()
 
     it 'loads events with upper bound', (done) ->
-      conversation_service.load_events_from_db conversation_id, undefined, new Date 1479903546803
+      conversation_service.load_preceding_events_from_db conversation_id, undefined, new Date 1479903546803
       .then (events) =>
         expect(events.length).toBe 4
         expect(events[0].time).toBe '2016-11-23T12:19:06.802Z'
@@ -159,14 +159,14 @@ describe 'z.conversation.ConversationServiceNoCompound', ->
         done()
 
     it 'loads events with upper and lower bound', (done) ->
-      conversation_service.load_events_from_db conversation_id, new Date(1479903546806), new Date 1479903546807
+      conversation_service.load_preceding_events_from_db conversation_id, new Date(1479903546806), new Date 1479903546807
       .then (events) =>
         expect(events.length).toBe 1
         expect(events[0].time).toBe '2016-11-23T12:19:06.806Z'
         done()
 
     it 'loads events with upper and lower bound and a fetch limit', (done) ->
-      conversation_service.load_events_from_db conversation_id, new Date(1479903546800), new Date(1479903546807), 2
+      conversation_service.load_preceding_events_from_db conversation_id, new Date(1479903546800), new Date(1479903546807), 2
       .then (events) =>
         expect(events.length).toBe 2
         expect(events[0].time).toBe '2016-11-23T12:19:06.806Z'
@@ -216,7 +216,7 @@ describe 'z.conversation.ConversationServiceNoCompound', ->
     it 'deletes message with the given key', (done) ->
       conversation_service.delete_message_with_key_from_db conversation_id, messages[1].key
       .then ->
-        conversation_service.load_events_from_db conversation_id
+        conversation_service.load_preceding_events_from_db conversation_id
       .then (events) ->
         expect(events.length).toBe 2
         for event in events
@@ -227,7 +227,7 @@ describe 'z.conversation.ConversationServiceNoCompound', ->
     it 'does not delete the event if key is wrong', (done) ->
       conversation_service.delete_message_with_key_from_db conversation_id, 'wrongKey'
       .then ->
-        conversation_service.load_events_from_db conversation_id
+        conversation_service.load_preceding_events_from_db conversation_id
       .then (events) ->
         expect(events.length).toBe 3
         done()

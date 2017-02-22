@@ -235,19 +235,16 @@ class z.conversation.ConversationService
       throw error
 
   ###
-  Load conversation events. Start and end are not included.
-  Events are always sorted beginning with the newest timestamp.
-
-  TODO: Make sure that only valid values (no Strings, No timestamps but Dates(!), ...) are passed to this function!
+  Load conversation events starting from the upper bound going back in history
+  until either limit or lower bound is reached.
 
   @param conversation_id [String] ID of conversation
   @param lower_bound [Date] Load from this date (included)
   @param upper_bound [Date] Load until this date (excluded)
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
-  @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
-  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = Number.MAX_SAFE_INTEGER) ->
+  load_preceding_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = Number.MAX_SAFE_INTEGER) ->
     if not _.isDate(lower_bound) or not _.isDate upper_bound
       throw new Error "Lower bound (#{typeof lower_bound}) and upper bound (#{typeof upper_bound}) must be of type 'Date'."
     else if lower_bound.getTime() > upper_bound.getTime()
@@ -262,6 +259,25 @@ class z.conversation.ConversationService
     .catch (error) =>
       @logger.error "Failed to load events for conversation '#{conversation_id}' from database: '#{error.message}'"
       throw error
+
+  ###
+  Load conversation events starting from the upper bound to the present until the limit is reached
+
+  @param conversation_id [String] ID of conversation
+  @param upper_bound [Date] Load until this date (excluded)
+  @param limit [Number] Amount of events to load
+  @param include_upper_bound [Boolean] Should upper bound be part of the message
+  @return [Promise] Promise that resolves with the retrieved records
+  ###
+  load_subsequent_events_from_db: (conversation_id, upper_bound, limit = Number.MAX_SAFE_INTEGER, include_upper_bound = true) =>
+    if not _.isDate upper_bound
+      throw new Error "Upper bound (#{typeof upper_bound}) must be of type 'Date'."
+
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where '[conversation+time]'
+    .between [conversation_id, upper_bound.toISOString()], [conversation_id, new Date().toISOString()], include_upper_bound, true
+    .limit limit
+    .toArray()
 
   ###
   Get events with given category.

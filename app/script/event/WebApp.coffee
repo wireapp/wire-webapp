@@ -22,6 +22,7 @@ z.event ?= {}
 # Enum of different webapp events.
 z.event.WebApp =
   ANALYTICS:
+    DIMENSION: 'wire.webapp.analytics.dimension'
     EVENT: 'wire.webapp.analytics.event'
     INIT: 'wire.webapp.analytics.init'
     SESSION:
@@ -90,6 +91,8 @@ z.event.WebApp =
       REMOVED: 'wire.webapp.conversation.message.removed'
     IMAGE:
       SEND: 'wire.webapp.conversation.image.send'
+    INPUT:
+      CLICK: 'wire.webapp.conversation.input.click'
   CONTENT:
     SWITCH: 'wire.webapp.content.switch'
   CONTEXT_MENU: 'wire.webapp.context-menu'
