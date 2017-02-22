@@ -11,7 +11,7 @@
     "keyboardjs": "https://github.com/RobertWHurst/KeyboardJS.git#2.3.3",
     "knockout": "https://github.com/knockout/knockout.git#3.4.1",
     "linkifyjs": "https://github.com/nfrasser/linkify-shim.git#2.1.4",
-    "marked": "https://github.com/mythsunwind/marked.git#18f7f85194ec0f619397f49f7dfdaa5e5b09db09",
+    "marked": "https://github.com/wireapp/marked.git#18f7f85194ec0f619397f49f7dfdaa5e5b09db09",
     "moment": "https://github.com/moment/moment.git#2.16.0",
     "normalize-css": "https://github.com/necolas/normalize.css.git#3.0.3",
     "object-hash": "https://github.com/puleos/object-hash.git#1.1.5",
