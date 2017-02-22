@@ -120,14 +120,14 @@ describe 'z.service.Client', ->
         jasmine.clock().uninstall()
         server.restore()
 
-      it 'it resolves with the payload if backend request successful', (done) ->
+      it 'resolves with the payload if backend request successful', (done) ->
         client.send_request config
         .then ->
           done()
         .catch done.fail
         server.requests[0].respond 200
 
-      it 'it caches the request if it is unauthorized', (done) ->
+      it 'caches the request if it is unauthorized', (done) ->
         token_refresh = jasmine.createSpy('token_refresh');
         amplify.subscribe z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, token_refresh
 
@@ -140,7 +140,7 @@ describe 'z.service.Client', ->
         expect(token_refresh).toHaveBeenCalled()
         done()
 
-      it 'it caches the request if it times out', (done) ->
+      it 'caches the request if it times out', (done) ->
         spyOn(client, 'execute_on_connectivity').and.returnValue Promise.resolve()
 
         client.send_request config
@@ -168,12 +168,12 @@ describe 'z.service.Client', ->
         jasmine.clock().uninstall()
         server.restore()
 
-      it 'it resolves with the payload if backend request successful', (done) ->
+      it 'resolves with the payload if backend request successful', (done) ->
         client.send_request config
         .then(done).catch done.fail
         server.requests[0].respond 200
 
-      it 'it caches the request if it is unauthorized', (done) ->
+      it 'caches the request if it is unauthorized', (done) ->
         token_refresh = jasmine.createSpy 'token_refresh'
         amplify.subscribe z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, token_refresh
 
@@ -186,7 +186,7 @@ describe 'z.service.Client', ->
         expect(token_refresh).toHaveBeenCalled()
         done()
 
-      it 'it caches the request if it times out', (done) ->
+      it 'caches the request if it times out', (done) ->
         spyOn(client, 'execute_on_connectivity').and.returnValue Promise.resolve()
 
         client.send_request config
