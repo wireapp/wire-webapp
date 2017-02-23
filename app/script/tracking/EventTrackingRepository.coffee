@@ -19,9 +19,6 @@
 window.z ?= {}
 z.tracking ?= {}
 
-z.tracking.config =
-  SESSION_TIMEOUT: 180000 # milliseconds
-
 LOCALYTICS =
   APP_KEY: '905792736c9f17c3464fd4e-60d90c82-d14a-11e4-af66-009c5fda0a25'
   TRACKING_INTERVAL: 60000 # milliseconds
@@ -135,7 +132,6 @@ class z.tracking.EventTrackingRepository
     options =
       appVersion: z.util.Environment.version()
       customDimensions: [_get_plaform()]
-      sessionTimeout: z.tracking.config.SESSION_TIMEOUT / 1000
 
     @localytics = ->
       (@localytics.q ?= []).push arguments

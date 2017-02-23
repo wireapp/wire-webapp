@@ -25,9 +25,6 @@ z.event.WebApp =
     DIMENSION: 'wire.webapp.analytics.dimension'
     EVENT: 'wire.webapp.analytics.event'
     INIT: 'wire.webapp.analytics.init'
-    SESSION:
-      CLOSE: 'wire.webapp.analytics.session.close'
-      START: 'wire.webapp.analytics.session.start'
   AUDIO:
     PLAY: 'wire.webapp.audio.play'
     PLAY_IN_LOOP: 'wire.webapp.audio.play-in-loop'
