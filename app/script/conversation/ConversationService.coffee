@@ -235,6 +235,23 @@ class z.conversation.ConversationService
       throw error
 
   ###
+  Get recent conversations.
+  ###
+  get_recent_conversations_from_db: ->
+    min_date = new Date()
+    min_date.setDate min_date.getDate() - 30
+
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where 'time'
+    .between min_date.toISOString(), new Date().toISOString()
+    .toArray()
+    .then (events) ->
+      conversation = events.reduce (acc, event) ->
+        acc[event.conversation] = if acc[event.conversation]? then acc[event.conversation] + 1 else 1
+        return acc
+      , {}
+
+  ###
   Load conversation events starting from the upper bound going back in history
   until either limit or lower bound is reached.
 
