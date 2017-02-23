@@ -28,8 +28,8 @@ z.links.LinkPreviewHelpers =
   ###
   contains_only_link: (text) ->
     text = text.trim()
-    urls = linkify.find text, 'url'
-    return urls.length is 1 and urls[0].value is text
+    urls = twttr.txt.extractUrls text
+    return urls.length is 1 and urls[0] is text
 
   ###
   Get first link and link offset for given text.
@@ -37,9 +37,9 @@ z.links.LinkPreviewHelpers =
   @param text [String]
   ###
   get_first_link_with_offset: (text) ->
-    links = linkify.find text, 'url'
+    links = twttr.txt.extractUrls text
     first_link = links[0]
 
     if first_link?
-      link_offset = text.indexOf first_link.value
-      return [first_link.value, link_offset]
+      link_offset = text.indexOf first_link
+      return [first_link, link_offset]
