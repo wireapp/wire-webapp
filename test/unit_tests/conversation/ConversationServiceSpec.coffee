@@ -329,6 +329,3 @@ describe 'z.conversation.ConversationService', ->
         expect(result[1].id).toBe 'f7adaa16-38f5-483e-b621-72ff1dbd2276'
         done()
       .catch done.fail
-
-
-
