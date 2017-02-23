@@ -114,8 +114,6 @@ class z.search.SearchRepository
                 result_user_ets.push user_et
             when z.search.SEARCH_MODE.ONBOARDING
               result_user_ets.push user_et if not user_et.connected()
-            when z.search.SEARCH_MODE.TOP_PEOPLE
-              result_user_ets.push user_et if user_et.connected()
             else
               result_user_ets.push user_et
 
