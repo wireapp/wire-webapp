@@ -339,19 +339,6 @@ z.util.markup_links = (message) ->
 # Note: We are using "Underscore.js" to escape HTML in the original message
 z.util.render_message = (message) ->
   message = marked message
-
-  # Parse links with linkifyjs library, ignore code tags
-  options =
-    validate:
-      email: (value) -> false
-    ignoreTags: ['code', 'pre']
-    attributes:
-      rel: 'nofollow noopener noreferrer'
-  message = linkifyHtml message, options
-
-  # Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
-  message = message.replace(/ class="linkified"/g, '')
-
   message = z.util.auto_link_emails message
   message = message.replace /\n/g, '<br />'
   # Remove <br /> if it is the last thing in a message
