@@ -47,8 +47,10 @@ z.tracking.EventName =
     ENTERED_SEARCH: 'contacts.entered_search'
   COLLECTION:
     DID_ITEM_ACTION: 'collections.did_item_action'
+    ENTERED_SEARCH: 'collection.entered_search'
     OPENED_COLLECTIONS: 'collections.opened_collections'
     OPENED_ITEM: 'collections.opened_item'
+    SELECTED_SEARCH_RESULT: 'collection.selected_search_result'
   CONVERSATION:
     ADD_TO_GROUP_CONVERSATION: 'addContactToGroupConversation'
     CHARACTER_LIMIT_REACHED: 'conversation.character_limit_reached'

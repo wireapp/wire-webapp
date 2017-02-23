@@ -24,6 +24,7 @@ class z.components.FullSearchViewModel
   constructor: (params) ->
     @search_provider = params.search_provider
     @on_change = params.change
+    @on_result = params.result
     @on_message_click = params.message_click
 
     @message_ets = []
@@ -46,6 +47,7 @@ class z.components.FullSearchViewModel
 
       @search_provider(query).then ([message_ets, query]) =>
         return if query isnt @input()
+        @on_result() if message_ets.length > 0
         @show_no_results_text message_ets.length is 0
         @message_ets = message_ets
         @message_ets_rendered @message_ets.splice(0, @number_of_message_to_render)
@@ -99,7 +101,7 @@ ko.components.register 'full-search',
               <span class="full-search-header-icon icon-search"></span>
               <div class="full-search-header-input">
                 <input type="text" data-bind="hasFocus: true, l10n_placeholder: z.string.fullsearch_placeholder, textInput: input" data-uie-name="full-search-header-input"/>
-                <span class="button-icon icon-dismiss" data-bind="click: on_dismiss_button_click, visible: input()"></span>
+                <span class="button-icon icon-dismiss" data-uie-name="full-search-dismiss" data-bind="click: on_dismiss_button_click, visible: input()"></span>
               </div>
             </header>
             <!-- ko if: show_no_results_text() -->
