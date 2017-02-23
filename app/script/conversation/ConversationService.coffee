@@ -282,13 +282,14 @@ class z.conversation.ConversationService
   ###
   Get events with given category.
   @param conversation_id [String] ID of conversation to add users to
-  @param category [z.message.MessageCategory] will be used as lower bound
+  @param category_min [z.message.MessageCategory]
+  @param category_max [z.message.MessageCategory]
   @return [Promise]
   ###
-  load_events_with_category_from_db: (conversation_id, category) ->
+  load_events_with_category_from_db: (conversation_id, category_min, category_max = z.message.MessageCategory.LIKED) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+category]'
-    .between [conversation_id, category], [conversation_id, z.message.MessageCategory.LIKED], true, true
+    .between [conversation_id, category_min], [conversation_id, category_max], true, true
     .sortBy 'time'
 
   ###
@@ -298,12 +299,11 @@ class z.conversation.ConversationService
   @return [Promise]
   ###
   search_in_conversation: (conversation_id, query) =>
-    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where '[conversation+category]'
-      .equals [conversation_id, z.message.MessageCategory.TEXT]
-      .sortBy 'time'
-      .then (events) ->
-        return events.filter (event) -> z.search.FullTextSearch.search event.data.content, query
+    category_min = z.message.MessageCategory.TEXT
+    category_max = z.message.MessageCategory.TEXT | z.message.MessageCategory.LINK | z.message.MessageCategory.LINK_PREVIEW
+    @load_events_with_category_from_db conversation_id, category_min, category_max
+    .then (events) ->
+      return events.filter (event) -> z.search.FullTextSearch.search event.data.content, query
 
   ###
   Add a bot to an existing conversation.
