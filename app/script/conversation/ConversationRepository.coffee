@@ -911,13 +911,24 @@ class z.conversation.ConversationRepository
   @param file [File] File to send
   ###
   send_asset_metadata: (conversation_et, file) =>
-    asset = new z.proto.Asset()
-    asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'asset', asset
-    if conversation_et.ephemeral_timer()
-      generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
-    @_send_and_inject_generic_message conversation_et, generic_message
+    z.assets.AssetMetaDataBuilder.build_metadata file
+    .then (metadata) ->
+      asset = new z.proto.Asset()
+      if z.assets.AssetMetaDataBuilder._is_audio(file)
+        asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name, null, null, metadata
+      else if z.assets.AssetMetaDataBuilder._is_video(file)
+        asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name, null, metadata
+      else
+        asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name, metadata
+      asset
+    .then (asset) =>
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'asset', asset
+      if conversation_et.ephemeral_timer()
+        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
+      @_send_and_inject_generic_message conversation_et, generic_message
+    .catch (error) =>
+      @logger.warn "Failed to upload otr asset-metadata for conversation #{conversation_et.id}", error
 
   ###
   Send asset preview message to specified conversation.
@@ -1014,7 +1025,9 @@ class z.conversation.ConversationRepository
   @param image [File, Blob]
   ###
   send_image_asset_v3: (conversation_et, image) =>
-    @asset_service.upload_image_asset image
+    @send_asset_metadata conversation_et, image
+    .then =>
+      @asset_service.upload_image_asset image
     .then (asset) =>
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'asset', asset
