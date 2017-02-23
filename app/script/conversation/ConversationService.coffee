@@ -299,8 +299,8 @@ class z.conversation.ConversationService
   ###
   search_in_conversation: (conversation_id, query) =>
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-      .where '[conversation+category]'
-      .equals [conversation_id, z.message.MessageCategory.TEXT]
+    .where '[conversation+category]'
+    .between [conversation_id, z.message.MessageCategory.TEXT], [conversation_id, z.message.MessageCategory.LINK_PREVIEW], true, true
       .sortBy 'time'
       .then (events) ->
         return events.filter (event) -> z.search.FullTextSearch.search event.data.content, query

@@ -296,3 +296,39 @@ describe 'z.conversation.ConversationService', ->
         expect(result[1].id).toBe events[2].id
         done()
       .catch done.fail
+
+  describe 'search_in_conversation', ->
+
+    events = undefined
+
+    beforeEach ->
+      events = [
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"2017-01-09T13:11:15.051Z","data":{"content":"https://wire.com","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add"}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"f7adaa16-38f5-483e-b621-72ff1dbd2276","from":"5598f954-674f-4a34-ad47-9e5ee8f00bce","time":"2017-01-09T13:11:15.052Z","data":{"content":"https://wire.com","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2276","previews":["CjZodHRwczovL3dpcmUuY29tLz81ZDczNDQ0OC00NDZiLTRmYTItYjMwMy1lYTJhNzhiY2NhMDgQABpWCjZodHRwczovL3dpcmUuY29tLz81ZDczNDQ0OC00NDZiLTRmYTItYjMwMy1lYTJhNzhiY2NhMDgSHFdpcmUgwrcgTW9kZXJuIGNvbW11bmljYXRpb24="]},"type":"conversation.message-add"}
+      ]
+
+    it 'should find query in text message', (done) ->
+      Promise.all events.slice(0, 1).map (event) ->
+        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, z.storage.StorageService.construct_primary_key(event), event
+      .then ->
+        return conversation_service.search_in_conversation events[0].conversation, 'https://wire.com'
+      .then (result) ->
+        expect(result.length).toBe 1
+        expect(result[0].id).toBe 'f7adaa16-38f5-483e-b621-72ff1dbd2275'
+        done()
+      .catch done.fail
+
+    it 'should find query in text message with link preview', (done) ->
+      Promise.all events.map (event) ->
+        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, z.storage.StorageService.construct_primary_key(event), event
+      .then ->
+        return conversation_service.search_in_conversation events[0].conversation, 'https://wire.com'
+      .then (result) ->
+        expect(result.length).toBe 2
+        expect(result[0].id).toBe 'f7adaa16-38f5-483e-b621-72ff1dbd2275'
+        expect(result[1].id).toBe 'f7adaa16-38f5-483e-b621-72ff1dbd2276'
+        done()
+      .catch done.fail
+
+
+
