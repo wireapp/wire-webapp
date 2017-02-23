@@ -99,7 +99,7 @@ ko.components.register 'full-search',
               <span class="full-search-header-icon icon-search"></span>
               <div class="full-search-header-input">
                 <input type="text" data-bind="hasFocus: true, l10n_placeholder: z.string.fullsearch_placeholder, textInput: input" data-uie-name="full-search-header-input"/>
-                <span class="button-icon icon-dismiss" data-bind="click: on_dismiss_button_click, visible: input()"></span>
+                <span class="button-icon icon-dismiss" data-uie-name="full-search-dismiss" data-bind="click: on_dismiss_button_click, visible: input()"></span>
               </div>
             </header>
             <!-- ko if: show_no_results_text() -->
