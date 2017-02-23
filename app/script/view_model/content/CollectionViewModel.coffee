@@ -61,7 +61,7 @@ class z.ViewModel.content.CollectionViewModel
     amplify.unsubscribe z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, @item_removed
     $(document).off 'keydown.collection'
     @conversation_et null
-    @search_input null
+    @search_input ''
     [@images, @files, @links, @audio].forEach (array) -> array.removeAll()
 
   set_conversation: (conversation_et) =>
