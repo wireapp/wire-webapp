@@ -929,7 +929,7 @@ class z.conversation.ConversationRepository
     image = null
     poster(file).then (img_blob) =>
       image = img_blob
-      @asset_service.upload_asset img_blob, null, null
+      @asset_service.upload_asset img_blob
     .then (uploaded_image_asset) =>
       asset = new z.proto.Asset()
       asset.set 'preview', new z.proto.Asset.Preview image.type, image.size, uploaded_image_asset.uploaded
