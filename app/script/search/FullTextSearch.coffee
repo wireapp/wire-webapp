@@ -26,7 +26,7 @@ z.search.FullTextSearch = do ->
     flags = 'gumi'
 
     regex = query.trim().split(delimiter).map((word) ->
-      "(\\b#{z.util.escape_regex(word)})").join '(?:.*)'
+      "(#{z.util.escape_regex(word)})").join '(?:.*)'
 
     return new RegExp(regex, flags)
 

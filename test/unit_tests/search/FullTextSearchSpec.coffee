@@ -57,6 +57,6 @@ describe 'z.search.FullTextSearch', ->
       # expect(z.search.FullTextSearch.search('Håkon Bø', 'Ha')).toBeTruthy()
 
     it 'transliteration', ->
-      # expect(z.search.FullTextSearch.search('bb бб bb', 'бб')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('bb бб bb', 'бб')).toBeTruthy()
       expect(z.search.FullTextSearch.search('bb бб bb', 'bb')).toBeTruthy()
-      # expect(z.search.FullTextSearch.search('苹果', '苹果')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('苹果', '苹果')).toBeTruthy()
