@@ -48,6 +48,9 @@ class z.ViewModel.content.CollectionViewModel
   on_input_change: (input) =>
     @search_input input or ''
 
+  on_result: ->
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.ENTERED_SEARCH
+
   item_added: (message_et) =>
     return unless @conversation_et().id is message_et.conversation_id
     @_populate_items [message_et]
@@ -89,6 +92,7 @@ class z.ViewModel.content.CollectionViewModel
           @links.push message_et
 
   click_on_message: (message_et) =>
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.SELECTED_SEARCH_RESULT
     amplify.publish z.event.WebApp.CONVERSATION.SHOW, @conversation_et(), message_et
 
   click_on_back_button: =>
@@ -107,6 +111,7 @@ class z.ViewModel.content.CollectionViewModel
       is_empty: is_empty
       conversation_type: z.tracking.helpers.get_conversation_type conversation_et
       with_bot: conversation_et.is_with_bot()
+      with_search_result: false
 
   _track_opened_item: (conversation_et, type) ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.OPENED_ITEM,
