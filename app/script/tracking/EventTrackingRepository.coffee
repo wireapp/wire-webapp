@@ -64,6 +64,7 @@ class z.tracking.EventTrackingRepository
 
     if not @_localytics_disabled() and @_has_permission()
       @_enable_error_reporting()
+      @_init_localytics window, document, 'script', @localytics if not @localytics
       amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
       amplify.subscribe z.event.WebApp.ANALYTICS.DIMENSION, @_track_dimension
 
@@ -73,8 +74,7 @@ class z.tracking.EventTrackingRepository
     @_enable_error_reporting()
 
     if not @_localytics_disabled()
-      if not @localytics
-        @_init_localytics window, document, 'script', @localytics
+      @_init_localytics window, document, 'script', @localytics if not @localytics
       amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
       amplify.subscribe z.event.WebApp.ANALYTICS.DIMENSION, @_track_dimension
 

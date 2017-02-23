@@ -23,10 +23,10 @@ z.search.FullTextSearch = do ->
 
   get_search_regex = (query) ->
     delimiter = ' '
-    flags = 'gmi'
+    flags = 'gumi'
 
     regex = query.trim().split(delimiter).map((word) ->
-      "(\\b#{z.util.escape_regex(word)})").join '|'
+      "(\\b#{z.util.escape_regex(word)})").join '(?:.*)'
 
     return new RegExp(regex, flags)
 

@@ -26,15 +26,37 @@ describe 'z.search.FullTextSearch', ->
       expect(z.search.FullTextSearch.search('aa', '')).toBeFalsy()
       expect(z.search.FullTextSearch.search('aa', undefined)).toBeFalsy()
       expect(z.search.FullTextSearch.search('aa', 'bb')).toBeFalsy()
-
-    it 'should return false if word does not start with the given query', ->
-      expect(z.search.FullTextSearch.search('Tree', 'ee')).toBeFalsy()
-
-    it 'should find text', ->
-      expect(z.search.FullTextSearch.search('aa bb', 'aa')).toBeTruthy()
-
-    it 'should ignore spaces', ->
       expect(z.search.FullTextSearch.search('aa bb', '     ')).toBeFalsy()
 
     it 'should handle special chars', ->
       expect(z.search.FullTextSearch.search('youtube.com/watch?v=pQHX-Sj', 'youtube.com/watch?v=pQHX-Sj')).toBeTruthy()
+
+    it 'general', ->
+      expect(z.search.FullTextSearch.search('aa bb', 'aa')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('aa cc', 'aa bb')).toBeFalsy()
+
+    it 'special signs', ->
+      expect(z.search.FullTextSearch.search('aa aa aa', 'aa aa')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('aa.bb', 'bb')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('aa....bb', 'bb')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('aa.bb', 'aa')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('aa....bb', 'aa')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('aa-bb', 'aa-bb')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('aa-bb', 'aa')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('aa-bb', 'bb')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('aa/bb', 'aa')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('aa/bb', 'bb')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('aa:bb', 'aa')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('aa:bb', 'bb')).toBeTruthy()
+
+    it 'special cases', ->
+      expect(z.search.FullTextSearch.search('aa 11:45 am bb', '11:45')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('https://www.link.com/something-to-read?q=12&second#reader', 'something to read')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('@peter', 'peter')).toBeTruthy()
+      # expect(z.search.FullTextSearch.search('René', 'rene')).toBeTruthy()
+      # expect(z.search.FullTextSearch.search('Håkon Bø', 'Ha')).toBeTruthy()
+
+    it 'transliteration', ->
+      # expect(z.search.FullTextSearch.search('bb бб bb', 'бб')).toBeTruthy()
+      expect(z.search.FullTextSearch.search('bb бб bb', 'bb')).toBeTruthy()
+      # expect(z.search.FullTextSearch.search('苹果', '苹果')).toBeTruthy()
