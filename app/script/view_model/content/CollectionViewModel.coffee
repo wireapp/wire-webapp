@@ -48,7 +48,7 @@ class z.ViewModel.content.CollectionViewModel
   on_input_change: (input) =>
     @search_input input or ''
 
-  on_result: =>
+  on_result: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.COLLECTION.ENTERED_SEARCH
 
   item_added: (message_et) =>
