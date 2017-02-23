@@ -207,13 +207,17 @@ class z.cryptography.CryptographyRepository
       return payload
 
   _session_from_encoded_prekey_payload: (remote_pre_key, user_id, client_id) =>
-    if remote_pre_key
-      @logger.log "Initializing session with Client ID '#{client_id}' from User ID '#{user_id}' with remote PreKey ID '#{remote_pre_key.id}'."
-      session_id = @_construct_session_id user_id, client_id
-      decoded_prekey_bundle_buffer = z.util.base64_to_array(remote_pre_key.key).buffer
-      return @cryptobox.session_from_prekey session_id, decoded_prekey_bundle_buffer
-    else
+    return Promise.resolve()
+    .then =>
+      if remote_pre_key
+        @logger.log "Initializing session with Client ID '#{client_id}' from User ID '#{user_id}' with remote PreKey ID '#{remote_pre_key.id}'."
+        session_id = @_construct_session_id user_id, client_id
+        decoded_prekey_bundle_buffer = z.util.base64_to_array(remote_pre_key.key).buffer
+        return @cryptobox.session_from_prekey session_id, decoded_prekey_bundle_buffer
       @logger.warn "No remote PreKey for User ID '#{user_id}' with Client ID '#{client_id}' found. The owner probably deleted the client already."
+      return undefined
+    .catch (error) =>
+      @logger.warn "Invalid remote PreKey for User ID '#{user_id}' with Client ID '#{client_id}' found. Skipping encryption. Reason: #{error.message}", error
       return undefined
 
   _encrypt_generic_message_for_new_sessions: (user_client_map_for_missing_sessions, generic_message) =>
@@ -230,7 +234,8 @@ class z.cryptography.CryptographyRepository
               remote_pre_key = user_pre_key_map[user_id][client_id]
               future_sessions.push @_session_from_encoded_prekey_payload remote_pre_key, user_id, client_id
 
-          Promise.all(future_sessions).then (cryptobox_sessions) =>
+          Promise.all future_sessions
+          .then (cryptobox_sessions) =>
             future_payloads = []
 
             for cryptobox_session in cryptobox_sessions when cryptobox_session

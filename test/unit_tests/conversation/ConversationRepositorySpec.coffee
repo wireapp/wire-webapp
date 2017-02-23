@@ -776,7 +776,7 @@ describe 'z.conversation.ConversationRepository', ->
         done()
       .catch done.fail
 
-  describe 'get_events', ->
+  describe 'get_preceding_messages', ->
     it 'gets messages which are not broken by design', (done) ->
       spyOn(user_repository, 'get_user_by_id').and.callFake (message_id, callback) ->
         callback new z.entity.User()
@@ -797,7 +797,7 @@ describe 'z.conversation.ConversationRepository', ->
 
       Promise.all save_messages
       .then ->
-        return conversation_repository.get_events conversation_et
+        return conversation_repository.get_preceding_messages conversation_et
       .then (loaded_events) ->
         expect(loaded_events.length).toBe 1
         done()

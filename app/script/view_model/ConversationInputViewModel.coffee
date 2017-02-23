@@ -245,7 +245,7 @@ class z.ViewModel.ConversationInputViewModel
 
   on_input_click: =>
     if not @has_text_input()
-      $('.messages-wrap').scroll_to_bottom()
+      amplify.publish z.event.WebApp.CONVERSATION.INPUT.CLICK
 
   on_input_enter: (data, event) =>
     if @pasted_file()?

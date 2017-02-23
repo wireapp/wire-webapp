@@ -19,10 +19,10 @@
 processors = [
   require('autoprefixer')(
     browsers: [
-      'Chrome >= 47'
-      'Edge >= 12'
-      'Firefox >= 38'
-      'Opera >= 37'
+      'Chrome >= 52'
+      'Edge >= 14'
+      'Firefox >= 45'
+      'Opera >= 41'
     ]
   )
 ]

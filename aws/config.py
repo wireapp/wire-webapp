@@ -32,7 +32,7 @@ SUPPORTED = {
   'chrome': 52,
   'firefox': 45,
   'opera': 41,
-  'msedge': 12,
+  'msedge': 14,
 }
 
 try:

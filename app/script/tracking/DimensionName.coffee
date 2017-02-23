@@ -17,27 +17,7 @@
 #
 
 window.z ?= {}
-z.search ?= {}
+z.tracking ?= {}
 
-z.search.FullTextSearch = do ->
-
-  get_search_regex = (query) ->
-    delimiter = ' '
-    flags = 'gumi'
-
-    regex = query.trim().split(delimiter).map((word) ->
-      "(\\b#{z.util.escape_regex(word)})").join '(?:.*)'
-
-    return new RegExp(regex, flags)
-
-  search = (text, query = '') ->
-    query = query.trim()
-
-    if query.length > 0
-      return get_search_regex(query).test(text)
-    return false
-
-  return {
-    get_search_regex: get_search_regex
-    search: search
-  }
+z.tracking.DimensionName =
+  CONTACTS: 'contacts'

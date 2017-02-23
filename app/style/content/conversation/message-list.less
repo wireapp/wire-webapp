@@ -60,6 +60,19 @@
   }
 }
 
+@keyframes marked-animation {to { background-color: inherit}}
+
+.message-marked {
+  .text {
+    .accent-background-color(24%);
+    animation-name: marked-animation;
+    animation-delay: 1s;
+    animation-timing-function: @ease-out-quart;
+    animation-duration: @animation-timing-slower;
+    animation-fill-mode: forwards;
+  }
+}
+
 // MESSAGE - HEADER
 .message-header {
   display: flex;
