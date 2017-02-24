@@ -201,7 +201,7 @@ class z.conversation.ConversationRepository
     conversation_et.is_pending true
 
     first_message = conversation_et.get_first_message()
-    upper_bound = if first_message then new Date first_message.timestamp else new Date()
+    upper_bound = if first_message then new Date first_message.timestamp() else new Date()
 
     @conversation_service.load_preceding_events_from_db conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT
     .then (events) =>
@@ -219,7 +219,7 @@ class z.conversation.ConversationRepository
   @return [Promise]
   ###
   get_messages_with_offset: (conversation_et, message_et, padding = 15) ->
-    message_date = new Date message_et.timestamp
+    message_date = new Date message_et.timestamp()
     conversation_et.is_pending true
     Promise.all([
       @conversation_service.load_preceding_events_from_db(conversation_et.id, new Date(0), message_date, padding)
@@ -239,7 +239,7 @@ class z.conversation.ConversationRepository
   @return [Promise]
   ###
   get_subsequent_messages: (conversation_et, message_et, include_message) ->
-    message_date = new Date message_et.timestamp
+    message_date = new Date message_et.timestamp()
     conversation_et.is_pending true
     @conversation_service.load_subsequent_events_from_db conversation_et.id, message_date, z.config.MESSAGES_FETCH_LIMIT, include_message
     .then (events) =>
@@ -283,7 +283,7 @@ class z.conversation.ConversationRepository
   ###
   _get_unread_events: (conversation_et) ->
     first_message = conversation_et.get_first_message()
-    upper_bound = if first_message then new Date first_message.timestamp else new Date()
+    upper_bound = if first_message then new Date first_message.timestamp() else new Date()
     lower_bound = new Date conversation_et.last_read_timestamp()
     return if lower_bound >= upper_bound
 
@@ -448,7 +448,7 @@ class z.conversation.ConversationRepository
       @get_conversation_by_id conversation_id, (conversation_et) =>
         @get_message_in_conversation_by_id conversation_et, message_id
         .then (message_et) ->
-          resolve conversation_et.last_read_timestamp() >= message_et.timestamp
+          resolve conversation_et.last_read_timestamp() >= message_et.timestamp()
         .catch (error) ->
           if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
             resolve true
@@ -834,7 +834,7 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation to update
   ###
   _update_last_read_timestamp: (conversation_et) ->
-    timestamp = conversation_et.get_last_message()?.timestamp
+    timestamp = conversation_et.get_last_message()?.timestamp()
     return if not timestamp?
 
     if conversation_et.set_timestamp timestamp, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
@@ -1303,9 +1303,9 @@ class z.conversation.ConversationRepository
       @on_conversation_event saved_event
       @sending_queue.push =>
         @_send_generic_message conversation_et.id, generic_message
-      .then =>
+      .then (payload) =>
         if saved_event.type in z.event.EventTypeHandling.STORE
-          @_update_message_sent_status conversation_et, saved_event.id
+          @_update_message_sent_status conversation_et, saved_event.id, payload.time
         @_track_completed_media_action conversation_et, generic_message
       .then ->
         return saved_event
@@ -1316,12 +1316,15 @@ class z.conversation.ConversationRepository
   @param message_id [String]
   @return [Promise]
   ###
-  _update_message_sent_status: (conversation_et, message_id) =>
+  _update_message_sent_status: (conversation_et, message_id, event_time) =>
     @get_message_in_conversation_by_id conversation_et, message_id
     .then (message_et) =>
-      changes = status: z.message.StatusType.SENT
+      console.debug 'update message with time ', new Date(message_et.timestamp()).toISOString(), new Date(event_time).toISOString()
       message_et.status z.message.StatusType.SENT
-      @conversation_service.update_message_in_db message_et, changes
+      message_et.timestamp new Date(event_time).getTime()
+      @conversation_service.update_message_in_db message_et,
+        status: z.message.StatusType.SENT
+        # time: event_time
 
   ###
   Send encrypted external message
@@ -2480,11 +2483,11 @@ class z.conversation.ConversationRepository
     .then (original_message_et) =>
       if event_json.from isnt original_message_et.from
         throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
-      if not original_message_et.timestamp
+      if not original_message_et.timestamp()
         throw new TypeError 'Missing timestamp'
 
       event_json.edited_time = event_json.time
-      event_json.time = new Date(original_message_et.timestamp).toISOString()
+      event_json.time = new Date(original_message_et.timestamp()).toISOString()
       @_delete_message_by_id conversation_et, event_json.id
       @_delete_message_by_id conversation_et, event_json.data.replacing_message_id
       @cryptography_repository.save_unencrypted_event event_json
@@ -2602,7 +2605,7 @@ class z.conversation.ConversationRepository
   @param method [z.tracking.attribute.DeleteType]
   ###
   _track_delete_message: (conversation, message_et, method) ->
-    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
+    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp()) / 1000
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE,
       conversation_type: z.tracking.helpers.get_conversation_type conversation
       method: method
@@ -2616,7 +2619,7 @@ class z.conversation.ConversationRepository
   @param message_et [z.entity.Message]
   ###
   _track_edit_message: (conversation, message_et) ->
-    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
+    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp()) / 1000
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.EDITED_MESSAGE,
       conversation_type: z.tracking.helpers.get_conversation_type conversation
       time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
