@@ -109,9 +109,7 @@ class z.search.SearchRepository
           ###
           switch mode
             when z.search.SEARCH_MODE.CONTACTS
-              if not user_et.connected()
-                user_et.connection_level z.user.ConnectionLevel.NO_CONNECTION
-                result_user_ets.push user_et
+              result_user_ets.push user_et if not user_et.connected()
             when z.search.SEARCH_MODE.ONBOARDING
               result_user_ets.push user_et if not user_et.connected()
             else
