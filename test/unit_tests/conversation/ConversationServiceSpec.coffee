@@ -329,3 +329,31 @@ describe 'z.conversation.ConversationService', ->
         expect(result[1].id).toBe 'f7adaa16-38f5-483e-b621-72ff1dbd2276'
         done()
       .catch done.fail
+
+  describe 'search_in_conversation', ->
+
+    events = undefined
+
+    beforeEach ->
+      events = [
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"#{new Date().toISOString()}","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"#{new Date(Date.now() - 1).toISOString()}","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c1","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"#{new Date(Date.now() - 2).toISOString()}","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c1","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"#{new Date(Date.now() - 3).toISOString()}","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c1","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"#{new Date(Date.now() - 4).toISOString()}","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c2","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"#{new Date(Date.now() - 5).toISOString()}","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c3","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"2016-01-09T13:11:15.051Z","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+      ]
+
+    it 'should return conversation ids sorted by number of messages', (done) ->
+      Promise.all events.map (event) ->
+        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, z.storage.StorageService.construct_primary_key(event), event
+      .then ->
+        return conversation_service.get_active_conversations_from_db()
+      .then (result) ->
+        expect(result.length).toBe 3
+        expect(result[0]).toBe '34e7f58e-b834-4d84-b628-b89b295d46c1'
+        expect(result[1]).toBe '34e7f58e-b834-4d84-b628-b89b295d46c0'
+        expect(result[2]).toBe '34e7f58e-b834-4d84-b628-b89b295d46c2'
+        done()
+      .catch done.fail
