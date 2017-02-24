@@ -397,7 +397,7 @@ class z.conversation.ConversationRepository
     return @conversations_unarchived()?[0]
 
   ###
-  Return all list of sorted conversation ids based on the number of messages in the last 30 days.
+  Returns a list of sorted conversation ids based on the number of messages in the last 30 days.
   @param limit [Number]
   @return [Array] conversation entities
   ###
