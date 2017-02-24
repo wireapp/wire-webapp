@@ -237,7 +237,7 @@ class z.conversation.ConversationService
   ###
   Get recent conversations.
   ###
-  get_recent_conversations_from_db: ->
+  get_active_conversations_from_db: ->
     min_date = new Date()
     min_date.setDate min_date.getDate() - 30
 
@@ -246,10 +246,15 @@ class z.conversation.ConversationService
     .between min_date.toISOString(), new Date().toISOString()
     .toArray()
     .then (events) ->
-      conversation = events.reduce (acc, event) ->
+      conversations = events.reduce (acc, event) ->
         acc[event.conversation] = if acc[event.conversation]? then acc[event.conversation] + 1 else 1
         return acc
       , {}
+
+      sorted_conversations = Object.keys(conversations).sort (a, b) ->
+        conversations[b] - conversations[a]
+
+      return sorted_conversations
 
   ###
   Load conversation events starting from the upper bound going back in history
