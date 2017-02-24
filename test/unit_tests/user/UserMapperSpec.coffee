@@ -70,7 +70,6 @@ describe 'User Mapper', ->
       expect(user_et.name()).toBe 'John Doe'
       expect(user_et.phone()).toBe '+49177123456'
       expect(user_et.is_me).toBeTruthy()
-      expect(user_et.tracking_id).toBe '50e65001-7a96-4468-9e76-c31784ab2eba'
       expect(user_et.locale).toBe 'en'
       expect(user_et.accent_id()).toBe z.config.ACCENT_ID.YELLOW
 

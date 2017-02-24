@@ -69,8 +69,6 @@ class z.user.UserRepository
   ###
   accept_connection_request: (user_et, show_conversation = false) =>
     @_update_connection_status user_et, z.user.ConnectionStatus.ACCEPTED, show_conversation
-    .then ->
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.CONNECT_REQUEST_ACCEPTED
 
   ###
   Block a user.
@@ -102,7 +100,6 @@ class z.user.UserRepository
   create_connection: (user_et, show_conversation = false) =>
     @user_service.create_connection user_et.id, user_et.name()
     .then (response) =>
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.CONNECT_REQUEST_SENT
       @user_connection response, show_conversation
     .catch (error) =>
       @logger.error "Failed to send connection request to user '#{user_et.id}': #{error.message}", error

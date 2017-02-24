@@ -50,8 +50,6 @@ class z.ViewModel.ImageDetailViewViewModel
       @image_src window.URL.createObjectURL blob
       @image_visible true
 
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.IMAGE_DETAIL_VIEW_OPENED
-
   message_removed: (message_id) =>
     @image_modal.hide() if @message_et()?.id is message_id
 

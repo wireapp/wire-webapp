@@ -41,7 +41,7 @@ describe 'z.conversation.ConversationService', ->
     storage_service.clear_all_stores()
     server.restore()
 
-  describe 'load_events_from_db', ->
+  describe 'load_preceding_events_from_db', ->
 
     conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
     sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
@@ -98,7 +98,7 @@ describe 'z.conversation.ConversationService', ->
         expect(error.type).toBe z.conversation.ConversationError::TYPE.NO_CHANGES
         done()
 
-  describe 'load_events_from_db', ->
+  describe 'load_preceding_events_from_db', ->
     conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
     sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
     messages = undefined
@@ -117,13 +117,13 @@ describe 'z.conversation.ConversationService', ->
       .catch done.fail
 
     it 'doesn\'t load events for invalid conversation id', (done) ->
-      conversation_service.load_events_from_db 'invalid_id', new Date(30), new Date 1479903546808
+      conversation_service.load_preceding_events_from_db 'invalid_id', new Date(30), new Date 1479903546808
       .then (events) =>
         expect(events.length).toBe 0
         done()
 
     it 'loads all events', (done) ->
-      conversation_service.load_events_from_db conversation_id
+      conversation_service.load_preceding_events_from_db conversation_id
       .then (events) =>
         expect(events.length).toBe 10
         expect(events[0].time).toBe '2016-11-23T12:19:06.808Z'
@@ -131,7 +131,7 @@ describe 'z.conversation.ConversationService', ->
         done()
 
     it 'loads all events with limit', (done) ->
-      conversation_service.load_events_from_db conversation_id, undefined, undefined, 5
+      conversation_service.load_preceding_events_from_db conversation_id, undefined, undefined, 5
       .then (events) =>
         expect(events.length).toBe 5
         expect(events[0].time).toBe '2016-11-23T12:19:06.808Z'
@@ -139,7 +139,7 @@ describe 'z.conversation.ConversationService', ->
         done()
 
     it 'loads events with lower bound', (done) ->
-      conversation_service.load_events_from_db conversation_id, new Date 1479903546805
+      conversation_service.load_preceding_events_from_db conversation_id, new Date 1479903546805
       .then (events) =>
         expect(events.length).toBe 4
         expect(events[0].time).toBe '2016-11-23T12:19:06.808Z'
@@ -149,7 +149,7 @@ describe 'z.conversation.ConversationService', ->
         done()
 
     it 'loads events with upper bound', (done) ->
-      conversation_service.load_events_from_db conversation_id, undefined, new Date 1479903546803
+      conversation_service.load_preceding_events_from_db conversation_id, undefined, new Date 1479903546803
       .then (events) =>
         expect(events.length).toBe 4
         expect(events[0].time).toBe '2016-11-23T12:19:06.802Z'
@@ -159,14 +159,14 @@ describe 'z.conversation.ConversationService', ->
         done()
 
     it 'loads events with upper and lower bound', (done) ->
-      conversation_service.load_events_from_db conversation_id, new Date(1479903546806), new Date 1479903546807
+      conversation_service.load_preceding_events_from_db conversation_id, new Date(1479903546806), new Date 1479903546807
       .then (events) =>
         expect(events.length).toBe 1
         expect(events[0].time).toBe '2016-11-23T12:19:06.806Z'
         done()
 
     it 'loads events with upper and lower bound and a fetch limit', (done) ->
-      conversation_service.load_events_from_db conversation_id, new Date(1479903546800), new Date(1479903546807), 2
+      conversation_service.load_preceding_events_from_db conversation_id, new Date(1479903546800), new Date(1479903546807), 2
       .then (events) =>
         expect(events.length).toBe 2
         expect(events[0].time).toBe '2016-11-23T12:19:06.806Z'
@@ -182,6 +182,37 @@ describe 'z.conversation.ConversationService', ->
       conversation_service.save_conversation_state_in_db conversation_et
       .then (conversation_record) =>
         expect(conversation_record.name()).toBe conversation_payload.name
+        done()
+
+  describe 'load_subsequent_events_from_db', ->
+    conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
+    sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
+    events = undefined
+
+    beforeEach (done) ->
+      timestamp = new Date('2016-11-23T12:19:06.808Z').getTime()
+      events = [0...10].map (index) ->
+        return {"conversation": conversation_id, "time": new Date(timestamp + index).toISOString(), "from": sender_id}
+
+      Promise.all events.map (event) ->
+        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, z.storage.StorageService.construct_primary_key(event), event
+      .then done
+      .catch done.fail
+
+    it 'loads all events', (done) ->
+      conversation_service.load_subsequent_events_from_db conversation_id, new Date('2016-11-23T12:19:06.808Z'), 2
+      .then (events) =>
+        expect(events.length).toBe 2
+        expect(events[0].time).toBe '2016-11-23T12:19:06.808Z'
+        expect(events[1].time).toBe '2016-11-23T12:19:06.809Z'
+        done()
+
+    it 'loads all events when include message is false', (done) ->
+      conversation_service.load_subsequent_events_from_db conversation_id, new Date('2016-11-23T12:19:06.808Z'), 2, false
+      .then (events) =>
+        expect(events.length).toBe 2
+        expect(events[0].time).toBe '2016-11-23T12:19:06.809Z'
+        expect(events[1].time).toBe '2016-11-23T12:19:06.810Z'
         done()
 
   describe 'delete_message_with_key_from_db', ->
@@ -216,7 +247,7 @@ describe 'z.conversation.ConversationService', ->
     it 'deletes message with the given key', (done) ->
       conversation_service.delete_message_with_key_from_db conversation_id, messages[1].key
       .then ->
-        conversation_service.load_events_from_db conversation_id
+        conversation_service.load_preceding_events_from_db conversation_id
       .then (events) ->
         expect(events.length).toBe 2
         for event in events
@@ -227,7 +258,7 @@ describe 'z.conversation.ConversationService', ->
     it 'does not delete the event if key is wrong', (done) ->
       conversation_service.delete_message_with_key_from_db conversation_id, 'wrongKey'
       .then ->
-        conversation_service.load_events_from_db conversation_id
+        conversation_service.load_preceding_events_from_db conversation_id
       .then (events) ->
         expect(events.length).toBe 3
         done()
@@ -263,5 +294,38 @@ describe 'z.conversation.ConversationService', ->
         expect(result.length).toBe 2
         expect(result[0].id).toBe events[1].id
         expect(result[1].id).toBe events[2].id
+        done()
+      .catch done.fail
+
+  describe 'search_in_conversation', ->
+
+    events = undefined
+
+    beforeEach ->
+      events = [
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"2017-01-09T13:11:15.051Z","data":{"content":"https://wire.com","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category": 16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"f7adaa16-38f5-483e-b621-72ff1dbd2276","from":"5598f954-674f-4a34-ad47-9e5ee8f00bce","time":"2017-01-09T13:11:15.052Z","data":{"content":"https://wire.com","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2276","previews":["CjZodHRwczovL3dpcmUuY29tLz81ZDczNDQ0OC00NDZiLTRmYTItYjMwMy1lYTJhNzhiY2NhMDgQABpWCjZodHRwczovL3dpcmUuY29tLz81ZDczNDQ0OC00NDZiLTRmYTItYjMwMy1lYTJhNzhiY2NhMDgSHFdpcmUgwrcgTW9kZXJuIGNvbW11bmljYXRpb24="]},"type":"conversation.message-add","category": 112}
+      ]
+
+    it 'should find query in text message', (done) ->
+      Promise.all events.slice(0, 1).map (event) ->
+        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, z.storage.StorageService.construct_primary_key(event), event
+      .then ->
+        return conversation_service.search_in_conversation events[0].conversation, 'https://wire.com'
+      .then (result) ->
+        expect(result.length).toBe 1
+        expect(result[0].id).toBe 'f7adaa16-38f5-483e-b621-72ff1dbd2275'
+        done()
+      .catch done.fail
+
+    it 'should find query in text message with link preview', (done) ->
+      Promise.all events.map (event) ->
+        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, z.storage.StorageService.construct_primary_key(event), event
+      .then ->
+        return conversation_service.search_in_conversation events[0].conversation, 'https://wire.com'
+      .then (result) ->
+        expect(result.length).toBe 2
+        expect(result[0].id).toBe 'f7adaa16-38f5-483e-b621-72ff1dbd2275'
+        expect(result[1].id).toBe 'f7adaa16-38f5-483e-b621-72ff1dbd2276'
         done()
       .catch done.fail

@@ -192,31 +192,61 @@ class z.conversation.ConversationRepository
         return @event_mapper.map_json_event event, conversation_et
       throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
 
-  get_events: (conversation_et) ->
+  ###
+  Get preceding messages starting with the given message
+  @param conversation_et [z.entity.Conversation]
+  @return [Promise]
+  ###
+  get_preceding_messages: (conversation_et) ->
     conversation_et.is_pending true
 
     first_message = conversation_et.get_first_message()
     upper_bound = if first_message then new Date first_message.timestamp else new Date()
 
-    @conversation_service.load_events_from_db conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT
+    @conversation_service.load_preceding_events_from_db conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT
     .then (events) =>
       if events.length < z.config.MESSAGES_FETCH_LIMIT
         conversation_et.has_further_messages false
-
-      if not events.length
-        @logger.info "No events for conversation '#{conversation_et.id}' found", events
-      else if first_message
-        @logger.info "Loaded #{events.length} event(s) starting at '#{upper_bound.toISOString()}' for conversation '#{conversation_et.id}'", events
-      else
-        @logger.info "Loaded first #{events.length} event(s) for conversation '#{conversation_et.id}'", events
-
       return @_add_events_to_conversation events, conversation_et
     .then (mapped_messages) ->
       conversation_et.is_pending false
       return mapped_messages
-    .catch (error) =>
-      @logger.info "Could not load events for conversation: #{conversation_et.id}", error
-      throw error
+
+  ###
+  Get specified message and load number preceding and subsequent messages defined by padding.
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  @return [Promise]
+  ###
+  get_messages_with_offset: (conversation_et, message_et, padding = 15) ->
+    message_date = new Date message_et.timestamp
+    conversation_et.is_pending true
+    Promise.all([
+      @conversation_service.load_preceding_events_from_db(conversation_et.id, new Date(0), message_date, padding)
+      @conversation_service.load_subsequent_events_from_db(conversation_et.id, message_date, padding, true)
+    ])
+    .then ([older_events, newer_events]) =>
+      return @_add_events_to_conversation older_events.concat(newer_events), conversation_et
+    .then (mapped_messages) ->
+      conversation_et.is_pending false
+      return mapped_messages
+
+  ###
+  Get subsequent messages starting with the given message
+  @param conversation_et [z.entity.Conversation]
+  @param message_et [z.entity.Message]
+  @param include_message [Boolean] include given message in the results
+  @return [Promise]
+  ###
+  get_subsequent_messages: (conversation_et, message_et, include_message) ->
+    message_date = new Date message_et.timestamp
+    conversation_et.is_pending true
+    @conversation_service.load_subsequent_events_from_db conversation_et.id, message_date, z.config.MESSAGES_FETCH_LIMIT, include_message
+    .then (events) =>
+      return @_add_events_to_conversation events, conversation_et
+    .then (mapped_messages) ->
+      conversation_et.is_pending false
+      return mapped_messages
 
   ###
   Get messages for given category. Category param acts as lower bound
@@ -258,7 +288,7 @@ class z.conversation.ConversationRepository
     return if lower_bound >= upper_bound
 
     conversation_et.is_pending true
-    @conversation_service.load_events_from_db conversation_et.id, lower_bound, upper_bound
+    @conversation_service.load_preceding_events_from_db conversation_et.id, lower_bound, upper_bound
     .then (events) =>
       if events.length
         @_add_events_to_conversation events, conversation_et
@@ -573,8 +603,6 @@ class z.conversation.ConversationRepository
   add_members: (conversation_et, users_ids) =>
     @conversation_service.post_members conversation_et.id, users_ids
     .then (response) ->
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT,
-        z.tracking.SessionEventName.INTEGER.USERS_ADDED_TO_CONVERSATIONS, users_ids.length
       amplify.publish z.event.WebApp.EVENT.INJECT, response
     .catch (error_response) ->
       if error_response.label is z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
@@ -699,9 +727,7 @@ class z.conversation.ConversationRepository
   ###
   rename_conversation: (conversation_et, name) =>
     @conversation_service.update_conversation_properties conversation_et.id, name
-    .then (response) ->
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.CONVERSATION_RENAMED
-      amplify.publish z.event.WebApp.EVENT.INJECT, response
+    .then (response) -> amplify.publish z.event.WebApp.EVENT.INJECT, response
 
   reset_session: (user_id, client_id, conversation_id) =>
     @logger.info "Resetting session with client '#{client_id}' of user '#{user_id}'."
@@ -894,6 +920,24 @@ class z.conversation.ConversationRepository
     @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
+  Send asset preview message to specified conversation.
+  @param conversation_et [z.entity.Conversation] Conversation that should receive the preview
+  @param file [File] File to generate preview from
+  @param message_id [String] Message ID of the message to generate a preview for
+  ###
+  send_asset_preview: (conversation_et, file, message_id) =>
+    poster(file).then (img_blob) =>
+      @asset_service.upload_image_asset img_blob
+    .then (uploaded_image_asset) =>
+      asset = new z.proto.Asset()
+      asset.set 'preview', new z.proto.Asset.Preview uploaded_image_asset.original.mime_type, uploaded_image_asset.original.size, uploaded_image_asset.uploaded
+      generic_message = new z.proto.GenericMessage message_id
+      generic_message.set 'asset', asset
+      @_send_and_inject_generic_message conversation_et, generic_message
+    .catch (error) =>
+      @logger.warn "Failed to upload otr asset-preview for conversation #{conversation_et.id}", error
+
+  ###
   Send asset upload failed message to specified conversation.
 
   @param conversation_et [z.entity.Conversation] Conversation that should receive the file
@@ -1081,7 +1125,6 @@ class z.conversation.ConversationRepository
   send_message_with_link_preview: (message, conversation_et) =>
     @send_message message, conversation_et
     .then (generic_message) =>
-      @_track_rich_media_content message
       @send_link_preview message, conversation_et, generic_message
     .catch (error) =>
       @logger.error "Error while sending text message: #{error.message}", error
@@ -1509,7 +1552,7 @@ class z.conversation.ConversationRepository
     @send_asset_metadata conversation_et, file
     .then (record) =>
       message_id = record.id
-      @send_asset conversation_et, file, record.id
+      @send_asset conversation_et, file, message_id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
       @logger.info "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
@@ -1546,7 +1589,9 @@ class z.conversation.ConversationRepository
     @send_asset_metadata conversation_et, file
     .then (record) =>
       message_id = record.id
-      @send_asset_v3 conversation_et, file, record.id
+      @send_asset_preview conversation_et, file, message_id
+    .then =>
+      @send_asset_v3 conversation_et, file, message_id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
       @logger.info "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
@@ -2101,8 +2146,6 @@ class z.conversation.ConversationRepository
       return false
     else
       @logger.warn "Event with nonce '#{event_nonce}' has been already processed.", message_et
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT,
-        z.tracking.SessionEventName.INTEGER.EVENT_HIDDEN_DUE_TO_DUPLICATE_NONCE
       return true
 
   ###
@@ -2562,21 +2605,6 @@ class z.conversation.ConversationRepository
       conversation_type: z.tracking.helpers.get_conversation_type conversation
       time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]
       time_elapsed_action: seconds_since_message_creation
-
-  ###
-  Track rich media content actions in text messages.
-  @private
-  @param message [String] Message content to be checked for rich media
-  ###
-  _track_rich_media_content: (message) ->
-    soundcloud_links = message.match z.media.MediaEmbeds.regex.soundcloud
-    if soundcloud_links
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.SOUNDCLOUD_LINKS_SENT, soundcloud_links.length
-
-    youtube_links = message.match z.media.MediaEmbeds.regex.youtube
-    if youtube_links
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.YOUTUBE_LINKS_SENT, youtube_links.length
-
 
   ###
   Track reaction action.

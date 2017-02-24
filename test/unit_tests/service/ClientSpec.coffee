@@ -120,14 +120,14 @@ describe 'z.service.Client', ->
         jasmine.clock().uninstall()
         server.restore()
 
-      it 'it resolves with the payload if backend request successful', (done) ->
+      it 'resolves with the payload if backend request successful', (done) ->
         client.send_request config
         .then ->
           done()
         .catch done.fail
         server.requests[0].respond 200
 
-      it 'it caches the request if it is unauthorized', (done) ->
+      it 'caches the request if it is unauthorized', (done) ->
         token_refresh = jasmine.createSpy('token_refresh');
         amplify.subscribe z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, token_refresh
 
@@ -140,7 +140,7 @@ describe 'z.service.Client', ->
         expect(token_refresh).toHaveBeenCalled()
         done()
 
-      it 'it caches the request if it times out', (done) ->
+      it 'caches the request if it times out', (done) ->
         spyOn(client, 'execute_on_connectivity').and.returnValue Promise.resolve()
 
         client.send_request config
@@ -151,6 +151,38 @@ describe 'z.service.Client', ->
         expect(client.execute_on_connectivity).toHaveBeenCalled()
         done()
 
+    describe 'send_json', ->
+      original_config = undefined
+
+      beforeEach ->
+        original_config =
+          callback: -> 'callback'
+          data: 'data'
+          headers:
+            'X-TEST-HEADER': 'header'
+          processData: true
+          timeout: 100
+          type: 'GET'
+          url: 'dummy/url'
+          withCredentials: true
+
+      it 'passes all params to send_request', (done) ->
+        spyOn(client, 'send_request').and.callFake (config) ->
+          expect(config.callback).toBe original_config.callback
+          expect(config.contentType).toBe 'application/json; charset=utf-8'
+          expect(config.headers['X-TEST-HEADER']).toBe original_config.headers['X-TEST-HEADER']
+          expect(config.headers['Content-Encoding']).toBe 'gzip'
+          expect(config.data).toBeDefined()
+          expect(config.processData).toBe original_config.processData
+          expect(config.timeout).toBe original_config.timeout
+          expect(config.type).toBe original_config.type
+          expect(config.url).toBe original_config.url
+          expect(config.withCredentials).toBe original_config.withCredentials
+          done()
+        client.send_json(original_config).catch(done.fail)
+
+    # TODO: The tests in the following "describe" block change timings which is unfortunate.
+    # That's why this block comes at the end of this file.
     describe 'requests that use ajax().always()', ->
 
       beforeAll ->
@@ -168,12 +200,12 @@ describe 'z.service.Client', ->
         jasmine.clock().uninstall()
         server.restore()
 
-      it 'it resolves with the payload if backend request successful', (done) ->
+      it 'resolves with the payload if backend request successful', (done) ->
         client.send_request config
         .then(done).catch done.fail
         server.requests[0].respond 200
 
-      it 'it caches the request if it is unauthorized', (done) ->
+      it 'caches the request if it is unauthorized', (done) ->
         token_refresh = jasmine.createSpy 'token_refresh'
         amplify.subscribe z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, token_refresh
 
@@ -186,7 +218,7 @@ describe 'z.service.Client', ->
         expect(token_refresh).toHaveBeenCalled()
         done()
 
-      it 'it caches the request if it times out', (done) ->
+      it 'caches the request if it times out', (done) ->
         spyOn(client, 'execute_on_connectivity').and.returnValue Promise.resolve()
 
         client.send_request config
@@ -196,33 +228,3 @@ describe 'z.service.Client', ->
         expect(client.request_queue.length).toBe 1
         expect(client.execute_on_connectivity).toHaveBeenCalled()
         done()
-
-  describe 'send_json', ->
-    original_config = undefined
-
-    beforeEach ->
-      original_config =
-        callback: -> 'callback'
-        data: 'data'
-        headers:
-         'X-TEST-HEADER': 'header'
-        processData: true
-        timeout: 100
-        type: 'GET'
-        url: 'dummy/url'
-        withCredentials: true
-
-    it 'passes all params to send_request', (done) ->
-      spyOn(client, 'send_request').and.callFake (config) ->
-        expect(config.callback).toBe original_config.callback
-        expect(config.contentType).toBe 'application/json; charset=utf-8'
-        expect(config.headers['X-TEST-HEADER']).toBe original_config.headers['X-TEST-HEADER']
-        expect(config.headers['Content-Encoding']).toBe 'gzip'
-        expect(config.data).toBeDefined()
-        expect(config.processData).toBe original_config.processData
-        expect(config.timeout).toBe original_config.timeout
-        expect(config.type).toBe original_config.type
-        expect(config.url).toBe original_config.url
-        expect(config.withCredentials).toBe original_config.withCredentials
-        done()
-      client.send_json(original_config).catch(done.fail)

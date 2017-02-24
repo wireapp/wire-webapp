@@ -330,7 +330,6 @@ class z.calling.handler.CallStateHandler
     @v2_call_center.get_call_by_id conversation_id
     .then (call_et) =>
       call_et.ignore()
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.INCOMING_CALL_MUTED
       @logger.info "Call in '#{conversation_id}' ignored"
       @v2_call_center.media_stream_handler.reset_media_streams()
     .catch (error) =>
