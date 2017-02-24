@@ -108,13 +108,13 @@ describe 'Event Repository', ->
   describe '_handle_event', ->
     beforeEach ->
       event_repository.notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET
-      spyOn(conversation_service, 'save_event').and.returnValue Promise.resolve({data: 'dummy content'})
+      spyOn(event_repository.conversation_service, 'save_event').and.returnValue Promise.resolve({data: 'dummy content'})
       spyOn(event_repository, '_distribute_event')
 
     it 'should not save but distribute user events', (done) ->
       event_repository._handle_event {type: z.event.Backend.USER.UPDATE}, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
       .then ->
-        expect(conversation_service.save_event).not.toHaveBeenCalled()
+        expect(event_repository.conversation_service.save_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).toHaveBeenCalled()
         done()
       .catch done.fail
@@ -122,7 +122,7 @@ describe 'Event Repository', ->
     it 'should not save but distribute call events', (done) ->
       event_repository._handle_event {type: z.event.Backend.CALL.FLOW_ACTIVE}, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
       .then ->
-        expect(conversation_service.save_event).not.toHaveBeenCalled()
+        expect(event_repository.conversation_service.save_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).toHaveBeenCalled()
         done()
       .catch done.fail
@@ -130,7 +130,7 @@ describe 'Event Repository', ->
     it 'should not save but distribute conversation.create event', (done) ->
       event_repository._handle_event {type: z.event.Backend.CONVERSATION.CREATE}, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
       .then ->
-        expect(conversation_service.save_event).not.toHaveBeenCalled()
+        expect(event_repository.conversation_service.save_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).toHaveBeenCalled()
         done()
       .catch done.fail
@@ -143,7 +143,7 @@ describe 'Event Repository', ->
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
       .then (result) ->
         expect(result).toBeTruthy()
-        expect(conversation_service.save_event).not.toHaveBeenCalled()
+        expect(event_repository.conversation_service.save_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).not.toHaveBeenCalled()
         done()
       .catch done.fail
@@ -156,7 +156,7 @@ describe 'Event Repository', ->
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
       .then (result) ->
         expect(result).toBeTruthy()
-        expect(conversation_service.save_event).not.toHaveBeenCalled()
+        expect(event_repository.conversation_service.save_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).not.toHaveBeenCalled()
         done()
       .catch done.fail
@@ -169,7 +169,7 @@ describe 'Event Repository', ->
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
       .then (result) ->
         expect(result).toBeTruthy()
-        expect(conversation_service.save_event).not.toHaveBeenCalled()
+        expect(event_repository.conversation_service.save_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).not.toHaveBeenCalled()
         done()
       .catch done.fail
@@ -183,7 +183,7 @@ describe 'Event Repository', ->
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.STREAM
       .then (result) ->
         expect(result).toBeTruthy()
-        expect(conversation_service.save_event).not.toHaveBeenCalled()
+        expect(event_repository.conversation_service.save_event).not.toHaveBeenCalled()
         expect(event_repository._distribute_event).not.toHaveBeenCalled()
         done()
       .catch done.fail
@@ -195,7 +195,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
       .then ->
-        expect(conversation_service.save_event).toHaveBeenCalled()
+        expect(event_repository.conversation_service.save_event).toHaveBeenCalled()
         expect(event_repository._distribute_event).toHaveBeenCalled()
         done()
       .catch done.fail
@@ -207,7 +207,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
       .then ->
-        expect(conversation_service.save_event).toHaveBeenCalled()
+        expect(event_repository.conversation_service.save_event).toHaveBeenCalled()
         expect(event_repository._distribute_event).toHaveBeenCalled()
         done()
       .catch done.fail
@@ -219,7 +219,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
       .then ->
-        expect(conversation_service.save_event).toHaveBeenCalled()
+        expect(event_repository.conversation_service.save_event).toHaveBeenCalled()
         expect(event_repository._distribute_event).toHaveBeenCalled()
         done()
       .catch done.fail
@@ -231,7 +231,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
       .then ->
-        expect(conversation_service.save_event).toHaveBeenCalled()
+        expect(event_repository.conversation_service.save_event).toHaveBeenCalled()
         expect(event_repository._distribute_event).toHaveBeenCalled()
         done()
       .catch done.fail
@@ -243,7 +243,7 @@ describe 'Event Repository', ->
 
       event_repository._handle_event event, z.event.EventRepository::NOTIFICATION_SOURCE.WEB_SOCKET
       .then ->
-        expect(conversation_service.save_event).toHaveBeenCalled()
+        expect(event_repository.conversation_service.save_event).toHaveBeenCalled()
         expect(event_repository._distribute_event).toHaveBeenCalled()
         done()
       .catch done.fail
