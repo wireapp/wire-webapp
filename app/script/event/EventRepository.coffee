@@ -368,9 +368,43 @@ class z.event.EventRepository
     .then =>
       if event.type in z.event.EventTypeHandling.DECRYPT
         return @cryptography_repository.decrypt_event event
-        .then (generic_message) =>
-          @cryptography_repository.cryptography_mapper.map_generic_message generic_message, event
-      return event
+        .catch (decrypt_error) =>
+          # Get error information
+          remote_client_id = event.data.sender
+          remote_user_id = event.from
+
+          # Hashing error message to get the error code (not very reliable if Proteus error messages change! Needs to be revised in the future)
+          hashed_error_message = z.util.murmurhash3 decrypt_error.message, 42
+          error_code = hashed_error_message.toString().substr 0, 4
+
+          @logger.warn "Decryption error '#{error_code}': #{decrypt_error.message}", decrypt_error
+
+          # Handle error
+          if decrypt_error instanceof Proteus.errors.DecryptError.DuplicateMessage or decrypt_error instanceof Proteus.errors.DecryptError.OutdatedMessage
+            # We don't need to show duplicate message errors to the user
+            throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+          else if decrypt_error instanceof z.cryptography.CryptographyError
+            if decrypt_error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
+              throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+          else if decrypt_error instanceof Proteus.errors.DecryptError.InvalidMessage or decrypt_error instanceof Proteus.errors.DecryptError.InvalidSignature
+            # Session is broken, let's see what's really causing it...
+            error_code = z.cryptography.CryptographyErrorType.INVALID_SIGNATURE
+            session_id = @cryptography_repository._construct_session_id remote_user_id, remote_client_id
+            @logger.error "Session '#{session_id}' with user '#{remote_user_id}' is broken or out of sync (#{decrypt_error.constructor.name}). Reset the session and decryption is likely to work again.", decrypt_error
+          else if decrypt_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged
+            # Remote identity changed
+            error_code = z.cryptography.CryptographyErrorType.REMOTE_IDENTITY_CHANGED
+            message = "Remote identity of client '#{remote_client_id}' from user '#{remote_user_id}' changed: #{decrypt_error.message}"
+            @logger.error message, decrypt_error
+
+          @_report_decrypt_error event, decrypt_error, error_code
+          return z.conversation.EventBuilder.build_unable_to_decrypt event, decrypt_error, error_code
+        .then (message) =>
+          if (message instanceof z.proto.GenericMessage)
+            return @cryptography_repository.cryptography_mapper.map_generic_message message, event
+          return message
+      else
+        return event
     .then (mapped_event) =>
       if mapped_event.type in z.event.EventTypeHandling.STORE
         return @cryptography_repository.save_unencrypted_event mapped_event
@@ -417,6 +451,31 @@ class z.event.EventRepository
         .catch (error) =>
           @logger.error "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
           reject error
+
+  ###
+  Report decryption error to Localytics and stack traces to Raygun.
+  ###
+  _report_decrypt_error: (event, decrypt_error, error_code) =>
+    remote_client_id = event.data.sender
+    remote_user_id = event.from
+    session_id = @cryptography_repository._construct_session_id remote_user_id, remote_client_id
+
+    attributes =
+      cause: "#{error_code}: #{decrypt_error.message}"
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE, attributes
+
+    if decrypt_error not instanceof Proteus.errors.DecryptError.DuplicateMessage and decrypt_error not instanceof Proteus.errors.DecryptError.TooDistantFuture
+      custom_data =
+        cryptobox_version: cryptobox.version
+        client_local_class: @current_client().class
+        client_local_type: @current_client().type
+        error_code: error_code
+        event_type: event.type
+        session_id: session_id
+
+      raygun_error = new Error "Decryption failed: #{decrypt_error.message}"
+      raygun_error.stack = decrypt_error.stack
+      Raygun.send raygun_error, custom_data
 
     ###
     Check if call event is handled within its valid lifespan.

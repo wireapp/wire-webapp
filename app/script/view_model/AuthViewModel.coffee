@@ -53,14 +53,14 @@ class z.ViewModel.AuthViewModel
     @storage_service = new z.storage.StorageService()
     @storage_repository = new z.storage.StorageRepository @storage_service
 
-    @user_mapper = new z.user.UserMapper @asset_service
-    user_service = new z.user.UserService @auth.client
-    @user_repository = new z.user.UserRepository user_service, @asset_service
-
     @cryptography_service = new z.cryptography.CryptographyRepository @auth.client
     @cryptography_repository = new z.cryptography.CryptographyRepository @cryptography_service, @storage_repository
     @client_service = new z.client.ClientService @auth.client, @storage_service
     @client_repository = new z.client.ClientRepository @client_service, @cryptography_repository
+
+    @user_mapper = new z.user.UserMapper @asset_service
+    user_service = new z.user.UserService @auth.client
+    @user_repository = new z.user.UserRepository user_service, @asset_service, undefined, @client_repository
 
     @notification_service = new z.event.NotificationService @auth.client, @storage_service
     @web_socket_service = new z.event.WebSocketService @auth.client
@@ -1256,9 +1256,7 @@ class z.ViewModel.AuthViewModel
         @logger.info 'Local client rejected as invalid by backend. Reinitializing storage.'
         @storage_service.init @self_user().id
     .then =>
-      return @storage_repository.init true
-    .then =>
-      return @cryptography_repository.init()
+      return @cryptography_repository.init @storage_service.db
     .then =>
       if @client_repository.current_client()
         @logger.info 'Active client found. Redirecting to app...'

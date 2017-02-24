@@ -156,7 +156,6 @@ entities.user = {
     "picture": entities.picture,
     "name": "John Doe",
     "id": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5",
-    "tracking_id": "50e65001-7a96-4468-9e76-c31784ab2eba",
     "locale": "en"
   },
   jane_roe: {

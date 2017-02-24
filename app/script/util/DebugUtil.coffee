@@ -32,6 +32,12 @@ class z.util.DebugUtil
     return new Promise (resolve) =>
       @user_repository.get_user_by_id user_id, (user_et) -> resolve user_et
 
+  block_all_connections: ->
+    block_users = []
+    wire.app.repository.user.users().forEach (user_et) =>
+      block_users.push @user_repository.block_user user_et
+    return Promise.all block_users
+
   get_number_of_clients_in_conversation: ->
     user_ets = @conversation_repository.active_conversation().participating_user_ets()
 
@@ -59,3 +65,9 @@ class z.util.DebugUtil
         @logger.warn "Conversation: #{debug_information.conversation.name()}", debug_information.conversation
         @logger.warn "From: #{debug_information.user.name()}", debug_information.user
         resolve debug_information
+
+  log_connection_status: ->
+    @logger.log 'Online Status'
+    @logger.log "-- Browser online: #{window.navigator.onLine}"
+    @logger.log "-- IndexedDB open: #{wire.app.repository.storage.storage_service.db.isOpen()}"
+    @logger.log "-- WebSocket ready state: #{window.wire.app.service.web_socket.socket.readyState}"

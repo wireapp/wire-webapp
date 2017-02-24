@@ -45,9 +45,6 @@ class z.user.UserMapper
     user_et = @update_user_from_object new z.entity.User(), data
     user_et.is_me = true
 
-    if data.tracking_id
-      user_et.tracking_id = data.tracking_id
-
     if data.locale
       user_et.locale = data.locale
 

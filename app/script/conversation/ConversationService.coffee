@@ -234,20 +234,36 @@ class z.conversation.ConversationService
       @logger.error "Failed to get event for conversation '#{conversation_id}': #{error.message}", error
       throw error
 
-  ###
-  Load conversation events. Start and end are not included.
-  Events are always sorted beginning with the newest timestamp.
+  get_active_conversations_from_db: ->
+    min_date = new Date()
+    min_date.setDate min_date.getDate() - 30
 
-  TODO: Make sure that only valid values (no Strings, No timestamps but Dates(!), ...) are passed to this function!
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where 'time'
+    .between min_date.toISOString(), new Date().toISOString()
+    .toArray()
+    .then (events) ->
+      conversations = events.reduce (accumulated, event) ->
+        accumulated[event.conversation] = if accumulated[event.conversation]? then accumulated[event.conversation] + 1 else 1
+        return accumulated
+      , {}
+
+      sorted_conversations = Object.keys(conversations).sort (a, b) ->
+        conversations[b] - conversations[a]
+
+      return sorted_conversations
+
+  ###
+  Load conversation events starting from the upper bound going back in history
+  until either limit or lower bound is reached.
 
   @param conversation_id [String] ID of conversation
   @param lower_bound [Date] Load from this date (included)
   @param upper_bound [Date] Load until this date (excluded)
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
-  @see https://github.com/dfahlander/Dexie.js/issues/366
   ###
-  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = Number.MAX_SAFE_INTEGER) ->
+  load_preceding_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = Number.MAX_SAFE_INTEGER) ->
     if not _.isDate(lower_bound) or not _.isDate upper_bound
       throw new Error "Lower bound (#{typeof lower_bound}) and upper bound (#{typeof upper_bound}) must be of type 'Date'."
     else if lower_bound.getTime() > upper_bound.getTime()
@@ -264,16 +280,49 @@ class z.conversation.ConversationService
       throw error
 
   ###
+  Load conversation events starting from the upper bound to the present until the limit is reached
+
+  @param conversation_id [String] ID of conversation
+  @param upper_bound [Date] Load until this date (excluded)
+  @param limit [Number] Amount of events to load
+  @param include_upper_bound [Boolean] Should upper bound be part of the message
+  @return [Promise] Promise that resolves with the retrieved records
+  ###
+  load_subsequent_events_from_db: (conversation_id, upper_bound, limit = Number.MAX_SAFE_INTEGER, include_upper_bound = true) =>
+    if not _.isDate upper_bound
+      throw new Error "Upper bound (#{typeof upper_bound}) must be of type 'Date'."
+
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where '[conversation+time]'
+    .between [conversation_id, upper_bound.toISOString()], [conversation_id, new Date().toISOString()], include_upper_bound, true
+    .limit limit
+    .toArray()
+
+  ###
   Get events with given category.
   @param conversation_id [String] ID of conversation to add users to
-  @param category [z.message.MessageCategory] will be used as lower bound
+  @param category_min [z.message.MessageCategory]
+  @param category_max [z.message.MessageCategory]
   @return [Promise]
   ###
-  load_events_with_category_from_db: (conversation_id, category) ->
+  load_events_with_category_from_db: (conversation_id, category_min, category_max = z.message.MessageCategory.LIKED) ->
     @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
     .where '[conversation+category]'
-    .between [conversation_id, category], [conversation_id, z.message.MessageCategory.LIKED], true, true
+    .between [conversation_id, category_min], [conversation_id, category_max], true, true
     .sortBy 'time'
+
+  ###
+  Search for text in given conversation.
+  @param conversation_id [String] ID of conversation to add users to
+  @param query [String] will be checked in agains all text messages
+  @return [Promise]
+  ###
+  search_in_conversation: (conversation_id, query) =>
+    category_min = z.message.MessageCategory.TEXT
+    category_max = z.message.MessageCategory.TEXT | z.message.MessageCategory.LINK | z.message.MessageCategory.LINK_PREVIEW
+    @load_events_with_category_from_db conversation_id, category_min, category_max
+    .then (events) ->
+      return events.filter (event) -> z.search.FullTextSearch.search event.data.content, query
 
   ###
   Add a bot to an existing conversation.

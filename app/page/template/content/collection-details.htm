@@ -24,8 +24,11 @@
             <!-- ko if: message_et.category & z.message.MessageCategory.LINK -->
               <link-preview-asset params="message: message_et, header: true"></link-preview-asset>
             <!-- /ko -->
-            <!-- ko if: message_et.category & z.message.MessageCategory.FILE -->
+            <!-- ko if: message_et.get_first_asset().is_file() -->
               <file-asset class="collection-file" params="message: message_et, header: true"></file-asset>
+            <!-- /ko -->
+            <!-- ko if: message_et.get_first_asset().is_audio() -->
+              <audio-asset class="collection-file" params="message: message_et, header: true"></audio-asset>
             <!-- /ko -->
           <!-- /ko -->
         </div>

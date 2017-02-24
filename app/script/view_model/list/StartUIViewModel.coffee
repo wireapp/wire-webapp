@@ -56,7 +56,6 @@ class z.ViewModel.list.StartUIViewModel
     , 300
 
     @searched_for_user = _.once (query) ->
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.BOOLEAN.SEARCHED_FOR_PEOPLE, true
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONTACTS.ENTERED_SEARCH,
         by_username_only: query.startsWith '@'
         context: 'startui'
@@ -212,7 +211,7 @@ class z.ViewModel.list.StartUIViewModel
     @search_repository.show_onboarding response
     .then (matched_user_ets) =>
       @suggestions matched_user_ets
-      return @search_repository.get_top_people()
+      return @get_top_people()
     .then (user_ets) =>
       @top_users user_ets
       @selected_people.removeAll()
@@ -224,12 +223,15 @@ class z.ViewModel.list.StartUIViewModel
     .catch (error) =>
       @logger.error "Could not show the on-boarding results: #{error.message}", error
 
+  get_top_people: =>
+    @conversation_repository.get_most_active_conversations 9
+    .then (conversation_ets) ->
+      return conversation_ets
+      .filter (conversation_et) -> conversation_et.is_one2one()
+      .map (conversation_et) -> conversation_et.participating_user_ets()[0]
+
   update_list: =>
-    @search_repository.get_top_people()
-    .then (user_ets) =>
-      @top_users user_ets if user_ets.length > 0
-    .catch (error) =>
-      @logger.error "Could not update the top people: #{error.message}", error
+    @get_top_people().then (user_ets) => @top_users user_ets
 
     @show_spinner false
 
@@ -239,8 +241,6 @@ class z.ViewModel.list.StartUIViewModel
     @clear_search_results()
     @user_profile null
     $('user-input input').focus()
-
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.SessionEventName.INTEGER.SEARCH_OPENED
 
   _close_list: ->
     @user_bubble?.hide()
@@ -461,7 +461,7 @@ class z.ViewModel.list.StartUIViewModel
     if @selected_people().length is 1
       return @conversation_repository.get_one_to_one_conversation @selected_people()[0]
       .then (conversation_et) =>
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_ONE_TO_ONE_CONVERSATION,
+        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION,
           source: 'top_user'
         @click_on_group conversation_et
         callback conversation_et if _.isFunction callback
@@ -483,16 +483,16 @@ class z.ViewModel.list.StartUIViewModel
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
         amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, false
-      , 1000
+      , 500
 
   on_video_call: =>
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
         amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, true
-      , 1000
+      , 500
 
   on_photo: (images) =>
     @on_submit_search ->
       window.setTimeout ->
         amplify.publish z.event.WebApp.CONVERSATION.IMAGE.SEND, images
-      , 1000
+      , 500

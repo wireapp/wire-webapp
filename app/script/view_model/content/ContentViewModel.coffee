@@ -77,11 +77,6 @@ class z.ViewModel.content.ContentViewModel
           @conversation_input.removed_from_view()
           @conversation_titlebar.removed_from_view()
 
-    @multitasking.is_minimized.subscribe (is_minimized) =>
-      if is_minimized and @calling_repository.joined_call()
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.MINIMIZED_FROM_FULLSCREEN,
-        conversation_type: if @calling_repository.joined_call().is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
-
     @user_repository.connect_requests.subscribe (requests) =>
       if @content_state() is z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS and requests.length is 0
         @show_conversation @conversation_repository.get_most_recent_conversation()
@@ -120,7 +115,7 @@ class z.ViewModel.content.ContentViewModel
 
   @param conversation_et [z.entity.Conversation | String] Conversation entity or conversation ID
   ###
-  show_conversation: (conversation_et) =>
+  show_conversation: (conversation_et, message_et) =>
     return @switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS if not conversation_et
 
     conversation_et = @conversation_repository.get_conversation_by_id conversation_et if not conversation_et.id
@@ -129,7 +124,7 @@ class z.ViewModel.content.ContentViewModel
     @_release_content()
     @content_state z.ViewModel.content.CONTENT_STATE.CONVERSATION
     @conversation_repository.active_conversation conversation_et
-    @message_list.change_conversation conversation_et, =>
+    @message_list.change_conversation conversation_et, message_et, =>
       @_show_content z.ViewModel.content.CONTENT_STATE.CONVERSATION
       @participants.change_conversation conversation_et
       @previous_conversation = @conversation_repository.active_conversation()

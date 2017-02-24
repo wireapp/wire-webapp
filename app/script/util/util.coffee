@@ -244,10 +244,6 @@ z.util.download_blob = (blob, filename) ->
   , 100
 
 
-z.util.phone_uri_to_e164 = (phone_number) ->
-  return phone_number.replace /tel:|-/g, ''
-
-
 z.util.phone_number_to_e164 = (phone_number, country_code) ->
   return window.PhoneFormat.formatE164 "#{country_code}".toUpperCase(), "#{phone_number}"
 
@@ -275,6 +271,8 @@ z.util.encode_sha256_base64 = (text) ->
 z.util.escape_html = (html) ->
   return _.escape html
 
+z.util.escape_regex = (string) ->
+  return string.replace /[.*+?^${}()|[\]\\]/g, '\\$&'
 
 z.util.alias =
   # Note IE10 listens to "transitionend" instead of "animationend"
@@ -614,3 +612,19 @@ z.util.format_time_remaining = (time_remaining) ->
     title += "#{moment_duration.seconds()} #{z.localization.Localizer.get_text z.string.ephememal_units_seconds}"
 
   return title or ''
+
+###
+Execute provided function on each item of the array with the given interval
+@param array [Array]
+@param fn [Function]
+@param interval [Number] Interval in ms
+###
+z.util.foreach_deferred = (array, fn, interval) ->
+  remaining_items = Array.prototype.slice.apply array
+  interval_id = window.setInterval ->
+    removed_element = remaining_items.shift()
+    if removed_element?
+      fn removed_element
+    else
+      window.clearInterval interval_id
+  , interval

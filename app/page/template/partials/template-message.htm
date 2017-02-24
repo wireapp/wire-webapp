@@ -1,12 +1,35 @@
-<script type="text/html" id="all-verified">
+<script type="text/html" id="verification">
   <div class="message-header">
     <div class="message-header-icon">
-      <svg width="16" height="16">
-        <use xlink:href="#icon-verified"></use>
-      </svg>
+      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.VERIFIED -->
+        <svg width="16" height="16">
+          <use xlink:href="#icon-verified"></use>
+        </svg>
+      <!-- /ko -->
+      <!-- ko ifnot: message.verification_message_type === z.message.VerificationMessageType.VERIFIED -->
+        <svg width="16" height="16">
+          <use xlink:href="#icon-not-verified"></use>
+        </svg>
+      <!-- /ko -->
     </div>
     <div class="message-header-label">
-      <span data-bind="l10n_text: z.string.tooltip_conversation_all_verified"></span>
+      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.VERIFIED -->
+        <span data-bind="l10n_text: z.string.tooltip_conversation_all_verified"></span>
+      <!-- /ko -->
+      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.UNVERIFIED -->
+        <span class="label-bold" data-bind="text: message.sender_name()"></span>
+        <span class="ellipsis" data-bind="l10n_text: z.string.conversation_device_unverified"></span>
+        <span class="ellipsis text-theme" data-uie-name="go-devices" data-bind="click: click_on_device, text: message.caption_unverified_device"></span>
+      <!-- /ko -->
+      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.NEW_DEVICE -->
+        <span class="label-bold" data-bind='text: message.caption_user'></span>
+        <span class="ellipsis" data-bind="text: message.caption_started_using"></span>
+        <span class="ellipsis text-theme" data-uie-name="go-devices" data-bind="click: click_on_device, text: message.caption_new_device"></span>
+      <!-- /ko -->
+      <!-- ko if: message.verification_message_type === z.message.VerificationMessageType.NEW_MEMBER -->
+        <span class="ellipsis" data-bind="l10n_text: z.string.conversation_device_new_people_joined"></span>
+        <span class="ellipsis text-theme" data-uie-name="go-devices" data-bind="click: click_on_device, l10n_text: z.string.conversation_device_new_people_joined_verify"></span>
+      <!-- /ko -->
       <hr class="message-header-line" />
     </div>
   </div>
@@ -224,7 +247,7 @@
     <div class="message-header-icon">
       <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
     </div>
-    <div class="message-header-label">
+    <div class="message-header-label" data-bind="css: {'ephemeral-message-obfuscated': message.is_expired()}">
       <span class="label-bold" data-bind='text: message.sender_name()'></span>
       <span class="ellipsis" data-bind="text: message.caption"></span>
     </div>
@@ -257,7 +280,7 @@
       <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp}"></time>
     </div>
   </div>
-  <div class="message-body label-bold" data-bind="text: message.name"></div>
+  <div class="message-body font-weight-bold" data-bind="text: message.name"></div>
 </script>
 
 <script type="text/html" id="unable-to-decrypt">

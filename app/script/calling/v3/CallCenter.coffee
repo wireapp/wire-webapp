@@ -212,8 +212,11 @@ class z.calling.v3.CallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       if e_call_message_et.response is true
-        if e_call_et.state() is z.calling.enum.CallState.INCOMING
-          return @delete_call conversation_id
+        switch e_call_et.state()
+          when z.calling.enum.CallState.INCOMING
+            return @delete_call conversation_id
+          when z.calling.enum.CallState.OUTGOING
+            e_call_et.state z.calling.enum.CallState.CONNECTING
         return e_call_et.update_e_participant user_id, e_call_message_et
 
       return new Promise (resolve) =>
@@ -361,7 +364,7 @@ class z.calling.v3.CallCenter
       e_call_et = e_call
       @logger.debug "Joining e-call in conversation '#{conversation_id}'", e_call_et
       e_call_et.start_timings()
-      unless @media_stream_handler.has_media_streams()
+      if not @media_stream_handler.has_media_streams()
         @media_stream_handler.initiate_media_stream conversation_id, video_send
     .then =>
       e_call_et.timings.time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED

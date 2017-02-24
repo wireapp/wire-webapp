@@ -17,8 +17,6 @@ env:
 # https://docs.travis-ci.com/user/installing-dependencies/#Installing-Packages-with-the-APT-Addon
 addons:
   apt:
-    sources:
-      - google-chrome
     packages:
       - google-chrome-stable
 
@@ -26,13 +24,6 @@ addons:
 language: node_js
 node_js:
   - "6"
-
-# https://blog.travis-ci.com/2013-12-05-speed-up-your-builds-cache-your-dependencies
-cache:
-  yarn: true
-  directories:
-    - bower_components
-    - node_modules
 
 # http://docs.travis-ci.com/user/gui-and-headless-browsers
 before_install:

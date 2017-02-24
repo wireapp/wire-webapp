@@ -30,13 +30,12 @@ z.tracking.EventName =
   APP_LAUNCH: 'appLaunch'
   CALLING:
     ENDED_CALL: 'calling.ended_call'
-    ESTABLISHED_CALL: 'calling.established_call'
+    ESTABLISHED_CALL: 'calling.established_successful_call'
     FAILED_REQUEST: 'calling.failed_request'
     FAILED_REQUESTING_MEDIA: 'calling.failed_requesting_media'
     FAILED_RTC: 'calling.failed_rtc'
     INITIATED_CALL: 'calling.initiated_call'
     JOINED_CALL: 'calling.joined_call'
-    MINIMIZED_FROM_FULLSCREEN: 'calling.minimized_from_fullscreen'
     RECEIVED_CALL: 'calling.received_call'
     SHARED_SCREEN: 'calling.shared_screen'
   CONNECT:
@@ -48,8 +47,10 @@ z.tracking.EventName =
     ENTERED_SEARCH: 'contacts.entered_search'
   COLLECTION:
     DID_ITEM_ACTION: 'collections.did_item_action'
+    ENTERED_SEARCH: 'collection.entered_search'
     OPENED_COLLECTIONS: 'collections.opened_collections'
     OPENED_ITEM: 'collections.opened_item'
+    SELECTED_SEARCH_RESULT: 'collection.selected_search_result'
   CONVERSATION:
     ADD_TO_GROUP_CONVERSATION: 'addContactToGroupConversation'
     CHARACTER_LIMIT_REACHED: 'conversation.character_limit_reached'

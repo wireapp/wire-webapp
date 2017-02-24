@@ -2,12 +2,12 @@
   <!-- ko if: conversation_et() -->
 
     <div class="conversation-titlebar-library">
-      <span class="conversation-titlebar-icon button-icon-large icon-collection"
+      <span class="conversation-titlebar-icon button-icon-large icon-search"
             data-bind="click: click_on_collection_button"
             data-uie-name="do-collections"></span>
     </div>
 
-    <!-- ko if: conversation_et().is_verified() -->
+    <!-- ko if: conversation_et().verification_state() === z.conversation.ConversationVerificationState.VERIFIED -->
       <svg class="conversation-verified-icon" width="16" height="16">
         <use xlink:href="#icon-verified"></use>
       </svg>

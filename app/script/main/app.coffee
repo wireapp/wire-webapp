@@ -167,13 +167,7 @@ class z.main.App
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER
       @repository.client.init self_user_et
       @repository.properties.init self_user_et
-      return @repository.storage.init false
-    .then =>
-      @view.loading.switch_message z.string.init_initialized_storage, true
-      @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_STORAGE
-      number_of_sessions = Object.keys(@repository.storage.sessions).length
-      @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.SESSIONS, number_of_sessions, 50
-      return @repository.cryptography.init()
+      return @repository.cryptography.init @service.storage.db
     .then =>
       @view.loading.switch_message z.string.init_initialized_cryptography, true
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY
@@ -194,10 +188,14 @@ class z.main.App
     .then (response_array) =>
       [client_ets, conversation_ets, connection_ets] = response_array
       @view.loading.switch_message z.string.init_received_user_data, true
+
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS, conversation_ets.length, 50
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS, connection_ets.length, 50
+
+      amplify.publish z.event.WebApp.ANALYTICS.DIMENSION, z.tracking.DimensionName.CONTACTS, connection_ets.length
+
       @repository.user.self().devices client_ets
       @repository.conversation.map_connections @repository.user.connections()
       @_subscribe_to_beforeunload()
@@ -401,7 +399,6 @@ class z.main.App
     _logout = =>
       # Disconnect from our backend, end tracking and clear cached data
       @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.LOGOUT
-      amplify.publish z.event.WebApp.ANALYTICS.SESSION.CLOSE
 
       # Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       do_not_delete = [z.storage.StorageKey.AUTH.SHOW_LOGIN]
@@ -483,10 +480,6 @@ class z.main.App
   # Report call telemetry to Raygun for analysis.
   report_call: =>
     @repository.calling.report_call()
-
-  # Reset all known sessions at once.
-  reset_all_sessions: =>
-    @repository.conversation.reset_all_sessions()
 
   # Initialize debugging features.
   init_debugging: =>

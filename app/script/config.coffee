@@ -41,9 +41,6 @@ z.config =
   # number of users displayed in people you may know
   SUGGESTIONS_FETCH_LIMIT: 30
 
-  # number of top people displayed in the start ui
-  TOP_PEOPLE_FETCH_LIMIT: 24
-
   #Accent color IDs
   ACCENT_ID:
     BLUE: 1

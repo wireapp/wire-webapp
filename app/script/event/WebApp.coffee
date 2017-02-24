@@ -22,11 +22,9 @@ z.event ?= {}
 # Enum of different webapp events.
 z.event.WebApp =
   ANALYTICS:
+    DIMENSION: 'wire.webapp.analytics.dimension'
     EVENT: 'wire.webapp.analytics.event'
     INIT: 'wire.webapp.analytics.init'
-    SESSION:
-      CLOSE: 'wire.webapp.analytics.session.close'
-      START: 'wire.webapp.analytics.session.start'
   AUDIO:
     PLAY: 'wire.webapp.audio.play'
     PLAY_IN_LOOP: 'wire.webapp.audio.play-in-loop'
@@ -57,7 +55,10 @@ z.event.WebApp =
       SEND_LOCAL_SDP_INFO: 'wire.webapp.call.signaling.send-local-sdp-info'
   CLIENT:
     ADD: 'wire.webapp.user.client.add'
+    ADD_OWN_CLIENT: 'wire.webapp.user.client.new-own-client'
     REMOVE: 'wire.webapp.client.remove'
+    UPDATE: 'wire.webapp.client.update'
+    VERIFICATION_STATE_CHANGED: 'wire.webapp.client.verification-state-changed'
   CONNECT:
     IMPORT_CONTACTS: 'wire.webapp.connect.import-contacts'
   CONNECTION:
@@ -87,7 +88,8 @@ z.event.WebApp =
       REMOVED: 'wire.webapp.conversation.message.removed'
     IMAGE:
       SEND: 'wire.webapp.conversation.image.send'
-    VERIFICATION_STATE_CHANGED: 'wire.webapp.conversation.verification_state_changed'
+    INPUT:
+      CLICK: 'wire.webapp.conversation.input.click'
   CONTENT:
     SWITCH: 'wire.webapp.content.switch'
   CONTEXT_MENU: 'wire.webapp.context-menu'
@@ -160,6 +162,9 @@ z.event.WebApp =
   USER:
     EVENT_FROM_BACKEND: 'wire.webapp.user.event-from-backend'
     UNBLOCKED: 'wire.webapp.user.unblocked'
+    CLIENT_ADDED: 'wire.webapp.user.client-added'
+    CLIENT_REMOVED: 'wire.webapp.user.client-removed'
+    CLIENTS_UPDATED: 'wire.webapp.user.clients-udpated'
   WARNING:
     SHOW: 'wire.webapp.warning.show'
     DISMISS: 'wire.webapp.warning.dismiss'

@@ -23,7 +23,6 @@ z.event.Client =
   CALL:
     E_CALL: 'call.e-call'
   CONVERSATION:
-    ALL_VERIFIED: 'conversation.all-verified'
     ASSET_META: 'conversation.asset-meta'
     ASSET_PREVIEW: 'conversation.asset-preview'
     ASSET_UPLOAD_COMPLETE: 'conversation.asset-upload-complete'
@@ -35,3 +34,4 @@ z.event.Client =
     MESSAGE_HIDDEN: 'conversation.message-hidden'
     REACTION: 'conversation.reaction'
     UNABLE_TO_DECRYPT: 'conversation.unable-to-decrypt'
+    VERIFICATION: 'conversation.verification'

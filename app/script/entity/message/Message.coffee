@@ -55,11 +55,13 @@ class z.entity.Message
     @is_editing = ko.observable false
     @primary_key = undefined
     @status = ko.observable z.message.StatusType.UNSPECIFIED
-    @timestamp = Date.now()
     @type = ''
     @user = ko.observable new z.entity.User()
     @visible = ko.observable true
     @version = 1
+
+    @timestamp = Date.now()
+    @should_effect_conversation_timestamp = true
 
     # z.message.MessageCategory
     @category = undefined
@@ -74,6 +76,9 @@ class z.entity.Message
 
     @accent_color = ko.pureComputed =>
       return "accent-color-#{@user().accent_id()}"
+
+  equals: (message_et) =>
+    @id is message_et?.id
 
   ###
   Check if message contains an asset of type file.

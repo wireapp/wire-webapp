@@ -124,7 +124,6 @@ z.string.cs.modal_button_send = 'Odeslat'
 
 # Block a user
 z.string.cs.modal_block_conversation_headline = 'Blokovat %@.name?'
-z.string.cs.modal_block_conversation_message = '%@.name vás nebude moci kontaktovat nebo přizvat ke skupinové konverzaci.'
 z.string.cs.modal_block_conversation_button = 'Blokovat'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.cs.modal_call_conversation_empty_headline = 'Nikdo pro volání'
@@ -184,9 +183,6 @@ z.string.cs.modal_logout_headline = 'Vyčistit data?'
 z.string.cs.modal_logout_message = 'Smazat všechny osobní informace a konverzace z tohoto přístroje.'
 z.string.cs.modal_logout_button = 'Odhlásit se'
 # New device
-z.string.cs.modal_new_device_headline = '%@.name začal(a) používat nové zařízení'
-z.string.cs.modal_new_device_headline_many = '%@.names začal(a) používat nové zařízení'
-z.string.cs.modal_new_device_headline_you = '%@.name začal(a) používat nové zařízení'
 z.string.cs.modal_new_device_message = 'Chcete přesto odeslat své zprávy?'
 z.string.cs.modal_new_device_show_device = 'zobrazit přístroj'
 z.string.cs.modal_new_device_send_anyway = 'přesto odeslat'
@@ -224,12 +220,9 @@ z.string.cs.conversation_connection_blocked = 'Blokováno'
 z.string.cs.conversation_connection_cancel_request = 'Zrušit žádost o připojení'
 z.string.cs.conversation_create = ' zahájil(a) rozhovor s %@names'
 z.string.cs.conversation_create_you = ' zahájil rozhovor s %@names'
-z.string.cs.conversation_device_started_using = ' začal(a) používat'
-z.string.cs.conversation_device_started_using_you = ' začal(a) používat'
 z.string.cs.conversation_device_unverified = ' neověřen jeden ze'
 z.string.cs.conversation_device_your_devices = ' vaše přístroje'
 z.string.cs.conversation_device_user_devices = ' přístroje uživatele %@name'
-z.string.cs.conversation_device_a_new_device = ' nový přístroj'
 z.string.cs.conversation_just_now = 'Právě teď'
 z.string.cs.conversation_location_link = 'Otevřít mapu'
 z.string.cs.conversation_member_join = ' přidal(a) %@names'
@@ -269,6 +262,8 @@ z.string.cs.conversation_delete_timestamp = 'Smazáno v %@timestamp'
 z.string.cs.conversation_edit_timestamp = 'Upraveno v %@timestamp'
 z.string.cs.conversation_likes_caption = '%@number lidí'
 
+# Collection
+
 # Archive
 z.string.cs.archive_header = 'Archivovat'
 
@@ -297,7 +292,6 @@ z.string.cs.invite_meta_key_pc = 'Ctrl'
 z.string.cs.invite_hint_selected = 'Stiskněte %meta_key + C pro kopírování'
 z.string.cs.invite_hint_unselected = 'Vybrat a stisknout %meta_key + C'
 z.string.cs.invite_headline = 'Pozvat lidi do aplikace Wire'
-z.string.cs.invite_message_no_email = 'Jsem k zastižení na síti Wire. K navázání kontaktu navštivte https://get.wire.com.'
 
 # Extensions
 z.string.cs.extensions_bubble_button_gif = 'Gif'
@@ -340,7 +334,6 @@ z.string.cs.people_verified = 'Ověreno'
 
 # Block user
 z.string.cs.people_block_headline = 'Blokovat?'
-z.string.cs.people_block_message = '%@.first_name tě nebude moci najít ani kontaktovat přes Wire.'
 
 # Accept a pending connection dialogue
 z.string.cs.people_connect_headline = 'Přijmout?'
@@ -360,7 +353,6 @@ z.string.cs.people_remove_message = '%@.first_name nebude moci odesílat nebo p�
 
 # Unblock user
 z.string.cs.people_unblock_headline = 'Odblokovat?'
-z.string.cs.people_unblock_message = '%@.first_name vás bude moci opět najít a kontaktovat přes Wire. Dostanete také zprávy z období kdy byl uživatel zablokován.'
 
 # Button labels for the actions
 z.string.cs.people_button_add = 'Přidat kontakty'
@@ -438,7 +430,6 @@ z.string.cs.preferences_options_data_checkbox = 'Použití a zprávy o pádech'
 z.string.cs.preferences_options_data_detail = 'Přispějte k vylepšení aplikace Wire odesíláním anonymních informací.'
 z.string.cs.preferences_options_notifications = 'Upozornění'
 z.string.cs.preferences_options_notifications_none = 'Vypnout'
-z.string.cs.preferences_options_notifications_obfuscate = 'Skrýt podrobnosti zprávy'
 z.string.cs.preferences_options_notifications_on = 'Zobrazit odesílatele a zprávu'
 
 # Search
@@ -483,6 +474,8 @@ z.string.cs.warning_tell_me_how = 'Jak na to'
 # Warnings: Connectivity
 z.string.cs.warning_connectivity_connection_lost = 'Pokoušíme se o připojení. Wire nemusí být schopen doručit zprávy.'
 z.string.cs.warning_connectivity_no_internet = 'Chybí připojení k internetu. Nebudete moci odesílat ani přijímat zprávy.'
+
+# Warnings: Desktop Update
 
 # Browser notifications
 z.string.cs.system_notification_asset_add = 'Sdílel(a) obrázek'
