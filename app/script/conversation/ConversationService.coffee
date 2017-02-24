@@ -234,9 +234,6 @@ class z.conversation.ConversationService
       @logger.error "Failed to get event for conversation '#{conversation_id}': #{error.message}", error
       throw error
 
-  ###
-  Get recent conversations.
-  ###
   get_active_conversations_from_db: ->
     min_date = new Date()
     min_date.setDate min_date.getDate() - 30
