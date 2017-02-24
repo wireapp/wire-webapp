@@ -234,6 +234,25 @@ class z.conversation.ConversationService
       @logger.error "Failed to get event for conversation '#{conversation_id}': #{error.message}", error
       throw error
 
+  get_active_conversations_from_db: ->
+    min_date = new Date()
+    min_date.setDate min_date.getDate() - 30
+
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where 'time'
+    .between min_date.toISOString(), new Date().toISOString()
+    .toArray()
+    .then (events) ->
+      conversations = events.reduce (accumulated, event) ->
+        accumulated[event.conversation] = if accumulated[event.conversation]? then accumulated[event.conversation] + 1 else 1
+        return accumulated
+      , {}
+
+      sorted_conversations = Object.keys(conversations).sort (a, b) ->
+        conversations[b] - conversations[a]
+
+      return sorted_conversations
+
   ###
   Load conversation events starting from the upper bound going back in history
   until either limit or lower bound is reached.

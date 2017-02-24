@@ -397,6 +397,20 @@ class z.conversation.ConversationRepository
     return @conversations_unarchived()?[0]
 
   ###
+  Returns a list of sorted conversation ids based on the number of messages in the last 30 days.
+  @param limit [Number]
+  @return [Array] conversation entities
+  ###
+  get_most_active_conversations: (limit) ->
+    return @conversation_service.get_active_conversations_from_db()
+    .then (conversation_ids) =>
+      return conversation_ids.map (conversation_id) => @find_conversation_by_id conversation_id
+    .then (conversation_ets) ->
+      if limit
+        return conversation_ets.splice 0, limit
+      return conversation_ets
+
+  ###
   Get conversation with a user.
   @param user_et [z.entity.User] User entity for whom to get the conversation
   @return [z.entity.Conversation] Conversation with requested user
