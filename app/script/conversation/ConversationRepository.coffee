@@ -1007,7 +1007,7 @@ class z.conversation.ConversationRepository
       optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
       @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
       .then (mapped_event) =>
-        @cryptography_repository.save_unencrypted_event mapped_event
+        @conversation_service.save_event mapped_event
       .then (saved_event) =>
         @on_conversation_event saved_event
 
@@ -2487,7 +2487,7 @@ class z.conversation.ConversationRepository
       event_json.time = new Date(original_message_et.timestamp).toISOString()
       @_delete_message_by_id conversation_et, event_json.id
       @_delete_message_by_id conversation_et, event_json.data.replacing_message_id
-      @cryptography_repository.save_unencrypted_event event_json
+      @conversation_service.save_event event_json
       return event_json
 
   ###
