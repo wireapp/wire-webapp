@@ -397,6 +397,20 @@ class z.conversation.ConversationRepository
     return @conversations_unarchived()?[0]
 
   ###
+  Returns a list of sorted conversation ids based on the number of messages in the last 30 days.
+  @param limit [Number]
+  @return [Array] conversation entities
+  ###
+  get_most_active_conversations: (limit) ->
+    return @conversation_service.get_active_conversations_from_db()
+    .then (conversation_ids) =>
+      return conversation_ids.map (conversation_id) => @find_conversation_by_id conversation_id
+    .then (conversation_ets) ->
+      if limit
+        return conversation_ets.splice 0, limit
+      return conversation_ets
+
+  ###
   Get conversation with a user.
   @param user_et [z.entity.User] User entity for whom to get the conversation
   @return [z.entity.Conversation] Conversation with requested user
@@ -939,11 +953,13 @@ class z.conversation.ConversationRepository
   @param message_id [String] Message ID of the message to generate a preview for
   ###
   send_asset_preview: (conversation_et, file, message_id) =>
+    image = null
     poster(file).then (img_blob) =>
-      @asset_service.upload_image_asset img_blob
+      image = img_blob
+      @asset_service.upload_asset img_blob
     .then (uploaded_image_asset) =>
       asset = new z.proto.Asset()
-      asset.set 'preview', new z.proto.Asset.Preview uploaded_image_asset.original.mime_type, uploaded_image_asset.original.size, uploaded_image_asset.uploaded
+      asset.set 'preview', new z.proto.Asset.Preview image.type, image.size, uploaded_image_asset.uploaded
       generic_message = new z.proto.GenericMessage message_id
       generic_message.set 'asset', asset
       @_send_and_inject_generic_message conversation_et, generic_message
