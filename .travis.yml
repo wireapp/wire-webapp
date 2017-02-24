@@ -17,8 +17,6 @@ env:
 # https://docs.travis-ci.com/user/installing-dependencies/#Installing-Packages-with-the-APT-Addon
 addons:
   apt:
-    sources:
-      - google-chrome
     packages:
       - google-chrome-stable
 
