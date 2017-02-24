@@ -225,7 +225,7 @@ class z.ViewModel.list.StartUIViewModel
 
   get_top_people: =>
     @conversation_repository.get_most_active_conversations 9
-    .then (conversation_ets) =>
+    .then (conversation_ets) ->
       return conversation_ets
       .filter (conversation_et) -> conversation_et.is_one2one()
       .map (conversation_et) -> conversation_et.participating_user_ets()[0]
