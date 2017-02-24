@@ -243,9 +243,9 @@ class z.conversation.ConversationService
     .between min_date.toISOString(), new Date().toISOString()
     .toArray()
     .then (events) ->
-      conversations = events.reduce (acc, event) ->
-        acc[event.conversation] = if acc[event.conversation]? then acc[event.conversation] + 1 else 1
-        return acc
+      conversations = events.reduce (accumulated, event) ->
+        accumulated[event.conversation] = if accumulated[event.conversation]? then accumulated[event.conversation] + 1 else 1
+        return accumulated
       , {}
 
       sorted_conversations = Object.keys(conversations).sort (a, b) ->
