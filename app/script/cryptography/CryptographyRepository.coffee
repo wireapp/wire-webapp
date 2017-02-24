@@ -26,7 +26,7 @@ class z.cryptography.CryptographyRepository
   @param cryptography_service [z.cryptography.CryptographyService] Backend REST API cryptography service implementation
   @param storage_repository [z.storage.StorageRepository] Repository for all storage interactions
   ###
-  constructor: (@cryptography_service, @storage_repository) ->
+  constructor: (@cryptography_service, @storage_repository, @conversation_service) ->
     @logger = new z.util.Logger 'z.cryptography.CryptographyRepository', z.config.LOGGER.OPTIONS
 
     @cryptography_mapper = new z.cryptography.CryptographyMapper()
@@ -291,16 +291,3 @@ class z.cryptography.CryptographyRepository
     session_id = @_construct_session_id event.from, event.data.sender
     ciphertext = z.util.base64_to_array(event.data.text or event.data.key).buffer
     return @cryptobox.decrypt(session_id, ciphertext).then (plaintext) -> z.proto.GenericMessage.decode plaintext
-
-  ###
-  Save an unencrypted event.
-  @param event [Object] JSON of unencrypted backend event
-  @return [Promise] Promise that will resolve with the saved record
-  ###
-  save_unencrypted_event: (event) ->
-    Promise.resolve().then =>
-      event.category = z.message.MessageCategorization.category_from_event event
-      @storage_repository.save_conversation_event event
-    .catch (error) =>
-      @logger.error "Saving unencrypted message failed: #{error.message}", error
-      throw error

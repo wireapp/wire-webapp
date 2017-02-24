@@ -1297,7 +1297,7 @@ class z.conversation.ConversationRepository
       return @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
     .then (mapped_event) =>
       if mapped_event.type in z.event.EventTypeHandling.STORE
-        return @cryptography_repository.save_unencrypted_event mapped_event
+        return @conversation_service.save_event mapped_event
       return mapped_event
     .then (saved_event) =>
       @on_conversation_event saved_event
