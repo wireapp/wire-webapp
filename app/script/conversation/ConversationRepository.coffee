@@ -914,12 +914,14 @@ class z.conversation.ConversationRepository
     z.assets.AssetMetaDataBuilder.build_metadata file
     .then (metadata) ->
       asset = new z.proto.Asset()
-      if z.assets.AssetMetaDataBuilder._is_audio(file)
+      if z.assets.AssetMetaDataBuilder.is_audio(file)
         asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name, null, null, metadata
-      else if z.assets.AssetMetaDataBuilder._is_video(file)
+      else if z.assets.AssetMetaDataBuilder.is_video(file)
         asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name, null, metadata
-      else
+      else if z.assets.AssetMetaDataBuilder.is_image(file)
         asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name, metadata
+      else
+        asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name
       asset
     .then (asset) =>
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()

@@ -30,74 +30,75 @@ z.assets.AssetMetaDataBuilder =
   ###
   build_metadata: (file) ->
     @logger = new z.util.Logger 'z.assets.AssetMetaDataBuilder', z.config.LOGGER.OPTIONS
-    if @_is_video(file)
+    if @is_video(file)
       return @_build_video_metdadata file
-    else if @_is_audio(file)
+    else if @is_audio(file)
       return @_build_audio_metdadata file
-    else if @_is_image(file)
+    else if @is_image(file)
       return @_build_image_metdadata file
     else
-      return null
+      return Promise.resolve()
+
+  is_video: (file) ->
+    file?.type?.startsWith 'video'
+
+  is_audio: (file) ->
+    file?.type?.startsWith 'audio'
+
+  is_image: (file) ->
+    file?.type?.startsWith 'image'
 
   _build_video_metdadata: (videofile) ->
-    new Promise (resolve, reject) ->
-      videoElement = document.createElement('video')
-      url = window.URL.createObjectURL videofile
-      videoElement.src = url
-      videoElement.onloadedmetadata = ->
-        resolve new z.proto.Asset.VideoMetaData videoElement.videoWidth, videoElement.videoHeight, videoElement.duration
-        window.setTimeout ->
-          window.URL.revokeObjectURL url
-          reject new Error('Exceeded video load timeout')
-        , 100
+    z.assets.AssetMetaDataBuilder._borrow_resource videofile, (url) ->
+      new Promise (resolve, reject) ->
+        videoElement = document.createElement('video')
+        videoElement.onloadedmetadata = ->
+          resolve new z.proto.Asset.VideoMetaData videoElement.videoWidth, videoElement.videoHeight, videoElement.duration
+        videoElement.onerror = reject
+        videoElement.src = url
 
+  _build_image_metdadata: (imagefile) ->
+    z.assets.AssetMetaDataBuilder._borrow_resource imagefile, (url) ->
+      new Promise (resolve, reject) ->
+        img = new Image()
+        img.onload = ->
+          resolve new z.proto.Asset.ImageMetaData img.width, img.height
+        img.onerror = reject
+        img.src = url
 
   _build_audio_metdadata: (audiofile) ->
     z.util.load_file_buffer(audiofile)
     .then (buffer) ->
       new AudioContext().decodeAudioData(buffer)
     .then (audio_buffer) ->
-      new z.proto.Asset.AudioMetaData audio_buffer.duration * 1000, @_generate_preview(audio_buffer)
+      new z.proto.Asset.AudioMetaData(audio_buffer.duration * 1000, z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer))
 
-  _build_image_metdadata: (imagefile) ->
-    new Promise (resolve, reject) ->
-      img = new Image()
-      url = window.URL.createObjectURL imagefile
-      img.src = url
-      img.onload = ->
-        resolve new z.proto.Asset.ImageMetaData img.width, img.height
-        window.setTimeout ->
-          window.URL.revokeObjectURL url
-          reject new Error('Exceeded image load timeout')
-        , 100
-
-  _is_video: (file) ->
-    file?.type?.startsWith 'video'
-
-  _is_audio: (file) ->
-    file?.type?.startsWith 'audio'
-
-  _is_image: (file) ->
-    file?.type?.startsWith 'image'
-
-  _generate_preview: (audio_buffer) ->
+  _normalise_loudness: (audio_buffer) ->
     MAX_SAMPLES = 200
     AMPLIFIER = 700 # in favour of iterating all samples before we interpolate them
-    preview = [0..MAX_SAMPLES - 1]
-    for channelIndex in [0..audio_buffer.numberOfChannels - 1]
-      channel = Array.from(audio_buffer.getChannelData(channelIndex))
-      bucketSize = parseInt(channel.length / MAX_SAMPLES)
-      buckets = z.util.ArrayUtil.chunk(channel, bucketSize)
-      for bucket, index in buckets
-        preview[index] = @_normalise_sample(@_root_mean_square(bucket) * AMPLIFIER)
+    preview = [0..MAX_SAMPLES]
+    for channel_index in [0..audio_buffer.numberOfChannels]
+      channel = Array.from(audio_buffer.getChannelData(channel_index))
+      bucket_size = parseInt(channel.length / MAX_SAMPLES)
+      buckets = z.util.ArrayUtil.chunk(channel, bucket_size)
+      for bucket, bucket_index in buckets
+        preview[bucket_index] = z.util.NumberUtil.cap_to_byte(z.util.NumberUtil.root_mean_square(bucket) * AMPLIFIER)
       break # only select first channel
     new Uint8Array(preview)
 
-  _root_mean_square: (float_array) ->
-    pow = float_array.map((n) -> Math.pow(n, 2))
-    sum = pow.reduce((p, n) -> p + n)
-    Math.sqrt(sum) / float_array.length
-
-  _normalise_sample: (value) ->
-    MAX_VALUE = 255
-    Math.min(Math.abs(parseInt(value * MAX_VALUE, 10)), MAX_VALUE)
+  _borrow_resource: (resource, job) ->
+    url = null
+    Promise.resolve()
+    .then ->
+      url = window.URL.createObjectURL resource
+    .then ->
+      job(url)
+    .then (result) ->
+      # Wait before removing resource and link. Needed in FF
+      window.setTimeout ->
+        window.URL.revokeObjectURL url
+      , 100
+      result
+    .catch (error) ->
+      window.URL.revokeObjectURL url
+      throw error
