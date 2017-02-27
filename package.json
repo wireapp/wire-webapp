@@ -33,7 +33,7 @@
     "karma-jasmine": "1.1.0",
     "load-grunt-tasks": "3.5.2",
     "request": "2.79.0",
-    "sinon": "1.17.7"
+    "sinon": "2.0.0-pre.6"
   },
   "scripts": {
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
