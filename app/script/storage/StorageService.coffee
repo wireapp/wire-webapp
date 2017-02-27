@@ -226,12 +226,18 @@ class z.storage.StorageService
       @db.version(13).stores version_12
         .upgrade (transaction) =>
           @logger.warn 'Database upgrade to version 13', transaction
-          transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().toArray().then (items) =>
+          transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().toArray()
+          .then (items) =>
             @db[@OBJECT_STORE_EVENTS].bulkPut items
 
       @db[@OBJECT_STORE_EVENTS].hook 'creating', (primary_key, object) ->
+        object.id = undefined
         object.meta =
           primary_key: primary_key
+        this.onsuccess = (primKey) ->
+          console.warn 'autoincremented key is known', primKey
+        this.onerror = (e) ->
+          console.error 'E', e
         return undefined
 
       @db.open()
