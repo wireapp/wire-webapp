@@ -150,7 +150,7 @@ class z.storage.StorageService
         "#{@OBJECT_STORE_CLIENTS}": ', meta.primary_key'
         "#{@OBJECT_STORE_CONVERSATION_EVENTS}": ', category, conversation, time, type, [conversation+time], [conversation+category]'
         "#{@OBJECT_STORE_CONVERSATIONS}": ', id, last_event_timestamp'
-        "#{@OBJECT_STORE_EVENTS}": '++, id, meta.primary_key, category, conversation, time, type, [conversation+time], [conversation+category]'
+        "#{@OBJECT_STORE_EVENTS}": '++meta.primary_key, id, category, conversation, time, type, [conversation+time], [conversation+category]'
         "#{@OBJECT_STORE_KEYS}": ''
         "#{@OBJECT_STORE_PREKEYS}": ''
         "#{@OBJECT_STORE_SESSIONS}": ''
@@ -231,9 +231,8 @@ class z.storage.StorageService
             @db[@OBJECT_STORE_EVENTS].bulkPut items
 
       @db[@OBJECT_STORE_EVENTS].hook 'creating', (primary_key, object) ->
-        console.warn 'TEST', primary_key
         object.meta =
-          primary_key: primary_key
+          primary_key: 1
         this.onsuccess = (primKey, a) ->
           console.warn 'autoincremented key is known', primKey, a
         this.onerror = (e) ->
