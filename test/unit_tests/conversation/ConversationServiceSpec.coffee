@@ -31,7 +31,6 @@ describe 'z.conversation.ConversationService', ->
       client = test_factory.client
       storage_service = storage_repository.storage_service
       conversation_service = new z.conversation.ConversationService client, storage_service
-
       conversation_mapper = new z.conversation.ConversationMapper()
       server = sinon.fakeServer.create()
       done()
@@ -79,6 +78,7 @@ describe 'z.conversation.ConversationService', ->
 
     it 'updated event in the database', (done) ->
       event.time = new Date().toISOString()
+      event.primary_key = 1337
       conversation_service.update_message_in_db event, {time: event.time}
       .then done
       .catch done.fail
