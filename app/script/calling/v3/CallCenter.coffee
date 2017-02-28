@@ -157,8 +157,7 @@ class z.calling.v3.CallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @_verify_session_id user_id, e_call_et, e_call_message_et
-    .then (e_call_et) =>
-      @_confirm_e_call_message e_call_et, e_call_message_et
+    .then (e_call_et) ->
       e_call_et.delete_e_participant user_id
     .then (e_call_et) =>
       unless e_call_et.participants().length
@@ -232,7 +231,11 @@ class z.calling.v3.CallCenter
 
       if @user_repository.self().id is user_id
         return @_create_ongoing_e_call conversation_id, e_call_message_et, user_id
-      @_create_incoming_e_call conversation_id, e_call_message_et, user_id
+
+      @conversation_repository.get_conversation_by_id conversation_id, (conversation_et) =>
+        @conversation_repository.grant_message conversation_et, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [user_id]
+        .then =>
+          @_create_incoming_e_call conversation_id, e_call_message_et, user_id
 
   ###
   Verify e-call message belongs to e-call by session id.
@@ -300,8 +303,6 @@ class z.calling.v3.CallCenter
     return unless incoming_e_call_message_et.response is false
 
     switch incoming_e_call_message_et.type
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
-        e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL, true, e_call_et.session_id
       when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
         e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, true, e_call_et.session_id
       when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC

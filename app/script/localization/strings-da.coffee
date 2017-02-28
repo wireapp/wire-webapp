@@ -66,6 +66,8 @@ z.string.da.auth_limit_devices_current = '(Nuværende)'
 # Authentication: limit section
 z.string.da.auth_history_headline = 'Det er første gang du bruger Wire på denne enhed.'
 z.string.da.auth_history_description = 'Af hensyn til fortrolighed, vil din chathistorik ikke vises her.'
+z.string.da.auth_history_reuse_headline = 'Du har brugt Wire på denne enhed før.'
+z.string.da.auth_history_reuse_description = 'Beskeder sendt i mellemtiden vises ikke.'
 z.string.da.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -224,9 +226,14 @@ z.string.da.conversation_connection_blocked = 'Blokeret'
 z.string.da.conversation_connection_cancel_request = 'Annullér anmodning om forbindelse'
 z.string.da.conversation_create = ' startede en samtale med %@names'
 z.string.da.conversation_create_you = ' startede en samtale med %@names'
+z.string.da.conversation_device_started_using_one = ' begyndte at bruge'
+z.string.da.conversation_device_started_using_many = ' begyndte at bruge'
 z.string.da.conversation_device_unverified = ' har afbekræftet en af'
 z.string.da.conversation_device_your_devices = ' dine enheder'
 z.string.da.conversation_device_user_devices = ' %@name’s enheder'
+z.string.da.conversation_device_new_device_one = ' en ny enhed'
+z.string.da.conversation_device_new_device_many = ' nye enheder'
+z.string.da.conversation_device_new_people_joined_verify = ' verificer enheder'
 z.string.da.conversation_just_now = 'Lige nu'
 z.string.da.conversation_location_link = 'Åben Kort'
 z.string.da.conversation_member_join = ' tilføjede %@names'
@@ -272,6 +279,9 @@ z.string.da.collection_show_all = 'Vis alle %no'
 z.string.da.collection_section_links = 'Links'
 z.string.da.collection_section_images = 'Billeder'
 z.string.da.collection_section_files = 'Filer'
+z.string.da.collection_section_audio = 'Lydbeskeder'
+
+# Full Search
 
 # Archive
 z.string.da.archive_header = 'Arkivér'
@@ -294,7 +304,7 @@ z.string.da.conversations_popover_unarchive = 'Anuller arkivering'
 
 # Takeover
 z.string.da.takeover_headline = 'Brugernavne er her.'
-z.string.da.takeover_sub = 'Hævde din unikke navn på Wire.'
+z.string.da.takeover_sub = 'Vælg dit unikke navn på Wire.'
 z.string.da.takeover_link = 'Lær mere'
 z.string.da.takeover_button_choose = 'Vælg dit eget'
 z.string.da.takeover_button_keep = 'Behold denne'

@@ -67,6 +67,7 @@ z.string.sl.auth_limit_devices_current = '(Trenutna)'
 z.string.sl.auth_history_headline = 'Prvič uporabljate Wire na tej napravi.'
 z.string.sl.auth_history_description = 'Zaradi zasebnosti se vaša zgodovina pogovorov ne bo pojavila tukaj.'
 z.string.sl.auth_history_reuse_headline = 'Na tej napravi si že uporabljal(-a) Wire.'
+z.string.sl.auth_history_reuse_description = 'Sporočila poslana medtem tukaj ne bodo prikazana.'
 z.string.sl.auth_history_button = 'V redu'
 
 # Authentication: POSTED section
@@ -225,9 +226,15 @@ z.string.sl.conversation_connection_blocked = 'Blokiran'
 z.string.sl.conversation_connection_cancel_request = 'Prekliči zahtevo za povezavo'
 z.string.sl.conversation_create = ' začel pogovor s/z %@names'
 z.string.sl.conversation_create_you = ' začel pogovor s/z %@names'
+z.string.sl.conversation_device_started_using_one = ' začel(-a) uporabljati'
+z.string.sl.conversation_device_started_using_many = ' začeli uporabljati'
 z.string.sl.conversation_device_unverified = ' odstranil(-a) preveritev ene izmed'
 z.string.sl.conversation_device_your_devices = ' vaših naprav'
 z.string.sl.conversation_device_user_devices = ' Naprave od %@name'
+z.string.sl.conversation_device_new_device_one = ' nova naprava'
+z.string.sl.conversation_device_new_device_many = ' nove naprave'
+z.string.sl.conversation_device_new_people_joined = 'nove osebe so se pridružile.'
+z.string.sl.conversation_device_new_people_joined_verify = ' preverite naprave'
 z.string.sl.conversation_just_now = 'Pravkar'
 z.string.sl.conversation_location_link = 'Odpri zemljevid'
 z.string.sl.conversation_member_join = ' dodal(-a) %@names'
@@ -273,6 +280,9 @@ z.string.sl.collection_show_all = 'Prikaži vse %no'
 z.string.sl.collection_section_links = 'Povezave'
 z.string.sl.collection_section_images = 'Slike'
 z.string.sl.collection_section_files = 'Zbirke'
+z.string.sl.collection_section_audio = 'Zvočna sporočila'
+
+# Full Search
 
 # Archive
 z.string.sl.archive_header = 'Arhiviraj'

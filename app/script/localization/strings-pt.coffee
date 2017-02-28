@@ -67,6 +67,7 @@ z.string.pt.auth_limit_devices_current = '(Atual)'
 z.string.pt.auth_history_headline = 'É a primeira vez que você está usando o Wire nesse dispositivo.'
 z.string.pt.auth_history_description = 'Por questões de privacidade, o seu histórico de conversa não aparecerá aqui.'
 z.string.pt.auth_history_reuse_headline = 'Você não usou o Wire nesse dispositivo antes.'
+z.string.pt.auth_history_reuse_description = 'Mensagens enviadas nesse meio tempo não irão aparecer aqui.'
 z.string.pt.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -225,9 +226,15 @@ z.string.pt.conversation_connection_blocked = 'Bloqueado'
 z.string.pt.conversation_connection_cancel_request = 'Cancelar a solicitação de conexão'
 z.string.pt.conversation_create = ' iniciou uma conversa com %@names'
 z.string.pt.conversation_create_you = ' iniciou uma conversa com %@names'
+z.string.pt.conversation_device_started_using_one = ' começou a usar'
+z.string.pt.conversation_device_started_using_many = ' começou a usar'
 z.string.pt.conversation_device_unverified = ' desautorizou um dos'
 z.string.pt.conversation_device_your_devices = ' seus dispositivos'
 z.string.pt.conversation_device_user_devices = ' dispositivos de %@name´s'
+z.string.pt.conversation_device_new_device_one = ' um novo dispositivo'
+z.string.pt.conversation_device_new_device_many = ' novos dispositivos'
+z.string.pt.conversation_device_new_people_joined = 'novas pessoas entraram.'
+z.string.pt.conversation_device_new_people_joined_verify = ' verifique dispositivos'
 z.string.pt.conversation_just_now = 'Agora'
 z.string.pt.conversation_location_link = 'Abrir Mapa'
 z.string.pt.conversation_member_join = ' adicionou %@names'
@@ -273,6 +280,9 @@ z.string.pt.collection_show_all = 'Mostrar todas %no'
 z.string.pt.collection_section_links = 'Links'
 z.string.pt.collection_section_images = 'Imagens'
 z.string.pt.collection_section_files = 'Arquivos'
+z.string.pt.collection_section_audio = 'Mensagens de áudio'
+
+# Full Search
 
 # Archive
 z.string.pt.archive_header = 'Arquivar'

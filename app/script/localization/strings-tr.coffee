@@ -67,6 +67,7 @@ z.string.tr.auth_limit_devices_current = '(Mevcut)'
 z.string.tr.auth_history_headline = 'Wire’ı bu cihazda ilk kez kullanıyorsunuz.'
 z.string.tr.auth_history_description = 'Gizlilik sebeplerinden ötürü, mesaj geçmişiniz burada gösterilmemektedir.'
 z.string.tr.auth_history_reuse_headline = 'Bu cihazdan daha önce Wire kullanmışsınız.'
+z.string.tr.auth_history_reuse_description = 'Bu sırada gönderilen mesajlar burada görünmeyecektir.'
 z.string.tr.auth_history_button = 'TAMAM'
 
 # Authentication: POSTED section
@@ -225,9 +226,15 @@ z.string.tr.conversation_connection_blocked = 'Engellendi'
 z.string.tr.conversation_connection_cancel_request = 'Bağlantı isteğini iptal et'
 z.string.tr.conversation_create = ' %@names ile bir konuşma başlattı'
 z.string.tr.conversation_create_you = ' %@names ile bir konuşma başlattın'
+z.string.tr.conversation_device_started_using_one = ' kullanmaya başladı'
+z.string.tr.conversation_device_started_using_many = ' kullanmaya başladı'
 z.string.tr.conversation_device_unverified = ' doğrulanmamışlardan bir tane'
 z.string.tr.conversation_device_your_devices = ' cihazların'
 z.string.tr.conversation_device_user_devices = ' %@name ’in cihazları'
+z.string.tr.conversation_device_new_device_one = ' yeni bir cihaz'
+z.string.tr.conversation_device_new_device_many = ' yeni cihazlar'
+z.string.tr.conversation_device_new_people_joined = 'yeni kişiler katıldı.'
+z.string.tr.conversation_device_new_people_joined_verify = ' cihazları doğrula'
 z.string.tr.conversation_just_now = 'Şimdi'
 z.string.tr.conversation_location_link = 'Haritayı Aç'
 z.string.tr.conversation_member_join = ' %@names eklendi'
@@ -273,6 +280,9 @@ z.string.tr.collection_show_all = '%no’nun tümünü göster'
 z.string.tr.collection_section_links = 'Bağlantılar'
 z.string.tr.collection_section_images = 'Resimler'
 z.string.tr.collection_section_files = 'Dosyalar'
+z.string.tr.collection_section_audio = 'Sesli mesajlar'
+
+# Full Search
 
 # Archive
 z.string.tr.archive_header = 'Arşivle'
