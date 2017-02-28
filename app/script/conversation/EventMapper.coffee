@@ -91,7 +91,7 @@ class z.conversation.EventMapper
 
     message_et.id = event.id
     message_et.from = event.from
-    message_et.timestamp = new Date(event.time).getTime()
+    message_et.timestamp new Date(event.time).getTime()
     message_et.primary_key = z.storage.StorageService.construct_primary_key event
     message_et.type = event.type
     message_et.version = event.version or 1
@@ -108,7 +108,7 @@ class z.conversation.EventMapper
       message_et.ephemeral_expires event.ephemeral_expires or event.expire_after_millis
       message_et.ephemeral_started event.ephemeral_started or '0'
 
-    if window.isNaN message_et.timestamp
+    if window.isNaN message_et.timestamp()
       @logger.warn "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
       message_et = undefined
 

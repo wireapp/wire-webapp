@@ -26,7 +26,7 @@ class z.entity.Message
   @return [Boolean] Is message of type system
   ###
   @sort_by_timestamp: (message_ets) ->
-    message_ets.sort (m1, m2) -> m1.timestamp > m2.timestamp
+    message_ets.sort (m1, m2) -> m1.timestamp() > m2.timestamp()
 
   # Construct a new base message entity.
   constructor: (@id = '0', @super_type = '') ->
@@ -60,14 +60,14 @@ class z.entity.Message
     @visible = ko.observable true
     @version = 1
 
-    @timestamp = Date.now()
+    @timestamp = ko.observable Date.now()
     @should_effect_conversation_timestamp = true
 
     # z.message.MessageCategory
     @category = undefined
 
     @display_timestamp_short = =>
-      date = moment.unix @timestamp / 1000
+      date = moment.unix @timestamp() / 1000
       return date.local().format 'HH:mm'
 
     @sender_name = ko.pureComputed =>

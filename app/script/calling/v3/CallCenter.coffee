@@ -517,7 +517,7 @@ class z.calling.v3.CallCenter
     message_et.conversation_id = e_call_et.id
     message_et.id = z.util.create_random_uuid()
     message_et.from = user_id
-    message_et.timestamp = Date.now()
+    message_et.timestamp Date.now()
     message_et.type = z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
     return message_et
 
