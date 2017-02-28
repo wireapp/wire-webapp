@@ -98,12 +98,10 @@ describe 'z.conversation.ConversationService', ->
     beforeEach (done) ->
       timestamp = 1479903546799
       messages = [0...10].map (index) ->
-        return {
-          object: {"conversation": conversation_id, "time": new Date(timestamp + index).toISOString()}
-        }
+        return {"conversation": conversation_id, "time": new Date(timestamp + index).toISOString()}
 
       Promise.all messages.map (message) ->
-        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, message.object
+        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, message
       .then done
       .catch done.fail
 
