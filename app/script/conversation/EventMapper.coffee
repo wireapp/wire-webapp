@@ -89,15 +89,14 @@ class z.conversation.EventMapper
       else
         message_et = @_map_event_ignored()
 
-    message_et.id = event.id
+    message_et.category = event.category
+    message_et.conversation_id = conversation_et.id
     message_et.from = event.from
+    message_et.id = event.id
+    message_et.primary_key = event.primary_key
     message_et.timestamp new Date(event.time).getTime()
-    message_et.primary_key = z.storage.StorageService.construct_primary_key event
     message_et.type = event.type
     message_et.version = event.version or 1
-    message_et.category = event.category
-
-    message_et.conversation_id = conversation_et.id
 
     if message_et.is_reactable()
       message_et.reactions event.reactions or {}
