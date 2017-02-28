@@ -312,6 +312,28 @@ class z.conversation.ConversationService
     .sortBy 'time'
 
   ###
+  Save an unencrypted conversation event.
+  @param event [Object] JSON event to be stored
+  @return [Promise] Promise that resolves with the stored record
+  ###
+  save_event: (event) ->
+    primary_key = z.storage.StorageService.construct_primary_key event
+    event.category = z.message.MessageCategorization.category_from_event event
+    @storage_service.save(@storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, event).then -> event
+
+  ###
+  Load conversation events by event type.
+
+  @param event_types [Array<Strings>] Array of event types to match
+  @return [Promise] Promise that resolves with the retrieved records
+  ###
+  load_events_with_types: (event_types) ->
+    return @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    .where 'type'
+    .anyOf event_types
+    .sortBy 'time'
+
+  ###
   Search for text in given conversation.
   @param conversation_id [String] ID of conversation to add users to
   @param query [String] will be checked in agains all text messages

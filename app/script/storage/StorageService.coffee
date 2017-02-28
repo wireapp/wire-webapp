@@ -290,35 +290,10 @@ class z.storage.StorageService
   @return [Promise] Promise that will resolve with the records from the object store
   ###
   get_all: (store_name) =>
-    return new Dexie.Promise (resolve, reject) =>
-      if @db[store_name]?
-        return @db[store_name].toArray()
-        .then (records) -> resolve records
-        .catch (error) =>
-          @logger.error "Could not load objects from store '#{store_name}'", error
-          reject error
-      reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
-
-  ###
-  Returns an array of all keys in a given object store.
-
-  @param store_name [String] Name of object store
-  @return [Promise] Promise that will resolve with the keys of the object store
-  ###
-  get_keys: (store_name, regex_string) =>
-    return new Dexie.Promise (resolve, reject) =>
-      if @db[store_name]?
-        return @db[store_name].toCollection()
-        .keys()
-        .then (keys) ->
-          if regex_string is undefined
-            resolve keys
-          else
-            regex = new RegExp regex_string, 'igm'
-            accepted_keys = keys.filter (key) -> key.match regex
-            resolve accepted_keys
-        .catch (error) -> reject error
-      reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
+    return @db[store_name].toArray()
+    .catch (error) =>
+      @logger.error "Could not load objects from store '#{store_name}'", error
+      throw error
 
   ###
   Loads persisted data via a promise.
@@ -330,50 +305,10 @@ class z.storage.StorageService
   @return [Promise] Promise that will resolve with the record matching the primary key
   ###
   load: (store_name, primary_key) =>
-    return new Dexie.Promise (resolve, reject) =>
-      return if @db[store_name]?
-        return @db[store_name].get primary_key
-        .then (record) -> resolve record
-        .catch (error) =>
-          @logger.error "Failed to load '#{primary_key}' from store '#{store_name}'", error
-          reject error
-      reject new Error z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
-
-  ###
-  Loads all objects from an object store and returns them with their keys and values.
-
-  @example Return value:
-    {
-      "key_1": {
-        "property_1": value_1,
-        "property_2": value_2
-      },
-      "key_2": {
-        "property_1": value_1,
-        "property_2": value_2
-      },
-      ...
-    }
-
-  @param store_name [String] Name of object store
-  @return [Promise<Object[String, Object]>] Promise which resolves with an object containing all keys and values
-  ###
-  load_all: (store_name, regex_string) =>
-    return new Dexie.Promise (resolve, reject) =>
-      data = {}
-
-      @get_keys store_name, regex_string
-      .then (keys) =>
-        promises = keys.map (key) =>
-          return new Promise (resolve, reject) =>
-            @load store_name, key
-            .then (value) ->
-              data[key] = value
-              resolve undefined
-            .catch (error) -> reject error
-        return Promise.all promises
-      .then -> resolve data
-      .catch (error) -> reject error
+    return @db[store_name].get primary_key
+    .catch (error) =>
+      @logger.error "Failed to load '#{primary_key}' from store '#{store_name}'", error
+      throw error
 
   ###
   Saves objects in the local database.
@@ -383,14 +318,10 @@ class z.storage.StorageService
   @return [Promise] Promise that will resolve with the primary key of the persisted object
   ###
   save: (store_name, primary_key, entity) =>
-    return new Dexie.Promise (resolve, reject) =>
-      if @db[store_name]?
-        return @db[store_name].put entity, primary_key
-        .then resolve
-        .catch (error) =>
-          @logger.error "Failed to put '#{primary_key}' into store '#{store_name}'", error
-          reject error
-      reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
+    return @db[store_name].put entity, primary_key
+    .catch (error) =>
+      @logger.error "Failed to put '#{primary_key}' into store '#{store_name}'", error
+      throw error
 
   ###
   Closes the database. This operation completes immediately and there is no returned Promise.
@@ -410,13 +341,10 @@ class z.storage.StorageService
   @return [Promise] Promise with the number of updated records (1 if an object was updated, otherwise 0).
   ###
   update: (store_name, primary_key, changes) =>
-    return new Dexie.Promise (resolve, reject) =>
-      if @db[store_name]?
-        return @db[store_name].update primary_key, changes
-        .then (number_of_updates) =>
-          @logger.info "Updated #{number_of_updates} record(s) with key '#{primary_key}' in store '#{store_name}'", changes
-          resolve number_of_updates
-        .catch (error) =>
-          @logger.error "Failed to update '#{primary_key}' in store '#{store_name}'", error
-          reject error
-      reject new z.storage.StorageError z.storage.StorageError::TYPE.DATA_STORE_NOT_FOUND
+    return @db[store_name].update primary_key, changes
+    .then (number_of_updates) =>
+      @logger.info "Updated #{number_of_updates} record(s) with key '#{primary_key}' in store '#{store_name}'", changes
+      return number_of_updates
+    .catch (error) =>
+      @logger.error "Failed to update '#{primary_key}' in store '#{store_name}'", error
+      throw error
