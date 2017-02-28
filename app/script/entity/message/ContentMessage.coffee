@@ -123,7 +123,7 @@ class z.entity.ContentMessage extends z.entity.Message
     file_name = asset_et.file_name
 
     if not file_name
-      date = moment @timestamp
+      date = moment @timestamp()
       file_name = "Wire #{date.format('YYYY-MM-DD')} at #{date.format('H.mm.ss')}"
 
     if asset_et.file_type

@@ -50,7 +50,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
     it 'sets the name of the conversation and a badge count (when the conversation is selected and when there are unread messages)', ->
       message = new z.entity.Message()
       message.id = z.util.create_random_uuid()
-      message.timestamp = Date.now()
+      message.timestamp Date.now()
 
       conversation = new z.entity.Conversation z.util.create_random_uuid()
       conversation.add_message message
@@ -89,12 +89,12 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       # Add messages to the muted conversation
       message = new z.entity.Message()
       message.id = z.util.create_random_uuid()
-      message.timestamp = Date.now()
+      message.timestamp Date.now()
       muted_conversation.add_message message
 
       message = new z.entity.Message()
       message.id = z.util.create_random_uuid()
-      message.timestamp = Date.now()
+      message.timestamp Date.now()
       muted_conversation.add_message message
 
       expect(muted_conversation.messages().length).toBe 2
@@ -109,7 +109,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
       # Add messages to the selected conversation
       message = new z.entity.Message()
       message.id = z.util.create_random_uuid()
-      message.timestamp = Date.now()
+      message.timestamp Date.now()
       selected_conversation.add_message message
 
       # Check title when there are messages in the selected conversation
@@ -198,7 +198,7 @@ describe 'z.ViewModel.WindowTitleViewModel', ->
     it 'publishes the badge count (for Wire\'s wrapper)', (done) ->
       message = new z.entity.Message()
       message.id = z.util.create_random_uuid()
-      message.timestamp = Date.now()
+      message.timestamp Date.now()
 
       conversation = new z.entity.Conversation z.util.create_random_uuid()
       conversation.add_message message

@@ -67,6 +67,7 @@ z.string.es.auth_limit_devices_current = '(Actual)'
 z.string.es.auth_history_headline = 'Es la primera vez que usas Wire en este dispositivo.'
 z.string.es.auth_history_description = 'Por motivos de privacidad, tu historial de conversación no aparecerá aquí.'
 z.string.es.auth_history_reuse_headline = 'Ya has utilizado Wire en este dispositivo antes.'
+z.string.es.auth_history_reuse_description = 'Los mensajes enviados mientras tanto no aparecerán aquí.'
 z.string.es.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -225,9 +226,15 @@ z.string.es.conversation_connection_blocked = 'Bloqueado'
 z.string.es.conversation_connection_cancel_request = 'Cancelar solicitud de conexión'
 z.string.es.conversation_create = ' inició una conversación con %@names'
 z.string.es.conversation_create_you = ' inició una conversación con %@names'
+z.string.es.conversation_device_started_using_one = ' comenzó a utilizar'
+z.string.es.conversation_device_started_using_many = ' comenzaron a utilizar'
 z.string.es.conversation_device_unverified = ' uno no verificado de'
 z.string.es.conversation_device_your_devices = ' tus dispositivos'
 z.string.es.conversation_device_user_devices = ' %@dispositivos nombre s'
+z.string.es.conversation_device_new_device_one = ' un nuevo dispositivo'
+z.string.es.conversation_device_new_device_many = ' nuevos dispositivos'
+z.string.es.conversation_device_new_people_joined = 'nuevas personas se han unido.'
+z.string.es.conversation_device_new_people_joined_verify = ' verificar dispositivos'
 z.string.es.conversation_just_now = 'Justo ahora'
 z.string.es.conversation_location_link = 'Abrir Mapa'
 z.string.es.conversation_member_join = ' %@nombres añadidos'
@@ -273,6 +280,9 @@ z.string.es.collection_show_all = 'Mostrar los %no'
 z.string.es.collection_section_links = 'Enlaces'
 z.string.es.collection_section_images = 'Fotos'
 z.string.es.collection_section_files = 'Ficheros'
+z.string.es.collection_section_audio = 'Mensajes de audio'
+
+# Full Search
 
 # Archive
 z.string.es.archive_header = 'Archivar'

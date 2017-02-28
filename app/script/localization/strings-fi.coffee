@@ -271,6 +271,8 @@ z.string.fi.collection_section_links = 'Linkit'
 z.string.fi.collection_section_images = 'Kuvat'
 z.string.fi.collection_section_files = 'Tiedostot'
 
+# Full Search
+
 # Archive
 z.string.fi.archive_header = 'Arkistoi'
 

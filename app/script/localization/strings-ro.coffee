@@ -67,6 +67,7 @@ z.string.ro.auth_limit_devices_current = '(Curent)'
 z.string.ro.auth_history_headline = 'Folosești Wire pentru prima dată pe acest dispozitiv.'
 z.string.ro.auth_history_description = 'Din motive de confidențialitate, istoricul conversației nu va apărea aici.'
 z.string.ro.auth_history_reuse_headline = 'Ai mai folosit Wire pe acest dispozitiv.'
+z.string.ro.auth_history_reuse_description = 'Mesajele trimise între timp nu vor apărea aici.'
 z.string.ro.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -225,9 +226,15 @@ z.string.ro.conversation_connection_blocked = 'Blocat'
 z.string.ro.conversation_connection_cancel_request = 'Anulează cererea de conectare'
 z.string.ro.conversation_create = 'a început o conversație cu %@names'
 z.string.ro.conversation_create_you = ' a început o conversație cu %@names'
+z.string.ro.conversation_device_started_using_one = ' a început să folosească'
+z.string.ro.conversation_device_started_using_many = ' a început să folosească'
 z.string.ro.conversation_device_unverified = ' unul dintre dispozitivele'
 z.string.ro.conversation_device_your_devices = ' tale neverificate'
 z.string.ro.conversation_device_user_devices = ' dispozitivele lui %@name'
+z.string.ro.conversation_device_new_device_one = ' un nou dispozitiv'
+z.string.ro.conversation_device_new_device_many = ' dispozitive noi'
+z.string.ro.conversation_device_new_people_joined = 's-au mai alăturat persoane.'
+z.string.ro.conversation_device_new_people_joined_verify = ' verifică dispozitivele'
 z.string.ro.conversation_just_now = 'Chiar acum'
 z.string.ro.conversation_location_link = 'Deschide harta'
 z.string.ro.conversation_member_join = ' ai adăuga pe %@names'
@@ -273,6 +280,9 @@ z.string.ro.collection_show_all = 'Arată toate %no'
 z.string.ro.collection_section_links = 'Legături'
 z.string.ro.collection_section_images = 'Imagini'
 z.string.ro.collection_section_files = 'Fișiere'
+z.string.ro.collection_section_audio = 'Mesaje audio'
+
+# Full Search
 
 # Archive
 z.string.ro.archive_header = 'Arhivă'

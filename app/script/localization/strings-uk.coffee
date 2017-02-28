@@ -67,6 +67,7 @@ z.string.uk.auth_limit_devices_current = '(Поточний)'
 z.string.uk.auth_history_headline = 'Це перший раз, коли ви використовуєте Wire на цьому пристрої.'
 z.string.uk.auth_history_description = 'З міркувань конфіденційності, історія ваших розмов тут не показується.'
 z.string.uk.auth_history_reuse_headline = 'Ви уже використовували Wire на цьому пристрої раніше.'
+z.string.uk.auth_history_reuse_description = 'Повідомлення, надіслані в той час, коли ви вийшли з Wire, не відображатимуться.'
 z.string.uk.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -225,9 +226,15 @@ z.string.uk.conversation_connection_blocked = 'Заблокований(-на)'
 z.string.uk.conversation_connection_cancel_request = 'Скасувати запит на додавання до контактів'
 z.string.uk.conversation_create = ' почав(-ла) розмову з %@names'
 z.string.uk.conversation_create_you = ' почав(-ла) розмову з %@names'
+z.string.uk.conversation_device_started_using_one = ' почав(-ла) використовувати'
+z.string.uk.conversation_device_started_using_many = ' почав(-ла) використовувати'
 z.string.uk.conversation_device_unverified = ' скасував(-ла) верифікацію одного з'
 z.string.uk.conversation_device_your_devices = ' ваші пристрої'
 z.string.uk.conversation_device_user_devices = ' пристрої %@name'
+z.string.uk.conversation_device_new_device_one = ' новий пристрій'
+z.string.uk.conversation_device_new_device_many = ' нові пристрої'
+z.string.uk.conversation_device_new_people_joined = 'приєдналися нові учасники.'
+z.string.uk.conversation_device_new_people_joined_verify = ' верифікувати пристрої'
 z.string.uk.conversation_just_now = 'Щойно'
 z.string.uk.conversation_location_link = 'Відкрити карту'
 z.string.uk.conversation_member_join = ' додав(-ла) %@names'
@@ -273,6 +280,9 @@ z.string.uk.collection_show_all = 'Показати всі %no'
 z.string.uk.collection_section_links = 'Посилання'
 z.string.uk.collection_section_images = 'Картинки'
 z.string.uk.collection_section_files = 'Файли'
+z.string.uk.collection_section_audio = 'Аудіоповідомлення'
+
+# Full Search
 
 # Archive
 z.string.uk.archive_header = 'Архівувати'

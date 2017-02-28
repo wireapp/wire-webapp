@@ -236,7 +236,7 @@ z.string.fr.conversation_rename = ' a renommé la conversation'
 z.string.fr.conversation_rename_you = ' avez renommé la conversation'
 z.string.fr.conversation_resume = 'Démarrez une conversation avec %@names'
 z.string.fr.conversation_ping = ' a fait un signe'
-z.string.fr.conversation_ping_you = ' a fait un signe'
+z.string.fr.conversation_ping_you = ' avez fait un signe'
 z.string.fr.conversation_today = 'aujourd’hui'
 z.string.fr.conversation_verified = 'Vérifié'
 z.string.fr.conversation_voice_channel_deactivate = ' a tenté d’appeler'
@@ -264,6 +264,8 @@ z.string.fr.conversation_likes_caption = '%@number personnes'
 z.string.fr.conversation_send_pasted_file = 'Image copiée le %date'
 
 # Collection
+
+# Full Search
 
 # Archive
 z.string.fr.archive_header = 'Archiver'
