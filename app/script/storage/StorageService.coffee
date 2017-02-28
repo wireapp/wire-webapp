@@ -27,24 +27,10 @@ class z.storage.StorageService
   OBJECT_STORE_CLIENTS: 'clients'
   OBJECT_STORE_CONVERSATION_EVENTS: 'conversation_events'
   OBJECT_STORE_CONVERSATIONS: 'conversations'
+  OBJECT_STORE_EVENTS: 'events'
   OBJECT_STORE_KEYS: 'keys'
   OBJECT_STORE_PREKEYS: 'prekeys'
   OBJECT_STORE_SESSIONS: 'sessions'
-
-  ###
-  Construct a unique primary key.
-  @param event [Object] Message event
-  @return [String] Generated primary key
-  ###
-  @construct_primary_key: (event) ->
-    throw new z.storage.StorageError z.storage.StorageError::TYPE.NO_CONVERSATION_ID if not event.conversation
-    throw new z.storage.StorageError z.storage.StorageError::TYPE.NO_SENDER_ID if not event.from
-    throw new z.storage.StorageError z.storage.StorageError::TYPE.NO_TIME if not event.time
-    throw new z.storage.StorageError z.storage.StorageError::TYPE.INVALID_TIME if not z.util.is_iso_string event.time
-    timestamp = new Date(event.time).getTime()
-    throw new z.storage.StorageError z.storage.StorageError::TYPE.INVALID_TIMESTAMP if window.isNaN timestamp
-    return "#{event.conversation}@#{event.from}@#{timestamp}"
-
 
   constructor: ->
     @logger = new z.util.Logger 'z.storage.StorageService', z.config.LOGGER.OPTIONS
@@ -144,6 +130,16 @@ class z.storage.StorageService
         "#{@OBJECT_STORE_PREKEYS}": ''
         "#{@OBJECT_STORE_SESSIONS}": ''
 
+      version_12 =
+        "#{@OBJECT_STORE_AMPLIFY}": ''
+        "#{@OBJECT_STORE_CLIENTS}": ', meta.primary_key'
+        "#{@OBJECT_STORE_CONVERSATION_EVENTS}": ', category, conversation, time, type, [conversation+time], [conversation+category]'
+        "#{@OBJECT_STORE_CONVERSATIONS}": ', id, last_event_timestamp'
+        "#{@OBJECT_STORE_EVENTS}": '++primary_key, id, category, conversation, time, type, [conversation+time], [conversation+category]'
+        "#{@OBJECT_STORE_KEYS}": ''
+        "#{@OBJECT_STORE_PREKEYS}": ''
+        "#{@OBJECT_STORE_SESSIONS}": ''
+
       @db = new Dexie @db_name
 
       @db.on 'blocked', =>
@@ -212,6 +208,14 @@ class z.storage.StorageService
           transaction[@OBJECT_STORE_SESSIONS].toCollection().modify (record) ->
             typed_array = z.util.base64_to_array record.serialised
             record.serialised = typed_array.buffer
+      @db.version(13).stores version_12
+        .upgrade (transaction) =>
+          @logger.warn 'Database upgrade to version 13', transaction
+          transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().toArray()
+          .then (items) =>
+            return @db[@OBJECT_STORE_EVENTS].bulkPut items
+          .then =>
+            return @db[@OBJECT_STORE_CONVERSATION_EVENTS].delete()
 
       @db.open()
       .then =>

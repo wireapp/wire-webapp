@@ -1323,7 +1323,7 @@ class z.conversation.ConversationRepository
       message_et.timestamp new Date(event_time).getTime()
       @conversation_service.update_message_in_db message_et,
         status: z.message.StatusType.SENT
-        # TODO update message timestamp
+        time: event_time
 
   ###
   Send encrypted external message
