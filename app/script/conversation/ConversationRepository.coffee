@@ -1319,12 +1319,11 @@ class z.conversation.ConversationRepository
   _update_message_sent_status: (conversation_et, message_id, event_time) =>
     @get_message_in_conversation_by_id conversation_et, message_id
     .then (message_et) =>
-      console.debug 'update message with time ', new Date(message_et.timestamp()).toISOString(), new Date(event_time).toISOString()
       message_et.status z.message.StatusType.SENT
       message_et.timestamp new Date(event_time).getTime()
       @conversation_service.update_message_in_db message_et,
         status: z.message.StatusType.SENT
-        # time: event_time
+        # TODO update message timestamp
 
   ###
   Send encrypted external message
