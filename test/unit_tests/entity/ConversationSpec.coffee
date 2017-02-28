@@ -32,21 +32,21 @@ describe 'Conversation', ->
 
     it 'adding a message should update the conversation timestamp', ->
       message_et = new z.entity.Message()
-      message_et.timestamp = new Date('2014-12-15T09:21:14.225Z').getTime()
+      message_et.timestamp new Date('2014-12-15T09:21:14.225Z').getTime()
       conversation_et.last_event_timestamp new Date('2014-12-14T09:21:14.225Z').getTime()
       conversation_et.add_message message_et
-      expect(conversation_et.last_event_timestamp()).toBe message_et.timestamp
+      expect(conversation_et.last_event_timestamp()).toBe message_et.timestamp()
 
     it 'adding a message should not update the conversation timestamp if should_effect_conversation_timestamp is false', ->
       message_et = new z.entity.Message()
-      message_et.timestamp = new Date('2014-12-15T09:21:14.225Z').getTime()
+      message_et.timestamp new Date('2014-12-15T09:21:14.225Z').getTime()
       conversation_et.add_message message_et
 
       message_two_et = new z.entity.Message()
-      message_two_et.timestamp = new Date('2014-12-16T09:21:14.225Z').getTime()
+      message_two_et.timestamp new Date('2014-12-16T09:21:14.225Z').getTime()
       message_two_et.should_effect_conversation_timestamp = false
       conversation_et.add_message message_two_et
-      expect(conversation_et.last_event_timestamp()).toBe message_et.timestamp
+      expect(conversation_et.last_event_timestamp()).toBe message_et.timestamp()
 
   describe '_increment_time_only', ->
     first_date = new Date('2014-12-15T09:21:14.225Z').getTime()
@@ -154,10 +154,10 @@ describe 'Conversation', ->
       conversation_et.last_read_timestamp last_read_timestamp
 
       ping_message = new z.entity.PingMessage()
-      ping_message.timestamp = last_read_timestamp - 1000
+      ping_message.timestamp last_read_timestamp - 1000
 
       call_message = new z.entity.CallMessage()
-      call_message.timestamp = last_read_timestamp - 1000
+      call_message.timestamp last_read_timestamp - 1000
       call_message.finished_reason = z.calling.enum.CALL_FINISHED_REASON.MISSED
 
       conversation_et.add_message ping_message
@@ -176,14 +176,14 @@ describe 'Conversation', ->
 
     it 'shows unread type "PING" if there is a ping message in the unread messages', ->
       ping_message = new z.entity.PingMessage()
-      ping_message.timestamp = Date.now() - 500
+      ping_message.timestamp Date.now() - 500
       conversation_et.add_message ping_message
       conversation_et.add_message new z.entity.Message()
       expect(conversation_et.unread_type()).toBe z.conversation.ConversationUnreadType.PING
 
     it 'shows unread type "CALL" if there is a missed call message in the unread messages', ->
       call_message = new z.entity.CallMessage()
-      call_message.timestamp = Date.now() - 500
+      call_message.timestamp Date.now() - 500
       call_message.finished_reason = z.calling.enum.CALL_FINISHED_REASON.MISSED
       conversation_et.add_message call_message
       conversation_et.add_message new z.entity.Message()
@@ -261,14 +261,14 @@ describe 'Conversation', ->
 
     beforeEach ->
       message = new z.entity.Message()
-      message.timestamp = reference_timestamp
+      message.timestamp reference_timestamp
       conversation_et.add_message message
 
     it 'can add message with a newer timestamp', ->
       message_id = z.util.create_random_uuid()
       message = new z.entity.Message()
       message.id = message_id
-      message.timestamp = Date.now()
+      message.timestamp Date.now()
       conversation_et.add_message message
       expect(conversation_et.messages().length).toBe 2
       expect(conversation_et.get_last_message().id).toBe message_id
@@ -277,7 +277,7 @@ describe 'Conversation', ->
       message_id = z.util.create_random_uuid()
       message = new z.entity.Message()
       message.id = message_id
-      message.timestamp = reference_timestamp - 10000
+      message.timestamp reference_timestamp - 10000
       conversation_et.add_message message
       expect(conversation_et.messages().length).toBe 2
       expect(conversation_et.get_first_message().id).toBe message_id
@@ -287,12 +287,12 @@ describe 'Conversation', ->
 
     message1 = new z.entity.Message()
     message1.id = z.util.create_random_uuid()
-    message1.timestamp = reference_timestamp - 10000
+    message1.timestamp reference_timestamp - 10000
     message1.user self_user
 
     message2 = new z.entity.Message()
     message2.id = z.util.create_random_uuid()
-    message2.timestamp = reference_timestamp - 5000
+    message2.timestamp reference_timestamp - 5000
 
     it 'adds many messages', ->
       message_ets = [message1, message2]
@@ -425,15 +425,15 @@ describe 'Conversation', ->
       conversation_et.id = z.util.create_random_uuid()
 
       ping_message_1 = new z.entity.PingMessage()
-      ping_message_1.timestamp = timestamp - 4000
+      ping_message_1.timestamp timestamp - 4000
       ping_message_1.id = z.util.create_random_uuid()
 
       ping_message_2 = new z.entity.PingMessage()
-      ping_message_2.timestamp = timestamp - 2000
+      ping_message_2.timestamp timestamp - 2000
       ping_message_2.id = z.util.create_random_uuid()
 
       ping_message_3 = new z.entity.PingMessage()
-      ping_message_3.timestamp = timestamp
+      ping_message_3.timestamp timestamp
       ping_message_3.id = z.util.create_random_uuid()
 
       conversation_et.add_message ping_message_1
@@ -453,7 +453,7 @@ describe 'Conversation', ->
 
       message_et = new z.entity.Message()
       message_et.user self_user
-      message_et.timestamp = last_message_timestamp
+      message_et.timestamp last_message_timestamp
       message_et.id = z.util.create_random_uuid()
 
       expect(conversation_et.last_read_timestamp()).toBe last_read_timestamp
@@ -467,7 +467,7 @@ describe 'Conversation', ->
       conversation_et.last_read_timestamp last_read_timestamp
 
       message_et = new z.entity.Message()
-      message_et.timestamp = last_message_timestamp
+      message_et.timestamp last_message_timestamp
       message_et.id = z.util.create_random_uuid()
 
       expect(conversation_et.last_read_timestamp()).toBe last_read_timestamp
@@ -483,7 +483,7 @@ describe 'Conversation', ->
       conversation_et.last_read_timestamp last_read_timestamp
 
       message_et = new z.entity.PingMessage()
-      message_et.timestamp = last_message_timestamp
+      message_et.timestamp last_message_timestamp
       message_et.id = z.util.create_random_uuid()
       conversation_et.add_message message_et
 
@@ -497,7 +497,7 @@ describe 'Conversation', ->
       last_message_timestamp = new Date('December 24, 2000 18:01:00').getTime()
 
       message_et = new z.entity.Message()
-      message_et.timestamp = last_message_timestamp
+      message_et.timestamp last_message_timestamp
       message_et.id = z.util.create_random_uuid()
       conversation_et.add_message message_et
 
@@ -520,14 +520,14 @@ describe 'Conversation', ->
       asset_et.file_size = 'audio/mp4'
 
       older_message_et = new z.entity.ContentMessage()
-      older_message_et.timestamp = older_timestamp
+      older_message_et.timestamp older_timestamp
       older_message_et.id = z.util.create_random_uuid()
       older_message_et.nonce = z.util.create_random_uuid()
       older_message_et.type = z.event.Client.CONVERSATION.ASSET_META
       older_message_et.add_asset asset_et
 
       newer_message_et = new z.entity.ContentMessage()
-      newer_message_et.timestamp = newer_timestamp
+      newer_message_et.timestamp newer_timestamp
       newer_message_et.id = older_message_et.id
       newer_message_et.nonce = older_message_et.nonce
       newer_message_et.type = z.event.Client.CONVERSATION.ASSET_META
