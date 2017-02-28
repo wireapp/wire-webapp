@@ -91,7 +91,7 @@ class z.main.App
 
     repository.client              = new z.client.ClientRepository @service.client, repository.cryptography
     repository.user                = new z.user.UserRepository @service.user, @service.asset, @service.search, repository.client, repository.cryptography
-    repository.event               = new z.event.EventRepository @service.web_socket, @service.notification, repository.cryptography, repository.user
+    repository.event               = new z.event.EventRepository @service.web_socket, @service.notification, repository.cryptography, repository.user, @service.conversation
     repository.search              = new z.search.SearchRepository @service.search, repository.user
     repository.properties          = new z.properties.PropertiesRepository @service.properties
     repository.connect             = new z.connect.ConnectRepository @service.connect, @service.connect_google, repository.properties

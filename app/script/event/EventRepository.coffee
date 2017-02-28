@@ -36,8 +36,9 @@ class z.event.EventRepository
   @param notification_service [z.event.NotificationService] Service handling the notification stream
   @param cryptography_repository [z.cryptography.CryptographyRepository] Repository for all cryptography interactions
   @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
+  @param conversation_service [z.conversation.ConversationService]
   ###
-  constructor: (@web_socket_service, @notification_service, @cryptography_repository, @user_repository) ->
+  constructor: (@web_socket_service, @notification_service, @cryptography_repository, @user_repository, @conversation_service) ->
     @logger = new z.util.Logger 'z.event.EventRepository', z.config.LOGGER.OPTIONS
 
     @current_client = undefined
@@ -250,7 +251,7 @@ class z.event.EventRepository
   ###
   get_conversation_ids_with_active_events: (include_on, exclude_on) =>
     return new Promise (resolve, reject) =>
-      @cryptography_repository.storage_repository.load_events_by_types _.flatten [include_on, exclude_on]
+      @conversation_service.load_events_with_types _.flatten [include_on, exclude_on]
       .then (events) ->
         filtered_conversations = {}
 
@@ -407,7 +408,7 @@ class z.event.EventRepository
         return event
     .then (mapped_event) =>
       if mapped_event.type in z.event.EventTypeHandling.STORE
-        return @cryptography_repository.save_unencrypted_event mapped_event
+        return @conversation_service.save_event mapped_event
       return mapped_event
     .then (saved_event) =>
       @_validate_call_event_lifetime event if event.type is z.event.Client.CALL.E_CALL

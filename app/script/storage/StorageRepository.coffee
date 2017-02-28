@@ -57,41 +57,6 @@ class z.storage.StorageRepository
   terminate: (reason) ->
     @storage_service.terminate reason
 
-  ###############################################################################
-  # Conversation Events
-  ###############################################################################
-
-  ###
-  Save an unencrypted conversation event.
-  @param event [Object] JSON event to be stored
-  @return [Promise] Promise that resolves with the stored record
-  ###
-  save_conversation_event: (event) ->
-    return Promise.resolve().then =>
-      primary_key = z.storage.StorageService.construct_primary_key event
-      @storage_service.save(@storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key, event).then -> event
-
-  ###
-  Load a conversation event for a given primary key.
-
-  @param primary_key [String] Primary key to save the object with
-  @return [Promise] Promise that resolves with the retrieved record
-  ###
-  load_event_for_conversation: (primary_key) ->
-    return @storage_service.load @storage_service.OBJECT_STORE_CONVERSATION_EVENTS, primary_key
-
-  ###
-  Load conversation events by event type.
-
-  @param event_types [Array<Strings>] Array of event types to match
-  @return [Promise] Promise that resolves with the retrieved records
-  ###
-  load_events_by_types: (event_types) ->
-    return @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
-    .where 'type'
-    .anyOf event_types
-    .sortBy 'time'
-
   clear_all_stores: =>
     @storage_service.clear_all_stores()
     .then => @logger.info "Cleared database '#{@storage_service.db_name}'"

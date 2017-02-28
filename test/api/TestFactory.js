@@ -183,7 +183,10 @@ window.TestFactory.prototype.exposeEventActors = function () {
     window.notification_service = new z.event.NotificationService(self.client, window.storage_service);
     window.notification_service.logger.level = self.settings.logging_level;
 
-    window.event_repository = new z.event.EventRepository(web_socket_service, notification_service, window.cryptography_repository, undefined);
+    window.converastion_service = new z.conversation.ConversationService(self.client, window.storage_service);
+    window.converastion_service.logger.level = self.settings.logging_level;
+
+    window.event_repository = new z.event.EventRepository(web_socket_service, notification_service, window.cryptography_repository, undefined, converastion_service);
     window.event_repository.logger.level = self.settings.logging_level;
     window.event_repository.current_client = ko.observable(window.cryptography_repository.current_client());
 
