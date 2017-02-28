@@ -1433,7 +1433,7 @@ class z.conversation.ConversationRepository
 
   _grant_outgoing_message: (conversation_et, generic_message, user_ids) ->
     return Promise.resolve() if generic_message.content in ['cleared', 'confirmation', 'deleted', 'lastRead']
-    consent_type = if generic_message.content is 'calling' then 'outgoing_call' else 'message'
+    consent_type = if generic_message.content is 'calling' then z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL else z.ViewModel.MODAL_CONSENT_TYPE.MESSAGE
     return @grant_message conversation_et, consent_type, user_ids
 
   grant_message: (conversation_et, consent_type, user_ids) =>
@@ -1453,11 +1453,11 @@ class z.conversation.ConversationRepository
           action: ->
             send_anyway = true
             conversation_et.verification_state z.conversation.ConversationVerificationState.UNVERIFIED
-            amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id if consent_type is 'incoming_call'
+            amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id if consent_type is z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL
             resolve()
           close: ->
             if not send_anyway
-              amplify.publish z.event.WebApp.CALL.STATE.DELETE, conversation_et.id if consent_type is 'outgoing_call'
+              amplify.publish z.event.WebApp.CALL.STATE.DELETE, conversation_et.id if consent_type is z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL
               reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   ###

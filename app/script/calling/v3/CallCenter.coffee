@@ -233,7 +233,7 @@ class z.calling.v3.CallCenter
         return @_create_ongoing_e_call conversation_id, e_call_message_et, user_id
 
       @conversation_repository.get_conversation_by_id conversation_id, (conversation_et) =>
-        @conversation_repository.grant_message conversation_et, 'incoming_call', [user_id]
+        @conversation_repository.grant_message conversation_et, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [user_id]
         .then =>
           @_create_incoming_e_call conversation_id, e_call_message_et, user_id
 

@@ -45,6 +45,13 @@ z.ViewModel.ModalType =
   UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large'
   WHITELIST_SCREENSHARING: '.modal-whitelist-screensharing'
 
+
+z.ViewModel.MODAL_CONSENT_TYPE =
+  INCOMING_CALL: 'incoming_call'
+  MESSAGE: 'message'
+  OUTGOING_CALL: 'outgoing_call'
+
+
 class z.ViewModel.ModalsViewModel
   constructor: (element_id) ->
     @logger = new z.util.Logger 'z.ViewModel.ModalsViewModel', z.config.LOGGER.OPTIONS
@@ -206,10 +213,10 @@ class z.ViewModel.ModalsViewModel
         content: joined_names
 
     switch content.consent_type
-      when 'incoming_call'
+      when z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL
         message_id = z.string.modal_new_device_call_incoming
         action_id = z.string.modal_new_device_call_accept
-      when 'outgoing_call'
+      when z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL
         message_id = z.string.modal_new_device_call_outgoing
         action_id = z.string.modal_new_device_call_anyway
       else
