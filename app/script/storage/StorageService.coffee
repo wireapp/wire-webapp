@@ -212,7 +212,10 @@ class z.storage.StorageService
         .upgrade (transaction) =>
           @logger.warn 'Database upgrade to version 13', transaction
           transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().toArray()
-          .then (items) => @db[@OBJECT_STORE_EVENTS].bulkPut items
+          .then (items) =>
+            return @db[@OBJECT_STORE_EVENTS].bulkPut items
+          .then =>
+            return @db[@OBJECT_STORE_CONVERSATION_EVENTS].delete()
 
       @db.open()
       .then =>
