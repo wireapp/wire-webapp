@@ -1431,29 +1431,34 @@ class z.conversation.ConversationRepository
           @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
           return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
 
-  _grant_outgoing_message: (conversation_et, generic_message, user_ids) =>
+  _grant_outgoing_message: (conversation_et, generic_message, user_ids) ->
+    return Promise.resolve() if generic_message.content in ['cleared', 'confirmation', 'deleted', 'lastRead']
+    consent_type = if generic_message.content is 'calling' then 'outgoing_call' else 'message'
+    return @grant_message conversation_et, consent_type, user_ids
+
+  grant_message: (conversation_et, consent_type, user_ids) =>
+    return Promise.resolve() if conversation_et.verification_state() is z.conversation.ConversationVerificationState.UNVERIFIED
     return new Promise (resolve, reject) =>
-      if conversation_et.verification_state() is z.conversation.ConversationVerificationState.UNVERIFIED
-        resolve()
-      else if generic_message.content in ['cleared', 'confirmation', 'deleted', 'lastRead']
-        resolve()
-      else
-        send_anyway = false
+      send_anyway = false
 
-        if not user_ids
-          users_with_unverified_clients = conversation_et.get_users_with_unverified_clients()
-          user_ids = users_with_unverified_clients.map (user_et) -> user_et.id
+      if not user_ids
+        users_with_unverified_clients = conversation_et.get_users_with_unverified_clients()
+        user_ids = users_with_unverified_clients.map (user_et) -> user_et.id
 
-        @user_repository.get_users_by_id user_ids, (user_ets) ->
-          amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
-            data: user_ets
-            action: ->
-              send_anyway = true
-              conversation_et.verification_state z.conversation.ConversationVerificationState.UNVERIFIED
-              resolve()
-            close: ->
-              if not send_anyway
-                reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
+      @user_repository.get_users_by_id user_ids, (user_ets) ->
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
+          data:
+            consent_type: consent_type
+            user_ets: user_ets
+          action: ->
+            send_anyway = true
+            conversation_et.verification_state z.conversation.ConversationVerificationState.UNVERIFIED
+            amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id if consent_type is 'incoming_call'
+            resolve()
+          close: ->
+            if not send_anyway
+              amplify.publish z.event.WebApp.CALL.STATE.DELETE, conversation_et.id if consent_type is 'outgoing_call'
+              reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   ###
   Sends an OTR asset to a conversation.
