@@ -44,16 +44,13 @@ describe 'z.conversation.ConversationService', ->
   describe 'load_preceding_events_from_db', ->
 
     conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
-    sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
 
     # @formatter:off
     messages = [
       {
-        key: "#{conversation_id}@#{sender_id}@1470317275182"
         object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"}
       },
       {
-        key: "#{conversation_id}@#{sender_id}@1470317278993"
         object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
       }
     ]
@@ -100,14 +97,12 @@ describe 'z.conversation.ConversationService', ->
 
   describe 'load_preceding_events_from_db', ->
     conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
-    sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
     messages = undefined
 
     beforeEach (done) ->
       timestamp = 1479903546799
       messages = [0...10].map (index) ->
         return {
-          key: "#{conversation_id}@#{sender_id}@#{index}"
           object: {"conversation": conversation_id, "time": new Date(timestamp + index).toISOString()}
         }
 
@@ -218,40 +213,32 @@ describe 'z.conversation.ConversationService', ->
   describe 'delete_message_with_key_from_db', ->
 
     conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
-    sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
+    primary_keys = undefined
 
     # @formatter:off
     messages = [
-      {
-        key: "#{conversation_id}@#{sender_id}@1470317275182"
-        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"}
-      },
-      {
-        key: "#{conversation_id}@#{sender_id}@1470317278993"
-        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
-      },
-
-      {
-        key: "#{conversation_id}@#{sender_id}@1470317278994"
-        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message (Duplicate)","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
-      }
+      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"}
+      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
+      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message (Duplicate)","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
     ]
     # @formatter:on
 
     beforeEach (done) ->
       Promise.all messages.map (message) ->
-        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, message.object
-      .then done
+        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, message
+      .then (ids) =>
+        primary_keys = ids
+        done()
       .catch done.fail
 
     it 'deletes message with the given key', (done) ->
-      conversation_service.delete_message_with_key_from_db conversation_id, messages[1].key
+      conversation_service.delete_message_with_key_from_db conversation_id, primary_keys[1]
       .then ->
         conversation_service.load_preceding_events_from_db conversation_id
       .then (events) ->
         expect(events.length).toBe 2
         for event in events
-          expect(event.data.content).not.toBe messages[1].object.data.content
+          expect(event.primary_key).not.toBe primary_keys[1]
         done()
       .catch done.fail
 
