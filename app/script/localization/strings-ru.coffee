@@ -67,6 +67,7 @@ z.string.ru.auth_limit_devices_current = '(Текущее)'
 z.string.ru.auth_history_headline = 'Вы впервые используете Wire на этом устройстве.'
 z.string.ru.auth_history_description = 'Из соображений конфиденциальности история ваших разговоров не будет показана здесь.'
 z.string.ru.auth_history_reuse_headline = 'Вы уже использовали Wire на этом устройстве.'
+z.string.ru.auth_history_reuse_description = 'Сообщения, отправленные в то время, пока устройство не использовалось, не будут показаны здесь.'
 z.string.ru.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -225,9 +226,15 @@ z.string.ru.conversation_connection_blocked = 'Заблокирован(а)'
 z.string.ru.conversation_connection_cancel_request = 'Отменить запрос'
 z.string.ru.conversation_create = ' начал(а) разговор с %@names'
 z.string.ru.conversation_create_you = ' начал(а) разговор с %@names'
+z.string.ru.conversation_device_started_using_one = ' начал(-а) использовать'
+z.string.ru.conversation_device_started_using_many = ' начали использовать'
 z.string.ru.conversation_device_unverified = ' деверифицировал(а) одно из'
 z.string.ru.conversation_device_your_devices = ' ваши устройства'
 z.string.ru.conversation_device_user_devices = 'Устройства, принадлежащие %@name'
+z.string.ru.conversation_device_new_device_one = ' новое устройство'
+z.string.ru.conversation_device_new_device_many = ' новые устройства'
+z.string.ru.conversation_device_new_people_joined = 'присоединились новые участники.'
+z.string.ru.conversation_device_new_people_joined_verify = ' верифицируйте устройства'
 z.string.ru.conversation_just_now = 'Только что'
 z.string.ru.conversation_location_link = 'Открыть карту'
 z.string.ru.conversation_member_join = ' добавил(а) %@names'
@@ -273,6 +280,9 @@ z.string.ru.collection_show_all = 'Показать все %no'
 z.string.ru.collection_section_links = 'Ссылки'
 z.string.ru.collection_section_images = 'Изображения'
 z.string.ru.collection_section_files = 'Файлы'
+z.string.ru.collection_section_audio = 'Аудиосообщения'
+
+# Full Search
 
 # Archive
 z.string.ru.archive_header = 'Архив'
@@ -290,7 +300,7 @@ z.string.ru.conversations_popover_cancel = 'Отклонить запрос'
 z.string.ru.conversations_popover_clear = 'Удалить'
 z.string.ru.conversations_popover_leave = 'Покинуть'
 z.string.ru.conversations_popover_notify = 'Включить уведомления'
-z.string.ru.conversations_popover_silence = 'Выключить уведомления'
+z.string.ru.conversations_popover_silence = 'Выкл. уведомления'
 z.string.ru.conversations_popover_unarchive = 'Разархивировать'
 
 # Takeover
@@ -306,8 +316,8 @@ z.string.ru.invite_meta_key_pc = 'Ctrl'
 z.string.ru.invite_hint_selected = 'Нажмите %meta_key + C для копирования'
 z.string.ru.invite_hint_unselected = 'Выделите и нажмите %meta_key + C'
 z.string.ru.invite_headline = 'Пригласите людей в Wire'
-z.string.ru.invite_message = 'Я использую Wire, ищите меня там по имени %username или посетите сайт get.wire.com.'
-z.string.ru.invite_message_no_email = 'Я использую Wire. Перейдите на get.wire.com, чтобы связаться со мной.'
+z.string.ru.invite_message = 'Я в Wire, ищи меня там по имени пользователя %username или зайди на сайт get.wire.com.'
+z.string.ru.invite_message_no_email = 'Я использую Wire. Перейди на get.wire.com, чтобы связаться со мной.'
 
 # Extensions
 z.string.ru.extensions_bubble_button_gif = 'Gif'
