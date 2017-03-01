@@ -214,8 +214,7 @@ class z.storage.StorageService
           transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().toArray()
           .then (items) =>
             return @db[@OBJECT_STORE_EVENTS].bulkPut items
-          .then =>
-            return @delete_store @OBJECT_STORE_CONVERSATION_EVENTS
+      @db.version(14).stores "#{@OBJECT_STORE_CONVERSATION_EVENTS}": null
 
       @db.open()
       .then =>
