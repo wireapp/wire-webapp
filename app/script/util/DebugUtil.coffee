@@ -38,6 +38,22 @@ class z.util.DebugUtil
       block_users.push @user_repository.block_user user_et
     return Promise.all block_users
 
+  break_session: (user_id, client_id) ->
+    session_id = "#{user_id}@#{client_id}"
+    wire.app.repository.cryptography.cryptobox.session_load session_id
+    .then (cryptobox_session) ->
+      cryptobox_session.session.session_states = {}
+      return cryptobox_session
+    .then (cryptobox_session) ->
+      record =
+        created: Date.now()
+        id: session_id
+        serialised: cryptobox_session.session.serialise()
+        version: 'broken_by_qa'
+      wire.app.repository.storage.storage_service.save 'sessions', session_id, record
+    .then (session_id) =>
+      @logger.log "Corrupted Session ID '#{session_id}'"
+
   get_number_of_clients_in_conversation: ->
     user_ets = @conversation_repository.active_conversation().participating_user_ets()
 
