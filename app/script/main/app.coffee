@@ -223,7 +223,6 @@ class z.main.App
       @repository.client.cleanup_clients_and_sessions true
       @logger.info 'App fully loaded'
     .catch (error) =>
-      debugger
       error_message = "Error during initialization of app version '#{z.util.Environment.version false}'"
       if z.util.Environment.electron
         error_message = "#{error_message} - Electron '#{platform.os.family}' '#{z.util.Environment.version()}'"
