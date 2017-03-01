@@ -215,7 +215,7 @@ class z.storage.StorageService
           .then (items) =>
             return @db[@OBJECT_STORE_EVENTS].bulkPut items
           .then =>
-            return @db[@OBJECT_STORE_CONVERSATION_EVENTS].delete()
+            return @delete_store @OBJECT_STORE_CONVERSATION_EVENTS
 
       @db.open()
       .then =>
