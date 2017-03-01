@@ -186,30 +186,6 @@ class z.conversation.ConversationRepository
         return local_conversation
 
   ###
-  Retrieve all conversations using paging.
-
-  @param limit [Integer] Query limit for conversation
-  @param conversation_id [String] ID of the last conversation in batch
-  @return [Promise] Promise that resolves when all conversations have been retrieved and saved
-  ###
-  get_conversations: (limit = 500, conversation_id) =>
-    @conversation_service.get_conversations limit, conversation_id
-    .then (response) =>
-      if response.conversations.length
-        conversation_ets = @conversation_mapper.map_conversations response.conversations
-        @save_conversations conversation_ets
-
-      if response.has_more
-        last_conversation_et = response.conversations[response.conversations.length - 1]
-        return @get_conversations limit, last_conversation_et.id
-
-      @load_conversation_states()
-      return @conversations()
-    .catch (error) =>
-      @logger.error "Failed to retrieve conversations from backend: #{error.message}", error
-      throw error
-
-  ###
   Get Message with given ID from the database.
   @param conversation_et [z.entity.Conversation]
   @param message_id [String]
