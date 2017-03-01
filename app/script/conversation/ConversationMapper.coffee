@@ -144,13 +144,9 @@ class z.conversation.ConversationMapper
     conversation_et.type data.type
     conversation_et.name data.name ? ''
 
-    # Last event
-    timestamp = new Date(data.last_event_time).getTime()
-    conversation_et.set_timestamp timestamp, z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
-
     conversation_et = @update_self_status conversation_et, self
 
-    # all users that are still active
+    # all users that are stidont ll active
     participating_user_ids = []
     others.forEach (other) ->
       participating_user_ids.push other.id if other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
