@@ -136,19 +136,16 @@ class z.conversation.ConversationMapper
   @return [z.entity.Conversation] Updated conversation entity
   ###
   _update_conversation_et: (conversation_et, data) ->
-    self = data.members.self
-    others = data.members.others
-
     conversation_et.id = data.id
     conversation_et.creator = data.creator
     conversation_et.type data.type
     conversation_et.name data.name ? ''
 
-    conversation_et = @update_self_status conversation_et, self
+    conversation_et = @update_self_status conversation_et, data.members?.self or data
 
     # all users that are still active
     participating_user_ids = []
-    others.forEach (other) ->
+    data.members?.others.forEach (other) ->
       participating_user_ids.push other.id if other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
     conversation_et.participating_user_ids participating_user_ids
 

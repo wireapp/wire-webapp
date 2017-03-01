@@ -152,6 +152,24 @@ class z.conversation.ConversationRepository
       @logger.error "Failed to fetch conversation '#{conversation_id}' from backend: #{error.message}", error
       throw error
 
+  init_conversations: =>
+    @conversation_service.load_conversation_states_from_db()
+    .then (local_conversations) =>
+      is_update_needed = local_conversations.length is 0 or local_conversations[0].status is undefined
+
+      if local_conversations.length
+        @save_conversations @conversation_mapper.map_conversations local_conversations
+
+      if is_update_needed
+        @conversation_service.get_all_conversations()
+        .then (remote_conversations) =>
+          ## save active conversations or update existing
+      else
+        return @conversations()
+    .then =>
+      amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
+      return @conversations()
+
   ###
   Retrieve all conversations using paging.
 
