@@ -146,7 +146,7 @@ class z.conversation.ConversationMapper
 
     conversation_et = @update_self_status conversation_et, self
 
-    # all users that are stidont ll active
+    # all users that are still active
     participating_user_ids = []
     others.forEach (other) ->
       participating_user_ids.push other.id if other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
