@@ -43,14 +43,14 @@ class z.util.DebugUtil
     wire.app.repository.cryptography.cryptobox.session_load session_id
     .then (cryptobox_session) ->
       cryptobox_session.session.session_states = {}
-      return cryptobox_session
-    .then (cryptobox_session) ->
+
       record =
         created: Date.now()
         id: session_id
         serialised: cryptobox_session.session.serialise()
         version: 'broken_by_qa'
-      wire.app.repository.storage.storage_service.save 'sessions', session_id, record
+
+      return wire.app.repository.storage.storage_service.save 'sessions', session_id, record
     .then (session_id) =>
       @logger.log "Corrupted Session ID '#{session_id}'"
 
