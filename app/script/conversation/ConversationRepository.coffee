@@ -164,21 +164,25 @@ class z.conversation.ConversationRepository
       else
         return local_conversations
     .then (conversations) =>
+      debugger
       amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
       @save_conversations @conversation_mapper.map_conversations conversations
       return @conversations()
 
   merge_conversations: (local, remote) =>
-    return local.map (local_conversation) ->
-      remote_conversation = remote.find (c) -> local_conversation.id is c.id
-      local_conversation.name = remote_conversation.name
-      local_conversation.type = remote_conversation.type
-      local_conversation.creator = remote_conversation.creator
-      local_conversation.status = remote_conversation.members.self.status
-      local_conversation.others = remote_conversation.members.others
-        .filter (other) -> other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
-        .map (other) -> other.id
-      return local_conversation
+    return remote
+      .filter (remote_conversation) -> remote_conversation.members.self.status is z.conversation.ConversationStatus.CURRENT_MEMBER
+      .map (remote_conversation) ->
+        local_conversation = local.find (c) -> c.id is remote_conversation.id
+        local_conversation = local_conversation or {id: remote_conversation.id}
+        local_conversation.name = remote_conversation.name
+        local_conversation.type = remote_conversation.type
+        local_conversation.creator = remote_conversation.creator
+        local_conversation.status = remote_conversation.members.self.status
+        local_conversation.others = remote_conversation.members.others
+          .filter (other) -> other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
+          .map (other) -> other.id
+        return local_conversation
 
   ###
   Retrieve all conversations using paging.

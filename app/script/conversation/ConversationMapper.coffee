@@ -147,8 +147,9 @@ class z.conversation.ConversationMapper
     if data.others
       conversation_et.participating_user_ids data.others
     else
-      conversation_et.participating_user_ids data.members.others
+      participating_user_ids = data.members.others
         .filter (other) -> other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
         .map (other) -> other.id
+      conversation_et.participating_user_ids participating_user_ids
 
     return conversation_et
