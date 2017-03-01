@@ -160,11 +160,12 @@ class z.conversation.ConversationRepository
       if is_update_needed
         return @conversation_service.get_all_conversations()
         .then (remote_conversations) =>
-          @merge_conversations local_conversations, remote_conversations # TODO save
+          @merge_conversations local_conversations, remote_conversations
+        .then (merged_conversations) =>
+          @conversation_service.put_conversations_in_db merged_conversations
       else
         return local_conversations
     .then (conversations) =>
-      debugger
       amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
       @save_conversations @conversation_mapper.map_conversations conversations
       return @conversations()

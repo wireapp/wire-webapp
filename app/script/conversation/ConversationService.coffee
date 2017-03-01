@@ -428,6 +428,10 @@ class z.conversation.ConversationService
       type: 'POST'
       data: payload
 
+  put_conversations_in_db: (conversations) =>
+    keys = conversations.map (conversation) -> conversation.id
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATIONS].bulkPut(conversations, keys).then => conversations
+
   ###
   Saves a conversation state in the local database.
   @param conversation_et [z.entity.Conversation] Conversation entity
