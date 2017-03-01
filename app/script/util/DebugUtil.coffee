@@ -50,7 +50,7 @@ class z.util.DebugUtil
         serialised: cryptobox_session.session.serialise()
         version: 'broken_by_qa'
 
-      return wire.app.repository.storage.storage_service.save 'sessions', session_id, record
+      return wire.app.repository.storage.storage_service.save z.storage.StorageService::OBJECT_STORE_SESSIONS, session_id, record
     .then (session_id) =>
       @logger.log "Corrupted Session ID '#{session_id}'"
 
