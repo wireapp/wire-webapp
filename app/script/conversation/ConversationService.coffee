@@ -57,7 +57,7 @@ class z.conversation.ConversationService
   ###############################################################################
 
   ###
-  Retrieves meta information about all the conversations of a user.
+  Retrieves paged meta information about the conversations of a user.
 
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversations
 
@@ -71,6 +71,26 @@ class z.conversation.ConversationService
       data:
         size: limit
         start: conversation_id
+
+  ###
+  Retrieves all the conversations of a user.
+
+  @param limit [Integer] Number of results to return (default 500, max 500)
+  ###
+  get_all_conversations: (limit = 500) =>
+    conversations = []
+
+    _get_conversations = (conversation_id) =>
+      @get_conversations(limit, conversation_id).then (response) =>
+        if response.conversations.length
+          conversations = conversations.concat response.conversations
+
+        if response.has_more
+          return _get_conversations limit, response.conversations.pop().id
+        else
+          return conversations
+
+    return _get_conversations()
 
   ###
   Get a conversation by ID.
