@@ -144,9 +144,11 @@ class z.conversation.ConversationMapper
     conversation_et = @update_self_status conversation_et, data.members?.self or data
 
     # all users that are still active
-    participating_user_ids = []
-    data.members?.others.forEach (other) ->
-      participating_user_ids.push other.id if other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
-    conversation_et.participating_user_ids participating_user_ids
+    if data.others
+      conversation_et.participating_user_ids data.others
+    else
+      conversation_et.participating_user_ids data.members.others
+        .filter (other) -> other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
+        .map (other) -> other.id
 
     return conversation_et

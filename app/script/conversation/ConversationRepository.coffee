@@ -157,18 +157,28 @@ class z.conversation.ConversationRepository
     .then (local_conversations) =>
       is_update_needed = local_conversations.length is 0 or local_conversations[0].status is undefined
 
-      if local_conversations.length
-        @save_conversations @conversation_mapper.map_conversations local_conversations
-
       if is_update_needed
-        @conversation_service.get_all_conversations()
+        return @conversation_service.get_all_conversations()
         .then (remote_conversations) =>
-          ## save active conversations or update existing
+          @merge_conversations local_conversations, remote_conversations # TODO save
       else
-        return @conversations()
-    .then =>
+        return local_conversations
+    .then (conversations) =>
       amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
+      @save_conversations @conversation_mapper.map_conversations conversations
       return @conversations()
+
+  merge_conversations: (local, remote) =>
+    return local.map (local_conversation) ->
+      remote_conversation = remote.find (c) -> local_conversation.id is c.id
+      local_conversation.name = remote_conversation.name
+      local_conversation.type = remote_conversation.type
+      local_conversation.creator = remote_conversation.creator
+      local_conversation.status = remote_conversation.members.self.status
+      local_conversation.others = remote_conversation.members.others
+        .filter (other) -> other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
+        .map (other) -> other.id
+      return local_conversation
 
   ###
   Retrieve all conversations using paging.

@@ -181,7 +181,7 @@ class z.main.App
       @repository.event.connect_web_socket()
       promises = [
         @repository.client.get_clients_for_self()
-        @repository.conversation.get_conversations()
+        @repository.conversation.init_conversations()
         @repository.user.get_connections()
       ]
       return Promise.all promises
@@ -223,6 +223,7 @@ class z.main.App
       @repository.client.cleanup_clients_and_sessions true
       @logger.info 'App fully loaded'
     .catch (error) =>
+      debugger
       error_message = "Error during initialization of app version '#{z.util.Environment.version false}'"
       if z.util.Environment.electron
         error_message = "#{error_message} - Electron '#{platform.os.family}' '#{z.util.Environment.version()}'"
