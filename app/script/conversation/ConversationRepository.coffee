@@ -166,8 +166,8 @@ class z.conversation.ConversationRepository
       else
         return local_conversations
     .then (conversations) =>
-      amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
       @save_conversations @conversation_mapper.map_conversations conversations
+      amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
       return @conversations()
 
   merge_conversations: (local, remote) =>
@@ -472,21 +472,6 @@ class z.conversation.ConversationRepository
             reject error
 
   ###
-  Load the conversation states from the store.
-  ###
-  load_conversation_states: =>
-    @conversation_service.load_conversation_states_from_db()
-    .then (conversation_states) =>
-      for state in conversation_states
-        conversation_et = @get_conversation_by_id state.id
-        @conversation_mapper.update_self_status conversation_et, state
-
-      @logger.info "Updated '#{conversation_states.length}' conversation states"
-      amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
-    .catch (error) =>
-      @logger.error 'Failed to update conversation states', error
-
-  ###
   Maps user connection to the corresponding conversation.
 
   @note If there is no conversation it will request it from the backend
@@ -567,6 +552,8 @@ class z.conversation.ConversationRepository
             muted_state: conversation_et.muted_state()
             muted_timestamp: conversation_et.muted_timestamp()
           }
+        when z.conversation.ConversationUpdateType.NAME
+          name: conversation_et.name()
         when z.conversation.ConversationUpdateType.VERIFICATION_STATE
           verification_state: conversation_et.verification_state()
       return @conversation_service.update_conversation_state_in_db conversation_et, changes
