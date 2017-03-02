@@ -181,8 +181,6 @@ class z.entity.Conversation
     amplify.subscribe z.event.WebApp.CONVERSATION.LOADED_STATES, @_subscribe_to_states_updates
 
   _subscribe_to_states_updates: =>
-    console.debug '_subscribe_to_states_updates ', @id, @display_name()
-
     @archived_state.subscribe =>
       @_persist_state_update z.conversation.ConversationUpdateType.ARCHIVED_STATE
     @cleared_timestamp.subscribe =>
@@ -196,15 +194,15 @@ class z.entity.Conversation
     @muted_state.subscribe =>
       @_persist_state_update z.conversation.ConversationUpdateType.MUTED_STATE
     @name.subscribe =>
-      console.debug 'name subscribe'
       @_persist_state_update z.conversation.ConversationUpdateType.NAME
+    @type.subscribe =>
+      @_persist_state_update z.conversation.ConversationUpdateType.TYPE
     @verification_state.subscribe =>
       @_persist_state_update z.conversation.ConversationUpdateType.VERIFICATION_STATE
 
     return true
 
   _persist_state_update: (updated_field) ->
-    console.debug '_persist_state_update ', updated_field
     amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @, updated_field
 
   ###############################################################################
@@ -497,5 +495,6 @@ class z.entity.Conversation
       muted_state: @muted_state()
       muted_timestamp: @muted_timestamp()
       name: @name()
+      type: @type()
       verification_state: @verification_state()
     }

@@ -554,6 +554,8 @@ class z.conversation.ConversationRepository
           }
         when z.conversation.ConversationUpdateType.NAME
           name: conversation_et.name()
+        when z.conversation.ConversationUpdateType.TYPE
+          name: conversation_et.type()
         when z.conversation.ConversationUpdateType.VERIFICATION_STATE
           verification_state: conversation_et.verification_state()
       return @conversation_service.update_conversation_state_in_db conversation_et, changes
