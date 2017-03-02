@@ -49,8 +49,26 @@ z.conversation.EventBuilder = do ->
     error: "#{decrypt_error.message} (#{event.data.sender})"
     error_code: "#{error_code} (#{event.data.sender})"
 
+  build_voice_channel_activate = (e_call_message_et) ->
+    conversation: e_call_message_et.conversation_id
+    id: z.util.create_random_uuid()
+    type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
+    from: e_call_message_et.user_id
+    time: e_call_message_et.time
+
+  build_voice_channel_deactivate = (e_call_message_et) ->
+    conversation: e_call_message_et.conversation_id
+    id: z.util.create_random_uuid()
+    type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
+    from: e_call_message_et.user_id
+    time: e_call_message_et.time
+    data:
+      reason: z.calling.enum.CALL_FINISHED_REASON.MISSED
+
   return {
     build_all_verified: build_all_verified
-    build_unable_to_decrypt: build_unable_to_decrypt
     build_degraded: build_degraded
+    build_unable_to_decrypt: build_unable_to_decrypt
+    build_voice_channel_activate: build_voice_channel_activate
+    build_voice_channel_deactivate: build_voice_channel_deactivate
   }
