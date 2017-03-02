@@ -195,7 +195,8 @@ class z.entity.Conversation
       @status
       @type
       @verification_state
-    ].forEach => amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @
+    ].forEach (property) =>
+      property.subscribe => amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @
 
   ###############################################################################
   # Lifecycle
