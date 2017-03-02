@@ -2420,7 +2420,7 @@ class z.conversation.ConversationRepository
         deleted_time: time
       type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
       from: message_to_delete_et.from
-      time: new Date(message_to_delete_et.timestamp).toISOString()
+      time: new Date(message_to_delete_et.timestamp()).toISOString()
 
 
   ###############################################################################
