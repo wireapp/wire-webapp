@@ -183,33 +183,19 @@ class z.entity.Conversation
     amplify.subscribe z.event.WebApp.CONVERSATION.LOADED_STATES, @_subscribe_to_states_updates
 
   _subscribe_to_states_updates: =>
-    @archived_state.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.ARCHIVED_STATE
-    @cleared_timestamp.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
-    @ephemeral_timer.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.EPHEMERAL_TIMER
-    @last_event_timestamp.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
-    @last_read_timestamp.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
-    @muted_state.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.MUTED_STATE
-    @name.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.NAME
-    @participating_user_ids.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.OTHERS
-    @status.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.STATUS
-    @type.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.TYPE
-    @verification_state.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.VERIFICATION_STATE
-
-    return true
-
-  _persist_state_update: (updated_field) ->
-    amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @, updated_field
+    [
+      @archived_state
+      @cleared_timestamp
+      @ephemeral_timer
+      @last_event_timestamp
+      @last_read_timestamp
+      @muted_state
+      @name
+      @participating_user_ids
+      @status
+      @type
+      @verification_state
+    ].forEach => amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @
 
   ###############################################################################
   # Lifecycle

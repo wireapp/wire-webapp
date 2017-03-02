@@ -531,41 +531,7 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation of which the state should be persisted
   @param updated_field [z.conversation.ConversationUpdateType] Optional type of updated state information
   ###
-  save_conversation_state_in_db: (conversation_et, updated_field) =>
-    if updated_field
-      changes = switch updated_field
-        when z.conversation.ConversationUpdateType.ARCHIVED_STATE
-          {
-            archived_state: conversation_et.archived_state()
-            archived_timestamp: conversation_et.archived_timestamp()
-          }
-        when z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
-          cleared_timestamp: conversation_et.cleared_timestamp()
-        when z.conversation.ConversationUpdateType.EPHEMERAL_TIMER
-          ephemeral_timer: conversation_et.ephemeral_timer()
-        when z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
-          last_event_timestamp: conversation_et.last_event_timestamp()
-        when z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
-          last_read_timestamp: conversation_et.last_read_timestamp()
-        when z.conversation.ConversationUpdateType.MUTED_STATE
-          {
-            muted_state: conversation_et.muted_state()
-            muted_timestamp: conversation_et.muted_timestamp()
-          }
-        when z.conversation.ConversationUpdateType.NAME
-          name: conversation_et.name()
-        when z.conversation.ConversationUpdateType.OTHERS
-          others: conversation_et.participating_user_ids()
-        when z.conversation.ConversationUpdateType.STATUS
-          status: conversation_et.status()
-        when z.conversation.ConversationUpdateType.TYPE
-          type: conversation_et.type()
-        when z.conversation.ConversationUpdateType.VERIFICATION_STATE
-          verification_state: conversation_et.verification_state()
-      return @conversation_service.update_conversation_state_in_db conversation_et, changes
-      .then =>
-        @logger.info "Persisted update of '#{updated_field}' to conversation '#{conversation_et.id}'"
-
+  save_conversation_state_in_db: (conversation_et) =>
     return @conversation_service.save_conversation_state_in_db conversation_et
 
   ###

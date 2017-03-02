@@ -439,21 +439,6 @@ class z.conversation.ConversationService
   ###
   save_conversation_state_in_db: (conversation_et) =>
     @storage_service.save @storage_service.OBJECT_STORE_CONVERSATIONS, conversation_et.id, conversation_et.serialize()
-    .then =>
-      @logger.info "State of conversation '#{conversation_et.id}' was stored for the first time"
-      return conversation_et
-
-  ###
-  Updates a conversation entity in the database.
-  @param changes [Object] Updates to be made to the stored conversation state
-  @return [Promise<String|z.entity.Conversation>] Promise which resolves with the conversation entity
-  ###
-  update_conversation_state_in_db: (conversation_et, changes) ->
-    @storage_service.update @storage_service.OBJECT_STORE_CONVERSATIONS, conversation_et.id, changes
-    .then (number_of_updated_records) =>
-      if number_of_updated_records
-        return conversation_et
-      @save_conversation_state_in_db conversation_et
 
   ###
   Update conversation properties.
