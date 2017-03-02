@@ -431,7 +431,7 @@ class z.conversation.ConversationService
   ###
   Saves a list of conversation records in the local database.
   @param conversations [z.entity.Conversation] Conversation entity
-  @return [Promise<String|z.entity.Conversation>] Promise which resolves with the conversation entity
+  @return [Promise<Array>] Promise which resolves with a list of conversation records
   ###
   save_conversations_in_db: (conversations) =>
     keys = conversations.map (conversation) -> conversation.id
