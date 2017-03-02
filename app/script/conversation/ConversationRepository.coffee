@@ -152,7 +152,7 @@ class z.conversation.ConversationRepository
       @logger.error "Failed to fetch conversation '#{conversation_id}' from backend: #{error.message}", error
       throw error
 
-  init_conversations: =>
+  get_conversations: =>
     @conversation_service.load_conversation_states_from_db()
     .then (local_conversations) =>
       is_update_needed = local_conversations.length is 0 or local_conversations[0].status is undefined

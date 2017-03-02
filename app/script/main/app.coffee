@@ -181,7 +181,7 @@ class z.main.App
       @repository.event.connect_web_socket()
       promises = [
         @repository.client.get_clients_for_self()
-        @repository.conversation.init_conversations()
+        @repository.conversation.get_conversations()
         @repository.user.get_connections()
       ]
       return Promise.all promises
