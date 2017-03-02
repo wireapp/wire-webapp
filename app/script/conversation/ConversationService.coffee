@@ -463,6 +463,9 @@ class z.conversation.ConversationService
   ###
   save_conversation_state_in_db: (conversation_et) =>
     @storage_service.save @storage_service.OBJECT_STORE_CONVERSATIONS, conversation_et.id, conversation_et.serialize()
+    .then (primary_key) =>
+      @logger.log @logger.levels.INFO, "Conversation '#{primary_key}' was stored for the first time"
+      return conversation_et
 
   ###
   Update conversation properties.
