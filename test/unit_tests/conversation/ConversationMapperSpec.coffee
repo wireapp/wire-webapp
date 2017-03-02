@@ -86,13 +86,11 @@ describe 'Conversation Mapper', ->
       expect(updated_conversation_et.removed_from_conversation()).toBeTruthy()
 
     it 'can update the self status if the user joins a conversation', ->
-      conversation_et.removed_from_conversation true
       self_status = {status: z.conversation.ConversationStatus.CURRENT_MEMBER}
       updated_conversation_et = conversation_mapper.update_self_status conversation_et, self_status
       expect(updated_conversation_et.removed_from_conversation()).toBeFalsy()
 
     it 'can does not change the self status if properties update does not contain a status', ->
-      conversation_et.removed_from_conversation true
       self_status = {otr_archived: true}
       updated_conversation_et = conversation_mapper.update_self_status conversation_et, self_status
       expect(updated_conversation_et.removed_from_conversation()).toBeTruthy()

@@ -85,7 +85,7 @@ class z.entity.Conversation
 
     @status = ko.observable z.conversation.ConversationStatus.CURRENT_MEMBER
     @removed_from_conversation = ko.pureComputed =>
-      return @status is z.conversation.ConversationStatus.PAST_MEMBER
+      return @status() is z.conversation.ConversationStatus.PAST_MEMBER
     @removed_from_conversation.subscribe (is_removed) =>
       @archived_state false if not is_removed
 

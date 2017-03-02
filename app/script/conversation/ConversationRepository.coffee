@@ -160,7 +160,7 @@ class z.conversation.ConversationRepository
       if is_update_needed
         return @conversation_service.get_all_conversations()
         .then (remote_conversations) =>
-          @merge_conversations local_conversations, remote_conversations
+          @conversation_service.merge_conversations local_conversations, remote_conversations
         .then (merged_conversations) =>
           @conversation_service.save_conversations_in_db merged_conversations
       else
@@ -169,33 +169,6 @@ class z.conversation.ConversationRepository
       @save_conversations @conversation_mapper.map_conversations conversations
       amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
       return @conversations()
-
-  merge_conversations: (local, remote) ->
-    return remote
-      .filter (remote_conversation) -> remote_conversation.members.self.status is z.conversation.ConversationStatus.CURRENT_MEMBER
-      .map (remote_conversation) ->
-        local_conversation = local.find (c) -> c.id is remote_conversation.id
-        local_conversation = local_conversation or {id: remote_conversation.id}
-        local_conversation.name = remote_conversation.name
-        local_conversation.type = remote_conversation.type
-        local_conversation.creator = remote_conversation.creator
-        local_conversation.status = remote_conversation.members.self.status
-        local_conversation.others = remote_conversation.members.others
-          .filter (other) -> other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
-          .map (other) -> other.id
-
-        if not local_conversation.last_event_timestamp?
-          local_conversation.last_event_timestamp = new Date(0).toISOString()
-
-        if not local_conversation.archived_state?
-          local_conversation.archived_state = remote_conversation.members.self.otr_archived
-          local_conversation.archived_timestamp = remote_conversation.members.self.otr_archived_ref
-
-        if not local_conversation.muted_state?
-          local_conversation.muted_state = remote_conversation.members.self.otr_muted
-          local_conversation.muted_timestamp = remote_conversation.members.self.otr_muted_ref
-
-        return local_conversation
 
   ###
   Get Message with given ID from the database.
