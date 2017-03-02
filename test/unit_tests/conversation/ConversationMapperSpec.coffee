@@ -90,11 +90,6 @@ describe 'Conversation Mapper', ->
       updated_conversation_et = conversation_mapper.update_self_status conversation_et, self_status
       expect(updated_conversation_et.removed_from_conversation()).toBeFalsy()
 
-    it 'can does not change the self status if properties update does not contain a status', ->
-      self_status = {otr_archived: true}
-      updated_conversation_et = conversation_mapper.update_self_status conversation_et, self_status
-      expect(updated_conversation_et.removed_from_conversation()).toBeTruthy()
-
     it 'can update the self status with last event timestamp', ->
       time = Date.now()
       self_status = {last_event_timestamp: time}
