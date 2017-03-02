@@ -74,7 +74,6 @@ class z.conversation.ConversationService
 
   ###
   Retrieves all the conversations of a user.
-
   @param limit [Integer] Number of results to return (default 500, max 500)
   ###
   get_all_conversations: (limit = 500) =>
@@ -84,11 +83,9 @@ class z.conversation.ConversationService
       @get_conversations(limit, conversation_id).then (response) ->
         if response.conversations.length
           conversations = conversations.concat response.conversations
-
         if response.has_more
           return _get_conversations limit, response.conversations.pop().id
-        else
-          return conversations
+        return conversations
 
     return _get_conversations()
 
