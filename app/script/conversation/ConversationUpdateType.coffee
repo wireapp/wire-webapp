@@ -29,5 +29,6 @@ z.conversation.ConversationUpdateType =
   MUTED_STATE: 'mute_state'
   MUTED_TIMESTAMP: 'muted_timestamp'
   NAME: 'name'
+  OTHERS: 'others'
   TYPE: 'type'
   VERIFICATION_STATE: 'verification_state'

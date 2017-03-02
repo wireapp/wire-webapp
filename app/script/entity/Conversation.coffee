@@ -195,6 +195,8 @@ class z.entity.Conversation
       @_persist_state_update z.conversation.ConversationUpdateType.MUTED_STATE
     @name.subscribe =>
       @_persist_state_update z.conversation.ConversationUpdateType.NAME
+    @participating_user_ids.subscribe =>
+      @_persist_state_update z.conversation.ConversationUpdateType.OTHERS
     @type.subscribe =>
       @_persist_state_update z.conversation.ConversationUpdateType.TYPE
     @verification_state.subscribe =>
@@ -495,6 +497,7 @@ class z.entity.Conversation
       muted_state: @muted_state()
       muted_timestamp: @muted_timestamp()
       name: @name()
+      others: @participating_user_ids()
       type: @type()
       verification_state: @verification_state()
     }
