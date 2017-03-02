@@ -79,15 +79,9 @@ class z.conversation.ConversationMapper
     if self.status?
       conversation_et.removed_from_conversation self.status is z.conversation.ConversationStatus.PAST_MEMBER
 
-    # Last Event Timestamp from storage
     if self.last_event_timestamp
       conversation_et.set_timestamp self.last_event_timestamp,
         z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
-
-    if self.otr_archived?
-      timestamp =  new Date(self.otr_archived_ref).getTime()
-      conversation_et.set_timestamp timestamp, z.conversation.ConversationUpdateType.ARCHIVED_TIMESTAMP
-      conversation_et.archived_state self.otr_archived
 
     if self.archived_timestamp
       timestamp = self.archived_timestamp
@@ -97,15 +91,8 @@ class z.conversation.ConversationMapper
     if self.cleared_timestamp
       conversation_et.set_timestamp self.cleared_timestamp, z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
 
-    # Last read
     if self.last_read_timestamp
       conversation_et.set_timestamp self.last_read_timestamp, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
-
-    # Muted
-    if self.otr_muted?
-      timestamp = new Date(self.otr_muted_ref).getTime()
-      conversation_et.set_timestamp timestamp, z.conversation.ConversationUpdateType.MUTED_TIMESTAMP
-      conversation_et.muted_state self.otr_muted
 
     if self.muted_timestamp
       conversation_et.set_timestamp self.muted_timestamp, z.conversation.ConversationUpdateType.MUTED_TIMESTAMP
@@ -113,6 +100,17 @@ class z.conversation.ConversationMapper
 
     if self.verification_state
       conversation_et.verification_state self.verification_state
+
+    # BE
+    if self.otr_archived?
+      timestamp =  new Date(self.otr_archived_ref).getTime()
+      conversation_et.set_timestamp timestamp, z.conversation.ConversationUpdateType.ARCHIVED_TIMESTAMP
+      conversation_et.archived_state self.otr_archived
+
+    if self.otr_muted?
+      timestamp = new Date(self.otr_muted_ref).getTime()
+      conversation_et.set_timestamp timestamp, z.conversation.ConversationUpdateType.MUTED_TIMESTAMP
+      conversation_et.muted_state self.otr_muted
 
     return conversation_et
 
