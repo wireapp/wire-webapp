@@ -81,7 +81,7 @@ class z.conversation.ConversationService
     conversations = []
 
     _get_conversations = (conversation_id) =>
-      @get_conversations(limit, conversation_id).then (response) =>
+      @get_conversations(limit, conversation_id).then (response) ->
         if response.conversations.length
           conversations = conversations.concat response.conversations
 
@@ -428,12 +428,17 @@ class z.conversation.ConversationService
       type: 'POST'
       data: payload
 
-  put_conversations_in_db: (conversations) =>
+  ###
+  Saves a list of conversation records in the local database.
+  @param conversations [z.entity.Conversation] Conversation entity
+  @return [Promise<String|z.entity.Conversation>] Promise which resolves with the conversation entity
+  ###
+  save_conversations_in_db: (conversations) =>
     keys = conversations.map (conversation) -> conversation.id
-    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATIONS].bulkPut(conversations, keys).then => conversations
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATIONS].bulkPut(conversations, keys).then -> conversations
 
   ###
-  Saves a conversation state in the local database.
+  Saves a conversation entity in the local database.
   @param conversation_et [z.entity.Conversation] Conversation entity
   @return [Promise<String|z.entity.Conversation>] Promise which resolves with the conversation entity
   ###

@@ -162,7 +162,7 @@ class z.conversation.ConversationRepository
         .then (remote_conversations) =>
           @merge_conversations local_conversations, remote_conversations
         .then (merged_conversations) =>
-          @conversation_service.put_conversations_in_db merged_conversations
+          @conversation_service.save_conversations_in_db merged_conversations
       else
         return local_conversations
     .then (conversations) =>
@@ -170,7 +170,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
       return @conversations()
 
-  merge_conversations: (local, remote) =>
+  merge_conversations: (local, remote) ->
     return remote
       .filter (remote_conversation) -> remote_conversation.members.self.status is z.conversation.ConversationStatus.CURRENT_MEMBER
       .map (remote_conversation) ->
