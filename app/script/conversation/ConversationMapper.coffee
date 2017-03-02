@@ -77,7 +77,7 @@ class z.conversation.ConversationMapper
       conversation_et.ephemeral_timer self.ephemeral_timer
 
     if self.status?
-      conversation_et.removed_from_conversation self.status is z.conversation.ConversationStatus.PAST_MEMBER
+      conversation_et.status self.status
 
     if self.last_event_timestamp
       conversation_et.set_timestamp self.last_event_timestamp,

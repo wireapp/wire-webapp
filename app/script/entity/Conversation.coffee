@@ -83,7 +83,9 @@ class z.entity.Conversation
       all_users = [@self].concat @participating_user_ets()
       return all_users.every (user_et) -> user_et?.is_verified()
 
-    @removed_from_conversation = ko.observable false
+    @status = ko.observable z.conversation.ConversationStatus.CURRENT_MEMBER
+    @removed_from_conversation = ko.pureComputed =>
+      return @status is z.conversation.ConversationStatus.PAST_MEMBER
     @removed_from_conversation.subscribe (is_removed) =>
       @archived_state false if not is_removed
 
@@ -197,6 +199,8 @@ class z.entity.Conversation
       @_persist_state_update z.conversation.ConversationUpdateType.NAME
     @participating_user_ids.subscribe =>
       @_persist_state_update z.conversation.ConversationUpdateType.OTHERS
+    @status.subscribe =>
+      @_persist_state_update z.conversation.ConversationUpdateType.STATUS
     @type.subscribe =>
       @_persist_state_update z.conversation.ConversationUpdateType.TYPE
     @verification_state.subscribe =>

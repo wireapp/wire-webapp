@@ -324,7 +324,7 @@ class z.conversation.ConversationRepository
   unblocked_user: (user_et) =>
     @get_one_to_one_conversation user_et
     .then (conversation_et) ->
-      conversation_et.removed_from_conversation false
+      conversation_et.status z.conversation.ConversationStatus.PAST_MEMBER
 
   ###
   Get users and events for conversations.
@@ -556,6 +556,8 @@ class z.conversation.ConversationRepository
           name: conversation_et.name()
         when z.conversation.ConversationUpdateType.OTHERS
           others: conversation_et.participating_user_ids()
+        when z.conversation.ConversationUpdateType.STATUS
+          status: conversation_et.status()
         when z.conversation.ConversationUpdateType.TYPE
           type: conversation_et.type()
         when z.conversation.ConversationUpdateType.VERIFICATION_STATE
@@ -1969,7 +1971,7 @@ class z.conversation.ConversationRepository
 
     # Self user joins again
     if @user_repository.self().id in event_json.data.user_ids
-      conversation_et.removed_from_conversation false
+      conversation_et.status z.conversation.ConversationStatus.CURRENT_MEMBER
 
     @update_participating_user_ets conversation_et, =>
       @_add_event_to_conversation event_json, conversation_et
@@ -1995,7 +1997,7 @@ class z.conversation.ConversationRepository
         conversation_et.participating_user_ids.remove user_et.id
         continue if not user_et.is_me
 
-        conversation_et.removed_from_conversation true
+        conversation_et.status z.conversation.ConversationStatus.PAST_MEMBER
         if conversation_et.call()
           amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id
 
