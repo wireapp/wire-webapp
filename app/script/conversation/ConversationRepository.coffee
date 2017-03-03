@@ -1123,7 +1123,7 @@ class z.conversation.ConversationRepository
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'edited', new z.proto.MessageEdit original_message_et.id, new z.proto.Text message
 
-    @_send_and_inject_generic_message conversation_et, generic_message
+    @_send_and_inject_generic_message conversation_et, generic_message, false
     .then =>
       @_track_edit_message conversation_et, original_message_et
       @send_link_preview message, conversation_et, generic_message
@@ -1288,7 +1288,7 @@ class z.conversation.ConversationRepository
   # Send Generic Messages
   ###############################################################################
 
-  _send_and_inject_generic_message: (conversation_et, generic_message) =>
+  _send_and_inject_generic_message: (conversation_et, generic_message, sync_timestamp = true) =>
     Promise.resolve()
     .then =>
       if conversation_et.removed_from_conversation()
@@ -1305,7 +1305,8 @@ class z.conversation.ConversationRepository
         @_send_generic_message conversation_et.id, generic_message
       .then (payload) =>
         if saved_event.type in z.event.EventTypeHandling.STORE
-          @_update_message_sent_status conversation_et, saved_event.id, payload.time
+          backend_timestamp = if sync_timestamp then payload.time else undefined
+          @_update_message_sent_status conversation_et, saved_event.id, backend_timestamp
         @_track_completed_media_action conversation_et, generic_message
       .then ->
         return saved_event
@@ -1314,16 +1315,22 @@ class z.conversation.ConversationRepository
   Update message as sent in db and view
   @param conversation_et [z.entity.Conversation]
   @param message_id [String]
+  @param event_time [Number|undefined] if defined it will update event timestamp
   @return [Promise]
   ###
   _update_message_sent_status: (conversation_et, message_id, event_time) =>
     @get_message_in_conversation_by_id conversation_et, message_id
     .then (message_et) =>
+      changes = {}
+
       message_et.status z.message.StatusType.SENT
-      message_et.timestamp new Date(event_time).getTime()
-      @conversation_service.update_message_in_db message_et,
-        status: z.message.StatusType.SENT
-        time: event_time
+      changes.status = z.message.StatusType.SENT
+
+      if event_time
+        message_et.timestamp new Date(event_time).getTime()
+        changes.time = event_time
+
+      @conversation_service.update_message_in_db message_et, changes
 
   ###
   Send encrypted external message
