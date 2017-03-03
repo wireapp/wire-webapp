@@ -95,9 +95,7 @@ class z.conversation.ConversationService
   @param remote [Array] backend payload
   ###
   merge_conversations: (local, remote) ->
-    return remote
-    .filter (remote_conversation) -> remote_conversation.members.self.status is z.conversation.ConversationStatus.CURRENT_MEMBER
-    .map (remote_conversation) ->
+    return remote.map (remote_conversation) ->
       local_conversation = local.find (c) -> c.id is remote_conversation.id
       local_conversation ?= id: remote_conversation.id
       local_conversation.last_event_timestamp ?= new Date(0).toISOString()
