@@ -2029,7 +2029,6 @@ class z.conversation.ConversationRepository
         return @_update_edited_message conversation_et, event_json
       return event_json
     .then (updated_event_json) =>
-      console.log '_on_message_add updated_event_json', event_json
       @_on_add_event conversation_et, updated_event_json
     .catch (error) ->
       throw error if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
@@ -2498,15 +2497,11 @@ class z.conversation.ConversationRepository
       if not original_message_et.timestamp()
         throw new TypeError 'Missing timestamp'
 
-      console.debug 'edited event ', event_json
-
       event_json.edited_time = event_json.time
       event_json.time = new Date(original_message_et.timestamp()).toISOString()
       @_delete_message_by_id conversation_et, event_json.id
       @_delete_message_by_id conversation_et, event_json.data.replacing_message_id
       @conversation_service.save_event event_json
-
-      console.debug 'updated event ', event_json
       return event_json
 
   ###
