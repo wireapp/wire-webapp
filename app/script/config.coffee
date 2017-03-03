@@ -88,6 +88,8 @@ z.config =
     'image/gif'
   ]
 
+  LOCALYTICS_SESSION_TIMEOUT: 180000 # 3 minutes in milliseconds
+
   MINIMUM_USERNAME_LENGTH: 2
   MINIMUM_PASSWORD_LENGTH: 8
 

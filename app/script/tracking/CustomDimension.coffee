@@ -19,5 +19,6 @@
 window.z ?= {}
 z.tracking ?= {}
 
-z.tracking.DimensionName =
-  CONTACTS: 'contacts'
+z.tracking.CustomDimension =
+  APP: 0
+  CONTACTS: 1
