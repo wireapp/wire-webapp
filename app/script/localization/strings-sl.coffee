@@ -190,6 +190,10 @@ z.string.sl.modal_new_device_headline = '%@.name je začel(-a) z uporabo nove na
 z.string.sl.modal_new_device_headline_many = '%@.names so začeli z uporabo novih naprav'
 z.string.sl.modal_new_device_headline_you = '%@.name je začel(-a) z uporabo nove naprave'
 z.string.sl.modal_new_device_message = 'Ali še vedno želite poslati vaša sporočila?'
+z.string.sl.modal_new_device_call_accept = 'Sprejmi klic'
+z.string.sl.modal_new_device_call_anyway = 'Vseeno pokliči'
+z.string.sl.modal_new_device_call_incoming = 'Ali še vedno želite sprejeti klic?'
+z.string.sl.modal_new_device_call_outgoing = 'Ali še vedno želite klicati?'
 z.string.sl.modal_new_device_show_device = 'pokaži napravo'
 z.string.sl.modal_new_device_send_anyway = 'pošlji vseeno'
 # Remove device
@@ -283,6 +287,8 @@ z.string.sl.collection_section_files = 'Zbirke'
 z.string.sl.collection_section_audio = 'Zvočna sporočila'
 
 # Full Search
+z.string.sl.fullsearch_placeholder = 'Išči po sporočilih'
+z.string.sl.fullsearch_no_results = 'Ni rezultatov.'
 
 # Archive
 z.string.sl.archive_header = 'Arhiviraj'

@@ -190,6 +190,10 @@ z.string.uk.modal_new_device_headline = '%@.name почав(-ла) викори�
 z.string.uk.modal_new_device_headline_many = '%@.names почали використовувати нові пристрої'
 z.string.uk.modal_new_device_headline_you = '%@.name почав(-ла) використовувати новий пристрій'
 z.string.uk.modal_new_device_message = 'Все одно надіслати ваші повідомлення?'
+z.string.uk.modal_new_device_call_accept = 'Прийняти виклик'
+z.string.uk.modal_new_device_call_anyway = 'Подзвонити все-одно'
+z.string.uk.modal_new_device_call_incoming = 'Ви все ще хочете прийняти дзвінок?'
+z.string.uk.modal_new_device_call_outgoing = 'Ви все ще хочете здійснити дзвінок?'
 z.string.uk.modal_new_device_show_device = 'Показати пристрій'
 z.string.uk.modal_new_device_send_anyway = 'Все одно надіслати'
 # Remove device
@@ -283,6 +287,8 @@ z.string.uk.collection_section_files = 'Файли'
 z.string.uk.collection_section_audio = 'Аудіоповідомлення'
 
 # Full Search
+z.string.uk.fullsearch_placeholder = 'Шукайте текстові повідомлення'
+z.string.uk.fullsearch_no_results = 'Нічого не знайдено.'
 
 # Archive
 z.string.uk.archive_header = 'Архівувати'
