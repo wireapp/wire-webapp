@@ -201,7 +201,7 @@ class z.conversation.ConversationRepository
     conversation_et.is_pending true
 
     first_message = conversation_et.get_first_message()
-    upper_bound = if first_message then new Date first_message.timestamp else new Date()
+    upper_bound = if first_message then new Date first_message.timestamp() else new Date()
 
     @conversation_service.load_preceding_events_from_db conversation_et.id, new Date(0), upper_bound, z.config.MESSAGES_FETCH_LIMIT
     .then (events) =>
@@ -219,7 +219,7 @@ class z.conversation.ConversationRepository
   @return [Promise]
   ###
   get_messages_with_offset: (conversation_et, message_et, padding = 15) ->
-    message_date = new Date message_et.timestamp
+    message_date = new Date message_et.timestamp()
     conversation_et.is_pending true
     Promise.all([
       @conversation_service.load_preceding_events_from_db(conversation_et.id, new Date(0), message_date, padding)
@@ -239,7 +239,7 @@ class z.conversation.ConversationRepository
   @return [Promise]
   ###
   get_subsequent_messages: (conversation_et, message_et, include_message) ->
-    message_date = new Date message_et.timestamp
+    message_date = new Date message_et.timestamp()
     conversation_et.is_pending true
     @conversation_service.load_subsequent_events_from_db conversation_et.id, message_date, z.config.MESSAGES_FETCH_LIMIT, include_message
     .then (events) =>
@@ -283,7 +283,7 @@ class z.conversation.ConversationRepository
   ###
   _get_unread_events: (conversation_et) ->
     first_message = conversation_et.get_first_message()
-    upper_bound = if first_message then new Date first_message.timestamp else new Date()
+    upper_bound = if first_message then new Date first_message.timestamp() else new Date()
     lower_bound = new Date conversation_et.last_read_timestamp()
     return if lower_bound >= upper_bound
 
@@ -397,6 +397,20 @@ class z.conversation.ConversationRepository
     return @conversations_unarchived()?[0]
 
   ###
+  Returns a list of sorted conversation ids based on the number of messages in the last 30 days.
+  @param limit [Number]
+  @return [Array] conversation entities
+  ###
+  get_most_active_conversations: (limit) ->
+    return @conversation_service.get_active_conversations_from_db()
+    .then (conversation_ids) =>
+      return conversation_ids.map (conversation_id) => @find_conversation_by_id conversation_id
+    .then (conversation_ets) ->
+      if limit
+        return conversation_ets.splice 0, limit
+      return conversation_ets
+
+  ###
   Get conversation with a user.
   @param user_et [z.entity.User] User entity for whom to get the conversation
   @return [z.entity.Conversation] Conversation with requested user
@@ -434,7 +448,7 @@ class z.conversation.ConversationRepository
       @get_conversation_by_id conversation_id, (conversation_et) =>
         @get_message_in_conversation_by_id conversation_et, message_id
         .then (message_et) ->
-          resolve conversation_et.last_read_timestamp() >= message_et.timestamp
+          resolve conversation_et.last_read_timestamp() >= message_et.timestamp()
         .catch (error) ->
           if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
             resolve true
@@ -820,7 +834,7 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation to update
   ###
   _update_last_read_timestamp: (conversation_et) ->
-    timestamp = conversation_et.get_last_message()?.timestamp
+    timestamp = conversation_et.get_last_message()?.timestamp()
     return if not timestamp?
 
     if conversation_et.set_timestamp timestamp, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
@@ -926,11 +940,13 @@ class z.conversation.ConversationRepository
   @param message_id [String] Message ID of the message to generate a preview for
   ###
   send_asset_preview: (conversation_et, file, message_id) =>
+    image = null
     poster(file).then (img_blob) =>
-      @asset_service.upload_image_asset img_blob
+      image = img_blob
+      @asset_service.upload_asset img_blob
     .then (uploaded_image_asset) =>
       asset = new z.proto.Asset()
-      asset.set 'preview', new z.proto.Asset.Preview uploaded_image_asset.original.mime_type, uploaded_image_asset.original.size, uploaded_image_asset.uploaded
+      asset.set 'preview', new z.proto.Asset.Preview image.type, image.size, uploaded_image_asset.uploaded
       generic_message = new z.proto.GenericMessage message_id
       generic_message.set 'asset', asset
       @_send_and_inject_generic_message conversation_et, generic_message
@@ -991,7 +1007,7 @@ class z.conversation.ConversationRepository
       optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
       @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
       .then (mapped_event) =>
-        @cryptography_repository.save_unencrypted_event mapped_event
+        @conversation_service.save_event mapped_event
       .then (saved_event) =>
         @on_conversation_event saved_event
 
@@ -1107,7 +1123,7 @@ class z.conversation.ConversationRepository
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'edited', new z.proto.MessageEdit original_message_et.id, new z.proto.Text message
 
-    @_send_and_inject_generic_message conversation_et, generic_message
+    @_send_and_inject_generic_message conversation_et, generic_message, false
     .then =>
       @_track_edit_message conversation_et, original_message_et
       @send_link_preview message, conversation_et, generic_message
@@ -1272,7 +1288,7 @@ class z.conversation.ConversationRepository
   # Send Generic Messages
   ###############################################################################
 
-  _send_and_inject_generic_message: (conversation_et, generic_message) =>
+  _send_and_inject_generic_message: (conversation_et, generic_message, sync_timestamp = true) =>
     Promise.resolve()
     .then =>
       if conversation_et.removed_from_conversation()
@@ -1281,15 +1297,16 @@ class z.conversation.ConversationRepository
       return @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
     .then (mapped_event) =>
       if mapped_event.type in z.event.EventTypeHandling.STORE
-        return @cryptography_repository.save_unencrypted_event mapped_event
+        return @conversation_service.save_event mapped_event
       return mapped_event
     .then (saved_event) =>
       @on_conversation_event saved_event
       @sending_queue.push =>
         @_send_generic_message conversation_et.id, generic_message
-      .then =>
+      .then (payload) =>
         if saved_event.type in z.event.EventTypeHandling.STORE
-          @_update_message_sent_status conversation_et, saved_event.id
+          backend_timestamp = if sync_timestamp then payload.time else undefined
+          @_update_message_sent_status conversation_et, saved_event.id, backend_timestamp
         @_track_completed_media_action conversation_et, generic_message
       .then ->
         return saved_event
@@ -1298,13 +1315,21 @@ class z.conversation.ConversationRepository
   Update message as sent in db and view
   @param conversation_et [z.entity.Conversation]
   @param message_id [String]
+  @param event_time [Number|undefined] if defined it will update event timestamp
   @return [Promise]
   ###
-  _update_message_sent_status: (conversation_et, message_id) =>
+  _update_message_sent_status: (conversation_et, message_id, event_time) =>
     @get_message_in_conversation_by_id conversation_et, message_id
     .then (message_et) =>
-      changes = status: z.message.StatusType.SENT
+      changes = {}
+
       message_et.status z.message.StatusType.SENT
+      changes.status = z.message.StatusType.SENT
+
+      if event_time
+        message_et.timestamp new Date(event_time).getTime()
+        changes.time = event_time
+
       @conversation_service.update_message_in_db message_et, changes
 
   ###
@@ -1413,29 +1438,34 @@ class z.conversation.ConversationRepository
           @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
           return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
 
-  _grant_outgoing_message: (conversation_et, generic_message, user_ids) =>
+  _grant_outgoing_message: (conversation_et, generic_message, user_ids) ->
+    return Promise.resolve() if generic_message.content in ['cleared', 'confirmation', 'deleted', 'lastRead']
+    consent_type = if generic_message.content is 'calling' then z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL else z.ViewModel.MODAL_CONSENT_TYPE.MESSAGE
+    return @grant_message conversation_et, consent_type, user_ids
+
+  grant_message: (conversation_et, consent_type, user_ids) =>
+    return Promise.resolve() if conversation_et.verification_state() is z.conversation.ConversationVerificationState.UNVERIFIED
     return new Promise (resolve, reject) =>
-      if conversation_et.verification_state() is z.conversation.ConversationVerificationState.UNVERIFIED
-        resolve()
-      else if generic_message.content in ['cleared', 'confirmation', 'lastRead']
-        resolve()
-      else
-        send_anyway = false
+      send_anyway = false
 
-        if not user_ids
-          users_with_unverified_clients = conversation_et.get_users_with_unverified_clients()
-          user_ids = users_with_unverified_clients.map (user_et) -> user_et.id
+      if not user_ids
+        users_with_unverified_clients = conversation_et.get_users_with_unverified_clients()
+        user_ids = users_with_unverified_clients.map (user_et) -> user_et.id
 
-        @user_repository.get_users_by_id user_ids, (user_ets) ->
-          amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
-            data: user_ets
-            action: ->
-              send_anyway = true
-              conversation_et.verification_state z.conversation.ConversationVerificationState.UNVERIFIED
-              resolve()
-            close: ->
-              if not send_anyway
-                reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
+      @user_repository.get_users_by_id user_ids, (user_ets) ->
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
+          data:
+            consent_type: consent_type
+            user_ets: user_ets
+          action: ->
+            send_anyway = true
+            conversation_et.verification_state z.conversation.ConversationVerificationState.UNVERIFIED
+            amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id if consent_type is z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL
+            resolve()
+          close: ->
+            if not send_anyway
+              amplify.publish z.event.WebApp.CALL.STATE.DELETE, conversation_et.id if consent_type is z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL
+              reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   ###
   Sends an OTR asset to a conversation.
@@ -2397,7 +2427,7 @@ class z.conversation.ConversationRepository
         deleted_time: time
       type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
       from: message_to_delete_et.from
-      time: new Date(message_to_delete_et.timestamp).toISOString()
+      time: new Date(message_to_delete_et.timestamp()).toISOString()
 
 
   ###############################################################################
@@ -2464,14 +2494,14 @@ class z.conversation.ConversationRepository
     .then (original_message_et) =>
       if event_json.from isnt original_message_et.from
         throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.WRONG_USER
-      if not original_message_et.timestamp
+      if not original_message_et.timestamp()
         throw new TypeError 'Missing timestamp'
 
       event_json.edited_time = event_json.time
-      event_json.time = new Date(original_message_et.timestamp).toISOString()
+      event_json.time = new Date(original_message_et.timestamp()).toISOString()
       @_delete_message_by_id conversation_et, event_json.id
       @_delete_message_by_id conversation_et, event_json.data.replacing_message_id
-      @cryptography_repository.save_unencrypted_event event_json
+      @conversation_service.save_event event_json
       return event_json
 
   ###
@@ -2586,7 +2616,7 @@ class z.conversation.ConversationRepository
   @param method [z.tracking.attribute.DeleteType]
   ###
   _track_delete_message: (conversation, message_et, method) ->
-    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
+    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp()) / 1000
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.DELETED_MESSAGE,
       conversation_type: z.tracking.helpers.get_conversation_type conversation
       method: method
@@ -2600,7 +2630,7 @@ class z.conversation.ConversationRepository
   @param message_et [z.entity.Message]
   ###
   _track_edit_message: (conversation, message_et) ->
-    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp) / 1000
+    seconds_since_message_creation = Math.round (Date.now() - message_et.timestamp()) / 1000
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.EDITED_MESSAGE,
       conversation_type: z.tracking.helpers.get_conversation_type conversation
       time_elapsed: z.util.bucket_values seconds_since_message_creation, [0, 60, 300, 600, 1800, 3600, 86400]

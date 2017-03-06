@@ -43,11 +43,15 @@ class z.user.UserRepository
     @connections = ko.observableArray []
 
     @connect_requests = ko.pureComputed =>
-      user_ets = []
-      for user_et in @users()
-        user_ets.push user_et if user_et.connection().status() is z.user.ConnectionStatus.PENDING
-      return user_ets
+      return (user_et for user_et in @users() when user_et.connection().status() is z.user.ConnectionStatus.PENDING)
     .extend rateLimit: 50
+
+    @connected_users = ko.pureComputed =>
+      return (user_et for user_et in @users() when user_et.connection().status() is z.user.ConnectionStatus.ACCEPTED)
+    .extend rateLimit: 1000
+
+    @connected_users.subscribe (user_ets) ->
+      amplify.publish z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, z.tracking.CustomDimension.CONTACTS, user_ets.length
 
     amplify.subscribe z.event.Backend.USER.CONNECTION, @user_connection
     amplify.subscribe z.event.Backend.USER.UPDATE, @user_update

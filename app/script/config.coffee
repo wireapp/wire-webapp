@@ -41,9 +41,6 @@ z.config =
   # number of users displayed in people you may know
   SUGGESTIONS_FETCH_LIMIT: 30
 
-  # number of top people displayed in the start ui
-  TOP_PEOPLE_FETCH_LIMIT: 24
-
   #Accent color IDs
   ACCENT_ID:
     BLUE: 1
@@ -90,6 +87,8 @@ z.config =
     'image/bmp',
     'image/gif'
   ]
+
+  LOCALYTICS_SESSION_TIMEOUT: 3 * 60 * 1000 # 3 minutes in milliseconds
 
   MINIMUM_USERNAME_LENGTH: 2
   MINIMUM_PASSWORD_LENGTH: 8

@@ -211,7 +211,7 @@ class z.ViewModel.list.StartUIViewModel
     @search_repository.show_onboarding response
     .then (matched_user_ets) =>
       @suggestions matched_user_ets
-      return @search_repository.get_top_people()
+      return @get_top_people()
     .then (user_ets) =>
       @top_users user_ets
       @selected_people.removeAll()
@@ -223,12 +223,15 @@ class z.ViewModel.list.StartUIViewModel
     .catch (error) =>
       @logger.error "Could not show the on-boarding results: #{error.message}", error
 
+  get_top_people: =>
+    @conversation_repository.get_most_active_conversations 9
+    .then (conversation_ets) ->
+      return conversation_ets
+      .filter (conversation_et) -> conversation_et.is_one2one()
+      .map (conversation_et) -> conversation_et.participating_user_ets()[0]
+
   update_list: =>
-    @search_repository.get_top_people()
-    .then (user_ets) =>
-      @top_users user_ets if user_ets.length > 0
-    .catch (error) =>
-      @logger.error "Could not update the top people: #{error.message}", error
+    @get_top_people().then (user_ets) => @top_users user_ets
 
     @show_spinner false
 
