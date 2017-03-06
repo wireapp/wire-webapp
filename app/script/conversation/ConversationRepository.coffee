@@ -1415,26 +1415,25 @@ class z.conversation.ConversationRepository
   _send_encrypted_message: (conversation_id, generic_message, payload, precondition_option = false) =>
     @logger.info "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
     conversation_et = @find_conversation_by_id conversation_id
-    return Promise.resolve()
-      .then =>
-        return @_grant_outgoing_message conversation_et, generic_message
-      .then =>
-        return @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
-      .then (response) =>
-        @_handle_client_mismatch conversation_id, response
-        return response
-      .catch (error) =>
-        updated_payload = undefined
 
-        throw error unless error.missing
+    return @_grant_outgoing_message conversation_et, generic_message
+    .then =>
+      return @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
+    .then (response) =>
+      @_handle_client_mismatch conversation_id, response
+      return response
+    .catch (error) =>
+      updated_payload = undefined
 
-        return @_handle_client_mismatch conversation_id, error, generic_message, payload
-        .then (payload_with_missing_clients) =>
-          updated_payload = payload_with_missing_clients
-          return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
-        .then =>
-          @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
-          return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
+      throw error unless error.missing
+
+      return @_handle_client_mismatch conversation_id, error, generic_message, payload
+      .then (payload_with_missing_clients) =>
+        updated_payload = payload_with_missing_clients
+        return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
+      .then =>
+        @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
+        return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
 
   _grant_outgoing_message: (conversation_et, generic_message, user_ids) ->
     return Promise.resolve() if generic_message.content in ['cleared', 'confirmation', 'deleted', 'lastRead']
@@ -1483,36 +1482,34 @@ class z.conversation.ConversationRepository
     skip_own_clients = generic_message.content is 'ephemeral'
     precondition_option = false
     image_payload = undefined
-
     conversation_et = @find_conversation_by_id conversation_id
-    return Promise.resolve()
-      .then =>
-        return @_grant_outgoing_message conversation_et, generic_message
-      .then =>
-        return @_create_user_client_map conversation_id, skip_own_clients
-      .then (user_client_map) =>
-        if skip_own_clients
-          precondition_option = Object.keys user_client_map
-        return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
-      .then (payload) =>
-        payload.inline = false
-        image_payload = payload
-        return @asset_service.post_asset_v2 conversation_id, image_payload, image_data, precondition_option, nonce
-      .then (response) =>
-        @_handle_client_mismatch conversation_id, response
-        return response
-      .catch (error) =>
-        updated_payload = undefined
 
-        throw error if not error.missing
+    return @_grant_outgoing_message conversation_et, generic_message
+    .then =>
+      return @_create_user_client_map conversation_id, skip_own_clients
+    .then (user_client_map) =>
+      if skip_own_clients
+        precondition_option = Object.keys user_client_map
+      return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+    .then (payload) =>
+      payload.inline = false
+      image_payload = payload
+      return @asset_service.post_asset_v2 conversation_id, image_payload, image_data, precondition_option, nonce
+    .then (response) =>
+      @_handle_client_mismatch conversation_id, response
+      return response
+    .catch (error) =>
+      updated_payload = undefined
 
-        return @_handle_client_mismatch conversation_id, error, generic_message, image_payload
-        .then (payload_with_missing_clients) =>
-          updated_payload = payload_with_missing_clients
-          return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
-        .then =>
-          @logger.log @logger.levels.INFO, "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
-          return @asset_service.post_asset_v2 conversation_id, updated_payload, image_data, true, nonce
+      throw error if not error.missing
+
+      return @_handle_client_mismatch conversation_id, error, generic_message, image_payload
+      .then (payload_with_missing_clients) =>
+        updated_payload = payload_with_missing_clients
+        return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
+      .then =>
+        @logger.log @logger.levels.INFO, "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
+        return @asset_service.post_asset_v2 conversation_id, updated_payload, image_data, true, nonce
 
   ###
   Estimate whether message should be send as type external.
