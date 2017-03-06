@@ -28,7 +28,7 @@ class z.ui.WindowHandler
     @width = 0
 
     @is_visible = true
-    @lost_focus_interval_time = (z.config.LOCALYTICS_SESSION_TIMEOUT / 3)
+    @lost_focus_interval_time = z.config.LOCALYTICS_SESSION_TIMEOUT / 3
     @lost_focus_interval = undefined
     @lost_focus_on = undefined
 
