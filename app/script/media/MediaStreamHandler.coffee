@@ -419,6 +419,7 @@ class z.media.MediaStreamHandler
   _replace_input_source_failure: (error, media_type) ->
     if media_type is z.media.MediaType.SCREEN
       if z.util.Environment.browser.firefox and error.type is z.media.MediaError::TYPE.MEDIA_STREAM_PERMISSION
+        # @deprecated Remove once we require Firefox 52 ESR
         @logger.warn 'We are not on the white list. Manually add the current domain to media.getusermedia.screensharing.allowed_domains on about:config'
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.WHITELIST_SCREENSHARING
       else
