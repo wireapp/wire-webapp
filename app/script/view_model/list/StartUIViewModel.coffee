@@ -102,7 +102,7 @@ class z.ViewModel.list.StartUIViewModel
              @search_results.contacts().length > 0 or
              @search_results.others().length > 0
 
-    @show_connections = ko.pureComputed => return @top_users().length > 9 and not @show_suggestions()
+    @show_connections = ko.pureComputed => return not @show_suggestions()
 
     @show_invite = ko.pureComputed =>
       no_top_people_and_suggestions = not @show_search_results() and not @show_top_people() and not @show_suggestions()
