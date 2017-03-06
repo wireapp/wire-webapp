@@ -425,12 +425,15 @@ class z.calling.entities.EFlow
         return @_set_send_sdp_timeout()
 
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' containing '#{ice_candidates}' ICE candidates for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
+      @should_send_local_sdp false
       e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @v3_call_center.create_setup_payload @local_sdp().sdp
       return @e_call_et.send_e_call_event e_call_message_et
       .then =>
-        @should_send_local_sdp true
         @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
         @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful", @local_sdp()
+      .catch (error) =>
+        @should_send_local_sdp true
+        throw error
 
   ###
   Clear the SDP send timeout.
