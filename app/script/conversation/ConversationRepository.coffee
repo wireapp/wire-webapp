@@ -1417,8 +1417,7 @@ class z.conversation.ConversationRepository
     conversation_et = @find_conversation_by_id conversation_id
     return Promise.resolve()
       .then =>
-        if conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
-          return @_grant_outgoing_message conversation_et, generic_message
+        return @_grant_outgoing_message conversation_et, generic_message
       .then =>
         return @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
       .then (response) =>
@@ -1443,7 +1442,9 @@ class z.conversation.ConversationRepository
     return @grant_message conversation_et, consent_type, user_ids
 
   grant_message: (conversation_et, consent_type, user_ids) =>
-    return Promise.resolve() if conversation_et.verification_state() is z.conversation.ConversationVerificationState.UNVERIFIED
+    if conversation_et.verification_state() isnt z.conversation.ConversationVerificationState.DEGRADED
+      return Promise.resolve()
+
     return new Promise (resolve, reject) =>
       send_anyway = false
 
@@ -1486,8 +1487,7 @@ class z.conversation.ConversationRepository
     conversation_et = @find_conversation_by_id conversation_id
     return Promise.resolve()
       .then =>
-        if conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
-          return @_grant_outgoing_message conversation_et, generic_message
+        return @_grant_outgoing_message conversation_et, generic_message
       .then =>
         return @_create_user_client_map conversation_id, skip_own_clients
       .then (user_client_map) =>
