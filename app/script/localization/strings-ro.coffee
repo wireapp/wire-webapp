@@ -190,6 +190,10 @@ z.string.ro.modal_new_device_headline = '%@.name a început să folosească un n
 z.string.ro.modal_new_device_headline_many = '%@.names au început să folosească dispozitive noi'
 z.string.ro.modal_new_device_headline_you = '%@.name a început să folosească un nou dispozitiv'
 z.string.ro.modal_new_device_message = 'Încă dorești să fie trimise mesajele?'
+z.string.ro.modal_new_device_call_accept = 'Acceptă apelul'
+z.string.ro.modal_new_device_call_anyway = 'Sună oricum'
+z.string.ro.modal_new_device_call_incoming = 'Încă mai dorești acest apel?'
+z.string.ro.modal_new_device_call_outgoing = 'Încă mai dorești să faci apelul?'
 z.string.ro.modal_new_device_show_device = 'arată dispozitivul'
 z.string.ro.modal_new_device_send_anyway = 'trimite oricum'
 # Remove device
@@ -283,6 +287,8 @@ z.string.ro.collection_section_files = 'Fișiere'
 z.string.ro.collection_section_audio = 'Mesaje audio'
 
 # Full Search
+z.string.ro.fullsearch_placeholder = 'Caută prin mesaje text'
+z.string.ro.fullsearch_no_results = 'Fără rezultate.'
 
 # Archive
 z.string.ro.archive_header = 'Arhivă'

@@ -190,6 +190,10 @@ z.string.pt.modal_new_device_headline = '%@.name começou a usar um novo disposi
 z.string.pt.modal_new_device_headline_many = '%@.name começou a usar novos dispositivos'
 z.string.pt.modal_new_device_headline_you = '%@.name começou a usar um novo dispositivo'
 z.string.pt.modal_new_device_message = 'Ainda quer enviar suas mensagens?'
+z.string.pt.modal_new_device_call_accept = 'Aceitar ligação'
+z.string.pt.modal_new_device_call_anyway = 'Ligar de qualquer maneira'
+z.string.pt.modal_new_device_call_incoming = 'Você ainda quer aceitar a ligação?'
+z.string.pt.modal_new_device_call_outgoing = 'Você ainda quer fazer a ligação?'
 z.string.pt.modal_new_device_show_device = 'mostrar dispositivo'
 z.string.pt.modal_new_device_send_anyway = 'enviar assim mesmo'
 # Remove device
@@ -283,6 +287,8 @@ z.string.pt.collection_section_files = 'Arquivos'
 z.string.pt.collection_section_audio = 'Mensagens de áudio'
 
 # Full Search
+z.string.pt.fullsearch_placeholder = 'Buscar mensagens de texto'
+z.string.pt.fullsearch_no_results = 'Sem resultados.'
 
 # Archive
 z.string.pt.archive_header = 'Arquivar'

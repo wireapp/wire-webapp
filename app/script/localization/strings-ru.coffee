@@ -190,6 +190,10 @@ z.string.ru.modal_new_device_headline = '%@.name начал(а) использо
 z.string.ru.modal_new_device_headline_many = '%@.names начали использовать новые устройства'
 z.string.ru.modal_new_device_headline_you = '%@.name начал(а) использовать новое устройство'
 z.string.ru.modal_new_device_message = 'Вы всё ещё хотите отправить ваши сообщения?'
+z.string.ru.modal_new_device_call_accept = 'Принять вызов'
+z.string.ru.modal_new_device_call_anyway = 'Всё равно позвонить'
+z.string.ru.modal_new_device_call_incoming = 'Вы действительно хотите принять вызов?'
+z.string.ru.modal_new_device_call_outgoing = 'Вы действительно хотите позвонить?'
 z.string.ru.modal_new_device_show_device = 'показать устройство'
 z.string.ru.modal_new_device_send_anyway = 'отправить всё равно'
 # Remove device
@@ -221,7 +225,7 @@ z.string.ru.conversation_you_nominative = 'вы'
 z.string.ru.conversation_you_dative = 'вам'
 z.string.ru.conversation_you_accusative = 'вас'
 
-z.string.ru.conversation_connection_accepted = 'Подключен(а)'
+z.string.ru.conversation_connection_accepted = 'Добавлен(а) в список контактов'
 z.string.ru.conversation_connection_blocked = 'Заблокирован(а)'
 z.string.ru.conversation_connection_cancel_request = 'Отменить запрос'
 z.string.ru.conversation_create = ' начал(а) разговор с %@names'
@@ -283,6 +287,8 @@ z.string.ru.collection_section_files = 'Файлы'
 z.string.ru.collection_section_audio = 'Аудиосообщения'
 
 # Full Search
+z.string.ru.fullsearch_placeholder = 'Поиск в текстовых сообщениях'
+z.string.ru.fullsearch_no_results = 'Ничего не найдено.'
 
 # Archive
 z.string.ru.archive_header = 'Архив'
