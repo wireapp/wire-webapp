@@ -140,6 +140,16 @@ class z.storage.StorageService
         "#{@OBJECT_STORE_PREKEYS}": ''
         "#{@OBJECT_STORE_SESSIONS}": ''
 
+      version_13 =
+        "#{@OBJECT_STORE_AMPLIFY}": ''
+        "#{@OBJECT_STORE_CLIENTS}": ', meta.primary_key'
+        "#{@OBJECT_STORE_CONVERSATION_EVENTS}": null
+        "#{@OBJECT_STORE_CONVERSATIONS}": ', id, last_event_timestamp'
+        "#{@OBJECT_STORE_EVENTS}": '++primary_key, id, category, conversation, time, type, [conversation+time], [conversation+category]'
+        "#{@OBJECT_STORE_KEYS}": ''
+        "#{@OBJECT_STORE_PREKEYS}": ''
+        "#{@OBJECT_STORE_SESSIONS}": ''
+
       @db = new Dexie @db_name
 
       @db.on 'blocked', =>
@@ -214,8 +224,7 @@ class z.storage.StorageService
           transaction[@OBJECT_STORE_CONVERSATION_EVENTS].toCollection().toArray()
           .then (items) =>
             return @db[@OBJECT_STORE_EVENTS].bulkPut items
-          .then =>
-            return @db[@OBJECT_STORE_CONVERSATION_EVENTS].delete()
+      @db.version(14).stores version_13
 
       @db.open()
       .then =>

@@ -190,6 +190,10 @@ z.string.tr.modal_new_device_headline = '%@.name yeni bir cihaz kullanmaya başl
 z.string.tr.modal_new_device_headline_many = '%@.names yeni cihazlar kullanmaya başladılar'
 z.string.tr.modal_new_device_headline_you = '%@.name yeni bir cihaz kullanmaya başladı'
 z.string.tr.modal_new_device_message = 'Hâlâ mesajlarınızı göndermek istiyor musunuz?'
+z.string.tr.modal_new_device_call_accept = 'Aramayı kabul et'
+z.string.tr.modal_new_device_call_anyway = 'Yine de ara'
+z.string.tr.modal_new_device_call_incoming = 'Hala aramayı kabul etmek istiyor musunuz?'
+z.string.tr.modal_new_device_call_outgoing = 'Hala aramayı istiyor musunuz?'
 z.string.tr.modal_new_device_show_device = 'cihazı göster'
 z.string.tr.modal_new_device_send_anyway = 'yine de gönder'
 # Remove device
@@ -283,6 +287,8 @@ z.string.tr.collection_section_files = 'Dosyalar'
 z.string.tr.collection_section_audio = 'Sesli mesajlar'
 
 # Full Search
+z.string.tr.fullsearch_placeholder = 'Metin mesajlarında ara'
+z.string.tr.fullsearch_no_results = 'Sonuç yok.'
 
 # Archive
 z.string.tr.archive_header = 'Arşivle'
