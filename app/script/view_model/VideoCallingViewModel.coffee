@@ -86,7 +86,6 @@ class z.ViewModel.VideoCallingViewModel
       return @joined_call()? and @joined_call() instanceof z.calling.entities.ECall
 
     @show_switch_camera = ko.pureComputed =>
-      return false if @joined_v3_call()
       is_visible = @local_video_stream() and @available_devices.video_input().length > 1 and @self_stream_state.video_send()
       return @is_ongoing() and is_visible
     @show_switch_screen = ko.pureComputed =>

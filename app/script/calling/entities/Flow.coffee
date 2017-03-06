@@ -105,7 +105,7 @@ class z.calling.entities.Flow
           @participant_et.is_connected false
           @call_et.interrupted_participants.push @participant_et
           @is_answer false
-          @negotiation_mode z.calling.enum.SDPNegotiationMode.ICE_RESTART
+          @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART
 
         when z.calling.rtc.ICEConnectionState.FAILED
           @participant_et.is_connected false
@@ -132,9 +132,9 @@ class z.calling.entities.Flow
           @negotiation_needed true
 
         when z.calling.rtc.SignalingState.STABLE
-          @negotiation_mode z.calling.enum.SDPNegotiationMode.DEFAULT
+          @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
 
-    @negotiation_mode = ko.observable z.calling.enum.SDPNegotiationMode.DEFAULT
+    @negotiation_mode = ko.observable z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
     @negotiation_needed = ko.observable false
 
     @negotiation_mode.subscribe (negotiation_mode) =>
@@ -326,7 +326,7 @@ class z.calling.entities.Flow
     return {
       iceServers: @payload().ice_servers
       bundlePolicy: 'max-bundle'
-      rtcpMuxPolicy: 'require'
+      rtcpMuxPolicy: 'require' # @deprecated Default value beginning Chrome 57
     }
 
   ###
@@ -719,7 +719,7 @@ class z.calling.entities.Flow
     .then =>
       return @_remove_media_streams media_stream_info.type
     .then =>
-      @negotiation_mode z.calling.enum.SDPNegotiationMode.STREAM_CHANGE
+      @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE
       @_add_media_stream media_stream_info.stream
       @is_answer false
       @negotiation_needed true

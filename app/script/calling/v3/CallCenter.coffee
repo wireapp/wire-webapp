@@ -101,7 +101,7 @@ class z.calling.v3.CallCenter
     content = switch e_call_message.type
       when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
         props: e_call_message.props
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
         props: e_call_message.props
         sdp: e_call_message.sdp
 
@@ -126,6 +126,8 @@ class z.calling.v3.CallCenter
         @_on_e_call_prop_sync_event e_call_message_et
       when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
         @_on_e_call_setup_event e_call_message_et
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
+        @_on_e_call_update_event e_call_message_et
       else
         throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.UNKNOWN_EVENT_TYPE
 
@@ -233,6 +235,20 @@ class z.calling.v3.CallCenter
           @_create_incoming_e_call e_call_message_et
 
   ###
+  E-call setup event handling.
+  @private
+  @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+  ###
+  _on_e_call_update_event: (e_call_message_et) =>
+    @get_e_call_by_id e_call_message_et.conversation_id
+    .then (e_call_et) =>
+      @_verify_session_id e_call_et, e_call_message_et
+    .then (e_call_et) ->
+      return e_call_et.update_e_participant e_call_message_et
+    .catch (error) ->
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
+
+  ###
   Verify e-call message belongs to e-call by session id.
 
   @private
@@ -263,7 +279,7 @@ class z.calling.v3.CallCenter
 
     @get_e_call_by_id conversation_et.id
     .then (e_call_et) =>
-      if e_call_et.data_channel_opened
+      if e_call_et.data_channel_opened and e_call_message_et.type in [z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC]
         @logger.debug "Sending e-call event of type '#{e_call_message_et.type}' to conversation '#{conversation_et.id}' via data channel", e_call_message_et.to_JSON()
         return e_flow_et.send_message e_call_message_et.to_content_string() for e_flow_et in e_call_et.get_flows()
       throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED

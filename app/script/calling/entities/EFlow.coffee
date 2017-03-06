@@ -86,21 +86,21 @@ class z.calling.entities.EFlow
           @e_call_et.interrupted_participants.remove @participant_et
           @e_call_et.state z.calling.enum.CallState.ONGOING
 
+        when z.calling.rtc.ICEConnectionState.CLOSED
+          @e_participant_et.is_connected false
+          @e_call_et.delete_e_participant @e_participant_et if @e_call_et.self_client_joined()
+
         when z.calling.rtc.ICEConnectionState.DISCONNECTED
           @e_participant_et.is_connected false
-          @e_call_et.interrupted_participants.push @participant_et
-          @is_answer false
-          @negotiation_mode z.calling.enum.SDPNegotiationMode.ICE_RESTART
+          if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
+            @e_call_et.interrupted_participants.push @participant_et
+            @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART
 
         when z.calling.rtc.ICEConnectionState.FAILED
           @e_participant_et.is_connected false
           if @is_group()
             return @e_call_et.delete_e_participant @participant_et if @e_call_et.self_client_joined()
           amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id
-
-        when z.calling.rtc.ICEConnectionState.CLOSED
-          @e_participant_et.is_connected false
-          @e_call_et.delete_e_participant @e_participant_et if @e_call_et.self_client_joined()
 
     @signaling_state.subscribe (signaling_state) =>
       switch signaling_state
@@ -115,13 +115,10 @@ class z.calling.entities.EFlow
           @negotiation_needed true
 
         when z.calling.rtc.SignalingState.STABLE
-          @negotiation_mode z.calling.enum.SDPNegotiationMode.DEFAULT
+          @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
 
-    @negotiation_mode = ko.observable z.calling.enum.SDPNegotiationMode.DEFAULT
+    @negotiation_mode = ko.observable z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
     @negotiation_needed = ko.observable false
-
-    @negotiation_mode.subscribe (negotiation_mode) =>
-      @logger.debug "Negotiation mode changed: #{negotiation_mode}"
 
 
     ###############################################################################
@@ -232,6 +229,14 @@ class z.calling.entities.EFlow
     @negotiation_needed true
     @pc_initialized true
 
+  restart_negotiation: (negotiation_mode) =>
+    @logger.debug "Negotiation restart triggered by '#{negotiation_mode}'"
+    @negotiation_mode negotiation_mode
+    @is_answer false
+    @remote_sdp undefined
+    @_set_sdp_states()
+    @negotiation_needed true
+
   _set_sdp_states: ->
     @should_set_remote_sdp true
     @should_set_local_sdp true
@@ -261,7 +266,7 @@ class z.calling.entities.EFlow
     return {
       iceServers: @e_call_et.config().ice_servers
       bundlePolicy: 'max-bundle'
-      rtcpMuxPolicy: 'require'
+      rtcpMuxPolicy: 'require' # @deprecated Default value beginning Chrome 57
     }
 
   ###
@@ -398,13 +403,18 @@ class z.calling.entities.EFlow
   @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
   save_remote_sdp: (e_call_message_et) =>
-    z.calling.mapper.SDPMapper.rewrite_sdp @_map_sdp(e_call_message_et), z.calling.enum.SDPSource.REMOTE, @
+    z.calling.mapper.SDPMapper.map_e_call_message_to_object e_call_message_et
+    .then (rtc_sdp) =>
+      return z.calling.mapper.SDPMapper.rewrite_sdp rtc_sdp, z.calling.enum.SDPSource.REMOTE, @
     .then ([ice_candidates, remote_sdp]) =>
       @remote_sdp remote_sdp
       @logger.info "Saved remote SDP of type '#{@remote_sdp().type}'", @remote_sdp()
-    .then =>
-      if @remote_sdp().type is z.calling.rtc.SDPType.OFFER and @signaling_state() is z.calling.rtc.SignalingState.LOCAL_OFFER
+
+      return unless @remote_sdp().type is z.calling.rtc.SDPType.OFFER
+      if @signaling_state() is z.calling.rtc.SignalingState.LOCAL_OFFER
         @_solve_colliding_states()
+      else if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
+        @negotiation_needed true
 
   # Initiates sending the local RTCSessionDescriptionProtocol to the remote user.
   send_local_sdp: =>
@@ -419,7 +429,12 @@ class z.calling.entities.EFlow
 
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' containing '#{ice_candidates}' ICE candidates for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
       @should_send_local_sdp false
-      e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @v3_call_center.create_setup_payload @local_sdp().sdp
+
+      if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
+        e_call_message_et_type = z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+      else
+        e_call_message_et_type = z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
+      e_call_message_et = new z.calling.entities.ECallMessage e_call_message_et_type, @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @v3_call_center.create_setup_payload @local_sdp().sdp
       return @e_call_et.send_e_call_event e_call_message_et
       .then =>
         @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
@@ -477,15 +492,6 @@ class z.calling.entities.EFlow
     .then ([ice_candidates, local_sdp]) =>
       @local_sdp local_sdp
 
-  ###
-  Map e-call setup message to RTCSessionDescription.
-  @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
-  @return [RTCSessionDescription] webRTC standard compliant RTCSessionDescription
-  ###
-  _map_sdp: (e_call_message_et) ->
-    return new window.RTCSessionDescription
-      sdp: e_call_message_et.sdp
-      type: if e_call_message_et.response is true then z.calling.rtc.SDPType.ANSWER else z.calling.rtc.SDPType.OFFER
 
   ###
   Sets the local Session Description Protocol on the PeerConnection.
@@ -616,13 +622,9 @@ class z.calling.entities.EFlow
     .then =>
       return @_remove_media_streams media_stream_info.type
     .then =>
-      @negotiation_mode z.calling.enum.SDPNegotiationMode.STREAM_CHANGE
       @_add_media_stream media_stream_info.stream
-      @is_answer false
-      @remote_sdp undefined
-      @_set_sdp_states()
-      @negotiation_needed true
       @logger.info 'Replaced the MediaStream successfully', media_stream_info.stream
+      @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE
       return media_stream_info
     .catch (error) =>
       @logger.error "Failed to replace local MediaStream: #{error.message}", error

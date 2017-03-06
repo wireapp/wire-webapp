@@ -28,6 +28,16 @@ z.calling.mapper.SDPMapper =
   get_tool_version: (sdp_string) ->
     return sdp_line.replace 'a=tool:', '' for sdp_line in sdp_string.split '\r\n' when sdp_line.startsWith 'a=tool'
 
+  ###
+  Map e-call setup message to RTCSessionDescription.
+  @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+  @return [RTCSessionDescription] webRTC standard compliant RTCSessionDescription
+  ###
+  map_e_call_message_to_object: (e_call_message_et) ->
+    return Promise.resolve new window.RTCSessionDescription
+      sdp: e_call_message_et.sdp
+      type: if e_call_message_et.response is true then z.calling.rtc.SDPType.ANSWER else z.calling.rtc.SDPType.OFFER
+
   map_event_to_object: (event) ->
     _convert_fingerprint_to_uppercase = (sdp_string) ->
       sdp_lines = sdp_string.split '\r\n'
@@ -63,7 +73,7 @@ z.calling.mapper.SDPMapper =
       outline = sdp_line
 
       if sdp_line.startsWith 't='
-        if sdp_source is z.calling.enum.SDPSource.LOCAL and not z.util.Environment.frontend.is_localhost()
+        if sdp_source is z.calling.enum.SDPSource.LOCAL
           sdp_lines.push sdp_line
           browser_string = "#{z.util.Environment.browser.name} #{z.util.Environment.browser.version}"
           if z.util.Environment.electron
@@ -75,22 +85,22 @@ z.calling.mapper.SDPMapper =
         ice_candidates.push sdp_line
 
       else if sdp_line.startsWith 'a=group'
-        if flow_et.negotiation_mode() is z.calling.enum.SDPNegotiationMode.STREAM_CHANGE and sdp_source is z.calling.enum.SDPSource.LOCAL
+        if flow_et.negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE and sdp_source is z.calling.enum.SDPSource.LOCAL
           sdp_lines.push 'a=x-streamchange'
 
-      # Remove once obsolete due to high uptake of AVS build containing fix for AUDIO-1215
+      # Remove once obsolete due to high uptake of clients based on AVS build 3.3.11 containing fix for AUDIO-1215
       else if sdp_line.startsWith 'a=mid'
         if z.util.Environment.browser.firefox and sdp_source is z.calling.enum.SDPSource.REMOTE
           outline = 'a=mid:sdparta_2' if sdp_line is 'a=mid:data'
 
       # Code to nail in bit-rate and ptime settings for improved performance and experience
       else if sdp_line.startsWith 'm=audio'
-        if flow_et.negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and flow_et.is_group())
+        if flow_et.negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and flow_et.is_group())
           sdp_lines.push sdp_line
           outline = "b=AS:#{SDP_MAPPER_CONFIG.AUDIO_BITRATE}"
 
       else if sdp_line.startsWith 'a=rtpmap'
-        if flow_et.negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and flow_et.is_group())
+        if flow_et.negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and flow_et.is_group())
           if z.util.StringUtil.includes sdp_line, 'opus'
             sdp_lines.push sdp_line
             outline = "a=ptime:#{SDP_MAPPER_CONFIG.AUDIO_PTIME}"
