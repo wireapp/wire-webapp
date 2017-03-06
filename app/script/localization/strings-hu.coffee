@@ -187,9 +187,11 @@ z.string.hu.modal_logout_message = 'Törli az összes személyes adatait és bes
 z.string.hu.modal_logout_button = 'Kijelentkezés'
 # New device
 z.string.hu.modal_new_device_headline = '"%@.name elkezdett használni egy új eszközt'
-z.string.hu.modal_new_device_headline_many = '%@.names elkezdtek használni egy új eszközt'
+z.string.hu.modal_new_device_headline_many = '%@.names elkezdtek használni új eszközöket'
 z.string.hu.modal_new_device_headline_you = '"%@.name elkezdett használni egy új eszközt'
 z.string.hu.modal_new_device_message = 'Még mindig elszeretnéd küldeni az üzeneteidet?'
+z.string.hu.modal_new_device_call_accept = 'Hívás fogadása'
+z.string.hu.modal_new_device_call_incoming = 'Még mindig fogadni akarja a hívást?'
 z.string.hu.modal_new_device_show_device = 'eszköz megjelenítése'
 z.string.hu.modal_new_device_send_anyway = 'küldés mindenképpen'
 # Remove device
@@ -276,13 +278,15 @@ z.string.hu.conversation_likes_caption = '%@number partner'
 z.string.hu.conversation_send_pasted_file = 'A kép ekkor lett beillesztve: %date'
 
 # Collection
-z.string.hu.collection_show_all = 'Összes megjeleítése %no'
+z.string.hu.collection_show_all = 'Összes megjelenítése %no'
 z.string.hu.collection_section_links = 'Hivatkozások'
 z.string.hu.collection_section_images = 'Képek'
 z.string.hu.collection_section_files = 'Fájlok'
 z.string.hu.collection_section_audio = 'Hangüzenetek'
 
 # Full Search
+z.string.hu.fullsearch_placeholder = 'Szöveges üzenetek keresése'
+z.string.hu.fullsearch_no_results = 'Nincs találat.'
 
 # Archive
 z.string.hu.archive_header = 'Archiválás'

@@ -265,6 +265,8 @@ z.string.hr.conversation_send_pasted_file = 'Slika zaljepljena na %date'
 
 # Collection
 
+# Full Search
+
 # Archive
 z.string.hr.archive_header = 'Arhiviraj'
 
