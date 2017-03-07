@@ -151,3 +151,23 @@ class z.conversation.ConversationMapper
       conversation_et.participating_user_ids participating_user_ids
 
     return conversation_et
+
+  ###
+  Merge local database records with remote backend payload.
+  @param local [Array] database records
+  @param remote [Array] backend payload
+  ###
+  merge_conversations: (local, remote) ->
+    return remote.map (remote_conversation) ->
+      local_conversation = local.find (c) -> c.id is remote_conversation.id
+      local_conversation ?= id: remote_conversation.id
+      local_conversation.last_event_timestamp ?= new Date(0).toISOString()
+      local_conversation.name = remote_conversation.name
+      local_conversation.type = remote_conversation.type
+      local_conversation.creator = remote_conversation.creator
+      local_conversation.status = remote_conversation.members.self.status
+      local_conversation.others = remote_conversation.members.others
+      .filter (other) -> other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
+      .map (other) -> other.id
+
+      return local_conversation

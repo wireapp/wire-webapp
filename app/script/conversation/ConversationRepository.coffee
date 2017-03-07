@@ -160,7 +160,7 @@ class z.conversation.ConversationRepository
       if is_update_needed
         return @conversation_service.get_all_conversations()
         .then (remote_conversations) =>
-          @conversation_service.merge_conversations local_conversations, remote_conversations
+          @conversation_mapper.merge_conversations local_conversations, remote_conversations
         .then (merged_conversations) =>
           @conversation_service.save_conversations_in_db merged_conversations
       else
