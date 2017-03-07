@@ -13,7 +13,6 @@
     "marked": "https://github.com/wireapp/marked.git#3fb540777bd042e7284d0a960729169d9efee508",
     "moment": "https://github.com/moment/moment.git#2.16.0",
     "normalize-css": "https://github.com/necolas/normalize.css.git#3.0.3",
-    "object-hash": "https://github.com/puleos/object-hash.git#1.1.5",
     "pako": "https://github.com/nodeca/pako.git#1.0.3",
     "phone-format": "https://github.com/albeebe/phoneformat.js.git#1.0.3",
     "platform.js": "https://github.com/bestiejs/platform.js.git#1.3.3",
@@ -90,9 +89,6 @@
     },
     "normalize-css": {
       "css": "normalize.css"
-    },
-    "object-hash": {
-      "js": "dist/object_hash.js"
     },
     "pako": {
       "js": "dist/pako.min.js"

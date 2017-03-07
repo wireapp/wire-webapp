@@ -219,21 +219,6 @@ class z.tracking.EventTrackingRepository
           rejected_promise.catch (error) => @logger.log @logger.levels.OFF, 'Handled uncaught Promise in error reporting', error
         , 0
 
-  ###
-  Checks if a Raygun payload has been already reported.
-
-  @see https://github.com/MindscapeHQ/raygun4js#onbeforesend
-  @param [JSON] raygun_payload
-  @return [JSON|Boolean] Returns the original payload if it is an unreported error, otherwise "false".
-  ###
-  _check_error_payload: (raygun_payload) =>
-    error_hash = objectHash.sha1 raygun_payload.Details.Error
-    if @reported_errors().includes error_hash
-      return false
-    else
-      @reported_errors.push error_hash
-    return raygun_payload
-
   _detach_promise_rejection_handler: ->
     window.onunhandledrejection = undefined
 
