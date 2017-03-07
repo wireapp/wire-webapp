@@ -95,18 +95,18 @@ class z.calling.entities.EFlow
         when z.calling.rtc.ICEConnectionState.FAILED
           @e_participant_et.is_connected false
           if @is_group()
-            return @e_call_et.delete_participant @participant_et if @e_call_et.self_client_joined()
+            return @e_call_et.delete_e_participant @participant_et if @e_call_et.self_client_joined()
           amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id
 
         when z.calling.rtc.ICEConnectionState.CLOSED
           @e_participant_et.is_connected false
-          @e_call_et.delete_participant @e_participant_et if @e_call_et.self_client_joined()
+          @e_call_et.delete_e_participant @e_participant_et if @e_call_et.self_client_joined()
 
     @signaling_state.subscribe (signaling_state) =>
       switch signaling_state
         when z.calling.rtc.SignalingState.CLOSED
           @logger.debug "PeerConnection with '#{@remote_user.name()}' was closed"
-          @e_call_et.delete_participant @e_participant_et
+          @e_call_et.delete_e_participant @e_participant_et
           @_remove_media_streams()
           unless @is_group()
             @e_call_et.finished_reason = z.calling.enum.CALL_FINISHED_REASON.CONNECTION_DROPPED
