@@ -105,9 +105,9 @@ class z.ViewModel.list.StartUIViewModel
     @show_connections = ko.pureComputed => return not @show_suggestions()
 
     @show_invite = ko.pureComputed =>
-      no_top_people_and_suggestions = not @show_search_results() and not @show_top_people() and not @show_suggestions()
+      no_connections_and_suggestions = not @show_search_results() and @connections().length is 0 and not @show_suggestions()
       no_search_results = @show_search_results() and not @has_results() and not @is_searching()
-      return no_top_people_and_suggestions or no_search_results
+      return no_connections_and_suggestions or no_search_results
 
     @show_suggestions = ko.pureComputed => return !!@suggestions().length
 
