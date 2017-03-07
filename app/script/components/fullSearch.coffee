@@ -46,7 +46,7 @@ class z.components.FullSearchViewModel
         return
 
       @search_provider(query).then ([message_ets, query]) =>
-        return if query isnt @input()
+        return if query isnt @input().trim()
         @on_result() if message_ets.length > 0
         @show_no_results_text message_ets.length is 0
         @message_ets = message_ets
