@@ -645,6 +645,7 @@ class z.calling.entities.EFlow
     .then =>
       if @peer_connection.getSenders
         for rtp_sender in @peer_connection.getSenders() when rtp_sender.track.kind is media_stream_info.type
+          throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED unless rtp_sender.replaceTrack
           return rtp_sender
         throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK
       throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
