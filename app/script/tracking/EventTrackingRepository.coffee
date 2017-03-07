@@ -251,5 +251,4 @@ class z.tracking.EventTrackingRepository
     ###
     Raygun.setVersion z.util.Environment.version false if not z.util.Environment.frontend.is_localhost()
     Raygun.withCustomData {electron_version: z.util.Environment.version true} if z.util.Environment.electron
-    Raygun.onBeforeSend @_check_error_payload
     @_attach_promise_rejection_handler()
