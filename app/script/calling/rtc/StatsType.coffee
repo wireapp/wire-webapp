@@ -22,8 +22,8 @@ z.calling.rtc ?= {}
 
 # http://www.w3.org/TR/webrtc/#idl-def-RTCStats
 z.calling.rtc.StatsType =
-  CANDIDATE_PAIR: 'candidatepair'
+  CANDIDATE_PAIR: 'candidate-pair'
   GOOGLE_CANDIDATE_PAIR: 'googCandidatePair'
-  INBOUND_RTP: 'inboundrtp'
-  OUTBOUND_RTP: 'outboundrtp'
+  INBOUND_RTP: 'inbound-rtp'
+  OUTBOUND_RTP: 'outbound-rtp'
   SSRC: 'ssrc'
