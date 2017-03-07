@@ -17,12 +17,13 @@
 #
 
 window.z ?= {}
-z.user ?= {}
+z.tracking ?= {}
 
-# Enum of different connection levels.
-z.user.ConnectionLevel =
-  UNKNOWN: -1
-  NO_CONNECTION: 0
-  KNOWN_CONTACT: 1
-  FRIEND_OF_FRIEND: 2
-  FRIEND_OF_FRIEND_OF_FRIEND: 3
+###
+@note Custom Dimensions for Localytics have to be created server side and are
+  identified by the index found in the settings of Desktop and Desktop staging projects
+@see https://dashboard.localytics.com/settings/apps?org_id=1145
+###
+z.tracking.CustomDimension =
+  APP: 0
+  CONTACTS: 1

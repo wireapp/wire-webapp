@@ -41,28 +41,25 @@ describe 'z.tracking.EventTrackingRepository', ->
     event_name = undefined
 
     beforeEach ->
-      amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, tracking_repository.track_event
+      tracking_repository.tag_event = jasmine.createSpy()
+      amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, tracking_repository.tag_event
 
     afterEach ->
       amplify.unsubscribeAll z.event.WebApp.ANALYTICS.EVENT
 
     it 'immediately reports events', ->
-      tracking_repository._tag_and_upload_event = jasmine.createSpy()
-
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, 'i_am_an_event'
-      expect(tracking_repository._tag_and_upload_event).toHaveBeenCalled()
-      expect(tracking_repository._tag_and_upload_event).toHaveBeenCalledTimes 1
+      expect(tracking_repository.tag_event).toHaveBeenCalled()
+      expect(tracking_repository.tag_event).toHaveBeenCalledTimes 1
 
     it 'allows additional parameters for events', ->
-      tracking_repository._tag_and_upload_event = jasmine.createSpy()
-
       event_name = 'ArticleView'
       attributes =
         'Page Name': 'Baseball-Headlines'
         'Section': 'Sports'
 
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name, attributes
-      expect(tracking_repository._tag_and_upload_event).toHaveBeenCalledWith event_name, attributes
+      expect(tracking_repository.tag_event).toHaveBeenCalledWith event_name, attributes
 
   describe 'Error Reporting', ->
     beforeAll ->

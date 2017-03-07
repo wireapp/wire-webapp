@@ -91,7 +91,7 @@ class z.main.App
 
     repository.client              = new z.client.ClientRepository @service.client, repository.cryptography
     repository.user                = new z.user.UserRepository @service.user, @service.asset, @service.search, repository.client, repository.cryptography
-    repository.event               = new z.event.EventRepository @service.web_socket, @service.notification, repository.cryptography, repository.user
+    repository.event               = new z.event.EventRepository @service.web_socket, @service.notification, repository.cryptography, repository.user, @service.conversation
     repository.search              = new z.search.SearchRepository @service.search, repository.user
     repository.properties          = new z.properties.PropertiesRepository @service.properties
     repository.connect             = new z.connect.ConnectRepository @service.connect, @service.connect_google, repository.properties
@@ -193,8 +193,6 @@ class z.main.App
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS, conversation_ets.length, 50
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS, connection_ets.length, 50
-
-      amplify.publish z.event.WebApp.ANALYTICS.DIMENSION, z.tracking.DimensionName.CONTACTS, connection_ets.length
 
       @repository.user.self().devices client_ets
       @repository.conversation.map_connections @repository.user.connections()
@@ -399,6 +397,7 @@ class z.main.App
     _logout = =>
       # Disconnect from our backend, end tracking and clear cached data
       @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.LOGOUT
+      amplify.publish z.event.WebApp.ANALYTICS.CLOSE_SESSION
 
       # Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       do_not_delete = [z.storage.StorageKey.AUTH.SHOW_LOGIN]

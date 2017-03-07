@@ -94,7 +94,7 @@ class z.entity.Conversation
     @ephemeral_timer = ko.observable false
 
     @messages_unordered = ko.observableArray()
-    @messages = ko.pureComputed => @messages_unordered().sort (a, b) -> a.timestamp - b.timestamp
+    @messages = ko.pureComputed => @messages_unordered().sort (a, b) -> a.timestamp() - b.timestamp()
     @messages.subscribe => @update_latest_from_message @get_last_message()
 
     @creation_message = undefined
@@ -129,7 +129,7 @@ class z.entity.Conversation
     @unread_events = ko.pureComputed =>
       unread_event = []
       for message_et in @messages() when message_et.visible() by -1
-        break if message_et.timestamp <= @last_read_timestamp()
+        break if message_et.timestamp() <= @last_read_timestamp()
         unread_event.push message_et
       return unread_event
 
@@ -384,7 +384,7 @@ class z.entity.Conversation
   ###
   update_latest_from_message: (message_et) ->
     if message_et? and message_et.visible() and message_et.should_effect_conversation_timestamp
-      @set_timestamp message_et.timestamp, z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
+      @set_timestamp message_et.timestamp(), z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
 
   ###
   Update last read if message sender is self
@@ -392,8 +392,8 @@ class z.entity.Conversation
   @param message_et [z.entity.Message]
   ###
   _update_last_read_from_message: (message_et) ->
-    if message_et.user()?.is_me and message_et.timestamp and message_et.should_effect_conversation_timestamp
-      @set_timestamp message_et.timestamp, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
+    if message_et.user()?.is_me and message_et.timestamp() and message_et.should_effect_conversation_timestamp
+      @set_timestamp message_et.timestamp(), z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
 
   ###############################################################################
   # Get messages

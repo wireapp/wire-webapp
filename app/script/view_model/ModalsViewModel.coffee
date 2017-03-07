@@ -45,6 +45,13 @@ z.ViewModel.ModalType =
   UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large'
   WHITELIST_SCREENSHARING: '.modal-whitelist-screensharing'
 
+
+z.ViewModel.MODAL_CONSENT_TYPE =
+  INCOMING_CALL: 'incoming_call'
+  MESSAGE: 'message'
+  OUTGOING_CALL: 'outgoing_call'
+
+
 class z.ViewModel.ModalsViewModel
   constructor: (element_id) ->
     @logger = new z.util.Logger 'z.ViewModel.ModalsViewModel', z.config.LOGGER.OPTIONS
@@ -66,6 +73,7 @@ class z.ViewModel.ModalsViewModel
   show_modal: (type, options = {}) =>
     message_element = $(type).find('.modal-text')
     title_element = $(type).find('.modal-title')
+    action_element = $(type).find('.modal-action')
     switch type
       when z.ViewModel.ModalType.BLOCK
         @_show_modal_block options.data, title_element, message_element
@@ -82,7 +90,7 @@ class z.ViewModel.ModalsViewModel
       when z.ViewModel.ModalType.LEAVE
         @_show_modal_leave options.data, title_element
       when z.ViewModel.ModalType.NEW_DEVICE
-        @_show_modal_new_device options.data, title_element
+        @_show_modal_new_device options.data, title_element, message_element, action_element
       when z.ViewModel.ModalType.REMOVE_DEVICE
         @_show_modal_remove_device options.data, title_element
       when z.ViewModel.ModalType.TOO_MANY_MEMBERS
@@ -190,19 +198,33 @@ class z.ViewModel.ModalsViewModel
         placeholder: '%@.name'
         content: content
 
-  _show_modal_new_device: (content, title_element) ->
-    joined_names = z.util.StringUtil.capitalize_first_char z.util.LocalizerUtil.join_names content, z.string.Declension.NOMINATIVE
+  _show_modal_new_device: (content, title_element, message_element, action_element) ->
+    joined_names = z.util.StringUtil.capitalize_first_char z.util.LocalizerUtil.join_names content.user_ets, z.string.Declension.NOMINATIVE
     string_id =
-      if content.length is 1
-        if content[0].is_me then z.string.modal_new_device_headline_you else z.string.modal_new_device_headline
+      if content.user_ets.length is 1
+        if content.user_ets[0].is_me then z.string.modal_new_device_headline_you else z.string.modal_new_device_headline
       else
         z.string.modal_new_device_headline_many
 
     title_element.text z.localization.Localizer.get_text
       id: string_id
       replace:
-        placeholder: if content.length is 1 then '%@.name' else '%@.names'
+        placeholder: if content.user_ets.length is 1 then '%@.name' else '%@.names'
         content: joined_names
+
+    switch content.consent_type
+      when z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL
+        message_id = z.string.modal_new_device_call_incoming
+        action_id = z.string.modal_new_device_call_accept
+      when z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL
+        message_id = z.string.modal_new_device_call_outgoing
+        action_id = z.string.modal_new_device_call_anyway
+      else
+        message_id = z.string.modal_new_device_message
+        action_id = z.string.modal_new_device_send_anyway
+
+    message_element.text z.localization.Localizer.get_text message_id
+    action_element.text z.localization.Localizer.get_text action_id
 
   _show_modal_remove_device: (content, title_element) ->
     title_element.text z.localization.Localizer.get_text

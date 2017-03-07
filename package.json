@@ -2,7 +2,7 @@
   "name": "wire-webapp",
   "license": "LicenseRef-LICENSE",
   "devDependencies": {
-    "autoprefixer": "6.7.5",
+    "autoprefixer": "6.7.6",
     "coffeelint": "1.16.0",
     "grunt": "1.0.1",
     "grunt-aws-s3": "0.14.5",
@@ -15,7 +15,7 @@
     "grunt-contrib-connect": "1.0.2",
     "grunt-contrib-copy": "1.0.0",
     "grunt-contrib-less": "1.4.0",
-    "grunt-contrib-uglify": "2.1.0",
+    "grunt-contrib-uglify": "2.2.0",
     "grunt-contrib-watch": "1.0.0",
     "grunt-gitinfo": "0.1.8",
     "grunt-include-replace": "5.0.0",
@@ -32,7 +32,7 @@
     "karma-coverage": "1.1.1",
     "karma-jasmine": "1.1.0",
     "load-grunt-tasks": "3.5.2",
-    "request": "2.79.0",
+    "request": "2.80.0",
     "sinon": "1.17.7"
   },
   "scripts": {
