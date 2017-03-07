@@ -1012,7 +1012,7 @@ class z.conversation.ConversationRepository
           @_track_completed_media_action conversation_et, generic_message
           saved_event.data.id = asset_id
           saved_event.data.info.nonce = asset_id
-          @_update_image_as_sent conversation_et, saved_event
+          @_update_image_as_sent conversation_et, saved_event, response.time
         .catch (error) =>
           @logger.error "Failed to upload otr asset for conversation #{conversation_et.id}", error
           throw error
@@ -1268,16 +1268,20 @@ class z.conversation.ConversationRepository
   Update image message with given event data
   @param conversation_et [z.entity.Conversation] Conversation image was sent in
   @param event_json [JSON] Image event containing updated information after sending
+  @param event_time [Number|undefined] if defined it will update event timestamp
   ###
-  _update_image_as_sent: (conversation_et, event_json) =>
+  _update_image_as_sent: (conversation_et, event_json, event_time) =>
     @get_message_in_conversation_by_id conversation_et, event_json.id
     .then (message_et) =>
       asset_data = event_json.data
       remote_data = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256, true
       message_et.get_first_asset().resource remote_data
       message_et.status z.message.StatusType.SENT
-      @conversation_service.update_message_in_db message_et, {data: asset_data, status: z.message.StatusType.SENT}
-
+      message_et.timestamp new Date(event_time).getTime()
+      @conversation_service.update_message_in_db message_et,
+        data: asset_data
+        status: z.message.StatusType.SENT
+        time: event_time
 
   ###############################################################################
   # Send Generic Messages
@@ -1411,27 +1415,25 @@ class z.conversation.ConversationRepository
   _send_encrypted_message: (conversation_id, generic_message, payload, precondition_option = false) =>
     @logger.info "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
     conversation_et = @find_conversation_by_id conversation_id
-    return Promise.resolve()
-      .then =>
-        if conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
-          return @_grant_outgoing_message conversation_et, generic_message
-      .then =>
-        return @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
-      .then (response) =>
-        @_handle_client_mismatch conversation_id, response
-        return response
-      .catch (error) =>
-        updated_payload = undefined
 
-        throw error unless error.missing
+    return @_grant_outgoing_message conversation_et, generic_message
+    .then =>
+      return @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
+    .then (response) =>
+      @_handle_client_mismatch conversation_id, response
+      return response
+    .catch (error) =>
+      updated_payload = undefined
 
-        return @_handle_client_mismatch conversation_id, error, generic_message, payload
-        .then (payload_with_missing_clients) =>
-          updated_payload = payload_with_missing_clients
-          return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
-        .then =>
-          @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
-          return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
+      throw error unless error.missing
+
+      return @_handle_client_mismatch conversation_id, error, generic_message, payload
+      .then (payload_with_missing_clients) =>
+        updated_payload = payload_with_missing_clients
+        return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
+      .then =>
+        @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
+        return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
 
   _grant_outgoing_message: (conversation_et, generic_message, user_ids) ->
     return Promise.resolve() if generic_message.content in ['cleared', 'confirmation', 'deleted', 'lastRead']
@@ -1439,7 +1441,9 @@ class z.conversation.ConversationRepository
     return @grant_message conversation_et, consent_type, user_ids
 
   grant_message: (conversation_et, consent_type, user_ids) =>
-    return Promise.resolve() if conversation_et.verification_state() is z.conversation.ConversationVerificationState.UNVERIFIED
+    if conversation_et.verification_state() isnt z.conversation.ConversationVerificationState.DEGRADED
+      return Promise.resolve()
+
     return new Promise (resolve, reject) =>
       send_anyway = false
 
@@ -1478,37 +1482,34 @@ class z.conversation.ConversationRepository
     skip_own_clients = generic_message.content is 'ephemeral'
     precondition_option = false
     image_payload = undefined
-
     conversation_et = @find_conversation_by_id conversation_id
-    return Promise.resolve()
-      .then =>
-        if conversation_et.verification_state() is z.conversation.ConversationVerificationState.DEGRADED
-          return @_grant_outgoing_message conversation_et, generic_message
-      .then =>
-        return @_create_user_client_map conversation_id, skip_own_clients
-      .then (user_client_map) =>
-        if skip_own_clients
-          precondition_option = Object.keys user_client_map
-        return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
-      .then (payload) =>
-        payload.inline = false
-        image_payload = payload
-        return @asset_service.post_asset_v2 conversation_id, image_payload, image_data, precondition_option, nonce
-      .then (response) =>
-        @_handle_client_mismatch conversation_id, response
-        return response
-      .catch (error) =>
-        updated_payload = undefined
 
-        throw error if not error.missing
+    return @_grant_outgoing_message conversation_et, generic_message
+    .then =>
+      return @_create_user_client_map conversation_id, skip_own_clients
+    .then (user_client_map) =>
+      if skip_own_clients
+        precondition_option = Object.keys user_client_map
+      return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+    .then (payload) =>
+      payload.inline = false
+      image_payload = payload
+      return @asset_service.post_asset_v2 conversation_id, image_payload, image_data, precondition_option, nonce
+    .then (response) =>
+      @_handle_client_mismatch conversation_id, response
+      return response
+    .catch (error) =>
+      updated_payload = undefined
 
-        return @_handle_client_mismatch conversation_id, error, generic_message, image_payload
-        .then (payload_with_missing_clients) =>
-          updated_payload = payload_with_missing_clients
-          return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
-        .then =>
-          @logger.log @logger.levels.INFO, "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
-          return @asset_service.post_asset_v2 conversation_id, updated_payload, image_data, true, nonce
+      throw error if not error.missing
+
+      return @_handle_client_mismatch conversation_id, error, generic_message, image_payload
+      .then (payload_with_missing_clients) =>
+        updated_payload = payload_with_missing_clients
+        return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
+      .then =>
+        @logger.log @logger.levels.INFO, "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
+        return @asset_service.post_asset_v2 conversation_id, updated_payload, image_data, true, nonce
 
   ###
   Estimate whether message should be send as type external.
