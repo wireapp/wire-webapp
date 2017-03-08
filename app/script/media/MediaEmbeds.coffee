@@ -72,7 +72,9 @@ z.media.MediaEmbeds = do ->
   ###
   _append_iframe = (link, message, iframe) ->
     link_string = link.outerHTML.replace /&amp;/g, '&'
-    message = message.replace link_string, "#{link_string}#{iframe}"
+    message = message
+      .replace /&amp;/g, '&'
+      .replace link_string, "#{link_string}#{iframe}"
 
   ###
   Generate embed url to use as src in iframes
