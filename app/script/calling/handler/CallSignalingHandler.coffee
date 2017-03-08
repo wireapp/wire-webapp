@@ -29,7 +29,7 @@ class z.calling.handler.CallSignalingHandler
   constructor: (@v2_call_center) ->
     @logger = new z.util.Logger 'z.calling.handler.CallSignalingHandler', z.config.LOGGER.OPTIONS
 
-    @audio_repository = @v2_call_center.media_repository.audio_repository
+    @media_repository = @v2_call_center.media_repository
 
     # Caches
     @candidate_cache = {}
@@ -194,7 +194,7 @@ class z.calling.handler.CallSignalingHandler
       # Get or construct flow entity
       flow_et = call_et.get_flow_by_id payload.id
       if not flow_et
-        flow_et = call_et.construct_flow payload.id, user_et, @audio_repository.get_audio_context(), @v2_call_center.timings
+        flow_et = call_et.construct_flow payload.id, user_et, @media_repository.get_audio_context(), @v2_call_center.timings
 
       # Add payload to flow entity
       flow_et.add_payload payload

@@ -39,7 +39,7 @@ class z.calling.entities.ECall
     @id = @conversation_et.id
     @timings = undefined
 
-    @audio_repository = @v3_call_center.media_repository.audio_repository
+    @media_repository = @v3_call_center.media_repository
     @config = @v3_call_center.calling_config
     @self_user = @v3_call_center.user_repository.self()
     @self_state = @v3_call_center.self_state

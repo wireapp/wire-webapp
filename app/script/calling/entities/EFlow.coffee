@@ -46,7 +46,7 @@ class z.calling.entities.EFlow
     @is_group = @e_call_et.is_group
 
     # Audio
-    @audio = new z.calling.entities.FlowAudio @, @e_call_et.audio_repository.get_audio_context()
+    @audio = new z.calling.entities.FlowAudio @, @e_call_et.media_repository.get_audio_context()
 
     # Users
     @remote_user = @e_participant_et.user
@@ -583,7 +583,7 @@ class z.calling.entities.EFlow
       try
         media_stream = @audio.wrap_microphone_stream media_stream
       catch error
-        @audio.audio_context = @e_call_et.audio_repository.get_audio_context()
+        @audio.audio_context = @e_call_et.media_repository.get_audio_context()
         media_stream = @audio.wrap_microphone_stream media_stream
 
     if @peer_connection.addTrack
