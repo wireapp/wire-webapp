@@ -24,12 +24,10 @@ describe 'Conversation Mapper', ->
   beforeEach ->
     conversation_mapper = new z.conversation.ConversationMapper()
 
+  it 'should throw error if conversation data is missing', ->
+    expect(=> conversation_mapper.map_conversation()).toThrow(new Error('Cannot create conversation entity without data'));
+
   it 'can map a conversation', ->
-    conversation = null
-    conversation_et = conversation_mapper.map_conversation conversation
-
-    expect(conversation_et).toBe undefined
-
     conversation = entities.conversation
     conversation_et = conversation_mapper.map_conversation conversation
 

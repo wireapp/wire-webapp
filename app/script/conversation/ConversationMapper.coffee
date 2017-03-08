@@ -123,7 +123,7 @@ class z.conversation.ConversationMapper
   ###
   _create_conversation_et: (data) ->
     if not data?
-      throw new Error 'Cannon create conversation entity without data'
+      throw new Error 'Cannot create conversation entity without data'
 
     conversation_et =  new z.entity.Conversation data.id
     conversation_et.id = data.id
