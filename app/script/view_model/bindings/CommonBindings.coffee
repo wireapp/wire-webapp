@@ -216,8 +216,11 @@ ko.subscribable.fn.subscribe_once = (handler, owner, event_name) ->
 # renders antiscroll scrollbar
 ko.bindingHandlers.antiscroll =
   init: (element, valueAccessor) ->
+
+    if z.util.Environment.os.mac
+      return
+
     $(element).antiscroll
-      notOnMacintosh: false
       autoHide: true
       autoWrap: true
 
