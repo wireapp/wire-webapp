@@ -75,7 +75,7 @@ describe 'z.tracking.EventTrackingRepository', ->
 
     afterAll ->
       tracking_repository._detach_promise_rejection_handler()
-emov
+
     it 'handles a Promise rejected with an Error that is uncaught', (done) ->
       window.onerror = (error_message, file_name, line_number, column_number, error) ->
         expect(error_message).toBe error_description
