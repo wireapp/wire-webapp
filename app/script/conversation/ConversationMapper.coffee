@@ -166,7 +166,7 @@ class z.conversation.ConversationMapper
         local_conversation.archived_state = remote_conversation.members.self.otr_archived
         local_conversation.archived_timestamp = remote_conversation.members.self.otr_archived_ref
 
-      if not local_conversation.muted_ligstate?
+      if not local_conversation.muted_state?
         local_conversation.muted_state = remote_conversation.members.self.otr_muted
         local_conversation.muted_timestamp = remote_conversation.members.self.otr_muted_ref
 
