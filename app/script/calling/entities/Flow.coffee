@@ -457,15 +457,17 @@ class z.calling.entities.Flow
       sdp_info = new z.calling.payloads.SDPInfo {conversation_id: @conversation_id, flow_id: @id, sdp: @local_sdp()}
 
       on_success = =>
-        @has_sent_local_sdp true
         @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful"
         @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
 
       on_failure = (error) =>
         @logger.warn "Failed to send local SDP of type '#{@local_sdp().type}'"
-        @reset_flow() if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+        if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+          return @reset_flow()
+        @has_sent_local_sdp false
 
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
+      @has_sent_local_sdp true
       amplify.publish z.event.WebApp.CALL.SIGNALING.SEND_LOCAL_SDP_INFO, sdp_info, on_success, on_failure
 
   ###
@@ -737,6 +739,7 @@ class z.calling.entities.Flow
     .then =>
       if @peer_connection.getSenders
         for rtp_sender in @peer_connection.getSenders() when rtp_sender.track.kind is media_stream_info.type
+          throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED unless rtp_sender.replaceTrack
           return rtp_sender
         throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK
       throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED

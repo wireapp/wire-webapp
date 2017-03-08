@@ -26,7 +26,7 @@ class z.cryptography.CryptographyRepository
   @param cryptography_service [z.cryptography.CryptographyService] Backend REST API cryptography service implementation
   @param storage_repository [z.storage.StorageRepository] Repository for all storage interactions
   ###
-  constructor: (@cryptography_service, @storage_repository) ->
+  constructor: (@cryptography_service, @storage_repository, @conversation_service) ->
     @logger = new z.util.Logger 'z.cryptography.CryptographyRepository', z.config.LOGGER.OPTIONS
 
     @cryptography_mapper = new z.cryptography.CryptographyMapper()
@@ -270,9 +270,8 @@ class z.cryptography.CryptographyRepository
   _encrypt_payload_for_session: (session_id, generic_message) ->
     return Promise.resolve().then =>
       @cryptobox.encrypt session_id, generic_message.toArrayBuffer()
-      .then (generic_message_encrypted) ->
-        ciphertext = z.util.array_to_base64 generic_message_encrypted
-        return [session_id, ciphertext]
+      .then (ciphertext) ->
+        return [session_id, z.util.array_to_base64 ciphertext]
       .catch (error) =>
         if error instanceof cryptobox.store.RecordNotFoundError
           @logger.log "Session '#{session_id}' needs to get initialized..."
@@ -285,43 +284,10 @@ class z.cryptography.CryptographyRepository
   @return [cryptobox.CryptoboxSession, z.proto.GenericMessage] Cryptobox session along with the decrypted message in ProtocolBuffer format
   ###
   decrypt_event: (event) =>
-    return new Promise (resolve, reject) =>
-      if not event.data
-        @logger.error "Encrypted event with ID '#{event.id}' does not contain it's data payload", event
-        reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.NO_DATA_CONTENT
-        return
+    if not event.data
+      @logger.error "Encrypted event with ID '#{event.id}' does not contain it's data payload", event
+      return Promise.reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.NO_DATA_CONTENT
 
-      primary_key = z.storage.StorageService.construct_primary_key event
-      @storage_repository.load_event_for_conversation primary_key
-      .then (loaded_event) =>
-        if loaded_event is undefined
-          resolve @_decrypt_message event
-        else
-          @logger.info "Skipped decryption of event '#{event.type}' (#{primary_key}) because it was previously stored"
-          reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
-
-  ###
-  Save an unencrypted event.
-  @param event [Object] JSON of unencrypted backend event
-  @return [Promise] Promise that will resolve with the saved record
-  ###
-  save_unencrypted_event: (event) ->
-    Promise.resolve().then =>
-      event.category = z.message.MessageCategorization.category_from_event event
-      @storage_repository.save_conversation_event event
-    .catch (error) =>
-      @logger.error "Saving unencrypted message failed: #{error.message}", error
-      throw error
-
-  ###
-  @return [z.proto.GenericMessage] Decrypted message in ProtocolBuffer format
-  ###
-  _decrypt_message: (event) =>
     session_id = @_construct_session_id event.from, event.data.sender
-
-    ciphertext = event.data.text or event.data.key
-    msg_bytes = z.util.base64_to_array(ciphertext).buffer
-
-    return @cryptobox.decrypt session_id, msg_bytes
-    .then (decrypted_message) ->
-      return z.proto.GenericMessage.decode decrypted_message
+    ciphertext = z.util.base64_to_array(event.data.text or event.data.key).buffer
+    return @cryptobox.decrypt(session_id, ciphertext).then (plaintext) -> z.proto.GenericMessage.decode plaintext

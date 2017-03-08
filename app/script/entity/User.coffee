@@ -102,7 +102,6 @@ class z.entity.User
     @preview_picture_resource = ko.observable()
     @medium_picture_resource = ko.observable()
 
-    @connection_level = ko.observable z.user.ConnectionLevel.UNKNOWN
     @connection = ko.observable new z.entity.Connection()
 
     # connection state shorthands TODO add others too since this is used very often?

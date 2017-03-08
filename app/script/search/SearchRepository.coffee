@@ -50,17 +50,6 @@ class z.search.SearchRepository
     @search_service.get_common(user_id).then (response) -> response.returned
 
   ###
-  Get top people.
-  @return [Function] Promise that resolves with the top connections
-  ###
-  get_top_people: ->
-    @search_service.get_top z.config.TOP_PEOPLE_FETCH_LIMIT
-    .then (response) =>
-      return @search_result_mapper.map_results response.documents, z.search.SEARCH_MODE.TOP_PEOPLE
-    .then ([search_ets, mode]) =>
-      return @_prepare_search_result search_ets, mode
-
-  ###
   Ignore suggested user.
   @param user_id [String] User ID
   @return [Promise] Promise that resolves when a suggestion has been ignored
@@ -120,13 +109,9 @@ class z.search.SearchRepository
           ###
           switch mode
             when z.search.SEARCH_MODE.CONTACTS
-              if not user_et.connected()
-                user_et.connection_level z.user.ConnectionLevel.NO_CONNECTION
-                result_user_ets.push user_et
+              result_user_ets.push user_et if not user_et.connected()
             when z.search.SEARCH_MODE.ONBOARDING
               result_user_ets.push user_et if not user_et.connected()
-            when z.search.SEARCH_MODE.TOP_PEOPLE
-              result_user_ets.push user_et if user_et.connected()
             else
               result_user_ets.push user_et
 

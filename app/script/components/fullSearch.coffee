@@ -116,7 +116,7 @@ ko.components.register 'full-search',
                   <div class="full-search-item-content-text ellipsis" data-uie-name="full-search-item-text" data-bind="html: $parent.transform_text($data)"></div>
                   <div class="full-search-item-content-info">
                     <span class="font-weight-bold" data-uie-name="full-search-item-sender" data-bind="text: user().first_name()"></span>
-                    <span data-uie-name="full-search-item-timestamp" data-bind="text: moment($data.timestamp).format('MMMM D, YYYY')"></span>
+                    <span data-uie-name="full-search-item-timestamp" data-bind="text: moment($data.timestamp()).format('MMMM D, YYYY')"></span>
                   </div>
                 </div>
                 <div class="badge" data-uie-name="full-search-item-badge" data-bind="text: matches_count, visible: matches_count > 1"></div>

@@ -22,9 +22,11 @@ z.event ?= {}
 # Enum of different webapp events.
 z.event.WebApp =
   ANALYTICS:
-    DIMENSION: 'wire.webapp.analytics.dimension'
+    CLOSE_SESSION: 'wire.webapp.analytics.close_session'
+    CUSTOM_DIMENSION: 'wire.webapp.analytics.custom_dimension'
     EVENT: 'wire.webapp.analytics.event'
     INIT: 'wire.webapp.analytics.init'
+    START_SESSION: 'wire.webapp.analytics.start_session'
   AUDIO:
     PLAY: 'wire.webapp.audio.play'
     PLAY_IN_LOOP: 'wire.webapp.audio.play-in-loop'

@@ -102,12 +102,12 @@ class z.ViewModel.list.StartUIViewModel
              @search_results.contacts().length > 0 or
              @search_results.others().length > 0
 
-    @show_connections = ko.pureComputed => return @top_users().length > 9 and not @show_suggestions()
+    @show_connections = ko.pureComputed => return not @show_suggestions()
 
     @show_invite = ko.pureComputed =>
-      no_top_people_and_suggestions = not @show_search_results() and not @show_top_people() and not @show_suggestions()
+      no_connections_and_suggestions = not @show_search_results() and @connections().length is 0 and not @show_suggestions()
       no_search_results = @show_search_results() and not @has_results() and not @is_searching()
-      return no_top_people_and_suggestions or no_search_results
+      return no_connections_and_suggestions or no_search_results
 
     @show_suggestions = ko.pureComputed => return !!@suggestions().length
 
@@ -211,7 +211,7 @@ class z.ViewModel.list.StartUIViewModel
     @search_repository.show_onboarding response
     .then (matched_user_ets) =>
       @suggestions matched_user_ets
-      return @search_repository.get_top_people()
+      return @get_top_people()
     .then (user_ets) =>
       @top_users user_ets
       @selected_people.removeAll()
@@ -223,12 +223,16 @@ class z.ViewModel.list.StartUIViewModel
     .catch (error) =>
       @logger.error "Could not show the on-boarding results: #{error.message}", error
 
+  get_top_people: =>
+    @conversation_repository.get_most_active_conversations()
+    .then (conversation_ets) ->
+      return conversation_ets
+      .filter (conversation_et) -> conversation_et.is_one2one()
+      .map (conversation_et) -> conversation_et.participating_user_ets()[0]
+      .slice(0, 9)
+
   update_list: =>
-    @search_repository.get_top_people()
-    .then (user_ets) =>
-      @top_users user_ets if user_ets.length > 0
-    .catch (error) =>
-      @logger.error "Could not update the top people: #{error.message}", error
+    @get_top_people().then (user_ets) => @top_users user_ets
 
     @show_spinner false
 

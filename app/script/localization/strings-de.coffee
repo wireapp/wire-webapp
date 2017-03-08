@@ -191,6 +191,10 @@ z.string.de.modal_new_device_headline = '%@.name hat begonnen ein neues Gerät z
 z.string.de.modal_new_device_headline_many = '%@.names haben begonnen neue Geräte zu nutzen'
 z.string.de.modal_new_device_headline_you = '%@.name hast begonnen ein neues Gerät zu nutzen'
 z.string.de.modal_new_device_message = 'Möchtest du die Nachrichten noch senden?'
+z.string.de.modal_new_device_call_accept = 'Anruf annehmen'
+z.string.de.modal_new_device_call_anyway = 'Dennoch anrufen'
+z.string.de.modal_new_device_call_incoming = 'Möchtest du den Anruf noch annehmen?'
+z.string.de.modal_new_device_call_outgoing = 'Möchtest du noch anrufen?'
 z.string.de.modal_new_device_show_device = 'Gerät anzeigen'
 z.string.de.modal_new_device_send_anyway = 'Dennoch senden'
 # Remove device
@@ -232,7 +236,7 @@ z.string.de.conversation_device_started_using_many = ' benutzen'
 z.string.de.conversation_device_unverified = ' hat die Überprüfung widerrufen für'
 z.string.de.conversation_device_your_devices = ' deine Geräte'
 z.string.de.conversation_device_user_devices = ' %@names Geräte'
-z.string.de.conversation_device_new_device_one = ' benutzen'
+z.string.de.conversation_device_new_device_one = ' ein neues Gerät'
 z.string.de.conversation_device_new_device_many = ' neue Geräte'
 z.string.de.conversation_device_new_people_joined = 'Neue Personen beigetreten.'
 z.string.de.conversation_device_new_people_joined_verify = 'Überprüfe Geräte'
@@ -282,6 +286,10 @@ z.string.de.collection_section_links = 'Links'
 z.string.de.collection_section_images = 'Bilder'
 z.string.de.collection_section_files = 'Dateien'
 z.string.de.collection_section_audio = 'Audio-Nachrichten'
+
+# Full Search
+z.string.de.fullsearch_placeholder = 'Nachrichten durchsuchen'
+z.string.de.fullsearch_no_results = 'Kein Treffer'
 
 # Archive
 z.string.de.archive_header = 'Archivieren'

@@ -53,16 +53,6 @@ class z.search.SearchService
       url: @client.create_url "/search/contacts?q=#{encodeURIComponent(query)}&size=#{size}&l=#{level}&d=#{directory}"
 
   ###
-  Get top people.
-  @param [Integer] size number of requested user
-  @return [Promise] Promise that resolves with the top connections
-  ###
-  get_top: (size) ->
-    @client.send_request
-      type: 'GET'
-      url: @client.create_url "/search/top?size=#{size}"
-
-  ###
   Ignore suggested user.
   @param user_id [String] User ID
   @return [Promise] Promise that resolves when a suggestion has been ignored

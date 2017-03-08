@@ -206,18 +206,18 @@ class z.calling.entities.ECall
   @param user_et [z.entities.User] User entity to be added to the e-call
   @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
-  add_e_participant: (user_et, e_call_message_et) =>
+  add_e_participant: (e_call_message_et, user_et) =>
     @get_e_participant_by_id user_et.id
     .then =>
-      @update_e_participant user_et.id, e_call_message_et
+      @update_e_participant e_call_message_et
     .catch (error) =>
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
-      @logger.debug "Adding e-call participant '#{user_et.name()}'"
-      @participants.push new z.calling.entities.EParticipant @, user_et, @timings, e_call_message_et
+      e_participant_et = new z.calling.entities.EParticipant @, user_et, @timings, e_call_message_et
+      @participants.push e_participant_et
+      @logger.debug "Adding e-call participant '#{user_et.name()}'", e_participant_et
       @_update_remote_state()
-    .then =>
-      return @
+      return e_participant_et
 
   ###
   Remove an e-participant from the call.
@@ -233,7 +233,6 @@ class z.calling.entities.ECall
       @v3_call_center.media_element_handler.remove_media_element user_id
       @logger.debug "Removed e-call participant '#{e_participant_et.user.name()}'"
       return @
-
 
   ###
   Get the number of participants in the call.
@@ -254,11 +253,10 @@ class z.calling.entities.ECall
 
   ###
   Update e-call participant with e-call message.
-  @param user_id [String] ID of user to be updated
   @param e_call_message_et [z.calling.entities.ECallMessage] E-call message to update user with
   ###
-  update_e_participant: (user_id, e_call_message_et) =>
-    @get_e_participant_by_id user_id
+  update_e_participant: (e_call_message_et) =>
+    @get_e_participant_by_id e_call_message_et.user_id
     .then (e_participant_et) =>
       @logger.debug "Updating e-call participant '#{e_participant_et.user.name()}'", e_call_message_et
       e_participant_et.update_state e_call_message_et
