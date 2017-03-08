@@ -30,7 +30,7 @@ class z.media.MediaRepository
     return z.util.Environment.browser.supports.media_devices
 
   # Construct a new MediaDevices repository.
-  constructor: () ->
+  constructor: ->
     @logger = new z.util.Logger 'z.media.MediaRepository', z.config.LOGGER.OPTIONS
 
     @devices_handler = new z.media.MediaDevicesHandler @

@@ -276,16 +276,16 @@ class z.calling.entities.EFlow
     @logger.debug "PeerConnection with '#{@remote_user.name()}' created - is_answer' #{@is_answer()}", @e_call_et.config().ice_servers
 
     @peer_connection.onaddstream = @_on_add_stream
-    @peer_connection.onaddtrack = @_on_add_track
+    @peer_connection.ontrack = @_on_track
     @peer_connection.ondatachannel = @_on_data_channel
     @peer_connection.onicecandidate = @_on_ice_candidate
     @peer_connection.oniceconnectionstatechange = @_on_ice_connection_state_change
     @peer_connection.onremovestream = @_on_remove_stream
-    @peer_connection.onremovetrack = @_on_remove_track
     @peer_connection.onsignalingstatechange = @_on_signaling_state_change
 
   ###
   A MediaStream was added to the PeerConnection.
+  @deprecated
   @param event [MediaStreamEvent] Event that contains the newly added MediaStream
   ###
   _on_add_stream: (event) =>
@@ -296,27 +296,6 @@ class z.calling.entities.EFlow
       media_stream = @audio.wrap_speaker_stream event.stream
     media_stream_info = new z.media.MediaStreamInfo z.media.MediaStreamSource.REMOTE, @remote_user.id, media_stream, @e_call_et
     amplify.publish z.event.WebApp.CALL.MEDIA.ADD_STREAM, media_stream_info
-
-  ###
-  A MediaStreamTrack was added to the PeerConnection.
-  @param event [MediaStreamTrackEvent] Event that contains the newly added MediaStreamTrack
-  ###
-  _on_add_track: (event) =>
-    @logger.debug 'Remote MediaStreamTrack added to PeerConnection', event
-
-  ###
-  A MediaStream was removed from the PeerConnection.
-  @param event [MediaStreamEvent] Event that a MediaStream has been removed
-  ###
-  _on_remove_stream: (event) =>
-    @logger.debug 'Remote MediaStream removed from PeerConnection', event
-
-  ###
-  A MediaStreamTrack was removed from the PeerConnection.
-  @param event [MediaStreamTrackEvent] Event that a MediaStreamTrack has been removed
-  ###
-  _on_remove_track: (event) =>
-    @logger.debug 'Remote MediaStreamTrack removed from PeerConnection', event
 
   ###
   A local ICE candidates is available.
@@ -340,10 +319,24 @@ class z.calling.entities.EFlow
     @gathering_state @peer_connection.iceGatheringState
     @connection_state @peer_connection.iceConnectionState
 
+  ###
+  A MediaStream was removed from the PeerConnection.
+  @param event [MediaStreamEvent] Event that a MediaStream has been removed
+  ###
+  _on_remove_stream: (event) =>
+    @logger.debug 'Remote MediaStream removed from PeerConnection', event
+
   # Signaling state has changed.
   _on_signaling_state_change: (event) =>
     @logger.debug "State changed - signaling state: #{@peer_connection.signalingState}", event
     @signaling_state @peer_connection.signalingState
+
+  ###
+  A MediaStreamTrack was added to the PeerConnection.
+  @param event [RTCTrackEvent] Event that contains the newly added MediaStreamTrack
+  ###
+  _on_track: (event) =>
+    @logger.debug 'Remote MediaStreamTrack added to PeerConnection', event
 
 
   ###############################################################################
@@ -667,11 +660,13 @@ class z.calling.entities.EFlow
   _remove_media_stream: (media_stream) ->
     return if not @peer_connection
 
-    if @peer_connection.getSenders and @peer_connection.removeTrack
+    if @peer_connection.removeTrack
+      return unless @peer_connection.signalingState is z.calling.rtc.SignalingState.STABLE
       for media_stream_track in media_stream.getTracks()
         for rtp_sender in @peer_connection.getSenders() when rtp_sender.track.id is media_stream_track.id
           @peer_connection.removeTrack rtp_sender
           @logger.info "Removed local MediaStreamTrack of type '#{media_stream_track.kind}' from PeerConnection"
+          break
     else if @peer_connection.signalingState isnt z.calling.rtc.SignalingState.CLOSED
       @peer_connection.removeStream media_stream
       @logger.info "Removed local MediaStream of type '#{media_stream.type}' from PeerConnection",
@@ -707,8 +702,8 @@ class z.calling.entities.EFlow
     @_clear_send_sdp_timeout()
     @telemetry.reset_statistics()
     @logger.info "Resetting flow with user '#{@remote_user.id}'"
-    @_close_peer_connection() if @peer_connection?.signalingState isnt z.calling.rtc.SignalingState.CLOSED
     @_remove_media_streams()
+    @_close_peer_connection() if @peer_connection?.signalingState isnt z.calling.rtc.SignalingState.CLOSED
     @_reset_signaling_states()
     @pc_initialized false
 
