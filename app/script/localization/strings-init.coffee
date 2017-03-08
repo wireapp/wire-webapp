@@ -30,6 +30,7 @@ z.string.it ?= {}
 z.string.pt ?= {}
 z.string.ro ?= {}
 z.string.ru ?= {}
+z.string.sk ?= {}
 z.string.sl ?= {}
 z.string.tr ?= {}
 z.string.uk ?= {}

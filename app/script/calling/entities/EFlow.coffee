@@ -95,18 +95,18 @@ class z.calling.entities.EFlow
         when z.calling.rtc.ICEConnectionState.FAILED
           @e_participant_et.is_connected false
           if @is_group()
-            return @e_call_et.delete_participant @participant_et if @e_call_et.self_client_joined()
+            return @e_call_et.delete_e_participant @participant_et if @e_call_et.self_client_joined()
           amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id
 
         when z.calling.rtc.ICEConnectionState.CLOSED
           @e_participant_et.is_connected false
-          @e_call_et.delete_participant @e_participant_et if @e_call_et.self_client_joined()
+          @e_call_et.delete_e_participant @e_participant_et if @e_call_et.self_client_joined()
 
     @signaling_state.subscribe (signaling_state) =>
       switch signaling_state
         when z.calling.rtc.SignalingState.CLOSED
           @logger.debug "PeerConnection with '#{@remote_user.name()}' was closed"
-          @e_call_et.delete_participant @e_participant_et
+          @e_call_et.delete_e_participant @e_participant_et
           @_remove_media_streams()
           unless @is_group()
             @e_call_et.finished_reason = z.calling.enum.CALL_FINISHED_REASON.CONNECTION_DROPPED
@@ -425,12 +425,15 @@ class z.calling.entities.EFlow
         return @_set_send_sdp_timeout()
 
       @logger.info "Sending local SDP of type '#{@local_sdp().type}' containing '#{ice_candidates}' ICE candidates for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
+      @should_send_local_sdp false
       e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @v3_call_center.create_setup_payload @local_sdp().sdp
       return @e_call_et.send_e_call_event e_call_message_et
       .then =>
-        @should_send_local_sdp true
         @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
         @logger.info "Sending local SDP of type '#{@local_sdp().type}' successful", @local_sdp()
+      .catch (error) =>
+        @should_send_local_sdp true
+        throw error
 
   ###
   Clear the SDP send timeout.
@@ -642,6 +645,7 @@ class z.calling.entities.EFlow
     .then =>
       if @peer_connection.getSenders
         for rtp_sender in @peer_connection.getSenders() when rtp_sender.track.kind is media_stream_info.type
+          throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED unless rtp_sender.replaceTrack
           return rtp_sender
         throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK
       throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
