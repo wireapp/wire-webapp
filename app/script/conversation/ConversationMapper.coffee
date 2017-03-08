@@ -159,14 +159,14 @@ class z.conversation.ConversationMapper
       local_conversation.creator = remote_conversation.creator
       local_conversation.status = remote_conversation.members.self.status
       local_conversation.others = remote_conversation.members.others
-      .filter (other) -> other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
-      .map (other) -> other.id
+        .filter (other) -> other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
+        .map (other) -> other.id
 
       if not local_conversation.archived_state?
         local_conversation.archived_state = remote_conversation.members.self.otr_archived
         local_conversation.archived_timestamp = remote_conversation.members.self.otr_archived_ref
 
-      if not local_conversation.muted_state?
+      if not local_conversation.muted_ligstate?
         local_conversation.muted_state = remote_conversation.members.self.otr_muted
         local_conversation.muted_timestamp = remote_conversation.members.self.otr_muted_ref
 
