@@ -122,23 +122,15 @@ class z.conversation.ConversationMapper
   @return [z.entity.Conversation] Mapped conversation entity
   ###
   _create_conversation_et: (data) ->
-    return if not data?
-    return @_update_conversation_et new z.entity.Conversation(data.id), data
+    if not data?
+      throw new Error 'Cannon create conversation entity without data'
 
-  ###
-  Updates a given conversation entity from JSON data.
-
-  @private
-  @param conversation_et [z.entity.Conversation] Conversation to be updated
-  @param data [Object] Conversation data
-  @return [z.entity.Conversation] Updated conversation entity
-  ###
-  _update_conversation_et: (conversation_et, data) ->
+    conversation_et =  new z.entity.Conversation data.id
     conversation_et.id = data.id
     conversation_et.creator = data.creator
     conversation_et.type data.type
     conversation_et.name data.name ? ''
-
+    conversation_et.last_event_timestamp Date.now()
     conversation_et = @update_self_status conversation_et, data.members?.self or data
 
     # all users that are still active
@@ -161,7 +153,7 @@ class z.conversation.ConversationMapper
     return remote.map (remote_conversation) ->
       local_conversation = local.find (c) -> c.id is remote_conversation.id
       local_conversation ?= id: remote_conversation.id
-      local_conversation.last_event_timestamp ?= new Date(0).toISOString()
+      local_conversation.last_event_timestamp ?= new Date().toISOString()
       local_conversation.name = remote_conversation.name
       local_conversation.type = remote_conversation.type
       local_conversation.creator = remote_conversation.creator
