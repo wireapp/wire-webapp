@@ -84,7 +84,7 @@ class z.conversation.ConversationService
         if response.conversations.length
           conversations = conversations.concat response.conversations
         if response.has_more
-          return _get_conversations limit, response.conversations.pop().id
+          return _get_conversations response.conversations.pop().id
         return conversations
 
     return _get_conversations()
