@@ -9,7 +9,7 @@
     "highlightjs": "https://github.com/components/highlightjs.git#9.9.0",
     "jquery": "https://github.com/jquery/jquery.git#2.1.4",
     "keyboardjs": "https://github.com/RobertWHurst/KeyboardJS.git#2.3.3",
-    "knockout": "https://github.com/knockout/knockout.git#3.4.2",
+    "knockout": "https://github.com/knockout/knockout.git#3.4.1",
     "marked": "https://github.com/wireapp/marked.git#3fb540777bd042e7284d0a960729169d9efee508",
     "moment": "https://github.com/moment/moment.git#2.17.1",
     "normalize-css": "https://github.com/necolas/normalize.css.git#3.0.3",
