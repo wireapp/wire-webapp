@@ -207,10 +207,13 @@ class z.calling.v3.CallCenter
     @get_e_call_by_id e_call_message_et.conversation_id
     .then (e_call_et) =>
       if e_call_message_et.response is true
-        return unless e_call_et.state() is z.calling.enum.CallState.OUTGOING
-
-        e_call_et.state z.calling.enum.CallState.CONNECTING
-        return e_call_et.update_e_participant e_call_message_et
+        switch e_call_et.state()
+          when z.calling.enum.CallState.INCOMING
+            @logger.info "Incoming e-call in conversation '#{e_call_et.conversation_et.display_name()}' accepted on other device"
+            return @delete_call e_call_message_et.conversation_id
+          when z.calling.enum.CallState.OUTGOING
+            e_call_et.state z.calling.enum.CallState.CONNECTING
+            return e_call_et.update_e_participant e_call_message_et
 
       return new Promise (resolve) =>
         @user_repository.get_user_by_id e_call_message_et.user_id, (remote_user_et) ->
@@ -220,10 +223,8 @@ class z.calling.v3.CallCenter
       e_participant_et.session_id = e_call_message_et.session_id if e_participant_et
     .catch (error) =>
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
+      return if e_call_message_et.user_id is @user_repository.self().id
       return if e_call_message_et.response is true
-
-      if @user_repository.self().id is e_call_message_et.user_id
-        return @_create_ongoing_e_call e_call_message_et
 
       @conversation_repository.get_conversation_by_id e_call_message_et.conversation_id, (conversation_et) =>
         @conversation_repository.grant_message conversation_et, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [e_call_message_et.user_id]
@@ -468,20 +469,6 @@ class z.calling.v3.CallCenter
           @media_stream_handler.initiate_media_stream e_call_et.id, true if e_call_et.is_remote_video_send()
           @telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, e_call_et
           @_distribute_activation_event e_call_message_et
-
-  ###
-  Constructs an ongoing e-call entity.
-  @private
-  @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
-  ###
-  _create_ongoing_e_call: (e_call_message_et) ->
-    @user_repository.get_user_by_id e_call_message_et.user_id, (remote_user_et) =>
-      @_create_e_call e_call_message_et, remote_user_et
-      .then (e_call_et) =>
-        @logger.debug "Ongoing '#{@_get_media_type_from_properties e_call_message_et.props}' e-call in conversation '#{e_call_et.conversation_et.display_name()}' on another client", e_call_et
-        e_call_et.state z.calling.enum.CallState.ONGOING
-        e_call_et.self_user_joined true
-        e_call_et.add_e_participant e_call_message_et, remote_user_et
 
   ###
   Constructs an outgoing e-call entity.
