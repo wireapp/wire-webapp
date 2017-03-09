@@ -46,7 +46,7 @@ class z.components.FullSearchViewModel
         return
 
       @search_provider(query).then ([message_ets, query]) =>
-        return if query isnt @input()
+        return if query isnt @input().trim()
         @on_result() if message_ets.length > 0
         @show_no_results_text message_ets.length is 0
         @message_ets = message_ets
@@ -116,7 +116,7 @@ ko.components.register 'full-search',
                   <div class="full-search-item-content-text ellipsis" data-uie-name="full-search-item-text" data-bind="html: $parent.transform_text($data)"></div>
                   <div class="full-search-item-content-info">
                     <span class="font-weight-bold" data-uie-name="full-search-item-sender" data-bind="text: user().first_name()"></span>
-                    <span data-uie-name="full-search-item-timestamp" data-bind="text: moment($data.timestamp).format('MMMM D, YYYY')"></span>
+                    <span data-uie-name="full-search-item-timestamp" data-bind="text: moment($data.timestamp()).format('MMMM D, YYYY')"></span>
                   </div>
                 </div>
                 <div class="badge" data-uie-name="full-search-item-badge" data-bind="text: matches_count, visible: matches_count > 1"></div>

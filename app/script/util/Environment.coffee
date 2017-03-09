@@ -68,6 +68,7 @@ z.util.Environment = do ->
       return true if navigator.mediaDevices?.getUserMedia
       return false
     supports_screen_sharing: ->
+      return true if window.desktopCapturer
       # @deprecated Remove warning modal once we require Firefox 52 ESR
       return @is_firefox() and @get_version() >= 48
 

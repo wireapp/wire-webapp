@@ -52,7 +52,7 @@ class z.calling.CallingRepository
 
     @calling_config = ko.observable()
     @calling_config_timeout = undefined
-    @use_v3_api = not z.util.Environment.frontend.is_production()
+    @use_v3_api = undefined
 
     @v2_call_center = new z.calling.v2.CallCenter @call_service, @conversation_repository, @media_repository, @user_repository
     @v3_call_center = new z.calling.v3.CallCenter @calling_config, @conversation_repository, @media_repository, @user_repository
@@ -106,12 +106,14 @@ class z.calling.CallingRepository
 
   outgoing_protocol_version: (conversation_id) =>
     conversation_et = @conversation_repository.get_conversation_by_id conversation_id
-    @logger.log "Select outgoing protocol version - 1to1 conversation: #{conversation_et?.is_one2one()}, backend protocol: #{@protocol_version_1to1()}, use_v3_api: #{@use_v3_api}"
-    if @use_v3_api is true and not conversation_et?.is_group()
-      return z.calling.enum.PROTOCOL.VERSION_3
-    if @use_v3_api isnt false and not conversation_et?.is_group() and @protocol_version_1to1() isnt z.calling.enum.PROTOCOL.VERSION_2
-      return z.calling.enum.PROTOCOL.VERSION_3
-    return z.calling.enum.PROTOCOL.VERSION_2
+
+    protocol_version = z.calling.enum.PROTOCOL.VERSION_3
+    if @use_v3_api is false or conversation_et?.is_group() or (@use_v3_api isnt true and @protocol_version_1to1() is z.calling.enum.PROTOCOL.VERSION_2)
+      protocol_version = z.calling.enum.PROTOCOL.VERSION_2
+
+    @logger.log "Selected outgoing call protocol version: #{protocol_version}",
+      {conversation_type: conversation_et?.type(), backend_protocol_1to1: @protocol_version_1to1(), use_v3_api: @use_v3_api}
+    return protocol_version
 
   # Initiate calling config update.
   initiate_config: =>
@@ -165,7 +167,13 @@ class z.calling.CallingRepository
   ###
   leave_call_on_beforeunload: =>
     conversation_id = @_self_client_on_a_call()
-    @switch_call_center z.calling.enum.CALL_ACTION.LEAVE, [conversation_id] if conversation_id
+    return if not conversation_id
+
+    @get_protocol_of_call conversation_id
+    .then (protocol_version) =>
+      @v2_call_center.state_handler.leave_call conversation_id if protocol_version is z.calling.enum.PROTOCOL.VERSION_2
+    .catch (error) ->
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
   ###
   Check whether we are actively participating in a call.
