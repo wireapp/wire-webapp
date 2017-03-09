@@ -381,18 +381,13 @@ class z.calling.v3.CallCenter
     .then (e_call_et) =>
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
       @media_stream_handler.release_media_streams()
-
-      if e_call_et.state() is z.calling.enum.CallState.OUTGOING
-        e_call_message_type = z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
-      else
-        e_call_message_type = z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
 
+      e_call_message_type = if e_call_et.is_connected() then z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL else z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
       additional_payload =
         conversation_id: conversation_id
         time: new Date().toISOString()
         user_id: @user_repository.self().id
-
       e_call_message_et = new z.calling.entities.ECallMessage e_call_message_type, false, e_call_et.session_id, additional_payload
       @send_e_call_event e_call_et.conversation_et, e_call_message_et
 
