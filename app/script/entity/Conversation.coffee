@@ -83,7 +83,9 @@ class z.entity.Conversation
       all_users = [@self].concat @participating_user_ets()
       return all_users.every (user_et) -> user_et?.is_verified()
 
-    @removed_from_conversation = ko.observable false
+    @status = ko.observable z.conversation.ConversationStatus.CURRENT_MEMBER
+    @removed_from_conversation = ko.pureComputed =>
+      return @status() is z.conversation.ConversationStatus.PAST_MEMBER
     @removed_from_conversation.subscribe (is_removed) =>
       @archived_state false if not is_removed
 
@@ -181,23 +183,20 @@ class z.entity.Conversation
     amplify.subscribe z.event.WebApp.CONVERSATION.LOADED_STATES, @_subscribe_to_states_updates
 
   _subscribe_to_states_updates: =>
-    @archived_state.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.ARCHIVED_STATE
-    @cleared_timestamp.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
-    @ephemeral_timer.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.EPHEMERAL_TIMER
-    @last_event_timestamp.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
-    @last_read_timestamp.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
-    @muted_state.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.MUTED_STATE
-    @verification_state.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.VERIFICATION_STATE
-
-  _persist_state_update: (updated_field) ->
-    amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @, updated_field
+    [
+      @archived_state
+      @cleared_timestamp
+      @ephemeral_timer
+      @last_event_timestamp
+      @last_read_timestamp
+      @muted_state
+      @name
+      @participating_user_ids
+      @status
+      @type
+      @verification_state
+    ].forEach (property) =>
+      property.subscribe => amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @
 
   ###############################################################################
   # Lifecycle
@@ -488,5 +487,8 @@ class z.entity.Conversation
       last_read_timestamp: @last_read_timestamp()
       muted_state: @muted_state()
       muted_timestamp: @muted_timestamp()
+      name: @name()
+      others: @participating_user_ids()
+      type: @type()
       verification_state: @verification_state()
     }

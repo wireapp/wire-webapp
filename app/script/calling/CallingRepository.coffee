@@ -167,7 +167,13 @@ class z.calling.CallingRepository
   ###
   leave_call_on_beforeunload: =>
     conversation_id = @_self_client_on_a_call()
-    @switch_call_center z.calling.enum.CALL_ACTION.LEAVE, [conversation_id] if conversation_id
+    return if not conversation_id
+
+    @get_protocol_of_call conversation_id
+    .then (protocol_version) =>
+      @v2_call_center.state_handler.leave_call conversation_id if protocol_version is z.calling.enum.PROTOCOL.VERSION_2
+    .catch (error) ->
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
   ###
   Check whether we are actively participating in a call.
