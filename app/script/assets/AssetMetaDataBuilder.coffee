@@ -30,11 +30,11 @@ z.assets.AssetMetaDataBuilder =
   ###
   build_metadata: (file) ->
     @logger = new z.util.Logger 'z.assets.AssetMetaDataBuilder', z.config.LOGGER.OPTIONS
-    if @is_video(file)
+    if @is_video file
       return @_build_video_metdadata file
-    else if @is_audio(file)
+    else if @is_audio file
       return @_build_audio_metdadata file
-    else if @is_image(file)
+    else if @is_image file
       return @_build_image_metdadata file
     else
       return Promise.resolve()
@@ -49,53 +49,47 @@ z.assets.AssetMetaDataBuilder =
     file?.type?.startsWith 'image'
 
   _build_video_metdadata: (videofile) ->
-    z.assets.AssetMetaDataBuilder._borrow_resource videofile, (url) ->
-      new Promise (resolve, reject) ->
-        videoElement = document.createElement('video')
-        videoElement.onloadedmetadata = ->
-          resolve new z.proto.Asset.VideoMetaData videoElement.videoWidth, videoElement.videoHeight, videoElement.duration
-        videoElement.onerror = reject
-        videoElement.src = url
+    return new Promise (resolve, reject) ->
+      url = window.URL.createObjectURL videofile
+      videoElement = document.createElement 'video'
+      videoElement.onloadedmetadata = ->
+        resolve new z.proto.Asset.VideoMetaData videoElement.videoWidth, videoElement.videoHeight, videoElement.duration
+        window.URL.revokeObjectURL url
+      videoElement.onerror = (error) ->
+        reject error
+        window.URL.revokeObjectURL url
+      videoElement.src = url
 
   _build_image_metdadata: (imagefile) ->
-    z.assets.AssetMetaDataBuilder._borrow_resource imagefile, (url) ->
-      new Promise (resolve, reject) ->
+    return new Promise (resolve, reject) ->
+        url = window.URL.createObjectURL imagefile
         img = new Image()
         img.onload = ->
           resolve new z.proto.Asset.ImageMetaData img.width, img.height
-        img.onerror = reject
+          window.URL.revokeObjectURL url
+        img.onerror = (error) ->
+          reject error
+          window.URL.revokeObjectURL url
         img.src = url
 
   _build_audio_metdadata: (audiofile) ->
-    z.util.load_file_buffer(audiofile)
+    z.util.load_file_buffer audiofile
     .then (buffer) ->
-      new AudioContext().decodeAudioData(buffer)
+      audioContext = new AudioContext()
+      audioContext.close()
+      audioContext.decodeAudioData buffer
     .then (audio_buffer) ->
-      new z.proto.Asset.AudioMetaData(audio_buffer.duration * 1000, z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer))
+      return new z.proto.Asset.AudioMetaData audio_buffer.duration * 1000, z.assets.AssetMetaDataBuilder._normalise_loudness audio_buffer
 
   _normalise_loudness: (audio_buffer) ->
     MAX_SAMPLES = 200
     AMPLIFIER = 700 # in favour of iterating all samples before we interpolate them
     preview = [0..MAX_SAMPLES]
     for channel_index in [0..audio_buffer.numberOfChannels]
-      channel = Array.from(audio_buffer.getChannelData(channel_index))
-      bucket_size = parseInt(channel.length / MAX_SAMPLES)
-      buckets = z.util.ArrayUtil.chunk(channel, bucket_size)
+      channel = Array.from audio_buffer.getChannelData channel_index
+      bucket_size = parseInt channel.length / MAX_SAMPLES
+      buckets = z.util.ArrayUtil.chunk channel, bucket_size
       for bucket, bucket_index in buckets
-        preview[bucket_index] = z.util.NumberUtil.cap_to_byte(z.util.NumberUtil.root_mean_square(bucket) * AMPLIFIER)
+        preview[bucket_index] = z.util.NumberUtil.cap_to_byte AMPLIFIER * z.util.NumberUtil.root_mean_square bucket
       break # only select first channel
-    new Uint8Array(preview)
-
-  _borrow_resource: (resource, job) ->
-    url = null
-    Promise.resolve()
-    .then ->
-      url = window.URL.createObjectURL resource
-    .then ->
-      job(url)
-    .then (result) ->
-      window.URL.revokeObjectURL url
-      result
-    .catch (error) ->
-      window.URL.revokeObjectURL url
-      throw error
+    return new Uint8Array preview
