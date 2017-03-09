@@ -109,7 +109,7 @@ class z.calling.handler.CallSignalingHandler
   @param event [Object] Event payload
   ###
   on_remote_sdp: (event) =>
-    remote_sdp = z.calling.mapper.SDPMapper.map_sdp_event_to_object event
+    remote_sdp = z.calling.mapper.SDPMapper.map_event_to_object event
 
     @v2_call_center.get_call_by_id event.conversation
     .then (call_et) =>
