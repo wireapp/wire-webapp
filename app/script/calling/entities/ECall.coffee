@@ -262,6 +262,8 @@ class z.calling.entities.ECall
     .then (e_participant_et) =>
       @logger.debug "Updating e-call participant '#{e_participant_et.user.name()}'", e_call_message_et
       e_participant_et.update_state e_call_message_et
+      if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+        @telemetry.set_remote_version z.calling.mapper.SDPMapper.get_tool_version e_call_message_et.sdp
       @_update_remote_state()
       return e_participant_et
 

@@ -35,10 +35,6 @@ class z.calling.handler.CallSignalingHandler
     @candidate_cache = {}
     @sdp_cache = {}
 
-    # Mapper
-    @ice_mapper = new z.calling.mapper.ICECandidateMapper()
-    @sdp_mapper = new z.calling.mapper.SDPMapper()
-
     @subscribe_to_events()
     return
 
@@ -91,7 +87,7 @@ class z.calling.handler.CallSignalingHandler
   @param event [Object] Event payload
   ###
   on_remote_ice_candidates: (event) =>
-    mapped_candidates = (@ice_mapper.map_ice_message_to_object candidate for candidate in event.candidates)
+    mapped_candidates = (z.calling.mapper.ICECandidateMapper.map_ice_message_to_object candidate for candidate in event.candidates)
 
     @v2_call_center.get_call_by_id event.conversation
     .then (call_et) =>
@@ -113,7 +109,7 @@ class z.calling.handler.CallSignalingHandler
   @param event [Object] Event payload
   ###
   on_remote_sdp: (event) =>
-    remote_sdp = @sdp_mapper.map_sdp_event_to_object event
+    remote_sdp = z.calling.mapper.SDPMapper.map_sdp_event_to_object event
 
     @v2_call_center.get_call_by_id event.conversation
     .then (call_et) =>
@@ -298,7 +294,7 @@ class z.calling.handler.CallSignalingHandler
   @param ice_info [z.calling.payloads.ICECandidateInfo] ICE candidate info to be send
   ###
   post_ice_candidate: (ice_info) =>
-    candidate = @ice_mapper.map_ice_object_to_message ice_info.ice_candidate
+    candidate = z.calling.mapper.ICECandidateMapper.map_ice_object_to_message ice_info.ice_candidate
 
     @logger.info "POSTing local ICE candidate for flow '#{ice_info.flow_id}'", candidate
     @v2_call_center.call_service.post_local_candidates ice_info.conversation_id, ice_info.flow_id, candidate
