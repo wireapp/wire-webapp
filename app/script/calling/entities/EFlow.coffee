@@ -398,7 +398,7 @@ class z.calling.entities.EFlow
   @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
   save_remote_sdp: (e_call_message_et) =>
-    z.calling.mapper.SDPRewriteMapper.rewrite_sdp @_map_sdp(e_call_message_et), z.calling.enum.SDPSource.REMOTE, @
+    z.calling.mapper.SDPMapper.rewrite_sdp @_map_sdp(e_call_message_et), z.calling.enum.SDPSource.REMOTE, @
     .then ([ice_candidates, remote_sdp]) =>
       @remote_sdp remote_sdp
       @logger.info "Saved remote SDP of type '#{@remote_sdp().type}'", @remote_sdp()
@@ -409,7 +409,7 @@ class z.calling.entities.EFlow
   # Initiates sending the local RTCSessionDescriptionProtocol to the remote user.
   send_local_sdp: =>
     @_clear_send_sdp_timeout()
-    z.calling.mapper.SDPRewriteMapper.rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL, @
+    z.calling.mapper.SDPMapper.rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL, @
     .then ([ice_candidates, local_sdp]) =>
       @local_sdp local_sdp
 
@@ -448,7 +448,7 @@ class z.calling.entities.EFlow
     @peer_connection.createAnswer()
     .then (sdp_answer) =>
       @logger.debug "Creating '#{z.calling.rtc.SDPType.ANSWER}' successful", sdp_answer
-      z.calling.mapper.SDPRewriteMapper.rewrite_sdp sdp_answer, z.calling.enum.SDPSource.LOCAL, @
+      z.calling.mapper.SDPMapper.rewrite_sdp sdp_answer, z.calling.enum.SDPSource.LOCAL, @
     .then ([ice_candidates, local_sdp]) =>
       @local_sdp local_sdp
 
@@ -473,7 +473,7 @@ class z.calling.entities.EFlow
     @peer_connection.createOffer offer_options
     .then (sdp_offer) =>
       @logger.debug "Creating '#{z.calling.rtc.SDPType.OFFER}' successful", sdp_offer
-      z.calling.mapper.SDPRewriteMapper.rewrite_sdp sdp_offer, z.calling.enum.SDPSource.LOCAL, @
+      z.calling.mapper.SDPMapper.rewrite_sdp sdp_offer, z.calling.enum.SDPSource.LOCAL, @
     .then ([ice_candidates, local_sdp]) =>
       @local_sdp local_sdp
 

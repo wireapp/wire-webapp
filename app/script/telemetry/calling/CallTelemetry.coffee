@@ -27,6 +27,7 @@ class z.telemetry.calling.CallTelemetry
 
     @sessions = {}
     @protocol_version = if protocol_version is z.calling.enum.PROTOCOL.VERSION_2 then 'C2' else 'C3'
+    @remote_version = undefined
 
 
   ###############################################################################
@@ -77,6 +78,14 @@ class z.telemetry.calling.CallTelemetry
   ###############################################################################
 
   ###
+  Stores the remove version of call.
+  @param remote_version [String] Remove version string
+  ###
+  set_remote_version: (remote_version) =>
+    @remote_version = remote_version
+    @logger.info "Identified remote call version as '#{remote_version}'"
+
+  ###
   Reports call events for call tracking to Localytics.
   @param event_name [z.tracking.EventName] String for call event
   @param call_et [z.calling.Call] Call entity
@@ -89,6 +98,7 @@ class z.telemetry.calling.CallTelemetry
         conversation_participants: call_et.conversation_et.number_of_participants()
         conversation_participants_in_call: call_et.max_number_of_participants
         conversation_type: if call_et.is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
+        remote_version: @remote_version
         version: @protocol_version
         with_bot: call_et.conversation_et.is_with_bot()
       , attributes
@@ -129,6 +139,7 @@ class z.telemetry.calling.CallTelemetry
         duration: duration_bucket
         duration_sec: duration
         reason: call_et.finished_reason
+        remote_version: @remote_version
         version: @protocol_version
         with_bot: call_et.conversation_et.is_with_bot()
 
