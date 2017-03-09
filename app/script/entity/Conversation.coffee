@@ -489,6 +489,7 @@ class z.entity.Conversation
       muted_timestamp: @muted_timestamp()
       name: @name()
       others: @participating_user_ids()
+      status: @status()
       type: @type()
       verification_state: @verification_state()
     }
