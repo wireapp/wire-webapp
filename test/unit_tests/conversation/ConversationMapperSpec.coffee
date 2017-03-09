@@ -192,6 +192,21 @@ describe 'Conversation Mapper', ->
       expect(merged_data.muted_timestamp).toBe local_data.muted_timestamp
       expect(merged_data.verification_state).toBe local_data.verification_state
 
+    it 'merged data contains remote data', ->
+      #@formatter:off
+      remote_data = {"access": ["private"], "creator": "532af01e-1e24-4366-aacf-33b67d4ee376", "members": { "self": { "hidden_ref": null, "status": 0, "last_read": "3d.800122000ad95594", "muted_time": null, "service": null, "otr_muted_ref": null, "muted": null, "status_time": "2015-01-07T16:26:51.363Z", "hidden": false, "status_ref": "0.0", "id": "8b497692-7a38-4a5d-8287-e3d1006577d6", "otr_archived": false, "cleared": null, "otr_muted": false, "otr_archived_ref": "2017-02-16T10:06:41.118Z", "archived": null }, "others": [{ "status": 0, "id": "532af01e-1e24-4366-aacf-33b67d4ee376" }] }, "name": "Family Gathering", "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "type": 2, "last_event_time": "2017-02-14T17:11:10.619Z", "last_event": "4a.800122000a62e4a1"}
+      #@formatter:on
+
+      merged_conversations = conversation_mapper.merge_conversations [], [remote_data]
+      merged_data = merged_conversations[0]
+
+      expect(merged_data.creator).toBe remote_data.creator
+      expect(merged_data.name).toBe remote_data.name
+      expect(merged_data.others[0]).toBe remote_data.members.others[0].id
+      expect(merged_data.status).toBe remote_data.members.self.status
+      expect(merged_data.type).toBe remote_data.type
+      expect(merged_data.last_event_timestamp).toBe 0
+
     it 'only maps other participants if they are still in the conversation', ->
       #@formatter:off
       remote_data = {"access": [ "invite" ], "creator": "d270c7b4-6492-4953-b1bf-be817fe665b2", "members": { "self": { "hidden_ref": null, "status": 0, "last_read": "1.800122000a55200f", "muted_time": null, "service": null, "otr_muted_ref": null, "muted": null, "status_time": "2016-07-05T08:22:32.899Z", "hidden": false, "status_ref": "0.0", "id": "9b47476f-974d-481c-af64-13f82ed98a5f", "otr_archived": true, "cleared": null, "otr_muted": false, "otr_archived_ref": "2016-07-05T09:17:57.741Z", "archived": null }, "others": [ { "status": 1, "id": "39b7f597-dfd1-4dff-86f5-fe1b79cb70a0" }, { "status": 0, "id": "5eeba863-44be-43ff-8c47-7565a028f182" }, { "status": 1, "id": "a187fd3e-479a-4e85-a77f-5e4ab95477cf" }, { "status": 0, "id": "d270c7b4-6492-4953-b1bf-be817fe665b2" } ] }, "name": null, "id": "01251ff6-383d-45b8-9420-751d365c6efe", "type": 0, "last_event_time": "2016-07-05T09:17:57.741Z", "last_event": "4.800122000a5520e4"}

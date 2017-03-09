@@ -118,7 +118,7 @@ class z.conversation.ConversationMapper
   Creates a conversation entity from JSON data.
 
   @private
-  @param data [Object] Conversation data
+  @param data [Object] Either locally stored or backend data
   @return [z.entity.Conversation] Mapped conversation entity
   ###
   _create_conversation_et: (data) ->
@@ -150,10 +150,9 @@ class z.conversation.ConversationMapper
   @param remote [Array] backend payload
   ###
   merge_conversations: (local, remote) ->
-    return remote.map (remote_conversation) ->
+    return remote.map (remote_conversation, index) ->
       local_conversation = local.find (c) -> c.id is remote_conversation.id
       local_conversation ?= id: remote_conversation.id
-      local_conversation.last_event_timestamp ?= new Date().toISOString()
       local_conversation.name = remote_conversation.name
       local_conversation.type = remote_conversation.type
       local_conversation.creator = remote_conversation.creator
@@ -161,6 +160,9 @@ class z.conversation.ConversationMapper
       local_conversation.others = remote_conversation.members.others
         .filter (other) -> other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
         .map (other) -> other.id
+
+      if not local_conversation.last_event_timestamp
+        local_conversation.last_event_timestamp = index # this should ensure a proper order
 
       if not local_conversation.archived_state?
         local_conversation.archived_state = remote_conversation.members.self.otr_archived
