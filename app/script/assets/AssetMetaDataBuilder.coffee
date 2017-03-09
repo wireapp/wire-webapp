@@ -62,15 +62,15 @@ z.assets.AssetMetaDataBuilder =
 
   _build_image_metdadata: (imagefile) ->
     return new Promise (resolve, reject) ->
-        url = window.URL.createObjectURL imagefile
-        img = new Image()
-        img.onload = ->
-          resolve new z.proto.Asset.ImageMetaData img.width, img.height
-          window.URL.revokeObjectURL url
-        img.onerror = (error) ->
-          reject error
-          window.URL.revokeObjectURL url
-        img.src = url
+      url = window.URL.createObjectURL imagefile
+      img = new Image()
+      img.onload = ->
+        resolve new z.proto.Asset.ImageMetaData img.width, img.height
+        window.URL.revokeObjectURL url
+      img.onerror = (error) ->
+        reject error
+        window.URL.revokeObjectURL url
+      img.src = url
 
   _build_audio_metdadata: (audiofile) ->
     z.util.load_file_buffer audiofile
