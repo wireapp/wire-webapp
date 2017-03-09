@@ -130,8 +130,10 @@ class z.conversation.ConversationMapper
     conversation_et.creator = data.creator
     conversation_et.type data.type
     conversation_et.name data.name ? ''
-    conversation_et.last_event_timestamp Date.now()
     conversation_et = @update_self_status conversation_et, data.members?.self or data
+
+    if not conversation_et.last_event_timestamp()
+      conversation_et.last_event_timestamp Date.now()
 
     # all users that are still active
     if data.others
@@ -162,7 +164,7 @@ class z.conversation.ConversationMapper
         .map (other) -> other.id
 
       if not local_conversation.last_event_timestamp
-        local_conversation.last_event_timestamp = index # this should ensure a proper order
+        local_conversation.last_event_timestamp = index + 1 # this should ensure a proper order
 
       if not local_conversation.archived_state?
         local_conversation.archived_state = remote_conversation.members.self.otr_archived
