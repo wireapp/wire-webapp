@@ -23,3 +23,12 @@ z.util ?= {}
 z.util.NumberUtil =
   in_range: (value, lower_bound, upper_bound) ->
     return value >= lower_bound and value <= upper_bound
+
+  root_mean_square: (float_array) ->
+    pow = float_array.map (n) -> Math.pow n, 2
+    sum = pow.reduce (p, n) -> p + n
+    Math.sqrt(sum) / float_array.length
+
+  cap_to_byte: (value) ->
+    MAX_VALUE = 255
+    Math.min Math.abs(parseInt(value * MAX_VALUE, 10)), MAX_VALUE
