@@ -205,7 +205,7 @@ describe 'Conversation Mapper', ->
       expect(merged_data.others[0]).toBe remote_data.members.others[0].id
       expect(merged_data.status).toBe remote_data.members.self.status
       expect(merged_data.type).toBe remote_data.type
-      expect(merged_data.last_event_timestamp).toBe 0
+      expect(merged_data.last_event_timestamp).toBe 1
 
     it 'only maps other participants if they are still in the conversation', ->
       #@formatter:off
