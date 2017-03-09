@@ -217,7 +217,7 @@ ko.subscribable.fn.subscribe_once = (handler, owner, event_name) ->
 ko.bindingHandlers.antiscroll =
   init: (element, valueAccessor) ->
 
-    if z.util.Environment.os.mac
+    if z.util.Environment.os.mac and not z.util.Environment.browser.firefox
       return
 
     $(element).antiscroll
