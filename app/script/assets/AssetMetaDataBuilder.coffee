@@ -94,10 +94,7 @@ z.assets.AssetMetaDataBuilder =
     .then ->
       job(url)
     .then (result) ->
-      # Wait before removing resource and link. Needed in FF
-      window.setTimeout ->
-        window.URL.revokeObjectURL url
-      , 100
+      window.URL.revokeObjectURL url
       result
     .catch (error) ->
       window.URL.revokeObjectURL url
