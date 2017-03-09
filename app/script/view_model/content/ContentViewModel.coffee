@@ -26,7 +26,6 @@ class z.ViewModel.content.ContentViewModel
     @logger = new z.util.Logger 'z.ViewModel.ContentViewModel', z.config.LOGGER.OPTIONS
 
     # repositories
-    @audio_repository = @media_repository.audio_repository
     @cryptography_repository = @client_repository.cryptography_repository
     @giphy_repository = @conversation_repository.giphy_repository
     @user_repository = @conversation_repository.user_repository
@@ -51,7 +50,7 @@ class z.ViewModel.content.ContentViewModel
     @giphy =                      new z.ViewModel.GiphyViewModel 'giphy-modal', @conversation_repository, @giphy_repository
 
     @preferences_account =        new z.ViewModel.content.PreferencesAccountViewModel 'preferences-account', @client_repository, @user_repository
-    @preferences_av =             new z.ViewModel.content.PreferencesAVViewModel 'preferences-av', @audio_repository, @media_repository
+    @preferences_av =             new z.ViewModel.content.PreferencesAVViewModel 'preferences-av', @media_repository
     @preferences_device_details = new z.ViewModel.content.PreferencesDeviceDetailsViewModel 'preferences-devices', @client_repository, @conversation_repository, @cryptography_repository
     @preferences_devices =        new z.ViewModel.content.PreferencesDevicesViewModel 'preferences-devices', @preferences_device_details, @client_repository, @conversation_repository, @cryptography_repository
     @preferences_options =        new z.ViewModel.content.PreferencesOptionsViewModel 'preferences-options', @properties_repository

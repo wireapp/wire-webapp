@@ -27,37 +27,14 @@ class z.audio.AudioRepository
   constructor: ->
     @logger = new z.util.Logger 'z.audio.AudioRepository', z.config.LOGGER.OPTIONS
 
-    @audio_context = undefined
-
     @audio_elements = {}
     @currently_looping = {}
-    @audio_preference = ko.observable z.audio.AudioPreference.ALL
 
+    @audio_preference = ko.observable z.audio.AudioPreference.ALL
     @audio_preference.subscribe (audio_preference) =>
       @_stop_all() if audio_preference is z.audio.AudioPreference.NONE
 
     @_subscribe_to_audio_properties()
-
-  # Closing the AudioContext.
-  close_audio_context: =>
-    if @audio_context
-      @audio_context.close()
-      .then =>
-        @audio_context = undefined
-        @logger.info 'Closed existing AudioContext'
-
-  # Initialize the AudioContext.
-  get_audio_context: =>
-    if @audio_context
-      @logger.info 'Reusing existing AudioContext', @audio_context
-      return @audio_context
-    else if window.AudioContext and window.AudioContext::createMediaStreamSource
-      @audio_context = new window.AudioContext()
-      @logger.info 'Initialized a new AudioContext', @audio_context
-      return @audio_context
-    else
-      @logger.error 'The flow audio cannot use the Web Audio API as it is unavailable.'
-      return undefined
 
   ###
   Initialize the repository.
