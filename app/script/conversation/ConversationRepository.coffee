@@ -991,9 +991,7 @@ class z.conversation.ConversationRepository
   @param image [File, Blob]
   ###
   send_image_asset_v3: (conversation_et, image) =>
-    @send_asset_metadata conversation_et, image
-    .then =>
-      @asset_service.upload_image_asset image
+    @asset_service.upload_image_asset image
     .then (asset) =>
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'asset', asset
