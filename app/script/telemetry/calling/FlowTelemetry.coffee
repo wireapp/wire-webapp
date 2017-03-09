@@ -131,7 +131,7 @@ class z.telemetry.calling.FlowTelemetry
   schedule_check: (timeout) ->
     window.setTimeout =>
       @check_stream z.media.MediaType.AUDIO, timeout
-      @check_stream z.media.MediaType.VIDEO, timeout if @call_et.is_remote_screen_send() or @call_et.is_remote_video_send()
+      @check_stream z.media.MediaType.VIDEO, timeout if @call_et.local_media_type() in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
     , timeout
 
   ###

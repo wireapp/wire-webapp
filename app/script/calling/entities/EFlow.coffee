@@ -66,8 +66,8 @@ class z.calling.entities.EFlow
     @pc_initialized.subscribe (is_initialized) =>
       @telemetry.set_peer_connection @peer_connection if is_initialized
 
-    @audio_stream = @e_call_et.local_audio_stream
-    @video_stream = @e_call_et.local_video_stream
+    @audio_stream = @e_call_et.local_stream_audio
+    @video_stream = @e_call_et.local_stream_video
     @data_channels = {}
 
     @connection_state = ko.observable z.calling.rtc.ICEConnectionState.NEW
