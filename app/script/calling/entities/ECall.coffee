@@ -39,7 +39,7 @@ class z.calling.entities.ECall
     @id = @conversation_et.id
     @timings = undefined
 
-    @audio_repository = @v3_call_center.media_repository.audio_repository
+    @media_repository = @v3_call_center.media_repository
     @config = @v3_call_center.calling_config
     @self_user = @v3_call_center.user_repository.self()
     @self_state = @v3_call_center.self_state
@@ -49,7 +49,6 @@ class z.calling.entities.ECall
     @call_timer_interval = undefined
     @timer_start = undefined
     @duration_time = ko.observable 0
-    @remote_media_type = ko.observable z.media.MediaType.NONE
     @data_channel_opened = false
 
     @is_connected = ko.observable false
@@ -66,8 +65,11 @@ class z.calling.entities.ECall
     @interrupted_participants = ko.observableArray []
 
     # Media
-    @local_audio_stream = ko.observable @v3_call_center.media_stream_handler.local_media_streams.audio
-    @local_video_stream = ko.observable @v3_call_center.media_stream_handler.local_media_streams.video
+    @local_stream_audio = @v3_call_center.media_stream_handler.local_media_streams.audio
+    @local_stream_video = @v3_call_center.media_stream_handler.local_media_streams.video
+
+    @local_media_type = @v3_call_center.media_stream_handler.local_media_type
+    @remote_media_type = ko.observable z.media.MediaType.NONE
 
     # Statistics
     @_reset_timer()

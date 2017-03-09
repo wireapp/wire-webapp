@@ -369,8 +369,6 @@ class z.calling.v3.CallCenter
           e_call_et.participants.push new z.calling.entities.EParticipant e_call_et, e_call_et.conversation_et.participating_user_ets()[0], e_call_et.timings
 
       @self_client_joined true
-      e_call_et.local_audio_stream @media_stream_handler.local_media_streams.audio()
-      e_call_et.local_video_stream @media_stream_handler.local_media_streams.video()
       e_call_et.start_negotiation()
 
   ###
@@ -380,8 +378,9 @@ class z.calling.v3.CallCenter
   leave_call: (conversation_id) =>
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
-      @media_stream_handler.release_media_streams()
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
+      @media_stream_handler.release_media_streams()
+
       if e_call_et.state() is z.calling.enum.CallState.OUTGOING
         e_call_message_type = z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
       else

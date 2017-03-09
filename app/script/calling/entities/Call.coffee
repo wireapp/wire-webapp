@@ -25,22 +25,23 @@ class z.calling.entities.Call
   ###
   Construct a new call entity.
   @param conversation_et [z.entity.Conversation] Conversation the call takes place in
-  @param self_user [z.entity.User] Self user entity
+  @param v2_call_center [z.calling.v2.CallCenter] V2 Call Center
   ###
-  constructor: (@conversation_et, @self_user, @telemetry) ->
+  constructor: (@conversation_et, @v2_call_center) ->
     @logger = new z.util.Logger "z.calling.Call (#{@conversation_et.id})", z.config.LOGGER.OPTIONS
 
     # IDs and references
     @id = @conversation_et.id
     @session_id = undefined
     @event_sequence = 0
+    @self_user = @v2_call_center.user_repository.self()
+    @telemetry = @v2_call_center.telemetry
 
     # States
     @call_timer_interval = undefined
     @timer_start = undefined
     @duration_time = ko.observable 0
     @finished_reason = z.calling.enum.CALL_FINISHED_REASON.UNKNOWN
-    @remote_media_type = ko.observable z.media.MediaType.NONE
 
     @is_connected = ko.observable false
     @is_group = @conversation_et.is_group
@@ -78,8 +79,11 @@ class z.calling.entities.Call
     @interrupted_participants = ko.observableArray []
 
     # Media
-    @local_audio_stream = ko.observable()
-    @local_video_stream = ko.observable()
+    @local_stream_audio = @v2_call_center.media_stream_handler.local_media_streams.audio
+    @local_stream_video = @v2_call_center.media_stream_handler.local_media_streams.video
+
+    @local_media_type = @v2_call_center.media_stream_handler.local_media_type
+    @remote_media_type = ko.observable z.media.MediaType.NONE
 
     # Statistics
     @_reset_timer()
