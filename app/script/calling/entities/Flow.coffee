@@ -83,8 +83,8 @@ class z.calling.entities.Flow
       @telemetry.set_peer_connection @peer_connection
       @telemetry.schedule_check 5000 if is_initialized
 
-    @audio_stream = @call_et.local_audio_stream
-    @video_stream = @call_et.local_video_stream
+    @audio_stream = @call_et.local_stream_audio
+    @video_stream = @call_et.local_stream_video
 
     @has_media_stream = ko.pureComputed => return @video_stream()? or @audio_stream()?
 
