@@ -41,9 +41,8 @@ class z.media.MediaStreamHandler
   ###
   Construct a new MediaStream handler.
   @param media_repository [z.media.MediaRepository] Media repository with with references to all other handlers
-  @param audio_repository [z.audio.AudioRepository] Audio repository to handle all audio related tasks
   ###
-  constructor: (@media_repository, @audio_repository) ->
+  constructor: (@media_repository) ->
     @logger = new z.util.Logger 'z.media.MediaDevicesHandler', z.config.LOGGER.OPTIONS
 
     @calls = -> return []
@@ -529,9 +528,9 @@ class z.media.MediaStreamHandler
   # Reset the MediaStreams and states.
   reset_media_streams: =>
     if not @needs_media_stream()
-      @audio_repository.close_audio_context()
       @release_media_streams()
       @reset_self_states()
+      @media_repository.close_audio_context()
 
   ###
   Set the self stream state to reflect current media type.

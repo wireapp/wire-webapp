@@ -22,7 +22,7 @@ z.ViewModel.content ?= {}
 
 
 class z.ViewModel.content.PreferencesAVViewModel
-  constructor: (element_id, @audio_repository, @media_repository) ->
+  constructor: (element_id, @media_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesAVViewModel', z.config.LOGGER.OPTIONS
 
     @media_devices_handler = @media_repository.devices_handler
@@ -87,7 +87,7 @@ class z.ViewModel.content.PreferencesAVViewModel
   ###
   _initiate_audio_meter: (audio_stream) =>
     @logger.info 'Initiating new audio meter', audio_stream
-    @audio_context = @audio_repository.get_audio_context()
+    @audio_context = @media_repository.get_audio_context()
 
     @audio_analyser = @audio_context.createAnalyser()
     @audio_analyser.fftSize = 1024

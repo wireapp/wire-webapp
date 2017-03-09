@@ -87,7 +87,7 @@ class z.main.App
     repository.cache               = new z.cache.CacheRepository()
     repository.cryptography        = new z.cryptography.CryptographyRepository @service.cryptography, repository.storage
     repository.giphy               = new z.extension.GiphyRepository @service.giphy
-    repository.media               = new z.media.MediaRepository repository.audio
+    repository.media               = new z.media.MediaRepository()
 
     repository.client              = new z.client.ClientRepository @service.client, repository.cryptography
     repository.user                = new z.user.UserRepository @service.user, @service.asset, @service.search, repository.client, repository.cryptography
