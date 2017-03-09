@@ -269,7 +269,7 @@ class z.calling.v3.CallCenter
     .catch (error) =>
       throw error if error.type not in [z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED , z.calling.v3.CallError::TYPE.NOT_FOUND]
       @logger.debug "Sending e-call event of type '#{e_call_message_et.type}' to conversation '#{conversation_et.id}'", e_call_message_et.to_JSON()
-      @conversation_repository.send_e_call conversation_et, e_call_message_et.to_content_string()
+      @conversation_repository.send_e_call conversation_et, e_call_message_et
 
   ###
   Create properties payload for e-call events.
@@ -383,7 +383,7 @@ class z.calling.v3.CallCenter
       @media_stream_handler.release_media_streams()
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
 
-      e_call_message_type = if e_call_et.is_connected() then z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL else z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
+      e_call_message_type = if e_call_et.is_connected() then z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP else z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
       additional_payload =
         conversation_id: conversation_id
         time: new Date().toISOString()

@@ -944,12 +944,15 @@ class z.conversation.ConversationRepository
   ###
   Send e-call message in specified conversation.
   @param conversation_et [z.entity.Conversation] Conversation to send e-call message to
-  @param content [String] Content for e-call message
+  @param e_call_message_et [z.calling.entity.ECallMessage] E-call message
   ###
-  send_e_call: (conversation_et, content) =>
+  send_e_call: (conversation_et, e_call_message_et) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'calling', new z.proto.Calling content
+    generic_message.set 'calling', new z.proto.Calling e_call_message_et.to_content_string()
     @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
+    .then =>
+      if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+        @_track_completed_media_action conversation_et, generic_message, e_call_message_et
 
   ###
   Sends image asset in specified conversation.
@@ -2540,8 +2543,9 @@ class z.conversation.ConversationRepository
   @private
   @param conversation_et [z.entity.Conversation]
   @param generic_message [z.protobuf.GenericMessage]
+  @param e_call_message [z.calling.entities.ECallMessage] Optional e-call message
   ###
-  _track_completed_media_action: (conversation_et, generic_message) ->
+  _track_completed_media_action: (conversation_et, generic_message, e_call_message_et) ->
     if generic_message.content is 'ephemeral'
       message = generic_message.ephemeral
       message_content_type = generic_message.ephemeral.content
@@ -2557,7 +2561,7 @@ class z.conversation.ConversationRepository
         if message.asset.original?
           if message.asset.original.image? then 'photo' else 'file'
       when 'calling'
-        if (JSON.parse generic_message.calling.content).props.videosend then 'video_call' else 'audio_call'
+        if e_call_message_et.props.videosend is 'true' then 'video_call' else 'audio_call'
       when 'image' then 'photo'
       when 'knock' then 'ping'
       when 'text' then 'text' if not message.text.link_preview.length
