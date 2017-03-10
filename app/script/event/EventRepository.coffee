@@ -239,41 +239,24 @@ class z.event.EventRepository
         amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
 
   ###
-  Method to return an array of Conversation IDs which have a certain active conversation type.
-
-  Example:
-  If the notifications for a conversation are for example "call.on", "call.off" and "call.on" then the call is active
-  because the last event which was seen was a "call.on". But if it would be "call.off" then the conversation would not
-  be marked as active and it's ID would not be returned.
-
-  @param include_on [Array<String>] List of event types to look for
-  @param exclude_on [Array<String>] Remove activate state on these events
-  ###
-  get_conversation_ids_with_active_events: (include_on, exclude_on) =>
-    return new Promise (resolve, reject) =>
-      @conversation_service.load_events_with_types _.flatten [include_on, exclude_on]
-      .then (events) ->
-        filtered_conversations = {}
-
-        for event in events
-          conversation_id = event.conversation
-          if event.type in include_on
-            filtered_conversations[conversation_id] = null
-          else if event.type in exclude_on
-            delete filtered_conversations[conversation_id]
-        resolve Object.keys filtered_conversations
-      .catch (error) =>
-        @logger.error "Something failed: #{error?.message}", error
-        reject error
-
-  ###
   Check for conversations with ongoing calls.
   @private
   @return [Promise] Promise that resolves when conversation that could contain a call have been identified
   ###
   _find_ongoing_calls: ->
     @logger.info 'Checking for ongoing calls'
-    @get_conversation_ids_with_active_events [z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE], [z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE]
+    @conversation_service.load_events_with_types [z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE, z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE]
+    .then (events) ->
+      filtered_conversations = {}
+
+      for event in events
+        conversation_id = event.conversation
+        if event.type is z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
+          filtered_conversations[conversation_id] = null unless event.protocol_version is z.calling.enum.PROTOCOL.VERSION_3
+        else if event.type is z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
+          delete filtered_conversations[conversation_id] unless event.protocol_version is z.calling.enum.PROTOCOL.VERSION_3
+
+      return Object.keys filtered_conversations
     .then (response) =>
       @logger.info "Identified '#{response.length}' conversations that possibly have an ongoing call", response
       amplify.publish z.event.WebApp.CALL.STATE.CHECK, conversation_id for conversation_id in response
