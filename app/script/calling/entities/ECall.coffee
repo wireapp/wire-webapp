@@ -186,7 +186,10 @@ class z.calling.entities.ECall
     sound_id = if is_incoming then z.audio.AudioType.INCOMING_CALL else z.audio.AudioType.OUTGOING_CALL
     amplify.publish z.event.WebApp.AUDIO.STOP, sound_id
 
-  _update_remote_state: ->
+  _update_remote_state: (e_call_message_et) ->
+    if e_call_message_et?.type is z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+      @telemetry.set_remote_version z.calling.mapper.SDPMapper.get_tool_version e_call_message_et.sdp
+
     media_type_changed = false
 
     for e_participant_et in @participants()
@@ -218,7 +221,7 @@ class z.calling.entities.ECall
       e_participant_et = new z.calling.entities.EParticipant @, user_et, @timings, e_call_message_et
       @participants.push e_participant_et
       @logger.debug "Adding e-call participant '#{user_et.name()}'", e_participant_et
-      @_update_remote_state()
+      @_update_remote_state e_call_message_et
       return e_participant_et
 
   ###
@@ -262,9 +265,7 @@ class z.calling.entities.ECall
     .then (e_participant_et) =>
       @logger.debug "Updating e-call participant '#{e_participant_et.user.name()}'", e_call_message_et
       e_participant_et.update_state e_call_message_et
-      if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
-        @telemetry.set_remote_version z.calling.mapper.SDPMapper.get_tool_version e_call_message_et.sdp
-      @_update_remote_state()
+      @_update_remote_state e_call_message_et
       return e_participant_et
 
 
