@@ -252,7 +252,7 @@ describe 'z.conversation.ConversationRepository', ->
       group_removed.name 'Removed'
       group_removed.last_event_timestamp Date.now() - 1000
       group_removed.set_timestamp Date.now(), z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
-      group_removed.removed_from_conversation true
+      group_removed.status z.conversation.ConversationStatus.PAST_MEMBER
 
       conversation_repository.save_conversation group_a
       conversation_repository.save_conversation group_b

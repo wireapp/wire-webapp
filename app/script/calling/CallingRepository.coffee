@@ -67,7 +67,6 @@ class z.calling.CallingRepository
 
     @flow_status = undefined
 
-    @protocol_version_1to1 = ko.pureComputed => @calling_config()?.features?.protocol_version_1to1
     @protocol_version_group = ko.pureComputed => @calling_config()?.features?.protocol_version_group
 
     @share_call_states()
@@ -107,12 +106,10 @@ class z.calling.CallingRepository
   outgoing_protocol_version: (conversation_id) =>
     conversation_et = @conversation_repository.get_conversation_by_id conversation_id
 
-    protocol_version = z.calling.enum.PROTOCOL.VERSION_3
-    if @use_v3_api is false or conversation_et?.is_group() or (@use_v3_api isnt true and @protocol_version_1to1() is z.calling.enum.PROTOCOL.VERSION_2)
-      protocol_version = z.calling.enum.PROTOCOL.VERSION_2
+    protocol_version = if conversation_et?.is_group() then z.calling.enum.PROTOCOL.VERSION_2 else z.calling.enum.PROTOCOL.VERSION_3
 
     @logger.log "Selected outgoing call protocol version: #{protocol_version}",
-      {conversation_type: conversation_et?.type(), backend_protocol_1to1: @protocol_version_1to1(), use_v3_api: @use_v3_api}
+      {conversation_type: conversation_et?.type(), backend_protocol_group: @protocol_version_group(), use_v3_api: @use_v3_api}
     return protocol_version
 
   # Initiate calling config update.
@@ -167,7 +164,13 @@ class z.calling.CallingRepository
   ###
   leave_call_on_beforeunload: =>
     conversation_id = @_self_client_on_a_call()
-    @switch_call_center z.calling.enum.CALL_ACTION.LEAVE, [conversation_id] if conversation_id
+    return if not conversation_id
+
+    @get_protocol_of_call conversation_id
+    .then (protocol_version) =>
+      @v2_call_center.state_handler.leave_call conversation_id if protocol_version is z.calling.enum.PROTOCOL.VERSION_2
+    .catch (error) ->
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
   ###
   Check whether we are actively participating in a call.

@@ -503,9 +503,7 @@ class z.calling.handler.CallStateHandler
       return call_et
     .catch =>
       conversation_et = @v2_call_center.conversation_repository.get_conversation_by_id event.conversation
-      call_et = new z.calling.entities.Call conversation_et, @v2_call_center.user_repository.self(), @v2_call_center.telemetry
-      call_et.local_audio_stream = @v2_call_center.media_stream_handler.local_media_streams.audio
-      call_et.local_video_stream = @v2_call_center.media_stream_handler.local_media_streams.video
+      call_et = new z.calling.entities.Call conversation_et, @v2_call_center
       call_et.session_id = event.session or @_fake_session_id()
       call_et.event_sequence = event.sequence
       conversation_et.call call_et

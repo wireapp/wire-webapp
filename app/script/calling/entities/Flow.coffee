@@ -83,8 +83,8 @@ class z.calling.entities.Flow
       @telemetry.set_peer_connection @peer_connection
       @telemetry.schedule_check 5000 if is_initialized
 
-    @audio_stream = @call_et.local_audio_stream
-    @video_stream = @call_et.local_video_stream
+    @audio_stream = @call_et.local_stream_audio
+    @video_stream = @call_et.local_stream_video
 
     @has_media_stream = ko.pureComputed => return @video_stream()? or @audio_stream()?
 
@@ -438,7 +438,7 @@ class z.calling.entities.Flow
   ###
   save_remote_sdp: (remote_sdp) =>
     @logger.debug "Saving remote SDP of type '#{remote_sdp.type}'"
-    z.calling.mapper.SDPRewriteMapper.rewrite_sdp remote_sdp, z.calling.enum.SDPSource.REMOTE, @
+    z.calling.mapper.SDPMapper.rewrite_sdp remote_sdp, z.calling.enum.SDPSource.REMOTE, @
     .then ([ice_candidates, remote_sdp]) =>
       @remote_sdp remote_sdp
 
@@ -446,7 +446,7 @@ class z.calling.entities.Flow
   send_local_sdp: =>
     @_clear_send_sdp_timeout()
 
-    z.calling.mapper.SDPRewriteMapper.rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL, @
+    z.calling.mapper.SDPMapper.rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL, @
     .then ([ice_candidates, local_sdp]) =>
       @local_sdp local_sdp
 
@@ -489,7 +489,7 @@ class z.calling.entities.Flow
     @peer_connection.createAnswer()
     .then (sdp_answer) =>
       @logger.debug "Creating '#{z.calling.rtc.SDPType.ANSWER}' successful", sdp_answer
-      z.calling.mapper.SDPRewriteMapper.rewrite_sdp sdp_answer, z.calling.enum.SDPSource.LOCAL, @
+      z.calling.mapper.SDPMapper.rewrite_sdp sdp_answer, z.calling.enum.SDPSource.LOCAL, @
     .then ([ice_candidates, local_sdp]) =>
       @local_sdp local_sdp
     .catch (error) =>
@@ -515,7 +515,7 @@ class z.calling.entities.Flow
     @peer_connection.createOffer offer_options
     .then (sdp_offer) =>
       @logger.debug "Creating '#{z.calling.rtc.SDPType.OFFER}' successful", sdp_offer
-      z.calling.mapper.SDPRewriteMapper.rewrite_sdp sdp_offer, z.calling.enum.SDPSource.LOCAL, @
+      z.calling.mapper.SDPMapper.rewrite_sdp sdp_offer, z.calling.enum.SDPSource.LOCAL, @
     .then ([ice_candidates, local_sdp]) =>
       @local_sdp local_sdp
     .catch (error) =>
@@ -761,11 +761,13 @@ class z.calling.entities.Flow
   _remove_media_stream: (media_stream) ->
     return @logger.info 'No PeerConnection found to remove MediaStream from' if not @peer_connection
 
-    if @peer_connection.getSenders and @peer_connection.removeTrack
+    if @peer_connection.removeTrack
+      return unless @peer_connection.signalingState is z.calling.rtc.SignalingState.STABLE
       for media_stream_track in media_stream.getTracks()
         for rtp_sender in @peer_connection.getSenders() when rtp_sender.track.id is media_stream_track.id
           @peer_connection.removeTrack rtp_sender
           @logger.info "Removed local MediaStreamTrack of type '#{media_stream_track.kind}' from PeerConnection"
+          break
     else if @peer_connection.signalingState isnt z.calling.rtc.SignalingState.CLOSED
       @peer_connection.removeStream media_stream
       @logger.info "Removed local MediaStream of type '#{media_stream.type}' from PeerConnection",

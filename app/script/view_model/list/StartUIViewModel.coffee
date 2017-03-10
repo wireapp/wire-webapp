@@ -74,12 +74,7 @@ class z.ViewModel.list.StartUIViewModel
     # results
     @top_users = ko.observableArray []
     @suggestions = ko.observableArray []
-    @connections = ko.pureComputed =>
-      @conversation_repository.sorted_conversations()
-      .filter (conversation_et) -> conversation_et.type() is z.conversation.ConversationType.ONE2ONE
-      .map (conversation_et) -> conversation_et.participating_user_ets()[0]
-      .filter (user_et) -> user_et?
-    @connections.extend rateLimit: 500
+    @connections = ko.observableArray []
 
     @search_results =
       groups: ko.observableArray []
@@ -223,16 +218,9 @@ class z.ViewModel.list.StartUIViewModel
     .catch (error) =>
       @logger.error "Could not show the on-boarding results: #{error.message}", error
 
-  get_top_people: =>
-    @conversation_repository.get_most_active_conversations()
-    .then (conversation_ets) ->
-      return conversation_ets
-      .filter (conversation_et) -> conversation_et.is_one2one()
-      .map (conversation_et) -> conversation_et.participating_user_ets()[0]
-      .slice(0, 9)
-
   update_list: =>
     @get_top_people().then (user_ets) => @top_users user_ets
+    @get_connections().then (user_ets) => @connections user_ets
 
     @show_spinner false
 
@@ -345,6 +333,29 @@ class z.ViewModel.list.StartUIViewModel
               @suggestions.remove user_et
         , 550
 
+  ###############################################################################
+  # Data sources
+  ###############################################################################
+
+  get_top_people: =>
+    @conversation_repository.get_most_active_conversations()
+    .then (conversation_ets) ->
+      return conversation_ets
+        .filter (conversation_et) -> conversation_et.is_one2one()
+        .map (conversation_et) -> conversation_et.participating_user_ids()[0]
+        .slice(0, 9)
+    .then (user_ids) =>
+      return new Promise (resolve) =>
+        @user_repository.get_users_by_id user_ids, resolve
+
+  get_connections: =>
+    Promise.resolve().then =>
+      return @conversation_repository.sorted_conversations()
+        .filter (conversation_et) -> conversation_et.is_one2one()
+        .map (conversation_et) -> conversation_et.participating_user_ids()[0]
+    .then (user_ids) =>
+      return new Promise (resolve) =>
+        @user_repository.get_users_by_id user_ids, resolve
 
   ###############################################################################
   # User bubble

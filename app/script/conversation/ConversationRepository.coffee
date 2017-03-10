@@ -152,29 +152,23 @@ class z.conversation.ConversationRepository
       @logger.error "Failed to fetch conversation '#{conversation_id}' from backend: #{error.message}", error
       throw error
 
-  ###
-  Retrieve all conversations using paging.
+  get_conversations: =>
+    @conversation_service.load_conversation_states_from_db()
+    .then (local_conversations) =>
+      is_update_needed = local_conversations.length is 0 or local_conversations[0].status is undefined
 
-  @param limit [Integer] Query limit for conversation
-  @param conversation_id [String] ID of the last conversation in batch
-  @return [Promise] Promise that resolves when all conversations have been retrieved and saved
-  ###
-  get_conversations: (limit = 500, conversation_id) =>
-    @conversation_service.get_conversations limit, conversation_id
-    .then (response) =>
-      if response.conversations.length
-        conversation_ets = @conversation_mapper.map_conversations response.conversations
-        @save_conversations conversation_ets
-
-      if response.has_more
-        last_conversation_et = response.conversations[response.conversations.length - 1]
-        return @get_conversations limit, last_conversation_et.id
-
-      @load_conversation_states()
+      if is_update_needed
+        return @conversation_service.get_all_conversations()
+        .then (remote_conversations) =>
+          @conversation_mapper.merge_conversations local_conversations, remote_conversations
+        .then (merged_conversations) =>
+          @conversation_service.save_conversations_in_db merged_conversations
+      else
+        return local_conversations
+    .then (conversations) =>
+      @save_conversations @conversation_mapper.map_conversations conversations
+      amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
       return @conversations()
-    .catch (error) =>
-      @logger.error "Failed to retrieve conversations from backend: #{error.message}", error
-      throw error
 
   ###
   Get Message with given ID from the database.
@@ -303,7 +297,7 @@ class z.conversation.ConversationRepository
   unblocked_user: (user_et) =>
     @get_one_to_one_conversation user_et
     .then (conversation_et) ->
-      conversation_et.removed_from_conversation false
+      conversation_et.status z.conversation.ConversationStatus.PAST_MEMBER
 
   ###
   Get users and events for conversations.
@@ -451,21 +445,6 @@ class z.conversation.ConversationRepository
             reject error
 
   ###
-  Load the conversation states from the store.
-  ###
-  load_conversation_states: =>
-    @conversation_service.load_conversation_states_from_db()
-    .then (conversation_states) =>
-      for state in conversation_states
-        conversation_et = @get_conversation_by_id state.id
-        @conversation_mapper.update_self_status conversation_et, state
-
-      @logger.info "Updated '#{conversation_states.length}' conversation states"
-      amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
-    .catch (error) =>
-      @logger.error 'Failed to update conversation states', error
-
-  ###
   Maps user connection to the corresponding conversation.
 
   @note If there is no conversation it will request it from the backend
@@ -525,33 +504,7 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation of which the state should be persisted
   @param updated_field [z.conversation.ConversationUpdateType] Optional type of updated state information
   ###
-  save_conversation_state_in_db: (conversation_et, updated_field) =>
-    if updated_field
-      changes = switch updated_field
-        when z.conversation.ConversationUpdateType.ARCHIVED_STATE
-          {
-            archived_state: conversation_et.archived_state()
-            archived_timestamp: conversation_et.archived_timestamp()
-          }
-        when z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
-          cleared_timestamp: conversation_et.cleared_timestamp()
-        when z.conversation.ConversationUpdateType.EPHEMERAL_TIMER
-          ephemeral_timer: conversation_et.ephemeral_timer()
-        when z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
-          last_event_timestamp: conversation_et.last_event_timestamp()
-        when z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
-          last_read_timestamp: conversation_et.last_read_timestamp()
-        when z.conversation.ConversationUpdateType.MUTED_STATE
-          {
-            muted_state: conversation_et.muted_state()
-            muted_timestamp: conversation_et.muted_timestamp()
-          }
-        when z.conversation.ConversationUpdateType.VERIFICATION_STATE
-          verification_state: conversation_et.verification_state()
-      return @conversation_service.update_conversation_state_in_db conversation_et, changes
-      .then =>
-        @logger.info "Persisted update of '#{updated_field}' to conversation '#{conversation_et.id}'"
-
+  save_conversation_state_in_db: (conversation_et) =>
     return @conversation_service.save_conversation_state_in_db conversation_et
 
   ###
@@ -920,13 +873,26 @@ class z.conversation.ConversationRepository
   @param file [File] File to send
   ###
   send_asset_metadata: (conversation_et, file) =>
-    asset = new z.proto.Asset()
-    asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'asset', asset
-    if conversation_et.ephemeral_timer()
-      generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
-    @_send_and_inject_generic_message conversation_et, generic_message
+    z.assets.AssetMetaDataBuilder.build_metadata file
+    .then (metadata) ->
+      asset = new z.proto.Asset()
+      if z.assets.AssetMetaDataBuilder.is_audio file
+        asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name, null, null, metadata
+      else if z.assets.AssetMetaDataBuilder.is_video file
+        asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name, null, metadata
+      else if z.assets.AssetMetaDataBuilder.is_image file
+        asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name, metadata
+      else
+        asset.set 'original', new z.proto.Asset.Original file.type, file.size, file.name
+      asset
+    .then (asset) =>
+      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message.set 'asset', asset
+      if conversation_et.ephemeral_timer()
+        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
+      @_send_and_inject_generic_message conversation_et, generic_message
+    .catch (error) =>
+      @logger.warn "Failed to upload otr asset-metadata for conversation #{conversation_et.id}", error
 
   ###
   Send asset preview message to specified conversation.
@@ -978,12 +944,15 @@ class z.conversation.ConversationRepository
   ###
   Send e-call message in specified conversation.
   @param conversation_et [z.entity.Conversation] Conversation to send e-call message to
-  @param content [String] Content for e-call message
+  @param e_call_message_et [z.calling.entity.ECallMessage] E-call message
   ###
-  send_e_call: (conversation_et, content) =>
+  send_e_call: (conversation_et, e_call_message_et) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'calling', new z.proto.Calling content
+    generic_message.set 'calling', new z.proto.Calling e_call_message_et.to_content_string()
     @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
+    .then =>
+      if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+        @_track_completed_media_action conversation_et, generic_message, e_call_message_et
 
   ###
   Sends image asset in specified conversation.
@@ -1957,7 +1926,7 @@ class z.conversation.ConversationRepository
 
     # Self user joins again
     if @user_repository.self().id in event_json.data.user_ids
-      conversation_et.removed_from_conversation false
+      conversation_et.status z.conversation.ConversationStatus.CURRENT_MEMBER
 
     @update_participating_user_ets conversation_et, =>
       @_add_event_to_conversation event_json, conversation_et
@@ -1983,7 +1952,7 @@ class z.conversation.ConversationRepository
         conversation_et.participating_user_ids.remove user_et.id
         continue if not user_et.is_me
 
-        conversation_et.removed_from_conversation true
+        conversation_et.status z.conversation.ConversationStatus.PAST_MEMBER
         if conversation_et.call()
           amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id
 
@@ -2574,8 +2543,9 @@ class z.conversation.ConversationRepository
   @private
   @param conversation_et [z.entity.Conversation]
   @param generic_message [z.protobuf.GenericMessage]
+  @param e_call_message [z.calling.entities.ECallMessage] Optional e-call message
   ###
-  _track_completed_media_action: (conversation_et, generic_message) ->
+  _track_completed_media_action: (conversation_et, generic_message, e_call_message_et) ->
     if generic_message.content is 'ephemeral'
       message = generic_message.ephemeral
       message_content_type = generic_message.ephemeral.content
@@ -2591,7 +2561,7 @@ class z.conversation.ConversationRepository
         if message.asset.original?
           if message.asset.original.image? then 'photo' else 'file'
       when 'calling'
-        if (JSON.parse generic_message.calling.content).props.videosend then 'video_call' else 'audio_call'
+        if e_call_message_et.props.videosend is 'true' then 'video_call' else 'audio_call'
       when 'image' then 'photo'
       when 'knock' then 'ping'
       when 'text' then 'text' if not message.text.link_preview.length
