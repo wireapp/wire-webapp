@@ -78,6 +78,11 @@ z.calling.mapper.SDPMapper =
         if flow_et.negotiation_mode() is z.calling.enum.SDPNegotiationMode.STREAM_CHANGE and sdp_source is z.calling.enum.SDPSource.LOCAL
           sdp_lines.push 'a=x-streamchange'
 
+      # Remove once obsolete due to high uptake of AVS build containing fix for AUDIO-1215
+      else if sdp_line.startsWith 'a=mid'
+        if z.util.Environment.browser.firefox and sdp_source is z.calling.enum.SDPSource.REMOTE
+          outline = 'a=mid:sdparta_2' if sdp_line is 'a=mid:data'
+
       # Code to nail in bit-rate and ptime settings for improved performance and experience
       else if sdp_line.startsWith 'm=audio'
         if flow_et.negotiation_mode() is z.calling.enum.SDPNegotiationMode.ICE_RESTART or (sdp_source is z.calling.enum.SDPSource.LOCAL and flow_et.is_group())
