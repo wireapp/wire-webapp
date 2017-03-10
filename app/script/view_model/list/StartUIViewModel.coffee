@@ -219,8 +219,8 @@ class z.ViewModel.list.StartUIViewModel
       @logger.error "Could not show the on-boarding results: #{error.message}", error
 
   update_list: =>
-    # @get_top_people().then (user_ets) => @top_users user_ets
-    # @get_connections().then (user_ets) => @connections user_ets
+    @get_top_people().then (user_ets) => @top_users user_ets
+    @get_connections().then (user_ets) => @connections user_ets
 
     @show_spinner false
 
