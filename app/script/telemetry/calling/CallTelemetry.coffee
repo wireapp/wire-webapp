@@ -82,8 +82,9 @@ class z.telemetry.calling.CallTelemetry
   @param remote_version [String] Remove version string
   ###
   set_remote_version: (remote_version) =>
-    @remote_version = remote_version
-    @logger.info "Identified remote call version as '#{remote_version}'"
+    unless @remote_version is remote_version
+      @remote_version = remote_version
+      @logger.info "Identified remote call version as '#{remote_version}'"
 
   ###
   Reports call events for call tracking to Localytics.

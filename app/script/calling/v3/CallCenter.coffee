@@ -212,6 +212,7 @@ class z.calling.v3.CallCenter
             @logger.info "Incoming e-call in conversation '#{e_call_et.conversation_et.display_name()}' accepted on other device"
             return @delete_call e_call_message_et.conversation_id
           when z.calling.enum.CallState.OUTGOING
+            e_call_et.set_remote_version e_call_message_et
             e_call_et.state z.calling.enum.CallState.CONNECTING
             return e_call_et.update_e_participant e_call_message_et
 
@@ -459,6 +460,7 @@ class z.calling.v3.CallCenter
       .then (e_call_et) =>
         @logger.debug "Incoming '#{@_get_media_type_from_properties e_call_message_et.props}' e-call in conversation '#{e_call_et.conversation_et.display_name()}'", e_call_et
         e_call_et.state z.calling.enum.CallState.INCOMING
+        e_call_et.set_remote_version e_call_message_et
         return e_call_et.add_e_participant e_call_message_et, remote_user_et
         .then =>
           @media_stream_handler.initiate_media_stream e_call_et.id, true if e_call_et.is_remote_video_send()
