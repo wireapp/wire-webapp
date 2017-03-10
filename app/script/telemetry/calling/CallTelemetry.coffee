@@ -98,7 +98,7 @@ class z.telemetry.calling.CallTelemetry
         conversation_participants: call_et.conversation_et.number_of_participants()
         conversation_participants_in_call: call_et.max_number_of_participants
         conversation_type: if call_et.is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
-        remote_version: @remote_version
+        remote_version: @remote_version if event_name in [z.tracking.EventName.CALLING.ESTABLISHED_CALL, z.tracking.EventName.CALLING.JOINED_CALL]
         version: @protocol_version
         with_bot: call_et.conversation_et.is_with_bot()
       , attributes
