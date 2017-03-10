@@ -168,10 +168,10 @@ class z.conversation.ConversationMapper
 
       if not local_conversation.archived_state?
         local_conversation.archived_state = remote_conversation.members.self.otr_archived
-        local_conversation.archived_timestamp = remote_conversation.members.self.otr_archived_ref
+        local_conversation.archived_timestamp = new Date(remote_conversation.members.self.otr_archived_ref).getTime()
 
       if not local_conversation.muted_state?
         local_conversation.muted_state = remote_conversation.members.self.otr_muted
-        local_conversation.muted_timestamp = remote_conversation.members.self.otr_muted_ref
+        local_conversation.muted_timestamp = new Date(remote_conversation.members.self.otr_muted_ref).getTime()
 
       return local_conversation
