@@ -106,15 +106,19 @@ class z.ViewModel.VideoCallingViewModel
     @disable_toggle_screen = ko.pureComputed =>
       return @joined_call()?.is_remote_screen_send()
 
+    @visible_call_id = undefined
     @joined_call.subscribe (joined_call) =>
       if joined_call
+        return if @visible_call_id is joined_call.id
+        @visible_call_id = joined_call.id
         if @show_local_video() or @show_remote_video()
           @multitasking.is_minimized false
-          @logger.info "Displaying call '#{joined_call.id}' full-screen", joined_call
+          @logger.info "Maximizing video call '#{joined_call.id}' to full-screen", joined_call
         else
           @multitasking.is_minimized true
-        @logger.info "Minimizing call '#{joined_call.id}' that is not videod", joined_call
+          @logger.info "Minimizing audio call '#{joined_call.id}' from full-screen", joined_call
       else
+        @visible_call_id = undefined
         @multitasking.auto_minimize true
         @multitasking.is_minimized false
         @logger.info 'Resetting full-screen calling to maximize'
