@@ -49,7 +49,6 @@ class z.entity.Conversation
 
     # in case this is a one2one conversation this is the connection to that user
     @connection = ko.observable new z.entity.Connection()
-    @connection.subscribe (connection_et) => @participating_user_ids [connection_et.to]
 
     ###############################################################################
     # E2EE conversation states
@@ -180,6 +179,10 @@ class z.entity.Conversation
       else
         return @name()
 
+    @persist_state = _.debounce =>
+      amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @
+    , 100
+
     amplify.subscribe z.event.WebApp.CONVERSATION.LOADED_STATES, @_subscribe_to_states_updates
 
   _subscribe_to_states_updates: =>
@@ -196,7 +199,7 @@ class z.entity.Conversation
       @type
       @verification_state
     ].forEach (property) =>
-      property.subscribe => amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @
+      property.subscribe @persist_state
 
   ###############################################################################
   # Lifecycle
