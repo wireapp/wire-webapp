@@ -164,7 +164,10 @@ class z.conversation.ConversationMapper
         .map (other) -> other.id
 
       if not local_conversation.last_event_timestamp
-        local_conversation.last_event_timestamp = index + 1 # this should ensure a proper order
+        if remote_conversation.last_event_time?
+          local_conversation.last_event_timestamp = new Date(remote_conversation.last_event_time).getTime()
+        else
+          local_conversation.last_event_timestamp = index + 1 # this should ensure a proper order
 
       if not local_conversation.archived_state?
         local_conversation.archived_state = remote_conversation.members.self.otr_archived
