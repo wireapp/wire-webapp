@@ -51,13 +51,3 @@ class z.search.SearchService
     @client.send_request
       type: 'GET'
       url: @client.create_url "/search/contacts?q=#{encodeURIComponent(query)}&size=#{size}&l=#{level}&d=#{directory}"
-
-  ###
-  Ignore suggested user.
-  @param user_id [String] User ID
-  @return [Promise] Promise that resolves when a suggestion has been ignored
-  ###
-  put_suggestions_ignore: (user_id) ->
-    @client.send_request
-      type: 'PUT'
-      url: @client.create_url "/search/suggestions/#{user_id}/ignore"
