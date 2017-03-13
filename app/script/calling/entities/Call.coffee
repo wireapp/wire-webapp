@@ -41,7 +41,7 @@ class z.calling.entities.Call
     @call_timer_interval = undefined
     @timer_start = undefined
     @duration_time = ko.observable 0
-    @finished_reason = z.calling.enum.CALL_FINISHED_REASON.UNKNOWN
+    @termination_reason = undefined
 
     @is_connected = ko.observable false
     @is_group = @conversation_et.is_group
@@ -70,10 +70,7 @@ class z.calling.entities.Call
     # @todo Calculate panning on participants update
     @participants = ko.observableArray []
     @participants_count = ko.pureComputed =>
-      if @self_user_joined()
-        @get_number_of_participants() + 1
-      else
-        @get_number_of_participants()
+      return @get_number_of_participants @self_user_joined()
     @max_number_of_participants = 0
 
     @interrupted_participants = ko.observableArray []
@@ -106,7 +103,7 @@ class z.calling.entities.Call
       else
         @is_connected false
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP if @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
-        @telemetry.track_duration @
+        @telemetry.track_duration @ if @termination_reason
         @_reset_timer()
         @_reset_flows()
 
@@ -273,9 +270,12 @@ class z.calling.entities.Call
 
   ###
   Get the number of participants in the call.
-  @return [Number] Number of participants in call excluding the self user
+  @param add_self_user [Boolean] Add self user to count
+  @return [Number] Number of participants in call
   ###
-  get_number_of_participants: =>
+  get_number_of_participants: (add_self_user) =>
+    if add_self_user
+      return @participants().length + 1
     return @participants().length
 
   ###
@@ -478,7 +478,7 @@ class z.calling.entities.Call
   reset_call: =>
     @self_client_joined false
     @event_sequence = 0
-    @finished_reason = z.calling.enum.CALL_FINISHED_REASON.UNKNOWN
+    @termination_reason = undefined
     @is_connected false
     @session_id = undefined
     @self_user_joined false

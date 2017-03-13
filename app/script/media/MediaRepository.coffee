@@ -19,6 +19,14 @@
 window.z ?= {}
 z.media ?= {}
 
+
+#https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/state
+AUDIO_CONTEXT_STATE =
+  CLOSED: 'closed'
+  RUNNING: 'running'
+  SUSPENDED: 'suspended'
+
+
 # Media Repository
 class z.media.MediaRepository
   ###
@@ -41,7 +49,7 @@ class z.media.MediaRepository
 
   # Closing the AudioContext.
   close_audio_context: =>
-    if @audio_context
+    if @audio_context?.state is AUDIO_CONTEXT_STATE.RUNNING
       @audio_context.close()
       .then =>
         @logger.info 'Closed existing AudioContext', @audio_context

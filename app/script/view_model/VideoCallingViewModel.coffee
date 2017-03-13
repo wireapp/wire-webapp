@@ -86,6 +86,7 @@ class z.ViewModel.VideoCallingViewModel
       return @joined_call()? and @joined_call() instanceof z.calling.entities.ECall
 
     @show_switch_camera = ko.pureComputed =>
+      return false if @joined_v3_call()
       is_visible = @local_video_stream() and @available_devices.video_input().length > 1 and @self_stream_state.video_send()
       return @is_ongoing() and is_visible
     @show_switch_screen = ko.pureComputed =>
@@ -165,11 +166,11 @@ class z.ViewModel.VideoCallingViewModel
       .catch (error) =>
         @logger.error 'Unable to get screens sources for sharing', error
 
-  clicked_on_cancel_call: =>
-    amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @joined_call()?.id
-
   clicked_on_cancel_screen: =>
     @is_choosing_screen false
+
+  clicked_on_leave_call: =>
+    amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @joined_call()?.id, z.calling.enum.TERMINATION_REASON.SELF_USER
 
   clicked_on_mute_audio: =>
     amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call()?.id, z.media.MediaType.AUDIO

@@ -50,6 +50,7 @@ class z.calling.entities.ECall
     @timer_start = undefined
     @duration_time = ko.observable 0
     @data_channel_opened = false
+    @termination_reason = undefined
 
     @is_connected = ko.observable false
     @is_group = @conversation_et.is_group
@@ -91,9 +92,7 @@ class z.calling.entities.ECall
       return false
 
     @participants_count = ko.pureComputed =>
-      if @self_user_joined()
-        return @get_number_of_participants() + 1
-      return @get_number_of_participants()
+      return @get_number_of_participants @self_user_joined()
 
     # Observable subscriptions
     @is_connected.subscribe (is_connected) =>
@@ -118,7 +117,7 @@ class z.calling.entities.ECall
       return if is_joined
       @is_connected false
       amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP if @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
-      @telemetry.track_duration @
+      @telemetry.track_duration @ if @termination_reason
       @_reset_timer()
       @_reset_e_flows()
 
@@ -241,9 +240,12 @@ class z.calling.entities.ECall
 
   ###
   Get the number of participants in the call.
-  @return [Number] Number of participants in call excluding the self user
+  @param add_self_user [Boolean] Add self user to count
+  @return [Number] Number of participants in call
   ###
-  get_number_of_participants: =>
+  get_number_of_participants: (add_self_user) =>
+    if add_self_user
+      return @participants().length + 1
     return @participants().length
 
   ###
@@ -338,6 +340,7 @@ class z.calling.entities.ECall
     @self_user_joined false
     @is_connected false
     @session_id = undefined
+    @termination_reason = undefined
     amplify.publish z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION
 
   ###

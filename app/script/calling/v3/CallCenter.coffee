@@ -115,7 +115,7 @@ class z.calling.v3.CallCenter
   @param e_call_message_et [z.calling.entities.ECallMessage] Mapped incoming e-call message entity
   ###
   _on_event_in_supported_browsers: (e_call_message_et) ->
-    @logger.debug "Received e-call message of type '#{e_call_message_et.type}' from user '#{e_call_message_et.user_id}' in conversation '#{e_call_message_et.conversation_id}'", e_call_message_et
+    @logger.debug "Received e-call '#{e_call_message_et.type}' message from user '#{e_call_message_et.user_id}' in conversation '#{e_call_message_et.conversation_id}'", e_call_message_et
 
     switch e_call_message_et.type
       when z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
@@ -164,6 +164,8 @@ class z.calling.v3.CallCenter
       e_call_et.delete_e_participant e_call_message_et.user_id
     .then (e_call_et) =>
       unless e_call_et.participants().length
+        if e_call_et.state() is z.calling.enum.CallState.CONNECTING
+          e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.OTHER_USER
         @delete_call e_call_message_et.conversation_id
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
@@ -181,9 +183,11 @@ class z.calling.v3.CallCenter
     @get_e_call_by_id e_call_message_et.conversation_id
     .then (e_call_et) =>
       @_confirm_e_call_message e_call_et, e_call_message_et
-      e_call_et.delete_e_participant e_call_message_et.user_id
+      e_call_et.delete_e_participant e_call_message_et.user_id, z.calling.enum.TERMINATION_REASON.OTHER_USER
     .then (e_call_et) =>
-      @delete_call e_call_message_et.conversation_id unless e_call_et.participants().length
+      unless e_call_et.participants().length
+        e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.OTHER_USER
+        @delete_call e_call_message_et.conversation_id
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
@@ -208,22 +212,18 @@ class z.calling.v3.CallCenter
   _on_e_call_setup_event: (e_call_message_et) =>
     @get_e_call_by_id e_call_message_et.conversation_id
     .then (e_call_et) =>
-      if e_call_message_et.response is true
-        switch e_call_et.state()
-          when z.calling.enum.CallState.INCOMING
-            @logger.info "Incoming e-call in conversation '#{e_call_et.conversation_et.display_name()}' accepted on other device"
-            return @delete_call e_call_message_et.conversation_id
-          when z.calling.enum.CallState.OUTGOING
-            e_call_et.set_remote_version e_call_message_et
-            e_call_et.state z.calling.enum.CallState.CONNECTING
-            return e_call_et.update_e_participant e_call_message_et
+      return if e_call_message_et.response is false
 
-      return new Promise (resolve) =>
-        @user_repository.get_user_by_id e_call_message_et.user_id, (remote_user_et) ->
-          return e_call_et.add_e_participant e_call_message_et, remote_user_et
-          .then resolve
-    .then (e_participant_et) ->
-      e_participant_et.session_id = e_call_message_et.session_id if e_participant_et
+      switch e_call_et.state()
+        when z.calling.enum.CallState.INCOMING
+          @logger.info "Incoming e-call in conversation '#{e_call_et.conversation_et.display_name()}' accepted on other device"
+          return @delete_call e_call_message_et.conversation_id
+        when z.calling.enum.CallState.OUTGOING
+          e_call_et.set_remote_version e_call_message_et
+          return e_call_et.update_e_participant e_call_message_et
+          .then (e_participant_et) ->
+            e_call_et.state z.calling.enum.CallState.CONNECTING
+            e_participant_et.session_id = e_call_message_et.session_id
     .catch (error) =>
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
       return if e_call_message_et.user_id is @user_repository.self().id
@@ -280,12 +280,12 @@ class z.calling.v3.CallCenter
     @get_e_call_by_id conversation_et.id
     .then (e_call_et) =>
       if e_call_et.data_channel_opened and e_call_message_et.type in [z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC]
-        @logger.debug "Sending e-call event of type '#{e_call_message_et.type}' to conversation '#{conversation_et.id}' via data channel", e_call_message_et.to_JSON()
+        @logger.debug "Sending e-call '#{e_call_message_et.type}' message to conversation '#{conversation_et.id}' via data channel", e_call_message_et.to_JSON()
         return e_flow_et.send_message e_call_message_et.to_content_string() for e_flow_et in e_call_et.get_flows()
       throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED
     .catch (error) =>
       throw error if error.type not in [z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED , z.calling.v3.CallError::TYPE.NOT_FOUND]
-      @logger.debug "Sending e-call event of type '#{e_call_message_et.type}' to conversation '#{conversation_et.id}'", e_call_message_et.to_JSON()
+      @logger.debug "Sending e-call '#{e_call_message_et.type}' message to conversation '#{conversation_et.id}'", e_call_message_et.to_JSON()
       @conversation_repository.send_e_call conversation_et, e_call_message_et
 
   ###
@@ -395,13 +395,15 @@ class z.calling.v3.CallCenter
   ###
   User action to leave an e-call.
   @param conversation_id [String] ID of conversation to leave e-call in
+  @param termination_reason [z.calling.enum.TERMINATION_REASON] Optional on reason for call termination
   ###
-  leave_call: (conversation_id) =>
+  leave_call: (conversation_id, termination_reason) =>
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
       @media_stream_handler.release_media_streams()
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
+      e_call_et.termination_reason = termination_reason if termination_reason
 
       e_call_message_type = if e_call_et.is_connected() then z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP else z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
       additional_payload =

@@ -64,7 +64,7 @@ z.conversation.EventBuilder = do ->
     from: e_call_message_et.user_id
     time: e_call_message_et.time
     data:
-      reason: z.calling.enum.CALL_FINISHED_REASON.MISSED
+      reason: z.calling.enum.TERMINATION_REASON.MISSED
     protocol_version: z.calling.enum.PROTOCOL.VERSION_3
 
   build_delete = (conversation_id, message_id, time, message_to_delete_et) ->

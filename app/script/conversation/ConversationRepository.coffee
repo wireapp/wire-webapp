@@ -1952,7 +1952,7 @@ class z.conversation.ConversationRepository
 
         conversation_et.status z.conversation.ConversationStatus.PAST_MEMBER
         if conversation_et.call()
-          amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id
+          amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.REMOVED_MEMBER
 
       @update_participating_user_ets conversation_et, =>
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
