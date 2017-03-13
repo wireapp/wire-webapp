@@ -24,7 +24,7 @@ LOCALYTICS =
   SESSION_INTERVAL: 60000 # milliseconds
   DISABLED_DOMAINS: [
     'localhost'
-    'wire-webapp'
+    'zinfra.io'
   ]
 
 RAYGUN =
