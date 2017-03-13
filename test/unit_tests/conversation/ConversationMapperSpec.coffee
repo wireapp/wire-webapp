@@ -192,6 +192,34 @@ describe 'Conversation Mapper', ->
       expect(merged_data.muted_timestamp).toBe local_data.muted_timestamp
       expect(merged_data.verification_state).toBe local_data.verification_state
 
+    it 'should set muted and archived data on local data if not present', ->
+      #@formatter:off
+      local_data = {"cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "verification_state": 0}
+      remote_data = {"access": ["private"], "creator": "532af01e-1e24-4366-aacf-33b67d4ee376", "members": { "self": { "hidden_ref": null, "status": 0, "last_read": "3d.800122000ad95594", "muted_time": null, "service": null, "otr_muted_ref": "2015-01-07T16:26:51.363Z", "muted": null, "status_time": "2015-01-07T16:26:51.363Z", "hidden": false, "status_ref": "0.0", "id": "8b497692-7a38-4a5d-8287-e3d1006577d6", "otr_archived": false, "cleared": null, "otr_muted": false, "otr_archived_ref": "2017-02-16T10:06:41.118Z", "archived": null }, "others": [{ "status": 0, "id": "532af01e-1e24-4366-aacf-33b67d4ee376" }] }, "name": "Family Gathering", "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "type": 2, "last_event_time": "2017-02-14T17:11:10.619Z", "last_event": "4a.800122000a62e4a1"}
+      #@formatter:on
+
+      merged_conversations = conversation_mapper.merge_conversations [local_data], [remote_data]
+      merged_data = merged_conversations[0]
+
+      expect(merged_data.creator).toBe remote_data.creator
+      expect(merged_data.name).toBe remote_data.name
+      expect(merged_data.others[0]).toBe remote_data.members.others[0].id
+      expect(merged_data.status).toBe remote_data.members.self.status
+      expect(merged_data.type).toBe remote_data.type
+
+      expect(merged_data.cleared_timestamp).toBe local_data.cleared_timestamp
+      expect(merged_data.ephemeral_timer).toBe local_data.ephemeral_timer
+      expect(merged_data.id).toBe local_data.id
+      expect(merged_data.last_event_timestamp).toBe local_data.last_event_timestamp
+      expect(merged_data.last_read_timestamp).toBe local_data.last_read_timestamp
+      expect(merged_data.verification_state).toBe local_data.verification_state
+
+      expect(merged_data.archived_state).toBe remote_data.members.self.otr_archived
+      expect(merged_data.archived_timestamp).toBe new Date(remote_data.members.self.otr_archived_ref).getTime()
+
+      expect(merged_data.muted_state).toBe remote_data.members.self.otr_muted
+      expect(merged_data.muted_timestamp).toBe new Date(remote_data.members.self.otr_muted_ref).getTime()
+
     it 'merged data contains remote data', ->
       #@formatter:off
       remote_data = {"access": ["private"], "creator": "532af01e-1e24-4366-aacf-33b67d4ee376", "members": { "self": { "hidden_ref": null, "status": 0, "last_read": "3d.800122000ad95594", "muted_time": null, "service": null, "otr_muted_ref": null, "muted": null, "status_time": "2015-01-07T16:26:51.363Z", "hidden": false, "status_ref": "0.0", "id": "8b497692-7a38-4a5d-8287-e3d1006577d6", "otr_archived": false, "cleared": null, "otr_muted": false, "otr_archived_ref": "2017-02-16T10:06:41.118Z", "archived": null }, "others": [{ "status": 0, "id": "532af01e-1e24-4366-aacf-33b67d4ee376" }] }, "name": "Family Gathering", "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "type": 2, "last_event_time": "2017-02-14T17:11:10.619Z", "last_event": "4a.800122000a62e4a1"}

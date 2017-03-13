@@ -49,6 +49,8 @@ class z.entity.Conversation
 
     # in case this is a one2one conversation this is the connection to that user
     @connection = ko.observable new z.entity.Connection()
+    @connection.subscribe (connection_et) =>
+      @participating_user_ids [connection_et.to] if connection_et.to not in @participating_user_ids()
 
     ###############################################################################
     # E2EE conversation states

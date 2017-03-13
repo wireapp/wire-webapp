@@ -372,6 +372,9 @@ class z.calling.v3.CallCenter
 
       @self_client_joined true
       e_call_et.start_negotiation()
+    .catch (error) =>
+      @delete_call conversation_id
+      throw error unless error instanceof z.media.MediaError
 
   ###
   User action to leave an e-call.
@@ -466,6 +469,9 @@ class z.calling.v3.CallCenter
           @media_stream_handler.initiate_media_stream e_call_et.id, true if e_call_et.is_remote_video_send()
           @telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, e_call_et
           @_distribute_activation_event e_call_message_et
+        .catch (error) =>
+          @delete_call e_call_et.conversation_et.id
+          throw error unless error instanceof z.media.MediaError
 
   ###
   Constructs an outgoing e-call entity.
