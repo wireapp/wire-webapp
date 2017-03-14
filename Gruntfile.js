@@ -19,7 +19,7 @@
 
 'use strict';
 
-module.exports = grunt => {
+module.exports = (grunt) => {
   require('load-grunt-tasks')(grunt);
   const path = require('path');
 
@@ -100,7 +100,7 @@ module.exports = grunt => {
   grunt.registerTask('app_deploy_staging', ['gitinfo', 'set_version:staging', 'aws_deploy']);
   grunt.registerTask('app_deploy_prod', ['gitinfo', 'set_version:prod', 'aws_deploy']);
 
-  grunt.registerTask('app_deploy_travis', target => {
+  grunt.registerTask('app_deploy_travis', (target) => {
     if (target === 'prod' || target === 'staging') {
       return grunt.task.run(`set_version:${target}`, 'init', `prepare_${target}`, 'aws_prepare');
     } else if (target === 'dev') {
@@ -113,7 +113,7 @@ module.exports = grunt => {
   // Test Related
   grunt.registerTask('test', () => grunt.task.run(['clean:docs_coverage', 'scripts', 'test_init', 'test_prepare', 'karma:test']));
 
-  grunt.registerTask('test_prepare', function(test_name) {
+  grunt.registerTask('test_prepare', (test_name) => {
     const scripts = grunt.config('scripts');
 
     const prepare_file_names = (file_name_array) => {
@@ -132,7 +132,7 @@ module.exports = grunt => {
 
   grunt.registerTask('test_init', ['prepare_dist', 'prepare_test']);
 
-  grunt.registerTask('test_run', test_name => {
+  grunt.registerTask('test_run', (test_name) => {
     grunt.config('karma.options.reporters', ['progress']);
     return grunt.task.run(['scripts', 'newer:coffee:dist', 'newer:coffee:test', `test_prepare:${test_name}`, 'karma:test']);
   });
