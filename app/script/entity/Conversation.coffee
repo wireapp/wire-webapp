@@ -56,7 +56,7 @@ class z.entity.Conversation
     # E2EE conversation states
     ###############################################################################
 
-    @archived_state = ko.observable false
+    @archived_state = ko.observable(false).extend notify: 'always'
     @muted_state = ko.observable false
     @verification_state = ko.observable z.conversation.ConversationVerificationState.UNVERIFIED
 
