@@ -56,7 +56,7 @@ class z.entity.Conversation
     # E2EE conversation states
     ###############################################################################
 
-    @archived_state = ko.observable false
+    @archived_state = ko.observable(false).extend notify: 'always'
     @muted_state = ko.observable false
     @verification_state = ko.observable z.conversation.ConversationVerificationState.UNVERIFIED
 
@@ -267,6 +267,12 @@ class z.entity.Conversation
   @param message_et [z.entity.Message] Message entity to be added to the conversation
   ###
   add_message: (message_et) ->
+    first_message = @get_first_message()
+
+    # don't add messages that are older then what is rendered
+    if first_message? and message_et.timestamp() < first_message.timestamp()
+      return
+
     amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et
     @_update_last_read_from_message message_et
     @messages_unordered.push @_check_for_duplicate_nonce message_et, @get_last_message()

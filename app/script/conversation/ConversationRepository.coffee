@@ -75,9 +75,6 @@ class z.conversation.ConversationRepository
     @conversations_cleared = ko.observableArray []
     @conversations_unarchived = ko.observableArray []
 
-    @processed_event_ids = {}
-    @processed_event_nonces = {}
-
     @_init_subscriptions()
 
   _init_state_updates: ->
@@ -2126,25 +2123,6 @@ class z.conversation.ConversationRepository
       return message_ets
 
   ###
-  Check for duplicates by event IDs and cache the event ID.
-
-  @private
-  @param message_et [z.entity.Message] Message entity
-  @param conversation_et [z.entity.Conversation] Conversation entity
-  @return [Boolean] Returns true if event is a duplicate
-  ###
-  _check_for_duplicate_event_by_nonce: (message_et, conversation_et) ->
-    return false if not message_et.nonce
-    event_nonce = "#{conversation_et.id}:#{message_et.nonce}:#{message_et.assets?()[0].type or message_et.super_type}"
-    if @processed_event_nonces[event_nonce] is undefined
-      @processed_event_nonces[event_nonce] = null
-      # @todo Maybe we need to reset "@processed_event_nonces" someday to save some memory, until now it's fine.
-      return false
-    else
-      @logger.warn "Event with nonce '#{event_nonce}' has been already processed.", message_et
-      return true
-
-  ###
   Fetch all unread events and users of a conversation.
   @private
   @param conversation_et [z.entity.Conversation] Conversation fetch events and users for
@@ -2386,15 +2364,8 @@ class z.conversation.ConversationRepository
   @param message_to_delete_et [z.entity.Message]
   ###
   _add_delete_message: (conversation_id, message_id, time, message_to_delete_et) ->
-    amplify.publish z.event.WebApp.EVENT.INJECT,
-      conversation: conversation_id
-      id: message_id
-      data:
-        deleted_time: time
-      type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
-      from: message_to_delete_et.from
-      time: new Date(message_to_delete_et.timestamp()).toISOString()
-
+    event = z.conversation.EventBuilder.build_delete conversation_et.id, event_json.id, event_json.time, message_to_delete_et
+    amplify.publish z.event.WebApp.EVENT.INJECT, event
 
   ###############################################################################
   # Message updates
@@ -2483,32 +2454,6 @@ class z.conversation.ConversationRepository
         @_delete_message conversation_et, original_message_et
     .then ->
       return event_json
-
-
-  ###############################################################################
-  # Helpers
-  ###############################################################################
-
-  ###
-  Archive all conversations but not the self conversation.
-  @note Archiving the self conversation will lead to problems on other clients (like Android).
-  ###
-  archive_all_conversations: =>
-    @archive_conversation conversation_et for conversation_et in @conversations() when not conversation_et.is_self()
-
-  ###
-  Clear and leave all conversations but not the self conversation.
-  ###
-  clear_all_conversations: =>
-    @clear_conversation conversation_et, conversation_et.is_group() for conversation_et in @conversations_unarchived()
-
-  ###
-  Un-archive all conversations (and even the self conversation).
-  @note Un-archiving all conversations can help to reset the client to a proper state.
-  ###
-  unarchive_all_conversations: =>
-    @unarchive_conversation conversation_et for conversation_et in @conversations()
-
 
   ###############################################################################
   # Tracking helpers

@@ -67,9 +67,19 @@ z.conversation.EventBuilder = do ->
       reason: z.calling.enum.CALL_FINISHED_REASON.MISSED
     protocol_version: z.calling.enum.PROTOCOL.VERSION_3
 
+  build_delete = (conversation_id, message_id, time, message_to_delete_et) ->
+    conversation: conversation_id
+    id: message_id
+    type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+    from: message_to_delete_et.from
+    time: new Date(message_to_delete_et.timestamp()).toISOString()
+    data:
+      deleted_time: time
+
   return {
     build_all_verified: build_all_verified
     build_degraded: build_degraded
+    build_delete: build_delete
     build_unable_to_decrypt: build_unable_to_decrypt
     build_voice_channel_activate: build_voice_channel_activate
     build_voice_channel_deactivate: build_voice_channel_deactivate

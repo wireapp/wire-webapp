@@ -32,6 +32,10 @@ module.exports =
     files: ['<%= dir.app_ %>/**/*.coffee', 'sw.coffee']
     tasks: ['coffee:dist']
 
+  js:
+    files: '<%= dir.app_ %>/**/*.js'
+    tasks: ['copy:dist_js']
+
   templates:
     files: '<%= dir.app_ %>/**/*.htm*'
     tasks: ['prepare_template']
