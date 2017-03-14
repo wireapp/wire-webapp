@@ -893,6 +893,7 @@ class z.conversation.ConversationRepository
       @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) =>
       @logger.warn "Failed to upload otr asset-metadata for conversation #{conversation_et.id}", error
+      throw error if error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   ###
   Send asset preview message to specified conversation.

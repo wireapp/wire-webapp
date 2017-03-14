@@ -95,6 +95,10 @@ z.calling.mapper.SDPMapper =
             sdp_lines.push sdp_line
             outline = "a=ptime:#{SDP_MAPPER_CONFIG.AUDIO_PTIME}"
 
+      # Workaround for incompatibility between Chrome 57 and AVS builds. Remove once update of clients with AVS 3.3.x is high enough.
+      else if sdp_line.startsWith 'a=fmtp'
+        outline = 'a=fmtp:125 apt=96' if sdp_line is 'a=fmtp:125 apt=100'
+
       sdp_lines.push outline unless outline is undefined
 
     rtc_sdp.sdp = sdp_lines.join '\r\n'
