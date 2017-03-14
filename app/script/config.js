@@ -19,7 +19,7 @@
 
 'use strict';
 
-if (window.z === null) {
+if (window.z == null) {
   window.z = {};
 }
 
@@ -70,7 +70,6 @@ z.config = {
     PURPLE: 7,
   },
 
-  // Conversation size
   MAXIMUM_CONVERSATION_SIZE: 128,
 
   // self profile image size
@@ -82,7 +81,7 @@ z.config = {
   // 15 megabyte image upload limit
   MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,
 
-  // 25 megabyte upload limit ( minus iv and padding )
+  // 25 megabyte upload limit (minus iv and padding)
   MAXIMUM_ASSET_FILE_SIZE: 25 * 1024 * 1024 - 16 - 16,
 
   // Maximum of parallel uploads
