@@ -53,13 +53,12 @@ z.config = {
     },
   },
 
-  // number of message that will be pulled
+  // number of messages that will be pulled
   MESSAGES_FETCH_LIMIT: 30,
 
-  // number of users displayed in people you may know
+  // number of users displayed in "people you may know"
   SUGGESTIONS_FETCH_LIMIT: 30,
 
-  // Accent color IDs
   ACCENT_ID: {
     BLUE: 1,
     GREEN: 2,
@@ -72,7 +71,7 @@ z.config = {
 
   MAXIMUM_CONVERSATION_SIZE: 128,
 
-  // self profile image size
+  // self profile image size in pixel
   MINIMUM_PROFILE_IMAGE_SIZE: {
     WIDTH: 320,
     HEIGHT: 320,
@@ -81,8 +80,8 @@ z.config = {
   // 15 megabyte image upload limit
   MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,
 
-  // 25 megabyte upload limit (minus iv and padding)
-  MAXIMUM_ASSET_FILE_SIZE: 25 * 1024 * 1024 - 16 - 16,
+  // 25 megabyte upload limit (minus AES overhead)
+  MAXIMUM_ASSET_FILE_SIZE: 25 * 1024 * 1024 - 32,
 
   // Maximum of parallel uploads
   MAXIMUM_ASSET_UPLOADS: 10,
@@ -107,12 +106,13 @@ z.config = {
     'image/gif',
   ],
 
-  LOCALYTICS_SESSION_TIMEOUT: 3 * 60 * 1000, // 3 minutes in milliseconds
+  // 3 minutes session timeout
+  LOCALYTICS_SESSION_TIMEOUT: 3 * 60 * 1000,
 
   MINIMUM_USERNAME_LENGTH: 2,
   MINIMUM_PASSWORD_LENGTH: 8,
 
-  // Time until phone code expires
+  // 10 seconds until phone code expires
   LOGIN_CODE_EXPIRATION: 10 * 60,
 
   // measured in pixel
