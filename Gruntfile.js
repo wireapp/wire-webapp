@@ -45,7 +45,7 @@ module.exports = grunt => {
     aws_: 'aws',
     aws: {
       s3: 'aws/s3',
-      "static": 'aws/static',
+      static: 'aws/static',
       templates: 'aws/templates'
     },
     deploy: 'deploy',
