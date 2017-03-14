@@ -80,14 +80,10 @@ z.config = {
   },
 
   // 15 megabyte image upload limit
-  MAXIMUM_IMAGE_FILE_SIZE: (
-    15 * 1024 * 1024
-  ),
+  MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,
 
   // 25 megabyte upload limit ( minus iv and padding )
-  MAXIMUM_ASSET_FILE_SIZE: (
-    25 * 1024 * 1024 - 16 - 16
-  ),
+  MAXIMUM_ASSET_FILE_SIZE: 25 * 1024 * 1024 - 16 - 16,
 
   // Maximum of parallel uploads
   MAXIMUM_ASSET_UPLOADS: 10,
@@ -112,13 +108,13 @@ z.config = {
     'image/gif',
   ],
 
-  LOCALYTICS_SESSION_TIMEOUT: (3 * 60 * 1000), // 3 minutes in milliseconds
+  LOCALYTICS_SESSION_TIMEOUT: 3 * 60 * 1000, // 3 minutes in milliseconds
 
   MINIMUM_USERNAME_LENGTH: 2,
   MINIMUM_PASSWORD_LENGTH: 8,
 
   // Time until phone code expires
-  LOGIN_CODE_EXPIRATION: (10 * 60),
+  LOGIN_CODE_EXPIRATION: 10 * 60,
 
   // measured in pixel
   SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,
