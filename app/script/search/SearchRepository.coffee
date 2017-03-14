@@ -47,7 +47,7 @@ class z.search.SearchRepository
   @return [Promise<Array<z.entity.User>>] Promise that will resolve with an array containing the users common contacts
   ###
   get_common_contacts: (username) =>
-    @search_service.get_contacts username, 30, z.search.SEARCH_LEVEL.INDIRECT_CONTACT, 1
+    @search_service.get_contacts username, 1
     .then (response) =>
       if response?.documents?.length > 0
         return response.documents[0].mutual_friends_total
