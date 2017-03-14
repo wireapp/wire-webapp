@@ -50,14 +50,6 @@ class z.search.SearchRepository
     @search_service.get_common(user_id).then (response) -> response.returned
 
   ###
-  Ignore suggested user.
-  @param user_id [String] User ID
-  @return [Promise] Promise that resolves when a suggestion has been ignored
-  ###
-  ignore_suggestion: (user_id) ->
-    @search_service.put_suggestions_ignore user_id
-
-  ###
   Search for users on the backend by name.
   @param name [String] Search query
   @return [Promise] Promise that resolves with the search results
