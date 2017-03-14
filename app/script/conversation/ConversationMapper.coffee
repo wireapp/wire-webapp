@@ -172,22 +172,18 @@ class z.conversation.ConversationMapper
 
       # some archived timestamp were not properly stored in the database. to fix this
       # we check if the remote one is newer and update our local timestamp
-      remote_archived_timestamp = remote_conversation.members.self.otr_archived_ref
-      local_archived_timestamp = local_conversation.archived_state
-      has_valid_timestamps = remote_archived_timestamp? and local_archived_timestamp?
-      is_remote_timestamp_newer = has_valid_timestamps and new Date(remote_archived_timestamp).getTime() > local_archived_timestamp
+      remote_archived_timestamp = new Date(remote_conversation.members.self.otr_archived_ref).getTime()
+      is_remote_archived_timestamp_newer = local_conversation.archived_timestamp? and remote_archived_timestamp > local_conversation.archived_timestamp
 
-      if not local_conversation.archived_state? or is_remote_timestamp_newer
+      if not local_conversation.archived_state? or is_remote_archived_timestamp_newer
         local_conversation.archived_state = remote_conversation.members.self.otr_archived
-        local_conversation.archived_timestamp = new Date(remote_conversation.members.self.otr_archived_ref).getTime()
+        local_conversation.archived_timestamp = remote_archived_timestamp
 
-      remote_muted_timestamp = remote_conversation.members.self.otr_muted_ref
-      local_muted_timestamp = local_conversation.muted_timestamp
-      has_valid_muted_timestamps = remote_muted_timestamp? and local_muted_timestamp?
-      is_remote_muted_timestamp_newer = has_valid_muted_timestamps and new Date(remote_muted_timestamp).getTime() > local_muted_timestamp
+      remote_muted_timestamp = new Date(remote_conversation.members.self.otr_muted_ref).getTime()
+      is_remote_muted_timestamp_newer = local_conversation.muted_timestamp? and remote_muted_timestamp > local_conversation.muted_timestamp?
 
       if not local_conversation.muted_state? or is_remote_muted_timestamp_newer
         local_conversation.muted_state = remote_conversation.members.self.otr_muted
-        local_conversation.muted_timestamp = new Date(remote_conversation.members.self.otr_muted_ref).getTime()
+        local_conversation.muted_timestamp = remote_muted_timestamp
 
       return local_conversation
