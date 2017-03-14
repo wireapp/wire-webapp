@@ -181,7 +181,12 @@ class z.conversation.ConversationMapper
         local_conversation.archived_state = remote_conversation.members.self.otr_archived
         local_conversation.archived_timestamp = new Date(remote_conversation.members.self.otr_archived_ref).getTime()
 
-      if not local_conversation.muted_state?
+      remote_muted_timestamp = remote_conversation.members.self.otr_muted_ref
+      local_muted_timestamp = local_conversation.muted_timestamp
+      has_valid_muted_timestamps = remote_muted_timestamp? and local_muted_timestamp?
+      is_remote_muted_timestamp_newer = has_valid_muted_timestamps and new Date(remote_muted_timestamp).getTime() > local_muted_timestamp
+
+      if not local_conversation.muted_state? or is_remote_muted_timestamp_newer
         local_conversation.muted_state = remote_conversation.members.self.otr_muted
         local_conversation.muted_timestamp = new Date(remote_conversation.members.self.otr_muted_ref).getTime()
 
