@@ -34,7 +34,7 @@ module.exports =
       'image/**/*'
       'font/**/*'
       'style/*.css'
-      'script/*/*.js'
+      'script/**/*.js'
       'worker/*'
     ]
 
@@ -42,7 +42,7 @@ module.exports =
     cwd: '<%= dir.app_ %>'
     dest: '<%= dir.dist %>'
     expand: true
-    src: 'script/*/*.js'
+    src: 'script/**/*.js'
 
   dist_audio:
     cwd: '<%= dir.app_ %>/ext/audio/wire-audio-files'
@@ -71,7 +71,7 @@ module.exports =
       'image/**/*'
       'font/**/*'
       'style/*.css'
-      'script/*/*.js'
+      'script/**/*.js'
       'worker/*'
     ]
 
