@@ -21,15 +21,14 @@
 
 module.exports = (grunt) => {
   require('load-grunt-tasks')(grunt);
-  const path = require('path');
 
   const config = {
     aws: {
-      port: 5000
+      port: 5000,
     },
     server: {
-      port: 8888
-    }
+      port: 8888,
+    },
   };
 
   const dir = {
@@ -40,19 +39,19 @@ module.exports = (grunt) => {
       page: 'app/page',
       script: 'app/script',
       style: 'app/style',
-      template_dist: 'app/page/template/_dist'
+      template_dist: 'app/page/template/_dist',
     },
     aws_: 'aws',
     aws: {
       s3: 'aws/s3',
       static: 'aws/static',
-      templates: 'aws/templates'
+      templates: 'aws/templates',
     },
     deploy: 'deploy',
     dist: 'dist',
     docs: {
       api: 'docs/api',
-      coverage: 'docs/coverage'
+      coverage: 'docs/coverage',
     },
     temp: 'temp',
     test_: 'test',
@@ -62,8 +61,8 @@ module.exports = (grunt) => {
       coverage: 'test/coverage',
       js: 'test/js',
       lib: 'test/lib',
-      unit_tests: 'test/unit_tests'
-    }
+      unit_tests: 'test/unit_tests',
+    },
   };
 
   grunt.initConfig({
@@ -87,7 +86,7 @@ module.exports = (grunt) => {
     todo: require('./grunt/config/todo'),
     uglify: require('./grunt/config/uglify'),
     watch: require('./grunt/config/watch'),
-    postcss: require('./grunt/config/postcss')
+    postcss: require('./grunt/config/postcss'),
   });
 
   // Tasks
@@ -104,7 +103,7 @@ module.exports = (grunt) => {
     if (target === 'prod' || target === 'staging') {
       return grunt.task.run(`set_version:${target}`, 'init', `prepare_${target}`, 'aws_prepare');
     } else if (target === 'dev') {
-      return grunt.task.run("set_version:staging", 'init', "prepare_staging", 'aws_prepare');
+      return grunt.task.run('set_version:staging', 'init', 'prepare_staging', 'aws_prepare');
     } else {
       return grunt.fail.warn('Invalid target specified. Valid targets are: "prod" & "staging"');
     }
@@ -124,7 +123,7 @@ module.exports = (grunt) => {
     const app_files = prepare_file_names(scripts.app);
     const component_files = prepare_file_names(scripts.component);
     const vendor_files = prepare_file_names(scripts.vendor);
-    const test_files = test_name ? ["../test/js/#{test_name}Spec.js"] : ['../test/**/*Spec.js'];
+    const test_files = test_name ? ['../test/js/#{test_name}Spec.js'] : ['../test/**/*Spec.js'];
 
     const files = [].concat(helper_files, vendor_files, component_files, app_files, test_files);
     grunt.config('karma.options.files', files);
