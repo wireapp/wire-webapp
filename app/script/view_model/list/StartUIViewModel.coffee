@@ -299,40 +299,6 @@ class z.ViewModel.list.StartUIViewModel
     else
       create_bubble(element[0].id)
 
-  _collapse_item: (search_list_item, callback) ->
-    search_list_item.find('.search-list-item-connect').remove()
-    window.requestAnimationFrame ->
-      search_list_item
-        .addClass 'search-list-item-collapse'
-        .on z.util.alias.animationend, (event) ->
-          if event.originalEvent.propertyName is 'height'
-            search_list_item
-              .remove()
-              .off z.util.alias.animationend
-            callback?()
-
-
-  click_on_dismiss: (user_et, event) =>
-    search_list_item = $(event.currentTarget.parentElement.parentElement)
-    @_collapse_item search_list_item, =>
-      @search_repository.ignore_suggestion user_et.id
-      .then =>
-        @suggestions.remove user_et
-      .catch (error) =>
-        @logger.error "Failed to ignore suggestions: '#{error.message}'", error
-
-  click_on_connect: (user_et, event) =>
-    search_list_item = $(event.currentTarget.parentElement.parentElement)
-    search_list_item
-      .addClass 'search-list-item-connect-anim'
-      .one z.util.alias.animationend, =>
-        window.setTimeout =>
-          @_collapse_item search_list_item, =>
-            @user_repository.create_connection user_et
-            .then =>
-              @suggestions.remove user_et
-        , 550
-
   ###############################################################################
   # Data sources
   ###############################################################################
