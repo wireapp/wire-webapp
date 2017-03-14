@@ -106,7 +106,7 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'prepare_test', [
     'clean:test'
-    'copy:test_js'
+    'copy:test'
     'coffee:test'
   ]
 

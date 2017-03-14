@@ -46,4 +46,4 @@ module.exports =
 
   test_js:
     files: '<%= dir.test_ %>/**/*.js'
-    tasks: ['copy:test_js', 'karma']
+    tasks: ['copy:test', 'karma']

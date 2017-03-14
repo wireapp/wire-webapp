@@ -44,12 +44,6 @@ module.exports =
     expand: true
     src: 'script/**/*.js'
 
-  test_js:
-    cwd: '<%= dir.test.unit_tests %>'
-    dest: '<%= dir.test.js %>'
-    expand: true
-    src: '**/*.js'
-
   dist_audio:
     cwd: '<%= dir.app_ %>/ext/audio/wire-audio-files'
     dest: '<%= dir.dist %>/audio'
@@ -61,6 +55,12 @@ module.exports =
     dest: '<%= dir.dist %>'
     expand: true
     src: 'favicon.ico'
+
+  test:
+    cwd: '<%= dir.test.unit_tests %>'
+    dest: '<%= dir.test.js %>'
+    expand: true
+    src: '**/*.js'
 
 ###############################################################################
 # Prod/Staging/Edge deployment related
