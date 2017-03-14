@@ -22,26 +22,21 @@
 describe('z.util.CountryCodes', function() {
   describe('get_country_code', function() {
     it('returns the county code for an existing ISO name', function() {
-      var code = z.util.CountryCodes.get_country_code('DE');
-      expect(code).toBe(49);
+      expect(z.util.CountryCodes.get_country_code('DE')).toBe(49);
     });
     it('returns undefined for a non-existent ISO name', function() {
-      var code = z.util.CountryCodes.get_country_code('XY');
-      expect(code).toBeUndefined();
+      expect(z.util.CountryCodes.get_country_code('XY')).toBeUndefined();
     });
   });
   describe('get_country_by_code', function() {
     it('returns the most populated country for country code ', function() {
-      var iso_name = z.util.CountryCodes.get_country_by_code(49);
-      expect(iso_name).toBe('DE');
+      expect(z.util.CountryCodes.get_country_by_code(49)).toBe('DE');
     });
     it('returns the most populated country for country code ', function() {
-      var iso_name = z.util.CountryCodes.get_country_by_code(7);
-      expect(iso_name).toBe('RU');
+      expect(z.util.CountryCodes.get_country_by_code(7)).toBe('RU');
     });
     it('returns undefined for a non-existent country code', function() {
-      var iso_name = z.util.CountryCodes.get_country_by_code(9999);
-      expect(iso_name).toBeUndefined();
+      expect(z.util.CountryCodes.get_country_by_code(9999)).toBeUndefined();
     });
   });
 });
