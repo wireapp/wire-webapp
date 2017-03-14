@@ -164,7 +164,7 @@ class z.conversation.ConversationMapper
         .map (other) -> other.id
 
       if not local_conversation.last_event_timestamp
-        # we can remove this once BE removed last_event_time
+        # TODO: we can remove this once BE removed last_event_time
         if remote_conversation.last_event_time?
           local_conversation.last_event_timestamp = new Date(remote_conversation.last_event_time).getTime()
         else
