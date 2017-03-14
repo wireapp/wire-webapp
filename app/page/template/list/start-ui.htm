@@ -38,7 +38,7 @@
           <!-- ko if: show_suggestions() && suggestions().length -->
             <div class="start-ui-list-suggestions">
               <span class="start-ui-list-header" data-uie-name="status-connect" data-bind="l10n_text: z.string.search_connect"></span>
-              <user-list class="search-list-theme-black" params="user: suggestions, click: click_on_other, connect: click_on_connect, dismiss: click_on_dismiss, mode: z.components.UserListMode.INFO"></user-list>
+              <user-list class="search-list-theme-black" params="user: suggestions, click: click_on_other, mode: z.components.UserListMode.INFO"></user-list>
             </div>
           <!-- /ko  -->
           <!-- ko if: show_connections() && connections().length -->
