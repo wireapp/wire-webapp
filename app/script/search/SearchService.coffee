@@ -29,16 +29,6 @@ class z.search.SearchService
     @logger = new z.util.Logger 'z.search.SearchService', z.config.LOGGER.OPTIONS
 
   ###
-  Get common contacts for given user.
-  @param user_id [String] User ID
-  @return [Promise] Promise that resolves with the common contacts
-  ###
-  get_common: (user_id) ->
-    @client.send_request
-      type: 'GET'
-      url: @client.create_url "/search/common/#{user_id}"
-
-  ###
   Search for a user.
 
   @param query [String] Query string (case insensitive)
@@ -47,7 +37,7 @@ class z.search.SearchService
   @param directory [Integer] Fall back to directory if graph search does not find the size of people (0 or 1)
   @return [Promise] Promise that resolves with the search results
   ###
-  get_contacts: (query, size, level, directory) ->
+  get_contacts: (query, size, level = z.search.SEARCH_LEVEL.DIRECT_CONTACT, directory = 1) ->
     @client.send_request
       type: 'GET'
       url: @client.create_url "/search/contacts?q=#{encodeURIComponent(query)}&size=#{size}&l=#{level}&d=#{directory}"

@@ -36,7 +36,7 @@ class z.components.CommonContactsViewModel
           placeholder: '%no',
           content: @common_contacts_total()
 
-    @search_repository.get_common_contacts(@user.id).then (total) =>
+    @search_repository.get_common_contacts(@user.username()).then (total) =>
       @user.mutual_friends_total total
       @common_contacts_total total
 
