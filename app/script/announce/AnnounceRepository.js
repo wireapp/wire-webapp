@@ -33,7 +33,6 @@
     constructor(announce_service) {
       this.logger = new z.util.Logger('z.announce.AnnounceRepository', z.config.LOGGER.OPTIONS);
       this.announce_service = announce_service;
-      return this;
     }
 
     init() {

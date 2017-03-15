@@ -32,7 +32,6 @@
       if (z.util.Environment.frontend.is_production()) {
         this.url += '&production=true';
       }
-      return this;
     }
 
     get_announcements() {
