@@ -48,7 +48,7 @@ class z.search.SearchRepository
   ###
   get_common_contacts: (username) =>
     @search_service.get_contacts username, 1
-    .then (response) =>
+    .then (response) ->
       if response?.documents?.length > 0
         return response.documents[0].mutual_friends_total
       return 0
