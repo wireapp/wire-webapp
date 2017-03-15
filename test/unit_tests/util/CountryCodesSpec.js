@@ -19,25 +19,25 @@
 
 // grunt test_init && grunt test_run:util/CountryCodes
 
-describe('z.util.CountryCodes', function() {
+describe('z.util.CountryCodes', () => {
 
-  describe('get_country_code', function() {
-    it('returns the county code for an existing ISO name', function() {
+  describe('get_country_code', () => {
+    it('returns the county code for an existing ISO name', () => {
       expect(z.util.CountryCodes.get_country_code('DE')).toBe(49);
     });
-    it('returns undefined for a non-existent ISO name', function() {
+    it('returns undefined for a non-existent ISO name', () => {
       expect(z.util.CountryCodes.get_country_code('XY')).toBeUndefined();
     });
   });
 
-  describe('get_country_by_code', function() {
-    it('returns the most populated country for country code ', function() {
+  describe('get_country_by_code', () => {
+    it('returns the most populated country for country code ', () => {
       expect(z.util.CountryCodes.get_country_by_code(49)).toBe('DE');
     });
-    it('returns the most populated country for country code ', function() {
+    it('returns the most populated country for country code ', () => {
       expect(z.util.CountryCodes.get_country_by_code(7)).toBe('RU');
     });
-    it('returns undefined for a non-existent country code', function() {
+    it('returns undefined for a non-existent country code', () => {
       expect(z.util.CountryCodes.get_country_by_code(9999)).toBeUndefined();
     });
   });
