@@ -59,7 +59,7 @@ class z.search.SearchRepository
   @return [Promise] Promise that resolves with the search results
   ###
   search_by_name: (name) ->
-    @search_service.get_contacts name, 30, z.search.SEARCH_LEVEL.INDIRECT_CONTACT, 1
+    @search_service.get_contacts name, 30
     .then (response) =>
       return @search_result_mapper.map_results response?.documents, z.search.SEARCH_MODE.CONTACTS
     .then ([search_ets, mode]) =>
