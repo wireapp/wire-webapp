@@ -22,9 +22,10 @@ z.media ?= {}
 # MediaElement handler
 class z.media.MediaElementHandler
   # Construct a new MediaElement handler.
-  constructor: ->
+  constructor: (@media_repository) ->
     @logger = new z.util.Logger 'z.media.MediaElementHandler', z.config.LOGGER.OPTIONS
 
+    @current_device_id = @media_repository.devices_handler.current_device_id
     @remote_media_elements = ko.observableArray []
 
   ###
@@ -70,6 +71,7 @@ class z.media.MediaElementHandler
       media_element.dataset['flow_id'] = media_stream_info.flow_id
       media_element.muted = false
       media_element.setAttribute 'autoplay', true
+      @_set_media_element_output media_element, @current_device_id.audio_output()
       return media_element
     catch error
       @logger.error "Unable to create AudioElement for flow '#{media_stream_info.flow_id}'", error
