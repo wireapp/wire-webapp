@@ -20,7 +20,6 @@
 // grunt test_init && grunt test_run:util/CountryCodes
 
 describe('z.util.CountryCodes', () => {
-
   describe('get_country_code', () => {
     it('returns the county code for an existing ISO name', () => {
       expect(z.util.CountryCodes.get_country_code('DE')).toBe(49);
@@ -44,5 +43,4 @@ describe('z.util.CountryCodes', () => {
       expect(z.util.CountryCodes.get_country_by_code(9999)).toBeUndefined();
     });
   });
-
 });
