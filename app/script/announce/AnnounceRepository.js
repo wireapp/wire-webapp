@@ -76,7 +76,7 @@
     }
 
     process_announce_list(announcements_list) {
-      if (process_announce_list) {
+      if (announcements_list) {
         for (let announcement in announcements_list) {
           if (!z.util.Environment.frontend.is_localhost()) {
             if (announcement.version_max && z.util.Environment.version(false) > announcement.version_max) {

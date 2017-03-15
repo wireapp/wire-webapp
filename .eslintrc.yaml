@@ -6,6 +6,11 @@ env:
 extends:
   "eslint:recommended"
 
+globals:
+  $: true
+  amplify: true
+  z: true
+
 rules:
   comma-dangle: [2, always-multiline]
   handle-callback-err: 2
