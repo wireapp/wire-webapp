@@ -458,7 +458,8 @@ class z.calling.entities.EFlow
   @return [Boolean] True if relay candidate found
   ###
   _contains_relay_candidate: (ice_candidates) ->
-    return true for ice_candidate in ice_candidates when ice_candidate.toLowerCase().includes 'srflx'
+    return ice_candidates.length > 0
+    #return true for ice_candidate in ice_candidates when ice_candidate.toLowerCase().includes 'srflx'
 
   ###
   Create a local SDP of type 'answer'.
