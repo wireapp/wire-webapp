@@ -90,7 +90,7 @@ z.calling.mapper.SDPMapper =
 
       # Remove once obsolete due to high uptake of clients based on AVS build 3.3.11 containing fix for AUDIO-1215
       else if sdp_line.startsWith 'a=mid'
-        if z.util.Environment.browser.firefox and sdp_source is z.calling.enum.SDPSource.REMOTE
+        if rtc_sdp.type is z.calling.rtc.SDPType.ANSWER and z.util.Environment.browser.firefox and sdp_source is z.calling.enum.SDPSource.REMOTE
           outline = 'a=mid:sdparta_2' if sdp_line is 'a=mid:data'
 
       # Code to nail in bit-rate and ptime settings for improved performance and experience
