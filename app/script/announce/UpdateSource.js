@@ -20,9 +20,9 @@
 'use strict';
 
 window.z = window.z || {};
-z.announce = z.announce || {};
+window.z.announce = z.announce || {};
 
-z.announce.UPDATE_SOURCE = {
+window.z.announce.UPDATE_SOURCE = {
   DESKTOP: 'desktop',
   WEBAPP: 'webapp'
 };
