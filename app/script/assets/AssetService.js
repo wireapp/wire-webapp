@@ -16,8 +16,10 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-if (window.z == null) { window.z = {}; }
-if (z.assets == null) { z.assets = {}; }
+'use strict';
+
+window.z = window.z || {};
+window.z.assets = z.assets || {};
 
 // AssetService for all asset handling and the calls to the backend REST API.
 z.assets.AssetService = class AssetService {

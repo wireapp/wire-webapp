@@ -51,9 +51,9 @@ z.assets.Asset = class Asset {
   Create the content disposition header for the asset.
   */
   get_content_disposition() {
-    let payload = ['zasset'];
+    const payload = ['zasset'];
     for (let key in this.payload) {
-      let value = this.payload[key];
+      const value = this.payload[key];
       payload.push(`${key}=${value}`);
     }
     return payload.join(';');

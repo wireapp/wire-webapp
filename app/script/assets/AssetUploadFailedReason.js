@@ -16,8 +16,11 @@
 // along with this program. If not, see http://www.gnu.org/licenses/.
 //
 
-if (window.z == null) { window.z = {}; }
-if (z.assets == null) { z.assets = {}; }
+'use strict';
+
+window.z = window.z || {};
+window.z.assets = z.assets || {};
+
 
 // Enum of different asset upload status.
 z.assets.AssetUploadFailedReason = {
