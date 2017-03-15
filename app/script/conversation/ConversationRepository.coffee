@@ -2364,7 +2364,7 @@ class z.conversation.ConversationRepository
   @param message_to_delete_et [z.entity.Message]
   ###
   _add_delete_message: (conversation_id, message_id, time, message_to_delete_et) ->
-    event = z.conversation.EventBuilder.build_delete conversation_et.id, event_json.id, event_json.time, message_to_delete_et
+    event = z.conversation.EventBuilder.build_delete conversation_id, message_id, time, message_to_delete_et
     amplify.publish z.event.WebApp.EVENT.INJECT, event
 
   ###############################################################################
