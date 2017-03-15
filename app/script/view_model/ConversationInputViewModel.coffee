@@ -283,13 +283,11 @@ class z.ViewModel.ConversationInputViewModel
     return true
 
   edit_message: (message_et, input_element) =>
-    console.debug 'edit_message'
     return if not message_et?.is_editable?() or message_et is @edit_message_et()
     @cancel_edit()
     @edit_message_et message_et
     @edit_message_et()?.is_editing true
     @input @edit_message_et().get_first_asset().text
-    console.debug 'input_element ', input_element
     @_move_cursor_to_end input_element if input_element?
 
   cancel_edit: =>
@@ -299,7 +297,6 @@ class z.ViewModel.ConversationInputViewModel
 
   _move_cursor_to_end: (input_element) ->
     setTimeout ->
-      console.debug '_move_cursor_to_end'
       input_element.selectionStart = input_element.selectionEnd = input_element.value.length * 2
     , 0
 
