@@ -22,7 +22,8 @@ z.calling.entities ?= {}
 
 E_FLOW_CONFIG =
   RTC_DATA_CHANNEL_LABEL: 'calling-3.0'
-  SDP_SEND_TIMEOUT: 1000
+  SDP_SEND_TIMEOUT_RESET: 1000
+  SDP_SEND_TIMEOUT: 5000
 
 # E-Flow entity.
 class z.calling.entities.EFlow
@@ -405,7 +406,7 @@ class z.calling.entities.EFlow
     z.calling.mapper.SDPMapper.map_e_call_message_to_object e_call_message_et
     .then (rtc_sdp) =>
       return z.calling.mapper.SDPMapper.rewrite_sdp rtc_sdp, z.calling.enum.SDPSource.REMOTE, @
-    .then ([ice_candidates, remote_sdp]) =>
+    .then ([remote_sdp, ice_candidates]) =>
       @remote_sdp remote_sdp
       @logger.info "Saved remote '#{@remote_sdp().type}' SDP", @remote_sdp()
 
@@ -419,12 +420,12 @@ class z.calling.entities.EFlow
   send_local_sdp: =>
     @_clear_send_sdp_timeout()
     z.calling.mapper.SDPMapper.rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL, @
-    .then ([ice_candidates, local_sdp]) =>
+    .then ([local_sdp, ice_candidates]) =>
       @local_sdp local_sdp
 
-      if not ice_candidates
-        @logger.warn 'Local SDP does not contain any ICE candidates, resetting timeout'
-        return @_set_send_sdp_timeout()
+      if not @_contains_relay_candidate ice_candidates
+        @logger.warn 'Local SDP does not contain any relay ICE candidates, resetting timeout'
+        return @_set_send_sdp_timeout false
 
       @logger.info "Sending local '#{@local_sdp().type}' SDP containing '#{ice_candidates}' ICE candidates for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
       @should_send_local_sdp false
@@ -452,6 +453,14 @@ class z.calling.entities.EFlow
       @send_sdp_timeout = undefined
 
   ###
+  Check for relay candidate among given ICE candidates
+  @param ice_candidates [Array<String>] Array of ICE candidate strings from SDP
+  @return [Boolean] True if relay candidate found
+  ###
+  _contains_relay_candidate: (ice_candidates) ->
+    return true for ice_candidate in ice_candidates when ice_candidate.toLowerCase().includes 'srflx'
+
+  ###
   Create a local SDP of type 'answer'.
   @see https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createAnswer
   @private
@@ -463,7 +472,7 @@ class z.calling.entities.EFlow
     .then (sdp_answer) =>
       @logger.debug "Creating '#{z.calling.rtc.SDPType.ANSWER}' successful", sdp_answer
       z.calling.mapper.SDPMapper.rewrite_sdp sdp_answer, z.calling.enum.SDPSource.LOCAL, @
-    .then ([ice_candidates, local_sdp]) =>
+    .then ([local_sdp, ice_candidates]) =>
       @local_sdp local_sdp
     .catch (error) =>
       @logger.error "Creating '#{z.calling.rtc.SDPType.ANSWER}' failed: #{error.name} - #{error.message}", error
@@ -493,7 +502,7 @@ class z.calling.entities.EFlow
     .then (sdp_offer) =>
       @logger.debug "Creating '#{z.calling.rtc.SDPType.OFFER}' successful", sdp_offer
       z.calling.mapper.SDPMapper.rewrite_sdp sdp_offer, z.calling.enum.SDPSource.LOCAL, @
-    .then ([ice_candidates, local_sdp]) =>
+    .then ([local_sdp, ice_candidates]) =>
       @local_sdp local_sdp
     .catch (error) =>
       @logger.error "Creating '#{z.calling.rtc.SDPType.OFFER}' failed: #{error.name} - #{error.message}", error
@@ -541,11 +550,11 @@ class z.calling.entities.EFlow
   Set the SDP send timeout.
   @private
   ###
-  _set_send_sdp_timeout: ->
+  _set_send_sdp_timeout: (initial_timeout = true) ->
     @send_sdp_timeout = window.setTimeout =>
       @logger.debug 'Sending local SDP on timeout'
       @send_local_sdp()
-    , E_FLOW_CONFIG.SDP_SEND_TIMEOUT
+    , if initial_timeout then E_FLOW_CONFIG.SDP_SEND_TIMEOUT else E_FLOW_CONFIG.SDP_SEND_TIMEOUT_RESET
 
 
   ###############################################################################

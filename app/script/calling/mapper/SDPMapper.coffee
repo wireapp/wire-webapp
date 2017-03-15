@@ -112,4 +112,4 @@ z.calling.mapper.SDPMapper =
       sdp_lines.push outline unless outline is undefined
 
     rtc_sdp.sdp = sdp_lines.join '\r\n'
-    return Promise.resolve [ice_candidates.length, rtc_sdp]
+    return Promise.resolve [rtc_sdp, ice_candidates]
