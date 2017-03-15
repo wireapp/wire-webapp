@@ -23,7 +23,7 @@ if (window.z == null) {
   window.z = {};
 }
 
-z.config = {
+window.z.config = {
   BROWSER_NOTIFICATION: {
     TIMEOUT: 5000,
     TITLE_LENGTH: 38,
