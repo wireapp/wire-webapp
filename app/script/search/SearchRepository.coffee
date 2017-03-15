@@ -43,11 +43,15 @@ class z.search.SearchRepository
 
   ###
   Get common contacts for given user.
-  @param user_id [String] User ID
+  @param username [String]
   @return [Promise<Array<z.entity.User>>] Promise that will resolve with an array containing the users common contacts
   ###
-  get_common_contacts: (user_id) =>
-    @search_service.get_common(user_id).then (response) -> response.returned
+  get_common_contacts: (username) =>
+    @search_service.get_contacts username, 1
+    .then (response) ->
+      if response?.documents?.length > 0
+        return response.documents[0].total_mutual_friends
+      return 0
 
   ###
   Search for users on the backend by name.
@@ -55,7 +59,7 @@ class z.search.SearchRepository
   @return [Promise] Promise that resolves with the search results
   ###
   search_by_name: (name) ->
-    @search_service.get_contacts name, 30, z.search.SEARCH_LEVEL.INDIRECT_CONTACT, 1
+    @search_service.get_contacts name, 30
     .then (response) =>
       return @search_result_mapper.map_results response?.documents, z.search.SEARCH_MODE.CONTACTS
     .then ([search_ets, mode]) =>
