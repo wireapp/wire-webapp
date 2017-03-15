@@ -50,7 +50,7 @@ class z.search.SearchRepository
     @search_service.get_contacts username, 1
     .then (response) ->
       if response?.documents?.length > 0
-        return response.documents[0].mutual_friends_total
+        return response.documents[0].total_mutual_friends
       return 0
 
   ###
