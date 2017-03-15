@@ -33,11 +33,9 @@ class z.search.SearchService
 
   @param query [String] Query string (case insensitive)
   @param size [Integer] Number of requested user
-  @param level [Integer] How deep to search (friends, friends of friends, friends of friends or friends)...
-  @param directory [Integer] Fall back to directory if graph search does not find the size of people (0 or 1)
   @return [Promise] Promise that resolves with the search results
   ###
-  get_contacts: (query, size, level = z.search.SEARCH_LEVEL.FRIEND_OF_FRIEND, directory = 1) ->
+  get_contacts: (query, size) ->
     @client.send_request
       type: 'GET'
-      url: @client.create_url "/search/contacts?q=#{encodeURIComponent(query)}&size=#{size}&l=#{level}&d=#{directory}"
+      url: @client.create_url "/search/contacts?q=#{encodeURIComponent(query)}&size=#{size}"
