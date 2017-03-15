@@ -25,6 +25,7 @@ describe('z.util.CountryCodes', () => {
     it('returns the county code for an existing ISO name', () => {
       expect(z.util.CountryCodes.get_country_code('DE')).toBe(49);
     });
+
     it('returns undefined for a non-existent ISO name', () => {
       expect(z.util.CountryCodes.get_country_code('XY')).toBeUndefined();
     });
@@ -34,9 +35,11 @@ describe('z.util.CountryCodes', () => {
     it('returns the most populated country for country code ', () => {
       expect(z.util.CountryCodes.get_country_by_code(49)).toBe('DE');
     });
+
     it('returns the most populated country for country code ', () => {
       expect(z.util.CountryCodes.get_country_by_code(7)).toBe('RU');
     });
+
     it('returns undefined for a non-existent country code', () => {
       expect(z.util.CountryCodes.get_country_by_code(9999)).toBeUndefined();
     });
