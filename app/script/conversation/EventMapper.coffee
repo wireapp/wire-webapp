@@ -336,7 +336,7 @@ class z.conversation.EventMapper
     message_et = new z.entity.CallMessage()
     message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED
     message_et.finished_reason = event.data.reason
-    message_et.visible message_et.finished_reason is z.calling.enum.CALL_FINISHED_REASON.MISSED
+    message_et.visible message_et.finished_reason is z.calling.enum.TERMINATION_REASON.MISSED
     return message_et
 
   ###############################################################################

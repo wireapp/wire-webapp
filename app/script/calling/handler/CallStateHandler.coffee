@@ -366,17 +366,14 @@ class z.calling.handler.CallStateHandler
   ###
   User action to leave a call.
   @param conversation_id [String] Conversation ID of call to be joined
-  @param has_call_dropped [Boolean] Optional information whether the call has dropped
+  @param termination_reason [z.calling.enum.TERMINATION_REASON] Optional on reason for call termination
   ###
-  leave_call: (conversation_id, has_call_dropped = false) =>
+  leave_call: (conversation_id, termination_reason) =>
     @v2_call_center.media_stream_handler.release_media_streams()
     @v2_call_center.get_call_by_id conversation_id
     .then (call_et) =>
       call_et.state z.calling.enum.CallState.DISCONNECTING
-      if has_call_dropped
-        call_et.finished_reason = z.calling.enum.CALL_FINISHED_REASON.CONNECTION_DROPPED
-      else
-        call_et.finished_reason = z.calling.enum.CALL_FINISHED_REASON.SELF_USER
+      call_et.termination_reason = termination_reason if termination_reason
       @_put_state_to_idle conversation_id
     .catch (error) =>
       @logger.warn "No call found in conversation '#{conversation_id}' to leave", error

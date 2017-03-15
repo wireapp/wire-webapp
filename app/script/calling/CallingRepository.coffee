@@ -186,7 +186,7 @@ class z.calling.CallingRepository
       if ongoing_call_id
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_START_ANOTHER,
           action: ->
-            amplify.publish z.event.WebApp.CALL.STATE.LEAVE, ongoing_call_id
+            amplify.publish z.event.WebApp.CALL.STATE.LEAVE, ongoing_call_id, z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL
             window.setTimeout resolve, 1000
           close: ->
             amplify.publish z.event.WebApp.CALL.STATE.IGNORE, new_call_id if call_state is z.calling.enum.CallState.INCOMING

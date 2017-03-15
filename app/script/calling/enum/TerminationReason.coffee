@@ -20,10 +20,14 @@ window.z ?= {}
 z.calling ?= {}
 z.calling.enum ?= {}
 
-z.calling.enum.CALL_FINISHED_REASON =
-  CONNECTION_DROPPED: 'connection_dropped'
+z.calling.enum.TERMINATION_REASON =
+  CONCURRENT_CALL: 'concurrent'
+  CONNECTION_DROP: 'drop'
+  CONNECTION_FAILED: 'failed_ice'
   COMPLETED: 'completed'
   MISSED: 'missed'
-  OTHER_USER: 'other_user'
-  SELF_USER: 'self_user'
+  OTHER_USER: 'other'
+  REMOVED_MEMBER: 'removed_member'
+  SDP_FAILED: 'failed_sdp'
+  SELF_USER: 'self'
   UNKNOWN: 'unknown'
