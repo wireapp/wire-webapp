@@ -19,6 +19,8 @@
 
 // grunt test_init && grunt test_run:util/Moment
 
+'use strict';
+
 describe('z.util.moment', () => {
   describe('is_today', () => {
     it('should return true if date is today', () => {
