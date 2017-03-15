@@ -34,19 +34,19 @@ window.z.config = {
     OPTIONS: {
       name_length: 65,
       domains: {
-        'app.wire.com': () => {
+        'app.wire.com': function() {
           return 0;
         },
-        'localhost': () => {
+        'localhost': function() {
           return 300;
         },
-        'wire.ms': () => {
+        'wire.ms': function() {
           return 300;
         },
-        'wire-webapp-staging.wire.com': () => {
+        'wire-webapp-staging.wire.com': function() {
           return 300;
         },
-        'zinfra.io': () => {
+        'zinfra.io': function() {
           return 300;
         },
       },
