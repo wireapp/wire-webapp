@@ -57,11 +57,11 @@ z.conversation.EventBuilder = do ->
     time: e_call_message_et.time
     protocol_version: z.calling.enum.PROTOCOL.VERSION_3
 
-  build_voice_channel_deactivate = (e_call_message_et) ->
+  build_voice_channel_deactivate = (e_call_message_et, creating_user_et) ->
     conversation: e_call_message_et.conversation_id
     id: z.util.create_random_uuid()
     type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
-    from: e_call_message_et.user_id
+    from: creating_user_et?.id or e_call_message_et.user_id
     time: e_call_message_et.time
     data:
       reason: z.calling.enum.TERMINATION_REASON.MISSED
