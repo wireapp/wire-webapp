@@ -135,7 +135,7 @@ class z.media.MediaStreamHandler
   @return [Object] Video stream constraints
   ###
   _get_audio_stream_constraints: (media_device_id) ->
-    if _.isString media_device_id and media_device_id isnt 'default'
+    if _.isString media_device_id
       media_stream_constraints =
         deviceId:
           exact: media_device_id

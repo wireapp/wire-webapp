@@ -42,7 +42,7 @@ class z.media.MediaRepository
     @logger = new z.util.Logger 'z.media.MediaRepository', z.config.LOGGER.OPTIONS
 
     @devices_handler = new z.media.MediaDevicesHandler @
-    @element_handler = new z.media.MediaElementHandler()
+    @element_handler = new z.media.MediaElementHandler @
     @stream_handler = new z.media.MediaStreamHandler @
 
     @audio_context = undefined
