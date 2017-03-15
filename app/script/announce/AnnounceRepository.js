@@ -44,25 +44,21 @@
     }
 
     check_announcements() {
-      return this.announce_service.get_announcements()
-        .then(() => this.process_announce_list())
-        .catch((error) => {
-          this.logger.error(`Failed to fetch announcements: ${error}`);
-        });
+      return this.announce_service.get_announcements().then(this.process_announce_list).catch((error) => {
+        this.logger.error(`Failed to fetch announcements: ${error}`);
+      });
     }
 
     check_version() {
-      return this.announce_service.get_version()
-        .then((server_version) => {
-          this.logger.info(`Found new version ${server_version}`);
+      return this.announce_service.get_version().then((server_version) => {
+        this.logger.info(`Found new version ${server_version}`);
 
-          if (server_version > z.util.Environment.version(false, true)) {
-            amplify.publish(z.event.WebApp.LIFECYCLE.UPDATE, z.announce.UPDATE_SOURCE.WEBAPP);
-          }
-        })
-        .catch((error) => {
-          this.logger.error(`Failed to fetch version: ${error}`);
-        });
+        if (server_version > z.util.Environment.version(false, true)) {
+          amplify.publish(z.event.WebApp.LIFECYCLE.UPDATE, z.announce.UPDATE_SOURCE.WEBAPP);
+        }
+      }).catch((error) => {
+        this.logger.error(`Failed to fetch version: ${error}`);
+      });
     }
 
     schedule_checks() {
