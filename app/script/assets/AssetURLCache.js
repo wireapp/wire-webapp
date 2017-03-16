@@ -21,18 +21,19 @@
 window.z = window.z || {};
 window.z.assets = z.assets || {};
 
-
 z.assets.AssetURLCache = (function() {
-  let lru_cache = new LRUCache(100);
+  const lru_cache = new LRUCache(100);
 
-  let set_url = function(identifier, url) {
-    let existing_url = get_url(identifier);
+  const set_url = function(identifier, url) {
+    const existing_url = get_url(identifier);
+
     if (existing_url) {
       window.URL.revokeObjectURL(url);
       return existing_url;
     }
 
-    let outdated_url = lru_cache.set(identifier, url);
+    const outdated_url = lru_cache.set(identifier, url);
+
     if (outdated_url != null) {
       window.URL.revokeObjectURL(outdated_url);
     }
@@ -40,10 +41,10 @@ z.assets.AssetURLCache = (function() {
     return url;
   };
 
-  var get_url = identifier => lru_cache.get(identifier);
+  const get_url = identifier => lru_cache.get(identifier);
 
   return {
     get_url,
-    set_url
+    set_url,
   };
 })();

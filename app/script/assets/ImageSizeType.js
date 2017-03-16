@@ -21,9 +21,8 @@
 window.z = window.z || {};
 window.z.assets = z.assets || {};
 
-// Enum of different image size types.
 z.assets.ImageSizeType = {
   MEDIUM: 'medium',
   PREVIEW: 'preview',
-  SMALL_PROFILE: 'smallProfile'
+  SMALL_PROFILE: 'smallProfile',
 };

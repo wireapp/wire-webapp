@@ -24,5 +24,5 @@ window.z.assets = z.assets || {};
 z.assets.AssetRetentionPolicy = {
   ETERNAL: 'eternal',
   PERSISTENT: 'persistent',
-  VOLATILE: 'volatile'
+  VOLATILE: 'volatile',
 };

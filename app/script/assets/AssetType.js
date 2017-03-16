@@ -21,11 +21,9 @@
 window.z = window.z || {};
 window.z.assets = z.assets || {};
 
-
-// Enum of different asset types.
 z.assets.AssetType = {
   FILE: 'File',
   LOCATION: 'Location',
   IMAGE: 'Image',
-  TEXT: 'Text'
+  TEXT: 'Text',
 };

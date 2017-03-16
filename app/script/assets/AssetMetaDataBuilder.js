@@ -31,7 +31,10 @@ z.assets.AssetMetaDataBuilder = {
   @return metadata [ImageMetaData, VideoMetaData, AudioMetaData]
   */
   build_metadata(file) {
-    this.logger = new z.util.Logger('z.assets.AssetMetaDataBuilder', z.config.LOGGER.OPTIONS);
+    if (!(file instanceof Blob)) {
+      throw new Error('Expected file to be type of Blob');
+    }
+
     if (this.is_video(file)) {
       return this._build_video_metdadata(file);
     } else if (this.is_audio(file)) {
@@ -43,38 +46,38 @@ z.assets.AssetMetaDataBuilder = {
     }
   },
 
-  is_video(file) {
-    return __guard__(file != null ? file.type : undefined, x => x.startsWith('video'));
+  is_audio(file) {
+    return file.type.startsWith('audio');
   },
 
-  is_audio(file) {
-    return __guard__(file != null ? file.type : undefined, x => x.startsWith('audio'));
+  is_video(file) {
+    return file.type.startsWith('video');
   },
 
   is_image(file) {
-    return __guard__(file != null ? file.type : undefined, x => x.startsWith('image'));
+    return file.type.startsWith('image');
   },
 
   _build_video_metdadata(videofile) {
     return new Promise(function(resolve, reject) {
-      let url = window.URL.createObjectURL(videofile);
-      let videoElement = document.createElement('video');
-      videoElement.onloadedmetadata = function() {
-        resolve(new z.proto.Asset.VideoMetaData(videoElement.videoWidth, videoElement.videoHeight, videoElement.duration));
+      const url = window.URL.createObjectURL(videofile);
+      const video = document.createElement('video');
+      video.onloadedmetadata = function() {
+        resolve(new z.proto.Asset.VideoMetaData(video.videoWidth, video.videoHeight, video.duration));
         return window.URL.revokeObjectURL(url);
       };
-      videoElement.onerror = function(error) {
+      video.onerror = function(error) {
         reject(error);
         return window.URL.revokeObjectURL(url);
       };
-      return videoElement.src = url;
+      return video.src = url;
     });
   },
 
   _build_image_metdadata(imagefile) {
     return new Promise(function(resolve, reject) {
-      let url = window.URL.createObjectURL(imagefile);
-      let img = new Image();
+      const url = window.URL.createObjectURL(imagefile);
+      const img = new Image();
       img.onload = function() {
         resolve(new z.proto.Asset.ImageMetaData(img.width, img.height));
         return window.URL.revokeObjectURL(url);
@@ -88,40 +91,27 @@ z.assets.AssetMetaDataBuilder = {
   },
 
   _build_audio_metdadata(audiofile) {
-    return z.util.load_file_buffer(audiofile)
-    .then(function(buffer) {
-      let audioContext = new AudioContext();
+    return z.util.load_file_buffer(audiofile).then(function(buffer) {
+      const audioContext = new AudioContext();
       audioContext.close();
-      return audioContext.decodeAudioData(buffer);}).then(audio_buffer => new z.proto.Asset.AudioMetaData(audio_buffer.duration * 1000, z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer)));
+      return audioContext.decodeAudioData(buffer);
+    }).then(audio_buffer => {
+      return new z.proto.Asset.AudioMetaData(audio_buffer.duration * 1000, z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer));
+    });
   },
 
   _normalise_loudness(audio_buffer) {
-    let MAX_SAMPLES = 200;
-    let AMPLIFIER = 700; // in favour of iterating all samples before we interpolate them
-    let preview = __range__(0, MAX_SAMPLES, true);
-    for (let channel_index = 0, end = audio_buffer.numberOfChannels, asc = 0 <= end; asc ? channel_index <= end : channel_index >= end; asc ? channel_index++ : channel_index--) {
-      let channel = Array.from(audio_buffer.getChannelData(channel_index));
-      let bucket_size = parseInt(channel.length / MAX_SAMPLES);
-      let buckets = z.util.ArrayUtil.chunk(channel, bucket_size);
-      for (let bucket_index = 0; bucket_index < buckets.length; bucket_index++) {
-        let bucket = buckets[bucket_index];
-        preview[bucket_index] = z.util.NumberUtil.cap_to_byte(AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket));
-      }
-      break;
-    } // only select first channel
-    return new Uint8Array(preview);
-  }
-};
+    const MAX_SAMPLES = 200;
+    const AMPLIFIER = 700; // in favour of iterating all samples before we interpolate them
+    const channel = audio_buffer.getChannelData(0);
+    const bucket_size = parseInt(channel.length / MAX_SAMPLES);
+    const buckets = z.util.ArrayUtil.chunk(channel, bucket_size);
 
-function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
-}
-function __range__(left, right, inclusive) {
-  let range = [];
-  let ascending = left < right;
-  let end = !inclusive ? right : ascending ? right + 1 : right - 1;
-  for (let i = left; ascending ? i < end : i > end; ascending ? i++ : i--) {
-    range.push(i);
-  }
-  return range;
-}
+    const preview = buckets.map((bucket) => {
+      return z.util.NumberUtil.cap_to_byte(AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket));
+    });
+
+    return new Uint8Array(preview);
+  },
+
+};

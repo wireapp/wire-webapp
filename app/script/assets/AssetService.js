@@ -53,8 +53,8 @@ z.assets.AssetService = class AssetService {
       processData: false, // otherwise jquery will convert it to a query string
       contentType: config.contentType,
       headers: {
-        'Content-Disposition': config.contentDisposition
-      }
+        'Content-Disposition': config.contentDisposition,
+      },
     });
   }
 
@@ -70,13 +70,13 @@ z.assets.AssetService = class AssetService {
       this.post_asset({
         contentType: small.content_type,
         contentDisposition: small.get_content_disposition(),
-        data: small.array_buffer
+        data: small.array_buffer,
       }),
       this.post_asset({
         contentType: medium.content_type,
         contentDisposition: medium.get_content_disposition(),
-        data: medium.array_buffer
-      })
+        data: medium.array_buffer,
+      }),
     ]);
   }
 
@@ -90,23 +90,22 @@ z.assets.AssetService = class AssetService {
   upload_profile_image(conversation_id, image) {
     return Promise.all([
       this._compress_profile_image(image),
-      this._compress_image(image)
-    ]).then((...args) => {
-      let [small, medium] = Array.from(args[0]);
-      let [small_image, small_image_bytes] = Array.from(small);
-      let [medium_image, medium_image_bytes] = Array.from(medium);
+      this._compress_image(image),
+    ]).then(([small, medium]) => {
+      const [small_image, small_image_bytes] = small;
+      const [medium_image, medium_image_bytes] = medium;
 
-      let medium_asset = new z.assets.Asset({
+      const medium_asset = new z.assets.Asset({
         array_buffer: medium_image_bytes,
         content_type: 'image/jpg',
         conversation_id,
         md5: z.util.array_to_md5_base64(medium_image_bytes),
-        width: medium_image.height,
+        width: medium_image.width,
         height: medium_image.height,
-        public: true
+        public: true,
       });
 
-      let small_profile_asset = $.extend(true, {}, medium_asset);
+      const small_profile_asset = $.extend(true, {}, medium_asset);
       small_profile_asset.array_buffer = small_image_bytes;
       small_profile_asset.payload.width = small_image.width;
       small_profile_asset.payload.height = small_image.height;
@@ -114,9 +113,9 @@ z.assets.AssetService = class AssetService {
       small_profile_asset.payload.tag = z.assets.ImageSizeType.SMALL_PROFILE;
 
       return this.post_asset_pair(small_profile_asset, medium_asset);
-    }).then(function(...args) {
-      let [small_response, medium_response] = Array.from(args[0]);
-      return [small_response.data, medium_response.data];});
+    }).then(function([small_response, medium_response]) {
+      return [small_response.data, medium_response.data];
+    });
   }
 
   /*
@@ -128,19 +127,18 @@ z.assets.AssetService = class AssetService {
   upload_profile_image_v3(image) {
     return Promise.all([
       this._compress_profile_image(image),
-      this._compress_image(image)
-    ]).then((...args) => {
-      let [small, medium] = Array.from(args[0]);
-      let [small_image, small_image_bytes] = Array.from(small);
-      let [medium_image, medium_image_bytes] = Array.from(medium);
+      this._compress_image(image),
+    ]).then(([small, medium]) => {
+      const [, small_image_bytes] = small;
+      const [, medium_image_bytes] = medium;
 
       return Promise.all([
         this.post_asset_v3(small_image_bytes, {public: true}),
-        this.post_asset_v3(medium_image_bytes, {public: true})
+        this.post_asset_v3(medium_image_bytes, {public: true}),
       ]);
-    }).then(function(...args) {
-      let [small_credentials, medium_credentials] = Array.from(args[0]);
-      return [small_credentials.key, medium_credentials.key];});
+    }).then(function([small_credentials, medium_credentials]) {
+      return [small_credentials.key, medium_credentials.key];
+    });
   }
 
   /*
@@ -155,8 +153,7 @@ z.assets.AssetService = class AssetService {
   */
   _upload_asset(bytes, options, xhr_accessor_function) {
     return z.assets.AssetCrypto.encrypt_aes_asset(bytes)
-    .then((...args) => {
-      let [key_bytes, sha256, ciphertext] = Array.from(args[0]);
+    .then(([key_bytes, sha256, ciphertext]) => {
       return this.post_asset_v3(ciphertext, options, xhr_accessor_function)
       .then(({key, token}) => [key_bytes, sha256, key, token]);
     });
@@ -176,9 +173,8 @@ z.assets.AssetService = class AssetService {
     return z.util.load_file_buffer(file)
     .then(buffer => {
       return this._upload_asset(buffer, options, xhr_accessor_function);
-    }).then(function(...args) {
-      let [key_bytes, sha256, key, token] = Array.from(args[0]);
-      let asset = new z.proto.Asset();
+    }).then(function([key_bytes, sha256, key, token]) {
+      const asset = new z.proto.Asset();
       asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256, key, token));
       return asset;
     });
@@ -195,13 +191,11 @@ z.assets.AssetService = class AssetService {
   */
   upload_image_asset(image, options) {
     return this._compress_image(image)
-    .then((...args) => {
-      let [compressed_image, compressed_bytes] = Array.from(args[0]);
+    .then(([compressed_image, compressed_bytes]) => {
       return this._upload_asset(compressed_bytes, options)
-      .then(function(...args1) {
-        let [key_bytes, sha256, key, token] = Array.from(args1[0]);
-        let image_meta_data = new z.proto.Asset.ImageMetaData(compressed_image.width, compressed_image.height);
-        let asset = new z.proto.Asset();
+      .then(function([key_bytes, sha256, key, token]) {
+        const image_meta_data = new z.proto.Asset.ImageMetaData(compressed_image.width, compressed_image.height);
+        const asset = new z.proto.Asset();
         asset.set('original', new z.proto.Asset.Original(image.type, compressed_bytes.length, null, image_meta_data));
         asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256, key, token));
         return asset;
@@ -353,11 +347,11 @@ z.assets.AssetService = class AssetService {
     return new Promise((function(resolve, reject) {
       metadata = $.extend({
         public: false,
-        retention: z.assets.AssetRetentionPolicy.PERSISTENT
+        retention: z.assets.AssetRetentionPolicy.PERSISTENT,
       }
       , metadata);
 
-      let xhr = new XMLHttpRequest();
+      const xhr = new XMLHttpRequest();
       xhr.open('POST', this.client.create_url('/assets/v3'));
       xhr.setRequestHeader('Content-Type', `multipart/mixed; boundary=${this.BOUNDARY}`);
       xhr.setRequestHeader('Authorization', `${this.client.access_token_type} ${this.client.access_token}`);
@@ -366,7 +360,7 @@ z.assets.AssetService = class AssetService {
       if (typeof xhr_accessor_function === 'function') {
         xhr_accessor_function(xhr);
       }
-      return xhr.send(this._create_asset_multipart_body(new Uint8Array(asset_data), metadata));
+      xhr.send(this._create_asset_multipart_body(new Uint8Array(asset_data), metadata));
     }.bind(this)));
   }
 
@@ -379,7 +373,7 @@ z.assets.AssetService = class AssetService {
     let xhr = this.pending_uploads[upload_id];
     if (xhr != null) {
       xhr.abort();
-      return delete this.pending_uploads[upload_id];
+      delete this.pending_uploads[upload_id];
     }
   }
 
@@ -391,11 +385,9 @@ z.assets.AssetService = class AssetService {
   */
   create_image_proto(image) {
     return this._compress_image(image)
-    .then(function(...args) {
-      let [compressed_image, compressed_bytes] = Array.from(args[0]);
+    .then(([compressed_image, compressed_bytes]) => {
       return z.assets.AssetCrypto.encrypt_aes_asset(compressed_bytes)
-      .then(function(...args1) {
-        let [key_bytes, sha256, ciphertext] = Array.from(args1[0]);
+      .then(([key_bytes, sha256, ciphertext]) => {
         let image_asset = new z.proto.ImageAsset();
         image_asset.set_tag(z.assets.ImageSizeType.MEDIUM);
         image_asset.set_width(compressed_image.width);
@@ -406,7 +398,9 @@ z.assets.AssetService = class AssetService {
         image_asset.set_size(compressed_bytes.length);
         image_asset.set_otr_key(key_bytes);
         image_asset.set_sha256(sha256);
-        return [image_asset, new Uint8Array(ciphertext)];});});
+        return [image_asset, new Uint8Array(ciphertext)];
+      });
+    });
   }
 
   /*
@@ -417,8 +411,8 @@ z.assets.AssetService = class AssetService {
   */
   create_asset_proto(asset) {
     return z.util.load_file_buffer(asset)
-    .then(file_bytes => z.assets.AssetCrypto.encrypt_aes_asset(file_bytes)).then(function(...args) {
-      let [key_bytes, sha256, ciphertext] = Array.from(args[0]);
+    .then(file_bytes => z.assets.AssetCrypto.encrypt_aes_asset(file_bytes))
+    .then(([key_bytes, sha256, ciphertext]) => {
       asset = new z.proto.Asset();
       asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256));
       return [asset, ciphertext];});
@@ -449,10 +443,16 @@ z.assets.AssetService = class AssetService {
   _compress_image_with_worker(worker, image, filter) {
     return z.util.load_file_buffer(image)
     .then(function(buffer) {
-      if (typeof filter === 'function' ? filter() : undefined) { return buffer; }
-      let image_worker = new z.util.Worker(worker);
-      return image_worker.post(buffer);}).then(compressed_bytes =>
-      z.util.load_image(new Blob([new Uint8Array(compressed_bytes)], {'type': image.type}))
-      .then(compressed_image => [compressed_image, new Uint8Array(compressed_bytes)]));
+      if (typeof filter === 'function' ? filter() : undefined) {
+        return buffer;
+      }
+      const image_worker = new z.util.Worker(worker);
+      return image_worker.post(buffer);
+    }).then(compressed_bytes => {
+      return Promise.all([
+        compressed_bytes,
+        z.util.load_image(new Blob([new Uint8Array(compressed_bytes)], {'type': image.type})),
+      ]);
+    });
   }
 };

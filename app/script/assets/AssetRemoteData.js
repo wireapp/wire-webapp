@@ -51,9 +51,8 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   @param asset_token [String] token is optional
   @param force_caching [Boolean]
   */
-  static v3(asset_key, otr_key, sha256, asset_token, force_caching) {
-    if (force_caching == null) { force_caching = false; }
-    let remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
+  static v3(asset_key, otr_key, sha256, asset_token, force_caching = false) {
+    const remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
     remote_data.generate_url = () => wire.app.service.asset.generate_asset_url_v3(asset_key, asset_token, force_caching);
     remote_data.identifier = `${asset_key}`;
     return remote_data;
@@ -68,9 +67,8 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   @param sha256 [Uint8Array]
   @param force_caching [Boolean]
   */
-  static v2(conversation_id, asset_id, otr_key, sha256, force_caching) {
-    if (force_caching == null) { force_caching = false; }
-    let remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
+  static v2(conversation_id, asset_id, otr_key, sha256, force_caching = false) {
+    const remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
     remote_data.generate_url = () => wire.app.service.asset.generate_asset_url_v2(asset_id, conversation_id, force_caching);
     remote_data.identifier = `${conversation_id}${asset_id}`;
     return remote_data;
@@ -84,9 +82,8 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   @param asset_id [String]
   @param force_caching [Boolean]
   */
-  static v1(conversation_id, asset_id, force_caching) {
-    if (force_caching == null) { force_caching = false; }
-    let remote_data = new z.assets.AssetRemoteData();
+  static v1(conversation_id, asset_id, force_caching = false) {
+    const remote_data = new z.assets.AssetRemoteData();
     remote_data.generate_url = () => wire.app.service.asset.generate_asset_url(asset_id, conversation_id, force_caching);
     remote_data.identifier = `${conversation_id}${asset_id}`;
     return remote_data;
@@ -98,17 +95,17 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   @returns [Blob]
   */
   load() {
-    let type = undefined;
+    let type;
+    let buffer;
 
     return this._load_buffer()
     .then(data => {
-      let buffer;
-      [buffer, type] = Array.from(data);
+      [buffer, type] = data;
       if ((this.otr_key != null) && (this.sha256 != null)) {
         return z.assets.AssetCrypto.decrypt_aes_asset(buffer, this.otr_key.buffer, this.sha256.buffer);
       }
       return buffer;
-    }).then(buffer => new Blob([new Uint8Array(buffer)], {type}));
+    }).then(plaintext => new Blob([new Uint8Array(plaintext)], {type}));
   }
 
   /*
@@ -117,8 +114,10 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   @returns [String] url
   */
   get_object_url() {
-    let object_url = z.assets.AssetURLCache.get_url(this.identifier);
-    if (object_url != null) { return Promise.resolve(object_url); }
+    const object_url = z.assets.AssetURLCache.get_url(this.identifier);
+    if (object_url != null) {
+      return Promise.resolve(object_url);
+    }
 
     return this.load().then(blob => z.assets.AssetURLCache.set_url(this.identifier, window.URL.createObjectURL(blob)));
   }

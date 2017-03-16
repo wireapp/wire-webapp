@@ -79,5 +79,6 @@ z.assets.AssetCrypto = {
       const img_ciphertext = ciphertext.slice(16);
       return window.crypto.subtle.decrypt({name: 'AES-CBC', iv}, key, img_ciphertext);
     });
-  }
+  },
+
 };
