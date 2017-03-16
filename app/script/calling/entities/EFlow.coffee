@@ -99,7 +99,7 @@ class z.calling.entities.EFlow
 
         when z.calling.rtc.ICEConnectionState.FAILED
           @e_participant_et.is_connected false
-          @e_call_et.delete_e_participant @participant_et if @e_call_et.self_client_joined()
+          @e_call_et.delete_e_participant @e_participant_et.id if @e_call_et.self_client_joined()
           unless @e_call_et.participants().length
             termination_reason = if @e_call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
             amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, termination_reason
@@ -460,7 +460,6 @@ class z.calling.entities.EFlow
   @return [Boolean] True if relay candidate found
   ###
   _contains_relay_candidate: (ice_candidates) ->
-    return ice_candidates.length > 0
     return true for ice_candidate in ice_candidates when ice_candidate.toLowerCase().includes 'relay'
 
   ###
