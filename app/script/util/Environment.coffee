@@ -61,8 +61,7 @@ z.util.Environment = do ->
       return true
 
     supports_audio_output_selection: ->
-      return true if @is_chrome()
-      return false
+      return @is_chrome()
     supports_calling: ->
       return false if not @supports_media_devices()
       return false if window.WebSocket is undefined
