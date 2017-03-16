@@ -22,23 +22,27 @@ z.components ?= {}
 class z.components.CommonContactsViewModel
   constructor: (params, component_info) ->
     # parameter list
-    @user = ko.unwrap params.user
+    @user = params.user
     @element = component_info.element
     @search_repository = wire.app.repository.search
 
-    @common_contacts_total = ko.observable 0
+    @common_contacts_caption = ko.observable ''
+    @common_contacts_total = ko.pureComputed =>
+      if not @user?
+        return @common_contacts_caption ''
 
-    @common_contacts_caption = ko.pureComputed =>
-      locale_id = if @common_contacts_total() > 1 then z.string.search_friends_in_common else z.string.search_friend_in_common
-      return z.localization.Localizer.get_text
-        id: locale_id
-        replace:
-          placeholder: '%no',
-          content: @common_contacts_total()
+      user = ko.unwrap @user
 
-    @search_repository.get_common_contacts(@user.username()).then (total) =>
-      @user.mutual_friends_total total
-      @common_contacts_total total
+      @search_repository.get_common_contacts(user.username()).then (total) =>
+        if total > 0
+          locale_id = if total > 1 then z.string.search_friends_in_common else z.string.search_friend_in_common
+          @common_contacts_caption z.localization.Localizer.get_text
+            id: locale_id
+            replace:
+              placeholder: '%no',
+              content: total
+        else
+          @common_contacts_caption ''
 
 ko.components.register 'common-contacts',
   viewModel: createViewModel: (params, component_info) ->
