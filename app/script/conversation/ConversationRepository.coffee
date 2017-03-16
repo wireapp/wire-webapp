@@ -1041,6 +1041,21 @@ class z.conversation.ConversationRepository
         @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
+  Send location message in specified conversation.
+
+  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
+  @param longitude [Integer] Longitude of the location
+  @param latitude [Integer] Latitude of the location
+  @param name [String] Name of the location
+  @param zoom [Integer] Zoom factor for the map (Google Maps)
+  @return [Promise] Promise that resolves after sending the message
+  ###
+  send_location: (conversation_et, longitude, latitude, name, zoom) =>
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'location', new z.proto.Location longitude, latitude, name, zoom
+    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
+
+  ###
   Send text message in specified conversation.
 
   @param message [String] plain text message
