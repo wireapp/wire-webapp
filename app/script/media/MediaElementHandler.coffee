@@ -71,7 +71,8 @@ class z.media.MediaElementHandler
       media_element.dataset['flow_id'] = media_stream_info.flow_id
       media_element.muted = false
       media_element.setAttribute 'autoplay', true
-      @_set_media_element_output media_element, @current_device_id.audio_output()
+      if z.util.Environment.browser.supports.audio_output_selection
+        @_set_media_element_output media_element, @current_device_id.audio_output()
       return media_element
     catch error
       @logger.error "Unable to create AudioElement for flow '#{media_stream_info.flow_id}'", error
@@ -99,6 +100,8 @@ class z.media.MediaElementHandler
   @param sink_id [String] ID of MediaDevice to be used
   ###
   _set_media_element_output: (media_element, sink_id) ->
+    return if not media_element.setSinkId
+
     media_element.setSinkId sink_id
     .then =>
       @logger.info "Audio output device '#{sink_id}' attached to flow '#{media_element.dataset['flow_id']}", media_element
