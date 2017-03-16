@@ -406,7 +406,7 @@ class z.calling.v3.CallCenter
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
       @media_stream_handler.release_media_streams()
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
-      e_call_et.termination_reason = termination_reason if termination_reason
+      e_call_et.termination_reason = termination_reason if termination_reason and not e_call_et.termination_reason
 
       e_call_message_type = if e_call_et.is_connected() then z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP else z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
       additional_payload =

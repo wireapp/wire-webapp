@@ -237,6 +237,8 @@ class z.calling.entities.ECall
       @v3_call_center.media_element_handler.remove_media_element user_id
       @logger.debug "Removed e-call participant '#{e_participant_et.user.name()}'"
       return @
+    .catch (error) ->
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
   ###
   Get the number of participants in the call.
@@ -269,6 +271,8 @@ class z.calling.entities.ECall
       e_participant_et.update_state e_call_message_et
       @_update_remote_state()
       return e_participant_et
+    .catch (error) ->
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
 
   ###############################################################################

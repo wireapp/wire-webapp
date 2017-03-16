@@ -86,6 +86,7 @@ class z.calling.entities.EFlow
           @e_participant_et.is_connected true
           @e_call_et.interrupted_participants.remove @participant_et
           @e_call_et.state z.calling.enum.CallState.ONGOING
+          @e_call_et.termination_reason = undefined
 
         when z.calling.rtc.ICEConnectionState.CLOSED
           @e_participant_et.is_connected false
@@ -93,6 +94,7 @@ class z.calling.entities.EFlow
 
         when z.calling.rtc.ICEConnectionState.DISCONNECTED
           @e_participant_et.is_connected false
+          @e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
           if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
             @e_call_et.interrupted_participants.push @participant_et
             @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false
