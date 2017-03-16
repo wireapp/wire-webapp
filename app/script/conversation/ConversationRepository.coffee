@@ -939,6 +939,11 @@ class z.conversation.ConversationRepository
     generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
     @sending_queue.push => @_send_generic_message conversation_et.id, generic_message, [message_et.user().id], false
 
+  send_location: (conversation_et, longitude, latitude, name, zoom) =>
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'location', new z.proto.Location longitude, latitude, name, zoom
+    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
+
   ###
   Send e-call message in specified conversation.
   @param conversation_et [z.entity.Conversation] Conversation to send e-call message to
