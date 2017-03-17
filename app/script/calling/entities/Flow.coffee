@@ -679,7 +679,7 @@ class z.calling.entities.Flow
   update_media_stream: (media_stream_info) =>
     @_replace_media_track media_stream_info
     .catch (error) =>
-      if error.type in [z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
+      if error.type in [z.calling.v3.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.v3.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
         @logger.info "Replacement of MediaStream and renegotiation necessary: #{error.message}", error
         return @_replace_media_stream media_stream_info
       throw error
@@ -752,17 +752,17 @@ class z.calling.entities.Flow
     .then =>
       if @peer_connection.getSenders
         for rtp_sender in @peer_connection.getSenders() when rtp_sender.track.kind is media_stream_info.type
-          throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED unless rtp_sender.replaceTrack
+          throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED unless rtp_sender.replaceTrack
           return rtp_sender
-        throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK
-      throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
+        throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.NO_REPLACEABLE_TRACK
+      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
     .then (rtp_sender) ->
       return rtp_sender.replaceTrack media_stream_info.stream.getTracks()[0]
     .then =>
       @logger.info "Replaced the '#{media_stream_info.type}' track"
       return media_stream_info
     .catch (error) =>
-      unless error.type in [z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
+      unless error.type in [z.calling.v3.CallError::TYPE.NO_REPLACEABLE_TRACK, z.calling.v3.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED]
         @logger.error "Failed to replace the '#{media_stream_info.type}' track: #{error.name} - #{error.message}", error
       throw error
 
