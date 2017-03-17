@@ -42,10 +42,10 @@ z.assets.AssetService = class AssetService {
   Upload any asset to the backend using asset api v1.
 
   @deprecated
-  @param config [Object] Configuration object containing the jQuery call settings
-  @option config [Object] data
-  @option config [String] contentType
-  @option config [String] contentDisposition
+  @param {Object} config - Configuration object containing the jQuery call settings
+  @param {String} config.data
+  @param {String} config.contentDisposition
+  @param {String} config.contentType
   */
   post_asset(config) {
     return this.client.send_request({
@@ -64,8 +64,8 @@ z.assets.AssetService = class AssetService {
   Upload any asset pair to the backend using asset api v1.
 
   @deprecated
-  @param small [z.assets.Asset] Small asset for upload
-  @param medium [z.assets.Asset] Medium asset for upload
+  @param {z.assets.Asset} small
+  @param {z.assets.Asset} medium
   */
   post_asset_pair(small, medium) {
     return Promise.all([
@@ -86,8 +86,8 @@ z.assets.AssetService = class AssetService {
   Update the user profile image by first making it usable, transforming it and then uploading the asset pair.
 
   @deprecated
-  @param conversation_id [String] ID of self conversation
-  @param image [File, Blob]
+  @param {string} conversation_id
+  @param {File|Blob} image
   */
   upload_profile_image(conversation_id, image) {
     return Promise.all([
@@ -123,8 +123,7 @@ z.assets.AssetService = class AssetService {
   /*
   Update the user profile image by first making it usable, transforming it and then uploading the asset pair.
 
-  @param conversation_id [String] ID of self conversation
-  @param image [File, Blob]
+  @param {File|Blob} image
   */
   upload_profile_image_v3(image) {
     return Promise.all([
@@ -147,11 +146,11 @@ z.assets.AssetService = class AssetService {
   Upload arbitrary binary data using the new asset api v3.
   The data is AES encrypted before uploading.
 
-  @param bytes [Uint8Array] asset binary data
-  @param options [Object]
-  @option public [Boolean]
-  @option retention [z.assets.AssetRetentionPolicy]
-  @param xhr_accessor_function [Function] Function will get a reference to the underlying XMLHTTPRequest
+  @param {Uint8Array} bytes - asset binary data
+  @param {Object} options
+  @param {Boolean} config.public
+  @param {z.assets.AssetRetentionPolicy} config.retention
+  @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
   */
   _upload_asset(bytes, options, xhr_accessor_function) {
     return z.assets.AssetCrypto.encrypt_aes_asset(bytes)
@@ -165,11 +164,11 @@ z.assets.AssetService = class AssetService {
   Upload file using the new asset api v3. Promise will resolve with z.proto.Asset instance.
   In case of an successful upload the uploaded property is set.
 
-  @param file [File, Blob]
-  @param options [Object]
-  @option public [Boolean]
-  @option retention [z.assets.AssetRetentionPolicy]
-  @param xhr_accessor_function [Function] Function will get a reference to the underlying XMLHTTPRequest
+   @param {Blob|File} file
+   @param {Object} options
+   @param {Boolean} config.public
+   @param {z.assets.AssetRetentionPolicy} config.retention
+   @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
   */
   upload_asset(file, options, xhr_accessor_function) {
     return z.util.load_file_buffer(file)
@@ -186,10 +185,10 @@ z.assets.AssetService = class AssetService {
   Upload image using the new asset api v3. Promise will resolve with z.proto.Asset instance.
   In case of an successful upload the uploaded property is set.
 
-  @param image [File, Blob]
-  @param options [Object]
-  @option public [Boolean]
-  @option retention [z.assets.AssetRetentionPolicy]
+  @param {Blob|File} file
+  @param {Object} options
+  @param {Boolean} config.public
+  @param {z.assets.AssetRetentionPolicy} config.retention
   */
   upload_image_asset(image, options) {
     return this._compress_image(image)
@@ -210,10 +209,10 @@ z.assets.AssetService = class AssetService {
   Generates the URL an asset can be downloaded from.
 
   @deprecated
-  @param asset_id [String] ID of the asset
-  @param conversation_id [String] ID of the conversation the asset belongs to
-  @param force_caching [Boolean]
-  @return [String] Asset URL
+  @param {string} asset_id
+  @param {string} conversation_id
+  @param {Boolean} force_caching
+  @return {String}
   */
   generate_asset_url(asset_id, conversation_id, force_caching) {
     const url = this.client.create_url(`/assets/${asset_id}`);
@@ -226,10 +225,10 @@ z.assets.AssetService = class AssetService {
   Generates the URL for asset api v2.
 
   @deprecated
-  @param asset_id [String] ID of the asset
-  @param conversation_id [String] ID of the conversation the asset belongs to
-  @param force_caching [Boolean]
-  @return [String] Asset URL
+  @param {string} asset_id
+  @param {string} conversation_id
+  @param {Boolean} force_caching
+  @return {String}
   */
   generate_asset_url_v2(asset_id, conversation_id, force_caching) {
     const url = this.client.create_url(`/conversations/${conversation_id}/otr/assets/${asset_id}`);
@@ -241,10 +240,10 @@ z.assets.AssetService = class AssetService {
   /*
   Generates the URL for asset api v3.
 
-  @param asset_key [String]
-  @param asset_token [String]
-  @param force_caching [Boolean]
-  @return [String] Asset URL
+  @param {string} asset_key
+  @param {string} asset_token
+  @param {Boolean} force_caching
+  @return {String}
   */
   generate_asset_url_v3(asset_key, asset_token, force_caching) {
     const url = this.client.create_url(`/assets/v3/${asset_key}/`);
@@ -257,8 +256,8 @@ z.assets.AssetService = class AssetService {
   /*
   Create request data for asset upload.
 
-  @param asset_data [UInt8Array|ArrayBuffer] Asset data
-  @param metadata [Object] image meta data
+  @param {UInt8Array|ArrayBuffer} asset_data
+  @param {Object} metadata
   */
   _create_asset_multipart_body(asset_data, metadata) {
     metadata = JSON.stringify(metadata);
@@ -285,11 +284,11 @@ z.assets.AssetService = class AssetService {
   Post assets to a conversation.
 
   @deprecated
-  @param conversation_id [String] ID of the self conversation
-  @param json_payload [Object] First part of the multipart message
-  @param image_data [Uint8Array|ArrayBuffer] encrypted image data
-  @param precondition_option [Array<String>|Boolean] Level that backend checks for missing clients
-  @param upload_id [String] Identifies the upload request
+  @param {string} conversation_id
+  @param {Object} json_payload
+  @param {Uint8Array|ArrayBuffer} image_data
+  @param {Array|Boolean} precondition_option - Level that backend checks for missing clients
+  @param {String} upload_id
   */
   post_asset_v2(conversation_id, json_payload, image_data, precondition_option, upload_id) {
     return new Promise((resolve, reject) => {
@@ -339,11 +338,11 @@ z.assets.AssetService = class AssetService {
   /*
   Post assets using asset api v3.
 
-  @param asset_data [Uint8Array|ArrayBuffer]
-  @param metadata [Object]
-  @option public [Boolean] Default is false
-  @option retention [z.assets.AssetRetentionPolicy] Default is z.assets.AssetRetentionPolicy.PERSISTENT
-  @param xhr_accessor_function [Function] Function will get a reference to the underlying XMLHTTPRequest
+  @param {Uint8Array|ArrayBuffer} asset_data
+  @param {Object} metadata
+  @param {Boolean} metadata.public
+  @param {z.assets.AssetRetentionPolicy} metadata.retention
+  @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
   */
   post_asset_v3(asset_data, metadata, xhr_accessor_function) {
     return new Promise((resolve, reject) => {
