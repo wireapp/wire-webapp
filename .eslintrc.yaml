@@ -9,6 +9,7 @@ extends:
 globals:
   $: true
   amplify: true
+  ko: true
   z: true
 
 rules:

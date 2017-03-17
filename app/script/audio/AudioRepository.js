@@ -117,10 +117,10 @@
           audio_element.loop = play_in_loop;
 
           if (audio_element.currentTime !== 0) {
-            audio_element.currentTime = 0
+            audio_element.currentTime = 0;
           }
 
-          _play_success = () => {
+          const _play_success = () => {
             if (play_in_loop) {
               this.currently_looping[audio_id] = audio_id;
             }
@@ -223,7 +223,7 @@
       }).then((audio_element) => {
         return this.logger.info(`Playing sound '${audio_id}' (loop: '${play_in_loop}')`, audio_element);
       }).catch((error) => {
-        if (!error instanceof z.audio.AudioError) {
+        if (!(error instanceof z.audio.AudioError)) {
           this.logger.error(`Failed playing sound '${audio_id}': ${error.message}`);
           throw error;
         }
@@ -245,7 +245,7 @@
           delete this.currently_looping[audio_id];
         }
       }).catch((error) => {
-        this.logger.error(`Failed stopping sound '${audio_id}': ${error.message}`, audio_element);
+        this.logger.error(`Failed stopping sound '${audio_id}': ${error.message}`);
         throw error;
       });
     }

@@ -20,17 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.announce = z.announce || {};
+window.z.audio = z.audio || {};
 
-z.audio.AudioType = {
-  ALERT: 'alert',
-  CALL_DROP: 'call_drop',
-  INCOMING_CALL: 'ringing_from_them',
-  INCOMING_PING: 'ping_from_them',
-  NETWORK_INTERRUPTION: 'nw_interruption',
-  NEW_MESSAGE: 'new_message',
-  OUTGOING_CALL: 'ringing_from_me',
-  OUTGOING_PING: 'ping_from_me',
-  READY_TO_TALK: 'ready_to_talk',
-  TALK_LATER: 'talk_later',
+z.audio.AudioPreference = {
+  ALL: 'all',
+  NONE: 'none',
+  SOME: 'some',
 };
