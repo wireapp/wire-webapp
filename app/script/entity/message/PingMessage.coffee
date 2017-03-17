@@ -31,5 +31,5 @@ class z.entity.PingMessage extends z.entity.Message
 
     @get_icon_classes = ko.pureComputed =>
       css_classes = @accent_color()
-      css_classes += ' ping-animation ping-animation-soft' if Date.now() - @timestamp < 2000
+      css_classes += ' ping-animation ping-animation-soft' if Date.now() - @timestamp() < 2000
       return css_classes

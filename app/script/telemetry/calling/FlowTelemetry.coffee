@@ -118,7 +118,7 @@ class z.telemetry.calling.FlowTelemetry
         @logger.debug "Stream has '#{media_type}' flowing properly both ways"
     else
       if @is_answer
-        @logger.info "Check stream statistics of type '#{media_type}' delayed as we created this flow"
+        @logger.info "Check '#{media_type}' statistics delayed as we created this flow"
       else
         window.setTimeout =>
           @check_stream media_type, timeout, attempt++
@@ -131,7 +131,7 @@ class z.telemetry.calling.FlowTelemetry
   schedule_check: (timeout) ->
     window.setTimeout =>
       @check_stream z.media.MediaType.AUDIO, timeout
-      @check_stream z.media.MediaType.VIDEO, timeout if @call_et.is_remote_screen_send() or @call_et.is_remote_video_send()
+      @check_stream z.media.MediaType.VIDEO, timeout if @call_et.local_media_type() in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
     , timeout
 
   ###
@@ -207,39 +207,39 @@ class z.telemetry.calling.FlowTelemetry
   ###
   _update_statistics: =>
     @peer_connection.getStats null
-    .then (rtc_statistics) =>
-      updated_statistics = new z.telemetry.calling.ConnectionStats()
+    .then (rtc_stats_report) =>
+      connection_stats = new z.telemetry.calling.ConnectionStats()
 
-      for key, report of rtc_statistics
+      rtc_stats_report.forEach (report) =>
         switch report.type
           when z.calling.rtc.StatsType.CANDIDATE_PAIR
-            updated_statistics = @_update_from_candidate_pair report, rtc_statistics, updated_statistics
+            connection_stats = @_update_from_candidate_pair report, rtc_stats_report, connection_stats
           when z.calling.rtc.StatsType.GOOGLE_CANDIDATE_PAIR
-            updated_statistics = @_update_peer_connection_bytes report, updated_statistics
-            updated_statistics = @_update_from_google_candidate_pair report, rtc_statistics, updated_statistics
+            connection_stats = @_update_peer_connection_bytes report, connection_stats
+            connection_stats = @_update_from_google_candidate_pair report, rtc_stats_report, connection_stats
           when z.calling.rtc.StatsType.INBOUND_RTP
-            updated_statistics = @_update_peer_connection_bytes report, updated_statistics
-            updated_statistics = @_update_from_inbound_rtp report, updated_statistics
+            connection_stats = @_update_peer_connection_bytes report, connection_stats
+            connection_stats = @_update_from_inbound_rtp report, connection_stats
           when z.calling.rtc.StatsType.OUTBOUND_RTP
-            updated_statistics = @_update_peer_connection_bytes report, updated_statistics
-            updated_statistics = @_update_from_outbound_rtp report, updated_statistics
+            connection_stats = @_update_peer_connection_bytes report, connection_stats
+            connection_stats = @_update_from_outbound_rtp report, connection_stats
           when z.calling.rtc.StatsType.SSRC
-            updated_statistics = @_update_from_ssrc report, updated_statistics
+            connection_stats = @_update_from_ssrc report, connection_stats
 
       _calc_rate = (key, timestamp, type) =>
-        bytes = (updated_statistics[key][type] - @statistics[key][type])
-        time_span = (updated_statistics.timestamp - timestamp)
+        bytes = (connection_stats[key][type] - @statistics[key][type])
+        time_span = (connection_stats.timestamp - timestamp)
         return window.parseInt 1000.0 * bytes / time_span, 10
 
       # Calculate bit rate since last update
-      for key, value of updated_statistics
+      for key, value of connection_stats
         if _.isObject value
-          updated_statistics[key].bit_rate_mean_received = _calc_rate key, @statistics.connected, 'bytes_received'
-          updated_statistics[key].bit_rate_mean_sent = _calc_rate key, @statistics.connected, 'bytes_sent'
-          updated_statistics[key].bit_rate_current_received = _calc_rate key, @statistics.timestamp, 'bytes_received'
-          updated_statistics[key].bit_rate_current_sent = _calc_rate key, @statistics.timestamp, 'bytes_sent'
+          connection_stats[key].bit_rate_mean_received = _calc_rate key, @statistics.connected, 'bytes_received'
+          connection_stats[key].bit_rate_mean_sent = _calc_rate key, @statistics.connected, 'bytes_sent'
+          connection_stats[key].bit_rate_current_received = _calc_rate key, @statistics.timestamp, 'bytes_received'
+          connection_stats[key].bit_rate_current_sent = _calc_rate key, @statistics.timestamp, 'bytes_sent'
 
-      $.extend @statistics, updated_statistics
+      $.extend @statistics, connection_stats
     .catch (error) =>
       @logger.warn 'Update of network stats for flow failed', error
 
@@ -247,43 +247,43 @@ class z.telemetry.calling.FlowTelemetry
   Update from z.calling.rtc.StatsType.CANDIDATE_PAIR report.
 
   @param report [Object] z.calling.rtc.StatsType.CANDIDATE_PAIR report
-  @param stats_reports [RTCStatsReport] Statistics report from PeerConnection
-  @param updated_stats [z.telemetry.calling.ConnectionStats] Parsed flow statistics
+  @param rtc_stats_report [RTCStatsReport] Statistics report from PeerConnection
+  @param connection_stats [z.telemetry.calling.ConnectionStats] Parsed flow statistics
   @return [z.telemetry.calling.ConnectionStats] updated_stats
   ###
-  _update_from_candidate_pair: (report, stat_reports, updated_stats) ->
+  _update_from_candidate_pair: (report, rtc_stats_report, connection_stats) ->
     if report.selected
-      updated_stats.peer_connection.local_candidate_type = stat_reports[report.localCandidateId].candidateType
-      updated_stats.peer_connection.remote_candidate_type = stat_reports[report.remoteCandidateId].candidateType
-    return updated_stats
+      connection_stats.peer_connection.local_candidate_type = rtc_stats_report.get(report.localCandidateId).candidateType
+      connection_stats.peer_connection.remote_candidate_type = rtc_stats_report.get(report.remoteCandidateId).candidateType
+    return connection_stats
 
   ###
   Update from z.calling.rtc.StatsType.GOOGLE_CANDIDATE_PAIR report.
 
   @param report [Object] z.calling.rtc.StatsType.GOOGLE_CANDIDATE_PAIR report
-  @param stats_reports [RTCStatsReport] Statistics report from PeerConnection
-  @param updated_stats [z.telemetry.calling.ConnectionStats] Parsed flow statistics
+  @param rtc_stats_report [RTCStatsReport] Statistics report from PeerConnection
+  @param connection_stats [z.telemetry.calling.ConnectionStats] Parsed flow statistics
   @return [z.telemetry.calling.ConnectionStats] updated_stats
   ###
-  _update_from_google_candidate_pair: (report, stat_reports, updated_stats) ->
+  _update_from_google_candidate_pair: (report, rtc_stats_report, connection_stats) ->
     if report.googActiveConnection is 'true'
-      updated_stats.peer_connection.round_trip_time = window.parseInt report.googRtt, 10
-      updated_stats.peer_connection.local_candidate_type = stat_reports[report.localCandidateId].candidateType
-      updated_stats.peer_connection.remote_candidate_type = stat_reports[report.remoteCandidateId].candidateType
-    return updated_stats
+      connection_stats.peer_connection.round_trip_time = window.parseInt report.googRtt, 10
+      connection_stats.peer_connection.local_candidate_type = rtc_stats_report.get(report.localCandidateId).candidateType
+      connection_stats.peer_connection.remote_candidate_type = rtc_stats_report.get(report.remoteCandidateId).candidateType
+    return connection_stats
 
   ###
   Update from z.calling.rtc.StatsType.INBOUND_RTP report.
 
   @param report [Object] z.calling.rtc.StatsType.INBOUND_RTP report
-  @param stats [z.telemetry.calling.ConnectionStats] Parsed flow statistics
+  @param connection_stats [z.telemetry.calling.ConnectionStats] Parsed flow statistics
   @return [z.telemetry.calling.ConnectionStats] updated_stats
   ###
-  _update_from_inbound_rtp: (report, stats) ->
+  _update_from_inbound_rtp: (report, connection_stats) ->
     if report.mediaType in [z.media.MediaType.AUDIO, z.media.MediaType.VIDEO]
-      stats[report.mediaType].bytes_received += report.bytesReceived if report.bytesReceived
-      stats[report.mediaType].frame_rate_received = window.parseInt report.framerateMean, 10 if report.framerateMean
-    return stats
+      connection_stats[report.mediaType].bytes_received += report.bytesReceived if report.bytesReceived
+      connection_stats[report.mediaType].frame_rate_received = window.parseInt report.framerateMean, 10 if report.framerateMean
+    return connection_stats
 
   ###
   Update from z.calling.rtc.StatsType.OUTBOUND_RTP report.
@@ -292,11 +292,11 @@ class z.telemetry.calling.FlowTelemetry
   @param stats [z.telemetry.calling.ConnectionStats] Parsed flow statistics
   @return [z.telemetry.calling.ConnectionStats] updated_stats
   ###
-  _update_from_outbound_rtp: (report, stats) ->
+  _update_from_outbound_rtp: (report, connection_stats) ->
     if report.mediaType in [z.media.MediaType.AUDIO, z.media.MediaType.VIDEO]
-      stats[report.mediaType].bytes_sent += report.bytesSent if report.bytesSent
-      stats[report.mediaType].frame_rate_sent = window.parseInt report.framerateMean, 10 if report.framerateMean
-    return stats
+      connection_stats[report.mediaType].bytes_sent += report.bytesSent if report.bytesSent
+      connection_stats[report.mediaType].frame_rate_sent = window.parseInt report.framerateMean, 10 if report.framerateMean
+    return connection_stats
 
   ###
   Update from statistics report.
@@ -305,10 +305,10 @@ class z.telemetry.calling.FlowTelemetry
   @param stats [z.telemetry.calling.ConnectionStats] Parsed flow statistics
   @return [z.telemetry.calling.ConnectionStats] updated_stats
   ###
-  _update_peer_connection_bytes: (report, stats) ->
-    stats.peer_connection.bytes_received += window.parseInt report.bytesReceived, 10 if report.bytesReceived
-    stats.peer_connection.bytes_sent += window.parseInt report.bytesSent, 10 if report.bytesSent
-    return stats
+  _update_peer_connection_bytes: (report, connection_stats) ->
+    connection_stats.peer_connection.bytes_received += window.parseInt report.bytesReceived, 10 if report.bytesReceived
+    connection_stats.peer_connection.bytes_sent += window.parseInt report.bytesSent, 10 if report.bytesSent
+    return connection_stats
 
   ###
   Update from z.calling.rtc.StatsType.SSRC report.
@@ -317,22 +317,22 @@ class z.telemetry.calling.FlowTelemetry
   @param stats [z.telemetry.calling.ConnectionStats] Parsed flow statistics
   @return [z.telemetry.calling.ConnectionStats] updated_stats
   ###
-  _update_from_ssrc: (report, stats) =>
+  _update_from_ssrc: (report, connection_stats) =>
     if report.codecImplementationName
       codec = "#{report.googCodecName} #{report.codecImplementationName}"
     else
       codec = report.googCodecName
 
     if report.audioOutputLevel
-      stream_stats = stats.audio
+      stream_stats = connection_stats.audio
       stream_stats.volume_received = window.parseInt report.audioOutputLevel, 10
       stream_stats.codec_received = codec
     else if report.audioInputLevel
-      stream_stats = stats.audio
+      stream_stats = connection_stats.audio
       stream_stats.volume_sent = window.parseInt report.audioInputLevel, 10
       stream_stats.codec_sent = codec
     else if @call_et.is_remote_screen_send() or @call_et.is_remote_video_send()
-      stream_stats = stats.video
+      stream_stats = connection_stats.video
       if report.googFrameHeightReceived
         stream_stats.frame_height_received = window.parseInt report.googFrameHeightReceived, 10
         stream_stats.frame_rate_received = window.parseInt report.googFrameRateReceived, 10
@@ -346,13 +346,13 @@ class z.telemetry.calling.FlowTelemetry
 
     if stream_stats
       stream_stats.bytes_received += window.parseInt report.bytesReceived, 10 if report.bytesReceived
-      stream_stats.bytes_received = stats.peer_connection.bytes_received if stream_stats.bytes_received is 0
+      stream_stats.bytes_received = connection_stats.peer_connection.bytes_received if stream_stats.bytes_received is 0
       stream_stats.bytes_sent += window.parseInt report.bytesSent, 10 if report.bytesSent
-      stream_stats.bytes_sent = stats.peer_connection.bytes_sent if stream_stats.bytes_sent is 0
+      stream_stats.bytes_sent = connection_stats.peer_connection.bytes_sent if stream_stats.bytes_sent is 0
       stream_stats.delay = window.parseInt report.googCurrentDelayMs, 10 if report.googCurrentDelayMs
       stream_stats.round_trip_time = window.parseInt report.googRtt, 10 if report.googRtt
 
-    return stats
+    return connection_stats
 
 
   ###############################################################################

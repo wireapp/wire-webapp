@@ -24,11 +24,11 @@ class z.ui.WindowHandler
   constructor: ->
     @logger = new z.util.Logger 'z.ui.WindowHandler', z.config.LOGGER.OPTIONS
 
-    @width = 0
     @height = 0
+    @width = 0
 
     @is_visible = true
-    @lost_focus_interval_time = (z.tracking.config.SESSION_TIMEOUT / 3)
+    @lost_focus_interval_time = z.config.LOCALYTICS_SESSION_TIMEOUT / 3
     @lost_focus_interval = undefined
     @lost_focus_on = undefined
 
@@ -46,7 +46,7 @@ class z.ui.WindowHandler
         window.clearInterval @lost_focus_interval
         @lost_focus_interval = undefined
         @lost_focus_on = undefined
-        amplify.publish z.event.WebApp.ANALYTICS.SESSION.START
+        amplify.publish z.event.WebApp.ANALYTICS.START_SESSION
       else
         @logger.info 'Webapp is hidden'
         @is_visible = false
@@ -100,5 +100,5 @@ class z.ui.WindowHandler
 
   _check_for_timeout: ->
     in_background_since = Date.now() - @lost_focus_on
-    if in_background_since >= z.tracking.config.SESSION_TIMEOUT
-      amplify.publish z.event.WebApp.ANALYTICS.SESSION.CLOSE
+    if in_background_since >= z.config.LOCALYTICS_SESSION_TIMEOUT
+      amplify.publish z.event.WebApp.ANALYTICS.CLOSE_SESSION

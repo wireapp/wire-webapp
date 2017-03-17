@@ -69,7 +69,7 @@ self.addEventListener 'fetch', (event) ->
   if should_cache_request event.request
     event.respondWith(
       caches.open(CURRENT_CACHES.asset).then (cache) ->
-        cache.match(event.request, {ignoreSearch: true})
+        cache.match(event.request)
         .then (response) ->
 
           if response

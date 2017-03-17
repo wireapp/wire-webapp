@@ -43,30 +43,15 @@ class z.search.SearchRepository
 
   ###
   Get common contacts for given user.
-  @param user_id [String] User ID
+  @param username [String]
   @return [Promise<Array<z.entity.User>>] Promise that will resolve with an array containing the users common contacts
   ###
-  get_common_contacts: (user_id) =>
-    @search_service.get_common(user_id).then (response) -> response.returned
-
-  ###
-  Get top people.
-  @return [Function] Promise that resolves with the top connections
-  ###
-  get_top_people: ->
-    @search_service.get_top z.config.TOP_PEOPLE_FETCH_LIMIT
-    .then (response) =>
-      return @search_result_mapper.map_results response.documents, z.search.SEARCH_MODE.TOP_PEOPLE
-    .then ([search_ets, mode]) =>
-      return @_prepare_search_result search_ets, mode
-
-  ###
-  Ignore suggested user.
-  @param user_id [String] User ID
-  @return [Promise] Promise that resolves when a suggestion has been ignored
-  ###
-  ignore_suggestion: (user_id) ->
-    @search_service.put_suggestions_ignore user_id
+  get_common_contacts: (username) =>
+    @search_service.get_contacts username, 1
+    .then (response) ->
+      if response?.documents?.length > 0
+        return response.documents[0].total_mutual_friends
+      return 0
 
   ###
   Search for users on the backend by name.
@@ -74,7 +59,7 @@ class z.search.SearchRepository
   @return [Promise] Promise that resolves with the search results
   ###
   search_by_name: (name) ->
-    @search_service.get_contacts name, 30, z.search.SEARCH_LEVEL.INDIRECT_CONTACT, 1
+    @search_service.get_contacts name, 30
     .then (response) =>
       return @search_result_mapper.map_results response?.documents, z.search.SEARCH_MODE.CONTACTS
     .then ([search_ets, mode]) =>
@@ -120,13 +105,9 @@ class z.search.SearchRepository
           ###
           switch mode
             when z.search.SEARCH_MODE.CONTACTS
-              if not user_et.connected()
-                user_et.connection_level z.user.ConnectionLevel.NO_CONNECTION
-                result_user_ets.push user_et
+              result_user_ets.push user_et if not user_et.connected()
             when z.search.SEARCH_MODE.ONBOARDING
               result_user_ets.push user_et if not user_et.connected()
-            when z.search.SEARCH_MODE.TOP_PEOPLE
-              result_user_ets.push user_et if user_et.connected()
             else
               result_user_ets.push user_et
 

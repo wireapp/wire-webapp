@@ -41,7 +41,7 @@ describe 'z.calling.CallingRepository', ->
       conversation_et.type z.conversation.ConversationType.ONE2ONE
       conversation_repository.conversations.push conversation_et
 
-    it 'returns the expected protocol version if backend switch is not set', ->
+    it 'should return the expected protocol version if backend switch is not set', ->
       calling_repository.use_v3_api = undefined
       expect(calling_repository.outgoing_protocol_version conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_3
       expect(calling_repository.outgoing_protocol_version group_conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
@@ -51,26 +51,14 @@ describe 'z.calling.CallingRepository', ->
       expect(calling_repository.outgoing_protocol_version group_conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
 
       calling_repository.use_v3_api = false
-      expect(calling_repository.outgoing_protocol_version conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
-      expect(calling_repository.outgoing_protocol_version group_conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
-
-    it 'returns the expected protocol version if backend switch is set to v2', ->
-      calling_repository.calling_config {features: protocol_version_1to1: z.calling.enum.PROTOCOL.VERSION_2}
-
-      calling_repository.use_v3_api = undefined
-      expect(calling_repository.outgoing_protocol_version conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
-      expect(calling_repository.outgoing_protocol_version group_conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
-
-      calling_repository.use_v3_api = true
       expect(calling_repository.outgoing_protocol_version conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_3
       expect(calling_repository.outgoing_protocol_version group_conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
 
-      calling_repository.use_v3_api = false
-      expect(calling_repository.outgoing_protocol_version conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
-      expect(calling_repository.outgoing_protocol_version group_conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
-
-    it 'returns the expected protocol version if backend switch is set to v3', ->
-      calling_repository.calling_config {features: protocol_version_1to1: z.calling.enum.PROTOCOL.VERSION_3}
+    it 'should return the expected protocol version if backend switch is set to v2', ->
+      calling_repository.calling_config
+        features:
+          protocol_version_1to1: z.calling.enum.PROTOCOL.VERSION_2
+          protocol_version_group: z.calling.enum.PROTOCOL.VERSION_2
 
       calling_repository.use_v3_api = undefined
       expect(calling_repository.outgoing_protocol_version conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_3
@@ -81,5 +69,23 @@ describe 'z.calling.CallingRepository', ->
       expect(calling_repository.outgoing_protocol_version group_conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
 
       calling_repository.use_v3_api = false
-      expect(calling_repository.outgoing_protocol_version conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
+      expect(calling_repository.outgoing_protocol_version conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_3
+      expect(calling_repository.outgoing_protocol_version group_conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
+
+    it 'should return the expected protocol version if backend switch is set to v3', ->
+      calling_repository.calling_config
+        features:
+          protocol_version_1to1: z.calling.enum.PROTOCOL.VERSION_3
+          protocol_version_group: z.calling.enum.PROTOCOL.VERSION_3
+
+      calling_repository.use_v3_api = undefined
+      expect(calling_repository.outgoing_protocol_version conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_3
+      expect(calling_repository.outgoing_protocol_version group_conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
+
+      calling_repository.use_v3_api = true
+      expect(calling_repository.outgoing_protocol_version conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_3
+      expect(calling_repository.outgoing_protocol_version group_conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2
+
+      calling_repository.use_v3_api = false
+      expect(calling_repository.outgoing_protocol_version conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_3
       expect(calling_repository.outgoing_protocol_version group_conversation_id).toBe z.calling.enum.PROTOCOL.VERSION_2

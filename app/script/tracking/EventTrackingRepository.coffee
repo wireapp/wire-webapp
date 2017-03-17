@@ -19,15 +19,12 @@
 window.z ?= {}
 z.tracking ?= {}
 
-z.tracking.config =
-  SESSION_TIMEOUT: 180000 # milliseconds
-
 LOCALYTICS =
   APP_KEY: '905792736c9f17c3464fd4e-60d90c82-d14a-11e4-af66-009c5fda0a25'
-  TRACKING_INTERVAL: 60000 # milliseconds
+  SESSION_INTERVAL: 60000 # milliseconds
   DISABLED_DOMAINS: [
     'localhost'
-    'wire-webapp'
+    'zinfra.io'
   ]
 
 RAYGUN =
@@ -48,6 +45,8 @@ class z.tracking.EventTrackingRepository
     @logger = new z.util.Logger 'z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS
 
     @localytics = undefined
+    @session_interval = undefined
+
     @properties = undefined # Reference to the properties
 
     @reported_errors = ko.observableArray()
@@ -67,31 +66,33 @@ class z.tracking.EventTrackingRepository
 
     if not @_localytics_disabled() and @_has_permission()
       @_enable_error_reporting()
-      amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
-      amplify.subscribe z.event.WebApp.ANALYTICS.DIMENSION, @_track_dimension
+      @_init_localytics() if not @localytics
+      @set_custom_dimension z.tracking.CustomDimension.CONTACTS, @user_repository.connected_users().length
+      @_subscribe_to_events()
 
-    @_subscribe_to_events()
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.SEND_DATA, @updated_send_data
 
   init_without_user_tracking: =>
     @_enable_error_reporting()
 
     if not @_localytics_disabled()
-      if not @localytics
-        @_init_localytics window, document, 'script', @localytics
-      amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
-      amplify.subscribe z.event.WebApp.ANALYTICS.DIMENSION, @_track_dimension
+      @_init_localytics() if not @localytics
+      @set_custom_dimension z.tracking.CustomDimension.CONTACTS, -1
+      amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @tag_event
 
   updated_send_data: (send_data) =>
     if send_data
       @_enable_error_reporting()
       if not @_localytics_disabled()
-        amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @track_event
-        amplify.subscribe z.event.WebApp.ANALYTICS.DIMENSION, @_track_dimension
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.TRACKING.OPT_IN
+        @start_session()
+        @set_custom_dimension z.tracking.CustomDimension.CONTACTS, @user_repository.connected_users().length
+        @_subscribe_to_events()
+        @tag_event z.tracking.EventName.TRACKING.OPT_IN
     else
       if not @_localytics_disabled()
+        amplify.unsubscribeAll z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION
         amplify.unsubscribeAll z.event.WebApp.ANALYTICS.EVENT
-        amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.TRACKING.OPT_OUT
+        @tag_event z.tracking.EventName.TRACKING.OPT_OUT
         @_disable_localytics()
       @_disable_error_reporting()
 
@@ -100,22 +101,60 @@ class z.tracking.EventTrackingRepository
     return @properties.settings.privacy.improve_wire
 
   _subscribe_to_events: ->
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.SEND_DATA, @updated_send_data
+    amplify.subscribe z.event.WebApp.ANALYTICS.CLOSE_SESSION, @close_session
+    amplify.subscribe z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, @set_custom_dimension
+    amplify.subscribe z.event.WebApp.ANALYTICS.EVENT, @tag_event
+    amplify.subscribe z.event.WebApp.ANALYTICS.START_SESSION, @start_session
 
-  track_event: (event_name, attributes) =>
-    @_tag_and_upload_event event_name, attributes
+  _unsubscribe_from_events: ->
+    amplify.unsubscribeAll z.event.WebApp.ANALYTICS.CLOSE_SESSION
+    amplify.unsubscribeAll z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION
+    amplify.unsubscribeAll z.event.WebApp.ANALYTICS.EVENT
+    amplify.unsubscribeAll z.event.WebApp.ANALYTICS.START_SESSION
 
-  _track_dimension: (name, value) =>
-    return if not @localytics
-
-    @logger.info "Tracking Localytics dimension '#{name}' of size '#{value}'"
-
-    @localytics 'setCustomDimension', value, name
-    @localytics 'upload'
 
   ###############################################################################
   # Localytics
   ###############################################################################
+
+  close_session: =>
+    return if @localytics is undefined or not @_has_permission()
+    @logger.info 'Closing Localytics session'
+
+    @localytics 'upload'
+    @localytics 'close'
+    window.clearInterval @session_interval if @session_interval
+    @session_interval = undefined
+
+  set_custom_dimension: (custom_dimension, value) =>
+    return if not @localytics
+
+    @logger.info "Set Localytics custom dimension '#{custom_dimension}' to value '#{value}'"
+    @localytics 'setCustomDimension', custom_dimension, value
+
+  start_session: =>
+    return if not @_has_permission() or @session_interval
+
+    @_init_localytics() if not @localytics
+
+    @logger.info 'Starting new Localytics session'
+    @localytics 'open'
+    @localytics 'upload'
+    @session_interval = window.setInterval @upload_session, LOCALYTICS.SESSION_INTERVAL
+
+  tag_event: (event_name, attributes) =>
+    return if not @localytics
+
+    if attributes
+      @logger.info "Localytics event '#{event_name}' with attributes: #{JSON.stringify(attributes)}"
+    else
+      @logger.info "Localytics event '#{event_name}' without attributes"
+
+    @localytics 'tagEvent', event_name, attributes
+
+  upload_session: =>
+    return if not @localytics
+    @localytics 'upload'
 
   _disable_localytics: ->
     @localytics 'close'
@@ -124,7 +163,7 @@ class z.tracking.EventTrackingRepository
     @logger.debug 'Localytics reporting was disabled due to user preferences'
 
   # @see http://docs.localytics.com/#Dev/Integrate/web-options.html
-  _init_localytics: (window, document, node_type, @localytics, c, script_node) ->
+  _init_localytics: ->
     _get_plaform = ->
       if z.util.Environment.electron
         return 'win' if z.util.Environment.os.win
@@ -135,19 +174,20 @@ class z.tracking.EventTrackingRepository
     options =
       appVersion: z.util.Environment.version()
       customDimensions: [_get_plaform()]
-      sessionTimeout: z.tracking.config.SESSION_TIMEOUT / 1000
 
     @localytics = ->
       (@localytics.q ?= []).push arguments
       @localytics.t = new Date()
+
     window.ll = @localytics
-    window['LocalyticsGlobal'] = 'll'
-    script_node = document.createElement node_type
-    script_node.src = 'https://web.localytics.com/v3/localytics.min.js'
-    (c = document.getElementsByTagName(node_type)[0]).parentNode.insertBefore script_node, c
+    window.LocalyticsGlobal = 'll'
+
+    script_element = document.createElement 'script'
+    script_element.src = 'https://web.localytics.com/v3/localytics.min.js'
+
+    (element_node = document.getElementsByTagName('script')[0]).parentNode.insertBefore script_element, element_node
 
     @localytics 'init', LOCALYTICS.APP_KEY, options
-    @_track_dimension z.tracking.DimensionName.CONTACTS, -1
     @logger.debug 'Localytics reporting is enabled'
 
   _localytics_disabled: ->
@@ -157,16 +197,6 @@ class z.tracking.EventTrackingRepository
         return true
     return false
 
-  _tag_and_upload_event: (event_name, attributes) =>
-    return if not @localytics
-
-    if attributes
-      @logger.info "Localytics event '#{event_name}' with attributes: #{JSON.stringify(attributes)}"
-    else
-      @logger.info "Localytics event '#{event_name}' without attributes"
-
-    @localytics 'tagEvent', event_name, attributes
-    @localytics 'upload'
 
   ###############################################################################
   # Raygun
@@ -188,21 +218,6 @@ class z.tracking.EventTrackingRepository
         window.setTimeout =>
           rejected_promise.catch (error) => @logger.log @logger.levels.OFF, 'Handled uncaught Promise in error reporting', error
         , 0
-
-  ###
-  Checks if a Raygun payload has been already reported.
-
-  @see https://github.com/MindscapeHQ/raygun4js#onbeforesend
-  @param [JSON] raygun_payload
-  @return [JSON|Boolean] Returns the original payload if it is an unreported error, otherwise "false".
-  ###
-  _check_error_payload: (raygun_payload) =>
-    error_hash = objectHash.sha1 raygun_payload.Details.Error
-    if @reported_errors().includes error_hash
-      return false
-    else
-      @reported_errors.push error_hash
-    return raygun_payload
 
   _detach_promise_rejection_handler: ->
     window.onunhandledrejection = undefined
@@ -236,5 +251,4 @@ class z.tracking.EventTrackingRepository
     ###
     Raygun.setVersion z.util.Environment.version false if not z.util.Environment.frontend.is_localhost()
     Raygun.withCustomData {electron_version: z.util.Environment.version true} if z.util.Environment.electron
-    Raygun.onBeforeSend @_check_error_payload
     @_attach_promise_rejection_handler()

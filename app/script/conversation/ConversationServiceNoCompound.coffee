@@ -35,7 +35,7 @@ class z.conversation.ConversationServiceNoCompound extends z.conversation.Conver
   @param limit [Number] Amount of events to load
   @return [Promise] Promise that resolves with the retrieved records
   ###
-  load_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit) ->
+  load_preceding_events_from_db: (conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit) ->
     if not _.isDate(lower_bound) or not _.isDate upper_bound
       throw new Error "Lower bound (#{typeof lower_bound}) and upper bound (#{typeof upper_bound}) must be of type 'Date'."
     else if lower_bound.getTime() > upper_bound.getTime()
@@ -44,7 +44,7 @@ class z.conversation.ConversationServiceNoCompound extends z.conversation.Conver
     lower_bound = lower_bound.getTime()
     upper_bound = upper_bound.getTime()
 
-    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    @storage_service.db[@storage_service.OBJECT_STORE_EVENTS]
     .where 'conversation'
     .equals conversation_id
     .reverse()
@@ -63,7 +63,7 @@ class z.conversation.ConversationServiceNoCompound extends z.conversation.Conver
   @return [Promise]
   ###
   load_events_with_category_from_db: (conversation_id, category) ->
-    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATION_EVENTS]
+    @storage_service.db[@storage_service.OBJECT_STORE_EVENTS]
     .where 'conversation'
     .equals conversation_id
     .sortBy 'time'

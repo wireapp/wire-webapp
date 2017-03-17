@@ -14,9 +14,7 @@
     <div class="content-list-wrapper">
       <div class="content-list collection-list" data-bind="antiscroll: true">
 
-        <!-- ko ifnot: z.util.Environment.frontend.is_production() -->
-          <full-search params="search_provider: search_in_conversation, change: on_input_change, message_click: click_on_message"></full-search>
-        <!-- /ko -->
+        <full-search params="search_provider: search_in_conversation, change: on_input_change, message_click: click_on_message, result: on_result"></full-search>
 
         <!-- ko if: search_input().length === 0 -->
           <!-- ko if: images().length -->

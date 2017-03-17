@@ -167,6 +167,8 @@ class z.ViewModel.MessageListViewModel
           return @conversation_repository.get_messages_with_offset conversation_et, @marked_message()
         return @conversation_repository.get_preceding_messages conversation_et
       .then =>
+        if @conversation().get_last_message()?.timestamp() is @conversation().last_event_timestamp()
+          @conversation_reached_bottom = true
         conversation_et.is_loaded true
         @_render_conversation conversation_et, callback
 
@@ -228,7 +230,7 @@ class z.ViewModel.MessageListViewModel
       return
 
     # message was prepended
-    if last_message?.timestamp isnt @conversation().last_event_timestamp()
+    if last_message?.timestamp() isnt @conversation().last_event_timestamp()
       return
 
     # scroll to bottom if self user send the message
@@ -485,11 +487,11 @@ class z.ViewModel.MessageListViewModel
     if message_et.is_call()
       return ''
 
-    if last_message.timestamp is @conversation_last_read_timestamp()
+    if last_message.timestamp() is @conversation_last_read_timestamp()
       return 'message-timestamp-visible message-timestamp-unread'
 
-    last = moment last_message.timestamp
-    current = moment message_et.timestamp
+    last = moment last_message.timestamp()
+    current = moment message_et.timestamp()
 
     if not last.isSame current, 'day'
       return 'message-timestamp-visible message-timestamp-day'

@@ -17,12 +17,13 @@
 #
 
 window.z ?= {}
-z.search ?= {}
+z.tracking ?= {}
 
 ###
-Enum of different search levels.
+@note Custom Dimensions for Localytics have to be created server side and are
+  identified by the index found in the settings of Desktop and Desktop staging projects
+@see https://dashboard.localytics.com/settings/apps?org_id=1145
 ###
-z.search.SEARCH_LEVEL =
-  DIRECT_CONTACT: 1
-  FRIEND_OF_FRIEND: 2
-  INDIRECT_CONTACT: 3
+z.tracking.CustomDimension =
+  APP: 0
+  CONTACTS: 1

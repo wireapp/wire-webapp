@@ -265,6 +265,8 @@ z.string.it.conversation_send_pasted_file = 'Immagine incollata alle %date'
 
 # Collection
 
+# Full Search
+
 # Archive
 z.string.it.archive_header = 'Archivia'
 

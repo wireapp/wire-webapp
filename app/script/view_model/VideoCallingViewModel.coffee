@@ -82,30 +82,43 @@ class z.ViewModel.VideoCallingViewModel
       is_visible = (@joined_call()?.is_remote_screen_send() or @joined_call()?.is_remote_video_send()) and @remote_video_stream()
       return @is_ongoing() and is_visible
 
+    @joined_v3_call = ko.pureComputed =>
+      return @joined_call()? and @joined_call() instanceof z.calling.entities.ECall
+
     @show_switch_camera = ko.pureComputed =>
+      return false if @joined_v3_call()
       is_visible = @local_video_stream() and @available_devices.video_input().length > 1 and @self_stream_state.video_send()
       return @is_ongoing() and is_visible
     @show_switch_screen = ko.pureComputed =>
+      return false if @joined_v3_call()
       is_visible = @local_video_stream() and @available_devices.screen_input().length > 1 and @self_stream_state.screen_send()
       return @is_ongoing() and is_visible
 
     @show_controls = ko.pureComputed =>
       is_visible = @show_remote_video() or @show_remote_participant() and not @multitasking.is_minimized()
       return @is_ongoing() and is_visible
-    @show_toggle_screen = ko.pureComputed ->
+    @show_toggle_video = ko.pureComputed =>
+      return false if @joined_v3_call() and @media_repository.stream_handler.local_media_type() is z.media.MediaType.AUDIO
+      return @joined_call()?.conversation_et.is_one2one()
+    @show_toggle_screen = ko.pureComputed =>
+      return false if @joined_v3_call()
       return z.calling.CallingRepository.supports_screen_sharing()
     @disable_toggle_screen = ko.pureComputed =>
       return @joined_call()?.is_remote_screen_send()
 
+    @visible_call_id = undefined
     @joined_call.subscribe (joined_call) =>
       if joined_call
+        return if @visible_call_id is joined_call.id
+        @visible_call_id = joined_call.id
         if @show_local_video() or @show_remote_video()
           @multitasking.is_minimized false
-          @logger.info "Displaying call '#{joined_call.id}' full-screen", joined_call
+          @logger.info "Maximizing video call '#{joined_call.id}' to full-screen", joined_call
         else
           @multitasking.is_minimized true
-        @logger.info "Minimizing call '#{joined_call.id}' that is not videod", joined_call
+          @logger.info "Minimizing audio call '#{joined_call.id}' from full-screen", joined_call
       else
+        @visible_call_id = undefined
         @multitasking.auto_minimize true
         @multitasking.is_minimized false
         @logger.info 'Resetting full-screen calling to maximize'
@@ -153,11 +166,11 @@ class z.ViewModel.VideoCallingViewModel
       .catch (error) =>
         @logger.error 'Unable to get screens sources for sharing', error
 
-  clicked_on_cancel_call: =>
-    amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @joined_call()?.id
-
   clicked_on_cancel_screen: =>
     @is_choosing_screen false
+
+  clicked_on_leave_call: =>
+    amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @joined_call()?.id, z.calling.enum.TERMINATION_REASON.SELF_USER
 
   clicked_on_mute_audio: =>
     amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call()?.id, z.media.MediaType.AUDIO

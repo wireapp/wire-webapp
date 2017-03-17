@@ -17,40 +17,12 @@
  *
  */
 
-@keyframes welcome-fade-in { 0%{ opacity: 0; transform: translateX(32px); } 100%{ opacity: 1; transform: translateY(0);}}
+'use strict';
 
-.welcome {
-  .full-screen;
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+window.z = window.z || {};
+window.z.announce = z.announce || {};
 
-.welcome-inner {
-  animation-name: welcome-fade-in;
-  animation-duration: @animation-timing-slow;
-  animation-timing-function: @ease-out-expo;
-  animation-delay: @animation-timing-fast;
-  animation-fill-mode: forwards;
-  width: 320px;
-  opacity: 0;
-}
-
-.welcome-text {
-  font-size: 40px;
-  font-weight: 200;
-  line-height: 48px;
-  margin-bottom: 40px;
-}
-
-.welcome-button {
-
-  & + & {
-    margin-top: 16px;
-  }
-
-  > svg {
-    margin-top: 10px;
-  }
-}
+window.z.announce.UPDATE_SOURCE = {
+  DESKTOP: 'desktop',
+  WEBAPP: 'webapp',
+};

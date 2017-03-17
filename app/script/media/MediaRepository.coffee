@@ -19,6 +19,14 @@
 window.z ?= {}
 z.media ?= {}
 
+
+#https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/state
+AUDIO_CONTEXT_STATE =
+  CLOSED: 'closed'
+  RUNNING: 'running'
+  SUSPENDED: 'suspended'
+
+
 # Media Repository
 class z.media.MediaRepository
   ###
@@ -30,9 +38,32 @@ class z.media.MediaRepository
     return z.util.Environment.browser.supports.media_devices
 
   # Construct a new MediaDevices repository.
-  constructor: (@audio_repository) ->
+  constructor: ->
     @logger = new z.util.Logger 'z.media.MediaRepository', z.config.LOGGER.OPTIONS
 
     @devices_handler = new z.media.MediaDevicesHandler @
-    @element_handler = new z.media.MediaElementHandler()
-    @stream_handler = new z.media.MediaStreamHandler @, @audio_repository
+    @element_handler = new z.media.MediaElementHandler @
+    @stream_handler = new z.media.MediaStreamHandler @
+
+    @audio_context = undefined
+
+  # Closing the AudioContext.
+  close_audio_context: =>
+    if @audio_context?.state is AUDIO_CONTEXT_STATE.RUNNING
+      @audio_context.close()
+      .then =>
+        @logger.info 'Closed existing AudioContext', @audio_context
+        @audio_context = undefined
+
+  # Initialize the AudioContext.
+  get_audio_context: =>
+    if @audio_context
+      @logger.info 'Reusing existing AudioContext', @audio_context
+      return @audio_context
+    else if window.AudioContext and window.AudioContext::createMediaStreamSource
+      @audio_context = new window.AudioContext()
+      @logger.info 'Initialized a new AudioContext', @audio_context
+      return @audio_context
+    else
+      @logger.error 'The flow audio cannot use the Web Audio API as it is unavailable.'
+      return undefined

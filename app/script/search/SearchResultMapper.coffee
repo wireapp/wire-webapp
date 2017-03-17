@@ -40,6 +40,5 @@ class z.search.SearchResultMapper
         search_et = {}
         search_et.id = search_result.id
         search_et.mutual_friends_total = search_result.total_mutual_friends
-        search_et.mutual_friend_ids = search_result.mutual_friends
         search_ets.push search_et
       resolve [search_ets, mode]

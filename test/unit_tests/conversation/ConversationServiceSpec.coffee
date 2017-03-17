@@ -31,7 +31,6 @@ describe 'z.conversation.ConversationService', ->
       client = test_factory.client
       storage_service = storage_repository.storage_service
       conversation_service = new z.conversation.ConversationService client, storage_service
-
       conversation_mapper = new z.conversation.ConversationMapper()
       server = sinon.fakeServer.create()
       done()
@@ -44,31 +43,24 @@ describe 'z.conversation.ConversationService', ->
   describe 'load_preceding_events_from_db', ->
 
     conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
-    sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
 
     # @formatter:off
     messages = [
-      {
-        key: "#{conversation_id}@#{sender_id}@1470317275182"
-        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"}
-      },
-      {
-        key: "#{conversation_id}@#{sender_id}@1470317278993"
-        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
-      }
+      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"}
+      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
     ]
     # @formatter:on
 
     beforeEach (done) ->
       Promise.all messages.map (message) ->
-        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
+        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, message
       .then done
       .catch done.fail
 
     it 'returns mapped message_et if event with id is found', (done) ->
       conversation_service.load_event_from_db conversation_id, '4af67f76-09f9-4831-b3a4-9df877b8c29a'
       .then (message_et) =>
-        expect(message_et).toEqual messages[1].object
+        expect(message_et).toEqual messages[1]
         done()
       .catch done.fail
 
@@ -86,6 +78,7 @@ describe 'z.conversation.ConversationService', ->
 
     it 'updated event in the database', (done) ->
       event.time = new Date().toISOString()
+      event.primary_key = 1337
       conversation_service.update_message_in_db event, {time: event.time}
       .then done
       .catch done.fail
@@ -100,19 +93,15 @@ describe 'z.conversation.ConversationService', ->
 
   describe 'load_preceding_events_from_db', ->
     conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
-    sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
     messages = undefined
 
     beforeEach (done) ->
       timestamp = 1479903546799
       messages = [0...10].map (index) ->
-        return {
-          key: "#{conversation_id}@#{sender_id}@#{index}"
-          object: {"conversation": conversation_id, "time": new Date(timestamp + index).toISOString()}
-        }
+        return {"conversation": conversation_id, "time": new Date(timestamp + index).toISOString()}
 
       Promise.all messages.map (message) ->
-        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
+        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, message
       .then done
       .catch done.fail
 
@@ -195,7 +184,7 @@ describe 'z.conversation.ConversationService', ->
         return {"conversation": conversation_id, "time": new Date(timestamp + index).toISOString(), "from": sender_id}
 
       Promise.all events.map (event) ->
-        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, z.storage.StorageService.construct_primary_key(event), event
+        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, event
       .then done
       .catch done.fail
 
@@ -218,40 +207,32 @@ describe 'z.conversation.ConversationService', ->
   describe 'delete_message_with_key_from_db', ->
 
     conversation_id = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a'
-    sender_id = '8b497692-7a38-4a5d-8287-e3d1006577d6'
+    primary_keys = undefined
 
     # @formatter:off
     messages = [
-      {
-        key: "#{conversation_id}@#{sender_id}@1470317275182"
-        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"}
-      },
-      {
-        key: "#{conversation_id}@#{sender_id}@1470317278993"
-        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
-      },
-
-      {
-        key: "#{conversation_id}@#{sender_id}@1470317278994"
-        object: {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message (Duplicate)","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
-      }
+      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"}
+      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
+      {"conversation":"35a9a89d-70dc-4d9e-88a2-4d8758458a6a","id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message (Duplicate)","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"}
     ]
     # @formatter:on
 
     beforeEach (done) ->
       Promise.all messages.map (message) ->
-        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, message.key, message.object
-      .then done
+        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, message
+      .then (ids) =>
+        primary_keys = ids
+        done()
       .catch done.fail
 
     it 'deletes message with the given key', (done) ->
-      conversation_service.delete_message_with_key_from_db conversation_id, messages[1].key
+      conversation_service.delete_message_with_key_from_db conversation_id, primary_keys[1]
       .then ->
         conversation_service.load_preceding_events_from_db conversation_id
       .then (events) ->
         expect(events.length).toBe 2
         for event in events
-          expect(event.data.content).not.toBe messages[1].object.data.content
+          expect(event.primary_key).not.toBe primary_keys[1]
         done()
       .catch done.fail
 
@@ -277,7 +258,7 @@ describe 'z.conversation.ConversationService', ->
 
     it 'should return no entry matches the given category', (done) ->
       Promise.all events.slice(0,1).map (event) ->
-        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, z.storage.StorageService.construct_primary_key(event), event
+        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, event
       .then ->
         return conversation_service.load_events_with_category_from_db events[0].conversation, z.message.MessageCategory.IMAGE
       .then (result) ->
@@ -287,12 +268,73 @@ describe 'z.conversation.ConversationService', ->
 
     it 'should get images in the correct order', (done) ->
       Promise.all events.map (event) ->
-        return storage_service.save storage_service.OBJECT_STORE_CONVERSATION_EVENTS, z.storage.StorageService.construct_primary_key(event), event
+        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, event
       .then ->
         return conversation_service.load_events_with_category_from_db events[0].conversation, z.message.MessageCategory.IMAGE
       .then (result) ->
         expect(result.length).toBe 2
         expect(result[0].id).toBe events[1].id
         expect(result[1].id).toBe events[2].id
+        done()
+      .catch done.fail
+
+  describe 'search_in_conversation', ->
+
+    events = undefined
+
+    beforeEach ->
+      events = [
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"2017-01-09T13:11:15.051Z","data":{"content":"https://wire.com","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category": 16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"f7adaa16-38f5-483e-b621-72ff1dbd2276","from":"5598f954-674f-4a34-ad47-9e5ee8f00bce","time":"2017-01-09T13:11:15.052Z","data":{"content":"https://wire.com","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2276","previews":["CjZodHRwczovL3dpcmUuY29tLz81ZDczNDQ0OC00NDZiLTRmYTItYjMwMy1lYTJhNzhiY2NhMDgQABpWCjZodHRwczovL3dpcmUuY29tLz81ZDczNDQ0OC00NDZiLTRmYTItYjMwMy1lYTJhNzhiY2NhMDgSHFdpcmUgwrcgTW9kZXJuIGNvbW11bmljYXRpb24="]},"type":"conversation.message-add","category": 112}
+      ]
+
+    it 'should find query in text message', (done) ->
+      Promise.all events.slice(0, 1).map (event) ->
+        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, event
+      .then ->
+        return conversation_service.search_in_conversation events[0].conversation, 'https://wire.com'
+      .then (result) ->
+        expect(result.length).toBe 1
+        expect(result[0].id).toBe 'f7adaa16-38f5-483e-b621-72ff1dbd2275'
+        done()
+      .catch done.fail
+
+    it 'should find query in text message with link preview', (done) ->
+      Promise.all events.map (event) ->
+        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, event
+      .then ->
+        return conversation_service.search_in_conversation events[0].conversation, 'https://wire.com'
+      .then (result) ->
+        expect(result.length).toBe 2
+        expect(result[0].id).toBe 'f7adaa16-38f5-483e-b621-72ff1dbd2275'
+        expect(result[1].id).toBe 'f7adaa16-38f5-483e-b621-72ff1dbd2276'
+        done()
+      .catch done.fail
+
+  describe 'search_in_conversation', ->
+
+    events = undefined
+
+    beforeEach ->
+      events = [
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"#{new Date().toISOString()}","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"#{new Date(Date.now() - 1).toISOString()}","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c1","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"#{new Date(Date.now() - 2).toISOString()}","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c1","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"#{new Date(Date.now() - 3).toISOString()}","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c1","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"#{new Date(Date.now() - 4).toISOString()}","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c2","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"#{new Date(Date.now() - 5).toISOString()}","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+        {"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c3","id":"f7adaa16-38f5-483e-b621-72ff1dbd2275","from":"5598f954-674f-4a34-ad47-9e5ee8f00bcd","time":"2016-01-09T13:11:15.051Z","data":{"content":"hello","nonce":"f7adaa16-38f5-483e-b621-72ff1dbd2275","previews":[]},"type":"conversation.message-add","category":16}
+      ]
+
+    it 'should return conversation ids sorted by number of messages', (done) ->
+      Promise.all events.map (event) ->
+        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, event
+      .then ->
+        return conversation_service.get_active_conversations_from_db()
+      .then (result) ->
+        expect(result.length).toBe 3
+        expect(result[0]).toBe '34e7f58e-b834-4d84-b628-b89b295d46c1'
+        expect(result[1]).toBe '34e7f58e-b834-4d84-b628-b89b295d46c0'
+        expect(result[2]).toBe '34e7f58e-b834-4d84-b628-b89b295d46c2'
         done()
       .catch done.fail

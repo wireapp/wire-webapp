@@ -31,3 +31,4 @@ class z.calling.CallingService
     @client.send_request
       type: 'GET'
       url: @client.create_url '/calls/config'
+      cache: false

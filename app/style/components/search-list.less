@@ -46,35 +46,6 @@
     height: 56px;
     margin: 0;
   }
-
-  .search-list-lg &.hover,
-  .search-list-lg &:hover {
-    .search-list-item-connect {
-      // fade in
-      transition-property: opacity;
-      transition-duration: @animation-timing-slow;
-      transition-timing-function: @ease-out-quart;
-      transition-delay: @animation-timing-faster + 0.05;
-      opacity: 1;
-      width: 48px;
-    }
-  }
-  .search-list-lg &:not(.hover):not(:hover) {
-    .search-list-item-connect {
-      // fade out
-      transition-property: opacity, width;
-      transition-duration: @animation-timing-fast, 0s;
-      transition-delay: 0s, @animation-timing-fast;
-      transition-timing-function: @ease-out-quart, linear;
-      opacity: 0;
-      width: 0;
-      overflow: hidden;
-    }
-  }
-
-  &.search-list-item-collapse {
-    .list-item-collapse();
-  }
 }
 
 .search-list-item-image {
@@ -106,27 +77,6 @@
   .checkmark {
     transform: scale(1.8);
     opacity: 0;
-  }
-
-  .search-list-item-connect-anim & {
-
-    .background {
-      // fade int
-      transition-property: opacity;
-      transition-duration: @animation-timing-fast;
-      transition-timing-function: @ease-out-quart;
-      opacity: .64;
-    }
-
-    .checkmark {
-      transition-property: transform, opacity;
-      transition-delay: .1s;
-      transition-duration: @animation-timing-slow;
-      transition-timing-function: @ease-out-back;
-      transform: scale(1);
-      opacity: 1;
-    }
-
   }
 }
 
@@ -161,25 +111,14 @@
 .search-list-item-content-info {
   display: flex;
   font-size: @font-size-xs;
-  color: fade(#fff, 56%);
   line-height: 16px;
+  opacity: 0.56;
 }
 
 .search-list-item-content-username + .search-list-item-content-friends:before {
   content: "-";
   margin-left: 4px;
   margin-right: 4px;
-}
-
-.search-list-item-connect {
-  align-items: center;
-  display: flex;
-  flex: 0 0 auto;
-  height: @avatar-diameter-sm;
-
-  > .icon-button {
-    margin-left: 8px;
-  }
 }
 
 .search-list-item-header {

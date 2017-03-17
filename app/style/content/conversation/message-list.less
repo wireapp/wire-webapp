@@ -20,12 +20,13 @@
 // MEMBER LIST
 .message-list {
   flex: 1 1;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .messages-wrap {
   width: 100%;
   height: 100%;
+  overflow-x: hidden;
 }
 
 .messages {
@@ -60,9 +61,16 @@
   }
 }
 
+@keyframes marked-animation {to { background-color: inherit}}
+
 .message-marked {
   .text {
-    .accent-background-color(24%)
+    .accent-background-color(24%);
+    animation-name: marked-animation;
+    animation-delay: 1s;
+    animation-timing-function: @ease-out-quart;
+    animation-duration: @animation-timing-slower * 2;
+    animation-fill-mode: forwards;
   }
 }
 

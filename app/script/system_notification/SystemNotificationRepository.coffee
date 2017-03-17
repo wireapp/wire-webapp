@@ -159,7 +159,7 @@ class z.SystemNotification.SystemNotificationRepository
     if message_et.is_activation()
       return z.localization.Localizer.get_text z.string.system_notification_voice_channel_activate
     else if message_et.is_deactivation()
-      return if message_et.finished_reason isnt z.calling.enum.CALL_FINISHED_REASON.MISSED
+      return if message_et.finished_reason isnt z.calling.enum.TERMINATION_REASON.MISSED
       return z.localization.Localizer.get_text z.string.system_notification_voice_channel_deactivate
 
   ###
@@ -551,9 +551,10 @@ class z.SystemNotification.SystemNotificationRepository
       hide_notification = true if @permission_state is z.system_notification.PermissionStatusState.DENIED
       hide_notification = true if message_et.user()?.is_me
 
-      in_active_conversation = document.hasFocus() and conversation_et.id is @conversation_repository.active_conversation()?.id
+      in_conversation_view = document.hasFocus() and wire.app.view.content.content_state() is z.ViewModel.content.CONTENT_STATE.CONVERSATION
+      in_active_conversation = conversation_et.id is @conversation_repository.active_conversation()?.id
       in_maximized_call = @calling_repository.joined_call() and not wire.app.view.content.multitasking.is_minimized()
-      hide_notification = true if in_active_conversation and not in_maximized_call
+      hide_notification = true if in_conversation_view and in_active_conversation and not in_maximized_call
 
       if hide_notification
         throw new z.system_notification.SystemNotificationError z.system_notification.SystemNotificationError::TYPE.HIDE_NOTIFICATION

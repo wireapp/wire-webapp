@@ -39,11 +39,27 @@ class z.media.MediaStreamHandler
     return media_stream
 
   ###
+  Get MediaStreamTracks from a MediaStream.
+
+  @param media_stream [MediaStream] MediaStream to get tracks from
+  @param media_type [z.media.MediaType.AUDIO_VIDEO]
+  @return [Array] Array of MediaStreamTracks optionally matching the requested type
+  ###
+  @get_media_tracks: (media_stream, media_type = z.media.MediaType.AUDIO_VIDEO) ->
+    switch media_type
+      when z.media.MediaType.AUDIO
+        media_stream_tracks = media_stream.getAudioTracks()
+      when z.media.MediaType.AUDIO_VIDEO
+        media_stream_tracks = media_stream.getTracks()
+      when z.media.MediaType.VIDEO
+        media_stream_tracks = media_stream.getVideoTracks()
+    return media_stream_tracks
+
+  ###
   Construct a new MediaStream handler.
   @param media_repository [z.media.MediaRepository] Media repository with with references to all other handlers
-  @param audio_repository [z.audio.AudioRepository] Audio repository to handle all audio related tasks
   ###
-  constructor: (@media_repository, @audio_repository) ->
+  constructor: (@media_repository) ->
     @logger = new z.util.Logger 'z.media.MediaDevicesHandler', z.config.LOGGER.OPTIONS
 
     @calls = -> return []
@@ -136,7 +152,7 @@ class z.media.MediaStreamHandler
   @return [Object] Video stream constraints
   ###
   _get_audio_stream_constraints: (media_device_id) ->
-    if _.isString media_device_id and media_device_id isnt 'default'
+    if _.isString media_device_id
       media_stream_constraints =
         deviceId:
           exact: media_device_id
@@ -314,24 +330,6 @@ class z.media.MediaStreamHandler
     return @local_media_streams.audio()?.id is @local_media_streams.video()?.id
 
   ###
-  Get MediaStreamTracks from a MediaStream.
-
-  @private
-  @param media_stream [MediaStream] MediaStream to get tracks from
-  @param media_type [z.media.MediaType.AUDIO_VIDEO]
-  @return [Array] Array of MediaStreamTracks optionally matching the requested type
-  ###
-  _get_media_tracks: (media_stream, media_type = z.media.MediaType.AUDIO_VIDEO) ->
-    switch media_type
-      when z.media.MediaType.AUDIO
-        media_stream_tracks = media_stream.getAudioTracks()
-      when z.media.MediaType.AUDIO_VIDEO
-        media_stream_tracks = media_stream.getTracks()
-      when z.media.MediaType.VIDEO
-        media_stream_tracks = media_stream.getVideoTracks()
-    return media_stream_tracks
-
-  ###
   Hide the permission denied hint banner.
   @private
   @param media_type [z.media.MediaType] Type of requested stream
@@ -398,7 +396,7 @@ class z.media.MediaStreamHandler
   _release_media_stream: (media_stream, media_type = z.media.MediaType.AUDIO_VIDEO) =>
     return false if not media_stream
 
-    media_stream_tracks = @_get_media_tracks media_stream, media_type
+    media_stream_tracks = z.media.MediaStreamHandler.get_media_tracks media_stream, media_type
 
     if media_stream_tracks.length
       for media_stream_track in media_stream_tracks
@@ -419,6 +417,7 @@ class z.media.MediaStreamHandler
   _replace_input_source_failure: (error, media_type) ->
     if media_type is z.media.MediaType.SCREEN
       if z.util.Environment.browser.firefox and error.type is z.media.MediaError::TYPE.MEDIA_STREAM_PERMISSION
+        # @deprecated Remove once we require Firefox 52 ESR
         @logger.warn 'We are not on the white list. Manually add the current domain to media.getusermedia.screensharing.allowed_domains on about:config'
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.WHITELIST_SCREENSHARING
       else
@@ -528,9 +527,9 @@ class z.media.MediaStreamHandler
   # Reset the MediaStreams and states.
   reset_media_streams: =>
     if not @needs_media_stream()
-      @audio_repository.close_audio_context()
       @release_media_streams()
       @reset_self_states()
+      @media_repository.close_audio_context()
 
   ###
   Set the self stream state to reflect current media type.
@@ -556,11 +555,11 @@ class z.media.MediaStreamHandler
   ###
   _set_stream_state: (media_stream_info) ->
     if media_stream_info.type in [z.media.MediaType.AUDIO, z.media.MediaType.AUDIO_VIDEO]
-      audio_stream_tracks = @_get_media_tracks media_stream_info.stream, z.media.MediaType.AUDIO
+      audio_stream_tracks = z.media.MediaStreamHandler.get_media_tracks media_stream_info.stream, z.media.MediaType.AUDIO
       audio_stream_tracks[0].enabled = @self_stream_state.audio_send()
 
     if media_stream_info.type in [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO]
-      video_stream_tracks = @_get_media_tracks media_stream_info.stream, z.media.MediaType.VIDEO
+      video_stream_tracks = z.media.MediaStreamHandler.get_media_tracks media_stream_info.stream, z.media.MediaType.VIDEO
       video_stream_tracks[0].enabled = @self_stream_state.screen_send() or @self_stream_state.video_send()
 
   ###
@@ -604,9 +603,9 @@ class z.media.MediaStreamHandler
   ###
   _toggle_stream_enabled: (media_type, media_stream, state_observable) ->
     Promise.resolve()
-    .then =>
+    .then ->
       state_observable not state_observable()
-      media_stream_track = (@_get_media_tracks media_stream, media_type)[0]
+      media_stream_track = (z.media.MediaStreamHandler.get_media_tracks media_stream, media_type)[0]
       if media_type is z.media.MediaType.AUDIO
         amplify.publish z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, not state_observable()
       enabled_state = state_observable()

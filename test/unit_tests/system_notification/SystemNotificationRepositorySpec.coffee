@@ -56,13 +56,14 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       system_notification_repository.permission_state = z.system_notification.PermissionStatusState.GRANTED
       z.util.Environment.browser.supports.notifications = true
       window.wire.app =
-          service:
-            asset:
-              generate_asset_url: -> '/image/logo/notification.png'
-          view:
-            content:
-              multitasking:
-                is_minimized: -> return true
+        service:
+          asset:
+            generate_asset_url: -> '/image/logo/notification.png'
+        view:
+          content:
+            content_state: ko.observable z.ViewModel.content.CONTENT_STATE.CONVERSATION
+            multitasking:
+              is_minimized: -> return true
 
       spyOn system_notification_repository, '_show_notification'
       spyOn system_notification_repository, '_notify_sound'
@@ -122,7 +123,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
     it 'for a successfully completed call', (done) ->
       message_et = new z.entity.CallMessage()
       message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED
-      message_et.finished_reason = z.calling.enum.CALL_FINISHED_REASON.COMPLETED
+      message_et.finished_reason = z.calling.enum.TERMINATION_REASON.COMPLETED
 
       system_notification_repository.notify conversation_et, message_et
       .then ->
@@ -186,7 +187,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
       beforeEach ->
         message_et = new z.entity.CallMessage()
         message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED
-        message_et.finished_reason = z.calling.enum.CALL_FINISHED_REASON.MISSED
+        message_et.finished_reason = z.calling.enum.TERMINATION_REASON.MISSED
         message_et.user user_et
         notification_content.options.body = z.string.system_notification_voice_channel_deactivate
         notification_content.trigger = system_notification_repository._create_trigger conversation_et, message_et

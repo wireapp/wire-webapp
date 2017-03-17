@@ -59,6 +59,9 @@ z.util.Environment = do ->
       return false if window.Notification.requestPermission is undefined
       return false if document.visibilityState is undefined
       return true
+
+    supports_audio_output_selection: ->
+      return @is_chrome()
     supports_calling: ->
       return false if not @supports_media_devices()
       return false if window.WebSocket is undefined
@@ -69,6 +72,7 @@ z.util.Environment = do ->
       return false
     supports_screen_sharing: ->
       return true if window.desktopCapturer
+      # @deprecated Remove warning modal once we require Firefox 52 ESR
       return @is_firefox() and @get_version() >= 48
 
   os =
@@ -125,6 +129,7 @@ z.util.Environment = do ->
     opera: _check.is_opera()
 
     supports:
+      audio_output_selection: _check.supports_audio_output_selection()
       calling: _check.supports_calling()
       media_devices: _check.supports_media_devices()
       notifications: _check.supports_notifications()

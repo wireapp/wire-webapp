@@ -264,6 +264,8 @@ z.string.cs.conversation_likes_caption = '%@number lidí'
 
 # Collection
 
+# Full Search
+
 # Archive
 z.string.cs.archive_header = 'Archivovat'
 

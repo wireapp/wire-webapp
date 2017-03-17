@@ -252,7 +252,7 @@ describe 'z.conversation.ConversationRepository', ->
       group_removed.name 'Removed'
       group_removed.last_event_timestamp Date.now() - 1000
       group_removed.set_timestamp Date.now(), z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
-      group_removed.removed_from_conversation true
+      group_removed.status z.conversation.ConversationStatus.PAST_MEMBER
 
       conversation_repository.save_conversation group_a
       conversation_repository.save_conversation group_b
@@ -786,16 +786,13 @@ describe 'z.conversation.ConversationRepository', ->
       bad_message = {"conversation":"#{conversation_et.id}","id":"aeac8355-739b-4dfc-a119-891a52c6a8dc","from":"532af01e-1e24-4366-aacf-33b67d4ee376","data":{"content":"Hello World :)","nonce":"aeac8355-739b-4dfc-a119-891a52c6a8dc"},"type":"conversation.message-add"}
       good_message = {"conversation":"#{conversation_et.id}","id":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:28:33.389Z","data":{"content":"Fifth message","nonce":"5a8cd79a-82bb-49ca-a59e-9a8e76df77fb","previews":[]},"type":"conversation.message-add"}
       #@formatter:on
+
       bad_message_key = "#{conversation_et.id}@#{bad_message.from}@NaN"
-      good_message_key = "#{conversation_et.id}@#{good_message.from}@#{new Date(good_message.time).getTime()}"
+      object_store = storage_service.OBJECT_STORE_EVENTS
 
-      object_store = storage_service.OBJECT_STORE_CONVERSATION_EVENTS
-
-      save_messages = []
-      save_messages.push storage_service.save object_store, bad_message_key, bad_message
-      save_messages.push storage_service.save object_store, good_message_key, good_message
-
-      Promise.all save_messages
+      storage_service.save object_store, bad_message_key, bad_message
+      .catch ->
+        return storage_service.save object_store, undefined, good_message
       .then ->
         return conversation_repository.get_preceding_messages conversation_et
       .then (loaded_events) ->

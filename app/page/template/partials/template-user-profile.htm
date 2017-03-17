@@ -7,7 +7,7 @@
         <div class="name popover-title ellipsis" data-bind="text: user().name(), attr: {'data-uie-uid': user().id, 'data-uie-value': user().name()}" data-uie-name="status-user"></div>
         <div class="username popover-meta label-username" data-bind="text: user().username(), attr: {'data-uie-value': user().name()}" data-uie-name="status-username"></div>
         <!-- ko if: !user().connected() && user().id && !user().is_me -->
-          <common-contacts class="popover-meta" data-uie-name="status-user-contacts" params="user: user()"></common-contacts>
+          <common-contacts class="popover-meta" data-uie-name="status-user-contacts" params="user: user"></common-contacts>
         <!-- /ko -->
         <!-- ko if: conversation && conversation().is_group() -->
           <div class="user-profile-back-button button-icon icon-back" data-bind="click: on_close, l10n_tooltip: z.string.tooltip_people_back" data-uie-name="do-back"></div>
@@ -73,7 +73,7 @@
         <span class="user-profile-my-device-button user-profile-top-right-button button-label text-theme" data-bind="click: click_on_my_fingerprint_button, l10n_text: z.string.people_tabs_device_detail_show_my_device"></span>
         <div class="user-profile-device-detail-message">
           <div data-bind="html: detail_message"></div>
-          <a data-bind="l10n_text: z.string.people_tabs_device_detail_how_to, l10n_href: z.string.url_privacy_why" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
+          <a data-bind="l10n_text: z.string.people_tabs_device_detail_how_to, l10n_href: z.string.url_privacy_how" rel="nofollow noopener noreferrer" target="_blank" class="text-theme"></a>
         </div>
         <device-card class="user-profile-device-detail-card" params="device: selected_device()"></device-card>
         <div class="user-profile-device-detail-fingerprint" data-bind="html: z.util.print_devices_id(fingerprint_remote())"></div>

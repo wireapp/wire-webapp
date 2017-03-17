@@ -27,6 +27,7 @@ class z.telemetry.calling.CallTelemetry
 
     @sessions = {}
     @protocol_version = if protocol_version is z.calling.enum.PROTOCOL.VERSION_2 then 'C2' else 'C3'
+    @remote_version = undefined
 
 
   ###############################################################################
@@ -77,6 +78,15 @@ class z.telemetry.calling.CallTelemetry
   ###############################################################################
 
   ###
+  Stores the remove version of call.
+  @param remote_version [String] Remove version string
+  ###
+  set_remote_version: (remote_version) =>
+    unless @remote_version is remote_version
+      @remote_version = remote_version
+      @logger.info "Identified remote call version as '#{remote_version}'"
+
+  ###
   Reports call events for call tracking to Localytics.
   @param event_name [z.tracking.EventName] String for call event
   @param call_et [z.calling.Call] Call entity
@@ -89,11 +99,12 @@ class z.telemetry.calling.CallTelemetry
         conversation_participants: call_et.conversation_et.number_of_participants()
         conversation_participants_in_call: call_et.max_number_of_participants
         conversation_type: if call_et.is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
+        remote_version: @remote_version if event_name in [z.tracking.EventName.CALLING.ESTABLISHED_CALL, z.tracking.EventName.CALLING.JOINED_CALL]
         version: @protocol_version
         with_bot: call_et.conversation_et.is_with_bot()
       , attributes
 
-      if call_et.is_remote_screen_send() or call_et.is_remote_video_send() or video_send
+      if call_et.local_media_type() is z.media.MediaType.VIDEO or video_send
         event_name = event_name.replace '_call', '_video_call'
 
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name, attributes
@@ -128,7 +139,8 @@ class z.telemetry.calling.CallTelemetry
         conversation_type: if call_et.is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
         duration: duration_bucket
         duration_sec: duration
-        reason: call_et.finished_reason
+        reason: call_et.termination_reason
+        remote_version: @remote_version
         version: @protocol_version
         with_bot: call_et.conversation_et.is_with_bot()
 

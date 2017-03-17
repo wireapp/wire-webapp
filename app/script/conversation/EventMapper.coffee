@@ -89,15 +89,14 @@ class z.conversation.EventMapper
       else
         message_et = @_map_event_ignored()
 
-    message_et.id = event.id
+    message_et.category = event.category
+    message_et.conversation_id = conversation_et.id
     message_et.from = event.from
-    message_et.timestamp = new Date(event.time).getTime()
-    message_et.primary_key = z.storage.StorageService.construct_primary_key event
+    message_et.id = event.id
+    message_et.primary_key = event.primary_key
+    message_et.timestamp new Date(event.time).getTime()
     message_et.type = event.type
     message_et.version = event.version or 1
-    message_et.category = event.category
-
-    message_et.conversation_id = conversation_et.id
 
     if message_et.is_reactable()
       message_et.reactions event.reactions or {}
@@ -108,7 +107,7 @@ class z.conversation.EventMapper
       message_et.ephemeral_expires event.ephemeral_expires or event.expire_after_millis
       message_et.ephemeral_started event.ephemeral_started or '0'
 
-    if window.isNaN message_et.timestamp
+    if window.isNaN message_et.timestamp()
       @logger.warn "Could not get timestamp for message '#{message_et.id}'. Skipping it.", event
       message_et = undefined
 
@@ -337,7 +336,7 @@ class z.conversation.EventMapper
     message_et = new z.entity.CallMessage()
     message_et.call_message_type = z.message.CALL_MESSAGE_TYPE.DEACTIVATED
     message_et.finished_reason = event.data.reason
-    message_et.visible message_et.finished_reason is z.calling.enum.CALL_FINISHED_REASON.MISSED
+    message_et.visible message_et.finished_reason is z.calling.enum.TERMINATION_REASON.MISSED
     return message_et
 
   ###############################################################################

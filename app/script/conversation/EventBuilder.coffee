@@ -49,8 +49,38 @@ z.conversation.EventBuilder = do ->
     error: "#{decrypt_error.message} (#{event.data.sender})"
     error_code: "#{error_code} (#{event.data.sender})"
 
+  build_voice_channel_activate = (e_call_message_et) ->
+    conversation: e_call_message_et.conversation_id
+    id: z.util.create_random_uuid()
+    type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
+    from: e_call_message_et.user_id
+    time: e_call_message_et.time
+    protocol_version: z.calling.enum.PROTOCOL.VERSION_3
+
+  build_voice_channel_deactivate = (e_call_message_et, creating_user_et) ->
+    conversation: e_call_message_et.conversation_id
+    id: z.util.create_random_uuid()
+    type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
+    from: creating_user_et?.id or e_call_message_et.user_id
+    time: e_call_message_et.time
+    data:
+      reason: z.calling.enum.TERMINATION_REASON.MISSED
+    protocol_version: z.calling.enum.PROTOCOL.VERSION_3
+
+  build_delete = (conversation_id, message_id, time, message_to_delete_et) ->
+    conversation: conversation_id
+    id: message_id
+    type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+    from: message_to_delete_et.from
+    time: new Date(message_to_delete_et.timestamp()).toISOString()
+    data:
+      deleted_time: time
+
   return {
     build_all_verified: build_all_verified
-    build_unable_to_decrypt: build_unable_to_decrypt
     build_degraded: build_degraded
+    build_delete: build_delete
+    build_unable_to_decrypt: build_unable_to_decrypt
+    build_voice_channel_activate: build_voice_channel_activate
+    build_voice_channel_deactivate: build_voice_channel_deactivate
   }

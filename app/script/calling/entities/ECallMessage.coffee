@@ -30,13 +30,13 @@ class z.calling.entities.ECallMessage
   @param type [z.calling.enum.ECallMessageType] Type of e-call message
   @param response [Boolean] Is message a response, defaults to false
   @param session_id [String] Optional session ID
-  @param content [Object] Optional object containing additional message payload
+  @param additional_properties [Object] Optional object containing additional message payload
   ###
-  constructor: (@type, @response = false, session_id, content) ->
+  constructor: (@type, @response = false, session_id, additional_properties) ->
     @session_id = session_id or @_create_session_id()
 
-    if content
-      @[key] = value for key, value of content
+    if additional_properties
+      @[key] = value for key, value of additional_properties
 
   ###
   Create a session ID.
@@ -53,9 +53,9 @@ class z.calling.entities.ECallMessage
       sessid: @session_id
       type: @type
 
-    if @type in [z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP]
+    if @type in [z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE]
       json_payload.props = @props
-      json_payload.sdp = @sdp if z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+      json_payload.sdp = @sdp if @type isnt z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
 
     return json_payload
 
