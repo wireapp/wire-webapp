@@ -31,7 +31,7 @@
       this.audio_preference = ko.observable(z.audio.AudioPreference.ALL);
       this.audio_preference.subscribe((audio_preference) => {
         if (audio_preference === z.audio.AudioPreference.NONE) {
-          return this._stop_all();
+          this._stop_all();
         }
       });
       this._subscribe_to_audio_properties();
