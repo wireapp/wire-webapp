@@ -168,9 +168,9 @@
      * @private
      */
     _subscribe_to_audio_events() {
-      amplify.subscribe(z.event.WebApp.AUDIO.PLAY, this.play);
-      amplify.subscribe(z.event.WebApp.AUDIO.PLAY_IN_LOOP, this.loop);
-      amplify.subscribe(z.event.WebApp.AUDIO.STOP, this.stop);
+      amplify.subscribe(z.event.WebApp.AUDIO.PLAY, this, this.play);
+      amplify.subscribe(z.event.WebApp.AUDIO.PLAY_IN_LOOP, this, this.loop);
+      amplify.subscribe(z.event.WebApp.AUDIO.STOP, this, this.stop);
     }
 
     /**
@@ -178,11 +178,11 @@
      * @private
      */
     _subscribe_to_audio_properties() {
-      amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, (properties) => {
+      amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this, (properties) => {
         this.audio_preference(properties.settings.sound.alerts);
       });
 
-      amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, (audio_preference) => {
+      amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, this, (audio_preference) => {
         this.audio_preference(audio_preference);
       });
     }
