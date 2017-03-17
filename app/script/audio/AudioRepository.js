@@ -19,234 +19,232 @@
 
 'use strict';
 
-(function() {
-  window.z = window.z || {};
-  window.z.audio = z.audio || {};
-
-  window.z.audio.AudioRepository = class AudioRepository {
-
-    constructor() {
-      this.logger = new z.util.Logger('z.audio.AudioRepository', z.config.LOGGER.OPTIONS);
-      this.audio_elements = {};
-      this.currently_looping = {};
-      this.audio_preference = ko.observable(z.audio.AudioPreference.ALL);
-      this.audio_preference.subscribe((audio_preference) => {
-        if (audio_preference === z.audio.AudioPreference.NONE) {
-          return this._stop_all();
-        }
-      });
-      this._subscribe_to_audio_properties();
-    }
-
-    /**
-     * Check if sound should be played with current setting.
-     * @private
-     * @param {z.audio.AudioType} audio_id - Sound identifier
-     * @returns {Promise} Resolves if the sound should be played.
-     */
-    _check_sound_setting(audio_id) {
-      return new Promise((resolve, reject) => {
-        if (this.audio_preference === z.audio.AudioPreference.NONE && audio_id !== z.audio.AudioPlayingType.NONE) {
-          reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.IGNORED_SOUND));
-        }
-        else if (this.audio_preference === z.audio.AudioPreference.SOME && audio_id !== z.audio.AudioPlayingType.SOME) {
-          reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.IGNORED_SOUND));
-        }
-        else {
-          resolve();
-        }
-      });
-    }
-
-    /**
-     * Create HTMLAudioElement.
-     * @private
-     * @param {string} source_path - Source for HTMLAudioElement
-     * @returns {Audio} Returns the audio element.
-     */
-    _create_audio_element(source_path) {
-      const audio_element = new Audio();
-      audio_element.preload = 'none';
-      audio_element.src = source_path;
-      return audio_element;
-    }
-
-    /**
-     * Get the sound object
-     * @private
-     * @param {z.audio.AudioType} audio_id - Sound identifier
-     * @returns {Promise} Resolves with the HTMLAudioElement.
-     */
-    _get_sound_by_id(audio_id) {
-      return new Promise((resolve, reject) => {
-        if (this.audio_elements[audio_id]) {
-          resolve(this.audio_elements[audio_id]);
-        } else {
-          reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.NOT_FOUND));
-        }
-      });
-    }
-
-    /**
-     * Initialize all sounds.
-     * @private
-     */
-    _init_sounds() {
-      for (let type in z.audio.AudioType) {
-        const audio_id = z.audio.AudioType[type];
-        this.audio_elements[audio_id] = this._create_audio_element(`${this.AUDIO_PATH}/${audio_id}.mp3`);
+class AudioRepository {
+  constructor() {
+    this.logger = new z.util.Logger('z.audio.AudioRepository', z.config.LOGGER.OPTIONS);
+    this.audio_elements = {};
+    this.currently_looping = {};
+    this.audio_preference = ko.observable(z.audio.AudioPreference.ALL);
+    this.audio_preference.subscribe((audio_preference) => {
+      if (audio_preference === z.audio.AudioPreference.NONE) {
+        return this._stop_all();
       }
-      this.logger.info('Initialized sounds');
+    });
+    this._subscribe_to_audio_properties();
+  }
+
+  /**
+   * Check if sound should be played with current setting.
+   * @private
+   * @param {z.audio.AudioType} audio_id - Sound identifier
+   * @returns {Promise} Resolves if the sound should be played.
+   */
+  _check_sound_setting(audio_id) {
+    return new Promise((resolve, reject) => {
+      if (this.audio_preference === z.audio.AudioPreference.NONE && audio_id !== z.audio.AudioPlayingType.NONE) {
+        reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.IGNORED_SOUND));
+      }
+      else if (this.audio_preference === z.audio.AudioPreference.SOME && audio_id !== z.audio.AudioPlayingType.SOME) {
+        reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.IGNORED_SOUND));
+      }
+      else {
+        resolve();
+      }
+    });
+  }
+
+  /**
+   * Create HTMLAudioElement.
+   * @private
+   * @param {string} source_path - Source for HTMLAudioElement
+   * @returns {Audio} Returns the audio element.
+   */
+  _create_audio_element(source_path) {
+    const audio_element = new Audio();
+    audio_element.preload = 'none';
+    audio_element.src = source_path;
+    return audio_element;
+  }
+
+  /**
+   * Get the sound object
+   * @private
+   * @param {z.audio.AudioType} audio_id - Sound identifier
+   * @returns {Promise} Resolves with the HTMLAudioElement.
+   */
+  _get_sound_by_id(audio_id) {
+    return new Promise((resolve, reject) => {
+      if (this.audio_elements[audio_id]) {
+        resolve(this.audio_elements[audio_id]);
+      } else {
+        reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.NOT_FOUND));
+      }
+    });
+  }
+
+  /**
+   * Initialize all sounds.
+   * @private
+   */
+  _init_sounds() {
+    for (let type in z.audio.AudioType) {
+      const audio_id = z.audio.AudioType[type];
+      this.audio_elements[audio_id] = this._create_audio_element(`/audio/${audio_id}.mp3`);
+    }
+    this.logger.info('Initialized sounds');
+  }
+
+  /**
+   * Start playback of a sound.
+   * @private
+   * @param {z.audio.AudioType} audio_id - Sound identifier
+   * @param {HTMLAudioElement} audio_element - AudioElement to play
+   * @param {Boolean} play_in_loop - Play sound in loop
+   * @return [Promise] Resolves with the HTMLAudioElement
+   */
+  _play(audio_id, audio_element, play_in_loop = false) {
+    if (!audio_id || !audio_element) {
+      return Promise.reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.NOT_FOUND));
     }
 
-    /**
-     * Start playback of a sound.
-     * @private
-     * @param {z.audio.AudioType} audio_id - Sound identifier
-     * @param {HTMLAudioElement} audio_element - AudioElement to play
-     * @param {Boolean} play_in_loop - Play sound in loop
-     * @return [Promise] Resolves with the HTMLAudioElement
-     */
-    _play(audio_id, audio_element, play_in_loop = false) {
-      if (!audio_id || !audio_element) {
-        return Promise.reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.NOT_FOUND));
-      }
+    return new Promise((resolve, reject) => {
+      if (audio_element.paused) {
+        audio_element.loop = play_in_loop;
 
-      return new Promise((resolve, reject) => {
-        if (audio_element.paused) {
-          audio_element.loop = play_in_loop;
+        if (audio_element.currentTime !== 0) {
+          audio_element.currentTime = 0;
+        }
 
-          if (audio_element.currentTime !== 0) {
-            audio_element.currentTime = 0;
+        const _play_success = () => {
+          if (play_in_loop) {
+            this.currently_looping[audio_id] = audio_id;
           }
+        };
 
-          const _play_success = () => {
-            if (play_in_loop) {
-              this.currently_looping[audio_id] = audio_id;
-            }
-          };
+        const play_promise = audio_element.play();
 
-          const play_promise = audio_element.play();
-
-          if (play_promise) {
-            play_promise.then(_play_success).catch(() => {
-              reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.FAILED_TO_PLAY));
-            });
-          } else {
-            _play_success();
-          }
+        if (play_promise) {
+          play_promise.then(_play_success).catch(() => {
+            reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.FAILED_TO_PLAY));
+          });
         } else {
-          reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.ALREADY_PLAYING));
+          _play_success();
         }
-      });
-    }
-
-    /**
-     * Preload all sounds for immediate playback.
-     * @private
-     */
-    _preload() {
-      for (let audio_id in this.audio_elements) {
-        const audio_element = this.audio_elements[audio_id];
-        audio_element.preload = 'auto';
-        audio_element.load();
+      } else {
+        reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.ALREADY_PLAYING));
       }
-      this.logger.info('Pre-loading audio files for immediate playback');
+    });
+  }
+
+  /**
+   * Preload all sounds for immediate playback.
+   * @private
+   */
+  _preload() {
+    for (let audio_id in this.audio_elements) {
+      const audio_element = this.audio_elements[audio_id];
+      audio_element.preload = 'auto';
+      audio_element.load();
     }
+    this.logger.info('Pre-loading audio files for immediate playback');
+  }
 
-    /**
-     * Stop all sounds playing in loop.
-     * @private
-     */
-    _stop_all() {
-      for (let audio_id in this.currently_looping) {
-        this.stop(audio_id);
-      }
+  /**
+   * Stop all sounds playing in loop.
+   * @private
+   */
+  _stop_all() {
+    for (let audio_id in this.currently_looping) {
+      this.stop(audio_id);
     }
+  }
 
-    /**
-     * Use Amplify to subscribe to all audio playback related events.
-     * @private
-     */
-    _subscribe_to_audio_events() {
-      amplify.subscribe(z.event.WebApp.AUDIO.PLAY, this.play);
-      amplify.subscribe(z.event.WebApp.AUDIO.PLAY_IN_LOOP, this.loop);
-      amplify.subscribe(z.event.WebApp.AUDIO.STOP, this.stop);
+  /**
+   * Use Amplify to subscribe to all audio playback related events.
+   * @private
+   */
+  _subscribe_to_audio_events() {
+    amplify.subscribe(z.event.WebApp.AUDIO.PLAY, this.play);
+    amplify.subscribe(z.event.WebApp.AUDIO.PLAY_IN_LOOP, this.loop);
+    amplify.subscribe(z.event.WebApp.AUDIO.STOP, this.stop);
+  }
+
+  /**
+   * Use Amplify to subscribe to all audio properties related events.
+   * @private
+   */
+  _subscribe_to_audio_properties() {
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, (properties) => {
+      this.audio_preference(properties.settings.sound.alerts);
+    });
+
+    amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, (audio_preference) => {
+      this.audio_preference(audio_preference);
+    });
+  }
+
+  /**
+   * Initialize the repository.
+   * @param {boolean} pre_load - Should sounds be pre-loaded with false as default
+   */
+  init(pre_load = false) {
+    this._init_sounds();
+    this._subscribe_to_audio_events();
+    if (pre_load) {
+      this._preload();
     }
+  }
 
-    /**
-     * Use Amplify to subscribe to all audio properties related events.
-     * @private
-     */
-    _subscribe_to_audio_properties() {
-      amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, (properties) => {
-        this.audio_preference(properties.settings.sound.alerts);
-      });
+  /**
+   * Start playback of a sound in a loop.
+   * @note Prevent playing multiples instances of looping sounds
+   * @param {z.audio.AudioType} audio_id - Sound identifier
+   */
+  loop(audio_id) {
+    this.play(audio_id, true);
+  }
 
-      amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, (audio_preference) => {
-        this.audio_preference(audio_preference);
-      });
-    }
-
-    /**
-     * Initialize the repository.
-     * @param {boolean} pre_load - Should sounds be pre-loaded with false as default
-     */
-    init(pre_load = false) {
-      this._init_sounds();
-      this._subscribe_to_audio_events();
-      if (pre_load) {
-        this._preload();
-      }
-    }
-
-    /**
-     * Start playback of a sound in a loop.
-     * @note Prevent playing multiples instances of looping sounds
-     * @param {z.audio.AudioType} audio_id - Sound identifier
-     */
-    loop(audio_id) {
-      this.play(audio_id, true);
-    }
-
-    /**
-     * Start playback of a sound.
-     * @param {z.audio.AudioType} audio_id - Sound identifier
-     * @param {boolean} play_in_loop - Play sound in loop
-     */
-    play(audio_id, play_in_loop = false) {
-      return this._check_sound_setting(audio_id).then(() => {
-        return this._get_sound_by_id(audio_id);
-      }).then((audio_element) => {
-        return this._play(audio_id, audio_element, play_in_loop);
-      }).then((audio_element) => {
-        return this.logger.info(`Playing sound '${audio_id}' (loop: '${play_in_loop}')`, audio_element);
-      }).catch((error) => {
-        if (!(error instanceof z.audio.AudioError)) {
-          this.logger.error(`Failed playing sound '${audio_id}': ${error.message}`);
-          throw error;
-        }
-      });
-    }
-
-    /**
-     * Stop playback of a sound.
-     * @param {z.audio.AudioType} audio_id - Sound identifier
-     */
-    stop(audio_id) {
-      return this._get_sound_by_id(audio_id).then((audio_element) => {
-        if (!audio_element.paused) {
-          this.logger.info(`Stopping sound '${audio_id}'`, audio_element);
-          audio_element.pause();
-        }
-
-        if (this.currently_looping[audio_id]) {
-          delete this.currently_looping[audio_id];
-        }
-      }).catch((error) => {
-        this.logger.error(`Failed stopping sound '${audio_id}': ${error.message}`);
+  /**
+   * Start playback of a sound.
+   * @param {z.audio.AudioType} audio_id - Sound identifier
+   * @param {boolean} play_in_loop - Play sound in loop
+   */
+  play(audio_id, play_in_loop = false) {
+    return this._check_sound_setting(audio_id).then(() => {
+      return this._get_sound_by_id(audio_id);
+    }).then((audio_element) => {
+      return this._play(audio_id, audio_element, play_in_loop);
+    }).then((audio_element) => {
+      return this.logger.info(`Playing sound '${audio_id}' (loop: '${play_in_loop}')`, audio_element);
+    }).catch((error) => {
+      if (!(error instanceof z.audio.AudioError)) {
+        this.logger.error(`Failed playing sound '${audio_id}': ${error.message}`);
         throw error;
-      });
-    }
-  };
-})();
+      }
+    });
+  }
+
+  /**
+   * Stop playback of a sound.
+   * @param {z.audio.AudioType} audio_id - Sound identifier
+   */
+  stop(audio_id) {
+    return this._get_sound_by_id(audio_id).then((audio_element) => {
+      if (!audio_element.paused) {
+        this.logger.info(`Stopping sound '${audio_id}'`, audio_element);
+        audio_element.pause();
+      }
+
+      if (this.currently_looping[audio_id]) {
+        delete this.currently_looping[audio_id];
+      }
+    }).catch((error) => {
+      this.logger.error(`Failed stopping sound '${audio_id}': ${error.message}`);
+      throw error;
+    });
+  }
+}
+
+window.z = window.z || {};
+window.z.audio = z.audio || {};
+window.z.audio.AudioRepository = AudioRepository;
