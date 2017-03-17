@@ -50,5 +50,16 @@
         this._preload();
       }
     }
+
+    /**
+     * Start playback of a sound in a loop.
+     * @note Prevent playing multiples instances of looping sounds
+     * @param {z.audio.AudioType} audio_id - Sound identifier
+     */
+    loop(audio_id) {
+      this.play(audio_id, true);
+    }
+
+
   };
 })();
