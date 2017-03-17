@@ -229,5 +229,25 @@
         }
       });
     }
+
+    /**
+     * Stop playback of a sound.
+     * @param {z.audio.AudioType} audio_id - Sound identifier
+     */
+    stop(audio_id) {
+      return this._get_sound_by_id(audio_id).then((audio_element) => {
+        if (!audio_element.paused) {
+          this.logger.info(`Stopping sound '${audio_id}'`, audio_element);
+          audio_element.pause();
+        }
+
+        if (this.currently_looping[audio_id]) {
+          delete this.currently_looping[audio_id];
+        }
+      }).catch((error) => {
+        this.logger.error(`Failed stopping sound '${audio_id}': ${error.message}`, audio_element);
+        throw error;
+      });
+    }
   };
 })();
