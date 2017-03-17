@@ -202,5 +202,39 @@
         }
       });
     }
+
+    /**
+     * Preload all sounds for immediate playback.
+     * @private
+     */
+    _preload() {
+      for (let audio_id in this.audio_elements) {
+        const audio_element = this.audio_elements[audio_id];
+        audio_element.preload = 'auto';
+        audio_element.load();
+      }
+
+      this.logger.info('Pre-loading audio files for immediate playback');
+    }
+
+    /**
+     * Stop all sounds playing in loop.
+     * @private
+     */
+    _stop_all() {
+      for (let audio_id in this.currently_looping) {
+        this.stop(audio_id);
+      }
+    }
+
+    /**
+     * Use Amplify to subscribe to all audio playback related events.
+     * @private
+     */
+    _subscribe_to_audio_events() {
+      amplify.subscribe(z.event.WebApp.AUDIO.PLAY, this.play);
+      amplify.subscribe(z.event.WebApp.AUDIO.PLAY_IN_LOOP, this.loop);
+      amplify.subscribe(z.event.WebApp.AUDIO.STOP, this.stop);
+    }
   };
 })();
