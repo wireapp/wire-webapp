@@ -29,7 +29,7 @@ z.assets.AssetMetaDataBuilder = {
   Constructs corresponding asset metadata depending on the given file type
 
   @param {File|Blob} file - the file to generate metadata for
-  @return {ImageMetaData|VideoMetaData|AudioMetaData}
+  @returns {ImageMetaData|VideoMetaData|AudioMetaData}
   */
   build_metadata(file) {
     if (!(file instanceof Blob)) {

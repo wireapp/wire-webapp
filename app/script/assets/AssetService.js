@@ -212,7 +212,7 @@ z.assets.AssetService = class AssetService {
   @param {string} asset_id
   @param {string} conversation_id
   @param {Boolean} force_caching
-  @return {String}
+  @returns {String}
   */
   generate_asset_url(asset_id, conversation_id, force_caching) {
     const url = this.client.create_url(`/assets/${asset_id}`);
@@ -228,7 +228,7 @@ z.assets.AssetService = class AssetService {
   @param {string} asset_id
   @param {string} conversation_id
   @param {Boolean} force_caching
-  @return {String}
+  @returns {String}
   */
   generate_asset_url_v2(asset_id, conversation_id, force_caching) {
     const url = this.client.create_url(`/conversations/${conversation_id}/otr/assets/${asset_id}`);
@@ -243,7 +243,7 @@ z.assets.AssetService = class AssetService {
   @param {string} asset_key
   @param {string} asset_token
   @param {Boolean} force_caching
-  @return {String}
+  @returns {String}
   */
   generate_asset_url_v3(asset_key, asset_token, force_caching) {
     const url = this.client.create_url(`/assets/v3/${asset_key}/`);

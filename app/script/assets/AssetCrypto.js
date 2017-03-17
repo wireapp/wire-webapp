@@ -26,9 +26,9 @@ window.z.assets = z.assets || {};
 z.assets.AssetCrypto = {
 
   /*
-  @return {ArrayBuffer} key_bytes - AES key used for encryption
-  @return {ArrayBuffer} computed_sha256 - SHA-256 checksum of the ciphertext
-  @return {ArrayBuffer} ciphertext - Encrypted plaintext
+  @param {ArrayBuffer} key_bytes - AES key used for encryption
+  @param {ArrayBuffer} computed_sha256 - SHA-256 checksum of the ciphertext
+  @param {ArrayBuffer} ciphertext - Encrypted plaintext
   */
   encrypt_aes_asset(plaintext) {
     const iv = new Uint8Array(16);
