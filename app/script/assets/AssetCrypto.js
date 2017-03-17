@@ -1,20 +1,22 @@
-//
-// Wire
-// Copyright (C) 2016 Wire Swiss GmbH
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see http://www.gnu.org/licenses/.
-//
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 
 'use strict';
 
@@ -24,11 +26,9 @@ window.z.assets = z.assets || {};
 z.assets.AssetCrypto = {
 
   /*
-  @param plaintext [ArrayBuffer]
-
-  @return key_bytes [ArrayBuffer] AES key used for encryption
-  @return computed_sha256 [ArrayBuffer] SHA-256 checksum of the ciphertext
-  @return ciphertext [ArrayBuffer] Encrypted plaintext
+  @return {ArrayBuffer} key_bytes - AES key used for encryption
+  @return {ArrayBuffer} computed_sha256 - SHA-256 checksum of the ciphertext
+  @return {ArrayBuffer} ciphertext - Encrypted plaintext
   */
   encrypt_aes_asset(plaintext) {
     const iv = new Uint8Array(16);
@@ -57,11 +57,9 @@ z.assets.AssetCrypto = {
   },
 
   /*
-  @param key_bytes [ArrayBuffer] AES key used for encryption
-  @param computed_sha256 [ArrayBuffer] SHA-256 checksum of the ciphertext
-  @param ciphertext [ArrayBuffer] Encrypted plaintext
-
-  @param [ArrayBuffer]
+  @param {ArrayBuffer} key_bytes - AES key used for encryption
+  @param {ArrayBuffer} computed_sha256 - SHA-256 checksum of the ciphertext
+  @param {ArrayBuffer} ciphertext - Encrypted plaintext
   */
   decrypt_aes_asset(ciphertext, key_bytes, reference_sha256) {
     return window.crypto.subtle.digest('SHA-256', ciphertext)

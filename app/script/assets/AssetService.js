@@ -1,20 +1,21 @@
-//
-// Wire
-// Copyright (C) 2016 Wire Swiss GmbH
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see http://www.gnu.org/licenses/.
-//
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 'use strict';
 
@@ -23,10 +24,11 @@ window.z.assets = z.assets || {};
 
 // AssetService for all asset handling and the calls to the backend REST API.
 z.assets.AssetService = class AssetService {
+
   /*
   Construct a new Asset Service.
 
-  @param client [z.service.Client] Client for the API calls
+  @param {z.service.Client} client - Client for the API calls
   */
   constructor(client) {
     this.cancel_asset_upload = this.cancel_asset_upload.bind(this);
@@ -367,7 +369,7 @@ z.assets.AssetService = class AssetService {
   /*
   Cancel an asset upload.
 
-  @param upload_id [String] Identifies the upload request
+  @param {string} upload_id - Identifies the upload request
   */
   cancel_asset_upload(upload_id) {
     let xhr = this.pending_uploads[upload_id];
@@ -381,7 +383,7 @@ z.assets.AssetService = class AssetService {
   Create image proto message.
 
   @deprecated
-  @param image [File, Blob]
+  @param {File|Blob} image
   */
   create_image_proto(image) {
     return this._compress_image(image)
@@ -407,7 +409,7 @@ z.assets.AssetService = class AssetService {
   Create asset proto message.
 
   @deprecated
-  @param asset [File, Blob]
+  @param {File|Blob} assets
   */
   create_asset_proto(asset) {
     return z.util.load_file_buffer(asset)
@@ -415,12 +417,13 @@ z.assets.AssetService = class AssetService {
     .then(([key_bytes, sha256, ciphertext]) => {
       asset = new z.proto.Asset();
       asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256));
-      return [asset, ciphertext];});
+      return [asset, ciphertext];
+    });
   }
 
   /*
   Compress image.
-  @param image [File, Blob]
+  @param {File|Blob} image
   */
   _compress_image(image) {
     return this._compress_image_with_worker('worker/image-worker.js', image, () => image.type === 'image/gif');
@@ -428,7 +431,7 @@ z.assets.AssetService = class AssetService {
 
   /*
   Compress profile image.
-  @param image [File, Blob]
+  @param {File|Blob} image
   */
   _compress_profile_image(image) {
     return this._compress_image_with_worker('worker/profile-image-worker.js', image);
@@ -436,9 +439,9 @@ z.assets.AssetService = class AssetService {
 
   /*
   Compress image using given worker.
-  @param worker [String] path to worker file
-  @param image [File, Blob]
-  @param filter [Function] skips compression if function returns true
+  @param {string} worker - path to worker file
+  @param {File|Blob} image
+  @param {Function} filter -
   */
   _compress_image_with_worker(worker, image, filter) {
     return z.util.load_file_buffer(image)
@@ -450,8 +453,8 @@ z.assets.AssetService = class AssetService {
       return image_worker.post(buffer);
     }).then(compressed_bytes => {
       return Promise.all([
-        compressed_bytes,
         z.util.load_image(new Blob([new Uint8Array(compressed_bytes)], {'type': image.type})),
+        compressed_bytes,
       ]);
     });
   }

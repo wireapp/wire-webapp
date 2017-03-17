@@ -1,20 +1,21 @@
-//
-// Wire
-// Copyright (C) 2017 Wire Swiss GmbH
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see http://www.gnu.org/licenses/.
-//
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
 
 'use strict';
 
@@ -27,8 +28,8 @@ z.assets.AssetMetaDataBuilder = {
   /*
   Constructs corresponding asset metadata depending on the given file type
 
-  @param file [File] the file to generate metadata for
-  @return metadata [ImageMetaData, VideoMetaData, AudioMetaData]
+  @param {File|Blob} file - the file to generate metadata for
+  @return {ImageMetaData|VideoMetaData|AudioMetaData}
   */
   build_metadata(file) {
     if (!(file instanceof Blob)) {
@@ -47,26 +48,26 @@ z.assets.AssetMetaDataBuilder = {
   },
 
   is_audio(file) {
-    return file.type.startsWith('audio');
+    return file && file.type.startsWith('audio');
   },
 
   is_video(file) {
-    return file.type.startsWith('video');
+    return file && file.type.startsWith('video');
   },
 
   is_image(file) {
-    return file.type.startsWith('image');
+    return file && file.type.startsWith('image');
   },
 
   _build_video_metdadata(videofile) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       const url = window.URL.createObjectURL(videofile);
       const video = document.createElement('video');
-      video.onloadedmetadata = function() {
+      video.onloadedmetadata = () => {
         resolve(new z.proto.Asset.VideoMetaData(video.videoWidth, video.videoHeight, video.duration));
         return window.URL.revokeObjectURL(url);
       };
-      video.onerror = function(error) {
+      video.onerror = (error) => {
         reject(error);
         return window.URL.revokeObjectURL(url);
       };
@@ -75,14 +76,14 @@ z.assets.AssetMetaDataBuilder = {
   },
 
   _build_image_metdadata(imagefile) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) =>{
       const url = window.URL.createObjectURL(imagefile);
       const img = new Image();
-      img.onload = function() {
+      img.onload = () => {
         resolve(new z.proto.Asset.ImageMetaData(img.width, img.height));
         return window.URL.revokeObjectURL(url);
       };
-      img.onerror = function(error) {
+      img.onerror = (error) => {
         reject(error);
         return window.URL.revokeObjectURL(url);
       };
@@ -91,7 +92,7 @@ z.assets.AssetMetaDataBuilder = {
   },
 
   _build_audio_metdadata(audiofile) {
-    return z.util.load_file_buffer(audiofile).then(function(buffer) {
+    return z.util.load_file_buffer(audiofile).then((buffer) => {
       const audioContext = new AudioContext();
       audioContext.close();
       return audioContext.decodeAudioData(buffer);
@@ -107,11 +108,9 @@ z.assets.AssetMetaDataBuilder = {
     const bucket_size = parseInt(channel.length / MAX_SAMPLES);
     const buckets = z.util.ArrayUtil.chunk(channel, bucket_size);
 
-    const preview = buckets.map((bucket) => {
+    return buckets.map((bucket) => {
       return z.util.NumberUtil.cap_to_byte(AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket));
     });
-
-    return new Uint8Array(preview);
   },
 
 };

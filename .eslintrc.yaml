@@ -7,13 +7,13 @@ extends:
   "eslint:recommended"
 
 globals:
+  _: true
   $: true
   amplify: true
-  z: true
   ko: true
-  wire: true
   LRUCache: true
-  _: true
+  wire: true
+  z: true
 
 rules:
   comma-dangle: [2, always-multiline]
