@@ -100,11 +100,14 @@ class z.calling.entities.EFlow
             @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false
 
         when z.calling.rtc.ICEConnectionState.FAILED
+          return unless @e_call_et.self_client_joined()
+
           @e_participant_et.is_connected false
-          @e_call_et.delete_e_participant @e_participant_et.id if @e_call_et.self_client_joined()
-          unless @e_call_et.participants().length
-            termination_reason = if @e_call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
-            amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, termination_reason
+          @e_call_et.delete_e_participant @e_participant_et.id
+          .then =>
+            unless @e_call_et.participants().length
+              termination_reason = if @e_call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
+              amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, termination_reason
 
     @signaling_state.subscribe (signaling_state) =>
       switch signaling_state
@@ -420,12 +423,19 @@ class z.calling.entities.EFlow
       @remote_sdp remote_sdp
       @logger.info "Saved remote '#{@remote_sdp().type}' SDP", @remote_sdp()
 
-  # Initiates sending the local RTCSessionDescriptionProtocol to the remote user.
-  send_local_sdp: =>
+  ###
+  Initiates sending the local RTCSessionDescriptionProtocol to the remote user.
+  @param on_timeout [Boolean] Optional Boolean defaulting to false on whether sending on timout
+  ###
+  send_local_sdp: (sending_on_timeout = false) =>
     @_clear_send_sdp_timeout()
     z.calling.mapper.SDPMapper.rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL, @
     .then ([local_sdp, ice_candidates]) =>
       @local_sdp local_sdp
+
+      if sending_on_timeout and not @_contains_relay_candidate ice_candidates
+        @logger.warn "Local SDP does not contain any relay ICE candidates, resetting timeout\n#{ice_candidates}", ice_candidates
+        return @_set_send_sdp_timeout false
 
       @logger.info "Sending local '#{@local_sdp().type}' SDP containing '#{ice_candidates.length}' ICE candidates for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
       @should_send_local_sdp false
@@ -555,12 +565,8 @@ class z.calling.entities.EFlow
   ###
   _set_send_sdp_timeout: (initial_timeout = true) ->
     @send_sdp_timeout = window.setTimeout =>
-      if not @_contains_relay_candidate ice_candidates
-        @logger.warn "Local SDP does not contain any relay ICE candidates, resetting timeout\n#{ice_candidates}", ice_candidates
-        return @_set_send_sdp_timeout false
-
       @logger.debug 'Sending local SDP on timeout'
-      @send_local_sdp()
+      @send_local_sdp true
     , if initial_timeout then E_FLOW_CONFIG.SDP_SEND_TIMEOUT else E_FLOW_CONFIG.SDP_SEND_TIMEOUT_RESET
 
 
@@ -653,13 +659,24 @@ class z.calling.entities.EFlow
     .then =>
       return @_remove_media_streams media_stream_info.type
     .then =>
-      @_add_media_stream media_stream_info.stream
-      @logger.info 'Replaced the MediaStream successfully', media_stream_info.stream
+      @_upgrade_media_stream media_stream_info.stream, media_stream_info.type
+    .then (media_stream) =>
+      @_add_media_stream media_stream
+      @logger.info "Replaced the MediaStream to update '#{media_stream_info.type}' successfully", media_stream
       @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false
       return media_stream_info
     .catch (error) =>
       @logger.error "Failed to replace local MediaStream: #{error.message}", error
       throw error
+
+  _upgrade_media_stream: (new_media_stream, media_type) ->
+    active_media_stream = if media_type is z.media.MediaType.AUDIO then @audio_stream() else @video_stream()
+
+    if active_media_stream
+      active_media_stream.removeTrack media_stream_track for media_stream_track in z.media.MediaStreamHandler.get_media_tracks active_media_stream, media_type
+      active_media_stream.addTrack media_stream_track for media_stream_track in z.media.MediaStreamHandler.get_media_tracks new_media_stream, media_type
+      return active_media_stream
+    return new_media_stream
 
   ###
   Replace the a MediaStreamTrack attached to the MediaStream of the PeerConnection.

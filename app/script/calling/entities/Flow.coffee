@@ -108,8 +108,10 @@ class z.calling.entities.Flow
           @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART
 
         when z.calling.rtc.ICEConnectionState.FAILED
+          return unless @call_et.self_client_joined()
+
           @participant_et.is_connected false
-          @call_et.delete_participant @participant_et if @call_et.self_client_joined()
+          @call_et.delete_participant @participant_et
           unless @call_et.participants().length
             termination_reason = if @e_call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
             amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @call_et.id, termination_reason
@@ -440,13 +442,20 @@ class z.calling.entities.Flow
     .then ([remote_sdp, ice_candidates]) =>
       @remote_sdp remote_sdp
 
-  # Initiates sending the local Session Description Protocol to the backend.
-  send_local_sdp: =>
+  ###
+  Initiates sending the local RTCSessionDescriptionProtocol to the remote user.
+  @param on_timeout [Boolean] Optional Boolean defaulting to false on whether sending on timout
+  ###
+  send_local_sdp: (sending_on_timeout = false) =>
     @_clear_send_sdp_timeout()
 
     z.calling.mapper.SDPMapper.rewrite_sdp @peer_connection.localDescription, z.calling.enum.SDPSource.LOCAL, @
     .then ([local_sdp, ice_candidates]) =>
       @local_sdp local_sdp
+
+      if sending_on_timeout and not @_contains_relay_candidate ice_candidates
+        @logger.warn "Local SDP does not contain any relay ICE candidates, resetting timeout\n#{ice_candidates}", ice_candidates
+        return @_set_send_sdp_timeout false
 
       sdp_info = new z.calling.payloads.SDPInfo {conversation_id: @conversation_id, flow_id: @id, sdp: @local_sdp()}
 
@@ -561,12 +570,8 @@ class z.calling.entities.Flow
   ###
   _set_send_sdp_timeout: (initial_timeout = true) ->
     @send_sdp_timeout = window.setTimeout =>
-      if not @_contains_relay_candidate ice_candidates
-        @logger.warn "Local SDP does not contain any relay ICE candidates, resetting timeout\n#{ice_candidates}", ice_candidates
-        return @_set_send_sdp_timeout false
-
       @logger.debug 'Sending local SDP on timeout'
-      @send_local_sdp
+      @send_local_sdp true
     , if initial_timeout then FLOW_CONFIG.SDP_SEND_TIMEOUT else FLOW_CONFIG.SDP_SEND_TIMEOUT_RESET
 
 
