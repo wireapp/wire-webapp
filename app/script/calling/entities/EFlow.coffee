@@ -646,7 +646,7 @@ class z.calling.entities.EFlow
       @_add_media_stream updated_media_stream
       @logger.info "Replaced the MediaStream to update '#{media_stream_info.type}' successfully", updated_media_stream
       @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false
-      return [updated_media_stream, media_stream_info.type]
+      return updated_media_stream
     .catch (error) =>
       @logger.error "Failed to replace local MediaStream: #{error.message}", error
       throw error
@@ -705,8 +705,13 @@ class z.calling.entities.EFlow
   ###
   _upgrade_media_stream: (new_media_stream, media_type) ->
     if @media_stream()
+      for media_stream_track in z.media.MediaStreamHandler.get_media_tracks @media_stream(), media_type
+        @media_stream().removeTrack media_stream_track
+        media_stream_track.stop()
+        @logger.info "Stopping MediaStreamTrack of kind '#{media_stream_track.kind}' successful", media_stream_track
+
       media_stream = @media_stream().clone()
-      media_stream.removeTrack media_stream_track for media_stream_track in z.media.MediaStreamHandler.get_media_tracks media_stream, media_type
+
       media_stream.addTrack media_stream_track for media_stream_track in z.media.MediaStreamHandler.get_media_tracks new_media_stream, media_type
       return z.media.MediaStreamHandler.detect_media_stream_type media_stream
     return new_media_stream
