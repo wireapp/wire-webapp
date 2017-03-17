@@ -341,7 +341,7 @@ class z.calling.v3.CallCenter
       e_call_et.state z.calling.enum.CallState.ENDED
       e_call_et.reset_call()
       @e_calls.remove (e_call_et) -> e_call_et.id is conversation_id
-      @media_stream_handler.reset_media_streams()
+      @media_stream_handler.reset_media_stream()
       return undefined
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
@@ -355,7 +355,7 @@ class z.calling.v3.CallCenter
     .then (e_call_et) =>
       @logger.debug "Ignoring e-call in conversation '#{conversation_id}'", e_call_et
       e_call_et.state z.calling.enum.CallState.IGNORED
-      @media_stream_handler.reset_media_streams()
+      @media_stream_handler.reset_media_stream()
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
@@ -378,7 +378,7 @@ class z.calling.v3.CallCenter
       e_call_et = e_call
       @logger.debug "Joining e-call in conversation '#{conversation_id}'", e_call_et
       e_call_et.start_timings()
-      if not @media_stream_handler.has_media_streams()
+      if not @media_stream_handler.local_media_stream()
         @media_stream_handler.initiate_media_stream conversation_id, video_send
     .then =>
       e_call_et.timings.time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED
@@ -404,7 +404,7 @@ class z.calling.v3.CallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
-      @media_stream_handler.release_media_streams()
+      @media_stream_handler.release_media_stream()
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
       e_call_et.termination_reason = termination_reason if termination_reason and not e_call_et.termination_reason
 
