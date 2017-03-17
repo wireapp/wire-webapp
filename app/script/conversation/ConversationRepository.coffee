@@ -152,16 +152,15 @@ class z.conversation.ConversationRepository
   get_conversations: =>
     @conversation_service.load_conversation_states_from_db()
     .then (local_conversations) =>
-      is_update_needed = local_conversations.length is 0 or local_conversations[0].status is undefined
-
-      if is_update_needed
-        return @conversation_service.get_all_conversations()
-        .then (remote_conversations) =>
-          @conversation_mapper.merge_conversations local_conversations, remote_conversations
-        .then (merged_conversations) =>
-          @conversation_service.save_conversations_in_db merged_conversations
-      else
-        return local_conversations
+      return @conversation_service.get_all_conversations()
+      .catch (error) =>
+        @logger.error "Failed to get all conversations from backend: #{error.message}"
+      .then (remote_conversations = []) =>
+        if remote_conversations.length > 0
+          return Promise.resolve @conversation_mapper.merge_conversations local_conversations, remote_conversations
+          .then (merged_conversations) => @conversation_service.save_conversations_in_db merged_conversations
+        else
+          return local_conversations
     .then (conversations) =>
       @save_conversations @conversation_mapper.map_conversations conversations
       amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
