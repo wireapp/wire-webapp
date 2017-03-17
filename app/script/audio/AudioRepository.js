@@ -104,7 +104,7 @@
      * Check if sound should be played with current setting.
      * @private
      * @param {z.audio.AudioType} audio_id - Sound identifier
-     * @returns {Promise} Resolves if the sound should be played
+     * @returns {Promise} Resolves if the sound should be played.
      */
     _check_sound_setting(audio_id) {
       return new Promise((resolve, reject) => {
@@ -118,6 +118,19 @@
           resolve();
         }
       });
+    }
+
+    /**
+     * Create HTMLAudioElement.
+     * @private
+     * @param {string} source_path - Source for HTMLAudioElement
+     * @returns {Audio} Returns the audio element-
+     */
+    _create_audio_element(source_path) {
+      const audio_element = new Audio();
+      audio_element.preload = 'none';
+      audio_element.src = source_path;
+      return audio_element;
     }
   };
 })();
