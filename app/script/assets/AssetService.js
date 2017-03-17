@@ -115,7 +115,7 @@ z.assets.AssetService = class AssetService {
       small_profile_asset.payload.tag = z.assets.ImageSizeType.SMALL_PROFILE;
 
       return this.post_asset_pair(small_profile_asset, medium_asset);
-    }).then(function([small_response, medium_response]) {
+    }).then(([small_response, medium_response]) => {
       return [small_response.data, medium_response.data];
     });
   }
@@ -138,7 +138,7 @@ z.assets.AssetService = class AssetService {
         this.post_asset_v3(small_image_bytes, {public: true}),
         this.post_asset_v3(medium_image_bytes, {public: true}),
       ]);
-    }).then(function([small_credentials, medium_credentials]) {
+    }).then(([small_credentials, medium_credentials]) => {
       return [small_credentials.key, medium_credentials.key];
     });
   }
@@ -216,7 +216,7 @@ z.assets.AssetService = class AssetService {
   @return [String] Asset URL
   */
   generate_asset_url(asset_id, conversation_id, force_caching) {
-    let url = this.client.create_url(`/assets/${asset_id}`);
+    const url = this.client.create_url(`/assets/${asset_id}`);
     let asset_url = `${url}?access_token=${this.client.access_token}&conv_id=${conversation_id}`;
     if (force_caching) { asset_url = `${asset_url}&forceCaching=true`; }
     return asset_url;
@@ -232,7 +232,7 @@ z.assets.AssetService = class AssetService {
   @return [String] Asset URL
   */
   generate_asset_url_v2(asset_id, conversation_id, force_caching) {
-    let url = this.client.create_url(`/conversations/${conversation_id}/otr/assets/${asset_id}`);
+    const url = this.client.create_url(`/conversations/${conversation_id}/otr/assets/${asset_id}`);
     let asset_url = `${url}?access_token=${this.client.access_token}`;
     if (force_caching) { asset_url = `${asset_url}&forceCaching=true`; }
     return asset_url;
@@ -247,7 +247,7 @@ z.assets.AssetService = class AssetService {
   @return [String] Asset URL
   */
   generate_asset_url_v3(asset_key, asset_token, force_caching) {
-    let url = this.client.create_url(`/assets/v3/${asset_key}/`);
+    const url = this.client.create_url(`/assets/v3/${asset_key}/`);
     let asset_url = `${url}?access_token=${this.client.access_token}`;
     if (asset_token) { asset_url = `${asset_url}&asset_token=${asset_token}`; }
     if (force_caching) { asset_url = `${asset_url}&forceCaching=true`; }
@@ -262,7 +262,7 @@ z.assets.AssetService = class AssetService {
   */
   _create_asset_multipart_body(asset_data, metadata) {
     metadata = JSON.stringify(metadata);
-    let asset_data_md5 = z.util.array_to_md5_base64(asset_data);
+    const asset_data_md5 = z.util.array_to_md5_base64(asset_data);
 
     let body = '';
     body += `--${this.BOUNDARY}\r\n`;
@@ -276,7 +276,7 @@ z.assets.AssetService = class AssetService {
     body += `Content-MD5: ${asset_data_md5}\r\n`;
     body += '\r\n';
 
-    let footer = `\r\n--${this.BOUNDARY}--\r\n`;
+    const footer = `\r\n--${this.BOUNDARY}--\r\n`;
 
     return new Blob([body, asset_data, footer]);
   }
@@ -292,10 +292,10 @@ z.assets.AssetService = class AssetService {
   @param upload_id [String] Identifies the upload request
   */
   post_asset_v2(conversation_id, json_payload, image_data, precondition_option, upload_id) {
-    return new Promise((function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       let url = this.client.create_url(`/conversations/${conversation_id}/otr/assets`);
 
-      if (_.isArray(precondition_option)) {
+      if (Array.isArray(precondition_option)) {
         url = `${url}?report_missing=${precondition_option.join(',')}`;
       } else if (precondition_option) {
         url = `${url}?ignore_missing=true`;
@@ -317,23 +317,23 @@ z.assets.AssetService = class AssetService {
         } else {
           reject(event);
         }
-        return delete pending_uploads[upload_id];
+        delete pending_uploads[upload_id];
       };
       xhr.onerror = function(error) {
         reject(error);
-        return delete pending_uploads[upload_id];
+        delete pending_uploads[upload_id];
       };
       xhr.upload.onprogress = function(event) {
         if (upload_id) {
           // we use amplify due to the fact that Promise API lacks progress support
-          let percentage_progress = Math.round((event.loaded / event.total) * 100);
+          const percentage_progress = Math.round((event.loaded / event.total) * 100);
           return amplify.publish(`upload${upload_id}`, percentage_progress);
         }
       };
       xhr.send(data);
 
       return pending_uploads[upload_id] = xhr;
-    }.bind(this)));
+    });
   }
 
   /*
@@ -346,24 +346,31 @@ z.assets.AssetService = class AssetService {
   @param xhr_accessor_function [Function] Function will get a reference to the underlying XMLHTTPRequest
   */
   post_asset_v3(asset_data, metadata, xhr_accessor_function) {
-    return new Promise((function(resolve, reject) {
-      metadata = $.extend({
+    return new Promise((resolve, reject) => {
+      metadata = Object.assign({
         public: false,
         retention: z.assets.AssetRetentionPolicy.PERSISTENT,
-      }
-      , metadata);
+      }, metadata);
 
       const xhr = new XMLHttpRequest();
       xhr.open('POST', this.client.create_url('/assets/v3'));
       xhr.setRequestHeader('Content-Type', `multipart/mixed; boundary=${this.BOUNDARY}`);
       xhr.setRequestHeader('Authorization', `${this.client.access_token_type} ${this.client.access_token}`);
-      xhr.onload = function(event) { if (this.status === 201) { return resolve(JSON.parse(this.response)); } else { return reject(event); } };
+      xhr.onload = function(event) {
+        if (this.status === 201) {
+          return resolve(JSON.parse(this.response));
+        } else {
+          return reject(event);
+        }
+      };
       xhr.onerror = reject;
+
       if (typeof xhr_accessor_function === 'function') {
         xhr_accessor_function(xhr);
       }
+
       xhr.send(this._create_asset_multipart_body(new Uint8Array(asset_data), metadata));
-    }.bind(this)));
+    });
   }
 
   /*
@@ -445,7 +452,7 @@ z.assets.AssetService = class AssetService {
   */
   _compress_image_with_worker(worker, image, filter) {
     return z.util.load_file_buffer(image)
-    .then(function(buffer) {
+    .then((buffer) => {
       if (typeof filter === 'function' ? filter() : undefined) {
         return buffer;
       }

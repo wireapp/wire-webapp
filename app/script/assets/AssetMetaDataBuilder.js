@@ -65,13 +65,13 @@ z.assets.AssetMetaDataBuilder = {
       const video = document.createElement('video');
       video.onloadedmetadata = () => {
         resolve(new z.proto.Asset.VideoMetaData(video.videoWidth, video.videoHeight, video.duration));
-        return window.URL.revokeObjectURL(url);
+        window.URL.revokeObjectURL(url);
       };
       video.onerror = (error) => {
         reject(error);
-        return window.URL.revokeObjectURL(url);
+        window.URL.revokeObjectURL(url);
       };
-      return video.src = url;
+      video.src = url;
     });
   },
 
@@ -81,13 +81,13 @@ z.assets.AssetMetaDataBuilder = {
       const img = new Image();
       img.onload = () => {
         resolve(new z.proto.Asset.ImageMetaData(img.width, img.height));
-        return window.URL.revokeObjectURL(url);
+        window.URL.revokeObjectURL(url);
       };
       img.onerror = (error) => {
         reject(error);
-        return window.URL.revokeObjectURL(url);
+        window.URL.revokeObjectURL(url);
       };
-      return img.src = url;
+      img.src = url;
     });
   },
 
