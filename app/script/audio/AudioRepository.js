@@ -39,6 +39,16 @@
       this._subscribe_to_audio_properties();
     }
 
-
+    /**
+     * Initialize the repository.
+     * @param {boolean} pre_load - Should sounds be pre-loaded with false as default
+     */
+    init(pre_load = false) {
+      this._init_sounds();
+      this._subscribe_to_audio_events();
+      if (pre_load) {
+        this._preload();
+      }
+    }
   };
 })();
