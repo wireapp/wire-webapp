@@ -448,10 +448,6 @@ class z.calling.entities.Flow
     .then ([local_sdp, ice_candidates]) =>
       @local_sdp local_sdp
 
-      if not @_contains_relay_candidate ice_candidates
-        @logger.warn 'Local SDP does not contain any relay ICE candidates, resetting timeout'
-        return @_set_send_sdp_timeout false
-
       sdp_info = new z.calling.payloads.SDPInfo {conversation_id: @conversation_id, flow_id: @id, sdp: @local_sdp()}
 
       on_success = =>
@@ -561,9 +557,14 @@ class z.calling.entities.Flow
   ###
   Set the SDP send timeout.
   @private
+  @param initial_timeout [Boolean] Optional Boolean defaulting to true in order to choose appropriate timeout length
   ###
   _set_send_sdp_timeout: (initial_timeout = true) ->
     @send_sdp_timeout = window.setTimeout =>
+      if not @_contains_relay_candidate ice_candidates
+        @logger.warn "Local SDP does not contain any relay ICE candidates, resetting timeout\n#{ice_candidates}", ice_candidates
+        return @_set_send_sdp_timeout false
+
       @logger.debug 'Sending local SDP on timeout'
       @send_local_sdp
     , if initial_timeout then FLOW_CONFIG.SDP_SEND_TIMEOUT else FLOW_CONFIG.SDP_SEND_TIMEOUT_RESET

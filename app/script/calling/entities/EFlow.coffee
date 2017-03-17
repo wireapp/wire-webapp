@@ -427,10 +427,6 @@ class z.calling.entities.EFlow
     .then ([local_sdp, ice_candidates]) =>
       @local_sdp local_sdp
 
-      if not @_contains_relay_candidate ice_candidates
-        @logger.warn 'Local SDP does not contain any relay ICE candidates, resetting timeout'
-        return @_set_send_sdp_timeout false
-
       @logger.info "Sending local '#{@local_sdp().type}' SDP containing '#{ice_candidates.length}' ICE candidates for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
       @should_send_local_sdp false
 
@@ -555,9 +551,14 @@ class z.calling.entities.EFlow
   ###
   Set the SDP send timeout.
   @private
+  @param initial_timeout [Boolean] Optional Boolean defaulting to true in order to choose appropriate timeout length
   ###
   _set_send_sdp_timeout: (initial_timeout = true) ->
     @send_sdp_timeout = window.setTimeout =>
+      if not @_contains_relay_candidate ice_candidates
+        @logger.warn "Local SDP does not contain any relay ICE candidates, resetting timeout\n#{ice_candidates}", ice_candidates
+        return @_set_send_sdp_timeout false
+
       @logger.debug 'Sending local SDP on timeout'
       @send_local_sdp()
     , if initial_timeout then E_FLOW_CONFIG.SDP_SEND_TIMEOUT else E_FLOW_CONFIG.SDP_SEND_TIMEOUT_RESET
