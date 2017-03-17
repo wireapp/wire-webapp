@@ -60,6 +60,46 @@
       this.play(audio_id, true);
     }
 
+    /**
+     * Start playback of a sound.
+     * @param {z.audio.AudioType} audio_id - Sound identifier
+     * @param {boolean} play_in_loop - Play sound in loop
+     */
+    play(audio_id, play_in_loop = false) {
+      this._check_sound_setting(audio_id).then(() => {
+        return this._get_sound_by_id(audio_id);
+      }).then((audio_element) => {
+        return this._play(audio_id, audio_element, play_in_loop);
+      }).then((audio_element) => {
+        return this.logger.info(`Playing sound '${audio_id}' (loop: '${play_in_loop}')`, audio_element);
+      }).catch((error) => {
+        if (!error instanceof z.audio.AudioError) {
+          this.logger.error(`Failed playing sound '${audio_id}': ${error.message}`);
+          throw error;
+        }
+      });
+    }
+
+    /**
+     * Stop playback of a sound.
+     * @param {z.audio.AudioType} audio_id - Sound identifier
+     */
+    stop(audio_id) {
+      this._get_sound_by_id(audio_id).then((audio_element) => {
+        if (!audio_element.paused) {
+          this.logger.info(`Stopping sound '${audio_id}'`, audio_element);
+          audio_element.pause();
+        }
+
+        if (this.currently_looping[audio_id]) {
+          delete @currently_looping[audio_id];
+        }
+      }).catch((error) => {
+        this.logger.error(`Failed stopping sound '${audio_id}': ${error.message}`, audio_element);
+        throw error;
+      });
+    }
+
 
   };
 })();
