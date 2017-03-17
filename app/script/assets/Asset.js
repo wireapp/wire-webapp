@@ -26,7 +26,9 @@ z.assets.Asset = class Asset {
 
   /*
   Construct a new asset for the asset service.
-  @param {Object} - Asset configuration
+
+  @deprecated
+  @param {Object} config - Asset configuration
   */
   constructor(config) {
     this.correlation_id = config.correlation_id || z.util.create_random_uuid();
