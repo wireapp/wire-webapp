@@ -206,36 +206,6 @@
 .message-asset-image {
   margin-top: 16px;
   margin-bottom: 24px;
-
-  .image {
-    display: inline-block;
-    position: relative;
-    max-width: 100%;
-  }
-
-  .image-loading {
-    .image-element          {cursor: default}
-    .image-placeholder-icon {display: flex}
-  }
-
-  .image-element {
-    cursor: pointer;
-    max-width: 100%;
-    max-height: 80vh;
-
-    &.image-ephemeral {
-      cursor: default;
-      opacity: 0;
-    }
-  }
-
-  .image-placeholder-icon {
-    .asset-container-style;
-    .full-screen;
-    align-items: center;
-    display: none;
-    justify-content: center;
-  }
 }
 
 // MESSAGE FOOTER
@@ -487,6 +457,11 @@
 
 .ephemeral-asset-expired {
   .bg-color-ephemeral;
-  .flex-center;
   color: #fff;
+  position: relative;
+
+  &:before {
+    .full-screen;
+    .flex-center;
+  }
 }

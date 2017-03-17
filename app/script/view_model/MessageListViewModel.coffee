@@ -58,9 +58,6 @@ class z.ViewModel.MessageListViewModel
     @participant_bubble = undefined
     @participant_bubble_last_id = undefined
 
-    @viewport_changed = ko.observable false
-    @viewport_changed.extend rateLimit: 100
-
     @recalculate_timeout = undefined
 
     # should we scroll to bottom when new message comes in
@@ -76,9 +73,6 @@ class z.ViewModel.MessageListViewModel
 
     @on_scroll = _.throttle (data, e) =>
       return if not @capture_scrolling_event
-
-      @viewport_changed not @viewport_changed()
-
       element = $ e.currentTarget
 
       # On some HDPI screen scrollTop returns a floating point number instead of an integer
@@ -104,8 +98,6 @@ class z.ViewModel.MessageListViewModel
     , 100
 
     $(window)
-    .on 'resize', =>
-      @viewport_changed not @viewport_changed()
     .on 'focus', =>
       if @mark_as_read_on_focus?
         window.setTimeout =>
@@ -191,9 +183,6 @@ class z.ViewModel.MessageListViewModel
       if not is_current_conversation
         @logger.info 'Skipped loading conversation', conversation_et.display_name()
         return
-
-      # reset scroll position
-      messages_container.scrollTop 0
 
       @capture_scrolling_event = true
 
@@ -474,10 +463,8 @@ class z.ViewModel.MessageListViewModel
   ###
   Shows detail image view.
   @param message_et [z.entity.Message] Message with asset to be displayed
-  @param event [UIEvent] Actual scroll event
   ###
-  show_detail: (message_et, event) ->
-    return if message_et.is_expired() or $(event.currentTarget).hasClass 'image-loading'
+  show_detail: (message_et) ->
     amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et
 
   get_timestamp_class: (message_et) ->

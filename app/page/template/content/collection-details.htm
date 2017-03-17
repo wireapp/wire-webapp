@@ -19,7 +19,7 @@
               <header class="collection-date-separator" data-bind="text: $parent.get_title_for_header(message_et)"></header>
             <!-- /ko -->
             <!-- ko if: message_et.category & z.message.MessageCategory.IMAGE -->
-              <image-component class="collection-image" params="asset: message_et.get_first_asset().resource, click: function() {$parent.click_on_image(message_et)}"></image-component>
+              <image-component class="collection-image" params="asset: message_et.get_first_asset(), click: function() {$parent.click_on_image(message_et)}"></image-component>
             <!-- /ko -->
             <!-- ko if: message_et.category & z.message.MessageCategory.LINK -->
               <link-preview-asset params="message: message_et, header: true"></link-preview-asset>

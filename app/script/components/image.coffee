@@ -25,8 +25,11 @@ class z.components.Image
     @asset_src = ko.observable()
     @asset_is_loading = ko.observable false
 
+    @image_src = ko.pureComputed =>
+      return @asset_src() or z.util.dummy_image @asset.width, @asset.height
+
     @on_click = =>
-      return if @asset_is_loading()
+      return if @asset_is_loading() or not @asset_src()
       params.click? @asset
 
     @on_entered_viewport = =>
@@ -35,7 +38,7 @@ class z.components.Image
 
     @load_image_asset = =>
       @asset_is_loading true
-      @asset.load().then (blob) =>
+      @asset.resource().load().then (blob) =>
         @asset_is_loading false
         @asset_src window.URL.createObjectURL blob
 
@@ -48,12 +51,8 @@ ko.components.register 'image-component',
     createViewModel: (params, component_info) ->
       return new z.components.Image params, component_info
   template: """
-              <!-- ko if: asset_src() -->
-                <img data-bind="attr:{src: asset_src}, click: on_click"/>
-              <!-- /ko -->
-              <!-- ko ifnot: asset_src() -->
-                <div data-bind="in_viewport: on_entered_viewport, css: {'three-dots': asset_is_loading()}">
-                  <span></span><span></span><span></span>
-                </div>
-              <!-- /ko -->
+              <img data-bind="attr:{src: image_src}, in_viewport: on_entered_viewport, click: on_click"/>
+              <div class="image-loading" data-bind="css: {'three-dots': asset_is_loading()}">
+                <span></span><span></span><span></span>
+              </div>
             """
