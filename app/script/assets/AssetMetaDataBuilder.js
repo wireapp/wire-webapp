@@ -108,9 +108,11 @@ z.assets.AssetMetaDataBuilder = {
     const bucket_size = parseInt(channel.length / MAX_SAMPLES);
     const buckets = z.util.ArrayUtil.chunk(channel, bucket_size);
 
-    return buckets.map((bucket) => {
+    const preview = buckets.map((bucket) => {
       return z.util.NumberUtil.cap_to_byte(AMPLIFIER * z.util.NumberUtil.root_mean_square(bucket));
     });
+
+    return new Uint8Array(preview);
   },
 
 };
