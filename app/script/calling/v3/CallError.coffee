@@ -31,8 +31,12 @@ class z.calling.v3.CallError
         'E-call has not yet established data channel'
       when z.calling.v3.CallError::TYPE.NO_CONVERSATION_ID
         'No conversation ID given'
+      when z.calling.v3.CallError::TYPE.NO_REPLACEABLE_TRACK
+        'No replaceable MediaStreamTrack found'
       when z.calling.v3.CallError::TYPE.NOT_FOUND
         'No e-call for conversation ID found'
+      when z.calling.v3.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
+        'PeerConnection does not support RtcRtpSender extension'
       when z.calling.v3.CallError::TYPE.UNKNOWN_EVENT_TYPE
         'E-call event of unknown type was ignored'
       when z.calling.v3.CallError::TYPE.UNSUPPORTED_VERSION
@@ -47,7 +51,9 @@ class z.calling.v3.CallError
   @::TYPE =
     DATA_CHANNEL_NOT_OPENED: 'z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED'
     NO_CONVERSATION_ID: 'z.calling.v3.CallError::TYPE.NO_CONVERSATION_ID'
+    NO_REPLACEABLE_TRACK: 'z.calling.v3.CallError::TYPE.NO_REPLACEABLE_TRACK'
     NOT_FOUND: 'z.calling.v3.CallError::TYPE.NOT_FOUND'
+    RTP_SENDER_NOT_SUPPORTED: 'z.calling.v3.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED'
     UNKNOWN: 'z.calling.v3.CallError::TYPE.UNKNOWN'
     UNKNOWN_EVENT_TYPE: 'z.calling.v3.CallError::TYPE.UNKNOWN_EVENT_TYPE'
     UNSUPPORTED_VERSION: 'z.calling.v3.CallError::TYPE.UNSUPPORTED_VERSION'

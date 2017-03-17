@@ -133,6 +133,6 @@ module.exports = (grunt) => {
 
   grunt.registerTask('test_run', (test_name) => {
     grunt.config('karma.options.reporters', ['progress']);
-    return grunt.task.run(['scripts', 'newer:coffee:dist', 'newer:copy:test', 'newer:coffee:test', `test_prepare:${test_name}`, 'karma:test']);
+    return grunt.task.run(['scripts', 'newer:coffee:dist', 'newer:coffee:test', 'copy:test', `test_prepare:${test_name}`, 'karma:test']);
   });
 };
