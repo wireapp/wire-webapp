@@ -28,13 +28,10 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   Use either z.assets.AssetRemoteData.v2 or z.assets.AssetRemoteData.v3
   to initialize.
 
-  @param otr_key [Uint8Array]
-  @param sha256 [Uint8Array]
+  @param {Uint8Array} otr_key
+  @param {Uint8Array} sha256
   */
   constructor(otr_key, sha256) {
-    this.load = this.load.bind(this);
-    this.get_object_url = this.get_object_url.bind(this);
-    this._load_buffer = this._load_buffer.bind(this);
     this.otr_key = otr_key;
     this.sha256 = sha256;
     this.download_progress = ko.observable();
@@ -46,11 +43,11 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   /*
   Static initializer for v3 assets
 
-  @param asset_key [String]
-  @param otr_key [Uint8Array]
-  @param sha256 [Uint8Array]
-  @param asset_token [String] token is optional
-  @param force_caching [Boolean]
+  @param {string} asset_key
+  @param {Uint8Array} otr_key
+  @param {Uint8Array} sha256
+  @param {string} [asset_token]
+  @param {string} [force_caching=false]
   */
   static v3(asset_key, otr_key, sha256, asset_token, force_caching = false) {
     const remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
@@ -62,11 +59,11 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   /*
   Static initializer for v2 assets
 
-  @param conversation_id [String]
-  @param asset_id [String]
-  @param otr_key [Uint8Array]
-  @param sha256 [Uint8Array]
-  @param force_caching [Boolean]
+  @param {string} conversation_id
+  @param {string} asset_id
+  @param {Uint8Array} otr_key
+  @param {Uint8Array} sha256
+  @param {string} [force_caching=false]
   */
   static v2(conversation_id, asset_id, otr_key, sha256, force_caching = false) {
     const remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
@@ -79,9 +76,9 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   Static initializer for v1 assets
 
   @deprecated
-  @param conversation_id [String]
-  @param asset_id [String]
-  @param force_caching [Boolean]
+  @param {string} conversation_id
+  @param {string} asset_id
+  @param {string} [force_caching=false]
   */
   static v1(conversation_id, asset_id, force_caching = false) {
     const remote_data = new z.assets.AssetRemoteData();
@@ -93,7 +90,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   /*
   Loads and decrypts stored asset
 
-  @returns [Blob]
+  @returns {Blob}
   */
   load() {
     let type;
@@ -112,7 +109,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   /*
   Get object url for asset remote data. URLs are cached in memory
 
-  @returns [String] url
+  @returns {String}
   */
   get_object_url() {
     const object_url = z.assets.AssetURLCache.get_url(this.identifier);
