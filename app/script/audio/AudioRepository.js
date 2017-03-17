@@ -100,6 +100,24 @@
       });
     }
 
-
+    /**
+     * Check if sound should be played with current setting.
+     * @private
+     * @param {z.audio.AudioType} audio_id - Sound identifier
+     * @returns {Promise} Resolves if the sound should be played
+     */
+    _check_sound_setting(audio_id) {
+      return new Promise((resolve, reject) => {
+        if (this.audio_preference === z.audio.AudioPreference.NONE && audio_id !== z.audio.AudioPlayingType.NONE) {
+          reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.IGNORED_SOUND));
+        }
+        else if (this.audio_preference === z.audio.AudioPreference.SOME && audio_id !== z.audio.AudioPlayingType.SOME) {
+          reject(new z.audio.AudioError(z.audio.AudioError.prototype.IGNORED_SOUND));
+        }
+        else {
+          resolve();
+        }
+      });
+    }
   };
 })();
