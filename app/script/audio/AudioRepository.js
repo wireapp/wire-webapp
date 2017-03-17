@@ -50,7 +50,7 @@
           reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.IGNORED_SOUND));
         }
         else if (this.audio_preference === z.audio.AudioPreference.SOME && audio_id !== z.audio.AudioPlayingType.SOME) {
-          reject(new z.audio.AudioError(z.audio.AudioError.prototype.IGNORED_SOUND));
+          reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.IGNORED_SOUND));
         }
         else {
           resolve();
@@ -82,7 +82,7 @@
         if (this.audio_elements[audio_id]) {
           resolve(this.audio_elements[audio_id]);
         } else {
-          reject(new z.audio.AudioError(z.audio.AudioError.prototype.NOT_FOUND));
+          reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.NOT_FOUND));
         }
       });
     }
@@ -109,7 +109,7 @@
      */
     _play(audio_id, audio_element, play_in_loop = false) {
       if (!audio_id || !audio_element) {
-        return Promise.reject(new z.audio.AudioError(z.audio.AudioError.prototype.NOT_FOUND));
+        return Promise.reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.NOT_FOUND));
       }
 
       return new Promise((resolve, reject) => {
@@ -136,7 +136,7 @@
             _play_success();
           }
         } else {
-          reject(new z.audio.AudioError(z.audio.AudioError.prototype.ALREADY_PLAYING));
+          reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.ALREADY_PLAYING));
         }
       });
     }
@@ -151,7 +151,6 @@
         audio_element.preload = 'auto';
         audio_element.load();
       }
-
       this.logger.info('Pre-loading audio files for immediate playback');
     }
 
