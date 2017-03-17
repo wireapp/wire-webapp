@@ -148,5 +148,17 @@
         }
       });
     }
+
+    /**
+     * Initialize all sounds.
+     * @private
+     */
+    _init_sounds() {
+      for (let type in z.audio.AudioType) {
+        const audio_id = z.audio.AudioType[type];
+        this.audio_elements[audio_id] = this._create_audio_element(`${this.AUDIO_PATH}/${audio_id}.mp3`);
+      }
+      this.logger.info('Initialized sounds');
+    }
   };
 })();
