@@ -44,8 +44,8 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   Static initializer for v3 assets
 
   @param {string} asset_key
-  @param {Uint8Array} otr_key
-  @param {Uint8Array} sha256
+  @param {Uint8Array} [otr_key]
+  @param {Uint8Array} [sha256]
   @param {string} [asset_token]
   @param {string} [force_caching=false]
   */
