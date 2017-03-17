@@ -124,13 +124,29 @@
      * Create HTMLAudioElement.
      * @private
      * @param {string} source_path - Source for HTMLAudioElement
-     * @returns {Audio} Returns the audio element-
+     * @returns {Audio} Returns the audio element.
      */
     _create_audio_element(source_path) {
       const audio_element = new Audio();
       audio_element.preload = 'none';
       audio_element.src = source_path;
       return audio_element;
+    }
+
+    /**
+     * Get the sound object
+     * @private
+     * @param {z.audio.AudioType} audio_id - Sound identifier
+     * @returns {Promise} Resolves with the HTMLAudioElement.
+     */
+    _get_sound_by_id(audio_id) {
+      return new Promise((resolve, reject) => {
+        if (this.audio_elements[audio_id]) {
+          resolve(this.audio_elements[audio_id]);
+        } else {
+          reject(new z.audio.AudioError(z.audio.AudioError.prototype.NOT_FOUND));
+        }
+      });
     }
   };
 })();
