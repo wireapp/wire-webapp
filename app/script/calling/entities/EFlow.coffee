@@ -105,9 +105,9 @@ class z.calling.entities.EFlow
           @e_participant_et.is_connected false
           @e_call_et.delete_e_participant @e_participant_et.id
           .then =>
-            unless @e_call_et.participants().length
-              termination_reason = if @e_call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
-              amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, termination_reason
+            return if @e_call_et.participants().length
+            termination_reason = if @e_call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
+            amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, termination_reason
 
     @signaling_state.subscribe (signaling_state) =>
       switch signaling_state
