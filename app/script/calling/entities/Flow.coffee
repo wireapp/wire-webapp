@@ -351,6 +351,7 @@ class z.calling.entities.Flow
     @_create_peer_connection()
     @_add_media_stream @media_stream()
     @pc_initialized true
+    @negotiation_needed true
 
   ###
   A MediaStream was added to the PeerConnection.
