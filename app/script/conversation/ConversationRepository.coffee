@@ -1531,12 +1531,11 @@ class z.conversation.ConversationRepository
   upload_files: (conversation_et, files) =>
     return if not @_can_upload_assets_to_conversation conversation_et
 
-    z.util.foreach_deferred files, (file) =>
+    for file in files
       if @use_v3_api
         @upload_file_v3 conversation_et, file
       else
         @upload_file conversation_et, file
-    , 10
 
   ###
   Post file to a conversation.
