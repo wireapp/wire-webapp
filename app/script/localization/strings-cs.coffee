@@ -198,11 +198,6 @@ z.string.cs.modal_session_reset_message_2 = 'nás.'
 # Too many members in conversation
 z.string.cs.modal_too_many_members_headline = 'Přeplněné kupé'
 z.string.cs.modal_too_many_members_message = 'Ke konverzaci se může připojit az %max účastníků. Je zde ještě místo pro %no.'
-# Whitelist screensharing
-z.string.cs.modal_whitelist_screensharing_headline = 'Wire potřebuje oprávnění sdílet vaši obrazovku'
-z.string.cs.modal_whitelist_screensharing_message_1 = 'Otevřete about:config a přidejte *.wire.com do seznamu domén s právy sdílet obrazovku. Otevřete'
-z.string.cs.modal_whitelist_screensharing_message_link = 'Časté dotazy'
-z.string.cs.modal_whitelist_screensharing_message_2 = 'pro více informací.'
 # Parallel uploads
 z.string.cs.modal_uploads_parallel = 'Najednou můžete poslat až %no souborů.'
 

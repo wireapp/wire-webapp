@@ -253,7 +253,9 @@ class z.media.MediaStreamHandler
       return @replace_media_stream media_stream_info
     .catch (error) =>
       [error, media_type] = error if _.isArray error
-      @_replace_input_source_failure error, media_type
+      if media_type is z.media.MediaType.SCREEN
+        return @logger.error "Failed to enable screen sharing: #{error.message}", error
+      @logger.error "Failed to replace '#{media_type}' input source: #{error.message}", error
 
   ###
   Request a MediaStream.
@@ -380,24 +382,6 @@ class z.media.MediaStreamHandler
       return true
     @logger.warn 'No MediaStreamTrack found to stop', media_stream
     return false
-
-  ###
-  Failed to replace an input source.
-
-  @private
-  @param error [Error] Error thrown when attempting to replace the source
-  @param media_type [z.media.MediaType] Type of failed request
-  ###
-  _replace_input_source_failure: (error, media_type) ->
-    if media_type is z.media.MediaType.SCREEN
-      if z.util.Environment.browser.firefox and error.type is z.media.MediaError::TYPE.MEDIA_STREAM_PERMISSION
-        # @deprecated Remove once we require Firefox 52 ESR
-        @logger.warn 'We are not on the white list. Manually add the current domain to media.getusermedia.screensharing.allowed_domains on about:config'
-        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.WHITELIST_SCREENSHARING
-      else
-        @logger.error "Failed to enable screen sharing: #{error.message}", error
-    else
-      @logger.error "Failed to replace '#{media_type}' input source: #{error.message}", error
 
   ###
   Show microphone not found hin banner.

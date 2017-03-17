@@ -208,11 +208,6 @@ z.string.it.modal_session_reset_message_2 = 'Wire.'
 # Too many members in conversation
 z.string.it.modal_too_many_members_headline = 'Chiamata piena'
 z.string.it.modal_too_many_members_message = 'Fino a %max persone possono partecipare a una conversazione. C’è spazio per ancora %no persone qui dentro.'
-# Whitelist screensharing
-z.string.it.modal_whitelist_screensharing_headline = 'Wire richiede l’autorizzazione per condividere il tuo schermo'
-z.string.it.modal_whitelist_screensharing_message_1 = 'Aprire about:config e aggiungere *.wire.com alla lista dei domini consentiti per la condivisione dello schermo. Vedere'
-z.string.it.modal_whitelist_screensharing_message_link = 'FAQ'
-z.string.it.modal_whitelist_screensharing_message_2 = 'per ulteriori dettagli.'
 # Parallel uploads
 z.string.it.modal_uploads_parallel = 'È possibile inviare fino a %no file in una sola volta.'
 
