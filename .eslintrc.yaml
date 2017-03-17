@@ -9,6 +9,7 @@ extends:
 globals:
   $: true
   amplify: true
+  ko: true
   z: true
 
 rules:
@@ -24,5 +25,6 @@ rules:
   no-var: 2
   quotes: [2, single, avoid-escape]
   semi: [2, always]
+  sort-vars: 2
   space-before-blocks: 2
   strict: [2, global]
