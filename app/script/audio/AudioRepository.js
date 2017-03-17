@@ -160,5 +160,47 @@
       }
       this.logger.info('Initialized sounds');
     }
+
+    /**
+     * Start playback of a sound.
+     * @private
+     * @param {z.audio.AudioType} audio_id - Sound identifier
+     * @param {HTMLAudioElement} audio_element - AudioElement to play
+     * @param {Boolean} play_in_loop - Play sound in loop
+     * @return [Promise] Resolves with the HTMLAudioElement
+     */
+    _play(audio_id, audio_element, play_in_loop = false) {
+      if (!audio_id || !audio_element) {
+        return Promise.reject(new z.audio.AudioError(z.audio.AudioError.prototype.NOT_FOUND));
+      }
+
+      return new Promise((resolve, reject) => {
+        if (audio_element.paused) {
+          audio_element.loop = play_in_loop;
+
+          if (audio_element.currentTime !== 0) {
+            audio_element.currentTime = 0
+          }
+
+          _play_success = () => {
+            if (play_in_loop) {
+              this.currently_looping[audio_id] = audio_id;
+            }
+          };
+
+          const play_promise = audio_element.play();
+
+          if (play_promise) {
+            play_promise.then(_play_success).catch(() => {
+              reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.FAILED_TO_PLAY));
+            });
+          } else {
+            _play_success();
+          }
+        } else {
+          reject(new z.audio.AudioError(z.audio.AudioError.prototype.ALREADY_PLAYING));
+        }
+      });
+    }
   };
 })();
