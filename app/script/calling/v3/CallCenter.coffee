@@ -406,7 +406,7 @@ class z.calling.v3.CallCenter
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
       @media_stream_handler.release_media_streams()
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
-      e_call_et.termination_reason = termination_reason if termination_reason
+      e_call_et.termination_reason = termination_reason if termination_reason and not e_call_et.termination_reason
 
       e_call_message_type = if e_call_et.is_connected() then z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP else z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
       additional_payload =
@@ -490,9 +490,9 @@ class z.calling.v3.CallCenter
           @media_stream_handler.initiate_media_stream e_call_et.id, true if e_call_et.is_remote_video_send()
           @telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, e_call_et
           @_distribute_activation_event e_call_message_et
-        .catch (error) =>
-          @delete_call e_call_et.conversation_et.id
-          throw error unless error instanceof z.media.MediaError
+      .catch (error) =>
+        @delete_call e_call_et.conversation_et.id
+        throw error unless error instanceof z.media.MediaError
 
   ###
   Constructs an outgoing e-call entity.
