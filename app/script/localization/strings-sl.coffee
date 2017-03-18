@@ -538,7 +538,7 @@ z.string.sl.warning_lifecycle_update_link = 'Posodobi zdaj'
 # Browser notifications
 z.string.sl.system_notification_asset_add = 'Je delil(-a) sliko'
 z.string.sl.system_notification_connection_accepted = 'Je sprejel(-a) vašo zahtevo po povezavi'
-z.string.sl.system_notification_connection_connected = 'Sta zdaj povezana'
+z.string.sl.system_notification_connection_connected = 'Zdaj ste povezani'
 z.string.sl.system_notification_connection_request = 'Si želi povezati'
 z.string.sl.system_notification_conversation_create = '%s.first_name je začel(-a) pogovor'
 z.string.sl.system_notification_conversation_rename = '%s.first_name je preimenoval(-a) pogovor v %name'

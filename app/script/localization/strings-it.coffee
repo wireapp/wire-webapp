@@ -66,6 +66,8 @@ z.string.it.auth_limit_devices_current = '(Corrente)'
 # Authentication: limit section
 z.string.it.auth_history_headline = 'È la prima volta che utilizzi Wire questo dispositivo.'
 z.string.it.auth_history_description = 'Per motivi di privacy, la cronologia delle tue conversazioni non apparirà qui.'
+z.string.it.auth_history_reuse_headline = 'Hai utilizzato Wire su questo dispositivo prima.'
+z.string.it.auth_history_reuse_description = 'I messaggi inviati nel frattempo non verranno visualizzati qui.'
 z.string.it.auth_history_button = 'OK'
 
 # Authentication: POSTED section
@@ -124,6 +126,7 @@ z.string.it.modal_button_send = 'Invia'
 
 # Block a user
 z.string.it.modal_block_conversation_headline = 'Bloccare %@.name?'
+z.string.it.modal_block_conversation_message = '%@.Name non sarà in grado di contattarti o aggiungerti alle conversazioni di gruppo.'
 z.string.it.modal_block_conversation_button = 'Blocca'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.it.modal_call_conversation_empty_headline = 'Nessuno da chiamare'
@@ -183,7 +186,14 @@ z.string.it.modal_logout_headline = 'Cancella dati?'
 z.string.it.modal_logout_message = 'Elimina tutti i tuoi dati personali e le conversazioni su questo dispositivo.'
 z.string.it.modal_logout_button = 'Logout'
 # New device
+z.string.it.modal_new_device_headline = '%@.name ha iniziato a utilizzare un nuovo dispositivo'
+z.string.it.modal_new_device_headline_many = '%@.names ha iniziato a utilizzare nuovi dispositivi'
+z.string.it.modal_new_device_headline_you = '%@.name ha iniziato a utilizzare un nuovo dispositivo'
 z.string.it.modal_new_device_message = 'Vuoi comunque mandare il messaggio?'
+z.string.it.modal_new_device_call_accept = 'Accetta la chiamata'
+z.string.it.modal_new_device_call_anyway = 'Chiama comunque'
+z.string.it.modal_new_device_call_incoming = 'Vuoi accettare la chiamata?'
+z.string.it.modal_new_device_call_outgoing = 'Vuoi effettuare la chiamata?'
 z.string.it.modal_new_device_show_device = 'visualizza dispositivo'
 z.string.it.modal_new_device_send_anyway = 'invia comunque'
 # Remove device
@@ -220,9 +230,15 @@ z.string.it.conversation_connection_blocked = 'Bloccato'
 z.string.it.conversation_connection_cancel_request = 'Annulla la richiesta di connessione'
 z.string.it.conversation_create = ' ha iniziato una conversazione con %@names'
 z.string.it.conversation_create_you = ' ha iniziato una conversazione con %@names'
+z.string.it.conversation_device_started_using_one = ' ha iniziato ad usare'
+z.string.it.conversation_device_started_using_many = ' ha iniziato ad usare'
 z.string.it.conversation_device_unverified = ' hai tolto la verifica di'
 z.string.it.conversation_device_your_devices = ' i tuoi dispositivi'
 z.string.it.conversation_device_user_devices = ' Dispositivi di %@name’s'
+z.string.it.conversation_device_new_device_one = ' un nuovo dispositivo'
+z.string.it.conversation_device_new_device_many = ' nuovi dispositivi'
+z.string.it.conversation_device_new_people_joined = 'nuove persone si sono unite.'
+z.string.it.conversation_device_new_people_joined_verify = ' verifica i dispositivi'
 z.string.it.conversation_just_now = 'Adesso'
 z.string.it.conversation_location_link = 'Apri mappa'
 z.string.it.conversation_member_join = ' ha aggiunto %@names'
@@ -264,8 +280,15 @@ z.string.it.conversation_likes_caption = '%@number persone'
 z.string.it.conversation_send_pasted_file = 'Immagine incollata alle %date'
 
 # Collection
+z.string.it.collection_show_all = 'Mostra tutti i %no'
+z.string.it.collection_section_links = 'Link'
+z.string.it.collection_section_images = 'Immagini'
+z.string.it.collection_section_files = 'Files'
+z.string.it.collection_section_audio = 'Messaggi audio'
 
 # Full Search
+z.string.it.fullsearch_placeholder = 'Cerca messaggi di testo'
+z.string.it.fullsearch_no_results = 'Nessun risultato.'
 
 # Archive
 z.string.it.archive_header = 'Archivia'
@@ -299,6 +322,8 @@ z.string.it.invite_meta_key_pc = 'Ctrl'
 z.string.it.invite_hint_selected = 'Premere %meta_key + C per copiare'
 z.string.it.invite_hint_unselected = 'Selezionare e premere % meta_key + C'
 z.string.it.invite_headline = 'Invita amici ad usare Wire'
+z.string.it.invite_message = 'Sono su Wire, cerca %username o visita get.wire.com.'
+z.string.it.invite_message_no_email = 'Sono su Wire. Visita get.wire.com per connetterti con me.'
 
 # Extensions
 z.string.it.extensions_bubble_button_gif = 'Gif'
@@ -322,6 +347,7 @@ z.string.it.people_no_matches = 'Nessun risultato corrispondente. Provare ad ins
 z.string.it.people_invite = 'Invita persone'
 z.string.it.people_share = 'Condividi contatti'
 z.string.it.people_bring_your_friends = 'Porta i tuoi amici su Wire'
+z.string.it.people_invite_detail = 'Condividere i contatti dalla rubrica ti aiuta a connetterti con gli altri. Rendiamo tutte le informazioni dei contatti anonime e non sono cedute a nessun altro.'
 z.string.it.people_invite_button_contacts = 'Dalla rubrica'
 z.string.it.people_invite_button_gmail = 'Da Gmail'
 z.string.it.people_invite_headline = 'Invita i tuoi amici'
@@ -341,6 +367,7 @@ z.string.it.people_verified = 'Verificato'
 
 # Block user
 z.string.it.people_block_headline = 'Blocca?'
+z.string.it.people_block_message = '%@.first_name non sarà in grado di contattarti o aggiungerti alle conversazioni di gruppo.'
 
 # Accept a pending connection dialogue
 z.string.it.people_connect_headline = 'Accettare?'
@@ -360,6 +387,7 @@ z.string.it.people_remove_message = '%@.first_name non sarà in grado di inviare
 
 # Unblock user
 z.string.it.people_unblock_headline = 'Sblocca?'
+z.string.it.people_unblock_message = '%@.first_name sarà in grado di contattarti e aggiungerti alle conversazioni di gruppo di nuovo.'
 
 # Button labels for the actions
 z.string.it.people_button_add = 'Aggiungi persone'
@@ -503,10 +531,13 @@ z.string.it.warning_connectivity_connection_lost = 'Tentativo di connessione. Wi
 z.string.it.warning_connectivity_no_internet = 'Nessuna connessione. Non sarai in grado di inviare o ricevere messaggi.'
 
 # Warnings: Desktop Update
+z.string.it.warning_lifecycle_update = 'Una nuova versione di Wire è disponibile.'
+z.string.it.warning_lifecycle_update_link = 'Aggiorna Ora'
 
 # Browser notifications
 z.string.it.system_notification_asset_add = 'Ha condiviso un’immagine'
 z.string.it.system_notification_connection_accepted = 'Ha accettato la tua richiesta di connessione'
+z.string.it.system_notification_connection_connected = 'Siete connessi ora'
 z.string.it.system_notification_connection_request = 'Vuole connettersi'
 z.string.it.system_notification_conversation_create = '%s.first_name ha iniziato una conversazione'
 z.string.it.system_notification_conversation_rename = '%s.first_name ha rinominato la conversazione in %name'
