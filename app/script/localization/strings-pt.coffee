@@ -545,7 +545,7 @@ z.string.pt.warning_lifecycle_update_link = 'Atualizar agora'
 # Browser notifications
 z.string.pt.system_notification_asset_add = 'Compartilhou uma imagem'
 z.string.pt.system_notification_connection_accepted = 'Aceitou seu pedido de conexão'
-z.string.pt.system_notification_connection_connected = 'Agora estão conectados'
+z.string.pt.system_notification_connection_connected = 'Você está conectado agora'
 z.string.pt.system_notification_connection_request = 'Quer se conectar'
 z.string.pt.system_notification_conversation_create = '%s.first_name começou uma conversa'
 z.string.pt.system_notification_conversation_rename = '%s.first_name mudou o nome da conversa para %name'

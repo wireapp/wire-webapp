@@ -528,7 +528,7 @@ z.string.sk.warning_lifecycle_update_link = 'Aktualizovať'
 # Browser notifications
 z.string.sk.system_notification_asset_add = 'Zdieľať obrázok'
 z.string.sk.system_notification_connection_accepted = 'Prijal Vašu požiadavku na pripojenie'
-z.string.sk.system_notification_connection_connected = 'Teraz pripojení'
+z.string.sk.system_notification_connection_connected = 'Teraz ste pripojení'
 z.string.sk.system_notification_connection_request = 'Chce sa pripojiť'
 z.string.sk.system_notification_conversation_create = '%s.first_name začal rozhovor'
 z.string.sk.system_notification_conversation_rename = '%s.first_name premenoval rozhovor na %name'
