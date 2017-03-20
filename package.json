@@ -43,7 +43,7 @@
     "lint": "eslint app/script/**/*.js",
     "postinstall": "grunt init",
     "start": "grunt",
-    "test": "npm run lint && grunt check && grunt test"
+    "test": "yarn run lint && grunt check && grunt test"
   },
   "repository": {
     "type": "git",
