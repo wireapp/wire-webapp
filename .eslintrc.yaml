@@ -6,6 +6,12 @@ env:
 extends:
   "eslint:recommended"
 
+globals:
+  $: true
+  amplify: true
+  ko: true
+  z: true
+
 rules:
   comma-dangle: [2, always-multiline]
   handle-callback-err: 2
@@ -16,7 +22,9 @@ rules:
   no-shadow: 2
   no-unused-expressions: 2
   no-unused-vars: [2, {args: none}]
+  no-var: 2
   quotes: [2, single, avoid-escape]
   semi: [2, always]
+  sort-vars: 2
   space-before-blocks: 2
   strict: [2, global]

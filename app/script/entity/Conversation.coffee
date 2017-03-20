@@ -144,7 +144,7 @@ class z.entity.Conversation
       unread_type = z.conversation.ConversationUnreadType.UNREAD
       return unread_type if @unread_message_count() <= 0
       for message in @unread_events() by -1
-        return z.conversation.ConversationUnreadType.CALL if message.finished_reason is z.calling.enum.CALL_FINISHED_REASON.MISSED
+        return z.conversation.ConversationUnreadType.CALL if message.finished_reason is z.calling.enum.TERMINATION_REASON.MISSED
         if message.is_ping()
           @unread_accent_color message.accent_color()
           return z.conversation.ConversationUnreadType.PING
@@ -267,7 +267,7 @@ class z.entity.Conversation
   @param message_et [z.entity.Message] Message entity to be added to the conversation
   ###
   add_message: (message_et) ->
-    first_message = @get_first_message()
+    first_message = @get_first_message true
 
     # don't add messages that are older then what is rendered
     if first_message? and message_et.timestamp() < first_message.timestamp()
@@ -418,9 +418,12 @@ class z.entity.Conversation
 
   ###
   Get the first message of the conversation.
+  @param include_creation_message [Boolean] Optionally include the local creation message defaulting to false
   @return [z.entity.Message, undefined] First message entity or undefined
   ###
-  get_first_message: ->
+  get_first_message: (include_creation_message = false) ->
+    if include_creation_message
+      return @messages_visible()[0]
     return @messages()[0]
 
   ###

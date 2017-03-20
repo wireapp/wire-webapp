@@ -166,11 +166,11 @@ class z.ViewModel.VideoCallingViewModel
       .catch (error) =>
         @logger.error 'Unable to get screens sources for sharing', error
 
-  clicked_on_cancel_call: =>
-    amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @joined_call()?.id
-
   clicked_on_cancel_screen: =>
     @is_choosing_screen false
+
+  clicked_on_leave_call: =>
+    amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @joined_call()?.id, z.calling.enum.TERMINATION_REASON.SELF_USER
 
   clicked_on_mute_audio: =>
     amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call()?.id, z.media.MediaType.AUDIO

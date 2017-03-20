@@ -118,7 +118,7 @@ class z.telemetry.calling.FlowTelemetry
         @logger.debug "Stream has '#{media_type}' flowing properly both ways"
     else
       if @is_answer
-        @logger.info "Check stream statistics of type '#{media_type}' delayed as we created this flow"
+        @logger.info "Check '#{media_type}' statistics delayed as we created this flow"
       else
         window.setTimeout =>
           @check_stream media_type, timeout, attempt++

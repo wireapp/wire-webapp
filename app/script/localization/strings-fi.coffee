@@ -524,7 +524,6 @@ z.string.fi.warning_connectivity_no_internet = 'Ei Internetiä. Et pysty lähett
 # Browser notifications
 z.string.fi.system_notification_asset_add = 'Jakoi kuvan'
 z.string.fi.system_notification_connection_accepted = 'Hyväksyi yhteyspyyntösi'
-z.string.fi.system_notification_connection_connected = 'Yhteys muodostettu'
 z.string.fi.system_notification_connection_request = 'Haluaa luoda kontaktin'
 z.string.fi.system_notification_conversation_create = '%s.first_name aloitti keskustelun'
 z.string.fi.system_notification_conversation_rename = '%s.first_name nimesi keskustelun uudelleen %nameksi'

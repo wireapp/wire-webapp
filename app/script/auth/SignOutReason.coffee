@@ -19,7 +19,7 @@
 window.z ?= {}
 z.auth ?= {}
 
-z.auth.SignOutReasion =
+z.auth.SignOutReason =
   CLIENT_REMOVED: 'client_removed'
   SESSION_EXPIRED: 'session_expired'
   USER_REQUESTED: 'user_requested'

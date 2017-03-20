@@ -152,16 +152,15 @@ class z.conversation.ConversationRepository
   get_conversations: =>
     @conversation_service.load_conversation_states_from_db()
     .then (local_conversations) =>
-      is_update_needed = local_conversations.length is 0 or local_conversations[0].status is undefined
-
-      if is_update_needed
-        return @conversation_service.get_all_conversations()
-        .then (remote_conversations) =>
-          @conversation_mapper.merge_conversations local_conversations, remote_conversations
-        .then (merged_conversations) =>
-          @conversation_service.save_conversations_in_db merged_conversations
-      else
-        return local_conversations
+      return @conversation_service.get_all_conversations()
+      .catch (error) =>
+        @logger.error "Failed to get all conversations from backend: #{error.message}"
+      .then (remote_conversations = []) =>
+        if remote_conversations.length > 0
+          return Promise.resolve @conversation_mapper.merge_conversations local_conversations, remote_conversations
+          .then (merged_conversations) => @conversation_service.save_conversations_in_db merged_conversations
+        else
+          return local_conversations
     .then (conversations) =>
       @save_conversations @conversation_mapper.map_conversations conversations
       amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
@@ -1041,6 +1040,21 @@ class z.conversation.ConversationRepository
         @_send_and_inject_generic_message conversation_et, generic_message
 
   ###
+  Send location message in specified conversation.
+
+  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
+  @param longitude [Integer] Longitude of the location
+  @param latitude [Integer] Latitude of the location
+  @param name [String] Name of the location
+  @param zoom [Integer] Zoom factor for the map (Google Maps)
+  @return [Promise] Promise that resolves after sending the message
+  ###
+  send_location: (conversation_et, longitude, latitude, name, zoom) =>
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'location', new z.proto.Location longitude, latitude, name, zoom
+    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
+
+  ###
   Send text message in specified conversation.
 
   @param message [String] plain text message
@@ -1516,12 +1530,11 @@ class z.conversation.ConversationRepository
   upload_files: (conversation_et, files) =>
     return if not @_can_upload_assets_to_conversation conversation_et
 
-    z.util.foreach_deferred files, (file) =>
+    for file in files
       if @use_v3_api
         @upload_file_v3 conversation_et, file
       else
         @upload_file conversation_et, file
-    , 10
 
   ###
   Post file to a conversation.
@@ -1952,7 +1965,7 @@ class z.conversation.ConversationRepository
 
         conversation_et.status z.conversation.ConversationStatus.PAST_MEMBER
         if conversation_et.call()
-          amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id
+          amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.REMOVED_MEMBER
 
       @update_participating_user_ets conversation_et, =>
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
@@ -2364,7 +2377,7 @@ class z.conversation.ConversationRepository
   @param message_to_delete_et [z.entity.Message]
   ###
   _add_delete_message: (conversation_id, message_id, time, message_to_delete_et) ->
-    event = z.conversation.EventBuilder.build_delete conversation_et.id, event_json.id, event_json.time, message_to_delete_et
+    event = z.conversation.EventBuilder.build_delete conversation_id, message_id, time, message_to_delete_et
     amplify.publish z.event.WebApp.EVENT.INJECT, event
 
   ###############################################################################

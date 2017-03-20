@@ -528,7 +528,6 @@ z.string.da.warning_lifecycle_update_link = 'Opdatér nu'
 # Browser notifications
 z.string.da.system_notification_asset_add = 'Delte et billede'
 z.string.da.system_notification_connection_accepted = 'Accepterede din anmodning om forbindelse'
-z.string.da.system_notification_connection_connected = 'Er nu tilsluttet'
 z.string.da.system_notification_connection_request = 'Ønsker at forbinde'
 z.string.da.system_notification_conversation_create = '%s.first_name startede en samtale'
 z.string.da.system_notification_conversation_rename = '%s.first_name omdøbte samtalen til %name'

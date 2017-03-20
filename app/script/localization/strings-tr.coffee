@@ -546,7 +546,7 @@ z.string.tr.warning_lifecycle_update_link = 'Şimdi güncelle'
 # Browser notifications
 z.string.tr.system_notification_asset_add = 'Bir resim paylaştı'
 z.string.tr.system_notification_connection_accepted = 'Bağlantı isteğinizi kabul etti'
-z.string.tr.system_notification_connection_connected = 'Şimdi bağlı'
+z.string.tr.system_notification_connection_connected = 'Şu anda bağlısınız'
 z.string.tr.system_notification_connection_request = 'Bağlanmak istiyor'
 z.string.tr.system_notification_conversation_create = '%s.first_name bir konuşma başlattı'
 z.string.tr.system_notification_conversation_rename = '%s.first_name, konuşma ismini %name olarak değiştirdi'
