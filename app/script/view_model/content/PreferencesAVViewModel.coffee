@@ -69,7 +69,7 @@ class z.ViewModel.content.PreferencesAVViewModel
       return @media_stream_handler.request_media_stream media_type, media_stream_constraints
     .then (media_stream_info) =>
       @media_stream_handler.local_media_type z.media.MediaType.VIDEO if @available_devices.video_input().length
-      @media_stream_handler.local_media_stream media_stream_info.media_stream
+      @media_stream_handler.local_media_stream media_stream_info.stream
       return @media_stream_handler.local_media_stream()
     .catch (error) =>
       error = error[0] if _.isArray error
@@ -113,6 +113,6 @@ class z.ViewModel.content.PreferencesAVViewModel
     @audio_interval = undefined
     @audio_source.disconnect() if @audio_source
 
-  _release_media_streams: =>
+  _release_media_stream: =>
     @media_stream_handler.reset_media_stream()
     @permission_denied false
