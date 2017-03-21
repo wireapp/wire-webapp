@@ -158,7 +158,7 @@ describe 'Conversation', ->
 
       call_message = new z.entity.CallMessage()
       call_message.timestamp last_read_timestamp - 1000
-      call_message.finished_reason = z.calling.enum.CALL_FINISHED_REASON.MISSED
+      call_message.finished_reason = z.calling.enum.TERMINATION_REASON.MISSED
 
       conversation_et.add_message ping_message
       conversation_et.add_message call_message
@@ -184,7 +184,7 @@ describe 'Conversation', ->
     it 'shows unread type "CALL" if there is a missed call message in the unread messages', ->
       call_message = new z.entity.CallMessage()
       call_message.timestamp Date.now() - 500
-      call_message.finished_reason = z.calling.enum.CALL_FINISHED_REASON.MISSED
+      call_message.finished_reason = z.calling.enum.TERMINATION_REASON.MISSED
       conversation_et.add_message call_message
       conversation_et.add_message new z.entity.Message()
       expect(conversation_et.unread_type()).toBe z.conversation.ConversationUnreadType.CALL
@@ -273,14 +273,20 @@ describe 'Conversation', ->
       expect(conversation_et.messages().length).toBe 2
       expect(conversation_et.get_last_message().id).toBe message_id
 
-    it 'can add message with an older timestamp', ->
-      message_id = z.util.create_random_uuid()
-      message = new z.entity.Message()
-      message.id = message_id
-      message.timestamp reference_timestamp - 10000
-      conversation_et.add_message message
-      expect(conversation_et.messages().length).toBe 2
-      expect(conversation_et.get_first_message().id).toBe message_id
+  xdescribe 'add_message', ->
+    message1 = new z.entity.Message()
+    message1.id = z.util.create_random_uuid()
+    message1.timestamp new Date('2014-12-15T09:21:14.225Z').getTime()
+
+    message2 = new z.entity.Message()
+    message2.id = z.util.create_random_uuid()
+    message2.timestamp new Date('2014-12-15T08:21:14.225Z').getTime()
+
+    it 'should not add message that is older then the last rendered message', ->
+      conversation_et.add_message message1
+      conversation_et.add_message message2
+      expect(conversation_et.messages_unordered().length).toBe 1
+      expect(conversation_et.get_last_message()).toBe message1
 
   describe 'add_messages', ->
     reference_timestamp = Date.now()

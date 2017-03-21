@@ -57,7 +57,7 @@ class z.conversation.ConversationService
   ###############################################################################
 
   ###
-  Retrieves meta information about all the conversations of a user.
+  Retrieves paged meta information about the conversations of a user.
 
   @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversations
 
@@ -71,6 +71,23 @@ class z.conversation.ConversationService
       data:
         size: limit
         start: conversation_id
+
+  ###
+  Retrieves all the conversations of a user.
+  @param limit [Integer] Number of results to return (default 500, max 500)
+  ###
+  get_all_conversations: (limit = 500) =>
+    conversations = []
+
+    _get_conversations = (conversation_id) =>
+      @get_conversations(limit, conversation_id).then (response) ->
+        if response.conversations.length
+          conversations = conversations.concat response.conversations
+        if response.has_more
+          return _get_conversations response.conversations.pop().id
+        return conversations
+
+    return _get_conversations()
 
   ###
   Get a conversation by ID.
@@ -409,27 +426,24 @@ class z.conversation.ConversationService
       data: payload
 
   ###
-  Saves a conversation state in the local database.
+  Saves a list of conversation records in the local database.
+  @param conversations [z.entity.Conversation] Conversation entity
+  @return [Promise<Array>] Promise which resolves with a list of conversation records
+  ###
+  save_conversations_in_db: (conversations) =>
+    keys = conversations.map (conversation) -> conversation.id
+    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATIONS].bulkPut(conversations, keys).then -> conversations
+
+  ###
+  Saves a conversation entity in the local database.
   @param conversation_et [z.entity.Conversation] Conversation entity
   @return [Promise<String|z.entity.Conversation>] Promise which resolves with the conversation entity
   ###
   save_conversation_state_in_db: (conversation_et) =>
     @storage_service.save @storage_service.OBJECT_STORE_CONVERSATIONS, conversation_et.id, conversation_et.serialize()
-    .then =>
-      @logger.info "State of conversation '#{conversation_et.id}' was stored for the first time"
+    .then (primary_key) =>
+      @logger.log @logger.levels.INFO, "State of conversation '#{primary_key}' was stored"
       return conversation_et
-
-  ###
-  Updates a conversation entity in the database.
-  @param changes [Object] Updates to be made to the stored conversation state
-  @return [Promise<String|z.entity.Conversation>] Promise which resolves with the conversation entity
-  ###
-  update_conversation_state_in_db: (conversation_et, changes) ->
-    @storage_service.update @storage_service.OBJECT_STORE_CONVERSATIONS, conversation_et.id, changes
-    .then (number_of_updated_records) =>
-      if number_of_updated_records
-        return conversation_et
-      @save_conversation_state_in_db conversation_et
 
   ###
   Update conversation properties.

@@ -49,13 +49,14 @@ class z.entity.Conversation
 
     # in case this is a one2one conversation this is the connection to that user
     @connection = ko.observable new z.entity.Connection()
-    @connection.subscribe (connection_et) => @participating_user_ids [connection_et.to]
+    @connection.subscribe (connection_et) =>
+      @participating_user_ids [connection_et.to] if connection_et.to not in @participating_user_ids()
 
     ###############################################################################
     # E2EE conversation states
     ###############################################################################
 
-    @archived_state = ko.observable false
+    @archived_state = ko.observable(false).extend notify: 'always'
     @muted_state = ko.observable false
     @verification_state = ko.observable z.conversation.ConversationVerificationState.UNVERIFIED
 
@@ -83,7 +84,9 @@ class z.entity.Conversation
       all_users = [@self].concat @participating_user_ets()
       return all_users.every (user_et) -> user_et?.is_verified()
 
-    @removed_from_conversation = ko.observable false
+    @status = ko.observable z.conversation.ConversationStatus.CURRENT_MEMBER
+    @removed_from_conversation = ko.pureComputed =>
+      return @status() is z.conversation.ConversationStatus.PAST_MEMBER
     @removed_from_conversation.subscribe (is_removed) =>
       @archived_state false if not is_removed
 
@@ -141,7 +144,7 @@ class z.entity.Conversation
       unread_type = z.conversation.ConversationUnreadType.UNREAD
       return unread_type if @unread_message_count() <= 0
       for message in @unread_events() by -1
-        return z.conversation.ConversationUnreadType.CALL if message.finished_reason is z.calling.enum.CALL_FINISHED_REASON.MISSED
+        return z.conversation.ConversationUnreadType.CALL if message.finished_reason is z.calling.enum.TERMINATION_REASON.MISSED
         if message.is_ping()
           @unread_accent_color message.accent_color()
           return z.conversation.ConversationUnreadType.PING
@@ -178,26 +181,27 @@ class z.entity.Conversation
       else
         return @name()
 
+    @persist_state = _.debounce =>
+      amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @
+    , 100
+
     amplify.subscribe z.event.WebApp.CONVERSATION.LOADED_STATES, @_subscribe_to_states_updates
 
   _subscribe_to_states_updates: =>
-    @archived_state.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.ARCHIVED_STATE
-    @cleared_timestamp.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
-    @ephemeral_timer.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.EPHEMERAL_TIMER
-    @last_event_timestamp.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
-    @last_read_timestamp.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
-    @muted_state.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.MUTED_STATE
-    @verification_state.subscribe =>
-      @_persist_state_update z.conversation.ConversationUpdateType.VERIFICATION_STATE
-
-  _persist_state_update: (updated_field) ->
-    amplify.publish z.event.WebApp.CONVERSATION.PERSIST_STATE, @, updated_field
+    [
+      @archived_state
+      @cleared_timestamp
+      @ephemeral_timer
+      @last_event_timestamp
+      @last_read_timestamp
+      @muted_state
+      @name
+      @participating_user_ids
+      @status
+      @type
+      @verification_state
+    ].forEach (property) =>
+      property.subscribe @persist_state
 
   ###############################################################################
   # Lifecycle
@@ -263,6 +267,12 @@ class z.entity.Conversation
   @param message_et [z.entity.Message] Message entity to be added to the conversation
   ###
   add_message: (message_et) ->
+    first_message = @get_first_message true
+
+    # don't add messages that are older then what is rendered
+    if first_message? and message_et.timestamp() < first_message.timestamp()
+      return
+
     amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et
     @_update_last_read_from_message message_et
     @messages_unordered.push @_check_for_duplicate_nonce message_et, @get_last_message()
@@ -408,9 +418,12 @@ class z.entity.Conversation
 
   ###
   Get the first message of the conversation.
+  @param include_creation_message [Boolean] Optionally include the local creation message defaulting to false
   @return [z.entity.Message, undefined] First message entity or undefined
   ###
-  get_first_message: ->
+  get_first_message: (include_creation_message = false) ->
+    if include_creation_message
+      return @messages_visible()[0]
     return @messages()[0]
 
   ###
@@ -488,5 +501,9 @@ class z.entity.Conversation
       last_read_timestamp: @last_read_timestamp()
       muted_state: @muted_state()
       muted_timestamp: @muted_timestamp()
+      name: @name()
+      others: @participating_user_ids()
+      status: @status()
+      type: @type()
       verification_state: @verification_state()
     }

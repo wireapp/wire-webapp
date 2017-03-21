@@ -55,19 +55,31 @@ z.conversation.EventBuilder = do ->
     type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
     from: e_call_message_et.user_id
     time: e_call_message_et.time
+    protocol_version: z.calling.enum.PROTOCOL.VERSION_3
 
-  build_voice_channel_deactivate = (e_call_message_et) ->
+  build_voice_channel_deactivate = (e_call_message_et, creating_user_et) ->
     conversation: e_call_message_et.conversation_id
     id: z.util.create_random_uuid()
     type: z.event.Backend.CONVERSATION.VOICE_CHANNEL_DEACTIVATE
-    from: e_call_message_et.user_id
+    from: creating_user_et?.id or e_call_message_et.user_id
     time: e_call_message_et.time
     data:
-      reason: z.calling.enum.CALL_FINISHED_REASON.MISSED
+      reason: z.calling.enum.TERMINATION_REASON.MISSED
+    protocol_version: z.calling.enum.PROTOCOL.VERSION_3
+
+  build_delete = (conversation_id, message_id, time, message_to_delete_et) ->
+    conversation: conversation_id
+    id: message_id
+    type: z.event.Client.CONVERSATION.DELETE_EVERYWHERE
+    from: message_to_delete_et.from
+    time: new Date(message_to_delete_et.timestamp()).toISOString()
+    data:
+      deleted_time: time
 
   return {
     build_all_verified: build_all_verified
     build_degraded: build_degraded
+    build_delete: build_delete
     build_unable_to_decrypt: build_unable_to_decrypt
     build_voice_channel_activate: build_voice_channel_activate
     build_voice_channel_deactivate: build_voice_channel_deactivate

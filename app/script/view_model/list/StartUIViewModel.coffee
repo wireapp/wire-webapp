@@ -74,12 +74,7 @@ class z.ViewModel.list.StartUIViewModel
     # results
     @top_users = ko.observableArray []
     @suggestions = ko.observableArray []
-    @connections = ko.pureComputed =>
-      @conversation_repository.sorted_conversations()
-      .filter (conversation_et) -> conversation_et.type() is z.conversation.ConversationType.ONE2ONE
-      .map (conversation_et) -> conversation_et.participating_user_ets()[0]
-      .filter (user_et) -> user_et?
-    @connections.extend rateLimit: 500
+    @connections = ko.observableArray []
 
     @search_results =
       groups: ko.observableArray []
@@ -223,16 +218,9 @@ class z.ViewModel.list.StartUIViewModel
     .catch (error) =>
       @logger.error "Could not show the on-boarding results: #{error.message}", error
 
-  get_top_people: =>
-    @conversation_repository.get_most_active_conversations()
-    .then (conversation_ets) ->
-      return conversation_ets
-      .filter (conversation_et) -> conversation_et.is_one2one()
-      .map (conversation_et) -> conversation_et.participating_user_ets()[0]
-      .slice(0, 9)
-
   update_list: =>
     @get_top_people().then (user_ets) => @top_users user_ets
+    @get_connections().then (user_ets) => @connections user_ets
 
     @show_spinner false
 
@@ -311,40 +299,29 @@ class z.ViewModel.list.StartUIViewModel
     else
       create_bubble(element[0].id)
 
-  _collapse_item: (search_list_item, callback) ->
-    search_list_item.find('.search-list-item-connect').remove()
-    window.requestAnimationFrame ->
-      search_list_item
-        .addClass 'search-list-item-collapse'
-        .on z.util.alias.animationend, (event) ->
-          if event.originalEvent.propertyName is 'height'
-            search_list_item
-              .remove()
-              .off z.util.alias.animationend
-            callback?()
+  ###############################################################################
+  # Data sources
+  ###############################################################################
 
+  get_top_people: =>
+    @conversation_repository.get_most_active_conversations()
+    .then (conversation_ets) ->
+      return conversation_ets
+        .filter (conversation_et) -> conversation_et.is_one2one()
+        .map (conversation_et) -> conversation_et.participating_user_ids()[0]
+        .slice(0, 9)
+    .then (user_ids) =>
+      return new Promise (resolve) =>
+        @user_repository.get_users_by_id user_ids, resolve
 
-  click_on_dismiss: (user_et, event) =>
-    search_list_item = $(event.currentTarget.parentElement.parentElement)
-    @_collapse_item search_list_item, =>
-      @search_repository.ignore_suggestion user_et.id
-      .then =>
-        @suggestions.remove user_et
-      .catch (error) =>
-        @logger.error "Failed to ignore suggestions: '#{error.message}'", error
-
-  click_on_connect: (user_et, event) =>
-    search_list_item = $(event.currentTarget.parentElement.parentElement)
-    search_list_item
-      .addClass 'search-list-item-connect-anim'
-      .one z.util.alias.animationend, =>
-        window.setTimeout =>
-          @_collapse_item search_list_item, =>
-            @user_repository.create_connection user_et
-            .then =>
-              @suggestions.remove user_et
-        , 550
-
+  get_connections: =>
+    Promise.resolve().then =>
+      return @conversation_repository.sorted_conversations()
+        .filter (conversation_et) -> conversation_et.is_one2one()
+        .map (conversation_et) -> conversation_et.participating_user_ids()[0]
+    .then (user_ids) =>
+      return new Promise (resolve) =>
+        @user_repository.get_users_by_id user_ids, resolve
 
   ###############################################################################
   # User bubble

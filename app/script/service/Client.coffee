@@ -153,6 +153,7 @@ class z.service.Client
       @number_of_requests @number_of_requests() + 1
 
       $.ajax
+        cache: config.cache
         contentType: config.contentType
         data: config.data
         headers: config.headers

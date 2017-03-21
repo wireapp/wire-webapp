@@ -17,21 +17,12 @@
  *
  */
 
-.start-ui-transition-fadein {
-  transition-delay: @animation-timing-fast;
-  transition-duration: @animation-timing-slow;
-  transition-property: all;
-  transition-timing-function: @ease-out-expo;
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
-}
+'use strict';
 
-.start-ui-transition-fadeout {
-  transition-delay: 0s;
-  transition-duration: @animation-timing-fast;
-  transition-timing-function: @ease-in-expo;
-  transform: translateY(@start-ui-search-bar-offset);
-  opacity: 0;
-  pointer-events: none;
-}
+window.z = window.z || {};
+window.z.announce = z.announce || {};
+
+window.z.announce.UPDATE_SOURCE = {
+  DESKTOP: 'desktop',
+  WEBAPP: 'webapp',
+};

@@ -52,7 +52,7 @@ class z.calling.entities.EParticipant
 
   update_state: (e_call_message_et) =>
     @update_properties e_call_message_et.props
-    if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+    unless e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
       @e_flow_et.save_remote_sdp e_call_message_et
 
   update_properties: (properties) =>

@@ -20,13 +20,8 @@ window.z ?= {}
 z.calling ?= {}
 z.calling.mapper ?= {}
 
-class z.calling.mapper.ICECandidateMapper
-  constructor: ->
-    @logger = new z.util.Logger 'z.calling.mapper.ICECandidateMapper', z.config.LOGGER.OPTIONS
-
-  ###
-  @param ice_candidate [RTCIceCandidate] Interactive Connectivity Establishment (ICE) Candidate
-  ###
+z.calling.mapper.ICECandidateMapper =
+  # @param ice_candidate [RTCIceCandidate] Interactive Connectivity Establishment (ICE) Candidate
   map_ice_object_to_message: (ice_candidate) ->
     message =
       sdp: ice_candidate.candidate

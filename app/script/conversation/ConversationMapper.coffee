@@ -77,17 +77,11 @@ class z.conversation.ConversationMapper
       conversation_et.ephemeral_timer self.ephemeral_timer
 
     if self.status?
-      conversation_et.removed_from_conversation self.status is z.conversation.ConversationStatus.PAST_MEMBER
+      conversation_et.status self.status
 
-    # Last Event Timestamp from storage
     if self.last_event_timestamp
       conversation_et.set_timestamp self.last_event_timestamp,
         z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
-
-    if self.otr_archived?
-      timestamp =  new Date(self.otr_archived_ref).getTime()
-      conversation_et.set_timestamp timestamp, z.conversation.ConversationUpdateType.ARCHIVED_TIMESTAMP
-      conversation_et.archived_state self.otr_archived
 
     if self.archived_timestamp
       timestamp = self.archived_timestamp
@@ -97,15 +91,8 @@ class z.conversation.ConversationMapper
     if self.cleared_timestamp
       conversation_et.set_timestamp self.cleared_timestamp, z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
 
-    # Last read
     if self.last_read_timestamp
       conversation_et.set_timestamp self.last_read_timestamp, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP
-
-    # Muted
-    if self.otr_muted?
-      timestamp = new Date(self.otr_muted_ref).getTime()
-      conversation_et.set_timestamp timestamp, z.conversation.ConversationUpdateType.MUTED_TIMESTAMP
-      conversation_et.muted_state self.otr_muted
 
     if self.muted_timestamp
       conversation_et.set_timestamp self.muted_timestamp, z.conversation.ConversationUpdateType.MUTED_TIMESTAMP
@@ -114,46 +101,89 @@ class z.conversation.ConversationMapper
     if self.verification_state
       conversation_et.verification_state self.verification_state
 
+    # BE
+    if self.otr_archived?
+      timestamp =  new Date(self.otr_archived_ref).getTime()
+      conversation_et.set_timestamp timestamp, z.conversation.ConversationUpdateType.ARCHIVED_TIMESTAMP
+      conversation_et.archived_state self.otr_archived
+
+    if self.otr_muted?
+      timestamp = new Date(self.otr_muted_ref).getTime()
+      conversation_et.set_timestamp timestamp, z.conversation.ConversationUpdateType.MUTED_TIMESTAMP
+      conversation_et.muted_state self.otr_muted
+
     return conversation_et
 
   ###
   Creates a conversation entity from JSON data.
 
   @private
-  @param data [Object] Conversation data
+  @param data [Object] Either locally stored or backend data
   @return [z.entity.Conversation] Mapped conversation entity
   ###
   _create_conversation_et: (data) ->
-    return if not data?
-    return @_update_conversation_et new z.entity.Conversation(data.id), data
+    if not data?
+      throw new Error 'Cannot create conversation entity without data'
 
-  ###
-  Updates a given conversation entity from JSON data.
-
-  @private
-  @param conversation_et [z.entity.Conversation] Conversation to be updated
-  @param data [Object] Conversation data
-  @return [z.entity.Conversation] Updated conversation entity
-  ###
-  _update_conversation_et: (conversation_et, data) ->
-    self = data.members.self
-    others = data.members.others
-
+    conversation_et =  new z.entity.Conversation data.id
     conversation_et.id = data.id
     conversation_et.creator = data.creator
     conversation_et.type data.type
     conversation_et.name data.name ? ''
+    conversation_et = @update_self_status conversation_et, data.members?.self or data
 
-    # Last event
-    timestamp = new Date(data.last_event_time).getTime()
-    conversation_et.set_timestamp timestamp, z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP
-
-    conversation_et = @update_self_status conversation_et, self
+    if not conversation_et.last_event_timestamp()
+      conversation_et.last_event_timestamp Date.now()
 
     # all users that are still active
-    participating_user_ids = []
-    others.forEach (other) ->
-      participating_user_ids.push other.id if other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
-    conversation_et.participating_user_ids participating_user_ids
+    if data.others
+      conversation_et.participating_user_ids data.others
+    else
+      participating_user_ids = data.members.others
+        .filter (other) -> other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
+        .map (other) -> other.id
+      conversation_et.participating_user_ids participating_user_ids
 
     return conversation_et
+
+  ###
+  Merge local database records with remote backend payload.
+  @param local [Array] database records
+  @param remote [Array] backend payload
+  ###
+  merge_conversations: (local, remote) ->
+    return remote.map (remote_conversation, index) ->
+      local_conversation = local.find (c) -> c.id is remote_conversation.id
+      local_conversation ?= id: remote_conversation.id
+      local_conversation.name = remote_conversation.name
+      local_conversation.type = remote_conversation.type
+      local_conversation.creator = remote_conversation.creator
+      local_conversation.status = remote_conversation.members.self.status
+      local_conversation.others = remote_conversation.members.others
+        .filter (other) -> other.status is z.conversation.ConversationStatus.CURRENT_MEMBER
+        .map (other) -> other.id
+
+      if not local_conversation.last_event_timestamp
+        # TODO: we can remove this once BE removed last_event_time
+        if remote_conversation.last_event_time?
+          local_conversation.last_event_timestamp = new Date(remote_conversation.last_event_time).getTime()
+        else
+          local_conversation.last_event_timestamp = index + 1 # this should ensure a proper order
+
+      # some archived timestamp were not properly stored in the database. to fix this
+      # we check if the remote one is newer and update our local timestamp
+      remote_archived_timestamp = new Date(remote_conversation.members.self.otr_archived_ref).getTime()
+      is_remote_archived_timestamp_newer = local_conversation.archived_timestamp? and remote_archived_timestamp > local_conversation.archived_timestamp
+
+      if not local_conversation.archived_state? or is_remote_archived_timestamp_newer
+        local_conversation.archived_state = remote_conversation.members.self.otr_archived
+        local_conversation.archived_timestamp = remote_archived_timestamp
+
+      remote_muted_timestamp = new Date(remote_conversation.members.self.otr_muted_ref).getTime()
+      is_remote_muted_timestamp_newer = local_conversation.muted_timestamp? and remote_muted_timestamp > local_conversation.muted_timestamp?
+
+      if not local_conversation.muted_state? or is_remote_muted_timestamp_newer
+        local_conversation.muted_state = remote_conversation.members.self.otr_muted
+        local_conversation.muted_timestamp = remote_muted_timestamp
+
+      return local_conversation

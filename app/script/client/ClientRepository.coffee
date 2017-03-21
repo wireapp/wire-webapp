@@ -415,10 +415,10 @@ class z.client.ClientRepository
     if @current_client().type is z.client.ClientType.PERMANENT
       amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LOGOUT,
         action: (clear_data) ->
-          amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, clear_data
+          amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, clear_data
     else
       @delete_temporary_client()
-      .then -> amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReasion.USER_REQUESTED, true
+      .then -> amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, true
 
   ###
   Removes a stored client and the session connected with it.
@@ -598,5 +598,5 @@ class z.client.ClientRepository
     if client_id is @current_client().id
       return @cryptography_repository.storage_repository.delete_cryptography()
       .then =>
-        amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReasion.CLIENT_REMOVED, @current_client().is_temporary()
+        amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.CLIENT_REMOVED, @current_client().is_temporary()
     amplify.publish z.event.WebApp.CLIENT.REMOVE, @self_user().id, client_id

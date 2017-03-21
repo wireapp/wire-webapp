@@ -118,7 +118,7 @@ class z.telemetry.calling.FlowTelemetry
         @logger.debug "Stream has '#{media_type}' flowing properly both ways"
     else
       if @is_answer
-        @logger.info "Check stream statistics of type '#{media_type}' delayed as we created this flow"
+        @logger.info "Check '#{media_type}' statistics delayed as we created this flow"
       else
         window.setTimeout =>
           @check_stream media_type, timeout, attempt++
@@ -131,7 +131,7 @@ class z.telemetry.calling.FlowTelemetry
   schedule_check: (timeout) ->
     window.setTimeout =>
       @check_stream z.media.MediaType.AUDIO, timeout
-      @check_stream z.media.MediaType.VIDEO, timeout if @call_et.is_remote_screen_send() or @call_et.is_remote_video_send()
+      @check_stream z.media.MediaType.VIDEO, timeout if @call_et.local_media_type() in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
     , timeout
 
   ###

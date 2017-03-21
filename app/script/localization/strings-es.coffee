@@ -190,6 +190,10 @@ z.string.es.modal_new_device_headline = '%@.name comenzó a utilizar un disposit
 z.string.es.modal_new_device_headline_many = '%@.names comenzaron a utilizar dispositivos nuevos'
 z.string.es.modal_new_device_headline_you = '%@.name comenzó a utilizar un dispositivo nuevo'
 z.string.es.modal_new_device_message = '¿Desea enviar su mensaje?'
+z.string.es.modal_new_device_call_accept = '¿Acepta la llamada?'
+z.string.es.modal_new_device_call_anyway = 'Llamar de todos modos'
+z.string.es.modal_new_device_call_incoming = '¿Desea aceptar la llamada?'
+z.string.es.modal_new_device_call_outgoing = '¿Desea realizar la llamada?'
 z.string.es.modal_new_device_show_device = 'mostrar dispositivo'
 z.string.es.modal_new_device_send_anyway = 'enviar de todos modos'
 # Remove device
@@ -283,6 +287,8 @@ z.string.es.collection_section_files = 'Ficheros'
 z.string.es.collection_section_audio = 'Mensajes de audio'
 
 # Full Search
+z.string.es.fullsearch_placeholder = 'Buscar mensajes'
+z.string.es.fullsearch_no_results = 'Ningún resultado.'
 
 # Archive
 z.string.es.archive_header = 'Archivar'
@@ -540,7 +546,7 @@ z.string.es.warning_lifecycle_update_link = 'Actualiza ahora'
 # Browser notifications
 z.string.es.system_notification_asset_add = 'Compartió una foto'
 z.string.es.system_notification_connection_accepted = 'Aceptó tu solicitud de conexión'
-z.string.es.system_notification_connection_connected = 'Están conectados'
+z.string.es.system_notification_connection_connected = 'Ahora está conectado'
 z.string.es.system_notification_connection_request = 'Quiere conectar'
 z.string.es.system_notification_conversation_create = '%s.first_name inició una conversación'
 z.string.es.system_notification_conversation_rename = '%s.first_name renombró la conversación a %name'

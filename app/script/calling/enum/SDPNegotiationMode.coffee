@@ -20,7 +20,7 @@ window.z ?= {}
 z.calling ?= {}
 z.calling.enum ?= {}
 
-z.calling.enum.SDPNegotiationMode =
+z.calling.enum.SDP_NEGOTIATION_MODE =
   DEFAULT: 'default'
   ICE_RESTART: 'ice_restart'
   STREAM_CHANGE: 'stream_change'
