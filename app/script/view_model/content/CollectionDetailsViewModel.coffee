@@ -71,7 +71,7 @@ class z.ViewModel.content.CollectionDetailsViewModel
 
   should_show_header: (message_et) =>
     if not @last_message_timestamp?
-      @last_message_timestamp = message_et.timestamp
+      @last_message_timestamp = message_et.timestamp()
       return true
 
     # we passed today

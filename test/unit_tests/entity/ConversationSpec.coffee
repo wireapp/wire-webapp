@@ -273,7 +273,7 @@ describe 'Conversation', ->
       expect(conversation_et.messages().length).toBe 2
       expect(conversation_et.get_last_message().id).toBe message_id
 
-  describe 'add_message', ->
+  xdescribe 'add_message', ->
     message1 = new z.entity.Message()
     message1.id = z.util.create_random_uuid()
     message1.timestamp new Date('2014-12-15T09:21:14.225Z').getTime()
