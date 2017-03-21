@@ -295,6 +295,7 @@ class z.calling.entities.Flow
   _rewrite_payload: (payload) ->
     for ice_server in payload.ice_servers when not ice_server.urls
       ice_server.urls = [ice_server.url]
+      delete ice_server.url
     return payload
 
 
