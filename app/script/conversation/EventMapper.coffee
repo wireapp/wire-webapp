@@ -86,6 +86,8 @@ class z.conversation.EventMapper
         message_et = @_map_verification event
       when z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
         message_et = @_map_system_event_unable_to_decrypt event
+      when z.event.Client.CONVERSATION.MISSED_MESSAGES
+        message_et = @_map_system_missed_messages event
       else
         message_et = @_map_event_ignored()
 
@@ -480,6 +482,16 @@ class z.conversation.EventMapper
     message_et.error_code = event.error_code?.substring(0, 4)
     message_et.client_id = event.error_code?.substring(5).replace(/[()]/g, '')
     return message_et
+
+  ###
+  Maps JSON data of local missed message event to message entity
+
+  @private
+
+  @return [z.entity.MissedMessage] Missed message entity
+  ###
+  _map_system_missed_messages: ->
+    return new z.entity.MissedMessage()
 
   ###
   Maps JSON data of delete everywhere event to message entity

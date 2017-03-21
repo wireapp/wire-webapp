@@ -76,10 +76,18 @@ z.conversation.EventBuilder = do ->
     data:
       deleted_time: time
 
+  build_missed = (conversation_et) ->
+    conversation: conversation_et.id
+    id: z.util.create_random_uuid()
+    type: z.event.Client.CONVERSATION.MISSED_MESSAGES
+    from: conversation_et.self.id
+    time: new Date().toISOString()
+
   return {
     build_all_verified: build_all_verified
     build_degraded: build_degraded
     build_delete: build_delete
+    build_missed: build_missed
     build_unable_to_decrypt: build_unable_to_decrypt
     build_voice_channel_activate: build_voice_channel_activate
     build_voice_channel_deactivate: build_voice_channel_deactivate

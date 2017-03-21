@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-window.z.entity.MissedMessage = class AnnounceService {
+window.z.entity.MissedMessage = class MissedMessage extends z.entity.Message {
 
   constructor() {
     super();
