@@ -358,9 +358,8 @@ z.assets.AssetService = class AssetService {
       xhr.onload = function(event) {
         if (this.status === 201) {
           return resolve(JSON.parse(this.response));
-        } else {
-          return reject(event);
         }
+        return reject(event);
       };
       xhr.onerror = reject;
 

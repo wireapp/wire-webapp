@@ -23,6 +23,6 @@ window.z = window.z || {};
 window.z.assets = z.assets || {};
 
 z.assets.AssetUploadFailedReason = {
-  FAILED: 1,
   CANCELLED: 0,
+  FAILED: 1,
 };
