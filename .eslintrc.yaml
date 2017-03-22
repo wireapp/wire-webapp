@@ -7,9 +7,12 @@ extends:
   "eslint:recommended"
 
 globals:
+  _: true
   $: true
   amplify: true
   ko: true
+  LRUCache: true
+  wire: true
   z: true
 
 rules:

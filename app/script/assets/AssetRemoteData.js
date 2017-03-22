@@ -1,0 +1,128 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+'use strict';
+
+window.z = window.z || {};
+window.z.assets = z.assets || {};
+
+z.assets.AssetRemoteData = class AssetRemoteData {
+
+  /*
+  Use either z.assets.AssetRemoteData.v2 or z.assets.AssetRemoteData.v3
+  to initialize.
+
+  @param {Uint8Array} otr_key
+  @param {Uint8Array} sha256
+  */
+  constructor(otr_key, sha256) {
+    this.otr_key = otr_key;
+    this.sha256 = sha256;
+    this.download_progress = ko.observable();
+    this.cancel_download = undefined;
+    this.generate_url = undefined;
+    this.identifier = undefined;
+  }
+
+  /*
+  Static initializer for v3 assets
+
+  @param {string} asset_key
+  @param {Uint8Array} [otr_key]
+  @param {Uint8Array} [sha256]
+  @param {string} [asset_token]
+  @param {string} [force_caching=false]
+  */
+  static v3(asset_key, otr_key, sha256, asset_token, force_caching = false) {
+    const remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
+    remote_data.generate_url = () => wire.app.service.asset.generate_asset_url_v3(asset_key, asset_token, force_caching);
+    remote_data.identifier = `${asset_key}`;
+    return remote_data;
+  }
+
+  /*
+  Static initializer for v2 assets
+
+  @param {string} conversation_id
+  @param {string} asset_id
+  @param {Uint8Array} otr_key
+  @param {Uint8Array} sha256
+  @param {string} [force_caching=false]
+  */
+  static v2(conversation_id, asset_id, otr_key, sha256, force_caching = false) {
+    const remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
+    remote_data.generate_url = () => wire.app.service.asset.generate_asset_url_v2(asset_id, conversation_id, force_caching);
+    remote_data.identifier = `${conversation_id}${asset_id}`;
+    return remote_data;
+  }
+
+  /*
+  Static initializer for v1 assets
+
+  @deprecated
+  @param {string} conversation_id
+  @param {string} asset_id
+  @param {string} [force_caching=false]
+  */
+  static v1(conversation_id, asset_id, force_caching = false) {
+    const remote_data = new z.assets.AssetRemoteData();
+    remote_data.generate_url = () => wire.app.service.asset.generate_asset_url(asset_id, conversation_id, force_caching);
+    remote_data.identifier = `${conversation_id}${asset_id}`;
+    return remote_data;
+  }
+
+  /*
+  Loads and decrypts stored asset
+
+  @returns {Blob}
+  */
+  load() {
+    let mime_type;
+
+    return this._load_buffer()
+    .then(([buffer, type]) => {
+      mime_type = type;
+      if ((this.otr_key != null) && (this.sha256 != null)) {
+        return z.assets.AssetCrypto.decrypt_aes_asset(buffer, this.otr_key.buffer, this.sha256.buffer);
+      }
+      return buffer;
+    }).then(plaintext => new Blob([new Uint8Array(plaintext)], {mime_type}));
+  }
+
+  /*
+  Get object url for asset remote data. URLs are cached in memory
+
+  @returns {String}
+  */
+  get_object_url() {
+    const object_url = z.assets.AssetURLCache.get_url(this.identifier);
+    if (object_url != null) {
+      return Promise.resolve(object_url);
+    }
+
+    return this.load().then(blob => z.assets.AssetURLCache.set_url(this.identifier, window.URL.createObjectURL(blob)));
+  }
+
+  _load_buffer() {
+    return z.util.load_url_buffer(this.generate_url(), xhr => {
+      xhr.onprogress = event => this.download_progress(Math.round((event.loaded / event.total) * 100));
+      return this.cancel_download = () => xhr.abort.call(xhr);
+    });
+  }
+};
