@@ -20,31 +20,33 @@
 'use strict';
 
 (function() {
-  function AudioError(type) {
-    this.name = this.constructor.name;
-    this.stack = (new Error()).stack;
-    this.type = type || z.audio.AudioError.prototype.TYPE.UNKNOWN;
-    switch (this.type) {
-      case z.audio.AudioError.prototype.TYPE.ALREADY_PLAYING:
-        this.message = 'Sound is already playing';
-        break;
-      case z.audio.AudioError.prototype.TYPE.FAILED_TO_PLAY:
-        this.message = 'Failed to play sound';
-        break;
-      case z.audio.AudioError.prototype.TYPE.IGNORED_SOUND:
-        this.message = 'Ignored request to play sound';
-        break;
-      case z.audio.AudioError.prototype.TYPE.NOT_FOUND:
-        this.message = 'AudioElement or ID not found';
-        break;
-      default:
-        this.message = 'Unknown AudioError';
+  window.z = window.z || {};
+  window.z.audio = z.audio || {};
+
+  class AudioError extends Error {
+    constructor(type) {
+      super();
+      this.name = this.constructor.name;
+      this.stack = (new Error()).stack;
+      this.type = type || z.audio.AudioError.prototype.TYPE.UNKNOWN;
+      switch (this.type) {
+        case z.audio.AudioError.prototype.TYPE.ALREADY_PLAYING:
+          this.message = 'Sound is already playing';
+          break;
+        case z.audio.AudioError.prototype.TYPE.FAILED_TO_PLAY:
+          this.message = 'Failed to play sound';
+          break;
+        case z.audio.AudioError.prototype.TYPE.IGNORED_SOUND:
+          this.message = 'Ignored request to play sound';
+          break;
+        case z.audio.AudioError.prototype.TYPE.NOT_FOUND:
+          this.message = 'AudioElement or ID not found';
+          break;
+        default:
+          this.message = 'Unknown AudioError';
+      }
     }
   }
-
-  AudioError.prototype = new Error();
-
-  AudioError.prototype.constructor = AudioError;
 
   AudioError.prototype.TYPE = {
     ALREADY_PLAYING: 'z.audio.AudioError::TYPE.ALREADY_PLAYING',
@@ -54,8 +56,6 @@
     UNKNOWN: 'z.audio.AudioError::TYPE.UNKNOWN',
   };
 
-  window.z = window.z || {};
-  window.z.audio = z.audio || {};
   window.z.audio.AudioError = AudioError;
 })();
 
