@@ -11,6 +11,10 @@ globals:
   amplify: true
   ko: true
   z: true
+  ko: true
+  wire: true
+  LRUCache: true
+  _: true
 
 rules:
   comma-dangle: [2, always-multiline]
