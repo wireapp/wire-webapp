@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.audio = z.audio || {};
 
-window.z.audio.AudioRepository = class {
+window.z.audio.AudioRepository = class AudioRepository {
   constructor() {
     this.logger = new z.util.Logger('z.audio.AudioRepository', z.config.LOGGER.OPTIONS);
     this.audio_elements = {};
@@ -45,9 +45,9 @@ window.z.audio.AudioRepository = class {
   _check_sound_setting(audio_id) {
     return new Promise((resolve, reject) => {
       if (this.audio_preference() === z.audio.AudioPreference.NONE && !(z.audio.AudioPlayingType.NONE.includes(audio_id))) {
-        reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.IGNORED_SOUND));
+        reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
       } else if (this.audio_preference() === z.audio.AudioPreference.SOME && !(z.audio.AudioPlayingType.SOME.includes(audio_id))) {
-        reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.IGNORED_SOUND));
+        reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
       } else {
         resolve();
       }
@@ -78,7 +78,7 @@ window.z.audio.AudioRepository = class {
       if (this.audio_elements[audio_id]) {
         resolve(this.audio_elements[audio_id]);
       } else {
-        reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.NOT_FOUND));
+        reject(new z.audio.AudioError(z.audio.AudioError.TYPE.NOT_FOUND));
       }
     });
   }
@@ -105,7 +105,7 @@ window.z.audio.AudioRepository = class {
    */
   _play(audio_id, audio_element, play_in_loop = false) {
     if (!audio_id || !audio_element) {
-      return Promise.reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.NOT_FOUND));
+      return Promise.reject(new z.audio.AudioError(z.audio.AudioError.TYPE.NOT_FOUND));
     }
 
     return new Promise((resolve, reject) => {
@@ -127,13 +127,13 @@ window.z.audio.AudioRepository = class {
 
         if (play_promise) {
           play_promise.then(_play_success).catch(() => {
-            reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.FAILED_TO_PLAY));
+            reject(new z.audio.AudioError(z.audio.AudioError.TYPE.FAILED_TO_PLAY));
           });
         } else {
           _play_success();
         }
       } else {
-        reject(new z.audio.AudioError(z.audio.AudioError.prototype.TYPE.ALREADY_PLAYING));
+        reject(new z.audio.AudioError(z.audio.AudioError.TYPE.ALREADY_PLAYING));
       }
     });
   }
