@@ -94,11 +94,9 @@ z.assets.AssetRemoteData = class AssetRemoteData {
   */
   load() {
     let type;
-    let buffer;
 
     return this._load_buffer()
-    .then(data => {
-      [buffer, type] = data;
+    .then(([buffer, type]) => {
       if ((this.otr_key != null) && (this.sha256 != null)) {
         return z.assets.AssetCrypto.decrypt_aes_asset(buffer, this.otr_key.buffer, this.sha256.buffer);
       }
