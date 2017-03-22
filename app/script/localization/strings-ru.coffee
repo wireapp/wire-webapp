@@ -546,7 +546,7 @@ z.string.ru.warning_lifecycle_update_link = 'Обновить сейчас'
 # Browser notifications
 z.string.ru.system_notification_asset_add = 'Поделился(-лась) картинкой'
 z.string.ru.system_notification_connection_accepted = 'Принял(а) ваш запрос на добавление'
-z.string.ru.system_notification_connection_connected = 'Теперь в вашем списке контактов'
+z.string.ru.system_notification_connection_connected = 'Теперь вы подключены'
 z.string.ru.system_notification_connection_request = 'Хочет связаться'
 z.string.ru.system_notification_conversation_create = '%s.first_name начал разговор'
 z.string.ru.system_notification_conversation_rename = '%s.first_name переименовал разговор на %name'

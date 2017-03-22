@@ -546,7 +546,7 @@ z.string.uk.warning_lifecycle_update_link = 'Оновити зараз'
 # Browser notifications
 z.string.uk.system_notification_asset_add = 'Поділився(-лась) картинкою'
 z.string.uk.system_notification_connection_accepted = 'Прийняв(-ла) ваш запит на додавання до контактів'
-z.string.uk.system_notification_connection_connected = 'Уже у вашому списку контактів'
+z.string.uk.system_notification_connection_connected = 'Тепер ви підключені'
 z.string.uk.system_notification_connection_request = 'Хоче бути доданим(-ою) до ваших контактів'
 z.string.uk.system_notification_conversation_create = '%s.first_name почав(-ла) розмову'
 z.string.uk.system_notification_conversation_rename = '%s.first_name перейменував(-ла) розмову на %name'
