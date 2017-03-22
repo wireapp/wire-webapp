@@ -74,6 +74,7 @@ z.event.WebApp =
     EPHEMERAL_MESSAGE_TIMEOUT: 'wire.webapp.conversation.ephemeral-message-timeout'
     LOADED_STATES: 'wire.webapp.conversation.loaded-states'
     MAP_CONNECTIONS: 'wire.webapp.conversation.map-connections'
+    MISSED_EVENTS: 'wire.webapp.conversation.missed-events'
     PEOPLE:
       HIDE: 'wire.webapp.conversation.people.hide'
     PERSIST_STATE: 'wire.webapp.conversation.persist-state'
