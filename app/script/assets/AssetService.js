@@ -108,6 +108,7 @@ z.assets.AssetService = class AssetService {
       });
 
       const small_profile_asset = $.extend(true, {}, medium_asset);
+      small_profile_asset.__proto__ = z.assets.Asset.prototype;
       small_profile_asset.array_buffer = small_image_bytes;
       small_profile_asset.payload.width = small_image.width;
       small_profile_asset.payload.height = small_image.height;
