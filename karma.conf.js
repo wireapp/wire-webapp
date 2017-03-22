@@ -102,7 +102,7 @@ module.exports = function (config) {
         each: {
           statements: 2,
           branches: 0,
-          functions: 1,
+          functions: 0,
           lines: 2
         }
       }

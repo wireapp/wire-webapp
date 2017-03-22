@@ -42,7 +42,7 @@ describe 'z.audio.AudioRepository', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.audio.AudioError
-        expect(error.type).toBe z.audio.AudioError::TYPE.IGNORED_SOUND
+        expect(error.type).toBe z.audio.AudioError.TYPE.IGNORED_SOUND
         done()
 
   describe '_get_sound_by_id', ->
@@ -58,7 +58,7 @@ describe 'z.audio.AudioRepository', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.audio.AudioError
-        expect(error.type).toBe z.audio.AudioError::TYPE.NOT_FOUND
+        expect(error.type).toBe z.audio.AudioError.TYPE.NOT_FOUND
         done()
 
   xdescribe '_play', ->
@@ -91,7 +91,7 @@ describe 'z.audio.AudioRepository', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.audio.AudioError
-        expect(error.type).toBe z.audio.AudioError::TYPE.ALREADY_PLAYING
+        expect(error.type).toBe z.audio.AudioError.TYPE.ALREADY_PLAYING
         done()
       .catch done.fail
 
@@ -99,7 +99,7 @@ describe 'z.audio.AudioRepository', ->
       audio_repository._play undefined, audio_repository.audio_elements[z.audio.AudioType.OUTGOING_CALL]
       .catch (error) ->
         expect(error).toEqual jasmine.any z.audio.AudioError
-        expect(error.type).toBe z.audio.AudioError::TYPE.NOT_FOUND
+        expect(error.type).toBe z.audio.AudioError.TYPE.NOT_FOUND
         done()
       .catch done.fail
 
@@ -107,6 +107,6 @@ describe 'z.audio.AudioRepository', ->
       audio_repository._play z.audio.AudioType.OUTGOING_CALL, undefined
       .catch (error) ->
         expect(error).toEqual jasmine.any z.audio.AudioError
-        expect(error.type).toBe z.audio.AudioError::TYPE.NOT_FOUND
+        expect(error.type).toBe z.audio.AudioError.TYPE.NOT_FOUND
         done()
       .catch done.fail
