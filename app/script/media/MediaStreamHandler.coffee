@@ -206,7 +206,6 @@ class z.media.MediaStreamHandler
       if _.isArray error
         [error, media_type] = error
         @_initiate_media_stream_failure error, media_type, conversation_id
-      @logger.error "Requesting MediaStream failed: #{error.message or error.name}", error
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA, {cause: error.name or error.message, video: video_send}
       throw error
 
@@ -283,6 +282,7 @@ class z.media.MediaStreamHandler
           @_clear_permission_request_hint media_type
           resolve new z.media.MediaStreamInfo z.media.MediaStreamSource.LOCAL, 'self', media_stream
         .catch (error) =>
+          @logger.warn "MediaStream request failed: #{error.name} - #{error.message}"
           @_clear_permission_request_hint media_type
           if error.name in z.calling.rtc.MediaStreamErrorTypes.DEVICE
             error = new z.media.MediaError z.media.MediaError::TYPE.MEDIA_STREAM_DEVICE
