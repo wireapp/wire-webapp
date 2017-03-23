@@ -937,17 +937,21 @@ class z.conversation.ConversationRepository
 
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
-    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message, [message_et.user().id], false
+    @sending_queue.push =>
+      @create_user_client_map conversation_et.id, false, [message_et.user().id]
+      .then (user_client_map) =>
+        @_send_generic_message conversation_et.id, generic_message, user_client_map, false
 
   ###
   Send e-call message in specified conversation.
   @param conversation_et [z.entity.Conversation] Conversation to send e-call message to
   @param e_call_message_et [z.calling.entity.ECallMessage] E-call message
+  @param user_client_map [Object] Contains the intended recipient users and clients
   ###
-  send_e_call: (conversation_et, e_call_message_et) =>
+  send_e_call: (conversation_et, e_call_message_et, user_client_map) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'calling', new z.proto.Calling e_call_message_et.to_content_string()
-    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
+    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message, user_client_map
     .then =>
       if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
         @_track_completed_media_action conversation_et, generic_message, e_call_message_et
@@ -1199,25 +1203,6 @@ class z.conversation.ConversationRepository
       status: z.message.StatusType.SENDING
 
   ###
-  Create a user client map for a given conversation.
-
-  @private
-  @param conversation_id [String] Conversation ID
-  @param skip_own_clients [Boolean] True, if other own clients should be skipped (to not sync messages on own clients)
-  @return [Promise<Object>] Promise that resolves with a user client map
-  ###
-  _create_user_client_map: (conversation_id, skip_own_clients = false) ->
-    @get_all_users_in_conversation conversation_id
-    .then (user_ets) ->
-      user_client_map = {}
-
-      for user_et in user_ets
-        continue if skip_own_clients and user_et.is_me
-        user_client_map[user_et.id] = (client_et.id for client_et in user_et.devices())
-
-      return user_client_map
-
-  ###
   Create a user client map for given IDs.
 
   @private
@@ -1269,6 +1254,25 @@ class z.conversation.ConversationRepository
   # Send Generic Messages
   ###############################################################################
 
+  ###
+  Create a user client map for a given conversation.
+
+  @param conversation_id [String] Conversation ID
+  @param user_ids [Array<String>] Optionally the intended recipient users
+  @param skip_own_clients [Boolean] True, if other own clients should be skipped (to not sync messages on own clients)
+  @return [Promise<Object>] Promise that resolves with a user client map
+  ###
+  create_user_client_map: (conversation_id, skip_own_clients = false, user_ids) ->
+    @get_all_users_in_conversation conversation_id
+    .then (user_ets) ->
+      user_client_map = {}
+
+      for user_et in user_ets when user_id not in user_ids
+        continue if skip_own_clients and user_et.is_me
+        user_client_map[user_et.id] = (client_et.id for client_et in user_et.devices())
+
+      return user_client_map
+
   _send_and_inject_generic_message: (conversation_et, generic_message, sync_timestamp = true) =>
     Promise.resolve()
     .then =>
@@ -1313,32 +1317,40 @@ class z.conversation.ConversationRepository
 
       @conversation_service.update_message_in_db message_et, changes
 
+  _prepare_user_client_map: (conversation_id, skip_own_clients = false, user_client_map) ->
+    if user_client_map
+      client_map_promise = Promise.resolve user_client_map
+    else
+      client_map_promise = @create_user_client_map conversation_id, skip_own_clients
+
+    client_map_promise.then (user_client_map) =>
+      if skip_own_clients or user_client_map
+        user_ids = Object.keys user_client_map
+      return [user_client_map, user_ids]
+
   ###
   Send encrypted external message
 
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Generic message to be sent as external message
-  @param user_ids [Array<String>] Optional array of user IDs to limit sending to
+  @param user_client_map [Object] Optional object containing recipient users and their clients
   @param native_push [Boolean] Optional if message should enforce native push
   @return [Promise] Promise that resolves after sending the external message
   ###
-  _send_external_generic_message: (conversation_id, generic_message, user_ids, native_push = true) =>
+  _send_external_generic_message: (conversation_id, generic_message, user_client_map, native_push = true) =>
     @logger.info "Sending external message of type '#{generic_message.content}'", generic_message
 
+    ciphertext = null
     key_bytes = null
     sha256 = null
-    ciphertext = null
-    skip_own_clients = generic_message.content is 'ephemeral'
+    user_ids = null
 
     z.assets.AssetCrypto.encrypt_aes_asset generic_message.toArrayBuffer()
     .then (data) =>
       [key_bytes, sha256, ciphertext] = data
-      return @_create_user_client_map conversation_id, skip_own_clients
-    .then (user_client_map) =>
-      if user_ids
-        delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
-      if skip_own_clients
-        user_ids = Object.keys user_client_map
+      return @_prepare_user_client_map conversation_id, generic_message.content is 'ephemeral', user_client_map
+    .then (data) =>
+      [user_client_map, user_ids] = data
       generic_message_external = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message_external.set 'external', new z.proto.External new Uint8Array(key_bytes), new Uint8Array(sha256)
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message_external
@@ -1356,23 +1368,21 @@ class z.conversation.ConversationRepository
   @private
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
-  @param user_ids [Array<String>] Optional array of user IDs to limit sending to
+  @param user_client_map [Object] Optional object containing recipient users and their clients
   @param native_push [Boolean] Optional if message should enforce native push
   @return [Promise] Promise that resolves when the message was sent
   ###
-  _send_generic_message: (conversation_id, generic_message, user_ids, native_push = true) =>
+  _send_generic_message: (conversation_id, generic_message, user_client_map, native_push = true) =>
+    user_ids = null
+
     Promise.resolve @_should_send_as_external conversation_id, generic_message
     .then (send_as_external) =>
       if send_as_external
-        @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
+        @_send_external_generic_message conversation_id, generic_message, user_client_map, native_push
       else
-        skip_own_clients = generic_message.content is 'ephemeral'
-        @_create_user_client_map conversation_id, skip_own_clients
-        .then (user_client_map) =>
-          if user_ids
-            delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
-          if skip_own_clients
-            user_ids = Object.keys user_client_map
+        @_prepare_user_client_map conversation_id, generic_message.content is 'ephemeral', user_client_map
+        .then (data) =>
+          [user_client_map, user_ids] = data
           return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
         .then (payload) =>
           payload.native_push = native_push
@@ -1468,7 +1478,7 @@ class z.conversation.ConversationRepository
 
     return @_grant_outgoing_message conversation_et, generic_message
     .then =>
-      return @_create_user_client_map conversation_id, skip_own_clients
+      return @create_user_client_map conversation_id, skip_own_clients
     .then (user_client_map) =>
       if skip_own_clients
         precondition_option = Object.keys user_client_map
@@ -1628,7 +1638,10 @@ class z.conversation.ConversationRepository
       generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
       return generic_message
     .then (generic_message) =>
-      @sending_queue.push => @_send_generic_message conversation_et.id, generic_message, user_ids
+      @sending_queue.push =>
+        @create_user_client_map conversation_et.id, false, user_ids
+        .then (user_client_map) =>
+          @_send_generic_message conversation_et.id, generic_message, user_client_map
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE
     .then =>

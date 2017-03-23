@@ -43,6 +43,8 @@ class z.calling.v3.CallError
         'Unsupported version of the e-call protocol'
       when z.calling.v3.CallError::TYPE.WRONG_PAYLOAD_FORMAT
         'Payload for an e-call message is in wrong format'
+      when z.calling.v3.CallError::TYPE.WRONG_SENDER
+        'Call change from wrong sender'
       else
         'Unknown ECallError'
 
@@ -58,3 +60,4 @@ class z.calling.v3.CallError
     UNKNOWN_EVENT_TYPE: 'z.calling.v3.CallError::TYPE.UNKNOWN_EVENT_TYPE'
     UNSUPPORTED_VERSION: 'z.calling.v3.CallError::TYPE.UNSUPPORTED_VERSION'
     WRONG_PAYLOAD_FORMAT: 'z.calling.v3.CallError::TYPE.WRONG_PAYLOAD_FORMAT'
+    WRONG_SENDER: 'z.calling.v3.CallError::TYPE.WRONG_SENDER'

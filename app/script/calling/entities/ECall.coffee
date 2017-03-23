@@ -224,11 +224,14 @@ class z.calling.entities.ECall
   ###
   Remove an e-participant from the call.
   @param user_id [String] ID of user to be removed from the e-call
+  @param client_id [String] ID of client that requested the removal from the e-call
   @return [z.calling.entities.ECall] E-call entity
   ###
-  delete_e_participant: (user_id) =>
+  delete_e_participant: (user_id, client_id) =>
     @get_e_participant_by_id user_id
     .then (e_participant_et) =>
+      if client_id
+        e_participant_et.verify_client_id client_id
       @interrupted_participants.remove e_participant_et
       @participants.remove e_participant_et
       @_update_remote_state()
@@ -265,12 +268,28 @@ class z.calling.entities.ECall
   update_e_participant: (e_call_message_et) =>
     @get_e_participant_by_id e_call_message_et.user_id
     .then (e_participant_et) =>
+      if e_call_message_et.client_id
+        e_participant_et.verify_client_id e_call_message_et.client_id
       @logger.debug "Updating e-call participant '#{e_participant_et.user.name()}'", e_call_message_et
       e_participant_et.update_state e_call_message_et
       @_update_remote_state()
       return e_participant_et
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
+
+  ###
+  Verify e-call message belongs to e-call by session id.
+
+  @private
+  @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity
+  @return [Undefined] Returns if verification is passed, otherwise throws an error
+  ###
+  verify_session_id: (e_call_message_et) =>
+    return @ if e_call_message_et.session_id is @session_id
+    @get_e_participant_by_id e_call_message_et.user_id
+    .then (e_participant_et) ->
+      return @ if e_call_message_et.session_id is e_participant_et.session_id
+      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.NOT_FOUND, 'Session IDs not matching'
 
 
   ###############################################################################

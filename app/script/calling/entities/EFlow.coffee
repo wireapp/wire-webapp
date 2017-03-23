@@ -51,6 +51,7 @@ class z.calling.entities.EFlow
     @audio = new z.calling.entities.FlowAudio @, @e_call_et.media_repository.get_audio_context()
 
     # Users
+    @remote_client_id = undefined
     @remote_user = @e_participant_et.user
     @remote_user_id = @remote_user.id
     @self_user_id = @e_call_et.self_user.id
@@ -90,7 +91,7 @@ class z.calling.entities.EFlow
 
         when z.calling.rtc.ICEConnectionState.CLOSED
           @e_participant_et.is_connected false
-          @e_call_et.delete_e_participant @e_participant_et if @e_call_et.self_client_joined()
+          @e_call_et.delete_e_participant @e_participant_et.id if @e_call_et.self_client_joined()
 
         when z.calling.rtc.ICEConnectionState.DISCONNECTED
           @e_participant_et.is_connected false
@@ -113,7 +114,7 @@ class z.calling.entities.EFlow
       switch signaling_state
         when z.calling.rtc.SignalingState.CLOSED
           @logger.debug "PeerConnection with '#{@remote_user.name()}' was closed"
-          @e_call_et.delete_e_participant @e_participant_et
+          @e_call_et.delete_e_participant @e_participant_et.id
           @_remove_media_stream @media_stream()
 
         when z.calling.rtc.SignalingState.REMOTE_OFFER
@@ -222,6 +223,7 @@ class z.calling.entities.EFlow
   ###
   initialize_e_flow: (e_call_message_et) =>
     if e_call_message_et
+      @remote_client_id = e_call_message_et.client_id
       @is_answer true
       return @save_remote_sdp e_call_message_et
     @is_answer false
@@ -390,12 +392,7 @@ class z.calling.entities.EFlow
       @logger.info "Received confirmation for e-call '#{e_call_message.type}' message via data channel", e_call_message
     else
       @logger.info "Received e-call '#{e_call_message.type}' message via data channel", e_call_message
-
-    amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND,
-      conversation: @conversation_id
-      from: @id
-      content: e_call_message
-      type: z.event.Client.CALL.E_CALL
+    amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND, z.conversation.EventBuilder.build_calling @e_call_et.conversation_et, e_call_message, @remote_client_id
 
   _on_open: (event) =>
     data_channel = event.target
