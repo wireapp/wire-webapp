@@ -455,11 +455,12 @@ z.assets.AssetService = class AssetService {
       if (typeof filter === 'function' ? filter() : undefined) {
         return buffer;
       }
-      const image_worker = new z.util.Worker(worker);
-      return image_worker.post(buffer);
-    }).then(compressed_bytes => {
+      return new z.util.Worker(worker).post(buffer);
+    })
+    .then(compressed_bytes => new Uint8Array(compressed_bytes))
+    .then(compressed_bytes => {
       return Promise.all([
-        z.util.load_image(new Blob([new Uint8Array(compressed_bytes)], {'type': image.type})),
+        z.util.load_image(new Blob([compressed_bytes], {'type': image.type})),
         compressed_bytes,
       ]);
     });
