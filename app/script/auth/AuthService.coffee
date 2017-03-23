@@ -92,7 +92,7 @@ class z.auth.AuthService
         error: (jqXHR, textStatus, errorThrown) =>
           if jqXHR.status is z.service.BackendClientError::STATUS_CODE.FORBIDDEN
             @logger.error "Requesting access token failed after #{retry_attempt} attempt(s): #{errorThrown} - #{jqXHR?.responseJSON?.label}", jqXHR
-            return reject new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
+            return reject new z.auth.AccessTokenError z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN
 
           if retry_attempt <= POST_ACCESS.RETRY_LIMIT
             retry_attempt++
@@ -113,7 +113,7 @@ class z.auth.AuthService
           else
             @client.request_queue_blocked_state z.service.RequestQueueBlockedState.NONE
             @save_access_token_in_client()
-            return reject new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.RETRIES_EXCEEDED
+            return reject new z.auth.AccessTokenError z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED
 
   ###
   Resend an email or phone activation code.

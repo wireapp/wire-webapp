@@ -129,11 +129,11 @@ class z.auth.AuthRepository
       @auth_service.client.execute_request_queue()
       amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED
     .catch (error) =>
-      if error.type is z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN or z.util.Environment.frontend.is_localhost()
+      if error.type is z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN or z.util.Environment.frontend.is_localhost()
         @logger.warn "Session expired on access token refresh: #{error.message}", error
         Raygun.send error
         amplify.publish z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.SESSION_EXPIRED, false, true
-      else if error.type isnt z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
+      else if error.type isnt z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS
         @logger.error "Refreshing access token failed: '#{error.type}'", error
         amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
 
@@ -149,7 +149,7 @@ class z.auth.AuthRepository
         @_schedule_token_refresh z.util.StorageUtil.get_value z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION
         resolve()
       else
-        reject new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE
+        reject new z.auth.AccessTokenError z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE
 
   ###
   Initially get access-token provided a valid cookie.
@@ -157,7 +157,7 @@ class z.auth.AuthRepository
   ###
   get_access_token: =>
     if @auth_service.client.request_queue_blocked_state() is z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH
-      return Promise.reject new z.auth.AccessTokenError z.auth.AccessTokenError::TYPE.REFRESH_IN_PROGRESS
+      return Promise.reject new z.auth.AccessTokenError z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS
 
     return @auth_service.post_access()
     .then (access_token) =>
