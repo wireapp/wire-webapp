@@ -84,9 +84,14 @@ class z.ViewModel.list.ConversationListViewModel
 
     @self_stream_state = @calling_repository.self_stream_state
 
-    @show_toggle_screen = ko.pureComputed ->
+    @joined_v3_call = ko.pureComputed =>
+      return @joined_call()? and @joined_call() instanceof z.calling.entities.ECall
+
+    @show_toggle_screen = ko.pureComputed =>
+      return false if @joined_v3_call()
       return z.calling.CallingRepository.supports_screen_sharing()
     @show_toggle_video = ko.pureComputed =>
+      return false if @joined_v3_call() and @calling_repository.media_repository.stream_handler.local_media_type() is z.media.MediaType.AUDIO
       return @joined_call()?.conversation_et.is_one2one()
     @disable_toggle_screen = ko.pureComputed =>
       return @joined_call()?.is_remote_screen_send()
