@@ -442,10 +442,10 @@ class z.calling.entities.EFlow
       @should_send_local_sdp false
 
       if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
-        e_call_message_et_type = z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_setup @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @v3_call_center.create_payload_setup(@local_sdp().sdp, @remote_user, @remote_client_id)
       else
-        e_call_message_et_type = z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
-      e_call_message_et = new z.calling.entities.ECallMessage e_call_message_et_type, @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @v3_call_center.create_setup_payload @local_sdp().sdp
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_update @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @v3_call_center.create_payload_setup(@local_sdp().sdp, @remote_user, @remote_client_id)
+
       return @e_call_et.send_e_call_event e_call_message_et
       .then =>
         @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND

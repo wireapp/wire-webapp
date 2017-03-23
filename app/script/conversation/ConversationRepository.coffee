@@ -619,7 +619,7 @@ class z.conversation.ConversationRepository
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'cleared', message_content
 
-      @sending_queue.push => @_send_generic_message @self_conversation().id, generic_message
+      @send_generic_message_to_conversation @self_conversation().id, generic_message
       .then =>
         @logger.info "Cleared conversation '#{conversation_et.id}' as read on '#{new Date(cleared_timestamp).toISOString()}'"
       .catch (error) =>
@@ -721,7 +721,7 @@ class z.conversation.ConversationRepository
 
     z.util.load_url_blob url
     .then (blob) =>
-      @send_message message, conversation_et
+      @send_text message, conversation_et
       @upload_images conversation_et, [blob]
 
   ###
@@ -788,7 +788,7 @@ class z.conversation.ConversationRepository
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'lastRead', message_content
 
-      @sending_queue.push => @_send_generic_message @self_conversation().id, generic_message
+      @send_generic_message_to_conversation @self_conversation().id, generic_message
       .then =>
         @logger.info "Marked conversation '#{conversation_et.id}' as read on '#{new Date(timestamp).toISOString()}'"
       .catch (error) =>
@@ -852,7 +852,7 @@ class z.conversation.ConversationRepository
       generic_message.set 'asset', asset
       if conversation_et.ephemeral_timer()
         generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
-      @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
+      @send_generic_message_to_conversation conversation_et.id, generic_message
     .then =>
       event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
       asset = if conversation_et.ephemeral_timer() then generic_message.ephemeral.asset else generic_message.asset
@@ -938,20 +938,22 @@ class z.conversation.ConversationRepository
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
     @sending_queue.push =>
-      @create_user_client_map conversation_et.id, false, [message_et.user().id]
-      .then (user_client_map) =>
-        @_send_generic_message conversation_et.id, generic_message, user_client_map, false
+      @create_user_client_map conversation_et.id, true, [message_et.user().id]
+    .then (user_client_map) =>
+      return @_send_generic_message conversation_et.id, generic_message, user_client_map, [message_et.user().id], false
 
   ###
   Send e-call message in specified conversation.
   @param conversation_et [z.entity.Conversation] Conversation to send e-call message to
   @param e_call_message_et [z.calling.entity.ECallMessage] E-call message
   @param user_client_map [Object] Contains the intended recipient users and clients
+  @param precondition_option [Array<String>|Boolean] Optional level that backend checks for missing clients
   ###
-  send_e_call: (conversation_et, e_call_message_et, user_client_map) =>
+  send_e_call: (conversation_et, e_call_message_et, user_client_map, precondition_option) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'calling', new z.proto.Calling e_call_message_et.to_content_string()
-    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message, user_client_map
+    @sending_queue.push =>
+      return @_send_generic_message conversation_et.id, generic_message, user_client_map, precondition_option
     .then =>
       if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
         @_track_completed_media_action conversation_et, generic_message, e_call_message_et
@@ -1057,37 +1059,7 @@ class z.conversation.ConversationRepository
   send_location: (conversation_et, longitude, latitude, name, zoom) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'location', new z.proto.Location longitude, latitude, name, zoom
-    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
-
-  ###
-  Send text message in specified conversation.
-
-  @param message [String] plain text message
-  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
-  @return [Promise] Promise that resolves after sending the message
-  ###
-  send_message: (message, conversation_et) =>
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'text', new z.proto.Text message
-    if conversation_et.ephemeral_timer()
-      generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
-    @_send_and_inject_generic_message conversation_et, generic_message
-    .then -> return generic_message
-
-  ###
-  Wraps generic message in ephemeral message.
-
-  @param generic_message [z.proto.Message]
-  @param millis [Number] expire time in milliseconds
-  @return [z.proto.Message]
-  ###
-  _wrap_in_ephemeral_message: (generic_message, millis) ->
-    ephemeral = new z.proto.Ephemeral()
-    ephemeral.set 'expire_after_millis', millis
-    ephemeral.set generic_message.content, generic_message[generic_message.content]
-    generic_message = new z.proto.GenericMessage generic_message.message_id
-    generic_message.set 'ephemeral', ephemeral
-    return generic_message
+    @send_generic_message_to_conversation conversation_et.id, generic_message
 
   ###
   Send edited message in specified conversation.
@@ -1110,21 +1082,6 @@ class z.conversation.ConversationRepository
       @send_link_preview message, conversation_et, generic_message
     .catch (error) =>
       @logger.error "Error while editing message: #{error.message}", error
-      throw error
-
-  ###
-  Send text message with link preview in specified conversation.
-
-  @param message [String] plain text message
-  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
-  @return [Promise] Promise that resolves after sending the message
-  ###
-  send_message_with_link_preview: (message, conversation_et) =>
-    @send_message message, conversation_et
-    .then (generic_message) =>
-      @send_link_preview message, conversation_et, generic_message
-    .catch (error) =>
-      @logger.error "Error while sending text message: #{error.message}", error
       throw error
 
   ###
@@ -1173,9 +1130,7 @@ class z.conversation.ConversationRepository
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.setClientAction z.proto.ClientAction.RESET_SESSION
 
-      user_client_map = @_create_user_client_map_from_ids user_id, client_id
-
-      @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+      @cryptography_repository.encrypt_generic_message {"#{user_id}": client_id}, generic_message
       .then (payload) =>
         return @conversation_service.post_encrypted_message conversation_id, payload, true
       .then (response) =>
@@ -1184,6 +1139,36 @@ class z.conversation.ConversationRepository
       .catch (error) =>
         @logger.error "Sending conversation reset failed: #{error.message}", error
         reject error
+
+  ###
+  Send text message in specified conversation.
+
+  @param message [String] plain text message
+  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
+  @return [Promise] Promise that resolves after sending the message
+  ###
+  send_text: (message, conversation_et) =>
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'text', new z.proto.Text message
+    if conversation_et.ephemeral_timer()
+      generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
+    @_send_and_inject_generic_message conversation_et, generic_message
+      .then -> return generic_message
+
+  ###
+  Send text message with link preview in specified conversation.
+
+  @param message [String] plain text message
+  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
+  @return [Promise] Promise that resolves after sending the message
+  ###
+  send_text_with_link_preview: (message, conversation_et) =>
+    @send_text message, conversation_et
+      .then (generic_message) =>
+      @send_link_preview message, conversation_et, generic_message
+      .catch (error) =>
+      @logger.error "Error while sending text message: #{error.message}", error
+      throw error
 
   ###
   Construct event payload.
@@ -1250,6 +1235,22 @@ class z.conversation.ConversationRepository
         status: z.message.StatusType.SENT
         time: event_time
 
+  ###
+  Wraps generic message in ephemeral message.
+
+  @param generic_message [z.proto.Message]
+  @param millis [Number] expire time in milliseconds
+  @return [z.proto.Message]
+  ###
+  _wrap_in_ephemeral_message: (generic_message, millis) ->
+    ephemeral = new z.proto.Ephemeral()
+    ephemeral.set 'expire_after_millis', millis
+    ephemeral.set generic_message.content, generic_message[generic_message.content]
+    generic_message = new z.proto.GenericMessage generic_message.message_id
+    generic_message.set 'ephemeral', ephemeral
+    return generic_message
+
+
   ###############################################################################
   # Send Generic Messages
   ###############################################################################
@@ -1273,6 +1274,15 @@ class z.conversation.ConversationRepository
 
       return user_client_map
 
+  send_generic_message_to_conversation: (conversation_id, generic_message) =>
+    @sending_queue.push =>
+      skip_own_clients = generic_message.content is 'ephemeral'
+      @create_user_client_map conversation_id, skip_own_clients
+      .then (user_client_map) =>
+        if skip_own_clients
+          precondition_option = Object.keys user_client_map
+        return @_send_generic_message conversation_id, generic_message, user_client_map, precondition_option
+
   _send_and_inject_generic_message: (conversation_et, generic_message, sync_timestamp = true) =>
     Promise.resolve()
     .then =>
@@ -1286,8 +1296,7 @@ class z.conversation.ConversationRepository
       return mapped_event
     .then (saved_event) =>
       @on_conversation_event saved_event
-      @sending_queue.push =>
-        @_send_generic_message conversation_et.id, generic_message
+      @send_generic_message_to_conversation conversation_et.id, generic_message
       .then (payload) =>
         if saved_event.type in z.event.EventTypeHandling.STORE
           backend_timestamp = if sync_timestamp then payload.time else undefined
@@ -1317,47 +1326,33 @@ class z.conversation.ConversationRepository
 
       @conversation_service.update_message_in_db message_et, changes
 
-  _prepare_user_client_map: (conversation_id, skip_own_clients = false, user_client_map) ->
-    if user_client_map
-      client_map_promise = Promise.resolve user_client_map
-    else
-      client_map_promise = @create_user_client_map conversation_id, skip_own_clients
-
-    client_map_promise.then (user_client_map) =>
-      if skip_own_clients or user_client_map
-        user_ids = Object.keys user_client_map
-      return [user_client_map, user_ids]
-
   ###
   Send encrypted external message
 
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Generic message to be sent as external message
   @param user_client_map [Object] Optional object containing recipient users and their clients
+  @param precondition_option [Array<String>|Boolean] Optional level that backend checks for missing clients
   @param native_push [Boolean] Optional if message should enforce native push
   @return [Promise] Promise that resolves after sending the external message
   ###
-  _send_external_generic_message: (conversation_id, generic_message, user_client_map, native_push = true) =>
+  _send_external_generic_message: (conversation_id, generic_message, user_client_map, precondition_option, native_push = true) =>
     @logger.info "Sending external message of type '#{generic_message.content}'", generic_message
 
     ciphertext = null
     key_bytes = null
     sha256 = null
-    user_ids = null
 
     z.assets.AssetCrypto.encrypt_aes_asset generic_message.toArrayBuffer()
     .then (data) =>
       [key_bytes, sha256, ciphertext] = data
-      return @_prepare_user_client_map conversation_id, generic_message.content is 'ephemeral', user_client_map
-    .then (data) =>
-      [user_client_map, user_ids] = data
       generic_message_external = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message_external.set 'external', new z.proto.External new Uint8Array(key_bytes), new Uint8Array(sha256)
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message_external
     .then (payload) =>
       payload.data = z.util.array_to_base64 ciphertext
       payload.native_push = native_push
-      @_send_encrypted_message conversation_id, generic_message, payload, user_ids
+      @_send_encrypted_message conversation_id, generic_message, payload, precondition_option
     .catch (error) =>
       @logger.info 'Failed sending external message', error
       throw error
@@ -1369,27 +1364,23 @@ class z.conversation.ConversationRepository
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
   @param user_client_map [Object] Optional object containing recipient users and their clients
+  @param precondition_option [Array<String>|Boolean] Optional level that backend checks for missing clients
   @param native_push [Boolean] Optional if message should enforce native push
   @return [Promise] Promise that resolves when the message was sent
   ###
-  _send_generic_message: (conversation_id, generic_message, user_client_map, native_push = true) =>
-    user_ids = null
-
-    Promise.resolve @_should_send_as_external conversation_id, generic_message
+  _send_generic_message: (conversation_id, generic_message, user_client_map, precondition_option, native_push = true) =>
+    @_should_send_as_external conversation_id, generic_message
     .then (send_as_external) =>
       if send_as_external
-        @_send_external_generic_message conversation_id, generic_message, user_client_map, native_push
+        @_send_external_generic_message conversation_id, generic_message, user_client_map, precondition_option, native_push
       else
-        @_prepare_user_client_map conversation_id, generic_message.content is 'ephemeral', user_client_map
-        .then (data) =>
-          [user_client_map, user_ids] = data
-          return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+        return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
         .then (payload) =>
           payload.native_push = native_push
-          @_send_encrypted_message conversation_id, generic_message, payload, user_ids
+          @_send_encrypted_message conversation_id, generic_message, payload, precondition_option
     .catch (error) =>
       if error?.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
-        return @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
+        return @_send_external_generic_message conversation_id, generic_message, user_client_map, precondition_option, native_push
       throw error
 
   ###
@@ -1627,9 +1618,9 @@ class z.conversation.ConversationRepository
 
   @param conversation_et [z.entity.Conversation]
   @param message_et [z.entity.Message]
-  @param user_ids [Array<String>] Optional array of user IDs to limit sending to
+  @param precondition_option [Array<String>|Boolean] Optional level that backend checks for missing clients
   ###
-  delete_message_everyone: (conversation_et, message_et, user_ids) =>
+  delete_message_everyone: (conversation_et, message_et, precondition_option) =>
     Promise.resolve()
     .then ->
       if not message_et.user().is_me and not message_et.ephemeral_expires()
@@ -1639,9 +1630,9 @@ class z.conversation.ConversationRepository
       return generic_message
     .then (generic_message) =>
       @sending_queue.push =>
-        @create_user_client_map conversation_et.id, false, user_ids
+        @create_user_client_map conversation_et.id, false, precondition_option
         .then (user_client_map) =>
-          @_send_generic_message conversation_et.id, generic_message, user_client_map
+          return @_send_generic_message conversation_et.id, generic_message, user_client_map, precondition_option
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE
     .then =>
@@ -1663,7 +1654,7 @@ class z.conversation.ConversationRepository
       generic_message.set 'hidden', new z.proto.MessageHide conversation_et.id, message_et.id
       return generic_message
     .then (generic_message) =>
-      @sending_queue.push => @_send_generic_message @self_conversation().id, generic_message
+      @send_generic_message_to_conversation @self_conversation().id, generic_message
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL
     .then =>

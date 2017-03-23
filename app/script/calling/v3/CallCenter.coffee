@@ -78,37 +78,11 @@ class z.calling.v3.CallCenter
     if event.content.version not in V3_CALL_CONFIG.SUPPORTED_VERSIONS
       throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.UNSUPPORTED_VERSION
 
-    e_call_message_et = @_map_e_call_message event
+    e_call_message_et = z.calling.mapper.ECallMessageMapper.map_event event
 
     if z.calling.CallingRepository.supports_calling()
       return @_on_event_in_supported_browsers e_call_message_et
     return @_on_event_in_unsupported_browsers e_call_message_et
-
-  ###
-  Map incoming e-call message into entity.
-  @private
-  @param event [Object] E-call event object
-  @return [z.calling.entities.ECallMessage] E-call message entity
-  ###
-  _map_e_call_message: (event) ->
-    e_call_message = event.content
-
-    additional_properties =
-      conversation_id: event.conversation
-      time: event.time
-      user_id: event.from
-      client_id: event.sender
-
-    content = switch e_call_message.type
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
-        props: e_call_message.props
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
-        props: e_call_message.props
-        sdp: e_call_message.sdp
-
-    $.extend additional_properties, content if content
-
-    return new z.calling.entities.ECallMessage e_call_message.type, e_call_message.resp, e_call_message.sessid, additional_properties
 
   ###
   E-call event handling for browsers supporting calling.
@@ -279,6 +253,12 @@ class z.calling.v3.CallCenter
   # Outbound e-call events
   ###############################################################################
 
+  create_payload_setup: (local_sdp, remote_user, remote_client_id) =>
+    return @_create_payload_prop_sync @self_state.video_send(),
+      remote_user: remote_user
+      remote_client_id: remote_client_id
+      sdp: local_sdp
+
   ###
   Send an e-call event.
   @param conversation_et [z.entity] Conversation to send message in
@@ -296,68 +276,88 @@ class z.calling.v3.CallCenter
     .catch (error) =>
       throw error if error.type not in [z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED , z.calling.v3.CallError::TYPE.NOT_FOUND]
       @logger.debug "Sending e-call '#{e_call_message_et.type}' message to conversation '#{conversation_et.id}'", e_call_message_et.to_JSON()
-      @_create_client_user_map conversation_et, e_call_message_et
-      .then (client_user_map) =>
-        @conversation_repository.send_e_call conversation_et, e_call_message_et, client_user_map
+      @_limit_message_recipients conversation_et, e_call_message_et
+      .then ([client_user_map, precondition_option]) =>
+        @conversation_repository.send_e_call conversation_et, e_call_message_et, client_user_map, precondition_option
+
+  _create_additional_payload: (conversation_id, remote_user_id, remote_client_id) ->
+    return {
+      conversation_id: conversation_id
+      remote_client_id: remote_client_id
+      remote_user_id: remote_user_id
+      time: new Date().toISOString()
+      user_id: @user_repository.self().id
+    }
 
   ###
   Create properties payload for e-call events.
-  @param force_video_send [Boolean] Video send state to be forced to true
-  @param media_type [z.media.MediaType.SCREEN|Boolean] Media type of property change or forced videosend state
+
+  @private
+  @param payload_type [z.media.MediaType.SCREEN|Boolean] Media type of property change or forced videosend state
+  @param additional_payload [Object] Optional additional payload to be added
   @return [Object] E-call message props object
   ###
-  create_prop_sync_payload: (payload_type) ->
+  _create_payload_prop_sync: (payload_type, additional_payload) ->
     if _.isBoolean payload_type
-      return props: videosend: "#{payload_type}"
+      payload = props: videosend: "#{payload_type}"
     else
       switch payload_type
         when z.media.MediaType.AUDIO
-          return props: audiosend: "#{@self_state.audio_send()}"
+          payload = props: audiosend: "#{@self_state.audio_send()}"
         when z.media.MediaType.SCREEN, z.media.MediaType.VIDEO
-          return props:
+          payload = props:
             screensend: "#{@self_state.screen_send()}"
             videosend: "#{@self_state.video_send()}"
 
-  create_setup_payload: (local_sdp) ->
-    return $.extend @create_prop_sync_payload(@self_state.video_send()), sdp: local_sdp
+    if additional_payload
+      payload = $.extend payload, additional_payload
+    return payload
 
-  _create_client_user_map: (conversation_et, e_call_message_et) ->
+  _confirm_e_call_message: (e_call_et, incoming_e_call_message_et) ->
+    return unless incoming_e_call_message_et.response is false
+
+    additional_payload = @_create_additional_payload incoming_e_call_message_et.conversation_id, incoming_e_call_message_et.user_id, incoming_e_call_message_et.sender_id
+    switch incoming_e_call_message_et.type
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_hangup true, e_call_et.session_id, additional_payload
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync true, e_call_et.session_id, @_create_payload_prop_sync(z.media.MediaType.VIDEO, additional_payload)
+
+    @send_e_call_event e_call_et.conversation_et, e_call_message_et
+
+  _limit_message_recipients: (conversation_et, e_call_message_et) ->
     return Promise.resolve undefined
     switch e_call_message_et.type
       when z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
         if e_call_message_et.response is true
           # Send to client that initiated call of remote user
-          return "#{remote_user_id}": ["#{remote_client_id}"]
+          user_client_map = "#{remote_user_id}": ["#{remote_client_id}"]
+          precondition_option = true
         else
           # Send to all clients of remote user
-          return "#{remote_user_id}": (device.id for device in remote_user.devices())
+          user_client_map = "#{remote_user_id}": (device.id for device in remote_user.devices())
+          precondition_option = [remote_user_id]
       when z.calling.enum.E_CALL_MESSAGE_TYPE.IGNORE
         # Send to all clients of self user
-        return "#{@user_repository.self().id}": (device.id for device in @user_repository.self().devices())
+        user_client_map = "#{@user_repository.self().id}": (device.id for device in @user_repository.self().devices())
+        precondition_option = [@user_repository.self().id]
       when z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
         # Send to remote client that initiated call
-        return "#{remote_user_id}": ["#{remote_client_id}"]
+        user_client_map = "#{remote_user_id}": ["#{remote_client_id}"]
+        precondition_option = true
       when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
         if e_call_message_et.response is true
           # Send to client that initiated call of remote user and all clients of self user
-          return {
+          user_client_map =
             "#{remote_user_id}": ["#{remote_client_id}"]
             "#{@user_repository.self().id}": (device.id for device in @user_repository.self().devices())
-          }
+          precondition_option = [@user_repository.self().id]]
         else
           # Send to all clients of remote user
-          return "#{remote_user_id}": (device.id for device in remote_user.devices())
+          user_client_map = "#{remote_user_id}": (device.id for device in remote_user.devices())
+          precondition_option = [remote_user_id]
 
-  _confirm_e_call_message: (e_call_et, incoming_e_call_message_et) ->
-    return unless incoming_e_call_message_et.response is false
-
-    switch incoming_e_call_message_et.type
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
-        e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, true, e_call_et.session_id, user_id: incoming_e_call_message_et.user_id, client_id: incoming_e_call_message_et.sender_id
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
-        e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, true, e_call_et.session_id, @create_prop_sync_payload z.media.MediaType.VIDEO
-
-    @send_e_call_event e_call_et.conversation_et, e_call_message_et
+    return [user_client_map, precondition_option]
 
 
   ###############################################################################
@@ -393,11 +393,8 @@ class z.calling.v3.CallCenter
       e_call_et.state z.calling.enum.CallState.IGNORED
       @media_stream_handler.reset_media_stream()
 
-      additional_payload =
-        conversation_id: conversation_id
-        time: new Date().toISOString()
-        user_id: @user_repository.self().id
-      e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.IGNORE, false, e_call_et.session_id, additional_payload
+      e_call_message_et = z.calling.mapper.ECallMessageMapper.build_ignore false, e_call_et.session_id, @_create_additional_payload conversation_id
+
       @send_e_call_event e_call_et.conversation_et, e_call_message_et
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
@@ -414,9 +411,7 @@ class z.calling.v3.CallCenter
     .catch (error) =>
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
-      additional_payload = $.extend @create_prop_sync_payload(video_send), conversation_id: conversation_id
-      e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, false, undefined, additional_payload
-      @_create_outgoing_e_call e_call_message_et
+      @_create_outgoing_e_call z.calling.mapper.ECallMessageMapper.build_prop_sync false, undefined, @_create_payload_prop_sync(video_send, conversation_id: conversation_id)
     .then (e_call) =>
       e_call_et = e_call
       @logger.debug "Joining e-call in conversation '#{conversation_id}'", e_call_et
@@ -451,13 +446,14 @@ class z.calling.v3.CallCenter
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
       e_call_et.termination_reason = termination_reason if termination_reason and not e_call_et.termination_reason
 
-      e_call_message_type = if e_call_et.is_connected() then z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP else z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
-      additional_payload =
-        conversation_id: conversation_id
-        time: new Date().toISOString()
-        user_id: @user_repository.self().id
-      e_call_message_et = new z.calling.entities.ECallMessage e_call_message_type, false, e_call_et.session_id, additional_payload
-      @send_e_call_event e_call_et.conversation_et, e_call_message_et
+      for e_flow_et in e_call_et.get_flows()[0]
+        additional_payload = @_create_additional_payload conversation_id, e_flow_et.remote_user_id, e_flow_et.remote_client_id
+        if e_call_et.is_connected()
+          e_call_message_et = z.calling.mapper.ECallMessageMapper.build_hangup false, e_call_et.session_id, additional_payload
+        else
+          e_call_message_et = z.calling.mapper.ECallMessageMapper.build_cancel false, e_call_et.session_id, additional_payload
+
+        @send_e_call_event e_call_et.conversation_et, e_call_message_et
 
       if e_call_et.participants().length < 2
         @delete_call conversation_id
@@ -490,8 +486,10 @@ class z.calling.v3.CallCenter
           @media_stream_handler.toggle_video_send()
 
       toggle_promise.then =>
-        e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, false, e_call_et.session_id, @create_prop_sync_payload media_type
-        @send_e_call_event e_call_et.conversation_et, e_call_message_et
+        for e_flow_et in e_call_et.get_flows()
+          additional_payload = @_create_additional_payload conversation_id, e_flow_et.remote_user_id, e_flow_et.remote_client_id
+          e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync false, e_call_et.session_id, @_create_payload_prop_sync(media_type, additional_payload)
+          @send_e_call_event e_call_et.conversation_et, e_call_message_et
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
