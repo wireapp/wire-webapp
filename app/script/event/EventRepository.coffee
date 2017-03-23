@@ -184,7 +184,7 @@ class z.event.EventRepository
         # When asking for notifications with a since set to a notification ID that does not belong to our client ID,
         #   we will get a 404 AND notifications
         if error_response.notifications
-          amplify.publish z.event.WebApp.CONVERSATION.MISSED_EVENTS # TODO only publish once
+          amplify.publish z.event.WebApp.CONVERSATION.MISSED_EVENTS
           _got_notifications error_response
         else if error_response.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
           @logger.info "No notifications found since '#{notification_id}'", error_response
