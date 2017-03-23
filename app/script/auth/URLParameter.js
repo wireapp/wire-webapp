@@ -31,5 +31,5 @@ z.auth.URLParameter = {
   EXPIRED: 'expired',
   INVITE: 'invite',
   LOCALE: 'hl',
-  LOCALYTICS: 'localytics'
+  LOCALYTICS: 'localytics',
 };
