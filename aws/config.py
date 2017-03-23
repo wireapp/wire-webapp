@@ -29,9 +29,9 @@ PUBLIC_KEY_PINS_REPORT_ONLY = os.environ.get('PUBLIC_KEY_PINS_REPORT_ONLY', '')
 PUBLIC_KEY_PINS = os.environ.get('PUBLIC_KEY_PINS', '')
 
 SUPPORTED = {
-  'chrome': 52,
-  'firefox': 45,
-  'opera': 41,
+  'chrome': 55,
+  'firefox': 52,
+  'opera': 42,
   'msedge': 14,
 }
 

@@ -200,11 +200,6 @@ z.string.fi.modal_session_reset_message_2 = 'meihin.'
 # Too many members in conversation
 z.string.fi.modal_too_many_members_headline = 'Talo täynnä'
 z.string.fi.modal_too_many_members_message = 'Maksimissaan %max henkilöä voi liittyä keskusteluun. Tässä keskustelussa on tilaa %no hengelle.'
-# Whitelist screensharing
-z.string.fi.modal_whitelist_screensharing_headline = 'Wire tarvitsee luvan jakaa näyttösi'
-z.string.fi.modal_whitelist_screensharing_message_1 = 'Avaa about:config ja lisää *.wire.com näytön jakamisen sallivaan verkkotunnus-listaan'
-z.string.fi.modal_whitelist_screensharing_message_link = 'UKK'
-z.string.fi.modal_whitelist_screensharing_message_2 = 'lisätiedoille.'
 # Parallel uploads
 z.string.fi.modal_uploads_parallel = 'Voit lähettää jopa %no tiedostoa samaan aikaan.'
 

@@ -70,11 +70,11 @@ class z.entity.Asset
   ###
   is_video: ->
     is_video_asset = @type is z.assets.AssetType.FILE and @file_type?.startsWith 'video'
-    is_supported_browser = not (z.util.Environment.browser.firefox and platform.version < 49)
-    if is_video_asset and is_supported_browser
+    if is_video_asset
       can_play = document.createElement('video').canPlayType @file_type
       return true if can_play isnt ''
     return false
+
   ###
   Check if asset is a audio.
 

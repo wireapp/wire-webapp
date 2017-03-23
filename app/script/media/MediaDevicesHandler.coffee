@@ -97,7 +97,7 @@ class z.media.MediaDevicesHandler
 
     @current_device_id.audio_input.subscribe (media_device_id) =>
       z.util.StorageUtil.set_value z.media.MediaDeviceType.AUDIO_INPUT, media_device_id
-      if media_device_id and @media_repository.stream_handler.local_media_streams.audio()
+      if media_device_id and @media_repository.stream_handler.local_media_stream()
         @media_repository.stream_handler.replace_input_source z.media.MediaType.AUDIO
         @_update_current_index_from_id z.media.MediaDeviceType.AUDIO_INPUT, media_device_id
 
@@ -108,13 +108,13 @@ class z.media.MediaDevicesHandler
         @_update_current_index_from_id z.media.MediaDeviceType.AUDIO_OUTPUT, media_device_id
 
     @current_device_id.screen_input.subscribe (media_device_id) =>
-      if media_device_id and @media_repository.stream_handler.local_media_streams.video() and @media_repository.stream_handler.local_media_type() is z.media.MediaType.SCREEN
+      if media_device_id and @media_repository.stream_handler.local_media_stream() and @media_repository.stream_handler.local_media_type() is z.media.MediaType.SCREEN
         @media_repository.stream_handler.replace_input_source z.media.MediaType.SCREEN
         @_update_current_index_from_id z.media.MediaDeviceType.SCREEN_INPUT, media_device_id
 
     @current_device_id.video_input.subscribe (media_device_id) =>
       z.util.StorageUtil.set_value z.media.MediaDeviceType.VIDEO_INPUT, media_device_id
-      if media_device_id and @media_repository.stream_handler.local_media_streams.video() and @media_repository.stream_handler.local_media_type() is z.media.MediaType.VIDEO
+      if media_device_id and @media_repository.stream_handler.local_media_stream() and @media_repository.stream_handler.local_media_type() is z.media.MediaType.VIDEO
         @media_repository.stream_handler.replace_input_source z.media.MediaType.VIDEO
         @_update_current_index_from_id z.media.MediaDeviceType.VIDEO_INPUT, media_device_id
 
