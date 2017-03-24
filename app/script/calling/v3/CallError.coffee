@@ -33,6 +33,8 @@ class z.calling.v3.CallError
         'No conversation ID given'
       when z.calling.v3.CallError::TYPE.NO_REPLACEABLE_TRACK
         'No replaceable MediaStreamTrack found'
+      when z.calling.v3.CallError::TYPE.NO_USER_ID
+        'User ID to target message not given'
       when z.calling.v3.CallError::TYPE.NOT_FOUND
         'No e-call for conversation ID found'
       when z.calling.v3.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
@@ -54,6 +56,7 @@ class z.calling.v3.CallError
     DATA_CHANNEL_NOT_OPENED: 'z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED'
     NO_CONVERSATION_ID: 'z.calling.v3.CallError::TYPE.NO_CONVERSATION_ID'
     NO_REPLACEABLE_TRACK: 'z.calling.v3.CallError::TYPE.NO_REPLACEABLE_TRACK'
+    NO_USER_ID: 'z.calling.v3.CallError::TYPE.NO_USER_ID'
     NOT_FOUND: 'z.calling.v3.CallError::TYPE.NOT_FOUND'
     RTP_SENDER_NOT_SUPPORTED: 'z.calling.v3.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED'
     UNKNOWN: 'z.calling.v3.CallError::TYPE.UNKNOWN'

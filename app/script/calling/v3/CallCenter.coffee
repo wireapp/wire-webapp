@@ -253,12 +253,6 @@ class z.calling.v3.CallCenter
   # Outbound e-call events
   ###############################################################################
 
-  create_payload_setup: (local_sdp, remote_user, remote_client_id) =>
-    return @_create_payload_prop_sync @self_state.video_send(),
-      remote_user: remote_user
-      remote_client_id: remote_client_id
-      sdp: local_sdp
-
   ###
   Send an e-call event.
   @param conversation_et [z.entity] Conversation to send message in
@@ -326,38 +320,48 @@ class z.calling.v3.CallCenter
     @send_e_call_event e_call_et.conversation_et, e_call_message_et
 
   _limit_message_recipients: (conversation_et, e_call_message_et) ->
-    return Promise.resolve undefined
-    switch e_call_message_et.type
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
-        if e_call_message_et.response is true
-          # Send to remote client that initiated call
-          user_client_map = "#{remote_user_id}": ["#{remote_client_id}"]
-          precondition_option = true
-        else
-          # Send to all clients of remote user
-          user_client_map = "#{remote_user_id}": (device.id for device in remote_user.devices())
-          precondition_option = [remote_user_id]
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
-        # Send to remote client that call is connected with
-        user_client_map = "#{remote_user_id}": ["#{remote_client_id}"]
-        precondition_option = true
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.IGNORE
-        # Send to all clients of self user
-        user_client_map = "#{@user_repository.self().id}": (device.id for device in @user_repository.self().devices())
-        precondition_option = [@user_repository.self().id]
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
-        if e_call_message_et.response is true
-          # Send to remote client that initiated call and all clients of self user
-          user_client_map =
-            "#{remote_user_id}": ["#{remote_client_id}"]
-            "#{@user_repository.self().id}": (device.id for device in @user_repository.self().devices())
-          precondition_option = [@user_repository.self().id]
-        else
-          # Send to all clients of remote user
-          user_client_map = "#{remote_user_id}": (device.id for device in remote_user.devices())
-          precondition_option = [remote_user_id]
+    remote_user = e_call_message_et.remote_user
+    remote_user_id = e_call_message_et.remote_user_id
+    remote_client_id = e_call_message_et.remote_client_id
+    throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.NO_USER_ID if not remote_user_id
 
-    return [user_client_map, precondition_option]
+    if remote_user
+      user_promise = Promise.resolve remote_user
+    else
+      user_promise = new Promise (resolve) =>  @user_repository.get_user_by_id remote_user_id, resolve
+
+    user_promise.then (remote_user) =>
+      switch e_call_message_et.type
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+          if e_call_message_et.response is true
+            # Send to remote client that initiated call
+            precondition_option = true
+            user_client_map = "#{remote_user_id}": ["#{remote_client_id}"]
+          else
+            # Send to all clients of remote user
+            precondition_option = [remote_user_id]
+            user_client_map = "#{remote_user_id}": (device.id for device in remote_user.devices())
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
+          # Send to remote client that call is connected with
+          precondition_option = true
+          user_client_map = "#{remote_user_id}": ["#{remote_client_id}"]
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.IGNORE
+          # Send to all clients of self user
+          precondition_option = [@user_repository.self().id]
+          user_client_map = "#{@user_repository.self().id}": (device.id for device in @user_repository.self().devices())
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+          if e_call_message_et.response is true
+            # Send to remote client that initiated call and all clients of self user
+            precondition_option = [@user_repository.self().id]
+            user_client_map =
+              "#{remote_user_id}": ["#{remote_client_id}"]
+              "#{@user_repository.self().id}": (device.id for device in @user_repository.self().devices())
+          else
+            # Send to all clients of remote user
+            precondition_option = [remote_user_id]
+            user_client_map = "#{remote_user_id}": (device.id for device in remote_user.devices())
+
+      return [user_client_map, precondition_option]
 
 
   ###############################################################################
@@ -446,7 +450,8 @@ class z.calling.v3.CallCenter
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
       e_call_et.termination_reason = termination_reason if termination_reason and not e_call_et.termination_reason
 
-      for e_flow_et in e_call_et.get_flows()[0]
+      e_call_message_et = undefined
+      for e_flow_et in e_call_et.get_flows()
         additional_payload = @_create_additional_payload conversation_id, e_flow_et.remote_user_id, e_flow_et.remote_client_id
         if e_call_et.is_connected()
           e_call_message_et = z.calling.mapper.ECallMessageMapper.build_hangup false, e_call_et.session_id, additional_payload
@@ -457,7 +462,7 @@ class z.calling.v3.CallCenter
 
       if e_call_et.participants().length < 2
         @delete_call conversation_id
-        @_distribute_deactivation_event e_call_message_et, e_call_et.creating_user if e_call_message_type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+        @_distribute_deactivation_event e_call_message_et, e_call_et.creating_user if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 

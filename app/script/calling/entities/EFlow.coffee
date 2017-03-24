@@ -441,11 +441,10 @@ class z.calling.entities.EFlow
       @logger.info "Sending local '#{@local_sdp().type}' SDP containing '#{ice_candidates.length}' ICE candidates for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
       @should_send_local_sdp false
 
-      additional_payload = @v3_call_center.create_payload_setup @local_sdp().sdp, @remote_user, @remote_client_id
       if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
-        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_setup @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, additional_payload
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_setup @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @_create_additional_payload()
       else
-        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_update @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, additional_payload
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_update @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @_create_additional_payload()
 
       return @e_call_et.send_e_call_event e_call_message_et
       .then =>
@@ -521,6 +520,10 @@ class z.calling.entities.EFlow
       attributes = {cause: error.name, step: 'create_sdp', type: z.calling.rtc.SDPType.OFFER}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
       amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED
+
+  _create_additional_payload: ->
+    payload = @v3_call_center._create_additional_payload @e_call_et.id, @remote_user_id, @remote_client_id
+    return @v3_call_center._create_payload_prop_sync @e_call_et.self_state.video_send(), $.extend({remote_user: @remote_user, sdp: @local_sdp().sdp}, payload)
 
   ###
   Sets the local Session Description Protocol on the PeerConnection.

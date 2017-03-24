@@ -24,7 +24,7 @@ z.calling.mapper.ECallMessageMapper = do ->
 
   build_e_call_message = (type, response, session_id, additional_payload) ->
     e_call_message_et = new z.calling.entities.ECallMessage type, response, session_id
-    e_call_message_et.add_payload additional_payload
+    e_call_message_et.add_properties additional_payload
     return e_call_message_et
 
   build_cancel = (response, session_id, additional_payload) ->
@@ -69,7 +69,9 @@ z.calling.mapper.ECallMessageMapper = do ->
 
     $.extend additional_properties, content if content
 
-    return new z.calling.entities.ECallMessage e_call_message.type, e_call_message.resp, e_call_message.sessid, additional_properties
+    e_call_message_et = new z.calling.entities.ECallMessage e_call_message.type, e_call_message.resp, e_call_message.sessid
+    e_call_message_et.add_properties additional_properties
+    return e_call_message_et
 
   return {
     build_cancel: build_cancel
