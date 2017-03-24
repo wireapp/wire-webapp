@@ -33,15 +33,9 @@ z.bot.BotService = class BotService {
   @param {string} bot_name - Bot name registered on backend
   */
   fetch_bot(bot_name) {
-    return new Promise((resolve, reject) => {
-      $.get(`${this.url}${bot_name}/`)
-      .done((data) => {
-        resolve(data.result);
-      }).fail((jqXHR, textStatus, errorThrown) => {
-        this.logger.warn(`Could not find information for bot '${bot_name}': ${errorThrown}`);
-        reject(errorThrown);
-      });
-    });
+    return fetch(`${this.url}${bot_name}/`)
+      .then(response => response.json())
+      .then(json => json.result);
   }
 
   static get URL() {
