@@ -70,6 +70,8 @@ class z.conversation.EventMapper
         message_et = @_map_event_member_leave event
       when z.event.Backend.CONVERSATION.MEMBER_UPDATE
         message_et = @_map_event_member_update event
+      when z.event.Client.CONVERSATION.MISSED_MESSAGES
+        message_et = @_map_system_missed_messages event
       when z.event.Backend.CONVERSATION.RENAME
         message_et = @_map_event_rename event
       when z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
@@ -86,8 +88,6 @@ class z.conversation.EventMapper
         message_et = @_map_verification event
       when z.event.Client.CONVERSATION.UNABLE_TO_DECRYPT
         message_et = @_map_system_event_unable_to_decrypt event
-      when z.event.Client.CONVERSATION.MISSED_MESSAGES
-        message_et = @_map_system_missed_messages event
       else
         message_et = @_map_event_ignored()
 
