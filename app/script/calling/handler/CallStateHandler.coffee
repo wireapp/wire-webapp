@@ -226,7 +226,7 @@ class z.calling.handler.CallStateHandler
     @logger.error "PUTting the state to '#{payload.state}' in '#{conversation_id}' failed: #{error.message}", error
     attributes = {cause: error.label or error.name, method: 'put', request: 'state', video: payload.videod}
     @v2_call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
-    @v2_call_center.media_stream_handler.release_media_streams()
+    @v2_call_center.media_stream_handler.release_media_stream()
     switch error.label
       when z.service.BackendClientError::LABEL.CONVERSATION_TOO_BIG
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_FULL_CONVERSATION,
@@ -318,7 +318,7 @@ class z.calling.handler.CallStateHandler
       call_et.state z.calling.enum.CallState.ENDED
       call_et.reset_call()
       @_remove_call call_et.id
-      @v2_call_center.media_stream_handler.reset_media_streams()
+      @v2_call_center.media_stream_handler.reset_media_stream()
     .catch (error) =>
       @logger.warn "No call found in conversation '#{conversation_id}' to delete", error
 
@@ -331,7 +331,7 @@ class z.calling.handler.CallStateHandler
     .then (call_et) =>
       call_et.ignore()
       @logger.info "Call in '#{conversation_id}' ignored"
-      @v2_call_center.media_stream_handler.reset_media_streams()
+      @v2_call_center.media_stream_handler.reset_media_stream()
     .catch (error) =>
       @logger.warn "No call found in conversation '#{conversation_id}' to ignore", error
 
@@ -353,8 +353,8 @@ class z.calling.handler.CallStateHandler
           with_bot: conversation_et.is_with_bot()
     .then =>
       @v2_call_center.timings = new z.telemetry.calling.CallSetupTimings conversation_id
-      if @v2_call_center.media_stream_handler.has_media_streams()
-        @logger.info 'MediaStream has already been initialized', @v2_call_center.media_stream_handler.local_media_streams
+      if @v2_call_center.media_stream_handler.local_media_stream()
+        @logger.info 'MediaStream has already been initialized', @v2_call_center.media_stream_handler.local_media_stream
       else
         return @v2_call_center.media_stream_handler.initiate_media_stream conversation_id, is_videod
     .then =>
@@ -369,7 +369,7 @@ class z.calling.handler.CallStateHandler
   @param termination_reason [z.calling.enum.TERMINATION_REASON] Optional on reason for call termination
   ###
   leave_call: (conversation_id, termination_reason) =>
-    @v2_call_center.media_stream_handler.release_media_streams()
+    @v2_call_center.media_stream_handler.release_media_stream()
     @v2_call_center.get_call_by_id conversation_id
     .then (call_et) =>
       call_et.state z.calling.enum.CallState.DISCONNECTING
@@ -479,7 +479,7 @@ class z.calling.handler.CallStateHandler
       call_et.state z.calling.enum.CallState.ONGOING if call_et.participants_count() >= 2
 
     if call_et.is_remote_video_send() and call_et.is_ongoing_on_another_client()
-      @v2_call_center.media_stream_handler.release_media_streams()
+      @v2_call_center.media_stream_handler.release_media_stream()
 
 
   ###############################################################################

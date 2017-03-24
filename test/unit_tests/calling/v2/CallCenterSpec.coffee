@@ -397,14 +397,14 @@ describe 'z.calling.v2.CallCenter', ->
         'member_count': 11
         'message': 'too many members for calling'
       }
-      spyOn v2_call_center.media_stream_handler, 'release_media_streams'
+      spyOn v2_call_center.media_stream_handler, 'release_media_stream'
 
       v2_call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.calling.v2.CallError
         expect(error.type).toBe z.calling.v2.CallError::TYPE.CONVERSATION_TOO_BIG
-        expect(v2_call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
+        expect(v2_call_center.media_stream_handler.release_media_stream).toHaveBeenCalled()
         done()
       server.requests[0].respond 409, 'Content-Type': 'application/json', JSON.stringify error_payload
 
@@ -415,14 +415,14 @@ describe 'z.calling.v2.CallCenter', ->
         'max_joined': 5
         'message': 'the voice channel is full'
       }
-      spyOn v2_call_center.media_stream_handler, 'release_media_streams'
+      spyOn v2_call_center.media_stream_handler, 'release_media_stream'
 
       v2_call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.calling.v2.CallError
         expect(error.type).toBe z.calling.v2.CallError::TYPE.VOICE_CHANNEL_FULL
-        expect(v2_call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
+        expect(v2_call_center.media_stream_handler.release_media_stream).toHaveBeenCalled()
         done()
       server.requests[0].respond 409, 'Content-Type': 'application/json', JSON.stringify error_payload
 
@@ -432,13 +432,13 @@ describe 'z.calling.v2.CallCenter', ->
         'label': 'invalid-op'
         'message': 'Nobody left to call'
       }
-      spyOn v2_call_center.media_stream_handler, 'release_media_streams'
+      spyOn v2_call_center.media_stream_handler, 'release_media_stream'
 
       v2_call_center.state_handler._put_state conversation_et.id, {state: z.calling.enum.ParticipantState.JOINED, videod: false}
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.calling.v2.CallError
         expect(error.type).toBe z.calling.v2.CallError::TYPE.CONVERSATION_EMPTY
-        expect(v2_call_center.media_stream_handler.release_media_streams).toHaveBeenCalled()
+        expect(v2_call_center.media_stream_handler.release_media_stream).toHaveBeenCalled()
         done()
       server.requests[0].respond 400, 'Content-Type': 'application/json', JSON.stringify error_payload

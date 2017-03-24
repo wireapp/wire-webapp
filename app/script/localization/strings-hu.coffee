@@ -208,11 +208,6 @@ z.string.hu.modal_session_reset_message_2 = 'minket.'
 # Too many members in conversation
 z.string.hu.modal_too_many_members_headline = 'Telt ház'
 z.string.hu.modal_too_many_members_message = 'Legfeljebb %max partner tud csatlakozni a beszélgetéshez. Még %no partner számára van hely a csoportban.'
-# Whitelist screensharing
-z.string.hu.modal_whitelist_screensharing_headline = 'Böngészőjének engedélyre van szüksége, hogy megossza képernyőjét'
-z.string.hu.modal_whitelist_screensharing_message_1 = 'Nyissa meg a beállításokat és adja hozzá a *.wire.com-ot, az engedélyezett domainekhez a képernyőmegosztási beállításokban. Lásd'
-z.string.hu.modal_whitelist_screensharing_message_link = 'GY. I. K'
-z.string.hu.modal_whitelist_screensharing_message_2 = 'a részletekért.'
 # Parallel uploads
 z.string.hu.modal_uploads_parallel = 'Egyszerre %no fájt küldhet.'
 
