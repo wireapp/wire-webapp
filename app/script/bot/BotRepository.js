@@ -16,6 +16,9 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
+'use strict';
+
 window.z = window.z || {};
 window.z.bot = z.bot || {};
 

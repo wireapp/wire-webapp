@@ -17,6 +17,8 @@
  *
  */
 
+'use strict';
+
 window.z = window.z || {};
 window.z.bot = z.bot || {};
 
