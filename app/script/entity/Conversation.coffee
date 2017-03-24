@@ -273,9 +273,14 @@ class z.entity.Conversation
     if first_message? and message_et.timestamp() < first_message.timestamp()
       return
 
-    amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et
     @_update_last_read_from_message message_et
-    @messages_unordered.push @_check_for_duplicate_nonce message_et, @get_last_message()
+
+    last_message = @get_last_message()
+    amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et
+
+    # last rendered message is the last message in this conversation so we are safe to add it
+    if not last_message? or last_message.timestamp() is @last_event_timestamp()
+      @messages_unordered.push @_check_for_duplicate_nonce message_et, last_message
 
   ###
   Adds multiple messages to the conversation.
