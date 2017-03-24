@@ -286,10 +286,11 @@ class z.calling.entities.ECall
   ###
   verify_session_id: (e_call_message_et) =>
     return @ if e_call_message_et.session_id is @session_id
-    @get_e_participant_by_id e_call_message_et.user_id
-    .then (e_participant_et) ->
+
+    return @get_e_participant_by_id e_call_message_et.user_id
+    .then (e_participant_et) =>
       return @ if e_call_message_et.session_id is e_participant_et.session_id
-      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.NOT_FOUND, 'Session IDs not matching'
+      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.WRONG_SENDER, 'Session IDs not matching'
 
 
   ###############################################################################

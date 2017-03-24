@@ -392,7 +392,7 @@ class z.calling.entities.EFlow
       @logger.info "Received confirmation for e-call '#{e_call_message.type}' message via data channel", e_call_message
     else
       @logger.info "Received e-call '#{e_call_message.type}' message via data channel", e_call_message
-    amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND, z.conversation.EventBuilder.build_calling @e_call_et.conversation_et, e_call_message, @remote_client_id
+    amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND, z.conversation.EventBuilder.build_calling @e_call_et.conversation_et, e_call_message, @remote_user_id, @remote_client_id
 
   _on_open: (event) =>
     data_channel = event.target
