@@ -39,20 +39,7 @@ z.calling.mapper.SDPMapper =
       type: if e_call_message_et.response is true then z.calling.rtc.SDPType.ANSWER else z.calling.rtc.SDPType.OFFER
 
   map_event_to_object: (event) ->
-    _convert_fingerprint_to_uppercase = (sdp_string) ->
-      sdp_lines = sdp_string.split '\r\n'
-
-      for sdp_line, index in sdp_lines when sdp_line.startsWith 'a=fingerprint'
-        sdp_line_parts = sdp_line.split ' '
-        sdp_lines[index] = "#{sdp_line_parts[0]} #{sdp_line_parts[1].toUpperCase()}"
-
-      return sdp_lines.join '\r\n'
-
-    remote_sdp =
-      sdp: _convert_fingerprint_to_uppercase event.sdp
-      type: event.state
-
-    return new window.RTCSessionDescription remote_sdp
+    return new window.RTCSessionDescription sdp: event.sdp, type: event.state
 
   ###
   Rewrite the SDP for compatibility reasons.
@@ -84,13 +71,9 @@ z.calling.mapper.SDPMapper =
       else if sdp_line.startsWith 'a=candidate'
         ice_candidates.push sdp_line
 
-      else if sdp_line.startsWith 'a=group'
-        if flow_et.negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE and sdp_source is z.calling.enum.SDPSource.LOCAL
-          sdp_lines.push 'a=x-streamchange'
-
       # Remove once obsolete due to high uptake of clients based on AVS build 3.3.11 containing fix for AUDIO-1215
       else if sdp_line.startsWith 'a=mid'
-        if rtc_sdp.type is z.calling.rtc.SDPType.ANSWER and z.util.Environment.browser.firefox and sdp_source is z.calling.enum.SDPSource.REMOTE
+        if sdp_source is z.calling.enum.SDPSource.REMOTE and z.util.Environment.browser.firefox and rtc_sdp.type is z.calling.rtc.SDPType.ANSWER
           outline = 'a=mid:sdparta_2' if sdp_line is 'a=mid:data'
 
       # Code to nail in bit-rate and ptime settings for improved performance and experience

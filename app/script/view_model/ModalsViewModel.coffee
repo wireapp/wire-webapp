@@ -43,7 +43,6 @@ z.ViewModel.ModalType =
   SESSION_RESET: '.modal-session-reset'
   UPLOAD_PARALLEL: '.modal-asset-upload-parallel'
   UPLOAD_TOO_LARGE: '.modal-asset-upload-too-large'
-  WHITELIST_SCREENSHARING: '.modal-whitelist-screensharing'
 
 
 z.ViewModel.MODAL_CONSENT_TYPE =

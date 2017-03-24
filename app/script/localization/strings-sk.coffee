@@ -208,11 +208,6 @@ z.string.sk.modal_session_reset_message_2 = 'nás.'
 # Too many members in conversation
 z.string.sk.modal_too_many_members_headline = 'Priveľa účastníkov'
 z.string.sk.modal_too_many_members_message = 'Do rozhovoru sa môže zapojiť %max ľudí. '
-# Whitelist screensharing
-z.string.sk.modal_whitelist_screensharing_headline = 'Wire potrebuje povolenie na zdieľanie obrazovky'
-z.string.sk.modal_whitelist_screensharing_message_1 = 'Otvorte about:config a pridajte *.wire.com do zoznamu povolených domén pre zdieľanie obrazovky.'
-z.string.sk.modal_whitelist_screensharing_message_link = 'FAQ'
-z.string.sk.modal_whitelist_screensharing_message_2 = 'pre viac informácií.'
 # Parallel uploads
 z.string.sk.modal_uploads_parallel = 'Súčasne môžete poslať až %no súborov.'
 

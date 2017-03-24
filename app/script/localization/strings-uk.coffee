@@ -208,11 +208,6 @@ z.string.uk.modal_session_reset_message_2 = 'з нами.'
 # Too many members in conversation
 z.string.uk.modal_too_many_members_headline = 'Голосовий канал переповнений'
 z.string.uk.modal_too_many_members_message = 'В розмові може бути до %max учасників. В даній розмові уже не вистачає місця для %no учасників.'
-# Whitelist screensharing
-z.string.uk.modal_whitelist_screensharing_headline = 'Для Wire необхідний дозвіл, щоб ви могли поділитись скріншотами робочого столу'
-z.string.uk.modal_whitelist_screensharing_message_1 = 'Перейдіть до about:config та додайте *.wire.com до списку дозволених доменів для обміну скріншотами робочого столу. Дивіться'
-z.string.uk.modal_whitelist_screensharing_message_link = 'розділ Часті запитання'
-z.string.uk.modal_whitelist_screensharing_message_2 = ', щоб дізнатись більше деталей.'
 # Parallel uploads
 z.string.uk.modal_uploads_parallel = 'Ви можете надіслати до %no файлів за один раз.'
 

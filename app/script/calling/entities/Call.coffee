@@ -76,9 +76,7 @@ class z.calling.entities.Call
     @interrupted_participants = ko.observableArray []
 
     # Media
-    @local_stream_audio = @v2_call_center.media_stream_handler.local_media_streams.audio
-    @local_stream_video = @v2_call_center.media_stream_handler.local_media_streams.video
-
+    @local_media_stream = @v2_call_center.media_stream_handler.local_media_stream
     @local_media_type = @v2_call_center.media_stream_handler.local_media_type
     @remote_media_type = ko.observable z.media.MediaType.NONE
 

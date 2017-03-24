@@ -208,11 +208,6 @@ z.string.ro.modal_session_reset_message_2 = 'ne.'
 # Too many members in conversation
 z.string.ro.modal_too_many_members_headline = 'Conversație plină'
 z.string.ro.modal_too_many_members_message = 'Maxim %max persoane se pot alătura conversației. Mai este loc pentru %no persoane aici.'
-# Whitelist screensharing
-z.string.ro.modal_whitelist_screensharing_headline = 'Wire are nevoie de permisiuni pentru a partaja ecranul'
-z.string.ro.modal_whitelist_screensharing_message_1 = 'Deschide about:config și adaugă *.wire.com în lista de domenii permise pentru partajarea ecranului. Vezi'
-z.string.ro.modal_whitelist_screensharing_message_link = 'Întrebări frecvente'
-z.string.ro.modal_whitelist_screensharing_message_2 = 'pentru detalii.'
 # Parallel uploads
 z.string.ro.modal_uploads_parallel = 'Poți trimite maxim %no fișiere simultan.'
 

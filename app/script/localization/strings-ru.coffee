@@ -208,11 +208,6 @@ z.string.ru.modal_session_reset_message_2 = 'с нами.'
 # Too many members in conversation
 z.string.ru.modal_too_many_members_headline = 'Канал переполнен'
 z.string.ru.modal_too_many_members_message = 'К разговору может присоединиться до %max человек. Здесь хватит места ещё для %no человек.'
-# Whitelist screensharing
-z.string.ru.modal_whitelist_screensharing_headline = 'Wire требуется разрешение для демонстрации экрана'
-z.string.ru.modal_whitelist_screensharing_message_1 = 'Откройте about:config и добавьте *.wire.com в список разрешённых доменов для демонстрации экрана. Смотрите'
-z.string.ru.modal_whitelist_screensharing_message_link = 'Вопросы и ответы'
-z.string.ru.modal_whitelist_screensharing_message_2 = 'для уточнения деталей.'
 # Parallel uploads
 z.string.ru.modal_uploads_parallel = 'Вы можете отправить до %no файлов за раз.'
 
