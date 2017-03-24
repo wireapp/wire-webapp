@@ -33,11 +33,11 @@ z.calling.mapper.ECallMessageMapper = do ->
   build_hangup = (response, session_id, additional_payload) ->
     return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, response, session_id, additional_payload
 
-  build_ignore = (response, session_id, additional_payload) ->
-    return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.IGNORE, response, session_id, additional_payload
-
   build_prop_sync = (response, session_id, additional_payload) ->
     return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, response, session_id, additional_payload
+
+  build_reject = (response, session_id, additional_payload) ->
+    return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT, response, session_id, additional_payload
 
   build_setup = (response, session_id, additional_payload) ->
     return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, response, session_id, additional_payload
@@ -76,8 +76,8 @@ z.calling.mapper.ECallMessageMapper = do ->
   return {
     build_cancel: build_cancel
     build_hangup: build_hangup
-    build_ignore: build_ignore
     build_prop_sync: build_prop_sync
+    build_reject: build_reject
     build_setup: build_setup
     build_update: build_update
     map_event: map_event

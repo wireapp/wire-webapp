@@ -74,7 +74,7 @@ class z.calling.entities.ECall
     @_reset_timer()
 
     # Computed values
-    @is_declined = ko.pureComputed => @state() is z.calling.enum.CallState.IGNORED
+    @is_declined = ko.pureComputed => @state() is z.calling.enum.CallState.REJECTED
 
     @is_ongoing_on_another_client = ko.pureComputed =>
       return @self_user_joined() and not @self_client_joined()
@@ -176,7 +176,7 @@ class z.calling.entities.ECall
     @state_timeout = window.setTimeout =>
       @_stop_call_sound is_incoming
       if is_incoming
-        return @state z.calling.enum.CallState.IGNORED if @is_group()
+        return @state z.calling.enum.CallState.REJECTED if @is_group()
         amplify.publish z.event.WebApp.CALL.STATE.DELETE, @id
       else
         amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @id

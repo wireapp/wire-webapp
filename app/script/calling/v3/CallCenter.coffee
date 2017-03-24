@@ -97,10 +97,10 @@ class z.calling.v3.CallCenter
         @_on_e_call_cancel_event e_call_message_et
       when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
         @_on_e_call_hangup_event e_call_message_et
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.IGNORE
-        @_on_e_call_ignore_event e_call_message_et
       when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
         @_on_e_call_prop_sync_event e_call_message_et
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT
+        @_on_e_call_reject_event e_call_message_et
       when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
         @_on_e_call_setup_event e_call_message_et
       when z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
@@ -171,22 +171,6 @@ class z.calling.v3.CallCenter
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
   ###
-  E-call ignore event handling.
-  @private
-  @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.IGNORE
-  ###
-  _on_e_call_ignore_event: (e_call_message_et) =>
-    @get_e_call_by_id e_call_message_et.conversation_id
-    .then (e_call_et) =>
-      if e_call_message_et.user_id isnt @user_repository.self().id
-        throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.WRONG_SENDER, 'Call ignored by wrong user'
-      @logger.debug "Ignoring e-call in conversation '#{e_call_message_et.conversation_id}'", e_call_et
-      e_call_et.state z.calling.enum.CallState.IGNORED
-      @media_stream_handler.reset_media_stream()
-    .catch (error) ->
-      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
-
-  ###
   E-call prop-sync event handling.
   @private
   @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
@@ -198,6 +182,22 @@ class z.calling.v3.CallCenter
     .then (e_call_et) =>
       @_confirm_e_call_message e_call_et, e_call_message_et
       return e_call_et.update_e_participant e_call_message_et
+    .catch (error) ->
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
+
+  ###
+  E-call reject event handling.
+  @private
+  @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT
+  ###
+  _on_e_call_reject_event: (e_call_message_et) =>
+    @get_e_call_by_id e_call_message_et.conversation_id
+    .then (e_call_et) =>
+      if e_call_message_et.user_id isnt @user_repository.self().id
+        throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.WRONG_SENDER, 'Call rejected by wrong user'
+      @logger.debug "Rejecting e-call in conversation '#{e_call_message_et.conversation_id}'", e_call_et
+      e_call_et.state z.calling.enum.CallState.REJECTED
+      @media_stream_handler.reset_media_stream()
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
@@ -345,7 +345,7 @@ class z.calling.v3.CallCenter
           # Send to remote client that call is connected with
           precondition_option = true
           user_client_map = "#{remote_user_id}": ["#{remote_client_id}"]
-        when z.calling.enum.E_CALL_MESSAGE_TYPE.IGNORE
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT
           # Send to all clients of self user
           precondition_option = [@user_repository.self().id]
           user_client_map = "#{@user_repository.self().id}": (device.id for device in @user_repository.self().devices())
@@ -383,23 +383,6 @@ class z.calling.v3.CallCenter
       @e_calls.remove (e_call_et) -> e_call_et.id is conversation_id
       @media_stream_handler.reset_media_stream()
       return undefined
-    .catch (error) ->
-      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
-
-  ###
-  User action to ignore incoming e-call.
-  @param conversation_id [String] ID of conversation to ignore e-call in
-  ###
-  ignore_call: (conversation_id) =>
-    @get_e_call_by_id conversation_id
-    .then (e_call_et) =>
-      @logger.debug "Ignoring e-call in conversation '#{conversation_id}'", e_call_et
-      e_call_et.state z.calling.enum.CallState.IGNORED
-      @media_stream_handler.reset_media_stream()
-
-      e_call_message_et = z.calling.mapper.ECallMessageMapper.build_ignore false, e_call_et.session_id, @_create_additional_payload conversation_id
-
-      @send_e_call_event e_call_et.conversation_et, e_call_message_et
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
@@ -463,6 +446,23 @@ class z.calling.v3.CallCenter
       if e_call_et.participants().length < 2
         @delete_call conversation_id
         @_distribute_deactivation_event e_call_message_et, e_call_et.creating_user if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+    .catch (error) ->
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
+
+  ###
+  User action to reject incoming e-call.
+  @param conversation_id [String] ID of conversation to ignore e-call in
+  ###
+  reject_call: (conversation_id) =>
+    @get_e_call_by_id conversation_id
+    .then (e_call_et) =>
+      @logger.debug "Rejecting e-call in conversation '#{conversation_id}'", e_call_et
+      e_call_et.state z.calling.enum.CallState.REJECTED
+      @media_stream_handler.reset_media_stream()
+
+      e_call_message_et = z.calling.mapper.ECallMessageMapper.build_reject false, e_call_et.session_id, @_create_additional_payload conversation_id
+
+      @send_e_call_event e_call_et.conversation_et, e_call_message_et
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 

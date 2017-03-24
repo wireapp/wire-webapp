@@ -152,8 +152,8 @@ class z.ViewModel.list.ConversationListViewModel
     termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER if @joined_call()?.state() isnt z.calling.enum.CallState.OUTGOING
     amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, termination_reason
 
-  on_ignore_call: (conversation_et) ->
-    amplify.publish z.event.WebApp.CALL.STATE.IGNORE, conversation_et.id
+  on_reject_call: (conversation_et) ->
+    amplify.publish z.event.WebApp.CALL.STATE.REJECT, conversation_et.id
 
   on_toggle_audio: (conversation_et) ->
     amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_et.id, z.media.MediaType.AUDIO
