@@ -135,7 +135,7 @@ class z.calling.v3.CallCenter
     return if e_call_message_et.response is true
 
     @get_e_call_by_id e_call_message_et.conversation_id
-    .then (e_call_et) =>
+    .then (e_call_et) ->
       return e_call_et.verify_session_id e_call_message_et
     .then (e_call_et) ->
       return e_call_et.delete_e_participant e_call_message_et.user_id, e_call_message_et.client_id
@@ -158,7 +158,7 @@ class z.calling.v3.CallCenter
     return if e_call_message_et.response is true
 
     @get_e_call_by_id e_call_message_et.conversation_id
-    .then (e_call_et) =>
+    .then (e_call_et) ->
       return e_call_et.verify_session_id e_call_message_et
     .then (e_call_et) =>
       @_confirm_e_call_message e_call_et, e_call_message_et
@@ -193,7 +193,7 @@ class z.calling.v3.CallCenter
   ###
   _on_e_call_prop_sync_event: (e_call_message_et) =>
     @get_e_call_by_id e_call_message_et.conversation_id
-    .then (e_call_et) =>
+    .then (e_call_et) ->
       return e_call_et.verify_session_id e_call_message_et
     .then (e_call_et) =>
       @_confirm_e_call_message e_call_et, e_call_message_et
@@ -241,7 +241,7 @@ class z.calling.v3.CallCenter
   ###
   _on_e_call_update_event: (e_call_message_et) =>
     @get_e_call_by_id e_call_message_et.conversation_id
-    .then (e_call_et) =>
+    .then (e_call_et) ->
       return e_call_et.verify_session_id e_call_message_et
     .then (e_call_et) ->
       return e_call_et.update_e_participant e_call_message_et
@@ -330,28 +330,28 @@ class z.calling.v3.CallCenter
     switch e_call_message_et.type
       when z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
         if e_call_message_et.response is true
-          # Send to client that initiated call of remote user
+          # Send to remote client that initiated call
           user_client_map = "#{remote_user_id}": ["#{remote_client_id}"]
           precondition_option = true
         else
           # Send to all clients of remote user
           user_client_map = "#{remote_user_id}": (device.id for device in remote_user.devices())
           precondition_option = [remote_user_id]
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
+        # Send to remote client that call is connected with
+        user_client_map = "#{remote_user_id}": ["#{remote_client_id}"]
+        precondition_option = true
       when z.calling.enum.E_CALL_MESSAGE_TYPE.IGNORE
         # Send to all clients of self user
         user_client_map = "#{@user_repository.self().id}": (device.id for device in @user_repository.self().devices())
         precondition_option = [@user_repository.self().id]
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
-        # Send to remote client that initiated call
-        user_client_map = "#{remote_user_id}": ["#{remote_client_id}"]
-        precondition_option = true
       when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
         if e_call_message_et.response is true
-          # Send to client that initiated call of remote user and all clients of self user
+          # Send to remote client that initiated call and all clients of self user
           user_client_map =
             "#{remote_user_id}": ["#{remote_client_id}"]
             "#{@user_repository.self().id}": (device.id for device in @user_repository.self().devices())
-          precondition_option = [@user_repository.self().id]]
+          precondition_option = [@user_repository.self().id]
         else
           # Send to all clients of remote user
           user_client_map = "#{remote_user_id}": (device.id for device in remote_user.devices())

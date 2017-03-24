@@ -1164,9 +1164,9 @@ class z.conversation.ConversationRepository
   ###
   send_text_with_link_preview: (message, conversation_et) =>
     @send_text message, conversation_et
-      .then (generic_message) =>
+    .then (generic_message) =>
       @send_link_preview message, conversation_et, generic_message
-      .catch (error) =>
+    .catch (error) =>
       @logger.error "Error while sending text message: #{error.message}", error
       throw error
 

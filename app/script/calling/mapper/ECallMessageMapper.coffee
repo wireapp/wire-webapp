@@ -22,35 +22,28 @@ z.calling.mapper ?= {}
 
 z.calling.mapper.ECallMessageMapper = do ->
 
-  build_cancel = (response, session_id, additional_payload) ->
-    e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL, response, session_id
+  build_e_call_message = (type, response, session_id, additional_payload) ->
+    e_call_message_et = new z.calling.entities.ECallMessage type, response, session_id
     e_call_message_et.add_payload additional_payload
     return e_call_message_et
+
+  build_cancel = (response, session_id, additional_payload) ->
+    return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL, response, session_id, additional_payload
 
   build_hangup = (response, session_id, additional_payload) ->
-    e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, response, session_id
-    e_call_message_et.add_payload additional_payload
-    return e_call_message_et
+    return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, response, session_id, additional_payload
 
   build_ignore = (response, session_id, additional_payload) ->
-    e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.IGNORE, response, session_id
-    e_call_message_et.add_payload additional_payload
-    return e_call_message_et
+    return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.IGNORE, response, session_id, additional_payload
 
   build_prop_sync = (response, session_id, additional_payload) ->
-    e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, response, session_id
-    e_call_message_et.add_payload additional_payload
-    return e_call_message_et
+    return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, response, session_id, additional_payload
 
   build_setup = (response, session_id, additional_payload) ->
-    e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, response, session_id
-    e_call_message_et.add_payload additional_payload
-    return e_call_message_et
+    return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, response, session_id, additional_payload
 
   build_update = (response, session_id, additional_payload) ->
-    e_call_message_et = new z.calling.entities.ECallMessage z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE, response, session_id
-    e_call_message_et.add_payload additional_payload
-    return e_call_message_et
+    return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE, response, session_id, additional_payload
 
   ###
   Map incoming e-call message into entity.
