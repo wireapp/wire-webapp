@@ -62,6 +62,7 @@ ko.components.register 'user-input',
                   <!-- ko foreach: selected -->
                     <span data-bind="text: first_name()"></span>
                   <!-- /ko -->
+                  <input type="text" style="display:none" /> <!-- prevent chrome from autocomplete -->
                   <input autocomplete="off" maxlength="128" required spellcheck="false" class="search-input" type="text" data-bind="textInput: input, hasFocus: true, event: {keydown: on_key_press}, enter: on_enter, attr: {placeholder: placeholder}" data-uie-name="enter-users">
                   <div class="search-close icon-close icon-button" data-bind="click: on_close, l10n_tooltip: z.string.tooltip_search_close" data-uie-name="do-close"></div>
                 </div>
