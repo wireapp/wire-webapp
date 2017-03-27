@@ -36,7 +36,7 @@ describe 'z.media.MediaStreamHandler', ->
       spyOn(media_repository.stream_handler, '_toggle_audio_send').and.returnValue Promise.resolve()
 
     it 'toggles the audio stream if available', (done) ->
-      media_repository.stream_handler.local_media_streams.audio true
+      media_repository.stream_handler.local_media_stream true
 
       media_repository.stream_handler.toggle_audio_send()
       .then ->
@@ -45,7 +45,7 @@ describe 'z.media.MediaStreamHandler', ->
       .catch done.fail
 
     it 'throws an error if no audio stream is found', (done) ->
-      media_repository.stream_handler.local_media_streams.audio undefined
+      media_repository.stream_handler.local_media_stream undefined
 
       media_repository.stream_handler.toggle_audio_send()
       .then done.fail
@@ -61,7 +61,7 @@ describe 'z.media.MediaStreamHandler', ->
       spyOn(media_repository.stream_handler, 'replace_input_source').and.returnValue Promise.resolve()
 
     it 'toggles the video stream if available and in video mode', (done) ->
-      media_repository.stream_handler.local_media_streams.video true
+      media_repository.stream_handler.local_media_stream true
       media_repository.stream_handler.local_media_type z.media.MediaType.VIDEO
 
       media_repository.stream_handler.toggle_video_send()
@@ -72,7 +72,7 @@ describe 'z.media.MediaStreamHandler', ->
       .catch done.fail
 
     it 'turns on the video stream if it does not exist', (done) ->
-      media_repository.stream_handler.local_media_streams.video undefined
+      media_repository.stream_handler.local_media_stream undefined
       media_repository.stream_handler.local_media_type z.media.MediaType.VIDEO
 
       media_repository.stream_handler.toggle_video_send()
@@ -83,7 +83,7 @@ describe 'z.media.MediaStreamHandler', ->
       .catch done.fail
 
     it 'turns on the video stream if not in video mode', (done) ->
-      media_repository.stream_handler.local_media_streams.video true
+      media_repository.stream_handler.local_media_stream true
       media_repository.stream_handler.local_media_type z.media.MediaType.SCREEN
 
       media_repository.stream_handler.toggle_video_send()
@@ -100,7 +100,7 @@ describe 'z.media.MediaStreamHandler', ->
       spyOn(media_repository.stream_handler, 'replace_input_source').and.returnValue Promise.resolve()
 
     it 'toggles screen sharing if available and in screen sharing mode', (done) ->
-      media_repository.stream_handler.local_media_streams.video true
+      media_repository.stream_handler.local_media_stream true
       media_repository.stream_handler.local_media_type z.media.MediaType.SCREEN
 
       media_repository.stream_handler.toggle_screen_send()
@@ -111,7 +111,7 @@ describe 'z.media.MediaStreamHandler', ->
       .catch done.fail
 
     it 'turns on the screen sharing stream if it does not exist', (done) ->
-      media_repository.stream_handler.local_media_streams.video undefined
+      media_repository.stream_handler.local_media_stream undefined
       media_repository.stream_handler.local_media_type z.media.MediaType.SCREEN
 
       media_repository.stream_handler.toggle_screen_send()
@@ -122,7 +122,7 @@ describe 'z.media.MediaStreamHandler', ->
       .catch done.fail
 
     it 'turns on the video stream if not in screen sharing mode', (done) ->
-      media_repository.stream_handler.local_media_streams.video true
+      media_repository.stream_handler.local_media_stream true
       media_repository.stream_handler.local_media_type z.media.MediaType.VIDEO
 
       media_repository.stream_handler.toggle_screen_send()

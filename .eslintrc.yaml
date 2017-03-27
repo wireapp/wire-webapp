@@ -7,12 +7,16 @@ extends:
   "eslint:recommended"
 
 globals:
+  _: true
   $: true
   amplify: true
   ko: true
+  LRUCache: true
+  wire: true
   z: true
 
 rules:
+  brace-style: [2, 1tbs]
   comma-dangle: [2, always-multiline]
   handle-callback-err: 2
   indent: [2, 2, {SwitchCase: 1}]

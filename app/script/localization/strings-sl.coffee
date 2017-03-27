@@ -208,11 +208,6 @@ z.string.sl.modal_session_reset_message_2 = 'nas.'
 # Too many members in conversation
 z.string.sl.modal_too_many_members_headline = 'Polna hiša'
 z.string.sl.modal_too_many_members_message = 'Do %max oseb se lahko pridruži pogovoru. Tukaj je prostora še za %no oseb.'
-# Whitelist screensharing
-z.string.sl.modal_whitelist_screensharing_headline = 'Wire potrebuje dovoljenje za deljenje vašega zaslona'
-z.string.sl.modal_whitelist_screensharing_message_1 = 'Odpri about:config in dodaj *.wire.com na seznam dovoljenih domen za deljenje zaslona. Glej'
-z.string.sl.modal_whitelist_screensharing_message_link = 'Pogosto zastavljena vprašanja'
-z.string.sl.modal_whitelist_screensharing_message_2 = 'za podrobnosti.'
 # Parallel uploads
 z.string.sl.modal_uploads_parallel = 'Lahko pošljete do %no zbirk naenkrat.'
 
