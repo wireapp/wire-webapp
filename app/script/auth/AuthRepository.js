@@ -27,7 +27,7 @@ window.z.auth.AuthRepository = class AuthRepository {
     this.access_token_refresh = undefined;
     this.auth_service = auth_service;
     this.logger = new z.util.Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
-    amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this.renew_access_token);
+    amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this, this.renew_access_token);
   }
 
   // Print all cookies for a user in the console.
