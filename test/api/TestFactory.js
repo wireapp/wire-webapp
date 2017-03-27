@@ -17,6 +17,8 @@
  *
  */
 
+'use strict';
+
 /**
  *
  * @returns {Window.TestFactory}
@@ -32,8 +34,8 @@ window.TestFactory = function (logger_level) {
     connection: {
       environment: 'test',
       rest_url: 'http://localhost',
-      websocket_url: 'wss://localhost'
-    }
+      websocket_url: 'wss://localhost',
+    },
   };
 
   this.client = new z.service.Client(this.settings.connection);
@@ -48,7 +50,7 @@ window.TestFactory = function (logger_level) {
  * @returns {Promise<z.audio.AudioRepository>}
  */
 window.TestFactory.prototype.exposeAudioActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeAudioActors');
   return Promise.resolve()
   .then(function() {
@@ -63,7 +65,7 @@ window.TestFactory.prototype.exposeAudioActors = function () {
  * @returns {Promise<z.auth.AuthRepository>}
  */
 window.TestFactory.prototype.exposeAuthActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeAuthActors');
   return Promise.resolve()
   .then(function() {
@@ -81,7 +83,7 @@ window.TestFactory.prototype.exposeAuthActors = function () {
  * @returns {Promise<z.storage.StorageRepository>}
  */
 window.TestFactory.prototype.exposeStorageActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeStorageActors');
   return Promise.resolve()
   .then(function() {
@@ -101,7 +103,7 @@ window.TestFactory.prototype.exposeStorageActors = function () {
  * @returns {Promise<z.cryptography.CryptographyRepository>}
  */
 window.TestFactory.prototype.exposeCryptographyActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeCryptographyActors');
   return Promise.resolve()
   .then(function() {
@@ -110,7 +112,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function () {
   .then(function() {
     self.logger.info('✓ exposedStorageActors');
 
-    var current_client = new z.client.Client({"id": entities.clients.john_doe.permanent.id});
+    let current_client = new z.client.Client({'id': entities.clients.john_doe.permanent.id});
     window.cryptography_service = new z.cryptography.CryptographyService(self.client);
     window.cryptography_service.logger.level = self.settings.logging_level;
 
@@ -130,7 +132,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function () {
  * @returns {Promise<z.client.ClientRepository>}
  */
 window.TestFactory.prototype.exposeClientActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeClientActors');
   return Promise.resolve()
   .then(function() {
@@ -139,9 +141,9 @@ window.TestFactory.prototype.exposeClientActors = function () {
   .then(function() {
     self.logger.info('✓ exposedCryptographyActors');
 
-    var client = new z.client.Client({'address': '192.168.0.1', 'id': '60aee26b7f55a99f', 'class': 'desktop'});
+    let client = new z.client.Client({'address': '192.168.0.1', 'id': '60aee26b7f55a99f', 'class': 'desktop'});
 
-    var user = new z.entity.User(entities.user.john_doe.id);
+    let user = new z.entity.User(entities.user.john_doe.id);
     user.devices.push(client);
     user.email(entities.user.john_doe.email);
     user.is_me = true;
@@ -155,8 +157,8 @@ window.TestFactory.prototype.exposeClientActors = function () {
     window.client_repository = new z.client.ClientRepository(client_service, window.cryptography_repository);
     window.client_repository.logger.level = self.settings.logging_level;
     window.client_repository.init(user);
-    var payload = {"cookie":"webapp@2153234453@temporary@1470926647664","time":"2016-10-07T16:01:42.133Z","location":{"lat":52.5233,"lon":13.4138},"address":"62.96.148.44","model":"Chrome (Temporary)","id":"132b3653b33f851f","type":"temporary","class":"desktop","label":"Windows 10","meta":{"is_verified":true,"primary_key":"local_identity"}};
-    var current_client = new z.client.Client(payload);
+    let payload = {'cookie':'webapp@2153234453@temporary@1470926647664','time':'2016-10-07T16:01:42.133Z','location':{'lat':52.5233,'lon':13.4138},'address':'62.96.148.44','model':'Chrome (Temporary)','id':'132b3653b33f851f','type':'temporary','class':'desktop','label':'Windows 10','meta':{'is_verified':true,'primary_key':'local_identity'}};
+    let current_client = new z.client.Client(payload);
     window.client_repository.current_client(current_client);
 
     return window.client_repository;
@@ -168,7 +170,7 @@ window.TestFactory.prototype.exposeClientActors = function () {
  * @returns {Promise<z.event.EventRepository>}
  */
 window.TestFactory.prototype.exposeEventActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeEventActors');
   return Promise.resolve()
   .then(function() {
@@ -199,7 +201,7 @@ window.TestFactory.prototype.exposeEventActors = function () {
  * @returns {Promise<z.user.UserRepository>}
  */
 window.TestFactory.prototype.exposeUserActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeUserActors');
   return Promise.resolve()
   .then(function() {
@@ -230,7 +232,7 @@ window.TestFactory.prototype.exposeUserActors = function () {
  * @returns {Promise<z.connect.ConnectRepository>}
  */
 window.TestFactory.prototype.exposeConnectActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeConnectActors');
   return Promise.resolve()
   .then(function() {
@@ -257,7 +259,7 @@ window.TestFactory.prototype.exposeConnectActors = function () {
  * @returns {Promise<z.search.SearchRepository>}
  */
 window.TestFactory.prototype.exposeSearchActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeSearchActors');
   return Promise.resolve()
   .then(function() {
@@ -281,7 +283,7 @@ window.TestFactory.prototype.exposeSearchActors = function () {
  * @returns {Promise<z.conversation.ConversationRepository>}
  */
 window.TestFactory.prototype.exposeConversationActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeConversationActors');
   return Promise.resolve()
   .then(function() {
@@ -311,13 +313,13 @@ window.TestFactory.prototype.exposeConversationActors = function () {
  * @returns {Promise<z.media.MediaRepository>}
  */
 window.TestFactory.prototype.exposeMediaActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeMediaActors');
   return Promise.resolve()
   .then(function() {
     return self.exposeAudioActors();
   })
-  .then(function(){
+  .then(function() {
     self.logger.info('✓ exposedAudioActors');
 
     window.media_repository = new z.media.MediaRepository(window.audio_repository);
@@ -336,7 +338,7 @@ window.TestFactory.prototype.exposeMediaActors = function () {
  * @returns {Promise<z.calling.CallCenter>}
  */
 window.TestFactory.prototype.exposeCallingActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeCallingActors');
   return Promise.resolve()
   .then(function() {
@@ -375,7 +377,7 @@ window.TestFactory.prototype.exposeCallingActors = function () {
  * @returns {Promise<z.SystemNotification.SystemNotificationRepository>}
  */
 window.TestFactory.prototype.exposeSystemNotificationActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeSystemNotificationActors');
   return Promise.resolve()
   .then(function() {
@@ -400,7 +402,7 @@ window.TestFactory.prototype.exposeSystemNotificationActors = function () {
  * @returns {Promise<z.tracking.EventTrackingRepository>}
  */
 window.TestFactory.prototype.exposeTrackingActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeTrackingActors');
   return Promise.resolve()
   .then(function() {
@@ -421,7 +423,7 @@ window.TestFactory.prototype.exposeTrackingActors = function () {
  * @returns {Promise<z.announce.AnnounceRepository>}
  */
 window.TestFactory.prototype.exposeAnnounceActors = function () {
-  var self = this;
+  let self = this;
   self.logger.info('- exposeAnnounceActors');
   return Promise.resolve()
   .then(function() {
