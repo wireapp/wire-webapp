@@ -21,10 +21,11 @@ z.calling ?= {}
 z.calling.entities ?= {}
 
 E_FLOW_CONFIG =
-  RTC_DATA_CHANNEL_LABEL: 'calling-3.0'
+  DATA_CHANNEL_LABEL: 'calling-3.0'
+  NEGOTIATION_TIMEOUT: 30 * 1000
+  SDP_SEND_TIMEOUT: 5 * 1000
   SDP_SEND_TIMEOUT_RENEGOTIATION: 50
   SDP_SEND_TIMEOUT_RESET: 1000
-  SDP_SEND_TIMEOUT: 5000
 
 # E-Flow entity.
 class z.calling.entities.EFlow
@@ -102,13 +103,7 @@ class z.calling.entities.EFlow
 
         when z.calling.rtc.ICEConnectionState.FAILED
           return unless @e_call_et.self_client_joined()
-
-          @e_participant_et.is_connected false
-          @e_call_et.delete_e_participant @e_participant_et.id
-          .then =>
-            return if @e_call_et.participants().length
-            termination_reason = if @e_call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
-            amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, termination_reason
+          @_remove_participant()
 
     @signaling_state.subscribe (signaling_state) =>
       switch signaling_state
@@ -121,10 +116,12 @@ class z.calling.entities.EFlow
           @negotiation_needed true
 
         when z.calling.rtc.SignalingState.STABLE
+          @_clear_negotiation_timeout()
           @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
 
     @negotiation_mode = ko.observable z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
     @negotiation_needed = ko.observable false
+    @negotiation_timeout = undefined
 
 
     ###############################################################################
@@ -230,7 +227,9 @@ class z.calling.entities.EFlow
 
   restart_negotiation: (negotiation_mode, is_answer, media_stream) =>
     @logger.debug "Negotiation restart triggered by '#{negotiation_mode}'"
+    @_close_data_channel E_FLOW_CONFIG.DATA_CHANNEL_LABEL
     @_close_peer_connection()
+    @_clear_negotiation_timeout()
     @_clear_send_sdp_timeout()
     @_reset_signaling_states()
     @is_answer is_answer
@@ -246,6 +245,16 @@ class z.calling.entities.EFlow
     @negotiation_mode negotiation_mode
     @negotiation_needed true
     @pc_initialized true
+    @_set_negotiation_timeout()
+
+  _remove_participant: (termination_reason) =>
+    @e_participant_et.is_connected false
+    @e_call_et.delete_e_participant @e_participant_et.id
+    .then =>
+      return if @e_call_et.participants().length
+      unless termination_reason
+        termination_reason = if @e_call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
+      amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, termination_reason
 
   _set_sdp_states: ->
     @should_set_remote_sdp true
@@ -262,11 +271,12 @@ class z.calling.entities.EFlow
   @private
   ###
   _close_peer_connection: ->
-    if @peer_connection?
+    if @peer_connection
       @peer_connection.oniceconnectionstatechange = => @logger.log @logger.levels.OFF, 'State change ignored - ICE connection'
       @peer_connection.onsignalingstatechange = => @logger.log @logger.levels.OFF, "State change ignored - signaling state: #{@peer_connection.signalingState}"
-      @peer_connection.close()
-      @logger.debug "Closing PeerConnection '#{@remote_user.name()}' successful"
+      if @peer_connection.signalingState isnt z.calling.rtc.SignalingState.CLOSED
+        @peer_connection.close()
+        @logger.debug "Closing PeerConnection '#{@remote_user.name()}' successful"
 
   ###
   Create the PeerConnection configuration.
@@ -360,7 +370,18 @@ class z.calling.entities.EFlow
   ###############################################################################
 
   send_message: (outbound_message) =>
-    @data_channels[E_FLOW_CONFIG.RTC_DATA_CHANNEL_LABEL].send outbound_message
+    try
+      @data_channels[E_FLOW_CONFIG.DATA_CHANNEL_LABEL].send outbound_message
+    catch error
+      @logger.warn "Failed to send calling message via data channel: #{error.name}", error
+      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED
+
+  _close_data_channel: (data_channel_label) ->
+    if @data_channels[data_channel_label]
+      if @data_channels[data_channel_label].readyState is z.calling.rtc.DataChannelState.OPEN
+        @data_channels[data_channel_label].close()
+      @data_channels[data_channel_label] = undefined
+      @e_call_et.data_channel_opened = false
 
   _initialize_data_channel: (data_channel_label) ->
     if @peer_connection.createDataChannel
@@ -455,6 +476,15 @@ class z.calling.entities.EFlow
         throw error
 
   ###
+  Clear the negotiation timeout.
+  @private
+  ###
+  _clear_negotiation_timeout: ->
+    if @negotiation_timeout
+      window.clearTimeout @negotiation_timeout
+      @negotiation_timeout = undefined
+
+  ###
   Clear the SDP send timeout.
   @private
   ###
@@ -500,7 +530,7 @@ class z.calling.entities.EFlow
   ###
   _create_offer: (restart) ->
     @negotiation_needed false
-    @_initialize_data_channel E_FLOW_CONFIG.RTC_DATA_CHANNEL_LABEL
+    @_initialize_data_channel E_FLOW_CONFIG.DATA_CHANNEL_LABEL
 
     offer_options =
       iceRestart: restart
@@ -574,6 +604,16 @@ class z.calling.entities.EFlow
         return @send_local_sdp true
       @_set_send_sdp_timeout()
     , E_FLOW_CONFIG.SDP_SEND_TIMEOUT_RENEGOTIATION
+
+  ###
+  Set the negotiation timeout.
+  @private
+  ###
+  _set_negotiation_timeout: ->
+    @negotiation_timeout = window.setTimeout =>
+      @logger.debug 'Removing call participant on negotiation timeout'
+      @_remove_participant z.calling.enum.TERMINATION_REASON.RENEGOTIATION
+    , E_FLOW_CONFIG.NEGOTIATION_TIMEOUT
 
   ###
   Set the SDP send timeout.
@@ -744,7 +784,8 @@ class z.calling.entities.EFlow
     @telemetry.reset_statistics()
     @logger.info "Resetting flow with user '#{@remote_user.id}'"
     @_remove_media_stream @media_stream() if @media_stream()
-    @_close_peer_connection() if @peer_connection?.signalingState isnt z.calling.rtc.SignalingState.CLOSED
+    @_close_data_channel E_FLOW_CONFIG.DATA_CHANNEL_LABEL
+    @_close_peer_connection()
     @_reset_signaling_states()
     @pc_initialized false
 

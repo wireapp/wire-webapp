@@ -269,9 +269,12 @@ class z.calling.v3.CallCenter
       throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED
     .catch (error) =>
       throw error if error.type not in [z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED , z.calling.v3.CallError::TYPE.NOT_FOUND]
+
       @logger.debug "Sending e-call '#{e_call_message_et.type}' message to conversation '#{conversation_et.id}'", e_call_message_et.to_JSON()
       @_limit_message_recipients conversation_et, e_call_message_et
       .then ([client_user_map, precondition_option]) =>
+        if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
+          e_call_message_et.type = z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
         @conversation_repository.send_e_call conversation_et, e_call_message_et, client_user_map, precondition_option
 
   _create_additional_payload: (conversation_id, remote_user_id, remote_client_id) ->
@@ -310,7 +313,7 @@ class z.calling.v3.CallCenter
   _confirm_e_call_message: (e_call_et, incoming_e_call_message_et) ->
     return unless incoming_e_call_message_et.response is false
 
-    additional_payload = @_create_additional_payload incoming_e_call_message_et.conversation_id, incoming_e_call_message_et.user_id, incoming_e_call_message_et.sender_id
+    additional_payload = @_create_additional_payload incoming_e_call_message_et.conversation_id, incoming_e_call_message_et.user_id, incoming_e_call_message_et.client_id
     switch incoming_e_call_message_et.type
       when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
         e_call_message_et = z.calling.mapper.ECallMessageMapper.build_hangup true, e_call_et.session_id, additional_payload

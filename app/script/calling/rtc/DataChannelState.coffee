@@ -1,6 +1,6 @@
 #
 # Wire
-# Copyright (C) 2016 Wire Swiss GmbH
+# Copyright (C) 2017 Wire Swiss GmbH
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,17 +18,12 @@
 
 window.z ?= {}
 z.calling ?= {}
-z.calling.enum ?= {}
+z.calling.rtc ?= {}
 
-z.calling.enum.TERMINATION_REASON =
-  CONCURRENT_CALL: 'concurrent'
-  CONNECTION_DROP: 'drop'
-  CONNECTION_FAILED: 'failed_ice'
-  COMPLETED: 'completed'
-  MISSED: 'missed'
-  OTHER_USER: 'other'
-  REMOVED_MEMBER: 'removed_member'
-  RENEGOTIATION: 'renegotiation'
-  SDP_FAILED: 'failed_sdp'
-  SELF_USER: 'self'
-  UNKNOWN: 'unknown'
+# https://w3c.github.io/webrtc-pc/#dom-rtcdatachannelstate
+# https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/readyState
+z.calling.rtc.DataChannelState =
+  CLOSED: 'closed'
+  CLOSING: 'closing'
+  CONNECTING: 'connecting'
+  OPEN: 'open'
