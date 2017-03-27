@@ -10,8 +10,21 @@ globals:
   _: true
   $: true
   amplify: true
+  asset_service: true
+  client_service: true
+  converastion_service: true
+  conversation_service: true
+  describe: true
+  entities: true
+  expect: true
+  it: true
   ko: true
   LRUCache: true
+  moment: true
+  notification_service: true
+  search_service: true
+  user_service: true
+  web_socket_service: true
   wire: true
   z: true
 
