@@ -60,6 +60,7 @@
 
     /**
      * Get all cookies for a user.
+     *
      * @returns {Promise} Promise that resolves with an array of cookies.
      */
     get_cookies() {
@@ -73,6 +74,7 @@
 
     /**
      * Get invite information.
+     *
      * @param {String} code - Invite code
      * @returns {Promise} Promise that resolves with invitations information.
      */
@@ -85,6 +87,7 @@
 
     /**
      * Get access-token if a valid cookie is provided.
+     *
      * @note Don't use our client wrapper here, because to query "/access" we need to set "withCredentials" to "true" in order to send the cookie.
      * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/authenticate
      * @param {Integer} retry_attempt - Retry attempts when a request fails
@@ -149,6 +152,160 @@
 
         $.ajax(config);
       });
+    }
+
+    /**
+     * Resend an email or phone activation code.
+     *
+     * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/sendActivationCode
+     * @param {Object} send_activation_code - Containing the email or phone number needed to resend activation email
+     * @option {String} send_activation_code - email
+     * @returns {Promise} Promise that resolves on successful code resend
+     */
+    post_activate_send(send_activation_code) {
+      return this.client.send_json({
+        url: this.client.create_url(`${AuthService.URL_ACTIVATE}/send`),
+        type: 'POST',
+        data: send_activation_code
+      });
+    }
+
+    /**
+     * Delete all cookies on the backend.
+     *
+     * @param {String} email - The user's e-mail address
+     * @param {String} password - The user's password
+     * @param {Array} labels - A list of cookie labels to remove from the system (optional)
+     */
+    post_cookies_remove(email, password, labels) {
+      return this.client.send_json({
+        url: this.client.create_url(`${AuthService.URL_COOKIES}/remove`),
+        type: 'POST',
+        data: {
+          email: email,
+          password: password,
+          labels: labels
+        }
+      });
+    }
+
+    /**
+     * Login in order to obtain an access-token and cookie.
+     *
+     * @note Don't use our client wrapper here. On cookie requests we need to use plain jQuery AJAX.
+     * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/login
+     *
+     * @param {Object} login - Containing sign in information
+     * @option {String} login - email The email address for a password login
+     * @option {String} login - phone The phone number for a password or SMS login
+     * @option {String} login - password The password for a password login
+     * @option {String} login - code The login code for an SMS login
+     * @param {Boolean} persist - Request a persistent cookie instead of a session cookie
+     * @return {Promise} Promise that resolves with access token
+     */
+    post_login(login, persist) {
+      return new Promise((resolve, reject) => {
+        $.ajax({
+          contentType: 'application/json; charset=utf-8',
+          crossDomain: true,
+          data: pako.gzip(JSON.stringify(login)),
+          headers: {
+            'Content-Encoding': 'gzip'
+          },
+          processData: false,
+          type: 'POST',
+          url: `${this.client.create_url(`${AuthService.URL_LOGIN}?persist=${persist}`)}`,
+          xhrFields: {
+            withCredentials: true
+          }
+        }).done((data) => {
+          resolve(data);
+        }).fail((jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.status === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS && login.email) {
+            // Backend blocked our user account from login, so we have to reset our cookies
+            this.post_cookies_remove(login.email, login.password, undefined).then(() => {
+              reject(jqXHR.responseJSON || errorThrown);
+            })
+          } else {
+            reject(jqXHR.responseJSON || errorThrown);
+          }
+        })
+      });
+    }
+
+    /**
+     * A login code can be used only once and times out after 10 minutes.
+     *
+     * @note Only one login code may be pending at a time.
+     * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/sendLoginCode
+     *
+     * @param {Object} request_code - Containing the phone number in E.164 format and whether a code should be forced
+     * @returns {Promise} Promise that resolves on successful login code request
+     */
+    post_login_send(request_code) {
+      return this.client.send_json({
+        url: this.client.create_url(`${AuthService.URL_LOGIN}/send`),
+        type: 'POST',
+        data: request_code
+      });
+    }
+
+    /**
+     * Logout on the backend side.
+     * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/logout
+     */
+    post_logout() {
+      return this.client.send_json({
+        url: this.client.create_url(`${AuthService.URL_ACCESS}/logout`),
+        type: 'POST',
+        withCredentials: true
+      });
+    }
+
+    /**
+     * Register a new user.
+     *
+     * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/register
+     *
+     * @param {Object} new_user - Containing the email, username and password needed for account creation
+     * @option {String} new_user - name
+     * @option {String} new_user - email
+     * @option {String} new_user - password
+     * @option {String} new_user - locale
+     * @return {Promise} Promise that will resolve on success
+     */
+    post_register() {
+      return new Promise((resolve, reject) => {
+        $.ajax({
+          contentType: 'application/json; charset=utf-8',
+          crossDomain: true,
+          data: pako.gzip(JSON.stringify(login)),
+          headers: {
+            'Content-Encoding': 'gzip'
+          },
+          processData: false,
+          type: 'POST',
+          url: `${this.client.create_url(`${AuthService.URL_REGISTER}?challenge_cookie=true`)}`,
+          xhrFields: {
+            withCredentials: true
+          }
+        }).done((data) => {
+          resolve(data);
+        }).fail((jqXHR, textStatus, errorThrown) => {
+          reject(jqXHR.responseJSON || errorThrown);
+        })
+      });
+    }
+
+    /**
+     * Save the access token date in the client.
+     *
+     * @param {String} type - Access token type
+     * @param {String} value - Access token
+     */
+    save_access_token_in_client(type = '', value = '') {
+      this.client.access_token_type = type;
+      this.client.access_token = value;
     }
   };
 })();
