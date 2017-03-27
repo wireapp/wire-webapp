@@ -159,8 +159,8 @@ window.z.auth.AuthRepository = class AuthRepository {
   // Get the cached access token from the Amplify store.
   get_cached_access_token() {
     return new Promise(((resolve, reject) => {
-      let access_token = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
-      let access_token_type = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
+      const access_token = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE);
+      const access_token_type = z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE);
 
       if (access_token) {
         this.logger.info('Cached access token found in Local Storage', {access_token});
@@ -205,8 +205,8 @@ window.z.auth.AuthRepository = class AuthRepository {
    * @option {String} access_token_data - type
    */
   save_access_token(access_token_data) {
-    let expires_in_millis = 1000 * access_token_data.expires_in;
-    let expiration_timestamp = Date.now() + expires_in_millis;
+    const expires_in_millis = 1000 * access_token_data.expires_in;
+    const expiration_timestamp = Date.now() + expires_in_millis;
 
     z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE, access_token_data.access_token, access_token_data.expires_in);
     z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expiration_timestamp, access_token_data.expires_in);
@@ -238,7 +238,7 @@ window.z.auth.AuthRepository = class AuthRepository {
    * @param {Integer} expiration_timestamp - Timestamp when access token expires
    */
   _log_access_token_update(access_token_data, expiration_timestamp) {
-    let expiration_log = z.util.format_timestamp(expiration_timestamp, false);
+    const expiration_log = z.util.format_timestamp(expiration_timestamp, false);
     return this.logger.info(`Saved updated access token. It will expire on: ${expiration_log}`, access_token_data);
   }
 

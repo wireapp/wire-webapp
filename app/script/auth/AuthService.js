@@ -23,15 +23,17 @@
   window.z = window.z || {};
   window.z.auth = z.auth || {};
 
-  const POST_ACCESS = {
-    RETRY_LIMIT: 10,
-    RETRY_TIMEOUT: 500,
-  };
-
   window.z.auth.AuthService = class AuthService {
     constructor(client) {
       this.client = client;
       this.logger = new z.util.Logger('z.auth.AuthService', z.config.LOGGER.OPTIONS);
+    }
+
+    static get POST_ACCESS() {
+      return {
+        RETRY_LIMIT: 10,
+        RETRY_TIMEOUT: 500,
+      }
     }
 
     static get URL_ACCESS() {
@@ -97,7 +99,7 @@
       return new Promise((resolve, reject) => {
         this.client.request_queue_blocked_state(z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH);
 
-        let config = {
+        const config = {
           crossDomain: true,
           type: 'POST',
           url: this.client.create_url(AuthService.URL_ACCESS),
@@ -124,7 +126,7 @@
             reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
           }
 
-          if (retry_attempt <= POST_ACCESS.RETRY_LIMIT) {
+          if (retry_attempt <= AuthService.POST_ACCESS.RETRY_LIMIT) {
             retry_attempt++;
 
             const _retry = () => {
@@ -142,7 +144,7 @@
             return window.setTimeout(() => {
               this.logger.info(`Trying to get a new access token: '${retry_attempt}' attempt`);
               return _retry();
-            }, POST_ACCESS.RETRY_TIMEOUT);
+            }, AuthService.POST_ACCESS.RETRY_TIMEOUT);
           } else {
             this.client.request_queue_blocked_state(z.service.RequestQueueBlockedState.NONE);
             this.save_access_token_in_client();
