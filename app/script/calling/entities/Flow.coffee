@@ -110,7 +110,7 @@ class z.calling.entities.Flow
           @participant_et.is_connected false
           @call_et.delete_participant @participant_et
           return if @call_et.participants().length
-          termination_reason = if @e_call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
+          termination_reason = if @call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
           amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @call_et.id, termination_reason
 
         when z.calling.rtc.ICEConnectionState.CLOSED
