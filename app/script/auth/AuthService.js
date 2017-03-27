@@ -83,5 +83,72 @@
       });
     }
 
+    /**
+     * Get access-token if a valid cookie is provided.
+     * @note Don't use our client wrapper here, because to query "/access" we need to set "withCredentials" to "true" in order to send the cookie.
+     * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/authenticate
+     * @param {Integer} retry_attempt - Retry attempts when a request fails
+     * @returns {Promise}
+     */
+    post_access(retry_attempt = 1) {
+      return new Promise((resolve, reject) => {
+        this.client.request_queue_blocked_state(z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH);
+
+        let config = {
+          crossDomain: true,
+          type: 'POST',
+          url: this.client.create_url(AuthService.URL_ACCESS),
+          xhrFields: {
+            withCredentials: true
+          }
+        };
+
+        if (this.client.access_token) {
+          config.headers = {
+            Authorization: `Bearer ${window.decodeURIComponent(this.client.access_token)}`
+          }
+        }
+
+        config.success = (data) => {
+          this.client.request_queue_blocked_state(z.service.RequestQueueBlockedState.NONE);
+          this.save_access_token_in_client(data.token_type, data.access_token);
+          resolve(data);
+        };
+
+        config.error = (jqXHR, textStatus, errorThrown) => {
+          if (jqXHR.status === z.service.BackendClientError.prototype.STATUS_CODE.FORBIDDEN) {
+            this.logger.error(`Requesting access token failed after ${retry_attempt} attempt(s): ${errorThrown}`, jqXHR);
+            reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
+          }
+
+          if (retry_attempt <= POST_ACCESS.RETRY_LIMIT) {
+            retry_attempt++;
+
+            _retry = () => {
+              return this.post_access(retry_attempt).then(resolve).catch(reject);
+            };
+
+            if (jqXHR.status === z.service.BackendClientError.prototype.STATUS_CODE.CONNECTIVITY_PROBLEM) {
+              this.logger.warn('Access token refresh delayed due to suspected connectivity issue');
+              return this.client.execute_on_connectivity().then(() => {
+                this.logger.info('Continuing access token refresh after verifying connectivity');
+                return _retry();
+              });
+            }
+
+            return window.setTimeout(() => {
+              this.logger.info(`Trying to get a new access token: '${retry_attempt}' attempt`);
+              return _retry();
+            }, POST_ACCESS.RETRY_TIMEOUT);
+          } else {
+            this.client.request_queue_blocked_state(z.service.RequestQueueBlockedState.NONE);
+            this.save_access_token_in_client();
+            return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED));
+          }
+        };
+
+        $.ajax(config);
+      });
+    }
   };
 })();
