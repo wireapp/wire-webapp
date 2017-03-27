@@ -337,21 +337,6 @@ describe 'Conversation', ->
 
       expect(conversation_et.messages_unordered().length).toBe 2
 
-    it 'detects duplicate messages', ->
-      content = z.message.SuperType.CONTENT
-      asset_meta = z.event.Client.CONVERSATION.ASSET_META
-
-      message1.super_type = content
-      message1.type = asset_meta
-
-      message2.super_type = content
-      message2.type = asset_meta
-      message_ets = [message1, message2]
-      conversation_et.add_messages message_ets
-
-      expect(message2.visible()).toBe false
-      expect(message1.visible()).toBe true
-
   describe 'message deletion', ->
 
     message_et = null
