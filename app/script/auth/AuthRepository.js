@@ -39,7 +39,7 @@ window.z.auth.AuthRepository = class AuthRepository {
           const cookie = cookies[i];
           const expiration = z.util.format_timestamp(cookie.time, false);
           const log = `Label: ${cookie.label} | Type: ${cookie.type} |  Expiration: ${expiration}`;
-          this.logger.force_log(`Cookie No. ${index + 1} | ${log}`);
+          this.logger.force_log(`Cookie No. ${i + 1} | ${log}`);
         }
       })
       .catch((error) => {
@@ -59,12 +59,12 @@ window.z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Promise that resolves with the received access token
    */
   login(login, persist) {
-    return auth_service.post_login(login, persist)
+    return this.auth_service.post_login(login, persist)
       .then((response) => {
         this.save_access_token(response);
         z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, persist);
         z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-        return response
+        return response;
       });
   }
 
@@ -74,7 +74,7 @@ window.z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Promise that will always resolve
    */
   logout() {
-    return auth_service.post_logout().then(() => {
+    return this.auth_service.post_logout().then(() => {
       this.logger.info('Log out on backend successful');
     }).catch((error) => {
       this.logger.warn(`Log out on backend failed: ${error.message}`, error);
@@ -93,16 +93,16 @@ window.z.auth.AuthRepository = class AuthRepository {
    */
   register(new_user) {
     return this.auth_service.post_register(new_user).then((response) => {
-        z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, true);
-        z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-        z.util.StorageUtil.set_value(new_user.label_key, new_user.label);
-        this.logger.info(`COOKIE::'${new_user.label}' Saved cookie label with key '${new_user.label_key}' in Local Storage`, {
-            key: new_user.label_key,
-            value: new_user.label
-          }
-        );
-        return response;
+      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, true);
+      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+      z.util.StorageUtil.set_value(new_user.label_key, new_user.label);
+      this.logger.info(`COOKIE::'${new_user.label}' Saved cookie label with key '${new_user.label_key}' in Local Storage`, {
+        key: new_user.label_key,
+        value: new_user.label,
       }
+        );
+      return response;
+    }
     );
   }
 
@@ -144,15 +144,15 @@ window.z.auth.AuthRepository = class AuthRepository {
       this.auth_service.client.execute_request_queue();
       return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
     }).catch((error) => {
-        if ((error.type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN) || z.util.Environment.frontend.is_localhost()) {
-          this.logger.warn(`Session expired on access token refresh: ${error.message}`, error);
-          Raygun.send(error);
-          return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.SESSION_EXPIRED, false, true);
-        } else if (error.type !== z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS) {
-          this.logger.error(`Refreshing access token failed: '${error.type}'`, error);
-          return amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
-        }
+      if ((error.type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN) || z.util.Environment.frontend.is_localhost()) {
+        this.logger.warn(`Session expired on access token refresh: ${error.message}`, error);
+        Raygun.send(error);
+        return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.SESSION_EXPIRED, false, true);
+      } else if (error.type !== z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS) {
+        this.logger.error(`Refreshing access token failed: '${error.type}'`, error);
+        return amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
       }
+    }
     );
   }
 
@@ -184,9 +184,9 @@ window.z.auth.AuthRepository = class AuthRepository {
     }
 
     return this.auth_service.post_access().then(access_token => {
-        this.save_access_token(access_token);
-        return access_token;
-      }
+      this.save_access_token(access_token);
+      return access_token;
+    }
     );
   }
 

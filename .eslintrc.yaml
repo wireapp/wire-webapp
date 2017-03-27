@@ -13,6 +13,7 @@ globals:
   ko: true
   LRUCache: true
   pako: true
+  Raygun: true
   wire: true
   z: true
 
