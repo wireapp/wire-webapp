@@ -104,6 +104,7 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
+    amplify.subscribe z.event.WebApp.CONVERSATION.MISSED_EVENTS, @on_missed_events
     amplify.subscribe z.event.WebApp.CONVERSATION.PERSIST_STATE, @save_conversation_state_in_db
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
@@ -1768,6 +1769,11 @@ class z.conversation.ConversationRepository
   ###############################################################################
   # Event callbacks
   ###############################################################################
+
+  on_missed_events: =>
+    @filtered_conversations()
+    .filter (conversation_et) -> not conversation_et.removed_from_conversation()
+    .forEach (conversation_et) -> amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_missed conversation_et
 
   ###
   Listener for incoming events from the WebSocket.

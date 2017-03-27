@@ -208,11 +208,6 @@ z.string.tr.modal_session_reset_message_2 = 'biz.'
 # Too many members in conversation
 z.string.tr.modal_too_many_members_headline = 'Dolup taşmış'
 z.string.tr.modal_too_many_members_message = 'Görüşmeye en fazla %max kişi katılabilir. Burada %no kişi için daha boş yer var.'
-# Whitelist screensharing
-z.string.tr.modal_whitelist_screensharing_headline = 'Wire ekranınızı paylaşmak için gerekli izinleri sağlamalıdır'
-z.string.tr.modal_whitelist_screensharing_message_1 = 'Hakkında:ayarlar bölümünü açın ve *.wire.com adresini ekran paylaşımı izinli alan adları listesine ekleyin'
-z.string.tr.modal_whitelist_screensharing_message_link = 'SSS'
-z.string.tr.modal_whitelist_screensharing_message_2 = 'detaylar için.'
 # Parallel uploads
 z.string.tr.modal_uploads_parallel = 'Tek seferde en fazla %no boyutunda dosya gönderebilirsiniz.'
 

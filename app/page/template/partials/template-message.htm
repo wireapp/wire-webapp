@@ -335,6 +335,15 @@
   </div>
 </script>
 
+<script type="text/html" id="missed">
+  <div class="message-header">
+    <div class="message-header-icon">
+      <span class="icon-sysmsg-error text-red"></span>
+    </div>
+    <div class="message-header-label" data-bind="l10n_text: z.string.conversation_missed_messages"></div>
+  </div>
+</script>
+
 <script type="text/html" id="timestamp">
   <div class="message-header message-timestamp" data-bind="css: $parent.get_timestamp_class($data)">
     <div class="message-header-icon">

@@ -208,11 +208,6 @@ z.string.da.modal_session_reset_message_2 = 'os.'
 # Too many members in conversation
 z.string.da.modal_too_many_members_headline = 'Fuldt hus'
 z.string.da.modal_too_many_members_message = 'Op til %max personer kan deltage i en samtale. Der er plads til %no personer mere herinde.'
-# Whitelist screensharing
-z.string.da.modal_whitelist_screensharing_headline = 'Wire skal have tilladelse til at dele din skærm'
-z.string.da.modal_whitelist_screensharing_message_1 = 'Åben about:config og tilføj *.wire.com til listen over tilladte domæner for skærmdeling. Se'
-z.string.da.modal_whitelist_screensharing_message_link = 'FAQ'
-z.string.da.modal_whitelist_screensharing_message_2 = 'for detaljer.'
 # Parallel uploads
 z.string.da.modal_uploads_parallel = 'Du kan sende op til %no filer på én gang.'
 

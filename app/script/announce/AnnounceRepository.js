@@ -50,7 +50,7 @@
 
     check_version() {
       return this.announce_service.get_version().then((server_version) => {
-        this.logger.info(`Found new version ${server_version}`);
+        this.logger.info(`Checking current webapp version. Server '${server_version}' vs. local '${z.util.Environment.version(false, true)}'`);
 
         if (server_version > z.util.Environment.version(false, true)) {
           amplify.publish(z.event.WebApp.LIFECYCLE.UPDATE, z.announce.UPDATE_SOURCE.WEBAPP);

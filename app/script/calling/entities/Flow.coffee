@@ -83,10 +83,7 @@ class z.calling.entities.Flow
       @telemetry.set_peer_connection @peer_connection
       @telemetry.schedule_check 5000 if is_initialized
 
-    @audio_stream = @call_et.local_stream_audio
-    @video_stream = @call_et.local_stream_video
-
-    @has_media_stream = ko.pureComputed => return @video_stream()? or @audio_stream()?
+    @media_stream = @call_et.local_media_stream
 
     @connection_state = ko.observable z.calling.rtc.ICEConnectionState.NEW
     @gathering_state = ko.observable z.calling.rtc.ICEGatheringState.NEW
@@ -113,7 +110,7 @@ class z.calling.entities.Flow
           @participant_et.is_connected false
           @call_et.delete_participant @participant_et
           return if @call_et.participants().length
-          termination_reason = if @e_call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
+          termination_reason = if @call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
           amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @call_et.id, termination_reason
 
         when z.calling.rtc.ICEConnectionState.CLOSED
@@ -126,7 +123,7 @@ class z.calling.entities.Flow
           return if @converted_own_sdp_state()
           @logger.debug "PeerConnection with '#{@remote_user.name()}' was closed"
           @call_et.delete_participant @participant_et
-          @_remove_media_streams()
+          @_remove_media_stream @media_stream()
 
         when z.calling.rtc.SignalingState.REMOTE_OFFER
           @negotiation_needed true
@@ -245,7 +242,7 @@ class z.calling.entities.Flow
         @_create_offer()
 
     @can_initialize_peer_connection = ko.pureComputed =>
-      can_initialize = @has_media_stream() and @payload() and not @pc_initialized()
+      can_initialize = @media_stream() and @payload() and not @pc_initialized()
       return can_initialize
 
     @can_initialize_peer_connection.subscribe (can_initialize) =>
@@ -298,6 +295,7 @@ class z.calling.entities.Flow
   _rewrite_payload: (payload) ->
     for ice_server in payload.ice_servers when not ice_server.urls
       ice_server.urls = [ice_server.url]
+      delete ice_server.url
     return payload
 
 
@@ -352,8 +350,9 @@ class z.calling.entities.Flow
   # Initialize the PeerConnection.
   _initialize_peer_connection: ->
     @_create_peer_connection()
-    @_add_media_streams()
+    @_add_media_stream @media_stream()
     @pc_initialized true
+    @negotiation_needed true
 
   ###
   A MediaStream was added to the PeerConnection.
@@ -709,25 +708,6 @@ class z.calling.entities.Flow
         {stream: media_stream, audio_tracks: media_stream.getAudioTracks(), video_tracks: media_stream.getVideoTracks()}
 
   ###
-  Adds the local MediaStreams to the PeerConnection.
-  @private
-  ###
-  _add_media_streams: ->
-    media_streams_identical = @_compare_local_media_streams()
-
-    @_add_media_stream @audio_stream() if @audio_stream()
-    @_add_media_stream @video_stream() if @video_stream() and not media_streams_identical
-
-    @negotiation_needed true
-
-  ###
-  Compare whether local audio and video streams are identical.
-  @private
-  ###
-  _compare_local_media_streams: ->
-    return @audio_stream() and @video_stream() and @audio_stream().id is @video_stream().id
-
-  ###
   Replace the MediaStream attached to the PeerConnection.
   @private
   @param media_stream_info [z.media.MediaStreamInfo] Object containing the required MediaStream information
@@ -735,14 +715,16 @@ class z.calling.entities.Flow
   _replace_media_stream: (media_stream_info) ->
     Promise.resolve()
     .then =>
-      return @_remove_media_streams media_stream_info.type
+      return @_remove_media_stream @media_stream()
     .then =>
+      @_upgrade_media_stream media_stream_info.stream, media_stream_info.type
+    .then (updated_media_stream) =>
       @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE
-      @_add_media_stream media_stream_info.stream
+      @_add_media_stream updated_media_stream
       @is_answer false
       @negotiation_needed true
       @logger.info 'Replaced the MediaStream successfully', media_stream_info.stream
-      return media_stream_info
+      return updated_media_stream
     .catch (error) =>
       @logger.error "Failed to replace local MediaStream: #{error.message}", error
       throw error
@@ -792,21 +774,25 @@ class z.calling.entities.Flow
         {stream: media_stream, audio_tracks: media_stream.getAudioTracks(), video_tracks: media_stream.getVideoTracks()}
 
   ###
-  Reset the flows MediaStream and media elements.
-  @private
-  @param media_type [z.media.MediaType] Optional media type of MediaStreams to be removed
-  ###
-  _remove_media_streams: (media_type = z.media.MediaType.AUDIO_VIDEO) ->
-    switch media_type
-      when z.media.MediaType.AUDIO_VIDEO
-        media_streams_identical = @_compare_local_media_streams()
+  Upgrade the local MediaStream with new MediaStreamTracks
 
-        @_remove_media_stream @audio_stream() if @audio_stream()
-        @_remove_media_stream @video_stream() if @video_stream() and not media_streams_identical
-      when z.media.MediaType.AUDIO
-        @_remove_media_stream @audio_stream() if @audio_stream()
-      when z.media.MediaType.VIDEO
-        @_remove_media_stream @video_stream() if @video_stream()
+  @private
+  @param new_media_stream [MediaStream] MediaStream containing new MediaStreamTracks
+  @param media_type [z.media.MediaType] Type of tracks to update
+  @return [MediaStream] New MediaStream to be used
+  ###
+  _upgrade_media_stream: (new_media_stream, media_type) ->
+    if @media_stream()
+      for media_stream_track in z.media.MediaStreamHandler.get_media_tracks @media_stream(), media_type
+        @media_stream().removeTrack media_stream_track
+        media_stream_track.stop()
+        @logger.info "Stopping MediaStreamTrack of kind '#{media_stream_track.kind}' successful", media_stream_track
+
+      media_stream = @media_stream().clone()
+
+      media_stream.addTrack media_stream_track for media_stream_track in z.media.MediaStreamHandler.get_media_tracks new_media_stream, media_type
+      return z.media.MediaStreamHandler.detect_media_stream_type media_stream
+    return new_media_stream
 
 
   ###############################################################################
@@ -831,7 +817,7 @@ class z.calling.entities.Flow
         @_close_peer_connection()
     catch error
       @logger.error "We caught the #{error.name}: #{error.message}", error
-    @_remove_media_streams()
+    @_remove_media_stream @media_stream()
     @_reset_signaling_states()
     @ice_candidates_cache = []
     @payload undefined

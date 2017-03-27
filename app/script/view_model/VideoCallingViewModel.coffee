@@ -30,7 +30,7 @@ class z.ViewModel.VideoCallingViewModel
     @current_device_id = @media_repository.devices_handler.current_device_id
     @current_device_index = @media_repository.devices_handler.current_device_index
 
-    @local_video_stream = @media_repository.stream_handler.local_media_streams.video
+    @local_video_stream = @media_repository.stream_handler.local_media_stream
     @remote_video_stream = @media_repository.stream_handler.remote_media_streams.video
 
     @self_stream_state = @media_repository.stream_handler.self_stream_state
