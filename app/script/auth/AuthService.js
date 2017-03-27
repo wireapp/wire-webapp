@@ -33,7 +33,7 @@
       return {
         RETRY_LIMIT: 10,
         RETRY_TIMEOUT: 500,
-      }
+      };
     }
 
     static get URL_ACCESS() {
