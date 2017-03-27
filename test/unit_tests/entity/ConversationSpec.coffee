@@ -154,9 +154,11 @@ describe 'Conversation', ->
       conversation_et.last_read_timestamp last_read_timestamp
 
       ping_message = new z.entity.PingMessage()
+      ping_message.id = z.util.create_random_uuid()
       ping_message.timestamp last_read_timestamp - 1000
 
       call_message = new z.entity.CallMessage()
+      call_message.id = z.util.create_random_uuid()
       call_message.timestamp last_read_timestamp - 1000
       call_message.finished_reason = z.calling.enum.TERMINATION_REASON.MISSED
 

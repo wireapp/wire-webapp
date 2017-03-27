@@ -21,12 +21,6 @@ z.entity ?= {}
 
 # Base message entity.
 class z.entity.Message
-  ###
-  Sort messages by timestamp
-  @return [Boolean] Is message of type system
-  ###
-  @sort_by_timestamp: (message_ets) ->
-    message_ets.sort (m1, m2) -> m1.timestamp() > m2.timestamp()
 
   # Construct a new base message entity.
   constructor: (@id = '0', @super_type = '') ->
