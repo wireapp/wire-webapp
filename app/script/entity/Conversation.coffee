@@ -263,6 +263,15 @@ class z.entity.Conversation
   ###############################################################################
 
   ###
+  Check if message with given id not added to conversation.
+  @param message_id [String]
+  @private
+  ###
+  _is_unique: (message_id) ->
+    duplicated_message_et = @messages_unordered().find (message_et) -> message_et.id is message_id
+    return not duplicated_message_et?
+
+  ###
   Adds a single message to the conversation.
   @param message_et [z.entity.Message] Message entity to be added to the conversation
   ###
@@ -281,19 +290,19 @@ class z.entity.Conversation
 
     # last rendered message is the last message in this conversation so we are safe to add it
     if not last_message? or last_message.timestamp() is @last_event_timestamp()
-      @messages_unordered.push @_check_for_duplicate_nonce message_et, last_message
+      @messages_unordered.push message_et if @_is_unique message_et.id
+
 
   ###
   Adds multiple messages to the conversation.
   @param message_ets [z.entity.Message[]] Array of message entities to be added to the conversation
   ###
   add_messages: (message_ets) ->
-    for message_et, i in message_ets
-      message_et = @_check_for_duplicate_nonce message_ets[i - 1], message_et
+    unique_message_ets = message_ets.filter (message_et) => @_is_unique message_et.id
 
     # in order to avoid multiple db writes check the messages from the end and stop once
     # we found a message from self user
-    for message_et in message_ets by -1
+    for message_et in unique_message_ets by -1
       if message_et.user()?.is_me
         @_update_last_read_from_message message_et
         break
@@ -305,11 +314,8 @@ class z.entity.Conversation
   @param message_ets [z.entity.Message[]] Array of messages to be added to conversation
   ###
   prepend_messages: (message_ets) ->
-    last_message_et = message_ets[message_ets.length - 1]
-    last_message_et = @_check_for_duplicate_nonce last_message_et, @get_first_message()
-    for message_et, i in message_ets by -1
-      message_et = @_check_for_duplicate_nonce message_ets[i - 1], message_et
-    z.util.ko_array_unshift_all @messages_unordered, message_ets
+    unique_message_ets = message_ets.filter (message_et) => @_is_unique message_et.id
+    z.util.ko_array_unshift_all @messages_unordered, unique_message_ets
 
   ###
   Removes message from the conversation by message id.
@@ -331,29 +337,6 @@ class z.entity.Conversation
   ###
   remove_messages: ->
     @messages_unordered.removeAll()
-
-  ###
-  Checks for message duplicates by nonce and returns the message.
-
-  @private
-  @note If a message is send to the backend multiple times by a client they will be in the conversation multiple times
-
-  @param message_et [z.entity.Message] Message entity to be added to the conversation
-  @param other_message_et [z.entity.Message] Other message entity to compare with
-  ###
-  _check_for_duplicate_nonce: (message_et, other_message_et) ->
-    return message_et if not message_et? or not other_message_et?
-    if message_et.has_nonce() and other_message_et.has_nonce() and message_et.nonce is other_message_et.nonce
-      sorted_messages = z.entity.Message.sort_by_timestamp [message_et, other_message_et]
-      if message_et.type is z.event.Client.CONVERSATION.ASSET_META and other_message_et.type is z.event.Client.CONVERSATION.ASSET_META
-        # android sends to meta messages with the same content. we would store both and but only update the first one
-        # whenever we reload the conversation the nonce check would hide the older one and we would show the non updated message
-        # to fix that we hide the newer one
-        sorted_messages[1].visible false # hide newer
-      else
-        sorted_messages[0].visible false # hide older
-    return message_et
-
 
   ###############################################################################
   # Generated messages

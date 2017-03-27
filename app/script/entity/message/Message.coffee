@@ -126,13 +126,6 @@ class z.entity.Message
     return false
 
   ###
-  Check if message contains a nonce.
-  @return [Boolean] Message contains a nonce
-  ###
-  has_nonce: ->
-    return @super_type in [z.message.SuperType.CONTENT]
-
-  ###
   Check if message is a call message.
   @return [Boolean] Is message of type call
   ###
