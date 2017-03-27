@@ -54,7 +54,7 @@ self.addEventListener 'activate', (event) ->
 
   expectedCacheNames = Object.keys(CURRENT_CACHES).map (key) -> CURRENT_CACHES[key]
 
-  event.waitUntil caches.keys().then((cacheNames) ->
+  event.waitUntil caches.keys().then(cacheNames) ->
     Promise.all(cacheNames.map((cacheName) ->
       if expectedCacheNames.indexOf(cacheName) is -1
         # coffeelint: disable
@@ -63,18 +63,14 @@ self.addEventListener 'activate', (event) ->
         return caches.delete(cacheName)
     )).then ->
       self.clients.claim()
-  )
 
 self.addEventListener 'fetch', (event) ->
   if should_cache_request event.request
-    event.respondWith(
+    event.respondWith
       caches.open(CURRENT_CACHES.asset).then (cache) ->
         cache.match(event.request)
         .then (response) ->
-
           if response
             cache.put event.request, response.clone()
             return response
-
           return add_to_lru cache, ASSET_CACHE_MAX_ITEMS, event.request
-    )
