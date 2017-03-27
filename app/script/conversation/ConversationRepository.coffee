@@ -1259,8 +1259,8 @@ class z.conversation.ConversationRepository
   Create a user client map for a given conversation.
 
   @param conversation_id [String] Conversation ID
-  @param user_ids [Array<String>] Optionally the intended recipient users
   @param skip_own_clients [Boolean] True, if other own clients should be skipped (to not sync messages on own clients)
+  @param user_ids [Array<String>] Optionally the intended recipient users
   @return [Promise<Object>] Promise that resolves with a user client map
   ###
   create_user_client_map: (conversation_id, skip_own_clients = false, user_ids) ->
@@ -1268,8 +1268,10 @@ class z.conversation.ConversationRepository
     .then (user_ets) ->
       user_client_map = {}
 
-      for user_et in user_ets when user_id not in user_ids
+      for user_et in user_ets
         continue if skip_own_clients and user_et.is_me
+        if user_ids
+          continue if user_et.id not in user_ids
         user_client_map[user_et.id] = (client_et.id for client_et in user_et.devices())
 
       return user_client_map
