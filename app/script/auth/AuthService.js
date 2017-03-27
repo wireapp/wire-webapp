@@ -25,7 +25,7 @@
 
   const POST_ACCESS = {
     RETRY_LIMIT: 10,
-    RETRY_TIMEOUT: 500
+    RETRY_TIMEOUT: 500,
   };
 
   window.z.auth.AuthService = class AuthService {
@@ -66,7 +66,7 @@
     get_cookies() {
       return this.client.send_request({
         url: this.client.create_url(this.URL_COOKIES),
-        type: 'GET'
+        type: 'GET',
       }).then((data) => {
         return data.cookies;
       });
@@ -81,7 +81,7 @@
     get_invitations_info(code) {
       return this.client.send_request({
         url: this.client.create_url(`${this.URL_INVITATIONS}/info?code=${code}`),
-        type: 'GET'
+        type: 'GET',
       });
     }
 
@@ -102,14 +102,14 @@
           type: 'POST',
           url: this.client.create_url(AuthService.URL_ACCESS),
           xhrFields: {
-            withCredentials: true
-          }
+            withCredentials: true,
+          },
         };
 
         if (this.client.access_token) {
           config.headers = {
-            Authorization: `Bearer ${window.decodeURIComponent(this.client.access_token)}`
-          }
+            Authorization: `Bearer ${window.decodeURIComponent(this.client.access_token)}`,
+          };
         }
 
         config.success = (data) => {
@@ -127,7 +127,7 @@
           if (retry_attempt <= POST_ACCESS.RETRY_LIMIT) {
             retry_attempt++;
 
-            _retry = () => {
+            const _retry = () => {
               return this.post_access(retry_attempt).then(resolve).catch(reject);
             };
 
@@ -166,7 +166,7 @@
       return this.client.send_json({
         url: this.client.create_url(`${AuthService.URL_ACTIVATE}/send`),
         type: 'POST',
-        data: send_activation_code
+        data: send_activation_code,
       });
     }
 
@@ -184,8 +184,8 @@
         data: {
           email: email,
           password: password,
-          labels: labels
-        }
+          labels: labels,
+        },
       });
     }
 
@@ -210,14 +210,14 @@
           crossDomain: true,
           data: pako.gzip(JSON.stringify(login)),
           headers: {
-            'Content-Encoding': 'gzip'
+            'Content-Encoding': 'gzip',
           },
           processData: false,
           type: 'POST',
           url: `${this.client.create_url(`${AuthService.URL_LOGIN}?persist=${persist}`)}`,
           xhrFields: {
-            withCredentials: true
-          }
+            withCredentials: true,
+          },
         }).done((data) => {
           resolve(data);
         }).fail((jqXHR, textStatus, errorThrown) => {
@@ -225,11 +225,11 @@
             // Backend blocked our user account from login, so we have to reset our cookies
             this.post_cookies_remove(login.email, login.password, undefined).then(() => {
               reject(jqXHR.responseJSON || errorThrown);
-            })
+            });
           } else {
             reject(jqXHR.responseJSON || errorThrown);
           }
-        })
+        });
       });
     }
 
@@ -246,7 +246,7 @@
       return this.client.send_json({
         url: this.client.create_url(`${AuthService.URL_LOGIN}/send`),
         type: 'POST',
-        data: request_code
+        data: request_code,
       });
     }
 
@@ -258,7 +258,7 @@
       return this.client.send_json({
         url: this.client.create_url(`${AuthService.URL_ACCESS}/logout`),
         type: 'POST',
-        withCredentials: true
+        withCredentials: true,
       });
     }
 
@@ -274,26 +274,26 @@
      * @option {String} new_user - locale
      * @return {Promise} Promise that will resolve on success
      */
-    post_register() {
+    post_register(new_user) {
       return new Promise((resolve, reject) => {
         $.ajax({
           contentType: 'application/json; charset=utf-8',
           crossDomain: true,
-          data: pako.gzip(JSON.stringify(login)),
+          data: pako.gzip(JSON.stringify(new_user)),
           headers: {
-            'Content-Encoding': 'gzip'
+            'Content-Encoding': 'gzip',
           },
           processData: false,
           type: 'POST',
           url: `${this.client.create_url(`${AuthService.URL_REGISTER}?challenge_cookie=true`)}`,
           xhrFields: {
-            withCredentials: true
-          }
+            withCredentials: true,
+          },
         }).done((data) => {
           resolve(data);
         }).fail((jqXHR, textStatus, errorThrown) => {
           reject(jqXHR.responseJSON || errorThrown);
-        })
+        });
       });
     }
 

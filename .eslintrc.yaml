@@ -12,6 +12,7 @@ globals:
   amplify: true
   ko: true
   LRUCache: true
+  pako: true
   wire: true
   z: true
 
