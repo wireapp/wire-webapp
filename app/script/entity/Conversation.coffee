@@ -368,6 +368,7 @@ class z.entity.Conversation
     return undefined if @participating_user_ets().length is 0
     message_et = new z.entity.MemberMessage()
     message_et.type = z.message.SuperType.MEMBER
+    message_et.timestamp new Date(0)
     message_et.user_ids @participating_user_ids()
     message_et.user_ets @participating_user_ets().slice 0
 
