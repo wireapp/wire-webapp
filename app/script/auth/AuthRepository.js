@@ -30,5 +30,43 @@
       this.logger = new z.util.Logger('z.auth.AuthRepository', z.config.LOGGER.OPTIONS);
       amplify.subscribe(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, this.renew_access_token);
     }
+
+    // Print all cookies for a user in the console.
+    list_cookies() {
+      this.auth_service.get_cookies()
+        .then((cookies) => {
+          this.logger.force_log('Backend cookies:');
+          for (let i = 0, len = cookies.length; i < len; ++i) {
+            const cookie = cookies[i];
+            const expiration = z.util.format_timestamp(cookie.time, false);
+            const log = `Label: ${cookie.label} | Type: ${cookie.type} |  Expiration: ${expiration}`;
+            this.logger.force_log(`Cookie No. ${index + 1} | ${log}`);
+          }
+        })
+        .catch((error) => {
+          this.logger.force_log('Could not list user cookies', error);
+        });
+    }
+
+    /**
+     * Login (with email or phone) in order to obtain an access-token and cookie.
+     *
+     * @param {Object} login - Containing sign in information
+     * @option {String} login - email The email address for a password login
+     * @option {String} login - phone The phone number for a password or SMS login
+     * @option {String} login - password The password for a password login
+     * @option {String} login - code The login code for an SMS login
+     * @param {Boolean} persist - Request a persistent cookie instead of a session cookie
+     * @return {Promise} Promise that resolves with the received access token
+     */
+    login(login, persist) {
+      return auth_service.post_login(login, persist)
+        .then((response) => {
+          this.save_access_token(response);
+          z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, persist);
+          z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+          return response
+        });
+    }
   }
 })();
