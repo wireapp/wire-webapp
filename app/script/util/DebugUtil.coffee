@@ -24,8 +24,7 @@ class z.util.DebugUtil
     @logger = new z.util.Logger 'z.util.DebugUtil', z.config.LOGGER.OPTIONS
 
   _get_user_by_id: (user_id) ->
-    return new Promise (resolve) =>
-      @user_repository.get_user_by_id user_id, (user_et) -> resolve user_et
+    return new Promise (resolve) => @user_repository.get_user_by_id user_id, (user_et) -> resolve user_et
 
   block_all_connections: ->
     block_users = []
@@ -49,7 +48,7 @@ class z.util.DebugUtil
     .then (session_id) =>
       @logger.log "Corrupted Session ID '#{session_id}'"
 
-  get_number_of_clients_in_conversation: ->
+  get_number_of_clients_in_conversation: =>
     user_ets = @conversation_repository.active_conversation().participating_user_ets()
 
     other_clients = user_ets
@@ -60,11 +59,11 @@ class z.util.DebugUtil
 
     return other_clients + my_clients
 
-  get_event_info: (event) ->
+  get_event_info: (event) =>
     debug_information =
       event: event
 
-    @get_conversation_by_id event.conversation
+    @conversation_repository.get_conversation_by_id event.conversation
     .then (conversation_et) =>
       debug_information.conversation = conversation_et
       return @_get_user_by_id event.from
@@ -77,14 +76,14 @@ class z.util.DebugUtil
       return debug_information
 
   get_serialised_session: (session_id) ->
-    return wire.app.repository.storage.storage_service.load 'sessions', session_id
-      .then (record) ->
-        base64_encoded_payload = z.util.array_to_base64 record.serialised
-        record.serialised = base64_encoded_payload
-        return record
+    wire.app.repository.storage.storage_service.load 'sessions', session_id
+    .then (record) ->
+      base64_encoded_payload = z.util.array_to_base64 record.serialised
+      record.serialised = base64_encoded_payload
+      return record
 
   get_serialised_identity: ->
-    return wire.app.repository.storage.storage_service.load 'keys', 'local_identity'
+    wire.app.repository.storage.storage_service.load 'keys', 'local_identity'
     .then (record) ->
       base64_encoded_payload = z.util.array_to_base64 record.serialised
       record.serialised = base64_encoded_payload

@@ -229,9 +229,7 @@ class z.calling.v3.CallCenter
       return if e_call_message_et.user_id is @user_repository.self().id
       return if e_call_message_et.response is true
 
-      @conversation_repository.get_conversation_by_id e_call_message_et.conversation_id
-      .then (conversation_et) =>
-        @conversation_repository.grant_message conversation_et, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [e_call_message_et.user_id]
+      @conversation_repository.grant_message e_call_message_et.conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [e_call_message_et.user_id]
       .then =>
         @_create_incoming_e_call e_call_message_et
 

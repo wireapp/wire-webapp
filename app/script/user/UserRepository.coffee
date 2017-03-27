@@ -262,7 +262,7 @@ class z.user.UserRepository
       if previous_status is z.user.ConnectionStatus.SENT and connection_et.status() is z.user.ConnectionStatus.ACCEPTED
         @update_user_by_id connection_et.to
       @_send_user_connection_notification connection_et, previous_status
-      amplify.publish z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, [connection_et], show_conversation
+      amplify.publish z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation
 
   ###
   Use a JSON event to update the matching user.
