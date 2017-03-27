@@ -201,7 +201,7 @@
      * @option {String} login - password The password for a password login
      * @option {String} login - code The login code for an SMS login
      * @param {Boolean} persist - Request a persistent cookie instead of a session cookie
-     * @return {Promise} Promise that resolves with access token
+     * @returns {Promise} Promise that resolves with access token
      */
     post_login(login, persist) {
       return new Promise((resolve, reject) => {
@@ -272,7 +272,7 @@
      * @option {String} new_user - email
      * @option {String} new_user - password
      * @option {String} new_user - locale
-     * @return {Promise} Promise that will resolve on success
+     * @returns {Promise} Promise that will resolve on success
      */
     post_register(new_user) {
       return new Promise((resolve, reject) => {
