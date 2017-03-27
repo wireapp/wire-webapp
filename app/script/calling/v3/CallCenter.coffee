@@ -491,7 +491,7 @@ class z.calling.v3.CallCenter
           @telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, e_call_et
           @_distribute_activation_event e_call_message_et
       .catch (error) =>
-        @delete_call e_call_et.conversation_et.id
+        @delete_call e_call_message_et.conversation_id
         throw error unless error instanceof z.media.MediaError
 
   ###
