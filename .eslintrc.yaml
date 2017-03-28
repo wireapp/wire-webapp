@@ -10,6 +10,9 @@ globals:
   _: true
   $: true
   amplify: true
+  describe: true
+  expect: true
+  it: true
   ko: true
   LRUCache: true
   pako: true
