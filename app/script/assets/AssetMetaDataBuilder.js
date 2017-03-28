@@ -42,9 +42,8 @@ z.assets.AssetMetaDataBuilder = {
       return this._build_audio_metdadata(file);
     } else if (this.is_image(file)) {
       return this._build_image_metdadata(file);
-    } else {
-      return Promise.resolve();
     }
+    return Promise.resolve();
   },
 
   is_audio(file) {

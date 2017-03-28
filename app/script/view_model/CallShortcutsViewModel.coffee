@@ -47,21 +47,21 @@ class z.ViewModel.CallShortcutsViewModel
         @_subscribe_shortcuts_incoming()
 
   _subscribe_shortcuts_incoming: =>
-    amplify.subscribe z.event.WebApp.SHORTCUT.CALL_IGNORE, @on_ignore_call
+    amplify.subscribe z.event.WebApp.SHORTCUT.CALL_REJECT, @on_reject_call
 
   _subscribe_shortcuts_outgoing_ongoing: =>
     amplify.subscribe z.event.WebApp.SHORTCUT.CALL_MUTE, @on_mute_call
 
   _unsubscribe_shortcuts: =>
     amplify.unsubscribe z.event.WebApp.SHORTCUT.CALL_MUTE, @on_mute_call
-    amplify.unsubscribe z.event.WebApp.SHORTCUT.CALL_IGNORE, @on_ignore_call
+    amplify.unsubscribe z.event.WebApp.SHORTCUT.CALL_REJECT, @on_reject_call
 
   ###########################
   # Component actions
   ###########################
 
-  on_ignore_call: =>
-    amplify.publish z.event.WebApp.CALL.STATE.IGNORE, @joined_call()?.id
-
   on_mute_call: =>
     amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, @joined_call()?.id, z.media.MediaType.AUDIO
+
+  on_reject_call: =>
+    amplify.publish z.event.WebApp.CALL.STATE.REJECT, @joined_call()?.id

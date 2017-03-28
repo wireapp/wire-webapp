@@ -1,6 +1,6 @@
 #
 # Wire
-# Copyright (C) 2016 Wire Swiss GmbH
+# Copyright (C) 2017 Wire Swiss GmbH
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,12 +17,13 @@
 #
 
 window.z ?= {}
-z.auth ?= {}
+z.calling ?= {}
+z.calling.rtc ?= {}
 
-# Authentication error entity.
-class z.auth.ValidationError
-  # Construct a new Authentication error.
-  constructor: (types, string_identifier) ->
-    types = [types] if _.isString types
-    @types = types
-    @message = z.localization.Localizer.get_text string_identifier
+# https://w3c.github.io/webrtc-pc/#dom-rtcdatachannelstate
+# https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/readyState
+z.calling.rtc.DataChannelState =
+  CLOSED: 'closed'
+  CLOSING: 'closing'
+  CONNECTING: 'connecting'
+  OPEN: 'open'

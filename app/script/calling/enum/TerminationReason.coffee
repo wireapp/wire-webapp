@@ -28,6 +28,7 @@ z.calling.enum.TERMINATION_REASON =
   MISSED: 'missed'
   OTHER_USER: 'other'
   REMOVED_MEMBER: 'removed_member'
+  RENEGOTIATION: 'renegotiation'
   SDP_FAILED: 'failed_sdp'
   SELF_USER: 'self'
   UNKNOWN: 'unknown'

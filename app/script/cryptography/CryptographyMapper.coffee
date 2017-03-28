@@ -52,7 +52,7 @@ class z.cryptography.CryptographyMapper
       when 'asset'
         return @_map_asset generic_message.asset, generic_message.message_id, event.data?.id
       when 'calling'
-        return @_map_calling generic_message.calling
+        return @_map_calling generic_message.calling, event.data
       when 'cleared'
         return @_map_cleared generic_message.cleared
       when 'confirmation'
@@ -99,9 +99,10 @@ class z.cryptography.CryptographyMapper
       @logger.info "Skipped event '#{event_id}': #{error.message}"
       throw error
 
-  _map_calling: (calling) ->
+  _map_calling: (calling, event_data) ->
     return {
       content: JSON.parse calling.content
+      sender: event_data.sender
       type: z.event.Client.CALL.E_CALL
     }
 

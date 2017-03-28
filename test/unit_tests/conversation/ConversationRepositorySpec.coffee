@@ -641,13 +641,11 @@ describe 'z.conversation.ConversationRepository', ->
         done()
       .catch done.fail
 
-    it 'can generate a user-client-map for users which have clients', (done) ->
-      spyOn cryptography_repository, '_construct_session_id'
-
+    it 'should generate a user-client-map including users with clients', (done) ->
       dudes = conversation_repository.conversations()[1]
       user_ets = dudes.participating_user_ets()
 
-      conversation_repository._create_user_client_map dudes.id
+      conversation_repository.create_user_client_map dudes.id
       .then (user_client_map) ->
         bobs_clients = user_client_map[Object.keys(user_client_map)[0]]
 
