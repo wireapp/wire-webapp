@@ -60,3 +60,10 @@ class z.calling.entities.EParticipant
       @state.audio_send properties.audiosend is 'true' if properties.audiosend?
       @state.screen_send properties.screensend is 'true' if properties.screensend?
       @state.video_send properties.videosend is 'true' if properties.videosend?
+
+  verify_client_id: (client) =>
+    throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.WRONG_SENDER, 'Sender ID missing' unless client
+
+    if @e_flow_et.remote_client_id
+      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.WRONG_SENDER unless client is @e_flow_et.remote_client_id
+    @e_flow_et.remote_client_id = client

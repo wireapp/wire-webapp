@@ -80,9 +80,9 @@ class z.calling.CallingRepository
   subscribe_to_events: =>
     amplify.subscribe z.event.WebApp.CALL.MEDIA.TOGGLE, => @switch_call_center z.calling.enum.CALL_ACTION.TOGGLE_MEDIA, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.DELETE, => @switch_call_center z.calling.enum.CALL_ACTION.DELETE, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.IGNORE, => @switch_call_center z.calling.enum.CALL_ACTION.IGNORE, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.JOIN, @join_call
     amplify.subscribe z.event.WebApp.CALL.STATE.LEAVE, => @switch_call_center z.calling.enum.CALL_ACTION.LEAVE, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.REJECT, => @switch_call_center z.calling.enum.CALL_ACTION.REJECT, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, => @switch_call_center z.calling.enum.CALL_ACTION.REMOVE_PARTICIPANT, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE, @toggle_state
     amplify.subscribe z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, @store_flow_status
@@ -189,7 +189,7 @@ class z.calling.CallingRepository
             amplify.publish z.event.WebApp.CALL.STATE.LEAVE, ongoing_call_id, z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL
             window.setTimeout resolve, 1000
           close: ->
-            amplify.publish z.event.WebApp.CALL.STATE.IGNORE, new_call_id if call_state is z.calling.enum.CallState.INCOMING
+            amplify.publish z.event.WebApp.CALL.STATE.REJECT, new_call_id if call_state is z.calling.enum.CallState.INCOMING
           data: call_state
         @logger.warn "You cannot join a second call while calling in conversation '#{ongoing_call_id}'."
       else

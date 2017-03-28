@@ -22,8 +22,8 @@ z.ui ?= {}
 z.ui.ShortcutType =
   ADD_PEOPLE: 'add_people'
   ARCHIVE: 'archive'
-  CALL_IGNORE: 'ignore'
   CALL_MUTE: 'mute_call'
+  CALL_REJECT: 'reject'
   DEBUG: 'debug'
   NEXT: 'next'
   PEOPLE: 'people'
@@ -58,7 +58,7 @@ z.ui.Shortcut = do ->
         menu: true
     event: z.event.WebApp.SHORTCUT.ARCHIVE
 
-  shortcut_map[z.ui.ShortcutType.CALL_IGNORE] =
+  shortcut_map[z.ui.ShortcutType.CALL_REJECT] =
     shortcut:
       webapp:
         macos: 'command + alt + .'
@@ -66,7 +66,7 @@ z.ui.Shortcut = do ->
       electron:
         macos: 'command + .'
         pc: 'ctrl + .'
-    event: z.event.WebApp.SHORTCUT.CALL_IGNORE
+    event: z.event.WebApp.SHORTCUT.CALL_REJECT
 
   shortcut_map[z.ui.ShortcutType.CALL_MUTE] =
     shortcut:

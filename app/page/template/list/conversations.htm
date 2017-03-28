@@ -64,7 +64,7 @@
           <div class="calls-controls-row">
             <div class="button button-pill button-full button-small button-theme-red"
                  data-uie-name="do-call-controls-call-decline"
-                 data-bind="click: $parent.on_ignore_call, l10n_text: z.string.call_decline">
+                 data-bind="click: $parent.on_reject_call, l10n_text: z.string.call_decline">
             </div>
             <!-- ko if: call().is_remote_video_send() -->
               <div class="button button-pill button-full button-small button-theme-green"
@@ -139,7 +139,7 @@
               <div class="calls-controls-action calls-controls-action-end-call">
                 <div class="up">
                   <div class="button-round button-round-theme-red icon-end-call"
-                       data-uie-name="do-call-controls-call-ignore"
+                       data-uie-name="do-call-controls-call-leave"
                        data-bind="click: $parent.on_leave_call"></div>
                 </div>
                 <div class="down">
