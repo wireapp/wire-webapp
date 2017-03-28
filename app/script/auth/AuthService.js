@@ -143,11 +143,10 @@
               this.logger.info(`Trying to get a new access token: '${retry_attempt}' attempt`);
               return _retry();
             }, AuthService.POST_ACCESS.RETRY_TIMEOUT);
-          } else {
-            this.client.request_queue_blocked_state(z.service.RequestQueueBlockedState.NONE);
-            this.save_access_token_in_client();
-            return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED));
           }
+          this.client.request_queue_blocked_state(z.service.RequestQueueBlockedState.NONE);
+          this.save_access_token_in_client();
+          return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED));
         };
 
         $.ajax(config);
