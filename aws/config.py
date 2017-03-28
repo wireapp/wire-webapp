@@ -30,7 +30,7 @@ PUBLIC_KEY_PINS = os.environ.get('PUBLIC_KEY_PINS', '')
 
 SUPPORTED = {
   'chrome': 53,
-  'firefox': 52,
+  'firefox': 45,
   'opera': 40,
   'msedge': 14,
 }
