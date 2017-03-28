@@ -92,18 +92,18 @@ window.z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Promise that will resolve on success
    */
   register(new_user) {
-    return this.auth_service.post_register(new_user).then((response) => {
-      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, true);
-      z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
-      z.util.StorageUtil.set_value(new_user.label_key, new_user.label);
-      this.logger.info(`COOKIE::'${new_user.label}' Saved cookie label with key '${new_user.label_key}' in Local Storage`, {
-        key: new_user.label_key,
-        value: new_user.label,
-      }
-        );
-      return response;
-    }
-    );
+    return this.auth_service.post_register(new_user)
+      .then((response) => {
+          z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.PERSIST, true);
+          z.util.StorageUtil.set_value(z.storage.StorageKey.AUTH.SHOW_LOGIN, true);
+          z.util.StorageUtil.set_value(new_user.label_key, new_user.label);
+          this.logger.info(`COOKIE::'${new_user.label}' Saved cookie label with key '${new_user.label_key}' in Local Storage`, {
+            key: new_user.label_key,
+            value: new_user.label,
+          });
+          return response;
+        }
+      );
   }
 
   /**
@@ -144,15 +144,15 @@ window.z.auth.AuthRepository = class AuthRepository {
       this.auth_service.client.execute_request_queue();
       return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
     }).catch((error) => {
-      if ((error.type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN) || z.util.Environment.frontend.is_localhost()) {
-        this.logger.warn(`Session expired on access token refresh: ${error.message}`, error);
-        Raygun.send(error);
-        return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.SESSION_EXPIRED, false, true);
-      } else if (error.type !== z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS) {
-        this.logger.error(`Refreshing access token failed: '${error.type}'`, error);
-        return amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
+        if ((error.type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN) || z.util.Environment.frontend.is_localhost()) {
+          this.logger.warn(`Session expired on access token refresh: ${error.message}`, error);
+          Raygun.send(error);
+          return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.SESSION_EXPIRED, false, true);
+        } else if (error.type !== z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS) {
+          this.logger.error(`Refreshing access token failed: '${error.type}'`, error);
+          return amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
+        }
       }
-    }
     );
   }
 
@@ -184,9 +184,9 @@ window.z.auth.AuthRepository = class AuthRepository {
     }
 
     return this.auth_service.post_access().then(access_token => {
-      this.save_access_token(access_token);
-      return access_token;
-    }
+        this.save_access_token(access_token);
+        return access_token;
+      }
     );
   }
 
@@ -266,9 +266,10 @@ window.z.auth.AuthRepository = class AuthRepository {
           return this.logger.info(`Access token refresh scheduled for '${time}' skipped because it was executed late`);
         } else if (navigator.onLine) {
           return this.renew_access_token(`Schedule for '${time}'`);
-        } else {
-          return this.logger.info(`Access token refresh scheduled for '${time}' skipped because we are offline`);
         }
+
+        return this.logger.info(`Access token refresh scheduled for '${time}' skipped because we are offline`);
+
       }, callback_timestamp - Date.now());
     }
   }

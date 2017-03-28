@@ -129,9 +129,7 @@
           if (retry_attempt <= AuthService.POST_ACCESS.RETRY_LIMIT) {
             retry_attempt++;
 
-            const _retry = () => {
-              return this.post_access(retry_attempt).then(resolve).catch(reject);
-            };
+            const _retry = () => this.post_access(retry_attempt).then(resolve).catch(reject);
 
             if (jqXHR.status === z.service.BackendClientError.prototype.STATUS_CODE.CONNECTIVITY_PROBLEM) {
               this.logger.warn('Access token refresh delayed due to suspected connectivity issue');
