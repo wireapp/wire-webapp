@@ -205,7 +205,7 @@
      */
     post_login(login, persist) {
       return new Promise((resolve, reject) => {
-        $.ajax({
+        const config = {
           contentType: 'application/json; charset=utf-8',
           crossDomain: true,
           data: pako.gzip(JSON.stringify(login)),
@@ -218,18 +218,22 @@
           xhrFields: {
             withCredentials: true,
           },
-        }).done((data) => {
-          resolve(data);
-        }).fail((jqXHR, textStatus, errorThrown) => {
-          if (jqXHR.status === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS && login.email) {
-            // Backend blocked our user account from login, so we have to reset our cookies
-            this.post_cookies_remove(login.email, login.password, undefined).then(() => {
-              reject(jqXHR.responseJSON || errorThrown);
-            });
-          } else {
-            reject(jqXHR.responseJSON || errorThrown);
-          }
-        });
+        };
+
+        $.ajax(config)
+         .done((data) => {
+           resolve(data);
+         })
+         .fail((jqXHR, textStatus, errorThrown) => {
+           if (jqXHR.status === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS && login.email) {
+             // Backend blocked our user account from login, so we have to reset our cookies
+             this.post_cookies_remove(login.email, login.password, undefined).then(() => {
+               reject(jqXHR.responseJSON || errorThrown);
+             });
+           } else {
+             reject(jqXHR.responseJSON || errorThrown);
+           }
+         });
       });
     }
 
