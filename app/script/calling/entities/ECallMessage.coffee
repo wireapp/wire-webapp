@@ -30,13 +30,9 @@ class z.calling.entities.ECallMessage
   @param type [z.calling.enum.ECallMessageType] Type of e-call message
   @param response [Boolean] Is message a response, defaults to false
   @param session_id [String] Optional session ID
-  @param additional_properties [Object] Optional object containing additional message payload
   ###
-  constructor: (@type, @response = false, session_id, additional_properties) ->
+  constructor: (@type, @response = false, session_id) ->
     @session_id = session_id or @_create_session_id()
-
-    if additional_properties
-      @[key] = value for key, value of additional_properties
 
   ###
   Create a session ID.
@@ -45,6 +41,13 @@ class z.calling.entities.ECallMessage
   ###
   _create_session_id: ->
     return (z.util.StringUtil.get_random_character() for [0..3]).join ''
+
+  ###
+  Add additional payload to message.
+  @param additional_properties [Object] Optional object containing additional message payload
+  ###
+  add_properties: (additional_properties = {}) =>
+    @[key] = value for key, value of additional_properties
 
   to_JSON: =>
     json_payload =
