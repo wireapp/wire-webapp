@@ -24,18 +24,15 @@ window.z = window.z || {};
 z.location = (() => {
   const GOOGLE_GEOCODING_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
   const API_KEY = 'AIzaSyCKxxKw5JBZ5zEFtoirtgnw8omvH7gWzfo';
-  let _parse_results = results => {
+  let _parse_results = (results) => {
     let res = {};
-    let result = results[0];
+    let [result] = results;
     res['address'] = result.formatted_address;
     res['lat'] = result.geometry.location.lat;
     res['lng'] = result.geometry.location.lng;
-    let ref = result.address_components;
-    for (let i = 0, len = ref.length; i < len; i++) {
-      let component = ref[i];
+    for (let component of result.address_components) {
       let name = component.long_name || component.short_name;
-      for (let j = 0, len1 = component.types.length; j < len1; j++) {
-        let type = component.types[j];
+      for (let type of component.types) {
         res[type] = name;
         if (type === 'country') {
           res['country_code'] = component.short_name || '';
@@ -57,12 +54,14 @@ z.location = (() => {
     }
     return $.ajax({
       url: `${GOOGLE_GEOCODING_BASE_URL}?latlng=${latitude},${longitude}&key=${API_KEY}`,
-    }).done(response => {
+    })
+    .done(response => {
       if (response.status === 'OK') {
         return resolve(_parse_results(response.results));
       }
       return resolve();
-    }).fail((jqXHR, textStatus, errorThrown) => reject(new Error(errorThrown)));
+    })
+    .fail((jqXHR, textStatus, errorThrown) => reject(new Error(errorThrown)));
   });
 
   /*
