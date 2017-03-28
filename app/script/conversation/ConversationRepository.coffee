@@ -1153,7 +1153,7 @@ class z.conversation.ConversationRepository
     if conversation_et.ephemeral_timer()
       generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
     @_send_and_inject_generic_message conversation_et, generic_message
-      .then -> return generic_message
+    .then -> return generic_message
 
   ###
   Send text message with link preview in specified conversation.

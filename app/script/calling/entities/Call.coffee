@@ -221,7 +221,7 @@ class z.calling.entities.Call
 
     @remote_media_type z.media.MediaType.AUDIO if not media_type_updated
 
-  # REject a call.
+  # Reject a call.
   reject: =>
     @state z.calling.enum.CallState.REJECTED
     @is_declined true
