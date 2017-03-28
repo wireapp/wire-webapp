@@ -167,9 +167,8 @@ window.z.auth.AuthRepository = class AuthRepository {
         this.auth_service.save_access_token_in_client(access_token_type, access_token);
         this._schedule_token_refresh(z.util.StorageUtil.get_value(z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION));
         return resolve();
-      } else {
-        return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE));
       }
+      return reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE));
     }));
   }
 
@@ -257,20 +256,20 @@ window.z.auth.AuthRepository = class AuthRepository {
 
     if (callback_timestamp < Date.now()) {
       return this.renew_access_token('Immediate on scheduling');
-    } else {
-      let time = z.util.format_timestamp(callback_timestamp, false);
-      this.logger.info(`Scheduling next access token refresh for '${time}'`);
-
-      return this.access_token_refresh = window.setTimeout(() => {
-        if (callback_timestamp > (Date.now() + 15000)) {
-          return this.logger.info(`Access token refresh scheduled for '${time}' skipped because it was executed late`);
-        } else if (navigator.onLine) {
-          return this.renew_access_token(`Schedule for '${time}'`);
-        }
-
-        return this.logger.info(`Access token refresh scheduled for '${time}' skipped because we are offline`);
-
-      }, callback_timestamp - Date.now());
     }
+    let time = z.util.format_timestamp(callback_timestamp, false);
+    this.logger.info(`Scheduling next access token refresh for '${time}'`);
+
+    return this.access_token_refresh = window.setTimeout(() => {
+      if (callback_timestamp > (Date.now() + 15000)) {
+        return this.logger.info(`Access token refresh scheduled for '${time}' skipped because it was executed late`);
+      } else if (navigator.onLine) {
+        return this.renew_access_token(`Schedule for '${time}'`);
+      }
+
+      return this.logger.info(`Access token refresh scheduled for '${time}' skipped because we are offline`);
+
+    }, callback_timestamp - Date.now());
+
   }
 };
