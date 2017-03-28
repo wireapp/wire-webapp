@@ -280,7 +280,7 @@ class z.entity.Conversation
     last_message = @get_last_message()
 
     # last rendered message is the last message in this conversation so we are safe to add it
-    if not last_message? or last_message.timestamp() is @last_event_timestamp()
+    if not last_message? or last_message.timestamp() >= @last_event_timestamp()
       @messages_unordered.push @_check_for_duplicate_nonce message_et, last_message
 
   ###
