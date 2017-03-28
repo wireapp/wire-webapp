@@ -30,6 +30,13 @@ z.conversation.EventBuilder = do ->
     data:
       type: z.message.VerificationMessageType.VERIFIED
 
+  build_calling = (conversation_et, e_call_message, user_id, client_id) ->
+    conversation: conversation_et.id
+    from: user_id
+    content: e_call_message
+    sender: client_id
+    type: z.event.Client.CALL.E_CALL
+
   build_degraded = (conversation_et, user_ids, type) ->
     conversation: conversation_et.id
     id: z.util.create_random_uuid()
@@ -85,6 +92,7 @@ z.conversation.EventBuilder = do ->
 
   return {
     build_all_verified: build_all_verified
+    build_calling: build_calling
     build_degraded: build_degraded
     build_delete: build_delete
     build_missed: build_missed

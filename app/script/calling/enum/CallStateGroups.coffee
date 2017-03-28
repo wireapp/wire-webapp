@@ -36,14 +36,14 @@ z.calling.enum.CallStateGroups =
     z.calling.enum.CallState.OUTGOING
   ]
   CAN_CONNECT: [
-    z.calling.enum.CallState.IGNORED
     z.calling.enum.CallState.INCOMING
     z.calling.enum.CallState.ONGOING
+    z.calling.enum.CallState.REJECTED
   ]
   STOP_RINGING: [
     z.calling.enum.CallState.CONNECTING
     z.calling.enum.CallState.DISCONNECTING
     z.calling.enum.CallState.ENDED
-    z.calling.enum.CallState.IGNORED
     z.calling.enum.CallState.ONGOING
+    z.calling.enum.CallState.REJECTED
   ]
