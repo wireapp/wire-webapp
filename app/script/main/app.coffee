@@ -314,7 +314,7 @@ class z.main.App
 
       token_promise.catch (error) =>
         if is_reload
-          if error.type in [z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN, z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE]
+          if error.type in [z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN, z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE]
             @logger.error "Session expired on page reload: #{error.message}", error
             Raygun.send new Error ('Session expired on page reload'), error
             @_redirect_to_login true
@@ -323,7 +323,7 @@ class z.main.App
             @auth.client.execute_on_connectivity().then -> window.location.reload false
         else if navigator.onLine
           switch error.type
-            when z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE, z.auth.AccessTokenError::TYPE.RETRIES_EXCEEDED, z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
+            when z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE, z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED, z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN
               @logger.warn "Redirecting to login: #{error.message}", error
               @_redirect_to_login false
             else
