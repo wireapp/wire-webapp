@@ -23,18 +23,18 @@
 
 describe('z.location', () => describe('get_maps_url', () => {
   it('should return proper url when lat and long is given', () => {
-    expect(z.location.get_maps_url(52, 13)).toBe('https://google.com/maps/@52,13')
+    expect(z.location.get_maps_url(52, 13)).toBe('https://google.com/maps/@52,13');
   });
 
   it('should return proper url when lat, long and zoom is given', () => {
-    expect(z.location.get_maps_url(52, 13, null, 14)).toBe('https://google.com/maps/@52,13,14z')
+    expect(z.location.get_maps_url(52, 13, null, 14)).toBe('https://google.com/maps/@52,13,14z');
   });
 
   it('should return proper url when lat, long and name is given', () => {
-    expect(z.location.get_maps_url(52, 13, 'Berlin')).toBe('https://google.com/maps/place/Berlin/@52,13')
+    expect(z.location.get_maps_url(52, 13, 'Berlin')).toBe('https://google.com/maps/place/Berlin/@52,13');
   });
 
   it('should return proper url when lat, long, name and zoom is given', () => {
-    expect(z.location.get_maps_url(52, 13, 'Berlin', 14)).toBe('https://google.com/maps/place/Berlin/@52,13,14z')
+    expect(z.location.get_maps_url(52, 13, 'Berlin', 14)).toBe('https://google.com/maps/place/Berlin/@52,13,14z');
   });
 }));
