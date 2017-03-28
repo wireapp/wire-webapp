@@ -66,7 +66,8 @@ z.util.Environment = do ->
       return false if not @supports_media_devices()
       return false if window.WebSocket is undefined
       return false if @is_edge()
-      return @is_chrome() or @is_firefox() or @is_opera()
+      return true if @is_firefox() and @get_version() >= 52
+      return @is_chrome() or @is_opera()
     supports_media_devices: ->
       return true if navigator.mediaDevices?.getUserMedia
       return false
