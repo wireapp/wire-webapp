@@ -280,7 +280,7 @@
      */
     post_register(new_user) {
       return new Promise((resolve, reject) => {
-        $.ajax({
+        const config = {
           contentType: 'application/json; charset=utf-8',
           crossDomain: true,
           data: pako.gzip(JSON.stringify(new_user)),
@@ -293,11 +293,15 @@
           xhrFields: {
             withCredentials: true,
           },
-        }).done((data) => {
-          resolve(data);
-        }).fail((jqXHR, textStatus, errorThrown) => {
-          reject(jqXHR.responseJSON || errorThrown);
-        });
+        };
+
+        $.ajax(config)
+         .done((data) => {
+           resolve(data);
+         })
+         .fail((jqXHR, textStatus, errorThrown) => {
+           reject(jqXHR.responseJSON || errorThrown);
+         });
       });
     }
 

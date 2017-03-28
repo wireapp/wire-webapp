@@ -10,9 +10,6 @@
         <JSCodeStyleSettings>
           <option name="SPACE_BEFORE_FUNCTION_LEFT_PARENTH" value="false" />
         </JSCodeStyleSettings>
-        <TypeScriptCodeStyleSettings>
-          <option name="SPACE_AFTER_TYPE_COLON" value="true" />
-        </TypeScriptCodeStyleSettings>
         <XML>
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
@@ -27,6 +24,7 @@
         </codeStyleSettings>
         <codeStyleSettings language="JavaScript">
           <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
+          <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
           <indentOptions>
             <option name="INDENT_SIZE" value="2" />
             <option name="CONTINUATION_INDENT_SIZE" value="2" />
