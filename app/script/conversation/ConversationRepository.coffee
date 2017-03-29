@@ -394,7 +394,9 @@ class z.conversation.ConversationRepository
   get_most_active_conversations: ->
     return @conversation_service.get_active_conversations_from_db()
     .then (conversation_ids) =>
-      return conversation_ids.map (conversation_id) => @find_conversation_by_id conversation_id
+      return conversation_ids
+        .map (conversation_id) => @find_conversation_by_id conversation_id
+        .filter (conversation_et) -> conversation_et?
 
   ###
   Get conversation with a user.

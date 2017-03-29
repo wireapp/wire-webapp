@@ -150,7 +150,8 @@ class z.main.App
 
   ###
   Initialize the app.
-  @note any failure will result in a logout
+  @note Locally known clients and sessions must not be touched until after the notification stream has been handled.
+    Any failure in the Promise chain will result in a logout.
   @todo Check if we really need to logout the user in all these error cases or how to recover from them
   ###
   init_app: (is_reload = @_is_reload()) =>
@@ -174,38 +175,44 @@ class z.main.App
       return @repository.client.get_valid_local_client()
     .then (client_observable) =>
       @view.loading.switch_message z.string.init_validated_client, true
+
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type
+
       @repository.cryptography.current_client = client_observable
       @repository.event.current_client = client_observable
       @repository.event.connect_web_socket()
       promises = [
-        @repository.client.get_clients_for_self()
         @repository.conversation.get_conversations()
         @repository.user.get_connections()
       ]
       return Promise.all promises
     .then (response_array) =>
-      [client_ets, conversation_ets, connection_ets] = response_array
+      [conversation_ets, connection_ets] = response_array
       @view.loading.switch_message z.string.init_received_user_data, true
 
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA
-      @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS, conversation_ets.length, 50
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS, connection_ets.length, 50
 
-      @repository.user.self().devices client_ets
       @repository.conversation.map_connections @repository.user.connections()
       @_subscribe_to_beforeunload()
       return @repository.event.initialize_from_notification_stream()
     .then (notifications_count) =>
       @view.loading.switch_message z.string.init_updated_from_notifications, true
+
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.NOTIFICATIONS, notifications_count, 100
-      return @_watch_online_status()
-    .then =>
+
+      @_watch_online_status()
+      return @repository.client.get_clients_for_self()
+    .then (client_ets) =>
       @view.loading.switch_message z.string.init_app_pre_loaded, true
+
+      @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED
+
+      @repository.user.self().devices client_ets
       @logger.info 'App pre-loading completed'
       @_handle_url_params()
     .then =>

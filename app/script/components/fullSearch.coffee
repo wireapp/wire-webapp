@@ -59,9 +59,10 @@ class z.components.FullSearchViewModel
       PRE_MARKED_OFFSET = 20
 
       text = _.escape message_et.get_first_asset().text
+      input = _.escape @input()
 
       message_et.matches_count = 0
-      transformed_text = text.replace z.search.FullTextSearch.get_search_regex(@input()), (match) ->
+      transformed_text = text.replace z.search.FullTextSearch.get_search_regex(input), (match) ->
         message_et.matches_count += 1
         return "<mark class='full-search-marked' data-uie-name='full-search-item-mark'>#{match}</mark>"
 
