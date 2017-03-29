@@ -481,9 +481,13 @@ class z.conversation.ConversationRepository
   @param show_conversation [Boolean] Open the new conversation
   ###
   map_connection: (connection_et, show_conversation = false) =>
-    return Promise.resolve() if connection_et.status() is z.user.ConnectionStatus.IGNORED
+    @find_conversation_by_id connection_et.conversation_id
+    .catch (error) =>
+      throw error unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
 
-    @get_conversation_by_id connection_et.conversation_id
+      if connection_et.status() in [z.user.ConnectionStatus.ACCEPTED, z.user.ConnectionStatus.SENT]
+        return @fetch_conversation_by_id connection_et.conversation_id
+      throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NOT_FOUND
     .then (conversation_et) =>
       conversation_et.connection connection_et
       if connection_et.status() is z.user.ConnectionStatus.ACCEPTED
@@ -493,7 +497,6 @@ class z.conversation.ConversationRepository
         amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et if show_conversation
       return conversation_et
     .catch (error) =>
-      @logger.warn "Could not map connection with user '#{connection_et.to}' to conversation '#{connection_et.conversation_id}'"
       throw error unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
 
   ###
