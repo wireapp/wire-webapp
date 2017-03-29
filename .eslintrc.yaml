@@ -16,6 +16,7 @@ globals:
   moment: true
   pako: true
   Raygun: true
+  twttr: true
   wire: true
   z: true
 
