@@ -117,16 +117,21 @@ class z.ViewModel.content.ContentViewModel
   show_conversation: (conversation_et, message_et) =>
     return @switch_content z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS if not conversation_et
 
-    conversation_et = @conversation_repository.get_conversation_by_id conversation_et if not conversation_et.id
-    return if conversation_et is @conversation_repository.active_conversation() and @content_state() is z.ViewModel.content.CONTENT_STATE.CONVERSATION
+    if conversation_et.id
+      conversation_promise = Promise.resolve conversation_et
+    else
+      conversation_promise = @conversation_repository.get_conversation_by_id conversation_et
 
-    @_release_content()
-    @content_state z.ViewModel.content.CONTENT_STATE.CONVERSATION
-    @conversation_repository.active_conversation conversation_et
-    @message_list.change_conversation conversation_et, message_et, =>
-      @_show_content z.ViewModel.content.CONTENT_STATE.CONVERSATION
-      @participants.change_conversation conversation_et
-      @previous_conversation = @conversation_repository.active_conversation()
+    conversation_promise.then (conversation_et) =>
+      return if conversation_et is @conversation_repository.active_conversation() and @content_state() is z.ViewModel.content.CONTENT_STATE.CONVERSATION
+
+      @_release_content()
+      @content_state z.ViewModel.content.CONTENT_STATE.CONVERSATION
+      @conversation_repository.active_conversation conversation_et
+      @message_list.change_conversation conversation_et, message_et, =>
+        @_show_content z.ViewModel.content.CONTENT_STATE.CONVERSATION
+        @participants.change_conversation conversation_et
+        @previous_conversation = @conversation_repository.active_conversation()
 
   switch_content: (new_content_state) =>
     return false if @content_state() is new_content_state

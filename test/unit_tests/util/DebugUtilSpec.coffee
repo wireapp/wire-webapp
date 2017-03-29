@@ -29,29 +29,7 @@ describe 'z.util.DebugUtil', ->
       done()
     .catch done.fail
 
-  describe 'get_event_info', ->
-    it 'resolves entities used in an event', (done) ->
-      #@formatter:off
-      event = {"conversation":"c44055e1-22db-40ec-9d64-17bed60899ca","time":"2016-06-13T15:17:09.378Z","data":{"text":"owABAaEAWCDb7YZ+fBvqad62i2jKdKOMvAzFMaL0uP7zIL1wVFIqqgJYwAKkABn//wGhAFggvdj9J7qxVWzYNMdjSVZ4KXC0Dw82xDn+/w4RV+R4PyoCoQChAFggFKfcdRCB3aR0IdJWlMVQAVkrUBOR9Wut3SBABNGKccEDpQBQ/pr1FQzlVt3ry1k7y3XmAgEDAgADoQBYICNJWY9nrldHZWnqIMzGFFW2WhSOxSgCDH35fNeFr8cEBFguliOs/jCjfDskzztIjbNXHdx0fhfMr7EE/8Dh4KTrm4+eDGXSCqfk3yjTNn/IEA==","sender":"118ed890d2a6f83","recipient":"d15b2781562b2c6e"},"from":"39b7f597-dfd1-4dff-86f5-fe1b79cb70a0","type":"conversation.otr-message-add"}
-      #@formatter:on
-      conversation_et = new z.entity.Conversation 'c44055e1-22db-40ec-9d64-17bed60899ca'
-      conversation_et.name 'Tomb Raider Fans'
-      conversation_repository.save_conversation conversation_et
-
-      user_et = new z.entity.User '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0'
-      user_et.name 'Lara Croft'
-      user_repository.save_user user_et
-
-      debug_util.get_event_info event
-      .then (debug_information) ->
-        expect(debug_information.conversation.id).toBe conversation_et.id
-        expect(debug_information.event.time).toBe event.time
-        expect(debug_information.user.id).toBe user_et.id
-        done()
-      .catch done.fail
-
   describe 'get_number_of_clients_in_conversation', ->
-
     it 'gets the amount of all clients in the current conversation (including own clients)', ->
       conversation_repository = debug_util.conversation_repository
 
@@ -80,4 +58,3 @@ describe 'z.util.DebugUtil', ->
 
       amount = debug_util.get_number_of_clients_in_conversation()
       expect(amount).toBe 4
-
