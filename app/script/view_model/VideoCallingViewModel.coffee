@@ -30,7 +30,7 @@ class z.ViewModel.VideoCallingViewModel
     @current_device_id = @media_repository.devices_handler.current_device_id
     @current_device_index = @media_repository.devices_handler.current_device_index
 
-    @local_video_stream = @media_repository.stream_handler.local_media_streams.video
+    @local_video_stream = @media_repository.stream_handler.local_media_stream
     @remote_video_stream = @media_repository.stream_handler.remote_media_streams.video
 
     @self_stream_state = @media_repository.stream_handler.self_stream_state
@@ -82,15 +82,10 @@ class z.ViewModel.VideoCallingViewModel
       is_visible = (@joined_call()?.is_remote_screen_send() or @joined_call()?.is_remote_video_send()) and @remote_video_stream()
       return @is_ongoing() and is_visible
 
-    @joined_v3_call = ko.pureComputed =>
-      return @joined_call()? and @joined_call() instanceof z.calling.entities.ECall
-
     @show_switch_camera = ko.pureComputed =>
-      return false if @joined_v3_call()
       is_visible = @local_video_stream() and @available_devices.video_input().length > 1 and @self_stream_state.video_send()
       return @is_ongoing() and is_visible
     @show_switch_screen = ko.pureComputed =>
-      return false if @joined_v3_call()
       is_visible = @local_video_stream() and @available_devices.screen_input().length > 1 and @self_stream_state.screen_send()
       return @is_ongoing() and is_visible
 
@@ -98,10 +93,8 @@ class z.ViewModel.VideoCallingViewModel
       is_visible = @show_remote_video() or @show_remote_participant() and not @multitasking.is_minimized()
       return @is_ongoing() and is_visible
     @show_toggle_video = ko.pureComputed =>
-      return false if @joined_v3_call() and @media_repository.stream_handler.local_media_type() is z.media.MediaType.AUDIO
       return @joined_call()?.conversation_et.is_one2one()
-    @show_toggle_screen = ko.pureComputed =>
-      return false if @joined_v3_call()
+    @show_toggle_screen = ko.pureComputed ->
       return z.calling.CallingRepository.supports_screen_sharing()
     @disable_toggle_screen = ko.pureComputed =>
       return @joined_call()?.is_remote_screen_send()

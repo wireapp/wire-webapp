@@ -37,7 +37,6 @@ z.string.tr.auth_account_create_account = 'Bir hesap oluştur'
 z.string.tr.auth_account_expiration = 'Oturumunuzun süresi dolduğu için çıkış yapıldı. Lütfen tekrar giriş yapın.'
 z.string.tr.auth_account_get_wire = 'Konuşma, arama; fotoğraf, video, müzik ve GIF paylaşmak için basit, gizli ve güvenli mesajlaşma uygulaması.'
 z.string.tr.auth_account_password_forgot = 'Şifremi unuttum'
-z.string.tr.auth_account_remember_me = 'Beni hatırla'
 z.string.tr.auth_account_sign_in = 'Giriş yap'
 z.string.tr.auth_account_sign_in_email = 'E-posta'
 z.string.tr.auth_account_sign_in_phone = 'Telefon'
@@ -208,11 +207,6 @@ z.string.tr.modal_session_reset_message_2 = 'biz.'
 # Too many members in conversation
 z.string.tr.modal_too_many_members_headline = 'Dolup taşmış'
 z.string.tr.modal_too_many_members_message = 'Görüşmeye en fazla %max kişi katılabilir. Burada %no kişi için daha boş yer var.'
-# Whitelist screensharing
-z.string.tr.modal_whitelist_screensharing_headline = 'Wire ekranınızı paylaşmak için gerekli izinleri sağlamalıdır'
-z.string.tr.modal_whitelist_screensharing_message_1 = 'Hakkında:ayarlar bölümünü açın ve *.wire.com adresini ekran paylaşımı izinli alan adları listesine ekleyin'
-z.string.tr.modal_whitelist_screensharing_message_link = 'SSS'
-z.string.tr.modal_whitelist_screensharing_message_2 = 'detaylar için.'
 # Parallel uploads
 z.string.tr.modal_uploads_parallel = 'Tek seferde en fazla %no boyutunda dosya gönderebilirsiniz.'
 
@@ -546,7 +540,7 @@ z.string.tr.warning_lifecycle_update_link = 'Şimdi güncelle'
 # Browser notifications
 z.string.tr.system_notification_asset_add = 'Bir resim paylaştı'
 z.string.tr.system_notification_connection_accepted = 'Bağlantı isteğinizi kabul etti'
-z.string.tr.system_notification_connection_connected = 'Şimdi bağlı'
+z.string.tr.system_notification_connection_connected = 'Şu anda bağlısınız'
 z.string.tr.system_notification_connection_request = 'Bağlanmak istiyor'
 z.string.tr.system_notification_conversation_create = '%s.first_name bir konuşma başlattı'
 z.string.tr.system_notification_conversation_rename = '%s.first_name, konuşma ismini %name olarak değiştirdi'

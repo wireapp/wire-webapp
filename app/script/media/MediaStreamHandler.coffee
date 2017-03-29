@@ -39,6 +39,23 @@ class z.media.MediaStreamHandler
     return media_stream
 
   ###
+  Get MediaStreamTracks from a MediaStream.
+
+  @param media_stream [MediaStream] MediaStream to get tracks from
+  @param media_type [z.media.MediaType.AUDIO_VIDEO]
+  @return [Array] Array of MediaStreamTracks optionally matching the requested type
+  ###
+  @get_media_tracks: (media_stream, media_type = z.media.MediaType.AUDIO_VIDEO) ->
+    switch media_type
+      when z.media.MediaType.AUDIO
+        media_stream_tracks = media_stream.getAudioTracks()
+      when z.media.MediaType.AUDIO_VIDEO
+        media_stream_tracks = media_stream.getTracks()
+      when z.media.MediaType.VIDEO
+        media_stream_tracks = media_stream.getVideoTracks()
+    return media_stream_tracks
+
+  ###
   Construct a new MediaStream handler.
   @param media_repository [z.media.MediaRepository] Media repository with with references to all other handlers
   ###
@@ -48,9 +65,7 @@ class z.media.MediaStreamHandler
     @calls = -> return []
     @joined_call = -> return undefined
 
-    @local_media_streams =
-      audio: ko.observable()
-      video: ko.observable()
+    @local_media_stream = ko.observable()
 
     @remote_media_streams =
       audio: ko.observableArray []
@@ -62,9 +77,6 @@ class z.media.MediaStreamHandler
       video_send: ko.observable false
 
     @local_media_type = ko.observable z.media.MediaType.AUDIO
-
-    @has_media_streams = ko.pureComputed =>
-      return @local_media_streams.audio() or @local_media_streams.video()
 
     @request_hint_timeout = undefined
 
@@ -194,16 +206,12 @@ class z.media.MediaStreamHandler
       if _.isArray error
         [error, media_type] = error
         @_initiate_media_stream_failure error, media_type, conversation_id
-      @logger.error "Requesting MediaStream failed: #{error.message or error.name}", error
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CALLING.FAILED_REQUESTING_MEDIA, {cause: error.name or error.message, video: video_send}
       throw error
 
-  # Release the MediaStreams.
-  release_media_streams: =>
-    media_streams_identical = @_compare_local_media_streams()
-
-    @local_media_streams.audio undefined if @_release_media_stream @local_media_streams.audio()
-    @local_media_streams.video undefined if media_streams_identical or @_release_media_stream @local_media_streams.video()
+  # Release the MediaStream.
+  release_media_stream: =>
+    @local_media_stream undefined if @_release_media_stream @local_media_stream()
 
   ###
   Replace the MediaStream after a change of the selected input device.
@@ -217,15 +225,12 @@ class z.media.MediaStreamHandler
       @_set_stream_state media_stream_info
       update_promise = Promise.all (flow_et.update_media_stream media_stream_info for flow_et in @joined_call().get_flows())
     else
-      update_promise = Promise.resolve [media_stream_info]
+      update_promise = Promise.resolve media_stream_info.stream
 
     update_promise.then (resolve_array) =>
-      media_stream_info = resolve_array[0]
-      if media_stream_info.type is z.media.MediaType.AUDIO
-        @_release_media_stream @local_media_streams.audio(), z.media.MediaType.AUDIO
-      else
-        @_release_media_stream @local_media_streams.video(), z.media.MediaType.VIDEO
-      @set_local_media_stream media_stream_info
+      media_stream = resolve_array[0]
+      @_release_media_stream @local_media_stream()
+      @local_media_stream media_stream
 
   ###
   Update the used MediaStream after a new input device was selected.
@@ -247,7 +252,9 @@ class z.media.MediaStreamHandler
       return @replace_media_stream media_stream_info
     .catch (error) =>
       [error, media_type] = error if _.isArray error
-      @_replace_input_source_failure error, media_type
+      if media_type is z.media.MediaType.SCREEN
+        return @logger.error "Failed to enable screen sharing: #{error.message}", error
+      @logger.error "Failed to replace '#{media_type}' input source: #{error.message}", error
 
   ###
   Request a MediaStream.
@@ -275,6 +282,7 @@ class z.media.MediaStreamHandler
           @_clear_permission_request_hint media_type
           resolve new z.media.MediaStreamInfo z.media.MediaStreamSource.LOCAL, 'self', media_stream
         .catch (error) =>
+          @logger.warn "MediaStream request failed: #{error.name} - #{error.message}"
           @_clear_permission_request_hint media_type
           if error.name in z.calling.rtc.MediaStreamErrorTypes.DEVICE
             error = new z.media.MediaError z.media.MediaError::TYPE.MEDIA_STREAM_DEVICE
@@ -284,15 +292,8 @@ class z.media.MediaStreamHandler
             error = new z.media.MediaError z.media.MediaError::TYPE.MEDIA_STREAM_PERMISSION
           reject [error, media_type]
 
-  ###
-  Save a reference to a local MediaStream.
-  @param media_stream_info [z.media.MediaStreamInfo] MediaStream and meta information
-  ###
-  set_local_media_stream: (media_stream_info) =>
-    if media_stream_info.type in [z.media.MediaType.AUDIO, z.media.MediaType.AUDIO_VIDEO]
-      @local_media_streams.audio media_stream_info.stream
-    if media_stream_info.type in [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO]
-      @local_media_streams.video media_stream_info.stream
+  set_local_media_stream: (media_stream) =>
+    @local_media_stream media_stream
 
   ###
   Clear the permission request hint timeout or hide the warning.
@@ -303,32 +304,6 @@ class z.media.MediaStreamHandler
     if @request_hint_timeout
       return window.clearTimeout @request_hint_timeout
     return @_hide_permission_request_hint media_type
-
-  ###
-  Compare the local MediaStreams for equality.
-  @private
-  @return [Boolean] True if both audio and video stream are identical
-  ###
-  _compare_local_media_streams: ->
-    return @local_media_streams.audio()?.id is @local_media_streams.video()?.id
-
-  ###
-  Get MediaStreamTracks from a MediaStream.
-
-  @private
-  @param media_stream [MediaStream] MediaStream to get tracks from
-  @param media_type [z.media.MediaType.AUDIO_VIDEO]
-  @return [Array] Array of MediaStreamTracks optionally matching the requested type
-  ###
-  _get_media_tracks: (media_stream, media_type = z.media.MediaType.AUDIO_VIDEO) ->
-    switch media_type
-      when z.media.MediaType.AUDIO
-        media_stream_tracks = media_stream.getAudioTracks()
-      when z.media.MediaType.AUDIO_VIDEO
-        media_stream_tracks = media_stream.getTracks()
-      when z.media.MediaType.VIDEO
-        media_stream_tracks = media_stream.getVideoTracks()
-    return media_stream_tracks
 
   ###
   Hide the permission denied hint banner.
@@ -369,7 +344,7 @@ class z.media.MediaStreamHandler
     @logger.debug "Received initial MediaStream with '#{media_stream_info.stream.getTracks().length}' MediaStreamTrack(s)",
       {stream: media_stream_info.stream, audio_tracks: media_stream_info.stream.getAudioTracks(), video_tracks: media_stream_info.stream.getVideoTracks()}
     @_set_stream_state media_stream_info
-    @set_local_media_stream media_stream_info
+    @local_media_stream media_stream_info.stream
 
   ###
   Local MediaStream creation failed.
@@ -397,7 +372,7 @@ class z.media.MediaStreamHandler
   _release_media_stream: (media_stream, media_type = z.media.MediaType.AUDIO_VIDEO) =>
     return false if not media_stream
 
-    media_stream_tracks = @_get_media_tracks media_stream, media_type
+    media_stream_tracks = z.media.MediaStreamHandler.get_media_tracks media_stream, media_type
 
     if media_stream_tracks.length
       for media_stream_track in media_stream_tracks
@@ -407,24 +382,6 @@ class z.media.MediaStreamHandler
       return true
     @logger.warn 'No MediaStreamTrack found to stop', media_stream
     return false
-
-  ###
-  Failed to replace an input source.
-
-  @private
-  @param error [Error] Error thrown when attempting to replace the source
-  @param media_type [z.media.MediaType] Type of failed request
-  ###
-  _replace_input_source_failure: (error, media_type) ->
-    if media_type is z.media.MediaType.SCREEN
-      if z.util.Environment.browser.firefox and error.type is z.media.MediaError::TYPE.MEDIA_STREAM_PERMISSION
-        # @deprecated Remove once we require Firefox 52 ESR
-        @logger.warn 'We are not on the white list. Manually add the current domain to media.getusermedia.screensharing.allowed_domains on about:config'
-        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.WHITELIST_SCREENSHARING
-      else
-        @logger.error "Failed to enable screen sharing: #{error.message}", error
-    else
-      @logger.error "Failed to replace '#{media_type}' input source: #{error.message}", error
 
   ###
   Show microphone not found hin banner.
@@ -503,18 +460,18 @@ class z.media.MediaStreamHandler
 
   # Toggle the camera.
   toggle_video_send: =>
-    if @local_media_streams.video() and @local_media_type() is z.media.MediaType.VIDEO
+    if @local_media_stream() and @local_media_type() is z.media.MediaType.VIDEO
       return @_toggle_video_send()
     return @replace_input_source z.media.MediaType.VIDEO
 
   # Toggle the mute state of the microphone.
   toggle_audio_send: =>
-    return @_toggle_audio_send() if @local_media_streams.audio()
+    return @_toggle_audio_send() if @local_media_stream()
     return Promise.reject new z.media.MediaError z.media.MediaError::TYPE.NO_AUDIO_STREAM_FOUND
 
   # Toggle the screen.
   toggle_screen_send: =>
-    if @local_media_streams.video() and @local_media_type() is z.media.MediaType.SCREEN
+    if @local_media_stream() and @local_media_type() is z.media.MediaType.SCREEN
       return @_toggle_screen_send()
     return @replace_input_source z.media.MediaType.SCREEN
 
@@ -525,10 +482,10 @@ class z.media.MediaStreamHandler
     @self_stream_state.video_send false
     @local_media_type z.media.MediaType.AUDIO
 
-  # Reset the MediaStreams and states.
-  reset_media_streams: =>
+  # Reset the MediaStream and states.
+  reset_media_stream: =>
     if not @needs_media_stream()
-      @release_media_streams()
+      @release_media_stream()
       @reset_self_states()
       @media_repository.close_audio_context()
 
@@ -556,11 +513,11 @@ class z.media.MediaStreamHandler
   ###
   _set_stream_state: (media_stream_info) ->
     if media_stream_info.type in [z.media.MediaType.AUDIO, z.media.MediaType.AUDIO_VIDEO]
-      audio_stream_tracks = @_get_media_tracks media_stream_info.stream, z.media.MediaType.AUDIO
+      audio_stream_tracks = z.media.MediaStreamHandler.get_media_tracks media_stream_info.stream, z.media.MediaType.AUDIO
       audio_stream_tracks[0].enabled = @self_stream_state.audio_send()
 
     if media_stream_info.type in [z.media.MediaType.AUDIO_VIDEO, z.media.MediaType.VIDEO]
-      video_stream_tracks = @_get_media_tracks media_stream_info.stream, z.media.MediaType.VIDEO
+      video_stream_tracks = z.media.MediaStreamHandler.get_media_tracks media_stream_info.stream, z.media.MediaType.VIDEO
       video_stream_tracks[0].enabled = @self_stream_state.screen_send() or @self_stream_state.video_send()
 
   ###
@@ -568,7 +525,7 @@ class z.media.MediaStreamHandler
   @private
   ###
   _toggle_audio_send: ->
-    @_toggle_stream_enabled z.media.MediaType.AUDIO, @local_media_streams.audio(), @self_stream_state.audio_send
+    @_toggle_stream_enabled z.media.MediaType.AUDIO, @local_media_stream(), @self_stream_state.audio_send
     .then (audio_track) =>
       @logger.info "Microphone enabled: #{@self_stream_state.audio_send()}", audio_track
       return @self_stream_state.audio_send()
@@ -578,7 +535,7 @@ class z.media.MediaStreamHandler
   @private
   ###
   _toggle_screen_send: ->
-    @_toggle_stream_enabled z.media.MediaType.VIDEO, @local_media_streams.video(), @self_stream_state.screen_send
+    @_toggle_stream_enabled z.media.MediaType.VIDEO, @local_media_stream(), @self_stream_state.screen_send
     .then (video_track) =>
       @logger.info "Screen enabled: #{@self_stream_state.screen_send()}", video_track
       return @self_stream_state.screen_send()
@@ -588,7 +545,7 @@ class z.media.MediaStreamHandler
   @private
   ###
   _toggle_video_send: ->
-    @_toggle_stream_enabled z.media.MediaType.VIDEO, @local_media_streams.video(), @self_stream_state.video_send
+    @_toggle_stream_enabled z.media.MediaType.VIDEO, @local_media_stream(), @self_stream_state.video_send
     .then (video_track) =>
       @logger.info "Camera enabled: #{@self_stream_state.video_send()}", video_track
       return @self_stream_state.video_send()
@@ -604,9 +561,9 @@ class z.media.MediaStreamHandler
   ###
   _toggle_stream_enabled: (media_type, media_stream, state_observable) ->
     Promise.resolve()
-    .then =>
+    .then ->
       state_observable not state_observable()
-      media_stream_track = (@_get_media_tracks media_stream, media_type)[0]
+      media_stream_track = (z.media.MediaStreamHandler.get_media_tracks media_stream, media_type)[0]
       if media_type is z.media.MediaType.AUDIO
         amplify.publish z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, not state_observable()
       enabled_state = state_observable()

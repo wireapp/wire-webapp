@@ -4,7 +4,7 @@
   "devDependencies": {
     "autoprefixer": "6.7.7",
     "coffeelint": "1.16.0",
-    "eslint": "3.17.1",
+    "eslint": "3.18.0",
     "grunt": "1.0.1",
     "grunt-aws-s3": "0.14.5",
     "grunt-bower-task": "0.4.0",
@@ -40,10 +40,11 @@
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
     "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
-    "lint": "eslint app/script/**/*.js",
+    "lint": "eslint -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/unit_tests/**/*.js",
+    "lint-fix": "eslint --fix -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/unit_tests/**/*.js",
     "postinstall": "grunt init",
     "start": "grunt",
-    "test": "npm run lint && grunt check && grunt test"
+    "test": "yarn run lint && grunt check && grunt test"
   },
   "repository": {
     "type": "git",

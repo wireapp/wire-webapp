@@ -37,7 +37,6 @@ z.string.es.auth_account_create_account = 'Crear una Cuenta'
 z.string.es.auth_account_expiration = 'Su sesión ha vencido. Entrar nuevamente.'
 z.string.es.auth_account_get_wire = 'Un messenger sencillo, privado y seguro para chat y llamadas, y para compartir fotos, música, videos, GIFs y mas.'
 z.string.es.auth_account_password_forgot = 'Contraseña Olvidada'
-z.string.es.auth_account_remember_me = 'Mantener sesión iniciada'
 z.string.es.auth_account_sign_in = 'Iniciar sesión'
 z.string.es.auth_account_sign_in_email = 'Correo'
 z.string.es.auth_account_sign_in_phone = 'Teléfono'
@@ -190,6 +189,10 @@ z.string.es.modal_new_device_headline = '%@.name comenzó a utilizar un disposit
 z.string.es.modal_new_device_headline_many = '%@.names comenzaron a utilizar dispositivos nuevos'
 z.string.es.modal_new_device_headline_you = '%@.name comenzó a utilizar un dispositivo nuevo'
 z.string.es.modal_new_device_message = '¿Desea enviar su mensaje?'
+z.string.es.modal_new_device_call_accept = '¿Acepta la llamada?'
+z.string.es.modal_new_device_call_anyway = 'Llamar de todos modos'
+z.string.es.modal_new_device_call_incoming = '¿Desea aceptar la llamada?'
+z.string.es.modal_new_device_call_outgoing = '¿Desea realizar la llamada?'
 z.string.es.modal_new_device_show_device = 'mostrar dispositivo'
 z.string.es.modal_new_device_send_anyway = 'enviar de todos modos'
 # Remove device
@@ -204,11 +207,6 @@ z.string.es.modal_session_reset_message_2 = 'nosotros.'
 # Too many members in conversation
 z.string.es.modal_too_many_members_headline = 'Llamada llena'
 z.string.es.modal_too_many_members_message = 'Hasta %max personas pueden unirse a una conversación. Hay espacio para %no más personas aquí.'
-# Whitelist screensharing
-z.string.es.modal_whitelist_screensharing_headline = 'Wire necesita permiso para compartir su pantalla'
-z.string.es.modal_whitelist_screensharing_message_1 = 'Abrir about:config y agregar *.wire.com a la lista de dominios que pueden compartir la pantalla. Ver'
-z.string.es.modal_whitelist_screensharing_message_link = 'Preguntas más Frecuentes'
-z.string.es.modal_whitelist_screensharing_message_2 = 'para mayor detalle.'
 # Parallel uploads
 z.string.es.modal_uploads_parallel = 'Puede enviar hasta %no archivos a la vez.'
 
@@ -283,6 +281,8 @@ z.string.es.collection_section_files = 'Ficheros'
 z.string.es.collection_section_audio = 'Mensajes de audio'
 
 # Full Search
+z.string.es.fullsearch_placeholder = 'Buscar mensajes'
+z.string.es.fullsearch_no_results = 'Ningún resultado.'
 
 # Archive
 z.string.es.archive_header = 'Archivar'
@@ -540,7 +540,7 @@ z.string.es.warning_lifecycle_update_link = 'Actualiza ahora'
 # Browser notifications
 z.string.es.system_notification_asset_add = 'Compartió una foto'
 z.string.es.system_notification_connection_accepted = 'Aceptó tu solicitud de conexión'
-z.string.es.system_notification_connection_connected = 'Están conectados'
+z.string.es.system_notification_connection_connected = 'Ahora está conectado'
 z.string.es.system_notification_connection_request = 'Quiere conectar'
 z.string.es.system_notification_conversation_create = '%s.first_name inició una conversación'
 z.string.es.system_notification_conversation_rename = '%s.first_name renombró la conversación a %name'

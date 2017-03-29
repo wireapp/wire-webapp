@@ -66,14 +66,14 @@ z.util.Environment = do ->
       return false if not @supports_media_devices()
       return false if window.WebSocket is undefined
       return false if @is_edge()
-      return @is_chrome() or @is_firefox() or @is_opera()
+      return true if @is_firefox() and @get_version() >= 52
+      return @is_chrome() or @is_opera()
     supports_media_devices: ->
       return true if navigator.mediaDevices?.getUserMedia
       return false
     supports_screen_sharing: ->
       return true if window.desktopCapturer
-      # @deprecated Remove warning modal once we require Firefox 52 ESR
-      return @is_firefox() and @get_version() >= 48
+      return @is_firefox()
 
   os =
     is_mac: ->

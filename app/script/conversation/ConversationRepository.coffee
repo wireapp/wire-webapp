@@ -104,6 +104,7 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
+    amplify.subscribe z.event.WebApp.CONVERSATION.MISSED_EVENTS, @on_missed_events
     amplify.subscribe z.event.WebApp.CONVERSATION.PERSIST_STATE, @save_conversation_state_in_db
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.event.WebApp.USER.UNBLOCKED, @unblocked_user
@@ -152,16 +153,15 @@ class z.conversation.ConversationRepository
   get_conversations: =>
     @conversation_service.load_conversation_states_from_db()
     .then (local_conversations) =>
-      is_update_needed = local_conversations.length is 0 or local_conversations[0].status is undefined
-
-      if is_update_needed
-        return @conversation_service.get_all_conversations()
-        .then (remote_conversations) =>
-          @conversation_mapper.merge_conversations local_conversations, remote_conversations
-        .then (merged_conversations) =>
-          @conversation_service.save_conversations_in_db merged_conversations
-      else
-        return local_conversations
+      return @conversation_service.get_all_conversations()
+      .catch (error) =>
+        @logger.error "Failed to get all conversations from backend: #{error.message}"
+      .then (remote_conversations = []) =>
+        if remote_conversations.length > 0
+          return Promise.resolve @conversation_mapper.merge_conversations local_conversations, remote_conversations
+          .then (merged_conversations) => @conversation_service.save_conversations_in_db merged_conversations
+        else
+          return local_conversations
     .then (conversations) =>
       @save_conversations @conversation_mapper.map_conversations conversations
       amplify.publish z.event.WebApp.CONVERSATION.LOADED_STATES
@@ -394,7 +394,9 @@ class z.conversation.ConversationRepository
   get_most_active_conversations: ->
     return @conversation_service.get_active_conversations_from_db()
     .then (conversation_ids) =>
-      return conversation_ids.map (conversation_id) => @find_conversation_by_id conversation_id
+      return conversation_ids
+        .map (conversation_id) => @find_conversation_by_id conversation_id
+        .filter (conversation_et) -> conversation_et?
 
   ###
   Get conversation with a user.
@@ -619,7 +621,7 @@ class z.conversation.ConversationRepository
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'cleared', message_content
 
-      @sending_queue.push => @_send_generic_message @self_conversation().id, generic_message
+      @send_generic_message_to_conversation @self_conversation().id, generic_message
       .then =>
         @logger.info "Cleared conversation '#{conversation_et.id}' as read on '#{new Date(cleared_timestamp).toISOString()}'"
       .catch (error) =>
@@ -721,7 +723,7 @@ class z.conversation.ConversationRepository
 
     z.util.load_url_blob url
     .then (blob) =>
-      @send_message message, conversation_et
+      @send_text message, conversation_et
       @upload_images conversation_et, [blob]
 
   ###
@@ -788,7 +790,7 @@ class z.conversation.ConversationRepository
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.set 'lastRead', message_content
 
-      @sending_queue.push => @_send_generic_message @self_conversation().id, generic_message
+      @send_generic_message_to_conversation @self_conversation().id, generic_message
       .then =>
         @logger.info "Marked conversation '#{conversation_et.id}' as read on '#{new Date(timestamp).toISOString()}'"
       .catch (error) =>
@@ -852,7 +854,7 @@ class z.conversation.ConversationRepository
       generic_message.set 'asset', asset
       if conversation_et.ephemeral_timer()
         generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
-      @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
+      @send_generic_message_to_conversation conversation_et.id, generic_message
     .then =>
       event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
       asset = if conversation_et.ephemeral_timer() then generic_message.ephemeral.asset else generic_message.asset
@@ -937,17 +939,23 @@ class z.conversation.ConversationRepository
 
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
-    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message, [message_et.user().id], false
+    @sending_queue.push =>
+      @create_user_client_map conversation_et.id, true, [message_et.user().id]
+    .then (user_client_map) =>
+      return @_send_generic_message conversation_et.id, generic_message, user_client_map, [message_et.user().id], false
 
   ###
   Send e-call message in specified conversation.
   @param conversation_et [z.entity.Conversation] Conversation to send e-call message to
   @param e_call_message_et [z.calling.entity.ECallMessage] E-call message
+  @param user_client_map [Object] Contains the intended recipient users and clients
+  @param precondition_option [Array<String>|Boolean] Optional level that backend checks for missing clients
   ###
-  send_e_call: (conversation_et, e_call_message_et) =>
+  send_e_call: (conversation_et, e_call_message_et, user_client_map, precondition_option) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'calling', new z.proto.Calling e_call_message_et.to_content_string()
-    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
+    @sending_queue.push =>
+      return @_send_generic_message conversation_et.id, generic_message, user_client_map, precondition_option
     .then =>
       if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
         @_track_completed_media_action conversation_et, generic_message, e_call_message_et
@@ -1053,37 +1061,7 @@ class z.conversation.ConversationRepository
   send_location: (conversation_et, longitude, latitude, name, zoom) =>
     generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
     generic_message.set 'location', new z.proto.Location longitude, latitude, name, zoom
-    @sending_queue.push => @_send_generic_message conversation_et.id, generic_message
-
-  ###
-  Send text message in specified conversation.
-
-  @param message [String] plain text message
-  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
-  @return [Promise] Promise that resolves after sending the message
-  ###
-  send_message: (message, conversation_et) =>
-    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-    generic_message.set 'text', new z.proto.Text message
-    if conversation_et.ephemeral_timer()
-      generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
-    @_send_and_inject_generic_message conversation_et, generic_message
-    .then -> return generic_message
-
-  ###
-  Wraps generic message in ephemeral message.
-
-  @param generic_message [z.proto.Message]
-  @param millis [Number] expire time in milliseconds
-  @return [z.proto.Message]
-  ###
-  _wrap_in_ephemeral_message: (generic_message, millis) ->
-    ephemeral = new z.proto.Ephemeral()
-    ephemeral.set 'expire_after_millis', millis
-    ephemeral.set generic_message.content, generic_message[generic_message.content]
-    generic_message = new z.proto.GenericMessage generic_message.message_id
-    generic_message.set 'ephemeral', ephemeral
-    return generic_message
+    @send_generic_message_to_conversation conversation_et.id, generic_message
 
   ###
   Send edited message in specified conversation.
@@ -1106,21 +1084,6 @@ class z.conversation.ConversationRepository
       @send_link_preview message, conversation_et, generic_message
     .catch (error) =>
       @logger.error "Error while editing message: #{error.message}", error
-      throw error
-
-  ###
-  Send text message with link preview in specified conversation.
-
-  @param message [String] plain text message
-  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
-  @return [Promise] Promise that resolves after sending the message
-  ###
-  send_message_with_link_preview: (message, conversation_et) =>
-    @send_message message, conversation_et
-    .then (generic_message) =>
-      @send_link_preview message, conversation_et, generic_message
-    .catch (error) =>
-      @logger.error "Error while sending text message: #{error.message}", error
       throw error
 
   ###
@@ -1169,9 +1132,7 @@ class z.conversation.ConversationRepository
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.setClientAction z.proto.ClientAction.RESET_SESSION
 
-      user_client_map = @_create_user_client_map_from_ids user_id, client_id
-
-      @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+      @cryptography_repository.encrypt_generic_message {"#{user_id}": client_id}, generic_message
       .then (payload) =>
         return @conversation_service.post_encrypted_message conversation_id, payload, true
       .then (response) =>
@@ -1180,6 +1141,36 @@ class z.conversation.ConversationRepository
       .catch (error) =>
         @logger.error "Sending conversation reset failed: #{error.message}", error
         reject error
+
+  ###
+  Send text message in specified conversation.
+
+  @param message [String] plain text message
+  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
+  @return [Promise] Promise that resolves after sending the message
+  ###
+  send_text: (message, conversation_et) =>
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'text', new z.proto.Text message
+    if conversation_et.ephemeral_timer()
+      generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
+    @_send_and_inject_generic_message conversation_et, generic_message
+    .then -> return generic_message
+
+  ###
+  Send text message with link preview in specified conversation.
+
+  @param message [String] plain text message
+  @param conversation_et [z.entity.Conversation] Conversation that should receive the message
+  @return [Promise] Promise that resolves after sending the message
+  ###
+  send_text_with_link_preview: (message, conversation_et) =>
+    @send_text message, conversation_et
+    .then (generic_message) =>
+      @send_link_preview message, conversation_et, generic_message
+    .catch (error) =>
+      @logger.error "Error while sending text message: #{error.message}", error
+      throw error
 
   ###
   Construct event payload.
@@ -1197,25 +1188,6 @@ class z.conversation.ConversationRepository
       type: event_type
       conversation: conversation_id
       status: z.message.StatusType.SENDING
-
-  ###
-  Create a user client map for a given conversation.
-
-  @private
-  @param conversation_id [String] Conversation ID
-  @param skip_own_clients [Boolean] True, if other own clients should be skipped (to not sync messages on own clients)
-  @return [Promise<Object>] Promise that resolves with a user client map
-  ###
-  _create_user_client_map: (conversation_id, skip_own_clients = false) ->
-    @get_all_users_in_conversation conversation_id
-    .then (user_ets) ->
-      user_client_map = {}
-
-      for user_et in user_ets
-        continue if skip_own_clients and user_et.is_me
-        user_client_map[user_et.id] = (client_et.id for client_et in user_et.devices())
-
-      return user_client_map
 
   ###
   Create a user client map for given IDs.
@@ -1265,9 +1237,55 @@ class z.conversation.ConversationRepository
         status: z.message.StatusType.SENT
         time: event_time
 
+  ###
+  Wraps generic message in ephemeral message.
+
+  @param generic_message [z.proto.Message]
+  @param millis [Number] expire time in milliseconds
+  @return [z.proto.Message]
+  ###
+  _wrap_in_ephemeral_message: (generic_message, millis) ->
+    ephemeral = new z.proto.Ephemeral()
+    ephemeral.set 'expire_after_millis', millis
+    ephemeral.set generic_message.content, generic_message[generic_message.content]
+    generic_message = new z.proto.GenericMessage generic_message.message_id
+    generic_message.set 'ephemeral', ephemeral
+    return generic_message
+
+
   ###############################################################################
   # Send Generic Messages
   ###############################################################################
+
+  ###
+  Create a user client map for a given conversation.
+
+  @param conversation_id [String] Conversation ID
+  @param skip_own_clients [Boolean] True, if other own clients should be skipped (to not sync messages on own clients)
+  @param user_ids [Array<String>] Optionally the intended recipient users
+  @return [Promise<Object>] Promise that resolves with a user client map
+  ###
+  create_user_client_map: (conversation_id, skip_own_clients = false, user_ids) ->
+    @get_all_users_in_conversation conversation_id
+    .then (user_ets) ->
+      user_client_map = {}
+
+      for user_et in user_ets
+        continue if skip_own_clients and user_et.is_me
+        if user_ids
+          continue if user_et.id not in user_ids
+        user_client_map[user_et.id] = (client_et.id for client_et in user_et.devices())
+
+      return user_client_map
+
+  send_generic_message_to_conversation: (conversation_id, generic_message) =>
+    @sending_queue.push =>
+      skip_own_clients = generic_message.content is 'ephemeral'
+      @create_user_client_map conversation_id, skip_own_clients
+      .then (user_client_map) =>
+        if skip_own_clients
+          precondition_option = Object.keys user_client_map
+        return @_send_generic_message conversation_id, generic_message, user_client_map, precondition_option
 
   _send_and_inject_generic_message: (conversation_et, generic_message, sync_timestamp = true) =>
     Promise.resolve()
@@ -1282,8 +1300,7 @@ class z.conversation.ConversationRepository
       return mapped_event
     .then (saved_event) =>
       @on_conversation_event saved_event
-      @sending_queue.push =>
-        @_send_generic_message conversation_et.id, generic_message
+      @send_generic_message_to_conversation conversation_et.id, generic_message
       .then (payload) =>
         if saved_event.type in z.event.EventTypeHandling.STORE
           backend_timestamp = if sync_timestamp then payload.time else undefined
@@ -1318,34 +1335,28 @@ class z.conversation.ConversationRepository
 
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Generic message to be sent as external message
-  @param user_ids [Array<String>] Optional array of user IDs to limit sending to
+  @param user_client_map [Object] Optional object containing recipient users and their clients
+  @param precondition_option [Array<String>|Boolean] Optional level that backend checks for missing clients
   @param native_push [Boolean] Optional if message should enforce native push
   @return [Promise] Promise that resolves after sending the external message
   ###
-  _send_external_generic_message: (conversation_id, generic_message, user_ids, native_push = true) =>
+  _send_external_generic_message: (conversation_id, generic_message, user_client_map, precondition_option, native_push = true) =>
     @logger.info "Sending external message of type '#{generic_message.content}'", generic_message
 
+    ciphertext = null
     key_bytes = null
     sha256 = null
-    ciphertext = null
-    skip_own_clients = generic_message.content is 'ephemeral'
 
     z.assets.AssetCrypto.encrypt_aes_asset generic_message.toArrayBuffer()
     .then (data) =>
       [key_bytes, sha256, ciphertext] = data
-      return @_create_user_client_map conversation_id, skip_own_clients
-    .then (user_client_map) =>
-      if user_ids
-        delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
-      if skip_own_clients
-        user_ids = Object.keys user_client_map
       generic_message_external = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message_external.set 'external', new z.proto.External new Uint8Array(key_bytes), new Uint8Array(sha256)
       return @cryptography_repository.encrypt_generic_message user_client_map, generic_message_external
     .then (payload) =>
       payload.data = z.util.array_to_base64 ciphertext
       payload.native_push = native_push
-      @_send_encrypted_message conversation_id, generic_message, payload, user_ids
+      @_send_encrypted_message conversation_id, generic_message, payload, precondition_option
     .catch (error) =>
       @logger.info 'Failed sending external message', error
       throw error
@@ -1356,30 +1367,24 @@ class z.conversation.ConversationRepository
   @private
   @param conversation_id [String] Conversation ID
   @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
-  @param user_ids [Array<String>] Optional array of user IDs to limit sending to
+  @param user_client_map [Object] Optional object containing recipient users and their clients
+  @param precondition_option [Array<String>|Boolean] Optional level that backend checks for missing clients
   @param native_push [Boolean] Optional if message should enforce native push
   @return [Promise] Promise that resolves when the message was sent
   ###
-  _send_generic_message: (conversation_id, generic_message, user_ids, native_push = true) =>
-    Promise.resolve @_should_send_as_external conversation_id, generic_message
+  _send_generic_message: (conversation_id, generic_message, user_client_map, precondition_option, native_push = true) =>
+    @_should_send_as_external conversation_id, generic_message
     .then (send_as_external) =>
       if send_as_external
-        @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
+        @_send_external_generic_message conversation_id, generic_message, user_client_map, precondition_option, native_push
       else
-        skip_own_clients = generic_message.content is 'ephemeral'
-        @_create_user_client_map conversation_id, skip_own_clients
-        .then (user_client_map) =>
-          if user_ids
-            delete user_client_map[user_id] for user_id of user_client_map when user_id not in user_ids
-          if skip_own_clients
-            user_ids = Object.keys user_client_map
-          return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+        return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
         .then (payload) =>
           payload.native_push = native_push
-          @_send_encrypted_message conversation_id, generic_message, payload, user_ids
+          @_send_encrypted_message conversation_id, generic_message, payload, precondition_option
     .catch (error) =>
       if error?.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
-        return @_send_external_generic_message conversation_id, generic_message, user_ids, native_push
+        return @_send_external_generic_message conversation_id, generic_message, user_client_map, precondition_option, native_push
       throw error
 
   ###
@@ -1468,7 +1473,7 @@ class z.conversation.ConversationRepository
 
     return @_grant_outgoing_message conversation_et, generic_message
     .then =>
-      return @_create_user_client_map conversation_id, skip_own_clients
+      return @create_user_client_map conversation_id, skip_own_clients
     .then (user_client_map) =>
       if skip_own_clients
         precondition_option = Object.keys user_client_map
@@ -1531,12 +1536,11 @@ class z.conversation.ConversationRepository
   upload_files: (conversation_et, files) =>
     return if not @_can_upload_assets_to_conversation conversation_et
 
-    z.util.foreach_deferred files, (file) =>
+    for file in files
       if @use_v3_api
         @upload_file_v3 conversation_et, file
       else
         @upload_file conversation_et, file
-    , 10
 
   ###
   Post file to a conversation.
@@ -1618,9 +1622,9 @@ class z.conversation.ConversationRepository
 
   @param conversation_et [z.entity.Conversation]
   @param message_et [z.entity.Message]
-  @param user_ids [Array<String>] Optional array of user IDs to limit sending to
+  @param precondition_option [Array<String>|Boolean] Optional level that backend checks for missing clients
   ###
-  delete_message_everyone: (conversation_et, message_et, user_ids) =>
+  delete_message_everyone: (conversation_et, message_et, precondition_option) =>
     Promise.resolve()
     .then ->
       if not message_et.user().is_me and not message_et.ephemeral_expires()
@@ -1629,7 +1633,10 @@ class z.conversation.ConversationRepository
       generic_message.set 'deleted', new z.proto.MessageDelete message_et.id
       return generic_message
     .then (generic_message) =>
-      @sending_queue.push => @_send_generic_message conversation_et.id, generic_message, user_ids
+      @sending_queue.push =>
+        @create_user_client_map conversation_et.id, false, precondition_option
+        .then (user_client_map) =>
+          return @_send_generic_message conversation_et.id, generic_message, user_client_map, precondition_option
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.EVERYWHERE
     .then =>
@@ -1651,7 +1658,7 @@ class z.conversation.ConversationRepository
       generic_message.set 'hidden', new z.proto.MessageHide conversation_et.id, message_et.id
       return generic_message
     .then (generic_message) =>
-      @sending_queue.push => @_send_generic_message @self_conversation().id, generic_message
+      @send_generic_message_to_conversation @self_conversation().id, generic_message
     .then =>
       @_track_delete_message conversation_et, message_et, z.tracking.attribute.DeleteType.LOCAL
     .then =>
@@ -1770,6 +1777,11 @@ class z.conversation.ConversationRepository
   ###############################################################################
   # Event callbacks
   ###############################################################################
+
+  on_missed_events: =>
+    @filtered_conversations()
+    .filter (conversation_et) -> not conversation_et.removed_from_conversation()
+    .forEach (conversation_et) -> amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_missed conversation_et
 
   ###
   Listener for incoming events from the WebSocket.

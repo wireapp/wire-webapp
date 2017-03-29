@@ -37,7 +37,6 @@ z.string.sl.auth_account_create_account = 'Ustvari račun'
 z.string.sl.auth_account_expiration = 'Ker je vaša seja potekla, ste bili odjavljeni. Prosimo prijavite se ponovno.'
 z.string.sl.auth_account_get_wire = 'Preprosta, zasebna in varna aplikacija za klepet, klice, skupno rabo slik, glasbo, video posnetke, GIFe in še več.'
 z.string.sl.auth_account_password_forgot = 'Pozabljeno geslo'
-z.string.sl.auth_account_remember_me = 'Zapomni si me'
 z.string.sl.auth_account_sign_in = 'Prijava'
 z.string.sl.auth_account_sign_in_email = 'E-pošta'
 z.string.sl.auth_account_sign_in_phone = 'Telefon'
@@ -208,11 +207,6 @@ z.string.sl.modal_session_reset_message_2 = 'nas.'
 # Too many members in conversation
 z.string.sl.modal_too_many_members_headline = 'Polna hiša'
 z.string.sl.modal_too_many_members_message = 'Do %max oseb se lahko pridruži pogovoru. Tukaj je prostora še za %no oseb.'
-# Whitelist screensharing
-z.string.sl.modal_whitelist_screensharing_headline = 'Wire potrebuje dovoljenje za deljenje vašega zaslona'
-z.string.sl.modal_whitelist_screensharing_message_1 = 'Odpri about:config in dodaj *.wire.com na seznam dovoljenih domen za deljenje zaslona. Glej'
-z.string.sl.modal_whitelist_screensharing_message_link = 'Pogosto zastavljena vprašanja'
-z.string.sl.modal_whitelist_screensharing_message_2 = 'za podrobnosti.'
 # Parallel uploads
 z.string.sl.modal_uploads_parallel = 'Lahko pošljete do %no zbirk naenkrat.'
 
@@ -538,7 +532,7 @@ z.string.sl.warning_lifecycle_update_link = 'Posodobi zdaj'
 # Browser notifications
 z.string.sl.system_notification_asset_add = 'Je delil(-a) sliko'
 z.string.sl.system_notification_connection_accepted = 'Je sprejel(-a) vašo zahtevo po povezavi'
-z.string.sl.system_notification_connection_connected = 'Sta zdaj povezana'
+z.string.sl.system_notification_connection_connected = 'Zdaj ste povezani'
 z.string.sl.system_notification_connection_request = 'Si želi povezati'
 z.string.sl.system_notification_conversation_create = '%s.first_name je začel(-a) pogovor'
 z.string.sl.system_notification_conversation_rename = '%s.first_name je preimenoval(-a) pogovor v %name'

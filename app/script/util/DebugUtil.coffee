@@ -82,6 +82,40 @@ class z.util.DebugUtil
         @logger.warn "From: #{debug_information.user.name()}", debug_information.user
         resolve debug_information
 
+  get_serialised_session: (session_id) ->
+    return wire.app.repository.storage.storage_service.load 'sessions', session_id
+      .then (record) ->
+        base64_encoded_payload = z.util.array_to_base64 record.serialised
+        record.serialised = base64_encoded_payload
+        return record
+
+  get_serialised_identity: ->
+    return wire.app.repository.storage.storage_service.load 'keys', 'local_identity'
+    .then (record) ->
+      base64_encoded_payload = z.util.array_to_base64 record.serialised
+      record.serialised = base64_encoded_payload
+      return record
+
+  get_event_from_notification_stream: (event_id) ->
+    client_id = wire.app.repository.client.current_client().id
+    return wire.app.service.notification.get_notifications(client_id, undefined, 10000)
+    .then (response) ->
+      events = response.notifications.filter (item) ->
+        return item.id is event_id
+      return events[0]
+
+  get_objects_for_decryption_errors: (session_id, event_id) ->
+    return Promise.all([
+      @get_event_from_notification_stream event_id
+      @get_serialised_identity()
+      @get_serialised_session session_id
+    ])
+    .then (items) ->
+      return JSON.stringify
+        event: items[0]
+        identity: items[1]
+        session: items[2]
+
   log_connection_status: ->
     @logger.log 'Online Status'
     @logger.log "-- Browser online: #{window.navigator.onLine}"

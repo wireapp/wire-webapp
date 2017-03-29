@@ -37,7 +37,6 @@ z.string.uk.auth_account_create_account = 'Створити акаунт'
 z.string.uk.auth_account_expiration = 'Ви вийшли, оскільки термін дії вашої сесії завершився. Будь ласка, увійдіть ще раз.'
 z.string.uk.auth_account_get_wire = 'Простий, приватний та захищений месенджер для розмов, дзвінків, обміну картинками, музикою, відео, GIF-анімаціями та іншими функціями.'
 z.string.uk.auth_account_password_forgot = 'Забули пароль?'
-z.string.uk.auth_account_remember_me = 'Запам’ятати мене'
 z.string.uk.auth_account_sign_in = 'Увійти'
 z.string.uk.auth_account_sign_in_email = 'Email'
 z.string.uk.auth_account_sign_in_phone = 'Номер телефону'
@@ -208,11 +207,6 @@ z.string.uk.modal_session_reset_message_2 = 'з нами.'
 # Too many members in conversation
 z.string.uk.modal_too_many_members_headline = 'Голосовий канал переповнений'
 z.string.uk.modal_too_many_members_message = 'В розмові може бути до %max учасників. В даній розмові уже не вистачає місця для %no учасників.'
-# Whitelist screensharing
-z.string.uk.modal_whitelist_screensharing_headline = 'Для Wire необхідний дозвіл, щоб ви могли поділитись скріншотами робочого столу'
-z.string.uk.modal_whitelist_screensharing_message_1 = 'Перейдіть до about:config та додайте *.wire.com до списку дозволених доменів для обміну скріншотами робочого столу. Дивіться'
-z.string.uk.modal_whitelist_screensharing_message_link = 'розділ Часті запитання'
-z.string.uk.modal_whitelist_screensharing_message_2 = ', щоб дізнатись більше деталей.'
 # Parallel uploads
 z.string.uk.modal_uploads_parallel = 'Ви можете надіслати до %no файлів за один раз.'
 
@@ -546,7 +540,7 @@ z.string.uk.warning_lifecycle_update_link = 'Оновити зараз'
 # Browser notifications
 z.string.uk.system_notification_asset_add = 'Поділився(-лась) картинкою'
 z.string.uk.system_notification_connection_accepted = 'Прийняв(-ла) ваш запит на додавання до контактів'
-z.string.uk.system_notification_connection_connected = 'Уже у вашому списку контактів'
+z.string.uk.system_notification_connection_connected = 'Тепер ви підключені'
 z.string.uk.system_notification_connection_request = 'Хоче бути доданим(-ою) до ваших контактів'
 z.string.uk.system_notification_conversation_create = '%s.first_name почав(-ла) розмову'
 z.string.uk.system_notification_conversation_rename = '%s.first_name перейменував(-ла) розмову на %name'

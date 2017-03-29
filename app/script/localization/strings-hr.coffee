@@ -37,7 +37,6 @@ z.string.hr.auth_account_create_account = 'Stvaranje računa'
 z.string.hr.auth_account_expiration = 'Odjavljeni ste jer je vaša sesija istekla. Molimo prijavite se ponovno.'
 z.string.hr.auth_account_get_wire = 'Jednostavan, privatan i siguran klijent za razgovor, pozive, dijeljenje slika, glazbe, videa, animacija i više.'
 z.string.hr.auth_account_password_forgot = 'Zaboravljena lozinka'
-z.string.hr.auth_account_remember_me = 'Zapamti me'
 z.string.hr.auth_account_sign_in = 'Prijava'
 z.string.hr.auth_account_sign_in_email = 'Email'
 z.string.hr.auth_account_sign_in_phone = 'Telefon'
@@ -198,11 +197,6 @@ z.string.hr.modal_session_reset_message_2 = 'nas.'
 # Too many members in conversation
 z.string.hr.modal_too_many_members_headline = 'Puna kuća'
 z.string.hr.modal_too_many_members_message = 'Do %max ljudi može pristupiti razgovoru. Ima mjesta za još %no ljudi ovdje.'
-# Whitelist screensharing
-z.string.hr.modal_whitelist_screensharing_headline = 'Wire treba dozvolu za zajedničko korištenje vašeg zaslona'
-z.string.hr.modal_whitelist_screensharing_message_1 = 'Otvorite about:config i dodajte *. wire.com na popis dopuštenih domena za screensharing. Vidjeti'
-z.string.hr.modal_whitelist_screensharing_message_link = 'Česta pitanja'
-z.string.hr.modal_whitelist_screensharing_message_2 = 'detalje.'
 # Parallel uploads
 z.string.hr.modal_uploads_parallel = 'Možete poslati %no datoteke odjednom.'
 
