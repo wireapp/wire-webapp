@@ -261,13 +261,12 @@ class z.calling.v3.CallCenter
     throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.WRONG_PAYLOAD_FORMAT if not _.isObject e_call_message_et
 
     @get_e_call_by_id conversation_et.id
-    .then (e_call_et) =>
-      if e_call_et.data_channel_opened and e_call_message_et.type in [z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC]
-        @logger.debug "Sending e-call '#{e_call_message_et.type}' message to conversation '#{conversation_et.id}' via data channel", e_call_message_et.to_JSON()
-        return e_flow_et.send_message e_call_message_et.to_content_string() for e_flow_et in e_call_et.get_flows()
-      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED
+    .then (e_call_et) ->
+      if e_call_message_et.type in [z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC]
+        return e_flow_et.send_message e_call_message_et for e_flow_et in e_call_et.get_flows()
+      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.NO_DATA_CHANNEL
     .catch (error) =>
-      throw error if error.type not in [z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED , z.calling.v3.CallError::TYPE.NOT_FOUND]
+      throw error if error.type not in [z.calling.v3.CallError::TYPE.NO_DATA_CHANNEL , z.calling.v3.CallError::TYPE.NOT_FOUND]
 
       @logger.debug "Sending e-call '#{e_call_message_et.type}' message to conversation '#{conversation_et.id}'", e_call_message_et.to_JSON()
       @_limit_message_recipients conversation_et, e_call_message_et
@@ -436,7 +435,9 @@ class z.calling.v3.CallCenter
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
       e_call_et.termination_reason = termination_reason if termination_reason and not e_call_et.termination_reason
 
+      event_promises = []
       e_call_message_et = undefined
+
       for e_flow_et in e_call_et.get_flows()
         additional_payload = @_create_additional_payload conversation_id, e_flow_et.remote_user_id, e_flow_et.remote_client_id
         if e_call_et.is_connected()
@@ -444,11 +445,13 @@ class z.calling.v3.CallCenter
         else
           e_call_message_et = z.calling.mapper.ECallMessageMapper.build_cancel false, e_call_et.session_id, additional_payload
 
-        @send_e_call_event e_call_et.conversation_et, e_call_message_et
+        event_promises.push @send_e_call_event e_call_et.conversation_et, e_call_message_et
 
-      if e_call_et.participants().length < 2
-        @delete_call conversation_id
-        @_distribute_deactivation_event e_call_message_et, e_call_et.creating_user if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+      return Promise.all event_promises
+      .then =>
+        if e_call_et.participants().length < 2
+          @delete_call conversation_id
+          @_distribute_deactivation_event e_call_message_et, e_call_et.creating_user if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
