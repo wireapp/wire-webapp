@@ -68,13 +68,12 @@
 
     process_announce_list(announcements_list) {
       if (announcements_list) {
-        for (let announcement in announcements_list) {
+        for (let announcement of Array.from(announcements_list)) {
           if (!z.util.Environment.frontend.is_localhost()) {
-            if (announcement.version_max && z.util.Environment.version(false) > announcement.version_max) {
+            if (announcement.version_max && (z.util.Environment.version(false) > announcement.version_max)) {
               continue;
             }
-
-            if (announcement.version_min && z.util.Environment.version(false) < announcement.version_min) {
+            if (announcement.version_min && (z.util.Environment.version(false) < announcement.version_min)) {
               continue;
             }
           }
