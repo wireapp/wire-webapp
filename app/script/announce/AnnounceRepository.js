@@ -43,7 +43,9 @@
     }
 
     check_announcements() {
-      return this.announce_service.get_announcements().then(this.process_announce_list);
+      return this.announce_service.get_announcements().then(() => {
+        this.process_announce_list();
+      });
     }
 
     check_version() {
