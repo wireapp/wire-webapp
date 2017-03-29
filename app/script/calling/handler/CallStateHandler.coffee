@@ -323,19 +323,6 @@ class z.calling.handler.CallStateHandler
       @logger.warn "No call found in conversation '#{conversation_id}' to delete", error
 
   ###
-  User action to ignore incoming call.
-  @param conversation_id [String] Conversation ID of call to be joined
-  ###
-  ignore_call: (conversation_id) =>
-    @v2_call_center.get_call_by_id conversation_id
-    .then (call_et) =>
-      call_et.ignore()
-      @logger.info "Call in '#{conversation_id}' ignored"
-      @v2_call_center.media_stream_handler.reset_media_stream()
-    .catch (error) =>
-      @logger.warn "No call found in conversation '#{conversation_id}' to ignore", error
-
-  ###
   User action to join a call.
   @param conversation_id [String] Conversation ID of call to be joined
   @param is_videod [Boolean] Is this a video call
@@ -377,6 +364,19 @@ class z.calling.handler.CallStateHandler
       @_put_state_to_idle conversation_id
     .catch (error) =>
       @logger.warn "No call found in conversation '#{conversation_id}' to leave", error
+
+  ###
+  User action to reject incoming call.
+  @param conversation_id [String] Conversation ID of call to be joined
+  ###
+  reject_call: (conversation_id) =>
+    @v2_call_center.get_call_by_id conversation_id
+    .then (call_et) =>
+      call_et.reject()
+      @logger.info "Call in '#{conversation_id}' rejected"
+      @v2_call_center.media_stream_handler.reset_media_stream()
+    .catch (error) =>
+      @logger.warn "No call found in conversation '#{conversation_id}' to reject", error
 
   ###
   Remove a participant from a call if he was removed from the group.

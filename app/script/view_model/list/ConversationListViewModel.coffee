@@ -84,14 +84,9 @@ class z.ViewModel.list.ConversationListViewModel
 
     @self_stream_state = @calling_repository.self_stream_state
 
-    @joined_v3_call = ko.pureComputed =>
-      return @joined_call()? and @joined_call() instanceof z.calling.entities.ECall
-
-    @show_toggle_screen = ko.pureComputed =>
-      return false if @joined_v3_call()
+    @show_toggle_screen = ko.pureComputed ->
       return z.calling.CallingRepository.supports_screen_sharing()
     @show_toggle_video = ko.pureComputed =>
-      return false if @joined_v3_call() and @calling_repository.media_repository.stream_handler.local_media_type() is z.media.MediaType.AUDIO
       return @joined_call()?.conversation_et.is_one2one()
     @disable_toggle_screen = ko.pureComputed =>
       return @joined_call()?.is_remote_screen_send()
@@ -152,8 +147,8 @@ class z.ViewModel.list.ConversationListViewModel
     termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER if @joined_call()?.state() isnt z.calling.enum.CallState.OUTGOING
     amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, termination_reason
 
-  on_ignore_call: (conversation_et) ->
-    amplify.publish z.event.WebApp.CALL.STATE.IGNORE, conversation_et.id
+  on_reject_call: (conversation_et) ->
+    amplify.publish z.event.WebApp.CALL.STATE.REJECT, conversation_et.id
 
   on_toggle_audio: (conversation_et) ->
     amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_et.id, z.media.MediaType.AUDIO

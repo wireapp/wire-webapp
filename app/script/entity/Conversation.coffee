@@ -289,9 +289,8 @@ class z.entity.Conversation
     last_message = @get_last_message()
 
     # last rendered message is the last message in this conversation so we are safe to add it
-    if not last_message? or last_message.timestamp() is @last_event_timestamp()
+    if not last_message? or last_message.timestamp() => @last_event_timestamp()
       @messages_unordered.push message_et if @_is_unique message_et.id
-
 
   ###
   Adds multiple messages to the conversation.

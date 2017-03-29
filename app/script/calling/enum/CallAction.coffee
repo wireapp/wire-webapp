@@ -22,8 +22,8 @@ z.calling.enum ?= {}
 
 z.calling.enum.CALL_ACTION =
   DELETE: 'delete_call'
-  IGNORE: 'ignore_call'
   JOIN: 'join_call'
   LEAVE: 'leave_call'
+  REJECT: 'reject_call'
   REMOVE_PARTICIPANT: 'remove_participant'
   TOGGLE_MEDIA: 'toggle_media'

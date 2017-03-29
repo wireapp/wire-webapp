@@ -10,8 +10,13 @@ globals:
   _: true
   $: true
   amplify: true
+  describe: true
+  expect: true
+  it: true
   ko: true
   LRUCache: true
+  pako: true
+  Raygun: true
   wire: true
   z: true
 
@@ -22,6 +27,7 @@ rules:
   indent: [2, 2, {SwitchCase: 1}]
   keyword-spacing: 2
   no-dupe-class-members: 2
+  no-else-return: 2
   no-multi-spaces: 2
   no-shadow: 2
   no-unused-expressions: 2
