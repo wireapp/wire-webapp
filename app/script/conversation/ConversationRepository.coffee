@@ -396,7 +396,7 @@ class z.conversation.ConversationRepository
     .then (conversation_ids) =>
       return conversation_ids
         .map (conversation_id) => @find_conversation_by_id conversation_id
-        .filter (conversation_et) => conversation_et?
+        .filter (conversation_et) -> conversation_et?
 
   ###
   Get conversation with a user.
