@@ -496,7 +496,7 @@ class z.conversation.ConversationRepository
       @update_participating_user_ets conversation_et, (conversation_et) ->
         amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et if show_conversation
       return conversation_et
-    .catch (error) =>
+    .catch (error) ->
       throw error unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
 
   ###
