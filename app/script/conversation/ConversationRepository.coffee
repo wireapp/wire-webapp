@@ -1451,7 +1451,7 @@ class z.conversation.ConversationRepository
   _grant_outgoing_message: (conversation_id, generic_message, user_ids) ->
     return Promise.resolve() if generic_message.content in ['cleared', 'confirmation', 'deleted', 'lastRead']
     consent_type = if generic_message.content is 'calling' then z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL else z.ViewModel.MODAL_CONSENT_TYPE.MESSAGE
-    return @grant_message conversation_et, consent_type, user_ids
+    return @grant_message conversation_id, consent_type, user_ids
 
   grant_message: (conversation_id, consent_type, user_ids) =>
     @get_conversation_by_id conversation_id
