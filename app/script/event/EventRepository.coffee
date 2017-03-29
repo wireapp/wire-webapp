@@ -372,7 +372,6 @@ class z.event.EventRepository
               throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
           else if decrypt_error instanceof Proteus.errors.DecryptError.InvalidMessage or decrypt_error instanceof Proteus.errors.DecryptError.InvalidSignature
             # Session is broken, let's see what's really causing it...
-            error_code = z.cryptography.CryptographyErrorType.INVALID_SIGNATURE
             @logger.error "Session '#{session_id}' with user '#{remote_user_id}' (client '#{remote_client_id}') is broken or out of sync. Reset the session and decryption is likely to work again. Error: #{decrypt_error.message}", decrypt_error
           else if decrypt_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged
             # Remote identity changed
