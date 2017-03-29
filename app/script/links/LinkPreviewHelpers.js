@@ -27,7 +27,7 @@ z.links.LinkPreviewHelpers = {
   /*
   Check if the text contains only one link
 
-  @param {String} text
+  @param {string} text
   */
   contains_only_link(text) {
     text = text.trim();
@@ -38,7 +38,7 @@ z.links.LinkPreviewHelpers = {
   /*
   Get first link and link offset for given text.
 
-   @param {String} text
+   @param {string} text
   */
   get_first_link_with_offset(text) {
     const links = twttr.txt.extractUrls(text);

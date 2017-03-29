@@ -57,7 +57,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
   resolve with an z.proto.LinkPreview instance
 
   @param {string} url
-  @param {number} offset - starting index of the link
+  @param {number} [offset=0] - starting index of the link
   */
   get_link_preview(url, offset = 0) {
     let open_graph_data;
@@ -91,6 +91,8 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
   /*
   Fetch and upload open graph images
 
+  @param {z.proto.LinkPreview} link_preview
+  @param {Object} [open_graph_image={}]
   */
   _fetch_preview_image(link_preview, open_graph_image = {}) {
     if ((link_preview.preview === 'article') && open_graph_image.data) {
@@ -107,7 +109,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
   /*
   Fetch open graph data
 
-  @param url [String]
+  @param {string} url
   */
   _fetch_open_graph_data(link) {
     return new Promise((resolve) => {
@@ -118,7 +120,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
   /*
   Upload open graph image as asset
 
-  @param data_uri [String] image data as base64 encoded data URI
+  @param {string} data_URI - image data as base64 encoded data URI
   */
   _upload_preview_image(data_URI) {
     return Promise.resolve(z.util.base64_to_blob(data_URI))
