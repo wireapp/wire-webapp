@@ -42,7 +42,7 @@ z.links.LinkPreviewProtoBuilder = {
     data.url = data.url || url;
 
     if (data.title && data.url) {
-      const preview = new z.proto.Article(data.url || url, data.title, data.description);
+      const preview = new z.proto.Article(data.url, data.title, data.description);
       return new z.proto.LinkPreview(url, offset, preview);
     }
   },
