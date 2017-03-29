@@ -2,6 +2,7 @@ env:
   browser: true
   node: true
   es6: true
+  jasmine: true
 
 extends:
   "eslint:recommended"
@@ -10,11 +11,9 @@ globals:
   _: true
   $: true
   amplify: true
-  describe: true
-  expect: true
-  it: true
   ko: true
   LRUCache: true
+  moment: true
   pako: true
   Raygun: true
   wire: true
