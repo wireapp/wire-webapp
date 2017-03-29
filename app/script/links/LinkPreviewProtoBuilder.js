@@ -34,7 +34,7 @@ z.links.LinkPreviewProtoBuilder = {
 
   @returns {z.proto.LinkPreview}
   */
-  build_from_open_graph_data(data, url = 0, offset) {
+  build_from_open_graph_data(data, url, offset = 0) {
     if (_.isEmpty(data)) {
       return;
     }
