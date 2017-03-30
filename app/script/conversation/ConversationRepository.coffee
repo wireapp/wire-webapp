@@ -359,7 +359,7 @@ class z.conversation.ConversationRepository
   @param callback [Function] Function to be called on server return
   ###
   get_conversation_by_id: (conversation_id, callback) =>
-    if z.util.Environment.electron
+    if z.util.Environment.electron and window.electron_version
       return @get_conversation_by_id_deprecated conversation_id, callback
 
     @find_conversation_by_id conversation_id
