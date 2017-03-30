@@ -41,6 +41,7 @@ z.location = (() => {
     }
     res['place'] = res.locality || res.natural_feature || res.administrative_area_level_3 || res.administrative_area_level_2 || res.administrative_area_level_1;
     delete (res.political != null);
+    return res;
   };
 
   /*
@@ -48,21 +49,23 @@ z.location = (() => {
   @param latitude [Number] latitude
   @param longitude [Number] longitude
    */
-  let get_location = (latitude, longitude) => new Promise((resolve, reject) => {
-    if ((latitude == null) || (longitude == null)) {
-      reject(new Error('You need to specify latitude and longitude in order to retrieve the location'));
-    }
-    return $.ajax({
-      url: `${GOOGLE_GEOCODING_BASE_URL}?latlng=${latitude},${longitude}&key=${API_KEY}`,
-    })
-    .done(response => {
-      if (response.status === 'OK') {
-        return resolve(_parse_results(response.results));
+  let get_location = (latitude, longitude) => {
+    return new Promise((resolve, reject) => {
+      if ((latitude == null) || (longitude == null)) {
+        reject(new Error('You need to specify latitude and longitude in order to retrieve the location'));
       }
-      return resolve();
-    })
-    .fail((jqXHR, textStatus, errorThrown) => reject(new Error(errorThrown)));
-  });
+      $.ajax({
+        url: `${GOOGLE_GEOCODING_BASE_URL}?latlng=${latitude},${longitude}&key=${API_KEY}`,
+      })
+      .done(response => {
+        if (response.status === 'OK') {
+          return resolve(_parse_results(response.results));
+        }
+        return resolve();
+      })
+      .fail((jqXHR, textStatus, errorThrown) => reject(new Error(errorThrown)))
+    });
+  };
 
   /*
   Return link to google maps

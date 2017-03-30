@@ -65,11 +65,10 @@ class z.ViewModel.content.ContentViewModel
           @conversation_titlebar.added_to_view()
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
           @preferences_account.check_new_clients()
-          @preferences_devices.update_fingerprint()
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
           @preferences_av.initiate_devices()
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
-          @preferences_devices.update_fingerprint()
+          @preferences_devices.update_device_info()
         when z.ViewModel.content.CONTENT_STATE.COLLECTION
           @collection.set_conversation @previous_conversation
         else

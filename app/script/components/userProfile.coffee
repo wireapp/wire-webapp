@@ -82,6 +82,7 @@ class z.components.UserProfileViewModel
       return if not @selected_device()
 
       @fingerprint_local @cryptography_repository.get_local_fingerprint()
+      @fingerprint_remote ''
       @cryptography_repository.get_remote_fingerprint @user().id, @selected_device().id
       .then (fingerprint) =>
         @fingerprint_remote fingerprint
