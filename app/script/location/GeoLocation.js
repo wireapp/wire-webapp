@@ -63,7 +63,7 @@ z.location = (() => {
         }
         return resolve();
       })
-      .fail((jqXHR, textStatus, errorThrown) => reject(new Error(errorThrown)))
+      .fail((jqXHR, textStatus, errorThrown) => reject(new Error(errorThrown)));
     });
   };
 
