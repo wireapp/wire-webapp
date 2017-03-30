@@ -463,7 +463,7 @@ class z.calling.v3.CallCenter
       .then =>
         if e_call_et.participants().length < 2
           @delete_call conversation_id
-          @_distribute_deactivation_event e_call_message_et, e_call_et.creating_user if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+          @_distribute_deactivation_event e_call_message_et, e_call_et.creating_user if e_call_message_et?.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
