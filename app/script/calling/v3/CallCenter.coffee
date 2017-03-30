@@ -345,8 +345,9 @@ class z.calling.v3.CallCenter
             user_client_map = "#{remote_user.id}": (device.id for device in remote_user.devices())
         when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
           # Send to remote client that call is connected with
-          precondition_option = true
-          user_client_map = "#{remote_user.id}": ["#{remote_client_id}"]
+          if remote_client_id
+            precondition_option = true
+            user_client_map = "#{remote_user.id}": ["#{remote_client_id}"]
         when z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT
           # Send to all clients of self user
           precondition_option = [self_user.id]
