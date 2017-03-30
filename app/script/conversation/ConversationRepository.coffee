@@ -1162,7 +1162,7 @@ class z.conversation.ConversationRepository
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
       generic_message.setClientAction z.proto.ClientAction.RESET_SESSION
 
-      @cryptography_repository.encrypt_generic_message {"#{user_id}": client_id}, generic_message
+      @cryptography_repository.encrypt_generic_message {"#{user_id}": [client_id]}, generic_message
       .then (payload) =>
         return @conversation_service.post_encrypted_message conversation_id, payload, true
       .then (response) =>
@@ -1218,19 +1218,6 @@ class z.conversation.ConversationRepository
       type: event_type
       conversation: conversation_id
       status: z.message.StatusType.SENDING
-
-  ###
-  Create a user client map for given IDs.
-
-  @private
-  @param user_id [String] User ID
-  @param client_id [String] Client ID
-  @return [Object] User client map
-  ###
-  _create_user_client_map_from_ids: (user_id, client_id) ->
-    user_client_map = {}
-    user_client_map[user_id] = [client_id]
-    return user_client_map
 
   ###
   Map a user client maps.
