@@ -1957,7 +1957,7 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] The conversation that was created
   ###
   _on_create: (event_json) ->
-    @find_conversation_by_id event_json.id
+    @find_conversation_by_id event_json.conversation
     .catch (error) =>
       throw error unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
 
