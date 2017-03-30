@@ -44,7 +44,7 @@
           <!-- ko if: show_connections() && connections().length -->
             <div class="start-ui-list-connections">
               <span class="start-ui-list-header" data-uie-name="status-connect" data-bind="l10n_text: z.string.search_connections"></span>
-              <user-list class="search-list-theme-black" params="user: connections, click: click_on_group, mode: z.components.UserListMode.INFO"></user-list>
+              <user-list class="search-list-theme-black" params="user: connections, mode: z.components.UserListMode.INFO, selected: selected_people"></user-list>
             </div>
           <!-- /ko  -->
         <!-- /ko  -->
