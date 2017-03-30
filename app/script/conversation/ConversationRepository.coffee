@@ -123,7 +123,7 @@ class z.conversation.ConversationRepository
   create_new_conversation: (user_ids, name) =>
     @conversation_service.create_conversation user_ids, name
     .then (response) =>
-      @_on_create response
+      @_on_create conversation: response.id, data: response
 
   ###
   Get a conversation from the backend.
