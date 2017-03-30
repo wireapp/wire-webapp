@@ -1860,7 +1860,7 @@ class z.conversation.ConversationRepository
         when z.event.Client.CONVERSATION.CONFIRMATION
           @_on_confirmation conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_DELETE
-          @_on_message_delete conversation_et, event
+          @_on_message_deleted conversation_et, event
         when z.event.Client.CONVERSATION.MESSAGE_HIDDEN
           @_on_message_hidden event
         when z.event.Client.CONVERSATION.REACTION
