@@ -1158,19 +1158,21 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the session reset
   ###
   send_session_reset: (user_id, client_id, conversation_id) =>
-    return new Promise (resolve, reject) =>
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.setClientAction z.proto.ClientAction.RESET_SESSION
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'clientAction', z.proto.ClientAction.RESET_SESSION
 
-      @cryptography_repository.encrypt_generic_message {"#{user_id}": [client_id]}, generic_message
-      .then (payload) =>
-        return @conversation_service.post_encrypted_message conversation_id, payload, true
-      .then (response) =>
-        @logger.info "Sent info about session reset to client '#{client_id}' of user '#{user_id}'"
-        resolve response
-      .catch (error) =>
-        @logger.error "Sending conversation reset failed: #{error.message}", error
-        reject error
+    user_client_map = {}
+    user_client_map[user_id] = [client_id]
+
+    @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+    .then (payload) =>
+      return @conversation_service.post_encrypted_message conversation_id, payload, true
+    .then (response) =>
+      @logger.info "Sent info about session reset to client '#{client_id}' of user '#{user_id}'"
+      return response
+    .catch (error) =>
+      @logger.error "Sending conversation reset failed: #{error.message}", error
+      thriw error
 
   ###
   Send text message in specified conversation.
