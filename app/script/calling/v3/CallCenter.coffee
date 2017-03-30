@@ -57,12 +57,23 @@ class z.calling.v3.CallCenter
     @self_state = @media_stream_handler.self_stream_state
     @self_client_joined = ko.observable false
 
+    @block_media_stream = true
     @subscribe_to_events()
 
   # Subscribe to amplify topics.
   subscribe_to_events: =>
     amplify.subscribe z.event.WebApp.CALL.EVENT_FROM_BACKEND, @on_event
+    amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
     amplify.subscribe z.util.Logger::LOG_ON_DEBUG, @set_logging
+
+  ###
+  Set the notification handling state.
+  @note Temporarily ignore call related events when handling notifications from the stream
+  @param handling_state [z.event.NotificationHandlingState] State of the notifications stream handling
+  ###
+  set_notification_handling_state: (handling_state) =>
+    @block_media_stream = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
+    @logger.info "Block requesting MediaStream: #{@block_media_stream}"
 
 
   ###############################################################################
@@ -541,7 +552,7 @@ class z.calling.v3.CallCenter
         e_call_et.set_remote_version e_call_message_et
         return e_call_et.add_e_participant e_call_message_et, remote_user_et
         .then =>
-          @media_stream_handler.initiate_media_stream e_call_et.id, true if e_call_et.is_remote_video_send()
+          @media_stream_handler.initiate_media_stream e_call_et.id, true if e_call_et.is_remote_video_send() and not @block_media_stream
           @telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, e_call_et
           @_distribute_activation_event e_call_message_et
       .catch (error) =>
