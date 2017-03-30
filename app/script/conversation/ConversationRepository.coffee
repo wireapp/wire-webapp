@@ -457,8 +457,8 @@ class z.conversation.ConversationRepository
     @get_conversation_by_id conversation_id
     .then (conversation_et) =>
       @get_message_in_conversation_by_id conversation_et, message_id
-    .then (message_et) ->
-      return conversation_et.last_read_timestamp() >= message_et.timestamp()
+      .then (message_et) ->
+        return conversation_et.last_read_timestamp() >= message_et.timestamp()
     .catch (error) ->
       if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         return true
