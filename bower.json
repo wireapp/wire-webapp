@@ -84,7 +84,22 @@
     "moment": {
       "js": [
         "moment.js",
-        "locale/de.js"
+        "locale/cs.js",
+        "locale/da.js",
+        "locale/de.js",
+        "locale/es.js",
+        "locale/fi.js",
+        "locale/fr.js",
+        "locale/hr.js",
+        "locale/hu.js",
+        "locale/it.js",
+        "locale/pt.js",
+        "locale/ro.js",
+        "locale/ru.js",
+        "locale/sk.js",
+        "locale/sl.js",
+        "locale/tr.js",
+        "locale/uk.js"
       ]
     },
     "normalize-css": {

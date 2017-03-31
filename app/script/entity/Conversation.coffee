@@ -276,21 +276,9 @@ class z.entity.Conversation
   @param message_et [z.entity.Message] Message entity to be added to the conversation
   ###
   add_message: (message_et) ->
-    first_message = @get_first_message true
-
     amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et
-
-    # don't add messages that are older then what is rendered
-    if first_message? and message_et.timestamp() < first_message.timestamp()
-      return
-
     @_update_last_read_from_message message_et
-
-    last_message = @get_last_message()
-
-    # last rendered message is the last message in this conversation so we are safe to add it
-    if not last_message? or last_message.timestamp() => @last_event_timestamp()
-      @messages_unordered.push message_et if @_is_unique message_et.id
+    @messages_unordered.push message_et if @_is_unique message_et.id
 
   ###
   Adds multiple messages to the conversation.
@@ -407,12 +395,9 @@ class z.entity.Conversation
 
   ###
   Get the first message of the conversation.
-  @param include_creation_message [Boolean] Optionally include the local creation message defaulting to false
   @return [z.entity.Message, undefined] First message entity or undefined
   ###
-  get_first_message: (include_creation_message = false) ->
-    if include_creation_message
-      return @messages_visible()[0]
+  get_first_message: ->
     return @messages()[0]
 
   ###

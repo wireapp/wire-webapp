@@ -38,16 +38,11 @@ class z.ViewModel.content.PreferencesDevicesViewModel
       return @devices()
     ).extend notify: 'always', rateLimit: 500
 
+    @_update_activation_location '?'
+
     # All clients except the current client
     @client_repository.clients.subscribe (client_ets) =>
       @devices (client_et for client_et in client_ets when client_et.id isnt @current_client().id)
-
-    @current_client.subscribe (device_et) =>
-      return if not device_et
-
-      @_update_activation_location '?'
-      @_update_activation_time device_et.time
-      @_update_device_location device_et.location if device_et.location
 
   _update_activation_location: (location) ->
     @activated_in z.localization.Localizer.get_text
@@ -80,6 +75,8 @@ class z.ViewModel.content.PreferencesDevicesViewModel
       data: device_et.model
     event.stopPropagation()
 
-  update_fingerprint: =>
-    return if @fingerprint() isnt ''
-    @fingerprint @cryptography_repository.get_local_fingerprint()
+  update_device_info: =>
+    if @current_client() and not @fingerprint()
+      @_update_activation_time @current_client().time
+      @_update_device_location @current_client().location
+      @fingerprint @cryptography_repository.get_local_fingerprint()

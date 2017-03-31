@@ -67,7 +67,7 @@
      */
     get_cookies() {
       return this.client.send_request({
-        url: this.client.create_url(this.URL_COOKIES),
+        url: this.client.create_url(AuthService.URL_COOKIES),
         type: 'GET',
       }).then((data) => {
         return data.cookies;
@@ -82,7 +82,7 @@
      */
     get_invitations_info(code) {
       return this.client.send_request({
-        url: this.client.create_url(`${this.URL_INVITATIONS}/info?code=${code}`),
+        url: this.client.create_url(`${AuthService.URL_INVITATIONS}/info?code=${code}`),
         type: 'GET',
       });
     }

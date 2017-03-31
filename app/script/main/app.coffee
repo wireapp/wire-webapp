@@ -195,7 +195,7 @@ class z.main.App
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS, conversation_ets.length, 50
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS, connection_ets.length, 50
 
-      @repository.conversation.map_connections @repository.user.connections()
+      @repository.conversation.initialize_connections @repository.user.connections()
       @_subscribe_to_beforeunload()
       return @repository.event.initialize_from_notification_stream()
     .then (notifications_count) =>
@@ -290,7 +290,7 @@ class z.main.App
       @repository.bot.add_bot bot_name
 
     assets_v3 = z.util.get_url_parameter z.auth.URLParameter.ASSETS_V3
-    if _.isBoolean assets_v3
+    if not z.util.Environment.frontend.is_production() or _.isBoolean assets_v3
       @repository.conversation.use_v3_api = assets_v3
       @repository.user.use_v3_api = assets_v3
 

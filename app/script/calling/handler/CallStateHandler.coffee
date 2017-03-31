@@ -56,14 +56,16 @@ class z.calling.handler.CallStateHandler
   @param conversation_id [String] Conversation ID
   ###
   check_state: (conversation_id) =>
-    conversation_et = @v2_call_center.conversation_repository.get_conversation_by_id conversation_id
-    return if not conversation_et? or conversation_et.removed_from_conversation()
-
-    @_is_call_ongoing conversation_id
-    .then ([is_call_ongoing, response]) =>
-      if is_call_ongoing
-        @on_call_state @_fake_on_state_event(response, conversation_id), true
-        @v2_call_center.conversation_repository.unarchive_conversation conversation_et if conversation_et.is_archived()
+    @v2_call_center.conversation_repository.get_conversation_by_id_async conversation_id
+    .then (conversation_et) =>
+      return if conversation_et.removed_from_conversation()
+      return @_is_call_ongoing conversation_id
+      .then ([is_call_ongoing, response]) =>
+        if is_call_ongoing
+          @on_call_state @_fake_on_state_event(response, conversation_id), true
+          @v2_call_center.conversation_repository.unarchive_conversation conversation_et if conversation_et.is_archived()
+    .catch (error) ->
+      throw error unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
 
   ###
   Set the notification handling state.
@@ -332,7 +334,8 @@ class z.calling.handler.CallStateHandler
     .catch (error) =>
       throw error unless error.type is z.calling.v2.CallError::TYPE.CALL_NOT_FOUND
 
-      @v2_call_center.conversation_repository.get_conversation_by_id conversation_id, (conversation_et) ->
+      @v2_call_center.conversation_repository.get_conversation_by_id_async conversation_id
+      .then (conversation_et) ->
         amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.MEDIA.COMPLETED_MEDIA_ACTION,
           action: if is_videod then 'video_call' else 'audio_call'
           conversation_type: z.tracking.helpers.get_conversation_type conversation_et
@@ -499,13 +502,14 @@ class z.calling.handler.CallStateHandler
       @logger.warn "Call entity for '#{event.conversation}' already exists", call_et
       return call_et
     .catch =>
-      conversation_et = @v2_call_center.conversation_repository.get_conversation_by_id event.conversation
-      call_et = new z.calling.entities.Call conversation_et, @v2_call_center
-      call_et.session_id = event.session or @_fake_session_id()
-      call_et.event_sequence = event.sequence
-      conversation_et.call call_et
-      @calls.push call_et
-      return call_et
+      @v2_call_center.conversation_repository.get_conversation_by_id_async event.conversation
+      .then (conversation_et) =>
+        call_et = new z.calling.entities.Call conversation_et, @v2_call_center
+        call_et.session_id = event.session or @_fake_session_id()
+        call_et.event_sequence = event.sequence
+        conversation_et.call call_et
+        @calls.push call_et
+        return call_et
 
   ###
   Constructs an connecting call entity.

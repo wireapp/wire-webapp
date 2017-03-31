@@ -43,11 +43,11 @@ class z.conversation.ConversationRepository
 
     @block_event_handling = true
     @fetching_conversations = {}
-    @has_initialized_participants = false
+    @should_initialize_participants = true
     @use_v3_api = false
 
     @self_conversation = ko.pureComputed =>
-      return @find_conversation_by_id @user_repository.self().id if @user_repository.self()
+      return @_find_conversation_by_id @user_repository.self().id if @user_repository.self()
 
     @filtered_conversations = ko.pureComputed =>
       @conversations().filter (conversation_et) ->
@@ -103,7 +103,7 @@ class z.conversation.ConversationRepository
     amplify.subscribe z.event.WebApp.CONVERSATION.ASSET.CANCEL, @cancel_asset_upload
     amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
-    amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, @map_connections
+    amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTION, @map_connection
     amplify.subscribe z.event.WebApp.CONVERSATION.MISSED_EVENTS, @on_missed_events
     amplify.subscribe z.event.WebApp.CONVERSATION.PERSIST_STATE, @save_conversation_state_in_db
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_notification_handling_state
@@ -123,32 +123,30 @@ class z.conversation.ConversationRepository
   create_new_conversation: (user_ids, name) =>
     @conversation_service.create_conversation user_ids, name
     .then (response) =>
-      @_on_create response
+      @_on_create conversation: response.id, data: response
 
   ###
   Get a conversation from the backend.
-  @param conversation_et [z.entity.Conversation] Conversation to be saved
-  @return [Boolean] Is the conversation active
+  @param conversation_et [z.entity.Conversation] Conversation to be retrieved from the backend
   ###
-  fetch_conversation_by_id: (conversation_id, callback) ->
-    for id, callbacks of @fetching_conversations when id is conversation_id
-      callbacks.push callback
-      return
+  fetch_conversation_by_id: (conversation_id) =>
+    for id, promises of @fetching_conversations when id is conversation_id
+      return new Promise (resolve) -> promises.push resolve
 
-    @fetching_conversations[conversation_id] = [callback]
+    @fetching_conversations[conversation_id] = []
 
     @conversation_service.get_conversation_by_id conversation_id
     .then (response) =>
       conversation_et = @conversation_mapper.map_conversation response
       @save_conversation conversation_et
       @logger.info "Fetched conversation '#{conversation_id}' from backend"
-      callbacks = @fetching_conversations[conversation_id]
-      for callback in callbacks
-        callback? conversation_et
+      for promise in @fetching_conversations[conversation_id]
+        promise conversation_et
       delete @fetching_conversations[conversation_id]
+      return conversation_et
     .catch (error) =>
       @logger.error "Failed to fetch conversation '#{conversation_id}' from backend: #{error.message}", error
-      throw error
+      throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NOT_FOUND
 
   get_conversations: =>
     @conversation_service.load_conversation_states_from_db()
@@ -323,33 +321,46 @@ class z.conversation.ConversationRepository
   @param conversation_id [String] ID of conversation to get
   @return [z.entity.Conversation] Conversation
   ###
-  find_conversation_by_id: (conversation_id) ->
+  find_conversation_by_id: (conversation_id) =>
+    Promise.resolve()
+    .then =>
+      if not conversation_id
+        throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NO_CONVERSATION_ID
+      conversation_et = @_find_conversation_by_id conversation_id
+      return conversation_et if conversation_et
+      throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NOT_FOUND
+
+  _find_conversation_by_id: (conversation_id) =>
     return conversation for conversation in @conversations() when conversation.id is conversation_id
 
-  get_all_users_in_conversation: (conversation_id) ->
-    return new Promise (resolve) =>
-      @get_conversation_by_id conversation_id, (conversation_et) =>
-        others = conversation_et.participating_user_ets()
-        resolve others.concat [@user_repository.self()]
+  get_all_users_in_conversation: (conversation_id) =>
+    @get_conversation_by_id_async conversation_id
+    .then (conversation_et) =>
+      return [@user_repository.self()].concat conversation_et.participating_user_ets()
+
+  ###
+  Check for conversation locally and fetch it from the server otherwise.
+  @deprecated
+  @note Deprecated legacy method, remove when last dependencies in wrapper has been removed
+  @param conversation_id [String] ID of conversation to get
+  ###
+  get_conversation_by_id: (conversation_id) =>
+    return conversation for conversation in @conversations() when conversation.id is conversation_id
 
   ###
   Check for conversation locally and fetch it from the server otherwise.
   @param conversation_id [String] ID of conversation to get
-  @param callback [Function] Function to be called on server return
   ###
-  get_conversation_by_id: (conversation_id, callback) ->
-    if not conversation_id
-      throw new Error 'Trying to get conversation without ID'
-      return
-
-    conversation_et = @find_conversation_by_id conversation_id
-    if callback
-      if conversation_et?
-        callback? conversation_et
-      else
-        @fetch_conversation_by_id conversation_id, callback
-
-    return conversation_et
+  get_conversation_by_id_async: (conversation_id) =>
+    @find_conversation_by_id conversation_id
+    .catch (error) =>
+      if error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
+        return @fetch_conversation_by_id conversation_id
+      throw error
+    .catch (error) =>
+      unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
+        @logger.log @logger.levels.ERROR, "Failed to get conversation '#{conversation_id}': #{error.message}", error
+      throw error
 
   ###
   Get group conversations by name
@@ -369,7 +380,7 @@ class z.conversation.ConversationRepository
           return true for user_et in conversation_et.participating_user_ets() when z.util.StringUtil.compare_transliteration user_et.name(), query
         return false
       .sort (conversation_a, conversation_b) ->
-        sort_query = if is_username then "@#{@query}" else query
+        sort_query = if is_username then "@#{query}" else query
         return z.util.StringUtil.sort_by_priority conversation_a.display_name(), conversation_b.display_name(), sort_query
 
   ###
@@ -395,7 +406,7 @@ class z.conversation.ConversationRepository
     return @conversation_service.get_active_conversations_from_db()
     .then (conversation_ids) =>
       return conversation_ids
-        .map (conversation_id) => @find_conversation_by_id conversation_id
+        .map (conversation_id) => @_find_conversation_by_id conversation_id
         .filter (conversation_et) -> conversation_et?
 
   ###
@@ -404,12 +415,13 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] Conversation with requested user
   ###
   get_one_to_one_conversation: (user_et) =>
-    return new Promise (resolve) =>
-      for conversation_et in @conversations() when conversation_et.type() in [z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.CONNECT]
-        return resolve conversation_et if user_et.id is conversation_et.participating_user_ids()[0]
+    for conversation_et in @conversations() when conversation_et.type() in [z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.CONNECT]
+      return Promise.resolve conversation_et if user_et.id is conversation_et.participating_user_ids()[0]
 
-      return @fetch_conversation_by_id user_et.connection().conversation_id, (conversation_et) =>
-        conversation_et.connection user_et.connection()
+    return @fetch_conversation_by_id user_et.connection().conversation_id
+    .then (conversation_et) =>
+      conversation_et.connection user_et.connection()
+      return new Promise (resolve) =>
         @update_participating_user_ets conversation_et, (conversation_et) ->
           resolve conversation_et
 
@@ -429,52 +441,61 @@ class z.conversation.ConversationRepository
   @return [Promise] Resolves with true if message is marked as read
   ###
   is_message_read: (conversation_id, message_id) =>
-    return new Promise (resolve, reject) =>
-      if not conversation_id or not message_id
-        return resolve false
+    if not conversation_id or not message_id
+      return Promise.resolve false
 
-      @get_conversation_by_id conversation_id, (conversation_et) =>
-        @get_message_in_conversation_by_id conversation_et, message_id
-        .then (message_et) ->
-          resolve conversation_et.last_read_timestamp() >= message_et.timestamp()
-        .catch (error) ->
-          if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-            resolve true
-          else
-            reject error
+    @get_conversation_by_id_async conversation_id
+    .then (conversation_et) =>
+      @get_message_in_conversation_by_id conversation_et, message_id
+      .then (message_et) ->
+        return conversation_et.last_read_timestamp() >= message_et.timestamp()
+    .catch (error) ->
+      if error.type is z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
+        return true
+      throw error
 
-  ###
-  Maps user connection to the corresponding conversation.
-
-  @note If there is no conversation it will request it from the backend
-  @param [Array<z.entity.Connection>] Connections
-  @param [Boolean] open the new conversation
-  ###
-  map_connections: (connection_ets, show_conversation = false) =>
-    @logger.info "Mapping '#{connection_ets.length}' user connection(s) to conversations", connection_ets
-    for connection_et in connection_ets
-      conversation_et = @find_conversation_by_id connection_et.conversation_id
-
-      # We either accepted a pending connection request or send new connection request
-      states_to_fetch = [z.user.ConnectionStatus.ACCEPTED, z.user.ConnectionStatus.SENT]
-      if not conversation_et and connection_et.status() in states_to_fetch
-        @fetch_conversation_by_id connection_et.conversation_id, (conversation_et) =>
-          conversation_et.connection connection_et
-          @update_participating_user_ets conversation_et, (conversation_et) ->
-            amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et if show_conversation
-      else if conversation_et?
-        conversation_et.connection connection_et
-        @update_participating_user_ets conversation_et, (conversation_et) ->
-          if connection_et.status() is z.user.ConnectionStatus.ACCEPTED
-            conversation_et.type z.conversation.ConversationType.ONE2ONE
-
-    if not @has_initialized_participants
+  initialize_connections: (connections_ets) =>
+    @map_connections connections_ets
+    .then =>
       @logger.info 'Updating group participants offline'
       @_init_state_updates()
       @update_conversations_offline @conversations_unarchived()
       @update_conversations_offline @conversations_archived()
       @update_conversations_offline @conversations_cleared()
-      @has_initialized_participants = true
+
+  ###
+  Maps user connection to the corresponding conversation.
+
+  @note If there is no conversation it will request it from the backend
+  @param connection_et [z.entity.Connection] Connections
+  @param show_conversation [Boolean] Open the new conversation
+  ###
+  map_connection: (connection_et, show_conversation = false) =>
+    @find_conversation_by_id connection_et.conversation_id
+    .catch (error) =>
+      throw error unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
+
+      if connection_et.status() in [z.user.ConnectionStatus.ACCEPTED, z.user.ConnectionStatus.SENT]
+        return @fetch_conversation_by_id connection_et.conversation_id
+      throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NOT_FOUND
+    .then (conversation_et) =>
+      conversation_et.connection connection_et
+      if connection_et.status() is z.user.ConnectionStatus.ACCEPTED
+        conversation_et.type z.conversation.ConversationType.ONE2ONE
+
+      @update_participating_user_ets conversation_et, (conversation_et) ->
+        amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et if show_conversation
+      return conversation_et
+    .catch (error) ->
+      throw error unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
+
+  ###
+  Maps user connections to the corresponding conversations.
+  @param [Array<z.entity.Connection>] Connections
+  ###
+  map_connections: (connection_ets) =>
+    @logger.info "Mapping '#{connection_ets.length}' user connection(s) to conversations", connection_ets
+    Promise.all (@map_connection connection_et for connection_et in connection_ets)
 
   ###
   Mark conversation as read.
@@ -494,7 +515,10 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation to be saved in the repository
   ###
   save_conversation: (conversation_et) =>
-    if not @find_conversation_by_id conversation_et.id
+    @find_conversation_by_id conversation_et.id
+    .catch (error) =>
+      throw error unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
+
       @conversations.push conversation_et
       @save_conversation_state_in_db conversation_et
 
@@ -623,11 +647,7 @@ class z.conversation.ConversationRepository
 
       @send_generic_message_to_conversation @self_conversation().id, generic_message
       .then =>
-        @logger.info "Cleared conversation '#{conversation_et.id}' as read on '#{new Date(cleared_timestamp).toISOString()}'"
-      .catch (error) =>
-        @logger.error "Error (#{error.label}): #{error.message}"
-        error = new Error 'Event response is undefined'
-        Raygun.send error, source: 'Sending encrypted last read'
+        @logger.info "Cleared conversation '#{conversation_et.id}' on '#{new Date(cleared_timestamp).toISOString()}'"
 
   ###
   Leave conversation.
@@ -1128,19 +1148,21 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves after sending the session reset
   ###
   send_session_reset: (user_id, client_id, conversation_id) =>
-    return new Promise (resolve, reject) =>
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.setClientAction z.proto.ClientAction.RESET_SESSION
+    generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+    generic_message.set 'clientAction', z.proto.ClientAction.RESET_SESSION
 
-      @cryptography_repository.encrypt_generic_message {"#{user_id}": client_id}, generic_message
-      .then (payload) =>
-        return @conversation_service.post_encrypted_message conversation_id, payload, true
-      .then (response) =>
-        @logger.info "Sent info about session reset to client '#{client_id}' of user '#{user_id}'"
-        resolve response
-      .catch (error) =>
-        @logger.error "Sending conversation reset failed: #{error.message}", error
-        reject error
+    user_client_map = {}
+    user_client_map[user_id] = [client_id]
+
+    @cryptography_repository.encrypt_generic_message user_client_map, generic_message
+    .then (payload) =>
+      return @conversation_service.post_encrypted_message conversation_id, payload, true
+    .then (response) =>
+      @logger.info "Sent info about session reset to client '#{client_id}' of user '#{user_id}'"
+      return response
+    .catch (error) =>
+      @logger.error "Sending conversation reset failed: #{error.message}", error
+      thriw error
 
   ###
   Send text message in specified conversation.
@@ -1188,19 +1210,6 @@ class z.conversation.ConversationRepository
       type: event_type
       conversation: conversation_id
       status: z.message.StatusType.SENDING
-
-  ###
-  Create a user client map for given IDs.
-
-  @private
-  @param user_id [String] User ID
-  @param client_id [String] Client ID
-  @return [Object] User client map
-  ###
-  _create_user_client_map_from_ids: (user_id, client_id) ->
-    user_client_map = {}
-    user_client_map[user_id] = [client_id]
-    return user_client_map
 
   ###
   Map a user client maps.
@@ -1401,9 +1410,8 @@ class z.conversation.ConversationRepository
   ###
   _send_encrypted_message: (conversation_id, generic_message, payload, precondition_option = false) =>
     @logger.info "Sending encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", payload
-    conversation_et = @find_conversation_by_id conversation_id
 
-    return @_grant_outgoing_message conversation_et, generic_message
+    @_grant_outgoing_message conversation_id, generic_message
     .then =>
       return @conversation_service.post_encrypted_message conversation_id, payload, precondition_option
     .then (response) =>
@@ -1417,41 +1425,42 @@ class z.conversation.ConversationRepository
       return @_handle_client_mismatch conversation_id, error, generic_message, payload
       .then (payload_with_missing_clients) =>
         updated_payload = payload_with_missing_clients
-        return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
+        return @_grant_outgoing_message conversation_id, generic_message, Object.keys error.missing
       .then =>
         @logger.info "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
         return @conversation_service.post_encrypted_message conversation_id, updated_payload, true
 
-  _grant_outgoing_message: (conversation_et, generic_message, user_ids) ->
+  _grant_outgoing_message: (conversation_id, generic_message, user_ids) ->
     return Promise.resolve() if generic_message.content in ['cleared', 'confirmation', 'deleted', 'lastRead']
     consent_type = if generic_message.content is 'calling' then z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL else z.ViewModel.MODAL_CONSENT_TYPE.MESSAGE
-    return @grant_message conversation_et, consent_type, user_ids
+    return @grant_message conversation_id, consent_type, user_ids
 
-  grant_message: (conversation_et, consent_type, user_ids) =>
-    if conversation_et.verification_state() isnt z.conversation.ConversationVerificationState.DEGRADED
-      return Promise.resolve()
+  grant_message: (conversation_id, consent_type, user_ids) =>
+    @get_conversation_by_id_async conversation_id
+    .then (conversation_et) =>
+      return if conversation_et.verification_state() isnt z.conversation.ConversationVerificationState.DEGRADED
 
-    return new Promise (resolve, reject) =>
-      send_anyway = false
+      return new Promise (resolve, reject) =>
+        send_anyway = false
 
-      if not user_ids
-        users_with_unverified_clients = conversation_et.get_users_with_unverified_clients()
-        user_ids = users_with_unverified_clients.map (user_et) -> user_et.id
+        if not user_ids
+          users_with_unverified_clients = conversation_et.get_users_with_unverified_clients()
+          user_ids = users_with_unverified_clients.map (user_et) -> user_et.id
 
-      @user_repository.get_users_by_id user_ids, (user_ets) ->
-        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
-          data:
-            consent_type: consent_type
-            user_ets: user_ets
-          action: ->
-            send_anyway = true
-            conversation_et.verification_state z.conversation.ConversationVerificationState.UNVERIFIED
-            amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id if consent_type is z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL
-            resolve()
-          close: ->
-            if not send_anyway
-              amplify.publish z.event.WebApp.CALL.STATE.DELETE, conversation_et.id if consent_type is z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL
-              reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
+        @user_repository.get_users_by_id user_ids, (user_ets) ->
+          amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
+            data:
+              consent_type: consent_type
+              user_ets: user_ets
+            action: ->
+              send_anyway = true
+              conversation_et.verification_state z.conversation.ConversationVerificationState.UNVERIFIED
+              amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id if consent_type is z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL
+              resolve()
+            close: ->
+              if not send_anyway
+                amplify.publish z.event.WebApp.CALL.STATE.DELETE, conversation_et.id if consent_type is z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL
+                reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   ###
   Sends an OTR asset to a conversation.
@@ -1469,9 +1478,8 @@ class z.conversation.ConversationRepository
     skip_own_clients = generic_message.content is 'ephemeral'
     precondition_option = false
     image_payload = undefined
-    conversation_et = @find_conversation_by_id conversation_id
 
-    return @_grant_outgoing_message conversation_et, generic_message
+    @_grant_outgoing_message conversation_id, generic_message
     .then =>
       return @create_user_client_map conversation_id, skip_own_clients
     .then (user_client_map) =>
@@ -1493,7 +1501,7 @@ class z.conversation.ConversationRepository
       return @_handle_client_mismatch conversation_id, error, generic_message, image_payload
       .then (payload_with_missing_clients) =>
         updated_payload = payload_with_missing_clients
-        return @_grant_outgoing_message conversation_et, generic_message, Object.keys error.missing
+        return @_grant_outgoing_message conversation_id, generic_message, Object.keys error.missing
       .then =>
         @logger.log @logger.levels.INFO, "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
         return @asset_service.post_asset_v2 conversation_id, updated_payload, image_data, true, nonce
@@ -1507,12 +1515,12 @@ class z.conversation.ConversationRepository
   @return [Boolean] Is payload likely to be too big so that we switch to type external?
   ###
   _should_send_as_external: (conversation_id, generic_message) ->
-    return new Promise (resolve) =>
-      @get_conversation_by_id conversation_id, (conversation_et) ->
-        estimated_number_of_clients = conversation_et.number_of_participants() * 4
-        message_in_bytes = new Uint8Array(generic_message.toArrayBuffer()).length
-        estimated_payload_in_bytes = estimated_number_of_clients * message_in_bytes
-        resolve estimated_payload_in_bytes / 1024 > 200
+    @get_conversation_by_id_async conversation_id
+    .then (conversation_et) ->
+      estimated_number_of_clients = conversation_et.number_of_participants() * 4
+      message_in_bytes = new Uint8Array(generic_message.toArrayBuffer()).length
+      estimated_payload_in_bytes = estimated_number_of_clients * message_in_bytes
+      return estimated_payload_in_bytes / 1024 > 200
 
   ###
   Post images to a conversation.
@@ -1685,7 +1693,8 @@ class z.conversation.ConversationRepository
   timeout_ephemeral_message: (message_et) =>
     return if message_et.is_expired()
 
-    @get_conversation_by_id message_et.conversation_id, (conversation_et) =>
+    @get_conversation_by_id_async message_et.conversation_id
+    .then (conversation_et) =>
       if message_et.user().is_me
         switch
           when message_et.has_asset_text()
@@ -1791,25 +1800,23 @@ class z.conversation.ConversationRepository
   @param event [Object] JSON data for event
   ####
   on_conversation_event: (event) =>
-    if not event
-      error = new Error('Event response is undefined')
-      custom_data =
-        source: 'WebSocket'
-      Raygun.send error, custom_data
+    unless event
+      Promise.reject new Error 'Conversation Repository Event Handling: Event missing'
 
     @logger.info "»» Event: '#{event.type}'", {event_object: event, event_json: JSON.stringify event}
 
-    # Ignore member join if we join a one2one conversation (accept a connection request)
+    # Ignore 'conversation.member-join if we join a 1to1 conversation (accept a connection request)
     if event.type is z.event.Backend.CONVERSATION.MEMBER_JOIN
       connection_et = @user_repository.get_connection_by_conversation_id event.conversation
-      return if connection_et?.status() is z.user.ConnectionStatus.PENDING
+      return Promise.resolve() if connection_et?.status() is z.user.ConnectionStatus.PENDING
 
     # Handle conversation create event separately
     if event.type is z.event.Backend.CONVERSATION.CREATE
       return @_on_create event
 
     # Check if conversation was archived
-    @get_conversation_by_id event.conversation, (conversation_et) =>
+    @get_conversation_by_id_async event.conversation
+    .then (conversation_et) =>
       previously_archived = conversation_et.is_archived()
 
       switch event.type
@@ -1819,10 +1826,10 @@ class z.conversation.ConversationRepository
           @_on_member_leave conversation_et, event
         when z.event.Backend.CONVERSATION.MEMBER_UPDATE
           @_on_member_update conversation_et, event
-        when z.event.Backend.CONVERSATION.RENAME
-          @_on_rename conversation_et, event
         when z.event.Backend.CONVERSATION.MESSAGE_ADD
           @_on_message_add conversation_et, event
+        when z.event.Backend.CONVERSATION.RENAME
+          @_on_rename conversation_et, event
         when z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE
           @_on_asset_upload_complete conversation_et, event
         when z.event.Client.CONVERSATION.ASSET_UPLOAD_FAILED
@@ -1929,15 +1936,15 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] The conversation that was created
   ###
   _on_create: (event_json) ->
-    conversation_et = @find_conversation_by_id event_json.id
+    @find_conversation_by_id event_json.conversation
+    .catch (error) =>
+      throw error unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
 
-    if not conversation_et?
       conversation_et = @conversation_mapper.map_conversation event_json
       @update_participating_user_ets conversation_et, (conversation_et) =>
         @_send_conversation_create_notification conversation_et
       @save_conversation conversation_et
-
-    return conversation_et
+      return conversation_et
 
   ###
   User were added to a group conversation.
@@ -2052,11 +2059,10 @@ class z.conversation.ConversationRepository
   @param event_json [Object] JSON data of 'conversation.message-hidden'
   ###
   _on_message_hidden: (event_json) =>
-    Promise.resolve()
-    .then =>
-      if event_json.from isnt @user_repository.self().id
-        throw new Error 'Sender is not self user'
-      return @find_conversation_by_id event_json.data.conversation_id
+    if event_json.from isnt @user_repository.self().id
+      return Promise.reject new Error 'Cannot hide message: Sender is not self user'
+
+    @get_conversation_by_id_async event_json.data.conversation_id
     .then (conversation_et) =>
       amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_json.data.message_id
       return @_delete_message_by_id conversation_et, event_json.data.message_id
@@ -2342,20 +2348,22 @@ class z.conversation.ConversationRepository
       return Promise.resolve payload
     @logger.debug "Message contains redundant clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
-    conversation_et = @get_conversation_by_id conversation_id if conversation_id
+    @get_conversation_by_id_async conversation_id
+    .catch (error) ->
+      throw error unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
+    .then (conversation_et) =>
+      _remove_redundant_client = (user_id, client_id) ->
+        delete payload.recipients[user_id][client_id] if payload
 
-    _remove_redundant_client = (user_id, client_id) ->
-      delete payload.recipients[user_id][client_id] if payload
+      _remove_redundant_user = (user_id) ->
+        conversation_et.participating_user_ids.remove user_id if conversation_et
+        if payload and Object.keys(payload.recipients[user_id]).length is 0
+          delete payload.recipients[user_id]
 
-    _remove_redundant_user = (user_id) ->
-      conversation_et.participating_user_ids.remove user_id if conversation_et
-      if payload and Object.keys(payload.recipients[user_id]).length is 0
-        delete payload.recipients[user_id]
-
-    return Promise.all @_map_user_client_map user_client_map, _remove_redundant_client, _remove_redundant_user
-    .then =>
-      @update_participating_user_ets conversation_et if conversation_et
-      return payload
+      return Promise.all @_map_user_client_map user_client_map, _remove_redundant_client, _remove_redundant_user
+      .then =>
+        @update_participating_user_ets conversation_et if conversation_et
+        return payload
 
   ###
   Delete message from UI and database. Primary key is used to delete message in database.

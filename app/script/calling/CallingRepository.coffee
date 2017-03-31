@@ -104,13 +104,13 @@ class z.calling.CallingRepository
         return z.calling.enum.PROTOCOL.VERSION_3
 
   outgoing_protocol_version: (conversation_id) =>
-    conversation_et = @conversation_repository.get_conversation_by_id conversation_id
+    @conversation_repository.get_conversation_by_id_async conversation_id
+    .then (conversation_et) =>
+      protocol_version = if conversation_et.is_group() then z.calling.enum.PROTOCOL.VERSION_2 else z.calling.enum.PROTOCOL.VERSION_3
 
-    protocol_version = if conversation_et?.is_group() then z.calling.enum.PROTOCOL.VERSION_2 else z.calling.enum.PROTOCOL.VERSION_3
-
-    @logger.log "Selected outgoing call protocol version: #{protocol_version}",
-      {conversation_type: conversation_et?.type(), backend_protocol_group: @protocol_version_group(), use_v3_api: @use_v3_api}
-    return protocol_version
+      @logger.log "Selected outgoing call protocol version: #{protocol_version}",
+        {conversation_type: conversation_et?.type(), backend_protocol_group: @protocol_version_group(), use_v3_api: @use_v3_api}
+      return protocol_version
 
   # Initiate calling config update.
   initiate_config: =>

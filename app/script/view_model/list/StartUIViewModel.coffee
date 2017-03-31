@@ -316,12 +316,9 @@ class z.ViewModel.list.StartUIViewModel
 
   get_connections: =>
     Promise.resolve().then =>
-      return @conversation_repository.sorted_conversations()
-        .filter (conversation_et) -> conversation_et.is_one2one()
-        .map (conversation_et) -> conversation_et.participating_user_ids()[0]
-    .then (user_ids) =>
-      return new Promise (resolve) =>
-        @user_repository.get_users_by_id user_ids, resolve
+      return @user_repository.users()
+        .filter (user_et) -> user_et.connected()
+        .sort (user_a, user_b) -> z.util.StringUtil.sort_by_priority user_a.first_name(), user_b.first_name()
 
   ###############################################################################
   # User bubble

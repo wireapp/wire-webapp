@@ -71,7 +71,7 @@ class z.calling.entities.EFlow
       @telemetry.set_peer_connection @peer_connection if is_initialized
 
     @media_stream = @e_call_et.local_media_stream
-    @data_channels = {}
+    @data_channel = undefined
 
     @connection_state = ko.observable z.calling.rtc.ICEConnectionState.NEW
     @gathering_state = ko.observable z.calling.rtc.ICEGatheringState.NEW
@@ -227,8 +227,8 @@ class z.calling.entities.EFlow
 
   restart_negotiation: (negotiation_mode, is_answer, media_stream) =>
     @logger.debug "Negotiation restart triggered by '#{negotiation_mode}'"
-    @_close_data_channel E_FLOW_CONFIG.DATA_CHANNEL_LABEL
     @_close_peer_connection()
+    @_close_data_channel()
     @_clear_negotiation_timeout()
     @_clear_send_sdp_timeout()
     @_reset_signaling_states()
@@ -369,27 +369,30 @@ class z.calling.entities.EFlow
   # Data channel handling
   ###############################################################################
 
-  send_message: (outbound_message) =>
-    try
-      @data_channels[E_FLOW_CONFIG.DATA_CHANNEL_LABEL].send outbound_message
-    catch error
-      @logger.warn "Failed to send calling message via data channel: #{error.name}", error
-      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.DATA_CHANNEL_NOT_OPENED
+  send_message: (e_call_message_et) =>
+    if @data_channel and @e_call_et.data_channel_opened
+      @logger.debug "Sending e-call '#{e_call_message_et.type}' message to conversation '#{@e_call_et.conversation_et.id}' via data channel", e_call_message_et.to_JSON()
+      try
+        return @data_channel.send e_call_message_et.to_content_string()
+      catch error
+        @logger.warn "Failed to send calling message via data channel: #{error.name}", error
+        throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.NO_DATA_CHANNEL
+    else
+      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.NO_DATA_CHANNEL
 
-  _close_data_channel: (data_channel_label) ->
-    if @data_channels[data_channel_label]
-      if @data_channels[data_channel_label].readyState is z.calling.rtc.DataChannelState.OPEN
-        @data_channels[data_channel_label].close()
-      @data_channels[data_channel_label] = undefined
+  _close_data_channel: ->
+    if @data_channel
+      if not @data_channel.readyState is z.calling.rtc.DataChannelState.OPEN
+        @data_channel.close()
+      delete @data_channel
       @e_call_et.data_channel_opened = false
 
-  _initialize_data_channel: (data_channel_label) ->
-    if @peer_connection.createDataChannel
-      return if @data_channels[data_channel_label]
-      @_setup_data_channel @peer_connection.createDataChannel data_channel_label, {ordered: true}
+  _initialize_data_channel: ->
+    if @peer_connection.createDataChannel and not @data_channel
+      @_setup_data_channel @peer_connection.createDataChannel E_FLOW_CONFIG.DATA_CHANNEL_LABEL, {ordered: true}
 
   _setup_data_channel: (data_channel) ->
-    @data_channels[data_channel.label] = data_channel
+    @data_channel = data_channel
     data_channel.onclose = @_on_close
     data_channel.onerror = @_on_error
     data_channel.onmessage = @_on_message
@@ -401,8 +404,9 @@ class z.calling.entities.EFlow
   _on_close: (event) =>
     data_channel = event.target
     @logger.debug "Data channel '#{data_channel.label}' was closed", data_channel
-    delete @data_channels[data_channel.label]
-    @e_call_et.data_channel_opened = false
+    if @data_channel?.readyState is z.calling.rtc.DataChannelState.CLOSED
+      delete @data_channel
+      @e_call_et.data_channel_opened = false
 
   _on_error: (error) -> throw error
 
@@ -530,7 +534,7 @@ class z.calling.entities.EFlow
   ###
   _create_offer: (restart) ->
     @negotiation_needed false
-    @_initialize_data_channel E_FLOW_CONFIG.DATA_CHANNEL_LABEL
+    @_initialize_data_channel()
 
     offer_options =
       iceRestart: restart
@@ -784,7 +788,7 @@ class z.calling.entities.EFlow
     @telemetry.reset_statistics()
     @logger.info "Resetting flow with user '#{@remote_user.id}'"
     @_remove_media_stream @media_stream() if @media_stream()
-    @_close_data_channel E_FLOW_CONFIG.DATA_CHANNEL_LABEL
+    @_close_data_channel()
     @_close_peer_connection()
     @_reset_signaling_states()
     @pc_initialized false
