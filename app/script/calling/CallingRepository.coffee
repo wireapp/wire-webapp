@@ -104,7 +104,7 @@ class z.calling.CallingRepository
         return z.calling.enum.PROTOCOL.VERSION_3
 
   outgoing_protocol_version: (conversation_id) =>
-    @conversation_repository.get_conversation_by_id conversation_id
+    @conversation_repository.get_conversation_by_id_async conversation_id
     .then (conversation_et) =>
       protocol_version = if conversation_et.is_group() then z.calling.enum.PROTOCOL.VERSION_2 else z.calling.enum.PROTOCOL.VERSION_3
 

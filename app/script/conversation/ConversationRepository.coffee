@@ -334,34 +334,24 @@ class z.conversation.ConversationRepository
     return conversation for conversation in @conversations() when conversation.id is conversation_id
 
   get_all_users_in_conversation: (conversation_id) =>
-    @get_conversation_by_id conversation_id
+    @get_conversation_by_id_async conversation_id
     .then (conversation_et) =>
       return [@user_repository.self()].concat conversation_et.participating_user_ets()
 
   ###
   Check for conversation locally and fetch it from the server otherwise.
   @deprecated
-  @note Deprecated legacy method, remove last dependencies in wrapper are removed is resolved
+  @note Deprecated legacy method, remove when last dependencies in wrapper has been removed
   @param conversation_id [String] ID of conversation to get
-  @param callback [Function] Function to be called on server return
   ###
-  get_conversation_by_id_deprecated: (conversation_id, callback) =>
-    if _.isFunction callback
-      @get_conversation_by_id conversation_id
-      .then (conversation_et) ->
-        callback conversation_et
-    else
-      return conversation for conversation in @conversations() when conversation.id is conversation_id
+  get_conversation_by_id: (conversation_id) =>
+    return conversation for conversation in @conversations() when conversation.id is conversation_id
 
   ###
   Check for conversation locally and fetch it from the server otherwise.
   @param conversation_id [String] ID of conversation to get
-  @param callback [Function] Function to be called on server return
   ###
-  get_conversation_by_id: (conversation_id, callback) =>
-    if z.util.Environment.electron
-      return @get_conversation_by_id_deprecated conversation_id, callback
-
+  get_conversation_by_id_async: (conversation_id) =>
     @find_conversation_by_id conversation_id
     .catch (error) =>
       if error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
@@ -454,7 +444,7 @@ class z.conversation.ConversationRepository
     if not conversation_id or not message_id
       return Promise.resolve false
 
-    @get_conversation_by_id conversation_id
+    @get_conversation_by_id_async conversation_id
     .then (conversation_et) =>
       @get_message_in_conversation_by_id conversation_et, message_id
       .then (message_et) ->
@@ -1446,7 +1436,7 @@ class z.conversation.ConversationRepository
     return @grant_message conversation_id, consent_type, user_ids
 
   grant_message: (conversation_id, consent_type, user_ids) =>
-    @get_conversation_by_id conversation_id
+    @get_conversation_by_id_async conversation_id
     .then (conversation_et) =>
       return if conversation_et.verification_state() isnt z.conversation.ConversationVerificationState.DEGRADED
 
@@ -1525,7 +1515,7 @@ class z.conversation.ConversationRepository
   @return [Boolean] Is payload likely to be too big so that we switch to type external?
   ###
   _should_send_as_external: (conversation_id, generic_message) ->
-    @get_conversation_by_id conversation_id
+    @get_conversation_by_id_async conversation_id
     .then (conversation_et) ->
       estimated_number_of_clients = conversation_et.number_of_participants() * 4
       message_in_bytes = new Uint8Array(generic_message.toArrayBuffer()).length
@@ -1703,7 +1693,7 @@ class z.conversation.ConversationRepository
   timeout_ephemeral_message: (message_et) =>
     return if message_et.is_expired()
 
-    @get_conversation_by_id message_et.conversation_id
+    @get_conversation_by_id_async message_et.conversation_id
     .then (conversation_et) =>
       if message_et.user().is_me
         switch
@@ -1825,7 +1815,7 @@ class z.conversation.ConversationRepository
       return @_on_create event
 
     # Check if conversation was archived
-    @get_conversation_by_id event.conversation
+    @get_conversation_by_id_async event.conversation
     .then (conversation_et) =>
       previously_archived = conversation_et.is_archived()
 
@@ -2072,7 +2062,7 @@ class z.conversation.ConversationRepository
     if event_json.from isnt @user_repository.self().id
       return Promise.reject new Error 'Cannot hide message: Sender is not self user'
 
-    @get_conversation_by_id event_json.data.conversation_id
+    @get_conversation_by_id_async event_json.data.conversation_id
     .then (conversation_et) =>
       amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_json.data.message_id
       return @_delete_message_by_id conversation_et, event_json.data.message_id
@@ -2358,7 +2348,7 @@ class z.conversation.ConversationRepository
       return Promise.resolve payload
     @logger.debug "Message contains redundant clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 
-    @get_conversation_by_id conversation_id
+    @get_conversation_by_id_async conversation_id
     .catch (error) ->
       throw error unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
     .then (conversation_et) =>

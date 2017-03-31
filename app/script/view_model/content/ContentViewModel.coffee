@@ -119,7 +119,7 @@ class z.ViewModel.content.ContentViewModel
     if conversation_et.id
       conversation_promise = Promise.resolve conversation_et
     else
-      conversation_promise = @conversation_repository.get_conversation_by_id conversation_et
+      conversation_promise = @conversation_repository.get_conversation_by_id_async conversation_et
 
     conversation_promise.then (conversation_et) =>
       return if conversation_et is @conversation_repository.active_conversation() and @content_state() is z.ViewModel.content.CONTENT_STATE.CONVERSATION
