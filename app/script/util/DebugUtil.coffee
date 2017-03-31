@@ -89,23 +89,32 @@ class z.util.DebugUtil
       record.serialised = base64_encoded_payload
       return record
 
-  get_event_from_notification_stream: (event_id) ->
+  get_notification_from_stream: (notification_id, notification_id_since) =>
     client_id = wire.app.repository.client.current_client().id
-    return wire.app.service.notification.get_notifications(client_id, undefined, 10000)
-    .then (response) ->
-      events = response.notifications.filter (item) ->
-        return item.id is event_id
-      return events[0]
 
-  get_objects_for_decryption_errors: (session_id, event_id) ->
+    _got_notifications = (response) =>
+      events = response.notifications.filter (item) ->
+        return item.id is notification_id
+      return events[0] if events.length
+
+      if response.has_more
+        last_notification = response.notifications[response.notifications.length - 1]
+        @get_notification_from_stream notification_id, last_notification.id
+      else
+        @logger.log "Notification '#{notification_id}' was not found in encrypted notification stream"
+
+    wire.app.service.notification.get_notifications(client_id, notification_id_since, 10000)
+    .then _got_notifications
+
+  get_objects_for_decryption_errors: (session_id, notification_id) ->
     return Promise.all([
-      @get_event_from_notification_stream event_id
+      @get_notification_from_stream notification_id
       @get_serialised_identity()
       @get_serialised_session session_id
     ])
     .then (items) ->
       return JSON.stringify
-        event: items[0]
+        notification: items[0]
         identity: items[1]
         session: items[2]
 
