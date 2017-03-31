@@ -63,7 +63,7 @@ class z.util.DebugUtil
     debug_information =
       event: event
 
-    @conversation_repository.get_conversation_by_id event.conversation
+    @conversation_repository.get_conversation_by_id_async event.conversation
     .then (conversation_et) =>
       debug_information.conversation = conversation_et
       return @_get_user_by_id event.from

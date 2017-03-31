@@ -532,7 +532,7 @@ class z.calling.v3.CallCenter
   _create_e_call: (e_call_message_et, creating_user_et) ->
     @get_e_call_by_id e_call_message_et.conversation_id
     .catch =>
-      @conversation_repository.get_conversation_by_id e_call_message_et.conversation_id
+      @conversation_repository.get_conversation_by_id_async e_call_message_et.conversation_id
       .then (conversation_et) =>
         e_call_et = new z.calling.entities.ECall conversation_et, creating_user_et, e_call_message_et.session_id, @
         @e_calls.push e_call_et
