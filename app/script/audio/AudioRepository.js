@@ -33,7 +33,8 @@ window.z.audio.AudioRepository = class AudioRepository {
         this._stop_all();
       }
     });
-    this._subscribe_to_audio_properties();
+    this.muted = true;
+    this._subscribe_to_events();
   }
 
   /**
@@ -44,7 +45,9 @@ window.z.audio.AudioRepository = class AudioRepository {
    */
   _check_sound_setting(audio_id) {
     return new Promise((resolve, reject) => {
-      if (this.audio_preference() === z.audio.AudioPreference.NONE && !(z.audio.AudioPlayingType.NONE.includes(audio_id))) {
+      if (this.muted === true && !(z.audio.AudioPlayingType.MUTED.includes(audio_id))) {
+        reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
+      } else if (this.audio_preference() === z.audio.AudioPreference.NONE && !(z.audio.AudioPlayingType.NONE.includes(audio_id))) {
         reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
       } else if (this.audio_preference() === z.audio.AudioPreference.SOME && !(z.audio.AudioPlayingType.SOME.includes(audio_id))) {
         reject(new z.audio.AudioError(z.audio.AudioError.TYPE.IGNORED_SOUND));
@@ -172,10 +175,15 @@ window.z.audio.AudioRepository = class AudioRepository {
   }
 
   /**
-   * Use Amplify to subscribe to all audio properties related events.
+   * Use Amplify to subscribe to required events.
    * @private
    */
-  _subscribe_to_audio_properties() {
+  _subscribe_to_events() {
+    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this, (handling_notifications) => {
+      this.muted = handling_notifications !== z.event.NotificationHandlingState.WEB_SOCKET;
+      this.logger.info(`Set muted state to '${this.muted}'`);
+    });
+
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this, (properties) => {
       this.audio_preference(properties.settings.sound.alerts);
     });
