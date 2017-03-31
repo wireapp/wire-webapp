@@ -22,7 +22,8 @@ z.calling.entities ?= {}
 
 E_FLOW_CONFIG =
   DATA_CHANNEL_LABEL: 'calling-3.0'
-  NEGOTIATION_TIMEOUT: 30 * 1000
+  NEGOTIATION_FAILED_TIMEOUT: 30 * 1000
+  NEGOTIATION_RESTART_TIMEOUT: 1000
   SDP_SEND_TIMEOUT: 5 * 1000
   SDP_SEND_TIMEOUT_RENEGOTIATION: 50
   SDP_SEND_TIMEOUT_RESET: 1000
@@ -95,11 +96,7 @@ class z.calling.entities.EFlow
           @e_call_et.delete_e_participant @e_participant_et.id if @e_call_et.self_client_joined()
 
         when z.calling.rtc.ICEConnectionState.DISCONNECTED
-          @e_participant_et.is_connected false
-          @e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
-          if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
-            @e_call_et.interrupted_participants.push @participant_et
-            @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false
+          @_set_negotiation_restart_timeout()
 
         when z.calling.rtc.ICEConnectionState.FAILED
           return unless @e_call_et.self_client_joined()
@@ -245,7 +242,7 @@ class z.calling.entities.EFlow
     @negotiation_mode negotiation_mode
     @negotiation_needed true
     @pc_initialized true
-    @_set_negotiation_timeout()
+    @_set_negotiation_failed_timeout()
 
   _remove_participant: (termination_reason) =>
     @e_participant_et.is_connected false
@@ -610,14 +607,27 @@ class z.calling.entities.EFlow
     , E_FLOW_CONFIG.SDP_SEND_TIMEOUT_RENEGOTIATION
 
   ###
-  Set the negotiation timeout.
+  Set the negotiation failed timeout.
   @private
   ###
-  _set_negotiation_timeout: ->
+  _set_negotiation_failed_timeout: ->
     @negotiation_timeout = window.setTimeout =>
       @logger.debug 'Removing call participant on negotiation timeout'
       @_remove_participant z.calling.enum.TERMINATION_REASON.RENEGOTIATION
-    , E_FLOW_CONFIG.NEGOTIATION_TIMEOUT
+    , E_FLOW_CONFIG.NEGOTIATION_FAILED_TIMEOUT
+
+  ###
+  Set the negotiation restart timeout.
+  @private
+  ###
+  _set_negotiation_restart_timeout: ->
+    @negotiation_timeout = window.setTimeout =>
+      @e_participant_et.is_connected false
+      @e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
+      if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
+        @e_call_et.interrupted_participants.push @participant_et
+        @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false
+    , E_FLOW_CONFIG.NEGOTIATION_RESTART_TIMEOUT
 
   ###
   Set the SDP send timeout.

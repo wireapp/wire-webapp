@@ -500,19 +500,22 @@ class z.calling.v3.CallCenter
   toggle_media: (conversation_id, media_type) =>
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
-      toggle_promise = switch media_type
+      send_promises = []
+
+      for e_flow_et in e_call_et.get_flows()
+        additional_payload = @_create_additional_payload conversation_id, e_flow_et.remote_user_id, e_flow_et.remote_client_id
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync false, e_call_et.session_id, @_create_payload_prop_sync(media_type, additional_payload)
+        send_promises.push @send_e_call_event e_call_et.conversation_et, e_call_message_et
+
+      return Promise.all send_promises
+    .then =>
+      switch media_type
         when z.media.MediaType.AUDIO
           @media_stream_handler.toggle_audio_send()
         when z.media.MediaType.SCREEN
           @media_stream_handler.toggle_screen_send()
         when z.media.MediaType.VIDEO
           @media_stream_handler.toggle_video_send()
-
-      toggle_promise.then =>
-        for e_flow_et in e_call_et.get_flows()
-          additional_payload = @_create_additional_payload conversation_id, e_flow_et.remote_user_id, e_flow_et.remote_client_id
-          e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync false, e_call_et.session_id, @_create_payload_prop_sync(media_type, additional_payload)
-          @send_e_call_event e_call_et.conversation_et, e_call_message_et
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
@@ -552,9 +555,9 @@ class z.calling.v3.CallCenter
         e_call_et.set_remote_version e_call_message_et
         return e_call_et.add_e_participant e_call_message_et, remote_user_et
         .then =>
-          @media_stream_handler.initiate_media_stream e_call_et.id, true if e_call_et.is_remote_video_send() and not @block_media_stream
           @telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, e_call_et
           @_distribute_activation_event e_call_message_et
+          @media_stream_handler.initiate_media_stream e_call_et.id, true if e_call_et.is_remote_video_send() and not @block_media_stream
       .catch (error) =>
         @delete_call e_call_message_et.conversation_id
         throw error unless error instanceof z.media.MediaError
