@@ -395,7 +395,7 @@ class z.media.MediaStreamHandler
       amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NOT_FOUND_MICROPHONE
     else if media_type is z.media.MediaType.VIDEO
       amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NOT_FOUND_CAMERA
-    amplify.publish z.event.WebApp.CALL.STATE.IGNORE, conversation_id if conversation_id
+    amplify.publish z.event.WebApp.CALL.STATE.REJECT, conversation_id if conversation_id
 
   ###
   Show permission denied hint banner.
