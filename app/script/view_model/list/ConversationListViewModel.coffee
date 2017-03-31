@@ -34,6 +34,7 @@ class z.ViewModel.list.ConversationListViewModel
     @logger = new z.util.Logger 'z.ViewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS
 
     @joined_call = @calling_repository.joined_call
+    @show_calls = ko.observable false
 
     @content_state = @content_view_model.content_state
     @selected_conversation = ko.observable()
@@ -100,7 +101,12 @@ class z.ViewModel.list.ConversationListViewModel
     return if @is_selected_conversation conversation_et
     @content_view_model.show_conversation conversation_et
 
+  set_show_calls_state: (handling_notifications) =>
+    @show_calls handling_notifications is z.event.NotificationHandlingState.WEB_SOCKET
+    @logger.info "Set show calls state to: #{@show_calls()}"
+
   _init_subscriptions: =>
+    amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_show_calls_state
     amplify.subscribe z.event.WebApp.LIFECYCLE.LOADED, @on_webapp_loaded
     amplify.subscribe z.event.WebApp.SEARCH.BADGE.SHOW, => @show_badge true
     amplify.subscribe z.event.WebApp.SEARCH.BADGE.HIDE, => @show_badge false
