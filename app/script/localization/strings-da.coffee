@@ -37,7 +37,6 @@ z.string.da.auth_account_create_account = 'Opret en konto'
 z.string.da.auth_account_expiration = 'Du er blevet logget af, da din session udløb. Log venligst ind igen.'
 z.string.da.auth_account_get_wire = 'Simpel, privat og sikker messenger til chat, opkald, deling af billeder, musik, videoer, GIF’s og mere.'
 z.string.da.auth_account_password_forgot = 'Glemt adgangskode'
-z.string.da.auth_account_remember_me = 'Husk mig'
 z.string.da.auth_account_sign_in = 'Log ind'
 z.string.da.auth_account_sign_in_email = 'Email'
 z.string.da.auth_account_sign_in_phone = 'Telefon'
@@ -208,11 +207,6 @@ z.string.da.modal_session_reset_message_2 = 'os.'
 # Too many members in conversation
 z.string.da.modal_too_many_members_headline = 'Fuldt hus'
 z.string.da.modal_too_many_members_message = 'Op til %max personer kan deltage i en samtale. Der er plads til %no personer mere herinde.'
-# Whitelist screensharing
-z.string.da.modal_whitelist_screensharing_headline = 'Wire skal have tilladelse til at dele din skærm'
-z.string.da.modal_whitelist_screensharing_message_1 = 'Åben about:config og tilføj *.wire.com til listen over tilladte domæner for skærmdeling. Se'
-z.string.da.modal_whitelist_screensharing_message_link = 'FAQ'
-z.string.da.modal_whitelist_screensharing_message_2 = 'for detaljer.'
 # Parallel uploads
 z.string.da.modal_uploads_parallel = 'Du kan sende op til %no filer på én gang.'
 
@@ -528,7 +522,6 @@ z.string.da.warning_lifecycle_update_link = 'Opdatér nu'
 # Browser notifications
 z.string.da.system_notification_asset_add = 'Delte et billede'
 z.string.da.system_notification_connection_accepted = 'Accepterede din anmodning om forbindelse'
-z.string.da.system_notification_connection_connected = 'Er nu tilsluttet'
 z.string.da.system_notification_connection_request = 'Ønsker at forbinde'
 z.string.da.system_notification_conversation_create = '%s.first_name startede en samtale'
 z.string.da.system_notification_conversation_rename = '%s.first_name omdøbte samtalen til %name'

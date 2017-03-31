@@ -32,7 +32,7 @@
         </section>
       <!-- /ko -->
 
-      <!-- ko if: available_devices.audio_output().length -->
+      <!-- ko if: available_devices.audio_output().length && z.util.Environment.browser.supports.audio_output_selection -->
         <section class="preferences-section">
           <header class="preferences-header preferences-av-header" data-bind="l10n_text: z.string.preferences_av_speakers"></header>
           <div class="preferences-option">
@@ -82,8 +82,8 @@
           <video class="preferences-av-video"
                  autoplay
                  data-bind="css: {'preferences-av-video-disabled': permission_denied},
-                            mute_media_element: video_stream(),
-                            source_stream: video_stream()">
+                            mute_media_element: media_stream(),
+                            source_stream: media_stream()">
           </video>
         </section>
       <!-- /ko -->

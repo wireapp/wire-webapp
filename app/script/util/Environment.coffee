@@ -59,18 +59,21 @@ z.util.Environment = do ->
       return false if window.Notification.requestPermission is undefined
       return false if document.visibilityState is undefined
       return true
+
+    supports_audio_output_selection: ->
+      return @is_chrome()
     supports_calling: ->
       return false if not @supports_media_devices()
       return false if window.WebSocket is undefined
       return false if @is_edge()
-      return @is_chrome() or @is_firefox() or @is_opera()
+      return true if @is_firefox() and @get_version() >= 52
+      return @is_chrome() or @is_opera()
     supports_media_devices: ->
       return true if navigator.mediaDevices?.getUserMedia
       return false
     supports_screen_sharing: ->
       return true if window.desktopCapturer
-      # @deprecated Remove warning modal once we require Firefox 52 ESR
-      return @is_firefox() and @get_version() >= 48
+      return @is_firefox()
 
   os =
     is_mac: ->
@@ -114,7 +117,7 @@ z.util.Environment = do ->
     is_localhost: ->
       return window.location.hostname in [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST]
     is_production: ->
-      return window.location.hostname in [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT, APP_ENV.TACO]
+      return window.location.hostname in [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT]
 
   browser:
     name: platform.name
@@ -126,6 +129,7 @@ z.util.Environment = do ->
     opera: _check.is_opera()
 
     supports:
+      audio_output_selection: _check.supports_audio_output_selection()
       calling: _check.supports_calling()
       media_devices: _check.supports_media_devices()
       notifications: _check.supports_notifications()

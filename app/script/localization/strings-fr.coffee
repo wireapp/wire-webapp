@@ -25,7 +25,7 @@ z.string.fr.and = 'et'
 
 # Alert view when trying to set a profile image that's too small
 z.string.fr.alert_upload_file_format = 'Cette image ne peut être utilisée. Veuillez choisir un fichier PNG ou JPEG.'
-z.string.fr.alert_upload_too_small = 'Cette image ne peut être utilisée. Veuillez choisir une image qui est au moins de 320x320 pixels.'
+z.string.fr.alert_upload_too_small = 'Cette image ne peut être utilisée. Veuillez choisir une image qui mesure au moins 320 x 320 pixels.'
 z.string.fr.alert_upload_too_large = 'Cette photo est trop lourde. Vous pouvez télécharger des fichiers jusqu’à %no Mo.'
 z.string.fr.alert_gif_too_large = 'L’animation est trop lourde. La taille maximale est de %no Mo.'
 
@@ -34,10 +34,9 @@ z.string.fr.alert_gif_too_large = 'L’animation est trop lourde. La taille maxi
 z.string.fr.auth_account_country_code = 'Indicatif du pays'
 z.string.fr.auth_account_create = 'Créer'
 z.string.fr.auth_account_create_account = 'Créer un compte'
-z.string.fr.auth_account_expiration = 'Vous avez été déconnecté car votre session a expiré. Veuillez vous reconnecter.'
+z.string.fr.auth_account_expiration = 'Vous avez été déconnecté car votre session a expirée. Veuillez vous reconnecter.'
 z.string.fr.auth_account_get_wire = 'Une messagerie simple, privée et sécurisée pour échanger, appeler, partager des images, de la musique, des vidéos, GIFs, et bien plus encore.'
 z.string.fr.auth_account_password_forgot = 'Mot de passe oublié'
-z.string.fr.auth_account_remember_me = 'Se souvenir de moi'
 z.string.fr.auth_account_sign_in = 'Se connecter'
 z.string.fr.auth_account_sign_in_email = 'Email'
 z.string.fr.auth_account_sign_in_phone = 'Téléphone'
@@ -126,7 +125,7 @@ z.string.fr.modal_button_send = 'Envoyer'
 
 # Block a user
 z.string.fr.modal_block_conversation_headline = 'Bloquer %@.name ?'
-z.string.fr.modal_block_conversation_message = '%@.name ne sera plus en mesure de vous contacter ou de vous ajouter à des conversations de groupe.'
+z.string.fr.modal_block_conversation_message = '%@.name ne sera plus en mesure de vous parler ou de vous ajouter à des conversations de groupe.'
 z.string.fr.modal_block_conversation_button = 'Bloquer'
 # Cannot create the call because there is nobody to call (conversation_empty)
 z.string.fr.modal_call_conversation_empty_headline = 'Personne à appeler'
@@ -186,14 +185,14 @@ z.string.fr.modal_logout_headline = 'Supprimer les données ?'
 z.string.fr.modal_logout_message = 'Supprime toutes vos informations personnelles et conversations de cet appareil.'
 z.string.fr.modal_logout_button = 'Se déconnecter'
 # New device
-z.string.fr.modal_new_device_headline = '%@.name a commencé à utiliser un nouvel appareil'
-z.string.fr.modal_new_device_headline_many = '%@.names ont commencé à utiliser de nouveaux appareils'
-z.string.fr.modal_new_device_headline_you = '%@.name a commencé à utiliser un nouvel appareil'
+z.string.fr.modal_new_device_headline = '%@.name utilise un nouvel appareil'
+z.string.fr.modal_new_device_headline_many = '%@.names utilisent de nouveaux appareils'
+z.string.fr.modal_new_device_headline_you = '%@.name utilise un nouvel appareil'
 z.string.fr.modal_new_device_message = 'Voulez-vous toujours envoyer vos messages ?'
-z.string.fr.modal_new_device_call_accept = 'Prendre l’appel'
+z.string.fr.modal_new_device_call_accept = 'Décrocher'
 z.string.fr.modal_new_device_call_anyway = 'Appeler quand même'
-z.string.fr.modal_new_device_call_incoming = 'Voulez-vous toujours prendre l’appel ?'
-z.string.fr.modal_new_device_call_outgoing = 'Voulez-vous toujours appeler ?'
+z.string.fr.modal_new_device_call_incoming = 'Voulez-vous quand même décrocher ?'
+z.string.fr.modal_new_device_call_outgoing = 'Voulez-vous quand même appeler ?'
 z.string.fr.modal_new_device_show_device = 'afficher l’appareil'
 z.string.fr.modal_new_device_send_anyway = 'envoyer quand même'
 # Remove device
@@ -208,11 +207,6 @@ z.string.fr.modal_session_reset_message_2 = '-nous.'
 # Too many members in conversation
 z.string.fr.modal_too_many_members_headline = 'Maison pleine'
 z.string.fr.modal_too_many_members_message = 'Jusqu’à %max personnes peuvent se joindre à une conversation. Il y a encore de la place pour %no gens ici.'
-# Whitelist screensharing
-z.string.fr.modal_whitelist_screensharing_headline = 'Wire a besoin de votre autorisation pour partager votre écran'
-z.string.fr.modal_whitelist_screensharing_message_1 = 'Ouvrez about:config et ajoutez *.wire.com à la liste des domaines autorisés à partager l’écran. Allez voir la'
-z.string.fr.modal_whitelist_screensharing_message_link = 'FAQ'
-z.string.fr.modal_whitelist_screensharing_message_2 = 'pour plus de détails.'
 # Parallel uploads
 z.string.fr.modal_uploads_parallel = 'Vous pouvez envoyer jusqu’à %no fichiers à la fois.'
 
@@ -238,6 +232,7 @@ z.string.fr.conversation_device_user_devices = ' appareils de %@name'
 z.string.fr.conversation_device_new_device_one = ' un nouvel appareil'
 z.string.fr.conversation_device_new_device_many = ' de nouveaux appareils'
 z.string.fr.conversation_device_new_people_joined = 'nouvelles personnes sont arrivées.'
+z.string.fr.conversation_device_new_people_joined_verify = ' vérifier l’appareil'
 z.string.fr.conversation_just_now = 'À l’instant'
 z.string.fr.conversation_location_link = 'Ouvrir la carte'
 z.string.fr.conversation_member_join = ' a ajouté %@names'
@@ -279,11 +274,11 @@ z.string.fr.conversation_likes_caption = '%@number personnes'
 z.string.fr.conversation_send_pasted_file = 'Image copiée le %date'
 
 # Collection
-z.string.fr.collection_show_all = 'Afficher les %no'
+z.string.fr.collection_show_all = 'Tout afficher (%no)'
 z.string.fr.collection_section_links = 'Liens'
 z.string.fr.collection_section_images = 'Images'
 z.string.fr.collection_section_files = 'Fichiers'
-z.string.fr.collection_section_audio = 'Messages audio'
+z.string.fr.collection_section_audio = 'Messages vocaux'
 
 # Full Search
 z.string.fr.fullsearch_placeholder = 'Chercher dans les messages'
@@ -310,7 +305,7 @@ z.string.fr.conversations_popover_unarchive = 'Désarchiver'
 
 # Takeover
 z.string.fr.takeover_headline = 'Les noms sont ici.'
-z.string.fr.takeover_sub = 'Choisissez votre nom unique sur Wire.'
+z.string.fr.takeover_sub = 'Choisissez votre nom d’utilisteur sur Wire.'
 z.string.fr.takeover_link = 'En savoir plus '
 z.string.fr.takeover_button_choose = 'Choisissez le vôtre'
 z.string.fr.takeover_button_keep = 'Garder celui-là'
@@ -322,7 +317,7 @@ z.string.fr.invite_hint_selected = 'Appuyez sur %meta_key + C pour copier'
 z.string.fr.invite_hint_unselected = 'Sélectionnez et appuyez sur %meta_key + C'
 z.string.fr.invite_headline = 'Invitez des gens sur Wire'
 z.string.fr.invite_message = 'Je suis sur Wire, cherche %username ou va voir get.wire.com .'
-z.string.fr.invite_message_no_email = 'Je suis sur Wire. Va voir get.wire.com pour te connecter avec moi.'
+z.string.fr.invite_message_no_email = 'Je suis sur Wire. Visite get.wire.com pour échanger avec moi.'
 
 # Extensions
 z.string.fr.extensions_bubble_button_gif = 'Gif'
@@ -346,7 +341,7 @@ z.string.fr.people_no_matches = 'Pas de résultats.\nEssayez avec un nom différ
 z.string.fr.people_invite = 'Inviter des personnes'
 z.string.fr.people_share = 'Partagez vos contacts'
 z.string.fr.people_bring_your_friends = 'Amenez vos amis sur Wire'
-z.string.fr.people_invite_detail = 'Le fait de partager vos contacts vous aide à vous connecter à d’autres personnes. Nous gardons anonyme toute information et ne le partageons avec personne d’autre.'
+z.string.fr.people_invite_detail = 'Partager vos contacts vous permet de trouvez vos amis. Nous anonymisons les données et ne les partageons avec personne d’autre.'
 z.string.fr.people_invite_button_contacts = 'Depuis vos Contacts'
 z.string.fr.people_invite_button_gmail = 'Depuis Gmail'
 z.string.fr.people_invite_headline = 'Amenez vos amis'
@@ -366,7 +361,7 @@ z.string.fr.people_verified = 'Vérifié'
 
 # Block user
 z.string.fr.people_block_headline = 'Bloquer ?'
-z.string.fr.people_block_message = '%@.first_name ne pourra plus vous contacter ou de vous ajouter à des conversations de groupe.'
+z.string.fr.people_block_message = '%@.first_name ne pourra plus vous parler ou vous ajouter à des conversations de groupe.'
 
 # Accept a pending connection dialogue
 z.string.fr.people_connect_headline = 'Accepter ?'
@@ -386,7 +381,7 @@ z.string.fr.people_remove_message = '%@.first_name ne pourra plus envoyer ou rec
 
 # Unblock user
 z.string.fr.people_unblock_headline = 'Débloquer ?'
-z.string.fr.people_unblock_message = '%@.first_name pourra de nouveau vous contacter ou de vous ajouter à des conversations de groupe.'
+z.string.fr.people_unblock_message = '%@.first_name pourra de nouveau vous parler ou vous ajouter à des conversations de groupe.'
 
 # Button labels for the actions
 z.string.fr.people_button_add = 'Ajouter des personnes'
@@ -479,7 +474,7 @@ z.string.fr.search_connections = 'Connexions'
 z.string.fr.search_groups = 'Groupes'
 z.string.fr.search_placeholder = 'Chercher par nom ou par identifiant'
 z.string.fr.search_top_people = 'Personnes favorites'
-z.string.fr.search_try_search = 'Trouver des personnes par\nnom ou nom d’utilisateur'
+z.string.fr.search_try_search = 'Trouver des personnes par\nnom ou identifiant'
 z.string.fr.search_no_contacts_on_wire = 'Vous n’avez pas de contacts sur Wire.\nEssayez de trouver des gens par\nleur nom ou leur nom d’utilisateur.'
 z.string.fr.search_others = 'Connecter'
 z.string.fr.search_friend_in_common = '%no personne en commun'
@@ -539,12 +534,12 @@ z.string.fr.warning_connectivity_no_internet = 'Pas d’Internet. Vous ne pourre
 
 # Warnings: Desktop Update
 z.string.fr.warning_lifecycle_update = 'Une nouvelle version de Wire est disponible.'
-z.string.fr.warning_lifecycle_update_link = 'Mettre à jour dès maintenant'
+z.string.fr.warning_lifecycle_update_link = 'Mettre à jour maintenant'
 
 # Browser notifications
 z.string.fr.system_notification_asset_add = 'A partagé une photo'
 z.string.fr.system_notification_connection_accepted = 'A accepté votre demande de connexion'
-z.string.fr.system_notification_connection_connected = 'Sont maintenant connectés'
+z.string.fr.system_notification_connection_connected = 'Vous êtes connecté'
 z.string.fr.system_notification_connection_request = 'Souhaite se connecter'
 z.string.fr.system_notification_conversation_create = '%s.first_name a démarré une conversation'
 z.string.fr.system_notification_conversation_rename = '%s.first_name a renommé la conversation en %name'

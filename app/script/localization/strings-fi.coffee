@@ -37,7 +37,6 @@ z.string.fi.auth_account_create_account = 'Luo käyttäjätili'
 z.string.fi.auth_account_expiration = 'Sinut kirjattiin ulos, koska istuntosi päättyi. Kirjaudu sisään uudelleen.'
 z.string.fi.auth_account_get_wire = 'Yksinkertainen, privaatti ja turvallinen pikaviestin chattailuun, puheluihin sekä muun muassa kuvien, videoiden ja animaatioiden jakamiseen.'
 z.string.fi.auth_account_password_forgot = 'Unohdin salasanani'
-z.string.fi.auth_account_remember_me = 'Muista minut'
 z.string.fi.auth_account_sign_in = 'Kirjaudu sisään'
 z.string.fi.auth_account_sign_in_email = 'Sähköposti'
 z.string.fi.auth_account_sign_in_phone = 'Puhelinnumero'
@@ -200,11 +199,6 @@ z.string.fi.modal_session_reset_message_2 = 'meihin.'
 # Too many members in conversation
 z.string.fi.modal_too_many_members_headline = 'Talo täynnä'
 z.string.fi.modal_too_many_members_message = 'Maksimissaan %max henkilöä voi liittyä keskusteluun. Tässä keskustelussa on tilaa %no hengelle.'
-# Whitelist screensharing
-z.string.fi.modal_whitelist_screensharing_headline = 'Wire tarvitsee luvan jakaa näyttösi'
-z.string.fi.modal_whitelist_screensharing_message_1 = 'Avaa about:config ja lisää *.wire.com näytön jakamisen sallivaan verkkotunnus-listaan'
-z.string.fi.modal_whitelist_screensharing_message_link = 'UKK'
-z.string.fi.modal_whitelist_screensharing_message_2 = 'lisätiedoille.'
 # Parallel uploads
 z.string.fi.modal_uploads_parallel = 'Voit lähettää jopa %no tiedostoa samaan aikaan.'
 
@@ -524,7 +518,6 @@ z.string.fi.warning_connectivity_no_internet = 'Ei Internetiä. Et pysty lähett
 # Browser notifications
 z.string.fi.system_notification_asset_add = 'Jakoi kuvan'
 z.string.fi.system_notification_connection_accepted = 'Hyväksyi yhteyspyyntösi'
-z.string.fi.system_notification_connection_connected = 'Yhteys muodostettu'
 z.string.fi.system_notification_connection_request = 'Haluaa luoda kontaktin'
 z.string.fi.system_notification_conversation_create = '%s.first_name aloitti keskustelun'
 z.string.fi.system_notification_conversation_rename = '%s.first_name nimesi keskustelun uudelleen %nameksi'

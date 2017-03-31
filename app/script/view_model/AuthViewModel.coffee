@@ -73,17 +73,19 @@ class z.ViewModel.AuthViewModel
     @session_expired = ko.observable false
     @device_reused = ko.observable false
 
-    @client_type = ko.observable z.client.ClientType.TEMPORARY
     @country_code = ko.observable ''
     @country = ko.observable ''
     @name = ko.observable ''
     @password = ko.observable ''
-    @persist = ko.observable z.util.Environment.electron
+    @persist = ko.observable true
     @phone_number = ko.observable ''
     @username = ko.observable ''
 
-    @persist.subscribe (is_persistent) =>
-      if is_persistent then @client_type z.client.ClientType.PERMANENT else z.client.ClientType.TEMPORARY
+    @is_public_computer = ko.observable false
+    @is_public_computer.subscribe (is_public_computer) => @persist not is_public_computer
+
+    @client_type = ko.pureComputed =>
+      if @persist() then z.client.ClientType.PERMANENT else z.client.ClientType.TEMPORARY
 
     @self_user = ko.observable()
 

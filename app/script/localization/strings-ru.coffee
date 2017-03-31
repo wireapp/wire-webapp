@@ -37,7 +37,6 @@ z.string.ru.auth_account_create_account = 'Создать аккаунт'
 z.string.ru.auth_account_expiration = 'Вы были отключены, потому что срок действия вашей сессии истёк. Пожалуйста, войдите снова.'
 z.string.ru.auth_account_get_wire = 'Простой, конфиденциальный и безопасный мессенджер для разговоров, звонков, обмена картинками, музыкой, видео, GIF-ками и многого другого.'
 z.string.ru.auth_account_password_forgot = 'Восстановление пароля'
-z.string.ru.auth_account_remember_me = 'Запомнить меня'
 z.string.ru.auth_account_sign_in = 'Вход'
 z.string.ru.auth_account_sign_in_email = 'Email'
 z.string.ru.auth_account_sign_in_phone = 'Телефон'
@@ -208,11 +207,6 @@ z.string.ru.modal_session_reset_message_2 = 'с нами.'
 # Too many members in conversation
 z.string.ru.modal_too_many_members_headline = 'Канал переполнен'
 z.string.ru.modal_too_many_members_message = 'К разговору может присоединиться до %max человек. Здесь хватит места ещё для %no человек.'
-# Whitelist screensharing
-z.string.ru.modal_whitelist_screensharing_headline = 'Wire требуется разрешение для демонстрации экрана'
-z.string.ru.modal_whitelist_screensharing_message_1 = 'Откройте about:config и добавьте *.wire.com в список разрешённых доменов для демонстрации экрана. Смотрите'
-z.string.ru.modal_whitelist_screensharing_message_link = 'Вопросы и ответы'
-z.string.ru.modal_whitelist_screensharing_message_2 = 'для уточнения деталей.'
 # Parallel uploads
 z.string.ru.modal_uploads_parallel = 'Вы можете отправить до %no файлов за раз.'
 
@@ -546,7 +540,7 @@ z.string.ru.warning_lifecycle_update_link = 'Обновить сейчас'
 # Browser notifications
 z.string.ru.system_notification_asset_add = 'Поделился(-лась) картинкой'
 z.string.ru.system_notification_connection_accepted = 'Принял(а) ваш запрос на добавление'
-z.string.ru.system_notification_connection_connected = 'Теперь в вашем списке контактов'
+z.string.ru.system_notification_connection_connected = 'Теперь вы подключены'
 z.string.ru.system_notification_connection_request = 'Хочет связаться'
 z.string.ru.system_notification_conversation_create = '%s.first_name начал разговор'
 z.string.ru.system_notification_conversation_rename = '%s.first_name переименовал разговор на %name'

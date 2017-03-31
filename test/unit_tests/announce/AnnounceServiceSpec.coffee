@@ -100,3 +100,28 @@ describe 'z.announce.AnnounceService', ->
       .catch (error) ->
         expect(error.message).toBe 'Not Found'
         done()
+
+  describe 'get_version', ->
+    response =
+      version: '2017-03-14-15-05-prod'
+
+    beforeEach ->
+      server = sinon.fakeServer.create()
+      server.autoRespond = true
+      server.respondWith 'GET', 'version/', [
+        200
+        'Content-Type': 'application/json'
+        JSON.stringify response
+      ]
+
+    afterEach ->
+      server.restore()
+
+    it 'fetches the webapp release version', (done) ->
+      announce_service.get_version()
+      .then (version) ->
+        expect(version).toBe response.version
+        done()
+      .catch done.fail
+
+

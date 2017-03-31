@@ -48,7 +48,7 @@ class z.entity.CallMessage extends z.entity.Message
     return @call_message_type is z.message.CALL_MESSAGE_TYPE.DEACTIVATED
 
   was_completed: ->
-    return @finished_reason is z.calling.enum.CALL_FINISHED_REASON.COMPLETED
+    return @finished_reason is z.calling.enum.TERMINATION_REASON.COMPLETED
 
   was_missed: ->
-    return @finished_reason is z.calling.enum.CALL_FINISHED_REASON.MISSED
+    return @finished_reason is z.calling.enum.TERMINATION_REASON.MISSED

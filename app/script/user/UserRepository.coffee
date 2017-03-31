@@ -262,7 +262,7 @@ class z.user.UserRepository
       if previous_status is z.user.ConnectionStatus.SENT and connection_et.status() is z.user.ConnectionStatus.ACCEPTED
         @update_user_by_id connection_et.to
       @_send_user_connection_notification connection_et, previous_status
-      amplify.publish z.event.WebApp.CONVERSATION.MAP_CONNECTIONS, [connection_et], show_conversation
+      amplify.publish z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation
 
   ###
   Use a JSON event to update the matching user.
@@ -700,24 +700,3 @@ class z.user.UserRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO,
         source: 'unsplash'
         outcome: 'success'
-
-  ###############################################################################
-  # Tracking helpers
-  ###############################################################################
-
-  ###
-  Count of connections.
-  @return [Integer] Number of connections
-  ###
-  get_number_of_connections: ->
-    amount =
-      incoming: 0
-      outgoing: 0
-
-    for connection_et in @connections()
-      if connection_et.status() is z.user.ConnectionStatus.PENDING
-        amount.incoming += 1
-      else if connection_et.status() is z.user.ConnectionStatus.SENT
-        amount.outgoing += 1
-
-    return amount

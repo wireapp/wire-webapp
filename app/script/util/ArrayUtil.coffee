@@ -24,7 +24,7 @@ z.util.ArrayUtil =
   # returns chunks of the given size
   chunk: (array, size) ->
     chunks = []
-    temp_array = [].concat array
+    temp_array = Array.from array
     while temp_array.length
       chunks.push temp_array.splice 0, size
     return chunks

@@ -50,6 +50,7 @@ class z.calling.entities.ECall
     @timer_start = undefined
     @duration_time = ko.observable 0
     @data_channel_opened = false
+    @termination_reason = undefined
 
     @is_connected = ko.observable false
     @is_group = @conversation_et.is_group
@@ -65,9 +66,7 @@ class z.calling.entities.ECall
     @interrupted_participants = ko.observableArray []
 
     # Media
-    @local_stream_audio = @v3_call_center.media_stream_handler.local_media_streams.audio
-    @local_stream_video = @v3_call_center.media_stream_handler.local_media_streams.video
-
+    @local_media_stream = @v3_call_center.media_stream_handler.local_media_stream
     @local_media_type = @v3_call_center.media_stream_handler.local_media_type
     @remote_media_type = ko.observable z.media.MediaType.NONE
 
@@ -75,7 +74,7 @@ class z.calling.entities.ECall
     @_reset_timer()
 
     # Computed values
-    @is_declined = ko.pureComputed => @state() is z.calling.enum.CallState.IGNORED
+    @is_declined = ko.pureComputed => @state() is z.calling.enum.CallState.REJECTED
 
     @is_ongoing_on_another_client = ko.pureComputed =>
       return @self_user_joined() and not @self_client_joined()
@@ -91,9 +90,7 @@ class z.calling.entities.ECall
       return false
 
     @participants_count = ko.pureComputed =>
-      if @self_user_joined()
-        return @get_number_of_participants() + 1
-      return @get_number_of_participants()
+      return @get_number_of_participants @self_user_joined()
 
     # Observable subscriptions
     @is_connected.subscribe (is_connected) =>
@@ -118,7 +115,7 @@ class z.calling.entities.ECall
       return if is_joined
       @is_connected false
       amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP if @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
-      @telemetry.track_duration @
+      @telemetry.track_duration @ if @termination_reason
       @_reset_timer()
       @_reset_e_flows()
 
@@ -179,7 +176,7 @@ class z.calling.entities.ECall
     @state_timeout = window.setTimeout =>
       @_stop_call_sound is_incoming
       if is_incoming
-        return @state z.calling.enum.CallState.IGNORED if @is_group()
+        return @state z.calling.enum.CallState.REJECTED if @is_group()
         amplify.publish z.event.WebApp.CALL.STATE.DELETE, @id
       else
         amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @id
@@ -227,23 +224,31 @@ class z.calling.entities.ECall
   ###
   Remove an e-participant from the call.
   @param user_id [String] ID of user to be removed from the e-call
+  @param client_id [String] ID of client that requested the removal from the e-call
   @return [z.calling.entities.ECall] E-call entity
   ###
-  delete_e_participant: (user_id) =>
+  delete_e_participant: (user_id, client_id) =>
     @get_e_participant_by_id user_id
     .then (e_participant_et) =>
+      if client_id
+        e_participant_et.verify_client_id client_id
       @interrupted_participants.remove e_participant_et
       @participants.remove e_participant_et
       @_update_remote_state()
       @v3_call_center.media_element_handler.remove_media_element user_id
       @logger.debug "Removed e-call participant '#{e_participant_et.user.name()}'"
       return @
+    .catch (error) ->
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
   ###
   Get the number of participants in the call.
-  @return [Number] Number of participants in call excluding the self user
+  @param add_self_user [Boolean] Add self user to count
+  @return [Number] Number of participants in call
   ###
-  get_number_of_participants: =>
+  get_number_of_participants: (add_self_user) =>
+    if add_self_user
+      return @participants().length + 1
     return @participants().length
 
   ###
@@ -263,10 +268,29 @@ class z.calling.entities.ECall
   update_e_participant: (e_call_message_et) =>
     @get_e_participant_by_id e_call_message_et.user_id
     .then (e_participant_et) =>
+      if e_call_message_et.client_id
+        e_participant_et.verify_client_id e_call_message_et.client_id
       @logger.debug "Updating e-call participant '#{e_participant_et.user.name()}'", e_call_message_et
       e_participant_et.update_state e_call_message_et
       @_update_remote_state()
       return e_participant_et
+    .catch (error) ->
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
+
+  ###
+  Verify e-call message belongs to e-call by session id.
+
+  @private
+  @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity
+  @return [Undefined] Returns if verification is passed, otherwise throws an error
+  ###
+  verify_session_id: (e_call_message_et) =>
+    return @ if e_call_message_et.session_id is @session_id
+
+    return @get_e_participant_by_id e_call_message_et.user_id
+    .then (e_participant_et) =>
+      return @ if e_call_message_et.session_id is e_participant_et.session_id
+      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.WRONG_SENDER, 'Session IDs not matching'
 
 
   ###############################################################################
@@ -338,6 +362,7 @@ class z.calling.entities.ECall
     @self_user_joined false
     @is_connected false
     @session_id = undefined
+    @termination_reason = undefined
     amplify.publish z.event.WebApp.AUDIO.STOP, z.audio.AudioType.NETWORK_INTERRUPTION
 
   ###

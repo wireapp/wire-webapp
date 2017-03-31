@@ -2,16 +2,32 @@ env:
   browser: true
   node: true
   es6: true
+  jasmine: true
 
 extends:
   "eslint:recommended"
 
+globals:
+  _: true
+  $: true
+  amplify: true
+  ko: true
+  LRUCache: true
+  moment: true
+  pako: true
+  Raygun: true
+  twttr: true
+  wire: true
+  z: true
+
 rules:
+  brace-style: [2, 1tbs]
   comma-dangle: [2, always-multiline]
   handle-callback-err: 2
   indent: [2, 2, {SwitchCase: 1}]
   keyword-spacing: 2
   no-dupe-class-members: 2
+  no-else-return: 2
   no-multi-spaces: 2
   no-shadow: 2
   no-unused-expressions: 2
@@ -19,5 +35,6 @@ rules:
   no-var: 2
   quotes: [2, single, avoid-escape]
   semi: [2, always]
+  sort-vars: 2
   space-before-blocks: 2
   strict: [2, global]

@@ -37,10 +37,6 @@ class z.calling.v2.CallError
         'Flow not found'
       when z.calling.v2.CallError::TYPE.NO_CONVERSATION_ID
         'No conversation ID given'
-      when z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK
-        'No replaceable MediaStreamTrack found'
-      when z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
-        'PeerConnection does not support getSenders()'
       when z.calling.v2.CallError::TYPE.VOICE_CHANNEL_FULL
         'Too many participants in call'
       else
@@ -54,7 +50,5 @@ class z.calling.v2.CallError
     CONVERSATION_TOO_BIG: 'z.calling.v2.CallError::TYPE.CONVERSATION_TOO_BIG'
     FLOW_NOT_FOUND: 'z.calling.v2.CallError::TYPE.FLOW_NOT_FOUND'
     NO_CONVERSATION_ID: 'z.calling.v2.CallError::TYPE.NO_CONVERSATION_ID'
-    NO_REPLACEABLE_TRACK: 'z.calling.v2.CallError::TYPE.NO_REPLACEABLE_TRACK'
-    RTP_SENDER_NOT_SUPPORTED: 'z.calling.v2.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED'
     UNKNOWN: 'z.calling.v2.CallError::TYPE.UNKNOWN'
     VOICE_CHANNEL_FULL: 'z.calling.v2.CallError::TYPE.VOICE_CHANNEL_FULL'

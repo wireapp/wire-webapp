@@ -64,8 +64,8 @@ class z.ViewModel.ConversationInputViewModel
     @conversation_has_focus = ko.observable(true).extend notify: 'always'
     @browser_has_focus = ko.observable true
 
-    @blinking_cursor = ko.pureComputed =>
-      return @browser_has_focus() and @conversation_has_focus() and @is_editing()
+    @blinking_cursor = ko.pureComputed => @is_editing() or @conversation_has_focus()
+    @blinking_cursor.extend notify: 'always'
 
     @has_text_input = ko.pureComputed =>
       return @conversation_et()?.input().length > 0
@@ -129,7 +129,7 @@ class z.ViewModel.ConversationInputViewModel
 
   send_message: (message) =>
     return if message.length is 0
-    @conversation_repository.send_message_with_link_preview message, @conversation_et()
+    @conversation_repository.send_text_with_link_preview message, @conversation_et()
 
   send_message_edit: (message, message_et) =>
     @cancel_edit()

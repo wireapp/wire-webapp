@@ -31,7 +31,9 @@ class z.ViewModel.ImageDetailViewViewModel
     @conversation_et = ko.observable()
     @message_et = ko.observable()
     @message_et.subscribe (message_et) =>
-      @conversation_et @conversation_repository.find_conversation_by_id message_et.conversation_id
+      @conversation_repository.get_conversation_by_id_async message_et.conversation_id
+      .then (conversation_et) =>
+        @conversation_et conversation_et
 
     amplify.subscribe z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, @show
 

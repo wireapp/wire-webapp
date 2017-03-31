@@ -41,7 +41,7 @@ class z.calling.entities.Call
     @call_timer_interval = undefined
     @timer_start = undefined
     @duration_time = ko.observable 0
-    @finished_reason = z.calling.enum.CALL_FINISHED_REASON.UNKNOWN
+    @termination_reason = undefined
 
     @is_connected = ko.observable false
     @is_group = @conversation_et.is_group
@@ -70,18 +70,13 @@ class z.calling.entities.Call
     # @todo Calculate panning on participants update
     @participants = ko.observableArray []
     @participants_count = ko.pureComputed =>
-      if @self_user_joined()
-        @get_number_of_participants() + 1
-      else
-        @get_number_of_participants()
+      return @get_number_of_participants @self_user_joined()
     @max_number_of_participants = 0
 
     @interrupted_participants = ko.observableArray []
 
     # Media
-    @local_stream_audio = @v2_call_center.media_stream_handler.local_media_streams.audio
-    @local_stream_video = @v2_call_center.media_stream_handler.local_media_streams.video
-
+    @local_media_stream = @v2_call_center.media_stream_handler.local_media_stream
     @local_media_type = @v2_call_center.media_stream_handler.local_media_type
     @remote_media_type = ko.observable z.media.MediaType.NONE
 
@@ -106,7 +101,7 @@ class z.calling.entities.Call
       else
         @is_connected false
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP if @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
-        @telemetry.track_duration @
+        @telemetry.track_duration @ if @termination_reason
         @_reset_timer()
         @_reset_flows()
 
@@ -136,12 +131,12 @@ class z.calling.entities.Call
           @_on_state_incoming()
         when z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ENDED
           @_on_state_disconnecting()
-        when z.calling.enum.CallState.IGNORED
-          @_on_state_ignored()
         when z.calling.enum.CallState.ONGOING
           @_on_state_ongoing()
         when z.calling.enum.CallState.OUTGOING
           @_on_state_outgoing()
+        when z.calling.enum.CallState.REJECTED
+          @_on_state_rejected()
 
       @previous_state = state
 
@@ -168,10 +163,6 @@ class z.calling.entities.Call
     @_play_call_sound true
     @_group_call_timeout true if @is_group()
 
-  _on_state_ignored: =>
-    if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
-      @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
-
   _on_state_ongoing: =>
     if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
       @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
@@ -179,6 +170,10 @@ class z.calling.entities.Call
   _on_state_outgoing: =>
     @_play_call_sound false
     @_group_call_timeout false if @is_group()
+
+  _on_state_rejected: =>
+    if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
+      @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
 
   _clear_join_timer: =>
     window.clearTimeout @is_declined_timer
@@ -226,9 +221,9 @@ class z.calling.entities.Call
 
     @remote_media_type z.media.MediaType.AUDIO if not media_type_updated
 
-  # Ignore a call.
-  ignore: =>
-    @state z.calling.enum.CallState.IGNORED
+  # Reject a call.
+  reject: =>
+    @state z.calling.enum.CallState.REJECTED
     @is_declined true
 
 
@@ -273,9 +268,12 @@ class z.calling.entities.Call
 
   ###
   Get the number of participants in the call.
-  @return [Number] Number of participants in call excluding the self user
+  @param add_self_user [Boolean] Add self user to count
+  @return [Number] Number of participants in call
   ###
-  get_number_of_participants: =>
+  get_number_of_participants: (add_self_user) =>
+    if add_self_user
+      return @participants().length + 1
     return @participants().length
 
   ###
@@ -478,7 +476,7 @@ class z.calling.entities.Call
   reset_call: =>
     @self_client_joined false
     @event_sequence = 0
-    @finished_reason = z.calling.enum.CALL_FINISHED_REASON.UNKNOWN
+    @termination_reason = undefined
     @is_connected false
     @session_id = undefined
     @self_user_joined false

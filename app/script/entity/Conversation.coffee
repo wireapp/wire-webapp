@@ -144,7 +144,7 @@ class z.entity.Conversation
       unread_type = z.conversation.ConversationUnreadType.UNREAD
       return unread_type if @unread_message_count() <= 0
       for message in @unread_events() by -1
-        return z.conversation.ConversationUnreadType.CALL if message.finished_reason is z.calling.enum.CALL_FINISHED_REASON.MISSED
+        return z.conversation.ConversationUnreadType.CALL if message.finished_reason is z.calling.enum.TERMINATION_REASON.MISSED
         if message.is_ping()
           @unread_accent_color message.accent_color()
           return z.conversation.ConversationUnreadType.PING
@@ -267,12 +267,6 @@ class z.entity.Conversation
   @param message_et [z.entity.Message] Message entity to be added to the conversation
   ###
   add_message: (message_et) ->
-    first_message = @get_first_message()
-
-    # don't add messages that are older then what is rendered
-    if first_message? and message_et.timestamp() < first_message.timestamp()
-      return
-
     amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et
     @_update_last_read_from_message message_et
     @messages_unordered.push @_check_for_duplicate_nonce message_et, @get_last_message()
@@ -362,6 +356,7 @@ class z.entity.Conversation
     return undefined if @participating_user_ets().length is 0
     message_et = new z.entity.MemberMessage()
     message_et.type = z.message.SuperType.MEMBER
+    message_et.timestamp new Date(0)
     message_et.user_ids @participating_user_ids()
     message_et.user_ets @participating_user_ets().slice 0
 

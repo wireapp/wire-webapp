@@ -19,18 +19,25 @@
 window.z ?= {}
 z.service ?= {}
 
-IGNORED_BACKEND_ERRORS = [
-  z.service.BackendClientError::STATUS_CODE.BAD_GATEWAY
-  z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
-  z.service.BackendClientError::STATUS_CODE.CONFLICT
-  z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
-  z.service.BackendClientError::STATUS_CODE.INTERNAL_SERVER_ERROR
-  z.service.BackendClientError::STATUS_CODE.NOT_FOUND
-  z.service.BackendClientError::STATUS_CODE.PRECONDITION_FAILED
-  z.service.BackendClientError::STATUS_CODE.REQUEST_TIMEOUT
-  z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
-  z.service.BackendClientError::STATUS_CODE.TOO_MANY_REQUESTS
-]
+CLIENT_CONFIG =
+  IGNORED_BACKEND_ERRORS: [
+    z.service.BackendClientError::STATUS_CODE.BAD_GATEWAY
+    z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
+    z.service.BackendClientError::STATUS_CODE.CONFLICT
+    z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
+    z.service.BackendClientError::STATUS_CODE.INTERNAL_SERVER_ERROR
+    z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+    z.service.BackendClientError::STATUS_CODE.PRECONDITION_FAILED
+    z.service.BackendClientError::STATUS_CODE.REQUEST_TIMEOUT
+    z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
+    z.service.BackendClientError::STATUS_CODE.TOO_MANY_REQUESTS
+  ]
+  IGNORED_BACKEND_LABELS: [
+    z.service.BackendClientError::LABEL.PASSWORD_EXISTS
+    z.service.BackendClientError::LABEL.TOO_MANY_CLIENTS
+    z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
+  ]
+
 
 # Client for all backend REST API calls.
 class z.service.Client
@@ -153,6 +160,7 @@ class z.service.Client
       @number_of_requests @number_of_requests() + 1
 
       $.ajax
+        cache: config.cache
         contentType: config.contentType
         data: config.data
         headers: config.headers
@@ -179,15 +187,12 @@ class z.service.Client
             amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, 'Unauthorized backend request'
             return
           when z.service.BackendClientError::STATUS_CODE.FORBIDDEN
-            switch jqXHR.responseJSON?.label
-              when z.service.BackendClientError::LABEL.INVALID_CREDENTIALS
-                Raygun.send new Error 'Server request failed: Invalid credentials'
-              when z.service.BackendClientError::LABEL.TOO_MANY_CLIENTS, z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
-                @logger.warn "Server request failed: '#{jqXHR.responseJSON.label}'"
-              else
-                Raygun.send new Error 'Server request failed'
+            if jqXHR.responseJSON?.label in CLIENT_CONFIG.IGNORED_BACKEND_LABELS
+              @logger.warn "Server request failed: #{jqXHR.responseJSON?.label}"
+            else
+              Raygun.send new Error "Server request failed: #{jqXHR.responseJSON?.label}"
           else
-            if jqXHR.status not in IGNORED_BACKEND_ERRORS
+            if jqXHR.status not in CLIENT_CONFIG.IGNORED_BACKEND_ERRORS
               Raygun.send new Error "Server request failed: #{jqXHR.status}"
 
         reject jqXHR.responseJSON or new z.service.BackendClientError jqXHR.status

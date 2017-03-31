@@ -37,7 +37,6 @@ z.string.pt.auth_account_create_account = 'Criar uma conta'
 z.string.pt.auth_account_expiration = 'Você foram deslogados porque sua sessão expirou. Efetue o login novamente.'
 z.string.pt.auth_account_get_wire = 'Simples, privada e segura aplicação de mensagens para conversa, chamadas, partilha de fotos, música, vídeos, GIFs e muito mais.'
 z.string.pt.auth_account_password_forgot = 'Esqueceu a senha'
-z.string.pt.auth_account_remember_me = 'Lembrar de mim'
 z.string.pt.auth_account_sign_in = 'Entrar'
 z.string.pt.auth_account_sign_in_email = 'E-mail'
 z.string.pt.auth_account_sign_in_phone = 'Telefone'
@@ -208,11 +207,6 @@ z.string.pt.modal_session_reset_message_2 = 'contate.'
 # Too many members in conversation
 z.string.pt.modal_too_many_members_headline = 'Chamada cheia'
 z.string.pt.modal_too_many_members_message = 'Até %max pessoas podem participar de uma conversa. Há espaço para %no pessoas aqui.'
-# Whitelist screensharing
-z.string.pt.modal_whitelist_screensharing_headline = 'Wire precisa de permissão para compartilhar sua tela'
-z.string.pt.modal_whitelist_screensharing_message_1 = 'Abrir about:config e adicione *. wire.com à lista de domínios permitidos para compartilhamento de tela. Consulte'
-z.string.pt.modal_whitelist_screensharing_message_link = 'o FAQ'
-z.string.pt.modal_whitelist_screensharing_message_2 = 'para detalhes.'
 # Parallel uploads
 z.string.pt.modal_uploads_parallel = 'Você pode enviar até %no arquivos de uma só vez.'
 
@@ -545,7 +539,7 @@ z.string.pt.warning_lifecycle_update_link = 'Atualizar agora'
 # Browser notifications
 z.string.pt.system_notification_asset_add = 'Compartilhou uma imagem'
 z.string.pt.system_notification_connection_accepted = 'Aceitou seu pedido de conexão'
-z.string.pt.system_notification_connection_connected = 'Agora estão conectados'
+z.string.pt.system_notification_connection_connected = 'Você está conectado agora'
 z.string.pt.system_notification_connection_request = 'Quer se conectar'
 z.string.pt.system_notification_conversation_create = '%s.first_name começou uma conversa'
 z.string.pt.system_notification_conversation_rename = '%s.first_name mudou o nome da conversa para %name'

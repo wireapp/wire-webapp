@@ -139,7 +139,7 @@ class z.telemetry.calling.CallTelemetry
         conversation_type: if call_et.is_group() then z.tracking.attribute.ConversationType.GROUP else z.tracking.attribute.ConversationType.ONE_TO_ONE
         duration: duration_bucket
         duration_sec: duration
-        reason: call_et.finished_reason
+        reason: call_et.termination_reason
         remote_version: @remote_version
         version: @protocol_version
         with_bot: call_et.conversation_et.is_with_bot()
