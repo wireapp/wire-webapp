@@ -21,7 +21,11 @@
 @image-size: 104px;
 @image-items-per-row: 6;
 
+@max-section-width: 696px;
+
 .collection-list {
+  display: flex;
+  flex-direction: column;
   padding-bottom: 64px;
   padding-top: 24px;
 }
@@ -29,6 +33,7 @@
 // Sections
 .collection-section {
   display: inline-block;
+  max-width: @max-section-width;
 
   > header {
     align-items: center;
