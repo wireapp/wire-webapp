@@ -1,7 +1,7 @@
 <div id="conversations" class="conversations left-list-is-visible" data-bind="with: $root.conversations">
 
   <!-- ko foreach: conversations_calls -->
-    <!-- ko if: call().self_client_joined || show_calls()-->
+    <!-- ko if: call().self_client_joined() || $parent.show_calls()-->
       <div class="calls" data-uie-name="status-call">
         <div class="calls-avatar">
           <!-- ko ifnot: call().is_declined() -->
