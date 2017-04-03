@@ -135,12 +135,7 @@ z.extension.GiphyRepository = class GiphyRepository {
 
         this.gif_query_cache[options.query] = response.pagination.total_count;
 
-        for (let n of [...Array(options.number).keys()]) {
-          if (n === gifs.length) {
-            break;
-          }
-
-          const gif = gifs[n];
+        for (let gif of gifs.slice(0, options.number)) {
           const { images } = gif;
           const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
           const animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
