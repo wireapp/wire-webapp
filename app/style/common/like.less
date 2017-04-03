@@ -1,16 +1,39 @@
+/*
+ * Wire
+ * Copyright (C) 2016 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 .like-button {
   .circle(24px);
   cursor: pointer;
   position: relative;
 
   > span {
-    .absolute-center(10px);
-    .font-size-xs;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: scale(.75) translate(-50%, -50%);
+    transform-origin: 0 0;
     color: @w-red;
+
 
     &:last-child {
       opacity: 0;
-      transform: scale(6);
+      transform: scale(6) translate(-50%, -50%);
       transition: all @animation-timing-fast @ease-out-quart;
       pointer-events: none;
     }
@@ -20,6 +43,6 @@
 .like-button-liked {
   > span:last-child {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(.75) translate(-50%, -50%);
   }
 }
