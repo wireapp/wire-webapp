@@ -67,8 +67,10 @@ class z.conversation.ConversationRepository
     @sending_queue = new z.util.PromiseQueue()
     @sending_queue.pause()
 
+    # @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
     @conversation_service.client.request_queue_blocked_state.subscribe (state) =>
-      @sending_queue.pause state isnt z.service.RequestQueueBlockedState.NONE and not @block_event_handling
+      request_queue_blocked = state isnt z.service.RequestQueueBlockedState.NONE
+      @sending_queue.pause request_queue_blocked or @block_event_handling
 
     @conversations_archived = ko.observableArray []
     @conversations_call = ko.observableArray []
