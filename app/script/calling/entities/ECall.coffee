@@ -232,6 +232,7 @@ class z.calling.entities.ECall
     .then (e_participant_et) =>
       if client_id
         e_participant_et.verify_client_id client_id
+      e_participant_et.reset_participant()
       @interrupted_participants.remove e_participant_et
       @participants.remove e_participant_et
       @_update_remote_state()
