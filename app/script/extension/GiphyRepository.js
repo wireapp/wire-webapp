@@ -60,7 +60,7 @@ z.extension.GiphyRepository = class GiphyRepository {
         const animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
 
         if (animation_gif.size > options.max_size) {
-          this.logger.info(`Gif size (${animation_gif.size}) over maximum size (${max_size})`);
+          this.logger.info(`Gif size (${animation_gif.size}) over maximum size (${options.max_size})`);
           return _get_random_gif(retries + 1);
         }
         return ({
