@@ -145,7 +145,7 @@ class z.telemetry.calling.CallTelemetry
         with_bot: call_et.conversation_et.is_with_bot()
 
       event_name = z.tracking.EventName.CALLING.ENDED_CALL
-      if call_et.is_remote_screen_send() or call_et.is_remote_video_send()
+      if call_et.local_media_type() in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
         event_name = event_name.replace '_call', '_video_call'
 
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, event_name, attributes
