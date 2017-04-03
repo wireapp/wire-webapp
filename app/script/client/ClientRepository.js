@@ -525,9 +525,9 @@ z.client.ClientRepository = class ClientRepository {
   get_client_by_user_id_from_db(user_id) {
     return this.client_service.load_all_clients_from_db()
     .then(clients => {
-      return clients
-        .filter((client) => (z.client.Client.dismantle_user_client_id(client.meta.primary_key)).user_id === user_id)
-        .map((client) => client);
+      return clients.filter((client) => {
+        return (z.client.Client.dismantle_user_client_id(client.meta.primary_key)).user_id === user_id
+      });
     });
   }
 

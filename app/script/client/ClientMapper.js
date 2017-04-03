@@ -23,9 +23,7 @@ window.z = window.z || {};
 window.z.client = z.client || {};
 
 z.client.ClientMapper = class ClientMapper {
-
-  constructor() {
-  }
+  constructor() {}
 
   /*
   Maps a JSON into a Client entity.
