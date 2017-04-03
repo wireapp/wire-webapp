@@ -443,9 +443,10 @@ class z.calling.v3.CallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
-      @media_stream_handler.release_media_stream()
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
       e_call_et.termination_reason = termination_reason if termination_reason and not e_call_et.termination_reason
+      e_call_et.self_client_joined false
+      @media_stream_handler.release_media_stream()
 
       event_promises = []
       e_call_message_et = undefined
