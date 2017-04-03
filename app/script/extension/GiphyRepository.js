@@ -68,7 +68,7 @@ z.extension.GiphyRepository = class GiphyRepository {
           static: static_gif.url,
           animated: animation_gif.url,
         });
-      })
+      });
     };
 
     return _get_random_gif();
