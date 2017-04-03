@@ -372,7 +372,6 @@ class z.event.EventRepository
             @logger.error "Session '#{session_id}' with user '#{remote_user_id}' (client '#{remote_client_id}') is broken or out of sync. Reset the session and decryption is likely to work again. Error: #{decrypt_error.message}", decrypt_error
           else if decrypt_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged
             # Remote identity changed
-            error_code = z.cryptography.CryptographyErrorType.REMOTE_IDENTITY_CHANGED
             message = "Remote identity of client '#{remote_client_id}' from user '#{remote_user_id}' changed: #{decrypt_error.message}"
             @logger.error message, decrypt_error
 

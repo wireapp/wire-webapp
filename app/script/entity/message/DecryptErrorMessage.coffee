@@ -29,14 +29,14 @@ class z.entity.DecryptErrorMessage extends z.entity.Message
 
     @caption = ko.pureComputed =>
       caption_id = z.string.conversation_unable_to_decrypt_1
-      caption_id = z.string.conversation_unable_to_decrypt_2 if @error_code is z.cryptography.CryptographyErrorType.REMOTE_IDENTITY_CHANGED
+      caption_id = z.string.conversation_unable_to_decrypt_2 if @error_code is Proteus.errors.DecodeError.CODE.CASE_204
       return z.localization.Localizer.get_text
         id: caption_id
         replace:
           placeholder: '%@name', content: "<span class='label-bold-xs'>#{ z.util.escape_html @user().first_name()}</span>"
 
     @link = ko.pureComputed =>
-      return z.localization.Localizer.get_text z.string.url_decrypt_error_2 if @error_code is z.cryptography.CryptographyErrorType.REMOTE_IDENTITY_CHANGED
+      return z.localization.Localizer.get_text z.string.url_decrypt_error_2 if @error_code is Proteus.errors.DecodeError.CODE.CASE_204
       return z.localization.Localizer.get_text z.string.url_decrypt_error_1
 
     @is_recoverable = ko.pureComputed =>
