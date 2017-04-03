@@ -42,39 +42,36 @@ z.extension.GiphyRepository = class GiphyRepository {
   @param {number} [options.max_size=3 * 1024 * 1024] - Maximum gif size in bytes (default 3MB)
   */
   get_random_gif(options) {
-    return new Promise((resolve, reject) => {
-      options = Object.assign({
-        retry: 3,
-        max_size: 3 * 1024 * 1024,
-      }, options);
+    options = Object.assign({
+      retry: 3,
+      max_size: 3 * 1024 * 1024,
+    }, options);
 
-      const _get_random_gif = (retries = 0) => {
-        if (options.retry === retries) {
-          reject(new Error(`Unable to fetch a proper gif within ${options.retry} retries`));
+    const _get_random_gif = (retries = 0) => {
+      if (options.retry === retries) {
+        throw new Error(`Unable to fetch a proper gif within ${options.retry} retries`);
+      }
+
+      return this.giphy_service.get_random(options.tag)
+      .then(response => this.giphy_service.get_by_id(response.data.id))
+      .then(response => {
+        const {images} = response.data;
+        const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
+        const animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
+
+        if (animation_gif.size > options.max_size) {
+          this.logger.info(`Gif size (${animation_gif.size}) over maximum size (${max_size})`);
+          return _get_random_gif(retries + 1);
         }
+        return ({
+          url: response.data.url,
+          static: static_gif.url,
+          animated: animation_gif.url,
+        });
+      })
+    };
 
-        return this.giphy_service.get_random(options.tag)
-        .then(response => this.giphy_service.get_by_id(response.data.id))
-        .then(response => {
-          const {images} = response.data;
-          const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
-          const animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
-
-          if (animation_gif.size > options.max_size) {
-            this.logger.info(`Gif size (${animation_gif.size}) is over maximum size (${animation_gif.size})`);
-            return _get_random_gif(retries + 1);
-          }
-          return resolve({
-            url: response.data.url,
-            static: static_gif.url,
-            animated: animation_gif.url,
-          });
-        })
-        .catch(reject);
-      };
-
-      return _get_random_gif();
-    });
+    return _get_random_gif();
   }
 
   /*
