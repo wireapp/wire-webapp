@@ -145,9 +145,7 @@ z.extension.GiphyRepository = class GiphyRepository {
           const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
           const animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
 
-          if (animation_gif.size > options.max_size) {
-            continue;
-          } else {
+          if (animation_gif.size <= options.max_size) {
             result.push({
               animated: animation_gif.url,
               static: static_gif.url,
