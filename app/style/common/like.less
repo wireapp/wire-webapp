@@ -17,32 +17,36 @@
  *
  */
 
+.like-transform-mixin(@scale) {
+  transform: scale(@scale) translate(-50%, -50%);
+}
+
 .like-button {
   .circle(24px);
   cursor: pointer;
   position: relative;
 
   > span {
+    .like-transform-mixin(.75);
+    color: @w-red;
+    left: 50%;
     position: absolute;
     top: 50%;
-    left: 50%;
-    transform: scale(.75) translate(-50%, -50%);
     transform-origin: 0 0;
-    color: @w-red;
 
 
     &:last-child {
+      .like-transform-mixin(6);
       opacity: 0;
-      transform: scale(6) translate(-50%, -50%);
-      transition: all @animation-timing-fast @ease-out-quart;
       pointer-events: none;
+      transition: all @animation-timing-fast @ease-out-quart;
     }
   }
 }
 
 .like-button-liked {
   > span:last-child {
+    .like-transform-mixin(.75);
     opacity: 1;
-    transform: scale(.75) translate(-50%, -50%);
   }
 }
