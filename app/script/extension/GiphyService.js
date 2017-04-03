@@ -64,9 +64,9 @@ z.extension.GiphyService = class GiphyService {
 
   @param {Object} options
   @param {string} options - query search query term or phrase
-  @param {number} [options.limit=25] - Number of results to return (maximum 100, default 25)
-  @param {number} [options.offset=0] - Results offset (defaults 0)
-  @param {string} [options.sorting='relevant'] - Relevant or recent
+  @param {number} options.limit=25 - Number of results to return (maximum 100, default 25)
+  @param {number} options.offset=0 - Results offset (defaults 0)
+  @param {string} options.sorting='relevant' - Relevant or recent
   */
   get_search(options) {
     options = Object.assign({

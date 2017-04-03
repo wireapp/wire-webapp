@@ -38,8 +38,8 @@ z.extension.GiphyRepository = class GiphyRepository {
 
   @param {Object} options
   @param {string} options.tag - search query term or phrase
-  @param {number} [options.retry=3] - How many retries to get the correct size. (default 3)
-  @param {number} [options.max_size=3 * 1024 * 1024] - Maximum gif size in bytes (default 3MB)
+  @param {number} options.retry=3 - How many retries to get the correct size.
+  @param {number} options.max_size=3 * 1024 * 1024 - Maximum gif size in bytes (default 3MB)
   */
   get_random_gif(options) {
     options = Object.assign({

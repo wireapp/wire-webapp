@@ -24,19 +24,19 @@ window.z.extension = z.extension || {};
 
 // Enum of different Giphy content sizes.
 z.extension.GiphyContentSizes = {
+  DOWNSIZED: 'downsized',
+  DOWNSIZED_LARGE: 'downsized_large',
+  DOWNSIZED_STILL: 'downsized_still',
   FIXED_HEIGHT: 'fixed_height',
-  FIXED_HEIGHT_STILL: 'fixed_height_still',
   FIXED_HEIGHT_DOWNSAMPLED: 'fixed_height_downsampled',
-  FIXED_WIDTH: 'fixed_width',
-  FIXED_WIDTH_STILL: 'fixed_width_still',
-  FIXED_WIDTH_DOWNSAMPLED: 'fixed_width_downsampled',
   FIXED_HEIGHT_SMALL: 'fixed_height_small',
   FIXED_HEIGHT_SMALL_STILL: 'fixed_height_small_still',
+  FIXED_HEIGHT_STILL: 'fixed_height_still',
+  FIXED_WIDTH: 'fixed_width',
+  FIXED_WIDTH_DOWNSAMPLED: 'fixed_width_downsampled',
   FIXED_WIDTH_SMALL: 'fixed_width_small',
   FIXED_WIDTH_SMALL_STILL: 'fixed_width_small_still',
-  DOWNSIZED: 'downsized',
-  DOWNSIZED_STILL: 'downsized_still',
-  DOWNSIZED_LARGE: 'downsized_large',
+  FIXED_WIDTH_STILL: 'fixed_width_still',
   ORIGINAL: 'original',
   ORIGINAL_STILL: 'original_still',
 };
