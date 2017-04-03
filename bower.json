@@ -78,9 +78,6 @@
     "libsodium.js": {
       "js/": "dist/browsers-sumo/combined/sodium.min.js"
     },
-    "logdown": {
-      "js/": "dist/*.js"
-    },
     "marked": {
       "js": "lib/marked.js"
     },
