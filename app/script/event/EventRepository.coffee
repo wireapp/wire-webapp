@@ -355,13 +355,10 @@ class z.event.EventRepository
         return @cryptography_repository.decrypt_event event
         .catch (decrypt_error) =>
           # Get error information
+          error_code = decrypt_error.code
           remote_client_id = event.data.sender
           remote_user_id = event.from
           session_id = @cryptography_repository._construct_session_id remote_user_id, remote_client_id
-
-          # Hashing error message to get the error code (not very reliable if Proteus error messages change! Needs to be revised in the future)
-          hashed_error_message = z.util.murmurhash3 decrypt_error.message, 42
-          error_code = hashed_error_message.toString().substr 0, 4
 
           # Handle error
           if decrypt_error instanceof Proteus.errors.DecryptError.DuplicateMessage or decrypt_error instanceof Proteus.errors.DecryptError.OutdatedMessage
@@ -379,7 +376,7 @@ class z.event.EventRepository
             message = "Remote identity of client '#{remote_client_id}' from user '#{remote_user_id}' changed: #{decrypt_error.message}"
             @logger.error message, decrypt_error
 
-          @logger.warn "Could not decrypt an event from client ID '#{remote_client_id}' of user ID '#{remote_user_id}' in session ID '#{session_id}'.\nError Code: '#{error_code}'´\nError Message: #{decrypt_error.message}", decrypt_error
+          @logger.warn "Could not decrypt an event from client ID '#{remote_client_id}' of user ID '#{remote_user_id}' in session ID '#{session_id}'.\nError Code: '#{error_code}'\nError Message: #{decrypt_error.message}", decrypt_error
           @_report_decrypt_error event, decrypt_error, error_code
 
           return z.conversation.EventBuilder.build_unable_to_decrypt event, decrypt_error, error_code

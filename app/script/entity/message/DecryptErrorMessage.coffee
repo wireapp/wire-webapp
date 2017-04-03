@@ -20,16 +20,6 @@ window.z ?= {}
 z.entity ?= {}
 
 class z.entity.DecryptErrorMessage extends z.entity.Message
-  @::RECOVERABLE_STATES = [
-    z.cryptography.CryptographyErrorType.DUPLICATE_MESSAGE
-    z.cryptography.CryptographyErrorType.INVALID_MESSAGE_SESSION_NOT_MATCHING
-    z.cryptography.CryptographyErrorType.INVALID_MESSAGE_SESSION_MISSING
-    z.cryptography.CryptographyErrorType.INVALID_SIGNATURE
-    z.cryptography.CryptographyErrorType.OUTDATED_MESSAGE
-    z.cryptography.CryptographyErrorType.PRE_KEY_NOT_FOUND
-    z.cryptography.CryptographyErrorType.TOO_DISTANT_FUTURE
-  ]
-
   constructor: ->
     super()
     @super_type = z.message.SuperType.UNABLE_TO_DECRYPT
@@ -50,7 +40,7 @@ class z.entity.DecryptErrorMessage extends z.entity.Message
       return z.localization.Localizer.get_text z.string.url_decrypt_error_1
 
     @is_recoverable = ko.pureComputed =>
-      return @error_code in @RECOVERABLE_STATES
+      return @error_code.toString().startsWith('2');
 
     @is_resetting_session = ko.observable false
 
