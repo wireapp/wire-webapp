@@ -88,72 +88,68 @@ z.extension.GiphyRepository = class GiphyRepository {
   @param {string} [options.sorting='relevant'] - specify sorting ('relevant' or 'recent' default 'relevant')
   */
   get_gifs(options) {
-    return new Promise((resolve, reject) => {
-      const result = [];
-      let offset = 0;
+    const result = [];
+    let offset = 0;
 
-      options = Object.assign({
-        max_size: 3 * 1024 * 1024,
-        number: 6,
-        random: true,
-        sorting: 'relevant',
-      }, options);
+    options = Object.assign({
+      max_size: 3 * 1024 * 1024,
+      number: 6,
+      random: true,
+      sorting: 'relevant',
+    }, options);
 
-      if (!options.query) {
-        const error = new Error('No query specified');
-        this.logger.error(error.message, error);
-        reject(error);
+    if (!options.query) {
+      throw new Error('No query specified');
+    }
+
+    if (options.random) {
+      options.sorting = z.util.ArrayUtil.random_element(['recent', 'relevant']);
+
+      const total = this.gif_query_cache[options.query];
+
+      if (total != null) {
+        if (options.number >= total) {
+          offset = 0;
+        } else {
+          const range = total - options.number;
+          offset = Math.floor(Math.random() * range);
+        }
       }
+    }
+
+    return this.giphy_service.get_search({
+      limit: 100,
+      query: options.query,
+      sorting: options.sorting,
+      offset,
+    })
+    .then(response => {
+      let gifs = response.data;
 
       if (options.random) {
-        options.sorting = z.util.ArrayUtil.random_element(['recent', 'relevant']);
+        gifs = gifs.sort(() => .5 - Math.random());
+      }
 
-        const total = this.gif_query_cache[options.query];
+      this.gif_query_cache[options.query] = response.pagination.total_count;
 
-        if (total != null) {
-          if (options.number >= total) {
-            offset = 0;
-          } else {
-            const range = total - options.number;
-            offset = Math.floor(Math.random() * range);
-          }
+      for (let gif of gifs.slice(0, options.number)) {
+        const { images } = gif;
+        const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
+        const animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
+
+        if (animation_gif.size <= options.max_size) {
+          result.push({
+            animated: animation_gif.url,
+            static: static_gif.url,
+            url: gif.url,
+          });
         }
       }
 
-      return this.giphy_service.get_search({
-        limit: 100,
-        query: options.query,
-        sorting: options.sorting,
-        offset,
-      })
-      .then(response => {
-        let gifs = response.data;
-
-        if (options.random) {
-          gifs = gifs.sort(() => .5 - Math.random());
-        }
-
-        this.gif_query_cache[options.query] = response.pagination.total_count;
-
-        for (let gif of gifs.slice(0, options.number)) {
-          const { images } = gif;
-          const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
-          const animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
-
-          if (animation_gif.size <= options.max_size) {
-            result.push({
-              animated: animation_gif.url,
-              static: static_gif.url,
-              url: gif.url,
-            });
-          }
-        }
-
-        return resolve(result);
-      }).catch(error => {
-        this.logger.info(`Unable to fetch gif for query: ${options.query}`, error);
-        return reject(error);
-      });
+      return result;
+    }).catch(error => {
+      this.logger.info(`Unable to fetch gif for query: ${options.query}`, error);
+      throw error;
     });
   }
 };
