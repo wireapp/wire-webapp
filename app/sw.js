@@ -1,33 +1,49 @@
 (global => {
   'use strict';
 
-  // Load the sw-tookbox library.
   importScripts('/ext/js/sw-toolbox.js');
 
-  // Turn on debug logging, visible in the Developer Tools' console.
-  global.toolbox.options.debug = true;
+  function stripSearchParameters(url) {
+    const strippedUrl = new URL(url);
+    strippedUrl.search = '';
+    return strippedUrl.toString();
+  }
 
-  // Set up a handler for HTTP GET requests:
-  // - /\.ytimg\.com\// will match any requests whose URL contains 'ytimg.com'.
-  //   A narrower RegExp could be used, but just checking for ytimg.com anywhere
-  //   in the URL should be fine for this sample.
-  // - toolbox.cacheFirst let us to use the predefined cache strategy for those
-  //   requests.
-  global.toolbox.router.get(/forceCaching=true/, global.toolbox.cacheFirst, {
-    // Use a dedicated cache for the responses, separate from the default cache.
+  function cacheRequest(cache, request, response) {
+    return cache.put(stripSearchParameters(request.url), response.clone()).then(() => response);
+  }
+
+  function assetFetchHandler(request, value, options) {
+    return global.caches.open(options.cache.name).then((cache) => {
+      return cache.match(stripSearchParameters(request.url)).then((response) => {
+        if (response) {
+          return cacheRequest(cache, request, response);
+        }
+        return global.fetch(request).then((response) => {
+          if (response.ok) {
+            return global.caches.open(options.cache.name).then((cache) => {
+              return cache.keys().then((keys) => {
+                if (keys.length < options.cache.maxEntries) {
+                  return cacheRequest(cache, request, response);
+                }
+                return cache.delete(keys[0]).then(() => cacheRequest(cache, request, response));
+              });
+            });
+          }
+        });
+      });
+    });
+  }
+
+  global.toolbox.options.debug = true;
+  global.toolbox.router.default = global.toolbox.networkOnly;
+  global.toolbox.router.get(/forceCaching=true/, assetFetchHandler, {
     cache: {
       name: 'asset-cache-v1',
-      maxEntries: 1000, // Store up to 1000 entries in that cache.
-    }
+      maxEntries: 1000
+    },
   });
 
-  // By default, all requests that don't match our custom handler will use the
-  // toolbox.networkFirst cache strategy, and their responses will be stored in
-  // the default cache.
-  global.toolbox.router.default = global.toolbox.networkFirst;
-
-  // Boilerplate to ensure our service worker takes control of the page as soon
-  // as possible.
   global.addEventListener('install', event => event.waitUntil(global.skipWaiting()));
   global.addEventListener('activate', event => event.waitUntil(global.clients.claim()));
 })(self);
