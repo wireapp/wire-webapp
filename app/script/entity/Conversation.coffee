@@ -267,8 +267,9 @@ class z.entity.Conversation
   @param message_id [String]
   @private
   ###
-  _is_unique: (message_id) ->
-    duplicated_message_et = @messages_unordered().find (message_et) -> message_et.id is message_id
+  _is_unique: (message_et) ->
+    duplicated_message_et = @messages_unordered().find (m) ->
+      return message_et.id is m.id and message_et.timestamp() is m.timestamp()
     return not duplicated_message_et?
 
   ###
@@ -278,14 +279,14 @@ class z.entity.Conversation
   add_message: (message_et) ->
     amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et
     @_update_last_read_from_message message_et
-    @messages_unordered.push message_et if @_is_unique message_et.id
+    @messages_unordered.push message_et if @_is_unique message_et
 
   ###
   Adds multiple messages to the conversation.
   @param message_ets [z.entity.Message[]] Array of message entities to be added to the conversation
   ###
   add_messages: (message_ets) ->
-    unique_message_ets = message_ets.filter (message_et) => @_is_unique message_et.id
+    unique_message_ets = message_ets.filter (message_et) => @_is_unique message_et
 
     # in order to avoid multiple db writes check the messages from the end and stop once
     # we found a message from self user
@@ -301,7 +302,7 @@ class z.entity.Conversation
   @param message_ets [z.entity.Message[]] Array of messages to be added to conversation
   ###
   prepend_messages: (message_ets) ->
-    unique_message_ets = message_ets.filter (message_et) => @_is_unique message_et.id
+    unique_message_ets = message_ets.filter (message_et) => @_is_unique message_et
     z.util.ko_array_unshift_all @messages_unordered, unique_message_ets
 
   ###
