@@ -40,7 +40,7 @@ class z.entity.DecryptErrorMessage extends z.entity.Message
       return z.localization.Localizer.get_text z.string.url_decrypt_error_1
 
     @is_recoverable = ko.pureComputed =>
-      return @error_code.toString().startsWith('2');
+      return @error_code.toString().startsWith '2'
 
     @is_resetting_session = ko.observable false
 
