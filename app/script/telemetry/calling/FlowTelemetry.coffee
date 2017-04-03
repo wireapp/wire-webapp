@@ -109,11 +109,11 @@ class z.telemetry.calling.FlowTelemetry
     if stats
       seconds = attempt * timeout / 1000
       if stats.bytes_received is 0 and stats.bytes_sent is 0
-        @logger.error "No '#{media_type}' flowing in either direction after #{seconds} seconds"
+        @logger.warn "No '#{media_type}' flowing in either direction after #{seconds} seconds"
       else if stats.bytes_received is 0
-        @logger.error "No incoming '#{media_type}' received after #{seconds} seconds"
+        @logger.warn "No incoming '#{media_type}' received after #{seconds} seconds"
       else if stats.bytes_sent is 0
-        @logger.error "No outgoing '#{media_type}' sent after #{seconds} seconds"
+        @logger.warn "No outgoing '#{media_type}' sent after #{seconds} seconds"
       else
         @logger.debug "Stream has '#{media_type}' flowing properly both ways"
     else

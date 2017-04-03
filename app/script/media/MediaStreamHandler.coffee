@@ -282,7 +282,7 @@ class z.media.MediaStreamHandler
           @_clear_permission_request_hint media_type
           resolve new z.media.MediaStreamInfo z.media.MediaStreamSource.LOCAL, 'self', media_stream
         .catch (error) =>
-          @logger.warn "MediaStream request failed: #{error.name} - #{error.message}"
+          @logger.warn "MediaStream request failed: #{error.name} #{error.message}"
           @_clear_permission_request_hint media_type
           if error.name in z.calling.rtc.MediaStreamErrorTypes.DEVICE
             error = new z.media.MediaError z.media.MediaError::TYPE.MEDIA_STREAM_DEVICE
