@@ -20,16 +20,6 @@ window.z ?= {}
 z.entity ?= {}
 
 class z.entity.DecryptErrorMessage extends z.entity.Message
-  @::RECOVERABLE_STATES = [
-    z.cryptography.CryptographyErrorType.DUPLICATE_MESSAGE
-    z.cryptography.CryptographyErrorType.INVALID_MESSAGE_SESSION_NOT_MATCHING
-    z.cryptography.CryptographyErrorType.INVALID_MESSAGE_SESSION_MISSING
-    z.cryptography.CryptographyErrorType.INVALID_SIGNATURE
-    z.cryptography.CryptographyErrorType.OUTDATED_MESSAGE
-    z.cryptography.CryptographyErrorType.PRE_KEY_NOT_FOUND
-    z.cryptography.CryptographyErrorType.TOO_DISTANT_FUTURE
-  ]
-
   constructor: ->
     super()
     @super_type = z.message.SuperType.UNABLE_TO_DECRYPT
@@ -39,18 +29,18 @@ class z.entity.DecryptErrorMessage extends z.entity.Message
 
     @caption = ko.pureComputed =>
       caption_id = z.string.conversation_unable_to_decrypt_1
-      caption_id = z.string.conversation_unable_to_decrypt_2 if @error_code is z.cryptography.CryptographyErrorType.REMOTE_IDENTITY_CHANGED
+      caption_id = z.string.conversation_unable_to_decrypt_2 if @error_code is Proteus.errors.DecodeError.CODE.CASE_204
       return z.localization.Localizer.get_text
         id: caption_id
         replace:
           placeholder: '%@name', content: "<span class='label-bold-xs'>#{ z.util.escape_html @user().first_name()}</span>"
 
     @link = ko.pureComputed =>
-      return z.localization.Localizer.get_text z.string.url_decrypt_error_2 if @error_code is z.cryptography.CryptographyErrorType.REMOTE_IDENTITY_CHANGED
+      return z.localization.Localizer.get_text z.string.url_decrypt_error_2 if @error_code is Proteus.errors.DecodeError.CODE.CASE_204
       return z.localization.Localizer.get_text z.string.url_decrypt_error_1
 
     @is_recoverable = ko.pureComputed =>
-      return @error_code in @RECOVERABLE_STATES
+      return @error_code.toString().startsWith '2'
 
     @is_resetting_session = ko.observable false
 
