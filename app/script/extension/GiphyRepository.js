@@ -56,7 +56,7 @@ z.extension.GiphyRepository = class GiphyRepository {
         return this.giphy_service.get_random(options.tag)
         .then(response => this.giphy_service.get_by_id(response.data.id))
         .then(response => {
-          const { images } = response.data;
+          const {images} = response.data;
           const static_gif = images[z.extension.GiphyContentSizes.FIXED_WIDTH_STILL];
           const animation_gif = images[z.extension.GiphyContentSizes.DOWNSIZED];
 
