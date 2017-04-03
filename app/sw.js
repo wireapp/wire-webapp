@@ -2,7 +2,7 @@
   'use strict';
 
   importScripts('/ext/js/sw-toolbox.js');
-  importScripts('/worker/lru-cache-strategy');
+  importScripts('/worker/lru-cache-strategy.js');
 
   global.toolbox.options.debug = true;
   global.toolbox.router.default = global.toolbox.networkOnly;
