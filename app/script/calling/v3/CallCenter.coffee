@@ -445,7 +445,6 @@ class z.calling.v3.CallCenter
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
       e_call_et.termination_reason = termination_reason if termination_reason and not e_call_et.termination_reason
-      e_call_et.self_client_joined false
       @media_stream_handler.release_media_stream()
 
       event_promises = []
@@ -462,6 +461,7 @@ class z.calling.v3.CallCenter
 
       return Promise.all event_promises
       .then =>
+        e_call_et.self_client_joined false
         if e_call_et.participants().length < 2
           @delete_call conversation_id
           @_distribute_deactivation_event e_call_message_et, e_call_et.creating_user if e_call_message_et?.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
