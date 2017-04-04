@@ -40,8 +40,8 @@
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
     "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
-    "lint": "eslint -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/unit_tests/**/*.js",
-    "lint-fix": "eslint --fix -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/unit_tests/**/*.js",
+    "lint": "eslint -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/**/*.js",
+    "lint-fix": "eslint --fix -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/**/*.js",
     "postinstall": "grunt init",
     "start": "grunt",
     "test": "yarn run lint && grunt check && grunt test"
