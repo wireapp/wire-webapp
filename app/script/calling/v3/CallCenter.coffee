@@ -51,11 +51,9 @@ class z.calling.v3.CallCenter
 
     @e_calls = ko.observableArray []
     @joined_e_call = ko.pureComputed =>
-      return unless @self_client_joined()
       return e_call_et for e_call_et in @e_calls() when e_call_et.self_client_joined()
 
     @self_state = @media_stream_handler.self_stream_state
-    @self_client_joined = ko.observable false
 
     @block_media_stream = true
     @subscribe_to_events()
@@ -428,7 +426,6 @@ class z.calling.v3.CallCenter
         when z.calling.enum.CallState.OUTGOING
           e_call_et.participants.push new z.calling.entities.EParticipant e_call_et, e_call_et.conversation_et.participating_user_ets()[0], e_call_et.timings
 
-      @self_client_joined true
       e_call_et.start_negotiation()
     .catch (error) =>
       @delete_call conversation_id
@@ -461,7 +458,6 @@ class z.calling.v3.CallCenter
 
       return Promise.all event_promises
       .then =>
-        @self_user_joined false
         e_call_et.self_user_joined false
         e_call_et.self_client_joined false
         if e_call_et.participants().length < 2
@@ -481,7 +477,6 @@ class z.calling.v3.CallCenter
       return e_call_et.delete_e_participant user_id
     .then (e_call_et) =>
       unless e_call_et.participants().length
-        @self_user_joined false
         e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
         e_call_et.self_user_joined false
         e_call_et.self_client_joined false
