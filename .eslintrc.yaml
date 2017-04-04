@@ -11,7 +11,6 @@ globals:
   _: true
   $: true
   amplify: true
-  entities: true
   ko: true
   LRUCache: true
   moment: true
