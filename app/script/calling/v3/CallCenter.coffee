@@ -461,12 +461,31 @@ class z.calling.v3.CallCenter
 
       return Promise.all event_promises
       .then =>
+        @self_user_joined false
+        e_call_et.self_user_joined false
         e_call_et.self_client_joined false
         if e_call_et.participants().length < 2
           @delete_call conversation_id
           @_distribute_deactivation_event e_call_message_et, e_call_et.creating_user if e_call_message_et?.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
+
+  ###
+  Remove a participant from an e-call if he was removed from the group.
+  @param conversation_id [String] ID of conversation for which the user should be removed from the e-call
+  @param user_id [String] ID of user to be removed
+  ###
+  participant_left: (conversation_id, user_id) =>
+    @get_e_call_by_id conversation_id
+    .then (e_call_et) ->
+      return e_call_et.delete_e_participant user_id
+    .then (e_call_et) =>
+      unless e_call_et.participants().length
+        @self_user_joined false
+        e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
+        e_call_et.self_user_joined false
+        e_call_et.self_client_joined false
+        @delete_call e_call_message_et.conversation_id
 
   ###
   User action to reject incoming e-call.
@@ -484,14 +503,6 @@ class z.calling.v3.CallCenter
       @send_e_call_event e_call_et.conversation_et, e_call_message_et
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
-
-  ###
-  Remove a participant from an e-call if he was removed from the group.
-  @param conversation_id [String] ID of conversation for which the user should be removed from the e-call
-  @param user_id [String] ID of user to be removed
-  ###
-  remove_participant: (conversation_id, user_id) =>
-    @_on_e_call_hangup_event conversation_id, user_id
 
   ###
   User action to toggle one of the media stats of an e-call

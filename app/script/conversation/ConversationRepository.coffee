@@ -1981,11 +1981,11 @@ class z.conversation.ConversationRepository
         if user_et.is_me
           conversation_et.status z.conversation.ConversationStatus.PAST_MEMBER
           if conversation_et.call()
-            amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.REMOVED_MEMBER
+            amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
         else
           conversation_et.participating_user_ids.remove user_et.id
           if conversation_et.call()
-            amplify.publish z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, conversation_et.id, user_et.id
+            amplify.publish z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, conversation_et.id, user_et.id
 
       @update_participating_user_ets conversation_et, =>
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et

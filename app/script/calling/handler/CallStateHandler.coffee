@@ -365,6 +365,19 @@ class z.calling.handler.CallStateHandler
       @logger.warn "No call found in conversation '#{conversation_id}' to leave", error
 
   ###
+  Remove a participant from a call if he was removed from the group.
+  @param conversation_id [String] Conversation ID of call that the user should be removed from
+  @param user_id [String] ID of user to be removed
+  ###
+  participant_left: (conversation_id, user_id) =>
+    @v2_call_center.get_call_by_id conversation_id
+    .then (call_et) ->
+      if participant_et = call_et.get_participant_by_id user_id
+        call_et.delete_participant participant_et, false
+    .catch (error) =>
+      @logger.warn "No call found in conversation '#{conversation_id}' to remove participant from", error
+
+  ###
   User action to reject incoming call.
   @param conversation_id [String] Conversation ID of call to be joined
   ###
@@ -376,19 +389,6 @@ class z.calling.handler.CallStateHandler
       @v2_call_center.media_stream_handler.reset_media_stream()
     .catch (error) =>
       @logger.warn "No call found in conversation '#{conversation_id}' to reject", error
-
-  ###
-  Remove a participant from a call if he was removed from the group.
-  @param conversation_id [String] Conversation ID of call that the user should be removed from
-  @param user_id [String] ID of user to be removed
-  ###
-  remove_participant: (conversation_id, user_id) =>
-    @v2_call_center.get_call_by_id conversation_id
-    .then (call_et) ->
-      if participant_et = call_et.get_participant_by_id user_id
-        call_et.delete_participant participant_et, false
-    .catch (error) =>
-      @logger.warn "No call found in conversation '#{conversation_id}' to remove participant from", error
 
   ###
   User action to toggle a media state of a call.

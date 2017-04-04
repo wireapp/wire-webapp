@@ -42,8 +42,8 @@ z.event.WebApp =
       DELETE: 'wire.webapp.call.state.delete'
       JOIN: 'wire.webapp.call.state.join'
       LEAVE: 'wire.webapp.call.state.leave'
+      PARTICIPANT_LEFT: 'wire.webapp.call.state.participant-left'
       REJECT: 'wire.webapp.call.state.reject'
-      REMOVE_PARTICIPANT: 'wire.webapp.call.state.remove-participant'
       TOGGLE: 'wire.webapp.call.state.toggle'
     MEDIA:
       ADD_STREAM: 'wire.webapp.call.media.add_stream'
