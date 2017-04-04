@@ -75,9 +75,6 @@
     "knockout": {
       "js": "dist/knockout.debug.js"
     },
-    "libsodium.js": {
-      "js/": "dist/browsers-sumo/combined/sodium.min.js"
-    },
     "marked": {
       "js": "lib/marked.js"
     },
