@@ -50,6 +50,10 @@ class z.calling.entities.EParticipant
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.READY_TO_TALK
         @was_connected = true
 
+  reset_participant: =>
+    if @e_flow_et
+      @e_flow_et.reset_flow()
+
   update_state: (e_call_message_et) =>
     @update_properties e_call_message_et.props
     unless e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC

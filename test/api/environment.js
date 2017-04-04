@@ -17,10 +17,8 @@
  *
  */
 
+'use strict';
+
 navigator.__defineGetter__('language', function () {
   return 'en';
 });
-
-// Removing the log noise in Travis CI Build logs
-if(window.location.port == 9877) {
-}

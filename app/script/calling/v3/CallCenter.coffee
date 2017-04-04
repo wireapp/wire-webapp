@@ -416,7 +416,7 @@ class z.calling.v3.CallCenter
     .then (e_call) =>
       e_call_et = e_call
       @logger.debug "Joining e-call in conversation '#{conversation_id}'", e_call_et
-      e_call_et.start_timings()
+      e_call_et.initiate_telemetry video_send
       if not @media_stream_handler.local_media_stream()
         @media_stream_handler.initiate_media_stream conversation_id, video_send
     .then =>
@@ -443,9 +443,10 @@ class z.calling.v3.CallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
-      @media_stream_handler.release_media_stream()
       e_call_et.state z.calling.enum.CallState.DISCONNECTING
       e_call_et.termination_reason = termination_reason if termination_reason and not e_call_et.termination_reason
+      e_call_et.self_client_joined false
+      @media_stream_handler.release_media_stream()
 
       event_promises = []
       e_call_message_et = undefined
@@ -500,19 +501,22 @@ class z.calling.v3.CallCenter
   toggle_media: (conversation_id, media_type) =>
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
-      toggle_promise = switch media_type
+      send_promises = []
+
+      for e_flow_et in e_call_et.get_flows()
+        additional_payload = @_create_additional_payload conversation_id, e_flow_et.remote_user_id, e_flow_et.remote_client_id
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync false, e_call_et.session_id, @_create_payload_prop_sync(media_type, additional_payload)
+        send_promises.push @send_e_call_event e_call_et.conversation_et, e_call_message_et
+
+      return Promise.all send_promises
+    .then =>
+      switch media_type
         when z.media.MediaType.AUDIO
           @media_stream_handler.toggle_audio_send()
         when z.media.MediaType.SCREEN
           @media_stream_handler.toggle_screen_send()
         when z.media.MediaType.VIDEO
           @media_stream_handler.toggle_video_send()
-
-      toggle_promise.then =>
-        for e_flow_et in e_call_et.get_flows()
-          additional_payload = @_create_additional_payload conversation_id, e_flow_et.remote_user_id, e_flow_et.remote_client_id
-          e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync false, e_call_et.session_id, @_create_payload_prop_sync(media_type, additional_payload)
-          @send_e_call_event e_call_et.conversation_et, e_call_message_et
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
@@ -552,9 +556,9 @@ class z.calling.v3.CallCenter
         e_call_et.set_remote_version e_call_message_et
         return e_call_et.add_e_participant e_call_message_et, remote_user_et
         .then =>
-          @media_stream_handler.initiate_media_stream e_call_et.id, true if e_call_et.is_remote_video_send() and not @block_media_stream
           @telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, e_call_et
           @_distribute_activation_event e_call_message_et
+          @media_stream_handler.initiate_media_stream e_call_et.id, true if e_call_et.is_remote_video_send() and not @block_media_stream
       .catch (error) =>
         @delete_call e_call_message_et.conversation_id
         throw error unless error instanceof z.media.MediaError
@@ -570,7 +574,8 @@ class z.calling.v3.CallCenter
       media_type = @_get_media_type_from_properties e_call_message_et.props
       @logger.debug "Outgoing '#{media_type}' e-call in conversation '#{e_call_et.conversation_et.display_name()}'", e_call_et
       e_call_et.state z.calling.enum.CallState.OUTGOING
-      @telemetry.track_event z.tracking.EventName.CALLING.INITIATED_CALL, e_call_et, undefined, media_type is z.media.MediaType.VIDEO
+      @telemetry.set_media_type media_type is z.media.MediaType.VIDEO
+      @telemetry.track_event z.tracking.EventName.CALLING.INITIATED_CALL, e_call_et
       return e_call_et
 
 

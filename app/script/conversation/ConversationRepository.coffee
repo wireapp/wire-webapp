@@ -67,8 +67,10 @@ class z.conversation.ConversationRepository
     @sending_queue = new z.util.PromiseQueue()
     @sending_queue.pause()
 
+    # @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
     @conversation_service.client.request_queue_blocked_state.subscribe (state) =>
-      @sending_queue.pause state isnt z.service.RequestQueueBlockedState.NONE and not @block_event_handling
+      request_queue_blocked = state isnt z.service.RequestQueueBlockedState.NONE
+      @sending_queue.pause request_queue_blocked or @block_event_handling
 
     @conversations_archived = ko.observableArray []
     @conversations_call = ko.observableArray []
@@ -389,7 +391,7 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] Next conversation
   ###
   get_next_conversation: (conversation_et) ->
-    return z.util.ArrayUtil.get_next_item @conversations_unarchived(), conversation_et
+    return z.util.ArrayUtil.get_next_item(@conversations_unarchived(), conversation_et) or @conversations_unarchived()[0]
 
   ###
   Get unarchived conversation with the most recent event.
@@ -1976,17 +1978,14 @@ class z.conversation.ConversationRepository
     @_add_event_to_conversation event_json, conversation_et
     .then (message_et) =>
       for user_et in message_et.user_ets()
-        if conversation_et.call()
-          if user_et.is_me
-            amplify.publish z.event.WebApp.CALL.STATE.DELETE, conversation_et.id
-          else
+        if user_et.is_me
+          conversation_et.status z.conversation.ConversationStatus.PAST_MEMBER
+          if conversation_et.call()
+            amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.REMOVED_MEMBER
+        else
+          conversation_et.participating_user_ids.remove user_et.id
+          if conversation_et.call()
             amplify.publish z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, conversation_et.id, user_et.id
-        conversation_et.participating_user_ids.remove user_et.id
-        continue if not user_et.is_me
-
-        conversation_et.status z.conversation.ConversationStatus.PAST_MEMBER
-        if conversation_et.call()
-          amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.REMOVED_MEMBER
 
       @update_participating_user_ets conversation_et, =>
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
