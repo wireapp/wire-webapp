@@ -20,6 +20,9 @@ window.z ?= {}
 z.telemetry ?= {}
 z.telemetry.calling ?= {}
 
+FLOW_TELEMETRY_CONFIG =
+  MEDIA_CHECK_TIMEOUT: 5000
+
 # Flow telemetry entity.
 class z.telemetry.calling.FlowTelemetry
   ###
@@ -104,35 +107,35 @@ class z.telemetry.calling.FlowTelemetry
   @param timeout [Number] Time in milliseconds since the check was scheduled
   @param attempt [Number] Attempt of stream check
   ###
-  check_stream: (media_type, timeout, attempt = 1) =>
+  check_stream: (media_type, attempt = 1) =>
     stats = @statistics[media_type]
     if stats
-      seconds = attempt * timeout / 1000
+      seconds = attempt * FLOW_TELEMETRY_CONFIG.MEDIA_CHECK_TIMEOUT / 1000
       if stats.bytes_received is 0 and stats.bytes_sent is 0
-        @logger.warn "No '#{media_type}' flowing in either direction after #{seconds} seconds"
+        @logger.warn "No '#{media_type}' flowing in either direction on stream after #{seconds} seconds"
       else if stats.bytes_received is 0
-        @logger.warn "No incoming '#{media_type}' received after #{seconds} seconds"
+        @logger.warn "No incoming '#{media_type}' received on stream after #{seconds} seconds"
       else if stats.bytes_sent is 0
-        @logger.warn "No outgoing '#{media_type}' sent after #{seconds} seconds"
+        @logger.warn "No outgoing '#{media_type}' sent on stream after #{seconds} seconds"
       else
         @logger.debug "Stream has '#{media_type}' flowing properly both ways"
     else
       if @is_answer
-        @logger.info "Check '#{media_type}' statistics delayed as we created this flow"
+        @logger.info "Check '#{media_type}' statistics on stream delayed as we created this flow"
       else
         window.setTimeout =>
-          @check_stream media_type, timeout, attempt++
-        , timeout
+          @check_stream media_type, attempt++
+        , FLOW_TELEMETRY_CONFIG.MEDIA_CHECK_TIMEOUT
 
   ###
   Schedule check of stream activity.
-  @param timeout [Number] Milliseconds from now to execute the check
+  @param media_type [z.media.MediaType] Type of checks to schedule
   ###
-  schedule_check: (timeout) ->
+  schedule_check: (media_type) ->
     window.setTimeout =>
-      @check_stream z.media.MediaType.AUDIO, timeout
-      @check_stream z.media.MediaType.VIDEO, timeout if @call_et.local_media_type() in [z.media.MediaType.SCREEN, z.media.MediaType.VIDEO]
-    , timeout
+      @check_stream z.media.MediaType.AUDIO
+      @check_stream z.media.MediaType.VIDEO if media_type is z.media.MediaType.VIDEO
+    , FLOW_TELEMETRY_CONFIG.MEDIA_CHECK_TIMEOUT
 
   ###
   Set the PeerConnection on the telemetry.

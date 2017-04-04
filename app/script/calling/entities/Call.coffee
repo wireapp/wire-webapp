@@ -263,6 +263,9 @@ class z.calling.entities.Call
 
     @logger.debug "Participants updated: '#{participant_et.user.name()}' removed"
     if not @get_number_of_participants()
+      @termination_reason = z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
+      @self_user_joined false
+      @self_client_joined false
       amplify.publish z.event.WebApp.CALL.STATE.DELETE, @id
     return true
 

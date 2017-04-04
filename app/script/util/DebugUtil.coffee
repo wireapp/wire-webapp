@@ -118,6 +118,17 @@ class z.util.DebugUtil
         identity: items[1]
         session: items[2]
 
+  get_v2_call_participants: (conversation_id = wire.app.repository.conversation.active_conversation().id) =>
+    wire.app.service.call.get_state conversation_id
+    .then (response) =>
+      participants = []
+      for id, participant of response.participants when participant.state is z.calling.enum.ParticipantState.JOINED
+        participants.push wire.app.repository.user.get_user_by_id id
+
+      @logger.debug "Call in '#{conversation_id}' has '#{participants.length}' joined participant/s", participants
+      for participant in participants
+        @logger.log "User '#{participant.name()}' with ID '#{participant.id}' is joined"
+
   log_connection_status: ->
     @logger.log 'Online Status'
     @logger.log "-- Browser online: #{window.navigator.onLine}"

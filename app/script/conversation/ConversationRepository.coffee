@@ -391,7 +391,7 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] Next conversation
   ###
   get_next_conversation: (conversation_et) ->
-    return z.util.ArrayUtil.get_next_item @conversations_unarchived(), conversation_et
+    return z.util.ArrayUtil.get_next_item(@conversations_unarchived(), conversation_et) or @conversations_unarchived()[0]
 
   ###
   Get unarchived conversation with the most recent event.
@@ -1978,17 +1978,14 @@ class z.conversation.ConversationRepository
     @_add_event_to_conversation event_json, conversation_et
     .then (message_et) =>
       for user_et in message_et.user_ets()
-        if conversation_et.call()
-          if user_et.is_me
-            amplify.publish z.event.WebApp.CALL.STATE.DELETE, conversation_et.id
-          else
-            amplify.publish z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, conversation_et.id, user_et.id
-        conversation_et.participating_user_ids.remove user_et.id
-        continue if not user_et.is_me
-
-        conversation_et.status z.conversation.ConversationStatus.PAST_MEMBER
-        if conversation_et.call()
-          amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.REMOVED_MEMBER
+        if user_et.is_me
+          conversation_et.status z.conversation.ConversationStatus.PAST_MEMBER
+          if conversation_et.call()
+            amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
+        else
+          conversation_et.participating_user_ids.remove user_et.id
+          if conversation_et.call()
+            amplify.publish z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, conversation_et.id, user_et.id
 
       @update_participating_user_ets conversation_et, =>
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
