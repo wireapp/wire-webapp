@@ -179,16 +179,12 @@ class z.calling.handler.CallStateHandler
       @logger.error error_description
       return Promise.reject new Error error_description
 
-    @logger.info "GETting call state for '#{conversation_id}'"
     @v2_call_center.call_service.get_state conversation_id
     .catch (error) =>
       @logger.error "GETting call state for '#{conversation_id}' failed: #{error.message}", error
       attributes = {cause: error.label or error.name, method: 'get', request: 'state'}
       @v2_call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
       throw error
-    .then (response) =>
-      @logger.debug "GETting call state for '#{conversation_id}' successful", response
-      return response
 
   ###
   Put the clients call state for a conversation.
