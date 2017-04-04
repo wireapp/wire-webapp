@@ -40,8 +40,8 @@
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
     "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
-    "lint": "eslint -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/unit_tests/**/*.js test/api/OpenGraphMocks.js",
-    "lint-fix": "eslint --fix -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/unit_tests/**/*.js test/api/OpenGraphMocks.js",
+    "lint": "eslint -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/unit_tests/**/*.js test/api/OpenGraphMocks.js test/api/environment.js",
+    "lint-fix": "eslint --fix -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/unit_tests/**/*.js test/api/OpenGraphMocks.js test/api/environment.js",
     "postinstall": "grunt init",
     "start": "grunt",
     "test": "yarn run lint && grunt check && grunt test"
