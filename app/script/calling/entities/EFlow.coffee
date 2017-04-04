@@ -81,7 +81,7 @@ class z.calling.entities.EFlow
     @connection_state.subscribe (ice_connection_state) =>
       switch ice_connection_state
         when z.calling.rtc.ICEConnectionState.CHECKING
-          @telemetry.schedule_check 5000
+          @telemetry.schedule_check @e_call_et.telemetry.media_type
 
         when z.calling.rtc.ICEConnectionState.COMPLETED, z.calling.rtc.ICEConnectionState.CONNECTED
           @telemetry.start_statistics()

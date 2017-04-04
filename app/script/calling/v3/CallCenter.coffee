@@ -416,7 +416,7 @@ class z.calling.v3.CallCenter
     .then (e_call) =>
       e_call_et = e_call
       @logger.debug "Joining e-call in conversation '#{conversation_id}'", e_call_et
-      e_call_et.start_timings()
+      e_call_et.initiate_telemetry video_send
       if not @media_stream_handler.local_media_stream()
         @media_stream_handler.initiate_media_stream conversation_id, video_send
     .then =>
@@ -574,7 +574,8 @@ class z.calling.v3.CallCenter
       media_type = @_get_media_type_from_properties e_call_message_et.props
       @logger.debug "Outgoing '#{media_type}' e-call in conversation '#{e_call_et.conversation_et.display_name()}'", e_call_et
       e_call_et.state z.calling.enum.CallState.OUTGOING
-      @telemetry.track_event z.tracking.EventName.CALLING.INITIATED_CALL, e_call_et, undefined, media_type is z.media.MediaType.VIDEO
+      @telemetry.set_media_type media_type is z.media.MediaType.VIDEO
+      @telemetry.track_event z.tracking.EventName.CALLING.INITIATED_CALL, e_call_et
       return e_call_et
 
 

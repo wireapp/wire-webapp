@@ -81,7 +81,7 @@ class z.calling.entities.Flow
     @pc_initialized = ko.observable false
     @pc_initialized.subscribe (is_initialized) =>
       @telemetry.set_peer_connection @peer_connection
-      @telemetry.schedule_check 5000 if is_initialized
+      @telemetry.schedule_check @call_et.telemetry.media_type if is_initialized
 
     @media_stream = @call_et.local_media_stream
 

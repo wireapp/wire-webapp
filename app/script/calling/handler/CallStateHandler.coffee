@@ -551,7 +551,7 @@ class z.calling.handler.CallStateHandler
         call_et.update_participants participant_ets
         call_et.update_remote_state event.participants
         call_et.state z.calling.enum.CallState.INCOMING
-        @v2_call_center.telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, call_et
+        call_et.telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, call_et
         @logger.debug "Incoming '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}'", call_et
         if call_et.is_remote_video_send()
           @v2_call_center.media_stream_handler.initiate_media_stream call_et.id, true
@@ -593,7 +593,8 @@ class z.calling.handler.CallStateHandler
       call_et.self_user_joined true
       call_et.set_creator @v2_call_center.user_repository.self()
       @logger.debug "Outgoing '#{@v2_call_center.media_stream_handler.local_media_type()}' call to '#{call_et.conversation_et.display_name()}'", call_et
-      @v2_call_center.telemetry.track_event z.tracking.EventName.CALLING.INITIATED_CALL, call_et, undefined, @self_state.video_send()
+      call_et.telemetry.set_media_type @self_state.video_send()
+      call_et.telemetry.track_event z.tracking.EventName.CALLING.INITIATED_CALL, call_et
       return call_et
 
 
