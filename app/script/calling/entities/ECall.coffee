@@ -312,7 +312,8 @@ class z.calling.entities.ECall
   get_flow_telemetry: =>
     return (e_participant_et.e_flow_et.get_telemetry() for e_participant_et in @participants() when e_participant_et.e_flow_et)
 
-  start_timings: =>
+  initiate_telemetry: (video_send = false) =>
+    @telemetry.set_media_type video_send
     @timings = new z.telemetry.calling.CallSetupTimings @id
 
   ###
