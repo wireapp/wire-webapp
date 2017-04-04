@@ -11,12 +11,20 @@ globals:
   _: true
   $: true
   amplify: true
+  asset_service: true
+  client_service: true
+  conversation_service: true
+  entities: true
   ko: true
   LRUCache: true
   moment: true
+  notification_service: true
   pako: true
   Raygun: true
+  search_service: true
   twttr: true
+  user_service: true
+  web_socket_service: true
   wire: true
   z: true
 
