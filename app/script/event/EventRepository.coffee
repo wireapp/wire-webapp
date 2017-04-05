@@ -409,28 +409,20 @@ class z.event.EventRepository
   @return [String] ID of the handled notification
   ###
   _handle_notification: (notification) =>
-    return new Promise (resolve, reject) =>
-      events = notification.payload
-      source = switch @notification_handling_state()
-        when z.event.NotificationHandlingState.WEB_SOCKET
-          @NOTIFICATION_SOURCE.WEB_SOCKET
-        else
-          @NOTIFICATION_SOURCE.STREAM
+    {id, payload, transient} = notification
+    source = if transient? then @NOTIFICATION_SOURCE.WEB_SOCKET else @NOTIFICATION_SOURCE.STREAM
 
-      @logger.info "Handling notification '#{notification.id}' from '#{source}' containing '#{events.length}' events", notification
-
-      if events.length is 0
-        @logger.warn 'Notification payload does not contain any events'
+    Promise.resolve().then =>
+      if events.length > 0
+        @logger.info "Handling notification '#{id}' from '#{source}' containing '#{events.length}' events", notification
+        return Promise.all (@_handle_event event for event in events)
+      @logger.warn 'Notification payload does not contain any events'
+    .then =>
+      if not transient? or transient is 'false'
         @_update_last_notification_id notification.id
-        resolve @last_notification_id()
-      else
-        Promise.all (@_handle_event event for event in events)
-        .then =>
-          @_update_last_notification_id notification.id
-          resolve @last_notification_id()
-        .catch (error) =>
-          @logger.error "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
-          reject error
+    .catch (error) =>
+      @logger.error "Failed to handle notification '#{id}' from '#{source}': #{error.message}", error
+      throw error
 
   ###
   Report decryption error to Localytics and stack traces to Raygun.
