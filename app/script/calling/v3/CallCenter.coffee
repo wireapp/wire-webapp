@@ -301,17 +301,24 @@ class z.calling.v3.CallCenter
   @param additional_payload [Object] Optional additional payload to be added
   @return [Object] E-call message props object
   ###
-  _create_payload_prop_sync: (payload_type, additional_payload) ->
+  _create_payload_prop_sync: (payload_type, invert = false, additional_payload) ->
     if _.isBoolean payload_type
       payload = props: videosend: "#{payload_type}"
     else
       switch payload_type
         when z.media.MediaType.AUDIO
-          payload = props: audiosend: "#{@self_state.audio_send()}"
-        when z.media.MediaType.SCREEN, z.media.MediaType.VIDEO
+          send_state = if invert then not @self_state.audio_send() else @self_state.audio_send()
+          payload = props: audiosend: "#{send_state}"
+        when z.media.MediaType.SCREEN
+          send_state = if invert then not @self_state.screen_send() else @self_state.screen_send()
+          payload = props:
+            screensend: "#send_state}"
+            videosend: "#{@self_state.video_send()}"
+        when z.media.MediaType.VIDEO
+          send_state = if invert then not @self_state.video_send() else @self_state.video_send()
           payload = props:
             screensend: "#{@self_state.screen_send()}"
-            videosend: "#{@self_state.video_send()}"
+            videosend: "#{send_state}"
 
     if additional_payload
       payload = $.extend payload, additional_payload
@@ -325,7 +332,7 @@ class z.calling.v3.CallCenter
       when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
         e_call_message_et = z.calling.mapper.ECallMessageMapper.build_hangup true, e_call_et.session_id, additional_payload
       when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
-        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync true, e_call_et.session_id, @_create_payload_prop_sync(z.media.MediaType.VIDEO, additional_payload)
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync true, e_call_et.session_id, @_create_payload_prop_sync(z.media.MediaType.VIDEO, false, additional_payload)
 
     @send_e_call_event e_call_et.conversation_et, e_call_message_et
 
@@ -410,7 +417,7 @@ class z.calling.v3.CallCenter
     .catch (error) =>
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
-      @_create_outgoing_e_call z.calling.mapper.ECallMessageMapper.build_prop_sync false, undefined, @_create_payload_prop_sync(video_send, conversation_id: conversation_id)
+      @_create_outgoing_e_call z.calling.mapper.ECallMessageMapper.build_prop_sync false, undefined, @_create_payload_prop_sync(video_send, false, conversation_id: conversation_id)
     .then (e_call) =>
       e_call_et = e_call
       @logger.debug "Joining e-call in conversation '#{conversation_id}'", e_call_et
@@ -511,7 +518,7 @@ class z.calling.v3.CallCenter
 
       for e_flow_et in e_call_et.get_flows()
         additional_payload = @_create_additional_payload conversation_id, e_flow_et.remote_user_id, e_flow_et.remote_client_id
-        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync false, e_call_et.session_id, @_create_payload_prop_sync(media_type, additional_payload)
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync false, e_call_et.session_id, @_create_payload_prop_sync(media_type, true, additional_payload)
         send_promises.push @send_e_call_event e_call_et.conversation_et, e_call_message_et
 
       return Promise.all send_promises
