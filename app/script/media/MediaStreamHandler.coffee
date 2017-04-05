@@ -282,7 +282,7 @@ class z.media.MediaStreamHandler
           @_clear_permission_request_hint media_type
           resolve new z.media.MediaStreamInfo z.media.MediaStreamSource.LOCAL, 'self', media_stream
         .catch (error) =>
-          @logger.warn "MediaStream request failed: #{error.name} - #{error.message}"
+          @logger.warn "MediaStream request failed: #{error.name} #{error.message}"
           @_clear_permission_request_hint media_type
           if error.name in z.calling.rtc.MediaStreamErrorTypes.DEVICE
             error = new z.media.MediaError z.media.MediaError::TYPE.MEDIA_STREAM_DEVICE
@@ -395,7 +395,7 @@ class z.media.MediaStreamHandler
       amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NOT_FOUND_MICROPHONE
     else if media_type is z.media.MediaType.VIDEO
       amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NOT_FOUND_CAMERA
-    amplify.publish z.event.WebApp.CALL.STATE.IGNORE, conversation_id if conversation_id
+    amplify.publish z.event.WebApp.CALL.STATE.REJECT, conversation_id if conversation_id
 
   ###
   Show permission denied hint banner.

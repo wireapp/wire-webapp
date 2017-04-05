@@ -33,5 +33,6 @@ z.calling.rtc.MediaStreamError =
   PERMISSION_DENIED_ERROR: 'PermissionDeniedError'
   PERMISSION_DISMISSED_ERROR: 'PermissionDismissedError'
   SECURITY_ERROR: 'SecurityError'
+  TRACK_START_ERROR: 'TrackStartError'
   TYPE_ERROR: 'TypeError'
   SOURCE_UNAVAILABLE_ERROR: 'SourceUnavailableError'

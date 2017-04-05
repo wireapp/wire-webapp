@@ -40,10 +40,10 @@ z.event.WebApp =
     STATE:
       CHECK: 'wire.webapp.call.state.check'
       DELETE: 'wire.webapp.call.state.delete'
-      IGNORE: 'wire.webapp.call.state.ignore'
       JOIN: 'wire.webapp.call.state.join'
       LEAVE: 'wire.webapp.call.state.leave'
-      REMOVE_PARTICIPANT: 'wire.webapp.call.state.remove-participant'
+      PARTICIPANT_LEFT: 'wire.webapp.call.state.participant-left'
+      REJECT: 'wire.webapp.call.state.reject'
       TOGGLE: 'wire.webapp.call.state.toggle'
     MEDIA:
       ADD_STREAM: 'wire.webapp.call.media.add_stream'
@@ -73,7 +73,8 @@ z.event.WebApp =
     EVENT_FROM_BACKEND: 'wire.webapp.conversation.event-from-backend'
     EPHEMERAL_MESSAGE_TIMEOUT: 'wire.webapp.conversation.ephemeral-message-timeout'
     LOADED_STATES: 'wire.webapp.conversation.loaded-states'
-    MAP_CONNECTIONS: 'wire.webapp.conversation.map-connections'
+    MAP_CONNECTION: 'wire.webapp.conversation.map-connection'
+    MISSED_EVENTS: 'wire.webapp.conversation.missed-events'
     PEOPLE:
       HIDE: 'wire.webapp.conversation.people.hide'
     PERSIST_STATE: 'wire.webapp.conversation.persist-state'
@@ -178,8 +179,8 @@ z.event.WebApp =
   SHORTCUT:
     ADD_PEOPLE: 'wire.webapp.shortcut.add-people'
     ARCHIVE: 'wire.webapp.shortcut.archive'
-    CALL_IGNORE: 'wire.webapp.shortcut.call-ignore'
     CALL_MUTE: 'wire.webapp.shortcut.call-mute'
+    CALL_REJECT: 'wire.webapp.shortcut.call-reject'
     NEXT: 'wire.webapp.shortcut.next'
     PEOPLE: 'wire.webapp.shortcut.people'
     PICTURE: 'wire.webapp.shortcut.picture'

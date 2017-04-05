@@ -117,7 +117,7 @@ z.util.Environment = do ->
     is_localhost: ->
       return window.location.hostname in [APP_ENV.LOCALHOST, APP_ENV.VIRTUAL_HOST]
     is_production: ->
-      return window.location.hostname in [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT, APP_ENV.TACO]
+      return window.location.hostname in [APP_ENV.PRODUCTION, APP_ENV.PROD_NEXT]
 
   browser:
     name: platform.name

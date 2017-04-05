@@ -1,6 +1,6 @@
 #
 # Wire
-# Copyright (C) 2016 Wire Swiss GmbH
+# Copyright (C) 2017 Wire Swiss GmbH
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,27 +17,13 @@
 #
 
 window.z ?= {}
-z.ephemeral ?= {}
+z.calling ?= {}
+z.calling.rtc ?= {}
 
-z.ephemeral.timings = do ->
-
-  # timings in milliseconds
-  timings = [
-    1000 * 5
-    1000 * 15
-    1000 * 30
-    1000 * 60
-    1000 * 60 * 5
-    1000 * 60 * 60 * 24
-  ]
-
-  get_values = ->
-    return timings
-
-  map_to_closest_timing = (milliseconds) ->
-    return z.util.ArrayUtil.find_closest timings, milliseconds
-
-  return {
-    get_values: get_values
-    map_to_closest_timing: map_to_closest_timing
-  }
+# https://w3c.github.io/webrtc-pc/#dom-rtcdatachannelstate
+# https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/readyState
+z.calling.rtc.DataChannelState =
+  CLOSED: 'closed'
+  CLOSING: 'closing'
+  CONNECTING: 'connecting'
+  OPEN: 'open'

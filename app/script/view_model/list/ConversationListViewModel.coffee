@@ -34,6 +34,7 @@ class z.ViewModel.list.ConversationListViewModel
     @logger = new z.util.Logger 'z.ViewModel.list.ConversationListViewModel', z.config.LOGGER.OPTIONS
 
     @joined_call = @calling_repository.joined_call
+    @show_calls = ko.observable false
 
     @content_state = @content_view_model.content_state
     @selected_conversation = ko.observable()
@@ -105,7 +106,12 @@ class z.ViewModel.list.ConversationListViewModel
     return if @is_selected_conversation conversation_et
     @content_view_model.show_conversation conversation_et
 
+  set_show_calls_state: (handling_notifications) =>
+    @show_calls handling_notifications is z.event.NotificationHandlingState.WEB_SOCKET
+    @logger.info "Set show calls state to: #{@show_calls()}"
+
   _init_subscriptions: =>
+    amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_show_calls_state
     amplify.subscribe z.event.WebApp.LIFECYCLE.LOADED, @on_webapp_loaded
     amplify.subscribe z.event.WebApp.SEARCH.BADGE.SHOW, => @show_badge true
     amplify.subscribe z.event.WebApp.SEARCH.BADGE.HIDE, => @show_badge false
@@ -152,8 +158,8 @@ class z.ViewModel.list.ConversationListViewModel
     termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER if @joined_call()?.state() isnt z.calling.enum.CallState.OUTGOING
     amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, termination_reason
 
-  on_ignore_call: (conversation_et) ->
-    amplify.publish z.event.WebApp.CALL.STATE.IGNORE, conversation_et.id
+  on_reject_call: (conversation_et) ->
+    amplify.publish z.event.WebApp.CALL.STATE.REJECT, conversation_et.id
 
   on_toggle_audio: (conversation_et) ->
     amplify.publish z.event.WebApp.CALL.MEDIA.TOGGLE, conversation_et.id, z.media.MediaType.AUDIO

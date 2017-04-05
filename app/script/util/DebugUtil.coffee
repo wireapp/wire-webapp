@@ -23,14 +23,8 @@ class z.util.DebugUtil
   constructor: (@user_repository, @conversation_repository) ->
     @logger = new z.util.Logger 'z.util.DebugUtil', z.config.LOGGER.OPTIONS
 
-  _get_conversation_by_id: (conversation_id) ->
-    return new Promise (resolve) =>
-      @conversation_repository.get_conversation_by_id conversation_id, (conversation_et) ->
-        resolve conversation_et
-
   _get_user_by_id: (user_id) ->
-    return new Promise (resolve) =>
-      @user_repository.get_user_by_id user_id, (user_et) -> resolve user_et
+    return new Promise (resolve) => @user_repository.get_user_by_id user_id, (user_et) -> resolve user_et
 
   block_all_connections: ->
     block_users = []
@@ -54,7 +48,7 @@ class z.util.DebugUtil
     .then (session_id) =>
       @logger.log "Corrupted Session ID '#{session_id}'"
 
-  get_number_of_clients_in_conversation: ->
+  get_number_of_clients_in_conversation: =>
     user_ets = @conversation_repository.active_conversation().participating_user_ets()
 
     other_clients = user_ets
@@ -65,56 +59,75 @@ class z.util.DebugUtil
 
     return other_clients + my_clients
 
-  get_event_info: (event) ->
+  get_event_info: (event) =>
     debug_information =
       event: event
 
-    return new Promise (resolve) =>
-      @_get_conversation_by_id event.conversation
-      .then (conversation_et) =>
-        debug_information.conversation = conversation_et
-        return @_get_user_by_id event.from
-      .then (user_et) =>
-        debug_information.user = user_et
-        log_message = "Hey #{@user_repository.self().name()}, this is for you:"
-        @logger.warn log_message, debug_information
-        @logger.warn "Conversation: #{debug_information.conversation.name()}", debug_information.conversation
-        @logger.warn "From: #{debug_information.user.name()}", debug_information.user
-        resolve debug_information
+    @conversation_repository.get_conversation_by_id_async event.conversation
+    .then (conversation_et) =>
+      debug_information.conversation = conversation_et
+      return @_get_user_by_id event.from
+    .then (user_et) =>
+      debug_information.user = user_et
+      log_message = "Hey #{@user_repository.self().name()}, this is for you:"
+      @logger.warn log_message, debug_information
+      @logger.warn "Conversation: #{debug_information.conversation.name()}", debug_information.conversation
+      @logger.warn "From: #{debug_information.user.name()}", debug_information.user
+      return debug_information
 
   get_serialised_session: (session_id) ->
-    return wire.app.repository.storage.storage_service.load 'sessions', session_id
-      .then (record) ->
-        base64_encoded_payload = z.util.array_to_base64 record.serialised
-        record.serialised = base64_encoded_payload
-        return record
-
-  get_serialised_identity: ->
-    return wire.app.repository.storage.storage_service.load 'keys', 'local_identity'
+    wire.app.repository.storage.storage_service.load 'sessions', session_id
     .then (record) ->
       base64_encoded_payload = z.util.array_to_base64 record.serialised
       record.serialised = base64_encoded_payload
       return record
 
-  get_event_from_notification_stream: (event_id) ->
-    client_id = wire.app.repository.client.current_client().id
-    return wire.app.service.notification.get_notifications(client_id, undefined, 10000)
-    .then (response) ->
-      events = response.notifications.filter (item) ->
-        return item.id is event_id
-      return events[0]
+  get_serialised_identity: ->
+    wire.app.repository.storage.storage_service.load 'keys', 'local_identity'
+    .then (record) ->
+      base64_encoded_payload = z.util.array_to_base64 record.serialised
+      record.serialised = base64_encoded_payload
+      return record
 
-  get_objects_for_decryption_errors: (session_id, event_id) ->
+  get_notification_from_stream: (notification_id, notification_id_since) =>
+    client_id = wire.app.repository.client.current_client().id
+
+    _got_notifications = (response) =>
+      events = response.notifications.filter (item) ->
+        return item.id is notification_id
+      return events[0] if events.length
+
+      if response.has_more
+        last_notification = response.notifications[response.notifications.length - 1]
+        @get_notification_from_stream notification_id, last_notification.id
+      else
+        @logger.log "Notification '#{notification_id}' was not found in encrypted notification stream"
+
+    wire.app.service.notification.get_notifications(client_id, notification_id_since, 10000)
+    .then _got_notifications
+
+  get_objects_for_decryption_errors: (session_id, notification_id) ->
     return Promise.all([
-      @get_event_from_notification_stream event_id
+      @get_notification_from_stream notification_id
       @get_serialised_identity()
       @get_serialised_session session_id
     ])
     .then (items) ->
       return JSON.stringify
-        event: items[0]
+        notification: items[0]
         identity: items[1]
         session: items[2]
+
+  get_v2_call_participants: (conversation_id = wire.app.repository.conversation.active_conversation().id) =>
+    wire.app.service.call.get_state conversation_id
+    .then (response) =>
+      participants = []
+      for id, participant of response.participants when participant.state is z.calling.enum.ParticipantState.JOINED
+        participants.push wire.app.repository.user.get_user_by_id id
+
+      @logger.debug "Call in '#{conversation_id}' has '#{participants.length}' joined participant/s", participants
+      for participant in participants
+        @logger.log "User '#{participant.name()}' with ID '#{participant.id}' is joined"
 
   log_connection_status: ->
     @logger.log 'Online Status'

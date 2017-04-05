@@ -80,10 +80,10 @@ class z.calling.CallingRepository
   subscribe_to_events: =>
     amplify.subscribe z.event.WebApp.CALL.MEDIA.TOGGLE, => @switch_call_center z.calling.enum.CALL_ACTION.TOGGLE_MEDIA, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.DELETE, => @switch_call_center z.calling.enum.CALL_ACTION.DELETE, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.IGNORE, => @switch_call_center z.calling.enum.CALL_ACTION.IGNORE, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.JOIN, @join_call
     amplify.subscribe z.event.WebApp.CALL.STATE.LEAVE, => @switch_call_center z.calling.enum.CALL_ACTION.LEAVE, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, => @switch_call_center z.calling.enum.CALL_ACTION.REMOVE_PARTICIPANT, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.REJECT, => @switch_call_center z.calling.enum.CALL_ACTION.REJECT, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, => @switch_call_center z.calling.enum.CALL_ACTION.PARTICIPANT_LEFT, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE, @toggle_state
     amplify.subscribe z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, @store_flow_status
     amplify.subscribe z.event.WebApp.LOADED, @initiate_config
@@ -104,13 +104,13 @@ class z.calling.CallingRepository
         return z.calling.enum.PROTOCOL.VERSION_3
 
   outgoing_protocol_version: (conversation_id) =>
-    conversation_et = @conversation_repository.get_conversation_by_id conversation_id
+    @conversation_repository.get_conversation_by_id_async conversation_id
+    .then (conversation_et) =>
+      protocol_version = if conversation_et.is_group() then z.calling.enum.PROTOCOL.VERSION_2 else z.calling.enum.PROTOCOL.VERSION_3
 
-    protocol_version = if conversation_et?.is_group() then z.calling.enum.PROTOCOL.VERSION_2 else z.calling.enum.PROTOCOL.VERSION_3
-
-    @logger.log "Selected outgoing call protocol version: #{protocol_version}",
-      {conversation_type: conversation_et?.type(), backend_protocol_group: @protocol_version_group(), use_v3_api: @use_v3_api}
-    return protocol_version
+      @logger.log "Selected outgoing call protocol version: #{protocol_version}",
+        {conversation_type: conversation_et?.type(), backend_protocol_group: @protocol_version_group(), use_v3_api: @use_v3_api}
+      return protocol_version
 
   # Initiate calling config update.
   initiate_config: =>
@@ -189,7 +189,7 @@ class z.calling.CallingRepository
             amplify.publish z.event.WebApp.CALL.STATE.LEAVE, ongoing_call_id, z.calling.enum.TERMINATION_REASON.CONCURRENT_CALL
             window.setTimeout resolve, 1000
           close: ->
-            amplify.publish z.event.WebApp.CALL.STATE.IGNORE, new_call_id if call_state is z.calling.enum.CallState.INCOMING
+            amplify.publish z.event.WebApp.CALL.STATE.REJECT, new_call_id if call_state is z.calling.enum.CallState.INCOMING
           data: call_state
         @logger.warn "You cannot join a second call while calling in conversation '#{ongoing_call_id}'."
       else

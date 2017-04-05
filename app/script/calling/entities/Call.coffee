@@ -131,12 +131,12 @@ class z.calling.entities.Call
           @_on_state_incoming()
         when z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ENDED
           @_on_state_disconnecting()
-        when z.calling.enum.CallState.IGNORED
-          @_on_state_ignored()
         when z.calling.enum.CallState.ONGOING
           @_on_state_ongoing()
         when z.calling.enum.CallState.OUTGOING
           @_on_state_outgoing()
+        when z.calling.enum.CallState.REJECTED
+          @_on_state_rejected()
 
       @previous_state = state
 
@@ -163,10 +163,6 @@ class z.calling.entities.Call
     @_play_call_sound true
     @_group_call_timeout true if @is_group()
 
-  _on_state_ignored: =>
-    if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
-      @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
-
   _on_state_ongoing: =>
     if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
       @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
@@ -174,6 +170,10 @@ class z.calling.entities.Call
   _on_state_outgoing: =>
     @_play_call_sound false
     @_group_call_timeout false if @is_group()
+
+  _on_state_rejected: =>
+    if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
+      @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
 
   _clear_join_timer: =>
     window.clearTimeout @is_declined_timer
@@ -221,9 +221,9 @@ class z.calling.entities.Call
 
     @remote_media_type z.media.MediaType.AUDIO if not media_type_updated
 
-  # Ignore a call.
-  ignore: =>
-    @state z.calling.enum.CallState.IGNORED
+  # Reject a call.
+  reject: =>
+    @state z.calling.enum.CallState.REJECTED
     @is_declined true
 
 
@@ -263,6 +263,9 @@ class z.calling.entities.Call
 
     @logger.debug "Participants updated: '#{participant_et.user.name()}' removed"
     if not @get_number_of_participants()
+      @termination_reason = z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
+      @self_user_joined false
+      @self_client_joined false
       amplify.publish z.event.WebApp.CALL.STATE.DELETE, @id
     return true
 

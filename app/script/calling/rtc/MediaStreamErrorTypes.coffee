@@ -33,6 +33,7 @@ z.calling.rtc.MediaStreamErrorTypes =
     z.calling.rtc.MediaStreamError.INVALID_STATE_ERROR
     z.calling.rtc.MediaStreamError.SOURCE_UNAVAILABLE_ERROR
     z.calling.rtc.MediaStreamError.OVER_CONSTRAINED_ERROR
+    z.calling.rtc.MediaStreamError.TRACK_START_ERROR
     z.calling.rtc.MediaStreamError.TYPE_ERROR
   ]
   PERMISSION: [
