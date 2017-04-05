@@ -554,7 +554,7 @@ class z.calling.entities.EFlow
 
   _create_additional_payload: ->
     payload = @v3_call_center._create_additional_payload @e_call_et.id, @remote_user_id, @remote_client_id
-    return @v3_call_center._create_payload_prop_sync @e_call_et.self_state.video_send(), $.extend({remote_user: @remote_user, sdp: @local_sdp().sdp}, payload)
+    return @v3_call_center._create_payload_prop_sync @e_call_et.self_state.video_send(), false, $.extend({remote_user: @remote_user, sdp: @local_sdp().sdp}, payload)
 
   ###
   Sets the local Session Description Protocol on the PeerConnection.
