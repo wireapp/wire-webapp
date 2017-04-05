@@ -21,6 +21,8 @@ z.telemetry ?= {}
 z.telemetry.calling ?= {}
 
 FLOW_TELEMETRY_CONFIG =
+  STATS_CHECK_INTERVAL: 2000
+  STATS_CHECK_TIMEOUT: 50
   MEDIA_CHECK_TIMEOUT: 5000
 
 # Flow telemetry entity.
@@ -198,11 +200,11 @@ class z.telemetry.calling.FlowTelemetry
       @_update_statistics()
       .then => @logger.info 'Network stats updated for the first time', @statistics
       .catch (error) => @logger.warn "Failed to update flow networks stats: #{error.message}"
-    , 50
+    , FLOW_TELEMETRY_CONFIG.STATS_CHECK_TIMEOUT
     @stats_poller = window.setInterval =>
       @_update_statistics()
       .catch (error) => @logger.warn "Networks stats not updated: #{error.message}"
-    , 2000
+    , FLOW_TELEMETRY_CONFIG.STATS_CHECK_INTERVAL
 
   ###
   Get current statistics from PeerConnection.
