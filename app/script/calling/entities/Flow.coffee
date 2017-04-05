@@ -807,11 +807,6 @@ class z.calling.entities.Flow
     @_clear_send_sdp_timeout()
     @logger.info "Resetting flow '#{@id}'"
     @telemetry.reset_statistics()
-    .then (statistics) =>
-      @logger.info 'Flow network stats updated for the last time', statistics
-      amplify.publish z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, @telemetry.create_report()
-    .catch (error) =>
-      @logger.warn "Failed to reset flow networks stats: #{error.message}"
     try
       if @peer_connection?.signalingState isnt z.calling.rtc.SignalingState.CLOSED
         @_close_peer_connection()
