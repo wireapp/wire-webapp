@@ -138,8 +138,8 @@
     <!-- ko if: !message.other_likes().length && message.is_reactable() -->
       <div class="message-body-like">
         <span class="message-body-like-icon like-button message-show-on-hover" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: $parent.click_on_like">
-          <span class="icon-like"></span>
-          <span class="icon-liked"></span>
+          <span class="icon-like-small"></span>
+          <span class="icon-liked-small"></span>
         </span>
       </div>
     <!-- /ko -->
@@ -167,8 +167,8 @@
     <div class="message-footer">
       <div class="message-footer-icon">
         <span class="like-button" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: $parent.click_on_like">
-          <span class="icon-like"></span>
-          <span class="icon-liked"></span>
+          <span class="icon-like-small"></span>
+          <span class="icon-liked-small"></span>
         </span>
       </div>
       <div class="message-footer-label cursor-pointer" data-bind="click: function() {$data.show_likes(true)}">
@@ -332,6 +332,15 @@
       </div>
       <!-- /ko -->
     </div>
+  </div>
+</script>
+
+<script type="text/html" id="missed">
+  <div class="message-header">
+    <div class="message-header-icon">
+      <span class="icon-sysmsg-error text-red"></span>
+    </div>
+    <div class="message-header-label" data-bind="l10n_text: z.string.conversation_missed_messages"></div>
   </div>
 </script>
 

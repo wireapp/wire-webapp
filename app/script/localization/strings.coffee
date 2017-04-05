@@ -259,6 +259,7 @@ z.string.conversation_unable_to_decrypt_2 = '%@name´s device identity changed. 
 z.string.conversation_unable_to_decrypt_link = 'Why?'
 z.string.conversation_unable_to_decrypt_error_message = 'Error'
 z.string.conversation_unable_to_decrypt_reset_session = 'Reset session'
+z.string.conversation_missed_messages = 'You haven’t used this device for a while. Some messages may not appear here.'
 z.string.conversation_asset_uploading = 'Uploading…'
 z.string.conversation_asset_downloading = 'Downloading…'
 z.string.conversation_asset_upload_failed = 'Upload Failed'

@@ -69,16 +69,16 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       conversation_c.self = user_self
       conversation_c.verification_state z.conversation.ConversationVerificationState.VERIFIED
 
-      conversation_repository.conversations []
-      conversation_repository.save_conversation conversation_ab
-      conversation_repository.save_conversation conversation_b
-      conversation_repository.save_conversation conversation_c
-
-      done()
-    .catch(done.fail)
+      conversation_repository.conversations.removeAll()
+      Promise.all [
+        conversation_repository.save_conversation conversation_ab
+        conversation_repository.save_conversation conversation_b
+        conversation_repository.save_conversation conversation_c
+      ]
+    .then done
+    .catch done.fail
 
   describe 'on_client_add', ->
-
     it 'should change state to DEGRADED if new unverified client was added', ->
       spyOn z.conversation.EventBuilder, 'build_degraded'
 
@@ -105,7 +105,6 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       expect(z.conversation.EventBuilder.build_all_verified).not.toHaveBeenCalled()
 
   describe 'on_client_removed', ->
-
     it 'should change state from DEGRADED to VERIFIED if last unverified client was removed', ->
       spyOn z.conversation.EventBuilder, 'build_degraded'
       spyOn z.conversation.EventBuilder, 'build_all_verified'
@@ -128,7 +127,6 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       expect(z.conversation.EventBuilder.build_all_verified.calls.count()).toEqual 3
 
   describe 'on_clients_updated', ->
-
     it 'should change state from DEGRADED to VERIFIED if last unverified client was removed by other user', ->
       spyOn z.conversation.EventBuilder, 'build_degraded'
       spyOn z.conversation.EventBuilder, 'build_all_verified'
@@ -151,7 +149,6 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       expect(z.conversation.EventBuilder.build_all_verified.calls.count()).toEqual 3
 
   describe 'on_member_joined', ->
-
     it 'should change state to DEGRADED if new user with unverified client was added to conversation', ->
       spyOn z.conversation.EventBuilder, 'build_degraded'
 
@@ -187,7 +184,6 @@ describe 'z.conversation.ConversationVerificationStateHandler', ->
       expect(z.conversation.EventBuilder.build_degraded).not.toHaveBeenCalled()
 
   describe 'on_client_verification_changed', ->
-
     it 'should change state to DEGRADED if user unverified client', ->
       client_a.meta.is_verified false
 

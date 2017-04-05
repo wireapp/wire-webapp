@@ -65,7 +65,6 @@ describe 'z.conversation.ConversationRepository', ->
 
       conversation_et = _generate_conversation z.conversation.ConversationType.SELF
       conversation_et.id = payload.conversations.knock.post.conversation
-      conversation_repository.save_conversation conversation_et
 
       ping_url = "#{test_factory.settings.connection.rest_url}/conversations/#{conversation_et.id}/knock"
       server.respondWith 'POST', ping_url, [
@@ -81,7 +80,61 @@ describe 'z.conversation.ConversationRepository', ->
         ''
       ]
 
-      conv =
+      return conversation_repository.save_conversation conversation_et
+    .then done
+    .catch done.fail
+
+  afterEach ->
+    server.restore()
+    storage_service.clear_all_stores()
+    jQuery.ajax.restore()
+
+  describe 'on_conversation_event', ->
+
+    member_join_event = null
+
+    beforeEach ->
+      spyOn(conversation_repository, '_on_member_join').and.callThrough()
+
+      member_join_event = {
+        "conversation": conversation_et.id,
+        "time": "2015-04-27T11:42:31.475Z",
+        "data": {"user_ids": []},
+        "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5",
+        "id": "3.800122000a5dcd58",
+        "type": "conversation.member-join"
+      }
+
+    it 'should process member-join event when joining a group conversation', (done) ->
+      conversation_repository.on_conversation_event member_join_event
+      .then ->
+        expect(conversation_repository._on_member_join).toHaveBeenCalled()
+        done()
+      .catch done.fail
+
+    it 'should ignore member-join event when joining a 1to1 conversation', (done) ->
+      # conversation has a corresponding pending connection
+      connection_et_a = new z.entity.Connection()
+      connection_et_a.conversation_id = conversation_et.id
+      connection_et_a.status z.user.ConnectionStatus.PENDING
+      user_repository.connections.push connection_et_a
+
+      conversation_repository.on_conversation_event member_join_event
+      .then ->
+        expect(conversation_repository._on_member_join).not.toHaveBeenCalled()
+        done()
+      .catch done.fail
+
+  describe 'map_connection', ->
+    connection_et = undefined
+    conversation_et = undefined
+
+    beforeEach ->
+      connection_et = new z.entity.Connection()
+      connection_et.conversation_id = conversation_et.id
+
+      spyOn(conversation_repository, 'fetch_conversation_by_id').and.callThrough()
+      spyOn(conversation_service, 'get_conversation_by_id').and.returnValue Promise.resolve {
         "creator": conversation_et.id,
         "members": {
           "self": {
@@ -101,137 +154,79 @@ describe 'z.conversation.ConversationRepository', ->
         "type": 0,
         "last_event_time": "2015-03-20T13:41:12.580Z",
         "last_event": "25.800122000a0b0bc9"
-
-      get_conversation_url = "#{test_factory.settings.connection.rest_url}/conversations/#{conversation_et.id}"
-
-      server.respondWith 'GET', get_conversation_url, [
-        201
-        'Content-Type': 'application/json'
-        JSON.stringify conv
-      ]
-
-      done()
-    .catch done.fail
-
-  afterEach ->
-    server.restore()
-    storage_service.clear_all_stores()
-    jQuery.ajax.restore()
-
-  describe 'handle member join correctly', ->
-
-    member_join_event = null
-
-    beforeEach ->
-      spyOn(conversation_repository, '_on_member_join').and.callThrough()
-
-      member_join_event = {
-        "conversation": conversation_et.id,
-        "time": "2015-04-27T11:42:31.475Z",
-        "data": {"user_ids": []},
-        "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5",
-        "id": "3.800122000a5dcd58",
-        "type": "conversation.member-join"
       }
 
-    it 'processes member join if joining a group conversation', ->
-      conversation_repository.on_conversation_event member_join_event
-      expect(conversation_repository._on_member_join).toHaveBeenCalled()
+    it 'should map a connection to an existing conversation', (done) ->
+      conversation_repository.map_connection connection_et
+      .then (conversation_et) ->
+        expect(conversation_repository.fetch_conversation_by_id).not.toHaveBeenCalled()
+        expect(conversation_service.get_conversation_by_id).not.toHaveBeenCalled()
+        expect(conversation_et.connection()).toBe connection_et
+        done()
+      .catch done.fail
 
-    it 'ignores member join if joining a one2on2 conversation', ->
-
-      # conversation has a corresponding pending connection
-      connection_et_a = new z.entity.Connection()
-      connection_et_a.conversation_id = conversation_et.id
-      connection_et_a.status z.user.ConnectionStatus.PENDING
-      user_repository.connections.push connection_et_a
-
-      conversation_repository.on_conversation_event member_join_event
-      expect(conversation_repository._on_member_join).not.toHaveBeenCalled()
-
-    # @todo Cached conversation events are not properly reset anymore
-    xit 'caches events while getting the conversation from the backend', ->
-      expect(conversation_repository.conversations().length).toBe 1
-      conversation_repository.conversations.removeAll()
-      expect(conversation_repository.conversations().length).toBe 0
-
-      conversation_repository.on_conversation_event member_join_event
-      expect(conversation_repository.fetching_conversations[conversation_et.id]).toBeDefined()
-
-      text_message_event = {"conversation": conversation_et.id, "time": "2015-03-12T16:43:37.993Z", "data": {"content": "Hello ", "nonce": "7092baae-d9ba-44a7-923b-0bffd076993f"}, "from": "d5a39ffb-6ce3-4cc8-9048-0e15d031b4c5", "id": "1ec.800122000a775854", "type": "conversation.message-add"}
-      conversation_repository.on_conversation_event text_message_event
-      expect(conversation_repository.fetching_conversations[conversation_et.id].length).toBe 2
-
-      server.respond()
-      expect(conversation_repository.fetching_conversations[conversation_et.id]).toBeUndefined()
-      conversation = conversation_repository.get_conversation_by_id conversation_et.id
-      expect(conversation.messages().length).toBe 2
-      expect(conversation.messages()[0].type).toBe z.event.Backend.CONVERSATION.MEMBER_JOIN
-      expect(conversation.messages()[1].type).toBe z.event.Backend.CONVERSATION.MESSAGE_ADD
-
-  describe 'map connection', ->
-    connection_et = undefined
-    conversation_et = undefined
-
-    beforeEach ->
-      connection_et = new z.entity.Connection()
-      connection_et.conversation_id = conversation_et.id
-
-      spyOn(conversation_repository, 'fetch_conversation_by_id').and.callThrough()
-      spyOn(conversation_repository, 'save_conversation').and.callThrough()
-      spyOn(conversation_service, 'get_conversation_by_id').and.callThrough()
-      spyOn(client, 'send_request').and.callThrough()
-
-    it 'maps connection to existing conversation', ->
-      conversation_repository.map_connections [connection_et]
-      expect(conversation_et.connection()).toBe connection_et
-
-    it 'maps connection to a new conversation', ->
+    it 'should map a connection to a new conversation', (done) ->
       connection_et.status z.user.ConnectionStatus.ACCEPTED
       conversation_repository.conversations.removeAll()
-      conversation_repository.map_connections [connection_et]
+      conversation_repository.map_connection connection_et
+      .then (conversation_et) ->
+        expect(conversation_repository.fetch_conversation_by_id).toHaveBeenCalled()
+        expect(conversation_service.get_conversation_by_id).toHaveBeenCalled()
+        expect(conversation_et.connection()).toBe connection_et
+        done()
+      .catch done.fail
 
-      expect(conversation_repository.fetch_conversation_by_id).toHaveBeenCalled()
-      expect(conversation_service.get_conversation_by_id).toHaveBeenCalled()
-      expect(client.send_request).toHaveBeenCalled()
-
-      server.respond()
-
-    it 'maps cancelled connections to exiting conversation and filters it correctly', ->
+    it 'should map a cancelled connection to an existing conversation and filter it', (done) ->
       connection_et.status z.user.ConnectionStatus.CANCELLED
-      conversation_repository.map_connections [connection_et]
-      expect(_find_conversation(conversation_et, conversation_repository.conversations)).not.toBeNull()
-      expect(_find_conversation(conversation_et, conversation_repository.filtered_conversations)).toBeNull()
+      conversation_repository.map_connection connection_et
+      .then (conversation_et) ->
+        expect(conversation_et.connection()).toBe connection_et
+        expect(_find_conversation conversation_et, conversation_repository.conversations).not.toBeNull()
+        expect(_find_conversation conversation_et, conversation_repository.filtered_conversations).toBeNull()
+        done()
+      .catch done.fail
 
-  describe 'filtered conversations', ->
 
-    it 'self conversation is not part of the filtered conversations', ->
+  describe 'filtered_conversations', ->
+    it 'should not contain the self conversation', (done) ->
       self_conversation_et = _generate_conversation z.conversation.ConversationType.SELF
       conversation_repository.save_conversation self_conversation_et
-      expect(_find_conversation(self_conversation_et, conversation_repository.conversations)).not.toBeNull()
-      expect(_find_conversation(self_conversation_et, conversation_repository.filtered_conversations)).toBeNull()
+      .then ->
+        expect(_find_conversation(self_conversation_et, conversation_repository.conversations)).not.toBeNull()
+        expect(_find_conversation(self_conversation_et, conversation_repository.filtered_conversations)).toBeNull()
+        done()
+      .catch done.fail
 
-    it 'blocked conversation is not part of filtered conversations', ->
+    it 'should not contain a blocked conversations', (done) ->
       blocked_conversation_et = _generate_conversation z.conversation.ConversationType.ONE2ONE, z.user.ConnectionStatus.BLOCKED
       conversation_repository.save_conversation blocked_conversation_et
-      expect(_find_conversation(blocked_conversation_et, conversation_repository.conversations)).not.toBeNull()
-      expect(_find_conversation(blocked_conversation_et, conversation_repository.filtered_conversations)).toBeNull()
+      .then ->
+        expect(_find_conversation(blocked_conversation_et, conversation_repository.conversations)).not.toBeNull()
+        expect(_find_conversation(blocked_conversation_et, conversation_repository.filtered_conversations)).toBeNull()
+        done()
+      .catch done.fail
 
-    it 'cancelled conversation is not part of the conversation list', ->
+    it 'should not contain the conversation for a cancelled connection request', (done) ->
       cancelled_conversation_et = _generate_conversation z.conversation.ConversationType.ONE2ONE, z.user.ConnectionStatus.CANCELLED
       conversation_repository.save_conversation cancelled_conversation_et
-      expect(_find_conversation(cancelled_conversation_et, conversation_repository.conversations)).not.toBeNull()
-      expect(_find_conversation(cancelled_conversation_et, conversation_repository.filtered_conversations)).toBeNull()
+      .then ->
+        expect(_find_conversation(cancelled_conversation_et, conversation_repository.conversations)).not.toBeNull()
+        expect(_find_conversation(cancelled_conversation_et, conversation_repository.filtered_conversations)).toBeNull()
+        done()
+      .catch done.fail
 
-    it 'pending conversation is not part of the conversation list', ->
+    it 'should not contain the conversation for a pending connection request', (done) ->
       pending_conversation_et = _generate_conversation z.conversation.ConversationType.ONE2ONE, z.user.ConnectionStatus.PENDING
       conversation_repository.save_conversation pending_conversation_et
-      expect(_find_conversation(pending_conversation_et, conversation_repository.conversations)).not.toBeNull()
-      expect(_find_conversation(pending_conversation_et, conversation_repository.filtered_conversations)).toBeNull()
+      .then ->
+        expect(_find_conversation(pending_conversation_et, conversation_repository.conversations)).not.toBeNull()
+        expect(_find_conversation(pending_conversation_et, conversation_repository.filtered_conversations)).toBeNull()
+        done()
+      .catch done.fail
 
   describe 'get_groups_by_name', ->
 
-    beforeEach ->
+    beforeEach (done) ->
       group_a = _generate_conversation z.conversation.ConversationType.REGULAR
       group_a.name 'Web Dudes'
 
@@ -254,36 +249,36 @@ describe 'z.conversation.ConversationRepository', ->
       group_removed.set_timestamp Date.now(), z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP
       group_removed.status z.conversation.ConversationStatus.PAST_MEMBER
 
-      conversation_repository.save_conversation group_a
-      conversation_repository.save_conversation group_b
-      conversation_repository.save_conversation group_c
-      conversation_repository.save_conversation group_cleared
+      Promise.all [
+        conversation_repository.save_conversation group_a
+        conversation_repository.save_conversation group_b
+        conversation_repository.save_conversation group_c
+        conversation_repository.save_conversation group_cleared
+      ]
+      .then done
+      .catch done.fail
 
-    it 'finds the correct groups by full name', ->
+    it 'should return expected matches', ->
       result = conversation_repository.get_groups_by_name 'Web Dudes'
       expect(result.length).toBe 1
 
-    it 'finds the correct groups by part of the group name', ->
       result = conversation_repository.get_groups_by_name 'Dudes'
       expect(result.length).toBe 1
 
-    it 'finds the correct groups by using transliteration', ->
-      result = conversation_repository.get_groups_by_name 'Rene'
-      expect(result.length).toBe 1
-
-    it 'finds the correct groups by search for string that is part of three groups', ->
       result = conversation_repository.get_groups_by_name 'e'
       expect(result.length).toBe 3
 
-    it 'finds the correct groups by the name of a group member', ->
+      result = conversation_repository.get_groups_by_name 'Rene'
+      expect(result.length).toBe 1
+
       result = conversation_repository.get_groups_by_name 'John'
       expect(result.length).toBe 1
 
-    it 'finds a group that is cleared that the user is still a member of', ->
+    it 'should return a cleared group with the user still being member of it', ->
       result = conversation_repository.get_groups_by_name 'Cleared'
       expect(result.length).toBe 1
 
-    it 'should not find a cleared group that the user left', ->
+    it 'should not return a cleared group that the user left', ->
       result = conversation_repository.get_groups_by_name 'Removed'
       expect(result.length).toBe 0
 
@@ -296,7 +291,7 @@ describe 'z.conversation.ConversationRepository', ->
 
       spyOn(conversation_repository, '_send_generic_message').and.returnValue Promise.resolve()
 
-    it 'does not delete other users messages', (done) ->
+    it 'should not delete other users messages', (done) ->
       user_et = new z.entity.User()
       user_et.is_me = false
       message_to_delete_et = new z.entity.Message()
@@ -311,7 +306,7 @@ describe 'z.conversation.ConversationRepository', ->
         expect(error.type).toBe z.conversation.ConversationError::TYPE.WRONG_USER
         done()
 
-    xit 'sends delete and deletes message for own messages', (done) ->
+    xit 'should send delete and deletes message for own messages', (done) ->
       user_et = new z.entity.User()
       user_et.is_me = true
       message_to_delete_et = new z.entity.Message()
@@ -331,15 +326,17 @@ describe 'z.conversation.ConversationRepository', ->
     conversation_et = null
     message_to_hide_et = null
 
-    beforeEach ->
+    beforeEach (done) ->
       conversation_et = _generate_conversation z.conversation.ConversationType.REGULAR
       conversation_repository.save_conversation conversation_et
+      .then ->
+        message_to_hide_et = new z.entity.PingMessage()
+        message_to_hide_et.id = z.util.create_random_uuid()
+        conversation_et.add_message message_to_hide_et
+        done()
+      .catch done.fail
 
-      message_to_hide_et = new z.entity.PingMessage()
-      message_to_hide_et.id = z.util.create_random_uuid()
-      conversation_et.add_message message_to_hide_et
-
-    it 'does not hide message if sender is not self user', (done) ->
+    it 'should not hide message if sender is not self user', (done) ->
       event =
         conversation: conversation_et.id
         id: z.util.create_random_uuid()
@@ -357,7 +354,7 @@ describe 'z.conversation.ConversationRepository', ->
         expect(conversation_et.get_message_by_id(message_to_hide_et.id)).toBeDefined()
         done()
 
-    it 'hides message if sender is self user', (done) ->
+    it 'should hide message if sender is self user', (done) ->
       event =
         conversation: conversation_et.id
         id: z.util.create_random_uuid()
@@ -380,19 +377,21 @@ describe 'z.conversation.ConversationRepository', ->
     conversation_et = null
     message_to_delete_et = null
 
-    beforeEach ->
+    beforeEach (done) ->
       conversation_et = _generate_conversation z.conversation.ConversationType.REGULAR
       conversation_repository.save_conversation conversation_et
+      .then ->
+        message_to_delete_et = new z.entity.PingMessage()
+        message_to_delete_et.id = z.util.create_random_uuid()
+        message_to_delete_et.from = user_repository.self().id
+        conversation_et.add_message message_to_delete_et
 
-      message_to_delete_et = new z.entity.PingMessage()
-      message_to_delete_et.id = z.util.create_random_uuid()
-      message_to_delete_et.from = user_repository.self().id
-      conversation_et.add_message message_to_delete_et
+        spyOn(conversation_repository, 'get_message_in_conversation_by_id').and.returnValue Promise.resolve message_to_delete_et
+        spyOn conversation_repository, '_add_delete_message'
+        done()
+      .catch done.fail
 
-      spyOn(conversation_repository, 'get_message_in_conversation_by_id').and.returnValue Promise.resolve message_to_delete_et
-      spyOn conversation_repository, '_add_delete_message'
-
-    it 'deletes message if user is self', (done) ->
+    it 'should delete message if user is self', (done) ->
       event =
         conversation: conversation_et.id
         id: z.util.create_random_uuid()
@@ -410,7 +409,7 @@ describe 'z.conversation.ConversationRepository', ->
         done()
       .catch done.fail
 
-    it 'deletes message and add delete message if user is not self', (done) ->
+    it 'should delete message and add delete message if user is not self', (done) ->
       other_user_id = z.util.create_random_uuid()
       message_to_delete_et.from = other_user_id
 
@@ -431,7 +430,7 @@ describe 'z.conversation.ConversationRepository', ->
         done()
       .catch done.fail
 
-    it 'deletes message and skips delete message if message is ephemeral', (done) ->
+    it 'should deletes message and skip adding delete message for ephemeral messages', (done) ->
       other_user_id = z.util.create_random_uuid()
       message_to_delete_et.from = other_user_id
       message_to_delete_et.ephemeral_expires true
@@ -479,20 +478,22 @@ describe 'z.conversation.ConversationRepository', ->
     conversation_et = null
     message_et = null
 
-    beforeEach ->
+    beforeEach (done) ->
       conversation_et = _generate_conversation z.conversation.ConversationType.REGULAR
       conversation_repository.save_conversation conversation_et
+      .then ->
+        file_et = new z.entity.File()
+        file_et.status z.assets.AssetTransferState.UPLOADING
+        message_et = new z.entity.ContentMessage z.util.create_random_uuid()
+        message_et.assets.push file_et
+        conversation_et.add_message message_et
 
-      file_et = new z.entity.File()
-      file_et.status z.assets.AssetTransferState.UPLOADING
-      message_et = new z.entity.ContentMessage z.util.create_random_uuid()
-      message_et.assets.push file_et
-      conversation_et.add_message message_et
-
-      spyOn conversation_service, 'update_asset_as_uploaded_in_db'
-      spyOn conversation_service, 'update_asset_as_failed_in_db'
-      spyOn conversation_service, 'update_asset_preview_in_db'
-      spyOn conversation_service, 'delete_message_from_db'
+        spyOn conversation_service, 'update_asset_as_uploaded_in_db'
+        spyOn conversation_service, 'update_asset_as_failed_in_db'
+        spyOn conversation_service, 'update_asset_preview_in_db'
+        spyOn conversation_service, 'delete_message_from_db'
+        done()
+      .catch done.fail
 
     afterEach ->
       conversation_et.remove_messages()
@@ -581,18 +582,17 @@ describe 'z.conversation.ConversationRepository', ->
   #@formatter:on
 
   describe 'Encryption', ->
-    beforeEach ->
+    beforeEach (done) ->
       anne = new z.entity.User()
       anne.name 'Anne'
 
-      window.bob = new z.entity.User()
-      bob.id = '532af01e-1e24-4366-aacf-33b67d4ee376'
+      window.bob = new z.entity.User '532af01e-1e24-4366-aacf-33b67d4ee376'
       bob.name 'Bob'
 
       jane = new z.entity.User window.entities.user.jane_roe.id
       jane.name 'Jane'
 
-      john = new z.entity.User window.entities.user.john_doe.id
+      window.john = new z.entity.User window.entities.user.john_doe.id
       john.name 'John'
 
       johns_computer = new z.client.Client {id: '83ad5d3c31d3c76b', class: 'tablet'}
@@ -626,12 +626,17 @@ describe 'z.conversation.ConversationRepository', ->
       mixed_group.participating_user_ets.push john
       mixed_group.participating_user_ets.push lara
 
-      conversation_repository.save_conversation dudes
-      conversation_repository.save_conversation gals
-      conversation_repository.save_conversation mixed_group
       cryptography_repository.load_session = (session_id) -> return Promise.resolve session_id
 
-    it 'knows all users participating in a conversation (including the self user)', (done) ->
+      Promise.all [
+        conversation_repository.save_conversation dudes
+        conversation_repository.save_conversation gals
+        conversation_repository.save_conversation mixed_group
+      ]
+      .then done
+      .catch done.fail
+
+    it 'should know all users participating in a conversation (including the self user)', (done) ->
       dudes = conversation_repository.conversations()[1]
       conversation_repository.get_all_users_in_conversation dudes.id
       .then (user_ets) ->
@@ -641,23 +646,20 @@ describe 'z.conversation.ConversationRepository', ->
         done()
       .catch done.fail
 
-    it 'can generate a user-client-map for users which have clients', (done) ->
-      spyOn cryptography_repository, '_construct_session_id'
-
+    it 'should generate a user-client-map including users with clients', (done) ->
       dudes = conversation_repository.conversations()[1]
       user_ets = dudes.participating_user_ets()
 
-      conversation_repository._create_user_client_map dudes.id
+      conversation_repository.create_user_client_map dudes.id
       .then (user_client_map) ->
-        bobs_clients = user_client_map[Object.keys(user_client_map)[0]]
-
         expect(Object.keys(user_client_map).length).toBe 2
-        expect(bobs_clients.length).toBe 2
+        expect(user_client_map[bob.id].length).toBe 2
+        expect(user_client_map[john.id].length).toBe 1
         expect(user_ets.length).toBe 2
         done()
       .catch done.fail
 
-    describe 'handling a client mismatch response', ->
+    describe '_handle_client_mismatch', ->
       client_mismatch = undefined
       generic_message = undefined
       payload = undefined
@@ -685,7 +687,7 @@ describe 'z.conversation.ConversationRepository', ->
             "#{jane_roe.user_id}":
               "#{jane_roe.client_id}": '💣'
 
-      it 'adds missing clients to the payload', (done) ->
+      it 'should add missing clients to the payload', (done) ->
         spyOn(user_repository, 'add_client_to_user').and.returnValue Promise.resolve()
         # TODO: Make this fake method available as a utility function for testing
         spyOn(cryptography_repository.cryptography_service, 'get_users_pre_keys').and.callFake (user_client_map) ->
@@ -716,7 +718,7 @@ describe 'z.conversation.ConversationRepository', ->
             done()
           .catch done.fail
 
-      it 'removes the payload of deleted clients', (done) ->
+      it 'should remove the payload of deleted clients', (done) ->
         client_mismatch =
           missing: {}
           deleted:
@@ -731,7 +733,7 @@ describe 'z.conversation.ConversationRepository', ->
           done()
         .catch done.fail
 
-      it 'removes the payload of redundant clients', (done) ->
+      it 'should remove the payload of redundant clients', (done) ->
         client_mismatch =
           missing: {}
           deleted: {}
@@ -752,11 +754,11 @@ describe 'z.conversation.ConversationRepository', ->
       external_conversation_et = _generate_conversation()
       external_conversation_et.participating_user_ids [0..128]
       conversation_repository.save_conversation external_conversation_et
+      .then ->
+        generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+        generic_message.set 'text', new z.proto.Text 'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message'
 
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'text', new z.proto.Text 'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message'
-
-      conversation_repository._should_send_as_external conversation_et.id, generic_message
+        conversation_repository._should_send_as_external conversation_et.id, generic_message
       .then (should_send_as_external) ->
         expect(should_send_as_external).toBeTruthy()
         done()
@@ -766,11 +768,11 @@ describe 'z.conversation.ConversationRepository', ->
       external_conversation_et = _generate_conversation()
       external_conversation_et.participating_user_ids [0..1]
       conversation_repository.save_conversation external_conversation_et
+      .then ->
+        generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+        generic_message.set 'text', new z.proto.Text 'Test'
 
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'text', new z.proto.Text 'Test'
-
-      conversation_repository._should_send_as_external conversation_et.id, generic_message
+        conversation_repository._should_send_as_external conversation_et.id, generic_message
       .then (should_send_as_external) ->
         expect(should_send_as_external).toBeFalsy()
         done()
