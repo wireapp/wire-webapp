@@ -443,7 +443,8 @@ class z.calling.handler.CallStateHandler
   _update_participants: (event, joined_participant_ids) ->
     @v2_call_center.get_call_by_id event.conversation
     .then (call_et) =>
-      @v2_call_center.user_repository.get_users_by_id joined_participant_ids, (participant_ets) ->
+      @v2_call_center.user_repository.get_users_by_id joined_participant_ids
+      .then (participant_ets) ->
         # This happens if we leave an ongoing call or if we accept a call on another device that we have ignored.
         limit = event.is_sequential and event.cause is z.calling.enum.CallStateEventCause.REQUESTED
         call_et.update_participants (new z.calling.entities.Participant user_et for user_et in participant_ets), limit
@@ -519,7 +520,8 @@ class z.calling.handler.CallStateHandler
     @_create_call event
     .then (call_et) =>
       call_et.state z.calling.enum.CallState.CONNECTING
-      @v2_call_center.user_repository.get_users_by_id remote_participant_ids, (remote_user_ets) =>
+      @v2_call_center.user_repository.get_users_by_id remote_participant_ids
+      .then (remote_user_ets) =>
         participant_ets = (new z.calling.entities.Participant user_et for user_et in remote_user_ets)
         call_et.update_participants participant_ets
         call_et.update_remote_state event.participants
@@ -541,8 +543,9 @@ class z.calling.handler.CallStateHandler
     .then (call_et) =>
       creator_id = @v2_call_center.get_creator_id event
       remote_participant_ids.push creator_id if creator_id not in remote_participant_ids
-      @v2_call_center.user_repository.get_users_by_id remote_participant_ids, (remote_user_ets) =>
-        call_et.set_creator @v2_call_center.user_repository.get_user_by_id creator_id
+      @v2_call_center.user_repository.get_users_by_id remote_participant_ids
+      .then (remote_user_ets) =>
+        @v2_call_center.user_repository.find_user_by_id(creator_id).then call_et.set_creator
         participant_ets = (new z.calling.entities.Participant user_et for user_et in remote_user_ets)
         call_et.update_participants participant_ets
         call_et.update_remote_state event.participants
@@ -567,7 +570,8 @@ class z.calling.handler.CallStateHandler
     .then (call_et) =>
       call_et.state z.calling.enum.CallState.ONGOING
       call_et.self_user_joined true
-      @v2_call_center.user_repository.get_users_by_id remote_participant_ids, (remote_user_ets) =>
+      @v2_call_center.user_repository.get_users_by_id remote_participant_ids
+      .then (remote_user_ets) =>
         participant_ets = (new z.calling.entities.Participant user_et for user_et in remote_user_ets)
         call_et.update_participants participant_ets
         call_et.update_remote_state event.participants

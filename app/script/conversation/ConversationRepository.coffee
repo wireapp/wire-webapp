@@ -303,7 +303,8 @@ class z.conversation.ConversationRepository
   ###
   update_conversations: (conversation_ets) =>
     user_ids = _.flatten(conversation_et.participating_user_ids() for conversation_et in conversation_ets)
-    @user_repository.get_users_by_id user_ids, =>
+    @user_repository.get_users_by_id user_ids
+    .then =>
       @_fetch_users_and_events conversation_et for conversation_et in conversation_ets
 
   ###
@@ -311,7 +312,7 @@ class z.conversation.ConversationRepository
   @param conversation_ets [Array<z.entity.Conversation>] Array of conversation entities to be updated
   ###
   update_conversations_offline: (conversation_ets) =>
-    @update_participating_user_ets conversation_et, undefined, true for conversation_et in conversation_ets
+    @update_participating_user_ets conversation_et, true for conversation_et in conversation_ets
 
 
   ###############################################################################
@@ -420,12 +421,10 @@ class z.conversation.ConversationRepository
     for conversation_et in @conversations() when conversation_et.type() in [z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.CONNECT]
       return Promise.resolve conversation_et if user_et.id is conversation_et.participating_user_ids()[0]
 
-    return @fetch_conversation_by_id user_et.connection().conversation_id
+    @fetch_conversation_by_id user_et.connection().conversation_id
     .then (conversation_et) =>
       conversation_et.connection user_et.connection()
-      return new Promise (resolve) =>
-        @update_participating_user_ets conversation_et, (conversation_et) ->
-          resolve conversation_et
+      return @update_participating_user_ets conversation_et
 
   ###
   Check whether conversation is currently displayed.
@@ -485,7 +484,8 @@ class z.conversation.ConversationRepository
       if connection_et.status() is z.user.ConnectionStatus.ACCEPTED
         conversation_et.type z.conversation.ConversationType.ONE2ONE
 
-      @update_participating_user_ets conversation_et, (conversation_et) ->
+      @update_participating_user_ets conversation_et
+      .then (conversation_et) ->
         amplify.publish z.event.WebApp.CONVERSATION.SHOW, conversation_et if show_conversation
       return conversation_et
     .catch (error) ->
@@ -551,18 +551,15 @@ class z.conversation.ConversationRepository
 
   ###
   Update participating users in a conversation.
-
   @param conversation_et [z.entity.Conversation] Conversation to be updated
-  @param callback [Function] Function to be called on server return
   @param offline [Boolean] Should we only look for cached contacts
   ###
-  update_participating_user_ets: (conversation_et, callback, offline = false) =>
-    conversation_et.self = @user_repository.self()
-    user_ids = conversation_et.participating_user_ids()
-    @user_repository.get_users_by_id user_ids, (user_ets) ->
+  update_participating_user_ets: (conversation_et, offline = false) =>
+    @user_repository.get_users_by_id conversation_et.participating_user_ids(), offline
+    .then (user_ets) =>
+      conversation_et.self = @user_repository.self()
       conversation_et.participating_user_ets user_ets
-      callback? conversation_et
-    , offline
+      return conversation_et
 
 
   ###############################################################################
@@ -1449,7 +1446,8 @@ class z.conversation.ConversationRepository
           users_with_unverified_clients = conversation_et.get_users_with_unverified_clients()
           user_ids = users_with_unverified_clients.map (user_et) -> user_et.id
 
-        @user_repository.get_users_by_id user_ids, (user_ets) ->
+        @user_repository.get_users_by_id user_ids
+        .then(user_ets) ->
           amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
             data:
               consent_type: consent_type
@@ -1942,11 +1940,11 @@ class z.conversation.ConversationRepository
     .catch (error) =>
       throw error unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
 
-      conversation_et = @conversation_mapper.map_conversation event_json
-      @update_participating_user_ets conversation_et, (conversation_et) =>
+      @update_participating_user_ets @conversation_mapper.map_conversation event_json
+      .then (conversation_et) =>
         @_send_conversation_create_notification conversation_et
-      @save_conversation conversation_et
-      return conversation_et
+        @save_conversation conversation_et
+        return conversation_et
 
   ###
   User were added to a group conversation.
@@ -1962,11 +1960,12 @@ class z.conversation.ConversationRepository
     if @user_repository.self().id in event_json.data.user_ids
       conversation_et.status z.conversation.ConversationStatus.CURRENT_MEMBER
 
-    @update_participating_user_ets conversation_et, =>
-      @_add_event_to_conversation event_json, conversation_et
-      .then (message_et) =>
-        amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
-        @verification_state_handler.on_member_joined conversation_et, event_json.data.user_ids
+    @update_participating_user_ets conversation_et
+    .then =>
+      return @_add_event_to_conversation event_json, conversation_et
+    .then (message_et) =>
+      amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
+      @verification_state_handler.on_member_joined conversation_et, event_json.data.user_ids
 
   ###
   Members of a group conversation were removed or left.
@@ -1987,7 +1986,8 @@ class z.conversation.ConversationRepository
           if conversation_et.call()
             amplify.publish z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, conversation_et.id, user_et.id
 
-      @update_participating_user_ets conversation_et, =>
+      @update_participating_user_ets conversation_et
+      .then =>
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et
         @verification_state_handler.on_member_left conversation_et, message_et.user_ids()
 
@@ -2185,7 +2185,8 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation that was created
   ###
   _send_conversation_create_notification: (conversation_et) ->
-    @user_repository.get_user_by_id conversation_et.creator, (user_et)  ->
+    @user_repository.get_user_by_id conversation_et.creator
+    .then (user_et)  ->
       message_et = new z.entity.MemberMessage()
       message_et.user user_et
       message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE
@@ -2213,7 +2214,8 @@ class z.conversation.ConversationRepository
     return if not event_json.data.reaction
     return if message_et.from isnt @user_repository.self().id
 
-    @user_repository.get_user_by_id event_json.from, (user_et) ->
+    @user_repository.get_user_by_id event_json.from
+    .then (user_et) ->
       reaction_message_et = new z.entity.Message message_et.id, z.message.SuperType.REACTION
       reaction_message_et.user user_et
       reaction_message_et.reaction = event_json.data.reaction
@@ -2224,30 +2226,32 @@ class z.conversation.ConversationRepository
   @param message_et [z.entity.Message] Message to be updated
   ###
   _update_user_ets: (message_et) =>
-    return new Promise (resolve) =>
-      @user_repository.get_user_by_id message_et.from, (user_et) =>
-        message_et.user user_et
+    @user_repository.get_user_by_id message_et.from
+    .then (user_et) =>
+      message_et.user user_et
 
-        if message_et.is_member() or message_et.user_ets?
-          @user_repository.get_users_by_id message_et.user_ids(), (user_ets) ->
-            message_et.user_ets user_ets
+      if message_et.is_member() or message_et.user_ets?
+        @user_repository.get_users_by_id message_et.user_ids()
+        .then (user_ets) ->
+          message_et.user_ets user_ets
 
-        if message_et.reactions
-          if Object.keys(message_et.reactions()).length
-            user_ids = (user_id for user_id of message_et.reactions())
-            @user_repository.get_users_by_id user_ids, (user_ets) ->
-              message_et.reactions_user_ets user_ets
+      if message_et.reactions
+        if Object.keys(message_et.reactions()).length
+          user_ids = (user_id for user_id of message_et.reactions())
+          @user_repository.get_users_by_id user_ids
+          .then (user_ets) ->
+            message_et.reactions_user_ets user_ets
+        else
+          message_et.reactions_user_ets.removeAll()
+
+      if message_et.has_asset_text()
+        for asset_et in message_et.assets() when asset_et.is_text()
+          if not message_et.user()
+            Raygun.send new Error 'Message does not contain user when updating'
           else
-            message_et.reactions_user_ets.removeAll()
+            asset_et.theme_color = message_et.user().accent_color()
 
-        if message_et.has_asset_text()
-          for asset_et in message_et.assets() when asset_et.is_text()
-            if not message_et.user()
-              Raygun.send new Error 'Message does not contain user when updating'
-            else
-              asset_et.theme_color = message_et.user().accent_color()
-
-        resolve message_et
+      return message_et
 
   ###
   Cancel asset upload.
@@ -2312,9 +2316,7 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves with the rewritten payload
   ###
   _handle_client_mismatch_missing: (user_client_map, payload, generic_message) ->
-    if _.isEmpty user_client_map
-      return Promise.resolve payload
-    if not payload
+    if not payload or _.isEmpty user_client_map
       return Promise.resolve payload
     @logger.debug "Message is missing clients of '#{Object.keys(user_client_map).length}' users", user_client_map
 

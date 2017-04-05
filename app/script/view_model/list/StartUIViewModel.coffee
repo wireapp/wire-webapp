@@ -311,8 +311,7 @@ class z.ViewModel.list.StartUIViewModel
         .map (conversation_et) -> conversation_et.participating_user_ids()[0]
         .slice(0, 9)
     .then (user_ids) =>
-      return new Promise (resolve) =>
-        @user_repository.get_users_by_id user_ids, resolve
+      return @user_repository.get_users_by_id user_ids
 
   get_connections: =>
     Promise.resolve().then =>
