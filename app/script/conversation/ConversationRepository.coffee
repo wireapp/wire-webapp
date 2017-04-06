@@ -1448,7 +1448,7 @@ class z.conversation.ConversationRepository
           user_ids = users_with_unverified_clients.map (user_et) -> user_et.id
 
         @user_repository.get_users_by_id user_ids
-        .then(user_ets) ->
+        .then (user_ets) ->
           amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.NEW_DEVICE,
             data:
               consent_type: consent_type
