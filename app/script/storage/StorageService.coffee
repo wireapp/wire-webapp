@@ -191,7 +191,7 @@ class z.storage.StorageService
       @db.version(11).stores version_11
       .upgrade (transaction) =>
         @logger.warn 'Database upgrade to version 11', transaction
-        primary_key_local_client = z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT
+        primary_key_local_client = z.client.ClientRepository::PRIMARY_KEY_CURRENT_CLIENT
         transaction[@OBJECT_STORE_CLIENTS].toCollection().each (client, cursor) =>
           if client.meta.primary_key is primary_key_local_client and client.primary_key isnt primary_key_local_client
             transaction[@OBJECT_STORE_CLIENTS].delete cursor.primaryKey

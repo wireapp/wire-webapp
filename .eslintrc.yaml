@@ -15,7 +15,6 @@ globals:
   LRUCache: true
   moment: true
   pako: true
-  platform: true
   Raygun: true
   twttr: true
   wire: true

@@ -1254,7 +1254,7 @@ class z.ViewModel.AuthViewModel
       return @client_repository.get_valid_local_client()
     .catch (error) =>
       @logger.info "No valid local client found: #{error.message}", error
-      if error.type is z.client.ClientError.TYPE.MISSING_ON_BACKEND
+      if error.type is z.client.ClientError::TYPE.MISSING_ON_BACKEND
         @logger.info 'Local client rejected as invalid by backend. Reinitializing storage.'
         @storage_service.init @self_user().id
     .then =>
@@ -1340,7 +1340,7 @@ class z.ViewModel.AuthViewModel
       else
         @_redirect_to_app()
     .catch (error) =>
-      if error.type is z.client.ClientError.TYPE.TOO_MANY_CLIENTS
+      if error.type is z.client.ClientError::TYPE.TOO_MANY_CLIENTS
         @logger.warn 'User has already registered the maximum number of clients', error
         window.location.hash = z.auth.AuthView.MODE.LIMIT
       else
