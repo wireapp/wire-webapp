@@ -316,13 +316,11 @@ class z.user.UserRepository
   add_client_to_user: (user_id, client_et) =>
     @get_user_by_id user_id
     .then (user_et) =>
-      return user_et.add_client client_et
-      .then (is_new_client) =>
-        return unless is_new_client
-        @client_repository.save_client_in_db user_id, client_et.to_json()
-        .then ->
-          amplify.publish z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et
-          amplify.publish z.event.WebApp.CLIENT.ADD_OWN_CLIENT, user_id, client_et if user_et.is_me
+      return unless user_et.add_client client_et
+      @client_repository.save_client_in_db user_id, client_et.to_json()
+      .then ->
+        amplify.publish z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et
+        amplify.publish z.event.WebApp.CLIENT.ADD_OWN_CLIENT, user_id, client_et if user_et.is_me
 
   ###
   Removes a stored client and the session connected with it.
