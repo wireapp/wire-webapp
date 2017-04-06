@@ -51,6 +51,7 @@ class z.entity.File extends z.entity.Asset
     @upload_progress = ko.observable()
     @uploaded_on_this_client = ko.observable false
     @upload_failed_reason = ko.observable()
+    @upload_cancel = undefined
     @pending_upload = ko.pureComputed =>
       return @status() is z.assets.AssetTransferState.UPLOADING and @uploaded_on_this_client()
 
@@ -120,8 +121,8 @@ class z.entity.File extends z.entity.Asset
     @original_resource()?.cancel_download()
 
   cancel: (message_et) =>
+    @upload_cancel?()
     amplify.publish z.event.WebApp.CONVERSATION.ASSET.CANCEL, message_et
-
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_CANCELLED,
       size_bytes: @file_size
       size_mb: z.util.bucket_values (@file_size / 1024 / 1024), [0, 5, 10, 15, 20, 25]

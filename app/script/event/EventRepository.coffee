@@ -355,7 +355,7 @@ class z.event.EventRepository
         return @cryptography_repository.decrypt_event event
         .catch (decrypt_error) =>
           # Get error information
-          error_code = decrypt_error.code
+          error_code = decrypt_error.code or 999
           remote_client_id = event.data.sender
           remote_user_id = event.from
           session_id = @cryptography_repository._construct_session_id remote_user_id, remote_client_id
@@ -410,26 +410,23 @@ class z.event.EventRepository
   ###
   _handle_notification: (notification) =>
     return new Promise (resolve, reject) =>
-      events = notification.payload
-      source = switch @notification_handling_state()
-        when z.event.NotificationHandlingState.WEB_SOCKET
-          @NOTIFICATION_SOURCE.WEB_SOCKET
-        else
-          @NOTIFICATION_SOURCE.STREAM
+      {payload: events, id, transient} = notification
+      source = if transient? then @NOTIFICATION_SOURCE.WEB_SOCKET else @NOTIFICATION_SOURCE.STREAM
+      is_transient_event = transient is true
 
-      @logger.info "Handling notification '#{notification.id}' from '#{source}' containing '#{events.length}' events", notification
+      @logger.info "Handling notification '#{id}' from '#{source}' containing '#{events.length}' events", notification
 
       if events.length is 0
         @logger.warn 'Notification payload does not contain any events'
-        @_update_last_notification_id notification.id
-        resolve @last_notification_id()
+        @_update_last_notification_id(id) if not is_transient_event
+        resolve()
       else
         Promise.all (@_handle_event event for event in events)
         .then =>
-          @_update_last_notification_id notification.id
-          resolve @last_notification_id()
+          @_update_last_notification_id(id) if not is_transient_event
+          resolve()
         .catch (error) =>
-          @logger.error "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
+          @logger.error "Failed to handle notification '#{id}' from '#{source}': #{error.message}", error
           reject error
 
   ###
