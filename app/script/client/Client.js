@@ -48,8 +48,8 @@ z.client.Client = class Client {
   @param {string} id
   @return {Object} Object containing the user ID & client ID
   */
-  static dismantle_user_client_id(id) {
-    let [user_id, client_id] = (id != null ? id.split('@') : undefined) || [];
+  static dismantle_user_client_id(id = []) {
+    let [user_id, client_id] = id.split('@');
     return {
       user_id,
       client_id,

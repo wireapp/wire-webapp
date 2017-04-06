@@ -597,69 +597,67 @@ z.client.ClientRepository = class ClientRepository {
   @return {Promise<Array[z.client.Client]>} - Client entities
   */
   _update_clients_for_user(user_id, clients) {
-    return new Promise((resolve, reject) => {
-      const clients_from_backend = {};
-      const clients_stored_in_db = [];
+    const clients_from_backend = {};
+    const clients_stored_in_db = [];
 
-      for (const client of clients) {
-        clients_from_backend[client.id] = client;
+    for (const client of clients) {
+      clients_from_backend[client.id] = client;
+    }
+
+    // Find clients in database
+    return this.get_client_by_user_id_from_db(user_id)
+    .then(results => {
+      const promises = [];
+      let client_payload;
+
+      for (const result of results) {
+        if (clients_from_backend[result.id]) {
+          let contains_update;
+          [client_payload, contains_update] = this.client_mapper.update_client(result, clients_from_backend[result.id]);
+          delete clients_from_backend[result.id];
+
+          if (this.current_client() && this._is_current_client(user_id, result.id)) {
+            this.logger.warn(`Removing duplicate self client '${result.id}' locally`);
+            this.remove_client(user_id, result.id);
+          }
+
+          // Locally known client changed on backend
+          if (contains_update) {
+            this.logger.info(`Updating client '${result.id}' of user '${user_id}' locally`);
+            promises.push(this.save_client_in_db(user_id, client_payload));
+            continue;
+          }
+
+          // Locally known client unchanged on backend
+          clients_stored_in_db.push(client_payload);
+          continue;
+        }
+
+        // Locally known client deleted on backend
+        this.logger.warn(`Removing client '${result.id}' of user '${user_id}' locally`);
+        this.remove_client(user_id, result.id);
       }
 
-      // Find clients in database
-      return this.get_client_by_user_id_from_db(user_id)
-      .then(results => {
-        const promises = [];
-        let client_payload;
-
-        for (const result of results) {
-          if (clients_from_backend[result.id]) {
-            let contains_update;
-            [client_payload, contains_update] = this.client_mapper.update_client(result, clients_from_backend[result.id]);
-            delete clients_from_backend[result.id];
-
-            if (this.current_client() && this._is_current_client(user_id, result.id)) {
-              this.logger.warn(`Removing duplicate self client '${result.id}' locally`);
-              this.remove_client(user_id, result.id);
-            }
-
-            // Locally known client changed on backend
-            if (contains_update) {
-              this.logger.info(`Updating client '${result.id}' of user '${user_id}' locally`);
-              promises.push(this.save_client_in_db(user_id, client_payload));
-              continue;
-            }
-
-            // Locally known client unchanged on backend
-            clients_stored_in_db.push(client_payload);
-            continue;
-          }
-
-          // Locally known client deleted on backend
-          this.logger.warn(`Removing client '${result.id}' of user '${user_id}' locally`);
-          this.remove_client(user_id, result.id);
+      for (const client_id in clients_from_backend) {
+        client_payload = clients_from_backend[client_id];
+        if (this.current_client() && this._is_current_client(user_id, client_id)) {
+          continue;
         }
 
-        for (const client_id in clients_from_backend) {
-          client_payload = clients_from_backend[client_id];
-          if (this.current_client() && this._is_current_client(user_id, client_id)) {
-            continue;
-          }
-
-          // Locally unknown client new on backend
-          this.logger.info(`New client '${client_id}' of user '${user_id}' will be stored locally`);
-          if (this.self_user().id === user_id) {
-            this.map_self_client({client: client_payload});
-          }
-          promises.push(this._update_client_schema_in_db(user_id, client_payload));
+        // Locally unknown client new on backend
+        this.logger.info(`New client '${client_id}' of user '${user_id}' will be stored locally`);
+        if (this.self_user().id === user_id) {
+          this.map_self_client({client: client_payload});
         }
+        promises.push(this._update_client_schema_in_db(user_id, client_payload));
+      }
 
-        return Promise.all(promises);
-      }).then(new_records => {
-        return resolve(this.client_mapper.map_clients(clients_stored_in_db.concat(new_records)));
-      }).catch(error => {
-        this.logger.error(`Unable to retrieve clients for user '${user_id}': ${error.message}`, error);
-        return reject(error);
-      });
+      return Promise.all(promises);
+    }).then(new_records => {
+      return this.client_mapper.map_clients(clients_stored_in_db.concat(new_records));
+    }).catch(error => {
+      this.logger.error(`Unable to retrieve clients for user '${user_id}': ${error.message}`, error);
+      throw error;
     });
   }
 
