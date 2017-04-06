@@ -353,10 +353,8 @@ z.client.ClientRepository = class ClientRepository {
       if (!z.util.Environment.frontend.is_production()) {
         device_model = `${device_model} (Internal)`;
       }
-    } else {
-      if (client_type === z.client.ClientType.TEMPORARY) {
-        device_model = `${device_model} (Temporary)`;
-      }
+    } else if (client_type === z.client.ClientType.TEMPORARY) {
+      device_model = `${device_model} (Temporary)`;
     }
 
     return {
