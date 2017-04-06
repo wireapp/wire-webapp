@@ -109,7 +109,6 @@ class z.conversation.ConversationService
 
   @param conversation_id [String] ID of conversation to remove bot from
   @param user_id [String] ID of bot to be removed from the the conversation
-  @param callback [Function] Function to be called on server return
   ###
   delete_bots: (conversation_id, user_id) ->
     @client.send_request
@@ -123,7 +122,6 @@ class z.conversation.ConversationService
 
   @param conversation_id [String] ID of conversation to remove member from
   @param user_id [String] ID of member to be removed from the the conversation
-  @param callback [Function] Function to be called on server return
   ###
   delete_members: (conversation_id, user_id) ->
     @client.send_request

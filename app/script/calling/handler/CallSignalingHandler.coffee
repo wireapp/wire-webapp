@@ -186,7 +186,8 @@ class z.calling.handler.CallSignalingHandler
   @param payload [Object] Payload for call to be created
   ###
   _add_flow: (call_et, payload) ->
-    @v2_call_center.user_repository.get_user_by_id payload.remote_user, (user_et) =>
+    @v2_call_center.user_repository.get_user_by_id payload.remote_user
+    .then (user_et) =>
       # Get or construct flow entity
       flow_et = call_et.get_flow_by_id payload.id
       if not flow_et

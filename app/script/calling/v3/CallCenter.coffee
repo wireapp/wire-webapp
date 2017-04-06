@@ -128,7 +128,8 @@ class z.calling.v3.CallCenter
     switch e_call_message_et.type
       when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
         @_distribute_activation_event e_call_message_et
-        @user_repository.get_user_by_id e_call_message_et.user_id, (user_et) ->
+        @user_repository.get_user_by_id e_call_message_et.user_id
+        .then(user_et) ->
           amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL,
             first_name: user_et.name()
             call_id: e_call_message_et.conversation_id
@@ -230,9 +231,9 @@ class z.calling.v3.CallCenter
               e_call_et.state z.calling.enum.CallState.CONNECTING
               e_participant_et.session_id = e_call_message_et.session_id
 
-      return new Promise (resolve) =>
-        @user_repository.get_user_by_id e_call_message_et.user_id, (remote_user_et) ->
-          return e_call_et.add_e_participant(e_call_message_et, remote_user_et).then resolve
+      return @user_repository.get_user_by_id e_call_message_et.user_id
+      .then (remote_user_et) ->
+        return e_call_et.add_e_participant e_call_message_et, remote_user_et
     .catch (error) =>
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
       return if e_call_message_et.user_id is @user_repository.self().id
@@ -345,8 +346,7 @@ class z.calling.v3.CallCenter
     else if remote_user
       recipients_promise = Promise.resolve [@user_repository.self(), remote_user]
     else
-      recipients_promise = new Promise (resolve) =>
-        @user_repository.get_user_by_id e_call_message_et.remote_user_id, (remote_user) => resolve [@user_repository.self(), remote_user]
+      recipients_promise = @user_repository.get_user_by_id(e_call_message_et.remote_user_id).then (remote_user) => return [@user_repository.self(), remote_user]
 
     recipients_promise.then ([self_user, remote_user]) =>
       switch e_call_message_et.type
@@ -561,7 +561,8 @@ class z.calling.v3.CallCenter
   @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
   _create_incoming_e_call: (e_call_message_et) ->
-    @user_repository.get_user_by_id e_call_message_et.user_id, (remote_user_et) =>
+    @user_repository.get_user_by_id e_call_message_et.user_id
+    .then (remote_user_et) =>
       @_create_e_call e_call_message_et, remote_user_et
       .then (e_call_et) =>
         @logger.debug "Incoming '#{@_get_media_type_from_properties e_call_message_et.props}' e-call in conversation '#{e_call_et.conversation_et.display_name()}'", e_call_et
