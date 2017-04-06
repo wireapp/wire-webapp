@@ -608,14 +608,10 @@ z.client.ClientRepository = class ClientRepository {
     return this.get_client_by_user_id_from_db(user_id)
     .then(results => {
       const promises = [];
-      let client_payload;
-      let contains_update;
 
       for (const result of results) {
         if (clients_from_backend[result.id]) {
-          const update_client_result = this.client_mapper.update_client(result, clients_from_backend[result.id]);
-
-          [client_payload, contains_update] = update_client_result;
+          const [client_payload, contains_update] = this.client_mapper.update_client(result, clients_from_backend[result.id]);
 
           delete clients_from_backend[result.id];
 
@@ -642,7 +638,8 @@ z.client.ClientRepository = class ClientRepository {
       }
 
       for (const client_id in clients_from_backend) {
-        client_payload = clients_from_backend[client_id];
+        const client_payload = clients_from_backend[client_id];
+
         if (this.current_client() && this._is_current_client(user_id, client_id)) {
           continue;
         }
