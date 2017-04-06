@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.auth = z.auth || {};
 
 z.auth.URLParameter = {
-  ASSETS_V3: 'assets_v3',
   BOT: 'bot',
   CALLING_V3: 'calling_v3',
   CONNECT: 'connect',

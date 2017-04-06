@@ -478,9 +478,9 @@ class z.conversation.EventMapper
   ###
   _map_system_event_unable_to_decrypt: (event) ->
     message_et = new z.entity.DecryptErrorMessage()
-    # error_code style "3690 (f0c0272e8f053774)"
-    message_et.error_code = event.error_code?.substring(0, 4)
-    message_et.client_id = event.error_code?.substring(5).replace(/[()]/g, '')
+    if event.error_code
+      message_et.error_code = event.error_code.split(' ')[0]
+      message_et.client_id = event.error_code.substring(message_et.error_code.length + 1).replace(/[()]/g, '')
     return message_et
 
   ###

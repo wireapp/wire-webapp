@@ -81,7 +81,7 @@ class z.calling.entities.Flow
     @pc_initialized = ko.observable false
     @pc_initialized.subscribe (is_initialized) =>
       @telemetry.set_peer_connection @peer_connection
-      @telemetry.schedule_check 5000 if is_initialized
+      @telemetry.schedule_check @call_et.telemetry.media_type if is_initialized
 
     @media_stream = @call_et.local_media_stream
 
@@ -807,11 +807,6 @@ class z.calling.entities.Flow
     @_clear_send_sdp_timeout()
     @logger.info "Resetting flow '#{@id}'"
     @telemetry.reset_statistics()
-    .then (statistics) =>
-      @logger.info 'Flow network stats updated for the last time', statistics
-      amplify.publish z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, @telemetry.create_report()
-    .catch (error) =>
-      @logger.warn "Failed to reset flow networks stats: #{error.message}"
     try
       if @peer_connection?.signalingState isnt z.calling.rtc.SignalingState.CLOSED
         @_close_peer_connection()

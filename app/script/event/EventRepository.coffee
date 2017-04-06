@@ -355,13 +355,10 @@ class z.event.EventRepository
         return @cryptography_repository.decrypt_event event
         .catch (decrypt_error) =>
           # Get error information
+          error_code = decrypt_error.code or 999
           remote_client_id = event.data.sender
           remote_user_id = event.from
           session_id = @cryptography_repository._construct_session_id remote_user_id, remote_client_id
-
-          # Hashing error message to get the error code (not very reliable if Proteus error messages change! Needs to be revised in the future)
-          hashed_error_message = z.util.murmurhash3 decrypt_error.message, 42
-          error_code = hashed_error_message.toString().substr 0, 4
 
           # Handle error
           if decrypt_error instanceof Proteus.errors.DecryptError.DuplicateMessage or decrypt_error instanceof Proteus.errors.DecryptError.OutdatedMessage
@@ -375,11 +372,10 @@ class z.event.EventRepository
             @logger.error "Session '#{session_id}' with user '#{remote_user_id}' (client '#{remote_client_id}') is broken or out of sync. Reset the session and decryption is likely to work again. Error: #{decrypt_error.message}", decrypt_error
           else if decrypt_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged
             # Remote identity changed
-            error_code = z.cryptography.CryptographyErrorType.REMOTE_IDENTITY_CHANGED
             message = "Remote identity of client '#{remote_client_id}' from user '#{remote_user_id}' changed: #{decrypt_error.message}"
             @logger.error message, decrypt_error
 
-          @logger.warn "Could not decrypt an event from client ID '#{remote_client_id}' of user ID '#{remote_user_id}' in session ID '#{session_id}'.\nError Code: '#{error_code}'´\nError Message: #{decrypt_error.message}", decrypt_error
+          @logger.warn "Could not decrypt an event from client ID '#{remote_client_id}' of user ID '#{remote_user_id}' in session ID '#{session_id}'.\nError Code: '#{error_code}'\nError Message: #{decrypt_error.message}", decrypt_error
           @_report_decrypt_error event, decrypt_error, error_code
 
           return z.conversation.EventBuilder.build_unable_to_decrypt event, decrypt_error, error_code
@@ -414,26 +410,23 @@ class z.event.EventRepository
   ###
   _handle_notification: (notification) =>
     return new Promise (resolve, reject) =>
-      events = notification.payload
-      source = switch @notification_handling_state()
-        when z.event.NotificationHandlingState.WEB_SOCKET
-          @NOTIFICATION_SOURCE.WEB_SOCKET
-        else
-          @NOTIFICATION_SOURCE.STREAM
+      {payload: events, id, transient} = notification
+      source = if transient? then @NOTIFICATION_SOURCE.WEB_SOCKET else @NOTIFICATION_SOURCE.STREAM
+      is_transient_event = transient is true
 
-      @logger.info "Handling notification '#{notification.id}' from '#{source}' containing '#{events.length}' events", notification
+      @logger.info "Handling notification '#{id}' from '#{source}' containing '#{events.length}' events", notification
 
       if events.length is 0
         @logger.warn 'Notification payload does not contain any events'
-        @_update_last_notification_id notification.id
-        resolve @last_notification_id()
+        @_update_last_notification_id(id) if not is_transient_event
+        resolve()
       else
         Promise.all (@_handle_event event for event in events)
         .then =>
-          @_update_last_notification_id notification.id
-          resolve @last_notification_id()
+          @_update_last_notification_id(id) if not is_transient_event
+          resolve()
         .catch (error) =>
-          @logger.error "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
+          @logger.error "Failed to handle notification '#{id}' from '#{source}': #{error.message}", error
           reject error
 
   ###

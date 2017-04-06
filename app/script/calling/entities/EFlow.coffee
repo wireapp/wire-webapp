@@ -22,7 +22,8 @@ z.calling.entities ?= {}
 
 E_FLOW_CONFIG =
   DATA_CHANNEL_LABEL: 'calling-3.0'
-  NEGOTIATION_TIMEOUT: 30 * 1000
+  NEGOTIATION_FAILED_TIMEOUT: 30 * 1000
+  NEGOTIATION_RESTART_TIMEOUT: 2500
   SDP_SEND_TIMEOUT: 5 * 1000
   SDP_SEND_TIMEOUT_RENEGOTIATION: 50
   SDP_SEND_TIMEOUT_RESET: 1000
@@ -80,9 +81,10 @@ class z.calling.entities.EFlow
     @connection_state.subscribe (ice_connection_state) =>
       switch ice_connection_state
         when z.calling.rtc.ICEConnectionState.CHECKING
-          @telemetry.schedule_check 5000
+          @telemetry.schedule_check @e_call_et.telemetry.media_type
 
         when z.calling.rtc.ICEConnectionState.COMPLETED, z.calling.rtc.ICEConnectionState.CONNECTED
+          @_clear_negotiation_timeout()
           @telemetry.start_statistics()
           @e_call_et.is_connected true
           @e_participant_et.is_connected true
@@ -96,10 +98,8 @@ class z.calling.entities.EFlow
 
         when z.calling.rtc.ICEConnectionState.DISCONNECTED
           @e_participant_et.is_connected false
-          @e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
-          if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
-            @e_call_et.interrupted_participants.push @participant_et
-            @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false
+          @e_call_et.interrupted_participants.push @participant_et
+          @_set_negotiation_restart_timeout()
 
         when z.calling.rtc.ICEConnectionState.FAILED
           return unless @e_call_et.self_client_joined()
@@ -245,7 +245,7 @@ class z.calling.entities.EFlow
     @negotiation_mode negotiation_mode
     @negotiation_needed true
     @pc_initialized true
-    @_set_negotiation_timeout()
+    @_set_negotiation_failed_timeout()
 
   _remove_participant: (termination_reason) =>
     @e_participant_et.is_connected false
@@ -557,7 +557,7 @@ class z.calling.entities.EFlow
 
   _create_additional_payload: ->
     payload = @v3_call_center._create_additional_payload @e_call_et.id, @remote_user_id, @remote_client_id
-    return @v3_call_center._create_payload_prop_sync @e_call_et.self_state.video_send(), $.extend({remote_user: @remote_user, sdp: @local_sdp().sdp}, payload)
+    return @v3_call_center._create_payload_prop_sync @e_call_et.self_state.video_send(), false, $.extend({remote_user: @remote_user, sdp: @local_sdp().sdp}, payload)
 
   ###
   Sets the local Session Description Protocol on the PeerConnection.
@@ -610,14 +610,25 @@ class z.calling.entities.EFlow
     , E_FLOW_CONFIG.SDP_SEND_TIMEOUT_RENEGOTIATION
 
   ###
-  Set the negotiation timeout.
+  Set the negotiation failed timeout.
   @private
   ###
-  _set_negotiation_timeout: ->
+  _set_negotiation_failed_timeout: ->
     @negotiation_timeout = window.setTimeout =>
       @logger.debug 'Removing call participant on negotiation timeout'
       @_remove_participant z.calling.enum.TERMINATION_REASON.RENEGOTIATION
-    , E_FLOW_CONFIG.NEGOTIATION_TIMEOUT
+    , E_FLOW_CONFIG.NEGOTIATION_FAILED_TIMEOUT
+
+  ###
+  Set the negotiation restart timeout.
+  @private
+  ###
+  _set_negotiation_restart_timeout: ->
+    @negotiation_timeout = window.setTimeout =>
+      @e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
+      if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
+        @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false
+    , E_FLOW_CONFIG.NEGOTIATION_RESTART_TIMEOUT
 
   ###
   Set the SDP send timeout.
