@@ -288,6 +288,7 @@ class z.cryptography.CryptographyRepository
       @logger.error "Encrypted event with ID '#{event.id}' does not contain it's data payload", event
       return Promise.reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.NO_DATA_CONTENT
 
+    # TODO: Make bomb a constant
     if event.data.text is '💣'
       return Promise.reject new Proteus.errors.DecryptError.InvalidMessage('The sending client couldn\'t encrypt the message for our client.')
 
