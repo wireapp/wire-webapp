@@ -191,7 +191,7 @@ z.client.ClientRepository = class ClientRepository {
   */
   _save_current_client_in_db(client_payload) {
     client_payload.meta = {is_verified: true};
-    return this.client_service.save_client_in_db(this.PRIMARY_KEY_CURRENT_CLIENT, client_payload);
+    return this.client_service.save_client_in_db(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT, client_payload);
   }
 
   /*
