@@ -92,13 +92,13 @@ class z.util.DebugUtil
   get_notification_from_stream: (notification_id, notification_id_since) =>
     client_id = wire.app.repository.client.current_client().id
 
-    _got_notifications = (response) =>
-      notifications = response.notifications.filter (item) ->
-        return item.id is notification_id
-      return notifications[0] if notifications.length
+    _got_notifications = ({has_more, notifications}) =>
+      matching_notifications = notifications.filter (notification) ->
+        return notification.id is notification_id
+      return matching_notifications[0] if matching_notifications.length
 
-      if response.has_more
-        last_notification = response.notifications[response.notifications.length - 1]
+      if has_more
+        last_notification = notifications[notifications.length - 1]
         @get_notification_from_stream notification_id, last_notification.id
       else
         @logger.log "Notification '#{notification_id}' was not found in encrypted notification stream"
@@ -110,8 +110,7 @@ class z.util.DebugUtil
     local_client_id = wire.app.repository.client.current_client().id
     local_user_id = wire.app.repository.user.self().id
 
-    _got_notifications = (response) =>
-      {has_more, notifications} = response
+    _got_notifications = ({has_more, notifications}) =>
       additional_notifications = notifications.filter (notification) ->
         {payload} = notification
         for {data, from} in payload when data and from in [local_user_id, remote_user_id]
