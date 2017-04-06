@@ -355,7 +355,7 @@ class z.event.EventRepository
         return @cryptography_repository.decrypt_event event
         .catch (decrypt_error) =>
           # Get error information
-          error_code = decrypt_error.code
+          error_code = decrypt_error.code or 999
           remote_client_id = event.data.sender
           remote_user_id = event.from
           session_id = @cryptography_repository._construct_session_id remote_user_id, remote_client_id
