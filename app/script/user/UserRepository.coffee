@@ -668,8 +668,8 @@ class z.user.UserRepository
       @user_service.update_own_user_profile {picture: upload_response}
       .then =>
         @user_update {user: {id: @self().id, picture: upload_response}} if update
-    .catch (error) ->
-      throw new Error "Error during profile image upload: #{error.message}"
+    .catch (error) =>
+      @logger.warn "Error during profile image upload: #{error.message}"
 
   ###
   Set the profile image using v3 api.
