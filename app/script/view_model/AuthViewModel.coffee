@@ -1340,7 +1340,7 @@ class z.ViewModel.AuthViewModel
       else
         @_redirect_to_app()
     .catch (error) =>
-      if error.type is z.client.ClientError::TYPE.TOO_MANY_CLIENTS
+      if error.type is z.client.ClientError.TYPE.TOO_MANY_CLIENTS
         @logger.warn 'User has already registered the maximum number of clients', error
         window.location.hash = z.auth.AuthView.MODE.LIMIT
       else
