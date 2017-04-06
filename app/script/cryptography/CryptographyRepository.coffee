@@ -21,6 +21,9 @@ z.cryptography ?= {}
 
 # Cryptography repository for all cryptography interactions with the cryptography service.
 class z.cryptography.CryptographyRepository
+  @::SYMBOL =
+    SENDER_FAILED_TO_DECRYPT: '💣'
+
   ###
   Construct a new Cryptography repository.
   @param cryptography_service [z.cryptography.CryptographyService] Backend REST API cryptography service implementation
@@ -278,7 +281,7 @@ class z.cryptography.CryptographyRepository
           return [session_id, undefined ]
         else
           @logger.warn "Failed encrypting '#{generic_message.content}' message for session '#{session_id}': #{error.message}", error
-          return [session_id, '💣']
+          return [session_id, @::SYMBOL.SENDER_FAILED_TO_DECRYPT]
 
   ###
   @return [cryptobox.CryptoboxSession, z.proto.GenericMessage] Cryptobox session along with the decrypted message in ProtocolBuffer format
@@ -289,8 +292,8 @@ class z.cryptography.CryptographyRepository
       return Promise.reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.NO_DATA_CONTENT
 
     # TODO: Make bomb a constant
-    if event.data.text is '💣'
-      return Promise.reject new Proteus.errors.DecryptError.InvalidMessage('The sending client couldn\'t encrypt the message for our client.')
+    if event.data.text is @::SYMBOL.SENDER_FAILED_TO_DECRYPT
+      return Promise.reject new Proteus.errors.DecryptError.InvalidMessage("The sending client ID '#{event.data.sender}' couldn't encrypt a message for our client.")
 
     session_id = @_construct_session_id event.from, event.data.sender
     ciphertext = z.util.base64_to_array(event.data.text or event.data.key).buffer
