@@ -61,7 +61,8 @@ z.client.ClientService = class ClientService {
     return this.client.send_json({
       url: this.client.create_url(`${z.client.ClientService.URL_CLIENTS}/${client_id}`),
       type: 'DELETE',
-      data: {}});
+      data: {},
+    });
   }
 
   /*
