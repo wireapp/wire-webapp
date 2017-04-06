@@ -174,37 +174,7 @@
       <!-- /ko -->
 
       <!-- ko foreach: conversations_unarchived -->
-        <li class="left-list-item"
-          data-bind="css: {'text-theme': $parent.is_selected_conversation($data)}">
-          <div class="overlay"></div>
-          <div class="left-column">
-            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.CALL -->
-              <span class="icon-end-call text-red" data-uie-name="status-unread" data-uie-value="call"></span>
-            <!-- /ko -->
-            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.CONNECT -->
-              <span class="dot-md dot-outlined border-theme" data-uie-name="status-unread" data-uie-value="connect"></span>
-            <!-- /ko -->
-            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.PING -->
-              <span class="icon-ping" data-bind="css: unread_accent_color()" data-uie-name="status-unread" data-uie-value="ping"></span>
-            <!-- /ko -->
-            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.UNREAD -->
-              <span data-bind="unread_indicator: unread_message_count" data-uie-name="status-unread" data-uie-value="message"></span>
-            <!-- /ko -->
-          </div>
-          <div class="center-column"
-               data-bind="attr: {'data-uie-uid': id, 'data-uie-value': display_name}, click: $parent.click_on_conversation, text: display_name()"
-               data-uie-name="item-conversation"></div>
-          <div class="right-column">
-            <span class="button-icon icon-more"
-                  data-bind="attr: {'id': 'options-' + id}, click: $root.click_on_actions, l10n_tooltip: z.string.tooltip_conversations_more"
-                  data-bubble="#actions-bubble"
-                  data-placement="right-flex"
-                  data-uie-name="go-options"></span>
-            <span class="icon-silence"
-                  data-bind="css: {'conversation-muted': is_muted()}"
-                  data-uie-name="status-silence"></span>
-          </div>
-        </li>
+        <conversation-list-cell params="conversation: $data"></conversation-list-cell>
       <!-- /ko -->
     </ul>
     <!-- /ko -->
