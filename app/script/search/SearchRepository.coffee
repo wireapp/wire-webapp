@@ -89,7 +89,8 @@ class z.search.SearchRepository
     return new Promise (resolve) =>
       user_ids = (user_et.id for user_et in search_ets)
 
-      @user_repository.get_users_by_id user_ids, (user_ets) ->
+      @user_repository.get_users_by_id user_ids
+      .then (user_ets) ->
         result_user_ets = []
         for user_et in user_ets
 

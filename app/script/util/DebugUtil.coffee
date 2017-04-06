@@ -23,9 +23,6 @@ class z.util.DebugUtil
   constructor: (@user_repository, @conversation_repository) ->
     @logger = new z.util.Logger 'z.util.DebugUtil', z.config.LOGGER.OPTIONS
 
-  _get_user_by_id: (user_id) ->
-    return new Promise (resolve) => @user_repository.get_user_by_id user_id, (user_et) -> resolve user_et
-
   block_all_connections: ->
     block_users = []
     wire.app.repository.user.users().forEach (user_et) =>
@@ -66,7 +63,7 @@ class z.util.DebugUtil
     @conversation_repository.get_conversation_by_id_async event.conversation
     .then (conversation_et) =>
       debug_information.conversation = conversation_et
-      return @_get_user_by_id event.from
+      return @user_repository.get_user_by_id event.from
     .then (user_et) =>
       debug_information.user = user_et
       log_message = "Hey #{@user_repository.self().name()}, this is for you:"
