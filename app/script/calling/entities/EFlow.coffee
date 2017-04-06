@@ -23,7 +23,7 @@ z.calling.entities ?= {}
 E_FLOW_CONFIG =
   DATA_CHANNEL_LABEL: 'calling-3.0'
   NEGOTIATION_FAILED_TIMEOUT: 30 * 1000
-  NEGOTIATION_RESTART_TIMEOUT: 1000
+  NEGOTIATION_RESTART_TIMEOUT: 2500
   SDP_SEND_TIMEOUT: 5 * 1000
   SDP_SEND_TIMEOUT_RENEGOTIATION: 50
   SDP_SEND_TIMEOUT_RESET: 1000
@@ -84,6 +84,7 @@ class z.calling.entities.EFlow
           @telemetry.schedule_check @e_call_et.telemetry.media_type
 
         when z.calling.rtc.ICEConnectionState.COMPLETED, z.calling.rtc.ICEConnectionState.CONNECTED
+          @_clear_negotiation_timeout()
           @telemetry.start_statistics()
           @e_call_et.is_connected true
           @e_participant_et.is_connected true
@@ -96,6 +97,8 @@ class z.calling.entities.EFlow
           @e_call_et.delete_e_participant @e_participant_et.id if @e_call_et.self_client_joined()
 
         when z.calling.rtc.ICEConnectionState.DISCONNECTED
+          @e_participant_et.is_connected false
+          @e_call_et.interrupted_participants.push @participant_et
           @_set_negotiation_restart_timeout()
 
         when z.calling.rtc.ICEConnectionState.FAILED
@@ -622,10 +625,8 @@ class z.calling.entities.EFlow
   ###
   _set_negotiation_restart_timeout: ->
     @negotiation_timeout = window.setTimeout =>
-      @e_participant_et.is_connected false
       @e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
       if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
-        @e_call_et.interrupted_participants.push @participant_et
         @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false
     , E_FLOW_CONFIG.NEGOTIATION_RESTART_TIMEOUT
 
