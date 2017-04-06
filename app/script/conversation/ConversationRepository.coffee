@@ -871,6 +871,7 @@ class z.conversation.ConversationRepository
       asset_et.uploaded_on_this_client true
       @asset_service.upload_asset file, null, (xhr) ->
         xhr.upload.onprogress = (event) -> asset_et.upload_progress Math.round(event.loaded / event.total * 100)
+        asset_et.upload_cancel = -> xhr.abort()
     .then (asset) =>
       generic_message = new z.proto.GenericMessage nonce
       generic_message.set 'asset', asset
