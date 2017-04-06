@@ -21,8 +21,8 @@ z.cryptography ?= {}
 
 # Cryptography repository for all cryptography interactions with the cryptography service.
 class z.cryptography.CryptographyRepository
-  @::SYMBOL =
-    SENDER_FAILED_TO_DECRYPT: '💣'
+  @::EVENT =
+    RESET_SESSION_REQUEST: '💣'
 
   ###
   Construct a new Cryptography repository.
@@ -281,7 +281,7 @@ class z.cryptography.CryptographyRepository
           return [session_id, undefined ]
         else
           @logger.warn "Failed encrypting '#{generic_message.content}' message for session '#{session_id}': #{error.message}", error
-          return [session_id, @::SYMBOL.SENDER_FAILED_TO_DECRYPT]
+          return [session_id, @EVENT.RESET_SESSION_REQUEST]
 
   ###
   @return [cryptobox.CryptoboxSession, z.proto.GenericMessage] Cryptobox session along with the decrypted message in ProtocolBuffer format
@@ -291,9 +291,8 @@ class z.cryptography.CryptographyRepository
       @logger.error "Encrypted event with ID '#{event.id}' does not contain it's data payload", event
       return Promise.reject new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.NO_DATA_CONTENT
 
-    # TODO: Make bomb a constant
-    if event.data.text is @::SYMBOL.SENDER_FAILED_TO_DECRYPT
-      return Promise.reject new Proteus.errors.DecryptError.InvalidMessage("The sending client ID '#{event.data.sender}' couldn't encrypt a message for our client.")
+    if event.data.text is @EVENT.RESET_SESSION_REQUEST
+      return Promise.reject new Proteus.errors.DecryptError.InvalidMessage 'The sending client couldn\'t encrypt a message for our client.'
 
     session_id = @_construct_session_id event.from, event.data.sender
     ciphertext = z.util.base64_to_array(event.data.text or event.data.key).buffer
