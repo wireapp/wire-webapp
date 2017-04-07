@@ -167,3 +167,27 @@
 .conversation-input-paste-cancel {
   margin-right: 32px;
 }
+
+.conversation-input-emoji-list {
+  z-index: 2147483000;
+  position: fixed;
+  display: block;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+  background: white;
+
+  div {
+    border-bottom: 1px solid #eee;
+    padding: 4px 8px;
+
+    &.selected {
+      background: #2391d3;
+      color: white;
+    }
+
+    span {
+      padding-right: 8px;
+      font-size: @font-size-lg;
+      vertical-align: middle;
+    }
+  }
+}

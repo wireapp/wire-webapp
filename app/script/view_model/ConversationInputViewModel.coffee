@@ -96,6 +96,8 @@ class z.ViewModel.ConversationInputViewModel
       .blur => @browser_has_focus false
       .focus => @browser_has_focus true
 
+    @conversation_input_emoji = new z.ViewModel.ConversationInputEmojiViewModel
+
     @_init_subscriptions()
 
   _init_subscriptions: ->
@@ -269,7 +271,12 @@ class z.ViewModel.ConversationInputViewModel
     @input ''
     $(event.target).focus()
 
+  on_input_key_up: (data, event) =>
+    @conversation_input_emoji.on_input_key_up data, event
+    return true
+
   on_input_key_down: (data, event) =>
+    return if @conversation_input_emoji.on_input_key_down data, event
     switch event.keyCode
       when z.util.KEYCODE.ARROW_UP
         @edit_message @conversation_et().get_last_editable_message(), event.target if @input().length is 0
