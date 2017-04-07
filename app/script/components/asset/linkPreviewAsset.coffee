@@ -62,9 +62,18 @@ ko.components.register 'link-preview-asset',
                 <!-- ko if: header -->
                   <asset-header class="link-preview-info-header" params="message: message_et"></asset-header>
                 <!-- /ko -->
-                <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
-                <a class="link-preview-info-link text-graphite ellipsis" data-uie-name="link-preview-url" target="_blank" rel="nofollow noopener noreferrer"
-                   data-bind="text: z.util.naked_url(url), attr: {href: z.util.add_http(url), title: url}"></a>
+                <!-- ko if: preview.meta_data_type == undefined -->
+                  <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
+                  <a class="link-preview-info-link text-graphite ellipsis" data-uie-name="link-preview-url" target="_blank" rel="nofollow noopener noreferrer"
+                     data-bind="text: z.util.naked_url(url), attr: {href: z.util.add_http(url), title: url}"></a>
+                <!-- /ko -->
+                <!-- ko if: preview.meta_data_type === z.links.LinkPreviewMetaDataType.TWEET -->
+                  <div class="link-preview-info-title" data-uie-name="link-preview-title" data-bind="text: preview.title, css: header ? 'link-preview-info-title-singleline' : 'link-preview-info-title-multiline'"></div>
+                  <div class="link-preview-info-link text-graphite" data-uie-name="link-preview-tweet-author" attr: {title: url}>
+                    <span class="font-weight-bold ellipsis" data-bind="text: preview.meta_data.author"></span>
+                    <span data-bind="l10n_text: z.string.conversation_tweet_author"></span>
+                  </div>
+                <!-- /ko -->
               </div>
             <!-- /ko -->
             <!-- ko if: message_et.is_expired() -->

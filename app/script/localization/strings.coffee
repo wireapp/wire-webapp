@@ -275,6 +275,7 @@ z.string.conversation_delete_timestamp = 'Deleted on %@timestamp'
 z.string.conversation_edit_timestamp = 'Edited on %@timestamp'
 z.string.conversation_likes_caption = '%@number people'
 z.string.conversation_send_pasted_file = 'Pasted image at %date'
+z.string.conversation_tweet_author = ' on Twitter'
 
 # Collection
 z.string.collection_show_all = 'Show all %no'
