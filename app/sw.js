@@ -20,6 +20,12 @@
 ((global) => {
   'use strict';
 
+  const ASSET_CACHE_MAX_ITEMS = 1000;
+  const CACHE_VERSION = 2;
+  const CURRENT_CACHES = {
+    asset: `asset: 'asset-cache-v${CACHE_VERSION}`,
+  };
+
   importScripts('/worker/sw-toolbox.js');
   importScripts('/worker/lru-cache-strategy.js');
 
@@ -27,11 +33,21 @@
   global.toolbox.router.default = global.toolbox.networkOnly;
   global.toolbox.router.get(/forceCaching=true/, global.cacheLRU, {
     cache: {
-      name: 'asset-cache-v1',
-      maxEntries: 1000,
+      name: CURRENT_CACHES.asset,
+      maxEntries: ASSET_CACHE_MAX_ITEMS,
     },
   });
 
   global.addEventListener('install', event => event.waitUntil(global.skipWaiting()));
-  global.addEventListener('activate', event => event.waitUntil(global.clients.claim()));
+  global.addEventListener('activate', event => {
+    const expectedCacheNames = Object.keys(CURRENT_CACHES).map((key) => CURRENT_CACHES[key]);
+
+    return event.waitUntil(caches.keys().then((cacheNames) => {
+      return Promise.all(cacheNames.map((cacheName) => {
+        if (!expectedCacheNames.includes(cacheName)) {
+          return caches.delete(cacheName)
+        }
+      }).then(() => global.clients.claim()));
+    }));
+  });
 })(self);
