@@ -36,6 +36,7 @@ module.exports =
       'style/*.css'
       'script/**/*.js'
       'worker/*'
+      '*.js'
     ]
 
   dist_js:
@@ -79,6 +80,7 @@ module.exports =
       'style/*.css'
       'script/**/*.js'
       'worker/*'
+      '*.js'
     ]
 
   deploy_audio:
