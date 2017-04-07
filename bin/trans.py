@@ -2,7 +2,7 @@
 # coding: utf-8
 #
 # Wire
-# Copyright (C) 2016 Wire Swiss GmbH
+# Copyright (C) 2017 Wire Swiss GmbH
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,20 +43,20 @@ SUPPORTED_LOCALE = [
   'tr',
   'uk',
 ]
-home_dir = os.path.expanduser('~')
 
-os.system('crowdin-cli --identity=keys/crowdin.yaml upload sources')
-os.system('crowdin-cli --identity=keys/crowdin.yaml download')
-
-os.chdir(os.path.dirname(os.path.realpath(__file__)))
-root = 'app/script/localization/'
+root = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
+crowdin_yaml = os.path.join(root, 'keys', 'crowdin.yaml')
+localization_dir = os.path.join(root, 'app', 'script', 'localization/')
+os.chdir(root)
+os.system('crowdin-cli --identity=%s upload sources' % crowdin_yaml)
+os.system('crowdin-cli --identity=%s download' % crowdin_yaml)
 
 
 def remove_country(filename):
   parts = filename.split('-')
   if len(parts) == 3:
-    source = os.path.join(root, filename)
-    dest = os.path.join(root, '%s-%s.js' % (parts[0], parts[1]))
+    source = os.path.join(localization_dir, filename)
+    dest = os.path.join(localization_dir, '%s-%s.js' % (parts[0], parts[1]))
     shutil.move(source, dest)
 
 
@@ -79,23 +79,24 @@ def fix_apostrophe(text):
   return text
 
 
-for filename in os.listdir(root):
+for filename in os.listdir(localization_dir):
   remove_country(filename)
   locale = get_locale(filename)
   if locale:
     if locale not in SUPPORTED_LOCALE:
-      file_to_delete = os.path.join(root, filename)
+      file_to_delete = os.path.join(localization_dir, filename)
       sys.stdout.write('Removing unsupported locale "{}" ({})\n'.format(locale, file_to_delete))
       os.remove(file_to_delete)
       continue
 
-    with open(os.path.join(root, filename), 'r') as f:
+    with open(os.path.join(localization_dir, filename), 'r') as f:
       source = f.read()
 
-    with open(os.path.join(root, filename), 'w') as f:
+    with open(os.path.join(localization_dir, filename), 'w') as f:
       zstr = 'z.string.'
       zstrl = 'z.string.%s.' % locale
       source = source.replace('#X-Generator: crowdin.com', "'use strict';")
+      source = source.replace("'use=strict';\n", '')
       source = source.replace(zstrl, zstr).replace(zstr, zstrl)
       source = source.replace("='", " = '")
       source = source.replace('\:', ':')

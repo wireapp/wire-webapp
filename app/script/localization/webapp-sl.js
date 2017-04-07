@@ -223,6 +223,7 @@ z.string.sl.conversation_delete_timestamp = 'Izbrisan ob %@timestamp';
 z.string.sl.conversation_edit_timestamp = 'Urejen ob %@timestamp';
 z.string.sl.conversation_likes_caption = '%@number oseb';
 z.string.sl.conversation_send_pasted_file = 'Prilepljena slika ob %date';
+z.string.sl.conversation_tweet_author = ' na Twitterju';
 
 z.string.sl.collection_show_all = 'Prikaži vse %no';
 z.string.sl.collection_section_links = 'Povezave';
@@ -455,6 +456,7 @@ z.string.sl.warning_connectivity_connection_lost = 'Poizkus povezave. Wire morda
 z.string.sl.warning_connectivity_no_internet = 'Ni spletne povezave. Ne boste mogli pošiljati ali prejemati sporočil.';
 
 z.string.sl.warning_lifecycle_update = 'Na voljo je nova različica Wire.';
+z.string.sl.warning_lifecycle_update_notes = 'Kaj je novega';
 z.string.sl.warning_lifecycle_update_link = 'Posodobi zdaj';
 
 z.string.sl.system_notification_asset_add = 'Je delil(-a) sliko';

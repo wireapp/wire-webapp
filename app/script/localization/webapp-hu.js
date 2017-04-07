@@ -423,7 +423,20 @@ z.string.hu.upload_google_button_again = 'Próbáld újra';
 
 z.string.hu.url_password_reset = 'forgot/';
 z.string.hu.url_legal = 'https://wire.com/legal/';
+z.string.hu.url_privacy = 'https://wire.com/privacy/';
+z.string.hu.url_privacy_how = 'https://wire.com/privacy/how/';
+z.string.hu.url_privacy_why = 'https://wire.com/privacy/why/';
+z.string.hu.url_support = 'https://support.wire.com';
+z.string.hu.url_terms_of_use = 'https://wire.com/legal/terms/';
+z.string.hu.url_wire = 'https://wire.com';
+z.string.hu.url_wire_for_web = 'https://app.wire.com';
+z.string.hu.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
+z.string.hu.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
 z.string.hu.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
+z.string.hu.url_support_contact = 'https://support.wire.com/hc/en-us/requests/new';
+z.string.hu.url_support_contact_bug = 'https://support.wire.com/hc/en-us/requests/new?ticket_form_id=101615';
+z.string.hu.url_support_history = 'https://support.wire.com/hc/en-us/articles/207834645';
+z.string.hu.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/articles/202590081';
 z.string.hu.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662';
 z.string.hu.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
 z.string.hu.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889';
@@ -521,6 +534,7 @@ z.string.hu.init_sessions_progress = 'Munkamenet inicializálása - %progress %t
 z.string.hu.init_initialized_storage = 'Munkamenet betöltött';
 z.string.hu.init_received_user_data = 'Új üzenetek megtekintése';
 z.string.hu.init_events_expectation = '%events új üzenete van';
+z.string.hu.init_events_progress = 'Üzenetek betöltése - %progress %total';
 z.string.hu.init_updated_from_notifications = 'Már majdnem ott vagyunk';
 z.string.hu.init_app_pre_loaded = 'Élvezze a Wire-t';
 
