@@ -389,15 +389,15 @@ class z.conversation.EventMapper
     return if not link_preview?
 
     link_preview_et = new z.entity.LinkPreview()
-    link_preview_et.title = link_preview.title or link_preview.article.title
-    link_preview_et.summary = link_preview.summary or link_preview.article.summary
-    link_preview_et.permanent_url = link_preview.permanent_url or link_preview.article.permanent_url
+    link_preview_et.title = link_preview.title or link_preview.article?.title
+    link_preview_et.summary = link_preview.summary or link_preview.article?.summary
+    link_preview_et.permanent_url = link_preview.permanent_url or link_preview.article?.permanent_url
     link_preview_et.original_url = link_preview.url
     link_preview_et.url_offset = link_preview.url_offset
     link_preview_et.meta_data_type = link_preview.meta_data
     link_preview_et.meta_data = link_preview[link_preview.meta_data]
 
-    image = link_preview.image or link_preview.article.image
+    image = link_preview.image or link_preview.article?.image
 
     if image?
       {asset_token, asset_id, otr_key, sha256} = image.uploaded
