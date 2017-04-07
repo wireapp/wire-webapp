@@ -2246,10 +2246,7 @@ class z.conversation.ConversationRepository
 
       if message_et.has_asset_text()
         for asset_et in message_et.assets() when asset_et.is_text()
-          if message_et.user()
-            asset_et.theme_color = message_et.user().accent_color()
-          else
-            Raygun.send new Error 'Message does not contain user when updating'
+          asset_et.theme_color = message_et.user().accent_color()
 
       return message_et
 
