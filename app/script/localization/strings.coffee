@@ -540,6 +540,7 @@ z.string.warning_connectivity_no_internet = 'No Internet. You won’t be able to
 
 # Warnings: Desktop Update
 z.string.warning_lifecycle_update = 'A new version of Wire is available.'
+z.string.warning_lifecycle_update_notes = 'What’s new'
 z.string.warning_lifecycle_update_link = 'Update now'
 
 # Browser notifications
