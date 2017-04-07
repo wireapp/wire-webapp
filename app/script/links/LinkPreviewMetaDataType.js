@@ -17,36 +17,11 @@
  *
  */
 
-.like-transform-mixin(@scale) {
-  transform: scale3d(@scale, @scale, 1) translate(-50%, -50%);
-}
+'use strict';
 
-.like-button {
-  .circle(24px);
-  cursor: pointer;
-  position: relative;
+window.z = window.z || {};
+window.z.links = z.links || {};
 
-  > span {
-    .like-transform-mixin(1);
-    color: @w-red;
-    left: 50%;
-    position: absolute;
-    top: 50%;
-    transform-origin: 0 0;
-
-
-    &:last-child {
-      .like-transform-mixin(4);
-      opacity: 0;
-      pointer-events: none;
-      transition: all @animation-timing-fast @ease-out-quart;
-    }
-  }
-}
-
-.like-button-liked {
-  > span:last-child {
-    .like-transform-mixin(1);
-    opacity: 1;
-  }
-}
+z.links.LinkPreviewMetaDataType = {
+  TWEET: 'tweet',
+};

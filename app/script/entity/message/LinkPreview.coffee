@@ -30,3 +30,7 @@ class z.entity.LinkPreview
 
     # z.assets.AssetRemoteData
     @image_resource = ko.observable()
+
+    # meta data
+    @meta_data_type = undefined
+    @meta_data = undefined
