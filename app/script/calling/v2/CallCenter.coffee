@@ -129,7 +129,8 @@ class z.calling.v2.CallCenter
   _on_handled_conversation_event: (event) ->
     switch event.type
       when z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
-        @user_repository.get_user_by_id @get_creator_id(event), (creator_et) ->
+        @user_repository.get_user_by_id @get_creator_id(event)
+        .then (creator_et) ->
           amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL,
             first_name: creator_et.name()
             call_id: event.conversation

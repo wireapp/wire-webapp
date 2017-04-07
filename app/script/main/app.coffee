@@ -237,7 +237,7 @@ class z.main.App
       @logger.info error_message, {error: error}
       @logger.debug "App reload: '#{is_reload}', Document referrer: '#{document.referrer}', Location: '#{window.location.href}'"
 
-      if is_reload and error.type not in [z.client.ClientError::TYPE.MISSING_ON_BACKEND, z.client.ClientError::TYPE.NO_LOCAL_CLIENT]
+      if is_reload and error.type not in [z.client.ClientError.TYPE.MISSING_ON_BACKEND, z.client.ClientError.TYPE.NO_LOCAL_CLIENT]
         @auth.client.execute_on_connectivity().then -> window.location.reload false
       else if navigator.onLine
         @logger.error "Caused by: #{error?.message or error}"

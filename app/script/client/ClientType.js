@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,12 @@
  *
  */
 
-((global) => {
-  'use strict';
+'use strict';
 
-  importScripts('/ext/js/sw-toolbox.js');
-  importScripts('/worker/lru-cache-strategy.js');
+window.z = window.z || {};
+window.z.client = z.client || {};
 
-  global.toolbox.options.debug = false;
-  global.toolbox.router.default = global.toolbox.networkOnly;
-  global.toolbox.router.get(/forceCaching=true/, global.cacheLRU, {
-    cache: {
-      name: 'asset-cache-v1',
-      maxEntries: 1000,
-    },
-  });
-
-  global.addEventListener('install', event => event.waitUntil(global.skipWaiting()));
-  global.addEventListener('activate', event => event.waitUntil(global.clients.claim()));
-})(self);
+z.client.ClientType = {
+  PERMANENT: 'permanent',
+  TEMPORARY: 'temporary',
+};

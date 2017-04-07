@@ -110,8 +110,7 @@ class z.connect.ConnectGoogleService
   _init_library: ->
     if window.gapi
       return Promise.resolve()
-    else
-      return @_load_library()
+    return @_load_library()
 
   ###
   Lazy loading of the Google Auth Client for JavaScript.
