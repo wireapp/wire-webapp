@@ -20,7 +20,7 @@
 ((global) => {
   'use strict';
 
-  importScripts('/ext/js/sw-toolbox.js');
+  importScripts('/worker/sw-toolbox.js');
   importScripts('/worker/lru-cache-strategy.js');
 
   global.toolbox.options.debug = false;
