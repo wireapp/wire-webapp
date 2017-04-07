@@ -11,6 +11,7 @@ globals:
   _: true
   $: true
   amplify: true
+  CryptoJS: true
   ko: true
   LRUCache: true
   moment: true

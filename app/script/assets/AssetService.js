@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -219,7 +219,7 @@ z.assets.AssetService = class AssetService {
     const url = this.client.create_url(`/assets/${asset_id}`);
     let asset_url = `${url}?access_token=${this.client.access_token}&conv_id=${conversation_id}`;
     if (force_caching) {
-      asset_url = `${asset_url}&forceCaching=true`; 
+      asset_url = `${asset_url}&forceCaching=true`;
     }
     return asset_url;
   }
@@ -237,7 +237,7 @@ z.assets.AssetService = class AssetService {
     const url = this.client.create_url(`/conversations/${conversation_id}/otr/assets/${asset_id}`);
     let asset_url = `${url}?access_token=${this.client.access_token}`;
     if (force_caching) {
-      asset_url = `${asset_url}&forceCaching=true`; 
+      asset_url = `${asset_url}&forceCaching=true`;
     }
     return asset_url;
   }
@@ -254,10 +254,10 @@ z.assets.AssetService = class AssetService {
     const url = this.client.create_url(`/assets/v3/${asset_key}/`);
     let asset_url = `${url}?access_token=${this.client.access_token}`;
     if (asset_token) {
-      asset_url = `${asset_url}&asset_token=${asset_token}`; 
+      asset_url = `${asset_url}&asset_token=${asset_token}`;
     }
     if (force_caching) {
-      asset_url = `${asset_url}&forceCaching=true`; 
+      asset_url = `${asset_url}&forceCaching=true`;
     }
     return asset_url;
   }
