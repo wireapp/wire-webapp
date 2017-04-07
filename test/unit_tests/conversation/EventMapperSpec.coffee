@@ -49,7 +49,7 @@ describe 'Event Mapper', ->
       expect(message_et.get_first_asset().nonce).toBe event.data.nonce
       expect(message_et).toBeDefined()
 
-    it 'maps text messages with link previews', ->
+    it 'maps text messages with deprecated link preview format', ->
       event_id = z.util.create_random_uuid
 
       article = new z.proto.Article 'test.com', 'Test title', 'Test description'
@@ -71,6 +71,30 @@ describe 'Event Mapper', ->
       expect(message_et.get_first_asset().nonce).toBe event.data.nonce
       expect(message_et.get_first_asset().previews().length).toBe 1
       expect(message_et.get_first_asset().previews()[0].original_url).toBe 'test.com'
+      expect(message_et).toBeDefined()
+
+    it 'maps text messages with link preview', ->
+      event_id = z.util.create_random_uuid
+
+      link_preview = new z.proto.LinkPreview 'test.com', 0, null, 'test.com/perm', 'Test title', 'Test description'
+
+      event =
+        conversation: conversation_et.id
+        data:
+          content: 'test.com'
+          nonce: event_id
+          previews: [link_preview.encode64()]
+        id: event_id
+        from: z.util.create_random_uuid
+        time: new Date().toISOString()
+        type: z.event.Backend.CONVERSATION.MESSAGE_ADD
+
+      message_et = event_mapper.map_json_event event, conversation_et
+      expect(message_et.get_first_asset().text).toBe event.data.content
+      expect(message_et.get_first_asset().nonce).toBe event.data.nonce
+      expect(message_et.get_first_asset().previews().length).toBe 1
+      expect(message_et.get_first_asset().previews()[0].original_url).toBe link_preview.url
+      expect(message_et.get_first_asset().previews()[0].permanent_url).toBe link_preview.permanent_url
       expect(message_et).toBeDefined()
 
     it 'skips messages which cannot be mapped', ->
