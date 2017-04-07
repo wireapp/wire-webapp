@@ -20,9 +20,26 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.assets = z.assets || {};
+window.z.connect = z.connect || {};
 
-z.assets.AssetUploadFailedReason = {
-  CANCELLED: 0,
-  FAILED: 1,
+z.connect.ConnectService = class ConnectService {
+  constructor(client) {
+    this.client = client;
+    this.logger = new z.util.Logger('z.connect.ConnectService', z.config.LOGGER.OPTIONS);
+  }
+
+  /*
+  Upload address book data for matching.
+  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/addressbook/onboardingV3
+
+  @param {z.connect.PhoneBook} phone_book Phone book containing the address cards
+  @return {Promise} - Resolves with the matched contacts from the user's phone book
+  */
+  post_onboarding(phone_book) {
+    return this.client.send_json({
+      type: 'POST',
+      url: this.client.create_url('/onboarding/v3'),
+      data: phone_book,
+    });
+  }
 };

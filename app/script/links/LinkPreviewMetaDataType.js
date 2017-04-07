@@ -20,9 +20,8 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.assets = z.assets || {};
+window.z.links = z.links || {};
 
-z.assets.AssetUploadFailedReason = {
-  CANCELLED: 0,
-  FAILED: 1,
+z.links.LinkPreviewMetaDataType = {
+  TWEET: 'tweet',
 };

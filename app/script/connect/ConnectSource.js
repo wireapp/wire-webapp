@@ -20,9 +20,9 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.assets = z.assets || {};
+window.z.connect = z.connect || {};
 
-z.assets.AssetUploadFailedReason = {
-  CANCELLED: 0,
-  FAILED: 1,
+z.connect.ConnectSource = {
+  GMAIL: 'gmail',
+  ICLOUD: 'icloud',
 };
