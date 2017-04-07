@@ -96,7 +96,7 @@ class z.ViewModel.ConversationInputViewModel
       .blur => @browser_has_focus false
       .focus => @browser_has_focus true
 
-    @conversation_input_emoji = new z.ViewModel.ConversationInputEmojiViewModel
+    @conversation_input_emoji = new z.ViewModel.ConversationInputEmojiViewModel()
 
     @_init_subscriptions()
 
