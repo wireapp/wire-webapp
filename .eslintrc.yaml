@@ -12,6 +12,7 @@ globals:
   $: true
   amplify: true
   ko: true
+  libsodium: true
   LRUCache: true
   moment: true
   pako: true
