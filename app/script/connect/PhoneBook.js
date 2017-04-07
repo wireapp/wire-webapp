@@ -20,9 +20,15 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.assets = z.assets || {};
+window.z.connect = z.connect || {};
 
-z.assets.AssetUploadFailedReason = {
-  CANCELLED: 0,
-  FAILED: 1,
+z.connect.PhoneBook = class PhoneBook {
+  /*
+  Construct a new Phone book.
+  @param {z.entity.User} self_user Self user
+  */
+  constructor(self_user) {
+    this.self = [self_user.email()];
+    this.cards = [];
+  }
 };

@@ -42,8 +42,18 @@ z.links.LinkPreviewProtoBuilder = {
     data.url = data.url || url;
 
     if (data.title && data.url) {
-      const preview = new z.proto.Article(data.url, data.title, data.description);
-      return new z.proto.LinkPreview(url, offset, preview);
+      const article = new z.proto.Article(data.url, data.title, data.description); // deprecated format
+      const preview = new z.proto.LinkPreview(url, offset, article, data.url, data.title, data.description);
+
+      if (data.site_name === 'Twitter') {
+        const author = data.title.replace('on Twitter', '').trim();
+        const username = data.url.match(/com\/([^/]*)\//)[1];
+        const tweet = new z.proto.Tweet(author, username);
+        preview.set('tweet', tweet);
+        preview.set('title', data.description);
+      }
+
+      return preview;
     }
   },
 
