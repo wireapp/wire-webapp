@@ -2123,8 +2123,7 @@ class z.conversation.ConversationRepository
   @return [Promise] Promise that resolves with the message entity for the event
   ###
   _add_event_to_conversation: (json, conversation_et) ->
-    message_et = @event_mapper.map_json_event json, conversation_et, true
-    @_update_user_ets message_et
+    @_update_user_ets @event_mapper.map_json_event json, conversation_et, true
     .then (message_et) =>
       if conversation_et
         conversation_et.add_message message_et
@@ -2232,25 +2231,25 @@ class z.conversation.ConversationRepository
       message_et.user user_et
 
       if message_et.is_member() or message_et.user_ets?
-        @user_repository.get_users_by_id message_et.user_ids()
+        return @user_repository.get_users_by_id message_et.user_ids()
         .then (user_ets) ->
           message_et.user_ets user_ets
+          return message_et
 
       if message_et.reactions
         if Object.keys(message_et.reactions()).length
-          user_ids = (user_id for user_id of message_et.reactions())
-          @user_repository.get_users_by_id user_ids
+          return @user_repository.get_users_by_id (user_id for user_id of message_et.reactions())
           .then (user_ets) ->
             message_et.reactions_user_ets user_ets
-        else
-          message_et.reactions_user_ets.removeAll()
+            return message_et
+        message_et.reactions_user_ets.removeAll()
 
       if message_et.has_asset_text()
         for asset_et in message_et.assets() when asset_et.is_text()
-          if not message_et.user()
-            Raygun.send new Error 'Message does not contain user when updating'
-          else
+          if message_et.user()
             asset_et.theme_color = message_et.user().accent_color()
+          else
+            Raygun.send new Error 'Message does not contain user when updating'
 
       return message_et
 
