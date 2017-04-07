@@ -20,14 +20,14 @@
 ((global) => {
   'use strict';
 
+  importScripts('/worker/sw-toolbox.js');
+  importScripts('/worker/lru-cache-strategy.js');
+
   const ASSET_CACHE_MAX_ITEMS = 1000;
   const CACHE_VERSION = 2;
   const CURRENT_CACHES = {
     asset: `asset: 'asset-cache-v${CACHE_VERSION}`,
   };
-
-  importScripts('/worker/sw-toolbox.js');
-  importScripts('/worker/lru-cache-strategy.js');
 
   global.toolbox.options.debug = false;
   global.toolbox.router.default = global.toolbox.networkOnly;
