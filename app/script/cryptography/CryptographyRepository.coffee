@@ -19,6 +19,7 @@
 window.z ?= {}
 z.cryptography ?= {}
 
+
 # Cryptography repository for all cryptography interactions with the cryptography service.
 class z.cryptography.CryptographyRepository
   @::EVENT =
