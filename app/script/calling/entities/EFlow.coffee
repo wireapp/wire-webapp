@@ -25,7 +25,6 @@ E_FLOW_CONFIG =
   NEGOTIATION_FAILED_TIMEOUT: 30 * 1000
   NEGOTIATION_RESTART_TIMEOUT: 2500
   SDP_SEND_TIMEOUT: 5 * 1000
-  SDP_SEND_TIMEOUT_RENEGOTIATION: 50
   SDP_SEND_TIMEOUT_RESET: 1000
 
 # E-Flow entity.
@@ -570,10 +569,7 @@ class z.calling.entities.EFlow
       @logger.debug "Setting local '#{@local_sdp().type}' SDP successful", @peer_connection.localDescription
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET
       @should_set_local_sdp false
-      switch @negotiation_mode()
-        when z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE then @send_local_sdp()
-        when z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART then @_set_gathering_state_timeout()
-        else @_set_send_sdp_timeout()
+      @_set_send_sdp_timeout()
     .catch (error) =>
       @logger.error "Setting local '#{@local_sdp().type}' SDP failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'set_sdp', location: 'local', type: @local_sdp()?.type}
@@ -596,18 +592,6 @@ class z.calling.entities.EFlow
       attributes = {cause: error.name, step: 'set_sdp', location: 'remote', type: @remote_sdp()?.type}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
       amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED
-
-  ###
-  Set timeout to check for ICE gathering state on renegotiation.
-  @note If renegotiation was triggered by remote end, we do not gather new candidates and can send SDP almost immediately.
-  ###
-  _set_gathering_state_timeout: ->
-    @send_sdp_timeout = window.setTimeout =>
-      if @gathering_state() is z.calling.rtc.ICEGatheringState.COMPLETE
-        @logger.debug 'Sending local SDP as ICE gathering state did not change'
-        return @send_local_sdp true
-      @_set_send_sdp_timeout()
-    , E_FLOW_CONFIG.SDP_SEND_TIMEOUT_RENEGOTIATION
 
   ###
   Set the negotiation failed timeout.

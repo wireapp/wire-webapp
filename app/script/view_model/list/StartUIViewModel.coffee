@@ -204,13 +204,14 @@ class z.ViewModel.list.StartUIViewModel
 
   _show_onboarding_results: (response) =>
     @search_repository.show_onboarding response
-    .then (matched_user_ets) =>
-      @suggestions matched_user_ets
+    .then ([connected_user_ets, suggested_user_ets]) =>
+      @contacts connected_user_ets
+      @suggestions suggested_user_ets
       return @get_top_people()
     .then (user_ets) =>
       @top_users user_ets
       @selected_people.removeAll()
-      if @suggestions().length is 0
+      if not @suggestions().length and not @contacts().length
         if @top_users().length > 0
           @suggestions @top_users()
         else
