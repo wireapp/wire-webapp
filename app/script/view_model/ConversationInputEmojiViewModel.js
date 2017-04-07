@@ -33,8 +33,16 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     });
   }
 
+  static get EMOJI_LIST_LENGTH() {
+    return 5;
+  }
+
+  static get MIN_QUERY_LENGTH() {
+    return 2;
+  }
+
   on_input_key_down(data, event) {
-    if (!this.emoji_list.is(':visible')) {
+    if (this.emoji_list.is(':hidden')) {
       return false;
     }
 
@@ -95,12 +103,12 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     }
 
     let query = input.value.substr(this.emoji_start_pos, input.selectionStart - this.emoji_start_pos);
-    if (query.length < 2 || query[0] === ' ' || !this.emoji_dict) {
+    if (query.length < ConversationInputEmojiViewModel.MIN_QUERY_LENGTH || query[0] === ' ' || !this.emoji_dict) {
       this.emoji_list.remove();
     } else {
       let emoji_matched = this.emoji_dict
         .filter((emoji) => emoji.indexOf(query) !== -1)
-        .slice(0, 5)
+        .slice(0, ConversationInputEmojiViewModel.EMOJI_LIST_LENGTH)
         .map((emoji) => {
           let [code, name] = emoji.split('\t');
           let parsed_unicode_emoji = String.fromCodePoint.apply(null, code.split(','));
