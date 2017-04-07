@@ -25,6 +25,7 @@ class z.cryptography.CryptographyRepository
   @::EVENT =
     RESET_SESSION_REQUEST: '💣'
 
+
   ###
   Construct a new Cryptography repository.
   @param cryptography_service [z.cryptography.CryptographyService] Backend REST API cryptography service implementation
