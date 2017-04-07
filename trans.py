@@ -56,12 +56,12 @@ def remove_country(filename):
   parts = filename.split('-')
   if len(parts) == 3:
     source = os.path.join(root, filename)
-    dest = os.path.join(root, '%s-%s.coffee' % (parts[0], parts[1]))
+    dest = os.path.join(root, '%s-%s.js' % (parts[0], parts[1]))
     shutil.move(source, dest)
 
 
 def get_locale(filename):
-  locale = filename.replace('strings-', '').replace('.coffee', '')
+  locale = filename.replace('webapp-', '').replace('.js', '')
   return locale if len(locale) == 2 else None
 
 
@@ -95,7 +95,7 @@ for filename in os.listdir(root):
     with open(os.path.join(root, filename), 'w') as f:
       zstr = 'z.string.'
       zstrl = 'z.string.%s.' % locale
-      source = source.replace('#X-Generator: crowdin.com\n', '')
+      source = source.replace('#X-Generator: crowdin.com', "'use strict';")
       source = source.replace(zstrl, zstr).replace(zstr, zstrl)
       source = source.replace("='", " = '")
       source = source.replace('\:', ':')
