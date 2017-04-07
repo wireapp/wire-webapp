@@ -313,12 +313,12 @@ class z.calling.v3.CallCenter
         when z.media.MediaType.SCREEN
           send_state = if invert then not @self_state.screen_send() else @self_state.screen_send()
           payload = props:
-            screensend: "#send_state}"
+            screensend: "#{send_state}"
             videosend: "#{@self_state.video_send()}"
         when z.media.MediaType.VIDEO
           send_state = if invert then not @self_state.video_send() else @self_state.video_send()
           payload = props:
-            screensend: "#{@self_state.screen_send()}"
+            screensend: "false"
             videosend: "#{send_state}"
 
     if additional_payload
