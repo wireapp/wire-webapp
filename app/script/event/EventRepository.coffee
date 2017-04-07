@@ -443,7 +443,7 @@ class z.event.EventRepository
       cryptobox_version: cryptobox.version
       client_local_class: @current_client().class
       client_local_type: @current_client().type
-      error_code: error_code
+      error_code: decrypt_error.code
       event_type: event.type
       session_id: session_id
 
