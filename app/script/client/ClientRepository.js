@@ -33,11 +33,11 @@ z.client.ClientRepository = class ClientRepository {
     this.clients = ko.pureComputed(() => this.self_user() ? this.self_user().devices() : []);
     this.current_client = ko.observable();
 
-    amplify.subscribe(z.event.Backend.USER.CLIENT_ADD, this.map_self_client);
-    amplify.subscribe(z.event.Backend.USER.CLIENT_REMOVE, this.on_client_remove);
-    amplify.subscribe(z.event.WebApp.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logout_client);
+    amplify.subscribe(z.event.Backend.USER.CLIENT_ADD, this.map_self_client.bind(this));
+    amplify.subscribe(z.event.Backend.USER.CLIENT_REMOVE, this.on_client_remove.bind(this));
+    amplify.subscribe(z.event.WebApp.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logout_client.bind(this));
     // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
-    amplify.subscribe(z.event.WebApp.LOGOUT.ASK_TO_CLEAR_DATA, this.logout_client);
+    amplify.subscribe(z.event.WebApp.LOGOUT.ASK_TO_CLEAR_DATA, this.logout_client.bind(this));
 
     return this;
   }
