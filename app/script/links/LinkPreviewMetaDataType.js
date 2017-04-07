@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,15 +20,8 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.auth = z.auth || {};
+window.z.links = z.links || {};
 
-z.auth.URLParameter = {
-  BOT: 'bot',
-  CALLING_V3: 'calling_v3',
-  CONNECT: 'connect',
-  ENVIRONMENT: 'env',
-  EXPIRED: 'expired',
-  INVITE: 'invite',
-  LOCALE: 'hl',
-  LOCALYTICS: 'localytics',
+z.links.LinkPreviewMetaDataType = {
+  TWEET: 'tweet',
 };

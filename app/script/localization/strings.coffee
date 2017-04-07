@@ -275,6 +275,7 @@ z.string.conversation_delete_timestamp = 'Deleted on %@timestamp'
 z.string.conversation_edit_timestamp = 'Edited on %@timestamp'
 z.string.conversation_likes_caption = '%@number people'
 z.string.conversation_send_pasted_file = 'Pasted image at %date'
+z.string.conversation_tweet_author = ' on Twitter'
 
 # Collection
 z.string.collection_show_all = 'Show all %no'
@@ -539,6 +540,7 @@ z.string.warning_connectivity_no_internet = 'No Internet. You won’t be able to
 
 # Warnings: Desktop Update
 z.string.warning_lifecycle_update = 'A new version of Wire is available.'
+z.string.warning_lifecycle_update_notes = 'What’s new'
 z.string.warning_lifecycle_update_link = 'Update now'
 
 # Browser notifications

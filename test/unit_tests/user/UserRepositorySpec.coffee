@@ -79,17 +79,16 @@ describe 'z.user.UserRepository', ->
       afterEach ->
         user_repository.connections.removeAll()
 
-      it 'returns connection for the given conversation id' , ->
+      it 'should return the expected connection for the given conversation id' , ->
         connection_et = user_repository.get_connection_by_conversation_id connection_et_a.conversation_id
         expect(connection_et).toBe connection_et_a
 
-      it 'returns connection for the given conversation id' , ->
         connection_et = user_repository.get_connection_by_conversation_id ''
         expect(connection_et).not.toBeDefined()
 
     describe 'get_connections', ->
       # TODO: This test seems to be flaky!
-      xit 'gets the connected users', (done) ->
+      xit 'should return the connected users', (done) ->
         server.respondWith 'GET', "#{test_factory.settings.connection.rest_url}/connections?size=500", [
           200
           'Content-Type': 'application/json'
@@ -112,22 +111,22 @@ describe 'z.user.UserRepository', ->
 
   describe 'users', ->
     describe 'add_client_to_user', ->
-      beforeEach ->
+      beforeEach (done) ->
         user_et = new z.entity.User()
         user_repository.save_user user_et
+        .then done
+        .catch done.fail
 
         it 'adds a client entity to a user entity', ->
           user_repository.add_client_to_user user_et.id, new z.client.Client()
           expect(user_et.devices().length).toBe 1
 
-        it 'does not add the same client twice', ->
+        it 'does not add the same client twice', (done) ->
           first_client = new z.client.Client()
           first_client.id = '5021d77752286cac'
 
           second_client = new z.client.Client()
           second_client.id = '575b7a890cdb7635'
-
-          user_repository.save_user user_et
 
           is_new_client = user_repository.add_client_to_user user_et.id, first_client
           expect(is_new_client).toBe true
@@ -141,36 +140,48 @@ describe 'z.user.UserRepository', ->
           expect(user_et.devices().length).toBe 2
 
     describe 'fetch_user_by_id', ->
-      it 'executes the callback if the array of user_ids only contains undefined', ->
-        user_ids = [undefined, undefined, undefined]
-        callback = sinon.spy()
+      it 'should handle malformed input', (done) ->
+        user_repository.fetch_users_by_id()
+        .then (response) ->
+          expect(response.length).toBe 0
+          return user_repository.fetch_users_by_id [undefined, undefined, undefined]
+        .then (response) ->
+          expect(response.length).toBe 0
+          done()
+        .catch done.fail
 
-        user_repository.fetch_users_by_id user_ids, callback
-        expect(callback.called).toBeTruthy()
-
-    describe 'find_user', ->
+    describe 'find_user_by_id', ->
       user = null
 
-      beforeEach ->
+      beforeEach (done) ->
         user = new z.entity.User()
         user.id = entities.user.john_doe.id
         user_repository.save_user user
+        .then done
+        .catch done.fail
 
       afterEach ->
         user_repository.users.removeAll()
 
-      it 'finds an existing user', ->
-        user_et = user_repository.find_user user.id
-        expect(user_et).toEqual user
+      it 'should find an existing user', (done) ->
+        user_repository.find_user_by_id user.id
+        .then (user_et) ->
+          expect(user_et).toEqual user
+          done()
+        .catch done.fail
 
-      it 'cannot find an unknown user', ->
-        expect(user_repository.find_user '1').toBeFalsy()
+      it 'should not find an unknown user', (done) ->
+        user_repository.find_user_by_id '1'
+        .then done.fail
+        .catch (error) ->
+          expect(error.type).toBe z.user.UserError::TYPE.USER_NOT_FOUND
+          done()
 
     describe 'search_for_connected_users', ->
       user_et_a = null
       user_et_b = null
 
-      beforeEach ->
+      beforeEach (done) ->
         connection_et = new z.entity.Connection()
         connection_et.status z.user.ConnectionStatus.ACCEPTED
 
@@ -178,15 +189,17 @@ describe 'z.user.UserRepository', ->
         user_et_a.name 'René'
         user_et_a.username 'foo'
         user_et_a.connection connection_et
-        user_repository.save_user user_et_a
 
         user_et_b = new z.entity.User z.util.create_random_uuid()
         user_et_b.name 'Gregor'
         user_et_b.connection connection_et
-        user_repository.save_user user_et_b
+
+        user_repository.save_users [user_et_a, user_et_b]
+        .then done
+        .catch done.fail
 
       afterEach ->
-        user_repository.users []
+        user_repository.users.removeAll()
 
       it 'finds the correct user by searching for the full name', ->
         result = user_repository.search_for_connected_users 'Gregor'
@@ -210,57 +223,50 @@ describe 'z.user.UserRepository', ->
         expect(result[1].id).toBe user_et_a.id
 
     describe 'save_user', ->
-      it 'saves a user', ->
+      afterEach ->
+        user_repository.users.removeAll()
+
+      it 'saves a user', (done) ->
         user = new z.entity.User()
         user.id = entities.user.jane_roe.id
 
         user_repository.save_user user
+        .then ->
+          expect(user_repository.users().length).toBe 1
+          expect(user_repository.users()[0]).toBe user
+          done()
+        .catch done.fail
 
-        expect(user_repository.find_user user.id).toBe user
-        expect(user_repository.user_exists user.id).toBeTruthy()
-
-      it 'saves self user', ->
+      it 'saves self user', (done) ->
         user = new z.entity.User()
         user.id = entities.user.jane_roe.id
 
         user_repository.save_user user, true
-
-        expect(user_repository.find_user user.id).toBe user
-        expect(user_repository.user_exists user.id).toBeTruthy()
-        expect(user_repository.self()).toBe user
-
-    describe 'user_exists', ->
-      user = null
-
-      beforeEach ->
-        user = new z.entity.User entities.user.john_doe.id
-        user_repository.save_user user
-
-      afterEach ->
-        user_repository.users.removeAll()
-
-      it 'finds an existing user', ->
-        expect(user_repository.user_exists user.id).toBeTruthy()
-
-      it 'cannot find an unknown user', ->
-        expect(user_repository.user_exists '1').toBeFalsy()
+        .then ->
+          expect(user_repository.users().length).toBe 1
+          expect(user_repository.users()[0]).toBe user
+          expect(user_repository.self()).toBe user
+          done()
+        .catch done.fail
 
     describe '_assign_all_clients', ->
       user_jane_roe = null
       user_john_doe = null
 
-      beforeEach ->
+      beforeEach (done) ->
         user_jane_roe = new z.entity.User entities.user.jane_roe.id
         user_john_doe = new z.entity.User entities.user.john_doe.id
         user_repository.save_users [user_jane_roe, user_john_doe]
-
-        permanent_client = client_repository.client_mapper.map_client entities.clients.john_doe.permanent
-        plain_client = client_repository.client_mapper.map_client entities.clients.jane_roe.plain
-        temporary_client = client_repository.client_mapper.map_client entities.clients.john_doe.temporary
-        user_client_map =
-          "#{entities.user.john_doe.id}": [permanent_client, temporary_client]
-          "#{entities.user.jane_roe.id}": [plain_client]
-        spyOn(client_repository, 'get_all_clients_from_db').and.returnValue Promise.resolve user_client_map
+        .then ->
+          permanent_client = client_repository.client_mapper.map_client entities.clients.john_doe.permanent
+          plain_client = client_repository.client_mapper.map_client entities.clients.jane_roe.plain
+          temporary_client = client_repository.client_mapper.map_client entities.clients.john_doe.temporary
+          user_client_map =
+            "#{entities.user.john_doe.id}": [permanent_client, temporary_client]
+            "#{entities.user.jane_roe.id}": [plain_client]
+          spyOn(client_repository, 'get_all_clients_from_db').and.returnValue Promise.resolve user_client_map
+          done()
+        .catch done.fail
 
       afterEach ->
         user_repository.users.removeAll()

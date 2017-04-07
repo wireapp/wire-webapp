@@ -93,7 +93,6 @@ describe 'z.calling.v2.CallCenter', ->
         user_et = new z.entity.User z.util.create_random_uuid()
         user_et.name name
         user_repository.save_user user_et, is_self
-
         return user_et
 
       user_ets =

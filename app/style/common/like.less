@@ -18,7 +18,7 @@
  */
 
 .like-transform-mixin(@scale) {
-  transform: scale(@scale) translate(-50%, -50%);
+  transform: scale3d(@scale, @scale, 1) translate(-50%, -50%);
 }
 
 .like-button {
@@ -36,7 +36,7 @@
 
 
     &:last-child {
-      .like-transform-mixin(6);
+      .like-transform-mixin(4);
       opacity: 0;
       pointer-events: none;
       transition: all @animation-timing-fast @ease-out-quart;
