@@ -57,9 +57,9 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         this.suppress_key_up = true;
         break;
       case z.util.KEYCODE.ENTER: {
-        let input = event.target;
-        let emoji = this.emoji_list.find('>div.selected>span').html();
-        let val = input.value;
+        const input = event.target;
+        const emoji = this.emoji_list.find('>div.selected>span').html();
+        const val = input.value;
         input.value = val.substr(0, this.emoji_start_pos - 1) + emoji + val.substr(input.selectionStart);
         input.setSelectionRange(this.emoji_start_pos, this.emoji_start_pos);
         this.emoji_list.remove();
@@ -77,8 +77,8 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
 
   on_input_key_up(data, event) {
     if (!this.suppress_key_up) {
-      let input = event.target;
-      let text = input.value || '';
+      const input = event.target;
+      const text = input.value || '';
 
       if (text[input.selectionStart - 1] === ':') {
         this.emoji_start_pos = input.selectionStart;
@@ -102,16 +102,16 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
       return;
     }
 
-    let query = input.value.substr(this.emoji_start_pos, input.selectionStart - this.emoji_start_pos);
+    const query = input.value.substr(this.emoji_start_pos, input.selectionStart - this.emoji_start_pos);
     if (query.length < ConversationInputEmojiViewModel.MIN_QUERY_LENGTH || query[0] === ' ' || !this.emoji_dict) {
       this.emoji_list.remove();
     } else {
-      let emoji_matched = this.emoji_dict
+      const emoji_matched = this.emoji_dict
         .filter((emoji) => emoji.indexOf(query) !== -1)
         .slice(0, ConversationInputEmojiViewModel.EMOJI_LIST_LENGTH)
         .map((emoji) => {
-          let [code, name] = emoji.split('\t');
-          let parsed_unicode_emoji = String.fromCodePoint.apply(null, code.split(','));
+          const [code, name] = emoji.split('\t');
+          const parsed_unicode_emoji = String.fromCodePoint.apply(null, code.split(','));
           return `<div><span>${parsed_unicode_emoji}</span>${name}</div>`;
         })
         .join('');
@@ -122,8 +122,8 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         this.emoji_list.html(emoji_matched).appendTo('body').show();
         this.emoji_list.find('>div:nth(0)').addClass('selected');
 
-        let pos = this.get_cursor_pixel_pos(input);
-        let top = pos.top - this.emoji_list.height();
+        const pos = this.get_cursor_pixel_pos(input);
+        const top = pos.top - this.emoji_list.height();
 
         this.emoji_list.css('left', pos.left);
         this.emoji_list.css('top', top);
@@ -132,23 +132,23 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   }
 
   rotate_emoji_list(backward) {
-    let previous = this.emoji_list.find('>div.selected');
-    let new_selection = (previous.index() + (backward ? -1 : 1)) % this.emoji_list.find('>div').length;
+    const previous = this.emoji_list.find('>div.selected');
+    const new_selection = (previous.index() + (backward ? -1 : 1)) % this.emoji_list.find('>div').length;
     previous.removeClass('selected');
     this.emoji_list.find(`>div:nth(${new_selection})`).addClass('selected');
   }
 
   get_cursor_pixel_pos(input) {
-    let css = getComputedStyle(input);
-    let br = input.getBoundingClientRect();
-    let mask = document.createElement('div');
-    let span = document.createElement('span');
+    const css = getComputedStyle(input);
+    const ibr = input.getBoundingClientRect();
+    const mask = document.createElement('div');
+    const span = document.createElement('span');
 
     mask.style.font = css.font;
     mask.style.position = 'fixed';
     mask.innerHTML = input.value;
-    mask.style.left = (input.clientLeft + br.left) + 'px';
-    mask.style.top = (input.clientTop + br.top) + 'px';
+    mask.style.left = (input.clientLeft + ibr.left) + 'px';
+    mask.style.top = (input.clientTop + ibr.top) + 'px';
     mask.style.color = 'red';
     mask.style.overflow = 'scroll';
     mask.style.visibility = 'hidden';
@@ -158,7 +158,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     mask.style.height = css.height;
     span.innerText = 'I';
 
-    let pos = input.selectionStart;
+    const pos = input.selectionStart;
     if (pos === input.value.length) {
       mask.appendChild(span);
     } else {
@@ -167,9 +167,9 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     document.body.appendChild(mask);
     span.scrollIntoViewIfNeeded();
 
-    br = span.getBoundingClientRect();
+    const sbr = span.getBoundingClientRect();
 
     mask.remove();
-    return br;
+    return sbr;
   }
 };
