@@ -47,7 +47,7 @@
         if (!expectedCacheNames.includes(cacheName)) {
           return caches.delete(cacheName)
         }
-      }).then(() => global.clients.claim()));
+      })).then(() => global.clients.claim());
     }));
   });
 })(self);
