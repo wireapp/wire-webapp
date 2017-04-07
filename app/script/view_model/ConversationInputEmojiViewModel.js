@@ -28,9 +28,11 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     this.emoji_dict = undefined;
     this.emoji_start_pos = -1;
 
-    $.get('/image/emoji.tsv', (text) => {
-      this.emoji_dict = text.split('\n');
-    });
+    fetch('/image/emoji.tsv')
+      .then((response) => response.text())
+      .then((text) => {
+        this.emoji_dict = text.split('\n');
+      });
   }
 
   static get EMOJI_LIST_LENGTH() {
