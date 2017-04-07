@@ -23,5 +23,5 @@ window.z = window.z || {};
 window.z.links = z.links || {};
 
 z.links.LinkPreviewMetaDataType = {
-  TWEET: 'tweet'
+  TWEET: 'tweet',
 };
