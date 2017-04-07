@@ -28,6 +28,7 @@ rules:
   handle-callback-err: 2
   indent: [2, 2, {SwitchCase: 1}]
   keyword-spacing: 2
+  no-console: 0
   no-dupe-class-members: 2
   no-else-return: 2
   no-multi-spaces: 2
