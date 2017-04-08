@@ -45,24 +45,29 @@ SUPPORTED_LOCALE = [
 ]
 
 root = os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
+preamble_js = os.path.join(root, 'bin', 'preamble.js')
 crowdin_yaml = os.path.join(root, 'keys', 'crowdin.yaml')
-localization_dir = os.path.join(root, 'app', 'script', 'localization/')
+translations_dir = os.path.join(root, 'app', 'script', 'localization', 'translations')
 os.chdir(root)
 os.system('crowdin-cli --identity=%s upload sources' % crowdin_yaml)
 os.system('crowdin-cli --identity=%s download' % crowdin_yaml)
 
 
-def remove_country(filename):
+def remove_country_from_filename(filename):
   parts = filename.split('-')
+  source = os.path.join(translations_dir, filename)
+  dest = source
   if len(parts) == 3:
-    source = os.path.join(localization_dir, filename)
-    dest = os.path.join(localization_dir, '%s-%s.js' % (parts[0], parts[1]))
+    dest = os.path.join(translations_dir, '%s-%s.js' % (parts[0], parts[1]))
     shutil.move(source, dest)
+  return dest
 
 
 def get_locale(filename):
+  if filename.find('webapp-') == -1:
+    return None
   locale = filename.replace('webapp-', '').replace('.js', '')
-  return locale if len(locale) == 2 else None
+  return locale or None
 
 
 def fix_apostrophe(text):
@@ -75,30 +80,47 @@ def fix_apostrophe(text):
     pre = text[0:first + 1]
     string = text[first + 1:last]
     post = text[last:]
-    return '%s%s%s' % (pre, string.replace(u"'", u'’'), post)
+    return '{}{}{}'.format(pre, string.replace(u"'", u'’'), post)
   return text
 
-
-for filename in os.listdir(localization_dir):
-  remove_country(filename)
+# Remove the unsupported translations
+for filename in os.listdir(translations_dir):
   locale = get_locale(filename)
-  if locale:
-    if locale not in SUPPORTED_LOCALE:
-      file_to_delete = os.path.join(localization_dir, filename)
-      sys.stdout.write('Removing unsupported locale "{}" ({})\n'.format(locale, file_to_delete))
-      os.remove(file_to_delete)
-      continue
+  if not locale:
+    continue
 
-    with open(os.path.join(localization_dir, filename), 'r') as f:
-      source = f.read()
+  lang = locale.split('-')[0]
+  if lang not in SUPPORTED_LOCALE:
+    file_to_delete = os.path.join(translations_dir, filename)
+    print 'Removing unsupported locale "{}"'.format(locale)
+    os.remove(file_to_delete)
 
-    with open(os.path.join(localization_dir, filename), 'w') as f:
-      zstr = 'z.string.'
-      zstrl = 'z.string.%s.' % locale
-      source = source.replace('#X-Generator: crowdin.com', "'use strict';")
-      source = source.replace("'use=strict';\n", '')
-      source = source.replace(zstrl, zstr).replace(zstr, zstrl)
-      source = source.replace("='", " = '")
-      source = source.replace('\:', ':')
-      source = '\n'.join(map(fix_apostrophe, source.splitlines()))
-      f.write(source)
+
+# Remove country code from filename
+for filename in os.listdir(translations_dir):
+  remove_country_from_filename(filename)
+
+
+# Cleanup files
+for filename in os.listdir(translations_dir):
+  locale = get_locale(filename)
+  if locale not in SUPPORTED_LOCALE:
+    continue
+
+  with open(preamble_js, 'r') as f:
+    preamble = f.read()
+
+  with open(os.path.join(translations_dir, filename), 'r') as f:
+    source = f.read()
+
+  with open(os.path.join(translations_dir, filename), 'w') as f:
+    zstr = 'z.string.'
+    zstrl = 'z.string.{}.'.format(locale)
+    source = '{}\n{}'.format(preamble, source)
+    source = source.replace('#X-Generator: crowdin.com', "'use strict';")
+    source = source.replace("'use=strict';\n", '')
+    source = source.replace(zstrl, zstr).replace(zstr, zstrl)
+    source = source.replace("='", " = '")
+    source = source.replace('\:', ':')
+    source = '\n'.join(map(fix_apostrophe, source.splitlines()))
+    f.write(source)

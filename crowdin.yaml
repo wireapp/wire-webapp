@@ -4,5 +4,5 @@ base_path: .
 files:
   -
     source: '/app/script/localization/webapp.js'
-    translation: '/app/script/localization/webapp-%locale%.js'
+    translation: '/app/script/localization/translations/webapp-%locale%.js'
     type: 'properties_play'

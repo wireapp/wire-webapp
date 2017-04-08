@@ -1,5 +1,26 @@
+/*
+ * Wire
+ * Copyright (C) 2017 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 'use strict';
 
+
+z.string.lt.wire = 'Wire';
 z.string.lt.wire_macos = 'Wire, skirta macOS';
 z.string.lt.wire_windows = 'Wire, skirta Windows';
 z.string.lt.wire_linux = 'Wire, skirta Linux';
@@ -223,6 +244,7 @@ z.string.lt.conversation_delete_timestamp = 'Ištrinta %@timestamp';
 z.string.lt.conversation_edit_timestamp = 'Taisyta %@timestamp';
 z.string.lt.conversation_likes_caption = '%@number žmonėms';
 z.string.lt.conversation_send_pasted_file = 'Paveikslas įdėtas %date';
+z.string.lt.conversation_tweet_author = ' socialiniame tinkle Twitter';
 
 z.string.lt.collection_show_all = 'Rodyti visus %no';
 z.string.lt.collection_section_links = 'Nuorodos';
@@ -342,6 +364,7 @@ z.string.lt.preferences_devices = 'Įrenginiai';
 z.string.lt.preferences_headline = 'Nuostatos';
 z.string.lt.preferences_options = 'Parinktys';
 
+z.string.lt.preferences_about_copyright = '© Wire Swiss GmbH';
 z.string.lt.preferences_about_privacy_policy = 'Privatumo politika';
 z.string.lt.preferences_about_support = 'Palaikymas';
 z.string.lt.preferences_about_support_website = 'Palaikymo svetainė';
@@ -445,6 +468,7 @@ z.string.lt.warning_connectivity_connection_lost = 'Bandoma prisijungti. Gali b�
 z.string.lt.warning_connectivity_no_internet = 'Nėra interneto. Jūs negalėsite siųsti ir gauti žinutes.';
 
 z.string.lt.warning_lifecycle_update = 'Yra prieinama nauja Wire versija.';
+z.string.lt.warning_lifecycle_update_notes = 'Kas naujo';
 z.string.lt.warning_lifecycle_update_link = 'Atnaujinti dabar';
 
 z.string.lt.system_notification_asset_add = 'Pasidalino paveikslu';
@@ -511,8 +535,12 @@ z.string.lt.init_sessions_expectation = 'Mes turime inicijuoti %sessions seansus
 z.string.lt.init_sessions_expectation_long = 'Mes turime inicijuoti %sessions seansus';
 z.string.lt.init_sessions_progress = 'Inicijuojami seansai - %progress iš %total';
 z.string.lt.init_initialized_storage = 'Seansai įkelti';
+z.string.lt.init_initialized_cryptography = 'Kriptografija yra pilnai nustatyta';
+z.string.lt.init_validated_client = 'Įkeliami jūsų kontaktai ir pokalbiai';
 z.string.lt.init_received_user_data = 'Tikrinama ar yra naujų žinučių';
 z.string.lt.init_events_expectation = 'Jūs turite %events naujas žinutes';
+z.string.lt.init_events_expectation_long = 'Įkeliama %events naujų žinučių';
+z.string.lt.init_events_progress = 'Įkeliamos žinutės - %progress iš %total';
 z.string.lt.init_updated_from_notifications = 'Beveik paruošta';
 z.string.lt.init_app_pre_loaded = 'Mėgaukitės Wire';
 
