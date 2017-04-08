@@ -89,15 +89,11 @@ for filename in os.listdir(translations_dir):
   if not locale:
     continue
 
-  lang = locale.split('-')[0]
-  if lang not in SUPPORTED_LOCALE:
+  if locale.split('-')[0] not in SUPPORTED_LOCALE:
     file_to_delete = os.path.join(translations_dir, filename)
     print 'Removing unsupported locale "{}"'.format(locale)
     os.remove(file_to_delete)
-
-
-# Remove country code from filename
-for filename in os.listdir(translations_dir):
+    continue
   remove_country_from_filename(filename)
 
 
