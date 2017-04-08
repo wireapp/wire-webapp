@@ -22,7 +22,7 @@
 'use strict';
 
 /**
- *
+ * @param {function} logger_level - A function returning the logger level.
  * @returns {Window.TestFactory}
  * @constructor
  */
