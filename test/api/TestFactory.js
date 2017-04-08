@@ -23,7 +23,7 @@
 
 /**
  * @param {function} logger_level - A function returning the logger level.
- * @returns {Window.TestFactory}
+ * @returns {Window.TestFactory} A TestFactory instance.
  * @constructor
  */
 window.TestFactory = function (logger_level) {
@@ -49,7 +49,7 @@ window.TestFactory = function (logger_level) {
 
 /**
  *
- * @returns {Promise<z.audio.AudioRepository>}
+ * @returns {Promise<z.audio.AudioRepository>} The audio repository.
  */
 window.TestFactory.prototype.exposeAudioActors = function () {
   const self = this;
@@ -64,7 +64,7 @@ window.TestFactory.prototype.exposeAudioActors = function () {
 
 /**
  *
- * @returns {Promise<z.auth.AuthRepository>}
+ * @returns {Promise<z.auth.AuthRepository>} The authentication repository.
  */
 window.TestFactory.prototype.exposeAuthActors = function () {
   const self = this;
@@ -82,7 +82,7 @@ window.TestFactory.prototype.exposeAuthActors = function () {
 
 /**
  *
- * @returns {Promise<z.storage.StorageRepository>}
+ * @returns {Promise<z.storage.StorageRepository>} The storage repository.
  */
 window.TestFactory.prototype.exposeStorageActors = function () {
   const self = this;
@@ -102,7 +102,7 @@ window.TestFactory.prototype.exposeStorageActors = function () {
 
 /**
  *
- * @returns {Promise<z.cryptography.CryptographyRepository>}
+ * @returns {Promise<z.cryptography.CryptographyRepository>} The cryptography repository.
  */
 window.TestFactory.prototype.exposeCryptographyActors = function () {
   const self = this;
@@ -131,7 +131,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function () {
 
 /**
  *
- * @returns {Promise<z.client.ClientRepository>}
+ * @returns {Promise<z.client.ClientRepository>} The client repository.
  */
 window.TestFactory.prototype.exposeClientActors = function () {
   const self = this;
@@ -169,7 +169,7 @@ window.TestFactory.prototype.exposeClientActors = function () {
 
 /**
  *
- * @returns {Promise<z.event.EventRepository>}
+ * @returns {Promise<z.event.EventRepository>} The event repository.
  */
 window.TestFactory.prototype.exposeEventActors = function () {
   const self = this;
@@ -200,7 +200,7 @@ window.TestFactory.prototype.exposeEventActors = function () {
 
 /**
  *
- * @returns {Promise<z.user.UserRepository>}
+ * @returns {Promise<z.user.UserRepository>} The user repository.
  */
 window.TestFactory.prototype.exposeUserActors = function () {
   const self = this;
@@ -231,7 +231,7 @@ window.TestFactory.prototype.exposeUserActors = function () {
 
 /**
  *
- * @returns {Promise<z.connect.ConnectRepository>}
+ * @returns {Promise<z.connect.ConnectRepository>} The connect repository.
  */
 window.TestFactory.prototype.exposeConnectActors = function () {
   const self = this;
@@ -258,7 +258,7 @@ window.TestFactory.prototype.exposeConnectActors = function () {
 
 /**
  *
- * @returns {Promise<z.search.SearchRepository>}
+ * @returns {Promise<z.search.SearchRepository>} The search repository.
  */
 window.TestFactory.prototype.exposeSearchActors = function () {
   const self = this;
@@ -282,7 +282,7 @@ window.TestFactory.prototype.exposeSearchActors = function () {
 
 /**
  *
- * @returns {Promise<z.conversation.ConversationRepository>}
+ * @returns {Promise<z.conversation.ConversationRepository>} The conversation repository.
  */
 window.TestFactory.prototype.exposeConversationActors = function () {
   const self = this;
@@ -312,7 +312,7 @@ window.TestFactory.prototype.exposeConversationActors = function () {
 
 /**
  *
- * @returns {Promise<z.media.MediaRepository>}
+ * @returns {Promise<z.media.MediaRepository>} The media repository.
  */
 window.TestFactory.prototype.exposeMediaActors = function () {
   const self = this;
@@ -337,7 +337,7 @@ window.TestFactory.prototype.exposeMediaActors = function () {
 
 /**
  *
- * @returns {Promise<z.calling.CallCenter>}
+ * @returns {Promise<z.calling.CallCenter>} The call center.
  */
 window.TestFactory.prototype.exposeCallingActors = function () {
   const self = this;
@@ -376,7 +376,7 @@ window.TestFactory.prototype.exposeCallingActors = function () {
 
 /**
  *
- * @returns {Promise<z.SystemNotification.SystemNotificationRepository>}
+ * @returns {Promise<z.SystemNotification.SystemNotificationRepository>} The repository for system notifications.
  */
 window.TestFactory.prototype.exposeSystemNotificationActors = function () {
   const self = this;
@@ -401,7 +401,7 @@ window.TestFactory.prototype.exposeSystemNotificationActors = function () {
 
 /**
  *
- * @returns {Promise<z.tracking.EventTrackingRepository>}
+ * @returns {Promise<z.tracking.EventTrackingRepository>} The event tracking repository.
  */
 window.TestFactory.prototype.exposeTrackingActors = function () {
   const self = this;
@@ -422,7 +422,7 @@ window.TestFactory.prototype.exposeTrackingActors = function () {
 
 /**
  *
- * @returns {Promise<z.announce.AnnounceRepository>}
+ * @returns {Promise<z.announce.AnnounceRepository>} The repository for announcements.
  */
 window.TestFactory.prototype.exposeAnnounceActors = function () {
   const self = this;

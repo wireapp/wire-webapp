@@ -40,4 +40,4 @@ rules:
   sort-vars: 2
   space-before-blocks: 2
   strict: [2, global]
-  valid-jsdoc: [2, {requireParamDescription: false, requireReturnDescription: false}]
+  valid-jsdoc: [2, {requireParamDescription: true, requireReturnDescription: true}]

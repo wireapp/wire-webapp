@@ -93,7 +93,7 @@
      * @note Don't use our client wrapper here, because to query "/access" we need to set "withCredentials" to "true" in order to send the cookie.
      * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/authenticate
      * @param {number} retry_attempt - Retry attempts when a request fails
-     * @returns {Promise}
+     * @returns {Promise} Promise which resolves with access token data (token_type, etc.).
      */
     post_access(retry_attempt = 1) {
       return new Promise((resolve, reject) => {
