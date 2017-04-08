@@ -273,7 +273,6 @@ class z.ViewModel.ConversationInputViewModel
 
   on_input_key_up: (data, event) =>
     @conversation_input_emoji.on_input_key_up data, event
-    return true
 
   on_input_key_down: (data, event) =>
     return if @conversation_input_emoji.on_input_key_down data, event
