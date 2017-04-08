@@ -41,6 +41,11 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
       return false;
     });
 
+    $(document).on('mouseenter', `.${emoji_list_class} .emoji`, (event) => {
+      $(`.${emoji_list_class} .emoji`).removeClass('selected');
+      $(event.target).addClass('selected');
+    });
+
     fetch('/image/emoji.tsv')
       .then((response) => response.text())
       .then((text) => {
