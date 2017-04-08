@@ -202,6 +202,7 @@ window.z.auth.AuthRepository = class AuthRepository {
    * @option {String} access_token_data - access_token
    * @option {String} access_token_data - expires_in
    * @option {String} access_token_data - type
+   * @returns {Integer} A Number, representing the ID value of the timer that is set.
    */
   save_access_token(access_token_data) {
     const expires_in_millis = 1000 * access_token_data.expires_in;
@@ -245,8 +246,9 @@ window.z.auth.AuthRepository = class AuthRepository {
    * Refreshes the access token in time before it expires.
    *
    * @private
-   * @param {Integer} expiration_timestamp - The expiration date (and time) as timestamp
    * @note Access token will be refreshed 1 minute (60000ms) before it expires
+   * @param {Integer} expiration_timestamp - The expiration date (and time) as timestamp
+   * @returns {Integer} A Number, representing the ID value of the timer that is set.
    */
   _schedule_token_refresh(expiration_timestamp) {
     if (this.access_token_refresh) {
