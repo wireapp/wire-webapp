@@ -198,7 +198,7 @@ window.z.auth.AuthRepository = class AuthRepository {
    *  access_token_type: Bearer
    *  access_token_ttl: 900000 => 900s/15min
    *
-   * @param {Object, String} access_token_data - Access Token
+   * @param {Object|String} access_token_data - Access Token
    * @option {String} access_token_data - access_token
    * @option {String} access_token_data - expires_in
    * @option {String} access_token_data - type
@@ -231,11 +231,12 @@ window.z.auth.AuthRepository = class AuthRepository {
    * Logs the update of the access token.
    *
    * @private
-   * @param {Object, String} access_token_data - Access Token
+   * @param {Object|String} access_token_data - Access Token
    * @option {String} access_token_data - access_token
    * @option {String} access_token_data - expires_in
    * @option {String} access_token_data - type
    * @param {Integer} expiration_timestamp - Timestamp when access token expires
+   * @returns {undefined}
    */
   _log_access_token_update(access_token_data, expiration_timestamp) {
     const expiration_log = z.util.format_timestamp(expiration_timestamp, false);
