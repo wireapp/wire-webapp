@@ -19,7 +19,6 @@
 
 'use strict';
 
-
 z.string.hu.wire = 'Wire';
 z.string.hu.wire_macos = 'MacOS-hez készült Wire';
 z.string.hu.wire_windows = 'Windowshoz készült Wire';

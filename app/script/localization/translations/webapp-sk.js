@@ -19,7 +19,6 @@
 
 'use strict';
 
-
 z.string.sk.wire_macos = 'Wire pre macOS';
 z.string.sk.wire_windows = 'Wire pre Windows';
 z.string.sk.wire_linux = 'Wire pre Linux';

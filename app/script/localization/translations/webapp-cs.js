@@ -19,7 +19,6 @@
 
 'use strict';
 
-
 z.string.cs.wire_macos = 'Wire pro macOS';
 z.string.cs.wire_windows = 'Wire pro Windows';
 z.string.cs.wire_linux = 'Wire pro Linux';

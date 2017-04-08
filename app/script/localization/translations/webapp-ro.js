@@ -19,7 +19,6 @@
 
 'use strict';
 
-
 z.string.ro.wire_macos = 'Wire pentru macOS';
 z.string.ro.wire_windows = 'Wire pentru Windows';
 z.string.ro.wire_linux = 'Wire pentru Linux';

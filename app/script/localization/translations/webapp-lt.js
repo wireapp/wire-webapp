@@ -19,7 +19,6 @@
 
 'use strict';
 
-
 z.string.lt.wire = 'Wire';
 z.string.lt.wire_macos = 'Wire, skirta macOS';
 z.string.lt.wire_windows = 'Wire, skirta Windows';

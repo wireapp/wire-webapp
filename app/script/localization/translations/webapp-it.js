@@ -19,7 +19,6 @@
 
 'use strict';
 
-
 z.string.it.wire_macos = 'Wire per macOS';
 z.string.it.wire_windows = 'Wire per Windows';
 z.string.it.wire_linux = 'Wire per Linux';

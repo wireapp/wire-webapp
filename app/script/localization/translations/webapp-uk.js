@@ -19,7 +19,6 @@
 
 'use strict';
 
-
 z.string.uk.wire_macos = 'Wire для macOS';
 z.string.uk.wire_windows = 'Wire для Windows';
 z.string.uk.wire_linux = 'Wire для Linux';

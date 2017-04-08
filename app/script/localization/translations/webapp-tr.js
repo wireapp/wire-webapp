@@ -19,7 +19,6 @@
 
 'use strict';
 
-
 z.string.tr.wire_macos = 'MacOS için Wire';
 z.string.tr.wire_windows = 'Windows için Wire';
 z.string.tr.wire_linux = 'Linux için Wire';

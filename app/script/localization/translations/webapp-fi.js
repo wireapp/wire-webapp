@@ -19,7 +19,6 @@
 
 'use strict';
 
-
 z.string.fi.wire_macos = 'Wire macOS: lle';
 z.string.fi.wire_windows = 'Wire Windowsille';
 z.string.fi.wire_linux = 'Wire Linuxille';

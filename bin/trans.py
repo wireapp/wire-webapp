@@ -113,7 +113,7 @@ for filename in os.listdir(translations_dir):
     zstr = 'z.string.'
     zstrl = 'z.string.{}.'.format(locale)
     source = '{}\n{}'.format(preamble, source)
-    source = source.replace('#X-Generator: crowdin.com', "'use strict';")
+    source = source.replace('#X-Generator: crowdin.com\n', "'use strict';")
     source = source.replace("'use=strict';\n", '')
     source = source.replace(zstrl, zstr).replace(zstr, zstrl)
     source = source.replace("='", " = '")
