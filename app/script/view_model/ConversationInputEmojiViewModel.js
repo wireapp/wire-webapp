@@ -27,9 +27,19 @@ const QUERY_MIN_LENGTH = 2;
 
 z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewModel {
   constructor() {
-    this.emoji_list = $('<div class="conversation-input-emoji-list" />');
+    const emoji_list_class = 'conversation-input-emoji-list';
+
+    this.emoji_list = $(`<div class='${emoji_list_class}' />`);
     this.emoji_dict = undefined;
     this.emoji_start_pos = -1;
+
+    $(document).on('click', `.${emoji_list_class}`, (event) => {
+      const clicked = $(event.target);
+      const emoji = clicked.hasClass('emoji') ? clicked : clicked.closest('.emoji');
+      const input = $('#conversation-input-text')[0];
+      this.enter_emoji(input, emoji);
+      return false;
+    });
 
     fetch('/image/emoji.tsv')
       .then((response) => response.text())
@@ -61,17 +71,9 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         this.rotate_emoji_list(event.keyCode === z.util.KEYCODE.ARROW_UP);
         this.suppress_key_up = true;
         break;
-      case z.util.KEYCODE.ENTER: {
-        const input = event.target;
-        const emoji = this.emoji_list.find('>div.selected>span').html();
-        const val = input.value;
-        input.value = val.substr(0, this.emoji_start_pos - 1) + emoji + val.substr(input.selectionStart);
-        input.setSelectionRange(this.emoji_start_pos, this.emoji_start_pos);
-        this.emoji_list.remove();
-        this.emoji_start_pos = -1;
-        $(input).change();
+      case z.util.KEYCODE.ENTER:
+        this.enter_emoji(event.target, this.emoji_list.find('.emoji.selected'));
         break;
-      }
       default:
         return false;
     }
@@ -117,7 +119,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         .map((emoji) => {
           const [code, name] = emoji.split('\t');
           const parsed_unicode_emoji = String.fromCodePoint.apply(null, code.split(','));
-          return `<div><span>${parsed_unicode_emoji}</span>${name}</div>`;
+          return `<div class='emoji'><span class='symbol'>${parsed_unicode_emoji}</span>${name}</div>`;
         })
         .join('');
 
@@ -125,7 +127,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         this.emoji_list.remove();
       } else {
         this.emoji_list.html(emoji_matched).appendTo('body').show();
-        this.emoji_list.find('>div:nth(0)').addClass('selected');
+        this.emoji_list.find('.emoji:nth(0)').addClass('selected');
 
         const pos = this.get_cursor_pixel_pos(input);
         const top = pos.top - this.emoji_list.height();
@@ -137,10 +139,21 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   }
 
   rotate_emoji_list(backward) {
-    const previous = this.emoji_list.find('>div.selected');
-    const new_selection = (previous.index() + (backward ? -1 : 1)) % this.emoji_list.find('>div').length;
+    const previous = this.emoji_list.find('.emoji.selected');
+    const new_selection = (previous.index() + (backward ? -1 : 1)) % this.emoji_list.find('.emoji').length;
     previous.removeClass('selected');
-    this.emoji_list.find(`>div:nth(${new_selection})`).addClass('selected');
+    this.emoji_list.find(`.emoji:nth(${new_selection})`).addClass('selected');
+  }
+
+  enter_emoji(input, emoji_line) {
+    const emoji = emoji_line.find('.symbol').html();
+    const val = input.value;
+    input.value = val.substr(0, this.emoji_start_pos - 1) + emoji + val.substr(input.selectionStart);
+    input.setSelectionRange(this.emoji_start_pos, this.emoji_start_pos);
+    this.emoji_list.remove();
+    this.emoji_start_pos = -1;
+    $(input).change();
+    $(input).focus();
   }
 
   get_cursor_pixel_pos(input) {
