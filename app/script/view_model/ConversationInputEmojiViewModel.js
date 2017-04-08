@@ -22,6 +22,9 @@
 window.z = window.z || {};
 z.ViewModel = z.ViewModel || {};
 
+const EMOJI_LIST_LENGTH = 5;
+const QUERY_MIN_LENGTH = 2;
+
 z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewModel {
   constructor() {
     this.emoji_list = $('<div class="conversation-input-emoji-list" />');
@@ -36,11 +39,11 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   }
 
   static get EMOJI_LIST_LENGTH() {
-    return 5;
+    return EMOJI_LIST_LENGTH;
   }
 
-  static get MIN_QUERY_LENGTH() {
-    return 2;
+  static get QUERY_MIN_LENGTH() {
+    return QUERY_MIN_LENGTH;
   }
 
   on_input_key_down(data, event) {
@@ -105,7 +108,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     }
 
     const query = input.value.substr(this.emoji_start_pos, input.selectionStart - this.emoji_start_pos);
-    if (query.length < ConversationInputEmojiViewModel.MIN_QUERY_LENGTH || query[0] === ' ' || !this.emoji_dict) {
+    if (query.length < ConversationInputEmojiViewModel.QUERY_MIN_LENGTH || query[0] === ' ' || !this.emoji_dict) {
       this.emoji_list.remove();
     } else {
       const emoji_matched = this.emoji_dict
