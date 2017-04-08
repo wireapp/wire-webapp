@@ -42,10 +42,7 @@ class Localizer {
     parameter in conjunction with a single or multiple (it supports but does not require an array) replace rules that
     consist of a placeholder and the content that it should be replace with.
 
-  @param id [String] Localization string ID
-  @param replace [Object | Array<Object>] Placeholders that should be replaced
-  @option replace [String] placeholder Content to be replaced
-  @option replace [String] content replacing content
+  @param valueAccessor [Object] contains localization string ID and replace object
     */
 
   get_text(valueAccessor) {
