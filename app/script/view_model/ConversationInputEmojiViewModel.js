@@ -143,7 +143,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   }
 
   enter_emoji(input, emoji_line) {
-    const emoji = emoji_line.find('.symbol').html();
+    const emoji = emoji_line.find('.symbol').text();
     const val = input.value;
     input.value = val.substr(0, this.emoji_start_pos - 1) + emoji + val.substr(input.selectionStart);
     input.setSelectionRange(this.emoji_start_pos, this.emoji_start_pos);
@@ -162,8 +162,8 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     mask.style.font = css.font;
     mask.style.position = 'fixed';
     mask.innerHTML = input.value;
-    mask.style.left = (input.clientLeft + ibr.left) + 'px';
-    mask.style.top = (input.clientTop + ibr.top) + 'px';
+    mask.style.left = `${input.clientLeft + ibr.left}px`;
+    mask.style.top = `${input.clientTop + ibr.top}px`;
     mask.style.color = 'red';
     mask.style.overflow = 'scroll';
     mask.style.visibility = 'hidden';
