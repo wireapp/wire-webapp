@@ -125,11 +125,11 @@ z.ui.Shortcut = do ->
   shortcut_map[z.ui.ShortcutType.SILENCE] =
     shortcut:
       webapp:
-        macos: 'command + alt + s'
-        pc: 'ctrl + alt + s'
+        macos: 'command + alt + ,'
+        pc: 'ctrl + alt + ,'
       electron:
-        macos: 'command + alt + s'
-        pc: 'ctrl + alt + s'
+        macos: 'command + alt + ,'
+        pc: 'ctrl + alt + ,'
         menu: true
     event: z.event.WebApp.SHORTCUT.SILENCE
 
