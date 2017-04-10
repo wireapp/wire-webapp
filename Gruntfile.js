@@ -101,11 +101,11 @@ module.exports = (grunt) => {
 
   grunt.registerTask('app_deploy_travis', (target) => {
     if (target === 'prod' || target === 'staging') {
-      return grunt.task.run(`set_version:${target}`, 'init', `prepare_${target}`, 'aws_prepare');
+      grunt.task.run(`set_version:${target}`, 'init', `prepare_${target}`, 'aws_prepare');
     } else if (target === 'dev') {
-      return grunt.task.run('set_version:staging', 'init', 'prepare_staging', 'aws_prepare');
+      grunt.task.run('set_version:staging', 'init', 'prepare_staging', 'aws_prepare');
     } else {
-      return grunt.fail.warn('Invalid target specified. Valid targets are: "prod" & "staging"');
+      grunt.fail.warn('Invalid target specified. Valid targets are: "prod" & "staging"');
     }
   });
 
@@ -123,7 +123,7 @@ module.exports = (grunt) => {
     const app_files = prepare_file_names(scripts.app);
     const component_files = prepare_file_names(scripts.component);
     const vendor_files = prepare_file_names(scripts.vendor);
-    const test_files = test_name ? ['../test/js/#{test_name}Spec.js'] : ['../test/**/*Spec.js'];
+    const test_files = test_name ? [`../test/js/${test_name}Spec.js`] : ['../test/**/*Spec.js'];
 
     const files = [].concat(helper_files, vendor_files, component_files, app_files, test_files);
     grunt.config('karma.options.files', files);
@@ -133,6 +133,6 @@ module.exports = (grunt) => {
 
   grunt.registerTask('test_run', (test_name) => {
     grunt.config('karma.options.reporters', ['progress']);
-    return grunt.task.run(['scripts', 'newer:coffee:dist', 'newer:coffee:test', 'copy:test', `test_prepare:${test_name}`, 'karma:test']);
+    grunt.task.run(['scripts', 'newer:coffee:dist', 'newer:coffee:test', 'copy:test', `test_prepare:${test_name}`, 'karma:test']);
   });
 };

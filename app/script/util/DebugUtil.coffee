@@ -23,9 +23,6 @@ class z.util.DebugUtil
   constructor: (@user_repository, @conversation_repository) ->
     @logger = new z.util.Logger 'z.util.DebugUtil', z.config.LOGGER.OPTIONS
 
-  _get_user_by_id: (user_id) ->
-    return new Promise (resolve) => @user_repository.get_user_by_id user_id, (user_et) -> resolve user_et
-
   block_all_connections: ->
     block_users = []
     wire.app.repository.user.users().forEach (user_et) =>
@@ -66,7 +63,7 @@ class z.util.DebugUtil
     @conversation_repository.get_conversation_by_id_async event.conversation
     .then (conversation_et) =>
       debug_information.conversation = conversation_et
-      return @_get_user_by_id event.from
+      return @user_repository.get_user_by_id event.from
     .then (user_et) =>
       debug_information.user = user_et
       log_message = "Hey #{@user_repository.self().name()}, this is for you:"
@@ -92,31 +89,79 @@ class z.util.DebugUtil
   get_notification_from_stream: (notification_id, notification_id_since) =>
     client_id = wire.app.repository.client.current_client().id
 
-    _got_notifications = (response) =>
-      events = response.notifications.filter (item) ->
-        return item.id is notification_id
-      return events[0] if events.length
+    _got_notifications = ({has_more, notifications}) =>
+      matching_notifications = notifications.filter (notification) ->
+        return notification.id is notification_id
+      return matching_notifications[0] if matching_notifications.length
 
-      if response.has_more
-        last_notification = response.notifications[response.notifications.length - 1]
+      if has_more
+        last_notification = notifications[notifications.length - 1]
         @get_notification_from_stream notification_id, last_notification.id
       else
         @logger.log "Notification '#{notification_id}' was not found in encrypted notification stream"
 
-    wire.app.service.notification.get_notifications(client_id, notification_id_since, 10000)
+    wire.app.service.notification.get_notifications client_id, notification_id_since, 10000
+    .then _got_notifications
+
+  get_notifications_from_stream: (remote_user_id, remote_client_id, matching_notifications = [], notification_id_since) =>
+    local_client_id = wire.app.repository.client.current_client().id
+    local_user_id = wire.app.repository.user.self().id
+
+    _got_notifications = ({has_more, notifications}) =>
+      additional_notifications = notifications.filter (notification) ->
+        {payload} = notification
+        for {data, from} in payload when data and from in [local_user_id, remote_user_id]
+          {sender, recipient} = data
+          incoming_event = sender is remote_client_id and recipient is local_client_id
+          outgoing_event = sender is local_client_id and recipient is remote_client_id
+          return incoming_event or outgoing_event
+        return false
+
+      matching_notifications = matching_notifications.concat additional_notifications
+      if has_more
+        last_notification = notifications[notifications.length - 1]
+        return @get_notifications_from_stream remote_user_id, remote_client_id, matching_notifications, last_notification.id
+      @logger.log "Found '#{matching_notifications.length}' notification between '#{local_client_id}' and '#{remote_client_id}'", matching_notifications
+      return matching_notifications
+
+    client_scope = if remote_user_id is local_user_id then undefined else local_client_id
+    wire.app.service.notification.get_notifications client_scope, notification_id_since, 10000
     .then _got_notifications
 
   get_objects_for_decryption_errors: (session_id, notification_id) ->
-    return Promise.all([
+    return Promise.all [
       @get_notification_from_stream notification_id
       @get_serialised_identity()
       @get_serialised_session session_id
-    ])
-    .then (items) ->
+    ]
+    .then (resolve_array) ->
       return JSON.stringify
-        notification: items[0]
-        identity: items[1]
-        session: items[2]
+        notification: resolve_array[0]
+        identity: resolve_array[1]
+        session: resolve_array[2]
+
+  get_info_for_client_decryption_errors: (remote_user_id, remote_client_id) ->
+    return Promise.all [
+      @get_notifications_from_stream remote_user_id, remote_client_id
+      @get_serialised_identity()
+      @get_serialised_session "#{remote_user_id}@#{remote_client_id}"
+    ]
+    .then (resolve_array) ->
+      return JSON.stringify
+        notifications: resolve_array[0]
+        identity: resolve_array[1]
+        session: resolve_array[2]
+
+  get_v2_call_participants: (conversation_id = wire.app.repository.conversation.active_conversation().id) =>
+    wire.app.service.call.get_state conversation_id
+    .then (response) =>
+      participants = []
+      for id, participant of response.participants when participant.state is z.calling.enum.ParticipantState.JOINED
+        participants.push wire.app.repository.user.get_user_by_id id
+
+      @logger.debug "Call in '#{conversation_id}' has '#{participants.length}' joined participant/s", participants
+      for participant in participants
+        @logger.log "User '#{participant.name()}' with ID '#{participant.id}' is joined"
 
   log_connection_status: ->
     @logger.log 'Online Status'

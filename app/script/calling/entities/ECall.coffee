@@ -114,7 +114,7 @@ class z.calling.entities.ECall
     @self_client_joined.subscribe (is_joined) =>
       return if is_joined
       @is_connected false
-      amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP if @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
+      amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER if @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
       @telemetry.track_duration @ if @termination_reason
       @_reset_timer()
       @_reset_e_flows()
@@ -232,6 +232,7 @@ class z.calling.entities.ECall
     .then (e_participant_et) =>
       if client_id
         e_participant_et.verify_client_id client_id
+      e_participant_et.reset_participant()
       @interrupted_participants.remove e_participant_et
       @participants.remove e_participant_et
       @_update_remote_state()
@@ -311,7 +312,8 @@ class z.calling.entities.ECall
   get_flow_telemetry: =>
     return (e_participant_et.e_flow_et.get_telemetry() for e_participant_et in @participants() when e_participant_et.e_flow_et)
 
-  start_timings: =>
+  initiate_telemetry: (video_send = false) =>
+    @telemetry.set_media_type video_send
     @timings = new z.telemetry.calling.CallSetupTimings @id
 
   ###

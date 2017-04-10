@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,22 +22,30 @@
 window.z = window.z || {};
 window.z.assets = z.assets || {};
 
-z.assets.AssetCrypto = {
+z.assets.AssetCrypto = (() => {
+
+  function generate_random_bytes(length) {
+    const randomValues = new Uint32Array(length / 4).map(() => libsodium.getRandomValue());
+    const ramdonBytes = new Uint8Array(randomValues.buffer);
+    if ((ramdonBytes.length > 0) && !ramdonBytes.every((byte) => byte === 0)) {
+      return ramdonBytes;
+    }
+    throw Error('Failed to initialize iv with random values');
+  }
 
   /*
   @param {ArrayBuffer} key_bytes - AES key used for encryption
   @param {ArrayBuffer} computed_sha256 - SHA-256 checksum of the ciphertext
   @param {ArrayBuffer} ciphertext - Encrypted plaintext
   */
-  encrypt_aes_asset(plaintext) {
-    const iv = new Uint8Array(16);
+  function encrypt_aes_asset(plaintext) {
+    const iv = generate_random_bytes(16);
+    const key_bytes_raw = generate_random_bytes(32);
     let key = null;
     let iv_ciphertext = null;
     let computed_sha256 = null;
 
-    window.crypto.getRandomValues(iv);
-
-    return window.crypto.subtle.generateKey({name: 'AES-CBC', length: 256}, true, ['encrypt'])
+    return window.crypto.subtle.importKey('raw', key_bytes_raw.buffer, 'AES-CBC', true, ['encrypt'])
     .then(function(ckey) {
       key = ckey;
 
@@ -53,14 +61,14 @@ z.assets.AssetCrypto = {
 
       return window.crypto.subtle.exportKey('raw', key);
     }).then(key_bytes => [key_bytes, computed_sha256, iv_ciphertext.buffer]);
-  },
+  }
 
   /*
   @param {ArrayBuffer} key_bytes - AES key used for encryption
   @param {ArrayBuffer} computed_sha256 - SHA-256 checksum of the ciphertext
   @param {ArrayBuffer} ciphertext - Encrypted plaintext
   */
-  decrypt_aes_asset(ciphertext, key_bytes, reference_sha256) {
+  function decrypt_aes_asset(ciphertext, key_bytes, reference_sha256) {
     return window.crypto.subtle.digest('SHA-256', ciphertext)
     .then(function(computed_sha256) {
       const a = new Uint32Array(reference_sha256);
@@ -76,6 +84,11 @@ z.assets.AssetCrypto = {
       const img_ciphertext = ciphertext.slice(16);
       return window.crypto.subtle.decrypt({name: 'AES-CBC', iv}, key, img_ciphertext);
     });
-  },
+  }
 
-};
+  return {
+    encrypt_aes_asset,
+    decrypt_aes_asset,
+  };
+
+})();

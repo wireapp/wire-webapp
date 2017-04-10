@@ -187,8 +187,9 @@ class z.user.UserRepository
       # Apply connection to other user entities (which are not us)
       user_ids = (connection_et.to for connection_et in connection_ets)
 
-      if user_ids.length > 0
-        @get_users_by_id user_ids, (user_ets) =>
+      if user_ids.length
+        @get_users_by_id user_ids
+        .then (user_ets) =>
           @_assign_connection user_et for user_et in user_ets
           if assign_clients
             @_assign_all_clients()
@@ -199,8 +200,8 @@ class z.user.UserRepository
     @client_repository.get_all_clients_from_db()
     .then (user_client_map) =>
       @logger.info "Found locally stored clients for '#{Object.keys(user_client_map).length}' users", user_client_map
-      user_ids = (user_id for user_id, client_ets of user_client_map)
-      @get_users_by_id user_ids, (user_ets) =>
+      @get_users_by_id (user_id for user_id, client_ets of user_client_map)
+      .then (user_ets) =>
         for user_et in user_ets
           if user_client_map[user_et.id].length > 8
             @logger.warn "Found '#{user_client_map[user_et.id].length}' clients for '#{user_et.name()}'", user_client_map[user_et.id]
@@ -272,8 +273,9 @@ class z.user.UserRepository
     if event_json.user.id is @self().id
       @user_mapper.update_user_from_object @self(), event_json.user
     else
-      @get_user_by_id event_json.user.id, (user_et) =>
-        @user_mapper.update_user_from_object user_et, event_json.user if user_et?
+      @get_user_by_id event_json.user.id
+      .then (user_et) =>
+        @user_mapper.update_user_from_object user_et, event_json.user
 
   ###
   Send the user connection notification.
@@ -285,7 +287,8 @@ class z.user.UserRepository
     no_notification = [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING]
     return if previous_status in no_notification and connection_et.status() is z.user.ConnectionStatus.ACCEPTED
 
-    @get_user_by_id connection_et.to, (user_et) ->
+    @get_user_by_id connection_et.to
+    .then (user_et) ->
       message_et = new z.entity.MemberMessage()
       message_et.user user_et
       switch connection_et.status()
@@ -311,19 +314,13 @@ class z.user.UserRepository
   @return [Promise] Promise that resolves when a client and its session have been deleted
   ###
   add_client_to_user: (user_id, client_et) =>
-    user = undefined
-    return new Promise (resolve) =>
-      @get_user_by_id user_id, (user_et) =>
-        user = user_et
-        is_new_client = user_et.add_client client_et
-        if is_new_client
-          @client_repository.save_client_in_db user_id, client_et.to_json()
-          .then ->
-            amplify.publish z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et
-            amplify.publish z.event.WebApp.CLIENT.ADD_OWN_CLIENT, user_id, client_et if user.is_me
-            resolve()
-        else
-          resolve()
+    @get_user_by_id user_id
+    .then (user_et) =>
+      return unless user_et.add_client client_et
+      @client_repository.save_client_in_db user_id, client_et.to_json()
+      .then ->
+        amplify.publish z.event.WebApp.USER.CLIENT_ADDED, user_id, client_et
+        amplify.publish z.event.WebApp.CLIENT.ADD_OWN_CLIENT, user_id, client_et if user_et.is_me
 
   ###
   Removes a stored client and the session connected with it.
@@ -335,9 +332,10 @@ class z.user.UserRepository
   remove_client_from_user: (user_id, client_id) =>
     @client_repository.remove_client user_id, client_id
     .then =>
-      @get_user_by_id user_id, (user_et) ->
-        user_et.remove_client client_id
-        amplify.publish z.event.WebApp.USER.CLIENT_REMOVED, user_id, client_id
+      return @get_user_by_id user_id
+    .then (user_et) ->
+      user_et.remove_client client_id
+      amplify.publish z.event.WebApp.USER.CLIENT_REMOVED, user_id, client_id
 
   ###
   Update clients for given user.
@@ -346,7 +344,8 @@ class z.user.UserRepository
   @param client_ets [Array<z.client.Client>]
   ###
   update_clients_from_user: (user_id, client_ets) =>
-    @get_user_by_id user_id, (user_et) ->
+    @get_user_by_id user_id
+    .then (user_et) ->
       user_et.devices client_ets
       amplify.publish z.event.WebApp.USER.CLIENTS_UPDATED, user_id, client_ets
 
@@ -368,54 +367,54 @@ class z.user.UserRepository
   ###
   Get a user from the backend.
   @param user_id [String] User ID
-  @param callback [Function] Function to be called on server return
+  @return [Promise<z.entity.User>] Promise that resolves with the user entity
   ###
-  fetch_user_by_id: (user_id, callback) =>
-    return callback?() if not user_id
-
-    @fetch_users_by_id [user_id], (user_ets) ->
-      callback? user_ets?[0]
+  fetch_user_by_id: (user_id) =>
+    @fetch_users_by_id [user_id]
+    .then (user_ets) ->
+      return user_ets?[0]
 
   ###
   Get users from the backend.
   @param user_ids [Array<String>] User IDs
-  @param callback [Function] Function to be called on server return
+  @return [Promise<Array<z.entity.User>>] Promise that resolves with an array of user entities
   ###
-  fetch_users_by_id: (user_ids, callback) =>
-    user_ids = user_ids?.filter (user_id) ->
-      return user_id isnt undefined
+  fetch_users_by_id: (user_ids = []) =>
+    user_ids = user_ids.filter (user_id) -> user_id?
+    return Promise.resolve [] if not user_ids.length
 
-    return callback? [] if not user_ids or user_ids.length is 0
-
-    # create chunks
-    fetched_user_ets = []
-    chunks = z.util.ArrayUtil.chunk user_ids, z.config.MAXIMUM_USERS_PER_REQUEST
-    number_of_loaded_chunks = 0
-
-    for chunk in chunks
-      @user_service.get_users chunk
+    _get_users = (user_id_chunk) =>
+      @user_service.get_users user_id_chunk
       .then (response) =>
-        number_of_loaded_chunks += 1
         if response
-          user_ets = @user_mapper.map_users_from_object response
-          fetched_user_ets = fetched_user_ets.concat user_ets
-
-        if number_of_loaded_chunks is chunks.length
-          # If the difference is 1 then we most likely have a case with a suspended user
-          if user_ids.length isnt fetched_user_ets.length
-            fetched_user_ets = @_add_suspended_users user_ids, fetched_user_ets
-          @save_users fetched_user_ets
-          callback? fetched_user_ets
+          return @user_mapper.map_users_from_object response
+        return []
       .catch (error) ->
-        throw error if error.code isnt z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+        if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+          return []
+        throw error
+
+
+    Promise.all (_get_users user_id_chunk for user_id_chunk in z.util.ArrayUtil.chunk user_ids, z.config.MAXIMUM_USERS_PER_REQUEST)
+    .then (resolve_array) =>
+      fetched_user_ets = _.flatten resolve_array
+
+      # If the difference is 1 then we most likely have a case with a suspended user
+      if user_ids.length isnt fetched_user_ets.length
+        fetched_user_ets = @_add_suspended_users user_ids, fetched_user_ets
+
+      return @save_users fetched_user_ets
+      .then ->
+        return fetched_user_ets
 
   ###
   Find a local user.
   @param user_id [String] User ID
-  @return [z.entity.User] Matching user entity
+  @return [Promise<z.entity.User>] Resolves with the matching user entity
   ###
-  find_user: (user_id) ->
-    return user_et for user_et in @users() when user_et.id is user_id
+  find_user_by_id: (user_id) ->
+    return Promise.resolve user_et for user_et in @users() when user_et.id is user_id
+    return Promise.reject new z.user.UserError z.user.UserError::TYPE.USER_NOT_FOUND
 
   ###
   Get self user from backend.
@@ -433,46 +432,45 @@ class z.user.UserRepository
   ###
   Check for user locally and fetch it from the server otherwise.
   @param user_id [String] User ID
-  @param callback [Function] Function to be called on server return
+  @return [Promise<z.entity.User>] Promise that resolves with the matching user entity
   ###
-  get_user_by_id: (user_id, callback) ->
-    if user_id is undefined
-      callback? null
-
-    user_et = @find_user user_id
-    if not user_et
-      @fetch_user_by_id user_id, callback
-    else
-      callback? user_et
-
-    return user_et
+  get_user_by_id: (user_id) ->
+    @find_user_by_id user_id
+    .catch (error) =>
+      if error.type is z.user.UserError::TYPE.USER_NOT_FOUND
+        return @fetch_user_by_id user_id
+      throw error
+    .catch (error) =>
+      unless error.type is z.user.UserError::TYPE.USER_NOT_FOUND
+        @logger.log @logger.levels.ERROR, "Failed to get user '#{user_id}': #{error.message}", error
+      throw error
 
   ###
   Check for users locally and fetch them from the server otherwise.
 
   @param user_ids [Array<String>] User IDs
-  @param callback [Function] Function to be called on server return
   @param offline [Boolean] Should we only look for cached contacts
+  @return [Promise<Array<z.entity.User>>] Resolves with an array of users
   ###
-  get_users_by_id: (user_ids = [], callback, offline = false) =>
-    return callback? [] if user_ids.length is 0
+  get_users_by_id: (user_ids = [], offline = false) =>
+    return Promise.resolve [] unless user_ids.length
 
-    known_user_ets = []
-    unknown_user_ids = []
+    _find_user = (user_id) =>
+      @find_user_by_id user_id
+      .catch (error) ->
+        throw error unless error.type is z.user.UserError::TYPE.USER_NOT_FOUND
+        return user_id
 
-    user_ids.forEach (user_id) =>
-      user_et = @find_user user_id
+    Promise.all (_find_user user_id for user_id in user_ids)
+    .then (resolve_array) =>
+      known_user_ets = resolve_array.filter (array_item) -> array_item instanceof z.entity.User
+      unknown_user_ids = resolve_array.filter (array_item) -> _.isString array_item
 
-      if user_et?
-        known_user_ets.push user_et
-      else
-        unknown_user_ids.push user_id
-
-    if unknown_user_ids.length is 0 or offline
-      callback? known_user_ets
-    else
-      @fetch_users_by_id unknown_user_ids, (user_ets) ->
-        callback? known_user_ets.concat user_ets
+      if offline or not unknown_user_ids.length
+        return known_user_ets
+      return @fetch_users_by_id unknown_user_ids
+      .then (user_ets) ->
+        return known_user_ets.concat user_ets
 
   ###
   Search for user.
@@ -505,41 +503,47 @@ class z.user.UserRepository
   @param is_me [Boolean] Is the user entity the self user
   ###
   save_user: (user_et, is_me = false) ->
-    @users.push user_et if not @user_exists(user_et.id)
+    @find_user_by_id user_et.id
+    .catch (error) =>
+      throw error unless error.type is z.user.UserError::TYPE.USER_NOT_FOUND
 
-    if is_me
-      user_et.is_me = true
-      @self user_et
-
-    return user_et
+      if is_me
+        user_et.is_me = true
+        @self user_et
+      @users.push user_et
+      return user_et
 
   ###
   Save multiple users at once.
   @param user_ets [Array<z.entity.User>] Array of user entities to be stored
   ###
   save_users: (user_ets) ->
-    new_user_ets = (user_et for user_et in user_ets when not @user_exists user_et.id)
-    z.util.ko_array_push_all @users, new_user_ets
-    return new_user_ets
+    _user_exists = (user_et) =>
+      @find_user_by_id user_et.id
+      .then -> return undefined
+      .catch (error) ->
+        throw error unless error.type is z.user.UserError::TYPE.USER_NOT_FOUND
+        return user_et
+
+    Promise.all (_user_exists user_et for user_et in user_ets)
+    .then (user_ets) =>
+      new_user_ets = user_ets.filter (user_et) -> user_et?
+      z.util.ko_array_push_all @users, new_user_ets
+      return new_user_ets
 
   ###
   Update a local user from the backend by ID.
   @param user_id [String] User ID
   ###
   update_user_by_id: (user_id) =>
-    @get_user_by_id user_id, (old_user_et) =>
-      @user_service.get_user_by_id user_id
+    @find_user_by_id user_id
+    .catch (error) ->
+      throw error unless error.type is z.user.UserError::TYPE.USER_NOT_FOUND
+      return new z.entity.User()
+    .then (old_user_et) =>
+      return @user_service.get_user_by_id user_id
       .then (new_user_et) =>
         @user_mapper.update_user_from_object old_user_et, new_user_et
-
-  ###
-  Check if the user is already stored.
-  @param user_id [String] User ID
-  @return [Boolean] Is the user already stored
-  ###
-  user_exists: (user_id) ->
-    user_et = @find_user user_id
-    return !!user_et
 
   ###
   Add user entities for suspended users.
@@ -668,8 +672,8 @@ class z.user.UserRepository
       @user_service.update_own_user_profile {picture: upload_response}
       .then =>
         @user_update {user: {id: @self().id, picture: upload_response}} if update
-    .catch (error) ->
-      throw new Error "Error during profile image upload: #{error.message}"
+    .catch (error) =>
+      @logger.warn "Error during profile image upload: #{error.message}"
 
   ###
   Set the profile image using v3 api.
