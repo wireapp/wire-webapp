@@ -28,10 +28,10 @@ z.bot.BotService = class BotService {
     this.url = `${z.util.Environment.backend.website_url()}${BotService.URL}`;
   }
 
-  /*
-  Fetch bot information.
-  @param {string} bot_name - Bot name registered on backend
-  */
+  /**
+   * Fetch bot information.
+   * @param {string} bot_name - Bot name registered on backend
+   */
   fetch_bot(bot_name) {
     return fetch(`${this.url}${bot_name}/`)
     .then((response) => response.json())

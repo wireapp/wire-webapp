@@ -29,11 +29,11 @@ z.bot.BotRepository = class BotRepository {
     this.conversation_repository = conversation_repository;
   }
 
-  /*
-  Add bot to conversation.
-  @param {string} bot_name - Bot name registered on backend
-  @param {string} [create_conversation=true] - A new conversation is created if true otherwise bot is added to active conversation
-  */
+  /**
+   * Add bot to conversation.
+   * @param {string} bot_name - Bot name registered on backend
+   * @param {Boolean} [create_conversation=true] - A new conversation is created if true otherwise bot is added to active conversation
+   */
   add_bot(bot_name, create_conversation = true) {
     let bot_result;
 

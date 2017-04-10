@@ -27,22 +27,22 @@ const URL_USERS = '/users';
 
 z.cryptography.CryptographyService = class CryptographyService {
 
-  /*
-  Construct a new Cryptography Service.
-  @param {z.service.Client} client Client for the API calls
-  */
+  /**
+   * Construct a new Cryptography Service.
+   * @param {z.service.Client} client - Client for the API calls
+   */
   constructor(client) {
     this.client = client;
     this.logger = new z.util.Logger('z.cryptography.CryptographyService', z.config.LOGGER.OPTIONS);
   }
 
-  /*
-  Gets a pre-key for each client of a user client map
-  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getMultiPrekeyBundles
-
-  @param {Object} user_client_map User client map to request pre-keys for
-  @return {Promise} - Resolves with a pre-key for each client of the given map
-  */
+  /**
+   * Gets a pre-key for each client of a user client map.
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getMultiPrekeyBundles
+   *
+   * @param {Object} user_client_map - User client map to request pre-keys for
+   * @returns {Promise} Resolves with a pre-key for each client of the given map
+   */
   get_users_pre_keys(user_client_map) {
     return this.client.send_json({
       type: 'POST',
@@ -51,13 +51,19 @@ z.cryptography.CryptographyService = class CryptographyService {
     });
   }
 
-
-  put_client_prekeys(client_id, serialized_prekeys) {
+  /**
+   * Put pre-keys for client to be used by remote clients for session initialization.
+   *
+   * @param {string} client_id - Local client ID
+   * @param {Array<string>} serialized_pre_keys - Additional pre-keys to be made available
+   * @returns {Promise} Resolves once the pre-keys are accepted
+   */
+  put_client_prekeys(client_id, serialized_pre_keys) {
     return this.client.send_json({
       url: this.client.create_url(`${URL_CLIENTS}/${client_id}`),
       type: 'PUT',
       data: {
-        prekeys: serialized_prekeys,
+        prekeys: serialized_pre_keys,
       },
     });
   }

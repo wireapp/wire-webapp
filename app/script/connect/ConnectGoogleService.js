@@ -23,14 +23,14 @@ window.z = window.z || {};
 window.z.connect = z.connect || {};
 
 /*
-Connect Google Service for calls to the Google's REST API.
-
-@see https://github.com/google/google-api-javascript-client
-  https://developers.google.com/api-client-library/javascript/
-  https://developers.google.com/google-apps/contacts/v3
-  Use updated-min for newer updates
-  max-results
-*/
+ * Connect Google Service for calls to the Google's REST API.
+ *
+ * @see https://github.com/google/google-api-javascript-client
+ * https://developers.google.com/api-client-library/javascript/
+ * https://developers.google.com/google-apps/contacts/v3
+ * Use updated-min for newer updates
+ * max-results
+ */
 z.connect.ConnectGoogleService = class ConnectGoogleService {
   constructor(client) {
     this.client = client;
@@ -40,10 +40,10 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
     this.url = 'https://www.google.com/m8/feeds/contacts/default/full';
   }
 
-  /*
-  Retrieves the user's Google Contacts.
-  @return {Promise} - Resolves with the Google contacts
-  */
+  /**
+   * Retrieves the user's Google Contacts.
+   * @returns {Promise} Resolves with the Google contacts
+   */
   get_contacts() {
     return this._init_library()
     .then(() => this._get_access_token())
@@ -53,11 +53,11 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
     });
   }
 
-  /*
-  Authenticate before getting the contacts.
-  @private
-  @return {Promise} - Resolves when the user has been successfully authenticated
-  */
+  /**
+   * Authenticate before getting the contacts.
+   * @private
+   * @returns {Promise} Resolves when the user has been successfully authenticated
+   */
   _authenticate() {
     return new Promise((resolve, reject) => {
       this.logger.info('Authenticating with Google for contacts access');
@@ -76,10 +76,10 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
     });
   }
 
-  /*
-  Check for cached access token or authenticate with Google.
-  @return {Promise} - Resolves with the access token
-  */
+  /**
+   * Check for cached access token or authenticate with Google.
+   * @returns {Promise} Resolves with the access token
+   */
   _get_access_token() {
     return new Promise((resolve, reject) => {
       if (window.gapi.auth) {
@@ -98,11 +98,11 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
     });
   }
 
-  /*
-  Retrieve the user's Google Contacts using a call to their backend.
-  @private
-  @return {Promise} - Resolves with the user's contacts
-  */
+  /**
+   * Retrieve the user's Google Contacts using a call to their backend.
+   * @private
+   * @returns {Promise} Resolves with the user's contacts
+   */
   _get_contacts(access_token) {
     return fetch(`${this.url}?access_token=${access_token}&alt=json&max-results=15000&v=3.0`)
     .then((response) => response.json())
@@ -112,18 +112,18 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
     });
   }
 
-  /*
-  Initialize Google Auth Client for JavaScript is loaded.
-  @return {Promise} - Resolves when the authentication library is initialized
-  */
+  /**
+   * Initialize Google Auth Client for JavaScript is loaded.
+   * @returns {Promise} Resolves when the authentication library is initialized
+   */
   _init_library() {
     return window.gapi ? Promise.resolve() : this._load_library();
   }
 
-  /*
-  Lazy loading of the Google Auth Client for JavaScript.
-  @return {Promise} - Resolves when the authentication library is loaded
-  */
+  /**
+   * Lazy loading of the Google Auth Client for JavaScript.
+   * @returns {Promise} Resolves when the authentication library is loaded
+   */
   _load_library() {
     return new Promise((resolve) => {
       window.gapi_loaded = resolve;

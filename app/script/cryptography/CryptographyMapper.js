@@ -27,13 +27,13 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     this.logger = new z.util.Logger('z.cryptography.CryptographyMapper', z.config.LOGGER.OPTIONS);
   }
 
-  /*
-  Maps a generic message into an event in JSON.
-
-  @param {z.proto.GenericMessage} generic_message Received ProtoBuffer message
-  @param {z.event.Backend.CONVERSATION.OTR-ASSET-ADD, z.event.Backend.CONVERSATION.OTR-MESSAGE-ADD} event Event
-  @return {Promise} - Resolves with the mapped event
-  */
+  /**
+   * Maps a generic message into an event in JSON.
+   *
+   * @param {z.proto.GenericMessage} generic_message - Received ProtoBuffer message
+   * @param {z.event.Backend.CONVERSATION.OTR-ASSET-ADD, z.event.Backend.CONVERSATION.OTR-MESSAGE-ADD} event - Event
+   * @returns {Promise} Resolves with the mapped event
+   */
   map_generic_message(generic_message, event) {
     return Promise.resolve()
     .then(() => {
@@ -250,13 +250,13 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     return embedded_message;
   }
 
-  /*
-  Unpacks a specific generic message which is wrapped inside an external generic message.
-
-  @note Wrapped messages get the 'message_id' of their wrappers (external message)
-  @param {z.proto.GenericMessage} external Generic message of type 'external'
-  @param {JSON} event Backend event of type 'conversation.otr-message-add'
-  */
+  /**
+   * Unpacks a specific generic message which is wrapped inside an external generic message.
+   *
+   * @note Wrapped messages get the 'message_id' of their wrappers (external message)
+   * @param {z.proto.GenericMessage} external - Generic message of type 'external'
+   * @param {JSON} event - Backend event of type 'conversation.otr-message-add'
+   */
   _map_external(external, event) {
     const data = {
       text: z.util.base64_to_array(event.data.data),

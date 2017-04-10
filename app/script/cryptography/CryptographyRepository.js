@@ -26,15 +26,14 @@ const REMOTE_ENCRYPTION_FAILURE = '💣';
 
 z.cryptography.CryptographyRepository = class CryptographyRepository {
 
-  /*
-  Construct a new Cryptography repository.
-  @param {z.cryptography.CryptographyService} cryptography_service Backend REST API cryptography service implementation
-  @param {z.storage.StorageRepository} storage_repository Repository for all storage interactions
-  */
-  constructor(cryptography_service, storage_repository, conversation_service) {
+  /**
+   * Construct a new Cryptography repository.
+   * @param {z.cryptography.CryptographyService} cryptography_service - Backend REST API cryptography service implementation
+   * @param {z.storage.StorageRepository} storage_repository - Repository for all storage interactions
+   */
+  constructor(cryptography_service, storage_repository) {
     this.cryptography_service = cryptography_service;
     this.storage_repository = storage_repository;
-    this.conversation_service = conversation_service;
     this.logger = new z.util.Logger('z.cryptography.CryptographyRepository', z.config.LOGGER.OPTIONS);
 
     this.cryptography_mapper = new z.cryptography.CryptographyMapper();
@@ -44,10 +43,10 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     return this;
   }
 
-  /*
-  Initialize the repository.
-  @return {Promise} - Resolves with the repository after initialization
-  */
+  /**
+   * Initialize the repository.
+   * @returns {Promise} Resolves with the repository after initialization
+   */
   init(db) {
     return Promise.resolve()
     .then(() => {
@@ -78,10 +77,10 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     });
   }
 
-  /*
-  Generate all keys need for client registration.
-  @return {Promise} - Resolves with an array of last resort key, pre-keys, and signaling keys
-  */
+  /**
+   * Generate all keys need for client registration.
+   * @returns {Promise} Resolves with an array of last resort key, pre-keys, and signaling keys
+   */
   generate_client_keys() {
     return Promise.all([
       this.cryptobox.get_serialized_last_resort_prekey(),
@@ -94,28 +93,28 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   }
 
   /*
-  Get the fingerprint of the local identity.
-  @return {string} - Fingerprint of local identity public key
-  */
+   * Get the fingerprint of the local identity.
+   * @returns {string} Fingerprint of local identity public key
+   */
   get_local_fingerprint() {
     return this.cryptobox.identity.public_key.fingerprint();
   }
 
-  /*
-  Get the fingerprint of a remote identity.
-  @param {string} user_id ID of user
-  @param {string} client_id ID of client
-  */
+  /**
+   * Get the fingerprint of a remote identity.
+   * @param {string} user_id - ID of user
+   * @param {string} client_id - ID of client
+   */
   get_remote_fingerprint(user_id, client_id) {
     return this._load_session(user_id, client_id)
     .then((cryptobox_session) => cryptobox_session.fingerprint_remote());
   }
 
-  /*
-  Get a pre-key for client of in the user client map.
-  @param {Object} user_client_map User client map to request pre-keys for
-  @return {Promise} - Resolves with a map of pre-keys for the requested clients
-  */
+  /**
+   * Get a pre-key for client of in the user client map.
+   * @param {Object} user_client_map - User client map to request pre-keys for
+   * @returns {Promise} Resolves with a map of pre-keys for the requested clients
+   */
   get_users_pre_keys(user_client_map) {
     return this.cryptography_service.get_users_pre_keys(user_client_map)
     .catch(error => {
@@ -137,13 +136,14 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     });
   }
 
-  /*
-  Generate the signaling keys (which are used for mobile push notifications).
-  @note Signaling Keys are unimportant for the webapp (because they are used for iOS or Android push notifications) but required by the backend.
-    Thus this method returns a static Signaling Key Pair.
-  @private
-  @return {Object} - Object containing the signaling keys
-  */
+  /**
+   * Generate the signaling keys (which are used for mobile push notifications).
+   * @note Signaling Keys are unimportant for the webapp (because they are used for iOS or Android push notifications) but required by the backend.
+   *   Thus this method returns a static Signaling Key Pair.
+   *
+   * @private
+   * @returns {Object} Object containing the signaling keys
+   */
   _generate_signaling_keys() {
     return {
       enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
@@ -151,10 +151,10 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     };
   }
 
-  /*
-  Create a map of all local sessions.
-  @return {Object} - Object of users each containing an array of local sessions
-  */
+  /**
+   * Create a map of all local sessions.
+   * @returns {Object} Object of users each containing an array of local sessions
+   */
   create_user_session_map() {
     const user_session_map = {};
     for (const session_id in this.storage_repository.sessions) {
@@ -165,14 +165,14 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     return user_session_map;
   }
 
-  /*
-  Construct a session ID.
-  @todo Make public
-  @private
-  @param {string} user_id User ID for the remote participant
-  @param {string} client_id Client ID of the remote participant
-  @return {string} - Session ID
-  */
+  /**
+   * Construct a session ID.
+   * @todo Make public
+   * @private
+   * @param {string} user_id - User ID for the remote participant
+   * @param {string} client_id - Client ID of the remote participant
+   * @returns {string} Session ID
+   */
   _construct_session_id(user_id, client_id) {
     return `${user_id}@${client_id}`;
   }
@@ -181,16 +181,15 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     return this.cryptobox.session_delete(this._construct_session_id(user_id, client_id));
   }
 
-  /*
-  Bundles and encrypts the generic message for all given clients.
-
-  @param user_client_map [Object] Contains all users and their known clients
-  @param generic_message [z.proto.GenericMessage] Proto buffer message to be encrypted
-  @return [Promise] Promise that resolves with the encrypted payload
-  */
-  encrypt_generic_message(user_client_map, generic_message, payload) {
-    payload = payload || this._construct_payload(this.current_client().id);
-
+  /**
+   * Bundles and encrypts the generic message for all given clients.
+   *
+   * @param {Object} user_client_map - Contains all users and their known clients
+   * @param {z.proto.GenericMessage} generic_message - Proto buffer message to be encrypted
+   * @param {Object} [payload={sender: string, recipients: {}, native_push: true}] - Object to contain encrypted message payload
+   * @returns {Promise} Resolves with the encrypted payload
+   */
+  encrypt_generic_message(user_client_map, generic_message, payload = this._construct_payload(this.current_client().id)) {
     const cipher_payload_promises = [];
 
     for (const user_id in user_client_map) {
@@ -277,29 +276,29 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     return Promise.resolve([]);
   }
 
-  /*
-  Construct the payload for an encrypted message.
-
-  @private
-  @param {string} sender Client ID of message sender
-  @return {Object} - Payload to send to backend
-  */
+  /**
+   * Construct the payload for an encrypted message.
+   *
+   * @private
+   * @param {string} sender - Client ID of message sender
+   * @returns {Object} Payload to send to backend
+   */
   _construct_payload(sender) {
     return {
-      sender,
+      sender: sender,
       recipients: {},
       native_push: true,
     };
   }
 
-  /*
-  Encrypt the generic message for a given session.
-  @note We created the convention that whenever we fail to encrypt for a specific client, we send a Bomb Emoji (no joke!)
-
-  @private
-  @param {z.proto.GenericMessage} generic_message ProtoBuffer message
-  @return {Array<string, string>} - Array containing session ID and encrypted message as BASE64 encoded string
-  */
+  /**
+   * Encrypt the generic message for a given session.
+   * @note We created the convention that whenever we fail to encrypt for a specific client, we send a Bomb Emoji (no joke!)
+   *
+   * @private
+   * @param {z.proto.GenericMessage} generic_message - ProtoBuffer message
+   * @returns {Array<string, string>} Array containing session ID and encrypted message as BASE64 encoded string
+   */
   _encrypt_payload_for_session(session_id, generic_message) {
     return this.cryptobox.encrypt(session_id, generic_message.toArrayBuffer())
     .then((ciphertext) => [session_id, z.util.array_to_base64(ciphertext)])
@@ -313,9 +312,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     });
   }
 
-  /*
-  @return {z.proto.GenericMessage} - Decrypted message in ProtocolBuffer format
-  */
+  /**
+   * @returns {Promise<z.proto.GenericMessage>} Resolves with the decrypted message in ProtocolBuffer format
+   */
   decrypt_event(event) {
     if (!event.data) {
       this.logger.error(`Encrypted event with ID '${event.id}' does not contain it's data payload`, event);

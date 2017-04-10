@@ -31,10 +31,10 @@ z.connect.ConnectRepository = class ConnectRepository {
     return this;
   }
 
-  /*
-  Retrieve a user's Google Contacts.
-  @return {Promise} - Resolves with the user's Google contacts that match on Wire
-  */
+  /**
+   * Retrieve a user's Google Contacts.
+   * @returns {Promise} Resolves with the user's Google contacts that match on Wire
+   */
   get_google_contacts() {
     return this.connect_google_service.get_contacts()
     .catch((error) => {
@@ -74,10 +74,10 @@ z.connect.ConnectRepository = class ConnectRepository {
     });
   }
 
-  /*
-  Retrieve a user's macOS address book contacts.
-  @return {Promise} - Resolves with the user's address book contacts that match on Wire
-  */
+  /**
+   * Retrieve a user's macOS address book contacts.
+   * @returns {Promise} Resolves with the user's address book contacts that match on Wire
+   */
   get_macos_contacts() {
     // TODO: Delete this block after uptake of wrapper builds including new address book implementation
     if (window.zAddressBook) {
@@ -145,13 +145,13 @@ z.connect.ConnectRepository = class ConnectRepository {
     });
   }
 
-  /*
-  Encode phone book
-
-  @private
-  @param {z.connect.PhoneBook} phone_book Object containing un-encoded phone book data
-  @return {z.connect.PhoneBook} - Object containing encoded phone book data
-  */
+  /**
+   * Encode phone book
+   *
+   * @private
+   * @param {z.connect.PhoneBook} phone_book - Object containing un-encoded phone book data
+   * @returns {z.connect.PhoneBook} Object containing encoded phone book data
+   */
   _encode_phone_book(phone_book) {
     const {cards, self} = phone_book;
     self.forEach((contact, contact_index) => {
@@ -167,11 +167,11 @@ z.connect.ConnectRepository = class ConnectRepository {
     return phone_book;
   }
 
-  /*
-  Parse a user's macOS address book Contacts.
-  @private
-  @return {z.connect.PhoneBook} - Encoded phone book data
-  */
+  /**
+   * Parse a user's macOS address book Contacts.
+   * @private
+   * @returns {z.connect.PhoneBook} Encoded phone book data
+   */
   _parse_macos_contacts() {
     return new Promise((resolve) => {
       if (!window.wAddressBook) {
@@ -254,12 +254,13 @@ z.connect.ConnectRepository = class ConnectRepository {
   }
 
 
-  /*
-  Parse a user's Google Contacts.
-  @private
-  @param {JSON} response Response from Google API
-  @return {z.connect.PhoneBook} - Encoded phone book data
-  */
+  /**
+   * Parse a user's Google Contacts.
+   *
+   * @private
+   * @param {JSON} response - Response from Google API
+   * @returns {z.connect.PhoneBook} Encoded phone book data
+   */
   _parse_google_contacts({feed: {author: self, entry: users}}) {
     const phone_book = new z.connect.PhoneBook(this.properties_repository.self());
 
