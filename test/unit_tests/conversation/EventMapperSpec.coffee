@@ -49,7 +49,7 @@ describe 'Event Mapper', ->
       expect(message_et.get_first_asset().nonce).toBe event.data.nonce
       expect(message_et).toBeDefined()
 
-    it 'maps text messages with link previews', ->
+    it 'maps text messages with deprecated link preview format', ->
       event_id = z.util.create_random_uuid
 
       article = new z.proto.Article 'test.com', 'Test title', 'Test description'
@@ -73,6 +73,30 @@ describe 'Event Mapper', ->
       expect(message_et.get_first_asset().previews()[0].original_url).toBe 'test.com'
       expect(message_et).toBeDefined()
 
+    it 'maps text messages with link preview', ->
+      event_id = z.util.create_random_uuid
+
+      link_preview = new z.proto.LinkPreview 'test.com', 0, null, 'test.com/perm', 'Test title', 'Test description'
+
+      event =
+        conversation: conversation_et.id
+        data:
+          content: 'test.com'
+          nonce: event_id
+          previews: [link_preview.encode64()]
+        id: event_id
+        from: z.util.create_random_uuid
+        time: new Date().toISOString()
+        type: z.event.Backend.CONVERSATION.MESSAGE_ADD
+
+      message_et = event_mapper.map_json_event event, conversation_et
+      expect(message_et.get_first_asset().text).toBe event.data.content
+      expect(message_et.get_first_asset().nonce).toBe event.data.nonce
+      expect(message_et.get_first_asset().previews().length).toBe 1
+      expect(message_et.get_first_asset().previews()[0].original_url).toBe link_preview.url
+      expect(message_et.get_first_asset().previews()[0].permanent_url).toBe link_preview.permanent_url
+      expect(message_et).toBeDefined()
+
     it 'skips messages which cannot be mapped', ->
       # @formatter:off
       good_message = {"conversation":conversation_et.id,"id":"4cec0f75-d963-486d-9401-415240ac2ad8","from":"532af01e-1e24-4366-aacf-33b67d4ee376","time":"2016-08-04T15:12:12.453Z","data":{"content":"Message with timestamp","nonce":"4cec0f75-d963-486d-9401-415240ac2ad8","previews":[]},"type":"conversation.message-add"}
@@ -81,3 +105,12 @@ describe 'Event Mapper', ->
 
       message_ets = event_mapper.map_json_events [good_message, bad_message], conversation_et
       expect(message_ets.length).toBe 1
+
+  describe '_map_system_event_unable_to_decrypt', ->
+    it 'maps a message from a decrypt error event', ->
+      # @formatter:off
+      event = {"category": 0, "conversation": "fb1c051a-3ce3-46c5-bbc2-0153b6076af0", "error": "We received a message with session tag 'a8859a310a0c374a3da67e3a0f871145', but we don't have a session for this tag. (c0a70d96aaeb87b6)", "error_code": "205 (c0a70d96aaeb87b6)", "from": "2bde49aa-bdb5-458f-98cf-7d3552b10916", "id": "cb4972e0-9586-42a2-90cc-1798ec0cb648", "primary_key": 9, "time": "2017-04-03T12:58:04.301Z", "type": "conversation.unable-to-decrypt"}
+      # @formatter:on
+      message_et = event_mapper._map_system_event_unable_to_decrypt event
+      expect(message_et.error_code).toBe '205'
+      expect(message_et.client_id).toBe 'c0a70d96aaeb87b6'

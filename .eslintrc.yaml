@@ -11,10 +11,12 @@ globals:
   _: true
   $: true
   amplify: true
+  CryptoJS: true
   ko: true
   LRUCache: true
   moment: true
   pako: true
+  platform: true
   Raygun: true
   twttr: true
   wire: true
@@ -26,6 +28,7 @@ rules:
   handle-callback-err: 2
   indent: [2, 2, {SwitchCase: 1}]
   keyword-spacing: 2
+  no-console: 0
   no-dupe-class-members: 2
   no-else-return: 2
   no-multi-spaces: 2
@@ -38,3 +41,4 @@ rules:
   sort-vars: 2
   space-before-blocks: 2
   strict: [2, global]
+  valid-jsdoc: [2, {requireParamDescription: true, requireReturnDescription: true}]

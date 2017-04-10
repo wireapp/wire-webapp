@@ -30,6 +30,10 @@ class z.user.UserError
         'Pre-key not found'
       when z.user.UserError::TYPE.REQUEST_FAILURE
         'User related backend request failure'
+      when z.user.UserError::TYPE.USER_NOT_FOUND
+        'User not found'
+      when z.user.UserError::TYPE.USERNAME_TAKEN
+        'Username is already taken'
       else
         'Unknown UserError'
 
@@ -39,4 +43,5 @@ class z.user.UserError
     PRE_KEY_NOT_FOUND: 'z.user.UserError::TYPE.PRE_KEY_NOT_FOUND'
     REQUEST_FAILURE: 'z.user.UserError::TYPE.REQUEST_FAILURE'
     UNKNOWN: 'z.user.UserError::TYPE.UNKNOWN'
+    USER_NOT_FOUND: 'z.user.UserError::TYPE.USER_NOT_FOUND'
     USERNAME_TAKEN: 'z.user.UserError::TYPE.USERNAME_TAKEN'

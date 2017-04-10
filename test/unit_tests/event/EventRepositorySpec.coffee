@@ -105,6 +105,34 @@ describe 'Event Repository', ->
         done()
       .catch done.fail
 
+  describe '_handle_notification', ->
+    last_notification_id = undefined
+
+    beforeEach ->
+      last_notification_id = z.util.create_random_uuid()
+      event_repository.last_notification_id last_notification_id
+
+    it 'should not update last notification id if transient is true', (done) ->
+      notification_payload = {id: z.util.create_random_uuid(), payload: [], transient: true}
+
+      event_repository._handle_notification(notification_payload).then =>
+        expect(event_repository.last_notification_id()).toBe last_notification_id
+        done()
+
+    it 'should update last notification id if transient is false', (done) ->
+      notification_payload = {id: z.util.create_random_uuid(), payload: [], transient: false}
+
+      event_repository._handle_notification(notification_payload).then =>
+        expect(event_repository.last_notification_id()).toBe notification_payload.id
+        done()
+
+    it 'should update last notification id if transient is not present', (done) ->
+      notification_payload = {id: z.util.create_random_uuid(), payload: []}
+
+      event_repository._handle_notification(notification_payload).then =>
+        expect(event_repository.last_notification_id()).toBe notification_payload.id
+        done()
+
   describe '_handle_event', ->
     beforeEach ->
       event_repository.notification_handling_state z.event.NotificationHandlingState.WEB_SOCKET

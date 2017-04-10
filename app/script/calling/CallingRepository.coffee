@@ -83,7 +83,7 @@ class z.calling.CallingRepository
     amplify.subscribe z.event.WebApp.CALL.STATE.JOIN, @join_call
     amplify.subscribe z.event.WebApp.CALL.STATE.LEAVE, => @switch_call_center z.calling.enum.CALL_ACTION.LEAVE, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.REJECT, => @switch_call_center z.calling.enum.CALL_ACTION.REJECT, arguments
-    amplify.subscribe z.event.WebApp.CALL.STATE.REMOVE_PARTICIPANT, => @switch_call_center z.calling.enum.CALL_ACTION.REMOVE_PARTICIPANT, arguments
+    amplify.subscribe z.event.WebApp.CALL.STATE.PARTICIPANT_LEFT, => @switch_call_center z.calling.enum.CALL_ACTION.PARTICIPANT_LEFT, arguments
     amplify.subscribe z.event.WebApp.CALL.STATE.TOGGLE, @toggle_state
     amplify.subscribe z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, @store_flow_status
     amplify.subscribe z.event.WebApp.LOADED, @initiate_config

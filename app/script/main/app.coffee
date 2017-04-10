@@ -237,7 +237,7 @@ class z.main.App
       @logger.info error_message, {error: error}
       @logger.debug "App reload: '#{is_reload}', Document referrer: '#{document.referrer}', Location: '#{window.location.href}'"
 
-      if is_reload and error.type not in [z.client.ClientError::TYPE.MISSING_ON_BACKEND, z.client.ClientError::TYPE.NO_LOCAL_CLIENT]
+      if is_reload and error.type not in [z.client.ClientError.TYPE.MISSING_ON_BACKEND, z.client.ClientError.TYPE.NO_LOCAL_CLIENT]
         @auth.client.execute_on_connectivity().then -> window.location.reload false
       else if navigator.onLine
         @logger.error "Caused by: #{error?.message or error}"
@@ -289,10 +289,9 @@ class z.main.App
       @logger.info "Found bot token '#{bot_name}'"
       @repository.bot.add_bot bot_name
 
-    assets_v3 = z.util.get_url_parameter z.auth.URLParameter.ASSETS_V3
-    if not z.util.Environment.frontend.is_production() or _.isBoolean assets_v3
-      @repository.conversation.use_v3_api = assets_v3
-      @repository.user.use_v3_api = assets_v3
+    if not z.util.Environment.frontend.is_production()
+      @repository.conversation.use_v3_api = true
+      @repository.user.use_v3_api = true
 
     calling_v3 = z.util.get_url_parameter z.auth.URLParameter.CALLING_V3
     if _.isBoolean calling_v3

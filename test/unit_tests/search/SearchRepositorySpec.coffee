@@ -28,15 +28,6 @@ describe 'z.search.SearchRepository', ->
       server = sinon.fakeServer.create()
       server.autoRespond = true
 
-      john_doe = new z.entity.User()
-      john_doe.id = entities.user.john_doe.id
-      user_repository.save_user john_doe
-
-      jane_roe = new z.entity.User()
-      jane_roe.id = entities.user.jane_roe.id
-      user_repository.save_user jane_roe
-
-
       server.respondWith 'GET', "#{test_factory.settings.connection.rest_url}/search/suggestions?size=30", [
         200
         'Content-Type': 'application/json'
@@ -54,7 +45,14 @@ describe 'z.search.SearchRepository', ->
         {}
         ''
       ]
-      done()
+
+      john_doe = new z.entity.User()
+      john_doe.id = entities.user.john_doe.id
+
+      jane_roe = new z.entity.User()
+      jane_roe.id = entities.user.jane_roe.id
+      user_repository.save_users [john_doe, jane_roe]
+    .then done
     .catch done.fail
 
   afterEach ->

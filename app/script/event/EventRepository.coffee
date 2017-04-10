@@ -22,6 +22,8 @@ z.event ?= {}
 EVENT_CONFIG =
   E_CALL_EVENT_LIFETIME: 30 * 1000 # 30 seconds
 
+UNKNOWN_DECRYPT_ERROR_CODE = 999
+
 # Event repository to handle all backend event channels.
 class z.event.EventRepository
   @::NOTIFICATION_SOURCE =
@@ -355,13 +357,10 @@ class z.event.EventRepository
         return @cryptography_repository.decrypt_event event
         .catch (decrypt_error) =>
           # Get error information
+          error_code = decrypt_error.code or UNKNOWN_DECRYPT_ERROR_CODE
           remote_client_id = event.data.sender
           remote_user_id = event.from
           session_id = @cryptography_repository._construct_session_id remote_user_id, remote_client_id
-
-          # Hashing error message to get the error code (not very reliable if Proteus error messages change! Needs to be revised in the future)
-          hashed_error_message = z.util.murmurhash3 decrypt_error.message, 42
-          error_code = hashed_error_message.toString().substr 0, 4
 
           # Handle error
           if decrypt_error instanceof Proteus.errors.DecryptError.DuplicateMessage or decrypt_error instanceof Proteus.errors.DecryptError.OutdatedMessage
@@ -375,12 +374,11 @@ class z.event.EventRepository
             @logger.error "Session '#{session_id}' with user '#{remote_user_id}' (client '#{remote_client_id}') is broken or out of sync. Reset the session and decryption is likely to work again. Error: #{decrypt_error.message}", decrypt_error
           else if decrypt_error instanceof Proteus.errors.DecryptError.RemoteIdentityChanged
             # Remote identity changed
-            error_code = z.cryptography.CryptographyErrorType.REMOTE_IDENTITY_CHANGED
             message = "Remote identity of client '#{remote_client_id}' from user '#{remote_user_id}' changed: #{decrypt_error.message}"
             @logger.error message, decrypt_error
 
-          @logger.warn "Could not decrypt an event from client ID '#{remote_client_id}' of user ID '#{remote_user_id}' in session ID '#{session_id}'.\nError Code: '#{error_code}'´\nError Message: #{decrypt_error.message}", decrypt_error
-          @_report_decrypt_error event, decrypt_error, error_code
+          @logger.warn "Could not decrypt an event from client ID '#{remote_client_id}' of user ID '#{remote_user_id}' in session ID '#{session_id}'.\nError Code: '#{error_code}'\nError Message: #{decrypt_error.message}", decrypt_error
+          @_report_decrypt_error event, decrypt_error
 
           return z.conversation.EventBuilder.build_unable_to_decrypt event, decrypt_error, error_code
         .then (message) =>
@@ -414,64 +412,58 @@ class z.event.EventRepository
   ###
   _handle_notification: (notification) =>
     return new Promise (resolve, reject) =>
-      events = notification.payload
-      source = switch @notification_handling_state()
-        when z.event.NotificationHandlingState.WEB_SOCKET
-          @NOTIFICATION_SOURCE.WEB_SOCKET
-        else
-          @NOTIFICATION_SOURCE.STREAM
+      {payload: events, id, transient} = notification
+      source = if transient? then @NOTIFICATION_SOURCE.WEB_SOCKET else @NOTIFICATION_SOURCE.STREAM
+      is_transient_event = transient is true
 
-      @logger.info "Handling notification '#{notification.id}' from '#{source}' containing '#{events.length}' events", notification
+      @logger.info "Handling notification '#{id}' from '#{source}' containing '#{events.length}' events", notification
 
       if events.length is 0
         @logger.warn 'Notification payload does not contain any events'
-        @_update_last_notification_id notification.id
-        resolve @last_notification_id()
+        @_update_last_notification_id(id) if not is_transient_event
+        resolve()
       else
         Promise.all (@_handle_event event for event in events)
         .then =>
-          @_update_last_notification_id notification.id
-          resolve @last_notification_id()
+          @_update_last_notification_id(id) if not is_transient_event
+          resolve()
         .catch (error) =>
-          @logger.error "Failed to handle notification '#{notification.id}' from '#{source}': #{error.message}", error
+          @logger.error "Failed to handle notification '#{id}' from '#{source}': #{error.message}", error
           reject error
 
   ###
   Report decryption error to Localytics and stack traces to Raygun.
   ###
-  _report_decrypt_error: (event, decrypt_error, error_code) =>
+  _report_decrypt_error: (event, decrypt_error) =>
     remote_client_id = event.data.sender
     remote_user_id = event.from
     session_id = @cryptography_repository._construct_session_id remote_user_id, remote_client_id
 
-    attributes =
-      cause: "#{error_code}: #{decrypt_error.message}"
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE, attributes
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE, cause: decrypt_error.code or decrypt_error.message
 
-    if decrypt_error not instanceof Proteus.errors.DecryptError.DuplicateMessage and decrypt_error not instanceof Proteus.errors.DecryptError.TooDistantFuture
-      custom_data =
-        cryptobox_version: cryptobox.version
-        client_local_class: @current_client().class
-        client_local_type: @current_client().type
-        error_code: error_code
-        event_type: event.type
-        session_id: session_id
+    custom_data =
+      cryptobox_version: cryptobox.version
+      client_local_class: @current_client().class
+      client_local_type: @current_client().type
+      error_code: decrypt_error.code
+      event_type: event.type
+      session_id: session_id
 
-      raygun_error = new Error "Decryption failed: #{decrypt_error.message}"
-      raygun_error.stack = decrypt_error.stack
-      Raygun.send raygun_error, custom_data
+    raygun_error = new Error "Decryption failed: #{decrypt_error.code or decrypt_error.message}"
+    raygun_error.stack = decrypt_error.stack
+    Raygun.send raygun_error, custom_data
 
-    ###
-    Check if call event is handled within its valid lifespan.
-    @return [Boolean] Returns true if event is handled within is lifetime, otherwise throws error
-    ###
-    _validate_call_event_lifetime: (event) ->
-      return true if @notification_handling_state() is z.event.NotificationHandlingState.WEB_SOCKET
-      return true if event.content.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+  ###
+  Check if call event is handled within its valid lifespan.
+  @return [Boolean] Returns true if event is handled within is lifetime, otherwise throws error
+  ###
+  _validate_call_event_lifetime: (event) ->
+    return true if @notification_handling_state() is z.event.NotificationHandlingState.WEB_SOCKET
+    return true if event.content.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
 
-      corrected_timestamp = Date.now() - @clock_drift
-      event_timestamp = new Date(event.time).getTime()
-      if corrected_timestamp > event_timestamp + EVENT_CONFIG.E_CALL_EVENT_LIFETIME
-        @logger.info "Ignored outdated '#{event.type}' event in conversation '#{event.conversation}' - Event: '#{event_timestamp}', Local: '#{corrected_timestamp}'", {event_object: event, event_json: JSON.stringify event}
-        throw new z.event.EventError z.event.EventError::TYPE.OUTDATED_E_CALL_EVENT
-      return true
+    corrected_timestamp = Date.now() - @clock_drift
+    event_timestamp = new Date(event.time).getTime()
+    if corrected_timestamp > event_timestamp + EVENT_CONFIG.E_CALL_EVENT_LIFETIME
+      @logger.info "Ignored outdated '#{event.type}' event in conversation '#{event.conversation}' - Event: '#{event_timestamp}', Local: '#{corrected_timestamp}'", {event_object: event, event_json: JSON.stringify event}
+      throw new z.event.EventError z.event.EventError::TYPE.OUTDATED_E_CALL_EVENT
+    return true

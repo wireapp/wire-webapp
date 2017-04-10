@@ -74,6 +74,10 @@ class z.search.SearchRepository
     @search_result_mapper.map_results response.results, z.search.SEARCH_MODE.ONBOARDING
     .then ([search_ets, mode]) =>
       return @_prepare_search_result search_ets, mode
+    .then (suggested_user_ets) =>
+      @user_repository.get_user_by_id (result.id for result in response['auto-connects'])
+      .then (connected_user_ets) ->
+        return [connected_user_ets, suggested_user_ets]
 
   ###
   Preparing the search results for display.
@@ -86,29 +90,27 @@ class z.search.SearchRepository
   @return [Promise] Promise that will resolve with search results
   ###
   _prepare_search_result: (search_ets, mode) ->
-    return new Promise (resolve) =>
-      user_ids = (user_et.id for user_et in search_ets)
+    @user_repository.get_users_by_id (user_et.id for user_et in search_ets)
+    .then (user_ets) ->
+      result_user_ets = []
+      for user_et in user_ets
 
-      @user_repository.get_users_by_id user_ids, (user_ets) ->
-        result_user_ets = []
-        for user_et in user_ets
+        search_et = ko.utils.arrayFirst search_ets, (search_et) -> search_et.id is user_et.id
+        user_et.mutual_friends_total search_et.mutual_friends_total
 
-          search_et = ko.utils.arrayFirst search_ets, (search_et) -> search_et.id is user_et.id
-          user_et.mutual_friends_total search_et.mutual_friends_total
+        ###
+        Skipping some results to adjust for slow graph updates.
 
-          ###
-          Skipping some results to adjust for slow graph updates.
+        Only show connected people among your top people.
+        Do not show already connected people when uploading address book.
+        Only show unknown or cancelled people in suggestions.
+        ###
+        switch mode
+          when z.search.SEARCH_MODE.CONTACTS
+            result_user_ets.push user_et if not user_et.connected()
+          when z.search.SEARCH_MODE.ONBOARDING
+            result_user_ets.push user_et if not user_et.connected()
+          else
+            result_user_ets.push user_et
 
-          Only show connected people among your top people.
-          Do not show already connected people when uploading address book.
-          Only show unknown or cancelled people in suggestions.
-          ###
-          switch mode
-            when z.search.SEARCH_MODE.CONTACTS
-              result_user_ets.push user_et if not user_et.connected()
-            when z.search.SEARCH_MODE.ONBOARDING
-              result_user_ets.push user_et if not user_et.connected()
-            else
-              result_user_ets.push user_et
-
-        resolve result_user_ets
+      return result_user_ets

@@ -29,7 +29,7 @@ describe 'z.cryptography.CryptographyRepository', ->
       done()
     .catch done.fail
 
-  describe 'Encryption', ->
+  describe 'encrypt_generic_message', ->
     jane_roe = undefined
     john_doe = undefined
 
@@ -76,3 +76,15 @@ describe 'z.cryptography.CryptographyRepository', ->
         expect(_.isString(payload.recipients[jane_roe.id][jane_roe.clients.phone_id])).toBeTruthy()
         done()
       .catch done.fail
+
+  describe 'decrypt_event', ->
+    it 'detects a session reset request', (done) ->
+      # @formatter:off
+      event = {"conversation": "f1d2d451-0fcb-4313-b0ba-313b971ab758", "time": "2017-03-22T11:06:29.232Z", "data": { "text": "💣", "sender": "e35e4ee5b80a1a9d", "recipient": "7481c47f2f7336d8" }, "from": "e3ff8dab-1407-4890-b9d3-e1aab49233e8", "type": "conversation.otr-message-add"}
+      # @formatter:on
+
+      cryptography_repository.decrypt_event event
+      .catch (error) ->
+        expect(error).toEqual jasmine.any Proteus.errors.DecryptError.InvalidMessage
+        done()
+      .then done.fail

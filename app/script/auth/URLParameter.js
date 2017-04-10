@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.auth = z.auth || {};
 
 z.auth.URLParameter = {
-  ASSETS_V3: 'assets_v3',
   BOT: 'bot',
   CALLING_V3: 'calling_v3',
   CONNECT: 'connect',

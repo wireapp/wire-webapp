@@ -27,6 +27,7 @@ z.string.fr ?= {}
 z.string.hr ?= {}
 z.string.hu ?= {}
 z.string.it ?= {}
+z.string.lt ?= {}
 z.string.pt ?= {}
 z.string.ro ?= {}
 z.string.ru ?= {}
