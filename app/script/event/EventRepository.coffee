@@ -22,6 +22,8 @@ z.event ?= {}
 EVENT_CONFIG =
   E_CALL_EVENT_LIFETIME: 30 * 1000 # 30 seconds
 
+UNKNOWN_DECRYPT_ERROR_CODE = 999
+
 # Event repository to handle all backend event channels.
 class z.event.EventRepository
   @::NOTIFICATION_SOURCE =
@@ -355,7 +357,7 @@ class z.event.EventRepository
         return @cryptography_repository.decrypt_event event
         .catch (decrypt_error) =>
           # Get error information
-          error_code = decrypt_error.code or 999
+          error_code = decrypt_error.code or UNKNOWN_DECRYPT_ERROR_CODE
           remote_client_id = event.data.sender
           remote_user_id = event.from
           session_id = @cryptography_repository._construct_session_id remote_user_id, remote_client_id
