@@ -1,6 +1,6 @@
 rules:
   font-family-name-quotes: always-where-required
-  selector-attribute-quotes: always
-  string-quotes: single
   function-url-quotes: never
   number-leading-zero: never
+  selector-attribute-quotes: always
+  string-quotes: single
