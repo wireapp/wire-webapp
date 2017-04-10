@@ -76,7 +76,7 @@ describe('z.announce.AnnounceService', function() {
         'status': 'success',
       };
 
-      return server.respondWith('GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [
+      server.respondWith('GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [
         200,
         {'Content-Type': 'application/json'},
         JSON.stringify(response),
@@ -85,11 +85,11 @@ describe('z.announce.AnnounceService', function() {
 
     afterEach(() => server.restore());
 
-    return it('can fetch an announcement', done =>
+    it('can fetch an announcement', done =>
       announce_service.get_announcements()
       .then(function(result) {
         expect(result.length).toBe(2);
-        return done();
+        done();
       }).catch(done.fail)
     );
   });
@@ -98,28 +98,27 @@ describe('z.announce.AnnounceService', function() {
     beforeEach(function() {
       server = sinon.fakeServer.create();
       server.autoRespond = true;
-      return server.respondWith('GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [404, {}, ""]);});
+      server.respondWith('GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [404, {}, ""]);});
 
     afterEach(() => server.restore());
 
-    return it('cannot fetch an announcement', done =>
+    it('cannot fetch an announcement', done =>
       announce_service.get_announcements()
       .then(done.fail)
       .catch(function(error) {
         expect(error.message).toBe('Not Found');
-        return done();
+        done();
       })
     );
   });
 
-  return describe('get_version', function() {
-    let response =
-      {version: '2017-03-14-15-05-prod'};
+  describe('get_version', function() {
+    const response = {version: '2017-03-14-15-05-prod'};
 
     beforeEach(function() {
       server = sinon.fakeServer.create();
       server.autoRespond = true;
-      return server.respondWith('GET', 'version/', [
+      server.respondWith('GET', 'version/', [
         200,
         {'Content-Type': 'application/json'},
         JSON.stringify(response),
@@ -128,11 +127,12 @@ describe('z.announce.AnnounceService', function() {
 
     afterEach(() => server.restore());
 
-    return it('fetches the webapp release version', done =>
+    it('fetches the webapp release version', done =>
       announce_service.get_version()
       .then(function(version) {
         expect(version).toBe(response.version);
-        return done();}).catch(done.fail)
+        done();
+      }).catch(done.fail)
     );
   });
 });

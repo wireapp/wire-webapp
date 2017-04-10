@@ -37,7 +37,7 @@ describe('z.announce.AnnounceRepository', function() {
   beforeEach(function() {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
-    let response = {
+    const response = {
       'count': 2,
       'now': '2016-05-26T10:15:43.507250',
       'result': [
@@ -75,7 +75,7 @@ describe('z.announce.AnnounceRepository', function() {
       'status': 'success',
     };
 
-    return server.respondWith('GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [
+    server.respondWith('GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [
       200,
       {'Content-Type': 'application/json'},
       JSON.stringify(response),
@@ -84,7 +84,7 @@ describe('z.announce.AnnounceRepository', function() {
 
   afterEach(() => server.restore());
 
-  return it('can fetch an announcement', done =>
+  it('can fetch an announcement', done =>
     announce_repository.check_announcements()
     .then(done)
     .catch(done.fail)
