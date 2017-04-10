@@ -29,6 +29,7 @@ LOCALYTICS =
 
 RAYGUN =
   API_KEY: '5hvAMmz8wTXaHBYqu2TFUQ=='
+  REPORTING_THRESHOLD_IN_MILLIS: 60000
 
 if z.util.Environment.frontend.is_production()
   RAYGUN.API_KEY = 'lAkLCPLx3ysnsXktajeHmw=='
@@ -44,6 +45,7 @@ class z.tracking.EventTrackingRepository
   constructor: (@user_repository, @conversation_repository) ->
     @logger = new z.util.Logger 'z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS
 
+    @last_report = undefined
     @localytics = undefined
     @properties = undefined
     @session_interval = undefined
@@ -223,7 +225,13 @@ class z.tracking.EventTrackingRepository
   @return [JSON|Boolean] Returns the original payload if it is an unreported error, otherwise "false".
   ###
   _check_error_payload: (raygun_payload) =>
+    if @last_report is undefined
+      @last_report = Date.now()
+      return raygun_payload
 
+    return false if (Date.now() - @last_report) <= RAYGUN.REPORTING_THRESHOLD_IN_MILLIS
+
+    @last_report = Date.now()
     return raygun_payload
 
   _detach_promise_rejection_handler: ->
