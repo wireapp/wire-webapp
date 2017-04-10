@@ -11,6 +11,7 @@ globals:
   _: true
   $: true
   amplify: true
+  cryptobox: true
   CryptoJS: true
   ko: true
   libsodium: true
@@ -18,6 +19,7 @@ globals:
   moment: true
   pako: true
   platform: true
+  Proteus: true
   Raygun: true
   twttr: true
   wire: true
