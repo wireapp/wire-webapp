@@ -81,11 +81,11 @@ describe 'z.tracking.EventTrackingRepository', ->
       error_payload = tracking_repository._check_error_payload raygun_payload
       expect(error_payload).toBe raygun_payload
 
-      _.times 100, () =>  error_payload = tracking_repository._check_error_payload raygun_payload
+      _.times 100, () => error_payload = tracking_repository._check_error_payload raygun_payload
       expect(error_payload).toBe false
 
       jasmine.clock().mockDate Date.now()
-      jasmine.clock().tick 100000
+      jasmine.clock().tick z.tracking.EventTrackingRepository::ERROR_REPORTING_THRESHOLD * 2
 
       error_payload = tracking_repository._check_error_payload raygun_payload
       expect(error_payload).toBe raygun_payload

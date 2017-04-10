@@ -29,7 +29,6 @@ LOCALYTICS =
 
 RAYGUN =
   API_KEY: '5hvAMmz8wTXaHBYqu2TFUQ=='
-  REPORTING_THRESHOLD_IN_MILLIS: 60000
 
 if z.util.Environment.frontend.is_production()
   RAYGUN.API_KEY = 'lAkLCPLx3ysnsXktajeHmw=='
@@ -42,6 +41,9 @@ Tracker for user actions which uses Localytics as a reference implementation but
 @see http://docs.localytics.com/#Dev/Instrument/js-tag-events.html
 ###
 class z.tracking.EventTrackingRepository
+  @::ERROR_REPORTING_THRESHOLD = 60000 # in milliseconds
+
+
   constructor: (@user_repository, @conversation_repository) ->
     @logger = new z.util.Logger 'z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS
 
@@ -229,7 +231,7 @@ class z.tracking.EventTrackingRepository
       @last_report = Date.now()
       return raygun_payload
 
-    return false if (Date.now() - @last_report) <= RAYGUN.REPORTING_THRESHOLD_IN_MILLIS
+    return false if (Date.now() - @last_report) <= @ERROR_REPORTING_THRESHOLD
 
     @last_report = Date.now()
     return raygun_payload
