@@ -44,10 +44,11 @@ z.location = (() => {
     return res;
   };
 
-  /*
-  Reverse loop up for geo location
-  @param latitude [Number] latitude
-  @param longitude [Number] longitude
+  /**
+   * Reverse loop up for geo location
+   * @param {Number} latitude - Latitude of location
+   * @param {Number} longitude - Longitude of location
+   * @returns {Promise} Resolves with the location information
    */
   let get_location = (latitude, longitude) => {
     return new Promise((resolve, reject) => {
@@ -67,13 +68,14 @@ z.location = (() => {
     });
   };
 
-  /*
-  Return link to google maps
-
-  @param lat [Number] latitude
-  @param lng [Number] longitude
-  @param name [String] location name
-  @param zoom [String] map zoom level
+  /**
+   * Return link to Google Maps
+   *
+   * @param {Number} lat - Latitude of location
+   * @param {Number} lng - Longitude of location
+   * @param {String} name - Name of location
+   * @param {String} zoom - Map zoom level
+   * @returns {string} URL to location in Google Maps
    */
   let get_maps_url = (lat, lng, name, zoom) => {
     let base_url;

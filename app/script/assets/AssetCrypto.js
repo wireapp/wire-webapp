@@ -33,11 +33,10 @@ z.assets.AssetCrypto = (() => {
     throw Error('Failed to initialize iv with random values');
   }
 
-  /*
-  @param {ArrayBuffer} key_bytes - AES key used for encryption
-  @param {ArrayBuffer} computed_sha256 - SHA-256 checksum of the ciphertext
-  @param {ArrayBuffer} ciphertext - Encrypted plaintext
-  */
+  /**
+   * @param {ArrayBuffer} plaintext - Plaintext asset to be encrypted
+   * @returns {Promise} Resolves with the encrypted asset
+   */
   function encrypt_aes_asset(plaintext) {
     const iv = generate_random_bytes(16);
     const key_bytes_raw = generate_random_bytes(32);
@@ -60,14 +59,15 @@ z.assets.AssetCrypto = (() => {
       computed_sha256 = digest;
 
       return window.crypto.subtle.exportKey('raw', key);
-    }).then(key_bytes => [key_bytes, computed_sha256, iv_ciphertext.buffer]);
+    }).then((key_bytes) => [key_bytes, computed_sha256, iv_ciphertext.buffer]);
   }
 
-  /*
-  @param {ArrayBuffer} key_bytes - AES key used for encryption
-  @param {ArrayBuffer} computed_sha256 - SHA-256 checksum of the ciphertext
-  @param {ArrayBuffer} ciphertext - Encrypted plaintext
-  */
+  /**
+   * @param {ArrayBuffer} ciphertext - Encrypted plaintext
+   * @param {ArrayBuffer} key_bytes - AES key used for encryption
+   * @param {ArrayBuffer} reference_sha256 - SHA-256 checksum of the ciphertext
+   * @returns {Promise} Resolves with the decrypted asset
+   */
   function decrypt_aes_asset(ciphertext, key_bytes, reference_sha256) {
     return window.crypto.subtle.digest('SHA-256', ciphertext)
     .then(function(computed_sha256) {
