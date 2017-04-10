@@ -96,8 +96,6 @@ class z.calling.entities.EFlow
           @e_call_et.delete_e_participant @e_participant_et.id if @e_call_et.self_client_joined()
 
         when z.calling.rtc.ICEConnectionState.DISCONNECTED
-          @e_participant_et.is_connected false
-          @e_call_et.interrupted_participants.push @participant_et
           @_set_negotiation_restart_timeout()
 
         when z.calling.rtc.ICEConnectionState.FAILED
@@ -610,6 +608,8 @@ class z.calling.entities.EFlow
   _set_negotiation_restart_timeout: ->
     @negotiation_timeout = window.setTimeout =>
       @e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
+      @e_participant_et.is_connected false
+      @e_call_et.interrupted_participants.push @participant_et
       if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
         @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false
     , E_FLOW_CONFIG.NEGOTIATION_RESTART_TIMEOUT
