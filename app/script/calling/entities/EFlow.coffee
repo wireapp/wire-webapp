@@ -84,6 +84,7 @@ class z.calling.entities.EFlow
 
         when z.calling.rtc.ICEConnectionState.COMPLETED, z.calling.rtc.ICEConnectionState.CONNECTED
           @_clear_negotiation_timeout()
+          @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
           @telemetry.start_statistics()
           @e_call_et.is_connected true
           @e_participant_et.is_connected true
@@ -114,7 +115,6 @@ class z.calling.entities.EFlow
 
         when z.calling.rtc.SignalingState.STABLE
           @_clear_negotiation_timeout()
-          @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
 
     @negotiation_mode = ko.observable z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
     @negotiation_needed = ko.observable false
