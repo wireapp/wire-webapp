@@ -25,6 +25,9 @@ z.ViewModel = z.ViewModel || {};
 const EMOJI_LIST_LENGTH = 5;
 const QUERY_MIN_LENGTH = 2;
 
+const EMOJI_LIST_OFFSET_TOP = 10;
+const EMOJI_LIST_OFFSET_LEFT = 20;
+
 z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewModel {
   constructor() {
     const emoji_list_class = 'conversation-input-emoji-list';
@@ -125,8 +128,8 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         this.emoji_list.find('.emoji:nth(0)').addClass('selected');
 
         const pos = this.get_cursor_pixel_pos(input);
-        const top = pos.top - this.emoji_list.height() - 10;
-        const left = pos.left - 20;
+        const top = pos.top - this.emoji_list.height() - EMOJI_LIST_OFFSET_TOP;
+        const left = pos.left - EMOJI_LIST_OFFSET_LEFT;
 
         this.emoji_list.css('left', left);
         this.emoji_list.css('top', top);
