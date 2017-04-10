@@ -25,20 +25,30 @@ window.z.components = z.components || {};
 z.components.ConversationListCell = class ConversationListCell {
   constructor(params) {
     this.conversation = params.conversation;
-    this.user = new z.entity.User()
+    this.is_selected = params.is_selected || function() {};
+    this.user = ko.pureComputed(() => this.conversation.participating_user_ets()[0]);
   }
 };
 
 ko.components.register('conversation-list-cell', {
   viewModel: z.components.ConversationListCell,
   template: `
-    <div class="conversation-list-cell-left">
-      <user-avatar class="user-avatar-sm" params="user: user"></user-avatar>
+    <div class="conversation-list-cell" data-bind="css: {'conversation-list-cell-active': is_selected(conversation)}">
+      <div class="conversation-list-cell-left">
+        <!-- ko if: conversation.is_group() -->
+          <group-avatar params="conversation: conversation"></group-avatar>
+        <!-- /ko -->
+        <!-- ko ifnot: conversation.is_group() -->
+          <user-avatar class="user-avatar-s" params="user: user"></user-avatar>
+        <!-- /ko -->
+      </div>
+      <div class="conversation-list-cell-center">
+        <span class="conversation-list-cell-title" data-bind="text: conversation.display_name()"></span>
+        <span class="conversation-list-cell-subtitle">subtitle</span>
+      </div>
+      <div class="conversation-list-cell-right">
+        <span class="conversation-list-cell-badge" data-bind="text: conversation.unread_event_count()"></span>
+      </div>
     </div>
-    <div class="conversation-list-cell-center">
-      <span class="ellipsis" data-bind="text: conversation.display_name()"></span>
-      <span class="label-xs">subtitle</span>
-    </div>
-    <div class="conversation-list-cell-right"></div>
   `,
 });

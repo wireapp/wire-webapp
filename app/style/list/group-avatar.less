@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,32 +17,23 @@
  *
  */
 
-
-#background {
-  .full-screen;
-  background-color: fade(#000, 88%);
+group-avatar {
+  .square(32px);
+  border-radius: 6px;
+  border: 1px solid fade(#fff, 24%);
 }
 
-.background,
-.background-image,
-.background-darken {
-  .full-screen;
+.group-avatar-image-wrapper {
+  .square(30px);
+  border-radius: 7px;
   overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
 }
 
-.background {
-  transition-property: opacity;
-  transition-duration: @animation-timing-slow;
-  transition-timing-function: @ease-out-quart;
-  background-color: fade(#000, 88%);
-}
-
-.background-image {
+.group-avatar-image {
+  .square(13px);
+  margin: 1px;
+  background-color: fade(#000, 16%);
   background-size: cover;
-  background-position: center;
-  filter: blur(32px)
-}
-
-.background-darken {
-  background-color: fade(#000, 64%);
 }

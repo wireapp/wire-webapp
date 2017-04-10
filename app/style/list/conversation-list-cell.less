@@ -17,24 +17,77 @@
  *
  */
 
-conversation-list-cell {
+ /* container */
+
+.conversation-list-cell {
   display: flex;
-  height: @left-list-item-height;
+  height: 56px; // TODO: @left-list-item-height;
+  position: relative;
+
+  &:after {
+    background-color: @seperator-color;
+    bottom: 0;
+    content: "";
+    left: @left-list-item-left-width;
+    height: 1px;
+    position: absolute;
+    right: 0;
+  }
 }
 
 .conversation-list-cell-left {
   .flex-center;
+  flex: 0 0 auto;
   width: @left-list-item-left-width;
 }
 
 .conversation-list-cell-center {
   display: flex;
-  flex: 1 1;
+  flex: 1 1 auto;
   flex-direction: column;
   justify-content: center;
+  min-width: 0;
 }
 
 .conversation-list-cell-right {
   .flex-center;
-  width: @left-list-item-right-width;
+}
+
+/* elements */
+
+.conversation-list-cell-title {
+  .ellipsis;
+  font-size: 14px;
+  font-weight: @font-weight-light;
+}
+
+.conversation-list-cell-subtitle {
+  .ellipsis;
+  font-size: @font-size-xs;
+  font-weight: @font-weight-regular;
+  opacity: .64;
+}
+
+.conversation-list-cell-badge {
+  background-color: fade(#000, 16%);
+  border-radius: 10px;
+  font-size: @font-size-xs;
+  font-weight: @font-weight-bold;
+  line-height: 20px;
+  height: 20px;
+  margin-right: 16px;
+  min-width: 30px;
+  text-align: center;
+}
+
+/* states */
+
+.conversation-list-cell-active {
+  &:after {
+    .accent-background-color();
+  }
+
+  .conversation-list-cell-title {
+    font-weight: @font-weight-bold;
+  }
 }

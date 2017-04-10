@@ -6,34 +6,8 @@
   <div class="left-list-center">
     <ul class="left-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_archived">
       <!-- ko foreach: conversations_archived -->
-        <li class="left-list-item">
-          <div class="left-column">
-            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.CALL -->
-              <span class="icon-end-call text-red" data-uie-name="status-unread" data-uie-value="call"></span>
-            <!-- /ko -->
-            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.CONNECT -->
-              <span class="dot-md dot-outlined border-theme" data-uie-name="status-unread" data-uie-value="connect"></span>
-            <!-- /ko -->
-            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.PING -->
-              <span class="icon-ping" data-bind="css: unread_accent_color()" data-uie-name="status-unread" data-uie-value="ping"></span>
-            <!-- /ko -->
-            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.UNREAD -->
-              <span data-bind="unread_indicator: unread_message_count" data-uie-name="status-unread" data-uie-value="message"></span>
-            <!-- /ko -->
-          </div>
-          <div class="center-column"
-               data-bind="attr: {'data-uie-uid': id, 'data-uie-value': display_name}, click: $parent.click_on_archived_conversation, text: display_name()"
-               data-uie-name="item-conversation-archived"></div>
-          <div class="right-column">
-              <span class="button-icon icon-more"
-                    data-bind="attr: {'id': 'options-' + id}, click: $root.click_on_actions, l10n_tooltip: z.string.tooltip_conversations_more"
-                    data-bubble="#actions-bubble"
-                    data-placement="right-flex"
-                    data-uie-name="go-options"></span>
-              <span class="icon-silence"
-                    data-bind="css: {'conversation-muted': is_muted()}"
-                    data-uie-name="status-silence"></span>
-          </div>
+        <li>
+          <conversation-list-cell data-bind="click: $parent.click_on_archived_conversation" params="conversation: $data"></conversation-list-cell>
         </li>
       <!-- /ko -->
     </ul>
