@@ -195,6 +195,14 @@
   .emoji {
     cursor: pointer;
 
+    &:first-child {
+      border-radius: 4px 4px 0 0; // to match parent's border-radius
+    }
+
+    &:last-child {
+      border-radius: 0 0 4px 4px; // to match parent's border-radius
+    }
+
     &.selected {
       background-color: fade(@graphite, 16%);
     }
