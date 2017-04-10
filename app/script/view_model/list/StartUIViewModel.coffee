@@ -194,7 +194,7 @@ class z.ViewModel.list.StartUIViewModel
     import_promise.then (response) =>
       @_show_onboarding_results response
     .catch (error) =>
-      if error.type isnt z.connect.ConnectError::TYPE.NO_CONTACTS
+      if error.type isnt z.connect.ConnectError.TYPE.NO_CONTACTS
         @logger.error "Importing contacts from '#{source}' failed: #{error.message}", error
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONTACTS, action: =>
           @import_contacts source

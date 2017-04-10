@@ -28,6 +28,7 @@ z.connect.ConnectRepository = class ConnectRepository {
     this.connect_google_service = connect_google_service;
     this.properties_repository = properties_repository;
     this.logger = new z.util.Logger('z.connect.ConnectRepository', z.config.LOGGER.OPTIONS);
+    return this;
   }
 
   /*
@@ -38,7 +39,7 @@ z.connect.ConnectRepository = class ConnectRepository {
     return this.connect_google_service.get_contacts()
     .catch((error) => {
       this.logger.info('Google Contacts SDK error', error);
-      throw new z.connect.ConnectError(z.connect.ConnectError.prototype.TYPE.GOOGLE_DOWNLOAD);
+      throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD);
     })
     .then((response) => {
       amplify.publish(z.event.WebApp.SEARCH.SHOW);
@@ -47,7 +48,7 @@ z.connect.ConnectRepository = class ConnectRepository {
     .then((phone_book) => {
       if (phone_book.cards.length === 0) {
         this.logger.warn('No contacts found for upload');
-        throw new z.connect.ConnectError(z.connect.ConnectError.prototype.TYPE.NO_CONTACTS);
+        throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.NO_CONTACTS);
       }
       this.logger.info(`Uploading hashes of '${phone_book.cards.length}' contacts for matching`, phone_book);
       return this.connect_service.post_onboarding(phone_book);
@@ -59,9 +60,9 @@ z.connect.ConnectRepository = class ConnectRepository {
     })
     .catch((error) => {
       switch (error.type) {
-        case z.connect.ConnectError.prototype.TYPE.GOOGLE_DOWNLOAD:
+        case z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD:
           throw error;
-        case z.connect.ConnectError.prototype.TYPE.NO_CONTACTS:
+        case z.connect.ConnectError.TYPE.NO_CONTACTS:
           return [];
       }
       if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
@@ -69,7 +70,7 @@ z.connect.ConnectRepository = class ConnectRepository {
       } else {
         this.logger.error('Gmail contacts upload failed', error);
       }
-      throw new z.connect.ConnectError(z.connect.ConnectError.prototype.TYPE.UPLOAD);
+      throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
     });
   }
 
@@ -86,7 +87,7 @@ z.connect.ConnectRepository = class ConnectRepository {
 
         if (phone_book.cards.length === 0) {
           this.logger.warn('No contacts found for upload');
-          throw new z.connect.ConnectError(z.connect.ConnectError.prototype.TYPE.NO_CONTACTS);
+          throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.NO_CONTACTS);
         }
 
         amplify.publish(z.event.WebApp.SEARCH.SHOW);
@@ -100,9 +101,9 @@ z.connect.ConnectRepository = class ConnectRepository {
       })
       .catch((error) => {
         switch (error.type) {
-          case z.connect.ConnectError.prototype.TYPE.GOOGLE_DOWNLOAD:
+          case z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD:
             throw error;
-          case z.connect.ConnectError.prototype.TYPE.NO_CONTACTS:
+          case z.connect.ConnectError.TYPE.NO_CONTACTS:
             return [];
         }
         if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
@@ -110,7 +111,7 @@ z.connect.ConnectRepository = class ConnectRepository {
         } else {
           this.logger.error('macOS contacts upload failed', error);
         }
-        throw new z.connect.ConnectError(z.connect.ConnectError.prototype.TYPE.UPLOAD);
+        throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
       });
     }
 
@@ -118,7 +119,7 @@ z.connect.ConnectRepository = class ConnectRepository {
     .then((phone_book) => {
       if (phone_book.cards.length === 0) {
         this.logger.warn('No contacts found for upload');
-        throw new z.connect.ConnectError(z.connect.ConnectError.prototype.TYPE.NO_CONTACTS);
+        throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.NO_CONTACTS);
       }
       amplify.publish(z.event.WebApp.SEARCH.SHOW);
       this.logger.info(`Uploading hashes of '${phone_book.cards.length}' contacts for matching`, phone_book);
@@ -131,16 +132,16 @@ z.connect.ConnectRepository = class ConnectRepository {
     })
     .catch((error) => {
       switch (error.type) {
-        case z.connect.ConnectError.prototype.TYPE.GOOGLE_DOWNLOAD:
+        case z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD:
           throw error;
-        case z.connect.ConnectError.prototype.TYPE.NO_CONTACTS:
+        case z.connect.ConnectError.TYPE.NO_CONTACTS:
           return [];
       }
       if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
         return this.logger.error('Backend refused macOS contacts upload: Endpoint used too frequent');
       }
       this.logger.error('macOS contacts upload failed', error);
-      throw new z.connect.ConnectError(z.connect.ConnectError.prototype.TYPE.UPLOAD);
+      throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
     });
   }
 
