@@ -123,7 +123,7 @@
 }
 
 .arrow-down:before {
-  .icon-mixin("\e111");
+  .icon-mixin('\e111');
   display: inline-block;
   transform: rotate(90deg);
 }
@@ -165,7 +165,7 @@
 
 .clear {
   &:after {
-    content: "";
+    content: '';
     display: table;
     clear: both;
   }
@@ -285,7 +285,7 @@
   .accent-color-selection-mixin(@accent_id - 1);
   // output
   .main-accent-color-@{accent_id} & {
-    @accent-color: "accent_colors-@{accent_id}";
+    @accent-color: 'accent_colors-@{accent_id}';
     &::-moz-selection { background-color: fade(@@accent-color, 24%) }
     &::selection { background-color: fade( @@accent-color, 24%) }
   }

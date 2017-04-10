@@ -18,24 +18,24 @@
  */
 
 // Custom checkbox component using Wire icon font
-// Checkbox can be style using "text-theme"
+// Checkbox can be style using 'text-theme'
 // Example:
 //
-//<div class="checkbox text-theme">
-//  <input type="checkbox" id="checkbox" name="check"/>
-//  <label for="checkbox"><div>Option</div></label>
+//<div class='checkbox text-theme'>
+//  <input type='checkbox' id='checkbox' name='check'/>
+//  <label for='checkbox'><div>Option</div></label>
 //</div>
 //
 .checkbox {
   display: inline-block;
 
-  input[type="checkbox"] {
+  input[type='checkbox'] {
     position: absolute;
     top: -9999px;
     left: -9999px;
 
     &:checked + label {
-      &:after {content: "\e601";}
+      &:after {content: '\e601';}
     }
   }
 
@@ -49,7 +49,7 @@
 
     &:after {
       .font-antialiasing();
-      content: "\e600";
+      content: '\e600';
       font-family: 'Wire';
       font-size: @icon-size-sm;
       font-style: normal;
