@@ -28,20 +28,20 @@
     "grunt-todo": "0.5.0",
     "jasmine-ajax": "3.2.0",
     "jasmine-core": "2.5.2",
-    "karma": "1.5.0",
+    "karma": "1.6.0",
     "karma-chrome-launcher": "2.0.0",
     "karma-coverage": "1.1.1",
     "karma-jasmine": "1.1.0",
     "load-grunt-tasks": "3.5.2",
     "request": "2.81.0",
-    "sinon": "1.17.7"
+    "sinon": "2.1.0"
   },
   "scripts": {
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
     "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
-    "lint": "eslint -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/**/*.js",
-    "lint-fix": "eslint --fix -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/**/*.js",
+    "lint": "eslint -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/**/*.js bin/*.js",
+    "lint-fix": "eslint --fix -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/**/*.js bin/*.js",
     "postinstall": "grunt init",
     "start": "grunt",
     "test": "yarn run lint && grunt check && grunt test"
