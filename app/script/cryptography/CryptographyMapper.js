@@ -95,19 +95,19 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
   }
 
   _map_asset(asset, event_nonce, event_id) {
-    if (asset.uploaded) {
-      if (asset.uploaded.asset_id && asset.original && asset.original.image) {
+    if (asset.uploaded !== null) {
+      if (asset.uploaded.asset_id && asset.original !== null && asset.original.image) {
         return this._map_image_asset_v3(asset, event_nonce);
       }
       return this._map_asset_uploaded(asset.uploaded, event_id);
     }
-    if (asset.not_uploaded) {
+    if (asset.not_uploaded !== null) {
       return this._map_asset_not_uploaded(asset.not_uploaded);
     }
-    if (asset.preview) {
+    if (asset.preview !== null) {
       return this._map_asset_preview(asset.preview, event_id);
     }
-    if (asset.original) {
+    if (asset.original !== null) {
       return this._map_asset_original(asset.original, event_nonce);
     }
     const error = new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.IGNORED_ASSET);

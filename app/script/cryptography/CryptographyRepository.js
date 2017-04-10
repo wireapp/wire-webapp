@@ -329,8 +329,8 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       return Promise.reject(new Proteus.errors.DecryptError.InvalidMessage('The sending client couldn\'t encrypt a message for our client.'));
     }
 
-    const ciphertext = z.util.base64_to_array(event.data.text || event.data.key).buffer;
-    return this.cryptobox.decrypt(this._construct_session_id(event.from, event.data.sender), ciphertext)
+    const cipher_text = z.util.base64_to_array(event.data.text || event.data.key).buffer;
+    return this.cryptobox.decrypt(this._construct_session_id(event.from, event.data.sender), cipher_text)
     .then((plaintext) => z.proto.GenericMessage.decode(plaintext));
   }
 };
