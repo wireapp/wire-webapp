@@ -17,7 +17,11 @@
  *
  */
 
+/* eslint no-undef: "off" */
+
 // grunt test_init && grunt test_run:announce/AnnounceService
+
+'use strict';
 
 let server = undefined;
 
@@ -51,7 +55,7 @@ describe('z.announce.AnnounceService', function() {
             'title': 'New Blog post',
             'version': 1464166352,
             'version_min': '2016.04.14.0921',
-            'version_max': '2016.06.14.0921'
+            'version_max': '2016.06.14.0921',
           },
           {
             'active': true,
@@ -66,17 +70,18 @@ describe('z.announce.AnnounceService', function() {
             'title': 'Click me to refresh..',
             'version': 1464166352,
             'version_min': '2016.04.14.0921',
-            'version_max': '2016.06.14.0921'
-          }
+            'version_max': '2016.06.14.0921',
+          },
         ],
-        'status': 'success'
+        'status': 'success',
       };
 
       return server.respondWith('GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [
         200,
         {'Content-Type': 'application/json'},
-        JSON.stringify(response)
-      ]);});
+        JSON.stringify(response),
+      ]);
+    });
 
     afterEach(() => server.restore());
 
@@ -84,7 +89,8 @@ describe('z.announce.AnnounceService', function() {
       announce_service.get_announcements()
       .then(function(result) {
         expect(result.length).toBe(2);
-        return done();}).catch(done.fail)
+        return done();
+      }).catch(done.fail)
     );
   });
 
@@ -116,8 +122,9 @@ describe('z.announce.AnnounceService', function() {
       return server.respondWith('GET', 'version/', [
         200,
         {'Content-Type': 'application/json'},
-        JSON.stringify(response)
-      ]);});
+        JSON.stringify(response),
+      ]);
+    });
 
     afterEach(() => server.restore());
 

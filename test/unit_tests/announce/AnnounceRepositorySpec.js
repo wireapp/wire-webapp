@@ -17,7 +17,11 @@
  *
  */
 
+/* eslint no-undef: "off" */
+
 // grunt test_init && grunt test_run:announce/AnnounceRepository
+
+'use strict';
 
 let server = undefined;
 
@@ -50,7 +54,7 @@ describe('z.announce.AnnounceRepository', function() {
           'title': 'New Blog post',
           'version': 1464166352,
           'version_min': '2016.04.14.0921',
-          'version_max': 'dev'
+          'version_max': 'dev',
         },
         {
           'active': true,
@@ -65,17 +69,18 @@ describe('z.announce.AnnounceRepository', function() {
           'title': 'Click me to refresh..',
           'version': 1464166352,
           'version_min': 'dev',
-          'version_max': '2016.06.14.0921'
-        }
+          'version_max': '2016.06.14.0921',
+        },
       ],
-      'status': 'success'
+      'status': 'success',
     };
 
     return server.respondWith('GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [
       200,
       {'Content-Type': 'application/json'},
-      JSON.stringify(response)
-    ]);});
+      JSON.stringify(response),
+    ]);
+  });
 
   afterEach(() => server.restore());
 
