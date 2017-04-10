@@ -695,11 +695,11 @@ class z.calling.entities.EFlow
     .then =>
       return @_remove_media_stream @media_stream()
     .then =>
-      @_upgrade_media_stream media_stream_info.stream, media_stream_info.type
-    .then (updated_media_stream) =>
-      @logger.info "Upgraded the MediaStream to update '#{media_stream_info.type}' successfully", updated_media_stream
-      @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, updated_media_stream
-      return updated_media_stream
+      @_upgrade_media_stream media_stream_info
+    .then (upgraded_media_stream_info) =>
+      @logger.info "Upgraded the MediaStream to update '#{media_stream_info.type}' successfully", upgraded_media_stream_info.stream
+      @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, upgraded_media_stream_info.stream
+      return upgraded_media_stream_info
     .catch (error) =>
       @logger.error "Failed to replace local MediaStream: #{error.message}", error
       throw error
@@ -752,12 +752,12 @@ class z.calling.entities.EFlow
   Upgrade the local MediaStream with new MediaStreamTracks
 
   @private
-  @param new_media_stream [MediaStream] MediaStream containing new MediaStreamTracks
-  @param media_type [z.media.MediaType] Type of tracks to update
-  @return [MediaStream] New MediaStream to be used
+  @param media_stream_info [z.media.MediaStreamInfo] MediaStreamInfo containing new MediaStreamTracks
+  @return [z.media.MediaStreamInfo] New MediaStream to be used
   ###
-  _upgrade_media_stream: (new_media_stream, media_type) ->
+  _upgrade_media_stream: (media_stream_info) ->
     if @media_stream()
+      {stream: new_media_stream, type: media_type} = media_stream_info
       for media_stream_track in z.media.MediaStreamHandler.get_media_tracks @media_stream(), media_type
         @media_stream().removeTrack media_stream_track
         media_stream_track.stop()
@@ -766,8 +766,8 @@ class z.calling.entities.EFlow
       media_stream = @media_stream().clone()
 
       media_stream.addTrack media_stream_track for media_stream_track in z.media.MediaStreamHandler.get_media_tracks new_media_stream, media_type
-      return z.media.MediaStreamHandler.detect_media_stream_type media_stream
-    return new_media_stream
+      return new z.media.MediaStreamInfo z.media.MediaStreamSource.LOCAL, 'self', media_stream
+    return media_stream_info
 
 
   ###############################################################################
