@@ -48,6 +48,9 @@
   font-weight: @font-weight-bold;
 }
 
-.label-username:not(:empty):before {
-  content: "@";
+.label-username {
+  .text-selection;
+  &:not(:empty):before {
+    content: "@";
+  }
 }
