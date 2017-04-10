@@ -107,12 +107,12 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
       return;
     }
 
-    const query = input.value.substr(this.emoji_start_pos, input.selectionStart - this.emoji_start_pos);
+    const query = input.value.substr(this.emoji_start_pos, input.selectionStart - this.emoji_start_pos).toLowerCase();
     if (query.length < QUERY_MIN_LENGTH || query[0] === ' ' || !this.emoji_dict) {
       this.emoji_list.remove();
     } else {
       const emoji_matched = this.emoji_dict
-        .filter((emoji) => emoji.indexOf(query) !== -1)
+        .filter((emoji) => emoji.toLowerCase().indexOf(query) !== -1)
         .slice(0, EMOJI_LIST_LENGTH)
         .map((emoji) => {
           const [code, name] = emoji.split('\t');
