@@ -225,12 +225,13 @@ class z.media.MediaStreamHandler
       @_set_stream_state media_stream_info
       update_promise = Promise.all (flow_et.update_media_stream media_stream_info for flow_et in @joined_call().get_flows())
     else
-      update_promise = Promise.resolve media_stream_info.stream
+      update_promise = Promise.resolve media_stream_info
 
     update_promise.then (resolve_array) =>
-      media_stream = resolve_array[0]
+      update_media_stream_info = resolve_array[0]
+      @_set_stream_state update_media_stream_info
       @_release_media_stream @local_media_stream()
-      @local_media_stream media_stream
+      @local_media_stream update_media_stream_info.stream
 
   ###
   Update the used MediaStream after a new input device was selected.
