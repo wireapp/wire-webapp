@@ -308,18 +308,20 @@ class z.calling.v3.CallCenter
     else
       switch payload_type
         when z.media.MediaType.AUDIO
-          send_state = if invert then not @self_state.audio_send() else @self_state.audio_send()
-          payload = props: audiosend: "#{send_state}"
+          audio_send_state = if invert then not @self_state.audio_send() else @self_state.audio_send()
+          payload = props: audiosend: "#{audio_send_state}"
         when z.media.MediaType.SCREEN
-          send_state = if invert then not @self_state.screen_send() else @self_state.screen_send()
+          screen_send_state = if invert then not @self_state.screen_send() else @self_state.screen_send()
+          video_send_state = if invert then "false" else @self_state.video_send()
           payload = props:
-            screensend: "#{send_state}"
-            videosend: "#{@self_state.video_send()}"
+            screensend: "#{screen_send_state}"
+            videosend: "#{video_send_state}"
         when z.media.MediaType.VIDEO
-          send_state = if invert then not @self_state.video_send() else @self_state.video_send()
+          screen_send_state = if invert then "false" else @self_state.screen_send()
+          video_send_state = if invert then not @self_state.video_send() else @self_state.video_send()
           payload = props:
-            screensend: "false"
-            videosend: "#{send_state}"
+            screensend: "#{screen_send_state}"
+            videosend: "#{video_send_state}"
 
     if additional_payload
       payload = $.extend payload, additional_payload
