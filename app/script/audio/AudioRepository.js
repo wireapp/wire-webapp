@@ -89,6 +89,7 @@ window.z.audio.AudioRepository = class AudioRepository {
   /**
    * Initialize all sounds.
    * @private
+   * @returns {undefined}
    */
   _init_sounds() {
     for (let type in z.audio.AudioType) {
@@ -144,6 +145,7 @@ window.z.audio.AudioRepository = class AudioRepository {
   /**
    * Preload all sounds for immediate playback.
    * @private
+   * @returns {undefined}
    */
   _preload() {
     for (let audio_id in this.audio_elements) {
@@ -157,6 +159,7 @@ window.z.audio.AudioRepository = class AudioRepository {
   /**
    * Stop all sounds playing in loop.
    * @private
+   * @returns {undefined}
    */
   _stop_all() {
     for (let audio_id in this.currently_looping) {
@@ -167,6 +170,7 @@ window.z.audio.AudioRepository = class AudioRepository {
   /**
    * Use Amplify to subscribe to all audio playback related events.
    * @private
+   * @returns {undefined}
    */
   _subscribe_to_audio_events() {
     amplify.subscribe(z.event.WebApp.AUDIO.PLAY, this, this.play);
@@ -177,6 +181,7 @@ window.z.audio.AudioRepository = class AudioRepository {
   /**
    * Use Amplify to subscribe to required events.
    * @private
+   * @returns {undefined}
    */
   _subscribe_to_events() {
     amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this, (handling_notifications) => {
@@ -196,6 +201,7 @@ window.z.audio.AudioRepository = class AudioRepository {
   /**
    * Initialize the repository.
    * @param {boolean} pre_load - Should sounds be pre-loaded with false as default
+   * @returns {undefined}
    */
   init(pre_load = false) {
     this._init_sounds();
@@ -209,6 +215,7 @@ window.z.audio.AudioRepository = class AudioRepository {
    * Start playback of a sound in a loop.
    * @note Prevent playing multiples instances of looping sounds
    * @param {z.audio.AudioType} audio_id - Sound identifier
+   * @returns {undefined}
    */
   loop(audio_id) {
     this.play(audio_id, true);
@@ -218,6 +225,7 @@ window.z.audio.AudioRepository = class AudioRepository {
    * Start playback of a sound.
    * @param {z.audio.AudioType} audio_id - Sound identifier
    * @param {boolean} play_in_loop - Play sound in loop
+   * @returns {undefined}
    */
   play(audio_id, play_in_loop = false) {
     return this._check_sound_setting(audio_id).then(() => {
@@ -237,6 +245,7 @@ window.z.audio.AudioRepository = class AudioRepository {
   /**
    * Stop playback of a sound.
    * @param {z.audio.AudioType} audio_id - Sound identifier
+   * @returns {undefined}
    */
   stop(audio_id) {
     return this._get_sound_by_id(audio_id).then((audio_element) => {
