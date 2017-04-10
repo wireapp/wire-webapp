@@ -31,6 +31,7 @@ z.bot.BotService = class BotService {
   /**
    * Fetch bot information.
    * @param {string} bot_name - Bot name registered on backend
+   * @returns {Promise} Resolves with information about bot
    */
   fetch_bot(bot_name) {
     return fetch(`${this.url}${bot_name}/`)

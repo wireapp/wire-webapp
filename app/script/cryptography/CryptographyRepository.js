@@ -45,6 +45,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
   /**
    * Initialize the repository.
+   * @param {Object} db - Database object
    * @returns {Promise} Resolves with the repository after initialization
    */
   init(db) {
@@ -78,7 +79,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   }
 
   /**
-   * Generate all keys need for client registration.
+   * Generate all keys needed for client registration.
    * @returns {Promise} Resolves with an array of last resort key, pre-keys, and signaling keys
    */
   generate_client_keys() {
@@ -92,7 +93,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     });
   }
 
-  /*
+  /**
    * Get the fingerprint of the local identity.
    * @returns {string} Fingerprint of local identity public key
    */
@@ -104,6 +105,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * Get the fingerprint of a remote identity.
    * @param {string} user_id - ID of user
    * @param {string} client_id - ID of client
+   * @returns {Promise} Resolves with the remote fingerprint
    */
   get_remote_fingerprint(user_id, client_id) {
     return this._load_session(user_id, client_id)
@@ -254,7 +256,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
         for (const user_id in user_pre_key_map) {
           const client_pre_key_map = user_pre_key_map[user_id];
           for (const client_id in client_pre_key_map) {
-            const remote_pre_key = client_pre_key_map[client_id]
+            const remote_pre_key = client_pre_key_map[client_id];
             new_session_promises.push(this._session_from_encoded_prekey_payload(remote_pre_key, user_id, client_id));
           }
         }
@@ -296,6 +298,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @note We created the convention that whenever we fail to encrypt for a specific client, we send a Bomb Emoji (no joke!)
    *
    * @private
+   * @param {string} session_id - ID of session to encrypt for
    * @param {z.proto.GenericMessage} generic_message - ProtoBuffer message
    * @returns {Array<string, string>} Array containing session ID and encrypted message as BASE64 encoded string
    */
@@ -313,6 +316,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   }
 
   /**
+   * @param {Object} event - Backend event to decrypt
    * @returns {Promise<z.proto.GenericMessage>} Resolves with the decrypted message in ProtocolBuffer format
    */
   decrypt_event(event) {

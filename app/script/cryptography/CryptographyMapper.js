@@ -31,7 +31,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
    * Maps a generic message into an event in JSON.
    *
    * @param {z.proto.GenericMessage} generic_message - Received ProtoBuffer message
-   * @param {z.event.Backend.CONVERSATION.OTR-ASSET-ADD, z.event.Backend.CONVERSATION.OTR-MESSAGE-ADD} event - Event
+   * @param {JSON} event - Event of z.event.Backend.CONVERSATION.OTR-ASSET-ADD or z.event.Backend.CONVERSATION.OTR-MESSAGE-ADD
    * @returns {Promise} Resolves with the mapped event
    */
   map_generic_message(generic_message, event) {
@@ -43,14 +43,16 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE);
     })
     .then((specific_content) => {
-      return $.extend({
-        conversation: event.conversation,
-        id: generic_message.message_id,
-        from: event.from,
-        time: event.time,
-        status: event.status,
-      }
-      , specific_content);
+      return $.extend(
+        {
+          conversation: event.conversation,
+          id: generic_message.message_id,
+          from: event.from,
+          time: event.time,
+          status: event.status,
+        },
+        specific_content
+      );
     });
   }
 
@@ -256,6 +258,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
    * @note Wrapped messages get the 'message_id' of their wrappers (external message)
    * @param {z.proto.GenericMessage} external - Generic message of type 'external'
    * @param {JSON} event - Backend event of type 'conversation.otr-message-add'
+   * @returns {Promise} Resolves with mapped message
    */
   _map_external(external, event) {
     const data = {
@@ -306,8 +309,8 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
           tag: image.tag,
           width: image.width,
           height: image.height,
-          nonce: event_id || z.util.create_random_uuid(),
-        }, // set nonce even if asset id is missing
+          nonce: event_id || z.util.create_random_uuid(), // set nonce even if asset id is missing
+        },
         otr_key: new Uint8Array(image.otr_key !== null ? image.otr_key.toArrayBuffer() : []),
         sha256: new Uint8Array(image.sha256 !== null ? image.sha256.toArrayBuffer() : []),
       },

@@ -101,6 +101,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
   /**
    * Retrieve the user's Google Contacts using a call to their backend.
    * @private
+   * @param {string} access_token - Access token
    * @returns {Promise} Resolves with the user's contacts
    */
   _get_contacts(access_token) {
