@@ -169,26 +169,51 @@
 }
 
 .conversation-input-emoji-list {
-  z-index: @z-index-level-7;
-  position: fixed;
-  display: block;
-  box-shadow: 0px 2px 10px rgba(0,0,0,.2);
   background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 1px 0 rgba(0,0,0,.08), 0 8px 24px 0 rgba(0,0,0,.16);
+  display: block;
+  font-size: 12px;
+  font-weight: @font-weight-regular;
+  line-height: @line-height-xl;
+  position: fixed;
+  z-index: @z-index-level-7;
+
+  &:after {
+    background-color: #fff;
+    bottom: -7.5px;
+    content: '';
+    display: block;
+    left: 15px;
+    position: absolute;
+    transform: rotate(45deg) translate3d(0, 0, 0);
+    height: 15px;
+    width: 15px;
+    z-index: -1;
+  }
 
   .emoji {
-    border-bottom: 1px solid #eee;
-    padding: 4px 8px;
     cursor: pointer;
 
     &.selected {
-      background-color: @w-blue;
-      color: #fff;
+      background-color: fade(@graphite, 16%);
     }
 
     .symbol {
-      padding-right: 8px;
-      font-size: @font-size-lg;
+      padding-left: 12px;
+      padding-right: 12px;
+      font-size: @font-size-sm;
       vertical-align: middle;
+    }
+
+    .name {
+      display: inline-block;
+      padding-right: 12px;
+      vertical-align: middle;
+
+      &:first-letter {
+        text-transform: capitalize;
+      }
     }
   }
 }

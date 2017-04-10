@@ -43,7 +43,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
 
     $(document).on('mouseenter', `.${emoji_list_class} .emoji`, (event) => {
       $(`.${emoji_list_class} .emoji`).removeClass('selected');
-      $(event.target).addClass('selected');
+      $(event.currentTarget).addClass('selected');
     });
 
     fetch('/image/emoji.tsv')
@@ -116,7 +116,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         .map((emoji) => {
           const [code, name] = emoji.split('\t');
           const parsed_unicode_emoji = String.fromCodePoint.apply(null, code.split(','));
-          return `<div class='emoji'><span class='symbol'>${parsed_unicode_emoji}</span>${name}</div>`;
+          return `<div class='emoji'><span class='symbol'>${parsed_unicode_emoji}</span><span class='name'>${name}</span></div>`;
         })
         .join('');
 
@@ -127,9 +127,10 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         this.emoji_list.find('.emoji:nth(0)').addClass('selected');
 
         const pos = this.get_cursor_pixel_pos(input);
-        const top = pos.top - this.emoji_list.height();
+        const top = pos.top - this.emoji_list.height() - 10;
+        const left = pos.left - 20;
 
-        this.emoji_list.css('left', pos.left);
+        this.emoji_list.css('left', left);
         this.emoji_list.css('top', top);
       }
     }
