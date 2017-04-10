@@ -60,8 +60,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
 
     switch (event.keyCode) {
       case z.util.KEYCODE.ESC:
-        this.emoji_list.remove();
-        this.emoji_start_pos = -1;
+        this.remove_emoji_list();
         break;
       case z.util.KEYCODE.ARROW_UP:
       case z.util.KEYCODE.ARROW_DOWN:
@@ -89,8 +88,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         this.update_emoji_list(input);
       } else if (this.emoji_start_pos !== -1) {
         if (input.selectionStart < this.emoji_start_pos || text[this.emoji_start_pos - 1] !== ':') {
-          this.emoji_list.remove();
-          this.emoji_start_pos = -1;
+          this.remove_emoji_list();
         } else {
           this.update_emoji_list(input);
         }
@@ -149,10 +147,14 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     const text_after_emoji = input.value.substr(input.selectionStart);
     input.value = `${text_before_emoji}${emoji}${text_after_emoji}`;
     input.setSelectionRange(this.emoji_start_pos, this.emoji_start_pos);
-    this.emoji_list.remove();
-    this.emoji_start_pos = -1;
+    this.remove_emoji_list();
     $(input).change();
     $(input).focus();
+  }
+
+  remove_emoji_list() {
+    this.emoji_list.remove();
+    this.emoji_start_pos = -1;
   }
 
   get_cursor_pixel_pos(input) {
