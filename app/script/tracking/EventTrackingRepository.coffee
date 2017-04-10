@@ -41,16 +41,16 @@ Tracker for user actions which uses Localytics as a reference implementation but
 @see http://docs.localytics.com/#Dev/Instrument/js-tag-events.html
 ###
 class z.tracking.EventTrackingRepository
+  @::ERROR_REPORTING_THRESHOLD = 60000 # in milliseconds
+
+
   constructor: (@user_repository, @conversation_repository) ->
     @logger = new z.util.Logger 'z.tracking.EventTrackingRepository', z.config.LOGGER.OPTIONS
 
+    @last_report = undefined
     @localytics = undefined
+    @properties = undefined
     @session_interval = undefined
-
-    @properties = undefined # Reference to the properties
-
-    @reported_errors = ko.observableArray()
-    @reported_errors.subscribe => @reported_errors [] if @reported_errors().length > 999
 
     if @user_repository is undefined and @conversation_repository is undefined
       @init_without_user_tracking()
@@ -219,6 +219,23 @@ class z.tracking.EventTrackingRepository
           rejected_promise.catch (error) => @logger.log @logger.levels.OFF, 'Handled uncaught Promise in error reporting', error
         , 0
 
+  ###
+  Checks if a Raygun payload has been already reported.
+
+  @see https://github.com/MindscapeHQ/raygun4js#onbeforesend
+  @param [JSON] raygun_payload
+  @return [JSON|Boolean] Returns the original payload if it is an unreported error, otherwise "false".
+  ###
+  _check_error_payload: (raygun_payload) =>
+    if @last_report is undefined
+      @last_report = Date.now()
+      return raygun_payload
+
+    return false if (Date.now() - @last_report) <= @ERROR_REPORTING_THRESHOLD
+
+    @last_report = Date.now()
+    return raygun_payload
+
   _detach_promise_rejection_handler: ->
     window.onunhandledrejection = undefined
 
@@ -251,4 +268,5 @@ class z.tracking.EventTrackingRepository
     ###
     Raygun.setVersion z.util.Environment.version false if not z.util.Environment.frontend.is_localhost()
     Raygun.withCustomData {electron_version: z.util.Environment.version true} if z.util.Environment.electron
+    Raygun.onBeforeSend @_check_error_payload
     @_attach_promise_rejection_handler()
