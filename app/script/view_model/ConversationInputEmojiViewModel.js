@@ -53,6 +53,12 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
       .then((text) => {
         this.emoji_dict = text.split('\n');
       });
+
+    this._init_subscriptions();
+  }
+
+  _init_subscriptions() {
+    amplify.subscribe(z.event.WebApp.CONTENT.SWITCH, () => this.remove_emoji_list());
   }
 
   on_input_key_down(data, event) {
