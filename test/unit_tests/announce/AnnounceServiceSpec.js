@@ -23,22 +23,18 @@
 
 'use strict';
 
-let server = undefined;
+let server = void 0;
 
-describe('z.announce.AnnounceService', function() {
-  let test_factory = new TestFactory();
-
-  beforeAll(done =>
-    test_factory.exposeAnnounceActors()
-    .then(done)
-    .catch(done.fail)
-  );
-
-  describe('Successful calls', function() {
-    beforeEach(function() {
+describe('z.announce.AnnounceService', () => {
+  let test_factory;
+  test_factory = new TestFactory();
+  beforeAll(done => test_factory.exposeAnnounceActors().then(done)['catch'](done.fail));
+  describe('Successful calls', () => {
+    beforeEach(() => {
+      let response;
       server = sinon.fakeServer.create();
       server.autoRespond = true;
-      let response = {
+      response = {
         'count': 2,
         'now': '2016-05-26T10:15:43.507250',
         'result': [
@@ -56,8 +52,7 @@ describe('z.announce.AnnounceService', function() {
             'version': 1464166352,
             'version_min': '2016.04.14.0921',
             'version_max': '2016.06.14.0921',
-          },
-          {
+          }, {
             'active': true,
             'created': '2016-05-25T09:54:38.376540',
             'id': 5746055551385600,
@@ -75,66 +70,48 @@ describe('z.announce.AnnounceService', function() {
         ],
         'status': 'success',
       };
-
       server.respondWith('GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [
-        200,
-        {'Content-Type': 'application/json'},
-        JSON.stringify(response),
+        200, {
+          'Content-Type': 'application/json',
+        }, JSON.stringify(response),
       ]);
     });
-
     afterEach(() => server.restore());
-
-    it('can fetch an announcement', done =>
-      announce_service.get_announcements()
-      .then(function(result) {
-        expect(result.length).toBe(2);
-        done();
-      }).catch(done.fail)
-    );
+    it('can fetch an announcement', done => announce_service.get_announcements().then(result => {
+      expect(result.length).toBe(2);
+      done();
+    })['catch'](done.fail));
   });
-
-  describe('Failed calls', function() {
-    beforeEach(function() {
+  describe('Failed calls', () => {
+    beforeEach(() => {
       server = sinon.fakeServer.create();
       server.autoRespond = true;
-      server.respondWith('GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [404, {}, ""]);});
-
+      server.respondWith('GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [404, {}, '']);
+    });
     afterEach(() => server.restore());
-
-    it('cannot fetch an announcement', done =>
-      announce_service.get_announcements()
-      .then(done.fail)
-      .catch(function(error) {
-        expect(error.message).toBe('Not Found');
-        done();
-      })
-    );
+    it('cannot fetch an announcement', done => announce_service.get_announcements().then(done.fail)['catch'](error => {
+      expect(error.message).toBe('Not Found');
+      done();
+    }));
   });
-
-  describe('get_version', function() {
-    const response = {version: '2017-03-14-15-05-prod'};
-
-    beforeEach(function() {
+  describe('get_version', () => {
+    let response;
+    response = {
+      version: '2017-03-14-15-05-prod',
+    };
+    beforeEach(() => {
       server = sinon.fakeServer.create();
       server.autoRespond = true;
       server.respondWith('GET', 'version/', [
-        200,
-        {'Content-Type': 'application/json'},
-        JSON.stringify(response),
+        200, {
+          'Content-Type': 'application/json',
+        }, JSON.stringify(response),
       ]);
     });
-
     afterEach(() => server.restore());
-
-    it('fetches the webapp release version', done =>
-      announce_service.get_version()
-      .then(function(version) {
-        expect(version).toBe(response.version);
-        done();
-      }).catch(done.fail)
-    );
+    it('fetches the webapp release version', done => announce_service.get_version().then(version => {
+      expect(version).toBe(response.version);
+      done();
+    })['catch'](done.fail));
   });
 });
-
-

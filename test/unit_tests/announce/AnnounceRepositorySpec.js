@@ -23,21 +23,17 @@
 
 'use strict';
 
-let server = undefined;
+let server = void 0;
 
-describe('z.announce.AnnounceRepository', function() {
-  let test_factory = new TestFactory();
-
-  beforeAll(done =>
-    test_factory.exposeAnnounceActors()
-    .then(done)
-    .catch(done.fail)
-  );
-
-  beforeEach(function() {
+describe('z.announce.AnnounceRepository', () => {
+  let test_factory;
+  test_factory = new TestFactory();
+  beforeAll(done => test_factory.exposeAnnounceActors().then(done)['catch'](done.fail));
+  beforeEach(() => {
+    let response;
     server = sinon.fakeServer.create();
     server.autoRespond = true;
-    const response = {
+    response = {
       'count': 2,
       'now': '2016-05-26T10:15:43.507250',
       'result': [
@@ -55,8 +51,7 @@ describe('z.announce.AnnounceRepository', function() {
           'version': 1464166352,
           'version_min': '2016.04.14.0921',
           'version_max': 'dev',
-        },
-        {
+        }, {
           'active': true,
           'created': '2016-05-25T09:54:38.376540',
           'id': 5746055551385600,
@@ -74,19 +69,12 @@ describe('z.announce.AnnounceRepository', function() {
       ],
       'status': 'success',
     };
-
     server.respondWith('GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(response),
+      200, {
+        'Content-Type': 'application/json',
+      }, JSON.stringify(response),
     ]);
   });
-
   afterEach(() => server.restore());
-
-  it('can fetch an announcement', done =>
-    announce_repository.check_announcements()
-    .then(done)
-    .catch(done.fail)
-  );
+  it('can fetch an announcement', done => announce_repository.check_announcements().then(done)['catch'](done.fail));
 });
