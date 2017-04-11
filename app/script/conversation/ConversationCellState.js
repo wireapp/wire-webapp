@@ -24,13 +24,13 @@ window.z.conversation = z.conversation || {};
 
 z.conversation.ConversationCellState = (() => {
 
-  const state = {
+  const default_state = {
     description() {
       return '';
     },
     icon() {
-      return z.conversation.ConversationStatusIcon.NONE
-    }
+      return z.conversation.ConversationStatusIcon.NONE;
+    },
   };
 
   const muted_state = {
@@ -41,8 +41,8 @@ z.conversation.ConversationCellState = (() => {
       return 'muted';
     },
     icon() {
-      return z.conversation.ConversationStatusIcon.MUTED
-    }
+      return z.conversation.ConversationStatusIcon.MUTED;
+    },
   };
 
   const new_message_state = {
@@ -53,8 +53,8 @@ z.conversation.ConversationCellState = (() => {
       return 'unread messages';
     },
     icon() {
-      return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES
-    }
+      return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
+    },
   };
 
   function generate(conversation_et) {
@@ -64,13 +64,13 @@ z.conversation.ConversationCellState = (() => {
     const description_state = states.find((state) => state.match(conversation_et));
 
     return {
-      icon: (icon_state || state).icon(),
-      description: (description_state || state).description(conversation_et),
-    }
+      icon: (icon_state || default_state).icon(),
+      description: (description_state || default_state).description(conversation_et),
+    };
   }
 
   return {
     generate,
-  }
+  };
 
 })();
