@@ -23,17 +23,15 @@
 
 'use strict';
 
-let server = void 0;
+let server = undefined;
 
 describe('z.announce.AnnounceRepository', () => {
-  let test_factory;
-  test_factory = new TestFactory();
+  let test_factory = new TestFactory();
   beforeAll(done => test_factory.exposeAnnounceActors().then(done)['catch'](done.fail));
   beforeEach(() => {
-    let response;
     server = sinon.fakeServer.create();
     server.autoRespond = true;
-    response = {
+    const response = {
       'count': 2,
       'now': '2016-05-26T10:15:43.507250',
       'result': [

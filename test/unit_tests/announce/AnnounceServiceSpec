@@ -23,18 +23,16 @@
 
 'use strict';
 
-let server = void 0;
+let server = undefined;
 
 describe('z.announce.AnnounceService', () => {
-  let test_factory;
-  test_factory = new TestFactory();
+  let test_factory = new TestFactory();
   beforeAll(done => test_factory.exposeAnnounceActors().then(done)['catch'](done.fail));
   describe('Successful calls', () => {
     beforeEach(() => {
-      let response;
       server = sinon.fakeServer.create();
       server.autoRespond = true;
-      response = {
+      const response = {
         'count': 2,
         'now': '2016-05-26T10:15:43.507250',
         'result': [
@@ -95,8 +93,7 @@ describe('z.announce.AnnounceService', () => {
     }));
   });
   describe('get_version', () => {
-    let response;
-    response = {
+    const response = {
       version: '2017-03-14-15-05-prod',
     };
     beforeEach(() => {
