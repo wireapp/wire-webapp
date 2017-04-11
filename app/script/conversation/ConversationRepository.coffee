@@ -922,19 +922,19 @@ class z.conversation.ConversationRepository
   @param message_id [String] Message ID of the message to generate a preview for
   ###
   send_asset_preview: (conversation_et, file, message_id) =>
-    image = null
-    poster(file).then (img_blob) =>
-      image = img_blob
-      @asset_service.upload_asset img_blob
-    .then (uploaded_image_asset) =>
-      asset = new z.proto.Asset()
-      asset.set 'preview', new z.proto.Asset.Preview image.type, image.size, uploaded_image_asset.uploaded
-      generic_message = new z.proto.GenericMessage message_id
-      generic_message.set 'asset', asset
-      @_send_and_inject_generic_message conversation_et, generic_message
+    poster(file)
+    .then (image_blob) =>
+      @asset_service.upload_asset image_blob
+      .then (uploaded_image_asset) =>
+        asset = new z.proto.Asset()
+        asset.set 'preview', new z.proto.Asset.Preview image_blob.type, image_blob.size, uploaded_image_asset.uploaded
+        generic_message = new z.proto.GenericMessage message_id
+        generic_message.set 'asset', asset
+        @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) =>
-      @logger.warn "Failed to upload otr asset-preview for conversation #{conversation_et.id}: #{error.message}", error
-      throw error
+      unless error.message.startsWith 'Failed to capture poster frame'
+        throw error
+        @logger.warn "Failed to upload otr asset-preview for conversation #{conversation_et.id}: #{error.message}", error
 
   ###
   Send asset upload failed message to specified conversation.
