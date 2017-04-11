@@ -24,22 +24,22 @@ window.z.links = z.links || {};
 
 z.links.LinkPreviewHelpers = {
 
-  /*
-  Check if the text contains only one link
-
-  @param {string} text
-  */
+  /**
+   * Check if the text contains only one link
+   * @param {string} text - Text to parse
+   * @returns {Boolean} Text contains only a link
+   */
   contains_only_link(text) {
     text = text.trim();
     const urls = twttr.txt.extractUrls(text);
     return (urls.length === 1) && (urls[0] === text);
   },
 
-  /*
-  Get first link and link offset for given text.
-
-   @param {string} text
-  */
+  /**
+   * Get first link and link offset for given text.
+   * @param {string} text - Text to parse
+   * @returns {Array<string, Number>} First link and its offset
+   */
   get_first_link_with_offset(text) {
     const links = twttr.txt.extractUrls(text);
     const first_link = links[0];

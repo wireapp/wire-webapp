@@ -111,7 +111,7 @@ window.z.auth.AuthRepository = class AuthRepository {
    *
    * @param {Object} send_activation_code - Containing the email or phone number needed to resend activation email
    * @option {string} send_activation_code - email
-   * @return {Promise} Promise that resolves on success
+   * @returns {Promise} Promise that resolves on success
    */
   resend_activation(send_activation_code) {
     return this.auth_service.post_activate_send(send_activation_code);
@@ -131,7 +131,7 @@ window.z.auth.AuthRepository = class AuthRepository {
    * Request SMS validation code.
    *
    * @param {Object} request_code - Containing the phone number in E.164 format and whether a code should be forced
-   * @return {Promise} Promise that resolve on success
+   * @returns {Promise} Promise that resolve on success
    */
   request_login_code(request_code) {
     return this.auth_service.post_login_send(request_code);

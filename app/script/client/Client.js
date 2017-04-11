@@ -43,11 +43,11 @@ z.client.Client = class Client {
     this.session = {};
   }
 
-  /*
-  Splits an ID into user ID & client ID.
-  @param {string} id
-  @return {Object} Object containing the user ID & client ID
-  */
+  /**
+   * Splits an ID into user ID & client ID.
+   * @param {string} id - Client ID to be dismantled
+   * @returns {Object} Object containing the user ID & client ID
+   */
   static dismantle_user_client_id(id) {
     const [user_id, client_id] = (id != null ? id.split('@') : undefined) || [];
     return {
@@ -56,32 +56,31 @@ z.client.Client = class Client {
     };
   }
 
-  /*
-  @return {boolean} - True, if the client is the self user's permanent client.
-  */
+  /**
+   * @returns {boolean} True, if the client is the self user's permanent client.
+   */
   is_permanent() {
     return this.type === z.client.ClientType.PERMANENT;
   }
 
-  /*
-  @return {boolean} - True, if it is NOT the client of the self user.
-  */
+  /**
+   * @returns {boolean} - True, if it is NOT the client of the self user.
+   */
   is_remote() {
     return !this.is_permanent() && !this.is_temporary();
   }
 
-  /*
-  @return {boolean} - True, if the client is the self user's temporary client.
-  */
+  /**
+   * @returns {boolean} - True, if the client is the self user's temporary client.
+   */
   is_temporary() {
     return this.type === z.client.ClientType.TEMPORARY;
   }
 
-  /*
-  This method returns a JSON object which can be stored in our local database.
-
-  @return {Object}
-  */
+  /**
+   * This method returns a JSON object which can be stored in our local database.
+   * @returns {Object} Client data as JSON object
+   */
   to_json() {
     let json = ko.toJSON(this);
     let real_json = JSON.parse(json);
