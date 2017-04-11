@@ -11,22 +11,31 @@ globals:
   _: true
   $: true
   amplify: true
+  cryptobox: true
+  CryptoJS: true
   ko: true
+  libsodium: true
   LRUCache: true
   moment: true
   pako: true
   platform: true
+  Proteus: true
   Raygun: true
   twttr: true
   wire: true
   z: true
+
+plugins:
+  - jsdoc
 
 rules:
   brace-style: [2, 1tbs]
   comma-dangle: [2, always-multiline]
   handle-callback-err: 2
   indent: [2, 2, {SwitchCase: 1}]
+  jsdoc/require-hyphen-before-param-description: 2
   keyword-spacing: 2
+  no-console: 0
   no-dupe-class-members: 2
   no-else-return: 2
   no-multi-spaces: 2
@@ -39,3 +48,4 @@ rules:
   sort-vars: 2
   space-before-blocks: 2
   strict: [2, global]
+  valid-jsdoc: [2, {prefer: {return: returns}, requireParamDescription: true, requireReturnDescription: true}]

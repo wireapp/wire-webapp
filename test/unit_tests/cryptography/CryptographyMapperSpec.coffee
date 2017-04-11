@@ -352,7 +352,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       .then done.fail
       .catch (error) ->
         expect(error instanceof z.cryptography.CryptographyError).toBeTruthy()
-        expect(error.type).toBe z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
+        expect(error.type).toBe z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW
         done()
 
     it 'resolves with a mapped knock message', (done) ->
@@ -429,7 +429,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       .then done.fail
       .catch (error) ->
         expect(error instanceof z.cryptography.CryptographyError).toBeTruthy()
-        expect(error.type).toBe z.cryptography.CryptographyError::TYPE.NO_GENERIC_MESSAGE
+        expect(error.type).toBe z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE
         done()
 
     it 'can map a text wrapped inside an external message', (done) ->

@@ -19,6 +19,7 @@
 window.z ?= {}
 z.conversation ?= {}
 
+
 # Conversation repository for all conversation interactions with the conversation service
 class z.conversation.ConversationRepository
   ###
@@ -932,7 +933,8 @@ class z.conversation.ConversationRepository
       generic_message.set 'asset', asset
       @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) =>
-      @logger.warn "Failed to upload otr asset-preview for conversation #{conversation_et.id}", error
+      @logger.warn "Failed to upload otr asset-preview for conversation #{conversation_et.id}: #{error.message}", error
+      throw error
 
   ###
   Send asset upload failed message to specified conversation.
@@ -961,8 +963,8 @@ class z.conversation.ConversationRepository
     generic_message.set 'confirmation', new z.proto.Confirmation message_et.id, z.proto.Confirmation.Type.DELIVERED
     @sending_queue.push =>
       @create_user_client_map conversation_et.id, true, [message_et.user().id]
-    .then (user_client_map) =>
-      return @_send_generic_message conversation_et.id, generic_message, user_client_map, [message_et.user().id], false
+      .then (user_client_map) =>
+        return @_send_generic_message conversation_et.id, generic_message, user_client_map, [message_et.user().id], false
 
   ###
   Send e-call message in specified conversation.
@@ -1009,7 +1011,7 @@ class z.conversation.ConversationRepository
           saved_event.data.info.nonce = asset_id
           @_update_image_as_sent conversation_et, saved_event, response.time
         .catch (error) =>
-          @logger.error "Failed to upload otr asset for conversation #{conversation_et.id}", error
+          @logger.error "Failed to upload otr asset for conversation #{conversation_et.id}: #{error.message}", error
           throw error
 
         return saved_event
@@ -1030,7 +1032,7 @@ class z.conversation.ConversationRepository
       .then =>
         @_track_completed_media_action conversation_et, generic_message
     .catch (error) =>
-      @logger.error "Failed to upload otr asset for conversation #{conversation_et.id}", error
+      @logger.error "Failed to upload otr asset for conversation #{conversation_et.id}: #{error.message}", error
       throw error
 
   ###
@@ -1045,7 +1047,10 @@ class z.conversation.ConversationRepository
       generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
 
     @_send_and_inject_generic_message conversation_et, generic_message
-    .catch (error) => @logger.error "#{error.message}"
+    .catch (error) =>
+      return if error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
+      @logger.error "Error while sending knock: #{error.message}", error
+      throw error
 
   ###
   Send link preview in specified conversation.
@@ -1103,6 +1108,7 @@ class z.conversation.ConversationRepository
       @_track_edit_message conversation_et, original_message_et
       @send_link_preview message, conversation_et, generic_message
     .catch (error) =>
+      return if error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
       @logger.error "Error while editing message: #{error.message}", error
       throw error
 
@@ -1162,7 +1168,7 @@ class z.conversation.ConversationRepository
       return response
     .catch (error) =>
       @logger.error "Sending conversation reset failed: #{error.message}", error
-      thriw error
+      throw error
 
   ###
   Send text message in specified conversation.
@@ -1191,6 +1197,7 @@ class z.conversation.ConversationRepository
     .then (generic_message) =>
       @send_link_preview message, conversation_et, generic_message
     .catch (error) =>
+      return if error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
       @logger.error "Error while sending text message: #{error.message}", error
       throw error
 
@@ -1580,7 +1587,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: upload_duration}
     .catch (error) =>
-      throw error if error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
+      return if error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
       @logger.error "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
       @get_message_in_conversation_by_id conversation_et, message_id
@@ -1619,6 +1626,7 @@ class z.conversation.ConversationRepository
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
         $.extend tracking_data, {time: upload_duration}
     .catch (error) =>
+      return if error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
       @logger.error "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
       @get_message_in_conversation_by_id conversation_et, message_id

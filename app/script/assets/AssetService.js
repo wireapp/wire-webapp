@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,11 +25,10 @@ window.z.assets = z.assets || {};
 // AssetService for all asset handling and the calls to the backend REST API.
 z.assets.AssetService = class AssetService {
 
-  /*
-  Construct a new Asset Service.
-
-  @param {z.service.Client} client - Client for the API calls
-  */
+  /**
+   * Construct a new Asset Service.
+   * @param {z.service.Client} client - Client for the API calls
+   */
   constructor(client) {
     this.cancel_asset_upload = this.cancel_asset_upload.bind(this);
     this.client = client;
@@ -38,15 +37,16 @@ z.assets.AssetService = class AssetService {
     this.pending_uploads = {};
   }
 
-  /*
-  Upload any asset to the backend using asset api v1.
-
-  @deprecated
-  @param {Object} config - Configuration object containing the jQuery call settings
-  @param {String} config.data
-  @param {String} config.contentDisposition
-  @param {String} config.contentType
-  */
+  /**
+   * Upload any asset to the backend using asset api v1.
+   *
+   * @deprecated
+   * @param {Object} config - Configuration object containing the jQuery call settings
+   * @param {string} config.data - Asset data
+   * @param {string} config.contentDisposition - Content disposition header
+   * @param {string} config.contentType - Content type
+   * @returns {Promise} Resolve when asset has been uploaded
+   */
   post_asset(config) {
     return this.client.send_request({
       type: 'POST',
@@ -60,13 +60,14 @@ z.assets.AssetService = class AssetService {
     });
   }
 
-  /*
-  Upload any asset pair to the backend using asset api v1.
-
-  @deprecated
-  @param {z.assets.Asset} small
-  @param {z.assets.Asset} medium
-  */
+  /**
+   * Upload any asset pair to the backend using asset api v1.
+   *
+   * @deprecated
+   * @param {z.assets.Asset} small - Small asset
+   * @param {z.assets.Asset} medium - Medium asset
+   * @returns {Promise} Resolves when asset pair has been uploaded
+   */
   post_asset_pair(small, medium) {
     return Promise.all([
       this.post_asset({
@@ -82,13 +83,14 @@ z.assets.AssetService = class AssetService {
     ]);
   }
 
-  /*
-  Update the user profile image by first making it usable, transforming it and then uploading the asset pair.
-
-  @deprecated
-  @param {string} conversation_id
-  @param {File|Blob} image
-  */
+  /**
+   * Update the user profile image by first making it usable, transforming it and then uploading the asset pair.
+   *
+   * @deprecated
+   * @param {string} conversation_id - ID of self conversation
+   * @param {File|Blob} image - Profile image
+   * @returns {Promise} Resolves when profile image has been uploaded
+   */
   upload_profile_image(conversation_id, image) {
     return Promise.all([
       this._compress_profile_image(image),
@@ -121,11 +123,11 @@ z.assets.AssetService = class AssetService {
     });
   }
 
-  /*
-  Update the user profile image by first making it usable, transforming it and then uploading the asset pair.
-
-  @param {File|Blob} image
-  */
+  /**
+   * Update the user profile image by first making it usable, transforming it and then uploading the asset pair.
+   * @param {File|Blob} image - Profile image
+   * @returns {Promise} Resolves when profile image has been uploaded
+   */
   upload_profile_image_v3(image) {
     return Promise.all([
       this._compress_profile_image(image),
@@ -143,16 +145,17 @@ z.assets.AssetService = class AssetService {
     });
   }
 
-  /*
-  Upload arbitrary binary data using the new asset api v3.
-  The data is AES encrypted before uploading.
-
-  @param {Uint8Array} bytes - asset binary data
-  @param {Object} options
-  @param {Boolean} config.public
-  @param {z.assets.AssetRetentionPolicy} config.retention
-  @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
-  */
+  /**
+   * Upload arbitrary binary data using the new asset api v3.
+   * The data is AES encrypted before uploading.
+   *
+   * @param {Uint8Array} bytes - Asset binary data
+   * @param {Object} options - Asset upload options
+   * @param {Boolean} options.public - Flag whether asset is public
+   * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
+   * @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
+   * @returns {Promise} Resolves when asset has been uploaded
+   */
   _upload_asset(bytes, options, xhr_accessor_function) {
     return z.assets.AssetCrypto.encrypt_aes_asset(bytes)
     .then(([key_bytes, sha256, ciphertext]) => {
@@ -161,16 +164,17 @@ z.assets.AssetService = class AssetService {
     });
   }
 
-  /*
-  Upload file using the new asset api v3. Promise will resolve with z.proto.Asset instance.
-  In case of an successful upload the uploaded property is set.
-
-   @param {Blob|File} file
-   @param {Object} options
-   @param {Boolean} config.public
-   @param {z.assets.AssetRetentionPolicy} config.retention
-   @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
-  */
+  /**
+   * Upload file using the new asset api v3. Promise will resolve with z.proto.Asset instance.
+   * In case of an successful upload the uploaded property is set.
+   *
+   * @param {Blob|File} file - File asset to be uploaded
+   * @param {Object} options - Asset upload options
+   * @param {Boolean} options.public - Flag whether asset is public
+   * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
+   * @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
+   * @returns {Promise} Resolves when asset has been uploaded
+   */
   upload_asset(file, options, xhr_accessor_function) {
     return z.util.load_file_buffer(file)
     .then(buffer => {
@@ -182,15 +186,16 @@ z.assets.AssetService = class AssetService {
     });
   }
 
-  /*
-  Upload image using the new asset api v3. Promise will resolve with z.proto.Asset instance.
-  In case of an successful upload the uploaded property is set.
-
-  @param {Blob|File} file
-  @param {Object} options
-  @param {Boolean} config.public
-  @param {z.assets.AssetRetentionPolicy} config.retention
-  */
+  /**
+   * Upload image using the new asset api v3. Promise will resolve with z.proto.Asset instance.
+   * In case of an successful upload the uploaded property is set.
+   *
+   * @param {Blob|File} image - Image asset to be uploaded
+   * @param {Object} options - Asset upload options
+   * @param {Boolean} options.public - Flag whether asset is public
+   * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
+   * @returns {Promise} Resolves when asset has been uploaded
+   */
   upload_image_asset(image, options) {
     return this._compress_image(image)
     .then(([compressed_image, compressed_bytes]) => {
@@ -206,68 +211,69 @@ z.assets.AssetService = class AssetService {
     );
   }
 
-  /*
-  Generates the URL an asset can be downloaded from.
-
-  @deprecated
-  @param {string} asset_id
-  @param {string} conversation_id
-  @param {Boolean} force_caching
-  @returns {String}
-  */
+  /**
+   * Generates the URL an asset can be downloaded from.
+   *
+   * @deprecated
+   * @param {string} asset_id - ID of asset
+   * @param {string} conversation_id - Conversation ID
+   * @param {Boolean} force_caching - Cache asset in ServiceWorker
+   * @returns {string} URL of v1 asset
+   */
   generate_asset_url(asset_id, conversation_id, force_caching) {
     const url = this.client.create_url(`/assets/${asset_id}`);
     let asset_url = `${url}?access_token=${this.client.access_token}&conv_id=${conversation_id}`;
     if (force_caching) {
-      asset_url = `${asset_url}&forceCaching=true`; 
+      asset_url = `${asset_url}&forceCaching=true`;
     }
     return asset_url;
   }
 
-  /*
-  Generates the URL for asset api v2.
-
-  @deprecated
-  @param {string} asset_id
-  @param {string} conversation_id
-  @param {Boolean} force_caching
-  @returns {String}
-  */
+  /**
+   * Generates the URL for asset api v2.
+   *
+   * @deprecated
+   * @param {string} asset_id - ID of asset
+   * @param {string} conversation_id - Conversation ID
+   * @param {Boolean} force_caching - Cache asset in ServiceWorker
+   * @returns {string} URL of v2 asset
+   */
   generate_asset_url_v2(asset_id, conversation_id, force_caching) {
     const url = this.client.create_url(`/conversations/${conversation_id}/otr/assets/${asset_id}`);
     let asset_url = `${url}?access_token=${this.client.access_token}`;
     if (force_caching) {
-      asset_url = `${asset_url}&forceCaching=true`; 
+      asset_url = `${asset_url}&forceCaching=true`;
     }
     return asset_url;
   }
 
-  /*
-  Generates the URL for asset api v3.
-
-  @param {string} asset_key
-  @param {string} asset_token
-  @param {Boolean} force_caching
-  @returns {String}
-  */
+  /**
+   * Generates the URL for asset api v3.
+   *
+   * @param {string} asset_key - ID of asset
+   * @param {string} asset_token - Asset token
+   * @param {Boolean} force_caching - Cache asset in ServiceWorker
+   * @returns {string} URL of v3 asset
+   */
   generate_asset_url_v3(asset_key, asset_token, force_caching) {
     const url = this.client.create_url(`/assets/v3/${asset_key}/`);
     let asset_url = `${url}?access_token=${this.client.access_token}`;
     if (asset_token) {
-      asset_url = `${asset_url}&asset_token=${asset_token}`; 
+      asset_url = `${asset_url}&asset_token=${asset_token}`;
     }
     if (force_caching) {
-      asset_url = `${asset_url}&forceCaching=true`; 
+      asset_url = `${asset_url}&forceCaching=true`;
     }
     return asset_url;
   }
 
-  /*
-  Create request data for asset upload.
-
-  @param {UInt8Array|ArrayBuffer} asset_data
-  @param {Object} metadata
-  */
+  /**
+   * Create request data for asset upload.
+   *
+   * @param {Uint8Array|ArrayBuffer} asset_data - Asset data
+   * @param {Object} metadata - Asset metadata
+   * @returns {Blob} Asset multipart body
+   */
   _create_asset_multipart_body(asset_data, metadata) {
     metadata = JSON.stringify(metadata);
     const asset_data_md5 = z.util.array_to_md5_base64(asset_data);
@@ -289,16 +295,17 @@ z.assets.AssetService = class AssetService {
     return new Blob([body, asset_data, footer]);
   }
 
-  /*
-  Post assets to a conversation.
-
-  @deprecated
-  @param {string} conversation_id
-  @param {Object} json_payload
-  @param {Uint8Array|ArrayBuffer} image_data
-  @param {Array|Boolean} precondition_option - Level that backend checks for missing clients
-  @param {String} upload_id
-  */
+  /**
+   * Post assets to a conversation.
+   *
+   * @deprecated
+   * @param {string} conversation_id - ID of conversation
+   * @param {Object} json_payload - Payload to post
+   * @param {Uint8Array|ArrayBuffer} image_data - Asset data to upload
+   * @param {Array|Boolean} precondition_option - Level that backend checks for missing clients
+   * @param {String} upload_id - Id to track upload with
+   * @returns {Promise} Resolves when asset has been uploaded
+   */
   post_asset_v2(conversation_id, json_payload, image_data, precondition_option, upload_id) {
     return new Promise((resolve, reject) => {
       let url = this.client.create_url(`/conversations/${conversation_id}/otr/assets`);
@@ -344,15 +351,16 @@ z.assets.AssetService = class AssetService {
     });
   }
 
-  /*
-  Post assets using asset api v3.
-
-  @param {Uint8Array|ArrayBuffer} asset_data
-  @param {Object} metadata
-  @param {Boolean} metadata.public
-  @param {z.assets.AssetRetentionPolicy} metadata.retention
-  @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
-  */
+  /**
+   * Post assets using asset api v3.
+   *
+   * @param {Uint8Array|ArrayBuffer} asset_data - Asset data
+   * @param {Object} metadata - Asset metadata
+   * @param {Boolean} metadata.public - Flag whether asset is public
+   * @param {z.assets.AssetRetentionPolicy} metadata.retention - Retention duration policy for asset
+   * @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
+   * @returns {Promise} Resolves when asset has been uploaded
+   */
   post_asset_v3(asset_data, metadata, xhr_accessor_function) {
     return new Promise((resolve, reject) => {
       metadata = Object.assign({
@@ -380,11 +388,11 @@ z.assets.AssetService = class AssetService {
     });
   }
 
-  /*
-  Cancel an asset upload.
-
-  @param {string} upload_id - Identifies the upload request
-  */
+  /**
+   * Cancel an asset upload.
+   * @param {string} upload_id - Identifies the upload request
+   * @returns {undefined} No return value
+   */
   cancel_asset_upload(upload_id) {
     let xhr = this.pending_uploads[upload_id];
     if (xhr != null) {
@@ -393,12 +401,12 @@ z.assets.AssetService = class AssetService {
     }
   }
 
-  /*
-  Create image proto message.
-
-  @deprecated
-  @param {File|Blob} image
-  */
+  /**
+   * Create image proto message.
+   * @deprecated
+   * @param {File|Blob} image - Image asset
+   * @returns {Promise} Resolves with image asset protobuffer
+   */
   create_image_proto(image) {
     return this._compress_image(image)
     .then(([compressed_image, compressed_bytes]) => {
@@ -419,12 +427,12 @@ z.assets.AssetService = class AssetService {
     });
   }
 
-  /*
-  Create asset proto message.
-
-  @deprecated
-  @param {File|Blob} assets
-  */
+  /**
+   * Create asset proto message.
+   * @deprecated
+   * @param {File|Blob} asset - Asset
+   * @returns {Promise} Resolves with asset protobuffer
+   */
   create_asset_proto(asset) {
     return z.util.load_file_buffer(asset)
     .then(file_bytes => z.assets.AssetCrypto.encrypt_aes_asset(file_bytes))
@@ -435,28 +443,31 @@ z.assets.AssetService = class AssetService {
     });
   }
 
-  /*
-  Compress image.
-  @param {File|Blob} image
-  */
+  /**
+   * Compress image.
+   * @param {File|Blob} image - Image to be compressed in ServiceWorker
+   * @returns {Promise} Resolves with the compressed imaged
+   */
   _compress_image(image) {
     return this._compress_image_with_worker('worker/image-worker.js', image, () => image.type === 'image/gif');
   }
 
-  /*
-  Compress profile image.
-  @param {File|Blob} image
-  */
+  /**
+   * Compress profile image.
+   * @param {File|Blob} image - Profile image to be compressed in ServiceWorker
+   * @returns {Promise} Resolves with the compressed profile imaged
+   */
   _compress_profile_image(image) {
     return this._compress_image_with_worker('worker/profile-image-worker.js', image);
   }
 
-  /*
-  Compress image using given worker.
-  @param {string} worker - path to worker file
-  @param {File|Blob} image
-  @param {Function} filter -
-  */
+  /**
+   * Compress image using given worker.
+   * @param {string} worker - Path to worker file
+   * @param {File|Blob} image - Image to be compressed in ServiceWorker
+   * @param {Function} filter - Optional filter to be applied
+   * @returns {Promise} Resolves with the compressed image
+   */
   _compress_image_with_worker(worker, image, filter) {
     return z.util.load_file_buffer(image)
     .then((buffer) => {
