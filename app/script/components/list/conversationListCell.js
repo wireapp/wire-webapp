@@ -27,6 +27,8 @@ z.components.ConversationListCell = class ConversationListCell {
     this.conversation = params.conversation;
     this.is_selected = params.is_selected || function() {};
     this.user = ko.pureComputed(() => this.conversation.participating_user_ets()[0]);
+
+    this.cell_state = ko.pureComputed(() => z.conversation.ConversationCellState.generate(this.conversation));
   }
 };
 
@@ -47,11 +49,28 @@ ko.components.register('conversation-list-cell', {
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-center">
-        <span class="conversation-list-cell-title" data-bind="text: conversation.display_name()"></span>
-        <span class="conversation-list-cell-subtitle">subtitle</span>
+        <span class="conversation-list-cell-name" data-bind="text: conversation.display_name()"></span>
+        <span class="conversation-list-cell-description" data-bind="text: cell_state().description"></span>
       </div>
       <div class="conversation-list-cell-right">
-        <span class="conversation-list-cell-badge" data-bind="text: conversation.unread_event_count()"></span>
+        <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.PENDING_CONNECTION -->
+          <span class="conversation-list-cell-badge icon-pending"></span>
+        <!-- /ko -->
+        <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_PING -->
+          <span class="conversation-list-cell-badge icon-ping"></span>
+        <!-- /ko -->
+        <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.MISSED_CALL -->
+          <span class="conversation-list-cell-badge icon-call"></span>
+        <!-- /ko -->
+        <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.ACTIVE_CALL -->
+          <span class="conversation-list-cell-badge icon-end-call"></span>
+        <!-- /ko -->
+        <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.MUTED -->
+          <span class="conversation-list-cell-badge icon-silence"></span>
+        <!-- /ko -->
+        <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES -->
+          <span class="conversation-list-cell-badge" data-bind="text: conversation.unread_event_count()"></span>
+        <!-- /ko -->
       </div>
     </div>
   `,
