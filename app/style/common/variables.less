@@ -18,11 +18,19 @@
  */
 
 // ----------------------------------------------------------------------------
+// Local Emoji Font
+// ----------------------------------------------------------------------------
+@font-face {
+  font-family: emoji;
+  src: local('Apple Color Emoji'), local('Android Emoji'), local('Segoe UI Emoji'), local('Segoe UI Symbol');
+}
+
+// ----------------------------------------------------------------------------
 // Font
 // ----------------------------------------------------------------------------
 @ars-font-path:       '../font/';
 
-@font-family-base:      BlinkMacSystemFont, -apple-system, Helvetica Neue, Arial, sans-serif;
+@font-family-base:      BlinkMacSystemFont, -apple-system, Helvetica Neue, emoji, Arial, sans-serif;
 @font-family-ephemeral: Redacted Script;
 
 @font-size-xxs:       8px;
