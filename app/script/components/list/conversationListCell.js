@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.ConversationListCell = class ConversationListCell {
-  constructor(params) {
+  constructor(params, component_info) {
     this.conversation = params.conversation;
     this.is_selected = params.is_selected || function() {};
     this.user = ko.pureComputed(() => this.conversation.participating_user_ets()[0]);
@@ -31,7 +31,11 @@ z.components.ConversationListCell = class ConversationListCell {
 };
 
 ko.components.register('conversation-list-cell', {
-  viewModel: z.components.ConversationListCell,
+  viewModel: {
+    createViewModel (params, component_info) {
+      return new z.components.ConversationListCell(params, component_info)
+    }
+  },
   template: `
     <div class="conversation-list-cell" data-bind="css: {'conversation-list-cell-active': is_selected(conversation)}">
       <div class="conversation-list-cell-left">
