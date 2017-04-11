@@ -258,10 +258,11 @@ z.connect.ConnectRepository = class ConnectRepository {
    * Parse a user's Google Contacts.
    *
    * @private
-   * @param {JSON} response - Response from Google API
+   * @param {Array} self - Self response from Google API
+   * @param {Array} users - Contacts response from Google API
    * @returns {z.connect.PhoneBook} Encoded phone book data
    */
-  _parse_google_contacts({feed: {author: self, entry: users}}) {
+  _parse_google_contacts({author: self, entry: users}) {
     const phone_book = new z.connect.PhoneBook(this.properties_repository.self());
 
     // Add self info from Google
