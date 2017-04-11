@@ -23,7 +23,7 @@ window.z = window.z || {};
 z.ViewModel = z.ViewModel || {};
 
 const EMOJI_LIST_LENGTH = 5;
-const EMOJI_LIST_OFFSET_LEFT = 20;
+const EMOJI_LIST_OFFSET_LEFT = 10;
 const EMOJI_LIST_OFFSET_TOP = 10;
 const QUERY_MIN_LENGTH = 2;
 
