@@ -20,7 +20,7 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.connect = z.connect = {};
+window.z.connect = z.connect || {};
 
 z.connect.ConnectError = class ConnectError extends Error {
   constructor(type) {
@@ -28,19 +28,19 @@ z.connect.ConnectError = class ConnectError extends Error {
 
     this.name = this.constructor.name;
     this.stack = (new Error()).stack;
-    this.type = type || z.connect.ConnectError.prototype.TYPE.UNKNOWN;
+    this.type = type || z.connect.ConnectError.TYPE.UNKNOWN;
 
     switch (this.type) {
-      case z.connect.ConnectError.prototype.TYPE.GOOGLE_CLIENT:
+      case z.connect.ConnectError.TYPE.GOOGLE_CLIENT:
         this.message = 'Google Auth Client for JavaScript not loaded';
         break;
-      case z.connect.ConnectError.prototype.TYPE.GOOGLE_DOWNLOAD:
+      case z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD:
         this.message = 'Failed to download contacts from Google';
         break;
-      case z.connect.ConnectError.prototype.TYPE.NO_CONTACTS:
+      case z.connect.ConnectError.TYPE.NO_CONTACTS:
         this.message = 'No contacts found for matching';
         break;
-      case z.connect.ConnectError.prototype.TYPE.UPLOAD:
+      case z.connect.ConnectError.TYPE.UPLOAD:
         this.message = 'Address book upload failed';
         break;
       default:
@@ -50,11 +50,11 @@ z.connect.ConnectError = class ConnectError extends Error {
 
   static get TYPE() {
     return {
-      GOOGLE_CLIENT: 'z.connect.ConnectError::TYPE.GOOGLE_CLIENT',
-      GOOGLE_DOWNLOAD: 'z.connect.ConnectError::TYPE.GOOGLE_DOWNLOAD',
-      NO_CONTACTS: 'z.connect.ConnectError::TYPE.NO_CONTACTS',
-      UNKNOWN: 'z.connect.ConnectError::TYPE.UNKNOWN',
-      UPLOAD: 'z.connect.ConnectError::TYPE.UPLOAD',
+      GOOGLE_CLIENT: 'z.connect.ConnectError.TYPE.GOOGLE_CLIENT',
+      GOOGLE_DOWNLOAD: 'z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD',
+      NO_CONTACTS: 'z.connect.ConnectError.TYPE.NO_CONTACTS',
+      UNKNOWN: 'z.connect.ConnectError.TYPE.UNKNOWN',
+      UPLOAD: 'z.connect.ConnectError.TYPE.UPLOAD',
     };
   }
 };

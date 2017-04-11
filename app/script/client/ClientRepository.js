@@ -59,18 +59,18 @@ z.client.ClientRepository = class ClientRepository {
     return this.client_service.delete_client_from_db(this._construct_primary_key(user_id, client_id));
   }
 
-  /*
-  Delete the temporary client on the backend.
-  @return {Promise} - Resolves when the temporary client was deleted on the backend
-  */
+  /**
+   * Delete the temporary client on the backend.
+   * @returns {Promise} Resolves when the temporary client was deleted on the backend
+   */
   delete_temporary_client() {
     return this.client_service.delete_temporary_client(this.current_client().id);
   }
 
-  /*
-  Load all known clients from the database.
-  @return {Promise} - Resolves with all the clients found in the local database
-  */
+  /**
+   * Load all known clients from the database.
+   * @returns {Promise} Resolves with all the clients found in the local database
+   */
   get_all_clients_from_db() {
     return this.client_service.load_all_clients_from_db()
     .then(clients => {
@@ -80,29 +80,26 @@ z.client.ClientRepository = class ClientRepository {
         if (!ids.user_id || [this.self_user().id, z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT].includes(ids.user_id)) {
           continue;
         }
-        if (user_client_map[ids.user_id] == null) {
-          user_client_map[ids.user_id] = [];
-        }
-        const client_et = this.client_mapper.map_client(client);
-        user_client_map[ids.user_id].push(client_et);
+        user_client_map[ids.user_id] = user_client_map[ids.user_id] || [];
+        user_client_map[ids.user_id].push(this.client_mapper.map_client(client));
       }
       return user_client_map;
     });
   }
 
-  /*
-  Retrieves meta information about specific client of the self user.
-  @param {string} client_id - ID of client to be retrieved
-  @return {Promise} - Resolves with the retrieved client information
-  */
+  /**
+   * Retrieves meta information about specific client of the self user.
+   * @param {string} client_id - ID of client to be retrieved
+   * @returns {Promise} Resolves with the retrieved client information
+   */
   get_client_by_id_from_backend(client_id) {
     return this.client_service.get_client_by_id(client_id);
   }
 
-  /*
-  Loads a client from the database (if it exists).
-  @return {Promise<z.client.Client>} - Resolves with the local client
-  */
+  /**
+   * Loads a client from the database (if it exists).
+   * @returns {Promise<z.client.Client>} Resolves with the local client
+   */
   get_current_client_from_db() {
     return this.client_service.load_client_from_db(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT)
     .catch(() => {
@@ -120,14 +117,14 @@ z.client.ClientRepository = class ClientRepository {
     });
   }
 
-  /*
-  Construct the primary key to store clients in database.
-  @private
-
-  @param {string} user_id - User ID from the owner of the client
-  @param {string} client_id
-  @return {String} - Primary key
-  */
+  /**
+   * Construct the primary key to store clients in database.
+   * @private
+   *
+   * @param {string} user_id - User ID from the owner of the client
+   * @param {string} client_id - ID of the client
+   * @returns {string} Primary key
+   */
   _construct_primary_key(user_id, client_id) {
     if (!user_id) {
       throw new z.client.ClientError(z.client.ClientError.TYPE.NO_USER_ID);
@@ -138,28 +135,28 @@ z.client.ClientRepository = class ClientRepository {
     return `${user_id}@${client_id}`;
   }
 
-  /*
-  Save the a client into the database.
-
-  @private
-  @param {string} user_id - ID of user client to be stored belongs to
-  @param {Object} client_payload - Client data to be stored in database
-  @return {Promise} - Resolves with the record stored in database
-  */
+  /**
+   * Save the a client into the database.
+   *
+   * @private
+   * @param {string} user_id - ID of user client to be stored belongs to
+   * @param {Object} client_payload - Client data to be stored in database
+   * @returns {Promise} Resolves with the record stored in database
+   */
   save_client_in_db(user_id, client_payload) {
     const primary_key = this._construct_primary_key(user_id, client_payload.id);
     return this.client_service.save_client_in_db(primary_key, client_payload);
   }
 
-  /*
-  Updates properties for a client record in database.
-
-  @todo Merge "meta" property before updating it, Object.assign(payload.meta, changes.meta)
-  @param {string} user_id - User ID of the client owner
-  @param {string} client_id - Client ID which needs to get updated
-  @param {string} changes - New values which should be updated on the client
-  @return {number} - Number of updated records
-  */
+  /**
+   * Updates properties for a client record in database.
+   *
+   * @todo Merge "meta" property before updating it, Object.assign(payload.meta, changes.meta)
+   * @param {string} user_id - User ID of the client owner
+   * @param {string} client_id - Client ID which needs to get updated
+   * @param {string} changes - New values which should be updated on the client
+   * @returns {number} Number of updated records
+   */
   update_client_in_db(user_id, client_id, changes) {
     const primary_key = this._construct_primary_key(user_id, client_id);
     // Preserve primary key on update
@@ -167,13 +164,14 @@ z.client.ClientRepository = class ClientRepository {
     return this.client_service.update_client_in_db(primary_key, changes);
   }
 
-  /*
-  Change verification state of client.
-
-  @param {string} user_id - User ID of the client owner
-  @param {z.client.Clients} client_et - Client which needs to get updated
-  @param {boolean} is_verified - New state to apply
-  */
+  /**
+   * Change verification state of client.
+   *
+   * @param {string} user_id - User ID of the client owner
+   * @param {z.client.Client} client_et - Client which needs to get updated
+   * @param {boolean} is_verified - New state to apply
+   * @returns {Promise} Resolves when the verification state has been updated
+   */
   verify_client(user_id, client_et, is_verified) {
     return this.update_client_in_db(user_id, client_et.id, {meta: {is_verified}})
     .then(() => {
@@ -182,26 +180,26 @@ z.client.ClientRepository = class ClientRepository {
     });
   }
 
-  /*
-  Save the local client into the database.
-
-  @private
-  @param {Object} client_payload - Client data to be stored in database
-  @return {Promise} - Resolves with the record stored in database
-  */
+  /**
+   * Save the local client into the database.
+   *
+   * @private
+   * @param {Object} client_payload - Client data to be stored in database
+   * @returns {Promise} Resolves with the record stored in database
+   */
   _save_current_client_in_db(client_payload) {
     client_payload.meta = {is_verified: true};
     return this.client_service.save_client_in_db(z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT, client_payload);
   }
 
-  /*
-  Updates a client payload if it does not fit the current database structure.
-
-  @private
-  @param {string} user_id - User ID of the client owner
-  @param {Object} client_payload - Client data to be stored in database
-  @return {Promise} - Resolves with the record stored in database
-  */
+  /**
+   * Updates a client payload if it does not fit the current database structure.
+   *
+   * @private
+   * @param {string} user_id - User ID of the client owner
+   * @param {Object} client_payload - Client data to be stored in database
+   * @returns {Promise} Resolves with the record stored in database
+   */
   _update_client_schema_in_db(user_id, client_payload) {
     client_payload.meta = {
       is_verified: false,
@@ -214,31 +212,32 @@ z.client.ClientRepository = class ClientRepository {
   // Login and registration
   //##############################################################################
 
-  /*
-  Constructs the value for a cookie label.
-  @param {string} login - Email or phone number of the user
-  @param {z.client.ClientType} client_type - Temporary or permanent client type
-  */
+  /**
+   * Constructs the value for a cookie label.
+   * @param {string} login - Email or phone number of the user
+   * @param {z.client.ClientType} client_type - Temporary or permanent client type
+   * @returns {string} Cookie label
+   */
   construct_cookie_label(login, client_type = this._load_current_client_type()) {
     const login_hash = z.util.murmurhash3(login, 42);
     return `webapp@${login_hash}@${client_type}@${Date.now()}`;
   }
 
-  /*
-  Constructs the key for a cookie label.
-  @param {string} login - Email or phone number of the user
-  @param {z.client.ClientType} client_type - Temporary or permanent client type
-  */
+  /**
+   * Constructs the key for a cookie label.
+   * @param {string} login - Email or phone number of the user
+   * @param {z.client.ClientType} client_type - Temporary or permanent client type
+   * @returns {string} Cookie label key
+   */
   construct_cookie_label_key(login, client_type = this._load_current_client_type()) {
     const login_hash = z.util.murmurhash3(login, 42);
     return `${z.storage.StorageKey.AUTH.COOKIE_LABEL}@${login_hash}@${client_type}`;
   }
 
-  /*
-  Validate existence of a local client online.
-  @param {z.client.Client} client - Client retrieved from IndexedDB
-  @return {Promise} - Resolve with an observable containing the client if valid
-  */
+  /**
+   * Get and validate the local client.
+   * @returns {Promise} Resolve with an observable containing the client if valid
+   */
   get_valid_local_client() {
     return this.get_current_client_from_db()
     .then(client_et => this.get_client_by_id_from_backend(client_et.id))
@@ -276,14 +275,14 @@ z.client.ClientRepository = class ClientRepository {
     });
   }
 
-  /*
-  Register a new client.
-  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/registerClient
-
-  @note Password is needed for the registration of a client once 1st client has been registered.
-  @param {string} password - User password for verification
-  @return {Promise<z.client.Client>} - Resolve with the newly registered client
-  */
+  /**
+   * Register a new client.
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/registerClient
+   *
+   * @note Password is needed for the registration of a client once 1st client has been registered.
+   * @param {string} password - User password for verification
+   * @returns {Promise<z.client.Client>} Resolve with the newly registered client
+   */
   register_client(password) {
     const client_type = this._load_current_client_type();
 
@@ -322,15 +321,17 @@ z.client.ClientRepository = class ClientRepository {
     });
   }
 
-  /*
-  Create payload for client registration.
-
-  @private
-  @param {z.client.ClientType} client_type - Type of client to be registered
-  @param {String} password - User password
-  @param {Array} keys - Array containing last resort key, pre-keys and signaling keys
-  @return {Object} - Payload to register client with backend
-  */
+  /**
+   * Create payload for client registration.
+   *
+   * @private
+   * @param {z.client.ClientType} client_type - Type of client to be registered
+   * @param {string} password - User password
+   * @param {string} last_resort_key - Last resort key
+   * @param {Array<string>} pre_keys - Pre-keys
+   * @param {Array<string>} signaling_keys - Signaling keys
+   * @returns {Object} - Payload to register client with backend
+   */
   _create_registration_payload(client_type, password, [last_resort_key, pre_keys, signaling_keys]) {
     let device_label = `${platform.os.family}`;
 
@@ -370,23 +371,24 @@ z.client.ClientRepository = class ClientRepository {
     };
   }
 
-  /*
-  Gets the value for a cookie label.
-  @private
-  @param {string} login - Email or phone number of the user
-  */
+  /**
+   * Gets the value for a cookie label.
+   * @private
+   * @param {string} login - Email or phone number of the user
+   * @returns {string} Cookie label
+   */
   _get_cookie_label_value(login) {
     return z.util.StorageUtil.get_value(this.construct_cookie_label_key(login));
   }
 
-  /*
-  Loads the cookie label value from the Local Storage and saves it into IndexedDB.
-
-  @private
-  @param {z.client.ClientType} client_type - Temporary or permanent client type
-  @param {string} cookie_label - Cookie label, something like "webapp@2153234453@temporary@145770538393"
-  @return {Promise} - Resolves with the key of the stored cookie label
-  */
+  /**
+   * Loads the cookie label value from the Local Storage and saves it into IndexedDB.
+   *
+   * @private
+   * @param {z.client.ClientType} client_type - Temporary or permanent client type
+   * @param {string} cookie_label - Cookie label, something like "webapp@2153234453@temporary@145770538393"
+   * @returns {Promise} Resolves with the key of the stored cookie label
+   */
   _transfer_cookie_label(client_type, cookie_label) {
     const indexed_db_key = z.storage.StorageKey.AUTH.COOKIE_LABEL;
     const local_storage_key = this.construct_cookie_label_key(this.self_user().email() || this.self_user().phone(), client_type);
@@ -405,11 +407,11 @@ z.client.ClientRepository = class ClientRepository {
     return this.cryptography_repository.storage_repository.save_value(indexed_db_key, cookie_label);
   }
 
-  /*
-  Load current client type from amplify store.
-  @private
-  @return {z.client.ClientType} - Type of current client
-  */
+  /**
+   * Load current client type from amplify store.
+   * @private
+   * @returns {z.client.ClientType} Type of current client
+   */
   _load_current_client_type() {
     if (this.current_client()) {
       return this.current_client().type;
@@ -424,12 +426,12 @@ z.client.ClientRepository = class ClientRepository {
   // Client handling
   //##############################################################################
 
-  /*
-  Cleanup local sessions.
-
-  @note If quick_clean parameter is set to false, there will be one backend request per user that has a session.
-  @param {Boolean} quick_clean - Optional value defaulting to true whether to check all users with local sessions or the ones with too many sessions
-  */
+  /**
+   * Cleanup local sessions.
+   * @note If quick_clean parameter is set to false, there will be one backend request per user that has a session.
+   * @param {Boolean} [quick_clean=true] - Optional value whether to check all users with local sessions or the ones with too many sessions
+   * @returns {undefined} No return value
+   */
   cleanup_clients_and_sessions(quick_clean = true) {
     const object = this.cryptography_repository.create_user_session_map();
 
@@ -444,13 +446,13 @@ z.client.ClientRepository = class ClientRepository {
     }
   }
 
-  /*
-  Delete client of a user on backend and removes it locally.
-
-  @param {string} client_id - ID of the client that should be deleted
-  @param {string} password - Password entered by user
-  @return {Promise} Resolves with the remaining user devices
-  */
+  /**
+   * Delete client of a user on backend and removes it locally.
+   *
+   * @param {string} client_id - ID of the client that should be deleted
+   * @param {string} password - Password entered by user
+   * @returns {Promise} Resolves with the remaining user devices
+   */
   delete_client(client_id, password) {
     if (!password) {
       this.logger.error(`Could not delete client '${client_id}' because password is missing`);
@@ -492,25 +494,25 @@ z.client.ClientRepository = class ClientRepository {
     .then(() => amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.USER_REQUESTED, true));
   }
 
-  /*
-  Removes a stored client and the session connected with it.
-
-  @param {string} user_id - ID of user
-  @param {string} client_id - ID of client to be deleted
-  @return {Promise} Resolves when a client and its session have been deleted
-  */
+  /**
+   * Removes a stored client and the session connected with it.
+   *
+   * @param {string} user_id - ID of user
+   * @param {string} client_id - ID of client to be deleted
+   * @returns {Promise} Resolves when a client and its session have been deleted
+   */
   remove_client(user_id, client_id) {
     return this.cryptography_repository.delete_session(user_id, client_id)
     .then(() => this.delete_client_from_db(user_id, client_id));
   }
 
-  /*
-  Retrieves meta information about all the clients of a given user.
-  @note If you want to get very detailed information about the devices from the own user, then use "@get_clients"
-
-  @param {string} user_id - User ID to retrieve client information for
-  @return {Promise} Resolves with an array of client entities
-  */
+  /**
+   * Retrieves meta information about all the clients of a given user.
+   * @note If you want to get very detailed information about the devices from the own user, then use "@get_clients"
+   *
+   * @param {string} user_id - User ID to retrieve client information for
+   * @returns {Promise} Resolves with an array of client entities
+   */
   get_clients_by_user_id(user_id) {
     return this.client_service.get_clients_by_user_id(user_id)
     .then(clients => this._update_clients_for_user(user_id, clients))
@@ -529,10 +531,10 @@ z.client.ClientRepository = class ClientRepository {
     });
   }
 
-  /*
-  Retrieves meta information about all the clients of the self user.
-  @return {Promise} Resolves with the retrieved information about the clients
-  */
+  /**
+   * Retrieves meta information about all the clients of the self user.
+   * @returns {Promise} Resolves with the retrieved information about the clients
+   */
   get_clients_for_self() {
     this.logger.info(`Retrieving all clients for the self user '${this.self_user().id}'`);
     return this.client_service.get_clients()
@@ -545,10 +547,10 @@ z.client.ClientRepository = class ClientRepository {
     });
   }
 
-  /*
-  Is the current client permanent.
-  @return {boolean} Type of current client is permanent
-  */
+  /**
+   * Is the current client permanent.
+   * @returns {boolean} Type of current client is permanent
+   */
   is_current_client_permanent() {
     if (!this.current_client()) {
       throw new z.client.ClientError(z.client.ClientError.TYPE.CLIENT_NOT_SET);
@@ -556,13 +558,14 @@ z.client.ClientRepository = class ClientRepository {
     return z.util.Environment.electron || this.current_client().is_permanent();
   }
 
-  /*
-  Remove obsolete clients and sessions for given user.
-
-  @private
-  @param {string} user_id - ID of user to check clients and sessions off
-  @param {Array<string>} client_ids - Contains IDs of local sessions for user
-  */
+  /**
+   * Remove obsolete clients and sessions for given user.
+   *
+   * @private
+   * @param {string} user_id - ID of user to check clients and sessions off
+   * @param {Array<string>} client_ids - Contains IDs of local sessions for user
+   * @returns {Promise} Resolves when obsolete clients have been removed
+   */
   _remove_obsolete_client_for_user_by_id(user_id, client_ids) {
     return this.get_clients_by_user_id(user_id)
     .then(client_ets => {
@@ -586,16 +589,16 @@ z.client.ClientRepository = class ClientRepository {
     });
   }
 
-  /*
-  Match backend client response with locally stored ones.
-  @note: This function matches clients retrieved from the backend with the data stored in the local database.
-    Clients will then be updated with the backend payload in the database and mapped into entities.
-
-  @private
-  @param {string} user_id
-  @param {Object} clients - Payload from the backend
-  @return {Promise<Array[z.client.Client]>} - Client entities
-  */
+  /**
+   * Match backend client response with locally stored ones.
+   * @note This function matches clients retrieved from the backend with the data stored in the local database.
+   *   Clients will then be updated with the backend payload in the database and mapped into entities.
+   *
+   * @private
+   * @param {string} user_id - ID of user to update clients for
+   * @param {Object} clients - Payload from the backend
+   * @returns {Promise<Array<z.client.Client>>} Resolves with the client entities
+   */
   _update_clients_for_user(user_id, clients) {
     const clients_from_backend = {};
     const clients_stored_in_db = [];
@@ -661,13 +664,13 @@ z.client.ClientRepository = class ClientRepository {
     });
   }
 
-  /*
-  Check if client is current local client.
-
-  @private
-  @param {string} user_id - User ID to be checked
-  @param {string} client_id - ID of client to be checked
-  @return {boolean} - Is the client the current local client
+  /**
+   * Check if client is current local client.
+   *
+   * @private
+   * @param {string} user_id - User ID to be checked
+   * @param {string} client_id - ID of client to be checked
+   * @returns {boolean} Is the client the current local client
   */
   _is_current_client(user_id, client_id) {
     if (!this.current_client()) {
@@ -687,32 +690,32 @@ z.client.ClientRepository = class ClientRepository {
   // Conversation Events
   //##############################################################################
 
-  /*
-  A client was added by the self user.
-  @param {Object} event_json - JSON data of 'user.client-add' event
-  */
+  /**
+   * A client was added by the self user.
+   * @param {Object} event_json - JSON data of 'user.client-add' event
+   * @returns {undefined} No return value
+   */
   map_self_client(event_json) {
     this.logger.info('Client of self user added', event_json);
     const client_et = this.client_mapper.map_client(event_json.client);
-    return amplify.publish(z.event.WebApp.CLIENT.ADD, this.self_user().id, client_et);
+    amplify.publish(z.event.WebApp.CLIENT.ADD, this.self_user().id, client_et);
   }
 
-  /*
-  A client was removed by the self user.
-  @param {Object} event_json - JSON data of 'user.client-remove' event
-  */
+  /**
+   * A client was removed by the self user.
+   * @param {Object} [event_json={}] - JSON data of 'user.client-remove' event
+   * @returns {Promise} Resolves when the event has been handled
+   */
   on_client_remove(event_json = {}) {
-    const client_id = event_json != null ? event_json.client.id : undefined;
-    if (!client_id) {
-      return;
+    const client_id = event_json.client !== null ? event_json.client.id : undefined;
+    if (client_id) {
+      if (client_id === this.current_client().id) {
+        return this.cryptography_repository.storage_repository.delete_cryptography()
+        .then(() => {
+          amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.CLIENT_REMOVED, this.current_client().is_temporary());
+        });
+      }
+      amplify.publish(z.event.WebApp.CLIENT.REMOVE, this.self_user().id, client_id);
     }
-
-    if (client_id === this.current_client().id) {
-      return this.cryptography_repository.storage_repository.delete_cryptography()
-      .then(() => {
-        return amplify.publish(z.event.WebApp.LIFECYCLE.SIGN_OUT, z.auth.SignOutReason.CLIENT_REMOVED, this.current_client().is_temporary());
-      });
-    }
-    return amplify.publish(z.event.WebApp.CLIENT.REMOVE, this.self_user().id, client_id);
   }
 };

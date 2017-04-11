@@ -25,12 +25,11 @@ window.z.assets = z.assets || {};
 // Builder for creating all kinds of asset metadata
 z.assets.AssetMetaDataBuilder = {
 
-  /*
-  Constructs corresponding asset metadata depending on the given file type
-
-  @param {File|Blob} file - the file to generate metadata for
-  @returns {ImageMetaData|VideoMetaData|AudioMetaData}
-  */
+  /**
+   * Constructs corresponding asset metadata depending on the given file type
+   * @param {File|Blob} file - the file to generate metadata for
+   * @returns {Promise} Resolves with ImageMetaData, VideoMetaData or AudioMetaData
+   */
   build_metadata(file) {
     if (!(file instanceof Blob)) {
       throw new Error('Expected file to be type of Blob');
