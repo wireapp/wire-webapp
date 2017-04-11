@@ -22,26 +22,25 @@
 window.z = window.z || {};
 window.z.cache = z.cache || {};
 
-/*
-Cache repository for local storage interactions using amplify.
-
-@todo We have to come up with a smart solution to handle "amplify.store quota exceeded"
-  This happened when doing "@cache_repository.set_entity user_et"
-
-*/
+/**
+ * Cache repository for local storage interactions using amplify.
+ *
+ * @todo We have to come up with a smart solution to handle "amplify.store quota exceeded"
+ *  This happened when doing "@cache_repository.set_entity user_et"
+ *
+ */
 z.cache.CacheRepository = class CacheRepository {
   constructor() {
     this.logger = new z.util.Logger('z.auth.CacheRepository', z.config.LOGGER.OPTIONS);
   }
 
-  /*
-  Deletes cached data.
-
-  @param {Boolean} [keep_conversation_input=false] - Should conversation input be kept
-  @param {[Array<String>]} [protected_key_patterns=[z.storage.StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from the cache
-
-  @return [Array<String>] Keys which have been deleted from the cache
-  */
+  /**
+   * Deletes cached data.
+   *
+   * @param {Boolean} [keep_conversation_input=false] - Should conversation input be kept
+   * @param {Array<String>} [protected_key_patterns=[z.storage.StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from the cache
+   * @returns {Array<String>} Keys which have been deleted from the cache
+   */
   clear_cache(keep_conversation_input = false, protected_key_patterns = [z.storage.StorageKey.AUTH.SHOW_LOGIN]) {
     const deleted_keys = [];
 

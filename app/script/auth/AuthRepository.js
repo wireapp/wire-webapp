@@ -51,10 +51,10 @@ window.z.auth.AuthRepository = class AuthRepository {
    * Login (with email or phone) in order to obtain an access-token and cookie.
    *
    * @param {Object} login - Containing sign in information
-   * @option {String} login - email The email address for a password login
-   * @option {String} login - phone The phone number for a password or SMS login
-   * @option {String} login - password The password for a password login
-   * @option {String} login - code The login code for an SMS login
+   * @option {string} login - email The email address for a password login
+   * @option {string} login - phone The phone number for a password or SMS login
+   * @option {string} login - password The password for a password login
+   * @option {string} login - code The login code for an SMS login
    * @param {Boolean} persist - Request a persistent cookie instead of a session cookie
    * @returns {Promise} Promise that resolves with the received access token
    */
@@ -85,10 +85,10 @@ window.z.auth.AuthRepository = class AuthRepository {
    * Register a new user (with email).
    *
    * @param {Object} new_user - Containing the email, username and password needed for account creation
-   * @option {String} new_user - name
-   * @option {String} new_user - email
-   * @option {String} new_user - password
-   * @option {String} new_user - label Cookie label
+   * @option {string} new_user - name
+   * @option {string} new_user - email
+   * @option {string} new_user - password
+   * @option {string} new_user - label Cookie label
    * @returns {Promise} Promise that will resolve on success
    */
   register(new_user) {
@@ -110,8 +110,8 @@ window.z.auth.AuthRepository = class AuthRepository {
    * Resend an email or phone activation code.
    *
    * @param {Object} send_activation_code - Containing the email or phone number needed to resend activation email
-   * @option {String} send_activation_code - email
-   * @return {Promise} Promise that resolves on success
+   * @option {string} send_activation_code - email
+   * @returns {Promise} Promise that resolves on success
    */
   resend_activation(send_activation_code) {
     return this.auth_service.post_activate_send(send_activation_code);
@@ -120,7 +120,7 @@ window.z.auth.AuthRepository = class AuthRepository {
   /**
    * Retrieve personal invite information.
    *
-   * @param {String} invite - Invite code
+   * @param {string} invite - Invite code
    * @returns {Promise} Promise that resolves with the invite data
    */
   retrieve_invite(invite) {
@@ -131,7 +131,7 @@ window.z.auth.AuthRepository = class AuthRepository {
    * Request SMS validation code.
    *
    * @param {Object} request_code - Containing the phone number in E.164 format and whether a code should be forced
-   * @return {Promise} Promise that resolve on success
+   * @returns {Promise} Promise that resolve on success
    */
   request_login_code(request_code) {
     return this.auth_service.post_login_send(request_code);
@@ -198,10 +198,11 @@ window.z.auth.AuthRepository = class AuthRepository {
    *  access_token_type: Bearer
    *  access_token_ttl: 900000 => 900s/15min
    *
-   * @param {Object, String} access_token_data - Access Token
-   * @option {String} access_token_data - access_token
-   * @option {String} access_token_data - expires_in
-   * @option {String} access_token_data - type
+   * @param {Object|string} access_token_data - Access Token
+   * @option {string} access_token_data - access_token
+   * @option {string} access_token_data - expires_in
+   * @option {string} access_token_data - type
+   * @returns {number} A Number, representing the ID value of the timer that is set.
    */
   save_access_token(access_token_data) {
     const expires_in_millis = 1000 * access_token_data.expires_in;
@@ -230,11 +231,12 @@ window.z.auth.AuthRepository = class AuthRepository {
    * Logs the update of the access token.
    *
    * @private
-   * @param {Object, String} access_token_data - Access Token
-   * @option {String} access_token_data - access_token
-   * @option {String} access_token_data - expires_in
-   * @option {String} access_token_data - type
-   * @param {Integer} expiration_timestamp - Timestamp when access token expires
+   * @param {Object|string} access_token_data - Access Token
+   * @option {string} access_token_data - access_token
+   * @option {string} access_token_data - expires_in
+   * @option {string} access_token_data - type
+   * @param {number} expiration_timestamp - Timestamp when access token expires
+   * @returns {undefined}
    */
   _log_access_token_update(access_token_data, expiration_timestamp) {
     const expiration_log = z.util.format_timestamp(expiration_timestamp, false);
@@ -245,8 +247,9 @@ window.z.auth.AuthRepository = class AuthRepository {
    * Refreshes the access token in time before it expires.
    *
    * @private
-   * @param {Integer} expiration_timestamp - The expiration date (and time) as timestamp
    * @note Access token will be refreshed 1 minute (60000ms) before it expires
+   * @param {number} expiration_timestamp - The expiration date (and time) as timestamp
+   * @returns {number} A Number, representing the ID value of the timer that is set.
    */
   _schedule_token_refresh(expiration_timestamp) {
     if (this.access_token_refresh) {

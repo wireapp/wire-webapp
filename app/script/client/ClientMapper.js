@@ -25,11 +25,11 @@ window.z.client = z.client || {};
 z.client.ClientMapper = class ClientMapper {
   constructor() {}
 
-  /*
-  Maps a JSON into a Client entity.
-  @param {Object} client_payload
-  @return {z.client.Client}
-  */
+  /**
+   * Maps a JSON into a Client entity.
+   * @param {Object} client_payload - Client data
+   * @returns {z.client.Client} Mapped client entity
+   */
   map_client(client_payload) {
     const client_et = new z.client.Client(client_payload);
 
@@ -42,22 +42,22 @@ z.client.ClientMapper = class ClientMapper {
     return client_et;
   }
 
-  /*
-  Maps an object of client IDs with their payloads to client entities.
-  @param {Array<Object>} clients_payload
-  @return {Array<z.client.Client>}
-  */
+  /**
+   * Maps an object of client IDs with their payloads to client entities.
+   * @param {Array<Object>} clients_payload - Clients data
+   * @returns {Array<z.client.Client>} - Mapped client entities
+   */
   map_clients(clients_payload) {
     return clients_payload.map((client_payload) => this.map_client(client_payload));
   }
 
-  /*
-  Update a client entity or object from JSON.
-
-  @param {z.client.Client|Object} client
-  @param {Object} update_payload - JSON possibly containing updates
-  @return {Array<z.client.Client|Object, Boolean>} - An array that contains the client and whether there was a change
-  */
+  /**
+   * Update a client entity or object from JSON.
+   *
+   * @param {z.client.Client|Object} client - Client data
+   * @param {Object} update_payload - JSON possibly containing updates
+   * @returns {Array<z.client.Client|Object, Boolean>} An array that contains the client and whether there was a change
+   */
   update_client(client, update_payload) {
     let contains_update = false;
     for (const member in update_payload) {

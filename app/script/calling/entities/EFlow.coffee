@@ -84,6 +84,7 @@ class z.calling.entities.EFlow
 
         when z.calling.rtc.ICEConnectionState.COMPLETED, z.calling.rtc.ICEConnectionState.CONNECTED
           @_clear_negotiation_timeout()
+          @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
           @telemetry.start_statistics()
           @e_call_et.is_connected true
           @e_participant_et.is_connected true
@@ -96,8 +97,6 @@ class z.calling.entities.EFlow
           @e_call_et.delete_e_participant @e_participant_et.id if @e_call_et.self_client_joined()
 
         when z.calling.rtc.ICEConnectionState.DISCONNECTED
-          @e_participant_et.is_connected false
-          @e_call_et.interrupted_participants.push @participant_et
           @_set_negotiation_restart_timeout()
 
         when z.calling.rtc.ICEConnectionState.FAILED
@@ -116,7 +115,6 @@ class z.calling.entities.EFlow
 
         when z.calling.rtc.SignalingState.STABLE
           @_clear_negotiation_timeout()
-          @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
 
     @negotiation_mode = ko.observable z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
     @negotiation_needed = ko.observable false
@@ -610,6 +608,8 @@ class z.calling.entities.EFlow
   _set_negotiation_restart_timeout: ->
     @negotiation_timeout = window.setTimeout =>
       @e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
+      @e_participant_et.is_connected false
+      @e_call_et.interrupted_participants.push @participant_et
       if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
         @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false
     , E_FLOW_CONFIG.NEGOTIATION_RESTART_TIMEOUT
@@ -695,11 +695,11 @@ class z.calling.entities.EFlow
     .then =>
       return @_remove_media_stream @media_stream()
     .then =>
-      @_upgrade_media_stream media_stream_info.stream, media_stream_info.type
-    .then (updated_media_stream) =>
-      @logger.info "Upgraded the MediaStream to update '#{media_stream_info.type}' successfully", updated_media_stream
-      @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, updated_media_stream
-      return updated_media_stream
+      @_upgrade_media_stream media_stream_info
+    .then (upgraded_media_stream_info) =>
+      @logger.info "Upgraded the MediaStream to update '#{media_stream_info.type}' successfully", upgraded_media_stream_info.stream
+      @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, upgraded_media_stream_info.stream
+      return upgraded_media_stream_info
     .catch (error) =>
       @logger.error "Failed to replace local MediaStream: #{error.message}", error
       throw error
@@ -752,12 +752,12 @@ class z.calling.entities.EFlow
   Upgrade the local MediaStream with new MediaStreamTracks
 
   @private
-  @param new_media_stream [MediaStream] MediaStream containing new MediaStreamTracks
-  @param media_type [z.media.MediaType] Type of tracks to update
-  @return [MediaStream] New MediaStream to be used
+  @param media_stream_info [z.media.MediaStreamInfo] MediaStreamInfo containing new MediaStreamTracks
+  @return [z.media.MediaStreamInfo] New MediaStream to be used
   ###
-  _upgrade_media_stream: (new_media_stream, media_type) ->
+  _upgrade_media_stream: (media_stream_info) ->
     if @media_stream()
+      {stream: new_media_stream, type: media_type} = media_stream_info
       for media_stream_track in z.media.MediaStreamHandler.get_media_tracks @media_stream(), media_type
         @media_stream().removeTrack media_stream_track
         media_stream_track.stop()
@@ -766,8 +766,8 @@ class z.calling.entities.EFlow
       media_stream = @media_stream().clone()
 
       media_stream.addTrack media_stream_track for media_stream_track in z.media.MediaStreamHandler.get_media_tracks new_media_stream, media_type
-      return z.media.MediaStreamHandler.detect_media_stream_type media_stream
-    return new_media_stream
+      return new z.media.MediaStreamInfo z.media.MediaStreamSource.LOCAL, 'self', media_stream
+    return media_stream_info
 
 
   ###############################################################################

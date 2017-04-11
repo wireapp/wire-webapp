@@ -28,13 +28,13 @@ z.connect.ConnectService = class ConnectService {
     this.logger = new z.util.Logger('z.connect.ConnectService', z.config.LOGGER.OPTIONS);
   }
 
-  /*
-  Upload address book data for matching.
-  @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/addressbook/onboardingV3
-
-  @param {z.connect.PhoneBook} phone_book Phone book containing the address cards
-  @return {Promise} - Resolves with the matched contacts from the user's phone book
-  */
+  /**
+   * Upload address book data for matching.
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/addressbook/onboardingV3
+   *
+   * @param {z.connect.PhoneBook} phone_book - Phone book containing the address cards
+   * @returns {Promise} Resolves with the matched contacts from the user's phone book
+   */
   post_onboarding(phone_book) {
     return this.client.send_json({
       type: 'POST',
