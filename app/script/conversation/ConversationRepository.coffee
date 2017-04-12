@@ -507,7 +507,7 @@ class z.conversation.ConversationRepository
   mark_as_read: (conversation_et) =>
     return if conversation_et is undefined
     return if @block_event_handling
-    return if conversation_et.unread_message_count() is 0
+    return if conversation_et.unread_event_count() is 0
     return if conversation_et.get_last_message()?.type is z.event.Backend.CONVERSATION.MEMBER_UPDATE
 
     @_update_last_read_timestamp conversation_et

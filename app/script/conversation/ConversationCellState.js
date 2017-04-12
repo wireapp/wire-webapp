@@ -65,8 +65,23 @@ z.conversation.ConversationCellState = (() => {
       const last_message_et = conversation_et.get_last_message();
       let message_text = '';
 
-      if (last_message_et.has_asset_text()) {
+      if (last_message_et.is_ping()) {
+        message_text = z.localization.Localizer.get_text(z.string.conversation_ping).trim();
+      } else if (last_message_et.has_asset_text()) {
         message_text = last_message_et.get_first_asset().text;
+      } else if (last_message_et.has_asset()) {
+        const asset_et = last_message_et.get_first_asset();
+        if (asset_et.is_audio()) {
+          message_text = z.localization.Localizer.get_text(z.string.system_notification_shared_audio);
+        } else if (asset_et.is_video()) {
+          message_text = z.localization.Localizer.get_text(z.string.system_notification_shared_video);
+        } else {
+          message_text = z.localization.Localizer.get_text(z.string.system_notification_shared_file);
+        }
+      } else if (last_message_et.has_asset_location()) {
+        message_text = z.localization.Localizer.get_text(z.string.system_notification_shared_location);
+      } else if (last_message_et.has_asset_image()) {
+        message_text = z.localization.Localizer.get_text(z.string.system_notification_asset_add);
       }
 
       if (conversation_et.is_group()) {
