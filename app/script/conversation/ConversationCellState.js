@@ -38,7 +38,7 @@ z.conversation.ConversationCellState = (() => {
       return conversation_et.removed_from_conversation();
     },
     description() {
-      return '';
+      return '[You Left]';
     },
     icon() {
       return z.conversation.ConversationStatusIcon.NONE;
