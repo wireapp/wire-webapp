@@ -63,7 +63,7 @@ z.connect.ConnectRepository = class ConnectRepository {
         case z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD:
           throw error;
         case z.connect.ConnectError.TYPE.NO_CONTACTS:
-          return [];
+          return {};
       }
       if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
         this.logger.error('Backend refused Gmail contacts upload: Endpoint used too frequent', error);
@@ -258,10 +258,11 @@ z.connect.ConnectRepository = class ConnectRepository {
    * Parse a user's Google Contacts.
    *
    * @private
-   * @param {JSON} response - Response from Google API
+   * @param {Array} self - Self response from Google API
+   * @param {Array} users - Contacts response from Google API
    * @returns {z.connect.PhoneBook} Encoded phone book data
    */
-  _parse_google_contacts({feed: {author: self, entry: users}}) {
+  _parse_google_contacts({author: self, entry: users}) {
     const phone_book = new z.connect.PhoneBook(this.properties_repository.self());
 
     // Add self info from Google
