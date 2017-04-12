@@ -19,6 +19,7 @@
 
 'use strict';
 
+z.string.fr.wire = 'Wire';
 z.string.fr.wire_macos = 'Wire pour macOS';
 z.string.fr.wire_windows = 'Wire pour Windows';
 z.string.fr.wire_linux = 'Wire pour Linux';
@@ -241,7 +242,8 @@ z.string.fr.conversation_context_menu_unlike = 'Je n’aime plus';
 z.string.fr.conversation_delete_timestamp = 'Supprimé le %@timestamp';
 z.string.fr.conversation_edit_timestamp = 'Édité le %@timestamp';
 z.string.fr.conversation_likes_caption = '%@number personnes';
-z.string.fr.conversation_send_pasted_file = 'Image copiée le %date';
+z.string.fr.conversation_send_pasted_file = 'Image collée le %date';
+z.string.fr.conversation_tweet_author = ' via Twitter';
 
 z.string.fr.collection_show_all = 'Tout afficher (%no)';
 z.string.fr.collection_section_links = 'Liens';
@@ -280,8 +282,8 @@ z.string.fr.invite_meta_key_pc = 'Ctrl';
 z.string.fr.invite_hint_selected = 'Appuyez sur %meta_key + C pour copier';
 z.string.fr.invite_hint_unselected = 'Sélectionnez et appuyez sur %meta_key + C';
 z.string.fr.invite_headline = 'Invitez des gens sur Wire';
-z.string.fr.invite_message = 'Je suis sur Wire, cherche %username ou va voir get.wire.com .';
-z.string.fr.invite_message_no_email = 'Je suis sur Wire. Visite get.wire.com pour échanger avec moi.';
+z.string.fr.invite_message = 'Je suis sur Wire, cherche %username ou va sur get.wire.com .';
+z.string.fr.invite_message_no_email = 'Je suis sur Wire. Va sur get.wire.com pour me rejoindre.';
 
 z.string.fr.extensions_bubble_button_gif = 'Gif';
 
@@ -374,7 +376,7 @@ z.string.fr.preferences_account_reset_password = 'Réinitialiser le mot de passe
 z.string.fr.preferences_account_delete = 'Supprimer le compte';
 z.string.fr.preferences_account_log_out = 'Se déconnecter';
 z.string.fr.preferences_account_username_placeholder = 'Votre nom complet';
-z.string.fr.preferences_account_username_hint = 'Au moins 2 caractères. a — z, 0 — 9 et _ seulement.';
+z.string.fr.preferences_account_username_hint = 'Au moins 2 caractères. a–z, 0–9 et _ seulement.';
 z.string.fr.preferences_account_username_available = 'Disponible';
 z.string.fr.preferences_account_username_error_taken = 'Déjà pris';
 
@@ -427,7 +429,7 @@ z.string.fr.search_groups = 'Groupes';
 z.string.fr.search_placeholder = 'Chercher par nom ou par identifiant';
 z.string.fr.search_top_people = 'Personnes favorites';
 z.string.fr.search_try_search = 'Trouver des contacts par\nnom ou identifiant';
-z.string.fr.search_no_contacts_on_wire = 'Vous n’avez pas de contacts sur Wire.\nEssayez de trouver des gens par\nleur nom ou leur nom d’utilisateur.';
+z.string.fr.search_no_contacts_on_wire = 'Vous n’avez pas de contacts sur Wire.\nEssayez de trouver des gens par\nleur nom ou leur identifiant.';
 z.string.fr.search_others = 'Connecter';
 z.string.fr.search_friend_in_common = '%no connaissance en commun';
 z.string.fr.search_friends_in_common = '%no connaissances en commun';
@@ -438,8 +440,10 @@ z.string.fr.upload_google_headline_error = 'Une erreur\nest survenue.';
 z.string.fr.upload_google_message_error = 'Nous n’avons pas reçu votre information. Veuillez réessayer d’importer vos contacts.';
 z.string.fr.upload_google_button_again = 'Retenter';
 
+z.string.fr.url_password_reset = 'forgot/';
 z.string.fr.url_legal = 'https://wire.com/legal/?hl=fr';
 z.string.fr.url_privacy = 'https://wire.com/privacy/?hl=fr';
+z.string.fr.url_privacy_how = 'https://wire.com/privacy/how/';
 z.string.fr.url_privacy_why = 'https://wire.com/privacy/why/?hl=fr';
 z.string.fr.url_support = 'https://support.wire.com';
 z.string.fr.url_terms_of_use = 'https://wire.com/legal/terms/';
@@ -481,6 +485,7 @@ z.string.fr.warning_connectivity_connection_lost = 'Tentative de connexion. Wire
 z.string.fr.warning_connectivity_no_internet = 'Pas d’Internet. Vous ne pourrez pas envoyer ou recevoir de messages.';
 
 z.string.fr.warning_lifecycle_update = 'Une nouvelle version de Wire est disponible.';
+z.string.fr.warning_lifecycle_update_notes = 'Nouveautés';
 z.string.fr.warning_lifecycle_update_link = 'Mettre à jour maintenant';
 
 z.string.fr.system_notification_asset_add = 'A partagé une photo';
@@ -533,9 +538,9 @@ z.string.fr.tooltip_people_rename = 'Changer le nom de la conversation';
 z.string.fr.tooltip_people_remove = 'Exclure de la conversation';
 z.string.fr.tooltip_people_unblock = 'Débloquer';
 
-z.string.fr.tooltip_preferences_contacts_gmail = 'Connectez-vous à votre compte Gmail pour partager des contacts';
+z.string.fr.tooltip_preferences_contacts_gmail = 'Connectez-vous à votre compte Gmail pour importer des contacts';
 z.string.fr.tooltip_preferences_contacts_macos = 'Partagez tous vos contacts de l’application Contacts de macOS';
-z.string.fr.tooltip_preferences_password = 'Ouvrir un autre site pour réinitialiser votre mot de passe';
+z.string.fr.tooltip_preferences_password = 'Ouvre une page web pour réinitialiser votre mot de passe';
 z.string.fr.tooltip_preferences_picture = 'Changez votre photo de profil…';
 z.string.fr.tooltip_preferences_rename = 'Changez votre nom';
 
@@ -547,6 +552,7 @@ z.string.fr.init_sessions_expectation = 'Nous devons initialiser %sessions sessi
 z.string.fr.init_sessions_expectation_long = 'Nous devons initialiser %sessions sessions';
 z.string.fr.init_sessions_progress = 'Initialisation des sessions - %progress sur %total';
 z.string.fr.init_initialized_storage = 'Sessions chargées';
+z.string.fr.init_initialized_cryptography = 'Service de chiffrement prêt';
 z.string.fr.init_validated_client = 'Chargement de vos connexions et de vos conversations';
 z.string.fr.init_received_user_data = 'Recherche de nouveaux messages';
 z.string.fr.init_events_expectation = 'Vous avez %events nouveau(x) message(s)';

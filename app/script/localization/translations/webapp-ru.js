@@ -19,6 +19,7 @@
 
 'use strict';
 
+z.string.ru.wire = 'Wire';
 z.string.ru.wire_macos = 'Wire для macOS';
 z.string.ru.wire_windows = 'Wire для Windows';
 z.string.ru.wire_linux = 'Wire для Linux';
@@ -242,6 +243,7 @@ z.string.ru.conversation_delete_timestamp = 'Удалено %@timestamp';
 z.string.ru.conversation_edit_timestamp = 'Изменено %@timestamp';
 z.string.ru.conversation_likes_caption = '%@number участникам';
 z.string.ru.conversation_send_pasted_file = 'Изображение добавлено %date';
+z.string.ru.conversation_tweet_author = ' в Twitter';
 
 z.string.ru.collection_show_all = 'Показать все %no';
 z.string.ru.collection_section_links = 'Ссылки';
@@ -441,6 +443,7 @@ z.string.ru.upload_google_button_again = 'Повторить';
 z.string.ru.url_password_reset = 'forgot/?hl=ru';
 z.string.ru.url_legal = 'https://wire.com/legal/';
 z.string.ru.url_privacy = 'https://wire.com/privacy/';
+z.string.ru.url_privacy_how = 'https://wire.com/privacy/how/';
 z.string.ru.url_privacy_why = 'https://wire.com/privacy/why/';
 z.string.ru.url_support = 'https://support.wire.com';
 z.string.ru.url_terms_of_use = 'https://wire.com/legal/terms/';
@@ -482,6 +485,7 @@ z.string.ru.warning_connectivity_connection_lost = 'Пытаемся подкл�
 z.string.ru.warning_connectivity_no_internet = 'Отсутсвует подключение к интернету. Вы не сможете отправлять и получать сообщения.';
 
 z.string.ru.warning_lifecycle_update = 'Доступна новая версия Wire.';
+z.string.ru.warning_lifecycle_update_notes = 'Что нового';
 z.string.ru.warning_lifecycle_update_link = 'Обновить сейчас';
 
 z.string.ru.system_notification_asset_add = 'Поделился(-лась) картинкой';

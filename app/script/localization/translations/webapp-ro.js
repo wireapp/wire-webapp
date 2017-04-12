@@ -19,6 +19,7 @@
 
 'use strict';
 
+z.string.ro.wire = 'Wire';
 z.string.ro.wire_macos = 'Wire pentru macOS';
 z.string.ro.wire_windows = 'Wire pentru Windows';
 z.string.ro.wire_linux = 'Wire pentru Linux';
@@ -242,6 +243,7 @@ z.string.ro.conversation_delete_timestamp = 'A fost șters la %@timestamp';
 z.string.ro.conversation_edit_timestamp = 'A fost editat la %@timestamp';
 z.string.ro.conversation_likes_caption = '%@number persoane';
 z.string.ro.conversation_send_pasted_file = 'A postat o imagine pe %date';
+z.string.ro.conversation_tweet_author = ' pe Twitter';
 
 z.string.ro.collection_show_all = 'Arată toate %no';
 z.string.ro.collection_section_links = 'Legături';
@@ -438,8 +440,10 @@ z.string.ro.upload_google_headline_error = 'Ceva\na mers prost.';
 z.string.ro.upload_google_message_error = 'Nu am primit nicio informație. Încearcă importarea contactelor din nou.';
 z.string.ro.upload_google_button_again = 'Reîncearcă';
 
+z.string.ro.url_password_reset = 'forgot/';
 z.string.ro.url_legal = 'https://wire.com/legal/';
 z.string.ro.url_privacy = 'https://wire.com/privacy/';
+z.string.ro.url_privacy_how = 'https://wire.com/privacy/how/';
 z.string.ro.url_privacy_why = 'https://wire.com/privacy/why/';
 z.string.ro.url_support = 'https://support.wire.com';
 z.string.ro.url_terms_of_use = 'https://wire.com/legal/terms/';
@@ -481,6 +485,7 @@ z.string.ro.warning_connectivity_connection_lost = 'Se încearcă conectarea. Wi
 z.string.ro.warning_connectivity_no_internet = 'Nu este conexiune la internet. Nu vei putea trimite sau primi mesaje.';
 
 z.string.ro.warning_lifecycle_update = 'Este disponibilă o nouă versiune de Wire.';
+z.string.ro.warning_lifecycle_update_notes = 'Ce mai e nou';
 z.string.ro.warning_lifecycle_update_link = 'Actualizează acum';
 
 z.string.ro.system_notification_asset_add = 'A împărtășit o imagine';

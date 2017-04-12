@@ -19,6 +19,7 @@
 
 'use strict';
 
+z.string.sk.wire = 'Wire';
 z.string.sk.wire_macos = 'Wire pre macOS';
 z.string.sk.wire_windows = 'Wire pre Windows';
 z.string.sk.wire_linux = 'Wire pre Linux';
@@ -362,6 +363,7 @@ z.string.sk.preferences_devices = 'Zariadenia';
 z.string.sk.preferences_headline = 'Nastavenia';
 z.string.sk.preferences_options = 'Možnosti';
 
+z.string.sk.preferences_about_copyright = '© Wire Swiss GmbH';
 z.string.sk.preferences_about_privacy_policy = 'Pravidlá ochrany súkromia';
 z.string.sk.preferences_about_support = 'Podpora';
 z.string.sk.preferences_about_support_website = 'Webová lokalita podpory';
@@ -438,7 +440,24 @@ z.string.sk.upload_google_headline_error = 'Niečo sa pokazilo.';
 z.string.sk.upload_google_message_error = 'Neprijali sme Vaše informácie. Skúste prosím znovu importovať Vaše kontakty.';
 z.string.sk.upload_google_button_again = 'Skúsiť znova';
 
+z.string.sk.url_legal = 'https://wire.com/legal/';
+z.string.sk.url_privacy = 'https://wire.com/legal/';
+z.string.sk.url_privacy_how = 'https://wire.com/privacy/how/';
+z.string.sk.url_privacy_why = 'https://wire.com/privacy/Why/';
+z.string.sk.url_support = 'https://support.wire.com';
+z.string.sk.url_terms_of_use = 'https://wire.com/legal/terms/';
+z.string.sk.url_wire = 'https://wire.com';
+z.string.sk.url_wire_for_web = 'https://app.wire.com';
+z.string.sk.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
+z.string.sk.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
 z.string.sk.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
+z.string.sk.url_support_contact = 'https://support.wire.com/hc/en-us/requests/new';
+z.string.sk.url_support_contact_bug = 'https://support.wire.com/hc/en-us/requests/new?ticket_form_id=101615';
+z.string.sk.url_support_history = 'https://support.wire.com/hc/en-us/articles/207834645';
+z.string.sk.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/articles/202590081';
+z.string.sk.url_support_mic_not_found = 'https://support.wire.com/hc/en-us/articles/202970662';
+z.string.sk.url_support_screen_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
+z.string.sk.url_support_screen_whitelist = 'https://support.wire.com/hc/en-us/articles/209423889';
 z.string.sk.url_support_usernames = 'https://wire.com/support/username';
 z.string.sk.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
 z.string.sk.url_decrypt_error_2 = 'https://wire.com/privacy/error-2';

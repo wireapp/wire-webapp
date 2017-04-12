@@ -242,6 +242,7 @@ z.string.pt.conversation_delete_timestamp = 'Excluído em %@timestamp';
 z.string.pt.conversation_edit_timestamp = 'Editado em %@timestamp';
 z.string.pt.conversation_likes_caption = '%@number pessoas';
 z.string.pt.conversation_send_pasted_file = 'Imagem postada em %date';
+z.string.pt.conversation_tweet_author = ' no Twitter';
 
 z.string.pt.collection_show_all = 'Mostrar todas %no';
 z.string.pt.collection_section_links = 'Links';
@@ -481,6 +482,7 @@ z.string.pt.warning_connectivity_connection_lost = 'Tentando-se conectar. Wire p
 z.string.pt.warning_connectivity_no_internet = 'Sem Internet. Não será capaz de enviar ou receber mensagens.';
 
 z.string.pt.warning_lifecycle_update = 'Uma nova versão do Wire está disponível.';
+z.string.pt.warning_lifecycle_update_notes = 'Novidades';
 z.string.pt.warning_lifecycle_update_link = 'Atualizar agora';
 
 z.string.pt.system_notification_asset_add = 'Compartilhou uma imagem';
