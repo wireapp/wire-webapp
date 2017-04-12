@@ -376,7 +376,7 @@ window.TestFactory.prototype.exposeCallingActors = function () {
 
 /**
  *
- * @returns {Promise<z.SystemNotification.SystemNotificationRepository>} The repository for system notifications.
+ * @returns {Promise<z.system_notification.SystemNotificationRepository>} The repository for system notifications.
  */
 window.TestFactory.prototype.exposeSystemNotificationActors = function () {
   const self = this;
@@ -392,7 +392,7 @@ window.TestFactory.prototype.exposeSystemNotificationActors = function () {
   .then(function() {
     self.logger.info('✓ exposedCallingActors');
 
-    window.system_notification_repository = new z.SystemNotification.SystemNotificationRepository(window.v2_call_center, window.conversation_repository);
+    window.system_notification_repository = new z.system_notification.SystemNotificationRepository(window.v2_call_center, window.conversation_repository);
     window.system_notification_repository.logger.level = self.settings.logging_level;
 
     return window.system_notification_repository;
