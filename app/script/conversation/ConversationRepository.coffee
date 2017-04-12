@@ -924,7 +924,9 @@ class z.conversation.ConversationRepository
   send_asset_preview: (conversation_et, file, message_id) =>
     poster(file)
     .then (image_blob) =>
-      @asset_service.upload_asset image_blob
+      if not image_blob?
+        throw Error 'No image available'
+      return @asset_service.upload_asset image_blob
       .then (uploaded_image_asset) =>
         asset = new z.proto.Asset()
         asset.set 'preview', new z.proto.Asset.Preview image_blob.type, image_blob.size, uploaded_image_asset.uploaded
@@ -932,9 +934,7 @@ class z.conversation.ConversationRepository
         generic_message.set 'asset', asset
         @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) =>
-      unless error.message.startsWith 'Failed to capture poster frame'
-        throw error
-        @logger.warn "Failed to upload otr asset-preview for conversation #{conversation_et.id}: #{error.message}", error
+      @logger.warn "Failed to upload otr asset-preview for conversation #{conversation_et.id}: #{error.message}", error
 
   ###
   Send asset upload failed message to specified conversation.
