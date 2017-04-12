@@ -24,7 +24,7 @@ z.localization = z.localization || {};
 
 class Localizer {
   constructor() {
-    let param = z.util.get_url_parameter(z.auth.URLParameter.LOCALE);
+    const param = z.util.get_url_parameter(z.auth.URLParameter.LOCALE);
     if (param) {
       z.util.StorageUtil.set_value(z.storage.StorageKey.LOCALIZATION.LOCALE, param);
     }
@@ -59,7 +59,7 @@ class Localizer {
       }
     }
     if (args.length !== 0) {
-      for (let arg of args) {
+      for (const arg of args) {
         const reg = new RegExp(arg.placeholder, 'gm');
         s = s.replace(reg, arg.content);
       }

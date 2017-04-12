@@ -26,7 +26,7 @@
  * @returns {Window.TestFactory} A TestFactory instance.
  * @constructor
  */
-window.TestFactory = function (logger_level) {
+window.TestFactory = function(logger_level) {
   if (!logger_level) {
     logger_level = z.util.Logger.prototype.levels.ERROR;
   }
@@ -51,7 +51,7 @@ window.TestFactory = function (logger_level) {
  *
  * @returns {Promise<z.audio.AudioRepository>} The audio repository.
  */
-window.TestFactory.prototype.exposeAudioActors = function () {
+window.TestFactory.prototype.exposeAudioActors = function() {
   const self = this;
   self.logger.info('- exposeAudioActors');
   return Promise.resolve()
@@ -66,7 +66,7 @@ window.TestFactory.prototype.exposeAudioActors = function () {
  *
  * @returns {Promise<z.auth.AuthRepository>} The authentication repository.
  */
-window.TestFactory.prototype.exposeAuthActors = function () {
+window.TestFactory.prototype.exposeAuthActors = function() {
   const self = this;
   self.logger.info('- exposeAuthActors');
   return Promise.resolve()
@@ -84,7 +84,7 @@ window.TestFactory.prototype.exposeAuthActors = function () {
  *
  * @returns {Promise<z.storage.StorageRepository>} The storage repository.
  */
-window.TestFactory.prototype.exposeStorageActors = function () {
+window.TestFactory.prototype.exposeStorageActors = function() {
   const self = this;
   self.logger.info('- exposeStorageActors');
   return Promise.resolve()
@@ -104,7 +104,7 @@ window.TestFactory.prototype.exposeStorageActors = function () {
  *
  * @returns {Promise<z.cryptography.CryptographyRepository>} The cryptography repository.
  */
-window.TestFactory.prototype.exposeCryptographyActors = function () {
+window.TestFactory.prototype.exposeCryptographyActors = function() {
   const self = this;
   self.logger.info('- exposeCryptographyActors');
   return Promise.resolve()
@@ -133,7 +133,7 @@ window.TestFactory.prototype.exposeCryptographyActors = function () {
  *
  * @returns {Promise<z.client.ClientRepository>} The client repository.
  */
-window.TestFactory.prototype.exposeClientActors = function () {
+window.TestFactory.prototype.exposeClientActors = function() {
   const self = this;
   self.logger.info('- exposeClientActors');
   return Promise.resolve()
@@ -145,7 +145,7 @@ window.TestFactory.prototype.exposeClientActors = function () {
 
     const client = new z.client.Client({'address': '192.168.0.1', 'id': '60aee26b7f55a99f', 'class': 'desktop'});
 
-    let user = new z.entity.User(entities.user.john_doe.id);
+    const user = new z.entity.User(entities.user.john_doe.id);
     user.devices.push(client);
     user.email(entities.user.john_doe.email);
     user.is_me = true;
@@ -159,7 +159,7 @@ window.TestFactory.prototype.exposeClientActors = function () {
     window.client_repository = new z.client.ClientRepository(client_service, window.cryptography_repository);
     window.client_repository.logger.level = self.settings.logging_level;
     window.client_repository.init(user);
-    const payload = {'cookie':'webapp@2153234453@temporary@1470926647664','time':'2016-10-07T16:01:42.133Z','location':{'lat':52.5233,'lon':13.4138},'address':'62.96.148.44','model':'Chrome (Temporary)','id':'132b3653b33f851f','type':'temporary','class':'desktop','label':'Windows 10','meta':{'is_verified':true,'primary_key':'local_identity'}};
+    const payload = {'cookie': 'webapp@2153234453@temporary@1470926647664', 'time': '2016-10-07T16:01:42.133Z', 'location': {'lat': 52.5233, 'lon': 13.4138}, 'address': '62.96.148.44', 'model': 'Chrome (Temporary)', 'id': '132b3653b33f851f', 'type': 'temporary', 'class': 'desktop', 'label': 'Windows 10', 'meta': {'is_verified': true, 'primary_key': 'local_identity'}};
     const current_client = new z.client.Client(payload);
     window.client_repository.current_client(current_client);
 
@@ -171,14 +171,14 @@ window.TestFactory.prototype.exposeClientActors = function () {
  *
  * @returns {Promise<z.event.EventRepository>} The event repository.
  */
-window.TestFactory.prototype.exposeEventActors = function () {
+window.TestFactory.prototype.exposeEventActors = function() {
   const self = this;
   self.logger.info('- exposeEventActors');
   return Promise.resolve()
   .then(function() {
     return self.exposeCryptographyActors();
   })
-  .then(function () {
+  .then(function() {
     self.logger.info('✓ exposedCryptographyActors');
 
     window.web_socket_service = new z.event.WebSocketService(self.client, window.storage_service);
@@ -202,7 +202,7 @@ window.TestFactory.prototype.exposeEventActors = function () {
  *
  * @returns {Promise<z.user.UserRepository>} The user repository.
  */
-window.TestFactory.prototype.exposeUserActors = function () {
+window.TestFactory.prototype.exposeUserActors = function() {
   const self = this;
   self.logger.info('- exposeUserActors');
   return Promise.resolve()
@@ -233,7 +233,7 @@ window.TestFactory.prototype.exposeUserActors = function () {
  *
  * @returns {Promise<z.connect.ConnectRepository>} The connect repository.
  */
-window.TestFactory.prototype.exposeConnectActors = function () {
+window.TestFactory.prototype.exposeConnectActors = function() {
   const self = this;
   self.logger.info('- exposeConnectActors');
   return Promise.resolve()
@@ -260,7 +260,7 @@ window.TestFactory.prototype.exposeConnectActors = function () {
  *
  * @returns {Promise<z.search.SearchRepository>} The search repository.
  */
-window.TestFactory.prototype.exposeSearchActors = function () {
+window.TestFactory.prototype.exposeSearchActors = function() {
   const self = this;
   self.logger.info('- exposeSearchActors');
   return Promise.resolve()
@@ -284,7 +284,7 @@ window.TestFactory.prototype.exposeSearchActors = function () {
  *
  * @returns {Promise<z.conversation.ConversationRepository>} The conversation repository.
  */
-window.TestFactory.prototype.exposeConversationActors = function () {
+window.TestFactory.prototype.exposeConversationActors = function() {
   const self = this;
   self.logger.info('- exposeConversationActors');
   return Promise.resolve()
@@ -314,7 +314,7 @@ window.TestFactory.prototype.exposeConversationActors = function () {
  *
  * @returns {Promise<z.media.MediaRepository>} The media repository.
  */
-window.TestFactory.prototype.exposeMediaActors = function () {
+window.TestFactory.prototype.exposeMediaActors = function() {
   const self = this;
   self.logger.info('- exposeMediaActors');
   return Promise.resolve()
@@ -339,7 +339,7 @@ window.TestFactory.prototype.exposeMediaActors = function () {
  *
  * @returns {Promise<z.calling.CallCenter>} The call center.
  */
-window.TestFactory.prototype.exposeCallingActors = function () {
+window.TestFactory.prototype.exposeCallingActors = function() {
   const self = this;
   self.logger.info('- exposeCallingActors');
   return Promise.resolve()
@@ -378,7 +378,7 @@ window.TestFactory.prototype.exposeCallingActors = function () {
  *
  * @returns {Promise<z.system_notification.SystemNotificationRepository>} The repository for system notifications.
  */
-window.TestFactory.prototype.exposeSystemNotificationActors = function () {
+window.TestFactory.prototype.exposeSystemNotificationActors = function() {
   const self = this;
   self.logger.info('- exposeSystemNotificationActors');
   return Promise.resolve()
@@ -403,7 +403,7 @@ window.TestFactory.prototype.exposeSystemNotificationActors = function () {
  *
  * @returns {Promise<z.tracking.EventTrackingRepository>} The event tracking repository.
  */
-window.TestFactory.prototype.exposeTrackingActors = function () {
+window.TestFactory.prototype.exposeTrackingActors = function() {
   const self = this;
   self.logger.info('- exposeTrackingActors');
   return Promise.resolve()
@@ -424,7 +424,7 @@ window.TestFactory.prototype.exposeTrackingActors = function () {
  *
  * @returns {Promise<z.announce.AnnounceRepository>} The repository for announcements.
  */
-window.TestFactory.prototype.exposeAnnounceActors = function () {
+window.TestFactory.prototype.exposeAnnounceActors = function() {
   const self = this;
   self.logger.info('- exposeAnnounceActors');
   return Promise.resolve()

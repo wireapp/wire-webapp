@@ -540,7 +540,7 @@ z.client.ClientRepository = class ClientRepository {
     return this.client_service.get_clients()
     .then((response) => this._update_clients_for_user(this.self_user().id, response))
     .then((client_ets) => {
-      for (let client_et of client_ets) {
+      for (const client_et of client_ets) {
         this.self_user().add_client(client_et);
       }
       return this.self_user().devices();
@@ -575,7 +575,7 @@ z.client.ClientRepository = class ClientRepository {
       });
       for (const client_id of client_ids) {
         let deleted_client = true;
-        for (let client_et of client_ets) {
+        for (const client_et of client_ets) {
           if (client_et.id === client_id) {
             deleted_client = false;
             break;
@@ -656,9 +656,11 @@ z.client.ClientRepository = class ClientRepository {
       }
 
       return Promise.all(promises);
-    }).then((new_records) => {
+    })
+    .then((new_records) => {
       return this.client_mapper.map_clients(clients_stored_in_db.concat(new_records));
-    }).catch((error) => {
+    })
+    .catch((error) => {
       this.logger.error(`Unable to retrieve clients for user '${user_id}': ${error.message}`, error);
       throw error;
     });

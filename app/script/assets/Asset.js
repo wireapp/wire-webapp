@@ -56,7 +56,7 @@ z.assets.Asset = class Asset {
    */
   get_content_disposition() {
     const payload = ['zasset'];
-    for (let key in this.payload) {
+    for (const key in this.payload) {
       const value = this.payload[key];
       payload.push(`${key}=${value}`);
     }
