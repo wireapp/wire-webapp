@@ -34,7 +34,7 @@ module.exports =
 
   js:
     files: '<%= dir.app_ %>/**/*.js'
-    tasks: ['copy:dist_js']
+    tasks: ['newer:copy:dist_js']
 
   templates:
     files: '<%= dir.app_ %>/**/*.htm*'
