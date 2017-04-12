@@ -118,7 +118,8 @@ z.assets.AssetService = class AssetService {
       small_profile_asset.payload.tag = z.assets.ImageSizeType.SMALL_PROFILE;
 
       return this.post_asset_pair(small_profile_asset, medium_asset);
-    }).then(([small_response, medium_response]) => {
+    })
+    .then(([small_response, medium_response]) => {
       return [small_response.data, medium_response.data];
     });
   }
@@ -132,7 +133,8 @@ z.assets.AssetService = class AssetService {
     return Promise.all([
       this._compress_profile_image(image),
       this._compress_image(image),
-    ]).then(([small, medium]) => {
+    ])
+    .then(([small, medium]) => {
       const [, small_image_bytes] = small;
       const [, medium_image_bytes] = medium;
 
@@ -140,7 +142,8 @@ z.assets.AssetService = class AssetService {
         this.post_asset_v3(small_image_bytes, {public: true}),
         this.post_asset_v3(medium_image_bytes, {public: true}),
       ]);
-    }).then(([small_credentials, medium_credentials]) => {
+    })
+    .then(([small_credentials, medium_credentials]) => {
       return [small_credentials.key, medium_credentials.key];
     });
   }
@@ -179,7 +182,8 @@ z.assets.AssetService = class AssetService {
     return z.util.load_file_buffer(file)
     .then((buffer) => {
       return this._upload_asset(buffer, options, xhr_accessor_function);
-    }).then(function([key_bytes, sha256, key, token]) {
+    })
+    .then(function([key_bytes, sha256, key, token]) {
       const asset = new z.proto.Asset();
       asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256, key, token));
       return asset;
@@ -317,10 +321,10 @@ z.assets.AssetService = class AssetService {
       }
 
       image_data = new Uint8Array(image_data);
-      let data = this._create_asset_multipart_body(image_data, json_payload);
-      let { pending_uploads } = this;
+      const data = this._create_asset_multipart_body(image_data, json_payload);
+      const {pending_uploads} = this;
 
-      let xhr = new XMLHttpRequest();
+      const xhr = new XMLHttpRequest();
       xhr.open('POST', url);
       xhr.setRequestHeader('Content-Type', `multipart/mixed; boundary=${this.BOUNDARY}`);
       xhr.setRequestHeader('Authorization', `${this.client.access_token_type} ${this.client.access_token}`);
@@ -394,7 +398,7 @@ z.assets.AssetService = class AssetService {
    * @returns {undefined} No return value
    */
   cancel_asset_upload(upload_id) {
-    let xhr = this.pending_uploads[upload_id];
+    const xhr = this.pending_uploads[upload_id];
     if (xhr != null) {
       xhr.abort();
       delete this.pending_uploads[upload_id];
@@ -412,7 +416,7 @@ z.assets.AssetService = class AssetService {
     .then(([compressed_image, compressed_bytes]) => {
       return z.assets.AssetCrypto.encrypt_aes_asset(compressed_bytes)
       .then(([key_bytes, sha256, ciphertext]) => {
-        let image_asset = new z.proto.ImageAsset();
+        const image_asset = new z.proto.ImageAsset();
         image_asset.set_tag(z.assets.ImageSizeType.MEDIUM);
         image_asset.set_width(compressed_image.width);
         image_asset.set_height(compressed_image.height);
@@ -475,7 +479,8 @@ z.assets.AssetService = class AssetService {
         return new Uint8Array(buffer);
       }
       return new z.util.Worker(worker).post(buffer);
-    }).then((compressed_bytes) => {
+    })
+    .then((compressed_bytes) => {
       return Promise.all([
         z.util.load_image(new Blob([compressed_bytes], {'type': image.type})),
         compressed_bytes,

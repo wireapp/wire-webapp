@@ -30,7 +30,7 @@ z.client.Client = class Client {
       this.model = payload.model || '?';
     }
 
-    for (let member in payload) {
+    for (const member in payload) {
       this[member] = payload[member];
     }
 
@@ -82,8 +82,7 @@ z.client.Client = class Client {
    * @returns {Object} Client data as JSON object
    */
   to_json() {
-    let json = ko.toJSON(this);
-    let real_json = JSON.parse(json);
+    const real_json = JSON.parse(ko.toJSON(this));
     delete real_json.session;
     return real_json;
   }

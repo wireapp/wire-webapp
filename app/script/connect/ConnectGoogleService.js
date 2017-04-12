@@ -88,7 +88,9 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
           this.logger.info('Using cached access token to access Google contacts', auth_token);
           return resolve(auth_token.access_token);
         }
-        return this._authenticate().then(resolve).catch(reject);
+        return this._authenticate()
+          .then(resolve)
+          .catch(reject);
       }
 
       this.logger.warn('Google Auth Client for JavaScript not loaded');

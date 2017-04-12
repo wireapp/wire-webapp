@@ -213,7 +213,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     } else if (message_et.has_asset_location()) {
       return z.localization.Localizer.get_text(z.string.system_notification_shared_location);
     } else if (message_et.has_asset()) {
-      let asset_et = message_et.assets()[0];
+      const asset_et = message_et.assets()[0];
       if (asset_et.is_audio()) {
         return z.localization.Localizer.get_text(z.string.system_notification_shared_audio);
       }
