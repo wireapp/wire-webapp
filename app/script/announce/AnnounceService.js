@@ -36,9 +36,11 @@
 
     get_announcements() {
       return new Promise((resolve, reject) => {
-        $.get(this.url).done((data) => {
+        $.get(this.url)
+        .done((data) => {
           resolve(data['result']);
-        }).fail((jqXHR, textStatus, errorThrown) => {
+        })
+        .fail((jqXHR, textStatus, errorThrown) => {
           reject(new Error(errorThrown));
         });
       });
@@ -46,9 +48,11 @@
 
     get_version() {
       return new Promise((resolve, reject) => {
-        $.get('version/').done((data) => {
+        $.get('version/')
+        .done((data) => {
           resolve(data['version']);
-        }).fail((jqXHR, textStatus, errorThrown) => {
+        })
+        .fail((jqXHR, textStatus, errorThrown) => {
           reject(new Error(errorThrown));
         });
       });

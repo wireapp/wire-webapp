@@ -77,7 +77,7 @@
     /**
      * Get invite information.
      *
-     * @param {String} code - Invite code
+     * @param {string} code - Invite code
      * @returns {Promise} Promise that resolves with invitations information.
      */
     get_invitations_info(code) {
@@ -92,8 +92,8 @@
      *
      * @note Don't use our client wrapper here, because to query "/access" we need to set "withCredentials" to "true" in order to send the cookie.
      * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/authenticate
-     * @param {Integer} retry_attempt - Retry attempts when a request fails
-     * @returns {Promise}
+     * @param {number} retry_attempt - Retry attempts when a request fails
+     * @returns {Promise} Promise which resolves with access token data (token_type, etc.).
      */
     post_access(retry_attempt = 1) {
       return new Promise((resolve, reject) => {
@@ -129,7 +129,9 @@
           if (retry_attempt <= AuthService.POST_ACCESS.RETRY_LIMIT) {
             retry_attempt++;
 
-            const _retry = () => this.post_access(retry_attempt).then(resolve).catch(reject);
+            const _retry = () => this.post_access(retry_attempt)
+              .then(resolve)
+              .catch(reject);
 
             if (jqXHR.status === z.service.BackendClientError.prototype.STATUS_CODE.CONNECTIVITY_PROBLEM) {
               this.logger.warn('Access token refresh delayed due to suspected connectivity issue');
@@ -158,7 +160,7 @@
      *
      * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/sendActivationCode
      * @param {Object} send_activation_code - Containing the email or phone number needed to resend activation email
-     * @option {String} send_activation_code - email
+     * @option {string} send_activation_code - email
      * @returns {Promise} Promise that resolves on successful code resend
      */
     post_activate_send(send_activation_code) {
@@ -172,9 +174,10 @@
     /**
      * Delete all cookies on the backend.
      *
-     * @param {String} email - The user's e-mail address
-     * @param {String} password - The user's password
-     * @param {Array} labels - A list of cookie labels to remove from the system (optional)
+     * @param {string} email - The user's e-mail address
+     * @param {string} password - The user's password
+     * @param {string[]} labels - A list of cookie labels to remove from the system (optional)
+     * @returns {jQuery.jqXHR} A superset of the XMLHTTPRequest object.
      */
     post_cookies_remove(email, password, labels) {
       return this.client.send_json({
@@ -195,10 +198,10 @@
      * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/login
      *
      * @param {Object} login - Containing sign in information
-     * @option {String} login - email The email address for a password login
-     * @option {String} login - phone The phone number for a password or SMS login
-     * @option {String} login - password The password for a password login
-     * @option {String} login - code The login code for an SMS login
+     * @option {string} login - email The email address for a password login
+     * @option {string} login - phone The phone number for a password or SMS login
+     * @option {string} login - password The password for a password login
+     * @option {string} login - code The login code for an SMS login
      * @param {Boolean} persist - Request a persistent cookie instead of a session cookie
      * @returns {Promise} Promise that resolves with access token
      */
@@ -256,6 +259,7 @@
     /**
      * Logout on the backend side.
      * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/auth/logout
+     * @returns {jQuery.jqXHR} A superset of the XMLHTTPRequest object.
      */
     post_logout() {
       return this.client.send_json({
@@ -271,10 +275,10 @@
      * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/register
      *
      * @param {Object} new_user - Containing the email, username and password needed for account creation
-     * @option {String} new_user - name
-     * @option {String} new_user - email
-     * @option {String} new_user - password
-     * @option {String} new_user - locale
+     * @option {string} new_user - name
+     * @option {string} new_user - email
+     * @option {string} new_user - password
+     * @option {string} new_user - locale
      * @returns {Promise} Promise that will resolve on success
      */
     post_register(new_user) {
@@ -307,8 +311,9 @@
     /**
      * Save the access token date in the client.
      *
-     * @param {String} type - Access token type
-     * @param {String} value - Access token
+     * @param {string} type - Access token type
+     * @param {string} value - Access token
+     * @returns {undefined}
      */
     save_access_token_in_client(type = '', value = '') {
       this.client.access_token_type = type;

@@ -22,36 +22,34 @@ z.ViewModel ?= {}
 class z.ViewModel.LoadingViewModel
   constructor: (element_id, @user_repository) ->
     @loading_message = ko.observable ''
-    @loading_step_current = ko.observable 0
-    @loading_step_percentage = ko.observable 0
-    @loading_step_total = 10
+    @loading_progress = ko.observable 0
+    @loading_percentage = ko.pureComputed =>
+      return "#{@loading_progress()}%"
 
-    amplify.subscribe z.event.WebApp.APP.UPDATE_INIT, @switch_message
+    amplify.subscribe z.event.WebApp.APP.UPDATE_PROGRESS, @update_progress
 
     ko.applyBindings @, document.getElementById element_id
 
-  switch_message: (message_locator, next_step = false, replace_content) =>
-    if not z.util.Environment.frontend.is_production()
-      _create_message = (message_locator, replacements) ->
-        replacements = ({placeholder: replacement[0], content: replacement[1]} for replacement in replacements)
-        return z.localization.Localizer.get_text
-          id: message_locator
-          replace: replacements
+  update_progress: (progress = 0, message_locator, replace_content) =>
+    if progress > @loading_progress()
+      @loading_progress progress
+    else
+      @loading_progess @loading_progress() + .01
 
+    if message_locator and not z.util.Environment.frontend.is_production()
       @loading_message switch message_locator
         when z.string.init_received_self_user
-          _create_message message_locator, [['%name', @user_repository.self().first_name()]]
-        when z.string.init_events_expectation
-          if replace_content[0] > 200
-            message_locator = z.string.init_events_expectation_long
-          _create_message message_locator, [['%events', replace_content[0]]]
+          z.localization.Localizer.get_text
+            id: message_locator
+            replace:
+              placeholder: '%name'
+              content: @user_repository.self().first_name()
         when z.string.init_events_progress
-          _create_message message_locator, [['%progress', replace_content[0]], ['%total', replace_content[1]]]
+          z.localization.Localizer.get_text
+            id: message_locator
+            replace: [
+              {placeholder: '%progress', content: replace_content[0]}
+              {placeholder: '%total', content: replace_content[1]}
+            ]
         else
           z.localization.Localizer.get_text message_locator
-
-    @_next_step() if next_step
-
-  _next_step: ->
-    @loading_step_current (@loading_step_current() + 1) % @loading_step_total
-    @loading_step_percentage "#{@loading_step_current() / @loading_step_total * 100}%"

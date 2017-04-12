@@ -24,12 +24,12 @@ window.z.assets = z.assets || {};
 
 z.assets.Asset = class Asset {
 
-  /*
-  Construct a new asset for the asset service.
-
-  @deprecated
-  @param {Object} config - Asset configuration
-  */
+  /**
+   * Construct a new asset for the asset service.
+   *
+   * @deprecated
+   * @param {Object} config - Asset configuration
+   */
   constructor(config) {
     this.correlation_id = config.correlation_id || z.util.create_random_uuid();
     this.content_type = config.content_type;
@@ -50,12 +50,13 @@ z.assets.Asset = class Asset {
     };
   }
 
-  /*
-  Create the content disposition header for the asset.
-  */
+  /**
+   * Create the content disposition header for the asset.
+   * @returns {string} Content disposition header
+   */
   get_content_disposition() {
     const payload = ['zasset'];
-    for (let key in this.payload) {
+    for (const key in this.payload) {
       const value = this.payload[key];
       payload.push(`${key}=${value}`);
     }

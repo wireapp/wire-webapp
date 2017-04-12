@@ -28,7 +28,7 @@ class z.conversation.ConversationError
     @message = switch @type
       when z.conversation.ConversationError::TYPE.CONVERSATION_NOT_FOUND
         'Conversation not found'
-      when z.conversation.ConversationError::DEGRADED_CONVERSATION_CANCELLATION
+      when z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
         'Sending to degraded conversation was canceled by user'
       when z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         'Message not found'

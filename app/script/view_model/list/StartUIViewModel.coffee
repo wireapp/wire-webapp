@@ -194,7 +194,7 @@ class z.ViewModel.list.StartUIViewModel
     import_promise.then (response) =>
       @_show_onboarding_results response
     .catch (error) =>
-      if error.type isnt z.connect.ConnectError::TYPE.NO_CONTACTS
+      if error.type isnt z.connect.ConnectError.TYPE.NO_CONTACTS
         @logger.error "Importing contacts from '#{source}' failed: #{error.message}", error
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CONTACTS, action: =>
           @import_contacts source
@@ -205,13 +205,13 @@ class z.ViewModel.list.StartUIViewModel
   _show_onboarding_results: (response) =>
     @search_repository.show_onboarding response
     .then ([connected_user_ets, suggested_user_ets]) =>
-      @contacts connected_user_ets
+      @connections connected_user_ets
       @suggestions suggested_user_ets
       return @get_top_people()
     .then (user_ets) =>
       @top_users user_ets
       @selected_people.removeAll()
-      if not @suggestions().length and not @contacts().length
+      if not @suggestions().length and not @connections().length
         if @top_users().length > 0
           @suggestions @top_users()
         else
