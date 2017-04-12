@@ -66,7 +66,7 @@ z.conversation.ConversationCellState = (() => {
       let message_text = '';
 
       if (last_message_et.is_ping()) {
-        message_text = z.localization.Localizer.get_text(z.string.conversation_ping).trim();
+        message_text = z.localization.Localizer.get_text(z.string.system_notification_ping);
       } else if (last_message_et.has_asset_text()) {
         message_text = last_message_et.get_first_asset().text;
       } else if (last_message_et.has_asset()) {
