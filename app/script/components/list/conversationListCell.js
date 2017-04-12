@@ -40,7 +40,7 @@ ko.components.register('conversation-list-cell', {
   },
   template: `
     <div class="conversation-list-cell" data-bind="css: {'conversation-list-cell-active': is_selected(conversation)}">
-      <div class="conversation-list-cell-left">
+      <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation()}">
         <!-- ko if: conversation.is_group() -->
           <group-avatar params="conversation: conversation"></group-avatar>
         <!-- /ko -->

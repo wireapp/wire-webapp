@@ -33,12 +33,24 @@ z.conversation.ConversationCellState = (() => {
     },
   };
 
+  const removed_state = {
+    match(conversation_et) {
+      return conversation_et.removed_from_conversation();
+    },
+    description() {
+      return '';
+    },
+    icon() {
+      return z.conversation.ConversationStatusIcon.NONE;
+    },
+  };
+
   const muted_state = {
     match(conversation_et) {
       return conversation_et.is_muted();
     },
     description() {
-      return 'muted';
+      return '';
     },
     icon() {
       return z.conversation.ConversationStatusIcon.MUTED;
@@ -49,8 +61,18 @@ z.conversation.ConversationCellState = (() => {
     match(conversation_et) {
       return conversation_et.unread_message_count() > 0;
     },
-    description() {
-      return 'unread messages';
+    description(conversation_et) {
+      const last_message_et = conversation_et.get_last_message();
+      let message_text = '';
+
+      if (last_message_et.has_asset_text()) {
+        message_text = last_message_et.get_first_asset().text;
+      }
+
+      if (conversation_et.is_group()) {
+        message_text = `${last_message_et.sender_name()}: ${message_text}`;
+      }
+      return message_text;
     },
     icon() {
       return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
@@ -59,7 +81,7 @@ z.conversation.ConversationCellState = (() => {
 
   function generate(conversation_et) {
     console.debug('generate');
-    const states = [muted_state, new_message_state];
+    const states = [removed_state, muted_state, new_message_state];
     const icon_state = states.find((state) => state.match(conversation_et));
     const description_state = states.find((state) => state.match(conversation_et));
 
