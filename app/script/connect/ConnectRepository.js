@@ -104,7 +104,7 @@ z.connect.ConnectRepository = class ConnectRepository {
           case z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD:
             throw error;
           case z.connect.ConnectError.TYPE.NO_CONTACTS:
-            return [];
+            return {};
         }
         if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
           this.logger.error('Backend refused macOS contacts upload: Endpoint used too frequent', error);
@@ -135,7 +135,7 @@ z.connect.ConnectRepository = class ConnectRepository {
         case z.connect.ConnectError.TYPE.GOOGLE_DOWNLOAD:
           throw error;
         case z.connect.ConnectError.TYPE.NO_CONTACTS:
-          return [];
+          return {};
       }
       if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
         return this.logger.error('Backend refused macOS contacts upload: Endpoint used too frequent');
@@ -180,7 +180,7 @@ z.connect.ConnectRepository = class ConnectRepository {
       const address_book = window.wAddressBook;
       const phone_book = new z.connect.PhoneBook(this.properties_repository.self());
 
-      const {email: self_emails, numbers: self_numbers} = address_book.getMe();
+      const {emails: self_emails, numbers: self_numbers} = address_book.getMe();
       self_emails.forEach((email) => {
         phone_book.self.push(email);
       });
