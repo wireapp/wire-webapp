@@ -113,7 +113,7 @@ class z.ViewModel.list.ListViewModel
       when z.ViewModel.list.LIST_STATE.START_UI
         @start_ui.update_list()
       when z.ViewModel.list.LIST_STATE.PREFERENCES
-        @content_view_model.switch_content z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
+        amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
       else
         @first_run false
         @content_view_model.switch_previous_content()

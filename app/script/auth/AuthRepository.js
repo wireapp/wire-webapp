@@ -74,9 +74,11 @@ window.z.auth.AuthRepository = class AuthRepository {
    * @returns {Promise} Promise that will always resolve
    */
   logout() {
-    return this.auth_service.post_logout().then(() => {
+    return this.auth_service.post_logout()
+    .then(() => {
       this.logger.info('Log out on backend successful');
-    }).catch((error) => {
+    })
+    .catch((error) => {
       this.logger.warn(`Log out on backend failed: ${error.message}`, error);
     });
   }
@@ -111,7 +113,7 @@ window.z.auth.AuthRepository = class AuthRepository {
    *
    * @param {Object} send_activation_code - Containing the email or phone number needed to resend activation email
    * @option {string} send_activation_code - email
-   * @return {Promise} Promise that resolves on success
+   * @returns {Promise} Promise that resolves on success
    */
   resend_activation(send_activation_code) {
     return this.auth_service.post_activate_send(send_activation_code);
@@ -131,7 +133,7 @@ window.z.auth.AuthRepository = class AuthRepository {
    * Request SMS validation code.
    *
    * @param {Object} request_code - Containing the phone number in E.164 format and whether a code should be forced
-   * @return {Promise} Promise that resolve on success
+   * @returns {Promise} Promise that resolve on success
    */
   request_login_code(request_code) {
     return this.auth_service.post_login_send(request_code);
@@ -140,10 +142,12 @@ window.z.auth.AuthRepository = class AuthRepository {
   // Renew access-token provided a valid cookie.
   renew_access_token(trigger) {
     this.logger.info(`Access token renewal started. Source: ${trigger}`);
-    return this.get_access_token().then(() => {
+    return this.get_access_token()
+    .then(() => {
       this.auth_service.client.execute_request_queue();
       return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEWED);
-    }).catch((error) => {
+    })
+    .catch((error) => {
       if ((error.type === z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN) || z.util.Environment.frontend.is_localhost()) {
         this.logger.warn(`Session expired on access token refresh: ${error.message}`, error);
         Raygun.send(error);
@@ -182,7 +186,8 @@ window.z.auth.AuthRepository = class AuthRepository {
       return Promise.reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS));
     }
 
-    return this.auth_service.post_access().then(access_token => {
+    return this.auth_service.post_access()
+    .then((access_token) => {
       this.save_access_token(access_token);
       return access_token;
     }
@@ -260,7 +265,7 @@ window.z.auth.AuthRepository = class AuthRepository {
     if (callback_timestamp < Date.now()) {
       return this.renew_access_token('Immediate on scheduling');
     }
-    let time = z.util.format_timestamp(callback_timestamp, false);
+    const time = z.util.format_timestamp(callback_timestamp, false);
     this.logger.info(`Scheduling next access token refresh for '${time}'`);
 
     return this.access_token_refresh = window.setTimeout(() => {

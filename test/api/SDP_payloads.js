@@ -19,7 +19,7 @@
 
 'use strict';
 
-let sdp_payloads = {
+const sdp_payloads = {
   original: {
     type: 'offer',
     sdp: 'v=0\r\n' +

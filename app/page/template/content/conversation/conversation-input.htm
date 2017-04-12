@@ -17,7 +17,7 @@
       <div class="controls-center">
         <textarea id="conversation-input-text"
                   class="conversation-input-text border-theme"
-                  data-bind="event: {'keydown': on_input_key_down},
+                  data-bind="event: {'keydown': on_input_key_down, 'keyup': on_input_key_up},
                              focus_on_keydown: true,
                              css: {'ephemeral-input': has_ephemeral_timer()},
                              enter: on_input_enter,

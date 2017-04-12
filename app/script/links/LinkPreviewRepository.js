@@ -85,7 +85,7 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
       }
       throw new z.links.LinkPreviewError(z.links.LinkPreviewError.TYPE.UNSUPPORTED_TYPE);
     })
-    .then(link_preview => this._fetch_preview_image(link_preview, open_graph_data.image));
+    .then((link_preview) => this._fetch_preview_image(link_preview, open_graph_data.image));
   }
 
   /*
@@ -125,6 +125,6 @@ z.links.LinkPreviewRepository = class LinkPreviewRepository {
   */
   _upload_preview_image(data_URI) {
     return Promise.resolve(z.util.base64_to_blob(data_URI))
-    .then(blob => this.asset_service.upload_image_asset(blob, {public: true}));
+    .then((blob) => this.asset_service.upload_image_asset(blob, {public: true}));
   }
 };

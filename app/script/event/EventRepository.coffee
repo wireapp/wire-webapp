@@ -80,8 +80,8 @@ class z.event.EventRepository
           @notifications_handled++
 
           if @notifications_handled % 5 is 0
-            replace = [@notifications_handled, @notifications_total]
-            amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_events_progress, false, replace
+            progress = @notifications_handled / @notifications_total * 70 + 25
+            amplify.publish z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events_progress, [@notifications_handled, @notifications_total]
 
       else if @notifications_loaded() and @notification_handling_state() isnt z.event.NotificationHandlingState.WEB_SOCKET
         @logger.info "Done handling '#{@notifications_total}' notifications from the stream"
@@ -174,7 +174,6 @@ class z.event.EventRepository
           else
             @notifications_loaded true
             @logger.info "Fetched '#{@notifications_total}' notifications from the backend"
-            amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_events_expectation, true, [@notifications_total]
 
         else
           @logger.info "No notifications found since '#{notification_id}'", response
@@ -365,10 +364,10 @@ class z.event.EventRepository
           # Handle error
           if decrypt_error instanceof Proteus.errors.DecryptError.DuplicateMessage or decrypt_error instanceof Proteus.errors.DecryptError.OutdatedMessage
             # We don't need to show duplicate message errors to the user
-            throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+            throw new z.cryptography.CryptographyError z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE
           else if decrypt_error instanceof z.cryptography.CryptographyError
-            if decrypt_error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
-              throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+            if decrypt_error.type is z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED
+              throw new z.cryptography.CryptographyError z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE
           else if decrypt_error instanceof Proteus.errors.DecryptError.InvalidMessage or decrypt_error instanceof Proteus.errors.DecryptError.InvalidSignature
             # Session is broken, let's see what's really causing it...
             @logger.error "Session '#{session_id}' with user '#{remote_user_id}' (client '#{remote_client_id}') is broken or out of sync. Reset the session and decryption is likely to work again. Error: #{decrypt_error.message}", decrypt_error
@@ -397,10 +396,10 @@ class z.event.EventRepository
       return saved_event
     .catch (error) ->
       ignored_errors = [
-        z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
-        z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
-        z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
-        z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+        z.cryptography.CryptographyError.TYPE.IGNORED_ASSET
+        z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW
+        z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED
+        z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE
         z.event.EventError::TYPE.OUTDATED_E_CALL_EVENT
       ]
       throw error unless error.type in ignored_errors

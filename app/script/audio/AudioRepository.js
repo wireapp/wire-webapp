@@ -92,7 +92,7 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   _init_sounds() {
-    for (let type in z.audio.AudioType) {
+    for (const type in z.audio.AudioType) {
       const audio_id = z.audio.AudioType[type];
       this.audio_elements[audio_id] = this._create_audio_element(`/audio/${audio_id}.mp3`);
     }
@@ -105,7 +105,7 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @param {z.audio.AudioType} audio_id - Sound identifier
    * @param {HTMLAudioElement} audio_element - AudioElement to play
    * @param {Boolean} play_in_loop - Play sound in loop
-   * @return {Promise} Resolves with the HTMLAudioElement
+   * @returns {Promise} Resolves with the HTMLAudioElement
    */
   _play(audio_id, audio_element, play_in_loop = false) {
     if (!audio_id || !audio_element) {
@@ -148,7 +148,7 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   _preload() {
-    for (let audio_id in this.audio_elements) {
+    for (const audio_id in this.audio_elements) {
       const audio_element = this.audio_elements[audio_id];
       audio_element.preload = 'auto';
       audio_element.load();
@@ -162,7 +162,7 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   _stop_all() {
-    for (let audio_id in this.currently_looping) {
+    for (const audio_id in this.currently_looping) {
       this.stop(audio_id);
     }
   }
@@ -228,13 +228,17 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   play(audio_id, play_in_loop = false) {
-    return this._check_sound_setting(audio_id).then(() => {
+    return this._check_sound_setting(audio_id)
+    .then(() => {
       return this._get_sound_by_id(audio_id);
-    }).then((audio_element) => {
+    })
+    .then((audio_element) => {
       return this._play(audio_id, audio_element, play_in_loop);
-    }).then((audio_element) => {
+    })
+    .then((audio_element) => {
       return this.logger.info(`Playing sound '${audio_id}' (loop: '${play_in_loop}')`, audio_element);
-    }).catch((error) => {
+    })
+    .catch((error) => {
       if (!(error instanceof z.audio.AudioError)) {
         this.logger.error(`Failed playing sound '${audio_id}': ${error.message}`);
         throw error;
@@ -248,7 +252,8 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @returns {undefined}
    */
   stop(audio_id) {
-    return this._get_sound_by_id(audio_id).then((audio_element) => {
+    return this._get_sound_by_id(audio_id)
+    .then((audio_element) => {
       if (!audio_element.paused) {
         this.logger.info(`Stopping sound '${audio_id}'`, audio_element);
         audio_element.pause();
@@ -257,7 +262,8 @@ window.z.audio.AudioRepository = class AudioRepository {
       if (this.currently_looping[audio_id]) {
         delete this.currently_looping[audio_id];
       }
-    }).catch((error) => {
+    })
+    .catch((error) => {
       this.logger.error(`Failed stopping sound '${audio_id}': ${error.message}`);
       throw error;
     });
