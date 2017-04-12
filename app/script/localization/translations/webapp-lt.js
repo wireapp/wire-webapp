@@ -546,20 +546,10 @@ z.string.lt.tooltip_preferences_rename = 'Pakeisti savo vardą';
 
 z.string.lt.tooltip_search_close = 'Užverti (Esc)';
 
-z.string.lt.init_received_access_token = 'Prieiga suteikta';
 z.string.lt.init_received_self_user = 'Sveiki, %name.';
-z.string.lt.init_sessions_expectation = 'Mes turime inicijuoti %sessions seansus';
-z.string.lt.init_sessions_expectation_long = 'Mes turime inicijuoti %sessions seansus';
-z.string.lt.init_sessions_progress = 'Inicijuojami seansai - %progress iš %total';
-z.string.lt.init_initialized_storage = 'Seansai įkelti';
-z.string.lt.init_initialized_cryptography = 'Kriptografija yra pilnai nustatyta';
-z.string.lt.init_validated_client = 'Įkeliami jūsų kontaktai ir pokalbiai';
 z.string.lt.init_received_user_data = 'Tikrinama ar yra naujų žinučių';
-z.string.lt.init_events_expectation = 'Jūs turite %events naujas žinutes';
-z.string.lt.init_events_expectation_long = 'Įkeliama %events naujų žinučių';
 z.string.lt.init_events_progress = 'Įkeliamos žinutės - %progress iš %total';
-z.string.lt.init_updated_from_notifications = 'Beveik paruošta';
-z.string.lt.init_app_pre_loaded = 'Mėgaukitės Wire';
+z.string.lt.init_updated_from_notifications = 'Mėgaukitės Wire';
 
 z.string.lt.ephememal_units_none = 'Išjungta';
 z.string.lt.ephememal_units_second = 'sek.';

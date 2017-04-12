@@ -545,16 +545,9 @@ z.string.sk.tooltip_preferences_rename = 'Zmeniť Vaše meno';
 
 z.string.sk.tooltip_search_close = 'Zavrieť (Esc)';
 
-z.string.sk.init_received_access_token = 'Prístup povolený';
 z.string.sk.init_received_self_user = 'Ahoj, %name%.';
-z.string.sk.init_sessions_expectation = 'Potrebujeme inicializovať %sessions relácie';
-z.string.sk.init_sessions_expectation_long = 'Potrebujeme inicializovať %sessions relácie';
-z.string.sk.init_sessions_progress = 'Inicializácia relácií - %progress z %total';
-z.string.sk.init_initialized_storage = 'Relácie načítané';
 z.string.sk.init_received_user_data = 'Kontrola nových správ';
-z.string.sk.init_events_expectation = 'Máte %events nových správ';
-z.string.sk.init_updated_from_notifications = 'Už tam skoro sme';
-z.string.sk.init_app_pre_loaded = 'Užite si Wire';
+z.string.sk.init_updated_from_notifications = 'Užite si Wire';
 
 z.string.sk.ephememal_units_none = 'Vypnúť';
 z.string.sk.ephememal_units_second = 'sekunda';

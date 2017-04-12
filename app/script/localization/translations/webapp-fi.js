@@ -517,20 +517,10 @@ z.string.fi.tooltip_preferences_rename = 'Vaihda nimesi';
 
 z.string.fi.tooltip_search_close = 'Sulje (Esc)';
 
-z.string.fi.init_received_access_token = 'Pääsy sallittu';
 z.string.fi.init_received_self_user = 'He, %name.';
-z.string.fi.init_sessions_expectation = 'Meidän täytyy alustaa %sessions istuntoja';
-z.string.fi.init_sessions_expectation_long = 'Meidän täytyy alustaa %sessions istuntoja';
-z.string.fi.init_sessions_progress = 'Alustetaan istuntoja - %progress %total';
-z.string.fi.init_initialized_storage = 'Istunnot ladattu';
-z.string.fi.init_initialized_cryptography = 'Salaus on täysin määritetty';
-z.string.fi.init_validated_client = 'Ladataan yhteyksiäsi ja keskustelujasi';
 z.string.fi.init_received_user_data = 'Tarkistetaan uusia viestejä';
-z.string.fi.init_events_expectation = 'Sinulle on %events uutta viestiä';
-z.string.fi.init_events_expectation_long = 'Ladataan %events uutta viestiä';
 z.string.fi.init_events_progress = 'Ladataan viestejä: %progress %total';
-z.string.fi.init_updated_from_notifications = 'Olemme melkein perillä';
-z.string.fi.init_app_pre_loaded = 'Nauti Wirestä';
+z.string.fi.init_updated_from_notifications = 'Nauti Wirestä';
 
 z.string.fi.ephememal_units_none = 'Pois päältä';
 z.string.fi.ephememal_units_second = 'sekunti';

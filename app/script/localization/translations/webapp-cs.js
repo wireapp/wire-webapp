@@ -475,16 +475,9 @@ z.string.cs.tooltip_preferences_rename = 'Změnit jméno';
 
 z.string.cs.tooltip_search_close = 'Zavřít (Esc)';
 
-z.string.cs.init_received_access_token = 'Přístup udělen';
 z.string.cs.init_received_self_user = 'Ahoj, %name.';
-z.string.cs.init_sessions_expectation = 'Je nutné inicializovat %sessions relací';
-z.string.cs.init_sessions_expectation_long = 'Je nutné inicializovat %sessions relací';
-z.string.cs.init_sessions_progress = 'Inicializace relací - %progress z %total';
-z.string.cs.init_initialized_storage = 'Sezení načtená';
 z.string.cs.init_received_user_data = 'Kontrola nových zpráv';
-z.string.cs.init_events_expectation = 'Máte %events nových zpráv';
-z.string.cs.init_updated_from_notifications = 'Už tam skoro jste';
-z.string.cs.init_app_pre_loaded = 'Užívejte si Wire';
+z.string.cs.init_updated_from_notifications = 'Užívejte si Wire';
 
 z.string.cs.ephememal_units_none = 'Vypnout';
 z.string.cs.ephememal_units_second = 'sekunda';

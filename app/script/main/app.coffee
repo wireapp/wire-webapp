@@ -157,24 +157,24 @@ class z.main.App
   init_app: (is_reload = @_is_reload()) =>
     @_load_access_token is_reload
     .then =>
-      @view.loading.switch_message z.string.init_received_access_token, true
+      @view.loading.update_progress 2.5, z.string.init_received_access_token
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN
-      return z.util.protobuf.load_protos "ext/proto/generic-message-proto/messages.proto?#{z.util.Environment.version false}"
-    .then =>
-      @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_PROTO_MESSAGES
-      return @_get_user_self()
-    .then (self_user_et) =>
-      @view.loading.switch_message z.string.init_received_self_user, true
+      return Promise.all [
+        @_get_user_self()
+        z.util.protobuf.load_protos "ext/proto/generic-message-proto/messages.proto?#{z.util.Environment.version false}"
+      ]
+    .then ([self_user_et]) =>
+      @view.loading.update_progress 5, z.string.init_received_self_user
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER
       @repository.client.init self_user_et
       @repository.properties.init self_user_et
       return @repository.cryptography.init @service.storage.db
     .then =>
-      @view.loading.switch_message z.string.init_initialized_cryptography, true
+      @view.loading.update_progress 7.5
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY
       return @repository.client.get_valid_local_client()
     .then (client_observable) =>
-      @view.loading.switch_message z.string.init_validated_client, true
+      @view.loading.update_progress 10, z.string.init_validated_client
 
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type
@@ -182,14 +182,14 @@ class z.main.App
       @repository.cryptography.current_client = client_observable
       @repository.event.current_client = client_observable
       @repository.event.connect_web_socket()
-      promises = [
+
+      return Promise.all [
         @repository.conversation.get_conversations()
         @repository.user.get_connections()
       ]
-      return Promise.all promises
     .then (response_array) =>
       [conversation_ets, connection_ets] = response_array
-      @view.loading.switch_message z.string.init_received_user_data, true
+      @view.loading.update_progress 25, z.string.init_received_user_data
 
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS, conversation_ets.length, 50
@@ -199,7 +199,7 @@ class z.main.App
       @_subscribe_to_beforeunload()
       return @repository.event.initialize_from_notification_stream()
     .then (notifications_count) =>
-      @view.loading.switch_message z.string.init_updated_from_notifications, true
+      @view.loading.update_progress 95, z.string.init_updated_from_notifications
 
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.NOTIFICATIONS, notifications_count, 100
@@ -207,7 +207,7 @@ class z.main.App
       @_watch_online_status()
       return @repository.client.get_clients_for_self()
     .then (client_ets) =>
-      @view.loading.switch_message z.string.init_app_pre_loaded, true
+      @view.loading.update_progress 97.5
 
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED
@@ -217,7 +217,6 @@ class z.main.App
       @_handle_url_params()
     .then =>
       @_show_ui()
-      @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.SHOWING_UI
       @telemetry.report()
       amplify.publish z.event.WebApp.LIFECYCLE.LOADED
       amplify.publish z.event.WebApp.LOADED # todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough

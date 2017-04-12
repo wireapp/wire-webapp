@@ -546,20 +546,12 @@ z.string.fr.tooltip_preferences_rename = 'Changez votre nom';
 
 z.string.fr.tooltip_search_close = 'Fermer (Échap)';
 
-z.string.fr.init_received_access_token = 'Accès accordé';
+z.string.fr.init_received_access_token = 'Connecté';
 z.string.fr.init_received_self_user = 'Bonjour, %name.';
-z.string.fr.init_sessions_expectation = 'Nous devons initialiser %sessions sessions';
-z.string.fr.init_sessions_expectation_long = 'Nous devons initialiser %sessions sessions';
-z.string.fr.init_sessions_progress = 'Initialisation des sessions - %progress sur %total';
-z.string.fr.init_initialized_storage = 'Sessions chargées';
-z.string.fr.init_initialized_cryptography = 'Service de chiffrement prêt';
-z.string.fr.init_validated_client = 'Chargement de vos connexions et de vos conversations';
+z.string.fr.init_validated_client = 'Téléchargement de vos contacts et de vos conversations';
 z.string.fr.init_received_user_data = 'Recherche de nouveaux messages';
-z.string.fr.init_events_expectation = 'Vous avez %events nouveau(x) message(s)';
-z.string.fr.init_events_expectation_long = 'Chargement de %events nouveau(x) message(s)';
 z.string.fr.init_events_progress = 'Chargement des messages - %progress sur %total';
-z.string.fr.init_updated_from_notifications = 'Nous y sommes presque';
-z.string.fr.init_app_pre_loaded = 'Profitez de Wire';
+z.string.fr.init_updated_from_notifications = 'Profitez de Wire';
 
 z.string.fr.ephememal_units_none = 'Désactivé';
 z.string.fr.ephememal_units_second = 'seconde';

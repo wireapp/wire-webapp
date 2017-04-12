@@ -542,20 +542,10 @@ z.string.tr.tooltip_preferences_rename = 'İsminizi değiştirin';
 
 z.string.tr.tooltip_search_close = 'Kapat (Esc)';
 
-z.string.tr.init_received_access_token = 'Erişim onaylandı';
 z.string.tr.init_received_self_user = 'Merhaba, %name.';
-z.string.tr.init_sessions_expectation = '%sessions oturumlarını başlatmamız gerekiyor';
-z.string.tr.init_sessions_expectation_long = '%sessions oturumlarını başlatmamız gerekiyor';
-z.string.tr.init_sessions_progress = 'Oturum başlatılıyor - %total’de %progress';
-z.string.tr.init_initialized_storage = 'Oturumlar yüklendi';
-z.string.tr.init_initialized_cryptography = 'Şifreleme tamamıyla kuruldu';
-z.string.tr.init_validated_client = 'Bağlantılarınız ve konuşmalarınız yükleniyor';
 z.string.tr.init_received_user_data = 'Yeni mesajlar kontrol ediliyor';
-z.string.tr.init_events_expectation = '%events yeni mesajınız var';
-z.string.tr.init_events_expectation_long = '%events yeni mesaj yükleniyor';
 z.string.tr.init_events_progress = 'Mesajlar yükleniyor - %total’de %progress';
-z.string.tr.init_updated_from_notifications = 'Az kaldı';
-z.string.tr.init_app_pre_loaded = 'Wire’ın tadını çıkarın';
+z.string.tr.init_updated_from_notifications = 'Wire’ın tadını çıkarın';
 
 z.string.tr.ephememal_units_none = 'Yok';
 z.string.tr.ephememal_units_second = 'saniye';

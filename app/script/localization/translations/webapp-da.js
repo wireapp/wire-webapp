@@ -521,16 +521,9 @@ z.string.da.tooltip_preferences_rename = 'Ændre dit navn';
 
 z.string.da.tooltip_search_close = 'Luk (Esc)';
 
-z.string.da.init_received_access_token = 'Adgang givet';
 z.string.da.init_received_self_user = 'Hej, %name.';
-z.string.da.init_sessions_expectation = 'Vi skal initialisere %sessions sessioner';
-z.string.da.init_sessions_expectation_long = 'Vi skal initialisere %sessions sessioner';
-z.string.da.init_sessions_progress = 'Initialiserer sessioner - %progress af %total';
-z.string.da.init_initialized_storage = 'Sessioner indlæst';
 z.string.da.init_received_user_data = 'Tjekker for nye beskeder';
-z.string.da.init_events_expectation = 'Du har %events nye beskeder';
-z.string.da.init_updated_from_notifications = 'Vi er der næsten';
-z.string.da.init_app_pre_loaded = 'Nyd Wire';
+z.string.da.init_updated_from_notifications = 'Nyd Wire';
 
 z.string.da.ephememal_units_none = 'Slået Fra';
 z.string.da.ephememal_units_second = 'sekund';

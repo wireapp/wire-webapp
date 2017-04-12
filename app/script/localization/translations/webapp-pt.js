@@ -543,20 +543,10 @@ z.string.pt.tooltip_preferences_rename = 'Altere seu nome';
 
 z.string.pt.tooltip_search_close = 'Fechar (Esc)';
 
-z.string.pt.init_received_access_token = 'Acesso concedido';
 z.string.pt.init_received_self_user = 'Olá, %name.';
-z.string.pt.init_sessions_expectation = 'Precisamos inicializar sessões %sessions';
-z.string.pt.init_sessions_expectation_long = 'Precisamos inicializar sessões %sessions';
-z.string.pt.init_sessions_progress = 'Inicializando as sessões - %progress de %total';
-z.string.pt.init_initialized_storage = 'Sessões carregadas';
-z.string.pt.init_initialized_cryptography = 'A criptografia foi totalmente configurada';
-z.string.pt.init_validated_client = 'Carregando suas conexões e suas conversas';
 z.string.pt.init_received_user_data = 'Verificando novas mensagens';
-z.string.pt.init_events_expectation = 'Você tem %events novas mensagens';
-z.string.pt.init_events_expectation_long = 'Carregando %events novas mensagens';
 z.string.pt.init_events_progress = 'Carregando mensagens - %progress de %total';
-z.string.pt.init_updated_from_notifications = 'Estamos quase lá';
-z.string.pt.init_app_pre_loaded = 'Aproveite o Wire';
+z.string.pt.init_updated_from_notifications = 'Aproveite o Wire';
 
 z.string.pt.ephememal_units_none = 'Desligar';
 z.string.pt.ephememal_units_second = 'segundo';

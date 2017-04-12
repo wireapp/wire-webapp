@@ -506,20 +506,10 @@ z.string.hr.tooltip_preferences_rename = 'Promijeni ime';
 
 z.string.hr.tooltip_search_close = 'Zatvori (Esc)';
 
-z.string.hr.init_received_access_token = 'Pristup je odobren';
 z.string.hr.init_received_self_user = 'Pozdrav, %name.';
-z.string.hr.init_sessions_expectation = 'Moramo pokrenuti %sessions sesija';
-z.string.hr.init_sessions_expectation_long = 'Moramo pokrenuti %sessions sesija';
-z.string.hr.init_sessions_progress = 'Pokretanje sesija - %progress %total';
-z.string.hr.init_initialized_storage = 'Sesija učitana';
-z.string.hr.init_initialized_cryptography = 'Kriptografija je potpuno postavljena';
-z.string.hr.init_validated_client = 'Učitavanje veze i razgovora';
 z.string.hr.init_received_user_data = 'Provjeravanje novih poruka';
-z.string.hr.init_events_expectation = 'Imate %events novih poruka';
-z.string.hr.init_events_expectation_long = 'Imate %events novih poruka';
 z.string.hr.init_events_progress = 'Učitavanje poruka - %progress %total';
-z.string.hr.init_updated_from_notifications = 'Skoro smo tamo';
-z.string.hr.init_app_pre_loaded = 'Uživajte u Wire';
+z.string.hr.init_updated_from_notifications = 'Uživajte u Wire';
 
 z.string.hr.ephememal_units_none = 'Isključi';
 z.string.hr.ephememal_units_second = 'sekunda';
