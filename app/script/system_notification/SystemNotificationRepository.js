@@ -51,13 +51,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     this.conversation_repository = conversation_repository;
     this.logger = new z.util.Logger('z.system_notification.SystemNotificationRepository', z.config.LOGGER.OPTIONS);
 
-    this.ask_for_permission = true;
     this.notifications = [];
 
     this.muted = true;
     this.subscribe_to_events();
     this.notifications_preference = ko.observable(z.system_notification.SystemNotificationPreference.ON);
-    this.notifications_preference.subscribe(notifications_preference => {
+    this.notifications_preference.subscribe((notifications_preference) => {
       if (notifications_preference !== z.system_notification.SystemNotificationPreference.NONE) this.check_permission();
     });
 
