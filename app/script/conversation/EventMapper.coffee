@@ -355,9 +355,8 @@ class z.conversation.EventMapper
   @return [z.entity.Text] Text asset entity
   ###
   _map_asset_text: (data) ->
-    asset_et = new z.entity.Text data.id
+    asset_et = new z.entity.Text data.id, data.content or data.message
     asset_et.nonce = data.nonce
-    asset_et.text = data.content or data.message
     asset_et.previews @_map_link_previews data.previews
     return asset_et
 

@@ -20,7 +20,7 @@
 window.wire ?= {}
 window.wire.app ?= {}
 
-describe 'z.SystemNotification.SystemNotificationRepository', ->
+describe 'z.system_notification.SystemNotificationRepository', ->
   test_factory = new TestFactory()
   conversation_et = null
   message_et = null
@@ -225,8 +225,7 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
 
     describe 'for a text message', ->
       beforeEach ->
-        asset_et = new z.entity.Text()
-        asset_et.text = 'Lorem ipsum'
+        asset_et = new z.entity.Text 'id', 'Lorem ipsum'
         message_et.assets.push asset_et
         notification_content.options.body = asset_et.text
 
@@ -409,7 +408,8 @@ describe 'z.SystemNotification.SystemNotificationRepository', ->
         notification_content.options.body = z.string.system_notification_obfuscated
 
       it 'that contains text', (done) ->
-        message_et.assets.push new z.entity.Text 'Hello world!'
+        message_et.assets.push new z.entity.Text 'id', 'Hello world!'
+
         system_notification_repository.notify conversation_et, message_et
         .then ->
           result = JSON.stringify system_notification_repository._show_notification.calls.first().args[0]
