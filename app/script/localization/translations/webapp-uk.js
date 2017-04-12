@@ -542,20 +542,10 @@ z.string.uk.tooltip_preferences_rename = 'Змініть своє ім’я';
 
 z.string.uk.tooltip_search_close = 'Закрити (Esc)';
 
-z.string.uk.init_received_access_token = 'Доступ дозволено';
 z.string.uk.init_received_self_user = 'Привіт %name.';
-z.string.uk.init_sessions_expectation = 'Ми повинні ініціювати %sessions сесій';
-z.string.uk.init_sessions_expectation_long = 'Ми повинні ініціювати %sessions сесій';
-z.string.uk.init_sessions_progress = 'Ініціюю сесії - %progress з %total';
-z.string.uk.init_initialized_storage = 'Ініціювання сесій завершене';
-z.string.uk.init_initialized_cryptography = 'Криптографія повністю налаштована';
-z.string.uk.init_validated_client = 'Завантажую ваші контакти та розмови';
 z.string.uk.init_received_user_data = 'Перевіряю наявність нових повідомлень';
-z.string.uk.init_events_expectation = 'У вас %events нових повідомлень';
-z.string.uk.init_events_expectation_long = 'Завантажую %events нових повідомлень';
 z.string.uk.init_events_progress = 'Завантажую повідомлення - %progress з %total';
-z.string.uk.init_updated_from_notifications = 'Майже готово';
-z.string.uk.init_app_pre_loaded = 'Насолоджуйтесь Wire';
+z.string.uk.init_updated_from_notifications = 'Насолоджуйтесь Wire';
 
 z.string.uk.ephememal_units_none = 'Вимкнений';
 z.string.uk.ephememal_units_second = 'секунда';

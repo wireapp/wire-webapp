@@ -531,19 +531,10 @@ z.string.it.tooltip_preferences_rename = 'Cambia il tuo nome';
 
 z.string.it.tooltip_search_close = 'Chiudi (Esc)';
 
-z.string.it.init_received_access_token = 'Accesso consentito';
 z.string.it.init_received_self_user = 'Ciao, %name.';
-z.string.it.init_sessions_expectation = 'Abbiamo bisogno di inizializzare %sessions sessioni';
-z.string.it.init_sessions_expectation_long = 'Abbiamo bisogno di inizializzare %sessions sessioni';
-z.string.it.init_sessions_progress = 'Caricamento sessioni - %progress di %total';
-z.string.it.init_initialized_storage = 'Sessione caricata';
-z.string.it.init_validated_client = 'Caricamento delle tue connessioni e conversazioni';
 z.string.it.init_received_user_data = 'Controllo nuovi messaggi';
-z.string.it.init_events_expectation = 'Hai %events nuovi messaggi';
-z.string.it.init_events_expectation_long = 'Caricamento di %events nuovi messaggi';
 z.string.it.init_events_progress = 'Caricamento messaggi - %progress di %total';
-z.string.it.init_updated_from_notifications = 'Ci siamo quasi';
-z.string.it.init_app_pre_loaded = 'Goditi Wire';
+z.string.it.init_updated_from_notifications = 'Goditi Wire';
 
 z.string.it.ephememal_units_none = 'Off';
 z.string.it.ephememal_units_second = 'secondo';

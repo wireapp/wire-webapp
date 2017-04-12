@@ -545,20 +545,12 @@ z.string.hu.tooltip_preferences_rename = 'Név módosítása';
 
 z.string.hu.tooltip_search_close = 'Bezárás (Esc)';
 
-z.string.hu.init_received_access_token = 'Hozzáférés enedélyezve';
+z.string.hu.init_received_access_token = 'Bejelentkezve';
 z.string.hu.init_received_self_user = 'Helló, %name.';
-z.string.hu.init_sessions_expectation = 'Munkamenet előkészítése %sessions';
-z.string.hu.init_sessions_expectation_long = 'Munkamenet előkészítése %sessions';
-z.string.hu.init_sessions_progress = 'Munkamenet inicializálása - %progress %total';
-z.string.hu.init_initialized_storage = 'Munkamenet betöltött';
-z.string.hu.init_initialized_cryptography = 'Titkosítás inicializálva';
-z.string.hu.init_validated_client = 'Kapcsolatok és beszélgetések betöltése';
+z.string.hu.init_validated_client = 'Kapcsolatok és a beszélgetések lekérése';
 z.string.hu.init_received_user_data = 'Új üzenetek megtekintése';
-z.string.hu.init_events_expectation = '%events új üzenete van';
-z.string.hu.init_events_expectation_long = '%events új üzenetek betöltése';
 z.string.hu.init_events_progress = 'Üzenetek betöltése - %progress %total';
-z.string.hu.init_updated_from_notifications = 'Már majdnem ott vagyunk';
-z.string.hu.init_app_pre_loaded = 'Élvezze a Wire-t';
+z.string.hu.init_updated_from_notifications = 'Élvezze a Wire-t';
 
 z.string.hu.ephememal_units_none = 'Kikapcsolás';
 z.string.hu.ephememal_units_second = 'másodperc';

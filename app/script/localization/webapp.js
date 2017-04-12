@@ -606,20 +606,12 @@ z.string.tooltip_preferences_rename = 'Change your name';
 z.string.tooltip_search_close = 'Close (Esc)';
 
 // App loading
-z.string.init_received_access_token = 'Access granted';
+z.string.init_received_access_token = 'Signed in';
 z.string.init_received_self_user = 'Hello, %name.';
-z.string.init_sessions_expectation = 'We need to initialize %sessions sessions';
-z.string.init_sessions_expectation_long = 'We need to initialize %sessions sessions';
-z.string.init_sessions_progress = 'Initializing sessions - %progress of %total';
-z.string.init_initialized_storage = 'Sessions loaded';
-z.string.init_initialized_cryptography = 'Cryptography has been fully set up';
-z.string.init_validated_client = 'Loading your connections and your conversations';
+z.string.init_validated_client = 'Fetching your connections and conversations';
 z.string.init_received_user_data = 'Checking for new messages';
-z.string.init_events_expectation = 'You have %events new messages';
-z.string.init_events_expectation_long = 'Loading %events new messages';
 z.string.init_events_progress = 'Loading messages - %progress of %total';
-z.string.init_updated_from_notifications = 'We are almost there';
-z.string.init_app_pre_loaded = 'Enjoy Wire';
+z.string.init_updated_from_notifications = 'Enjoy Wire';
 
 z.string.ephememal_units_none = 'Off';
 z.string.ephememal_units_second = 'second';

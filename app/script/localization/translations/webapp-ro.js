@@ -546,20 +546,10 @@ z.string.ro.tooltip_preferences_rename = 'Schimbă numele tău';
 
 z.string.ro.tooltip_search_close = 'Închide (Esc)';
 
-z.string.ro.init_received_access_token = 'Acces permis';
 z.string.ro.init_received_self_user = 'Bună, %name.';
-z.string.ro.init_sessions_expectation = 'Trebuie să inițializăm %sessions sesiuni';
-z.string.ro.init_sessions_expectation_long = 'Trebuie să inițializăm %sessions sesiuni';
-z.string.ro.init_sessions_progress = 'Se inițializează sesiunile - %progress din %total';
-z.string.ro.init_initialized_storage = 'Sesiunile s-au încărcat';
-z.string.ro.init_initialized_cryptography = 'Criptografia a fost configurată complet';
-z.string.ro.init_validated_client = 'Se încarcă conexiunile și conversațiile tale';
 z.string.ro.init_received_user_data = 'Verifică dacă sunt mesaje noi';
-z.string.ro.init_events_expectation = 'Ai %events noi mesaje';
-z.string.ro.init_events_expectation_long = 'Se încarcă %events noi mesaje';
 z.string.ro.init_events_progress = 'Se încacrcă mesajele - %progress din %total';
-z.string.ro.init_updated_from_notifications = 'Ești foarte aproape';
-z.string.ro.init_app_pre_loaded = 'Bucură-te de Wire';
+z.string.ro.init_updated_from_notifications = 'Bucură-te de Wire';
 
 z.string.ro.ephememal_units_none = 'Închis';
 z.string.ro.ephememal_units_second = 'secundă';
