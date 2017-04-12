@@ -80,8 +80,8 @@ class z.event.EventRepository
           @notifications_handled++
 
           if @notifications_handled % 5 is 0
-            replace = [@notifications_handled, @notifications_total]
-            amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_events_progress, false, replace
+            progress = @notifications_handled / @notifications_total * 70 + 25
+            amplify.publish z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events_progress, [@notifications_handled, @notifications_total]
 
       else if @notifications_loaded() and @notification_handling_state() isnt z.event.NotificationHandlingState.WEB_SOCKET
         @logger.info "Done handling '#{@notifications_total}' notifications from the stream"
@@ -174,7 +174,6 @@ class z.event.EventRepository
           else
             @notifications_loaded true
             @logger.info "Fetched '#{@notifications_total}' notifications from the backend"
-            amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_events_expectation, true, [@notifications_total]
 
         else
           @logger.info "No notifications found since '#{notification_id}'", response
