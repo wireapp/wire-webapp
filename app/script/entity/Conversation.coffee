@@ -124,10 +124,6 @@ class z.entity.Conversation
       return false if not @call()
       return @call().state() not in z.calling.enum.CallStateGroups.IS_ENDED and not @call().is_ongoing_on_another_client()
 
-    # TODO: check what is needed
-    @unread_event_count = ko.pureComputed =>
-      return @unread_events().length
-
     @unread_events = ko.pureComputed =>
       unread_event = []
       for message_et in @messages() when message_et.visible() by -1
@@ -135,8 +131,7 @@ class z.entity.Conversation
         unread_event.push message_et
       return unread_event
 
-    @unread_message_count = ko.pureComputed =>
-      return (message_et for message_et in @unread_events() when not message_et.user().is_me).length
+    @unread_message_count = ko.pureComputed => @unread_events().length
 
     ###
     Display name strategy:

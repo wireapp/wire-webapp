@@ -74,7 +74,11 @@ z.conversation.ConversationCellState = (() => {
       }
       return message_text;
     },
-    icon() {
+    icon(conversation_et) {
+      const ping_message_et = conversation_et.unread_events().find((message_et) => message_et.is_ping());
+      if (ping_message_et) {
+        return z.conversation.ConversationStatusIcon.UNREAD_PING
+      }
       return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
     },
   };
@@ -86,7 +90,7 @@ z.conversation.ConversationCellState = (() => {
     const description_state = states.find((state) => state.match(conversation_et));
 
     return {
-      icon: (icon_state || default_state).icon(),
+      icon: (icon_state || default_state).icon(conversation_et),
       description: (description_state || default_state).description(conversation_et),
     };
   }
