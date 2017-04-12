@@ -129,7 +129,10 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
       if (emoji_matched === '') {
         this.emoji_list.remove();
       } else {
-        this.emoji_list.html(emoji_matched).appendTo('body').show();
+        this.emoji_list
+          .html(emoji_matched)
+          .appendTo('body')
+          .show();
         this.emoji_list.find('.emoji:nth(0)').addClass('selected');
 
         const pos = this.get_cursor_pixel_pos(input);
