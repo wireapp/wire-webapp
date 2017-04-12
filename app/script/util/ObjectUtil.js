@@ -23,12 +23,19 @@ window.z = window.z || {};
 window.z.util = z.util || {};
 
 z.util.ObjectUtil = {
+  /**
+   * Creates an object copy and applies a mapping functions to all properties of that object.
+   *
+   * @param {Object} object - Base object
+   * @param {Function} mapping_function - Mapping function
+   * @returns {Object} Object copy with mapped properties
+   */
   map_recursive(object, mapping_function) {
     if (typeof object !== 'object') {
       return mapping_function(object);
     }
 
-    let new_object = {};
+    const new_object = {};
 
     for (const property in object) {
       if (object.hasOwnProperty(property)) {
@@ -38,7 +45,13 @@ z.util.ObjectUtil = {
 
     return new_object;
   },
+  /**
+   * Escapes all properties of a given object.
+   *
+   * @param {Object} object - Base object
+   * @returns {Object} Object copy with escaped properties
+   */
   escape_properties(object) {
     return z.util.ObjectUtil.map_recursive(object, _.escape);
-  }
+  },
 };
