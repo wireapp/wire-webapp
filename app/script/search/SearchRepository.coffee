@@ -75,7 +75,7 @@ class z.search.SearchRepository
     .then ([search_ets, mode]) =>
       return @_prepare_search_result search_ets, mode
     .then (suggested_user_ets) =>
-      if response['auto-connects'].length
+      if response['auto-connects'] and response['auto-connects'].length
         connections_promise = @user_repository.get_user_by_id (result.id for result in response['auto-connects'])
       else
         connections_promise = Promise.resolve []
