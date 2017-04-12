@@ -35,15 +35,15 @@ class Localizer {
     }
   }
 
-  /*
-  Pulls the localized string from the resources and replaces placeholders.
-
-  @note Takes the id of the string for look up from z.string is directly for simple use. Else pass it in as the id
-    parameter in conjunction with a single or multiple (it supports but does not require an array) replace rules that
-    consist of a placeholder and the content that it should be replace with.
-
-  @param valueAccessor [Object] contains localization string ID and replace object
-    */
+  /**
+   * Pulls the localized string from the resources and replaces placeholders.
+   *
+   * @note Takes the id of the string for look up from z.string is directly for simple use. Else pass it in as the id
+   *   parameter in conjunction with a single or multiple (it supports but does not require an array) replace rules that
+   *   consist of a placeholder and the content that it should be replace with.
+   *
+   * @param valueAccessor [Object] contains localization string ID and replace object
+   */
 
   get_text(valueAccessor) {
     if (valueAccessor == null) return;
