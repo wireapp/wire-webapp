@@ -58,7 +58,7 @@ z.location = (() => {
       $.ajax({
         url: `${GOOGLE_GEOCODING_BASE_URL}?latlng=${latitude},${longitude}&key=${API_KEY}`,
       })
-      .done(response => {
+      .done((response) => {
         if (response.status === 'OK') {
           return resolve(_parse_results(response.results));
         }

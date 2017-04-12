@@ -39,14 +39,14 @@ z.bot.BotRepository = class BotRepository {
     let bot_result;
 
     return this.bot_service.fetch_bot(bot_name)
-    .then(result => {
+    .then((result) => {
       bot_result = result;
       this.logger.info(`Info for bot '${bot_name}' retrieved`, bot_result);
       if (create_conversation) {
         return this.conversation_repository.create_new_conversation([], bot_result.name || bot_name);
       }
     })
-    .then(conversation_et => {
+    .then((conversation_et) => {
       if (conversation_et == null) {
         conversation_et = this.conversation_repository.active_conversation();
       }

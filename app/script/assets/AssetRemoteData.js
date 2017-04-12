@@ -103,7 +103,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
       }
       return buffer;
     })
-    .then(plaintext => new Blob([new Uint8Array(plaintext)], {mime_type}));
+    .then((plaintext) => new Blob([new Uint8Array(plaintext)], {mime_type}));
   }
 
   /**
@@ -116,12 +116,12 @@ z.assets.AssetRemoteData = class AssetRemoteData {
       return Promise.resolve(object_url);
     }
 
-    return this.load().then(blob => z.assets.AssetURLCache.set_url(this.identifier, window.URL.createObjectURL(blob)));
+    return this.load().then((blob) => z.assets.AssetURLCache.set_url(this.identifier, window.URL.createObjectURL(blob)));
   }
 
   _load_buffer() {
-    return z.util.load_url_buffer(this.generate_url(), xhr => {
-      xhr.onprogress = event => this.download_progress(Math.round((event.loaded / event.total) * 100));
+    return z.util.load_url_buffer(this.generate_url(), (xhr) => {
+      xhr.onprogress = (event) => this.download_progress(Math.round((event.loaded / event.total) * 100));
       return this.cancel_download = () => xhr.abort.call(xhr);
     });
   }

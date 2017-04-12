@@ -182,7 +182,7 @@ window.z.auth.AuthRepository = class AuthRepository {
       return Promise.reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REFRESH_IN_PROGRESS));
     }
 
-    return this.auth_service.post_access().then(access_token => {
+    return this.auth_service.post_access().then((access_token) => {
       this.save_access_token(access_token);
       return access_token;
     }

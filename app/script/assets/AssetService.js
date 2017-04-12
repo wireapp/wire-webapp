@@ -177,7 +177,7 @@ z.assets.AssetService = class AssetService {
    */
   upload_asset(file, options, xhr_accessor_function) {
     return z.util.load_file_buffer(file)
-    .then(buffer => {
+    .then((buffer) => {
       return this._upload_asset(buffer, options, xhr_accessor_function);
     }).then(function([key_bytes, sha256, key, token]) {
       const asset = new z.proto.Asset();
@@ -435,7 +435,7 @@ z.assets.AssetService = class AssetService {
    */
   create_asset_proto(asset) {
     return z.util.load_file_buffer(asset)
-    .then(file_bytes => z.assets.AssetCrypto.encrypt_aes_asset(file_bytes))
+    .then((file_bytes) => z.assets.AssetCrypto.encrypt_aes_asset(file_bytes))
     .then(([key_bytes, sha256, ciphertext]) => {
       asset = new z.proto.Asset();
       asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256));
@@ -475,7 +475,7 @@ z.assets.AssetService = class AssetService {
         return new Uint8Array(buffer);
       }
       return new z.util.Worker(worker).post(buffer);
-    }).then(compressed_bytes => {
+    }).then((compressed_bytes) => {
       return Promise.all([
         z.util.load_image(new Blob([compressed_bytes], {'type': image.type})),
         compressed_bytes,

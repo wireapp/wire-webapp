@@ -367,7 +367,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       data: {
         content: `${text.content}`,
         nonce: event_id,
-        previews: text.link_preview.map(preview => preview.encode64()),
+        previews: text.link_preview.map((preview) => preview.encode64()),
       },
       type: z.event.Backend.CONVERSATION.MESSAGE_ADD,
     };
