@@ -98,9 +98,26 @@ z.conversation.ConversationCellState = (() => {
     },
   };
 
+  const pending_state = {
+    match(conversation_et) {
+      return conversation_et.is_request();
+    },
+    description(conversation_et) {
+      return `@${conversation_et.participating_user_ets()[0].username()}`;
+    },
+    icon() {
+      return z.conversation.ConversationStatusIcon.PENDING_CONNECTION;
+    },
+  };
+
+  /**
+   * Generate cell description and icon
+   * @param {z.entity.Conversation} conversation_et
+   * @returns {{icon: z.z.conversation.ConversationStatusIcon, description: string}}
+   */
   function generate(conversation_et) {
     console.debug('generate');
-    const states = [removed_state, muted_state, new_message_state];
+    const states = [removed_state, muted_state, new_message_state, pending_state];
     const icon_state = states.find((state) => state.match(conversation_et));
     const description_state = states.find((state) => state.match(conversation_et));
 
