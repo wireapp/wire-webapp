@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-window.z.entity.Asset = class Asset {
+z.entity.Asset = class Asset {
   constructor(id) {
     this.id = id;
     this.key = '';
