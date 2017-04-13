@@ -35,7 +35,6 @@ class z.user.UserRepository
 
     @connection_mapper = new z.user.UserConnectionMapper()
     @user_mapper = new z.user.UserMapper @asset_service
-    @use_v3_api = false
     @should_set_username = false
 
     @self = ko.observable()
