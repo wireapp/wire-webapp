@@ -34,7 +34,7 @@ class z.ViewModel.LoadingViewModel
     if progress > @loading_progress()
       @loading_progress progress
     else
-      @loading_progess @loading_progress() + .01
+      @loading_progress @loading_progress() + .01
 
     if message_locator and not z.util.Environment.frontend.is_production()
       @loading_message switch message_locator

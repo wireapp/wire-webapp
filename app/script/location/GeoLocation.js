@@ -41,7 +41,7 @@ z.location = (() => {
     }
     res['place'] = res.locality || res.natural_feature || res.administrative_area_level_3 || res.administrative_area_level_2 || res.administrative_area_level_1;
     delete (res.political != null);
-    return res;
+    return z.util.ObjectUtil.escape_properties(res);
   };
 
   /**
