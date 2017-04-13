@@ -65,7 +65,9 @@ z.conversation.ConversationCellState = (() => {
       const last_message_et = conversation_et.get_last_message();
       let message_text = '';
 
-      if (last_message_et.is_ping()) {
+      if (conversation_et.unread_events().find((message_et) => message_et.is_call() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED)) {
+        message_text = `${z.localization.Localizer.get_text(z.string.system_notification_missed_call)}`; // TODO: number
+      } else if (last_message_et.is_ping()) {
         message_text = z.localization.Localizer.get_text(z.string.system_notification_ping);
       } else if (last_message_et.has_asset_text()) {
         message_text = last_message_et.get_first_asset().text;

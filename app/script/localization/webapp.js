@@ -565,6 +565,7 @@ z.string.system_notification_shared_location = 'Shared a location';
 z.string.system_notification_shared_video = 'Shared a video';
 z.string.system_notification_voice_channel_activate = 'Calling';
 z.string.system_notification_voice_channel_deactivate = 'Called';
+z.string.system_notification_missed_call = 'Missed call';
 
 // Tooltips
 z.string.tooltip_conversation_all_verified = 'All fingerprints are verified';
