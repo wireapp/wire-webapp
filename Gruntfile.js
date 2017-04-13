@@ -140,7 +140,7 @@ module.exports = (grunt) => {
       'newer:copy:dist_js',
       'copy:test',
       `test_prepare:${test_name}`,
-      'karma:test'
+      'karma:test',
     ]);
   });
 };
