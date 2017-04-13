@@ -22,100 +22,47 @@
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.Asset = (function() {
-
-  /*
-   Construct a new asset.
-
-   @param id [String] Asset ID
-   */
-  function Asset(id) {
+class Asset {
+  constructor(id) {
     this.id = id;
     this.key = '';
     this.type = '';
   }
 
-
-  /*
-   Check if asset is a medium image.
-
-   @return [Boolean] Is asset of type medium image
-   */
-
-  Asset.prototype.is_image = function() {
+  is_image() {
     return this.type === z.assets.AssetType.IMAGE;
-  };
+  }
 
-
-  /*
-   Check if asset is a text.
-
-   @return [Boolean] Is asset of type text
-   */
-
-  Asset.prototype.is_text = function() {
+  is_text() {
     return this.type === z.assets.AssetType.TEXT;
-  };
+  }
 
-
-  /*
-   Check if asset is a file.
-
-   @return [Boolean] Is asset of type file
-   */
-
-  Asset.prototype.is_file = function() {
+  is_file() {
     return this.type === z.assets.AssetType.FILE && !this.is_video() && !this.is_audio();
-  };
+  }
 
-
-  /*
-   Check if asset is a location.
-
-   @return [Boolean] Is asset of type location
-   */
-
-  Asset.prototype.is_location = function() {
+  is_location() {
     return this.type === z.assets.AssetType.LOCATION;
-  };
+  }
 
-
-  /*
-   Check if asset is a video.
-
-   @return [Boolean] Is asset of type video
-   */
-
-  Asset.prototype.is_video = function() {
-    var can_play, is_video_asset, ref;
-    is_video_asset = this.type === z.assets.AssetType.FILE && ((ref = this.file_type) != null ? ref.startsWith('video') : void 0);
+  is_video() {
+    const is_video_asset = (this.type === z.assets.AssetType.FILE) && (this.file_type != null ? this.file_type.startsWith('video') : undefined);
     if (is_video_asset) {
-      can_play = document.createElement('video').canPlayType(this.file_type);
+      const can_play = document.createElement('video').canPlayType(this.file_type);
       if (can_play !== '') {
         return true;
       }
     }
     return false;
-  };
+  }
 
-
-  /*
-   Check if asset is a audio.
-
-   @return [Boolean] Is asset of type audio
-   */
-
-  Asset.prototype.is_audio = function() {
-    var can_play, ref;
-    if (this.type === z.assets.AssetType.FILE && ((ref = this.file_type) != null ? ref.startsWith('audio') : void 0)) {
-      can_play = document.createElement('audio').canPlayType(this.file_type);
+  is_audio() {
+    if ((this.type === z.assets.AssetType.FILE) && (this.file_type != null ? this.file_type.startsWith('audio') : undefined)) {
+      const can_play = document.createElement('audio').canPlayType(this.file_type);
       if (can_play !== '') {
         return true;
       }
     }
     return false;
-  };
-
-  return Asset;
-
-})();
+  }
+}
