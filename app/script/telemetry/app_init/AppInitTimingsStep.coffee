@@ -22,14 +22,11 @@ z.telemetry.app_init ?= {}
 
 z.telemetry.app_init.AppInitTimingsStep =
   RECEIVED_ACCESS_TOKEN: 'received_access_token'
-  INITIALIZED_PROTO_MESSAGES: 'initialized_proto_messages'
   RECEIVED_SELF_USER: 'received_self_user'
-  INITIALIZED_STORAGE: 'initialized_storage'
   INITIALIZED_CRYPTOGRAPHY: 'initialized_cryptography'
   VALIDATED_CLIENT: 'validated_client'
   RECEIVED_USER_DATA: 'received_user_data'
   UPDATED_FROM_NOTIFICATIONS: 'updated_from_notifications'
   APP_PRE_LOADED: 'app_pre_loaded'
-  SHOWING_UI: 'showing_ui'
   APP_LOADED: 'app_loaded'
   UPDATED_CONVERSATIONS: 'updated_conversations'

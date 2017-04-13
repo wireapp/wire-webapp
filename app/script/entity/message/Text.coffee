@@ -26,13 +26,13 @@ class z.entity.Text extends z.entity.Asset
 
   @param id [String] Asset ID
   ###
-  constructor: (id) ->
+  constructor: (id, text = '') ->
     super id
     @type = z.assets.AssetType.TEXT
     @nonce = undefined
 
     # Raw message text
-    @text = ''
+    @text = text
 
     # Can be used to theme media embeds
     @theme_color = undefined

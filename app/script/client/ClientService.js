@@ -157,7 +157,7 @@ z.client.ClientService = class ClientService {
     .where('meta.primary_key')
     .equals(primary_key)
     .first()
-    .then(client_record => {
+    .then((client_record) => {
       if (client_record === undefined) {
         this.logger.info(`Client with primary key '${primary_key}' not found in database`);
         return primary_key;

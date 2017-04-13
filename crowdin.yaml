@@ -3,7 +3,6 @@ base_path: .
 
 files:
   -
-    source: '/app/script/localization/strings.coffee'
-    translation: '/app/script/localization/strings-%locale%.coffee'
-    ignore:
-      - /**/?.pot
+    source: '/app/script/localization/webapp.js'
+    translation: '/app/script/localization/translations/webapp-%locale%.js'
+    type: 'properties_play'

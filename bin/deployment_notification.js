@@ -21,23 +21,23 @@
 
 const wire = require('wire-webapp-core');
 
-let login = {
+const login = {
   email: process.env.WIRE_WEBAPP_BOT_EMAIL,
   password: process.env.WIRE_WEBAPP_BOT_PASSWORD,
 };
 
-let commit = {
+const commit = {
   author: process.argv[2],
   branch: process.env.TRAVIS_BRANCH,
   message: process.argv[3],
 };
 
-let build = {
+const build = {
   number: process.env.TRAVIS_BUILD_NUMBER,
   url: 'https://app.wire.com/',
 };
 
-let content = {
+const content = {
   conversationId: '9fe8b359-b9e0-4624-b63c-71747664e4fa',
   message: 'Hello World',
 };

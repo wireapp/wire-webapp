@@ -74,7 +74,7 @@ z.assets.AssetMetaDataBuilder = {
   },
 
   _build_image_metdadata(imagefile) {
-    return new Promise((resolve, reject) =>{
+    return new Promise((resolve, reject) => {
       const url = window.URL.createObjectURL(imagefile);
       const img = new Image();
       img.onload = () => {
@@ -90,11 +90,13 @@ z.assets.AssetMetaDataBuilder = {
   },
 
   _build_audio_metdadata(audiofile) {
-    return z.util.load_file_buffer(audiofile).then((buffer) => {
+    return z.util.load_file_buffer(audiofile)
+    .then((buffer) => {
       const audioContext = new AudioContext();
       audioContext.close();
       return audioContext.decodeAudioData(buffer);
-    }).then(audio_buffer => {
+    })
+    .then((audio_buffer) => {
       return new z.proto.Asset.AudioMetaData(audio_buffer.duration * 1000, z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer));
     });
   },

@@ -49,17 +49,20 @@ z.assets.AssetCrypto = (() => {
       key = ckey;
 
       return window.crypto.subtle.encrypt({name: 'AES-CBC', iv: iv.buffer}, key, plaintext);
-    }).then(function(ciphertext) {
+    })
+    .then(function(ciphertext) {
       iv_ciphertext = new Uint8Array(ciphertext.byteLength + iv.byteLength);
       iv_ciphertext.set(iv, 0);
       iv_ciphertext.set(new Uint8Array(ciphertext), iv.byteLength);
 
       return window.crypto.subtle.digest('SHA-256', iv_ciphertext);
-    }).then(function(digest) {
+    })
+    .then(function(digest) {
       computed_sha256 = digest;
 
       return window.crypto.subtle.exportKey('raw', key);
-    }).then((key_bytes) => [key_bytes, computed_sha256, iv_ciphertext.buffer]);
+    })
+    .then((key_bytes) => [key_bytes, computed_sha256, iv_ciphertext.buffer]);
   }
 
   /**
@@ -79,7 +82,8 @@ z.assets.AssetCrypto = (() => {
       }
 
       throw new Error('Encrypted asset does not match its SHA-256 hash');
-    }).then(function(key) {
+    })
+    .then(function(key) {
       const iv = ciphertext.slice(0, 16);
       const img_ciphertext = ciphertext.slice(16);
       return window.crypto.subtle.decrypt({name: 'AES-CBC', iv}, key, img_ciphertext);
