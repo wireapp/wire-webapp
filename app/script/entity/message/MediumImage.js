@@ -41,9 +41,13 @@ z.entity.MediumImage = class MediumImage extends z.entity.Asset {
   }
 
   download(file_name) {
-    return this.resource().load()
-      .then(function(blob) {
-        z.util.download_blob(blob, file_name);
-      });
+    if (this.resource()) {
+      return this.resource().load()
+        .then(function(blob) {
+          z.util.download_blob(blob, file_name);
+        });
+    }
+
+    return undefined;
   }
 };
