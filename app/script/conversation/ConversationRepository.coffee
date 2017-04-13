@@ -912,7 +912,7 @@ class z.conversation.ConversationRepository
         generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
       @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) =>
-      @logger.info "No metadata uploaded for asset in conversation #{conversation_et.id}", error
+      @logger.warn "Failed to upload metadata for asset in conversation #{conversation_et.id}: #{error.message}", error
       throw error if error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   ###
@@ -934,7 +934,7 @@ class z.conversation.ConversationRepository
         generic_message.set 'asset', asset
         @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) =>
-      @logger.warn "Failed to upload otr asset-preview for conversation #{conversation_et.id}: #{error.message}", error
+      @logger.info "No preview for asset '#{message_id}' in conversation uploaded #{conversation_et.id}", error
 
   ###
   Send asset upload failed message to specified conversation.
