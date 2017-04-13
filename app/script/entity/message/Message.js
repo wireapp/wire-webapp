@@ -204,6 +204,18 @@ z.entity.Message = class Message {
   }
 
   /*
+   Check if message can be deleted.
+   @return [Boolean]
+   */
+  is_deletable() {
+    if (this.is_ping() || !this.has_asset()) {
+      return true;
+    }
+    return ![z.assets.AssetTransferState.DOWNLOADING,
+      z.assets.AssetTransferState.UPLOADING].includes(this.get_first_asset().status());
+  }
+
+  /*
    Check if the message content can be downloaded
    @return [Boolean] Is message of type content
    */
