@@ -912,7 +912,7 @@ class z.conversation.ConversationRepository
         generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
       @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) =>
-      @logger.warn "Failed to upload otr asset-metadata for conversation #{conversation_et.id}", error
+      @logger.info "No metadata uploaded for asset in conversation #{conversation_et.id}", error
       throw error if error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   ###
