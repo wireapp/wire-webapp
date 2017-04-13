@@ -174,7 +174,7 @@
       <!-- /ko -->
 
       <!-- ko foreach: conversations_unarchived -->
-        <conversation-list-cell data-bind="click: $parent.click_on_conversation" params="conversation: $data, is_selected: $parent.is_selected_conversation"></conversation-list-cell>
+        <conversation-list-cell data-bind="click: $parent.click_on_conversation, event: {'contextmenu': $parent.on_context_menu}" params="conversation: $data, is_selected: $parent.is_selected_conversation"></conversation-list-cell>
       <!-- /ko -->
     </ul>
     <!-- /ko -->

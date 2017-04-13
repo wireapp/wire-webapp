@@ -178,3 +178,22 @@ class z.ViewModel.list.ConversationListViewModel
 
   click_on_people_button: =>
     @list_view_model.switch_list z.ViewModel.list.LIST_STATE.START_UI
+
+  ###############################################################################
+  # Context menu
+  ###############################################################################
+
+  on_context_menu: (conversation_et, event) =>
+    entries = []
+
+    if not conversation_et.is_request() and not conversation_et.removed_from_conversation()
+      if conversation_et.is_muted()
+        entries.push
+          title: z.localization.Localizer.get_text(z.string.conversations_popover_notify),
+          callback: => @click_on_mute_action conversation_et
+      else
+        entries.push
+          title: z.localization.Localizer.get_text(z.string.conversations_popover_silence),
+          callback: => @click_on_mute_action conversation_et
+
+    z.ui.Context.from event, entries
