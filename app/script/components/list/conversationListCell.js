@@ -28,6 +28,7 @@ z.components.ConversationListCell = class ConversationListCell {
     this.is_selected = params.is_selected || function() {};
     this.user = ko.pureComputed(() => this.conversation.participating_user_ets()[0]);
 
+    // TODO: in viewport
     this.cell_state = ko.pureComputed(() => z.conversation.ConversationCellState.generate(this.conversation));
   }
 };

@@ -38,7 +38,7 @@ z.conversation.ConversationCellState = (() => {
       return conversation_et.removed_from_conversation();
     },
     description() {
-      return '[You Left]';
+      return '[You Left]'; // TODO check you left/ you got removed
     },
     icon() {
       return z.conversation.ConversationStatusIcon.NONE;
@@ -57,7 +57,7 @@ z.conversation.ConversationCellState = (() => {
     },
   };
 
-  const new_message_state = {
+  const unread_message_state = {
     match(conversation_et) {
       return conversation_et.unread_message_count() > 0;
     },
@@ -90,9 +90,11 @@ z.conversation.ConversationCellState = (() => {
       return message_text;
     },
     icon(conversation_et) {
-      const ping_message_et = conversation_et.unread_events().find((message_et) => message_et.is_ping());
-      if (ping_message_et) {
-        return z.conversation.ConversationStatusIcon.UNREAD_PING
+      if (conversation_et.unread_events().find((message_et) => message_et.is_ping())) {
+        return z.conversation.ConversationStatusIcon.UNREAD_PING;
+      }
+      if (conversation_et.unread_events().find((message_et) => message_et.is_call())) {
+        return z.conversation.ConversationStatusIcon.MISSED_CALL;
       }
       return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
     },
@@ -103,7 +105,7 @@ z.conversation.ConversationCellState = (() => {
       return conversation_et.is_request();
     },
     description(conversation_et) {
-      return `@${conversation_et.participating_user_ets()[0].username()}`;
+      return `@${conversation_et.participating_user_ets()[0].username()}`; // TODO check for undefined
     },
     icon() {
       return z.conversation.ConversationStatusIcon.PENDING_CONNECTION;
@@ -116,8 +118,8 @@ z.conversation.ConversationCellState = (() => {
    * @returns {{icon: z.z.conversation.ConversationStatusIcon, description: string}}
    */
   function generate(conversation_et) {
-    console.debug('generate');
-    const states = [removed_state, muted_state, new_message_state, pending_state];
+    console.debug('generate', conversation_et.display_name()); // TODO remove
+    const states = [removed_state, muted_state, unread_message_state, pending_state];
     const icon_state = states.find((state) => state.match(conversation_et));
     const description_state = states.find((state) => state.match(conversation_et));
 
