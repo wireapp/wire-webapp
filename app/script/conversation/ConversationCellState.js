@@ -24,6 +24,13 @@ window.z.conversation = z.conversation || {};
 
 z.conversation.ConversationCellState = (() => {
 
+  // TODO: move to message?
+  function has_missed_call_helper(conversation_et) {
+    return conversation_et.unread_events().find((message_et) => {
+      return message_et.is_call() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED
+    });
+  }
+
   const default_state = {
     description() {
       return '';
@@ -65,7 +72,7 @@ z.conversation.ConversationCellState = (() => {
       const last_message_et = conversation_et.get_last_message();
       let message_text = '';
 
-      if (conversation_et.unread_events().find((message_et) => message_et.is_call() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED)) {
+      if (has_missed_call_helper(conversation_et)) {
         message_text = `${z.localization.Localizer.get_text(z.string.system_notification_missed_call)}`; // TODO: number
       } else if (last_message_et.is_ping()) {
         message_text = z.localization.Localizer.get_text(z.string.system_notification_ping);
@@ -95,7 +102,7 @@ z.conversation.ConversationCellState = (() => {
       if (conversation_et.unread_events().find((message_et) => message_et.is_ping())) {
         return z.conversation.ConversationStatusIcon.UNREAD_PING;
       }
-      if (conversation_et.unread_events().find((message_et) => message_et.is_call() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED)) {
+      if (has_missed_call_helper(conversation_et)) {
         return z.conversation.ConversationStatusIcon.MISSED_CALL;
       }
       return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
