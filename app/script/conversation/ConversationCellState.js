@@ -93,7 +93,7 @@ z.conversation.ConversationCellState = (() => {
       if (conversation_et.unread_events().find((message_et) => message_et.is_ping())) {
         return z.conversation.ConversationStatusIcon.UNREAD_PING;
       }
-      if (conversation_et.unread_events().find((message_et) => message_et.is_call())) {
+      if (conversation_et.unread_events().find((message_et) => message_et.is_call() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED)) {
         return z.conversation.ConversationStatusIcon.MISSED_CALL;
       }
       return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
