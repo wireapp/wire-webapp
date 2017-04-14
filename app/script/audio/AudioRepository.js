@@ -93,8 +93,10 @@ window.z.audio.AudioRepository = class AudioRepository {
    */
   _init_sounds() {
     for (const type in z.audio.AudioType) {
-      const audio_id = z.audio.AudioType[type];
-      this.audio_elements[audio_id] = this._create_audio_element(`/audio/${audio_id}.mp3`);
+      if (z.audio.AudioType.hasOwnProperty(type)) {
+        const audio_id = z.audio.AudioType[type];
+        this.audio_elements[audio_id] = this._create_audio_element(`/audio/${audio_id}.mp3`);
+      }
     }
     this.logger.info('Initialized sounds');
   }

@@ -14,11 +14,12 @@ globals:
   cryptobox: true
   CryptoJS: true
   dcodeIO: true
-  hljs: true,
+  Dexie: true
+  hljs: true
   ko: true
   libsodium: true
   LRUCache: true
-  marked: true,
+  marked: true
   moment: true
   pako: true
   platform: true

@@ -2100,7 +2100,7 @@ class z.conversation.ConversationRepository
         @logger.debug "Updating reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
         return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
     .catch (error) =>
-      if error.type is z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
+      if error.type is z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE
         Raygun.send 'Failed sequential database update'
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         @logger.error "Failed to handle reaction to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", {error: error, event: event_json}

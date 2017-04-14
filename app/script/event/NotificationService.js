@@ -85,7 +85,7 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the stored last notification ID.
    */
   get_last_notification_id_from_db() {
-    return this.storage_service.load(this.storage_service.OBJECT_STORE_AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION)
+    return this.storage_service.load(z.storage.StorageService.OBJECT_STORE.AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION)
     .then(function(record) {
       if (record && record.value) {
         return record.value;
@@ -104,6 +104,6 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the stored record
    */
   save_last_notification_id_to_db(notification_id) {
-    return this.storage_service.save(this.storage_service.OBJECT_STORE_AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION, {value: notification_id});
+    return this.storage_service.save(z.storage.StorageService.OBJECT_STORE.AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION, {value: notification_id});
   }
 };
