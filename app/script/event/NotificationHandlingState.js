@@ -20,21 +20,10 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.ephemeral = z.ephemeral || {};
+window.z.event = z.event || {};
 
-z.ephemeral.timings = (() => {
-  const timings = [
-    1000 * 5,
-    1000 * 15,
-    1000 * 30,
-    1000 * 60,
-    1000 * 60 * 5,
-    1000 * 60 * 60 * 24,
-  ];
-  const get_values = () => timings;
-  const map_to_closest_timing = (milliseconds) => z.util.ArrayUtil.find_closest(timings, milliseconds);
-  return {
-    get_values,
-    map_to_closest_timing,
-  };
-})();
+z.event.NOTIFICATION_HANDLING_STATE = {
+  RECOVERY: 'z.event.NOTIFICATION_HANDLING_STATE.RECOVERY',
+  STREAM: 'z.event.NOTIFICATION_HANDLING_STATE.STREAM',
+  WEB_SOCKET: 'z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET',
+};

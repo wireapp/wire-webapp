@@ -154,11 +154,11 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   /**
    * Set the muted state.
    * @note Temporarily mute notifications on recovery from Notification Stream
-   * @param {z.event.NotificationHandlingState} handling_notifications - Updated notification handling state
+   * @param {z.event.NOTIFICATION_HANDLING_STATE} handling_notifications - Updated notification handling state
    * @returns {undefined} No return value
    */
   set_muted_state(handling_notifications) {
-    this.muted = handling_notifications !== z.event.NotificationHandlingState.WEB_SOCKET;
+    this.muted = handling_notifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
     return this.logger.info(`Set muted state to: ${this.muted}`);
   }
 
