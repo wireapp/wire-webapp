@@ -70,7 +70,7 @@ class z.tracking.EventTrackingRepository
       @set_custom_dimension z.tracking.CustomDimension.CONTACTS, @user_repository.connected_users().length
       @_subscribe_to_events()
 
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.SEND_DATA, @updated_send_data
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, @updated_send_data
 
   init_without_user_tracking: =>
     @_enable_error_reporting()

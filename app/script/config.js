@@ -118,8 +118,6 @@ window.z.config = {
   // measured in pixel
   SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,
 
-  PROPERTIES_KEY: 'webapp',
-
   // bigger requests will be split in chunks with a maximum size as defined
   MAXIMUM_USERS_PER_REQUEST: 200,
 
