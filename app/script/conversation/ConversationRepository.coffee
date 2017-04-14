@@ -1799,7 +1799,7 @@ class z.conversation.ConversationRepository
   on_missed_events: =>
     @filtered_conversations()
     .filter (conversation_et) -> not conversation_et.removed_from_conversation()
-    .forEach (conversation_et) -> amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_missed conversation_et
+    .forEach (conversation_et) => amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_missed conversation_et, @user_repository.self()
 
   ###
   Listener for incoming events from the WebSocket.
