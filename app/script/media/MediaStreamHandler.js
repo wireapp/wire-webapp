@@ -329,10 +329,10 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   request_media_stream(media_type, media_stream_constraints) {
     if (!this.media_repository.devices_handler.has_microphone()) {
-      return Promise.reject(new z.media.MediaError(z.media.MediaError.prototype.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO));
+      return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO));
     }
     if (!this.media_repository.devices_handler.has_camera() && (media_type === z.media.MediaType.VIDEO)) {
-      return Promise.reject(new z.media.MediaError(z.media.MediaError.prototype.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO));
+      return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaType.VIDEO));
     }
 
     this.logger.info(`Requesting MediaStream access for '${media_type}'`, media_stream_constraints);
@@ -352,13 +352,13 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       this.logger.warn(`MediaStream request failed: ${error.name} ${error.message}`);
       this._clear_permission_request_hint(media_type);
       if (z.calling.rtc.MediaStreamErrorTypes.DEVICE.includes(error.name)) {
-        throw new z.media.MediaError(z.media.MediaError.prototype.TYPE.MEDIA_STREAM_DEVICE, media_type);
+        throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, media_type);
       }
       if (z.calling.rtc.MediaStreamErrorTypes.MISC.includes(error.name)) {
-        throw new z.media.MediaError(z.media.MediaError.prototype.TYPE.MEDIA_STREAM_MISC, media_type);
+        throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_MISC, media_type);
       }
       if (z.calling.rtc.MediaStreamErrorTypes.PERMISSION.includes(error.name)) {
-        throw new z.media.MediaError(z.media.MediaError.prototype.TYPE.MEDIA_STREAM_PERMISSION, media_type);
+        throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION, media_type);
       }
       throw error;
     });

@@ -191,7 +191,7 @@ class z.ViewModel.list.StartUIViewModel
       import_promise = @connect_repository.get_macos_contacts()
 
     import_promise.then (response) =>
-      @_show_onboarding_results response
+      @_show_on_boarding_results response
     .catch (error) =>
       if error.type isnt z.connect.ConnectError.TYPE.NO_CONTACTS
         @logger.error "Importing contacts from '#{source}' failed: #{error.message}", error
@@ -201,11 +201,11 @@ class z.ViewModel.list.StartUIViewModel
       @show_spinner false
       @_track_import source, error
 
-  _show_onboarding_results: (response) =>
-    @search_repository.show_onboarding response
-    .then ([connected_user_ets, suggested_user_ets]) =>
-      @connections connected_user_ets
-      @suggestions suggested_user_ets
+  _show_on_boarding_results: (response) =>
+    @search_repository.show_on_boarding response
+    .then ({connections, suggestions}) =>
+      @connections connections
+      @suggestions suggestions
       return @get_top_people()
     .then (user_ets) =>
       @top_users user_ets
