@@ -389,7 +389,7 @@ class z.user.UserRepository
           return @user_mapper.map_users_from_object response
         return []
       .catch (error) ->
-        if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+        if error.code is z.service.BackendClientError.STATUS_CODE.NOT_FOUND
           return []
         throw error
 
@@ -602,7 +602,7 @@ class z.user.UserRepository
         outcome: 'success'
         num_of_attempts: 1
     .catch (error) =>
-      if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+      if error.code is z.service.BackendClientError.STATUS_CODE.NOT_FOUND
         @should_set_username = false
 
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.GENERATED_USERNAME,
@@ -621,7 +621,7 @@ class z.user.UserRepository
       @should_set_username = false
       @self().username username
     .catch (error) ->
-      if error.code in [z.service.BackendClientError::STATUS_CODE.CONFLICT, z.service.BackendClientError::STATUS_CODE.BAD_REQUEST]
+      if error.code in [z.service.BackendClientError.STATUS_CODE.CONFLICT, z.service.BackendClientError.STATUS_CODE.BAD_REQUEST]
         throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
 
@@ -641,9 +641,9 @@ class z.user.UserRepository
   verify_username: (username) ->
     return @user_service.check_username username
     .catch (error) ->
-      if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+      if error.code is z.service.BackendClientError.STATUS_CODE.NOT_FOUND
         return username
-      if error.code is z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
+      if error.code is z.service.BackendClientError.STATUS_CODE.BAD_REQUEST
         throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
       throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
     .then (username) ->
