@@ -195,7 +195,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
       mask.insertBefore(span, mask.childNodes[0].splitText(pos));
     }
     document.body.appendChild(mask);
-    span.scrollIntoViewIfNeeded();
+    span.scrollIntoView();
 
     const sbr = span.getBoundingClientRect();
 

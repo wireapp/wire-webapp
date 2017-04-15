@@ -223,7 +223,7 @@ z.connect.ConnectRepository = class ConnectRepository {
     const address_book = window.zAddressBook();
     const phone_book = new z.connect.PhoneBook(this.properties_repository.self());
 
-    const {email: self_emails, numbers: self_numbers} = address_book.getMe();
+    const {emails: self_emails, numbers: self_numbers} = address_book.getMe();
     self_emails.forEach((email) => {
       phone_book.self.push(email);
     });
