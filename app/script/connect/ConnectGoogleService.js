@@ -72,7 +72,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
         return reject(response !== null ? response.error : undefined);
       };
 
-      return window.gapi.auth.authorize({client_id: this.client_id, scope: this.scopes, immediate: false}, on_response);
+      return window.gapi.auth.authorize({client_id: this.client_id, immediate: false, scope: this.scopes}, on_response);
     });
   }
 

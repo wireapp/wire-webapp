@@ -24,7 +24,7 @@ window.z.assets = z.assets || {};
 
 z.assets.AssetType = {
   FILE: 'File',
-  LOCATION: 'Location',
   IMAGE: 'Image',
+  LOCATION: 'Location',
   TEXT: 'Text',
 };

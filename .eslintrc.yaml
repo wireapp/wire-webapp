@@ -65,10 +65,12 @@ rules:
   quotes: [2, single, avoid-escape]
   semi: [2, always]
   semi-spacing: [2, {before: false, after: true}]
+  sort-keys: [2, asc, {caseSensitive: true, natural: true}]
   sort-vars: 2
   space-before-blocks: 2
   space-before-function-paren: [2, never]
   space-in-parens: [2, never]
+  space-unary-ops: [2, {words: true, nonwords: false}]
   spaced-comment: [2, always, {exceptions: ["#"]}]
   strict: [2, global]
   valid-jsdoc: [2, {prefer: {return: returns}, requireParamDescription: true, requireReturnDescription: true}]

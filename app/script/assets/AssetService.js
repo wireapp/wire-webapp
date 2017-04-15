@@ -49,14 +49,14 @@ z.assets.AssetService = class AssetService {
    */
   post_asset(config) {
     return this.client.send_request({
-      type: 'POST',
-      url: this.client.create_url('/assets'),
-      data: config.data,
-      processData: false, // otherwise jquery will convert it to a query string
       contentType: config.contentType,
+      data: config.data,
       headers: {
         'Content-Disposition': config.contentDisposition,
       },
+      processData: false, // otherwise jquery will convert it to a query string
+      type: 'POST',
+      url: this.client.create_url('/assets'),
     });
   }
 
@@ -71,13 +71,13 @@ z.assets.AssetService = class AssetService {
   post_asset_pair(small, medium) {
     return Promise.all([
       this.post_asset({
-        contentType: small.content_type,
         contentDisposition: small.get_content_disposition(),
+        contentType: small.content_type,
         data: small.array_buffer,
       }),
       this.post_asset({
-        contentType: medium.content_type,
         contentDisposition: medium.get_content_disposition(),
+        contentType: medium.content_type,
         data: medium.array_buffer,
       }),
     ]);
@@ -102,11 +102,11 @@ z.assets.AssetService = class AssetService {
       const medium_asset = new z.assets.Asset({
         array_buffer: medium_image_bytes,
         content_type: 'image/jpg',
-        conversation_id,
-        md5: z.util.array_to_md5_base64(medium_image_bytes),
-        width: medium_image.width,
+        conversation_id: conversation_id,
         height: medium_image.height,
+        md5: z.util.array_to_md5_base64(medium_image_bytes),
         public: true,
+        width: medium_image.width,
       });
 
       const small_profile_asset = $.extend(true, {}, medium_asset);

@@ -51,8 +51,8 @@ z.client.Client = class Client {
   static dismantle_user_client_id(id) {
     const [user_id, client_id] = (id != null ? id.split('@') : undefined) || [];
     return {
-      user_id,
-      client_id,
+      client_id: client_id,
+      user_id: user_id,
     };
   }
 
