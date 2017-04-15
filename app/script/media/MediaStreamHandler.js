@@ -119,7 +119,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         video: request_video ? this._get_video_stream_constraints(this.current_device_id.video_input()) : undefined,
       };
       const media_type = request_video ? z.media.MediaType.VIDEO : z.media.MediaType.AUDIO;
-      return {media_type: media_type, media_stream_constraints: constraints};
+      return {media_stream_constraints: constraints, media_type: media_type};
     });
   }
 
@@ -156,13 +156,13 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
             chromeMediaSourceId: this.current_device_id.screen_input(),
             maxHeight: 720,
             maxWidth: 1280,
-            minWidth: 1280,
             minHeight: 720,
+            minWidth: 1280,
           },
         },
       };
 
-      return Promise.resolve({media_type: z.media.MediaType.SCREEN, media_stream_constraints: constraints});
+      return Promise.resolve({media_stream_constraints: constraints, media_type: z.media.MediaType.SCREEN});
     }
 
     if (z.util.Environment.browser.firefox) {
@@ -175,7 +175,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         },
       };
 
-      return Promise.resolve({media_type: z.media.MediaType.SCREEN, media_stream_constraints: constraints});
+      return Promise.resolve({media_stream_constraints: constraints, media_type: z.media.MediaType.SCREEN});
     }
 
     return Promise.reject(new z.media.MediaError(z.media.MediaError.TYPE.SCREEN_NOT_SUPPORTED));
@@ -192,15 +192,15 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     const media_stream_constraints = {
       facingMode: 'user',
       frameRate: 30,
-      width: {
-        min: 640,
-        ideal: 640,
-        max: 1280,
-      },
       height: {
-        min: 360,
         ideal: 360,
         max: 720,
+        min: 360,
+      },
+      width: {
+        ideal: 640,
+        max: 1280,
+        min: 640,
       },
     };
 
@@ -266,7 +266,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   replace_media_stream(media_stream_info) {
     const {stream: media_stream} = media_stream_info;
     this.logger.debug(`Received new MediaStream with '${media_stream.getTracks().length}' MediaStreamTrack(s)`,
-      {stream: media_stream, audio_tracks: media_stream.getAudioTracks(), video_tracks: media_stream.getVideoTracks()});
+      {audio_tracks: media_stream.getAudioTracks(), stream: media_stream, video_tracks: media_stream.getVideoTracks()});
 
     let update_promise;
     if (this.joined_call()) {
@@ -432,7 +432,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       const {stream: media_stream} = media_stream_info;
 
       this.logger.debug(`Received initial MediaStream with '${media_stream.getTracks().length}' MediaStreamTrack(s)`,
-        {stream: media_stream, audio_tracks: media_stream.getAudioTracks(), video_tracks: media_stream.getVideoTracks()});
+        {audio_tracks: media_stream.getAudioTracks(), stream: media_stream, video_tracks: media_stream.getVideoTracks()});
       this._set_stream_state(media_stream_info);
       this.local_media_stream(media_stream);
     }

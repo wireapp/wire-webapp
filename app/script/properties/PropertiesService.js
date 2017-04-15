@@ -99,9 +99,9 @@ z.properties.PropertiesService = class PropertiesService {
    */
   put_properties_by_key(key, properties) {
     return this.client.send_json({
+      data: properties,
       type: 'PUT',
       url: this.client.create_url(`${PROPERTIES_SERVICE_CONFIG.URL_PROPERTIES}/${key}`),
-      data: properties,
     });
   }
 };

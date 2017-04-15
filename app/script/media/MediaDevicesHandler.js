@@ -200,11 +200,11 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
   get_screen_sources() {
     return new Promise((resolve, reject) => {
       const options = {
-        types: ['screen'],
         thumbnailSize: {
-          width: 312,
           height: 176,
+          width: 312,
         },
+        types: ['screen'],
       };
 
       return window.desktopCapturer.getSources(options, (error, screen_sources) => {
