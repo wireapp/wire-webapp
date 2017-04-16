@@ -187,13 +187,68 @@ class z.ViewModel.list.ConversationListViewModel
     entries = []
 
     if not conversation_et.is_request() and not conversation_et.removed_from_conversation()
-      if conversation_et.is_muted()
-        entries.push
-          title: z.localization.Localizer.get_text(z.string.conversations_popover_notify),
-          callback: => @click_on_mute_action conversation_et
-      else
-        entries.push
-          title: z.localization.Localizer.get_text(z.string.conversations_popover_silence),
-          callback: => @click_on_mute_action conversation_et
+      title = if conversation_et.is_muted() then z.string.conversations_popover_notify else z.string.conversations_popover_silence
+      entries.push
+        title: z.localization.Localizer.get_text(title),
+        callback: => @conversation_repository.toggle_silence_conversation conversation_et
+
+    if conversation_et.is_archived()
+      entries.push
+        title: z.localization.Localizer.get_text(z.string.conversations_popover_unarchive),
+        callback: => @click_on_unarchive_action conversation_et
+    else
+      entries.push
+        title: z.localization.Localizer.get_text(z.string.conversations_popover_archive),
+        callback: => @click_on_archive_action conversation_et
+
+    if conversation_et.is_request()
+      entries.push
+        title: z.localization.Localizer.get_text(z.string.conversations_popover_cancel),
+        callback: => @click_on_cancel_action conversation_et
+
+    if not conversation_et.is_request() and not conversation_et.is_cleared()
+      entries.push
+        title: z.localization.Localizer.get_text(z.string.conversations_popover_clear),
+        callback: => @click_on_clear_action conversation_et
+
+    if not conversation_et.is_group()
+      entries.push
+        title: z.localization.Localizer.get_text(z.string.conversations_popover_block),
+        callback: => @click_on_block_action conversation_et
+
+    if conversation_et.is_group() and not conversation_et.removed_from_conversation()
+      entries.push
+        title: z.localization.Localizer.get_text(z.string.conversations_popover_leave),
+        callback: => @click_on_leave_action conversation_et
 
     z.ui.Context.from event, entries
+
+  click_on_block_action: (conversation_et) =>
+    next_conversation_et = @conversation_repository.get_next_conversation conversation_et
+    user_et = conversation_et.participating_user_ets()[0]
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BLOCK,
+      data: user_et.first_name()
+      action: => @user_repository.block_user user_et, ->
+        amplify.publish z.event.WebApp.CONVERSATION.SWITCH, conversation_et, next_conversation_et
+
+  click_on_cancel_action: (conversation_et) =>
+    next_conversation_et = @conversation_repository.get_next_conversation conversation_et
+    @user_repository.cancel_connection_request conversation_et.participating_user_ets()[0], next_conversation_et
+
+  click_on_clear_action: (conversation_et) =>
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CLEAR,
+      data: conversation_et.display_name()
+      conversation: conversation_et
+      action: (leave = false) => @conversation_repository.clear_conversation conversation_et, leave
+
+  click_on_leave_action: (conversation_et) =>
+    next_conversation_et = @conversation_repository.get_next_conversation conversation_et
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LEAVE,
+      data: conversation_et.display_name()
+      action: => @conversation_repository.leave_conversation conversation_et, next_conversation_et
+
+  click_on_unarchive_action: (conversation_et) =>
+    @conversation_repository.unarchive_conversation conversation_et
+    .then =>
+      if not @conversation_repository.conversations_archived().length
+        @list_view_model.switch_list z.ViewModel.list.LIST_STATE.CONVERSATIONS
