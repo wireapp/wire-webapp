@@ -818,50 +818,12 @@ class z.conversation.ConversationRepository
         error = new Error 'Event response is undefined'
         Raygun.send error, source: 'Sending encrypted last read'
 
-
-  ###############################################################################
-  # Send encrypted events
-  ###############################################################################
-
   ###
   Send assets to specified conversation. Used for file transfers.
   @param conversation_id [String] Conversation ID
   @return [Object] Collection with User IDs which hold their Client IDs in an Array
   ###
   send_asset: (conversation_et, file, nonce) =>
-    generic_message = null
-    @get_message_in_conversation_by_id conversation_et, nonce
-    .then (message_et) =>
-      asset_et = message_et.assets()[0]
-      asset_et.upload_id nonce # TODO deprecated
-      asset_et.uploaded_on_this_client true
-      return @asset_service.create_asset_proto file
-    .then ([asset, ciphertext]) =>
-      generic_message = new z.proto.GenericMessage nonce
-      generic_message.set 'asset', asset
-      if conversation_et.ephemeral_timer()
-        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
-      @_send_encrypted_asset conversation_et.id, generic_message, ciphertext, nonce
-    .then ([response, asset_id]) =>
-      event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
-
-      if conversation_et.ephemeral_timer()
-        asset = generic_message.ephemeral.asset
-      else
-        asset = generic_message.asset
-
-      event.data.otr_key = asset.uploaded.otr_key
-      event.data.sha256 = asset.uploaded.sha256
-      event.data.id = asset_id
-      event.id = nonce
-      return @_on_asset_upload_complete conversation_et, event
-
-  ###
-  Send assets to specified conversation using v3 api. Used for file transfers.
-  @param conversation_id [String] Conversation ID
-  @return [Object] Collection with User IDs which hold their Client IDs in an Array
-  ###
-  send_asset_v3: (conversation_et, file, nonce) =>
     generic_message = null
     @get_message_in_conversation_by_id conversation_et, nonce
     .then (message_et) =>
@@ -983,45 +945,11 @@ class z.conversation.ConversationRepository
         @_track_completed_media_action conversation_et, generic_message, e_call_message_et
 
   ###
-  Sends image asset in specified conversation.
-
-  @deprecated # TODO: remove once support for v2 ends
-  @param conversation_et [z.entity.Conversation] Conversation to send image in
-  @param image [File, Blob]
-  ###
-  send_image_asset: (conversation_et, image) =>
-    @asset_service.create_image_proto image
-    .then ([image, ciphertext]) =>
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
-      generic_message.set 'image', image
-      if conversation_et.ephemeral_timer()
-        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
-      optimistic_event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
-      @cryptography_repository.cryptography_mapper.map_generic_message generic_message, optimistic_event
-      .then (mapped_event) =>
-        @conversation_service.save_event mapped_event
-      .then (saved_event) =>
-        @on_conversation_event saved_event
-
-        # we don't need to wait for the sending to resolve
-        @_send_encrypted_asset conversation_et.id, generic_message, ciphertext
-        .then ([response, asset_id]) =>
-          @_track_completed_media_action conversation_et, generic_message
-          saved_event.data.id = asset_id
-          saved_event.data.info.nonce = asset_id
-          @_update_image_as_sent conversation_et, saved_event, response.time
-        .catch (error) =>
-          @logger.error "Failed to upload otr asset for conversation #{conversation_et.id}: #{error.message}", error
-          throw error
-
-        return saved_event
-
-  ###
   Sends image asset in specified conversation using v3 api.
   @param conversation_et [z.entity.Conversation] Conversation to send image in
   @param image [File, Blob]
   ###
-  send_image_asset_v3: (conversation_et, image) =>
+  send_image_asset: (conversation_et, image) =>
     @asset_service.upload_image_asset image
     .then (asset) =>
       generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
@@ -1233,25 +1161,6 @@ class z.conversation.ConversationRepository
         result.push client_callback user_id, client_id
       result.push user_callback user_id if user_callback
     return result
-
-  ###
-  Update image message with given event data
-  @param conversation_et [z.entity.Conversation] Conversation image was sent in
-  @param event_json [JSON] Image event containing updated information after sending
-  @param event_time [Number|undefined] if defined it will update event timestamp
-  ###
-  _update_image_as_sent: (conversation_et, event_json, event_time) =>
-    @get_message_in_conversation_by_id conversation_et, event_json.id
-    .then (message_et) =>
-      asset_data = event_json.data
-      remote_data = z.assets.AssetRemoteData.v2 conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256, true
-      message_et.get_first_asset().resource remote_data
-      message_et.status z.message.StatusType.SENT
-      message_et.timestamp new Date(event_time).getTime()
-      @conversation_service.update_message_in_db message_et,
-        data: asset_data
-        status: z.message.StatusType.SENT
-        time: event_time
 
   ###
   Wraps generic message in ephemeral message.
@@ -1471,50 +1380,6 @@ class z.conversation.ConversationRepository
                 reject new z.conversation.ConversationError z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
 
   ###
-  Sends an OTR asset to a conversation.
-
-  @deprecated # TODO: remove once support for v2 ends
-  @private
-  @param conversation_id [String] Conversation ID
-  @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
-  @param image_data [Uint8Array|ArrayBuffer]
-  @param nonce [String]
-  @return [Promise] Promise that resolves after sending the encrypted message
-  ###
-  _send_encrypted_asset: (conversation_id, generic_message, image_data, nonce) =>
-    @logger.log @logger.levels.INFO, "Sending encrypted '#{generic_message.content}' asset to conversation '#{conversation_id}'", image_data
-    skip_own_clients = generic_message.content is 'ephemeral'
-    precondition_option = false
-    image_payload = undefined
-
-    @_grant_outgoing_message conversation_id, generic_message
-    .then =>
-      return @create_user_client_map conversation_id, skip_own_clients
-    .then (user_client_map) =>
-      if skip_own_clients
-        precondition_option = Object.keys user_client_map
-      return @cryptography_repository.encrypt_generic_message user_client_map, generic_message
-    .then (payload) =>
-      payload.inline = false
-      image_payload = payload
-      return @asset_service.post_asset_v2 conversation_id, image_payload, image_data, precondition_option, nonce
-    .then (response) =>
-      @_handle_client_mismatch conversation_id, response
-      return response
-    .catch (error) =>
-      updated_payload = undefined
-
-      throw error if not error.missing
-
-      return @_handle_client_mismatch conversation_id, error, generic_message, image_payload
-      .then (payload_with_missing_clients) =>
-        updated_payload = payload_with_missing_clients
-        return @_grant_outgoing_message conversation_id, generic_message, Object.keys error.missing
-      .then =>
-        @logger.log @logger.levels.INFO, "Sending updated encrypted '#{generic_message.content}' message to conversation '#{conversation_id}'", updated_payload
-        return @asset_service.post_asset_v2 conversation_id, updated_payload, image_data, true, nonce
-
-  ###
   Estimate whether message should be send as type external.
 
   @private
@@ -1539,10 +1404,7 @@ class z.conversation.ConversationRepository
   upload_images: (conversation_et, images) =>
     return if not @_can_upload_assets_to_conversation conversation_et
     for image in images
-      if @use_v3_api
-        @send_image_asset_v3 conversation_et, image
-      else
-        @send_image_asset conversation_et, image
+      @send_image_asset_v3 conversation_et, image
 
   ###
   Post files to a conversation.
@@ -1553,10 +1415,7 @@ class z.conversation.ConversationRepository
     return if not @_can_upload_assets_to_conversation conversation_et
 
     for file in files
-      if @use_v3_api
-        @upload_file_v3 conversation_et, file
-      else
-        @upload_file conversation_et, file
+      @upload_file conversation_et, file
 
   ###
   Post file to a conversation.
@@ -1601,7 +1460,7 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation to post the file
   @param file [Object] File object
   ###
-  upload_file_v3: (conversation_et, file) =>
+  upload_file: (conversation_et, file) =>
     return if not @_can_upload_assets_to_conversation conversation_et
     message_id = null
 
@@ -1619,7 +1478,7 @@ class z.conversation.ConversationRepository
       message_id = record.id
       @send_asset_preview conversation_et, file, message_id
     .then =>
-      @send_asset_v3 conversation_et, file, message_id
+      @send_asset conversation_et, file, message_id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
       @logger.info "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
