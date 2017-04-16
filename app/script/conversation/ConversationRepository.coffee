@@ -65,6 +65,7 @@ class z.conversation.ConversationRepository
     @sorted_conversations = ko.pureComputed =>
       @filtered_conversations().sort z.util.sort_groups_by_last_event
 
+    @receiving_queue = new z.util.PromiseQueue()
     @sending_queue = new z.util.PromiseQueue()
     @sending_queue.pause()
 
@@ -104,7 +105,7 @@ class z.conversation.ConversationRepository
 
   _init_subscriptions: ->
     amplify.subscribe z.event.WebApp.CONVERSATION.ASSET.CANCEL, @cancel_asset_upload
-    amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
+    amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @push_to_receiving_queue
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTION, @map_connection
     amplify.subscribe z.event.WebApp.CONVERSATION.MISSED_EVENTS, @on_missed_events
@@ -1803,8 +1804,6 @@ class z.conversation.ConversationRepository
 
   ###
   Listener for incoming events from the WebSocket.
-
-  @private
   @note We check for events received multiple times via the WebSocket by event id here
   @param event [Object] JSON data for event
   ####
@@ -1860,6 +1859,13 @@ class z.conversation.ConversationRepository
       if not @block_event_handling and previously_archived and not conversation_et.is_archived()
         @logger.info "Unarchiving conversation '#{conversation_et.id}' with new event"
         @unarchive_conversation conversation_et
+
+  ###
+  Push to receiving queue.
+  @param event [Object] JSON data for event
+  ###
+  push_to_receiving_queue: (event) =>
+    @receiving_queue.push => @on_conversation_event event
 
   ###
   A message or ping received in a conversation.
