@@ -2090,24 +2090,18 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation entity that a message was reacted upon in
   @param event_json [Object] JSON data of 'conversation.reaction' event
   ###
-  _on_reaction: (conversation_et, event_json, attempt = 1) ->
+  _on_reaction: (conversation_et, event_json) ->
     @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
     .then (message_et) =>
       changes = message_et.update_reactions event_json
-      return if not changes
-
-      @_update_user_ets message_et
-      @_send_reaction_notification conversation_et, message_et, event_json
-      @logger.debug "Updated reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
-      return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
-      .catch (error) =>
-        throw error is error.type isnt z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
-        if attempt < 10
-          return window.setTimeout =>
-            @_on_reaction conversation_et, event_json, attempt + 1
-          , 10 * attempt
-        @logger.error "Too many attempts to update reaction to message '#{message_et.id}' in conversation '#{conversation_et.id}'", error
+      if changes
+        @_update_user_ets message_et
+        @_send_reaction_notification conversation_et, message_et, event_json
+        @logger.debug "Updating reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
+        return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
     .catch (error) =>
+      if error.type is z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
+        Raygun.send 'Failed sequential database update'
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         @logger.error "Failed to handle reaction to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", {error: error, event: event_json}
         throw error
