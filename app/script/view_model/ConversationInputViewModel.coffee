@@ -355,4 +355,4 @@ class z.ViewModel.ConversationInputViewModel
     ].concat z.ephemeral.timings.get_values().map (milliseconds) =>
       [number, unit] = z.util.format_milliseconds_short(milliseconds)
       unit_locale = @_get_localized_unit_string number, unit
-      return title: "#{number} #{unit_locale}", callback: => @set_ephemeral_timer milliseconds
+      return label: "#{number} #{unit_locale}", click: => @set_ephemeral_timer milliseconds
