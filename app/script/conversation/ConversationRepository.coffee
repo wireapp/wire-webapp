@@ -2103,7 +2103,7 @@ class z.conversation.ConversationRepository
         @logger.error "Too many attempts to update reaction to message '#{message_et.id}' in conversation '#{conversation_et.id}'", error
     .catch (error) =>
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-        @logger.error "Failed to handle reaction to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
+        @logger.error "Failed to handle reaction to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", {error: error, event: event_json}
         throw error
 
   ###
