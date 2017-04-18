@@ -53,5 +53,5 @@ class z.ViewModel.content.PreferencesOptionsViewModel
 
   update_properties: (properties) =>
     @option_audio properties.settings.sound.alerts
-    @option_data properties.settings.privacy.report_errors
+    @option_privacy properties.settings.privacy.report_errors
     @option_notifications properties.settings.notifications
