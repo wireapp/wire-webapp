@@ -29,22 +29,47 @@ z.entity.Asset = class Asset {
     this.type = '';
   }
 
+  /**
+   * Check if asset is a medium image.
+   *
+   * @returns {Boolean} Is asset of type medium image
+   */
   is_image() {
     return this.type === z.assets.AssetType.IMAGE;
   }
 
+  /**
+   * Check if asset is a text.
+   *
+   * @returns {Boolean} Is asset of type text
+   */
   is_text() {
     return this.type === z.assets.AssetType.TEXT;
   }
 
+  /**
+   * Check if asset is a file.
+   *
+   * @returns {Boolean} Is asset of type file
+   */
   is_file() {
     return this.type === z.assets.AssetType.FILE && !this.is_video() && !this.is_audio();
   }
 
+  /**
+   * Check if asset is a location.
+   *
+   * @returns {Boolean} Is asset of type location
+   */
   is_location() {
     return this.type === z.assets.AssetType.LOCATION;
   }
 
+  /**
+   * Check if asset is a video.
+   *
+   * @returns {Boolean} Is asset of type video
+   */
   is_video() {
     const is_video_asset = (this.type === z.assets.AssetType.FILE) && (this.file_type != null ? this.file_type.startsWith('video') : undefined);
     if (is_video_asset) {
@@ -56,6 +81,11 @@ z.entity.Asset = class Asset {
     return false;
   }
 
+  /**
+   * Check if asset is a audio.
+   *
+   * @returns {Boolean} Is asset of type audio
+   */
   is_audio() {
     if ((this.type === z.assets.AssetType.FILE) && (this.file_type != null ? this.file_type.startsWith('audio') : undefined)) {
       const can_play = document.createElement('audio').canPlayType(this.file_type);
