@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.CallMessage = class CallMessage extends z.entity.Message {
-  // Construct a new content message.
   constructor() {
     super();
     this.super_type = z.message.SuperType.CALL;
@@ -39,17 +38,17 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
       , this, {deferEvaluation: true});
   }
 
-  /*
-   Check if call message is call activation.
-   @return [Boolean] Is message of type activate
+  /**
+   * Check if call message is call activation.
+   * @returns {Boolean} Is message of type activate
    */
   is_activation() {
     return this.call_message_type === z.message.CALL_MESSAGE_TYPE.ACTIVATED;
   }
 
-  /*
-   Check if call message is call activation.
-   @return [Boolean] Is message of type deactivate
+  /**
+   * Check if call message is call deactivation.
+   * @returns {Boolean} Is message of type deactivate
    */
   is_deactivation() {
     return this.call_message_type === z.message.CALL_MESSAGE_TYPE.DEACTIVATED;

@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
-  // Construct a new content message.
   constructor() {
     super();
 
@@ -50,7 +49,6 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
       });
     };
 
-    // like
     this.is_liked_provisional = ko.observable();
     this.is_liked = ko.pureComputed({
       read: () => {
@@ -88,19 +86,20 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     });
   }
 
-  /*
-   Add another content asset to the message.
-
-   @param asset_et [z.entity.Asset] New content asset
+  /**
+   * Add another content asset to the message.
+   *
+   * @param {z.entity.Asset} asset_et - New content asset
+   * @returns {undefined} No return value
    */
   add_asset(asset_et) {
     return this.assets.push(asset_et);
   }
 
-  /*
-   Get the first asset attached to the message.
-
-   @return [z.entity.Message] The first asset attached to the message
+  /**
+   * Get the first asset attached to the message.
+   *
+   * @returns {z.entity.Message} The first asset attached to the message
    */
   get_first_asset() {
     return this.assets()[0];
@@ -122,17 +121,18 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     }
   }
 
-  /*
-   Check whether the message was edited.
-
-   @return [Boolean]
+  /**
+   * Check whether the message was edited.
+   *
+   * @returns {Boolean}
    */
   was_edited() {
     return (this.replacing_message_id != null);
   }
 
-  /*
-   Download message content.
+  /**
+   * Download message content.
+   * @returns {undefined} No return value
    */
   download() {
     const asset_et = this.get_first_asset();
@@ -140,10 +140,10 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     return asset_et.download(file_name);
   }
 
-  /*
-   Get content name.
-
-   @return [Boolean]
+  /**
+   * Get content name.
+   *
+   * @returns {Boolean}
    */
   get_content_name() {
     const asset_et = this.get_first_asset();
