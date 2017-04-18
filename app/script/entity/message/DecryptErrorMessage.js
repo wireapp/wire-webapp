@@ -38,8 +38,8 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
       return z.localization.Localizer.get_text({
         id: caption_id,
         replace: {
-          placeholder: '%@name',
           content: `<span class='label-bold-xs'>${ z.util.escape_html(this.user().first_name())}</span>`,
+          placeholder: '%@name',
         },
       });
     });

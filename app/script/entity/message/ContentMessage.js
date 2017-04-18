@@ -43,8 +43,8 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
       return z.localization.Localizer.get_text({
         id: z.string.conversation_edit_timestamp,
         replace: {
-          placeholder: '%@timestamp',
           content: moment(this.edited_timestamp).format('HH:mm'),
+          placeholder: '%@timestamp',
         },
       });
     };
@@ -78,8 +78,8 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
       return z.localization.Localizer.get_text({
         id: z.string.conversation_likes_caption,
         replace: {
-          placeholder: '%@number',
           content: this.reactions_user_ets().length,
+          placeholder: '%@number',
         },
       });
 

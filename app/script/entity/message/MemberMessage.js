@@ -73,8 +73,8 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       return z.localization.Localizer.get_text({
         id: key,
         replace: {
-          placeholder: '%@names',
           content: this._generate_name_string(declension),
+          placeholder: '%@names',
         },
       });
     };
