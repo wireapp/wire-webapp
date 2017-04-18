@@ -28,8 +28,8 @@ z.properties.Properties = class Properties {
     this.settings = {
       notifications: z.system_notification.SystemNotificationPreference.ON,
       privacy: {
-        report_errors: true,
         improve_wire: true,
+        report_errors: true,
       },
       sound: {
         alerts: z.audio.AudioPreference.ALL,

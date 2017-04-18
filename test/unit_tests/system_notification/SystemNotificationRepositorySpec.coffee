@@ -40,16 +40,16 @@ describe 'z.system_notification.SystemNotificationRepository', ->
 
       # Notification
       notification_content =
-        title: z.util.StringUtil.truncate conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
         options:
           body: ''
           data:
             conversation_id: conversation_et.id
             message_id: '0'
           icon: '/image/logo/notification.png'
-          tag: conversation_et.id
           silent: true
+          tag: conversation_et.id
         timeout: z.config.BROWSER_NOTIFICATION.TIMEOUT
+        title: z.util.StringUtil.truncate conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
       # Mocks
       document.hasFocus = -> return false

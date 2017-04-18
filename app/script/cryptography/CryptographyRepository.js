@@ -25,11 +25,11 @@ window.z.cryptography = z.cryptography || {};
 const REMOTE_ENCRYPTION_FAILURE = '💣';
 
 z.cryptography.CryptographyRepository = class CryptographyRepository {
-
   /**
    * Construct a new Cryptography repository.
    * @param {z.cryptography.CryptographyService} cryptography_service - Backend REST API cryptography service implementation
    * @param {z.storage.StorageRepository} storage_repository - Repository for all storage interactions
+   * @returns {CryptographyRepository} The new repository for cryptography
    */
   constructor(cryptography_service, storage_repository) {
     this.cryptography_service = cryptography_service;
@@ -287,9 +287,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    */
   _construct_payload(sender) {
     return {
-      sender: sender,
-      recipients: {},
       native_push: true,
+      recipients: {},
+      sender: sender,
     };
   }
 

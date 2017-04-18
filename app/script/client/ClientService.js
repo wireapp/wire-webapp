@@ -23,6 +23,12 @@ window.z = window.z || {};
 window.z.client = z.client || {};
 
 z.client.ClientService = class ClientService {
+  /**
+   * Construct a new client service.
+   * @param {z.client.Client} client - Local client entity
+   * @param {z.storage.StorageService} storage_service - Service for all storage interactions
+   * @returns {ClientService} Service for all client interactions
+   */
   constructor(client, storage_service) {
     this.client = client;
     this.storage_service = storage_service;
@@ -44,11 +50,11 @@ z.client.ClientService = class ClientService {
    */
   delete_client(client_id, password) {
     return this.client.send_json({
-      url: this.client.create_url(`${z.client.ClientService.URL_CLIENTS}/${client_id}`),
-      type: 'DELETE',
       data: {
         password,
       },
+      type: 'DELETE',
+      url: this.client.create_url(`${z.client.ClientService.URL_CLIENTS}/${client_id}`),
     });
   }
 
@@ -59,9 +65,9 @@ z.client.ClientService = class ClientService {
    */
   delete_temporary_client(client_id) {
     return this.client.send_json({
-      url: this.client.create_url(`${z.client.ClientService.URL_CLIENTS}/${client_id}`),
-      type: 'DELETE',
       data: {},
+      type: 'DELETE',
+      url: this.client.create_url(`${z.client.ClientService.URL_CLIENTS}/${client_id}`),
     });
   }
 
@@ -74,8 +80,8 @@ z.client.ClientService = class ClientService {
   */
   get_client_by_id(client_id) {
     return this.client.send_request({
-      url: this.client.create_url(`${z.client.ClientService.URL_CLIENTS}/${client_id}`),
       type: 'GET',
+      url: this.client.create_url(`${z.client.ClientService.URL_CLIENTS}/${client_id}`),
     });
   }
 
@@ -86,8 +92,8 @@ z.client.ClientService = class ClientService {
    */
   get_clients() {
     return this.client.send_request({
-      url: this.client.create_url(z.client.ClientService.URL_CLIENTS),
       type: 'GET',
+      url: this.client.create_url(z.client.ClientService.URL_CLIENTS),
     });
   }
 
@@ -100,8 +106,8 @@ z.client.ClientService = class ClientService {
    */
   get_clients_by_user_id(user_id) {
     return this.client.send_request({
-      url: this.client.create_url(`${z.client.ClientService.URL_USERS}/${user_id}${z.client.ClientService.URL_CLIENTS}`),
       type: 'GET',
+      url: this.client.create_url(`${z.client.ClientService.URL_USERS}/${user_id}${z.client.ClientService.URL_CLIENTS}`),
     });
   }
 
@@ -112,9 +118,9 @@ z.client.ClientService = class ClientService {
    */
   post_clients(payload) {
     return this.client.send_json({
+      data: payload,
       type: 'POST',
       url: this.client.create_url(z.client.ClientService.URL_CLIENTS),
-      data: payload,
     });
   }
 

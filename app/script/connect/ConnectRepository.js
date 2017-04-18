@@ -194,8 +194,8 @@ z.connect.ConnectRepository = class ConnectRepository {
       (contacts) => {
         contacts.forEach(({emails, firstName: first_name, lastName: last_name, numbers}) => {
           const card = {
-            contact: [],
             card_id: CryptoJS.MD5(`${first_name}${last_name}`).toString(),
+            contact: [],
           };
           emails.forEach((email) => {
             card.contact.push(email.toLowerCase().trim());
@@ -235,8 +235,8 @@ z.connect.ConnectRepository = class ConnectRepository {
     while (x < address_book.contactCount()) {
       const {emails, firstName: first_name, lastName: last_name, numbers} = address_book.getContact(x);
       const card = {
-        contact: [],
         card_id: CryptoJS.MD5(`${first_name}${last_name}`).toString(),
+        contact: [],
       };
       emails.forEach((email) => {
         card.contact.push(email.toLowerCase().trim());
@@ -278,8 +278,8 @@ z.connect.ConnectRepository = class ConnectRepository {
       users.forEach((user) => {
         if ((user.gd$email) || (user.gd$phoneNumber)) {
           const card = {
-            contact: [],
             card_id: user.gd$etag,
+            contact: [],
           };
 
           if (user.gd$email) {

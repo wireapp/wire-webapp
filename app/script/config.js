@@ -19,20 +19,33 @@
 
 'use strict';
 
-if (window.z == null) {
-  window.z = {};
-}
+window.z = window.z || {};
 
 window.z.config = {
+  ACCENT_ID: {
+    BLUE: 1,
+    GREEN: 2,
+    ORANGE: 5,
+    PINK: 6,
+    PURPLE: 7,
+    RED: 4,
+    YELLOW: 3,
+  },
+
+  ACCOUNT_PRODUCTION_URL: 'https://account-wire.com/',
+  ACCOUNT_STAGING_URL: 'https://wire-account-staging.zinfra.io/',
+
   BROWSER_NOTIFICATION: {
+    BODY_LENGTH: 80,
     TIMEOUT: 5000,
     TITLE_LENGTH: 38,
-    BODY_LENGTH: 80,
   },
+
+  // 3 minutes session timeout
+  LOCALYTICS_SESSION_TIMEOUT: 3 * 60 * 1000,
 
   LOGGER: {
     OPTIONS: {
-      name_length: 65,
       domains: {
         'app.wire.com': function() {
           return 0;
@@ -50,35 +63,12 @@ window.z.config = {
           return 300;
         },
       },
+      name_length: 65,
     },
   },
 
-  // number of messages that will be pulled
-  MESSAGES_FETCH_LIMIT: 30,
-
-  // number of users displayed in "people you may know"
-  SUGGESTIONS_FETCH_LIMIT: 30,
-
-  ACCENT_ID: {
-    BLUE: 1,
-    GREEN: 2,
-    YELLOW: 3,
-    RED: 4,
-    ORANGE: 5,
-    PINK: 6,
-    PURPLE: 7,
-  },
-
-  MAXIMUM_CONVERSATION_SIZE: 128,
-
-  // self profile image size in pixel
-  MINIMUM_PROFILE_IMAGE_SIZE: {
-    WIDTH: 320,
-    HEIGHT: 320,
-  },
-
-  // 15 megabyte image upload limit
-  MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,
+  // 10 seconds until phone code expires
+  LOGIN_CODE_EXPIRATION: 10 * 60,
 
   // 25 megabyte upload limit (minus AES overhead)
   MAXIMUM_ASSET_FILE_SIZE: 25 * 1024 * 1024 - 32,
@@ -86,16 +76,37 @@ window.z.config = {
   // Maximum of parallel uploads
   MAXIMUM_ASSET_UPLOADS: 10,
 
+  MAXIMUM_CONVERSATION_SIZE: 128,
+
+  // 15 megabyte image upload limit
+  MAXIMUM_IMAGE_FILE_SIZE: 15 * 1024 * 1024,
+
   // Maximum characters per message
   MAXIMUM_MESSAGE_LENGTH: 8000,
 
-  SUPPORTED_PROFILE_IMAGE_TYPES: [
-    '.jpg-large',
-    'image/jpg',
-    'image/jpeg',
-    'image/png',
-    'image/bmp',
-  ],
+  // bigger requests will be split in chunks with a maximum size as defined
+  MAXIMUM_USERS_PER_REQUEST: 200,
+
+  // number of messages that will be pulled
+  MESSAGES_FETCH_LIMIT: 30,
+
+  MINIMUM_PASSWORD_LENGTH: 8,
+
+  // self profile image size in pixel
+  MINIMUM_PROFILE_IMAGE_SIZE: {
+    HEIGHT: 320,
+    WIDTH: 320,
+  },
+
+  MINIMUM_USERNAME_LENGTH: 2,
+
+  PROPERTIES_KEY: 'webapp',
+
+  // measured in pixel
+  SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,
+
+  // number of users displayed in "people you may know"
+  SUGGESTIONS_FETCH_LIMIT: 30,
 
   SUPPORTED_CONVERSATION_IMAGE_TYPES: [
     '.jpg-large',
@@ -106,25 +117,15 @@ window.z.config = {
     'image/gif',
   ],
 
-  // 3 minutes session timeout
-  LOCALYTICS_SESSION_TIMEOUT: 3 * 60 * 1000,
-
-  MINIMUM_USERNAME_LENGTH: 2,
-  MINIMUM_PASSWORD_LENGTH: 8,
-
-  // 10 seconds until phone code expires
-  LOGIN_CODE_EXPIRATION: 10 * 60,
-
-  // measured in pixel
-  SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,
-
-  // bigger requests will be split in chunks with a maximum size as defined
-  MAXIMUM_USERS_PER_REQUEST: 200,
+  SUPPORTED_PROFILE_IMAGE_TYPES: [
+    '.jpg-large',
+    'image/jpg',
+    'image/jpeg',
+    'image/png',
+    'image/bmp',
+  ],
 
   UNSPLASH_URL: 'https://source.unsplash.com/1200x1200/?landscape',
-
-  ACCOUNT_PRODUCTION_URL: 'https://account-wire.com/',
-  ACCOUNT_STAGING_URL: 'https://wire-account-staging.zinfra.io/',
 
   WEBSITE_PRODUCTION_URL: 'https://wire.com/',
   WEBSITE_STAGING_URL: 'https://staging-website.zinfra.io/',

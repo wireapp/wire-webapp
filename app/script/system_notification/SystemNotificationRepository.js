@@ -238,12 +238,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       id: z.string.system_notification_conversation_rename,
       replace: [
         {
-          placeholder: '%s.first_name',
           content: message_et.user().first_name(),
+          placeholder: '%s.first_name',
         },
         {
-          placeholder: '%name',
           content: message_et.name,
+          placeholder: '%name',
         },
       ],
     });
@@ -262,12 +262,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         id: z.string.system_notification_member_join_one,
         replace: [
           {
-            placeholder: '%s.first_name',
             content: message_et.user().first_name(),
+            placeholder: '%s.first_name',
           },
           {
-            placeholder: '%@.first_name',
             content: z.util.get_first_name(message_et.user_ets()[0], z.string.Declension.ACCUSATIVE),
+            placeholder: '%@.first_name',
           },
         ],
       });
@@ -277,12 +277,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       id: z.string.system_notification_member_join_many,
       replace: [
         {
-          placeholder: '%s.first_name',
           content: message_et.user().first_name(),
+          placeholder: '%s.first_name',
         },
         {
-          placeholder: '%no',
           content: message_et.user_ids().length,
+          placeholder: '%no',
         },
       ],
     });
@@ -301,8 +301,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         return z.localization.Localizer.get_text({
           id: z.string.system_notification_member_leave_left,
           replace: {
-            placeholder: '%s.first_name',
             content: message_et.user().first_name(),
+            placeholder: '%s.first_name',
           },
         });
       }
@@ -311,12 +311,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         id: z.string.system_notification_member_leave_removed_one,
         replace: [
           {
-            placeholder: '%s.first_name',
             content: message_et.user().first_name(),
+            placeholder: '%s.first_name',
           },
           {
-            placeholder: '%@.first_name',
             content: z.util.get_first_name(message_et.user_ets()[0], z.string.Declension.ACCUSATIVE),
+            placeholder: '%@.first_name',
           },
         ],
       });
@@ -326,12 +326,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       id: z.string.system_notification_member_leave_removed_many,
       replace: [
         {
-          placeholder: '%s.first_name',
           content: message_et.user().first_name(),
+          placeholder: '%s.first_name',
         },
         {
-          placeholder: '%no',
           content: message_et.user_ets().length,
+          placeholder: '%no',
         },
       ],
     });
@@ -369,8 +369,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         return z.localization.Localizer.get_text({
           id: z.string.system_notification_conversation_create,
           replace: {
-            placeholder: '%s.first_name',
             content: message_et.user().first_name(),
+            placeholder: '%s.first_name',
           },
         });
     }
@@ -404,8 +404,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     return z.localization.Localizer.get_text({
       id: z.string.system_notification_reaction,
       replace: {
-        placeholder: '%reaction',
         content: message_et.reaction,
+        placeholder: '%reaction',
       },
     });
   }
@@ -443,15 +443,15 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     })
     .then((should_obfuscate_sender) => {
       return {
-        title: should_obfuscate_sender ? this._create_title_obfuscated() : this._create_title(conversation_et, message_et),
         options: {
           body: this._should_obfuscate_notification_message(message_et) ? this._create_body_obfuscated() : options_body,
           data: this._create_options_data(conversation_et, message_et),
           icon: this._create_options_icon(should_obfuscate_sender, message_et.user()),
+          silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
           tag: this._create_options_tag(conversation_et),
-          silent: true, //@note When Firefox supports this we can remove the fix for WEBAPP-731
         },
         timeout: z.config.BROWSER_NOTIFICATION.TIMEOUT,
+        title: should_obfuscate_sender ? this._create_title_obfuscated() : this._create_title(conversation_et, message_et),
         trigger: this._create_trigger(conversation_et, message_et),
       };
     });
