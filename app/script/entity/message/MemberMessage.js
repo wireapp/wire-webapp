@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
-  // Construct a new member message.
   constructor() {
     super();
 

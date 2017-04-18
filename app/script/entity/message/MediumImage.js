@@ -25,9 +25,9 @@ window.z.entity = z.entity || {};
 z.entity.MediumImage = class MediumImage extends z.entity.Asset {
   constructor(id) {
     super(id);
-    this.type = z.assets.AssetType.IMAGE;
 
     this.correlation_id = '';
+    this.type = z.assets.AssetType.IMAGE;
 
     this.width = '0px';
     this.height = '0px';
@@ -40,6 +40,10 @@ z.entity.MediumImage = class MediumImage extends z.entity.Asset {
     this.resource = ko.observable();
   }
 
+  /**
+   * Loads and decrypts otr asset as initiates download
+   * @returns {Promise} Returns a promise that resolves with the asset as blob
+   */
   download(file_name) {
     if (this.resource()) {
       return this.resource().load()

@@ -34,7 +34,6 @@ z.entity.LinkPreview = class LinkPreview {
     // z.assets.AssetRemoteData
     this.image_resource = ko.observable();
 
-    // meta data
     this.meta_data = undefined;
     this.meta_data_type = undefined;
   }

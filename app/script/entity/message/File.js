@@ -77,10 +77,10 @@ z.entity.File = class File extends z.entity.Asset {
     return this.upload_progress(progress);
   }
 
-  /*
-   Loads and decrypts otr asset preview
-
-   @return [Promise] Returns a promise that resolves with the asset as blob
+  /**
+   * Loads and decrypts otr asset preview
+   *
+   * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
   load_preview() {
     if (this.preview_resource()) {
@@ -90,10 +90,10 @@ z.entity.File = class File extends z.entity.Asset {
     return undefined;
   }
 
-  /*
-   Loads and decrypts otr asset
-
-   @return [Promise] Returns a promise that resolves with the asset as blob
+  /**
+   * Loads and decrypts otr asset
+   *
+   * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
   load() {
     this.status(z.assets.AssetTransferState.DOWNLOADING);
@@ -113,10 +113,10 @@ z.entity.File = class File extends z.entity.Asset {
     return undefined;
   }
 
-  /*
-   Loads and decrypts otr asset as initiates download
-
-   @return [Promise] Returns a promise that resolves with the asset as blob
+  /**
+   * Loads and decrypts otr asset as initiates download
+   *
+   * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
   download() {
     if (this.status() !== z.assets.AssetTransferState.UPLOADED) {
