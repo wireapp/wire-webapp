@@ -136,7 +136,8 @@ z.search.SearchRepository = class SearchRepository {
           default:
             return user_et;
         }
-      });
+      })
+      .filter((user_et) => user_et);
     });
   }
 };
