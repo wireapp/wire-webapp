@@ -24,7 +24,7 @@ window.z.components = z.components || {};
 
 z.components.GroupAvatar = class GroupAvatar {
   constructor(params) {
-    this.conversation = params.conversation;
+    this.users = params.users;
     this.on_in_viewport = this.on_in_viewport.bind(this);
 
     this.slot0 = ko.observable('');
@@ -34,7 +34,8 @@ z.components.GroupAvatar = class GroupAvatar {
   }
 
   on_in_viewport() {
-    this.conversation.participating_user_ets().slice(0, 4).forEach((user_et, index) => {
+    console.debug('in viewport')
+    this.users().forEach((user_et, index) => {
       const preview = user_et.preview_picture_resource();
 
       if (preview) {

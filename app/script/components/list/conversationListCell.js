@@ -27,6 +27,7 @@ z.components.ConversationListCell = class ConversationListCell {
     this.conversation = params.conversation;
     this.is_selected = params.is_selected || function() {};
     this.user = ko.pureComputed(() => this.conversation.participating_user_ets()[0]);
+    this.users = ko.pureComputed(() => this.conversation.participating_user_ets().slice(0, 4));
 
     // TODO: in viewport
     this.cell_state = ko.pureComputed(() => z.conversation.ConversationCellState.generate(this.conversation));
@@ -43,7 +44,7 @@ ko.components.register('conversation-list-cell', {
     <div class="conversation-list-cell" data-bind="css: {'conversation-list-cell-active': is_selected(conversation)}">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation()}">
         <!-- ko if: conversation.is_group() -->
-          <group-avatar params="conversation: conversation"></group-avatar>
+          <group-avatar params="users: users()"></group-avatar>
         <!-- /ko -->
         <!-- ko ifnot: conversation.is_group() -->
           <user-avatar class="user-avatar-s" params="user: user"></user-avatar>

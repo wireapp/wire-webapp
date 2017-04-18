@@ -31,6 +31,62 @@ z.conversation.ConversationCellState = (() => {
     });
   }
 
+  function generate_activity_string(activities) {
+    const activity_strings = [];
+
+    for (const activity in activities) {
+      const count = activities[activity];
+
+      // TODO: localization
+      switch (activity) {
+        case 'message':
+          if (count === 1) {
+            activity_strings.push(`${count} new message`);
+          } else if (count > 1) {
+            activity_strings.push(`${count} new messages`);
+          }
+          break;
+        case 'ping':
+          if (count === 1) {
+            activity_strings.push(`${count} ping`);
+          } else if (count > 1) {
+            activity_strings.push(`${count} pings`);
+          }
+          break;
+        case 'call':
+          if (count === 1) {
+            activity_strings.push(`${count} missed call`);
+          } else if (count > 1) {
+            activity_strings.push(`${count} missed calls`);
+          }
+          break;
+      }
+    }
+
+    return activity_strings.join(', ');
+  }
+
+  function accumulate_activity(conversation_et) {
+    const unread_events = conversation_et.unread_events();
+    const activities = {
+      'message': 0,
+      'call': 0,
+      'ping': 0,
+    };
+
+    for (const message_et of unread_events) {
+      if (message_et.is_call() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED) { // TODO: message
+        activities.call = activities.call + 1;
+      } else if (message_et.is_ping()) {
+        activities.ping = activities.ping + 1
+      } else {
+        activities.message = activities.message + 1
+      }
+    }
+
+    return generate_activity_string(activities);
+  }
+
   const default_state = {
     description() {
       return '';
@@ -45,7 +101,7 @@ z.conversation.ConversationCellState = (() => {
       return conversation_et.removed_from_conversation();
     },
     description() {
-      return '[You Left]'; // TODO check you left/ you got removed
+      return '';
     },
     icon() {
       return z.conversation.ConversationStatusIcon.NONE;
@@ -56,8 +112,8 @@ z.conversation.ConversationCellState = (() => {
     match(conversation_et) {
       return conversation_et.is_muted();
     },
-    description() {
-      return '';
+    description(conversation_et) {
+      return accumulate_activity(conversation_et);
     },
     icon() {
       return z.conversation.ConversationStatusIcon.MUTED;
@@ -73,7 +129,9 @@ z.conversation.ConversationCellState = (() => {
       let message_text = '';
 
       if (has_missed_call_helper(conversation_et)) {
-        message_text = `${z.localization.Localizer.get_text(z.string.system_notification_missed_call)}`; // TODO: number
+        message_text = z.localization.Localizer.get_text(z.string.system_notification_missed_call); // TODO: number
+      } else if (last_message_et.is_ephemeral()) {
+        message_text = z.localization.Localizer.get_text(z.string.system_notification_timed_message);
       } else if (last_message_et.is_ping()) {
         message_text = z.localization.Localizer.get_text(z.string.system_notification_ping);
       } else if (last_message_et.has_asset_text()) {
@@ -99,11 +157,11 @@ z.conversation.ConversationCellState = (() => {
       return message_text;
     },
     icon(conversation_et) {
-      if (conversation_et.unread_events().find((message_et) => message_et.is_ping())) {
-        return z.conversation.ConversationStatusIcon.UNREAD_PING;
-      }
       if (has_missed_call_helper(conversation_et)) {
         return z.conversation.ConversationStatusIcon.MISSED_CALL;
+      }
+      if (conversation_et.unread_events().find((message_et) => message_et.is_ping())) {
+        return z.conversation.ConversationStatusIcon.UNREAD_PING;
       }
       return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
     },

@@ -161,15 +161,24 @@
       <ul class="left-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_unarchived">
 
       <!-- ko if: connect_requests().length > 0 -->
-        <li class="left-list-item"
-            data-bind="css: {'text-theme': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}">
-          <div class="left-column">
-            <div class="dot-md dot-outlined border-theme"></div>
+        <li class="conversation-list-cell"
+            data-bind="css: {'conversation-list-cell-active': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}">
+          <div class="conversation-list-cell-left">
+            <!-- ko if: connect_requests().length > 1 -->
+              <group-avatar params="users: connect_requests()"></group-avatar>
+            <!-- /ko -->
+            <!-- ko if: connect_requests().length === 1 -->
+              <user-avatar class="user-avatar-s" params="user: connect_requests()[0]"></user-avatar>
+            <!-- /ko -->
           </div>
-          <div class="center-column"
-               data-bind="click: click_on_connect_requests, text: connect_requests_text"
-               data-uie-name="item-pending-requests"></div>
-          <div class="right-column"></div>
+          <div class="conversation-list-cell-center">
+            <span class="conversation-list-cell-name"
+                  data-bind="click: click_on_connect_requests, text: connect_requests_text"
+                  data-uie-name="item-pending-requests"></span>
+          </div>
+          <div class="conversation-list-cell-right">
+            <span class="conversation-list-cell-badge icon-pending"></span>
+          </div>
         </li>
       <!-- /ko -->
 
