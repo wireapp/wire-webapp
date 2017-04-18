@@ -24,13 +24,21 @@ window.z.components = z.components || {};
 
 z.components.ConversationListCell = class ConversationListCell {
   constructor(params, component_info) {
+    this.on_in_viewport = this.on_in_viewport.bind(this);
     this.conversation = params.conversation;
     this.is_selected = params.is_selected || function() {};
+    this.entered_viewport = ko.observable(false);
     this.user = ko.pureComputed(() => this.conversation.participating_user_ets()[0]);
     this.users = ko.pureComputed(() => this.conversation.participating_user_ets().slice(0, 4));
 
-    // TODO: in viewport
-    this.cell_state = ko.pureComputed(() => z.conversation.ConversationCellState.generate(this.conversation));
+    this.cell_state = ko.pureComputed(() => {
+      return this.entered_viewport() ? z.conversation.ConversationCellState.generate(this.conversation) : '';
+    });
+  }
+
+  on_in_viewport() {
+    this.entered_viewport(true);
+    return true;
   }
 };
 
@@ -41,7 +49,7 @@ ko.components.register('conversation-list-cell', {
     }
   },
   template: `
-    <div class="conversation-list-cell" data-bind="css: {'conversation-list-cell-active': is_selected(conversation)}">
+    <div class="conversation-list-cell" data-bind="css: {'conversation-list-cell-active': is_selected(conversation)}, in_viewport: on_in_viewport">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation()}">
         <!-- ko if: conversation.is_group() -->
           <group-avatar params="users: users()"></group-avatar>
