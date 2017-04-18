@@ -341,7 +341,7 @@ class z.main.App
   _subscribe_to_beforeunload: ->
     $(window).on 'beforeunload', =>
       @logger.info "'window.onbeforeunload' was triggered, so we will disconnect from the backend."
-      @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.PAGE_NAVIGATION
+      @repository.event.disconnect_web_socket z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION
       @repository.calling.leave_call_on_beforeunload()
       @repository.storage.terminate 'window.onbeforeunload'
       return undefined
@@ -378,12 +378,12 @@ class z.main.App
     .then =>
       amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.NO_INTERNET
       amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
-      @repository.event.reconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.ONLINE
+      @repository.event.reconnect_web_socket z.event.WebSocketService.CHANGE_TRIGGER.ONLINE
 
   # Reflect internet connection loss in the UI.
   on_internet_connection_lost: =>
     @logger.warn 'Internet connection lost'
-    @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.OFFLINE
+    @repository.event.disconnect_web_socket z.event.WebSocketService.CHANGE_TRIGGER.OFFLINE
     amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NO_INTERNET
 
 
@@ -400,7 +400,7 @@ class z.main.App
   logout: (cause, clear_data = false, session_expired = false) =>
     _logout = =>
       # Disconnect from our backend, end tracking and clear cached data
-      @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.LOGOUT
+      @repository.event.disconnect_web_socket z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT
       amplify.publish z.event.WebApp.ANALYTICS.CLOSE_SESSION
 
       # Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)

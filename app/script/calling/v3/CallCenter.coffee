@@ -67,10 +67,10 @@ class z.calling.v3.CallCenter
   ###
   Set the notification handling state.
   @note Temporarily ignore call related events when handling notifications from the stream
-  @param handling_state [z.event.NotificationHandlingState] State of the notifications stream handling
+  @param handling_state [z.event.NOTIFICATION_HANDLING_STATE] State of the notifications stream handling
   ###
   set_notification_handling_state: (handling_state) =>
-    @block_media_stream = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
+    @block_media_stream = handling_state isnt z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
     @logger.info "Block requesting MediaStream: #{@block_media_stream}"
 
 

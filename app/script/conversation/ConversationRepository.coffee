@@ -543,10 +543,10 @@ class z.conversation.ConversationRepository
   ###
   Set the notification handling state.
   @note Temporarily do not unarchive conversations when handling the notification stream
-  @param handling_state [z.event.NotificationHandlingState] State of the notifications stream handling
+  @param handling_state [z.event.NOTIFICATION_HANDLING_STATE] State of the notifications stream handling
   ###
   set_notification_handling_state: (handling_state) =>
-    @block_event_handling = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
+    @block_event_handling = handling_state isnt z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
     @sending_queue.pause @block_event_handling
     @logger.info "Block handling of conversation events: #{@block_event_handling}"
 
