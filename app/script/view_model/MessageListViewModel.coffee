@@ -557,9 +557,7 @@ class z.ViewModel.MessageListViewModel
     @_track_context_menu message_et
 
     if message_et.is_downloadable() and not message_et.is_ephemeral()
-      entries.push
-        title: z.string.conversation_context_menu_download,
-        callback: -> message_et.download()
+      entries.push title: z.string.conversation_context_menu_download, callback: -> message_et.download()
 
     if message_et.is_reactable() and not @conversation().removed_from_conversation()
       if message_et.is_liked()

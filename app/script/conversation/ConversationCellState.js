@@ -179,7 +179,8 @@ z.conversation.ConversationCellState = (() => {
       return conversation_et.is_request();
     },
     description(conversation_et) {
-      return `@${conversation_et.participating_user_ets()[0].username()}`; // TODO check for undefined
+      const username = conversation_et.participating_user_ets()[0].username();
+      return username ? `@${username}` : '';
     },
     icon() {
       return z.conversation.ConversationStatusIcon.PENDING_CONNECTION;

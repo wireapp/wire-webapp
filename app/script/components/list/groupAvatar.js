@@ -44,6 +44,8 @@ z.components.GroupAvatar = class GroupAvatar {
         });
       }
     });
+
+    return true;
   }
 };
 
