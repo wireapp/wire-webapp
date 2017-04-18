@@ -56,9 +56,13 @@ class z.calling.entities.ECallMessage
       sessid: @session_id
       type: @type
 
-    if @type in [z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE]
+    if @type in [z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE]
       json_payload.props = @props
       json_payload.sdp = @sdp if @type isnt z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
+
+    if @type is z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP
+      json_payload.dest_clientid = @remote_client_id
+      json_payload.dest_userid = @remote_user_id
 
     return json_payload
 

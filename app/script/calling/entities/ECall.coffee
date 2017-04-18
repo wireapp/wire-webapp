@@ -145,16 +145,101 @@ class z.calling.entities.ECall
   # Call states
   ###############################################################################
 
+  check_group_activity: (termination_reason) =>
+    @leave_call termination_reason unless @participants().length
+
+  deactivate_call: (e_call_message_et, termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER) =>
+    return if @participants().length
+
+    reason = if @state() in z.calling.enum.CallStateGroups.WAS_MISSED then z.calling.enum.TERMINATION_REASON.MISSED else z.calling.enum.TERMINATION_REASON.COMPLETED
+    @termination_reason = termination_reason
+    @v3_call_center.inject_deactivate_event e_call_message_et, @creating_user, reason
+    @v3_call_center.delete_call @id
+
+  delete_call: =>
+    @state z.calling.enum.CallState.ENDED
+    @reset_call()
+
+  join_call: =>
+    @set_self_state true
+
+    if @state() is z.calling.enum.CallState.INCOMING
+      @state z.calling.enum.CallState.CONNECTING
+
+    if @is_group()
+      additional_payload = @v3_call_center.create_payload_prop_sync z.media.MediaType.AUDIO, false, @v3_call_center.create_additional_payload(@id)
+      @send_e_call_event z.calling.mapper.ECallMessageMapper.build_group_start @state() is z.calling.enum.CallState.CONNECTING, @session_id, additional_payload
+    else
+      @add_e_participant undefined, @conversation_et.participating_user_ets()[0]
+
+  leave_call: (termination_reason) =>
+    if @state() is z.calling.enum.CallState.ONGOING and not @is_group()
+      @state z.calling.enum.CallState.DISCONNECTING
+
+    event_promises = []
+    e_call_message_et = undefined
+
+    for e_flow_et in @get_flows()
+      additional_payload = @v3_call_center.create_additional_payload @id, e_flow_et.remote_user_id, e_flow_et.remote_client_id
+      if @is_connected()
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_hangup false, @session_id, additional_payload
+      else
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_cancel false, @session_id, additional_payload
+
+      event_promises.push @send_e_call_event e_call_message_et
+
+    Promise.all event_promises
+    .then =>
+      return Promise.all (@delete_e_participant e_participant_et.id for e_participant_et in @participants())
+    .then =>
+      if @is_group()
+        additional_payload = @v3_call_center.create_additional_payload @id
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_group_leave false, @session_id, additional_payload
+        @send_e_call_event e_call_message_et
+
+      @set_self_state false, termination_reason
+      @deactivate_call e_call_message_et, termination_reason
+
+  reject_call: =>
+    @state z.calling.enum.CallState.REJECTED
+    @send_e_call_event z.calling.mapper.ECallMessageMapper.build_reject false, @session_id, @v3_call_center.create_additional_payload @id
+
+  set_self_state: (joined_state, termination_reason) =>
+    @self_user_joined joined_state
+    @self_client_joined joined_state
+    @termination_reason = termination_reason if termination_reason and not @termination_reason
+
+  toggle_media: (media_type) =>
+    send_promises = []
+
+    for e_flow_et in @get_flows()
+      additional_payload = @v3_call_center.create_payload_prop_sync media_type, true, @v3_call_center.create_additional_payload @id, e_flow_et.remote_user_id, e_flow_et.remote_client_id
+      send_promises.push @send_e_call_event z.calling.mapper.ECallMessageMapper.build_prop_sync false, @session_id, additional_payload
+
+    return Promise.all send_promises
+
+
+  ###############################################################################
+  # Call states
+  ###############################################################################
+
+  confirm_message: (incoming_e_call_message_et) =>
+    additional_payload = @v3_call_center.create_additional_payload @id, incoming_e_call_message_et.user_id, incoming_e_call_message_et.client_id
+
+    switch incoming_e_call_message_et.type
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_hangup true, @session_id, additional_payload
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync true, @session_id, @v3_call_center.create_payload_prop_sync(z.media.MediaType.VIDEO, additional_payload)
+
+    @send_e_call_event e_call_message_et
+
   send_e_call_event: (e_call_message_et) =>
     @v3_call_center.send_e_call_event @conversation_et, e_call_message_et
 
   set_remote_version: (e_call_message_et) =>
-    @telemetry.set_remote_version z.calling.mapper.SDPMapper.get_tool_version e_call_message_et.sdp
-
-  start_negotiation: =>
-    @self_client_joined true
-    @self_user_joined true
-    e_participant_et.e_flow_et.start_negotiation() for e_participant_et in @participants() when e_participant_et.e_flow_et
+    if e_call_message_et.sdp
+      @telemetry.set_remote_version z.calling.mapper.SDPMapper.get_tool_version e_call_message_et.sdp
 
   _on_state_start_ringing: (is_incoming) =>
     @_play_call_sound is_incoming
@@ -205,18 +290,21 @@ class z.calling.entities.ECall
 
   ###
   Add an e-participant to the e-call.
-  @param user_et [z.entities.User] User entity to be added to the e-call
   @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+  @param user_et [z.entities.User] User entity to be added to the e-call
+  @param negotiate [Boolean] Should negotiation be started
   ###
-  add_e_participant: (e_call_message_et, user_et) =>
+  add_e_participant: (e_call_message_et, user_et, negotiate = true) =>
     @get_e_participant_by_id user_et.id
     .then =>
-      @update_e_participant e_call_message_et
+      # we do not always have an e call message
+      @update_e_participant e_call_message_et, negotiate, user_et.id
     .catch (error) =>
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
       e_participant_et = new z.calling.entities.EParticipant @, user_et, @timings, e_call_message_et
       @participants.push e_participant_et
+      e_participant_et.start_negotiation() if negotiate
       @logger.debug "Adding e-call participant '#{user_et.name()}'", e_participant_et
       @_update_remote_state()
       return e_participant_et
@@ -227,7 +315,7 @@ class z.calling.entities.ECall
   @param client_id [String] ID of client that requested the removal from the e-call
   @return [z.calling.entities.ECall] E-call entity
   ###
-  delete_e_participant: (user_id, client_id) =>
+  delete_e_participant: (user_id, client_id, termination_reason) =>
     @get_e_participant_by_id user_id
     .then (e_participant_et) =>
       if client_id
@@ -237,6 +325,13 @@ class z.calling.entities.ECall
       @participants.remove e_participant_et
       @_update_remote_state()
       @v3_call_center.media_element_handler.remove_media_element user_id
+
+      switch termination_reason
+        when z.calling.enum.TERMINATION_REASON.OTHER_USER
+          amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER
+        when z.calling.enum.TERMINATION_REASON.CONNECTION_DROP, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
+          amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP
+
       @logger.debug "Removed e-call participant '#{e_participant_et.user.name()}'"
       return @
     .catch (error) ->
@@ -265,16 +360,19 @@ class z.calling.entities.ECall
   ###
   Update e-call participant with e-call message.
   @param e_call_message_et [z.calling.entities.ECallMessage] E-call message to update user with
+  @param negotiate [Boolean] Should negotiation be started
   ###
-  update_e_participant: (e_call_message_et) =>
-    @get_e_participant_by_id e_call_message_et.user_id
+  update_e_participant: (e_call_message_et, negotiate = false, user_et) =>
+    @get_e_participant_by_id e_call_message_et.user_id or user_et.id
     .then (e_participant_et) =>
       if e_call_message_et.client_id
         e_participant_et.verify_client_id e_call_message_et.client_id
       @logger.debug "Updating e-call participant '#{e_participant_et.user.name()}'", e_call_message_et
       e_participant_et.update_state e_call_message_et
-      @_update_remote_state()
-      return e_participant_et
+      .then =>
+        e_participant_et.start_negotiation() if negotiate
+        @_update_remote_state()
+        return e_participant_et
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
@@ -360,8 +458,7 @@ class z.calling.entities.ECall
   @private
   ###
   reset_call: =>
-    @self_client_joined false
-    @self_user_joined false
+    @set_self_state false
     @is_connected false
     @session_id = undefined
     @termination_reason = undefined

@@ -28,17 +28,18 @@ V3_CALL_CONFIG =
     z.calling.enum.PROTOCOL.VERSION_3
   ]
 
-# V2 call center for all e-call interactions.
+# V3 call center for all e-call interactions.
 class z.calling.v3.CallCenter
   ###
   Construct a new e-call center.
 
   @param calling_config [ko.observable] Calling configuration from backend
+  @param client_repository [z.client.ClientRepository] Repository for client interactions
   @param conversation_repository [z.conversation.ConversationRepository] Repository for conversation interactions
   @param media_repository [z.media.MediaRepository] Repository for media interactions
   @param user_repository [z.user.UserRepository] Repository for all user and connection interactions
   ###
-  constructor: (@calling_config, @conversation_repository, @media_repository, @user_repository) ->
+  constructor: (@calling_config, @client_repository, @conversation_repository, @media_repository, @user_repository) ->
     @logger = new z.util.Logger 'z.calling.v3.CallCenter', z.config.LOGGER.OPTIONS
 
     # Telemetry
@@ -101,21 +102,31 @@ class z.calling.v3.CallCenter
   _on_event_in_supported_browsers: (e_call_message_et) ->
     @logger.debug "Received e-call '#{e_call_message_et.type}' message from user '#{e_call_message_et.user_id}' in conversation '#{e_call_message_et.conversation_id}'", e_call_message_et
 
-    switch e_call_message_et.type
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
-        @_on_e_call_cancel_event e_call_message_et
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
-        @_on_e_call_hangup_event e_call_message_et
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
-        @_on_e_call_prop_sync_event e_call_message_et
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT
-        @_on_e_call_reject_event e_call_message_et
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
-        @_on_e_call_setup_event e_call_message_et
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
-        @_on_e_call_update_event e_call_message_et
-      else
-        throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.UNKNOWN_EVENT_TYPE
+    @_validate_message_type e_call_message_et
+    .then =>
+      switch e_call_message_et.type
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+          @_on_cancel e_call_message_et
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_CHECK
+          @_on_group_check e_call_message_et
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_LEAVE
+          @_on_group_leave e_call_message_et
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP
+          @_on_group_setup e_call_message_et
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START
+          @_on_group_start e_call_message_et
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
+          @_on_hangup e_call_message_et
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
+          @_on_prop_sync e_call_message_et
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT
+          @_on_reject e_call_message_et
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+          @_on_setup e_call_message_et
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
+          @_on_update e_call_message_et
+        else
+          @logger.warn "E-call event of unknown type '#{e_call_message_et.type}' was ignored", e_call_message_et
 
   ###
   E-call event handling for browsers not supporting calling.
@@ -137,34 +148,105 @@ class z.calling.v3.CallCenter
         amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL
 
   ###
-  E-call cancel event handling.
+  E-call cancel message handling.
   @private
   @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
   ###
-  _on_e_call_cancel_event: (e_call_message_et) =>
+  _on_cancel: (e_call_message_et) ->
     return if e_call_message_et.response is true
 
     @get_e_call_by_id e_call_message_et.conversation_id
     .then (e_call_et) ->
       return e_call_et.verify_session_id e_call_message_et
     .then (e_call_et) ->
-      return e_call_et.delete_e_participant e_call_message_et.user_id, e_call_message_et.client_id
-    .then (e_call_et) =>
-      unless e_call_et.participants().length
-        if e_call_et.state() is z.calling.enum.CallState.CONNECTING
-          e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.OTHER_USER
-        @_distribute_deactivation_event e_call_message_et, e_call_et.creating_user
-        @delete_call e_call_message_et.conversation_id
+      return e_call_et.delete_e_participant e_call_message_et.user_id, e_call_message_et.client_id, z.calling.enum.TERMINATION_REASON.OTHER_USER
+    .then (e_call_et) ->
+      return e_call_et.deactivate_call e_call_message_et, z.calling.enum.TERMINATION_REASON.OTHER_USER
     .catch (error) =>
-      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
-      @_distribute_deactivation_event e_call_message_et
+      if error.type isnt z.calling.v3.CallError::TYPE.NOT_FOUND
+        @inject_deactivate_event e_call_message_et
+        throw error
 
   ###
-  E-call hangup event handling.
+  E-call group check message handling.
+  @private
+  @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_CHECK
+  ###
+  _on_group_check: (e_call_message_et) =>
+    @logger.debug 'GROUP_CHECK NOT IMPLEMENTED', e_call_message_et
+    @get_e_call_by_id e_call_message_et.conversation_id
+    .then (e_call_et) ->
+      e_call_et = undefined
+      #reset group check timeouts
+    .catch (error) =>
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
+      return if e_call_message_et.user_id is @user_repository.self().id
+
+      @conversation_repository.grant_message e_call_message_et.conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [e_call_message_et.user_id]
+      .then =>
+        @_create_incoming_e_call e_call_message_et
+
+  ###
+  E-call group leave message handling.
+  @private
+  @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_LEAVE
+  ###
+  _on_group_leave: (e_call_message_et) =>
+    @logger.debug 'GROUP_LEAVE', e_call_message_et
+    @get_e_call_by_id e_call_message_et.conversation_id
+    .then (e_call_et) ->
+      return e_call_et.delete_e_participant e_call_message_et.user_id, e_call_message_et.client_id, z.calling.enum.TERMINATION_REASON.OTHER_USER
+    .then (e_call_et) ->
+      return e_call_et.check_group_activity z.calling.enum.TERMINATION_REASON.OTHER_USER
+    .catch (error) ->
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
+
+  ###
+  E-call group setup message handling.
+  @private
+  @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP
+  ###
+  _on_group_setup: (e_call_message_et) =>
+    @logger.debug 'GROUP_SETUP', e_call_message_et
+    if e_call_message_et.dest_user_id isnt @user_repository.self().id or e_call_message_et.dest_client_id isnt @client_repository.current_client().id
+      return @logger.log "Ignored e-call group setup for client '#{e_call_message_et.dest_client_id}' user '#{e_call_message_et.dest_user_id}'"
+
+    @get_e_call_by_id e_call_message_et.conversation_id
+    .then (e_call_et) ->
+      e_call_et.set_remote_version e_call_message_et
+      return e_call_et.update_e_participant e_call_message_et, e_call_message_et.response isnt true
+    .catch (error) ->
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
+
+  ###
+  E-call group start message handling.
+  @private
+  @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START
+  ###
+  _on_group_start: (e_call_message_et) =>
+    @logger.debug 'GROUP_START', e_call_message_et
+    @get_e_call_by_id e_call_message_et.conversation_id
+    .then (e_call_et) =>
+      if e_call_et.state() in [z.calling.enum.CallState.INCOMING, z.calling.enum.CallState.OUTGOING]
+        e_call_et.state z.calling.enum.CallState.CONNECTING
+
+      # add the correct participant, start negotiating
+      @user_repository.get_user_by_id e_call_message_et.user_id, (remote_user_et) ->
+        return e_call_et.add_e_participant e_call_message_et, remote_user_et
+    .catch (error) =>
+      throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
+      return if e_call_message_et.user_id is @user_repository.self().id
+
+      @conversation_repository.grant_message e_call_message_et.conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [e_call_message_et.user_id]
+      .then =>
+        @_create_incoming_e_call e_call_message_et
+
+  ###
+  E-call hangup message handling.
   @private
   @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
   ###
-  _on_e_call_hangup_event: (e_call_message_et) =>
+  _on_hangup: (e_call_message_et) ->
     return if e_call_message_et.response is true
 
     @get_e_call_by_id e_call_message_et.conversation_id
@@ -172,20 +254,18 @@ class z.calling.v3.CallCenter
       return e_call_et.verify_session_id e_call_message_et
     .then (e_call_et) =>
       @_confirm_e_call_message e_call_et, e_call_message_et
-      return e_call_et.delete_e_participant e_call_message_et.user_id
-    .then (e_call_et) =>
-      unless e_call_et.participants().length
-        e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.OTHER_USER
-        @delete_call e_call_message_et.conversation_id
+      return e_call_et.delete_e_participant e_call_message_et.user_id, e_call_message_et.client_id, z.calling.enum.TERMINATION_REASON.OTHER_USER
+    .then (e_call_et) ->
+      return e_call_et.deactivate_call e_call_message_et, z.calling.enum.TERMINATION_REASON.OTHER_USER
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
   ###
-  E-call prop-sync event handling.
+  E-call prop-sync message handling.
   @private
   @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
-  _on_e_call_prop_sync_event: (e_call_message_et) =>
+  _on_prop_sync: (e_call_message_et) ->
     @get_e_call_by_id e_call_message_et.conversation_id
     .then (e_call_et) ->
       return e_call_et.verify_session_id e_call_message_et
@@ -196,11 +276,11 @@ class z.calling.v3.CallCenter
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
   ###
-  E-call reject event handling.
+  E-call reject message handling.
   @private
   @param e_call_message [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT
   ###
-  _on_e_call_reject_event: (e_call_message_et) =>
+  _on_reject: (e_call_message_et) ->
     @get_e_call_by_id e_call_message_et.conversation_id
     .then (e_call_et) =>
       if e_call_message_et.user_id isnt @user_repository.self().id
@@ -212,25 +292,22 @@ class z.calling.v3.CallCenter
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
   ###
-  E-call setup event handling.
+  E-call setup message handling.
   @private
   @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
-  _on_e_call_setup_event: (e_call_message_et) =>
+  _on_setup: (e_call_message_et) ->
     @get_e_call_by_id e_call_message_et.conversation_id
     .then (e_call_et) =>
+      e_call_et.set_remote_version e_call_message_et
       if e_call_message_et.response is true
         switch e_call_et.state()
           when z.calling.enum.CallState.INCOMING
             @logger.info "Incoming e-call in conversation '#{e_call_et.conversation_et.display_name()}' accepted on other device"
             return @delete_call e_call_message_et.conversation_id
           when z.calling.enum.CallState.OUTGOING
-            e_call_et.set_remote_version e_call_message_et
             return e_call_et.update_e_participant e_call_message_et
-            .then (e_participant_et) ->
-              if e_participant_et
-                e_call_et.state z.calling.enum.CallState.CONNECTING
-                e_participant_et.session_id = e_call_message_et.session_id
+            .then -> e_call_et.state z.calling.enum.CallState.CONNECTING
 
       return @user_repository.get_user_by_id e_call_message_et.user_id
       .then (remote_user_et) ->
@@ -245,11 +322,11 @@ class z.calling.v3.CallCenter
         @_create_incoming_e_call e_call_message_et
 
   ###
-  E-call setup event handling.
+  E-call setup message handling.
   @private
   @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
-  _on_e_call_update_event: (e_call_message_et) =>
+  _on_update: (e_call_message_et) ->
     @get_e_call_by_id e_call_message_et.conversation_id
     .then (e_call_et) ->
       return e_call_et.verify_session_id e_call_message_et
@@ -258,35 +335,36 @@ class z.calling.v3.CallCenter
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
+  ###
+  Validate that type of e-call message matches conversation type.
+  @param e_call_message_et [z.calling.entities.E_CALL_MESSAGE] E-call message to validate
+  ###
+  _validate_message_type: (e_call_message_et) ->
+    @conversation_repository.get_conversation_by_id_async e_call_message_et.conversation_id
+    .then (conversation_et) ->
+      if conversation_et.is_one2one()
+        group_message_types =  [
+          z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_CHECK
+          z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_LEAVE
+          z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP
+          z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START
+        ]
+        throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.WRONG_CONVERSATION_TYPE if e_call_message_et.type in group_message_types
+      else if conversation_et.is_group()
+        one2one_message_types =  [
+          z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+          z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+        ]
+        throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.WRONG_CONVERSATION_TYPE if e_call_message_et.type in one2one_message_types
+      else
+        throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.WRONG_CONVERSATION_TYPE
+
 
   ###############################################################################
   # Outbound e-call events
   ###############################################################################
 
-  ###
-  Send an e-call event.
-  @param conversation_et [z.entity] Conversation to send message in
-  @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity
-  ###
-  send_e_call_event: (conversation_et, e_call_message_et) =>
-    throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.WRONG_PAYLOAD_FORMAT if not _.isObject e_call_message_et
-
-    @get_e_call_by_id conversation_et.id
-    .then (e_call_et) ->
-      if e_call_message_et.type in [z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC]
-        return e_flow_et.send_message e_call_message_et for e_flow_et in e_call_et.get_flows()
-      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.NO_DATA_CHANNEL
-    .catch (error) =>
-      throw error if error.type not in [z.calling.v3.CallError::TYPE.NO_DATA_CHANNEL , z.calling.v3.CallError::TYPE.NOT_FOUND]
-
-      @logger.debug "Sending e-call '#{e_call_message_et.type}' message to conversation '#{conversation_et.id}'", e_call_message_et.to_JSON()
-      @_limit_message_recipients conversation_et, e_call_message_et
-      .then ([client_user_map, precondition_option]) =>
-        if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
-          e_call_message_et.type = z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
-        @conversation_repository.send_e_call conversation_et, e_call_message_et, client_user_map, precondition_option
-
-  _create_additional_payload: (conversation_id, remote_user_id, remote_client_id) ->
+  create_additional_payload: (conversation_id, remote_user_id, remote_client_id) ->
     return {
       conversation_id: conversation_id
       remote_client_id: remote_client_id
@@ -303,7 +381,7 @@ class z.calling.v3.CallCenter
   @param additional_payload [Object] Optional additional payload to be added
   @return [Object] E-call message props object
   ###
-  _create_payload_prop_sync: (payload_type, invert = false, additional_payload) ->
+  create_payload_prop_sync: (payload_type, invert = false, additional_payload) ->
     if _.isBoolean payload_type
       payload = props: videosend: "#{payload_type}"
     else
@@ -328,17 +406,32 @@ class z.calling.v3.CallCenter
       payload = $.extend payload, additional_payload
     return payload
 
+  ###
+  Send an e-call event.
+  @param conversation_et [z.entity] Conversation to send message in
+  @param e_call_message_et [z.calling.entities.ECallMessage] E-call message entity
+  ###
+  send_e_call_event: (conversation_et, e_call_message_et) =>
+    throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.WRONG_PAYLOAD_FORMAT if not _.isObject e_call_message_et
+
+    @get_e_call_by_id conversation_et.id
+    .then (e_call_et) ->
+      if e_call_message_et.type in [z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC]
+        return e_flow_et.send_message e_call_message_et for e_flow_et in e_call_et.get_flows()
+      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.NO_DATA_CHANNEL
+    .catch (error) =>
+      throw error if error.type not in [z.calling.v3.CallError::TYPE.NO_DATA_CHANNEL , z.calling.v3.CallError::TYPE.NOT_FOUND]
+
+      @logger.debug "Sending e-call '#{e_call_message_et.type}' message to conversation '#{conversation_et.id}'", e_call_message_et.to_JSON()
+      @_limit_message_recipients conversation_et, e_call_message_et
+      .then ([client_user_map, precondition_option]) =>
+        if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
+          e_call_message_et.type = z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+        @conversation_repository.send_e_call conversation_et, e_call_message_et, client_user_map, precondition_option
+
   _confirm_e_call_message: (e_call_et, incoming_e_call_message_et) ->
     return unless incoming_e_call_message_et.response is false
-
-    additional_payload = @_create_additional_payload incoming_e_call_message_et.conversation_id, incoming_e_call_message_et.user_id, incoming_e_call_message_et.client_id
-    switch incoming_e_call_message_et.type
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
-        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_hangup true, e_call_et.session_id, additional_payload
-      when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
-        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync true, e_call_et.session_id, @_create_payload_prop_sync(z.media.MediaType.VIDEO, false, additional_payload)
-
-    @send_e_call_event e_call_et.conversation_et, e_call_message_et
+    e_call_et.confirm_message incoming_e_call_message_et
 
   _limit_message_recipients: (conversation_et, e_call_message_et) ->
     remote_user = e_call_message_et.remote_user
@@ -362,7 +455,7 @@ class z.calling.v3.CallCenter
             # Send to all clients of remote user
             precondition_option = [remote_user.id]
             user_client_map = "#{remote_user.id}": (device.id for device in remote_user.devices())
-        when z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
+        when z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP, z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
           # Send to remote client that call is connected with
           if remote_client_id
             precondition_option = true
@@ -398,10 +491,7 @@ class z.calling.v3.CallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @logger.debug "Deleting e-call in conversation '#{conversation_id}'", e_call_et
-      if e_call_et.self_client_joined() and e_call_et.state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
-        amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP
-      e_call_et.state z.calling.enum.CallState.ENDED
-      e_call_et.reset_call()
+      e_call_et.delete_call()
       @e_calls.remove (e_call_et) -> e_call_et.id is conversation_id
       @media_stream_handler.reset_media_stream()
       return undefined
@@ -414,31 +504,20 @@ class z.calling.v3.CallCenter
   @param video_send [Boolean] Send video for this e-call
   ###
   join_call: (conversation_id, video_send = false) =>
-    e_call_et = undefined
-
     @get_e_call_by_id conversation_id
     .catch (error) =>
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
-
-      @_create_outgoing_e_call z.calling.mapper.ECallMessageMapper.build_prop_sync false, undefined, @_create_payload_prop_sync(video_send, false, conversation_id: conversation_id)
-    .then (e_call) =>
-      e_call_et = e_call
+      @_create_outgoing_e_call z.calling.mapper.ECallMessageMapper.build_prop_sync false, undefined, @create_payload_prop_sync(video_send, false, conversation_id: conversation_id)
+    .then (e_call_et) =>
       @logger.debug "Joining e-call in conversation '#{conversation_id}'", e_call_et
       e_call_et.initiate_telemetry video_send
       if not @media_stream_handler.local_media_stream()
-        @media_stream_handler.initiate_media_stream conversation_id, video_send
-    .then =>
+        return @media_stream_handler.initiate_media_stream conversation_id, video_send
+        .then -> return e_call_et
+      return e_call_et
+    .then (e_call_et) ->
       e_call_et.timings.time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED
-
-      switch e_call_et.state()
-        when z.calling.enum.CallState.INCOMING, z.calling.enum.CallState.REJECTED
-          return e_call_et.state z.calling.enum.CallState.CONNECTING
-        when z.calling.enum.CallState.OUTGOING
-          return @user_repository.get_user_by_id(e_call_et.conversation_et.participating_user_ids()[0])
-          .then (user_et) ->
-            e_call_et.participants.push new z.calling.entities.EParticipant e_call_et, user_et, e_call_et.timings
-    .then ->
-      e_call_et.start_negotiation()
+      e_call_et.join_call()
     .catch (error) =>
       @delete_call conversation_id
       throw error unless error instanceof z.media.MediaError
@@ -452,29 +531,8 @@ class z.calling.v3.CallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @logger.debug "Leaving e-call in conversation '#{conversation_id}'", e_call_et
-      e_call_et.state z.calling.enum.CallState.DISCONNECTING
-      e_call_et.termination_reason = termination_reason if termination_reason and not e_call_et.termination_reason
       @media_stream_handler.release_media_stream()
-
-      event_promises = []
-      e_call_message_et = undefined
-
-      for e_flow_et in e_call_et.get_flows()
-        additional_payload = @_create_additional_payload conversation_id, e_flow_et.remote_user_id, e_flow_et.remote_client_id
-        if e_call_et.is_connected()
-          e_call_message_et = z.calling.mapper.ECallMessageMapper.build_hangup false, e_call_et.session_id, additional_payload
-        else
-          e_call_message_et = z.calling.mapper.ECallMessageMapper.build_cancel false, e_call_et.session_id, additional_payload
-
-        event_promises.push @send_e_call_event e_call_et.conversation_et, e_call_message_et
-
-      return Promise.all event_promises
-      .then =>
-        e_call_et.self_user_joined false
-        e_call_et.self_client_joined false
-        if e_call_et.participants().length < 2
-          @delete_call conversation_id
-          @_distribute_deactivation_event e_call_message_et, e_call_et.creating_user if e_call_message_et?.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+      e_call_et.leave_call termination_reason
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
@@ -486,12 +544,10 @@ class z.calling.v3.CallCenter
   participant_left: (conversation_id, user_id) =>
     @get_e_call_by_id conversation_id
     .then (e_call_et) ->
-      return e_call_et.delete_e_participant user_id
+      return e_call_et.delete_e_participant user_id, undefined, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
     .then (e_call_et) =>
       unless e_call_et.participants().length
-        e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
-        e_call_et.self_user_joined false
-        e_call_et.self_client_joined false
+        e_call_et.set_self_state false, z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE
         @delete_call e_call_message_et.conversation_id
 
   ###
@@ -502,12 +558,8 @@ class z.calling.v3.CallCenter
     @get_e_call_by_id conversation_id
     .then (e_call_et) =>
       @logger.debug "Rejecting e-call in conversation '#{conversation_id}'", e_call_et
-      e_call_et.state z.calling.enum.CallState.REJECTED
       @media_stream_handler.reset_media_stream()
-
-      e_call_message_et = z.calling.mapper.ECallMessageMapper.build_reject false, e_call_et.session_id, @_create_additional_payload conversation_id
-
-      @send_e_call_event e_call_et.conversation_et, e_call_message_et
+      e_call_et.reject_call()
     .catch (error) ->
       throw error unless error.type is z.calling.v3.CallError::TYPE.NOT_FOUND
 
@@ -518,15 +570,8 @@ class z.calling.v3.CallCenter
   ###
   toggle_media: (conversation_id, media_type) =>
     @get_e_call_by_id conversation_id
-    .then (e_call_et) =>
-      send_promises = []
-
-      for e_flow_et in e_call_et.get_flows()
-        additional_payload = @_create_additional_payload conversation_id, e_flow_et.remote_user_id, e_flow_et.remote_client_id
-        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync false, e_call_et.session_id, @_create_payload_prop_sync(media_type, true, additional_payload)
-        send_promises.push @send_e_call_event e_call_et.conversation_et, e_call_message_et
-
-      return Promise.all send_promises
+    .then (e_call_et) ->
+      return e_call_et.toggle_media media_type
     .then =>
       switch media_type
         when z.media.MediaType.AUDIO
@@ -573,10 +618,10 @@ class z.calling.v3.CallCenter
         @logger.debug "Incoming '#{@_get_media_type_from_properties e_call_message_et.props}' e-call in conversation '#{e_call_et.conversation_et.display_name()}'", e_call_et
         e_call_et.state z.calling.enum.CallState.INCOMING
         e_call_et.set_remote_version e_call_message_et
-        return e_call_et.add_e_participant e_call_message_et, remote_user_et
+        return e_call_et.add_e_participant e_call_message_et, remote_user_et, false
         .then =>
           @telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, e_call_et
-          @_distribute_activation_event e_call_message_et
+          @inject_activate_event e_call_message_et
           @media_stream_handler.initiate_media_stream e_call_et.id, true if e_call_et.is_remote_video_send() and not @block_media_stream
       .catch (error) =>
         @delete_call e_call_message_et.conversation_id
@@ -602,11 +647,11 @@ class z.calling.v3.CallCenter
   # Notifications
   ###############################################################################
 
-  _distribute_activation_event: (e_call_message_et) ->
+  inject_activate_event: (e_call_message_et) ->
     amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_voice_channel_activate e_call_message_et
 
-  _distribute_deactivation_event: (e_call_message_et, creating_user_et) ->
-    amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_voice_channel_deactivate e_call_message_et, creating_user_et
+  inject_deactivate_event: (e_call_message_et, creating_user_et, reason) ->
+    amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_voice_channel_deactivate e_call_message_et, creating_user_et, reason
 
 
   ###############################################################################

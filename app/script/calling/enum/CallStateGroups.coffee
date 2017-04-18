@@ -47,3 +47,9 @@ z.calling.enum.CallStateGroups =
     z.calling.enum.CallState.ONGOING
     z.calling.enum.CallState.REJECTED
   ]
+  WAS_MISSED: [
+    z.calling.enum.CallState.CONNECTING
+    z.calling.enum.CallState.INCOMING
+    z.calling.enum.CallState.REJECTED
+    z.calling.enum.CallState.OUTGOING
+  ]

@@ -30,6 +30,18 @@ z.calling.mapper.ECallMessageMapper = do ->
   build_cancel = (response, session_id, additional_payload) ->
     return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL, response, session_id, additional_payload
 
+  build_group_check = (response, session_id, additional_payload) ->
+    return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_CHECK, response, session_id, additional_payload
+
+  build_group_leave = (response, session_id, additional_payload) ->
+    return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_LEAVE, response, session_id, additional_payload
+
+  build_group_setup = (response, session_id, additional_payload) ->
+    return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP, response, session_id, additional_payload
+
+  build_group_start = (response, session_id, additional_payload) ->
+    return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START, response, session_id, additional_payload
+
   build_hangup = (response, session_id, additional_payload) ->
     return build_e_call_message z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP, response, session_id, additional_payload
 
@@ -61,6 +73,11 @@ z.calling.mapper.ECallMessageMapper = do ->
       client_id: event.sender
 
     content = switch e_call_message.type
+      when z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP
+        dest_client_id: e_call_message.dest_clientid
+        dest_user_id: e_call_message.dest_userid
+        props: e_call_message.props
+        sdp: e_call_message.sdp
       when z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
         props: e_call_message.props
       when z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP, z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
@@ -75,6 +92,10 @@ z.calling.mapper.ECallMessageMapper = do ->
 
   return {
     build_cancel: build_cancel
+    build_group_check: build_group_check
+    build_group_leave: build_group_leave
+    build_group_setup: build_group_setup
+    build_group_start: build_group_start
     build_hangup: build_hangup
     build_prop_sync: build_prop_sync
     build_reject: build_reject

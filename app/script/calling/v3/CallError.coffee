@@ -39,10 +39,10 @@ class z.calling.v3.CallError
         'No e-call for conversation ID found'
       when z.calling.v3.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED
         'PeerConnection does not support RtcRtpSender extension'
-      when z.calling.v3.CallError::TYPE.UNKNOWN_EVENT_TYPE
-        'E-call event of unknown type was ignored'
       when z.calling.v3.CallError::TYPE.UNSUPPORTED_VERSION
         'Unsupported version of the e-call protocol'
+      when z.calling.v3.CallError::TYPE.WRONG_CONVERSATION_TYPE
+        'Wrong conversation type for e-call message'
       when z.calling.v3.CallError::TYPE.WRONG_PAYLOAD_FORMAT
         'Payload for an e-call message is in wrong format'
       when z.calling.v3.CallError::TYPE.WRONG_SENDER
@@ -60,7 +60,7 @@ class z.calling.v3.CallError
     NOT_FOUND: 'z.calling.v3.CallError::TYPE.NOT_FOUND'
     RTP_SENDER_NOT_SUPPORTED: 'z.calling.v3.CallError::TYPE.RTP_SENDER_NOT_SUPPORTED'
     UNKNOWN: 'z.calling.v3.CallError::TYPE.UNKNOWN'
-    UNKNOWN_EVENT_TYPE: 'z.calling.v3.CallError::TYPE.UNKNOWN_EVENT_TYPE'
     UNSUPPORTED_VERSION: 'z.calling.v3.CallError::TYPE.UNSUPPORTED_VERSION'
+    WRONG_CONVERSATION_TYPE: 'z.calling.v3.CallError::TYPE.WRONG_CONVERSATION_TYPE'
     WRONG_PAYLOAD_FORMAT: 'z.calling.v3.CallError::TYPE.WRONG_PAYLOAD_FORMAT'
     WRONG_SENDER: 'z.calling.v3.CallError::TYPE.WRONG_SENDER'

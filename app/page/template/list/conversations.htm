@@ -11,7 +11,7 @@
               <!-- /ko -->
             <!-- /ko -->
             <!-- ko if: is_group() && call().state() != z.calling.enum.CallState.ONGOING -->
-              <user-avatar class="user-avatar-xs" params="user: call().creator()"></user-avatar>
+              <user-avatar class="user-avatar-xs" params="user: call().creating_user"></user-avatar>
             <!-- /ko -->
           <!-- /ko -->
           <!-- ko if: is_group() && (call().state() === z.calling.enum.CallState.ONGOING && !call().self_user_joined()) || call().is_declined() -->

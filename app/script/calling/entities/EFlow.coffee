@@ -94,7 +94,7 @@ class z.calling.entities.EFlow
 
         when z.calling.rtc.ICEConnectionState.CLOSED
           @e_participant_et.is_connected false
-          @e_call_et.delete_e_participant @e_participant_et.id if @e_call_et.self_client_joined()
+          @e_call_et.delete_e_participant @e_participant_et.id, @remote_client_id if @e_call_et.self_client_joined()
 
         when z.calling.rtc.ICEConnectionState.DISCONNECTED
           @_set_negotiation_restart_timeout()
@@ -107,7 +107,7 @@ class z.calling.entities.EFlow
       switch signaling_state
         when z.calling.rtc.SignalingState.CLOSED
           @logger.debug "PeerConnection with '#{@remote_user.name()}' was closed"
-          @e_call_et.delete_e_participant @e_participant_et.id
+          @e_call_et.delete_e_participant @e_participant_et.id, @remote_client_id
           @_remove_media_stream @media_stream()
 
         when z.calling.rtc.SignalingState.REMOTE_OFFER
@@ -216,9 +216,7 @@ class z.calling.entities.EFlow
   @param e_call_message_et [z.calling.entities.ECallMessage] Optional e-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
   ###
   initialize_e_flow: (e_call_message_et) =>
-    if e_call_message_et
-      @remote_client_id = e_call_message_et.client_id
-      @is_answer true
+    if e_call_message_et?.sdp
       return @save_remote_sdp e_call_message_et
     @is_answer false
 
@@ -246,7 +244,7 @@ class z.calling.entities.EFlow
 
   _remove_participant: (termination_reason) =>
     @e_participant_et.is_connected false
-    @e_call_et.delete_e_participant @e_participant_et.id
+    @e_call_et.delete_e_participant @e_participant_et.id, @remote_client_id, z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
     .then =>
       return if @e_call_et.participants().length
       unless termination_reason
@@ -435,9 +433,14 @@ class z.calling.entities.EFlow
     .then (rtc_sdp) =>
       return z.calling.mapper.SDPMapper.rewrite_sdp rtc_sdp, z.calling.enum.SDPSource.REMOTE, @
     .then ([remote_sdp, ice_candidates]) =>
+      @remote_client_id = e_call_message_et.client_id
+
       if remote_sdp.type is z.calling.rtc.SDPType.OFFER
-        if @signaling_state() is z.calling.rtc.SignalingState.LOCAL_OFFER
-          return if @_solve_colliding_states()
+        switch @signaling_state()
+          when z.calling.rtc.SignalingState.LOCAL_OFFER
+            return if @_solve_colliding_states()
+          when z.calling.rtc.SignalingState.NEW, z.calling.rtc.SignalingState.STABLE
+            @is_answer true
 
         if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
           @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, true
@@ -463,10 +466,14 @@ class z.calling.entities.EFlow
       @logger.info "Sending local '#{@local_sdp().type}' SDP containing '#{ice_candidates.length}' ICE candidates for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
       @should_send_local_sdp false
 
+      response = @local_sdp().type is z.calling.rtc.SDPType.ANSWER
       if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
-        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_setup @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @_create_additional_payload()
+        if @e_call_et.is_group()
+          e_call_message_et = z.calling.mapper.ECallMessageMapper.build_group_setup response, @e_call_et.session_id, @_create_additional_payload()
+        else
+          e_call_message_et = z.calling.mapper.ECallMessageMapper.build_setup response, @e_call_et.session_id, @_create_additional_payload()
       else
-        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_update @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @_create_additional_payload()
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_update response, @e_call_et.session_id, @_create_additional_payload()
 
       return @e_call_et.send_e_call_event e_call_message_et
       .then =>
@@ -553,8 +560,8 @@ class z.calling.entities.EFlow
       amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED
 
   _create_additional_payload: ->
-    payload = @v3_call_center._create_additional_payload @e_call_et.id, @remote_user_id, @remote_client_id
-    return @v3_call_center._create_payload_prop_sync @e_call_et.self_state.video_send(), false, $.extend({remote_user: @remote_user, sdp: @local_sdp().sdp}, payload)
+    payload = @v3_call_center.create_additional_payload @e_call_et.id, @remote_user_id, @remote_client_id
+    return @v3_call_center.create_payload_prop_sync @e_call_et.self_state.video_send(), false, $.extend({remote_user: @remote_user, sdp: @local_sdp().sdp}, payload)
 
   ###
   Sets the local Session Description Protocol on the PeerConnection.
