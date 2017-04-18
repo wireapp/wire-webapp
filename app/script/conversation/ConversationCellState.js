@@ -135,6 +135,42 @@ z.conversation.ConversationCellState = (() => {
     },
   };
 
+  const group_activity_state = {
+    match(conversation_et) {
+      return conversation_et.is_group() && conversation_et.unread_event_count() > 0 && conversation_et.get_last_message().is_member()
+    },
+    description(conversation_et) {
+      const last_message_et = conversation_et.get_last_message();
+      let message_text = '';
+      switch (last_message_et.type) {
+        case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
+          if (last_message_et.remote_user_ets().length === 1) {
+            message_text = 'person left';
+          } else if (last_message_et.remote_user_ets().length > 1) {
+            message_text = 'people left';
+          }
+          break;
+        case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+          if (last_message_et.remote_user_ets().length === 1) {
+            message_text = 'person added';
+          } else if (last_message_et.remote_user_ets().length > 1) {
+            message_text = 'people added';
+          }
+          break;
+      }
+      return message_text;
+    },
+    icon(conversation_et) {
+      const last_message_et = conversation_et.get_last_message();
+      if (last_message_et.type === z.event.Backend.CONVERSATION.MEMBER_LEAVE) {
+        if (conversation_et.is_muted()) {
+          return z.conversation.ConversationStatusIcon.MUTED;
+        }
+        return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
+      }
+    },
+  };
+
   const unread_message_state = {
     match(conversation_et) {
       return conversation_et.unread_message_count() > 0;
@@ -194,7 +230,7 @@ z.conversation.ConversationCellState = (() => {
    */
   function generate(conversation_et) {
     console.debug('generate', conversation_et.display_name()); // TODO remove
-    const states = [removed_state, muted_state, alert_state, unread_message_state, pending_state];
+    const states = [removed_state, muted_state, alert_state, group_activity_state, unread_message_state, pending_state];
     const icon_state = states.find((state) => state.match(conversation_et));
     const description_state = states.find((state) => state.match(conversation_et));
 
