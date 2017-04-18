@@ -35,25 +35,25 @@ z.cryptography.CryptographyError = class CryptographyError extends Error {
         this.message = 'Failed to map external message';
         break;
       case z.cryptography.CryptographyError.TYPE.IGNORED_ASSET:
-        this.message ='Ignored asset preview';
+        this.message = 'Ignored asset preview';
         break;
       case z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW:
-        this.message ='Ignored image preview';
+        this.message = 'Ignored image preview';
         break;
       case z.cryptography.CryptographyError.TYPE.NO_DATA_CONTENT:
-        this.message ='No message data content found';
+        this.message = 'No message data content found';
         break;
       case z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE:
-        this.message ='No GenericMessage found';
+        this.message = 'No GenericMessage found';
         break;
       case z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED:
-        this.message ='Message was previously stored';
+        this.message = 'Message was previously stored';
         break;
       case z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE:
-        this.message ='Unhandled event type';
+        this.message = 'Unhandled event type';
         break;
       default:
-        this.message ='Unknown CryptographyError';
+        this.message = 'Unknown CryptographyError';
     }
   }
 

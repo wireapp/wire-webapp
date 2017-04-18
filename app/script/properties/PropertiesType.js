@@ -20,12 +20,17 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.assets = z.assets || {};
+window.z.properties = z.properties || {};
 
-z.assets.AssetTransferState = {
-  DOWNLOADING: 'downloading',
-  UPLOAD_CANCELED: 'upload-canceled',
-  UPLOAD_FAILED: 'upload-failed',
-  UPLOADED: 'uploaded',
-  UPLOADING: 'uploading',
+z.properties.PROPERTIES_TYPE = {
+  CONTACT_IMPORT: {
+    GOOGLE: 'contact_import.google',
+    MACOS: 'contact_import.macos',
+  },
+  ENABLE_DEBUGGING: 'enable_debugging',
+  HAS_CREATED_CONVERSATION: 'has_created_conversation',
+  NOTIFICATIONS: 'settings.notifications',
+  PRIVACY: 'settings.privacy.improve_wire',
+  SOUND_ALERTS: 'settings.privacy.sound.alerts',
+  VERSION: 'version',
 };

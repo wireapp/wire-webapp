@@ -20,12 +20,26 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.assets = z.assets || {};
+window.z.properties = z.properties || {};
 
-z.assets.AssetTransferState = {
-  DOWNLOADING: 'downloading',
-  UPLOAD_CANCELED: 'upload-canceled',
-  UPLOAD_FAILED: 'upload-failed',
-  UPLOADED: 'uploaded',
-  UPLOADING: 'uploading',
+z.properties.Properties = class Properties {
+  constructor() {
+    this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
+    this.settings = {
+      notifications: z.system_notification.SystemNotificationPreference.ON,
+      privacy: {
+        improve_wire: true,
+        report_errors: true,
+      },
+      sound: {
+        alerts: z.audio.AudioPreference.ALL,
+      },
+    };
+    this.contact_import = {
+      google: undefined,
+      macos: undefined,
+    };
+    this[z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION] = false;
+    this[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING] = false;
+  }
 };

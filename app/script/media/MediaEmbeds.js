@@ -59,10 +59,10 @@ z.media.MediaEmbeds = (function() {
   // Enum of different regex for the supported services.
   const _regex = {
     // example: http://regexr.com/3ase5
-    youtube: /.*(?:youtu.be|youtube.com).*(?:\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/g,
     soundcloud: /(https?:\/\/(?:www\.|m\.)?)?soundcloud\.com(\/[\w\-]+){2,3}/g,
     spotify: /https?:\/\/(?:play\.|open\.)*spotify.com\/([\w\-/]+)/g,
     vimeo: /https?:\/\/(?:vimeo\.com\/|player\.vimeo\.com\/)(?:video\/|(?:channels\/staffpicks\/|channels\/)|)((\w|-){7,9})/g,
+    youtube: /.*(?:youtu.be|youtube.com).*(?:\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/g,
   };
 
   /**
@@ -133,9 +133,9 @@ z.media.MediaEmbeds = (function() {
 
   // Make public for testability.
   return {
-    regex: _regex,
-    generate_youtube_embed_url: _generate_youtube_embed_url,
     convert_youtube_timestamp_to_seconds: _convert_youtube_timestamp_to_seconds,
+    generate_youtube_embed_url: _generate_youtube_embed_url,
+    regex: _regex,
 
     /**
      * Appends SoundCloud iFrame if link is a valid SoundCloud source.
@@ -168,10 +168,10 @@ z.media.MediaEmbeds = (function() {
         const height = is_single_track ? 164 : 465;
 
         const iframe = _create_iframe_container({
+          height: height,
           src: 'https://w.soundcloud.com/player/?url={1}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true',
           type: 'soundcloud',
           video: false,
-          height: height,
         });
 
         const embed = z.util.StringUtil.format(iframe, height, link_src);
@@ -193,10 +193,10 @@ z.media.MediaEmbeds = (function() {
 
       if (link_src.match(_regex.spotify)) {
         const iframe = _create_iframe_container({
+          height: '80px',
           src: 'https://embed.spotify.com/?uri=spotify$1',
           type: 'spotify',
           video: false,
-          height: '80px',
         });
 
         // convert spotify uri: album/23... -> album:23... -> album%3A23...

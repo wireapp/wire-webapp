@@ -37,16 +37,16 @@ z.assets.Asset = class Asset {
     this.payload = {
       conv_id: config.conversation_id,
       correlation_id: this.correlation_id,
+      height: config.height,
+      inline: config.inline || false,
+      md5: config.md5,
+      native_push: config.native_push || false,
+      nonce: this.correlation_id,
+      original_height: config.original_height || config.width,
+      original_width: config.original_width || config.width,
       public: config.public || false,
       tag: config.tag || 'medium',
-      inline: config.inline || false,
-      nonce: this.correlation_id,
-      md5: config.md5,
       width: config.width,
-      height: config.height,
-      original_width: config.original_width || config.width,
-      original_height: config.original_height || config.width,
-      native_push: config.native_push || false,
     };
   }
 

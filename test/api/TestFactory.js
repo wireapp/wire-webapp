@@ -32,12 +32,12 @@ window.TestFactory = function(logger_level) {
   }
 
   this.settings = {
-    logging_level: logger_level,
     connection: {
       environment: 'test',
       rest_url: 'http://localhost',
       websocket_url: 'wss://localhost',
     },
+    logging_level: logger_level,
   };
 
   this.client = new z.service.Client(this.settings.connection);
@@ -143,7 +143,7 @@ window.TestFactory.prototype.exposeClientActors = function() {
   .then(function() {
     self.logger.info('✓ exposedCryptographyActors');
 
-    const client = new z.client.Client({'address': '192.168.0.1', 'id': '60aee26b7f55a99f', 'class': 'desktop'});
+    const client = new z.client.Client({'address': '192.168.0.1', 'class': 'desktop', 'id': '60aee26b7f55a99f'});
 
     const user = new z.entity.User(entities.user.john_doe.id);
     user.devices.push(client);
@@ -159,7 +159,7 @@ window.TestFactory.prototype.exposeClientActors = function() {
     window.client_repository = new z.client.ClientRepository(client_service, window.cryptography_repository);
     window.client_repository.logger.level = self.settings.logging_level;
     window.client_repository.init(user);
-    const payload = {'cookie': 'webapp@2153234453@temporary@1470926647664', 'time': '2016-10-07T16:01:42.133Z', 'location': {'lat': 52.5233, 'lon': 13.4138}, 'address': '62.96.148.44', 'model': 'Chrome (Temporary)', 'id': '132b3653b33f851f', 'type': 'temporary', 'class': 'desktop', 'label': 'Windows 10', 'meta': {'is_verified': true, 'primary_key': 'local_identity'}};
+    const payload = {'address': '62.96.148.44', 'class': 'desktop', 'cookie': 'webapp@2153234453@temporary@1470926647664', 'id': '132b3653b33f851f', 'label': 'Windows 10', 'location': {'lat': 52.5233, 'lon': 13.4138}, 'meta': {'is_verified': true, 'primary_key': 'local_identity'}, 'model': 'Chrome (Temporary)', 'time': '2016-10-07T16:01:42.133Z', 'type': 'temporary'};
     const current_client = new z.client.Client(payload);
     window.client_repository.current_client(current_client);
 
