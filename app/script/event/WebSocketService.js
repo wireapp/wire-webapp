@@ -94,7 +94,7 @@ z.event.WebSocketService = class WebSocketService {
 
       this.socket.onopen = () => {
         this.logger.info(`Connected WebSocket to: ${this.client.web_socket_url}/await`);
-        this.ping_interval_id = window.setInterval(this.send_ping, WEB_SOCKET_SERVICE_CONFIG.PING_INTERVAL);
+        this.ping_interval_id = window.setInterval(this.send_ping.bind(this), WEB_SOCKET_SERVICE_CONFIG.PING_INTERVAL);
         resolve();
       };
 
