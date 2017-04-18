@@ -346,3 +346,13 @@ class z.ViewModel.ConversationInputViewModel
   on_context_menu_action: (tag, action) =>
     return if tag isnt 'ephemeral'
     @set_ephemeral_timer window.parseInt(action, 10)
+
+  # TODO: dev
+  click_on_ephemeral_button: (data, event) =>
+    z.ui.Context.from event, [
+      title: z.localization.Localizer.get_text(z.string.ephememal_units_none)
+      callback: => @set_ephemeral_timer 0
+    ].concat z.ephemeral.timings.get_values().map (milliseconds) =>
+      [number, unit] = z.util.format_milliseconds_short(milliseconds)
+      unit_locale = @_get_localized_unit_string number, unit
+      return title: "#{number} #{unit_locale}", callback: => @set_ephemeral_timer milliseconds

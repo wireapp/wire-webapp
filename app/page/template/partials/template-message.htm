@@ -145,9 +145,7 @@
     <!-- /ko -->
 
     <div class="message-body-actions">
-      <context-menu params="entries: function() {return $parent.get_context_menu_entries(message)}, tag: 'message', data: message.id"
-                    class="context-menu icon-more font-size-xs"
-                    tabindex="-1"></context-menu>
+        <span class="context-menu icon-more font-size-xs" data-bind="click: $parent.on_context_menu_click"></span>
       <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}"></time>
       <!-- /ko -->

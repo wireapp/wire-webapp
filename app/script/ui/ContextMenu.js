@@ -63,6 +63,7 @@ z.ui.Context = (() => {
    */
   function from(event, entries) {
     event.preventDefault();
+    event.stopPropagation();
 
     cleanup();
 

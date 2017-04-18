@@ -549,3 +549,35 @@ class z.ViewModel.MessageListViewModel
         @conversation_repository.check_ephemeral_timer message_et if start_timer_on_focus is @conversation.id
 
     return true
+
+  # TODO: dev
+  on_context_menu_click: (message_et, event) =>
+    entries = []
+
+    @_track_context_menu message_et
+
+    if message_et.is_downloadable() and not message_et.is_ephemeral()
+      entries.push
+        title: z.string.conversation_context_menu_download,
+        callback: -> message_et.download()
+
+    if message_et.is_reactable() and not @conversation().removed_from_conversation()
+      if message_et.is_liked()
+        entries.push title: z.string.conversation_context_menu_unlike, callback: => @click_on_like message_et, false
+      else
+        entries.push title: z.string.conversation_context_menu_like, callback: => @click_on_like message_et, false
+
+    if message_et.is_editable() and not @conversation().removed_from_conversation()
+      entries.push title: z.string.conversation_context_menu_edit, callback: -> amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.EDIT, message_et
+
+    if message_et.is_deletable()
+      entries.push title: z.string.conversation_context_menu_delete, callback: =>
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
+          action: => @conversation_repository.delete_message @conversation(), message_et
+
+    if message_et.user().is_me and not @conversation().removed_from_conversation() and message_et.status() isnt z.message.StatusType.SENDING
+      entries.push title: z.string.conversation_context_menu_delete_everyone, callback: =>
+        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
+          action: => @conversation_repository.delete_message_everyone @conversation(), message_et
+
+    z.ui.Context.from event, entries
