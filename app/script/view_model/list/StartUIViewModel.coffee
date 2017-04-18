@@ -160,8 +160,7 @@ class z.ViewModel.list.StartUIViewModel
   _init_subscriptions: =>
     amplify.subscribe z.event.WebApp.CONNECT.IMPORT_CONTACTS,                    @import_contacts
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED,                         @update_properties
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_GOOGLE,          @update_properties
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_MACOS,           @update_properties
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.CONTACTS,                 @update_properties
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, @update_properties
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @update_properties
 
@@ -445,7 +444,7 @@ class z.ViewModel.list.StartUIViewModel
 
     @conversation_repository.create_new_conversation user_ids, null
     .then (conversation_et) =>
-      @properties_repository.save_preference_has_created_conversation()
+      @properties_repository.save_preference z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION,
         {creationContext: 'search', numberOfParticipants: user_ids.length}
       @click_on_group conversation_et

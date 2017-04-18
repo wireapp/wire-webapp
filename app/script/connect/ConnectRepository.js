@@ -55,7 +55,7 @@ z.connect.ConnectRepository = class ConnectRepository {
     })
     .then((response) => {
       this.logger.info(`Gmail contacts upload successful: ${response.results.length} matches, ${response['auto-connects'].length} auto connects`, response);
-      this.properties_repository.save_preference_contact_import_google(Date.now());
+      this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE);
       return response;
     })
     .catch((error) => {
@@ -96,7 +96,7 @@ z.connect.ConnectRepository = class ConnectRepository {
       })
       .then((response) => {
         this.logger.info(`macOS contacts upload successful: ${response.results.length} matches, ${response['auto-connects'].length} auto connects`, response);
-        this.properties_repository.save_preference_contact_import_macos(Date.now());
+        this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS);
         return response;
       })
       .catch((error) => {
@@ -127,7 +127,7 @@ z.connect.ConnectRepository = class ConnectRepository {
     })
     .then((response) => {
       this.logger.info(`macOS contacts upload successful: ${response.results.length} matches, ${response['auto-connects'].length} auto connects`, response);
-      this.properties_repository.save_preference_contact_import_macos(Date.now());
+      this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS);
       return response;
     })
     .catch((error) => {

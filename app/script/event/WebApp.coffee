@@ -136,10 +136,9 @@ z.event.WebApp =
       SHOW: 'wire.webapp.profile.settings.show'
   PROPERTIES:
     UPDATE:
-      CONTACTS_GOOGLE: 'wire.webapp.properties.update.contacts-google'
-      CONTACTS_MACOS: 'wire.webapp.properties.update.contacts-macos'
+      CONTACTS: 'wire.webapp.properties.update.contacts'
       NOTIFICATIONS: 'wire.webapp.properties.update.notifications'
-      SEND_DATA: 'wire.webapp.properties.update.send-data'
+      PRIVACY: 'wire.webapp.properties.update.privacy'
       SOUND_ALERTS: 'wire.webapp.properties.update.sound-alerts'
       HAS_CREATED_CONVERSATION: 'wire.webapp.properties.update.has-created-conversation'
     UPDATED: 'wire.webapp.properties.updated'
