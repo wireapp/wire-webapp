@@ -67,8 +67,8 @@
      */
     get_cookies() {
       return this.client.send_request({
-        url: this.client.create_url(AuthService.URL_COOKIES),
         type: 'GET',
+        url: this.client.create_url(AuthService.URL_COOKIES),
       }).then((data) => {
         return data.cookies;
       });
@@ -82,8 +82,8 @@
      */
     get_invitations_info(code) {
       return this.client.send_request({
-        url: this.client.create_url(`${AuthService.URL_INVITATIONS}/info?code=${code}`),
         type: 'GET',
+        url: this.client.create_url(`${AuthService.URL_INVITATIONS}/info?code=${code}`),
       });
     }
 
@@ -165,9 +165,9 @@
      */
     post_activate_send(send_activation_code) {
       return this.client.send_json({
-        url: this.client.create_url(`${AuthService.URL_ACTIVATE}/send`),
-        type: 'POST',
         data: send_activation_code,
+        type: 'POST',
+        url: this.client.create_url(`${AuthService.URL_ACTIVATE}/send`),
       });
     }
 
@@ -181,13 +181,13 @@
      */
     post_cookies_remove(email, password, labels) {
       return this.client.send_json({
-        url: this.client.create_url(`${AuthService.URL_COOKIES}/remove`),
-        type: 'POST',
         data: {
           email: email,
-          password: password,
           labels: labels,
+          password: password,
         },
+        type: 'POST',
+        url: this.client.create_url(`${AuthService.URL_COOKIES}/remove`),
       });
     }
 
@@ -250,9 +250,9 @@
      */
     post_login_send(request_code) {
       return this.client.send_json({
-        url: this.client.create_url(`${AuthService.URL_LOGIN}/send`),
-        type: 'POST',
         data: request_code,
+        type: 'POST',
+        url: this.client.create_url(`${AuthService.URL_LOGIN}/send`),
       });
     }
 
@@ -263,8 +263,8 @@
      */
     post_logout() {
       return this.client.send_json({
-        url: this.client.create_url(`${AuthService.URL_ACCESS}/logout`),
         type: 'POST',
+        url: this.client.create_url(`${AuthService.URL_ACCESS}/logout`),
         withCredentials: true,
       });
     }

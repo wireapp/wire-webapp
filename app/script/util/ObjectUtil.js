@@ -24,6 +24,14 @@ window.z.util = z.util || {};
 
 z.util.ObjectUtil = {
   /**
+   * Escapes all properties of a given object.
+   * @param {Object} object - Base object
+   * @returns {Object} Object copy with escaped properties
+   */
+  escape_properties(object) {
+    return z.util.ObjectUtil.map_recursive(object, _.escape);
+  },
+  /**
    * Creates an object copy and applies a mapping functions to all properties of that object.
    *
    * @param {Object} object - Base object
@@ -44,14 +52,5 @@ z.util.ObjectUtil = {
     }
 
     return new_object;
-  },
-  /**
-   * Escapes all properties of a given object.
-   *
-   * @param {Object} object - Base object
-   * @returns {Object} Object copy with escaped properties
-   */
-  escape_properties(object) {
-    return z.util.ObjectUtil.map_recursive(object, _.escape);
   },
 };

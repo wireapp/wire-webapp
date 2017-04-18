@@ -185,7 +185,7 @@ window.z.audio.AudioRepository = class AudioRepository {
    */
   _subscribe_to_events() {
     amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this, (handling_notifications) => {
-      this.muted = handling_notifications !== z.event.NotificationHandlingState.WEB_SOCKET;
+      this.muted = handling_notifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
       this.logger.info(`Set muted state to '${this.muted}'`);
     });
 

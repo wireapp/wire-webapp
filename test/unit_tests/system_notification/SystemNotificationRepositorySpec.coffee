@@ -32,7 +32,7 @@ describe 'z.system_notification.SystemNotificationRepository', ->
   beforeEach (done) ->
     test_factory.exposeSystemNotificationActors()
     .then ->
-      amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NotificationHandlingState.WEB_SOCKET
+      amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
 
       # Create entities
       user_et = user_repository.user_mapper.map_user_from_object payload.users.get.one[0]
@@ -40,16 +40,16 @@ describe 'z.system_notification.SystemNotificationRepository', ->
 
       # Notification
       notification_content =
-        title: z.util.StringUtil.truncate conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
         options:
           body: ''
           data:
             conversation_id: conversation_et.id
             message_id: '0'
           icon: '/image/logo/notification.png'
-          tag: conversation_et.id
           silent: true
+          tag: conversation_et.id
         timeout: z.config.BROWSER_NOTIFICATION.TIMEOUT
+        title: z.util.StringUtil.truncate conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false
 
       # Mocks
       document.hasFocus = -> return false
