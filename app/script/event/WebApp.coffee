@@ -144,7 +144,6 @@ z.event.WebApp =
     UPDATED: 'wire.webapp.properties.updated'
   SEARCH:
     HIDE: 'wire.webapp.search.hide'
-    ONBOARDING: 'wire.webapp.search.onboarding'
     SHOW: 'wire.webapp.people-picker.show'
     BADGE:
       HIDE: 'wire.webapp.search.badge.hide'
