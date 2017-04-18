@@ -45,10 +45,10 @@ z.ui.Context = (() => {
     for (const entry of entries) {
       const element = document.createElement('div');
       element.classList.add('emoji');
-      element.innerText = entry.title;
+      element.innerText = entry.label;
       element.onclick = function() {
         cleanup();
-        entry.callback();
+        entry.click();
       };
       menu.appendChild(element)
     }

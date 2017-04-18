@@ -187,39 +187,39 @@ class z.ViewModel.list.ConversationListViewModel
     entries = []
 
     if not conversation_et.is_request() and not conversation_et.removed_from_conversation()
-      title = if conversation_et.is_muted() then z.string.conversations_popover_notify else z.string.conversations_popover_silence
+      label = if conversation_et.is_muted() then z.string.conversations_popover_notify else z.string.conversations_popover_silence
       entries.push
-        title: z.localization.Localizer.get_text(title),
-        callback: => @conversation_repository.toggle_silence_conversation conversation_et
+        label: z.localization.Localizer.get_text(label),
+        click: => @conversation_repository.toggle_silence_conversation conversation_et
 
     if conversation_et.is_archived()
       entries.push
-        title: z.localization.Localizer.get_text(z.string.conversations_popover_unarchive),
-        callback: => @click_on_unarchive_action conversation_et
+        label: z.localization.Localizer.get_text(z.string.conversations_popover_unarchive),
+        click: => @click_on_unarchive_action conversation_et
     else
       entries.push
-        title: z.localization.Localizer.get_text(z.string.conversations_popover_archive),
-        callback: => @click_on_archive_action conversation_et
+        label: z.localization.Localizer.get_text(z.string.conversations_popover_archive),
+        click: => @click_on_archive_action conversation_et
 
     if conversation_et.is_request()
       entries.push
-        title: z.localization.Localizer.get_text(z.string.conversations_popover_cancel),
-        callback: => @click_on_cancel_action conversation_et
+        label: z.localization.Localizer.get_text(z.string.conversations_popover_cancel),
+        click: => @click_on_cancel_action conversation_et
 
     if not conversation_et.is_request() and not conversation_et.is_cleared()
       entries.push
-        title: z.localization.Localizer.get_text(z.string.conversations_popover_clear),
-        callback: => @click_on_clear_action conversation_et
+        label: z.localization.Localizer.get_text(z.string.conversations_popover_clear),
+        click: => @click_on_clear_action conversation_et
 
     if not conversation_et.is_group()
       entries.push
-        title: z.localization.Localizer.get_text(z.string.conversations_popover_block),
-        callback: => @click_on_block_action conversation_et
+        label: z.localization.Localizer.get_text(z.string.conversations_popover_block),
+        click: => @click_on_block_action conversation_et
 
     if conversation_et.is_group() and not conversation_et.removed_from_conversation()
       entries.push
-        title: z.localization.Localizer.get_text(z.string.conversations_popover_leave),
-        callback: => @click_on_leave_action conversation_et
+        label: z.localization.Localizer.get_text(z.string.conversations_popover_leave),
+        click: => @click_on_leave_action conversation_et
 
     z.ui.Context.from event, entries
 
