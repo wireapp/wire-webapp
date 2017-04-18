@@ -34,8 +34,7 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
         return z.localization.Localizer.get_text(z.string.conversation_voice_channel_deactivate_you);
       }
       return z.localization.Localizer.get_text(z.string.conversation_voice_channel_deactivate);
-    }
-      , this, {deferEvaluation: true});
+    }, this, {deferEvaluation: true});
   }
 
   /**

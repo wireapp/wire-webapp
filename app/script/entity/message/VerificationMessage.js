@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.VerificationMessage = class VerificationMessage extends z.entity.Message {
-
   constructor() {
     super();
     this.super_type = z.message.SuperType.VERIFICATION;
@@ -72,8 +71,7 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
   click_on_device() {
     if (this.is_self_device()) {
       return amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);
-    } 
+    }
     return amplify.publish(z.event.WebApp.SHORTCUT.PEOPLE);
-    
   }
 };

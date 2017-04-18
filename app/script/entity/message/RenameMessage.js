@@ -23,7 +23,6 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.RenameMessage = class RenameMessage extends z.entity.SystemMessage {
-  // Construct a new system message.
   constructor() {
     super();
     this.system_message_type = z.message.SystemMessageType.CONVERSATION_RENAME;

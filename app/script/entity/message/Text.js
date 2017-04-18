@@ -23,11 +23,6 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.Text = class Text extends z.entity.Asset {
-  /*
-   Construct a new text asset.
-
-   @param id [String] Asset ID
-   */
   constructor(id, text) {
     if (text == null) {
       text = '';
@@ -54,7 +49,7 @@ z.entity.Text = class Text extends z.entity.Asset {
     });
   }
 
-  // Process text before rendering it.
+  // Process text before rendering it
   render() {
     let message = z.util.render_message(this.text);
     if (this.previews().length === 0) {
