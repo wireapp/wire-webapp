@@ -42,6 +42,7 @@ z.entity.MediumImage = class MediumImage extends z.entity.Asset {
 
   /**
    * Loads and decrypts otr asset as initiates download
+   * @param {String} file_name - File name
    * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
   download(file_name) {

@@ -25,6 +25,7 @@ window.z.entity = z.entity || {};
 z.entity.Message = class Message {
   /**
    * Sort messages by timestamp
+   * @param {Array<z.entity.Message>} message_ets - Message entities
    * @returns {Boolean} Is message of type system
    */
   static sort_by_timestamp(message_ets) {
@@ -204,7 +205,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message can be deleted.
-   * @returns {Boolean}
+   * @returns {Boolean} True, if message is deletable.
    */
   is_deletable() {
     if (this.is_ping() || !this.has_asset()) {
@@ -270,29 +271,17 @@ z.entity.Message = class Message {
     return this.super_type === z.message.SuperType.UNABLE_TO_DECRYPT;
   }
 
-  /*
-   Check if message can be deconsted.
-   @return [Boolean]
-   */
-  is_deconstable() {
-    if (this.is_ping() || !this.has_asset()) {
-      return true;
-    }
-    return ![z.assets.AssetTransferState.DOWNLOADING,
-      z.assets.AssetTransferState.UPLOADING].includes(this.get_first_asset().status());
-  }
-
   /**
    * Check if message can be edited.
-   * @returns {Boolean}
+   * @returns {Boolean} True, if message can be edited.
    */
   is_editable() {
     return this.has_asset_text() && this.user().is_me && !this.is_ephemeral();
   }
 
-  /*
-   Check if message is ephemeral.
-   @return [Boolean]
+  /**
+   * Check if message is ephemeral.
+   * @returns {Boolean} True, if message is ephemeral.
    */
   is_ephemeral() {
     return this.ephemeral_expires() !== false;
@@ -300,7 +289,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if ephemeral message is expired.
-   * @returns {Boolean}
+   * @returns {Boolean} True, if message expired.
    */
   is_expired() {
     return this.ephemeral_expires() === true;
@@ -308,7 +297,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message can be reacted to.
-   * @returns {Boolean}
+   * @returns {Boolean} True, if message type supports reactions.
    */
   is_reactable() {
     return this.is_content() && (this.status() !== z.message.StatusType.SENDING) && !this.is_ephemeral();
@@ -346,7 +335,7 @@ z.entity.Message = class Message {
 
   /**
    * Update the status of a message.
-   * @param {z.message.StatusType} update_status - New status of message
+   * @param {z.message.StatusType} updated_status - New status of message
    * @returns {undefined} No return value
    */
   update_status(updated_status) {
