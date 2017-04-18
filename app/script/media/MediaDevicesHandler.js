@@ -264,7 +264,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
         const media_devices = this.available_devices[`${device_type}`]();
         const {current_device: media_device} = this._get_current_device(media_devices, device_id_observable());
 
-        if (!media_device.deviceId) {
+        if (!media_device) {
           const updated_device = this.available_devices[`${device_type}`]()[0];
           if (updated_device) {
             device_id_observable(updated_device.deviceId);
