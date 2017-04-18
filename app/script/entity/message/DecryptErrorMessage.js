@@ -39,8 +39,8 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
         id: caption_id,
         replace: {
           placeholder: '%@name',
-          content: `<span class='label-bold-xs'>${ z.util.escape_html(this.user().first_name())}</span>`
-        }
+          content: `<span class='label-bold-xs'>${ z.util.escape_html(this.user().first_name())}</span>`,
+        },
       });
     });
 

@@ -63,8 +63,8 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
         id: z.string.conversation_device_user_devices,
         replace: {
           placeholder: '%@name',
-          content: this.user_ets()[0].first_name()
-        }
+          content: this.user_ets()[0].first_name(),
+        },
       });
     });
   }
@@ -72,8 +72,8 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
   click_on_device() {
     if (this.is_self_device()) {
       return amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_DEVICES);
-    } else {
-      return amplify.publish(z.event.WebApp.SHORTCUT.PEOPLE);
-    }
+    } 
+    return amplify.publish(z.event.WebApp.SHORTCUT.PEOPLE);
+    
   }
 };

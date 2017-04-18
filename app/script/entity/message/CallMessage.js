@@ -31,11 +31,11 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
     this.finished_reason = '';
 
     this.caption = ko.pureComputed(() => {
-        if (this.user().is_me) {
-          return z.localization.Localizer.get_text(z.string.conversation_voice_channel_deactivate_you);
-        }
-        return z.localization.Localizer.get_text(z.string.conversation_voice_channel_deactivate);
+      if (this.user().is_me) {
+        return z.localization.Localizer.get_text(z.string.conversation_voice_channel_deactivate_you);
       }
+      return z.localization.Localizer.get_text(z.string.conversation_voice_channel_deactivate);
+    }
       , this, {deferEvaluation: true});
   }
 

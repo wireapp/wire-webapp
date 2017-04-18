@@ -35,15 +35,18 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
 
     this.reactions = ko.observable({});
     this.reactions_user_ets = ko.observableArray();
-    this.reactions_user_ids = ko.pureComputed(() => (this.reactions_user_ets().map(user_et => user_et.first_name())).join(', '));
+    this.reactions_user_ids = ko.pureComputed(() => (this.reactions_user_ets()
+      .map((user_et) => user_et.first_name()))
+      .join(', ')
+    );
 
     this.display_edited_timestamp = () => {
       return z.localization.Localizer.get_text({
         id: z.string.conversation_edit_timestamp,
         replace: {
           placeholder: '%@timestamp',
-          content: moment(this.edited_timestamp).format('HH:mm')
-        }
+          content: moment(this.edited_timestamp).format('HH:mm'),
+        },
       });
     };
 
@@ -56,30 +59,32 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
           this.is_liked_provisional(null);
           return is_liked_provisional;
         }
-        const likes = this.reactions_user_ets().filter(user_et => user_et.is_me);
+        const likes = this.reactions_user_ets().filter((user_et) => user_et.is_me);
         return likes.length === 1;
       },
-      write: value => {
+      write: (value) => {
         return this.is_liked_provisional(value);
-      }
+      },
     });
     this.other_likes = ko.pureComputed(() => {
-      return this.reactions_user_ets().filter(user_et => !user_et.is_me);
+      return this.reactions_user_ets().filter((user_et) => !user_et.is_me);
     });
     this.show_likes = ko.observable(false);
 
     this.like_caption = ko.pureComputed(() => {
       if (this.reactions_user_ets().length <= 5) {
-        return (this.reactions_user_ets().map(user_et => user_et.first_name())).join(', ');
-      } else {
-        return z.localization.Localizer.get_text({
-          id: z.string.conversation_likes_caption,
-          replace: {
-            placeholder: '%@number',
-            content: this.reactions_user_ets().length
-          }
-        });
+        return (this.reactions_user_ets()
+          .map((user_et) => user_et.first_name())
+        ).join(', ');
       }
+      return z.localization.Localizer.get_text({
+        id: z.string.conversation_likes_caption,
+        replace: {
+          placeholder: '%@number',
+          content: this.reactions_user_ets().length,
+        },
+      });
+
     });
   }
 

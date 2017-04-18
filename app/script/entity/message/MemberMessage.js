@@ -35,15 +35,21 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     // Users joined the conversation without sender
     this.joined_user_ets = ko.pureComputed(() => {
-      return (Array.from(this.user_ets()).filter((user_et) => user_et.id !== this.user().id).map((user_et) => user_et));
+      return (Array.from(this.user_ets())
+        .filter((user_et) => user_et.id !== this.user().id)
+        .map((user_et) => user_et)
+      );
     });
 
     // Users joined the conversation without self
     this.remote_user_ets = ko.pureComputed(() => {
-      return (Array.from(this.user_ets()).filter((user_et) => !user_et.is_me).map((user_et) => user_et));
+      return (Array.from(this.user_ets())
+        .filter((user_et) => !user_et.is_me)
+        .map((user_et) => user_et)
+      );
     });
 
-    this._generate_name_string = declension => {
+    this._generate_name_string = (declension) => {
       if (declension == null) {
         declension = z.string.Declension.ACCUSATIVE;
       }
@@ -58,7 +64,6 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           break;
         case z.user.ConnectionStatus.SENT:
           return '';
-          break;
         default:
           identifier = z.string.conversation_connection_accepted;
       }
@@ -70,15 +75,15 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         id: key,
         replace: {
           placeholder: '%@names',
-          content: this._generate_name_string(declension)
-        }
+          content: this._generate_name_string(declension),
+        },
       });
     };
 
     this.show_large_avatar = () => {
       const large_avatar_types = [
         z.message.SystemMessageType.CONNECTION_ACCEPTED,
-        z.message.SystemMessageType.CONNECTION_REQUEST
+        z.message.SystemMessageType.CONNECTION_REQUEST,
       ];
       return Array.from(large_avatar_types).includes(this.member_message_type);
     };
@@ -86,51 +91,50 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     this.other_user = ko.pureComputed(() => {
       if (this.user_ets().length === 1) {
         return this.user_ets()[0];
-      } else {
-        return new z.entity.User();
       }
+      return new z.entity.User();
+
     });
 
     this.caption = ko.pureComputed(() => {
-        if (this.user_ets().length === 0) {
-          return '';
-        }
-
-        switch (this.member_message_type) {
-          case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-          case z.message.SystemMessageType.CONNECTION_REQUEST:
-            return this._get_caption_connection(this.other_user().connection().status());
-            break;
-          case z.message.SystemMessageType.CONVERSATION_CREATE:
-            if (this.user().is_me) {
-              return this._get_caption_with_names(z.string.conversation_create_you);
-            }
-            return this._get_caption_with_names(z.string.conversation_create, z.string.Declension.DATIVE);
-            break;
-          case z.message.SystemMessageType.CONVERSATION_RESUME:
-            return this._get_caption_with_names(z.string.conversation_resume, z.string.Declension.DATIVE);
-            break;
-        }
-
-        switch (this.type) {
-          case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-            if (this.other_user().id === this.user().id) {
-              if (this.user().is_me) {
-                return z.localization.Localizer.get_text(z.string.conversation_member_leave_left_you);
-              }
-              return z.localization.Localizer.get_text(z.string.conversation_member_leave_left);
-            }
-            if (this.user().is_me) {
-              return this._get_caption_with_names(z.string.conversation_member_leave_removed_you);
-            }
-            return this._get_caption_with_names(z.string.conversation_member_leave_removed);
-          case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-            if (this.user().is_me) {
-              return this._get_caption_with_names(z.string.conversation_member_join_you);
-            }
-            return this._get_caption_with_names(z.string.conversation_member_join);
-        }
+      if (this.user_ets().length === 0) {
+        return '';
       }
+
+      switch (this.member_message_type) {
+        case z.message.SystemMessageType.CONNECTION_ACCEPTED:
+        case z.message.SystemMessageType.CONNECTION_REQUEST:
+          return this._get_caption_connection(this.other_user()
+            .connection()
+            .status());
+        case z.message.SystemMessageType.CONVERSATION_CREATE:
+          if (this.user().is_me) {
+            return this._get_caption_with_names(z.string.conversation_create_you);
+          }
+          return this._get_caption_with_names(z.string.conversation_create, z.string.Declension.DATIVE);
+        case z.message.SystemMessageType.CONVERSATION_RESUME:
+          return this._get_caption_with_names(z.string.conversation_resume, z.string.Declension.DATIVE);
+      }
+
+      switch (this.type) {
+        case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
+          if (this.other_user().id === this.user().id) {
+            if (this.user().is_me) {
+              return z.localization.Localizer.get_text(z.string.conversation_member_leave_left_you);
+            }
+            return z.localization.Localizer.get_text(z.string.conversation_member_leave_left);
+          }
+          if (this.user().is_me) {
+            return this._get_caption_with_names(z.string.conversation_member_leave_removed_you);
+          }
+          return this._get_caption_with_names(z.string.conversation_member_leave_removed);
+        case z.event.Backend.CONVERSATION.MEMBER_JOIN:
+          if (this.user().is_me) {
+            return this._get_caption_with_names(z.string.conversation_member_join_you);
+          }
+          return this._get_caption_with_names(z.string.conversation_member_join);
+      }
+    }
 
       , this, {deferEvaluation: true});
   }
@@ -138,7 +142,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
   is_connection() {
     return [
       z.message.SystemMessageType.CONNECTION_ACCEPTED,
-      z.message.SystemMessageType.CONNECTION_REQUEST
+      z.message.SystemMessageType.CONNECTION_REQUEST,
     ].includes(this.member_message_type);
   }
 
@@ -147,7 +151,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       z.message.SystemMessageType.CONNECTION_ACCEPTED,
       z.message.SystemMessageType.CONNECTION_REQUEST,
       z.message.SystemMessageType.CONVERSATION_CREATE,
-      z.message.SystemMessageType.CONVERSATION_RESUME
+      z.message.SystemMessageType.CONVERSATION_RESUME,
     ].includes(this.member_message_type);
   }
 };

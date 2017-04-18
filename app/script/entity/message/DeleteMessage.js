@@ -34,8 +34,8 @@ z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
         id: z.string.conversation_delete_timestamp,
         replace: {
           placeholder: '%@timestamp',
-          content: moment(this.deleted_timestamp).format('HH:mm')
-        }
+          content: moment(this.deleted_timestamp).format('HH:mm'),
+        },
       });
     };
   }
