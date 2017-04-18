@@ -473,12 +473,12 @@ class z.main.App
   # Disable debugging on any environment.
   disable_debugging: ->
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = -> 0
-    @repository.properties.save_preference_enable_debugging false
+    @repository.properties.save_preference z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, false
 
   # Enable debugging on any environment.
   enable_debugging: ->
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = -> 300
-    @repository.properties.save_preference_enable_debugging true
+    @repository.properties.save_preference z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, true
 
   # Report call telemetry to Raygun for analysis.
   report_call: =>

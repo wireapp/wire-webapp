@@ -49,8 +49,8 @@ z.links.LinkPreviewError = class LinkPreviewError extends Error {
       BLACKLISTED: 'z.links.LinkPreviewError.TYPE.BLACKLISTED',
       NO_DATA_AVAILABLE: 'z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE',
       NOT_SUPPORTED: 'z.links.LinkPreviewError.TYPE.NOT_SUPPORTED',
-      UNSUPPORTED_TYPE: 'z.links.LinkPreviewError.TYPE.UNSUPPORTED_TYPE',
       UNKNOWN: 'z.links.LinkPreviewError.TYPE.UNKNOWN',
+      UNSUPPORTED_TYPE: 'z.links.LinkPreviewError.TYPE.UNSUPPORTED_TYPE',
     };
   }
 };

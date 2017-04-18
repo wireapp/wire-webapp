@@ -160,8 +160,7 @@ class z.ViewModel.list.StartUIViewModel
   _init_subscriptions: =>
     amplify.subscribe z.event.WebApp.CONNECT.IMPORT_CONTACTS,                    @import_contacts
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED,                         @update_properties
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_GOOGLE,          @update_properties
-    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.CONTACTS_MACOS,           @update_properties
+    amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.CONTACTS,                 @update_properties
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, @update_properties
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @update_properties
 
@@ -192,7 +191,7 @@ class z.ViewModel.list.StartUIViewModel
       import_promise = @connect_repository.get_macos_contacts()
 
     import_promise.then (response) =>
-      @_show_onboarding_results response
+      @_show_on_boarding_results response
     .catch (error) =>
       if error.type isnt z.connect.ConnectError.TYPE.NO_CONTACTS
         @logger.error "Importing contacts from '#{source}' failed: #{error.message}", error
@@ -202,11 +201,11 @@ class z.ViewModel.list.StartUIViewModel
       @show_spinner false
       @_track_import source, error
 
-  _show_onboarding_results: (response) =>
-    @search_repository.show_onboarding response
-    .then ([connected_user_ets, suggested_user_ets]) =>
-      @connections connected_user_ets
-      @suggestions suggested_user_ets
+  _show_on_boarding_results: (response) =>
+    @search_repository.show_on_boarding response
+    .then ({connections, suggestions}) =>
+      @connections connections
+      @suggestions suggestions
       return @get_top_people()
     .then (user_ets) =>
       @top_users user_ets
@@ -445,7 +444,7 @@ class z.ViewModel.list.StartUIViewModel
 
     @conversation_repository.create_new_conversation user_ids, null
     .then (conversation_et) =>
-      @properties_repository.save_preference_has_created_conversation()
+      @properties_repository.save_preference z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION,
         {creationContext: 'search', numberOfParticipants: user_ids.length}
       @click_on_group conversation_et

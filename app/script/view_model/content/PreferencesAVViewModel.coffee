@@ -74,7 +74,7 @@ class z.ViewModel.content.PreferencesAVViewModel
     .catch (error) =>
       error = error[0] if _.isArray error
       @logger.error "Requesting MediaStream failed: #{error.message}", error
-      if error.type in [z.media.MediaError::TYPE.MEDIA_STREAM_DEVICE, z.media.MediaError::TYPE.MEDIA_STREAM_PERMISSION]
+      if error.type in [z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION]
         @permission_denied true
         return false
       throw error

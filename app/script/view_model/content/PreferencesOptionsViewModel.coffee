@@ -25,8 +25,9 @@ class z.ViewModel.content.PreferencesOptionsViewModel
   constructor: (element_id, @properties_repository) ->
     @logger = new z.util.Logger 'z.ViewModel.content.PreferencesOptionsViewModel', z.config.LOGGER.OPTIONS
 
-    @option_data = ko.observable()
-    @option_data.subscribe (data_preference) => @properties_repository.save_preference_data data_preference
+    @option_privacy = ko.observable()
+    @option_privacy.subscribe (privacy_preference) =>
+      @properties_repository.save_preference z.properties.PROPERTIES_TYPE.PRIVACY, privacy_preference
 
     @option_audio = ko.observable()
     @option_audio.subscribe (audio_preference) =>
@@ -35,11 +36,12 @@ class z.ViewModel.content.PreferencesOptionsViewModel
         when z.audio.AudioPreference.SOME then 'firstMessageOnly'
         when z.audio.AudioPreference.NONE then 'neverPlay'
 
-      @properties_repository.save_preference_sound_alerts audio_preference
+      @properties_repository.save_preference z.properties.PROPERTIES_TYPE.SOUND_ALERTS, audio_preference
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SOUND_SETTINGS_CHANGED, value: tracking_value
 
     @option_notifications = ko.observable()
-    @option_notifications.subscribe (notifications_preference) => @properties_repository.save_preference_notifications notifications_preference
+    @option_notifications.subscribe (notifications_preference) =>
+      @properties_repository.save_preference z.properties.PROPERTIES_TYPE.NOTIFICATIONS, notifications_preference
 
     amplify.subscribe z.event.WebApp.PROPERTIES.UPDATED, @update_properties
 
@@ -51,5 +53,5 @@ class z.ViewModel.content.PreferencesOptionsViewModel
 
   update_properties: (properties) =>
     @option_audio properties.settings.sound.alerts
-    @option_data properties.settings.privacy.report_errors
+    @option_privacy properties.settings.privacy.report_errors
     @option_notifications properties.settings.notifications

@@ -99,8 +99,8 @@
             const notification = new window.Notification(announcement.title, {
               body: announcement.message,
               icon: z.util.Environment.electron && z.util.Environment.os.mac ? '' : '/image/logo/notification.png',
-              sticky: true,
               requireInteraction: true,
+              sticky: true,
             });
 
             amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.SENT, {campaign: announcement.campaign});
