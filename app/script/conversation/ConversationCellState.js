@@ -24,11 +24,8 @@ window.z.conversation = z.conversation || {};
 
 z.conversation.ConversationCellState = (() => {
 
-  // TODO: move to message?
-  function has_missed_call_helper(conversation_et) {
-    return conversation_et.unread_events().find((message_et) => {
-      return message_et.is_call() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED
-    });
+  function is_alert(message_et) {
+    return message_et.is_ping() || message_et.is_call() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED;
   }
 
   function generate_activity_string(activities) {
@@ -78,9 +75,9 @@ z.conversation.ConversationCellState = (() => {
       if (message_et.is_call() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED) { // TODO: message
         activities.call = activities.call + 1;
       } else if (message_et.is_ping()) {
-        activities.ping = activities.ping + 1
+        activities.ping = activities.ping + 1;
       } else {
-        activities.message = activities.message + 1
+        activities.message = activities.message + 1;
       }
     }
 
@@ -120,6 +117,24 @@ z.conversation.ConversationCellState = (() => {
     },
   };
 
+  const alert_state = {
+    match(conversation_et) {
+      return conversation_et.unread_events().find(is_alert) !== undefined;
+    },
+    description(conversation_et) {
+      return accumulate_activity(conversation_et);
+    },
+    icon(conversation_et) {
+      const last_alert = conversation_et.unread_events().find(is_alert);
+      if (last_alert.is_ping()) {
+        return z.conversation.ConversationStatusIcon.UNREAD_PING;
+      }
+      if (last_alert.is_call() && last_alert.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED) {
+        return z.conversation.ConversationStatusIcon.MISSED_CALL;
+      }
+    },
+  };
+
   const unread_message_state = {
     match(conversation_et) {
       return conversation_et.unread_message_count() > 0;
@@ -128,9 +143,7 @@ z.conversation.ConversationCellState = (() => {
       const last_message_et = conversation_et.get_last_message();
       let message_text = '';
 
-      if (has_missed_call_helper(conversation_et)) {
-        message_text = z.localization.Localizer.get_text(z.string.system_notification_missed_call); // TODO: number
-      } else if (last_message_et.is_ephemeral()) {
+      if (last_message_et.is_ephemeral()) {
         message_text = z.localization.Localizer.get_text(z.string.system_notification_timed_message);
       } else if (last_message_et.is_ping()) {
         message_text = z.localization.Localizer.get_text(z.string.system_notification_ping);
@@ -156,13 +169,7 @@ z.conversation.ConversationCellState = (() => {
       }
       return message_text;
     },
-    icon(conversation_et) {
-      if (has_missed_call_helper(conversation_et)) {
-        return z.conversation.ConversationStatusIcon.MISSED_CALL;
-      }
-      if (conversation_et.unread_events().find((message_et) => message_et.is_ping())) {
-        return z.conversation.ConversationStatusIcon.UNREAD_PING;
-      }
+    icon() {
       return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
     },
   };
@@ -186,7 +193,7 @@ z.conversation.ConversationCellState = (() => {
    */
   function generate(conversation_et) {
     console.debug('generate', conversation_et.display_name()); // TODO remove
-    const states = [removed_state, muted_state, unread_message_state, pending_state];
+    const states = [removed_state, muted_state, alert_state, unread_message_state, pending_state];
     const icon_state = states.find((state) => state.match(conversation_et));
     const description_state = states.find((state) => state.match(conversation_et));
 
