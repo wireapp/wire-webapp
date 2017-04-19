@@ -105,7 +105,7 @@ z.properties.PropertiesRepository = class PropertiesRepository {
    * @returns {undefined} No return value
    */
   save_preference(properties_type, updated_preference) {
-    if (!updated_preference) {
+    if (updated_preference === undefined) {
       switch (properties_type) {
         case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE:
         case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
