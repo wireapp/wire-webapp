@@ -83,11 +83,7 @@ z.entity.File = class File extends z.entity.Asset {
    * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
   load_preview() {
-    if (this.preview_resource()) {
-      return this.preview_resource().load();
-    }
-
-    return Promise.resolve(undefined);
+    return this.preview_resource().load();
   }
 
   /**
@@ -98,19 +94,15 @@ z.entity.File = class File extends z.entity.Asset {
   load() {
     this.status(z.assets.AssetTransferState.DOWNLOADING);
 
-    if (this.original_resource()) {
-      this.original_resource().load()
-        .then((blob) => {
-          this.status(z.assets.AssetTransferState.UPLOADED);
-          return blob;
-        })
-        .catch((error) => {
-          this.status(z.assets.AssetTransferState.UPLOADED);
-          throw error;
-        });
-    }
-
-    return Promise.resolve(undefined);
+    return this.original_resource().load()
+      .then((blob) => {
+        this.status(z.assets.AssetTransferState.UPLOADED);
+        return blob;
+      })
+      .catch((error) => {
+        this.status(z.assets.AssetTransferState.UPLOADED);
+        throw error;
+      });
   }
 
   /**
@@ -129,6 +121,7 @@ z.entity.File = class File extends z.entity.Asset {
       size_mb: z.util.bucket_values((this.file_size / 1024 / 1024), [0, 5, 10, 15, 20, 25]),
       type: z.util.get_file_extension(this.file_name),
     };
+
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.DOWNLOAD_INITIATED, tracking_data);
 
     return this.load()
@@ -149,12 +142,7 @@ z.entity.File = class File extends z.entity.Asset {
 
   cancel_download() {
     this.status(z.assets.AssetTransferState.UPLOADED);
-
-    if (this.original_resource()) {
-      return this.original_resource().cancel_download();
-    }
-
-    return Promise.resolve(undefined);
+    return this.original_resource().cancel_download();
   }
 
   cancel(message_et) {

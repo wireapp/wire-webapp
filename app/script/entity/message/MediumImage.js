@@ -46,13 +46,9 @@ z.entity.MediumImage = class MediumImage extends z.entity.Asset {
    * @returns {Promise} Returns a promise that resolves with the asset as blob
    */
   download(file_name) {
-    if (this.resource()) {
-      return this.resource().load()
-        .then(function(blob) {
-          z.util.download_blob(blob, file_name);
-        });
-    }
-
-    return Promise.resolve(undefined);
+    return this.resource().load()
+      .then(function(blob) {
+        return z.util.download_blob(blob, file_name);
+      });
   }
 };
