@@ -118,6 +118,11 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     } else {
       const emoji_matched = this.emoji_dict
         .filter((emoji) => emoji.toLowerCase().indexOf(query) !== -1)
+        .sort((emoji_a, emoji_b) => {
+          const [emoji_code_a, emoji_name_a] = emoji_a.split('\t');
+          const [emoji_code_b, emoji_name_b] = emoji_b.split('\t');
+          return z.util.StringUtil.sort_by_priority(emoji_name_a, emoji_name_b, query);
+        })
         .slice(0, EMOJI_LIST_LENGTH)
         .map((emoji) => {
           const [code, name] = emoji.split('\t');
