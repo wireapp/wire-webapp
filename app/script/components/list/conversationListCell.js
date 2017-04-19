@@ -49,7 +49,7 @@ ko.components.register('conversation-list-cell', {
     }
   },
   template: `
-    <div class="conversation-list-cell" data-bind="css: {'conversation-list-cell-active': is_selected(conversation)}, in_viewport: on_in_viewport">
+    <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': id, 'data-uie-value': display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}, in_viewport: on_in_viewport">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation()}">
         <!-- ko if: conversation.is_group() -->
           <group-avatar params="users: users()"></group-avatar>
