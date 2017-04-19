@@ -56,7 +56,7 @@ z.entity.File = class File extends z.entity.Asset {
     this.upload_failed_reason = ko.observable();
     this.upload_cancel = undefined;
     this.pending_upload = ko.pureComputed(() => {
-      return (this.status() === z.assets.AssetTransferState.UPLOADING) && this.uploaded_on_this_client();
+      return this.status() === z.assets.AssetTransferState.UPLOADING && this.uploaded_on_this_client();
     });
 
     // update progress
@@ -87,7 +87,7 @@ z.entity.File = class File extends z.entity.Asset {
       return this.preview_resource().load();
     }
 
-    return undefined;
+    return Promise.resolve(undefined);
   }
 
   /**
@@ -110,7 +110,7 @@ z.entity.File = class File extends z.entity.Asset {
         });
     }
 
-    return undefined;
+    return Promise.resolve(undefined);
   }
 
   /**
@@ -120,7 +120,7 @@ z.entity.File = class File extends z.entity.Asset {
    */
   download() {
     if (this.status() !== z.assets.AssetTransferState.UPLOADED) {
-      return;
+      return Promise.resolve(undefined);
     }
 
     const download_started = Date.now();
@@ -154,7 +154,7 @@ z.entity.File = class File extends z.entity.Asset {
       return this.original_resource().cancel_download();
     }
 
-    return undefined;
+    return Promise.resolve(undefined);
   }
 
   cancel(message_et) {
@@ -162,15 +162,15 @@ z.entity.File = class File extends z.entity.Asset {
       this.upload_cancel();
     }
     amplify.publish(z.event.WebApp.CONVERSATION.ASSET.CANCEL, message_et);
-    return amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_CANCELLED, {
-      size_bytes: this.file_size,
-      size_mb: z.util.bucket_values((this.file_size / 1024 / 1024), [0, 5, 10, 15, 20, 25]),
-      type: z.util.get_file_extension(this.file_name),
-    }
+    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_CANCELLED, {
+        size_bytes: this.file_size,
+        size_mb: z.util.bucket_values((this.file_size / 1024 / 1024), [0, 5, 10, 15, 20, 25]),
+        type: z.util.get_file_extension(this.file_name),
+      }
     );
   }
 
   reload() {
-    return this.logger.info('Restart upload');
+    this.logger.info('Restart upload');
   }
 };

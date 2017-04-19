@@ -71,7 +71,7 @@ z.entity.Asset = class Asset {
    * @returns {Boolean} Is asset of type video
    */
   is_video() {
-    const is_video_asset = (this.type === z.assets.AssetType.FILE) && (this.file_type != null ? this.file_type.startsWith('video') : undefined);
+    const is_video_asset = this.type === z.assets.AssetType.FILE && this.file_type && this.file_type.startsWith('video');
     if (is_video_asset) {
       const can_play = document.createElement('video').canPlayType(this.file_type);
       if (can_play !== '') {
@@ -87,7 +87,8 @@ z.entity.Asset = class Asset {
    * @returns {Boolean} Is asset of type audio
    */
   is_audio() {
-    if ((this.type === z.assets.AssetType.FILE) && (this.file_type != null ? this.file_type.startsWith('audio') : undefined)) {
+    const is_audio_asset = this.type === z.assets.AssetType.FILE && this.file_type && this.file_type.startsWith('audio');
+    if (is_audio_asset) {
       const can_play = document.createElement('audio').canPlayType(this.file_type);
       if (can_play !== '') {
         return true;

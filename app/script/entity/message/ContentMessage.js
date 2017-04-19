@@ -73,7 +73,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
       if (this.reactions_user_ets().length <= 5) {
         return (this.reactions_user_ets()
           .map((user_et) => user_et.first_name())
-        ).join(', ');
+          .join(', '));
       }
       return z.localization.Localizer.get_text({
         id: z.string.conversation_likes_caption,
@@ -82,7 +82,6 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
           placeholder: '%@number',
         },
       });
-
     });
   }
 
@@ -136,7 +135,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
   download() {
     const asset_et = this.get_first_asset();
     const file_name = this.get_content_name();
-    return asset_et.download(file_name);
+    asset_et.download(file_name);
   }
 
   /**
