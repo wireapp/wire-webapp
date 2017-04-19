@@ -142,6 +142,9 @@ z.properties.PropertiesRepository = class PropertiesRepository {
             break;
           case z.properties.PROPERTIES_TYPE.SOUND_ALERTS:
             amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updated_preference);
+            break;
+          default:
+            throw new Error(`Failed to update preference of unhandled type '${properties_type}'`);
         }
       });
     }

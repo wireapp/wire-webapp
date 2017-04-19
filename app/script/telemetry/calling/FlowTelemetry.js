@@ -291,6 +291,8 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
             return connection_stats = this._update_from_outbound_rtp(report, connection_stats);
           case z.calling.rtc.StatsType.SSRC:
             return connection_stats = this._update_from_ssrc(report, connection_stats);
+          default:
+            this.logger.log(this.logger.levels.OFF, `Unhandled stats report type '${report.type}'`, report);
         }
       });
 
