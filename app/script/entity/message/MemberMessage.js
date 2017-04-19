@@ -34,18 +34,16 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
 
     // Users joined the conversation without sender
     this.joined_user_ets = ko.pureComputed(() => {
-      return (Array.from(this.user_ets())
+      return this.user_ets()
         .filter((user_et) => user_et.id !== this.user().id)
-        .map((user_et) => user_et)
-      );
+        .map((user_et) => user_et);
     });
 
     // Users joined the conversation without self
     this.remote_user_ets = ko.pureComputed(() => {
-      return (Array.from(this.user_ets())
+      return this.user_ets()
         .filter((user_et) => !user_et.is_me)
-        .map((user_et) => user_et)
-      );
+        .map((user_et) => user_et);
     });
 
     this._generate_name_string = (declension) => {
@@ -56,7 +54,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
     };
 
     this._get_caption_connection = function(connection_status) {
-      let identifier;
+      let identifier = undefined;
       switch (connection_status) {
         case z.user.ConnectionStatus.BLOCKED:
           identifier = z.string.conversation_connection_blocked;
@@ -84,7 +82,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         z.message.SystemMessageType.CONNECTION_ACCEPTED,
         z.message.SystemMessageType.CONNECTION_REQUEST,
       ];
-      return Array.from(large_avatar_types).includes(this.member_message_type);
+      return large_avatar_types.includes(this.member_message_type);
     };
 
     this.other_user = ko.pureComputed(() => {
