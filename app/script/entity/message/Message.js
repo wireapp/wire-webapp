@@ -213,7 +213,11 @@ z.entity.Message = class Message {
    */
   is_downloadable() {
     if (typeof this.get_first_asset === 'function') {
-      return true;
+      const asset_et = this.get_first_asset();
+      if (asset_et && (typeof asset_et.download === 'function')) {
+        return true;
+      }
+      return false;
     }
     return false;
   }
@@ -329,7 +333,7 @@ z.entity.Message = class Message {
   /**
    * Update the status of a message.
    * @param {z.message.StatusType} updated_status - New status of message
-   * @returns {undefined} No return value
+   * @returns {z.message.StatusType|Boolean} Returns the new status on a successful update, otherwise "false"
    */
   update_status(updated_status) {
     if (this.status() >= z.message.StatusType.SENT) {

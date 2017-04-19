@@ -88,18 +88,16 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
 
   /**
    * Add another content asset to the message.
-   *
    * @param {z.entity.Asset} asset_et - New content asset
    * @returns {undefined} No return value
    */
   add_asset(asset_et) {
-    return this.assets.push(asset_et);
+    this.assets.push(asset_et);
   }
 
   /**
    * Get the first asset attached to the message.
-   *
-   * @returns {z.entity.Message} The first asset attached to the message
+   * @returns {z.entity.Asset} The first asset attached to the message
    */
   get_first_asset() {
     return this.assets()[0];
