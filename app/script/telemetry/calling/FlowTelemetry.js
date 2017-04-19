@@ -127,7 +127,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @returns {undefined} No return value
    */
   check_stream(media_type, attempt = 1) {
-    if (this.start_statistics.hasOwnProperty(media_type)) {
+    if (this.statistics.hasOwnProperty(media_type)) {
       const stats = this.statistics[media_type];
 
       const seconds = (attempt * FLOW_TELEMETRY_CONFIG.MEDIA_CHECK_TIMEOUT) / 1000;
