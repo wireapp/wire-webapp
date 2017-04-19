@@ -24,18 +24,31 @@ window.z.ui = z.ui || {};
 
 z.ui.Context = (() => {
 
-  function cleanup() {
-    [...document.querySelectorAll('.ctx-menu')].forEach((menu) => menu.remove());
-  }
+  let onWheel;
+  let onKeyup;
 
-  function initListener() {
-    window.addEventListener('keyup', (e) => {
+  function addListeners() {
+    window.addEventListener('wheel', onWheel = (e) => e.preventDefault());
+    window.addEventListener('keyup', onKeyup = (e) => {
+      // TODO: arrow keys
       if (e.keyCode === 27) {
         cleanup();
       }
     });
     window.addEventListener('click', cleanup);
     window.addEventListener('resize', cleanup);
+  }
+
+  function removeListeners() {
+    window.removeEventListener('wheel', onWheel);
+    window.removeEventListener('keyup', onKeyup);
+    window.removeEventListener('click', cleanup);
+    window.removeEventListener('resize', cleanup);
+  }
+
+  function cleanup() {
+    [...document.querySelectorAll('.ctx-menu')].forEach((menu) => menu.remove());
+    removeListeners()
   }
 
   function build(entries) {
@@ -83,9 +96,9 @@ z.ui.Context = (() => {
     menu.style.left = `${(((windowWidth - click_x) < menuWidth ) ? click_x - menuWidth : click_x)}px`;
     menu.style.top = `${(((windowHeight - click_y) < menuHeight ) ? click_y - menuHeight : click_y)}px`;
     menu.style.visibility = '';
-  }
 
-  initListener();
+    addListeners();
+  }
 
   return {
     from,
