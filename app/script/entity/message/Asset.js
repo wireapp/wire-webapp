@@ -31,7 +31,6 @@ z.entity.Asset = class Asset {
 
   /**
    * Check if asset is a medium image.
-   *
    * @returns {Boolean} Is asset of type medium image
    */
   is_image() {
@@ -40,7 +39,6 @@ z.entity.Asset = class Asset {
 
   /**
    * Check if asset is a text.
-   *
    * @returns {Boolean} Is asset of type text
    */
   is_text() {
@@ -49,7 +47,6 @@ z.entity.Asset = class Asset {
 
   /**
    * Check if asset is a file.
-   *
    * @returns {Boolean} Is asset of type file
    */
   is_file() {
@@ -58,7 +55,6 @@ z.entity.Asset = class Asset {
 
   /**
    * Check if asset is a location.
-   *
    * @returns {Boolean} Is asset of type location
    */
   is_location() {
@@ -67,7 +63,6 @@ z.entity.Asset = class Asset {
 
   /**
    * Check if asset is a video.
-   *
    * @returns {Boolean} Is asset of type video
    */
   is_video() {
@@ -83,7 +78,6 @@ z.entity.Asset = class Asset {
 
   /**
    * Check if asset is a audio.
-   *
    * @returns {Boolean} Is asset of type audio
    */
   is_audio() {
