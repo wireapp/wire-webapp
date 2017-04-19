@@ -57,7 +57,6 @@ z.entity.Message = class Message {
           return z.message.EphemeralStatusType.ACTIVE;
         }
         return z.message.EphemeralStatusType.TIMED_OUT;
-
       }
 
       return z.message.EphemeralStatusType.NONE;
@@ -86,8 +85,7 @@ z.entity.Message = class Message {
 
     this.sender_name = ko.pureComputed(() => {
       return z.util.get_first_name(this.user());
-    }
-      , this, {deferEvaluation: true});
+    }, this, {deferEvaluation: true});
 
     this.accent_color = ko.pureComputed(() => {
       return `accent-color-${this.user().accent_id()}`;
@@ -104,7 +102,7 @@ z.entity.Message = class Message {
    */
   has_asset() {
     if (this.is_content()) {
-      for (const asset_et of Array.from(this.assets())) {
+      for (const asset_et of this.assets()) {
         if (asset_et.type === z.assets.AssetType.FILE) {
           return true;
         }
@@ -119,7 +117,7 @@ z.entity.Message = class Message {
    */
   has_asset_file() {
     if (this.is_content()) {
-      for (const asset_et of Array.from(this.assets())) {
+      for (const asset_et of this.assets()) {
         if (asset_et.is_file()) {
           return true;
         }
@@ -134,7 +132,7 @@ z.entity.Message = class Message {
    */
   has_asset_image() {
     if (this.is_content()) {
-      for (const asset_et of Array.from(this.assets())) {
+      for (const asset_et of this.assets()) {
         if (asset_et.is_image()) {
           return true;
         }
@@ -149,7 +147,7 @@ z.entity.Message = class Message {
    */
   has_asset_location() {
     if (this.is_content()) {
-      for (const asset_et of Array.from(this.assets())) {
+      for (const asset_et of this.assets()) {
         if (asset_et.is_location()) {
           return true;
         }
@@ -164,7 +162,7 @@ z.entity.Message = class Message {
    */
   has_asset_text() {
     if (this.is_content()) {
-      for (const asset_et of Array.from(this.assets())) {
+      for (const asset_et of this.assets()) {
         if (asset_et.is_text()) {
           return true;
         }
