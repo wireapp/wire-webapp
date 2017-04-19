@@ -55,7 +55,7 @@ ko.components.register('conversation-list-cell', {
           <group-avatar params="users: users()"></group-avatar>
         <!-- /ko -->
         <!-- ko ifnot: conversation.is_group() -->
-          <user-avatar class="user-avatar-s" params="user: user"></user-avatar>
+          <user-avatar class="user-avatar-xs" params="user: user"></user-avatar>
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-center">
