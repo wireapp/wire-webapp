@@ -72,9 +72,9 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
 
     this.like_caption = ko.pureComputed(() => {
       if (this.reactions_user_ets().length <= 5) {
-        return (this.reactions_user_ets()
+        return this.reactions_user_ets()
           .map((user_et) => user_et.first_name())
-          .join(', '));
+          .join(', ');
       }
       return z.localization.Localizer.get_text({
         id: z.string.conversation_likes_caption,
