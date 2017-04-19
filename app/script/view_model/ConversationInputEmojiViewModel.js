@@ -76,6 +76,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         this.suppress_key_up = true;
         break;
       case z.util.KEYCODE.ENTER:
+      case z.util.KEYCODE.TAB:
         this.enter_emoji(event.target, this.emoji_list.find('.emoji.selected'));
         break;
       default:
@@ -119,8 +120,8 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
       const emoji_matched = this.emoji_dict
         .filter((emoji) => emoji.toLowerCase().indexOf(query) !== -1)
         .sort((emoji_a, emoji_b) => {
-          const [emoji_code_a, emoji_name_a] = emoji_a.split('\t');
-          const [emoji_code_b, emoji_name_b] = emoji_b.split('\t');
+          const [, emoji_name_a] = emoji_a.split('\t');
+          const [, emoji_name_b] = emoji_b.split('\t');
           return z.util.StringUtil.sort_by_priority(emoji_name_a, emoji_name_b, query);
         })
         .slice(0, EMOJI_LIST_LENGTH)
@@ -132,8 +133,9 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         .join('');
 
       if (emoji_matched === '') {
-        this.emoji_list.remove();
+        this.remove_emoji_list();
       } else {
+        window.addEventListener('click', this.remove_emoji_list.bind(this));
         this.emoji_list
           .html(emoji_matched)
           .appendTo('body')
@@ -169,6 +171,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   }
 
   remove_emoji_list() {
+    window.removeEventListener('click', this.remove_emoji_list);
     this.emoji_list.remove();
     this.emoji_start_pos = -1;
   }
