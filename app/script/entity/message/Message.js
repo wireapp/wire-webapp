@@ -32,17 +32,11 @@ z.entity.Message = class Message {
     return message_ets.sort((m1, m2) => m1.timestamp() > m2.timestamp());
   }
 
-  constructor(id, super_type) {
+  constructor(id = '0', super_type = '') {
     this.equals = this.equals.bind(this);
     this.is_expired = this.is_expired.bind(this);
     this.start_ephemeral_timer = this.start_ephemeral_timer.bind(this);
-    if (id == null) {
-      id = '0';
-    }
     this.id = id;
-    if (super_type == null) {
-      super_type = '';
-    }
     this.super_type = super_type;
     this.ephemeral_caption = ko.observable('');
     this.ephemeral_duration = ko.observable(0);

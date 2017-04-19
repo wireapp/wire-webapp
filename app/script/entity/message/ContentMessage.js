@@ -34,10 +34,11 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
 
     this.reactions = ko.observable({});
     this.reactions_user_ets = ko.observableArray();
-    this.reactions_user_ids = ko.pureComputed(() => (this.reactions_user_ets()
-      .map((user_et) => user_et.first_name()))
-      .join(', ')
-    );
+    this.reactions_user_ids = ko.pureComputed(() => {
+      this.reactions_user_ets()
+        .map((user_et) => user_et.first_name())
+        .join(', ')
+    });
 
     this.display_edited_timestamp = () => {
       return z.localization.Localizer.get_text({
