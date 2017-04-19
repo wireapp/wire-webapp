@@ -126,22 +126,22 @@ z.properties.PropertiesRepository = class PropertiesRepository {
         switch (properties_type) {
           case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE:
           case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
-            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS);
+            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, updated_preference);
             break;
           case z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING:
             amplify.publish(z.util.Logger.prototype.LOG_ON_DEBUG, updated_preference);
             break;
           case z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION:
-            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION);
+            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.HAS_CREATED_CONVERSATION, updated_preference);
             break;
           case z.properties.PROPERTIES_TYPE.NOTIFICATIONS:
-            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS);
+            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.NOTIFICATIONS, updated_preference);
             break;
           case z.properties.PROPERTIES_TYPE.PRIVACY:
-            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY);
+            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.PRIVACY, updated_preference);
             break;
           case z.properties.PROPERTIES_TYPE.SOUND_ALERTS:
-            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS);
+            amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updated_preference);
         }
       });
     }
