@@ -31,6 +31,6 @@ z.properties.PROPERTIES_TYPE = {
   HAS_CREATED_CONVERSATION: 'has_created_conversation',
   NOTIFICATIONS: 'settings.notifications',
   PRIVACY: 'settings.privacy.improve_wire',
-  SOUND_ALERTS: 'settings.privacy.sound.alerts',
+  SOUND_ALERTS: 'settings.sound.alerts',
   VERSION: 'version',
 };
