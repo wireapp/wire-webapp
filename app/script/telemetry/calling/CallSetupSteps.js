@@ -20,17 +20,16 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.properties = z.properties || {};
+window.z.telemetry = z.telemetry || {};
+window.z.telemetry.calling = z.telemetry.calling || {};
 
-z.properties.PROPERTIES_TYPE = {
-  CONTACT_IMPORT: {
-    GOOGLE: 'contact_import.google',
-    MACOS: 'contact_import.macos',
-  },
-  ENABLE_DEBUGGING: 'enable_debugging',
-  HAS_CREATED_CONVERSATION: 'has_created_conversation',
-  NOTIFICATIONS: 'settings.notifications',
-  PRIVACY: 'settings.privacy.improve_wire',
-  SOUND_ALERTS: 'settings.sound.alerts',
-  VERSION: 'version',
+z.telemetry.calling.CallSetupSteps = {
+  ICE_CONNECTION_CONNECTED: 'ice_connection_connected',
+  ICE_GATHERING_COMPLETED: 'ice_gathering_completed',
+  LOCAL_SDP_SEND: 'local_sdp_send',
+  LOCAL_SDP_SET: 'local_sdp_set',
+  PEER_CONNECTION_CREATED: 'peer_connection_created',
+  REMOTE_SDP_SET: 'remote_sdp_set',
+  STARTED: 'started',
+  STREAM_RECEIVED: 'stream_received',
 };

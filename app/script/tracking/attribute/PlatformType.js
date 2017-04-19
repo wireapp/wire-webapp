@@ -20,17 +20,12 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.properties = z.properties || {};
+window.z.tracking = z.tracking || {};
+window.z.tracking.attribute = z.tracking.attribute || {};
 
-z.properties.PROPERTIES_TYPE = {
-  CONTACT_IMPORT: {
-    GOOGLE: 'contact_import.google',
-    MACOS: 'contact_import.macos',
-  },
-  ENABLE_DEBUGGING: 'enable_debugging',
-  HAS_CREATED_CONVERSATION: 'has_created_conversation',
-  NOTIFICATIONS: 'settings.notifications',
-  PRIVACY: 'settings.privacy.improve_wire',
-  SOUND_ALERTS: 'settings.sound.alerts',
-  VERSION: 'version',
+z.tracking.attribute.PlatformType = {
+  BROWSER_APP: 'web',
+  DESKTOP_LINUX: 'linux',
+  DESKTOP_MACOS: 'mac',
+  DESKTOP_WINDOWS: 'win',
 };

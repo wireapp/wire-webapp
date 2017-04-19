@@ -1,0 +1,109 @@
+/*
+ * Wire
+ * Copyright (C) 2017 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+'use strict';
+
+window.z = window.z || {};
+window.z.event = z.event || {};
+
+const NOTIFICATION_SERVICE_CONFIG = {
+  PRIMARY_KEY_LAST_NOTIFICATION: 'z.storage.StorageKey.NOTIFICATION.LAST_ID',
+  URL_NOTIFICATIONS: '/notifications',
+  URL_NOTIFICATIONS_LAST: '/notifications/last',
+};
+
+z.event.NotificationService = class NotificationService {
+  /**
+   * Construct a new Notification Service.
+   *
+   * @param {z.service.Client} client - Client for the API calls
+   * @param {z.storage.StorageService} storage_service - Service for all storage related tasks
+   * @returns {NotificationService} Notification Service for all notification stream calls to the backend REST API
+   */
+  constructor(client, storage_service) {
+    this.get_last_notification_id_from_db = this.get_last_notification_id_from_db.bind(this);
+    this.save_last_notification_id_to_db = this.save_last_notification_id_to_db.bind(this);
+    this.client = client;
+    this.storage_service = storage_service;
+    this.logger = new z.util.Logger('z.event.NotificationService', z.config.LOGGER.OPTIONS);
+    return this;
+  }
+
+  /**
+   * Get notifications from the stream.
+   *
+   * @param {String} client_id - Only return notifications targeted at the given client
+   * @param {String} notification_id - Only return notifications more recent than this notification ID (like "7130304a-c839-11e5-8001-22000b0fe035")
+   * @param {Number} size - Maximum number of notifications to return
+   * @returns {Promise} Resolves with the retrieved notifications
+   */
+  get_notifications(client_id, notification_id, size) {
+    return this.client.send_request({
+      data: {
+        client: client_id,
+        since: notification_id,
+        size: size,
+      },
+      type: 'GET',
+      url: this.client.create_url(NOTIFICATION_SERVICE_CONFIG.URL_NOTIFICATIONS),
+    });
+  }
+
+  /**
+   * Get the last notification for a given client.
+   * @param {String} client_id - Client ID to retrieve notification ID for
+   * @returns {Promise} Resolves with the last known notification ID for given client
+   */
+  get_notifications_last(client_id) {
+    return this.client.send_request({
+      data: {
+        client: client_id,
+      },
+      type: 'GET',
+      url: this.client.create_url(NOTIFICATION_SERVICE_CONFIG.URL_NOTIFICATIONS_LAST),
+    });
+  }
+
+  /**
+   * Load last notifications id from storage.
+   * @returns {Promise} Resolves with the stored last notification ID.
+   */
+  get_last_notification_id_from_db() {
+    return this.storage_service.load(this.storage_service.OBJECT_STORE_AMPLIFY, NOTIFICATION_SERVICE_CONFIG.PRIMARY_KEY_LAST_NOTIFICATION)
+    .then(function(record) {
+      if (record && record.value) {
+        return record.value;
+      }
+      throw new z.event.EventError(z.event.EventError.TYPE.NO_LAST_ID);
+    })
+    .catch((error) => {
+      this.logger.error(`Failed to get last notification ID from storage: ${error.message}`, error);
+      throw new z.event.EventError(z.event.EventError.TYPE.DATABASE_FAILURE);
+    });
+  }
+
+  /**
+   * Save last notifications id from storage.
+   * @param {string} notification_id - Notification ID to be stored
+   * @returns {Promise} Resolves with the stored record
+   */
+  save_last_notification_id_to_db(notification_id) {
+    return this.storage_service.save(this.storage_service.OBJECT_STORE_AMPLIFY, NOTIFICATION_SERVICE_CONFIG.PRIMARY_KEY_LAST_NOTIFICATION, {value: notification_id});
+  }
+};

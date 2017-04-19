@@ -413,7 +413,7 @@ window.TestFactory.prototype.exposeTrackingActors = function() {
   .then(function() {
     self.logger.info('✓ exposedConversationActors');
 
-    window.tracking_repository = new z.tracking.EventTrackingRepository(window.user_repository, window.conversation_repository);
+    window.tracking_repository = new z.tracking.EventTrackingRepository(window.conversation_repository, window.user_repository);
     window.tracking_repository.logger.level = self.settings.logging_level;
 
     return window.tracking_repository;

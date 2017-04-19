@@ -20,17 +20,18 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.properties = z.properties || {};
+window.z.tracking = z.tracking || {};
 
-z.properties.PROPERTIES_TYPE = {
-  CONTACT_IMPORT: {
-    GOOGLE: 'contact_import.google',
-    MACOS: 'contact_import.macos',
-  },
-  ENABLE_DEBUGGING: 'enable_debugging',
-  HAS_CREATED_CONVERSATION: 'has_created_conversation',
-  NOTIFICATIONS: 'settings.notifications',
-  PRIVACY: 'settings.privacy.improve_wire',
-  SOUND_ALERTS: 'settings.sound.alerts',
-  VERSION: 'version',
+/**
+ * Enum of custom dimensions for Localytics
+ *
+ * @note Custom Dimensions for Localytics have to be created server side and are
+ *   identified by the index found in the settings of Desktop and Desktop staging projects
+ * @see https://dashboard.localytics.com/settings/apps?org_id=1145
+ *
+ * @returns {z.tracking.CustomDimension} Enum of custom dimensions
+ */
+z.tracking.CustomDimension = {
+  APP: 0,
+  CONTACTS: 1,
 };

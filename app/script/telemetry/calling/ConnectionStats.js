@@ -20,17 +20,21 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.properties = z.properties || {};
+window.z.telemetry = z.telemetry || {};
+window.z.telemetry.calling = z.telemetry.calling || {};
 
-z.properties.PROPERTIES_TYPE = {
-  CONTACT_IMPORT: {
-    GOOGLE: 'contact_import.google',
-    MACOS: 'contact_import.macos',
-  },
-  ENABLE_DEBUGGING: 'enable_debugging',
-  HAS_CREATED_CONVERSATION: 'has_created_conversation',
-  NOTIFICATIONS: 'settings.notifications',
-  PRIVACY: 'settings.privacy.improve_wire',
-  SOUND_ALERTS: 'settings.sound.alerts',
-  VERSION: 'version',
+z.telemetry.calling.ConnectionStats = class ConnectionStats {
+  /**
+   * Construct a new connection stats report.
+   * @returns {ConnectionStats} The new Connection stats entity
+   */
+  constructor() {
+    this.timestamp = Date.now();
+    this.connected = undefined;
+
+    this.audio = new z.telemetry.calling.AudioStreamStats(this.timestamp);
+    this.peer_connection = new z.telemetry.calling.StreamStats(this.timestamp);
+    this.video = new z.telemetry.calling.VideoStreamStats(this.timestamp);
+    return this;
+  }
 };

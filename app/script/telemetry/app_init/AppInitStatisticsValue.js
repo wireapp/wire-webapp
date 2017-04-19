@@ -20,17 +20,15 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.properties = z.properties || {};
+window.z.telemetry = z.telemetry || {};
+window.z.telemetry.app_init = z.telemetry.app_init || {};
 
-z.properties.PROPERTIES_TYPE = {
-  CONTACT_IMPORT: {
-    GOOGLE: 'contact_import.google',
-    MACOS: 'contact_import.macos',
-  },
-  ENABLE_DEBUGGING: 'enable_debugging',
-  HAS_CREATED_CONVERSATION: 'has_created_conversation',
-  NOTIFICATIONS: 'settings.notifications',
-  PRIVACY: 'settings.privacy.improve_wire',
-  SOUND_ALERTS: 'settings.sound.alerts',
-  VERSION: 'version',
+z.telemetry.app_init.AppInitStatisticsValue = {
+  BACKEND_REQUESTS: 'backend_requests',
+  CLIENT_TYPE: 'client_type',
+  CLIENTS: 'clients',
+  CONNECTIONS: 'connections',
+  CONVERSATIONS: 'conversations',
+  NOTIFICATIONS: 'notifications',
+  SESSIONS: 'sessions',
 };

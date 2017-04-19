@@ -60,7 +60,7 @@ describe 'z.conversation.ConversationRepository', ->
 
     test_factory.exposeConversationActors()
     .then (conversation_repository) ->
-      amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NotificationHandlingState.WEB_SOCKET
+      amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
       storage_service = conversation_repository.conversation_service.storage_service
 
       conversation_et = _generate_conversation z.conversation.ConversationType.SELF

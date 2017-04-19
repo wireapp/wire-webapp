@@ -20,17 +20,26 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.properties = z.properties || {};
+window.z.tracking = z.tracking || {};
+window.z.tracking.event = z.tracking.event || {};
 
-z.properties.PROPERTIES_TYPE = {
-  CONTACT_IMPORT: {
-    GOOGLE: 'contact_import.google',
-    MACOS: 'contact_import.macos',
-  },
-  ENABLE_DEBUGGING: 'enable_debugging',
-  HAS_CREATED_CONVERSATION: 'has_created_conversation',
-  NOTIFICATIONS: 'settings.notifications',
-  PRIVACY: 'settings.privacy.improve_wire',
-  SOUND_ALERTS: 'settings.sound.alerts',
-  VERSION: 'version',
+z.tracking.event.PictureTakenEvent = class PictureTakenEvent {
+  /**
+   * Construct a phone verification event.
+   * @param {string} context - <conversation|registration|profile>
+   * @param {string} source - <camera|photoLibrary|giphy|sketch>
+   * @param {string} trigger - <cli|button>
+   * @returns {PictureTakenEvent} The new PictureTakenEvent
+   */
+  constructor(context, source, trigger) {
+    this.context = context;
+    this.source = source;
+    this.trigger = trigger;
+    this.name = 'PictureTaken';
+    this.attributes = {
+      context: this.context,
+      source: this.source,
+      trigger: this.trigger,
+    };
+  }
 };
