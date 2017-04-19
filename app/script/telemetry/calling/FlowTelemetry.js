@@ -123,7 +123,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * Check stream for flowing bytes.
    *
    * @param {z.media.MediaType} media_type - Media type of stream
-   * @param {Number} [attempt=1] - Attempt of stream check
+   * @param {number} [attempt=1] - Attempt of stream check
    * @returns {undefined} No return value
    */
   check_stream(media_type, attempt = 1) {
@@ -186,7 +186,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
   /**
    * Update 'is_answer' status of flow.
-   * @param {Boolean} is_answer - Is the flow an answer
+   * @param {boolean} is_answer - Is the flow an answer
    * @returns {undefined} No return value
    */
   update_is_answer(is_answer) {

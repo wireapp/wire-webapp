@@ -39,8 +39,8 @@ z.extension.GiphyRepository = class GiphyRepository {
    *
    * @param {Object} options - Search options
    * @param {string} options.tag - Search query term or phrase
-   * @param {Number} [options.retry=3] - How many retries to get the correct size
-   * @param {Number} [options.max_size=3MB] - Maximum gif size in bytes
+   * @param {number} [options.retry=3] - How many retries to get the correct size
+   * @param {number} [options.max_size=3MB] - Maximum gif size in bytes
    * @returns {Promise} Resolves with a random matching gif
    */
   get_random_gif(options) {
@@ -84,9 +84,9 @@ z.extension.GiphyRepository = class GiphyRepository {
    *
    * @param {Object} options - Search options
    * @param {string} options.query - Search query term or phrase
-   * @param {Number} options.number - Amount of GIFs to retrieve
-   * @param {Number} [options.max_size=3MB] - Maximum gif size in bytes
-   * @param {Boolean} [options.random=true] - Will return an randomized result
+   * @param {number} options.number - Amount of GIFs to retrieve
+   * @param {number} [options.max_size=3MB] - Maximum gif size in bytes
+   * @param {boolean} [options.random=true] - Will return an randomized result
    * @param {string} [options.sorting='recent'] - Specify sorting ('relevant' or 'recent')
    * @returns {Promise} Resolves with gifs
    */

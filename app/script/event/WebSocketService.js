@@ -175,7 +175,7 @@ z.event.WebSocketService = class WebSocketService {
    * Reset the WebSocket connection.
    *
    * @param {z.event.WebSocketService.CHANGE_TRIGGER} trigger - Trigger of the reset
-   * @param {Boolean} [reconnect=false] - Re-establish the WebSocket connection
+   * @param {boolean} [reconnect=false] - Re-establish the WebSocket connection
    * @returns {undefined} No return value
    */
   reset(trigger, reconnect = false) {

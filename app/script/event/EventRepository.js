@@ -188,8 +188,8 @@ z.event.EventRepository = class EventRepository {
   /**
    * Get notifications for the current client from the stream.
    *
-   * @param {String} notification_id - Event ID to start from
-   * @param {Number} [limit=10000] - Max. number of notifications to retrieve from backend at once
+   * @param {string} notification_id - Event ID to start from
+   * @param {number} [limit=10000] - Max. number of notifications to retrieve from backend at once
    * @returns {Promise} Resolves when all new notifications from the stream have been handled
    */
   get_notifications(notification_id, limit = 10000) {
@@ -549,7 +549,7 @@ z.event.EventRepository = class EventRepository {
    * @private
    * @param {Array} events - Events contained in a notification
    * @param {string} id - Notification ID
-   * @param {Boolean} transient - Type of notification
+   * @param {boolean} transient - Type of notification
    * @returns {Promise} Resolves with the ID of the handled notification
    */
   _handle_notification({payload: events, id, transient}) {
@@ -613,7 +613,7 @@ z.event.EventRepository = class EventRepository {
    *
    * @private
    * @param {Object} event - Event to validate
-   * @returns {Boolean} Returns true if event is handled within is lifetime, otherwise throws error
+   * @returns {boolean} Returns true if event is handled within is lifetime, otherwise throws error
    */
   _validate_call_event_lifetime(event) {
     if (this.notification_handling_state() === z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) return true;

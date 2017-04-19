@@ -107,8 +107,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * Get the MediaStreamConstraints to be used for MediaStream creation.
    *
    * @private
-   * @param {Boolean} [request_audio=false] - Request audio in the constraints
-   * @param {Boolean} [request_video=false] - Request video in the constraints
+   * @param {boolean} [request_audio=false] - Request audio in the constraints
+   * @param {boolean} [request_video=false] - Request video in the constraints
    * @returns {Promise} Resolves with MediaStreamConstraints and their type
    */
   get_media_stream_constraints(request_audio = false, request_video = false) {
@@ -221,7 +221,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * Initiate the MediaStream.
    *
    * @param {string} conversation_id - Conversation ID of call
-   * @param {Boolean} [video_send=false] - Should MediaStream contain video
+   * @param {boolean} [video_send=false] - Should MediaStream contain video
    * @returns {Promise} Resolves when the MediaStream has been initiated
    */
   initiate_media_stream(conversation_id, video_send = false) {
@@ -466,7 +466,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @private
    * @param {MediaStream} media_stream - MediaStream to be released
    * @param {z.media.MediaType} [media_type=z.media.MediaType.AUDIO_VIDEO] - Type of MediaStreamTracks to be released
-   * @returns {Boolean} Have tracks been stopped
+   * @returns {boolean} Have tracks been stopped
    */
   _release_media_stream(media_stream, media_type = z.media.MediaType.AUDIO_VIDEO) {
     if (media_stream) {
@@ -579,7 +579,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   /**
    * Check for active calls that need a MediaStream.
-   * @returns {Boolean} Returns true if an active media stream is needed for at least one call
+   * @returns {boolean} Returns true if an active media stream is needed for at least one call
    */
   needs_media_stream() {
     for (const call_et of this.calls()) {

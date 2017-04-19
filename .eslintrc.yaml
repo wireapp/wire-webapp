@@ -1,8 +1,8 @@
 env:
   browser: true
-  node: true
   es6: true
   jasmine: true
+  node: true
 
 extends:
   "eslint:recommended"
@@ -75,4 +75,16 @@ rules:
   space-unary-ops: [2, {words: true, nonwords: false}]
   spaced-comment: [2, always, {exceptions: ["#"]}]
   strict: [2, global]
-  valid-jsdoc: [2, {prefer: {return: returns}, requireParamDescription: true, requireReturnDescription: true}]
+  valid-jsdoc:
+    - error
+    -
+      prefer:
+        class: class
+        return: returns
+      preferType:
+        Boolean: boolean
+        Number: number
+        object: Object
+        String: string
+      requireParamDescription: true
+      requireReturnDescription: true
