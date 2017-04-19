@@ -42,6 +42,25 @@ z.properties.PropertiesRepository = class PropertiesRepository {
   }
 
   /**
+   * Get the current preference for a property type.
+   * @param {z.properties.PROPERTIES_TYPE} properties_type - Type of preference to get
+   * @returns {*} Preference value
+   */
+  get_preference(properties_type) {
+    const type_parts = properties_type.split('.');
+    switch (type_parts.length) {
+      case 1:
+        return this.properties[type_parts[0]];
+      case 2:
+        return this.properties[type_parts[0]][type_parts[1]];
+      case 3:
+        return this.properties[type_parts[0]][type_parts[1]][type_parts[2]];
+      default:
+        throw new Error(`Failed to get preference of type ${properties_type}`);
+    }
+  }
+
+  /**
    * Initialize properties on app startup.
    * @param {z.entity.User} self_user_et - Self user
    * @returns {undefined} No return value
@@ -81,7 +100,7 @@ z.properties.PropertiesRepository = class PropertiesRepository {
   /**
    * Save property setting.
    *
-   * @param {z.properties.PROPERTIES_TYPE} properties_type - Property type to update
+   * @param {z.properties.PROPERTIES_TYPE} properties_type - Type of preference to update
    * @param {*} updated_preference - New property setting
    * @returns {undefined} No return value
    */
@@ -97,26 +116,12 @@ z.properties.PropertiesRepository = class PropertiesRepository {
       }
     }
 
-    let current_preference;
-    const type_parts = properties_type.split('.');
-    switch (type_parts.length) {
-      case 1:
-        current_preference = this.properties[type_parts[0]];
-        break;
-      case 2:
-        current_preference = this.properties[type_parts[0]][type_parts[1]];
-        break;
-      case 3:
-        current_preference = this.properties[type_parts[0]][type_parts[1]][type_parts[2]];
-        break;
-    }
-
-    if (updated_preference !== current_preference) {
-      current_preference = updated_preference;
+    if (updated_preference !== this.get_preference(properties_type)) {
+      this.set_preference(properties_type, updated_preference);
 
       this.properties_service.put_properties_by_key(PROPERTIES_KEY, this.properties)
       .then(() => {
-        this.logger.info(`Saved updated settings: '${properties_type}' - '${updated_preference}'`);
+        this.logger.info(`Saved updated preference: '${properties_type}' - '${updated_preference}'`);
 
         switch (properties_type) {
           case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.GOOGLE:
@@ -139,6 +144,29 @@ z.properties.PropertiesRepository = class PropertiesRepository {
             amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS);
         }
       });
+    }
+  }
+
+  /**
+   * Set the preference of specified type
+   * @param {z.properties.PROPERTIES_TYPE} properties_type - Type of preference to set
+   * @param {*} changed_preference - New preference to set
+   * @returns {undefined} No return value
+   */
+  set_preference(properties_type, changed_preference) {
+    const type_parts = properties_type.split('.');
+    switch (type_parts.length) {
+      case 1:
+        this.properties[type_parts[0]] = changed_preference;
+        break;
+      case 2:
+        this.properties[type_parts[0]][type_parts[1]] = changed_preference;
+        break;
+      case 3:
+        this.properties[type_parts[0]][type_parts[1]][type_parts[2]] = changed_preference;
+        break;
+      default:
+        throw new Error(`Failed to set preference of type ${properties_type}`);
     }
   }
 };
