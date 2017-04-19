@@ -53,6 +53,6 @@ z.entity.MediumImage = class MediumImage extends z.entity.Asset {
         });
     }
 
-    return undefined;
+    return Promise.resolve(undefined);
   }
 };
