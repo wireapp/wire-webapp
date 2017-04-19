@@ -11,7 +11,7 @@
     "keyboardjs": "https://github.com/RobertWHurst/KeyboardJS.git#2.3.3",
     "knockout": "https://github.com/knockout/knockout.git#3.4.1",
     "marked": "https://github.com/wireapp/marked.git#3fb540777bd042e7284d0a960729169d9efee508",
-    "moment": "https://github.com/moment/moment.git#2.17.1",
+    "moment": "https://github.com/moment/moment.git#2.18.1",
     "normalize-css": "https://github.com/necolas/normalize.css.git#3.0.3",
     "pako": "https://github.com/nodeca/pako.git#1.0.4",
     "phone-format": "https://github.com/albeebe/phoneformat.js.git#1.0.3",
@@ -31,7 +31,7 @@
     "webrtc-adapter": "https://github.com/webrtc/adapter.git#3.2.0",
     "wire-audio-files": "https://github.com/wireapp/wire-audio-files.git#1.1.0",
     "wire-theme": "https://github.com/wireapp/wire-theme.git#1.0.0",
-    "wire-webapp-cryptobox": "https://github.com/wireapp/wire-webapp-cryptobox.git#5.0.4"
+    "wire-webapp-cryptobox": "https://github.com/wireapp/wire-webapp-cryptobox.git#5.1.0"
   },
   "exportsOverride": {
     "amplify": {
@@ -93,6 +93,7 @@
         "locale/hr.js",
         "locale/hu.js",
         "locale/it.js",
+        "locale/lt.js",
         "locale/pt.js",
         "locale/ro.js",
         "locale/ru.js",
@@ -164,6 +165,9 @@
     },
     "wire-theme": {
       "less": "app/style/{wire-theme,variables,input}.less"
+    },
+    "wire-webapp-cbor": {
+      "js/": "dist/window/*.js"
     },
     "wire-webapp-cryptobox": {
       "js/": "dist/window/*.js"

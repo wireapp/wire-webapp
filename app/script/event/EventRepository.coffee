@@ -22,6 +22,8 @@ z.event ?= {}
 EVENT_CONFIG =
   E_CALL_EVENT_LIFETIME: 30 * 1000 # 30 seconds
 
+UNKNOWN_DECRYPT_ERROR_CODE = 999
+
 # Event repository to handle all backend event channels.
 class z.event.EventRepository
   @::NOTIFICATION_SOURCE =
@@ -78,8 +80,8 @@ class z.event.EventRepository
           @notifications_handled++
 
           if @notifications_handled % 5 is 0
-            replace = [@notifications_handled, @notifications_total]
-            amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_events_progress, false, replace
+            progress = @notifications_handled / @notifications_total * 70 + 25
+            amplify.publish z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events_progress, [@notifications_handled, @notifications_total]
 
       else if @notifications_loaded() and @notification_handling_state() isnt z.event.NotificationHandlingState.WEB_SOCKET
         @logger.info "Done handling '#{@notifications_total}' notifications from the stream"
@@ -172,7 +174,6 @@ class z.event.EventRepository
           else
             @notifications_loaded true
             @logger.info "Fetched '#{@notifications_total}' notifications from the backend"
-            amplify.publish z.event.WebApp.APP.UPDATE_INIT, z.string.init_events_expectation, true, [@notifications_total]
 
         else
           @logger.info "No notifications found since '#{notification_id}'", response
@@ -355,7 +356,7 @@ class z.event.EventRepository
         return @cryptography_repository.decrypt_event event
         .catch (decrypt_error) =>
           # Get error information
-          error_code = decrypt_error.code
+          error_code = decrypt_error.code or UNKNOWN_DECRYPT_ERROR_CODE
           remote_client_id = event.data.sender
           remote_user_id = event.from
           session_id = @cryptography_repository._construct_session_id remote_user_id, remote_client_id
@@ -363,10 +364,10 @@ class z.event.EventRepository
           # Handle error
           if decrypt_error instanceof Proteus.errors.DecryptError.DuplicateMessage or decrypt_error instanceof Proteus.errors.DecryptError.OutdatedMessage
             # We don't need to show duplicate message errors to the user
-            throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+            throw new z.cryptography.CryptographyError z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE
           else if decrypt_error instanceof z.cryptography.CryptographyError
-            if decrypt_error.type is z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
-              throw new z.cryptography.CryptographyError z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+            if decrypt_error.type is z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED
+              throw new z.cryptography.CryptographyError z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE
           else if decrypt_error instanceof Proteus.errors.DecryptError.InvalidMessage or decrypt_error instanceof Proteus.errors.DecryptError.InvalidSignature
             # Session is broken, let's see what's really causing it...
             @logger.error "Session '#{session_id}' with user '#{remote_user_id}' (client '#{remote_client_id}') is broken or out of sync. Reset the session and decryption is likely to work again. Error: #{decrypt_error.message}", decrypt_error
@@ -376,7 +377,7 @@ class z.event.EventRepository
             @logger.error message, decrypt_error
 
           @logger.warn "Could not decrypt an event from client ID '#{remote_client_id}' of user ID '#{remote_user_id}' in session ID '#{session_id}'.\nError Code: '#{error_code}'\nError Message: #{decrypt_error.message}", decrypt_error
-          @_report_decrypt_error event, decrypt_error, error_code
+          @_report_decrypt_error event, decrypt_error
 
           return z.conversation.EventBuilder.build_unable_to_decrypt event, decrypt_error, error_code
         .then (message) =>
@@ -395,10 +396,10 @@ class z.event.EventRepository
       return saved_event
     .catch (error) ->
       ignored_errors = [
-        z.cryptography.CryptographyError::TYPE.IGNORED_ASSET
-        z.cryptography.CryptographyError::TYPE.IGNORED_PREVIEW
-        z.cryptography.CryptographyError::TYPE.PREVIOUSLY_STORED
-        z.cryptography.CryptographyError::TYPE.UNHANDLED_TYPE
+        z.cryptography.CryptographyError.TYPE.IGNORED_ASSET
+        z.cryptography.CryptographyError.TYPE.IGNORED_PREVIEW
+        z.cryptography.CryptographyError.TYPE.PREVIOUSLY_STORED
+        z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE
         z.event.EventError::TYPE.OUTDATED_E_CALL_EVENT
       ]
       throw error unless error.type in ignored_errors
@@ -432,39 +433,36 @@ class z.event.EventRepository
   ###
   Report decryption error to Localytics and stack traces to Raygun.
   ###
-  _report_decrypt_error: (event, decrypt_error, error_code) =>
+  _report_decrypt_error: (event, decrypt_error) =>
     remote_client_id = event.data.sender
     remote_user_id = event.from
     session_id = @cryptography_repository._construct_session_id remote_user_id, remote_client_id
 
-    attributes =
-      cause: "#{error_code}: #{decrypt_error.message}"
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE, attributes
+    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.E2EE.CANNOT_DECRYPT_MESSAGE, cause: decrypt_error.code or decrypt_error.message
 
-    if decrypt_error not instanceof Proteus.errors.DecryptError.DuplicateMessage and decrypt_error not instanceof Proteus.errors.DecryptError.TooDistantFuture
-      custom_data =
-        cryptobox_version: cryptobox.version
-        client_local_class: @current_client().class
-        client_local_type: @current_client().type
-        error_code: error_code
-        event_type: event.type
-        session_id: session_id
+    custom_data =
+      cryptobox_version: cryptobox.version
+      client_local_class: @current_client().class
+      client_local_type: @current_client().type
+      error_code: decrypt_error.code
+      event_type: event.type
+      session_id: session_id
 
-      raygun_error = new Error "Decryption failed: #{decrypt_error.message}"
-      raygun_error.stack = decrypt_error.stack
-      Raygun.send raygun_error, custom_data
+    raygun_error = new Error "Decryption failed: #{decrypt_error.code or decrypt_error.message}"
+    raygun_error.stack = decrypt_error.stack
+    Raygun.send raygun_error, custom_data
 
-    ###
-    Check if call event is handled within its valid lifespan.
-    @return [Boolean] Returns true if event is handled within is lifetime, otherwise throws error
-    ###
-    _validate_call_event_lifetime: (event) ->
-      return true if @notification_handling_state() is z.event.NotificationHandlingState.WEB_SOCKET
-      return true if event.content.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+  ###
+  Check if call event is handled within its valid lifespan.
+  @return [Boolean] Returns true if event is handled within is lifetime, otherwise throws error
+  ###
+  _validate_call_event_lifetime: (event) ->
+    return true if @notification_handling_state() is z.event.NotificationHandlingState.WEB_SOCKET
+    return true if event.content.type is z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
 
-      corrected_timestamp = Date.now() - @clock_drift
-      event_timestamp = new Date(event.time).getTime()
-      if corrected_timestamp > event_timestamp + EVENT_CONFIG.E_CALL_EVENT_LIFETIME
-        @logger.info "Ignored outdated '#{event.type}' event in conversation '#{event.conversation}' - Event: '#{event_timestamp}', Local: '#{corrected_timestamp}'", {event_object: event, event_json: JSON.stringify event}
-        throw new z.event.EventError z.event.EventError::TYPE.OUTDATED_E_CALL_EVENT
-      return true
+    corrected_timestamp = Date.now() - @clock_drift
+    event_timestamp = new Date(event.time).getTime()
+    if corrected_timestamp > event_timestamp + EVENT_CONFIG.E_CALL_EVENT_LIFETIME
+      @logger.info "Ignored outdated '#{event.type}' event in conversation '#{event.conversation}' - Event: '#{event_timestamp}', Local: '#{corrected_timestamp}'", {event_object: event, event_json: JSON.stringify event}
+      throw new z.event.EventError z.event.EventError::TYPE.OUTDATED_E_CALL_EVENT
+    return true

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,13 +24,11 @@ window.z.assets = z.assets || {};
 
 z.assets.AssetRemoteData = class AssetRemoteData {
 
-  /*
-  Use either z.assets.AssetRemoteData.v2 or z.assets.AssetRemoteData.v3
-  to initialize.
-
-  @param {Uint8Array} otr_key
-  @param {Uint8Array} sha256
-  */
+  /**
+   * Use either z.assets.AssetRemoteData.v2 or z.assets.AssetRemoteData.v3 to initialize.
+   * @param {Uint8Array} otr_key - Encryption key
+   * @param {Uint8Array} sha256 - Checksum
+   */
   constructor(otr_key, sha256) {
     this.otr_key = otr_key;
     this.sha256 = sha256;
@@ -40,15 +38,16 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     this.identifier = undefined;
   }
 
-  /*
-  Static initializer for v3 assets
-
-  @param {string} asset_key
-  @param {Uint8Array} [otr_key]
-  @param {Uint8Array} [sha256]
-  @param {string} [asset_token]
-  @param {string} [force_caching=false]
-  */
+  /**
+   * Static initializer for v3 assets.
+   *
+   * @param {string} asset_key - ID to retrieve asset with
+   * @param {Uint8Array} [otr_key] - Encryption key
+   * @param {Uint8Array} [sha256] - Checksum
+   * @param {string} [asset_token] - Token data
+   * @param {Boolean} [force_caching=false] - Cache asset in ServiceWorker
+   * @returns {z.assets.AssetRemoteData} V3 asset remote data
+   */
   static v3(asset_key, otr_key, sha256, asset_token, force_caching = false) {
     const remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
     remote_data.generate_url = () => wire.app.service.asset.generate_asset_url_v3(asset_key, asset_token, force_caching);
@@ -56,15 +55,16 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     return remote_data;
   }
 
-  /*
-  Static initializer for v2 assets
-
-  @param {string} conversation_id
-  @param {string} asset_id
-  @param {Uint8Array} otr_key
-  @param {Uint8Array} sha256
-  @param {string} [force_caching=false]
-  */
+  /**
+   * Static initializer for v2 assets.
+   *
+   * @param {string} conversation_id - ID of conversation
+   * @param {string} asset_id - ID to retrieve asset with
+   * @param {Uint8Array} otr_key - Encryption key
+   * @param {Uint8Array} sha256 - Checksum
+   * @param {Boolean} [force_caching=false] - Cache asset in ServiceWorker
+   * @returns {z.assets.AssetRemoteData} V2 asset remote data
+   */
   static v2(conversation_id, asset_id, otr_key, sha256, force_caching = false) {
     const remote_data = new z.assets.AssetRemoteData(otr_key, sha256);
     remote_data.generate_url = () => wire.app.service.asset.generate_asset_url_v2(asset_id, conversation_id, force_caching);
@@ -72,14 +72,15 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     return remote_data;
   }
 
-  /*
-  Static initializer for v1 assets
-
-  @deprecated
-  @param {string} conversation_id
-  @param {string} asset_id
-  @param {string} [force_caching=false]
-  */
+  /**
+   * Static initializer for v1 assets.
+   *
+   * @deprecated
+   * @param {string} conversation_id - ID of conversation
+   * @param {string} asset_id - ID to retrieve asset with
+   * @param {Boolean} [force_caching=false] - Cache asset in ServiceWorker
+   * @returns {z.assets.AssetRemoteData} V1 asset remote data
+   */
   static v1(conversation_id, asset_id, force_caching = false) {
     const remote_data = new z.assets.AssetRemoteData();
     remote_data.generate_url = () => wire.app.service.asset.generate_asset_url(asset_id, conversation_id, force_caching);
@@ -87,11 +88,10 @@ z.assets.AssetRemoteData = class AssetRemoteData {
     return remote_data;
   }
 
-  /*
-  Loads and decrypts stored asset
-
-  @returns {Blob}
-  */
+  /**
+   * Loads and decrypts stored asset
+   * @returns {Blob} Decrypted asset data
+   */
   load() {
     let mime_type;
 
@@ -102,26 +102,26 @@ z.assets.AssetRemoteData = class AssetRemoteData {
         return z.assets.AssetCrypto.decrypt_aes_asset(buffer, this.otr_key.buffer, this.sha256.buffer);
       }
       return buffer;
-    }).then(plaintext => new Blob([new Uint8Array(plaintext)], {mime_type}));
+    })
+    .then((plaintext) => new Blob([new Uint8Array(plaintext)], {mime_type}));
   }
 
-  /*
-  Get object url for asset remote data. URLs are cached in memory
-
-  @returns {String}
-  */
+  /**
+   * Get object url for asset remote data. URLs are cached in memory.
+   * @returns {Promise<string>} Object URL for asset
+   */
   get_object_url() {
     const object_url = z.assets.AssetURLCache.get_url(this.identifier);
     if (object_url != null) {
       return Promise.resolve(object_url);
     }
 
-    return this.load().then(blob => z.assets.AssetURLCache.set_url(this.identifier, window.URL.createObjectURL(blob)));
+    return this.load().then((blob) => z.assets.AssetURLCache.set_url(this.identifier, window.URL.createObjectURL(blob)));
   }
 
   _load_buffer() {
-    return z.util.load_url_buffer(this.generate_url(), xhr => {
-      xhr.onprogress = event => this.download_progress(Math.round((event.loaded / event.total) * 100));
+    return z.util.load_url_buffer(this.generate_url(), (xhr) => {
+      xhr.onprogress = (event) => this.download_progress(Math.round((event.loaded / event.total) * 100));
       return this.cancel_download = () => xhr.abort.call(xhr);
     });
   }

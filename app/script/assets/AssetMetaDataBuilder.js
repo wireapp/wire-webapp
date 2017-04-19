@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,12 +25,11 @@ window.z.assets = z.assets || {};
 // Builder for creating all kinds of asset metadata
 z.assets.AssetMetaDataBuilder = {
 
-  /*
-  Constructs corresponding asset metadata depending on the given file type
-
-  @param {File|Blob} file - the file to generate metadata for
-  @returns {ImageMetaData|VideoMetaData|AudioMetaData}
-  */
+  /**
+   * Constructs corresponding asset metadata depending on the given file type
+   * @param {File|Blob} file - the file to generate metadata for
+   * @returns {Promise} Resolves with ImageMetaData, VideoMetaData or AudioMetaData
+   */
   build_metadata(file) {
     if (!(file instanceof Blob)) {
       throw new Error('Expected file to be type of Blob');
@@ -75,7 +74,7 @@ z.assets.AssetMetaDataBuilder = {
   },
 
   _build_image_metdadata(imagefile) {
-    return new Promise((resolve, reject) =>{
+    return new Promise((resolve, reject) => {
       const url = window.URL.createObjectURL(imagefile);
       const img = new Image();
       img.onload = () => {
@@ -91,11 +90,13 @@ z.assets.AssetMetaDataBuilder = {
   },
 
   _build_audio_metdadata(audiofile) {
-    return z.util.load_file_buffer(audiofile).then((buffer) => {
+    return z.util.load_file_buffer(audiofile)
+    .then((buffer) => {
       const audioContext = new AudioContext();
       audioContext.close();
       return audioContext.decodeAudioData(buffer);
-    }).then(audio_buffer => {
+    })
+    .then((audio_buffer) => {
       return new z.proto.Asset.AudioMetaData(audio_buffer.duration * 1000, z.assets.AssetMetaDataBuilder._normalise_loudness(audio_buffer));
     });
   },

@@ -24,15 +24,15 @@ window.z = window.z || {};
 z.location = (() => {
   const GOOGLE_GEOCODING_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
   const API_KEY = 'AIzaSyCKxxKw5JBZ5zEFtoirtgnw8omvH7gWzfo';
-  let _parse_results = (results) => {
-    let res = {};
-    let [result] = results;
+  const _parse_results = (results) => {
+    const res = {};
+    const [result] = results;
     res['address'] = result.formatted_address;
     res['lat'] = result.geometry.location.lat;
     res['lng'] = result.geometry.location.lng;
-    for (let component of result.address_components) {
-      let name = component.long_name || component.short_name;
-      for (let type of component.types) {
+    for (const component of result.address_components) {
+      const name = component.long_name || component.short_name;
+      for (const type of component.types) {
         res[type] = name;
         if (type === 'country') {
           res['country_code'] = component.short_name || '';
@@ -41,15 +41,16 @@ z.location = (() => {
     }
     res['place'] = res.locality || res.natural_feature || res.administrative_area_level_3 || res.administrative_area_level_2 || res.administrative_area_level_1;
     delete (res.political != null);
-    return res;
+    return z.util.ObjectUtil.escape_properties(res);
   };
 
-  /*
-  Reverse loop up for geo location
-  @param latitude [Number] latitude
-  @param longitude [Number] longitude
+  /**
+   * Reverse loop up for geo location
+   * @param {Number} latitude - Latitude of location
+   * @param {Number} longitude - Longitude of location
+   * @returns {Promise} Resolves with the location information
    */
-  let get_location = (latitude, longitude) => {
+  const get_location = (latitude, longitude) => {
     return new Promise((resolve, reject) => {
       if ((latitude == null) || (longitude == null)) {
         reject(new Error('You need to specify latitude and longitude in order to retrieve the location'));
@@ -57,7 +58,7 @@ z.location = (() => {
       $.ajax({
         url: `${GOOGLE_GEOCODING_BASE_URL}?latlng=${latitude},${longitude}&key=${API_KEY}`,
       })
-      .done(response => {
+      .done((response) => {
         if (response.status === 'OK') {
           return resolve(_parse_results(response.results));
         }
@@ -67,15 +68,16 @@ z.location = (() => {
     });
   };
 
-  /*
-  Return link to google maps
-
-  @param lat [Number] latitude
-  @param lng [Number] longitude
-  @param name [String] location name
-  @param zoom [String] map zoom level
+  /**
+   * Return link to Google Maps
+   *
+   * @param {Number} lat - Latitude of location
+   * @param {Number} lng - Longitude of location
+   * @param {String} name - Name of location
+   * @param {String} zoom - Map zoom level
+   * @returns {string} URL to location in Google Maps
    */
-  let get_maps_url = (lat, lng, name, zoom) => {
+  const get_maps_url = (lat, lng, name, zoom) => {
     let base_url;
     base_url = 'https://google.com/maps/';
     if (name != null) {
@@ -87,6 +89,7 @@ z.location = (() => {
     }
     return base_url;
   };
+
   return {
     get_location,
     get_maps_url,

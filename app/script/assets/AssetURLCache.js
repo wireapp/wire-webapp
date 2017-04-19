@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ z.assets.AssetURLCache = (function() {
     return url;
   };
 
-  const get_url = identifier => lru_cache.get(identifier);
+  const get_url = (identifier) => lru_cache.get(identifier);
 
   return {
     get_url,

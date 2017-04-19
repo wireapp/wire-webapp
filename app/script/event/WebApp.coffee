@@ -32,9 +32,9 @@ z.event.WebApp =
     PLAY_IN_LOOP: 'wire.webapp.audio.play-in-loop'
     STOP: 'wire.webapp.audio.stop'
   APP:
-    UPDATE_INIT: 'wire.webapp.app.update-init'
-    HIDE: 'wire.webapp.app.hide'
     FADE_IN: 'wire.webapp.app.fade-in'
+    HIDE: 'wire.webapp.app.hide'
+    UPDATE_PROGRESS: 'wire.webapp.app.update_progress'
   CALL:
     EVENT_FROM_BACKEND: 'wire.webapp.call.event-from-backend'
     STATE:

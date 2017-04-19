@@ -780,8 +780,7 @@ describe 'z.conversation.ConversationRepository', ->
 
   describe 'get_preceding_messages', ->
     it 'gets messages which are not broken by design', (done) ->
-      spyOn(user_repository, 'get_user_by_id').and.callFake (message_id, callback) ->
-        callback new z.entity.User()
+      spyOn(user_repository, 'get_user_by_id').and.returnValue Promise.resolve new z.entity.User()
 
       conversation_et = new z.entity.Conversation z.util.create_random_uuid()
       #@formatter:off
