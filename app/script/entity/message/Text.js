@@ -23,10 +23,7 @@ window.z = window.z || {};
 window.z.entity = z.entity || {};
 
 z.entity.Text = class Text extends z.entity.Asset {
-  constructor(id, text) {
-    if (text == null) {
-      text = '';
-    }
+  constructor(id, text = '') {
     super(id);
     this.type = z.assets.AssetType.TEXT;
     this.nonce = undefined;

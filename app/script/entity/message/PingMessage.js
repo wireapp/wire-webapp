@@ -33,8 +33,9 @@ z.entity.PingMessage = class PingMessage extends z.entity.Message {
     }, this, {deferEvaluation: true});
 
     this.get_icon_classes = ko.pureComputed(() => {
+      const show_ping_animation = (Date.now() - this.timestamp()) < 2000;
       let css_classes = this.accent_color();
-      if ((Date.now() - this.timestamp()) < 2000) {
+      if (show_ping_animation) {
         css_classes += ' ping-animation ping-animation-soft';
       }
       return css_classes;
