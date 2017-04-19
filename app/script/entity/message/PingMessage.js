@@ -30,8 +30,7 @@ z.entity.PingMessage = class PingMessage extends z.entity.Message {
     this.caption = ko.pureComputed(() => {
       const string = this.user().is_me ? z.string.conversation_ping_you : z.string.conversation_ping;
       return z.localization.Localizer.get_text(string);
-    }
-      , this, {deferEvaluation: true});
+    }, this, {deferEvaluation: true});
 
     this.get_icon_classes = ko.pureComputed(() => {
       let css_classes = this.accent_color();

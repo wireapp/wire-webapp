@@ -176,7 +176,7 @@ z.entity.Message = class Message {
    * @returns {Boolean} Message contains a nonce
    */
   has_nonce() {
-    return [z.message.SuperType.CONTENT].includes(this.super_type);
+    return this.super_type === z.message.SuperType.CONTENT;
   }
 
   /**
@@ -292,7 +292,7 @@ z.entity.Message = class Message {
    * @returns {Boolean} True, if message type supports reactions.
    */
   is_reactable() {
-    return this.is_content() && (this.status() !== z.message.StatusType.SENDING) && !this.is_ephemeral();
+    return this.is_content() && !this.is_ephemeral() && this.status() !== z.message.StatusType.SENDING;
   }
 
   // Start the ephemeral timer for the message.
@@ -315,14 +315,12 @@ z.entity.Message = class Message {
     this.ephemeral_interval_id = window.setInterval(() => {
       this.ephemeral_remaining(this.ephemeral_expires() - Date.now());
       return this.ephemeral_caption(z.util.format_time_remaining(this.ephemeral_remaining()));
-    }
-      , 250);
+    }, 250);
 
     return this.ephemeral_timeout_id = window.setTimeout(() => {
       amplify.publish(z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this);
       return window.clearInterval(this.ephemeral_interval_id);
-    }
-      , this.ephemeral_remaining());
+    }, this.ephemeral_remaining());
   }
 
   /**

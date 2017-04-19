@@ -131,9 +131,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           }
           return this._get_caption_with_names(z.string.conversation_member_join);
       }
-    }
-
-      , this, {deferEvaluation: true});
+    }, this, {deferEvaluation: true});
   }
 
   is_connection() {
