@@ -212,7 +212,7 @@ z.entity.Message = class Message {
    * @returns {Boolean} True, if the message has downloadable content.
    */
   is_downloadable() {
-    if(typeof this.get_first_asset === 'function') {
+    if (typeof this.get_first_asset === 'function') {
       return true;
     }
     return false;

@@ -163,11 +163,10 @@ z.entity.File = class File extends z.entity.Asset {
     }
     amplify.publish(z.event.WebApp.CONVERSATION.ASSET.CANCEL, message_et);
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_CANCELLED, {
-        size_bytes: this.file_size,
-        size_mb: z.util.bucket_values((this.file_size / 1024 / 1024), [0, 5, 10, 15, 20, 25]),
-        type: z.util.get_file_extension(this.file_name),
-      }
-    );
+      size_bytes: this.file_size,
+      size_mb: z.util.bucket_values((this.file_size / 1024 / 1024), [0, 5, 10, 15, 20, 25]),
+      type: z.util.get_file_extension(this.file_name),
+    });
   }
 
   reload() {

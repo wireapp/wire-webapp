@@ -37,7 +37,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
     this.reactions_user_ids = ko.pureComputed(() => {
       this.reactions_user_ets()
         .map((user_et) => user_et.first_name())
-        .join(', ')
+        .join(', ');
     });
 
     this.display_edited_timestamp = () => {
