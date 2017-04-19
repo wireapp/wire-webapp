@@ -25,8 +25,11 @@ window.z.components = z.components || {};
 z.components.ConversationListCell = class ConversationListCell {
   constructor(params, component_info) {
     this.on_in_viewport = this.on_in_viewport.bind(this);
+
     this.conversation = params.conversation;
     this.is_selected = params.is_selected || function() {};
+    this.on_click = params.click || function() {};
+
     this.entered_viewport = ko.observable(false);
     this.user = ko.pureComputed(() => this.conversation.participating_user_ets()[0]);
     this.users = ko.pureComputed(() => this.conversation.participating_user_ets().slice(0, 4));
@@ -52,10 +55,10 @@ ko.components.register('conversation-list-cell', {
     <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}, in_viewport: on_in_viewport">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation()}">
         <!-- ko if: conversation.is_group() -->
-          <group-avatar params="users: users()"></group-avatar>
+          <group-avatar class="conversation-list-cell-avatar-arrow" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options" params="users: users()"></group-avatar>
         <!-- /ko -->
         <!-- ko ifnot: conversation.is_group() -->
-          <user-avatar class="user-avatar-xs" params="user: user"></user-avatar>
+          <user-avatar class="conversation-list-cell-avatar-arrow, user-avatar-xs" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options" params="user: user"></user-avatar>
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-center">

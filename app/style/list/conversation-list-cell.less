@@ -81,6 +81,22 @@
   text-align: center;
 }
 
+.conversation-list-cell-avatar-arrow {
+  position: relative;
+
+  &:hover:after {
+    position: absolute;
+    right: -5px;
+    bottom: -5px;
+    content: "";
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #fff;
+  }
+}
+
 /* states */
 
 .conversation-list-cell-active {

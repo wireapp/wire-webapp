@@ -163,7 +163,7 @@
       <!-- ko if: connect_requests().length > 0 -->
         <li class="conversation-list-cell"
             data-bind="css: {'conversation-list-cell-active': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}">
-          <div class="conversation-list-cell-left">
+          <div class="conversation-list-cell-left" data-bind="click: on_context_menu">
             <!-- ko if: connect_requests().length > 1 -->
               <group-avatar params="users: connect_requests()"></group-avatar>
             <!-- /ko -->
@@ -183,7 +183,7 @@
       <!-- /ko -->
 
       <!-- ko foreach: conversations_unarchived -->
-        <conversation-list-cell data-bind="click: $parent.click_on_conversation, event: {'contextmenu': $parent.on_context_menu}" params="conversation: $data, is_selected: $parent.is_selected_conversation"></conversation-list-cell>
+        <conversation-list-cell data-bind="click: $parent.click_on_conversation, event: {'contextmenu': $parent.on_context_menu}" params="click: $parent.on_context_menu, conversation: $data, is_selected: $parent.is_selected_conversation"></conversation-list-cell>
       <!-- /ko -->
     </ul>
     <!-- /ko -->
