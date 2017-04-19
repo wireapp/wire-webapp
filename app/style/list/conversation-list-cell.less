@@ -84,16 +84,25 @@
 .conversation-list-cell-avatar-arrow {
   position: relative;
 
+  &:after {
+    content: "";
+    transition-property: opacity;
+    transition-timing-function: @ease-out-quart;
+    opacity: 0;
+  }
+
   &:hover:after {
     position: absolute;
     right: -5px;
     bottom: -5px;
-    content: "";
     width: 0;
     height: 0;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
     border-top: 5px solid #fff;
+    transition-delay: @animation-timing-faster + .05;
+    transition-duration: @animation-timing-slow;
+    opacity: 1;
   }
 }
 
