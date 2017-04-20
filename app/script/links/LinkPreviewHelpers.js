@@ -38,7 +38,7 @@ z.links.LinkPreviewHelpers = {
   /**
    * Get first link and link offset for given text.
    * @param {string} text - Text to parse
-   * @returns {Array<string, number>} First link and it's offset
+   * @returns {Array<string, number>} First link and its offset
    */
   get_first_link_with_offset(text) {
     const links = twttr.txt.extractUrls(text);
