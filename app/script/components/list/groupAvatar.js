@@ -23,29 +23,38 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.GroupAvatar = class GroupAvatar {
-  constructor(params) {
-    this.users = params.users;
+  constructor({users}) {
     this.on_in_viewport = this.on_in_viewport.bind(this);
+    this.entered_viewport = ko.observable(false);
 
     this.slot0 = ko.observable('');
     this.slot1 = ko.observable('');
     this.slot2 = ko.observable('');
     this.slot3 = ko.observable('');
+
+    this.user_image_observable = ko.computed(() => {
+      if(!this.entered_viewport()) {
+        return;
+      }
+      users().forEach((user_et, index) => {
+        const preview = user_et.preview_picture_resource();
+
+        if (preview) {
+          preview.get_object_url().then((url) => {
+            this[`slot${index}`](`url("${url}")`);
+          });
+        }
+      });
+    });
   }
 
   on_in_viewport() {
-    console.debug('in viewport')
-    this.users().forEach((user_et, index) => {
-      const preview = user_et.preview_picture_resource();
-
-      if (preview) {
-        preview.get_object_url().then((url) => {
-          this[`slot${index}`](`url("${url}")`);
-        });
-      }
-    });
-
+    this.entered_viewport(true);
     return true;
+  }
+
+  dispose() {
+    this.user_image_observable.dispose()
   }
 };
 

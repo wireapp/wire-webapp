@@ -150,10 +150,10 @@ z.conversation.ConversationCellState = (() => {
           break;
         case z.event.Backend.CONVERSATION.MEMBER_JOIN:
           if (last_message_et.remote_user_ets().length === 1) {
+            // TODO: full name if you were added?
             message_text = `${last_message_et.sender_name()} added ${last_message_et.remote_user_ets()[0].first_name()}`;
           } else if (last_message_et.remote_user_ets().length > 1) {
-            // TODO: full name if you were added?
-            message_text = `${last_message_et.sender_name()} added ${last_message_et.remote_user_ets().length} people`;
+            message_text = `$${last_message_et.remote_user_ets().length} people were added`;
           }
           break;
         default:
