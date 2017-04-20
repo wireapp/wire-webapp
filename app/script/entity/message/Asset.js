@@ -31,7 +31,7 @@ z.entity.Asset = class Asset {
 
   /**
    * Check if asset is a medium image.
-   * @returns {Boolean} Is asset of type medium image
+   * @returns {boolean} Is asset of type medium image
    */
   is_image() {
     return this.type === z.assets.AssetType.IMAGE;
@@ -39,7 +39,7 @@ z.entity.Asset = class Asset {
 
   /**
    * Check if asset is a text.
-   * @returns {Boolean} Is asset of type text
+   * @returns {boolean} Is asset of type text
    */
   is_text() {
     return this.type === z.assets.AssetType.TEXT;
@@ -47,7 +47,7 @@ z.entity.Asset = class Asset {
 
   /**
    * Check if asset is a file.
-   * @returns {Boolean} Is asset of type file
+   * @returns {boolean} Is asset of type file
    */
   is_file() {
     return this.type === z.assets.AssetType.FILE && !this.is_video() && !this.is_audio();
@@ -55,7 +55,7 @@ z.entity.Asset = class Asset {
 
   /**
    * Check if asset is a location.
-   * @returns {Boolean} Is asset of type location
+   * @returns {boolean} Is asset of type location
    */
   is_location() {
     return this.type === z.assets.AssetType.LOCATION;
@@ -63,7 +63,7 @@ z.entity.Asset = class Asset {
 
   /**
    * Check if asset is a video.
-   * @returns {Boolean} Is asset of type video
+   * @returns {boolean} Is asset of type video
    */
   is_video() {
     const is_video_asset = this.type === z.assets.AssetType.FILE && this.file_type && this.file_type.startsWith('video');
@@ -78,7 +78,7 @@ z.entity.Asset = class Asset {
 
   /**
    * Check if asset is a audio.
-   * @returns {Boolean} Is asset of type audio
+   * @returns {boolean} Is asset of type audio
    */
   is_audio() {
     const is_audio_asset = this.type === z.assets.AssetType.FILE && this.file_type && this.file_type.startsWith('audio');

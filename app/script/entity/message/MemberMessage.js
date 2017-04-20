@@ -111,6 +111,8 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
           return this._get_caption_with_names(z.string.conversation_create, z.string.Declension.DATIVE);
         case z.message.SystemMessageType.CONVERSATION_RESUME:
           return this._get_caption_with_names(z.string.conversation_resume, z.string.Declension.DATIVE);
+        default:
+          break;
       }
 
       switch (this.type) {
@@ -130,6 +132,8 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             return this._get_caption_with_names(z.string.conversation_member_join_you);
           }
           return this._get_caption_with_names(z.string.conversation_member_join);
+        default:
+          break;
       }
     }, this, {deferEvaluation: true});
   }

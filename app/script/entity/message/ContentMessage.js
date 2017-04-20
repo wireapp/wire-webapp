@@ -121,7 +121,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
 
   /**
    * Check whether the message was edited.
-   * @returns {Boolean} True, if message has been edited.
+   * @returns {boolean} True, if message has been edited.
    */
   was_edited() {
     return (this.replacing_message_id != null);
@@ -139,7 +139,7 @@ z.entity.ContentMessage = class ContentMessage extends z.entity.Message {
 
   /**
    * Get content name.
-   * @returns {String} The content/file name.
+   * @returns {string} The content/file name.
    */
   get_content_name() {
     const asset_et = this.get_first_asset();

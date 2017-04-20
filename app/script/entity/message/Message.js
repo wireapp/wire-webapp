@@ -26,7 +26,7 @@ z.entity.Message = class Message {
   /**
    * Sort messages by timestamp
    * @param {Array<z.entity.Message>} message_ets - Message entities
-   * @returns {Boolean} Sorted message entities
+   * @returns {boolean} Sorted message entities
    */
   static sort_by_timestamp(message_ets) {
     return message_ets.sort((m1, m2) => m1.timestamp() > m2.timestamp());
@@ -98,7 +98,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message contains an asset of type file.
-   * @returns {Boolean} Message contains any file type asset
+   * @returns {boolean} Message contains any file type asset
    */
   has_asset() {
     if (this.is_content()) {
@@ -113,7 +113,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message contains a file asset.
-   * @returns {Boolean} Message contains a file
+   * @returns {boolean} Message contains a file
    */
   has_asset_file() {
     if (this.is_content()) {
@@ -128,7 +128,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message contains any image asset.
-   * @returns {Boolean} Message contains any image
+   * @returns {boolean} Message contains any image
    */
   has_asset_image() {
     if (this.is_content()) {
@@ -143,7 +143,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message contains a location asset.
-   * @returns {Boolean} Message contains a location
+   * @returns {boolean} Message contains a location
    */
   has_asset_location() {
     if (this.is_content()) {
@@ -158,7 +158,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message contains a text asset.
-   * @returns {Boolean} Message contains text
+   * @returns {boolean} Message contains text
    */
   has_asset_text() {
     if (this.is_content()) {
@@ -173,7 +173,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message contains a nonce.
-   * @returns {Boolean} Message contains a nonce
+   * @returns {boolean} Message contains a nonce
    */
   has_nonce() {
     return this.super_type === z.message.SuperType.CONTENT;
@@ -181,7 +181,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message is a call message.
-   * @returns {Boolean} Is message of type call
+   * @returns {boolean} Is message of type call
    */
   is_call() {
     return this.super_type === z.message.SuperType.CALL;
@@ -189,7 +189,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message is a content message.
-   * @returns {Boolean} Is message of type content
+   * @returns {boolean} Is message of type content
    */
   is_content() {
     return this.super_type === z.message.SuperType.CONTENT;
@@ -197,7 +197,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message can be deleted.
-   * @returns {Boolean} True, if message is deletable.
+   * @returns {boolean} True, if message is deletable.
    */
   is_deletable() {
     if (this.is_ping() || !this.has_asset()) {
@@ -209,7 +209,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if the message content can be downloaded.
-   * @returns {Boolean} True, if the message has downloadable content.
+   * @returns {boolean} True, if the message has downloadable content.
    */
   is_downloadable() {
     if (typeof this.get_first_asset === 'function') {
@@ -217,14 +217,13 @@ z.entity.Message = class Message {
       if (asset_et && (typeof asset_et.download === 'function')) {
         return true;
       }
-      return false;
     }
     return false;
   }
 
   /**
    * Check if message is a member message.
-   * @returns {Boolean} Is message of type member
+   * @returns {boolean} Is message of type member
    */
   is_member() {
     return this.super_type === z.message.SuperType.MEMBER;
@@ -232,7 +231,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message is a ping message.
-   * @returns {Boolean} Is message of type ping
+   * @returns {boolean} Is message of type ping
    */
   is_ping() {
     return this.super_type === z.message.SuperType.PING;
@@ -240,7 +239,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message is a system message.
-   * @returns {Boolean} Is message of type system
+   * @returns {boolean} Is message of type system
    */
   is_system() {
     return this.super_type === z.message.SuperType.SYSTEM;
@@ -248,7 +247,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message is a e2ee message.
-   * @returns {Boolean} Is message of type system
+   * @returns {boolean} Is message of type system
    */
   is_device() {
     return this.super_type === z.message.SuperType.DEVICE;
@@ -256,7 +255,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message is a e2ee message.
-   * @returns {Boolean} Is message of type system
+   * @returns {boolean} Is message of type system
    */
   is_all_verified() {
     return this.super_type === z.message.SuperType.ALL_VERIFIED;
@@ -264,7 +263,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message is a e2ee message.
-   * @returns {Boolean} Is message of type system
+   * @returns {boolean} Is message of type system
    */
   is_unable_to_decrypt() {
     return this.super_type === z.message.SuperType.UNABLE_TO_DECRYPT;
@@ -272,7 +271,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message can be edited.
-   * @returns {Boolean} True, if message can be edited.
+   * @returns {boolean} True, if message can be edited.
    */
   is_editable() {
     return this.has_asset_text() && this.user().is_me && !this.is_ephemeral();
@@ -280,7 +279,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message is ephemeral.
-   * @returns {Boolean} True, if message is ephemeral.
+   * @returns {boolean} True, if message is ephemeral.
    */
   is_ephemeral() {
     return this.ephemeral_expires() !== false;
@@ -288,7 +287,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if ephemeral message is expired.
-   * @returns {Boolean} True, if message expired.
+   * @returns {boolean} True, if message expired.
    */
   is_expired() {
     return this.ephemeral_expires() === true;
@@ -296,7 +295,7 @@ z.entity.Message = class Message {
 
   /**
    * Check if message can be reacted to.
-   * @returns {Boolean} True, if message type supports reactions.
+   * @returns {boolean} True, if message type supports reactions.
    */
   is_reactable() {
     return this.is_content() && !this.is_ephemeral() && this.status() !== z.message.StatusType.SENDING;
@@ -333,7 +332,7 @@ z.entity.Message = class Message {
   /**
    * Update the status of a message.
    * @param {z.message.StatusType} updated_status - New status of message
-   * @returns {z.message.StatusType|Boolean} Returns the new status on a successful update, otherwise "false"
+   * @returns {z.message.StatusType|boolean} Returns the new status on a successful update, otherwise "false"
    */
   update_status(updated_status) {
     if (this.status() >= z.message.StatusType.SENT) {

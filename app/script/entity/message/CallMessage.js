@@ -39,7 +39,7 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
 
   /**
    * Check if call message is call activation.
-   * @returns {Boolean} Is message of type activate
+   * @returns {boolean} Is message of type activate
    */
   is_activation() {
     return this.call_message_type === z.message.CALL_MESSAGE_TYPE.ACTIVATED;
@@ -47,7 +47,7 @@ z.entity.CallMessage = class CallMessage extends z.entity.Message {
 
   /**
    * Check if call message is call deactivation.
-   * @returns {Boolean} Is message of type deactivate
+   * @returns {boolean} Is message of type deactivate
    */
   is_deactivation() {
     return this.call_message_type === z.message.CALL_MESSAGE_TYPE.DEACTIVATED;
