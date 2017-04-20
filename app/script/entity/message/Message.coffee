@@ -21,12 +21,6 @@ z.entity ?= {}
 
 # Base message entity.
 class z.entity.Message
-  ###
-  Sort messages by timestamp
-  @return [Boolean] Is message of type system
-  ###
-  @sort_by_timestamp: (message_ets) ->
-    message_ets.sort (m1, m2) -> m1.timestamp() > m2.timestamp()
 
   # Construct a new base message entity.
   constructor: (@id = '0', @super_type = '') ->
@@ -124,13 +118,6 @@ class z.entity.Message
     if @is_content()
       return true for asset_et in @assets() when asset_et.is_text()
     return false
-
-  ###
-  Check if message contains a nonce.
-  @return [Boolean] Message contains a nonce
-  ###
-  has_nonce: ->
-    return @super_type in [z.message.SuperType.CONTENT]
 
   ###
   Check if message is a call message.

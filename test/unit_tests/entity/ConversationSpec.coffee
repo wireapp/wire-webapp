@@ -154,9 +154,11 @@ describe 'Conversation', ->
       conversation_et.last_read_timestamp last_read_timestamp
 
       ping_message = new z.entity.PingMessage()
+      ping_message.id = z.util.create_random_uuid()
       ping_message.timestamp last_read_timestamp - 1000
 
       call_message = new z.entity.CallMessage()
+      call_message.id = z.util.create_random_uuid()
       call_message.timestamp last_read_timestamp - 1000
       call_message.finished_reason = z.calling.enum.TERMINATION_REASON.MISSED
 
@@ -273,6 +275,20 @@ describe 'Conversation', ->
       expect(conversation_et.messages().length).toBe 2
       expect(conversation_et.get_last_message().id).toBe message_id
 
+  describe 'add_message', ->
+    it 'should not add message that is already added to conversation', ->
+      message_et = new z.entity.Message()
+      message_et.id = z.util.create_random_uuid()
+      message_et.timestamp new Date('2014-12-14T08:21:14.225Z').getTime()
+
+      duplicated_message_et = new z.entity.Message()
+      duplicated_message_et.id = message_et.id
+
+      conversation_et.add_message message_et
+      conversation_et.add_message duplicated_message_et
+      expect(conversation_et.messages_unordered().length).toBe 1
+      expect(conversation_et.messages_unordered()[0].id).toBe message_et.id
+
   describe 'add_messages', ->
     reference_timestamp = Date.now()
 
@@ -291,21 +307,6 @@ describe 'Conversation', ->
 
       expect(conversation_et.messages_unordered().length).toBe 2
 
-    it 'detects duplicate messages', ->
-      content = z.message.SuperType.CONTENT
-      asset_meta = z.event.Client.CONVERSATION.ASSET_META
-
-      message1.super_type = content
-      message1.type = asset_meta
-
-      message2.super_type = content
-      message2.type = asset_meta
-      message_ets = [message1, message2]
-      conversation_et.add_messages message_ets
-
-      expect(message2.visible()).toBe false
-      expect(message1.visible()).toBe true
-
   describe 'message deletion', ->
 
     message_et = null
@@ -320,15 +321,6 @@ describe 'Conversation', ->
 
     it 'should remove message by id', ->
       expect(conversation_et.messages().length).toBe 1
-      conversation_et.remove_message_by_id message_et.id
-      expect(conversation_et.messages().length).toBe 0
-
-    it 'should remove all message with the same id', ->
-      duplicated_message_et = new z.entity.Message()
-      duplicated_message_et.id = message_et.id
-      conversation_et.add_message duplicated_message_et
-
-      expect(conversation_et.messages().length).toBe 2
       conversation_et.remove_message_by_id message_et.id
       expect(conversation_et.messages().length).toBe 0
 
@@ -500,34 +492,6 @@ describe 'Conversation', ->
       expect(conversation_et.messages().length).toBe 0
       expect(conversation_et.is_loaded()).toBeFalsy()
       expect(conversation_et.has_further_messages()).toBeTruthy()
-
-  describe '_check_for_duplicate_nonce', ->
-
-    it 'should hide newer duplicated audio asset', ->
-      older_timestamp = new Date('December 24, 2000 18:00:00').getTime()
-      newer_timestamp = new Date('December 24, 2000 18:01:00').getTime()
-
-      asset_et = new z.entity.File z.util.create_random_uuid()
-      asset_et.file_size = 'audio/mp4'
-
-      older_message_et = new z.entity.ContentMessage()
-      older_message_et.timestamp older_timestamp
-      older_message_et.id = z.util.create_random_uuid()
-      older_message_et.nonce = z.util.create_random_uuid()
-      older_message_et.type = z.event.Client.CONVERSATION.ASSET_META
-      older_message_et.add_asset asset_et
-
-      newer_message_et = new z.entity.ContentMessage()
-      newer_message_et.timestamp newer_timestamp
-      newer_message_et.id = older_message_et.id
-      newer_message_et.nonce = older_message_et.nonce
-      newer_message_et.type = z.event.Client.CONVERSATION.ASSET_META
-      newer_message_et.add_asset asset_et
-
-      conversation_et._check_for_duplicate_nonce older_message_et, newer_message_et
-
-      expect(older_message_et.visible()).toBeTruthy()
-      expect(newer_message_et.visible()).toBeFalsy()
 
   describe 'is_with_bot', ->
     it 'detects bot conversations by the username of the remote participant', ->
