@@ -135,7 +135,8 @@
 
             if (jqXHR.status === z.service.BackendClientError.prototype.STATUS_CODE.CONNECTIVITY_PROBLEM) {
               this.logger.warn('Access token refresh delayed due to suspected connectivity issue');
-              return this.client.execute_on_connectivity().then(() => {
+              return this.client.execute_on_connectivity(z.service.Client.prototype.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
+              .then(() => {
                 this.logger.info('Continuing access token refresh after verifying connectivity');
                 return _retry();
               });

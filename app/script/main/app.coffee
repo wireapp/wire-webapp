@@ -237,7 +237,7 @@ class z.main.App
       @logger.debug "App reload: '#{is_reload}', Document referrer: '#{document.referrer}', Location: '#{window.location.href}'"
 
       if is_reload and error.type not in [z.client.ClientError.TYPE.MISSING_ON_BACKEND, z.client.ClientError.TYPE.NO_LOCAL_CLIENT]
-        @auth.client.execute_on_connectivity().then -> window.location.reload false
+        @auth.client.execute_on_connectivity(z.service.Client::CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD).then -> window.location.reload false
       else if navigator.onLine
         @logger.error "Caused by: #{error?.message or error}"
         Raygun.send error if error instanceof z.storage.StorageError
@@ -324,7 +324,7 @@ class z.main.App
             @_redirect_to_login true
           else
             @logger.warn 'Connectivity issues. Trigger reload on regained connectivity.', error
-            @auth.client.execute_on_connectivity().then -> window.location.reload false
+            @auth.client.execute_on_connectivity(z.service.Client::CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL).then -> window.location.reload false
         else if navigator.onLine
           switch error.type
             when z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE, z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED, z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN
@@ -374,7 +374,7 @@ class z.main.App
   # Behavior when internet connection is re-established.
   on_internet_connection_gained: =>
     @logger.info 'Internet connection regained. Re-establishing WebSocket connection...'
-    @auth.client.execute_on_connectivity()
+    @auth.client.execute_on_connectivity z.service.Client::CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED
     .then =>
       amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.NO_INTERNET
       amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
@@ -459,7 +459,7 @@ class z.main.App
   # Redirect to the login page after internet connectivity has been verified.
   _redirect_to_login: (session_expired) ->
     @logger.info "Redirecting to login after connectivity verification. Session expired: #{session_expired}"
-    @auth.client.execute_on_connectivity()
+    @auth.client.execute_on_connectivity(z.service.Client::CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
     .then ->
       url = "/auth/#{location.search}"
       url = z.util.append_url_parameter url, z.auth.URLParameter.EXPIRED if session_expired
