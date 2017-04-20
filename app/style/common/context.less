@@ -20,8 +20,31 @@
 
 .ctx-menu {
   min-width: 160px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 1px 0 rgba(0,0,0,.08), 0 8px 24px 0 rgba(0,0,0,.16);
+  display: block;
+  font-size: 12px;
+  font-weight: @font-weight-regular;
+  line-height: @line-height-xl;
+  position: fixed;
+  z-index: @z-index-level-7;
+}
 
-  .emoji {
-    padding-left: 24px;
+.ctx-menu-item {
+  padding-left: 24px;
+
+  cursor: pointer;
+
+  &:first-child {
+    border-radius: 4px 4px 0 0; // to match parent's border-radius
+  }
+
+  &:last-child {
+    border-radius: 0 0 4px 4px; // to match parent's border-radius
+  }
+
+  &.selected {
+    background-color: fade(@graphite, 16%);
   }
 }

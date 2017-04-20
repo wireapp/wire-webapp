@@ -57,6 +57,7 @@ z.conversation.ConversationCellState = (() => {
             activity_strings.push(`${count} missed calls`);
           }
           break;
+        default:
       }
     }
 
@@ -66,8 +67,8 @@ z.conversation.ConversationCellState = (() => {
   function accumulate_activity(conversation_et) {
     const unread_events = conversation_et.unread_events();
     const activities = {
-      'message': 0,
       'call': 0,
+      'message': 0,
       'ping': 0,
     };
 
@@ -94,33 +95,30 @@ z.conversation.ConversationCellState = (() => {
   };
 
   const removed_state = {
-    match(conversation_et) {
-      return conversation_et.removed_from_conversation();
-    },
     description() {
       return '';
     },
     icon() {
       return z.conversation.ConversationStatusIcon.NONE;
     },
+    match(conversation_et) {
+      return conversation_et.removed_from_conversation();
+    },
   };
 
   const muted_state = {
-    match(conversation_et) {
-      return conversation_et.is_muted();
-    },
     description(conversation_et) {
       return accumulate_activity(conversation_et);
     },
     icon() {
       return z.conversation.ConversationStatusIcon.MUTED;
     },
+    match(conversation_et) {
+      return conversation_et.is_muted();
+    },
   };
 
   const alert_state = {
-    match(conversation_et) {
-      return conversation_et.unread_events().find(is_alert) !== undefined;
-    },
     description(conversation_et) {
       return accumulate_activity(conversation_et);
     },
@@ -133,15 +131,15 @@ z.conversation.ConversationCellState = (() => {
         return z.conversation.ConversationStatusIcon.MISSED_CALL;
       }
     },
+    match(conversation_et) {
+      return conversation_et.unread_events().find(is_alert) !== undefined;
+    },
   };
 
   const group_activity_state = {
-    match(conversation_et) {
-      return conversation_et.is_group() && conversation_et.unread_event_count() > 0 && conversation_et.get_last_message().is_member()
-    },
     description(conversation_et) {
       const last_message_et = conversation_et.get_last_message();
-      let message_text = '';
+      let message_text;
       switch (last_message_et.type) {
         case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
           if (last_message_et.remote_user_ets().length === 1) {
@@ -157,6 +155,8 @@ z.conversation.ConversationCellState = (() => {
             message_text = 'people added';
           }
           break;
+        default:
+          message_text = '';
       }
       return message_text;
     },
@@ -169,12 +169,12 @@ z.conversation.ConversationCellState = (() => {
         return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
       }
     },
+    match(conversation_et) {
+      return conversation_et.is_group() && conversation_et.unread_event_count() > 0 && conversation_et.get_last_message().is_member();
+    },
   };
 
   const unread_message_state = {
-    match(conversation_et) {
-      return conversation_et.unread_message_count() > 0;
-    },
     description(conversation_et) {
       const last_message_et = conversation_et.get_last_message();
       let message_text = '';
@@ -208,12 +208,12 @@ z.conversation.ConversationCellState = (() => {
     icon() {
       return z.conversation.ConversationStatusIcon.UNREAD_MESSAGES;
     },
+    match(conversation_et) {
+      return conversation_et.unread_message_count() > 0;
+    },
   };
 
   const pending_state = {
-    match(conversation_et) {
-      return conversation_et.is_request();
-    },
     description(conversation_et) {
       const username = conversation_et.participating_user_ets()[0].username();
       return username ? `@${username}` : '';
@@ -221,13 +221,11 @@ z.conversation.ConversationCellState = (() => {
     icon() {
       return z.conversation.ConversationStatusIcon.PENDING_CONNECTION;
     },
+    match(conversation_et) {
+      return conversation_et.is_request();
+    },
   };
 
-  /**
-   * Generate cell description and icon
-   * @param {z.entity.Conversation} conversation_et
-   * @returns {{icon: z.z.conversation.ConversationStatusIcon, description: string}}
-   */
   function generate(conversation_et) {
     console.debug('generate', conversation_et.display_name()); // TODO remove
     const states = [removed_state, muted_state, alert_state, group_activity_state, unread_message_state, pending_state];
@@ -235,8 +233,8 @@ z.conversation.ConversationCellState = (() => {
     const description_state = states.find((state) => state.match(conversation_et));
 
     return {
-      icon: (icon_state || default_state).icon(conversation_et),
       description: (description_state || default_state).description(conversation_et),
+      icon: (icon_state || default_state).icon(conversation_et),
     };
   }
 

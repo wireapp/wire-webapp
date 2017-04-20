@@ -48,32 +48,27 @@ z.ui.Context = (() => {
 
   function cleanup() {
     [...document.querySelectorAll('.ctx-menu')].forEach((menu) => menu.remove());
-    removeListeners()
+    removeListeners();
   }
 
   function build(entries) {
-    let menu = document.createElement('div');
-    menu.classList.add('ctx-menu', 'conversation-input-emoji-list');
+    const menu = document.createElement('div');
+    menu.classList.add('ctx-menu');
 
     for (const entry of entries) {
       const element = document.createElement('div');
-      element.classList.add('emoji');
+      element.classList.add('ctx-menu-item');
       element.innerText = entry.label;
       element.onclick = function() {
         cleanup();
         entry.click();
       };
-      menu.appendChild(element)
+      menu.appendChild(element);
     }
 
-    return menu
+    return menu;
   }
 
-  /**
-   *
-   * @param event
-   * @param options
-   */
   function from(event, entries) {
     event.preventDefault();
     event.stopPropagation();
@@ -86,15 +81,15 @@ z.ui.Context = (() => {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
-    let menu = build(entries);
+    const menu = build(entries);
     menu.style.visibility = 'hidden';
     document.body.appendChild(menu);
 
     const menuWidth = menu.offsetWidth;
     const menuHeight = menu.offsetHeight;
 
-    menu.style.left = `${(((windowWidth - click_x) < menuWidth ) ? click_x - menuWidth : click_x)}px`;
-    menu.style.top = `${(((windowHeight - click_y) < menuHeight ) ? click_y - menuHeight : click_y)}px`;
+    menu.style.left = `${(((windowWidth - click_x) < menuWidth) ? click_x - menuWidth : click_x)}px`;
+    menu.style.top = `${(((windowHeight - click_y) < menuHeight) ? click_y - menuHeight : click_y)}px`;
     menu.style.visibility = '';
 
     addListeners();
@@ -102,6 +97,6 @@ z.ui.Context = (() => {
 
   return {
     from,
-  }
+  };
 
 })();
