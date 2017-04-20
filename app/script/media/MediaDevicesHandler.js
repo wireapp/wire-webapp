@@ -183,6 +183,8 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
             case z.media.MediaDeviceType.VIDEO_INPUT:
               this.available_devices.video_input.push(media_device);
               break;
+            default:
+              throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
           }
         });
 

@@ -61,6 +61,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         return media_stream.getTracks();
       case z.media.MediaType.VIDEO:
         return media_stream.getVideoTracks();
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
   }
 
@@ -303,6 +305,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       case z.media.MediaType.VIDEO:
         constraints_promise = this.get_media_stream_constraints(false, true);
         break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
 
     return constraints_promise.then(({media_type, media_stream_constraints}) => {
@@ -395,6 +399,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         break;
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_CAMERA);
+        break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
   }
 
@@ -417,6 +424,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         break;
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_CAMERA);
+        break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
   }
 
@@ -521,6 +531,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         break;
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_CAMERA);
+        break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
   }
 
@@ -543,6 +556,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         break;
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_CAMERA);
+        break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
   }
 
@@ -567,6 +583,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       case z.media.MediaType.VIDEO:
         this.remote_media_streams.video(media_stream);
         break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
 
     this.media_repository.element_handler.add_media_element(media_stream_info);
@@ -649,6 +667,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         this.self_stream_state.video_send(true);
         this.self_stream_state.screen_send(false);
         this.local_media_type(z.media.MediaType.VIDEO);
+        break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
   }
 

@@ -373,6 +373,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
             placeholder: '%s.first_name',
           },
         });
+      default:
+        this.logger.log(this.logger.levels.OFF, `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`);
     }
   }
 
@@ -481,6 +483,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           return this._create_body_reaction(message_et);
         case z.message.SuperType.SYSTEM:
           return this._create_body_system(message_et);
+        default:
+          this.logger.log(this.logger.levels.OFF, `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`);
       }
     });
   }
@@ -571,6 +575,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et.conversation_id);
         case z.message.SystemMessageType.CONNECTION_REQUEST:
           return () => amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+        default:
+          this.logger.log(this.logger.levels.OFF, `Notification for member message '${message_et.id} in '${conversation_et.id}' does not have specific trigger.`);
       }
     }
     return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
@@ -625,6 +631,9 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           return amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
         amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
+        break;
+      default:
+        this.logger.log(this.logger.levels.OFF, `Notification for message '${message_et.id} does not play sound.`);
     }
   }
 

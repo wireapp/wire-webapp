@@ -227,6 +227,8 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
               return z.message.StatusType.DELIVERED;
             case z.proto.Confirmation.Type.READ:
               return z.message.StatusType.SEEN;
+            default:
+              throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE, 'Unhandled confirmation type');
           }
         })(),
       },
