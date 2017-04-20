@@ -183,7 +183,11 @@
       <!-- /ko -->
 
       <!-- ko foreach: conversations_unarchived -->
-        <conversation-list-cell data-bind="click: $parent.click_on_conversation, event: {'contextmenu': $parent.on_context_menu}" params="click: $parent.on_context_menu, conversation: $data, is_selected: $parent.is_selected_conversation"></conversation-list-cell>
+        <conversation-list-cell
+          data-bind="click: $parent.click_on_conversation, event: {'contextmenu': $parent.on_context_menu}"
+          data-uie-name="item-conversation"
+          params="click: $parent.on_context_menu, conversation: $data, is_selected: $parent.is_selected_conversation">
+        </conversation-list-cell>
       <!-- /ko -->
     </ul>
     <!-- /ko -->
