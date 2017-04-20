@@ -504,7 +504,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * Creates the notification icon.
    *
    * @private
-   * @param {Boolean} should_obfuscate_sender - Sender visible in notification
+   * @param {boolean} should_obfuscate_sender - Sender visible in notification
    * @param {z.entity.User} user_et - Sender of message
    * @returns {string} Icon URL
   */
@@ -648,7 +648,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * Should message in a notification be obfuscated.
    * @private
    * @param {z.entity.Message} message_et - Message entity
-   * @returns {Boolean} Obfucscate message in notification
+   * @returns {boolean} Obfucscate message in notification
    */
   _should_obfuscate_notification_message(message_et) {
     return message_et.is_ephemeral() || [
@@ -661,7 +661,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * Should sender in a notification be obfuscated.
    * @private
    * @param {z.entity.Message} message_et - Message entity
-   * @returns {Boolean} Obfuscate sender in noticiation
+   * @returns {boolean} Obfuscate sender in noticiation
    */
   _should_obfuscate_notification_sender(message_et) {
     return message_et.is_ephemeral() || this.notifications_preference() === z.system_notification.SystemNotificationPreference.OBFUSCATE;
@@ -672,7 +672,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @private
    * @param {z.entity.Conversation} conversation_et - Conversation entity
    * @param {z.entity.Message} message_et - Message entity
-   * @returns {Promise<Boolean>} Resolves whether notification should be hidden
+   * @returns {Promise<boolean>} Resolves whether notification should be hidden
    */
   _should_hide_notification(conversation_et, message_et) {
     return Promise.resolve()
@@ -729,7 +729,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @param {string} notification_content.title - Notification title
    * @param {Object} notification_content.options - Notification options
    * @param {Function} notification_content.trigger - Function to be triggered on click [Function] trigger
-   * @param {Number} notification_content.timeout - Timeout for notification
+   * @param {number} notification_content.timeout - Timeout for notification
    * @returns {undefined} No return value
    */
   _show_notification_in_browser(notification_content) {

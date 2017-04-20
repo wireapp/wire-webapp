@@ -295,7 +295,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
    *
    * @see https://github.com/MindscapeHQ/raygun4js#onbeforesend
    * @param {JSON} raygun_payload - Error payload about to be send
-   * @returns {JSON|Boolean} Payload if error will be reported, otherwise "false"
+   * @returns {JSON|boolean} Payload if error will be reported, otherwise "false"
    */
   _check_error_payload(raygun_payload) {
     if (!this.last_report) {

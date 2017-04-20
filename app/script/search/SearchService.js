@@ -37,8 +37,8 @@ z.search.SearchService = class SearchService {
   /**
    * Search for a user.
    *
-   * @param {String} query - Query string (case insensitive)
-   * @param {Number} size - Number of requested user
+   * @param {string} query - Query string (case insensitive)
+   * @param {number} size - Number of requested user
    * @returns {Promise} Resolves with the search results
    */
   get_contacts(query, size) {

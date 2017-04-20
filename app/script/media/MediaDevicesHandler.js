@@ -252,7 +252,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
 
   /**
    * Check for availability of selected devices.
-   * @param {Boolean} video_send - Also check for video devices
+   * @param {boolean} video_send - Also check for video devices
    * @returns {Promise} Resolves when the current device has been updated
    */
   update_current_devices(video_send) {
@@ -313,7 +313,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * Add underscore to MediaDevice types.
    * @private
    * @param {z.media.MediaDeviceType} device_type - Device type string to update
-   * @returns {String} Updated device type
+   * @returns {string} Updated device type
    */
   _type_conversion(device_type) {
     return device_type.replace('input', '_input').replace('output', '_output');

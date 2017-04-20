@@ -48,9 +48,9 @@ z.event.NotificationService = class NotificationService {
   /**
    * Get notifications from the stream.
    *
-   * @param {String} client_id - Only return notifications targeted at the given client
-   * @param {String} notification_id - Only return notifications more recent than this notification ID (like "7130304a-c839-11e5-8001-22000b0fe035")
-   * @param {Number} size - Maximum number of notifications to return
+   * @param {string} client_id - Only return notifications targeted at the given client
+   * @param {string} notification_id - Only return notifications more recent than this notification ID (like "7130304a-c839-11e5-8001-22000b0fe035")
+   * @param {number} size - Maximum number of notifications to return
    * @returns {Promise} Resolves with the retrieved notifications
    */
   get_notifications(client_id, notification_id, size) {
@@ -67,7 +67,7 @@ z.event.NotificationService = class NotificationService {
 
   /**
    * Get the last notification for a given client.
-   * @param {String} client_id - Client ID to retrieve notification ID for
+   * @param {string} client_id - Client ID to retrieve notification ID for
    * @returns {Promise} Resolves with the last known notification ID for given client
    */
   get_notifications_last(client_id) {

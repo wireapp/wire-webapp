@@ -156,7 +156,7 @@ z.client.ClientService = class ClientService {
   /**
    * Loads a persisted client from the database.
    * @param {string} primary_key - Primary key used to find a client in the database
-   * @returns {Promise<JSON|String>} Resolves with the client's payload or the primary key if not found
+   * @returns {Promise<JSON|string>} Resolves with the client's payload or the primary key if not found
    */
   load_client_from_db(primary_key) {
     return this.storage_service.db[this.storage_service.OBJECT_STORE_CLIENTS]

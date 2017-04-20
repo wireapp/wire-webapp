@@ -104,7 +104,7 @@ window.z.audio.AudioRepository = class AudioRepository {
    * @private
    * @param {z.audio.AudioType} audio_id - Sound identifier
    * @param {HTMLAudioElement} audio_element - AudioElement to play
-   * @param {Boolean} play_in_loop - Play sound in loop
+   * @param {boolean} play_in_loop - Play sound in loop
    * @returns {Promise} Resolves with the HTMLAudioElement
    */
   _play(audio_id, audio_element, play_in_loop = false) {

@@ -37,9 +37,9 @@ z.cache.CacheRepository = class CacheRepository {
   /**
    * Deletes cached data.
    *
-   * @param {Boolean} [keep_conversation_input=false] - Should conversation input be kept
-   * @param {Array<String>} [protected_key_patterns=[z.storage.StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from the cache
-   * @returns {Array<String>} Keys which have been deleted from the cache
+   * @param {boolean} [keep_conversation_input=false] - Should conversation input be kept
+   * @param {Array<string>} [protected_key_patterns=[z.storage.StorageKey.AUTH.SHOW_LOGIN]] - Keys which should NOT be deleted from the cache
+   * @returns {Array<string>} Keys which have been deleted from the cache
    */
   clear_cache(keep_conversation_input = false, protected_key_patterns = [z.storage.StorageKey.AUTH.SHOW_LOGIN]) {
     const deleted_keys = [];

@@ -46,8 +46,8 @@ z.location = (() => {
 
   /**
    * Reverse loop up for geo location
-   * @param {Number} latitude - Latitude of location
-   * @param {Number} longitude - Longitude of location
+   * @param {number} latitude - Latitude of location
+   * @param {number} longitude - Longitude of location
    * @returns {Promise} Resolves with the location information
    */
   const get_location = (latitude, longitude) => {
@@ -71,10 +71,10 @@ z.location = (() => {
   /**
    * Return link to Google Maps
    *
-   * @param {Number} lat - Latitude of location
-   * @param {Number} lng - Longitude of location
-   * @param {String} name - Name of location
-   * @param {String} zoom - Map zoom level
+   * @param {number} lat - Latitude of location
+   * @param {number} lng - Longitude of location
+   * @param {string} name - Name of location
+   * @param {string} zoom - Map zoom level
    * @returns {string} URL to location in Google Maps
    */
   const get_maps_url = (lat, lng, name, zoom) => {

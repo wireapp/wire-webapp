@@ -67,7 +67,7 @@ z.search.SearchRepository = class SearchRepository {
 
   /**
    * Search for users on the backend by name.
-   * @param {String} name - Search query
+   * @param {string} name - Search query
    * @returns {Promise} Resolves with the search results
    */
   search_by_name(name) {
