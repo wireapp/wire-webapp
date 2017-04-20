@@ -23,12 +23,12 @@ window.z = window.z || {};
 window.z.components = z.components || {};
 
 z.components.ConversationListCell = class ConversationListCell {
-  constructor(params, component_info) {
+  constructor({conversation, is_selected = z.util.noop, click = z.util.noop}) {
     this.on_in_viewport = this.on_in_viewport.bind(this);
 
-    this.conversation = params.conversation;
-    this.is_selected = params.is_selected || function() {};
-    this.on_click = params.click || function() {};
+    this.conversation = conversation;
+    this.is_selected = is_selected;
+    this.on_click = click;
 
     this.entered_viewport = ko.observable(false);
     this.user = ko.pureComputed(() => this.conversation.participating_user_ets()[0]);
@@ -46,11 +46,7 @@ z.components.ConversationListCell = class ConversationListCell {
 };
 
 ko.components.register('conversation-list-cell', {
-  viewModel: {
-    createViewModel (params, component_info) {
-      return new z.components.ConversationListCell(params, component_info)
-    }
-  },
+  viewModel: z.components.ConversationListCell,
   template: `
     <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}, in_viewport: on_in_viewport">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation()}">
@@ -58,7 +54,7 @@ ko.components.register('conversation-list-cell', {
           <group-avatar class="conversation-list-cell-avatar-arrow" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options" params="users: users()"></group-avatar>
         <!-- /ko -->
         <!-- ko ifnot: conversation.is_group() -->
-          <user-avatar class="conversation-list-cell-avatar-arrow, user-avatar-xs" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options" params="user: user"></user-avatar>
+          <user-avatar class="conversation-list-cell-avatar-arrow user-avatar-xs" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options" params="user: user"></user-avatar>
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-center">
