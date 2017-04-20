@@ -87,11 +87,11 @@ def user_agent():
         'name': 'Electron',
         'version': electron_version,
       }
-  franz_version = ''.join(re.findall(r'Franz/(.*)\ ', user_agent)).strip()
+  is_franz = bool(re.search(r'Franz/(.*)\ ', user_agent))
 
   is_media = {}
   is_media['electron'] = bool(electron_version)
-  is_media['franz'] = bool(franz_version)
+  is_media['franz'] = is_franz
   is_media['wrapper'] = is_media['electron']
 
   # Google Related
