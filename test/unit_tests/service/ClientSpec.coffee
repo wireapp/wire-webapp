@@ -52,6 +52,7 @@ describe 'z.service.Client', ->
         expect(client.status).toHaveBeenCalledTimes 1
         done()
       .catch done.fail
+      jasmine.clock().tick 10
       server.requests[0].respond 200
 
     it 'executes callback when backend status return an error', (done) ->
@@ -61,6 +62,7 @@ describe 'z.service.Client', ->
         expect(client.status).toHaveBeenCalledTimes 1
         done()
       .catch done.fail
+      jasmine.clock().tick 10
       server.requests[0].respond 401
 
     it 'does not execute callback when request times out', (done) ->
