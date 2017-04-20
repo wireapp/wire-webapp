@@ -47,7 +47,7 @@
     "lint-styles": "stylelint app/style/**/*.less --syntax less",
     "postinstall": "grunt init",
     "start": "grunt",
-    "test": "yarn lint && yarn stylelint && grunt check && grunt test"
+    "test": "yarn lint && grunt check && grunt test"
   },
   "repository": {
     "type": "git",
