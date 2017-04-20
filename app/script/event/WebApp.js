@@ -32,8 +32,6 @@ z.event.WebApp = {
     START_SESSION: 'wire.webapp.analytics.start_session',
   },
   APP: {
-    FADE_IN: 'wire.webapp.app.fade_in',
-    HIDE: 'wire.webapp.app.hide',
     UPDATE_PROGRESS: 'wire.webapp.app.update_progress',
   },
   AUDIO: {

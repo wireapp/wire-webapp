@@ -191,10 +191,6 @@
   opacity: .4;
 }
 
-.hidden {
-  visibility: hidden;
-}
-
 .element-disabled {
   .translucent;
   pointer-events: none;
@@ -217,16 +213,24 @@
 // VISIBILITY
 // ----------------------------------------------------------------------------
 
+.none,
+.off,
+.hide {
+  display: none;
+}
+
 .block,
 .on,
 .show {
   display: block;
 }
 
-.none,
-.off,
-.hide {
-  display: none!important;
+.hidden {
+  visibility: hidden;
+}
+
+.visible {
+  visibility: visible;
 }
 
 // ----------------------------------------------------------------------------
