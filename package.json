@@ -42,12 +42,12 @@
     "deploy-travis-dev": "grunt app_deploy_travis:dev",
     "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
-    "lint": "eslint -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/**/*.js bin/*.js",
-    "lint-fix": "eslint --fix -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/**/*.js bin/*.js",
-    "stylelint": "stylelint app/style/**/*.less --syntax less",
+    "lint": "yarn lint-scripts && yarn lint-styles",
+    "lint-scripts": "eslint -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/**/*.js test/**/*.js bin/*.js",
+    "lint-styles": "stylelint app/style/**/*.less --syntax less",
     "postinstall": "grunt init",
     "start": "grunt",
-    "test": "yarn lint && yarn stylelint && grunt check && grunt test"
+    "test": "yarn lint && grunt check && grunt test"
   },
   "repository": {
     "type": "git",

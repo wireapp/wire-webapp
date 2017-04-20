@@ -61,6 +61,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         return media_stream.getTracks();
       case z.media.MediaType.VIDEO:
         return media_stream.getVideoTracks();
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
   }
 
@@ -107,8 +109,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * Get the MediaStreamConstraints to be used for MediaStream creation.
    *
    * @private
-   * @param {Boolean} [request_audio=false] - Request audio in the constraints
-   * @param {Boolean} [request_video=false] - Request video in the constraints
+   * @param {boolean} [request_audio=false] - Request audio in the constraints
+   * @param {boolean} [request_video=false] - Request video in the constraints
    * @returns {Promise} Resolves with MediaStreamConstraints and their type
    */
   get_media_stream_constraints(request_audio = false, request_video = false) {
@@ -221,7 +223,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * Initiate the MediaStream.
    *
    * @param {string} conversation_id - Conversation ID of call
-   * @param {Boolean} [video_send=false] - Should MediaStream contain video
+   * @param {boolean} [video_send=false] - Should MediaStream contain video
    * @returns {Promise} Resolves when the MediaStream has been initiated
    */
   initiate_media_stream(conversation_id, video_send = false) {
@@ -303,6 +305,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       case z.media.MediaType.VIDEO:
         constraints_promise = this.get_media_stream_constraints(false, true);
         break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
 
     return constraints_promise.then(({media_type, media_stream_constraints}) => {
@@ -395,6 +399,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         break;
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.DENIED_CAMERA);
+        break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
   }
 
@@ -417,6 +424,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         break;
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.REQUEST_CAMERA);
+        break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
   }
 
@@ -466,7 +476,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    * @private
    * @param {MediaStream} media_stream - MediaStream to be released
    * @param {z.media.MediaType} [media_type=z.media.MediaType.AUDIO_VIDEO] - Type of MediaStreamTracks to be released
-   * @returns {Boolean} Have tracks been stopped
+   * @returns {boolean} Have tracks been stopped
    */
   _release_media_stream(media_stream, media_type = z.media.MediaType.AUDIO_VIDEO) {
     if (media_stream) {
@@ -521,6 +531,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         break;
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.DENIED_CAMERA);
+        break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
   }
 
@@ -543,6 +556,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         break;
       case z.media.MediaType.VIDEO:
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_CAMERA);
+        break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
   }
 
@@ -567,6 +583,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       case z.media.MediaType.VIDEO:
         this.remote_media_streams.video(media_stream);
         break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
 
     this.media_repository.element_handler.add_media_element(media_stream_info);
@@ -579,7 +597,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
   /**
    * Check for active calls that need a MediaStream.
-   * @returns {Boolean} Returns true if an active media stream is needed for at least one call
+   * @returns {boolean} Returns true if an active media stream is needed for at least one call
    */
   needs_media_stream() {
     for (const call_et of this.calls()) {
@@ -649,6 +667,9 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
         this.self_stream_state.video_send(true);
         this.self_stream_state.screen_send(false);
         this.local_media_type(z.media.MediaType.VIDEO);
+        break;
+      default:
+        throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
     }
   }
 

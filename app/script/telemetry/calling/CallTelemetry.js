@@ -101,7 +101,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
   /**
    * Set the media type of the call.
-   * @param {Boolean} [video_send=false] - Call contains video
+   * @param {boolean} [video_send=false] - Call contains video
    * @returns {undefined} No return value
    */
   set_media_type(video_send = false) {

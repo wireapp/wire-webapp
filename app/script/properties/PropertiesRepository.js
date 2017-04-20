@@ -88,7 +88,7 @@ z.properties.PropertiesRepository = class PropertiesRepository {
   /**
    * Updated properties handler.
    * @param {z.properties.Properties} properties - New properties
-   * @returns {Boolean} Always returns true to ensure other subscribers handling the event
+   * @returns {boolean} Always returns true to ensure other subscribers handling the event
    */
   properties_updated(properties) {
     if (properties[z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING]) {
@@ -142,6 +142,9 @@ z.properties.PropertiesRepository = class PropertiesRepository {
             break;
           case z.properties.PROPERTIES_TYPE.SOUND_ALERTS:
             amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.SOUND_ALERTS, updated_preference);
+            break;
+          default:
+            throw new Error(`Failed to update preference of unhandled type '${properties_type}'`);
         }
       });
     }

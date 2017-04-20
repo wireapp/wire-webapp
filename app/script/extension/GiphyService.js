@@ -52,7 +52,7 @@ z.extension.GiphyService = class GiphyService {
 
   /**
    * Search all Giphy GIFs for a word or phrase.
-   * @param {String} tag - GIF tag to limit randomness by
+   * @param {string} tag - GIF tag to limit randomness by
    * @returns {Promise} Resolves with random gifs for given tag
    */
   get_random(tag) {
@@ -67,8 +67,8 @@ z.extension.GiphyService = class GiphyService {
    *
    * @param {Object} options - Search options
    * @param {string} options.query - Search query term or phrase
-   * @param {Number} [options.limit=25] - Number of results to return (maximum 100)
-   * @param {Number} [options.offset=0] - Results offset
+   * @param {number} [options.limit=25] - Number of results to return (maximum 100)
+   * @param {number} [options.offset=0] - Results offset
    * @param {string} [options.sorting='recent'] - Specify sorting ('relevant' or 'recent')
    * @returns {Promise} Resolves with matches
    */

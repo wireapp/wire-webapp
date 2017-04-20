@@ -64,13 +64,14 @@ z.connect.ConnectRepository = class ConnectRepository {
           throw error;
         case z.connect.ConnectError.TYPE.NO_CONTACTS:
           return {};
+        default:
+          if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
+            this.logger.error('Backend refused Gmail contacts upload: Endpoint used too frequent', error);
+          } else {
+            this.logger.error('Gmail contacts upload failed', error);
+          }
+          throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
       }
-      if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
-        this.logger.error('Backend refused Gmail contacts upload: Endpoint used too frequent', error);
-      } else {
-        this.logger.error('Gmail contacts upload failed', error);
-      }
-      throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
     });
   }
 
@@ -105,13 +106,14 @@ z.connect.ConnectRepository = class ConnectRepository {
             throw error;
           case z.connect.ConnectError.TYPE.NO_CONTACTS:
             return {};
+          default:
+            if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
+              this.logger.error('Backend refused macOS contacts upload: Endpoint used too frequent', error);
+            } else {
+              this.logger.error('macOS contacts upload failed', error);
+            }
+            throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
         }
-        if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
-          this.logger.error('Backend refused macOS contacts upload: Endpoint used too frequent', error);
-        } else {
-          this.logger.error('macOS contacts upload failed', error);
-        }
-        throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
       });
     }
 
@@ -136,12 +138,14 @@ z.connect.ConnectRepository = class ConnectRepository {
           throw error;
         case z.connect.ConnectError.TYPE.NO_CONTACTS:
           return {};
+        default:
+          if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
+            this.logger.error('Backend refused macOS contacts upload: Endpoint used too frequent');
+          } else {
+            this.logger.error('macOS contacts upload failed', error);
+          }
+          throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
       }
-      if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
-        return this.logger.error('Backend refused macOS contacts upload: Endpoint used too frequent');
-      }
-      this.logger.error('macOS contacts upload failed', error);
-      throw new z.connect.ConnectError(z.connect.ConnectError.TYPE.UPLOAD);
     });
   }
 

@@ -70,7 +70,7 @@ z.media.MediaEmbeds = (function() {
    *
    * @private
    * @param {HTMLAnchorElement} link - Link element
-   * @param {String} message - Message containing the link
+   * @param {string} message - Message containing the link
    * @param {string} iframe - HTML of iframe
    * @returns {string} Message content
    */
@@ -114,7 +114,7 @@ z.media.MediaEmbeds = (function() {
    *
    * @private
    * @param {string} timestamp - Youtube timestamp (1h8m55s)
-   * @returns {Number} Timestamp in seconds
+   * @returns {number} Timestamp in seconds
    */
   const _convert_youtube_timestamp_to_seconds = function(timestamp) {
     if (timestamp) {

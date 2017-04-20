@@ -123,7 +123,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * Check stream for flowing bytes.
    *
    * @param {z.media.MediaType} media_type - Media type of stream
-   * @param {Number} [attempt=1] - Attempt of stream check
+   * @param {number} [attempt=1] - Attempt of stream check
    * @returns {undefined} No return value
    */
   check_stream(media_type, attempt = 1) {
@@ -186,7 +186,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
   /**
    * Update 'is_answer' status of flow.
-   * @param {Boolean} is_answer - Is the flow an answer
+   * @param {boolean} is_answer - Is the flow an answer
    * @returns {undefined} No return value
    */
   update_is_answer(is_answer) {
@@ -291,6 +291,8 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
             return connection_stats = this._update_from_outbound_rtp(report, connection_stats);
           case z.calling.rtc.StatsType.SSRC:
             return connection_stats = this._update_from_ssrc(report, connection_stats);
+          default:
+            this.logger.log(this.logger.levels.OFF, `Unhandled stats report type '${report.type}'`, report);
         }
       });
 
