@@ -22,10 +22,19 @@
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.MissedMessage = class MissedMessage extends z.entity.Message {
+z.entity.LinkPreview = class LinkPreview {
   constructor() {
-    super();
-    this.super_type = z.message.SuperType.MISSED;
-    this.should_effect_conversation_timestamp = false;
+
+    this.original_url = '';
+    this.permanent_url = '';
+    this.summary = '';
+    this.title = '';
+    this.url_offset = 0;
+
+    // z.assets.AssetRemoteData
+    this.image_resource = ko.observable();
+
+    this.meta_data = undefined;
+    this.meta_data_type = undefined;
   }
 };

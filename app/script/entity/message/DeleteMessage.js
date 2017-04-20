@@ -22,10 +22,21 @@
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.MissedMessage = class MissedMessage extends z.entity.Message {
+z.entity.DeleteMessage = class DeleteMessage extends z.entity.Message {
   constructor() {
     super();
-    this.super_type = z.message.SuperType.MISSED;
-    this.should_effect_conversation_timestamp = false;
+
+    this.super_type = z.message.SuperType.DELETE;
+    this.deleted_timestamp = null;
+
+    this.display_deleted_timestamp = () => {
+      return z.localization.Localizer.get_text({
+        id: z.string.conversation_delete_timestamp,
+        replace: {
+          content: moment(this.deleted_timestamp).format('HH:mm'),
+          placeholder: '%@timestamp',
+        },
+      });
+    };
   }
 };

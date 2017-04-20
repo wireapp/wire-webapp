@@ -22,10 +22,23 @@
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.MissedMessage = class MissedMessage extends z.entity.Message {
+z.entity.PingMessage = class PingMessage extends z.entity.Message {
   constructor() {
     super();
-    this.super_type = z.message.SuperType.MISSED;
-    this.should_effect_conversation_timestamp = false;
+    this.super_type = z.message.SuperType.PING;
+
+    this.caption = ko.pureComputed(() => {
+      const string = this.user().is_me ? z.string.conversation_ping_you : z.string.conversation_ping;
+      return z.localization.Localizer.get_text(string);
+    }, this, {deferEvaluation: true});
+
+    this.get_icon_classes = ko.pureComputed(() => {
+      const show_ping_animation = (Date.now() - this.timestamp()) < 2000;
+      let css_classes = this.accent_color();
+      if (show_ping_animation) {
+        css_classes += ' ping-animation ping-animation-soft';
+      }
+      return css_classes;
+    });
   }
 };

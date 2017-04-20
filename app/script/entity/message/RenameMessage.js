@@ -22,10 +22,15 @@
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.MissedMessage = class MissedMessage extends z.entity.Message {
+z.entity.RenameMessage = class RenameMessage extends z.entity.SystemMessage {
   constructor() {
     super();
-    this.super_type = z.message.SuperType.MISSED;
-    this.should_effect_conversation_timestamp = false;
+    this.system_message_type = z.message.SystemMessageType.CONVERSATION_RENAME;
+    this.caption = ko.pureComputed(() => {
+      if (this.user().is_me) {
+        return z.localization.Localizer.get_text(z.string.conversation_rename_you);
+      }
+      return z.localization.Localizer.get_text(z.string.conversation_rename);
+    });
   }
 };

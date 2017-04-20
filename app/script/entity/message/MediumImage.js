@@ -22,10 +22,33 @@
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-z.entity.MissedMessage = class MissedMessage extends z.entity.Message {
-  constructor() {
-    super();
-    this.super_type = z.message.SuperType.MISSED;
-    this.should_effect_conversation_timestamp = false;
+z.entity.MediumImage = class MediumImage extends z.entity.Asset {
+  constructor(id) {
+    super(id);
+
+    this.correlation_id = '';
+    this.type = z.assets.AssetType.IMAGE;
+
+    this.width = '0px';
+    this.height = '0px';
+
+    this.file_name = '';
+    this.file_size = '';
+    this.file_type = '';
+
+    // z.assets.AssetRemoteData
+    this.resource = ko.observable();
+  }
+
+  /**
+   * Loads and decrypts otr asset as initiates download
+   * @param {string} file_name - File name
+   * @returns {Promise} Returns a promise that resolves with the asset as blob
+   */
+  download(file_name) {
+    return this.resource().load()
+      .then(function(blob) {
+        return z.util.download_blob(blob, file_name);
+      });
   }
 };
