@@ -308,17 +308,6 @@ class z.ViewModel.ConversationInputViewModel
     , 0
 
   ###
-  Create context menu entries for ephemeral timer
-  @param message_et [z.entity.Message]
-  ###
-  get_context_menu_entries: ->
-    entries = [label: z.localization.Localizer.get_text(z.string.ephememal_units_none), action: 0]
-    return entries.concat z.ephemeral.timings.get_values().map (milliseconds) =>
-      [number, unit] = z.util.format_milliseconds_short(milliseconds)
-      unit_locale = @_get_localized_unit_string number, unit
-      return label: "#{number} #{unit_locale}", action: milliseconds
-
-  ###
   Returns the full localized unit string
   @param number [Number]
   @param unit [String] 's', 'm', 'd', 'h'
@@ -339,15 +328,10 @@ class z.ViewModel.ConversationInputViewModel
         return z.localization.Localizer.get_text z.string.ephememal_units_days
 
   ###
-  Click on context menu entry
-  @param tag [String] associated tag
-  @param action [String] action that was triggered
+  Click on ephemeral button
+  @param data [Object]
+  @param event [DOMEvent]
   ###
-  on_context_menu_action: (tag, action) =>
-    return if tag isnt 'ephemeral'
-    @set_ephemeral_timer window.parseInt(action, 10)
-
-  # TODO: dev
   click_on_ephemeral_button: (data, event) =>
     z.ui.Context.from event, [
       label: z.localization.Localizer.get_text(z.string.ephememal_units_none)

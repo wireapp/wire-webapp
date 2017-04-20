@@ -408,35 +408,6 @@ class z.ViewModel.MessageListViewModel
         return 'message-system'
 
   ###
-  Create context menu entries for given message
-  @param message_et [z.entity.Message]
-  ###
-  get_context_menu_entries: (message_et) =>
-    entries = []
-
-    @_track_context_menu message_et
-
-    if message_et.is_downloadable() and not message_et.is_ephemeral()
-      entries.push {label: z.string.conversation_context_menu_download, action: 'download'}
-
-    if message_et.is_reactable() and not @conversation().removed_from_conversation()
-      if message_et.is_liked()
-        entries.push {label: z.string.conversation_context_menu_unlike, action: 'react'}
-      else
-        entries.push {label: z.string.conversation_context_menu_like, action: 'react'}
-
-    if message_et.is_editable() and not @conversation().removed_from_conversation()
-      entries.push {label: z.string.conversation_context_menu_edit, action: 'edit'}
-
-    if message_et.is_deletable()
-      entries.push {label: z.string.conversation_context_menu_delete, action: 'delete'}
-
-    if message_et.user().is_me and not @conversation().removed_from_conversation() and message_et.status() isnt z.message.StatusType.SENDING
-      entries.push {label: z.string.conversation_context_menu_delete_everyone, action: 'delete-everyone'}
-
-    return entries
-
-  ###
   Track context menu click
   @param message_et [z.entity.Message]
   ###
@@ -445,31 +416,6 @@ class z.ViewModel.MessageListViewModel
       context: 'single'
       conversation_type: z.tracking.helpers.get_conversation_type @conversation()
       type: z.tracking.helpers.get_message_type message_et
-
-  ###
-  Click on context menu entry
-  @param tag [String] associated tag
-  @param action [String] action that was triggered
-  @param data [Object] optional data
-  ###
-  on_context_menu_action: (tag, action, data) =>
-    return if tag isnt 'message'
-
-    message_et = @conversation().get_message_by_id data
-
-    switch action
-      when 'delete'
-        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_MESSAGE,
-          action: => @conversation_repository.delete_message @conversation(), message_et
-      when 'delete-everyone'
-        amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
-          action: => @conversation_repository.delete_message_everyone @conversation(), message_et
-      when 'download'
-        message_et.download()
-      when 'edit'
-        amplify.publish z.event.WebApp.CONVERSATION.MESSAGE.EDIT, message_et
-      when 'react'
-        @click_on_like message_et, false
 
   ###
   Shows detail image view.
