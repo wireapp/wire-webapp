@@ -57,7 +57,7 @@ ko.components.register 'file-asset',
               <div class="file"
                  data-uie-name="file"
                  data-bind="attr: {'data-uie-value': asset.file_name},
-                            click: asset.status() === z.assets.AssetTransferState.UPLOADED ? asset.download : null,
+                            click: asset.status() === z.assets.AssetTransferState.UPLOADED ? asset.download.bind(asset) : null,
                             css: {'cursor-pointer': asset.status() === z.assets.AssetTransferState.UPLOADED}">
                 <!-- ko if: !asset.uploaded_on_this_client() && asset.status() === z.assets.AssetTransferState.UPLOADING -->
                   <div class="asset-placeholder">
