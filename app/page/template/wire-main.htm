@@ -7,7 +7,7 @@
     <div id="app" class="app">
       <div id="left" class="left">
         #include('list/background.htm')
-        <!-- ko if: show_list -->
+        <!-- ko if: webapp_loaded -->
           <!-- ko ifnot: list_modal() -->
             #include('list/archive.htm')
             #include('list/conversations.htm')
