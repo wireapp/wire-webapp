@@ -117,6 +117,7 @@ z.util.ArrayUtil = {
   /**
    * Remove given element from array
    * @param {Array} array - source
+   * @param {Object} element - Element which should be removed
    * @returns {Array|undefined} containing the removed element
    */
   remove_element(array = [], element) {
