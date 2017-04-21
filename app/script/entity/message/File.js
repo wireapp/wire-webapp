@@ -42,6 +42,7 @@ z.entity.File = class File extends z.entity.Asset {
     this.original_resource = ko.observable();
     this.preview_resource = ko.observable();
 
+    this.download = this.download.bind(this);
     this.download_progress = ko.pureComputed(() => {
       if (this.original_resource()) {
         return this.original_resource().download_progress();
