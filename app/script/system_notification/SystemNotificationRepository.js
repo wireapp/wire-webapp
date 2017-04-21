@@ -639,7 +639,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
   // Request browser permission for notifications.
   _request_permission() {
-    return new Promise((function(resolve) {
+    return new Promise((resolve) => {
       amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_NOTIFICATION);
       // Note: The callback will be only triggered in Chrome.
       // If you ignore a permission request on Firefox, then the callback will not be triggered.
@@ -650,7 +650,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           return resolve(this.permission_state);
         });
       }
-    }));
+    });
   }
 
   /**
