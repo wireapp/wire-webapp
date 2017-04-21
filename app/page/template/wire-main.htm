@@ -7,15 +7,17 @@
     <div id="app" class="app">
       <div id="left" class="left">
         #include('list/background.htm')
-        <!-- ko ifnot: list_modal() -->
-          #include('list/archive.htm')
-          #include('list/conversations.htm')
-          #include('list/preferences.htm')
-          #include('list/start-ui.htm')
-          #include('list/actions.htm')
-        <!-- /ko -->
-        <!-- ko if: list_modal() === z.ViewModel.list.LIST_MODAL_TYPE.TAKEOVER -->
-          #include('list/takeover.htm')
+        <!-- ko if: show_list -->
+          <!-- ko ifnot: list_modal() -->
+            #include('list/archive.htm')
+            #include('list/conversations.htm')
+            #include('list/preferences.htm')
+            #include('list/start-ui.htm')
+            #include('list/actions.htm')
+          <!-- /ko -->
+          <!-- ko if: list_modal() === z.ViewModel.list.LIST_MODAL_TYPE.TAKEOVER -->
+            #include('list/takeover.htm')
+          <!-- /ko -->
         <!-- /ko -->
       </div>
       <div id="right" class="right">

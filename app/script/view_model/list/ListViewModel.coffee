@@ -42,6 +42,7 @@ class z.ViewModel.list.ListViewModel
     @last_update = ko.observable()
     @list_modal = ko.observable()
     @webapp_loaded = ko.observable false
+    @show_list = ko.observable false
 
     @first_run = ko.observable false
 
@@ -69,6 +70,7 @@ class z.ViewModel.list.ListViewModel
     amplify.subscribe z.event.WebApp.SEARCH.SHOW, @open_start_ui
     amplify.subscribe z.event.WebApp.TAKEOVER.SHOW, @show_takeover
     amplify.subscribe z.event.WebApp.TAKEOVER.DISMISS, @dismiss_takeover
+    amplify.subscribe z.event.WebApp.LIFECYCLE.LOADED, => @show_list true
 
   click_on_actions: (conversation_et, event) =>
     @actions.click_on_actions conversation_et, event
