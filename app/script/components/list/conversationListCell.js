@@ -36,7 +36,7 @@ z.components.ConversationListCell = class ConversationListCell {
 
     this.cell_state = ko.pureComputed(() => {
       return this.entered_viewport() ? z.conversation.ConversationCellState.generate(this.conversation) : '';
-    }).extend({rateLimit: 1000})
+    }).extend({rateLimit: 100})
   }
 
   on_in_viewport() {
