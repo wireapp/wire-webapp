@@ -30,7 +30,7 @@ z.util.Worker = class Worker {
         worker.onmessage = (event) => resolve(event.data);
         worker.onerror = (error) => reject(error);
         return worker.postMessage(data);
-      })
-    }
+      });
+    };
   }
 };
