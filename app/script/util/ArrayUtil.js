@@ -61,8 +61,7 @@ z.util.ArrayUtil = {
       return undefined;
     }
 
-    for (let i = next_index, end = array.length,
-           asc = next_index <= end; asc ? i <= end : i >= end; asc ? i++ : i--) {
+    for (let i = next_index; i <= array.length; i++) {
       const current_item = array[i];
       if ((filter == null) || !!filter(current_item)) {
         return current_item;
