@@ -22,7 +22,6 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-// grunt test_init && grunt test_run:util/CountryCodes
 (function() {
   const COUNTRY_CODES = [
     {

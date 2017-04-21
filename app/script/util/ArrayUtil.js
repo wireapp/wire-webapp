@@ -22,7 +22,6 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-// grunt test_init && grunt test_run:util/ArrayUtil
 z.util.ArrayUtil = {
   chunk(array, size) {
     const chunks = [];

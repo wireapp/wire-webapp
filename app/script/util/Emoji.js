@@ -22,24 +22,16 @@
 window.z = window.z || {};
 window.z.util = z.util || {};
 
-z.util.Crypto = {
-  Hashing: {
-    joaat_hash(str) {
-      const {uint32} = window;
-      let hash = uint32.toUint32(0);
-      const key = str.toLowerCase();
+z.util.emoji = {
+  includes_only_emojies: function(text) {
+    // http://www.unicode.org/Public/emoji/1.0/emoji-data.txt
+    // http://crocodillon.com/blog/parsing-emoji-unicode-in-javascript
+    const emoji_regex = /\ud83c[\udf00-\udfff]|\ud83d[\udc00-\udeff]|\ud83e[\udd10-\uddff]|[\u231a-\u27ff][\ufe0f]?/g;
 
-      for (let i = 0; i <= key.length - 1; i++) {
-        hash = uint32.addMod32(hash, uint32.toUint32(key.charCodeAt(i)));
-        hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 10));
-        hash = uint32.xor(hash, uint32.shiftRight(hash, 6));
-      }
+    const is_valid_string = (string) => _.isString(string) && (string.length > 0);
+    const remove_emojies = (string) => string.replace(emoji_regex, '');
+    const remove_whitespace = (string) => string.replace(/\s/g, '');
 
-      hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 3));
-      hash = uint32.xor(hash, uint32.shiftRight(hash, 11));
-      hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 15));
-
-      return hash;
-    },
+    return is_valid_string(text) && (remove_emojies(remove_whitespace(text)).length === 0);
   },
 };
