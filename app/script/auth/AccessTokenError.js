@@ -45,6 +45,8 @@ window.z.auth.AccessTokenError = class AccessTokenError extends Error {
       case z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN:
         this.message = 'Request to POST for access token forbidden';
         break;
+      default:
+        this.message = 'Unknown AccessTokenError';
     }
   }
 
@@ -55,6 +57,7 @@ window.z.auth.AccessTokenError = class AccessTokenError extends Error {
       REQUEST_FAILED: 'z.auth.AccessTokenError.TYPE.REQUEST_FAILED',
       REQUEST_FORBIDDEN: 'z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN',
       RETRIES_EXCEEDED: 'z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED',
+      UNKNOWN: 'z.auth.AccessTokenError.TYPE.UNKNOWN',
     };
   }
 };

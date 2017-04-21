@@ -21,7 +21,10 @@
   'use strict';
 
   function cacheRequest(cache, request, response) {
-    return cache.put(stripSearchParameters(request.url), response.clone()).then(() => response);
+    return cache
+    .put(stripSearchParameters(request.url), response.clone())
+    .catch((error) => console.warn(`Failed to cache asset: ${error.message}`))
+    .then(() => response);
   }
 
   function cacheRequestLRU(cache, request, response, maxEntries = 100) {

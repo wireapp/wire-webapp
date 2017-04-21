@@ -167,18 +167,20 @@ class z.conversation.ConversationService
   @param message_et [z.entity.Message] Message event to update in the database
   @param changes [Object] Changes to update message with
   ###
-  update_message_in_db: (message_et, changes, conversation_id) ->
+  update_message_in_db: (message_et, changes = {}, conversation_id) ->
     Promise.resolve message_et.primary_key
     .then (primary_key) =>
-      if _.isObject(changes) and changes[Object.keys(changes)[0]]?
-        return @storage_service.update @storage_service.OBJECT_STORE_EVENTS, primary_key, changes if not changes.version
+      if Object.keys(changes).length
+        if changes.version
+          return @storage_service.db.transaction 'rw', @storage_service.OBJECT_STORE_EVENTS, =>
+            @load_event_from_db conversation_id, message_et.id
+            .then (record) =>
+              if record and changes.version is (record.version or 1) + 1
+                return @storage_service.update @storage_service.OBJECT_STORE_EVENTS, primary_key, changes
+              throw new z.storage.StorageError z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
 
-        return @storage_service.db.transaction 'rw', @storage_service.OBJECT_STORE_EVENTS, =>
-          @load_event_from_db conversation_id, message_et.id
-          .then (record) =>
-            if record and changes.version is (record.version or 1) + 1
-              return @storage_service.update @storage_service.OBJECT_STORE_EVENTS, primary_key, changes
-            throw new z.storage.StorageError z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
+        return @storage_service.update @storage_service.OBJECT_STORE_EVENTS, primary_key, changes
+
       throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NO_CHANGES
 
   ###

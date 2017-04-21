@@ -429,7 +429,7 @@ z.client.ClientRepository = class ClientRepository {
   /**
    * Cleanup local sessions.
    * @note If quick_clean parameter is set to false, there will be one backend request per user that has a session.
-   * @param {Boolean} [quick_clean=true] - Optional value whether to check all users with local sessions or the ones with too many sessions
+   * @param {boolean} [quick_clean=true] - Optional value whether to check all users with local sessions or the ones with too many sessions
    * @returns {undefined} No return value
    */
   cleanup_clients_and_sessions(quick_clean = true) {

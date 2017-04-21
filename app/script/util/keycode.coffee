@@ -28,6 +28,7 @@ z.util.KEYCODE =
   DELETE: 8
   ENTER: 13
   ESC: 27
+  TAB: 9
   V: 86
 
 z.util.KEYCODE.is_arrow_key = (keyCode) ->

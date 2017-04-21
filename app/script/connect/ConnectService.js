@@ -23,9 +23,15 @@ window.z = window.z || {};
 window.z.connect = z.connect || {};
 
 z.connect.ConnectService = class ConnectService {
+  /**
+   * Construct an new ConnectService.
+   * @param {z.client.Client} client - Local client
+   * @returns {ClientService} The new service for connect interactions
+   */
   constructor(client) {
     this.client = client;
     this.logger = new z.util.Logger('z.connect.ConnectService', z.config.LOGGER.OPTIONS);
+    return this;
   }
 
   /**
@@ -37,9 +43,9 @@ z.connect.ConnectService = class ConnectService {
    */
   post_onboarding(phone_book) {
     return this.client.send_json({
+      data: phone_book,
       type: 'POST',
       url: this.client.create_url('/onboarding/v3'),
-      data: phone_book,
     });
   }
 };

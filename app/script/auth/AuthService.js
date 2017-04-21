@@ -67,8 +67,8 @@
      */
     get_cookies() {
       return this.client.send_request({
-        url: this.client.create_url(AuthService.URL_COOKIES),
         type: 'GET',
+        url: this.client.create_url(AuthService.URL_COOKIES),
       }).then((data) => {
         return data.cookies;
       });
@@ -82,8 +82,8 @@
      */
     get_invitations_info(code) {
       return this.client.send_request({
-        url: this.client.create_url(`${AuthService.URL_INVITATIONS}/info?code=${code}`),
         type: 'GET',
+        url: this.client.create_url(`${AuthService.URL_INVITATIONS}/info?code=${code}`),
       });
     }
 
@@ -135,7 +135,8 @@
 
             if (jqXHR.status === z.service.BackendClientError.prototype.STATUS_CODE.CONNECTIVITY_PROBLEM) {
               this.logger.warn('Access token refresh delayed due to suspected connectivity issue');
-              return this.client.execute_on_connectivity().then(() => {
+              return this.client.execute_on_connectivity(z.service.Client.prototype.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
+              .then(() => {
                 this.logger.info('Continuing access token refresh after verifying connectivity');
                 return _retry();
               });
@@ -165,9 +166,9 @@
      */
     post_activate_send(send_activation_code) {
       return this.client.send_json({
-        url: this.client.create_url(`${AuthService.URL_ACTIVATE}/send`),
-        type: 'POST',
         data: send_activation_code,
+        type: 'POST',
+        url: this.client.create_url(`${AuthService.URL_ACTIVATE}/send`),
       });
     }
 
@@ -181,13 +182,13 @@
      */
     post_cookies_remove(email, password, labels) {
       return this.client.send_json({
-        url: this.client.create_url(`${AuthService.URL_COOKIES}/remove`),
-        type: 'POST',
         data: {
           email: email,
-          password: password,
           labels: labels,
+          password: password,
         },
+        type: 'POST',
+        url: this.client.create_url(`${AuthService.URL_COOKIES}/remove`),
       });
     }
 
@@ -202,7 +203,7 @@
      * @option {string} login - phone The phone number for a password or SMS login
      * @option {string} login - password The password for a password login
      * @option {string} login - code The login code for an SMS login
-     * @param {Boolean} persist - Request a persistent cookie instead of a session cookie
+     * @param {boolean} persist - Request a persistent cookie instead of a session cookie
      * @returns {Promise} Promise that resolves with access token
      */
     post_login(login, persist) {
@@ -250,9 +251,9 @@
      */
     post_login_send(request_code) {
       return this.client.send_json({
-        url: this.client.create_url(`${AuthService.URL_LOGIN}/send`),
-        type: 'POST',
         data: request_code,
+        type: 'POST',
+        url: this.client.create_url(`${AuthService.URL_LOGIN}/send`),
       });
     }
 
@@ -263,8 +264,8 @@
      */
     post_logout() {
       return this.client.send_json({
-        url: this.client.create_url(`${AuthService.URL_ACCESS}/logout`),
         type: 'POST',
+        url: this.client.create_url(`${AuthService.URL_ACCESS}/logout`),
         withCredentials: true,
       });
     }

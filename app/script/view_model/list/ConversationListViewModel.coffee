@@ -102,7 +102,7 @@ class z.ViewModel.list.ConversationListViewModel
     @content_view_model.show_conversation conversation_et
 
   set_show_calls_state: (handling_notifications) =>
-    @show_calls handling_notifications is z.event.NotificationHandlingState.WEB_SOCKET
+    @show_calls handling_notifications is z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
     @logger.info "Set show calls state to: #{@show_calls()}"
 
   _init_subscriptions: =>

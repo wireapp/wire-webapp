@@ -154,11 +154,11 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   /**
    * Set the muted state.
    * @note Temporarily mute notifications on recovery from Notification Stream
-   * @param {z.event.NotificationHandlingState} handling_notifications - Updated notification handling state
+   * @param {z.event.NOTIFICATION_HANDLING_STATE} handling_notifications - Updated notification handling state
    * @returns {undefined} No return value
    */
   set_muted_state(handling_notifications) {
-    this.muted = handling_notifications !== z.event.NotificationHandlingState.WEB_SOCKET;
+    this.muted = handling_notifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
     return this.logger.info(`Set muted state to: ${this.muted}`);
   }
 
@@ -238,12 +238,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       id: z.string.system_notification_conversation_rename,
       replace: [
         {
-          placeholder: '%s.first_name',
           content: message_et.user().first_name(),
+          placeholder: '%s.first_name',
         },
         {
-          placeholder: '%name',
           content: message_et.name,
+          placeholder: '%name',
         },
       ],
     });
@@ -262,12 +262,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         id: z.string.system_notification_member_join_one,
         replace: [
           {
-            placeholder: '%s.first_name',
             content: message_et.user().first_name(),
+            placeholder: '%s.first_name',
           },
           {
-            placeholder: '%@.first_name',
             content: z.util.get_first_name(message_et.user_ets()[0], z.string.Declension.ACCUSATIVE),
+            placeholder: '%@.first_name',
           },
         ],
       });
@@ -277,12 +277,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       id: z.string.system_notification_member_join_many,
       replace: [
         {
-          placeholder: '%s.first_name',
           content: message_et.user().first_name(),
+          placeholder: '%s.first_name',
         },
         {
-          placeholder: '%no',
           content: message_et.user_ids().length,
+          placeholder: '%no',
         },
       ],
     });
@@ -301,8 +301,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         return z.localization.Localizer.get_text({
           id: z.string.system_notification_member_leave_left,
           replace: {
-            placeholder: '%s.first_name',
             content: message_et.user().first_name(),
+            placeholder: '%s.first_name',
           },
         });
       }
@@ -311,12 +311,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         id: z.string.system_notification_member_leave_removed_one,
         replace: [
           {
-            placeholder: '%s.first_name',
             content: message_et.user().first_name(),
+            placeholder: '%s.first_name',
           },
           {
-            placeholder: '%@.first_name',
             content: z.util.get_first_name(message_et.user_ets()[0], z.string.Declension.ACCUSATIVE),
+            placeholder: '%@.first_name',
           },
         ],
       });
@@ -326,12 +326,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       id: z.string.system_notification_member_leave_removed_many,
       replace: [
         {
-          placeholder: '%s.first_name',
           content: message_et.user().first_name(),
+          placeholder: '%s.first_name',
         },
         {
-          placeholder: '%no',
           content: message_et.user_ets().length,
+          placeholder: '%no',
         },
       ],
     });
@@ -369,10 +369,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         return z.localization.Localizer.get_text({
           id: z.string.system_notification_conversation_create,
           replace: {
-            placeholder: '%s.first_name',
             content: message_et.user().first_name(),
+            placeholder: '%s.first_name',
           },
         });
+      default:
+        this.logger.log(this.logger.levels.OFF, `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`);
     }
   }
 
@@ -404,8 +406,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     return z.localization.Localizer.get_text({
       id: z.string.system_notification_reaction,
       replace: {
-        placeholder: '%reaction',
         content: message_et.reaction,
+        placeholder: '%reaction',
       },
     });
   }
@@ -443,15 +445,15 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     })
     .then((should_obfuscate_sender) => {
       return {
-        title: should_obfuscate_sender ? this._create_title_obfuscated() : this._create_title(conversation_et, message_et),
         options: {
           body: this._should_obfuscate_notification_message(message_et) ? this._create_body_obfuscated() : options_body,
           data: this._create_options_data(conversation_et, message_et),
           icon: this._create_options_icon(should_obfuscate_sender, message_et.user()),
+          silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
           tag: this._create_options_tag(conversation_et),
-          silent: true, //@note When Firefox supports this we can remove the fix for WEBAPP-731
         },
         timeout: z.config.BROWSER_NOTIFICATION.TIMEOUT,
+        title: should_obfuscate_sender ? this._create_title_obfuscated() : this._create_title(conversation_et, message_et),
         trigger: this._create_trigger(conversation_et, message_et),
       };
     });
@@ -481,6 +483,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           return this._create_body_reaction(message_et);
         case z.message.SuperType.SYSTEM:
           return this._create_body_system(message_et);
+        default:
+          this.logger.log(this.logger.levels.OFF, `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`);
       }
     });
   }
@@ -504,7 +508,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * Creates the notification icon.
    *
    * @private
-   * @param {Boolean} should_obfuscate_sender - Sender visible in notification
+   * @param {boolean} should_obfuscate_sender - Sender visible in notification
    * @param {z.entity.User} user_et - Sender of message
    * @returns {string} Icon URL
   */
@@ -571,6 +575,8 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et.conversation_id);
         case z.message.SystemMessageType.CONNECTION_REQUEST:
           return () => amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS);
+        default:
+          this.logger.log(this.logger.levels.OFF, `Notification for member message '${message_et.id} in '${conversation_et.id}' does not have specific trigger.`);
       }
     }
     return () => amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
@@ -625,12 +631,15 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           return amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
         }
         amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
+        break;
+      default:
+        this.logger.log(this.logger.levels.OFF, `Notification for message '${message_et.id} does not play sound.`);
     }
   }
 
   // Request browser permission for notifications.
   _request_permission() {
-    return new Promise((function(resolve) {
+    return new Promise((resolve) => {
       amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.REQUEST_NOTIFICATION);
       // Note: The callback will be only triggered in Chrome.
       // If you ignore a permission request on Firefox, then the callback will not be triggered.
@@ -641,14 +650,14 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           return resolve(this.permission_state);
         });
       }
-    }));
+    });
   }
 
   /**
    * Should message in a notification be obfuscated.
    * @private
    * @param {z.entity.Message} message_et - Message entity
-   * @returns {Boolean} Obfucscate message in notification
+   * @returns {boolean} Obfucscate message in notification
    */
   _should_obfuscate_notification_message(message_et) {
     return message_et.is_ephemeral() || [
@@ -661,7 +670,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * Should sender in a notification be obfuscated.
    * @private
    * @param {z.entity.Message} message_et - Message entity
-   * @returns {Boolean} Obfuscate sender in noticiation
+   * @returns {boolean} Obfuscate sender in noticiation
    */
   _should_obfuscate_notification_sender(message_et) {
     return message_et.is_ephemeral() || this.notifications_preference() === z.system_notification.SystemNotificationPreference.OBFUSCATE;
@@ -672,7 +681,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @private
    * @param {z.entity.Conversation} conversation_et - Conversation entity
    * @param {z.entity.Message} message_et - Message entity
-   * @returns {Promise<Boolean>} Resolves whether notification should be hidden
+   * @returns {Promise<boolean>} Resolves whether notification should be hidden
    */
   _should_hide_notification(conversation_et, message_et) {
     return Promise.resolve()
@@ -729,7 +738,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @param {string} notification_content.title - Notification title
    * @param {Object} notification_content.options - Notification options
    * @param {Function} notification_content.trigger - Function to be triggered on click [Function] trigger
-   * @param {Number} notification_content.timeout - Timeout for notification
+   * @param {number} notification_content.timeout - Timeout for notification
    * @returns {undefined} No return value
    */
   _show_notification_in_browser(notification_content) {
