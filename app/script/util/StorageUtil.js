@@ -35,5 +35,5 @@ z.util.StorageUtil = {
     } else {
       amplify.store(key, value);
     }
-  }
+  },
 };
