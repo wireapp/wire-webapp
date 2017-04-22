@@ -24,7 +24,9 @@ globals:
   platform: true
   Proteus: true
   Raygun: true
+  sodium: true
   twttr: true
+  UUID: true
   wire: true
   z: true
 
