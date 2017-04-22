@@ -143,7 +143,7 @@ z.util.DebugUtil = class DebugUtil {
     const _got_notifications = ({has_more, notifications}) => {
       const additional_notifications = notifications.filter(function(notification) {
         const {payload} = notification;
-        for (const {data, from} of Array.from(payload)) {
+        for (const {data, from} of payload) {
           if (data && [local_user_id, remote_user_id].includes(from)) {
             const {sender, recipient} = data;
             const incoming_event = (sender === remote_client_id) && (recipient === local_client_id);

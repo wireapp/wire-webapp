@@ -66,7 +66,7 @@ z.util.StringUtil = {
     const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z'];
     let obfuscated = '';
 
-    for (const character of Array.from(text)) {
+    for (const character of text) {
       if (character.match(/[\n\r\s]+/gi)) {
         obfuscated += character;
       } else {
