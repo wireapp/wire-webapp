@@ -25,7 +25,7 @@ window.z.util = z.util || {};
 z.util.ArrayUtil = {
   chunk(array, size) {
     const chunks = [];
-    const temp_array = array;
+    const temp_array = Array.from(array);
     while (temp_array.length) {
       chunks.push(temp_array.splice(0, size));
     }
