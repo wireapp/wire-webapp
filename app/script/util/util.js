@@ -61,7 +61,7 @@ z.util.load_file_buffer = function(file) {
 };
 
 z.util.load_url_buffer = function(url, xhr_accessor_function) {
-  new Promise(function(resolve, reject) {
+  return new Promise(function(resolve, reject) {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.responseType = 'arraybuffer';
