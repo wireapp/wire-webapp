@@ -8,14 +8,16 @@ extends:
   "eslint:recommended"
 
 globals:
-  _: true
   $: true
+  _: true
   amplify: true
   cryptobox: true
   CryptoJS: true
+  hljs: true,
   ko: true
   libsodium: true
   LRUCache: true
+  marked: true,
   moment: true
   pako: true
   platform: true
