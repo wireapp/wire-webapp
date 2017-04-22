@@ -34,7 +34,7 @@ z.util.Statistics = {
   /**
    * Calculates the standard deviation within an array.
    * @param {Array<number>} values - Input values
-   * @param {number} average - Average value (optional)
+   * @param {number} [average] - Average value
    * @returns {undefined} Standard deviation
    */
   standard_deviation: function(values, average) {
