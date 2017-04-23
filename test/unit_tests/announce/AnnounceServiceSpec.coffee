@@ -123,5 +123,3 @@ describe 'z.announce.AnnounceService', ->
         expect(version).toBe response.version
         done()
       .catch done.fail
-
-
