@@ -8,7 +8,7 @@
     "eslint-plugin-jsdoc": "3.0.0",
     "grunt": "1.0.1",
     "grunt-aws-s3": "0.14.5",
-    "grunt-bower-task": "0.4.0",
+    "grunt-bower-task": "0.5.0",
     "grunt-cli": "1.2.0",
     "grunt-coffeelint": "0.0.16",
     "grunt-contrib-clean": "1.1.0",
