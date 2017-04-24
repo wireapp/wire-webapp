@@ -434,7 +434,8 @@ describe 'z.cryptography.CryptographyMapper', ->
 
     it 'can map a text wrapped inside an external message', (done) ->
       plaintext = 'Test'
-      generic_message = new z.proto.GenericMessage z.util.create_random_uuid()
+      generic_message_id = z.util.create_random_uuid()
+      generic_message = new z.proto.GenericMessage generic_message_id
       generic_message.set 'text', new z.proto.Text plaintext
 
       z.assets.AssetCrypto.encrypt_aes_asset generic_message.toArrayBuffer()
@@ -452,6 +453,7 @@ describe 'z.cryptography.CryptographyMapper', ->
       .then (event_json) ->
         expect(event_json.data.content).toBe plaintext
         expect(event_json.type).toBe z.event.Backend.CONVERSATION.MESSAGE_ADD
+        expect(event_json.id).toBe generic_message_id
         done()
       .catch done.fail
 
