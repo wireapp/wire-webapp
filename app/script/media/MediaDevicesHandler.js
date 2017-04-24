@@ -26,7 +26,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
   /**
    * Construct a new MediaDevices handler.
    * @param {z.media.MediaRepository} media_repository - Media repository referencing the other handlers
-   * @returns {z.media.MediaDevicesHandler} Handler for MediaDevices
+   * @returns {MediaDevicesHandler} Handler for MediaDevices
    */
   constructor(media_repository) {
     this.media_repository = media_repository;
@@ -68,11 +68,11 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     if (!z.media.MediaRepository.supports_media_devices()) return;
 
     this.get_media_devices()
-    .then(() => {
-      this._set_current_devices();
-      this._subscribe_to_observables();
-      this._subscribe_to_devices();
-    });
+      .then(() => {
+        this._set_current_devices();
+        this._subscribe_to_observables();
+        this._subscribe_to_devices();
+      });
   }
 
   /**
@@ -112,19 +112,27 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   _subscribe_to_observables() {
     this.available_devices.audio_input.subscribe((media_devices) => {
-      if (media_devices) this._update_current_index_from_devices(z.media.MediaDeviceType.AUDIO_INPUT, media_devices);
+      if (media_devices.length) {
+        this._update_current_index_from_devices(z.media.MediaDeviceType.AUDIO_INPUT, media_devices);
+      }
     });
 
     this.available_devices.audio_output.subscribe((media_devices) => {
-      if (media_devices) this._update_current_index_from_devices(z.media.MediaDeviceType.AUDIO_OUTPUT, media_devices);
+      if (media_devices.length) {
+        this._update_current_index_from_devices(z.media.MediaDeviceType.AUDIO_OUTPUT, media_devices);
+      }
     });
 
     this.available_devices.screen_input.subscribe((media_devices) => {
-      if (media_devices) this._update_current_index_from_devices(z.media.MediaDeviceType.SCREEN_INPUT, media_devices);
+      if (media_devices.length) {
+        this._update_current_index_from_devices(z.media.MediaDeviceType.SCREEN_INPUT, media_devices);
+      }
     });
 
     this.available_devices.video_input.subscribe((media_devices) => {
-      if (media_devices) this._update_current_index_from_devices(z.media.MediaDeviceType.VIDEO_INPUT, media_devices);
+      if (media_devices.length) {
+        this._update_current_index_from_devices(z.media.MediaDeviceType.VIDEO_INPUT, media_devices);
+      }
     });
 
     this.current_device_id.audio_input.subscribe((media_device_id) => {
@@ -165,34 +173,43 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   get_media_devices() {
     return navigator.mediaDevices.enumerateDevices()
-    .catch((error) => {
-      this.logger.error(`Failed to update MediaDevice list: ${error.message}`, error);
-      throw error;
-    })
-    .then((media_devices) => {
-      if (media_devices) {
+      .catch((error) => {
+        this.logger.error(`Failed to update MediaDevice list: ${error.message}`, error);
+        throw error;
+      })
+      .then((media_devices) => {
         this._remove_all_devices();
-        media_devices.forEach((media_device) => {
-          switch (media_device.kind) {
-            case z.media.MediaDeviceType.AUDIO_INPUT:
-              this.available_devices.audio_input.push(media_device);
-              break;
-            case z.media.MediaDeviceType.AUDIO_OUTPUT:
-              this.available_devices.audio_output.push(media_device);
-              break;
-            case z.media.MediaDeviceType.VIDEO_INPUT:
-              this.available_devices.video_input.push(media_device);
-              break;
-            default:
-              throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
-          }
-        });
 
-        this.logger.info('Updated MediaDevice list', media_devices);
-        return media_devices;
-      }
-      throw new z.media.MediaError(z.media.MediaError.TYPE.NO_MEDIA_DEVICES_FOUND);
-    });
+        if (media_devices) {
+          const audio_input_devices = [];
+          const audio_output_devices = [];
+          const video_input_devices = [];
+
+          media_devices.forEach((media_device) => {
+            switch (media_device.kind) {
+              case z.media.MediaDeviceType.AUDIO_INPUT:
+                audio_input_devices.push(media_device);
+                break;
+              case z.media.MediaDeviceType.AUDIO_OUTPUT:
+                audio_output_devices.push(media_device);
+                break;
+              case z.media.MediaDeviceType.VIDEO_INPUT:
+                video_input_devices.push(media_device);
+                break;
+              default:
+                throw new z.media.MediaError(z.media.MediaError.TYPE.UNHANDLED_MEDIA_TYPE);
+            }
+          });
+
+          z.util.ko_array_push_all(this.available_devices.audio_input, audio_input_devices);
+          z.util.ko_array_push_all(this.available_devices.audio_output, audio_output_devices);
+          z.util.ko_array_push_all(this.available_devices.video_input, video_input_devices);
+
+          this.logger.info('Updated MediaDevice list', media_devices);
+          return media_devices;
+        }
+        throw new z.media.MediaError(z.media.MediaError.TYPE.NO_MEDIA_DEVICES_FOUND);
+      });
   }
 
   /**
@@ -230,12 +247,14 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   toggle_next_camera() {
     return this.get_media_devices()
-    .then(() => {
-      const {current_device} = this._get_current_device(this.available_devices.video_input(), this.current_device_id.video_input());
-      const next_device = this.available_devices.video_input()[z.util.ArrayUtil.iterate_index(this.available_devices.video_input(), this.current_device_index.video_input()) || 0];
-      this.current_device_id.video_input(next_device.deviceId);
-      return this.logger.info(`Switching the active camera from '${current_device.label || current_device.deviceId}' to '${next_device.label || next_device.deviceId}'`);
-    });
+      .then(() => {
+        const {current_device} = this._get_current_device(this.available_devices.video_input(), this.current_device_id.video_input());
+        const next_device = this.available_devices.video_input()[z.util.ArrayUtil.iterate_index(this.available_devices.video_input(), this.current_device_index.video_input()) || 0];
+
+        this.current_device_id.video_input(next_device.deviceId);
+
+        return this.logger.info(`Switching the active camera from '${current_device.label || current_device.deviceId}' to '${next_device.label || next_device.deviceId}'`);
+      });
   }
 
   /**
@@ -244,12 +263,14 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   toggle_next_screen() {
     return this.get_screen_sources()
-    .then(() => {
-      const {current_device} = this._get_current_device(this.available_devices.screen_input(), this.current_device_id.screen_input());
-      const next_device = this.available_devices.screen_input()[z.util.ArrayUtil.iterate_index(this.available_devices.screen_input(), this.current_device_index.screen_input()) || 0];
-      this.current_device_id.screen_input(next_device.id);
-      return this.logger.info(`Switching the active screen from '${current_device.name || current_device.id}' to '${next_device.name || next_device.id}'`);
-    });
+      .then(() => {
+        const {current_device} = this._get_current_device(this.available_devices.screen_input(), this.current_device_id.screen_input());
+        const next_device = this.available_devices.screen_input()[z.util.ArrayUtil.iterate_index(this.available_devices.screen_input(), this.current_device_index.screen_input()) || 0];
+
+        this.current_device_id.screen_input(next_device.id);
+
+        return this.logger.info(`Switching the active screen from '${current_device.name || current_device.id}' to '${next_device.name || next_device.id}'`);
+      });
   }
 
   /**
@@ -259,29 +280,32 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   update_current_devices(video_send) {
     return this.get_media_devices()
-    .then(() => {
-      const _check_device = (media_type, device_type) => {
-        device_type = this._type_conversion(device_type);
-        const device_id_observable = this.current_device_id[`${device_type}`];
-        const media_devices = this.available_devices[`${device_type}`]();
-        const {current_device: media_device} = this._get_current_device(media_devices, device_id_observable());
+      .then(() => {
+        const _check_device = (media_type, device_type) => {
+          device_type = this._type_conversion(device_type);
 
-        if (!media_device) {
-          const updated_device = this.available_devices[`${device_type}`]()[0];
-          if (updated_device) {
-            device_id_observable(updated_device.deviceId);
-            return this.logger.warn(`Selected '${media_type}' device '${device_id_observable()}' not found and replaced by '${updated_device.label || updated_device.deviceId}'`, media_devices);
+          const device_id_observable = this.current_device_id[`${device_type}`];
+          const media_devices = this.available_devices[`${device_type}`]();
+          const {current_device: media_device} = this._get_current_device(media_devices, device_id_observable());
+
+          if (!media_device) {
+            const updated_device = this.available_devices[`${device_type}`]()[0];
+
+            if (updated_device) {
+              this.logger.warn(`Selected '${media_type}' device '${device_id_observable()}' not found and replaced by '${updated_device.label || updated_device.deviceId}'`, media_devices);
+              return device_id_observable(updated_device.deviceId);
+            }
+
+            this.logger.warn(`Selected '${media_type}' device '${device_id_observable()}' not found and reset'`, media_devices);
+            return device_id_observable('');
           }
-          this.logger.warn(`Selected '${media_type}' device '${device_id_observable()}' not found and reset'`, media_devices);
-          return device_id_observable('');
-        }
-      };
+        };
 
-      _check_device(z.media.MediaType.AUDIO, z.media.MediaDeviceType.AUDIO_INPUT);
-      if (video_send) {
-        _check_device(z.media.MediaType.VIDEO, z.media.MediaDeviceType.VIDEO_INPUT);
-      }
-    });
+        _check_device(z.media.MediaType.AUDIO, z.media.MediaDeviceType.AUDIO_INPUT);
+        if (video_send) {
+          _check_device(z.media.MediaType.VIDEO, z.media.MediaDeviceType.VIDEO_INPUT);
+        }
+      });
   }
 
   /**
@@ -292,11 +316,12 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    * @returns {Object} Selected MediaDevice and its array index
    */
   _get_current_device(media_devices, current_device_id) {
-    for (const [media_device, index] of media_devices.entries()) {
+    for (const [index, media_device] of media_devices.entries()) {
       if (media_device.deviceId === current_device_id || media_device.id === current_device_id) {
         return {current_device: media_device, current_device_index: index};
       }
     }
+
     return {current_device_index: 0};
   }
 
@@ -332,6 +357,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
    */
   _update_current_device_index(index_observable, available_devices, current_device_id) {
     const {current_device_index} = this._get_current_device(available_devices, current_device_id);
+
     if (_.isNumber(current_device_index)) {
       index_observable(current_device_index);
     }

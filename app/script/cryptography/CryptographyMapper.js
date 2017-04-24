@@ -40,24 +40,27 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
    * @returns {Promise} Resolves with the mapped event
    */
   map_generic_message(generic_message, event) {
+    if (generic_message === undefined) {
+      return Promise.reject(new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE));
+    }
     return Promise.resolve()
     .then(() => {
-      if (generic_message) {
-        return this._map_generic_message(generic_message, event);
-      }
-      throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE);
+      return generic_message.external ? this._unwrap_external(generic_message.external, event) : generic_message;
     })
-    .then((specific_content) => {
-      return $.extend(
-        {
-          conversation: event.conversation,
-          from: event.from,
-          id: generic_message.message_id,
-          status: event.status,
-          time: event.time,
-        },
-        specific_content
-      );
+    .then((unwrapped_generic_message) => {
+      return Promise.all([
+        this._map_generic_message(unwrapped_generic_message, event),
+        unwrapped_generic_message,
+      ]);
+    })
+    .then(([specific_content, unwrapped_generic_message]) => {
+      return Object.assign({
+        conversation: event.conversation,
+        from: event.from,
+        id: unwrapped_generic_message.message_id,
+        status: event.status,
+        time: event.time,
+      }, specific_content);
     });
   }
 
@@ -77,8 +80,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         return this._map_edited(generic_message.edited, generic_message.message_id);
       case 'ephemeral':
         return this._map_ephemeral(generic_message, event);
-      case 'external':
-        return this._map_external(generic_message.external, event);
       case 'hidden':
         return this._map_hidden(generic_message.hidden);
       case 'image':
@@ -265,9 +266,9 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
    * @note Wrapped messages get the 'message_id' of their wrappers (external message)
    * @param {z.proto.GenericMessage} external - Generic message of type 'external'
    * @param {JSON} event - Backend event of type 'conversation.otr-message-add'
-   * @returns {Promise} Resolves with mapped message
+   * @returns {Promise} Resolves with generic message
    */
-  _map_external(external, event) {
+  _unwrap_external(external, event) {
     const data = {
       otr_key: new Uint8Array(external.otr_key.toArrayBuffer()),
       sha256: new Uint8Array(external.sha256.toArrayBuffer()),
@@ -276,10 +277,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
 
     return z.assets.AssetCrypto.decrypt_aes_asset(data.text.buffer, data.otr_key.buffer, data.sha256.buffer)
     .then((external_message_buffer) => z.proto.GenericMessage.decode(external_message_buffer))
-    .then((generic_message) => {
-      this.logger.info(`Received external message of type '${generic_message.content}'`, generic_message);
-      return this._map_generic_message(generic_message, event);
-    })
     .catch((error) => {
       this.logger.error(`Failed to map external message: ${error.message}`, error);
       throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.BROKEN_EXTERNAL);
