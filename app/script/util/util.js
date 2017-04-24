@@ -76,7 +76,7 @@ z.util.load_url_buffer = function(url, xhr_accessor_function) {
     if (typeof xhr_accessor_function === 'function') {
       xhr_accessor_function(xhr);
     }
-    return xhr.send();
+    xhr.send();
   });
 };
 
