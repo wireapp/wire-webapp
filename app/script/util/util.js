@@ -70,7 +70,6 @@ z.util.load_url_buffer = function(url, xhr_accessor_function) {
         return resolve([xhr.response, xhr.getResponseHeader('content-type')]);
       }
       return reject(new Error(`Requesting arraybuffer failed with status ${xhr.status}`));
-
     };
     xhr.onerror = reject;
     if (typeof xhr_accessor_function === 'function') {
