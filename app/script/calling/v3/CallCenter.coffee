@@ -427,7 +427,7 @@ class z.calling.v3.CallCenter
       e_call_et.initiate_telemetry video_send
       if not @media_stream_handler.local_media_stream()
         @media_stream_handler.initiate_media_stream conversation_id, video_send
-    .then ->
+    .then =>
       e_call_et.timings.time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED
 
       switch e_call_et.state()
