@@ -92,7 +92,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       return Promise.resolve(this.permission_state);
     }
 
-    if (navigator.permissions !== null) {
+    if (navigator.permissions) {
       return navigator.permissions.query({name: 'notifications'})
       .then((permission_status) => {
         this.permission_status = permission_status;
