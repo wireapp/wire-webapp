@@ -190,13 +190,13 @@ z.util.DebugUtil = class DebugUtil {
       this.get_serialised_identity(),
       this.get_serialised_session(`${remote_user_id}@${remote_client_id}`),
     ])
-      .then((resolve_array) => {
-        return JSON.stringify({
-          identity: resolve_array[1],
-          notifications: resolve_array[0],
-          session: resolve_array[2],
-        });
+    .then((resolve_array) => {
+      return JSON.stringify({
+        identity: resolve_array[1],
+        notifications: resolve_array[0],
+        session: resolve_array[2],
       });
+    });
   }
 
   get_v2_call_participants(conversation_id = wire.app.repository.conversation.active_conversation().id) {
