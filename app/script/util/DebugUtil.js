@@ -126,7 +126,6 @@ z.util.DebugUtil = class DebugUtil {
         return this.get_notification_from_stream(notification_id, last_notification.id);
       }
       return this.logger.log(`Notification '${notification_id}' was not found in encrypted notification stream`);
-
     };
 
     return wire.app.service.notification.get_notifications(client_id, notification_id_since, 10000)
