@@ -94,6 +94,18 @@ z.conversation.ConversationCellState = (() => {
     },
   };
 
+  const empty_state = {
+    description() {
+      return z.localization.Localizer.get_text(z.string.conversations_empty_conversation_description);
+    },
+    icon() {
+      return z.conversation.ConversationStatusIcon.NONE;
+    },
+    match(conversation_et) {
+      return conversation_et.participating_user_ids().length === 0;
+    },
+  };
+
   const removed_state = {
     description() {
       return '';
@@ -229,7 +241,7 @@ z.conversation.ConversationCellState = (() => {
 
   function generate(conversation_et) {
     console.debug('generate', conversation_et.display_name()); // TODO remove
-    const states = [removed_state, muted_state, alert_state, group_activity_state, unread_message_state, pending_state];
+    const states = [empty_state, removed_state, muted_state, alert_state, group_activity_state, unread_message_state, pending_state];
     const icon_state = states.find((state) => state.match(conversation_et));
     const description_state = states.find((state) => state.match(conversation_et));
 
