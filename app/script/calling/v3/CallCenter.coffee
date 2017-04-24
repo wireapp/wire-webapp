@@ -431,10 +431,12 @@ class z.calling.v3.CallCenter
 
       switch e_call_et.state()
         when z.calling.enum.CallState.INCOMING
-          e_call_et.state z.calling.enum.CallState.CONNECTING
+          return e_call_et.state z.calling.enum.CallState.CONNECTING
         when z.calling.enum.CallState.OUTGOING
-          e_call_et.participants.push new z.calling.entities.EParticipant e_call_et, e_call_et.conversation_et.participating_user_ets()[0], e_call_et.timings
-
+          return @user_repository.get_user_by_id(e_call_et.conversation_et.participating_user_ids()[0])
+          .then (user_et) ->
+            e_call_et.participants.push new z.calling.entities.EParticipant e_call_et, user_et, e_call_et.timings
+    .then ->
       e_call_et.start_negotiation()
     .catch (error) =>
       @delete_call conversation_id
