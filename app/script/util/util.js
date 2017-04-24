@@ -45,7 +45,7 @@ z.util.load_image = function(blob) {
       return window.URL.revokeObjectURL(object_url);
     };
     img.onerror = reject;
-    return img.src = object_url;
+    img.src = object_url;
   });
 };
 
