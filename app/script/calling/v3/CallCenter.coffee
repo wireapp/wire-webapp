@@ -228,8 +228,9 @@ class z.calling.v3.CallCenter
             e_call_et.set_remote_version e_call_message_et
             return e_call_et.update_e_participant e_call_message_et
             .then (e_participant_et) ->
-              e_call_et.state z.calling.enum.CallState.CONNECTING
-              e_participant_et.session_id = e_call_message_et.session_id
+              if e_participant_et
+                e_call_et.state z.calling.enum.CallState.CONNECTING
+                e_participant_et.session_id = e_call_message_et.session_id
 
       return @user_repository.get_user_by_id e_call_message_et.user_id
       .then (remote_user_et) ->
