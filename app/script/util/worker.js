@@ -29,7 +29,7 @@ z.util.Worker = class Worker {
         const worker = new window.Worker(uri);
         worker.onmessage = (event) => resolve(event.data);
         worker.onerror = (error) => reject(error);
-        return worker.postMessage(data);
+        worker.postMessage(data);
       });
     };
   }
