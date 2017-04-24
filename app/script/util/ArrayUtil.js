@@ -81,7 +81,7 @@ z.util.ArrayUtil = {
     new_array[0] = array[0];
     new_array[length - 1] = array[array.length - 1];
 
-    for (let i = 1; i < length - 1; i++) {
+    for (const index of [0..length - 1]) {
       const original_index = i * scale_factor;
       const before = Math.floor(original_index).toFixed();
       const after = Math.ceil(original_index).toFixed();

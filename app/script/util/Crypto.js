@@ -29,7 +29,7 @@ z.util.Crypto = {
       let hash = uint32.toUint32(0);
       const key = str.toLowerCase();
 
-      for (let i = 0; i <= key.length - 1; i++) {
+      for (const index of [0..key.length - 1]) {
         hash = uint32.addMod32(hash, uint32.toUint32(key.charCodeAt(i)));
         hash = uint32.addMod32(hash, uint32.shiftLeft(hash, 10));
         hash = uint32.xor(hash, uint32.shiftRight(hash, 6));
