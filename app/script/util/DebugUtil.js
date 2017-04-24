@@ -27,12 +27,6 @@ z.util.DebugUtil = class DebugUtil {
     this.conversation_repository = conversation_repository;
     this.logger = new z.util.Logger('z.util.DebugUtil', z.config.LOGGER.OPTIONS);
     this.user_repository = user_repository;
-
-    this.get_event_info = this.get_event_info.bind(this);
-    this.get_notification_from_stream = this.get_notification_from_stream.bind(this);
-    this.get_notifications_from_stream = this.get_notifications_from_stream.bind(this);
-    this.get_number_of_clients_in_conversation = this.get_number_of_clients_in_conversation.bind(this);
-    this.get_v2_call_participants = this.get_v2_call_participants.bind(this);
   }
 
   block_all_connections() {
