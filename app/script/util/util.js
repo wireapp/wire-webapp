@@ -56,7 +56,7 @@ z.util.load_file_buffer = function(file) {
       return resolve(this.result);
     };
     reader.onerror = reject;
-    return reader.readAsArrayBuffer(file);
+    reader.readAsArrayBuffer(file);
   });
 };
 
