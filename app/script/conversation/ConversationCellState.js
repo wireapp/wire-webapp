@@ -144,7 +144,7 @@ z.conversation.ConversationCellState = (() => {
       }
     },
     match(conversation_et) {
-      return conversation_et.unread_events().find(is_alert) !== undefined;
+      return conversation_et.unread_message_count() > 0 && conversation_et.unread_events().find(is_alert) !== undefined;
     },
   };
 
