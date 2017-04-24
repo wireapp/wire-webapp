@@ -33,5 +33,5 @@ z.ui.ShortcutType = {
   PING: 'ping',
   PREV: 'prev',
   SILENCE: 'silence',
-  START: 'start'
+  START: 'start',
 };

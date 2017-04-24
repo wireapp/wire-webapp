@@ -13,6 +13,7 @@ globals:
   amplify: true
   cryptobox: true
   CryptoJS: true
+  keyboardJS: true
   ko: true
   libsodium: true
   LRUCache: true
