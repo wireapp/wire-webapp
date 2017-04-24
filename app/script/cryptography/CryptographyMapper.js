@@ -40,7 +40,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
    * @returns {Promise} Resolves with the mapped event
    */
   map_generic_message(generic_message, event) {
-    if(generic_message === undefined) {
+    if (generic_message === undefined) {
       return Promise.reject(new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE));
     }
     return Promise.resolve()
@@ -50,17 +50,17 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     .then((unwrapped_generic_message) => {
       return Promise.all([
         this._map_generic_message(unwrapped_generic_message, event),
-        unwrapped_generic_message
+        unwrapped_generic_message,
       ]);
     })
     .then(([specific_content, unwrapped_generic_message]) => {
       return Object.assign({
-          conversation: event.conversation,
-          from: event.from,
-          id: unwrapped_generic_message.message_id,
-          status: event.status,
-          time: event.time,
-        }, specific_content);
+        conversation: event.conversation,
+        from: event.from,
+        id: unwrapped_generic_message.message_id,
+        status: event.status,
+        time: event.time,
+      }, specific_content);
     });
   }
 
