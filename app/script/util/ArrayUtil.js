@@ -60,10 +60,9 @@ z.util.ArrayUtil = {
       return undefined;
     }
 
-    for (let i = next_index; i <= array.length; i++) {
-      const current_item = array[i];
-      if ((filter == null) || !!filter(current_item)) {
-        return current_item;
+    for (const item of array) {
+      if(!_.isFunction(filter) || !!filter(item)) {
+        return item
       }
     }
   },
