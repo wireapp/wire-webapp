@@ -239,7 +239,7 @@ class z.main.App
       if is_reload and error.type not in [z.client.ClientError.TYPE.MISSING_ON_BACKEND, z.client.ClientError.TYPE.NO_LOCAL_CLIENT]
         @auth.client.execute_on_connectivity(z.service.Client::CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD).then -> window.location.reload false
       else if navigator.onLine
-        @logger.error "Caused by: #{error?.message or error}", error
+        @logger.error "Caused by: #{error?.message or error}"
         Raygun.send error if error instanceof z.storage.StorageError
         @logout 'init_app'
       else

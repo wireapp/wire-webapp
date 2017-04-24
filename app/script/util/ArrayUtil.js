@@ -60,9 +60,10 @@ z.util.ArrayUtil = {
       return undefined;
     }
 
-    for (const item of array) {
-      if(!_.isFunction(filter) || !!filter(item)) {
-        return item
+    for (let i = next_index; i <= array.length; i++) {
+      const current_item = array[i];
+      if ((filter == null) || !!filter(current_item)) {
+        return current_item;
       }
     }
   },
@@ -80,7 +81,7 @@ z.util.ArrayUtil = {
     new_array[0] = array[0];
     new_array[length - 1] = array[array.length - 1];
 
-    for (const index of [0..length - 1]) {
+    for (let i = 1; i < length - 1; i++) {
       const original_index = i * scale_factor;
       const before = Math.floor(original_index).toFixed();
       const after = Math.ceil(original_index).toFixed();
