@@ -24,7 +24,8 @@ window.z.util = z.util || {};
 
 z.util.LocalizerUtil = {
   join_names: function(user_ets, declension = z.string.Declension.ACCUSATIVE) {
-    const names_string = user_ets.map((user_et) => z.util.get_first_name(user_et, declension)).join(', ');
+    const first_names = user_ets.map((user_et) => z.util.get_first_name(user_et, declension));
+    const names_string = first_names.join(', ');
     return names_string.replace(/,(?=[^,]*$)/, ` ${z.localization.Localizer.get_text(z.string.and)}`);
   },
 };
