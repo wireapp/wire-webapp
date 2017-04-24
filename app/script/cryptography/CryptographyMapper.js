@@ -45,7 +45,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     }
     return Promise.resolve()
     .then(() => {
-      return generic_message.external ? this._map_external(generic_message.external, event) : generic_message;
+      return generic_message.external ? this._unwrap_external(generic_message.external, event) : generic_message;
     })
     .then((unwrapped_generic_message) => {
       return Promise.all([
@@ -54,7 +54,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
       ]);
     })
     .then(([specific_content, unwrapped_generic_message]) => {
-      return $.extend({
+      return Object.assign({
           conversation: event.conversation,
           from: event.from,
           id: unwrapped_generic_message.message_id,
@@ -268,7 +268,7 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
    * @param {JSON} event - Backend event of type 'conversation.otr-message-add'
    * @returns {Promise} Resolves with generic message
    */
-  _map_external(external, event) {
+  _unwrap_external(external, event) {
     const data = {
       otr_key: new Uint8Array(external.otr_key.toArrayBuffer()),
       sha256: new Uint8Array(external.sha256.toArrayBuffer()),
