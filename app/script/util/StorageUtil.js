@@ -31,9 +31,8 @@ z.util.StorageUtil = {
   },
   set_value: function(key, value, seconds_to_expire) {
     if (seconds_to_expire) {
-      amplify.store(key, value, {expires: seconds_to_expire * 1000});
-    } else {
-      amplify.store(key, value);
+      return amplify.store(key, value, {expires: seconds_to_expire * 1000});
     }
+    return amplify.store(key, value);
   },
 };
