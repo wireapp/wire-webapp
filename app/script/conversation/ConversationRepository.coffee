@@ -1418,7 +1418,7 @@ class z.conversation.ConversationRepository
       @upload_file conversation_et, file
 
   ###
-  Post file to a conversation
+  Post file to a conversation.
 
   @param conversation_et [z.entity.Conversation] Conversation to post the file
   @param file [Object] File object
