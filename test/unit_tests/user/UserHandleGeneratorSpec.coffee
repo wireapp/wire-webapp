@@ -59,9 +59,11 @@ describe 'UserHandleGenerator', ->
       expect(z.user.UserHandleGenerator.validate_character('شمس')).toBeFalsy()
       expect(z.user.UserHandleGenerator.validate_character('!')).toBeFalsy()
 
-  describe 'append_random_digits', ->
+  describe '"append_random_digits"', ->
 
     it 'appends random digits to the end of the string', ->
+      handle = 'foo'
+      additional_numbers = 5
       string_with_digits = z.user.UserHandleGenerator.append_random_digits 'foo', 5
-      expect(string_with_digits.length).toBe 8
-      expect(string_with_digits.match(/[1-9]*$/)[0].length).toBe 5
+      expect(string_with_digits.length).toBe handle.length + additional_numbers
+      expect(string_with_digits.match(/[1-9]*$/)[0].length).toBe additional_numbers
