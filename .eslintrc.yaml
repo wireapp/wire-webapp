@@ -25,7 +25,8 @@ globals:
   Proteus: true
   Raygun: true
   sodium: true
-  twttr: true
+  linkify: true
+  linkifyHtml: true
   UUID: true
   wire: true
   z: true
