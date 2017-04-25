@@ -706,3 +706,8 @@ z.util.format_time_remaining = function(time_remaining) {
 
   return title || '';
 };
+
+/**
+ * In case you need dev/null
+ */
+z.util.noop = function() {};
