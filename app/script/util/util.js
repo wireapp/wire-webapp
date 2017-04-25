@@ -402,17 +402,15 @@ z.util.render_message = function(message) {
   message = marked(message);
 
   // Parse links with linkifyjs library, ignore code tags
-  var options;
-
-  options = {
+  const options = {
     attributes: {
-      rel: 'nofollow noopener noreferrer'
+      rel: 'nofollow noopener noreferrer',
     },
     ignoreTags: ['code', 'pre'],
     validate: {
       email: function(value) {
         return false;
-      }
+      },
     },
   };
   message = linkifyHtml(message, options);
