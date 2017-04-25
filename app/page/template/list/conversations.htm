@@ -10,11 +10,11 @@
                 <user-avatar class="user-avatar-xs" params="user: call().participants()[0].user"></user-avatar>
               <!-- /ko -->
             <!-- /ko -->
-            <!-- ko if: is_group() && call().state() != z.calling.enum.CallState.ONGOING -->
+            <!-- ko if: is_group() && call().state() != z.calling.enum.CALL_STATE.ONGOING -->
               <user-avatar class="user-avatar-xs" params="user: call().creating_user"></user-avatar>
             <!-- /ko -->
           <!-- /ko -->
-          <!-- ko if: is_group() && (call().state() === z.calling.enum.CallState.ONGOING && !call().self_user_joined()) || call().is_declined() -->
+          <!-- ko if: is_group() && (call().state() === z.calling.enum.CALL_STATE.ONGOING && !call().self_user_joined()) || call().is_declined() -->
             <svg class="svg-theme" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
               <circle class="fill-theme" opacity=".16" cx="9" cy="9" r="9"></circle>
               <circle class="fill-theme" cx="9" cy="9" r="3"></circle>
@@ -24,7 +24,7 @@
         </div>
         <div class="calls-controls">
 
-          <!-- ko if: is_group() && call().state() === z.calling.enum.CallState.ONGOING && call().self_user_joined() -->
+          <!-- ko if: is_group() && call().state() === z.calling.enum.CALL_STATE.ONGOING && call().self_user_joined() -->
             <div class="calls-controls-row calls-controls-row-participants"
                  data-bind="click: $parent.click_on_conversation">
               <!-- ko foreach: call().participants() -->
@@ -41,27 +41,27 @@
                             text: display_name()"
                  data-uie-name="item-call"></div>
             <!-- ko ifnot: call().is_declined() -->
-              <!-- ko if: call().state() === z.calling.enum.CallState.CONNECTING -->
+              <!-- ko if: call().state() === z.calling.enum.CALL_STATE.CONNECTING -->
                 <span class="label-xs" data-bind="l10n_text: z.string.call_state_connecting" data-uie-name="call-label-connecting"></span>
               <!-- /ko -->
-              <!-- ko if: call().state() === z.calling.enum.CallState.OUTGOING -->
+              <!-- ko if: call().state() === z.calling.enum.CALL_STATE.OUTGOING -->
                 <span class="label-xs" data-bind="l10n_text: z.string.call_state_outgoing" data-uie-name="call-label-outgoing"></span>
               <!-- /ko -->
-              <!-- ko if: call().state() === z.calling.enum.CallState.INCOMING -->
+              <!-- ko if: call().state() === z.calling.enum.CALL_STATE.INCOMING -->
                 <span class="label-xs" data-bind="l10n_text: z.string.call_state_incoming" data-uie-name="call-label-incoming"></span>
               <!-- /ko -->
-              <!-- ko if: call().state() === z.calling.enum.CallState.ONGOING && call().self_user_joined() -->
+              <!-- ko if: call().state() === z.calling.enum.CALL_STATE.ONGOING && call().self_user_joined() -->
                 <span class="label-xs" data-bind="text: z.util.format_seconds(call().duration_time())" data-uie-name="call-duration"></span>
               <!-- /ko -->
             <!-- /ko -->
-            <!-- ko if: (call().state() === z.calling.enum.CallState.ONGOING && !call().self_user_joined()) || call().is_declined() -->
+            <!-- ko if: (call().state() === z.calling.enum.CALL_STATE.ONGOING && !call().self_user_joined()) || call().is_declined() -->
               <div class="button button-pill button-fluid button-outline button-small"
                    data-uie-name="do-call-controls-call-join"
                    data-bind="click: $parent.on_accept_call, l10n_text: z.string.call_join"></div>
             <!-- /ko -->
           </div>
 
-          <!-- ko if: call().state() === z.calling.enum.CallState.INCOMING && !call().is_declined() -->
+          <!-- ko if: call().state() === z.calling.enum.CALL_STATE.INCOMING && !call().is_declined() -->
             <div class="calls-controls-row">
               <div class="button button-pill button-full button-small button-theme-red"
                    data-uie-name="do-call-controls-call-decline"
@@ -100,7 +100,7 @@
                   </div>
                 </div>
 
-                <!-- ko if: call().state() === z.calling.enum.CallState.ONGOING -->
+                <!-- ko if: call().state() === z.calling.enum.CALL_STATE.ONGOING -->
                   <!-- ko if: $parent.show_toggle_screen() -->
                     <div class="calls-controls-action calls-controls-action-screensharing">
                       <div class="up">

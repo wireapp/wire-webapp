@@ -165,8 +165,11 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {undefined} No return value
    */
   set_muted_state(handling_notifications) {
-    this.muted = handling_notifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
-    return this.logger.info(`Set muted state to: ${this.muted}`);
+    const updated_muted_state = handling_notifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    if (this.muted !== updated_muted_state) {
+      this.muted = updated_muted_state;
+      this.logger.info(`Set muted state to: ${this.muted}`);
+    }
   }
 
   /**

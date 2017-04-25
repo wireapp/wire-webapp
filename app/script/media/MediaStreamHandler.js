@@ -352,13 +352,13 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     .catch((error) => {
       this.logger.warn(`MediaStream request failed: ${error.name} ${error.message}`);
       this._clear_permission_request_hint(media_type);
-      if (z.calling.rtc.MediaStreamErrorTypes.DEVICE.includes(error.name)) {
+      if (z.calling.rtc.MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(error.name)) {
         throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, media_type);
       }
-      if (z.calling.rtc.MediaStreamErrorTypes.MISC.includes(error.name)) {
+      if (z.calling.rtc.MEDIA_STREAM_ERROR_TYPES.MISC.includes(error.name)) {
         throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_MISC, media_type);
       }
-      if (z.calling.rtc.MediaStreamErrorTypes.PERMISSION.includes(error.name)) {
+      if (z.calling.rtc.MEDIA_STREAM_ERROR_TYPES.PERMISSION.includes(error.name)) {
         throw new z.media.MediaError(z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION, media_type);
       }
       throw error;
@@ -598,7 +598,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   needs_media_stream() {
     for (const call_et of this.calls()) {
-      if (call_et.is_remote_video_send() && call_et.state() === z.calling.enum.CallState.INCOMING) return true;
+      if (call_et.is_remote_video_send() && call_et.state() === z.calling.enum.CALL_STATE.INCOMING) return true;
       if (call_et.self_client_joined()) return true;
     }
     return false;

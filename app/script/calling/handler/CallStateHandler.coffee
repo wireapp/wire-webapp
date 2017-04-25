@@ -311,9 +311,9 @@ class z.calling.handler.CallStateHandler
     .then (call_et) =>
       @logger.info "Delete call in conversation '#{conversation_id}'"
       # Reset call and delete it afterwards
-      if call_et.self_client_joined() and call_et.state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
+      if call_et.self_client_joined() and call_et.state() in [z.calling.enum.CALL_STATE.DISCONNECTING, z.calling.enum.CALL_STATE.ONGOING]
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP
-      call_et.state z.calling.enum.CallState.ENDED
+      call_et.state z.calling.enum.CALL_STATE.ENDED
       call_et.reset_call()
       @_remove_call call_et.id
       @v2_call_center.media_stream_handler.reset_media_stream()
@@ -358,7 +358,7 @@ class z.calling.handler.CallStateHandler
     @v2_call_center.media_stream_handler.release_media_stream()
     @v2_call_center.get_call_by_id conversation_id
     .then (call_et) =>
-      call_et.state z.calling.enum.CallState.DISCONNECTING
+      call_et.state z.calling.enum.CALL_STATE.DISCONNECTING
       call_et.termination_reason = termination_reason if termination_reason
       @_put_state_to_idle conversation_id
     .catch (error) =>
@@ -467,16 +467,16 @@ class z.calling.handler.CallStateHandler
       call_et.self_client_joined self_user_joined
 
     if call_et.self_user_joined() and not call_et.self_client_joined()
-      call_et.state z.calling.enum.CallState.ONGOING
-    else if call_et.state() is z.calling.enum.CallState.OUTGOING
-      call_et.state z.calling.enum.CallState.CONNECTING if call_et.get_number_of_participants()
-    else if call_et.state() in z.calling.enum.CallStateGroups.CAN_CONNECT
+      call_et.state z.calling.enum.CALL_STATE.ONGOING
+    else if call_et.state() is z.calling.enum.CALL_STATE.OUTGOING
+      call_et.state z.calling.enum.CALL_STATE.CONNECTING if call_et.get_number_of_participants()
+    else if call_et.state() in z.calling.enum.CALL_STATE_GROUP.CAN_CONNECT
       if call_et.self_client_joined() and client_joined_change
-        call_et.state z.calling.enum.CallState.CONNECTING
-    else if call_et.state() is z.calling.enum.CallState.CONNECTING
-      call_et.state z.calling.enum.CallState.ONGOING if not call_et.self_client_joined()
-    else if call_et.state() is z.calling.enum.CallState.DISCONNECTING
-      call_et.state z.calling.enum.CallState.ONGOING if call_et.participants_count() >= 2
+        call_et.state z.calling.enum.CALL_STATE.CONNECTING
+    else if call_et.state() is z.calling.enum.CALL_STATE.CONNECTING
+      call_et.state z.calling.enum.CALL_STATE.ONGOING if not call_et.self_client_joined()
+    else if call_et.state() is z.calling.enum.CALL_STATE.DISCONNECTING
+      call_et.state z.calling.enum.CALL_STATE.ONGOING if call_et.participants_count() >= 2
 
     if call_et.is_remote_video_send() and call_et.is_ongoing_on_another_client()
       @v2_call_center.media_stream_handler.release_media_stream()
@@ -519,7 +519,7 @@ class z.calling.handler.CallStateHandler
   _create_connecting_call: (event, remote_participant_ids = []) ->
     @_create_call event
     .then (call_et) =>
-      call_et.state z.calling.enum.CallState.CONNECTING
+      call_et.state z.calling.enum.CALL_STATE.CONNECTING
       @v2_call_center.user_repository.get_users_by_id remote_participant_ids
       .then (remote_user_ets) =>
         participant_ets = (new z.calling.entities.Participant user_et for user_et in remote_user_ets)
@@ -549,7 +549,7 @@ class z.calling.handler.CallStateHandler
         participant_ets = (new z.calling.entities.Participant user_et for user_et in remote_user_ets)
         call_et.update_participants participant_ets
         call_et.update_remote_state event.participants
-        call_et.state z.calling.enum.CallState.INCOMING
+        call_et.state z.calling.enum.CALL_STATE.INCOMING
         call_et.telemetry.track_event z.tracking.EventName.CALLING.RECEIVED_CALL, call_et
         @logger.debug "Incoming '#{call_et.remote_media_type()}' call to '#{call_et.conversation_et.display_name()}'", call_et
         if call_et.is_remote_video_send()
@@ -568,7 +568,7 @@ class z.calling.handler.CallStateHandler
   _create_ongoing_call: (event, remote_participant_ids = []) ->
     @_create_call event
     .then (call_et) =>
-      call_et.state z.calling.enum.CallState.ONGOING
+      call_et.state z.calling.enum.CALL_STATE.ONGOING
       call_et.self_user_joined true
       @v2_call_center.user_repository.get_users_by_id remote_participant_ids
       .then (remote_user_ets) =>
@@ -587,7 +587,7 @@ class z.calling.handler.CallStateHandler
   _create_outgoing_call: (event) ->
     @_create_call event
     .then (call_et) =>
-      call_et.state z.calling.enum.CallState.OUTGOING
+      call_et.state z.calling.enum.CALL_STATE.OUTGOING
       @self_client_joined true
       call_et.self_client_joined true
       call_et.self_user_joined true

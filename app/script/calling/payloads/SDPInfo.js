@@ -19,20 +19,22 @@
 
 'use strict';
 
-z.util.NumberUtil = {
-  cap_to_byte: function(value) {
-    const MAX_VALUE = 255;
-    return Math.min(Math.abs(parseInt(value * MAX_VALUE, 10)), MAX_VALUE);
-  },
-  get_random_number: function(minimum, maximum) {
-    return Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
-  },
-  in_range: function(value, lower_bound, upper_bound) {
-    return (value >= lower_bound) && (value <= upper_bound);
-  },
-  root_mean_square: function(float_array) {
-    const pow = float_array.map((number) => Math.pow(number, 2));
-    const sum = pow.reduce((power, number) => power + number);
-    return Math.sqrt(sum) / float_array.length;
-  },
+window.z = window.z || {};
+window.z.calling = z.calling || {};
+window.z.calling.payloads = z.calling.payloads || {};
+
+z.calling.payloads.SDPInfo = class SDPInfo {
+  /**
+   * Object to keep an SDP bundled with signaling information.
+   *
+   * @param {Object} params - Properties to setup the ICE information container
+   * @param {string} params.conversation_id - Conversation ID
+   * @param {string} params.flow_id - Flow ID
+   * @param {RTCSessionDescription} params.sdp - Session Description Protocol (SDP)
+   */
+  constructor(params) {
+    this.conversation_id = params.conversation_id;
+    this.flow_id = params.flow_id;
+    this.sdp = params.sdp;
+  }
 };

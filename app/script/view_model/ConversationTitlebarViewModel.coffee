@@ -41,7 +41,7 @@ class z.ViewModel.ConversationTitlebarViewModel
 
     @has_ongoing_call = ko.computed =>
       return false if not @joined_call()
-      return @has_call() and @joined_call().state() is z.calling.enum.CallState.ONGOING
+      return @has_call() and @joined_call().state() is z.calling.enum.CALL_STATE.ONGOING
 
     @show_maximize_control = ko.pureComputed =>
       return false if not @joined_call()

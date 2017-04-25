@@ -120,7 +120,7 @@ class z.calling.handler.CallSignalingHandler
         throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.FLOW_NOT_FOUND
     .catch (error) =>
       if error.type is z.calling.v2.CallError::TYPE.FLOW_NOT_FOUND
-        if event.state is z.calling.rtc.SDPType.OFFER
+        if event.state is z.calling.rtc.SDP_TYPE.OFFER
           @_cache_remote_sdp event.flow, remote_sdp
           @logger.info "Cached remote SDP for unknown flow '#{event.flow}'", remote_sdp
         else

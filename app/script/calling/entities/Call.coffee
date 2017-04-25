@@ -52,7 +52,7 @@ class z.calling.entities.Call
 
     @self_client_joined = ko.observable false
     @self_user_joined = ko.observable false
-    @state = ko.observable z.calling.enum.CallState.UNKNOWN
+    @state = ko.observable z.calling.enum.CALL_STATE.UNKNOWN
     @previous_state = undefined
     @is_declined_timer = undefined
 
@@ -100,7 +100,7 @@ class z.calling.entities.Call
         amplify.publish z.event.WebApp.CALL.SIGNALING.POST_FLOWS, @id if @get_number_of_participants()
       else
         @is_connected false
-        amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER if @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
+        amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER if @state() in [z.calling.enum.CALL_STATE.DISCONNECTING, z.calling.enum.CALL_STATE.ONGOING]
         @telemetry.track_duration @ if @termination_reason
         @_reset_timer()
         @_reset_flows()
@@ -125,17 +125,17 @@ class z.calling.entities.Call
       @_clear_join_timer() if @is_group()
 
       switch state
-        when z.calling.enum.CallState.CONNECTING
+        when z.calling.enum.CALL_STATE.CONNECTING
           @_on_state_connecting()
-        when z.calling.enum.CallState.INCOMING
+        when z.calling.enum.CALL_STATE.INCOMING
           @_on_state_incoming()
-        when z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ENDED
+        when z.calling.enum.CALL_STATE.DISCONNECTING, z.calling.enum.CALL_STATE.ENDED
           @_on_state_disconnecting()
-        when z.calling.enum.CallState.ONGOING
+        when z.calling.enum.CALL_STATE.ONGOING
           @_on_state_ongoing()
-        when z.calling.enum.CallState.OUTGOING
+        when z.calling.enum.CALL_STATE.OUTGOING
           @_on_state_outgoing()
-        when z.calling.enum.CallState.REJECTED
+        when z.calling.enum.CALL_STATE.REJECTED
           @_on_state_rejected()
 
       @previous_state = state
@@ -149,14 +149,14 @@ class z.calling.entities.Call
   ###############################################################################
 
   _on_state_connecting: =>
-    attributes = direction: if @previous_state is z.calling.enum.CallState.OUTGOING then z.calling.enum.CallState.OUTGOING else z.calling.enum.CallState.INCOMING
+    attributes = direction: if @previous_state is z.calling.enum.CALL_STATE.OUTGOING then z.calling.enum.CALL_STATE.OUTGOING else z.calling.enum.CALL_STATE.INCOMING
     @telemetry.track_event z.tracking.EventName.CALLING.JOINED_CALL, @, attributes
-    @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
+    @_stop_call_sound @previous_state is z.calling.enum.CALL_STATE.INCOMING
     @is_declined false
 
   _on_state_disconnecting: =>
-    if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
-      @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
+    if @previous_state in z.calling.enum.CALL_STATE_GROUP.IS_RINGING
+      @_stop_call_sound @previous_state is z.calling.enum.CALL_STATE.INCOMING
     @is_declined false
 
   _on_state_incoming: =>
@@ -164,16 +164,16 @@ class z.calling.entities.Call
     @_group_call_timeout true if @is_group()
 
   _on_state_ongoing: =>
-    if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
-      @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
+    if @previous_state in z.calling.enum.CALL_STATE_GROUP.IS_RINGING
+      @_stop_call_sound @previous_state is z.calling.enum.CALL_STATE.INCOMING
 
   _on_state_outgoing: =>
     @_play_call_sound false
     @_group_call_timeout false if @is_group()
 
   _on_state_rejected: =>
-    if @previous_state in z.calling.enum.CallStateGroups.IS_RINGING
-      @_stop_call_sound @previous_state is z.calling.enum.CallState.INCOMING
+    if @previous_state in z.calling.enum.CALL_STATE_GROUP.IS_RINGING
+      @_stop_call_sound @previous_state is z.calling.enum.CALL_STATE.INCOMING
 
   _clear_join_timer: =>
     window.clearTimeout @is_declined_timer
@@ -223,7 +223,7 @@ class z.calling.entities.Call
 
   # Reject a call.
   reject: =>
-    @state z.calling.enum.CallState.REJECTED
+    @state z.calling.enum.CALL_STATE.REJECTED
     @is_declined true
 
 
@@ -308,7 +308,7 @@ class z.calling.entities.Call
     then the delta in participants can only be one. If we have added a user, we cannot add or remove another one.
   ###
   update_participants: (participant_ets = [], sequential_event = false) =>
-    sequential_event = false if @state() in z.calling.enum.CallStateGroups.IS_RINGING
+    sequential_event = false if @state() in z.calling.enum.CALL_STATE_GROUP.IS_RINGING
     if sequential_event
       @logger.info 'Sequential event by request: Only one participant change will be applied'
 
@@ -329,7 +329,7 @@ class z.calling.entities.Call
       for participant_et in delete_participants_ets when @delete_participant participant_et
         participant_left = true
         break if sequential_event
-      if participant_left and @self_client_joined() and @state() in [z.calling.enum.CallState.DISCONNECTING, z.calling.enum.CallState.ONGOING]
+      if participant_left and @self_client_joined() and @state() in [z.calling.enum.CALL_STATE.DISCONNECTING, z.calling.enum.CALL_STATE.ONGOING]
         amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP
 
     @_sort_participants_by_panning()

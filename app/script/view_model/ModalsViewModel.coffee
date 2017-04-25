@@ -156,8 +156,8 @@ class z.ViewModel.ModalsViewModel
         content: content
 
   ###
-  @note Modal supports z.calling.enum.CallState.INCOMING, z.calling.enum.CallState.ONGOING, z.calling.enum.CallState.OUTGOING
-  @param call_state [z.calling.enum.CallState] Current call state
+  @note Modal supports z.calling.enum.CALL_STATE.INCOMING, z.calling.enum.CALL_STATE.ONGOING, z.calling.enum.CALL_STATE.OUTGOING
+  @param call_state [z.calling.enum.CALL_STATE] Current call state
   ###
   _show_modal_call_start_another: (call_state, title_element, message_element) ->
     action_element = $(z.ViewModel.ModalType.CALL_START_ANOTHER).find('.modal-action')
