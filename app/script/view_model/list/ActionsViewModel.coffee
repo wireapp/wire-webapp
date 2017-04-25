@@ -98,7 +98,7 @@ class z.ViewModel.list.ActionsViewModel
       user_et = conversation_et.participating_user_ets()[0]
       amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BLOCK,
         data: user_et.first_name()
-        action: => @user_repository.block_user user_et, ->
+        action: => @user_repository.block_user(user_et).then ->
           amplify.publish z.event.WebApp.CONVERSATION.SWITCH, conversation_et, next_conversation_et
 
   click_on_cancel_action: =>
