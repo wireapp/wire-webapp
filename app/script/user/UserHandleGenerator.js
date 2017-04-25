@@ -39,12 +39,10 @@ window.z.user = z.user || {};
    * @returns {Array<string>} Handle variations
    */
   function generate_handle_variations(handle, number_of_variations = 5) {
-    return new Array(number_of_variations)
-      .keys()
-      .map(function(i) {
-        i += 1;
-        return append_random_digits(handle.slice(0, MAX_HANDLE_LENGTH - i), i);
-      });
+    return new Array(number_of_variations).map(function(value, i) {
+      i += 1;
+      return append_random_digits(handle.slice(0, MAX_HANDLE_LENGTH - i), i);
+    });
   }
 
   /**
@@ -114,5 +112,4 @@ window.z.user = z.user || {};
     normalize_name: normalize_name,
     validate_character: validate_character,
   };
-
 })();

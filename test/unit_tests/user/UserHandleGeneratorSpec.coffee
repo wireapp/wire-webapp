@@ -69,4 +69,8 @@ describe 'UserHandleGenerator', ->
       expect(string_with_digits.match(/[1-9]*$/)[0].length).toBe additional_numbers
 
   describe 'create_suggestions', ->
-    
+
+    it 'appends random digits to the end of the string', ->
+      username = 'memphis'
+      suggestions = z.user.UserHandleGenerator.create_suggestions username
+      expect(suggestions.length).toBe 12
