@@ -16,20 +16,10 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #
 
-window.z = window.z or {}
-z.util = z.util or {}
+# grunt test_init && grunt test_run:util/KeyCode
 
-z.util.KEYCODE =
-  ARROW_DOWN: 40
-  ARROW_LEFT: 37
-  ARROW_RIGHT: 39
-  ARROW_UP: 38
-  BACKSPACE: 46
-  DELETE: 8
-  ENTER: 13
-  ESC: 27
-  TAB: 9
-  V: 86
+describe 'z.util.KEYCODE', ->
+  describe 'is_arrow_key', ->
+    it 'knows if "key up" has been pressed', ->
+      expect(z.util.KEYCODE.is_arrow_key(z.util.KEYCODE.ARROW_UP)).toBe true
 
-z.util.KEYCODE.is_arrow_key = (keyCode) ->
-  return keyCode in [z.util.KEYCODE.ARROW_DOWN, z.util.KEYCODE.ARROW_LEFT, z.util.KEYCODE.ARROW_RIGHT, z.util.KEYCODE.ARROW_UP]

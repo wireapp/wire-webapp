@@ -46,10 +46,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         .map((user_et) => user_et);
     });
 
-    this._generate_name_string = (declension) => {
-      if (declension === null) {
-        declension = z.string.Declension.ACCUSATIVE;
-      }
+    this._generate_name_string = (declension = z.string.Declension.ACCUSATIVE) => {
       return z.util.LocalizerUtil.join_names(this.joined_user_ets(), declension);
     };
 
