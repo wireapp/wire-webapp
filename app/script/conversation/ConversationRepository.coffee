@@ -1418,44 +1418,7 @@ class z.conversation.ConversationRepository
       @upload_file conversation_et, file
 
   ###
-  Post file to a conversation.
-
-  @param conversation_et [z.entity.Conversation] Conversation to post the file
-  @param file [Object] File object
-  ###
-  upload_file: (conversation_et, file) =>
-    return if not @_can_upload_assets_to_conversation conversation_et
-    message_id = null
-
-    upload_started = Date.now()
-    tracking_data =
-      size_bytes: file.size
-      size_mb: z.util.bucket_values (file.size / 1024 / 1024), [0, 5, 10, 15, 20, 25]
-      type: z.util.get_file_extension file.name
-    conversation_type = z.tracking.helpers.get_conversation_type conversation_et
-    amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED,
-      $.extend tracking_data, {conversation_type: conversation_type}
-
-    @send_asset_metadata conversation_et, file
-    .then (record) =>
-      message_id = record.id
-      @send_asset conversation_et, file, message_id
-    .then =>
-      upload_duration = (Date.now() - upload_started) / 1000
-      @logger.info "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
-        $.extend tracking_data, {time: upload_duration}
-    .catch (error) =>
-      throw error if error.type is z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
-      amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data
-      @logger.error "Failed to upload asset for conversation '#{conversation_et.id}': #{error.message}", error
-      @get_message_in_conversation_by_id conversation_et, message_id
-      .then (message_et) =>
-        @send_asset_upload_failed conversation_et, message_et.id
-        @update_message_as_upload_failed message_et
-
-  ###
-  Post file to a conversation using v3
+  Post file to a conversation
 
   @param conversation_et [z.entity.Conversation] Conversation to post the file
   @param file [Object] File object

@@ -32,8 +32,6 @@ z.assets.AssetService = class AssetService {
   constructor(client) {
     this.client = client;
     this.logger = new z.util.Logger('z.assets.AssetService', z.config.LOGGER.OPTIONS);
-    this.BOUNDARY = 'frontier';
-    this.pending_uploads = {};
   }
 
   /**
@@ -200,25 +198,26 @@ z.assets.AssetService = class AssetService {
         retention: z.assets.AssetRetentionPolicy.PERSISTENT,
       }, metadata);
 
+      const BOUNDARY = 'frontier';
       const asset_data_md5 = z.util.array_to_md5_base64(asset_data);
       metadata = JSON.stringify(metadata);
 
       let body = '';
-      body += `--${this.BOUNDARY}\r\n`;
+      body += `--${BOUNDARY}\r\n`;
       body += 'Content-Type: application/json; charset=utf-8\r\n';
       body += `Content-length: ${metadata.length}\r\n`;
       body += '\r\n';
       body += metadata + '\r\n';
-      body += `--${this.BOUNDARY}\r\n`;
+      body += `--${BOUNDARY}\r\n`;
       body += 'Content-Type: application/octet-stream\r\n';
       body += `Content-length: ${asset_data.length}\r\n`;
       body += `Content-MD5: ${asset_data_md5}\r\n`;
       body += '\r\n';
-      const footer = `\r\n--${this.BOUNDARY}--\r\n`;
+      const footer = `\r\n--${BOUNDARY}--\r\n`;
 
       const xhr = new XMLHttpRequest();
       xhr.open('POST', this.client.create_url('/assets/v3'));
-      xhr.setRequestHeader('Content-Type', `multipart/mixed; boundary=${this.BOUNDARY}`);
+      xhr.setRequestHeader('Content-Type', `multipart/mixed; boundary=${BOUNDARY}`);
       xhr.setRequestHeader('Authorization', `${this.client.access_token_type} ${this.client.access_token}`);
       xhr.onload = function(event) {
         if (this.status === 201) {
