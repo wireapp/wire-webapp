@@ -1404,7 +1404,7 @@ class z.conversation.ConversationRepository
   upload_images: (conversation_et, images) =>
     return if not @_can_upload_assets_to_conversation conversation_et
     for image in images
-      @send_image_asset_v3 conversation_et, image
+      @send_image_asset conversation_et, image
 
   ###
   Post files to a conversation.

@@ -72,7 +72,7 @@ z.assets.AssetService = class AssetService {
   _upload_asset(bytes, options, xhr_accessor_function) {
     return z.assets.AssetCrypto.encrypt_aes_asset(bytes)
     .then(([key_bytes, sha256, ciphertext]) => {
-      return this.post_asset(ciphertext, options, xhr_accessor_function)
+      return this.post_asset(new Uint8Array(ciphertext), options, xhr_accessor_function)
       .then(({key, token}) => [key_bytes, sha256, key, token]);
     });
   }
@@ -184,7 +184,7 @@ z.assets.AssetService = class AssetService {
   /**
    * Post assets.
    *
-   * @param {Uint8Array|ArrayBuffer} asset_data - Asset data
+   * @param {Uint8Array} asset_data - Asset data
    * @param {Object} metadata - Asset metadata
    * @param {boolean} metadata.public - Flag whether asset is public
    * @param {z.assets.AssetRetentionPolicy} metadata.retention - Retention duration policy for asset
@@ -193,13 +193,13 @@ z.assets.AssetService = class AssetService {
    */
   post_asset(asset_data, metadata, xhr_accessor_function) {
     return new Promise((resolve, reject) => {
+      const BOUNDARY = 'frontier';
+
       metadata = Object.assign({
         public: false,
         retention: z.assets.AssetRetentionPolicy.PERSISTENT,
       }, metadata);
 
-      const BOUNDARY = 'frontier';
-      const asset_data_md5 = z.util.array_to_md5_base64(asset_data);
       metadata = JSON.stringify(metadata);
 
       let body = '';
@@ -211,7 +211,7 @@ z.assets.AssetService = class AssetService {
       body += `--${BOUNDARY}\r\n`;
       body += 'Content-Type: application/octet-stream\r\n';
       body += `Content-length: ${asset_data.length}\r\n`;
-      body += `Content-MD5: ${asset_data_md5}\r\n`;
+      body += `Content-MD5: ${z.util.array_to_md5_base64(asset_data)}\r\n`;
       body += '\r\n';
       const footer = `\r\n--${BOUNDARY}--\r\n`;
 
