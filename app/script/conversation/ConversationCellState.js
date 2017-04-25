@@ -240,7 +240,6 @@ z.conversation.ConversationCellState = (() => {
   };
 
   function generate(conversation_et) {
-    console.debug('generate', conversation_et.display_name()); // TODO remove
     const states = [empty_state, removed_state, muted_state, alert_state, group_activity_state, unread_message_state, pending_state];
     const icon_state = states.find((state) => state.match(conversation_et));
     const description_state = states.find((state) => state.match(conversation_et));
