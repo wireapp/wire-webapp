@@ -25,11 +25,12 @@
   position: relative;
 
   &:after {
-    background-color: @seperator-color;
+    background-color: @graphite;
     bottom: 0;
     content: '';
     left: @left-list-item-left-width;
     height: 1px;
+    opacity: .24;
     position: absolute;
     right: 0;
   }
@@ -111,6 +112,7 @@
 .conversation-list-cell-active {
   &:after {
     .accent-background-color();
+    opacity: .4;
   }
 
   .conversation-list-cell-name {

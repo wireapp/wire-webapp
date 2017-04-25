@@ -19,21 +19,25 @@
 
 group-avatar {
   .square(28px);
+  border: 1px solid fade(#fff, 12%);
   border-radius: 6px;
-  border: 1px solid fade(#fff, 24%);
 }
 
 .group-avatar-image-wrapper {
   .square(26px);
   border-radius: 7px;
-  overflow: hidden;
-  display: flex;
   flex-wrap: wrap;
+  display: flex;
+  overflow: hidden;
 }
 
 .group-avatar-image {
-  .square(11px);
-  margin: 1px;
   background-color: fade(#000, 16%);
   background-size: cover;
+  flex: 1 1 auto;
+  margin: 1px;
+}
+
+.group-avatar-image-grid {
+  .square(11px);
 }

@@ -22,6 +22,7 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
+// TODO: rethink the slots
 z.components.GroupAvatar = class GroupAvatar {
   constructor({users}) {
     this.on_in_viewport = this.on_in_viewport.bind(this);
@@ -31,6 +32,8 @@ z.components.GroupAvatar = class GroupAvatar {
     this.slot1 = ko.observable('');
     this.slot2 = ko.observable('');
     this.slot3 = ko.observable('');
+
+    this.show_avatar_grid = ko.pureComputed(() => users().length > 1);
 
     this.user_image_observable = ko.computed(() => {
       if(!this.entered_viewport()) {
@@ -62,10 +65,15 @@ ko.components.register('group-avatar', {
   viewModel: z.components.GroupAvatar,
   template: `
     <div class="group-avatar-image-wrapper" data-bind="in_viewport: on_in_viewport">
-      <div class="group-avatar-image" data-bind="style: {backgroundImage: slot0}"></div>
-      <div class="group-avatar-image" data-bind="style: {backgroundImage: slot1}"></div>
-      <div class="group-avatar-image" data-bind="style: {backgroundImage: slot2}"></div>
-      <div class="group-avatar-image" data-bind="style: {backgroundImage: slot3}"></div>
+      <!-- ko if: show_avatar_grid -->
+        <div class="group-avatar-image-grid group-avatar-image" data-bind="style: {backgroundImage: slot0}"></div>
+        <div class="group-avatar-image-grid group-avatar-image" data-bind="style: {backgroundImage: slot1}"></div>
+        <div class="group-avatar-image-grid group-avatar-image" data-bind="style: {backgroundImage: slot2}"></div>
+        <div class="group-avatar-image-grid group-avatar-image" data-bind="style: {backgroundImage: slot3}"></div>
+      <!-- /ko -->
+      <!-- ko ifnot: show_avatar_grid -->
+        <div class="group-avatar-image" data-bind="style: {backgroundImage: slot0}"></div>
+      <!-- /ko -->
     </div>
   `,
 });
