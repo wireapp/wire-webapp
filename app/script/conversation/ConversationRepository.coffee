@@ -819,37 +819,6 @@ class z.conversation.ConversationRepository
         Raygun.send error, source: 'Sending encrypted last read'
 
   ###
-  Send assets to specified conversation. Used for file transfers.
-  @param conversation_id [String] Conversation ID
-  @return [Object] Collection with User IDs which hold their Client IDs in an Array
-  ###
-  send_asset: (conversation_et, file, nonce) =>
-    generic_message = null
-    @get_message_in_conversation_by_id conversation_et, nonce
-    .then (message_et) =>
-      asset_et = message_et.get_first_asset()
-      asset_et.uploaded_on_this_client true
-      @asset_service.upload_asset file, null, (xhr) ->
-        xhr.upload.onprogress = (event) -> asset_et.upload_progress Math.round(event.loaded / event.total * 100)
-        asset_et.upload_cancel = -> xhr.abort()
-    .then (asset) =>
-      generic_message = new z.proto.GenericMessage nonce
-      generic_message.set 'asset', asset
-      if conversation_et.ephemeral_timer()
-        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
-      @send_generic_message_to_conversation conversation_et.id, generic_message
-    .then =>
-      event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
-      asset = if conversation_et.ephemeral_timer() then generic_message.ephemeral.asset else generic_message.asset
-
-      event.data.otr_key = asset.uploaded.otr_key
-      event.data.sha256 = asset.uploaded.sha256
-      event.data.key = asset.uploaded.asset_id
-      event.data.token = asset.uploaded.asset_token
-      event.id = nonce
-      return @_on_asset_upload_complete conversation_et, event
-
-  ###
   Send asset metadata message to specified conversation.
   @param conversation_et [z.entity.Conversation] Conversation that should receive the file
   @param file [File] File to send
@@ -897,6 +866,37 @@ class z.conversation.ConversationRepository
         @_send_and_inject_generic_message conversation_et, generic_message
     .catch (error) =>
       @logger.info "No preview for asset '#{message_id}' in conversation uploaded #{conversation_et.id}", error
+
+  ###
+  Send assets to specified conversation. Used for file transfers.
+  @param conversation_id [String] Conversation ID
+  @return [Object] Collection with User IDs which hold their Client IDs in an Array
+  ###
+  send_asset_remotedata: (conversation_et, file, nonce) =>
+    generic_message = null
+    @get_message_in_conversation_by_id conversation_et, nonce
+      .then (message_et) =>
+      asset_et = message_et.get_first_asset()
+      asset_et.uploaded_on_this_client true
+      @asset_service.upload_asset file, null, (xhr) ->
+        xhr.upload.onprogress = (event) -> asset_et.upload_progress Math.round(event.loaded / event.total * 100)
+        asset_et.upload_cancel = -> xhr.abort()
+      .then (asset) =>
+      generic_message = new z.proto.GenericMessage nonce
+      generic_message.set 'asset', asset
+      if conversation_et.ephemeral_timer()
+        generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
+      @send_generic_message_to_conversation conversation_et.id, generic_message
+      .then =>
+      event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
+      asset = if conversation_et.ephemeral_timer() then generic_message.ephemeral.asset else generic_message.asset
+
+      event.data.otr_key = asset.uploaded.otr_key
+      event.data.sha256 = asset.uploaded.sha256
+      event.data.key = asset.uploaded.asset_id
+      event.data.token = asset.uploaded.asset_token
+      event.id = nonce
+      return @_on_asset_upload_complete conversation_et, event
 
   ###
   Send asset upload failed message to specified conversation.
@@ -1441,7 +1441,7 @@ class z.conversation.ConversationRepository
       message_id = record.id
       @send_asset_preview conversation_et, file, message_id
     .then =>
-      @send_asset conversation_et, file, message_id
+      @send_asset_remotedata conversation_et, file, message_id
     .then =>
       upload_duration = (Date.now() - upload_started) / 1000
       @logger.info "Finished to upload asset for conversation'#{conversation_et.id} in #{upload_duration}"
