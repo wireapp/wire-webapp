@@ -66,7 +66,7 @@ z.assets.AssetService = class AssetService {
    *
    * @param {Uint8Array} bytes - Asset binary data
    * @param {Object} options - Asset upload options
-   * @param {Boolean} options.public - Flag whether asset is public
+   * @param {boolean} options.public - Flag whether asset is public
    * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
    * @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
@@ -85,7 +85,7 @@ z.assets.AssetService = class AssetService {
    *
    * @param {Blob|File} file - File asset to be uploaded
    * @param {Object} options - Asset upload options
-   * @param {Boolean} options.public - Flag whether asset is public
+   * @param {boolean} options.public - Flag whether asset is public
    * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
    * @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
@@ -108,7 +108,7 @@ z.assets.AssetService = class AssetService {
    *
    * @param {Blob|File} image - Image asset to be uploaded
    * @param {Object} options - Asset upload options
-   * @param {Boolean} options.public - Flag whether asset is public
+   * @param {boolean} options.public - Flag whether asset is public
    * @param {z.assets.AssetRetentionPolicy} options.retention - Retention duration policy for asset
    * @returns {Promise} Resolves when asset has been uploaded
    */
@@ -133,7 +133,7 @@ z.assets.AssetService = class AssetService {
    * @deprecated
    * @param {string} asset_id - ID of asset
    * @param {string} conversation_id - Conversation ID
-   * @param {Boolean} force_caching - Cache asset in ServiceWorker
+   * @param {boolean} force_caching - Cache asset in ServiceWorker
    * @returns {string} URL of v1 asset
    */
   generate_asset_url(asset_id, conversation_id, force_caching) {
@@ -151,7 +151,7 @@ z.assets.AssetService = class AssetService {
    * @deprecated
    * @param {string} asset_id - ID of asset
    * @param {string} conversation_id - Conversation ID
-   * @param {Boolean} force_caching - Cache asset in ServiceWorker
+   * @param {boolean} force_caching - Cache asset in ServiceWorker
    * @returns {string} URL of v2 asset
    */
   generate_asset_url_v2(asset_id, conversation_id, force_caching) {
@@ -168,7 +168,7 @@ z.assets.AssetService = class AssetService {
    *
    * @param {string} asset_key - ID of asset
    * @param {string} asset_token - Asset token
-   * @param {Boolean} force_caching - Cache asset in ServiceWorker
+   * @param {boolean} force_caching - Cache asset in ServiceWorker
    * @returns {string} URL of v3 asset
    */
   generate_asset_url_v3(asset_key, asset_token, force_caching) {
@@ -188,7 +188,7 @@ z.assets.AssetService = class AssetService {
    *
    * @param {Uint8Array|ArrayBuffer} asset_data - Asset data
    * @param {Object} metadata - Asset metadata
-   * @param {Boolean} metadata.public - Flag whether asset is public
+   * @param {boolean} metadata.public - Flag whether asset is public
    * @param {z.assets.AssetRetentionPolicy} metadata.retention - Retention duration policy for asset
    * @param {Function} xhr_accessor_function - Function will get a reference to the underlying XMLHTTPRequest
    * @returns {Promise} Resolves when asset has been uploaded
