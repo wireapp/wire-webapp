@@ -1128,7 +1128,7 @@ class z.conversation.ConversationRepository
     window.setTimeout =>
       @send_reaction conversation_et, message_et, reaction
       @_track_reaction conversation_et, message_et, reaction, button
-    , 50
+    , 100
 
   ###
   Send reaction to a content message in specified conversation.
