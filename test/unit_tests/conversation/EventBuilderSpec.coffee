@@ -19,8 +19,9 @@
 # grunt test_init && grunt test_run:conversation/EventBuilder
 
 describe 'z.conversation.EventBuilder', ->
-  conversation_et = undefined
   event_mapper = undefined
+  conversation_et = undefined
+  self_user_et = undefined
 
   beforeEach ->
     self_user_et = new z.entity.User z.util.create_random_uuid()
@@ -50,3 +51,11 @@ describe 'z.conversation.EventBuilder', ->
     expect(message_et.from).toBe conversation_et.self.id
     expect(message_et.conversation_id).toBe conversation_et.id
     expect(message_et.user_ids()).toEqual user_ids
+
+  it 'build_missed', ->
+    event = z.conversation.EventBuilder.build_missed conversation_et, self_user_et
+    message_et = event_mapper.map_json_event event, conversation_et
+    expect(message_et).toBeDefined()
+    expect(message_et.super_type).toBe z.message.SuperType.MISSED
+    expect(message_et.from).toBe conversation_et.self.id
+    expect(message_et.conversation_id).toBe conversation_et.id

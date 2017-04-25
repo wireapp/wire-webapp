@@ -70,6 +70,8 @@ class z.conversation.EventMapper
         message_et = @_map_event_member_leave event
       when z.event.Backend.CONVERSATION.MEMBER_UPDATE
         message_et = @_map_event_member_update event
+      when z.event.Client.CONVERSATION.MISSED_MESSAGES
+        message_et = @_map_system_missed_messages event
       when z.event.Backend.CONVERSATION.RENAME
         message_et = @_map_event_rename event
       when z.event.Backend.CONVERSATION.VOICE_CHANNEL_ACTIVATE
@@ -353,9 +355,8 @@ class z.conversation.EventMapper
   @return [z.entity.Text] Text asset entity
   ###
   _map_asset_text: (data) ->
-    asset_et = new z.entity.Text data.id
+    asset_et = new z.entity.Text data.id, data.content or data.message
     asset_et.nonce = data.nonce
-    asset_et.text = data.content or data.message
     asset_et.previews @_map_link_previews data.previews
     return asset_et
 
@@ -383,25 +384,27 @@ class z.conversation.EventMapper
 
   @return [z.entity.LinkPreview]
   ###
-  _map_link_preview: (link_preview = {}) ->
-    switch link_preview.preview
-      when 'article'
-        article = link_preview.article
+  _map_link_preview: (link_preview) ->
+    return if not link_preview?
 
-        link_preview_et = new z.entity.LinkPreview()
-        link_preview_et.title = article.title
-        link_preview_et.summary = article.summary
-        link_preview_et.permanent_url = article.permanent_url
-        link_preview_et.original_url = link_preview.url
-        link_preview_et.url_offset = link_preview.url_offset
+    link_preview_et = new z.entity.LinkPreview()
+    link_preview_et.title = link_preview.title or link_preview.article?.title
+    link_preview_et.summary = link_preview.summary or link_preview.article?.summary
+    link_preview_et.permanent_url = link_preview.permanent_url or link_preview.article?.permanent_url
+    link_preview_et.original_url = link_preview.url
+    link_preview_et.url_offset = link_preview.url_offset
+    link_preview_et.meta_data_type = link_preview.meta_data
+    link_preview_et.meta_data = link_preview[link_preview.meta_data]
 
-        if article.image?.uploaded?
-          {asset_token, asset_id, otr_key, sha256} = article.image.uploaded
-          otr_key = new Uint8Array otr_key.toArrayBuffer()
-          sha256 = new Uint8Array sha256.toArrayBuffer()
-          link_preview_et.image_resource z.assets.AssetRemoteData.v3 asset_id, otr_key, sha256, asset_token, true
+    image = link_preview.image or link_preview.article?.image
 
-        return link_preview_et
+    if image?
+      {asset_token, asset_id, otr_key, sha256} = image.uploaded
+      otr_key = new Uint8Array otr_key.toArrayBuffer()
+      sha256 = new Uint8Array sha256.toArrayBuffer()
+      link_preview_et.image_resource z.assets.AssetRemoteData.v3 asset_id, otr_key, sha256, asset_token, true
+
+    return link_preview_et
 
   ###
   Maps JSON data of medium image asset into asset entity
@@ -476,10 +479,20 @@ class z.conversation.EventMapper
   ###
   _map_system_event_unable_to_decrypt: (event) ->
     message_et = new z.entity.DecryptErrorMessage()
-    # error_code style "3690 (f0c0272e8f053774)"
-    message_et.error_code = event.error_code?.substring(0, 4)
-    message_et.client_id = event.error_code?.substring(5).replace(/[()]/g, '')
+    if event.error_code
+      message_et.error_code = event.error_code.split(' ')[0]
+      message_et.client_id = event.error_code.substring(message_et.error_code.length + 1).replace(/[()]/g, '')
     return message_et
+
+  ###
+  Maps JSON data of local missed message event to message entity
+
+  @private
+
+  @return [z.entity.MissedMessage] Missed message entity
+  ###
+  _map_system_missed_messages: ->
+    return new z.entity.MissedMessage()
 
   ###
   Maps JSON data of delete everywhere event to message entity

@@ -21,9 +21,11 @@ z.calling ?= {}
 z.calling.entities ?= {}
 
 E_FLOW_CONFIG =
-  RTC_DATA_CHANNEL_LABEL: 'calling-3.0'
+  DATA_CHANNEL_LABEL: 'calling-3.0'
+  NEGOTIATION_FAILED_TIMEOUT: 30 * 1000
+  NEGOTIATION_RESTART_TIMEOUT: 2500
+  SDP_SEND_TIMEOUT: 5 * 1000
   SDP_SEND_TIMEOUT_RESET: 1000
-  SDP_SEND_TIMEOUT: 5000
 
 # E-Flow entity.
 class z.calling.entities.EFlow
@@ -50,6 +52,7 @@ class z.calling.entities.EFlow
     @audio = new z.calling.entities.FlowAudio @, @e_call_et.media_repository.get_audio_context()
 
     # Users
+    @remote_client_id = undefined
     @remote_user = @e_participant_et.user
     @remote_user_id = @remote_user.id
     @self_user_id = @e_call_et.self_user.id
@@ -67,9 +70,8 @@ class z.calling.entities.EFlow
     @pc_initialized.subscribe (is_initialized) =>
       @telemetry.set_peer_connection @peer_connection if is_initialized
 
-    @audio_stream = @e_call_et.local_stream_audio
-    @video_stream = @e_call_et.local_stream_video
-    @data_channels = {}
+    @media_stream = @e_call_et.local_media_stream
+    @data_channel = undefined
 
     @connection_state = ko.observable z.calling.rtc.ICEConnectionState.NEW
     @gathering_state = ko.observable z.calling.rtc.ICEGatheringState.NEW
@@ -78,9 +80,11 @@ class z.calling.entities.EFlow
     @connection_state.subscribe (ice_connection_state) =>
       switch ice_connection_state
         when z.calling.rtc.ICEConnectionState.CHECKING
-          @telemetry.schedule_check 5000
+          @telemetry.schedule_check @e_call_et.telemetry.media_type
 
         when z.calling.rtc.ICEConnectionState.COMPLETED, z.calling.rtc.ICEConnectionState.CONNECTED
+          @_clear_negotiation_timeout()
+          @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
           @telemetry.start_statistics()
           @e_call_et.is_connected true
           @e_participant_et.is_connected true
@@ -90,40 +94,31 @@ class z.calling.entities.EFlow
 
         when z.calling.rtc.ICEConnectionState.CLOSED
           @e_participant_et.is_connected false
-          @e_call_et.delete_e_participant @e_participant_et if @e_call_et.self_client_joined()
+          @e_call_et.delete_e_participant @e_participant_et.id if @e_call_et.self_client_joined()
 
         when z.calling.rtc.ICEConnectionState.DISCONNECTED
-          @e_participant_et.is_connected false
-          @e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
-          if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
-            @e_call_et.interrupted_participants.push @participant_et
-            @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false
+          @_set_negotiation_restart_timeout()
 
         when z.calling.rtc.ICEConnectionState.FAILED
           return unless @e_call_et.self_client_joined()
-
-          @e_participant_et.is_connected false
-          @e_call_et.delete_e_participant @e_participant_et.id
-          .then =>
-            return if @e_call_et.participants().length
-            termination_reason = if @e_call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
-            amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, termination_reason
+          @_remove_participant()
 
     @signaling_state.subscribe (signaling_state) =>
       switch signaling_state
         when z.calling.rtc.SignalingState.CLOSED
           @logger.debug "PeerConnection with '#{@remote_user.name()}' was closed"
-          @e_call_et.delete_e_participant @e_participant_et
-          @_remove_media_streams()
+          @e_call_et.delete_e_participant @e_participant_et.id
+          @_remove_media_stream @media_stream()
 
         when z.calling.rtc.SignalingState.REMOTE_OFFER
           @negotiation_needed true
 
         when z.calling.rtc.SignalingState.STABLE
-          @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
+          @_clear_negotiation_timeout()
 
     @negotiation_mode = ko.observable z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
     @negotiation_needed = ko.observable false
+    @negotiation_timeout = undefined
 
 
     ###############################################################################
@@ -222,26 +217,41 @@ class z.calling.entities.EFlow
   ###
   initialize_e_flow: (e_call_message_et) =>
     if e_call_message_et
+      @remote_client_id = e_call_message_et.client_id
       @is_answer true
       return @save_remote_sdp e_call_message_et
     @is_answer false
 
-  start_negotiation: =>
-    @audio.hookup true
-    @_create_peer_connection()
-    @_add_media_streams()
-    @_set_sdp_states()
-    @negotiation_needed true
-    @pc_initialized true
-
-  restart_negotiation: (negotiation_mode, is_answer) =>
+  restart_negotiation: (negotiation_mode, is_answer, media_stream) =>
     @logger.debug "Negotiation restart triggered by '#{negotiation_mode}'"
-    @negotiation_mode negotiation_mode
+    @_close_peer_connection()
+    @_close_data_channel()
+    @_clear_negotiation_timeout()
+    @_clear_send_sdp_timeout()
+    @_reset_signaling_states()
     @is_answer is_answer
     @local_sdp undefined
     @remote_sdp undefined
+    @start_negotiation negotiation_mode, media_stream
+
+  start_negotiation: (negotiation_mode = z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT, media_stream = @media_stream()) =>
+    @audio.hookup true
+    @_create_peer_connection()
+    @_add_media_stream media_stream
     @_set_sdp_states()
+    @negotiation_mode negotiation_mode
     @negotiation_needed true
+    @pc_initialized true
+    @_set_negotiation_failed_timeout()
+
+  _remove_participant: (termination_reason) =>
+    @e_participant_et.is_connected false
+    @e_call_et.delete_e_participant @e_participant_et.id
+    .then =>
+      return if @e_call_et.participants().length
+      unless termination_reason
+        termination_reason = if @e_call_et.is_connected() then z.calling.enum.TERMINATION_REASON.CONNECTION_DROP else z.calling.enum.TERMINATION_REASON.CONNECTION_FAILED
+      amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, termination_reason
 
   _set_sdp_states: ->
     @should_set_remote_sdp true
@@ -258,11 +268,12 @@ class z.calling.entities.EFlow
   @private
   ###
   _close_peer_connection: ->
-    if @peer_connection?
+    if @peer_connection
       @peer_connection.oniceconnectionstatechange = => @logger.log @logger.levels.OFF, 'State change ignored - ICE connection'
       @peer_connection.onsignalingstatechange = => @logger.log @logger.levels.OFF, "State change ignored - signaling state: #{@peer_connection.signalingState}"
-      @peer_connection.close()
-      @logger.debug "Closing PeerConnection '#{@remote_user.name()}' successful"
+      if @peer_connection.signalingState isnt z.calling.rtc.SignalingState.CLOSED
+        @peer_connection.close()
+        @logger.debug "Closing PeerConnection '#{@remote_user.name()}' successful"
 
   ###
   Create the PeerConnection configuration.
@@ -285,7 +296,7 @@ class z.calling.entities.EFlow
     @peer_connection = new window.RTCPeerConnection @_create_peer_connection_configuration()
     @telemetry.time_step z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED
     @signaling_state @peer_connection.signalingState
-    @logger.debug "PeerConnection with '#{@remote_user.name()}' created - is_answer' #{@is_answer()}", @e_call_et.config().ice_servers
+    @logger.debug "PeerConnection with '#{@remote_user.name()}' created - is_answer '#{@is_answer()}'", @e_call_et.config().ice_servers
 
     @peer_connection.onaddstream = @_on_add_stream
     @peer_connection.ontrack = @_on_track
@@ -355,16 +366,30 @@ class z.calling.entities.EFlow
   # Data channel handling
   ###############################################################################
 
-  send_message: (outbound_message) =>
-    @data_channels[E_FLOW_CONFIG.RTC_DATA_CHANNEL_LABEL].send outbound_message
+  send_message: (e_call_message_et) =>
+    if @data_channel and @e_call_et.data_channel_opened
+      @logger.debug "Sending e-call '#{e_call_message_et.type}' message to conversation '#{@e_call_et.conversation_et.id}' via data channel", e_call_message_et.to_JSON()
+      try
+        return @data_channel.send e_call_message_et.to_content_string()
+      catch error
+        @logger.warn "Failed to send calling message via data channel: #{error.name}", error
+        throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.NO_DATA_CHANNEL
+    else
+      throw new z.calling.v3.CallError z.calling.v3.CallError::TYPE.NO_DATA_CHANNEL
 
-  _initialize_data_channel: (data_channel_label) ->
-    if @peer_connection.createDataChannel
-      return if @data_channels[data_channel_label]
-      @_setup_data_channel @peer_connection.createDataChannel data_channel_label, {ordered: true}
+  _close_data_channel: ->
+    if @data_channel
+      if not @data_channel.readyState is z.calling.rtc.DataChannelState.OPEN
+        @data_channel.close()
+      delete @data_channel
+      @e_call_et.data_channel_opened = false
+
+  _initialize_data_channel: ->
+    if @peer_connection.createDataChannel and not @data_channel
+      @_setup_data_channel @peer_connection.createDataChannel E_FLOW_CONFIG.DATA_CHANNEL_LABEL, {ordered: true}
 
   _setup_data_channel: (data_channel) ->
-    @data_channels[data_channel.label] = data_channel
+    @data_channel = data_channel
     data_channel.onclose = @_on_close
     data_channel.onerror = @_on_error
     data_channel.onmessage = @_on_message
@@ -376,8 +401,9 @@ class z.calling.entities.EFlow
   _on_close: (event) =>
     data_channel = event.target
     @logger.debug "Data channel '#{data_channel.label}' was closed", data_channel
-    delete @data_channels[data_channel.label]
-    @e_call_et.data_channel_opened = false
+    if @data_channel?.readyState is z.calling.rtc.DataChannelState.CLOSED
+      delete @data_channel
+      @e_call_et.data_channel_opened = false
 
   _on_error: (error) -> throw error
 
@@ -388,12 +414,7 @@ class z.calling.entities.EFlow
       @logger.info "Received confirmation for e-call '#{e_call_message.type}' message via data channel", e_call_message
     else
       @logger.info "Received e-call '#{e_call_message.type}' message via data channel", e_call_message
-
-    amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND,
-      conversation: @conversation_id
-      from: @id
-      content: e_call_message
-      type: z.event.Client.CALL.E_CALL
+    amplify.publish z.event.WebApp.CALL.EVENT_FROM_BACKEND, z.conversation.EventBuilder.build_calling @e_call_et.conversation_et, e_call_message, @remote_user_id, @remote_client_id
 
   _on_open: (event) =>
     data_channel = event.target
@@ -416,8 +437,9 @@ class z.calling.entities.EFlow
     .then ([remote_sdp, ice_candidates]) =>
       if remote_sdp.type is z.calling.rtc.SDPType.OFFER
         if @signaling_state() is z.calling.rtc.SignalingState.LOCAL_OFFER
-          return @_solve_colliding_states()
-        else if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
+          return if @_solve_colliding_states()
+
+        if e_call_message_et.type is z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
           @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, true
 
       @remote_sdp remote_sdp
@@ -433,18 +455,19 @@ class z.calling.entities.EFlow
     .then ([local_sdp, ice_candidates]) =>
       @local_sdp local_sdp
 
-      if sending_on_timeout and not @_contains_relay_candidate ice_candidates
-        @logger.warn "Local SDP does not contain any relay ICE candidates, resetting timeout\n#{ice_candidates}", ice_candidates
-        return @_set_send_sdp_timeout false
+      if sending_on_timeout and @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
+        unless @_contains_relay_candidate ice_candidates
+          @logger.warn "Local SDP does not contain any relay ICE candidates, resetting timeout\n#{ice_candidates}", ice_candidates
+          return @_set_send_sdp_timeout false
 
       @logger.info "Sending local '#{@local_sdp().type}' SDP containing '#{ice_candidates.length}' ICE candidates for flow with '#{@remote_user.name()}'\n#{@local_sdp().sdp}"
       @should_send_local_sdp false
 
       if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
-        e_call_message_et_type = z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_setup @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @_create_additional_payload()
       else
-        e_call_message_et_type = z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE
-      e_call_message_et = new z.calling.entities.ECallMessage e_call_message_et_type, @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @v3_call_center.create_setup_payload @local_sdp().sdp
+        e_call_message_et = z.calling.mapper.ECallMessageMapper.build_update @local_sdp().type is z.calling.rtc.SDPType.ANSWER, @e_call_et.session_id, @_create_additional_payload()
+
       return @e_call_et.send_e_call_event e_call_message_et
       .then =>
         @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND
@@ -452,6 +475,15 @@ class z.calling.entities.EFlow
       .catch (error) =>
         @should_send_local_sdp true
         throw error
+
+  ###
+  Clear the negotiation timeout.
+  @private
+  ###
+  _clear_negotiation_timeout: ->
+    if @negotiation_timeout
+      window.clearTimeout @negotiation_timeout
+      @negotiation_timeout = undefined
 
   ###
   Clear the SDP send timeout.
@@ -487,7 +519,7 @@ class z.calling.entities.EFlow
     .catch (error) =>
       @logger.error "Creating '#{z.calling.rtc.SDPType.ANSWER}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'create_sdp', type: z.calling.rtc.SDPType.ANSWER}
-      @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
+      @e_call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
       amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED
 
   ###
@@ -499,7 +531,7 @@ class z.calling.entities.EFlow
   ###
   _create_offer: (restart) ->
     @negotiation_needed false
-    @_initialize_data_channel E_FLOW_CONFIG.RTC_DATA_CHANNEL_LABEL
+    @_initialize_data_channel()
 
     offer_options =
       iceRestart: restart
@@ -517,9 +549,12 @@ class z.calling.entities.EFlow
     .catch (error) =>
       @logger.error "Creating '#{z.calling.rtc.SDPType.OFFER}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'create_sdp', type: z.calling.rtc.SDPType.OFFER}
-      @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
+      @e_call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
       amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED
 
+  _create_additional_payload: ->
+    payload = @v3_call_center._create_additional_payload @e_call_et.id, @remote_user_id, @remote_client_id
+    return @v3_call_center._create_payload_prop_sync @e_call_et.self_state.video_send(), false, $.extend({remote_user: @remote_user, sdp: @local_sdp().sdp}, payload)
 
   ###
   Sets the local Session Description Protocol on the PeerConnection.
@@ -532,13 +567,11 @@ class z.calling.entities.EFlow
       @logger.debug "Setting local '#{@local_sdp().type}' SDP successful", @peer_connection.localDescription
       @telemetry.time_step z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET
       @should_set_local_sdp false
-      if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE
-        return @send_local_sdp()
       @_set_send_sdp_timeout()
     .catch (error) =>
       @logger.error "Setting local '#{@local_sdp().type}' SDP failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'set_sdp', location: 'local', type: @local_sdp()?.type}
-      @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
+      @e_call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
       amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED
 
   ###
@@ -555,8 +588,31 @@ class z.calling.entities.EFlow
     .catch (error) =>
       @logger.error "Setting remote '#{@remote_sdp().type}' SDP failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'set_sdp', location: 'remote', type: @remote_sdp()?.type}
-      @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
+      @e_call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
       amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED
+
+  ###
+  Set the negotiation failed timeout.
+  @private
+  ###
+  _set_negotiation_failed_timeout: ->
+    @negotiation_timeout = window.setTimeout =>
+      @logger.debug 'Removing call participant on negotiation timeout'
+      @_remove_participant z.calling.enum.TERMINATION_REASON.RENEGOTIATION
+    , E_FLOW_CONFIG.NEGOTIATION_FAILED_TIMEOUT
+
+  ###
+  Set the negotiation restart timeout.
+  @private
+  ###
+  _set_negotiation_restart_timeout: ->
+    @negotiation_timeout = window.setTimeout =>
+      @e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP
+      @e_participant_et.is_connected false
+      @e_call_et.interrupted_participants.push @participant_et
+      if @negotiation_mode() is z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
+        @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false
+    , E_FLOW_CONFIG.NEGOTIATION_RESTART_TIMEOUT
 
   ###
   Set the SDP send timeout.
@@ -583,13 +639,10 @@ class z.calling.entities.EFlow
   _solve_colliding_states: ->
     if @self_user_id < @remote_user_id
       @logger.warn "We need to switch SDP state of flow with '#{@remote_user.name()}' to answer."
-      @_close_peer_connection()
-      @_clear_send_sdp_timeout()
-      @_reset_signaling_states()
-      @is_answer true
-      @local_sdp undefined
-      return @start_negotiation()
+      @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, true
+      return false
     @logger.warn "Remote side needs to switch SDP state of flow with '#{@remote_user.name()}' to answer."
+    return true
 
 
   ###############################################################################
@@ -633,23 +686,6 @@ class z.calling.entities.EFlow
         {stream: media_stream, audio_tracks: media_stream.getAudioTracks(), video_tracks: media_stream.getVideoTracks()}
 
   ###
-  Adds the local MediaStreams to the PeerConnection.
-  @private
-  ###
-  _add_media_streams: ->
-    media_streams_identical = @_compare_local_media_streams()
-
-    @_add_media_stream @audio_stream() if @audio_stream()
-    @_add_media_stream @video_stream() if @video_stream() and not media_streams_identical
-
-  ###
-  Compare whether local audio and video streams are identical.
-  @private
-  ###
-  _compare_local_media_streams: ->
-    return @audio_stream() and @video_stream() and @audio_stream().id is @video_stream().id
-
-  ###
   Replace the MediaStream attached to the PeerConnection.
   @private
   @param media_stream_info [z.media.MediaStreamInfo] Object containing the required MediaStream information
@@ -657,26 +693,16 @@ class z.calling.entities.EFlow
   _replace_media_stream: (media_stream_info) ->
     Promise.resolve()
     .then =>
-      return @_remove_media_streams media_stream_info.type
+      return @_remove_media_stream @media_stream()
     .then =>
-      @_upgrade_media_stream media_stream_info.stream, media_stream_info.type
-    .then (media_stream) =>
-      @_add_media_stream media_stream
-      @logger.info "Replaced the MediaStream to update '#{media_stream_info.type}' successfully", media_stream
-      @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false
-      return media_stream_info
+      @_upgrade_media_stream media_stream_info
+    .then (upgraded_media_stream_info) =>
+      @logger.info "Upgraded the MediaStream to update '#{media_stream_info.type}' successfully", upgraded_media_stream_info.stream
+      @restart_negotiation z.calling.enum.SDP_NEGOTIATION_MODE.STREAM_CHANGE, false, upgraded_media_stream_info.stream
+      return upgraded_media_stream_info
     .catch (error) =>
       @logger.error "Failed to replace local MediaStream: #{error.message}", error
       throw error
-
-  _upgrade_media_stream: (new_media_stream, media_type) ->
-    active_media_stream = if media_type is z.media.MediaType.AUDIO then @audio_stream() else @video_stream()
-
-    if active_media_stream
-      active_media_stream.removeTrack media_stream_track for media_stream_track in z.media.MediaStreamHandler.get_media_tracks active_media_stream, media_type
-      active_media_stream.addTrack media_stream_track for media_stream_track in z.media.MediaStreamHandler.get_media_tracks new_media_stream, media_type
-      return active_media_stream
-    return new_media_stream
 
   ###
   Replace the a MediaStreamTrack attached to the MediaStream of the PeerConnection.
@@ -723,21 +749,25 @@ class z.calling.entities.EFlow
         {stream: media_stream, audio_tracks: media_stream.getAudioTracks(), video_tracks: media_stream.getVideoTracks()}
 
   ###
-  Reset the flows MediaStream and media elements.
-  @private
-  @param media_type [z.media.MediaType] Optional media type of MediaStreams to be removed
-  ###
-  _remove_media_streams: (media_type = z.media.MediaType.AUDIO_VIDEO) ->
-    switch media_type
-      when z.media.MediaType.AUDIO_VIDEO
-        media_streams_identical = @_compare_local_media_streams()
+  Upgrade the local MediaStream with new MediaStreamTracks
 
-        @_remove_media_stream @audio_stream() if @audio_stream()
-        @_remove_media_stream @video_stream() if @video_stream() and not media_streams_identical
-      when z.media.MediaType.AUDIO
-        @_remove_media_stream @audio_stream() if @audio_stream()
-      when z.media.MediaType.VIDEO
-        @_remove_media_stream @video_stream() if @video_stream()
+  @private
+  @param media_stream_info [z.media.MediaStreamInfo] MediaStreamInfo containing new MediaStreamTracks
+  @return [z.media.MediaStreamInfo] New MediaStream to be used
+  ###
+  _upgrade_media_stream: (media_stream_info) ->
+    if @media_stream()
+      {stream: new_media_stream, type: media_type} = media_stream_info
+      for media_stream_track in z.media.MediaStreamHandler.get_media_tracks @media_stream(), media_type
+        @media_stream().removeTrack media_stream_track
+        media_stream_track.stop()
+        @logger.info "Stopping MediaStreamTrack of kind '#{media_stream_track.kind}' successful", media_stream_track
+
+      media_stream = @media_stream().clone()
+
+      media_stream.addTrack media_stream_track for media_stream_track in z.media.MediaStreamHandler.get_media_tracks new_media_stream, media_type
+      return new z.media.MediaStreamInfo z.media.MediaStreamSource.LOCAL, 'self', media_stream
+    return media_stream_info
 
 
   ###############################################################################
@@ -752,8 +782,9 @@ class z.calling.entities.EFlow
     @_clear_send_sdp_timeout()
     @telemetry.reset_statistics()
     @logger.info "Resetting flow with user '#{@remote_user.id}'"
-    @_remove_media_streams()
-    @_close_peer_connection() if @peer_connection?.signalingState isnt z.calling.rtc.SignalingState.CLOSED
+    @_remove_media_stream @media_stream() if @media_stream()
+    @_close_data_channel()
+    @_close_peer_connection()
     @_reset_signaling_states()
     @pc_initialized false
 

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,20 +43,18 @@
     }
 
     check_announcements() {
-      return this.announce_service.get_announcements().then(this.process_announce_list).catch((error) => {
-        this.logger.error(`Failed to fetch announcements: ${error}`);
+      return this.announce_service.get_announcements().then(() => {
+        this.process_announce_list();
       });
     }
 
     check_version() {
       return this.announce_service.get_version().then((server_version) => {
-        this.logger.info(`Found new version ${server_version}`);
+        this.logger.info(`Checking current webapp version. Server '${server_version}' vs. local '${z.util.Environment.version(false, true)}'`);
 
         if (server_version > z.util.Environment.version(false, true)) {
           amplify.publish(z.event.WebApp.LIFECYCLE.UPDATE, z.announce.UPDATE_SOURCE.WEBAPP);
         }
-      }).catch((error) => {
-        this.logger.error(`Failed to fetch version: ${error}`);
       });
     }
 
@@ -72,13 +70,12 @@
 
     process_announce_list(announcements_list) {
       if (announcements_list) {
-        for (let announcement in announcements_list) {
+        for (const announcement of announcements_list) {
           if (!z.util.Environment.frontend.is_localhost()) {
-            if (announcement.version_max && z.util.Environment.version(false) > announcement.version_max) {
+            if (announcement.version_max && (z.util.Environment.version(false) > announcement.version_max)) {
               continue;
             }
-
-            if (announcement.version_min && z.util.Environment.version(false) < announcement.version_min) {
+            if (announcement.version_min && (z.util.Environment.version(false) < announcement.version_min)) {
               continue;
             }
           }
@@ -102,8 +99,8 @@
             const notification = new window.Notification(announcement.title, {
               body: announcement.message,
               icon: z.util.Environment.electron && z.util.Environment.os.mac ? '' : '/image/logo/notification.png',
-              sticky: true,
               requireInteraction: true,
+              sticky: true,
             });
 
             amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ANNOUNCE.SENT, {campaign: announcement.campaign});

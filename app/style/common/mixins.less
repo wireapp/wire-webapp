@@ -123,7 +123,7 @@
 }
 
 .arrow-down:before {
-  .icon-mixin("\e111");
+  .icon-mixin('\e111');
   display: inline-block;
   transform: rotate(90deg);
 }
@@ -137,14 +137,6 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-}
-
-.absolute-center(@size) {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  margin-left: -@size / 2;
-  margin-top: -@size / 2;
 }
 
 .flex-center {
@@ -173,7 +165,7 @@
 
 .clear {
   &:after {
-    content: "";
+    content: '';
     display: table;
     clear: both;
   }
@@ -293,7 +285,7 @@
   .accent-color-selection-mixin(@accent_id - 1);
   // output
   .main-accent-color-@{accent_id} & {
-    @accent-color: "accent_colors-@{accent_id}";
+    @accent-color: 'accent_colors-@{accent_id}';
     &::-moz-selection { background-color: fade(@@accent-color, 24%) }
     &::selection { background-color: fade( @@accent-color, 24%) }
   }
@@ -321,7 +313,7 @@
 
 .icon-mixin (@code, @icon-size: 16px){
   content: @code;
-  font-family: 'Wire';
+  font-family: Wire;
   speak: none;
   font-size: @icon-size;
   font-style: normal;

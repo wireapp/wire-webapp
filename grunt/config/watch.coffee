@@ -29,12 +29,12 @@ module.exports =
   coffee:
     options:
       spawn: false
-    files: ['<%= dir.app_ %>/**/*.coffee', 'sw.coffee']
+    files: ['<%= dir.app_ %>/**/*.coffee', 'sw.js']
     tasks: ['coffee:dist']
 
   js:
     files: '<%= dir.app_ %>/**/*.js'
-    tasks: ['copy:dist_js']
+    tasks: ['newer:copy:dist_js']
 
   templates:
     files: '<%= dir.app_ %>/**/*.htm*'

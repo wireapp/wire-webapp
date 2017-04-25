@@ -161,16 +161,16 @@ class z.ViewModel.MessageListViewModel
     if conversation_et.is_loaded() # TODO rethink conversation.is_loaded
       return @_render_conversation conversation_et, callback
 
-    @conversation_repository.update_participating_user_ets conversation_et, (conversation_et) =>
-      Promise.resolve().then =>
-        if @marked_message()
-          return @conversation_repository.get_messages_with_offset conversation_et, @marked_message()
-        return @conversation_repository.get_preceding_messages conversation_et
-      .then =>
-        if @conversation().get_last_message()?.timestamp() is @conversation().last_event_timestamp()
-          @conversation_reached_bottom = true
-        conversation_et.is_loaded true
-        @_render_conversation conversation_et, callback
+    @conversation_repository.update_participating_user_ets conversation_et
+    .then (conversation_et) =>
+      if @marked_message()
+        return @conversation_repository.get_messages_with_offset conversation_et, @marked_message()
+      return @conversation_repository.get_preceding_messages conversation_et
+    .then =>
+      if @conversation().get_last_message()?.timestamp() is @conversation().last_event_timestamp()
+        @conversation_reached_bottom = true
+      conversation_et.is_loaded true
+      @_render_conversation conversation_et, callback
 
   ###
   Sets the conversation and waits for further processing until knockout has rendered the messages.

@@ -30,14 +30,13 @@ class z.ViewModel.content.PreferencesAVViewModel
     @current_device_id = @media_devices_handler.current_device_id
 
     @media_stream_handler = @media_repository.stream_handler
-    @audio_stream = @media_stream_handler.local_media_streams.audio
-    @video_stream = @media_stream_handler.local_media_streams.video
+    @media_stream = @media_stream_handler.local_media_stream
 
     @is_visible = false
 
-    @audio_stream.subscribe (audio_stream) =>
+    @media_stream.subscribe (media_stream) =>
       @_release_audio_meter() if @audio_interval
-      @_initiate_audio_meter audio_stream if @is_visible and audio_stream
+      @_initiate_audio_meter media_stream if @is_visible and media_stream
 
     @audio_context = undefined
     @audio_level = ko.observable 0
@@ -49,33 +48,33 @@ class z.ViewModel.content.PreferencesAVViewModel
   initiate_devices: =>
     @is_visible = true
     @_get_media_stream()
-    .then (audio_stream) =>
-      @_initiate_audio_meter audio_stream if audio_stream and not @audio_interval
+    .then (media_stream) =>
+      @_initiate_audio_meter media_stream if media_stream and not @audio_interval
 
   # Release devices.
   release_devices: =>
     @is_visible = false
     @_release_audio_meter()
-    @_release_media_streams()
+    @_release_media_stream()
 
   ###
   Get current MediaStream or initiate it.
   @private
   ###
   _get_media_stream: =>
-    return Promise.resolve @audio_stream() if @audio_stream() and @video_stream()
+    return Promise.resolve @media_stream() if @media_stream() and @media_stream_handler.local_media_type() is z.media.MediaType.VIDEO
 
     @media_stream_handler.get_media_stream_constraints @available_devices.audio_input().length, @available_devices.video_input().length
-    .then ([media_type, media_stream_constraints]) =>
+    .then ({media_stream_constraints, media_type}) =>
       return @media_stream_handler.request_media_stream media_type, media_stream_constraints
     .then (media_stream_info) =>
       @media_stream_handler.local_media_type z.media.MediaType.VIDEO if @available_devices.video_input().length
-      @media_stream_handler.set_local_media_stream media_stream_info
-      return @audio_stream()
+      @media_stream_handler.local_media_stream media_stream_info.stream
+      return @media_stream_handler.local_media_stream()
     .catch (error) =>
       error = error[0] if _.isArray error
       @logger.error "Requesting MediaStream failed: #{error.message}", error
-      if error.type in [z.media.MediaError::TYPE.MEDIA_STREAM_DEVICE, z.media.MediaError::TYPE.MEDIA_STREAM_PERMISSION]
+      if error.type in [z.media.MediaError.TYPE.MEDIA_STREAM_DEVICE, z.media.MediaError.TYPE.MEDIA_STREAM_PERMISSION]
         @permission_denied true
         return false
       throw error
@@ -83,10 +82,10 @@ class z.ViewModel.content.PreferencesAVViewModel
   ###
   Initiate audio meter.
   @private
-  @param audio_stream []
+  @param media_stream [MediaStream] MediaStream to measure audio levels on
   ###
-  _initiate_audio_meter: (audio_stream) =>
-    @logger.info 'Initiating new audio meter', audio_stream
+  _initiate_audio_meter: (media_stream) =>
+    @logger.info 'Initiating new audio meter', media_stream
     @audio_context = @media_repository.get_audio_context()
 
     @audio_analyser = @audio_context.createAnalyser()
@@ -106,7 +105,7 @@ class z.ViewModel.content.PreferencesAVViewModel
       @audio_level average_volume - 0.075
     , 100
 
-    @audio_source = @audio_context.createMediaStreamSource audio_stream
+    @audio_source = @audio_context.createMediaStreamSource media_stream
     @audio_source.connect @audio_analyser
 
   _release_audio_meter: =>
@@ -114,6 +113,6 @@ class z.ViewModel.content.PreferencesAVViewModel
     @audio_interval = undefined
     @audio_source.disconnect() if @audio_source
 
-  _release_media_streams: =>
-    @media_stream_handler.reset_media_streams()
+  _release_media_stream: =>
+    @media_stream_handler.reset_media_stream()
     @permission_denied false

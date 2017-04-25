@@ -108,8 +108,8 @@ class z.main.App
 
     repository.bot                 = new z.bot.BotRepository @service.bot, repository.conversation
     repository.calling             = new z.calling.CallingRepository @service.call, @service.calling, repository.conversation, repository.media, repository.user
-    repository.event_tracker       = new z.tracking.EventTrackingRepository repository.user, repository.conversation
-    repository.system_notification = new z.SystemNotification.SystemNotificationRepository repository.calling, repository.conversation
+    repository.event_tracker       = new z.tracking.EventTrackingRepository repository.conversation, repository.user
+    repository.system_notification = new z.system_notification.SystemNotificationRepository repository.calling, repository.conversation
 
     return repository
 
@@ -150,67 +150,73 @@ class z.main.App
 
   ###
   Initialize the app.
-  @note any failure will result in a logout
+  @note Locally known clients and sessions must not be touched until after the notification stream has been handled.
+    Any failure in the Promise chain will result in a logout.
   @todo Check if we really need to logout the user in all these error cases or how to recover from them
   ###
   init_app: (is_reload = @_is_reload()) =>
     @_load_access_token is_reload
     .then =>
-      @view.loading.switch_message z.string.init_received_access_token, true
+      @view.loading.update_progress 2.5, z.string.init_received_access_token
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_ACCESS_TOKEN
-      return z.util.protobuf.load_protos "ext/proto/generic-message-proto/messages.proto?#{z.util.Environment.version false}"
-    .then =>
-      @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_PROTO_MESSAGES
-      return @_get_user_self()
-    .then (self_user_et) =>
-      @view.loading.switch_message z.string.init_received_self_user, true
+      return Promise.all [
+        @_get_user_self()
+        z.util.protobuf.load_protos "ext/proto/generic-message-proto/messages.proto?#{z.util.Environment.version false}"
+      ]
+    .then ([self_user_et]) =>
+      @view.loading.update_progress 5, z.string.init_received_self_user
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_SELF_USER
       @repository.client.init self_user_et
       @repository.properties.init self_user_et
       return @repository.cryptography.init @service.storage.db
     .then =>
-      @view.loading.switch_message z.string.init_initialized_cryptography, true
+      @view.loading.update_progress 7.5
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY
       return @repository.client.get_valid_local_client()
     .then (client_observable) =>
-      @view.loading.switch_message z.string.init_validated_client, true
+      @view.loading.update_progress 10, z.string.init_validated_client
+
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.VALIDATED_CLIENT
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CLIENT_TYPE, client_observable().type
+
       @repository.cryptography.current_client = client_observable
       @repository.event.current_client = client_observable
       @repository.event.connect_web_socket()
-      promises = [
-        @repository.client.get_clients_for_self()
+
+      return Promise.all [
         @repository.conversation.get_conversations()
         @repository.user.get_connections()
       ]
-      return Promise.all promises
     .then (response_array) =>
-      [client_ets, conversation_ets, connection_ets] = response_array
-      @view.loading.switch_message z.string.init_received_user_data, true
+      [conversation_ets, connection_ets] = response_array
+      @view.loading.update_progress 25, z.string.init_received_user_data
 
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.RECEIVED_USER_DATA
-      @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONVERSATIONS, conversation_ets.length, 50
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CONNECTIONS, connection_ets.length, 50
 
-      @repository.user.self().devices client_ets
-      @repository.conversation.map_connections @repository.user.connections()
+      @repository.conversation.initialize_connections @repository.user.connections()
       @_subscribe_to_beforeunload()
       return @repository.event.initialize_from_notification_stream()
     .then (notifications_count) =>
-      @view.loading.switch_message z.string.init_updated_from_notifications, true
+      @view.loading.update_progress 95, z.string.init_updated_from_notifications
+
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS
       @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.NOTIFICATIONS, notifications_count, 100
-      return @_watch_online_status()
-    .then =>
-      @view.loading.switch_message z.string.init_app_pre_loaded, true
+
+      @_watch_online_status()
+      return @repository.client.get_clients_for_self()
+    .then (client_ets) =>
+      @view.loading.update_progress 97.5
+
+      @telemetry.add_statistic z.telemetry.app_init.AppInitStatisticsValue.CLIENTS, client_ets.length
       @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.APP_PRE_LOADED
+
+      @repository.user.self().devices client_ets
       @logger.info 'App pre-loading completed'
       @_handle_url_params()
     .then =>
       @_show_ui()
-      @telemetry.time_step z.telemetry.app_init.AppInitTimingsStep.SHOWING_UI
       @telemetry.report()
       amplify.publish z.event.WebApp.LIFECYCLE.LOADED
       amplify.publish z.event.WebApp.LOADED # todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
@@ -230,8 +236,8 @@ class z.main.App
       @logger.info error_message, {error: error}
       @logger.debug "App reload: '#{is_reload}', Document referrer: '#{document.referrer}', Location: '#{window.location.href}'"
 
-      if is_reload and error.type not in [z.client.ClientError::TYPE.MISSING_ON_BACKEND, z.client.ClientError::TYPE.NO_LOCAL_CLIENT]
-        @auth.client.execute_on_connectivity().then -> window.location.reload false
+      if is_reload and error.type not in [z.client.ClientError.TYPE.MISSING_ON_BACKEND, z.client.ClientError.TYPE.NO_LOCAL_CLIENT]
+        @auth.client.execute_on_connectivity(z.service.Client::CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD).then -> window.location.reload false
       else if navigator.onLine
         @logger.error "Caused by: #{error?.message or error}"
         Raygun.send error if error instanceof z.storage.StorageError
@@ -282,10 +288,8 @@ class z.main.App
       @logger.info "Found bot token '#{bot_name}'"
       @repository.bot.add_bot bot_name
 
-    assets_v3 = z.util.get_url_parameter z.auth.URLParameter.ASSETS_V3
-    if _.isBoolean assets_v3
-      @repository.conversation.use_v3_api = assets_v3
-      @repository.user.use_v3_api = assets_v3
+    # TODO: remove in the next release
+    @repository.conversation.use_v3_api = true
 
     calling_v3 = z.util.get_url_parameter z.auth.URLParameter.CALLING_V3
     if _.isBoolean calling_v3
@@ -314,16 +318,16 @@ class z.main.App
 
       token_promise.catch (error) =>
         if is_reload
-          if error.type in [z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN, z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE]
+          if error.type in [z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN, z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE]
             @logger.error "Session expired on page reload: #{error.message}", error
             Raygun.send new Error ('Session expired on page reload'), error
             @_redirect_to_login true
           else
             @logger.warn 'Connectivity issues. Trigger reload on regained connectivity.', error
-            @auth.client.execute_on_connectivity().then -> window.location.reload false
+            @auth.client.execute_on_connectivity(z.service.Client::CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL).then -> window.location.reload false
         else if navigator.onLine
           switch error.type
-            when z.auth.AccessTokenError::TYPE.NOT_FOUND_IN_CACHE, z.auth.AccessTokenError::TYPE.RETRIES_EXCEEDED, z.auth.AccessTokenError::TYPE.REQUEST_FORBIDDEN
+            when z.auth.AccessTokenError.TYPE.NOT_FOUND_IN_CACHE, z.auth.AccessTokenError.TYPE.RETRIES_EXCEEDED, z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN
               @logger.warn "Redirecting to login: #{error.message}", error
               @_redirect_to_login false
             else
@@ -337,7 +341,7 @@ class z.main.App
   _subscribe_to_beforeunload: ->
     $(window).on 'beforeunload', =>
       @logger.info "'window.onbeforeunload' was triggered, so we will disconnect from the backend."
-      @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.PAGE_NAVIGATION
+      @repository.event.disconnect_web_socket z.event.WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION
       @repository.calling.leave_call_on_beforeunload()
       @repository.storage.terminate 'window.onbeforeunload'
       return undefined
@@ -370,16 +374,16 @@ class z.main.App
   # Behavior when internet connection is re-established.
   on_internet_connection_gained: =>
     @logger.info 'Internet connection regained. Re-establishing WebSocket connection...'
-    @auth.client.execute_on_connectivity()
+    @auth.client.execute_on_connectivity z.service.Client::CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED
     .then =>
       amplify.publish z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.NO_INTERNET
       amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT
-      @repository.event.reconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.ONLINE
+      @repository.event.reconnect_web_socket z.event.WebSocketService.CHANGE_TRIGGER.ONLINE
 
   # Reflect internet connection loss in the UI.
   on_internet_connection_lost: =>
     @logger.warn 'Internet connection lost'
-    @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.OFFLINE
+    @repository.event.disconnect_web_socket z.event.WebSocketService.CHANGE_TRIGGER.OFFLINE
     amplify.publish z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.NO_INTERNET
 
 
@@ -396,7 +400,7 @@ class z.main.App
   logout: (cause, clear_data = false, session_expired = false) =>
     _logout = =>
       # Disconnect from our backend, end tracking and clear cached data
-      @repository.event.disconnect_web_socket z.event.WebSocketService::CHANGE_TRIGGER.LOGOUT
+      @repository.event.disconnect_web_socket z.event.WebSocketService.CHANGE_TRIGGER.LOGOUT
       amplify.publish z.event.WebApp.ANALYTICS.CLOSE_SESSION
 
       # Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
@@ -455,7 +459,7 @@ class z.main.App
   # Redirect to the login page after internet connectivity has been verified.
   _redirect_to_login: (session_expired) ->
     @logger.info "Redirecting to login after connectivity verification. Session expired: #{session_expired}"
-    @auth.client.execute_on_connectivity()
+    @auth.client.execute_on_connectivity(z.service.Client::CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
     .then ->
       url = "/auth/#{location.search}"
       url = z.util.append_url_parameter url, z.auth.URLParameter.EXPIRED if session_expired
@@ -469,12 +473,12 @@ class z.main.App
   # Disable debugging on any environment.
   disable_debugging: ->
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = -> 0
-    @repository.properties.save_preference_enable_debugging false
+    @repository.properties.save_preference z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, false
 
   # Enable debugging on any environment.
   enable_debugging: ->
     z.config.LOGGER.OPTIONS.domains['app.wire.com'] = -> 300
-    @repository.properties.save_preference_enable_debugging true
+    @repository.properties.save_preference z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING, true
 
   # Report call telemetry to Raygun for analysis.
   report_call: =>

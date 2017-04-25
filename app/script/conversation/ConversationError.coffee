@@ -28,12 +28,18 @@ class z.conversation.ConversationError
     @message = switch @type
       when z.conversation.ConversationError::TYPE.CONVERSATION_NOT_FOUND
         'Conversation not found'
-      when z.conversation.ConversationError::DEGRADED_CONVERSATION_CANCELLATION
+      when z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION
         'Sending to degraded conversation was canceled by user'
       when z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
         'Message not found'
       when z.conversation.ConversationError::TYPE.NO_CHANGES
         'Missing changes to message'
+      when z.conversation.ConversationError::TYPE.NO_CONVERSATION_ID
+        'Conversation ID is not defined'
+      when z.conversation.ConversationError::TYPE.NOT_FOUND
+        'Conversation not found'
+      when z.conversation.ConversationError::TYPE.REQUEST_FAILED
+        'Conversation related backend request failed'
       when z.conversation.ConversationError::TYPE.WRONG_USER
         'Wrong user tried to change or delete a message'
       else
@@ -46,5 +52,8 @@ class z.conversation.ConversationError
     DEGRADED_CONVERSATION_CANCELLATION: 'z.conversation.ConversationError::TYPE.DEGRADED_CONVERSATION_CANCELLATION'
     MESSAGE_NOT_FOUND: 'z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND'
     NO_CHANGES: 'z.conversation.ConversationError::TYPE.NO_CHANGES'
+    NO_CONVERSATION_ID: 'z.conversation.ConversationError::TYPE.NO_CONVERSATION_ID'
+    NOT_FOUND: 'z.conversation.ConversationError::TYPE.NOT_FOUND'
+    REQUEST_FAILURE: 'z.conversation.ConversationError::TYPE.REQUEST_FAILURE'
     WRONG_USER: 'z.conversation.ConversationError::TYPE.WRONG_USER'
     UNKNOWN: 'z.conversation.ConversationError::TYPE.UNKNOWN'

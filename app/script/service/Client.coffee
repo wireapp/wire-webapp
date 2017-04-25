@@ -19,21 +19,42 @@
 window.z ?= {}
 z.service ?= {}
 
-IGNORED_BACKEND_ERRORS = [
-  z.service.BackendClientError::STATUS_CODE.BAD_GATEWAY
-  z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
-  z.service.BackendClientError::STATUS_CODE.CONFLICT
-  z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
-  z.service.BackendClientError::STATUS_CODE.INTERNAL_SERVER_ERROR
-  z.service.BackendClientError::STATUS_CODE.NOT_FOUND
-  z.service.BackendClientError::STATUS_CODE.PRECONDITION_FAILED
-  z.service.BackendClientError::STATUS_CODE.REQUEST_TIMEOUT
-  z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
-  z.service.BackendClientError::STATUS_CODE.TOO_MANY_REQUESTS
-]
+CLIENT_CONFIG =
+  CONNECTIVITY_CHECK:
+    INITIAL_TIMEOUT: 0
+    RECHECK_TIMEOUT: 2000
+    REQUEST_TIMEOUT: 500
+  IGNORED_BACKEND_ERRORS: [
+    z.service.BackendClientError::STATUS_CODE.BAD_GATEWAY
+    z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
+    z.service.BackendClientError::STATUS_CODE.CONFLICT
+    z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
+    z.service.BackendClientError::STATUS_CODE.INTERNAL_SERVER_ERROR
+    z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+    z.service.BackendClientError::STATUS_CODE.PRECONDITION_FAILED
+    z.service.BackendClientError::STATUS_CODE.REQUEST_TIMEOUT
+    z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
+    z.service.BackendClientError::STATUS_CODE.TOO_MANY_REQUESTS
+  ]
+  IGNORED_BACKEND_LABELS: [
+    z.service.BackendClientError::LABEL.PASSWORD_EXISTS
+    z.service.BackendClientError::LABEL.TOO_MANY_CLIENTS
+    z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
+  ]
+
 
 # Client for all backend REST API calls.
 class z.service.Client
+  @::CONNECTIVITY_CHECK_TRIGGER =
+    ACCESS_TOKEN_REFRESH: 'z.service.Client::CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH'
+    ACCESS_TOKEN_RETRIEVAL: 'z.service.Client::CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL'
+    APP_INIT_RELOAD: 'z.service.Client.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD'
+    CONNECTION_REGAINED: 'z.service.Client.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED'
+    LOGIN_REDIRECT: 'z.service.Client.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT'
+    REQUEST_FAILURE: 'z.service.Client.CONNECTIVITY_CHECK_TRIGGER.REQUEST_FAILURE'
+    UNKNOWN: 'z.service.Client.CONNECTIVITY_CHECK_TRIGGER.UNKNOWN'
+
+
   ###
   Construct a new client.
 
@@ -49,6 +70,8 @@ class z.service.Client
     z.util.Environment.backend.current = settings.environment
     @rest_url = settings.rest_url
     @web_socket_url = settings.web_socket_url
+
+    @connectivity_queue = new z.util.PromiseQueue()
 
     @request_queue = []
     @request_queue_blocked_state = ko.observable z.service.RequestQueueBlockedState.NONE
@@ -85,30 +108,40 @@ class z.service.Client
   status: =>
     $.ajax
       type: 'HEAD'
-      timeout: 500
+      timeout: CLIENT_CONFIG.CONNECTIVITY_CHECK.REQUEST_TIMEOUT
       url: @create_url '/self'
 
   ###
   Delay a function call until backend connectivity is guaranteed.
+  @param [z.service.Client::CONNECTIVITY_CHECK_TRIGGER] source - Trigger that requested connectivity check
   @return [Promise] Promise that resolves once the connectivity is verified
   ###
-  execute_on_connectivity: =>
-    return new Promise (resolve) =>
+  execute_on_connectivity: (source) =>
+    source = z.service.Client::CONNECTIVITY_CHECK_TRIGGER.UNKNOWN if not source
+    @logger.info "Connectivity check requested by '#{source}'"
 
-      _check_status = =>
-        @status()
-        .done (jqXHR) =>
-          @logger.info 'Connectivity verified', jqXHR
-          resolve()
-        .fail (jqXHR) =>
-          if jqXHR.readyState is 4
-            @logger.info "Connectivity verified by server error '#{jqXHR.status}'", jqXHR
-            resolve()
-          else
-            @logger.warn 'Connectivity could not be verified... retrying'
-            window.setTimeout _check_status, 2000
+    _check_status = =>
+      @status()
+      .done (jqXHR) =>
+        @logger.info 'Connectivity verified', jqXHR
+        @connectivity_timeout = undefined
+        @connectivity_queue.pause false
+      .fail (jqXHR) =>
+        if jqXHR.readyState is 4
+          @logger.info "Connectivity verified by server error '#{jqXHR.status}'", jqXHR
+          @connectivity_queue.pause false
+          @connectivity_timeout = undefined
+        else
+          @logger.warn 'Connectivity could not be verified... retrying'
+          @connectivity_queue.pause true
+          @connectivity_timeout = window.setTimeout _check_status, CLIENT_CONFIG.CONNECTIVITY_CHECK.RECHECK_TIMEOUT
 
-      _check_status()
+    @connectivity_queue.pause true
+    queued_promise = @connectivity_queue.push -> Promise.resolve()
+    if not @connectivity_timeout
+      @connectivity_timeout = window.setTimeout _check_status, CLIENT_CONFIG.CONNECTIVITY_CHECK.INITIAL_TIMEOUT
+
+    return queued_promise
 
   # Execute queued requests.
   execute_request_queue: =>
@@ -170,7 +203,7 @@ class z.service.Client
           when z.service.BackendClientError::STATUS_CODE.CONNECTIVITY_PROBLEM
             @request_queue_blocked_state z.service.RequestQueueBlockedState.CONNECTIVITY_PROBLEM
             @_push_to_request_queue [config, resolve, reject], @request_queue_blocked_state()
-            @execute_on_connectivity()
+            @execute_on_connectivity(z.service.Client::CONNECTIVITY_CHECK_TRIGGER.REQUEST_FAILURE)
             .then =>
               @request_queue_blocked_state z.service.RequestQueueBlockedState.NONE
               @execute_request_queue()
@@ -180,15 +213,12 @@ class z.service.Client
             amplify.publish z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, 'Unauthorized backend request'
             return
           when z.service.BackendClientError::STATUS_CODE.FORBIDDEN
-            switch jqXHR.responseJSON?.label
-              when z.service.BackendClientError::LABEL.INVALID_CREDENTIALS
-                Raygun.send new Error 'Server request failed: Invalid credentials'
-              when z.service.BackendClientError::LABEL.TOO_MANY_CLIENTS, z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
-                @logger.warn "Server request failed: '#{jqXHR.responseJSON.label}'"
-              else
-                Raygun.send new Error 'Server request failed'
+            if jqXHR.responseJSON?.label in CLIENT_CONFIG.IGNORED_BACKEND_LABELS
+              @logger.warn "Server request failed: #{jqXHR.responseJSON?.label}"
+            else
+              Raygun.send new Error "Server request failed: #{jqXHR.responseJSON?.label}"
           else
-            if jqXHR.status not in IGNORED_BACKEND_ERRORS
+            if jqXHR.status not in CLIENT_CONFIG.IGNORED_BACKEND_ERRORS
               Raygun.send new Error "Server request failed: #{jqXHR.status}"
 
         reject jqXHR.responseJSON or new z.service.BackendClientError jqXHR.status

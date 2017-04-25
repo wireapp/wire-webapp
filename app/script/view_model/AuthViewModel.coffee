@@ -73,17 +73,19 @@ class z.ViewModel.AuthViewModel
     @session_expired = ko.observable false
     @device_reused = ko.observable false
 
-    @client_type = ko.observable z.client.ClientType.TEMPORARY
     @country_code = ko.observable ''
     @country = ko.observable ''
     @name = ko.observable ''
     @password = ko.observable ''
-    @persist = ko.observable z.util.Environment.electron
+    @persist = ko.observable true
     @phone_number = ko.observable ''
     @username = ko.observable ''
 
-    @persist.subscribe (is_persistent) =>
-      if is_persistent then @client_type z.client.ClientType.PERMANENT else z.client.ClientType.TEMPORARY
+    @is_public_computer = ko.observable false
+    @is_public_computer.subscribe (is_public_computer) => @persist not is_public_computer
+
+    @client_type = ko.pureComputed =>
+      if @persist() then z.client.ClientType.PERMANENT else z.client.ClientType.TEMPORARY
 
     @self_user = ko.observable()
 
@@ -1252,7 +1254,7 @@ class z.ViewModel.AuthViewModel
       return @client_repository.get_valid_local_client()
     .catch (error) =>
       @logger.info "No valid local client found: #{error.message}", error
-      if error.type is z.client.ClientError::TYPE.MISSING_ON_BACKEND
+      if error.type is z.client.ClientError.TYPE.MISSING_ON_BACKEND
         @logger.info 'Local client rejected as invalid by backend. Reinitializing storage.'
         @storage_service.init @self_user().id
     .then =>
@@ -1314,7 +1316,7 @@ class z.ViewModel.AuthViewModel
     @client_repository.register_client @password()
     .then (client_observable) =>
       @event_repository.current_client = client_observable
-      @event_repository.initialize_last_notification_id()
+      @event_repository.initialize_last_notification_id client_observable().id
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         @logger.warn "Cannot set starting point on notification stream: #{error.message}", error
@@ -1338,7 +1340,7 @@ class z.ViewModel.AuthViewModel
       else
         @_redirect_to_app()
     .catch (error) =>
-      if error.type is z.client.ClientError::TYPE.TOO_MANY_CLIENTS
+      if error.type is z.client.ClientError.TYPE.TOO_MANY_CLIENTS
         @logger.warn 'User has already registered the maximum number of clients', error
         window.location.hash = z.auth.AuthView.MODE.LIMIT
       else

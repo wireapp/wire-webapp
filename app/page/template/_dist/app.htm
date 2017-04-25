@@ -12,6 +12,7 @@
 <script src="/script/util/marked.js"></script>
 <script src="/script/util/moment.js"></script>
 <script src="/script/util/NumberUtil.js"></script>
+<script src="/script/util/ObjectUtil.js"></script>
 <script src="/script/util/confirm.js"></script>
 <script src="/script/util/PromiseQueue.js"></script>
 <script src="/script/util/scroll-helpers.js"></script>
@@ -50,23 +51,24 @@
 <script src="/script/auth/URLParameter.js"></script>
 <!-- Localization -->
 <script src="/script/localization/strings-init.js"></script>
-<script src="/script/localization/strings-cs.js"></script>
-<script src="/script/localization/strings-da.js"></script>
-<script src="/script/localization/strings-de.js"></script>
-<script src="/script/localization/strings-es.js"></script>
-<script src="/script/localization/strings-fi.js"></script>
-<script src="/script/localization/strings-fr.js"></script>
-<script src="/script/localization/strings-hr.js"></script>
-<script src="/script/localization/strings-hu.js"></script>
-<script src="/script/localization/strings-it.js"></script>
-<script src="/script/localization/strings-pt.js"></script>
-<script src="/script/localization/strings-ro.js"></script>
-<script src="/script/localization/strings-ru.js"></script>
-<script src="/script/localization/strings-sk.js"></script>
-<script src="/script/localization/strings-sl.js"></script>
-<script src="/script/localization/strings-tr.js"></script>
-<script src="/script/localization/strings-uk.js"></script>
-<script src="/script/localization/strings.js"></script>
+<script src="/script/localization/translations/webapp-cs.js"></script>
+<script src="/script/localization/translations/webapp-da.js"></script>
+<script src="/script/localization/translations/webapp-de.js"></script>
+<script src="/script/localization/translations/webapp-es.js"></script>
+<script src="/script/localization/translations/webapp-fi.js"></script>
+<script src="/script/localization/translations/webapp-fr.js"></script>
+<script src="/script/localization/translations/webapp-hr.js"></script>
+<script src="/script/localization/translations/webapp-hu.js"></script>
+<script src="/script/localization/translations/webapp-it.js"></script>
+<script src="/script/localization/translations/webapp-lt.js"></script>
+<script src="/script/localization/translations/webapp-pt.js"></script>
+<script src="/script/localization/translations/webapp-ro.js"></script>
+<script src="/script/localization/translations/webapp-ru.js"></script>
+<script src="/script/localization/translations/webapp-sk.js"></script>
+<script src="/script/localization/translations/webapp-sl.js"></script>
+<script src="/script/localization/translations/webapp-tr.js"></script>
+<script src="/script/localization/translations/webapp-uk.js"></script>
+<script src="/script/localization/webapp.js"></script>
 <script src="/script/localization/Localizer.js"></script>
 <!-- Media -->
 <script src="/script/media/MediaDevicesHandler.js"></script>
@@ -90,6 +92,7 @@
 <script src="/script/tracking/attribute/ConversationType.js"></script>
 <script src="/script/tracking/attribute/DeleteType.js"></script>
 <script src="/script/tracking/attribute/MessageType.js"></script>
+<script src="/script/tracking/attribute/PlatformType.js"></script>
 <script src="/script/tracking/event/PictureTakenEvent.js"></script>
 <script src="/script/tracking/CustomDimension.js"></script>
 <script src="/script/tracking/EventName.js"></script>
@@ -121,8 +124,9 @@
 <script src="/script/user/UserHandleGenerator.js"></script>
 <!-- User Properties -->
 <script src="/script/properties/Properties.js"></script>
-<script src="/script/properties/PropertiesService.js"></script>
 <script src="/script/properties/PropertiesRepository.js"></script>
+<script src="/script/properties/PropertiesService.js"></script>
+<script src="/script/properties/PropertiesType.js"></script>
 <!-- Connection -->
 <script src="/script/connect/ConnectError.js"></script>
 <script src="/script/connect/ConnectGoogleService.js"></script>
@@ -155,6 +159,7 @@
 <!-- Link Previews -->
 <script src="/script/links/LinkPreviewError.js"></script>
 <script src="/script/links/LinkPreviewHelpers.js"></script>
+<script src="/script/links/LinkPreviewMetaDataType.js"></script>
 <script src="/script/links/LinkPreviewProtoBuilder.js"></script>
 <script src="/script/links/LinkPreviewRepository.js"></script>
 <script src="/script/links/LinkPreviewBlackList.js"></script>
@@ -173,7 +178,6 @@
 <script src="/script/client/ClientType.js"></script>
 <!-- Cryptography -->
 <script src="/script/cryptography/CryptographyError.js"></script>
-<script src="/script/cryptography/CryptographyErrorType.js"></script>
 <script src="/script/cryptography/CryptographyMapper.js"></script>
 <script src="/script/cryptography/CryptographyRepository.js"></script>
 <script src="/script/cryptography/CryptographyService.js"></script>
@@ -193,6 +197,7 @@
 <script src="/script/view_model/LoadingViewModel.js"></script>
 <script src="/script/view_model/MainViewModel.js"></script>
 <script src="/script/view_model/MessageListViewModel.js"></script>
+<script src="/script/view_model/ConversationInputEmojiViewModel.js"></script>
 <script src="/script/view_model/ConversationInputViewModel.js"></script>
 <script src="/script/view_model/ConversationTitlebarViewModel.js"></script>
 <script src="/script/view_model/ParticipantsViewModel.js"></script>
@@ -262,7 +267,6 @@
 <script src="/script/message/MessageCategorization.js"></script>
 <script src="/script/message/EphemeralStatusType.js"></script>
 <script src="/script/message/StatusType.js"></script>
-<script src="/script/message/PingMessageType.js"></script>
 <script src="/script/message/ReactionType.js"></script>
 <script src="/script/message/SuperType.js"></script>
 <script src="/script/message/SystemMessageType.js"></script>
@@ -277,6 +281,7 @@
 <script src="/script/entity/message/DeleteMessage.js"></script>
 <script src="/script/entity/message/SystemMessage.js"></script>
 <script src="/script/entity/message/MemberMessage.js"></script>
+<script src="/script/entity/message/MissedMessage.js"></script>
 <script src="/script/entity/message/ContentMessage.js"></script>
 <script src="/script/entity/message/RenameMessage.js"></script>
 <script src="/script/entity/message/PingMessage.js"></script>
@@ -322,6 +327,7 @@
 <script src="/script/calling/payloads/ICECandidateInfo.js"></script>
 <script src="/script/calling/payloads/SDPInfo.js"></script>
 <!-- Calling/Rtc -->
+<script src="/script/calling/rtc/DataChannelState.js"></script>
 <script src="/script/calling/rtc/ICEConnectionState.js"></script>
 <script src="/script/calling/rtc/ICEGatheringState.js"></script>
 <script src="/script/calling/rtc/MediaStreamError.js"></script>
@@ -333,6 +339,7 @@
 <script src="/script/calling/handler/CallSignalingHandler.js"></script>
 <script src="/script/calling/handler/CallStateHandler.js"></script>
 <!-- Calling/Mapper -->
+<script src="/script/calling/mapper/ECallMessageMapper.js"></script>
 <script src="/script/calling/mapper/ICECandidateMapper.js"></script>
 <script src="/script/calling/mapper/SDPMapper.js"></script>
 <!-- Calling/Entities -->

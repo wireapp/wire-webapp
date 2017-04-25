@@ -40,6 +40,7 @@ user-profile {
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: hidden;
 }
 
 .user-profile-device-detail {
@@ -91,7 +92,7 @@ user-profile {
     border-right: 1px solid @seperator-color;
     border-top: 1px solid @seperator-color;
     bottom: 0;
-    content: " ";
+    content: ' ';
     display: block;
     height: 7px;
     position: absolute;
@@ -166,7 +167,7 @@ user-profile {
   margin-top: 24px;
 }
 
-.user-profile-avatar + .user-profile-contacts[data-contacts="0"] {
+.user-profile-avatar + .user-profile-contacts[data-contacts='0'] {
   margin-top: 0;
 }
 
@@ -231,6 +232,7 @@ user-profile {
 }
 
 .user-profile-device-detail-fingerprint {
+  height: 72px;
   margin-bottom: 16px;
   font-family: monospace;
 

@@ -35,7 +35,7 @@ describe 'z.links.LinkPreviewRepository', ->
       link_preview_repository.get_link_preview()
       .then done.fail
       .catch (error) ->
-        expect(error.type).toBe z.links.LinkPreviewError::TYPE.NOT_SUPPORTED
+        expect(error.type).toBe z.links.LinkPreviewError.TYPE.NOT_SUPPORTED
         done()
 
     it 'should fetch open graph data if openGraph lib is available', (done) ->
@@ -46,7 +46,7 @@ describe 'z.links.LinkPreviewRepository', ->
         done.fail
       .catch (error) ->
         expect(link_preview_repository._fetch_open_graph_data).toHaveBeenCalled()
-        expect(error.type).toBe z.links.LinkPreviewError::TYPE.NO_DATA_AVAILABLE
+        expect(error.type).toBe z.links.LinkPreviewError.TYPE.NO_DATA_AVAILABLE
         done()
 
     it 'should reject if link is blacklisted', (done) ->
@@ -57,5 +57,5 @@ describe 'z.links.LinkPreviewRepository', ->
         done.fail
       .catch (error) ->
         console.log error
-        expect(error.type).toBe z.links.LinkPreviewError::TYPE.BLACKLISTED
+        expect(error.type).toBe z.links.LinkPreviewError.TYPE.BLACKLISTED
         done()

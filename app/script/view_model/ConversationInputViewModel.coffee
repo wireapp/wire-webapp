@@ -96,6 +96,8 @@ class z.ViewModel.ConversationInputViewModel
       .blur => @browser_has_focus false
       .focus => @browser_has_focus true
 
+    @conversation_input_emoji = new z.ViewModel.ConversationInputEmojiViewModel()
+
     @_init_subscriptions()
 
   _init_subscriptions: ->
@@ -129,7 +131,7 @@ class z.ViewModel.ConversationInputViewModel
 
   send_message: (message) =>
     return if message.length is 0
-    @conversation_repository.send_message_with_link_preview message, @conversation_et()
+    @conversation_repository.send_text_with_link_preview message, @conversation_et()
 
   send_message_edit: (message, message_et) =>
     @cancel_edit()
@@ -269,7 +271,11 @@ class z.ViewModel.ConversationInputViewModel
     @input ''
     $(event.target).focus()
 
+  on_input_key_up: (data, event) =>
+    @conversation_input_emoji.on_input_key_up data, event
+
   on_input_key_down: (data, event) =>
+    return if @conversation_input_emoji.on_input_key_down data, event
     switch event.keyCode
       when z.util.KEYCODE.ARROW_UP
         @edit_message @conversation_et().get_last_editable_message(), event.target if @input().length is 0
@@ -291,6 +297,7 @@ class z.ViewModel.ConversationInputViewModel
     @_move_cursor_to_end input_element if input_element?
 
   cancel_edit: =>
+    @conversation_input_emoji.remove_emoji_list()
     @edit_message_et()?.is_editing false
     @edit_message_et undefined
     @edit_input ''

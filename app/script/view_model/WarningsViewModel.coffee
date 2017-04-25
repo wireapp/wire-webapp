@@ -99,13 +99,13 @@ class z.ViewModel.WarningsViewModel
         # We block subsequent permission requests for notifications when the user ignores the request.
         amplify.publish z.event.WebApp.SYSTEM_NOTIFICATION.PERMISSION_STATE, z.system_notification.PermissionStatusState.IGNORED
 
-  dismiss_warning: (type) =>
-    type = @top_warning() if not type
-    @logger.warn "Dismissed warning of type '#{type}'"
-    @warnings.remove type
+  dismiss_warning: (type = @top_warning()) =>
+    if type
+      @logger.warn "Dismissed warning of type '#{type}'"
+      @warnings.remove type
 
   show_warning: (type, info) =>
-    @dismiss_warning() if type in [z.ViewModel.WarningType.CONNECTIVITY_RECONNECT, z.ViewModel.WarningType.NO_INTERNET] and @top_warning() isnt z.ViewModel.WarningType.LIFECYCLE_UPDATE
+    @dismiss_warning @top_warning() if type in [z.ViewModel.WarningType.CONNECTIVITY_RECONNECT, z.ViewModel.WarningType.NO_INTERNET] and @top_warning() isnt z.ViewModel.WarningType.LIFECYCLE_UPDATE
     @logger.warn "Showing warning of type '#{type}'"
     if info?
       @first_name info.first_name

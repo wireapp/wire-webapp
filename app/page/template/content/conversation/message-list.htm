@@ -7,7 +7,7 @@
            data-bind="css: $parent.get_css_class(message),
                       css: {'message-marked': message.equals($parent.marked_message())},
                       in_viewport: function() {$parent.message_in_viewport(message)},
-                      attr: {'data-uie-uid': message.id, 'data-uie-value': message.super_type, 'data-uie-expired-status': message.ephemeral_expires}"
+                      attr: {'data-uie-uid': message.id, 'data-uie-value': message.super_type, 'data-uie-expired-status': message.ephemeral_expires, 'data-uie-send-status': message.status}"
            data-uie-name="item-message">
         <div data-bind="template: {name: 'timestamp'}"></div>
         <div data-bind="template: {name: message.super_type}"></div>

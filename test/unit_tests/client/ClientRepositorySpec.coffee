@@ -95,13 +95,13 @@ describe 'z.client.ClientRepository', ->
 
     it 'rejects with an error if no client found locally', (done) ->
       spyOn client_service, 'load_client_from_db'
-      .and.returnValue Promise.resolve z.client.ClientRepository::PRIMARY_KEY_CURRENT_CLIENT
+      .and.returnValue Promise.resolve z.client.ClientRepository.PRIMARY_KEY_CURRENT_CLIENT
 
       client_repository.get_valid_local_client()
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.client.ClientError
-        expect(error.type).toBe z.client.ClientError::TYPE.NO_LOCAL_CLIENT
+        expect(error.type).toBe z.client.ClientError.TYPE.NO_LOCAL_CLIENT
         done()
 
     it 'rejects with an error if client removed on backend', (done) ->
@@ -112,7 +112,7 @@ describe 'z.client.ClientRepository', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.client.ClientError
-        expect(error.type).toBe z.client.ClientError::TYPE.MISSING_ON_BACKEND
+        expect(error.type).toBe z.client.ClientError.TYPE.MISSING_ON_BACKEND
         done()
 
     it 'rejects with an error if database deletion fails', (done) ->
@@ -123,7 +123,7 @@ describe 'z.client.ClientRepository', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.client.ClientError
-        expect(error.type).toBe z.client.ClientError::TYPE.DATABASE_FAILURE
+        expect(error.type).toBe z.client.ClientError.TYPE.DATABASE_FAILURE
         done()
 
     it 'rejects with an error if something else fails', (done) ->
@@ -133,7 +133,7 @@ describe 'z.client.ClientRepository', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any Error
-        expect(error.type).toBe z.client.ClientError::TYPE.DATABASE_FAILURE
+        expect(error.type).toBe z.client.ClientError.TYPE.DATABASE_FAILURE
         done()
 
   describe '_construct_primary_key', ->
