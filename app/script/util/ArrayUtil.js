@@ -62,7 +62,7 @@ z.util.ArrayUtil = {
 
     for (let i = next_index; i <= array.length; i++) {
       const current_item = array[i];
-      if ((filter == null) || !!filter(current_item)) {
+      if ((typeof filter !== 'function') || !!filter(current_item)) {
         return current_item;
       }
     }
