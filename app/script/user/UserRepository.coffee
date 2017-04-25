@@ -413,7 +413,7 @@ class z.user.UserRepository
   ###
   find_user_by_id: (user_id) ->
     return Promise.resolve user_et for user_et in @users() when user_et.id is user_id
-    return Promise.reject new z.user.UserError z.user.UserError::TYPE.USER_NOT_FOUND
+    return Promise.reject new z.user.UserError z.user.UserError.TYPE.USER_NOT_FOUND
 
   ###
   Get self user from backend.
@@ -436,11 +436,11 @@ class z.user.UserRepository
   get_user_by_id: (user_id) ->
     @find_user_by_id user_id
     .catch (error) =>
-      if error.type is z.user.UserError::TYPE.USER_NOT_FOUND
+      if error.type is z.user.UserError.TYPE.USER_NOT_FOUND
         return @fetch_user_by_id user_id
       throw error
     .catch (error) =>
-      unless error.type is z.user.UserError::TYPE.USER_NOT_FOUND
+      unless error.type is z.user.UserError.TYPE.USER_NOT_FOUND
         @logger.log @logger.levels.ERROR, "Failed to get user '#{user_id}': #{error.message}", error
       throw error
 
@@ -457,7 +457,7 @@ class z.user.UserRepository
     _find_user = (user_id) =>
       @find_user_by_id user_id
       .catch (error) ->
-        throw error unless error.type is z.user.UserError::TYPE.USER_NOT_FOUND
+        throw error unless error.type is z.user.UserError.TYPE.USER_NOT_FOUND
         return user_id
 
     Promise.all (_find_user user_id for user_id in user_ids)
@@ -504,7 +504,7 @@ class z.user.UserRepository
   save_user: (user_et, is_me = false) ->
     @find_user_by_id user_et.id
     .catch (error) =>
-      throw error unless error.type is z.user.UserError::TYPE.USER_NOT_FOUND
+      throw error unless error.type is z.user.UserError.TYPE.USER_NOT_FOUND
 
       if is_me
         user_et.is_me = true
@@ -521,7 +521,7 @@ class z.user.UserRepository
       @find_user_by_id user_et.id
       .then -> return undefined
       .catch (error) ->
-        throw error unless error.type is z.user.UserError::TYPE.USER_NOT_FOUND
+        throw error unless error.type is z.user.UserError.TYPE.USER_NOT_FOUND
         return user_et
 
     Promise.all (_user_exists user_et for user_et in user_ets)
@@ -537,7 +537,7 @@ class z.user.UserRepository
   update_user_by_id: (user_id) =>
     @find_user_by_id user_id
     .catch (error) ->
-      throw error unless error.type is z.user.UserError::TYPE.USER_NOT_FOUND
+      throw error unless error.type is z.user.UserError.TYPE.USER_NOT_FOUND
       return new z.entity.User()
     .then (old_user_et) =>
       return @user_service.get_user_by_id user_id
@@ -622,8 +622,8 @@ class z.user.UserRepository
       @self().username username
     .catch (error) ->
       if error.code in [z.service.BackendClientError::STATUS_CODE.CONFLICT, z.service.BackendClientError::STATUS_CODE.BAD_REQUEST]
-        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
-      throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
+        throw new z.user.UserError z.user.UserError.TYPE.USERNAME_TAKEN
+      throw new z.user.UserError z.user.UserError.TYPE.REQUEST_FAILURE
 
   ###
   Verify usernames against the backend.
@@ -644,12 +644,12 @@ class z.user.UserRepository
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         return username
       if error.code is z.service.BackendClientError::STATUS_CODE.BAD_REQUEST
-        throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
-      throw new z.user.UserError z.user.UserError::TYPE.REQUEST_FAILURE
+        throw new z.user.UserError z.user.UserError.TYPE.USERNAME_TAKEN
+      throw new z.user.UserError z.user.UserError.TYPE.REQUEST_FAILURE
     .then (username) ->
       if username
         return username
-      throw new z.user.UserError z.user.UserError::TYPE.USERNAME_TAKEN
+      throw new z.user.UserError z.user.UserError.TYPE.USERNAME_TAKEN
 
   ###
   Change the profile image.
