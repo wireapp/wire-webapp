@@ -49,7 +49,6 @@ describe 'z.util.ArrayUtil', ->
       expect(actual[3].length).toBe 1
       expect(arr.length).toBe 10
 
-
   describe 'get_next_item', ->
     a = 'a'
     b = 'b'
@@ -70,7 +69,6 @@ describe 'z.util.ArrayUtil', ->
     it 'returns undefined when item is not in the array', ->
       expect(z.util.ArrayUtil.get_next_item array, d).toEqual null
 
-
   describe 'interpolate', ->
     it 'interpolates arrays with bigger lengths', ->
       expect(z.util.ArrayUtil.interpolate([1, 5, 3], 5)).toEqual [1, 3, 5, 4, 3]
@@ -82,7 +80,6 @@ describe 'z.util.ArrayUtil', ->
       interpolated_array = z.util.ArrayUtil.interpolate([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
       expect(interpolated_array[0]).toEqual 0
       expect(interpolated_array[interpolated_array.length - 1]).toEqual 9
-
 
   describe 'is_last_item', ->
     a = 'a'
@@ -100,7 +97,6 @@ describe 'z.util.ArrayUtil', ->
 
     it 'returns false for an item that is not in the array', ->
       expect(z.util.ArrayUtil.is_last_item array, d).toBeFalsy()
-
 
   describe 'iterate_index', ->
     it 'returns undefined in case of wrong input parameters', ->
