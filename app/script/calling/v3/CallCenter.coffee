@@ -228,8 +228,9 @@ class z.calling.v3.CallCenter
             e_call_et.set_remote_version e_call_message_et
             return e_call_et.update_e_participant e_call_message_et
             .then (e_participant_et) ->
-              e_call_et.state z.calling.enum.CallState.CONNECTING
-              e_participant_et.session_id = e_call_message_et.session_id
+              if e_participant_et
+                e_call_et.state z.calling.enum.CallState.CONNECTING
+                e_participant_et.session_id = e_call_message_et.session_id
 
       return @user_repository.get_user_by_id e_call_message_et.user_id
       .then (remote_user_et) ->
@@ -426,15 +427,17 @@ class z.calling.v3.CallCenter
       e_call_et.initiate_telemetry video_send
       if not @media_stream_handler.local_media_stream()
         @media_stream_handler.initiate_media_stream conversation_id, video_send
-    .then ->
+    .then =>
       e_call_et.timings.time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED
 
       switch e_call_et.state()
         when z.calling.enum.CallState.INCOMING
-          e_call_et.state z.calling.enum.CallState.CONNECTING
+          return e_call_et.state z.calling.enum.CallState.CONNECTING
         when z.calling.enum.CallState.OUTGOING
-          e_call_et.participants.push new z.calling.entities.EParticipant e_call_et, e_call_et.conversation_et.participating_user_ets()[0], e_call_et.timings
-
+          return @user_repository.get_user_by_id(e_call_et.conversation_et.participating_user_ids()[0])
+          .then (user_et) ->
+            e_call_et.participants.push new z.calling.entities.EParticipant e_call_et, user_et, e_call_et.timings
+    .then ->
       e_call_et.start_negotiation()
     .catch (error) =>
       @delete_call conversation_id
