@@ -25,11 +25,9 @@ window.z.cryptography = z.cryptography || {};
 z.cryptography.CryptographyMapper = class CryptographyMapper {
   /**
    * Construct a new CryptographyMapper.
-   * @returns {CryptographyMapper} The new mapper for encrypted messages
    */
   constructor() {
     this.logger = new z.util.Logger('z.cryptography.CryptographyMapper', z.config.LOGGER.OPTIONS);
-    return this;
   }
 
   /**

@@ -69,7 +69,6 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   /**
    * Construct a new MediaStream handler.
    * @param {z.media.MediaRepository} media_repository - Media repository with with references to all other handlers
-   * @returns {MediaStreamHandler} Handler for MediaStreams
    */
   constructor(media_repository) {
     this.media_repository = media_repository;
@@ -96,8 +95,6 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     this.request_hint_timeout = undefined;
     amplify.subscribe(z.event.WebApp.CALL.MEDIA.ADD_STREAM, this.add_remote_media_stream.bind(this));
-
-    return this;
   }
 
 
