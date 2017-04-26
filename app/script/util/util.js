@@ -561,6 +561,12 @@ z.util.is_valid_phone_number = function(phone_number) {
   return regular_expression.test(phone_number);
 };
 
+z.util.is_valid_username = function(username) {
+  if (username.startsWith('@')) {
+    username = username.substring(1);
+  }
+  return /^[a-z_0-9]{2,21}$/.test(username);
+};
 
 z.util.murmurhash3 = function(key, seed) {
   const remainder = key.length & 3; // key.length % 4
