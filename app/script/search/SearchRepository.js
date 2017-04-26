@@ -49,21 +49,6 @@ z.search.SearchRepository = class SearchRepository {
   }
 
   /**
-   * Get common contacts for given user.
-   * @param {string} username - Username to retrieve common contacts for
-   * @returns {Promise} Resolves with number of common contacts
-   */
-  get_common_contacts(username) {
-    return this.search_service.get_contacts(username, 1)
-    .then(function({documents: matches}) {
-      if (matches.length > 0) {
-        return matches[0].total_mutual_friends;
-      }
-      return 0;
-    });
-  }
-
-  /**
    * Search for users on the backend by name.
    * @param {string} name - Search query
    * @returns {Promise} Resolves with the search results
@@ -135,7 +120,7 @@ z.search.SearchRepository = class SearchRepository {
             return user_et;
         }
       })
-      .filter((user_et) => user_et);
+      .filter((user_et) => user_et != null);
     });
   }
 };
