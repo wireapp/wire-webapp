@@ -709,5 +709,6 @@ z.util.format_time_remaining = function(time_remaining) {
 
 /**
  * In case you need dev/null
+ * @returns {undefined}
  */
 z.util.noop = function() {};
