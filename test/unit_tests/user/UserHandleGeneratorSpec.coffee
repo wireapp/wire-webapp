@@ -74,3 +74,7 @@ describe 'UserHandleGenerator', ->
       username = 'memphis'
       suggestions = z.user.UserHandleGenerator.create_suggestions username
       expect(suggestions.length).toBe 12
+
+      suggestions.splice suggestions.indexOf(username), 1
+      suggestions.forEach (suggestion) ->
+        expect(suggestion).not.toBe username
