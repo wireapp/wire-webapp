@@ -431,7 +431,7 @@ class z.calling.v3.CallCenter
       e_call_et.timings.time_step z.telemetry.calling.CallSetupSteps.STREAM_RECEIVED
 
       switch e_call_et.state()
-        when z.calling.enum.CallState.INCOMING
+        when z.calling.enum.CallState.INCOMING, z.calling.enum.CallState.REJECTED
           return e_call_et.state z.calling.enum.CallState.CONNECTING
         when z.calling.enum.CallState.OUTGOING
           return @user_repository.get_user_by_id(e_call_et.conversation_et.participating_user_ids()[0])
