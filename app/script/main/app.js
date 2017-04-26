@@ -467,9 +467,7 @@ z.main.App = class App {
     , 10000);
 
     $('#loading-screen').remove();
-    return $('#wire-main')
-      .removeClass('off')
-      .attr('data-uie-value', 'is-loaded');
+    $('#wire-main').attr('data-uie-value', 'is-loaded');
   }
 
   /**
