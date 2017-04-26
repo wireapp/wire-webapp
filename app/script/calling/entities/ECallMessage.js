@@ -23,25 +23,26 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
-const E_CALL_MESSAGE_CONFIG = {
-  SESSION_ID_LENGTH: 4,
-  VERSION: '3.0',
-};
 
 z.calling.entities.ECallMessage = class ECallMessage {
+  static get CONFIG() {
+    return {
+      SESSION_ID_LENGTH: 4,
+      VERSION: '3.0',
+    };
+  }
+
   /**
    * Construct a new e-call message entity.
    *
    * @param {z.calling.enum.E_CALL_MESSAGE_TYPE} type - Type of e-call message
    * @param {boolean} [response=false] - Is message a response, defaults to false
    * @param {string} session_id - Optional session ID
-   * @returns {ECallMessage} The new e-call message entity
    */
   constructor(type, response = false, session_id) {
     this.type = type;
     this.response = response;
     this.session_id = session_id || this._create_session_id();
-    return this;
   }
 
   /**
@@ -66,7 +67,7 @@ z.calling.entities.ECallMessage = class ECallMessage {
       resp: this.response,
       sessid: this.session_id,
       type: this.type,
-      version: E_CALL_MESSAGE_CONFIG.VERSION,
+      version: ECallMessage.CONFIG.VERSION,
     };
 
     const extended_message_types = [
@@ -93,7 +94,7 @@ z.calling.entities.ECallMessage = class ECallMessage {
 
   /**
    * Cast e-call message to string.
-   * @returns {string} - Stringified JSON representation of e-call message
+   * @returns {string} Stringified JSON representation of e-call message
    */
   to_content_string() {
     return JSON.stringify(this.to_JSON());
@@ -102,10 +103,10 @@ z.calling.entities.ECallMessage = class ECallMessage {
   /**
    * Create a session ID.
    * @private
-   * @returns {string} Random four char session ID
+   * @returns {string} Random char session ID of length z.calling.entities.ECallMessage.CONFIG.SESSION_ID_LENGTH
    */
   _create_session_id() {
-    return new Array(E_CALL_MESSAGE_CONFIG.SESSION_ID_LENGTH)
+    return _.range(ECallMessage.CONFIG.SESSION_ID_LENGTH)
       .map(function() {
         return z.util.StringUtil.get_random_character();
       })

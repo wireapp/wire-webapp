@@ -23,20 +23,21 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
-const E_CALL_CONFIG = {
-  STATE_TIMEOUT: 30 * 1000,
-  TIMER_UPDATE_INTERVAL: 1000,
-  TIMER_UPDATE_START: 100,
-};
-
 z.calling.entities.ECall = class ECall {
+  static get CONFIG() {
+    return {
+      STATE_TIMEOUT: 30 * 1000,
+      TIMER_UPDATE_INTERVAL: 1000,
+      TIMER_UPDATE_START: 100,
+    };
+  }
+
   /**
    * Construct a new e-call entity.
    * @param {z.entity.Conversation} conversation_et - Conversation the call takes place in
    * @param {z.entity.User} creating_user - Entity of user starting the call
    * @param {string} session_id - Session ID to identify call
    * @param {z.calling.v3.CallCenter} v3_call_center - V3 call center
-   * @returns {ECall} A new e-call entity.
    */
   constructor(conversation_et, creating_user, session_id, v3_call_center) {
     this.conversation_et = conversation_et;
@@ -112,13 +113,13 @@ z.calling.entities.ECall = class ECall {
     this.is_connected.subscribe((is_connected) => {
       if (is_connected) {
         this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this);
-        this.timer_start = Date.now() - E_CALL_CONFIG.TIMER_UPDATE_START;
+        this.timer_start = Date.now() - ECall.CONFIG.TIMER_UPDATE_START;
         this.call_timer_interval = window.setInterval(() => {
           const duration_in_seconds = Math.floor((Date.now() - this.timer_start) / 1000);
 
           this.duration_time(duration_in_seconds);
         },
-        E_CALL_CONFIG.TIMER_UPDATE_INTERVAL);
+        ECall.CONFIG.TIMER_UPDATE_INTERVAL);
       }
     });
 
@@ -176,8 +177,6 @@ z.calling.entities.ECall = class ECall {
     });
 
     this.conversation_et.call(this);
-
-    return this;
   }
 
 
@@ -391,8 +390,10 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   set_remote_version(e_call_message_et) {
-    if (e_call_message_et.sdp) {
-      this.telemetry.set_remote_version(z.calling.mapper.SDPMapper.get_tool_version(e_call_message_et.sdp));
+    const {sdp: rtc_sdp} = e_call_message_et;
+
+    if (rtc_sdp) {
+      this.telemetry.set_remote_version(z.calling.mapper.SDPMapper.get_tool_version(rtc_sdp));
     }
   }
 
@@ -465,7 +466,7 @@ z.calling.entities.ECall = class ECall {
 
       return amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.id, z.calling.enum.TERMINATION_REASON.TIMEOUT);
     },
-    E_CALL_CONFIG.STATE_TIMEOUT);
+    ECall.CONFIG.STATE_TIMEOUT);
   }
 
   /**
@@ -672,13 +673,13 @@ z.calling.entities.ECall = class ECall {
    *
    * @private
    * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity
-   * @returns {z.calling.entities.ECall} E-call entity if verification passed
+   * @returns {Promise} Resolves with the e-call entity if verification passed
    */
   verify_session_id(e_call_message_et) {
     const {user_id, session_id} = e_call_message_et;
 
     if (session_id === this.session_id) {
-      return this;
+      return Promise.resolve(this);
     }
 
     return this.get_e_participant_by_id(user_id)

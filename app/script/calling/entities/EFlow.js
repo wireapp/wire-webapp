@@ -23,15 +23,17 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.entities = z.calling.entities || {};
 
-const E_FLOW_CONFIG = {
-  DATA_CHANNEL_LABEL: 'calling-3.0',
-  NEGOTIATION_FAILED_TIMEOUT: 30 * 1000 + 500,
-  NEGOTIATION_RESTART_TIMEOUT: 2500,
-  SDP_SEND_TIMEOUT: 5 * 1000,
-  SDP_SEND_TIMEOUT_RESET: 1000,
-};
-
 z.calling.entities.EFlow = class EFlow {
+  static get CONFIG() {
+    return {
+      DATA_CHANNEL_LABEL: 'calling-3.0',
+      NEGOTIATION_FAILED_TIMEOUT: 30 * 1000 + 500,
+      NEGOTIATION_RESTART_TIMEOUT: 2500,
+      SDP_SEND_TIMEOUT: 5 * 1000,
+      SDP_SEND_TIMEOUT_RESET: 1000,
+    };
+  }
+
   /**
    * Construct a new e-flow entity.
    *
@@ -39,7 +41,6 @@ z.calling.entities.EFlow = class EFlow {
    * @param {z.calling.entities.EParticipant} e_participant_et - E-Participant entity that the e-flow belongs to
    * @param {z.telemetry.calling.CallSetupTimings} timings - Timing statistics of call setup steps
    * @param {z.calling.entities.ECallMessage} e_call_message_et - Optional e-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
-   * @returns {EFlow} A new e-flow entity
    */
   constructor(e_call_et, e_participant_et, timings, e_call_message_et) {
     this.v3_call_center = e_call_et.v3_call_center;
@@ -574,7 +575,7 @@ z.calling.entities.EFlow = class EFlow {
    */
   _initialize_data_channel() {
     if (this.peer_connection.createDataChannel && !this.data_channel) {
-      this._setup_data_channel(this.peer_connection.createDataChannel(E_FLOW_CONFIG.DATA_CHANNEL_LABEL, {ordered: true}));
+      this._setup_data_channel(this.peer_connection.createDataChannel(EFlow.CONFIG.DATA_CHANNEL_LABEL, {ordered: true}));
     }
   }
 
@@ -821,7 +822,9 @@ z.calling.entities.EFlow = class EFlow {
     this.logger.info(`Creating '${z.calling.rtc.SDP_TYPE.ANSWER}' for flow with '${this.remote_user.name()}'`);
 
     this.peer_connection.createAnswer()
-      .then(this._create_sdp_success)
+      .then((rtc_sdp) => {
+        this._create_sdp_success(rtc_sdp);
+      })
       .catch((error) => {
         this._create_sdp_failure(error, z.calling.rtc.SDP_TYPE.ANSWER);
       });
@@ -884,7 +887,9 @@ z.calling.entities.EFlow = class EFlow {
     this.logger.info(`Creating '${z.calling.rtc.SDP_TYPE.OFFER}' for flow with '${this.remote_user.name()}'`);
 
     this.peer_connection.createOffer(offer_options)
-      .then(this._create_sdp_success)
+      .then((rtc_sdp) => {
+        this._create_sdp_success(rtc_sdp);
+      })
       .catch((error) => {
         this._create_sdp_failure(error, z.calling.rtc.SDP_TYPE.OFFER);
       });
@@ -897,7 +902,7 @@ z.calling.entities.EFlow = class EFlow {
    */
   _create_additional_payload() {
     const payload = this.v3_call_center.create_additional_payload(this.e_call_et.id, this.remote_user_id, this.remote_client_id);
-    const additional_payload =  $.extend({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
+    const additional_payload = $.extend({remote_user: this.remote_user, sdp: this.local_sdp().sdp}, payload);
 
     return this.v3_call_center.create_payload_prop_sync(this.e_call_et.self_state.video_send(), false, additional_payload);
   }
@@ -972,7 +977,7 @@ z.calling.entities.EFlow = class EFlow {
       this.logger.debug('Removing call participant on negotiation timeout');
       this._remove_participant(z.calling.enum.TERMINATION_REASON.RENEGOTIATION);
     },
-    E_FLOW_CONFIG.NEGOTIATION_FAILED_TIMEOUT);
+    EFlow.CONFIG.NEGOTIATION_FAILED_TIMEOUT);
   }
 
   /**
@@ -990,7 +995,7 @@ z.calling.entities.EFlow = class EFlow {
         return this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false);
       }
     },
-    E_FLOW_CONFIG.NEGOTIATION_RESTART_TIMEOUT);
+    EFlow.CONFIG.NEGOTIATION_RESTART_TIMEOUT);
   }
 
   /**
@@ -1004,7 +1009,7 @@ z.calling.entities.EFlow = class EFlow {
       this.logger.debug('Sending local SDP on timeout');
       this.send_local_sdp(true);
     },
-    initial_timeout ? E_FLOW_CONFIG.SDP_SEND_TIMEOUT : E_FLOW_CONFIG.SDP_SEND_TIMEOUT_RESET);
+    initial_timeout ? EFlow.CONFIG.SDP_SEND_TIMEOUT : EFlow.CONFIG.SDP_SEND_TIMEOUT_RESET);
   }
 
 

@@ -30,7 +30,6 @@ z.calling.entities.EParticipant = class EParticipant {
    * @param {z.entity.User} user - User entity to base the participant on
    * @param {z.telemetry.calling.CallSetupTimings} timings - Timing statistics of call setup steps
    * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
-   * @returns {EParticipant} New e-participant entity
    */
   constructor(e_call_et, user, timings, e_call_message_et) {
     this.e_call_et = e_call_et;
@@ -50,7 +49,9 @@ z.calling.entities.EParticipant = class EParticipant {
 
     this.e_flow_et = new z.calling.entities.EFlow(this.e_call_et, this, timings, e_call_message_et);
     if (e_call_message_et) {
-      this.update_properties(e_call_message_et.props);
+      const {props: properties} = e_call_message_et;
+
+      this.update_properties(properties);
     }
 
     this.is_connected.subscribe(function(is_connected) {
@@ -59,8 +60,6 @@ z.calling.entities.EParticipant = class EParticipant {
         this.was_connected = true;
       }
     });
-
-    return this;
   }
 
   /**

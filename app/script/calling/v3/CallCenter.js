@@ -33,7 +33,6 @@ z.calling.v3.CallCenter = class CallCenter {
    * @param {z.conversation.ConversationRepository} conversation_repository - Repository for conversation interactions
    * @param {z.media.MediaRepository} media_repository - Repository for media interactions
    * @param {z.user.UserRepository} user_repository - Repository for all user and connection interactions
-   * @returns {CallCenter} The V3 call center for all e-call interactions
    */
   constructor(calling_config, client_repository, conversation_repository, media_repository, user_repository) {
     this.calling_config = calling_config;
@@ -64,7 +63,6 @@ z.calling.v3.CallCenter = class CallCenter {
 
     this.block_media_stream = true;
     this.subscribe_to_events();
-    return this;
   }
 
   /**
@@ -515,7 +513,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {Promise} Resolves if the message is valid
    */
   _validate_message_type(e_call_message_et) {
-    const {conversation_id} = e_call_message_et;
+    const {conversation_id, type} = e_call_message_et;
 
     return this.conversation_repository.get_conversation_by_id_async(conversation_id)
       .then(function(conversation_et) {
@@ -527,7 +525,7 @@ z.calling.v3.CallCenter = class CallCenter {
             z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START,
           ];
 
-          if (group_message_types.includes(e_call_message_et.type)) {
+          if (group_message_types.includes(type)) {
             throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.WRONG_CONVERSATION_TYPE);
           }
         } else if (conversation_et.is_group()) {
@@ -536,7 +534,7 @@ z.calling.v3.CallCenter = class CallCenter {
             z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP,
           ];
 
-          if (one2one_message_types.includes(e_call_message_et.type)) {
+          if (one2one_message_types.includes(type)) {
             throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.WRONG_CONVERSATION_TYPE);
           }
         } else {
@@ -707,7 +705,7 @@ z.calling.v3.CallCenter = class CallCenter {
     const {remote_client_id, remote_user, remote_user_id, response, type} = e_call_message_et;
     let recipients_promise;
 
-    if (e_call_message_et.type === z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT) {
+    if (type === z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT) {
       recipients_promise = Promise.resolve({self_user_et: this.user_repository.self()});
     } else if (remote_user) {
       recipients_promise = Promise.resolve({remote_user_et: remote_user, self_user_et: this.user_repository.self()});

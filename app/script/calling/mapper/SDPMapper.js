@@ -23,12 +23,13 @@ window.z = window.z || {};
 window.z.calling = z.calling || {};
 window.z.calling.mapper = z.calling.mapper || {};
 
-const SDP_MAPPER_CONFIG = {
-  AUDIO_BITRATE: '30',
-  AUDIO_PTIME: '60',
-};
 
 z.calling.mapper.SDPMapper = {
+  CONFIG: {
+    AUDIO_BITRATE: '30',
+    AUDIO_PTIME: '60',
+  },
+
   /**
    * Get the tool version that generated the SDP
    * @param {string} sdp_string - Full SDP string
@@ -48,9 +49,10 @@ z.calling.mapper.SDPMapper = {
    * @returns {Promise} Resolves with a webRTC standard compliant RTCSessionDescription
    */
   map_e_call_message_to_object(e_call_message_et) {
+    const {response, sdp: sdp_string} = e_call_message_et;
     const sdp = {
-      sdp: e_call_message_et.sdp,
-      type: e_call_message_et.response === true ? z.calling.rtc.SDP_TYPE.ANSWER : z.calling.rtc.SDP_TYPE.OFFER,
+      sdp: sdp_string,
+      type: response === true ? z.calling.rtc.SDP_TYPE.ANSWER : z.calling.rtc.SDP_TYPE.OFFER,
     };
 
     return Promise.resolve(new window.RTCSessionDescription(sdp));
@@ -116,14 +118,14 @@ z.calling.mapper.SDPMapper = {
       } else if (sdp_line.startsWith('m=audio')) {
         if (flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART || (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && flow_et.is_group())) {
           sdp_lines.push(sdp_line);
-          outline = `b=AS:${SDP_MAPPER_CONFIG.AUDIO_BITRATE}`;
+          outline = `b=AS:${z.calling.mapper.SDPMapper.CONFIG.AUDIO_BITRATE}`;
         }
 
       } else if (sdp_line.startsWith('a=rtpmap')) {
         if (flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART || (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && flow_et.is_group())) {
           if (z.util.StringUtil.includes(sdp_line, 'opus')) {
             sdp_lines.push(sdp_line);
-            outline = `a=ptime:${SDP_MAPPER_CONFIG.AUDIO_PTIME}`;
+            outline = `a=ptime:${z.calling.mapper.SDPMapper.CONFIG.AUDIO_PTIME}`;
           }
         }
 

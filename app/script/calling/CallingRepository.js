@@ -22,11 +22,13 @@
 window.z = window.z || {};
 window.z.calling = z.calling || {};
 
-const CALLING_CONFIG = {
-  DEFAULT_UPDATE_INTERVAL: 30 * 60, // 30 minutes in seconds
-};
-
 z.calling.CallingRepository = class CallingRepository {
+  static get CONFIG() {
+    return {
+      DEFAULT_UPDATE_INTERVAL: 30 * 60, // 30 minutes in seconds
+    };
+  }
+
   /**
    * Extended check for calling support of browser.
    * @returns {boolean} True if calling is supported
@@ -51,7 +53,6 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {z.conversation.ConversationRepository} conversation_repository -  Repository for conversation interactions
    * @param {z.media.MediaRepository} media_repository -  Repository for media interactions
    * @param {z.user.UserRepository} user_repository -  Repository for all user and connection interactions
-   * @returns {CallingRepository} New Calling repository for all calling interactions.
    */
   constructor(call_service, calling_service, client_repository, conversation_repository, media_repository, user_repository) {
     this.call_service = call_service;
@@ -369,7 +370,7 @@ z.calling.CallingRepository = class CallingRepository {
     this.calling_service.get_config()
       .then((calling_config) => {
         // Removed reliance on "calling_config.ttl" until further notice
-        const timeout_in_seconds = CALLING_CONFIG.DEFAULT_UPDATE_INTERVAL;
+        const timeout_in_seconds = CallingRepository.CONFIG.DEFAULT_UPDATE_INTERVAL;
 
         this.logger.info(`Updated calling configuration - next update in ${timeout_in_seconds}s`, calling_config);
         this.calling_config(calling_config);

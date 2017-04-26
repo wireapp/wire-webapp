@@ -39,7 +39,6 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @param {string} remote_user_id - Remote user ID
    * @param {z.calling.Call} call_et - Call entity
    * @param {z.telemetry.calling.CallSetupTimings} timings - Timings of call setup steps
-   * returns {FlowTelemetry} The new flow telemetry entity
    */
   constructor(id, remote_user_id, call_et, timings) {
     this.remote_user_id = remote_user_id;
