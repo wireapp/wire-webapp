@@ -54,6 +54,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         this.emoji_dict = text.split('\n');
       });
 
+    this.bound_remove_emoji_list = this.remove_emoji_list.bind(this);
     this._init_subscriptions();
   }
 
@@ -133,9 +134,9 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         .join('');
 
       if (emoji_matched === '') {
-        this.remove_emoji_list();
+        this.close_emoji_list();
       } else {
-        window.addEventListener('click', this.remove_emoji_list.bind(this));
+        window.addEventListener('click', this.bound_remove_emoji_list);
         this.emoji_list
           .html(emoji_matched)
           .appendTo('body')
@@ -170,9 +171,13 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     $(input).focus();
   }
 
-  remove_emoji_list() {
-    window.removeEventListener('click', this.remove_emoji_list);
+  close_emoji_list() {
+    window.removeEventListener('click', this.bound_remove_emoji_list);
     this.emoji_list.remove();
+  }
+
+  remove_emoji_list() {
+    this.close_emoji_list();
     this.emoji_start_pos = -1;
   }
 
