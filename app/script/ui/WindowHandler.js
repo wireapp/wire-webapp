@@ -57,7 +57,7 @@ z.ui.WindowHandler = class WindowHandler {
         if (this.lost_focus_interval === undefined) {
           this.lost_focus_on = Date.now();
           this.lost_focus_interval = window.setInterval((() => this._check_for_timeout()),
-            this.z.tracking.EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL);
+            z.tracking.EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL);
         }
       }
     });
