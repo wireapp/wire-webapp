@@ -60,7 +60,8 @@ z.ui.Context = (() => {
       element.setAttribute('data-uie-name', identifier || 'ctx-menu');
       element.classList.add('ctx-menu-item');
       element.innerText = entry.label;
-      element.onclick = function() {
+      element.onclick = function(event) {
+        event.stopPropagation();
         cleanup();
         entry.click();
       };

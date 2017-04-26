@@ -106,7 +106,6 @@ class z.ViewModel.ConversationInputViewModel
     amplify.subscribe z.event.WebApp.EXTENSIONS.GIPHY.SEND, => @conversation_et()?.input ''
     amplify.subscribe z.event.WebApp.CONVERSATION.IMAGE.SEND, @upload_images
     amplify.subscribe z.event.WebApp.CONVERSATION.MESSAGE.EDIT, @edit_message
-    amplify.subscribe z.event.WebApp.CONTEXT_MENU, @on_context_menu_action
 
   added_to_view: =>
     window.setTimeout =>
