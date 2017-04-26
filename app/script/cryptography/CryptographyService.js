@@ -22,19 +22,21 @@
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
 
-const URL_CLIENTS = '/clients';
-const URL_USERS = '/users';
-
 z.cryptography.CryptographyService = class CryptographyService {
+  static get CONFIG() {
+    return {
+      URL_CLIENTS: '/clients',
+      URL_USERS: '/users',
+    };
+  }
+
   /**
    * Construct a new Cryptography Service.
    * @param {z.service.Client} client - Client for the API calls
-   * @returns {CryptographyService} The new service for cryptography interactions
    */
   constructor(client) {
     this.client = client;
     this.logger = new z.util.Logger('z.cryptography.CryptographyService', z.config.LOGGER.OPTIONS);
-    return this;
   }
 
   /**
@@ -48,7 +50,7 @@ z.cryptography.CryptographyService = class CryptographyService {
     return this.client.send_json({
       data: user_client_map,
       type: 'POST',
-      url: this.client.create_url(`${URL_USERS}/prekeys`),
+      url: this.client.create_url(`${CryptographyService.CONFIG.URL_USERS}/prekeys`),
     });
   }
 
@@ -65,7 +67,7 @@ z.cryptography.CryptographyService = class CryptographyService {
         prekeys: serialized_pre_keys,
       },
       type: 'PUT',
-      url: this.client.create_url(`${URL_CLIENTS}/${client_id}`),
+      url: this.client.create_url(`${CryptographyService.CONFIG.URL_CLIENTS}/${client_id}`),
     });
   }
 };

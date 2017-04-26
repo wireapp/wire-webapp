@@ -39,7 +39,6 @@ z.search.SearchRepository = class SearchRepository {
    * Construct a new Conversation Repository.
    * @param {z.search.SearchService} search_service - Backend REST API search service implementation
    * @param {z.user.UserRepository} user_repository - Repository for all user and connection interactions
-   * @returns {SearchRepository} Repository for all interactions with the search service
   */
   constructor(search_service, user_repository) {
     this.search_service = search_service;
@@ -47,7 +46,6 @@ z.search.SearchRepository = class SearchRepository {
     this.logger = new z.util.Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
 
     this.search_result_mapper = new z.search.SearchResultMapper(this.user_repository);
-    return this;
   }
 
   /**

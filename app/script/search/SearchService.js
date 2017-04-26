@@ -26,12 +26,10 @@ z.search.SearchService = class SearchService {
   /**
    * Construct a new Search Service.
    * @param {z.service.Client} client - Client for the API calls
-   * @returns {SearchService} Service for all search calls to the backend REST API
    */
   constructor(client) {
     this.client = client;
     this.logger = new z.util.Logger('z.search.SearchService', z.config.LOGGER.OPTIONS);
-    return this;
   }
 
   /**

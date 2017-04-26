@@ -22,17 +22,21 @@
 window.z = window.z || {};
 window.z.event = z.event || {};
 
-const EVENT_CONFIG = {
-  E_CALL_EVENT_LIFETIME: 30 * 1000, // 30 seconds
-  UNKNOWN_DECRYPTION_ERROR_CODE: 999,
-};
-
-const NOTIFICATION_SOURCE = {
-  STREAM: 'Notification Stream',
-  WEB_SOCKET: 'WebSocket',
-};
-
 z.event.EventRepository = class EventRepository {
+  static get CONFIG() {
+    return {
+      E_CALL_EVENT_LIFETIME: 30 * 1000, // 30 seconds
+      UNKNOWN_DECRYPTION_ERROR_CODE: 999,
+    };
+  }
+
+  static get NOTIFICATION_SOURCE() {
+    return {
+      STREAM: 'Notification Stream',
+      WEB_SOCKET: 'WebSocket',
+    };
+  }
+
   /**
    * Construct a new Event Repository.
    *
@@ -41,7 +45,6 @@ z.event.EventRepository = class EventRepository {
    * @param {z.cryptography.CryptographyRepository} cryptography_repository - Repository for all cryptography interactions
    * @param {z.user.UserRepository} user_repository - Repository for all user and connection interactions
    * @param {z.conversation.ConversationService} conversation_service - Service to handle conversation related tasks
-   * @returns {EventRepository} Repository that handles events
    */
   constructor(web_socket_service, notification_service, cryptography_repository, user_repository, conversation_service) {
     this.web_socket_service = web_socket_service;
@@ -114,7 +117,6 @@ z.event.EventRepository = class EventRepository {
 
     amplify.subscribe(z.event.WebApp.CONNECTION.ONLINE, this.recover_from_notification_stream.bind(this));
     amplify.subscribe(z.event.WebApp.EVENT.INJECT, this.inject_event.bind(this));
-    return this;
   }
 
 
@@ -479,7 +481,7 @@ z.event.EventRepository = class EventRepository {
         return this.cryptography_repository.decrypt_event(event)
         .catch((decryption_error) => {
           // Get error information
-          const error_code = decryption_error.code || EVENT_CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
+          const error_code = decryption_error.code || EventRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
           const {data: event_data, from: remote_user_id} = event;
           const {sender: remote_client_id} = event_data.sender;
           const session_id = this.cryptography_repository._construct_session_id(remote_user_id, remote_client_id);
@@ -553,7 +555,7 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the ID of the handled notification
    */
   _handle_notification({payload: events, id, transient}) {
-    const source = transient !== null ? NOTIFICATION_SOURCE.WEB_SOCKET : NOTIFICATION_SOURCE.STREAM;
+    const source = transient !== null ? EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET : EventRepository.NOTIFICATION_SOURCE.STREAM;
     const is_transient_event = transient === true;
 
     this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
@@ -621,7 +623,7 @@ z.event.EventRepository = class EventRepository {
 
     const corrected_timestamp = Date.now() - this.clock_drift;
     const event_timestamp = new Date(event.time).getTime();
-    if (corrected_timestamp > (event_timestamp + EVENT_CONFIG.E_CALL_EVENT_LIFETIME)) {
+    if (corrected_timestamp > (event_timestamp + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME)) {
       this.logger.info(`Ignored outdated '${event.type}' event in conversation '${event.conversation}' - Event: '${event_timestamp}', Local: '${corrected_timestamp}'`, {event_json: JSON.stringify(event), event_object: event});
       throw new z.event.EventError(z.event.EventError.TYPE.OUTDATED_E_CALL_EVENT);
     }

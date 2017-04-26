@@ -26,7 +26,6 @@ z.media.MediaElementHandler = class MediaElementHandler {
   /**
    * Construct an new MediaElement handler.
    * @param {z.media.MediaRepository} media_repository - Repository for media interactions
-   * @returns {MediaElementHandler} Handler for MediaElements
    */
   constructor(media_repository) {
     this.media_repository = media_repository;
@@ -34,7 +33,6 @@ z.media.MediaElementHandler = class MediaElementHandler {
 
     this.current_device_id = this.media_repository.devices_handler.current_device_id;
     this.remote_media_elements = ko.observableArray([]);
-    return this;
   }
 
   /**
