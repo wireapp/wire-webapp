@@ -28,7 +28,6 @@ z.connect.ConnectRepository = class ConnectRepository {
     this.connect_google_service = connect_google_service;
     this.properties_repository = properties_repository;
     this.logger = new z.util.Logger('z.connect.ConnectRepository', z.config.LOGGER.OPTIONS);
-    return this;
   }
 
   /**

@@ -22,13 +22,16 @@
 window.z = window.z || {};
 window.z.properties = z.properties || {};
 
-const PROPERTIES_KEY = 'webapp';
-
 z.properties.PropertiesRepository = class PropertiesRepository {
+  static get CONFIG() {
+    return {
+      PROPERTIES_KEY: 'webapp',
+    };
+  }
+
   /**
    * Construct a new User properties repository.
    * @param {z.properties.PropertiesService} properties_service - Backend REST API properties service implementation
-   * @returns {PropertiesRepository} Properties repository for all property interactions with the user property service
    */
   constructor(properties_service) {
     this.properties_service = properties_service;
@@ -38,7 +41,6 @@ z.properties.PropertiesRepository = class PropertiesRepository {
     this.self = ko.observable();
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.properties_updated.bind(this));
-    return this;
   }
 
   /**
@@ -69,8 +71,8 @@ z.properties.PropertiesRepository = class PropertiesRepository {
     this.properties_service.get_properties()
     .then((keys) => {
       this.self(self_user_et);
-      if (keys.includes(PROPERTIES_KEY)) {
-        return this.properties_service.get_properties_by_key(PROPERTIES_KEY)
+      if (keys.includes(PropertiesRepository.CONFIG.PROPERTIES_KEY)) {
+        return this.properties_service.get_properties_by_key(PropertiesRepository.CONFIG.PROPERTIES_KEY)
         .then((properties) => {
           $.extend(true, this.properties, properties);
           this.logger.info('Loaded user properties', this.properties);
@@ -119,7 +121,7 @@ z.properties.PropertiesRepository = class PropertiesRepository {
     if (updated_preference !== this.get_preference(properties_type)) {
       this.set_preference(properties_type, updated_preference);
 
-      this.properties_service.put_properties_by_key(PROPERTIES_KEY, this.properties)
+      this.properties_service.put_properties_by_key(PropertiesRepository.CONFIG.PROPERTIES_KEY, this.properties)
       .then(() => {
         this.logger.info(`Saved updated preference: '${properties_type}' - '${updated_preference}'`);
 

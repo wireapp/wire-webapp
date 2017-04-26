@@ -35,15 +35,6 @@ window.z.config = {
   ACCOUNT_PRODUCTION_URL: 'https://account-wire.com/',
   ACCOUNT_STAGING_URL: 'https://wire-account-staging.zinfra.io/',
 
-  BROWSER_NOTIFICATION: {
-    BODY_LENGTH: 80,
-    TIMEOUT: 5000,
-    TITLE_LENGTH: 38,
-  },
-
-  // 3 minutes session timeout
-  LOCALYTICS_SESSION_TIMEOUT: 3 * 60 * 1000,
-
   LOGGER: {
     OPTIONS: {
       domains: {
@@ -100,13 +91,8 @@ window.z.config = {
 
   MINIMUM_USERNAME_LENGTH: 2,
 
-  PROPERTIES_KEY: 'webapp',
-
   // measured in pixel
   SCROLL_TO_LAST_MESSAGE_THRESHOLD: 100,
-
-  // number of users displayed in "people you may know"
-  SUGGESTIONS_FETCH_LIMIT: 30,
 
   SUPPORTED_CONVERSATION_IMAGE_TYPES: [
     '.jpg-large',

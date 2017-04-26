@@ -22,28 +22,26 @@
 window.z = window.z || {};
 window.z.tracking = z.tracking || {};
 
-const EVENT_TRACKING_CONFIG = {
-  LOCALYTICS: {
-    APP_KEY: '905792736c9f17c3464fd4e-60d90c82-d14a-11e4-af66-009c5fda0a25',
-    DISABLED_DOMAINS: [
-      'localhost',
-      'zinfra.io',
-    ],
-    SESSION_INTERVAL: 60000, // milliseconds
-  },
-  RAYGUN: {
-    API_KEY: '5hvAMmz8wTXaHBYqu2TFUQ==',
-  },
-};
-
-if (z.util.Environment.frontend.is_production()) {
-  EVENT_TRACKING_CONFIG.RAYGUN.API_KEY = 'lAkLCPLx3ysnsXktajeHmw==';
-  EVENT_TRACKING_CONFIG.LOCALYTICS.APP_KEY = 'f19c50ccf7bff11992798f0-59fac3b8-ad88-11e6-ff9e-00ae30fe7875';
-}
-
 z.tracking.EventTrackingRepository = class EventTrackingRepository {
-  static get ERROR_REPORTING_THRESHOLD() {
-    return 60000; // in milliseconds
+  static get CONFIG() {
+    const RAYGUN_API_KEY = z.util.Environment.frontend.is_production() ? 'lAkLCPLx3ysnsXktajeHmw==' : '5hvAMmz8wTXaHBYqu2TFUQ==';
+    const LOCALYTICS_APP_KEY = z.util.Environment.frontend.is_production() ? 'f19c50ccf7bff11992798f0-59fac3b8-ad88-11e6-ff9e-00ae30fe7875' : '905792736c9f17c3464fd4e-60d90c82-d14a-11e4-af66-009c5fda0a25';
+
+    return {
+      ERROR_REPORTING_THRESHOLD: 60 * 1000, // in milliseconds
+      LOCALYTICS: {
+        APP_KEY: LOCALYTICS_APP_KEY,
+        DISABLED_DOMAINS: [
+          'localhost',
+          'zinfra.io',
+        ],
+        SESSION_INTERVAL: 60 * 1000, // milliseconds
+        SESSION_TIMEOUT: 3 * 60 * 1000,
+      },
+      RAYGUN: {
+        API_KEY: RAYGUN_API_KEY,
+      },
+    };
   }
 
   /**
@@ -189,7 +187,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       this.logger.info('Starting new Localytics session');
       this.localytics('open');
       this.localytics('upload');
-      this.session_interval = window.setInterval(this.upload_session, EVENT_TRACKING_CONFIG.LOCALYTICS.SESSION_INTERVAL);
+      this.session_interval = window.setInterval(this.upload_session, EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL);
     }
   }
 
@@ -240,13 +238,13 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     (element_node = document.getElementsByTagName('script')[0]).parentNode.insertBefore(script_element, element_node);
 
-    this.localytics('init', EVENT_TRACKING_CONFIG.LOCALYTICS.APP_KEY, options);
+    this.localytics('init', EventTrackingRepository.CONFIG.LOCALYTICS.APP_KEY, options);
     this.logger.debug('Localytics reporting is enabled');
   }
 
   _localytics_disabled() {
     if (!z.util.get_url_parameter(z.auth.URLParameter.LOCALYTICS)) {
-      for (const domain of EVENT_TRACKING_CONFIG.LOCALYTICS.DISABLED_DOMAINS) {
+      for (const domain of EventTrackingRepository.CONFIG.LOCALYTICS.DISABLED_DOMAINS) {
         if (z.util.StringUtil.includes(window.location.hostname, domain)) {
           this.logger.debug('Localytics reporting is disabled due to domain');
 
@@ -304,7 +302,8 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
       return raygun_payload;
     }
 
-    if (Date.now() - this.last_report > z.tracking.EventTrackingRepository.ERROR_REPORTING_THRESHOLD) {
+    const time_since_last_report = Date.now() - this.last_report;
+    if (time_since_last_report > EventTrackingRepository.CONFIG.ERROR_REPORTING_THRESHOLD) {
       this.last_report = Date.now();
 
       return raygun_payload;
@@ -320,7 +319,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
   _disable_error_reporting() {
     this.logger.debug('Disabling Raygun error reporting');
     Raygun.detach();
-    Raygun.init(EVENT_TRACKING_CONFIG.RAYGUN.API_KEY, {disableErrorTracking: true});
+    Raygun.init(EventTrackingRepository.CONFIG.RAYGUN.API_KEY, {disableErrorTracking: true});
     this._detach_promise_rejection_handler();
   }
 
@@ -339,7 +338,7 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
 
     options.debugMode = !z.util.Environment.frontend.is_production();
 
-    Raygun.init(EVENT_TRACKING_CONFIG.RAYGUN.API_KEY, options).attach();
+    Raygun.init(EventTrackingRepository.CONFIG.RAYGUN.API_KEY, options).attach();
 
     /*
     Adding a version to the Raygun reports to identify which version of the Wire ran into the issue.

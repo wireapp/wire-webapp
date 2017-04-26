@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.auth = z.auth || {};
 
-window.z.auth.AuthRepository = class AuthRepository {
+z.auth.AuthRepository = class AuthRepository {
   constructor(auth_service) {
     this.access_token_refresh = undefined;
     this.auth_service = auth_service;

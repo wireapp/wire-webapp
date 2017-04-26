@@ -17,7 +17,9 @@
  *
  */
 
-module.exports = function (config) {
+/* eslint-disable sort-keys */
+
+module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -40,7 +42,7 @@ module.exports = function (config) {
     // pre-process matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '../dist/script/**/*.js': ['coverage']
+      '../dist/script/**/*.js': ['coverage'],
     },
 
     // test results reporter to use
@@ -68,8 +70,8 @@ module.exports = function (config) {
     customLaunchers: {
       Chrome_travis_ci: {
         base: 'Chrome',
-        flags: ['--no-sandbox']
-      }
+        flags: ['--no-sandbox'],
+      },
     },
 
     // Continuous Integration mode
@@ -84,34 +86,34 @@ module.exports = function (config) {
       reporters: [
         {
           dir: '../docs/coverage',
-          type: 'html'
+          type: 'html',
         },
         {
           dir: '../docs/coverage',
           file: 'coverage-summary.txt',
-          type: 'text-summary'
-        }
+          type: 'text-summary',
+        },
       ],
       check: {
         global: {
           statements: 40,
           branches: 25,
           functions: 20,
-          lines: 40
+          lines: 40,
         },
         each: {
-          statements: 2,
+          statements: 0,
           branches: 0,
           functions: 0,
-          lines: 2
-        }
-      }
-    }
+          lines: 0,
+        },
+      },
+    },
   });
 
   if (process.env.TRAVIS) {
     config.set({
-      port: 9877
+      port: 9877,
     });
   }
 };

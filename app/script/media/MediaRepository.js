@@ -41,7 +41,6 @@ z.media.MediaRepository = class MediaRepository {
 
   /**
    * Construct a new Media repository.
-   * @returns {MediaRepository} The new Media repository
    */
   constructor() {
     this.logger = new z.util.Logger('z.media.MediaRepository', z.config.LOGGER.OPTIONS);
@@ -51,7 +50,6 @@ z.media.MediaRepository = class MediaRepository {
     this.stream_handler = new z.media.MediaStreamHandler(this);
 
     this.audio_context = undefined;
-    return this;
   }
 
   /**
