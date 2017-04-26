@@ -77,10 +77,7 @@ window.z.util = z.util || {};
       if (this.is_edge()) {
         return false;
       }
-      if (this.is_firefox() && (this.get_version() >= 52)) {
-        return true;
-      }
-      return this.is_chrome() || this.is_opera();
+      return this.is_chrome() || this.is_firefox() || this.is_opera();
     },
     supports_media_devices: function() {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
