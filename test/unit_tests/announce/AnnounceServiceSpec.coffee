@@ -69,7 +69,7 @@ describe 'z.announce.AnnounceService', ->
         ]
         'status': 'success'
 
-      server.respondWith 'GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [
+      server.respondWith 'GET', 'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true', [
         200
         'Content-Type': 'application/json'
         JSON.stringify response
@@ -89,7 +89,7 @@ describe 'z.announce.AnnounceService', ->
     beforeEach ->
       server = sinon.fakeServer.create()
       server.autoRespond = true
-      server.respondWith 'GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [404, {}, ""]
+      server.respondWith 'GET', 'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true', [404, {}, ""]
 
     afterEach ->
       server.restore()
@@ -123,5 +123,3 @@ describe 'z.announce.AnnounceService', ->
         expect(version).toBe response.version
         done()
       .catch done.fail
-
-
