@@ -27,13 +27,11 @@ z.client.ClientService = class ClientService {
    * Construct a new client service.
    * @param {z.client.Client} client - Local client entity
    * @param {z.storage.StorageService} storage_service - Service for all storage interactions
-   * @returns {ClientService} Service for all client interactions
    */
   constructor(client, storage_service) {
     this.client = client;
     this.storage_service = storage_service;
     this.logger = new z.util.Logger('z.client.ClientService', z.config.LOGGER.OPTIONS);
-    return this;
   }
 
   //##############################################################################

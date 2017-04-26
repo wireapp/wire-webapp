@@ -19,43 +19,45 @@
 
 'use strict';
 
-(function() {
-  window.z = window.z || {};
-  window.z.announce = z.announce || {};
+window.z = window.z || {};
+window.z.announce = z.announce || {};
 
-  const ANNOUNCE_SERVICE_URL = 'api/v1/announce/';
+z.announce.AnnounceService = class AnnounceService {
+  static get CONFIG() {
+    return {
+      URL: 'api/v1/announce/',
+    };
+  }
 
-  window.z.announce.AnnounceService = class AnnounceService {
-    constructor() {
-      this.logger = new z.util.Logger('z.announce.AnnounceService', z.config.LOGGER.OPTIONS);
-      this.url = `${z.util.Environment.backend.website_url()}${ANNOUNCE_SERVICE_URL}?order=created&active=true`;
-      if (z.util.Environment.frontend.is_production()) {
-        this.url += '&production=true';
-      }
+  constructor() {
+    this.logger = new z.util.Logger('z.announce.AnnounceService', z.config.LOGGER.OPTIONS);
+    this.url = `${z.util.Environment.backend.website_url()}${AnnounceService.CONFIG.URL}?order=created&active=true`;
+    if (z.util.Environment.frontend.is_production()) {
+      this.url += '&production=true';
     }
+  }
 
-    get_announcements() {
-      return new Promise((resolve, reject) => {
-        $.get(this.url)
+  get_announcements() {
+    return new Promise((resolve, reject) => {
+      $.get(this.url)
         .done((data) => {
           resolve(data['result']);
         })
         .fail((jqXHR, textStatus, errorThrown) => {
           reject(new Error(errorThrown));
         });
-      });
-    }
+    });
+  }
 
-    get_version() {
-      return new Promise((resolve, reject) => {
-        $.get('version/')
+  get_version() {
+    return new Promise((resolve, reject) => {
+      $.get('version/')
         .done((data) => {
           resolve(data['version']);
         })
         .fail((jqXHR, textStatus, errorThrown) => {
           reject(new Error(errorThrown));
         });
-      });
-    }
-  };
-})();
+    });
+  }
+};

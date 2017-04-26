@@ -33,7 +33,6 @@ z.ui.WindowHandler = class WindowHandler {
 
     this.is_visible = true;
     this.lost_focus_interval = undefined;
-    this.lost_focus_interval_time = z.config.LOCALYTICS_SESSION_TIMEOUT / 3;
     this.lost_focus_on = undefined;
 
     return this;
@@ -44,7 +43,7 @@ z.ui.WindowHandler = class WindowHandler {
     this.height = $(window).height();
     this._listen_to_unhandled_promise_rejection();
     this._listen_to_window_resize();
-    this._listen_to_visibility_change(() => {
+    document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         this.logger.info('Webapp is visible');
         this.is_visible = true;
@@ -57,7 +56,8 @@ z.ui.WindowHandler = class WindowHandler {
         this.is_visible = false;
         if (this.lost_focus_interval === undefined) {
           this.lost_focus_on = Date.now();
-          this.lost_focus_interval = window.setInterval((() => this._check_for_timeout()), this.lost_focus_interval_time);
+          this.lost_focus_interval = window.setInterval((() => this._check_for_timeout()),
+            this.z.tracking.EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL);
         }
       }
     });
@@ -94,29 +94,9 @@ z.ui.WindowHandler = class WindowHandler {
     });
   }
 
-  _listen_to_visibility_change(callback) {
-    let property_hidden = undefined;
-    let property_visibility_change = undefined;
-
-    if (typeof document.hidden !== 'undefined') {
-      property_hidden = 'hidden';
-      property_visibility_change = 'visibilitychange';
-    } else if (typeof document.msHidden !== 'undefined') {
-      property_hidden = 'msHidden';
-      property_visibility_change = 'msvisibilitychange';
-    } else if (typeof document.webkitHidden !== 'undefined') {
-      property_hidden = 'webkitHidden';
-      property_visibility_change = 'webkitvisibilitychange';
-    }
-
-    if (property_hidden) {
-      return $(document).on(property_visibility_change, () => callback());
-    }
-  }
-
   _check_for_timeout() {
     const in_background_since = Date.now() - this.lost_focus_on;
-    if (in_background_since >= z.config.LOCALYTICS_SESSION_TIMEOUT) {
+    if (in_background_since >= z.tracking.EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_TIMEOUT) {
       return amplify.publish(z.event.WebApp.ANALYTICS.CLOSE_SESSION);
     }
   }

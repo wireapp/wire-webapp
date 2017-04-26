@@ -22,19 +22,20 @@
 window.z = window.z || {};
 window.z.event = z.event || {};
 
-const NOTIFICATION_SERVICE_CONFIG = {
-  PRIMARY_KEY_LAST_NOTIFICATION: 'z.storage.StorageKey.NOTIFICATION.LAST_ID',
-  URL_NOTIFICATIONS: '/notifications',
-  URL_NOTIFICATIONS_LAST: '/notifications/last',
-};
-
 z.event.NotificationService = class NotificationService {
+  static get CONFIG() {
+    return {
+      PRIMARY_KEY_LAST_NOTIFICATION: 'z.storage.StorageKey.NOTIFICATION.LAST_ID',
+      URL_NOTIFICATIONS: '/notifications',
+      URL_NOTIFICATIONS_LAST: '/notifications/last',
+    };
+  }
+
   /**
    * Construct a new Notification Service.
    *
    * @param {z.service.Client} client - Client for the API calls
    * @param {z.storage.StorageService} storage_service - Service for all storage related tasks
-   * @returns {NotificationService} Notification Service for all notification stream calls to the backend REST API
    */
   constructor(client, storage_service) {
     this.get_last_notification_id_from_db = this.get_last_notification_id_from_db.bind(this);
@@ -42,7 +43,6 @@ z.event.NotificationService = class NotificationService {
     this.client = client;
     this.storage_service = storage_service;
     this.logger = new z.util.Logger('z.event.NotificationService', z.config.LOGGER.OPTIONS);
-    return this;
   }
 
   /**
@@ -61,7 +61,7 @@ z.event.NotificationService = class NotificationService {
         size: size,
       },
       type: 'GET',
-      url: this.client.create_url(NOTIFICATION_SERVICE_CONFIG.URL_NOTIFICATIONS),
+      url: this.client.create_url(NotificationService.CONFIG.URL_NOTIFICATIONS),
     });
   }
 
@@ -76,7 +76,7 @@ z.event.NotificationService = class NotificationService {
         client: client_id,
       },
       type: 'GET',
-      url: this.client.create_url(NOTIFICATION_SERVICE_CONFIG.URL_NOTIFICATIONS_LAST),
+      url: this.client.create_url(NotificationService.CONFIG.URL_NOTIFICATIONS_LAST),
     });
   }
 
@@ -85,7 +85,7 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the stored last notification ID.
    */
   get_last_notification_id_from_db() {
-    return this.storage_service.load(this.storage_service.OBJECT_STORE_AMPLIFY, NOTIFICATION_SERVICE_CONFIG.PRIMARY_KEY_LAST_NOTIFICATION)
+    return this.storage_service.load(this.storage_service.OBJECT_STORE_AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION)
     .then(function(record) {
       if (record && record.value) {
         return record.value;
@@ -104,6 +104,6 @@ z.event.NotificationService = class NotificationService {
    * @returns {Promise} Resolves with the stored record
    */
   save_last_notification_id_to_db(notification_id) {
-    return this.storage_service.save(this.storage_service.OBJECT_STORE_AMPLIFY, NOTIFICATION_SERVICE_CONFIG.PRIMARY_KEY_LAST_NOTIFICATION, {value: notification_id});
+    return this.storage_service.save(this.storage_service.OBJECT_STORE_AMPLIFY, NotificationService.CONFIG.PRIMARY_KEY_LAST_NOTIFICATION, {value: notification_id});
   }
 };

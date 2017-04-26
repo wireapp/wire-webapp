@@ -22,20 +22,20 @@
 window.z = window.z || {};
 window.z.properties = z.properties || {};
 
-const PROPERTIES_SERVICE_CONFIG = {
-  URL_PROPERTIES: '/properties',
-};
-
 z.properties.PropertiesService = class PropertiesService {
+  static get CONFIG() {
+    return {
+      URL_PROPERTIES: '/properties',
+    };
+  }
+
   /**
    * Construct a new Properties Service.
    * @param {z.service.Client} client - Client for the API calls
-   * @returns {PropertiesService} Properties service for all user property calls to the backend REST API
    */
   constructor(client) {
     this.client = client;
     this.logger = new z.util.Logger('z.properties.PropertiesService', z.config.LOGGER.OPTIONS);
-    return this;
   }
 
   /**
@@ -46,7 +46,7 @@ z.properties.PropertiesService = class PropertiesService {
   delete_properties() {
     return this.client.send_request({
       type: 'DELETE',
-      url: this.client.create_url(PROPERTIES_SERVICE_CONFIG.URL_PROPERTIES),
+      url: this.client.create_url(PropertiesService.CONFIG.URL_PROPERTIES),
     });
   }
 
@@ -59,7 +59,7 @@ z.properties.PropertiesService = class PropertiesService {
   delete_properties_by_key(key) {
     return this.client.send_request({
       type: 'DELETE',
-      url: this.client.create_url(`${PROPERTIES_SERVICE_CONFIG.URL_PROPERTIES}/${key}`),
+      url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
     });
   }
 
@@ -71,7 +71,7 @@ z.properties.PropertiesService = class PropertiesService {
   get_properties() {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(PROPERTIES_SERVICE_CONFIG.URL_PROPERTIES),
+      url: this.client.create_url(PropertiesService.CONFIG.URL_PROPERTIES),
     });
   }
 
@@ -85,7 +85,7 @@ z.properties.PropertiesService = class PropertiesService {
   get_properties_by_key(key) {
     return this.client.send_request({
       type: 'GET',
-      url: this.client.create_url(`${PROPERTIES_SERVICE_CONFIG.URL_PROPERTIES}/${key}`),
+      url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
     });
   }
 
@@ -101,7 +101,7 @@ z.properties.PropertiesService = class PropertiesService {
     return this.client.send_json({
       data: properties,
       type: 'PUT',
-      url: this.client.create_url(`${PROPERTIES_SERVICE_CONFIG.URL_PROPERTIES}/${key}`),
+      url: this.client.create_url(`${PropertiesService.CONFIG.URL_PROPERTIES}/${key}`),
     });
   }
 };
