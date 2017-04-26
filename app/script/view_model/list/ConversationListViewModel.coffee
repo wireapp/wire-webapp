@@ -221,7 +221,7 @@ class z.ViewModel.list.ConversationListViewModel
         label: z.localization.Localizer.get_text(z.string.conversations_popover_leave),
         click: => @click_on_leave_action conversation_et
 
-    z.ui.Context.from event, entries
+    z.ui.Context.from event, entries, 'conversation-list-options-menu'
 
   click_on_block_action: (conversation_et) =>
     next_conversation_et = @conversation_repository.get_next_conversation conversation_et

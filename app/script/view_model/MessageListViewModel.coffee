@@ -524,4 +524,4 @@ class z.ViewModel.MessageListViewModel
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.DELETE_EVERYONE_MESSAGE,
           action: => @conversation_repository.delete_message_everyone @conversation(), message_et
 
-    z.ui.Context.from event, entries
+    z.ui.Context.from event, entries, 'message-options-menu'

@@ -51,12 +51,13 @@ z.ui.Context = (() => {
     removeListeners();
   }
 
-  function build(entries) {
+  function build(entries, identifier) {
     const menu = document.createElement('div');
     menu.classList.add('ctx-menu');
 
     for (const entry of entries) {
       const element = document.createElement('div');
+      element.setAttribute('data-uie-name', identifier || 'ctx-menu');
       element.classList.add('ctx-menu-item');
       element.innerText = entry.label;
       element.onclick = function() {
@@ -69,7 +70,7 @@ z.ui.Context = (() => {
     return menu;
   }
 
-  function from(event, entries) {
+  function from(event, entries, identifier) {
     event.preventDefault();
     event.stopPropagation();
 
@@ -81,7 +82,7 @@ z.ui.Context = (() => {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
-    const menu = build(entries);
+    const menu = build(entries, identifier);
     menu.style.visibility = 'hidden';
     document.body.appendChild(menu);
 

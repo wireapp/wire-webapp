@@ -333,10 +333,12 @@ class z.ViewModel.ConversationInputViewModel
   @param event [DOMEvent]
   ###
   click_on_ephemeral_button: (data, event) =>
-    z.ui.Context.from event, [
+    entries = [
       label: z.localization.Localizer.get_text(z.string.ephememal_units_none)
       click: => @set_ephemeral_timer 0
     ].concat z.ephemeral.timings.get_values().map (milliseconds) =>
       [number, unit] = z.util.format_milliseconds_short(milliseconds)
       unit_locale = @_get_localized_unit_string number, unit
       return label: "#{number} #{unit_locale}", click: => @set_ephemeral_timer milliseconds
+
+    z.ui.Context.from event, entries, 'ephemeral-options-menu'
