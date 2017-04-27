@@ -526,7 +526,7 @@ z.main.App = class App {
       if (self_user) {
         const cookie_label_key = this.repository.client.construct_cookie_label_key(self_user.email() || self_user.phone());
 
-        amplify.store().forEach(function(amplify_key) {
+        Object.keys(amplify.store()).forEach(function(amplify_key) {
           if (!(amplify_key === cookie_label_key && clear_data) && z.util.StringUtil.includes(amplify_key, z.storage.StorageKey.AUTH.COOKIE_LABEL)) {
             do_not_delete.push(amplify_key);
           }
