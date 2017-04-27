@@ -73,4 +73,70 @@ z.user.UserMapper = class UserMapper {
     this.logger.warn('We got no user data from the backend');
     return [];
   }
+
+  /**
+   * Maps JSON user into a blank user entity or updates an existing one.
+   * @note Mapping of single properties to an existing user happens when the user changes his name or accent color.
+   * @param {z.entity.User} user_et - User entity that the info shall be mapped to
+   * @param {Object} data - User data
+   * @returns {z.entity.User} Mapped user entity
+   */
+  update_user_from_object(user_et, data) {
+    if (!data) {
+      return;
+    }
+
+    if ((user_et.id === '') && (data.id !== '')) {
+      // It's a new user
+      user_et.id = data.id;
+      user_et.joaat_hash = z.util.Crypto.Hashing.joaat_hash(data.id);
+    } else if ((user_et.id !== '') && (data.id !== user_et.id)) {
+      // We are trying to update non-matching users
+      throw new Error(`Updating wrong user entity. User ID '${user_et.id}' does not match data ID '${data.id}'.`);
+    }
+
+    if (data.accent_id && data.accent_id !== 0) {
+      user_et.accent_id(data.accent_id);
+    }
+
+    if (data.assets && (data.assets.length > 0)) {
+      this._map_profile_assets(user_et, data.assets);
+    } else if (data.picture && (data.picture.length > 0)) {
+      this._map_profile_pictures(user_et, data.picture);
+    }
+
+    if (data.email) {
+      user_et.email(data.email);
+    }
+
+    if (data.handle) {
+      user_et.username(data.handle);
+    }
+
+    if (data.name) {
+      user_et.name(data.name.trim());
+    }
+
+    if (data.phone) {
+      user_et.phone(data.phone);
+    }
+
+    if (data.service) {
+      user_et.is_bot = true;
+      user_et.provider_id = data.service.provider;
+      user_et.service_id = data.service.id;
+    }
+
+    return user_et;
+  }
+
+  _map_profile_pictures(user_et, picture) {
+    if (picture[0]) {
+      user_et.preview_picture_resource(z.assets.AssetRemoteData.v1(user_et.id, picture[0].id, true));
+    }
+
+    if (picture[1]) {
+      return user_et.medium_picture_resource(z.assets.AssetRemoteData.v1(user_et.id, picture[1].id, true));
+    }
+  }
 }
