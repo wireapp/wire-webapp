@@ -139,4 +139,21 @@ z.user.UserMapper = class UserMapper {
       return user_et.medium_picture_resource(z.assets.AssetRemoteData.v1(user_et.id, picture[1].id, true));
     }
   }
+
+  _map_profile_assets(user_et, assets) {
+    return assets
+      .filter((asset) => asset.type === 'image')
+      .map((asset) => {
+        switch (asset.size) {
+          case 'preview':
+            user_et.preview_picture_resource(z.assets.AssetRemoteData.v3(asset.key, true));
+            break;
+          case 'complete':
+            user_et.medium_picture_resource(z.assets.AssetRemoteData.v3(asset.key, true));
+            break;
+          default:
+            break;
+        }
+      });
+  }
 }
