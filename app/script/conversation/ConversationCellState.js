@@ -25,7 +25,7 @@ window.z.conversation = z.conversation || {};
 z.conversation.ConversationCellState = (() => {
 
   function is_alert(message_et) {
-    return message_et.is_ping() || message_et.is_call() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED;
+    return message_et.is_ping() || message_et.is_call() && message_et.was_missed();
   }
 
   function generate_activity_string(activities) {
@@ -73,7 +73,7 @@ z.conversation.ConversationCellState = (() => {
     };
 
     for (const message_et of unread_events) {
-      if (message_et.is_call() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED) { // TODO: message
+      if (message_et.is_call() && message_et.was_missed()) {
         activities.call = activities.call + 1;
       } else if (message_et.is_ping()) {
         activities.ping = activities.ping + 1;
@@ -139,7 +139,7 @@ z.conversation.ConversationCellState = (() => {
       if (last_alert.is_ping()) {
         return z.conversation.ConversationStatusIcon.UNREAD_PING;
       }
-      if (last_alert.is_call() && last_alert.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED) {
+      if (last_alert.is_call() && last_alert.was_missed()) {
         return z.conversation.ConversationStatusIcon.MISSED_CALL;
       }
     },
