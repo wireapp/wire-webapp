@@ -191,7 +191,7 @@ window.z.audio.AudioRepository = class AudioRepository {
 
       if (this.muted !== updated_muted_state_muted_state) {
         this.muted = updated_muted_state_muted_state;
-        this.logger.info(`Set muted state to '${this.muted}'`);
+        this.logger.debug(`Set muted state to '${this.muted}'`);
       }
     });
 

@@ -392,7 +392,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   set_logging(is_logging_enabled) {
-    this.logger.info(`Set logging for webRTC Adapter: ${is_logging_enabled}`);
+    this.logger.debug(`Set logging for webRTC Adapter: ${is_logging_enabled}`);
     if (adapter) {
       adapter.disableLog = !is_logging_enabled;
     }
@@ -445,6 +445,6 @@ z.calling.CallingRepository = class CallingRepository {
    */
   _send_report(custom_data) {
     Raygun.send(new Error('Call failure report'), custom_data);
-    this.logger.info(`Reported status of flow id '${custom_data.meta.flow_id}' for call analysis`, custom_data);
+    this.logger.debug(`Reported status of flow id '${custom_data.meta.flow_id}' for call analysis`, custom_data);
   }
 };

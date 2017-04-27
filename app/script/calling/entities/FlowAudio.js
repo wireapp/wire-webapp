@@ -41,7 +41,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
       this.panning = this.flow_et.participant_et.panning;
     }
     this.panning.subscribe((updated_panning_value) => {
-      this.logger.info(`Panning of ${this.flow_et.remote_user.name()} changed to '${updated_panning_value}'`);
+      this.logger.debug(`Panning of ${this.flow_et.remote_user.name()} changed to '${updated_panning_value}'`);
       this.set_pan(updated_panning_value);
     });
 
@@ -80,7 +80,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
       } else {
         this.gain_node.gain.value = 1;
       }
-      this.logger.info(`Outgoing audio on flow muted '${is_muted}'`);
+      this.logger.debug(`Outgoing audio on flow muted '${is_muted}'`);
     }
   }
 
@@ -108,7 +108,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
       this._hookup_audio();
 
       $.extend(true, media_stream, this.audio_remote.stream);
-      this.logger.info('Wrapped audio stream from microphone', media_stream);
+      this.logger.debug('Wrapped audio stream from microphone', media_stream);
     }
 
     return media_stream;
@@ -131,7 +131,7 @@ z.calling.entities.FlowAudio = class FlowAudio {
       this.pan_node.connect(audio_output_device);
 
       $.extend(true, media_stream, audio_output_device.stream);
-      this.logger.info(`Wrapped audio stream to speaker to create stereo. Initial panning set to '${this.panning()}'.`, media_stream);
+      this.logger.debug(`Wrapped audio stream to speaker to create stereo. Initial panning set to '${this.panning()}'.`, media_stream);
     }
 
     return media_stream;

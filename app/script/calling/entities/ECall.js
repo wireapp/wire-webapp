@@ -158,7 +158,7 @@ z.calling.entities.ECall = class ECall {
     });
 
     this.state.subscribe((state) => {
-      this.logger.debug(`E-call state '${this.id}' changed to '${state}'`);
+      this.logger.info(`E-call state '${this.id}' changed to '${state}'`);
 
       this._clear_state_timeout();
 
@@ -361,7 +361,7 @@ z.calling.entities.ECall = class ECall {
       }
 
       case z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC: {
-        const prop_sync_payload = this.v3_call_center.create_payload_prop_sync(z.media.MediaType.VIDEO, additional_payload);
+        const prop_sync_payload = this.v3_call_center.create_payload_prop_sync(z.media.MediaType.VIDEO, false, additional_payload);
 
         e_call_message_et = z.calling.mapper.ECallMessageMapper.build_prop_sync(true, this.session_id, prop_sync_payload);
         break;
@@ -550,7 +550,7 @@ z.calling.entities.ECall = class ECall {
 
         const e_participant_et = new z.calling.entities.EParticipant(this, user_et, this.timings, e_call_message_et);
 
-        this.logger.debug(`Adding e-call participant '${user_et.name()}'`, e_participant_et);
+        this.logger.info(`Adding e-call participant '${user_et.name()}'`, e_participant_et);
         this.participants.push(e_participant_et);
 
         return this._update_state(e_participant_et, negotiate);
@@ -596,7 +596,7 @@ z.calling.entities.ECall = class ECall {
           }
         }
 
-        this.logger.debug(`Removed e-call participant '${e_participant_et.user.name()}'`);
+        this.logger.info(`Removed e-call participant '${e_participant_et.user.name()}'`);
         return this;
       })
       .catch(function(error) {
@@ -652,7 +652,7 @@ z.calling.entities.ECall = class ECall {
             e_participant_et.verify_client_id(client_id);
           }
 
-          this.logger.debug(`Updating e-call participant '${e_participant_et.user.name()}'`, e_call_message_et);
+          this.logger.info(`Updating e-call participant '${e_participant_et.user.name()}'`, e_call_message_et);
           return e_participant_et.update_state(e_call_message_et);
         }
 
@@ -769,7 +769,7 @@ z.calling.entities.ECall = class ECall {
         .forEach((e_participant_et, index) => {
           const panning = this._calculate_panning(index, this.participants().length);
 
-          this.logger.info(`Panning for '${e_participant_et.user.name()}' recalculated to '${panning}'`);
+          this.logger.debug(`Panning for '${e_participant_et.user.name()}' recalculated to '${panning}'`);
           e_participant_et.panning(panning);
         });
 

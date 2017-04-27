@@ -105,7 +105,7 @@ class z.ViewModel.list.ConversationListViewModel
     updated_show_calls_state = handling_notifications is z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
     if @show_calls isnt updated_show_calls_state
       @show_calls updated_show_calls_state
-      @logger.info "Set show calls state to: #{@show_calls()}"
+      @logger.debug "Set show calls state to: #{@show_calls()}"
 
   _init_subscriptions: =>
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_show_calls_state

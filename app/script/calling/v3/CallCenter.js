@@ -86,7 +86,7 @@ z.calling.v3.CallCenter = class CallCenter {
     const new_block_media_stream_state = handling_state !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
     if (this.block_media_stream !== new_block_media_stream_state) {
       this.block_media_stream = new_block_media_stream_state;
-      this.logger.info(`Block requesting MediaStream: ${this.block_media_stream}`);
+      this.logger.debug(`Block requesting MediaStream: ${this.block_media_stream}`);
     }
   }
 
@@ -125,7 +125,7 @@ z.calling.v3.CallCenter = class CallCenter {
   _on_event_in_supported_browsers(e_call_message_et) {
     const {conversation_id, type, user_id} = e_call_message_et;
 
-    this.logger.debug(`Received e-call '${type}' message from user '${user_id}' in conversation '${conversation_id}'`, e_call_message_et);
+    this.logger.info(`Received e-call '${type}' message from user '${user_id}' in conversation '${conversation_id}'`, e_call_message_et);
 
     this._validate_message_type(e_call_message_et)
     .then(() => {
@@ -229,7 +229,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {undefined} No return value
    */
   _on_group_check(e_call_message_et) {
-    this.logger.debug('GROUP_CHECK NOT IMPLEMENTED', e_call_message_et);
+    this.logger.info('GROUP_CHECK NOT IMPLEMENTED', e_call_message_et);
 
     const {conversation_id, user_id} = e_call_message_et;
 
@@ -261,7 +261,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {undefined} No return value
    */
   _on_group_leave(e_call_message_et) {
-    this.logger.debug('GROUP_LEAVE', e_call_message_et);
+    this.logger.info('GROUP_LEAVE', e_call_message_et);
 
     const {conversation_id, client_id, user_id} = e_call_message_et;
 
@@ -287,7 +287,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {undefined} No return value
    */
   _on_group_setup(e_call_message_et) {
-    this.logger.debug('GROUP_SETUP', e_call_message_et);
+    this.logger.info('GROUP_SETUP', e_call_message_et);
 
     const {conversation_id, dest_client_id, dest_user_id, response, user_id} = e_call_message_et;
 
@@ -317,7 +317,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {undefined} No return value
    */
   _on_group_start(e_call_message_et) {
-    this.logger.debug('GROUP_START', e_call_message_et);
+    this.logger.info('GROUP_START', e_call_message_et);
 
     const {conversation_id, user_id} = e_call_message_et;
 
@@ -420,7 +420,7 @@ z.calling.v3.CallCenter = class CallCenter {
           throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.WRONG_SENDER, 'Call rejected by wrong user');
         }
 
-        this.logger.debug(`Rejecting e-call in conversation '${conversation_id}'`, e_call_et);
+        this.logger.info(`Rejecting e-call in conversation '${conversation_id}'`, e_call_et);
         e_call_et.state(z.calling.enum.CALL_STATE.REJECTED);
         this.media_stream_handler.reset_media_stream();
       })
@@ -642,7 +642,7 @@ z.calling.v3.CallCenter = class CallCenter {
 
     const {conversation_id, type} = e_call_message_et;
 
-    return this.get_e_call_by_id(conversation_id)
+    return this.get_e_call_by_id(conversation_id || conversation_et.id)
       .then((e_call_et) => {
         const data_channel_message_types = [
           z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP,
@@ -666,7 +666,7 @@ z.calling.v3.CallCenter = class CallCenter {
           throw error;
         }
 
-        this.logger.debug(`Sending e-call '${type}' message to conversation '${conversation_id}'`, e_call_message_et.to_JSON());
+        this.logger.info(`Sending e-call '${type}' message to conversation '${conversation_id}'`, e_call_message_et.to_JSON());
 
         return this._limit_message_recipients(e_call_message_et)
         .then(({precondition_option, user_client_map}) => {
@@ -804,7 +804,7 @@ z.calling.v3.CallCenter = class CallCenter {
   delete_call(conversation_id) {
     this.get_e_call_by_id(conversation_id)
       .then((e_call_et) => {
-        this.logger.debug(`Deleting e-call in conversation '${conversation_id}'`, e_call_et);
+        this.logger.info(`Deleting e-call in conversation '${conversation_id}'`, e_call_et);
 
         e_call_et.delete_call();
         this.e_calls.remove((e_call) => e_call.id === conversation_id);
@@ -831,12 +831,12 @@ z.calling.v3.CallCenter = class CallCenter {
           throw error;
         }
 
-        const prop_sync_payload = this.create_payload_prop_sync(video_send, false, {conversation_id});
+        const prop_sync_payload = this.create_payload_prop_sync(video_send, false, {conversation_id: conversation_id});
 
         return this._create_outgoing_e_call(z.calling.mapper.ECallMessageMapper.build_prop_sync(false, undefined, prop_sync_payload));
       })
       .then((e_call_et) => {
-        this.logger.debug(`Joining e-call in conversation '${conversation_id}'`, e_call_et);
+        this.logger.info(`Joining e-call in conversation '${conversation_id}'`, e_call_et);
 
         e_call_et.initiate_telemetry(video_send);
         if (this.media_stream_handler.local_media_stream()) {
@@ -870,7 +870,7 @@ z.calling.v3.CallCenter = class CallCenter {
   leave_call(conversation_id, termination_reason) {
     this.get_e_call_by_id(conversation_id)
       .then((e_call_et) => {
-        this.logger.debug(`Leaving e-call in conversation '${conversation_id}' triggered by '${termination_reason}'`, e_call_et);
+        this.logger.info(`Leaving e-call in conversation '${conversation_id}' triggered by '${termination_reason}'`, e_call_et);
 
         if (e_call_et.state() !== z.calling.enum.CALL_STATE.ONGOING) {
           termination_reason = undefined;
@@ -914,7 +914,7 @@ z.calling.v3.CallCenter = class CallCenter {
   reject_call(conversation_id) {
     this.get_e_call_by_id(conversation_id)
       .then((e_call_et) => {
-        this.logger.debug(`Rejecting e-call in conversation '${conversation_id}'`, e_call_et);
+        this.logger.info(`Rejecting e-call in conversation '${conversation_id}'`, e_call_et);
 
         this.media_stream_handler.reset_media_stream();
         e_call_et.reject_call();
@@ -999,7 +999,7 @@ z.calling.v3.CallCenter = class CallCenter {
       .then((remote_user_et) => {
         return this._create_e_call(e_call_message_et, remote_user_et)
           .then((e_call_et) => {
-            this.logger.debug(`Incoming '${this._get_media_type_from_properties(props)}' e-call in conversation '${e_call_et.conversation_et.display_name()}'`, e_call_et);
+            this.logger.info(`Incoming '${this._get_media_type_from_properties(props)}' e-call in conversation '${e_call_et.conversation_et.display_name()}'`, e_call_et);
 
             e_call_et.state(z.calling.enum.CALL_STATE.INCOMING);
             e_call_et.set_remote_version(e_call_message_et);
@@ -1035,7 +1035,7 @@ z.calling.v3.CallCenter = class CallCenter {
     return this._create_e_call(e_call_message_et, this.user_repository.self())
       .then((e_call_et) => {
         const media_type = this._get_media_type_from_properties(props);
-        this.logger.debug(`Outgoing '${media_type}' e-call in conversation '${e_call_et.conversation_et.display_name()}'`, e_call_et);
+        this.logger.info(`Outgoing '${media_type}' e-call in conversation '${e_call_et.conversation_et.display_name()}'`, e_call_et);
 
         e_call_et.state(z.calling.enum.CALL_STATE.OUTGOING);
         this.telemetry.set_media_type(media_type === z.media.MediaType.VIDEO);
@@ -1101,7 +1101,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {undefined} No return value
    */
   set_logging(is_enabled) {
-    this.logger.info(`Set logging for webRTC Adapter: ${is_enabled}`);
+    this.logger.debug(`Set logging for webRTC Adapter: ${is_enabled}`);
     if (adapter) {
       adapter.disableLog = !is_enabled;
     }

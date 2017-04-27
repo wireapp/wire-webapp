@@ -75,7 +75,7 @@ class z.calling.handler.CallStateHandler
   set_notification_handling_state: (handling_state) =>
     @block_event_handling = handling_state isnt z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
     @_update_ongoing_calls() if not @block_event_handling
-    @logger.info "Block handling of call events: #{@block_event_handling}"
+    @logger.debug "Block handling of call events: #{@block_event_handling}"
 
   ###
   Update state of currently ongoing calls.
