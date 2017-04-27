@@ -46,8 +46,8 @@ z.ui.Context = (() => {
 
   function triggerItem() {
     const entry = document.querySelector('.ctx-menu-item.selected');
-    if (entry != null) {
-      entry.click()
+    if (entry !== null) {
+      entry.click();
     }
   }
 
@@ -102,6 +102,13 @@ z.ui.Context = (() => {
     return menu;
   }
 
+  /**
+   * Build and display custom context menu
+   * @param {Event} event - menu will appear at currentTarget position
+   * @param {Array} entries - configuration to build the menu {label: 'label', click: function() {}}
+   * @param {string} identifier - data-uie-name added to all entries
+   * @returns {undefined}
+   */
   function from(event, entries, identifier) {
     event.preventDefault();
     event.stopPropagation();
