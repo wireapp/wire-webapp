@@ -17,7 +17,6 @@ globals:
   Dexie: true
   hljs: true
   keyboardJS: true
-  hljs: true
   ko: true
   libsodium: true
   LRUCache: true
