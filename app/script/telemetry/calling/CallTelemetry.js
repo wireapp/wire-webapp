@@ -124,19 +124,21 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   /**
    * Reports call events for call tracking to Localytics.
    * @param {z.tracking.EventName} event_name - String for call event
-   * @param {z.calling.Call} call_et - Call entity
+   * @param {z.calling.Call|z.calling.entities.ECall} call_et - Call entity
    * @param {Object} [attributes={}] - Attributes for the event
    * @returns {undefined} No return value
    */
   track_event(event_name, call_et, attributes = {}) {
     if (call_et) {
+      const {conversation_et, is_group, max_number_of_participants} = call_et;
+
       attributes = $.extend({
-        conversation_participants: call_et.conversation_et.number_of_participants(),
-        conversation_participants_in_call: call_et.max_number_of_participants,
-        conversation_type: call_et.is_group() ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+        conversation_participants: conversation_et.number_of_participants(),
+        conversation_participants_in_call: max_number_of_participants,
+        conversation_type: is_group() ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
         remote_version: [z.tracking.EventName.CALLING.ESTABLISHED_CALL, z.tracking.EventName.CALLING.JOINED_CALL].includes(event_name) ? this.remote_version : undefined,
         version: this.protocol_version,
-        with_bot: call_et.conversation_et.is_with_bot(),
+        with_bot: conversation_et.is_with_bot(),
       },
       attributes);
 
@@ -150,15 +152,17 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
   /**
    * Track the call duration.
-   * @param {z.calling.Call} call_et - Call entity
+   * @param {z.calling.entities.Call|z.calling.entities.ECall} call_et - Call entity
    * @returns {undefined} No return value
    */
   track_duration(call_et) {
-    const duration = Math.floor((Date.now() - call_et.timer_start) / 1000);
-    if (!window.isNaN(duration)) {
-      let duration_bucket;
-      this.logger.info(`Call duration: ${duration} seconds.`, call_et.duration_time());
+    const {conversation_et, duration_time, is_group, termination_reason, timer_start, max_number_of_participants} = call_et;
+    const duration = Math.floor((Date.now() - timer_start) / 1000);
 
+    if (!window.isNaN(duration)) {
+      this.logger.info(`Call duration: ${duration} seconds.`, duration_time());
+
+      let duration_bucket;
       if (duration <= 15) {
         duration_bucket = '0s-15s';
       } else if (duration <= 30) {
@@ -176,15 +180,15 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
       }
 
       const attributes = {
-        conversation_participants: call_et.conversation_et.number_of_participants(),
-        conversation_participants_in_call: call_et.max_number_of_participants,
-        conversation_type: call_et.is_group() ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
+        conversation_participants: conversation_et.number_of_participants(),
+        conversation_participants_in_call: max_number_of_participants,
+        conversation_type: is_group() ? z.tracking.attribute.ConversationType.GROUP : z.tracking.attribute.ConversationType.ONE_TO_ONE,
         duration: duration_bucket,
         duration_sec: duration,
-        reason: call_et.termination_reason,
+        reason: termination_reason,
         remote_version: this.remote_version,
         version: this.protocol_version,
-        with_bot: call_et.conversation_et.is_with_bot(),
+        with_bot: conversation_et.is_with_bot(),
       };
 
       let event_name = z.tracking.EventName.CALLING.ENDED_CALL;

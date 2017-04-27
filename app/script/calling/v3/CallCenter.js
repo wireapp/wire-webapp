@@ -682,8 +682,8 @@ z.calling.v3.CallCenter = class CallCenter {
   /**
    *
    * @private
-   * @param {z.calling.entity.ECall} e_call_et - Call entity
-   * @param {z.calling.entity.ECallMessage} incoming_e_call_message_et - Incoming e-call message
+   * @param {z.calling.entities.ECall} e_call_et - Call entity
+   * @param {z.calling.entities.ECallMessage} incoming_e_call_message_et - Incoming e-call message
    * @returns {undefined} No return value
    */
   _confirm_e_call_message(e_call_et, incoming_e_call_message_et) {
@@ -871,6 +871,10 @@ z.calling.v3.CallCenter = class CallCenter {
     this.get_e_call_by_id(conversation_id)
       .then((e_call_et) => {
         this.logger.debug(`Leaving e-call in conversation '${conversation_id}' triggered by '${termination_reason}'`, e_call_et);
+
+        if (e_call_et.state() !== z.calling.enum.CALL_STATE.ONGOING) {
+          termination_reason = undefined;
+        }
 
         this.media_stream_handler.release_media_stream();
         e_call_et.leave_call(termination_reason);

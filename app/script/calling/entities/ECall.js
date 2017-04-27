@@ -144,7 +144,7 @@ z.calling.entities.ECall = class ECall {
       if (!is_joined) {
         this.is_connected(false);
 
-        if ([z.calling.enum.CALL_STATE.DISCONNECTING, z.calling.enum.CALL_STATE.ONGOING].includes(this.state())) {
+        if (z.calling.enum.CALL_STATE_GROUP.IS_ENDING.includes(this.state())) {
           amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
         }
 
@@ -315,11 +315,11 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   set_self_state(joined_state, termination_reason) {
-    this.self_user_joined(joined_state);
-    this.self_client_joined(joined_state);
     if (termination_reason && !this.termination_reason) {
       this.termination_reason = termination_reason;
     }
+    this.self_user_joined(joined_state);
+    this.self_client_joined(joined_state);
   }
 
   /**

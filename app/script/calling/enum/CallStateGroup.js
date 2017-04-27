@@ -39,6 +39,10 @@ z.calling.enum.CALL_STATE_GROUP = {
     z.calling.enum.CALL_STATE.ENDED,
     z.calling.enum.CALL_STATE.UNKNOWN,
   ],
+  IS_ENDING: [
+    z.calling.enum.CALL_STATE.DISCONNECTING,
+    z.calling.enum.CALL_STATE.ONGOING,
+  ],
   IS_RINGING: [
     z.calling.enum.CALL_STATE.INCOMING,
     z.calling.enum.CALL_STATE.OUTGOING,
