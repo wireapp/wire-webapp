@@ -27,26 +27,21 @@ z.components.GroupAvatar = class GroupAvatar {
   constructor({users}) {
     this.on_in_viewport = this.on_in_viewport.bind(this);
     this.entered_viewport = ko.observable(false);
-
-    this.slot0 = ko.observable('');
-    this.slot1 = ko.observable('');
-    this.slot2 = ko.observable('');
-    this.slot3 = ko.observable('');
-
+    this.avatar_urls = ko.observableArray();
     this.show_avatar_grid = ko.pureComputed(() => users().length > 1);
 
     this.user_image_observable = ko.computed(() => {
       if(!this.entered_viewport()) {
         return;
       }
-      users().forEach((user_et, index) => {
-        const preview = user_et.preview_picture_resource();
 
-        if (preview) {
-          preview.get_object_url().then((url) => {
-            this[`slot${index}`](`url("${url}")`);
-          });
-        }
+      Promise.all(users().slice(0, 4)
+        .map((user_et) => user_et.preview_picture_resource())
+        .filter((resource) => resource !== undefined))
+        .map((resource) => preview.get_object_url())
+      })
+      .then((urls) => {
+        this.avatar_urls.push(urls);
       });
     });
   }
@@ -66,10 +61,9 @@ ko.components.register('group-avatar', {
   template: `
     <div class="group-avatar-image-wrapper" data-bind="in_viewport: on_in_viewport">
       <!-- ko if: show_avatar_grid -->
-        <div class="group-avatar-image-grid group-avatar-image" data-bind="style: {backgroundImage: slot0}"></div>
-        <div class="group-avatar-image-grid group-avatar-image" data-bind="style: {backgroundImage: slot1}"></div>
-        <div class="group-avatar-image-grid group-avatar-image" data-bind="style: {backgroundImage: slot2}"></div>
-        <div class="group-avatar-image-grid group-avatar-image" data-bind="style: {backgroundImage: slot3}"></div>
+        <!-- ko foreach: avatar_urls -->
+          <div class="group-avatar-image-grid group-avatar-image" data-bind="style: {backgroundImage: $data}"></div>
+        <!-- /ko -->
       <!-- /ko -->
       <!-- ko ifnot: show_avatar_grid -->
         <div class="group-avatar-image" data-bind="style: {backgroundImage: slot0}"></div>
