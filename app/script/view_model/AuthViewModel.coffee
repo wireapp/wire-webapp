@@ -274,7 +274,7 @@ class z.ViewModel.AuthViewModel
         @username invite_info.email
         @prefilled_email = invite_info.email
     .catch (error) ->
-      if error.label isnt z.service.BackendClientError::LABEL.INVALID_INVITATION_CODE
+      if error.label isnt z.service.BackendClientError.LABEL.INVALID_INVITATION_CODE
         Raygun.send new Error('Invitation not found'), {invite_code: invite, error: error}
     .then =>
       @_set_hash z.auth.AuthView.MODE.ACCOUNT_REGISTER
@@ -299,7 +299,7 @@ class z.ViewModel.AuthViewModel
       @pending_server_request false
       $('#wire-login-password').focus()
       if navigator.onLine
-        if error.label is z.service.BackendClientError::LABEL.PENDING_ACTIVATION
+        if error.label is z.service.BackendClientError.LABEL.PENDING_ACTIVATION
           return @_set_hash z.auth.AuthView.MODE.POSTED_PENDING
         else if error.label
           @_add_error z.string.auth_error_sign_in, [z.auth.AuthView.TYPE.EMAIL, z.auth.AuthView.TYPE.PASSWORD]
@@ -331,16 +331,16 @@ class z.ViewModel.AuthViewModel
       @pending_server_request false
       if navigator.onLine
         switch error.label
-          when z.service.BackendClientError::LABEL.BAD_REQUEST
+          when z.service.BackendClientError.LABEL.BAD_REQUEST
             @_add_error z.string.auth_error_phone_number_invalid, z.auth.AuthView.TYPE.PHONE
-          when z.service.BackendClientError::LABEL.INVALID_PHONE
+          when z.service.BackendClientError.LABEL.INVALID_PHONE
             @_add_error z.string.auth_error_phone_number_unknown, z.auth.AuthView.TYPE.PHONE
-          when z.service.BackendClientError::LABEL.PASSWORD_EXISTS
+          when z.service.BackendClientError.LABEL.PASSWORD_EXISTS
             return @_set_hash z.auth.AuthView.MODE.VERIFY_PASSWORD
-          when z.service.BackendClientError::LABEL.PENDING_LOGIN
+          when z.service.BackendClientError.LABEL.PENDING_LOGIN
             _on_code_request_success error
             return
-          when z.service.BackendClientError::LABEL.UNAUTHORIZED
+          when z.service.BackendClientError.LABEL.UNAUTHORIZED
             @_add_error z.string.auth_error_phone_number_forbidden, z.auth.AuthView.TYPE.PHONE
           else
             @_add_error z.string.auth_error_misc
@@ -377,7 +377,7 @@ class z.ViewModel.AuthViewModel
     @user_service.change_own_password @password()
     .catch (error) =>
       @logger.warn 'Could not change user password', error
-      if error.code isnt z.service.BackendClientError::STATUS_CODE.FORBIDDEN
+      if error.code isnt z.service.BackendClientError.STATUS_CODE.FORBIDDEN
         throw error
     .then =>
       @user_service.change_own_email @username()
@@ -389,11 +389,11 @@ class z.ViewModel.AuthViewModel
       @pending_server_request false
       if error
         switch error.label
-          when z.service.BackendClientError::LABEL.BLACKLISTED_EMAIL
+          when z.service.BackendClientError.LABEL.BLACKLISTED_EMAIL
             @_add_error z.string.auth_error_email_forbidden, z.auth.AuthView.TYPE.EMAIL
-          when z.service.BackendClientError::LABEL.KEY_EXISTS
+          when z.service.BackendClientError.LABEL.KEY_EXISTS
             @_add_error z.string.auth_error_email_exists, z.auth.AuthView.TYPE.EMAIL
-          when z.service.BackendClientError::LABEL.INVALID_EMAIL
+          when z.service.BackendClientError.LABEL.INVALID_EMAIL
             @_add_error z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL
           else
             @_add_error z.string.auth_error_email_malformed, z.auth.AuthView.TYPE.EMAIL
@@ -430,7 +430,7 @@ class z.ViewModel.AuthViewModel
       $('#wire-verify-password').focus()
       if navigator.onLine
         if error.label
-          if error.label is z.service.BackendClientError::LABEL.PENDING_ACTIVATION
+          if error.label is z.service.BackendClientError.LABEL.PENDING_ACTIVATION
             return @_set_hash z.auth.AuthView.MODE.POSTED_PENDING
           @_add_error z.string.auth_error_sign_in, z.auth.AuthView.TYPE.PASSWORD
         else
@@ -686,9 +686,9 @@ class z.ViewModel.AuthViewModel
   _on_register_error: (error) =>
     @pending_server_request false
     switch error.label
-      when z.service.BackendClientError::LABEL.BLACKLISTED_EMAIL, z.service.BackendClientError::LABEL.UNAUTHORIZED
+      when z.service.BackendClientError.LABEL.BLACKLISTED_EMAIL, z.service.BackendClientError.LABEL.UNAUTHORIZED
         @_add_error z.string.auth_error_email_forbidden, z.auth.AuthView.TYPE.EMAIL
-      when z.service.BackendClientError::LABEL.KEY_EXISTS
+      when z.service.BackendClientError.LABEL.KEY_EXISTS
         payload = @_create_payload z.auth.AuthView.MODE.ACCOUNT_PASSWORD
         @auth.repository.login payload, @persist()
         .then =>
@@ -698,7 +698,7 @@ class z.ViewModel.AuthViewModel
           @_add_error z.string.auth_error_email_exists, z.auth.AuthView.TYPE.EMAIL
           @_has_errors()
         return
-      when z.service.BackendClientError::LABEL.MISSING_IDENTITY
+      when z.service.BackendClientError.LABEL.MISSING_IDENTITY
         @_add_error z.string.auth_error_email_missing, z.auth.AuthView.TYPE.EMAIL
 
     if @_has_errors()
@@ -1318,7 +1318,7 @@ class z.ViewModel.AuthViewModel
       @event_repository.current_client = client_observable
       @event_repository.initialize_last_notification_id client_observable().id
     .catch (error) =>
-      if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+      if error.code is z.service.BackendClientError.STATUS_CODE.NOT_FOUND
         @logger.warn "Cannot set starting point on notification stream: #{error.message}", error
       else
         throw error

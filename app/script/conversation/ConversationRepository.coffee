@@ -66,8 +66,7 @@ class z.conversation.ConversationRepository
       @filtered_conversations().sort z.util.sort_groups_by_last_event
 
     @receiving_queue = new z.util.PromiseQueue()
-    @sending_queue = new z.util.PromiseQueue()
-    @sending_queue.pause()
+    @sending_queue = new z.util.PromiseQueue paused: true
 
     # @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
     @conversation_service.client.request_queue_blocked_state.subscribe (state) =>
@@ -591,7 +590,7 @@ class z.conversation.ConversationRepository
     .then (response) ->
       amplify.publish z.event.WebApp.EVENT.INJECT, response
     .catch (error_response) ->
-      if error_response.label is z.service.BackendClientError::LABEL.TOO_MANY_MEMBERS
+      if error_response.label is z.service.BackendClientError.LABEL.TOO_MANY_MEMBERS
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.TOO_MANY_MEMBERS,
           data:
             max: z.config.MAXIMUM_CONVERSATION_SIZE
@@ -1400,7 +1399,7 @@ class z.conversation.ConversationRepository
           payload.native_push = native_push
           @_send_encrypted_message conversation_id, generic_message, payload, precondition_option
     .catch (error) =>
-      if error?.code is z.service.BackendClientError::STATUS_CODE.REQUEST_TOO_LARGE
+      if error.code is z.service.BackendClientError.STATUS_CODE.REQUEST_TOO_LARGE
         return @_send_external_generic_message conversation_id, generic_message, user_client_map, precondition_option, native_push
       throw error
 

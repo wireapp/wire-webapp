@@ -40,7 +40,7 @@ window.TestFactory = function(logger_level) {
     logging_level: logger_level,
   };
 
-  this.client = new z.service.Client(this.settings.connection);
+  this.client = new z.service.BackendClient(this.settings.connection);
   this.logger = new z.util.Logger('TestFactory', z.config.LOGGER.OPTIONS);
   this.logger.level = logger_level;
 

@@ -102,7 +102,7 @@ z.auth.AuthService = class AuthService {
       };
 
       config.error = (jqXHR, textStatus, errorThrown) => {
-        if (jqXHR.status === z.service.BackendClientError.prototype.STATUS_CODE.FORBIDDEN) {
+        if (jqXHR.status === z.service.BackendClientError.STATUS_CODE.FORBIDDEN) {
           this.logger.error(`Requesting access token failed after ${retry_attempt} attempt(s): ${errorThrown}`, jqXHR);
           reject(new z.auth.AccessTokenError(z.auth.AccessTokenError.TYPE.REQUEST_FORBIDDEN));
         }
@@ -114,9 +114,9 @@ z.auth.AuthService = class AuthService {
             .then(resolve)
             .catch(reject);
 
-          if (jqXHR.status === z.service.BackendClientError.prototype.STATUS_CODE.CONNECTIVITY_PROBLEM) {
+          if (jqXHR.status === z.service.BackendClientError.STATUS_CODE.CONNECTIVITY_PROBLEM) {
             this.logger.warn('Access token refresh delayed due to suspected connectivity issue');
-            return this.client.execute_on_connectivity(z.service.Client.prototype.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
+            return this.client.execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_REFRESH)
               .then(() => {
                 this.logger.info('Continuing access token refresh after verifying connectivity');
                 return _retry();
@@ -209,7 +209,7 @@ z.auth.AuthService = class AuthService {
           resolve(data);
         })
         .fail((jqXHR, textStatus, errorThrown) => {
-          if (jqXHR.status === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS && login.email) {
+          if (jqXHR.status === z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS && login.email) {
             // Backend blocked our user account from login, so we have to reset our cookies
             this.post_cookies_remove(login.email, login.password, undefined).then(() => {
               reject(jqXHR.responseJSON || errorThrown);

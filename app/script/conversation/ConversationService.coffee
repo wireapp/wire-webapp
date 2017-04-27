@@ -25,7 +25,7 @@ class z.conversation.ConversationService
   ###
   Construct a new Conversation Service.
 
-  @param client [z.service.Client] Client for the API calls
+  @param client [z.service.BackendClient] Client for the API calls
   ###
   constructor: (@client, @storage_service) ->
     @logger = new z.util.Logger 'z.conversation.ConversationService', z.config.LOGGER.OPTIONS
