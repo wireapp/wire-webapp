@@ -25,23 +25,54 @@ window.z.ui = z.ui || {};
 z.ui.Context = (() => {
 
   let onWheel;
-  let onKeyup;
+  let onKeydown;
 
   function addListeners() {
     window.addEventListener('wheel', onWheel = (e) => e.preventDefault());
-    window.addEventListener('keyup', onKeyup = (e) => {
-      // TODO: arrow keys
-      if (e.keyCode === 27) {
+    window.addEventListener('keydown', onKeydown = (e) => {
+      e.preventDefault();
+
+      if (e.keyCode === z.util.KEYCODE.ESC) {
         cleanup();
+      } else if (e.keyCode === z.util.KEYCODE.ARROW_UP || e.keyCode === z.util.KEYCODE.ARROW_DOWN) {
+        rotateItem(e.keyCode);
+      } else if (e.keyCode === z.util.KEYCODE.ENTER) {
+        triggerItem();
       }
     });
     window.addEventListener('click', cleanup);
     window.addEventListener('resize', cleanup);
   }
 
+  function triggerItem() {
+    const entry = document.querySelector('.ctx-menu-item.selected');
+    if (entry != null) {
+      entry.click()
+    }
+  }
+
+  function rotateItem(keyCode) {
+    const entries = Array.from(document.querySelectorAll('.ctx-menu-item'));
+    const entry = document.querySelector('.ctx-menu-item.selected');
+
+    if (entries.length === 0) {
+      return;
+    }
+
+    if (entry === null) {
+      const index = keyCode === z.util.KEYCODE.ARROW_UP ? entries.length - 1 : 0;
+      return entries[index].classList.add('selected');
+    }
+
+    const direction = keyCode === z.util.KEYCODE.ARROW_UP ? -1 : 1;
+    const nextEntry = entries[((entries.indexOf(entry) + direction) + entries.length) % entries.length];
+    nextEntry.classList.add('selected');
+    entry.classList.remove('selected');
+  }
+
   function removeListeners() {
     window.removeEventListener('wheel', onWheel);
-    window.removeEventListener('keyup', onKeyup);
+    window.removeEventListener('keydown', onKeydown);
     window.removeEventListener('click', cleanup);
     window.removeEventListener('resize', cleanup);
   }
