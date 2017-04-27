@@ -22,15 +22,16 @@
 window.z = window.z || {};
 window.z.extension = z.extension || {};
 
-const GIPHY_SERVICE_CONFIG = {
-  ENDPOINT_BASE: '/giphy/v1/gifs',
-};
-
 z.extension.GiphyService = class GiphyService {
+  static get CONFIG() {
+    return {
+      ENDPOINT_BASE: '/giphy/v1/gifs',
+    };
+  }
+
   /**
    * Construct a new Giphy Service.
-   * @param {z.service.Client} client - Client for the API calls
-   * @returns {GiphyService} Service for all giphy calls to the backend REST API.
+   * @param {z.service.BackendClient} client - Client for the API calls
    */
   constructor(client) {
     this.client = client;
@@ -46,7 +47,7 @@ z.extension.GiphyService = class GiphyService {
 
     return this.client.send_json({
       type: 'GET',
-      url: this.client.create_url(`${GIPHY_SERVICE_CONFIG.ENDPOINT_BASE}/${ids.join(',')}`),
+      url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/${ids.join(',')}`),
     });
   }
 
@@ -58,7 +59,7 @@ z.extension.GiphyService = class GiphyService {
   get_random(tag) {
     return this.client.send_json({
       type: 'GET',
-      url: this.client.create_url(`${GIPHY_SERVICE_CONFIG.ENDPOINT_BASE}/random?tag=${encodeURIComponent(tag)}`),
+      url: this.client.create_url(`${GiphyService.CONFIG.ENDPOINT_BASE}/random?tag=${encodeURIComponent(tag)}`),
     });
   }
 
@@ -80,7 +81,7 @@ z.extension.GiphyService = class GiphyService {
     }
     , options);
 
-    const url = `${GIPHY_SERVICE_CONFIG.ENDPOINT_BASE}/search` +
+    const url = `${GiphyService.CONFIG.ENDPOINT_BASE}/search` +
       `?q=${encodeURIComponent(options.query)}` +
       `&offset=${options.offset}` +
       `&limit=${options.limit}` +

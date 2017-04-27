@@ -28,7 +28,6 @@ z.connect.ConnectRepository = class ConnectRepository {
     this.connect_google_service = connect_google_service;
     this.properties_repository = properties_repository;
     this.logger = new z.util.Logger('z.connect.ConnectRepository', z.config.LOGGER.OPTIONS);
-    return this;
   }
 
   /**
@@ -65,7 +64,7 @@ z.connect.ConnectRepository = class ConnectRepository {
         case z.connect.ConnectError.TYPE.NO_CONTACTS:
           return {};
         default:
-          if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
+          if (error.code === z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
             this.logger.error('Backend refused Gmail contacts upload: Endpoint used too frequent', error);
           } else {
             this.logger.error('Gmail contacts upload failed', error);
@@ -107,7 +106,7 @@ z.connect.ConnectRepository = class ConnectRepository {
           case z.connect.ConnectError.TYPE.NO_CONTACTS:
             return {};
           default:
-            if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
+            if (error.code === z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
               this.logger.error('Backend refused macOS contacts upload: Endpoint used too frequent', error);
             } else {
               this.logger.error('macOS contacts upload failed', error);
@@ -139,7 +138,7 @@ z.connect.ConnectRepository = class ConnectRepository {
         case z.connect.ConnectError.TYPE.NO_CONTACTS:
           return {};
         default:
-          if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.TOO_MANY_REQUESTS) {
+          if (error.code === z.service.BackendClientError.STATUS_CODE.TOO_MANY_REQUESTS) {
             this.logger.error('Backend refused macOS contacts upload: Endpoint used too frequent');
           } else {
             this.logger.error('macOS contacts upload failed', error);

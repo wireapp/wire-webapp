@@ -23,14 +23,15 @@ window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
 window.z.telemetry.app_init = z.telemetry.app_init || {};
 
-const APP_INIT_TIMINGS_CONFIG = {
-  BUCKET_SIZE: 10,
-  LOG_LENGTH_KEY: 27,
-  LOG_LENGTH_VALUE: 6,
-};
-const MILLISECONDS_IN_SECOND = 1000;
-
 z.telemetry.app_init.AppInitTimings = class AppInitTimings {
+  static get CONFIG() {
+    return {
+      BUCKET_SIZE: 10,
+      LOG_LENGTH_KEY: 27,
+      LOG_LENGTH_VALUE: 6,
+    };
+  }
+
   constructor() {
     this.logger = new z.util.Logger('z.telemetry.AppInitTimings', z.config.LOGGER.OPTIONS);
     this.init = window.performance.now();
@@ -53,8 +54,8 @@ z.telemetry.app_init.AppInitTimings = class AppInitTimings {
   }
 
   get_app_load() {
-    const app_loaded_in_seconds = this[z.telemetry.app_init.AppInitTimingsStep.APP_LOADED] / MILLISECONDS_IN_SECOND;
-    return (Math.floor(app_loaded_in_seconds / APP_INIT_TIMINGS_CONFIG.BUCKET_SIZE) + 1) * APP_INIT_TIMINGS_CONFIG.BUCKET_SIZE;
+    const app_loaded_in_seconds = this[z.telemetry.app_init.AppInitTimingsStep.APP_LOADED] / 1000;
+    return (Math.floor(app_loaded_in_seconds / AppInitTimings.CONFIG.BUCKET_SIZE) + 1) * AppInitTimings.CONFIG.BUCKET_SIZE;
   }
 
   log() {
@@ -65,9 +66,9 @@ z.telemetry.app_init.AppInitTimings = class AppInitTimings {
         const value = this[key];
 
         if (key.toString() !== 'init' && _.isNumber(value)) {
-          const placeholder_key_length = Math.max(APP_INIT_TIMINGS_CONFIG.LOG_LENGTH_KEY - key.length, 1);
+          const placeholder_key_length = Math.max(AppInitTimings.CONFIG.LOG_LENGTH_KEY - key.length, 1);
           const placeholder_key = new Array(placeholder_key_length).join(' ');
-          const placeholder_value_length = Math.max(APP_INIT_TIMINGS_CONFIG.LOG_LENGTH_VALUE - value.toString().length, 1);
+          const placeholder_value_length = Math.max(AppInitTimings.CONFIG.LOG_LENGTH_VALUE - value.toString().length, 1);
           const placeholder_value = new Array(placeholder_value_length).join(' ');
 
           this.logger.info(`${placeholder_key}'${key}':${placeholder_value}${value}ms`);

@@ -27,7 +27,7 @@ z.assets.AssetService = class AssetService {
 
   /**
    * Construct a new Asset Service.
-   * @param {z.service.Client} client - Client for the API calls
+   * @param {z.service.BackendClient} client - Client for the API calls
    */
   constructor(client) {
     this.cancel_asset_upload = this.cancel_asset_upload.bind(this);

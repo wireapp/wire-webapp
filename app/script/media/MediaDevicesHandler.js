@@ -26,7 +26,6 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
   /**
    * Construct a new MediaDevices handler.
    * @param {z.media.MediaRepository} media_repository - Media repository referencing the other handlers
-   * @returns {MediaDevicesHandler} Handler for MediaDevices
    */
   constructor(media_repository) {
     this.media_repository = media_repository;
@@ -57,7 +56,6 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
     this.has_microphone = ko.pureComputed(() => this.available_devices.audio_input().length > 0);
 
     this.initialize_media_devices();
-    return this;
   }
 
   /**

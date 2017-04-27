@@ -570,7 +570,7 @@ z.util.is_valid_email = function(email) {
 z.util.is_valid_phone_number = function(phone_number) {
   let regular_expression;
 
-  if (z.util.Environment.backend.current === 'production') {
+  if (z.util.Environment.backend.current === z.service.BackendEnvironment.PRODUCTION) {
     regular_expression = /^\+[1-9]\d{1,14}$/;
   } else {
     regular_expression = /^\+[0-9]\d{1,14}$/;

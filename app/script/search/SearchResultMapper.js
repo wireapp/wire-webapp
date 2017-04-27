@@ -25,11 +25,9 @@ window.z.search = z.search || {};
 z.search.SearchResultMapper = class SearchResultMapper {
   /**
    * Construct a new Search Result Mapper.
-   * @returns {SearchResultMapper} Mapper to convert all server side JSON search results into usable entities
    */
   constructor() {
     this.logger = new z.util.Logger('z.search.SearchResultMapper', z.config.LOGGER.OPTIONS);
-    return this;
   }
 
   /**

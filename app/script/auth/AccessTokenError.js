@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.auth = z.audio || {};
 
-window.z.auth.AccessTokenError = class AccessTokenError extends Error {
+z.auth.AccessTokenError = class AccessTokenError extends Error {
   constructor(type) {
     super();
     this.name = this.constructor.name;

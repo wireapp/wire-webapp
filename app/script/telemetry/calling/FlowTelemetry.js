@@ -23,13 +23,15 @@ window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
 window.z.telemetry.calling = z.telemetry.calling || {};
 
-const FLOW_TELEMETRY_CONFIG = {
-  MEDIA_CHECK_TIMEOUT: 5000,
-  STATS_CHECK_INTERVAL: 2000,
-  STATS_CHECK_TIMEOUT: 50,
-};
-
 z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
+  static get CONFIG() {
+    return {
+      MEDIA_CHECK_TIMEOUT: 5000,
+      STATS_CHECK_INTERVAL: 2000,
+      STATS_CHECK_TIMEOUT: 50,
+    };
+  }
+
   /**
    * Construct new flow telemetry entity.
    *
@@ -131,7 +133,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     if (this.statistics.hasOwnProperty(media_type)) {
       const stats = this.statistics[media_type];
 
-      const seconds = (attempt * FLOW_TELEMETRY_CONFIG.MEDIA_CHECK_TIMEOUT) / 1000;
+      const seconds = (attempt * FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT) / 1000;
       if (stats.bytes_received === 0 && stats.bytes_sent === 0) {
         return this.logger.warn(`No '${media_type}' flowing in either direction on stream after ${seconds} seconds`);
       }
@@ -153,7 +155,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
       const stream_check_timeout = window.setTimeout(() => {
         this.check_stream(media_type, attempt++);
       },
-      FLOW_TELEMETRY_CONFIG.MEDIA_CHECK_TIMEOUT);
+      FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT);
 
       this.stream_check_timeouts.push(stream_check_timeout);
       return;
@@ -175,7 +177,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
         this.check_stream(z.media.MediaType.VIDEO);
       }
     },
-    FLOW_TELEMETRY_CONFIG.MEDIA_CHECK_TIMEOUT);
+    FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT);
 
     this.stream_check_timeouts.push(stream_check_timeout);
   }
@@ -259,7 +261,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
           this.logger.warn(`Failed to update flow networks stats: ${error.message}`);
         });
       },
-      FLOW_TELEMETRY_CONFIG.STATS_CHECK_TIMEOUT);
+      FlowTelemetry.CONFIG.STATS_CHECK_TIMEOUT);
 
       this.stream_check_timeouts.push(stream_check_timeout);
 
@@ -269,7 +271,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
           this.logger.warn(`Networks stats not updated: ${error.message}`);
         });
       },
-      FLOW_TELEMETRY_CONFIG.STATS_CHECK_INTERVAL);
+      FlowTelemetry.CONFIG.STATS_CHECK_INTERVAL);
     }
   }
 

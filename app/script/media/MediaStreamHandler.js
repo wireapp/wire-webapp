@@ -69,7 +69,6 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
   /**
    * Construct a new MediaStream handler.
    * @param {z.media.MediaRepository} media_repository - Media repository with with references to all other handlers
-   * @returns {MediaStreamHandler} Handler for MediaStreams
    */
   constructor(media_repository) {
     this.media_repository = media_repository;
@@ -96,8 +95,6 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     this.request_hint_timeout = undefined;
     amplify.subscribe(z.event.WebApp.CALL.MEDIA.ADD_STREAM, this.add_remote_media_stream.bind(this));
-
-    return this;
   }
 
 
@@ -698,8 +695,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   _toggle_audio_send() {
     return this._toggle_stream_enabled(z.media.MediaType.AUDIO, this.local_media_stream(), this.self_stream_state.audio_send)
-    .then((audio_track) => {
-      this.logger.info(`Microphone enabled: ${this.self_stream_state.audio_send()}`, audio_track);
+    .then((audio_tracks) => {
+      this.logger.info(`Microphone enabled: ${this.self_stream_state.audio_send()}`, audio_tracks);
       this.self_stream_state.audio_send();
     });
   }
@@ -711,8 +708,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   _toggle_screen_send() {
     return this._toggle_stream_enabled(z.media.MediaType.VIDEO, this.local_media_stream(), this.self_stream_state.screen_send)
-    .then((video_track) => {
-      this.logger.info(`Screen enabled: ${this.self_stream_state.screen_send()}`, video_track);
+    .then((video_tracks) => {
+      this.logger.info(`Screen enabled: ${this.self_stream_state.screen_send()}`, video_tracks);
       this.self_stream_state.screen_send();
     });
   }
@@ -724,8 +721,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   _toggle_video_send() {
     return this._toggle_stream_enabled(z.media.MediaType.VIDEO, this.local_media_stream(), this.self_stream_state.video_send)
-    .then((video_track) => {
-      this.logger.info(`Camera enabled: ${this.self_stream_state.video_send()}`, video_track);
+    .then((video_tracks) => {
+      this.logger.info(`Camera enabled: ${this.self_stream_state.video_send()}`, video_tracks);
       this.self_stream_state.video_send();
     });
   }
@@ -743,12 +740,17 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
     return Promise.resolve()
     .then(function() {
       state_observable(!state_observable());
-      const media_stream_track = (z.media.MediaStreamHandler.get_media_tracks(media_stream, media_type))[0];
       if (media_type === z.media.MediaType.AUDIO) {
         amplify.publish(z.event.WebApp.CALL.MEDIA.MUTE_AUDIO, !state_observable());
       }
-      media_stream_track.enabled = state_observable();
-      return media_stream_track;
+
+      const media_stream_tracks = z.media.MediaStreamHandler.get_media_tracks(media_stream, media_type);
+
+      media_stream_tracks.forEach(function(media_stream_track) {
+        media_stream_track.enabled = state_observable();
+      });
+
+      return media_stream_tracks;
     });
   }
 };

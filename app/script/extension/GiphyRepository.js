@@ -26,7 +26,6 @@ z.extension.GiphyRepository = class GiphyRepository {
   /**
    * Construct a new Giphy Repository.
    * @param {z.extension.GiphyService} giphy_service - Giphy REST API implementation
-   * @returns {GiphyRepository} Repository for all interactions with the giphy service
    */
   constructor(giphy_service) {
     this.giphy_service = giphy_service;
