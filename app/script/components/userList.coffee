@@ -86,15 +86,6 @@ class z.components.UserListViewModel
       @is_selected = (user_et) =>
         return user_et in @user_selected()
 
-    @get_common_contacts_caption = (user_et) ->
-      total = user_et.mutual_friends_total()
-      locale_id = if total > 1 then z.string.search_friends_in_common else z.string.search_friend_in_common
-      return z.localization.Localizer.get_text
-        id: locale_id
-        replace:
-          placeholder: '%no',
-          content: total
-
 ko.components.register 'user-list',
   viewModel: z.components.UserListViewModel
   template: """
