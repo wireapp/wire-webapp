@@ -247,7 +247,7 @@ z.client.ClientRepository = class ClientRepository {
       const client_et = this.current_client();
       this.current_client(undefined);
 
-      if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.NOT_FOUND) {
+      if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
         this.logger.warn(`Local client '${client_et.id}' (${client_et.type}) no longer exists on the backend`, error);
         return Promise.resolve()
         .then(() => {
@@ -289,7 +289,7 @@ z.client.ClientRepository = class ClientRepository {
       return this.client_service.post_clients(this._create_registration_payload(client_type, password, keys));
     })
     .catch((error) => {
-      if (error.label === z.service.BackendClientError.prototype.LABEL.TOO_MANY_CLIENTS) {
+      if (error.label === z.service.BackendClientError.LABEL.TOO_MANY_CLIENTS) {
         throw new z.client.ClientError(z.client.ClientError.TYPE.TOO_MANY_CLIENTS);
       }
       this.logger.error(`Client registration request failed: ${error.message}`, error);
@@ -471,7 +471,7 @@ z.client.ClientRepository = class ClientRepository {
       this.logger.error(`Unable to delete client '${client_id}': ${error.message}`, error);
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.SETTINGS.REMOVED_DEVICE, {outcome: 'fail'});
 
-      if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.FORBIDDEN) {
+      if (error.code === z.service.BackendClientError.STATUS_CODE.FORBIDDEN) {
         error = new z.client.ClientError(z.client.ClientError.TYPE.REQUEST_FORBIDDEN);
       } else {
         error = new z.client.ClientError(z.client.ClientError.TYPE.REQUEST_FAILURE);

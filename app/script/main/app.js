@@ -280,7 +280,7 @@ z.main.App = class App {
       this.logger.debug(`App reload: '${is_reload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`);
 
       if (is_reload && ![z.client.ClientError.TYPE.MISSING_ON_BACKEND, z.client.ClientError.TYPE.NO_LOCAL_CLIENT].includes(error.type)) {
-        return this.auth.client.execute_on_connectivity(z.service.Client.prototype.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD).then(() => window.location.reload(false));
+        return this.auth.client.execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD).then(() => window.location.reload(false));
       }
 
       if (navigator.onLine) {
@@ -315,7 +315,7 @@ z.main.App = class App {
    */
   on_internet_connection_gained() {
     this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-    this.auth.client.execute_on_connectivity(z.service.Client.prototype.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED)
+    this.auth.client.execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED)
       .then(() => {
         amplify.publish(z.event.WebApp.WARNING.DISMISS, z.ViewModel.WarningType.NO_INTERNET);
         amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
@@ -420,7 +420,7 @@ z.main.App = class App {
             return this._redirect_to_login(true);
           }
           this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
-          return this.auth.client.execute_on_connectivity(z.service.Client.prototype.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL)
+          return this.auth.client.execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL)
           .then(function() {
             window.location.reload(false);
           });
@@ -599,7 +599,7 @@ z.main.App = class App {
    */
   _redirect_to_login(session_expired) {
     this.logger.info(`Redirecting to login after connectivity verification. Session expired: ${session_expired}`);
-    this.auth.client.execute_on_connectivity(z.service.Client.prototype.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
+    this.auth.client.execute_on_connectivity(z.service.BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT)
     .then(function() {
       let url = `/auth/${location.search}`;
       if (session_expired) {

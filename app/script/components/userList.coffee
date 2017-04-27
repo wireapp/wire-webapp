@@ -86,6 +86,7 @@ class z.components.UserListViewModel
       @is_selected = (user_et) =>
         return user_et in @user_selected()
 
+
 ko.components.register 'user-list',
   viewModel: z.components.UserListViewModel
   template: """
