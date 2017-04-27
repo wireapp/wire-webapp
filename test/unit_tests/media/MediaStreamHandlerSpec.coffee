@@ -51,7 +51,7 @@ describe 'z.media.MediaStreamHandler', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.media.MediaError
-        expect(error.type).toBe z.media.MediaError::TYPE.NO_AUDIO_STREAM_FOUND
+        expect(error.type).toBe z.media.MediaError.TYPE.NO_AUDIO_STREAM_FOUND
         done()
 
 

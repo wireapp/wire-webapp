@@ -23,6 +23,10 @@ window.z = window.z || {};
 window.z.client = z.client || {};
 
 z.client.ClientRepository = class ClientRepository {
+  static get PRIMARY_KEY_CURRENT_CLIENT() {
+    return 'local_identity';
+  }
+
   constructor(client_service, cryptography_repository) {
     this.client_service = client_service;
     this.cryptography_repository = cryptography_repository;
@@ -38,17 +42,11 @@ z.client.ClientRepository = class ClientRepository {
     amplify.subscribe(z.event.WebApp.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logout_client.bind(this));
     // todo: deprecated - remove when user base of wrappers version >= 2.12 is large enough
     amplify.subscribe(z.event.WebApp.LOGOUT.ASK_TO_CLEAR_DATA, this.logout_client.bind(this));
-
-    return this;
   }
 
   init(self_user) {
     this.self_user(self_user);
     return this.logger.info(`Initialized repository with user ID '${this.self_user().id}'`);
-  }
-
-  static get PRIMARY_KEY_CURRENT_CLIENT() {
-    return 'local_identity';
   }
 
   //##############################################################################
@@ -429,7 +427,7 @@ z.client.ClientRepository = class ClientRepository {
   /**
    * Cleanup local sessions.
    * @note If quick_clean parameter is set to false, there will be one backend request per user that has a session.
-   * @param {Boolean} [quick_clean=true] - Optional value whether to check all users with local sessions or the ones with too many sessions
+   * @param {boolean} [quick_clean=true] - Optional value whether to check all users with local sessions or the ones with too many sessions
    * @returns {undefined} No return value
    */
   cleanup_clients_and_sessions(quick_clean = true) {

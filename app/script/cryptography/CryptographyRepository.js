@@ -22,9 +22,10 @@
 window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
 
-const REMOTE_ENCRYPTION_FAILURE = '💣';
-
 z.cryptography.CryptographyRepository = class CryptographyRepository {
+  static get REMOTE_ENCRYPTION_FAILURE() {
+    return '💣';
+  }
 
   /**
    * Construct a new Cryptography repository.
@@ -40,7 +41,6 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
 
     this.current_client = undefined;
     this.cryptobox = undefined;
-    return this;
   }
 
   /**
@@ -208,10 +208,10 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
     .then((cipher_payloads) => {
       const user_client_map_for_missing_sessions = {};
 
-      cipher_payloads.forEach(([session_id, ciphertext]) => {
+      cipher_payloads.forEach(({cipher_text, session_id}) => {
         const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
-        if (ciphertext) {
-          return payload.recipients[user_id][client_id] = ciphertext;
+        if (cipher_text) {
+          return payload.recipients[user_id][client_id] = cipher_text;
         }
         user_client_map_for_missing_sessions[user_id] = user_client_map_for_missing_sessions[user_id] || [];
         user_client_map_for_missing_sessions[user_id].push(client_id);
@@ -220,10 +220,10 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       return this._encrypt_generic_message_for_new_sessions(user_client_map_for_missing_sessions, generic_message);
     })
     .then((additional_cipher_payloads) => {
-      additional_cipher_payloads.forEach(([session_id, ciphertext]) => {
+      additional_cipher_payloads.forEach(({cipher_text, session_id}) => {
         const {user_id, client_id} = z.client.Client.dismantle_user_client_id(session_id);
         payload.recipients[user_id] = payload.recipients[user_id] || {};
-        payload.recipients[user_id][client_id] = ciphertext;
+        payload.recipients[user_id][client_id] = cipher_text;
       });
       return payload;
     });
@@ -287,9 +287,9 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    */
   _construct_payload(sender) {
     return {
-      sender: sender,
-      recipients: {},
       native_push: true,
+      recipients: {},
+      sender: sender,
     };
   }
 
@@ -300,18 +300,20 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
    * @private
    * @param {string} session_id - ID of session to encrypt for
    * @param {z.proto.GenericMessage} generic_message - ProtoBuffer message
-   * @returns {Array<string, string>} Array containing session ID and encrypted message as BASE64 encoded string
+   * @returns {Object} Contains session ID and encrypted message as BASE64 encoded string
    */
   _encrypt_payload_for_session(session_id, generic_message) {
     return this.cryptobox.encrypt(session_id, generic_message.toArrayBuffer())
-    .then((ciphertext) => [session_id, z.util.array_to_base64(ciphertext)])
+    .then((cipher_text) => {
+      return {cipher_text: z.util.array_to_base64(cipher_text), session_id: session_id};
+    })
     .catch((error) => {
       if (error instanceof cryptobox.store.RecordNotFoundError) {
         this.logger.log(`Session '${session_id}' needs to get initialized...`);
-        return [session_id, undefined];
+        return {session_id: session_id};
       }
       this.logger.warn(`Failed encrypting '${generic_message.content}' message for session '${session_id}': ${error.message}`, error);
-      return [session_id, REMOTE_ENCRYPTION_FAILURE];
+      return {cipher_text: CryptographyRepository.REMOTE_ENCRYPTION_FAILURE, session_id: session_id};
     });
   }
 
@@ -325,7 +327,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
       return Promise.reject(new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_DATA_CONTENT));
     }
 
-    if (event.data.text === REMOTE_ENCRYPTION_FAILURE) {
+    if (event.data.text === CryptographyRepository.REMOTE_ENCRYPTION_FAILURE) {
       return Promise.reject(new Proteus.errors.DecryptError.InvalidMessage('The sending client couldn\'t encrypt a message for our client.'));
     }
 

@@ -65,6 +65,7 @@ class z.conversation.ConversationRepository
     @sorted_conversations = ko.pureComputed =>
       @filtered_conversations().sort z.util.sort_groups_by_last_event
 
+    @receiving_queue = new z.util.PromiseQueue()
     @sending_queue = new z.util.PromiseQueue()
     @sending_queue.pause()
 
@@ -104,7 +105,7 @@ class z.conversation.ConversationRepository
 
   _init_subscriptions: ->
     amplify.subscribe z.event.WebApp.CONVERSATION.ASSET.CANCEL, @cancel_asset_upload
-    amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @on_conversation_event
+    amplify.subscribe z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, @push_to_receiving_queue
     amplify.subscribe z.event.WebApp.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, @timeout_ephemeral_message
     amplify.subscribe z.event.WebApp.CONVERSATION.MAP_CONNECTION, @map_connection
     amplify.subscribe z.event.WebApp.CONVERSATION.MISSED_EVENTS, @on_missed_events
@@ -543,10 +544,10 @@ class z.conversation.ConversationRepository
   ###
   Set the notification handling state.
   @note Temporarily do not unarchive conversations when handling the notification stream
-  @param handling_state [z.event.NotificationHandlingState] State of the notifications stream handling
+  @param handling_state [z.event.NOTIFICATION_HANDLING_STATE] State of the notifications stream handling
   ###
   set_notification_handling_state: (handling_state) =>
-    @block_event_handling = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
+    @block_event_handling = handling_state isnt z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
     @sending_queue.pause @block_event_handling
     @logger.info "Block handling of conversation events: #{@block_event_handling}"
 
@@ -1127,7 +1128,7 @@ class z.conversation.ConversationRepository
     window.setTimeout =>
       @send_reaction conversation_et, message_et, reaction
       @_track_reaction conversation_et, message_et, reaction, button
-    , 50
+    , 100
 
   ###
   Send reaction to a content message in specified conversation.
@@ -1799,12 +1800,10 @@ class z.conversation.ConversationRepository
   on_missed_events: =>
     @filtered_conversations()
     .filter (conversation_et) -> not conversation_et.removed_from_conversation()
-    .forEach (conversation_et) -> amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_missed conversation_et
+    .forEach (conversation_et) => amplify.publish z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_missed conversation_et, @user_repository.self()
 
   ###
   Listener for incoming events from the WebSocket.
-
-  @private
   @note We check for events received multiple times via the WebSocket by event id here
   @param event [Object] JSON data for event
   ####
@@ -1860,6 +1859,13 @@ class z.conversation.ConversationRepository
       if not @block_event_handling and previously_archived and not conversation_et.is_archived()
         @logger.info "Unarchiving conversation '#{conversation_et.id}' with new event"
         @unarchive_conversation conversation_et
+
+  ###
+  Push to receiving queue.
+  @param event [Object] JSON data for event
+  ###
+  push_to_receiving_queue: (event) =>
+    @receiving_queue.push => @on_conversation_event event
 
   ###
   A message or ping received in a conversation.
@@ -2084,26 +2090,20 @@ class z.conversation.ConversationRepository
   @param conversation_et [z.entity.Conversation] Conversation entity that a message was reacted upon in
   @param event_json [Object] JSON data of 'conversation.reaction' event
   ###
-  _on_reaction: (conversation_et, event_json, attempt = 1) ->
+  _on_reaction: (conversation_et, event_json) ->
     @get_message_in_conversation_by_id conversation_et, event_json.data.message_id
     .then (message_et) =>
       changes = message_et.update_reactions event_json
-      return if not changes
-
-      @_update_user_ets message_et
-      @_send_reaction_notification conversation_et, message_et, event_json
-      @logger.debug "Updated reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
-      return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
-      .catch (error) =>
-        throw error is error.type isnt z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
-        if attempt < 10
-          return window.setTimeout =>
-            @_on_reaction conversation_et, event_json, attempt + 1
-          , 10 * attempt
-        @logger.error "Too many attempts to update reaction to message '#{message_et.id}' in conversation '#{conversation_et.id}'", error
+      if changes
+        @_update_user_ets message_et
+        @_send_reaction_notification conversation_et, message_et, event_json
+        @logger.debug "Updating reactions to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", event_json
+        return @conversation_service.update_message_in_db message_et, changes, conversation_et.id
     .catch (error) =>
+      if error.type is z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE
+        Raygun.send 'Failed sequential database update'
       if error.type isnt z.conversation.ConversationError::TYPE.MESSAGE_NOT_FOUND
-        @logger.error "Failed to handle reaction to message in conversation '#{conversation_et.id}'", error
+        @logger.error "Failed to handle reaction to message '#{event_json.data.message_id}' in conversation '#{conversation_et.id}'", {error: error, event: event_json}
         throw error
 
   ###

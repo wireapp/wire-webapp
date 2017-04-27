@@ -1299,7 +1299,7 @@ class z.ViewModel.AuthViewModel
   @return [Boolean] Returns true if there is at least one conversation event stored
   ###
   _has_local_history: =>
-    @storage_service.get_all @storage_service.OBJECT_STORE_EVENTS
+    @storage_service.get_all z.storage.StorageService.OBJECT_STORE.EVENTS
     .then (events) ->
       return events.length > 0
 
@@ -1316,7 +1316,7 @@ class z.ViewModel.AuthViewModel
     @client_repository.register_client @password()
     .then (client_observable) =>
       @event_repository.current_client = client_observable
-      @event_repository.initialize_last_notification_id()
+      @event_repository.initialize_last_notification_id client_observable().id
     .catch (error) =>
       if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
         @logger.warn "Cannot set starting point on notification stream: #{error.message}", error

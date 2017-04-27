@@ -136,7 +136,7 @@ class z.conversation.ConversationService
   @return [Promise] Resolves with the number of deleted records
   ###
   delete_message_with_key_from_db: (conversation_id, primary_key) ->
-    @storage_service.db[@storage_service.OBJECT_STORE_EVENTS].delete primary_key
+    @storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS].delete primary_key
 
   ###
   Delete a message from a conversation. Duplicates are delete as well.
@@ -146,7 +146,7 @@ class z.conversation.ConversationService
   @return [Promise] Resolves with the number of deleted records
   ###
   delete_message_from_db: (conversation_id, message_id) ->
-    @storage_service.db[@storage_service.OBJECT_STORE_EVENTS]
+    @storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
     .where 'conversation'
     .equals conversation_id
     .and (record) -> record.id is message_id
@@ -157,7 +157,7 @@ class z.conversation.ConversationService
   @param conversation_id [String] Delete messages for this conversation
   ###
   delete_messages_from_db: (conversation_id) ->
-    @storage_service.db[@storage_service.OBJECT_STORE_EVENTS]
+    @storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
     .where 'conversation'
     .equals conversation_id
     .delete()
@@ -167,18 +167,20 @@ class z.conversation.ConversationService
   @param message_et [z.entity.Message] Message event to update in the database
   @param changes [Object] Changes to update message with
   ###
-  update_message_in_db: (message_et, changes, conversation_id) ->
+  update_message_in_db: (message_et, changes = {}, conversation_id) ->
     Promise.resolve message_et.primary_key
     .then (primary_key) =>
-      if _.isObject(changes) and changes[Object.keys(changes)[0]]?
-        return @storage_service.update @storage_service.OBJECT_STORE_EVENTS, primary_key, changes if not changes.version
+      if Object.keys(changes).length
+        if changes.version
+          return @storage_service.db.transaction 'rw', z.storage.StorageService.OBJECT_STORE.EVENTS, =>
+            @load_event_from_db conversation_id, message_et.id
+            .then (record) =>
+              if record and changes.version is (record.version or 1) + 1
+                return @storage_service.update z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, changes
+              throw new z.storage.StorageError z.storage.StorageError.TYPE.NON_SEQUENTIAL_UPDATE
 
-        return @storage_service.db.transaction 'rw', @storage_service.OBJECT_STORE_EVENTS, =>
-          @load_event_from_db conversation_id, message_et.id
-          .then (record) =>
-            if record and changes.version is (record.version or 1) + 1
-              return @storage_service.update @storage_service.OBJECT_STORE_EVENTS, primary_key, changes
-            throw new z.storage.StorageError z.storage.StorageError::TYPE.NON_SEQUENTIAL_UPDATE
+        return @storage_service.update z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, changes
+
       throw new z.conversation.ConversationError z.conversation.ConversationError::TYPE.NO_CHANGES
 
   ###
@@ -186,7 +188,7 @@ class z.conversation.ConversationService
   @param primary_key [String] Primary key used to find an event in the database
   ###
   update_asset_as_uploaded_in_db: (primary_key, asset_data) ->
-    @storage_service.load @storage_service.OBJECT_STORE_EVENTS, primary_key
+    @storage_service.load z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key
     .then (record) =>
       record.data.id = asset_data.id
       record.data.otr_key = asset_data.otr_key
@@ -194,7 +196,7 @@ class z.conversation.ConversationService
       record.data.key = asset_data.key
       record.data.token = asset_data.token
       record.data.status = z.assets.AssetTransferState.UPLOADED
-      @storage_service.update @storage_service.OBJECT_STORE_EVENTS, primary_key, record
+      @storage_service.update z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record
     .then =>
       @logger.info 'Updated asset message_et (uploaded)', primary_key
 
@@ -203,14 +205,14 @@ class z.conversation.ConversationService
   @param primary_key [String] Primary key used to find an event in the database
   ###
   update_asset_preview_in_db: (primary_key, asset_data) ->
-    @storage_service.load @storage_service.OBJECT_STORE_EVENTS, primary_key
+    @storage_service.load z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key
     .then (record) =>
       record.data.preview_id = asset_data.id
       record.data.preview_otr_key = asset_data.otr_key
       record.data.preview_sha256 = asset_data.sha256
       record.data.preview_key = asset_data.key
       record.data.preview_token = asset_data.token
-      @storage_service.update @storage_service.OBJECT_STORE_EVENTS, primary_key, record
+      @storage_service.update z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record
     .then =>
       @logger.info 'Updated asset message_et (preview)', primary_key
 
@@ -219,11 +221,11 @@ class z.conversation.ConversationService
   @param primary_key [String] Primary key used to find an event in the database
   ###
   update_asset_as_failed_in_db: (primary_key, reason) ->
-    @storage_service.load @storage_service.OBJECT_STORE_EVENTS, primary_key
+    @storage_service.load z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key
     .then (record) =>
       record.data.status = z.assets.AssetTransferState.UPLOAD_FAILED
       record.data.reason = reason
-      @storage_service.update @storage_service.OBJECT_STORE_EVENTS, primary_key, record
+      @storage_service.update z.storage.StorageService.OBJECT_STORE.EVENTS, primary_key, record
     .then =>
       @logger.info 'Updated asset message_et (failed)', primary_key
 
@@ -232,7 +234,7 @@ class z.conversation.ConversationService
   @return [Promise] Promise that resolves with all the stored conversation states
   ###
   load_conversation_states_from_db: =>
-    @storage_service.get_all @storage_service.OBJECT_STORE_CONVERSATIONS
+    @storage_service.get_all z.storage.StorageService.OBJECT_STORE.CONVERSATIONS
 
   ###
   Load conversation event.
@@ -240,7 +242,7 @@ class z.conversation.ConversationService
   @param message_id [String]
   ###
   load_event_from_db: (conversation_id, message_id) ->
-    @storage_service.db[@storage_service.OBJECT_STORE_EVENTS]
+    @storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
     .where 'conversation'
     .equals conversation_id
     .filter (record) -> record.id is message_id
@@ -253,7 +255,7 @@ class z.conversation.ConversationService
     min_date = new Date()
     min_date.setDate min_date.getDate() - 30
 
-    @storage_service.db[@storage_service.OBJECT_STORE_EVENTS]
+    @storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
     .where 'time'
     .between min_date.toISOString(), new Date().toISOString()
     .toArray()
@@ -284,7 +286,7 @@ class z.conversation.ConversationService
     else if lower_bound.getTime() > upper_bound.getTime()
       throw new Error "Lower bound (#{lower_bound.getTime()}) cannot be greater than upper bound (#{upper_bound.getTime()})."
 
-    @storage_service.db[@storage_service.OBJECT_STORE_EVENTS]
+    @storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
     .where '[conversation+time]'
     .between [conversation_id, lower_bound.toISOString()], [conversation_id, upper_bound.toISOString()], true, false
     .reverse()
@@ -307,7 +309,7 @@ class z.conversation.ConversationService
     if not _.isDate upper_bound
       throw new Error "Upper bound (#{typeof upper_bound}) must be of type 'Date'."
 
-    @storage_service.db[@storage_service.OBJECT_STORE_EVENTS]
+    @storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
     .where '[conversation+time]'
     .between [conversation_id, upper_bound.toISOString()], [conversation_id, new Date().toISOString()], include_upper_bound, true
     .limit limit
@@ -321,7 +323,7 @@ class z.conversation.ConversationService
   @return [Promise]
   ###
   load_events_with_category_from_db: (conversation_id, category_min, category_max = z.message.MessageCategory.LIKED) ->
-    @storage_service.db[@storage_service.OBJECT_STORE_EVENTS]
+    @storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
     .where '[conversation+category]'
     .between [conversation_id, category_min], [conversation_id, category_max], true, true
     .sortBy 'time'
@@ -333,7 +335,7 @@ class z.conversation.ConversationService
   ###
   save_event: (event) ->
     event.category = z.message.MessageCategorization.category_from_event event
-    @storage_service.save(@storage_service.OBJECT_STORE_EVENTS, undefined, event).then -> event
+    @storage_service.save(z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event).then -> event
 
   ###
   Load conversation events by event type.
@@ -342,7 +344,7 @@ class z.conversation.ConversationService
   @return [Promise] Promise that resolves with the retrieved records
   ###
   load_events_with_types: (event_types) ->
-    return @storage_service.db[@storage_service.OBJECT_STORE_EVENTS]
+    return @storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
     .where 'type'
     .anyOf event_types
     .sortBy 'time'
@@ -430,7 +432,7 @@ class z.conversation.ConversationService
   ###
   save_conversations_in_db: (conversations) =>
     keys = conversations.map (conversation) -> conversation.id
-    @storage_service.db[@storage_service.OBJECT_STORE_CONVERSATIONS].bulkPut(conversations, keys).then -> conversations
+    @storage_service.db[z.storage.StorageService.OBJECT_STORE.CONVERSATIONS].bulkPut(conversations, keys).then -> conversations
 
   ###
   Saves a conversation entity in the local database.
@@ -438,7 +440,7 @@ class z.conversation.ConversationService
   @return [Promise<String|z.entity.Conversation>] Promise which resolves with the conversation entity
   ###
   save_conversation_state_in_db: (conversation_et) =>
-    @storage_service.save @storage_service.OBJECT_STORE_CONVERSATIONS, conversation_et.id, conversation_et.serialize()
+    @storage_service.save z.storage.StorageService.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversation_et.serialize()
     .then (primary_key) =>
       @logger.log @logger.levels.INFO, "State of conversation '#{primary_key}' was stored"
       return conversation_et

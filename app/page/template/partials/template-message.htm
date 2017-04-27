@@ -213,9 +213,6 @@
     <div class="message-connected">
       <span class="message-connected-header" data-bind='text: other_user().name()'></span>
       <span class="message-connected-username label-username" data-bind='text: other_user().username()'></span>
-      <!-- ko if: !other_user().connected() -->
-        <common-contacts class="message-connected-contacts" params="user: other_user()"></common-contacts>
-      <!-- /ko -->
       <user-avatar class="message-connected-avatar user-avatar-lg user-avatar-no-badge cursor-default"
                    data-bind="css: {'user-avatar-no-badge': other_user().sent()}"
                    params="user: other_user()"></user-avatar>

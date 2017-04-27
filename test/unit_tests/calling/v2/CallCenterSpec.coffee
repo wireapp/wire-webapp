@@ -86,7 +86,7 @@ describe 'z.calling.v2.CallCenter', ->
   beforeAll (done) ->
     test_factory.exposeCallingActors()
     .then ->
-      amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NotificationHandlingState.WEB_SOCKET
+      amplify.publish z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
 
       # User entities
       build_user = (name, is_self = false) ->

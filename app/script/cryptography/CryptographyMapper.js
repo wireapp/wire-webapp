@@ -23,6 +23,9 @@ window.z = window.z || {};
 window.z.cryptography = z.cryptography || {};
 
 z.cryptography.CryptographyMapper = class CryptographyMapper {
+  /**
+   * Construct a new CryptographyMapper.
+   */
   constructor() {
     this.logger = new z.util.Logger('z.cryptography.CryptographyMapper', z.config.LOGGER.OPTIONS);
   }
@@ -35,24 +38,27 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
    * @returns {Promise} Resolves with the mapped event
    */
   map_generic_message(generic_message, event) {
+    if (generic_message === undefined) {
+      return Promise.reject(new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE));
+    }
     return Promise.resolve()
     .then(() => {
-      if (generic_message) {
-        return this._map_generic_message(generic_message, event);
-      }
-      throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.NO_GENERIC_MESSAGE);
+      return generic_message.external ? this._unwrap_external(generic_message.external, event) : generic_message;
     })
-    .then((specific_content) => {
-      return $.extend(
-        {
-          conversation: event.conversation,
-          id: generic_message.message_id,
-          from: event.from,
-          time: event.time,
-          status: event.status,
-        },
-        specific_content
-      );
+    .then((unwrapped_generic_message) => {
+      return Promise.all([
+        this._map_generic_message(unwrapped_generic_message, event),
+        unwrapped_generic_message,
+      ]);
+    })
+    .then(([specific_content, unwrapped_generic_message]) => {
+      return Object.assign({
+        conversation: event.conversation,
+        from: event.from,
+        id: unwrapped_generic_message.message_id,
+        status: event.status,
+        time: event.time,
+      }, specific_content);
     });
   }
 
@@ -72,8 +78,6 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         return this._map_edited(generic_message.edited, generic_message.message_id);
       case 'ephemeral':
         return this._map_ephemeral(generic_message, event);
-      case 'external':
-        return this._map_external(generic_message.external, event);
       case 'hidden':
         return this._map_hidden(generic_message.hidden);
       case 'image':
@@ -129,15 +133,15 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         content_length: asset.original.size.toNumber(),
         content_type: asset.original.mime_type,
         info: {
-          width: asset.original.image.width,
           height: asset.original.image.height,
           nonce: event_nonce,
           tag: 'medium',
+          width: asset.original.image.width,
         },
         key: asset.uploaded.asset_id,
-        token: asset.uploaded.asset_token,
         otr_key: new Uint8Array(asset.uploaded.otr_key.toArrayBuffer()),
         sha256: new Uint8Array(asset.uploaded.sha256.toArrayBuffer()),
+        token: asset.uploaded.asset_token,
       },
       type: z.event.Backend.CONVERSATION.ASSET_ADD,
     };
@@ -180,9 +184,9 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     return {
       data: {
         id: event_id,
+        key: preview.remote.asset_id,
         otr_key: new Uint8Array(preview.remote.otr_key !== null ? preview.remote.otr_key.toArrayBuffer() : []),
         sha256: new Uint8Array(preview.remote.sha256 !== null ? preview.remote.sha256.toArrayBuffer() : []),
-        key: preview.remote.asset_id,
         token: preview.remote.asset_token,
       },
       type: z.event.Client.CONVERSATION.ASSET_PREVIEW,
@@ -193,9 +197,9 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     return {
       data: {
         id: event_id,
+        key: uploaded.asset_id,
         otr_key: new Uint8Array(uploaded.otr_key !== null ? uploaded.otr_key.toArrayBuffer() : []),
         sha256: new Uint8Array(uploaded.sha256 !== null ? uploaded.sha256.toArrayBuffer() : []),
-        key: uploaded.asset_id,
         token: uploaded.asset_token,
       },
       type: z.event.Client.CONVERSATION.ASSET_UPLOAD_COMPLETE,
@@ -222,6 +226,8 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
               return z.message.StatusType.DELIVERED;
             case z.proto.Confirmation.Type.READ:
               return z.message.StatusType.SEEN;
+            default:
+              throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.UNHANDLED_TYPE, 'Unhandled confirmation type');
           }
         })(),
       },
@@ -258,21 +264,17 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
    * @note Wrapped messages get the 'message_id' of their wrappers (external message)
    * @param {z.proto.GenericMessage} external - Generic message of type 'external'
    * @param {JSON} event - Backend event of type 'conversation.otr-message-add'
-   * @returns {Promise} Resolves with mapped message
+   * @returns {Promise} Resolves with generic message
    */
-  _map_external(external, event) {
+  _unwrap_external(external, event) {
     const data = {
-      text: z.util.base64_to_array(event.data.data),
       otr_key: new Uint8Array(external.otr_key.toArrayBuffer()),
       sha256: new Uint8Array(external.sha256.toArrayBuffer()),
+      text: z.util.base64_to_array(event.data.data),
     };
 
     return z.assets.AssetCrypto.decrypt_aes_asset(data.text.buffer, data.otr_key.buffer, data.sha256.buffer)
     .then((external_message_buffer) => z.proto.GenericMessage.decode(external_message_buffer))
-    .then((generic_message) => {
-      this.logger.info(`Received external message of type '${generic_message.content}'`, generic_message);
-      return this._map_generic_message(generic_message, event);
-    })
     .catch((error) => {
       this.logger.error(`Failed to map external message: ${error.message}`, error);
       throw new z.cryptography.CryptographyError(z.cryptography.CryptographyError.TYPE.BROKEN_EXTERNAL);
@@ -306,10 +308,10 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
         content_type: image.mime_type,
         id: event_id,
         info: {
-          tag: image.tag,
-          width: image.width,
           height: image.height,
           nonce: event_id || z.util.create_random_uuid(), // set nonce even if asset id is missing
+          tag: image.tag,
+          width: image.width,
         },
         otr_key: new Uint8Array(image.otr_key !== null ? image.otr_key.toArrayBuffer() : []),
         sha256: new Uint8Array(image.sha256 !== null ? image.sha256.toArrayBuffer() : []),
@@ -341,8 +343,8 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
     return {
       data: {
         location: {
-          longitude: location.longitude,
           latitude: location.latitude,
+          longitude: location.longitude,
           name: location.name,
           zoom: location.zoom,
         },

@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.auth = z.auth || {};
 
-window.z.auth.AuthRepository = class AuthRepository {
+z.auth.AuthRepository = class AuthRepository {
   constructor(auth_service) {
     this.access_token_refresh = undefined;
     this.auth_service = auth_service;
@@ -55,7 +55,7 @@ window.z.auth.AuthRepository = class AuthRepository {
    * @option {string} login - phone The phone number for a password or SMS login
    * @option {string} login - password The password for a password login
    * @option {string} login - code The login code for an SMS login
-   * @param {Boolean} persist - Request a persistent cookie instead of a session cookie
+   * @param {boolean} persist - Request a persistent cookie instead of a session cookie
    * @returns {Promise} Promise that resolves with the received access token
    */
   login(login, persist) {
