@@ -53,7 +53,7 @@ describe 'z.conversation.ConversationService', ->
 
     beforeEach (done) ->
       Promise.all messages.map (message) ->
-        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, message
+        return storage_service.save z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message
       .then done
       .catch done.fail
 
@@ -101,7 +101,7 @@ describe 'z.conversation.ConversationService', ->
         return {"conversation": conversation_id, "time": new Date(timestamp + index).toISOString()}
 
       Promise.all messages.map (message) ->
-        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, message
+        return storage_service.save z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message
       .then done
       .catch done.fail
 
@@ -184,7 +184,7 @@ describe 'z.conversation.ConversationService', ->
         return {"conversation": conversation_id, "time": new Date(timestamp + index).toISOString(), "from": sender_id}
 
       Promise.all events.map (event) ->
-        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, event
+        return storage_service.save z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event
       .then done
       .catch done.fail
 
@@ -219,7 +219,7 @@ describe 'z.conversation.ConversationService', ->
 
     beforeEach (done) ->
       Promise.all messages.map (message) ->
-        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, message
+        return storage_service.save z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, message
       .then (ids) =>
         primary_keys = ids
         done()
@@ -258,7 +258,7 @@ describe 'z.conversation.ConversationService', ->
 
     it 'should return no entry matches the given category', (done) ->
       Promise.all events.slice(0,1).map (event) ->
-        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, event
+        return storage_service.save z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event
       .then ->
         return conversation_service.load_events_with_category_from_db events[0].conversation, z.message.MessageCategory.IMAGE
       .then (result) ->
@@ -268,7 +268,7 @@ describe 'z.conversation.ConversationService', ->
 
     it 'should get images in the correct order', (done) ->
       Promise.all events.map (event) ->
-        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, event
+        return storage_service.save z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event
       .then ->
         return conversation_service.load_events_with_category_from_db events[0].conversation, z.message.MessageCategory.IMAGE
       .then (result) ->
@@ -290,7 +290,7 @@ describe 'z.conversation.ConversationService', ->
 
     it 'should find query in text message', (done) ->
       Promise.all events.slice(0, 1).map (event) ->
-        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, event
+        return storage_service.save z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event
       .then ->
         return conversation_service.search_in_conversation events[0].conversation, 'https://wire.com'
       .then (result) ->
@@ -301,7 +301,7 @@ describe 'z.conversation.ConversationService', ->
 
     it 'should find query in text message with link preview', (done) ->
       Promise.all events.map (event) ->
-        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, event
+        return storage_service.save z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event
       .then ->
         return conversation_service.search_in_conversation events[0].conversation, 'https://wire.com'
       .then (result) ->
@@ -328,7 +328,7 @@ describe 'z.conversation.ConversationService', ->
 
     it 'should return conversation ids sorted by number of messages', (done) ->
       Promise.all events.map (event) ->
-        return storage_service.save storage_service.OBJECT_STORE_EVENTS, undefined, event
+        return storage_service.save z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, event
       .then ->
         return conversation_service.get_active_conversations_from_db()
       .then (result) ->

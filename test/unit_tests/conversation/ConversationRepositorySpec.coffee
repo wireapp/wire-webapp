@@ -789,11 +789,10 @@ describe 'z.conversation.ConversationRepository', ->
       #@formatter:on
 
       bad_message_key = "#{conversation_et.id}@#{bad_message.from}@NaN"
-      object_store = storage_service.OBJECT_STORE_EVENTS
 
-      storage_service.save object_store, bad_message_key, bad_message
+      storage_service.save z.storage.StorageService.OBJECT_STORE.EVENTS, bad_message_key, bad_message
       .catch ->
-        return storage_service.save object_store, undefined, good_message
+        return storage_service.save z.storage.StorageService.OBJECT_STORE.EVENTS, undefined, good_message
       .then ->
         return conversation_repository.get_preceding_messages conversation_et
       .then (loaded_events) ->
