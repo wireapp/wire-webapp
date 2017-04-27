@@ -39,7 +39,6 @@ z.search.SearchRepository = class SearchRepository {
    * Construct a new Conversation Repository.
    * @param {z.search.SearchService} search_service - Backend REST API search service implementation
    * @param {z.user.UserRepository} user_repository - Repository for all user and connection interactions
-   * @returns {SearchRepository} Repository for all interactions with the search service
   */
   constructor(search_service, user_repository) {
     this.search_service = search_service;
@@ -47,22 +46,6 @@ z.search.SearchRepository = class SearchRepository {
     this.logger = new z.util.Logger('z.search.SearchRepository', z.config.LOGGER.OPTIONS);
 
     this.search_result_mapper = new z.search.SearchResultMapper(this.user_repository);
-    return this;
-  }
-
-  /**
-   * Get common contacts for given user.
-   * @param {string} username - Username to retrieve common contacts for
-   * @returns {Promise} Resolves with number of common contacts
-   */
-  get_common_contacts(username) {
-    return this.search_service.get_contacts(username, 1)
-    .then(function({documents: matches}) {
-      if (matches.length > 0) {
-        return matches[0].total_mutual_friends;
-      }
-      return 0;
-    });
   }
 
   /**
@@ -137,7 +120,7 @@ z.search.SearchRepository = class SearchRepository {
             return user_et;
         }
       })
-      .filter((user_et) => user_et);
+      .filter((user_et) => user_et != null);
     });
   }
 };

@@ -60,7 +60,7 @@ z.assets.Asset = class Asset {
       const value = this.payload[key];
       payload.push(`${key}=${value}`);
     }
+
     return payload.join(';');
   }
-
 };

@@ -1299,7 +1299,7 @@ class z.ViewModel.AuthViewModel
   @return [Boolean] Returns true if there is at least one conversation event stored
   ###
   _has_local_history: =>
-    @storage_service.get_all @storage_service.OBJECT_STORE_EVENTS
+    @storage_service.get_all z.storage.StorageService.OBJECT_STORE.EVENTS
     .then (events) ->
       return events.length > 0
 

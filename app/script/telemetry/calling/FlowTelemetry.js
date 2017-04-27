@@ -23,13 +23,15 @@ window.z = window.z || {};
 window.z.telemetry = z.telemetry || {};
 window.z.telemetry.calling = z.telemetry.calling || {};
 
-const FLOW_TELEMETRY_CONFIG = {
-  MEDIA_CHECK_TIMEOUT: 5000,
-  STATS_CHECK_INTERVAL: 2000,
-  STATS_CHECK_TIMEOUT: 50,
-};
-
 z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
+  static get CONFIG() {
+    return {
+      MEDIA_CHECK_TIMEOUT: 5000,
+      STATS_CHECK_INTERVAL: 2000,
+      STATS_CHECK_TIMEOUT: 50,
+    };
+  }
+
   /**
    * Construct new flow telemetry entity.
    *
@@ -51,7 +53,8 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     this.timings = $.extend(new z.telemetry.calling.CallSetupTimings(this.id), timings ? timings.get() : {});
     this.statistics = new z.telemetry.calling.ConnectionStats();
 
-    this.stats_poller = undefined;
+    this.statistics_interval = undefined;
+    this.stream_check_timeouts = [];
   }
 
 
@@ -130,7 +133,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     if (this.statistics.hasOwnProperty(media_type)) {
       const stats = this.statistics[media_type];
 
-      const seconds = (attempt * FLOW_TELEMETRY_CONFIG.MEDIA_CHECK_TIMEOUT) / 1000;
+      const seconds = (attempt * FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT) / 1000;
       if (stats.bytes_received === 0 && stats.bytes_sent === 0) {
         return this.logger.warn(`No '${media_type}' flowing in either direction on stream after ${seconds} seconds`);
       }
@@ -149,10 +152,12 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
     if (this.is_answer) {
       this.logger.info(`Check '${media_type}' statistics on stream delayed as we created this flow`);
 
-      window.setTimeout(() => {
+      const stream_check_timeout = window.setTimeout(() => {
         this.check_stream(media_type, attempt++);
       },
-      FLOW_TELEMETRY_CONFIG.MEDIA_CHECK_TIMEOUT);
+      FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT);
+
+      this.stream_check_timeouts.push(stream_check_timeout);
       return;
 
     }
@@ -166,13 +171,15 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @returns {undefined} No return value
    */
   schedule_check(media_type) {
-    window.setTimeout(() => {
+    const stream_check_timeout = window.setTimeout(() => {
       this.check_stream(z.media.MediaType.AUDIO);
       if (media_type === z.media.MediaType.VIDEO) {
         this.check_stream(z.media.MediaType.VIDEO);
       }
     },
-    FLOW_TELEMETRY_CONFIG.MEDIA_CHECK_TIMEOUT);
+    FlowTelemetry.CONFIG.MEDIA_CHECK_TIMEOUT);
+
+    this.stream_check_timeouts.push(stream_check_timeout);
   }
 
   /**
@@ -220,9 +227,9 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @returns {undefined} No return value
    */
   reset_statistics() {
-    if (this.stats_poller) {
-      window.clearInterval(this.stats_poller);
-      this.stats_poller = undefined;
+    if (this.statistics_interval) {
+      this._clear_statistics_interval();
+      this._clear_stream_check_timeouts();
 
       this._update_statistics()
       .then(() => {
@@ -238,14 +245,14 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @returns {undefined} No return value
    */
   start_statistics() {
-    if (!this.stats_poller) {
+    if (!this.statistics_interval) {
       // Track call stats
       this.time_step(z.telemetry.calling.CallSetupSteps.ICE_CONNECTION_CONNECTED);
       $.extend(this.statistics, new z.telemetry.calling.ConnectionStats());
       this.connected();
 
       // Report calling stats within specified interval
-      window.setTimeout(() => {
+      const stream_check_timeout = window.setTimeout(() => {
         this._update_statistics()
         .then(() => {
           this.logger.info('Network stats updated for the first time', this.statistics);
@@ -254,15 +261,44 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
           this.logger.warn(`Failed to update flow networks stats: ${error.message}`);
         });
       },
-      FLOW_TELEMETRY_CONFIG.STATS_CHECK_TIMEOUT);
+      FlowTelemetry.CONFIG.STATS_CHECK_TIMEOUT);
 
-      this.stats_poller = window.setInterval(() => {
+      this.stream_check_timeouts.push(stream_check_timeout);
+
+      this.statistics_interval = window.setInterval(() => {
         this._update_statistics()
         .catch((error) => {
           this.logger.warn(`Networks stats not updated: ${error.message}`);
         });
       },
-      FLOW_TELEMETRY_CONFIG.STATS_CHECK_INTERVAL);
+      FlowTelemetry.CONFIG.STATS_CHECK_INTERVAL);
+    }
+  }
+
+  /**
+   * Clear the statistics interval.
+   * @private
+   * @returns {undefined} No return value
+   */
+  _clear_statistics_interval() {
+    if (this.statistics_interval) {
+      window.clearInterval(this.statistics_interval);
+      this.statistics_interval = undefined;
+    }
+  }
+
+  /**
+   * Clear the stream check timeouts.
+   * @private
+   * @returns {undefined} No return value
+   */
+  _clear_stream_check_timeouts() {
+    if (this.stream_check_timeouts.length) {
+      this.stream_check_timeouts.forEach(function(stream_check_timeout) {
+        window.clearTimeout(stream_check_timeout);
+      });
+
+      this.stream_check_timeouts = [];
     }
   }
 

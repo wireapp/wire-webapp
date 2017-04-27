@@ -22,18 +22,6 @@
 window.z = window.z || {};
 window.z.system_notification = z.system_notification || {};
 
-const SYSTEM_NOTIFICATION_CONFIG = {
-  EVENTS_TO_NOTIFY: [
-    z.message.SuperType.CALL,
-    z.message.SuperType.CONTENT,
-    z.message.SuperType.MEMBER,
-    z.message.SuperType.PING,
-    z.message.SuperType.REACTION,
-    z.message.SuperType.SYSTEM,
-  ],
-  NOTIFICATION_ICON_URL: '/image/logo/notification.png',
-};
-
 /**
  * System notification repository to trigger browser and audio notifications.
  *
@@ -41,6 +29,26 @@ const SYSTEM_NOTIFICATION_CONFIG = {
  * @see http://www.w3.org/TR/notifications
  */
 z.system_notification.SystemNotificationRepository = class SystemNotificationRepository {
+  static get CONFIG() {
+    return {
+      BODY_LENGTH: 80,
+      ICON_URL: '/image/logo/notification.png',
+      TIMEOUT: 5000,
+      TITLE_LENGTH: 38,
+    };
+  }
+
+  static get EVENTS_TO_NOTIFY() {
+    return [
+      z.message.SuperType.CALL,
+      z.message.SuperType.CONTENT,
+      z.message.SuperType.MEMBER,
+      z.message.SuperType.PING,
+      z.message.SuperType.REACTION,
+      z.message.SuperType.SYSTEM,
+    ];
+  }
+
   /**
    * Construct a new System Notification Repository.
    * @param {z.calling.CallingRepository} calling_repository - Repository for all call interactions
@@ -62,7 +70,6 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
     this.permission_state = z.system_notification.PermissionStatusState.PROMPT;
     this.permission_status = undefined;
-    return this;
   }
 
   subscribe_to_events() {
@@ -126,7 +133,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   notify(conversation_et, message_et) {
     return Promise.resolve()
     .then(() => {
-      if (this.muted || !SYSTEM_NOTIFICATION_CONFIG.EVENTS_TO_NOTIFY.includes(message_et.super_type)) return;
+      if (this.muted || !SystemNotificationRepository.EVENTS_TO_NOTIFY.includes(message_et.super_type)) return;
       if (conversation_et.is_muted && conversation_et.is_muted()) return;
       if (message_et.is_content() && message_et.was_edited()) return;
 
@@ -205,7 +212,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     if (message_et.has_asset_text()) {
       for (const asset_et of message_et.assets()) {
         if (asset_et.is_text() && !asset_et.previews().length) {
-          return z.util.StringUtil.truncate(asset_et.text, z.config.BROWSER_NOTIFICATION.BODY_LENGTH);
+          return z.util.StringUtil.truncate(asset_et.text, SystemNotificationRepository.CONFIG.BODY_LENGTH);
         }
       }
     } else if (message_et.has_asset_image()) {
@@ -452,7 +459,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
           silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
           tag: this._create_options_tag(conversation_et),
         },
-        timeout: z.config.BROWSER_NOTIFICATION.TIMEOUT,
+        timeout: SystemNotificationRepository.CONFIG.TIMEOUT,
         title: should_obfuscate_sender ? this._create_title_obfuscated() : this._create_title(conversation_et, message_et),
         trigger: this._create_trigger(conversation_et, message_et),
       };
@@ -519,7 +526,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     if (z.util.Environment.electron && z.util.Environment.os.mac) {
       return '';
     }
-    return SYSTEM_NOTIFICATION_CONFIG.NOTIFICATION_ICON_URL;
+    return SystemNotificationRepository.CONFIG.ICON_URL;
   }
 
   /**
@@ -544,11 +551,11 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   _create_title(conversation_et, message_et) {
     if (conversation_et instanceof z.entity.Conversation && conversation_et.display_name()) {
       if (conversation_et.is_group()) {
-        return z.util.StringUtil.truncate(`${message_et.user().first_name()} in ${conversation_et.display_name()}`, z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false);
+        return z.util.StringUtil.truncate(`${message_et.user().first_name()} in ${conversation_et.display_name()}`, SystemNotificationRepository.CONFIG.TITLE_LENGTH, false);
       }
-      return z.util.StringUtil.truncate(conversation_et.display_name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false);
+      return z.util.StringUtil.truncate(conversation_et.display_name(), SystemNotificationRepository.CONFIG.TITLE_LENGTH, false);
     }
-    return z.util.StringUtil.truncate(message_et.user().name(), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false);
+    return z.util.StringUtil.truncate(message_et.user().name(), SystemNotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
 
   /**
@@ -557,7 +564,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Obfuscated notification message title
    */
   _create_title_obfuscated() {
-    return z.util.StringUtil.truncate(z.localization.Localizer.get_text(z.string.system_notification_obfuscated_title), z.config.BROWSER_NOTIFICATION.TITLE_LENGTH, false);
+    return z.util.StringUtil.truncate(z.localization.Localizer.get_text(z.string.system_notification_obfuscated_title), SystemNotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
 
   /**

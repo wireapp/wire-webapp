@@ -28,7 +28,6 @@ class z.ui.WindowHandler
     @width = 0
 
     @is_visible = true
-    @lost_focus_interval_time = z.config.LOCALYTICS_SESSION_TIMEOUT / 3
     @lost_focus_interval = undefined
     @lost_focus_on = undefined
 
@@ -52,7 +51,7 @@ class z.ui.WindowHandler
         @is_visible = false
         if @lost_focus_interval is undefined
           @lost_focus_on = Date.now()
-          @lost_focus_interval = window.setInterval (=> @_check_for_timeout()), @lost_focus_interval_time
+          @lost_focus_interval = window.setInterval (=> @_check_for_timeout()), z.tracking.EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_INTERVAL
     return @
 
   _listen_to_window_resize: =>
@@ -100,5 +99,5 @@ class z.ui.WindowHandler
 
   _check_for_timeout: ->
     in_background_since = Date.now() - @lost_focus_on
-    if in_background_since >= z.config.LOCALYTICS_SESSION_TIMEOUT
+    if in_background_since >= z.tracking.EventTrackingRepository.CONFIG.LOCALYTICS.SESSION_TIMEOUT
       amplify.publish z.event.WebApp.ANALYTICS.CLOSE_SESSION

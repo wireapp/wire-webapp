@@ -65,7 +65,7 @@ class z.ViewModel.content.PreferencesAVViewModel
     return Promise.resolve @media_stream() if @media_stream() and @media_stream_handler.local_media_type() is z.media.MediaType.VIDEO
 
     @media_stream_handler.get_media_stream_constraints @available_devices.audio_input().length, @available_devices.video_input().length
-    .then ([media_type, media_stream_constraints]) =>
+    .then ({media_stream_constraints, media_type}) =>
       return @media_stream_handler.request_media_stream media_type, media_stream_constraints
     .then (media_stream_info) =>
       @media_stream_handler.local_media_type z.media.MediaType.VIDEO if @available_devices.video_input().length
