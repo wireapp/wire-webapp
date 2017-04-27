@@ -16,6 +16,7 @@ globals:
   dcodeIO: true
   Dexie: true
   hljs: true
+  keyboardJS: true
   ko: true
   libsodium: true
   LRUCache: true
