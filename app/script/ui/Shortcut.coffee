@@ -125,22 +125,22 @@ z.ui.Shortcut = do ->
   shortcut_map[z.ui.ShortcutType.SILENCE] =
     shortcut:
       webapp:
-        macos: 'command + alt + s'
-        pc: 'ctrl + alt + s'
+        macos: 'command + alt + ,'
+        pc: 'ctrl + alt + ,'
       electron:
-        macos: 'command + alt + s'
-        pc: 'ctrl + alt + s'
+        macos: 'command + alt + ,'
+        pc: 'ctrl + alt + ,'
         menu: true
     event: z.event.WebApp.SHORTCUT.SILENCE
 
   shortcut_map[z.ui.ShortcutType.START] =
     shortcut:
       webapp:
-        macos: 'command + alt + graveaccent' # KeyboardJS fires this when using cmd + alt + n
-        pc: 'ctrl + alt + graveaccent'
+        macos: 'command + alt + x'
+        pc: 'ctrl + alt + x'
       electron:
-        macos: 'command + n'
-        pc: 'ctrl + n'
+        macos: 'command + x'
+        pc: 'ctrl + x'
         menu: true
 
     event: z.event.WebApp.SHORTCUT.START
@@ -157,12 +157,6 @@ z.ui.Shortcut = do ->
       event: z.event.WebApp.SHORTCUT.DEBUG
 
   _register_event = (platform_specific_shortcut, event) ->
-
-    # bind also 'command + alt + n' for start shortcut
-    if z.util.StringUtil.includes platform_specific_shortcut, 'graveaccent'
-      replaced_shortcut = platform_specific_shortcut.replace 'graveaccent', 'n'
-      _register_event replaced_shortcut, event
-
     keyboardJS.on platform_specific_shortcut, (e) ->
       keyboardJS.releaseKey e.keyCode
 
