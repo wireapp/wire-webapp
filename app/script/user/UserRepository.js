@@ -64,11 +64,11 @@ z.user.UserRepository = class UserRepository {
       amplify.publish(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, z.tracking.CustomDimension.CONTACTS, user_ets.length);
     });
 
-    amplify.subscribe(z.event.Backend.USER.CONNECTION, this.user_connection);
-    amplify.subscribe(z.event.Backend.USER.UPDATE, this.user_update);
-    amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user);
-    amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user);
-    amplify.subscribe(z.event.WebApp.CLIENT.UPDATE, this.update_clients_from_user);
+    amplify.subscribe(z.event.Backend.USER.CONNECTION, this.user_connection.bind(this));
+    amplify.subscribe(z.event.Backend.USER.UPDATE, this.user_update.bind(this));
+    amplify.subscribe(z.event.WebApp.CLIENT.ADD, this.add_client_to_user.bind(this));
+    amplify.subscribe(z.event.WebApp.CLIENT.REMOVE, this.remove_client_from_user.bind(this));
+    amplify.subscribe(z.event.WebApp.CLIENT.UPDATE, this.update_clients_from_user.bind(this));
   }
 
   /**
