@@ -81,10 +81,21 @@ z.user.UserRepository = class UserRepository {
     return this._update_connection_status(user_et, z.user.ConnectionStatus.ACCEPTED, show_conversation);
   }
 
+  /**
+   * Block a user.
+   * @param {z.entity.User} user_et - User to block
+   * @returns {Promise} Promise that resolves when the user was blocked
+   */
   block_user(user_et) {
     return this._update_connection_status(user_et, z.user.ConnectionStatus.BLOCKED);
   }
 
+  /**
+   * Cancel a connection request.
+   * @param {z.entity.User} user_et - User to cancel the sent connection request
+   * @param {z.entity.Conversation} next_conversation_et - Optional conversation to be switched to
+   * @returns {Promise} Promise that resolves when an outgoing connection request was cancelled
+   */
   cancel_connection_request(user_et, next_conversation_et) {
     return this._update_connection_status(user_et, z.user.ConnectionStatus.CANCELLED)
       .then(function() {
@@ -94,6 +105,12 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Create a connection request.
+   * @param {z.entity.User} user_et - User to connect to
+   * @param {boolean} show_conversation - Should we open the new conversation
+   * @returns {Promise} Promise that resolves when the connection request was successfully created
+   */
   create_connection(user_et, show_conversation = false) {
     return this.user_service.create_connection(user_et.id, user_et.name())
       .then((response) => {
@@ -104,6 +121,11 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Get a connection for a user ID.
+   * @param {string} user_id - User ID
+   * @returns {z.entity.Connection} User connection entity
+   */
   get_connection_by_user_id(user_id) {
     for (const connection_et of this.connections()) {
       if (connection_et.to === user_id) {
@@ -112,6 +134,11 @@ z.user.UserRepository = class UserRepository {
     }
   }
 
+  /**
+   * Get a connection for a conversation ID.
+   * @param {string} conversation_id - Conversation ID
+   * @returns {z.entity.Connection} User connection entity
+   */
   get_connection_by_conversation_id(conversation_id) {
     for (const connection_et of this.connections()) {
       if (connection_et.conversation_id === conversation_id) {
@@ -148,10 +175,21 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Ignore connection request.
+   * @param {z.entity.User} user_et - User to ignore the connection request
+   * @returns {Promise} Promise that resolves when an incoming connection request was ignored
+   */
   ignore_connection_request(user_et) {
     return this._update_connection_status(user_et, z.user.ConnectionStatus.IGNORED);
   }
 
+  /**
+   * Unblock a user.
+   * @param {z.entity.User} user_et - User to unblock
+   * @param {boolean} show_conversation - Show new conversation on success
+   * @returns {Promise} Promise that resolves when a user was unblocked
+   */
   unblock_user(user_et, show_conversation = true) {
     return this._update_connection_status(user_et, z.user.ConnectionStatus.ACCEPTED, show_conversation);
   }
