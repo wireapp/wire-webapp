@@ -31,7 +31,7 @@ describe 'Giphy Repository', ->
   beforeEach ->
     server = sinon.fakeServer.create()
 
-    client = new z.service.Client urls
+    client = new z.service.BackendClient urls
     client.logger.level = client.logger.levels.OFF
 
     giphy_service = new z.extension.GiphyService client

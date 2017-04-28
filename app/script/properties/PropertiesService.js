@@ -31,7 +31,7 @@ z.properties.PropertiesService = class PropertiesService {
 
   /**
    * Construct a new Properties Service.
-   * @param {z.service.Client} client - Client for the API calls
+   * @param {z.service.BackendClient} client - Client for the API calls
    */
   constructor(client) {
     this.client = client;
