@@ -377,7 +377,7 @@ z.user.UserRepository = class UserRepository {
     }
 
     const user_id_chunks = z.util.ArrayUtil.chunk(user_ids, z.config.MAXIMUM_USERS_PER_REQUEST);
-    const get_users_promises = user_id_chunks.maps((user_id_chunk) => _get_users(user_id_chunk));
+    const get_users_promises = user_id_chunks.map((user_id_chunk) => _get_users(user_id_chunk));
     return Promise.all(get_users_promises)
       .then((resolve_array) => {
         let fetched_user_ets = _.flatten(resolve_array);
@@ -434,7 +434,7 @@ z.user.UserRepository = class UserRepository {
       return Promise.resolve([]);
     }
 
-    function _find_user(user_id) {
+    const _find_user = (user_id) => {
       return this.find_user_by_id(user_id)
         .catch(function(error) {
           if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
@@ -442,9 +442,9 @@ z.user.UserRepository = class UserRepository {
           }
           return user_id;
         });
-    }
+    };
 
-    const find_users = user_ids.maps((user_id) => _find_user(user_id));
+    const find_users = user_ids.map((user_id) => _find_user(user_id));
     return Promise.all(find_users).then((resolve_array) => {
       const known_user_ets = resolve_array.filter((array_item) => array_item instanceof z.entity.User);
       const unknown_user_ids = resolve_array.filter((array_item) => _.isString(array_item));
@@ -497,7 +497,7 @@ z.user.UserRepository = class UserRepository {
   }
 
   save_users(user_ets) {
-    function _user_exists(user_et) {
+    const _user_exists = (user_et) => {
       return this.find_user_by_id(user_et.id)
         .then(() => undefined)
         .catch(function(error) {
@@ -506,9 +506,9 @@ z.user.UserRepository = class UserRepository {
           }
           return user_et;
         });
-    }
+    };
 
-    const existing_users = user_ets.maps((user_et) => _user_exists(user_et));
+    const existing_users = user_ets.map((user_et) => _user_exists(user_et));
     return Promise.all(existing_users)
       .then((existing_user_ets) => {
         const new_user_ets = existing_user_ets.filter((user_et) => user_et);
@@ -526,7 +526,7 @@ z.user.UserRepository = class UserRepository {
         return new z.entity.User();
       })
       .then((old_user_et) => {
-        return this.user_service.get_user_by_id(user_id)
+        return this.get_user_by_id(user_id)
           .then((new_user_et) => {
             return this.user_mapper.update_user_from_object(old_user_et, new_user_et);
           });
