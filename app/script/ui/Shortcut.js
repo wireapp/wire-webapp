@@ -189,7 +189,7 @@ window.z.ui = z.ui || {};
       }
 
       inputEvent.preventDefault();
-      amplify.publish(inputEvent);
+      amplify.publish(event);
     });
   }
 
@@ -217,8 +217,7 @@ window.z.ui = z.ui || {};
   function get_shortcut(shortcut_name) {
     const platform = z.util.Environment.electron ? 'electron' : 'webapp';
     const platform_shortcuts = shortcut_map[shortcut_name].shortcut[platform];
-    const os_shortcut = z.util.Environment.os.mac ? platform_shortcuts.macos : platform_shortcuts.pc;
-    return os_shortcut;
+    return z.util.Environment.os.mac ? platform_shortcuts.macos : platform_shortcuts.pc;
   }
 
   function get_shortcut_tooltip(shortcut_name) {
