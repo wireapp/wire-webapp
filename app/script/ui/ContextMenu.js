@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,24 +24,34 @@ window.z.ui = z.ui || {};
 
 z.ui.Context = (() => {
 
-  let onWheel;
-  let onKeydown;
-
   function addListeners() {
-    window.addEventListener('wheel', onWheel = (e) => e.preventDefault());
-    window.addEventListener('keydown', onKeydown = (e) => {
-      e.preventDefault();
-
-      if (e.keyCode === z.util.KEYCODE.ESC) {
-        cleanup();
-      } else if (e.keyCode === z.util.KEYCODE.ARROW_UP || e.keyCode === z.util.KEYCODE.ARROW_DOWN) {
-        rotateItem(e.keyCode);
-      } else if (e.keyCode === z.util.KEYCODE.ENTER) {
-        triggerItem();
-      }
-    });
-    window.addEventListener('click', cleanup);
+    window.addEventListener('wheel', onWheel);
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('mousedown', onMouseDown);
     window.addEventListener('resize', cleanup);
+  }
+
+  function onKeyDown(e) {
+    e.preventDefault();
+
+    if (e.keyCode === z.util.KEYCODE.ESC) {
+      cleanup();
+    } else if (e.keyCode === z.util.KEYCODE.ARROW_UP || e.keyCode === z.util.KEYCODE.ARROW_DOWN) {
+      rotateItem(e.keyCode);
+    } else if (e.keyCode === z.util.KEYCODE.ENTER) {
+      triggerItem();
+    }
+  }
+
+  function onWheel(e) {
+    e.preventDefault()
+  }
+
+  function onMouseDown(e) {
+    const entry = document.querySelector('.ctx-menu');
+    if (entry && entry.contains(e.target) === false) {
+      cleanup();
+    }
   }
 
   function triggerItem() {
@@ -72,17 +82,19 @@ z.ui.Context = (() => {
 
   function removeListeners() {
     window.removeEventListener('wheel', onWheel);
-    window.removeEventListener('keydown', onKeydown);
-    window.removeEventListener('click', cleanup);
+    window.removeEventListener('keydown', onKeyDown);
+    window.removeEventListener('mousedown', onMouseDown);
     window.removeEventListener('resize', cleanup);
   }
 
   function cleanup() {
+    console.log('cleanup');
     [...document.querySelectorAll('.ctx-menu')].forEach((menu) => menu.remove());
     removeListeners();
   }
 
   function build(entries, identifier) {
+    console.log('build');
     const menu = document.createElement('div');
     menu.classList.add('ctx-menu');
 
