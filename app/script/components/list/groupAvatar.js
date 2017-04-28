@@ -29,7 +29,7 @@ z.components.GroupAvatar = class GroupAvatar {
     this.avatar_urls = ko.observableArray();
 
     this.user_image_observable = ko.computed(() => {
-      if(!this.entered_viewport()) {
+      if (!this.entered_viewport()) {
         return;
       }
 
