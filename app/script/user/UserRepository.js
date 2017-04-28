@@ -185,18 +185,23 @@ z.user.UserRepository = class UserRepository {
     return this.client_repository.get_all_clients_from_db()
       .then((user_client_map) => {
         this.logger.info(`Found locally stored clients for '${Object.keys(user_client_map).length}' users`, user_client_map);
+        const user_ids = [];
+
         for (const user_id in user_client_map) {
-          const client_ets = user_client_map[user_id];
-          return this.get_users_by_id(client_ets)
-            .then((user_ets) => {
-              for (const user_et of user_ets) {
-                if (user_client_map[user_et.id].length > 8) {
-                  this.logger.warn(`Found '${user_client_map[user_et.id].length}' clients for '${user_et.name()}'`, user_client_map[user_et.id]);
-                }
-                user_et.devices(user_client_map[user_et.id]);
-              }
-            });
+          user_ids.push(user_id);
         }
+
+        return this.get_users_by_id(user_ids)
+          .then((user_ets) => {
+            for (const user_et of user_ets) {
+              if (user_client_map[user_et.id].length > 8) {
+                this.logger.warn(`Found '${user_client_map[user_et.id].length}' clients for '${user_et.name()}'`, user_client_map[user_et.id]);
+              }
+              user_et.devices(user_client_map[user_et.id]);
+            }
+
+            return undefined;
+          });
       });
   }
 
