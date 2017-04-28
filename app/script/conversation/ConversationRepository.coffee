@@ -393,7 +393,7 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] Next conversation
   ###
   get_next_conversation: (conversation_et) ->
-    return z.util.ArrayUtil.get_next_item(@conversations_unarchived(), conversation_et) or @conversations_unarchived()[0]
+    return z.util.ArrayUtil.get_next_item @conversations_unarchived(), conversation_et
 
   ###
   Get unarchived conversation with the most recent event.
