@@ -27,8 +27,8 @@ z.calling.entities.ECall = class ECall {
   static get CONFIG() {
     return {
       GROUP_CHECK_ACTIVITY_TIMEOUT: 2 * 60 * 1000,
-      GROUP_CHECK_MAXIMUM_TIMEOUT: 90 * 1000,
-      GROUP_CHECK_MINIMUM_TIMEOUT: 60 * 1000,
+      GROUP_CHECK_MAXIMUM_TIMEOUT: 90,
+      GROUP_CHECK_MINIMUM_TIMEOUT: 60,
       STATE_TIMEOUT: 30 * 1000,
       TIMER_UPDATE_INTERVAL: 1000,
       TIMER_UPDATE_START: 100,
@@ -44,6 +44,8 @@ z.calling.entities.ECall = class ECall {
    */
   constructor(conversation_et, creating_user, session_id, v3_call_center) {
     const {id: conversation_id, is_group} = conversation_et;
+    const {calling_config, media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.v3_call_center;
+
     this.conversation_et = conversation_et;
     this.creating_user = creating_user;
     this.session_id = session_id;
@@ -54,7 +56,6 @@ z.calling.entities.ECall = class ECall {
     this.id = conversation_id;
     this.timings = undefined;
 
-    const {calling_config, media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.v3_call_center;
     this.media_repository = media_repository;
     this.config = calling_config;
     this.self_user = user_repository.self();
@@ -66,6 +67,7 @@ z.calling.entities.ECall = class ECall {
     this.timer_start = undefined;
     this.duration_time = ko.observable(0);
     this.data_channel_opened = false;
+    this.group_check_timeout = undefined;
     this.termination_reason = undefined;
 
     this.is_connected = ko.observable(false);
@@ -119,6 +121,7 @@ z.calling.entities.ECall = class ECall {
       if (is_connected) {
         this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this);
         this.timer_start = Date.now() - ECall.CONFIG.TIMER_UPDATE_START;
+
         this.call_timer_interval = window.setInterval(() => {
           const duration_in_seconds = Math.floor((Date.now() - this.timer_start) / 1000);
 
@@ -178,8 +181,12 @@ z.calling.entities.ECall = class ECall {
         this.telemetry.track_event(z.tracking.EventName.CALLING.JOINED_CALL, this, attributes);
       }
 
-      return this.previous_state = state;
+      this.previous_state = state;
     });
+
+    if (this.is_group()) {
+      this.schedule_group_check();
+    }
 
     this.conversation_et.call(this);
   }
@@ -196,7 +203,11 @@ z.calling.entities.ECall = class ECall {
    */
   check_activity(termination_reason) {
     if (!this.participants().length) {
-      this.leave_call(termination_reason);
+      if (this.self_client_joined()) {
+        this.leave_call(termination_reason);
+      } else {
+        this.deactivate_call();
+      }
     }
   }
 
@@ -208,12 +219,15 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   deactivate_call(e_call_message_et, termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER) {
-    if (!this.participants().length) {
-      const reason = z.calling.enum.CALL_STATE_GROUP.WAS_MISSED.includes(this.state()) ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
+    const reason = z.calling.enum.CALL_STATE_GROUP.WAS_MISSED.includes(this.state()) ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
 
-      this.termination_reason = termination_reason;
-      this.v3_call_center.inject_deactivate_event(e_call_message_et, this.creating_user, reason);
+    this.termination_reason = termination_reason;
+    this.v3_call_center.inject_deactivate_event(e_call_message_et, this.creating_user, reason);
+
+    if (!this.participants().length) {
       this.v3_call_center.delete_call(this.id);
+    } else {
+      this.v3_call_center.media_stream_handler.reset_media_stream();
     }
   }
 
@@ -302,13 +316,6 @@ z.calling.entities.ECall = class ECall {
       });
   }
 
-  reset_check() {
-    this.check_activity_timeout = window.setTimeout(() =>{
-
-    },
-    ECall.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT);
-  }
-
   /**
    * Reject the call.
    * @returns {undefined} No return value
@@ -318,6 +325,20 @@ z.calling.entities.ECall = class ECall {
 
     this.state(z.calling.enum.CALL_STATE.REJECTED);
     this.send_e_call_event(z.calling.mapper.ECallMessageMapper.build_reject(false, this.session_id, additional_payload));
+  }
+
+  /**
+   * Schedule the check for group activity.
+   * @returns {undefined} No return value
+   */
+  schedule_group_check() {
+    this._clear_group_check_timeout();
+
+    if (this.is_connected()) {
+      this._set_send_group_check_timeout();
+    } else {
+      this._set_verify_group_check_timeout();
+    }
   }
 
   /**
@@ -340,14 +361,57 @@ z.calling.entities.ECall = class ECall {
    * @returns {Promise} Resolves when state has been toggled
    */
   toggle_media(media_type) {
-    Promise.all(this.get_flows()
+    const e_call_event_promises = this.get_flows()
       .map(({remote_client_id, remote_user_id}) => {
         const additional_payload = this.v3_call_center.create_additional_payload(this.id, remote_user_id, remote_client_id);
         const prop_sync_payload = this.v3_call_center.create_payload_prop_sync(media_type, true, additional_payload);
 
         return this.send_e_call_event(z.calling.mapper.ECallMessageMapper.build_prop_sync(false, this.session_id, prop_sync_payload));
-      })
-    );
+      });
+
+    return Promise.all(e_call_event_promises);
+  }
+
+  /**
+   * Clear the group check timeout.
+   * @private
+   * @returns {undefined} No return value
+   */
+  _clear_group_check_timeout() {
+    if (this.check_group_check_timeout) {
+      window.clearTimeout(this.check_group_check_timeout);
+      this.check_group_check_timeout = undefined;
+    }
+  }
+
+  /**
+   * Set the outgoing group check timeout.
+   * @private
+   * @returns {undefined} No return value
+   */
+  _set_send_group_check_timeout() {
+    const maximum_timeout = ECall.CONFIG.GROUP_CHECK_MAXIMUM_TIMEOUT;
+    const minimum_timeout = ECall.CONFIG.GROUP_CHECK_MINIMUM_TIMEOUT;
+    const timeout_in_milliseconds = 1000 * z.util.NumberUtil.get_random_number(minimum_timeout, maximum_timeout);
+
+    this.group_check_timeout = window.setTimeout(() => {
+      const additional_payload = this.v3_call_center.create_additional_payload(this.id);
+      this.send_e_call_event(z.calling.mapper.ECallMessageMapper.build_group_check(true, this.session_id, additional_payload));
+    },
+    timeout_in_milliseconds);
+  }
+
+  /**
+   * Set the incoming group check timeout.
+   * @private
+   * @returns {undefined} No return value
+   */
+  _set_verify_group_check_timeout() {
+    this.group_check_timeout = window.setTimeout(() => {
+      // @todo Create expected deactivation message
+      this.deactivate_call();
+    },
+    ECall.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT);
   }
 
 

@@ -296,7 +296,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
         window.clearTimeout(stream_check_timeout);
       });
 
-      this.stream_check_timeouts = [];
+      this.stream_check_timeouts.length = 0;
     }
   }
 

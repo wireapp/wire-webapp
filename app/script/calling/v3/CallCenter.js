@@ -84,6 +84,7 @@ z.calling.v3.CallCenter = class CallCenter {
    */
   set_notification_handling_state(handling_state) {
     const new_block_media_stream_state = handling_state !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+
     if (this.block_media_stream !== new_block_media_stream_state) {
       this.block_media_stream = new_block_media_stream_state;
       this.logger.debug(`Block requesting MediaStream: ${this.block_media_stream}`);
@@ -229,15 +230,13 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {undefined} No return value
    */
   _on_group_check(e_call_message_et) {
-    this.logger.info('GROUP_CHECK NOT IMPLEMENTED', e_call_message_et);
-
     const {conversation_id, user_id} = e_call_message_et;
 
     this.get_e_call_by_id(conversation_id)
       .then((e_call_et) => {
         // @todo Grant message for ongoing call
 
-        e_call_et.reset_check(e_call_message_et);
+        e_call_et.schedule_group_check();
       })
       .catch((error) => {
         if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
@@ -247,7 +246,7 @@ z.calling.v3.CallCenter = class CallCenter {
         if (user_id !== this.user_repository.self().id) {
           this.conversation_repository.grant_message(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [user_id])
             .then(() => {
-              this._create_incoming_e_call(e_call_message_et);
+              this._create_incoming_e_call(e_call_message_et, true);
             });
         }
       });
@@ -261,8 +260,6 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {undefined} No return value
    */
   _on_group_leave(e_call_message_et) {
-    this.logger.info('GROUP_LEAVE', e_call_message_et);
-
     const {conversation_id, client_id, user_id} = e_call_message_et;
 
     this.get_e_call_by_id(conversation_id)
@@ -287,8 +284,6 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {undefined} No return value
    */
   _on_group_setup(e_call_message_et) {
-    this.logger.info('GROUP_SETUP', e_call_message_et);
-
     const {conversation_id, dest_client_id, dest_user_id, response, user_id} = e_call_message_et;
 
     if (dest_user_id !== this.user_repository.self().id || dest_client_id !== this.client_repository.current_client().id) {
@@ -317,13 +312,16 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {undefined} No return value
    */
   _on_group_start(e_call_message_et) {
-    this.logger.info('GROUP_START', e_call_message_et);
-
     const {conversation_id, user_id} = e_call_message_et;
 
     this.get_e_call_by_id(conversation_id)
       .then((e_call_et) => {
         // @todo Grant message for ongoing call
+
+        if (user_id === this.user_repository.self().id) {
+          e_call_et.self_user_joined(true);
+          e_call_et.state(z.calling.enum.CALL_STATE.REJECTED);
+        }
 
         if (e_call_et.state() === z.calling.enum.CALL_STATE.OUTGOING) {
           e_call_et.state(z.calling.enum.CALL_STATE.CONNECTING);
@@ -332,7 +330,7 @@ z.calling.v3.CallCenter = class CallCenter {
         // add the correct participant, start negotiating
         this.user_repository.get_user_by_id(user_id)
           .then((remote_user_et) => {
-            e_call_et.add_e_participant(remote_user_et, e_call_message_et);
+            e_call_et.add_e_participant(remote_user_et, e_call_message_et, e_call_et.self_client_joined());
           });
       })
       .catch((error) => {
@@ -936,7 +934,7 @@ z.calling.v3.CallCenter = class CallCenter {
   toggle_media(conversation_id, media_type) {
     this.get_e_call_by_id(conversation_id)
       .then((e_call_et) => {
-        e_call_et.toggle_media(media_type);
+        return e_call_et.toggle_media(media_type);
       })
       .then(() => {
         switch (media_type) {
@@ -990,9 +988,10 @@ z.calling.v3.CallCenter = class CallCenter {
    *
    * @private
    * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {boolean} silent - Start call in rejected mode
    * @returns {Promise} Resolves with the new e-call entity
    */
-  _create_incoming_e_call(e_call_message_et) {
+  _create_incoming_e_call(e_call_message_et, silent = false) {
     const {conversation_id, props, user_id} = e_call_message_et;
 
     return this.user_repository.get_user_by_id(user_id)
@@ -1001,7 +1000,13 @@ z.calling.v3.CallCenter = class CallCenter {
           .then((e_call_et) => {
             this.logger.info(`Incoming '${this._get_media_type_from_properties(props)}' e-call in conversation '${e_call_et.conversation_et.display_name()}'`, e_call_et);
 
-            e_call_et.state(z.calling.enum.CALL_STATE.INCOMING);
+            if (silent) {
+              e_call_et.state(z.calling.enum.CALL_STATE.REJECTED);
+
+            } else {
+              e_call_et.state(z.calling.enum.CALL_STATE.INCOMING);
+            }
+
             e_call_et.set_remote_version(e_call_message_et);
             return e_call_et.add_e_participant(remote_user_et, e_call_message_et, false)
               .then(() => {

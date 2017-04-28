@@ -674,10 +674,10 @@ z.calling.entities.EFlow = class EFlow {
   /**
    * Save the remote SDP received via an e-call message within the e-flow.
    * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when remote SDP was saved
    */
   save_remote_sdp(e_call_message_et) {
-    z.calling.mapper.SDPMapper.map_e_call_message_to_object(e_call_message_et)
+    return z.calling.mapper.SDPMapper.map_e_call_message_to_object(e_call_message_et)
       .then((rtc_sdp) => {
         return z.calling.mapper.SDPMapper.rewrite_sdp(rtc_sdp, z.calling.enum.SDP_SOURCE.REMOTE, this);
       })
