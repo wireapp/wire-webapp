@@ -324,4 +324,368 @@ z.user.UserRepository = class UserRepository {
         amplify.publish(z.event.WebApp.USER.CLIENT_REMOVED, user_id, client_id);
       });
   }
+
+  update_clients_from_user(user_id, client_ets) {
+    return this.get_user_by_id(user_id)
+      .then(function(user_et) {
+        user_et.devices(client_ets);
+        amplify.publish(z.event.WebApp.USER.CLIENTS_UPDATED, user_id, client_ets);
+      });
+  }
+
+  delete_me() {
+    return this.user_service.delete_self()
+      .then(() => {
+        return this.logger.info('Account deletion initiated');
+      })
+      .catch((error) => {
+        return this.logger.error(`Unable to delete self: ${error}`);
+      });
+  }
+
+  fetch_user_by_id(user_id) {
+    return this.fetch_users_by_id([user_id])
+      .then((user_ets) => {
+        if (user_ets) {
+          return user_ets[0];
+        }
+        return undefined;
+      });
+  }
+
+  fetch_users_by_id(user_ids = []) {
+    user_ids = user_ids.filter((user_id) => user_id);
+
+    if (!user_ids.length) {
+      return Promise.resolve([]);
+    }
+
+    function _get_users(user_id_chunk) {
+      return this.user_service.get_users(user_id_chunk)
+        .then((response) => {
+          if (response) {
+            return this.user_mapper.map_users_from_object(response);
+          }
+          return [];
+        })
+        .catch(function(error) {
+          if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+            return [];
+          }
+          throw error;
+        });
+    }
+
+    const user_id_chunks = z.util.ArrayUtil.chunk(user_ids, z.config.MAXIMUM_USERS_PER_REQUEST);
+    const get_users_promises = user_id_chunks.maps((user_id_chunk) => _get_users(user_id_chunk));
+    return Promise.all(get_users_promises)
+      .then((resolve_array) => {
+        let fetched_user_ets = _.flatten(resolve_array);
+
+        // If the difference is 1 then we most likely have a case with a suspended user
+        if (user_ids.length !== fetched_user_ets.length) {
+          fetched_user_ets = this._add_suspended_users(user_ids, fetched_user_ets);
+        }
+
+        return this.save_users(fetched_user_ets).then(() => fetched_user_ets);
+      });
+  }
+
+  find_user_by_id(user_id) {
+    for (const user_et of this.users()) {
+      if (user_et.id === user_id) {
+        return Promise.resolve(user_et);
+      }
+    }
+
+    return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.USER_NOT_FOUND));
+  }
+
+  get_me() {
+    return this.user_service.get_own_user()
+      .then((response) => {
+        const user_et = this.user_mapper.map_self_user_from_object(response);
+        return this.save_user(user_et, true);
+      })
+      .catch((error) => {
+        this.logger.error(`Unable to load self user: ${error}`);
+        throw error;
+      });
+  }
+
+  get_user_by_id(user_id) {
+    return this.find_user_by_id(user_id)
+      .catch((error) => {
+        if (error.type === z.user.UserError.TYPE.USER_NOT_FOUND) {
+          return this.fetch_user_by_id(user_id);
+        }
+        throw error;
+      })
+      .catch((error) => {
+        if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+          this.logger.log(this.logger.levels.ERROR, `Failed to get user '${user_id}': ${error.message}`, error);
+        }
+        throw error;
+      });
+  }
+
+  get_users_by_id(user_ids = [], offline = false) {
+    if (!user_ids.length) {
+      return Promise.resolve([]);
+    }
+
+    function _find_user(user_id) {
+      return this.find_user_by_id(user_id)
+        .catch(function(error) {
+          if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+            throw error;
+          }
+          return user_id;
+        });
+    }
+
+    const find_users = user_ids.maps((user_id) => _find_user(user_id));
+    return Promise.all(find_users).then((resolve_array) => {
+      const known_user_ets = resolve_array.filter((array_item) => array_item instanceof z.entity.User);
+      const unknown_user_ids = resolve_array.filter((array_item) => _.isString(array_item));
+
+      if (offline || !unknown_user_ids.length) {
+        return known_user_ets;
+      }
+
+      return this.fetch_users_by_id(unknown_user_ids).then((user_ets) => known_user_ets.concat(user_ets));
+    });
+  }
+
+  search_for_connected_users(query, is_username) {
+    return this.users()
+      .filter(function(user_et) {
+        if (!user_et.connected()) {
+          return false;
+        }
+        return user_et.matches(query, is_username);
+      })
+      .sort(function(user_a, user_b) {
+        if (is_username) {
+          return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
+        }
+        return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), query);
+      });
+  }
+
+  is_me(user_id) {
+    if (!_.isString(user_id)) {
+      user_id = user_id.id;
+    }
+    return this.self().id === user_id;
+  }
+
+  save_user(user_et, is_me = false) {
+    return this.find_user_by_id(user_et.id)
+      .catch((error) => {
+        if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+          throw error;
+        }
+
+        if (is_me) {
+          user_et.is_me = true;
+          this.self(user_et);
+        }
+        this.users.push(user_et);
+        return user_et;
+      });
+  }
+
+  save_users(user_ets) {
+    function _user_exists(user_et) {
+      return this.find_user_by_id(user_et.id)
+        .then(() => undefined)
+        .catch(function(error) {
+          if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+            throw error;
+          }
+          return user_et;
+        });
+    }
+
+    const existing_users = user_ets.maps((user_et) => _user_exists(user_et));
+    return Promise.all(existing_users)
+      .then((existing_user_ets) => {
+        const new_user_ets = existing_user_ets.filter((user_et) => user_et);
+        z.util.ko_array_push_all(this.users, new_user_ets);
+        return new_user_ets;
+      });
+  }
+
+  update_user_by_id(user_id) {
+    return this.find_user_by_id(user_id)
+      .catch(function(error) {
+        if (error.type !== z.user.UserError.TYPE.USER_NOT_FOUND) {
+          throw error;
+        }
+        return new z.entity.User();
+      })
+      .then((old_user_et) => {
+        return this.user_service.get_user_by_id(user_id)
+          .then((new_user_et) => {
+            return this.user_mapper.update_user_from_object(old_user_et, new_user_et);
+          });
+      });
+  }
+
+  _add_suspended_users(user_ids, user_ets) {
+    for (let i = 0; i < user_ids.length; i++) {
+      const user_id = user_ids[i];
+      const matching_user_ids = user_ets.find(function(user_et) {
+        if (user_et.id === user_id) {
+          return true;
+        }
+        return false;
+      });
+
+      if (!matching_user_ids) {
+        const user_et = new z.entity.User(user_id);
+        user_et.name(z.localization.Localizer.get_text(z.string.nonexistent_user));
+        user_ets.push(user_et);
+      }
+    }
+    return user_ets;
+  }
+
+  change_accent_color(accent_id) {
+    return this.user_service.update_own_user_profile({accent_id})
+      .then(() => this.self().accent_id(accent_id));
+  }
+
+  change_name(name) {
+    if (name.length >= z.config.MINIMUM_USERNAME_LENGTH) {
+      return this.user_service.update_own_user_profile({name})
+        .then(() => this.self().name(name));
+    }
+  }
+
+  should_change_username() {
+    return this.should_set_username;
+  }
+
+  get_username_suggestion() {
+    let suggestions = null;
+
+    return Promise.resolve()
+      .then(() => {
+        suggestions = z.user.UserHandleGenerator.create_suggestions(this.self().name());
+        return this.verify_usernames(suggestions);
+      })
+      .then((valid_suggestions) => {
+        this.should_set_username = true;
+        this.self().username(valid_suggestions[0]);
+
+        return amplify.publish(z.event.WebApp.ANALYTICS.EVENT,
+          z.tracking.EventName.ONBOARDING.GENERATED_USERNAME, {
+            num_of_attempts: 1,
+            outcome: 'success',
+          });
+      })
+      .catch((error) => {
+        if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+          this.should_set_username = false;
+        }
+
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT,
+          z.tracking.EventName.ONBOARDING.GENERATED_USERNAME, {
+            num_of_attempts: 1,
+            outcome: 'fail',
+          }
+        );
+
+        throw error;
+      });
+  }
+
+  change_username(username) {
+    return this.user_service.change_own_username(username)
+      .then(() => {
+        this.should_set_username = false;
+        return this.self().username(username);
+      })
+      .catch(function(error) {
+        if ([z.service.BackendClientError.STATUS_CODE.CONFLICT, z.service.BackendClientError.STATUS_CODE.BAD_REQUEST].includes(error.code)) {
+          throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
+        }
+        throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
+      });
+  }
+
+  verify_usernames(usernames) {
+    return this.user_service.check_usernames(usernames);
+  }
+
+  verify_username(username) {
+    return this.user_service.check_username(username)
+      .catch(function(error) {
+        if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+          return username;
+        }
+        if (error.code === z.service.BackendClientError.STATUS_CODE.BAD_REQUEST) {
+          throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
+        }
+        throw new z.user.UserError(z.user.UserError.TYPE.REQUEST_FAILURE);
+      })
+      .then(function(verified_username) {
+        if (verified_username) {
+          return verified_username;
+        }
+        throw new z.user.UserError(z.user.UserError.TYPE.USERNAME_TAKEN);
+      });
+  }
+
+  change_picture(picture) {
+    this._set_picture_v2(picture, false);
+    return this._set_picture_v3(picture);
+  }
+
+  _set_picture_v2(picture, update = true) {
+    return this.asset_service.upload_profile_image(this.self().id, picture)
+      .then((upload_response) => {
+        return this.user_service.update_own_user_profile({picture: upload_response})
+          .then(() => {
+            if (update) {
+              return this.user_update({user: {id: this.self().id, picture: upload_response}});
+            }
+          });
+      })
+      .catch((error) => {
+        return this.logger.warn(`Error during profile image upload: ${error.message}`);
+      });
+  }
+
+  _set_picture_v3(picture) {
+    return this.asset_service.upload_profile_image_v3(picture)
+      .then(([small_key, medium_key]) => {
+        const assets = [
+          {key: small_key, size: 'preview', type: 'image'},
+          {key: medium_key, size: 'complete', type: 'image'},
+        ];
+        return this.user_service.update_own_user_profile({assets})
+          .then(() => {
+            return this.user_update({assets: assets, user: {id: this.self().id}});
+          });
+      })
+      .catch(function(error) {
+        throw new Error(`Error during profile image upload: ${error.message}`);
+      });
+  }
+
+  set_default_picture() {
+    return z.util.load_url_blob(z.config.UNSPLASH_URL)
+      .then((blob) => {
+        return this.change_picture(blob);
+      })
+      .then(() => {
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.ONBOARDING.ADDED_PHOTO, {
+          outcome: 'success',
+          source: 'unsplash',
+        });
+      });
+  }
 };
