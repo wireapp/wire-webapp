@@ -35,7 +35,7 @@ z.user.UserService = class UserService {
   /**
    * Construct a new User Service.
    * @class z.user.UserService
-   * @param {z.service.Client} client - Client for the API calls
+   * @param {z.service.BackendClient} client - Client for the API calls
    */
   constructor(client) {
     this.client = client;
