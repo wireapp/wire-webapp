@@ -28,7 +28,7 @@ z.user.UserError = class UserError extends Error {
 
     this.name = this.constructor.name;
     this.stack = (new Error()).stack;
-    this.type = type || z.connect.UserError.TYPE.UNKNOWN;
+    this.type = type || z.user.UserError.TYPE.UNKNOWN;
 
     switch (this.type) {
       case z.user.UserError.TYPE.PRE_KEY_NOT_FOUND:
