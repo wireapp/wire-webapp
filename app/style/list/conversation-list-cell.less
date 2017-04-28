@@ -86,25 +86,39 @@
 .conversation-list-cell-avatar-arrow {
   position: relative;
 
+  &:before,
   &:after {
     content: '';
     transition-property: opacity;
     transition-timing-function: @ease-out-quart;
+    transition-delay: @animation-timing-faster + .05;
+    transition-duration: @animation-timing-slow;
     opacity: 0;
+    z-index: 1;
+  }
+
+  &:hover:before,
+  &:hover:after {
+    opacity: 1;
+  }
+
+  &:hover:before {
+    .circle(12px);
+    background-color: #fff;
+    position: absolute;
+    right: -3px;
+    bottom: -3px;
   }
 
   &:hover:after {
     position: absolute;
-    right: -5px;
-    bottom: -5px;
+    right: 0;
+    bottom: 1px;
     width: 0;
     height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid #fff;
-    transition-delay: @animation-timing-faster + .05;
-    transition-duration: @animation-timing-slow;
-    opacity: 1;
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+    border-top: 3px solid #000;
   }
 }
 

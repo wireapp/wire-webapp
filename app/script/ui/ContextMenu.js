@@ -88,13 +88,11 @@ z.ui.Context = (() => {
   }
 
   function cleanup() {
-    console.log('cleanup');
     [...document.querySelectorAll('.ctx-menu')].forEach((menu) => menu.remove());
     removeListeners();
   }
 
   function build(entries, identifier) {
-    console.log('build');
     const menu = document.createElement('div');
     menu.classList.add('ctx-menu');
 
