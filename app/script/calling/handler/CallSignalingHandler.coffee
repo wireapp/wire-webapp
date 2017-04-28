@@ -136,7 +136,7 @@ class z.calling.handler.CallSignalingHandler
   ###
   Delete a flow on the backend.
   @private
-  @param delete_flow_info [z.calling.payloads.FlowDeletionInfo] Contains Conversation ID, Flow ID and Reason for flow deletion
+  @param delete_flow_info [FlowDeletionInfo] Contains Conversation ID, Flow ID and Reason for flow deletion
   ###
   delete_flow: (flow_info) =>
     Promise.resolve @v2_call_center.media_element_handler.remove_media_element flow_info.flow_id
@@ -256,7 +256,7 @@ class z.calling.handler.CallSignalingHandler
   ###
   Put the local SDP on the backend.
 
-  @param sdp_info [z.calling.payloads.SDPInfo] SDP info to be send
+  @param sdp_info [SDPInfo] SDP info to be send
   @param on_success [Function] Function to be called on success
   @param on_error [Function] Function to be called on failure
   ###
@@ -292,7 +292,7 @@ class z.calling.handler.CallSignalingHandler
 
   ###
   Post a local ICE candidate to the backend.
-  @param ice_info [z.calling.payloads.ICECandidateInfo] ICE candidate info to be send
+  @param ice_info [ICECandidateInfo] ICE candidate info to be send
   ###
   post_ice_candidate: (ice_info) =>
     candidate = z.calling.mapper.ICECandidateMapper.map_ice_object_to_message ice_info.ice_candidate

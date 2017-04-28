@@ -345,7 +345,7 @@ class z.calling.entities.Call
   @param flow_id [String] ID of flow to be constructed
   @param user_et [z.entity.User] User that the flow is with
   @param audio_context [AudioContext] Audio context for the flow audio
-  @param call_timings [z.telemetry.calling.CallSetupTimings] Optional object to track duration of call setup
+  @param call_timings [CallSetupTimings] Optional object to track duration of call setup
   ###
   construct_flow: (flow_id, user_et, audio_context, call_timings) =>
     participant_et = @get_participant_by_id user_et.id

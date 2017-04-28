@@ -38,7 +38,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * @param {string} id - Flow ID
    * @param {string} remote_user_id - Remote user ID
    * @param {z.calling.Call} call_et - Call entity
-   * @param {z.telemetry.calling.CallSetupTimings} timings - Timings of call setup steps
+   * @param {CallSetupTimings} timings - Timings of call setup steps
    */
   constructor(id, remote_user_id, call_et, timings) {
     this.remote_user_id = remote_user_id;
@@ -214,7 +214,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
   /**
    * Return the statistics object.
-   * @returns {z.telemetry.calling.ConnectionStats} Flow statistics
+   * @returns {ConnectionStats} Flow statistics
    */
   get_statistics() {
     return this.statistics;
@@ -361,8 +361,8 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    *
    * @param {Object} report - z.calling.rtc.STATS_TYPE.CANDIDATE_PAIR report
    * @param {RTCStatsReport} rtc_stats_report - Statistics report from PeerConnection
-   * @param {z.telemetry.calling.ConnectionStats} connection_stats - Parsed flow statistics
-   * @returns {z.telemetry.calling.ConnectionStats} updated_stats
+   * @param {ConnectionStats} connection_stats - Parsed flow statistics
+   * @returns {ConnectionStats} updated_stats
    */
   _update_from_candidate_pair(report, rtc_stats_report, connection_stats) {
     if (report.selected) {
@@ -378,8 +378,8 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    *
    * @param {Object} report - z.calling.rtc.STATS_TYPE.GOOGLE_CANDIDATE_PAIR report
    * @param {RTCStatsReport} rtc_stats_report - Statistics report from PeerConnection
-   * @param {z.telemetry.calling.ConnectionStats} connection_stats - Parsed flow statistics
-   * @returns {z.telemetry.calling.ConnectionStats} updated_stats
+   * @param {ConnectionStats} connection_stats - Parsed flow statistics
+   * @returns {ConnectionStats} updated_stats
    */
   _update_from_google_candidate_pair(report, rtc_stats_report, connection_stats) {
     if (report.googActiveConnection === 'true') {
@@ -395,8 +395,8 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * Update from z.calling.rtc.STATS_TYPE.INBOUND_RTP report.
    *
    * @param {Object} report - z.calling.rtc.STATS_TYPE.INBOUND_RTP report
-   * @param {z.telemetry.calling.ConnectionStats} connection_stats - Parsed flow statistics
-   * @returns {z.telemetry.calling.ConnectionStats} updated_stats
+   * @param {ConnectionStats} connection_stats - Parsed flow statistics
+   * @returns {ConnectionStats} updated_stats
    */
   _update_from_inbound_rtp(report, connection_stats) {
     if ([z.media.MediaType.AUDIO, z.media.MediaType.VIDEO].includes(report.mediaType)) {
@@ -415,8 +415,8 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * Update from z.calling.rtc.STATS_TYPE.OUTBOUND_RTP report.
    *
    * @param {Object} report - z.calling.rtc.STATS_TYPE.OUTBOUND_RTP report
-   * @param {z.telemetry.calling.ConnectionStats} connection_stats - Parsed flow statistics
-   * @returns {z.telemetry.calling.ConnectionStats} Updated connection stats
+   * @param {ConnectionStats} connection_stats - Parsed flow statistics
+   * @returns {ConnectionStats} Updated connection stats
    */
   _update_from_outbound_rtp(report, connection_stats) {
     if ([z.media.MediaType.AUDIO, z.media.MediaType.VIDEO].includes(report.mediaType)) {
@@ -435,8 +435,8 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * Update from statistics report.
    *
    * @param {Object} report - Statistics report
-   * @param {z.telemetry.calling.ConnectionStats} connection_stats - Parsed flow statistics
-   * @returns {z.telemetry.calling.ConnectionStats} updated_stats
+   * @param {ConnectionStats} connection_stats - Parsed flow statistics
+   * @returns {ConnectionStats} updated_stats
    */
   _update_peer_connection_bytes(report, connection_stats) {
     if (report.bytesReceived) {
@@ -453,8 +453,8 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    * Update from z.calling.rtc.STATS_TYPE.SSRC report.
    *
    * @param {Object} report - z.calling.rtc.STATS_TYPE.SSRC report
-   * @param {z.telemetry.calling.ConnectionStats} connection_stats - Parsed flow statistics
-   * @returns {z.telemetry.calling.ConnectionStats} Update connection stats
+   * @param {ConnectionStats} connection_stats - Parsed flow statistics
+   * @returns {ConnectionStats} Update connection stats
    */
   _update_from_ssrc(report, connection_stats) {
     let codec, stream_stats;
@@ -522,7 +522,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
   /**
    * Return the step timings object.
-   * @returns {z.telemetry.calling.CallSetupTimings} Flow statistics
+   * @returns {CallSetupTimings} Flow statistics
    */
   get_timings() {
     return this.timings.get();
@@ -530,7 +530,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
   /**
    * Time a call setup step.
-   * @param {z.telemetry.calling.CallSetupSteps} step - Step to time
+   * @param {CallSetupSteps} step - Step to time
    * @returns {undefined} No return value
    */
   time_step(step) {
@@ -554,7 +554,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
   /**
    * Log the flow to the browser console.
-   * @param {z.calling.entities.Participant|z.calling.entities.EParticipant} participant_et - Call participant
+   * @param {Participant|EParticipant} participant_et - Call participant
    * @returns {undefined} No return value
    */
   log_status(participant_et) {

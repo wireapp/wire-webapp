@@ -119,7 +119,7 @@ z.calling.v3.CallCenter = class CallCenter {
   /**
    * E-call event handling for browsers supporting calling.
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - Mapped incoming e-call message entity
+   * @param {ECallMessage} e_call_message_et - Mapped incoming e-call message entity
    * @returns {undefined} No return value
    */
   _on_event_in_supported_browsers(e_call_message_et) {
@@ -159,7 +159,7 @@ z.calling.v3.CallCenter = class CallCenter {
   /**
    * E-call event handling for browsers not supporting calling.
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - Mapped incoming e-call message entity
+   * @param {ECallMessage} e_call_message_et - Mapped incoming e-call message entity
    * @returns {undefined} No return value
    */
   _on_event_in_unsupported_browsers(e_call_message_et) {
@@ -168,7 +168,7 @@ z.calling.v3.CallCenter = class CallCenter {
     if (!response) {
       switch (type) {
         case z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP: {
-          this._distribute_activation_event(e_call_message_et);
+          this.inject_activate_event(e_call_message_et);
           this.user_repository.get_user_by_id(user_id)
             .then((user_et) => {
               amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.UNSUPPORTED_INCOMING_CALL, {
@@ -195,7 +195,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * E-call cancel message handling.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL
    * @returns {undefined} No return value
    */
   _on_cancel(e_call_message_et) {
@@ -225,7 +225,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * E-call group check message handling.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_CHECK
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_CHECK
    * @returns {undefined} No return value
    */
   _on_group_check(e_call_message_et) {
@@ -237,7 +237,7 @@ z.calling.v3.CallCenter = class CallCenter {
       .then((e_call_et) => {
         // @todo Grant message for ongoing call
 
-        e_call_et = undefined;
+        e_call_et.reset_check(e_call_message_et);
       })
       .catch((error) => {
         if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
@@ -257,7 +257,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * E-call group leave message handling.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_LEAVE
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_LEAVE
    * @returns {undefined} No return value
    */
   _on_group_leave(e_call_message_et) {
@@ -270,7 +270,7 @@ z.calling.v3.CallCenter = class CallCenter {
         return e_call_et.delete_e_participant(user_id, client_id, z.calling.enum.TERMINATION_REASON.OTHER_USER);
       })
       .then((e_call_et) => {
-        e_call_et.check_group_activity(z.calling.enum.TERMINATION_REASON.OTHER_USER);
+        e_call_et.check_activity(z.calling.enum.TERMINATION_REASON.OTHER_USER);
       })
       .catch(function(error) {
         if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
@@ -283,7 +283,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * E-call group setup message handling.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP
    * @returns {undefined} No return value
    */
   _on_group_setup(e_call_message_et) {
@@ -313,7 +313,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * E-call group start message handling.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START
    * @returns {undefined} No return value
    */
   _on_group_start(e_call_message_et) {
@@ -353,7 +353,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * E-call hangup message handling.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP
    * @returns {undefined} No return value
    */
   _on_hangup(e_call_message_et) {
@@ -383,7 +383,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * E-call prop-sync message handling.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
    * @returns {undefined} No return value
    */
   _on_prop_sync(e_call_message_et) {
@@ -408,7 +408,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * E-call reject message handling.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT
    * @returns {undefined} No return value
    */
   _on_reject(e_call_message_et) {
@@ -435,7 +435,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * E-call setup message handling.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
    * @returns {undefined} No return value
    */
   _on_setup(e_call_message_et) {
@@ -487,7 +487,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * E-call setup message handling.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
    * @returns {undefined} No return value
    */
   _on_update(e_call_message_et) {
@@ -509,7 +509,7 @@ z.calling.v3.CallCenter = class CallCenter {
 
   /**
    * Validate that type of e-call message matches conversation type.
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message to validate
+   * @param {ECallMessage} e_call_message_et - E-call message to validate
    * @returns {Promise} Resolves if the message is valid
    */
   _validate_message_type(e_call_message_et) {
@@ -632,7 +632,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * Send an e-call event.
    *
    * @param {z.entity.Conversation} conversation_et - Conversation to send message in
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity
+   * @param {ECallMessage} e_call_message_et - E-call message entity
    * @returns {Promise} Resolves when the event has been sent
    */
   send_e_call_event(conversation_et, e_call_message_et) {
@@ -682,8 +682,8 @@ z.calling.v3.CallCenter = class CallCenter {
   /**
    *
    * @private
-   * @param {z.calling.entities.ECall} e_call_et - Call entity
-   * @param {z.calling.entities.ECallMessage} incoming_e_call_message_et - Incoming e-call message
+   * @param {ECall} e_call_et - Call entity
+   * @param {ECallMessage} incoming_e_call_message_et - Incoming e-call message
    * @returns {undefined} No return value
    */
   _confirm_e_call_message(e_call_et, incoming_e_call_message_et) {
@@ -698,7 +698,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * Limit the message recipients for a call message.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message to target at clients
+   * @param {ECallMessage} e_call_message_et - E-call message to target at clients
    * @returns {Promise} Resolves with the client user map and precondition option
    */
   _limit_message_recipients(e_call_message_et) {
@@ -966,7 +966,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * Constructs a e-call entity.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
    * @param {z.entity.User} creating_user_et - User that created e-call
    * @returns {Promise} Resolves with the new e-call entity
    */
@@ -989,7 +989,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * Constructs an incoming e-call entity.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves with the new e-call entity
    */
   _create_incoming_e_call(e_call_message_et) {
@@ -1026,7 +1026,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * Constructs an outgoing e-call entity.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC
    * @returns {Promise} Resolves with the new e-call entity
    */
   _create_outgoing_e_call(e_call_message_et) {
@@ -1051,7 +1051,7 @@ z.calling.v3.CallCenter = class CallCenter {
 
   /**
    * Inject a call activate event.
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message to create event from
+   * @param {ECallMessage} e_call_message_et - E-call message to create event from
    * @returns {undefined} No return value
    */
   inject_activate_event(e_call_message_et) {
@@ -1061,7 +1061,7 @@ z.calling.v3.CallCenter = class CallCenter {
 
   /**
    * Inject a call deactivate event.
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message to create event from
+   * @param {ECallMessage} e_call_message_et - E-call message to create event from
    * @param {z.entity.User} creating_user_et - User that created call
    * @param {z.calling.enum.TERMINATION_REASON} reason - Reason for call to end
    * @returns {undefined} No return value
@@ -1079,7 +1079,7 @@ z.calling.v3.CallCenter = class CallCenter {
   /**
    * Get an e-call entity for a given conversation ID.
    * @param {string} conversation_id - ID of Conversation of requested e-call
-   * @returns {z.calling.entities.ECall} E-call entity for conversation ID
+   * @returns {ECall} E-call entity for conversation ID
   */
   get_e_call_by_id(conversation_id) {
     if (conversation_id) {

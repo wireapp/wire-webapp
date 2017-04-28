@@ -124,7 +124,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   /**
    * Reports call events for call tracking to Localytics.
    * @param {z.tracking.EventName} event_name - String for call event
-   * @param {z.calling.Call|z.calling.entities.ECall} call_et - Call entity
+   * @param {Call|ECall} call_et - Call entity
    * @param {Object} [attributes={}] - Attributes for the event
    * @returns {undefined} No return value
    */
@@ -152,7 +152,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
 
   /**
    * Track the call duration.
-   * @param {z.calling.entities.Call|z.calling.entities.ECall} call_et - Call entity
+   * @param {Call|ECall} call_et - Call entity
    * @returns {undefined} No return value
    */
   track_duration(call_et) {

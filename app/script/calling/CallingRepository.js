@@ -47,12 +47,12 @@ z.calling.CallingRepository = class CallingRepository {
 
   /**
    * Construct a new Calling repository.
-   * @param {z.calling.v2} call_service - CallService] Backend REST API call service implementation
-   * @param {z.calling.CallingService} calling_service -  Backend REST API calling service implementation
-   * @param {z.client.ClientRepository} client_repository - Repository for client interactions
-   * @param {z.conversation.ConversationRepository} conversation_repository -  Repository for conversation interactions
-   * @param {z.media.MediaRepository} media_repository -  Repository for media interactions
-   * @param {z.user.UserRepository} user_repository -  Repository for all user and connection interactions
+   * @param {CallService} call_service - CallService] Backend REST API call service implementation
+   * @param {CallingService} calling_service -  Backend REST API calling service implementation
+   * @param {ClientRepository} client_repository - Repository for client interactions
+   * @param {ConversationRepository} conversation_repository -  Repository for conversation interactions
+   * @param {MediaRepository} media_repository -  Repository for media interactions
+   * @param {UserRepository} user_repository -  Repository for all user and connection interactions
    */
   constructor(call_service, calling_service, client_repository, conversation_repository, media_repository, user_repository) {
     this.call_service = call_service;
@@ -87,7 +87,7 @@ z.calling.CallingRepository = class CallingRepository {
   }
 
   /**
-   * Share call staes with MediaRepository.
+   * Share call states with MediaRepository.
    * @returns {undefined} No return value
    */
   share_call_states() {

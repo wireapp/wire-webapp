@@ -26,10 +26,10 @@ window.z.calling.entities = z.calling.entities || {};
 z.calling.entities.EParticipant = class EParticipant {
   /**
    * Construct a new e-participant.
-   * @param {z.calling.entities.ECall} e_call_et - E-call entity
+   * @param {ECall} e_call_et - E-call entity
    * @param {z.entity.User} user - User entity to base the participant on
-   * @param {z.telemetry.calling.CallSetupTimings} timings - Timing statistics of call setup steps
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {CallSetupTimings} timings - Timing statistics of call setup steps
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
    */
   constructor(e_call_et, user, timings, e_call_message_et) {
     this.e_call_et = e_call_et;
@@ -82,7 +82,7 @@ z.calling.entities.EParticipant = class EParticipant {
 
   /**
    * Update the participant state.
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message to update state from.
+   * @param {ECallMessage} e_call_message_et - E-call message to update state from.
    * @returns {Promise} Resolves with the participant when the state was updated
    */
   update_state(e_call_message_et) {

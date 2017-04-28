@@ -26,6 +26,9 @@ window.z.calling.entities = z.calling.entities || {};
 z.calling.entities.ECall = class ECall {
   static get CONFIG() {
     return {
+      GROUP_CHECK_ACTIVITY_TIMEOUT: 2 * 60 * 1000,
+      GROUP_CHECK_MAXIMUM_TIMEOUT: 90 * 1000,
+      GROUP_CHECK_MINIMUM_TIMEOUT: 60 * 1000,
       STATE_TIMEOUT: 30 * 1000,
       TIMER_UPDATE_INTERVAL: 1000,
       TIMER_UPDATE_START: 100,
@@ -40,21 +43,23 @@ z.calling.entities.ECall = class ECall {
    * @param {z.calling.v3.CallCenter} v3_call_center - V3 call center
    */
   constructor(conversation_et, creating_user, session_id, v3_call_center) {
+    const {id: conversation_id, is_group} = conversation_et;
     this.conversation_et = conversation_et;
     this.creating_user = creating_user;
     this.session_id = session_id;
     this.v3_call_center = v3_call_center;
-    this.logger = new z.util.Logger(`z.calling.entities.ECall (${this.conversation_et.id})`, z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger(`z.calling.entities.ECall (${conversation_id})`, z.config.LOGGER.OPTIONS);
 
     // IDs and references
-    this.id = this.conversation_et.id;
+    this.id = conversation_id;
     this.timings = undefined;
 
-    this.media_repository = this.v3_call_center.media_repository;
-    this.config = this.v3_call_center.calling_config;
-    this.self_user = this.v3_call_center.user_repository.self();
-    this.self_state = this.v3_call_center.self_state;
-    this.telemetry = this.v3_call_center.telemetry;
+    const {calling_config, media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.v3_call_center;
+    this.media_repository = media_repository;
+    this.config = calling_config;
+    this.self_user = user_repository.self();
+    this.self_state = self_state;
+    this.telemetry = telemetry;
 
     // States
     this.call_timer_interval = undefined;
@@ -64,7 +69,7 @@ z.calling.entities.ECall = class ECall {
     this.termination_reason = undefined;
 
     this.is_connected = ko.observable(false);
-    this.is_group = this.conversation_et.is_group;
+    this.is_group = is_group;
 
     this.self_client_joined = ko.observable(false);
     this.self_user_joined = ko.observable(false);
@@ -76,8 +81,8 @@ z.calling.entities.ECall = class ECall {
     this.interrupted_participants = ko.observableArray([]);
 
     // Media
-    this.local_media_stream = this.v3_call_center.media_stream_handler.local_media_stream;
-    this.local_media_type = this.v3_call_center.media_stream_handler.local_media_type;
+    this.local_media_stream = media_stream_handler.local_media_stream;
+    this.local_media_type = media_stream_handler.local_media_type;
     this.remote_media_type = ko.observable(z.media.MediaType.NONE);
 
     // Statistics
@@ -189,7 +194,7 @@ z.calling.entities.ECall = class ECall {
    * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Call termination reason
    * @returns {undefined} No return value
    */
-  check_group_activity(termination_reason) {
+  check_activity(termination_reason) {
     if (!this.participants().length) {
       this.leave_call(termination_reason);
     }
@@ -198,7 +203,7 @@ z.calling.entities.ECall = class ECall {
   /**
    * Deactivate the call.
    *
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message for deactivation
+   * @param {ECallMessage} e_call_message_et - E-call message for deactivation
    * @param {z.calling.enum.TERMINATION_REASON} [termination_reason=z.calling.enum.TERMINATION_REASON.SELF_USER] - Call termination reason
    * @returns {undefined} No return value
    */
@@ -297,6 +302,13 @@ z.calling.entities.ECall = class ECall {
       });
   }
 
+  reset_check() {
+    this.check_activity_timeout = window.setTimeout(() =>{
+
+    },
+    ECall.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT);
+  }
+
   /**
    * Reject the call.
    * @returns {undefined} No return value
@@ -345,7 +357,7 @@ z.calling.entities.ECall = class ECall {
 
   /**
    * Confirm an incoming message.
-   * @param {z.calling.entities.ECallMessage} incoming_e_call_message_et - Incoming e-call message to be confirmed
+   * @param {ECallMessage} incoming_e_call_message_et - Incoming e-call message to be confirmed
    * @returns {undefined} No return value
    */
   confirm_message(incoming_e_call_message_et) {
@@ -377,7 +389,7 @@ z.calling.entities.ECall = class ECall {
 
   /**
    * Send e-call message.
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message to be send
+   * @param {ECallMessage} e_call_message_et - E-call message to be send
    * @returns {Promise} Resolves when the event has been send
    */
   send_e_call_event(e_call_message_et) {
@@ -386,7 +398,7 @@ z.calling.entities.ECall = class ECall {
 
   /**
    * Set remote version of call
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message to get remote version from
+   * @param {ECallMessage} e_call_message_et - E-call message to get remote version from
    * @returns {undefined} No return value
    */
   set_remote_version(e_call_message_et) {
@@ -509,9 +521,9 @@ z.calling.entities.ECall = class ECall {
    * Update the state on participant change.
    *
    * @private
-   * @param {z.calling.entities.EParticipant} e_participant_et - Updated participant
+   * @param {EParticipant} e_participant_et - Updated participant
    * @param {boolean} negotiate - Should negotiation be started immediately
-   * @returns {z.calling.entities.EParticipant} Changed e-participant
+   * @returns {EParticipant} Changed e-participant
    */
   _update_state(e_participant_et, negotiate) {
     this._update_remote_state();
@@ -532,7 +544,7 @@ z.calling.entities.ECall = class ECall {
    * Add an e-participant to the e-call.
    *
    * @param {z.entities.User} user_et - User entity to be added to the e-call
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
    * @param {boolean} [negotiate=true] - Should negotiation be started immediately
    * @returns {Promise} Resolves with added participant
    */
@@ -638,7 +650,7 @@ z.calling.entities.ECall = class ECall {
    * Update e-call participant with e-call message.
    *
    * @param {string} user_id - ID of participant to update
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message to update user with
+   * @param {ECallMessage} e_call_message_et - E-call message to update user with
    * @param {boolean} [negotiate=false] - Should negotiation be started
    * @returns {Promise} Resolves when participant was updated
    */
@@ -672,7 +684,7 @@ z.calling.entities.ECall = class ECall {
    * Verify e-call message belongs to e-call by session id.
    *
    * @private
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity
+   * @param {ECallMessage} e_call_message_et - E-call message entity
    * @returns {Promise} Resolves with the e-call entity if verification passed
    */
   verify_session_id(e_call_message_et) {

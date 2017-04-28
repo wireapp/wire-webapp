@@ -37,10 +37,10 @@ z.calling.entities.EFlow = class EFlow {
   /**
    * Construct a new e-flow entity.
    *
-   * @param {z.calling.entities.ECall} e_call_et - E-Call entity that the e-flow belongs to
-   * @param {z.calling.entities.EParticipant} e_participant_et - E-Participant entity that the e-flow belongs to
-   * @param {z.telemetry.calling.CallSetupTimings} timings - Timing statistics of call setup steps
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - Optional e-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {ECall} e_call_et - E-Call entity that the e-flow belongs to
+   * @param {EParticipant} e_participant_et - E-Participant entity that the e-flow belongs to
+   * @param {CallSetupTimings} timings - Timing statistics of call setup steps
+   * @param {ECallMessage} e_call_message_et - Optional e-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
    */
   constructor(e_call_et, e_participant_et, timings, e_call_message_et) {
     this.v3_call_center = e_call_et.v3_call_center;
@@ -284,7 +284,7 @@ z.calling.entities.EFlow = class EFlow {
    * Initialize the e-flow.
    *
    * @note Magic here is that if an e_call_message is present, the remote user is the creator of the flow
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - Optional e-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {ECallMessage} e_call_message_et - Optional e-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
    * @returns {undefined} No return value
    */
   initialize_e_flow(e_call_message_et) {
@@ -531,7 +531,7 @@ z.calling.entities.EFlow = class EFlow {
 
   /**
    * Send an e-call message through the data channel.
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message to be send
+   * @param {ECallMessage} e_call_message_et - E-call message to be send
    * @returns {undefined} No return value
    */
   send_message(e_call_message_et) {
@@ -673,7 +673,7 @@ z.calling.entities.EFlow = class EFlow {
 
   /**
    * Save the remote SDP received via an e-call message within the e-flow.
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
    * @returns {undefined} No return value
    */
   save_remote_sdp(e_call_message_et) {

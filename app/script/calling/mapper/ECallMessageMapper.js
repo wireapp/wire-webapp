@@ -80,7 +80,7 @@ z.calling.mapper.ECallMessageMapper = (function() {
    *
    * @private
    * @param {Object} event - E-call event object
-   * @returns {z.calling.entities.ECallMessage} E-call message entity
+   * @returns {ECallMessage} E-call message entity
    */
   const _map_event = function(event) {
     const {content: e_call_message, conversation: conversation_id, from: user_id, sender: client_id, time} = event;

@@ -45,7 +45,7 @@ z.calling.mapper.SDPMapper = {
 
   /**
    * Map e-call setup message to RTCSessionDescription.
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
+   * @param {ECallMessage} e_call_message_et - E-call message entity of type z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP
    * @returns {Promise} Resolves with a webRTC standard compliant RTCSessionDescription
    */
   map_e_call_message_to_object(e_call_message_et) {
@@ -77,7 +77,7 @@ z.calling.mapper.SDPMapper = {
    *
    * @param {RTCSessionDescription} rtc_sdp - Session Description Protocol to be rewritten
    * @param {z.calling.enum.SDP_SOURCE} [sdp_source=z.calling.enum.SDP_SOURCE.REMOTE] - Source of the SDP - local or remote
-   * @param {z.calling.entities.EFlow|z.calling.entities.Flow} flow_et - Flow entity
+   * @param {EFlow|z.calling.entities.Flow} flow_et - Flow entity
    * @returns {Object} Object containing rewritten Session Description Protocol and number of ICE candidates
    */
   rewrite_sdp(rtc_sdp, sdp_source = z.calling.enum.SDP_SOURCE.REMOTE, flow_et) {
