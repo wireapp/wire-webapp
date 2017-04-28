@@ -156,4 +156,4 @@ z.user.UserMapper = class UserMapper {
         }
       });
   }
-}
+};
