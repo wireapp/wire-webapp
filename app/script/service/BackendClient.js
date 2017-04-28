@@ -297,7 +297,7 @@ z.service.BackendClient = class BackendClient {
             this._push_to_request_queue(config, z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH)
               .then(resolve)
               .catch(reject);
-            return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, 'Unauthorized backend request');
+            return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST);
           }
 
           case z.service.BackendClientError.STATUS_CODE.FORBIDDEN: {
