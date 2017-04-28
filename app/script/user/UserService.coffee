@@ -29,7 +29,7 @@ class z.user.UserService
   URL_USERS: '/users'
   ###
   Construct a new User Service.
-  @param client [z.service.Client] Client for the API calls
+  @param client [z.service.BackendClient] Client for the API calls
   ###
   constructor: (@client) ->
     @logger = new z.util.Logger 'z.user.UserService', z.config.LOGGER.OPTIONS

@@ -29,7 +29,7 @@ describe 'User Service', ->
   beforeEach ->
     server = sinon.fakeServer.create()
 
-    client = new z.service.Client urls
+    client = new z.service.BackendClient urls
     client.logger.level = client.logger.levels.OFF
 
     user_service = new z.user.UserService client
@@ -86,7 +86,7 @@ describe 'User Service', ->
       user_service.get_users ['7025598b-ffac-4993-8a81-af3f35b71414']
       .then done.fail
       .catch (error) =>
-        expect(error.code).toBe z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+        expect(error.code).toBe z.service.BackendClientError.STATUS_CODE.NOT_FOUND
         done()
 
       server.respond()
@@ -120,7 +120,7 @@ describe 'User Service', ->
       user_service.get_users ['7025598b-ffac-4993-8a81-af3f35b71488', '7025598b-ffac-4993-8a81-af3f35b71414']
       .then done.fail
       .catch (error) =>
-        expect(error.code).toBe z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+        expect(error.code).toBe z.service.BackendClientError.STATUS_CODE.NOT_FOUND
         done()
 
       server.respond()

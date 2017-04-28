@@ -149,7 +149,7 @@ class z.calling.handler.CallSignalingHandler
         @logger.debug 'Flow was released - We need implement posting for flows to renegotiate'
       return response
     .catch (error) =>
-      if error.label is z.service.BackendClientError::LABEL.IN_USE
+      if error.label is z.service.BackendClientError.LABEL.IN_USE
         @logger.warn "DELETEing flow '#{flow_info.flow_id}' would have to be forced"
         flow_info.reason = z.calling.payloads.FlowDeletionReason.RELEASED
         return @delete_flow flow_info

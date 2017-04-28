@@ -120,7 +120,7 @@ z.cryptography.CryptographyRepository = class CryptographyRepository {
   get_users_pre_keys(user_client_map) {
     return this.cryptography_service.get_users_pre_keys(user_client_map)
     .catch((error) => {
-      if (error.code === z.service.BackendClientError.prototype.STATUS_CODE.NOT_FOUND) {
+      if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
         throw new z.user.UserError(z.user.UserError.prototype.TYPE.PRE_KEY_NOT_FOUND);
       }
       this.logger.error(`Failed to get pre-key from backend: ${error.message}`);

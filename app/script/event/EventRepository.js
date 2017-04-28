@@ -235,7 +235,7 @@ z.event.EventRepository = class EventRepository {
           return _got_notifications(error_response);
         }
 
-        if (error_response.code === z.service.BackendClientError.prototype.STATUS_CODE.NOT_FOUND) {
+        if (error_response.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
           this.logger.info(`No notifications found since '${notification_id}'`, error_response);
           return reject(new z.event.EventError(z.event.EventError.TYPE.NO_NOTIFICATIONS));
         }

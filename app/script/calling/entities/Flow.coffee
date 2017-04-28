@@ -464,7 +464,7 @@ class z.calling.entities.Flow
 
       on_failure = (error) =>
         @logger.warn "Failed to send local '#{@local_sdp().type}' SDP"
-        if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+        if error.code is z.service.BackendClientError.STATUS_CODE.NOT_FOUND
           return @reset_flow()
         @has_sent_local_sdp false
 
