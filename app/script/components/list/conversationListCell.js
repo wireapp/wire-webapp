@@ -31,8 +31,7 @@ z.components.ConversationListCell = class ConversationListCell {
     this.on_click = click;
 
     this.entered_viewport = ko.observable(false);
-    this.user = ko.pureComputed(() => this.conversation.participating_user_ets()[0]);
-    this.users = ko.pureComputed(() => this.conversation.participating_user_ets().slice(0, 4));
+    this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
 
     this.cell_state = ko.pureComputed(() => {
       return this.entered_viewport() ? z.conversation.ConversationCellState.generate(this.conversation) : '';
@@ -54,7 +53,7 @@ ko.components.register('conversation-list-cell', {
           <group-avatar class="conversation-list-cell-avatar-arrow" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options" params="users: users()"></group-avatar>
         <!-- /ko -->
         <!-- ko ifnot: conversation.is_group() -->
-          <user-avatar class="conversation-list-cell-avatar-arrow user-avatar-xs" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options" params="user: user"></user-avatar>
+          <user-avatar class="conversation-list-cell-avatar-arrow user-avatar-xs" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options" params="user: users()[0]"></user-avatar>
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-center">
