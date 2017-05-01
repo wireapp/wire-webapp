@@ -68,7 +68,7 @@ describe 'z.announce.AnnounceRepository', ->
       ]
       'status': 'success'
 
-    server.respondWith 'GET', 'https://wire.com/api/v1/announce/?order=created&active=true', [
+    server.respondWith 'GET', 'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true', [
       200
       'Content-Type': 'application/json'
       JSON.stringify response

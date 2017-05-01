@@ -31,7 +31,6 @@ z.components.UserListMode =
 # @option params [ko.observable] filter filter list items
 # @option params [function] click is called when a list item is selected
 # @option params [function] connect is called when the connect button is clicked
-# @option params [function] dismiss is called when the dismiss button is clicked
 # @option params [ko.observable] selected will be populated will all the selected items
 # @option params [function] selected_filter that determines if the user can be selected
 #
@@ -41,7 +40,6 @@ class z.components.UserListViewModel
     @user_ets = params.user
     @user_click = params.click
     @user_connect = params.connect
-    @user_dismiss = params.dismiss
     @user_filter = params.filter
     @user_selected = params.selected
     @user_selected_filter = params.selectable
@@ -50,10 +48,7 @@ class z.components.UserListViewModel
     @css_classes = ko.pureComputed =>
       if @mode is z.components.UserListMode.COMPACT
         return 'search-list-sm'
-      else if @mode is z.components.UserListMode.INFO
-        return 'search-list-lg'
-      else
-        return 'search-list-md'
+      return 'search-list-lg'
 
     @show_buttons = =>
       return @user_connect?
@@ -63,9 +58,6 @@ class z.components.UserListViewModel
     @is_selected = -> return false
     @is_selectable = -> return true
     @on_select = (user_et, e) => @user_click? user_et, e
-    @on_dismiss = (user_et, e) =>
-      e.stopPropagation()
-      @user_dismiss? user_et, e
     @on_connect = (user_et, e) =>
       e.stopPropagation()
       @user_connect? user_et, e
@@ -94,14 +86,6 @@ class z.components.UserListViewModel
       @is_selected = (user_et) =>
         return user_et in @user_selected()
 
-    @get_common_contacts_caption = (user_et) ->
-      total = user_et.mutual_friends_total()
-      locale_id = if total > 1 then z.string.search_friends_in_common else z.string.search_friend_in_common
-      return z.localization.Localizer.get_text
-        id: locale_id
-        replace:
-          placeholder: '%no',
-          content: total
 
 ko.components.register 'user-list',
   viewModel: z.components.UserListViewModel
@@ -124,19 +108,13 @@ ko.components.register 'user-list',
                   </div>
                   <div class="search-list-item-content">
                     <div class="search-list-item-content-name" data-bind="text: name"></div>
-                    <!-- ko if: $parent.mode === z.components.UserListMode.INFO -->
-                      <div class="search-list-item-content-info">
-                        <!-- ko if: $data.username() -->
-                          <span class="search-list-item-content-username label-username" data-bind="text: $data.username"></span>
-                        <!-- /ko -->
-                        <!-- ko if: !$data.connected() && $data.mutual_friends_total() > 0 -->
-                          <span class="search-list-item-content-friends ellipsis" data-bind="attr: {'data-uie-common-friends': mutual_friends_total()}, text: $parent.get_common_contacts_caption($data)"></span>
-                        <!-- /ko -->
-                      </div>
-                    <!-- /ko -->
+                    <div class="search-list-item-content-info">
+                      <!-- ko if: $data.username() -->
+                        <span class="search-list-item-content-username label-username" data-bind="text: $data.username"></span>
+                      <!-- /ko -->
+                    </div>
                   </div>
                   <div class="search-list-item-connect" data-bind="visible: $parent.show_buttons()">
-                    <span class="icon-dismiss icon-button" data-bind="click: $parent.on_dismiss"></span>
                     <span class="icon-add icon-button" data-bind="click: $parent.on_connect"></span>
                   </div>
                 <!-- /ko -->

@@ -83,11 +83,11 @@ z.conversation.EventBuilder = do ->
     data:
       deleted_time: time
 
-  build_missed = (conversation_et) ->
+  build_missed = (conversation_et, self_user_et) ->
     conversation: conversation_et.id
     id: z.util.create_random_uuid()
     type: z.event.Client.CONVERSATION.MISSED_MESSAGES
-    from: conversation_et.self.id
+    from: self_user_et.id
     time: new Date().toISOString()
 
   return {

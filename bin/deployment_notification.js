@@ -34,7 +34,7 @@ const commit = {
 
 const build = {
   number: process.env.TRAVIS_BUILD_NUMBER,
-  url: 'https://app.wire.com/',
+  url: '',
 };
 
 const content = {
@@ -52,6 +52,8 @@ switch (commit.branch) {
   case 'staging':
     build.url = 'https://wire-webapp-staging.zinfra.io/auth/?env=prod#login';
     break;
+  default:
+    build.url = 'https://app.wire.com/';
 }
 
 content.message =

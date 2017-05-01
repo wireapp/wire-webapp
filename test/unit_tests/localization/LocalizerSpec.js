@@ -33,8 +33,8 @@ describe('Localizer', () => {
     const text = z.localization.Localizer.get_text({
       id: 'Talk, message, share.',
       replace: {
-        placeholder: '%nl',
         content: '<br>',
+        placeholder: '%nl',
       },
     });
     expect(text).toBe('Talk, message, share.');
@@ -45,11 +45,12 @@ describe('Localizer', () => {
       id: 'I’m on Wire. Search for %email or visit %url to connect with me.',
       replace: [
         {
-          placeholder: '%email',
           content: entities.user.john_doe.email,
-        }, {
-          placeholder: '%url',
+          placeholder: '%email',
+        },
+        {
           content: 'html://LINK',
+          placeholder: '%url',
         },
       ],
     });
@@ -60,8 +61,8 @@ describe('Localizer', () => {
     const text = z.localization.Localizer.get_text({
       id: '%@.first_name won’t see you in search results and won’t be able to send you messages.',
       replace: {
-        placeholder: '%@.first_name',
         content: '<span class=\"user\"></span>',
+        placeholder: '%@.first_name',
       },
     });
     expect(text).toBe('<span class="user"></span> won’t see you in search results and won’t be able to send you messages.');

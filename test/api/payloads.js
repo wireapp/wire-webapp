@@ -17,7 +17,7 @@
  *
  */
 
-/* eslint no-undef: "off" */
+/* eslint no-undef: "off", sort-keys: "off" */
 
 'use strict';
 

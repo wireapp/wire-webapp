@@ -22,7 +22,7 @@
 window.z = window.z || {};
 window.z.auth = z.auth || {};
 
-window.z.auth.ValidationError = class ValidationError extends Error {
+z.auth.ValidationError = class ValidationError extends Error {
   constructor(types, string_identifier) {
     super();
 

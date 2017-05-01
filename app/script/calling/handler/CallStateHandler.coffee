@@ -70,10 +70,10 @@ class z.calling.handler.CallStateHandler
   ###
   Set the notification handling state.
   @note Temporarily ignore call related events when handling notifications from the stream
-  @param handling_state [z.event.NotificationHandlingState] State of the notifications stream handling
+  @param handling_state [z.event.NOTIFICATION_HANDLING_STATE] State of the notifications stream handling
   ###
   set_notification_handling_state: (handling_state) =>
-    @block_event_handling = handling_state isnt z.event.NotificationHandlingState.WEB_SOCKET
+    @block_event_handling = handling_state isnt z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
     @_update_ongoing_calls() if not @block_event_handling
     @logger.info "Block handling of call events: #{@block_event_handling}"
 
@@ -226,15 +226,15 @@ class z.calling.handler.CallStateHandler
     @v2_call_center.telemetry.track_event z.tracking.EventName.CALLING.FAILED_REQUEST, undefined, attributes
     @v2_call_center.media_stream_handler.release_media_stream()
     switch error.label
-      when z.service.BackendClientError::LABEL.CONVERSATION_TOO_BIG
+      when z.service.BackendClientError.LABEL.CONVERSATION_TOO_BIG
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_FULL_CONVERSATION,
           data: error.max_members
         throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.CONVERSATION_TOO_BIG
-      when z.service.BackendClientError::LABEL.INVALID_OPERATION
+      when z.service.BackendClientError.LABEL.INVALID_OPERATION
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_EMPTY_CONVERSATION
         @delete_call conversation_id
         throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.CONVERSATION_EMPTY
-      when z.service.BackendClientError::LABEL.VOICE_CHANNEL_FULL
+      when z.service.BackendClientError.LABEL.VOICE_CHANNEL_FULL
         amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_FULL_VOICE_CHANNEL,
           data: error.max_joined
         throw new z.calling.v2.CallError z.calling.v2.CallError::TYPE.VOICE_CHANNEL_FULL
