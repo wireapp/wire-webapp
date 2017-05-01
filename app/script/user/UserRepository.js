@@ -147,6 +147,14 @@ z.user.UserRepository = class UserRepository {
     }
   }
 
+  /**
+   * Create a new conversation.
+   * @note Initially called by Wire for Web's app start to retrieve user entities and their connections.
+   * @param {number} limit - Query limit for user connections
+   * @param {string} user_id - User ID of the latest connection
+   * @param {Array<z.entity.Connection>} connection_ets - Unordered array of user connections
+   * @returns {Promise} Promise that resolves when all connections have been retrieved and mapped
+   */
   get_connections(limit = 500, user_id, connection_ets = []) {
     return this.user_service.get_own_connections(limit, user_id)
       .then((response) => {
@@ -194,6 +202,12 @@ z.user.UserRepository = class UserRepository {
     return this._update_connection_status(user_et, z.user.ConnectionStatus.ACCEPTED, show_conversation);
   }
 
+  /**
+   * Update the user connections and get the matching users.
+   * @param {Array<z.entity.Connection>} connection_ets - Connection entities
+   * @param {boolean} assign_clients - Retrieve locally known clients from database
+   * @returns {Promise} Promise that resolves when all user connections have been updated
+   */
   update_user_connections(connection_ets, assign_clients = false) {
     return new Promise((resolve) => {
       z.util.ko_array_push_all(this.connections, connection_ets);
@@ -219,6 +233,11 @@ z.user.UserRepository = class UserRepository {
     });
   }
 
+  /**
+   * Assign all locally stored clients to the users.
+   * @private
+   * @returns {Promise} Promise that resolves with all user entities where client entities have been assigned to.
+   */
   _assign_all_clients() {
     return this.client_repository.get_all_clients_from_db()
       .then((user_client_map) => {
@@ -238,18 +257,33 @@ z.user.UserRepository = class UserRepository {
               user_et.devices(user_client_map[user_et.id]);
             }
 
-            return undefined;
+            return user_ets;
           });
       });
   }
 
+  /**
+   * Assign connections to the users.
+   * @param {z.entity.User} user_et - User to which a connection will be assigned to.
+   * @returns {Promise} Promise that resolves with the connection entity which has been found for the given user entity.
+   * @private
+   */
   _assign_connection(user_et) {
     const connection_et = this.get_connection_by_user_id(user_et.id);
     if (connection_et) {
-      return user_et.connection(connection_et);
+      user_et.connection(connection_et);
     }
+    return connection_et;
   }
 
+  /**
+   * Update the status of a connection.
+   * @private
+   * @param {z.entity.User} user_et - User to update connection with
+   * @param {string} status - Connection status
+   * @param {boolean} show_conversation - Show conversation on success
+   * @returns {Promise} Promise that resolves when the connection status was updated
+   */
   _update_connection_status(user_et, status, show_conversation = false) {
     return Promise.resolve()
       .then(() => {
@@ -274,6 +308,12 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Convert a JSON event into an entity and get the matching conversation.
+   * @param {Object} event_json - JSON data of 'user.connection' event
+   * @param {boolean} show_conversation - Should the new conversation be opened?
+   * @returns {undefined} No return value
+   */
   user_connection(event_json, show_conversation) {
     if (event_json == null) {
       return;
@@ -296,10 +336,15 @@ z.user.UserRepository = class UserRepository {
         this.update_user_by_id(connection_et.to);
       }
       this._send_user_connection_notification(connection_et, previous_status);
-      return amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation);
+      amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation);
     }
   }
 
+  /**
+   * Use a JSON event to update the matching user.
+   * @param {Object} event_json - JSON data
+   * @returns {z.entity.User} Updated user entity.
+   */
   user_update(event_json) {
     if (event_json.user.id === this.self().id) {
       return this.user_mapper.update_user_from_object(this.self(), event_json.user);
@@ -311,6 +356,12 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Send the user connection notification.
+   * @param {z.entity.Connection} connection_et - Connection entity
+   * @param {z.user.ConnectionStatus} previous_status - Previous connection status
+   * @returns {undefined} No return value
+   */
   _send_user_connection_notification(connection_et, previous_status) {
     // We accepted the connection request or unblocked the user
     const no_notification = [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING];
@@ -340,6 +391,12 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Saves a new client for the first time to the database and adds it to a user's entity.
+   * @param {string} user_id - ID of user
+   * @param {string} client_et - Client which should get deleted
+   * @returns {Promise} Promise that resolves when a client and its session have been deleted
+   */
   add_client_to_user(user_id, client_et) {
     return this.get_user_by_id(user_id)
       .then((user_et) => {
@@ -357,6 +414,12 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Removes a stored client and the session connected with it.
+   * @param {string} user_id - ID of user
+   * @param {string} client_id - ID of client to be deleted
+   * @returns {Promise} Promise that resolves when a client and its session have been deleted
+   */
   remove_client_from_user(user_id, client_id) {
     return this.client_repository.remove_client(user_id, client_id)
       .then(() => {
@@ -368,6 +431,12 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Update clients for given user.
+   * @param {string} user_id - ID of user
+   * @param {Array<z.client.Client>} client_ets - Clients which should get updated
+   * @returns {undefined} No return value
+   */
   update_clients_from_user(user_id, client_ets) {
     return this.get_user_by_id(user_id)
       .then(function(user_et) {
@@ -376,6 +445,10 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Request account deletion.
+   * @returns {Promise} Promise that resolves when account deletion process has been initiated
+   */
   delete_me() {
     return this.user_service.delete_self()
       .then(() => {
@@ -386,6 +459,11 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Get a user from the backend.
+   * @param {string} user_id - User ID
+   * @returns {Promise<z.entity.User>} Promise that resolves with the user entity
+   */
   fetch_user_by_id(user_id) {
     return this.fetch_users_by_id([user_id])
       .then((user_ets) => {
@@ -396,6 +474,11 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Get users from the backend.
+   * @param {Array<string>} user_ids - User IDs
+   * @returns {Promise<Array<z.entity.User>>} Promise that resolves with an array of user entities
+   */
   fetch_users_by_id(user_ids = []) {
     user_ids = user_ids.filter((user_id) => user_id);
 
@@ -403,7 +486,7 @@ z.user.UserRepository = class UserRepository {
       return Promise.resolve([]);
     }
 
-    function _get_users(user_id_chunk) {
+    const _get_users = (user_id_chunk) => {
       return this.user_service.get_users(user_id_chunk)
         .then((response) => {
           if (response) {
@@ -417,7 +500,7 @@ z.user.UserRepository = class UserRepository {
           }
           throw error;
         });
-    }
+    };
 
     const user_id_chunks = z.util.ArrayUtil.chunk(user_ids, z.config.MAXIMUM_USERS_PER_REQUEST);
     const get_users_promises = user_id_chunks.map((user_id_chunk) => _get_users(user_id_chunk));
@@ -434,6 +517,11 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Find a local user.
+   * @param {string} user_id - User ID
+   * @returns {Promise<z.entity.User>} Resolves with the matching user entity
+   */
   find_user_by_id(user_id) {
     for (const user_et of this.users()) {
       if (user_et.id === user_id) {
@@ -444,6 +532,10 @@ z.user.UserRepository = class UserRepository {
     return Promise.reject(new z.user.UserError(z.user.UserError.TYPE.USER_NOT_FOUND));
   }
 
+  /**
+   * Get self user from backend.
+   * @returns {Promise} Promise that will resolve with the self user entity
+   */
   get_me() {
     return this.user_service.get_own_user()
       .then((response) => {
@@ -456,6 +548,11 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Check for user locally and fetch it from the server otherwise.
+   * @param {string} user_id - User ID
+   * @returns {Promise<z.entity.User>} Promise that resolves with the matching user entity
+   */
   get_user_by_id(user_id) {
     return this.find_user_by_id(user_id)
       .catch((error) => {
@@ -472,6 +569,12 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Check for users locally and fetch them from the server otherwise.
+   * @param {Array<string>} user_ids - User IDs
+   * @param {boolean} offline - Should we only look for cached contacts
+   * @returns {Promise<Array<z.entity.User>>} Resolves with an array of users
+   */
   get_users_by_id(user_ids = [], offline = false) {
     if (!user_ids.length) {
       return Promise.resolve([]);
@@ -500,6 +603,12 @@ z.user.UserRepository = class UserRepository {
     });
   }
 
+  /**
+   * Search for user.
+   * @param {string} query - Find user using name or username
+   * @param {boolean} is_username - Query string is username
+   * @returns {Array<z.entity.User>} Matching users
+   */
   search_for_connected_users(query, is_username) {
     return this.users()
       .filter(function(user_et) {
@@ -516,6 +625,11 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Is the user the logged in user.
+   * @param {z.entity.User|string} user_id - User entity or user ID
+   * @returns {boolean} Is the user the logged in user
+   */
   is_me(user_id) {
     if (!_.isString(user_id)) {
       user_id = user_id.id;
@@ -523,6 +637,12 @@ z.user.UserRepository = class UserRepository {
     return this.self().id === user_id;
   }
 
+  /**
+   * Is the user the logged in user.
+   * @param {z.entity.User|string} user_et - User entity or user ID
+   * @param {boolean} is_me - True, if self user
+   * @returns {boolean} Is the user the logged in user
+   */
   save_user(user_et, is_me = false) {
     return this.find_user_by_id(user_et.id)
       .catch((error) => {
@@ -539,6 +659,11 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Save multiple users at once.
+   * @param {Array<z.entity.User>} user_ets - Array of user entities to be stored
+   * @returns {undefined} No return value
+   */
   save_users(user_ets) {
     const _user_exists = (user_et) => {
       return this.find_user_by_id(user_et.id)
@@ -560,6 +685,11 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Update a local user from the backend by ID.
+   * @param {string} user_id - User ID
+   * @returns {undefined} No return value
+   */
   update_user_by_id(user_id) {
     return this.find_user_by_id(user_id)
       .catch(function(error) {
@@ -576,6 +706,12 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Add user entities for suspended users.
+   * @param {Array<string>} user_ids - Requested user IDs
+   * @param {Array<z.entity.User>} user_ets - User entities returned by backend
+   * @returns {Array<z.entity.User>} User entities to be returned
+   */
   _add_suspended_users(user_ids, user_ets) {
     for (let i = 0; i < user_ids.length; i++) {
       const user_id = user_ids[i];
@@ -595,11 +731,21 @@ z.user.UserRepository = class UserRepository {
     return user_ets;
   }
 
+  /**
+   * Change the accent color.
+   * @param {number} accent_id - New accent color
+   * @returns {undefined} No return value
+   */
   change_accent_color(accent_id) {
     return this.user_service.update_own_user_profile({accent_id})
       .then(() => this.self().accent_id(accent_id));
   }
 
+  /**
+   * Change name.
+   * @param {string} name - New name
+   * @returns {undefined} No return value
+   */
   change_name(name) {
     if (name.length >= z.config.MINIMUM_USERNAME_LENGTH) {
       return this.user_service.update_own_user_profile({name})
@@ -607,10 +753,18 @@ z.user.UserRepository = class UserRepository {
     }
   }
 
+  /**
+   * Whether the user needs to set a username.
+   * @returns {boolean} True, if username should be changed.
+   */
   should_change_username() {
     return this.should_set_username;
   }
 
+  /**
+   * Tries to generate a username suggestion.
+   * @returns {undefined} No return value
+   */
   get_username_suggestion() {
     let suggestions = null;
 
@@ -623,7 +777,7 @@ z.user.UserRepository = class UserRepository {
         this.should_set_username = true;
         this.self().username(valid_suggestions[0]);
 
-        return amplify.publish(z.event.WebApp.ANALYTICS.EVENT,
+        amplify.publish(z.event.WebApp.ANALYTICS.EVENT,
           z.tracking.EventName.ONBOARDING.GENERATED_USERNAME, {
             num_of_attempts: 1,
             outcome: 'success',
@@ -645,6 +799,11 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Change username.
+   * @param {string} username - New username
+   * @returns {undefined} No return value
+   */
   change_username(username) {
     return this.user_service.change_own_username(username)
       .then(() => {
@@ -659,10 +818,20 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Verify usernames against the backend.
+   * @param {Array} usernames - Username suggestions
+   * @returns {Promise<string>} A list with usernames that are not taken.
+   */
   verify_usernames(usernames) {
     return this.user_service.check_usernames(usernames);
   }
 
+  /**
+   * Verify a username against the backend.
+   * @param {Array} username - New user name
+   * @returns {string} Username which is not taken.
+   */
   verify_username(username) {
     return this.user_service.check_username(username)
       .catch(function(error) {
@@ -682,11 +851,23 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Change the profile image.
+   * @param {string|Object} picture - New user picture
+   * @returns {undefined} No return value
+   */
   change_picture(picture) {
     this._set_picture_v2(picture, false);
     return this._set_picture_v3(picture);
   }
 
+  /**
+   * Set the profile image using v2 API.
+   * @deprecated
+   * @param {string|Object} picture - New user picture
+   * @param {boolean} update - update user entity
+   * @returns {undefined} No return value
+   */
   _set_picture_v2(picture, update = true) {
     return this.asset_service.upload_profile_image(this.self().id, picture)
       .then((upload_response) => {
@@ -702,6 +883,12 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Set the profile image using v3 API.
+   * @deprecated
+   * @param {string|Object} picture - New user picture
+   * @returns {undefined} No return value
+   */
   _set_picture_v3(picture) {
     return this.asset_service.upload_profile_image_v3(picture)
       .then(([small_key, medium_key]) => {
@@ -719,6 +906,10 @@ z.user.UserRepository = class UserRepository {
       });
   }
 
+  /**
+   * Set users default profile image.
+   * @returns {undefined} No return value
+   */
   set_default_picture() {
     return z.util.load_url_blob(z.config.UNSPLASH_URL)
       .then((blob) => {
