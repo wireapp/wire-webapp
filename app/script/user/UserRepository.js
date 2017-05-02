@@ -72,7 +72,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Accept a connection request.
    * @param {z.entity.User} user_et - User to update connection with
-   * @param {boolean} show_conversation - Show new conversation on success
+   * @param {boolean} [show_conversation=false] - Show new conversation on success
    * @returns {Promise} Promise that resolves when the connection request was accepted
    */
   accept_connection_request(user_et, show_conversation = false) {
@@ -106,7 +106,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Create a connection request.
    * @param {z.entity.User} user_et - User to connect to
-   * @param {boolean} show_conversation - Should we open the new conversation
+   * @param {boolean} [show_conversation=false] - Should we open the new conversation
    * @returns {Promise} Promise that resolves when the connection request was successfully created
    */
   create_connection(user_et, show_conversation = false) {
@@ -115,7 +115,7 @@ z.user.UserRepository = class UserRepository {
         return this.user_connection(response, show_conversation);
       })
       .catch((error) => {
-        return this.logger.error(`Failed to send connection request to user '${user_et.id}': ${error.message}`, error);
+        this.logger.error(`Failed to send connection request to user '${user_et.id}': ${error.message}`, error);
       });
   }
 
@@ -148,20 +148,20 @@ z.user.UserRepository = class UserRepository {
   /**
    * Create a new conversation.
    * @note Initially called by Wire for Web's app start to retrieve user entities and their connections.
-   * @param {number} limit - Query limit for user connections
+   * @param {number} limit=500 - Query limit for user connections
    * @param {string} user_id - User ID of the latest connection
    * @param {Array<z.entity.Connection>} connection_ets - Unordered array of user connections
    * @returns {Promise} Promise that resolves when all connections have been retrieved and mapped
    */
   get_connections(limit = 500, user_id, connection_ets = []) {
     return this.user_service.get_own_connections(limit, user_id)
-      .then((response) => {
-        if (response.connections.length) {
-          const new_connection_ets = this.connection_mapper.map_user_connections_from_json(response.connections);
+      .then(({connections, has_more}) => {
+        if (connections.length) {
+          const new_connection_ets = this.connection_mapper.map_user_connections_from_json(connections);
           connection_ets = connection_ets.concat(new_connection_ets);
         }
 
-        if (response.has_more) {
+        if (has_more) {
           const last_connection_et = connection_ets[connection_ets.length - 1];
           return this.get_connections(limit, last_connection_et.to, connection_ets);
         }
@@ -193,7 +193,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Unblock a user.
    * @param {z.entity.User} user_et - User to unblock
-   * @param {boolean} show_conversation - Show new conversation on success
+   * @param {boolean} [show_conversation=false] - Show new conversation on success
    * @returns {Promise} Promise that resolves when a user was unblocked
    */
   unblock_user(user_et, show_conversation = true) {
@@ -279,7 +279,7 @@ z.user.UserRepository = class UserRepository {
    * @private
    * @param {z.entity.User} user_et - User to update connection with
    * @param {string} status - Connection status
-   * @param {boolean} show_conversation - Show conversation on success
+   * @param {boolean} [show_conversation=false] - Show conversation on success
    * @returns {Promise} Promise that resolves when the connection status was updated
    */
   _update_connection_status(user_et, status, show_conversation = false) {
