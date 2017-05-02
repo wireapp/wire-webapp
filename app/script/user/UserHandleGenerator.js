@@ -35,7 +35,7 @@ window.z.user = z.user || {};
   /**
    * Creates variations of the given handle by appending random digits.
    * @param {string} handle - Input
-   * @param {number} number_of_variations - Number of variants that should be generated
+   * @param {number} [number_of_variations=5] - Number of variants that should be generated
    * @returns {Array<string>} Handle variations
    */
   function generate_handle_variations(handle, number_of_variations = 5) {
@@ -51,12 +51,7 @@ window.z.user = z.user || {};
    * @returns {string} String appended with random digits.
    */
   function append_random_digits(handle, additional_numbers) {
-    const random_digits = [];
-
-    for (let index = 0; index < additional_numbers; index++) {
-      random_digits.push(z.util.get_random_int(1, 9));
-    }
-
+    const random_digits = _.range(additional_numbers).map(() => z.util.get_random_int(1, 9));
     return `${handle}${random_digits.join('')}`;
   }
 

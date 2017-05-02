@@ -50,14 +50,12 @@ z.user.UserRepository = class UserRepository {
 
     this.connect_requests = ko.pureComputed(() => {
       return this.users()
-        .filter((user_et) => user_et.connection().status() === z.user.ConnectionStatus.PENDING)
-        .map((user_et) => user_et);
+        .filter((user_et) => user_et.connection().status() === z.user.ConnectionStatus.PENDING);
     }).extend({rateLimit: 50});
 
     this.connected_users = ko.pureComputed(() => {
       return this.users()
-        .filter((user_et) => user_et.connection().status() === z.user.ConnectionStatus.ACCEPTED)
-        .map((user_et) => user_et);
+        .filter((user_et) => user_et.connection().status() === z.user.ConnectionStatus.ACCEPTED);
     }).extend({rateLimit: 1000});
 
     this.connected_users.subscribe((user_ets) => {
