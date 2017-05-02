@@ -27,7 +27,6 @@
 /test/js/*
 /Web.config
 aws-keys.json
-Gruntfile.js
 npm-debug.log
 
 # Automatically created files
