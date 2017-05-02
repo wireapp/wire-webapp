@@ -33,20 +33,21 @@ z.util.PromiseQueue = class PromiseQueue {
    * Construct a new Promise Queue.
    *
    * @param {Object} [options={}] - Initialization options
-   * @param {number} options.timeout - Timeout in ms
+   * @param {string} options.name - Name for Promise queue
    * @param {boolean} options.paused - Initial paused state
+   * @param {number} options.timeout - Timeout in ms
    * @returns {PromiseQueue} Process Promises sequentially
    */
   constructor(options = {}) {
-    const {timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL, paused = false} = options;
+    const {name, paused = false, timeout = PromiseQueue.CONFIG.UNBLOCK_INTERVAL} = options;
 
-    this.logger = new z.util.Logger('z.util.PromiseQueue', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger((name ? `z.util.PromiseQueue (${name})` : 'z.util.PromiseQueue'), z.config.LOGGER.OPTIONS);
 
     this._blocked = false;
     this._interval = undefined;
     this._paused = paused;
-    this._timeout = timeout;
     this._queue = [];
+    this._timeout = timeout;
     return this;
   }
 
