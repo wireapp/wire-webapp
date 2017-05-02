@@ -65,8 +65,8 @@ class z.conversation.ConversationRepository
     @sorted_conversations = ko.pureComputed =>
       @filtered_conversations().sort z.util.sort_groups_by_last_event
 
-    @receiving_queue = new z.util.PromiseQueue()
-    @sending_queue = new z.util.PromiseQueue paused: true
+    @receiving_queue = new z.util.PromiseQueue name: 'ConversationRepository.Receiving'
+    @sending_queue = new z.util.PromiseQueue name: 'ConversationRepository.Sending', paused: true
 
     # @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
     @conversation_service.client.request_queue_blocked_state.subscribe (state) =>
@@ -393,7 +393,7 @@ class z.conversation.ConversationRepository
   @return [z.entity.Conversation] Next conversation
   ###
   get_next_conversation: (conversation_et) ->
-    return z.util.ArrayUtil.get_next_item(@conversations_unarchived(), conversation_et) or @conversations_unarchived()[0]
+    return z.util.ArrayUtil.get_next_item @conversations_unarchived(), conversation_et
 
   ###
   Get unarchived conversation with the most recent event.
