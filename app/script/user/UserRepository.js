@@ -446,10 +446,10 @@ z.user.UserRepository = class UserRepository {
   delete_me() {
     return this.user_service.delete_self()
       .then(() => {
-        return this.logger.info('Account deletion initiated');
+        this.logger.info('Account deletion initiated');
       })
       .catch((error) => {
-        return this.logger.error(`Unable to delete self: ${error}`);
+        this.logger.error(`Unable to delete self: ${error}`);
       });
   }
 
@@ -873,7 +873,7 @@ z.user.UserRepository = class UserRepository {
           });
       })
       .catch((error) => {
-        return this.logger.warn(`Error during profile image upload: ${error.message}`);
+        this.logger.warn(`Error during profile image upload: ${error.message}`);
       });
   }
 
