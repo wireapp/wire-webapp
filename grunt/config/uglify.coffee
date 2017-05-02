@@ -29,6 +29,7 @@ module.exports =
       'deploy/min/wire-component.min.js': '<%= scripts.component %>'
       'deploy/min/wire-vendor.min.js': '<%= scripts.vendor %>'
     options:
+      banner: '/*! <%= pkg.name %> - <%= grunt.option("version") %> */'
       preserveComments: false
       screwIE8: true
       sourceMap: true
