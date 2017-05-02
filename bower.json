@@ -125,7 +125,7 @@
       "js": "speakingurl.min.js"
     },
     "linkifyjs": {
-      "js": "linkify{-html,}.js"
+      "js/": "linkify{-html,}.min.js"
     },
     "uint32": {
       "js": "uint32.js"

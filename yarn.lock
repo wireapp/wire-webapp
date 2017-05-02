@@ -1903,14 +1903,14 @@ grunt-contrib-less@1.4.1:
     less "~2.7.1"
     lodash "^4.8.2"
 
-grunt-contrib-uglify@wireapp/grunt-contrib-uglify#46f176e1a59b40f54a2e98b71ae49ac6cbe64483:
-  version "2.2.0"
-  resolved "https://codeload.github.com/wireapp/grunt-contrib-uglify/tar.gz/46f176e1a59b40f54a2e98b71ae49ac6cbe64483"
+grunt-contrib-uglify@wireapp/grunt-contrib-uglify#be6e6f0fd28aa0e20e7f22a70bf52f1176b0441b:
+  version "2.3.0"
+  resolved "https://codeload.github.com/wireapp/grunt-contrib-uglify/tar.gz/be6e6f0fd28aa0e20e7f22a70bf52f1176b0441b"
   dependencies:
     chalk "^1.0.0"
     maxmin "^1.1.0"
     object.assign "^4.0.4"
-    uglify-js mishoo/UglifyJS2#harmony-v2.8.21
+    uglify-js mishoo/UglifyJS2#harmony-v2.8.22
     uri-path "^1.0.0"
 
 grunt-contrib-watch@1.0.0:
@@ -4008,9 +4008,9 @@ signal-exit@^3.0.0:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
 
-sinon@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/sinon/-/sinon-2.1.0.tgz#e057a9d2bf1b32f5d6dd62628ca9ee3961b0cafb"
+sinon@2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/sinon/-/sinon-2.2.0.tgz#3b1b42ff5defcbf51a52a62aca6d61171b9fd262"
   dependencies:
     diff "^3.1.0"
     formatio "1.2.0"
@@ -4536,9 +4536,9 @@ uglify-js@^2.6:
   optionalDependencies:
     uglify-to-browserify "~1.0.0"
 
-uglify-js@mishoo/UglifyJS2#harmony-v2.8.21:
-  version "2.8.21"
-  resolved "https://codeload.github.com/mishoo/UglifyJS2/tar.gz/35bae3fcd061cf736878b1005df62de15b727224"
+uglify-js@mishoo/UglifyJS2#harmony-v2.8.22:
+  version "2.8.22"
+  resolved "https://codeload.github.com/mishoo/UglifyJS2/tar.gz/278577f3cb75e72320564805ee91be63e5f9c806"
   dependencies:
     source-map "~0.5.1"
     yargs "~3.10.0"
