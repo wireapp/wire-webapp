@@ -117,7 +117,7 @@ z.telemetry.calling.CallTelemetry = class CallTelemetry {
   set_remote_version(remote_version) {
     if (this.remote_version !== remote_version) {
       this.remote_version = remote_version;
-      return this.logger.info(`Identified remote call version as '${remote_version}'`);
+      this.logger.info(`Identified remote call version as '${remote_version}'`);
     }
   }
 

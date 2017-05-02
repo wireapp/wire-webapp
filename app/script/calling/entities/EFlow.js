@@ -288,8 +288,14 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   initialize_e_flow(e_call_message_et) {
-    if (e_call_message_et && e_call_message_et.sdp) {
-      return this.save_remote_sdp(e_call_message_et);
+    if (e_call_message_et) {
+      const {client_id, sdp: rtc_sdp} = e_call_message_et;
+
+      this.set_remote_client_id(client_id);
+
+      if (rtc_sdp) {
+        return this.save_remote_sdp(e_call_message_et);
+      }
     }
 
     this.is_answer(false);
@@ -319,7 +325,20 @@ z.calling.entities.EFlow = class EFlow {
   }
 
   /**
+   * Set the remote client ID.
+   * @param {string} client_id - Remote client ID
+   * @returns {Undefined} No return value
+   */
+  set_remote_client_id(client_id) {
+    if (!this.remote_client_id) {
+      this.remote_client_id = client_id;
+      this.logger.info(`Identified remote client as '${client_id}'`);
+    }
+  }
+
+  /**
    * Start the peer connection negotiation.
+   *
    * @param {z.calling.enum.SDP_NEGOTIATION_MODE} [negotiation_mode=z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT] - Mode for renegotiation
    * @param {MediaStream} [media_stream=this.media_stream()] - Local media stream
    * @returns {undefined} No return value
@@ -339,6 +358,7 @@ z.calling.entities.EFlow = class EFlow {
 
   /**
    * Remove the participant from the call
+   *
    * @private
    * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Reason for termination
    * @returns {undefined} No return value
@@ -446,9 +466,9 @@ z.calling.entities.EFlow = class EFlow {
         video_tracks: media_stream.getVideoTracks(),
       });
 
-    media_stream = z.media.MediaStreamHandler.detect_media_stream_type(event.stream);
+    media_stream = z.media.MediaStreamHandler.detect_media_stream_type(media_stream);
     if (media_stream.type === z.media.MediaType.AUDIO) {
-      media_stream = this.audio.wrap_audio_output_stream(event.stream);
+      media_stream = this.audio.wrap_audio_output_stream(media_stream);
     }
 
     const media_stream_info = new z.media.MediaStreamInfo(z.media.MediaStreamSource.REMOTE, this.remote_user.id, media_stream, this.e_call_et);
@@ -682,9 +702,7 @@ z.calling.entities.EFlow = class EFlow {
         return z.calling.mapper.SDPMapper.rewrite_sdp(rtc_sdp, z.calling.enum.SDP_SOURCE.REMOTE, this);
       })
       .then(({sdp: remote_sdp}) => {
-        const {client_id, type} = e_call_message_et;
-
-        this.remote_client_id = client_id;
+        const {type} = e_call_message_et;
 
         if (remote_sdp.type === z.calling.rtc.SDP_TYPE.OFFER) {
           switch (this.signaling_state()) {
@@ -788,15 +806,6 @@ z.calling.entities.EFlow = class EFlow {
     }
   }
 
-  /**
-   * Clear the timeouts.
-   * @private
-   * @returns {undefined} No return value
-   */
-  _clear_timeouts() {
-    this._clear_negotiation_timeout();
-    this._clear_send_sdp_timeout();
-  }
 
   /**
    * Check for relay candidate among given ICE candidates
@@ -1293,11 +1302,20 @@ z.calling.entities.EFlow = class EFlow {
   //##############################################################################
 
   /**
+   * Clear the timeouts.
+   * @returns {undefined} No return value
+   */
+  clear_timeouts() {
+    this._clear_negotiation_timeout();
+    this._clear_send_sdp_timeout();
+  }
+
+  /**
    * Reset the flow.
    * @returns {undefined} No return value
     */
   reset_flow() {
-    this._clear_timeouts();
+    this.clear_timeouts();
     this.telemetry.reset_statistics();
 
     this.logger.debug(`Resetting flow with user '${this.remote_user.id}'`);

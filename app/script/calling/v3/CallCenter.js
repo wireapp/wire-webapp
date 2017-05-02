@@ -132,27 +132,37 @@ z.calling.v3.CallCenter = class CallCenter {
     .then(() => {
       switch (type) {
         case z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL:
-          return this._on_cancel(e_call_message_et);
+          this._on_cancel(e_call_message_et);
+          break;
         case z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_CHECK:
-          return this._on_group_check(e_call_message_et);
+          this._on_group_check(e_call_message_et);
+          break;
         case z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_LEAVE:
-          return this._on_group_leave(e_call_message_et);
+          this._on_group_leave(e_call_message_et);
+          break;
         case z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP:
-          return this._on_group_setup(e_call_message_et);
+          this._on_group_setup(e_call_message_et);
+          break;
         case z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START:
-          return this._on_group_start(e_call_message_et);
+          this._on_group_start(e_call_message_et);
+          break;
         case z.calling.enum.E_CALL_MESSAGE_TYPE.HANGUP:
-          return this._on_hangup(e_call_message_et);
+          this._on_hangup(e_call_message_et);
+          break;
         case z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC:
-          return this._on_prop_sync(e_call_message_et);
+          this._on_prop_sync(e_call_message_et);
+          break;
         case z.calling.enum.E_CALL_MESSAGE_TYPE.REJECT:
-          return this._on_reject(e_call_message_et);
+          this._on_reject(e_call_message_et);
+          break;
         case z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP:
-          return this._on_setup(e_call_message_et);
+          this._on_setup(e_call_message_et);
+          break;
         case z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE:
-          return this._on_update(e_call_message_et);
+          this._on_update(e_call_message_et);
+          break;
         default:
-          return this.logger.warn(`E-call event of unknown type '${type}' was ignored`, e_call_message_et);
+          this.logger.warn(`E-call event of unknown type '${type}' was ignored`, e_call_message_et);
       }
     });
   }
@@ -464,7 +474,7 @@ z.calling.v3.CallCenter = class CallCenter {
 
         this.user_repository.get_user_by_id(user_id)
           .then((remote_user_et) => {
-            e_call_et.add_e_participant(remote_user_et, e_call_message_et);
+            e_call_et.add_e_participant(remote_user_et, e_call_message_et, true);
           });
       })
       .catch((error) => {
@@ -528,7 +538,6 @@ z.calling.v3.CallCenter = class CallCenter {
           }
         } else if (conversation_et.is_group()) {
           const one2one_message_types = [
-            z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL,
             z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP,
           ];
 
@@ -638,7 +647,7 @@ z.calling.v3.CallCenter = class CallCenter {
       throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.WRONG_PAYLOAD_FORMAT);
     }
 
-    const {conversation_id, type} = e_call_message_et;
+    const {conversation_id, remote_user_id, type} = e_call_message_et;
 
     return this.get_e_call_by_id(conversation_id || conversation_et.id)
       .then((e_call_et) => {
@@ -648,9 +657,11 @@ z.calling.v3.CallCenter = class CallCenter {
         ];
 
         if (data_channel_message_types.includes(type)) {
-          return e_call_et.get_flows().forEach((e_flow_et) => {
-            e_flow_et.send_message(e_call_message_et);
-          });
+          return e_call_et.get_e_participant_by_id(remote_user_id)
+            .then((e_participant_et) => {
+              const {e_flow_et} = e_participant_et;
+              e_flow_et.send_message(e_call_message_et);
+            });
         }
         throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.NO_DATA_CHANNEL);
       })
@@ -1118,7 +1129,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {z.media.MediaType} MediaType of e-call
    */
   _get_media_type_from_properties(properties) {
-    if (properties && properties.videosend === 'true') {
+    if (properties && properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE) {
       return z.media.MediaType.VIDEO;
     }
 

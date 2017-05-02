@@ -43,13 +43,14 @@ z.calling.entities.ECall = class ECall {
    * @param {z.calling.v3.CallCenter} v3_call_center - V3 call center
    */
   constructor(conversation_et, creating_user, session_id, v3_call_center) {
-    const {id: conversation_id, is_group} = conversation_et;
-    const {calling_config, media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.v3_call_center;
-
     this.conversation_et = conversation_et;
     this.creating_user = creating_user;
     this.session_id = session_id;
     this.v3_call_center = v3_call_center;
+
+    const {id: conversation_id, is_group} = conversation_et;
+    const {calling_config, media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.v3_call_center;
+
     this.logger = new z.util.Logger(`z.calling.entities.ECall (${conversation_id})`, z.config.LOGGER.OPTIONS);
 
     // IDs and references
@@ -273,6 +274,8 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   leave_call(termination_reason) {
+    this._clear_timeouts();
+
     if (this.state() === z.calling.enum.CALL_STATE.ONGOING && !this.is_group()) {
       this.state(z.calling.enum.CALL_STATE.DISCONNECTING);
     }
@@ -286,10 +289,7 @@ z.calling.entities.ECall = class ECall {
 
     const event_promises = this.get_flows()
       .map(({remote_client_id, remote_user_id}) => {
-        const additional_payload = this.v3_call_center.create_additional_payload(this.id, remote_user_id, remote_client_id);
-
-        e_call_message_et.add_properties(additional_payload);
-
+        e_call_message_et.add_properties(this.v3_call_center.create_additional_payload(this.id, remote_user_id, remote_client_id));
         return this.send_e_call_event(e_call_message_et);
       });
 
@@ -382,6 +382,17 @@ z.calling.entities.ECall = class ECall {
       window.clearTimeout(this.check_group_check_timeout);
       this.check_group_check_timeout = undefined;
     }
+  }
+
+  /**
+   * Clear all timeouts.
+   * @private
+   * @returns {undefined} No return value
+   */
+  _clear_timeouts() {
+    this.get_flows().map((e_flow_et) => e_flow_et.clear_timeouts());
+    this._clear_group_check_timeout();
+    this._clear_state_timeout();
   }
 
   /**
@@ -679,6 +690,7 @@ z.calling.entities.ECall = class ECall {
         if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
+        return this;
       });
   }
 
