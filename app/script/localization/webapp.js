@@ -310,6 +310,19 @@ z.string.conversations_popover_notify = 'Unmute';
 z.string.conversations_popover_silence = 'Mute';
 z.string.conversations_popover_unarchive = 'Unarchive';
 
+// Conversations secondary line
+z.string.conversations_secondary_line_missed_call = '%n missed call';
+z.string.conversations_secondary_line_missed_calls = '%n missed calls';
+z.string.conversations_secondary_line_new_message = '%n new message';
+z.string.conversations_secondary_line_new_messages = '%n new messages';
+z.string.conversations_secondary_line_ping = '%n ping';
+z.string.conversations_secondary_line_pings = '%n pings';
+z.string.conversations_secondary_line_person_left = '%n person left';
+z.string.conversations_secondary_line_people_left = '%n people left';
+z.string.conversations_secondary_line_person_added = '%user1 added %user2';
+z.string.conversations_secondary_line_people_added = '%user people were added';
+z.string.conversations_secondary_line_timed_message = 'Timed message';
+
 // Takeover
 z.string.takeover_headline = 'Usernames are here.';
 z.string.takeover_sub = 'Claim your unique name on Wire.';
@@ -566,8 +579,6 @@ z.string.system_notification_shared_location = 'Shared a location';
 z.string.system_notification_shared_video = 'Shared a video';
 z.string.system_notification_voice_channel_activate = 'Calling';
 z.string.system_notification_voice_channel_deactivate = 'Called';
-z.string.system_notification_missed_call = 'Missed call';
-z.string.system_notification_timed_message = 'Timed message';
 
 // Tooltips
 z.string.tooltip_conversation_all_verified = 'All fingerprints are verified';
