@@ -50,6 +50,7 @@ rules:
   eol-last: 2
   func-call-spacing: 2
   handle-callback-err: 2
+  id-length: [2, {exceptions: ['z']}]
   indent: [2, 2, {SwitchCase: 1}]
   jsdoc/require-hyphen-before-param-description: 2
   key-spacing: 2

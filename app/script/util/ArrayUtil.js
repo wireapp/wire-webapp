@@ -60,8 +60,8 @@ z.util.ArrayUtil = {
       return undefined;
     }
 
-    for (let i = next_index; i <= array.length; i++) {
-      const current_item = array[i];
+    for (let idx = next_index; idx <= array.length; idx++) {
+      const current_item = array[idx];
       if ((typeof filter !== 'function') || !!filter(current_item)) {
         return current_item;
       }
@@ -81,12 +81,12 @@ z.util.ArrayUtil = {
     new_array[0] = array[0];
     new_array[length - 1] = array[array.length - 1];
 
-    for (let i = 1; i < length - 1; i++) {
-      const original_index = i * scale_factor;
+    for (let index = 1; index < length - 1; index++) {
+      const original_index = index * scale_factor;
       const before = Math.floor(original_index).toFixed();
       const after = Math.ceil(original_index).toFixed();
       const point = original_index - before;
-      new_array[i] = array[before] + ((array[after] - array[before]) * point); // linear interpolation
+      new_array[index] = array[before] + ((array[after] - array[before]) * point); // linear interpolation
     }
 
     return new_array;
