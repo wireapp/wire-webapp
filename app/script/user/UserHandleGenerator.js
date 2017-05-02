@@ -39,9 +39,9 @@ window.z.user = z.user || {};
    * @returns {Array<string>} Handle variations
    */
   function generate_handle_variations(handle, number_of_variations = 5) {
-    return new Array(number_of_variations).map(function(value, i) {
-      i += 1;
-      return append_random_digits(handle.slice(0, MAX_HANDLE_LENGTH - i), i);
+    return new Array(number_of_variations).map(function(value, index) {
+      index += 1;
+      return append_random_digits(handle.slice(0, MAX_HANDLE_LENGTH - index), index);
     });
   }
 
@@ -54,7 +54,7 @@ window.z.user = z.user || {};
   function append_random_digits(handle, additional_numbers) {
     const random_digits = [];
 
-    for (let i = 0; i < additional_numbers; i++) {
+    for (let index = 0; index < additional_numbers; index++) {
       random_digits.push(z.util.get_random_int(1, 9));
     }
 
