@@ -45,7 +45,6 @@ z.user.UserError = class UserError extends Error {
         break;
       default:
         this.message = 'Unknown UserError';
-        break;
     }
   }
 

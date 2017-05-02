@@ -20,7 +20,18 @@
 
 describe 'UserHandleGenerator', ->
 
+  describe 'generate_handle_variations', ->
+
+    it 'generates handle variations', ->
+      handle = 'superman'
+      number_of_variations = 10
+      variations = z.user.UserHandleGenerator.generate_handle_variations handle, number_of_variations
+      expect(variations.length).toBe number_of_variations
+      variations.forEach (variation) ->
+        expect(variation).not.toBe handle
+
   describe 'normalize_name', ->
+
     it 'should normalize user names', ->
       expect(z.user.UserHandleGenerator.normalize_name('Maria LaRochelle')).toBe 'marialarochelle'
       expect(z.user.UserHandleGenerator.normalize_name("Mêrié \"LaRöche'lle\"")).toBe 'merielaroechelle'
@@ -74,7 +85,6 @@ describe 'UserHandleGenerator', ->
       username = 'memphis'
       suggestions = z.user.UserHandleGenerator.create_suggestions username
       expect(suggestions.length).toBe 12
-
-      suggestions.splice suggestions.indexOf(username), 1
+      expect(suggestions.shift()).toBe username
       suggestions.forEach (suggestion) ->
         expect(suggestion).not.toBe username

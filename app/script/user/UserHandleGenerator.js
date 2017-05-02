@@ -39,9 +39,8 @@ window.z.user = z.user || {};
    * @returns {Array<string>} Handle variations
    */
   function generate_handle_variations(handle, number_of_variations = 5) {
-    return new Array(number_of_variations).map(function(value, index) {
-      index += 1;
-      return append_random_digits(handle.slice(0, MAX_HANDLE_LENGTH - index), index);
+    return _.range(1, number_of_variations + 1).map(function(value) {
+      return append_random_digits(handle.slice(0, MAX_HANDLE_LENGTH - value), value);
     });
   }
 
