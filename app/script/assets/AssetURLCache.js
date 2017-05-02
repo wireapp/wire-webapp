@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.assets = z.assets || {};
 
 z.assets.AssetURLCache = (function() {
-  const lru_cache = new LRUCache(100);
+  const cache = new LRUCache(100);
 
   const set_url = function(identifier, url) {
     const existing_url = get_url(identifier);
@@ -33,7 +33,7 @@ z.assets.AssetURLCache = (function() {
       return existing_url;
     }
 
-    const outdated_url = lru_cache.set(identifier, url);
+    const outdated_url = cache.set(identifier, url);
 
     if (outdated_url != null) {
       window.URL.revokeObjectURL(outdated_url);
@@ -42,7 +42,7 @@ z.assets.AssetURLCache = (function() {
     return url;
   };
 
-  const get_url = (identifier) => lru_cache.get(identifier);
+  const get_url = (identifier) => cache.get(identifier);
 
   return {
     get_url,
