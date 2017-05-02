@@ -483,7 +483,7 @@ z.event.EventRepository = class EventRepository {
           // Get error information
           const error_code = decryption_error.code || EventRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
           const {data: event_data, from: remote_user_id} = event;
-          const {sender: remote_client_id} = event_data.sender;
+          const remote_client_id = event_data.sender;
           const session_id = this.cryptography_repository._construct_session_id(remote_user_id, remote_client_id);
 
           // Handle error
