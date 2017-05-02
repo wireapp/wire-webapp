@@ -104,7 +104,7 @@ def update_headers(response):
     "img-src 'self' blob: data: https://*.giphy.com https://1-ps.googleusercontent.com https://*.localytics.com https://*.wire.com https://*.cloudfront.net https://*.zinfra.io https://csi.gstatic.com",
     # Note: The "blob:" attribute needs to be explicitly set for Chrome 47+: https://code.google.com/p/chromium/issues/detail?id=473904
     "media-src blob: data: *",
-    "object-src 'self' https://*.youtube.com 1-ps.googleusercontent.com",
+    "object-src 'self' https://*.youtube.com https://1-ps.googleusercontent.com",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.localytics.com https://api.raygun.io https://*.wire.com https://*.zinfra.io",
     "style-src 'self' 'unsafe-inline' https://*.wire.com https://*.googleusercontent.com"
   ])
