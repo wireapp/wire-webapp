@@ -875,19 +875,19 @@ class z.conversation.ConversationRepository
   send_asset_remotedata: (conversation_et, file, nonce) =>
     generic_message = null
     @get_message_in_conversation_by_id conversation_et, nonce
-      .then (message_et) =>
+    .then (message_et) =>
       asset_et = message_et.get_first_asset()
       asset_et.uploaded_on_this_client true
       @asset_service.upload_asset file, null, (xhr) ->
         xhr.upload.onprogress = (event) -> asset_et.upload_progress Math.round(event.loaded / event.total * 100)
         asset_et.upload_cancel = -> xhr.abort()
-      .then (asset) =>
+    .then (asset) =>
       generic_message = new z.proto.GenericMessage nonce
       generic_message.set 'asset', asset
       if conversation_et.ephemeral_timer()
         generic_message = @_wrap_in_ephemeral_message generic_message, conversation_et.ephemeral_timer()
       @send_generic_message_to_conversation conversation_et.id, generic_message
-      .then =>
+    .then =>
       event = @_construct_otr_event conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD
       asset = if conversation_et.ephemeral_timer() then generic_message.ephemeral.asset else generic_message.asset
 
