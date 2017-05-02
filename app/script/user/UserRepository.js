@@ -464,7 +464,6 @@ z.user.UserRepository = class UserRepository {
         if (user_ets) {
           return user_ets[0];
         }
-        return undefined;
       });
   }
 
@@ -707,8 +706,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {Array<z.entity.User>} User entities to be returned
    */
   _add_suspended_users(user_ids, user_ets) {
-    for (let i = 0; i < user_ids.length; i++) {
-      const user_id = user_ids[i];
+    for (const user_id of user_ids) {
       const matching_user_ids = user_ets.find(function(user_et) {
         if (user_et.id === user_id) {
           return true;
