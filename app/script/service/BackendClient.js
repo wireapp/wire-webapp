@@ -229,16 +229,7 @@ z.service.BackendClient = class BackendClient {
    */
   _push_to_request_queue(config, reason) {
     this.logger.info(`Adding '${config.type}' request to '${config.url}' to queue due to '${reason}'`, config);
-
-    return this.request_queue.push(() => {
-      this.logger.info(`Queued '${config.type}' request to '${config.url}' executed`);
-
-      this._send_request(config)
-        .catch((error) => {
-          this.logger.info(`Failed to execute queued '${config.type}' request to '${config.url}'`, error);
-          throw error;
-        });
-    });
+    return this.request_queue.push(() => this._send_request(config));
   }
 
   /**
