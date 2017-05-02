@@ -29,19 +29,7 @@ class z.ViewModel.MainViewModel
       if @user()?
         main_css_classes = "main-accent-color-#{@user().accent_id()}"  # deprecated - still used on input control hover
         main_css_classes += " #{@user().accent_theme()}"
+        main_css_classes += " show"
         return main_css_classes
 
     ko.applyBindings @, document.getElementById element_id
-
-    amplify.subscribe z.event.WebApp.APP.HIDE, @_hide_app
-    amplify.subscribe z.event.WebApp.APP.FADE_IN, @_fade_in_app
-
-  _hide_app: ->
-    $('#left, #right').css
-      opacity: 0
-      'pointer-events': 'none'
-
-  _fade_in_app: ->
-    $('#left, #right').css
-      opacity: 1
-      'pointer-events': ''

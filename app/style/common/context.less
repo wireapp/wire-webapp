@@ -18,32 +18,33 @@
  */
 
 
-#background {
-  .full-screen;
-  background-color: fade(#000, 88%);
+.ctx-menu {
+  min-width: 160px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 1px 0 fade(#000, 8%), 0 8px 24px 0 fade(#000, 16%);
+  display: block;
+  font-size: 12px;
+  font-weight: @font-weight-regular;
+  line-height: @line-height-xl;
+  position: fixed;
+  z-index: @z-index-level-7;
 }
 
-.background,
-.background-image,
-.background-darken {
-  .full-screen;
-  overflow: hidden;
-}
+.ctx-menu-item {
+  cursor: pointer;
+  padding-left: 24px;
 
-.background {
-  transition-property: opacity;
-  transition-duration: @animation-timing-slow;
-  transition-timing-function: @ease-out-quart;
-  background-color: fade(#000, 88%);
-}
+  &:first-child {
+    border-radius: 4px 4px 0 0;
+  }
 
-.background-image {
-  background-size: cover;
-  background-position: center;
-  filter: blur(32px) saturate(200%);
-  transform: scale(1.4);
-}
+  &:last-child {
+    border-radius: 0 0 4px 4px;
+  }
 
-.background-darken {
-  background-color: fade(#000, 64%);
+  &:hover,
+  &.selected {
+    background-color: fade(@graphite, 16%);
+  }
 }
