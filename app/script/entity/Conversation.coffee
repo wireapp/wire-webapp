@@ -131,7 +131,6 @@ class z.entity.Conversation
         unread_event.push message_et
       return unread_event
 
-    # TODO: check what is needed
     @unread_event_count = ko.pureComputed =>
       return @unread_events().length
 
