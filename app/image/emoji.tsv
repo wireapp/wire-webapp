@@ -1,6 +1,7 @@
 0x1f600	grinning
 0x1f601	grin
 0x1f602	joy
+0x1f642	simple smile
 0x1f603	smiley
 0x1f604	smile
 0x1f605	sweat smile
@@ -12,6 +13,7 @@
 0x1f60a	blush
 0x1f60b	yum
 0x1f60c	relieved
+0x2764	heart
 0x1f60d	heart eyes
 0x1f60e	sunglasses
 0x1f60f	smirk
@@ -22,6 +24,7 @@
 0x1f614	pensive
 0x1f615	confused
 0x1f616	confounded
+0x1f48b	kiss
 0x1f617	kissing
 0x1f618	kissing heart
 0x1f619	kissing smiling eyes
@@ -53,8 +56,13 @@
 0x1f633	flushed
 0x1f634	sleeping
 0x1f635	dizzy face
+0x1f644	face with rolling eyes
+0x1f641	slightly frowning face
+0x1f642	slightly smiling face
+0x1f643	upside down face
 0x1f636	no mouth
 0x1f637	mask
+0x1f491	couple with heart
 0x1f638	smile cat
 0x1f639	joy cat
 0x1f63a	smiley cat
@@ -64,22 +72,40 @@
 0x1f63e	pouting cat
 0x1f63f	crying cat face
 0x1f640	scream cat
-0x1f641	slightly frowning face
-0x1f642	slightly smiling face
-0x1f642	simple smile
-0x1f643	upside down face
-0x1f644	face with rolling eyes
-0x1f645	no good
-0x1f646	ok woman
-0x1f647	bow
 0x1f648	see no evil
 0x1f649	hear no evil
 0x1f64a	speak no evil
+0x270a	fist
+0x270b	raised hand
+0x1f590	raised hand with fingers splayed
+0x1f91e	crossed fingers
+0x1f595	middle finger
+0x270c	victory hand
+0x261d	point up
+0x1f446	point up 2
+0x1f447	point down
+0x1f448	point left
+0x1f449	point right
+0x1f44a	facepunch
+0x1f44b	wave
+0x1f44c	ok hand
+0x1f44d	+1
+0x1f44d	thumbsup
+0x1f44e	-1
+0x1f44e	thumbsdown
+0x1f44f	clap
+0x1f91d	handshake
+0x1f450	open hands
+0x1f64f	pray
 0x1f64b	raising hand
 0x1f64c	raised hands
+0x1f596	spock hand
+0x270d	writing hand
 0x1f64d	person frowning
 0x1f64e	person with pouting face
-0x1f64f	pray
+0x1f645	no good
+0x1f646	ok woman
+0x1f647	bow
 0x00a9	copyright
 0x00ae	registered
 0x203c	bangbang
@@ -132,7 +158,6 @@
 0x2614	umbrella with rain drops
 0x2615	coffee
 0x2618	shamrock
-0x261d	point up
 0x2620	skull and crossbones
 0x2622	radioactive sign
 0x2623	biohazard sign
@@ -205,11 +230,6 @@
 0x2708	airplane
 0x2709	email
 0x2709	envelope
-0x270a	fist
-0x270b	hand
-0x270b	raised hand
-0x270c	v
-0x270d	writing hand
 0x270f	pencil2
 0x2712	black nib
 0x2714	heavy check mark
@@ -229,7 +249,6 @@
 0x2757	exclamation
 0x2757	heavy exclamation mark
 0x2763	heavy heart exclamation mark ornament
-0x2764	heart
 0x2795	heavy plus sign
 0x2796	heavy minus sign
 0x2797	heavy division sign
@@ -608,20 +627,6 @@
 0x1f443	nose
 0x1f444	lips
 0x1f445	tongue
-0x1f446	point up 2
-0x1f447	point down
-0x1f448	point left
-0x1f449	point right
-0x1f44a	facepunch
-0x1f44a	punch
-0x1f44b	wave
-0x1f44c	ok hand
-0x1f44d	+1
-0x1f44d	thumbsup
-0x1f44e	-1
-0x1f44e	thumbsdown
-0x1f44f	clap
-0x1f450	open hands
 0x1f451	crown
 0x1f452	womans hat
 0x1f453	eyeglasses
@@ -684,13 +689,11 @@
 0x1f488	barber
 0x1f489	syringe
 0x1f48a	pill
-0x1f48b	kiss
 0x1f48c	love letter
 0x1f48d	ring
 0x1f48e	gem
 0x1f48f	couplekiss
 0x1f490	bouquet
-0x1f491	couple with heart
 0x1f492	wedding
 0x1f493	heartbeat
 0x1f494	broken heart
@@ -912,10 +915,6 @@
 0x1f58b	lower left fountain pen
 0x1f58c	lower left paintbrush
 0x1f58d	lower left crayon
-0x1f590	raised hand with fingers splayed
-0x1f595	middle finger
-0x1f595	reversed hand with middle finger extended
-0x1f596	spock hand
 0x1f5a5	desktop computer
 0x1f5a8	printer
 0x1f5b1	three button mouse
