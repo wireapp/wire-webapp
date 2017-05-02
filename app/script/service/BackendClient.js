@@ -84,9 +84,9 @@ z.service.BackendClient = class BackendClient {
     this.web_socket_url = settings.web_socket_url;
 
     this.connectivity_timeout = undefined;
-    this.connectivity_queue = new z.util.PromiseQueue();
+    this.connectivity_queue = new z.util.PromiseQueue({name: 'BackendClient.Connectivity'});
 
-    this.request_queue = new z.util.PromiseQueue();
+    this.request_queue = new z.util.PromiseQueue({name: 'BackendClient.Request'});
     this.request_queue_blocked_state = ko.observable(z.service.RequestQueueBlockedState.NONE);
 
     this.access_token = '';
