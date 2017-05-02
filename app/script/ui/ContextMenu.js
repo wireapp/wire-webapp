@@ -44,7 +44,7 @@ z.ui.Context = (() => {
   }
 
   function onWheel(e) {
-    e.preventDefault()
+    e.preventDefault();
   }
 
   function onMouseDown(e) {
