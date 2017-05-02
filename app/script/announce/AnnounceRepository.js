@@ -37,26 +37,32 @@ z.announce.AnnounceRepository = class AnnounceRepository {
   }
 
   init() {
-    return window.setTimeout(() => {
+    window.setTimeout(() => {
       this.check_announcements();
       this.schedule_checks();
     }, AnnounceRepository.CONFIG.CHECK_TIMEOUT);
   }
 
   check_announcements() {
-    return this.announce_service.get_announcements().then(() => {
-      this.process_announce_list();
-    });
+    if (navigator.onLine) {
+      return this.announce_service.get_announcements()
+        .then(() => {
+          this.process_announce_list();
+        });
+    }
   }
 
   check_version() {
-    return this.announce_service.get_version().then((server_version) => {
-      this.logger.info(`Checking current webapp version. Server '${server_version}' vs. local '${z.util.Environment.version(false, true)}'`);
+    if (navigator.onLine) {
+      return this.announce_service.get_version()
+        .then((server_version) => {
+          this.logger.info(`Checking current webapp version. Server '${server_version}' vs. local '${z.util.Environment.version(false, true)}'`);
 
-      if (server_version > z.util.Environment.version(false, true)) {
-        amplify.publish(z.event.WebApp.LIFECYCLE.UPDATE, z.announce.UPDATE_SOURCE.WEBAPP);
-      }
-    });
+          if (server_version > z.util.Environment.version(false, true)) {
+            amplify.publish(z.event.WebApp.LIFECYCLE.UPDATE, z.announce.UPDATE_SOURCE.WEBAPP);
+          }
+        });
+    }
   }
 
   schedule_checks() {

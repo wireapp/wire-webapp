@@ -162,9 +162,9 @@ z.util.DebugUtil = class DebugUtil {
 
   get_objects_for_decryption_errors(session_id, notification_id) {
     return Promise.all([
-      this.get_notification_from_stream(notification_id),
+      this.get_notification_from_stream(notification_id.toLowerCase()),
       this.get_serialised_identity(),
-      this.get_serialised_session(session_id),
+      this.get_serialised_session(session_id.toLowerCase()),
     ])
     .then((resolve_array) => {
       return JSON.stringify({

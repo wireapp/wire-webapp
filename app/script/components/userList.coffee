@@ -110,7 +110,7 @@ ko.components.register 'user-list',
                     <div class="search-list-item-content-name" data-bind="text: name"></div>
                     <div class="search-list-item-content-info">
                       <!-- ko if: $data.username() -->
-                        <span class="label-username" data-bind="text: $data.username"></span>
+                        <span class="search-list-item-content-username label-username" data-bind="text: $data.username"></span>
                       <!-- /ko -->
                     </div>
                   </div>

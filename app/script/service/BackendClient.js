@@ -84,9 +84,9 @@ z.service.BackendClient = class BackendClient {
     this.web_socket_url = settings.web_socket_url;
 
     this.connectivity_timeout = undefined;
-    this.connectivity_queue = new z.util.PromiseQueue();
+    this.connectivity_queue = new z.util.PromiseQueue({name: 'BackendClient.Connectivity'});
 
-    this.request_queue = new z.util.PromiseQueue();
+    this.request_queue = new z.util.PromiseQueue({name: 'BackendClient.Request'});
     this.request_queue_blocked_state = ko.observable(z.service.RequestQueueBlockedState.NONE);
 
     this.access_token = '';
@@ -229,16 +229,7 @@ z.service.BackendClient = class BackendClient {
    */
   _push_to_request_queue(config, reason) {
     this.logger.info(`Adding '${config.type}' request to '${config.url}' to queue due to '${reason}'`, config);
-
-    return this.request_queue.push(() => {
-      this.logger.info(`Queued '${config.type}' request to '${config.url}' executed`);
-
-      this._send_request(config)
-        .catch((error) => {
-          this.logger.info(`Failed to execute queued '${config.type}' request to '${config.url}'`, error);
-          throw error;
-        });
-    });
+    return this.request_queue.push(() => this._send_request(config));
   }
 
   /**
@@ -297,7 +288,7 @@ z.service.BackendClient = class BackendClient {
             this._push_to_request_queue(config, z.service.RequestQueueBlockedState.ACCESS_TOKEN_REFRESH)
               .then(resolve)
               .catch(reject);
-            return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, 'Unauthorized backend request');
+            return amplify.publish(z.event.WebApp.CONNECTION.ACCESS_TOKEN.RENEW, z.auth.AuthRepository.ACCESS_TOKEN_TRIGGER.UNAUTHORIZED_REQUEST);
           }
 
           case z.service.BackendClientError.STATUS_CODE.FORBIDDEN: {

@@ -78,5 +78,5 @@ class z.ViewModel.content.PreferencesDevicesViewModel
   update_device_info: =>
     if @current_client() and not @fingerprint()
       @_update_activation_time @current_client().time
-      @_update_device_location @current_client().location
+      @_update_device_location @current_client().location if @current_client().location
       @fingerprint @cryptography_repository.get_local_fingerprint()
