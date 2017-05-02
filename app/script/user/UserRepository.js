@@ -240,11 +240,7 @@ z.user.UserRepository = class UserRepository {
     return this.client_repository.get_all_clients_from_db()
       .then((user_client_map) => {
         this.logger.info(`Found locally stored clients for '${Object.keys(user_client_map).length}' users`, user_client_map);
-        const user_ids = [];
-
-        for (const user_id in user_client_map) {
-          user_ids.push(user_id);
-        }
+        const user_ids = Object.keys(user_client_map);
 
         return this.get_users_by_id(user_ids)
           .then((user_ets) => {
