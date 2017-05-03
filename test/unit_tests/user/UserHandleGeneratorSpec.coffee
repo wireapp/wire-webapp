@@ -20,7 +20,18 @@
 
 describe 'UserHandleGenerator', ->
 
+  describe 'generate_handle_variations', ->
+
+    it 'generates handle variations', ->
+      handle = 'superman'
+      number_of_variations = 10
+      variations = z.user.UserHandleGenerator.generate_handle_variations handle, number_of_variations
+      expect(variations.length).toBe number_of_variations
+      variations.forEach (variation) ->
+        expect(variation).not.toBe handle
+
   describe 'normalize_name', ->
+
     it 'should normalize user names', ->
       expect(z.user.UserHandleGenerator.normalize_name('Maria LaRochelle')).toBe 'marialarochelle'
       expect(z.user.UserHandleGenerator.normalize_name("Mêrié \"LaRöche'lle\"")).toBe 'merielaroechelle'
@@ -62,6 +73,18 @@ describe 'UserHandleGenerator', ->
   describe 'append_random_digits', ->
 
     it 'appends random digits to the end of the string', ->
+      handle = 'foo'
+      additional_numbers = 5
       string_with_digits = z.user.UserHandleGenerator.append_random_digits 'foo', 5
-      expect(string_with_digits.length).toBe 8
-      expect(string_with_digits.match(/[1-9]*$/)[0].length).toBe 5
+      expect(string_with_digits.length).toBe handle.length + additional_numbers
+      expect(string_with_digits.match(/[1-9]*$/)[0].length).toBe additional_numbers
+
+  describe 'create_suggestions', ->
+
+    it 'appends random digits to the end of the string', ->
+      username = 'memphis'
+      suggestions = z.user.UserHandleGenerator.create_suggestions username
+      expect(suggestions.length).toBe 12
+      expect(suggestions.shift()).toBe username
+      suggestions.forEach (suggestion) ->
+        expect(suggestion).not.toBe username

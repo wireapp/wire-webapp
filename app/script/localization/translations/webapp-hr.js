@@ -233,7 +233,6 @@ z.string.hr.conversations_all_archived = 'Sve arhivirano';
 z.string.hr.conversations_contacts = 'Kontakti';
 z.string.hr.conversations_connection_request_many = '%no ljudi čekaju';
 z.string.hr.conversations_connection_request_one = '1 osoba čeka';
-z.string.hr.conversations_empty_conversation = 'Prazan razgovor';
 z.string.hr.conversations_no_conversations = 'Započni razgovor ili pozovi ljude.';
 z.string.hr.conversations_popover_archive = 'Arhiviraj';
 z.string.hr.conversations_popover_block = 'Blokiraj';
@@ -243,6 +242,8 @@ z.string.hr.conversations_popover_leave = 'Napusti';
 z.string.hr.conversations_popover_notify = 'Uključi zvuk';
 z.string.hr.conversations_popover_silence = 'Isključi zvuk';
 z.string.hr.conversations_popover_unarchive = 'Dearhiviraj';
+
+z.string.hr.conversations_secondary_line_timed_message = 'Odgođeno slanje';
 
 z.string.hr.takeover_headline = 'Korisnička imena su ovdje.';
 z.string.hr.takeover_sub = 'Zatražite svoje jedinstveno ime na Wire.';
@@ -397,8 +398,6 @@ z.string.hr.search_top_people = 'Top veze';
 z.string.hr.search_try_search = 'Traženje ljudi po imenu ili korisničkom imenu';
 z.string.hr.search_no_contacts_on_wire = 'Nemate veza na Wire. Pokušajte pronaći ljude po imenu ili korisničkom imenu.';
 z.string.hr.search_others = 'Poveži se';
-z.string.hr.search_friend_in_common = '%no osoba zajedničko';
-z.string.hr.search_friends_in_common = '%no ljudi zajedničko';
 
 z.string.hr.upload_google_headline = 'Pronađi ljude za razgovor.';
 z.string.hr.upload_google_message = 'Mi koristimo vaše kontakt podatke za povezivanje s drugima. Sve informacije su anonimiziane i nisu dijeljene s drugima.';
