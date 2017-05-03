@@ -298,7 +298,8 @@ z.string.conversations_all_archived = 'Everything archived';
 z.string.conversations_contacts = 'Contacts';
 z.string.conversations_connection_request_many = '%no people waiting';
 z.string.conversations_connection_request_one = '1 person waiting';
-z.string.conversations_empty_conversation = 'Empty conversation';
+z.string.conversations_empty_conversation = 'Group conversation';
+z.string.conversations_empty_conversation_description = 'Everyone left';
 z.string.conversations_no_conversations = 'Start a conversation or invite people to join.';
 z.string.conversations_popover_archive = 'Archive';
 z.string.conversations_popover_block = 'Block';
@@ -308,6 +309,19 @@ z.string.conversations_popover_leave = 'Leave';
 z.string.conversations_popover_notify = 'Unmute';
 z.string.conversations_popover_silence = 'Mute';
 z.string.conversations_popover_unarchive = 'Unarchive';
+
+// Conversations secondary line
+z.string.conversations_secondary_line_missed_call = '%n missed call';
+z.string.conversations_secondary_line_missed_calls = '%n missed calls';
+z.string.conversations_secondary_line_new_message = '%n new message';
+z.string.conversations_secondary_line_new_messages = '%n new messages';
+z.string.conversations_secondary_line_ping = '%n ping';
+z.string.conversations_secondary_line_pings = '%n pings';
+z.string.conversations_secondary_line_person_left = '%n person left';
+z.string.conversations_secondary_line_people_left = '%n people left';
+z.string.conversations_secondary_line_person_added = '%user1 added %user2';
+z.string.conversations_secondary_line_people_added = '%user people were added';
+z.string.conversations_secondary_line_timed_message = 'Timed message';
 
 // Takeover
 z.string.takeover_headline = 'Usernames are here.';

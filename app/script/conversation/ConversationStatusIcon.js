@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,33 +17,18 @@
  *
  */
 
+'use strict';
 
-#background {
-  .full-screen;
-  background-color: fade(#000, 88%);
-}
+window.z = window.z || {};
+window.z.conversation = z.conversation || {};
 
-.background,
-.background-image,
-.background-darken {
-  .full-screen;
-  overflow: hidden;
-}
-
-.background {
-  transition-property: opacity;
-  transition-duration: @animation-timing-slow;
-  transition-timing-function: @ease-out-quart;
-  background-color: fade(#000, 88%);
-}
-
-.background-image {
-  background-size: cover;
-  background-position: center;
-  filter: blur(32px) saturate(200%);
-  transform: scale(1.4);
-}
-
-.background-darken {
-  background-color: fade(#000, 64%);
-}
+z.conversation.ConversationStatusIcon = {
+  ACTIVE_CALL: 'active-call',
+  MISSED_CALL: 'missed-call',
+  MUTED: 'muted',
+  NONE: 'none',
+  PENDING_CONNECTION: 'pending',
+  TYPING: 'typing',
+  UNREAD_MESSAGES: 'messages',
+  UNREAD_PING: 'ping',
+};

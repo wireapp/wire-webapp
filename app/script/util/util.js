@@ -706,3 +706,9 @@ z.util.format_time_remaining = function(time_remaining) {
 
   return title || '';
 };
+
+/**
+ * No operation
+ * @returns {undefined}
+ */
+z.util.noop = function() {};
