@@ -692,9 +692,9 @@ z.user.UserRepository = class UserRepository {
         return new z.entity.User();
       })
       .then((old_user_et) => {
-        return this.get_user_by_id(user_id)
-          .then((new_user_et) => {
-            return this.user_mapper.update_user_from_object(old_user_et, new_user_et);
+        return this.user_service.get_user_by_id(user_id)
+          .then((new_user_data) => {
+            return this.user_mapper.update_user_from_object(old_user_et, new_user_data);
           });
       });
   }
