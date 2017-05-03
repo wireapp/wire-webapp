@@ -52,7 +52,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     fetch('/image/emoji.tsv')
       .then((response) => response.text())
       .then((text) => {
-        this.emoji_dict = text.split('\n').filter((e) => e.length > 0);
+        this.emoji_dict = text.split('\n').filter((event) => event.length > 0);
       });
 
     this.bound_remove_emoji_list = this.remove_emoji_list.bind(this);

@@ -617,7 +617,7 @@ class z.ViewModel.AuthViewModel
 
   keydown_phone_code: (view_model, event) =>
     combo_key = if z.util.Environment.os.win then event.ctrlKey else event.metaKey
-    return true if combo_key and event.keyCode is z.util.KEYCODE.V
+    return true if combo_key and event.keyCode is z.util.KEYCODE.KEY_V
     return false if event.altKey or event.ctrlKey or event.metaKey or event.shiftKey
 
     target_id = event.currentTarget.id
