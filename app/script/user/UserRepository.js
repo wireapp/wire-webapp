@@ -204,7 +204,7 @@ z.user.UserRepository = class UserRepository {
    * Update the user connections and get the matching users.
    * @param {Array<z.entity.Connection>} connection_ets - Connection entities
    * @param {boolean} assign_clients - Retrieve locally known clients from database
-   * @returns {Promise} Promise that resolves when all user connections have been updated
+   * @returns {Promise<Array<z.entity.Connection>>} Promise that resolves when all user connections have been updated
    */
   update_user_connections(connection_ets, assign_clients = false) {
     return new Promise((resolve) => {
@@ -223,7 +223,7 @@ z.user.UserRepository = class UserRepository {
             if (assign_clients) {
               return this._assign_all_clients()
                 .then(function() {
-                  return resolve();
+                  return resolve(connection_ets);
                 });
             }
           });
@@ -322,16 +322,15 @@ z.user.UserRepository = class UserRepository {
       this.connection_mapper.update_user_connection_from_json(connection_et, event_json);
     } else {
       connection_et = this.connection_mapper.map_user_connection_from_json(event_json);
-      this.update_user_connections([connection_et]);
     }
 
-    if (connection_et) {
+    this.update_user_connections([connection_et]).then(() => {
       if ((previous_status === z.user.ConnectionStatus.SENT) && (connection_et.status() === z.user.ConnectionStatus.ACCEPTED)) {
         this.update_user_by_id(connection_et.to);
       }
       this._send_user_connection_notification(connection_et, previous_status);
       amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation);
-    }
+    });
   }
 
   /**
