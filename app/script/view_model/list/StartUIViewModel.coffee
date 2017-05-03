@@ -312,7 +312,7 @@ class z.ViewModel.list.StartUIViewModel
         .map (conversation_et) -> conversation_et.participating_user_ids()[0]
     .then (user_ids) =>
       return @user_repository.get_users_by_id user_ids
-    .then (user_ets) =>
+    .then (user_ets) ->
       return user_ets.filter (user_et) -> not user_et.blocked()
 
   get_connections: =>
