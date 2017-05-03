@@ -31,8 +31,8 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   constructor() {
     const emoji_list_class = 'conversation-input-emoji-list';
 
+    this.emojis = [];
     this.emoji_list = $(`<div class='${emoji_list_class}' />`);
-    this.emoji_dict = undefined;
     this.emoji_start_pos = -1;
     this.emoji_usage_count = z.util.StorageUtil.get_value(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
@@ -52,26 +52,26 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     fetch('/image/emoji.json')
       .then((response) => response.json())
       .then((json) => {
-        this.emoji_dict = Object.entries(json)
-          .reduce((acc, [code, details]) => {
-            // Ignore 'tone' emojis for now, they clutter suggestions too much.
-            if (details['alpha code'].match(/_tone\d/)) {
-              return acc;
-            }
+        for (const code in json) {
+          const details = json[code];
 
-            const icon = String.fromCodePoint.apply(null, code.split('-').map((char) => `0x${char}`));
-            const alpha_codes = [details['alpha code'], ...details['aliases'].split('|')];
-            alpha_codes.forEach((alpha_code) => {
-              if (alpha_code) {
-                const name = alpha_code
-                  .slice(1, -1)
-                  .replace(/_/g, ' ')
-                  .toLowerCase();
-                acc[name] = {icon, name};
-              }
-            });
-            return acc;
-          }, {});
+          // Ignore 'tone' emojis for now, they clutter suggestions too much.
+          if (details['alpha code'].match(/_tone\d/)) {
+            continue;
+          }
+
+          const icon = String.fromCodePoint.apply(null, code.split('-').map((char) => `0x${char}`));
+          const alpha_codes = [details['alpha code'], ...details['aliases'].split('|')];
+          alpha_codes.forEach((alpha_code) => {
+            if (alpha_code) {
+              const name = alpha_code
+                .slice(1, -1)
+                .replace(/_/g, ' ')
+                .toLowerCase();
+              this.emojis.push({icon, name});
+            }
+          });
+        }
       });
 
     this.bound_remove_emoji_list = this.remove_emoji_list.bind(this);
@@ -135,11 +135,11 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     }
 
     const query = input.value.substr(this.emoji_start_pos, input.selectionStart - this.emoji_start_pos).toLowerCase();
-    if (query.length < QUERY_MIN_LENGTH || query[0] === ' ' || !this.emoji_dict) {
+    if (query.length < QUERY_MIN_LENGTH || query[0] === ' ' || this.emojis.length === 0) {
       this.emoji_list.remove();
     } else {
       const query_words = query.split(' ');
-      const emoji_matched = Object.values(this.emoji_dict)
+      const emoji_matched = this.emojis
         .filter((emoji) => {
           const emoji_name_words = emoji.name.split(' ');
           return query_words.every((query_word) => emoji_name_words.some((emoji_name_word) => emoji_name_word.startsWith(query_word)));
