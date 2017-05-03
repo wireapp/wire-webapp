@@ -30,11 +30,14 @@ module.exports = (grunt) ->
     for line in lines
       has_source = line.match /src="(.*?)"/
       is_comment = line.match /<!--[\s\S]*?-->/
-      if has_source
-        if is_comment
-          grunt.log.writeln "Skipping file '#{has_source[1]}' for minification."
+      if has_source and not is_comment
+        source = has_source[1]
+        if source.endsWith '.min.js'
+          current_files = grunt.config('scripts-minified')
+          current_files.vendor.push source
+          grunt.config 'scripts-minified', current_files
         else
-          script_files.push "deploy#{has_source[1]}"
+          script_files.push "deploy#{source}"
 
     grunt.log.ok "Processed files from '#{source_file}'."
 
@@ -42,6 +45,9 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'scripts', ->
     dist_path = grunt.config 'dir.app.template_dist'
+
+    grunt.config 'scripts-minified',
+      vendor: []
 
     grunt.config 'scripts',
       app: extract_sources "#{dist_path}/app.htm"
