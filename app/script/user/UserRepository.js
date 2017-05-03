@@ -324,13 +324,14 @@ z.user.UserRepository = class UserRepository {
       connection_et = this.connection_mapper.map_user_connection_from_json(event_json);
     }
 
-    this.update_user_connections([connection_et]).then(() => {
-      if ((previous_status === z.user.ConnectionStatus.SENT) && (connection_et.status() === z.user.ConnectionStatus.ACCEPTED)) {
-        this.update_user_by_id(connection_et.to);
-      }
-      this._send_user_connection_notification(connection_et, previous_status);
-      amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation);
-    });
+    this.update_user_connections([connection_et])
+      .then(() => {
+        if ((previous_status === z.user.ConnectionStatus.SENT) && (connection_et.status() === z.user.ConnectionStatus.ACCEPTED)) {
+          this.update_user_by_id(connection_et.to);
+        }
+        this._send_user_connection_notification(connection_et, previous_status);
+        amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation);
+      });
   }
 
   /**
