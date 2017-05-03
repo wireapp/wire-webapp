@@ -308,8 +308,8 @@ class z.ViewModel.list.StartUIViewModel
     .then (conversation_ets) ->
       return conversation_ets
         .filter (conversation_et) -> conversation_et.is_one2one()
-        .map (conversation_et) -> conversation_et.participating_user_ids()[0]
         .slice(0, 9)
+        .map (conversation_et) -> conversation_et.participating_user_ids()[0]
     .then (user_ids) =>
       return @user_repository.get_users_by_id user_ids
     .then (user_ets) =>
