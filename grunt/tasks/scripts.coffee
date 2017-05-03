@@ -21,7 +21,7 @@
 ###############################################################################
 module.exports = (grunt) ->
 
-  extract_sources = (source_file) ->
+  extract_sources = (source_file, target) ->
     scripts = grunt.file.read source_file
     script_files = []
 
@@ -33,11 +33,13 @@ module.exports = (grunt) ->
       if has_source and not is_comment
         source = has_source[1]
         if source.endsWith '.min.js'
-          current_files = grunt.config('scripts-minified')
-          current_files.vendor.push source
+          current_files = grunt.config 'scripts-minified'
+          current_files[target].push "deploy#{source}"
           grunt.config 'scripts-minified', current_files
         else
-          script_files.push "deploy#{source}"
+          current_files = grunt.config 'scripts'
+          current_files[target].push "deploy#{source}"
+          grunt.config 'scripts', current_files
 
     grunt.log.ok "Processed files from '#{source_file}'."
 
@@ -50,7 +52,12 @@ module.exports = (grunt) ->
       vendor: []
 
     grunt.config 'scripts',
-      app: extract_sources "#{dist_path}/app.htm"
-      auth_page: extract_sources "#{dist_path}/auth.htm"
-      component: extract_sources "#{dist_path}/component.htm"
-      vendor: extract_sources "#{dist_path}/vendor.htm"
+      app: []
+      auth_page: []
+      component: []
+      vendor: []
+
+    extract_sources "#{dist_path}/app.htm", 'app'
+    extract_sources "#{dist_path}/auth.htm", 'auth_page'
+    extract_sources "#{dist_path}/component.htm", 'component'
+    extract_sources "#{dist_path}/vendor.htm", 'vendor'
