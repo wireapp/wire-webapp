@@ -858,9 +858,9 @@ z.user.UserRepository = class UserRepository {
           {key: medium_key, size: 'complete', type: 'image'},
         ];
         return this.user_service.update_own_user_profile({assets})
-          .then(() => {
-            return this.user_update({user: {assets: assets, id: this.self().id}});
-          });
+        .then(() => {
+          return this.user_update({user: {assets: assets, id: this.self().id}});
+        });
       })
       .catch(function(error) {
         throw new Error(`Error during profile image upload: ${error.message}`);
