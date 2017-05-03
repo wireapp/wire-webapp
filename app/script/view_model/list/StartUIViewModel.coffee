@@ -312,6 +312,8 @@ class z.ViewModel.list.StartUIViewModel
         .slice(0, 9)
     .then (user_ids) =>
       return @user_repository.get_users_by_id user_ids
+    .then (user_ets) =>
+      return user_ets.filter (user_et) -> !user_et.blocked()
 
   get_connections: =>
     Promise.resolve().then =>
