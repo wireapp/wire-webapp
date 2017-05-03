@@ -100,7 +100,7 @@ z.media.MediaEmbeds = (function() {
         .substr(url.indexOf('?'), url.length)
         .replace(/^[?]/, '&')
         .replace(/[&]v=[a-zA-Z0-9_-]{11}/, '')
-        .replace(/[&#]t=([a-z0-9]+)/, (first, second) => `&start=${_convert_youtube_timestamp_to_seconds(second)}`)
+        .replace(/[&#]t=([a-z0-9]+)/, (temp, timestamp) => `&start=${_convert_youtube_timestamp_to_seconds(timestamp)}`)
         .replace(/[&]?autoplay=1/, ''); // remove autoplay param
 
       // append html5 parameter to youtube src to force html5 mode
