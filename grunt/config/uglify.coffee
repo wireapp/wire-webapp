@@ -25,7 +25,7 @@ module.exports =
   deploy:
     files:
       'deploy/min/wire-app.min.js': '<%= scripts.app %>'
-      'deploy/min/wire-auth.min.js': '<%= scripts.auth_page %>'
+      'deploy/min/wire-auth.min.js': '<%= scripts.auth %>'
       'deploy/min/wire-component.min.js': '<%= scripts.component %>'
       'deploy/min/wire-vendor.min.js': '<%= scripts.vendor %>'
     options:

@@ -48,16 +48,14 @@ module.exports = (grunt) ->
   grunt.registerTask 'scripts', ->
     dist_path = grunt.config 'dir.app.template_dist'
 
-    grunt.config 'scripts-minified',
-      vendor: []
-
-    grunt.config 'scripts',
+    directories =
       app: []
-      auth_page: []
+      auth: []
       component: []
       vendor: []
 
-    extract_sources "#{dist_path}/app.htm", 'app'
-    extract_sources "#{dist_path}/auth.htm", 'auth_page'
-    extract_sources "#{dist_path}/component.htm", 'component'
-    extract_sources "#{dist_path}/vendor.htm", 'vendor'
+    grunt.config 'scripts', directories
+    grunt.config 'scripts-minified', directories
+
+    for directory_name of directories
+      extract_sources "#{dist_path}/#{directory_name}.htm", directory_name
