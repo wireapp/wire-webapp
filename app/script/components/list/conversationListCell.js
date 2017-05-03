@@ -35,7 +35,7 @@ z.components.ConversationListCell = class ConversationListCell {
 
     this.cell_state = ko.pureComputed(() => {
       return this.entered_viewport() ? z.conversation.ConversationCellState.generate(this.conversation) : '';
-    }).extend({rateLimit: 100})
+    }).extend({rateLimit: 100});
   }
 
   on_in_viewport() {
@@ -45,7 +45,6 @@ z.components.ConversationListCell = class ConversationListCell {
 };
 
 ko.components.register('conversation-list-cell', {
-  viewModel: z.components.ConversationListCell,
   template: `
     <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}, in_viewport: on_in_viewport">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation() || conversation.participating_user_ids().length === 0}">
@@ -79,4 +78,5 @@ ko.components.register('conversation-list-cell', {
       </div>
     </div>
   `,
+  viewModel: z.components.ConversationListCell,
 });
