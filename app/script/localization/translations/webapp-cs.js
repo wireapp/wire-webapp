@@ -232,7 +232,6 @@ z.string.cs.conversations_all_archived = 'Vše archivováno';
 z.string.cs.conversations_contacts = 'Kontakty';
 z.string.cs.conversations_connection_request_many = '%no čekajících osob';
 z.string.cs.conversations_connection_request_one = '1 čekající osoba';
-z.string.cs.conversations_empty_conversation = 'Prázdná konverzace';
 z.string.cs.conversations_no_conversations = 'Zahájit konverzaci nebo přizvat další osoby.';
 z.string.cs.conversations_popover_archive = 'Archivovat';
 z.string.cs.conversations_popover_block = 'Blokovat';
@@ -242,6 +241,8 @@ z.string.cs.conversations_popover_leave = 'Odejít';
 z.string.cs.conversations_popover_notify = 'Zapnout zvuk';
 z.string.cs.conversations_popover_silence = 'Ztlumit';
 z.string.cs.conversations_popover_unarchive = 'Obnovit';
+
+z.string.cs.conversations_secondary_line_timed_message = 'Časované zprávy';
 
 z.string.cs.takeover_link = 'Dozvědět se více';
 
