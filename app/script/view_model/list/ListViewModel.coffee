@@ -194,7 +194,7 @@ class z.ViewModel.list.ListViewModel
 
     z.ui.Context.from event, entries, 'conversation-list-options-menu'
 
-  click_on_archive_action: (conversation_et)=>
+  click_on_archive_action: (conversation_et) =>
     @conversation_repository.archive_conversation conversation_et
 
   click_on_block_action: (conversation_et) =>
