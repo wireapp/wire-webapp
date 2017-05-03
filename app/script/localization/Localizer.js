@@ -49,9 +49,9 @@ class Localizer {
     if (valueAccessor == null) return;
 
     let args = [];
-    let s = valueAccessor;
+    let value = valueAccessor;
     if (valueAccessor.id != null) {
-      s = valueAccessor.id;
+      value = valueAccessor.id;
       if (_.isArray(valueAccessor.replace)) {
         args = valueAccessor.replace;
       } else {
@@ -61,10 +61,10 @@ class Localizer {
     if (args.length !== 0) {
       for (const arg of args) {
         const reg = new RegExp(arg.placeholder, 'gm');
-        s = s.replace(reg, arg.content);
+        value = value.replace(reg, arg.content);
       }
     }
-    return s;
+    return value;
   }
 }
 

@@ -31,8 +31,8 @@ z.util.KEYCODE = {
   DELETE: 8,
   ENTER: 13,
   ESC: 27,
+  KEY_V: 86,
   TAB: 9,
-  V: 86,
   is_arrow_key: function(keyCode) {
     return [z.util.KEYCODE.ARROW_DOWN, z.util.KEYCODE.ARROW_LEFT, z.util.KEYCODE.ARROW_RIGHT, z.util.KEYCODE.ARROW_UP].includes(keyCode);
   },

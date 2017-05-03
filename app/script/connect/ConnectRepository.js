@@ -234,9 +234,9 @@ z.connect.ConnectRepository = class ConnectRepository {
       phone_book.self.push(number);
     });
 
-    let x = 0;
-    while (x < address_book.contactCount()) {
-      const {emails, firstName: first_name, lastName: last_name, numbers} = address_book.getContact(x);
+    let index = 0;
+    while (index < address_book.contactCount()) {
+      const {emails, firstName: first_name, lastName: last_name, numbers} = address_book.getContact(index);
       const card = {
         card_id: CryptoJS.MD5(`${first_name}${last_name}`).toString(),
         contact: [],
@@ -251,7 +251,7 @@ z.connect.ConnectRepository = class ConnectRepository {
       if (card.contact.length > 0) {
         phone_book.cards.push(card);
       }
-      x++;
+      index++;
     }
     return this._encode_phone_book(phone_book);
   }

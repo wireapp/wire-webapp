@@ -225,9 +225,11 @@ z.tracking.EventTrackingRepository = class EventTrackingRepository {
     };
 
     this.localytics = function() {
+      /* eslint-disable id-length */
       this.localytics.t = new Date();
       this.localytics.q = this.localytics.q || [];
       this.localytics.q.push(arguments);
+      /* eslint-enable id-length */
     };
 
     window.ll = this.localytics;
