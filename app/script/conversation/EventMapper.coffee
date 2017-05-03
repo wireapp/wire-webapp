@@ -145,8 +145,7 @@ class z.conversation.EventMapper
   ###
   _map_event_asset_add: (event, should_create_dummy_image) ->
     message_et = new z.entity.ContentMessage()
-    if event.data?.info.tag is z.assets.ImageSizeType.MEDIUM
-      message_et.assets.push @_map_asset_medium_image event, should_create_dummy_image
+    message_et.assets.push @_map_asset_medium_image event, should_create_dummy_image
     message_et.nonce = event.data.info.nonce
     return message_et
 
