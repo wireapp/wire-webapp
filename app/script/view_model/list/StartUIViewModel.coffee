@@ -313,7 +313,7 @@ class z.ViewModel.list.StartUIViewModel
     .then (user_ids) =>
       return @user_repository.get_users_by_id user_ids
     .then (user_ets) =>
-      return user_ets.filter (user_et) -> !user_et.blocked()
+      return user_ets.filter (user_et) -> not user_et.blocked()
 
   get_connections: =>
     Promise.resolve().then =>
