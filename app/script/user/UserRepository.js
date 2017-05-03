@@ -207,28 +207,28 @@ z.user.UserRepository = class UserRepository {
    * @returns {Promise<Array<z.entity.Connection>>} Promise that resolves when all user connections have been updated
    */
   update_user_connections(connection_ets, assign_clients = false) {
-    return new Promise((resolve) => {
-      z.util.ko_array_push_all(this.connections, connection_ets);
+    return Promise.resolve()
+      .then(() => {
+        z.util.ko_array_push_all(this.connections, connection_ets);
+        const user_ids = connection_ets.map((connection_et) => connection_et.to);
 
-      // Apply connection to other user entities (which are not us)
-      const user_ids = connection_ets.map((connection_et) => connection_et.to);
+        if (user_ids.length === 0) {
+          return;
+        }
 
-      if (user_ids.length) {
         return this.get_users_by_id(user_ids)
           .then((user_ets) => {
             for (const user_et of user_ets) {
               this._assign_connection(user_et);
             }
-
             if (assign_clients) {
-              return this._assign_all_clients()
-                .then(function() {
-                  return resolve(connection_ets);
-                });
+              return this._assign_all_clients();
             }
           });
-      }
-    });
+      })
+      .then(() => {
+        return connection_ets;
+      });
   }
 
   /**
