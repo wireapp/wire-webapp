@@ -174,7 +174,7 @@ describe 'z.user.UserRepository', ->
         user_repository.find_user_by_id '1'
         .then done.fail
         .catch (error) ->
-          expect(error.type).toBe z.user.UserError::TYPE.USER_NOT_FOUND
+          expect(error.type).toBe z.user.UserError.TYPE.USER_NOT_FOUND
           done()
 
     describe 'search_for_connected_users', ->

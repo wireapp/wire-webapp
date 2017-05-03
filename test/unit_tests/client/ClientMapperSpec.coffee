@@ -117,9 +117,9 @@ describe 'z.client.ClientMapper', ->
       initial_client_et = mapper.map_client entities.clients.john_doe.plain
       client_payload = entities.clients.john_doe.permanent
 
-      [client_et, contains_update] = mapper.update_client initial_client_et, client_payload
+      {client: client_et, was_updated} = mapper.update_client initial_client_et, client_payload
 
-      expect(contains_update).toBeTruthy()
+      expect(was_updated).toBeTruthy()
       expect(client_et.address).toBe client_payload.address
       expect(client_et.class).toBe client_payload.class
       expect(client_et.cookie).toBe client_payload.cookie
@@ -139,9 +139,9 @@ describe 'z.client.ClientMapper', ->
       client_payload = entities.clients.john_doe.permanent
       initial_client_et = mapper.map_client client_payload
 
-      [client_et, contains_update] = mapper.update_client initial_client_et, client_payload
+      {client: client_et, was_updated} = mapper.update_client initial_client_et, client_payload
 
-      expect(contains_update).toBeFalsy()
+      expect(was_updated).toBeFalsy()
       expect(client_et.address).toBe client_payload.address
       expect(client_et.class).toBe client_payload.class
       expect(client_et.cookie).toBe client_payload.cookie
