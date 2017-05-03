@@ -256,7 +256,6 @@ z.string.es.conversations_all_archived = 'Todo archivado';
 z.string.es.conversations_contacts = 'Contactos';
 z.string.es.conversations_connection_request_many = '%no personas en espera';
 z.string.es.conversations_connection_request_one = '1 persona en espera';
-z.string.es.conversations_empty_conversation = 'Conversación vacía';
 z.string.es.conversations_no_conversations = 'Iniciar una conversación o invitar personas a unirse.';
 z.string.es.conversations_popover_archive = 'Archivar';
 z.string.es.conversations_popover_block = 'Bloquear';
@@ -266,6 +265,8 @@ z.string.es.conversations_popover_leave = 'Abandonar';
 z.string.es.conversations_popover_notify = 'Sonido';
 z.string.es.conversations_popover_silence = 'Silenciar';
 z.string.es.conversations_popover_unarchive = 'Desarchivar';
+
+z.string.es.conversations_secondary_line_timed_message = 'Mensaje temporizado';
 
 z.string.es.takeover_headline = 'Ya llegaron los nombres de usuario.';
 z.string.es.takeover_sub = 'Reclama tu nombre único en Wire.';
@@ -427,8 +428,6 @@ z.string.es.search_top_people = 'Personas más importantes';
 z.string.es.search_try_search = 'Encontrar personas por nombre o usuario';
 z.string.es.search_no_contacts_on_wire = 'No tienes contactos en Wire. Trata de encontrar personas por nombre o usuario.';
 z.string.es.search_others = 'Conectar';
-z.string.es.search_friend_in_common = '%no persona en común';
-z.string.es.search_friends_in_common = '%no personas en común';
 
 z.string.es.upload_google_headline = 'Buscar con quien hablar.';
 z.string.es.upload_google_message = 'Compartir tus contactos te ayuda a conectarte con otros. Toda la información es anónima y no será compartida con nadie más.';

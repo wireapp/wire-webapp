@@ -36,6 +36,7 @@ z.string.da.auth_account_create_account = 'Opret en konto';
 z.string.da.auth_account_expiration = 'Du er blevet logget af, da din session udløb. Log venligst ind igen.';
 z.string.da.auth_account_get_wire = 'Simpel, privat og sikker messenger til chat, opkald, deling af billeder, musik, videoer, GIF’s og mere.';
 z.string.da.auth_account_password_forgot = 'Glemt adgangskode';
+z.string.da.auth_account_public_computer = 'Dette er en offentlig computer';
 z.string.da.auth_account_sign_in = 'Log ind';
 z.string.da.auth_account_sign_in_email = 'Email';
 z.string.da.auth_account_sign_in_phone = 'Telefon';
@@ -225,6 +226,7 @@ z.string.da.conversation_unable_to_decrypt_2 = '%@name’s enheds identitet er �
 z.string.da.conversation_unable_to_decrypt_link = 'Hvorfor?';
 z.string.da.conversation_unable_to_decrypt_error_message = 'Fejl';
 z.string.da.conversation_unable_to_decrypt_reset_session = 'Nulstil session';
+z.string.da.conversation_missed_messages = 'Du har ikke brugt denne enhed i et stykke tid. Nogle meddelelser vises måske ikke her.';
 z.string.da.conversation_asset_uploading = 'Uploader…';
 z.string.da.conversation_asset_downloading = 'Downloader…';
 z.string.da.conversation_asset_upload_failed = 'Upload Mislykkedes';
@@ -240,6 +242,7 @@ z.string.da.conversation_delete_timestamp = 'Slettet på %@timestamp';
 z.string.da.conversation_edit_timestamp = 'Redigeret på %@timestamp';
 z.string.da.conversation_likes_caption = '%@number personer';
 z.string.da.conversation_send_pasted_file = 'Indsatte billede d. %date';
+z.string.da.conversation_tweet_author = ' på Twitter';
 
 z.string.da.collection_show_all = 'Vis alle %no';
 z.string.da.collection_section_links = 'Links';
@@ -256,7 +259,6 @@ z.string.da.conversations_all_archived = 'Alt arkiveret';
 z.string.da.conversations_contacts = 'Kontakter';
 z.string.da.conversations_connection_request_many = '%no personer venter';
 z.string.da.conversations_connection_request_one = '1 person venter';
-z.string.da.conversations_empty_conversation = 'Tom samtale';
 z.string.da.conversations_no_conversations = 'Start en samtale og inviter personer til at deltage.';
 z.string.da.conversations_popover_archive = 'Arkivér';
 z.string.da.conversations_popover_block = 'Blokér';
@@ -266,6 +268,8 @@ z.string.da.conversations_popover_leave = 'Forlad';
 z.string.da.conversations_popover_notify = 'Lyd til';
 z.string.da.conversations_popover_silence = 'Lyd fra';
 z.string.da.conversations_popover_unarchive = 'Anuller arkivering';
+
+z.string.da.conversations_secondary_line_timed_message = 'Tidsbestemt besked';
 
 z.string.da.takeover_headline = 'Brugernavne er her.';
 z.string.da.takeover_sub = 'Vælg dit unikke navn på Wire.';
@@ -359,6 +363,7 @@ z.string.da.preferences_devices = 'Enheder';
 z.string.da.preferences_headline = 'Indstillinger';
 z.string.da.preferences_options = 'Egenskaber';
 
+z.string.da.preferences_about_copyright = '© Wire Swiss GmbH';
 z.string.da.preferences_about_privacy_policy = 'Privatlivspolitik';
 z.string.da.preferences_about_support = 'Support';
 z.string.da.preferences_about_support_website = 'Support hjemmeside';
@@ -426,8 +431,6 @@ z.string.da.search_top_people = 'Top personer';
 z.string.da.search_try_search = 'Find personer ved navn eller Brugernavn';
 z.string.da.search_no_contacts_on_wire = 'Du har ingen kontakter på Wire. Prøv at finde folk ved navn eller brugernavn.';
 z.string.da.search_others = 'Forbind';
-z.string.da.search_friend_in_common = '%no person til fælles';
-z.string.da.search_friends_in_common = '%no personer til fælles';
 
 z.string.da.upload_google_headline = 'Finde personer at snakke med.';
 z.string.da.upload_google_message = 'Vi bruger dine kontaktdata til at forbinde dig med andre. Vi anonymisere alle oplysninger og deler ikke det med alle andre.';
@@ -435,6 +438,16 @@ z.string.da.upload_google_headline_error = 'Noget \ngik galt.';
 z.string.da.upload_google_message_error = 'Vi har ikke modtaget dine oplysninger. Venligst prøv at importere dine kontakter igen.';
 z.string.da.upload_google_button_again = 'Prøv igen';
 
+z.string.da.url_password_reset = 'glemt/';
+z.string.da.url_legal = 'https://wire.com/legal/';
+z.string.da.url_privacy = 'https://wire.com/privacy/';
+z.string.da.url_privacy_how = 'https://wire.com/privacy/how/';
+z.string.da.url_privacy_why = 'https://wire.com/privacy/why/';
+z.string.da.url_support = 'https://support.wire.com';
+z.string.da.url_terms_of_use = 'https://wire.com/legal/terms/';
+z.string.da.url_wire = 'https://wire.com';
+z.string.da.url_wire_for_web = 'https://app.wire.com';
+z.string.da.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
 z.string.da.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
 z.string.da.url_support_usernames = 'https://wire.com/support/username';
 z.string.da.url_decrypt_error_1 = 'https://wire.com/privacy/error-1';
@@ -462,10 +475,12 @@ z.string.da.warning_connectivity_connection_lost = 'Forsøger at forbinde. Wire 
 z.string.da.warning_connectivity_no_internet = 'Ingen Internet. Du vil ikke kunne sende eller modtage beskeder.';
 
 z.string.da.warning_lifecycle_update = 'En ny version af Wire er tilgængelig.';
+z.string.da.warning_lifecycle_update_notes = 'Hvad er nyt';
 z.string.da.warning_lifecycle_update_link = 'Opdatér nu';
 
 z.string.da.system_notification_asset_add = 'Delte et billede';
 z.string.da.system_notification_connection_accepted = 'Accepterede din anmodning om forbindelse';
+z.string.da.system_notification_connection_connected = 'Du er nu forbundet';
 z.string.da.system_notification_connection_request = 'Ønsker at forbinde';
 z.string.da.system_notification_conversation_create = '%s.first_name startede en samtale';
 z.string.da.system_notification_conversation_rename = '%s.first_name omdøbte samtalen til %name';
@@ -521,8 +536,11 @@ z.string.da.tooltip_preferences_rename = 'Ændre dit navn';
 
 z.string.da.tooltip_search_close = 'Luk (Esc)';
 
+z.string.da.init_received_access_token = 'Loggede på';
 z.string.da.init_received_self_user = 'Hej, %name.';
+z.string.da.init_validated_client = 'Henter dine forbindelser og samtaler';
 z.string.da.init_received_user_data = 'Tjekker for nye beskeder';
+z.string.da.init_events_progress = 'Indlæser beskeder - %process af %total';
 z.string.da.init_updated_from_notifications = 'Nyd Wire';
 
 z.string.da.ephememal_units_none = 'Slået Fra';

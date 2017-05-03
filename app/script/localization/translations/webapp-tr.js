@@ -242,6 +242,7 @@ z.string.tr.conversation_delete_timestamp = '%@timestamp ’da silinmiş';
 z.string.tr.conversation_edit_timestamp = '%@timestamp ’da düzenlenmiş';
 z.string.tr.conversation_likes_caption = '%@number kişi';
 z.string.tr.conversation_send_pasted_file = 'Yapıştırılmış resim, %date ’de';
+z.string.tr.conversation_tweet_author = ' Twitter’da';
 
 z.string.tr.collection_show_all = '%no’nun tümünü göster';
 z.string.tr.collection_section_links = 'Bağlantılar';
@@ -258,7 +259,6 @@ z.string.tr.conversations_all_archived = 'Her şey arşivlendi';
 z.string.tr.conversations_contacts = 'Kişiler';
 z.string.tr.conversations_connection_request_many = '%no kişi bekliyor';
 z.string.tr.conversations_connection_request_one = 'Bir kişi bekliyor';
-z.string.tr.conversations_empty_conversation = 'Boş konuşma';
 z.string.tr.conversations_no_conversations = 'Bir konuşma başlatın veya insanları katılmaları için davet edin.';
 z.string.tr.conversations_popover_archive = 'Arşivle';
 z.string.tr.conversations_popover_block = 'Engelle';
@@ -268,6 +268,8 @@ z.string.tr.conversations_popover_leave = 'Ayrıl';
 z.string.tr.conversations_popover_notify = 'Susturmayı Aç';
 z.string.tr.conversations_popover_silence = 'Sustur';
 z.string.tr.conversations_popover_unarchive = 'Arşivden Çıkar';
+
+z.string.tr.conversations_secondary_line_timed_message = 'Süreli Mesaj';
 
 z.string.tr.takeover_headline = 'Kullanıcı adları burada.';
 z.string.tr.takeover_sub = 'Wire üzerinden size özel isminizi hemen alın.';
@@ -429,8 +431,6 @@ z.string.tr.search_top_people = 'Enler';
 z.string.tr.search_try_search = 'İnsanları isimlerine veya kullanıcı adlarına göre bul';
 z.string.tr.search_no_contacts_on_wire = 'Wire’da hiç kişiniz yok. İnsanları isimlerine veya kullanıcı adlarına göre bulmayı deneyin.';
 z.string.tr.search_others = 'Bağlan';
-z.string.tr.search_friend_in_common = '%no ortak kişi';
-z.string.tr.search_friends_in_common = '%no ortak kişi';
 
 z.string.tr.upload_google_headline = 'Konuşmak için\ninsanları bul.';
 z.string.tr.upload_google_message = 'İletişim verilerinizi sizi başkalarıyla bağlayabilmek için kullanıyoruz. Tüm bilgilerinizi gizler ve kimseyle paylaşmayız.';
@@ -441,6 +441,7 @@ z.string.tr.upload_google_button_again = 'Tekrar deneyin';
 z.string.tr.url_password_reset = 'forgot/';
 z.string.tr.url_legal = 'https://wire.com/legal/';
 z.string.tr.url_privacy = 'https://wire.com/privacy/';
+z.string.tr.url_privacy_how = 'https://wire.com/privacy/how/';
 z.string.tr.url_privacy_why = 'https://wire.com/privacy/why/';
 z.string.tr.url_support = 'https://support.wire.com';
 z.string.tr.url_terms_of_use = 'https://wire.com/legal/terms/';
@@ -482,6 +483,7 @@ z.string.tr.warning_connectivity_connection_lost = 'Bağlanmaya çalışılıyor
 z.string.tr.warning_connectivity_no_internet = 'İnternet bağlantısı yok. Mesaj gönderemez veya mesaj alamazsınız.';
 
 z.string.tr.warning_lifecycle_update = 'Wire’ın yeni bir versiyonu mevcut.';
+z.string.tr.warning_lifecycle_update_notes = 'Neler yeni';
 z.string.tr.warning_lifecycle_update_link = 'Şimdi güncelle';
 
 z.string.tr.system_notification_asset_add = 'Bir resim paylaştı';
@@ -542,7 +544,9 @@ z.string.tr.tooltip_preferences_rename = 'İsminizi değiştirin';
 
 z.string.tr.tooltip_search_close = 'Kapat (Esc)';
 
+z.string.tr.init_received_access_token = 'Giriş yapıldı';
 z.string.tr.init_received_self_user = 'Merhaba, %name.';
+z.string.tr.init_validated_client = 'Bağlantılarınız ve konuşmalarınız alınıyor';
 z.string.tr.init_received_user_data = 'Yeni mesajlar kontrol ediliyor';
 z.string.tr.init_events_progress = 'Mesajlar yükleniyor - %total’de %progress';
 z.string.tr.init_updated_from_notifications = 'Wire’ın tadını çıkarın';
