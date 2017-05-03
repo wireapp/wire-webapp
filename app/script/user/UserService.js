@@ -53,7 +53,7 @@ z.user.UserService = class UserService {
     return this.client.send_json({
       data: {
         message: ' ',
-        name,
+        name: name,
         user: user_id,
       },
       type: 'POST',
@@ -93,7 +93,7 @@ z.user.UserService = class UserService {
   update_connection_status(user_id, status) {
     return this.client.send_json({
       data: {
-        status,
+        status: status,
       },
       type: 'PUT',
       url: this.client.create_url(`/connections/${user_id}`),
@@ -110,7 +110,7 @@ z.user.UserService = class UserService {
   initiate_password_reset(email, phone_number) {
     return this.client.send_json({
       data: {
-        email,
+        email: email,
         phone: phone_number,
       },
       type: 'POST',
@@ -141,7 +141,7 @@ z.user.UserService = class UserService {
    */
   update_own_user_profile(data) {
     return this.client.send_json({
-      data,
+      data: data,
       type: 'PUT',
       url: this.client.create_url(UserService.URL.SELF),
     });
@@ -156,7 +156,7 @@ z.user.UserService = class UserService {
   change_own_email(email) {
     return this.client.send_json({
       data: {
-        email,
+        email: email,
       },
       type: 'PUT',
       url: this.client.create_url('/self/email'),
@@ -188,8 +188,8 @@ z.user.UserService = class UserService {
   change_own_password(new_password, old_password) {
     return this.client.send_json({
       data: {
-        new_password,
-        old_password,
+        new_password: new_password,
+        old_password: old_password,
       },
       type: 'PUT',
       url: this.client.create_url('/self/password'),
