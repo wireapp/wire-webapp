@@ -65,8 +65,8 @@ class z.conversation.ConversationRepository
     @sorted_conversations = ko.pureComputed =>
       @filtered_conversations().sort z.util.sort_groups_by_last_event
 
-    @receiving_queue = new z.util.PromiseQueue()
-    @sending_queue = new z.util.PromiseQueue paused: true
+    @receiving_queue = new z.util.PromiseQueue name: 'ConversationRepository.Receiving'
+    @sending_queue = new z.util.PromiseQueue name: 'ConversationRepository.Sending', paused: true
 
     # @note Only use the client request queue as to unblock if not blocked by event handling or the cryptographic order of messages will be ruined and sessions might be deleted
     @conversation_service.client.request_queue_blocked_state.subscribe (state) =>
@@ -1791,6 +1791,14 @@ class z.conversation.ConversationRepository
     return false if conversation_et.is_one2one() and conversation_et.connection().status() isnt z.user.ConnectionStatus.ACCEPTED
     return true
 
+  ###
+  Count number of pending uploads
+  @return [Integer] Number of pending uploads
+  ###
+  get_number_of_pending_uploads: =>
+    return @conversations().reduce (sum, conversation_et) ->
+      sum + conversation_et.get_number_of_pending_uploads()
+    , 0
 
   ###############################################################################
   # Event callbacks
@@ -2498,31 +2506,6 @@ class z.conversation.ConversationRepository
   ###############################################################################
   # Tracking helpers
   ###############################################################################
-
-  ###
-  Count of group conversations
-  @return [Integer] Number of group conversations
-  ###
-  get_number_of_group_conversations: ->
-    group_conversations = (i for conversation_et, i in @conversations() when conversation_et.is_group())
-    return group_conversations.length
-
-  ###
-  Count of silenced conversations
-  @return [Integer] Number of conversations that are silenced
-  ###
-  get_number_of_silenced_conversations: =>
-    silenced_conversations = (i for conversation_et, i in @conversations() when conversation_et.is_muted())
-    return silenced_conversations.length
-
-  ###
-  Count number of pending uploads
-  @return [Integer] Number of pending uploads
-  ###
-  get_number_of_pending_uploads: =>
-    return @conversations().reduce (sum, conversation_et) ->
-      sum + conversation_et.get_number_of_pending_uploads()
-    , 0
 
   ###
   Track generic messages for media actions.
