@@ -25,7 +25,7 @@ z.ViewModel = z.ViewModel || {};
 const EMOJI_LIST_LENGTH = 5;
 const EMOJI_LIST_OFFSET_LEFT = 8;
 const EMOJI_LIST_OFFSET_TOP = 8;
-const QUERY_MIN_LENGTH = 2;
+const QUERY_MIN_LENGTH = 1;
 
 z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewModel {
   constructor() {
@@ -34,6 +34,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     this.emoji_list = $(`<div class='${emoji_list_class}' />`);
     this.emoji_dict = undefined;
     this.emoji_start_pos = -1;
+    this.emoji_usage_count = z.util.StorageUtil.get_value(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
     $(document).on('click', `.${emoji_list_class}`, (event) => {
       const clicked = $(event.target);
@@ -51,9 +52,10 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     fetch('/image/emoji.tsv')
       .then((response) => response.text())
       .then((text) => {
-        this.emoji_dict = text.split('\n');
+        this.emoji_dict = text.split('\n').filter((event) => event.length > 0);
       });
 
+    this.bound_remove_emoji_list = this.remove_emoji_list.bind(this);
     this._init_subscriptions();
   }
 
@@ -117,12 +119,22 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     if (query.length < QUERY_MIN_LENGTH || query[0] === ' ' || !this.emoji_dict) {
       this.emoji_list.remove();
     } else {
+      const query_words = query.split(' ');
       const emoji_matched = this.emoji_dict
-        .filter((emoji) => emoji.toLowerCase().indexOf(query) !== -1)
+        .filter((emoji) => {
+          const [, emoji_name] = emoji.split('\t');
+          const emoji_name_words = emoji_name.split(' ');
+          return query_words.every((query_word) => emoji_name_words.some((emoji_name_word) => emoji_name_word.startsWith(query_word)));
+        })
         .sort((emoji_a, emoji_b) => {
           const [, emoji_name_a] = emoji_a.split('\t');
           const [, emoji_name_b] = emoji_b.split('\t');
-          return z.util.StringUtil.sort_by_priority(emoji_name_a, emoji_name_b, query);
+          const usage_count_a = this.get_usage_count(emoji_name_a);
+          const usage_count_b = this.get_usage_count(emoji_name_b);
+          if (usage_count_a === usage_count_b) {
+            return z.util.StringUtil.sort_by_priority(emoji_name_a, emoji_name_b, query);
+          }
+          return usage_count_b - usage_count_a;
         })
         .slice(0, EMOJI_LIST_LENGTH)
         .map((emoji) => {
@@ -133,9 +145,9 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
         .join('');
 
       if (emoji_matched === '') {
-        this.remove_emoji_list();
+        this.close_emoji_list();
       } else {
-        window.addEventListener('click', this.remove_emoji_list.bind(this));
+        window.addEventListener('click', this.bound_remove_emoji_list);
         this.emoji_list
           .html(emoji_matched)
           .appendTo('body')
@@ -161,6 +173,8 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
 
   enter_emoji(input, emoji_line) {
     const emoji = emoji_line.find('.symbol').text();
+    const emoji_name = emoji_line.find('.name').text();
+    this.inc_usage_count(emoji_name);
     const text_before_emoji = input.value.substr(0, this.emoji_start_pos - 1);
     const text_after_emoji = input.value.substr(input.selectionStart);
     input.value = `${text_before_emoji}${emoji}${text_after_emoji}`;
@@ -170,9 +184,13 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
     $(input).focus();
   }
 
-  remove_emoji_list() {
-    window.removeEventListener('click', this.remove_emoji_list);
+  close_emoji_list() {
+    window.removeEventListener('click', this.bound_remove_emoji_list);
     this.emoji_list.remove();
+  }
+
+  remove_emoji_list() {
+    this.close_emoji_list();
     this.emoji_start_pos = -1;
   }
 
@@ -209,5 +227,15 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
 
     mask.remove();
     return sbr;
+  }
+
+  get_usage_count(emoji_name) {
+    return this.emoji_usage_count[emoji_name.toLowerCase()] || 0;
+  }
+
+  inc_usage_count(emoji_name) {
+    emoji_name = emoji_name.toLowerCase();
+    this.emoji_usage_count[emoji_name] = this.get_usage_count(emoji_name) + 1;
+    z.util.StorageUtil.set_value(z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, this.emoji_usage_count);
   }
 };

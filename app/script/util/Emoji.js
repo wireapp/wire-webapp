@@ -26,7 +26,7 @@ z.util.emoji = {
   includes_only_emojies: function(text) {
     // http://www.unicode.org/Public/emoji/1.0/emoji-data.txt
     // http://crocodillon.com/blog/parsing-emoji-unicode-in-javascript
-    const emoji_regex = /\ud83c[\udf00-\udfff]|\ud83d[\udc00-\udeff]|\ud83e[\udd10-\uddff]|[\u231a-\u27ff][\ufe0f]?/g;
+    const emoji_regex = /\ud83c[\udf00-\udfff]|\ud83c[\udde6-\uddff]|\ud83d[\udc00-\udeff]|\ud83e[\udd10-\uddff]|[\u231a-\u27ff][\ufe0f]?/g;
 
     const is_valid_string = (string) => _.isString(string) && (string.length > 0);
     const remove_emojies = (string) => string.replace(emoji_regex, '');

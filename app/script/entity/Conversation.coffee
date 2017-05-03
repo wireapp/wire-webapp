@@ -124,11 +124,6 @@ class z.entity.Conversation
       return false if not @call()
       return @call().state() not in z.calling.enum.CallStateGroups.IS_ENDED and not @call().is_ongoing_on_another_client()
 
-    @unread_accent_color = ko.observable ''
-
-    @unread_event_count = ko.pureComputed =>
-      return @unread_events().length
-
     @unread_events = ko.pureComputed =>
       unread_event = []
       for message_et in @messages() when message_et.visible() by -1
@@ -136,20 +131,11 @@ class z.entity.Conversation
         unread_event.push message_et
       return unread_event
 
+    @unread_event_count = ko.pureComputed =>
+      return @unread_events().length
+
     @unread_message_count = ko.pureComputed =>
       return (message_et for message_et in @unread_events() when not message_et.user().is_me).length
-
-    @unread_type = ko.pureComputed =>
-      return z.conversation.ConversationUnreadType.CONNECT if @connection().status() is z.user.ConnectionStatus.SENT
-      unread_type = z.conversation.ConversationUnreadType.UNREAD
-      return unread_type if @unread_message_count() <= 0
-      for message in @unread_events() by -1
-        return z.conversation.ConversationUnreadType.CALL if message.finished_reason is z.calling.enum.TERMINATION_REASON.MISSED
-        if message.is_ping()
-          @unread_accent_color message.accent_color()
-          return z.conversation.ConversationUnreadType.PING
-      return unread_type
-    @unread_type.extend rateLimit: 50
 
     ###
     Display name strategy:

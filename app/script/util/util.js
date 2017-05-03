@@ -513,8 +513,8 @@ z.util.sort_object_by_keys = function(object, reverse) {
   keys.sort();
 
   if (reverse) {
-    for (let i = keys.length - 1; i >= 0; i--) {
-      const key = keys[i];
+    for (let index = keys.length - 1; index >= 0; index--) {
+      const key = keys[index];
       const value = object[key];
       sorted_object[key] = value;
     }
@@ -592,15 +592,15 @@ z.util.murmurhash3 = function(key, seed) {
   let h1 = seed;
   const c1 = 0xcc9e2d51;
   const c2 = 0x1b873593;
-  let i = 0;
+  let index = 0;
 
-  while (i < bytes) {
+  while (index < bytes) {
     let k1 =
-      ((key.charCodeAt(i) & 0xff)) |
-      ((key.charCodeAt(++i) & 0xff) << 8) |
-      ((key.charCodeAt(++i) & 0xff) << 16) |
-      ((key.charCodeAt(++i) & 0xff) << 24);
-    ++i;
+      ((key.charCodeAt(index) & 0xff)) |
+      ((key.charCodeAt(++index) & 0xff) << 8) |
+      ((key.charCodeAt(++index) & 0xff) << 16) |
+      ((key.charCodeAt(++index) & 0xff) << 24);
+    ++index;
 
     k1 = ((((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16))) & 0xffffffff;
     k1 = (k1 << 15) | (k1 >>> 17);
@@ -616,13 +616,13 @@ z.util.murmurhash3 = function(key, seed) {
 
   switch (remainder) {
     case 3:
-      k1 ^= (key.charCodeAt(i + 2) & 0xff) << 16;
+      k1 ^= (key.charCodeAt(index + 2) & 0xff) << 16;
       break;
     case 2:
-      k1 ^= (key.charCodeAt(i + 1) & 0xff) << 8;
+      k1 ^= (key.charCodeAt(index + 1) & 0xff) << 8;
       break;
     case 1:
-      k1 ^= (key.charCodeAt(i) & 0xff);
+      k1 ^= (key.charCodeAt(index) & 0xff);
 
       k1 = (((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
       k1 = (k1 << 15) | (k1 >>> 17);
@@ -688,10 +688,10 @@ z.util.bucket_values = function(value, bucket_limits) {
     return '0';
   }
 
-  for (let i = 0; i < bucket_limits.length; i++) {
-    const limit = bucket_limits[i];
+  for (let index = 0; index < bucket_limits.length; index++) {
+    const limit = bucket_limits[index];
     if (value < (limit + 1)) {
-      const previous_limit = bucket_limits[i - 1];
+      const previous_limit = bucket_limits[index - 1];
       return `${previous_limit + 1}-${limit}`;
     }
   }
@@ -724,3 +724,9 @@ z.util.format_time_remaining = function(time_remaining) {
 
   return title || '';
 };
+
+/**
+ * No operation
+ * @returns {undefined}
+ */
+z.util.noop = function() {};
