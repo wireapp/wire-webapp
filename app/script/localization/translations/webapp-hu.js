@@ -260,7 +260,6 @@ z.string.hu.conversations_all_archived = 'Minden archiválva';
 z.string.hu.conversations_contacts = 'Névjegyek';
 z.string.hu.conversations_connection_request_many = '%no partner várakozik';
 z.string.hu.conversations_connection_request_one = '1 partner várakozik';
-z.string.hu.conversations_empty_conversation = 'Üres beszélgetés';
 z.string.hu.conversations_no_conversations = 'Indítson beszélgetést, vagy hívjon partnereket, hogy csatlakozzanak.';
 z.string.hu.conversations_popover_archive = 'Archiválás';
 z.string.hu.conversations_popover_block = 'Tiltás';
@@ -270,6 +269,8 @@ z.string.hu.conversations_popover_leave = 'Elhagyás';
 z.string.hu.conversations_popover_notify = 'Némítás feloldása';
 z.string.hu.conversations_popover_silence = 'Némítás';
 z.string.hu.conversations_popover_unarchive = 'Archiválás visszavonása';
+
+z.string.hu.conversations_secondary_line_timed_message = 'Időzített üzenet';
 
 z.string.hu.takeover_headline = 'Felhasználónevek itt találhatóak.';
 z.string.hu.takeover_sub = 'Igényeljen egyedei nevet a Wire-ön.';
@@ -431,8 +432,6 @@ z.string.hu.search_top_people = 'Top Partnerek';
 z.string.hu.search_try_search = 'Találjon partnerekre név vagy felhasználónév alapján';
 z.string.hu.search_no_contacts_on_wire = 'Nincsenek névjegyei a Wire-ben.\nKeressen partnereket, \nnév vagy felhasználónév alapján.';
 z.string.hu.search_others = 'Csatlakozás';
-z.string.hu.search_friend_in_common = '%no közös ismerős';
-z.string.hu.search_friends_in_common = '%no közös ismerős';
 
 z.string.hu.upload_google_headline = 'Keressen partnereket\na Wire-ön.';
 z.string.hu.upload_google_message = 'Mi a névjegyeit használjuk, hogy kapcsolatba lépjen másokkal. Minden információt névtelenítünk, és nem osszuk meg másoknak.';
@@ -485,6 +484,7 @@ z.string.hu.warning_connectivity_connection_lost = 'Csatlakozni próbál. A Wire
 z.string.hu.warning_connectivity_no_internet = 'Nincs internet. Nem képes üzeneteket küldeni és fogadni.';
 
 z.string.hu.warning_lifecycle_update = 'Elérhető a Wire új verziója.';
+z.string.hu.warning_lifecycle_update_notes = 'Újdonságok';
 z.string.hu.warning_lifecycle_update_link = 'Frissítés most';
 
 z.string.hu.system_notification_asset_add = 'Kép megosztása';

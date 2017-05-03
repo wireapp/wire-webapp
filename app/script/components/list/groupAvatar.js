@@ -38,7 +38,7 @@ z.components.GroupAvatar = class GroupAvatar {
         .filter((resource) => resource !== undefined)
         .map((resource) => resource.get_object_url());
 
-      Promise.all(promises).then((urls) => this.avatar_urls(urls.map((url) =>`url(${url})`)));
+      Promise.all(promises).then((urls) => this.avatar_urls(urls.map((url) => `url(${url})`)));
     }).extend({rateLimit: 50});
   }
 
@@ -48,12 +48,11 @@ z.components.GroupAvatar = class GroupAvatar {
   }
 
   dispose() {
-    this.user_image_observable.dispose()
+    this.user_image_observable.dispose();
   }
 };
 
 ko.components.register('group-avatar', {
-  viewModel: z.components.GroupAvatar,
   template: `
     <div class="group-avatar-image-wrapper" data-bind="in_viewport: on_in_viewport">
       <!-- ko foreach: avatar_urls -->
@@ -61,4 +60,5 @@ ko.components.register('group-avatar', {
       <!-- /ko -->
     </div>
   `,
+  viewModel: z.components.GroupAvatar,
 });

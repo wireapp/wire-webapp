@@ -242,6 +242,7 @@ z.string.uk.conversation_delete_timestamp = 'Видалене: %@timestamp';
 z.string.uk.conversation_edit_timestamp = 'Відредаговане: %@timestamp';
 z.string.uk.conversation_likes_caption = '%@number учасників';
 z.string.uk.conversation_send_pasted_file = 'Надіслав(-ла) зображення %date';
+z.string.uk.conversation_tweet_author = ' в Twitter';
 
 z.string.uk.collection_show_all = 'Показати всі %no';
 z.string.uk.collection_section_links = 'Посилання';
@@ -258,7 +259,6 @@ z.string.uk.conversations_all_archived = 'Усі розмови заархіво
 z.string.uk.conversations_contacts = 'Контакти';
 z.string.uk.conversations_connection_request_many = '%no людей очікує';
 z.string.uk.conversations_connection_request_one = '1 людина очікує';
-z.string.uk.conversations_empty_conversation = 'Розмова без учасників';
 z.string.uk.conversations_no_conversations = 'Розпочніть розмову або запросіть більше людей приєднатися до неї.';
 z.string.uk.conversations_popover_archive = 'Архівувати';
 z.string.uk.conversations_popover_block = 'Заблокувати';
@@ -268,6 +268,8 @@ z.string.uk.conversations_popover_leave = 'Вийти з розмови';
 z.string.uk.conversations_popover_notify = 'Увімкнути звук';
 z.string.uk.conversations_popover_silence = 'Вимкнути звук';
 z.string.uk.conversations_popover_unarchive = 'Розархівувати';
+
+z.string.uk.conversations_secondary_line_timed_message = 'Тимчасове повідомлення';
 
 z.string.uk.takeover_headline = 'Ніки вже тут.';
 z.string.uk.takeover_sub = 'Зарезервуйте свій унікальний нік в Wire.';
@@ -429,8 +431,6 @@ z.string.uk.search_top_people = 'Топ-контакти';
 z.string.uk.search_try_search = 'Шукайте людай\nза іменем або ніком';
 z.string.uk.search_no_contacts_on_wire = 'У вас поки що немає контактів в Wire.\nСпробуйте знайти людей\nза їхніми іменами або ніками.';
 z.string.uk.search_others = 'Додати до контактів';
-z.string.uk.search_friend_in_common = '%no спільний знайомий';
-z.string.uk.search_friends_in_common = '%no спільних знайомих';
 
 z.string.uk.upload_google_headline = 'Знайдіть людей,\nщоб порозмовляти.';
 z.string.uk.upload_google_message = 'Ми використовуємо дані про ваші контакти, щоб ви могли знайти людей, яких ви знаєте. Ми анонімізуємо всю інформацію та не передаємо її третім особам.';
@@ -441,6 +441,7 @@ z.string.uk.upload_google_button_again = 'Спробувати ще раз';
 z.string.uk.url_password_reset = 'forgot/';
 z.string.uk.url_legal = 'https://wire.com/legal/';
 z.string.uk.url_privacy = 'https://wire.com/privacy/';
+z.string.uk.url_privacy_how = 'https://wire.com/privacy/how/';
 z.string.uk.url_privacy_why = 'https://wire.com/privacy/why/';
 z.string.uk.url_support = 'https://support.wire.com';
 z.string.uk.url_terms_of_use = 'https://wire.com/legal/terms/';
@@ -482,6 +483,7 @@ z.string.uk.warning_connectivity_connection_lost = 'Намагаюся підк�
 z.string.uk.warning_connectivity_no_internet = 'Відсутнє підключення до Internet. Ви не зможете надсилати чи отримувати повідомлення.';
 
 z.string.uk.warning_lifecycle_update = 'Доступна нова версія Wire.';
+z.string.uk.warning_lifecycle_update_notes = 'Що нового';
 z.string.uk.warning_lifecycle_update_link = 'Оновити зараз';
 
 z.string.uk.system_notification_asset_add = 'Поділився(-лась) картинкою';
@@ -542,7 +544,9 @@ z.string.uk.tooltip_preferences_rename = 'Змініть своє ім’я';
 
 z.string.uk.tooltip_search_close = 'Закрити (Esc)';
 
+z.string.uk.init_received_access_token = 'Аутентифікація пройшла успішно';
 z.string.uk.init_received_self_user = 'Привіт %name.';
+z.string.uk.init_validated_client = 'Отримую список контактів та розмов';
 z.string.uk.init_received_user_data = 'Перевіряю наявність нових повідомлень';
 z.string.uk.init_events_progress = 'Завантажую повідомлення - %progress з %total';
 z.string.uk.init_updated_from_notifications = 'Насолоджуйтесь Wire';

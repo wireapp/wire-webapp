@@ -260,7 +260,8 @@ z.string.de.conversations_all_archived = 'Alle Unterhaltungen archiviert';
 z.string.de.conversations_contacts = 'Kontakte';
 z.string.de.conversations_connection_request_many = '%no Kontaktanfragen';
 z.string.de.conversations_connection_request_one = 'Eine Kontaktanfrage';
-z.string.de.conversations_empty_conversation = 'Leere Unterhaltung';
+z.string.de.conversations_empty_conversation = 'Gruppenunterhaltung';
+z.string.de.conversations_empty_conversation_description = 'Leere Unterhaltung';
 z.string.de.conversations_no_conversations = 'Beginne eine Unterhaltung oder lade weitere Freunde ein.';
 z.string.de.conversations_popover_archive = 'Archivieren';
 z.string.de.conversations_popover_block = 'Blockieren';
@@ -270,6 +271,18 @@ z.string.de.conversations_popover_leave = 'Verlassen';
 z.string.de.conversations_popover_notify = 'Benachrichtigen';
 z.string.de.conversations_popover_silence = 'Stummschalten';
 z.string.de.conversations_popover_unarchive = 'Dearchivieren';
+
+z.string.de.conversations_secondary_line_missed_call = '%n verpasster Anruf';
+z.string.de.conversations_secondary_line_missed_calls = '%n verpasste Anrufe';
+z.string.de.conversations_secondary_line_new_message = '%n neue Nachricht';
+z.string.de.conversations_secondary_line_new_messages = '%n neue Nachrichten';
+z.string.de.conversations_secondary_line_ping = '%n Ping';
+z.string.de.conversations_secondary_line_pings = '%n Ping';
+z.string.de.conversations_secondary_line_person_left = '%n Person entfernt';
+z.string.de.conversations_secondary_line_people_left = '%n Personen entfernt';
+z.string.de.conversations_secondary_line_person_added = '%user1 hat %user2 hinzugefügt';
+z.string.de.conversations_secondary_line_people_added = '%user Kontakte wurden hinzugefügt';
+z.string.de.conversations_secondary_line_timed_message = 'Temporäre Nachricht';
 
 z.string.de.takeover_headline = 'Benutzernamen sind da.';
 z.string.de.takeover_sub = 'Sichere dir deinen persönlichen Benutzernamen auf Wire.';
@@ -319,7 +332,7 @@ z.string.de.people_tabs_device_detail_headline = 'Überprüfe, ob dieser Fingera
 z.string.de.people_tabs_device_detail_how_to = 'Wie mache ich das?';
 z.string.de.people_tabs_device_detail_reset_session = 'Session zurücksetzen';
 z.string.de.people_tabs_device_detail_show_my_device = 'Zeige meinen Fingerabdruck';
-z.string.de.people_tabs_device_detail_verify = 'Verifiziert';
+z.string.de.people_tabs_device_detail_verify = 'Ok';
 z.string.de.people_verified = 'Verifiziert';
 
 z.string.de.people_block_headline = 'Blockieren?';
@@ -431,8 +444,6 @@ z.string.de.search_top_people = 'Top Kontakte';
 z.string.de.search_try_search = 'Finde Kontakte anhand ihres\nNamens oder Benutzernamens';
 z.string.de.search_no_contacts_on_wire = 'Du hast keine Kontakte auf Wire.\nSuche nach Namen\noder Benutzernamen.';
 z.string.de.search_others = 'Kontakt hinzufügen';
-z.string.de.search_friend_in_common = '%no gemeinsamer Freund';
-z.string.de.search_friends_in_common = '%no gemeinsame Freunde';
 
 z.string.de.upload_google_headline = 'Finde Kontakte \nauf Wire.';
 z.string.de.upload_google_message = 'Wir verwenden deine Daten, um Kontakte für dich zu erstellen. Wir anonymisieren alle Informationen und teilen sie mit niemand anderem.';

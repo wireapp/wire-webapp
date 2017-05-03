@@ -38,6 +38,7 @@ z.storage.StorageKey = {
     SHOW_LOGIN: 'z.storage.StorageKey.AUTH.SHOW_LOGIN',
   },
   CONVERSATION: {
+    EMOJI_USAGE_COUNT: 'z.storage.StorageKey.CONVERSATION.EMOJI_USAGE_COUNT',
     INPUT: 'z.storage.StorageKey.CONVERSATION.INPUT',
   },
   LOCALIZATION: {
