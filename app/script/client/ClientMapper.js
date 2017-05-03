@@ -56,16 +56,18 @@ z.client.ClientMapper = class ClientMapper {
    *
    * @param {z.client.Client|Object} client - Client data
    * @param {Object} update_payload - JSON possibly containing updates
-   * @returns {Array<z.client.Client|Object, Boolean>} An array that contains the client and whether there was a change
+   * @returns {Object} Contains the client and whether there was a change
    */
   update_client(client, update_payload) {
     let contains_update = false;
+
     for (const member in update_payload) {
       if (JSON.stringify(client[member]) !== JSON.stringify(update_payload[member])) {
         contains_update = true;
         client[member] = update_payload[member];
       }
     }
-    return [client, contains_update];
+
+    return {client: client, was_updated: contains_update};
   }
 };
