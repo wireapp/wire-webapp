@@ -192,7 +192,7 @@ z.conversation.ConversationCellState = (() => {
       let message_text = '';
 
       if (last_message_et.is_ephemeral()) {
-        message_text = z.localization.Localizer.get_text(z.string.system_notification_timed_message);
+        message_text = z.localization.Localizer.get_text(z.string.conversations_secondary_line_timed_message);
       } else if (last_message_et.is_ping()) {
         message_text = z.localization.Localizer.get_text(z.string.system_notification_ping);
       } else if (last_message_et.has_asset_text()) {
