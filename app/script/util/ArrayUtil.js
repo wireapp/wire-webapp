@@ -43,25 +43,25 @@ z.util.ArrayUtil = {
     return closest;
   },
   get_next_item(array, item, filter) {
-    const index = array.indexOf(item);
-    const next_index = index + 1;
+    const current_index = array.indexOf(item);
+    const next_index = current_index + 1;
 
     // couldn't find the item
-    if (index === -1) {
+    if (current_index === -1) {
       return null;
     }
 
     // item is last item in the array
-    if ((next_index === array.length) && (index > 0)) {
-      return array[index - 1];
+    if ((next_index === array.length) && (current_index > 0)) {
+      return array[current_index - 1];
     }
 
     if (next_index >= array.length) {
       return undefined;
     }
 
-    for (let idx = next_index; idx <= array.length; idx++) {
-      const current_item = array[idx];
+    for (let index = next_index; index <= array.length; index++) {
+      const current_item = array[index];
       if ((typeof filter !== 'function') || !!filter(current_item)) {
         return current_item;
       }

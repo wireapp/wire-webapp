@@ -33,10 +33,10 @@ z.assets.AssetCrypto = (() => {
   function decrypt_aes_asset(ciphertext, key_bytes, reference_sha256) {
     return window.crypto.subtle.digest('SHA-256', ciphertext)
       .then(function(computed_sha256) {
-        const first = new Uint32Array(reference_sha256);
-        const second = new Uint32Array(computed_sha256);
+        const typed_reference_sha256 = new Uint32Array(reference_sha256);
+        const typed_computed_sha256 = new Uint32Array(computed_sha256);
 
-        if ((first.length === second.length) && first.every((value, length) => value === second[length])) {
+        if ((typed_reference_sha256.length === typed_computed_sha256.length) && typed_reference_sha256.every((value, length) => value === typed_computed_sha256[length])) {
           return window.crypto.subtle.importKey('raw', key_bytes, 'AES-CBC', false, ['decrypt']);
         }
 
