@@ -85,7 +85,7 @@ z.ui.WindowHandler = class WindowHandler {
       const promise_rejection_event = event.originalEvent;
       const promise_error = promise_rejection_event.reason;
 
-      if (promise_error && promise_error.type === z.conversation.ConversationError.prototype.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
+      if (promise_error && promise_error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
         this.logger.log('User has canceled sending a message to a degraded conversation.');
         promise_rejection_event.preventDefault();
         promise_rejection_event.stopPropagation();

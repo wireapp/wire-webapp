@@ -303,7 +303,7 @@ describe 'z.conversation.ConversationRepository', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.conversation.ConversationError
-        expect(error.type).toBe z.conversation.ConversationError::TYPE.WRONG_USER
+        expect(error.type).toBe z.conversation.ConversationError.TYPE.WRONG_USER
         done()
 
     xit 'should send delete and deletes message for own messages', (done) ->
