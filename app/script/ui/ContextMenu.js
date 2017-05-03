@@ -31,25 +31,25 @@ z.ui.Context = (() => {
     window.addEventListener('resize', cleanup);
   }
 
-  function onKeyDown(e) {
-    e.preventDefault();
+  function onKeyDown(event) {
+    event.preventDefault();
 
-    if (e.keyCode === z.util.KEYCODE.ESC) {
+    if (event.keyCode === z.util.KEYCODE.ESC) {
       cleanup();
-    } else if (e.keyCode === z.util.KEYCODE.ARROW_UP || e.keyCode === z.util.KEYCODE.ARROW_DOWN) {
-      rotateItem(e.keyCode);
-    } else if (e.keyCode === z.util.KEYCODE.ENTER) {
+    } else if (event.keyCode === z.util.KEYCODE.ARROW_UP || event.keyCode === z.util.KEYCODE.ARROW_DOWN) {
+      rotateItem(event.keyCode);
+    } else if (event.keyCode === z.util.KEYCODE.ENTER) {
       triggerItem();
     }
   }
 
-  function onWheel(e) {
-    e.preventDefault();
+  function onWheel(event) {
+    event.preventDefault();
   }
 
-  function onMouseDown(e) {
+  function onMouseDown(event) {
     const entry = document.querySelector('.ctx-menu');
-    if (entry && entry.contains(e.target) === false) {
+    if (entry && entry.contains(event.target) === false) {
       cleanup();
     }
   }

@@ -27,7 +27,7 @@ ko.bindingHandlers.focus_on_keydown =
           return false if $('.detail-view').hasClass 'modal-show'
 
           meta_key_is_pressed = e.metaKey or e.ctrlKey
-          is_paste_action = meta_key_is_pressed and e.keyCode is z.util.KEYCODE.V
+          is_paste_action = meta_key_is_pressed and e.keyCode is z.util.KEYCODE.KEY_V
           is_arrow_key = z.util.KEYCODE.is_arrow_key e.keyCode
 
           # check for activeElement needed, cause in IE11 i could be undefined under some circumstances

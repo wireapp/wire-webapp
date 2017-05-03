@@ -30,12 +30,11 @@ z.util.StringUtil = {
     return z.util.StringUtil.includes(window.getSlug(name_a), window.getSlug(name_b));
   },
   format: function() {
-    let index = 0;
     let string = arguments[0];
 
-    for (let i = 0; i < arguments.length; ++i) {
+    for (let index = 0; index < arguments.length; ++index) {
       const reg = new RegExp('\\{' + index + '\\}', 'gm');
-      string = string.replace(reg, arguments[++index]);
+      string = string.replace(reg, arguments[index + 1]);
     }
 
     return string;
