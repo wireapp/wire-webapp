@@ -21,7 +21,6 @@
 
 const sdp_payloads = {
   original: {
-    type: 'offer',
     sdp: 'v=0\r\n' +
          'o=- 417754658890736523 2 IN IP4 127.0.0.1\r\n' +
          's=-\r\n' +
@@ -100,26 +99,26 @@ const sdp_payloads = {
          'a=ssrc:2255821848 msid:vmYtSQeNol6s2SCJ4LwWRDmzJnEGZPNcvMw7 68dc6bc0-c2c8-4f6d-b07d-3a4e00434eca\r\n' +
          'a=ssrc:2255821848 mslabel:vmYtSQeNol6s2SCJ4LwWRDmzJnEGZPNcvMw7\r\n' +
          'a=ssrc:2255821848 label:68dc6bc0-c2c8-4f6d-b07d-3a4e00434eca',
+    type: 'offer',
   },
   original_fingerprint: {
-    type: 'offer',
     sdp: 'v=0\r\n' +
-    'o=- 417754658890736523 2 IN IP4 127.0.0.1\r\n' + 's=-\r\n' +
-    't=0 0\r\n' +
-    'a=group:BUNDLE audio video\r\n' +
-    'a=msid-semantic: WMS vmYtSQeNol6s2SCJ4LwWRDmzJnEGZPNcvMw7\r\n' +
-    'm=audio 33723 RTP/SAVPF 111 103 104 9 0 8 106 105 13 126\r\n' +
-    'c=IN IP4 54.170.248.231\r\n' +
-    'a=rtcp:9 IN IP4 0.0.0.0\r\n' +
-    'a=ice-ufrag:QeJO/RZdtjZZAB4C\r\n' +
-    'a=ice-pwd:6Q224z4qZ5MgDieVn9i6ltyc\r\n' +
-    'a=fingerprint:sha-256 49:ee:7f:43:e6:66:bc:49:1b:7d:cf:53:3f:26:da:b5:c8:44:2e:08:a8:b4:ee:98:af:18:19:02:66:2a:fb:6c\r\n' +
-    'a=setup:actpass\r\n' +
-    'a=mid:audio\r\n' +
-    'a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level',
+         'o=- 417754658890736523 2 IN IP4 127.0.0.1\r\n' + 's=-\r\n' +
+         't=0 0\r\n' +
+         'a=group:BUNDLE audio video\r\n' +
+         'a=msid-semantic: WMS vmYtSQeNol6s2SCJ4LwWRDmzJnEGZPNcvMw7\r\n' +
+         'm=audio 33723 RTP/SAVPF 111 103 104 9 0 8 106 105 13 126\r\n' +
+         'c=IN IP4 54.170.248.231\r\n' +
+         'a=rtcp:9 IN IP4 0.0.0.0\r\n' +
+         'a=ice-ufrag:QeJO/RZdtjZZAB4C\r\n' +
+         'a=ice-pwd:6Q224z4qZ5MgDieVn9i6ltyc\r\n' +
+         'a=fingerprint:sha-256 49:ee:7f:43:e6:66:bc:49:1b:7d:cf:53:3f:26:da:b5:c8:44:2e:08:a8:b4:ee:98:af:18:19:02:66:2a:fb:6c\r\n' +
+         'a=setup:actpass\r\n' +
+         'a=mid:audio\r\n' +
+         'a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level',
+    type: 'offer',
   },
   rewritten_codecs: {
-    type: 'offer',
     sdp: 'v=0\r\n' +
          'o=- 417754658890736523 2 IN IP4 127.0.0.1\r\n' + 's=-\r\n' +
          't=0 0\r\n' +
@@ -194,23 +193,24 @@ const sdp_payloads = {
          'a=ssrc:2255821848 msid:vmYtSQeNol6s2SCJ4LwWRDmzJnEGZPNcvMw7 68dc6bc0-c2c8-4f6d-b07d-3a4e00434eca\r\n' +
          'a=ssrc:2255821848 mslabel:vmYtSQeNol6s2SCJ4LwWRDmzJnEGZPNcvMw7\r\n' +
          'a=ssrc:2255821848 label:68dc6bc0-c2c8-4f6d-b07d-3a4e00434eca',
+    type: 'offer',
   },
   rewritten_fingerprint: {
-    type: 'offer',
     sdp: 'v=0\r\n' +
-    'o=- 417754658890736523 2 IN IP4 127.0.0.1\r\n' + 's=-\r\n' +
-    't=0 0\r\n' +
-    'a=group:BUNDLE audio video\r\n' +
-    'a=msid-semantic: WMS vmYtSQeNol6s2SCJ4LwWRDmzJnEGZPNcvMw7\r\n' +
-    'm=audio 33723 RTP/SAVPF 111 103 104 9 0 8 106 105 13 126\r\n' +
-    'c=IN IP4 54.170.248.231\r\n' +
-    'a=rtcp:9 IN IP4 0.0.0.0\r\n' +
-    'a=ice-ufrag:QeJO/RZdtjZZAB4C\r\n' +
-    'a=ice-pwd:6Q224z4qZ5MgDieVn9i6ltyc\r\n' +
-    'a=fingerprint:sha-256 49:EE:7F:43:E6:66:BC:49:1B:7D:CF:53:3F:26:DA:B5:C8:44:2E:08:A8:B4:EE:98:AF:18:19:02:66:2A:FB:6C\r\n' +
-    'a=setup:actpass\r\n' +
-    'a=mid:audio\r\n' +
-    'a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level',
+         'o=- 417754658890736523 2 IN IP4 127.0.0.1\r\n' + 's=-\r\n' +
+         't=0 0\r\n' +
+         'a=group:BUNDLE audio video\r\n' +
+         'a=msid-semantic: WMS vmYtSQeNol6s2SCJ4LwWRDmzJnEGZPNcvMw7\r\n' +
+         'm=audio 33723 RTP/SAVPF 111 103 104 9 0 8 106 105 13 126\r\n' +
+         'c=IN IP4 54.170.248.231\r\n' +
+         'a=rtcp:9 IN IP4 0.0.0.0\r\n' +
+         'a=ice-ufrag:QeJO/RZdtjZZAB4C\r\n' +
+         'a=ice-pwd:6Q224z4qZ5MgDieVn9i6ltyc\r\n' +
+         'a=fingerprint:sha-256 49:EE:7F:43:E6:66:BC:49:1B:7D:CF:53:3F:26:DA:B5:C8:44:2E:08:A8:B4:EE:98:AF:18:19:02:66:2A:FB:6C\r\n' +
+         'a=setup:actpass\r\n' +
+         'a=mid:audio\r\n' +
+         'a=extmap:1 urn:ietf:params:rtp-hdrext:ssrc-audio-level',
+    type: 'offer',
   },
 };
 

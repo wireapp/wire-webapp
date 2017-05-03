@@ -464,7 +464,7 @@ class z.calling.entities.Flow
 
       on_failure = (error) =>
         @logger.warn "Failed to send local '#{@local_sdp().type}' SDP"
-        if error.code is z.service.BackendClientError::STATUS_CODE.NOT_FOUND
+        if error.code is z.service.BackendClientError.STATUS_CODE.NOT_FOUND
           return @reset_flow()
         @has_sent_local_sdp false
 
@@ -498,7 +498,7 @@ class z.calling.entities.Flow
       @logger.error "Creating '#{z.calling.rtc.SDPType.ANSWER}' failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'create_sdp', type: z.calling.rtc.SDPType.ANSWER}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
-      amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED
+      amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED
 
   ###
   Create a local SDP of type 'offer'.
@@ -543,7 +543,7 @@ class z.calling.entities.Flow
       @logger.error "Setting local '#{@local_sdp().type}' SDP failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'set_sdp', location: 'local', type: @local_sdp()?.type}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
-      amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED
+      amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED
 
   ###
   Sets the remote Session Description Protocol on the PeerConnection.
@@ -560,7 +560,7 @@ class z.calling.entities.Flow
       @logger.error "Setting remote '#{@remote_sdp().type}' SDP failed: #{error.name} - #{error.message}", error
       attributes = {cause: error.name, step: 'set_sdp', location: 'remote', type: @remote_sdp()?.type}
       @call_et.telemetry.track_event z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes
-      amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED
+      amplify.publish z.event.WebApp.CALL.STATE.LEAVE, @call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED
 
   ###
   Set the SDP send timeout.

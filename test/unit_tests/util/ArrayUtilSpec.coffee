@@ -49,7 +49,6 @@ describe 'z.util.ArrayUtil', ->
       expect(actual[3].length).toBe 1
       expect(arr.length).toBe 10
 
-
   describe 'get_next_item', ->
     a = 'a'
     b = 'b'
@@ -58,31 +57,29 @@ describe 'z.util.ArrayUtil', ->
     array = [a, b, c]
     filter = (item) -> item isnt 'b'
 
-    it 'can return the second item when first item was given', ->
+    it 'returns the second item when first item was given', ->
       expect(z.util.ArrayUtil.get_next_item array, a).toEqual b
 
-    it 'can return the third item when first item was given and filter skips the second item', ->
+    it 'returns the third item when first item was given and filter skips the second item', ->
       expect(z.util.ArrayUtil.get_next_item array, a, filter).toEqual c
 
-    it 'can return the second item when last item was given', ->
+    it 'returns the second item when last item was given', ->
       expect(z.util.ArrayUtil.get_next_item array, c).toEqual b
 
-    it 'can return undefined when item is not in the array', ->
+    it 'returns undefined when item is not in the array', ->
       expect(z.util.ArrayUtil.get_next_item array, d).toEqual null
 
-
   describe 'interpolate', ->
-    it 'should interpolate array with bigger length', ->
+    it 'interpolates arrays with bigger lengths', ->
       expect(z.util.ArrayUtil.interpolate([1, 5, 3], 5)).toEqual [1, 3, 5, 4, 3]
 
-    it 'should interpolate array with bigger length', ->
+    it 'interpolates arrays with bigger lengths (2nd example)', ->
       expect(z.util.ArrayUtil.interpolate([1, 3, 5, 4, 3], 3)).toEqual [1, 5, 3]
 
-    it 'should keep first and last value', ->
+    it 'keeps the first and the last value', ->
       interpolated_array = z.util.ArrayUtil.interpolate([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 5)
       expect(interpolated_array[0]).toEqual 0
       expect(interpolated_array[interpolated_array.length - 1]).toEqual 9
-
 
   describe 'is_last_item', ->
     a = 'a'
@@ -101,14 +98,13 @@ describe 'z.util.ArrayUtil', ->
     it 'returns false for an item that is not in the array', ->
       expect(z.util.ArrayUtil.is_last_item array, d).toBeFalsy()
 
-
   describe 'iterate_index', ->
     it 'returns undefined in case of wrong input parameters', ->
       expect(z.util.ArrayUtil.iterate_index 'Test', 0).toBe undefined
       expect(z.util.ArrayUtil.iterate_index [1, 2, 3], 'Test').toBe undefined
       expect(z.util.ArrayUtil.iterate_index [], 0).toBe undefined
 
-    it 'should iterate through the array index', ->
+    it 'iterates through the array index', ->
       array = [1, 2, 3, 4, 5]
       expect(z.util.ArrayUtil.iterate_index array, 0).toBe 1
       expect(z.util.ArrayUtil.iterate_index array, 1).toBe 2

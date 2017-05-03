@@ -23,9 +23,9 @@ window.z = window.z || {};
 window.z.assets = z.assets || {};
 
 z.assets.AssetTransferState = {
-  UPLOADING: 'uploading',
-  UPLOADED: 'uploaded',
-  UPLOAD_FAILED: 'upload-failed',
-  UPLOAD_CANCELED: 'upload-canceled',
   DOWNLOADING: 'downloading',
+  UPLOAD_CANCELED: 'upload-canceled',
+  UPLOAD_FAILED: 'upload-failed',
+  UPLOADED: 'uploaded',
+  UPLOADING: 'uploading',
 };

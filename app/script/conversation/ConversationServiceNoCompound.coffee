@@ -44,7 +44,7 @@ class z.conversation.ConversationServiceNoCompound extends z.conversation.Conver
     lower_bound = lower_bound.getTime()
     upper_bound = upper_bound.getTime()
 
-    @storage_service.db[@storage_service.OBJECT_STORE_EVENTS]
+    @storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
     .where 'conversation'
     .equals conversation_id
     .reverse()
@@ -63,7 +63,7 @@ class z.conversation.ConversationServiceNoCompound extends z.conversation.Conver
   @return [Promise]
   ###
   load_events_with_category_from_db: (conversation_id, category) ->
-    @storage_service.db[@storage_service.OBJECT_STORE_EVENTS]
+    @storage_service.db[z.storage.StorageService.OBJECT_STORE.EVENTS]
     .where 'conversation'
     .equals conversation_id
     .sortBy 'time'

@@ -30,8 +30,10 @@ describe 'z.client.ClientRepository', ->
       done()
     .catch done.fail
 
-  beforeEach ->
+  beforeEach (done) ->
     storage_repository.clear_all_stores()
+      .then done
+      .catch done.fail
 
   describe 'get_clients_by_user_id', ->
     it 'maps client entities from client payloads by the backend', (done) ->

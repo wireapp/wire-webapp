@@ -45,7 +45,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    * @param {Uint8Array} [otr_key] - Encryption key
    * @param {Uint8Array} [sha256] - Checksum
    * @param {string} [asset_token] - Token data
-   * @param {Boolean} [force_caching=false] - Cache asset in ServiceWorker
+   * @param {boolean} [force_caching=false] - Cache asset in ServiceWorker
    * @returns {z.assets.AssetRemoteData} V3 asset remote data
    */
   static v3(asset_key, otr_key, sha256, asset_token, force_caching = false) {
@@ -62,7 +62,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    * @param {string} asset_id - ID to retrieve asset with
    * @param {Uint8Array} otr_key - Encryption key
    * @param {Uint8Array} sha256 - Checksum
-   * @param {Boolean} [force_caching=false] - Cache asset in ServiceWorker
+   * @param {boolean} [force_caching=false] - Cache asset in ServiceWorker
    * @returns {z.assets.AssetRemoteData} V2 asset remote data
    */
   static v2(conversation_id, asset_id, otr_key, sha256, force_caching = false) {
@@ -78,7 +78,7 @@ z.assets.AssetRemoteData = class AssetRemoteData {
    * @deprecated
    * @param {string} conversation_id - ID of conversation
    * @param {string} asset_id - ID to retrieve asset with
-   * @param {Boolean} [force_caching=false] - Cache asset in ServiceWorker
+   * @param {boolean} [force_caching=false] - Cache asset in ServiceWorker
    * @returns {z.assets.AssetRemoteData} V1 asset remote data
    */
   static v1(conversation_id, asset_id, force_caching = false) {
