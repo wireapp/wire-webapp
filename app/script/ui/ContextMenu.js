@@ -99,6 +99,7 @@ z.ui.Context = (() => {
     for (const entry of entries) {
       const element = document.createElement('div');
       element.setAttribute('data-uie-name', identifier || 'ctx-menu');
+      element.setAttribute('title', entry.title || entry.label || '');
       element.classList.add('ctx-menu-item');
       element.innerText = entry.label;
       element.onclick = function(event) {
