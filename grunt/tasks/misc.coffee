@@ -97,6 +97,7 @@ module.exports = (grunt) ->
     'includereplace:prod_auth'
     'clean:deploy_app'
     'uglify:deploy'
+    'concat:deploy'
     'clean:deploy_script'
     'raygun:prod'
     'clean:prod'
