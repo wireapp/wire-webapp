@@ -3413,7 +3413,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       case 'calling': {
         const {props: properties} = e_call_message_et;
-        action_type = properties.videsend === 'true' ? 'video_call' : 'audio_call';
+        action_type = properties.videosend === 'true' ? 'video_call' : 'audio_call';
         break;
       }
 
