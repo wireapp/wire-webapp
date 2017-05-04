@@ -108,9 +108,9 @@ z.ui.Context = (() => {
         entry.click();
       };
       element.onmouseenter = function() {
-        const entry = document.querySelector('.ctx-menu-item.selected');
-        if (entry != null) {
-          entry.classList.remove('selected');
+        const selectedEntry = document.querySelector('.ctx-menu-item.selected');
+        if (selectedEntry != null) {
+          selectedEntry.classList.remove('selected');
         }
       };
       menu.appendChild(element);
