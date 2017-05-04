@@ -3087,7 +3087,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Object} user_client_map - User client map containing redundant clients
    * @param {Object} payload - Optional payload of the failed request
-   * @returns {Promise} Resolves with the rewritten payload
+   * @returns {Promise} Resolves with the updated payload
    */
   _handle_client_mismatch_deleted(user_client_map, payload) {
     if (_.isEmpty(user_client_map)) {
@@ -3103,9 +3103,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     };
 
     const _remove_deleted_user = function(user_id) {
-      const client_ids = Object.keys(payload.recipients[user_id]);
-
-      if (payload && !client_ids.length) {
+      if (payload && !Object.keys(payload.recipients[user_id]).length) {
         return delete payload.recipients[user_id];
       }
     };
@@ -3124,7 +3122,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Object} user_client_map - User client map containing redundant clients
    * @param {Object} payload - Optional payload of the failed request
    * @param {z.proto.GenericMessage} generic_message - Protobuffer message to be sent
-   * @returns {Promise} Resolves with the rewritten payload
+   * @returns {Promise} Resolves with the updated payload
    */
   _handle_client_mismatch_missing(user_client_map, payload, generic_message) {
     if (!payload || _.isEmpty(user_client_map)) {
@@ -3159,7 +3157,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Object} user_client_map - User client map containing redundant clients
    * @param {Object} payload - Optional payload of the failed request
    * @param {string} conversation_id - ID of conversation the message was sent in
-   * @returns {Promise} Resolves with the rewritten payload
+   * @returns {Promise} Resolves with the updated payload
   */
   _handle_client_mismatch_redundant(user_client_map, payload, conversation_id) {
     if (_.isEmpty(user_client_map)) {
@@ -3185,8 +3183,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             conversation_et.participating_user_ids.remove(user_id);
           }
 
-          const client_ids = Object.keys(payload.recipients[user_id]);
-          if (payload && !client_ids.length) {
+          if (payload && !Object.keys(payload.recipients[user_id]).length) {
             return delete payload.recipients[user_id];
           }
         };
