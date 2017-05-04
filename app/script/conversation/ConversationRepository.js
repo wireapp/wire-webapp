@@ -1653,25 +1653,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Object} user_client_map - User client map
-   * @param {Function} client_callback - Function to be executed on clients first
-   * @param {Function} user_callback - Function to be executed on users at the end
+   * @param {Function} client_fn - Function to be executed on clients first
+   * @param {Function} user_fn - Function to be executed on users at the end
    * @returns {Array} Function array
    */
-  _map_user_client_map(user_client_map, client_callback, user_callback) {
+  _map_user_client_map(user_client_map, client_fn, user_fn) {
     const result = [];
+    const user_ids = Object.keys(user_client_map);
 
-    user_client_map.forEach(function(user_id) {
+    user_ids.forEach(function(user_id) {
       if (user_client_map.hasOwnProperty(user_id)) {
         const client_ids = user_client_map[user_id];
 
-        if (_.isFunction(client_callback)) {
+        if (_.isFunction(client_fn)) {
           client_ids.forEach((function(client_id) {
-            result.push(client_callback(user_id, client_id));
+            result.push(client_fn(user_id, client_id));
           }));
         }
 
-        if (_.isFunction(user_callback)) {
-          result.push(user_callback(user_id));
+        if (_.isFunction(user_fn)) {
+          result.push(user_fn(user_id));
         }
       }
     });
@@ -2814,17 +2815,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the event was handled
    */
   _on_message_hidden(event_json) {
-    if (event_json.from !== this.user_repository.self().id) {
+    const {data: event_data, from} = event_json;
+    if (from !== this.user_repository.self().id) {
       return Promise.reject(new Error('Cannot hide message: Sender is not self user'));
     }
 
-    return this.get_conversation_by_id_async(event_json.data.conversation_id)
+    return this.get_conversation_by_id_async(event_data.conversation_id)
       .then((conversation_et) => {
-        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_json.data.message_id);
-        return this._delete_message_by_id(conversation_et, event_json.data.message_id);
+        amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, event_data.message_id);
+        return this._delete_message_by_id(conversation_et, event_data.message_id);
       })
       .catch((error) => {
-        this.logger.info(`Failed to delete message for conversation '${event_json.conversation}'`, error);
+        this.logger.info(`Failed to delete message '${event_data.message_id}' for conversation '${event_data.conversation_id}'`, error);
         throw error;
       });
   }
@@ -3204,9 +3206,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Message} message_et - Message to delete
    * @returns {Promise} Resolves when message was deleted
    */
-  _delete_message_by_id(conversation_et, message_et) {
+  _delete_message(conversation_et, message_et) {
     conversation_et.remove_message_by_id(message_et.id);
     return this.conversation_service.delete_message_with_key_from_db(message_et.primary_key);
+  }
+
+  /**
+   * Delete message from UI and database. Primary key is used to delete message in database.
+   *
+   * @private
+   * @param {Conversation} conversation_et - Conversation that contains the message
+   * @param {string} message_id - ID of message to delete
+   * @returns {Promise} Resolves when message was deleted
+   */
+  _delete_message_by_id(conversation_et, message_id) {
+    conversation_et.remove_message_by_id(message_id);
+    return this.conversation_service.delete_message_from_db(conversation_et.id, message_id);
   }
 
   /**
@@ -3352,7 +3367,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const first_asset = original_message_et.get_first_asset();
 
         if (!first_asset.previews().length) {
-          return this._delete_message_by_id(conversation_et, original_message_et.id);
+          return this._delete_message(conversation_et, original_message_et);
         }
       })
       .then(() => event_json);

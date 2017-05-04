@@ -18,7 +18,7 @@
 
 # grunt test_init && grunt test_run:conversation/ConversationRepository
 #@formatter:off
-describe 'z.conversation.ConversationRepository', ->
+describe 'ConversationRepository', ->
   test_factory = new TestFactory()
 
   client = test_factory.client

@@ -98,7 +98,7 @@ z.conversation.EventMapper = class EventMapper {
         message_et = this._map_event_member_update(event);
         break;
       case z.event.Client.CONVERSATION.MISSED_MESSAGES:
-        message_et = this._map_event_missed_messages(event);
+        message_et = this._map_event_missed_messages();
         break;
       case z.event.Backend.CONVERSATION.RENAME:
         message_et = this._map_event_rename(event);
@@ -156,6 +156,7 @@ z.conversation.EventMapper = class EventMapper {
 
     return message_et;
   }
+
 
   //##############################################################################
   // Event mappers
@@ -485,8 +486,8 @@ z.conversation.EventMapper = class EventMapper {
   _map_asset_link_preview(link_preview) {
     if (link_preview) {
       const link_preview_et = new z.entity.LinkPreview();
-      const {article = {}, image, permanent_url, summary, title, url, url_offset, meta_data} = link_preview;
-      const {image: article_image, title: article_title, summary: article_summary, permanent_url: article_permanent_url} = article;
+      const {image, permanent_url, summary, title, url, url_offset, meta_data} = link_preview;
+      const {image: article_image, title: article_title, summary: article_summary, permanent_url: article_permanent_url} = link_preview.article || {};
 
       link_preview_et.title = title || article_title;
       link_preview_et.summary = summary || article_summary;
@@ -520,7 +521,7 @@ z.conversation.EventMapper = class EventMapper {
    * @param {Array} [link_previews=[]] - base64 encoded proto previews
    * @returns {Array<LinkPreview>} Array of mapped link previews
    */
-  _map_asset_link_previews(link_previews) {
+  _map_asset_link_previews(link_previews = []) {
     return link_previews
       .map((encoded_link_preview) => z.proto.LinkPreview.decode64(encoded_link_preview))
       .map((link_preview) => this._map_asset_link_preview(link_preview))
@@ -531,12 +532,12 @@ z.conversation.EventMapper = class EventMapper {
    * Maps JSON data of text asset into asset entity
    *
    * @private
-   * @param {Object} data - Asset data received as JSON
+   * @param {Object} event_data - Asset data received as JSON
    * @returns {Text} Text asset entity
    */
-  _map_asset_text(data) {
-    const {id, content, message, nonce, previews} = data;
-    const asset_et = new z.entity.Text(id, content || message);
+  _map_asset_text(event_data) {
+    const {id, content, message, nonce, previews} = event_data;
+    const asset_et = new z.entity.Text(id, (content || message));
 
     asset_et.nonce = nonce;
     asset_et.previews(this._map_asset_link_previews(previews));

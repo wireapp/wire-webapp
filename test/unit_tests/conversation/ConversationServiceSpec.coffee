@@ -18,7 +18,7 @@
 
 # grunt test_init && grunt test_run:conversation/ConversationService
 
-describe 'z.conversation.ConversationService', ->
+describe 'ConversationService', ->
   conversation_mapper = null
   conversation_service = null
   server = null

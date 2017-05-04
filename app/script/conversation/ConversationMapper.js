@@ -32,17 +32,18 @@ z.conversation.ConversationMapper = class ConversationMapper {
   /**
    * Convert a JSON conversation into a conversation entity.
    * @param {Object} json - Conversation data
-   * @returns {z.entity.Conversation} Mapped conversation entity
+   * @returns {Conversation} Mapped conversation entity
    */
   map_conversation(json) {
-    const conversation_ets = this.map_conversations([(json != null ? json.data : undefined) || json]);
-    return conversation_ets[0];
+    const json_data_array = json ? (json.data ? [json.data] : [json]) : [json];
+    const [conversation_et] = this.map_conversations(json_data_array);
+    return conversation_et;
   }
 
   /**
    * Convert multiple JSON conversations into a conversation entities.
    * @param {Object} json - Conversation data
-   * @returns {Array<z.entity.Conversation>} Mapped conversation entities
+   * @returns {Array<Conversation>} Mapped conversation entities
    */
   map_conversations(json) {
     return json.map((conversation) => this._create_conversation_et(conversation));
@@ -54,16 +55,16 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * @example data: {"name":"ThisIsMyNewConversationName"}
    * @todo make utility?
    *
-   * @param {z.entity.Conversation} conversation_et - Conversation to be updated
-   * @param {data} data - Conversation data
-   * @returns {z.entity.Conversation} Updated conversation entity
+   * @param {Conversation} conversation_et - Conversation to be updated
+   * @param {Object} conversation_data - Conversation data
+   * @returns {Conversation} Updated conversation entity
    */
-  update_properties(conversation_et, data) {
-    for (const key in data) {
+  update_properties(conversation_et, conversation_data) {
+    for (const key in conversation_data) {
       if (key !== 'id' && conversation_et.hasOwnProperty(key)) {
-        const value = conversation_et[key];
+        const value = conversation_data[key];
 
-        if (conversation_et[key] !== undefined) {
+        if (value !== undefined) {
           if (ko.isObservable(conversation_et[key])) {
             conversation_et[key](value);
           } else {
@@ -79,9 +80,9 @@ z.conversation.ConversationMapper = class ConversationMapper {
   /**
    * Update the membership properties of a conversation.
    *
-   * @param {z.entity.Conversation} conversation_et - Conversation to be updated
+   * @param {Conversation} conversation_et - Conversation to be updated
    * @param {Object} self - Conversation self data
-   * @returns {z.entity.Conversation} Updated conversation entity
+   * @returns {Conversation} Updated conversation entity
    */
   update_self_status(conversation_et, self) {
     if (conversation_et) {
@@ -140,30 +141,36 @@ z.conversation.ConversationMapper = class ConversationMapper {
    * Creates a conversation entity from JSON data.
    *
    * @private
-   * @param {Object} data - Either locally stored or backend data
-   * @returns {z.entity.Conversation} Mapped conversation entity
+   * @param {Object} conversation_data - Either locally stored or backend data
+   * @returns {Conversation} Mapped conversation entity
    */
-  _create_conversation_et(data) {
-    if (data === undefined) {
+  _create_conversation_et(conversation_data) {
+    if (conversation_data === undefined) {
       throw new Error('Cannot create conversation entity without data');
     }
 
-    let conversation_et = new z.entity.Conversation(data.id);
+    const {id, creator, members, name, type, others} = conversation_data;
+    let conversation_et = new z.entity.Conversation(id);
 
-    conversation_et.creator = data.creator;
-    conversation_et.type(data.type);
-    conversation_et.name(data.name ? data.name : '');
-    conversation_et = this.update_self_status(conversation_et, (data.members != null ? data.members.self : undefined) || data);
+    conversation_et.creator = creator;
+    conversation_et.type(type);
+    conversation_et.name(name ? name : '');
+
+    if (members) {
+      conversation_et = this.update_self_status(conversation_et, members.self);
+    } else {
+      conversation_et = this.update_self_status(conversation_et, conversation_data);
+    }
 
     if (!conversation_et.last_event_timestamp()) {
       conversation_et.last_event_timestamp(Date.now());
     }
 
     // all users that are still active
-    if (data.others) {
-      conversation_et.participating_user_ids(data.others);
+    if (others) {
+      conversation_et.participating_user_ids(others);
     } else {
-      const participating_user_ids = data.members.others
+      const participating_user_ids = members.others
         .filter((other) => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
         .map((other) => other.id);
 

@@ -32,8 +32,8 @@ z.conversation.ConversationService = class ConversationService {
 
   /**
    * Construct a new Conversation Service.
-   * @param {z.service.BackendClient} client - Client for the API calls
-   * @param {z.storage.StorageService} storage_service - Service for all storage interactions
+   * @param {BackendClient} client - Client for the API calls
+   * @param {StorageService} storage_service - Service for all storage interactions
    */
   constructor(client, storage_service) {
     this.client = client;
@@ -122,6 +122,7 @@ z.conversation.ConversationService = class ConversationService {
    * Get a conversation by ID.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
+   *
    * @param {string} conversation_id - ID of conversation to get
    * @returns {Promise} Resolves with the server response
    */
@@ -413,7 +414,7 @@ z.conversation.ConversationService = class ConversationService {
    * @param {number} [limit=Number.MAX_SAFE_INTEGER] - Amount of events to load
    * @returns {Promise} Resolves with the retrieved records
    */
-  load_preceding_events_from_db(conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit) {
+  load_preceding_events_from_db(conversation_id, lower_bound = new Date(0), upper_bound = new Date(), limit = Number.MAX_SAFE_INTEGER) {
     if (!_.isDate(lower_bound) || !_.isDate(upper_bound)) {
       throw new Error(`Lower bound (${typeof lower_bound}) and upper bound (${typeof upper_bound}) must be of type 'Date'.`);
     } else if (lower_bound.getTime() > upper_bound.getTime()) {
@@ -465,7 +466,7 @@ z.conversation.ConversationService = class ConversationService {
 
   /**
    * Saves a list of conversation records in the local database.
-   * @param {Array<z.entity.Conversation>} conversations - Conversation entity
+   * @param {Array<Conversation>} conversations - Conversation entity
    * @returns {Promise<Array>} Resolves with a list of conversation records
    */
   save_conversations_in_db(conversations) {
@@ -477,7 +478,7 @@ z.conversation.ConversationService = class ConversationService {
 
   /**
    * Saves a conversation entity in the local database.
-   * @param {z.entity.Conversation} conversation_et - Conversation entity
+   * @param {Conversation} conversation_et - Conversation entity
    * @returns {Promise} Resolves with the conversation entity
    */
   save_conversation_state_in_db(conversation_et) {
@@ -501,9 +502,7 @@ z.conversation.ConversationService = class ConversationService {
 
     return this.load_events_with_category_from_db(conversation_id, category_min, category_max)
       .then((events) => {
-        return events.filter((event) => {
-          z.search.FullTextSearch.search(event.data.content, query);
-        });
+        return events.filter(({data: event_data}) => z.search.FullTextSearch.search(event_data.content, query));
       });
   }
 
@@ -574,7 +573,7 @@ z.conversation.ConversationService = class ConversationService {
   /**
    * Update a message in the database.
    *
-   * @param {z.entity.Message} message_et - Message event to update in the database
+   * @param {Message} message_et - Message event to update in the database
    * @param {Object} [changes={}] - Changes to update message with
    * @param {string} conversation_id - ID of conversation
    * @returns {Promise} Resolves when the message was updated in database
