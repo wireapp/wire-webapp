@@ -99,20 +99,23 @@ ko.bindingHandlers.resize = do ->
   resize_observable = null
   resize_callback = null
 
-  resize_textarea = (element) ->
+  resize_textarea = _.throttle((element) ->
     element.style.height = 0
     element.style.height = "#{element.scrollHeight}px"
 
+    current_height = element.clientHeight
+
     # height has changed
-    if last_height isnt element.clientHeight
-      resize_callback? element.clientHeight, last_height
-      last_height = element.clientHeight
+    if last_height isnt current_height
+      resize_callback? current_height, last_height
+      last_height = current_height
       max_height = window.parseInt getComputedStyle(element).maxHeight, 10
 
-      if element.clientHeight is max_height
+      if current_height is max_height
         element.style.overflowY = 'scroll'
       else
         element.style.overflowY = 'hidden'
+  , 300)
 
   init: (element, valueAccessor, allBindings, data, context) ->
     last_height = element.scrollHeight
