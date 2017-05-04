@@ -440,10 +440,10 @@ describe 'z.cryptography.CryptographyMapper', ->
 
       z.assets.AssetCrypto.encrypt_aes_asset generic_message.toArrayBuffer()
       .then (data) ->
-        [key_bytes, sha256, ciphertext] = data
+        {cipher_text, key_bytes, sha256} = data
         key_bytes = new Uint8Array key_bytes
         sha256 = new Uint8Array sha256
-        event.data.data = z.util.array_to_base64 ciphertext
+        event.data.data = z.util.array_to_base64 cipher_text
 
         external_message = new z.proto.GenericMessage z.util.create_random_uuid()
         external_message.set 'external', new z.proto.External key_bytes, sha256
@@ -465,10 +465,10 @@ describe 'z.cryptography.CryptographyMapper', ->
 
       z.assets.AssetCrypto.encrypt_aes_asset ping.toArrayBuffer()
       .then (data) ->
-        [key_bytes, sha256, ciphertext] = data
+        {cipher_text, key_bytes, sha256} = data
         key_bytes = new Uint8Array key_bytes
         sha256 = new Uint8Array sha256
-        event.data.data = z.util.array_to_base64 ciphertext
+        event.data.data = z.util.array_to_base64 cipher_text
 
         external_message = new z.proto.GenericMessage z.util.create_random_uuid()
         external_message.set 'external', new z.proto.External key_bytes, sha256

@@ -1159,15 +1159,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.asset_service.create_asset_proto(file);
       })
-      .then(([asset, ciphertext]) => {
+      .then(({asset_proto, cipher_text}) => {
         generic_message = new z.proto.GenericMessage(nonce);
-        generic_message.set('asset', asset);
+        generic_message.set('asset', asset_proto);
 
         if (conversation_et.ephemeral_timer()) {
           generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
         }
 
-        return this._send_encrypted_asset(conversation_et.id, generic_message, ciphertext, nonce);
+        return this._send_encrypted_asset(conversation_et.id, generic_message, cipher_text, nonce);
       })
       .then(([response, asset_id]) => {
         const asset_data = conversation_et.ephemeral_timer() ? generic_message.ephemeral.asset : generic_message.asset;
@@ -1373,7 +1373,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   */
   send_image_asset(conversation_et, image) {
     return this.asset_service.create_image_proto(image)
-      .then(([image_proto, ciphertext]) => {
+      .then(({cipher_text, image_proto}) => {
         const optimistic_event = this._construct_otr_event(conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD);
         let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
         generic_message.set('image', image_proto);
@@ -1390,7 +1390,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             this.on_conversation_event(saved_event);
 
             // we don't need to wait for the sending to resolve
-            this._send_encrypted_asset(conversation_et.id, generic_message, ciphertext)
+            this._send_encrypted_asset(conversation_et.id, generic_message, cipher_text)
               .then(([response, asset_id]) => {
                 this._track_completed_media_action(conversation_et, generic_message);
                 saved_event.data.id = asset_id;
@@ -1850,20 +1850,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _send_external_generic_message(conversation_id, generic_message, user_client_map, precondition_option, native_push = true) {
     this.logger.info(`Sending external message of type '${generic_message.content}'`, generic_message);
 
-    let ciphertext, key_bytes, sha256;
-
     return z.assets.AssetCrypto.encrypt_aes_asset(generic_message.toArrayBuffer())
-      .then((asset_data) => {
-        [key_bytes, sha256, ciphertext] = asset_data;
+      .then(({key_bytes, sha256, cipher_text}) => {
         const generic_message_external = new z.proto.GenericMessage(z.util.create_random_uuid());
         generic_message_external.set('external', new z.proto.External(new Uint8Array(key_bytes), new Uint8Array(sha256)));
 
-        return this.cryptography_repository.encrypt_generic_message(user_client_map, generic_message_external);
-      })
-      .then((payload) => {
-        payload.data = z.util.array_to_base64(ciphertext);
-        payload.native_push = native_push;
-        return this._send_encrypted_message(conversation_id, generic_message, payload, precondition_option);
+        return this.cryptography_repository.encrypt_generic_message(user_client_map, generic_message_external)
+          .then((payload) => {
+            payload.data = z.util.array_to_base64(cipher_text);
+            payload.native_push = native_push;
+            return this._send_encrypted_message(conversation_id, generic_message, payload, precondition_option);
+          });
       })
       .catch((error) => {
         this.logger.info('Failed sending external message', error);
