@@ -24,6 +24,7 @@ globals:
   moment: true
   pako: true
   platform: true
+  poster: true
   Proteus: true
   Raygun: true
   sodium: true

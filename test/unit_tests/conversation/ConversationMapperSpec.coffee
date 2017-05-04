@@ -61,9 +61,8 @@ describe 'Conversation Mapper', ->
     data = {name: 'New foo bar conversation name', id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc', creator: creator_id}
     updated_conversation_et = conversation_mapper.update_properties conversation_et, data
 
-    expect(updated_conversation_et.name()).toBe 'New foo bar conversation name'
-    expect(updated_conversation_et.id).not.toBe 'd5a39ffb-6ce3-4cc8-9048-0123456789abc'
-    expect(updated_conversation_et.creator).toBe creator_id
+    expect(updated_conversation_et.name()).toBe data.name
+    expect(updated_conversation_et.id).not.toBe data.id
     expect(updated_conversation_et.creator).toBe data.creator
 
   describe 'update_self_status', ->
@@ -233,7 +232,6 @@ describe 'Conversation Mapper', ->
       expect(merged_data.others[0]).toBe remote_data.members.others[0].id
       expect(merged_data.status).toBe remote_data.members.self.status
       expect(merged_data.type).toBe remote_data.type
-      expect(merged_data.last_event_timestamp).toBe new Date(remote_data.last_event_time).getTime()
 
     it 'updates local archive and muted timestamps if time of remote data is newer', ->
       #@formatter:off
