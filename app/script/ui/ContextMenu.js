@@ -107,6 +107,12 @@ z.ui.Context = (() => {
         cleanup();
         entry.click();
       };
+      element.onmouseenter = function() {
+        const selectedEntry = document.querySelector('.ctx-menu-item.selected');
+        if (selectedEntry != null) {
+          selectedEntry.classList.remove('selected');
+        }
+      };
       menu.appendChild(element);
     }
 

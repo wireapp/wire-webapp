@@ -155,7 +155,7 @@ class z.ViewModel.MessageListViewModel
     @marked_message message_et
 
     # keep last read timestamp to render unread when entering conversation
-    if @conversation().unread_message_count() > 0
+    if @conversation().unread_event_count() > 0
       @conversation_last_read_timestamp @conversation().last_read_timestamp()
 
     if conversation_et.is_loaded() # TODO rethink conversation.is_loaded

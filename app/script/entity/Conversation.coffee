@@ -127,15 +127,12 @@ class z.entity.Conversation
     @unread_events = ko.pureComputed =>
       unread_event = []
       for message_et in @messages() when message_et.visible() by -1
-        break if message_et.timestamp() <= @last_read_timestamp()
+        break if message_et.timestamp() <= @last_read_timestamp() or message_et.user().is_me
         unread_event.push message_et
       return unread_event
 
     @unread_event_count = ko.pureComputed =>
       return @unread_events().length
-
-    @unread_message_count = ko.pureComputed =>
-      return (message_et for message_et in @unread_events() when not message_et.user().is_me).length
 
     ###
     Display name strategy:
@@ -195,7 +192,7 @@ class z.entity.Conversation
 
   # Remove all message from conversation unless there are unread messages.
   release: =>
-    unless @unread_message_count()
+    unless @unread_event_count()
       @remove_messages()
       @is_loaded false
       @has_further_messages true

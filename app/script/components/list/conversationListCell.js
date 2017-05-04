@@ -72,7 +72,7 @@ ko.components.register('conversation-list-cell', {
         <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.MUTED -->
           <span class="conversation-list-cell-badge icon-silence" data-uie-name="status-silence"></span>
         <!-- /ko -->
-        <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES -->
+        <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_MESSAGES && conversation.unread_event_count() > 0 -->
           <span class="conversation-list-cell-badge" data-uie-name="status-unread" data-bind="text: conversation.unread_event_count()"></span>
         <!-- /ko -->
       </div>
