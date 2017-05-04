@@ -1117,8 +1117,8 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {undefined} No return value
    */
   set_logging(is_enabled) {
-    this.logger.debug(`Set logging for webRTC Adapter: ${is_enabled}`);
     if (adapter) {
+      this.logger.debug(`Set logging for webRTC Adapter: ${is_enabled}`);
       adapter.disableLog = !is_enabled;
     }
   }

@@ -392,7 +392,7 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   set_logging(is_logging_enabled) {
-    this.logger.debug(`Set logging for webRTC Adapter: ${is_logging_enabled}`);
+    this.logger.debug(`Set logging for WebRTC Adapter: ${is_logging_enabled}`);
     if (adapter) {
       adapter.disableLog = !is_logging_enabled;
     }
