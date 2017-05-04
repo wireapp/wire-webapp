@@ -33,9 +33,10 @@ module.exports = (grunt) ->
       if has_source and not is_comment
         source = has_source[1]
         if source.endsWith '.min.js'
-          current_files = grunt.config 'scripts-minified'
+          current_files = grunt.config 'scripts_minified'
           current_files[target].push "deploy#{source}"
-          grunt.config 'scripts-minified', current_files
+          grunt.config 'scripts_minified', current_files
+          grunt.log.writeln "Minified script '#{source}' for target '#{target}' will not get uglified."
         else
           current_files = grunt.config 'scripts'
           current_files[target].push "deploy#{source}"
@@ -55,7 +56,7 @@ module.exports = (grunt) ->
       vendor: []
 
     grunt.config 'scripts', directories
-    grunt.config 'scripts-minified', directories
+    grunt.config 'scripts_minified', directories
 
     for directory_name of directories
       extract_sources "#{dist_path}/#{directory_name}.htm", directory_name

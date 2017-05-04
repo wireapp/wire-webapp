@@ -75,6 +75,7 @@ module.exports = (grunt) => {
     coffee: require('./grunt/config/coffee'),
     coffeelint: require('./grunt/config/coffeelint'),
     compress: require('./grunt/config/compress'),
+    concat: require('./grunt/config/concat'),
     connect: require('./grunt/config/connect'),
     copy: require('./grunt/config/copy'),
     includereplace: require('./grunt/config/includereplace'),

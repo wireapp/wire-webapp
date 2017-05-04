@@ -81,6 +81,7 @@ module.exports = (grunt) ->
     'includereplace:deploy_demo'
     'clean:deploy_app'
     'uglify:deploy'
+    'concat:deploy'
     'clean:deploy_script'
   ]
 
