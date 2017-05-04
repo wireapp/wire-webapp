@@ -120,7 +120,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
         conversation_et.verification_state(self.verification_state);
       }
 
-      // BE
+      // Backend states
       if (self.otr_archived !== undefined) {
         const otr_archived_timestamp = new Date(self.otr_archived_ref).getTime();
         conversation_et.set_timestamp(otr_archived_timestamp, z.conversation.ConversationUpdateType.ARCHIVED_TIMESTAMP);
@@ -166,7 +166,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       conversation_et.last_event_timestamp(Date.now());
     }
 
-    // all users that are still active
+    // All users that are still active
     if (others) {
       conversation_et.participating_user_ids(others);
     } else {
@@ -206,11 +206,12 @@ z.conversation.ConversationMapper = class ConversationMapper {
         .map((other) => other.id);
 
       if (!local_conversation.last_event_timestamp) {
-        local_conversation.last_event_timestamp = index + 1; // this should ensure a proper order
+        // This should ensure a proper order
+        local_conversation.last_event_timestamp = index + 1;
       }
 
-      // Some archived timestamp were not properly stored in the database. to fix this
-      // we check if the remote one is newer and update our local timestamp
+      // Some archived timestamp were not properly stored in the database.
+      // To fix this we check if the remote one is newer and update our local timestamp.
       const {archived_state: local_archived_state, archived_timestamp: local_archived_timestamp} = local_conversation;
       const remote_archived_timestamp = new Date(members.self.otr_archived_ref).getTime();
       const is_remote_archived_timestamp_newer = (local_archived_timestamp !== undefined) && (remote_archived_timestamp > local_archived_timestamp);
