@@ -169,8 +169,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   fetch_conversation_by_id(conversation_id) {
     if (this.fetching_conversations.hasOwnProperty(conversation_id)) {
-      return new Promise((resolve) => {
-        this.fetching_conversations[conversation_id].push(resolve);
+      return new Promise((resolve, reject) => {
+        this.fetching_conversations[conversation_id].push({reject_fn: reject, resolve_fn: resolve});
       });
     }
 
@@ -183,7 +183,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         this.logger.info(`Fetched conversation '${conversation_id}' from backend`);
         this.save_conversation(conversation_et);
 
-        this.fetching_conversations[conversation_id].forEach(function(resolve_fn) {
+        this.fetching_conversations[conversation_id].forEach(function({resolve_fn}) {
           resolve_fn(conversation_et);
         });
         delete this.fetching_conversations[conversation_id];
@@ -191,7 +191,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return conversation_et;
       })
       .catch(function() {
-        throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NOT_FOUND);
+        const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NOT_FOUND);
+
+        this.fetching_conversations[conversation_id].forEach(function({reject_fn}) {
+          reject_fn(error);
+        });
+        delete this.fetching_conversations[conversation_id];
+
+        throw error;
       });
   }
 
