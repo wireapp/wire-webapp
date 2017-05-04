@@ -67,6 +67,8 @@ class z.ViewModel.list.ListViewModel
     amplify.subscribe z.event.WebApp.SEARCH.SHOW, @open_start_ui
     amplify.subscribe z.event.WebApp.TAKEOVER.SHOW, @show_takeover
     amplify.subscribe z.event.WebApp.TAKEOVER.DISMISS, @dismiss_takeover
+    amplify.subscribe z.event.WebApp.SHORTCUT.ARCHIVE, => @click_on_archive_action @conversation_repository.active_conversation()
+    amplify.subscribe z.event.WebApp.SHORTCUT.SILENCE, => @click_on_mute_action @conversation_repository.active_conversation()
 
   click_on_actions: (conversation_et, event) =>
     @actions.click_on_actions conversation_et, event
@@ -153,7 +155,7 @@ class z.ViewModel.list.ListViewModel
       title = if conversation_et.is_muted() then notify_conversation_tooltip else silence_conversation_tooltip
       entries.push
         label: z.localization.Localizer.get_text(label),
-        click: => @conversation_repository.toggle_silence_conversation conversation_et
+        click: => @click_on_mute_action conversation_et
         title: title
 
     if conversation_et.is_archived()
@@ -208,6 +210,9 @@ class z.ViewModel.list.ListViewModel
   click_on_cancel_action: (conversation_et) =>
     next_conversation_et = @conversation_repository.get_next_conversation conversation_et
     @user_repository.cancel_connection_request conversation_et.participating_user_ets()[0], next_conversation_et
+
+  click_on_mute_action: (conversation_et) =>
+    @conversation_repository.toggle_silence_conversation conversation_et
 
   click_on_clear_action: (conversation_et) =>
     amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CLEAR,

@@ -33,10 +33,7 @@ z.assets.AssetCrypto = (() => {
   function decrypt_aes_asset(ciphertext, key_bytes, reference_sha256) {
     return window.crypto.subtle.digest('SHA-256', ciphertext)
       .then(function(computed_sha256) {
-        const typed_reference_sha256 = new Uint32Array(reference_sha256);
-        const typed_computed_sha256 = new Uint32Array(computed_sha256);
-
-        if ((typed_reference_sha256.length === typed_computed_sha256.length) && typed_reference_sha256.every((value, length) => value === typed_computed_sha256[length])) {
+        if (_equal_hashes(reference_sha256, computed_sha256)) {
           return window.crypto.subtle.importKey('raw', key_bytes, 'AES-CBC', false, ['decrypt']);
         }
 
@@ -79,6 +76,12 @@ z.assets.AssetCrypto = (() => {
       return window.crypto.subtle.exportKey('raw', key);
     })
     .then((key_bytes) => [key_bytes, computed_sha256, iv_ciphertext.buffer]);
+  }
+
+  function _equal_hashes(buffer_a, buffer_b) {
+    const arr_a = new Uint32Array(buffer_a);
+    const arr_b = new Uint32Array(buffer_b);
+    return arr_a.length === arr_b.length && arr_a.every((value, index) => value === arr_b[index]);
   }
 
   function _generate_random_bytes(length) {
