@@ -144,9 +144,8 @@ z.conversation.EventMapper = class EventMapper {
       }
     }
 
-    // todo Remove deprecated expire_after_millis with subsequent release
-    if (event.ephemeral_expires || event.expire_after_millis) {
-      message_et.ephemeral_expires(event.ephemeral_expires || event.expire_after_millis);
+    if (event.ephemeral_expires) {
+      message_et.ephemeral_expires(event.ephemeral_expires);
       message_et.ephemeral_started(event.ephemeral_started || '0');
     }
 
@@ -471,7 +470,7 @@ z.conversation.EventMapper = class EventMapper {
       }
     }
 
-    asset_et.status(status || z.assets.AssetTransferState.UPLOADING); // TODO
+    asset_et.status(status || z.assets.AssetTransferState.UPLOADING);
 
     return asset_et;
   }
