@@ -28,11 +28,15 @@ module.exports = (grunt) ->
     # parse app scripts
     lines = scripts.split '\n'
     for line in lines
-      match = line.match /src="(.*?)"/
-      if match
-        script_files.push "deploy#{match[1]}"
+      has_source = line.match /src="(.*?)"/
+      is_comment = line.match /<!--[\s\S]*?-->/
+      if has_source
+        if is_comment
+          grunt.log.writeln "Skipping file '#{has_source[1]}' for minification."
+        else
+          script_files.push "deploy#{has_source[1]}"
 
-    grunt.log.ok "Processed #{source_file}."
+    grunt.log.ok "Processed files from '#{source_file}'."
 
     return script_files
 

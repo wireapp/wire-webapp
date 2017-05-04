@@ -52,8 +52,6 @@ class z.ViewModel.list.ListViewModel
     @start_ui      = new z.ViewModel.list.StartUIViewModel 'start-ui', @, @connect_repository, @conversation_repository, @search_repository, @user_repository, @properties_repository
     @takeover      = new z.ViewModel.list.TakeoverViewModel 'takeover', @conversation_repository, @user_repository
 
-    @actions       = new z.ViewModel.list.ActionsViewModel 'actions-bubble', @, @conversations, @conversation_repository, @user_repository
-
     @self_user = ko.pureComputed => @user_repository.self()?.medium_picture_resource() if @webapp_loaded()
 
     @_init_subscriptions()
@@ -69,6 +67,8 @@ class z.ViewModel.list.ListViewModel
     amplify.subscribe z.event.WebApp.SEARCH.SHOW, @open_start_ui
     amplify.subscribe z.event.WebApp.TAKEOVER.SHOW, @show_takeover
     amplify.subscribe z.event.WebApp.TAKEOVER.DISMISS, @dismiss_takeover
+    amplify.subscribe z.event.WebApp.SHORTCUT.ARCHIVE, => @click_on_archive_action @conversation_repository.active_conversation()
+    amplify.subscribe z.event.WebApp.SHORTCUT.SILENCE, => @click_on_mute_action @conversation_repository.active_conversation()
 
   click_on_actions: (conversation_et, event) =>
     @actions.click_on_actions conversation_et, event
@@ -130,3 +130,104 @@ class z.ViewModel.list.ListViewModel
 
   dismiss_takeover: =>
     @list_modal undefined
+
+  ###############################################################################
+  # Context menu
+  ###############################################################################
+
+  on_context_menu: (conversation_et, event) =>
+    entries = []
+
+    if not conversation_et.is_request() and not conversation_et.removed_from_conversation()
+      notify_conversation_tooltip = z.localization.Localizer.get_text
+        id: z.string.tooltip_conversations_notify
+        replace:
+          placeholder: '%shortcut'
+          content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.SILENCE
+
+      silence_conversation_tooltip = z.localization.Localizer.get_text
+        id: z.string.tooltip_conversations_silence
+        replace:
+          placeholder: '%shortcut'
+          content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.SILENCE
+
+      label = if conversation_et.is_muted() then z.string.conversations_popover_notify else z.string.conversations_popover_silence
+      title = if conversation_et.is_muted() then notify_conversation_tooltip else silence_conversation_tooltip
+      entries.push
+        label: z.localization.Localizer.get_text(label),
+        click: => @click_on_mute_action conversation_et
+        title: title
+
+    if conversation_et.is_archived()
+      entries.push
+        label: z.localization.Localizer.get_text(z.string.conversations_popover_unarchive)
+        click: => @click_on_unarchive_action conversation_et
+    else
+      archive_conversation_tooltip = z.localization.Localizer.get_text
+        id: z.string.tooltip_conversations_archive
+        replace:
+          placeholder: '%shortcut'
+          content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.ARCHIVE
+
+      entries.push
+        label: z.localization.Localizer.get_text(z.string.conversations_popover_archive),
+        click: => @click_on_archive_action conversation_et
+        title: archive_conversation_tooltip
+
+    if conversation_et.is_request()
+      entries.push
+        label: z.localization.Localizer.get_text(z.string.conversations_popover_cancel),
+        click: => @click_on_cancel_action conversation_et
+
+    if not conversation_et.is_request() and not conversation_et.is_cleared()
+      entries.push
+        label: z.localization.Localizer.get_text(z.string.conversations_popover_clear),
+        click: => @click_on_clear_action conversation_et
+
+    if not conversation_et.is_group()
+      entries.push
+        label: z.localization.Localizer.get_text(z.string.conversations_popover_block),
+        click: => @click_on_block_action conversation_et
+
+    if conversation_et.is_group() and not conversation_et.removed_from_conversation()
+      entries.push
+        label: z.localization.Localizer.get_text(z.string.conversations_popover_leave),
+        click: => @click_on_leave_action conversation_et
+
+    z.ui.Context.from event, entries, 'conversation-list-options-menu'
+
+  click_on_archive_action: (conversation_et) =>
+    @conversation_repository.archive_conversation conversation_et
+
+  click_on_block_action: (conversation_et) =>
+    next_conversation_et = @conversation_repository.get_next_conversation conversation_et
+    user_et = conversation_et.participating_user_ets()[0]
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.BLOCK,
+      data: user_et.first_name()
+      action: => @user_repository.block_user user_et, ->
+        amplify.publish z.event.WebApp.CONVERSATION.SWITCH, conversation_et, next_conversation_et
+
+  click_on_cancel_action: (conversation_et) =>
+    next_conversation_et = @conversation_repository.get_next_conversation conversation_et
+    @user_repository.cancel_connection_request conversation_et.participating_user_ets()[0], next_conversation_et
+
+  click_on_mute_action: (conversation_et) =>
+    @conversation_repository.toggle_silence_conversation conversation_et
+
+  click_on_clear_action: (conversation_et) =>
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CLEAR,
+      data: conversation_et.display_name()
+      conversation: conversation_et
+      action: (leave = false) => @conversation_repository.clear_conversation conversation_et, leave
+
+  click_on_leave_action: (conversation_et) =>
+    next_conversation_et = @conversation_repository.get_next_conversation conversation_et
+    amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.LEAVE,
+      data: conversation_et.display_name()
+      action: => @conversation_repository.leave_conversation conversation_et, next_conversation_et
+
+  click_on_unarchive_action: (conversation_et) =>
+    @conversation_repository.unarchive_conversation conversation_et
+      .then =>
+        if not @conversation_repository.conversations_archived().length
+          @switch_list z.ViewModel.list.LIST_STATE.CONVERSATIONS

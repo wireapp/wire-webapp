@@ -25,9 +25,7 @@
 
 .background,
 .background-image,
-.background-darken,
-.background-accent,
-.background-vignette {
+.background-darken {
   .full-screen;
   overflow: hidden;
 }
@@ -42,16 +40,10 @@
 .background-image {
   background-size: cover;
   background-position: center;
+  filter: blur(32px) saturate(200%);
+  transform: scale(1.4);
 }
 
 .background-darken {
-  background-color: fade(#000, 48%);
-}
-
-.background-accent {
-  opacity: .08;
-}
-
-.background-vignette {
-  background-image: radial-gradient(50% 100%, rgba(0,0,0,.16) 0%, rgba(0,0,0,.56) 100%);
+  background-color: fade(#000, 64%);
 }

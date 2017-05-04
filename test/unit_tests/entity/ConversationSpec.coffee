@@ -148,51 +148,6 @@ describe 'Conversation', ->
 
       expect(conversation_et.is_verified()).toBeTruthy()
 
-  describe 'unread_type', ->
-    beforeEach ->
-      last_read_timestamp = Date.now() - 1000
-      conversation_et.last_read_timestamp last_read_timestamp
-
-      ping_message = new z.entity.PingMessage()
-      ping_message.timestamp last_read_timestamp - 1000
-
-      call_message = new z.entity.CallMessage()
-      call_message.timestamp last_read_timestamp - 1000
-      call_message.finished_reason = z.calling.enum.TERMINATION_REASON.MISSED
-
-      conversation_et.add_message ping_message
-      conversation_et.add_message call_message
-
-    afterEach ->
-      conversation_et.remove_messages()
-
-    it 'shows unread type "UNREAD" if unread message is text', ->
-      conversation_et.add_message new z.entity.Message()
-      expect(conversation_et.unread_type()).toBe z.conversation.ConversationUnreadType.UNREAD
-
-    it 'shows unread type "PING" if unread message is ping', ->
-      conversation_et.add_message new z.entity.PingMessage()
-      expect(conversation_et.unread_type()).toBe z.conversation.ConversationUnreadType.PING
-
-    it 'shows unread type "PING" if there is a ping message in the unread messages', ->
-      ping_message = new z.entity.PingMessage()
-      ping_message.timestamp Date.now() - 500
-      conversation_et.add_message ping_message
-      conversation_et.add_message new z.entity.Message()
-      expect(conversation_et.unread_type()).toBe z.conversation.ConversationUnreadType.PING
-
-    it 'shows unread type "CALL" if there is a missed call message in the unread messages', ->
-      call_message = new z.entity.CallMessage()
-      call_message.timestamp Date.now() - 500
-      call_message.finished_reason = z.calling.enum.TERMINATION_REASON.MISSED
-      conversation_et.add_message call_message
-      conversation_et.add_message new z.entity.Message()
-      expect(conversation_et.unread_type()).toBe z.conversation.ConversationUnreadType.CALL
-
-    it 'shows unread type "CONNECT" if connection is still pending', ->
-      conversation_et.connection().status z.user.ConnectionStatus.SENT
-      expect(conversation_et.unread_type()).toBe z.conversation.ConversationUnreadType.CONNECT
-
   describe 'display_name', ->
 
     it 'displays a name if the conversation is a 1:1 conversation or a connection request', ->
