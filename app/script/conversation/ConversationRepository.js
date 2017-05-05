@@ -182,7 +182,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return conversation_et;
       })
-      .catch(function() {
+      .catch(() => {
         const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NOT_FOUND);
 
         this.fetching_conversations[conversation_id].forEach(function({reject_fn}) {
