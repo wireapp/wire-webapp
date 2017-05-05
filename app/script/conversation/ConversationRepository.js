@@ -2926,12 +2926,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return Promise.all(message_ets.map((message_et) => this._update_user_ets(message_et)));
       })
       .then(function(message_ets) {
-        if (conversation_et.messages().length) {
-          if (prepend) {
-            conversation_et.prepend_messages(message_ets);
-          } else {
-            conversation_et.add_messages(message_ets);
-          }
+        if (prepend && conversation_et.messages().length) {
+          conversation_et.prepend_messages(message_ets);
+        } else {
+          conversation_et.add_messages(message_ets);
         }
 
         return message_ets;
