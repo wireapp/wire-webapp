@@ -178,3 +178,11 @@ class z.ViewModel.list.ConversationListViewModel
 
   click_on_people_button: =>
     @list_view_model.switch_list z.ViewModel.list.LIST_STATE.START_UI
+
+  ###############################################################################
+  # Legacy
+  ###############################################################################
+
+  click_on_clear_action: =>
+    # desktop clients <= 2.13.2742 rely on that function.
+    amplify.publish z.event.WebApp.SHORTCUT.DELETE
