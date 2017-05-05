@@ -161,9 +161,9 @@ z.assets.AssetService = class AssetService {
    */
   _upload_asset(bytes, options, xhr_accessor_function) {
     return z.assets.AssetCrypto.encrypt_aes_asset(bytes)
-    .then(([key_bytes, sha256, ciphertext]) => {
-      return this.post_asset_v3(ciphertext, options, xhr_accessor_function)
-      .then(({key, token}) => [key_bytes, sha256, key, token]);
+    .then(({cipher_text, key_bytes, sha256}) => {
+      return this.post_asset_v3(cipher_text, options, xhr_accessor_function)
+      .then(({key, token}) => ({key, key_bytes, sha256, token}));
     });
   }
 
@@ -183,7 +183,7 @@ z.assets.AssetService = class AssetService {
     .then((buffer) => {
       return this._upload_asset(buffer, options, xhr_accessor_function);
     })
-    .then(function([key_bytes, sha256, key, token]) {
+    .then(function({key, key_bytes, sha256, token}) {
       const asset = new z.proto.Asset();
       asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256, key, token));
       return asset;
@@ -204,7 +204,7 @@ z.assets.AssetService = class AssetService {
     return this._compress_image(image)
     .then(([compressed_image, compressed_bytes]) => {
       return this._upload_asset(compressed_bytes, options)
-      .then(function([key_bytes, sha256, key, token]) {
+      .then(function({key, key_bytes, sha256, token}) {
         const image_meta_data = new z.proto.Asset.ImageMetaData(compressed_image.width, compressed_image.height);
         const asset = new z.proto.Asset();
         asset.set('original', new z.proto.Asset.Original(image.type, compressed_bytes.length, null, image_meta_data));
@@ -415,7 +415,7 @@ z.assets.AssetService = class AssetService {
     return this._compress_image(image)
     .then(([compressed_image, compressed_bytes]) => {
       return z.assets.AssetCrypto.encrypt_aes_asset(compressed_bytes)
-      .then(([key_bytes, sha256, ciphertext]) => {
+      .then(({cipher_text, key_bytes, sha256}) => {
         const image_asset = new z.proto.ImageAsset();
         image_asset.set_tag(z.assets.ImageSizeType.MEDIUM);
         image_asset.set_width(compressed_image.width);
@@ -426,7 +426,7 @@ z.assets.AssetService = class AssetService {
         image_asset.set_size(compressed_bytes.length);
         image_asset.set_otr_key(key_bytes);
         image_asset.set_sha256(sha256);
-        return [image_asset, new Uint8Array(ciphertext)];
+        return {cipher_text: new Uint8Array(cipher_text), image_proto: image_asset};
       });
     });
   }
@@ -440,10 +440,10 @@ z.assets.AssetService = class AssetService {
   create_asset_proto(asset) {
     return z.util.load_file_buffer(asset)
     .then((file_bytes) => z.assets.AssetCrypto.encrypt_aes_asset(file_bytes))
-    .then(([key_bytes, sha256, ciphertext]) => {
+    .then(({cipher_text, key_bytes, sha256}) => {
       asset = new z.proto.Asset();
       asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256));
-      return [asset, ciphertext];
+      return {asset_proto: asset, cipher_text: cipher_text};
     });
   }
 

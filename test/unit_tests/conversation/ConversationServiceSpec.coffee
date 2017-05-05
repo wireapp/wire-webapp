@@ -18,7 +18,7 @@
 
 # grunt test_init && grunt test_run:conversation/ConversationService
 
-describe 'z.conversation.ConversationService', ->
+describe 'ConversationService', ->
   conversation_mapper = null
   conversation_service = null
   server = null
@@ -88,7 +88,7 @@ describe 'z.conversation.ConversationService', ->
       .then done.fail
       .catch (error) ->
         expect(error).toEqual jasmine.any z.conversation.ConversationError
-        expect(error.type).toBe z.conversation.ConversationError::TYPE.NO_CHANGES
+        expect(error.type).toBe z.conversation.ConversationError.TYPE.NO_CHANGES
         done()
 
   describe 'load_preceding_events_from_db', ->
@@ -226,7 +226,7 @@ describe 'z.conversation.ConversationService', ->
       .catch done.fail
 
     it 'deletes message with the given key', (done) ->
-      conversation_service.delete_message_with_key_from_db conversation_id, primary_keys[1]
+      conversation_service.delete_message_with_key_from_db primary_keys[1]
       .then ->
         conversation_service.load_preceding_events_from_db conversation_id
       .then (events) ->
@@ -237,7 +237,7 @@ describe 'z.conversation.ConversationService', ->
       .catch done.fail
 
     it 'does not delete the event if key is wrong', (done) ->
-      conversation_service.delete_message_with_key_from_db conversation_id, 'wrongKey'
+      conversation_service.delete_message_with_key_from_db 'wrongKey'
       .then ->
         conversation_service.load_preceding_events_from_db conversation_id
       .then (events) ->

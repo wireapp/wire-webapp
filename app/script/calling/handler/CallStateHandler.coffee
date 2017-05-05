@@ -65,7 +65,7 @@ class z.calling.handler.CallStateHandler
           @on_call_state @_fake_on_state_event(response, conversation_id), true
           @v2_call_center.conversation_repository.unarchive_conversation conversation_et if conversation_et.is_archived()
     .catch (error) ->
-      throw error unless error.type is z.conversation.ConversationError::TYPE.NOT_FOUND
+      throw error unless error.type is z.conversation.ConversationError.TYPE.NOT_FOUND
 
   ###
   Set the notification handling state.

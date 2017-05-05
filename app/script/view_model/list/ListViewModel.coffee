@@ -68,6 +68,7 @@ class z.ViewModel.list.ListViewModel
     amplify.subscribe z.event.WebApp.TAKEOVER.SHOW, @show_takeover
     amplify.subscribe z.event.WebApp.TAKEOVER.DISMISS, @dismiss_takeover
     amplify.subscribe z.event.WebApp.SHORTCUT.ARCHIVE, => @click_on_archive_action @conversation_repository.active_conversation()
+    amplify.subscribe z.event.WebApp.SHORTCUT.DELETE, => @click_on_clear_action @conversation_repository.active_conversation()
     amplify.subscribe z.event.WebApp.SHORTCUT.SILENCE, => @click_on_mute_action @conversation_repository.active_conversation()
 
   click_on_actions: (conversation_et, event) =>
