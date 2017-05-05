@@ -2218,7 +2218,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   delete_message_everyone(conversation_et, message_et, precondition_option) {
     return Promise.resolve()
-      .then(function() {
+      .then(() => {
         if (!message_et.user().is_me && !message_et.ephemeral_expires()) {
           throw new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.WRONG_USER);
         }
