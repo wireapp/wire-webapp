@@ -183,6 +183,6 @@ class z.ViewModel.list.ConversationListViewModel
   # Legacy
   ###############################################################################
 
-  click_on_clear_action: =>
+  click_on_clear_action: ->
     # desktop clients <= 2.13.2742 rely on that function.
     amplify.publish z.event.WebApp.SHORTCUT.DELETE
