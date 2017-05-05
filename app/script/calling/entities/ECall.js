@@ -94,16 +94,9 @@ z.calling.entities.ECall = class ECall {
     // Computed values
     this.is_declined = ko.pureComputed(() => this.state() === z.calling.enum.CALL_STATE.REJECTED);
 
-    this.is_ongoing_on_another_client = ko.pureComputed(() => {
-      return this.self_user_joined() && !this.self_client_joined();
-    });
-
-    this.is_remote_screen_send = ko.pureComputed(() => {
-      return this.remote_media_type() === z.media.MediaType.SCREEN;
-    });
-    this.is_remote_video_send = ko.pureComputed(() => {
-      return this.remote_media_type() === z.media.MediaType.VIDEO;
-    });
+    this.is_ongoing_on_another_client = ko.pureComputed(() => this.self_user_joined() && !this.self_client_joined());
+    this.is_remote_screen_send = ko.pureComputed(() => this.remote_media_type() === z.media.MediaType.SCREEN);
+    this.is_remote_video_send = ko.pureComputed(() => this.remote_media_type() === z.media.MediaType.VIDEO);
 
     this.network_interruption = ko.pureComputed(() => {
       if (this.is_connected() && !this.is_group()) {
@@ -113,9 +106,7 @@ z.calling.entities.ECall = class ECall {
       return false;
     });
 
-    this.participants_count = ko.pureComputed(() => {
-      return this.get_number_of_participants(this.self_user_joined());
-    });
+    this.participants_count = ko.pureComputed(() => this.get_number_of_participants(this.self_user_joined()));
 
     // Observable subscriptions
     this.is_connected.subscribe((is_connected) => {
@@ -262,9 +253,7 @@ z.calling.entities.ECall = class ECall {
       const [user_id] = this.conversation_et.participating_user_ids();
 
       this.v3_call_center.user_repository.get_user_by_id(user_id)
-        .then((remote_user_et) => {
-          this.add_e_participant(remote_user_et);
-        });
+        .then((remote_user_et) => this.add_e_participant(remote_user_et));
     }
   }
 
@@ -294,13 +283,7 @@ z.calling.entities.ECall = class ECall {
       });
 
     Promise.all(event_promises)
-      .then(() => {
-        const deletion_promises = this.participants().map(({id}) => {
-          return this.delete_e_participant(id);
-        });
-
-        return Promise.all(deletion_promises);
-      })
+      .then(() => Promise.all(this.participants().map(({id}) => this.delete_e_participant(id))))
       .then(() => {
         const additional_payload = this.v3_call_center.create_additional_payload(this.id);
 
@@ -627,9 +610,7 @@ z.calling.entities.ECall = class ECall {
     const {id: user_id} = user_et;
 
     return this.get_e_participant_by_id(user_id)
-      .then(() => {
-        return this.update_e_participant(user_id, e_call_message_et, negotiate);
-      })
+      .then(() => this.update_e_participant(user_id, e_call_message_et, negotiate))
       .catch((error) => {
         if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
           throw error;
@@ -640,7 +621,8 @@ z.calling.entities.ECall = class ECall {
         this.logger.info(`Adding e-call participant '${user_et.name()}'`, e_participant_et);
         this.participants.push(e_participant_et);
 
-        return this._update_state(e_participant_et, negotiate);
+        return e_participant_et.update_state(e_call_message_et)
+          .then(() => this._update_state(e_participant_et, negotiate));
       });
   }
 
@@ -746,9 +728,7 @@ z.calling.entities.ECall = class ECall {
 
         return e_participant_et;
       })
-      .then((e_participant_et) => {
-        this._update_state(e_participant_et, negotiate);
-      })
+      .then((e_participant_et) => this._update_state(e_participant_et, negotiate))
       .catch(function(error) {
         if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
           throw error;
@@ -791,12 +771,8 @@ z.calling.entities.ECall = class ECall {
    */
   get_flows() {
     return this.participants()
-      .filter((e_participant_et) => {
-        return e_participant_et.e_flow_et;
-      })
-      .map((e_participant_et) => {
-        return e_participant_et.e_flow_et;
-      });
+      .filter((e_participant_et) => e_participant_et.e_flow_et)
+      .map((e_participant_et) => e_participant_et.e_flow_et);
   }
 
   /**
@@ -805,9 +781,7 @@ z.calling.entities.ECall = class ECall {
    */
   get_flow_telemetry() {
     return this.get_flows()
-      .map((e_flow_et) => {
-        return e_flow_et.get_telemetry();
-      });
+      .map((e_flow_et) => e_flow_et.get_telemetry());
   }
 
   /**
@@ -851,9 +825,7 @@ z.calling.entities.ECall = class ECall {
   _sort_participants_by_panning() {
     if (this.participants().length >= 2) {
       this.participants
-        .sort((participant_a, participant_b) => {
-          return participant_a.user.joaat_hash - participant_b.user.joaat_hash;
-        })
+        .sort((participant_a, participant_b) => participant_a.user.joaat_hash - participant_b.user.joaat_hash)
         .forEach((e_participant_et, index) => {
           const panning = this._calculate_panning(index, this.participants().length);
 
@@ -862,9 +834,7 @@ z.calling.entities.ECall = class ECall {
         });
 
       const panning_order = this.participants()
-        .map(({user}) => {
-          return user.name();
-        })
+        .map(({user}) => user.name())
         .join(', ');
 
       this.logger.info(`New panning order: ${panning_order}`);
@@ -909,9 +879,7 @@ z.calling.entities.ECall = class ECall {
    */
   _reset_e_flows() {
     this.get_flows()
-      .forEach((e_flow_et) => {
-        e_flow_et.reset_flow();
-      });
+      .forEach((e_flow_et) => e_flow_et.reset_flow());
   }
 
 
@@ -925,9 +893,7 @@ z.calling.entities.ECall = class ECall {
    */
   log_status() {
     this.get_flows()
-      .forEach((e_flow_et) => {
-        e_flow_et.log_status();
-      });
+      .forEach((e_flow_et) => e_flow_et.log_status());
   }
 
   /**
@@ -936,8 +902,6 @@ z.calling.entities.ECall = class ECall {
    */
   log_timings() {
     this.get_flows()
-      .forEach((e_flow_et) => {
-        e_flow_et.log_timings();
-      });
+      .forEach((e_flow_et) => e_flow_et.log_timings());
   }
 };

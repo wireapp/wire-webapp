@@ -107,9 +107,7 @@ z.calling.entities.ECallMessage = class ECallMessage {
    */
   _create_session_id() {
     return _.range(ECallMessage.CONFIG.SESSION_ID_LENGTH)
-      .map(function() {
-        return z.util.StringUtil.get_random_character();
-      })
+      .map(() => z.util.StringUtil.get_random_character())
       .join('');
   }
 };

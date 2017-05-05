@@ -178,9 +178,7 @@ z.calling.CallingRepository = class CallingRepository {
    */
   join_call(conversation_id, video_send) {
     this.get_call_by_id(conversation_id)
-      .then((call_et) => {
-        return call_et.state();
-      })
+      .then((call_et) => call_et.state())
       .catch(function(error) {
         if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
           throw error;
@@ -194,9 +192,7 @@ z.calling.CallingRepository = class CallingRepository {
         }
 
         return this._check_concurrent_joined_call(conversation_id, call_state)
-          .then(() => {
-            this.switch_call_center(z.calling.enum.CALL_ACTION.JOIN, [conversation_id, video_send]);
-          });
+          .then(() => this.switch_call_center(z.calling.enum.CALL_ACTION.JOIN, [conversation_id, video_send]));
       });
   }
 
@@ -392,8 +388,8 @@ z.calling.CallingRepository = class CallingRepository {
    * @returns {undefined} No return value
    */
   set_logging(is_logging_enabled) {
-    this.logger.debug(`Set logging for WebRTC Adapter: ${is_logging_enabled}`);
     if (adapter) {
+      this.logger.debug(`Set logging for WebRTC Adapter: ${is_logging_enabled}`);
       adapter.disableLog = !is_logging_enabled;
     }
   }

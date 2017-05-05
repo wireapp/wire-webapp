@@ -698,9 +698,7 @@ z.calling.entities.EFlow = class EFlow {
    */
   save_remote_sdp(e_call_message_et) {
     return z.calling.mapper.SDPMapper.map_e_call_message_to_object(e_call_message_et)
-      .then((rtc_sdp) => {
-        return z.calling.mapper.SDPMapper.rewrite_sdp(rtc_sdp, z.calling.enum.SDP_SOURCE.REMOTE, this);
-      })
+      .then((rtc_sdp) => z.calling.mapper.SDPMapper.rewrite_sdp(rtc_sdp, z.calling.enum.SDP_SOURCE.REMOTE, this))
       .then(({sdp: remote_sdp}) => {
         const {type} = e_call_message_et;
 
@@ -834,12 +832,8 @@ z.calling.entities.EFlow = class EFlow {
     this.logger.debug(`Creating '${z.calling.rtc.SDP_TYPE.ANSWER}' for flow with '${this.remote_user.name()}'`);
 
     this.peer_connection.createAnswer()
-      .then((rtc_sdp) => {
-        this._create_sdp_success(rtc_sdp);
-      })
-      .catch((error) => {
-        this._create_sdp_failure(error, z.calling.rtc.SDP_TYPE.ANSWER);
-      });
+      .then((rtc_sdp) => this._create_sdp_success(rtc_sdp))
+      .catch((error) => this._create_sdp_failure(error, z.calling.rtc.SDP_TYPE.ANSWER));
   }
 
   /**
@@ -872,9 +866,7 @@ z.calling.entities.EFlow = class EFlow {
     this.logger.info(`Creating '${rct_sdp.type}' successful`, rct_sdp);
 
     z.calling.mapper.SDPMapper.rewrite_sdp(rct_sdp, z.calling.enum.SDP_SOURCE.LOCAL, this)
-    .then(({sdp: local_sdp}) => {
-      this.local_sdp(local_sdp);
-    });
+      .then(({sdp: local_sdp}) => this.local_sdp(local_sdp));
   }
 
   /**
@@ -899,12 +891,8 @@ z.calling.entities.EFlow = class EFlow {
     this.logger.debug(`Creating '${z.calling.rtc.SDP_TYPE.OFFER}' for flow with '${this.remote_user.name()}'`);
 
     this.peer_connection.createOffer(offer_options)
-      .then((rtc_sdp) => {
-        this._create_sdp_success(rtc_sdp);
-      })
-      .catch((error) => {
-        this._create_sdp_failure(error, z.calling.rtc.SDP_TYPE.OFFER);
-      });
+      .then((rtc_sdp) => this._create_sdp_success(rtc_sdp))
+      .catch((error) => this._create_sdp_failure(error, z.calling.rtc.SDP_TYPE.OFFER));
   }
 
   /**
@@ -935,9 +923,7 @@ z.calling.entities.EFlow = class EFlow {
         this.should_set_local_sdp(false);
         this._set_send_sdp_timeout();
       })
-      .catch((error) => {
-        this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.LOCAL, this.local_sdp().type);
-      });
+      .catch((error) => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.LOCAL, this.local_sdp().type));
   }
 
   /**
@@ -955,9 +941,7 @@ z.calling.entities.EFlow = class EFlow {
 
         this.should_set_remote_sdp(false);
       })
-      .catch((error) => {
-        this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.REMOTE, this.remote_sdp().type);
-      });
+      .catch((error) => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.REMOTE, this.remote_sdp().type));
   }
 
   /**
@@ -1147,12 +1131,8 @@ z.calling.entities.EFlow = class EFlow {
    */
   _replace_media_stream(media_stream_info) {
     return Promise.resolve()
-      .then(() => {
-        return this._stop_media_stream(this.media_stream());
-      })
-      .then(() => {
-        return this._upgrade_media_stream(media_stream_info);
-      })
+      .then(() => this._stop_media_stream(this.media_stream()))
+      .then(() => this._upgrade_media_stream(media_stream_info))
       .then((upgraded_media_stream_info) => {
         const {stream: media_stream, type: media_type} = upgraded_media_stream_info;
 
@@ -1232,9 +1212,7 @@ z.calling.entities.EFlow = class EFlow {
    */
   _remove_media_stream_tracks(media_stream) {
     media_stream.getTracks()
-      .forEach(({id: track_id, kind: media_type}) => {
-        this._remove_media_stream_track(track_id, media_type);
-      });
+      .forEach(({id: track_id, kind: media_type}) => this._remove_media_stream_track(track_id, media_type));
   }
 
   /**
@@ -1286,9 +1264,7 @@ z.calling.entities.EFlow = class EFlow {
       const media_stream = this.media_stream().clone();
 
       z.media.MediaStreamHandler.get_media_tracks(new_media_stream, media_type)
-        .forEach((media_stream_track) => {
-          media_stream.addTrack(media_stream_track);
-        });
+        .forEach((media_stream_track) => media_stream.addTrack(media_stream_track));
 
       return new z.media.MediaStreamInfo(z.media.MediaStreamSource.LOCAL, 'self', media_stream);
     }

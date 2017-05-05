@@ -48,11 +48,6 @@ z.calling.entities.EParticipant = class EParticipant {
     };
 
     this.e_flow_et = new z.calling.entities.EFlow(this.e_call_et, this, timings, e_call_message_et);
-    if (e_call_message_et) {
-      const {props: properties} = e_call_message_et;
-
-      this.update_properties(properties);
-    }
 
     this.is_connected.subscribe(function(is_connected) {
       if (is_connected && !this.was_connected) {
@@ -97,9 +92,7 @@ z.calling.entities.EParticipant = class EParticipant {
           return this.e_flow_et.save_remote_sdp(e_call_message_et);
         }
       })
-      .then(() => {
-        return this;
-      });
+      .then(() => this);
   }
 
   /**
