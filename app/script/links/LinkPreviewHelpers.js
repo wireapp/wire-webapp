@@ -38,7 +38,7 @@ z.links.LinkPreviewHelpers = {
   /**
    * Get first link and link offset for given text.
    * @param {string} text - Text to parse
-   * @returns {Array<string, number>} First link and its offset
+   * @returns {Object} Containing link and its offset
    */
   get_first_link_with_offset(text) {
     const links = linkify.find(text, 'url');
@@ -46,7 +46,10 @@ z.links.LinkPreviewHelpers = {
 
     if (first_link != null) {
       const link_offset = text.indexOf(first_link.value);
-      return [first_link.value, link_offset];
+      return {
+        offset: link_offset,
+        url: first_link.value,
+      };
     }
   },
 
