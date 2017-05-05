@@ -2082,7 +2082,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   upload_images(conversation_et, images) {
     if (this._can_upload_assets_to_conversation(conversation_et)) {
-      images.map((image) => {
+      [...images].forEach((image) => {
         if (this.use_v3_api) {
           this.send_image_asset_v3(conversation_et, image);
         } else {
@@ -2101,11 +2101,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   upload_files(conversation_et, files) {
     if (this._can_upload_assets_to_conversation(conversation_et)) {
-      files.map((image) => {
+      [...files].forEach((file) => {
         if (this.use_v3_api) {
-          this.upload_file_v3(conversation_et, image);
+          this.upload_file_v3(conversation_et, file);
         } else {
-          this.upload_file(conversation_et, image);
+          this.upload_file(conversation_et, file);
         }
       });
     }
@@ -2417,7 +2417,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return false;
     }
 
-    return conversation_et.is_one2one() && (conversation_et.connection().status() !== z.user.ConnectionStatus.ACCEPTED);
+    if (conversation_et.is_one2one() && conversation_et.connection().status() !== z.user.ConnectionStatus.ACCEPTED) {
+      return false;
+    }
+
+    return true;
   }
 
   /**
