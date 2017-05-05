@@ -24,39 +24,18 @@ window.z.components = z.components || {};
 
 z.components.GroupAvatar = class GroupAvatar {
   constructor({users}) {
-    this.on_in_viewport = this.on_in_viewport.bind(this);
-    this.entered_viewport = ko.observable(false);
-    this.avatar_urls = ko.observableArray();
-
-    this.user_image_observable = ko.computed(() => {
-      if (!this.entered_viewport()) {
-        return;
-      }
-
-      const promises = users().slice(0, 4)
-        .map((user_et) => user_et.preview_picture_resource())
-        .filter((resource) => resource !== undefined)
-        .map((resource) => resource.get_object_url());
-
-      Promise.all(promises).then((urls) => this.avatar_urls(urls.map((url) => `url(${url})`)));
-    }).extend({rateLimit: 50});
-  }
-
-  on_in_viewport() {
-    this.entered_viewport(true);
-    return true;
-  }
-
-  dispose() {
-    this.user_image_observable.dispose();
+    this.users = ko.pureComputed(() => users().slice(0, 4));
   }
 };
 
 ko.components.register('group-avatar', {
   template: `
-    <div class="group-avatar-image-wrapper" data-bind="in_viewport: on_in_viewport">
-      <!-- ko foreach: avatar_urls -->
-        <div class="group-avatar-image" data-bind="css: {'group-avatar-image-grid': $parent.avatar_urls().length > 1}, style: {backgroundImage: $data}"></div>
+    <div class="group-avatar-image-wrapper">
+      <!-- ko foreach: users -->
+        <div class="group-avatar-image group-avatar-initial" 
+            data-bind="css: {'group-avatar-image-grid': $parent.users().length > 1}, 
+                       text: $data.initials()[0], 
+                       style: {color: $data.accent_color()}"></div>
       <!-- /ko -->
     </div>
   `,
