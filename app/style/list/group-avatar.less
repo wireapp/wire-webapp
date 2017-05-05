@@ -18,13 +18,13 @@
  */
 
 group-avatar {
-  .square(28px);
+  .square(32px);
   border: 1px solid fade(#fff, 12%);
   border-radius: 6px;
 }
 
 .group-avatar-image-wrapper {
-  .square(26px);
+  .square(30px);
   border-radius: 7px;
   flex-wrap: wrap;
   display: flex;
@@ -32,12 +32,19 @@ group-avatar {
 }
 
 .group-avatar-image {
-  background-color: fade(#000, 16%);
+  background-color: #333;
   background-size: cover;
   flex: 1 1 auto;
   margin: 1px;
 }
 
 .group-avatar-image-grid {
-  .square(11px);
+  .square(13px);
+  flex: 0 0 auto;
+}
+
+.group-avatar-initial {
+  .flex-center;
+  font-weight: @font-weight-bold;
+  font-size: 8px;
 }

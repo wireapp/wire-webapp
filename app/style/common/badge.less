@@ -28,3 +28,24 @@
   min-width: 24px;
   text-align: center;
 }
+
+.cell-badge {
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: @font-weight-bold;
+  line-height: @badge-height;
+  height: @badge-height;
+  min-width: 32px;
+  text-align: center;
+}
+
+.cell-badge-light {
+  .cell-badge;
+  background-color: #fff;
+  color: @graphite-dark;
+}
+
+.cell-badge-dark {
+  .cell-badge;
+  background-color: fade(#000, 16%);
+}

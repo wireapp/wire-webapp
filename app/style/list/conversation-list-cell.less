@@ -22,16 +22,17 @@
 .conversation-list-cell {
   cursor: pointer;
   display: flex;
+  font-weight: @font-weight-regular;
   height: 56px;
   position: relative;
 
   &:after {
-    background-color: @graphite;
+    background-color: #fff;
     bottom: 0;
     content: '';
     left: @left-list-item-left-width;
     height: 1px;
-    opacity: .24;
+    opacity: .06;
     position: absolute;
     right: 0;
   }
@@ -53,6 +54,7 @@
 
 .conversation-list-cell-right {
   .flex-center;
+  padding-right: 16px;
 }
 
 /* elements */
@@ -60,81 +62,55 @@
 .conversation-list-cell-name {
   .ellipsis-nowrap;
   font-size: 14px;
-  font-weight: @font-weight-light;
-  margin-right: 16px;
+  line-height: 16px;
+  margin-right: 4px;
 }
 
 .conversation-list-cell-description {
   .ellipsis-nowrap;
-  font-size: @font-size-xs;
+  font-size: 12px;
   font-weight: @font-weight-regular;
+  line-height: 16px;
+  margin-right: 4px;
+  margin-top: 2px;
   opacity: .64;
 }
 
 .conversation-list-cell-badge {
-  background-color: fade(#000, 16%);
-  border-radius: 10px;
-  font-size: @font-size-xs;
-  font-weight: @font-weight-bold;
-  line-height: 20px;
-  height: 20px;
-  margin-right: 16px;
-  min-width: 30px;
-  text-align: center;
+  font-size: 12px;
 }
 
-.conversation-list-cell-avatar-arrow {
-  position: relative;
+.conversation-list-cell-context-menu {
+  .flex-center;
+  .square(20px);
+  margin-right: 8px;
 
-  &:before,
-  &:after {
+  &:before {
     content: '';
     transition-property: opacity;
     transition-timing-function: @ease-out-quart;
     transition-delay: @animation-timing-faster + .05;
     transition-duration: @animation-timing-slow;
     opacity: 0;
-    z-index: 1;
-  }
-
-  &:hover:before,
-  &:hover:after {
-    opacity: 1;
-  }
-
-  &:hover:before {
-    .circle(12px);
-    background-color: #fff;
-    position: absolute;
-    right: -3px;
-    bottom: -3px;
-  }
-
-  &:hover:after {
-    position: absolute;
-    right: 0;
-    bottom: 1px;
     width: 0;
     height: 0;
-    border-left: 3px solid transparent;
-    border-right: 3px solid transparent;
-    border-top: 3px solid #000;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #fff;
+
+    .conversation-list-cell:hover & {
+      opacity: 1;
+    }
   }
 }
 
 /* states */
 
-.conversation-list-cell-active {
-  &:after {
-    .accent-background-color();
-    opacity: .4;
-  }
-
-  .conversation-list-cell-name {
-    font-weight: @font-weight-bold;
-  }
+.conversation-list-cell-active:after {
+  .accent-background-color();
+  opacity: .64;
 }
 
 .conversation-list-cell-left-opaque {
-  opacity: .4;
+  opacity: .32;
 }
