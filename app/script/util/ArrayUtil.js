@@ -42,16 +42,15 @@ z.util.ArrayUtil = {
 
     return closest;
   },
-  get_next_item(array, item, filter) {
-    const current_index = array.indexOf(item);
-    const next_index = current_index + 1;
+  get_next_item(array, current_item, filter) {
+    const current_index = array.indexOf(current_item);
 
     // couldn't find the item
     if (current_index === -1) {
       return null;
     }
 
-    const next_index = index + 1;
+    const next_index = current_index + 1;
 
     // item is last item in the array
     if ((next_index === array.length) && (current_index > 0)) {
@@ -63,9 +62,9 @@ z.util.ArrayUtil = {
     }
 
     for (let index = next_index; index <= array.length; index++) {
-      const current_item = array[index];
-      if ((typeof filter !== 'function') || !!filter(current_item)) {
-        return current_item;
+      const next_item = array[index];
+      if ((typeof filter !== 'function') || !!filter(next_item)) {
+        return next_item;
       }
     }
   },
@@ -107,6 +106,18 @@ z.util.ArrayUtil = {
       }
 
       return (current_index + 1) % array.length;
+    }
+  },
+  iterate_item(array, current_item, reverse = false) {
+    if (_.isArray(array) && array.length) {
+      const current_index = array.indexOf(current_item);
+
+      // If item could not be found
+      if (current_index === -1) {
+        return;
+      }
+
+      return array[z.util.ArrayUtil.iterate_index(array, current_index, reverse)];
     }
   },
   /**
