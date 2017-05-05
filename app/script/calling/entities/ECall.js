@@ -307,6 +307,11 @@ z.calling.entities.ECall = class ECall {
     const additional_payload = this.v3_call_center.create_additional_payload(this.id);
 
     this.state(z.calling.enum.CALL_STATE.REJECTED);
+
+    if (this.is_remote_video_send()) {
+      this.v3_call_center.media_stream_handler.reset_media_stream();
+    }
+
     this.send_e_call_event(z.calling.mapper.ECallMessageMapper.build_reject(false, this.session_id, additional_payload));
   }
 

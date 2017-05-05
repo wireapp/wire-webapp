@@ -925,7 +925,6 @@ z.calling.v3.CallCenter = class CallCenter {
       .then((e_call_et) => {
         this.logger.info(`Rejecting e-call in conversation '${conversation_id}'`, e_call_et);
 
-        this.media_stream_handler.reset_media_stream();
         e_call_et.reject_call();
       })
       .catch(function(error) {

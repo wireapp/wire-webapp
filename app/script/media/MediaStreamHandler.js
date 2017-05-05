@@ -598,9 +598,13 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
    */
   needs_media_stream() {
     for (const call_et of this.calls()) {
-      if (call_et.is_remote_video_send() && call_et.state() === z.calling.enum.CALL_STATE.INCOMING) return true;
-      if (call_et.self_client_joined()) return true;
+      const is_incoming_video_call = call_et.is_remote_video_send() && call_et.state() === z.calling.enum.CALL_STATE.INCOMING;
+
+      if ((call_et.self_client_joined()) || is_incoming_video_call) {
+        return true;
+      }
     }
+
     return false;
   }
 
