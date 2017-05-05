@@ -113,16 +113,15 @@ z.assets.AssetService = class AssetService {
   upload_image_asset(image, options) {
     return this._compress_image(image)
       .then(([compressed_image, compressed_bytes]) => {
-          return this._upload_asset(compressed_bytes, options)
-            .then(function([key_bytes, sha256, key, token]) {
-              const image_meta_data = new z.proto.Asset.ImageMetaData(compressed_image.width, compressed_image.height);
-              const asset = new z.proto.Asset();
-              asset.set('original', new z.proto.Asset.Original(image.type, compressed_bytes.length, null, image_meta_data));
-              asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256, key, token));
-              return asset;
-            });
-        }
-      );
+        return this._upload_asset(compressed_bytes, options)
+          .then(function([key_bytes, sha256, key, token]) {
+            const image_meta_data = new z.proto.Asset.ImageMetaData(compressed_image.width, compressed_image.height);
+            const asset = new z.proto.Asset();
+            asset.set('original', new z.proto.Asset.Original(image.type, compressed_bytes.length, null, image_meta_data));
+            asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256, key, token));
+            return asset;
+          });
+      });
   }
 
   /**
