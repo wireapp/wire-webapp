@@ -28,5 +28,5 @@ module.exports = {
     files: {
       'deploy/min/wire-vendor.min.js': ['deploy/min/wire-vendor.min.js'].concat('<%= scripts_minified.vendor %>'),
     },
-  }
+  },
 };
