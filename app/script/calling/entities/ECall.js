@@ -677,6 +677,7 @@ z.calling.entities.ECall = class ECall {
         if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
+
         return this;
       });
   }
@@ -785,8 +786,7 @@ z.calling.entities.ECall = class ECall {
    * @returns {Array<Object>} Array of flow telemetry reports for calling service automation
    */
   get_flow_telemetry() {
-    return this.get_flows()
-      .map((e_flow_et) => e_flow_et.get_telemetry());
+    return this.get_flows().map((e_flow_et) => e_flow_et.get_telemetry());
   }
 
   /**
@@ -883,8 +883,7 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   _reset_e_flows() {
-    this.get_flows()
-      .forEach((e_flow_et) => e_flow_et.reset_flow());
+    this.get_flows().forEach((e_flow_et) => e_flow_et.reset_flow());
   }
 
 
@@ -897,8 +896,7 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   log_status() {
-    this.get_flows()
-      .forEach((e_flow_et) => e_flow_et.log_status());
+    this.get_flows().forEach((e_flow_et) => e_flow_et.log_status());
   }
 
   /**
@@ -906,7 +904,6 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   log_timings() {
-    this.get_flows()
-      .forEach((e_flow_et) => e_flow_et.log_timings());
+    this.get_flows().forEach((e_flow_et) => e_flow_et.log_timings());
   }
 };
