@@ -71,7 +71,7 @@ class z.ViewModel.ConversationTitlebarViewModel
     amplify.unsubscribe z.event.WebApp.SHORTCUT.PEOPLE
     amplify.unsubscribe z.event.WebApp.SHORTCUT.ADD_PEOPLE
 
-  click_on_call_button: =>
+  click_on_call_button: ->
     amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, false
 
   click_on_maximize: =>
@@ -82,7 +82,7 @@ class z.ViewModel.ConversationTitlebarViewModel
   click_on_participants: =>
     @show_participants()
 
-  click_on_video_button: =>
+  click_on_video_button: ->
     amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, true
 
   click_on_collection_button: ->
