@@ -47,6 +47,7 @@ z.calling.CallingRepository = class CallingRepository {
 
   /**
    * Construct a new Calling repository.
+   *
    * @param {CallService} call_service - CallService] Backend REST API call service implementation
    * @param {CallingService} calling_service -  Backend REST API calling service implementation
    * @param {ClientRepository} client_repository - Repository for client interactions
@@ -172,6 +173,7 @@ z.calling.CallingRepository = class CallingRepository {
 
   /**
    * Join a call.
+   *
    * @param {string} conversation_id - Conversation ID
    * @param {boolean} video_send - Should video be send
    * @returns {undefined} No return value
@@ -261,15 +263,28 @@ z.calling.CallingRepository = class CallingRepository {
 
   /**
    * User action to toggle the call state.
-   * @param {string} conversation_id - Conversation ID of call for which state will be toggled
-   * @param {boolean} video_send - Is this a video call
+   *
+   * @param {boolean} [video_send=false] - Is this a video call
+   * @param {Conversation} conversation_et - Conversation for which state will be toggled
    * @returns {undefined} No return value
    */
-  toggle_state(conversation_id, video_send) {
-    if (this._self_client_on_a_call() === conversation_id) {
-      return this.switch_call_center(z.calling.enum.CALL_ACTION.LEAVE, [conversation_id]);
+  toggle_state(video_send, conversation_et) {
+    if (!conversation_et) {
+      if (this.conversation_repository.active_conversation()) {
+        conversation_et = this.conversation_repository.active_conversation();
+      } else {
+        this.logger.info('No conversation selected to toggle call state in');
+      }
     }
-    this.join_call(conversation_id, video_send);
+
+    if (video_send && conversation_et.is_group()) {
+      amplify.publish(z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP);
+    } else {
+      if (conversation_et.id === this._self_client_on_a_call()) {
+        return this.switch_call_center(z.calling.enum.CALL_ACTION.LEAVE, [conversation_et.id]);
+      }
+      this.join_call(conversation_et.id, video_send);
+    }
   }
 
   /**
