@@ -81,6 +81,10 @@ z.calling.entities.EParticipant = class EParticipant {
    * @returns {Promise} Resolves with the participant when the state was updated
    */
   update_state(e_call_message_et) {
+    if (!e_call_message_et) {
+      return Promise.resolve(this);
+    }
+
     const {client_id, props, session_id, type} = e_call_message_et;
 
     return this.update_properties(props)
