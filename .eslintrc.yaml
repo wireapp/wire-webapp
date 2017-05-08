@@ -27,7 +27,9 @@ globals:
   poster: true
   Proteus: true
   Raygun: true
+  sinon: true
   sodium: true
+  TestFactory: true
   twttr: true
   UUID: true
   wire: true
