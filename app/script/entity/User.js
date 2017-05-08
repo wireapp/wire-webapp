@@ -142,7 +142,7 @@ z.entity.User = class User {
 
     // e2ee
     this.devices = ko.observableArray();
-    return this.is_verified = ko.pureComputed(() => {
+    this.is_verified = ko.pureComputed(() => {
       if ((this.devices().length === 0) && !this.is_me) {
         return false;
       }
