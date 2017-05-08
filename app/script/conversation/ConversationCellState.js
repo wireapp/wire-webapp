@@ -34,27 +34,26 @@ z.conversation.ConversationCellState = (() => {
     for (const activity in activities) {
       const count = activities[activity];
 
-      // TODO: localization
       switch (activity) {
         case 'message':
           if (count === 1) {
-            activity_strings.push(`${count} new message`);
+            activity_strings.push(z.l10n.format(z.string.conversations_secondary_line_new_message, count));
           } else if (count > 1) {
-            activity_strings.push(`${count} new messages`);
+            activity_strings.push(z.l10n.format(z.string.conversations_secondary_line_new_messages, count));
           }
           break;
         case 'ping':
           if (count === 1) {
-            activity_strings.push(`${count} ping`);
+            activity_strings.push(z.l10n.format(z.string.conversations_secondary_line_ping, count));
           } else if (count > 1) {
-            activity_strings.push(`${count} pings`);
+            activity_strings.push(z.l10n.format(z.string.conversations_secondary_line_pings, count));
           }
           break;
         case 'call':
           if (count === 1) {
-            activity_strings.push(`${count} missed call`);
+            activity_strings.push(z.l10n.format(z.string.conversations_secondary_line_missed_call, count));
           } else if (count > 1) {
-            activity_strings.push(`${count} missed calls`);
+            activity_strings.push(z.l10n.format(z.string.conversations_secondary_line_missed_calls, count));
           }
           break;
         default:
@@ -151,21 +150,26 @@ z.conversation.ConversationCellState = (() => {
   const group_activity_state = {
     description(conversation_et) {
       const last_message_et = conversation_et.get_last_message();
+      const count = last_message_et.remote_user_ets().length;
       let message_text;
+
       switch (last_message_et.type) {
         case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-          if (last_message_et.remote_user_ets().length === 1) {
-            message_text = 'person left';
+          if (count === 1) {
+            message_text = z.l10n.format(z.string.conversations_secondary_line_person_left, count);
           } else if (last_message_et.remote_user_ets().length > 1) {
-            message_text = 'people left';
+            message_text = z.l10n.format(z.string.conversations_secondary_line_people_left, count);
           }
           break;
         case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-          if (last_message_et.remote_user_ets().length === 1) {
-            message_text = `${last_message_et.sender_name()} added ${last_message_et.remote_user_ets()[0].first_name()}`;
+          if (count) {
+            message_text = z.l10n.format(z.string.conversations_secondary_line_person_added, last_message_et.sender_name(), last_message_et.remote_user_ets()[0].first_name());
           } else if (last_message_et.remote_user_ets().length > 1) {
-            message_text = `${last_message_et.remote_user_ets().length} people were added`;
+            message_text = z.l10n.format(z.string.conversations_secondary_line_people_added, last_message_et.remote_user_ets().length);
           }
+          break;
+        case z.event.Backend.CONVERSATION.RENAME:
+          message_text = 'renamed';
           break;
         default:
           message_text = '';
