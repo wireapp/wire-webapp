@@ -17,9 +17,9 @@
  *
  */
 
-'use strict';
-
 // grunt test_init && grunt test_run:service/Client
+
+'use strict';
 
 describe('z.service.BackendClient', function() {
   let backend_client = null;
