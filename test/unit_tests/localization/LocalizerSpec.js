@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint no-undef: "off" */
-
 // grunt test_init && grunt test_run:localization/Localizer
 
 'use strict';
