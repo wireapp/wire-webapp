@@ -474,9 +474,7 @@ z.entity.Conversation = class Conversation {
   get_number_of_pending_uploads() {
     const pending_uploads = [];
 
-    const messages = this.messages();
-    for (let index = 0; index < messages.length; index++) {
-      const message_et = messages[index];
+    for (const message_et of this.messages()) {
       if (message_et.assets && message_et.assets()[0] && message_et.assets()[0].pending_upload && message_et.assets()[0].pending_upload()) {
         pending_uploads.push(message_et);
       }
