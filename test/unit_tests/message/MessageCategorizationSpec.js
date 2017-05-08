@@ -21,7 +21,7 @@
 
 // grunt test_init && grunt test_run:message/MessageCategorization
 
-describe('z.message.MessageCategorization', () =>
+describe('z.message.MessageCategorization', function() {
   describe('category_from_event', function() {
     it('malformed events should have category of type UNDEFINED', function() {
       expect(z.message.MessageCategorization.category_from_event()).toBe(z.message.MessageCategory.UNDEFINED);
@@ -84,10 +84,10 @@ describe('z.message.MessageCategorization', () =>
       expect(category).toBe(z.message.MessageCategory.KNOCK);
     });
 
-    return it('location message should have category of type LOCATION', function() {
+    it('location message should have category of type LOCATION', function() {
       const event = '{"conversation":"34e7f58e-b834-4d84-b628-b89b295d46c0","id":"ae551ad3-2ca5-4d3a-8eec-ef9985996c29","from":"9b47476f-974d-481c-af64-13f82ed98a5f","time":"2017-01-09T13:54:00.960","data":{"location":{"longitude":13,"latitude":52,"name":"Alexanderplatz","zoom":20},"nonce":"ae551ad3-2ca5-4d3a-8eec-ef9985996c29"},"type":"conversation.location"}';
       const category = z.message.MessageCategorization.category_from_event(JSON.parse(event));
       expect(category).toBe(z.message.MessageCategory.LOCATION);
     });
-  })
-);
+  });
+});

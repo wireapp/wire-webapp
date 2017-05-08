@@ -26,7 +26,7 @@ let server = undefined;
 describe('z.announce.AnnounceService', function() {
   const test_factory = new window.TestFactory();
 
-  beforeAll((done) => {
+  beforeAll(function(done) {
     test_factory.exposeAnnounceActors()
       .then(done)
       .catch(done.fail);
@@ -85,7 +85,7 @@ describe('z.announce.AnnounceService', function() {
       server.restore();
     });
 
-    it('can fetch an announcement', (done) => {
+    it('can fetch an announcement', function(done) {
       TestFactory.announce_service.get_announcements()
         .then(function(result) {
           expect(result.length).toBe(2);
@@ -105,7 +105,7 @@ describe('z.announce.AnnounceService', function() {
       server.restore();
     });
 
-    it('cannot fetch an announcement', (done) => {
+    it('cannot fetch an announcement', function(done) {
       TestFactory.announce_service.get_announcements()
         .then(done.fail)
         .catch(function(error) {
@@ -134,7 +134,7 @@ describe('z.announce.AnnounceService', function() {
       server.restore();
     });
 
-    it('fetches the webapp release version', (done) => {
+    it('fetches the webapp release version', function(done) {
       TestFactory.announce_service.get_version()
         .then(function(version) {
           expect(version).toBe(response.version);

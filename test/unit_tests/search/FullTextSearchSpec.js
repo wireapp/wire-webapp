@@ -21,7 +21,7 @@
 
 // grunt test_init && grunt test_run:search/FullTextSearch
 
-describe('z.search.FullTextSearch', () =>
+describe('z.search.FullTextSearch', function() {
   describe('search', function() {
     it('should return false if text is not found', function() {
       expect(z.search.FullTextSearch.search('aa', '')).toBeFalsy();
@@ -67,5 +67,5 @@ describe('z.search.FullTextSearch', () =>
       expect(z.search.FullTextSearch.search('bb бб bb', 'bb')).toBeTruthy();
       expect(z.search.FullTextSearch.search('苹果', '苹果')).toBeTruthy();
     });
-  })
-);
+  });
+});

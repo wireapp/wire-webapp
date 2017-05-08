@@ -25,7 +25,7 @@ describe('z.search.SearchRepository', function() {
   const test_factory = new TestFactory();
   let server = null;
 
-  beforeEach((done) => {
+  beforeEach(function(done) {
     test_factory.exposeSearchActors()
       .then(function() {
         server = sinon.fakeServer.create();

@@ -26,7 +26,7 @@ let server = undefined;
 describe('z.announce.AnnounceRepository', function() {
   const test_factory = new TestFactory();
 
-  beforeAll((done) => {
+  beforeAll(function(done) {
     test_factory.exposeAnnounceActors()
       .then(done)
       .catch(done.fail);
@@ -84,7 +84,7 @@ describe('z.announce.AnnounceRepository', function() {
     server.restore();
   });
 
-  it('can fetch an announcement', (done) => {
+  it('can fetch an announcement', function(done) {
     TestFactory.announce_repository.check_announcements()
       .then(done)
       .catch(done.fail);

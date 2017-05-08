@@ -24,8 +24,9 @@ describe('Shortcut', function() {
 
   describe('get_shortcut', function() {
     describe('webapp', function() {
-      beforeEach(() => z.util.Environment.electron = false);
-
+      beforeEach(function() {
+        z.util.Environment.electron = false;
+      });
       it('can get shortcut for mac', function() {
         z.util.Environment.os.mac = true;
         const mac_shortcut = z.ui.Shortcut.get_shortcut(z.ui.ShortcutType.ADD_PEOPLE);
@@ -40,8 +41,9 @@ describe('Shortcut', function() {
     });
 
     describe('electron', function() {
-      beforeEach(() => z.util.Environment.electron = true);
-
+      beforeEach(function() {
+        z.util.Environment.electron = true;
+      });
       it('can get shortcut for electron mac', function() {
         z.util.Environment.os.mac = true;
         const mac_shortcut = z.ui.Shortcut.get_shortcut(z.ui.ShortcutType.ADD_PEOPLE);
@@ -58,8 +60,9 @@ describe('Shortcut', function() {
 
   describe('get_shortcut_tooltip', function() {
     describe('webapp', function() {
-      beforeEach(() => z.util.Environment.electron = false);
-
+      beforeEach(function() {
+        z.util.Environment.electron = false;
+      });
       it('can create a beautified tooltip for webapp mac', function() {
         z.util.Environment.os.mac = true;
         const mac_shortcut = z.ui.Shortcut.get_shortcut_tooltip(z.ui.ShortcutType.ADD_PEOPLE);
@@ -74,7 +77,9 @@ describe('Shortcut', function() {
     });
 
     describe('electron', function() {
-      beforeEach(() => z.util.Environment.electron = true);
+      beforeEach(function() {
+        z.util.Environment.electron = true;
+      });
 
       it('can create a beautified tooltip for webapp mac', function() {
         z.util.Environment.os.mac = true;
@@ -90,17 +95,17 @@ describe('Shortcut', function() {
     });
   });
 
-  describe('get_beautified_shortcut_mac', () =>
+  describe('get_beautified_shortcut_mac', function() {
     it('can create a beautified shortcut', function() {
       const mac_shortcut = z.ui.Shortcut.get_beautified_shortcut_mac('command + q');
       expect(mac_shortcut).toBe('⌘Q');
-    })
-  );
+    });
+  });
 
-  describe('get_beautified_shortcut_pc', () =>
+  describe('get_beautified_shortcut_pc', function() {
     it('can create a beautified shortcut', function() {
       const pc_shortcut = z.ui.Shortcut.get_beautified_shortcut_win('alt + F4');
       expect(pc_shortcut).toBe('Alt + F4');
-    })
-  );
+    });
+  });
 });
