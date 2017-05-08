@@ -23,6 +23,7 @@ globals:
   LRUCache: true
   marked: true
   moment: true
+  OpenGraphMocks: true
   pako: true
   payload: true
   platform: true
