@@ -24,6 +24,31 @@ window.z.entity = z.entity || {};
 
 // Please note: The own user has a "locale"
 z.entity.User = class User {
+
+  static get ACCENT_COLOR() {
+    return {
+      BLUE: '#2391d3',
+      GREEN: '#00c800',
+      ORANGE: '#ff8900',
+      PINK: '#fe5ebd',
+      PURPLE: '#9c00fe',
+      RED: '#fb0807',
+      YELLOW: '#febf02',
+    };
+  }
+
+  static get THEME() {
+    return {
+      BLUE: 'theme-blue',
+      GREEN: 'theme-green',
+      ORANGE: 'theme-orange',
+      PINK: 'theme-pink',
+      PURPLE: 'theme-purple',
+      RED: 'theme-red',
+      YELLOW: 'theme-yellow',
+    };
+  }
+
   constructor(id = '') {
     this.id = id;
     this.is_me = false;
@@ -35,42 +60,42 @@ z.entity.User = class User {
     this.accent_theme = ko.pureComputed(() => {
       switch (this.accent_id()) {
         case z.config.ACCENT_ID.BLUE:
-          return this.THEME.BLUE;
+          return z.entity.User.THEME.BLUE;
         case z.config.ACCENT_ID.GREEN:
-          return this.THEME.GREEN;
+          return z.entity.User.THEME.GREEN;
         case z.config.ACCENT_ID.ORANGE:
-          return this.THEME.ORANGE;
+          return z.entity.User.THEME.ORANGE;
         case z.config.ACCENT_ID.PINK:
-          return this.THEME.PINK;
+          return z.entity.User.THEME.PINK;
         case z.config.ACCENT_ID.PURPLE:
-          return this.THEME.PURPLE;
+          return z.entity.User.THEME.PURPLE;
         case z.config.ACCENT_ID.RED:
-          return this.THEME.RED;
+          return z.entity.User.THEME.RED;
         case z.config.ACCENT_ID.YELLOW:
-          return this.THEME.YELLOW;
+          return z.entity.User.THEME.YELLOW;
         default:
-          return this.THEME.BLUE;
+          return z.entity.User.THEME.BLUE;
       }
     }, this, {deferEvaluation: true});
 
     this.accent_color = ko.pureComputed(() => {
       switch (this.accent_id()) {
         case z.config.ACCENT_ID.BLUE:
-          return this.ACCENT_COLOR.BLUE;
+          return z.entity.User.ACCENT_COLOR.BLUE;
         case z.config.ACCENT_ID.GREEN:
-          return this.ACCENT_COLOR.GREEN;
+          return z.entity.User.ACCENT_COLOR.GREEN;
         case z.config.ACCENT_ID.ORANGE:
-          return this.ACCENT_COLOR.ORANGE;
+          return z.entity.User.ACCENT_COLOR.ORANGE;
         case z.config.ACCENT_ID.PINK:
-          return this.ACCENT_COLOR.PINK;
+          return z.entity.User.ACCENT_COLOR.PINK;
         case z.config.ACCENT_ID.PURPLE:
-          return this.ACCENT_COLOR.PURPLE;
+          return z.entity.User.ACCENT_COLOR.PURPLE;
         case z.config.ACCENT_ID.RED:
-          return this.ACCENT_COLOR.RED;
+          return z.entity.User.ACCENT_COLOR.RED;
         case z.config.ACCENT_ID.YELLOW:
-          return this.ACCENT_COLOR.YELLOW;
+          return z.entity.User.ACCENT_COLOR.YELLOW;
         default:
-          return this.ACCENT_COLOR.BLUE;
+          return z.entity.User.ACCENT_COLOR.BLUE;
       }
     }, this, {deferEvaluation: true});
 
