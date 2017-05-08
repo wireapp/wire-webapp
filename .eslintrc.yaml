@@ -15,6 +15,7 @@ globals:
   CryptoJS: true
   dcodeIO: true
   Dexie: true
+  entities: true
   hljs: true
   keyboardJS: true
   ko: true
@@ -23,6 +24,7 @@ globals:
   marked: true
   moment: true
   pako: true
+  payload: true
   platform: true
   poster: true
   Proteus: true
