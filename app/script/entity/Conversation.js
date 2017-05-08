@@ -235,7 +235,10 @@ z.entity.Conversation = class Conversation {
     });
   }
 
-  // Remove all message from conversation unless there are unread messages.
+  /**
+   * Remove all message from conversation unless there are unread messages.
+   * @returns {undefined} No return value
+   */
   release() {
     if (!this.unread_event_count()) {
       this.remove_messages();
@@ -284,6 +287,12 @@ z.entity.Conversation = class Conversation {
     return updated_timestamp;
   }
 
+  /**
+   * Increment only on timestamp update
+   * @param {z.entity.Conversation} current_timestamp - Current timestamp
+   * @param {string} updated_timestamp - Timestamp from update
+   * @returns {string|boolean} Updated timestamp or false if not increased
+   */
   _increment_time_only(current_timestamp, updated_timestamp) {
     if (updated_timestamp > current_timestamp) {
       return updated_timestamp;
@@ -292,12 +301,22 @@ z.entity.Conversation = class Conversation {
 
   }
 
+  /**
+   * Adds a single message to the conversation.
+   * @param {z.entity.Message} message_et - Message entity to be added to the conversation
+   * @returns {undefined} No return value
+   */
   add_message(message_et) {
     amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et);
     this._update_last_read_from_message(message_et);
     return this.messages_unordered.push(this._check_for_duplicate_nonce(message_et, this.get_last_message()));
   }
 
+  /**
+   * Adds multiple messages to the conversation.
+   * @param {Array<z.entity.Message>} message_ets - Array of message entities to be added to the conversation
+   * @returns {undefined} No return value
+   */
   add_messages(message_ets) {
     let message_et;
     for (let index = 0; index < message_ets.length; index++) {
@@ -318,6 +337,11 @@ z.entity.Conversation = class Conversation {
     return z.util.ko_array_push_all(this.messages_unordered, message_ets);
   }
 
+  /**
+   * Prepends messages with new batch of messages.
+   * @param {Array<z.entity.Message>} message_ets - Array of messages to be added to conversation
+   * @returns {undefined} No return value
+   */
   prepend_messages(message_ets) {
     const last_message_et = message_ets[message_ets.length - 1];
     this._check_for_duplicate_nonce(last_message_et, this.get_first_message());
@@ -330,6 +354,11 @@ z.entity.Conversation = class Conversation {
     return z.util.ko_array_unshift_all(this.messages_unordered, message_ets);
   }
 
+  /**
+   * Removes message from the conversation by message id.
+   * @param {string} message_id - ID of the message entity to be removed from the conversation
+   * @returns {undefined} No return value
+   */
   remove_message_by_id(message_id) {
     const messages = this.messages_unordered();
     for (let index = messages.length - 1; index >= 0; index--) {
@@ -340,14 +369,31 @@ z.entity.Conversation = class Conversation {
     }
   }
 
+  /**
+   * Removes a single message from the conversation.
+   * @param {z.entity.Message} message_et - Message entity to be removed from the conversation
+   * @returns {undefined} No return value
+   */
   remove_message(message_et) {
     return this.messages_unordered.remove(message_et);
   }
 
+  /**
+   * Removes all messages from the conversation.
+   * @returns {undefined} No return value
+   */
   remove_messages() {
     return this.messages_unordered.removeAll();
   }
 
+  /**
+   * Checks for message duplicates by nonce and returns the message.
+   * @private
+   * @note If a message is send to the backend multiple times by a client they will be in the conversation multiple times
+   * @param {z.entity.Message} message_et - Message entity to be added to the conversation
+   * @param {z.entity.Message} other_message_et - Other message entity to compare with
+   * @returns {undefined} No return value
+   */
   _check_for_duplicate_nonce(message_et, other_message_et) {
     if ((message_et == null) || (other_message_et == null)) {
       return message_et;
@@ -368,6 +414,12 @@ z.entity.Conversation = class Conversation {
     return message_et;
   }
 
+  /**
+   * Creates the placeholder message after clearing a conversation.
+   * @private
+   * @note Only create the message if the group participants have been set
+   * @returns {undefined} No return value
+   */
   _creation_message() {
     if (this.participating_user_ets().length === 0) {
       return undefined;
@@ -406,12 +458,23 @@ z.entity.Conversation = class Conversation {
     return message_et;
   }
 
+  /**
+   * Update information about last activity from single message.
+   * @param {z.entity.Message} message_et - Message to be added to conversation
+   * @returns {undefined} No return value
+   */
   update_latest_from_message(message_et) {
     if ((message_et != null) && message_et.visible() && message_et.should_effect_conversation_timestamp) {
       return this.set_timestamp(message_et.timestamp(), z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP);
     }
   }
 
+  /**
+   * Update last read if message sender is self
+   * @private
+   * @param {z.entity.Message} message_et - Message entity
+   * @returns {undefined} No return value
+   */
   _update_last_read_from_message(message_et) {
     const is_me = message_et.user() && message_et.user().is_me;
     const has_timestamp = message_et.timestamp();
@@ -421,19 +484,35 @@ z.entity.Conversation = class Conversation {
     }
   }
 
+  /**
+   * Get all messages.
+   * @returns {Array<z.entity.Message>} Array of all message in the conversation
+   */
   get_all_messages() {
     return this.messages();
   }
 
-
+  /**
+   * Get the first message of the conversation.
+   * @returns {z.entity.Message|undefined} First message entity or undefined
+   */
   get_first_message() {
     return this.messages()[0];
   }
 
+  /**
+   * Get the last message of the conversation.
+   * @returns {z.entity.Message|undefined} Last message entity or undefined
+   */
   get_last_message() {
     return this.messages()[this.messages().length - 1];
   }
 
+  /**
+   * Get the message before a given message.
+   * @param {z.entity.Message} message_et - Message to look up from
+   * @returns {z.entity.Message | undefined} Previous message
+   */
   get_previous_message(message_et) {
     const messages_visible = this.messages_visible();
     const message_index = messages_visible.indexOf(message_et);
@@ -442,6 +521,10 @@ z.entity.Conversation = class Conversation {
     }
   }
 
+  /**
+   * Get the last text message that was added by self user.
+   * @returns {z.entity.Message} Last message edited
+   */
   get_last_editable_message() {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
@@ -452,6 +535,10 @@ z.entity.Conversation = class Conversation {
     }
   }
 
+  /**
+   * Get the last delivered message.
+   * @returns {z.entity.Message} Last delivered message
+   */
   get_last_delivered_message() {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
@@ -462,6 +549,11 @@ z.entity.Conversation = class Conversation {
     }
   }
 
+  /**
+   * Get a message by it's unique ID.
+   * @param {string} id - ID of message to be retrieved
+   * @returns {z.entity.Message|undefined} Message with ID or undefined
+   */
   get_message_by_id(id) {
     for (const message_et of this.messages()) {
       if (message_et.id === id) {
@@ -470,7 +562,10 @@ z.entity.Conversation = class Conversation {
     }
   }
 
-
+  /**
+   * Get Number of pending uploads for this conversation.
+   * @returns {number} Count of pending uploads
+   */
   get_number_of_pending_uploads() {
     const pending_uploads = [];
 
@@ -490,6 +585,10 @@ z.entity.Conversation = class Conversation {
       .map((user_et) => user_et);
   }
 
+  /**
+   * Check whether the conversation is held with a bot like Anna or Otto.
+   * @returns {boolean} True, if conversation with a bot
+   */
   is_with_bot() {
     for (const user_et of this.participating_user_ets()) {
       if (user_et.is_bot) {
