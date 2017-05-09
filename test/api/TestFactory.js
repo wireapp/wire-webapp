@@ -151,7 +151,7 @@ window.TestFactory.prototype.exposeClientActors = function() {
       TestFactory.client_service = new z.client.ClientService(this.client, TestFactory.storage_service);
       TestFactory.client_service.logger.level = this.settings.logging_level;
 
-      TestFactory.client_repository = new z.client.ClientRepository(client_service, TestFactory.cryptography_repository);
+      TestFactory.client_repository = new z.client.ClientRepository(TestFactory.client_service, TestFactory.cryptography_repository);
       TestFactory.client_repository.logger.level = this.settings.logging_level;
       TestFactory.client_repository.init(user);
       const payload = {'address': '62.96.148.44', 'class': 'desktop', 'cookie': 'webapp@2153234453@temporary@1470926647664', 'id': '132b3653b33f851f', 'label': 'Windows 10', 'location': {'lat': 52.5233, 'lon': 13.4138}, 'meta': {'is_verified': true, 'primary_key': 'local_identity'}, 'model': 'Chrome (Temporary)', 'time': '2016-10-07T16:01:42.133Z', 'type': 'temporary'};
@@ -228,7 +228,7 @@ window.TestFactory.prototype.exposeUserActors = function() {
         TestFactory.cryptography_repository
       );
       TestFactory.user_repository.logger.level = this.settings.logging_level;
-      TestFactory.user_repository.save_user(TestFactory.client_repository.this_user(), true);
+      TestFactory.user_repository.save_user(TestFactory.client_repository.self_user(), true);
 
       return TestFactory.user_repository;
     });

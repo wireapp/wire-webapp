@@ -93,7 +93,7 @@ describe('PromiseQueue', function() {
       const resolving_promise = () => Promise.resolve(counter++);
 
       const timeout_promise = function() {
-        new Promise(function(resolve) {
+        return new Promise(function(resolve) {
           if (counter++ === 3) {
             resolve();
           }

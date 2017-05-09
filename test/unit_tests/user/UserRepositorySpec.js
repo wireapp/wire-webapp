@@ -133,43 +133,6 @@ describe('z.user.UserRepository', function() {
   });
 
   describe('users', function() {
-    describe('add_client_to_user', function() {
-      let user_et;
-
-      beforeEach(function(done) {
-        user_et = new z.entity.User();
-        TestFactory.user_repository.save_user(user_et)
-          .then(done)
-          .catch(done.fail);
-      });
-
-      it('adds a client entity to a user entity', function(done) {
-        TestFactory.user_repository.add_client_to_user(user_et.id, new z.client.Client())
-          .then(function() {
-            expect(user_et.devices().length).toBe(1);
-            done();
-          })
-          .catch(done.fail);
-      });
-
-      it('does not add the same client twice', function(done) {
-        const first_client = new z.client.Client();
-        first_client.id = '5021d77752286cac';
-
-        const second_client = new z.client.Client();
-        second_client.id = '575b7a890cdb7635';
-
-        TestFactory.user_repository.add_client_to_user(user_et.id, first_client)
-          .then(() => TestFactory.user_repository.add_client_to_user(user_et.id, second_client))
-          .then(() => TestFactory.user_repository.add_client_to_user(user_et.id, second_client))
-          .then(function() {
-            expect(user_et.devices().length).toBe(2);
-            done();
-          })
-          .catch(done.fail);
-      });
-    });
-
     describe('fetch_user_by_id', function() {
       it('should handle malformed input', function(done) {
         TestFactory.user_repository.fetch_users_by_id()

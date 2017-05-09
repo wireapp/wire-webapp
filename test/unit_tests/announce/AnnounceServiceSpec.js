@@ -21,9 +21,8 @@
 
 'use strict';
 
-let server = undefined;
-
 describe('z.announce.AnnounceService', function() {
+  let server = undefined;
   const test_factory = new window.TestFactory();
 
   beforeAll(function(done) {

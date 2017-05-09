@@ -530,7 +530,7 @@ describe('Markdown for code snippets', function() {
   });
 
   it('renders code within code spans', function() {
-    expect(z.util.render_message('This is `code`.´')).toEqual('This is <code>code</code>.');
+    expect(z.util.render_message('This is `code`.')).toEqual('This is <code>code</code>.');
   });
 
   it('renders code within code blocks', function() {

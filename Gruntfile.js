@@ -67,8 +67,8 @@ module.exports = (grunt) => {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    config,
-    dir,
+    config: config,
+    dir: dir,
     aws_s3: require('./grunt/config/aws_s3'),
     bower: require('./grunt/config/bower'),
     clean: require('./grunt/config/clean'),
@@ -116,7 +116,7 @@ module.exports = (grunt) => {
     const scripts = grunt.config('scripts');
 
     const prepare_file_names = (file_name_array) => {
-      return file_name_array.map(file_name => file_name.replace('deploy/', ''));
+      return file_name_array.map((file_name) => file_name.replace('deploy/', ''));
     };
 
     const helper_files = grunt.config.get('karma.options.files');
@@ -138,7 +138,7 @@ module.exports = (grunt) => {
       'newer:coffee:dist',
       'newer:coffee:test',
       'newer:copy:dist_js',
-      'copy:test',
+      'newer:copy:test',
       `test_prepare:${test_name}`,
       'karma:test',
     ]);

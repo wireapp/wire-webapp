@@ -137,7 +137,9 @@ describe('z.tracking.EventTrackingRepository', function() {
         done();
       };
 
-      Promise.reject(new Error('Unit test error'));
+      /* eslint-disable prefer-promise-reject-errors */
+      Promise.reject('Unit test failing with string');
+      /* eslint-enable prefer-promise-reject-errors */
     });
 
     it('ignores a rejected Promise that is caught', function(done) {

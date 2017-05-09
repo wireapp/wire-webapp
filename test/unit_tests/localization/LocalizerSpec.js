@@ -22,7 +22,7 @@
 'use strict';
 
 describe('Localizer', function() {
-  it('can get localized strings', () => {
+  it('can get localized strings', function() {
     const text = z.localization.Localizer.get_text(z.string.upload_choose);
     expect(text).toBe(z.string.upload_choose);
   });

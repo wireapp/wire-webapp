@@ -149,7 +149,7 @@ describe('z.entity.User', function() {
       expect(user_et.accent_color()).toBe(z.entity.User.ACCENT_COLOR.PURPLE);
 
       user_et.accent_id(z.config.ACCENT_ID.RED);
-      expect(user_et.accent_color()).toBe(user_et.ACCENT_COLOR.RED);
+      expect(user_et.accent_color()).toBe(z.entity.User.ACCENT_COLOR.RED);
 
       user_et.accent_id(z.config.ACCENT_ID.YELLOW);
       expect(user_et.accent_color()).toBe(z.entity.User.ACCENT_COLOR.YELLOW);

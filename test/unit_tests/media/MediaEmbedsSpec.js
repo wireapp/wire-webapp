@@ -21,19 +21,19 @@
 
 // grunt test_init && grunt test_run:media/MediaEmbeds
 
-// Will test all common link variations
-const test_link_variants = function(site, re) {
-  expect(`http://${site}.com`.match(re)).toBe(null);
-  expect(`https://${site}.com`.match(re)).toBe(null);
-  expect(`${site}.com`.match(re)).toBe(null);
-  expect(`http://m.${site}.com`.match(re)).toBe(null);
-  expect(`https://m.${site}.com`.match(re)).toBe(null);
-  expect(`m.${site}.com`.match(re)).toBe(null);
-  expect(`www.${site}.com`.match(re)).toBe(null);
-};
-
 // grunt test_init && grunt test_run:media/MediaEmbeds
 describe('MediaEmbeds', function() {
+// Will test all common link variations
+  const test_link_variants = function(site, re) {
+    expect(`http://${site}.com`.match(re)).toBe(null);
+    expect(`https://${site}.com`.match(re)).toBe(null);
+    expect(`${site}.com`.match(re)).toBe(null);
+    expect(`http://m.${site}.com`.match(re)).toBe(null);
+    expect(`https://m.${site}.com`.match(re)).toBe(null);
+    expect(`m.${site}.com`.match(re)).toBe(null);
+    expect(`www.${site}.com`.match(re)).toBe(null);
+  };
+
   const build_message_with_anchor = (link) => `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
 
   const build_youtube_iframe = function(link) {

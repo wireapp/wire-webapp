@@ -21,24 +21,24 @@
 
 // grunt test_init && grunt test_run:links/LinkPreviewProtoBuilder
 
-const compare_article_with_mock = function(url, offset, preview, mock) {
-  expect(preview).toBeDefined();
-  expect(preview.preview).toBe('article');
-  expect(preview.url).toBe(url);
-  expect(preview.url_offset).toBe(offset);
-  expect(preview.article.title).toBe(mock.title);
-  expect(preview.article.permanent_url).toBe(mock.url);
-  expect(preview.article.summary).toEqual(mock.description || null);
-  expect(() => preview.toArrayBuffer()).not.toThrow();
-};
+describe('LinkPreviewProtoBuilder', function() {
+  const compare_article_with_mock = function(url, offset, preview, mock) {
+    expect(preview).toBeDefined();
+    expect(preview.preview).toBe('article');
+    expect(preview.url).toBe(url);
+    expect(preview.url_offset).toBe(offset);
+    expect(preview.article.title).toBe(mock.title);
+    expect(preview.article.permanent_url).toBe(mock.url);
+    expect(preview.article.summary).toEqual(mock.description || null);
+    expect(() => preview.toArrayBuffer()).not.toThrow();
+  };
 
-beforeAll(function(done) {
-  z.util.protobuf.load_protos('ext/proto/generic-message-proto/messages.proto')
-    .then(done)
-    .catch(done.fail);
-});
+  beforeAll(function(done) {
+    z.util.protobuf.load_protos('ext/proto/generic-message-proto/messages.proto')
+      .then(done)
+      .catch(done.fail);
+  });
 
-describe('build_from_open_graph_data', function() {
   it('returns undefined if no data is given', function() {
     const link_preview = z.links.LinkPreviewProtoBuilder.build_from_open_graph_data();
     expect(link_preview).not.toBeDefined();

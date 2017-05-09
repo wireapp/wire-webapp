@@ -21,9 +21,8 @@
 
 'use strict';
 
-let server = undefined;
-
 describe('z.announce.AnnounceRepository', function() {
+  let server = undefined;
   const test_factory = new TestFactory();
 
   beforeAll(function(done) {
