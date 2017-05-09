@@ -185,7 +185,9 @@ z.entity.Conversation = class Conversation {
         }
 
         return '…';
-      } else if (this.is_group()) {
+      }
+
+      if (this.is_group()) {
         if (this.name()) {
           return this.name();
         }
@@ -226,9 +228,7 @@ z.entity.Conversation = class Conversation {
       this.status,
       this.type,
       this.verification_state,
-    ].forEach((property) => {
-      return property.subscribe(this.persist_state);
-    });
+    ].forEach((property) => property.subscribe(this.persist_state));
   }
 
   /**

@@ -103,9 +103,7 @@ z.entity.User = class User {
     this.phone = ko.observable();
 
     this.name = ko.observable('');
-    this.first_name = ko.pureComputed(() => {
-      return this.name().split(' ')[0];
-    });
+    this.first_name = ko.pureComputed(() => this.name().split(' ')[0]);
 
     this.last_name = ko.pureComputed(() => {
       const parts = this.name().split(' ');
