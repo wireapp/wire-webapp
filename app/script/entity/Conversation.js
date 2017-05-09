@@ -70,9 +70,7 @@ z.entity.Conversation = class Conversation {
     this.muted_timestamp = ko.observable(0);
 
     // Conversation states for view
-    this.is_muted = ko.pureComputed(() => {
-      return this.muted_state();
-    });
+    this.is_muted = ko.pureComputed(() => this.muted_state());
 
     this.is_archived = ko.pureComputed(() => {
       const archived = this.last_event_timestamp() <= this.archived_timestamp();
