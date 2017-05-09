@@ -85,14 +85,14 @@ z.calling.entities.EParticipant = class EParticipant {
       return Promise.resolve(this);
     }
 
-    const {client_id, props, session_id, type} = e_call_message_et;
+    const {client_id, props, sdp: rtc_sdp, session_id} = e_call_message_et;
 
     return this.update_properties(props)
       .then(() => {
         this.session_id = session_id;
         this.e_flow_et.set_remote_client_id(client_id);
 
-        if (type !== z.calling.enum.E_CALL_MESSAGE_TYPE.PROP_SYNC) {
+        if (rtc_sdp) {
           return this.e_flow_et.save_remote_sdp(e_call_message_et);
         }
       })
