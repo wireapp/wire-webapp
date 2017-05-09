@@ -34,7 +34,7 @@ const test_link_variants = function(site, re) {
 
 // grunt test_init && grunt test_run:media/MediaEmbeds
 describe('MediaEmbeds', function() {
-  const build_message_with_anchor = link => `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
+  const build_message_with_anchor = (link) => `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
 
   const build_youtube_iframe = function(link) {
     const embed_url = z.media.MediaEmbeds.generate_youtube_embed_url(link);

@@ -90,7 +90,7 @@ window.TestFactory.prototype.exposeStorageActors = function() {
       TestFactory.storage_service.logger.level = this.settings.logging_level;
       return TestFactory.storage_service.init(entities.user.john_doe.id);
     })
-      .then(() => {
+    .then(() => {
       TestFactory.storage_repository = new z.storage.StorageRepository(TestFactory.storage_service);
       TestFactory.storage_repository.logger.level = this.settings.logging_level;
       return TestFactory.storage_repository;

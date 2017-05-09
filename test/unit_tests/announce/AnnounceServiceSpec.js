@@ -93,12 +93,13 @@ describe('z.announce.AnnounceService', function() {
         })
         .catch(done.fail);
     });
+  });
 
   describe('Failed calls', function() {
     beforeEach(function() {
       server = sinon.fakeServer.create();
       server.autoRespond = true;
-      server.respondWith('GET', 'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true', [404, {}, ""]);
+      server.respondWith('GET', 'https://staging-website.zinfra.io/api/v1/announce/?order=created&active=true', [404, {}, '']);
     });
 
     afterEach(function() {

@@ -17,9 +17,11 @@ globals:
   Dexie: true
   entities: true
   hljs: true
+  jQuery: true
   keyboardJS: true
   ko: true
   libsodium: true
+  lorem_ipsum: true
   LRUCache: true
   marked: true
   moment: true
