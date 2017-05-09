@@ -185,19 +185,23 @@ z.entity.Conversation = class Conversation {
         if (this.participating_user_ets()[0] && this.participating_user_ets()[0].name) {
           return this.participating_user_ets()[0].name();
         }
+
         return '…';
       } else if (this.is_group()) {
         if (this.name()) {
           return this.name();
         }
+
         if (this.participating_user_ets().length > 0) {
           return this.participating_user_ets()
             .map((user_et) => user_et.first_name())
             .join(', ');
         }
+
         if (this.participating_user_ids().length === 0) {
           return z.localization.Localizer.get_text(z.string.conversations_empty_conversation);
         }
+
         return '…';
       }
 
