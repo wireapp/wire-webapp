@@ -158,9 +158,7 @@ z.entity.User = class User {
     this.devices.push(new_client_et);
 
     if (this.is_me) {
-      this.devices.sort((client_a, client_b) => {
-        return new Date(client_b.time) - new Date(client_a.time);
-      });
+      this.devices.sort((client_a, client_b) => new Date(client_b.time) - new Date(client_a.time));
     }
 
     return true;

@@ -81,9 +81,7 @@ z.entity.Conversation = class Conversation {
 
     });
 
-    this.is_cleared = ko.pureComputed(() => {
-      return this.last_event_timestamp() <= this.cleared_timestamp();
-    });
+    this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
 
     this.is_verified = ko.pureComputed(() => {
       const all_users = [this.self].concat(this.participating_user_ets());
@@ -91,9 +89,7 @@ z.entity.Conversation = class Conversation {
     });
 
     this.status = ko.observable(z.conversation.ConversationStatus.CURRENT_MEMBER);
-    this.removed_from_conversation = ko.pureComputed(() => {
-      return this.status() === z.conversation.ConversationStatus.PAST_MEMBER;
-    });
+    this.removed_from_conversation = ko.pureComputed(() => this.status() === z.conversation.ConversationStatus.PAST_MEMBER);
 
     this.removed_from_conversation.subscribe((is_removed) => {
       if (!is_removed) {
@@ -157,9 +153,7 @@ z.entity.Conversation = class Conversation {
       return unread_event;
     });
 
-    this.unread_event_count = ko.pureComputed(() => {
-      return this.unread_events().length;
-    });
+    this.unread_event_count = ko.pureComputed(() => this.unread_events().length);
 
     /**
      * Display name strategy:
@@ -440,9 +434,7 @@ z.entity.Conversation = class Conversation {
       } else {
         message_et.user_ets.push(this.self);
 
-        const user_et = ko.utils.arrayFirst(this.participating_user_ets(), (current_user_et) => {
-          return current_user_et.id === this.creator;
-        });
+        const user_et = ko.utils.arrayFirst(this.participating_user_ets(), (current_user_et) => current_user_et.id === this.creator);
 
         if (user_et) {
           message_et.user(user_et);
