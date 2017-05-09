@@ -206,7 +206,7 @@ z.entity.Conversation = class Conversation {
       amplify.publish(z.event.WebApp.CONVERSATION.PERSIST_STATE, this);
     }, 100);
 
-    amplify.subscribe(z.event.WebApp.CONVERSATION.LOADED_STATES, this._subscribe_to_states_updates);
+    amplify.subscribe(z.event.WebApp.CONVERSATION.LOADED_STATES, this._subscribe_to_states_updates.bind(this));
   }
 
   _subscribe_to_states_updates() {
