@@ -103,7 +103,7 @@ class z.ViewModel.content.CollectionViewModel
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION_DETAILS
 
   click_on_image: (message_et) =>
-    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et, 'collection'
+    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, @images(), message_et, 'collection'
     @_track_opened_item @conversation_et(), 'image'
 
   _track_opened_collection: (conversation_et, is_empty) ->

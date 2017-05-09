@@ -32,6 +32,7 @@ z.util.KEYCODE = {
   ENTER: 13,
   ESC: 27,
   KEY_V: 86,
+  SPACE: 32,
   TAB: 9,
   is_arrow_key: function(keyCode) {
     return [z.util.KEYCODE.ARROW_DOWN, z.util.KEYCODE.ARROW_LEFT, z.util.KEYCODE.ARROW_RIGHT, z.util.KEYCODE.ARROW_UP].includes(keyCode);
