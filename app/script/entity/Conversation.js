@@ -22,7 +22,6 @@
 window.z = window.z || {};
 window.z.entity = z.entity || {};
 
-
 z.entity.Conversation = class Conversation {
   /**
    * Constructs a new conversation entity.
@@ -34,20 +33,17 @@ z.entity.Conversation = class Conversation {
     this.creator = undefined;
     this.type = ko.observable();
     this.name = ko.observable();
+
     this.input = ko.observable(z.util.StorageUtil.get_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`) || '');
-    this.input.subscribe((text) => {
-      return z.util.StorageUtil.set_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`, text);
-    });
+    this.input.subscribe((text) => z.util.StorageUtil.set_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`, text));
 
     this.is_pending = ko.observable(false);
     this.is_loaded = ko.observable(false);
 
-    this.participating_user_ets = ko.observableArray([]); // Does not include us
+    this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]);
     this.self = undefined;
-    this.number_of_participants = ko.pureComputed(() => {
-      return this.participating_user_ids().length;
-    });
+    this.number_of_participants = ko.pureComputed(() => this.participating_user_ids().length);
 
     this.is_group = ko.pureComputed(() => this.type() === z.conversation.ConversationType.REGULAR);
     this.is_one2one = ko.pureComputed(() => this.type() === z.conversation.ConversationType.ONE2ONE);
@@ -125,9 +121,7 @@ z.entity.Conversation = class Conversation {
         return [];
       }
 
-      const message_ets = this.messages()
-        .filter((message_et) => message_et.visible())
-        .map((message_et) => message_et);
+      const message_ets = this.messages().filter((message_et) => message_et.visible());
 
       const first_message = this.get_first_message();
       if (!this.has_further_messages() && !((first_message != null ? first_message.is_member() : undefined) && first_message.is_creation())) {
@@ -309,7 +303,7 @@ z.entity.Conversation = class Conversation {
   add_message(message_et) {
     amplify.publish(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, message_et);
     this._update_last_read_from_message(message_et);
-    return this.messages_unordered.push(this._check_for_duplicate_nonce(message_et, this.get_last_message()));
+    this.messages_unordered.push(this._check_for_duplicate_nonce(message_et, this.get_last_message()));
   }
 
   /**
@@ -334,7 +328,7 @@ z.entity.Conversation = class Conversation {
       }
     }
 
-    return z.util.ko_array_push_all(this.messages_unordered, message_ets);
+    z.util.ko_array_push_all(this.messages_unordered, message_ets);
   }
 
   /**
@@ -351,7 +345,7 @@ z.entity.Conversation = class Conversation {
       message_et = this._check_for_duplicate_nonce(message_ets[index - 1], message_et);
     }
 
-    return z.util.ko_array_unshift_all(this.messages_unordered, message_ets);
+    z.util.ko_array_unshift_all(this.messages_unordered, message_ets);
   }
 
   /**
@@ -375,7 +369,7 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   remove_message(message_et) {
-    return this.messages_unordered.remove(message_et);
+    this.messages_unordered.remove(message_et);
   }
 
   /**
@@ -383,7 +377,7 @@ z.entity.Conversation = class Conversation {
    * @returns {undefined} No return value
    */
   remove_messages() {
-    return this.messages_unordered.removeAll();
+    this.messages_unordered.removeAll();
   }
 
   /**
@@ -465,7 +459,7 @@ z.entity.Conversation = class Conversation {
    */
   update_latest_from_message(message_et) {
     if ((message_et != null) && message_et.visible() && message_et.should_effect_conversation_timestamp) {
-      return this.set_timestamp(message_et.timestamp(), z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP);
+      this.set_timestamp(message_et.timestamp(), z.conversation.ConversationUpdateType.LAST_EVENT_TIMESTAMP);
     }
   }
 
@@ -480,7 +474,7 @@ z.entity.Conversation = class Conversation {
     const has_timestamp = message_et.timestamp();
 
     if (is_me && has_timestamp && message_et.should_effect_conversation_timestamp) {
-      return this.set_timestamp(message_et.timestamp(), z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP);
+      this.set_timestamp(message_et.timestamp(), z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP);
     }
   }
 
@@ -581,8 +575,7 @@ z.entity.Conversation = class Conversation {
   get_users_with_unverified_clients() {
     return [this.self]
       .concat(this.participating_user_ets())
-      .filter((user_et) => !user_et.is_verified())
-      .map((user_et) => user_et);
+      .filter((user_et) => !user_et.is_verified());
   }
 
   /**
