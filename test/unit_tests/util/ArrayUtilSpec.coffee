@@ -99,15 +99,45 @@ describe 'z.util.ArrayUtil', ->
       expect(z.util.ArrayUtil.is_last_item array, d).toBeFalsy()
 
   describe 'iterate_index', ->
+    array = ['A', 'B', 'C', 'D', 'E']
+
     it 'returns undefined in case of wrong input parameters', ->
       expect(z.util.ArrayUtil.iterate_index 'Test', 0).toBe undefined
       expect(z.util.ArrayUtil.iterate_index [1, 2, 3], 'Test').toBe undefined
       expect(z.util.ArrayUtil.iterate_index [], 0).toBe undefined
 
-    it 'iterates through the array index', ->
-      array = [1, 2, 3, 4, 5]
+    it 'should iterate through the array index', ->
       expect(z.util.ArrayUtil.iterate_index array, 0).toBe 1
       expect(z.util.ArrayUtil.iterate_index array, 1).toBe 2
       expect(z.util.ArrayUtil.iterate_index array, 2).toBe 3
       expect(z.util.ArrayUtil.iterate_index array, 3).toBe 4
       expect(z.util.ArrayUtil.iterate_index array, 4).toBe 0
+
+    it 'should iterate through the array index in reverse order', ->
+      expect(z.util.ArrayUtil.iterate_index array, 0, true).toBe 4
+      expect(z.util.ArrayUtil.iterate_index array, 1, true).toBe 0
+      expect(z.util.ArrayUtil.iterate_index array, 2, true).toBe 1
+      expect(z.util.ArrayUtil.iterate_index array, 3, true).toBe 2
+      expect(z.util.ArrayUtil.iterate_index array, 4, true).toBe 3
+
+  describe 'iterate_item', ->
+    array = ['A', 'B', 'C', 'D', 'E']
+
+    it 'returns undefined in case of wrong input parameters', ->
+      expect(z.util.ArrayUtil.iterate_item 'Test', 0).toBe undefined
+      expect(z.util.ArrayUtil.iterate_item [], 0).toBe undefined
+      expect(z.util.ArrayUtil.iterate_item [1, 2, 3], 'Test').toBe undefined
+
+    it 'should iterate through the array items', ->
+      expect(z.util.ArrayUtil.iterate_item array, 'A').toBe 'B'
+      expect(z.util.ArrayUtil.iterate_item array, 'B').toBe 'C'
+      expect(z.util.ArrayUtil.iterate_item array, 'C').toBe 'D'
+      expect(z.util.ArrayUtil.iterate_item array, 'D').toBe 'E'
+      expect(z.util.ArrayUtil.iterate_item array, 'E').toBe 'A'
+
+    it 'should iterate through the array items in reverse order', ->
+      expect(z.util.ArrayUtil.iterate_item array, 'A', true).toBe 'E'
+      expect(z.util.ArrayUtil.iterate_item array, 'B', true).toBe 'A'
+      expect(z.util.ArrayUtil.iterate_item array, 'C', true).toBe 'B'
+      expect(z.util.ArrayUtil.iterate_item array, 'D', true).toBe 'C'
+      expect(z.util.ArrayUtil.iterate_item array, 'E', true).toBe 'D'
