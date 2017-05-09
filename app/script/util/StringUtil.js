@@ -40,14 +40,7 @@ z.util.StringUtil = {
     return string;
   },
   get_first_character: function(string) {
-    const reg = new RegExp(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/);
-    const find_emoji_in_string = reg.exec(string);
-
-    if (find_emoji_in_string && (find_emoji_in_string.index === 0)) {
-      return find_emoji_in_string[0];
-    }
-
-    return string[0];
+    return [...string][0];
   },
   get_random_character: function() {
     let char_index;
