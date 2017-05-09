@@ -869,7 +869,7 @@ describe('ConversationRepository', function() {
           const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
           generic_message.set('text', new z.proto.Text('massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message'));
 
-          return TestFactory.conversation_repository._should_send_as_external(conversation_et.id, generic_message);
+          return TestFactory.conversation_repository._should_send_as_external(external_conversation_et.id, generic_message);
         })
         .then(function(should_send_as_external) {
           expect(should_send_as_external).toBeTruthy();
@@ -887,7 +887,7 @@ describe('ConversationRepository', function() {
           const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
           generic_message.set('text', new z.proto.Text('Test'));
 
-          return TestFactory.conversation_repository._should_send_as_external(conversation_et.id, generic_message);
+          return TestFactory.conversation_repository._should_send_as_external(external_conversation_et.id, generic_message);
         })
         .then(function(should_send_as_external) {
           expect(should_send_as_external).toBeFalsy();
