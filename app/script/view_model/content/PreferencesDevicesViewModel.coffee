@@ -29,8 +29,8 @@ class z.ViewModel.content.PreferencesDevicesViewModel
 
     @current_client = @client_repository.current_client
 
-    @activated_in = ko.observable z.localization.Localizer.get_text z.string.preferences_devices_activated_in
-    @activated_on = ko.observable z.localization.Localizer.get_text z.string.preferences_devices_activated_on
+    @activated_in = ko.observable z.l10n.text z.string.preferences_devices_activated_in
+    @activated_on = ko.observable z.l10n.text z.string.preferences_devices_activated_on
     @devices = ko.observableArray()
     @fingerprint = ko.observable ''
 
@@ -45,18 +45,10 @@ class z.ViewModel.content.PreferencesDevicesViewModel
       @devices (client_et for client_et in client_ets when client_et.id isnt @current_client().id)
 
   _update_activation_location: (location) ->
-    @activated_in z.localization.Localizer.get_text
-      id: z.string.preferences_devices_activated_in
-      replace:
-        placeholder: '%location'
-        content: "<span class='preferences-devices-activated-bold'>#{location}</span>"
+    @activated_in z.l10n.text z.string.preferences_devices_activated_in, "<span class='preferences-devices-activated-bold'>#{location}</span>"
 
   _update_activation_time: (time) ->
-    @activated_on z.localization.Localizer.get_text
-      id: z.string.preferences_devices_activated_on
-      replace:
-        placeholder: '%time'
-        content: "<span class='preferences-devices-activated-bold'>#{z.util.format_timestamp time}</span>"
+    @activated_on z.z.l10n.text z.string.preferences_devices_activated_on, "<span class='preferences-devices-activated-bold'>#{z.util.format_timestamp time}</span>"
 
   _update_device_location: (location) ->
     z.location.get_location location.lat, location.lon

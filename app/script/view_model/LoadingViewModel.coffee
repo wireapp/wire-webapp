@@ -39,17 +39,8 @@ class z.ViewModel.LoadingViewModel
     if message_locator and not z.util.Environment.frontend.is_production()
       @loading_message switch message_locator
         when z.string.init_received_self_user
-          z.localization.Localizer.get_text
-            id: message_locator
-            replace:
-              placeholder: '%name'
-              content: @user_repository.self().first_name()
+          z.l10n.text message_locator, @user_repository.self().first_name()
         when z.string.init_events_progress
-          z.localization.Localizer.get_text
-            id: message_locator
-            replace: [
-              {placeholder: '%progress', content: replace_content[0]}
-              {placeholder: '%total', content: replace_content[1]}
-            ]
+          z.l10n.text message_locator, replace_content[0], replace_content[1]
         else
-          z.localization.Localizer.get_text message_locator
+          z.l10n.text message_locator

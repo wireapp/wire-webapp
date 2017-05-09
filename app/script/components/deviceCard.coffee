@@ -46,11 +46,7 @@ class z.components.DeviceCard
     @click? @device
 
   _update_activation_location: (location) ->
-    @activated_in z.localization.Localizer.get_text
-      id: z.string.preferences_devices_activated_in
-      replace:
-        placeholder: '%location'
-        content: "<span class='label-bold-xs'>#{location}</span>"
+    @activated_in z.l10n.text z.string.preferences_devices_activated_in, "<span class='label-bold-xs'>#{location}</span>"
 
   _update_location: =>
     return if not @device?.location

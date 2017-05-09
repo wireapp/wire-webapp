@@ -87,7 +87,7 @@ class z.ViewModel.content.CollectionDetailsViewModel
   get_title_for_header: (message_et) ->
     message_date = moment(message_et.timestamp())
     if message_date.is_today()
-      return z.localization.Localizer.get_text z.string.conversation_today
+      return z.l10n.text z.string.conversation_today
     if message_date.is_current_year()
       return message_date.format 'MMMM'
     return message_date.format 'MMMM Y'

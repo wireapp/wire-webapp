@@ -47,31 +47,27 @@ class z.ViewModel.WindowTitleViewModel
       switch @content_state()
         when z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS
           if number_of_connect_requests > 1
-            window_title += z.localization.Localizer.get_text
-              id: z.string.conversations_connection_request_many
-              replace:
-                placeholder: '%no'
-                content: number_of_connect_requests
+            window_title += z.l10n.text z.string.conversations_connection_request_many, number_of_connect_requests
           else
-            window_title += z.localization.Localizer.get_text z.string.conversations_connection_request_one
+            window_title += z.l10n.text z.string.conversations_connection_request_one
         when z.ViewModel.content.CONTENT_STATE.CONVERSATION
           window_title += @conversation_repository.active_conversation()?.display_name()
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ABOUT
-          window_title += z.localization.Localizer.get_text z.string.preferences_about
+          window_title += z.l10n.text z.string.preferences_about
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT
-          window_title += z.localization.Localizer.get_text z.string.preferences_account
+          window_title += z.l10n.text z.string.preferences_account
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_AV
-          window_title += z.localization.Localizer.get_text z.string.preferences_av
+          window_title += z.l10n.text z.string.preferences_av
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICE_DETAILS
-          window_title += z.localization.Localizer.get_text z.string.preferences_device_details
+          window_title += z.l10n.text z.string.preferences_device_details
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_DEVICES
-          window_title += z.localization.Localizer.get_text z.string.preferences_devices
+          window_title += z.l10n.text z.string.preferences_devices
         when z.ViewModel.content.CONTENT_STATE.PREFERENCES_OPTIONS
-          window_title += z.localization.Localizer.get_text z.string.preferences_options
+          window_title += z.l10n.text z.string.preferences_options
 
       if window_title isnt '' and not window_title.endsWith ' '
         window_title += ' · '
-      window_title += z.localization.Localizer.get_text z.string.wire
+      window_title += z.l10n.text z.string.wire
 
       window.document.title = window_title
 

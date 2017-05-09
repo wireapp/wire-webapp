@@ -32,10 +32,7 @@ ko.components.register('group-avatar', {
   template: `
     <div class="group-avatar-image-wrapper">
       <!-- ko foreach: users -->
-        <div class="group-avatar-image group-avatar-initial" 
-            data-bind="css: {'group-avatar-image-grid': $parent.users().length > 1}, 
-                       text: $data.initials()[0], 
-                       style: {color: $data.accent_color()}"></div>
+        <div class="group-avatar-box" data-bind="text: $data.initials()[0], style: {color: $data.accent_color()}"></div>
       <!-- /ko -->
     </div>
   `,

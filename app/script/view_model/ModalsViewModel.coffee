@@ -129,31 +129,14 @@ class z.ViewModel.ModalsViewModel
     modal.toggle()
 
   _show_modal_block: (content, title_element, message_element) ->
-    title_element.text z.localization.Localizer.get_text
-      id: z.string.modal_block_conversation_headline
-      replace:
-        placeholder: '%@.name'
-        content: content
-
-    message_element.text z.localization.Localizer.get_text
-      id: z.string.modal_block_conversation_message
-      replace:
-        placeholder: '%@.name'
-        content: content
+    title_element.text z.l10n.text z.string.modal_block_conversation_headline, content
+    message_element.text z.l10n.text z.string.modal_block_conversation_message, content
 
   _show_modal_call_full_conversation: (content, message_element) ->
-    message_element.text z.localization.Localizer.get_text
-      id: z.string.modal_call_conversation_full_message
-      replace:
-        placeholder: '%no'
-        content: content
+    message_element.text z.l10n.text z.string.modal_call_conversation_full_message, content
 
   _show_modal_call_full_voice_channel: (content, message_element) ->
-    message_element.text z.localization.Localizer.get_text
-      id: z.string.modal_call_voice_channel_full_message
-      replace:
-        placeholder: '%no'
-        content: content
+    message_element.text z.l10n.text z.string.modal_call_voice_channel_full_message, content
 
   ###
   @note Modal supports z.calling.enum.CallState.INCOMING, z.calling.enum.CallState.ONGOING, z.calling.enum.CallState.OUTGOING
@@ -162,20 +145,16 @@ class z.ViewModel.ModalsViewModel
   _show_modal_call_start_another: (call_state, title_element, message_element) ->
     action_element = $(z.ViewModel.ModalType.CALL_START_ANOTHER).find('.modal-action')
 
-    action_element.text z.localization.Localizer.get_text z.string["modal_call_second_#{call_state}_action"]
-    message_element.text z.localization.Localizer.get_text z.string["modal_call_second_#{call_state}_message"]
-    title_element.text z.localization.Localizer.get_text z.string["modal_call_second_#{call_state}_headline"]
+    action_element.text z.l10n.text z.string["modal_call_second_#{call_state}_action"]
+    message_element.text z.l10n.text z.string["modal_call_second_#{call_state}_message"]
+    title_element.text z.l10n.text z.string["modal_call_second_#{call_state}_headline"]
 
   _show_modal_clear: (options, type) ->
     if options.conversation.is_group() and not options.conversation.removed_from_conversation()
       type = z.ViewModel.ModalType.CLEAR_GROUP
 
     title_element = $(type).find('.modal-title')
-    title_element.text z.localization.Localizer.get_text
-      id: z.string.modal_clear_conversation_headline
-      replace:
-        placeholder: '%@.name'
-        content: options.data
+    title_element.text z.l10n.text z.string.modal_clear_conversation_headline, options.data
 
     return type
 
@@ -187,15 +166,11 @@ class z.ViewModel.ModalsViewModel
         .text "#{moment(device.time).format 'MMMM Do YYYY, HH:mm'} - UTC"
         .appendTo devices_element
       $('<div>')
-        .text "#{z.localization.Localizer.get_text z.string.modal_connected_device_from} #{device.model}"
+        .text "#{z.l10n.text z.string.modal_connected_device_from} #{device.model}"
         .appendTo devices_element
 
   _show_modal_leave: (content, title_element) ->
-    title_element.text z.localization.Localizer.get_text
-      id: z.string.modal_leave_conversation_headline
-      replace:
-        placeholder: '%@.name'
-        content: content
+    title_element.text z.l10n.text z.string.modal_leave_conversation_headline, content
 
   _show_modal_new_device: (content, title_element, message_element, action_element) ->
     joined_names = z.util.StringUtil.capitalize_first_char z.util.LocalizerUtil.join_names content.user_ets, z.string.Declension.NOMINATIVE
@@ -205,11 +180,7 @@ class z.ViewModel.ModalsViewModel
       else
         z.string.modal_new_device_headline_many
 
-    title_element.text z.localization.Localizer.get_text
-      id: string_id
-      replace:
-        placeholder: if content.user_ets.length is 1 then '%@.name' else '%@.names'
-        content: joined_names
+    title_element.text z.l10n.text string_id, joined_names
 
     switch content.consent_type
       when z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL
@@ -222,44 +193,20 @@ class z.ViewModel.ModalsViewModel
         message_id = z.string.modal_new_device_message
         action_id = z.string.modal_new_device_send_anyway
 
-    message_element.text z.localization.Localizer.get_text message_id
-    action_element.text z.localization.Localizer.get_text action_id
+    message_element.text z.l10n.text message_id
+    action_element.text z.l10n.text action_id
 
   _show_modal_remove_device: (content, title_element) ->
-    title_element.text z.localization.Localizer.get_text
-      id: z.string.modal_remove_device_headline
-      replace:
-        placeholder: '%device_name'
-        content: content
+    title_element.text z.l10n.text z.string.modal_remove_device_headline, content
 
   _show_modal_too_many_members: (content, message_element) ->
-    message_element.text z.localization.Localizer.get_text
-      id: z.string.modal_too_many_members_message
-      replace: [
-        placeholder: '%no'
-        content: content.open_spots
-      ,
-        placeholder: '%max'
-        content: content.max
-      ]
+    message_element.text z.l10n.text z.string.modal_too_many_members_message, content.open_spots, content.max
 
   _show_modal_upload_parallel: (content, title_element) ->
-    title_element.text z.localization.Localizer.get_text
-      id: z.string.modal_uploads_parallel
-      replace:
-        placeholder: '%no'
-        content: content
+    title_element.text z.l10n.text z.string.modal_uploads_parallel, content
 
   _show_modal_upload_too_large: (content, title_element) ->
-    title_element.text z.localization.Localizer.get_text
-      id: z.string.conversation_asset_upload_too_large
-      replace:
-        placeholder: '%no'
-        content: content
+    title_element.text z.l10n.text z.string.conversation_asset_upload_too_large, content
 
   _show_modal_message_too_long: (content, message_element) ->
-    message_element.text z.localization.Localizer.get_text
-      id: z.string.modal_too_long_message
-      replace:
-        placeholder: '%no'
-        content: content
+    message_element.text z.l10n.text z.string.modal_too_long_message, content

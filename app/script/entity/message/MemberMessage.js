@@ -61,17 +61,11 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         default:
           identifier = z.string.conversation_connection_accepted;
       }
-      return z.localization.Localizer.get_text(identifier);
+      return z.l10n.text(identifier);
     };
 
     this._get_caption_with_names = (key, declension) => {
-      return z.localization.Localizer.get_text({
-        id: key,
-        replace: {
-          content: this._generate_name_string(declension),
-          placeholder: '%@names',
-        },
-      });
+      return z.l10n.text(key, this._generate_name_string(declension));
     };
 
     this.show_large_avatar = () => {
@@ -116,9 +110,9 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
         case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
           if (this.other_user().id === this.user().id) {
             if (this.user().is_me) {
-              return z.localization.Localizer.get_text(z.string.conversation_member_leave_left_you);
+              return z.l10n.text(z.string.conversation_member_leave_left_you);
             }
-            return z.localization.Localizer.get_text(z.string.conversation_member_leave_left);
+            return z.l10n.text(z.string.conversation_member_leave_left);
           }
           if (this.user().is_me) {
             return this._get_caption_with_names(z.string.conversation_member_leave_removed_you);
