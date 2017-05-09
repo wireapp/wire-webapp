@@ -57,12 +57,6 @@ module.exports =
     expand: true
     src: 'favicon.ico'
 
-  test:
-    cwd: '<%= dir.test.unit_tests %>'
-    dest: '<%= dir.test.js %>'
-    expand: true
-    src: '**/*.js'
-
 ###############################################################################
 # Prod/Staging/Edge deployment related
 ###############################################################################
