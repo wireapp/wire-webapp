@@ -87,39 +87,10 @@ class z.components.UserProfileViewModel
       .then (fingerprint) =>
         @fingerprint_remote fingerprint
 
-    @add_people_tooltip = z.localization.Localizer.get_text
-      id: z.string.tooltip_people_add
-      replace:
-        placeholder: '%shortcut'
-        content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.ADD_PEOPLE
-
-    @device_headline = ko.pureComputed =>
-      z.localization.Localizer.get_text
-        id: z.string.people_tabs_devices_headline
-        replace:
-          placeholder: '%@.name'
-          content: @user().first_name()
-
-    @no_device_headline = ko.pureComputed =>
-      z.localization.Localizer.get_text
-        id: z.string.people_tabs_no_devices_headline
-        replace:
-          placeholder: '%@.name'
-          content: @user().first_name()
-
-    @detail_message = ko.pureComputed =>
-      z.localization.Localizer.get_text
-        id: z.string.people_tabs_device_detail_headline
-        replace: [
-          placeholder: '%bold'
-          content: "<span class='user-profile-device-detail-highlight'>"
-        ,
-          placeholder: '%@.name'
-          content: z.util.escape_html @user().first_name()
-        ,
-          placeholder: '%end'
-          content: '</span>'
-        ]
+    @add_people_tooltip = z.l10n.text z.string.tooltip_people_add, z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.ADD_PEOPLE
+    @device_headline = ko.pureComputed => z.l10n.text z.string.people_tabs_devices_headline, @user().first_name()
+    @no_device_headline = ko.pureComputed => z.l10n.text z.string.people_tabs_no_devices_headline, @user().first_name()
+    @detail_message = ko.pureComputed => z.l10n.text z.string.people_tabs_device_detail_headline "<span class='user-profile-device-detail-highlight'>", z.util.escape_html(@user().first_name()), '</span>'
 
     @on_cancel_request = =>
       amplify.publish z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.ALERT

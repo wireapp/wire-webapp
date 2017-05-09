@@ -140,59 +140,46 @@ class z.ViewModel.list.ListViewModel
     entries = []
 
     if not conversation_et.is_request() and not conversation_et.removed_from_conversation()
-      notify_conversation_tooltip = z.localization.Localizer.get_text
-        id: z.string.tooltip_conversations_notify
-        replace:
-          placeholder: '%shortcut'
-          content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.SILENCE
-
-      silence_conversation_tooltip = z.localization.Localizer.get_text
-        id: z.string.tooltip_conversations_silence
-        replace:
-          placeholder: '%shortcut'
-          content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.SILENCE
+      notify_conversation_tooltip = z.l10n.text z.string.tooltip_conversations_notify, z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.SILENCE
+      silence_conversation_tooltip = z.l10n.text z.string.tooltip_conversations_silence, z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.SILENCE
 
       label = if conversation_et.is_muted() then z.string.conversations_popover_notify else z.string.conversations_popover_silence
       title = if conversation_et.is_muted() then notify_conversation_tooltip else silence_conversation_tooltip
       entries.push
-        label: z.localization.Localizer.get_text(label),
+        label: z.l10n.text(label),
         click: => @click_on_mute_action conversation_et
         title: title
 
     if conversation_et.is_archived()
       entries.push
-        label: z.localization.Localizer.get_text(z.string.conversations_popover_unarchive)
+        label: z.l10n.text(z.string.conversations_popover_unarchive)
         click: => @click_on_unarchive_action conversation_et
     else
-      archive_conversation_tooltip = z.localization.Localizer.get_text
-        id: z.string.tooltip_conversations_archive
-        replace:
-          placeholder: '%shortcut'
-          content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.ARCHIVE
+      archive_conversation_tooltip = z.l10n.text z.string.tooltip_conversations_archive, z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.ARCHIVE
 
       entries.push
-        label: z.localization.Localizer.get_text(z.string.conversations_popover_archive),
+        label: z.l10n.text(z.string.conversations_popover_archive),
         click: => @click_on_archive_action conversation_et
         title: archive_conversation_tooltip
 
     if conversation_et.is_request()
       entries.push
-        label: z.localization.Localizer.get_text(z.string.conversations_popover_cancel),
+        label: z.l10n.text(z.string.conversations_popover_cancel),
         click: => @click_on_cancel_action conversation_et
 
     if not conversation_et.is_request() and not conversation_et.is_cleared()
       entries.push
-        label: z.localization.Localizer.get_text(z.string.conversations_popover_clear),
+        label: z.l10n.text(z.string.conversations_popover_clear),
         click: => @click_on_clear_action conversation_et
 
     if not conversation_et.is_group()
       entries.push
-        label: z.localization.Localizer.get_text(z.string.conversations_popover_block),
+        label: z.l10n.text(z.string.conversations_popover_block),
         click: => @click_on_block_action conversation_et
 
     if conversation_et.is_group() and not conversation_et.removed_from_conversation()
       entries.push
-        label: z.localization.Localizer.get_text(z.string.conversations_popover_leave),
+        label: z.l10n.text(z.string.conversations_popover_leave),
         click: => @click_on_leave_action conversation_et
 
     z.ui.Context.from event, entries, 'conversation-list-options-menu'

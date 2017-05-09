@@ -95,7 +95,7 @@ z.conversation.ConversationCellState = (() => {
 
   const empty_state = {
     description() {
-      return z.localization.Localizer.get_text(z.string.conversations_empty_conversation_description);
+      return z.l10n.text(z.string.conversations_empty_conversation_description);
     },
     icon() {
       return z.conversation.ConversationStatusIcon.NONE;
@@ -196,24 +196,24 @@ z.conversation.ConversationCellState = (() => {
       let message_text = '';
 
       if (last_message_et.is_ephemeral()) {
-        message_text = z.localization.Localizer.get_text(z.string.conversations_secondary_line_timed_message);
+        message_text = z.l10n.text(z.string.conversations_secondary_line_timed_message);
       } else if (last_message_et.is_ping()) {
-        message_text = z.localization.Localizer.get_text(z.string.system_notification_ping);
+        message_text = z.l10n.text(z.string.system_notification_ping);
       } else if (last_message_et.has_asset_text()) {
         message_text = last_message_et.get_first_asset().text;
       } else if (last_message_et.has_asset()) {
         const asset_et = last_message_et.get_first_asset();
         if (asset_et.is_audio()) {
-          message_text = z.localization.Localizer.get_text(z.string.system_notification_shared_audio);
+          message_text = z.l10n.text(z.string.system_notification_shared_audio);
         } else if (asset_et.is_video()) {
-          message_text = z.localization.Localizer.get_text(z.string.system_notification_shared_video);
+          message_text = z.l10n.text(z.string.system_notification_shared_video);
         } else {
-          message_text = z.localization.Localizer.get_text(z.string.system_notification_shared_file);
+          message_text = z.l10n.text(z.string.system_notification_shared_file);
         }
       } else if (last_message_et.has_asset_location()) {
-        message_text = z.localization.Localizer.get_text(z.string.system_notification_shared_location);
+        message_text = z.l10n.text(z.string.system_notification_shared_location);
       } else if (last_message_et.has_asset_image()) {
-        message_text = z.localization.Localizer.get_text(z.string.system_notification_asset_add);
+        message_text = z.l10n.text(z.string.system_notification_asset_add);
       }
 
       if (conversation_et.is_group()) {

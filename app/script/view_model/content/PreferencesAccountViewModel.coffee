@@ -159,17 +159,13 @@ class z.ViewModel.content.PreferencesAccountViewModel
 
   click_on_reset_password: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, value: 'fromProfile'
-    z.util.safe_window_open "#{z.util.Environment.backend.website_url()}#{z.localization.Localizer.get_text z.string.url_password_reset}"
+    z.util.safe_window_open "#{z.util.Environment.backend.website_url()}#{z.l10n.text z.string.url_password_reset}"
 
   set_picture: (files, callback) =>
     input_picture = files[0]
-    warning_file_format = z.localization.Localizer.get_text z.string.alert_upload_file_format
-    warning_file_size = z.localization.Localizer.get_text
-      id: z.string.alert_upload_too_large
-      replace:
-        placeholder: '%no'
-        content: z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024
-    warning_min_size = z.localization.Localizer.get_text z.string.alert_upload_too_small
+    warning_file_format = z.l10n.text z.string.alert_upload_file_format
+    warning_file_size = z.l10n.text z.string.alert_upload_too_large, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024
+    warning_min_size = z.l10n.text z.string.alert_upload_too_small
 
     if input_picture.size > z.config.MAXIMUM_IMAGE_FILE_SIZE
       return @_show_upload_warning warning_file_size, callback

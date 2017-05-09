@@ -157,22 +157,14 @@ class z.ViewModel.AuthViewModel
       return not @disabled_by_animation() and @password().length
 
     @account_retry_text = ko.pureComputed =>
-      return z.localization.Localizer.get_text
-        id: z.string.auth_posted_retry
-        replace: {placeholder: '%email', content: @username()}
+      return z.l10n.text z.string.auth_posted_retry, @username()
     @account_resend_text = ko.pureComputed =>
-      return z.localization.Localizer.get_text
-        id: z.string.auth_posted_resend
-        replace: {placeholder: '%email', content: @username()}
+      return z.l10n.text z.string.auth_posted_resend, @username()
     @verify_code_text = ko.pureComputed =>
       phone_number = PhoneFormat.formatNumberForMobileDialing('', @phone_number_e164()) or @phone_number_e164()
-      return z.localization.Localizer.get_text
-        id: z.string.auth_verify_code_description
-        replace: {placeholder: '%@number', content: phone_number}
+      return z.l10n.text z.string.auth_verify_code_description, phone_number
     @verify_code_timer_text = ko.pureComputed =>
-      return z.localization.Localizer.get_text
-        id: z.string.auth_verify_code_resend_timer
-        replace: {placeholder: '%expiration', content: @code_expiration_in()}
+      return z.l10n.text z.string.auth_verify_code_resend_timer, @code_expiration_in()
 
     @visible_section = ko.observable undefined
     @visible_mode = ko.observable undefined
@@ -544,7 +536,7 @@ class z.ViewModel.AuthViewModel
 
   clicked_on_password: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PASSWORD_RESET, value: 'fromSignIn'
-    z.util.safe_window_open "#{z.util.Environment.backend.website_url()}#{z.localization.Localizer.get_text z.string.url_password_reset}"
+    z.util.safe_window_open "#{z.util.Environment.backend.website_url()}#{z.l10n.text z.string.url_password_reset}"
 
   clicked_on_register: => @_set_hash z.auth.AuthView.MODE.ACCOUNT_REGISTER
 
@@ -593,13 +585,13 @@ class z.ViewModel.AuthViewModel
 
   clicked_on_terms: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.NAVIGATION.OPENED_TERMS
-    z.util.safe_window_open z.localization.Localizer.get_text z.string.url_terms_of_use
+    z.util.safe_window_open z.l10n.text z.string.url_terms_of_use
 
   clicked_on_verify_later: => @_authentication_successful()
 
   clicked_on_wire_link: ->
     amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.NAVIGATION.OPENED_WIRE_WEBSITE
-    z.util.safe_window_open z.localization.Localizer.get_text z.string.url_wire
+    z.util.safe_window_open z.l10n.text z.string.url_wire
 
   keydown_auth: (event) =>
     if event.keyCode is z.util.KEYCODE.ENTER

@@ -69,7 +69,7 @@ class z.ViewModel.list.StartUIViewModel
     @has_created_conversation = ko.observable false
     @show_hint = ko.pureComputed => @selected_people().length is 1 and not @has_created_conversation()
 
-    @group_hint_text = z.localization.Localizer.get_text z.string.search_group_hint
+    @group_hint_text = z.l10n.text z.string.search_group_hint
 
     # results
     @top_users = ko.observableArray []
@@ -130,26 +130,17 @@ class z.ViewModel.list.StartUIViewModel
     @invite_message = ko.observable ''
     @invite_message_selected = ko.observable true
     @invite_hints = ko.pureComputed =>
-      meta_key_mac = z.localization.Localizer.get_text z.string.invite_meta_key_mac
-      meta_key_pc = z.localization.Localizer.get_text z.string.invite_meta_key_pc
+      meta_key_mac = z.l10n.text z.string.invite_meta_key_mac
+      meta_key_pc = z.l10n.text z.string.invite_meta_key_pc
       meta_key = if z.util.Environment.os.mac then meta_key_mac else meta_key_pc
 
       if @invite_message_selected()
-        return z.localization.Localizer.get_text
-          id: z.string.invite_hint_selected
-          replace: [
-            placeholder: '%meta_key', content: meta_key
-          ]
-      else
-        return z.localization.Localizer.get_text
-          id: z.string.invite_hint_unselected
-          replace: [
-            placeholder: '%meta_key', content: meta_key
-          ]
+        return z.l10n.text z.string.invite_hint_selected, meta_key
+      return z.l10n.text z.string.invite_hint_unselected, meta_key
 
     @invite_button_text = ko.pureComputed =>
       button_text = if @show_invite_form_only() then z.string.people_invite else z.string.people_bring_your_friends
-      z.localization.Localizer.get_text button_text
+      z.l10n.text button_text
 
     # last open bubble
     @user_bubble = undefined
@@ -380,13 +371,9 @@ class z.ViewModel.list.StartUIViewModel
     self = @user_repository.self()
 
     if self.email()
-      @invite_message z.localization.Localizer.get_text
-        id: z.string.invite_message
-        replace: [
-          {placeholder: '%username', content: "@#{self.username()}"}
-        ]
+      @invite_message z.l10n.text z.string.invite_message, "@#{self.username()}"
     else
-      @invite_message z.localization.Localizer.get_text z.string.invite_message_no_email
+      @invite_message z.l10n.text z.string.invite_message_no_email
 
     @invite_bubble = new zeta.webapp.module.Bubble
       host_selector: '#invite-button'

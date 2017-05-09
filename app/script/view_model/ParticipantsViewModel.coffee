@@ -83,11 +83,7 @@ class z.ViewModel.ParticipantsViewModel
       connected_users.sort (user_a, user_b) -> z.util.StringUtil.sort_by_priority user_a.first_name(), user_b.first_name()
     , @, deferEvaluation: true
 
-    @add_people_tooltip = z.localization.Localizer.get_text
-      id: z.string.tooltip_people_add
-      replace:
-        placeholder: '%shortcut'
-        content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.ADD_PEOPLE
+    @add_people_tooltip = z.l10n.text z.string.tooltip_people_add, z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.ADD_PEOPLE
 
     amplify.subscribe z.event.WebApp.CONTENT.SWITCH, (content_state) =>
       @participants_bubble.hide() if content_state is z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS

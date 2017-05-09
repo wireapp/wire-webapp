@@ -46,12 +46,14 @@ z.l10n = (() => {
      * @param string
      * @param substitutes
      */
-    text(string, ...substitutes) {
-      const string = ko.unwrap(string);
-      return string.replace(/%\w+/, ...substitutes);
+    text(value, ...substitutes) {
+      const string = ko.unwrap(value);
+      if (string != null) {
+        return string.replace(/%\w+/, ...substitutes);
+      }
     },
   }
-});
+})();
 
 ko.bindingHandlers.l10n_href = {
   update(element, valueAccessor) {

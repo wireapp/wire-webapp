@@ -39,7 +39,7 @@ class z.components.UserListInputViewModel
 
     @placeholder = ko.pureComputed =>
       if @input() is '' and @selected().length is 0
-        return z.localization.Localizer.get_text params.placeholder
+        return z.l10n.text params.placeholder
       else
         return ''
 

@@ -40,7 +40,7 @@ class z.ViewModel.ConversationInputViewModel
       if blob?
         if blob.type in z.config.SUPPORTED_CONVERSATION_IMAGE_TYPES
           @pasted_file_preview_url URL.createObjectURL blob
-        @pasted_file_name z.localization.Localizer.get_text
+        @pasted_file_name z.l10n.text
           id: z.string.conversation_send_pasted_file
           replace:
             placeholder: '%date'
@@ -79,17 +79,13 @@ class z.ViewModel.ConversationInputViewModel
       write: (value) =>
         if @is_editing() then @edit_input value else @conversation_et()?.input value
 
-    @ping_tooltip = z.localization.Localizer.get_text
-      id: z.string.tooltip_conversation_ping
-      replace:
-        placeholder: '%shortcut'
-        content: z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.PING
-    @picture_tooltip = z.localization.Localizer.get_text z.string.tooltip_conversation_picture
-    @file_tooltip = z.localization.Localizer.get_text z.string.tooltip_conversation_file
+    @ping_tooltip = z.l10n.text z.string.tooltip_conversation_ping, z.ui.Shortcut.get_shortcut_tooltip z.ui.ShortcutType.PING
+    @picture_tooltip = z.l10n.text z.string.tooltip_conversation_picture
+    @file_tooltip = z.l10n.text z.string.tooltip_conversation_file
     @input_tooltip = ko.pureComputed =>
       if @conversation_et().ephemeral_timer()
-        return z.localization.Localizer.get_text z.string.tooltip_conversation_ephemeral
-      return z.localization.Localizer.get_text z.string.tooltip_conversation_input_placeholder
+        return z.l10n.text z.string.tooltip_conversation_ephemeral
+      return z.l10n.text z.string.tooltip_conversation_input_placeholder
     @ping_disabled = ko.observable false
 
     $(window)
@@ -203,11 +199,8 @@ class z.ViewModel.ConversationInputViewModel
     @upload_files files
 
   _show_upload_warning: (image) ->
-    warning = z.localization.Localizer.get_text
-      id: if image.type is 'image/gif' then z.string.alert_gif_too_large else z.string.alert_upload_too_large
-      replace:
-        placeholder: '%no'
-        content: z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024
+    id = if image.type is 'image/gif' then z.string.alert_gif_too_large else z.string.alert_upload_too_large
+    warning = z.l10n.text id, z.config.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024
 
     attributes =
       reason: 'too large'
@@ -315,16 +308,16 @@ class z.ViewModel.ConversationInputViewModel
     return switch
       when unit is 's'
         if number is 1
-          return z.localization.Localizer.get_text z.string.ephememal_units_second
-        return z.localization.Localizer.get_text z.string.ephememal_units_seconds
+          return z.l10n.text z.string.ephememal_units_second
+        return z.l10n.text z.string.ephememal_units_seconds
       when unit is 'm'
         if number is 1
-          return z.localization.Localizer.get_text z.string.ephememal_units_minute
-        return z.localization.Localizer.get_text z.string.ephememal_units_minutes
+          return z.l10n.text z.string.ephememal_units_minute
+        return z.l10n.text z.string.ephememal_units_minutes
       when unit is 'd'
         if number is 1
-          return z.localization.Localizer.get_text z.string.ephememal_units_day
-        return z.localization.Localizer.get_text z.string.ephememal_units_days
+          return z.l10n.text z.string.ephememal_units_day
+        return z.l10n.text z.string.ephememal_units_days
 
   ###
   Click on ephemeral button
@@ -333,7 +326,7 @@ class z.ViewModel.ConversationInputViewModel
   ###
   click_on_ephemeral_button: (data, event) =>
     entries = [
-      label: z.localization.Localizer.get_text(z.string.ephememal_units_none)
+      label: z.l10n.text(z.string.ephememal_units_none)
       click: => @set_ephemeral_timer 0
     ].concat z.ephemeral.timings.get_values().map (milliseconds) =>
       [number, unit] = z.util.format_milliseconds_short(milliseconds)

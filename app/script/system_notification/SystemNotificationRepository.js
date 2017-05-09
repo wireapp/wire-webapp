@@ -194,10 +194,10 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    */
   _create_body_call(message_et) {
     if (message_et.is_activation()) {
-      return z.localization.Localizer.get_text(z.string.system_notification_voice_channel_activate);
+      return z.l10n.text(z.string.system_notification_voice_channel_activate);
     }
     if (message_et.is_deactivation() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED) {
-      return z.localization.Localizer.get_text(z.string.system_notification_voice_channel_deactivate);
+      return z.l10n.text(z.string.system_notification_voice_channel_deactivate);
     }
   }
 
@@ -216,19 +216,19 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         }
       }
     } else if (message_et.has_asset_image()) {
-      return z.localization.Localizer.get_text(z.string.system_notification_asset_add);
+      return z.l10n.text(z.string.system_notification_asset_add);
     } else if (message_et.has_asset_location()) {
-      return z.localization.Localizer.get_text(z.string.system_notification_shared_location);
+      return z.l10n.text(z.string.system_notification_shared_location);
     } else if (message_et.has_asset()) {
       const asset_et = message_et.assets()[0];
       if (asset_et.is_audio()) {
-        return z.localization.Localizer.get_text(z.string.system_notification_shared_audio);
+        return z.l10n.text(z.string.system_notification_shared_audio);
       }
       if (asset_et.is_video()) {
-        return z.localization.Localizer.get_text(z.string.system_notification_shared_video);
+        return z.l10n.text(z.string.system_notification_shared_video);
       }
       if (asset_et.is_file()) {
-        return z.localization.Localizer.get_text(z.string.system_notification_shared_file);
+        return z.l10n.text(z.string.system_notification_shared_file);
       }
     }
   }
@@ -241,19 +241,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_conversation_rename(message_et) {
-    return z.localization.Localizer.get_text({
-      id: z.string.system_notification_conversation_rename,
-      replace: [
-        {
-          content: message_et.user().first_name(),
-          placeholder: '%s.first_name',
-        },
-        {
-          content: message_et.name,
-          placeholder: '%name',
-        },
-      ],
-    });
+    return z.l10n.text(z.string.system_notification_conversation_rename, message_et.user().first_name(), message_et.name);
   }
 
   /**
@@ -265,34 +253,9 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    */
   _create_body_member_join(message_et) {
     if (message_et.user_ets().length === 1) {
-      return z.localization.Localizer.get_text({
-        id: z.string.system_notification_member_join_one,
-        replace: [
-          {
-            content: message_et.user().first_name(),
-            placeholder: '%s.first_name',
-          },
-          {
-            content: z.util.get_first_name(message_et.user_ets()[0], z.string.Declension.ACCUSATIVE),
-            placeholder: '%@.first_name',
-          },
-        ],
-      });
+      return z.l10n.text(z.string.system_notification_member_join_one, message_et.user().first_name(), z.util.get_first_name(message_et.user_ets()[0], z.string.Declension.ACCUSATIVE));
     }
-
-    return z.localization.Localizer.get_text({
-      id: z.string.system_notification_member_join_many,
-      replace: [
-        {
-          content: message_et.user().first_name(),
-          placeholder: '%s.first_name',
-        },
-        {
-          content: message_et.user_ids().length,
-          placeholder: '%no',
-        },
-      ],
-    });
+    return z.l10n.text(z.string.system_notification_member_join_many, message_et.user().first_name(), message_et.user_ids().length);
   }
 
   /**
@@ -305,43 +268,11 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   _create_body_member_leave(message_et) {
     if (message_et.user_ets().length === 1) {
       if (message_et.user_ets()[0] === message_et.user()) {
-        return z.localization.Localizer.get_text({
-          id: z.string.system_notification_member_leave_left,
-          replace: {
-            content: message_et.user().first_name(),
-            placeholder: '%s.first_name',
-          },
-        });
+        return z.l10n.text(z.string.system_notification_member_leave_left, message_et.user().first_name());
       }
-
-      return z.localization.Localizer.get_text({
-        id: z.string.system_notification_member_leave_removed_one,
-        replace: [
-          {
-            content: message_et.user().first_name(),
-            placeholder: '%s.first_name',
-          },
-          {
-            content: z.util.get_first_name(message_et.user_ets()[0], z.string.Declension.ACCUSATIVE),
-            placeholder: '%@.first_name',
-          },
-        ],
-      });
+      return z.l10n.text(z.string.system_notification_member_leave_removed_one, message_et.user().first_name(), z.util.get_first_name(message_et.user_ets()[0], z.string.Declension.ACCUSATIVE));
     }
-
-    return z.localization.Localizer.get_text({
-      id: z.string.system_notification_member_leave_removed_many,
-      replace: [
-        {
-          content: message_et.user().first_name(),
-          placeholder: '%s.first_name',
-        },
-        {
-          content: message_et.user_ets().length,
-          placeholder: '%no',
-        },
-      ],
-    });
+    return z.l10n.text(z.string.system_notification_member_leave_removed_many, message_et.user().first_name(), message_et.user_ets().length);
   }
 
   /**
@@ -367,13 +298,13 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         }
         break;
       case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-        return z.localization.Localizer.get_text(z.string.system_notification_connection_accepted);
+        return z.l10n.text(z.string.system_notification_connection_accepted);
       case z.message.SystemMessageType.CONNECTION_CONNECTED:
-        return z.localization.Localizer.get_text(z.string.system_notification_connection_connected);
+        return z.l10n.text(z.string.system_notification_connection_connected);
       case z.message.SystemMessageType.CONNECTION_REQUEST:
-        return z.localization.Localizer.get_text(z.string.system_notification_connection_request);
+        return z.l10n.text(z.string.system_notification_connection_request);
       case z.message.SystemMessageType.CONVERSATION_CREATE:
-        return z.localization.Localizer.get_text({
+        return z.l10n.text({
           id: z.string.system_notification_conversation_create,
           replace: {
             content: message_et.user().first_name(),
@@ -391,7 +322,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_obfuscated() {
-    return z.localization.Localizer.get_text(z.string.system_notification_obfuscated);
+    return z.l10n.text(z.string.system_notification_obfuscated);
   }
 
   /**
@@ -400,7 +331,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_ping() {
-    return z.localization.Localizer.get_text(z.string.system_notification_ping);
+    return z.l10n.text(z.string.system_notification_ping);
   }
 
   /**
@@ -410,7 +341,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_reaction(message_et) {
-    return z.localization.Localizer.get_text({
+    return z.l10n.text({
       id: z.string.system_notification_reaction,
       replace: {
         content: message_et.reaction,
@@ -564,7 +495,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Obfuscated notification message title
    */
   _create_title_obfuscated() {
-    return z.util.StringUtil.truncate(z.localization.Localizer.get_text(z.string.system_notification_obfuscated_title), SystemNotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return z.util.StringUtil.truncate(z.l10n.text(z.string.system_notification_obfuscated_title), SystemNotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
 
   /**

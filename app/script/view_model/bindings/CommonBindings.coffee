@@ -275,13 +275,13 @@ ko.bindingHandlers.relative_timestamp = do ->
     current_day = date.local().format 'YYMMDD'
 
     if moment().diff(date, 'minutes') < 2
-      $(element).text z.localization.Localizer.get_text z.string.conversation_just_now
+      $(element).text z.l10n.text z.string.conversation_just_now
     else if moment().diff(date, 'minutes') < 60
       $(element).text date.fromNow()
     else if current_day is today
       $(element).text date.local().format 'HH:mm'
     else if current_day is yesterday
-      yesterday_string = z.localization.Localizer.get_text z.string.conversation_yesterday
+      yesterday_string = z.l10n.text z.string.conversation_yesterday
       $(element).text "#{yesterday_string} #{date.local().format('HH:mm')}"
     else if moment().diff(date, 'days') < 7
       $(element).text date.local().format 'dddd HH:mm'

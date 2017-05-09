@@ -348,7 +348,7 @@ z.client.ClientRepository = class ClientRepository {
       } else {
         identifier = z.string.wire_linux;
       }
-      device_model = z.localization.Localizer.get_text(identifier);
+      device_model = z.l10n.text(identifier);
       if (!z.util.Environment.frontend.is_production()) {
         device_model = `${device_model} (Internal)`;
       }
