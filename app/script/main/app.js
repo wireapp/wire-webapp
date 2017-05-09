@@ -284,7 +284,7 @@ z.main.App = class App {
       }
 
       if (navigator.onLine) {
-        this.logger.error(`Caused by: ${(error != null ? error.message : undefined) || error}`);
+        this.logger.error(`Caused by: ${(error != null ? error.message : undefined) || error}`, error);
         if (error instanceof z.storage.StorageError) {
           Raygun.send(error);
         }
