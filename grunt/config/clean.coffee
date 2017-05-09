@@ -27,7 +27,6 @@ module.exports =
   docs: '<%= dir.docs %>'
   docs_coverage: '<%= dir.docs.coverage %>'
   ext: '<%= dir.app.ext %>/*'
-  test: '<%= dir.test.js %>'
   temp: '<%= dir.temp %>'
 
 ###############################################################################

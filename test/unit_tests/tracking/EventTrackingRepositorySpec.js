@@ -138,7 +138,7 @@ describe('z.tracking.EventTrackingRepository', function() {
       };
 
       /* eslint-disable prefer-promise-reject-errors */
-      Promise.reject('Unit test failing with string');
+      Promise.reject(error_description);
       /* eslint-enable prefer-promise-reject-errors */
     });
 

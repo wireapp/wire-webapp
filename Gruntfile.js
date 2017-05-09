@@ -31,6 +31,7 @@ module.exports = (grunt) => {
     },
   };
 
+  /* eslint-disable sort-keys */
   const dir = {
     app_: 'app',
     app: {
@@ -57,9 +58,7 @@ module.exports = (grunt) => {
     test_: 'test',
     test: {
       api: 'test/api',
-      coffee: 'test/coffee',
       coverage: 'test/coverage',
-      js: 'test/js',
       lib: 'test/lib',
       unit_tests: 'test/unit_tests',
     },
@@ -82,12 +81,13 @@ module.exports = (grunt) => {
     less: require('./grunt/config/less'),
     open: require('./grunt/config/open'),
     path: require('path'),
+    postcss: require('./grunt/config/postcss'),
     shell: require('./grunt/config/shell'),
     todo: require('./grunt/config/todo'),
     uglify: require('./grunt/config/uglify'),
     watch: require('./grunt/config/watch'),
-    postcss: require('./grunt/config/postcss'),
   });
+  /* eslint-enable sort-keys */
 
   // Tasks
   grunt.loadTasks('grunt/tasks');
@@ -123,22 +123,20 @@ module.exports = (grunt) => {
     const app_files = prepare_file_names(scripts.app);
     const component_files = prepare_file_names(scripts.component);
     const vendor_files = prepare_file_names(scripts.vendor);
-    const test_files = test_name ? [`../test/js/${test_name}Spec.js`] : ['../test/**/*Spec.js'];
+    const test_files = test_name ? [`../test/unit_tests/${test_name}Spec.js`] : ['../test/unit_tests/**/*Spec.js'];
 
     const files = [].concat(helper_files, vendor_files, component_files, app_files, test_files);
     grunt.config('karma.options.files', files);
   });
 
-  grunt.registerTask('test_init', ['prepare_dist', 'prepare_test']);
+  grunt.registerTask('test_init', ['prepare_dist']);
 
   grunt.registerTask('test_run', (test_name) => {
     grunt.config('karma.options.reporters', ['progress']);
     grunt.task.run([
       'scripts',
       'newer:coffee:dist',
-      'newer:coffee:test',
       'newer:copy:dist_js',
-      'newer:copy:test',
       `test_prepare:${test_name}`,
       'karma:test',
     ]);
