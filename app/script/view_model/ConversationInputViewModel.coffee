@@ -296,7 +296,7 @@ class z.ViewModel.ConversationInputViewModel
     @_move_cursor_to_end input_element if input_element?
 
   cancel_edit: =>
-    @conversation_input_emoji.remove_emoji_list()
+    @conversation_input_emoji.remove_emoji_popup()
     @edit_message_et()?.is_editing false
     @edit_message_et undefined
     @edit_input ''
