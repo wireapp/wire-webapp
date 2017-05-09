@@ -71,9 +71,9 @@ z.assets.AssetService = class AssetService {
    */
   _upload_asset(bytes, options, xhr_accessor_function) {
     return z.assets.AssetCrypto.encrypt_aes_asset(bytes)
-      .then(([key_bytes, sha256, ciphertext]) => {
-        return this.post_asset(new Uint8Array(ciphertext), options, xhr_accessor_function)
-          .then(({key, token}) => [key_bytes, sha256, key, token]);
+      .then(({cipher_text, key_bytes, sha256}) => {
+        return this.post_asset(new Uint8Array(cipher_text), options, xhr_accessor_function)
+          .then(({key, token}) => ({key, key_bytes, sha256, token}));
       });
   }
 
@@ -93,7 +93,7 @@ z.assets.AssetService = class AssetService {
       .then((buffer) => {
         return this._upload_asset(buffer, options, xhr_accessor_function);
       })
-      .then(function([key_bytes, sha256, key, token]) {
+      .then(function({key, key_bytes, sha256, token}) {
         const asset = new z.proto.Asset();
         asset.set('uploaded', new z.proto.Asset.RemoteData(key_bytes, sha256, key, token));
         return asset;
@@ -114,7 +114,7 @@ z.assets.AssetService = class AssetService {
     return this._compress_image(image)
       .then(([compressed_image, compressed_bytes]) => {
         return this._upload_asset(compressed_bytes, options)
-          .then(function([key_bytes, sha256, key, token]) {
+          .then(function({key, key_bytes, sha256, token}) {
             const image_meta_data = new z.proto.Asset.ImageMetaData(compressed_image.width, compressed_image.height);
             const asset = new z.proto.Asset();
             asset.set('original', new z.proto.Asset.Original(image.type, compressed_bytes.length, null, image_meta_data));
