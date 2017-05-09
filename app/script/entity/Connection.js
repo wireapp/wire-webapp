@@ -17,34 +17,18 @@
  *
  */
 
-group-avatar {
-  .square(32px);
-  border: 1px solid fade(#fff, 12%);
-  border-radius: 6px;
-}
+'use strict';
 
-.group-avatar-image-wrapper {
-  .square(30px);
-  border-radius: 7px;
-  flex-wrap: wrap;
-  display: flex;
-  overflow: hidden;
-}
+window.z = window.z || {};
+window.z.entity = z.entity || {};
 
-.group-avatar-image {
-  background-color: #333;
-  background-size: cover;
-  flex: 1 1 auto;
-  margin: 1px;
-}
-
-.group-avatar-image-grid {
-  .square(13px);
-  flex: 0 0 auto;
-}
-
-.group-avatar-initial {
-  .flex-center;
-  font-weight: @font-weight-bold;
-  font-size: 8px;
-}
+z.entity.Connection = class Connection {
+  constructor() {
+    this.conversation_id = null;
+    this.from = null;
+    this.last_update = null;
+    this.message = null;
+    this.status = ko.observable(z.user.ConnectionStatus.UNKNOWN);
+    this.to = null;
+  }
+};

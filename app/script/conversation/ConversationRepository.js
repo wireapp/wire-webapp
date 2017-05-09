@@ -67,19 +67,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
           z.user.ConnectionStatus.PENDING,
         ];
 
-        if (states_to_filter.includes(conversation_et.connection().status())) {
+        if (conversation_et.is_self() || states_to_filter.includes(conversation_et.connection().status())) {
           return false;
         }
 
-        if (conversation_et.is_self()) {
-          return false;
-        }
-
-        if (conversation_et.is_cleared() && conversation_et.removed_from_conversation()) {
-          return false;
-        }
-
-        return true;
+        return !(conversation_et.is_cleared() && conversation_et.removed_from_conversation());
       });
     });
 
@@ -189,7 +181,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return conversation_et;
       })
-      .catch(function() {
+      .catch(() => {
         const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NOT_FOUND);
 
         this.fetching_conversations[conversation_id].forEach(function({reject_fn}) {
@@ -882,6 +874,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return _clear_conversation();
   }
 
+  /**
+   * Update cleared of conversation using timestamp.
+   *
+   * @private
+   * @param {Conversation} conversation_et - Conversation to update
+   * @returns {undefined} No return value
+   */
   _update_cleared_timestamp(conversation_et) {
     const cleared_timestamp = conversation_et.last_event_timestamp();
 
@@ -890,7 +889,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set('cleared', message_content);
 
-      return this.send_generic_message_to_conversation(this.self_conversation().id, generic_message)
+      this.send_generic_message_to_conversation(this.self_conversation().id, generic_message)
         .then(() => {
           this.logger.info(`Cleared conversation '${conversation_et.id}' on '${new Date(cleared_timestamp).toISOString()}'`);
         });
@@ -2018,7 +2017,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   delete_message(conversation_et, message_et) {
     return Promise.resolve()
-      .then(function() {
+      .then(() => {
         const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
         generic_message.set('hidden', new z.proto.MessageHide(conversation_et.id, message_et.id));
 
@@ -2690,12 +2689,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return Promise.all(message_ets.map((message_et) => this._update_user_ets(message_et)));
       })
       .then(function(message_ets) {
-        if (conversation_et.messages().length) {
-          if (prepend) {
-            conversation_et.prepend_messages(message_ets);
-          } else {
-            conversation_et.add_messages(message_ets);
-          }
+        if (prepend && conversation_et.messages().length) {
+          conversation_et.prepend_messages(message_ets);
+        } else {
+          conversation_et.add_messages(message_ets);
         }
 
         return message_ets;

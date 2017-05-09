@@ -115,7 +115,7 @@ ko.bindingHandlers.resize = do ->
         element.style.overflowY = 'scroll'
       else
         element.style.overflowY = 'hidden'
-  , 300)
+  , 100)
 
   init: (element, valueAccessor, allBindings, data, context) ->
     last_height = element.scrollHeight
