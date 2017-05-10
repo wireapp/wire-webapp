@@ -20,24 +20,24 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.components = z.components || {};
+window.z.announce = z.announce || {};
 
-z.components.DeviceToggleButton = class DeviceToggleButton {
+z.components.LocationAssetComponent = class LocationAssetComponent {
+  /**
+   * Construct a new audio asset.
+   * @param {Object} params - Component parameters
+   * @param {z.entity.Location} params.asset - Location asset
+   */
   constructor(params) {
-    this.current_device_index = params.index;
-    this.number_of_devices = params.length;
-    this.icon_class = params.type === z.media.MediaDeviceType.VIDEO_INPUT ? 'icon-video' : 'icon-screensharing';
+    this.asset = params.asset;
   }
 };
 
-ko.components.register('device-toggle-button', {
+ko.components.register('location-asset', {
   template: `
-    <div class="device-toggle-button-icon" data-bind="css: icon_class"></div>
-    <div class="device-toggle-button-indicator">
-      <!-- ko foreach: ko.utils.range(0, number_of_devices() - 1) -->
-        <span class="device-toggle-button-indicator-dot" data-bind="css: {'device-toggle-button-indicator-dot-active': $data == $parent.current_device_index()}"></span>
-      <!-- /ko -->
-    </div>
+    <div class="location-asset-icon icon-location"></div>
+    <div class="location-asset-title" data-uie-name="location-name" data-bind="text: asset.name"></div>
+    <a target="_blank" rel="nofollow noopener noreferrer" class="label-xs text-theme" data-bind="attr: {href: asset.link_src}, l10n_text: z.string.conversation_location_link"></a>
   `,
-  viewModel: z.components.DeviceToggleButton,
+  viewModel: z.components.LocationAssetComponent,
 });

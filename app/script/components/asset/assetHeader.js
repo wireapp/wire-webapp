@@ -20,24 +20,23 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.components = z.components || {};
+window.z.announce = z.announce || {};
 
-z.components.DeviceToggleButton = class DeviceToggleButton {
+z.components.AssetHeader = class AssetHeader {
+  /**
+   * Construct a new asset header.
+   * @param {Object} params - Component parameters
+   * @param {z.entity.Message} params.message - Message entity
+   */
   constructor(params) {
-    this.current_device_index = params.index;
-    this.number_of_devices = params.length;
-    this.icon_class = params.type === z.media.MediaDeviceType.VIDEO_INPUT ? 'icon-video' : 'icon-screensharing';
+    this.message_et = params.message;
   }
 };
 
-ko.components.register('device-toggle-button', {
+ko.components.register('asset-header', {
   template: `
-    <div class="device-toggle-button-icon" data-bind="css: icon_class"></div>
-    <div class="device-toggle-button-indicator">
-      <!-- ko foreach: ko.utils.range(0, number_of_devices() - 1) -->
-        <span class="device-toggle-button-indicator-dot" data-bind="css: {'device-toggle-button-indicator-dot-active': $data == $parent.current_device_index()}"></span>
-      <!-- /ko -->
-    </div>
+    <span class="asset-header-name" data-bind="text: message_et.user().first_name(), css: message_et.accent_color"></span>
+    <span class="asset-header-time" data-bind="text: moment(message_et.timestamp()).format('D.M H:mm')"></span>
   `,
-  viewModel: z.components.DeviceToggleButton,
+  viewModel: z.components.AssetHeader,
 });
