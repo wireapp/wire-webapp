@@ -10,7 +10,7 @@
           <conversation-list-cell
             data-bind="click: $parent.click_on_archived_conversation, event: {'contextmenu': $parent.list_view_model.on_context_menu}"
             data-uie-name="item-conversation-archived"
-            params="conversation: $data">
+            params="click: $parent.list_view_model.on_context_menu, conversation: $data">
           </conversation-list-cell>
         </li>
       <!-- /ko -->

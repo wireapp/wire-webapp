@@ -10,24 +10,32 @@ extends:
 globals:
   $: true
   _: true
+  adapter: true
   amplify: true
   cryptobox: true
   CryptoJS: true
   dcodeIO: true
   Dexie: true
+  entities: true
   hljs: true
+  jQuery: true
   keyboardJS: true
   ko: true
   libsodium: true
+  lorem_ipsum: true
   LRUCache: true
   marked: true
   moment: true
+  OpenGraphMocks: true
   pako: true
+  payload: true
   platform: true
   poster: true
   Proteus: true
   Raygun: true
+  sinon: true
   sodium: true
+  TestFactory: true
   twttr: true
   UUID: true
   wire: true

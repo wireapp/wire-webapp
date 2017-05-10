@@ -29,13 +29,6 @@ module.exports =
     ext: '.js'
     src: '**/*.coffee'
 
-  test:
-    cwd: '<%= dir.test.unit_tests %>'
-    dest: '<%= dir.test.js %>'
-    expand: true
-    ext: '.js'
-    src: '**/*.coffee'
-
 ###############################################################################
 # Production/Staging/Edge deployment related
 ###############################################################################

@@ -67,7 +67,7 @@ class z.ViewModel.content.CollectionDetailsViewModel
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION
 
   click_on_image: (message_et) ->
-    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et, 'collection'
+    amplify.publish z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, @items(), message_et, 'collection'
 
   should_show_header: (message_et) =>
     if not @last_message_timestamp?

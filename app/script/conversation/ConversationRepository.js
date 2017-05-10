@@ -52,7 +52,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this.block_event_handling = true;
     this.fetching_conversations = {};
-    this.use_v3_api = false;
 
     this.self_conversation = ko.pureComputed(() => {
       if (this.user_repository.self()) {
@@ -1138,58 +1137,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   // Send encrypted events
   //##############################################################################
 
-  /**
-   * Send assets to specified conversation. Used for file transfers.
-   *
-   * @param {string} conversation_et - Conversation entity
-   * @param {Object} file - File asset
-   * @param {string} nonce - Message ID
-   * @returns {Promise} Resolves when the asset was sent
-   */
-  send_asset(conversation_et, file, nonce) {
-    let generic_message;
-
-    return this.get_message_in_conversation_by_id(conversation_et, nonce)
-      .then((message_et) => {
-        const [asset_et] = message_et.assets();
-
-        asset_et.upload_id(nonce); // TODO deprecated
-        asset_et.uploaded_on_this_client(true);
-
-        return this.asset_service.create_asset_proto(file);
-      })
-      .then(({asset_proto, cipher_text}) => {
-        generic_message = new z.proto.GenericMessage(nonce);
-        generic_message.set('asset', asset_proto);
-
-        if (conversation_et.ephemeral_timer()) {
-          generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
-        }
-
-        return this._send_encrypted_asset(conversation_et.id, generic_message, cipher_text, nonce);
-      })
-      .then(([response, asset_id]) => {
-        const asset_data = conversation_et.ephemeral_timer() ? generic_message.ephemeral.asset : generic_message.asset;
-        const event = this._construct_otr_event(conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD);
-
-        event.data.otr_key = asset_data.uploaded.otr_key;
-        event.data.sha256 = asset_data.uploaded.sha256;
-        event.data.id = asset_id;
-        event.id = nonce;
-
-        return this._on_asset_upload_complete(conversation_et, event);
-      });
-  }
-
-  /**
-   * Send assets to specified conversation using v3 api. Used for file transfers.
-   *
-   * @param {string} conversation_et - Conversation entity
-   * @param {File} file - File asset
-   * @param {string} nonce - Message ID
-   * @returns {Promise} Resolves when the asset was sent
-   */
-  send_asset_v3(conversation_et, file, nonce) {
+  send_asset_remotedata(conversation_et, file, nonce) {
     let generic_message;
 
     return this.get_message_in_conversation_by_id(conversation_et, nonce)
@@ -1363,49 +1311,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
   }
 
-  /*
-  Sends image asset in specified conversation.
-
-  @deprecated # TODO: remove once support for v2 ends
-  @param conversation_et [z.entity.Conversation] Conversation to send image in
-  @param image [File, Blob]
-  */
-  send_image_asset(conversation_et, image) {
-    return this.asset_service.create_image_proto(image)
-      .then(({cipher_text, image_proto}) => {
-        const optimistic_event = this._construct_otr_event(conversation_et.id, z.event.Backend.CONVERSATION.ASSET_ADD);
-        let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-        generic_message.set('image', image_proto);
-
-        if (conversation_et.ephemeral_timer()) {
-          generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
-        }
-
-        return this.cryptography_repository.cryptography_mapper.map_generic_message(generic_message, optimistic_event)
-          .then((mapped_event) => {
-            return this.conversation_service.save_event(mapped_event);
-          })
-          .then((saved_event) => {
-            this.on_conversation_event(saved_event);
-
-            // we don't need to wait for the sending to resolve
-            this._send_encrypted_asset(conversation_et.id, generic_message, cipher_text)
-              .then(([response, asset_id]) => {
-                this._track_completed_media_action(conversation_et, generic_message);
-                saved_event.data.id = asset_id;
-                saved_event.data.info.nonce = asset_id;
-                this._update_image_as_sent(conversation_et, saved_event, response.time);
-              })
-              .catch((error) => {
-                this.logger.error(`Failed to upload otr asset for conversation ${conversation_et.id}: ${error.message}`, error);
-                throw error;
-              });
-
-            return saved_event;
-          });
-      });
-  }
-
   /**
    * Sends image asset in specified conversation using v3 api.
    *
@@ -1413,7 +1318,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {File|Blob} image - Image
    * @returns {Promise} Resolves when the image was sent
    */
-  send_image_asset_v3(conversation_et, image) {
+  send_image_asset(conversation_et, image) {
     return this.asset_service.upload_image_asset(image)
       .then((asset) => {
         let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
@@ -1684,33 +1589,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     return result;
-  }
-
-  /**
-   * Update image message with given event data.
-   *
-   * @param {Conversation} conversation_et - Conversation image was sent in
-   * @param {JSON} event_json - Image event containing updated information after sending
-   * @param {number} event_time -Update event timestamp
-   * @returns {Promise} Resolves when image was updated
-   */
-  _update_image_as_sent(conversation_et, event_json, event_time) {
-    const {data: asset_data, id} = event_json;
-
-    return this.get_message_in_conversation_by_id(conversation_et, id)
-      .then((message_et) => {
-        const remote_data = z.assets.AssetRemoteData.v2(conversation_et.id, asset_data.id, asset_data.otr_key, asset_data.sha256, true);
-
-        message_et.get_first_asset().resource(remote_data);
-        message_et.status(z.message.StatusType.SENT);
-        message_et.timestamp(new Date(event_time).getTime());
-
-        return this.conversation_service.update_message_in_db(message_et, {
-          data: asset_data,
-          status: z.message.StatusType.SENT,
-          time: event_time,
-        });
-      });
   }
 
   /**
@@ -1997,62 +1875,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  /*
-  Sends an OTR asset to a conversation.
-
-  @deprecated # TODO: remove once support for v2 ends
-  @private
-  @param conversation_id [String] Conversation ID
-  @param generic_message [z.protobuf.GenericMessage] Protobuf message to be encrypted and send
-  @param image_data [Uint8Array|ArrayBuffer]
-  @param nonce [String]
-  @return [Promise] Promise that resolves after sending the encrypted message
-  */
-  _send_encrypted_asset(conversation_id, generic_message, image_data, nonce) {
-    this.logger.log(this.logger.levels.INFO, `Sending encrypted '${generic_message.content}' asset to conversation '${conversation_id}'`, image_data);
-
-    const skip_own_clients = generic_message.content === 'ephemeral';
-    let precondition_option = false;
-    let image_payload = undefined;
-
-    return this._grant_outgoing_message(conversation_id, generic_message)
-      .then(() => {
-        return this.create_user_client_map(conversation_id, skip_own_clients);
-      })
-      .then((user_client_map) => {
-        if (skip_own_clients) {
-          precondition_option = Object.keys(user_client_map);
-        }
-
-        return this.cryptography_repository.encrypt_generic_message(user_client_map, generic_message);
-      })
-      .then((payload) => {
-        payload.inline = false;
-        image_payload = payload;
-        return this.asset_service.post_asset_v2(conversation_id, image_payload, image_data, precondition_option, nonce);
-      })
-      .then((response) => {
-        this._handle_client_mismatch(conversation_id, response);
-        return response;
-      })
-      .catch((error) => {
-        if (!error.missing) {
-          throw error;
-        }
-
-        let updated_payload = undefined;
-        return this._handle_client_mismatch(conversation_id, error, generic_message, image_payload)
-          .then((payload_with_missing_clients) => {
-            updated_payload = payload_with_missing_clients;
-            return this._grant_outgoing_message(conversation_id, generic_message, Object.keys(error.missing));
-          })
-          .then(() => {
-            this.logger.log(this.logger.levels.INFO, `Sending updated encrypted '${generic_message.content}' message to conversation '${conversation_id}'`, updated_payload);
-            return this.asset_service.post_asset_v2(conversation_id, updated_payload, image_data, true, nonce);
-          });
-      });
-  }
-
   /**
    * Estimate whether message should be send as type external.
    *
@@ -2081,13 +1903,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   upload_images(conversation_et, images) {
     if (this._can_upload_assets_to_conversation(conversation_et)) {
-      [...images].forEach((image) => {
-        if (this.use_v3_api) {
-          this.send_image_asset_v3(conversation_et, image);
-        } else {
-          this.send_image_asset(conversation_et, image);
-        }
-      });
+      [...images].forEach((image) => this.send_image_asset(conversation_et, image));
     }
   }
 
@@ -2100,61 +1916,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   upload_files(conversation_et, files) {
     if (this._can_upload_assets_to_conversation(conversation_et)) {
-      [...files].forEach((file) => {
-        if (this.use_v3_api) {
-          this.upload_file_v3(conversation_et, file);
-        } else {
-          this.upload_file(conversation_et, file);
-        }
-      });
+      [...files].forEach((file) => this.upload_file(conversation_et, file));
     }
-  }
-
-  /*
-  Post file to a conversation.
-
-  @param conversation_et [z.entity.Conversation] Conversation to post the file
-  @param file [Object] File object
-  */
-  upload_file(conversation_et, file) {
-    let message_id = null;
-
-    const upload_started = Date.now();
-    const tracking_data = {
-      size_bytes: file.size,
-      size_mb: z.util.bucket_values((file.size / 1024 / 1024), [0, 5, 10, 15, 20, 25]),
-      type: z.util.get_file_extension(file.name),
-    };
-    const conversation_type = z.tracking.helpers.get_conversation_type(conversation_et);
-
-    amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_INITIATED,
-      $.extend(tracking_data, {conversation_type}));
-
-    return this.send_asset_metadata(conversation_et, file)
-      .then((record) => {
-        message_id = record.id;
-        return this.send_asset(conversation_et, file, message_id);
-      })
-      .then(() => {
-        const upload_duration = (Date.now() - upload_started) / 1000;
-
-        this.logger.info(`Finished to upload asset for conversation'${conversation_et.id} in ${upload_duration}`);
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_SUCCESSFUL,
-          $.extend(tracking_data, {time: upload_duration}));
-      })
-      .catch((error) => {
-        if (error.type === z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION) {
-          throw error;
-        }
-
-        amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.FILE.UPLOAD_FAILED, tracking_data);
-        this.logger.error(`Failed to upload asset for conversation '${conversation_et.id}': ${error.message}`, error);
-        return this.get_message_in_conversation_by_id(conversation_et, message_id)
-          .then((message_et) => {
-            this.send_asset_upload_failed(conversation_et, message_et.id);
-            return this.update_message_as_upload_failed(message_et);
-          });
-      });
   }
 
   /**
@@ -2164,7 +1927,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Object} file - File object
    * @returns {Promise} Resolves when file was uploaded
    */
-  upload_file_v3(conversation_et, file) {
+  upload_file(conversation_et, file) {
     let message_id;
 
     const upload_started = Date.now();
@@ -2183,7 +1946,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this.send_asset_preview(conversation_et, file, message_id);
       })
       .then(() => {
-        return this.send_asset_v3(conversation_et, file, message_id);
+        return this.send_asset_remotedata(conversation_et, file, message_id);
       })
       .then(() => {
         const upload_duration = (Date.now() - upload_started) / 1000;
@@ -2440,9 +2203,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Listener for incoming events.
    * @param {Object} event_json - JSON data for event
+   * @param {boolean} send_notification - Send a notification for message
    * @returns {Promise} Resolves when event was handled
    */
-  on_conversation_event(event_json) {
+  on_conversation_event(event_json, send_notification = false) {
     if (!event_json) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
@@ -2464,10 +2228,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     // Check if conversation was archived
-    let conversation_et, previously_archived;
+    let previously_archived;
     return this.get_conversation_by_id_async(conversation_id)
-      .then((conversation) => {
-        conversation_et = conversation;
+      .then((conversation_et) => {
         previously_archived = conversation_et.is_archived();
 
         switch (type) {
@@ -2499,7 +2262,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_add_event(conversation_et, event_json);
         }
       })
-      .then(() => {
+      .then(({conversation: conversation_et, message: message_et}) => {
+        if (message_et && send_notification) {
+          amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
+        }
+
         // Un-archive it also on the backend side
         if (!this.block_event_handling && previously_archived && !conversation_et.is_archived()) {
           this.logger.info(`Unarchiving conversation '${conversation_et.id}' with new event`);
@@ -2520,7 +2287,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when event was handled
    */
   push_to_receiving_queue(event_json) {
-    return this.receiving_queue.push(() => this.on_conversation_event(event_json));
+    return this.receiving_queue.push(() => this.on_conversation_event(event_json, !this.block_event_handling));
   }
 
   /**
@@ -2535,7 +2302,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this._add_event_to_conversation(event_json, conversation_et)
       .then((message_et) => {
         this.send_confirmation_status(conversation_et, message_et);
-        this._send_event_notification(conversation_et, message_et);
+        return {conversation_et: conversation_et, message_et: message_et};
       });
   }
 
@@ -2649,11 +2416,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.update_participating_user_ets(this.conversation_mapper.map_conversation(event_json))
           .then((conversation_et) => {
-            this._send_conversation_create_notification(conversation_et);
-            return this.save_conversation(conversation_et)
-              .then(function() {
-                return conversation_et;
-              });
+            return this.save_conversation(conversation_et);
+          })
+          .then((conversation_et) => {
+            return this._prepare_conversation_create_notification(conversation_et);
           });
       });
   }
@@ -2685,8 +2451,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this._add_event_to_conversation(event_json, conversation_et);
       })
       .then((message_et) => {
-        amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
         this.verification_state_handler.on_member_joined(conversation_et, event_json.data.user_ids);
+        return {conversation_et: conversation_et, message_et: message_et};
       });
   }
 
@@ -2717,8 +2483,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.update_participating_user_ets(conversation_et)
           .then(() => {
-            amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
             this.verification_state_handler.on_member_left(conversation_et, message_et.user_ids());
+            return {conversation_et: conversation_et, message_et: message_et};
           });
       });
   }
@@ -2852,10 +2618,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const changes = message_et.update_reactions(event_json);
 
         if (changes) {
-          this._update_user_ets(message_et);
-          this._send_reaction_notification(conversation_et, message_et, event_json);
           this.logger.debug(`Updating reactions to message '${event_json.data.message_id}' in conversation '${conversation_et.id}'`, event_json);
-          return this.conversation_service.update_message_in_db(message_et, changes, conversation_et.id);
+          return this._update_user_ets(message_et)
+            .then((updated_message_et) => {
+              this.conversation_service.update_message_in_db(updated_message_et, changes, conversation_et.id);
+              return this._prepare_reaction_notification(conversation_et, updated_message_et, event_json);
+            });
         }
       })
       .catch((error) => {
@@ -2882,7 +2650,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this._add_event_to_conversation(event_json, conversation_et)
       .then((message_et) => {
         this.conversation_mapper.update_properties(conversation_et, event_json.data);
-        amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
+        return {conversation_et: conversation_et, message_et: message_et};
       });
   }
 
@@ -2955,28 +2723,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversation_et - Conversation that was created
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the notification was prepared
    */
-  _send_conversation_create_notification(conversation_et) {
-    this.user_repository.get_user_by_id(conversation_et.creator)
+  _prepare_conversation_create_notification(conversation_et) {
+    return this.user_repository.get_user_by_id(conversation_et.creator)
       .then(function(user_et) {
         const message_et = new z.entity.MemberMessage();
         message_et.user(user_et);
         message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
-        amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
+        return {conversation_et: conversation_et, message_et: message_et};
       });
-  }
-
-  /**
-   * Forward the event to the SystemNotification repository for browser and audio notifications.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation that event was received in
-   * @param {Message} message_et - Message that has been received
-   * @returns {undefined} No return value
-   */
-  _send_event_notification(conversation_et, message_et) {
-    amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
   }
 
   /**
@@ -2986,20 +2742,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversation_et - Conversation that event was received in
    * @param {Message} message_et - Message that has been reacted upon
    * @param {Object} event_json -] JSON data of received reaction event
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the notification was prepared
    */
-  _send_reaction_notification(conversation_et, message_et, event_json) {
+  _prepare_reaction_notification(conversation_et, message_et, event_json) {
     const {data: event_data, from} = event_json;
 
     if (event_data.reaction && message_et.from === this.user_repository.self().id) {
-      this.user_repository.get_user_by_id(from)
+      return this.user_repository.get_user_by_id(from)
         .then(function(user_et) {
           const reaction_message_et = new z.entity.Message(message_et.id, z.message.SuperType.REACTION);
           reaction_message_et.user(user_et);
           reaction_message_et.reaction = event_data.reaction;
-          amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, reaction_message_et);
+          return {conversation_et: conversation_et, message_et: reaction_message_et};
         });
     }
+
+    return Promise.resolve({conversation_et: conversation_et});
   }
 
   /**
@@ -3414,7 +3172,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       case 'calling': {
         const {props: properties} = e_call_message_et;
-        action_type = properties.videosend === 'true' ? 'video_call' : 'audio_call';
+        action_type = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE ? 'video_call' : 'audio_call';
         break;
       }
 
