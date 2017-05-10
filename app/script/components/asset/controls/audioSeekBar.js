@@ -20,7 +20,7 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.announce = z.announce || {};
+window.z.components = z.components || {};
 
 z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
   /**
@@ -71,11 +71,15 @@ z.components.AudioSeekBarComponent = class AudioSeekBarComponent {
     const scaled_loudness = z.util.ArrayUtil.interpolate(this.loudness, number_of_levels_fit_on_screen);
 
     $(this.element).empty();
-    return Array.from(scaled_loudness).map((level) => $('<span>').height(level).appendTo(this.element));
+    scaled_loudness.map((level) => {
+      $('<span>')
+        .height(level)
+        .appendTo(this.element);
+    });
   }
 
   _normalize_loudness(loudness, max) {
-    const peak = Math.max.apply(Math, loudness);
+    const peak = Math.max(...loudness);
     return peak > max ? loudness.map((level) => (level * max) / peak) : loudness;
   }
 

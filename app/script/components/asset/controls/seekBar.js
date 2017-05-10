@@ -20,7 +20,7 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.announce = z.announce || {};
+window.z.components = z.components || {};
 
 z.components.SeekBarComponent = class SeekBarComponent {
   /**

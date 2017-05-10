@@ -22,22 +22,29 @@
 window.z = window.z || {};
 window.z.components = z.components || {};
 
-z.components.LocationAssetComponent = class LocationAssetComponent {
+z.components.GroupListViewModel = class GroupListViewModel {
   /**
-   * Construct a new audio asset.
+   * Construct a new group list view model.
+   *
    * @param {Object} params - Component parameters
-   * @param {z.entity.Location} params.asset - Location asset
+   * @param {ko.observableArray} params.groups - Data source
+   * @param {Function} params.click - Function called when a list item is clicked
    */
   constructor(params) {
-    this.asset = params.asset;
+    this.groups = params.groups;
+    this.on_select = params.click;
   }
 };
 
-ko.components.register('location-asset', {
+// Knockout registration of the group list component.
+ko.components.register('group-list', {
   template: `
-    <div class="location-asset-icon icon-location"></div>
-    <div class="location-asset-title" data-uie-name="location-name" data-bind="text: asset.name"></div>
-    <a target="_blank" rel="nofollow noopener noreferrer" class="label-xs text-theme" data-bind="attr: {href: asset.link_src}, l10n_text: z.string.conversation_location_link"></a>
+    <div class="search-list search-list-lg" data-bind="foreach: {data: groups, as: 'group'}">
+      <div class="search-list-item" data-bind="click: $parent.on_select, attr: {'data-uie-uid': group.id, 'data-uie-value': group.display_name" data-uie-name="item-group">
+        <div class="search-list-item-image"></div>
+        <div class="search-list-item-header" data-bind="text: group.display_name"></div>
+      </div>
+    </div>
   `,
-  viewModel: z.components.LocationAssetComponent,
+  viewModel: z.components.GroupListViewModel,
 });

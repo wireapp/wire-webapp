@@ -20,7 +20,7 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.announce = z.announce || {};
+window.z.components = z.components || {};
 
 z.components.MediaButtonComponent = class MediaButtonComponent {
   /**
@@ -65,7 +65,7 @@ z.components.MediaButtonComponent = class MediaButtonComponent {
       }
     };
     this.on_pause_button_clicked = function() {
-      if(typeof params.pause === 'function') {
+      if (typeof params.pause === 'function') {
         params.pause();
       }
     };
