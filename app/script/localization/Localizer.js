@@ -26,7 +26,7 @@ class Localizer {
   constructor() {
     const DEFAULT_LOCALE = 'en';
     const query_param = z.util.get_url_parameter(z.auth.URLParameter.LOCALE);
-    const current_browser_locale =  navigator.language.substr(0, 2);
+    const current_browser_locale = navigator.language.substr(0, 2);
     let stored_locale = z.util.StorageUtil.get_value(z.storage.StorageKey.LOCALIZATION.LOCALE);
 
     if (query_param) {
@@ -85,7 +85,7 @@ z.l10n = (() => {
   }
 
   function replaceWithObject(string, substitute) {
-    for (let identifier in substitute) {
+    for (const identifier in substitute) {
       if (substitute.hasOwnProperty(identifier)) {
         string = string.replace(new RegExp(`{{${identifier}}}`, 'g'), substitute[identifier]);
       }
@@ -106,9 +106,9 @@ z.l10n = (() => {
      * @example using an object as substitute
      * z.l10.text('{{greeting}} {{name}}', {name: 'Tod', greeting: 'Hey') // returns 'Hey Tod'
      *
-     * @param {Observable|string} value
-     * @param {string|Object} substitute
-     * @returns {string}
+     * @param {Observable|string} value - localized string in our case usually z.string.foo
+     * @param {string|Object} substitute - data to fill all the placeholder with
+     * @returns {string} - string with substituted placeholders
      */
     text(value, substitute) {
       const string = ko.unwrap(value);
@@ -120,8 +120,8 @@ z.l10n = (() => {
         return replaceWithString(string, substitute);
       }
       return string;
-    }
-  }
+    },
+  };
 
 })();
 
