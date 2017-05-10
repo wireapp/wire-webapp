@@ -87,7 +87,7 @@ z.l10n = (() => {
   function replaceWithObject(string, substitute) {
     for (let identifier in substitute) {
       if (substitute.hasOwnProperty(identifier)) {
-        string = string.replace(`{{${identifier}}}`, substitute[identifier]);
+        string = string.replace(new RegExp(`{{${identifier}}}`, 'g'), substitute[identifier]);
       }
     }
     return string;

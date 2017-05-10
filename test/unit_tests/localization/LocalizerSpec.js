@@ -94,4 +94,9 @@ describe('l10n', function() {
     expect(text).toBe('Hey Tod');
   });
 
+  it('can replace duplicate placeholders in localized strings using a more complex object', function() {
+    const text = z.l10n.text('{{greeting}} {{greeting}} {{name}}', {name: 'Tod', greeting: 'Hey'});
+    expect(text).toBe('Hey Hey Tod');
+  });
+
 });
