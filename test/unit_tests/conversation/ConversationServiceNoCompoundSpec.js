@@ -219,8 +219,8 @@ describe('ConversationServiceNoCompound', function() {
       const conversation_et = conversation_mapper.map_conversation(conversation_payload);
 
       conversation_service.save_conversation_state_in_db(conversation_et)
-        .then(function(conversation_record) {
-          expect(conversation_record.name()).toBe(conversation_payload.name);
+        .then(function(conversation) {
+          expect(conversation.name()).toBe(conversation_payload.name);
           done();
         })
         .catch(done.fail);
