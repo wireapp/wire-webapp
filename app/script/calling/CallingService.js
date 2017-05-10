@@ -19,20 +19,28 @@
 
 'use strict';
 
-z.util.NumberUtil = {
-  cap_to_byte: function(value) {
-    const MAX_VALUE = 255;
-    return Math.min(Math.abs(parseInt(value * MAX_VALUE, 10)), MAX_VALUE);
-  },
-  get_random_number: function(minimum, maximum) {
-    return Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
-  },
-  in_range: function(value, lower_bound, upper_bound) {
-    return (value >= lower_bound) && (value <= upper_bound);
-  },
-  root_mean_square: function(float_array) {
-    const pow = float_array.map((number) => Math.pow(number, 2));
-    const sum = pow.reduce((power, number) => power + number);
-    return Math.sqrt(sum) / float_array.length;
-  },
+window.z = window.z || {};
+window.z.calling = z.calling || {};
+
+z.calling.CallingService = class CallingService {
+  /**
+   * Construct an new CallingService.
+   * @param {z.client.Client} client - Local client entity
+   */
+  constructor(client) {
+    this.logger = new z.util.Logger('z.calling.CallingService', z.config.LOGGER.OPTIONS);
+    this.client = client;
+  }
+
+  /**
+   * Retrieves a calling config from the backend.
+   * @returns {Promise} Resolves with call config information
+   */
+  get_config() {
+    return this.client.send_request({
+      cache: false,
+      type: 'GET',
+      url: this.client.create_url('/calls/config'),
+    });
+  }
 };

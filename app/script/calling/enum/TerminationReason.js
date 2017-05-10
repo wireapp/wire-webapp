@@ -19,20 +19,21 @@
 
 'use strict';
 
-z.util.NumberUtil = {
-  cap_to_byte: function(value) {
-    const MAX_VALUE = 255;
-    return Math.min(Math.abs(parseInt(value * MAX_VALUE, 10)), MAX_VALUE);
-  },
-  get_random_number: function(minimum, maximum) {
-    return Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
-  },
-  in_range: function(value, lower_bound, upper_bound) {
-    return (value >= lower_bound) && (value <= upper_bound);
-  },
-  root_mean_square: function(float_array) {
-    const pow = float_array.map((number) => Math.pow(number, 2));
-    const sum = pow.reduce((power, number) => power + number);
-    return Math.sqrt(sum) / float_array.length;
-  },
+window.z = window.z || {};
+window.z.calling = z.calling || {};
+window.z.calling.enum = z.calling.enum || {};
+
+z.calling.enum.TERMINATION_REASON = {
+  COMPLETED: 'completed',
+  CONCURRENT_CALL: 'concurrent',
+  CONNECTION_DROP: 'drop',
+  CONNECTION_FAILED: 'failed_ice',
+  MEMBER_LEAVE: 'member_leave',
+  MISSED: 'missed',
+  OTHER_USER: 'other',
+  RENEGOTIATION: 'renegotiation',
+  SDP_FAILED: 'failed_sdp',
+  SELF_USER: 'self',
+  TIMEOUT: 'timeout',
+  UNKNOWN: 'unknown',
 };
