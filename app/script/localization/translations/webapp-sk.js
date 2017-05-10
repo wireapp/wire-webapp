@@ -260,6 +260,8 @@ z.string.sk.conversations_all_archived = 'Všetko archivované';
 z.string.sk.conversations_contacts = 'Kontakty';
 z.string.sk.conversations_connection_request_many = '%no ľudí čaká';
 z.string.sk.conversations_connection_request_one = '1 osoba čaká';
+z.string.sk.conversations_empty_conversation = 'Skupinová konverzácia';
+z.string.sk.conversations_empty_conversation_description = 'Všetci opustili rozhovor';
 z.string.sk.conversations_no_conversations = 'Začať rozhovor, alebo pozvať ľudí.';
 z.string.sk.conversations_popover_archive = 'Archív';
 z.string.sk.conversations_popover_block = 'Blokovať';
@@ -270,6 +272,16 @@ z.string.sk.conversations_popover_notify = 'Zapnúť zvuk';
 z.string.sk.conversations_popover_silence = 'Stlmiť';
 z.string.sk.conversations_popover_unarchive = 'Zrušiť archiváciu';
 
+z.string.sk.conversations_secondary_line_missed_call = '%n zmeškaný hovor';
+z.string.sk.conversations_secondary_line_missed_calls = '%n zmeškaných hovorov';
+z.string.sk.conversations_secondary_line_new_message = '%n nová správa';
+z.string.sk.conversations_secondary_line_new_messages = '%n nových správ';
+z.string.sk.conversations_secondary_line_ping = '%n ping';
+z.string.sk.conversations_secondary_line_pings = '%n ping';
+z.string.sk.conversations_secondary_line_person_left = '%n osoba zostáva';
+z.string.sk.conversations_secondary_line_people_left = '%n ľudí zostáva';
+z.string.sk.conversations_secondary_line_person_added = '%user1 priadal %user2';
+z.string.sk.conversations_secondary_line_people_added = '%user ľudia boli pridaní';
 z.string.sk.conversations_secondary_line_timed_message = 'Časovaná správa';
 
 z.string.sk.takeover_headline = 'Užívateľské mená sú obsadené.';

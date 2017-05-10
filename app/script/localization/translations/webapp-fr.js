@@ -260,6 +260,8 @@ z.string.fr.conversations_all_archived = 'Tout a été archivé';
 z.string.fr.conversations_contacts = 'Contacts';
 z.string.fr.conversations_connection_request_many = '%no personnes en attente';
 z.string.fr.conversations_connection_request_one = '1 personne en attente';
+z.string.fr.conversations_empty_conversation = 'Conversation de groupe';
+z.string.fr.conversations_empty_conversation_description = 'Tout le monde est parti';
 z.string.fr.conversations_no_conversations = 'Démarrez une conversation ou invitez des personnes à vous rejoindre.';
 z.string.fr.conversations_popover_archive = 'Archiver';
 z.string.fr.conversations_popover_block = 'Bloquer';
@@ -270,6 +272,16 @@ z.string.fr.conversations_popover_notify = 'Activer le micro';
 z.string.fr.conversations_popover_silence = 'Mettre en sourdine';
 z.string.fr.conversations_popover_unarchive = 'Restaurer';
 
+z.string.fr.conversations_secondary_line_missed_call = '%n appel manqué';
+z.string.fr.conversations_secondary_line_missed_calls = '%n appels manqués';
+z.string.fr.conversations_secondary_line_new_message = '%n nouveau message';
+z.string.fr.conversations_secondary_line_new_messages = '%n nouveaux messages';
+z.string.fr.conversations_secondary_line_ping = '%n ping';
+z.string.fr.conversations_secondary_line_pings = '%n pings';
+z.string.fr.conversations_secondary_line_person_left = '%n personne est partie';
+z.string.fr.conversations_secondary_line_people_left = '%n personnes sont parties';
+z.string.fr.conversations_secondary_line_person_added = '%user1 a ajouté %user2';
+z.string.fr.conversations_secondary_line_people_added = '%user personnes ont été ajoutées';
 z.string.fr.conversations_secondary_line_timed_message = 'Message éphémère';
 
 z.string.fr.takeover_headline = 'Les identifiants sont disponibles.';
