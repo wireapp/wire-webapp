@@ -259,6 +259,8 @@ z.string.pt.conversations_all_archived = 'Tudo foi arquivado';
 z.string.pt.conversations_contacts = 'Contatos';
 z.string.pt.conversations_connection_request_many = '%no pessoas esperando';
 z.string.pt.conversations_connection_request_one = '1 pessoa esperando';
+z.string.pt.conversations_empty_conversation = 'Conversa em grupo';
+z.string.pt.conversations_empty_conversation_description = 'Todos saíram';
 z.string.pt.conversations_no_conversations = 'Inicie uma conversa ou convide pessoas para participar.';
 z.string.pt.conversations_popover_archive = 'Arquivar';
 z.string.pt.conversations_popover_block = 'Bloquear';
@@ -269,6 +271,16 @@ z.string.pt.conversations_popover_notify = 'Notificar';
 z.string.pt.conversations_popover_silence = 'Sem som';
 z.string.pt.conversations_popover_unarchive = 'Desarquivar';
 
+z.string.pt.conversations_secondary_line_missed_call = '%n chamada perdida';
+z.string.pt.conversations_secondary_line_missed_calls = '%n chamadas perdidas';
+z.string.pt.conversations_secondary_line_new_message = '%n nova mensagem';
+z.string.pt.conversations_secondary_line_new_messages = '%n novas mensagens';
+z.string.pt.conversations_secondary_line_ping = '%n ping';
+z.string.pt.conversations_secondary_line_pings = '%n pings';
+z.string.pt.conversations_secondary_line_person_left = '%n pessoa saiu';
+z.string.pt.conversations_secondary_line_people_left = '%n pessoas saíram';
+z.string.pt.conversations_secondary_line_person_added = '%user1 adicionou %user2';
+z.string.pt.conversations_secondary_line_people_added = '%user adicionou pessoas';
 z.string.pt.conversations_secondary_line_timed_message = 'Mensagem temporizada';
 
 z.string.pt.takeover_headline = 'Nomes de usuário estão aqui.';

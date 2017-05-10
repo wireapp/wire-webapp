@@ -260,6 +260,8 @@ z.string.hu.conversations_all_archived = 'Minden archiválva';
 z.string.hu.conversations_contacts = 'Névjegyek';
 z.string.hu.conversations_connection_request_many = '%no partner várakozik';
 z.string.hu.conversations_connection_request_one = '1 partner várakozik';
+z.string.hu.conversations_empty_conversation = 'Csoportos beszélgetés';
+z.string.hu.conversations_empty_conversation_description = 'Mindenki elhagyta a beszélgetést';
 z.string.hu.conversations_no_conversations = 'Indítson beszélgetést, vagy hívjon partnereket, hogy csatlakozzanak.';
 z.string.hu.conversations_popover_archive = 'Archiválás';
 z.string.hu.conversations_popover_block = 'Tiltás';
@@ -270,6 +272,16 @@ z.string.hu.conversations_popover_notify = 'Némítás feloldása';
 z.string.hu.conversations_popover_silence = 'Némítás';
 z.string.hu.conversations_popover_unarchive = 'Archiválás visszavonása';
 
+z.string.hu.conversations_secondary_line_missed_call = '%n nem fogadott hívás';
+z.string.hu.conversations_secondary_line_missed_calls = '%n nem fogadott hívások';
+z.string.hu.conversations_secondary_line_new_message = '%n új üzenet';
+z.string.hu.conversations_secondary_line_new_messages = '%n új üzenetek';
+z.string.hu.conversations_secondary_line_ping = '%n kopogás';
+z.string.hu.conversations_secondary_line_pings = '%n kopogások';
+z.string.hu.conversations_secondary_line_person_left = '%n személy elhagyta a beszélgetést';
+z.string.hu.conversations_secondary_line_people_left = '%n partner elhagyta a beszélgetést';
+z.string.hu.conversations_secondary_line_person_added = '%user1 felvette %user2';
+z.string.hu.conversations_secondary_line_people_added = '%user partner hozzáadva';
 z.string.hu.conversations_secondary_line_timed_message = 'Időzített üzenet';
 
 z.string.hu.takeover_headline = 'Felhasználónevek itt találhatóak.';
