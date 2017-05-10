@@ -41,9 +41,9 @@ class z.ViewModel.CallShortcutsViewModel
     return if not call_et
 
     switch call_et.state()
-      when z.calling.enum.CallState.ONGOING, z.calling.enum.CallState.OUTGOING
+      when z.calling.enum.CALL_STATE.ONGOING, z.calling.enum.CALL_STATE.OUTGOING
         @_subscribe_shortcuts_outgoing_ongoing()
-      when z.calling.enum.CallState.INCOMING
+      when z.calling.enum.CALL_STATE.INCOMING
         @_subscribe_shortcuts_incoming()
 
   _subscribe_shortcuts_incoming: =>

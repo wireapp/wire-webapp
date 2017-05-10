@@ -445,7 +445,7 @@ class z.ViewModel.list.StartUIViewModel
     user_ids = (user_et.id for user_et in @selected_people())
 
     @conversation_repository.create_new_conversation user_ids, null
-    .then (conversation_et) =>
+    .then ({conversation_et}) =>
       @properties_repository.save_preference z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION,
         {creationContext: 'search', numberOfParticipants: user_ids.length}
@@ -458,13 +458,13 @@ class z.ViewModel.list.StartUIViewModel
   on_audio_call: =>
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
-        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, false
+        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, false, conversation_et
       , 500
 
   on_video_call: =>
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
-        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, true
+        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, true, conversation_et
       , 500
 
   on_photo: (images) =>

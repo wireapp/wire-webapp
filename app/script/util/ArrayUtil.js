@@ -47,7 +47,7 @@ z.util.ArrayUtil = {
 
     // couldn't find the item
     if (current_index === -1) {
-      return null;
+      return undefined;
     }
 
     const next_index = current_index + 1;

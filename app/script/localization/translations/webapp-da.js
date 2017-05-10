@@ -296,7 +296,6 @@ z.string.da.extensions_giphy_random = 'Tilfældig';
 z.string.da.search_open = 'Åbn';
 z.string.da.search_open_group = 'Opret Gruppe';
 z.string.da.people_confirm_label = 'Tilføj til samtale';
-z.string.da.people_common_contacts = 'I kender begge';
 z.string.da.people_people = '%no Personer';
 z.string.da.people_search_placeholder = 'Søg ved navn';
 z.string.da.people_everyone_participates = 'Alle du er \nforbundet med er allerede i \ndenne samtale.';

@@ -293,7 +293,6 @@ z.string.es.extensions_giphy_random = 'Aleatorio';
 z.string.es.search_open = 'Abrir';
 z.string.es.search_open_group = 'Crear Grupo';
 z.string.es.people_confirm_label = 'Agregar a la conversación';
-z.string.es.people_common_contacts = 'Ambos conocen a';
 z.string.es.people_people = '%no Personas';
 z.string.es.people_search_placeholder = 'Buscar por nombre';
 z.string.es.people_everyone_participates = 'Todas las personas con quien estás conectado ya se encuentran en esta conversación.';

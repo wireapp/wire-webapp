@@ -39,11 +39,3 @@ module.exports =
   templates:
     files: '<%= dir.app_ %>/**/*.htm*'
     tasks: ['prepare_template']
-
-  test:
-    files: '<%= dir.test_ %>/**/*.coffee'
-    tasks: ['coffee:test', 'karma']
-
-  test_js:
-    files: '<%= dir.test_ %>/**/*.js'
-    tasks: ['copy:test', 'karma']

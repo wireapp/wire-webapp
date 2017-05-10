@@ -297,7 +297,6 @@ z.string.ro.extensions_giphy_random = 'La întâmplare';
 z.string.ro.search_open = 'Deschide';
 z.string.ro.search_open_group = 'Creează grup';
 z.string.ro.people_confirm_label = 'Adaugă la conversație';
-z.string.ro.people_common_contacts = 'Amândoi cunoașteți';
 z.string.ro.people_people = '%no persoane';
 z.string.ro.people_search_placeholder = 'Caută după nume';
 z.string.ro.people_everyone_participates = 'Toată lumea cu care\nești conectat este deja\nîn această conversație.';
