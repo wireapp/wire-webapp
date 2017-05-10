@@ -23,8 +23,6 @@
 /tags
 /temp
 /test/_SpecRunner.html
-/test/coverage
-/test/js/*
 /Web.config
 aws-keys.json
 npm-debug.log
