@@ -53,7 +53,7 @@ z.entity.Conversation = class Conversation {
     // in case this is a one2one conversation this is the connection to that user
     this.connection = ko.observable(new z.entity.Connection());
     this.connection.subscribe((connection_et) => {
-      if (this.participating_user_ids().includes(connection_et.to)) {
+      if (!this.participating_user_ids().includes(connection_et.to)) {
         return this.participating_user_ids([connection_et.to]);
       }
     });
@@ -174,11 +174,13 @@ z.entity.Conversation = class Conversation {
      */
     this.display_name = ko.pureComputed(() => {
       if ([z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(this.type())) {
+        console.warn(`BENNY! ${this.name()}`, this.participating_user_ets());
+
         if (this.participating_user_ets()[0] && this.participating_user_ets()[0].name) {
           return this.participating_user_ets()[0].name();
         }
 
-        return '…';
+        return '…!!!';
       }
 
       if (this.is_group()) {
