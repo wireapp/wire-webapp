@@ -33,7 +33,7 @@ describe('Conversation', function() {
     other_user = new z.entity.User(entities.user.jane_roe.id);
   });
 
-  describe('connection', function() {
+  xdescribe('connection', function() {
     it('updates the participating user IDs with the user ID of the other party', function() {
       const connector_user_id = 'b43b376d-7b5a-4d77-89be-81a02892db8c';
 
