@@ -734,6 +734,13 @@ z.calling.entities.ECall = class ECall {
 
         return e_participant_et;
       })
+      .catch(function(error) {
+        if (error.type !== z.calling.v3.CallError.TYPE.SDP_STATE_COLLISION) {
+          throw error;
+        }
+
+        negotiate = false;
+      })
       .then((e_participant_et) => this._update_state(e_participant_et, negotiate))
       .catch(function(error) {
         if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {

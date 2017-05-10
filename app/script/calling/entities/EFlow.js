@@ -706,7 +706,7 @@ z.calling.entities.EFlow = class EFlow {
           switch (this.signaling_state()) {
             case z.calling.rtc.SIGNALING_OFFER.LOCAL_OFFER: {
               if (this._solve_colliding_states()) {
-                return;
+                throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.SDP_STATE_COLLISION);
               }
               break;
             }
@@ -1028,7 +1028,7 @@ z.calling.entities.EFlow = class EFlow {
       return false;
     }
 
-    this.logger.warn(`Remote side needs to switch SDP state of flow with '${this.remote_user.name()}' to answer.`);
+    this.logger.warn(`Remote side '${this.remote_user.name()}' needs to switch SDP state flow  to answer.`);
     return true;
   }
 

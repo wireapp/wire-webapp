@@ -50,6 +50,9 @@ z.calling.v3.CallError = class CallError extends Error {
       case z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED:
         this.message = 'PeerConnection does not support RtcRtpSender extension';
         break;
+      case z.calling.v3.CallError.TYPE.SDP_STATE_COLLISION:
+        this.message = 'Unresolved SDP states collision of participants';
+        break;
       case z.calling.v3.CallError.TYPE.UNSUPPORTED_VERSION:
         this.message = 'Unsupported version of the e-call protocol';
         break;
@@ -75,6 +78,7 @@ z.calling.v3.CallError = class CallError extends Error {
       NO_USER_ID: 'z.calling.v3.CallError.TYPE.NO_USER_ID',
       NOT_FOUND: 'z.calling.v3.CallError.TYPE.NOT_FOUND',
       RTP_SENDER_NOT_SUPPORTED: 'z.calling.v3.CallError.TYPE.RTP_SENDER_NOT_SUPPORTED',
+      SDP_STATE_COLLISION: 'z.calling.v3.CallError.TYPE.SDP_STATE_COLLISION',
       UNKNOWN: 'z.calling.v3.CallError.TYPE.UNKNOWN',
       UNSUPPORTED_VERSION: 'z.calling.v3.CallError.TYPE.UNSUPPORTED_VERSION',
       WRONG_CONVERSATION_TYPE: 'z.calling.v3.CallError.TYPE.WRONG_CONVERSATION_TYPE',
