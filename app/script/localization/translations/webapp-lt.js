@@ -309,7 +309,6 @@ z.string.lt.extensions_giphy_random = 'Atsitiktinis';
 z.string.lt.search_open = 'Atverti';
 z.string.lt.search_open_group = 'Sukurti grupę';
 z.string.lt.people_confirm_label = 'Pridėti į pokalbį';
-z.string.lt.people_common_contacts = 'Jūs abu pažįstami su';
 z.string.lt.people_people = '%no žmonių';
 z.string.lt.people_search_placeholder = 'Ieškokite pagal vardą';
 z.string.lt.people_everyone_participates = 'Visi, su kuo esate\nužmezgę kontaktą, jau yra\nšiame pokalbyje.';
