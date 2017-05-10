@@ -66,3 +66,32 @@ describe('Localizer', function() {
     expect(text).toBe('<span class="user"></span> won’t see you in search results and won’t be able to send you messages.');
   });
 });
+
+describe('l10n', function() {
+
+  it('can get localized strings', function() {
+    const text = z.l10n.text(z.string.wire);
+    expect(text).toBe(z.string.wire);
+  });
+
+  it('can get localized strings when value is observable', function() {
+    const text = z.l10n.text(ko.observable(z.string.wire));
+    expect(text).toBe(z.string.wire);
+  });
+
+  it('can replace placeholders in localized strings using shorthand string version', function() {
+    const text = z.l10n.text('Hey {{name}}', 'Tod');
+    expect(text).toBe('Hey Tod');
+  });
+
+  it('can replace placeholders in localized strings using an object', function() {
+    const text = z.l10n.text('Hey {{name}}', {name: 'Tod'});
+    expect(text).toBe('Hey Tod');
+  });
+
+  it('can replace placeholders in localized strings using a more complex object', function() {
+    const text = z.l10n.text('{{greeting}} {{name}}', {name: 'Tod', greeting: 'Hey'});
+    expect(text).toBe('Hey Tod');
+  });
+
+});
