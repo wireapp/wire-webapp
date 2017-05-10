@@ -124,9 +124,9 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {undefined} No return value
    */
   _on_event_in_supported_browsers(e_call_message_et) {
-    const {conversation_id, type, user_id} = e_call_message_et;
+    const {conversation_id, response, type, user_id} = e_call_message_et;
 
-    this.logger.info(`Received e-call '${type}' message from user '${user_id}' in conversation '${conversation_id}'`, e_call_message_et);
+    this.logger.info(`Received e-call '${type}' response '${response}' message from user '${user_id}' in conversation '${conversation_id}'`, e_call_message_et);
 
     this._validate_message_type(e_call_message_et)
     .then(() => {
