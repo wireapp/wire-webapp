@@ -362,6 +362,7 @@ window.TestFactory.prototype.exposeCallingActors = function() {
       TestFactory.calling_repository = new z.calling.CallingRepository(
         TestFactory.call_service,
         TestFactory.calling_service,
+        TestFactory.client_repository,
         TestFactory.conversation_repository,
         TestFactory.media_repository,
         TestFactory.user_repository

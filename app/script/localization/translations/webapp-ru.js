@@ -309,7 +309,6 @@ z.string.ru.extensions_giphy_random = 'Случайно';
 z.string.ru.search_open = 'Открыть';
 z.string.ru.search_open_group = 'Создать группу';
 z.string.ru.people_confirm_label = 'Добавить в разговор';
-z.string.ru.people_common_contacts = 'Вы оба знакомы с';
 z.string.ru.people_people = '%no участника(ов)';
 z.string.ru.people_search_placeholder = 'Поиск по имени';
 z.string.ru.people_everyone_participates = 'Все ваши контакты \nуже участвуют\nв этом разговоре.';
@@ -559,7 +558,7 @@ z.string.ru.tooltip_search_close = 'Закрыть (Esc)';
 
 z.string.ru.init_received_access_token = 'Вы вошли';
 z.string.ru.init_received_self_user = 'Здравствуйте, %name.';
-z.string.ru.init_validated_client = 'Загрузка ваших контактов и разговоров';
+z.string.ru.init_validated_client = 'Загрузка контактов и разговоров';
 z.string.ru.init_received_user_data = 'Проверка наличия новых сообщений';
 z.string.ru.init_events_progress = 'Загрузка сообщений — %progress из %total';
 z.string.ru.init_updated_from_notifications = 'Наслаждайтесь Wire';

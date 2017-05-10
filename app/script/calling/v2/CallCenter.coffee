@@ -91,7 +91,7 @@ class z.calling.v2.CallCenter
       return @logger.info "Skipping '#{event.type}' event in conversation '#{event.conversation}'", {event_object: event, event_json: JSON.stringify event}
     @logger.info "Handling '#{event.type}' event in conversation '#{event.conversation}", {event_object: event, event_json: JSON.stringify event}
 
-    @_on_handled_call_event event if z.calling.CallingRepository.supports_calling()
+    @_on_handled_call_event event if z.calling.CallingRepository.supports_calling
 
   ###
   Handle incoming backend conversation events.
@@ -99,7 +99,7 @@ class z.calling.v2.CallCenter
   ###
   on_conversation_event: (event) =>
     return if event.type not in CONFIG.SUPPORTED_CONVERSATION_EVENTS
-    @_on_handled_conversation_event event unless z.calling.CallingRepository.supports_calling()
+    @_on_handled_conversation_event event unless z.calling.CallingRepository.supports_calling
 
   ###
   Backend call event handling.
