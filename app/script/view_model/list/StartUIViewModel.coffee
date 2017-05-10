@@ -313,12 +313,12 @@ class z.ViewModel.list.StartUIViewModel
     .then (user_ids) =>
       return @user_repository.get_users_by_id user_ids
     .then (user_ets) ->
-      return user_ets.filter (user_et) -> not user_et.blocked()
+      return user_ets.filter (user_et) -> not user_et.is_blocked()
 
   get_connections: =>
     Promise.resolve().then =>
       return @user_repository.users()
-        .filter (user_et) -> user_et.connected()
+        .filter (user_et) -> user_et.is_connected()
         .sort (user_a, user_b) -> z.util.StringUtil.sort_by_priority user_a.first_name(), user_b.first_name()
 
   ###############################################################################

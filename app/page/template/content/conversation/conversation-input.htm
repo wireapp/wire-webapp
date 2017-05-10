@@ -6,7 +6,7 @@
                   'conversation-input-editing': $root.conversation_input.is_editing()
                 }">
 
-  <!-- ko if: conversation_et() && conversation_et().connection().status() !== z.user.ConnectionStatus.SENT -->
+  <!-- ko if: conversation_et() && conversation_et().connection().is_outgoing_request() -->
     <div class="controls-left">
       <!-- ko if: input().length > 0 -->
         <user-avatar class="user-avatar-xs cursor-default" params="user: self()"></user-avatar>

@@ -647,7 +647,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
 
-        if ([z.user.ConnectionStatus.ACCEPTED, z.user.ConnectionStatus.SENT].includes(connection_et.status())) {
+        if (connection_et.is_connected() || connection_et.is_outgoing_request()) {
           return this.fetch_conversation_by_id(connection_et.conversation_id);
         }
 
@@ -656,7 +656,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then((conversation_et) => {
         conversation_et.connection(connection_et);
 
-        if (connection_et.status() === z.user.ConnectionStatus.ACCEPTED) {
+        if (connection_et.is_connected()) {
           conversation_et.type(z.conversation.ConversationType.ONE2ONE);
         }
 
@@ -2179,7 +2179,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return false;
     }
 
-    if (conversation_et.is_one2one() && conversation_et.connection().status() !== z.user.ConnectionStatus.ACCEPTED) {
+    if (conversation_et.is_one2one() && !conversation_et.connection().is_connected) {
       return false;
     }
 
