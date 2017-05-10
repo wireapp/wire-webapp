@@ -90,7 +90,7 @@ describe('l10n', function() {
   });
 
   it('can replace placeholders in localized strings using a more complex object', function() {
-    const text = z.l10n.text('{{greeting}} {{name}}', {name: 'Tod', greeting: 'Hey'});
+    const text = z.l10n.text('{{greeting}} {{name}}', {greeting: 'Hey', name: 'Tod'});
     expect(text).toBe('Hey Tod');
   });
 

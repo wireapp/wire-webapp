@@ -34,27 +34,26 @@ z.conversation.ConversationCellState = (() => {
     for (const activity in activities) {
       const count = activities[activity];
 
-      // TODO: localization
       switch (activity) {
         case 'message':
           if (count === 1) {
-            activity_strings.push(`${count} new message`);
+            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_new_message, count));
           } else if (count > 1) {
-            activity_strings.push(`${count} new messages`);
+            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_new_messages, count));
           }
           break;
         case 'ping':
           if (count === 1) {
-            activity_strings.push(`${count} ping`);
+            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_ping, count));
           } else if (count > 1) {
-            activity_strings.push(`${count} pings`);
+            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_pings, count));
           }
           break;
         case 'call':
           if (count === 1) {
-            activity_strings.push(`${count} missed call`);
+            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_missed_call, count));
           } else if (count > 1) {
-            activity_strings.push(`${count} missed calls`);
+            activity_strings.push(z.l10n.text(z.string.conversations_secondary_line_missed_calls, count));
           }
           break;
         default:
@@ -96,7 +95,7 @@ z.conversation.ConversationCellState = (() => {
 
   const empty_state = {
     description() {
-      return z.localization.Localizer.get_text(z.string.conversations_empty_conversation_description);
+      return z.l10n.text(z.string.conversations_empty_conversation_description);
     },
     icon() {
       return z.conversation.ConversationStatusIcon.NONE;
@@ -151,21 +150,28 @@ z.conversation.ConversationCellState = (() => {
   const group_activity_state = {
     description(conversation_et) {
       const last_message_et = conversation_et.get_last_message();
+      const remote_user_count = last_message_et.remote_user_ets().length === 1;
+      const sender_name = last_message_et.sender_name();
       let message_text;
+
       switch (last_message_et.type) {
         case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-          if (last_message_et.remote_user_ets().length === 1) {
-            message_text = 'person left';
-          } else if (last_message_et.remote_user_ets().length > 1) {
-            message_text = 'people left';
+          if (remote_user_count === 1) {
+            message_text = z.l10n.text(z.string.conversations_secondary_line_person_left, remote_user_count);
+          } else if (remote_user_count > 1) {
+            message_text = z.l10n.text(z.string.conversations_secondary_line_people_left, remote_user_count);
           }
           break;
         case z.event.Backend.CONVERSATION.MEMBER_JOIN:
-          if (last_message_et.remote_user_ets().length === 1) {
-            message_text = `${last_message_et.sender_name()} added ${last_message_et.remote_user_ets()[0].first_name()}`;
-          } else if (last_message_et.remote_user_ets().length > 1) {
-            message_text = `${last_message_et.remote_user_ets().length} people were added`;
+          if (remote_user_count === 1) {
+            const remote_name = last_message_et.remote_user_ets()[0].first_name();
+            message_text = z.l10n.text(z.string.conversations_secondary_line_person_added, {user1: sender_name, user2: remote_name});
+          } else if (remote_user_count > 1) {
+            message_text = z.l10n.text(z.string.conversations_secondary_line_people_added, remote_user_count);
           }
+          break;
+        case z.event.Backend.CONVERSATION.RENAME:
+          message_text = z.l10n.text(z.string.conversations_secondary_line_renamed, sender_name);
           break;
         default:
           message_text = '';
@@ -192,24 +198,24 @@ z.conversation.ConversationCellState = (() => {
       let message_text = '';
 
       if (last_message_et.is_ephemeral()) {
-        message_text = z.localization.Localizer.get_text(z.string.conversations_secondary_line_timed_message);
+        message_text = z.l10n.text(z.string.conversations_secondary_line_timed_message);
       } else if (last_message_et.is_ping()) {
-        message_text = z.localization.Localizer.get_text(z.string.system_notification_ping);
+        message_text = z.l10n.text(z.string.system_notification_ping);
       } else if (last_message_et.has_asset_text()) {
         message_text = last_message_et.get_first_asset().text;
       } else if (last_message_et.has_asset()) {
         const asset_et = last_message_et.get_first_asset();
         if (asset_et.is_audio()) {
-          message_text = z.localization.Localizer.get_text(z.string.system_notification_shared_audio);
+          message_text = z.l10n.text(z.string.system_notification_shared_audio);
         } else if (asset_et.is_video()) {
-          message_text = z.localization.Localizer.get_text(z.string.system_notification_shared_video);
+          message_text = z.l10n.text(z.string.system_notification_shared_video);
         } else {
-          message_text = z.localization.Localizer.get_text(z.string.system_notification_shared_file);
+          message_text = z.l10n.text(z.string.system_notification_shared_file);
         }
       } else if (last_message_et.has_asset_location()) {
-        message_text = z.localization.Localizer.get_text(z.string.system_notification_shared_location);
+        message_text = z.l10n.text(z.string.system_notification_shared_location);
       } else if (last_message_et.has_asset_image()) {
-        message_text = z.localization.Localizer.get_text(z.string.system_notification_asset_add);
+        message_text = z.l10n.text(z.string.system_notification_asset_add);
       }
 
       if (conversation_et.is_group()) {

@@ -107,7 +107,7 @@ z.l10n = (() => {
      * z.l10.text('{{greeting}} {{name}}', {name: 'Tod', greeting: 'Hey') // returns 'Hey Tod'
      *
      * @param {Observable|string} value - localized string in our case usually z.string.foo
-     * @param {string|Object} substitute - data to fill all the placeholder with
+     * @param {string|Object} [substitute] - data to fill all the placeholder with
      * @returns {string} - string with substituted placeholders
      */
     text(value, substitute) {

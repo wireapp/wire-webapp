@@ -322,6 +322,7 @@ z.string.conversations_secondary_line_people_left = '{{number}} people left';
 z.string.conversations_secondary_line_person_added = '{{user1}} added {{user2}}';
 z.string.conversations_secondary_line_people_added = '{{user}} people were added';
 z.string.conversations_secondary_line_timed_message = 'Timed message';
+z.string.conversations_secondary_line_renamed = '{{user}} renamed';
 
 // Takeover
 z.string.takeover_headline = 'Usernames are here.';
