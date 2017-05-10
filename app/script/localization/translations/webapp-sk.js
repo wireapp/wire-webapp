@@ -309,7 +309,6 @@ z.string.sk.extensions_giphy_random = 'Náhodný';
 z.string.sk.search_open = 'Otvoriť';
 z.string.sk.search_open_group = 'Vytvoriť skupinu';
 z.string.sk.people_confirm_label = 'Pridať do rozhovoru';
-z.string.sk.people_common_contacts = 'Obaja poznáte';
 z.string.sk.people_people = '%no Ľudí';
 z.string.sk.people_search_placeholder = 'Vyhľadať podľa mena';
 z.string.sk.people_everyone_participates = 'Všetci pripojení sú už v tomto rozhovore.';

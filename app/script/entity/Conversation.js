@@ -53,7 +53,7 @@ z.entity.Conversation = class Conversation {
     // in case this is a one2one conversation this is the connection to that user
     this.connection = ko.observable(new z.entity.Connection());
     this.connection.subscribe((connection_et) => {
-      if (this.participating_user_ids().includes(connection_et.to)) {
+      if (!this.participating_user_ids().includes(connection_et.to)) {
         return this.participating_user_ids([connection_et.to]);
       }
     });
@@ -135,7 +135,7 @@ z.entity.Conversation = class Conversation {
       if (!this.call()) {
         return false;
       }
-      return !z.calling.enum.CallStateGroups.IS_ENDED.includes(this.call().state()) && !this.call().is_ongoing_on_another_client();
+      return !z.calling.enum.CALL_STATE_GROUP.IS_ENDED.includes(this.call().state()) && !this.call().is_ongoing_on_another_client();
     });
 
     this.unread_events = ko.pureComputed(() => {

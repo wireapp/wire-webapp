@@ -309,7 +309,6 @@ z.string.sl.extensions_giphy_random = 'Naključno';
 z.string.sl.search_open = 'Odpri';
 z.string.sl.search_open_group = 'Ustvari skupino';
 z.string.sl.people_confirm_label = 'Dodaj v pogovor';
-z.string.sl.people_common_contacts = 'Oba poznata';
 z.string.sl.people_people = '%no oseb';
 z.string.sl.people_search_placeholder = 'Iskanje po imenu';
 z.string.sl.people_everyone_participates = 'Vsi \ns katerimi ste povezani,\nso že v tem pogovoru.';

@@ -3177,7 +3177,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
       case 'calling': {
         const {props: properties} = e_call_message_et;
-        action_type = properties.videosend === 'true' ? 'video_call' : 'audio_call';
+        action_type = properties.videosend === z.calling.enum.PROPERTY_STATE.TRUE ? 'video_call' : 'audio_call';
         break;
       }
 

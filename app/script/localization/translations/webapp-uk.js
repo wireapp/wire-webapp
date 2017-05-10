@@ -308,7 +308,6 @@ z.string.uk.extensions_giphy_random = 'Випадкова';
 z.string.uk.search_open = 'Вiдкрити';
 z.string.uk.search_open_group = 'Створити групу';
 z.string.uk.people_confirm_label = 'Додати до розмови';
-z.string.uk.people_common_contacts = 'Ви обидва знайомі з';
 z.string.uk.people_people = '%no учасників';
 z.string.uk.people_search_placeholder = 'Пошук за іменем';
 z.string.uk.people_everyone_participates = 'Всі ваші контакти\nуже присутні\nв даній групі.';

@@ -24,6 +24,9 @@ z.util.NumberUtil = {
     const MAX_VALUE = 255;
     return Math.min(Math.abs(parseInt(value * MAX_VALUE, 10)), MAX_VALUE);
   },
+  get_random_number: function(minimum, maximum) {
+    return Math.floor(Math.random() * (maximum - minimum + 1) + minimum);
+  },
   in_range: function(value, lower_bound, upper_bound) {
     return (value >= lower_bound) && (value <= upper_bound);
   },

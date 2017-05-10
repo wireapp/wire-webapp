@@ -298,7 +298,6 @@ z.string.tr.extensions_giphy_random = 'Rastgele';
 z.string.tr.search_open = 'Aç';
 z.string.tr.search_open_group = 'Grup oluştur';
 z.string.tr.people_confirm_label = 'Konuşmaya ekle';
-z.string.tr.people_common_contacts = 'İkiniz de tanıyorsunuz';
 z.string.tr.people_people = '%no kişi';
 z.string.tr.people_search_placeholder = 'İsme göre ara';
 z.string.tr.people_everyone_participates = 'Bağlantıda olduğun herkes zaten bu görüşme içerisinde.';
