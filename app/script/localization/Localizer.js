@@ -96,6 +96,15 @@ z.l10n = (() => {
   return {
 
     /**
+     * Retrieve localized string and replace placeholders
+     *
+     * This method give you two options to replace placeholders
+     *
+     * @example using a string as substitute
+     * z.l10.text('Hey {{name}}', 'Tod') // returns 'Hey Tod'
+     *
+     * @example using an object as substitute
+     * z.l10.text('{{greeting}} {{name}}', {name: 'Tod', greeting: 'Hey') // returns 'Hey Tod'
      *
      * @param {Observable|string} value
      * @param {string|Object} substitute
