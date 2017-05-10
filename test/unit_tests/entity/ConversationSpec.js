@@ -33,29 +33,6 @@ describe('Conversation', function() {
     other_user = new z.entity.User(entities.user.jane_roe.id);
   });
 
-  xdescribe('connection', function() {
-    it('updates the participating user IDs with the user ID of the other party', function() {
-      const connector_user_id = 'b43b376d-7b5a-4d77-89be-81a02892db8c';
-
-      // @formatter:off
-      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const payload_connection = {"status":"sent","conversation":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","to":`${connector_user_id}`,"from":"616cbbeb-1360-4e17-b333-e000662257bd","last_update":"2017-05-10T11:34:18.396Z","message":" "};
-      const payload_conversation = {"access":["private"],"creator":"616cbbeb-1360-4e17-b333-e000662257bd","members":{"self":{"hidden_ref":null,"status":0,"last_read":"1.800122000a73cb62","muted_time":null,"service":null,"otr_muted_ref":null,"muted":null,"status_time":"2017-05-10T11:34:18.376Z","hidden":false,"status_ref":"0.0","id":"616cbbeb-1360-4e17-b333-e000662257bd","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":null,"archived":null},"others":[]},"name":"Marco","id":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","type":3,"last_event_time":"2017-05-10T11:34:18.376Z","last_event":"2.800122000a73cb63"};
-      /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
-      // @formatter:on
-
-      const user_connection_mapper = new z.user.UserConnectionMapper();
-      const connection_et = user_connection_mapper.map_user_connection_from_json(payload_connection);
-
-      const conversation_mapper = new z.conversation.ConversationMapper();
-      conversation_et = conversation_mapper._create_conversation_et(payload_conversation);
-      conversation_et.connection(connection_et);
-
-      expect(conversation_et.participating_user_ids().length).toBe(1);
-      expect(conversation_et.participating_user_ids()[0]).toBe(connector_user_id);
-    });
-  });
-
   describe('timestamp', function() {
     it('adding a message should update the conversation timestamp', function() {
       const message_et = new z.entity.Message();
