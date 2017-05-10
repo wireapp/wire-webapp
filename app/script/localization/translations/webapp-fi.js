@@ -276,7 +276,6 @@ z.string.fi.extensions_giphy_random = 'Satunnainen';
 z.string.fi.search_open = 'Avaa';
 z.string.fi.search_open_group = 'Luo Ryhmä';
 z.string.fi.people_confirm_label = 'Lisää keskusteluun';
-z.string.fi.people_common_contacts = 'Te molemmat tunnette';
 z.string.fi.people_people = '%no Ihmistä';
 z.string.fi.people_search_placeholder = 'Hae nimellä';
 z.string.fi.people_everyone_participates = 'Jokainen jonka kanssa olet yhdistetty on jo tässä keskustelussa.';

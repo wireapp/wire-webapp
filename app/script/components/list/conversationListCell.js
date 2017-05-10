@@ -49,7 +49,7 @@ ko.components.register('conversation-list-cell', {
     <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}, in_viewport: on_in_viewport">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation() || conversation.participating_user_ids().length === 0}">
         <!-- ko if: conversation.is_group() -->
-          <group-avatar class="conversation-list-cell-avatar-arrow" data-uie-name="go-options" params="users: users(), conversation: conversation"></group-avatar>
+          <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
         <!-- /ko -->
         <!-- ko ifnot: conversation.is_group() -->
           <user-avatar class="user-avatar-s" params="user: users()[0]"></user-avatar>

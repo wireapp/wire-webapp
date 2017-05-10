@@ -49,13 +49,13 @@ class z.ViewModel.VideoCallingViewModel
 
     @videod_call = ko.pureComputed =>
       for call_et in @calls()
-        is_active = call_et.state() in z.calling.enum.CallStateGroups.IS_ACTIVE
+        is_active = call_et.state() in z.calling.enum.CALL_STATE_GROUP.IS_ACTIVE
         self_video_send = call_et.self_client_joined() and @self_stream_state.screen_send() or @self_stream_state.video_send()
         remote_video_send = (call_et.is_remote_screen_send() or call_et.is_remote_video_send()) and not call_et.is_ongoing_on_another_client()
         return call_et if is_active and (self_video_send or remote_video_send or @is_choosing_screen())
 
     @is_ongoing = ko.pureComputed =>
-      return @videod_call()? and @joined_call()?.state() is z.calling.enum.CallState.ONGOING
+      return @videod_call()? and @joined_call()?.state() is z.calling.enum.CALL_STATE.ONGOING
 
     @overlay_icon_class = ko.pureComputed =>
       if @is_ongoing()
@@ -70,7 +70,7 @@ class z.ViewModel.VideoCallingViewModel
     @show_local = ko.pureComputed =>
       return (@show_local_video() or @overlay_icon_class()) and not @multitasking.is_minimized() and not @is_choosing_screen()
     @show_local_video = ko.pureComputed =>
-      is_visible = @self_stream_state.screen_send() or @self_stream_state.video_send() or @videod_call()?.state() isnt z.calling.enum.CallState.ONGOING
+      is_visible = @self_stream_state.screen_send() or @self_stream_state.video_send() or @videod_call()?.state() isnt z.calling.enum.CALL_STATE.ONGOING
       return is_visible and @local_video_stream()
 
     @show_remote = ko.pureComputed =>
@@ -95,7 +95,7 @@ class z.ViewModel.VideoCallingViewModel
     @show_toggle_video = ko.pureComputed =>
       return @joined_call()?.conversation_et.is_one2one()
     @show_toggle_screen = ko.pureComputed ->
-      return z.calling.CallingRepository.supports_screen_sharing()
+      return z.calling.CallingRepository.supports_screen_sharing
     @disable_toggle_screen = ko.pureComputed =>
       return @joined_call()?.is_remote_screen_send()
 
@@ -208,10 +208,10 @@ class z.ViewModel.VideoCallingViewModel
     media_element = event.target
     if media_element.videoHeight > media_element.videoWidth
       @remote_video_element_contain true
-      detected_video_mode = z.calling.enum.VideoOrientation.PORTRAIT
+      detected_video_mode = z.calling.enum.VIDEO_ORIENTATION.PORTRAIT
     else
       @remote_video_element_contain false
-      detected_video_mode = z.calling.enum.VideoOrientation.LANDSCAPE
+      detected_video_mode = z.calling.enum.VIDEO_ORIENTATION.LANDSCAPE
     @logger.info "Remote video is in '#{detected_video_mode}' mode"
 
 

@@ -41,7 +41,7 @@ class z.ViewModel.ConversationTitlebarViewModel
 
     @has_ongoing_call = ko.computed =>
       return false if not @joined_call()
-      return @has_call() and @joined_call().state() is z.calling.enum.CallState.ONGOING
+      return @has_call() and @joined_call().state() is z.calling.enum.CALL_STATE.ONGOING
 
     @show_maximize_control = ko.pureComputed =>
       return false if not @joined_call()
@@ -71,9 +71,8 @@ class z.ViewModel.ConversationTitlebarViewModel
     amplify.unsubscribe z.event.WebApp.SHORTCUT.PEOPLE
     amplify.unsubscribe z.event.WebApp.SHORTCUT.ADD_PEOPLE
 
-  click_on_call_button: =>
-    return if not @conversation_et()
-    amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, @conversation_et().id, false
+  click_on_call_button: ->
+    amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, false
 
   click_on_maximize: =>
     @multitasking.auto_minimize false
@@ -83,12 +82,8 @@ class z.ViewModel.ConversationTitlebarViewModel
   click_on_participants: =>
     @show_participants()
 
-  click_on_video_button: =>
-    return if not @conversation_et()
-    if @conversation_et().is_group()
-      amplify.publish z.event.WebApp.WARNING.MODAL, z.ViewModel.ModalType.CALL_NO_VIDEO_IN_GROUP
-    else
-      amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, @conversation_et().id, true
+  click_on_video_button: ->
+    amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, true
 
   click_on_collection_button: ->
     amplify.publish z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.COLLECTION
