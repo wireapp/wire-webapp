@@ -86,7 +86,7 @@ class z.ViewModel.list.ConversationListViewModel
     @self_stream_state = @calling_repository.self_stream_state
 
     @show_toggle_screen = ko.pureComputed ->
-      return z.calling.CallingRepository.supports_screen_sharing()
+      return z.calling.CallingRepository.supports_screen_sharing
     @show_toggle_video = ko.pureComputed =>
       return @joined_call()?.conversation_et.is_one2one()
     @disable_toggle_screen = ko.pureComputed =>
@@ -102,8 +102,10 @@ class z.ViewModel.list.ConversationListViewModel
     @content_view_model.show_conversation conversation_et
 
   set_show_calls_state: (handling_notifications) =>
-    @show_calls handling_notifications is z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
-    @logger.info "Set show calls state to: #{@show_calls()}"
+    updated_show_calls_state = handling_notifications is z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET
+    if @show_calls isnt updated_show_calls_state
+      @show_calls updated_show_calls_state
+      @logger.debug "Set show calls state to: #{@show_calls()}"
 
   _init_subscriptions: =>
     amplify.subscribe z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, @set_show_calls_state
@@ -149,9 +151,8 @@ class z.ViewModel.list.ConversationListViewModel
   on_accept_video: (conversation_et) ->
     amplify.publish z.event.WebApp.CALL.STATE.JOIN, conversation_et.id, true
 
-  on_leave_call: (conversation_et) =>
-    termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER if @joined_call()?.state() isnt z.calling.enum.CallState.OUTGOING
-    amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, termination_reason
+  on_leave_call: (conversation_et) ->
+    amplify.publish z.event.WebApp.CALL.STATE.LEAVE, conversation_et.id, z.calling.enum.TERMINATION_REASON.SELF_USER
 
   on_reject_call: (conversation_et) ->
     amplify.publish z.event.WebApp.CALL.STATE.REJECT, conversation_et.id
@@ -178,3 +179,11 @@ class z.ViewModel.list.ConversationListViewModel
 
   click_on_people_button: =>
     @list_view_model.switch_list z.ViewModel.list.LIST_STATE.START_UI
+
+  ###############################################################################
+  # Legacy
+  ###############################################################################
+
+  click_on_clear_action: ->
+    # desktop clients <= 2.13.2742 rely on that function.
+    amplify.publish z.event.WebApp.SHORTCUT.DELETE

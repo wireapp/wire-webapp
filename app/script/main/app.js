@@ -87,7 +87,7 @@ z.main.App = class App {
     );
 
     repositories.bot                 = new z.bot.BotRepository(this.service.bot, repositories.conversation);
-    repositories.calling             = new z.calling.CallingRepository(this.service.call, this.service.calling, repositories.conversation, repositories.media, repositories.user);
+    repositories.calling             = new z.calling.CallingRepository(this.service.call, this.service.calling, repositories.client, repositories.conversation, repositories.media, repositories.user);
     repositories.event_tracker       = new z.tracking.EventTrackingRepository(repositories.conversation, repositories.user);
     repositories.system_notification = new z.system_notification.SystemNotificationRepository(repositories.calling, repositories.conversation);
 
@@ -284,7 +284,7 @@ z.main.App = class App {
       }
 
       if (navigator.onLine) {
-        this.logger.error(`Caused by: ${(error != null ? error.message : undefined) || error}`);
+        this.logger.error(`Caused by: ${(error != null ? error.message : undefined) || error}`, error);
         if (error instanceof z.storage.StorageError) {
           Raygun.send(error);
         }

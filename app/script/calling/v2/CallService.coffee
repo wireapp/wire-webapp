@@ -86,7 +86,7 @@ class z.calling.v2.CallService
 
   @param conversation_id [String] Conversation ID
   @param flow_id [String] Flow ID
-  @param ice_info [z.calling.payloads.ICECandidateInfo] Signaling info bundled with ICE candidate
+  @param ice_info [ICECandidateInfo] Signaling info bundled with ICE candidate
   ###
   post_local_candidates: (conversation_id, flow_id, ice_info) ->
     @client.send_json

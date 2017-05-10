@@ -263,7 +263,6 @@ z.string.cs.extensions_giphy_random = 'Náhodně';
 z.string.cs.search_open = 'Otevřít';
 z.string.cs.search_open_group = 'Vytvořit skupinu';
 z.string.cs.people_confirm_label = 'Přidat ke konverzaci';
-z.string.cs.people_common_contacts = 'Oba znáte';
 z.string.cs.people_people = '%no lidí';
 z.string.cs.people_search_placeholder = 'Hledat podle jména';
 z.string.cs.people_everyone_participates = 'Všichni, které znáte\njsou již připojeni\nk této konverzaci.';

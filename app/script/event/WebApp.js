@@ -190,6 +190,7 @@ z.event.WebApp = {
     ARCHIVE: 'wire.webapp.shortcut.archive',
     CALL_MUTE: 'wire.webapp.shortcut.call_mute',
     CALL_REJECT: 'wire.webapp.shortcut.call_reject',
+    DELETE: 'wire.webapp.shortcut.delete',
     NEXT: 'wire.webapp.shortcut.next',
     PEOPLE: 'wire.webapp.shortcut.people',
     PICTURE: 'wire.webapp.shortcut.picture',

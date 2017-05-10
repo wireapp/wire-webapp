@@ -26,7 +26,7 @@ window.z.conversation = z.conversation || {};
 z.conversation.EventMapper = class EventMapper {
   /**
    * Construct a new Event Mapper.
-   * @param {z.assets.AssetService} asset_service - Asset handling service
+   * @param {AssetService} asset_service - Asset handling service
    */
   constructor(asset_service) {
     this.map_json_event = this.map_json_event.bind(this);
@@ -38,7 +38,7 @@ z.conversation.EventMapper = class EventMapper {
    * Convert multiple JSON events into message entities.
    *
    * @param {Object} events - Event data
-   * @param {z.entity.Conversation} conversation_et - Conversation entity the events belong to
+   * @param {Conversation} conversation_et - Conversation entity the events belong to
    * @param {boolean} should_create_dummy_image - Create a dummy image
    * @returns {Array<Message>} Mapped message entities
    */
@@ -54,7 +54,7 @@ z.conversation.EventMapper = class EventMapper {
    * Convert JSON event into a message entity.
    *
    * @param {Object} event - Event data
-   * @param {z.entity.Conversation} conversation_et - Conversation entity the event belong to
+   * @param {Conversation} conversation_et - Conversation entity the event belong to
    * @param {boolean} should_create_dummy_image - Create a dummy image
    * @returns {Message} Mapped message entity
    */
@@ -71,7 +71,7 @@ z.conversation.EventMapper = class EventMapper {
    * Convert JSON event into a message entity.
    *
    * @param {Object} event - Event data
-   * @param {z.entity.Conversation} conversation_et - Conversation entity the event belong to
+   * @param {Conversation} conversation_et - Conversation entity the event belong to
    * @param {boolean} should_create_dummy_image - Create a dummy image
    * @returns {Message} Mapped message entity
    */
@@ -175,9 +175,7 @@ z.conversation.EventMapper = class EventMapper {
     const event_data = event.data;
     const message_et = new z.entity.ContentMessage();
 
-    if (event_data && event_data.info.tag === z.assets.ImageSizeType.MEDIUM) {
-      message_et.assets.push(this._map_asset_medium_image(event, should_create_dummy_image));
-    }
+    message_et.assets.push(this._map_asset_image(event, should_create_dummy_image));
     message_et.nonce = event_data.info.nonce;
 
     return message_et;
@@ -553,7 +551,7 @@ z.conversation.EventMapper = class EventMapper {
    * @param {boolean} should_create_dummy_image - Create a dummy image
    * @returns {z.entity.MediumImage} Medium image asset entity
    */
-  _map_asset_medium_image(event, should_create_dummy_image) {
+  _map_asset_image(event, should_create_dummy_image) {
     const {data: event_data} = event;
     const {content_length, content_type, conversation: conversation_id, id, info} = event_data;
     const asset_et = new z.entity.MediumImage(id);

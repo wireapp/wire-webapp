@@ -339,15 +339,10 @@ z.user.UserRepository = class UserRepository {
    * @param {Object} event_json - JSON data
    * @returns {z.entity.User} Updated user entity.
    */
-  user_update(event_json) {
-    if (event_json.user.id === this.self().id) {
-      return this.user_mapper.update_user_from_object(this.self(), event_json.user);
-    }
-
-    return this.get_user_by_id(event_json.user.id)
-      .then((user_et) => {
-        return this.user_mapper.update_user_from_object(user_et, event_json.user);
-      });
+  user_update({user}) {
+    return Promise.resolve()
+      .then(() => user.id === this.self().id ? this.self() : this.get_user_by_id(user.id))
+      .then((user_et) => this.user_mapper.update_user_from_object(user_et, user));
   }
 
   /**
@@ -849,40 +844,7 @@ z.user.UserRepository = class UserRepository {
    * @returns {undefined} No return value
    */
   change_picture(picture) {
-    this._set_picture_v2(picture, false);
-    return this._set_picture_v3(picture);
-  }
-
-  /**
-   * Set the profile image using v2 API.
-   * @deprecated
-   * @param {string|Object} picture - New user picture
-   * @param {boolean} update - update user entity
-   * @returns {undefined} No return value
-   */
-  _set_picture_v2(picture, update = true) {
-    return this.asset_service.upload_profile_image(this.self().id, picture)
-      .then((upload_response) => {
-        return this.user_service.update_own_user_profile({picture: upload_response})
-          .then(() => {
-            if (update) {
-              return this.user_update({user: {id: this.self().id, picture: upload_response}});
-            }
-          });
-      })
-      .catch((error) => {
-        this.logger.warn(`Error during profile image upload: ${error.message}`);
-      });
-  }
-
-  /**
-   * Set the profile image using v3 API.
-   * @deprecated
-   * @param {string|Object} picture - New user picture
-   * @returns {undefined} No return value
-   */
-  _set_picture_v3(picture) {
-    return this.asset_service.upload_profile_image_v3(picture)
+    return this.asset_service.upload_profile_image(picture)
       .then(([small_key, medium_key]) => {
         const assets = [
           {key: small_key, size: 'preview', type: 'image'},

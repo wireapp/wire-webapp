@@ -18,26 +18,25 @@
  */
 
 group-avatar {
-  .square(28px);
+  .square(32px);
   border: 1px solid fade(#fff, 12%);
   border-radius: 6px;
 }
 
-.group-avatar-image-wrapper {
-  .square(26px);
+.group-avatar-box-wrapper {
+  .square(30px);
   border-radius: 7px;
   flex-wrap: wrap;
   display: flex;
   overflow: hidden;
 }
 
-.group-avatar-image {
-  background-color: fade(#000, 16%);
-  background-size: cover;
-  flex: 1 1 auto;
+.group-avatar-box {
+  .flex-center;
+  .square(13px);
+  background-color: fade(#000, 40%);
+  flex: 0 0 auto;
+  font-weight: 900;
+  font-size: 8px;
   margin: 1px;
-}
-
-.group-avatar-image-grid {
-  .square(11px);
 }
