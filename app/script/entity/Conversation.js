@@ -174,13 +174,11 @@ z.entity.Conversation = class Conversation {
      */
     this.display_name = ko.pureComputed(() => {
       if ([z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(this.type())) {
-        console.warn(`BENNY! ${this.name()}`, this.participating_user_ets());
-
         if (this.participating_user_ets()[0] && this.participating_user_ets()[0].name) {
           return this.participating_user_ets()[0].name();
         }
 
-        return '…!!!';
+        return '…';
       }
 
       if (this.is_group()) {
