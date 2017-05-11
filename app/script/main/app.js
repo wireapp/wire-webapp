@@ -268,7 +268,7 @@ z.main.App = class App {
       this.repository.announce.init();
       this.repository.audio.init(true);
       this.repository.client.cleanup_clients_and_sessions(true);
-      return this.logger.info('App fully loaded');
+      this.logger.info('App fully loaded');
     })
     .catch((error) => {
       let error_message = `Error during initialization of app version '${z.util.Environment.version(false)}'`;

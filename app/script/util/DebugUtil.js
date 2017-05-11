@@ -52,7 +52,7 @@ z.util.DebugUtil = class DebugUtil {
         return wire.app.repository.storage.storage_service.save(z.storage.StorageService.OBJECT_STORE.SESSIONS, session_id, record);
       })
       .then(() => {
-        return this.logger.log(`Corrupted Session ID '${session_id}'`);
+        this.logger.log(`Corrupted Session ID '${session_id}'`);
       });
   }
 
@@ -118,7 +118,7 @@ z.util.DebugUtil = class DebugUtil {
         const last_notification = notifications[notifications.length - 1];
         return this.get_notification_from_stream(notification_id, last_notification.id);
       }
-      return this.logger.log(`Notification '${notification_id}' was not found in encrypted notification stream`);
+      this.logger.log(`Notification '${notification_id}' was not found in encrypted notification stream`);
     };
 
     return wire.app.service.notification.get_notifications(client_id, notification_id_since, 10000)
