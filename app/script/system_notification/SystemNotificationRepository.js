@@ -166,9 +166,10 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    */
   set_muted_state(handling_notifications) {
     const updated_muted_state = handling_notifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+
     if (this.muted !== updated_muted_state) {
       this.muted = updated_muted_state;
-      this.logger.debug(`Set muted state to: ${this.muted}`);
+      this.logger.debug(`Block notifications: ${this.muted}`);
     }
   }
 

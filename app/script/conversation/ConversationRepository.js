@@ -2203,9 +2203,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Listener for incoming events.
    * @param {Object} event_json - JSON data for event
+   * @param {boolean} send_notification - Send a notification for message
    * @returns {Promise} Resolves when event was handled
    */
-  on_conversation_event(event_json) {
+  on_conversation_event(event_json, send_notification = false) {
     if (!event_json) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
@@ -2227,10 +2228,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     // Check if conversation was archived
-    let conversation_et, previously_archived;
+    let previously_archived;
     return this.get_conversation_by_id_async(conversation_id)
-      .then((conversation) => {
-        conversation_et = conversation;
+      .then((conversation_et) => {
         previously_archived = conversation_et.is_archived();
 
         switch (type) {
@@ -2262,11 +2262,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_add_event(conversation_et, event_json);
         }
       })
-      .then(() => {
-        // Un-archive it also on the backend side
-        if (!this.block_event_handling && previously_archived && !conversation_et.is_archived()) {
-          this.logger.info(`Unarchiving conversation '${conversation_et.id}' with new event`);
-          return this.unarchive_conversation(conversation_et);
+      .then((return_value) => {
+        if (_.isObject(return_value)) {
+          const {conversation_et, message_et} = return_value;
+
+          if (message_et && send_notification) {
+            amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
+          }
+
+          if (conversation_et) {
+            // Un-archive it also on the backend side
+            if (!this.block_event_handling && previously_archived && !conversation_et.is_archived()) {
+              this.logger.info(`Unarchiving conversation '${conversation_et.id}' with new event`);
+              return this.unarchive_conversation(conversation_et);
+            }
+          }
         }
       });
   }
@@ -2283,7 +2293,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when event was handled
    */
   push_to_receiving_queue(event_json) {
-    return this.receiving_queue.push(() => this.on_conversation_event(event_json));
+    return this.receiving_queue.push(() => this.on_conversation_event(event_json, !this.block_event_handling));
   }
 
   /**
@@ -2298,7 +2308,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this._add_event_to_conversation(event_json, conversation_et)
       .then((message_et) => {
         this.send_confirmation_status(conversation_et, message_et);
-        this._send_event_notification(conversation_et, message_et);
+        return {conversation_et: conversation_et, message_et: message_et};
       });
   }
 
@@ -2412,11 +2422,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.update_participating_user_ets(this.conversation_mapper.map_conversation(event_json))
           .then((conversation_et) => {
-            this._send_conversation_create_notification(conversation_et);
-            return this.save_conversation(conversation_et)
-              .then(function() {
-                return conversation_et;
-              });
+            return this.save_conversation(conversation_et);
+          })
+          .then((conversation_et) => {
+            return this._prepare_conversation_create_notification(conversation_et);
           });
       });
   }
@@ -2448,8 +2457,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return this._add_event_to_conversation(event_json, conversation_et);
       })
       .then((message_et) => {
-        amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
         this.verification_state_handler.on_member_joined(conversation_et, event_json.data.user_ids);
+        return {conversation_et: conversation_et, message_et: message_et};
       });
   }
 
@@ -2480,8 +2489,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
         return this.update_participating_user_ets(conversation_et)
           .then(() => {
-            amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
             this.verification_state_handler.on_member_left(conversation_et, message_et.user_ids());
+            return {conversation_et: conversation_et, message_et: message_et};
           });
       });
   }
@@ -2615,10 +2624,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const changes = message_et.update_reactions(event_json);
 
         if (changes) {
-          this._update_user_ets(message_et);
-          this._send_reaction_notification(conversation_et, message_et, event_json);
           this.logger.debug(`Updating reactions to message '${event_json.data.message_id}' in conversation '${conversation_et.id}'`, event_json);
-          return this.conversation_service.update_message_in_db(message_et, changes, conversation_et.id);
+          return this._update_user_ets(message_et)
+            .then((updated_message_et) => {
+              this.conversation_service.update_message_in_db(updated_message_et, changes, conversation_et.id);
+              return this._prepare_reaction_notification(conversation_et, updated_message_et, event_json);
+            });
         }
       })
       .catch((error) => {
@@ -2645,7 +2656,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this._add_event_to_conversation(event_json, conversation_et)
       .then((message_et) => {
         this.conversation_mapper.update_properties(conversation_et, event_json.data);
-        amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
+        return {conversation_et: conversation_et, message_et: message_et};
       });
   }
 
@@ -2718,28 +2729,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversation_et - Conversation that was created
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the notification was prepared
    */
-  _send_conversation_create_notification(conversation_et) {
-    this.user_repository.get_user_by_id(conversation_et.creator)
+  _prepare_conversation_create_notification(conversation_et) {
+    return this.user_repository.get_user_by_id(conversation_et.creator)
       .then(function(user_et) {
         const message_et = new z.entity.MemberMessage();
         message_et.user(user_et);
         message_et.member_message_type = z.message.SystemMessageType.CONVERSATION_CREATE;
-        amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
+        return {conversation_et: conversation_et, message_et: message_et};
       });
-  }
-
-  /**
-   * Forward the event to the SystemNotification repository for browser and audio notifications.
-   *
-   * @private
-   * @param {Conversation} conversation_et - Conversation that event was received in
-   * @param {Message} message_et - Message that has been received
-   * @returns {undefined} No return value
-   */
-  _send_event_notification(conversation_et, message_et) {
-    amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
   }
 
   /**
@@ -2749,20 +2748,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {Conversation} conversation_et - Conversation that event was received in
    * @param {Message} message_et - Message that has been reacted upon
    * @param {Object} event_json -] JSON data of received reaction event
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the notification was prepared
    */
-  _send_reaction_notification(conversation_et, message_et, event_json) {
+  _prepare_reaction_notification(conversation_et, message_et, event_json) {
     const {data: event_data, from} = event_json;
 
     if (event_data.reaction && message_et.from === this.user_repository.self().id) {
-      this.user_repository.get_user_by_id(from)
+      return this.user_repository.get_user_by_id(from)
         .then(function(user_et) {
           const reaction_message_et = new z.entity.Message(message_et.id, z.message.SuperType.REACTION);
           reaction_message_et.user(user_et);
           reaction_message_et.reaction = event_data.reaction;
-          amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, reaction_message_et);
+          return {conversation_et: conversation_et, message_et: reaction_message_et};
         });
     }
+
+    return Promise.resolve({conversation_et: conversation_et});
   }
 
   /**
@@ -2816,7 +2817,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   cancel_asset_upload(message_et) {
-    this.asset_service.cancel_asset_upload(message_et.assets()[0].upload_id());
     this.send_asset_upload_failed(this.active_conversation(), message_et.id, z.assets.AssetUploadFailedReason.CANCELLED);
   }
 
