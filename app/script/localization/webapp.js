@@ -311,17 +311,18 @@ z.string.conversations_popover_silence = 'Mute';
 z.string.conversations_popover_unarchive = 'Unarchive';
 
 // Conversations secondary line
-z.string.conversations_secondary_line_missed_call = '%n missed call';
-z.string.conversations_secondary_line_missed_calls = '%n missed calls';
-z.string.conversations_secondary_line_new_message = '%n new message';
-z.string.conversations_secondary_line_new_messages = '%n new messages';
-z.string.conversations_secondary_line_ping = '%n ping';
-z.string.conversations_secondary_line_pings = '%n pings';
-z.string.conversations_secondary_line_person_left = '%n person left';
-z.string.conversations_secondary_line_people_left = '%n people left';
-z.string.conversations_secondary_line_person_added = '%user1 added %user2';
-z.string.conversations_secondary_line_people_added = '%user people were added';
+z.string.conversations_secondary_line_missed_call = '{{number}} missed call';
+z.string.conversations_secondary_line_missed_calls = '{{number}} missed calls';
+z.string.conversations_secondary_line_new_message = '{{number}} new message';
+z.string.conversations_secondary_line_new_messages = '{{number}} new messages';
+z.string.conversations_secondary_line_ping = '{{number}} ping';
+z.string.conversations_secondary_line_pings = '{{number}} pings';
+z.string.conversations_secondary_line_person_left = '{{number}} person left';
+z.string.conversations_secondary_line_people_left = '{{number}} people left';
+z.string.conversations_secondary_line_person_added = '{{user1}} added {{user2}}';
+z.string.conversations_secondary_line_people_added = '{{user}} people were added';
 z.string.conversations_secondary_line_timed_message = 'Timed message';
+z.string.conversations_secondary_line_renamed = '{{user}} renamed';
 
 // Takeover
 z.string.takeover_headline = 'Usernames are here.';
