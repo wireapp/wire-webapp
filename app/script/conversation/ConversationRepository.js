@@ -2262,7 +2262,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_add_event(conversation_et, event_json);
         }
       })
-      .then(({conversation: conversation_et, message: message_et}) => {
+      .then(({conversation_et, message_et}) => {
         if (message_et && send_notification) {
           amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
         }
