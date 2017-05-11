@@ -1675,7 +1675,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return mapped_event;
       })
       .then((saved_event) => {
-        this.on_conversation_event(saved_event);
+        this.on_conversation_event(saved_event, true);
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then((payload) => {
             if (z.event.EventTypeHandling.STORE.includes(saved_event.type)) {
