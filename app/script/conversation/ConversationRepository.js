@@ -2120,7 +2120,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             info: {
               height: asset.height,
               nonce: message_et.nonce,
-              tag: z.assets.ImageSizeType.MEDIUM,
+              tag: 'medium',
               width: asset.width,
             },
           },
