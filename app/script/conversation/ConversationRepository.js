@@ -2262,15 +2262,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_add_event(conversation_et, event_json);
         }
       })
-      .then(({conversation_et, message_et}) => {
-        if (message_et && send_notification) {
-          amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
-        }
+      .then((return_value) => {
+        if (_.isObject(return_value)) {
+          const {conversation_et, message_et} = return_value;
 
-        // Un-archive it also on the backend side
-        if (!this.block_event_handling && previously_archived && !conversation_et.is_archived()) {
-          this.logger.info(`Unarchiving conversation '${conversation_et.id}' with new event`);
-          return this.unarchive_conversation(conversation_et);
+          if (message_et && send_notification) {
+            amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
+          }
+
+          if (conversation_et) {
+            // Un-archive it also on the backend side
+            if (!this.block_event_handling && previously_archived && !conversation_et.is_archived()) {
+              this.logger.info(`Unarchiving conversation '${conversation_et.id}' with new event`);
+              return this.unarchive_conversation(conversation_et);
+            }
+          }
         }
       });
   }
