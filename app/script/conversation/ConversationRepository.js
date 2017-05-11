@@ -2811,7 +2811,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   cancel_asset_upload(message_et) {
-    this.asset_service.cancel_asset_upload(message_et.assets()[0].upload_id());
     this.send_asset_upload_failed(this.active_conversation(), message_et.id, z.assets.AssetUploadFailedReason.CANCELLED);
   }
 
