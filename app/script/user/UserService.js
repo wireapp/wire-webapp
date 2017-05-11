@@ -71,7 +71,7 @@ z.user.UserService = class UserService {
    * @param {string} user_id - User ID to start from
    * @returns {Promise} Promise that resolves with user connections
    */
-  get_own_connections(limit = 500, user_id = undefined) {
+  get_own_connections(limit = 500, user_id) {
     return this.client.send_request({
       data: {
         size: limit,
