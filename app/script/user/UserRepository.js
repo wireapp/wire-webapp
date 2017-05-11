@@ -50,12 +50,12 @@ z.user.UserRepository = class UserRepository {
 
     this.connect_requests = ko.pureComputed(() => {
       return this.users()
-        .filter((user_et) => user_et.connection().status() === z.user.ConnectionStatus.PENDING);
+        .filter((user_et) => user_et.is_incoming_request());
     }).extend({rateLimit: 50});
 
     this.connected_users = ko.pureComputed(() => {
       return this.users()
-        .filter((user_et) => user_et.connection().status() === z.user.ConnectionStatus.ACCEPTED);
+        .filter((user_et) => user_et.is_connected());
     }).extend({rateLimit: 1000});
 
     this.connected_users.subscribe((user_ets) => {
@@ -326,7 +326,7 @@ z.user.UserRepository = class UserRepository {
 
     this.update_user_connections([connection_et])
       .then(() => {
-        if ((previous_status === z.user.ConnectionStatus.SENT) && (connection_et.status() === z.user.ConnectionStatus.ACCEPTED)) {
+        if ((previous_status === z.user.ConnectionStatus.SENT) && connection_et.is_connected()) {
           this.update_user_by_id(connection_et.to);
         }
         this._send_user_connection_notification(connection_et, previous_status);
@@ -353,8 +353,7 @@ z.user.UserRepository = class UserRepository {
    */
   _send_user_connection_notification(connection_et, previous_status) {
     // We accepted the connection request or unblocked the user
-    const no_notification = [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING];
-    if (no_notification.includes(previous_status) && (connection_et.status() === z.user.ConnectionStatus.ACCEPTED)) {
+    if (connection_et.is_accepted() && [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING].includes(previous_status)) {
       return;
     }
 
@@ -600,7 +599,7 @@ z.user.UserRepository = class UserRepository {
   search_for_connected_users(query, is_username) {
     return this.users()
       .filter(function(user_et) {
-        if (!user_et.connected()) {
+        if (!user_et.is_connected()) {
           return false;
         }
         return user_et.matches(query, is_username);

@@ -133,10 +133,15 @@ z.entity.User = class User {
 
     this.connection = ko.observable(new z.entity.Connection());
 
-    // connection state shorthands TODO add others too since this is used very often?
-    this.blocked = ko.pureComputed(() => this.connection().status() === z.user.ConnectionStatus.BLOCKED);
-    this.connected = ko.pureComputed(() => this.connection().status() === z.user.ConnectionStatus.ACCEPTED);
-    this.sent = ko.pureComputed(() => this.connection().status() === z.user.ConnectionStatus.SENT);
+    this.is_blocked = ko.pureComputed(() => this.connection().is_blocked());
+    this.is_canceled = ko.pureComputed(() => this.connection().is_canceled());
+    this.is_connected = ko.pureComputed(() => this.connection().is_connected());
+    this.is_ignored = ko.pureComputed(() => this.connection().is_ignored());
+    this.is_incoming_request = ko.pureComputed(() => this.connection().is_incoming_request());
+    this.is_outgoing_request = ko.pureComputed(() => this.connection().is_outgoing_request());
+    this.is_unknown = ko.pureComputed(() => this.connection().is_unknown());
+
+    this.is_request = ko.pureComputed(() => this.connection().is_request());
 
     // e2ee
     this.devices = ko.observableArray();
