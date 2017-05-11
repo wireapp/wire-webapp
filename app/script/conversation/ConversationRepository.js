@@ -2128,7 +2128,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         });
       })
       .then(() => {
-        return this.logger.info(`Obfuscated image message '${message_id}'`);
+        this.logger.info(`Obfuscated image message '${message_id}'`);
       });
   }
 

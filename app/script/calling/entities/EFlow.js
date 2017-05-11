@@ -321,7 +321,9 @@ z.calling.entities.EFlow = class EFlow {
     this.local_sdp(undefined);
     this.remote_sdp(undefined);
 
-    this.start_negotiation(negotiation_mode, media_stream);
+    if (negotiation_mode !== z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION) {
+      this.start_negotiation(negotiation_mode, media_stream);
+    }
   }
 
   /**
@@ -344,7 +346,7 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   start_negotiation(negotiation_mode = z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT, media_stream = this.media_stream()) {
-    this.logger.info(`Start negotiating PeerConnection with '${this.remote_user.name()}'`);
+    this.logger.info(`Start negotiating PeerConnection with '${this.remote_user.name()}' triggered by '${negotiation_mode}'`);
 
     this.audio.hookup(true);
     this._create_peer_connection();
@@ -1024,7 +1026,7 @@ z.calling.entities.EFlow = class EFlow {
     if (this.self_user_id < this.remote_user_id) {
       this.logger.warn(`We need to switch SDP state of flow with '${this.remote_user.name()}' to answer.`);
 
-      this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, true);
+      this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, true);
       return false;
     }
 

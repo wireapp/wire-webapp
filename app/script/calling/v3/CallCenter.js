@@ -126,7 +126,7 @@ z.calling.v3.CallCenter = class CallCenter {
   _on_event_in_supported_browsers(e_call_message_et) {
     const {conversation_id, response, type, user_id} = e_call_message_et;
 
-    this.logger.info(`Received e-call '${type}' response '${response}' message from user '${user_id}' in conversation '${conversation_id}'`, e_call_message_et);
+    this.logger.info(`Received e-call '${type}' message (response :${response}) from user '${user_id}' in conversation '${conversation_id}'`, e_call_message_et);
 
     this._validate_message_type(e_call_message_et)
     .then(() => {
@@ -287,7 +287,7 @@ z.calling.v3.CallCenter = class CallCenter {
     const {conversation_id, dest_client_id, dest_user_id, response, user_id} = e_call_message_et;
 
     if (dest_user_id !== this.user_repository.self().id || dest_client_id !== this.client_repository.current_client().id) {
-      return this.logger.log(`Ignored e-call group setup for client '${dest_client_id}' user '${dest_user_id}'`);
+      return this.logger.log(`Ignored non-targeted e-call group setup intended for client '${dest_client_id}' of user '${dest_user_id}'`);
     }
 
     this.get_e_call_by_id(conversation_id)
@@ -618,7 +618,7 @@ z.calling.v3.CallCenter = class CallCenter {
       throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.WRONG_PAYLOAD_FORMAT);
     }
 
-    const {conversation_id, remote_user_id, type} = e_call_message_et;
+    const {conversation_id, remote_user_id, response, type} = e_call_message_et;
 
     return this.get_e_call_by_id(conversation_id || conversation_et.id)
       .then((e_call_et) => {
@@ -646,7 +646,7 @@ z.calling.v3.CallCenter = class CallCenter {
           throw error;
         }
 
-        this.logger.info(`Sending e-call '${type}' message to conversation '${conversation_id}'`, e_call_message_et.to_JSON());
+        this.logger.info(`Sending e-call '${type}' message (response: ${response}) to conversation '${conversation_id}'`, e_call_message_et.to_JSON());
 
         return this._limit_message_recipients(e_call_message_et)
           .then(({precondition_option, user_client_map}) => {
