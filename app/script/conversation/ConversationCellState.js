@@ -150,7 +150,7 @@ z.conversation.ConversationCellState = (() => {
   const group_activity_state = {
     description(conversation_et) {
       const last_message_et = conversation_et.get_last_message();
-      const remote_user_count = last_message_et.remote_user_ets().length === 1;
+      const remote_user_count = last_message_et.remote_user_ets().length;
       const sender_name = last_message_et.sender_name();
       let message_text;
 
