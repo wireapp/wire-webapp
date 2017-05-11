@@ -173,13 +173,13 @@ z.calling.entities.EFlow = class EFlow {
 
     this.local_sdp_type = ko.observable(undefined);
     this.local_sdp = ko.observable(undefined);
-    this.local_sdp.subscribe((sdp) => {
-      if (sdp) {
-        this.local_sdp_type(sdp.type);
+    this.local_sdp.subscribe((sdp = {}) => {
+      this.local_sdp_type(sdp.type);
 
+      if (sdp.type) {
         if (!this.should_send_local_sdp()) {
           this.should_send_local_sdp(true);
-          return this.should_set_local_sdp(true);
+          this.should_set_local_sdp(true);
         }
       }
     });
@@ -189,18 +189,21 @@ z.calling.entities.EFlow = class EFlow {
 
     this.send_sdp_timeout = undefined;
 
+    this.proper_local_sdp_state = ko.pureComputed(() => {
+      const is_answer = this.local_sdp_type() === z.calling.rtc.SDP_TYPE.ANSWER;
+      const is_offer = this.local_sdp_type() === z.calling.rtc.SDP_TYPE.OFFER;
+      const in_remote_offer_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.REMOTE_OFFER;
+      const in_stable_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.STABLE;
+
+      return (is_offer && in_stable_state) || (is_answer && in_remote_offer_state);
+    });
+
     this.can_set_local_sdp = ko.pureComputed(() => {
       const in_connection_progress = this.connection_state() === z.calling.rtc.ICE_CONNECTION_STATE.CHECKING;
       const progress_gathering_states = [z.calling.rtc.ICE_GATHERING_STATE.COMPLETE, z.calling.rtc.ICE_GATHERING_STATE.GATHERING];
       const in_progress = in_connection_progress && progress_gathering_states.includes(this.gathering_state());
 
-      const is_answer = this.local_sdp_type() === z.calling.rtc.SDP_TYPE.ANSWER;
-      const is_offer = this.local_sdp_type() === z.calling.rtc.SDP_TYPE.OFFER;
-      const in_remote_offer_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.REMOTE_OFFER;
-      const in_stable_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.STABLE;
-      const in_proper_state = (is_offer && in_stable_state) || (is_answer && in_remote_offer_state);
-
-      return this.local_sdp() && this.should_set_local_sdp() && in_proper_state && !in_progress;
+      return this.local_sdp() && this.should_set_local_sdp() && this.proper_local_sdp_state() && !in_progress;
     });
 
     this.can_set_local_sdp.subscribe((can_set) => {
@@ -216,25 +219,27 @@ z.calling.entities.EFlow = class EFlow {
 
     this.remote_sdp_type = ko.observable(undefined);
     this.remote_sdp = ko.observable(undefined);
-    this.remote_sdp.subscribe((sdp) => {
-      if (sdp) {
-        this.remote_sdp_type(sdp.type);
-        return this.should_set_remote_sdp(true);
-      }
+    this.remote_sdp.subscribe((sdp = {}) => {
+      this.remote_sdp_type(sdp.type);
 
-      return this.remote_sdp_type(undefined);
+      if (sdp.type) {
+        this.should_set_remote_sdp(true);
+      }
     });
 
     this.should_set_remote_sdp = ko.observable(false);
 
-    this.can_set_remote_sdp = ko.pureComputed(() => {
+    this.proper_remote_sdp_state = ko.pureComputed(() => {
       const is_answer = this.remote_sdp_type() === z.calling.rtc.SDP_TYPE.ANSWER;
       const is_offer = this.remote_sdp_type() === z.calling.rtc.SDP_TYPE.OFFER;
       const in_local_offer_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.LOCAL_OFFER;
       const in_stable_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.STABLE;
-      const in_proper_state = (is_offer && in_stable_state) || (is_answer && in_local_offer_state);
 
-      return this.pc_initialized() && this.should_set_remote_sdp() && in_proper_state;
+      return (is_offer && in_stable_state) || (is_answer && in_local_offer_state);
+    });
+
+    this.can_set_remote_sdp = ko.pureComputed(() => {
+      return this.pc_initialized() && this.should_set_remote_sdp() && this.proper_remote_sdp_state();
     });
 
     this.can_set_remote_sdp.subscribe((can_set) => {
@@ -669,7 +674,7 @@ z.calling.entities.EFlow = class EFlow {
     if (response === true) {
       this.logger.debug(`Received confirmation for e-call '${type}' message via data channel`, e_call_message);
     } else {
-      this.logger.debug(`Received e-call '${type}' message via data channel`, e_call_message);
+      this.logger.debug(`Received e-call '${type}' (response: ${response}) message via data channel`, e_call_message);
     }
 
     const call_event = z.conversation.EventBuilder.build_calling(conversation_et, e_call_message, this.remote_user_id, this.remote_client_id);
@@ -854,7 +859,6 @@ z.calling.entities.EFlow = class EFlow {
     this.e_call_et.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
     amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED);
-
   }
 
   /**
@@ -957,6 +961,13 @@ z.calling.entities.EFlow = class EFlow {
    */
   _set_sdp_failure(error, sdp_source, sdp_type) {
     const {message, name} = error;
+
+    const wrong_local_state = sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && !this.proper_local_sdp_state();
+    const wrong_remote_state = sdp_source === z.calling.enum.SDP_SOURCE.REMOTE && !this.proper_remote_sdp_state();
+    if (wrong_local_state || wrong_remote_state) {
+      return this._solve_colliding_states();
+    }
+
     this.logger.error(`Setting ${sdp_source} '${sdp_type}' SDP failed: ${name} - ${message}`, error);
 
     const attributes = {cause: name, location: sdp_source, step: 'set_sdp', type: sdp_type};
