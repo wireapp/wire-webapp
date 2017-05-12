@@ -1272,14 +1272,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation that content message was received in
    * @param {Message} message_et - Message for which to acknowledge receipt
-   * @returns {Promise} Resolves when the confirmation was sent
+   * @returns {undefined} No return value
    */
   send_confirmation_status(conversation_et, message_et) {
     if (!message_et.user().is_me && conversation_et.is_one2one() && z.event.EventTypeHandling.CONFIRM.includes(message_et.type)) {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
       generic_message.set('confirmation', new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED));
 
-      return this.sending_queue.push(() => {
+      this.sending_queue.push(() => {
         return this.create_user_client_map(conversation_et.id, true, [message_et.user().id])
           .then((user_client_map) => {
             return this._send_generic_message(conversation_et.id, generic_message, user_client_map, [message_et.user().id], false);
@@ -1594,7 +1594,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Wraps generic message in ephemeral message.
    *
-   * @param {z.proto.Message} generic_message - Message to be wrapped
+   * @param {z.proto.GenericMessage} generic_message - Message to be wrapped
    * @param {number} millis - Expire time in milliseconds
    * @returns {z.proto.Message} New proto message
    */
@@ -2202,11 +2202,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Listener for incoming events.
+   *
    * @param {Object} event_json - JSON data for event
-   * @param {boolean} send_notification - Send a notification for message
+   * @param {boolean} received_while_active - Send a notification and un-archive if necessary
    * @returns {Promise} Resolves when event was handled
    */
-  on_conversation_event(event_json, send_notification = false) {
+  on_conversation_event(event_json, received_while_active = false) {
     if (!event_json) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
@@ -2266,23 +2267,29 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (_.isObject(return_value)) {
           const {conversation_et, message_et} = return_value;
 
-          if (message_et && send_notification) {
-            amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
-          }
+          if (received_while_active) {
+            if (message_et) {
+              amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
+            }
 
-          if (conversation_et) {
-            // Un-archive it also on the backend side
-            if (!this.block_event_handling && previously_archived && !conversation_et.is_archived()) {
-              this.logger.info(`Unarchiving conversation '${conversation_et.id}' with new event`);
-              return this.unarchive_conversation(conversation_et);
+            if (conversation_et) {
+              // Un-archive it also on the backend side
+              if (previously_archived && !conversation_et.is_archived()) {
+                this.logger.info(`Un-archiving conversation '${conversation_et.id}' with new event`);
+                return this.unarchive_conversation(conversation_et);
+              }
             }
           }
         }
       });
   }
 
+  /**
+   * Add missed events message to conversations.
+   * @returns {undefined} No return value
+   */
   on_missed_events() {
-    return this.filtered_conversations()
+    this.filtered_conversations()
       .filter((conversation_et) => !conversation_et.removed_from_conversation())
       .forEach((conversation_et) => amplify.publish(z.event.WebApp.EVENT.INJECT, z.conversation.EventBuilder.build_missed(conversation_et, this.user_repository.self())));
   }
@@ -2293,7 +2300,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when event was handled
    */
   push_to_receiving_queue(event_json) {
-    return this.receiving_queue.push(() => this.on_conversation_event(event_json, !this.block_event_handling));
+    this.receiving_queue.push(() => this.on_conversation_event(event_json, !this.block_event_handling));
   }
 
   /**
@@ -2501,7 +2508,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @private
    * @param {Conversation} conversation_et - Conversation entity that will be updated
    * @param {Object} event_json - JSON data of 'conversation.member-update' event
-   * @param {Conversation} next_conversation_et - Next conversation in list
+   * @param {Conversation} [next_conversation_et] - Next conversation in list
    * @returns {Promise} Resolves when the event was handled
    */
   _on_member_update(conversation_et, event_json, next_conversation_et) {
