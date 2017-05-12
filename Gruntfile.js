@@ -115,20 +115,19 @@ module.exports = (grunt) => {
 
   grunt.registerTask('test_prepare', (test_name) => {
     const scripts = grunt.config('scripts');
-    const already_minified_scripts = grunt.config('scripts_minified');
+    const scripts_minified = grunt.config('scripts_minified');
 
     const prepare_file_names = (file_name_array) => {
       return file_name_array.map((file_name) => file_name.replace('deploy/', ''));
     };
 
     const helper_files = grunt.config.get('karma.options.files');
-    const app_files = prepare_file_names(scripts.app);
-    const component_files = prepare_file_names(scripts.component);
-    const vendor_files = prepare_file_names(scripts.vendor);
-    const minified_vendor_files = prepare_file_names(already_minified_scripts.vendor);
+    const app_files = prepare_file_names(scripts_minified.app.concat(scripts.app));
+    const component_files = prepare_file_names(scripts_minified.component.concat(scripts.component));
+    const vendor_files = prepare_file_names(scripts_minified.vendor.concat(scripts.vendor));
     const test_files = test_name ? [`../test/unit_tests/${test_name}Spec.js`] : ['../test/unit_tests/**/*Spec.js'];
 
-    const files = [].concat(helper_files, minified_vendor_files, vendor_files, component_files, app_files, test_files);
+    const files = [].concat(helper_files, vendor_files, component_files, app_files, test_files);
 
     grunt.config('karma.options.files', files);
   });
