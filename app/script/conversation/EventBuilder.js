@@ -115,13 +115,13 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
-  const _build_voice_channel_deactivate = (e_call_message_et, creating_user_et) => {
-    const {conversation_id, user_id, time} = e_call_message_et;
+  const _build_voice_channel_deactivate = (e_call_message_et, creating_user_et, reason = z.calling.enum.TERMINATION_REASON.COMPLETED) => {
+    const {conversation_id, user_id, time = new Date().toISOString()} = e_call_message_et;
 
     return {
       conversation: conversation_id,
       data: {
-        reason: z.calling.enum.TERMINATION_REASON.MISSED,
+        reason: reason,
       },
       from: creating_user_et ? creating_user_et.id : user_id,
       id: z.util.create_random_uuid(),

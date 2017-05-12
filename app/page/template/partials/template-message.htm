@@ -212,9 +212,9 @@
       <span class="message-connected-header" data-bind='text: other_user().name()'></span>
       <span class="message-connected-username label-username" data-bind='text: other_user().username()'></span>
       <user-avatar class="message-connected-avatar user-avatar-lg user-avatar-no-badge cursor-default"
-                   data-bind="css: {'user-avatar-no-badge': other_user().sent()}"
+                   data-bind="css: {'user-avatar-no-badge': other_user().is_outgoing_request()}"
                    params="user: other_user()"></user-avatar>
-      <!-- ko if: other_user().sent() -->
+      <!-- ko if: other_user().is_outgoing_request() -->
         <div class="message-connected-cancel text-theme"
              data-bind="click: $parent.click_on_cancel_request,
                         l10n_text: z.string.conversation_connection_cancel_request"

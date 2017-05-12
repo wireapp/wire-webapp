@@ -27,6 +27,8 @@
   font-size: 12px;
   font-weight: @font-weight-regular;
   line-height: @line-height-xl;
+  padding-top: 4px;
+  padding-bottom: 4px;
   position: fixed;
   z-index: @z-index-level-7;
 }
@@ -34,14 +36,6 @@
 .ctx-menu-item {
   cursor: pointer;
   padding-left: 24px;
-
-  &:first-child {
-    border-radius: 4px 4px 0 0;
-  }
-
-  &:last-child {
-    border-radius: 0 0 4px 4px;
-  }
 
   &:hover,
   &.selected {

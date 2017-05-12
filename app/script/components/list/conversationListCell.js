@@ -49,10 +49,10 @@ ko.components.register('conversation-list-cell', {
     <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}, in_viewport: on_in_viewport">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation() || conversation.participating_user_ids().length === 0}">
         <!-- ko if: conversation.is_group() -->
-          <group-avatar class="conversation-list-cell-avatar-arrow" data-bind="click: function(data, event) {on_click(conversation, event)}" data-uie-name="go-options" params="users: users(), conversation: conversation"></group-avatar>
+          <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
         <!-- /ko -->
-        <!-- ko ifnot: conversation.is_group() -->
-          <user-avatar class="user-avatar-s" data-uie-name="go-options" params="user: users()[0]"></user-avatar>
+        <!-- ko if: !conversation.is_group() && users()[0] -->
+          <user-avatar class="user-avatar-s" params="user: users()[0]"></user-avatar>
         <!-- /ko -->
       </div>
       <div class="conversation-list-cell-center">
@@ -60,7 +60,7 @@ ko.components.register('conversation-list-cell', {
         <span class="conversation-list-cell-description" data-bind="text: cell_state().description" data-uie-name="secondary-line"></span>
       </div>
       <div class="conversation-list-cell-right">
-        <span class="conversation-list-cell-context-menu" data-bind="click: function(data, event) {on_click(conversation, event)}"></span>
+        <span class="conversation-list-cell-context-menu" data-uie-name="go-options" data-bind="click: function(data, event) {on_click(conversation, event)}"></span>
         <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.PENDING_CONNECTION -->
           <span class="conversation-list-cell-badge cell-badge-dark icon-pending" data-uie-name="status-pending"></span>
         <!-- /ko -->

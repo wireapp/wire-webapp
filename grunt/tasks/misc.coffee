@@ -101,12 +101,6 @@ module.exports = (grunt) ->
     'clean:prod'
   ]
 
-  grunt.registerTask 'prepare_test', [
-    'clean:test'
-    'copy:test'
-    'coffee:test'
-  ]
-
   grunt.registerTask 'check', (file) ->
     grunt.log.writeln '=== ' + grunt.task.current.name.toUpperCase() + ' ==='
 
