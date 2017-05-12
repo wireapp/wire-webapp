@@ -272,16 +272,6 @@ z.string.sl.conversations_popover_notify = 'Povrni glasnost';
 z.string.sl.conversations_popover_silence = 'Utišaj';
 z.string.sl.conversations_popover_unarchive = 'Dearhiviraj';
 
-z.string.sl.conversations_secondary_line_missed_call = '%n zgrešen klic';
-z.string.sl.conversations_secondary_line_missed_calls = '%n zgrešenih klicev';
-z.string.sl.conversations_secondary_line_new_message = '%n novo sporočilo';
-z.string.sl.conversations_secondary_line_new_messages = '%n novih sporočil';
-z.string.sl.conversations_secondary_line_ping = '%n ping';
-z.string.sl.conversations_secondary_line_pings = '%n pingov';
-z.string.sl.conversations_secondary_line_person_left = '%n preostala oseba';
-z.string.sl.conversations_secondary_line_people_left = '%n preostalih oseb';
-z.string.sl.conversations_secondary_line_person_added = '%user1 je dodal(-a) %user2';
-z.string.sl.conversations_secondary_line_people_added = '%user oseb je bilo dodanih';
 z.string.sl.conversations_secondary_line_timed_message = 'Časovno sporočilo';
 
 z.string.sl.takeover_headline = 'Uporabniška imena so tukaj.';
