@@ -400,6 +400,24 @@ z.util.markup_links = function(message) {
 // Note: We are using "Underscore.js" to escape HTML in the original message
 z.util.render_message = function(message) {
   message = marked(message);
+
+  // Parse links with linkifyjs library, ignore code tags
+  const options = {
+    attributes: {
+      rel: 'nofollow noopener noreferrer',
+    },
+    ignoreTags: ['code', 'pre'],
+    validate: {
+      email: function(value) {
+        return false;
+      },
+    },
+  };
+  message = linkifyHtml(message, options);
+
+  // Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
+  message = message.replace(/ class="linkified"/g, '');
+
   message = z.util.auto_link_emails(message);
   message = message.replace(/\n/g, '<br />');
 

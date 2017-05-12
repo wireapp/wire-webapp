@@ -21,7 +21,7 @@
 ###############################################################################
 module.exports = (grunt) ->
 
-  extract_sources = (source_file) ->
+  extract_sources = (source_file, target) ->
     scripts = grunt.file.read source_file
     script_files = []
 
@@ -30,11 +30,18 @@ module.exports = (grunt) ->
     for line in lines
       has_source = line.match /src="(.*?)"/
       is_comment = line.match /<!--[\s\S]*?-->/
-      if has_source
-        if is_comment
-          grunt.log.writeln "Skipping file '#{has_source[1]}' for minification."
+      if has_source and not is_comment
+        source = has_source[1]
+        # sodium hotfix until this issue gets resolved: https://github.com/jedisct1/libsodium.js/issues/90
+        if (not source.endsWith 'sodium.min.js') and (source.endsWith '.min.js')
+          current_files = grunt.config 'scripts_minified'
+          current_files[target].push "deploy#{source}"
+          grunt.config 'scripts_minified', current_files
+          grunt.log.writeln "Minified script '#{source}' for target '#{target}' will not get uglified."
         else
-          script_files.push "deploy#{has_source[1]}"
+          current_files = grunt.config 'scripts'
+          current_files[target].push "deploy#{source}"
+          grunt.config 'scripts', current_files
 
     grunt.log.ok "Processed files from '#{source_file}'."
 
@@ -43,8 +50,14 @@ module.exports = (grunt) ->
   grunt.registerTask 'scripts', ->
     dist_path = grunt.config 'dir.app.template_dist'
 
-    grunt.config 'scripts',
-      app: extract_sources "#{dist_path}/app.htm"
-      auth_page: extract_sources "#{dist_path}/auth.htm"
-      component: extract_sources "#{dist_path}/component.htm"
-      vendor: extract_sources "#{dist_path}/vendor.htm"
+    directories =
+      app: []
+      auth: []
+      component: []
+      vendor: []
+
+    grunt.config 'scripts', directories
+    grunt.config 'scripts_minified', directories
+
+    for directory_name of directories
+      extract_sources "#{dist_path}/#{directory_name}.htm", directory_name
