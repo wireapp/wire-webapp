@@ -2950,7 +2950,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         };
 
         const _remove_redundant_user = function(user_id) {
-          if (conversation_et) {
+          if (conversation_et && conversation_et.is_group()) {
             conversation_et.participating_user_ids.remove(user_id);
           }
 

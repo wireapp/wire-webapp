@@ -271,16 +271,6 @@ z.string.uk.conversations_popover_notify = 'Увімкнути звук';
 z.string.uk.conversations_popover_silence = 'Вимкнути звук';
 z.string.uk.conversations_popover_unarchive = 'Розархівувати';
 
-z.string.uk.conversations_secondary_line_missed_call = '%n пропущений дзвінок';
-z.string.uk.conversations_secondary_line_missed_calls = '%n пропущених дзвінків';
-z.string.uk.conversations_secondary_line_new_message = '%n нове повідомлення';
-z.string.uk.conversations_secondary_line_new_messages = '%n нових повідомлень';
-z.string.uk.conversations_secondary_line_ping = '%n пінг';
-z.string.uk.conversations_secondary_line_pings = '%n пінгів';
-z.string.uk.conversations_secondary_line_person_left = '%n учасник вийшов';
-z.string.uk.conversations_secondary_line_people_left = '%n учасників вийшло';
-z.string.uk.conversations_secondary_line_person_added = '%user1 додав(-ла) %user2';
-z.string.uk.conversations_secondary_line_people_added = '%user були додані';
 z.string.uk.conversations_secondary_line_timed_message = 'Тимчасове повідомлення';
 
 z.string.uk.takeover_headline = 'Ніки вже тут.';
