@@ -841,6 +841,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.conversation_service.update_member_properties(conversation_et.id, payload)
       .catch((error) => {
         this.logger.error(`Conversation '${conversation_et.id}' could not be archived: ${error.code}\r\nPayload: ${JSON.stringify(payload)}`, error);
+        if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+          throw error;
+        }
       })
       .then(() => {
         this._on_member_update(conversation_et, {data: payload}, next_conversation_et);
