@@ -32,9 +32,10 @@ describe('z.util.render_message', function() {
     expect(z.util.render_message('Check this: wire.com/about/')).toBe(expected);
   });
 
-  xit('renders complicated image links', function() {
+  it('renders complicated image links', function() {
     const link = 'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&crop=(0,27,848,506.0960451977401)&cropxunits=848&cropyunits=595&format=jpg&quality=90&width=752&maxheight=42';
-    const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
+    const link_with_entities = link.split('&').join('&amp;');
+    const expected = `<a href=\"${link_with_entities}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link_with_entities}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
 
@@ -68,28 +69,40 @@ describe('z.util.render_message', function() {
     expect(z.util.render_message(link)).toBe(expected);
   });
 
+  it('renders URLs with @-signs correctly', function() {
+    const link = 'https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1448956.html';
+    const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
+    expect(z.util.render_message(link)).toBe(expected);
+  });
+
+  it('renders URLs with @-signs and text correctly', function() {
+    const link = 'https://t.facdn.net/22382738@400-1485204208.jpg';
+    const expected = `Just click <a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a> and download it`;
+    expect(z.util.render_message(`Just click ${link} and download it`)).toBe(expected);
+  });
+
   it('escapes links when they are posted as plain HTML', function() {
     const expected = '&lt;a href=&quot;javascript:alert(&#x27;ohoh!&#x27;)&quot;&gt;what?&lt;/a&gt;';
     expect(z.util.render_message("<a href=\"javascript:alert('ohoh!')\">what?</a>")).toBe(expected);
   });
 
   it('renders an email address', function() {
-    const expected = 'send it over to <a onclick="z.util.safe_mailto_open(\'hello@wire.com\')" href="#">hello@wire.com</a>';
+    const expected = 'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'hello@wire.com\')">hello@wire.com</a>';
     expect(z.util.render_message('send it over to hello@wire.com')).toBe(expected);
   });
 
   it('renders an email address with pluses', function() {
-    const expected = 'send it over to <a onclick="z.util.safe_mailto_open(\'hello+world@wire.com\')" href="#">hello+world@wire.com</a>';
+    const expected = 'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'hello+world@wire.com\')">hello+world@wire.com</a>';
     expect(z.util.render_message('send it over to hello+world@wire.com')).toBe(expected);
   });
 
   it('renders an email long domains', function() {
-    const expected = 'send it over to <a onclick="z.util.safe_mailto_open(\'janedoe@school.university.edu\')" href="#">janedoe@school.university.edu</a>';
+    const expected = 'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
     expect(z.util.render_message('send it over to janedoe@school.university.edu')).toBe(expected);
   });
 
   it('renders an email with multiple subdomains', function() {
-    const expected = 'send it over to <a onclick="z.util.safe_mailto_open(\'bla@foo.co.uk\')" href="#">bla@foo.co.uk</a>';
+    const expected = 'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'bla@foo.co.uk\')">bla@foo.co.uk</a>';
     expect(z.util.render_message('send it over to bla@foo.co.uk')).toBe(expected);
   });
 
@@ -103,14 +116,16 @@ describe('z.util.render_message', function() {
     expect(z.util.render_message('Hello,\n\n\n\n\n\n\nworld!')).toBe('Hello,<br /><br /><br /><br /><br /><br /><br />world!');
   });
 
-  xit('renders an emoticon of someone shrugging', function() {
-    expect(z.util.render_message('¯\_(ツ)_/¯')).toBe('¯\_(ツ)_/¯');
+  it('does not render URLs within <code> tags', function() {
+    expect(z.util.render_message('```Url url = new Url("wire.com");```')).toBe('<code>Url url = new Url(&quot;wire.com&quot;);</code>');
   });
 
-  xit('renders URLs with @-signs correctly', function() {
-    const link = 'https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1448956.html';
-    const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
-    expect(z.util.render_message(link)).toBe(expected);
+  it('does not render emails within <code> tags', function() {
+    expect(z.util.render_message('```this.isValid("opensource@wire.com")```')).toBe('<code>this.isValid(&quot;opensource@wire.com&quot;)</code>');
+  });
+
+  xit('renders an emoticon of someone shrugging', function() {
+    expect(z.util.render_message('¯\_(ツ)_/¯')).toBe('¯\_(ツ)_/¯');
   });
 });
 
