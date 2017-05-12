@@ -60,22 +60,26 @@ describe('get_first_link_with_offset', function() {
   });
 
   it('should return correct link and offset for single link without text)', function() {
-    const text = 'wire.com';
-    expect(z.links.LinkPreviewHelpers.get_first_link_with_offset(text)).toEqual(['wire.com', 0]);
+    const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset('wire.com');
+    expect(link_preview.offset).toEqual(0);
+    expect(link_preview.url).toEqual('wire.com');
   });
 
   it('should return correct link and offset for single link with text in front)', function() {
-    const text = 'Hey check wire.com';
-    expect(z.links.LinkPreviewHelpers.get_first_link_with_offset(text)).toEqual(['wire.com', 10]);
+    const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset('Hey check wire.com');
+    expect(link_preview.offset).toEqual(10);
+    expect(link_preview.url).toEqual('wire.com');
   });
 
   it('should return correct link and offset for single link surrounded by text )', function() {
-    const text = 'Hey check wire.com PLEASE!';
-    expect(z.links.LinkPreviewHelpers.get_first_link_with_offset(text)).toEqual(['wire.com', 10]);
+    const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset('Hey check wire.com PLEASE!');
+    expect(link_preview.offset).toEqual(10);
+    expect(link_preview.url).toEqual('wire.com');
   });
 
   it('should return correct link and offset for single link surrounded by text )', function() {
-    const text = 'wire.com wire.com wire.com wire.com wire.com';
-    expect(z.links.LinkPreviewHelpers.get_first_link_with_offset(text)).toEqual(['wire.com', 0]);
+    const link_preview = z.links.LinkPreviewHelpers.get_first_link_with_offset('wire.com wire.com wire.com wire.com wire.com');
+    expect(link_preview.offset).toEqual(0);
+    expect(link_preview.url).toEqual('wire.com');
   });
 });
