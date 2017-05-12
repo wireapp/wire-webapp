@@ -2128,7 +2128,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         });
       })
       .then(() => {
-        return this.logger.info(`Obfuscated image message '${message_id}'`);
+        this.logger.info(`Obfuscated image message '${message_id}'`);
       });
   }
 
@@ -2297,7 +2297,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Push to receiving queue.
    * @param {Object} event_json - JSON data for event
-   * @returns {Promise} Resolves when event was handled
+   * @returns {undefined} No return value
    */
   push_to_receiving_queue(event_json) {
     this.receiving_queue.push(() => this.on_conversation_event(event_json, !this.block_event_handling));

@@ -443,7 +443,7 @@ z.calling.CallingRepository = class CallingRepository {
           return this._send_report(this.flow_status);
         }
 
-        return this.logger.warn('Could not find flows to report for call analysis');
+        this.logger.warn('Could not find flows to report for call analysis');
       });
   }
 

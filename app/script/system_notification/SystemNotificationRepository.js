@@ -151,7 +151,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         .then((is_read) => {
           if (is_read) {
             notification.close();
-            return this.logger.info(`Removed read notification for '${message_id}' in '${conversation_id}'.`);
+            this.logger.info(`Removed read notification for '${message_id}' in '${conversation_id}'.`);
           }
         });
       }
@@ -774,7 +774,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     notification.onclose = () => {
       window.clearTimeout(timeout_trigger_id);
       this.notifications.splice(this.notifications.indexOf(notification), 1);
-      return this.logger.info(`Removed notification for '${message_id}' in '${conversation_id}' locally.`);
+      this.logger.info(`Removed notification for '${message_id}' in '${conversation_id}' locally.`);
     };
 
     notification.onerror = () => {

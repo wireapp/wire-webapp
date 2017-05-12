@@ -317,7 +317,8 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
       if (error.media_type === z.media.MediaType.SCREEN) {
         return this.logger.error(`Failed to enable screen sharing: ${error.message}`, error);
       }
-      return this.logger.error(`Failed to replace '${error.media_type}' input source: ${error.message}`, error);
+
+      this.logger.error(`Failed to replace '${error.media_type}' input source: ${error.message}`, error);
     });
   }
 

@@ -216,7 +216,7 @@ z.calling.entities.ECall = class ECall {
     this.termination_reason = termination_reason;
     this.v3_call_center.inject_deactivate_event(e_call_message_et, this.creating_user, reason);
 
-    if (!this.participants().length) {
+    if (this.participants().length <= 1) {
       this.v3_call_center.delete_call(this.id);
     } else {
       this.v3_call_center.media_stream_handler.reset_media_stream();
@@ -283,7 +283,7 @@ z.calling.entities.ECall = class ECall {
       });
 
     Promise.all(event_promises)
-      .then(() => Promise.all(this.participants().map(({id}) => this.delete_e_participant(id))))
+      .then(() => Promise.all(this.participants().map(({id}) => this.reset_e_participant(id))))
       .then(() => {
         const additional_payload = this.v3_call_center.create_additional_payload(this.id);
 
@@ -627,6 +627,13 @@ z.calling.entities.ECall = class ECall {
         this.participants.push(e_participant_et);
 
         return e_participant_et.update_state(e_call_message_et)
+          .catch(function(_error) {
+            if (_error.type !== z.calling.v3.CallError.TYPE.SDP_STATE_COLLISION) {
+              throw error;
+            }
+
+            negotiate = false;
+          })
           .then(() => this._update_state(e_participant_et, negotiate));
       });
   }
@@ -708,6 +715,26 @@ z.calling.entities.ECall = class ECall {
     }
 
     return Promise.reject(new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.NOT_FOUND, 'No participant for given user ID found'));
+  }
+
+  /**
+   * Remove an e-participant from the call.
+   *
+   * @param {string} user_id - ID of user to be removed from the e-call
+   * @param {string} client_id - ID of client that requested the removal from the e-call
+   * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Call termination reason
+   * @returns {Promise} Resolves with the e-call entity
+   */
+  reset_e_participant(user_id) {
+    return this.get_e_participant_by_id(user_id)
+      .then((e_participant_et) => {
+        e_participant_et.reset_participant();
+        this.interrupted_participants.remove(e_participant_et);
+        this.participants.remove(e_participant_et);
+
+        this._update_remote_state();
+        this.v3_call_center.media_element_handler.remove_media_element(user_id);
+      });
   }
 
   /**
