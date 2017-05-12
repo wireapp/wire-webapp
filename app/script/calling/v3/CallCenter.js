@@ -268,7 +268,7 @@ z.calling.v3.CallCenter = class CallCenter {
 
     this.get_e_call_by_id(conversation_id)
       .then((e_call_et) => e_call_et.delete_e_participant(user_id, client_id, z.calling.enum.TERMINATION_REASON.OTHER_USER))
-      .then((e_call_et) => e_call_et.check_activity(e_call_message_et))
+      .then((e_call_et) => e_call_et.participant_left(e_call_message_et))
       .catch(function(error) {
         if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
           throw error;

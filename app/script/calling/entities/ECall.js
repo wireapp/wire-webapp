@@ -189,21 +189,6 @@ z.calling.entities.ECall = class ECall {
   //##############################################################################
 
   /**
-   * Check if group call should continue.
-   * @param {z.calling.entities.ECallMessage} e_call_message_et - Last member leaving call
-   * @returns {undefined} No return value
-   */
-  check_activity(e_call_message_et) {
-    if (!this.participants().length) {
-      if (this.self_client_joined()) {
-        return this.leave_call(z.calling.enum.TERMINATION_REASON.OTHER_USER);
-      }
-
-      this.deactivate_call(e_call_message_et, z.calling.enum.TERMINATION_REASON.OTHER_USER);
-    }
-  }
-
-  /**
    * Deactivate the call.
    *
    * @param {ECallMessage} e_call_message_et - E-call message for deactivation
@@ -297,6 +282,21 @@ z.calling.entities.ECall = class ECall {
         this.set_self_state(false, termination_reason);
         this.deactivate_call(e_call_message_et, termination_reason);
       });
+  }
+
+  /**
+   * Check if group call should continue after participant left.
+   * @param {ECallMessage} e_call_message_et - Last member leaving call
+   * @returns {undefined} No return value
+   */
+  participant_left(e_call_message_et) {
+    if (!this.participants().length) {
+      if (this.self_client_joined()) {
+        return this.leave_call(z.calling.enum.TERMINATION_REASON.OTHER_USER);
+      }
+
+      this.deactivate_call(e_call_message_et, z.calling.enum.TERMINATION_REASON.OTHER_USER);
+    }
   }
 
   /**
@@ -721,10 +721,7 @@ z.calling.entities.ECall = class ECall {
 
   /**
    * Remove an e-participant from the call.
-   *
    * @param {string} user_id - ID of user to be removed from the e-call
-   * @param {string} client_id - ID of client that requested the removal from the e-call
-   * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Call termination reason
    * @returns {Promise} Resolves with the e-call entity
    */
   reset_e_participant(user_id) {
