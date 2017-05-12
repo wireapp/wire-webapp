@@ -32,9 +32,10 @@ describe('z.util.render_message', function() {
     expect(z.util.render_message('Check this: wire.com/about/')).toBe(expected);
   });
 
-  xit('renders complicated image links', function() {
+  it('renders complicated image links', function() {
     const link = 'http://static.err.ee/gridfs/95E91BE0D28DF7236BC00EE349284A451C05949C2D04E7857BC686E4394F1585.jpg?&crop=(0,27,848,506.0960451977401)&cropxunits=848&cropyunits=595&format=jpg&quality=90&width=752&maxheight=42';
-    const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
+    const link_with_entities = link.split('&').join('&amp;');
+    const expected = `<a href=\"${link_with_entities}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link_with_entities}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
 
@@ -68,7 +69,13 @@ describe('z.util.render_message', function() {
     expect(z.util.render_message(link)).toBe(expected);
   });
 
-  it('renders links with @ symbol', function() {
+  it('renders URLs with @-signs correctly', function() {
+    const link = 'https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1448956.html';
+    const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
+    expect(z.util.render_message(link)).toBe(expected);
+  });
+
+  it('renders URLs with @-signs and text correctly', function() {
     const link = 'https://t.facdn.net/22382738@400-1485204208.jpg';
     const expected = `Just click <a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a> and download it`;
     expect(z.util.render_message(`Just click ${link} and download it`)).toBe(expected);
@@ -111,12 +118,6 @@ describe('z.util.render_message', function() {
 
   xit('renders an emoticon of someone shrugging', function() {
     expect(z.util.render_message('¯\_(ツ)_/¯')).toBe('¯\_(ツ)_/¯');
-  });
-
-  xit('renders URLs with @-signs correctly', function() {
-    const link = 'https://www.mail-archive.com/debian-bugs-dist@lists.debian.org/msg1448956.html';
-    const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
-    expect(z.util.render_message(link)).toBe(expected);
   });
 });
 
