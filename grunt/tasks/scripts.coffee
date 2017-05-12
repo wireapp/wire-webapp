@@ -32,7 +32,8 @@ module.exports = (grunt) ->
       is_comment = line.match /<!--[\s\S]*?-->/
       if has_source and not is_comment
         source = has_source[1]
-        if source.endsWith '.min.js'
+        # sodium hotfix until this issue gets resolved: https://github.com/jedisct1/libsodium.js/issues/90
+        if (not source.endsWith 'sodium.min.js') and (source.endsWith '.min.js')
           current_files = grunt.config 'scripts_minified'
           current_files[target].push "deploy#{source}"
           grunt.config 'scripts_minified', current_files
