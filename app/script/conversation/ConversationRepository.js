@@ -863,12 +863,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   clear_conversation(conversation_et, leave = false) {
     const next_conversation_et = this.get_next_conversation(conversation_et);
-    return Promise.resolve()
-      .then(() => {
-        if (leave) {
-          return this.leave_conversation(conversation_et, next_conversation_et);
-        }
-      })
+    const promise = leave ? this.leave_conversation(conversation_et, next_conversation_et) : Promise.resolve();
+    return promise
       .then(() => {
         this._update_cleared_timestamp(conversation_et);
         this._delete_messages(conversation_et);
