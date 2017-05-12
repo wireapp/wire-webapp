@@ -353,7 +353,7 @@ z.user.UserRepository = class UserRepository {
    */
   _send_user_connection_notification(connection_et, previous_status) {
     // We accepted the connection request or unblocked the user
-    if (connection_et.is_accepted() && [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING].includes(previous_status)) {
+    if (connection_et.is_connected() && [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING].includes(previous_status)) {
       return;
     }
 
