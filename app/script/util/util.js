@@ -376,11 +376,6 @@ z.util.safe_mailto_open = function(email) {
   }
 };
 
-z.util.auto_link_emails = function(text) {
-  const email_pattern = /([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)/gim;
-  return text.replace(email_pattern, '<a onclick="z.util.safe_mailto_open(\'$1\')" href="#">$1</a>');
-};
-
 z.util.get_last_characters = function(message, amount) {
   if (message.length < amount) {
     return false;
@@ -403,12 +398,21 @@ z.util.render_message = function(message) {
 
   // Parse links with linkifyjs library, ignore code tags
   const options = {
-    attributes: {
-      rel: 'nofollow noopener noreferrer',
+    attributes: function(href, type) {
+      if (type === 'url') return {rel: 'nofollow noopener noreferrer'};
+      if (type === 'email') return {onclick: 'z.util.safe_mailto_open(\'' + href.replace('mailto:', '') + '\')'};
+      return {};
+    },
+    formatHref: function(href, type) {
+      if (type === 'email') return '#';
+      return href;
     },
     ignoreTags: ['code', 'pre'],
     validate: {
-      email: function(value) {
+      hashtag: function(value) {
+        return false;
+      },
+      mention: function(value) {
         return false;
       },
     },
@@ -418,7 +422,6 @@ z.util.render_message = function(message) {
   // Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
   message = message.replace(/ class="linkified"/g, '');
 
-  message = z.util.auto_link_emails(message);
   message = message.replace(/\n/g, '<br />');
 
   // Remove <br /> if it is the last thing in a message

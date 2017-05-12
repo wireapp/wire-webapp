@@ -74,22 +74,22 @@ describe('z.util.render_message', function() {
   });
 
   it('renders an email address', function() {
-    const expected = 'send it over to <a onclick="z.util.safe_mailto_open(\'hello@wire.com\')" href="#">hello@wire.com</a>';
+    const expected = 'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'hello@wire.com\')">hello@wire.com</a>';
     expect(z.util.render_message('send it over to hello@wire.com')).toBe(expected);
   });
 
   it('renders an email address with pluses', function() {
-    const expected = 'send it over to <a onclick="z.util.safe_mailto_open(\'hello+world@wire.com\')" href="#">hello+world@wire.com</a>';
+    const expected = 'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'hello+world@wire.com\')">hello+world@wire.com</a>';
     expect(z.util.render_message('send it over to hello+world@wire.com')).toBe(expected);
   });
 
   it('renders an email long domains', function() {
-    const expected = 'send it over to <a onclick="z.util.safe_mailto_open(\'janedoe@school.university.edu\')" href="#">janedoe@school.university.edu</a>';
+    const expected = 'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'janedoe@school.university.edu\')">janedoe@school.university.edu</a>';
     expect(z.util.render_message('send it over to janedoe@school.university.edu')).toBe(expected);
   });
 
   it('renders an email with multiple subdomains', function() {
-    const expected = 'send it over to <a onclick="z.util.safe_mailto_open(\'bla@foo.co.uk\')" href="#">bla@foo.co.uk</a>';
+    const expected = 'send it over to <a href="#" onclick="z.util.safe_mailto_open(\'bla@foo.co.uk\')">bla@foo.co.uk</a>';
     expect(z.util.render_message('send it over to bla@foo.co.uk')).toBe(expected);
   });
 
