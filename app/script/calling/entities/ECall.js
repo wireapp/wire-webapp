@@ -680,7 +680,7 @@ z.calling.entities.ECall = class ECall {
         this.logger.info(`Removed e-call participant '${e_participant_et.user.name()}'`);
         return this;
       })
-      .catch(function(error) {
+      .catch((error) => {
         if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
