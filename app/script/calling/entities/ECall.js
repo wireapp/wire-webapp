@@ -190,16 +190,16 @@ z.calling.entities.ECall = class ECall {
 
   /**
    * Check if group call should continue.
-   * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Call termination reason
+   * @param {z.calling.entities.ECallMessage} e_call_message_et - Last member leaving call
    * @returns {undefined} No return value
    */
-  check_activity(termination_reason) {
+  check_activity(e_call_message_et) {
     if (!this.participants().length) {
       if (this.self_client_joined()) {
-        this.leave_call(termination_reason);
-      } else {
-        this.deactivate_call();
+        return this.leave_call(z.calling.enum.TERMINATION_REASON.OTHER_USER);
       }
+
+      this.deactivate_call(e_call_message_et, z.calling.enum.TERMINATION_REASON.OTHER_USER);
     }
   }
 
@@ -407,8 +407,10 @@ z.calling.entities.ECall = class ECall {
    */
   _set_verify_group_check_timeout() {
     this.group_check_timeout = window.setTimeout(() => {
-      // @todo Create expected deactivation message
-      this.deactivate_call();
+      const additional_payload = this.v3_call_center.create_additional_payload(this.id, this.creating_user.id);
+      const e_call_message_et = z.calling.mapper.ECallMessageMapper.build_group_leave(false, this.session_id, additional_payload);
+
+      this.deactivate_call(e_call_message_et, z.calling.enum.TERMINATION_REASON.MISSED);
     },
     ECall.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT);
   }
