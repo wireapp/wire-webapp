@@ -304,7 +304,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
       }
 
       // When used in conversation!
-      if (this.conversation()) {
+      if (typeof this.conversation === 'function') {
         const type = this.conversation().type();
 
         if ([z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.CONNECT].includes(type)) {
