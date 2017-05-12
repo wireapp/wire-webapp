@@ -19,10 +19,6 @@
 
 'use strict';
 
-const grunt = require('grunt');
-
-grunt.log.writeln('Files', grunt.config('scripts_minified'));
-
 module.exports = {
   deploy: {
     files: {
