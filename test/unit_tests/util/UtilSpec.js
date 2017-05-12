@@ -116,6 +116,14 @@ describe('z.util.render_message', function() {
     expect(z.util.render_message('Hello,\n\n\n\n\n\n\nworld!')).toBe('Hello,<br /><br /><br /><br /><br /><br /><br />world!');
   });
 
+  it('does not render URLs within <code> tags', function() {
+    expect(z.util.render_message('```Url url = new Url("wire.com");```')).toBe('<code>Url url = new Url(&quot;wire.com&quot;);</code>');
+  });
+
+  it('does not render emails within <code> tags', function() {
+    expect(z.util.render_message('```this.isValid("opensource@wire.com")```')).toBe('<code>this.isValid(&quot;opensource@wire.com&quot;)</code>');
+  });
+
   xit('renders an emoticon of someone shrugging', function() {
     expect(z.util.render_message('¯\_(ツ)_/¯')).toBe('¯\_(ツ)_/¯');
   });
