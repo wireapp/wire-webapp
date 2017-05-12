@@ -112,7 +112,7 @@ z.search.SearchRepository = class SearchRepository {
         switch (search_mode) {
           case z.search.SEARCH_MODE.CONTACTS:
           case z.search.SEARCH_MODE.ON_BOARDING:
-            if (!user_et.connected()) {
+            if (!user_et.is_connected()) {
               return user_et;
             }
             break;

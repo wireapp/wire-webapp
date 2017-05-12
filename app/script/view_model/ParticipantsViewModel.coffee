@@ -78,8 +78,7 @@ class z.ViewModel.ParticipantsViewModel
     @connected_users = ko.pureComputed =>
       connected_users = ko.utils.arrayFilter @user_repository.users(), (user_et) =>
         is_participant = ko.utils.arrayFirst @participants(), (participant) -> user_et.id is participant.id
-        is_connected = user_et.connection().status() is z.user.ConnectionStatus.ACCEPTED
-        return is_participant is null and is_connected
+        return is_participant is null and user_et.is_connected()
       connected_users.sort (user_a, user_b) -> z.util.StringUtil.sort_by_priority user_a.first_name(), user_b.first_name()
     , @, deferEvaluation: true
 

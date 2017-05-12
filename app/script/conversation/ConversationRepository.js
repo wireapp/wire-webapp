@@ -647,7 +647,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
 
-        if ([z.user.ConnectionStatus.ACCEPTED, z.user.ConnectionStatus.SENT].includes(connection_et.status())) {
+        if (connection_et.is_connected() || connection_et.is_outgoing_request()) {
           return this.fetch_conversation_by_id(connection_et.conversation_id);
         }
 
@@ -656,7 +656,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then((conversation_et) => {
         conversation_et.connection(connection_et);
 
-        if (connection_et.status() === z.user.ConnectionStatus.ACCEPTED) {
+        if (connection_et.is_connected()) {
           conversation_et.type(z.conversation.ConversationType.ONE2ONE);
         }
 
@@ -1675,7 +1675,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return mapped_event;
       })
       .then((saved_event) => {
-        this.on_conversation_event(saved_event);
+        this.on_conversation_event(saved_event, true);
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then((payload) => {
             if (z.event.EventTypeHandling.STORE.includes(saved_event.type)) {
@@ -2120,7 +2120,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             info: {
               height: asset.height,
               nonce: message_et.nonce,
-              tag: z.assets.ImageSizeType.MEDIUM,
+              tag: 'medium',
               width: asset.width,
             },
           },
@@ -2179,7 +2179,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return false;
     }
 
-    if (conversation_et.is_one2one() && conversation_et.connection().status() !== z.user.ConnectionStatus.ACCEPTED) {
+    if (conversation_et.is_one2one() && !conversation_et.connection().is_connected) {
       return false;
     }
 
@@ -2262,15 +2262,21 @@ z.conversation.ConversationRepository = class ConversationRepository {
             return this._on_add_event(conversation_et, event_json);
         }
       })
-      .then(({conversation: conversation_et, message: message_et}) => {
-        if (message_et && send_notification) {
-          amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
-        }
+      .then((return_value) => {
+        if (_.isObject(return_value)) {
+          const {conversation_et, message_et} = return_value;
 
-        // Un-archive it also on the backend side
-        if (!this.block_event_handling && previously_archived && !conversation_et.is_archived()) {
-          this.logger.info(`Unarchiving conversation '${conversation_et.id}' with new event`);
-          return this.unarchive_conversation(conversation_et);
+          if (message_et && send_notification) {
+            amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
+          }
+
+          if (conversation_et) {
+            // Un-archive it also on the backend side
+            if (!this.block_event_handling && previously_archived && !conversation_et.is_archived()) {
+              this.logger.info(`Unarchiving conversation '${conversation_et.id}' with new event`);
+              return this.unarchive_conversation(conversation_et);
+            }
+          }
         }
       });
   }
@@ -2811,7 +2817,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {undefined} No return value
    */
   cancel_asset_upload(message_et) {
-    this.asset_service.cancel_asset_upload(message_et.assets()[0].upload_id());
     this.send_asset_upload_failed(this.active_conversation(), message_et.id, z.assets.AssetUploadFailedReason.CANCELLED);
   }
 

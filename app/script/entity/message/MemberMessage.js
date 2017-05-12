@@ -50,18 +50,16 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       return z.util.LocalizerUtil.join_names(this.joined_user_ets(), declension);
     };
 
-    this._get_caption_connection = function(connection_status) {
-      let identifier = undefined;
-      switch (connection_status) {
-        case z.user.ConnectionStatus.BLOCKED:
-          identifier = z.string.conversation_connection_blocked;
-          break;
-        case z.user.ConnectionStatus.SENT:
-          return '';
-        default:
-          identifier = z.string.conversation_connection_accepted;
+    this._get_caption_connection = function(user_et) {
+      if (user_et.is_blocked()) {
+        return z.localization.Localizer.get_text(z.string.conversation_connection_blocked);
       }
-      return z.localization.Localizer.get_text(identifier);
+
+      if (user_et.is_outgoing_request()) {
+        return '';
+      }
+
+      return z.localization.Localizer.get_text(z.string.conversation_connection_accepted);
     };
 
     this._get_caption_with_names = (key, declension) => {
@@ -98,9 +96,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
       switch (this.member_message_type) {
         case z.message.SystemMessageType.CONNECTION_ACCEPTED:
         case z.message.SystemMessageType.CONNECTION_REQUEST:
-          return this._get_caption_connection(this.other_user()
-            .connection()
-            .status());
+          return this._get_caption_connection(this.other_user());
         case z.message.SystemMessageType.CONVERSATION_CREATE:
           if (this.user().is_me) {
             return this._get_caption_with_names(z.string.conversation_create_you);
