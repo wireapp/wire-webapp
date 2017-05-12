@@ -56,13 +56,13 @@ describe('z.util.render_message', function() {
     expect(z.util.render_message(`e.g. ${link}.`)).toBe(expected);
   });
 
-  xit('renders localhost links', function() {
+  it('renders localhost links', function() {
     const link = 'http://localhost:8888/';
     const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
   });
 
-  xit('renders links with IP addresses', function() {
+  it('renders links with IP addresses', function() {
     const link = 'http://192.168.10.44:8080//job/webapp_atomic_test/4290/cucumber-html-reports';
     const expected = `<a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a>`;
     expect(z.util.render_message(link)).toBe(expected);
