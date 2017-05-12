@@ -170,9 +170,6 @@ z.conversation.ConversationCellState = (() => {
             message_text = z.l10n.text(z.string.conversations_secondary_line_people_added, remote_user_count);
           }
           break;
-        case z.event.Backend.CONVERSATION.RENAME:
-          message_text = z.l10n.text(z.string.conversations_secondary_line_renamed, sender_name);
-          break;
         default:
           message_text = '';
       }

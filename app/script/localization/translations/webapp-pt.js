@@ -271,16 +271,6 @@ z.string.pt.conversations_popover_notify = 'Notificar';
 z.string.pt.conversations_popover_silence = 'Sem som';
 z.string.pt.conversations_popover_unarchive = 'Desarquivar';
 
-z.string.pt.conversations_secondary_line_missed_call = '%n chamada perdida';
-z.string.pt.conversations_secondary_line_missed_calls = '%n chamadas perdidas';
-z.string.pt.conversations_secondary_line_new_message = '%n nova mensagem';
-z.string.pt.conversations_secondary_line_new_messages = '%n novas mensagens';
-z.string.pt.conversations_secondary_line_ping = '%n ping';
-z.string.pt.conversations_secondary_line_pings = '%n pings';
-z.string.pt.conversations_secondary_line_person_left = '%n pessoa saiu';
-z.string.pt.conversations_secondary_line_people_left = '%n pessoas saíram';
-z.string.pt.conversations_secondary_line_person_added = '%user1 adicionou %user2';
-z.string.pt.conversations_secondary_line_people_added = '%user adicionou pessoas';
 z.string.pt.conversations_secondary_line_timed_message = 'Mensagem temporizada';
 
 z.string.pt.takeover_headline = 'Nomes de usuário estão aqui.';

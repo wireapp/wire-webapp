@@ -272,16 +272,6 @@ z.string.hu.conversations_popover_notify = 'Némítás feloldása';
 z.string.hu.conversations_popover_silence = 'Némítás';
 z.string.hu.conversations_popover_unarchive = 'Archiválás visszavonása';
 
-z.string.hu.conversations_secondary_line_missed_call = '%n nem fogadott hívás';
-z.string.hu.conversations_secondary_line_missed_calls = '%n nem fogadott hívások';
-z.string.hu.conversations_secondary_line_new_message = '%n új üzenet';
-z.string.hu.conversations_secondary_line_new_messages = '%n új üzenetek';
-z.string.hu.conversations_secondary_line_ping = '%n kopogás';
-z.string.hu.conversations_secondary_line_pings = '%n kopogások';
-z.string.hu.conversations_secondary_line_person_left = '%n személy elhagyta a beszélgetést';
-z.string.hu.conversations_secondary_line_people_left = '%n partner elhagyta a beszélgetést';
-z.string.hu.conversations_secondary_line_person_added = '%user1 felvette %user2';
-z.string.hu.conversations_secondary_line_people_added = '%user partner hozzáadva';
 z.string.hu.conversations_secondary_line_timed_message = 'Időzített üzenet';
 
 z.string.hu.takeover_headline = 'Felhasználónevek itt találhatóak.';
