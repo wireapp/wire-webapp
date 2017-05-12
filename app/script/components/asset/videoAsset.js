@@ -53,6 +53,9 @@ z.components.VideoAssetComponent = class VideoAssetComponent {
     } else {
       this.preview_subscription = this.asset.preview_resource.subscribe(this._load_video_preview.bind(this));
     }
+
+    this.on_play_button_clicked = this.on_play_button_clicked.bind(this);
+    this.on_pause_button_clicked = this.on_pause_button_clicked.bind(this);
   }
 
   _load_video_preview() {

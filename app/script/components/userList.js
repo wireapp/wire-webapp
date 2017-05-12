@@ -81,13 +81,14 @@ z.components.UserListViewModel = class UserListViewModel {
     if (this.user_filter) {
       this.filtered_user_ets = ko.pureComputed(() => {
         const normalized_query = z.search.SearchRepository.normalize_query(this.user_filter());
-        ko.utils.arrayFilter(this.user_ets(), (user_et) => {
-          const match = this.user_filter()
-            .trim()
-            .startsWith('@');
+        return this.user_ets()
+          .filter((user_et) => {
+            const is_username = this.user_filter()
+              .trim()
+              .startsWith('@');
 
-          return user_et.matches(normalized_query, match);
-        });
+            return user_et.matches(normalized_query, is_username);
+          });
       });
     }
 

@@ -58,6 +58,9 @@ z.components.AudioAssetComponent = class AudioAssetComponent {
       'data-uie-name': 'audio-asset',
       'data-uie-value': this.asset.file_name,
     });
+
+    this.on_play_button_clicked = this.on_play_button_clicked.bind(this);
+    this.on_pause_button_clicked = this.on_pause_button_clicked.bind(this);
   }
 
   on_loadedmetadata() {
