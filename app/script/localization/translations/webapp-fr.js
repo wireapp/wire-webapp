@@ -272,16 +272,6 @@ z.string.fr.conversations_popover_notify = 'Activer le micro';
 z.string.fr.conversations_popover_silence = 'Mettre en sourdine';
 z.string.fr.conversations_popover_unarchive = 'Restaurer';
 
-z.string.fr.conversations_secondary_line_missed_call = '%n appel manqué';
-z.string.fr.conversations_secondary_line_missed_calls = '%n appels manqués';
-z.string.fr.conversations_secondary_line_new_message = '%n nouveau message';
-z.string.fr.conversations_secondary_line_new_messages = '%n nouveaux messages';
-z.string.fr.conversations_secondary_line_ping = '%n ping';
-z.string.fr.conversations_secondary_line_pings = '%n pings';
-z.string.fr.conversations_secondary_line_person_left = '%n personne est partie';
-z.string.fr.conversations_secondary_line_people_left = '%n personnes sont parties';
-z.string.fr.conversations_secondary_line_person_added = '%user1 a ajouté %user2';
-z.string.fr.conversations_secondary_line_people_added = '%user personnes ont été ajoutées';
 z.string.fr.conversations_secondary_line_timed_message = 'Message éphémère';
 
 z.string.fr.takeover_headline = 'Les identifiants sont disponibles.';

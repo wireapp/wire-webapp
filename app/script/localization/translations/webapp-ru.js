@@ -272,16 +272,6 @@ z.string.ru.conversations_popover_notify = 'Вкл. звук';
 z.string.ru.conversations_popover_silence = 'Выкл. звук';
 z.string.ru.conversations_popover_unarchive = 'Разархивировать';
 
-z.string.ru.conversations_secondary_line_missed_call = '%n пропущенный звонок';
-z.string.ru.conversations_secondary_line_missed_calls = '%n пропущенных звонков';
-z.string.ru.conversations_secondary_line_new_message = '%n новое сообщение';
-z.string.ru.conversations_secondary_line_new_messages = '%n новых сообщений';
-z.string.ru.conversations_secondary_line_ping = '%n пинг';
-z.string.ru.conversations_secondary_line_pings = '%n пингов';
-z.string.ru.conversations_secondary_line_person_left = '%n человек вышел';
-z.string.ru.conversations_secondary_line_people_left = '%n человек вышло';
-z.string.ru.conversations_secondary_line_person_added = '%user1 добавил(-а) %user2';
-z.string.ru.conversations_secondary_line_people_added = '%user человек были добавлены';
 z.string.ru.conversations_secondary_line_timed_message = 'Временное сообщение';
 
 z.string.ru.takeover_headline = 'Имена пользователей уже здесь.';
