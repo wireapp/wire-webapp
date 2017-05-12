@@ -399,13 +399,17 @@ z.util.render_message = function(message) {
   // Parse links with linkifyjs library, ignore code tags
   const options = {
     attributes: function(href, type) {
-      if (type === 'url') return {rel: 'nofollow noopener noreferrer'};
-      if (type === 'email') return {onclick: 'z.util.safe_mailto_open(\'' + href.replace('mailto:', '') + '\')'};
+      if (type === 'url') {
+        return {rel: 'nofollow noopener noreferrer'};
+      }
+      if (type === 'email') {
+        const email = href.replace('mailto:', '');
+        return {onclick: 'z.util.safe_mailto_open(\'' + email + '\')'};
+      }
       return {};
     },
     formatHref: function(href, type) {
-      if (type === 'email') return '#';
-      return href;
+      return (type === 'email') ? '#' : href;
     },
     ignoreTags: ['code', 'pre'],
     validate: {
