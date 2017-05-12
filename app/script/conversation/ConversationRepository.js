@@ -1373,7 +1373,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             case z.cryptography.GENERIC_MESSAGE_TYPE.EDITED:
               generic_message.edited.text.link_preview.push(link_preview);
               break;
-            case z.cryptography.GENERIC_MESSAGE_TYPE.:
+            case z.cryptography.GENERIC_MESSAGE_TYPE.TEXT:
               generic_message.text.link_preview.push(link_preview);
               break;
             default:
