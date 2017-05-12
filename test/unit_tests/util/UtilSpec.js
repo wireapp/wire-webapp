@@ -68,6 +68,12 @@ describe('z.util.render_message', function() {
     expect(z.util.render_message(link)).toBe(expected);
   });
 
+  it('renders links with @ symbol', function() {
+    const link = 'https://t.facdn.net/22382738@400-1485204208.jpg';
+    const expected = `Just click <a href=\"${link}\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">${link}</a> and download it`;
+    expect(z.util.render_message(`Just click ${link} and download it`)).toBe(expected);
+  });
+
   it('escapes links when they are posted as plain HTML', function() {
     const expected = '&lt;a href=&quot;javascript:alert(&#x27;ohoh!&#x27;)&quot;&gt;what?&lt;/a&gt;';
     expect(z.util.render_message("<a href=\"javascript:alert('ohoh!')\">what?</a>")).toBe(expected);
