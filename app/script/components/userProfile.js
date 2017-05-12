@@ -244,7 +244,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
     };
 
     this.on_pending = () => {
-      if (this.user.is_ignored() || this.user.is_incoming_request()) {
+      if (this.user().is_ignored() || this.user().is_incoming_request()) {
         if (typeof params.pending === 'function') {
           params.pending(this.user());
         }
