@@ -678,7 +678,7 @@ z.calling.entities.EFlow = class EFlow {
     }
 
     const call_event = z.conversation.EventBuilder.build_calling(conversation_et, e_call_message, this.remote_user_id, this.remote_client_id);
-    amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, call_event);
+    amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, call_event, z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET);
   }
 
   /**

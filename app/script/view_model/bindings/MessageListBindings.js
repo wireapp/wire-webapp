@@ -81,7 +81,7 @@ ko.bindingHandlers.background_image = {
 
     const _on_viewport_change = _.debounce(function() {
       if (_in_view(element) && asset_remote_data()) {
-        asset_remote_data.load()
+        asset_remote_data().load()
           .then(function(blob) {
             $(element).removeClass('image-loading');
             object_url = window.URL.createObjectURL(blob);
