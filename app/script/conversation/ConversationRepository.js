@@ -1665,8 +1665,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return mapped_event;
       })
       .then((saved_event) => {
-        const treat_as_active_event = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK;
-        this.on_conversation_event(saved_event, treat_as_active_event);
+        if (generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK) {
+          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
+        }
+
+        this.on_conversation_event(saved_event, z.event.EventRepository.NOTIFICATION_SOURCE.INJECTED);
+
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then((payload) => {
             if (z.event.EventTypeHandling.STORE.includes(saved_event.type)) {
@@ -2195,10 +2199,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Listener for incoming events.
    *
    * @param {Object} event_json - JSON data for event
-   * @param {boolean} received_while_active - Send a notification and un-archive if necessary
+   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
-  on_conversation_event(event_json, received_while_active = false) {
+  on_conversation_event(event_json, source = z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
     if (!event_json) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
@@ -2258,7 +2262,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (_.isObject(return_value)) {
           const {conversation_et, message_et} = return_value;
 
-          if (received_while_active) {
+          if (source === z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET) {
             if (message_et) {
               amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
             }
@@ -2287,11 +2291,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Push to receiving queue.
-   * @param {Object} event_json - JSON data for event
+   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  push_to_receiving_queue(event_json) {
-    this.receiving_queue.push(() => this.on_conversation_event(event_json, !this.block_event_handling));
+  push_to_receiving_queue(event_json, source) {
+    this.receiving_queue.push(() => this.on_conversation_event(event_json, source));
   }
 
   /**

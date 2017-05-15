@@ -638,10 +638,9 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         }
         break;
       case z.message.SuperType.PING:
-        if (message_et.user().is_me) {
-          return amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
+        if (!message_et.user().is_me) {
+          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
         }
-        amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
         break;
       default:
         this.logger.log(this.logger.levels.OFF, `Notification for message '${message_et.id} does not play sound.`);
