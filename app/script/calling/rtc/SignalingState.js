@@ -25,7 +25,7 @@ window.z.calling.rtc = z.calling.rtc || {};
 
 // http://www.w3.org/TR/webrtc/#rtcpeerstate-enum
 // https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection.signalingState#Value
-z.calling.rtc.SIGNALING_OFFER = {
+z.calling.rtc.SIGNALING_STATE = {
   CLOSED: 'closed',
   LOCAL_OFFER: 'have-local-offer',
   LOCAL_PROVISIONAL_ANSWER: 'have-local-pranswer',

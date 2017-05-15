@@ -86,7 +86,7 @@ z.calling.entities.EFlow = class EFlow {
 
     this.connection_state = ko.observable(z.calling.rtc.ICE_CONNECTION_STATE.NEW);
     this.gathering_state = ko.observable(z.calling.rtc.ICE_GATHERING_STATE.NEW);
-    this.signaling_state = ko.observable(z.calling.rtc.SIGNALING_OFFER.NEW);
+    this.signaling_state = ko.observable(z.calling.rtc.SIGNALING_STATE.NEW);
 
     this.connection_state.subscribe((ice_connection_state) => {
       switch (ice_connection_state) {
@@ -139,19 +139,19 @@ z.calling.entities.EFlow = class EFlow {
 
     this.signaling_state.subscribe((signaling_state) => {
       switch (signaling_state) {
-        case z.calling.rtc.SIGNALING_OFFER.CLOSED: {
+        case z.calling.rtc.SIGNALING_STATE.CLOSED: {
           this.logger.info(`PeerConnection with '${this.remote_user.name()}' was closed`);
           this.e_call_et.delete_e_participant(this.e_participant_et.id, this.remote_client_id);
           this._stop_media_stream(this.media_stream());
           break;
         }
 
-        case z.calling.rtc.SIGNALING_OFFER.REMOTE_OFFER: {
+        case z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER: {
           this.negotiation_needed(true);
           break;
         }
 
-        case z.calling.rtc.SIGNALING_OFFER.STABLE: {
+        case z.calling.rtc.SIGNALING_STATE.STABLE: {
           this._clear_negotiation_timeout();
           break;
         }
@@ -194,8 +194,8 @@ z.calling.entities.EFlow = class EFlow {
     this.proper_local_sdp_state = ko.pureComputed(() => {
       const is_answer = this.local_sdp_type() === z.calling.rtc.SDP_TYPE.ANSWER;
       const is_offer = this.local_sdp_type() === z.calling.rtc.SDP_TYPE.OFFER;
-      const in_remote_offer_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.REMOTE_OFFER;
-      const in_stable_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.STABLE;
+      const in_remote_offer_state = this.signaling_state() === z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER;
+      const in_stable_state = this.signaling_state() === z.calling.rtc.SIGNALING_STATE.STABLE;
 
       return (is_offer && in_stable_state) || (is_answer && in_remote_offer_state);
     });
@@ -234,8 +234,8 @@ z.calling.entities.EFlow = class EFlow {
     this.proper_remote_sdp_state = ko.pureComputed(() => {
       const is_answer = this.remote_sdp_type() === z.calling.rtc.SDP_TYPE.ANSWER;
       const is_offer = this.remote_sdp_type() === z.calling.rtc.SDP_TYPE.OFFER;
-      const in_local_offer_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.LOCAL_OFFER;
-      const in_stable_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.STABLE;
+      const in_local_offer_state = this.signaling_state() === z.calling.rtc.SIGNALING_STATE.LOCAL_OFFER;
+      const in_stable_state = this.signaling_state() === z.calling.rtc.SIGNALING_STATE.STABLE;
 
       return (is_offer && in_stable_state) || (is_answer && in_local_offer_state);
     });
@@ -256,12 +256,12 @@ z.calling.entities.EFlow = class EFlow {
     //##############################################################################
 
     this.can_create_sdp = ko.pureComputed(() => {
-      const in_state_for_creation = this.negotiation_needed() && this.signaling_state() !== z.calling.rtc.SIGNALING_OFFER.CLOSED;
+      const in_state_for_creation = this.negotiation_needed() && this.signaling_state() !== z.calling.rtc.SIGNALING_STATE.CLOSED;
       return this.pc_initialized() && in_state_for_creation;
     });
 
     this.can_create_sdp_answer = ko.pureComputed(() => {
-      const answer_state = this.is_answer() && this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.REMOTE_OFFER;
+      const answer_state = this.is_answer() && this.signaling_state() === z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER;
       return this.can_create_sdp() && answer_state;
     });
 
@@ -272,7 +272,7 @@ z.calling.entities.EFlow = class EFlow {
     });
 
     this.can_create_sdp_offer = ko.pureComputed(() => {
-      const offer_state = !this.is_answer() && this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.STABLE;
+      const offer_state = !this.is_answer() && this.signaling_state() === z.calling.rtc.SIGNALING_STATE.STABLE;
       return this.can_create_sdp() && offer_state;
     });
 
@@ -415,7 +415,7 @@ z.calling.entities.EFlow = class EFlow {
         this.logger.log(this.logger.levels.OFF, `State change ignored - signaling state: ${this.peer_connection.signalingState}`);
       };
 
-      if (this.peer_connection.signalingState !== z.calling.rtc.SIGNALING_OFFER.CLOSED) {
+      if (this.peer_connection.signalingState !== z.calling.rtc.SIGNALING_STATE.CLOSED) {
         this.peer_connection.close();
         this.logger.info(`Closing PeerConnection '${this.remote_user.name()}' successful`);
       }
@@ -711,15 +711,15 @@ z.calling.entities.EFlow = class EFlow {
 
         if (remote_sdp.type === z.calling.rtc.SDP_TYPE.OFFER) {
           switch (this.signaling_state()) {
-            case z.calling.rtc.SIGNALING_OFFER.LOCAL_OFFER: {
+            case z.calling.rtc.SIGNALING_STATE.LOCAL_OFFER: {
               if (this._solve_colliding_states()) {
                 throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.SDP_STATE_COLLISION);
               }
               break;
             }
 
-            case z.calling.rtc.SIGNALING_OFFER.NEW:
-            case z.calling.rtc.SIGNALING_OFFER.STABLE: {
+            case z.calling.rtc.SIGNALING_STATE.NEW:
+            case z.calling.rtc.SIGNALING_STATE.STABLE: {
 
               this.is_answer(true);
               break;
@@ -1258,13 +1258,14 @@ z.calling.entities.EFlow = class EFlow {
    */
   _stop_media_stream(media_stream) {
     if (this.peer_connection) {
-      const signaling_state_stable = this.peer_connection.signalingState === z.calling.rtc.SIGNALING_OFFER.STABLE;
+      const signaling_state_stable = this.peer_connection.signalingState === z.calling.rtc.SIGNALING_STATE.STABLE;
 
-      if (signaling_state_stable && this.peer_connection.removeTrack) {
+      if (signaling_state_stable && typeof this.peer_connection.removeTrack === 'function') {
         return this._remove_media_stream_tracks(media_stream);
       }
 
-      if (this.peer_connection.signalingState !== z.calling.rtc.SIGNALING_OFFER.CLOSED) {
+      const signaling_state_not_closed = this.peer_connection.signalingState !== z.calling.rtc.SIGNALING_STATE.CLOSED;
+      if (signaling_state_not_closed && typeof this.peer_connection.removeStream === 'function') {
         this.peer_connection.removeStream(media_stream);
         this.logger.debug(`Removed local '${media_stream.type}' MediaStream from PeerConnection`,
           {
@@ -1347,7 +1348,7 @@ z.calling.entities.EFlow = class EFlow {
   _reset_signaling_states() {
     this.connection_state(z.calling.rtc.ICE_CONNECTION_STATE.NEW);
     this.gathering_state(z.calling.rtc.ICE_GATHERING_STATE.NEW);
-    this.signaling_state(z.calling.rtc.SIGNALING_OFFER.NEW);
+    this.signaling_state(z.calling.rtc.SIGNALING_STATE.NEW);
   }
 
 
