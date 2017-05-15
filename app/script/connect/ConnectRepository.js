@@ -192,7 +192,7 @@ z.connect.ConnectRepository = class ConnectRepository {
       });
 
       return address_book.getContacts((percentage) => {
-        return this.logger.info('Importing Contacts', percentage);
+        this.logger.info('Importing Contacts', percentage);
       },
       (contacts) => {
         contacts.forEach(({emails, firstName: first_name, lastName: last_name, numbers}) => {

@@ -242,7 +242,7 @@ window.z.audio.AudioRepository = class AudioRepository {
       return this._play(audio_id, audio_element, play_in_loop);
     })
     .then((audio_element) => {
-      return this.logger.info(`Playing sound '${audio_id}' (loop: '${play_in_loop}')`, audio_element);
+      this.logger.info(`Playing sound '${audio_id}' (loop: '${play_in_loop}')`, audio_element);
     })
     .catch((error) => {
       if (!(error instanceof z.audio.AudioError)) {

@@ -104,7 +104,7 @@ z.calling.entities.EFlow = class EFlow {
           this.e_call_et.is_connected(true);
           this.e_participant_et.is_connected(true);
 
-          this.e_call_et.interrupted_participants.remove(this.participant_et);
+          this.e_call_et.interrupted_participants.remove(this.e_participant_et);
           this.e_call_et.state(z.calling.enum.CALL_STATE.ONGOING);
           this.e_call_et.termination_reason = undefined;
           break;
@@ -166,6 +166,8 @@ z.calling.entities.EFlow = class EFlow {
     this.negotiation_needed = ko.observable(false);
     this.negotiation_timeout = undefined;
 
+    this.sdp_state_changing = ko.observable(false);
+
 
     //##############################################################################
     // Local SDP
@@ -173,13 +175,13 @@ z.calling.entities.EFlow = class EFlow {
 
     this.local_sdp_type = ko.observable(undefined);
     this.local_sdp = ko.observable(undefined);
-    this.local_sdp.subscribe((sdp) => {
-      if (sdp) {
-        this.local_sdp_type(sdp.type);
+    this.local_sdp.subscribe((sdp = {}) => {
+      this.local_sdp_type(sdp.type);
 
+      if (sdp.type) {
         if (!this.should_send_local_sdp()) {
           this.should_send_local_sdp(true);
-          return this.should_set_local_sdp(true);
+          this.should_set_local_sdp(true);
         }
       }
     });
@@ -189,18 +191,21 @@ z.calling.entities.EFlow = class EFlow {
 
     this.send_sdp_timeout = undefined;
 
+    this.proper_local_sdp_state = ko.pureComputed(() => {
+      const is_answer = this.local_sdp_type() === z.calling.rtc.SDP_TYPE.ANSWER;
+      const is_offer = this.local_sdp_type() === z.calling.rtc.SDP_TYPE.OFFER;
+      const in_remote_offer_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.REMOTE_OFFER;
+      const in_stable_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.STABLE;
+
+      return (is_offer && in_stable_state) || (is_answer && in_remote_offer_state);
+    });
+
     this.can_set_local_sdp = ko.pureComputed(() => {
       const in_connection_progress = this.connection_state() === z.calling.rtc.ICE_CONNECTION_STATE.CHECKING;
       const progress_gathering_states = [z.calling.rtc.ICE_GATHERING_STATE.COMPLETE, z.calling.rtc.ICE_GATHERING_STATE.GATHERING];
       const in_progress = in_connection_progress && progress_gathering_states.includes(this.gathering_state());
 
-      const is_answer = this.local_sdp_type() === z.calling.rtc.SDP_TYPE.ANSWER;
-      const is_offer = this.local_sdp_type() === z.calling.rtc.SDP_TYPE.OFFER;
-      const in_remote_offer_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.REMOTE_OFFER;
-      const in_stable_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.STABLE;
-      const in_proper_state = (is_offer && in_stable_state) || (is_answer && in_remote_offer_state);
-
-      return this.local_sdp() && this.should_set_local_sdp() && in_proper_state && !in_progress;
+      return this.local_sdp() && this.should_set_local_sdp() && this.proper_local_sdp_state() && !in_progress && !this.sdp_state_changing();
     });
 
     this.can_set_local_sdp.subscribe((can_set) => {
@@ -216,25 +221,27 @@ z.calling.entities.EFlow = class EFlow {
 
     this.remote_sdp_type = ko.observable(undefined);
     this.remote_sdp = ko.observable(undefined);
-    this.remote_sdp.subscribe((sdp) => {
-      if (sdp) {
-        this.remote_sdp_type(sdp.type);
-        return this.should_set_remote_sdp(true);
-      }
+    this.remote_sdp.subscribe((sdp = {}) => {
+      this.remote_sdp_type(sdp.type);
 
-      return this.remote_sdp_type(undefined);
+      if (sdp.type) {
+        this.should_set_remote_sdp(true);
+      }
     });
 
     this.should_set_remote_sdp = ko.observable(false);
 
-    this.can_set_remote_sdp = ko.pureComputed(() => {
+    this.proper_remote_sdp_state = ko.pureComputed(() => {
       const is_answer = this.remote_sdp_type() === z.calling.rtc.SDP_TYPE.ANSWER;
       const is_offer = this.remote_sdp_type() === z.calling.rtc.SDP_TYPE.OFFER;
       const in_local_offer_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.LOCAL_OFFER;
       const in_stable_state = this.signaling_state() === z.calling.rtc.SIGNALING_OFFER.STABLE;
-      const in_proper_state = (is_offer && in_stable_state) || (is_answer && in_local_offer_state);
 
-      return this.pc_initialized() && this.should_set_remote_sdp() && in_proper_state;
+      return (is_offer && in_stable_state) || (is_answer && in_local_offer_state);
+    });
+
+    this.can_set_remote_sdp = ko.pureComputed(() => {
+      return this.pc_initialized() && this.should_set_remote_sdp() && this.proper_remote_sdp_state() && !this.sdp_state_changing();
     });
 
     this.can_set_remote_sdp.subscribe((can_set) => {
@@ -276,8 +283,6 @@ z.calling.entities.EFlow = class EFlow {
     });
 
     this.initialize_e_flow(e_call_message_et);
-
-    return this;
   }
 
   /**
@@ -306,7 +311,7 @@ z.calling.entities.EFlow = class EFlow {
    *
    * @param {z.calling.enum.SDP_NEGOTIATION_MODE} negotiation_mode - Mode for renegotiation
    * @param {boolean} is_answer - Flow is answer
-   * @param {MediaStream} media_stream - Local media stream
+   * @param {MediaStream} [media_stream] - Local media stream
    * @returns {undefined} No return value
    */
   restart_negotiation(negotiation_mode, is_answer, media_stream) {
@@ -321,7 +326,9 @@ z.calling.entities.EFlow = class EFlow {
     this.local_sdp(undefined);
     this.remote_sdp(undefined);
 
-    this.start_negotiation(negotiation_mode, media_stream);
+    if (negotiation_mode !== z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION) {
+      this.start_negotiation(negotiation_mode, media_stream);
+    }
   }
 
   /**
@@ -344,7 +351,7 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   start_negotiation(negotiation_mode = z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT, media_stream = this.media_stream()) {
-    this.logger.info(`Start negotiating PeerConnection with '${this.remote_user.name()}'`);
+    this.logger.info(`Start negotiating PeerConnection with '${this.remote_user.name()}' triggered by '${negotiation_mode}'`);
 
     this.audio.hookup(true);
     this._create_peer_connection();
@@ -667,7 +674,7 @@ z.calling.entities.EFlow = class EFlow {
     if (response === true) {
       this.logger.debug(`Received confirmation for e-call '${type}' message via data channel`, e_call_message);
     } else {
-      this.logger.debug(`Received e-call '${type}' message via data channel`, e_call_message);
+      this.logger.debug(`Received e-call '${type}' (response: ${response}) message via data channel`, e_call_message);
     }
 
     const call_event = z.conversation.EventBuilder.build_calling(conversation_et, e_call_message, this.remote_user_id, this.remote_client_id);
@@ -852,7 +859,6 @@ z.calling.entities.EFlow = class EFlow {
     this.e_call_et.telemetry.track_event(z.tracking.EventName.CALLING.FAILED_RTC, undefined, attributes);
 
     amplify.publish(z.event.WebApp.CALL.STATE.LEAVE, this.e_call_et.id, z.calling.enum.TERMINATION_REASON.SDP_FAILED);
-
   }
 
   /**
@@ -913,6 +919,7 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   _set_local_sdp() {
+    this.sdp_state_changing(true);
     this.logger.debug(`Setting local '${this.local_sdp().type}' SDP`, this.local_sdp());
 
     this.peer_connection.setLocalDescription(this.local_sdp())
@@ -921,6 +928,7 @@ z.calling.entities.EFlow = class EFlow {
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SET);
 
         this.should_set_local_sdp(false);
+        this.sdp_state_changing(false);
         this._set_send_sdp_timeout();
       })
       .catch((error) => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.LOCAL, this.local_sdp().type));
@@ -932,6 +940,7 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   _set_remote_sdp() {
+    this.sdp_state_changing(false);
     this.logger.debug(`Setting remote '${this.remote_sdp().type}' SDP\n${this.remote_sdp().sdp}`, this.remote_sdp());
 
     this.peer_connection.setRemoteDescription(this.remote_sdp())
@@ -940,6 +949,7 @@ z.calling.entities.EFlow = class EFlow {
         this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.REMOTE_SDP_SET);
 
         this.should_set_remote_sdp(false);
+        this.sdp_state_changing(false);
       })
       .catch((error) => this._set_sdp_failure(error, z.calling.enum.SDP_SOURCE.REMOTE, this.remote_sdp().type));
   }
@@ -955,6 +965,15 @@ z.calling.entities.EFlow = class EFlow {
    */
   _set_sdp_failure(error, sdp_source, sdp_type) {
     const {message, name} = error;
+
+    const failed_local_sdp = sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && !this.proper_local_sdp_state();
+    const failed_remote_sdp = sdp_source === z.calling.enum.SDP_SOURCE.REMOTE && !this.proper_remote_sdp_state();
+
+    if (failed_local_sdp || failed_remote_sdp) {
+      this._solve_colliding_sdps(failed_local_sdp);
+      return this.sdp_state_changing(false);
+    }
+
     this.logger.error(`Setting ${sdp_source} '${sdp_type}' SDP failed: ${name} - ${message}`, error);
 
     const attributes = {cause: name, location: sdp_source, step: 'set_sdp', type: sdp_type};
@@ -986,7 +1005,7 @@ z.calling.entities.EFlow = class EFlow {
       this.e_call_et.termination_reason = z.calling.enum.TERMINATION_REASON.CONNECTION_DROP;
       this.e_participant_et.is_connected(false);
 
-      this.e_call_et.interrupted_participants.push(this.participant_et);
+      this.e_call_et.interrupted_participants.push(this.e_participant_et);
       if (this.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT) {
         return this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, false);
       }
@@ -1018,18 +1037,33 @@ z.calling.entities.EFlow = class EFlow {
    *
    * @note If we receive a remote offer while we have a local offer, we need to check who needs to switch his SDP type.
    * @private
+   * @param {boolean} [force_renegotiation=false] - Force local renegotiation to switch to
    * @returns {boolean} False if we locally needed to switch sides
    */
-  _solve_colliding_states() {
-    if (this.self_user_id < this.remote_user_id) {
+  _solve_colliding_states(force_renegotiation = false) {
+    if (this.self_user_id < this.remote_user_id || force_renegotiation) {
       this.logger.warn(`We need to switch SDP state of flow with '${this.remote_user.name()}' to answer.`);
 
-      this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART, true);
-      return false;
+      this.restart_negotiation(z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION, true);
+      return force_renegotiation || false;
     }
 
-    this.logger.warn(`Remote side '${this.remote_user.name()}' needs to switch SDP state flow  to answer.`);
+    this.logger.warn(`Remote side '${this.remote_user.name()}' needs to switch SDP state flow to answer.`);
     return true;
+  }
+
+  /**
+   * Solve colliding SDP states when setting SDP failed.
+   * @private
+   * @param {boolean} failed_local_sdp - Failed to set local SDP
+   * @returns {undefined} No return value
+   */
+  _solve_colliding_sdps(failed_local_sdp) {
+    const remote_sdp = this.remote_sdp();
+
+    if (!this._solve_colliding_states(failed_local_sdp)) {
+      this.remote_sdp(remote_sdp);
+    }
   }
 
 

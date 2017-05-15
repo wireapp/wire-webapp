@@ -839,12 +839,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
     };
 
     return this.conversation_service.update_member_properties(conversation_et.id, payload)
-      .then(() => {
-        this._on_member_update(conversation_et, {data: payload}, next_conversation_et);
-        this.logger.info(`Archived conversation '${conversation_et.id}' on '${payload.otr_archived_ref}'`);
-      })
       .catch((error) => {
         this.logger.error(`Conversation '${conversation_et.id}' could not be archived: ${error.code}\r\nPayload: ${JSON.stringify(payload)}`, error);
+        if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+          throw error;
+        }
+      })
+      .then(() => {
+        this._on_member_update(conversation_et, {data: payload}, next_conversation_et);
+        this.logger.info(`Archived conversation '${conversation_et.id}' locally on '${payload.otr_archived_ref}'`);
       });
   }
 
@@ -856,22 +859,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation to clear
    * @param {boolean} [leave=false] - Should we leave the conversation before clearing the content?
-   * @returns {undefined} No return value
+   * @returns {Promise} No return value
    */
   clear_conversation(conversation_et, leave = false) {
     const next_conversation_et = this.get_next_conversation(conversation_et);
-
-    const _clear_conversation = () => {
-      this._update_cleared_timestamp(conversation_et);
-      this._delete_messages(conversation_et);
-      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
-    };
-
-    if (leave) {
-      return this.leave_conversation(conversation_et, next_conversation_et, _clear_conversation);
-    }
-
-    return _clear_conversation();
+    const promise = leave ? this.leave_conversation(conversation_et, next_conversation_et) : Promise.resolve();
+    return promise
+      .then(() => {
+        this._update_cleared_timestamp(conversation_et);
+        this._delete_messages(conversation_et);
+        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, next_conversation_et);
+      });
   }
 
   /**
@@ -901,20 +899,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @param {Conversation} conversation_et - Conversation to leave
    * @param {Conversation} next_conversation_et - Next conversation in list
-   * @param {Function} callback - Function to be called on server return
    * @returns {Promise} Resolves when the conversation was left
    */
-  leave_conversation(conversation_et, next_conversation_et, callback) {
+  leave_conversation(conversation_et, next_conversation_et) {
     return this.conversation_service.delete_members(conversation_et.id, this.user_repository.self().id)
       .then((response) => {
         amplify.publish(z.event.WebApp.EVENT.INJECT, response);
         return this._on_member_leave(conversation_et, response);
       })
       .then(() => {
-        if (_.isFunction(callback)) {
-          return callback(next_conversation_et);
-        }
-
         return this.archive_conversation(conversation_et, next_conversation_et);
       });
   }
@@ -2128,7 +2121,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         });
       })
       .then(() => {
-        return this.logger.info(`Obfuscated image message '${message_id}'`);
+        this.logger.info(`Obfuscated image message '${message_id}'`);
       });
   }
 
@@ -2297,7 +2290,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Push to receiving queue.
    * @param {Object} event_json - JSON data for event
-   * @returns {Promise} Resolves when event was handled
+   * @returns {undefined} No return value
    */
   push_to_receiving_queue(event_json) {
     this.receiving_queue.push(() => this.on_conversation_event(event_json, !this.block_event_handling));
@@ -2950,7 +2943,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         };
 
         const _remove_redundant_user = function(user_id) {
-          if (conversation_et) {
+          if (conversation_et && conversation_et.is_group()) {
             conversation_et.participating_user_ids.remove(user_id);
           }
 

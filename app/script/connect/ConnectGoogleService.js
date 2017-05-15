@@ -49,7 +49,7 @@ z.connect.ConnectGoogleService = class ConnectGoogleService {
     .then(() => this._get_access_token())
     .then((access_token) => this._get_contacts(access_token))
     .catch((error) => {
-      return this.logger.error(`Failed to import contacts from Google: ${error.message}`, error);
+      this.logger.error(`Failed to import contacts from Google: ${error.message}`, error);
     });
   }
 

@@ -22,6 +22,8 @@ globals:
   keyboardJS: true
   ko: true
   libsodium: true
+  linkify: true
+  linkifyHtml: true
   lorem_ipsum: true
   LRUCache: true
   marked: true

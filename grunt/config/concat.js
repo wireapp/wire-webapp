@@ -19,13 +19,10 @@
 
 'use strict';
 
-window.z = window.z || {};
-window.z.calling = z.calling || {};
-window.z.calling.enum = z.calling.enum || {};
-
-z.calling.enum.SDP_NEGOTIATION_MODE = {
-  DEFAULT: 'default',
-  ICE_RESTART: 'ice_restart',
-  STATE_COLLISION: 'state_collision',
-  STREAM_CHANGE: 'stream_change',
+module.exports = {
+  deploy: {
+    files: {
+      'deploy/min/wire-vendor.min.js': ['deploy/min/wire-vendor.min.js'].concat('<%= scripts_minified.vendor %>'),
+    },
+  },
 };

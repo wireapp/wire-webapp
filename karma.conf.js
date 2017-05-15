@@ -19,6 +19,8 @@
 
 /* eslint-disable sort-keys */
 
+'use strict';
+
 module.exports = function(config) {
   config.set({
 

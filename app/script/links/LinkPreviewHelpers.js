@@ -31,22 +31,25 @@ z.links.LinkPreviewHelpers = {
    */
   contains_only_link(text) {
     text = text.trim();
-    const urls = twttr.txt.extractUrls(text);
-    return (urls.length === 1) && (urls[0] === text);
+    const urls = linkify.find(text, 'url');
+    return (urls.length === 1) && (urls[0].value === text);
   },
 
   /**
    * Get first link and link offset for given text.
    * @param {string} text - Text to parse
-   * @returns {Array<string, number>} First link and its offset
+   * @returns {Object} Containing link and its offset
    */
   get_first_link_with_offset(text) {
-    const links = twttr.txt.extractUrls(text);
+    const links = linkify.find(text, 'url');
     const first_link = links[0];
 
     if (first_link != null) {
-      const link_offset = text.indexOf(first_link);
-      return [first_link, link_offset];
+      const link_offset = text.indexOf(first_link.value);
+      return {
+        offset: link_offset,
+        url: first_link.value,
+      };
     }
   },
 

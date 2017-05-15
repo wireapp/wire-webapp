@@ -251,7 +251,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
 
         this.current_device_id.video_input(next_device.deviceId);
 
-        return this.logger.info(`Switching the active camera from '${current_device.label || current_device.deviceId}' to '${next_device.label || next_device.deviceId}'`);
+        this.logger.info(`Switching the active camera from '${current_device.label || current_device.deviceId}' to '${next_device.label || next_device.deviceId}'`);
       });
   }
 
@@ -267,7 +267,7 @@ z.media.MediaDevicesHandler = class MediaDevicesHandler {
 
         this.current_device_id.screen_input(next_device.id);
 
-        return this.logger.info(`Switching the active screen from '${current_device.name || current_device.id}' to '${next_device.name || next_device.id}'`);
+        this.logger.info(`Switching the active screen from '${current_device.name || current_device.id}' to '${next_device.name || next_device.id}'`);
       });
   }
 
