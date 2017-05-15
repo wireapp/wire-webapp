@@ -35,6 +35,8 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
    * @param {z.user.UserRepository} user_repository - User repository
   */
   constructor(element_id, list_view_model, content_view_model, calling_repository, conversation_repository, user_repository) {
+    this.is_selected_conversation = this.is_selected_conversation.bind(this);
+
     this.list_view_model = list_view_model;
     this.content_view_model = content_view_model;
     this.calling_repository = calling_repository;
