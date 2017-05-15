@@ -142,7 +142,6 @@ z.calling.entities.EFlow = class EFlow {
         case z.calling.rtc.SIGNALING_STATE.CLOSED: {
           this.logger.info(`PeerConnection with '${this.remote_user.name()}' was closed`);
           this.e_call_et.delete_e_participant(this.e_participant_et.id, this.remote_client_id);
-          this._stop_media_stream(this.media_stream());
           break;
         }
 
@@ -1250,13 +1249,13 @@ z.calling.entities.EFlow = class EFlow {
   }
 
   /**
-   * Stop the MediaStream.
+   * Remove the MediaStream.
    *
    * @private
    * @param {MediaStream} media_stream - Local MediaStream to stop
    * @returns {undefined} No return value
    */
-  _stop_media_stream(media_stream) {
+  _remove_media_stream(media_stream) {
     if (this.peer_connection) {
       const signaling_state_stable = this.peer_connection.signalingState === z.calling.rtc.SIGNALING_STATE.STABLE;
 
@@ -1331,7 +1330,7 @@ z.calling.entities.EFlow = class EFlow {
 
     this.logger.debug(`Resetting flow with user '${this.remote_user.id}'`);
     if (this.media_stream()) {
-      this._stop_media_stream(this.media_stream());
+      this._remove_media_stream(this.media_stream());
     }
 
     this._close_data_channel();
