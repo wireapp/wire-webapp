@@ -189,21 +189,6 @@ z.calling.entities.ECall = class ECall {
   //##############################################################################
 
   /**
-   * Check if group call should continue.
-   * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Call termination reason
-   * @returns {undefined} No return value
-   */
-  check_activity(termination_reason) {
-    if (!this.participants().length) {
-      if (this.self_client_joined()) {
-        this.leave_call(termination_reason);
-      } else {
-        this.deactivate_call();
-      }
-    }
-  }
-
-  /**
    * Deactivate the call.
    *
    * @param {ECallMessage} e_call_message_et - E-call message for deactivation
@@ -297,6 +282,21 @@ z.calling.entities.ECall = class ECall {
         this.set_self_state(false, termination_reason);
         this.deactivate_call(e_call_message_et, termination_reason);
       });
+  }
+
+  /**
+   * Check if group call should continue after participant left.
+   * @param {ECallMessage} e_call_message_et - Last member leaving call
+   * @returns {undefined} No return value
+   */
+  participant_left(e_call_message_et) {
+    if (!this.participants().length) {
+      if (this.self_client_joined()) {
+        return this.leave_call(z.calling.enum.TERMINATION_REASON.OTHER_USER);
+      }
+
+      this.deactivate_call(e_call_message_et, z.calling.enum.TERMINATION_REASON.OTHER_USER);
+    }
   }
 
   /**
@@ -407,8 +407,10 @@ z.calling.entities.ECall = class ECall {
    */
   _set_verify_group_check_timeout() {
     this.group_check_timeout = window.setTimeout(() => {
-      // @todo Create expected deactivation message
-      this.deactivate_call();
+      const additional_payload = this.v3_call_center.create_additional_payload(this.id, this.creating_user.id);
+      const e_call_message_et = z.calling.mapper.ECallMessageMapper.build_group_leave(false, this.session_id, additional_payload);
+
+      this.deactivate_call(e_call_message_et, z.calling.enum.TERMINATION_REASON.MISSED);
     },
     ECall.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT);
   }
@@ -680,7 +682,7 @@ z.calling.entities.ECall = class ECall {
         this.logger.info(`Removed e-call participant '${e_participant_et.user.name()}'`);
         return this;
       })
-      .catch(function(error) {
+      .catch((error) => {
         if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
@@ -719,10 +721,7 @@ z.calling.entities.ECall = class ECall {
 
   /**
    * Remove an e-participant from the call.
-   *
    * @param {string} user_id - ID of user to be removed from the e-call
-   * @param {string} client_id - ID of client that requested the removal from the e-call
-   * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Call termination reason
    * @returns {Promise} Resolves with the e-call entity
    */
   reset_e_participant(user_id) {
