@@ -514,7 +514,7 @@ ko.bindingHandlers.in_viewport = (function() {
           const dispose = callback && callback();
 
           if (dispose) {
-           _dispose();
+            _dispose();
           }
 
         }
