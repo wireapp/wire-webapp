@@ -487,8 +487,8 @@ ko.bindingHandlers.in_viewport = (function() {
 
   // listeners can be deleted during iteration
   const notify_listeners = _.throttle((event) => {
-    for (let i = listeners.length; i--; ) {
-      listeners[i](event)
+    for (let index = listeners.length; index--;) {
+      listeners[index](event);
     }
   }, 300);
 
@@ -503,19 +503,19 @@ ko.bindingHandlers.in_viewport = (function() {
       }
 
       function _dispose() {
-        z.util.ArrayUtil.remove_element(listeners, _check_element)
+        z.util.ArrayUtil.remove_element(listeners, _check_element);
       }
 
       function _check_element() {
-        let is_child = event ? event.target.contains(element) : true;
+        const is_child = event ? event.target.contains(element) : true;
 
         if (is_child && _in_view(element)) {
           const callback = valueAccessor();
           const dispose = callback && callback();
 
-           if (dispose) {
-             _dispose();
-           }
+          if (dispose) {
+           _dispose();
+          }
 
         }
       }
