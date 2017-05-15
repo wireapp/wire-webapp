@@ -822,36 +822,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Archive a conversation.
-   *
-   * @param {Conversation} conversation_et - Conversation to rename
-   * @param {Conversation} next_conversation_et - Next conversation to potentially switch to
-   * @returns {Promise} Resolves when the conversation was archived
-   */
-  archive_conversation(conversation_et, next_conversation_et) {
-    if (!conversation_et) {
-      return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND));
-    }
-
-    const payload = {
-      otr_archived: true,
-      otr_archived_ref: new Date(conversation_et.last_event_timestamp()).toISOString(),
-    };
-
-    return this.conversation_service.update_member_properties(conversation_et.id, payload)
-      .catch((error) => {
-        this.logger.error(`Conversation '${conversation_et.id}' could not be archived: ${error.code}\r\nPayload: ${JSON.stringify(payload)}`, error);
-        if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
-          throw error;
-        }
-      })
-      .then(() => {
-        this._on_member_update(conversation_et, {data: payload}, next_conversation_et);
-        this.logger.info(`Archived conversation '${conversation_et.id}' locally on '${payload.otr_archived_ref}'`);
-      });
-  }
-
-  /**
    * Clear conversation content and archive the conversation.
    *
    * @note According to spec we archive a conversation when we clear it.
@@ -1066,6 +1036,36 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
+   * Archive a conversation.
+   *
+   * @param {Conversation} conversation_et - Conversation to rename
+   * @param {Conversation} next_conversation_et - Next conversation to potentially switch to
+   * @returns {Promise} Resolves when the conversation was archived
+   */
+  archive_conversation(conversation_et, next_conversation_et) {
+    if (!conversation_et) {
+      return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND));
+    }
+
+    const payload = {
+      otr_archived: true,
+      otr_archived_ref: new Date(conversation_et.last_event_timestamp()).toISOString(),
+    };
+
+    return this.conversation_service.update_member_properties(conversation_et.id, payload)
+      .catch((error) => {
+        this.logger.error(`Conversation '${conversation_et.id}' could not be archived: ${error.code}\r\nPayload: ${JSON.stringify(payload)}`, error);
+        if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+          throw error;
+        }
+      })
+      .then(() => {
+        this._on_member_update(conversation_et, {data: payload}, next_conversation_et);
+        this.logger.info(`Archived conversation '${conversation_et.id}' locally on '${payload.otr_archived_ref}'`);
+      });
+  }
+
+  /**
    * Un-archive a conversation.
    * @param {Conversation} conversation_et - Conversation to unarchive
    * @returns {Promise} Resolves when the conversation was unarchived
@@ -1081,20 +1081,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
     };
 
     return this.conversation_service.update_member_properties(conversation_et.id, payload)
-      .then(() => {
-        const response = {
-          data: payload,
-        };
-
-        this._on_member_update(conversation_et, response);
-        this.logger.info(`Unarchived conversation '${conversation_et.id}' on '${payload.otr_archived_ref}'`);
-        return response;
-      })
       .catch((error) => {
-        const reject_error = new Error(`Conversation '${conversation_et.id}' could not be unarchived: ${error.code}`);
-        this.logger.warn(reject_error.message, error);
-        throw reject_error;
+        this.logger.error(`Conversation '${conversation_et.id}' could not be unarchived: ${error.code}`);
+        if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+          throw error;
+        }
+      })
+      .then(() => {
+        this._on_member_update(conversation_et, {data: payload});
+        this.logger.info(`Unarchived conversation '${conversation_et.id}' on '${payload.otr_archived_ref}'`);
       });
+
   }
 
   /**

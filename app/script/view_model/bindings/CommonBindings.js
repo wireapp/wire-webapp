@@ -487,38 +487,38 @@ ko.bindingHandlers.in_viewport = (function() {
 
   // listeners can be deleted during iteration
   const notify_listeners = _.throttle((event) => {
-    listeners
-      .reverse()
-      .forEach((listener) => listener(event))
-      .reverse();
-  },
-  300);
+    for (let i = listeners.length; i--; ) {
+      listeners[i](event)
+    }
+  }, 300);
 
   window.addEventListener('scroll', notify_listeners, true);
 
   return {
     init(element, valueAccessor, allBindingsAccessor) {
 
-      const _in_view = function(dom_element) {
+      function _in_view(dom_element) {
         const box = dom_element.getBoundingClientRect();
         return (box.right >= 0) && (box.bottom >= 0) && (box.left <= document.documentElement.clientWidth) && (box.top <= document.documentElement.clientHeight);
-      };
+      }
 
-      const _dispose = function() {
-      };
+      function _dispose() {
+        z.util.ArrayUtil.remove_element(listeners, _check_element)
+      }
 
-      const _check_element = function() {
-        let is_child = true;
-        if (event) {
-          is_child = event.target.contains(element);
-        }
+      function _check_element() {
+        let is_child = event ? event.target.contains(element) : true;
 
         if (is_child && _in_view(element)) {
-          if (typeof valueAccessor() === 'function') {
-            _dispose();
-          }
+          const callback = valueAccessor();
+          const dispose = callback && callback();
+
+           if (dispose) {
+             _dispose();
+           }
+
         }
-      };
+      }
 
       listeners.push(_check_element);
       window.setTimeout(_check_element, allBindingsAccessor.get('delay') || 0);
