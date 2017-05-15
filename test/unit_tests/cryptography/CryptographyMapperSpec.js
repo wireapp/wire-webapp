@@ -559,6 +559,25 @@ describe('z.cryptography.CryptographyMapper', function() {
         .catch(done.fail);
     });
 
+    it('resolves with a mapped reaction message', function(done) {
+      const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
+      generic_message.set('reaction', new z.proto.Reaction(z.message.ReactionType.LIKE, generic_message.message_id));
+
+      mapper.map_generic_message(generic_message, event)
+        .then(function(event_json) {
+          expect(_.isObject(event_json)).toBeTruthy();
+          expect(event_json.type).toBe(z.event.Client.CONVERSATION.REACTION);
+          expect(event_json.conversation).toBe(event.conversation);
+          expect(event_json.from).toBe(event.from);
+          expect(event_json.time).toBe(event.time);
+          expect(event_json.id).toBe(generic_message.message_id);
+          expect(event_json.data.message_id).toBe(generic_message.message_id);
+          expect(event_json.data.reaction).toBe(z.message.ReactionType.LIKE);
+          done();
+        })
+        .catch(done.fail);
+    });
+
     it('resolves with a mapped calling message', function(done) {
       const content_message = {
         resp: false,
