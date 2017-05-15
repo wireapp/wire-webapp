@@ -36,6 +36,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
    * @param {z.properties.PropertiesRepository} properties_repository - Properties repository
   */
   constructor(element_id, list_view_model, connect_repository, conversation_repository, search_repository, user_repository, properties_repository) {
+    this.click_on_close = this.click_on_close.bind(this);
+    this.click_on_group = this.click_on_group.bind(this);
+    this.click_on_other = this.click_on_other.bind(this);
+
     this.list_view_model = list_view_model;
     this.connect_repository = connect_repository;
     this.conversation_repository = conversation_repository;
