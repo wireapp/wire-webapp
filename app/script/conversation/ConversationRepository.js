@@ -2291,6 +2291,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Push to receiving queue.
+   * @param {Object} event_json - JSON data for event
    * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
