@@ -750,7 +750,7 @@ describe('ConversationRepository', function() {
 
       beforeAll(function() {
         generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-        generic_message.set('text', new z.proto.Text('Test'));
+        generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Test'));
 
         john_doe = {
           client_id: 'd13a2ec9b6436122',
@@ -867,7 +867,7 @@ describe('ConversationRepository', function() {
       TestFactory.conversation_repository.save_conversation(external_conversation_et)
         .then(function() {
           const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-          generic_message.set('text', new z.proto.Text('massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message'));
+          generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message'));
 
           return TestFactory.conversation_repository._should_send_as_external(external_conversation_et.id, generic_message);
         })
@@ -885,7 +885,7 @@ describe('ConversationRepository', function() {
       TestFactory.conversation_repository.save_conversation(external_conversation_et)
         .then(function() {
           const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-          generic_message.set('text', new z.proto.Text('Test'));
+          generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Test'));
 
           return TestFactory.conversation_repository._should_send_as_external(external_conversation_et.id, generic_message);
         })
