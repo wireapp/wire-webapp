@@ -17,26 +17,25 @@
  *
  */
 
-group-avatar {
-  .square(32px);
-  border: 1px solid fade(#fff, 12%);
-  border-radius: 6px;
-}
+'use strict';
 
-.group-avatar-box-wrapper {
-  .square(28px);
-  background-color: fade(#000, 40%);
-  border-radius: 4px;
-  display: flex;
-  flex-wrap: wrap;
-  margin: 1px;
-  overflow: hidden;
-}
+window.z = window.z || {};
+window.z.cryptography = z.cryptography || {};
 
-.group-avatar-box {
-  .flex-center;
-  .square(14px);
-  flex: 0 0 auto;
-  font-weight: 900;
-  font-size: 9px;
-}
+z.cryptography.GENERIC_MESSAGE_TYPE = {
+  ASSET: 'asset',
+  CALLING: 'calling',
+  CLEARED: 'cleared',
+  CLIENT_ACTION: 'clientAction',
+  CONFIRMATION: 'confirmation',
+  DELETED: 'deleted',
+  EDITED: 'edited',
+  EPHEMERAL: 'ephemeral',
+  HIDDEN: 'hidden',
+  IMAGE: 'image',
+  KNOCK: 'knock',
+  LAST_READ: 'lastRead',
+  LOCATION: 'location',
+  REACTION: 'reaction',
+  TEXT: 'text',
+};

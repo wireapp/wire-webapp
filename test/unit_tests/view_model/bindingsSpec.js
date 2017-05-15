@@ -22,63 +22,6 @@
 'use strict';
 
 describe('ko.bindingHandlers', function() {
-  describe('ko.bindingHandlers.unread_indicator', function() {
-    it('can show a filled indicator dot on a conversation when call state is "NONE"', function() {
-      const element = $('<div></div>')[0];
-      const observable = ko.observable('');
-      const valueAccessor = () => observable;
-      const binding = ko.bindingHandlers.unread_indicator;
-      const conversation = new z.entity.Conversation();
-
-      binding.update(element, valueAccessor, null, conversation);
-      expect(element.className).toBe('bg-theme');
-
-      observable(0);
-      binding.update(element, valueAccessor, null, conversation);
-      expect(element.className).toBe('bg-theme');
-
-      observable(1);
-      binding.update(element, valueAccessor, null, conversation);
-      expect(element.className).toBe('bg-theme dot-xs');
-
-      observable(2);
-      binding.update(element, valueAccessor, null, conversation);
-      expect(element.className).toBe('bg-theme dot-xs');
-
-      observable(3);
-      binding.update(element, valueAccessor, null, conversation);
-      expect(element.className).toBe('bg-theme dot-sm');
-
-      observable(4);
-      binding.update(element, valueAccessor, null, conversation);
-      expect(element.className).toBe('bg-theme dot-sm');
-
-      observable(5);
-      binding.update(element, valueAccessor, null, conversation);
-      expect(element.className).toBe('bg-theme dot-md');
-
-      observable(6);
-      binding.update(element, valueAccessor, null, conversation);
-      expect(element.className).toBe('bg-theme dot-md');
-
-      observable(7);
-      binding.update(element, valueAccessor, null, conversation);
-      expect(element.className).toBe('bg-theme dot-lg');
-
-      observable(8);
-      binding.update(element, valueAccessor, null, conversation);
-      expect(element.className).toBe('bg-theme dot-lg');
-
-      observable(9);
-      binding.update(element, valueAccessor, null, conversation);
-      expect(element.className).toBe('bg-theme dot-xl');
-
-      observable(1337);
-      binding.update(element, valueAccessor, null, conversation);
-      expect(element.className).toBe('bg-theme dot-xl');
-    });
-  });
-
   describe('ko.bindingHandlers.enter', function() {
     const binding = ko.bindingHandlers.enter;
     let element = null;
