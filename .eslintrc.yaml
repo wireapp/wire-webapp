@@ -42,6 +42,7 @@ globals:
   UUID: true
   wire: true
   z: true
+  zeta: true
 
 plugins:
   - jsdoc
