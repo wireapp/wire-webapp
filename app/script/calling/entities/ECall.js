@@ -196,7 +196,8 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   deactivate_call(e_call_message_et, termination_reason = z.calling.enum.TERMINATION_REASON.SELF_USER) {
-    const reason = z.calling.enum.CALL_STATE_GROUP.WAS_MISSED.includes(this.state()) ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
+    const was_missed = z.calling.enum.CALL_STATE_GROUP.WAS_MISSED.includes(this.state());
+    const reason = was_missed ? z.calling.enum.TERMINATION_REASON.MISSED : z.calling.enum.TERMINATION_REASON.COMPLETED;
 
     this.termination_reason = termination_reason;
     this.v3_call_center.inject_deactivate_event(e_call_message_et, this.creating_user, reason);
@@ -224,12 +225,13 @@ z.calling.entities.ECall = class ECall {
   join_call() {
     this.set_self_state(true);
 
-    if ([z.calling.enum.CALL_STATE.INCOMING, z.calling.enum.CALL_STATE.REJECTED].includes(this.state())) {
+    const states_to_connect = [z.calling.enum.CALL_STATE.INCOMING, z.calling.enum.CALL_STATE.REJECTED];
+    if (states_to_connect.includes(this.state())) {
       this.state(z.calling.enum.CALL_STATE.CONNECTING);
     }
 
     if (this.is_group()) {
-      const response = this.state() === z.calling.enum.CALL_STATE.CONNECTING;
+      const response = this.state() !== z.calling.enum.CALL_STATE.OUTGOING;
       const additional_payload = this.v3_call_center.create_additional_payload(this.id);
       const prop_sync_payload = this.v3_call_center.create_payload_prop_sync(z.media.MediaType.AUDIO, false, additional_payload);
 
@@ -287,15 +289,16 @@ z.calling.entities.ECall = class ECall {
   /**
    * Check if group call should continue after participant left.
    * @param {ECallMessage} e_call_message_et - Last member leaving call
+   * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Reason for call participant to leave
    * @returns {undefined} No return value
    */
-  participant_left(e_call_message_et) {
+  participant_left(e_call_message_et, termination_reason) {
     if (!this.participants().length) {
       if (this.self_client_joined()) {
-        return this.leave_call(z.calling.enum.TERMINATION_REASON.OTHER_USER);
+        return this.leave_call(termination_reason);
       }
 
-      this.deactivate_call(e_call_message_et, z.calling.enum.TERMINATION_REASON.OTHER_USER);
+      this.deactivate_call(e_call_message_et, termination_reason);
     }
   }
 
@@ -423,7 +426,7 @@ z.calling.entities.ECall = class ECall {
   /**
    * Confirm an incoming message.
    * @param {ECallMessage} incoming_e_call_message_et - Incoming e-call message to be confirmed
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when message was confirmed
    */
   confirm_message(incoming_e_call_message_et) {
     const {client_id, type, user_id} = incoming_e_call_message_et;
@@ -445,11 +448,12 @@ z.calling.entities.ECall = class ECall {
       }
 
       default: {
-        return this.logger.error(`Tried to confirm e-call event of wrong type '${type}'`, e_call_message_et);
+        this.logger.error(`Tried to confirm e-call event of wrong type '${type}'`, e_call_message_et);
+        return Promise.resolve();
       }
     }
 
-    this.send_e_call_event(e_call_message_et);
+    return this.send_e_call_event(e_call_message_et);
   }
 
   /**
@@ -729,7 +733,6 @@ z.calling.entities.ECall = class ECall {
       .then((e_participant_et) => {
         e_participant_et.reset_participant();
         this.interrupted_participants.remove(e_participant_et);
-        this.participants.remove(e_participant_et);
 
         this._update_remote_state();
         this.v3_call_center.media_element_handler.remove_media_element(user_id);

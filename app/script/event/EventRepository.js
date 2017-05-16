@@ -430,7 +430,7 @@ z.event.EventRepository = class EventRepository {
   inject_event(event) {
     if (event.conversation !== this.user_repository.self().id) {
       this.logger.info(`Injected event ID '${event.id}' of type '${event.type}'`, event);
-      this._handle_event(event, z.event.EventRepository.NOTIFICATION_SOURCE.INJECTED);
+      this._handle_event(event, EventRepository.NOTIFICATION_SOURCE.INJECTED);
     }
   }
 
