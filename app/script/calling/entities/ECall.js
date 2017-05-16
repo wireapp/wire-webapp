@@ -731,7 +731,6 @@ z.calling.entities.ECall = class ECall {
       .then((e_participant_et) => {
         e_participant_et.reset_participant();
         this.interrupted_participants.remove(e_participant_et);
-        this.participants.remove(e_participant_et);
 
         this._update_remote_state();
         this.v3_call_center.media_element_handler.remove_media_element(user_id);
