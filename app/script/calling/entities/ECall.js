@@ -26,7 +26,7 @@ window.z.calling.entities = z.calling.entities || {};
 z.calling.entities.ECall = class ECall {
   static get CONFIG() {
     return {
-      GROUP_CHECK_ACTIVITY_TIMEOUT: 2 * 60 * 1000,
+      GROUP_CHECK_ACTIVITY_TIMEOUT: 2 * 60,
       GROUP_CHECK_MAXIMUM_TIMEOUT: 90,
       GROUP_CHECK_MINIMUM_TIMEOUT: 60,
       STATE_TIMEOUT: 30 * 1000,
@@ -67,7 +67,6 @@ z.calling.entities.ECall = class ECall {
     this.call_timer_interval = undefined;
     this.timer_start = undefined;
     this.duration_time = ko.observable(0);
-    this.data_channel_opened = false;
     this.group_check_timeout = undefined;
     this.termination_reason = undefined;
 
@@ -111,6 +110,10 @@ z.calling.entities.ECall = class ECall {
     // Observable subscriptions
     this.is_connected.subscribe((is_connected) => {
       if (is_connected) {
+        if (this.is_group()) {
+          this.schedule_group_check();
+        }
+
         this.telemetry.track_event(z.tracking.EventName.CALLING.ESTABLISHED_CALL, this);
         this.timer_start = Date.now() - ECall.CONFIG.TIMER_UPDATE_START;
 
@@ -118,8 +121,7 @@ z.calling.entities.ECall = class ECall {
           const duration_in_seconds = Math.floor((Date.now() - this.timer_start) / 1000);
 
           this.duration_time(duration_in_seconds);
-        },
-        ECall.CONFIG.TIMER_UPDATE_INTERVAL);
+        }, ECall.CONFIG.TIMER_UPDATE_INTERVAL);
       }
     });
 
@@ -225,8 +227,7 @@ z.calling.entities.ECall = class ECall {
   join_call() {
     this.set_self_state(true);
 
-    const states_to_connect = [z.calling.enum.CALL_STATE.INCOMING, z.calling.enum.CALL_STATE.REJECTED];
-    if (states_to_connect.includes(this.state())) {
+    if (z.calling.enum.CALL_STATE_GROUP.CAN_CONNECT.includes(this.state())) {
       this.state(z.calling.enum.CALL_STATE.CONNECTING);
     }
 
@@ -369,9 +370,9 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   _clear_group_check_timeout() {
-    if (this.check_group_check_timeout) {
-      window.clearTimeout(this.check_group_check_timeout);
-      this.check_group_check_timeout = undefined;
+    if (this.group_check_timeout) {
+      window.clearTimeout(this.group_check_timeout);
+      this.group_check_timeout = undefined;
     }
   }
 
@@ -394,13 +395,16 @@ z.calling.entities.ECall = class ECall {
   _set_send_group_check_timeout() {
     const maximum_timeout = ECall.CONFIG.GROUP_CHECK_MAXIMUM_TIMEOUT;
     const minimum_timeout = ECall.CONFIG.GROUP_CHECK_MINIMUM_TIMEOUT;
-    const timeout_in_milliseconds = 1000 * z.util.NumberUtil.get_random_number(minimum_timeout, maximum_timeout);
+    const timeout_in_seconds = z.util.NumberUtil.get_random_number(minimum_timeout, maximum_timeout);
 
+    this.logger.debug(`Set sending group check after random timeout of '${timeout_in_seconds}s'`);
     this.group_check_timeout = window.setTimeout(() => {
+      this.logger.debug(`Sending group check after random timeout of '${timeout_in_seconds}s'`);
       const additional_payload = this.v3_call_center.create_additional_payload(this.id);
+
       this.send_e_call_event(z.calling.mapper.ECallMessageMapper.build_group_check(true, this.session_id, additional_payload));
-    },
-    timeout_in_milliseconds);
+      this.schedule_group_check();
+    }, timeout_in_seconds * 1000);
   }
 
   /**
@@ -409,13 +413,16 @@ z.calling.entities.ECall = class ECall {
    * @returns {undefined} No return value
    */
   _set_verify_group_check_timeout() {
+    const timeout_in_seconds = ECall.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT;
+
+    this.logger.debug(`Set verifying group check after '${timeout_in_seconds}s'`);
     this.group_check_timeout = window.setTimeout(() => {
+      this.logger.debug('Removing on group check timeout');
       const additional_payload = this.v3_call_center.create_additional_payload(this.id, this.creating_user.id);
       const e_call_message_et = z.calling.mapper.ECallMessageMapper.build_group_leave(false, this.session_id, additional_payload);
 
       this.deactivate_call(e_call_message_et, z.calling.enum.TERMINATION_REASON.MISSED);
-    },
-    ECall.CONFIG.GROUP_CHECK_ACTIVITY_TIMEOUT);
+    }, timeout_in_seconds * 1000);
   }
 
 

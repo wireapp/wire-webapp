@@ -83,6 +83,7 @@ z.calling.entities.EFlow = class EFlow {
 
     this.media_stream = this.e_call_et.local_media_stream;
     this.data_channel = undefined;
+    this.data_channel_opened = false;
 
     this.connection_state = ko.observable(z.calling.rtc.ICE_CONNECTION_STATE.NEW);
     this.gathering_state = ko.observable(z.calling.rtc.ICE_GATHERING_STATE.NEW);
@@ -322,8 +323,7 @@ z.calling.entities.EFlow = class EFlow {
     this._clear_send_sdp_timeout();
     this._reset_signaling_states();
     this.is_answer(is_answer);
-    this.local_sdp(undefined);
-    this.remote_sdp(undefined);
+    this._reset_sdp();
 
     if (negotiation_mode !== z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION) {
       this.start_negotiation(negotiation_mode, media_stream);
@@ -566,7 +566,7 @@ z.calling.entities.EFlow = class EFlow {
   send_message(e_call_message_et) {
     const {conversation_id, response, type} = e_call_message_et;
 
-    if (this.data_channel && this.e_call_et.data_channel_opened) {
+    if (this.data_channel && this.data_channel_opened) {
       try {
         this.data_channel.send(e_call_message_et.to_content_string());
         this.logger.info(`Send e-call '${type}' message to conversation '${conversation_id}' via data channel`, e_call_message_et.to_JSON());
@@ -594,7 +594,7 @@ z.calling.entities.EFlow = class EFlow {
       }
       delete this.data_channel;
     }
-    this.e_call_et.data_channel_opened = false;
+    this.data_channel_opened = false;
   }
 
   /**
@@ -646,7 +646,7 @@ z.calling.entities.EFlow = class EFlow {
 
     if (this.data_channel && this.data_channel.readyState === z.calling.rtc.DATA_CHANNEL_STATE.CLOSED) {
       delete this.data_channel;
-      this.e_call_et.data_channel_opened = false;
+      this.data_channel_opened = false;
     }
   }
 
@@ -692,7 +692,7 @@ z.calling.entities.EFlow = class EFlow {
    */
   _on_open({target: data_channel}) {
     this.logger.info(`Data channel '${data_channel.label}' was opened and can be used`, data_channel);
-    this.e_call_et.data_channel_opened = true;
+    this.data_channel_opened = true;
   }
 
 
@@ -1334,7 +1334,18 @@ z.calling.entities.EFlow = class EFlow {
     this._close_data_channel();
     this._close_peer_connection();
     this._reset_signaling_states();
+    this._reset_sdp();
     this.pc_initialized(false);
+  }
+
+  /**
+   * Reset the SDP.
+   * @private
+   * @returns {undefined} No return value
+   */
+  _reset_sdp() {
+    this.local_sdp(undefined);
+    this.remote_sdp(undefined);
   }
 
   /**
