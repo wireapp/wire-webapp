@@ -30,7 +30,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   constructor(element_id, client_repository, user_repository) {
     this.check_new_clients = this.check_new_clients.bind(this);
-    this.removed_from_view = this.removed_from_view.bind(this);
+    this.click_on_change_picture = this.click_on_change_picture.bind(this);
 
     this.client_repository = client_repository;
     this.user_repository = user_repository;
