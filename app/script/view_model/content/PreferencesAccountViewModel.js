@@ -182,7 +182,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   click_on_change_picture(files) {
     this.set_picture(files, () => {
       amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, {source: 'fromPhotoLibrary'})
-    });
+    })
   }
 
   click_on_delete_account() {
