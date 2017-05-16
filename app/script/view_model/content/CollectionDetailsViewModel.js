@@ -26,7 +26,6 @@ window.z.ViewModel.content = z.ViewModel.content || {};
 // Parent: z.ViewModel.CollectionViewModel
 z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewModel {
   constructor() {
-    this.added_to_view = this.added_to_view.bind(this);
     this.item_added = this.item_added.bind(this);
     this.item_removed = this.item_removed.bind(this);
     this.removed_from_view = this.removed_from_view.bind(this);
