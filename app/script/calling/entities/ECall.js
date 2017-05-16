@@ -67,7 +67,6 @@ z.calling.entities.ECall = class ECall {
     this.call_timer_interval = undefined;
     this.timer_start = undefined;
     this.duration_time = ko.observable(0);
-    this.data_channel_opened = false;
     this.group_check_timeout = undefined;
     this.termination_reason = undefined;
 
