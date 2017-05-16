@@ -27,12 +27,14 @@ z.calling.entities.FlowAudio = class FlowAudio {
   /**
    * Create a new flow audio.
    * @param {z.entities.EFlow|z.entities.Flow} flow_et - Flow entity
-   * @param {AudioContext} audio_context - AudioContext to use
+   * @param {MediaRepository} media_repository - Media repository
    */
-  constructor(flow_et, audio_context) {
+  constructor(flow_et, media_repository) {
     this.flow_et = flow_et;
-    this.audio_context = audio_context;
+    this.media_repository = media_repository;
     this.logger = new z.util.Logger(`z.calling.FlowAudio (${this.flow_et.id})`, z.config.LOGGER.OPTIONS);
+
+    this.audio_context = undefined;
 
     // Panning
     if (this.flow_et.e_participant_et) {
@@ -101,10 +103,12 @@ z.calling.entities.FlowAudio = class FlowAudio {
    * @returns {MediaStream} Wrapped MediaStream
    */
   wrap_audio_input_stream(media_stream) {
-    if (this.audio_context) {
-      this.audio_source = this.audio_context.createMediaStreamSource(media_stream);
-      this.gain_node = this.audio_context.createGain();
-      this.audio_remote = this.audio_context.createMediaStreamDestination();
+    const audio_context = this._get_audio_context();
+
+    if (audio_context) {
+      this.audio_source = audio_context.createMediaStreamSource(media_stream);
+      this.gain_node = audio_context.createGain();
+      this.audio_remote = audio_context.createMediaStreamDestination();
       this._hookup_audio();
 
       $.extend(true, media_stream, this.audio_remote.stream);
@@ -120,21 +124,36 @@ z.calling.entities.FlowAudio = class FlowAudio {
    * @returns {MediaStream} Wrapped MediaStream
    */
   wrap_audio_output_stream(media_stream) {
-    if (z.util.Environment.browser.firefox && this.audio_context) {
-      const remote_source = this.audio_context.createMediaStreamSource(media_stream);
-      const audio_output_device = this.audio_context.createMediaStreamDestination();
+    if (z.util.Environment.browser.firefox) {
+      const audio_context = this._get_audio_context();
 
-      this.pan_node = this.audio_context.createStereoPanner();
-      this.pan_node.pan.value = this.panning();
+      if (audio_context) {
+        const remote_source = audio_context.createMediaStreamSource(media_stream);
+        const audio_output_device = audio_context.createMediaStreamDestination();
 
-      remote_source.connect(this.pan_node);
-      this.pan_node.connect(audio_output_device);
+        this.pan_node = audio_context.createStereoPanner();
+        this.pan_node.pan.value = this.panning();
 
-      $.extend(true, media_stream, audio_output_device.stream);
-      this.logger.debug(`Wrapped audio stream to speaker to create stereo. Initial panning set to '${this.panning()}'.`, media_stream);
+        remote_source.connect(this.pan_node);
+        this.pan_node.connect(audio_output_device);
+
+        $.extend(true, media_stream, audio_output_device.stream);
+        this.logger.debug(`Wrapped audio stream to speaker to create stereo. Initial panning set to '${this.panning()}'.`, media_stream);
+      }
     }
 
     return media_stream;
+  }
+
+  /**
+   * Get running AudioContext.
+   * @returns {AudioContext} Active AudioContext
+   */
+  _get_audio_context() {
+    if (!this.audio_context || this.audio_context.state === z.media.MediaRepository.AUDIO_CONTEXT_STATE.CLOSED) {
+      this.audio_context = this.media_repository.get_audio_context();
+    }
+    return this.audio_context;
   }
 
   /**

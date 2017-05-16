@@ -57,7 +57,7 @@ z.calling.entities.EFlow = class EFlow {
     this.is_group = this.e_call_et.is_group;
 
     // Audio
-    this.audio = new z.calling.entities.FlowAudio(this, this.v3_call_center.media_repository.get_audio_context());
+    this.audio = new z.calling.entities.FlowAudio(this, this.v3_call_center.media_repository);
 
     // Users
     this.remote_client_id = undefined;
@@ -352,9 +352,9 @@ z.calling.entities.EFlow = class EFlow {
   start_negotiation(negotiation_mode = z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT, media_stream = this.media_stream()) {
     this.logger.info(`Start negotiating PeerConnection with '${this.remote_user.name()}' triggered by '${negotiation_mode}'`);
 
-    this.audio.hookup(true);
     this._create_peer_connection();
     this._add_media_stream(media_stream);
+    this.audio.hookup(true);
     this._set_sdp_states();
     this.negotiation_mode(negotiation_mode);
     this.negotiation_needed(true);
@@ -506,7 +506,10 @@ z.calling.entities.EFlow = class EFlow {
    * @returns {undefined} No return value
    */
   _on_ice_connection_state_change(event) {
-    if (this.peer_connection || ![z.calling.enum.CALL_STATE.DISCONNECTING, z.calling.enum.CALL_STATE.ENDED].includes(this.e_call_et.state())) {
+    const ending_call_states = [z.calling.enum.CALL_STATE.DISCONNECTING, z.calling.enum.CALL_STATE.ENDED];
+    const is_ending_call = ending_call_states.includes(this.e_call_et.state());
+
+    if (this.peer_connection || !is_ending_call) {
       this.logger.info('State changed - ICE connection', event);
       this.logger.log(this.logger.levels.LEVEL_1, `ICE connection state: ${this.peer_connection.iceConnectionState}`);
       this.logger.log(this.logger.levels.LEVEL_1, `ICE gathering state: ${this.peer_connection.iceGatheringState}`);
@@ -1101,12 +1104,7 @@ z.calling.entities.EFlow = class EFlow {
    */
   _add_media_stream(media_stream) {
     if (media_stream.type === z.media.MediaType.AUDIO) {
-      try {
-        media_stream = this.audio.wrap_audio_input_stream(media_stream);
-      } catch (error) {
-        this.audio.audio_context = this.e_call_et.media_repository.get_audio_context();
-        media_stream = this.audio.wrap_audio_input_stream(media_stream);
-      }
+      media_stream = this.audio.wrap_audio_input_stream(media_stream);
     }
 
     if (this.peer_connection.addTrack) {
