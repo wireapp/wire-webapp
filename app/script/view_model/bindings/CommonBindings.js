@@ -506,7 +506,7 @@ ko.bindingHandlers.in_viewport = (function() {
         z.util.ArrayUtil.remove_element(listeners, _check_element);
       }
 
-      function _check_element() {
+      function _check_element(event) {
         const is_child = event ? event.target.contains(element) : true;
 
         if (is_child && _in_view(element)) {

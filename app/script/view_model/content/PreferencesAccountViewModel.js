@@ -30,7 +30,6 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
 
   constructor(element_id, client_repository, user_repository) {
     this.check_new_clients = this.check_new_clients.bind(this);
-    this.click_on_change_picture = this.click_on_change_picture.bind(this);
 
     this.client_repository = client_repository;
     this.user_repository = user_repository;
@@ -181,8 +180,9 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   click_on_change_picture(files) {
-    this.set_picture(files)
-      .then(() => amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, {source: 'fromPhotoLibrary'}));
+    this.set_picture(files, () => {
+      amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.PROFILE_PICTURE_CHANGED, {source: 'fromPhotoLibrary'})
+    });
   }
 
   click_on_delete_account() {
