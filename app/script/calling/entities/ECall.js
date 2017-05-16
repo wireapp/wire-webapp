@@ -287,15 +287,16 @@ z.calling.entities.ECall = class ECall {
   /**
    * Check if group call should continue after participant left.
    * @param {ECallMessage} e_call_message_et - Last member leaving call
+   * @param {z.calling.enum.TERMINATION_REASON} termination_reason - Reason for call participant to leave
    * @returns {undefined} No return value
    */
-  participant_left(e_call_message_et) {
+  participant_left(e_call_message_et, termination_reason) {
     if (!this.participants().length) {
       if (this.self_client_joined()) {
-        return this.leave_call(z.calling.enum.TERMINATION_REASON.OTHER_USER);
+        return this.leave_call(termination_reason);
       }
 
-      this.deactivate_call(e_call_message_et, z.calling.enum.TERMINATION_REASON.OTHER_USER);
+      this.deactivate_call(e_call_message_et, termination_reason);
     }
   }
 
