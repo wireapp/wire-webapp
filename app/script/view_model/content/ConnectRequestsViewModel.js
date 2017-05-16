@@ -30,6 +30,8 @@ z.ViewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
    * @param {z.user.UserRepository} user_repository - User repository
    */
   constructor(element_id, user_repository) {
+    this.after_render = this.after_render.bind(this);
+
     this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.ViewModel.content.ConnectRequestsViewModel', z.config.LOGGER.OPTIONS);
 
