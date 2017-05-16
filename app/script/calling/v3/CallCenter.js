@@ -315,7 +315,7 @@ z.calling.v3.CallCenter = class CallCenter {
           e_call_et.state(z.calling.enum.CALL_STATE.CONNECTING);
         }
 
-        // add the correct participant, start negotiating
+        // Add the correct participant, start negotiating
         this.user_repository.get_user_by_id(user_id)
           .then((remote_user_et) => e_call_et.add_e_participant(remote_user_et, e_call_message_et, e_call_et.self_client_joined()));
       })
