@@ -40,13 +40,13 @@ z.ViewModel.list.TakeoverViewModel = class TakeoverViewModel {
 
     this.name = ko.pureComputed(() => {
       if (this.self_user()) {
-        this.self_user().name();
+        return this.self_user().name();
       }
     });
 
     this.username = ko.pureComputed(() => {
       if (this.self_user()) {
-        this.self_user().username();
+        return this.self_user().username();
       }
     });
   }
