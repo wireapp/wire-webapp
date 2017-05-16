@@ -32,10 +32,10 @@ class z.calling.entities.Flow
   @param id [String] ID of the flow
   @param call_et [z.calling.Call] Call entity that the flow belongs to
   @param participant_et [z.calling.Participant] Participant entity that the flow belongs to
-  @param audio_context [AudioContext] AudioContext to be used with the flow
+  @param media_repository [z.media.MediaRepository] Media repository for flow audio
   @param timings [z.telemetry.calling.CallSetupTimings] Timing statistics of call setup steps
   ###
-  constructor: (@id, @call_et, @participant_et, @audio_context, timings) ->
+  constructor: (@id, @call_et, @participant_et, @media_repository, timings) ->
     @logger = new z.util.Logger "z.calling.Flow (#{@id})", z.config.LOGGER.OPTIONS
 
     @conversation_id = @call_et.id
@@ -47,7 +47,7 @@ class z.calling.entities.Flow
     @is_group = @call_et.is_group
 
     # Audio
-    @audio = new z.calling.entities.FlowAudio @, @audio_context
+    @audio = new z.calling.entities.FlowAudio @, @media_repository
 
     # ICE candidates
     @ice_candidates_cache = []
