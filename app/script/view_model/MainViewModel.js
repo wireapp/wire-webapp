@@ -32,10 +32,7 @@ z.ViewModel.MainViewModel = class MainViewModel {
     this.main_classes = ko.pureComputed(() => {
       if (this.user()) {
         // deprecated - still used on input control hover
-        let main_css_classes = `main-accent-color-${this.user().accent_id()}`;
-        main_css_classes += ` ${this.user().accent_theme()}`;
-        main_css_classes += ' show';
-        return main_css_classes;
+        return `main-accent-color-${this.user().accent_id()} ${this.user().accent_theme()} show`;
       }
     });
 

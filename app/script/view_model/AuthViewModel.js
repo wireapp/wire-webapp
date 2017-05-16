@@ -37,8 +37,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         z.auth.URLParameter.LOCALYTICS,
       ],
     };
-
   }
+
   /**
    * View model for the auth page.
    *
@@ -177,17 +177,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       return !this.disabled_by_animation() && (this.code_expiration_timestamp() < z.util.get_unix_timestamp());
     });
 
-    this.can_resend_registration = ko.pureComputed(() => {
-      return !this.disabled_by_animation() && this.username().length;
-    });
+    this.can_resend_registration = ko.pureComputed(() => !this.disabled_by_animation() && this.username().length);
 
-    this.can_resend_verification = ko.pureComputed(() => {
-      return !this.disabled_by_animation() && this.username().length;
-    });
+    this.can_resend_verification = ko.pureComputed(() => !this.disabled_by_animation() && this.username().length);
 
-    this.can_verify_password = ko.pureComputed(() => {
-      return !this.disabled_by_animation() && this.password().length;
-    });
+    this.can_verify_password = ko.pureComputed(() => !this.disabled_by_animation() && this.password().length);
 
     this.account_retry_text = ko.pureComputed(() => {
       return z.localization.Localizer.get_text({
@@ -245,21 +239,11 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
     });
 
     this.posted_mode = ko.observable(undefined);
-    this.posted_mode_offline = ko.pureComputed(() => {
-      return this.posted_mode() === z.auth.AuthView.MODE.POSTED_OFFLINE;
-    });
-    this.posted_mode_pending = ko.pureComputed(() => {
-      return this.posted_mode() === z.auth.AuthView.MODE.POSTED_PENDING;
-    });
-    this.posted_mode_resend = ko.pureComputed(() => {
-      return this.posted_mode() === z.auth.AuthView.MODE.POSTED_RESEND;
-    });
-    this.posted_mode_retry = ko.pureComputed(() => {
-      return this.posted_mode() === z.auth.AuthView.MODE.POSTED_RETRY;
-    });
-    this.posted_mode_verify = ko.pureComputed(() => {
-      return this.posted_mode() === z.auth.AuthView.MODE.POSTED_VERIFY;
-    });
+    this.posted_mode_offline = ko.pureComputed(() => this.posted_mode() === z.auth.AuthView.MODE.POSTED_OFFLINE);
+    this.posted_mode_pending = ko.pureComputed(() => this.posted_mode() === z.auth.AuthView.MODE.POSTED_PENDING);
+    this.posted_mode_resend = ko.pureComputed(() => this.posted_mode() === z.auth.AuthView.MODE.POSTED_RESEND);
+    this.posted_mode_retry = ko.pureComputed(() => this.posted_mode() === z.auth.AuthView.MODE.POSTED_RETRY);
+    this.posted_mode_verify = ko.pureComputed(() => this.posted_mode() === z.auth.AuthView.MODE.POSTED_VERIFY);
 
     // Debugging
     if (z.util.Environment.frontend.is_localhost()) {
@@ -500,9 +484,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
             throw error;
           }
         })
-        .then(() => {
-          return this.user_service.change_own_email(this.username());
-        })
+        .then(() => this.user_service.change_own_email(this.username()))
         .then(() => {
           this.pending_server_request(false);
           this._wait_for_update();

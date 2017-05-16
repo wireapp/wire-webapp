@@ -187,7 +187,6 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
           this.logger.error(`No gifs found for query: ${this.query()}`, error);
           this.state(GiphyViewModel.STATE.ERROR);
         });
-
     }
   }
 };
