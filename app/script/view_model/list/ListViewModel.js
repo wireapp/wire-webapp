@@ -37,6 +37,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   */
   constructor(element_id, content_view_model, calling_repository, connect_repository, conversation_repository, search_repository, properties_repository) {
     this.switch_list = this.switch_list.bind(this);
+    this.on_context_menu = this.on_context_menu.bind(this);
 
     this.content_view_model = content_view_model;
     this.calling_repository = calling_repository;
