@@ -67,9 +67,9 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.takeover      = new z.ViewModel.list.TakeoverViewModel('takeover', this.conversation_repository, this.user_repository);
     /* eslint-enable no-multi-spaces */
 
-    this.self_user = ko.pureComputed(() => {
+    this.self_user_picture = ko.pureComputed(() => {
       if (this.webapp_loaded() && this.user_repository.self()) {
-        this.user_repository.self().medium_picture_resource();
+        return this.user_repository.self().medium_picture_resource();
       }
     });
 
