@@ -592,7 +592,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {boolean} Is the conversation active
    */
   is_active_conversation(conversation_et) {
-    return this.active_conversation().id === conversation_et.id;
+    if (this.active_conversation()) {
+      return this.active_conversation().id === conversation_et.id;
+    }
   }
 
   /**
