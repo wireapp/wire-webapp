@@ -31,6 +31,8 @@ z.ViewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
    */
   constructor(element_id, user_repository) {
     this.after_render = this.after_render.bind(this);
+    this.click_on_accept = this.click_on_accept.bind(this);
+    this.click_on_ignore = this.click_on_ignore.bind(this);
 
     this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.ViewModel.content.ConnectRequestsViewModel', z.config.LOGGER.OPTIONS);
@@ -40,6 +42,18 @@ z.ViewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
     this.should_update_scrollbar = ko.computed(() => {
       return this.connect_requests();
     }).extend({notify: 'always', rateLimit: 500});
+  }
+
+  /**
+   * Called after each connection request is rendered.
+   * @param {Object} elements - rendered objects
+   * @param {z.entity.User} request - Rendered connection request
+   * @returns {undefined} No return value
+   */
+  after_render(elements, request) {
+    if (z.util.ArrayUtil.is_last_item(this.connect_requests(), request)) {
+      window.requestAnimationFrame(() => $('.connect-requests').scroll_to_bottom());
+    }
   }
 
   /**
@@ -58,17 +72,5 @@ z.ViewModel.content.ConnectRequestsViewModel = class ConnectRequestsViewModel {
    */
   click_on_ignore(user_et) {
     this.user_repository.ignore_connection_request(user_et);
-  }
-
-  /**
-   * Called after each connection request is rendered.
-   * @param {Object} elements - rendered objects
-   * @param {z.entity.User} request - Rendered connection request
-   * @returns {undefined} No return value
-   */
-  after_render(elements, request) {
-    if (z.util.ArrayUtil.is_last_item(this.connect_requests(), request)) {
-      window.requestAnimationFrame(() => $('.connect-requests').scroll_to_bottom());
-    }
   }
 };
