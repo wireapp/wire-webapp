@@ -227,8 +227,7 @@ z.calling.entities.ECall = class ECall {
   join_call() {
     this.set_self_state(true);
 
-    const states_to_connect = [z.calling.enum.CALL_STATE.INCOMING, z.calling.enum.CALL_STATE.REJECTED];
-    if (states_to_connect.includes(this.state())) {
+    if (z.calling.enum.CALL_STATE_GROUP.CAN_CONNECT.includes(this.state())) {
       this.state(z.calling.enum.CALL_STATE.CONNECTING);
     }
 

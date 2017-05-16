@@ -323,8 +323,7 @@ z.calling.entities.EFlow = class EFlow {
     this._clear_send_sdp_timeout();
     this._reset_signaling_states();
     this.is_answer(is_answer);
-    this.local_sdp(undefined);
-    this.remote_sdp(undefined);
+    this._reset_sdp();
 
     if (negotiation_mode !== z.calling.enum.SDP_NEGOTIATION_MODE.STATE_COLLISION) {
       this.start_negotiation(negotiation_mode, media_stream);
@@ -1335,7 +1334,18 @@ z.calling.entities.EFlow = class EFlow {
     this._close_data_channel();
     this._close_peer_connection();
     this._reset_signaling_states();
+    this._reset_sdp();
     this.pc_initialized(false);
+  }
+
+  /**
+   * Reset the SDP.
+   * @private
+   * @returns {undefined} No return value
+   */
+  _reset_sdp() {
+    this.local_sdp(undefined);
+    this.remote_sdp(undefined);
   }
 
   /**
