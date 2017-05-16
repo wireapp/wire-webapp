@@ -164,7 +164,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
         const is_conversation_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
 
         if (is_active_conversation && is_conversation_state) {
-          return
+          return;
         }
 
         this._release_content();
