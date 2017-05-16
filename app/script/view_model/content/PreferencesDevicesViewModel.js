@@ -25,6 +25,8 @@ window.z.ViewModel.content = z.ViewModel.content || {};
 
 z.ViewModel.content.PreferencesDevicesViewModel = class PreferencesDevicesViewModel {
   constructor(element_id, preferences_device_details, client_repository, conversation_repository, cryptography_repository) {
+    this.click_on_remove_device = this.click_on_remove_device.bind(this);
+    this.click_on_show_device = this.click_on_show_device.bind(this);
     this.update_device_info = this.update_device_info.bind(this);
 
     this.preferences_device_details = preferences_device_details;
