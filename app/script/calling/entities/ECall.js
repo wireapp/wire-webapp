@@ -424,7 +424,7 @@ z.calling.entities.ECall = class ECall {
   /**
    * Confirm an incoming message.
    * @param {ECallMessage} incoming_e_call_message_et - Incoming e-call message to be confirmed
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when message was confirmed
    */
   confirm_message(incoming_e_call_message_et) {
     const {client_id, type, user_id} = incoming_e_call_message_et;
@@ -446,11 +446,12 @@ z.calling.entities.ECall = class ECall {
       }
 
       default: {
-        return this.logger.error(`Tried to confirm e-call event of wrong type '${type}'`, e_call_message_et);
+        this.logger.error(`Tried to confirm e-call event of wrong type '${type}'`, e_call_message_et);
+        return Promise.resolve();
       }
     }
 
-    this.send_e_call_event(e_call_message_et);
+    return this.send_e_call_event(e_call_message_et);
   }
 
   /**
