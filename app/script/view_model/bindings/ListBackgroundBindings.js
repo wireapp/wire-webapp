@@ -32,7 +32,8 @@ ko.bindingHandlers.switch_background = (function() {
         background_next.css({'opacity': '0'});
         background_next.insertAfter(background_last);
 
-        image_resource.load()
+        image_resource
+          .load()
           .then(function(blob) {
             background_next
               .find('.background-image')
