@@ -160,16 +160,21 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
 
     conversation_promise
       .then((conversation_et) => {
-        if ((conversation_et !== this.conversation_repository.active_conversation()) && (this.content_state() !== z.ViewModel.content.CONTENT_STATE.CONVERSATION)) {
-          this._release_content();
-          this.content_state(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
-          this.conversation_repository.active_conversation(conversation_et);
-          this.message_list.change_conversation(conversation_et, message_et, () => {
-            this._show_content(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
-            this.participants.change_conversation(conversation_et);
-            this.previous_conversation = this.conversation_repository.active_conversation();
-          });
+        const is_active_conversation = conversation_et === this.conversation_repository.active_conversation();
+        const is_conversation_state = this.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
+
+        if (is_active_conversation && is_conversation_state) {
+          return
         }
+
+        this._release_content();
+        this.content_state(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
+        this.conversation_repository.active_conversation(conversation_et);
+        this.message_list.change_conversation(conversation_et, message_et, () => {
+          this._show_content(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
+          this.participants.change_conversation(conversation_et);
+          this.previous_conversation = this.conversation_repository.active_conversation();
+        });
       });
   }
 
