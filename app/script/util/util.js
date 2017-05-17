@@ -404,7 +404,7 @@ z.util.render_message = function(message) {
       }
       if (type === 'email') {
         const email = href.replace('mailto:', '');
-        return {onclick: 'z.util.safe_mailto_open(\'' + email + '\')'};
+        return {onclick: `z.util.safe_mailto_open('${email}')`};
       }
       return {};
     },
