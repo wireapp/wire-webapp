@@ -65,10 +65,10 @@ ko.components.register('conversation-list-cell', {
           <span class="conversation-list-cell-badge cell-badge-dark icon-pending" data-uie-name="status-pending"></span>
         <!-- /ko -->
         <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.UNREAD_PING -->
-          <span class="conversation-list-cell-badge cell-badge-dark icon-ping" data-uie-name="status-ping"></span>
+          <span class="conversation-list-cell-badge cell-badge-light icon-ping" data-uie-name="status-ping"></span>
         <!-- /ko -->
         <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.MISSED_CALL -->
-          <span class="conversation-list-cell-badge cell-badge-dark icon-call" data-uie-name="status-missed-call"></span>
+          <span class="conversation-list-cell-badge cell-badge-light icon-end-call" data-uie-name="status-missed-call"></span>
         <!-- /ko -->
         <!-- ko if: cell_state().icon === z.conversation.ConversationStatusIcon.MUTED -->
           <span class="conversation-list-cell-badge cell-badge-dark icon-silence" data-uie-name="status-silence"></span>
