@@ -141,7 +141,7 @@ describe('Event Mapper', function() {
     });
   });
 
-  describe('_map_event_unable_to_decrypt', () =>
+  describe('_map_event_unable_to_decrypt', () => {
     it('maps a message from a decrypt error event', function() {
       // @formatter:off
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
@@ -152,6 +152,6 @@ describe('Event Mapper', function() {
       const message_et = event_mapper._map_event_unable_to_decrypt(event);
       expect(message_et.error_code).toBe('205');
       expect(message_et.client_id).toBe('c0a70d96aaeb87b6');
-    })
-  );
+    });
+  });
 });
