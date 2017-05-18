@@ -134,7 +134,7 @@ describe('MediaEmbeds', function() {
       });
 
       it('does not render a malicious youtube link', function() {
-        const link = 'https://yоutube-nocookie.com/#youtu0be/v/fKopy74weus',
+        const link = 'https://xn--yutube-wqf.com/#youtu0be/v/fKopy74weus',
               message = build_message_with_anchor(link);
 
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
