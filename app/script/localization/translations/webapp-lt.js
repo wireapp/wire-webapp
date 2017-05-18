@@ -272,6 +272,15 @@ z.string.lt.conversations_popover_notify = 'Įjungti garsą';
 z.string.lt.conversations_popover_silence = 'Nutildyti';
 z.string.lt.conversations_popover_unarchive = 'Išarchyvuoti';
 
+z.string.lt.conversations_secondary_line_missed_call = '{{number}} praleistas skambutis';
+z.string.lt.conversations_secondary_line_missed_calls = '{{number}} praleistų skambučių';
+z.string.lt.conversations_secondary_line_new_message = '{{number}} nauja žinutė';
+z.string.lt.conversations_secondary_line_new_messages = '{{number}} naujų žinučių';
+z.string.lt.conversations_secondary_line_ping = '{{number}} ryšio tikrinimas';
+z.string.lt.conversations_secondary_line_pings = '{{number}} ryšio tikrinimų';
+z.string.lt.conversations_secondary_line_person_left = '{{number}} asmuo išėjo';
+z.string.lt.conversations_secondary_line_people_left = '{{number}} žmonių išėjo';
+z.string.lt.conversations_secondary_line_person_added = '{{user1}} pridėjo {{user2}}';
 z.string.lt.conversations_secondary_line_timed_message = 'Laikina žinutė';
 
 z.string.lt.takeover_headline = 'Naudotojo vardai jau čia.';
