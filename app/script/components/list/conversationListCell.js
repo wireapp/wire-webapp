@@ -33,8 +33,12 @@ z.components.ConversationListCell = class ConversationListCell {
     this.entered_viewport = ko.observable(false);
     this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
 
+    this.should_render_cell = ko.pureComputed(() => {
+      return conversation.last_event_timestamp() && this.entered_viewport()
+    });
+
     this.cell_state = ko.pureComputed(() => {
-      return this.entered_viewport() ? z.conversation.ConversationCellState.generate(this.conversation) : '';
+      return this.should_render_cell() ? z.conversation.ConversationCellState.generate(this.conversation) : '';
     }).extend({rateLimit: 100});
   }
 
@@ -48,10 +52,10 @@ ko.components.register('conversation-list-cell', {
   template: `
     <div class="conversation-list-cell" data-bind="attr: {'data-uie-uid': conversation.id, 'data-uie-value': conversation.display_name}, css: {'conversation-list-cell-active': is_selected(conversation)}, in_viewport: on_in_viewport">
       <div class="conversation-list-cell-left" data-bind="css: {'conversation-list-cell-left-opaque': conversation.removed_from_conversation() || conversation.participating_user_ids().length === 0}">
-        <!-- ko if: conversation.is_group() -->
+        <!-- ko if: conversation.is_group() && should_render_cell() -->
           <group-avatar class="conversation-list-cell-avatar-arrow" params="users: users(), conversation: conversation"></group-avatar>
         <!-- /ko -->
-        <!-- ko if: !conversation.is_group() && users()[0] -->
+        <!-- ko if: !conversation.is_group() && users()[0] && should_render_cell() -->
           <user-avatar class="user-avatar-s" params="user: users()[0]"></user-avatar>
         <!-- /ko -->
       </div>
