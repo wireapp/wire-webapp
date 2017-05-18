@@ -60,7 +60,7 @@ z.media.MediaEmbeds = (function() {
   const _regex = {
     // example: http://regexr.com/3ase5
     soundcloud: /(https?:\/\/(?:www\.|m\.)?)?soundcloud\.com(\/[\w\-]+){2,3}/g,
-    spotify: /https?:\/\/(?:play\.|open\.)*spotify.com\/([\w\-/]+)/g,
+    spotify: /https?:\/\/(?:play\.|open\.)*spotify\.com\/([\w\-/]+)/g,
     vimeo: /https?:\/\/(?:vimeo\.com\/|player\.vimeo\.com\/)(?:video\/|(?:channels\/staffpicks\/|channels\/)|)((\w|-){7,9})/g,
     youtube: /.*(?:youtu.be|youtube.com).*(?:\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/g,
   };
