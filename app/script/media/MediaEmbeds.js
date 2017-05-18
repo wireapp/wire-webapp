@@ -105,7 +105,7 @@ z.media.MediaEmbeds = (function() {
 
       // append html5 parameter to youtube src to force html5 mode
       // this fixes the issue that FF displays black box in some cases
-      return `https://www.youtube.com/embed/${video_id[1]}?html5=1${query}`;
+      return `https://www.youtube-nocookie.com/embed/${video_id[1]}?html5=1${query}`;
     }
   };
 
