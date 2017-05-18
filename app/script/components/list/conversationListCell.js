@@ -34,7 +34,7 @@ z.components.ConversationListCell = class ConversationListCell {
     this.users = ko.pureComputed(() => this.conversation.participating_user_ets());
 
     this.should_render_cell = ko.pureComputed(() => {
-      return this.entered_viewport() && conversation.last_event_timestamp()
+      return this.entered_viewport() && conversation.last_event_timestamp();
     });
 
     this.cell_state = ko.pureComputed(() => {
