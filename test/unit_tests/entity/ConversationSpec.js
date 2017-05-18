@@ -747,4 +747,3 @@ describe('Conversation', function() {
     });
   });
 });
-

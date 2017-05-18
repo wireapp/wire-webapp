@@ -44,6 +44,7 @@
     "deploy-travis-prod": "grunt app_deploy_travis:prod",
     "deploy-travis-staging": "grunt app_deploy_travis:staging",
     "lint": "yarn lint-scripts && yarn lint-styles",
+    "lint-fix": "npm run lint-scripts -- --fix",
     "lint-scripts": "eslint -c .eslintrc.yaml --ignore-path .gitignore --quiet app/script/ test/ bin/ grunt/ Gruntfile.js",
     "lint-styles": "stylelint app/style/**/*.less --syntax less",
     "postinstall": "grunt init",

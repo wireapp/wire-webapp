@@ -434,4 +434,3 @@ ko.components.register('user-profile', {
     },
   },
 });
-
