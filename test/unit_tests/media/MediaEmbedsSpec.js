@@ -133,6 +133,13 @@ describe('MediaEmbeds', function() {
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
       });
 
+      it('does not render a malicious youtube link', function() {
+        const link = 'https://yоutube-nocookie.com/#youtu0be/v/fKopy74weus',
+              message = build_message_with_anchor(link);
+
+        expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
+      });
+
       it('https://www.youtube-nocookie.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd', function() {
         const link = 'https://www.youtube-nocookie.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd';
         const message = build_message_with_anchor(link);
