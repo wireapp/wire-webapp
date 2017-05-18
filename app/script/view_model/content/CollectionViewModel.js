@@ -29,7 +29,9 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
     this.added_to_view = this.added_to_view.bind(this);
     this.item_added = this.item_added.bind(this);
     this.item_removed = this.item_removed.bind(this);
+    this.on_input_change = this.on_input_change.bind(this);
     this.removed_from_view = this.removed_from_view.bind(this);
+    this.search_in_conversation = this.search_in_conversation.bind(this);
     this.set_conversation = this.set_conversation.bind(this);
 
     this.conversation_repository = conversation_repository;
@@ -60,7 +62,7 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   search_in_conversation(query) {
-    this.conversation_repository.search_in_conversation(this.conversation_et(), query);
+    return this.conversation_repository.search_in_conversation(this.conversation_et(), query);
   }
 
   on_input_change(input) {
