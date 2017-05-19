@@ -145,9 +145,7 @@
     <!-- /ko -->
 
     <div class="message-body-actions">
-      <context-menu params="entries: function() {return $parent.get_context_menu_entries(message)}, tag: 'message', data: message.id"
-                    class="context-menu icon-more font-size-xs"
-                    tabindex="-1"></context-menu>
+      <span class="context-menu icon-more font-size-xs" data-bind="click: $parent.on_context_menu_click"></span>
       <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}"></time>
       <!-- /ko -->
@@ -214,9 +212,9 @@
       <span class="message-connected-header" data-bind='text: other_user().name()'></span>
       <span class="message-connected-username label-username" data-bind='text: other_user().username()'></span>
       <user-avatar class="message-connected-avatar user-avatar-lg user-avatar-no-badge cursor-default"
-                   data-bind="css: {'user-avatar-no-badge': other_user().sent()}"
+                   data-bind="css: {'user-avatar-no-badge': other_user().is_outgoing_request()}"
                    params="user: other_user()"></user-avatar>
-      <!-- ko if: other_user().sent() -->
+      <!-- ko if: other_user().is_outgoing_request() -->
         <div class="message-connected-cancel text-theme"
              data-bind="click: $parent.click_on_cancel_request,
                         l10n_text: z.string.conversation_connection_cancel_request"
@@ -272,9 +270,6 @@
       <span class="ellipsis" data-bind="text: message.caption"></span>
     </div>
     <div class="message-body-actions">
-      <context-menu params="entries: function() {return $parent.get_context_menu_entries($data)}, tag: 'message', data: message.id"
-                    class="context-menu icon-more font-size-xs"
-                    tabindex="-1"></context-menu>
       <!-- ko if: message.ephemeral_status() === z.message.EphemeralStatusType.ACTIVE -->
         <time class="time" data-bind="text: message.display_timestamp_short(), attr: {'data-timestamp': message.timestamp, 'data-uie-uid': message.id, 'title': message.ephemeral_caption()}"></time>
         <ephemeral-timer class="message-ephemeral-timer" data-bind="attr: {'title': message.ephemeral_caption()}" params="message: message"></ephemeral-timer>

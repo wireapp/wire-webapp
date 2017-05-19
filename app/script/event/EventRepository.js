@@ -81,28 +81,27 @@ z.event.EventRepository = class EventRepository {
 
     this.notifications_queue.subscribe((notifications) => {
       if (notifications.length) {
-        if (this.notifications_blocked) return;
+        if (!this.notifications_blocked) {
 
-        const notification = this.notifications_queue()[0];
-        this.notifications_blocked = true;
+          const notification = this.notifications_queue()[0];
+          this.notifications_blocked = true;
 
-        return this._handle_notification(notification)
-        .catch((error) => {
-          return this.logger.warn(`We failed to handle a notification but will continue with queue: ${error.message}`, error);
-        })
-        .then(() => {
-          this.notifications_blocked = false;
-          this.notifications_queue.shift();
-          this.notifications_handled++;
+          return this._handle_notification(notification)
+            .catch((error) => {
+              this.logger.warn(`We failed to handle a notification but will continue with queue: ${error.message}`, error);
+            })
+            .then(() => {
+              this.notifications_blocked = false;
+              this.notifications_queue.shift();
+              this.notifications_handled++;
 
-          if ((this.notifications_handled % 5) === 0) {
-            const progress = this.notifications_handled / this.notifications_total * 70 + 25;
-            return amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events_progress, [this.notifications_handled, this.notifications_total]);
-          }
-        });
-      }
-
-      if (this.notifications_loaded() && this.notification_handling_state() !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) {
+              if ((this.notifications_handled % 5) === 0) {
+                const progress = this.notifications_handled / this.notifications_total * 70 + 25;
+                amplify.publish(z.event.WebApp.APP.UPDATE_PROGRESS, progress, z.string.init_events_progress, [this.notifications_handled, this.notifications_total]);
+              }
+            });
+        }
+      } else if (this.notifications_loaded() && this.notification_handling_state() !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET) {
         this.logger.info(`Done handling '${this.notifications_total}' notifications from the stream`);
         this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         this._find_ongoing_calls();
@@ -218,8 +217,8 @@ z.event.EventRepository = class EventRepository {
           }
 
           this.notifications_loaded(true);
-          return this.logger.info(`Fetched '${this.notifications_total}' notifications from the backend`);
-
+          this.logger.info(`Fetched '${this.notifications_total}' notifications from the backend`);
+          return notification_id;
         }
         this.logger.info(`No notifications found since '${notification_id}'`);
         return reject(new z.event.EventError(z.event.EventError.TYPE.NO_NOTIFICATIONS));
@@ -277,17 +276,17 @@ z.event.EventRepository = class EventRepository {
    */
   initialize_from_notification_stream() {
     return this.get_last_notification_id_from_db()
-    .then((last_notification_id) => {
-      return this._update_from_notification_stream(last_notification_id);
-    })
-    .catch((error) => {
-      this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      if (error.type === z.event.EventError.TYPE.NO_LAST_ID) {
-        this.logger.info('No notifications found for this user', error);
-        return 0;
-      }
-      throw error;
-    });
+      .then((last_notification_id) => {
+        return this._update_from_notification_stream(last_notification_id);
+      })
+      .catch((error) => {
+        this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+        if (error.type === z.event.EventError.TYPE.NO_LAST_ID) {
+          this.logger.info('No notifications found for this user', error);
+          return 0;
+        }
+        throw error;
+      });
   }
 
   /**
@@ -299,18 +298,17 @@ z.event.EventRepository = class EventRepository {
     amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECOVERY);
 
     return this._update_from_notification_stream(this._get_last_known_notification_id())
-    .then((number_of_notifications) => {
-      this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      this.logger.info(`Retrieved '${number_of_notifications}' notifications from stream after connectivity loss`);
-    })
-    .catch((error) => {
-      if (error.type !== z.event.EventError.TYPE.NO_NOTIFICATIONS) {
-        this.logger.error(`Failed to recover from notification stream: ${error.message}`, error);
-        this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-        // @todo What do we do in this case?
-        amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
-      }
-    });
+      .then((number_of_notifications) => {
+        this.logger.info(`Retrieved '${number_of_notifications}' notifications from stream after connectivity loss`);
+      })
+      .catch((error) => {
+        if (error.type !== z.event.EventError.TYPE.NO_NOTIFICATIONS) {
+          this.logger.error(`Failed to recover from notification stream: ${error.message}`, error);
+          this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+          // @todo What do we do in this case?
+          amplify.publish(z.event.WebApp.WARNING.SHOW, z.ViewModel.WarningType.CONNECTIVITY_RECONNECT);
+        }
+      });
   }
 
   /**
@@ -372,22 +370,22 @@ z.event.EventRepository = class EventRepository {
     this.notifications_total = 0;
 
     return this.get_notifications(last_notification_id, 500)
-    .then((updated_last_notification_id) => {
-      if (updated_last_notification_id) {
-        this.logger.info(`ID of last notification fetched from stream is '${updated_last_notification_id}'`);
-      }
-      return this.notifications_total;
-    })
-    .catch((error) => {
-      this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      if (error.type === z.event.EventError.TYPE.NO_NOTIFICATIONS) {
-        this._find_ongoing_calls();
-        this.logger.info('No notifications found for this user', error);
-        return 0;
-      }
-      this.logger.error(`Failed to handle notification stream: ${error.message}`, error);
-      throw error;
-    });
+      .then((updated_last_notification_id) => {
+        if (updated_last_notification_id) {
+          this.logger.info(`ID of last notification fetched from stream is '${updated_last_notification_id}'`);
+        }
+        return this.notifications_total;
+      })
+      .catch((error) => {
+        this.notification_handling_state(z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+        if (error.type === z.event.EventError.TYPE.NO_NOTIFICATIONS) {
+          this._find_ongoing_calls();
+          this.logger.info('No notifications found for this user', error);
+          return 0;
+        }
+        this.logger.error(`Failed to handle notification stream: ${error.message}`, error);
+        throw error;
+      });
   }
 
   /**

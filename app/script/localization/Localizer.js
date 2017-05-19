@@ -24,20 +24,28 @@ z.localization = z.localization || {};
 
 class Localizer {
   constructor() {
-    const param = z.util.get_url_parameter(z.auth.URLParameter.LOCALE);
-    if (param) {
-      z.util.StorageUtil.set_value(z.storage.StorageKey.LOCALIZATION.LOCALE, param);
+    const DEFAULT_LOCALE = 'en';
+    const query_param = z.util.get_url_parameter(z.auth.URLParameter.LOCALE);
+    const current_browser_locale = navigator.language.substr(0, 2);
+    let stored_locale = z.util.StorageUtil.get_value(z.storage.StorageKey.LOCALIZATION.LOCALE);
+
+    if (query_param) {
+      stored_locale = z.util.StorageUtil.set_value(z.storage.StorageKey.LOCALIZATION.LOCALE, query_param);
     }
-    this.locale = z.util.StorageUtil.get_value(z.storage.StorageKey.LOCALIZATION.LOCALE) || navigator.language.substr(0, 2) || 'en';
-    moment.locale([this.locale, 'en']);
+
+    this.locale = stored_locale || current_browser_locale || DEFAULT_LOCALE;
+
+    moment.locale([this.locale, DEFAULT_LOCALE]);
+
     if (z.string[this.locale]) {
-      $.extend(z.string, z.string[this.locale]);
+      Object.assign(z.string, z.string[this.locale]);
     }
   }
 
   /**
    * Pulls the localized string from the resources and replaces placeholders.
    *
+   * @deprecated
    * @note Takes the id of the string for look up from z.string is directly for simple use. Else pass it in as the id
    *   parameter in conjunction with a single or multiple (it supports but does not require an array) replace rules that
    *   consist of a placeholder and the content that it should be replace with.
@@ -49,9 +57,9 @@ class Localizer {
     if (valueAccessor == null) return;
 
     let args = [];
-    let s = valueAccessor;
+    let value = valueAccessor;
     if (valueAccessor.id != null) {
-      s = valueAccessor.id;
+      value = valueAccessor.id;
       if (_.isArray(valueAccessor.replace)) {
         args = valueAccessor.replace;
       } else {
@@ -61,14 +69,61 @@ class Localizer {
     if (args.length !== 0) {
       for (const arg of args) {
         const reg = new RegExp(arg.placeholder, 'gm');
-        s = s.replace(reg, arg.content);
+        value = value.replace(reg, arg.content);
       }
     }
-    return s;
+    return value;
   }
 }
 
 z.localization.Localizer = new Localizer();
+
+z.l10n = (() => {
+
+  function replaceWithString(string, substitute) {
+    return string.replace(/{{\w+}}/, substitute);
+  }
+
+  function replaceWithObject(string, substitute) {
+    for (const identifier in substitute) {
+      if (substitute.hasOwnProperty(identifier)) {
+        string = string.replace(new RegExp(`{{${identifier}}}`, 'g'), substitute[identifier]);
+      }
+    }
+    return string;
+  }
+
+  return {
+
+    /**
+     * Retrieve localized string and replace placeholders
+     *
+     * This method give you two options to replace placeholders
+     *
+     * @example using a string as substitute
+     * z.l10.text('Hey {{name}}', 'Tod') // returns 'Hey Tod'
+     *
+     * @example using an object as substitute
+     * z.l10.text('{{greeting}} {{name}}', {name: 'Tod', greeting: 'Hey') // returns 'Hey Tod'
+     *
+     * @param {Observable|string} value - localized string in our case usually z.string.foo
+     * @param {string|Object} [substitute] - data to fill all the placeholder with
+     * @returns {string} - string with substituted placeholders
+     */
+    text(value, substitute) {
+      const string = ko.unwrap(value);
+
+      if (_.isObject(substitute)) {
+        return replaceWithObject(string, substitute);
+      }
+      if (_.isString(value)) {
+        return replaceWithString(string, substitute);
+      }
+      return string;
+    },
+  };
+
+})();
 
 ko.bindingHandlers.l10n_href = {
   update(element, valueAccessor) {

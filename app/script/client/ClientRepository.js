@@ -46,7 +46,7 @@ z.client.ClientRepository = class ClientRepository {
 
   init(self_user) {
     this.self_user(self_user);
-    return this.logger.info(`Initialized repository with user ID '${this.self_user().id}'`);
+    this.logger.info(`Initialized repository with user ID '${this.self_user().id}'`);
   }
 
   //##############################################################################
@@ -612,7 +612,7 @@ z.client.ClientRepository = class ClientRepository {
 
       for (const result of results) {
         if (clients_from_backend[result.id]) {
-          const [client_payload, contains_update] = this.client_mapper.update_client(result, clients_from_backend[result.id]);
+          const {client, was_updated} = this.client_mapper.update_client(result, clients_from_backend[result.id]);
 
           delete clients_from_backend[result.id];
 
@@ -622,14 +622,14 @@ z.client.ClientRepository = class ClientRepository {
           }
 
           // Locally known client changed on backend
-          if (contains_update) {
+          if (was_updated) {
             this.logger.info(`Updating client '${result.id}' of user '${user_id}' locally`);
-            promises.push(this.save_client_in_db(user_id, client_payload));
+            promises.push(this.save_client_in_db(user_id, client));
             continue;
           }
 
           // Locally known client unchanged on backend
-          clients_stored_in_db.push(client_payload);
+          clients_stored_in_db.push(client);
           continue;
         }
 

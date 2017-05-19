@@ -31,6 +31,7 @@ module.exports = (grunt) => {
     },
   };
 
+  /* eslint-disable sort-keys */
   const dir = {
     app_: 'app',
     app: {
@@ -57,9 +58,7 @@ module.exports = (grunt) => {
     test_: 'test',
     test: {
       api: 'test/api',
-      coffee: 'test/coffee',
       coverage: 'test/coverage',
-      js: 'test/js',
       lib: 'test/lib',
       unit_tests: 'test/unit_tests',
     },
@@ -67,14 +66,15 @@ module.exports = (grunt) => {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    config,
-    dir,
+    config: config,
+    dir: dir,
     aws_s3: require('./grunt/config/aws_s3'),
     bower: require('./grunt/config/bower'),
     clean: require('./grunt/config/clean'),
     coffee: require('./grunt/config/coffee'),
     coffeelint: require('./grunt/config/coffeelint'),
     compress: require('./grunt/config/compress'),
+    concat: require('./grunt/config/concat'),
     connect: require('./grunt/config/connect'),
     copy: require('./grunt/config/copy'),
     includereplace: require('./grunt/config/includereplace'),
@@ -82,12 +82,13 @@ module.exports = (grunt) => {
     less: require('./grunt/config/less'),
     open: require('./grunt/config/open'),
     path: require('path'),
+    postcss: require('./grunt/config/postcss'),
     shell: require('./grunt/config/shell'),
     todo: require('./grunt/config/todo'),
     uglify: require('./grunt/config/uglify'),
     watch: require('./grunt/config/watch'),
-    postcss: require('./grunt/config/postcss'),
   });
+  /* eslint-enable sort-keys */
 
   // Tasks
   grunt.loadTasks('grunt/tasks');
@@ -114,31 +115,31 @@ module.exports = (grunt) => {
 
   grunt.registerTask('test_prepare', (test_name) => {
     const scripts = grunt.config('scripts');
+    const scripts_minified = grunt.config('scripts_minified');
 
     const prepare_file_names = (file_name_array) => {
-      return file_name_array.map(file_name => file_name.replace('deploy/', ''));
+      return file_name_array.map((file_name) => file_name.replace('deploy/', ''));
     };
 
     const helper_files = grunt.config.get('karma.options.files');
-    const app_files = prepare_file_names(scripts.app);
-    const component_files = prepare_file_names(scripts.component);
-    const vendor_files = prepare_file_names(scripts.vendor);
-    const test_files = test_name ? [`../test/js/${test_name}Spec.js`] : ['../test/**/*Spec.js'];
+    const app_files = prepare_file_names(scripts_minified.app.concat(scripts.app));
+    const component_files = prepare_file_names(scripts_minified.component.concat(scripts.component));
+    const vendor_files = prepare_file_names(scripts_minified.vendor.concat(scripts.vendor));
+    const test_files = test_name ? [`../test/unit_tests/${test_name}Spec.js`] : ['../test/unit_tests/**/*Spec.js'];
 
     const files = [].concat(helper_files, vendor_files, component_files, app_files, test_files);
+
     grunt.config('karma.options.files', files);
   });
 
-  grunt.registerTask('test_init', ['prepare_dist', 'prepare_test']);
+  grunt.registerTask('test_init', ['prepare_dist']);
 
   grunt.registerTask('test_run', (test_name) => {
     grunt.config('karma.options.reporters', ['progress']);
     grunt.task.run([
       'scripts',
       'newer:coffee:dist',
-      'newer:coffee:test',
       'newer:copy:dist_js',
-      'copy:test',
       `test_prepare:${test_name}`,
       'karma:test',
     ]);

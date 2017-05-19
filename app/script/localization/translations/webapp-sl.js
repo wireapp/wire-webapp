@@ -19,6 +19,7 @@
 
 'use strict';
 
+z.string.sl.wire = 'Wire';
 z.string.sl.wire_macos = 'Wire za macOS';
 z.string.sl.wire_windows = 'Wire za Windows';
 z.string.sl.wire_linux = 'Wire za Linux';
@@ -259,7 +260,8 @@ z.string.sl.conversations_all_archived = 'Vse je arhivirano';
 z.string.sl.conversations_contacts = 'Stiki';
 z.string.sl.conversations_connection_request_many = '%no oseb čaka';
 z.string.sl.conversations_connection_request_one = '1 oseba čaka';
-z.string.sl.conversations_empty_conversation = 'Prazen pogovor';
+z.string.sl.conversations_empty_conversation = 'Skupinski pogovor';
+z.string.sl.conversations_empty_conversation_description = 'Vsi so zapustili pogovor';
 z.string.sl.conversations_no_conversations = 'Začni pogovor ali povabi stike na Wire.';
 z.string.sl.conversations_popover_archive = 'Arhiviraj';
 z.string.sl.conversations_popover_block = 'Blokiraj';
@@ -269,6 +271,8 @@ z.string.sl.conversations_popover_leave = 'Zapusti';
 z.string.sl.conversations_popover_notify = 'Povrni glasnost';
 z.string.sl.conversations_popover_silence = 'Utišaj';
 z.string.sl.conversations_popover_unarchive = 'Dearhiviraj';
+
+z.string.sl.conversations_secondary_line_timed_message = 'Časovno sporočilo';
 
 z.string.sl.takeover_headline = 'Uporabniška imena so tukaj.';
 z.string.sl.takeover_sub = 'Zavzemite vaše unikatno ime na Wire.';
@@ -295,7 +299,6 @@ z.string.sl.extensions_giphy_random = 'Naključno';
 z.string.sl.search_open = 'Odpri';
 z.string.sl.search_open_group = 'Ustvari skupino';
 z.string.sl.people_confirm_label = 'Dodaj v pogovor';
-z.string.sl.people_common_contacts = 'Oba poznata';
 z.string.sl.people_people = '%no oseb';
 z.string.sl.people_search_placeholder = 'Iskanje po imenu';
 z.string.sl.people_everyone_participates = 'Vsi \ns katerimi ste povezani,\nso že v tem pogovoru.';
@@ -362,6 +365,7 @@ z.string.sl.preferences_devices = 'Naprave';
 z.string.sl.preferences_headline = 'Možnosti';
 z.string.sl.preferences_options = 'Možnosti';
 
+z.string.sl.preferences_about_copyright = '© Wire Swiss GmbH';
 z.string.sl.preferences_about_privacy_policy = 'Politika zasebnosti';
 z.string.sl.preferences_about_support = 'Podpora';
 z.string.sl.preferences_about_support_website = 'Spletna stran Wire podpore';
@@ -429,8 +433,6 @@ z.string.sl.search_top_people = 'Top osebe';
 z.string.sl.search_try_search = 'Najdi osebe po imenu ali uporabniškem imenu';
 z.string.sl.search_no_contacts_on_wire = 'Nimate nobenih stikov na Wire.\nPoizkusite najti osebe po imenu\nali uporabniškem imenu.';
 z.string.sl.search_others = 'Poveži';
-z.string.sl.search_friend_in_common = '%no skupna oseba';
-z.string.sl.search_friends_in_common = '%no skupnih oseb';
 
 z.string.sl.upload_google_headline = 'Poiščite osebe\nza pogovor.';
 z.string.sl.upload_google_message = 'Uporabljamo vaše podatke stikov pri povezovanju z drugimi. Vse informacije anonimiziramo in ne delimo z drugimi.';
@@ -439,10 +441,18 @@ z.string.sl.upload_google_message_error = 'Nismo prejeli vaših podatkov. Prosim
 z.string.sl.upload_google_button_again = 'Poskusite ponovno';
 
 z.string.sl.url_password_reset = 'forgot/';
+z.string.sl.url_legal = 'https://wire.com/legal/';
+z.string.sl.url_privacy = 'https://wire.com/privacy/';
+z.string.sl.url_privacy_how = 'https://wire.com/privacy/how/';
+z.string.sl.url_privacy_why = 'https://wire.com/privacy/why/';
+z.string.sl.url_support = 'https://support.wire.com';
 z.string.sl.url_terms_of_use = 'https://wire.com/legal/terms/';
+z.string.sl.url_wire = 'https://wire.com';
+z.string.sl.url_wire_for_web = 'https://app.wire.com';
 z.string.sl.url_support_calling = 'https://support.wire.com/hc/en-us/articles/202969412';
 z.string.sl.url_support_camera_access_denied = 'https://support.wire.com/hc/en-us/articles/202935412';
 z.string.sl.url_support_device_access_denied = 'https://support.wire.com/hc/en-us/articles/213512545';
+z.string.sl.url_support_contact = 'https://support.wire.com/hc/en-us/requests/new';
 z.string.sl.url_support_contact_bug = 'https://support.wire.com/hc/en-us/requests/new?ticket_form_id=101615';
 z.string.sl.url_support_history = 'https://support.wire.com/hc/en-us/articles/207834645';
 z.string.sl.url_support_mic_access_denied = 'https://support.wire.com/hc/en-us/articles/202590081';
@@ -536,8 +546,11 @@ z.string.sl.tooltip_preferences_rename = 'Spremenite vaše ime';
 
 z.string.sl.tooltip_search_close = 'Zapri (Esc)';
 
+z.string.sl.init_received_access_token = 'Prijava uspešna';
 z.string.sl.init_received_self_user = 'Hej, %name.';
+z.string.sl.init_validated_client = 'Pridobivam vaše povezave in pogovore';
 z.string.sl.init_received_user_data = 'Preverjanje za morebitna nova sporočila';
+z.string.sl.init_events_progress = 'Nalaganje sporočil - %progress od %total';
 z.string.sl.init_updated_from_notifications = 'Uživajte v Wire';
 
 z.string.sl.ephememal_units_none = 'Izklopljeno';

@@ -239,7 +239,6 @@ z.string.fi.conversations_all_archived = 'Kaikki arkistoitu';
 z.string.fi.conversations_contacts = 'Yhteystiedot';
 z.string.fi.conversations_connection_request_many = '%no ihmisiä odottaa';
 z.string.fi.conversations_connection_request_one = '1 ihminen odottaa';
-z.string.fi.conversations_empty_conversation = 'Tyhjä keskustelu';
 z.string.fi.conversations_no_conversations = 'Aloita keskustelu tai kutsu ihmisiä liittymään keskusteluun.';
 z.string.fi.conversations_popover_archive = 'Arkistoi';
 z.string.fi.conversations_popover_block = 'Estä';
@@ -249,6 +248,8 @@ z.string.fi.conversations_popover_leave = 'Poistu';
 z.string.fi.conversations_popover_notify = 'Poista mykistys';
 z.string.fi.conversations_popover_silence = 'Mykistä';
 z.string.fi.conversations_popover_unarchive = 'Palauta arkistosta';
+
+z.string.fi.conversations_secondary_line_timed_message = 'Ajoitettu viesti';
 
 z.string.fi.takeover_headline = 'Käyttäjänimet ovat täällä.';
 z.string.fi.takeover_sub = 'Valtaa yksilöllinen nimesi Wiressä.';
@@ -275,7 +276,6 @@ z.string.fi.extensions_giphy_random = 'Satunnainen';
 z.string.fi.search_open = 'Avaa';
 z.string.fi.search_open_group = 'Luo Ryhmä';
 z.string.fi.people_confirm_label = 'Lisää keskusteluun';
-z.string.fi.people_common_contacts = 'Te molemmat tunnette';
 z.string.fi.people_people = '%no Ihmistä';
 z.string.fi.people_search_placeholder = 'Hae nimellä';
 z.string.fi.people_everyone_participates = 'Jokainen jonka kanssa olet yhdistetty on jo tässä keskustelussa.';
@@ -408,8 +408,6 @@ z.string.fi.search_top_people = 'Eniten käytetyt kontaktit';
 z.string.fi.search_try_search = 'Etsi käyttäjiä nimellä tai käyttäjänimellä';
 z.string.fi.search_no_contacts_on_wire = 'Sinulla ei ole kontakteja Wiressä. Yritä etsiä muita käyttäjiä nimellä tai käyttäjänimellä.';
 z.string.fi.search_others = 'Yhdistä';
-z.string.fi.search_friend_in_common = '%n yhteinen käyttäjä molemmilla';
-z.string.fi.search_friends_in_common = '%n yhteistä käyttäjää molemmilla';
 
 z.string.fi.upload_google_headline = 'Etsi ihmisiä joiden kanssa jutella.';
 z.string.fi.upload_google_message = 'Käytämme sinun kontaktitietoja yhdistääksemme sinut muiden kanssa. Anonymisoimme kaiken tiedon ja emme jaa sitä ulkopuolisille.';

@@ -62,6 +62,23 @@ user-avatar {
     }
   }
 
+  &.user-avatar-s {
+    .square(@avatar-diameter-s);
+
+    .user-avatar-initials {
+      font-size: @avatar-initials-s;
+      line-height: @avatar-diameter-s;
+    }
+
+    .user-avatar-image {
+      .no-transition();
+    }
+
+    .user-avatar-badge {
+      display: none;
+    }
+  }
+
   &.user-avatar-xs {
     .square(@avatar-diameter-xs);
 

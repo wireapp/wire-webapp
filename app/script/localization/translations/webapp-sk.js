@@ -260,7 +260,8 @@ z.string.sk.conversations_all_archived = 'Všetko archivované';
 z.string.sk.conversations_contacts = 'Kontakty';
 z.string.sk.conversations_connection_request_many = '%no ľudí čaká';
 z.string.sk.conversations_connection_request_one = '1 osoba čaká';
-z.string.sk.conversations_empty_conversation = 'Prázdny rozhovor';
+z.string.sk.conversations_empty_conversation = 'Skupinová konverzácia';
+z.string.sk.conversations_empty_conversation_description = 'Všetci opustili rozhovor';
 z.string.sk.conversations_no_conversations = 'Začať rozhovor, alebo pozvať ľudí.';
 z.string.sk.conversations_popover_archive = 'Archív';
 z.string.sk.conversations_popover_block = 'Blokovať';
@@ -270,6 +271,8 @@ z.string.sk.conversations_popover_leave = 'Opustiť';
 z.string.sk.conversations_popover_notify = 'Zapnúť zvuk';
 z.string.sk.conversations_popover_silence = 'Stlmiť';
 z.string.sk.conversations_popover_unarchive = 'Zrušiť archiváciu';
+
+z.string.sk.conversations_secondary_line_timed_message = 'Časovaná správa';
 
 z.string.sk.takeover_headline = 'Užívateľské mená sú obsadené.';
 z.string.sk.takeover_sub = 'Potvrďte Vaše jednoznačné meno pre Wire.';
@@ -296,7 +299,6 @@ z.string.sk.extensions_giphy_random = 'Náhodný';
 z.string.sk.search_open = 'Otvoriť';
 z.string.sk.search_open_group = 'Vytvoriť skupinu';
 z.string.sk.people_confirm_label = 'Pridať do rozhovoru';
-z.string.sk.people_common_contacts = 'Obaja poznáte';
 z.string.sk.people_people = '%no Ľudí';
 z.string.sk.people_search_placeholder = 'Vyhľadať podľa mena';
 z.string.sk.people_everyone_participates = 'Všetci pripojení sú už v tomto rozhovore.';
@@ -431,8 +433,6 @@ z.string.sk.search_top_people = 'Top kontakty';
 z.string.sk.search_try_search = 'Nájsť ľudí podľa názvu, alebo užívateľského mena';
 z.string.sk.search_no_contacts_on_wire = 'Nemáte žiadne kontakty Wire. Skúste nájsť ľudí podľa názvu alebo užívateľského mena.';
 z.string.sk.search_others = 'Pripojiť';
-z.string.sk.search_friend_in_common = '%no spoločných osôb';
-z.string.sk.search_friends_in_common = '%no spoločných ľudí';
 
 z.string.sk.upload_google_headline = 'Nájsť ľudí\npre rozhovor.';
 z.string.sk.upload_google_message = 'Vaše údaje o kontaktoch používame na pripojenie k iným užívateľom. Všetky informácie anonymizujeme a nezdieľame ich s nikým iným.';
@@ -440,6 +440,7 @@ z.string.sk.upload_google_headline_error = 'Niečo sa pokazilo.';
 z.string.sk.upload_google_message_error = 'Neprijali sme Vaše informácie. Skúste prosím znovu importovať Vaše kontakty.';
 z.string.sk.upload_google_button_again = 'Skúsiť znova';
 
+z.string.sk.url_password_reset = 'zabudnutý';
 z.string.sk.url_legal = 'https://wire.com/legal/';
 z.string.sk.url_privacy = 'https://wire.com/legal/';
 z.string.sk.url_privacy_how = 'https://wire.com/privacy/how/';
@@ -545,8 +546,11 @@ z.string.sk.tooltip_preferences_rename = 'Zmeniť Vaše meno';
 
 z.string.sk.tooltip_search_close = 'Zavrieť (Esc)';
 
+z.string.sk.init_received_access_token = 'Prihlásený';
 z.string.sk.init_received_self_user = 'Ahoj, %name%.';
+z.string.sk.init_validated_client = 'Získavanie pripojení a konverzácií';
 z.string.sk.init_received_user_data = 'Kontrola nových správ';
+z.string.sk.init_events_progress = 'Načítanie správ - %progress z %total';
 z.string.sk.init_updated_from_notifications = 'Užite si Wire';
 
 z.string.sk.ephememal_units_none = 'Vypnúť';

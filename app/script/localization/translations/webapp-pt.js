@@ -259,7 +259,8 @@ z.string.pt.conversations_all_archived = 'Tudo foi arquivado';
 z.string.pt.conversations_contacts = 'Contatos';
 z.string.pt.conversations_connection_request_many = '%no pessoas esperando';
 z.string.pt.conversations_connection_request_one = '1 pessoa esperando';
-z.string.pt.conversations_empty_conversation = 'Conversa vazia';
+z.string.pt.conversations_empty_conversation = 'Conversa em grupo';
+z.string.pt.conversations_empty_conversation_description = 'Todos saíram';
 z.string.pt.conversations_no_conversations = 'Inicie uma conversa ou convide pessoas para participar.';
 z.string.pt.conversations_popover_archive = 'Arquivar';
 z.string.pt.conversations_popover_block = 'Bloquear';
@@ -269,6 +270,8 @@ z.string.pt.conversations_popover_leave = 'Sair';
 z.string.pt.conversations_popover_notify = 'Notificar';
 z.string.pt.conversations_popover_silence = 'Sem som';
 z.string.pt.conversations_popover_unarchive = 'Desarquivar';
+
+z.string.pt.conversations_secondary_line_timed_message = 'Mensagem temporizada';
 
 z.string.pt.takeover_headline = 'Nomes de usuário estão aqui.';
 z.string.pt.takeover_sub = 'Revindicar seu nome único no Wire.';
@@ -295,7 +298,6 @@ z.string.pt.extensions_giphy_random = 'Aleatório';
 z.string.pt.search_open = 'Abrir';
 z.string.pt.search_open_group = 'Criar Grupo';
 z.string.pt.people_confirm_label = 'Adicionar a conversa';
-z.string.pt.people_common_contacts = 'Vocês conhecem';
 z.string.pt.people_people = '%no pessoas';
 z.string.pt.people_search_placeholder = 'Pesquisar por nome';
 z.string.pt.people_everyone_participates = 'Todo mundo que você \nestá conectado já está \nnesta conversa.';
@@ -410,7 +412,7 @@ z.string.pt.preferences_options_audio_some = 'Alguns';
 z.string.pt.preferences_options_audio_some_detail = 'Pings e chamadas';
 z.string.pt.preferences_options_contacts = 'Contatos';
 z.string.pt.preferences_options_contacts_gmail = 'Importar do Gmail';
-z.string.pt.preferences_options_contacts_macos = 'Importar dos seus Contactos';
+z.string.pt.preferences_options_contacts_macos = 'Importar de Contatos';
 z.string.pt.preferences_options_contacts_detail = 'Usamos seus dados de contato para conectá-lo com os outros. Nós tornamos anônimas todas as informações e não compartilhamos com mais ninguém.';
 z.string.pt.preferences_options_data = 'Relatórios de uso e erro';
 z.string.pt.preferences_options_data_checkbox = 'Relatórios de uso e erro';
@@ -430,8 +432,6 @@ z.string.pt.search_top_people = 'Contatos frequentes';
 z.string.pt.search_try_search = 'Encontre pessoas pelo \nnome ou nome de usuário';
 z.string.pt.search_no_contacts_on_wire = 'Você não tem nenhum contato no Wire. \nTente encontrar pessoas pelo\nnome ou nome de usuário.';
 z.string.pt.search_others = 'Conectar';
-z.string.pt.search_friend_in_common = '%no pessoa em comum';
-z.string.pt.search_friends_in_common = '%no pessoas em comum';
 
 z.string.pt.upload_google_headline = 'Encontre pessoas \npara conversar.';
 z.string.pt.upload_google_message = 'Usamos seus dados de contato para conectá-lo com os outros. Nós tornamos anônimas todas as informações e não compartilhamos com mais ninguém.';
@@ -439,8 +439,10 @@ z.string.pt.upload_google_headline_error = 'Algo deu errado.';
 z.string.pt.upload_google_message_error = 'Nós não recebemos suas informações. Por favor, tente importar seus contatos novamente.';
 z.string.pt.upload_google_button_again = 'Tente novamente';
 
+z.string.pt.url_password_reset = 'forgot/';
 z.string.pt.url_legal = 'https://wire.com/legal/';
 z.string.pt.url_privacy = 'https://wire.com/privacy/';
+z.string.pt.url_privacy_how = 'https://wire.com/privacy/how/';
 z.string.pt.url_privacy_why = 'https://wire.com/privacy/why/';
 z.string.pt.url_support = 'https://support.wire.com';
 z.string.pt.url_terms_of_use = 'https://wire.com/legal/terms/';
@@ -543,7 +545,9 @@ z.string.pt.tooltip_preferences_rename = 'Altere seu nome';
 
 z.string.pt.tooltip_search_close = 'Fechar (Esc)';
 
+z.string.pt.init_received_access_token = 'Conectado';
 z.string.pt.init_received_self_user = 'Olá, %name.';
+z.string.pt.init_validated_client = 'Buscando suas conexões e conversas';
 z.string.pt.init_received_user_data = 'Verificando novas mensagens';
 z.string.pt.init_events_progress = 'Carregando mensagens - %progress de %total';
 z.string.pt.init_updated_from_notifications = 'Aproveite o Wire';

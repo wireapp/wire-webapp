@@ -42,28 +42,29 @@ z.util.ArrayUtil = {
 
     return closest;
   },
-  get_next_item(array, item, filter) {
-    const index = array.indexOf(item);
-    const next_index = index + 1;
+  get_next_item(array, current_item, filter) {
+    const current_index = array.indexOf(current_item);
 
     // couldn't find the item
-    if (index === -1) {
-      return null;
+    if (current_index === -1) {
+      return undefined;
     }
 
+    const next_index = current_index + 1;
+
     // item is last item in the array
-    if ((next_index === array.length) && (index > 0)) {
-      return array[index - 1];
+    if ((next_index === array.length) && (current_index > 0)) {
+      return array[current_index - 1];
     }
 
     if (next_index >= array.length) {
       return undefined;
     }
 
-    for (let i = next_index; i <= array.length; i++) {
-      const current_item = array[i];
-      if ((typeof filter !== 'function') || !!filter(current_item)) {
-        return current_item;
+    for (let index = next_index; index <= array.length; index++) {
+      const next_item = array[index];
+      if ((typeof filter !== 'function') || !!filter(next_item)) {
+        return next_item;
       }
     }
   },
@@ -81,12 +82,12 @@ z.util.ArrayUtil = {
     new_array[0] = array[0];
     new_array[length - 1] = array[array.length - 1];
 
-    for (let i = 1; i < length - 1; i++) {
-      const original_index = i * scale_factor;
+    for (let index = 1; index < length - 1; index++) {
+      const original_index = index * scale_factor;
       const before = Math.floor(original_index).toFixed();
       const after = Math.ceil(original_index).toFixed();
       const point = original_index - before;
-      new_array[i] = array[before] + ((array[after] - array[before]) * point); // linear interpolation
+      new_array[index] = array[before] + ((array[after] - array[before]) * point); // linear interpolation
     }
 
     return new_array;
@@ -94,16 +95,30 @@ z.util.ArrayUtil = {
   is_last_item(array, item) {
     return array.indexOf(item) === (array.length - 1);
   },
-  iterate_index(array, current_index) {
-    if (!_.isArray(array) || !_.isNumber(current_index)) {
-      return undefined;
-    }
+  iterate_index(array, current_index, reverse = false) {
+    if (_.isArray(array) && array.length && _.isNumber(current_index)) {
+      if (reverse) {
+        if (current_index === 0) {
+          return array.length - 1;
+        }
 
-    if (!array.length) {
-      return undefined;
-    }
+        return (current_index - 1) % array.length;
+      }
 
-    return (current_index + 1) % array.length;
+      return (current_index + 1) % array.length;
+    }
+  },
+  iterate_item(array, current_item, reverse = false) {
+    if (_.isArray(array) && array.length) {
+      const current_index = array.indexOf(current_item);
+
+      // If item could not be found
+      if (current_index === -1) {
+        return;
+      }
+
+      return array[z.util.ArrayUtil.iterate_index(array, current_index, reverse)];
+    }
   },
   /**
    * Returns random element

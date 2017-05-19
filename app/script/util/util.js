@@ -376,11 +376,6 @@ z.util.safe_mailto_open = function(email) {
   }
 };
 
-z.util.auto_link_emails = function(text) {
-  const email_pattern = /([a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+)/gim;
-  return text.replace(email_pattern, '<a onclick="z.util.safe_mailto_open(\'$1\')" href="#">$1</a>');
-};
-
 z.util.get_last_characters = function(message, amount) {
   if (message.length < amount) {
     return false;
@@ -400,7 +395,37 @@ z.util.markup_links = function(message) {
 // Note: We are using "Underscore.js" to escape HTML in the original message
 z.util.render_message = function(message) {
   message = marked(message);
-  message = z.util.auto_link_emails(message);
+
+  // Parse links with linkifyjs library, ignore code tags
+  const options = {
+    attributes: function(href, type) {
+      if (type === 'url') {
+        return {rel: 'nofollow noopener noreferrer'};
+      }
+      if (type === 'email') {
+        const email = href.replace('mailto:', '');
+        return {onclick: 'z.util.safe_mailto_open(\'' + email + '\')'};
+      }
+      return {};
+    },
+    formatHref: function(href, type) {
+      return (type === 'email') ? '#' : href;
+    },
+    ignoreTags: ['code', 'pre'],
+    validate: {
+      hashtag: function(value) {
+        return false;
+      },
+      mention: function(value) {
+        return false;
+      },
+    },
+  };
+  message = linkifyHtml(message, options);
+
+  // Remove this when this is merged: https://github.com/SoapBox/linkifyjs/pull/189
+  message = message.replace(/ class="linkified"/g, '');
+
   message = message.replace(/\n/g, '<br />');
 
   // Remove <br /> if it is the last thing in a message
@@ -495,8 +520,8 @@ z.util.sort_object_by_keys = function(object, reverse) {
   keys.sort();
 
   if (reverse) {
-    for (let i = keys.length - 1; i >= 0; i--) {
-      const key = keys[i];
+    for (let index = keys.length - 1; index >= 0; index--) {
+      const key = keys[index];
       const value = object[key];
       sorted_object[key] = value;
     }
@@ -574,15 +599,15 @@ z.util.murmurhash3 = function(key, seed) {
   let h1 = seed;
   const c1 = 0xcc9e2d51;
   const c2 = 0x1b873593;
-  let i = 0;
+  let index = 0;
 
-  while (i < bytes) {
+  while (index < bytes) {
     let k1 =
-      ((key.charCodeAt(i) & 0xff)) |
-      ((key.charCodeAt(++i) & 0xff) << 8) |
-      ((key.charCodeAt(++i) & 0xff) << 16) |
-      ((key.charCodeAt(++i) & 0xff) << 24);
-    ++i;
+      ((key.charCodeAt(index) & 0xff)) |
+      ((key.charCodeAt(++index) & 0xff) << 8) |
+      ((key.charCodeAt(++index) & 0xff) << 16) |
+      ((key.charCodeAt(++index) & 0xff) << 24);
+    ++index;
 
     k1 = ((((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16))) & 0xffffffff;
     k1 = (k1 << 15) | (k1 >>> 17);
@@ -598,13 +623,13 @@ z.util.murmurhash3 = function(key, seed) {
 
   switch (remainder) {
     case 3:
-      k1 ^= (key.charCodeAt(i + 2) & 0xff) << 16;
+      k1 ^= (key.charCodeAt(index + 2) & 0xff) << 16;
       break;
     case 2:
-      k1 ^= (key.charCodeAt(i + 1) & 0xff) << 8;
+      k1 ^= (key.charCodeAt(index + 1) & 0xff) << 8;
       break;
     case 1:
-      k1 ^= (key.charCodeAt(i) & 0xff);
+      k1 ^= (key.charCodeAt(index) & 0xff);
 
       k1 = (((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
       k1 = (k1 << 15) | (k1 >>> 17);
@@ -670,10 +695,10 @@ z.util.bucket_values = function(value, bucket_limits) {
     return '0';
   }
 
-  for (let i = 0; i < bucket_limits.length; i++) {
-    const limit = bucket_limits[i];
+  for (let index = 0; index < bucket_limits.length; index++) {
+    const limit = bucket_limits[index];
     if (value < (limit + 1)) {
-      const previous_limit = bucket_limits[i - 1];
+      const previous_limit = bucket_limits[index - 1];
       return `${previous_limit + 1}-${limit}`;
     }
   }
@@ -706,3 +731,9 @@ z.util.format_time_remaining = function(time_remaining) {
 
   return title || '';
 };
+
+/**
+ * No operation
+ * @returns {undefined}
+ */
+z.util.noop = function() {};

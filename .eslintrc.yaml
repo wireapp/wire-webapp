@@ -10,23 +10,34 @@ extends:
 globals:
   $: true
   _: true
+  adapter: true
   amplify: true
   cryptobox: true
   CryptoJS: true
   dcodeIO: true
   Dexie: true
+  entities: true
   hljs: true
+  jQuery: true
   keyboardJS: true
   ko: true
   libsodium: true
+  linkify: true
+  linkifyHtml: true
+  lorem_ipsum: true
   LRUCache: true
   marked: true
   moment: true
+  OpenGraphMocks: true
   pako: true
+  payload: true
   platform: true
+  poster: true
   Proteus: true
   Raygun: true
+  sinon: true
   sodium: true
+  TestFactory: true
   twttr: true
   UUID: true
   wire: true
@@ -50,6 +61,7 @@ rules:
   eol-last: 2
   func-call-spacing: 2
   handle-callback-err: 2
+  id-length: [2, {exceptions: ['z']}]
   indent: [2, 2, {SwitchCase: 1}]
   jsdoc/require-hyphen-before-param-description: 2
   key-spacing: 2

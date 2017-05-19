@@ -187,10 +187,11 @@ window.z.audio.AudioRepository = class AudioRepository {
    */
   _subscribe_to_events() {
     amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this, (handling_notifications) => {
-      const new_muted_state = handling_notifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
-      if (this.muted !== new_muted_state) {
-        this.muted = new_muted_state;
-        this.logger.info(`Set muted state to '${this.muted}'`);
+      const updated_muted_state_muted_state = handling_notifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+
+      if (this.muted !== updated_muted_state_muted_state) {
+        this.muted = updated_muted_state_muted_state;
+        this.logger.debug(`Set muted state to '${this.muted}'`);
       }
     });
 
@@ -241,7 +242,7 @@ window.z.audio.AudioRepository = class AudioRepository {
       return this._play(audio_id, audio_element, play_in_loop);
     })
     .then((audio_element) => {
-      return this.logger.info(`Playing sound '${audio_id}' (loop: '${play_in_loop}')`, audio_element);
+      this.logger.info(`Playing sound '${audio_id}' (loop: '${play_in_loop}')`, audio_element);
     })
     .catch((error) => {
       if (!(error instanceof z.audio.AudioError)) {

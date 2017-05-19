@@ -260,7 +260,6 @@ z.string.ro.conversations_all_archived = 'Totul a fost arhivat';
 z.string.ro.conversations_contacts = 'Contacte';
 z.string.ro.conversations_connection_request_many = '%no persoane așteaptă';
 z.string.ro.conversations_connection_request_one = '1 persoană așteaptă';
-z.string.ro.conversations_empty_conversation = 'Conversație goală';
 z.string.ro.conversations_no_conversations = 'Începe o conversație sau invită persoane să se alăture.';
 z.string.ro.conversations_popover_archive = 'Arhivă';
 z.string.ro.conversations_popover_block = 'Blochează';
@@ -270,6 +269,8 @@ z.string.ro.conversations_popover_leave = 'Ieși';
 z.string.ro.conversations_popover_notify = 'Demutizează';
 z.string.ro.conversations_popover_silence = 'Mutizează';
 z.string.ro.conversations_popover_unarchive = 'Dezarhivează';
+
+z.string.ro.conversations_secondary_line_timed_message = 'Mesaj temporizat';
 
 z.string.ro.takeover_headline = 'Numele de utilizator sunt aici.';
 z.string.ro.takeover_sub = 'Obține numele tău unic pe Wire.';
@@ -296,7 +297,6 @@ z.string.ro.extensions_giphy_random = 'La întâmplare';
 z.string.ro.search_open = 'Deschide';
 z.string.ro.search_open_group = 'Creează grup';
 z.string.ro.people_confirm_label = 'Adaugă la conversație';
-z.string.ro.people_common_contacts = 'Amândoi cunoașteți';
 z.string.ro.people_people = '%no persoane';
 z.string.ro.people_search_placeholder = 'Caută după nume';
 z.string.ro.people_everyone_participates = 'Toată lumea cu care\nești conectat este deja\nîn această conversație.';
@@ -431,8 +431,6 @@ z.string.ro.search_top_people = 'Top persoane';
 z.string.ro.search_try_search = 'Caută oameni după\nnume sau nume utilizator';
 z.string.ro.search_no_contacts_on_wire = 'Nu ai contacte pe Wire.\nÎncearcă să găsește oameni după\nnume sau nume utilizator.';
 z.string.ro.search_others = 'Conectare';
-z.string.ro.search_friend_in_common = '%no persoană în conum';
-z.string.ro.search_friends_in_common = '%no persoane în conum';
 
 z.string.ro.upload_google_headline = 'Caută persoane\ncu care să vorbești.';
 z.string.ro.upload_google_message = 'Vom folosi datele tale de contact pentru a te conecta cu alții. Vom anonimiza toate informațiile și nu le vom împărtăși cu altcineva.';
@@ -546,7 +544,9 @@ z.string.ro.tooltip_preferences_rename = 'Schimbă numele tău';
 
 z.string.ro.tooltip_search_close = 'Închide (Esc)';
 
+z.string.ro.init_received_access_token = 'Conectat';
 z.string.ro.init_received_self_user = 'Bună, %name.';
+z.string.ro.init_validated_client = 'Se încarcă conexiunile și conversațiile tale';
 z.string.ro.init_received_user_data = 'Verifică dacă sunt mesaje noi';
 z.string.ro.init_events_progress = 'Se încacrcă mesajele - %progress din %total';
 z.string.ro.init_updated_from_notifications = 'Bucură-te de Wire';

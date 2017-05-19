@@ -81,6 +81,7 @@ module.exports = (grunt) ->
     'includereplace:deploy_demo'
     'clean:deploy_app'
     'uglify:deploy'
+    'concat:deploy'
     'clean:deploy_script'
   ]
 
@@ -96,15 +97,10 @@ module.exports = (grunt) ->
     'includereplace:prod_auth'
     'clean:deploy_app'
     'uglify:deploy'
+    'concat:deploy'
     'clean:deploy_script'
     'raygun:prod'
     'clean:prod'
-  ]
-
-  grunt.registerTask 'prepare_test', [
-    'clean:test'
-    'copy:test'
-    'coffee:test'
   ]
 
   grunt.registerTask 'check', (file) ->

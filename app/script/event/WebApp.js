@@ -32,8 +32,6 @@ z.event.WebApp = {
     START_SESSION: 'wire.webapp.analytics.start_session',
   },
   APP: {
-    FADE_IN: 'wire.webapp.app.fade_in',
-    HIDE: 'wire.webapp.app.hide',
     UPDATE_PROGRESS: 'wire.webapp.app.update_progress',
   },
   AUDIO: {
@@ -192,6 +190,7 @@ z.event.WebApp = {
     ARCHIVE: 'wire.webapp.shortcut.archive',
     CALL_MUTE: 'wire.webapp.shortcut.call_mute',
     CALL_REJECT: 'wire.webapp.shortcut.call_reject',
+    DELETE: 'wire.webapp.shortcut.delete',
     NEXT: 'wire.webapp.shortcut.next',
     PEOPLE: 'wire.webapp.shortcut.people',
     PICTURE: 'wire.webapp.shortcut.picture',

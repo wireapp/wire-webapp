@@ -151,7 +151,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         .then((is_read) => {
           if (is_read) {
             notification.close();
-            return this.logger.info(`Removed read notification for '${message_id}' in '${conversation_id}'.`);
+            this.logger.info(`Removed read notification for '${message_id}' in '${conversation_id}'.`);
           }
         });
       }
@@ -165,8 +165,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {undefined} No return value
    */
   set_muted_state(handling_notifications) {
-    this.muted = handling_notifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
-    return this.logger.info(`Set muted state to: ${this.muted}`);
+    const updated_muted_state = handling_notifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+
+    if (this.muted !== updated_muted_state) {
+      this.muted = updated_muted_state;
+      this.logger.debug(`Block notifications: ${this.muted}`);
+    }
   }
 
   /**
@@ -770,7 +774,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     notification.onclose = () => {
       window.clearTimeout(timeout_trigger_id);
       this.notifications.splice(this.notifications.indexOf(notification), 1);
-      return this.logger.info(`Removed notification for '${message_id}' in '${conversation_id}' locally.`);
+      this.logger.info(`Removed notification for '${message_id}' in '${conversation_id}' locally.`);
     };
 
     notification.onerror = () => {

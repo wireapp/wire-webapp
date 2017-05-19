@@ -138,14 +138,15 @@
 <!-- GeoLocation -->
 <script src="/script/location/GeoLocation.js"></script>
 <!-- Conversation -->
+<script src="/script/conversation/ConversationCellState.js"></script>
 <script src="/script/conversation/ConversationError.js"></script>
 <script src="/script/conversation/ConversationMapper.js"></script>
 <script src="/script/conversation/ConversationRepository.js"></script>
 <script src="/script/conversation/ConversationService.js"></script>
 <script src="/script/conversation/ConversationServiceNoCompound.js"></script>
 <script src="/script/conversation/ConversationStatus.js"></script>
+<script src="/script/conversation/ConversationStatusIcon.js"></script>
 <script src="/script/conversation/ConversationType.js"></script>
-<script src="/script/conversation/ConversationUnreadType.js"></script>
 <script src="/script/conversation/ConversationUpdateType.js"></script>
 <script src="/script/conversation/ConversationVerificationState.js"></script>
 <script src="/script/conversation/ConversationVerificationStateHandler.js"></script>
@@ -187,11 +188,9 @@
 <script src="/script/assets/AssetRetentionPolicy.js"></script>
 <script src="/script/assets/AssetTransferState.js"></script>
 <script src="/script/assets/AssetType.js"></script>
-<script src="/script/assets/Asset.js"></script>
 <script src="/script/assets/AssetService.js"></script>
 <script src="/script/assets/AssetMetaDataBuilder.js"></script>
 <script src="/script/assets/AssetCrypto.js"></script>
-<script src="/script/assets/ImageSizeType.js"></script>
 <!-- View Models -->
 <script src="/script/view_model/LoadingViewModel.js"></script>
 <script src="/script/view_model/MainViewModel.js"></script>
@@ -217,7 +216,6 @@
 <script src="/script/view_model/content/PreferencesDeviceDetailsViewModel.js"></script>
 <script src="/script/view_model/content/PreferencesDevicesViewModel.js"></script>
 <script src="/script/view_model/content/PreferencesOptionsViewModel.js"></script>
-<script src="/script/view_model/list/ActionsViewModel.js"></script>
 <script src="/script/view_model/list/ArchiveViewModel.js"></script>
 <script src="/script/view_model/list/ConversationListViewModel.js"></script>
 <script src="/script/view_model/list/ListModalType.js"></script>
@@ -234,7 +232,6 @@
 <script src="/script/view_model/bindings/SearchBindings.js"></script>
 <!-- Knockout components -->
 <script src="/script/components/accentColorPicker.js"></script>
-<script src="/script/components/contextMenu.js"></script>
 <script src="/script/components/deviceCard.js"></script>
 <script src="/script/components/deviceRemove.js"></script>
 <script src="/script/components/ephemeralTimer.js"></script>
@@ -259,6 +256,8 @@
 <script src="/script/components/asset/controls/mediaButton.js"></script>
 <script src="/script/components/calling/chooseScreen.js"></script>
 <script src="/script/components/calling/deviceToggleButton.js"></script>
+<script src="/script/components/list/conversationListCell.js"></script>
+<script src="/script/components/list/groupAvatar.js"></script>
 <!-- Entities -->
 <script src="/script/message/CallMessageType.js"></script>
 <script src="/script/message/MessageCategory.js"></script>
@@ -312,9 +311,10 @@
 <script src="/script/calling/enum/CallAction.js"></script>
 <script src="/script/calling/enum/CallState.js"></script>
 <script src="/script/calling/enum/CallStateEventCause.js"></script>
-<script src="/script/calling/enum/CallStateGroups.js"></script>
+<script src="/script/calling/enum/CallStateGroup.js"></script>
 <script src="/script/calling/enum/ECallMessageType.js"></script>
 <script src="/script/calling/enum/ParticipantState.js"></script>
+<script src="/script/calling/enum/PropertyState.js"></script>
 <script src="/script/calling/enum/Protocol.js"></script>
 <script src="/script/calling/enum/SDPNegotiationMode.js"></script>
 <script src="/script/calling/enum/SDPSource.js"></script>
@@ -361,6 +361,7 @@
 <script src="/script/calling/CallingRepository.js"></script>
 <script src="/script/calling/CallingService.js"></script>
 <!-- View -->
+<script src="/script/ui/ContextMenu.js"></script>
 <script src="/script/ui/ShortcutType.js"></script>
 <script src="/script/ui/Shortcut.js"></script>
 <script src="/script/ui/WindowHandler.js"></script>

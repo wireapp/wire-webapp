@@ -260,7 +260,8 @@ z.string.ru.conversations_all_archived = 'Все разговоры отправ
 z.string.ru.conversations_contacts = 'Контакты';
 z.string.ru.conversations_connection_request_many = '%no ожидающих';
 z.string.ru.conversations_connection_request_one = '1 человек ожидает';
-z.string.ru.conversations_empty_conversation = 'Разговор без участников';
+z.string.ru.conversations_empty_conversation = 'Групповой разговор';
+z.string.ru.conversations_empty_conversation_description = 'Все вышли';
 z.string.ru.conversations_no_conversations = 'Начни разговор или пригласи людей присоединиться.';
 z.string.ru.conversations_popover_archive = 'Архивировать';
 z.string.ru.conversations_popover_block = 'Заблокировать';
@@ -270,6 +271,8 @@ z.string.ru.conversations_popover_leave = 'Покинуть';
 z.string.ru.conversations_popover_notify = 'Вкл. звук';
 z.string.ru.conversations_popover_silence = 'Выкл. звук';
 z.string.ru.conversations_popover_unarchive = 'Разархивировать';
+
+z.string.ru.conversations_secondary_line_timed_message = 'Временное сообщение';
 
 z.string.ru.takeover_headline = 'Имена пользователей уже здесь.';
 z.string.ru.takeover_sub = 'Зарегистрируйте своё уникальное имя в Wire.';
@@ -296,7 +299,6 @@ z.string.ru.extensions_giphy_random = 'Случайно';
 z.string.ru.search_open = 'Открыть';
 z.string.ru.search_open_group = 'Создать группу';
 z.string.ru.people_confirm_label = 'Добавить в разговор';
-z.string.ru.people_common_contacts = 'Вы оба знакомы с';
 z.string.ru.people_people = '%no участника(ов)';
 z.string.ru.people_search_placeholder = 'Поиск по имени';
 z.string.ru.people_everyone_participates = 'Все ваши контакты \nуже участвуют\nв этом разговоре.';
@@ -431,8 +433,6 @@ z.string.ru.search_top_people = 'Топ-контакты';
 z.string.ru.search_try_search = 'Найдите людей по имени\nили имени пользователя';
 z.string.ru.search_no_contacts_on_wire = 'У вас нет контактов в Wire.\nПопробуйте найти людей по имени\nили имени пользователя.';
 z.string.ru.search_others = 'Связаться';
-z.string.ru.search_friend_in_common = '%no общий знакомый';
-z.string.ru.search_friends_in_common = '%no общих знакомых';
 
 z.string.ru.upload_google_headline = 'Найти людей,\nчтобы поговорить.';
 z.string.ru.upload_google_message = 'Мы используем ваши контактные данные, чтобы соединить вас с другими пользователями. Мы анонимизируем всю информацию и не делимся ей с кем-либо еще.';
@@ -546,7 +546,9 @@ z.string.ru.tooltip_preferences_rename = 'Изменить свое имя';
 
 z.string.ru.tooltip_search_close = 'Закрыть (Esc)';
 
+z.string.ru.init_received_access_token = 'Вы вошли';
 z.string.ru.init_received_self_user = 'Здравствуйте, %name.';
+z.string.ru.init_validated_client = 'Загрузка контактов и разговоров';
 z.string.ru.init_received_user_data = 'Проверка наличия новых сообщений';
 z.string.ru.init_events_progress = 'Загрузка сообщений — %progress из %total';
 z.string.ru.init_updated_from_notifications = 'Наслаждайтесь Wire';

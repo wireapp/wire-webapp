@@ -308,15 +308,17 @@ class z.ViewModel.list.StartUIViewModel
     .then (conversation_ets) ->
       return conversation_ets
         .filter (conversation_et) -> conversation_et.is_one2one()
-        .map (conversation_et) -> conversation_et.participating_user_ids()[0]
         .slice(0, 9)
+        .map (conversation_et) -> conversation_et.participating_user_ids()[0]
     .then (user_ids) =>
       return @user_repository.get_users_by_id user_ids
+    .then (user_ets) ->
+      return user_ets.filter (user_et) -> not user_et.is_blocked()
 
   get_connections: =>
     Promise.resolve().then =>
       return @user_repository.users()
-        .filter (user_et) -> user_et.connected()
+        .filter (user_et) -> user_et.is_connected()
         .sort (user_a, user_b) -> z.util.StringUtil.sort_by_priority user_a.first_name(), user_b.first_name()
 
   ###############################################################################
@@ -443,7 +445,7 @@ class z.ViewModel.list.StartUIViewModel
     user_ids = (user_et.id for user_et in @selected_people())
 
     @conversation_repository.create_new_conversation user_ids, null
-    .then (conversation_et) =>
+    .then ({conversation_et}) =>
       @properties_repository.save_preference z.properties.PROPERTIES_TYPE.HAS_CREATED_CONVERSATION
       amplify.publish z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONVERSATION.CREATE_GROUP_CONVERSATION,
         {creationContext: 'search', numberOfParticipants: user_ids.length}
@@ -456,13 +458,13 @@ class z.ViewModel.list.StartUIViewModel
   on_audio_call: =>
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
-        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, false
+        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, false, conversation_et
       , 500
 
   on_video_call: =>
     @on_submit_search (conversation_et) ->
       window.setTimeout ->
-        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, conversation_et.id, true
+        amplify.publish z.event.WebApp.CALL.STATE.TOGGLE, true, conversation_et
       , 500
 
   on_photo: (images) =>

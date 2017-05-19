@@ -112,7 +112,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
     .catch (error) =>
       if @entered_username() isnt @submitted_username()
         return
-      if error.type is z.user.UserError::TYPE.USERNAME_TAKEN
+      if error.type is z.user.UserError.TYPE.USERNAME_TAKEN
         @username_error 'taken'
 
   verify_username: (username, e) =>
@@ -130,7 +130,7 @@ class z.ViewModel.content.PreferencesAccountViewModel
     .catch (error) =>
       if @entered_username() isnt entered_username
         return
-      if error.type is z.user.UserError::TYPE.USERNAME_TAKEN
+      if error.type is z.user.UserError.TYPE.USERNAME_TAKEN
         @username_error 'taken'
 
   check_new_clients: =>

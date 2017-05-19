@@ -10,11 +10,11 @@
                 <user-avatar class="user-avatar-xs" params="user: call().participants()[0].user"></user-avatar>
               <!-- /ko -->
             <!-- /ko -->
-            <!-- ko if: is_group() && call().state() != z.calling.enum.CallState.ONGOING -->
-              <user-avatar class="user-avatar-xs" params="user: call().creator()"></user-avatar>
+            <!-- ko if: is_group() && call().state() != z.calling.enum.CALL_STATE.ONGOING -->
+              <user-avatar class="user-avatar-xs" params="user: call().creating_user"></user-avatar>
             <!-- /ko -->
           <!-- /ko -->
-          <!-- ko if: is_group() && (call().state() === z.calling.enum.CallState.ONGOING && !call().self_user_joined()) || call().is_declined() -->
+          <!-- ko if: is_group() && (call().state() === z.calling.enum.CALL_STATE.ONGOING && !call().self_user_joined()) || call().is_declined() -->
             <svg class="svg-theme" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
               <circle class="fill-theme" opacity=".16" cx="9" cy="9" r="9"></circle>
               <circle class="fill-theme" cx="9" cy="9" r="3"></circle>
@@ -24,7 +24,7 @@
         </div>
         <div class="calls-controls">
 
-          <!-- ko if: is_group() && call().state() === z.calling.enum.CallState.ONGOING && call().self_user_joined() -->
+          <!-- ko if: is_group() && call().state() === z.calling.enum.CALL_STATE.ONGOING && call().self_user_joined() -->
             <div class="calls-controls-row calls-controls-row-participants"
                  data-bind="click: $parent.click_on_conversation">
               <!-- ko foreach: call().participants() -->
@@ -41,27 +41,27 @@
                             text: display_name()"
                  data-uie-name="item-call"></div>
             <!-- ko ifnot: call().is_declined() -->
-              <!-- ko if: call().state() === z.calling.enum.CallState.CONNECTING -->
+              <!-- ko if: call().state() === z.calling.enum.CALL_STATE.CONNECTING -->
                 <span class="label-xs" data-bind="l10n_text: z.string.call_state_connecting" data-uie-name="call-label-connecting"></span>
               <!-- /ko -->
-              <!-- ko if: call().state() === z.calling.enum.CallState.OUTGOING -->
+              <!-- ko if: call().state() === z.calling.enum.CALL_STATE.OUTGOING -->
                 <span class="label-xs" data-bind="l10n_text: z.string.call_state_outgoing" data-uie-name="call-label-outgoing"></span>
               <!-- /ko -->
-              <!-- ko if: call().state() === z.calling.enum.CallState.INCOMING -->
+              <!-- ko if: call().state() === z.calling.enum.CALL_STATE.INCOMING -->
                 <span class="label-xs" data-bind="l10n_text: z.string.call_state_incoming" data-uie-name="call-label-incoming"></span>
               <!-- /ko -->
-              <!-- ko if: call().state() === z.calling.enum.CallState.ONGOING && call().self_user_joined() -->
+              <!-- ko if: call().state() === z.calling.enum.CALL_STATE.ONGOING && call().self_user_joined() -->
                 <span class="label-xs" data-bind="text: z.util.format_seconds(call().duration_time())" data-uie-name="call-duration"></span>
               <!-- /ko -->
             <!-- /ko -->
-            <!-- ko if: (call().state() === z.calling.enum.CallState.ONGOING && !call().self_user_joined()) || call().is_declined() -->
+            <!-- ko if: (call().state() === z.calling.enum.CALL_STATE.ONGOING && !call().self_user_joined()) || call().is_declined() -->
               <div class="button button-pill button-fluid button-outline button-small"
                    data-uie-name="do-call-controls-call-join"
                    data-bind="click: $parent.on_accept_call, l10n_text: z.string.call_join"></div>
             <!-- /ko -->
           </div>
 
-          <!-- ko if: call().state() === z.calling.enum.CallState.INCOMING && !call().is_declined() -->
+          <!-- ko if: call().state() === z.calling.enum.CALL_STATE.INCOMING && !call().is_declined() -->
             <div class="calls-controls-row">
               <div class="button button-pill button-full button-small button-theme-red"
                    data-uie-name="do-call-controls-call-decline"
@@ -100,7 +100,7 @@
                   </div>
                 </div>
 
-                <!-- ko if: call().state() === z.calling.enum.CallState.ONGOING -->
+                <!-- ko if: call().state() === z.calling.enum.CALL_STATE.ONGOING -->
                   <!-- ko if: $parent.show_toggle_screen() -->
                     <div class="calls-controls-action calls-controls-action-screensharing">
                       <div class="up">
@@ -161,50 +161,33 @@
       <ul class="left-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_unarchived">
 
       <!-- ko if: connect_requests().length > 0 -->
-        <li class="left-list-item"
-            data-bind="css: {'text-theme': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}">
-          <div class="left-column">
-            <div class="dot-md dot-outlined border-theme"></div>
+        <li class="conversation-list-cell"
+            data-bind="css: {'conversation-list-cell-active': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}">
+          <div class="conversation-list-cell-left">
+            <!-- ko if: connect_requests().length > 1 -->
+              <group-avatar params="users: connect_requests()"></group-avatar>
+            <!-- /ko -->
+            <!-- ko if: connect_requests().length === 1 -->
+              <user-avatar class="user-avatar-xs" params="user: connect_requests()[0]"></user-avatar>
+            <!-- /ko -->
           </div>
-          <div class="center-column"
-               data-bind="click: click_on_connect_requests, text: connect_requests_text"
-               data-uie-name="item-pending-requests"></div>
-          <div class="right-column"></div>
+          <div class="conversation-list-cell-center">
+            <span class="conversation-list-cell-name"
+                  data-bind="click: click_on_connect_requests, text: connect_requests_text"
+                  data-uie-name="item-pending-requests"></span>
+          </div>
+          <div class="conversation-list-cell-right">
+            <span class="conversation-list-cell-badge icon-pending"></span>
+          </div>
         </li>
       <!-- /ko -->
 
       <!-- ko foreach: conversations_unarchived -->
-        <li class="left-list-item"
-          data-bind="css: {'text-theme': $parent.is_selected_conversation($data)}">
-          <div class="overlay"></div>
-          <div class="left-column">
-            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.CALL -->
-              <span class="icon-end-call text-red" data-uie-name="status-unread" data-uie-value="call"></span>
-            <!-- /ko -->
-            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.CONNECT -->
-              <span class="dot-md dot-outlined border-theme" data-uie-name="status-unread" data-uie-value="connect"></span>
-            <!-- /ko -->
-            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.PING -->
-              <span class="icon-ping" data-bind="css: unread_accent_color()" data-uie-name="status-unread" data-uie-value="ping"></span>
-            <!-- /ko -->
-            <!-- ko if: unread_type() === z.conversation.ConversationUnreadType.UNREAD -->
-              <span data-bind="unread_indicator: unread_message_count" data-uie-name="status-unread" data-uie-value="message"></span>
-            <!-- /ko -->
-          </div>
-          <div class="center-column"
-               data-bind="attr: {'data-uie-uid': id, 'data-uie-value': display_name}, click: $parent.click_on_conversation, text: display_name()"
-               data-uie-name="item-conversation"></div>
-          <div class="right-column">
-            <span class="button-icon icon-more"
-                  data-bind="attr: {'id': 'options-' + id}, click: $root.click_on_actions, l10n_tooltip: z.string.tooltip_conversations_more"
-                  data-bubble="#actions-bubble"
-                  data-placement="right-flex"
-                  data-uie-name="go-options"></span>
-            <span class="icon-silence"
-                  data-bind="css: {'conversation-muted': is_muted()}"
-                  data-uie-name="status-silence"></span>
-          </div>
-        </li>
+        <conversation-list-cell
+          data-bind="click: $parent.click_on_conversation, event: {'contextmenu': $parent.list_view_model.on_context_menu}"
+          data-uie-name="item-conversation"
+          params="click: $parent.list_view_model.on_context_menu, conversation: $data, is_selected: $parent.is_selected_conversation">
+        </conversation-list-cell>
       <!-- /ko -->
     </ul>
     <!-- /ko -->

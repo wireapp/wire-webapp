@@ -30,25 +30,17 @@ z.util.StringUtil = {
     return z.util.StringUtil.includes(window.getSlug(name_a), window.getSlug(name_b));
   },
   format: function() {
-    let index = 0;
     let string = arguments[0];
 
-    for (let i = 0; i < arguments.length; ++i) {
+    for (let index = 0; index < arguments.length; ++index) {
       const reg = new RegExp('\\{' + index + '\\}', 'gm');
-      string = string.replace(reg, arguments[++index]);
+      string = string.replace(reg, arguments[index + 1]);
     }
 
     return string;
   },
   get_first_character: function(string) {
-    const reg = new RegExp(/([\uE000-\uF8FF]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDDFF])/);
-    const find_emoji_in_string = reg.exec(string);
-
-    if (find_emoji_in_string && (find_emoji_in_string.index === 0)) {
-      return find_emoji_in_string[0];
-    }
-
-    return string[0];
+    return [...string][0];
   },
   get_random_character: function() {
     let char_index;
