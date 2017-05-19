@@ -93,7 +93,7 @@ z.media.MediaEmbeds = (function() {
 
       const video_id = url.match(/(?:embed\/|v=|v\/|be\/)([a-zA-Z0-9_-]{11})/);
       if (!video_id) {
-          return;
+        return;
       }
 
       // W have to remove the v param and convert the timestamp
