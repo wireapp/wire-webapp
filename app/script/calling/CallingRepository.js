@@ -214,7 +214,7 @@ z.calling.CallingRepository = class CallingRepository {
             return this.use_v3_api ? z.calling.enum.PROTOCOL.VERSION_3 : z.calling.enum.PROTOCOL.VERSION_2;
           }
 
-          return z.calling.enum.PROTOCOL.VERSION_2;
+          return z.calling.enum.PROTOCOL.VERSION_3;
         }
 
         return z.calling.enum.PROTOCOL.VERSION_3;
