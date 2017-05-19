@@ -29,6 +29,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
   }
 
   constructor(element_id, client_repository, user_repository) {
+    this.change_accent_color = this.change_accent_color.bind(this);
     this.check_new_clients = this.check_new_clients.bind(this);
     this.removed_from_view = this.removed_from_view.bind(this);
 

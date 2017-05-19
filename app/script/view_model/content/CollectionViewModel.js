@@ -27,6 +27,7 @@ window.z.ViewModel.content = z.ViewModel.content || {};
 z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
   constructor(element_id, conversation_repository, collection_details) {
     this.added_to_view = this.added_to_view.bind(this);
+    this.click_on_message = this.click_on_message.bind(this);
     this.item_added = this.item_added.bind(this);
     this.item_removed = this.item_removed.bind(this);
     this.on_input_change = this.on_input_change.bind(this);
@@ -108,22 +109,18 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
 
   _populate_items(message_ets) {
     message_ets.map((message_et) => {
-      switch (true) {
-        case (message_et.category & z.message.MessageCategory.IMAGE) && !(message_et.category & z.message.MessageCategory.GIF):
-          this.images.push(message_et);
-          break;
-        case (message_et.category & z.message.MessageCategory.FILE):
-          if (message_et.get_first_asset().is_audio()) {
-            this.audio.push(message_et);
-          } else {
-            this.files.push(message_et);
-          }
-          break;
-        case (message_et.category & z.message.MessageCategory.LINK_PREVIEW):
-          this.links.push(message_et);
-          break;
-        default:
-          break;
+
+      // TODO: create binary map helper
+      if ((message_et.category & z.message.MessageCategory.IMAGE) && !(message_et.category & z.message.MessageCategory.GIF)) {
+        this.images.push(message_et);
+      } else if (message_et.category & z.message.MessageCategory.FILE) {
+        if (message_et.get_first_asset().is_audio()) {
+          this.audio.push(message_et);
+        } else {
+          this.files.push(message_et);
+        }
+      } else if (message_et.category & z.message.MessageCategory.LINK_PREVIEW) {
+        this.links.push(message_et);
       }
     });
   }
