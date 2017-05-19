@@ -46,7 +46,7 @@ describe('z.calling.CallingRepository', function() {
       TestFactory.conversation_repository.conversations.push(conversation_et);
     });
 
-    it('should return the expected protocol version', function(done) {
+    xit('should return the expected protocol version', function(done) {
       TestFactory.calling_repository.use_v3_api = undefined;
 
       TestFactory.calling_repository.set_protocol_version(conversation_id)
