@@ -272,7 +272,18 @@ z.string.sk.conversations_popover_notify = 'Zapnúť zvuk';
 z.string.sk.conversations_popover_silence = 'Stlmiť';
 z.string.sk.conversations_popover_unarchive = 'Zrušiť archiváciu';
 
+z.string.sk.conversations_secondary_line_missed_call = '{{number}} zmeškaný hovor';
+z.string.sk.conversations_secondary_line_missed_calls = '{{number}} neprijaté hovory';
+z.string.sk.conversations_secondary_line_new_message = '{{number}} nová správa';
+z.string.sk.conversations_secondary_line_new_messages = '{{number}} nových správ';
+z.string.sk.conversations_secondary_line_ping = '{{number}} ping';
+z.string.sk.conversations_secondary_line_pings = '{{number}} pingy';
+z.string.sk.conversations_secondary_line_person_left = '{{number}} osoba zostáva';
+z.string.sk.conversations_secondary_line_people_left = '{{number}} ľudí zostáva';
+z.string.sk.conversations_secondary_line_person_added = '{{user1}} pridal {{user2}}';
+z.string.sk.conversations_secondary_line_people_added = '{{user}} ľudia boli pridaní';
 z.string.sk.conversations_secondary_line_timed_message = 'Časovaná správa';
+z.string.sk.conversations_secondary_line_renamed = '{{user}} premenovaný';
 
 z.string.sk.takeover_headline = 'Užívateľské mená sú obsadené.';
 z.string.sk.takeover_sub = 'Potvrďte Vaše jednoznačné meno pre Wire.';

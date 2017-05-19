@@ -327,18 +327,17 @@ ko.bindingHandlers.antiscroll = {
     if (antiscroll) {
       const trigger_value = valueAccessor();
       if (ko.isObservable(trigger_value)) {
-        trigger_subscription = trigger_value.subscribe(function() {
+        trigger_subscription = trigger_value.subscribe(() => {
           antiscroll.rebuild();
         });
       }
 
       const resize_event = `resize.${Date.now()}`;
-      $(window).on(resize_event, _.throttle(function() {
+      $(window).on(resize_event, _.throttle(() => {
         antiscroll.rebuild();
-      }),
-      100);
+      }, 100));
 
-      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
         antiscroll.destroy();
         $(window).off(resize_event);
         if (trigger_subscription) {

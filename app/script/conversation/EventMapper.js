@@ -552,9 +552,9 @@ z.conversation.EventMapper = class EventMapper {
    * @returns {z.entity.MediumImage} Medium image asset entity
    */
   _map_asset_image(event, should_create_dummy_image) {
-    const {data: event_data} = event;
-    const {content_length, content_type, conversation: conversation_id, id, info} = event_data;
-    const asset_et = new z.entity.MediumImage(id);
+    const {data: event_data, conversation: conversation_id} = event;
+    const {content_length, content_type, id: asset_id, info} = event_data;
+    const asset_et = new z.entity.MediumImage(asset_id);
 
     asset_et.file_size = content_length;
     asset_et.file_type = content_type;
@@ -566,7 +566,7 @@ z.conversation.EventMapper = class EventMapper {
     if (key) {
       asset_et.resource(z.assets.AssetRemoteData.v3(key, otr_key, sha256, token, true));
     } else {
-      asset_et.resource(z.assets.AssetRemoteData.v2(conversation_id, id, otr_key, sha256, true));
+      asset_et.resource(z.assets.AssetRemoteData.v2(conversation_id, asset_id, otr_key, sha256, true));
     }
 
     if (should_create_dummy_image) {

@@ -85,6 +85,7 @@ rules:
   prefer-const: 2
   prefer-promise-reject-errors: 2
   prefer-spread: 2
+  prefer-template: 2
   quotes: [2, single, avoid-escape]
   semi: [2, always]
   semi-spacing: [2, {before: false, after: true}]

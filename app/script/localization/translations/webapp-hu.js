@@ -272,7 +272,18 @@ z.string.hu.conversations_popover_notify = 'Némítás feloldása';
 z.string.hu.conversations_popover_silence = 'Némítás';
 z.string.hu.conversations_popover_unarchive = 'Archiválás visszavonása';
 
+z.string.hu.conversations_secondary_line_missed_call = '{{number}} nem fogadott hívás';
+z.string.hu.conversations_secondary_line_missed_calls = '{{number}} nem fogadott hívások';
+z.string.hu.conversations_secondary_line_new_message = '{{number}} új üzenet';
+z.string.hu.conversations_secondary_line_new_messages = '{{number}} új üzenet';
+z.string.hu.conversations_secondary_line_ping = '{{number}} kopogás';
+z.string.hu.conversations_secondary_line_pings = '{{number}} kopogás';
+z.string.hu.conversations_secondary_line_person_left = '{{number}} személy elhagyta a beszélgetést';
+z.string.hu.conversations_secondary_line_people_left = '{{number}} partner elhagyta a beszélgetést';
+z.string.hu.conversations_secondary_line_person_added = '{{user1}} hozzáadta {{user2}} partnert';
+z.string.hu.conversations_secondary_line_people_added = '{{user}} partnerek lettek hozzáadva';
 z.string.hu.conversations_secondary_line_timed_message = 'Időzített üzenet';
+z.string.hu.conversations_secondary_line_renamed = '{{user}} átnevezve';
 
 z.string.hu.takeover_headline = 'Felhasználónevek itt találhatóak.';
 z.string.hu.takeover_sub = 'Igényeljen egyedei nevet a Wire-ön.';
