@@ -191,7 +191,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
       return this._render_conversation(conversation_et);
     }
 
-    this.conversation_repository.update_participating_user_ets(conversation_et)
+    return this.conversation_repository.update_participating_user_ets(conversation_et)
       .then((_conversation_et) => {
         if (this.marked_message()) {
           return this.conversation_repository.get_messages_with_offset(_conversation_et, this.marked_message());

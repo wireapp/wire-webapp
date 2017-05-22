@@ -27,6 +27,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   constructor(element_id, conversation_repository, user_repository) {
     this.added_to_view = this.added_to_view.bind(this);
     this.on_window_click = this.on_window_click.bind(this);
+    this.show_separator = this.show_separator.bind(this);
 
     this.conversation_repository = conversation_repository;
     this.user_repository = user_repository;
@@ -66,7 +67,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
     this.edit_message_et = ko.observable();
     this.edit_input = ko.observable('');
-    this.is_editing = ko.pureComputed(() => (this.edit_message_et() !== null));
+    this.is_editing = ko.pureComputed(() => this.edit_message_et() != null);
 
     this.is_editing.subscribe((is_editing) => {
       if (is_editing) {
@@ -105,7 +106,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
         }
 
         if (this.conversation_et()) {
-          return this.conversation_et() || '';
+          return this.conversation_et().input() || '';
         }
 
         return '';
