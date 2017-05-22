@@ -31,6 +31,7 @@ globals:
   OpenGraphMocks: true
   pako: true
   payload: true
+  PhoneFormat: true
   platform: true
   poster: true
   Proteus: true

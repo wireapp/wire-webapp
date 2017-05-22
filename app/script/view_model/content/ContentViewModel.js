@@ -170,11 +170,12 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
         this._release_content();
         this.content_state(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
         this.conversation_repository.active_conversation(conversation_et);
-        this.message_list.change_conversation(conversation_et, message_et, () => {
-          this._show_content(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
-          this.participants.change_conversation(conversation_et);
-          this.previous_conversation = this.conversation_repository.active_conversation();
-        });
+        this.message_list.change_conversation(conversation_et, message_et)
+          .then(() => {
+            this._show_content(z.ViewModel.content.CONTENT_STATE.CONVERSATION);
+            this.participants.change_conversation(conversation_et);
+            this.previous_conversation = this.conversation_repository.active_conversation();
+          });
       });
   }
 

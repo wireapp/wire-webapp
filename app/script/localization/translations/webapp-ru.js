@@ -254,7 +254,7 @@ z.string.ru.collection_section_audio = 'Аудиосообщения';
 z.string.ru.fullsearch_placeholder = 'Поиск в текстовых сообщениях';
 z.string.ru.fullsearch_no_results = 'Ничего не найдено.';
 
-z.string.ru.archive_header = 'Архивировать';
+z.string.ru.archive_header = 'Архив';
 
 z.string.ru.conversations_all_archived = 'Все разговоры отправлены в архив';
 z.string.ru.conversations_contacts = 'Контакты';
@@ -269,10 +269,21 @@ z.string.ru.conversations_popover_cancel = 'Отклонить запрос';
 z.string.ru.conversations_popover_clear = 'Удалить';
 z.string.ru.conversations_popover_leave = 'Покинуть';
 z.string.ru.conversations_popover_notify = 'Вкл. звук';
-z.string.ru.conversations_popover_silence = 'Выкл. звук';
+z.string.ru.conversations_popover_silence = 'Откл. уведомления';
 z.string.ru.conversations_popover_unarchive = 'Разархивировать';
 
+z.string.ru.conversations_secondary_line_missed_call = '{{number}} пропущенный звонок';
+z.string.ru.conversations_secondary_line_missed_calls = '{{number}} пропущенных звонка';
+z.string.ru.conversations_secondary_line_new_message = '{{number}} новое сообщение';
+z.string.ru.conversations_secondary_line_new_messages = '{{number}} новых сообщения';
+z.string.ru.conversations_secondary_line_ping = '{{number}} пинг';
+z.string.ru.conversations_secondary_line_pings = '{{number}} пинга';
+z.string.ru.conversations_secondary_line_person_left = '{{number}} человек покинул';
+z.string.ru.conversations_secondary_line_people_left = '{{number}} человек(а) покинули';
+z.string.ru.conversations_secondary_line_person_added = '{{user1}} добавил(-а) {{user2}}';
+z.string.ru.conversations_secondary_line_people_added = '{{user}} человек были добавлены';
 z.string.ru.conversations_secondary_line_timed_message = 'Временное сообщение';
+z.string.ru.conversations_secondary_line_renamed = '{{user}} переименовал группу';
 
 z.string.ru.takeover_headline = 'Имена пользователей уже здесь.';
 z.string.ru.takeover_sub = 'Зарегистрируйте своё уникальное имя в Wire.';

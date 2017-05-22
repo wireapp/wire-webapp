@@ -56,7 +56,7 @@ describe('z.calling.CallingRepository', function() {
           return TestFactory.calling_repository.set_protocol_version(group_conversation_id);
         })
         .then(function(protocol_version) {
-          expect(protocol_version).toBe(z.calling.enum.PROTOCOL.VERSION_2);
+          expect(protocol_version).toBe(z.calling.enum.PROTOCOL.VERSION_3);
 
           TestFactory.calling_repository.use_v3_api = true;
           return TestFactory.calling_repository.set_protocol_version(conversation_id);
