@@ -36,7 +36,7 @@
     "karma-jasmine": "1.1.0",
     "load-grunt-tasks": "3.5.2",
     "request": "2.81.0",
-    "sinon": "2.2.0",
+    "sinon": "2.3.0",
     "stylelint": "7.10.1"
   },
   "scripts": {
