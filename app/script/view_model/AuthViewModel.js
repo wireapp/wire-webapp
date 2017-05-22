@@ -1424,7 +1424,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    * @returns {string} Hash value
    */
   _get_hash() {
-    window.location.hash.substr(1);
+    return window.location.hash.substr(1);
   }
 
   /**
