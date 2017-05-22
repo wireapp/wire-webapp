@@ -65,6 +65,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.preferences   = new z.ViewModel.list.PreferencesListViewModel('preferences', this, this.content_view_model);
     this.start_ui      = new z.ViewModel.list.StartUIViewModel('start-ui', this, this.connect_repository, this.conversation_repository, this.search_repository, this.user_repository, this.properties_repository);
     this.takeover      = new z.ViewModel.list.TakeoverViewModel('takeover', this.conversation_repository, this.user_repository);
+    this.teams_tabs    = new z.ViewModel.list.TeamsTabViewModel('teams');
     /* eslint-enable no-multi-spaces */
 
     this.self_user_picture = ko.pureComputed(() => {
