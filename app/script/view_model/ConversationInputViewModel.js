@@ -374,31 +374,35 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   }
 
   on_input_key_down(data, event) {
-    if (!this.conversation_input_emoji.on_input_key_down(data, event)) {
-      switch (event.keyCode) {
-        case z.util.KEYCODE.ARROW_UP:
-          if (!this.input().length) {
-            this.edit_message(this.conversation_et().get_last_editable_message(), event.target);
-          }
-          break;
-        case z.util.KEYCODE.ESC:
-          if (this.pasted_file()) {
-            this.pasted_file(null);
-          } else {
-            this.cancel_edit();
-          }
-          break;
-        case z.util.KEYCODE.ENTER:
-          if (event.altKey || event.metaKey) {
-            z.util.KeyUtil.insert_at_caret(event.target, '\n');
-            $(event.target).change();
-            event.preventDefault();
-          }
-          break;
-        default:
-          return true;
-      }
+    if (this.conversation_input_emoji.on_input_key_down(data, event)) {
+      return;
     }
+
+    switch (event.keyCode) {
+      case z.util.KEYCODE.ARROW_UP:
+        if (!this.input().length) {
+          this.edit_message(this.conversation_et().get_last_editable_message(), event.target);
+        }
+        break;
+      case z.util.KEYCODE.ESC:
+        if (this.pasted_file()) {
+          this.pasted_file(null);
+        } else {
+          this.cancel_edit();
+        }
+        break;
+      case z.util.KEYCODE.ENTER:
+        if (event.altKey || event.metaKey) {
+          z.util.KeyUtil.insert_at_caret(event.target, '\n');
+          $(event.target).change();
+          event.preventDefault();
+        }
+        break;
+      default:
+        // noop
+    }
+
+    return true;
   }
 
   edit_message(message_et, input_element) {

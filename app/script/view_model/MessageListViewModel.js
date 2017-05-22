@@ -31,6 +31,8 @@ window.z.ViewModel = z.ViewModel || {};
  */
 z.ViewModel.MessageListViewModel = class MessageListViewModel {
   constructor(element_id, conversation_repository, user_repository) {
+    this._on_message_add = this._on_message_add.bind(this);
+
     this.conversation_repository = conversation_repository;
     this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.ViewModel.MessageListViewModel', z.config.LOGGER.OPTIONS);
