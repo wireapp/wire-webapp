@@ -41,9 +41,6 @@ z.team.TeamService = class TeamService {
 
   delete_member(team_id, user_id) {
     return this.client.send_json({
-      data: {
-        todo: 'Change this to normal request!',
-      },
       type: 'DELETE',
       url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}/members/${user_id}`),
     });
@@ -51,9 +48,6 @@ z.team.TeamService = class TeamService {
 
   delete_team() {
     return this.client.send_json({
-      data: {
-        todo: 'Change this to normal request!',
-      },
       type: 'DELETE',
       url: this.client.create_url(TeamService.URL.TEAMS),
     });
@@ -61,9 +55,6 @@ z.team.TeamService = class TeamService {
 
   get_members(team_id) {
     return this.client.send_request({
-      data: {
-        todo: 'Change this to normal request!',
-      },
       type: 'GET',
       url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}/members`),
     });
@@ -77,6 +68,13 @@ z.team.TeamService = class TeamService {
       },
       type: 'GET',
       url: this.client.create_url(TeamService.URL.TEAMS),
+    });
+  }
+
+  get_team_metadata(team_id) {
+    return this.client.send_request({
+      type: 'GET',
+      url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}`),
     });
   }
 

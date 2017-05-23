@@ -23,6 +23,8 @@
 
 describe('z.team.TeamRepository', () => {
   const test_factory = new TestFactory();
+  const teams_data = { teams: [ { creator: '9ca1bf41-42cd-4ee4-b54e-99e8dcc9d375', icon_key: null, icon: '', id: 'e6d3adc5-9140-477a-abc1-8279d210ceab', name: 'Wire GmbH', }, { creator: 'e82019bc-5ee1-4835-8057-cfbe2229582b', icon_key: null, icon: '', id: 'f9310b63-0c04-4f13-a051-c19d24b78ed5', name: 'My Awesome Company', } ], 'has_more': false };
+  const team_metadata = teams_data.teams[0];
 
   let server = undefined;
   let team_repository = undefined;
@@ -40,15 +42,16 @@ describe('z.team.TeamRepository', () => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
-    const response = {
-      'teams': [],
-      'has_more': false,
-    };
-
     server.respondWith('GET', `${test_factory.settings.connection.rest_url}/teams?size=100`, [
       200,
       {'Content-Type': 'application/json'},
-      JSON.stringify(response),
+      JSON.stringify(teams_data),
+    ]);
+
+    server.respondWith('GET', `${test_factory.settings.connection.rest_url}/teams/${team_metadata.id}`, [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify(team_metadata),
     ]);
   });
 
@@ -56,10 +59,28 @@ describe('z.team.TeamRepository', () => {
     server.restore();
   });
 
-  describe('get_teams', () => {
+  describe('get_teams()', () => {
     it('returns team entities', (done) => {
       team_repository.get_teams(100)
-        .then(done)
+        .then((entity) => {
+          expect(entity.length).toEqual(teams_data.teams.length);
+          expect(entity[0].creator).toEqual(teams_data.teams[0].creator);
+          expect(entity[1].creator).toEqual(teams_data.teams[1].creator);
+          done();
+        })
+        .catch(done.fail);
+    });
+  });
+
+  describe('get_team_metadata()', () => {
+    it('returns team metadata entities', (done) => {
+      team_repository.get_team_metadata(team_metadata.id)
+        .then((entity) => {
+          expect(entity.length).toEqual(team_metadata.length);
+          expect(entity.creator).toEqual(team_metadata.creator);
+          expect(entity.id).toEqual(team_metadata.id);
+          done();
+        })
         .catch(done.fail);
     });
   });

@@ -54,7 +54,7 @@ z.team.TeamRepository = class TeamRepository {
     return this.team_service.get_teams()
       .then(({teams, has_more}) => {
         if (teams.length) {
-          const new_team_ets = this.team_mapper.map_team_from_object(teams);
+          const new_team_ets = this.team_mapper.map_teams_from_array(teams);
           team_ets = team_ets.concat(new_team_ets);
         }
 
@@ -63,7 +63,24 @@ z.team.TeamRepository = class TeamRepository {
           return this.get_teams(limit, last_team_et.id, team_ets);
         }
 
+        z.util.ko_array_push_all(this.teams, team_ets);
+
         return this.teams();
+      })
+      .catch((error) => {
+        this.logger.error(`Failed to retrieve teams from backend: ${error.message}`, error);
+        throw error;
+      });
+  }
+
+  get_team_metadata(team_id, team_ets = []) {
+    return this.team_service.get_team_metadata(team_id)
+      .then((team_metadata) => {
+        if (Object.keys(team_metadata).length) {
+          const new_team_ets = this.team_mapper.map_team_from_object(team_metadata);
+          team_ets = team_ets.concat(new_team_ets);
+        }
+        return team_ets[0];
       })
       .catch((error) => {
         this.logger.error(`Failed to retrieve teams from backend: ${error.message}`, error);

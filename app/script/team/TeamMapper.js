@@ -27,16 +27,39 @@ z.team.TeamMapper = class TeamMapper {
     this.logger = new z.util.Logger('z.team.TeamMapper', z.config.LOGGER.OPTIONS);
   }
 
-  map_team_from_object(data) {
-    return this.update_user_from_object(new z.team.TeamEntity(), data);
+  map_teams_from_array(teams) {
+    return teams.map((team) => this.update_team_from_object(new z.team.TeamEntity(), team));
   }
 
-  update_user_from_object(entity, data) {
-    entity.creator = data.creator;
-    entity.icon = data.icon;
-    entity.icon_key = data.icon_key;
-    entity.id = data.id;
-    entity.name(data.name);
-    return entity;
+  map_team_from_object(data) {
+    return this.update_team_from_object(new z.team.TeamEntity(), data);
+  }
+
+  update_team_from_object(team_et, data) {
+    if (!data) {
+      return;
+    }
+
+    if (data.creator) {
+      team_et.creator = data.creator;
+    }
+
+    if (data.icon) {
+      team_et.icon = data.icon;
+    }
+
+    if (data.icon_key) {
+      team_et.icon_key = data.icon_key;
+    }
+
+    if (data.id) {
+      team_et.id = data.id;
+    }
+
+    if (data.name) {
+      team_et.name(data.name);
+    }
+
+    return team_et;
   }
 };
