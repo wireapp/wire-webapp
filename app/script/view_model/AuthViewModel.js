@@ -1515,7 +1515,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    *
    * @private
    * @param {string} string_identifier - Identifier of error message
-   * @param {Array<string>|string} types - Input type(s) of validation error
+   * @param {Array<string>|string} [types] - Input type(s) of validation error
    * @returns {undefined} No return value
    */
   _add_error(string_identifier, types) {
@@ -1828,6 +1828,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         return this.client_repository.get_valid_local_client();
       })
       .catch((error) => {
+        if (error.type === z.user.UserError.TYPE.USER_MISSING_EMAIL) {
+          throw error;
+        }
+
         this.logger.info(`No valid local client found: ${error.message}`, error);
         if (error.type === z.client.ClientError.TYPE.MISSING_ON_BACKEND) {
           this.logger.info('Local client rejected as invalid by backend. Reinitializing storage.');
@@ -1847,10 +1851,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         this._register_client();
       })
       .catch((error) => {
-        this.logger.error(`Login failed: ${error.message}`, error);
-        this._add_error(z.string.auth_error_misc);
-        this._has_errors();
-        this._set_hash(z.auth.AuthView.MODE.ACCOUNT_LOGIN);
+        if (error.type !== z.user.UserError.TYPE.USER_MISSING_EMAIL) {
+          this.logger.error(`Login failed: ${error.message}`, error);
+          this._add_error(z.string.auth_error_misc);
+          this._has_errors();
+          this._set_hash(z.auth.AuthView.MODE.ACCOUNT_LOGIN);
+        }
       });
   }
 
@@ -1875,6 +1881,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         }
 
         this._set_hash(z.auth.AuthView.MODE.VERIFY_ACCOUNT);
+        throw new z.user.UserError(z.user.UserError.TYPE.USER_MISSING_EMAIL);
       });
   }
 
