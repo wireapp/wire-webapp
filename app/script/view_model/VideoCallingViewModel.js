@@ -333,4 +333,3 @@ ko.bindingHandlers.source_stream = {
     element.srcObject = valueAccessor();
   },
 };
-
