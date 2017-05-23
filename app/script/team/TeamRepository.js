@@ -23,6 +23,7 @@ window.z = window.z || {};
 window.z.team = z.team || {};
 
 z.team.TeamRepository = class TeamRepository {
+  // todo: pass in user repository
   constructor(team_service) {
     this.team_service = team_service;
     this.teams = ko.observableArray([]);
@@ -83,7 +84,23 @@ z.team.TeamRepository = class TeamRepository {
         return team_ets[0];
       })
       .catch((error) => {
-        this.logger.error(`Failed to retrieve teams from backend: ${error.message}`, error);
+        this.logger.error(`Failed to retrieve metadata from backend: ${error.message}`, error);
+        throw error;
+      });
+  }
+
+  get_team_members(team_id, team_members_ets = []) {
+    return this.team_service.get_team_members(team_id)
+      .then(({members}) => {
+        if (members.length) {
+          // todo: map team member entity
+          const new_team_members_ets = this.team_mapper.map_teams_from_array(members);
+          team_members_ets = team_members_ets.concat(new_team_members_ets);
+        }
+        return team_members_ets;
+      })
+      .catch((error) => {
+        this.logger.error(`Failed to retrieve members from backend: ${error.message}`, error);
         throw error;
       });
   }

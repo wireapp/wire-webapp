@@ -22,13 +22,9 @@
 window.z = window.z || {};
 window.z.team = z.team || {};
 
-z.team.TeamEntity = class TeamEntity {
-  constructor(id = '') {
-    this.creator = undefined;
-    this.icon = '';
-    this.icon_key = undefined;
-    this.members = ko.observableArray([]);
-    this.id = id;
-    this.name = ko.observable('');
+z.team.TeamMemberEntity = class TeamMemberEntity {
+  constructor() {
+    this.permissions = undefined;
+    this.user = undefined;
   }
 };

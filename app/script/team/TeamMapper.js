@@ -31,6 +31,10 @@ z.team.TeamMapper = class TeamMapper {
     return teams.map((team) => this.update_team_from_object(new z.team.TeamEntity(), team));
   }
 
+  map_members_from_array(teams) {
+    return teams.map((team) => this.update_team_from_object(new z.team.TeamEntity(), team));
+  }
+
   map_team_from_object(data) {
     return this.update_team_from_object(new z.team.TeamEntity(), data);
   }

@@ -53,7 +53,7 @@ z.team.TeamService = class TeamService {
     });
   }
 
-  get_members(team_id) {
+  get_team_members(team_id) {
     return this.client.send_request({
       type: 'GET',
       url: this.client.create_url(`${TeamService.URL.TEAMS}/${team_id}/members`),
