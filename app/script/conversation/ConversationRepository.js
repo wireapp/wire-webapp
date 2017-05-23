@@ -787,7 +787,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   /**
    * Set active team entity.
-   * @param {TeamEntity} team_et - only conversation_et that are related to this team are visible
+   * @param {TeamEntity} team_et - only conversations that are related to this team are visible
    */
   set_active_team(team_et) {
     if (team_et == null) {
