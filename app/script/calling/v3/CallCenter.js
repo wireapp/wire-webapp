@@ -272,16 +272,13 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {undefined} No return value
    */
   _on_group_setup(e_call_message_et) {
-    const {conversation_id, dest_client_id, dest_user_id, response, user_id} = e_call_message_et;
-
-    if (dest_user_id !== this.user_repository.self().id || dest_client_id !== this.client_repository.current_client().id) {
-      return this.logger.log(`Ignored non-targeted e-call group setup intended for client '${dest_client_id}' of user '${dest_user_id}'`);
-    }
+    const {conversation_id, response, user_id} = e_call_message_et;
 
     this.get_e_call_by_id(conversation_id)
       .then((e_call_et) => {
         // @todo Grant message for ongoing call
 
+        this._validate_message_destination(e_call_et, e_call_message_et);
         e_call_et.set_remote_version(e_call_message_et);
         e_call_et.update_e_participant(user_id, e_call_message_et, response !== true);
       })
@@ -468,13 +465,33 @@ z.calling.v3.CallCenter = class CallCenter {
     const {conversation_id, user_id} = e_call_message_et;
 
     this.get_e_call_by_id(conversation_id)
-      .then((e_call_et) => e_call_et.verify_session_id(e_call_message_et))
+      .then((e_call_et) => {
+        this._validate_message_destination(e_call_et, e_call_message_et);
+        return e_call_et.verify_session_id(e_call_message_et);
+      })
       .then((e_call_et) => e_call_et.update_e_participant(user_id, e_call_message_et))
       .catch(function(error) {
         if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
           throw error;
         }
       });
+  }
+
+  /**
+   * Validate that content of e-call message is targeted at local client.
+   * @param {ECall} e_call_et - E-call message belongs to
+   * @param {ECallMessage} e_call_message_et - E-call message to validate
+   * @returns {undefined} Resolves if the message is valid
+   */
+  _validate_message_destination(e_call_et, e_call_message_et) {
+    if (e_call_et.is_group()) {
+      const {dest_client_id, dest_user_id, type} = e_call_message_et;
+
+      if (dest_user_id !== this.user_repository.self().id || dest_client_id !== this.client_repository.current_client().id) {
+        this.logger.log(`Ignored non-targeted e-call '${type}' message intended for client '${dest_client_id}' of user '${dest_user_id}'`);
+        throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.MISTARGETED_MESSAGE);
+      }
+    }
   }
 
   /**
