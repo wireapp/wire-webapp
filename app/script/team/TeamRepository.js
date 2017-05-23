@@ -25,10 +25,11 @@ window.z.team = z.team || {};
 z.team.TeamRepository = class TeamRepository {
   // todo: pass in user repository
   constructor(team_service) {
+    this.logger = new z.util.Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);
+    this.personal_space = new z.team.TeamEntity(undefined);
+    this.team_mapper = new z.team.TeamMapper();
     this.team_service = team_service;
     this.teams = ko.observableArray([]);
-    this.team_mapper = new z.team.TeamMapper();
-    this.logger = new z.util.Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);
   }
 
   add_members() {
