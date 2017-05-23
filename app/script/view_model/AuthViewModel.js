@@ -46,6 +46,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    * @param {z.main.Auth} auth - App authentication
    */
   constructor(element_id, auth) {
+    this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
+
     this.auth = auth;
     this.logger = new z.util.Logger('z.ViewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
 
