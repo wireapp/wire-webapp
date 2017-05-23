@@ -253,7 +253,14 @@ z.calling.v3.CallCenter = class CallCenter {
     const {conversation_id, client_id, user_id} = e_call_message_et;
 
     this.get_e_call_by_id(conversation_id)
-      .then((e_call_et) => e_call_et.delete_e_participant(user_id, client_id, termination_reason))
+      .then((e_call_et) => {
+        if (user_id === this.user_repository.self().id) {
+          e_call_et.self_user_joined(true);
+          return e_call_et;
+        }
+
+        return e_call_et.delete_e_participant(user_id, client_id, termination_reason);
+      })
       .then((e_call_et) => e_call_et.participant_left(e_call_message_et, termination_reason))
       .catch(this._throw_message_error);
   }
