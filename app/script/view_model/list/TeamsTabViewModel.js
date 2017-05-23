@@ -25,6 +25,6 @@ window.z.ViewModel.list = z.ViewModel.list || {};
 
 z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
   constructor() {
-    console.log('TeamsTabViewModel')
+    console.log('TeamsTabViewModel');
   }
 };
