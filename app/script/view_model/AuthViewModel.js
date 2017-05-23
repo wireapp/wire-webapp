@@ -393,7 +393,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    * @returns {undefined} No return value
    */
   login_phone() {
-    if (!this.pending_server_request() && !this.can_login_phone() && this._validate_input(z.auth.AuthView.MODE.ACCOUNT_PHONE)) {
+    if (!this.pending_server_request() && this.can_login_phone() && this._validate_input(z.auth.AuthView.MODE.ACCOUNT_PHONE)) {
       const _on_code_request_success = (response) => {
         window.clearInterval(this.code_interval_id);
         if (response.expires_in) {
