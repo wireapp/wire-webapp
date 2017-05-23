@@ -1850,7 +1850,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
                       amplify.publish(z.event.WebApp.CALL.STATE.JOIN, conversation_et.id);
                     }
 
-                    return resolve();
+                    resolve();
                   },
                   close() {
                     if (!send_anyway) {
@@ -1858,7 +1858,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
                         amplify.publish(z.event.WebApp.CALL.STATE.DELETE, conversation_et.id);
                       }
 
-                      return reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION));
+                      reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION));
                     }
                   },
                   data: {
