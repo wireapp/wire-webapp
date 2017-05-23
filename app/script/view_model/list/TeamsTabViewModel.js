@@ -24,7 +24,16 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.list = z.ViewModel.list || {};
 
 z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
-  constructor(team_repository) {
+  constructor(team_repository, conversation_repository) {
     this.team_repository = team_repository;
+    this.conversation_repository = conversation_repository;
+    this.teams = this.team_repository.teams;
+
+    this.click_on_team = this.click_on_team.bind(this);
   }
+
+  click_on_team(team_et) {
+    this.conversation_repository.set_active_team(team_et);
+  }
+
 };
