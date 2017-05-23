@@ -1,1 +1,5 @@
-<div id="teams" class="teams"></div>
+<div id="teams" class="teams" data-bind="with: $root.teams_tabs">
+  <!-- ko foreach: teams -->
+    <div class="team" data-bind="click: $parent.click_on_team"></div>
+  <!-- /ko -->
+</div>

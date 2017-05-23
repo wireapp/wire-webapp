@@ -71,6 +71,30 @@ z.team.TeamService = class TeamService {
     });
   }
 
+  get_teams() {
+    return Promise.resolve().then(() => {
+      return {
+        teams: [
+          {
+            "id": "Wire",
+            "creator": "9ca1bf41-42cd-4ee4-b54e-99e8dcc9d375",
+            "name": "Wire GmbH",
+            "icon": "",
+            "icon_key": null
+          },
+          {
+            "id": "Benny",
+            "creator": "e82019bc-5ee1-4835-8057-cfbe2229582b",
+            "name": "My Awesome Company",
+            "icon": "",
+            "icon_key": null
+          }
+        ],
+        has_more: false
+      }
+    })
+  }
+
   get_team_metadata(team_id) {
     return this.client.send_request({
       type: 'GET',

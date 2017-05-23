@@ -50,6 +50,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
 
+    this.active_team = ko.observable();
+
     this.block_event_handling = true;
     this.fetching_conversations = {};
 
@@ -103,7 +105,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const cleared = [];
       const unarchived = [];
 
-      this.sorted_conversations().forEach(function(conversation_et) {
+      this.sorted_conversations().forEach((conversation_et) => {
+        if (this.active_team() != null && !z.util.StringUtil.includes(conversation_et.display_name(), this.active_team().id)) { // TODO check against id
+          return;
+        }
         if (conversation_et.has_active_call()) {
           calls.push(conversation_et);
         } else if (conversation_et.is_cleared()) {
@@ -780,6 +785,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
+  /**
+   * Set active team entity.
+   * @param {TeamEntity} team_et - only conversations that are related to this team are visible
+   */
+  set_active_team(team_et) {
+    if (team_et == null) {
+      throw new TypeError('Missing team entity');
+    }
+    this.active_team(team_et);
+  }
 
   //##############################################################################
   // Send events
