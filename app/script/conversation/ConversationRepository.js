@@ -791,7 +791,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   set_active_team(team_et) {
     if (team_et == null) {
-      throw TypeError('Missing team entity');
+      throw new TypeError('Missing team entity');
     }
     this.active_team(team_et);
   }
