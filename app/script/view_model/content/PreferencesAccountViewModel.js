@@ -103,7 +103,7 @@ z.ViewModel.content.PreferencesAccountViewModel = class PreferencesAccountViewMo
     // FF sends charCode 0 when pressing backspace
     if (event.charCode !== 0) {
       // Automation is missing key prop
-      z.user.UserHandleGenerator.validate_character(String.fromCharCode(event.charCode));
+      return z.user.UserHandleGenerator.validate_character(String.fromCharCode(event.charCode));
     }
     return true;
   }
