@@ -36,6 +36,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     this.click_on_like = this.click_on_like.bind(this);
     this.get_timestamp_class = this.get_timestamp_class.bind(this);
     this.is_last_delivered_message = this.is_last_delivered_message.bind(this);
+    this.on_context_menu_click = this.on_context_menu_click.bind(this);
     this.on_message_user_click = this.on_message_user_click.bind(this);
     this.on_session_reset_click = this.on_session_reset_click.bind(this);
     this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
