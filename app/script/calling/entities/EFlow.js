@@ -1162,7 +1162,7 @@ z.calling.entities.EFlow = class EFlow {
    */
   _replace_media_stream(media_stream_info) {
     return Promise.resolve()
-      .then(() => this._stop_media_stream(this.media_stream()))
+      .then(() => this._remove_media_stream(this.media_stream()))
       .then(() => this._upgrade_media_stream(media_stream_info))
       .then((upgraded_media_stream_info) => {
         const {stream: media_stream, type: media_type} = upgraded_media_stream_info;
