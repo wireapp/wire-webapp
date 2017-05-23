@@ -75,11 +75,6 @@ z.calling.entities.EFlow = class EFlow {
 
     this.peer_connection = undefined;
     this.pc_initialized = ko.observable(false);
-    this.pc_initialized.subscribe((is_initialized) => {
-      if (is_initialized) {
-        this.telemetry.set_peer_connection(this.peer_connection);
-      }
-    });
 
     this.media_stream = this.e_call_et.local_media_stream;
     this.data_channel = undefined;
@@ -454,6 +449,8 @@ z.calling.entities.EFlow = class EFlow {
     this.peer_connection.oniceconnectionstatechange = this._on_ice_connection_state_change.bind(this);
     this.peer_connection.onremovestream = this._on_remove_stream.bind(this);
     this.peer_connection.onsignalingstatechange = this._on_signaling_state_change.bind(this);
+
+    this.telemetry.set_peer_connection(this.peer_connection);
   }
 
   /**
