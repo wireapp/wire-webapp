@@ -32,6 +32,13 @@ window.z.ViewModel = z.ViewModel || {};
 z.ViewModel.MessageListViewModel = class MessageListViewModel {
   constructor(element_id, conversation_repository, user_repository) {
     this._on_message_add = this._on_message_add.bind(this);
+    this.click_on_cancel_request = this.click_on_cancel_request.bind(this);
+    this.click_on_like = this.click_on_like.bind(this);
+    this.get_timestamp_class = this.get_timestamp_class.bind(this);
+    this.is_last_delivered_message = this.is_last_delivered_message.bind(this);
+    this.on_message_user_click = this.on_message_user_click.bind(this);
+    this.on_session_reset_click = this.on_session_reset_click.bind(this);
+    this.should_hide_user_avatar = this.should_hide_user_avatar.bind(this);
 
     this.conversation_repository = conversation_repository;
     this.user_repository = user_repository;

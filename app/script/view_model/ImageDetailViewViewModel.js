@@ -24,6 +24,8 @@ window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   constructor(element_id, conversation_repository) {
+    this.before_hide_callback = this.before_hide_callback.bind(this);
+    this.hide_callback = this.hide_callback.bind(this);
     this.message_added = this.message_added.bind(this);
     this.message_removed = this.message_removed.bind(this);
 
@@ -52,6 +54,19 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     ko.applyBindings(this, document.getElementById(this.element_id));
   }
 
+  before_hide_callback() {
+    this.image_visible(false);
+  }
+
+  hide_callback() {
+    $(document).off('keydown.lightbox');
+    window.URL.revokeObjectURL(this.image_src());
+    this.image_src(undefined);
+    this.source = undefined;
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.message_added);
+    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.message_removed);
+  }
+
   show(message_ets, message_et, source) {
     this.items(message_ets);
     this.source = source;
@@ -62,7 +77,7 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     if (this.image_modal) {
       this.image_modal.destroy();
     }
-    this.image_modal = new zeta.webapp.module.Modal('#detail-view', this._hide_callback, this._before_hide_callback);
+    this.image_modal = new zeta.webapp.module.Modal('#detail-view', this.hide_callback, this.before_hide_callback);
     this.image_modal.show();
 
     this._load_image();
@@ -73,11 +88,11 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
           break;
         case z.util.KEYCODE.ARROW_DOWN:
         case z.util.KEYCODE.ARROW_RIGHT:
-          this.click_on_show_next();
+          this.click_on_show_next(this, event);
           break;
         case z.util.KEYCODE.ARROW_LEFT:
         case z.util.KEYCODE.ARROW_UP:
-          this.click_on_show_previous();
+          this.click_on_show_previous(this, event);
           break;
         default:
           break;
@@ -96,19 +111,6 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     if (this.message_et().id === removed_message_id) {
       this.image_modal.hide();
     }
-  }
-
-  _hide_callback() {
-    $(document).off('keydown.lightbox');
-    window.URL.revokeObjectURL(this.image_src());
-    this.image_src(undefined);
-    this.source = undefined;
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.message_added);
-    amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.message_removed);
-  }
-
-  _before_hide_callback() {
-    this.image_visible(false);
   }
 
   _load_image() {
