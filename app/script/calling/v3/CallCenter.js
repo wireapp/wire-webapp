@@ -230,9 +230,7 @@ z.calling.v3.CallCenter = class CallCenter {
         e_call_et.schedule_group_check();
       })
       .catch((error) => {
-        if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
-          throw error;
-        }
+        this._throw_message_error(error);
 
         if (user_id !== this.user_repository.self().id) {
           this.conversation_repository.grant_message(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [user_id])
@@ -257,11 +255,7 @@ z.calling.v3.CallCenter = class CallCenter {
     this.get_e_call_by_id(conversation_id)
       .then((e_call_et) => e_call_et.delete_e_participant(user_id, client_id, termination_reason))
       .then((e_call_et) => e_call_et.participant_left(e_call_message_et, termination_reason))
-      .catch(function(error) {
-        if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
-          throw error;
-        }
-      });
+      .catch(this._throw_message_error);
   }
 
   /**
@@ -282,11 +276,7 @@ z.calling.v3.CallCenter = class CallCenter {
         e_call_et.set_remote_version(e_call_message_et);
         e_call_et.update_e_participant(user_id, e_call_message_et, response !== true);
       })
-      .catch(function(error) {
-        if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
-          throw error;
-        }
-      });
+      .catch(this._throw_message_error);
   }
 
   /**
@@ -318,9 +308,7 @@ z.calling.v3.CallCenter = class CallCenter {
           .then((remote_user_et) => e_call_et.add_e_participant(remote_user_et, e_call_message_et, e_call_et.self_client_joined()));
       })
       .catch((error) => {
-        if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
-          throw error;
-        }
+        this._throw_message_error(error);
 
         if (user_id !== this.user_repository.self().id) {
           this.conversation_repository.grant_message(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [user_id])
@@ -350,11 +338,7 @@ z.calling.v3.CallCenter = class CallCenter {
             e_call_et.deactivate_call(e_call_message_et, termination_reason);
           }
         })
-        .catch(function(error) {
-          if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
-            throw error;
-          }
-        });
+        .catch(this._throw_message_error);
     }
   }
 
@@ -372,11 +356,7 @@ z.calling.v3.CallCenter = class CallCenter {
       .then((e_call_et) => e_call_et.verify_session_id(e_call_message_et))
       .then((e_call_et) => this._confirm_e_call_message(e_call_et, e_call_message_et))
       .then((e_call_et) => e_call_et.update_e_participant(user_id, e_call_message_et))
-      .catch(function(error) {
-        if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
-          throw error;
-        }
-      });
+      .catch(this._throw_message_error);
   }
 
   /**
@@ -399,11 +379,7 @@ z.calling.v3.CallCenter = class CallCenter {
         e_call_et.state(z.calling.enum.CALL_STATE.REJECTED);
         this.media_stream_handler.reset_media_stream();
       })
-      .catch(function(error) {
-        if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
-          throw error;
-        }
-      });
+      .catch(this._throw_message_error);
   }
 
   /**
@@ -443,9 +419,7 @@ z.calling.v3.CallCenter = class CallCenter {
           .then((remote_user_et) => e_call_et.add_e_participant(remote_user_et, e_call_message_et, true));
       })
       .catch((error) => {
-        if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
-          throw error;
-        }
+        this._throw_message_error(error);
 
         if (!response && user_id !== this.user_repository.self().id) {
           this.conversation_repository.grant_message(conversation_id, z.ViewModel.MODAL_CONSENT_TYPE.INCOMING_CALL, [user_id])
@@ -470,11 +444,25 @@ z.calling.v3.CallCenter = class CallCenter {
         return e_call_et.verify_session_id(e_call_message_et);
       })
       .then((e_call_et) => e_call_et.update_e_participant(user_id, e_call_message_et))
-      .catch(function(error) {
-        if (error.type !== z.calling.v3.CallError.TYPE.NOT_FOUND) {
-          throw error;
-        }
-      });
+      .catch(this._throw_message_error);
+  }
+
+  /**
+   * Throw error is not expected types.
+   *
+   * @private
+   * @param {z.calling.v3.CallError|Error} error - Error thrown during e-call message handling
+   * @returns {undefined} No return value
+   */
+  _throw_message_error(error) {
+    const expected_error_types = [
+      z.calling.v3.CallError.TYPE.MISTARGETED_MESSAGE,
+      z.calling.v3.CallError.TYPE.NOT_FOUND,
+    ];
+
+    if (!expected_error_types.includes(error.type)) {
+      throw error;
+    }
   }
 
   /**
