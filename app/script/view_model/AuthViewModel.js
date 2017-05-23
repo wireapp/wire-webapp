@@ -458,10 +458,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
           // Track if the user changed the pre-filled email
           if (this.prefilled_email === this.username()) {
-            this.auth.repository.get_access_token().then(this._account_verified);
+            this.auth.repository.get_access_token()
+              .then(() => this._account_verified());
           } else {
             this._set_hash(z.auth.AuthView.MODE.POSTED);
-            this.auth.repository.get_access_token().then(this._wait_for_activate);
+            this.auth.repository.get_access_token()
+              .then(() => this._wait_for_activate());
           }
           this.pending_server_request(false);
         })
