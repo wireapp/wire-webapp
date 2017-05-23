@@ -34,8 +34,9 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
    * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
    * @param {z.search.SearchRepository} search_repository - Search repository
    * @param {z.properties.PropertiesRepository} properties_repository - Properties repository
+   * @param {z.team.TeamRepository} team_repository - Team repository
   */
-  constructor(element_id, content_view_model, calling_repository, connect_repository, conversation_repository, search_repository, properties_repository) {
+  constructor(element_id, content_view_model, calling_repository, connect_repository, conversation_repository, search_repository, properties_repository, team_repository) {
     this.switch_list = this.switch_list.bind(this);
     this.on_context_menu = this.on_context_menu.bind(this);
 
@@ -45,6 +46,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.conversation_repository = conversation_repository;
     this.search_repository = search_repository;
     this.properties_repository = properties_repository;
+    this.team_repository = team_repository;
     this.logger = new z.util.Logger('z.ViewModel.list.ListViewModel', z.config.LOGGER.OPTIONS);
 
     // Repositories
@@ -65,7 +67,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.preferences   = new z.ViewModel.list.PreferencesListViewModel('preferences', this, this.content_view_model);
     this.start_ui      = new z.ViewModel.list.StartUIViewModel('start-ui', this, this.connect_repository, this.conversation_repository, this.search_repository, this.user_repository, this.properties_repository);
     this.takeover      = new z.ViewModel.list.TakeoverViewModel('takeover', this.conversation_repository, this.user_repository);
-    this.teams_tabs    = new z.ViewModel.list.TeamsTabViewModel('teams');
+    this.teams_tabs    = new z.ViewModel.list.TeamsTabViewModel('teams', this.team_repository);
     /* eslint-enable no-multi-spaces */
 
     this.self_user_picture = ko.pureComputed(() => {
