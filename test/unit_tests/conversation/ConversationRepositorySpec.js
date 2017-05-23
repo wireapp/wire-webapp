@@ -922,4 +922,3 @@ describe('ConversationRepository', function() {
     });
   });
 });
-

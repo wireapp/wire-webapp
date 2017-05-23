@@ -438,4 +438,3 @@ describe('MediaEmbeds', function() {
     });
   });
 });
-
