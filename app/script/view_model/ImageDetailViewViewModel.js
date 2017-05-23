@@ -24,7 +24,7 @@ window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
   constructor(element_id, conversation_repository) {
-    this.before_hide_callback = this.before_hide_callback(this);
+    this.before_hide_callback = this.before_hide_callback.bind(this);
     this.hide_callback = this.hide_callback.bind(this);
     this.message_added = this.message_added.bind(this);
     this.message_removed = this.message_removed.bind(this);
