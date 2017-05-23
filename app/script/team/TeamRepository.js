@@ -27,6 +27,7 @@ z.team.TeamRepository = class TeamRepository {
     this.team_service = team_service;
     this.teams = ko.observableArray([]);
     this.team_mapper = new z.team.TeamMapper();
+    this.logger = new z.util.Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);
   }
 
   add_members() {
@@ -65,7 +66,7 @@ z.team.TeamRepository = class TeamRepository {
         return this.teams();
       })
       .catch((error) => {
-        this.logger.error(`Failed to retrieve connections from backend: ${error.message}`, error);
+        this.logger.error(`Failed to retrieve teams from backend: ${error.message}`, error);
         throw error;
       });
   }

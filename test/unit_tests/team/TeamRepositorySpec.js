@@ -23,9 +23,44 @@
 
 describe('z.team.TeamRepository', () => {
   const test_factory = new TestFactory();
+
+  let server = undefined;
+  let team_repository = undefined;
+
+  beforeAll((done) => {
+    test_factory.exposeTeamActors()
+      .then(function(repository) {
+        team_repository = repository;
+        done();
+      })
+      .catch(done.fail);
+  });
+
+  beforeEach(function() {
+    server = sinon.fakeServer.create();
+    server.autoRespond = true;
+
+    const response = {
+      'teams': [],
+      'has_more': false,
+    };
+
+    server.respondWith('GET', `${test_factory.settings.connection.rest_url}/teams?size=100`, [
+      200,
+      {'Content-Type': 'application/json'},
+      JSON.stringify(response),
+    ]);
+  });
+
+  afterEach(function() {
+    server.restore();
+  });
+
   describe('get_teams', () => {
-    it('returns team entities', () => {
-      expect('a').toBe('a');
+    it('returns team entities', (done) => {
+      team_repository.get_teams(100)
+        .then(done)
+        .catch(done.fail);
     });
   });
 });
