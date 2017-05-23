@@ -63,12 +63,13 @@ z.main.App = class App {
 
     repositories.announce            = new z.announce.AnnounceRepository(this.service.announce);
     repositories.audio               = this.auth.audio;
-    repositories.storage             = new z.storage.StorageRepository(this.service.storage);
     repositories.cache               = new z.cache.CacheRepository();
-    repositories.cryptography        = new z.cryptography.CryptographyRepository(this.service.cryptography, repositories.storage);
     repositories.giphy               = new z.extension.GiphyRepository(this.service.giphy);
     repositories.media               = new z.media.MediaRepository();
+    repositories.storage             = new z.storage.StorageRepository(this.service.storage);
+    repositories.team                = new z.team.TeamRepository(this.service.team);
 
+    repositories.cryptography        = new z.cryptography.CryptographyRepository(this.service.cryptography, repositories.storage);
     repositories.client              = new z.client.ClientRepository(this.service.client, repositories.cryptography);
     repositories.user                = new z.user.UserRepository(this.service.user, this.service.asset, this.service.search, repositories.client, repositories.cryptography);
     repositories.event               = new z.event.EventRepository(this.service.web_socket, this.service.notification, repositories.cryptography, repositories.user, this.service.conversation);
@@ -111,6 +112,7 @@ z.main.App = class App {
     services.giphy          = new z.extension.GiphyService(this.auth.client);
     services.search         = new z.search.SearchService(this.auth.client);
     services.storage        = new z.storage.StorageService();
+    services.team           = new z.team.TeamService(this.auth.client);
     services.user           = new z.user.UserService(this.auth.client);
     services.properties     = new z.properties.PropertiesService(this.auth.client);
     services.web_socket     = new z.event.WebSocketService(this.auth.client);
@@ -223,6 +225,7 @@ z.main.App = class App {
       return Promise.all([
         this.repository.conversation.get_conversations(),
         this.repository.user.get_connections(),
+        this.repository.team.get_teams(),
       ]);
     })
     .then(([conversation_ets, connection_ets]) => {
