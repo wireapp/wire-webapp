@@ -95,7 +95,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
     this.show_giphy_button = ko.pureComputed(() => {
       if (this.conversation_et()) {
-        return this.has_text_input() && this.conversation_et().length <= 256;
+        return this.has_text_input() && this.conversation_et().input().length <= 256;
       }
     });
 
