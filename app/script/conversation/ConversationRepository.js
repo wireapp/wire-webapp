@@ -106,7 +106,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const unarchived = [];
 
       this.sorted_conversations().forEach((conversation_et) => {
-        if (this.active_team() != null && !z.util.StringUtil.includes(conversation_et.display_name(), this.active_team().id)) { // TODO check against id
+        if (this.active_team() != null && conversation_et.team_id !== this.active_team().id) {
           return;
         }
         if (conversation_et.has_active_call()) {

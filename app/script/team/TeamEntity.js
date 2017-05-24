@@ -23,7 +23,7 @@ window.z = window.z || {};
 window.z.team = z.team || {};
 
 z.team.TeamEntity = class TeamEntity {
-  constructor(id = '') {
+  constructor(id) {
     this.creator = undefined;
     this.icon = '';
     this.icon_key = undefined;

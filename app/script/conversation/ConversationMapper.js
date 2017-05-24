@@ -149,7 +149,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       throw new Error('Cannot create conversation entity without data');
     }
 
-    const {id, creator, members, name, type, others} = conversation_data;
+    const {id, creator, members, name, type, others, team} = conversation_data;
     let conversation_et = new z.entity.Conversation(id);
 
     conversation_et.creator = creator;
@@ -177,9 +177,12 @@ z.conversation.ConversationMapper = class ConversationMapper {
       conversation_et.participating_user_ids(participating_user_ids);
     }
 
-    if (conversation_data.team) {
-      conversation_et.team_id = conversation_data.team.teamid;
-      conversation_et.is_managed = conversation_data.team.managed;
+    if (team) {
+      conversation_et.team_id = team.teamid;
+      conversation_et.is_managed = team.managed;
+    } else {
+      conversation_et.team_id = conversation_data.team_id;
+      conversation_et.is_managed = conversation_data.is_managed;
     }
 
     return conversation_et;
