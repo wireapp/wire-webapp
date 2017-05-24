@@ -37,7 +37,7 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
 
   initiate_title_updates() {
     this.logger.info('Starting to update window title');
-    this.update_window_title = ko.observable(true);
+    this.update_window_title(true);
 
     ko.computed(() => {
       if (this.update_window_title()) {
