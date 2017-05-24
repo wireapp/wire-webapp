@@ -31,9 +31,11 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
     this.teams = this.team_repository.teams;
     this.self = this.user_repository.self;
 
+    this.personal_space = this.team_repository.personal_space;
+    this.conversation_repository.set_active_team(this.personal_space);
+
     this.active_team = this.conversation_repository.active_team;
     this.show_badge = ko.observable(false);
-    this.is_personal_team_selected = ko.observable(true); // TODO: check against team
 
     this.click_on_team = this.click_on_team.bind(this);
 
@@ -46,13 +48,10 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
   }
 
   click_on_personal() {
-    const personal_team_et = new z.team.TeamEntity(); // TODO: use Peronsal team
-    this.is_personal_team_selected(true);
-    this.conversation_repository.set_active_team(personal_team_et);
+    this.conversation_repository.set_active_team(this.personal_space);
   }
 
   click_on_team(team_et) {
-    this.is_personal_team_selected(false);
     this.conversation_repository.set_active_team(team_et);
   }
 
