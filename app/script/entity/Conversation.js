@@ -29,16 +29,16 @@ z.entity.Conversation = class Conversation {
    * @param {string} conversation_id - Conversation ID
    */
   constructor(conversation_id = '') {
-    this.id = conversation_id;
     this.creator = undefined;
-    this.type = ko.observable();
+    this.id = conversation_id;
     this.name = ko.observable();
+    this.type = ko.observable();
 
     this.input = ko.observable(z.util.StorageUtil.get_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`) || '');
     this.input.subscribe((text) => z.util.StorageUtil.set_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`, text));
 
-    this.is_pending = ko.observable(false);
     this.is_loaded = ko.observable(false);
+    this.is_pending = ko.observable(false);
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]);
