@@ -67,7 +67,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.preferences   = new z.ViewModel.list.PreferencesListViewModel('preferences', this, this.content_view_model);
     this.start_ui      = new z.ViewModel.list.StartUIViewModel('start-ui', this, this.connect_repository, this.conversation_repository, this.search_repository, this.user_repository, this.properties_repository);
     this.takeover      = new z.ViewModel.list.TakeoverViewModel('takeover', this.conversation_repository, this.user_repository);
-    this.teams_tabs    = new z.ViewModel.list.TeamsTabViewModel(this.team_repository, this.conversation_repository);
+    this.teams_tabs    = new z.ViewModel.list.TeamsTabViewModel(this.team_repository, this.conversation_repository, this.user_repository);
     /* eslint-enable no-multi-spaces */
 
     this.self_user_picture = ko.pureComputed(() => {
@@ -81,7 +81,6 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     ko.applyBindings(this, document.getElementById(element_id));
   }
 
-
   _init_subscriptions() {
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => this.webapp_loaded(true));
     amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, this.open_preferences_account.bind(this));
@@ -92,10 +91,6 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, () => this.click_on_archive_action(this.conversation_repository.active_conversation()));
     amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, () => this.click_on_clear_action(this.conversation_repository.active_conversation()));
     amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, () => this.click_on_mute_action(this.conversation_repository.active_conversation()));
-  }
-
-  click_on_actions(conversation_et, event) {
-    this.actions.click_on_actions(conversation_et, event);
   }
 
   open_preferences_account() {

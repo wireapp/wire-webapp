@@ -24,16 +24,34 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.list = z.ViewModel.list || {};
 
 z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
-  constructor(team_repository, conversation_repository) {
+  constructor(team_repository, conversation_repository, user_repository) {
     this.team_repository = team_repository;
     this.conversation_repository = conversation_repository;
+    this.user_repository = user_repository;
     this.teams = this.team_repository.teams;
 
+    this.active_team = ko.observable();
+    this.show_badge = ko.observable(false);
+
     this.click_on_team = this.click_on_team.bind(this);
+
+    this._init_subscriptions();
   }
 
+  _init_subscriptions() {
+    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.SHOW, () => this.show_badge(true));
+    amplify.subscribe(z.event.WebApp.SEARCH.BADGE.HIDE, () => this.show_badge(false));
+  }
+
+  click_on_personal() {}
+
   click_on_team(team_et) {
+    this.active_team(team_et);
     this.conversation_repository.set_active_team(team_et);
+  }
+
+  click_on_preferences_button() {
+    amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
   }
 
 };
