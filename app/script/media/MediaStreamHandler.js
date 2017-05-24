@@ -280,7 +280,7 @@ z.media.MediaStreamHandler = class MediaStreamHandler {
 
     return update_promise.then(([update_media_stream_info]) => {
       this._set_stream_state(update_media_stream_info);
-      this._release_media_stream(this.local_media_stream());
+      this._release_media_stream(this.local_media_stream(), media_stream_info.type);
       this.local_media_stream(update_media_stream_info.stream);
     });
   }
