@@ -1,5 +1,10 @@
 <div id="teams" class="teams" data-bind="with: $root.teams_tabs">
   <div class="teams-items">
+    <div class="team team-personal">
+      <!-- self() -->
+        <user-avatar class="user-avatar-s" data-bind="click: click_on_personal" params="user: self()"></user-avatar>
+      <!-- /ko -->
+    </div>
     <!-- ko foreach: teams -->
       <div class="team" data-bind="click: $parent.click_on_team">
         <svg class="team-active absolute-center" data-bind="visible: $parent.active_team() && $data.id === $parent.active_team().id" width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg"><title>Outline</title><path d="M22.706 1.82l9.52 5.375C34.444 8.445 36 11.112 36 13.655v10.69c0 2.546-1.553 5.207-3.773 6.46l-9.52 5.375c-2.183 1.233-5.228 1.234-7.413 0l-9.52-5.375C3.556 29.555 2 26.888 2 24.345v-10.69c0-2.546 1.553-5.207 3.773-6.46l9.52-5.375c2.183-1.233 5.228-1.234 7.413 0zm-6.43 1.74l-9.52 5.376C5.164 9.836 4 11.83 4 13.656v10.69c0 1.82 1.168 3.82 2.756 4.718l9.52 5.375c1.575.888 3.875.887 5.447 0l9.52-5.376c1.593-.9 2.757-2.894 2.757-4.72v-10.69c0-1.82-1.168-3.82-2.756-4.718l-9.52-5.375c-1.575-.888-3.875-.887-5.447 0z" fill-rule="nonzero"/></svg>
