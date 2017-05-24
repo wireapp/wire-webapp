@@ -33,7 +33,7 @@ z.util.StringUtil = {
     let string = arguments[0];
 
     for (let index = 0; index < arguments.length; ++index) {
-      const reg = new RegExp('\\{' + index + '\\}', 'gm');
+      const reg = new RegExp(`\\{${index}\\}`, 'gm');
       string = string.replace(reg, arguments[index + 1]);
     }
 

@@ -28,19 +28,22 @@ z.user.UserError = class UserError extends Error {
 
     this.name = this.constructor.name;
     this.stack = (new Error()).stack;
-    this.type = type || z.user.UserError.TYPE.UNKNOWN;
+    this.type = type || UserError.TYPE.UNKNOWN;
 
     switch (this.type) {
-      case z.user.UserError.TYPE.PRE_KEY_NOT_FOUND:
+      case UserError.TYPE.PRE_KEY_NOT_FOUND:
         this.message = 'Pre-key not found';
         break;
-      case z.user.UserError.TYPE.REQUEST_FAILURE:
+      case UserError.TYPE.REQUEST_FAILURE:
         this.message = 'User related backend request failure';
         break;
-      case z.user.UserError.TYPE.USER_NOT_FOUND:
+      case UserError.TYPE.USER_MISSING_EMAIL:
+        this.message = 'Self user has not set email address';
+        break;
+      case UserError.TYPE.USER_NOT_FOUND:
         this.message = 'User not found';
         break;
-      case z.user.UserError.TYPE.USERNAME_TAKEN:
+      case UserError.TYPE.USERNAME_TAKEN:
         this.message = 'Username is already taken';
         break;
       default:
@@ -53,6 +56,7 @@ z.user.UserError = class UserError extends Error {
       PRE_KEY_NOT_FOUND: 'z.user.UserError.TYPE.PRE_KEY_NOT_FOUND',
       REQUEST_FAILURE: 'z.user.UserError.TYPE.REQUEST_FAILURE',
       UNKNOWN: 'z.user.UserError.TYPE.UNKNOWN',
+      USER_MISSING_EMAIL: 'z.user.UserError.TYPE.USER_MISSING_EMAIL',
       USER_NOT_FOUND: 'z.user.UserError.TYPE.USER_NOT_FOUND',
       USERNAME_TAKEN: 'z.user.UserError.TYPE.USERNAME_TAKEN',
     };

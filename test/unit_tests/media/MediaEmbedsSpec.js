@@ -127,21 +127,28 @@ describe('MediaEmbeds', function() {
 
     describe('YouTube', function() {
       it('does not render a youtube link without video id', function() {
-        const link = 'youtube.com';
+        const link = 'youtube-nocookie.com';
         const message = build_message_with_anchor(link);
 
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
       });
 
-      it('https://www.youtube.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd', function() {
-        const link = 'https://www.youtube.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd';
+      it('does not render a malicious youtube link', function() {
+        const link = 'https://xn--yutube-wqf.com/#youtu0be/v/fKopy74weus';
         const message = build_message_with_anchor(link);
 
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
       });
 
-      it('renders link with params (http://www.youtube.com/watch?v=6o-nmK9WRGE&feature=player_embedded)', function() {
-        const link = 'http://www.youtube.com/watch?v=6o-nmK9WRGE&feature=player_embedded';
+      it('https://www.youtube-nocookie.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd', function() {
+        const link = 'https://www.youtube-nocookie.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd';
+        const message = build_message_with_anchor(link);
+
+        expect(z.media.MediaParser.render_media_embeds(message)).toBe(message);
+      });
+
+      it('renders link with params (http://www.youtube-nocookie.com/watch?v=6o-nmK9WRGE&feature=player_embedded)', function() {
+        const link = 'http://www.youtube-nocookie.com/watch?v=6o-nmK9WRGE&feature=player_embedded';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -149,8 +156,8 @@ describe('MediaEmbeds', function() {
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
 
-      it('renders link with params (http://www.youtube.com/watch?v=0zM3nApSvMg&feature=feedrec_grec_index)', function() {
-        const link = 'http://www.youtube.com/watch?v=0zM3nApSvMg&feature=feedrec_grec_index';
+      it('renders link with params (http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg&feature=feedrec_grec_index)', function() {
+        const link = 'http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg&feature=feedrec_grec_index';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -158,8 +165,8 @@ describe('MediaEmbeds', function() {
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
 
-      it('renders link with params (http://www.youtube.com/v/0zM3nApSvMg?fs=1&hl=en_US&rel=0)', function() {
-        const link = 'http://www.youtube.com/v/0zM3nApSvMg?fs=1&hl=en_US&rel=0';
+      it('renders link with params (http://www.youtube-nocookie.com/v/0zM3nApSvMg?fs=1&hl=en_US&rel=0)', function() {
+        const link = 'http://www.youtube-nocookie.com/v/0zM3nApSvMg?fs=1&hl=en_US&rel=0';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -167,24 +174,24 @@ describe('MediaEmbeds', function() {
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
 
-      it('renders link with timestamp (http://www.youtube.com/watch?v=0zM3nApSvMg#t=0m10s)', function() {
-        const link = 'http://www.youtube.com/watch?v=0zM3nApSvMg#t=0m10s';
+      it('renders link with timestamp (http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg#t=0m10s)', function() {
+        const link = 'http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg#t=0m10s';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
 
-      it('renders link with timestamp inverted (https://www.youtube.com/watch?t=125&v=CfEWiV8PoZo)', function() {
-        const link = 'https://www.youtube.com/watch?t=125&v=CfEWiV8PoZo';
+      it('renders link with timestamp inverted (https://www.youtube-nocookie.com/watch?t=125&v=CfEWiV8PoZo)', function() {
+        const link = 'https://www.youtube-nocookie.com/watch?t=125&v=CfEWiV8PoZo';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
 
-      it('renders embed link (http://www.youtube.com/embed/0zM3nApSvMg?rel=0)', function() {
-        const link = 'http://www.youtube.com/embed/0zM3nApSvMg?rel=0';
+      it('renders embed link (http://www.youtube-nocookie.com/embed/0zM3nApSvMg?rel=0)', function() {
+        const link = 'http://www.youtube-nocookie.com/embed/0zM3nApSvMg?rel=0';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -192,8 +199,8 @@ describe('MediaEmbeds', function() {
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
 
-      it('renders watch link (http://www.youtube.com/watch?v=0zM3nApSvMg)', function() {
-        const link = 'http://www.youtube.com/watch?v=0zM3nApSvMg';
+      it('renders watch link (http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg)', function() {
+        const link = 'http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -219,8 +226,8 @@ describe('MediaEmbeds', function() {
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
 
-      it('renders a mobile link (https://m.youtube.com/?#/watch?v=0zM3nApSvMg)', function() {
-        const link = 'https://m.youtube.com/?#/watch?v=0zM3nApSvMg';
+      it('renders a mobile link (https://m.youtube-nocookie.com/?#/watch?v=0zM3nApSvMg)', function() {
+        const link = 'https://m.youtube-nocookie.com/?#/watch?v=0zM3nApSvMg';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -228,8 +235,8 @@ describe('MediaEmbeds', function() {
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
 
-      it('renders another mobile link (https://www.youtube.com/watch?v=1w4Gf97q2oU&feature=youtu.be)', function() {
-        const link = 'https://www.youtube.com/watch?v=1w4Gf97q2oU&feature=youtu.be';
+      it('renders another mobile link (https://www.youtube-nocookie.com/watch?v=1w4Gf97q2oU&feature=youtu.be)', function() {
+        const link = 'https://www.youtube-nocookie.com/watch?v=1w4Gf97q2oU&feature=youtu.be';
 
         const message = build_message_with_anchor(link);
         const iframe = build_youtube_iframe(link);
@@ -238,25 +245,25 @@ describe('MediaEmbeds', function() {
       });
 
       it('doesn`t render Youtube profile link', function() {
-        const message = '<a href="https://www.youtube.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube.com/user/GoogleWebDesigner</a>';
-        const iframe = '<a href="https://www.youtube.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube.com/user/GoogleWebDesigner</a>';
+        const message = '<a href="https://www.youtube-nocookie.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/user/GoogleWebDesigner</a>';
+        const iframe = '<a href="https://www.youtube-nocookie.com/user/GoogleWebDesigner" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/user/GoogleWebDesigner</a>';
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
 
-      it('removes autoplay param from url (https://www.youtube.com/watch?v=oHg5SJYRHA0&autoplay=1)', function() {
-        const link = 'https://www.youtube.com/watch?v=oHg5SJYRHA0&autoplay=1';
+      it('removes autoplay param from url (https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1)', function() {
+        const link = 'https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1';
 
         const message = build_message_with_anchor(link);
-        const iframe = '<a href="https://www.youtube.com/watch?v=oHg5SJYRHA0&autoplay=1" target="_blank" rel="nofollow">https://www.youtube.com/watch?v=oHg5SJYRHA0&autoplay=1</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube.com/embed/oHg5SJYRHA0?html5=1" frameborder="0" allowfullscreen></iframe></div>';
+        const iframe = '<a href="https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1" frameborder="0" allowfullscreen></iframe></div>';
 
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
 
-      return it('removes autoplay param from url (https://www.youtube.com/watch?autoplay=1&v=oHg5SJYRHA0)', function() {
-        const link = 'https://www.youtube.com/watch?autoplay=1&v=oHg5SJYRHA0';
+      return it('removes autoplay param from url (https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0)', function() {
+        const link = 'https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0';
 
         const message = build_message_with_anchor(link);
-        const iframe = '<a href="https://www.youtube.com/watch?autoplay=1&v=oHg5SJYRHA0" target="_blank" rel="nofollow">https://www.youtube.com/watch?autoplay=1&v=oHg5SJYRHA0</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube.com/embed/oHg5SJYRHA0?html5=1" frameborder="0" allowfullscreen></iframe></div>';
+        const iframe = '<a href="https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1" frameborder="0" allowfullscreen></iframe></div>';
 
         expect(z.media.MediaParser.render_media_embeds(message)).toBe(iframe);
       });
@@ -431,4 +438,3 @@ describe('MediaEmbeds', function() {
     });
   });
 });
-

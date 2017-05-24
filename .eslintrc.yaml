@@ -31,6 +31,7 @@ globals:
   OpenGraphMocks: true
   pako: true
   payload: true
+  PhoneFormat: true
   platform: true
   poster: true
   Proteus: true
@@ -42,6 +43,7 @@ globals:
   UUID: true
   wire: true
   z: true
+  zeta: true
 
 plugins:
   - jsdoc
@@ -74,6 +76,7 @@ rules:
   no-else-return: 2
   no-lonely-if: 2
   no-multi-spaces: 2
+  no-multiple-empty-lines: [2, {max: 2, maxBOF: 0, maxEOF: 0}]
   no-shadow: 2
   no-unused-expressions: 2
   no-unused-vars: [2, {args: none}]
@@ -83,6 +86,7 @@ rules:
   prefer-const: 2
   prefer-promise-reject-errors: 2
   prefer-spread: 2
+  prefer-template: 2
   quotes: [2, single, avoid-escape]
   semi: [2, always]
   semi-spacing: [2, {before: false, after: true}]

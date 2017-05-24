@@ -592,7 +592,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {boolean} Is the conversation active
    */
   is_active_conversation(conversation_et) {
-    return this.active_conversation().id === conversation_et.id;
+    if (this.active_conversation()) {
+      return this.active_conversation().id === conversation_et.id;
+    }
   }
 
   /**
@@ -822,36 +824,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
-   * Archive a conversation.
-   *
-   * @param {Conversation} conversation_et - Conversation to rename
-   * @param {Conversation} next_conversation_et - Next conversation to potentially switch to
-   * @returns {Promise} Resolves when the conversation was archived
-   */
-  archive_conversation(conversation_et, next_conversation_et) {
-    if (!conversation_et) {
-      return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND));
-    }
-
-    const payload = {
-      otr_archived: true,
-      otr_archived_ref: new Date(conversation_et.last_event_timestamp()).toISOString(),
-    };
-
-    return this.conversation_service.update_member_properties(conversation_et.id, payload)
-      .catch((error) => {
-        this.logger.error(`Conversation '${conversation_et.id}' could not be archived: ${error.code}\r\nPayload: ${JSON.stringify(payload)}`, error);
-        if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
-          throw error;
-        }
-      })
-      .then(() => {
-        this._on_member_update(conversation_et, {data: payload}, next_conversation_et);
-        this.logger.info(`Archived conversation '${conversation_et.id}' locally on '${payload.otr_archived_ref}'`);
-      });
-  }
-
-  /**
    * Clear conversation content and archive the conversation.
    *
    * @note According to spec we archive a conversation when we clear it.
@@ -885,7 +857,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (conversation_et.set_timestamp(cleared_timestamp, z.conversation.ConversationUpdateType.CLEARED_TIMESTAMP)) {
       const message_content = new z.proto.Cleared(conversation_et.id, cleared_timestamp);
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      generic_message.set('cleared', message_content);
+      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED, message_content);
 
       this.send_generic_message_to_conversation(this.self_conversation().id, generic_message)
         .then(() => {
@@ -1066,6 +1038,36 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   /**
+   * Archive a conversation.
+   *
+   * @param {Conversation} conversation_et - Conversation to rename
+   * @param {Conversation} next_conversation_et - Next conversation to potentially switch to
+   * @returns {Promise} Resolves when the conversation was archived
+   */
+  archive_conversation(conversation_et, next_conversation_et) {
+    if (!conversation_et) {
+      return Promise.reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.CONVERSATION_NOT_FOUND));
+    }
+
+    const payload = {
+      otr_archived: true,
+      otr_archived_ref: new Date(conversation_et.last_event_timestamp()).toISOString(),
+    };
+
+    return this.conversation_service.update_member_properties(conversation_et.id, payload)
+      .catch((error) => {
+        this.logger.error(`Conversation '${conversation_et.id}' could not be archived: ${error.code}\r\nPayload: ${JSON.stringify(payload)}`, error);
+        if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+          throw error;
+        }
+      })
+      .then(() => {
+        this._on_member_update(conversation_et, {data: payload}, next_conversation_et);
+        this.logger.info(`Archived conversation '${conversation_et.id}' locally on '${payload.otr_archived_ref}'`);
+      });
+  }
+
+  /**
    * Un-archive a conversation.
    * @param {Conversation} conversation_et - Conversation to unarchive
    * @returns {Promise} Resolves when the conversation was unarchived
@@ -1081,20 +1083,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
     };
 
     return this.conversation_service.update_member_properties(conversation_et.id, payload)
-      .then(() => {
-        const response = {
-          data: payload,
-        };
-
-        this._on_member_update(conversation_et, response);
-        this.logger.info(`Unarchived conversation '${conversation_et.id}' on '${payload.otr_archived_ref}'`);
-        return response;
-      })
       .catch((error) => {
-        const reject_error = new Error(`Conversation '${conversation_et.id}' could not be unarchived: ${error.code}`);
-        this.logger.warn(reject_error.message, error);
-        throw reject_error;
+        this.logger.error(`Conversation '${conversation_et.id}' could not be unarchived: ${error.code}`);
+        if (error.code !== z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
+          throw error;
+        }
+      })
+      .then(() => {
+        this._on_member_update(conversation_et, {data: payload});
+        this.logger.info(`Unarchived conversation '${conversation_et.id}' on '${payload.otr_archived_ref}'`);
       });
+
   }
 
   /**
@@ -1111,7 +1110,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (timestamp && conversation_et.set_timestamp(timestamp, z.conversation.ConversationUpdateType.LAST_READ_TIMESTAMP)) {
       const message_content = new z.proto.LastRead(conversation_et.id, conversation_et.last_read_timestamp());
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      generic_message.set('lastRead', message_content);
+      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ, message_content);
 
       this.send_generic_message_to_conversation(this.self_conversation().id, generic_message)
         .then(() => {
@@ -1145,7 +1144,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then((asset) => {
         generic_message = new z.proto.GenericMessage(nonce);
-        generic_message.set('asset', asset);
+        generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
         if (conversation_et.ephemeral_timer()) {
           generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
@@ -1193,7 +1192,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       })
       .then((asset) => {
         let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-        generic_message.set('asset', asset);
+        generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
         if (conversation_et.ephemeral_timer()) {
           generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
@@ -1231,7 +1230,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
             asset.set('preview', new z.proto.Asset.Preview(image_blob.type, image_blob.size, uploaded_image_asset.uploaded));
 
             const generic_message = new z.proto.GenericMessage(message_id);
-            generic_message.set('asset', asset);
+            generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
             return this._send_and_inject_generic_message(conversation_et, generic_message);
           });
@@ -1255,7 +1254,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     asset.set('not_uploaded', reason_proto);
 
     const generic_message = new z.proto.GenericMessage(nonce);
-    generic_message.set('asset', asset);
+    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
     return this._send_and_inject_generic_message(conversation_et, generic_message);
   }
@@ -1270,7 +1269,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   send_confirmation_status(conversation_et, message_et) {
     if (!message_et.user().is_me && conversation_et.is_one2one() && z.event.EventTypeHandling.CONFIRM.includes(message_et.type)) {
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      generic_message.set('confirmation', new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED));
+      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION, new z.proto.Confirmation(message_et.id, z.proto.Confirmation.Type.DELIVERED));
 
       this.sending_queue.push(() => {
         return this.create_user_client_map(conversation_et.id, true, [message_et.user().id])
@@ -1292,13 +1291,18 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_e_call(conversation_et, e_call_message_et, user_client_map, precondition_option) {
     const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-    generic_message.set('calling', new z.proto.Calling(e_call_message_et.to_content_string()));
+    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CALLING, new z.proto.Calling(e_call_message_et.to_content_string()));
 
     return this.sending_queue.push(() => {
       return this._send_generic_message(conversation_et.id, generic_message, user_client_map, precondition_option);
     })
     .then(() => {
-      if (e_call_message_et.type === z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP) {
+      const initiating_call_message = [
+        z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START,
+        z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP,
+      ];
+
+      if (initiating_call_message.includes(e_call_message_et.type)) {
         return this._track_completed_media_action(conversation_et, generic_message, e_call_message_et);
       }
     });
@@ -1315,7 +1319,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return this.asset_service.upload_image_asset(image)
       .then((asset) => {
         let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-        generic_message.set('asset', asset);
+        generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.ASSET, asset);
 
         if (conversation_et.ephemeral_timer()) {
           generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
@@ -1339,7 +1343,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_knock(conversation_et) {
     let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-    generic_message.set('knock', new z.proto.Knock(false));
+    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK, new z.proto.Knock(false));
 
     if (conversation_et.ephemeral_timer()) {
       generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
@@ -1367,13 +1371,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then((link_preview) => {
         if (link_preview) {
           switch (generic_message.content) {
-            case 'ephemeral':
+            case z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL:
               generic_message.ephemeral.text.link_preview.push(link_preview);
               break;
-            case 'edited':
+            case z.cryptography.GENERIC_MESSAGE_TYPE.EDITED:
               generic_message.edited.text.link_preview.push(link_preview);
               break;
-            case 'text':
+            case z.cryptography.GENERIC_MESSAGE_TYPE.TEXT:
               generic_message.text.link_preview.push(link_preview);
               break;
             default:
@@ -1397,7 +1401,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_location(conversation_et, longitude, latitude, name, zoom) {
     const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-    generic_message.set('location', new z.proto.Location(longitude, latitude, name, zoom));
+    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION, new z.proto.Location(longitude, latitude, name, zoom));
     return this.send_generic_message_to_conversation(conversation_et.id, generic_message);
   }
 
@@ -1415,7 +1419,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     }
 
     const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-    generic_message.set('edited', new z.proto.MessageEdit(original_message_et.id, new z.proto.Text(message)));
+    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.EDITED, new z.proto.MessageEdit(original_message_et.id, new z.proto.Text(message)));
 
     return this._send_and_inject_generic_message(conversation_et, generic_message, false)
       .then(() => {
@@ -1459,7 +1463,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_reaction(conversation_et, message_et, reaction) {
     const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-    generic_message.set('reaction', new z.proto.Reaction(reaction, message_et.id));
+    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.REACTION, new z.proto.Reaction(reaction, message_et.id));
 
     return this._send_and_inject_generic_message(conversation_et, generic_message);
   }
@@ -1478,7 +1482,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_session_reset(user_id, client_id, conversation_id) {
     const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-    generic_message.set('clientAction', z.proto.ClientAction.RESET_SESSION);
+    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.CLIENT_ACTION, z.proto.ClientAction.RESET_SESSION);
 
     const user_client_map = {};
     user_client_map[user_id] = [client_id];
@@ -1503,7 +1507,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_text(message, conversation_et) {
     let generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-    generic_message.set('text', new z.proto.Text(message));
+    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text(message));
 
     if (conversation_et.ephemeral_timer()) {
       generic_message = this._wrap_in_ephemeral_message(generic_message, conversation_et.ephemeral_timer());
@@ -1597,7 +1601,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     ephemeral.set(generic_message.content, generic_message[generic_message.content]);
 
     generic_message = new z.proto.GenericMessage(generic_message.message_id);
-    generic_message.set('ephemeral', ephemeral);
+    generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL, ephemeral);
     return generic_message;
   }
 
@@ -1635,7 +1639,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
   send_generic_message_to_conversation(conversation_id, generic_message) {
     return this.sending_queue.push(() => {
-      const skip_own_clients = generic_message.content === 'ephemeral';
+      const skip_own_clients = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL;
 
       return this.create_user_client_map(conversation_id, skip_own_clients)
       .then((user_client_map) => {
@@ -1668,7 +1672,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return mapped_event;
       })
       .then((saved_event) => {
-        this.on_conversation_event(saved_event, true);
+        if (generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK) {
+          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
+        }
+
+        this.on_conversation_event(saved_event, z.event.EventRepository.NOTIFICATION_SOURCE.INJECTED);
+
         return this.send_generic_message_to_conversation(conversation_et.id, generic_message)
           .then((payload) => {
             if (z.event.EventTypeHandling.STORE.includes(saved_event.type)) {
@@ -1818,7 +1827,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return Promise.resolve();
     }
 
-    const consent_type = generic_message.content === 'calling' ? z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL : z.ViewModel.MODAL_CONSENT_TYPE.MESSAGE;
+    const consent_type = generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.CALLING ? z.ViewModel.MODAL_CONSENT_TYPE.OUTGOING_CALL : z.ViewModel.MODAL_CONSENT_TYPE.MESSAGE;
     return this.grant_message(conversation_id, consent_type, user_ids);
   }
 
@@ -1846,7 +1855,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
                       amplify.publish(z.event.WebApp.CALL.STATE.JOIN, conversation_et.id);
                     }
 
-                    return resolve();
+                    resolve();
                   },
                   close() {
                     if (!send_anyway) {
@@ -1854,7 +1863,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
                         amplify.publish(z.event.WebApp.CALL.STATE.DELETE, conversation_et.id);
                       }
 
-                      return reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION));
+                      reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION));
                     }
                   },
                   data: {
@@ -1979,7 +1988,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-        generic_message.set('deleted', new z.proto.MessageDelete(message_et.id));
+        generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.DELETED, new z.proto.MessageDelete(message_et.id));
 
         return this.sending_queue.push(() => {
           return this.create_user_client_map(conversation_et.id, false, precondition_option)
@@ -2012,7 +2021,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     return Promise.resolve()
       .then(() => {
         const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-        generic_message.set('hidden', new z.proto.MessageHide(conversation_et.id, message_et.id));
+        generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN, new z.proto.MessageHide(conversation_et.id, message_et.id));
 
         return this.send_generic_message_to_conversation(this.self_conversation().id, generic_message);
       })
@@ -2197,10 +2206,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * Listener for incoming events.
    *
    * @param {Object} event_json - JSON data for event
-   * @param {boolean} received_while_active - Send a notification and un-archive if necessary
+   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
    * @returns {Promise} Resolves when event was handled
    */
-  on_conversation_event(event_json, received_while_active = false) {
+  on_conversation_event(event_json, source = z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
     if (!event_json) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
@@ -2260,11 +2269,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (_.isObject(return_value)) {
           const {conversation_et, message_et} = return_value;
 
-          if (received_while_active) {
+          if (source !== z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
             if (message_et) {
               amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
             }
+          }
 
+          if (source === z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET) {
             if (conversation_et) {
               // Un-archive it also on the backend side
               if (previously_archived && !conversation_et.is_archived()) {
@@ -2290,10 +2301,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Push to receiving queue.
    * @param {Object} event_json - JSON data for event
+   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
    * @returns {undefined} No return value
    */
-  push_to_receiving_queue(event_json) {
-    this.receiving_queue.push(() => this.on_conversation_event(event_json, !this.block_event_handling));
+  push_to_receiving_queue(event_json, source) {
+    this.receiving_queue.push(() => this.on_conversation_event(event_json, source));
   }
 
   /**
@@ -3155,7 +3167,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
   _track_completed_media_action(conversation_et, generic_message, e_call_message_et) {
     let ephemeral_time, is_ephemeral, message, message_content_type;
 
-    if (generic_message.content === 'ephemeral') {
+    if (generic_message.content === z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL) {
       message = generic_message.ephemeral;
       message_content_type = generic_message.ephemeral.content;
       is_ephemeral = true;
@@ -3272,4 +3284,3 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
   }
 };
-

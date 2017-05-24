@@ -61,11 +61,12 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
 
     this.notifications = [];
 
-    this.muted = true;
     this.subscribe_to_events();
     this.notifications_preference = ko.observable(z.system_notification.SystemNotificationPreference.ON);
     this.notifications_preference.subscribe((notifications_preference) => {
-      if (notifications_preference !== z.system_notification.SystemNotificationPreference.NONE) this.check_permission();
+      if (notifications_preference !== z.system_notification.SystemNotificationPreference.NONE) {
+        this.check_permission();
+      }
     });
 
     this.permission_state = z.system_notification.PermissionStatusState.PROMPT;
@@ -73,7 +74,6 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
   }
 
   subscribe_to_events() {
-    amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_muted_state.bind(this));
     amplify.subscribe(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, this.notify.bind(this));
     amplify.subscribe(z.event.WebApp.SYSTEM_NOTIFICATION.PERMISSION_STATE, this.set_permission_state.bind(this));
     amplify.subscribe(z.event.WebApp.SYSTEM_NOTIFICATION.REMOVE_READ, this.remove_read_notifications.bind(this));
@@ -132,14 +132,20 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    */
   notify(conversation_et, message_et) {
     return Promise.resolve()
-    .then(() => {
-      if (this.muted || !SystemNotificationRepository.EVENTS_TO_NOTIFY.includes(message_et.super_type)) return;
-      if (conversation_et.is_muted && conversation_et.is_muted()) return;
-      if (message_et.is_content() && message_et.was_edited()) return;
+      .then(() => {
+        if (conversation_et.is_muted && conversation_et.is_muted()) {
+          return;
+        }
 
-      this._notify_sound(message_et);
-      return this._notify_banner(conversation_et, message_et);
-    });
+        if (message_et.is_content() && message_et.was_edited()) {
+          return;
+        }
+
+        if (SystemNotificationRepository.EVENTS_TO_NOTIFY.includes(message_et.super_type)) {
+          this._notify_sound(message_et);
+          return this._notify_banner(conversation_et, message_et);
+        }
+      });
   }
 
   // Remove notifications from the queue that are no longer unread
@@ -148,29 +154,14 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
       if (notification.data) {
         const {conversation_id, message_id} = notification.data;
         this.conversation_repository.is_message_read(conversation_id, message_id)
-        .then((is_read) => {
-          if (is_read) {
-            notification.close();
-            this.logger.info(`Removed read notification for '${message_id}' in '${conversation_id}'.`);
-          }
-        });
+          .then((is_read) => {
+            if (is_read) {
+              notification.close();
+              this.logger.info(`Removed read notification for '${message_id}' in '${conversation_id}'.`);
+            }
+          });
       }
     });
-  }
-
-  /**
-   * Set the muted state.
-   * @note Temporarily mute notifications on recovery from Notification Stream
-   * @param {z.event.NOTIFICATION_HANDLING_STATE} handling_notifications - Updated notification handling state
-   * @returns {undefined} No return value
-   */
-  set_muted_state(handling_notifications) {
-    const updated_muted_state = handling_notifications !== z.event.NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
-
-    if (this.muted !== updated_muted_state) {
-      this.muted = updated_muted_state;
-      this.logger.debug(`Block notifications: ${this.muted}`);
-    }
   }
 
   /**
@@ -198,10 +189,10 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    */
   _create_body_call(message_et) {
     if (message_et.is_activation()) {
-      return z.localization.Localizer.get_text(z.string.system_notification_voice_channel_activate);
+      return z.l10n.text(z.string.system_notification_voice_channel_activate);
     }
     if (message_et.is_deactivation() && message_et.finished_reason === z.calling.enum.TERMINATION_REASON.MISSED) {
-      return z.localization.Localizer.get_text(z.string.system_notification_voice_channel_deactivate);
+      return z.l10n.text(z.string.system_notification_voice_channel_deactivate);
     }
   }
 
@@ -220,19 +211,19 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         }
       }
     } else if (message_et.has_asset_image()) {
-      return z.localization.Localizer.get_text(z.string.system_notification_asset_add);
+      return z.l10n.text(z.string.system_notification_asset_add);
     } else if (message_et.has_asset_location()) {
-      return z.localization.Localizer.get_text(z.string.system_notification_shared_location);
+      return z.l10n.text(z.string.system_notification_shared_location);
     } else if (message_et.has_asset()) {
       const asset_et = message_et.assets()[0];
       if (asset_et.is_audio()) {
-        return z.localization.Localizer.get_text(z.string.system_notification_shared_audio);
+        return z.l10n.text(z.string.system_notification_shared_audio);
       }
       if (asset_et.is_video()) {
-        return z.localization.Localizer.get_text(z.string.system_notification_shared_video);
+        return z.l10n.text(z.string.system_notification_shared_video);
       }
       if (asset_et.is_file()) {
-        return z.localization.Localizer.get_text(z.string.system_notification_shared_file);
+        return z.l10n.text(z.string.system_notification_shared_file);
       }
     }
   }
@@ -371,11 +362,11 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         }
         break;
       case z.message.SystemMessageType.CONNECTION_ACCEPTED:
-        return z.localization.Localizer.get_text(z.string.system_notification_connection_accepted);
+        return z.l10n.text(z.string.system_notification_connection_accepted);
       case z.message.SystemMessageType.CONNECTION_CONNECTED:
-        return z.localization.Localizer.get_text(z.string.system_notification_connection_connected);
+        return z.l10n.text(z.string.system_notification_connection_connected);
       case z.message.SystemMessageType.CONNECTION_REQUEST:
-        return z.localization.Localizer.get_text(z.string.system_notification_connection_request);
+        return z.l10n.text(z.string.system_notification_connection_request);
       case z.message.SystemMessageType.CONVERSATION_CREATE:
         return z.localization.Localizer.get_text({
           id: z.string.system_notification_conversation_create,
@@ -395,7 +386,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_obfuscated() {
-    return z.localization.Localizer.get_text(z.string.system_notification_obfuscated);
+    return z.l10n.text(z.string.system_notification_obfuscated);
   }
 
   /**
@@ -404,7 +395,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Notification message body
    */
   _create_body_ping() {
-    return z.localization.Localizer.get_text(z.string.system_notification_ping);
+    return z.l10n.text(z.string.system_notification_ping);
   }
 
   /**
@@ -447,27 +438,27 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
     let options_body = undefined;
 
     return this._create_options_body(conversation_et, message_et)
-    .then((body) => {
-      options_body = body;
-      if (options_body) {
-        return this._should_obfuscate_notification_sender(message_et);
-      }
-      throw new z.system_notification.SystemNotificationError(z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION);
-    })
-    .then((should_obfuscate_sender) => {
-      return {
-        options: {
-          body: this._should_obfuscate_notification_message(message_et) ? this._create_body_obfuscated() : options_body,
-          data: this._create_options_data(conversation_et, message_et),
-          icon: this._create_options_icon(should_obfuscate_sender, message_et.user()),
-          silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
-          tag: this._create_options_tag(conversation_et),
-        },
-        timeout: SystemNotificationRepository.CONFIG.TIMEOUT,
-        title: should_obfuscate_sender ? this._create_title_obfuscated() : this._create_title(conversation_et, message_et),
-        trigger: this._create_trigger(conversation_et, message_et),
-      };
-    });
+      .then((body) => {
+        options_body = body;
+        if (options_body) {
+          return this._should_obfuscate_notification_sender(message_et);
+        }
+        throw new z.system_notification.SystemNotificationError(z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION);
+      })
+      .then((should_obfuscate_sender) => {
+        return {
+          options: {
+            body: this._should_obfuscate_notification_message(message_et) ? this._create_body_obfuscated() : options_body,
+            data: this._create_options_data(conversation_et, message_et),
+            icon: this._create_options_icon(should_obfuscate_sender, message_et.user()),
+            silent: true, // @note When Firefox supports this we can remove the fix for WEBAPP-731
+            tag: this._create_options_tag(conversation_et),
+          },
+          timeout: SystemNotificationRepository.CONFIG.TIMEOUT,
+          title: should_obfuscate_sender ? this._create_title_obfuscated() : this._create_title(conversation_et, message_et),
+          trigger: this._create_trigger(conversation_et, message_et),
+        };
+      });
   }
 
   /**
@@ -480,24 +471,24 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    */
   _create_options_body(conversation_et, message_et) {
     return Promise.resolve()
-    .then(() => {
-      switch (message_et.super_type) {
-        case z.message.SuperType.CALL:
-          return this._create_body_call(message_et);
-        case z.message.SuperType.CONTENT:
-          return this._create_body_content(message_et);
-        case z.message.SuperType.MEMBER:
-          return this._create_body_member_update(message_et, conversation_et);
-        case z.message.SuperType.PING:
-          return this._create_body_ping();
-        case z.message.SuperType.REACTION:
-          return this._create_body_reaction(message_et);
-        case z.message.SuperType.SYSTEM:
-          return this._create_body_system(message_et);
-        default:
-          this.logger.log(this.logger.levels.OFF, `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`);
-      }
-    });
+      .then(() => {
+        switch (message_et.super_type) {
+          case z.message.SuperType.CALL:
+            return this._create_body_call(message_et);
+          case z.message.SuperType.CONTENT:
+            return this._create_body_content(message_et);
+          case z.message.SuperType.MEMBER:
+            return this._create_body_member_update(message_et, conversation_et);
+          case z.message.SuperType.PING:
+            return this._create_body_ping();
+          case z.message.SuperType.REACTION:
+            return this._create_body_reaction(message_et);
+          case z.message.SuperType.SYSTEM:
+            return this._create_body_system(message_et);
+          default:
+            this.logger.log(this.logger.levels.OFF, `Notification for '${message_et.id} in '${conversation_et.id}' does not show notification.`);
+        }
+      });
   }
 
   /**
@@ -568,7 +559,7 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    * @returns {string} Obfuscated notification message title
    */
   _create_title_obfuscated() {
-    return z.util.StringUtil.truncate(z.localization.Localizer.get_text(z.string.system_notification_obfuscated_title), SystemNotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return z.util.StringUtil.truncate(z.l10n.text(z.string.system_notification_obfuscated_title), SystemNotificationRepository.CONFIG.TITLE_LENGTH, false);
   }
 
   /**
@@ -604,20 +595,22 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    */
   _notify_banner(conversation_et, message_et) {
     return this._should_hide_notification(conversation_et, message_et)
-    .then(() => {
-      return this._create_notification_content(conversation_et, message_et);
-    })
-    .then((notification_content) => {
-      return this.check_permission()
-      .then((permission_state) => {
-        if (permission_state === z.system_notification.PermissionStatusState.GRANTED) {
-          return this._show_notification(notification_content);
+      .then(() => {
+        return this._create_notification_content(conversation_et, message_et);
+      })
+      .then((notification_content) => {
+        return this.check_permission()
+          .then((permission_state) => {
+            if (permission_state === z.system_notification.PermissionStatusState.GRANTED) {
+              return this._show_notification(notification_content);
+            }
+          });
+      })
+      .catch(function(error) {
+        if (error.type !== z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION) {
+          throw error;
         }
       });
-    })
-    .catch(function(error) {
-      if (error.type !== z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION) throw error;
-    });
   }
 
 
@@ -638,10 +631,9 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
         }
         break;
       case z.message.SuperType.PING:
-        if (message_et.user().is_me) {
-          return amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.OUTGOING_PING);
+        if (!message_et.user().is_me) {
+          amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
         }
-        amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.INCOMING_PING);
         break;
       default:
         this.logger.log(this.logger.levels.OFF, `Notification for message '${message_et.id} does not play sound.`);
@@ -696,34 +688,34 @@ z.system_notification.SystemNotificationRepository = class SystemNotificationRep
    */
   _should_hide_notification(conversation_et, message_et) {
     return Promise.resolve()
-    .then(() => {
-      let hide_notification = false;
+      .then(() => {
+        let hide_notification = false;
 
-      if (this.notifications_preference() === z.system_notification.SystemNotificationPreference.NONE) {
-        hide_notification = true;
-      }
-      if (!z.util.Environment.browser.supports.notifications) {
-        hide_notification = true;
-      }
-      if (this.permission_state === z.system_notification.PermissionStatusState.DENIED) {
-        hide_notification = true;
-      }
-      if (message_et.user().is_me) {
-        hide_notification = true;
-      }
+        if (this.notifications_preference() === z.system_notification.SystemNotificationPreference.NONE) {
+          hide_notification = true;
+        }
+        if (!z.util.Environment.browser.supports.notifications) {
+          hide_notification = true;
+        }
+        if (this.permission_state === z.system_notification.PermissionStatusState.DENIED) {
+          hide_notification = true;
+        }
+        if (message_et.user().is_me) {
+          hide_notification = true;
+        }
 
-      const active_conversation_id = this.conversation_repository.active_conversation() ? this.conversation_repository.active_conversation().id : undefined;
-      const in_active_conversation = conversation_et.id === active_conversation_id;
-      const in_conversation_view = document.hasFocus() && wire.app.view.content.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
-      const in_maximized_call = this.calling_repository.joined_call() && !wire.app.view.content.multitasking.is_minimized();
-      if (in_conversation_view && in_active_conversation && !in_maximized_call) {
-        hide_notification = true;
-      }
+        const active_conversation_id = this.conversation_repository.active_conversation() ? this.conversation_repository.active_conversation().id : undefined;
+        const in_active_conversation = conversation_et.id === active_conversation_id;
+        const in_conversation_view = document.hasFocus() && wire.app.view.content.content_state() === z.ViewModel.content.CONTENT_STATE.CONVERSATION;
+        const in_maximized_call = this.calling_repository.joined_call() && !wire.app.view.content.multitasking.is_minimized();
+        if (in_conversation_view && in_active_conversation && !in_maximized_call) {
+          hide_notification = true;
+        }
 
-      if (hide_notification) {
-        throw new z.system_notification.SystemNotificationError(z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION);
-      }
-    });
+        if (hide_notification) {
+          throw new z.system_notification.SystemNotificationError(z.system_notification.SystemNotificationError.TYPE.HIDE_NOTIFICATION);
+        }
+      });
   }
 
   /**
