@@ -2,7 +2,9 @@
   <div class="teams-items">
     <div class="team team-personal">
       <!-- self() -->
-        <user-avatar class="user-avatar-s" data-bind="click: click_on_personal" params="user: self()"></user-avatar>
+        <div class="user-avatar-halo" data-bind="css: {'user-avatar-halo-active': is_personal_team_selected() && teams().length > 0}">
+          <user-avatar class="user-avatar-s" data-bind="click: click_on_personal" params="user: self()"></user-avatar>
+        </div>
       <!-- /ko -->
     </div>
     <!-- ko foreach: teams -->
