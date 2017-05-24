@@ -2269,19 +2269,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (_.isObject(return_value)) {
           const {conversation_et, message_et} = return_value;
 
-          if (source !== z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
-            if (message_et) {
-              amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
-            }
+          const event_from_stream = source === z.event.EventRepository.NOTIFICATION_SOURCE.STREAM;
+          if (message_et && !event_from_stream && !this.block_event_handling) {
+            amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
           }
 
-          if (source === z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET) {
-            if (conversation_et) {
-              // Un-archive it also on the backend side
-              if (previously_archived && !conversation_et.is_archived()) {
-                this.logger.info(`Un-archiving conversation '${conversation_et.id}' with new event`);
-                return this.unarchive_conversation(conversation_et);
-              }
+          const event_from_web_socket = source === z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET;
+          if (conversation_et && event_from_web_socket) {
+            // Un-archive it also on the backend side
+            if (previously_archived && !conversation_et.is_archived()) {
+              this.logger.info(`Un-archiving conversation '${conversation_et.id}' with new event`);
+              return this.unarchive_conversation(conversation_et);
             }
           }
         }
