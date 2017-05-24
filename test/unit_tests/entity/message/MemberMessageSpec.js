@@ -125,4 +125,3 @@ describe('Message Entities', function() {
     });
   });
 });
-

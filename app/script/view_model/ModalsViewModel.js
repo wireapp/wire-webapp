@@ -149,11 +149,15 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
       .find('.modal-close')
       .click(() => modal.hide());
 
-    if (typeof options.secondary === 'function') {
-      $(type)
-        .find('.modal-secondary')
-        .click(() => modal.hide(options.secondary()));
-    }
+    $(type)
+      .find('.modal-secondary')
+      .click(() => {
+        modal.hide(() => {
+          if (typeof options.secondary === 'function') {
+            options.secondary();
+          }
+        });
+      });
 
     $(type)
       .find('.modal-action')
@@ -271,7 +275,7 @@ z.ViewModel.ModalsViewModel = class ModalsViewModel {
   }
 
   _show_modal_leave(content, title_element) {
-    return title_element.text(z.localization.Localizer.get_text({
+    title_element.text(z.localization.Localizer.get_text({
       id: z.string.modal_leave_conversation_headline,
       replace: {
         content: content,

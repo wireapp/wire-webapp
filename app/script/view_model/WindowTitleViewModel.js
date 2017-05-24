@@ -29,7 +29,7 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
     this.conversation_repository = conversation_repository;
     this.logger = new z.util.Logger('z.ViewModel.WindowTitleViewModel', z.config.LOGGER.OPTIONS);
 
-    this.update_window_title = ko.observable(false);
+    this.update_window_title = false;
 
     amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_update_state.bind(this));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, this.initiate_title_updates.bind(this));
@@ -37,10 +37,10 @@ z.ViewModel.WindowTitleViewModel = class WindowTitleViewModel {
 
   initiate_title_updates() {
     this.logger.info('Starting to update window title');
-    this.update_window_title = ko.observable(true);
+    this.update_window_title = true;
 
     ko.computed(() => {
-      if (this.update_window_title()) {
+      if (this.update_window_title) {
         let window_title = '';
         let number_of_unread_conversations = 0;
         const number_of_connect_requests = this.user_repository.connect_requests().length;

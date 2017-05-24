@@ -46,6 +46,8 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    * @param {z.main.Auth} auth - App authentication
    */
   constructor(element_id, auth) {
+    this.click_on_remove_device_submit = this.click_on_remove_device_submit.bind(this);
+
     this.auth = auth;
     this.logger = new z.util.Logger('z.ViewModel.AuthViewModel', z.config.LOGGER.OPTIONS);
 
@@ -393,7 +395,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    * @returns {undefined} No return value
    */
   login_phone() {
-    if (!this.pending_server_request() && !this.can_login_phone() && this._validate_input(z.auth.AuthView.MODE.ACCOUNT_PHONE)) {
+    if (!this.pending_server_request() && this.can_login_phone() && this._validate_input(z.auth.AuthView.MODE.ACCOUNT_PHONE)) {
       const _on_code_request_success = (response) => {
         window.clearInterval(this.code_interval_id);
         if (response.expires_in) {
@@ -458,10 +460,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
 
           // Track if the user changed the pre-filled email
           if (this.prefilled_email === this.username()) {
-            this.auth.repository.get_access_token().then(this._account_verified);
+            this.auth.repository.get_access_token()
+              .then(() => this._account_verified());
           } else {
             this._set_hash(z.auth.AuthView.MODE.POSTED);
-            this.auth.repository.get_access_token().then(this._wait_for_activate);
+            this.auth.repository.get_access_token()
+              .then(() => this._wait_for_activate());
           }
           this.pending_server_request(false);
         })
@@ -1511,7 +1515,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
    *
    * @private
    * @param {string} string_identifier - Identifier of error message
-   * @param {Array<string>|string} types - Input type(s) of validation error
+   * @param {Array<string>|string} [types] - Input type(s) of validation error
    * @returns {undefined} No return value
    */
   _add_error(string_identifier, types) {
@@ -1824,6 +1828,10 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         return this.client_repository.get_valid_local_client();
       })
       .catch((error) => {
+        if (error.type === z.user.UserError.TYPE.USER_MISSING_EMAIL) {
+          throw error;
+        }
+
         this.logger.info(`No valid local client found: ${error.message}`, error);
         if (error.type === z.client.ClientError.TYPE.MISSING_ON_BACKEND) {
           this.logger.info('Local client rejected as invalid by backend. Reinitializing storage.');
@@ -1843,10 +1851,12 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         this._register_client();
       })
       .catch((error) => {
-        this.logger.error(`Login failed: ${error.message}`, error);
-        this._add_error(z.string.auth_error_misc);
-        this._has_errors();
-        this._set_hash(z.auth.AuthView.MODE.ACCOUNT_LOGIN);
+        if (error.type !== z.user.UserError.TYPE.USER_MISSING_EMAIL) {
+          this.logger.error(`Login failed: ${error.message}`, error);
+          this._add_error(z.string.auth_error_misc);
+          this._has_errors();
+          this._set_hash(z.auth.AuthView.MODE.ACCOUNT_LOGIN);
+        }
       });
   }
 
@@ -1871,6 +1881,7 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
         }
 
         this._set_hash(z.auth.AuthView.MODE.VERIFY_ACCOUNT);
+        throw new z.user.UserError(z.user.UserError.TYPE.USER_MISSING_EMAIL);
       });
   }
 

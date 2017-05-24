@@ -84,7 +84,13 @@ z.calling.entities.ECallMessage = class ECallMessage {
       }
     }
 
-    if (this.type === z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP) {
+    const targeted_message_types = [
+      z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL,
+      z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP,
+      z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE,
+    ];
+
+    if (targeted_message_types.includes(this.type)) {
       json_payload.dest_clientid = this.remote_client_id;
       json_payload.dest_userid = this.remote_user_id;
     }

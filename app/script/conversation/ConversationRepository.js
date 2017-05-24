@@ -1313,7 +1313,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return this._send_generic_message(conversation_et.id, generic_message, user_client_map, precondition_option);
     })
     .then(() => {
-      if (e_call_message_et.type === z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP) {
+      const initiating_call_message = [
+        z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START,
+        z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP,
+      ];
+
+      if (initiating_call_message.includes(e_call_message_et.type)) {
         return this._track_completed_media_action(conversation_et, generic_message, e_call_message_et);
       }
     });
@@ -1866,7 +1871,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
                       amplify.publish(z.event.WebApp.CALL.STATE.JOIN, conversation_et.id);
                     }
 
-                    return resolve();
+                    resolve();
                   },
                   close() {
                     if (!send_anyway) {
@@ -1874,7 +1879,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
                         amplify.publish(z.event.WebApp.CALL.STATE.DELETE, conversation_et.id);
                       }
 
-                      return reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION));
+                      reject(new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION));
                     }
                   },
                   data: {
@@ -2280,11 +2285,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
         if (_.isObject(return_value)) {
           const {conversation_et, message_et} = return_value;
 
-          if (source === z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET) {
+          if (source !== z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
             if (message_et) {
               amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, conversation_et, message_et);
             }
+          }
 
+          if (source === z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET) {
             if (conversation_et) {
               // Un-archive it also on the backend side
               if (previously_archived && !conversation_et.is_archived()) {
@@ -3293,4 +3300,3 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
   }
 };
-

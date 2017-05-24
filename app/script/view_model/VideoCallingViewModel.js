@@ -24,6 +24,8 @@ window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
   constructor(element_id, calling_repository, conversation_repository, media_repository, user_repository, multitasking) {
+    this.choose_shared_screen = this.choose_shared_screen.bind(this);
+
     this.calling_repository = calling_repository;
     this.conversation_repository = conversation_repository;
     this.media_repository = media_repository;
@@ -333,4 +335,3 @@ ko.bindingHandlers.source_stream = {
     element.srcObject = valueAccessor();
   },
 };
-

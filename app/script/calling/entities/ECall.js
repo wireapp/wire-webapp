@@ -673,20 +673,22 @@ z.calling.entities.ECall = class ECall {
         this._update_remote_state();
         this.v3_call_center.media_element_handler.remove_media_element(user_id);
 
-        switch (termination_reason) {
-          case z.calling.enum.TERMINATION_REASON.OTHER_USER: {
-            amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
-            break;
-          }
+        if (this.self_client_joined()) {
+          switch (termination_reason) {
+            case z.calling.enum.TERMINATION_REASON.OTHER_USER: {
+              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.TALK_LATER);
+              break;
+            }
 
-          case z.calling.enum.TERMINATION_REASON.CONNECTION_DROP:
-          case z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE: {
-            amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP);
-            break;
-          }
+            case z.calling.enum.TERMINATION_REASON.CONNECTION_DROP:
+            case z.calling.enum.TERMINATION_REASON.MEMBER_LEAVE: {
+              amplify.publish(z.event.WebApp.AUDIO.PLAY, z.audio.AudioType.CALL_DROP);
+              break;
+            }
 
-          default: {
-            break;
+            default: {
+              break;
+            }
           }
         }
 

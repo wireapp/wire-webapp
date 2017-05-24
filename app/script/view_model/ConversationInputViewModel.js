@@ -26,6 +26,7 @@ window.z.ViewModel = z.ViewModel || {};
 z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   constructor(element_id, conversation_repository, user_repository) {
     this.added_to_view = this.added_to_view.bind(this);
+    this.on_drop_files = this.on_drop_files.bind(this);
     this.on_window_click = this.on_window_click.bind(this);
     this.show_separator = this.show_separator.bind(this);
 
@@ -95,7 +96,7 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
 
     this.show_giphy_button = ko.pureComputed(() => {
       if (this.conversation_et()) {
-        return this.has_text_input() && this.conversation_et().length <= 256;
+        return this.has_text_input() && this.conversation_et().input().length <= 256;
       }
     });
 
@@ -374,45 +375,49 @@ z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   }
 
   on_input_key_down(data, event) {
-    if (this.conversation_input_emoji.on_input_key_down(data, event)) {
-      return;
-    }
+    if (!this.conversation_input_emoji.on_input_key_down(data, event)) {
+      switch (event.keyCode) {
+        case z.util.KEYCODE.ARROW_UP: {
+          if (!this.input().length) {
+            this.edit_message(this.conversation_et().get_last_editable_message(), event.target);
+          }
+          break;
+        }
 
-    switch (event.keyCode) {
-      case z.util.KEYCODE.ARROW_UP:
-        if (!this.input().length) {
-          this.edit_message(this.conversation_et().get_last_editable_message(), event.target);
+        case z.util.KEYCODE.ESC: {
+          if (this.pasted_file()) {
+            this.pasted_file(null);
+          } else {
+            this.cancel_edit();
+          }
+          break;
         }
-        break;
-      case z.util.KEYCODE.ESC:
-        if (this.pasted_file()) {
-          this.pasted_file(null);
-        } else {
-          this.cancel_edit();
-        }
-        break;
-      case z.util.KEYCODE.ENTER:
-        if (event.altKey || event.metaKey) {
-          z.util.KeyUtil.insert_at_caret(event.target, '\n');
-          $(event.target).change();
-          event.preventDefault();
-        }
-        break;
-      default:
-        // noop
-    }
 
-    return true;
+        case z.util.KEYCODE.ENTER: {
+          if (event.altKey || event.metaKey) {
+            z.util.KeyUtil.insert_at_caret(event.target, '\n');
+            $(event.target).change();
+            event.preventDefault();
+          }
+          break;
+        }
+
+        default:
+          break;
+      }
+
+      return true;
+    }
   }
 
   edit_message(message_et, input_element) {
-    if (message_et && (!message_et.is_editable() && message_et !== this.edit_message_et())) {
+    if (message_et && (message_et.is_editable() && message_et !== this.edit_message_et())) {
       this.cancel_edit();
       this.edit_message_et(message_et);
       this.edit_message_et().is_editing(true);
       this.input(this.edit_message_et().get_first_asset().text);
       if (input_element) {
-        return this._move_cursor_to_end(input_element);
+        this._move_cursor_to_end(input_element);
       }
     }
   }

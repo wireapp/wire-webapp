@@ -31,6 +31,18 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   constructor(element_id, user_repository, conversation_repository, search_repository) {
+    this.add_people = this.add_people.bind(this);
+    this.block = this.block.bind(this);
+    this.close = this.close.bind(this);
+    this.connect = this.connect.bind(this);
+    this.leave_conversation = this.leave_conversation.bind(this);
+    this.on_search_close = this.on_search_close.bind(this);
+    this.pending = this.pending.bind(this);
+    this.remove = this.remove.bind(this);
+    this.show_participant = this.show_participant.bind(this);
+    this.toggle_participants_bubble = this.toggle_participants_bubble.bind(this);
+    this.unblock = this.unblock.bind(this);
+
     this.element_id = element_id;
     this.user_repository = user_repository;
     this.conversation_repository = conversation_repository;
@@ -105,11 +117,11 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         .filter((user_et) => {
           for (const group_participant of this.participants()) {
             if (user_et.id === group_participant.id) {
-              return true;
+              return false;
             }
           }
 
-          return false;
+          return true;
         })
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     }, this, {deferEvaluation: true});
@@ -209,7 +221,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
   }
 
   show_participant(user_et) {
-    return this.user_profile(user_et);
+    this.user_profile(user_et);
   }
 
   rename_conversation(data, event) {
