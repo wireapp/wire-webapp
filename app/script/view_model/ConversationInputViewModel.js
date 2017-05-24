@@ -26,6 +26,7 @@ window.z.ViewModel = z.ViewModel || {};
 z.ViewModel.ConversationInputViewModel = class ConversationInputViewModel {
   constructor(element_id, conversation_repository, user_repository) {
     this.added_to_view = this.added_to_view.bind(this);
+    this.on_drop_files = this.on_drop_files.bind(this);
     this.on_window_click = this.on_window_click.bind(this);
     this.show_separator = this.show_separator.bind(this);
 
