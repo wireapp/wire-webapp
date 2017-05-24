@@ -27,15 +27,15 @@ z.team.TeamMapper = class TeamMapper {
     this.logger = new z.util.Logger('z.team.TeamMapper', z.config.LOGGER.OPTIONS);
   }
 
-  map_teams_from_array(teams) {
-    return teams.map((team) => this.update_team_from_object(new z.team.TeamEntity(), team));
+  map_teams_from_array(team_data) {
+    return team_data.map((data) => this.update_team_from_object(data));
   }
 
   map_team_from_object(data) {
-    return this.update_team_from_object(new z.team.TeamEntity(), data);
+    return this.update_team_from_object(data);
   }
 
-  update_team_from_object(team_et, data) {
+  update_team_from_object(data, team_et = new z.team.TeamEntity()) {
     if (!data) {
       return;
     }
