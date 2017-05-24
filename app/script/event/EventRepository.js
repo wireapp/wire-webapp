@@ -556,7 +556,7 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the ID of the handled notification
    */
   _handle_notification({payload: events, id, transient}) {
-    const source = transient !== null ? EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET : EventRepository.NOTIFICATION_SOURCE.STREAM;
+    const source = transient !== undefined ? EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET : EventRepository.NOTIFICATION_SOURCE.STREAM;
     const is_transient_event = transient === true;
 
     this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
