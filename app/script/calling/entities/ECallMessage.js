@@ -85,6 +85,7 @@ z.calling.entities.ECallMessage = class ECallMessage {
     }
 
     const targeted_message_types = [
+      z.calling.enum.E_CALL_MESSAGE_TYPE.CANCEL,
       z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP,
       z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE,
     ];
