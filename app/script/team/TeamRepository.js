@@ -23,13 +23,15 @@ window.z = window.z || {};
 window.z.team = z.team || {};
 
 z.team.TeamRepository = class TeamRepository {
-  // todo: pass in user repository
-  constructor(team_service) {
+  constructor(team_service, user_repository) {
     this.logger = new z.util.Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);
-    this.personal_space = new z.team.TeamEntity(undefined);
     this.team_mapper = new z.team.TeamMapper();
     this.team_service = team_service;
     this.teams = ko.observableArray([]);
+
+    const personal_space = new z.team.TeamEntity();
+    personal_space.name('Personal'); // self is not defined yet
+    this.personal_space = personal_space;
   }
 
   add_members() {

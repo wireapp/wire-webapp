@@ -67,7 +67,6 @@ z.main.App = class App {
     repositories.giphy               = new z.extension.GiphyRepository(this.service.giphy);
     repositories.media               = new z.media.MediaRepository();
     repositories.storage             = new z.storage.StorageRepository(this.service.storage);
-    repositories.team                = new z.team.TeamRepository(this.service.team);
 
     repositories.cryptography        = new z.cryptography.CryptographyRepository(this.service.cryptography, repositories.storage);
     repositories.client              = new z.client.ClientRepository(this.service.client, repositories.cryptography);
@@ -77,6 +76,7 @@ z.main.App = class App {
     repositories.properties          = new z.properties.PropertiesRepository(this.service.properties);
     repositories.connect             = new z.connect.ConnectRepository(this.service.connect, this.service.connect_google, repositories.properties);
     repositories.links               = new z.links.LinkPreviewRepository(this.service.asset);
+    repositories.team                = new z.team.TeamRepository(this.service.team, repositories.user);
 
     repositories.conversation        = new z.conversation.ConversationRepository(
       this.service.conversation,
