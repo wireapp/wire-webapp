@@ -1297,7 +1297,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       return this._send_generic_message(conversation_et.id, generic_message, user_client_map, precondition_option);
     })
     .then(() => {
-      if (e_call_message_et.type === z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP) {
+      const initiating_call_message = [
+        z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_START,
+        z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP,
+      ];
+
+      if (initiating_call_message.includes(e_call_message_et.type)) {
         return this._track_completed_media_action(conversation_et, generic_message, e_call_message_et);
       }
     });
