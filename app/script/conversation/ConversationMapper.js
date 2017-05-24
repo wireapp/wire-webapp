@@ -177,6 +177,11 @@ z.conversation.ConversationMapper = class ConversationMapper {
       conversation_et.participating_user_ids(participating_user_ids);
     }
 
+    if (conversation_data.team) {
+      conversation_et.team_id = conversation_data.team.teamid;
+      conversation_et.is_managed = conversation_data.team.managed;
+    }
+
     return conversation_et;
   }
 

@@ -32,6 +32,7 @@ z.entity.Conversation = class Conversation {
     this.creator = undefined;
     this.id = conversation_id;
     this.name = ko.observable();
+    this.team_id = undefined;
     this.type = ko.observable();
 
     this.input = ko.observable(z.util.StorageUtil.get_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`) || '');
@@ -46,6 +47,7 @@ z.entity.Conversation = class Conversation {
     this.number_of_participants = ko.pureComputed(() => this.participating_user_ids().length);
 
     this.is_group = ko.pureComputed(() => this.type() === z.conversation.ConversationType.REGULAR);
+    this.is_managed = false;
     this.is_one2one = ko.pureComputed(() => this.type() === z.conversation.ConversationType.ONE2ONE);
     this.is_request = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
     this.is_self = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
