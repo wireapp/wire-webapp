@@ -60,39 +60,39 @@ z.team.TeamService = class TeamService {
     });
   }
 
-  get_teams(limit = 100, team_ids) {
-    return this.client.send_request({
-      data: {
-        size: limit,
-        start: team_ids,
-      },
-      type: 'GET',
-      url: this.client.create_url(TeamService.URL.TEAMS),
-    });
-  }
+  // get_teams(limit = 100, team_ids) {
+  //   return this.client.send_request({
+  //     data: {
+  //       size: limit,
+  //       start: team_ids,
+  //     },
+  //     type: 'GET',
+  //     url: this.client.create_url(TeamService.URL.TEAMS),
+  //   });
+  // }
 
   get_teams() {
     return Promise.resolve().then(() => {
       return {
+        has_more: false,
         teams: [
           {
-            "id": "Wire",
-            "creator": "9ca1bf41-42cd-4ee4-b54e-99e8dcc9d375",
-            "name": "Wire GmbH",
-            "icon": "",
-            "icon_key": null
+            'creator': '9ca1bf41-42cd-4ee4-b54e-99e8dcc9d375',
+            'icon': '',
+            'icon_key': null,
+            'id': 'Wire',
+            'name': 'Wire GmbH',
           },
           {
-            "id": "Benny",
-            "creator": "e82019bc-5ee1-4835-8057-cfbe2229582b",
-            "name": "My Awesome Company",
-            "icon": "",
-            "icon_key": null
-          }
+            'creator': 'e82019bc-5ee1-4835-8057-cfbe2229582b',
+            'icon': '',
+            'icon_key': null,
+            'id': 'Benny',
+            'name': 'My Awesome Company',
+          },
         ],
-        has_more: false
-      }
-    })
+      };
+    });
   }
 
   get_team_metadata(team_id) {

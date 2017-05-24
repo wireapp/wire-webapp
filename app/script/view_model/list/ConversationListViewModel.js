@@ -80,7 +80,7 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
 
     this.active_team_name = ko.pureComputed(() => {
       const team_et = this.conversation_repository.active_team();
-      return team_et && team_et.name()
+      return team_et && team_et.name();
     });
 
     this.active_conversation_id = ko.pureComputed(() => {
