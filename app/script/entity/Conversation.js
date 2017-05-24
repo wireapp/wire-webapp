@@ -603,6 +603,7 @@ z.entity.Conversation = class Conversation {
       cleared_timestamp: this.cleared_timestamp(),
       ephemeral_timer: this.ephemeral_timer(),
       id: this.id,
+      is_managed: this.is_managed,
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       muted_state: this.muted_state(),
@@ -610,6 +611,7 @@ z.entity.Conversation = class Conversation {
       name: this.name(),
       others: this.participating_user_ids(),
       status: this.status(),
+      team_id: this.team_id,
       type: this.type(),
       verification_state: this.verification_state(),
     };
