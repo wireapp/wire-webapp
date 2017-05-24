@@ -367,7 +367,7 @@ z.storage.StorageService = class StorageService {
    */
   get_all(store_name) {
     return this.db[store_name].toArray()
-      .then((result_array) => result_array.filter((result) => result)
+      .then((result_array) => result_array.filter((result) => result))
       .catch((error) => {
         this.logger.error(`Failed to load objects from store '${store_name}'`, error);
         throw error;
