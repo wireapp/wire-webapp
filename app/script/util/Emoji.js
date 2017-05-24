@@ -31,9 +31,10 @@ const EMOJI_UNICODE_RANGES = 'U+1F004, U+1F0CF, U+1F170-1F171, U+1F17E, U+1F17F,
     if (codepoint.indexOf('-') === -1) {
       list.push(String.fromCodePoint(`0x${codepoint}`));
     } else {
-      const [start, end] = codepoint.split('-').map((code) => parseInt(code, 16));
+      const hex_base = 16;
+      const [start, end] = codepoint.split('-').map((code) => parseInt(code, hex_base));
       for (let code = start; code <= end; code++) {
-        list.push(String.fromCodePoint(`0x${code.toString(16)}`));
+        list.push(String.fromCodePoint(`0x${code.toString(hex_base)}`));
       }
     }
     return list;
