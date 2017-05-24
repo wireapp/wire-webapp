@@ -1324,6 +1324,8 @@ z.calling.entities.EFlow = class EFlow {
     this.telemetry.reset_statistics();
 
     this.logger.debug(`Resetting flow with user '${this.remote_user.id}'`);
+    this.remote_client_id = undefined;
+
     if (this.media_stream()) {
       this._remove_media_stream(this.media_stream());
     }
