@@ -108,8 +108,8 @@ window.entities = {
     'last_event': '1.800122000a4b6e15',
     'team': {
       'teamid': '537992e5-3782-4b6c-8718-a5db2cc786ee',
-      'managed': false
-    }
+      'managed': false,
+    },
   },
 };
 
