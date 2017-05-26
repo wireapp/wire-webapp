@@ -52,7 +52,6 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
   }
 
   click_on_team(team_et) {
-    this.team_repository.update_team_members(team_et);
     this.conversation_repository.set_active_team(team_et);
   }
 
