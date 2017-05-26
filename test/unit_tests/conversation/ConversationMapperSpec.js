@@ -67,7 +67,7 @@ describe('Conversation Mapper', function() {
     it('maps a team conversation', function() {
       // @formatter:off
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
-      const payload = {"conversation":"f2520615-f860-4c72-8b90-9ace3b5f6c37","time":"2017-05-26T08:10:27.040Z","data":{"access":["invite"],"creator":"f52eed1b-aa64-447f-ad4a-96529f72105f","members":{"self":{"hidden_ref":null,"status":0,"service":null,"otr_muted_ref":null,"status_time":"1970-01-01T00:00:00.000Z","hidden":false,"status_ref":"0.0","id":"39b7f597-dfd1-4dff-86f5-fe1b79cb70a0","otr_archived":false,"otr_muted":false,"otr_archived_ref":null},"others":[{"status":0,"id":"f52eed1b-aa64-447f-ad4a-96529f72105f"}]},"name":"BennyTest","team":"5316fe03-24ee-4b19-b789-6d026bd3ce5f","id":"f2520615-f860-4c72-8b90-9ace3b5f6c37","type":0,"last_event_time":"1970-01-01T00:00:00.000Z","last_event":"0.0"},"from":"f52eed1b-aa64-447f-ad4a-96529f72105f","type":"conversation.create"}
+      const payload = {"conversation":"f2520615-f860-4c72-8b90-9ace3b5f6c37","time":"2017-05-26T08:10:27.040Z","data":{"access":["invite"],"creator":"f52eed1b-aa64-447f-ad4a-96529f72105f","members":{"self":{"hidden_ref":null,"status":0,"service":null,"otr_muted_ref":null,"status_time":"1970-01-01T00:00:00.000Z","hidden":false,"status_ref":"0.0","id":"39b7f597-dfd1-4dff-86f5-fe1b79cb70a0","otr_archived":false,"otr_muted":false,"otr_archived_ref":null},"others":[{"status":0,"id":"f52eed1b-aa64-447f-ad4a-96529f72105f"}]},"name":"BennyTest","team":"5316fe03-24ee-4b19-b789-6d026bd3ce5f","id":"f2520615-f860-4c72-8b90-9ace3b5f6c37","type":0,"last_event_time":"1970-01-01T00:00:00.000Z","last_event":"0.0"},"from":"f52eed1b-aa64-447f-ad4a-96529f72105f","type":"conversation.create"};
       // @formatter:on
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
 
@@ -84,7 +84,7 @@ describe('Conversation Mapper', function() {
       const data = {
         creator: creator_id,
         id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc',
-        name: 'New foo bar conversation name'
+        name: 'New foo bar conversation name',
       };
       const updated_conversation_et = conversation_mapper.update_properties(conversation_et, data);
 
