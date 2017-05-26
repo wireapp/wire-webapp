@@ -53,9 +53,6 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
 
   click_on_team(team_et) {
     this.conversation_repository.set_active_team(team_et);
-    if (team_et.id) {
-      Array.prototype.reverse.call($('conversation-list-cell')).click();
-    }
   }
 
   click_on_preferences_button() {

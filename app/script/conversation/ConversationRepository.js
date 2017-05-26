@@ -94,6 +94,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversations_call = ko.observableArray([]);
     this.conversations_cleared = ko.observableArray([]);
     this.conversations_unarchived = ko.observableArray([]);
+    this.conversations_unarchived.subscribe((conversation_ets) => {
+      this.update_conversations(conversation_ets);
+    });
 
     this._init_subscriptions();
   }
@@ -633,9 +636,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         this.logger.info('Updating group participants offline');
         this._init_state_updates();
-        this.update_conversations_offline(this.conversations_unarchived());
-        this.update_conversations_offline(this.conversations_archived());
-        this.update_conversations_offline(this.conversations_cleared());
+        this.update_conversations_offline(this.sorted_conversations());
       });
   }
 
