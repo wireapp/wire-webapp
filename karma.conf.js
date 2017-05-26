@@ -67,12 +67,21 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: [process.env.TRAVIS ? 'Chrome_travis_ci' : 'Chrome'],
+    browsers: [process.env.TRAVIS ? 'Chrome_travis_ci' : 'ChromeCanaryHeadless'],
 
     customLaunchers: {
       Chrome_travis_ci: {
         base: 'Chrome',
         flags: ['--no-sandbox'],
+      },
+      ChromeCanaryHeadless: {
+        base: 'ChromeCanary',
+        flags: [
+          ' --remote-debugging-port=9222',
+          '--disable-gpu',
+          '--headless',
+          '--no-sandbox',
+        ],
       },
     },
 
