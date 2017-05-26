@@ -52,8 +52,7 @@ describe('Conversation Mapper', function() {
       expect(conversation_et.number_of_participants()).toBe(conversation.members.others.length);
       expect(conversation_et.is_muted()).toBe(conversation.members.self.otr_muted);
       expect(conversation_et.muted_timestamp()).toEqual(new Date(conversation.members.self.otr_muted_ref).getTime());
-      // expect(conversation_et.team_id).toEqual(conversation.team.teamid);
-      // expect(conversation_et.is_managed).toEqual(conversation.team.managed);
+      expect(conversation_et.team_id).toEqual(conversation.team);
     });
 
     it('maps conversations', function() {
@@ -217,7 +216,7 @@ describe('Conversation Mapper', function() {
       // @formatter:off
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const local_data = {"archived_state": false, "archived_timestamp": 1487239601118, "cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "muted_state": false, "muted_timestamp": 0, "verification_state": 0};
-      const remote_data = {"access": ["private"], "creator": "532af01e-1e24-4366-aacf-33b67d4ee376", "members": {"self": {"hidden_ref": null, "status": 0, "last_read": "3d.800122000ad95594", "muted_time": null, "service": null, "otr_muted_ref": null, "muted": null, "status_time": "2015-01-07T16:26:51.363Z", "hidden": false, "status_ref": "0.0", "id": "8b497692-7a38-4a5d-8287-e3d1006577d6", "otr_archived": false, "cleared": null, "otr_muted": false, "otr_archived_ref": "2017-02-16T10:06:41.118Z", "archived": null}, "others": [{"status": 0, "id": "532af01e-1e24-4366-aacf-33b67d4ee376"}]}, "name": "Family Gathering", "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "type": 2, "last_event_time": "2017-02-14T17:11:10.619Z", "last_event": "4a.800122000a62e4a1"};
+      const remote_data = {"access": ["private"], "creator": "532af01e-1e24-4366-aacf-33b67d4ee376", "members": {"self": {"hidden_ref": null, "status": 0, "last_read": "3d.800122000ad95594", "muted_time": null, "service": null, "otr_muted_ref": null, "muted": null, "status_time": "2015-01-07T16:26:51.363Z", "hidden": false, "status_ref": "0.0", "id": "8b497692-7a38-4a5d-8287-e3d1006577d6", "otr_archived": false, "cleared": null, "otr_muted": false, "otr_archived_ref": "2017-02-16T10:06:41.118Z", "archived": null}, "others": [{"status": 0, "id": "532af01e-1e24-4366-aacf-33b67d4ee376"}]}, "name": "Family Gathering", "team": "5316fe03-24ee-4b19-b789-6d026bd3ce5f", "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "type": 2, "last_event_time": "2017-02-14T17:11:10.619Z", "last_event": "4a.800122000a62e4a1"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
 
@@ -228,6 +227,7 @@ describe('Conversation Mapper', function() {
       expect(merged_data.name).toBe(remote_data.name);
       expect(merged_data.others[0]).toBe(remote_data.members.others[0].id);
       expect(merged_data.status).toBe(remote_data.members.self.status);
+      expect(merged_data.team_id).toBe(remote_data.team);
       expect(merged_data.type).toBe(remote_data.type);
 
       expect(merged_data.archived_state).toBe(local_data.archived_state);

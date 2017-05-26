@@ -138,7 +138,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
   }
 
   /**
-   * Creates a conversation entity from JSON data.
+   * Creates a conversation entity from backend JSON data.
    *
    * @private
    * @param {Object} conversation_data - Either locally stored or backend data
@@ -178,9 +178,9 @@ z.conversation.ConversationMapper = class ConversationMapper {
     }
 
     if (conversation_data.team_id) {
-      conversation_et.team_id = conversation_data.team_id; // from IndexedDB
+      conversation_et.team_id = conversation_data.team_id; // data from IndexedDB
     } else {
-      conversation_et.team_id = conversation_data.team; // from backend payload
+      conversation_et.team_id = conversation_data.team; // data from backend
     }
 
     return conversation_et;
@@ -194,7 +194,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
    */
   merge_conversations(local, remote) {
     return remote.map(function(remote_conversation, index) {
-      const {id, creator, members, name, type} = remote_conversation;
+      const {id, creator, members, name, team, type} = remote_conversation;
       let local_conversation = local
         .filter((conversation) => conversation)
         .find((conversation) => conversation.id === id);
@@ -205,10 +205,12 @@ z.conversation.ConversationMapper = class ConversationMapper {
         };
       }
 
-      local_conversation.name = name;
-      local_conversation.type = type;
       local_conversation.creator = creator;
+      local_conversation.name = name;
       local_conversation.status = members.self.status;
+      local_conversation.team_id = team;
+      local_conversation.type = type;
+
       local_conversation.others = members.others
         .filter((other) => other.status === z.conversation.ConversationStatus.CURRENT_MEMBER)
         .map((other) => other.id);
