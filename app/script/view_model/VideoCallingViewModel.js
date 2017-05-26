@@ -24,6 +24,8 @@ window.z.ViewModel = z.ViewModel || {};
 
 z.ViewModel.VideoCallingViewModel = class VideoCallingViewModel {
   constructor(element_id, calling_repository, conversation_repository, media_repository, user_repository, multitasking) {
+    this.clicked_on_cancel_screen = this.clicked_on_cancel_screen.bind(this);
+    this.clicked_on_choose_screen = this.clicked_on_choose_screen.bind(this);
     this.choose_shared_screen = this.choose_shared_screen.bind(this);
 
     this.calling_repository = calling_repository;
