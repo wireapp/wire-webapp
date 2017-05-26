@@ -40,12 +40,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.click_on_group = this.click_on_group.bind(this);
     this.click_on_other = this.click_on_other.bind(this);
 
+    this.on_cancel_request = this.on_cancel_request.bind(this);
+    this.on_submit_search = this.on_submit_search.bind(this);
     this.on_user_accept = this.on_user_accept.bind(this);
     this.on_user_connect = this.on_user_connect.bind(this);
     this.on_user_ignore = this.on_user_ignore.bind(this);
     this.on_user_open = this.on_user_open.bind(this);
     this.on_user_unblock = this.on_user_unblock.bind(this);
-    this.on_cancel_request = this.on_cancel_request.bind(this);
 
     this.list_view_model = list_view_model;
     this.connect_repository = connect_repository;
