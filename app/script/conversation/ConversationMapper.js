@@ -149,7 +149,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
       throw new Error('Cannot create conversation entity without data');
     }
 
-    const {id, creator, members, name, type, others, team} = conversation_data;
+    const {creator, id, members, name, others, team, type} = conversation_data;
     let conversation_et = new z.entity.Conversation(id);
 
     conversation_et.creator = creator;
