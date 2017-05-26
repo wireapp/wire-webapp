@@ -129,7 +129,13 @@ z.team.TeamRepository = class TeamRepository {
   update_team_members(team_et) {
     this.get_team_members(team_et.id)
       .then((team_members) => {
-        const member_ids = team_members.map((team_member) => team_member.user_id);
+        const member_ids = team_members
+          .map((team_member) => {
+            if (team_member.user_id !== this.user_repository.self().id) {
+              return team_member.user_id;
+            }
+          })
+          .filter((member_id) => member_id);
 
         return this.user_repository.get_users_by_id(member_ids);
       })
