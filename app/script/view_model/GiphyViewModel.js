@@ -38,6 +38,8 @@ z.ViewModel.GiphyViewModel = class GiphyViewModel {
     };
   }
   constructor(element_id, conversation_repository, giphy_repository) {
+    this.on_clicked_gif = this.on_clicked_gif.bind(this);
+
     this.element_id = element_id;
     this.conversation_repository = conversation_repository;
     this.giphy_repository = giphy_repository;
