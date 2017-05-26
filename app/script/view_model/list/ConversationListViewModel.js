@@ -110,6 +110,13 @@ z.ViewModel.list.ConversationListViewModel = class ConversationListViewModel {
       },
     });
 
+    this.show_connect_requests = ko.pureComputed(() => {
+      const team_et = this.conversation_repository.active_team();
+      const is_personal_team = team_et && !team_et.name();
+
+      return is_personal_team && this.connect_requests().length;
+    });
+
     this.self_stream_state = this.calling_repository.self_stream_state;
 
     this.show_toggle_screen = ko.pureComputed(() => z.calling.CallingRepository.supports_screen_sharing);

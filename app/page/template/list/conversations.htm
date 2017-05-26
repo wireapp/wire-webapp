@@ -162,7 +162,7 @@
     <!-- ko if: conversations_unarchived().length > 0 || connect_requests().length > 0 -->
       <ul class="left-list-items" data-bind="antiscroll: should_update_scrollbar, bordered_list: conversations_unarchived">
 
-      <!-- ko if: connect_requests().length > 0 -->
+      <!-- ko if: show_connect_requests() -->
         <li class="conversation-list-cell"
             data-bind="css: {'conversation-list-cell-active': content_state() === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS}">
           <div class="conversation-list-cell-left">
