@@ -456,6 +456,9 @@ z.event.EventRepository = class EventRepository {
       case 'conversation':
         amplify.publish(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, event, source);
         break;
+      case 'team':
+        amplify.publish(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, event, source);
+        break;
       default:
         amplify.publish(event.type, event, source);
     }
