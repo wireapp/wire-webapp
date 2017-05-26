@@ -272,7 +272,18 @@ z.string.sl.conversations_popover_notify = 'Povrni glasnost';
 z.string.sl.conversations_popover_silence = 'Utišaj';
 z.string.sl.conversations_popover_unarchive = 'Dearhiviraj';
 
+z.string.sl.conversations_secondary_line_missed_call = '{{number}} zgrešeni klic';
+z.string.sl.conversations_secondary_line_missed_calls = '{{number}} zgrešenih klicev';
+z.string.sl.conversations_secondary_line_new_message = '{{number}} novo sporočilo';
+z.string.sl.conversations_secondary_line_new_messages = '{{number}} novih sporočil';
+z.string.sl.conversations_secondary_line_ping = '{{number}} ping';
+z.string.sl.conversations_secondary_line_pings = '{{number}} pingov';
+z.string.sl.conversations_secondary_line_person_left = '{{number}} oseba je zapustila pogovor';
+z.string.sl.conversations_secondary_line_people_left = '{{number}} oseb je zapustilo pogovor';
+z.string.sl.conversations_secondary_line_person_added = '{{user1}} dodal(-a) {{user2}}';
+z.string.sl.conversations_secondary_line_people_added = '{{user}} oseb je bilo dodanih';
 z.string.sl.conversations_secondary_line_timed_message = 'Časovno sporočilo';
+z.string.sl.conversations_secondary_line_renamed = '{{user}} preimenovan(-a)';
 
 z.string.sl.takeover_headline = 'Uporabniška imena so tukaj.';
 z.string.sl.takeover_sub = 'Zavzemite vaše unikatno ime na Wire.';

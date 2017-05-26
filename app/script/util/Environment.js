@@ -80,10 +80,7 @@ window.z.util = z.util || {};
       return this.is_chrome() || this.is_firefox() || this.is_opera();
     },
     supports_media_devices: function() {
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        return true;
-      }
-      return false;
+      return navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
     },
     supports_notifications: function() {
       if (window.Notification === undefined) {
@@ -92,10 +89,7 @@ window.z.util = z.util || {};
       if (window.Notification.requestPermission === undefined) {
         return false;
       }
-      if (document.visibilityState === undefined) {
-        return false;
-      }
-      return true;
+      return document.visibilityState !== undefined;
     },
     supports_screen_sharing: function() {
       if (window.desktopCapturer) {

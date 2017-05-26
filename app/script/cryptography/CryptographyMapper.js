@@ -64,33 +64,33 @@ z.cryptography.CryptographyMapper = class CryptographyMapper {
 
   _map_generic_message(generic_message, event) {
     switch (generic_message.content) {
-      case 'asset':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.ASSET:
         return this._map_asset(generic_message.asset, generic_message.message_id, event.data !== null ? event.data.id : undefined);
-      case 'calling':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.CALLING:
         return this._map_calling(generic_message.calling, event.data);
-      case 'cleared':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.CLEARED:
         return this._map_cleared(generic_message.cleared);
-      case 'confirmation':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.CONFIRMATION:
         return this._map_confirmation(generic_message.confirmation);
-      case 'deleted':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.DELETED:
         return this._map_deleted(generic_message.deleted);
-      case 'edited':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.EDITED:
         return this._map_edited(generic_message.edited, generic_message.message_id);
-      case 'ephemeral':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.EPHEMERAL:
         return this._map_ephemeral(generic_message, event);
-      case 'hidden':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.HIDDEN:
         return this._map_hidden(generic_message.hidden);
-      case 'image':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.IMAGE:
         return this._map_image(generic_message.image, event.data.id);
-      case 'knock':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.KNOCK:
         return this._map_knock(generic_message.knock, generic_message.message_id);
-      case 'lastRead':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.LAST_READ:
         return this._map_last_read(generic_message.lastRead);
-      case 'location':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.LOCATION:
         return this._map_location(generic_message.location, generic_message.message_id);
-      case 'reaction':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.REACTION:
         return this._map_reaction(generic_message.reaction);
-      case 'text':
+      case z.cryptography.GENERIC_MESSAGE_TYPE.TEXT:
         return this._map_text(generic_message.text, generic_message.message_id);
       default:
         this.logger.debug(`Skipped event '${generic_message.message_id}' of unhandled type '${generic_message.content}'`, {event, generic_message});

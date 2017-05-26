@@ -112,7 +112,7 @@ z.user.UserRepository = class UserRepository {
   create_connection(user_et, show_conversation = false) {
     return this.user_service.create_connection(user_et.id, user_et.name())
       .then((response) => {
-        return this.user_connection(response, show_conversation);
+        return this.user_connection(response, z.event.EventRepository.NOTIFICATION_SOURCE.INJECTED, show_conversation);
       })
       .catch((error) => {
         this.logger.error(`Failed to send connection request to user '${user_et.id}': ${error.message}`, error);
@@ -287,7 +287,7 @@ z.user.UserRepository = class UserRepository {
         return this.user_service.update_connection_status(user_et.id, status);
       })
       .then((response) => {
-        return this.user_connection(response, show_conversation);
+        return this.user_connection(response, z.event.EventRepository.NOTIFICATION_SOURCE.INJECTED, show_conversation);
       })
       .catch((error) => {
         this.logger.error(`Connection status change to '${status}' for user '${user_et.id}' failed: ${error.message}`, error);
@@ -305,10 +305,11 @@ z.user.UserRepository = class UserRepository {
   /**
    * Convert a JSON event into an entity and get the matching conversation.
    * @param {Object} event_json - JSON data of 'user.connection' event
+   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
    * @param {boolean} show_conversation - Should the new conversation be opened?
    * @returns {undefined} No return value
    */
-  user_connection(event_json, show_conversation) {
+  user_connection(event_json, source, show_conversation) {
     if (event_json == null) {
       return;
     }
@@ -329,7 +330,7 @@ z.user.UserRepository = class UserRepository {
         if ((previous_status === z.user.ConnectionStatus.SENT) && connection_et.is_connected()) {
           this.update_user_by_id(connection_et.to);
         }
-        this._send_user_connection_notification(connection_et, previous_status);
+        this._send_user_connection_notification(connection_et, source, previous_status);
         amplify.publish(z.event.WebApp.CONVERSATION.MAP_CONNECTION, connection_et, show_conversation);
       });
   }
@@ -348,35 +349,43 @@ z.user.UserRepository = class UserRepository {
   /**
    * Send the user connection notification.
    * @param {z.entity.Connection} connection_et - Connection entity
+   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
    * @param {z.user.ConnectionStatus} previous_status - Previous connection status
    * @returns {undefined} No return value
    */
-  _send_user_connection_notification(connection_et, previous_status) {
+  _send_user_connection_notification(connection_et, source, previous_status) {
     // We accepted the connection request or unblocked the user
-    if (connection_et.is_connected() && [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING].includes(previous_status)) {
-      return;
-    }
+    const self_user_accepted = connection_et.is_connected() && [z.user.ConnectionStatus.BLOCKED, z.user.ConnectionStatus.PENDING].includes(previous_status);
+    const is_web_socket_event = source === z.event.EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET;
 
-    return this.get_user_by_id(connection_et.to)
-      .then(function(user_et) {
-        const message_et = new z.entity.MemberMessage();
-        message_et.user(user_et);
-        switch (connection_et.status()) {
-          case z.user.ConnectionStatus.PENDING:
-            message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
-            break;
-          case z.user.ConnectionStatus.ACCEPTED:
-            if (previous_status === z.user.ConnectionStatus.SENT) {
-              message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
-            } else {
-              message_et.member_message_type = z.message.SystemMessageType.CONNECTION_CONNECTED;
+    if (is_web_socket_event && !self_user_accepted) {
+      this.get_user_by_id(connection_et.to)
+        .then(function(user_et) {
+          const message_et = new z.entity.MemberMessage();
+          message_et.user(user_et);
+
+          switch (connection_et.status()) {
+            case z.user.ConnectionStatus.PENDING: {
+              message_et.member_message_type = z.message.SystemMessageType.CONNECTION_REQUEST;
+              break;
             }
-            break;
-          default:
-            break;
-        }
-        amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, connection_et, message_et);
-      });
+
+            case z.user.ConnectionStatus.ACCEPTED: {
+              if (previous_status === z.user.ConnectionStatus.SENT) {
+                message_et.member_message_type = z.message.SystemMessageType.CONNECTION_ACCEPTED;
+              } else {
+                message_et.member_message_type = z.message.SystemMessageType.CONNECTION_CONNECTED;
+              }
+              break;
+            }
+
+            default:
+              break;
+          }
+
+          amplify.publish(z.event.WebApp.SYSTEM_NOTIFICATION.NOTIFY, connection_et, message_et);
+        });
+    }
   }
 
   /**

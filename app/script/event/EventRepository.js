@@ -32,6 +32,7 @@ z.event.EventRepository = class EventRepository {
 
   static get NOTIFICATION_SOURCE() {
     return {
+      INJECTED: 'injected',
       STREAM: 'Notification Stream',
       WEB_SOCKET: 'WebSocket',
     };
@@ -429,7 +430,7 @@ z.event.EventRepository = class EventRepository {
   inject_event(event) {
     if (event.conversation !== this.user_repository.self().id) {
       this.logger.info(`Injected event ID '${event.id}' of type '${event.type}'`, event);
-      this._handle_event(event);
+      this._handle_event(event, EventRepository.NOTIFICATION_SOURCE.INJECTED);
     }
   }
 
@@ -438,9 +439,10 @@ z.event.EventRepository = class EventRepository {
    *
    * @private
    * @param {Object} event - Mapped event to be distributed
+   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of notification
    * @returns {undefined} No return value
    */
-  _distribute_event(event) {
+  _distribute_event(event, source) {
     if (event.conversation) {
       this.logger.info(`Distributed '${event.type}' event for conversation '${event.conversation}'`, event);
     } else {
@@ -449,13 +451,13 @@ z.event.EventRepository = class EventRepository {
 
     switch (event.type.split('.')[0]) {
       case 'call':
-        amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, event);
+        amplify.publish(z.event.WebApp.CALL.EVENT_FROM_BACKEND, event, source);
         break;
       case 'conversation':
-        amplify.publish(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, event);
+        amplify.publish(z.event.WebApp.CONVERSATION.EVENT_FROM_BACKEND, event, source);
         break;
       default:
-        amplify.publish(event.type, event);
+        amplify.publish(event.type, event, source);
     }
   }
 
@@ -464,9 +466,10 @@ z.event.EventRepository = class EventRepository {
    *
    * @private
    * @param {JSON} event - Backend event extracted from notification stream
+   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
    * @returns {Promise} Resolves with the saved record or boolean true if the event was skipped
    */
-  _handle_event(event) {
+  _handle_event(event, source) {
     const {type: event_type} = event;
     if (z.event.EventTypeHandling.IGNORE.includes(event_type)) {
       this.logger.info(`Event ignored: '${event_type}'`, {event_json: JSON.stringify(event), event_object: event});
@@ -525,7 +528,7 @@ z.event.EventRepository = class EventRepository {
       if (event_type === z.event.Client.CALL.E_CALL) {
         this._validate_call_event_lifetime(event);
       }
-      this._distribute_event(saved_event);
+      this._distribute_event(saved_event, source);
       return saved_event;
     })
     .catch(function(error) {
@@ -553,7 +556,7 @@ z.event.EventRepository = class EventRepository {
    * @returns {Promise} Resolves with the ID of the handled notification
    */
   _handle_notification({payload: events, id, transient}) {
-    const source = transient !== null ? EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET : EventRepository.NOTIFICATION_SOURCE.STREAM;
+    const source = transient !== undefined ? EventRepository.NOTIFICATION_SOURCE.WEB_SOCKET : EventRepository.NOTIFICATION_SOURCE.STREAM;
     const is_transient_event = transient === true;
 
     this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
@@ -566,17 +569,17 @@ z.event.EventRepository = class EventRepository {
       return Promise.resolve(id);
     }
 
-    return Promise.all(events.map((event) => this._handle_event(event)))
-    .then(() => {
-      if (!is_transient_event) {
-        this._update_last_notification_id(id);
-      }
-      return id;
-    })
-    .catch((error) => {
-      this.logger.error(`Failed to handle notification '${id}' from '${source}': ${error.message}`, error);
-      throw error;
-    });
+    return Promise.all(events.map((event) => this._handle_event(event, source)))
+      .then(() => {
+        if (!is_transient_event) {
+          this._update_last_notification_id(id);
+        }
+        return id;
+      })
+      .catch((error) => {
+        this.logger.error(`Failed to handle notification '${id}' from '${source}': ${error.message}`, error);
+        throw error;
+      });
   }
 
   /**

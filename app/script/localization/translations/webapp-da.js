@@ -259,6 +259,8 @@ z.string.da.conversations_all_archived = 'Alt arkiveret';
 z.string.da.conversations_contacts = 'Kontakter';
 z.string.da.conversations_connection_request_many = '%no personer venter';
 z.string.da.conversations_connection_request_one = '1 person venter';
+z.string.da.conversations_empty_conversation = 'Gruppesamtale';
+z.string.da.conversations_empty_conversation_description = 'Alle forlod gruppen';
 z.string.da.conversations_no_conversations = 'Start en samtale og inviter personer til at deltage.';
 z.string.da.conversations_popover_archive = 'Arkivér';
 z.string.da.conversations_popover_block = 'Blokér';
@@ -269,6 +271,12 @@ z.string.da.conversations_popover_notify = 'Lyd til';
 z.string.da.conversations_popover_silence = 'Lyd fra';
 z.string.da.conversations_popover_unarchive = 'Anuller arkivering';
 
+z.string.da.conversations_secondary_line_missed_call = '{{number}} ubesvaret opkald';
+z.string.da.conversations_secondary_line_missed_calls = '{{number}} ubesvarede opkald';
+z.string.da.conversations_secondary_line_new_message = '{{number}} ny besked';
+z.string.da.conversations_secondary_line_new_messages = '{{number}} nye beskeder';
+z.string.da.conversations_secondary_line_ping = '{{number}} ping';
+z.string.da.conversations_secondary_line_pings = '{{number}} pings';
 z.string.da.conversations_secondary_line_timed_message = 'Tidsbestemt besked';
 
 z.string.da.takeover_headline = 'Brugernavne er her.';

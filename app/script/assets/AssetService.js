@@ -206,7 +206,7 @@ z.assets.AssetService = class AssetService {
       body += 'Content-Type: application/json; charset=utf-8\r\n';
       body += `Content-length: ${metadata.length}\r\n`;
       body += '\r\n';
-      body += metadata + '\r\n';
+      body += `${metadata}\r\n`;
       body += `--${BOUNDARY}\r\n`;
       body += 'Content-Type: application/octet-stream\r\n';
       body += `Content-length: ${asset_data.length}\r\n`;

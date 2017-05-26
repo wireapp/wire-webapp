@@ -154,6 +154,9 @@ z.calling.CallingRepository = class CallingRepository {
     return this.get_call_by_id(conversation_id)
       .then(function(call) {
         if (call instanceof z.calling.entities.Call) {
+          if (z.util.Environment.frontend.is_localhost()) {
+            window.alert('Call is using the deprecated v2 API');
+          }
           return z.calling.enum.PROTOCOL.VERSION_2;
         }
 
@@ -211,12 +214,16 @@ z.calling.CallingRepository = class CallingRepository {
             return this.use_v3_api ? z.calling.enum.PROTOCOL.VERSION_3 : z.calling.enum.PROTOCOL.VERSION_2;
           }
 
-          return z.calling.enum.PROTOCOL.VERSION_2;
+          return z.calling.enum.PROTOCOL.VERSION_3;
         }
 
         return z.calling.enum.PROTOCOL.VERSION_3;
       })
       .then((protocol_version) => {
+        if (z.util.Environment.frontend.is_localhost() && protocol_version === z.calling.enum.PROTOCOL.VERSION_2) {
+          window.alert('Call is using the deprecated v2 API');
+        }
+
         this.logger.log(`Selected outgoing call protocol version: ${protocol_version}`,
           {
             conversation_id: conversation_id,

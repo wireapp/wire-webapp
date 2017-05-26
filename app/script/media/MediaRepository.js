@@ -22,15 +22,16 @@
 window.z = window.z || {};
 window.z.media = z.media || {};
 
-// https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/state
-const AUDIO_CONTEXT_STATE = {
-  CLOSED: 'closed',
-  RUNNING: 'running',
-  SUSPENDED: 'suspended',
-};
-
-
 z.media.MediaRepository = class MediaRepository {
+  // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/state
+  static get AUDIO_CONTEXT_STATE() {
+    return {
+      CLOSED: 'closed',
+      RUNNING: 'running',
+      SUSPENDED: 'suspended',
+    };
+  }
+
   /**
    * Extended check for MediaDevices support of browser.
    * @returns {boolean} True if MediaDevices are supported
@@ -57,7 +58,7 @@ z.media.MediaRepository = class MediaRepository {
    * @returns {undefined} No return value
    */
   close_audio_context() {
-    if (this.audio_context && this.audio_context.state === AUDIO_CONTEXT_STATE.RUNNING) {
+    if (this.audio_context && this.audio_context.state === MediaRepository.AUDIO_CONTEXT_STATE.RUNNING) {
       this.audio_context.close()
       .then(() => {
         this.logger.info('Closed existing AudioContext', this.audio_context);
@@ -71,7 +72,7 @@ z.media.MediaRepository = class MediaRepository {
    * @returns {AudioContext} AudioContext
    */
   get_audio_context() {
-    if (this.audio_context) {
+    if (this.audio_context && this.audio_context.state === MediaRepository.AUDIO_CONTEXT_STATE.RUNNING) {
       this.logger.info('Reusing existing AudioContext', this.audio_context);
       return this.audio_context;
     }

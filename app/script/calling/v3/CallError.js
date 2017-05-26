@@ -32,6 +32,9 @@ z.calling.v3.CallError = class CallError extends Error {
     this.type = type || z.calling.v3.CallError.TYPE.UNKNOWN;
 
     switch (this.type) {
+      case z.calling.v3.CallError.TYPE.MISTARGETED_MESSAGE:
+        this.message = 'Message targeted at another client';
+        break;
       case z.calling.v3.CallError.TYPE.NO_CONVERSATION_ID:
         this.message = 'No conversation ID given';
         break;
@@ -72,6 +75,7 @@ z.calling.v3.CallError = class CallError extends Error {
 
   static get TYPE() {
     return {
+      MISTARGETED_MESSAGE: 'z.calling.v3.CallError.TYPE.MISTARGETED_MESSAGE',
       NO_CONVERSATION_ID: 'z.calling.v3.CallError.TYPE.NO_CONVERSATION_ID',
       NO_DATA_CHANNEL: 'z.calling.v3.CallError.TYPE.NO_DATA_CHANNEL',
       NO_REPLACEABLE_TRACK: 'z.calling.v3.CallError.TYPE.NO_REPLACEABLE_TRACK',

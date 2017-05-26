@@ -260,7 +260,7 @@ z.string.tr.conversations_contacts = 'Kişiler';
 z.string.tr.conversations_connection_request_many = '%no kişi bekliyor';
 z.string.tr.conversations_connection_request_one = 'Bir kişi bekliyor';
 z.string.tr.conversations_empty_conversation = 'Grup sohbeti';
-z.string.tr.conversations_empty_conversation_description = 'Herkes çıktı';
+z.string.tr.conversations_empty_conversation_description = 'Herkes ayrıldı';
 z.string.tr.conversations_no_conversations = 'Bir konuşma başlatın veya insanları katılmaları için davet edin.';
 z.string.tr.conversations_popover_archive = 'Arşivle';
 z.string.tr.conversations_popover_block = 'Engelle';
@@ -271,7 +271,18 @@ z.string.tr.conversations_popover_notify = 'Susturmayı Aç';
 z.string.tr.conversations_popover_silence = 'Sustur';
 z.string.tr.conversations_popover_unarchive = 'Arşivden Çıkar';
 
+z.string.tr.conversations_secondary_line_missed_call = '{{number}} cevapsız çağrı';
+z.string.tr.conversations_secondary_line_missed_calls = '{{number}} cevapsız çağrı';
+z.string.tr.conversations_secondary_line_new_message = '{{number}} yeni mesaj';
+z.string.tr.conversations_secondary_line_new_messages = '{{number}} yeni mesaj';
+z.string.tr.conversations_secondary_line_ping = '{{number}} ping';
+z.string.tr.conversations_secondary_line_pings = '{{number}} ping';
+z.string.tr.conversations_secondary_line_person_left = '{{number}} kişi ayrıldı';
+z.string.tr.conversations_secondary_line_people_left = '{{number}} kişi ayrıldı';
+z.string.tr.conversations_secondary_line_person_added = '{{user2}}, {{user1}} tarafından eklendi';
+z.string.tr.conversations_secondary_line_people_added = '{{user}} kişi eklendi';
 z.string.tr.conversations_secondary_line_timed_message = 'Süreli Mesaj';
+z.string.tr.conversations_secondary_line_renamed = '{{user}} yeniden adlandırdı';
 
 z.string.tr.takeover_headline = 'Kullanıcı adları burada.';
 z.string.tr.takeover_sub = 'Wire üzerinden size özel isminizi hemen alın.';

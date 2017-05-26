@@ -189,7 +189,9 @@ z.conversation.ConversationMapper = class ConversationMapper {
   merge_conversations(local, remote) {
     return remote.map(function(remote_conversation, index) {
       const {id, creator, members, name, type} = remote_conversation;
-      let local_conversation = local.find((conversation) => conversation.id === id);
+      let local_conversation = local
+        .filter((conversation) => conversation)
+        .find((conversation) => conversation.id === id);
 
       if (!local_conversation) {
         local_conversation = {

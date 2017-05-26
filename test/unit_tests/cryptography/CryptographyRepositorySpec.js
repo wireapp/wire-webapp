@@ -77,7 +77,7 @@ describe('z.cryptography.CryptographyRepository', function() {
       );
 
       const generic_message = new z.proto.GenericMessage(z.util.create_random_uuid());
-      generic_message.set('text', new z.proto.Text('Unit test'));
+      generic_message.set(z.cryptography.GENERIC_MESSAGE_TYPE.TEXT, new z.proto.Text('Unit test'));
 
       const user_client_map = {};
       user_client_map[john_doe.id] = [john_doe.clients.phone_id, john_doe.clients.desktop_id];

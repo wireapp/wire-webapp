@@ -37,6 +37,8 @@ z.calling.entities.EParticipant = class EParticipant {
     this.id = this.user.id;
     this.session_id = undefined;
 
+    this.logger = new z.util.Logger(`z.calling.entities.EParticipant (${this.id})`, z.config.LOGGER.OPTIONS);
+
     this.is_connected = ko.observable(false);
     this.panning = ko.observable(0.0);
     this.was_connected = false;
@@ -132,7 +134,10 @@ z.calling.entities.EParticipant = class EParticipant {
    */
   verify_client_id(client_id) {
     if (client_id) {
-      if (this.e_flow_et.remote_client_id && client_id !== this.e_flow_et.remote_client_id) {
+      const connected_client_id = this.e_flow_et.remote_client_id;
+
+      if (connected_client_id && client_id !== connected_client_id) {
+        this.logger.warn(`State change requested from '${client_id}' while we are connected to '${connected_client_id}'`, this);
         throw new z.calling.v3.CallError(z.calling.v3.CallError.TYPE.WRONG_SENDER);
       }
       this.e_flow_et.remote_client_id = client_id;

@@ -60,9 +60,9 @@ z.media.MediaEmbeds = (function() {
   const _regex = {
     // example: http://regexr.com/3ase5
     soundcloud: /(https?:\/\/(?:www\.|m\.)?)?soundcloud\.com(\/[\w\-]+){2,3}/g,
-    spotify: /https?:\/\/(?:play\.|open\.)*spotify.com\/([\w\-/]+)/g,
+    spotify: /https?:\/\/(?:play\.|open\.)*spotify\.com\/([\w\-/]+)/g,
     vimeo: /https?:\/\/(?:vimeo\.com\/|player\.vimeo\.com\/)(?:video\/|(?:channels\/staffpicks\/|channels\/)|)((\w|-){7,9})/g,
-    youtube: /.*(?:youtu.be|youtube.com).*(?:\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/g,
+    youtube: /(?:youtube(?:-nocookie|)\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/g,
   };
 
   /**
@@ -89,10 +89,12 @@ z.media.MediaEmbeds = (function() {
    * @returns {string} Youtube embed URL
   */
   const _generate_youtube_embed_url = function(url) {
-    if (url.match(/youtu.be|youtube.com/)) {
+    if (url.match(_regex.youtube)) {
 
       const video_id = url.match(/(?:embed\/|v=|v\/|be\/)([a-zA-Z0-9_-]{11})/);
-      if (!video_id) return;
+      if (!video_id) {
+        return;
+      }
 
       // W have to remove the v param and convert the timestamp
       // into an embed friendly format (start=seconds)
@@ -105,7 +107,7 @@ z.media.MediaEmbeds = (function() {
 
       // append html5 parameter to youtube src to force html5 mode
       // this fixes the issue that FF displays black box in some cases
-      return `https://www.youtube.com/embed/${video_id[1]}?html5=1${query}`;
+      return `https://www.youtube-nocookie.com/embed/${video_id[1]}?html5=1${query}`;
     }
   };
 

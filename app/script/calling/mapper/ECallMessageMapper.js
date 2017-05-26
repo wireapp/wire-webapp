@@ -94,7 +94,8 @@ z.calling.mapper.ECallMessageMapper = (function() {
 
     let content = undefined;
     switch (e_call_message.type) {
-      case z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP: {
+      case z.calling.enum.E_CALL_MESSAGE_TYPE.GROUP_SETUP:
+      case z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE: {
         const {dest_clientid, dest_userid, props: properties, sdp} = e_call_message;
 
         content = {
@@ -115,8 +116,7 @@ z.calling.mapper.ECallMessageMapper = (function() {
         break;
       }
 
-      case z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP:
-      case z.calling.enum.E_CALL_MESSAGE_TYPE.UPDATE: {
+      case z.calling.enum.E_CALL_MESSAGE_TYPE.SETUP: {
         const {props: properties, sdp} = e_call_message;
 
         content = {

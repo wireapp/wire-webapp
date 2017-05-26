@@ -187,6 +187,7 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    */
   set_peer_connection(peer_connection) {
     this.peer_connection = peer_connection;
+    this.logger.debug('Set or updated PeerConnection for telemetry checks', this.peer_connection);
   }
 
   /**
@@ -230,11 +231,11 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
       this._clear_stream_check_timeouts();
 
       this._update_statistics()
-      .then(() => {
-        this.logger.info('Network stats updated for the last time', this.statistics);
-        amplify.publish(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.create_report());
-        this.statistics = {};
-      });
+        .then(() => {
+          this.logger.info('Network stats updated for the last time', this.statistics);
+          amplify.publish(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.create_report());
+          this.statistics = {};
+        });
     }
   }
 
@@ -252,12 +253,12 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
       // Report calling stats within specified interval
       const stream_check_timeout = window.setTimeout(() => {
         this._update_statistics()
-        .then(() => {
-          this.logger.info('Network stats updated for the first time', this.statistics);
-        })
-        .catch((error) => {
-          this.logger.warn(`Failed to update flow networks stats: ${error.message}`);
-        });
+          .then(() => {
+            this.logger.info('Network stats updated for the first time', this.statistics);
+          })
+          .catch((error) => {
+            this.logger.warn(`Failed to update flow networks stats: ${error.message}`);
+          });
       },
       FlowTelemetry.CONFIG.STATS_CHECK_TIMEOUT);
 
@@ -265,9 +266,9 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
 
       this.statistics_interval = window.setInterval(() => {
         this._update_statistics()
-        .catch((error) => {
-          this.logger.warn(`Networks stats not updated: ${error.message}`);
-        });
+          .catch((error) => {
+            this.logger.warn(`Networks stats not updated: ${error.message}`);
+          });
       },
       FlowTelemetry.CONFIG.STATS_CHECK_INTERVAL);
     }
@@ -307,53 +308,68 @@ z.telemetry.calling.FlowTelemetry = class FlowTelemetry {
    */
   _update_statistics() {
     return this.peer_connection.getStats(null)
-    .then((rtc_stats_report) => {
-      let connection_stats = new z.telemetry.calling.ConnectionStats();
+      .then((rtc_stats_report) => {
+        let connection_stats = new z.telemetry.calling.ConnectionStats();
 
-      rtc_stats_report.forEach((report) => {
-        switch (report.type) {
-          case z.calling.rtc.STATS_TYPE.CANDIDATE_PAIR:
-            return connection_stats = this._update_from_candidate_pair(report, rtc_stats_report, connection_stats);
-          case z.calling.rtc.STATS_TYPE.GOOGLE_CANDIDATE_PAIR:
-            connection_stats = this._update_peer_connection_bytes(report, connection_stats);
-            return connection_stats = this._update_from_google_candidate_pair(report, rtc_stats_report, connection_stats);
-          case z.calling.rtc.STATS_TYPE.INBOUND_RTP:
-            connection_stats = this._update_peer_connection_bytes(report, connection_stats);
-            return connection_stats = this._update_from_inbound_rtp(report, connection_stats);
-          case z.calling.rtc.STATS_TYPE.OUTBOUND_RTP:
-            connection_stats = this._update_peer_connection_bytes(report, connection_stats);
-            return connection_stats = this._update_from_outbound_rtp(report, connection_stats);
-          case z.calling.rtc.STATS_TYPE.SSRC:
-            return connection_stats = this._update_from_ssrc(report, connection_stats);
-          default:
-            this.logger.log(this.logger.levels.OFF, `Unhandled stats report type '${report.type}'`, report);
-        }
-      });
+        rtc_stats_report.forEach((report) => {
+          switch (report.type) {
+            case z.calling.rtc.STATS_TYPE.CANDIDATE_PAIR: {
+              connection_stats = this._update_from_candidate_pair(report, rtc_stats_report, connection_stats);
+              break;
+            }
 
-      const _calc_rate = (key, timestamp, type) => {
-        const bytes = (connection_stats[key][type] - this.statistics[key][type]);
-        const time_span = (connection_stats.timestamp - timestamp);
-        return window.parseInt((1000.0 * bytes) / time_span, 10);
-      };
+            case z.calling.rtc.STATS_TYPE.GOOGLE_CANDIDATE_PAIR: {
+              connection_stats = this._update_peer_connection_bytes(report, connection_stats);
+              connection_stats = this._update_from_google_candidate_pair(report, rtc_stats_report, connection_stats);
+              break;
+            }
 
-      // Calculate bit rate since last update
-      for (const key in connection_stats) {
-        if (connection_stats.hasOwnProperty(key)) {
-          const value = connection_stats[key];
-          if (_.isObject(value)) {
-            connection_stats[key].bit_rate_mean_received = _calc_rate(key, this.statistics.connected, 'bytes_received');
-            connection_stats[key].bit_rate_mean_sent = _calc_rate(key, this.statistics.connected, 'bytes_sent');
-            connection_stats[key].bit_rate_current_received = _calc_rate(key, this.statistics.timestamp, 'bytes_received');
-            connection_stats[key].bit_rate_current_sent = _calc_rate(key, this.statistics.timestamp, 'bytes_sent');
+            case z.calling.rtc.STATS_TYPE.INBOUND_RTP: {
+              connection_stats = this._update_peer_connection_bytes(report, connection_stats);
+              connection_stats = this._update_from_inbound_rtp(report, connection_stats);
+              break;
+            }
+
+            case z.calling.rtc.STATS_TYPE.OUTBOUND_RTP: {
+              connection_stats = this._update_peer_connection_bytes(report, connection_stats);
+              connection_stats = this._update_from_outbound_rtp(report, connection_stats);
+              break;
+            }
+
+            case z.calling.rtc.STATS_TYPE.SSRC: {
+              connection_stats = this._update_from_ssrc(report, connection_stats);
+              break;
+            }
+
+            default:
+              this.logger.log(this.logger.levels.OFF, `Unhandled stats report type '${report.type}'`, report);
+          }
+        });
+
+        const _calc_rate = (key, timestamp, type) => {
+          const bytes = (connection_stats[key][type] - this.statistics[key][type]);
+          const time_span = (connection_stats.timestamp - timestamp);
+          return window.parseInt((1000.0 * bytes) / time_span, 10);
+        };
+
+        // Calculate bit rate since last update
+        for (const key in connection_stats) {
+          if (connection_stats.hasOwnProperty(key)) {
+            const value = connection_stats[key];
+            if (_.isObject(value)) {
+              connection_stats[key].bit_rate_mean_received = _calc_rate(key, this.statistics.connected, 'bytes_received');
+              connection_stats[key].bit_rate_mean_sent = _calc_rate(key, this.statistics.connected, 'bytes_sent');
+              connection_stats[key].bit_rate_current_received = _calc_rate(key, this.statistics.timestamp, 'bytes_received');
+              connection_stats[key].bit_rate_current_sent = _calc_rate(key, this.statistics.timestamp, 'bytes_sent');
+            }
           }
         }
-      }
 
-      return $.extend(this.statistics, connection_stats);
-    })
-    .catch((error) => {
-      this.logger.warn('Update of network stats for flow failed', error);
-    });
+        return $.extend(this.statistics, connection_stats);
+      })
+      .catch((error) => {
+        this.logger.warn('Update of network stats for flow failed', error);
+      });
   }
 
   /**

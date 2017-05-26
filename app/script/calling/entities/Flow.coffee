@@ -32,10 +32,10 @@ class z.calling.entities.Flow
   @param id [String] ID of the flow
   @param call_et [z.calling.Call] Call entity that the flow belongs to
   @param participant_et [z.calling.Participant] Participant entity that the flow belongs to
-  @param audio_context [AudioContext] AudioContext to be used with the flow
+  @param media_repository [z.media.MediaRepository] Media repository for flow audio
   @param timings [z.telemetry.calling.CallSetupTimings] Timing statistics of call setup steps
   ###
-  constructor: (@id, @call_et, @participant_et, @audio_context, timings) ->
+  constructor: (@id, @call_et, @participant_et, @media_repository, timings) ->
     @logger = new z.util.Logger "z.calling.Flow (#{@id})", z.config.LOGGER.OPTIONS
 
     @conversation_id = @call_et.id
@@ -47,7 +47,7 @@ class z.calling.entities.Flow
     @is_group = @call_et.is_group
 
     # Audio
-    @audio = new z.calling.entities.FlowAudio @, @audio_context
+    @audio = new z.calling.entities.FlowAudio @, @media_repository
 
     # ICE candidates
     @ice_candidates_cache = []
@@ -87,7 +87,7 @@ class z.calling.entities.Flow
 
     @connection_state = ko.observable z.calling.rtc.ICE_CONNECTION_STATE.NEW
     @gathering_state = ko.observable z.calling.rtc.ICE_GATHERING_STATE.NEW
-    @signaling_state = ko.observable z.calling.rtc.SIGNALING_OFFER.NEW
+    @signaling_state = ko.observable z.calling.rtc.SIGNALING_STATE.NEW
 
     @connection_state.subscribe (ice_connection_state) =>
       switch ice_connection_state
@@ -119,16 +119,16 @@ class z.calling.entities.Flow
 
     @signaling_state.subscribe (signaling_state) =>
       switch signaling_state
-        when z.calling.rtc.SIGNALING_OFFER.CLOSED
+        when z.calling.rtc.SIGNALING_STATE.CLOSED
           return if @converted_own_sdp_state()
           @logger.debug "PeerConnection with '#{@remote_user.name()}' was closed"
           @call_et.delete_participant @participant_et
           @_remove_media_stream @media_stream()
 
-        when z.calling.rtc.SIGNALING_OFFER.REMOTE_OFFER
+        when z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER
           @negotiation_needed true
 
-        when z.calling.rtc.SIGNALING_OFFER.STABLE
+        when z.calling.rtc.SIGNALING_STATE.STABLE
           @negotiation_mode z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
 
     @negotiation_mode = ko.observable z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT
@@ -166,8 +166,8 @@ class z.calling.entities.Flow
 
       is_answer = @local_sdp_type() is z.calling.rtc.SDP_TYPE.ANSWER
       is_offer = @local_sdp_type() is z.calling.rtc.SDP_TYPE.OFFER
-      in_remote_offer_state = @signaling_state() is z.calling.rtc.SIGNALING_OFFER.REMOTE_OFFER
-      in_stable_state = @signaling_state() is z.calling.rtc.SIGNALING_OFFER.STABLE
+      in_remote_offer_state = @signaling_state() is z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER
+      in_stable_state = @signaling_state() is z.calling.rtc.SIGNALING_STATE.STABLE
       in_proper_state = (is_offer and in_stable_state) or (is_answer and in_remote_offer_state)
 
       return @local_sdp() and @should_set_local_sdp() and in_proper_state and not in_progress
@@ -194,8 +194,8 @@ class z.calling.entities.Flow
     @can_set_remote_sdp = ko.pureComputed =>
       is_answer = @remote_sdp_type() is z.calling.rtc.SDP_TYPE.ANSWER
       is_offer = @remote_sdp_type() is z.calling.rtc.SDP_TYPE.OFFER
-      in_local_offer_state = @signaling_state() is z.calling.rtc.SIGNALING_OFFER.LOCAL_OFFER
-      in_stable_state = @signaling_state() is z.calling.rtc.SIGNALING_OFFER.STABLE
+      in_local_offer_state = @signaling_state() is z.calling.rtc.SIGNALING_STATE.LOCAL_OFFER
+      in_stable_state = @signaling_state() is z.calling.rtc.SIGNALING_STATE.STABLE
       in_proper_state = (is_offer and in_stable_state) or (is_answer and in_local_offer_state)
 
       return @pc_initialized() and @should_set_remote_sdp() and in_proper_state
@@ -211,7 +211,7 @@ class z.calling.entities.Flow
     ###############################################################################
 
     @can_create_sdp = ko.pureComputed =>
-      in_state_for_creation = @negotiation_needed() and @signaling_state() isnt z.calling.rtc.SIGNALING_OFFER.CLOSED
+      in_state_for_creation = @negotiation_needed() and @signaling_state() isnt z.calling.rtc.SIGNALING_STATE.CLOSED
       can_create = @pc_initialized() and in_state_for_creation
       return can_create
 
@@ -220,7 +220,7 @@ class z.calling.entities.Flow
         @logger.debug "State changed - can_create_sdp: #{can_create}"
 
     @can_create_answer = ko.pureComputed =>
-      answer_state = @is_answer() and @signaling_state() is z.calling.rtc.SIGNALING_OFFER.REMOTE_OFFER
+      answer_state = @is_answer() and @signaling_state() is z.calling.rtc.SIGNALING_STATE.REMOTE_OFFER
       can_create = @can_create_sdp() and answer_state
       return can_create
 
@@ -231,7 +231,7 @@ class z.calling.entities.Flow
         @_create_answer()
 
     @can_create_offer = ko.pureComputed =>
-      offer_state = not @is_answer() and @signaling_state() is z.calling.rtc.SIGNALING_OFFER.STABLE
+      offer_state = not @is_answer() and @signaling_state() is z.calling.rtc.SIGNALING_STATE.STABLE
       can_create = @can_create_sdp() and offer_state
       return can_create
 
@@ -251,7 +251,7 @@ class z.calling.entities.Flow
         @_initialize_peer_connection()
 
     @can_set_ice_candidates = ko.pureComputed =>
-      can_set = @local_sdp() and @remote_sdp() and @signaling_state() is z.calling.rtc.SIGNALING_OFFER.STABLE
+      can_set = @local_sdp() and @remote_sdp() and @signaling_state() is z.calling.rtc.SIGNALING_STATE.STABLE
       return can_set
 
     @can_set_ice_candidates.subscribe (can_set) =>
@@ -762,13 +762,13 @@ class z.calling.entities.Flow
     return @logger.info 'No PeerConnection found to remove MediaStream from' if not @peer_connection
 
     if @peer_connection.removeTrack
-      return unless @peer_connection.signalingState is z.calling.rtc.SIGNALING_OFFER.STABLE
+      return unless @peer_connection.signalingState is z.calling.rtc.SIGNALING_STATE.STABLE
       for media_stream_track in media_stream.getTracks()
         for rtp_sender in @peer_connection.getSenders() when rtp_sender.track.id is media_stream_track.id
           @peer_connection.removeTrack rtp_sender
           @logger.info "Removed local '#{media_stream_track.kind}' MediaStreamTrack from PeerConnection"
           break
-    else if @peer_connection.signalingState isnt z.calling.rtc.SIGNALING_OFFER.CLOSED
+    else if @peer_connection.signalingState isnt z.calling.rtc.SIGNALING_STATE.CLOSED
       @peer_connection.removeStream media_stream
       @logger.info "Removed local '#{media_stream.type}' MediaStream from PeerConnection",
         {stream: media_stream, audio_tracks: media_stream.getAudioTracks(), video_tracks: media_stream.getVideoTracks()}
@@ -808,7 +808,7 @@ class z.calling.entities.Flow
     @logger.info "Resetting flow '#{@id}'"
     @telemetry.reset_statistics()
     try
-      if @peer_connection?.signalingState isnt z.calling.rtc.SIGNALING_OFFER.CLOSED
+      if @peer_connection?.signalingState isnt z.calling.rtc.SIGNALING_STATE.CLOSED
         @_close_peer_connection()
     catch error
       @logger.error "We caught the #{error.name}: #{error.message}", error
@@ -826,7 +826,7 @@ class z.calling.entities.Flow
   _reset_signaling_states: ->
     @connection_state z.calling.rtc.ICE_CONNECTION_STATE.NEW
     @gathering_state z.calling.rtc.ICE_GATHERING_STATE.NEW
-    @signaling_state z.calling.rtc.SIGNALING_OFFER.NEW
+    @signaling_state z.calling.rtc.SIGNALING_STATE.NEW
 
 
   ###############################################################################
