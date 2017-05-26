@@ -103,6 +103,7 @@ describe('ConversationRepository', function() {
       TestFactory.conversation_repository.conversations([]);
     });
 
+    // TODO: Needs to get finished
     xit('finds an existing 1:1 conversation within a team', function(done) {
       // @formatter:off
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
