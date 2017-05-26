@@ -146,10 +146,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
   // Conversation service interactions
   //##############################################################################
 
-  reuse_conversation() {
-    return (this.active_team()) ? true : false;
-  }
-
   /**
    * Create a new conversation.
    * @note Supply at least 2 user IDs! Do not include the requestor
@@ -580,15 +576,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Get conversation with a user.
    * @param {User} user_et - User entity for whom to get the conversation
+   * @param {string} [team_id] - Team ID in which the conversation should be searched
    * @returns {Promise} Resolves with the conversation with requested user
    */
-  get_one_to_one_conversation(user_et) {
+  get_one_to_one_conversation(user_et, team_id = this.active_team().id) {
     for (const conversation_et of this.conversations()) {
-      if ([z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.CONNECT].includes(conversation_et.type())) {
+      if (team_id) {
+        if (conversation_et.type() === z.conversation.ConversationType.REGULAR) {
+          if (user_et.id === conversation_et.participating_user_ids()[0] && team_id === conversation_et.team_id) {
+            return Promise.resolve(conversation_et);
+          }
+        }
+      } else if ([z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.CONNECT].includes(conversation_et.type())) {
         if (user_et.id === conversation_et.participating_user_ids()[0]) {
           return Promise.resolve(conversation_et);
         }
       }
+    }
+
+    if (team_id) {
+      return this.create_new_conversation([user_et.id], undefined).then(({conversation_et}) => conversation_et);
     }
 
     return this.fetch_conversation_by_id(user_et.connection().conversation_id)
