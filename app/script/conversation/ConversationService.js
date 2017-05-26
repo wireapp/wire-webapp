@@ -54,12 +54,17 @@ z.conversation.ConversationService = class ConversationService {
    *
    * @param {Array<string>} user_ids - IDs of users (excluding the requestor) to be part of the conversation
    * @param {string} name - User defined name for the Conversation (optional)
+   * @param {string} team_id - ID of team conversation belongs to
    * @returns {Promise} Resolves when the conversation was created
    */
-  create_conversation(user_ids, name) {
+  create_conversation(user_ids, name, team_id) {
     return this.client.send_json({
       data: {
         name: name,
+        team: {
+          managed: false,
+          teamid: team_id,
+        },
         users: user_ids,
       },
       type: 'POST',
