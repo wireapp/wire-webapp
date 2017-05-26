@@ -104,6 +104,14 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       }
     });
 
+    this.active_team_name = ko.pureComputed(() => {
+      const team_et = this.active_team();
+      if (team_et && team_et.name()) {
+        return team_et.name();
+      }
+      return this.user_repository.self().name();
+    });
+
     this.search_input = ko.observable('');
     this.search_input.subscribe(this.search);
     this.selected_people = ko.observableArray([]);
