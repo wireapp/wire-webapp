@@ -30,7 +30,6 @@ z.team.TeamRepository = class TeamRepository {
     this.teams = ko.observableArray([]);
 
     const personal_space = new z.team.TeamEntity();
-    personal_space.name('Personal'); // self is not defined yet
     this.personal_space = personal_space;
   }
 
