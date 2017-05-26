@@ -146,6 +146,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
   // Conversation service interactions
   //##############################################################################
 
+  reuse_conversation() {
+    return (this.active_team()) ? true : false;
+  }
+
   /**
    * Create a new conversation.
    * @note Supply at least 2 user IDs! Do not include the requestor
