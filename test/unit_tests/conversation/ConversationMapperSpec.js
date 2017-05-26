@@ -29,11 +29,11 @@ describe('Conversation Mapper', function() {
   });
 
   describe('map_conversation', () => {
-    it('should throw error if conversation data is missing', function() {
+    it('throws an error if conversation data is missing', function() {
       expect(() => conversation_mapper.map_conversation()).toThrow(new Error('Cannot create conversation entity without data'));
     });
 
-    it('can map a conversation', function() {
+    it('maps a conversation', function() {
       const {conversation} = entities;
       const conversation_et = conversation_mapper.map_conversation(conversation);
 
@@ -56,7 +56,7 @@ describe('Conversation Mapper', function() {
       expect(conversation_et.is_managed).toEqual(conversation.team.managed);
     });
 
-    it('can map conversations', function() {
+    it('maps conversations', function() {
       const {conversations} = payload.conversations.get;
       const conversation_ets = conversation_mapper.map_conversations(conversations);
 
