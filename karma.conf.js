@@ -77,7 +77,7 @@ module.exports = function(config) {
       ChromeCanaryHeadless: {
         base: 'ChromeCanary',
         flags: [
-          ' --remote-debugging-port=9222',
+          '--remote-debugging-port=9222',
           '--disable-gpu',
           '--headless',
           '--no-sandbox',
