@@ -106,9 +106,11 @@
     </div>
   <!-- /ko  -->
 
-  <div class="start-ui-import" data-bind="click: show_invite_bubble" >
-    <span id="invite-button" class="label-bold-xs" data-bind="text: invite_button_text" data-bubble="#invite-bubble" data-placement="top"></span>
-  </div>
+  <!-- ko if: show_invite_people() -->
+    <div class="start-ui-import" data-bind="click: show_invite_bubble" >
+      <span id="invite-button" class="label-bold-xs" data-bind="text: invite_button_text" data-bubble="#invite-bubble" data-placement="top"></span>
+    </div>
+  <!-- /ko -->
 
   <!-- ko if: user_profile() -->
     <div id="start-ui-user-bubble" class="start-ui-user-bubble bubble">
