@@ -62,4 +62,29 @@ z.team.TeamMapper = class TeamMapper {
 
     return team_et;
   }
+
+  map_member_from_array(members_data) {
+    return members_data.map((data) => this.update_member_from_object(data));
+  }
+
+  map_member_from_object(data) {
+    return this.update_member_from_object(data);
+  }
+
+  update_member_from_object(data, member_et = new z.team.TeamMemberEntity()) {
+    if (!data) {
+      return;
+    }
+
+    const {permissions, user} = data;
+    if (permissions) {
+      member_et.permissions = permissions;
+    }
+
+    if (user) {
+      member_et.user_id = user;
+    }
+
+    return member_et;
+  }
 };

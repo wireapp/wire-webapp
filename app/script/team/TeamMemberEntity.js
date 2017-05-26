@@ -25,6 +25,6 @@ window.z.team = z.team || {};
 z.team.TeamMemberEntity = class TeamMemberEntity {
   constructor() {
     this.permissions = undefined;
-    this.user = undefined;
+    this.user_id = undefined;
   }
 };

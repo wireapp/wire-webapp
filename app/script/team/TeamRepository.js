@@ -25,11 +25,14 @@ window.z.team = z.team || {};
 z.team.TeamRepository = class TeamRepository {
   constructor(team_service, user_repository) {
     this.logger = new z.util.Logger('z.team.TeamRepository', z.config.LOGGER.OPTIONS);
+
     this.team_mapper = new z.team.TeamMapper();
     this.team_service = team_service;
-    this.teams = ko.observableArray([]);
+    this.user_repository = user_repository;
 
     this.personal_space = new z.team.TeamEntity();
+    this.teams = ko.observableArray([]);
+
     amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
   }
 
@@ -68,6 +71,7 @@ z.team.TeamRepository = class TeamRepository {
 
         z.util.ko_array_push_all(this.teams, team_ets);
 
+        team_ets.forEach((team_et) => this.update_team_members(team_et));
         return this.teams();
       })
       .catch((error) => {
@@ -95,8 +99,7 @@ z.team.TeamRepository = class TeamRepository {
     return this.team_service.get_team_members(team_id)
       .then(({members}) => {
         if (members.length) {
-          // todo: map team member entity
-          const new_team_members_ets = this.team_mapper.map_teams_from_array(members);
+          const new_team_members_ets = this.team_mapper.map_member_from_array(members);
           team_members_ets = team_members_ets.concat(new_team_members_ets);
         }
         return team_members_ets;
@@ -121,6 +124,16 @@ z.team.TeamRepository = class TeamRepository {
 
   update_team() {
     return this.team_service.put_team();
+  }
+
+  update_team_members(team_et) {
+    this.get_team_members(team_et.id)
+      .then((team_members) => {
+        const member_ids = team_members.map((team_member) => team_member.user_id);
+
+        return this.user_repository.get_users_by_id(member_ids);
+      })
+      .then((user_ets) => team_et.members(user_ets));
   }
 
   _update_teams(team_ets) {

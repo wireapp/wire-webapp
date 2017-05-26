@@ -90,6 +90,12 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     });
 
     this.user = this.user_repository.self;
+    this.active_team = this.conversation_repository.active_team;
+    this.active_team.subscribe((active_team) => {
+      if (active_team) {
+        this.team_members(active_team.members());
+      }
+    });
 
     this.search_input = ko.observable('');
     this.search_input.subscribe(this.search);
@@ -149,7 +155,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     });
 
     this.is_personal_space = ko.pureComputed(() => {
-      const team_et = this.conversation_repository.active_team();
+      const team_et = this.active_team();
       if (team_et) {
         return !team_et.name();
       }

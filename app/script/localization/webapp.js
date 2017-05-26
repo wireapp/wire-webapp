@@ -493,6 +493,7 @@ z.string.search_connect = 'Connect';
 z.string.search_connections = 'Connections';
 z.string.search_groups = 'Groups';
 z.string.search_placeholder = 'Search by name or username';
+z.string.search_team_members = 'Team members';
 z.string.search_top_people = 'Top people';
 z.string.search_try_search = 'Find people by\nname or username';
 z.string.search_no_contacts_on_wire = 'You have no contacts on Wire.\nTry finding people by\nname or username.';
