@@ -28,51 +28,59 @@ describe('Conversation Mapper', function() {
     conversation_mapper = new z.conversation.ConversationMapper();
   });
 
-  it('should throw error if conversation data is missing', function() {
-    expect(() => conversation_mapper.map_conversation()).toThrow(new Error('Cannot create conversation entity without data'));
+  describe('map_conversation', () => {
+    it('should throw error if conversation data is missing', function() {
+      expect(() => conversation_mapper.map_conversation()).toThrow(new Error('Cannot create conversation entity without data'));
+    });
+
+    it('can map a conversation', function() {
+      const {conversation} = entities;
+      const conversation_et = conversation_mapper.map_conversation(conversation);
+
+      const expected_participant_ids = [
+        conversation.members.others[0].id,
+        conversation.members.others[1].id,
+        conversation.members.others[2].id,
+        conversation.members.others[3].id,
+      ];
+
+      expect(conversation_et.participating_user_ids()).toEqual(expected_participant_ids);
+      expect(conversation_et.id).toBe(conversation.id);
+      expect(conversation_et.name()).toBe(conversation.name);
+      expect(conversation_et.type()).toBe(z.conversation.ConversationType.REGULAR);
+      expect(conversation_et.is_group()).toBeTruthy();
+      expect(conversation_et.number_of_participants()).toBe(conversation.members.others.length);
+      expect(conversation_et.is_muted()).toBe(conversation.members.self.otr_muted);
+      expect(conversation_et.muted_timestamp()).toEqual(new Date(conversation.members.self.otr_muted_ref).getTime());
+      expect(conversation_et.team_id).toEqual(conversation.team.teamid);
+      expect(conversation_et.is_managed).toEqual(conversation.team.managed);
+    });
+
+    it('can map conversations', function() {
+      const {conversations} = payload.conversations.get;
+      const conversation_ets = conversation_mapper.map_conversations(conversations);
+
+      expect(conversation_ets.length).toBe(conversations.length);
+      expect(conversation_ets[0].id).toBe(conversations[0].id);
+      expect(conversation_ets[1].name()).toBe(conversations[1].name);
+    });
   });
 
-  it('can map a conversation', function() {
-    const {conversation} = entities;
-    const conversation_et = conversation_mapper.map_conversation(conversation);
+  describe('update_properties', () => {
+    it('can update the properties of a conversation', function() {
+      const creator_id = z.util.create_random_uuid();
+      const conversation_et = conversation_mapper._create_conversation_et(payload.conversations.get.conversations[0]);
+      const data = {
+        creator: creator_id,
+        id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc',
+        name: 'New foo bar conversation name'
+      };
+      const updated_conversation_et = conversation_mapper.update_properties(conversation_et, data);
 
-    const expected_participant_ids = [
-      conversation.members.others[0].id,
-      conversation.members.others[1].id,
-      conversation.members.others[2].id,
-      conversation.members.others[3].id,
-    ];
-
-    expect(conversation_et.participating_user_ids()).toEqual(expected_participant_ids);
-    expect(conversation_et.id).toBe(conversation.id);
-    expect(conversation_et.name()).toBe(conversation.name);
-    expect(conversation_et.type()).toBe(z.conversation.ConversationType.REGULAR);
-    expect(conversation_et.is_group()).toBeTruthy();
-    expect(conversation_et.number_of_participants()).toBe(conversation.members.others.length);
-    expect(conversation_et.is_muted()).toBe(conversation.members.self.otr_muted);
-    expect(conversation_et.muted_timestamp()).toEqual(new Date(conversation.members.self.otr_muted_ref).getTime());
-    expect(conversation_et.team_id).toEqual(conversation.team.teamid);
-    expect(conversation_et.is_managed).toEqual(conversation.team.managed);
-  });
-
-  it('can map conversations', function() {
-    const {conversations} = payload.conversations.get;
-    const conversation_ets = conversation_mapper.map_conversations(conversations);
-
-    expect(conversation_ets.length).toBe(conversations.length);
-    expect(conversation_ets[0].id).toBe(conversations[0].id);
-    expect(conversation_ets[1].name()).toBe(conversations[1].name);
-  });
-
-  it('can update the properties of a conversation', function() {
-    const creator_id = z.util.create_random_uuid();
-    const conversation_et = conversation_mapper._create_conversation_et(payload.conversations.get.conversations[0]);
-    const data = {creator: creator_id, id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc', name: 'New foo bar conversation name'};
-    const updated_conversation_et = conversation_mapper.update_properties(conversation_et, data);
-
-    expect(updated_conversation_et.name()).toBe(data.name);
-    expect(updated_conversation_et.id).not.toBe(data.id);
-    expect(updated_conversation_et.creator).toBe(data.creator);
+      expect(updated_conversation_et.name()).toBe(data.name);
+      expect(updated_conversation_et.id).not.toBe(data.id);
+      expect(updated_conversation_et.creator).toBe(data.creator);
+    });
   });
 
   describe('update_self_status', function() {
