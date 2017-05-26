@@ -106,6 +106,7 @@ window.entities = {
     'type': 0,
     'last_event_time': '2015-01-13T10:41:55.032Z',
     'last_event': '1.800122000a4b6e15',
+    // TODO: Verify if these properties are valid! https://github.com/wireapp/architecture/commit/45a3e4908b34050cfa73b9a8b059a7916f67e87b
     'team': {
       'teamid': '537992e5-3782-4b6c-8718-a5db2cc786ee',
       'managed': false,
