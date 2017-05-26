@@ -29,6 +29,12 @@
       <!-- ko ifnot: show_spinner() -->
 
         <!-- ko ifnot: show_search_results() -->
+          <!-- ko if: show_team_member() && team_members().length -->
+            <div class="start-ui-list-team-member">
+              <span class="start-ui-list-header start-ui-list-header-team-member" data-uie-name="status-team-members" data-bind="l10n_text: z.string.search_team_members"></span>
+              <user-list class="search-list-theme-black" params="user: team_members, mode: z.components.UserListMode.INFO, selected: selected_people"></user-list>
+            </div>
+          <!-- /ko  -->
           <!-- ko if: show_top_people() && top_users().length -->
             <div class="start-ui-list-top-conversations">
               <span class="start-ui-list-header start-ui-list-header-top-people" data-uie-name="status-top-people" data-bind="l10n_text: z.string.search_top_people"></span>

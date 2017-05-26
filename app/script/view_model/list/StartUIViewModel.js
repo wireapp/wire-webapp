@@ -104,6 +104,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.top_users = ko.observableArray([]);
     this.suggestions = ko.observableArray([]);
     this.connections = ko.observableArray([]);
+    this.team_members = ko.observableArray([]);
 
     this.search_results = {
       contacts: ko.observableArray([]),
@@ -152,6 +153,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       if (team_et) {
         return !team_et.name();
       }
+    });
+
+    this.show_team_member = ko.pureComputed(() => {
+      return !this.is_personal_space() && this.team_members().length;
     });
 
     this.show_top_people = ko.pureComputed(() => {
