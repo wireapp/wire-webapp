@@ -236,7 +236,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
       window.setTimeout(() => {
         const is_current_conversation = conversation_et === this.conversation();
         if (!is_current_conversation) {
-          this.logger.info('Skipped re-loading current conversation', conversation_et.display_name());
+          this.logger.info(`Skipped re-loading current conversation '${conversation_et.display_name()}'`);
           return resolve();
         }
 
