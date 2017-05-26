@@ -78,6 +78,12 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.search_results.contacts(this.user_repository.search_for_connected_users(normalized_query, is_username));
         this.search_results.groups(this.conversation_repository.get_groups_by_name(normalized_query, is_username));
 
+        if (!this.is_personal_space()) {
+          this.search_results.team_members(this.search_for_member(normalized_query, is_username));
+          const non_member_contacts = this.search_results.contacts().filter((user_et) => !this.search_results.team_members().includes(user_et));
+          this.search_results.contacts(non_member_contacts);
+        }
+
         this.searched_for_user(query);
       }
     }, 300);
@@ -116,6 +122,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       contacts: ko.observableArray([]),
       groups: ko.observableArray([]),
       others: ko.observableArray([]),
+      team_members: ko.observableArray([]),
     };
 
     // view states
@@ -306,6 +313,17 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       })
       .catch((error) => {
         this.logger.error(`Could not show the on-boarding results: ${error.message}`, error);
+      });
+  }
+
+  search_for_member(query, is_username) {
+    return this.team_members()
+      .filter((user_et) => user_et.matches(query, is_username))
+      .sort(function(user_a, user_b) {
+        if (is_username) {
+          return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), query);
+        }
+        return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), query);
       });
   }
 
