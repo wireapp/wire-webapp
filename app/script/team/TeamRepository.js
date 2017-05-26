@@ -29,8 +29,8 @@ z.team.TeamRepository = class TeamRepository {
     this.team_service = team_service;
     this.teams = ko.observableArray([]);
 
-    const personal_space = new z.team.TeamEntity();
-    this.personal_space = personal_space;
+    this.personal_space = new z.team.TeamEntity();
+    amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
   }
 
   add_members() {
@@ -105,6 +105,18 @@ z.team.TeamRepository = class TeamRepository {
         this.logger.error(`Failed to retrieve members from backend: ${error.message}`, error);
         throw error;
       });
+  }
+
+  /**
+   * Listener for incoming team events.
+   *
+   * @param {Object} event_json - JSON data for team event
+   * @param {z.event.EventRepository.NOTIFICATION_SOURCE} source - Source of event
+   * @returns {Promise} Resolves when event was handled
+   */
+  on_team_event(event_json, source = z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
+    const {type} = event_json;
+    this.logger.info(`»» Event: '${type}'`, {event_json: JSON.stringify(event_json), event_object: event_json});
   }
 
   update_team() {
