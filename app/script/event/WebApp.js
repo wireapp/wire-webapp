@@ -170,6 +170,7 @@ z.event.WebApp = {
   PROPERTIES: {
     UPDATE: {
       CONTACTS: 'wire.webapp.properties.update.contacts',
+      EMOJI: 'wire.webapp.properties.update.emoji',
       HAS_CREATED_CONVERSATION: 'wire.webapp.properties.update.has_created_conversation',
       NOTIFICATIONS: 'wire.webapp.properties.update.notifications',
       PRIVACY: 'wire.webapp.properties.update.privacy',

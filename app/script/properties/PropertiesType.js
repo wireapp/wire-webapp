@@ -27,6 +27,7 @@ z.properties.PROPERTIES_TYPE = {
     GOOGLE: 'contact_import.google',
     MACOS: 'contact_import.macos',
   },
+  EMOJI: 'settings.emoji.inline',
   ENABLE_DEBUGGING: 'enable_debugging',
   HAS_CREATED_CONVERSATION: 'has_created_conversation',
   NOTIFICATIONS: 'settings.notifications',
