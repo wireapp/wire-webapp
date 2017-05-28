@@ -130,7 +130,7 @@ z.properties.PropertiesRepository = class PropertiesRepository {
           case z.properties.PROPERTIES_TYPE.CONTACT_IMPORT.MACOS:
             amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.CONTACTS, updated_preference);
             break;
-        case z.properties.PROPERTIES_TYPE.EMOJI:
+          case z.properties.PROPERTIES_TYPE.EMOJI:
             amplify.publish(z.event.WebApp.PROPERTIES.UPDATE.EMOJI, updated_preference);
             break;
           case z.properties.PROPERTIES_TYPE.ENABLE_DEBUGGING:

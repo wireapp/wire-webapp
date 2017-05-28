@@ -238,7 +238,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   }
 
   _try_replace_inline_emoji(input) {
-    if (! this.should_replace_inline_emoji()) {
+    if (!this.should_replace_inline_emoji()) {
       return false;
     }
     const text = input.value || '';
@@ -260,7 +260,7 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   }
 
   _replace_all_inline_emoji(input) {
-    if (! this.should_replace_inline_emoji()) {
+    if (!this.should_replace_inline_emoji()) {
       return false;
     }
     let text_before_cursor = input.value.substr(0, input.selectionStart);
