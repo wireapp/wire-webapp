@@ -58,15 +58,20 @@ z.conversation.ConversationService = class ConversationService {
    * @returns {Promise} Resolves when the conversation was created
    */
   create_conversation(user_ids, name, team_id) {
+    const data = {
+      name: name,
+      users: user_ids,
+    };
+
+    if (team_id) {
+      data.team = {
+        managed: false,
+        teamid: team_id,
+      };
+    }
+
     return this.client.send_json({
-      data: {
-        name: name,
-        team: {
-          managed: false,
-          teamid: team_id,
-        },
-        users: user_ids,
-      },
+      data: data,
       type: 'POST',
       url: this.client.create_url(ConversationService.CONFIG.URL_CONVERSATIONS),
     });
