@@ -96,6 +96,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.user = this.user_repository.self;
     this.active_team = this.conversation_repository.active_team;
     this.active_team.subscribe((active_team) => {
+      this.search(this.search_input());
       if (active_team) {
         this.team_members(active_team.members());
       }
