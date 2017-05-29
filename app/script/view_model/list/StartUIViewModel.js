@@ -64,12 +64,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         // Contacts, groups and others
         const is_username = query.trim().startsWith('@');
 
-        this.search_repository.search_by_name(normalized_query)
+        this.search_repository.search_by_name(normalized_query, is_username)
           .then((user_ets) => {
             if (normalized_query === z.search.SearchRepository.normalize_query(this.search_input())) {
-              if (is_username) {
-                user_ets = user_ets.filter((user_et) => z.util.StringUtil.starts_with(user_et.username(), normalized_query));
-              }
               this.search_results.others(user_ets);
             }
           })

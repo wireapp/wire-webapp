@@ -536,8 +536,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         return false;
       })
       .sort(function(conversation_a, conversation_b) {
-        const sort_query = is_username ? `@${query}` : query;
-        return z.util.StringUtil.sort_by_priority(conversation_a.display_name(), conversation_b.display_name(), sort_query);
+        return z.util.StringUtil.sort_by_priority(conversation_a.display_name(), conversation_b.display_name(), query);
       });
   }
 
