@@ -115,7 +115,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const {team_id} = conversation_et;
 
         const is_team_conversation = team_id === active_team_id;
-        const is_guest_conversation = conversation_et.is_guest;
+        const is_guest_conversation = !active_team_id && team_id && conversation_et.is_guest;
 
         if (is_team_conversation || is_guest_conversation) {
           if (conversation_et.has_active_call()) {
