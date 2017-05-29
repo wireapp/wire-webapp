@@ -80,7 +80,7 @@ z.team.TeamRepository = class TeamRepository {
       });
   }
 
-  get_team_metadata(team_id, team_ets = []) {
+  get_team(team_id, team_ets = []) {
     return this.team_service.get_team_metadata(team_id)
       .then((team_metadata) => {
         if (Object.keys(team_metadata).length) {
@@ -118,8 +118,48 @@ z.team.TeamRepository = class TeamRepository {
    * @returns {Promise} Resolves when event was handled
    */
   on_team_event(event_json, source = z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
-    const {type} = event_json;
+    const {type = '', team: team_id = ''} = event_json;
     this.logger.info(`»» Event: '${type}'`, {event_json: JSON.stringify(event_json), event_object: event_json});
+
+    switch (type.split('.')[1]) {
+      case 'conversation-create':
+        this.logger.info('A conversation was created.');
+        z.conversation.ConversationRepository.update_conversations();
+        break;
+      case 'conversation-delete':
+        this.logger.info('A conversation was deleted.');
+        break;
+      case 'create':
+        this.logger.info('A team was created.');
+        this.get_team(team_id)
+          .then((team_et) => {
+            this.teams.push(team_et);
+          })
+          .catch((error) => this.logger.error(`Failed to handle the created team: ${error.message}`, error));
+        break;
+      case 'delete':
+        this.logger.info('A team was deleted.');
+        this.teams.remove((team) => team.id === team_id);
+        amplify.publish(z.event.WebApp.TEAM.DELETE_TEAM, team_id, this.personal_space);
+        break;
+      case 'member-join':
+        this.logger.info('A member joined the team.');
+        break;
+      case 'member-leave':
+        this.logger.info('A member left the team.');
+        break;
+      case 'update':
+        this.logger.info('A team was updated.');
+        this.get_team(team_id)
+          .then((team_et) => {
+            this.teams.remove((team_obj) => team_obj.id === team_id);
+            this.teams.push(team_et);
+          })
+          .catch((error) => this.logger.error(`Failed to handle the updated team: ${error.message}`, error));
+        break;
+      default:
+        this.logger.info('An unknown team event happened.', event_json);
+    }
   }
 
   update_team() {

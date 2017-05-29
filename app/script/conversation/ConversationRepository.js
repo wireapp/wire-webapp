@@ -139,6 +139,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     amplify.subscribe(z.event.WebApp.CONVERSATION.PERSIST_STATE, this.save_conversation_state_in_db.bind(this));
     amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_notification_handling_state.bind(this));
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
+    amplify.subscribe(z.event.WebApp.TEAM.DELETE_TEAM, this.delete_team.bind(this));
   }
 
 
@@ -159,6 +160,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then((response) => {
         return this._on_create({conversation: response.id, data: response});
       });
+  }
+
+  delete_team(team_id, personal_space) {
+    if (this.active_team().id === team_id) {
+      this.set_active_team(personal_space);
+    }
   }
 
   /**
