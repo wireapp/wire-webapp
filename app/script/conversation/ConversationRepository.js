@@ -169,9 +169,9 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  delete_team(team_id, personal_space) {
+  delete_team(team_id) {
     if (this.active_team().id === team_id) {
-      this.set_active_team(personal_space);
+      this.set_active_team(this.team_repository.personal_space);
     }
   }
 

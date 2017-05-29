@@ -141,7 +141,7 @@ z.team.TeamRepository = class TeamRepository {
       case z.event.Backend.TEAM.DELETE:
         this.logger.info('A team was deleted.');
         this.teams.remove((team) => team.id === team_id);
-        amplify.publish(z.event.WebApp.TEAM.DELETE_TEAM, team_id, this.personal_space);
+        amplify.publish(z.event.WebApp.TEAM.DELETE_TEAM, team_id);
         break;
       case z.event.Backend.TEAM.MEMBER_JOIN:
         this.logger.info('A member joined the team.');
