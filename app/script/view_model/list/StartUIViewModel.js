@@ -97,9 +97,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.active_team = this.conversation_repository.active_team;
     this.active_team.subscribe((active_team) => {
       this.search(this.search_input());
-      if (active_team) {
-        this.team_members(active_team.members());
-      }
     });
 
     this.active_team_name = ko.pureComputed(() => {
@@ -122,12 +119,23 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     // Results
     this.top_users = ko.observableArray([]);
     this.suggestions = ko.observableArray([]);
+
     this.connections = ko.pureComputed(() => {
       return this.user_repository.users()
         .filter((user_et) => user_et.is_connected())
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     });
-    this.team_members = ko.observableArray([]);
+
+    this.team_members = ko.pureComputed(() => {
+      const active_team = this.active_team();
+
+      if (active_team && active_team.id) {
+        return active_team.members().sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
+      }
+
+      return [];
+    });
+
 
     this.search_results = {
       contacts: ko.observableArray([]),
