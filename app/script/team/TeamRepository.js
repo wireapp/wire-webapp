@@ -121,14 +121,14 @@ z.team.TeamRepository = class TeamRepository {
     const {type = '', team: team_id = ''} = event_json;
     this.logger.info(`»» Event: '${type}'`, {event_json: JSON.stringify(event_json), event_object: event_json});
 
-    switch (type.split('.')[1]) {
-      case 'conversation-create':
+    switch (type) {
+      case z.event.Backend.TEAM.CONVERSATION_CREATE:
         this.logger.info('A conversation was created.');
         break;
-      case 'conversation-delete':
+      case z.event.Backend.TEAM.CONVERSATION_DELETE:
         this.logger.info('A conversation was deleted.');
         break;
-      case 'create':
+      case z.event.Backend.TEAM.CREATE:
         this.logger.info('A team was created.');
         this.get_team(team_id)
           .then((team_et) => {
@@ -136,18 +136,18 @@ z.team.TeamRepository = class TeamRepository {
           })
           .catch((error) => this.logger.error(`Failed to handle the created team: ${error.message}`, error));
         break;
-      case 'delete':
+      case z.event.Backend.TEAM.DELETE:
         this.logger.info('A team was deleted.');
         this.teams.remove((team) => team.id === team_id);
         amplify.publish(z.event.WebApp.TEAM.DELETE_TEAM, team_id, this.personal_space);
         break;
-      case 'member-join':
+      case z.event.Backend.TEAM.MEMBER_JOIN:
         this.logger.info('A member joined the team.');
         break;
-      case 'member-leave':
+      case z.event.Backend.TEAM.MEMBER_LEAVE:
         this.logger.info('A member left the team.');
         break;
-      case 'update':
+      case z.event.Backend.TEAM.UPDATE:
         this.logger.info('A team was updated.');
         this.get_team(team_id)
           .then((team_et) => {

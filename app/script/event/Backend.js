@@ -48,6 +48,15 @@ z.event.Backend = {
     VOICE_CHANNEL_ACTIVATE: 'conversation.voice-channel-activate',
     VOICE_CHANNEL_DEACTIVATE: 'conversation.voice-channel-deactivate',
   },
+  TEAM: {
+    CONVERSATION_CREATE: 'team.conversation-create',
+    CONVERSATION_DELETE: 'team.conversation-delete',
+    CREATE: 'team.create',
+    DELETE: 'team.delete',
+    MEMBER_JOIN: 'team.member-join',
+    MEMBER_LEAVE: 'team.member-leave',
+    UPDATE: 'team.update',
+  },
   USER: {
     ACTIVATE: 'user.activate',
     CLIENT_ADD: 'user.client-add',
