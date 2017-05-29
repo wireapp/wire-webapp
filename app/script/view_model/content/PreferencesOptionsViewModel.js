@@ -57,9 +57,9 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
       this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.NOTIFICATIONS, notifications_preference);
     });
 
-    this.option_inline_emoji = ko.observable();
-    this.option_inline_emoji.subscribe((inline_emoji_preference) => {
-      this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.EMOJI, inline_emoji_preference);
+    this.option_replace_inline_emoji = ko.observable();
+    this.option_replace_inline_emoji.subscribe((replace_inline_emoji_preference) => {
+      this.properties_repository.save_preference(z.properties.PROPERTIES_TYPE.EMOJI.REPLACE_INLINE, replace_inline_emoji_preference);
     });
 
     amplify.subscribe(z.event.WebApp.PROPERTIES.UPDATED, this.update_properties.bind(this));
@@ -75,7 +75,7 @@ z.ViewModel.content.PreferencesOptionsViewModel = class PreferencesOptionsViewMo
 
   update_properties(properties) {
     this.option_audio(properties.settings.sound.alerts);
-    this.option_inline_emoji(properties.settings.emoji.inline);
+    this.option_replace_inline_emoji(properties.settings.emoji.replace_inline);
     this.option_privacy(properties.settings.privacy.report_errors);
     this.option_notifications(properties.settings.notifications);
   }

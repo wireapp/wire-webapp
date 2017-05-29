@@ -27,7 +27,7 @@ z.properties.Properties = class Properties {
     this[z.properties.PROPERTIES_TYPE.VERSION] = 1;
     this.settings = {
       emoji: {
-        inline: true,
+        replace_inline: true,
       },
       notifications: z.system_notification.SystemNotificationPreference.ON,
       privacy: {
