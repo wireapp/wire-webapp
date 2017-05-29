@@ -85,6 +85,10 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   get_team(team_id, team_ets = []) {
+    const team_local = this.teams().filter((team_et) => team_et.id === team_id);
+    if (team_local.length) {
+      return Promise.resolve(team_local[0]);
+    }
     return this.team_service.get_team_metadata(team_id)
       .then((team_metadata) => {
         if (Object.keys(team_metadata).length) {
@@ -126,44 +130,60 @@ z.team.TeamRepository = class TeamRepository {
     this.logger.info(`»» Event: '${type}'`, {event_json: JSON.stringify(event_json), event_object: event_json});
 
     switch (type) {
-      case z.event.Backend.TEAM.CONVERSATION_CREATE:
-        this.logger.info('A conversation was created.');
+      case z.event.Backend.TEAM.CONVERSATION_CREATE: {
         break;
-      case z.event.Backend.TEAM.CONVERSATION_DELETE:
-        this.logger.info('A conversation was deleted.');
+      }
+      case z.event.Backend.TEAM.CONVERSATION_DELETE: {
         break;
-      case z.event.Backend.TEAM.CREATE:
-        this.logger.info('A team was created.');
+      }
+      case z.event.Backend.TEAM.CREATE: {
         this.get_team(team_id)
           .then((team_et) => {
-            this.teams.push(team_et);
+            this._add_team(this.teams(), team_et);
           })
           .catch((error) => this.logger.error(`Failed to handle the created team: ${error.message}`, error));
         break;
-      case z.event.Backend.TEAM.DELETE:
-        this.logger.info('A team was deleted.');
+      }
+      case z.event.Backend.TEAM.DELETE: {
         this.teams.remove((team) => team.id === team_id);
         if (this.active_team().id === team_id) {
           this.set_active_team(this.personal_space);
         }
         break;
-      case z.event.Backend.TEAM.MEMBER_JOIN:
-        this.logger.info('A member joined the team.');
+      }
+      case z.event.Backend.TEAM.MEMBER_JOIN: {
+        const {data: {user: user_id}} = event_json;
+        this.get_team(team_id)
+          .then((team_et) => {
+            this.user_repository.get_users_by_id([user_id]).then(([user_et]) => {
+              this._add_user_to_team(user_et, team_et);
+            });
+          })
+          .catch((error) => this.logger.error(`Failed to handle the created team: ${error.message}`, error));
         break;
-      case z.event.Backend.TEAM.MEMBER_LEAVE:
-        this.logger.info('A member left the team.');
+      }
+      case z.event.Backend.TEAM.MEMBER_LEAVE: {
+        const {data: {user: user_id = ''} = {}} = event_json;
+        const [team_of_user] = this.teams().filter((team) => team.id === team_id);
+        if (!team_of_user) {
+          this.logger.error(`Failed to handle leaving user: Could not find a team for user ${user_id}`);
+        } else {
+          team_of_user.members.remove((member) => member.id === user_id);
+        }
         break;
-      case z.event.Backend.TEAM.UPDATE:
-        this.logger.info('A team was updated.');
+      }
+      case z.event.Backend.TEAM.UPDATE: {
         this.get_team(team_id)
           .then((team_et) => {
             this.teams.remove((team_obj) => team_obj.id === team_id);
-            this.teams.push(team_et);
+            this._add_team(this.teams(), team_et);
           })
           .catch((error) => this.logger.error(`Failed to handle the updated team: ${error.message}`, error));
         break;
-      default:
+      }
+      default: {
         this.logger.info('An unknown team event happened.', event_json);
+      }
     }
   }
 
@@ -197,6 +217,19 @@ z.team.TeamRepository = class TeamRepository {
         return this.user_repository.get_users_by_id(member_ids);
       })
       .then((user_ets) => team_et.members(user_ets));
+  }
+
+  _add_user_to_team(user_et, team_et) {
+    const members = team_et.members;
+    if (members().filter((member) => member.id === user_et.id).length < 1) {
+      members.push(user_et);
+    }
+  }
+
+  _add_team(team_ets, team_et) {
+    if (team_ets.filter((team) => team.id === team_et.id).length < 1) {
+      team_ets.push(team_et);
+    }
   }
 
   _update_teams(team_ets) {
