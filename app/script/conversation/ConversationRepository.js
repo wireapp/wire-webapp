@@ -109,10 +109,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const calls = [];
       const cleared = [];
       const unarchived = [];
+      const active_team_id = this.active_team().id;
 
       this.sorted_conversations().forEach((conversation_et) => {
         const {team_id} = conversation_et;
-        const active_team_id = this.active_team().id;
 
         const is_team_conversation = team_id === active_team_id;
         const is_guest_conversation = !active_team_id && team_id && !this.team_repository.known_team_ids().includes(team_id);

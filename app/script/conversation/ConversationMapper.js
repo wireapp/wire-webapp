@@ -179,7 +179,7 @@ z.conversation.ConversationMapper = class ConversationMapper {
 
     if (conversation_data.team_id) {
       conversation_et.team_id = conversation_data.team_id; // data from IndexedDB
-    } else {
+    } else if (conversation_data.team) {
       conversation_et.team_id = conversation_data.team; // data from backend
     }
 
