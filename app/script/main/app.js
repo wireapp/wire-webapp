@@ -85,7 +85,7 @@ z.main.App = class App {
       repositories.giphy,
       repositories.cryptography,
       repositories.links,
-      repositories.team,
+      repositories.team
     );
 
     repositories.bot                 = new z.bot.BotRepository(this.service.bot, repositories.conversation);
