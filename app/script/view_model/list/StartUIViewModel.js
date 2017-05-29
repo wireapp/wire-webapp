@@ -149,7 +149,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       return this.search_results.groups().length || this.search_results.contacts().length || this.search_results.others().length;
     });
 
-    this.show_connections = ko.pureComputed(() => !this.show_suggestions());
+    this.show_connections = ko.pureComputed(() => this.is_personal_space() && !this.show_suggestions());
 
     this.show_invite = ko.pureComputed(() => {
       const no_connections_and_suggestions = !this.show_search_results() && !this.connections().length && !this.show_suggestions();
