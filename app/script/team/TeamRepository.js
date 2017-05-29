@@ -124,7 +124,6 @@ z.team.TeamRepository = class TeamRepository {
     switch (type.split('.')[1]) {
       case 'conversation-create':
         this.logger.info('A conversation was created.');
-        z.conversation.ConversationRepository.update_conversations();
         break;
       case 'conversation-delete':
         this.logger.info('A conversation was deleted.');
