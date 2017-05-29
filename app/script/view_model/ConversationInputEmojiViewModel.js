@@ -340,8 +340,9 @@ z.ViewModel.ConversationInputEmojiViewModel = class ConversationInputEmojiViewMo
   _enter_emoji(input, emoji_icon) {
     const text_before_emoji = input.value.substr(0, this.emoji_start_pos - 1);
     const text_after_emoji = input.value.substr(input.selectionStart);
+    const new_cursor_pos = text_before_emoji.length + emoji_icon.length;
     input.value = `${text_before_emoji}${emoji_icon}${text_after_emoji}`;
-    input.setSelectionRange(this.emoji_start_pos, this.emoji_start_pos);
+    input.setSelectionRange(new_cursor_pos, new_cursor_pos);
     this.remove_emoji_popup();
     $(input).change();
     $(input).focus();
