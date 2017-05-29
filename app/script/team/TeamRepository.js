@@ -174,7 +174,7 @@ z.team.TeamRepository = class TeamRepository {
    */
   set_active_team(team_et) {
     if (team_et) {
-      this.active_team(team_et);
+      return this.active_team(team_et);
     }
     throw new TypeError('Missing team entity');
   }
