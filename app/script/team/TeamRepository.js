@@ -33,6 +33,8 @@ z.team.TeamRepository = class TeamRepository {
     this.personal_space = new z.team.TeamEntity();
     this.teams = ko.observableArray([]);
 
+    this.active_team = ko.observable(this.personal_space);
+
     this.known_team_ids = ko.pureComputed(() => this.teams().map((team_et) => team_et.id));
 
     amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
@@ -141,7 +143,9 @@ z.team.TeamRepository = class TeamRepository {
       case z.event.Backend.TEAM.DELETE:
         this.logger.info('A team was deleted.');
         this.teams.remove((team) => team.id === team_id);
-        amplify.publish(z.event.WebApp.TEAM.DELETE_TEAM, team_id);
+        if (this.active_team().id === team_id) {
+          this.set_active_team(this.personal_space);
+        }
         break;
       case z.event.Backend.TEAM.MEMBER_JOIN:
         this.logger.info('A member joined the team.');
@@ -161,6 +165,18 @@ z.team.TeamRepository = class TeamRepository {
       default:
         this.logger.info('An unknown team event happened.', event_json);
     }
+  }
+
+  /**
+   * Set active team entity.
+   * @param {TeamEntity} team_et - only conversations that are related to this team are visible
+   * @returns {undefined} No return value
+   */
+  set_active_team(team_et) {
+    if (team_et) {
+      this.active_team(team_et);
+    }
+    throw new TypeError('Missing team entity');
   }
 
   update_team() {

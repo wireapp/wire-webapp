@@ -32,7 +32,6 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
     this.self = this.user_repository.self;
 
     this.personal_space = this.team_repository.personal_space;
-    this.conversation_repository.set_active_team(this.personal_space);
 
     this.active_team = this.conversation_repository.active_team;
     this.show_badge = ko.observable(false);
@@ -48,11 +47,11 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
   }
 
   click_on_personal() {
-    this.conversation_repository.set_active_team(this.personal_space);
+    this.team_repository.set_active_team(this.personal_space);
   }
 
   click_on_team(team_et) {
-    this.conversation_repository.set_active_team(team_et);
+    this.team_repository.set_active_team(team_et);
   }
 
   click_on_preferences_button() {

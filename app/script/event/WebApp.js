@@ -215,7 +215,6 @@ z.event.WebApp = {
     SHOW: 'wire.webapp.takeover.show',
   },
   TEAM: {
-    DELETE_TEAM: 'wire.webapp.team.delete_team',
     EVENT_FROM_BACKEND: 'wire.webapp.team.event_from_backend',
   },
   TELEMETRY: {

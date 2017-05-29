@@ -52,7 +52,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
 
-    this.active_team = ko.observable();
+    this.active_team = this.team_repository.active_team;
 
     this.block_event_handling = true;
     this.fetching_conversations = {};
@@ -167,12 +167,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then((response) => {
         return this._on_create({conversation: response.id, data: response});
       });
-  }
-
-  delete_team(team_id) {
-    if (this.active_team().id === team_id) {
-      this.set_active_team(this.team_repository.personal_space);
-    }
   }
 
   /**
@@ -812,17 +806,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
       });
   }
 
-  /**
-   * Set active team entity.
-   * @param {TeamEntity} team_et - only conversations that are related to this team are visible
-   * @returns {undefined} No return value
-   */
-  set_active_team(team_et) {
-    if (team_et == null) {
-      throw new TypeError('Missing team entity');
-    }
-    this.active_team(team_et);
-  }
 
   //##############################################################################
   // Send events
