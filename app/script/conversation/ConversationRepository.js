@@ -115,7 +115,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const {team_id} = conversation_et;
 
         const is_team_conversation = team_id === active_team_id;
-        const is_guest_conversation = !active_team_id && team_id && !this.team_repository.known_team_ids().includes(team_id);
+        const is_guest_conversation = conversation_et.is_guest;
 
         if (is_team_conversation || is_guest_conversation) {
           if (conversation_et.has_active_call()) {
@@ -714,11 +714,20 @@ z.conversation.ConversationRepository = class ConversationRepository {
   }
 
   map_conversations(payload) {
+    const is_guest_mapping = (conversation_et) => {
+      const team_id = conversation_et.team_id;
+      conversation_et.is_guest = !!(team_id && !this.team_repository.known_team_ids().includes(team_id));
+    };
+
     if (payload.length) {
-      return this.conversation_mapper.map_conversations(payload);
+      const conversation_ets = this.conversation_mapper.map_conversations(payload);
+      conversation_ets.forEach(is_guest_mapping);
+      return conversation_ets;
     }
 
-    return this.conversation_mapper.map_conversation(payload);
+    const conversation_et = this.conversation_mapper.map_conversation(payload);
+    is_guest_mapping(conversation_et);
+    return conversation_et;
   }
 
   /**

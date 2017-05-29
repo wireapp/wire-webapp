@@ -47,6 +47,7 @@ z.entity.Conversation = class Conversation {
     this.number_of_participants = ko.pureComputed(() => this.participating_user_ids().length);
 
     this.is_group = ko.pureComputed(() => this.type() === z.conversation.ConversationType.REGULAR);
+    this.is_guest = false;
     this.is_managed = false;
     this.is_one2one = ko.pureComputed(() => this.type() === z.conversation.ConversationType.ONE2ONE);
     this.is_request = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
@@ -603,6 +604,7 @@ z.entity.Conversation = class Conversation {
       cleared_timestamp: this.cleared_timestamp(),
       ephemeral_timer: this.ephemeral_timer(),
       id: this.id,
+      is_guest: this.is_guest,
       is_managed: this.is_managed,
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
