@@ -184,7 +184,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this.conversation_service.get_conversation_by_id(conversation_id)
       .then((response) => {
-        const conversation_et = this.conversation_mapper.map_conversation(response);
+        const conversation_et = this.map_conversations(response);
 
         this.logger.info(`Fetched conversation '${conversation_id}' from backend`);
         this.save_conversation(conversation_et);
@@ -225,7 +225,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           });
       })
       .then((conversations) => {
-        this.save_conversations(this.conversation_mapper.map_conversations(conversations));
+        this.save_conversations(this.map_conversations(conversations));
         amplify.publish(z.event.WebApp.CONVERSATION.LOADED_STATES);
         return this.conversations();
       });
@@ -711,6 +711,14 @@ z.conversation.ConversationRepository = class ConversationRepository {
   map_connections(connection_ets) {
     this.logger.info(`Mapping '${connection_ets.length}' user connection(s) to conversations`, connection_ets);
     return Promise.all(connection_ets.map((connection_et) => this.map_connection(connection_et)));
+  }
+
+  map_conversations(payload) {
+    if (payload.length) {
+      return this.conversation_mapper.map_conversations(payload);
+    }
+
+    return this.conversation_mapper.map_conversation(payload);
   }
 
   /**
@@ -2455,7 +2463,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
 
-        return this.update_participating_user_ets(this.conversation_mapper.map_conversation(event_json))
+        return this.update_participating_user_ets(this.map_conversations(event_json))
           .then((conversation_et) => {
             return this.save_conversation(conversation_et);
           })
