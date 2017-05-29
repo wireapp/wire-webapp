@@ -33,6 +33,8 @@ z.team.TeamRepository = class TeamRepository {
     this.personal_space = new z.team.TeamEntity();
     this.teams = ko.observableArray([]);
 
+    this.known_team_ids = ko.pureComputed(() => this.teams().map((team_et) => team_et.id));
+
     amplify.subscribe(z.event.WebApp.TEAM.EVENT_FROM_BACKEND, this.on_team_event.bind(this));
   }
 

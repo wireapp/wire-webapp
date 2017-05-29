@@ -33,14 +33,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {CryptographyRepository} cryptography_repository - Repository for all cryptography interactions
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
+   * @param {TeamRepository} team_repository - Repository for teams
    */
-  constructor(conversation_service, asset_service, user_repository, giphy_repository, cryptography_repository, link_repository) {
+  constructor(conversation_service, asset_service, user_repository, giphy_repository, cryptography_repository, link_repository, team_repository) {
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
     this.user_repository = user_repository;
     this.giphy_repository = giphy_repository;
     this.cryptography_repository = cryptography_repository;
     this.link_repository = link_repository;
+    this.team_repository = team_repository;
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
     this.conversation_mapper = new z.conversation.ConversationMapper();
@@ -109,17 +111,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const unarchived = [];
 
       this.sorted_conversations().forEach((conversation_et) => {
-        if (conversation_et.team_id !== this.active_team().id) {
-          return;
-        }
-        if (conversation_et.has_active_call()) {
-          calls.push(conversation_et);
-        } else if (conversation_et.is_cleared()) {
-          cleared.push(conversation_et);
-        } else if (conversation_et.is_archived()) {
-          archived.push(conversation_et);
-        } else {
-          unarchived.push(conversation_et);
+        const {team_id} = conversation_et;
+        const active_team_id = this.active_team().id;
+
+        const is_team_conversation = team_id === active_team_id;
+        const is_guest_conversation = !active_team_id && team_id && !this.team_repository.known_team_ids().includes(team_id);
+
+        if (is_team_conversation || is_guest_conversation) {
+          if (conversation_et.has_active_call()) {
+            calls.push(conversation_et);
+          } else if (conversation_et.is_cleared()) {
+            cleared.push(conversation_et);
+          } else if (conversation_et.is_archived()) {
+            archived.push(conversation_et);
+          } else {
+            unarchived.push(conversation_et);
+          }
         }
       });
 
