@@ -29,7 +29,7 @@
             <!-- /ko -->
           </div>
           <div class="participants-group-footer">
-            <!-- ko if: conversation().removed_from_conversation() == false -->
+            <!-- ko if: conversation().removed_from_conversation() == false && conversation().is_guest == false -->
               <div class="button-icon pull-left" data-bind="click: add_people, attr:{'title': add_people_tooltip}" data-uie-name="do-add-people">
                 <div class="button-icon icon-people-add"></div>
                 <label data-bind="l10n_text: z.string.people_button_add"></label>
