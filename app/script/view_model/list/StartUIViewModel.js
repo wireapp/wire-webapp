@@ -122,7 +122,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     // Results
     this.top_users = ko.observableArray([]);
     this.suggestions = ko.observableArray([]);
-    this.connections = ko.observableArray([]);
+    this.connections = ko.pureComputed(() => {
+      return this.user_repository.users()
+        .filter((user_et) => user_et.is_connected())
+        .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
+    });
     this.team_members = ko.observableArray([]);
 
     this.search_results = {
@@ -298,15 +302,14 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   _show_on_boarding_results(response) {
     return this.search_repository.show_on_boarding(response)
       .then(({connections, suggestions}) => {
-        this.connections(connections);
-        this.suggestions(suggestions);
+        this.suggestions(suggestions.length ? suggestions : connections);
         return this.get_top_people();
       })
       .then((user_ets) => {
         this.top_users(user_ets);
         this.selected_people.removeAll();
 
-        if (!this.suggestions().length && !this.connections().length) {
+        if (!this.suggestions().length) {
           if (this.top_users().length) {
             return this.suggestions(this.top_users());
           }
@@ -332,7 +335,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   update_list() {
     this.get_top_people().then((user_ets) => this.top_users(user_ets));
-    this.get_connections().then((user_ets) => this.connections(user_ets));
 
     this.show_spinner(false);
 
@@ -458,14 +460,6 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       .then((user_ets) => user_ets.filter((user_et) => !user_et.is_blocked()));
   }
 
-  get_connections() {
-    return Promise.resolve()
-      .then(() => {
-        return this.user_repository.users()
-          .filter((user_et) => user_et.is_connected())
-          .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
-      });
-  }
 
   //##############################################################################
   // User bubble
