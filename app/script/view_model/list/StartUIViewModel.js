@@ -175,13 +175,9 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
       }
     });
 
-    this.show_team_member = ko.pureComputed(() => {
-      return !this.is_personal_space() && this.team_members().length;
-    });
+    this.show_team_member = ko.pureComputed(() => !this.is_personal_space() && this.team_members().length);
 
-    this.show_top_people = ko.pureComputed(() => {
-      return this.is_personal_space() && this.top_users().length;
-    });
+    this.show_top_people = ko.pureComputed(() => this.is_personal_space() && this.top_users().length);
 
     // Invite bubble states
     this.show_invite_form = ko.observable(true);
