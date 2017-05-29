@@ -686,10 +686,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         this.update_participating_user_ets(conversation_et)
-          .then(function(updated_conversation_et) {
+          .then((updated_conversation_et) => {
             if (show_conversation) {
               amplify.publish(z.event.WebApp.CONVERSATION.SHOW, updated_conversation_et);
             }
+
+            this.conversations.notifySubscribers();
           });
 
         return conversation_et;
