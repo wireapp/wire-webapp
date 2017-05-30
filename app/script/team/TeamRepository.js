@@ -197,6 +197,7 @@ z.team.TeamRepository = class TeamRepository {
 
   _add_user_to_team(user_et, team_et) {
     const members = team_et.members;
+
     if (members().filter((member) => member.id === user_et.id).length < 1) {
       members.push(user_et);
     }
@@ -210,9 +211,7 @@ z.team.TeamRepository = class TeamRepository {
     const team_id = event_json.team;
 
     this.get_team(team_id)
-      .then((team_et) => {
-        this._add_team(team_et);
-      })
+      .then((team_et) => this._add_team(team_et))
       .catch((error) => this.logger.error(`Failed to handle the created team: ${error.message}`, error));
   }
 
@@ -231,9 +230,8 @@ z.team.TeamRepository = class TeamRepository {
     this.get_team(team_id)
       .then((team_et) => {
         if (this.user_repository.self().id !== user_id) {
-          this.user_repository.get_users_by_id([user_id]).then(([user_et]) => {
-            this._add_user_to_team(user_et, team_et);
-          });
+          this.user_repository.get_users_by_id([user_id])
+            .then(([user_et]) => this._add_user_to_team(user_et, team_et));
         } else {
           this._add_team(team_et);
         }
@@ -276,11 +274,7 @@ z.team.TeamRepository = class TeamRepository {
 
   _update_teams(team_ets) {
     return Promise.resolve()
-      .then(() => {
-        z.util.ko_array_push_all(this.teams, team_ets);
-      })
-      .then(() => {
-        return team_ets;
-      });
+      .then(() => z.util.ko_array_push_all(this.teams, team_ets))
+      .then(() => team_ets);
   }
 };
