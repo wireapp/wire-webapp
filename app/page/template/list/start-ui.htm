@@ -35,7 +35,7 @@
           <!-- ko if: show_team_member() && team_members().length -->
             <div class="start-ui-list-team-member">
               <span class="start-ui-list-header start-ui-list-header-team-member" data-uie-name="status-team-members" data-bind="l10n_text: z.string.search_team_members"></span>
-              <user-list class="search-list-theme-black" params="user: team_members, mode: z.components.UserListMode.INFO, selected: selected_people"></user-list>
+              <user-list class="search-list-theme-black" params="user: team_members, mode: z.components.UserListMode.TEAM_MEMBERS, selected: selected_people"></user-list>
             </div>
           <!-- /ko  -->
           <!-- ko if: show_top_people() && top_users().length -->
@@ -63,7 +63,7 @@
             <!-- ko ifnot: is_personal_space() -->
               <div class="team_members" data-bind="visible: search_results.team_members().length > 0">
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_team_members"></span>
-                <user-list class="search-list-theme-black" params="user: search_results.team_members, selected: selected_people, mode: z.components.UserListMode.INFO"></user-list>
+                <user-list class="search-list-theme-black" params="user: search_results.team_members, selected: selected_people, mode: z.components.UserListMode.TEAM_MEMBERS"></user-list>
               </div>
               <div class="start-ui-team-groups" data-bind="visible: search_results.groups().length > 0">
                 <span class="start-ui-list-header" data-bind="l10n_text: z.string.search_team_groups"></span>
