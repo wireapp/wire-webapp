@@ -22,7 +22,7 @@
 // grunt test_init && grunt test_run:view_model/WindowTitleViewModel
 
 describe('z.ViewModel.WindowTitleViewModel', function() {
-  const suffix = z.localization.Localizer.get_text(z.string.wire);
+  const suffix = z.l10n.text(z.string.wire);
   const test_factory = new TestFactory();
   let title_view_model = undefined;
 
@@ -185,7 +185,7 @@ describe('z.ViewModel.WindowTitleViewModel', function() {
       // Test one connect request message
       title_view_model.user_repository.users.push(user_et);
 
-      let message = z.localization.Localizer.get_text(z.string.conversations_connection_request_one);
+      let message = z.l10n.text(z.string.conversations_connection_request_one);
       let waiting_people = title_view_model.user_repository.connect_requests().length;
 
       let expected_title = `(${waiting_people}) · ${message} · ${suffix}`;

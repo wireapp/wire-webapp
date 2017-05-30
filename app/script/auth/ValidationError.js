@@ -31,6 +31,6 @@ z.auth.ValidationError = class ValidationError extends Error {
     }
 
     this.types = types;
-    this.message = z.localization.Localizer.get_text(string_identifier);
+    this.message = z.l10n.text(string_identifier);
   }
 };

@@ -46,9 +46,9 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
 
     this.link = ko.pureComputed(() => {
       if (this.error_code === Proteus.errors.DecodeError.CODE.CASE_204) {
-        return z.localization.Localizer.get_text(z.string.url_decrypt_error_2);
+        return z.l10n.text(z.string.url_decrypt_error_2);
       }
-      return z.localization.Localizer.get_text(z.string.url_decrypt_error_1);
+      return z.l10n.text(z.string.url_decrypt_error_1);
     });
 
     this.is_recoverable = ko.pureComputed(() => {
@@ -61,7 +61,7 @@ z.entity.DecryptErrorMessage = class DecryptErrorMessage extends z.entity.Messag
       const parts = [];
 
       if (this.error_code) {
-        const error_text = z.localization.Localizer.get_text(z.string.conversation_unable_to_decrypt_error_message);
+        const error_text = z.l10n.text(z.string.conversation_unable_to_decrypt_error_message);
         parts.push(`${error_text}: <span class='label-bold-xs'>${this.error_code}</span>`);
       }
 

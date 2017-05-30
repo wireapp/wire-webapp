@@ -196,7 +196,7 @@ z.entity.Conversation = class Conversation {
         }
 
         if (this.participating_user_ids().length === 0) {
-          return z.localization.Localizer.get_text(z.string.conversations_empty_conversation);
+          return z.l10n.text(z.string.conversations_empty_conversation);
         }
 
         return '…';

@@ -658,11 +658,11 @@ z.util.get_unix_timestamp = function() {
 z.util.get_first_name = function(user_et, declension = z.string.Declension.NOMINATIVE) {
   if (user_et.is_me) {
     if (declension === z.string.Declension.NOMINATIVE) {
-      return z.localization.Localizer.get_text(z.string.conversation_you_nominative);
+      return z.l10n.text(z.string.conversation_you_nominative);
     } else if (declension === z.string.Declension.DATIVE) {
-      return z.localization.Localizer.get_text(z.string.conversation_you_dative);
+      return z.l10n.text(z.string.conversation_you_dative);
     } else if (declension === z.string.Declension.ACCUSATIVE) {
-      return z.localization.Localizer.get_text(z.string.conversation_you_accusative);
+      return z.l10n.text(z.string.conversation_you_accusative);
     }
   }
   return user_et.first_name();
@@ -712,21 +712,21 @@ z.util.format_time_remaining = function(time_remaining) {
 
   let title = '';
   if (moment_duration.asHours() === 1) {
-    title += `${moment_duration.hours()} ${z.localization.Localizer.get_text(z.string.ephememal_units_hour)}, `;
+    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememal_units_hour)}, `;
   } else if (moment_duration.asHours() > 1) {
-    title += `${moment_duration.hours()} ${z.localization.Localizer.get_text(z.string.ephememal_units_hours)}, `;
+    title += `${moment_duration.hours()} ${z.l10n.text(z.string.ephememal_units_hours)}, `;
   }
 
   if (moment_duration.asMinutes() === 1) {
-    title += `${moment_duration.minutes()} ${z.localization.Localizer.get_text(z.string.ephememal_units_minute)} ${z.localization.Localizer.get_text(z.string.and)} `;
+    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememal_units_minute)} ${z.l10n.text(z.string.and)} `;
   } else if (moment_duration.asMinutes() > 1) {
-    title += `${moment_duration.minutes()} ${z.localization.Localizer.get_text(z.string.ephememal_units_minutes)} ${z.localization.Localizer.get_text(z.string.and)} `;
+    title += `${moment_duration.minutes()} ${z.l10n.text(z.string.ephememal_units_minutes)} ${z.l10n.text(z.string.and)} `;
   }
 
   if (moment_duration.asSeconds() === 1) {
-    title += `${moment_duration.seconds()} ${z.localization.Localizer.get_text(z.string.ephememal_units_second)}`;
+    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememal_units_second)}`;
   } else if (moment_duration.asSeconds() > 1) {
-    title += `${moment_duration.seconds()} ${z.localization.Localizer.get_text(z.string.ephememal_units_seconds)}`;
+    title += `${moment_duration.seconds()} ${z.l10n.text(z.string.ephememal_units_seconds)}`;
   }
 
   return title || '';
