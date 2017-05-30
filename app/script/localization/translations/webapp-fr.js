@@ -281,6 +281,7 @@ z.string.fr.conversations_secondary_line_pings = '{{number}} pings';
 z.string.fr.conversations_secondary_line_person_left = '{{number}} personne est partie';
 z.string.fr.conversations_secondary_line_people_left = '{{number}} personnes sont parties';
 z.string.fr.conversations_secondary_line_person_added = '{{user1}} a ajouté {{user2}}';
+z.string.fr.conversations_secondary_line_people_added = '{{user}} ont été ajoutés';
 z.string.fr.conversations_secondary_line_timed_message = 'Message éphémère';
 
 z.string.fr.takeover_headline = 'Les identifiants sont disponibles.';

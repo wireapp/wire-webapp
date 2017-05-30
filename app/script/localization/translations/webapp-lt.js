@@ -281,7 +281,9 @@ z.string.lt.conversations_secondary_line_pings = '{{number}} ryšio tikrinimų';
 z.string.lt.conversations_secondary_line_person_left = '{{number}} asmuo išėjo';
 z.string.lt.conversations_secondary_line_people_left = '{{number}} žmonių išėjo';
 z.string.lt.conversations_secondary_line_person_added = '{{user1}} pridėjo {{user2}}';
+z.string.lt.conversations_secondary_line_people_added = 'Buvo pridėta {{user}} žmonių';
 z.string.lt.conversations_secondary_line_timed_message = 'Laikina žinutė';
+z.string.lt.conversations_secondary_line_renamed = '{{user}} pervadino';
 
 z.string.lt.takeover_headline = 'Naudotojo vardai jau čia.';
 z.string.lt.takeover_sub = 'Užsirezervuokite savo unikalų Wire vardą.';

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2016 Wire Swiss GmbH
+ * Copyright (C) 2017 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,18 @@
  *
  */
 
-.app {
-  .font-antialiasing;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  min-width: @screen-md-min;
-  background-color: @app-bg;
+'use strict';
 
-  .left {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    color: @left-color;
-    width: @left-width + @teams-width;
-  }
+window.z = window.z || {};
+window.z.team = z.team || {};
 
-  .right {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: @left-width + @teams-width;
+z.team.TeamEntity = class TeamEntity {
+  constructor(id) {
+    this.creator = undefined;
+    this.icon = '';
+    this.icon_key = undefined;
+    this.members = ko.observableArray([]);
+    this.id = id;
+    this.name = ko.observable('');
   }
-}
+};

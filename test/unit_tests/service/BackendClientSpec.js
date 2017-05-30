@@ -210,7 +210,7 @@ describe('z.service.BackendClient', function() {
         done();
       });
 
-      backend_client.send_json(original_config).catch(done.fail);
+      backend_client.send_json(original_config);
     });
   });
 });
