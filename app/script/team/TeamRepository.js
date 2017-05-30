@@ -243,7 +243,7 @@ z.team.TeamRepository = class TeamRepository {
         }
       })
       .catch((error) => {
-        this.logger.error(`Failed to handle the created team: ${error.message}`, error)
+        this.logger.error(`Failed to handle the created team: ${error.message}`, error);
         throw error;
       });
   }
@@ -273,7 +273,7 @@ z.team.TeamRepository = class TeamRepository {
         this._add_team(team_et);
       })
       .catch((error) => {
-        this.logger.error(`Failed to handle the updated team: ${error.message}`, error)
+        this.logger.error(`Failed to handle the updated team: ${error.message}`, error);
         throw error;
       });
   }
