@@ -429,26 +429,6 @@ window.TestFactory.prototype.exposeSystemNotificationActors = function() {
 
 /**
  *
- * @returns {Promise<z.team.TeamRepository>} The team repository.
- */
-window.TestFactory.prototype.exposeTeamActors = function() {
-  this.logger.info('- exposeTeamActors');
-  return Promise.resolve()
-    .then(() => {
-      this.logger.info('✓ exposedTeamActors');
-
-      TestFactory.team_service = new z.team.TeamService(this.client);
-      TestFactory.team_service.logger.level = this.settings.logging_level;
-
-      TestFactory.team_repository = new z.team.TeamRepository(TestFactory.team_service);
-      TestFactory.team_repository.logger.level = this.settings.logging_level;
-
-      return TestFactory.team_repository;
-    });
-};
-
-/**
- *
  * @returns {Promise<z.tracking.EventTrackingRepository>} The event tracking repository.
  */
 window.TestFactory.prototype.exposeTrackingActors = function() {
