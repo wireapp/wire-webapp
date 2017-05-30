@@ -155,11 +155,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (team_et) {
       if (team_et.id !== this.active_team().id) {
         this.active_team(team_et);
-
-        const conversation_et = this.get_most_recent_conversation();
-        if (conversation_et) {
-          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
-        }
+        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.get_most_recent_conversation());
       }
     } else {
       throw new TypeError('Missing team entity');
