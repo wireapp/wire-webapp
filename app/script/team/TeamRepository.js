@@ -95,9 +95,8 @@ z.team.TeamRepository = class TeamRepository {
   get_team_from_backend(team_id) {
     return this.team_service.get_team_metadata(team_id)
       .then((team_metadata) => {
-        if (Object.keys(team_metadata).length) {
-          const [new_team_ets] = this.team_mapper.map_team_from_object(team_metadata);
-          return new_team_ets;
+        if (team_metadata) {
+          return this.team_mapper.map_team_from_object(team_metadata);
         }
       })
       .catch((error) => {
