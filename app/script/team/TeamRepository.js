@@ -84,22 +84,21 @@ z.team.TeamRepository = class TeamRepository {
       });
   }
 
-  get_team(team_id, team_ets = []) {
+  get_team_by_id(team_id) {
     const [team_local] = this.teams().filter((team_et) => team_et.id === team_id);
     if (team_local) {
       return Promise.resolve(team_local);
     }
-    return this.get_team_remotely(team_id, team_ets);
+    return this.get_team_from_backend(team_id);
   }
 
-  get_team_remotely(team_id, team_ets = []) {
+  get_team_from_backend(team_id) {
     return this.team_service.get_team_metadata(team_id)
       .then((team_metadata) => {
         if (Object.keys(team_metadata).length) {
-          const new_team_ets = this.team_mapper.map_team_from_object(team_metadata);
-          team_ets = team_ets.concat(new_team_ets);
+          const [new_team_ets] = this.team_mapper.map_team_from_object(team_metadata);
+          return new_team_ets;
         }
-        return team_ets[0];
       })
       .catch((error) => {
         this.logger.error(`Failed to retrieve metadata from backend: ${error.message}`, error);
@@ -107,14 +106,12 @@ z.team.TeamRepository = class TeamRepository {
       });
   }
 
-  get_team_members(team_id, team_members_ets = []) {
+  get_team_members(team_id) {
     return this.team_service.get_team_members(team_id)
       .then(({members}) => {
         if (members.length) {
-          const new_team_members_ets = this.team_mapper.map_member_from_array(members);
-          team_members_ets = team_members_ets.concat(new_team_members_ets);
+          return this.team_mapper.map_member_from_array(members);
         }
-        return team_members_ets;
       })
       .catch((error) => {
         this.logger.error(`Failed to retrieve members from backend: ${error.message}`, error);
@@ -190,7 +187,7 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   _add_team(team_et) {
-    if (this.teams().filter((team) => team.id === team_et.id).length < 1) {
+    if (!this.teams().filter((team) => team.id === team_et.id).length) {
       this.teams.push(team_et);
     }
   }
@@ -198,7 +195,7 @@ z.team.TeamRepository = class TeamRepository {
   _add_user_to_team(user_et, team_et) {
     const members = team_et.members;
 
-    if (members().filter((member) => member.id === user_et.id).length < 1) {
+    if (!members().filter((member) => member.id === user_et.id).length) {
       members.push(user_et);
     }
   }
@@ -210,7 +207,7 @@ z.team.TeamRepository = class TeamRepository {
   _on_create(event_json) {
     const team_id = event_json.team;
 
-    this.get_team(team_id)
+    this.get_team_by_id(team_id)
       .then((team_et) => this._add_team(team_et))
       .catch((error) => this.logger.error(`Failed to handle the created team: ${error.message}`, error));
   }
@@ -227,7 +224,7 @@ z.team.TeamRepository = class TeamRepository {
   _on_member_join(event_json) {
     const {data: {user: user_id}, team: team_id} = event_json;
 
-    this.get_team(team_id)
+    this.get_team_by_id(team_id)
       .then((team_et) => {
         if (this.user_repository.self().id !== user_id) {
           this.user_repository.get_users_by_id([user_id])
@@ -254,14 +251,14 @@ z.team.TeamRepository = class TeamRepository {
     if (this.user_repository.self().id !== user_id) {
       team_of_user.members.remove((member) => member.id === user_id);
     } else {
-      this.teams.remove((team_obj) => team_obj.id === team_id);
+      this._on_delete({team: team_id});
     }
   }
 
   _on_update(event_json) {
     const team_id = event_json.team;
 
-    this.get_team_remotely(team_id)
+    this.get_team_from_backend(team_id)
       .then((team_et) => {
         this.teams.remove((team_obj) => team_obj.id === team_id);
         this._add_team(team_et);
