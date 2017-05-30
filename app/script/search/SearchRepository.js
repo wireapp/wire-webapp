@@ -52,9 +52,10 @@ z.search.SearchRepository = class SearchRepository {
    * Search for users on the backend by name.
    * @param {string} name - Search query
    * @param {boolean} is_username - Is query a username
+   * @param {number} [max_results=10] - Maximum number of results
    * @returns {Promise} Resolves with the search results
    */
-  search_by_name(name, is_username) {
+  search_by_name(name, is_username, max_results = 10) {
     return this.search_service.get_contacts(name, 30)
       .then(({documents: matches}) => this.search_result_mapper.map_results(matches, z.search.SEARCH_MODE.CONTACTS))
       .then(({results, mode}) => this._prepare_search_result(results, mode))
@@ -70,7 +71,7 @@ z.search.SearchRepository = class SearchRepository {
             }
             return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), name);
           })
-          .slice(0, 10);
+          .slice(0, max_results);
       });
   }
 

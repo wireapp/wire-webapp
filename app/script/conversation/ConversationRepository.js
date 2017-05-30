@@ -592,16 +592,17 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   get_one_to_one_conversation(user_et, team_id = this.active_team().id) {
     for (const conversation_et of this.conversations()) {
+      const with_expected_user = user_et.id === conversation_et.participating_user_ids()[0];
+
       if (team_id) {
-        if (conversation_et.type() === z.conversation.ConversationType.REGULAR) {
-          if (user_et.id === conversation_et.participating_user_ids()[0] && team_id === conversation_et.team_id) {
-            return Promise.resolve(conversation_et);
-          }
-        }
-      } else if ([z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.CONNECT].includes(conversation_et.type())) {
-        if (user_et.id === conversation_et.participating_user_ids()[0]) {
+        const with_one_participant = conversation_et.participating_user_ids().length === 1;
+        const is_in_active_team = team_id === conversation_et.team_id;
+
+        if (conversation_et.is_group() && with_one_participant && with_expected_user && is_in_active_team) {
           return Promise.resolve(conversation_et);
         }
+      } else if (with_expected_user && (conversation_et.is_one2one() || conversation_et.is_request())) {
+        return Promise.resolve(conversation_et);
       }
     }
 
