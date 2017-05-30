@@ -56,6 +56,8 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.properties_repository = properties_repository;
     this.logger = new z.util.Logger('z.ViewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS);
 
+    this.submitted_search = false;
+
     this.search = _.debounce((query) => {
       this.clear_search_results();
 
@@ -620,16 +622,23 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
   //##############################################################################
 
   on_submit_search() {
-    if (!this.selected_people().length) {
+    if (!this.selected_people().length || this.submitted_search) {
       return Promise.resolve();
     }
+
+    this.submitted_search = true;
 
     if (this.selected_people().length === 1) {
       return this.conversation_repository.get_one_to_one_conversation(this.selected_people()[0])
         .then((conversation_et) => {
           amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, {source: 'top_user'});
           this.click_on_group(conversation_et);
+          this.submitted_search = false;
           return conversation_et;
+        })
+        .catch((error) => {
+          this.submitted_search = false;
+          throw error;
         });
     }
 
@@ -644,9 +653,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
             numberOfParticipants: user_ids.length,
           });
           this.click_on_group(conversation_et);
+          this.submitted_search = false;
           return conversation_et;
         })
         .catch((error) => {
+          this.submitted_search = false;
           this._close_list();
           throw new Error(`Unable to create conversation: ${error.message}`);
         });
