@@ -29,11 +29,13 @@
             <!-- /ko -->
           </div>
           <div class="participants-group-footer">
-            <!-- ko if: conversation().removed_from_conversation() == false && conversation().is_guest == false -->
-              <div class="button-icon pull-left" data-bind="click: add_people, attr:{'title': add_people_tooltip}" data-uie-name="do-add-people">
-                <div class="button-icon icon-people-add"></div>
-                <label data-bind="l10n_text: z.string.people_button_add"></label>
-              </div>
+            <!-- ko if: conversation().removed_from_conversation() == false -->
+              <!-- ko if: conversation().is_guest === false -->
+                <div class="button-icon pull-left" data-bind="click: add_people, attr:{'title': add_people_tooltip}" data-uie-name="do-add-people">
+                  <div class="button-icon icon-people-add"></div>
+                  <label data-bind="l10n_text: z.string.people_button_add"></label>
+                </div>
+              <!-- /ko -->
               <div class="button-icon icon-minus pull-right" data-bind="click: leave_conversation, l10n_tooltip: z.string.tooltip_people_leave" data-uie-name="do-leave"></div>
             <!-- /ko -->
           </div>
