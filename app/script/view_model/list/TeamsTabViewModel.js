@@ -28,8 +28,8 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
     this.team_repository = team_repository;
     this.conversation_repository = conversation_repository;
     this.user_repository = user_repository;
-    this.teams = this.team_repository.teams;
     this.self = this.user_repository.self;
+    this.teams = ko.pureComputed(() => this.team_repository.teams().sort((team_a, team_b) => team_a.name() > team_b.name()));
 
     this.personal_space = this.team_repository.personal_space;
 
