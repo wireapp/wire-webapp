@@ -55,10 +55,18 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
 
   click_on_personal() {
     this.team_repository.set_active_team(this.personal_space);
+
+    if (this.list_view_model.list_state() === z.ViewModel.list.LIST_STATE.PREFERENCES) {
+      this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+    }
   }
 
   click_on_team(team_et) {
     this.team_repository.set_active_team(team_et);
+
+    if (this.list_view_model.list_state() === z.ViewModel.list.LIST_STATE.PREFERENCES) {
+      this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+    }
   }
 
   click_on_preferences_button() {
