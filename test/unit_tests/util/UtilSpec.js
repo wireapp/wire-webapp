@@ -455,32 +455,32 @@ describe('z.util.get_url_parameter', function() {
 describe('z.util.forward_url_parameter', function() {
   it('forwards existing URL parameters', function() {
     z.util.get_url_parameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.CALLING_V3) {
+      if (parameter_value === z.auth.URLParameter.LOCALYTICS) {
         return true;
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.CALLING_V3)).toBe('foo.com?calling_v3=true');
+    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)).toBe('foo.com?localytics=true');
 
     z.util.get_url_parameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.CALLING_V3) {
+      if (parameter_value === z.auth.URLParameter.LOCALYTICS) {
         return false;
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.CALLING_V3)).toBe('foo.com?calling_v3=false');
+    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)).toBe('foo.com?localytics=false');
 
     z.util.get_url_parameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.CALLING_V3) {
+      if (parameter_value === z.auth.URLParameter.LOCALYTICS) {
         return 'bar';
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.CALLING_V3)).toBe('foo.com?calling_v3=bar');
+    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)).toBe('foo.com?localytics=bar');
 
     z.util.get_url_parameter = function(parameter_value) {
-      if (parameter_value === z.auth.URLParameter.CALLING_V3) {
+      if (parameter_value === z.auth.URLParameter.LOCALYTICS) {
         return null;
       }
     };
-    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.CALLING_V3)).toBe('foo.com');
+    expect(z.util.forward_url_parameter('foo.com', z.auth.URLParameter.LOCALYTICS)).toBe('foo.com');
   });
 });
 

@@ -28,14 +28,14 @@ z.calling.v3.CallCenter = class CallCenter {
   /**
    * Construct a new e-call center.
    *
-   * @param {ko.observable} calling_config - Calling configuration from backend
+   * @param {z.calling.CallingRepository} calling_repository - Repository for calling interactions
    * @param {z.client.ClientRepository} client_repository - Repository for client interactions
    * @param {z.conversation.ConversationRepository} conversation_repository - Repository for conversation interactions
    * @param {z.media.MediaRepository} media_repository - Repository for media interactions
    * @param {z.user.UserRepository} user_repository - Repository for all user and connection interactions
    */
-  constructor(calling_config, client_repository, conversation_repository, media_repository, user_repository) {
-    this.calling_config = calling_config;
+  constructor(calling_repository, client_repository, conversation_repository, media_repository, user_repository) {
+    this.calling_repository = calling_repository;
     this.client_repository = client_repository;
     this.conversation_repository = conversation_repository;
     this.media_repository = media_repository;
@@ -1052,6 +1052,18 @@ z.calling.v3.CallCenter = class CallCenter {
   //##############################################################################
   // Helper functions
   //##############################################################################
+
+  /**
+   * Get the current calling config.
+   * @returns {Promise} Resolves with calling config
+   */
+  get_config() {
+    if (this.calling_repository.calling_config) {
+      return Promise.resolve(this.calling_repository.calling_config);
+    }
+
+    return this.calling_repository.get_config();
+  }
 
   /**
    * Get an e-call entity for a given conversation ID.

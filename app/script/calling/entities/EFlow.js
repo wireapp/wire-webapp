@@ -347,14 +347,16 @@ z.calling.entities.EFlow = class EFlow {
   start_negotiation(negotiation_mode = z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT, media_stream = this.media_stream()) {
     this.logger.info(`Start negotiating PeerConnection with '${this.remote_user.name()}' triggered by '${negotiation_mode}'`);
 
-    this._create_peer_connection();
-    this._add_media_stream(media_stream);
-    this.audio.hookup(true);
-    this._set_sdp_states();
-    this.negotiation_mode(negotiation_mode);
-    this.negotiation_needed(true);
-    this.pc_initialized(true);
-    this._set_negotiation_failed_timeout();
+    this._create_peer_connection()
+      .then(() => {
+        this._add_media_stream(media_stream);
+        this.audio.hookup(true);
+        this._set_sdp_states();
+        this.negotiation_mode(negotiation_mode);
+        this.negotiation_needed(true);
+        this.pc_initialized(true);
+        this._set_negotiation_failed_timeout();
+      });
   }
 
   /**
@@ -419,14 +421,17 @@ z.calling.entities.EFlow = class EFlow {
   /**
    * Create the PeerConnection configuration.
    * @private
-   * @returns {RTCConfiguration} Configuration object to initialize PeerConnection
+   * @returns {Promise} Resolves with the configuration object to initialize PeerConnection
    */
   _create_peer_connection_configuration() {
-    return {
-      bundlePolicy: 'max-bundle',
-      iceServers: this.e_call_et.config().ice_servers,
-      rtcpMuxPolicy: 'require', // @deprecated Default value beginning Chrome 57
-    };
+    return this.e_call_et.v3_call_center.get_config()
+      .then((calling_config) => {
+        return {
+          bundlePolicy: 'max-bundle',
+          iceServers: calling_config.ice_servers,
+          rtcpMuxPolicy: 'require', // @deprecated Default value beginning Chrome 57
+        };
+      });
   }
 
   /**
@@ -434,23 +439,26 @@ z.calling.entities.EFlow = class EFlow {
    *
    * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCConfiguration
    * @private
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves when the PeerConnection was created
    */
   _create_peer_connection() {
-    this.peer_connection = new window.RTCPeerConnection(this._create_peer_connection_configuration());
-    this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED);
-    this.signaling_state(this.peer_connection.signalingState);
-    this.logger.debug(`PeerConnection with '${this.remote_user.name()}' created - is_answer '${this.is_answer()}'`, this.e_call_et.config().ice_servers);
+    return this._create_peer_connection_configuration()
+      .then((pc_configuration) => {
+        this.peer_connection = new window.RTCPeerConnection(pc_configuration);
+        this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.PEER_CONNECTION_CREATED);
+        this.signaling_state(this.peer_connection.signalingState);
+        this.logger.debug(`PeerConnection with '${this.remote_user.name()}' created - is_answer '${this.is_answer()}'`, pc_configuration);
 
-    this.peer_connection.onaddstream = this._on_add_stream.bind(this);
-    this.peer_connection.ontrack = this._on_track.bind(this);
-    this.peer_connection.ondatachannel = this._on_data_channel.bind(this);
-    this.peer_connection.onicecandidate = this._on_ice_candidate.bind(this);
-    this.peer_connection.oniceconnectionstatechange = this._on_ice_connection_state_change.bind(this);
-    this.peer_connection.onremovestream = this._on_remove_stream.bind(this);
-    this.peer_connection.onsignalingstatechange = this._on_signaling_state_change.bind(this);
+        this.peer_connection.onaddstream = this._on_add_stream.bind(this);
+        this.peer_connection.ontrack = this._on_track.bind(this);
+        this.peer_connection.ondatachannel = this._on_data_channel.bind(this);
+        this.peer_connection.onicecandidate = this._on_ice_candidate.bind(this);
+        this.peer_connection.oniceconnectionstatechange = this._on_ice_connection_state_change.bind(this);
+        this.peer_connection.onremovestream = this._on_remove_stream.bind(this);
+        this.peer_connection.onsignalingstatechange = this._on_signaling_state_change.bind(this);
 
-    this.telemetry.set_peer_connection(this.peer_connection);
+        this.telemetry.set_peer_connection(this.peer_connection);
+      });
   }
 
   /**

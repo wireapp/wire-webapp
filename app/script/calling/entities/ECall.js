@@ -49,7 +49,7 @@ z.calling.entities.ECall = class ECall {
     this.v3_call_center = v3_call_center;
 
     const {id: conversation_id, is_group} = conversation_et;
-    const {calling_config, media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.v3_call_center;
+    const {media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.v3_call_center;
 
     this.logger = new z.util.Logger(`z.calling.entities.ECall (${conversation_id})`, z.config.LOGGER.OPTIONS);
 
@@ -58,7 +58,6 @@ z.calling.entities.ECall = class ECall {
     this.timings = undefined;
 
     this.media_repository = media_repository;
-    this.config = calling_config;
     this.self_user = user_repository.self();
     this.self_state = self_state;
     this.telemetry = telemetry;
