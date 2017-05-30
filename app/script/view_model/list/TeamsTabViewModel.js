@@ -56,21 +56,22 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
 
   click_on_personal() {
     this.conversation_repository.set_active_team(this.personal_space);
-
-    if (this.list_view_model.list_state() === z.ViewModel.list.LIST_STATE.PREFERENCES) {
-      this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
-    }
+    this._show_team_conversations();
   }
 
   click_on_team(team_et) {
     this.conversation_repository.set_active_team(team_et);
-
-    if (this.list_view_model.list_state() === z.ViewModel.list.LIST_STATE.PREFERENCES) {
-      this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
-    }
+    this._show_team_conversations();
   }
 
   click_on_preferences_button() {
     amplify.publish(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT);
+  }
+
+  _show_team_conversations() {
+    if (this.list_view_model.list_state() === z.ViewModel.list.LIST_STATE.PREFERENCES) {
+      this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
+      amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.conversation_repository.get_most_recent_conversation());
+    }
   }
 };
