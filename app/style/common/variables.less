@@ -205,13 +205,14 @@
 // ----------------------------------------------------------------------------
 // Media queries breakpoints
 // ----------------------------------------------------------------------------
+@screen-xs:     350px;
 @screen-sm:     480px;
 @screen-md-min: 768px;
 @screen-lg-min: 1312px;
 
 // So media queries don't overlap when required, provide a maximum
-@screen-sm-max: @screen-md-min - 1;
-@screen-md-max: @screen-lg-min - 1;
+@screen-sm-max: (@screen-md-min - 1);
+@screen-md-max: (@screen-lg-min - 1);
 
 // ----------------------------------------------------------------------------
 // Warnings
