@@ -208,7 +208,7 @@ z.team.TeamRepository = class TeamRepository {
 
     const team_et = this.team_mapper.map_team_from_object(team_data);
     if (!team_et) {
-      const error_message = `Failed to handle created team: Could not map team with id ${team_data.id}`;
+      const error_message = `Failed to handle '${event_json.type}': Could not map team with id '${team_data.id}'`;
       this.logger.error(error_message);
       throw error_message;
     }
@@ -238,7 +238,7 @@ z.team.TeamRepository = class TeamRepository {
         }
       })
       .catch((error) => {
-        this.logger.error(`Failed to handle joining member: ${error.message}`, error);
+        this.logger.error(`Failed to handle '${event_json.type}': ${error.message}`, error);
         throw error;
       });
   }
@@ -248,7 +248,7 @@ z.team.TeamRepository = class TeamRepository {
     const [team_of_user] = this.teams().filter((team) => team.id === team_id);
 
     if (!team_of_user) {
-      const error_message = `Failed to handle leaving user: Could not find a team for user ${user_id}`;
+      const error_message = `Failed to handle '${event_json.type}': Could not find a team for user with id '${user_id}'`;
       this.logger.error(error_message);
       throw error_message;
     }
@@ -268,7 +268,7 @@ z.team.TeamRepository = class TeamRepository {
         this._add_team(team_et);
       })
       .catch((error) => {
-        this.logger.error(`Failed to handle the updated team: ${error.message}`, error);
+        this.logger.error(`Failed to handle '${event_json.type}': ${error.message}`, error);
         throw error;
       });
   }
