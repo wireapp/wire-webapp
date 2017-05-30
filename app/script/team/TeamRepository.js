@@ -77,10 +77,6 @@ z.team.TeamRepository = class TeamRepository {
 
         team_ets.forEach((team_et) => this.update_team_members(team_et));
         return this.teams();
-      })
-      .catch((error) => {
-        this.logger.error(`Failed to retrieve teams from backend: ${error.message}`, error);
-        throw error;
       });
   }
 
@@ -98,10 +94,6 @@ z.team.TeamRepository = class TeamRepository {
         if (team_metadata) {
           return this.team_mapper.map_team_from_object(team_metadata);
         }
-      })
-      .catch((error) => {
-        this.logger.error(`Failed to retrieve metadata from backend: ${error.message}`, error);
-        throw error;
       });
   }
 
@@ -111,10 +103,6 @@ z.team.TeamRepository = class TeamRepository {
         if (members.length) {
           return this.team_mapper.map_member_from_array(members);
         }
-      })
-      .catch((error) => {
-        this.logger.error(`Failed to retrieve members from backend: ${error.message}`, error);
-        throw error;
       });
   }
 
@@ -207,11 +195,6 @@ z.team.TeamRepository = class TeamRepository {
     const team_data = event_json.data;
 
     const team_et = this.team_mapper.map_team_from_object(team_data);
-    if (!team_et) {
-      const error_message = `Failed to handle '${event_json.type}': Could not map team with id '${team_data.id}'`;
-      this.logger.error(error_message);
-      throw error_message;
-    }
     this._add_team(team_et);
   }
 
@@ -236,10 +219,6 @@ z.team.TeamRepository = class TeamRepository {
           this.update_team_members(team_et);
           this._add_team(team_et);
         }
-      })
-      .catch((error) => {
-        this.logger.error(`Failed to handle '${event_json.type}': ${error.message}`, error);
-        throw error;
       });
   }
 
@@ -247,11 +226,6 @@ z.team.TeamRepository = class TeamRepository {
     const {data: {user: user_id}, team: team_id} = event_json;
     const [team_of_user] = this.teams().filter((team) => team.id === team_id);
 
-    if (!team_of_user) {
-      const error_message = `Failed to handle '${event_json.type}': Could not find a team for user with id '${user_id}'`;
-      this.logger.error(error_message);
-      throw error_message;
-    }
     if (this.user_repository.self().id !== user_id) {
       team_of_user.members.remove((member) => member.id === user_id);
     } else {
