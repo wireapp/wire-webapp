@@ -380,11 +380,6 @@ z.main.App = class App {
       this.logger.info(`Found bot token '${bot_name}'`);
       this.repository.bot.add_bot(bot_name);
     }
-
-    const calling_v3 = z.util.get_url_parameter(z.auth.URLParameter.CALLING_V3);
-    if (_.isBoolean(calling_v3)) {
-      return this.repository.calling.use_v3_api = calling_v3;
-    }
   }
 
   /**

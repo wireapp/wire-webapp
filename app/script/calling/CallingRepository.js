@@ -56,6 +56,8 @@ z.calling.CallingRepository = class CallingRepository {
    * @param {UserRepository} user_repository -  Repository for all user and connection interactions
    */
   constructor(call_service, calling_service, client_repository, conversation_repository, media_repository, user_repository) {
+    this.get_config = this.get_config.bind(this);
+
     this.call_service = call_service;
     this.calling_service = calling_service;
     this.client_repository = client_repository;
@@ -64,12 +66,12 @@ z.calling.CallingRepository = class CallingRepository {
     this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.calling.CallingRepository', z.config.LOGGER.OPTIONS);
 
-    this.calling_config = ko.observable();
-    this.calling_config_timeout = undefined;
+    this.calling_config = undefined;
+    this.calling_config_timeouts = [];
     this.use_v3_api = undefined;
 
     this.v2_call_center = new z.calling.v2.CallCenter(this.call_service, this.conversation_repository, this.media_repository, this.user_repository);
-    this.v3_call_center = new z.calling.v3.CallCenter(this.calling_config, this.client_repository, this.conversation_repository, this.media_repository, this.user_repository);
+    this.v3_call_center = new z.calling.v3.CallCenter(this, this.client_repository, this.conversation_repository, this.media_repository, this.user_repository);
 
     this.calls = ko.pureComputed(() => {
       return this.v2_call_center.calls().concat(this.v3_call_center.e_calls());
@@ -125,7 +127,7 @@ z.calling.CallingRepository = class CallingRepository {
 
     amplify.subscribe(z.event.WebApp.CALL.STATE.TOGGLE, this.toggle_state.bind(this));
     amplify.subscribe(z.event.WebApp.DEBUG.UPDATE_LAST_CALL_STATUS, this.store_flow_status.bind(this));
-    amplify.subscribe(z.event.WebApp.LOADED, this.initiate_config.bind(this));
+    amplify.subscribe(z.event.WebApp.LOADED, this.get_config);
     amplify.subscribe(z.util.Logger.prototype.LOG_ON_DEBUG, this.set_logging.bind(this));
   }
 
@@ -164,14 +166,6 @@ z.calling.CallingRepository = class CallingRepository {
           return z.calling.enum.PROTOCOL.VERSION_3;
         }
       });
-  }
-
-  /**
-   * Initiate calling config update.
-   * @returns {undefined} No return value
-   */
-  initiate_config() {
-    this._update_calling_config();
   }
 
   /**
@@ -251,7 +245,7 @@ z.calling.CallingRepository = class CallingRepository {
         }
 
         if (fn_name === z.calling.enum.CALL_ACTION.JOIN) {
-          return this.set_protocol_version(conversation_id);
+          return z.calling.enum.PROTOCOL.VERSION_3;
         }
       })
       .then((protocol_version) => {
@@ -379,24 +373,43 @@ z.calling.CallingRepository = class CallingRepository {
     return false;
   }
 
+
+  //##############################################################################
+  // Calling config
+  //##############################################################################
+
   /**
    * Get the calling config from the backend and store it.
    * @private
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves with the updated calling config
    */
-  _update_calling_config() {
-    this.calling_service.get_config()
+  get_config() {
+    return this.calling_service.get_config()
       .then((calling_config) => {
-        // Removed reliance on "calling_config.ttl" until further notice
-        const timeout_in_seconds = CallingRepository.CONFIG.DEFAULT_UPDATE_INTERVAL;
+        if (calling_config) {
+          this._clear_calling_config_timeouts();
+          const renewal_timeout_in_seconds = CallingRepository.CONFIG.DEFAULT_UPDATE_INTERVAL;
+          const clear_timeout_in_seconds = calling_config.ttl || renewal_timeout_in_seconds;
 
-        this.logger.info(`Updated calling configuration - next update in ${timeout_in_seconds}s`, calling_config);
-        this.calling_config(calling_config);
-        if (this.calling_config_timeout) {
-          window.clearTimeout(this.calling_config_timeout);
+          this.logger.info(`Updated calling configuration - next update in ${renewal_timeout_in_seconds}s`, calling_config);
+          this.calling_config = calling_config;
+
+          this.calling_config_timeouts.push = window.setTimeout(this.get_config, renewal_timeout_in_seconds * 1000);
+          this.calling_config_timeouts.push = window.setTimeout(this._clear_calling_config, clear_timeout_in_seconds * 1000);
+          return this.calling_config;
         }
-        this.calling_config_timeout = window.setTimeout(this._update_calling_config.bind(this), timeout_in_seconds * 1000);
       });
+  }
+
+  _clear_calling_config() {
+    this.calling_config = undefined;
+  }
+
+  _clear_calling_config_timeouts() {
+    if (this.calling_config_timeouts.length) {
+      this.calling_config_timeouts.forEach((timeout) => window.clearTimeout(timeout));
+      this.calling_config_timeouts.length = 0;
+    }
   }
 
 
