@@ -26,7 +26,7 @@ z.components.UserListMode = {
   COMPACT: 'compact',
   DEFAULT: 'default',
   INFO: 'info',
-  TEAM_MEMBERS: 'team_members'
+  TEAM_MEMBERS: 'team_members',
 };
 
 z.components.UserListViewModel = class UserListViewModel {
