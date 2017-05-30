@@ -204,11 +204,15 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   _on_create(event_json) {
-    const team_id = event_json.team;
+    const team_data = event_json.data;
 
-    this.get_team_by_id(team_id)
-      .then((team_et) => this._add_team(team_et))
-      .catch((error) => this.logger.error(`Failed to handle the created team: ${error.message}`, error));
+    const team_et = this.team_mapper.map_team_from_object(team_data);
+    if (!team_et) {
+      const error_message = `Failed to handle created team: Could not map team with id ${team_data.id}`;
+      this.logger.error(error_message);
+      throw error_message;
+    }
+    this._add_team(team_et);
   }
 
   _on_delete(event_json) {
@@ -229,11 +233,12 @@ z.team.TeamRepository = class TeamRepository {
           this.user_repository.get_users_by_id([user_id])
             .then(([user_et]) => this._add_user_to_team(user_et, team_et));
         } else {
+          this.update_team_members(team_et);
           this._add_team(team_et);
         }
       })
       .catch((error) => {
-        this.logger.error(`Failed to handle the created team: ${error.message}`, error);
+        this.logger.error(`Failed to handle joining member: ${error.message}`, error);
         throw error;
       });
   }
