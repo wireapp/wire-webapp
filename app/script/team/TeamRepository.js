@@ -85,10 +85,14 @@ z.team.TeamRepository = class TeamRepository {
   }
 
   get_team(team_id, team_ets = []) {
-    const team_local = this.teams().filter((team_et) => team_et.id === team_id);
-    if (team_local.length) {
-      return Promise.resolve(team_local[0]);
+    const [team_local] = this.teams().filter((team_et) => team_et.id === team_id);
+    if (team_local) {
+      return Promise.resolve(team_local);
     }
+    return this.get_team_remotely(team_id, team_ets);
+  }
+
+  get_team_remotely(team_id, team_ets = []) {
     return this.team_service.get_team_metadata(team_id)
       .then((team_metadata) => {
         if (Object.keys(team_metadata).length) {
@@ -155,28 +159,36 @@ z.team.TeamRepository = class TeamRepository {
         const {data: {user: user_id}} = event_json;
         this.get_team(team_id)
           .then((team_et) => {
-            this.user_repository.get_users_by_id([user_id]).then(([user_et]) => {
-              this._add_user_to_team(user_et, team_et);
-            });
+            if (this.user_repository.self().id !== user_id) {
+              this.user_repository.get_users_by_id([user_id]).then(([user_et]) => {
+                this._add_user_to_team(user_et, team_et);
+              });
+            } else {
+              this._add_team(team_et);
+            }
           })
           .catch((error) => this.logger.error(`Failed to handle the created team: ${error.message}`, error));
         break;
       }
       case z.event.Backend.TEAM.MEMBER_LEAVE: {
-        const {data: {user: user_id = ''} = {}} = event_json;
+        const {data: {user: user_id}} = event_json;
         const [team_of_user] = this.teams().filter((team) => team.id === team_id);
         if (!team_of_user) {
           this.logger.error(`Failed to handle leaving user: Could not find a team for user ${user_id}`);
-        } else {
+          break;
+        }
+        if (this.user_repository.self().id !== user_id) {
           team_of_user.members.remove((member) => member.id === user_id);
+        } else {
+          this.teams.remove((team_obj) => team_obj.id === team_id);
         }
         break;
       }
       case z.event.Backend.TEAM.UPDATE: {
-        this.get_team(team_id)
+        this.get_team_remotely(team_id)
           .then((team_et) => {
             this.teams.remove((team_obj) => team_obj.id === team_id);
-            this._add_team(this.teams(), team_et);
+            this._add_team(team_et);
           })
           .catch((error) => this.logger.error(`Failed to handle the updated team: ${error.message}`, error));
         break;
