@@ -24,9 +24,10 @@ window.z.ViewModel = z.ViewModel || {};
 window.z.ViewModel.list = z.ViewModel.list || {};
 
 z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
-  constructor(list_view_model, team_repository, user_repository) {
+  constructor(list_view_model, conversation_repository, team_repository, user_repository) {
     this.list_view_model = list_view_model;
 
+    this.conversation_repository = conversation_repository;
     this.team_repository = team_repository;
     this.user_repository = user_repository;
 
@@ -54,7 +55,7 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
   }
 
   click_on_personal() {
-    this.team_repository.set_active_team(this.personal_space);
+    this.conversation_repository.set_active_team(this.personal_space);
 
     if (this.list_view_model.list_state() === z.ViewModel.list.LIST_STATE.PREFERENCES) {
       this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);
@@ -62,7 +63,7 @@ z.ViewModel.list.TeamsTabViewModel = class TeamsTabViewModel {
   }
 
   click_on_team(team_et) {
-    this.team_repository.set_active_team(team_et);
+    this.conversation_repository.set_active_team(team_et);
 
     if (this.list_view_model.list_state() === z.ViewModel.list.LIST_STATE.PREFERENCES) {
       this.list_view_model.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS);

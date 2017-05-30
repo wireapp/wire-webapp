@@ -148,6 +148,26 @@ z.conversation.ConversationRepository = class ConversationRepository {
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
   }
 
+  /**
+   * Set active team entity.
+   * @param {TeamEntity} team_et - only conversations that are related to this team are visible
+   * @returns {undefined} No return value
+   */
+  set_active_team(team_et) {
+    if (team_et) {
+      if (team_et.id !== this.active_team().id) {
+        this.active_team(team_et);
+
+        const conversation_et = this.get_most_recent_conversation();
+        if (conversation_et) {
+          amplify.publish(z.event.WebApp.CONVERSATION.SHOW, conversation_et);
+        }
+      }
+    } else {
+      throw new TypeError('Missing team entity');
+    }
+  }
+
 
   //##############################################################################
   // Conversation service interactions

@@ -169,18 +169,6 @@ z.team.TeamRepository = class TeamRepository {
     }
   }
 
-  /**
-   * Set active team entity.
-   * @param {TeamEntity} team_et - only conversations that are related to this team are visible
-   * @returns {undefined} No return value
-   */
-  set_active_team(team_et) {
-    if (team_et) {
-      return this.active_team(team_et);
-    }
-    throw new TypeError('Missing team entity');
-  }
-
   update_team() {
     return this.team_service.put_team();
   }
@@ -237,7 +225,7 @@ z.team.TeamRepository = class TeamRepository {
 
     this.teams.remove((team) => team.id === team_id);
     if (this.active_team().id === team_id) {
-      this.set_active_team(this.personal_space);
+      this.active_team(this.personal_space);
     }
   }
 
