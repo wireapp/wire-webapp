@@ -67,7 +67,12 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         this.search_repository.search_by_name(normalized_query, is_username)
           .then((user_ets) => {
             if (normalized_query === z.search.SearchRepository.normalize_query(this.search_input())) {
-              this.search_results.others(user_ets);
+              if (this.is_personal_space()) {
+                this.search_results.others(user_ets);
+              } else {
+                const non_member_others = user_ets.filter((user_et) => !this.search_results.team_members().includes(user_et));
+                this.search_results.others(non_member_others);
+              }
             }
           })
           .catch((error) => {
