@@ -96,9 +96,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversations_call = ko.observableArray([]);
     this.conversations_cleared = ko.observableArray([]);
     this.conversations_unarchived = ko.observableArray([]);
-    this.conversations_unarchived.subscribe((conversation_ets) => {
-      this.update_conversations(conversation_ets);
-    });
+    this.conversations_unarchived.subscribe((conversation_ets) => this.update_conversations(conversation_ets));
 
     this._init_subscriptions();
   }
