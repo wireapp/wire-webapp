@@ -55,6 +55,7 @@ z.event.Backend = {
     DELETE: 'team.delete',
     MEMBER_JOIN: 'team.member-join',
     MEMBER_LEAVE: 'team.member-leave',
+    MEMBER_UPDATE: 'team-member-update',
     UPDATE: 'team.update',
   },
   USER: {
