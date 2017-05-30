@@ -139,7 +139,7 @@ z.team.TeamRepository = class TeamRepository {
       case z.event.Backend.TEAM.CREATE: {
         this.get_team(team_id)
           .then((team_et) => {
-            this._add_team(this.teams(), team_et);
+            this._add_team(team_et);
           })
           .catch((error) => this.logger.error(`Failed to handle the created team: ${error.message}`, error));
         break;
@@ -226,9 +226,9 @@ z.team.TeamRepository = class TeamRepository {
     }
   }
 
-  _add_team(team_ets, team_et) {
-    if (team_ets.filter((team) => team.id === team_et.id).length < 1) {
-      team_ets.push(team_et);
+  _add_team(team_et) {
+    if (this.teams().filter((team) => team.id === team_et.id).length < 1) {
+      this.teams.push(team_et);
     }
   }
 
