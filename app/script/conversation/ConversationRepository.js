@@ -1043,7 +1043,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_gif(conversation_et, url, tag) {
     if (!tag) {
-      tag = z.localization.Localizer.get_text(z.string.extensions_giphy_random);
+      tag = z.l10n.text(z.string.extensions_giphy_random);
     }
 
     const message = z.localization.Localizer.get_text({
