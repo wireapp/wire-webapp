@@ -283,6 +283,26 @@ window.TestFactory.prototype.exposeSearchActors = function() {
     });
 };
 
+window.TestFactory.prototype.exposeTeamActors = function() {
+  this.logger.info('- exposeTeamActors');
+  return Promise.resolve()
+    .then(() => {
+      return this.exposeUserActors();
+    })
+    .then(() => {
+      this.logger.info('✓ exposedUserActors');
+
+      TestFactory.team_service = new z.team.TeamService(this.client);
+      TestFactory.team_service.logger.level = this.settings.logging_level;
+      return TestFactory.team_service;
+    })
+    .then(() => {
+      TestFactory.team_repository = new z.team.TeamRepository(TestFactory.team_service, TestFactory.user_repository);
+      TestFactory.team_repository.logger.level = this.settings.logging_level;
+      return TestFactory.team_repository;
+    });
+};
+
 /**
  *
  * @returns {Promise<z.conversation.ConversationRepository>} The conversation repository.
@@ -291,10 +311,10 @@ window.TestFactory.prototype.exposeConversationActors = function() {
   this.logger.info('- exposeConversationActors');
   return Promise.resolve()
     .then(() => {
-      return this.exposeUserActors();
+      return this.exposeTeamActors();
     })
     .then(() => {
-      this.logger.info('✓ exposedUserActors');
+      this.logger.info('✓ exposedTeamActors');
 
       TestFactory.conversation_service = new z.conversation.ConversationService(this.client, TestFactory.storage_service);
       TestFactory.conversation_service.logger.level = this.settings.logging_level;
@@ -304,7 +324,9 @@ window.TestFactory.prototype.exposeConversationActors = function() {
         TestFactory.asset_service,
         TestFactory.user_repository,
         undefined,
-        TestFactory.cryptography_repository
+        TestFactory.cryptography_repository,
+        undefined,
+        TestFactory.team_repository
       );
       TestFactory.conversation_repository.logger.level = this.settings.logging_level;
 
@@ -329,8 +351,8 @@ window.TestFactory.prototype.exposeMediaActors = function() {
       TestFactory.media_repository.logger.level = this.settings.logging_level;
 
       TestFactory.media_repository.devices_handler.logger.level = this.settings.logging_level;
-      TestFactory.media_repository.stream_handler.logger.level = this.settings.logging_level;
       TestFactory.media_repository.element_handler.logger.level = this.settings.logging_level;
+      TestFactory.media_repository.stream_handler.logger.level = this.settings.logging_level;
 
       return TestFactory.media_repository;
     });
