@@ -131,68 +131,36 @@ z.team.TeamRepository = class TeamRepository {
    */
   on_team_event(event_json, source = z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
     const type = event_json.type;
-    const team_id = event_json.team;
 
     this.logger.info(`»» Event: '${type}'`, {event_json: JSON.stringify(event_json), event_object: event_json});
 
     switch (type) {
       case z.event.Backend.TEAM.CONVERSATION_CREATE: {
+        this._on_conversation_create(event_json);
         break;
       }
       case z.event.Backend.TEAM.CONVERSATION_DELETE: {
+        this._on_conversation_delete(event_json);
         break;
       }
       case z.event.Backend.TEAM.CREATE: {
-        this.get_team(team_id)
-          .then((team_et) => {
-            this._add_team(team_et);
-          })
-          .catch((error) => this.logger.error(`Failed to handle the created team: ${error.message}`, error));
+        this._on_create(event_json);
         break;
       }
       case z.event.Backend.TEAM.DELETE: {
-        this.teams.remove((team) => team.id === team_id);
-        if (this.active_team().id === team_id) {
-          this.set_active_team(this.personal_space);
-        }
+        this._on_delete(event_json);
         break;
       }
       case z.event.Backend.TEAM.MEMBER_JOIN: {
-        const {data: {user: user_id}} = event_json;
-        this.get_team(team_id)
-          .then((team_et) => {
-            if (this.user_repository.self().id !== user_id) {
-              this.user_repository.get_users_by_id([user_id]).then(([user_et]) => {
-                this._add_user_to_team(user_et, team_et);
-              });
-            } else {
-              this._add_team(team_et);
-            }
-          })
-          .catch((error) => this.logger.error(`Failed to handle the created team: ${error.message}`, error));
+        this._on_member_join(event_json);
         break;
       }
       case z.event.Backend.TEAM.MEMBER_LEAVE: {
-        const {data: {user: user_id}} = event_json;
-        const [team_of_user] = this.teams().filter((team) => team.id === team_id);
-        if (!team_of_user) {
-          this.logger.error(`Failed to handle leaving user: Could not find a team for user ${user_id}`);
-          break;
-        }
-        if (this.user_repository.self().id !== user_id) {
-          team_of_user.members.remove((member) => member.id === user_id);
-        } else {
-          this.teams.remove((team_obj) => team_obj.id === team_id);
-        }
+        this._on_member_leave(event_json);
         break;
       }
       case z.event.Backend.TEAM.UPDATE: {
-        this.get_team_remotely(team_id)
-          .then((team_et) => {
-            this.teams.remove((team_obj) => team_obj.id === team_id);
-            this._add_team(team_et);
-          })
-          .catch((error) => this.logger.error(`Failed to handle the updated team: ${error.message}`, error));
+        this._on_update(event_json);
         break;
       }
       default: {
@@ -233,6 +201,12 @@ z.team.TeamRepository = class TeamRepository {
       .then((user_ets) => team_et.members(user_ets));
   }
 
+  _add_team(team_et) {
+    if (this.teams().filter((team) => team.id === team_et.id).length < 1) {
+      this.teams.push(team_et);
+    }
+  }
+
   _add_user_to_team(user_et, team_et) {
     const members = team_et.members;
     if (members().filter((member) => member.id === user_et.id).length < 1) {
@@ -240,10 +214,80 @@ z.team.TeamRepository = class TeamRepository {
     }
   }
 
-  _add_team(team_et) {
-    if (this.teams().filter((team) => team.id === team_et.id).length < 1) {
-      this.teams.push(team_et);
+  _on_conversation_create(event_json) {
+
+  }
+
+  _on_conversation_delete(event_json) {
+
+  }
+
+  _on_create(event_json) {
+    const team_id = event_json.team;
+
+    this.get_team(team_id)
+      .then((team_et) => {
+        this._add_team(team_et);
+      })
+      .catch((error) => this.logger.error(`Failed to handle the created team: ${error.message}`, error));
+  }
+
+  _on_delete(event_json) {
+    const team_id = event_json.team;
+
+    this.teams.remove((team) => team.id === team_id);
+    if (this.active_team().id === team_id) {
+      this.set_active_team(this.personal_space);
     }
+  }
+
+  _on_member_join(event_json) {
+    const {data: {user: user_id}, team: team_id} = event_json;
+
+    this.get_team(team_id)
+      .then((team_et) => {
+        if (this.user_repository.self().id !== user_id) {
+          this.user_repository.get_users_by_id([user_id]).then(([user_et]) => {
+            this._add_user_to_team(user_et, team_et);
+          });
+        } else {
+          this._add_team(team_et);
+        }
+      })
+      .catch((error) => {
+        this.logger.error(`Failed to handle the created team: ${error.message}`, error)
+        throw error;
+      });
+  }
+
+  _on_member_leave(event_json) {
+    const {data: {user: user_id}, team: team_id} = event_json;
+    const [team_of_user] = this.teams().filter((team) => team.id === team_id);
+
+    if (!team_of_user) {
+      const error_message = `Failed to handle leaving user: Could not find a team for user ${user_id}`;
+      this.logger.error(error_message);
+      throw error_message;
+    }
+    if (this.user_repository.self().id !== user_id) {
+      team_of_user.members.remove((member) => member.id === user_id);
+    } else {
+      this.teams.remove((team_obj) => team_obj.id === team_id);
+    }
+  }
+
+  _on_update(event_json) {
+    const team_id = event_json.team;
+
+    this.get_team_remotely(team_id)
+      .then((team_et) => {
+        this.teams.remove((team_obj) => team_obj.id === team_id);
+        this._add_team(team_et);
+      })
+      .catch((error) => {
+        this.logger.error(`Failed to handle the updated team: ${error.message}`, error)
+        throw error;
+      });
   }
 
   _update_teams(team_ets) {
