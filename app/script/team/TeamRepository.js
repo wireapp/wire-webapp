@@ -136,11 +136,11 @@ z.team.TeamRepository = class TeamRepository {
 
     switch (type) {
       case z.event.Backend.TEAM.CONVERSATION_CREATE: {
-        this._on_conversation_create(event_json);
+        this._on_conversation(event_json);
         break;
       }
       case z.event.Backend.TEAM.CONVERSATION_DELETE: {
-        this._on_conversation_delete(event_json);
+        this._on_conversation(event_json);
         break;
       }
       case z.event.Backend.TEAM.CREATE: {
@@ -202,12 +202,8 @@ z.team.TeamRepository = class TeamRepository {
     }
   }
 
-  _on_conversation_create(event_json) {
-
-  }
-
-  _on_conversation_delete(event_json) {
-
+  _on_conversation(event_json) {
+    this.logger.log(`Received '${event_json.type}' event from backend which is not yet handled`, event_json);
   }
 
   _on_create(event_json) {
