@@ -131,12 +131,10 @@ z.team.TeamRepository = class TeamRepository {
     this.logger.info(`»» Event: '${type}'`, {event_json: JSON.stringify(event_json), event_object: event_json});
 
     switch (type) {
-      case z.event.Backend.TEAM.CONVERSATION_CREATE: {
-        this._on_conversation(event_json);
-        break;
-      }
-      case z.event.Backend.TEAM.CONVERSATION_DELETE: {
-        this._on_conversation(event_json);
+      case z.event.Backend.TEAM.CONVERSATION_CREATE:
+      case z.event.Backend.TEAM.CONVERSATION_DELETE:
+      case z.event.Backend.TEAM.MEMBER_UPDATE: {
+        this._on_unhandled(event_json);
         break;
       }
       case z.event.Backend.TEAM.CREATE: {
@@ -160,7 +158,7 @@ z.team.TeamRepository = class TeamRepository {
         break;
       }
       default: {
-        this.logger.info('An unknown team event happened.', event_json);
+        this._on_unhandled(event_json);
       }
     }
   }
@@ -197,10 +195,6 @@ z.team.TeamRepository = class TeamRepository {
     if (!members().filter((member) => member.id === user_et.id).length) {
       members.push(user_et);
     }
-  }
-
-  _on_conversation(event_json) {
-    this.logger.log(`Received '${event_json.type}' event from backend which is not yet handled`, event_json);
   }
 
   _on_create(event_json) {
@@ -257,6 +251,10 @@ z.team.TeamRepository = class TeamRepository {
     } else {
       this._on_delete({team: team_id});
     }
+  }
+
+  _on_unhandled(event_json) {
+    this.logger.log(`Received '${event_json.type}' event from backend which is not yet handled`, event_json);
   }
 
   _on_update(event_json) {
