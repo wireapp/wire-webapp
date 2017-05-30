@@ -130,7 +130,9 @@ z.team.TeamRepository = class TeamRepository {
    * @returns {Promise} Resolves when event was handled
    */
   on_team_event(event_json, source = z.event.EventRepository.NOTIFICATION_SOURCE.STREAM) {
-    const {type = '', team: team_id = ''} = event_json;
+    const type = event_json.type;
+    const team_id = event_json.team;
+
     this.logger.info(`»» Event: '${type}'`, {event_json: JSON.stringify(event_json), event_object: event_json});
 
     switch (type) {
