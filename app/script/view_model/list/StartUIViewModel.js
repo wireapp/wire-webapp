@@ -95,15 +95,15 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.user = this.user_repository.self;
     this.active_team = this.conversation_repository.active_team;
-    this.active_team.subscribe((active_team) => {
-      this.search(this.search_input());
-    });
+    this.active_team.subscribe((active_team) => this.search(this.search_input()));
 
     this.active_team_name = ko.pureComputed(() => {
       const team_et = this.active_team();
+
       if (team_et && team_et.name()) {
         return team_et.name();
       }
+
       return this.user_repository.self().name();
     });
 
@@ -182,13 +182,13 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     this.is_personal_space = ko.pureComputed(() => {
       const team_et = this.active_team();
+
       if (team_et) {
         return !team_et.name();
       }
     });
 
     this.show_team_member = ko.pureComputed(() => !this.is_personal_space() && this.team_members().length);
-
     this.show_top_people = ko.pureComputed(() => this.is_personal_space() && this.top_users().length);
 
     // Invite bubble states
