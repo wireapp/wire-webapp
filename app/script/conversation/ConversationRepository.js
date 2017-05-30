@@ -514,8 +514,13 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   get_groups_by_name(query, is_username) {
     return this.sorted_conversations()
-      .filter(function(conversation_et) {
+      .filter((conversation_et) => {
         if (!conversation_et.is_group()) {
+          return false;
+        }
+
+        const active_team_id = this.active_team().id;
+        if (active_team_id && conversation_et.team_id !== active_team_id) {
           return false;
         }
 
@@ -542,7 +547,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
         return false;
       })
-      .sort(function(conversation_a, conversation_b) {
+      .sort((conversation_a, conversation_b) => {
         return z.util.StringUtil.sort_by_priority(conversation_a.display_name(), conversation_b.display_name(), query);
       });
   }
