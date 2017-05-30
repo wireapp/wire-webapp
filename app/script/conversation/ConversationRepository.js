@@ -536,7 +536,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         const active_team_id = this.active_team().id;
         if (active_team_id && conversation_et.team_id !== active_team_id) {
           return false;
-        } else if (!active_team_id && this.team_repository.known_team_ids.includes(conversation_et.team_id)) {
+        } else if (!active_team_id && this.team_repository.known_team_ids().includes(conversation_et.team_id)) {
           return false;
         }
 
