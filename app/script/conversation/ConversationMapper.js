@@ -183,8 +183,8 @@ z.conversation.ConversationMapper = class ConversationMapper {
       conversation_et.team_id = conversation_data.team; // data from backend
     }
 
-    if (conversation_data.is_group) {
-      conversation_et.is_group = conversation_data.is_group;
+    if (conversation_data.is_guest) {
+      conversation_et.is_guest = conversation_data.is_guest;
     }
 
     return conversation_et;
