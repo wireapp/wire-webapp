@@ -103,8 +103,7 @@ describe('ConversationRepository', function() {
       TestFactory.conversation_repository.conversations([]);
     });
 
-    // TODO: Needs to get finished
-    xit('finds an existing 1:1 conversation within a team', function(done) {
+    it('finds an existing 1:1 conversation within a team', function(done) {
       // @formatter:off
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const team_1to1_conversation = {"access":["invite"],"creator":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","members":{"self":{"hidden_ref":null,"status":0,"service":null,"otr_muted_ref":null,"status_time":"1970-01-01T00:00:00.000Z","hidden":false,"status_ref":"0.0","id":"109da9ca-a495-47a8-ac70-9ffbe924b2d0","otr_archived":false,"otr_muted":false,"otr_archived_ref":null},"others":[{"status":0,"id":"f718410c-3833-479d-bd80-a5df03f38414"}]},"name":null,"team":"cf162e22-20b8-4533-a5ab-d3f5dde39d2c","id":"04ab891e-ccf1-4dba-9d74-bacec64b5b1e","type":0,"last_event_time":"1970-01-01T00:00:00.000Z","last_event":"0.0"};
@@ -116,8 +115,9 @@ describe('ConversationRepository', function() {
 
       const team_id = team_1to1_conversation.team;
       const team_member_id = team_1to1_conversation.members.others[0].id;
+      const user_et = new z.entity.User(team_member_id);
 
-      TestFactory.conversation_repository.get_one_to_one_conversation(team_member_id, team_id)
+      TestFactory.conversation_repository.get_one_to_one_conversation(user_et, team_id)
         .then(function(found_conversation_et) {
           expect(found_conversation_et).toBe(new_conversation_et);
           done();
