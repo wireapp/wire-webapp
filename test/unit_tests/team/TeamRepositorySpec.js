@@ -84,7 +84,7 @@ describe('z.team.TeamRepository', () => {
 
   describe('get_team_metadata()', () => {
     it('returns team metadata entities', (done) => {
-      team_repository.get_team_remotely(team_metadata.id)
+      team_repository.get_team_from_backend(team_metadata.id)
         .then((entity) => {
           expect(entity.length).toEqual(team_metadata.length);
           expect(entity.creator).toEqual(team_metadata.creator);
