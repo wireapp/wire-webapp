@@ -30,7 +30,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     };
   }
 
-  constructor(element_id, user_repository, conversation_repository, search_repository) {
+  constructor(element_id, user_repository, conversation_repository, search_repository, team_repository) {
     this.add_people = this.add_people.bind(this);
     this.block = this.block.bind(this);
     this.close = this.close.bind(this);
@@ -47,12 +47,15 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
     this.user_repository = user_repository;
     this.conversation_repository = conversation_repository;
     this.search_repository = search_repository;
+    this.team_repository = team_repository;
     this.logger = new z.util.Logger('z.ViewModel.ParticipantsViewModel', z.config.LOGGER.OPTIONS);
 
     this.state = ko.observable(ParticipantsViewModel.STATE.PARTICIPANTS);
 
     this.conversation = ko.observable(new z.entity.Conversation());
     this.conversation.subscribe(() => this.render_participants(false));
+
+    this.active_team = this.team_repository.active_team;
 
     this.render_participants = ko.observable(false);
 
@@ -121,10 +124,19 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
             }
           }
 
+          if (this.active_team().id) {
+            for (const team_member of this.team_members()) {
+              if (user_et.id === team_member.id) {
+                return false;
+              }
+            }
+          }
+
           return true;
         })
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     }, this, {deferEvaluation: true});
+    this.team_members = ko.pureComputed(() => this.active_team().members());
 
     this.add_people_tooltip = z.localization.Localizer.get_text({
       id: z.string.tooltip_people_add,
@@ -335,6 +347,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   connect(user_et) {
     this.participants_bubble.hide();
+    this.active_team(this.team_repository.personal_space);
 
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
       common_users_count: user_et.mutual_friends_total(),

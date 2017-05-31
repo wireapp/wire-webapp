@@ -28,49 +28,70 @@ describe('Conversation Mapper', function() {
     conversation_mapper = new z.conversation.ConversationMapper();
   });
 
-  it('should throw error if conversation data is missing', function() {
-    expect(() => conversation_mapper.map_conversation()).toThrow(new Error('Cannot create conversation entity without data'));
+  describe('map_conversation', function() {
+    it('throws an error if conversation data is missing', function() {
+      expect(() => conversation_mapper.map_conversation()).toThrow(new Error('Cannot create conversation entity without data'));
+    });
+
+    it('maps a conversation', function() {
+      const {conversation} = entities;
+      const conversation_et = conversation_mapper.map_conversation(conversation);
+
+      const expected_participant_ids = [
+        conversation.members.others[0].id,
+        conversation.members.others[1].id,
+        conversation.members.others[2].id,
+        conversation.members.others[3].id,
+      ];
+
+      expect(conversation_et.participating_user_ids()).toEqual(expected_participant_ids);
+      expect(conversation_et.id).toBe(conversation.id);
+      expect(conversation_et.name()).toBe(conversation.name);
+      expect(conversation_et.type()).toBe(z.conversation.ConversationType.REGULAR);
+      expect(conversation_et.is_group()).toBeTruthy();
+      expect(conversation_et.number_of_participants()).toBe(conversation.members.others.length);
+      expect(conversation_et.is_muted()).toBe(conversation.members.self.otr_muted);
+      expect(conversation_et.muted_timestamp()).toEqual(new Date(conversation.members.self.otr_muted_ref).getTime());
+      expect(conversation_et.team_id).toEqual(conversation.team);
+    });
+
+    it('maps conversations', function() {
+      const {conversations} = payload.conversations.get;
+      const conversation_ets = conversation_mapper.map_conversations(conversations);
+
+      expect(conversation_ets.length).toBe(conversations.length);
+      expect(conversation_ets[0].id).toBe(conversations[0].id);
+      expect(conversation_ets[1].name()).toBe(conversations[1].name);
+    });
+
+    it('maps a team conversation', function() {
+      // @formatter:off
+      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+      const payload = {"conversation":"f2520615-f860-4c72-8b90-9ace3b5f6c37","time":"2017-05-26T08:10:27.040Z","data":{"access":["invite"],"creator":"f52eed1b-aa64-447f-ad4a-96529f72105f","members":{"self":{"hidden_ref":null,"status":0,"service":null,"otr_muted_ref":null,"status_time":"1970-01-01T00:00:00.000Z","hidden":false,"status_ref":"0.0","id":"39b7f597-dfd1-4dff-86f5-fe1b79cb70a0","otr_archived":false,"otr_muted":false,"otr_archived_ref":null},"others":[{"status":0,"id":"f52eed1b-aa64-447f-ad4a-96529f72105f"}]},"name":"BennyTest","team":"5316fe03-24ee-4b19-b789-6d026bd3ce5f","id":"f2520615-f860-4c72-8b90-9ace3b5f6c37","type":0,"last_event_time":"1970-01-01T00:00:00.000Z","last_event":"0.0"},"from":"f52eed1b-aa64-447f-ad4a-96529f72105f","type":"conversation.create"};
+      // @formatter:on
+      /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
+
+      const conversation_et = conversation_mapper.map_conversation(payload);
+      expect(conversation_et.name()).toBe(payload.data.name);
+      expect(conversation_et.team_id).toBe(payload.data.team);
+    });
   });
 
-  it('can map a conversation', function() {
-    const {conversation} = entities;
-    const conversation_et = conversation_mapper.map_conversation(conversation);
+  describe('update_properties', () => {
+    it('can update the properties of a conversation', function() {
+      const creator_id = z.util.create_random_uuid();
+      const conversation_et = conversation_mapper._create_conversation_et(payload.conversations.get.conversations[0]);
+      const data = {
+        creator: creator_id,
+        id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc',
+        name: 'New foo bar conversation name',
+      };
+      const updated_conversation_et = conversation_mapper.update_properties(conversation_et, data);
 
-    const expected_participant_ids = [
-      conversation.members.others[0].id,
-      conversation.members.others[1].id,
-      conversation.members.others[2].id,
-      conversation.members.others[3].id,
-    ];
-
-    expect(conversation_et.participating_user_ids()).toEqual(expected_participant_ids);
-    expect(conversation_et.id).toBe(conversation.id);
-    expect(conversation_et.name()).toBe(conversation.name);
-    expect(conversation_et.type()).toBe(z.conversation.ConversationType.REGULAR);
-    expect(conversation_et.is_group()).toBeTruthy();
-    expect(conversation_et.number_of_participants()).toBe(conversation.members.others.length);
-    expect(conversation_et.is_muted()).toBe(conversation.members.self.otr_muted);
-    expect(conversation_et.muted_timestamp()).toEqual(new Date(conversation.members.self.otr_muted_ref).getTime());
-  });
-
-  it('can map conversations', function() {
-    const {conversations} = payload.conversations.get;
-    const conversation_ets = conversation_mapper.map_conversations(conversations);
-
-    expect(conversation_ets.length).toBe(conversations.length);
-    expect(conversation_ets[0].id).toBe(conversations[0].id);
-    expect(conversation_ets[1].name()).toBe(conversations[1].name);
-  });
-
-  it('can update the properties of a conversation', function() {
-    const creator_id = z.util.create_random_uuid();
-    const conversation_et = conversation_mapper._create_conversation_et(payload.conversations.get.conversations[0]);
-    const data = {creator: creator_id, id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc', name: 'New foo bar conversation name'};
-    const updated_conversation_et = conversation_mapper.update_properties(conversation_et, data);
-
-    expect(updated_conversation_et.name()).toBe(data.name);
-    expect(updated_conversation_et.id).not.toBe(data.id);
-    expect(updated_conversation_et.creator).toBe(data.creator);
+      expect(updated_conversation_et.name()).toBe(data.name);
+      expect(updated_conversation_et.id).not.toBe(data.id);
+      expect(updated_conversation_et.creator).toBe(data.creator);
+    });
   });
 
   describe('update_self_status', function() {
@@ -195,7 +216,7 @@ describe('Conversation Mapper', function() {
       // @formatter:off
       /* eslint-disable comma-spacing, key-spacing, sort-keys, quotes */
       const local_data = {"archived_state": false, "archived_timestamp": 1487239601118, "cleared_timestamp": 0, "ephemeral_timer": false, "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "last_event_timestamp": 1488387380633, "last_read_timestamp": 1488387380633, "muted_state": false, "muted_timestamp": 0, "verification_state": 0};
-      const remote_data = {"access": ["private"], "creator": "532af01e-1e24-4366-aacf-33b67d4ee376", "members": {"self": {"hidden_ref": null, "status": 0, "last_read": "3d.800122000ad95594", "muted_time": null, "service": null, "otr_muted_ref": null, "muted": null, "status_time": "2015-01-07T16:26:51.363Z", "hidden": false, "status_ref": "0.0", "id": "8b497692-7a38-4a5d-8287-e3d1006577d6", "otr_archived": false, "cleared": null, "otr_muted": false, "otr_archived_ref": "2017-02-16T10:06:41.118Z", "archived": null}, "others": [{"status": 0, "id": "532af01e-1e24-4366-aacf-33b67d4ee376"}]}, "name": "Family Gathering", "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "type": 2, "last_event_time": "2017-02-14T17:11:10.619Z", "last_event": "4a.800122000a62e4a1"};
+      const remote_data = {"access": ["private"], "creator": "532af01e-1e24-4366-aacf-33b67d4ee376", "members": {"self": {"hidden_ref": null, "status": 0, "last_read": "3d.800122000ad95594", "muted_time": null, "service": null, "otr_muted_ref": null, "muted": null, "status_time": "2015-01-07T16:26:51.363Z", "hidden": false, "status_ref": "0.0", "id": "8b497692-7a38-4a5d-8287-e3d1006577d6", "otr_archived": false, "cleared": null, "otr_muted": false, "otr_archived_ref": "2017-02-16T10:06:41.118Z", "archived": null}, "others": [{"status": 0, "id": "532af01e-1e24-4366-aacf-33b67d4ee376"}]}, "name": "Family Gathering", "team": "5316fe03-24ee-4b19-b789-6d026bd3ce5f", "id": "de7466b0-985c-4dc3-ad57-17877db45b4c", "type": 2, "last_event_time": "2017-02-14T17:11:10.619Z", "last_event": "4a.800122000a62e4a1"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys, quotes */
       // @formatter:on
 
@@ -206,6 +227,7 @@ describe('Conversation Mapper', function() {
       expect(merged_data.name).toBe(remote_data.name);
       expect(merged_data.others[0]).toBe(remote_data.members.others[0].id);
       expect(merged_data.status).toBe(remote_data.members.self.status);
+      expect(merged_data.team_id).toBe(remote_data.team);
       expect(merged_data.type).toBe(remote_data.type);
 
       expect(merged_data.archived_state).toBe(local_data.archived_state);

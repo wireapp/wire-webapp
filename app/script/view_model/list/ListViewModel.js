@@ -34,8 +34,9 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
    * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
    * @param {z.search.SearchRepository} search_repository - Search repository
    * @param {z.properties.PropertiesRepository} properties_repository - Properties repository
+   * @param {z.team.TeamRepository} team_repository - Team repository
   */
-  constructor(element_id, content_view_model, calling_repository, connect_repository, conversation_repository, search_repository, properties_repository) {
+  constructor(element_id, content_view_model, calling_repository, connect_repository, conversation_repository, search_repository, properties_repository, team_repository) {
     this.switch_list = this.switch_list.bind(this);
     this.on_context_menu = this.on_context_menu.bind(this);
 
@@ -45,6 +46,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.conversation_repository = conversation_repository;
     this.search_repository = search_repository;
     this.properties_repository = properties_repository;
+    this.team_repository = team_repository;
     this.logger = new z.util.Logger('z.ViewModel.list.ListViewModel', z.config.LOGGER.OPTIONS);
 
     // Repositories
@@ -63,8 +65,9 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.archive       = new z.ViewModel.list.ArchiveViewModel('archive', this, this.conversation_repository);
     this.conversations = new z.ViewModel.list.ConversationListViewModel('conversations', this, this.content_view_model, this.calling_repository, this.conversation_repository, this.user_repository);
     this.preferences   = new z.ViewModel.list.PreferencesListViewModel('preferences', this, this.content_view_model);
-    this.start_ui      = new z.ViewModel.list.StartUIViewModel('start-ui', this, this.connect_repository, this.conversation_repository, this.search_repository, this.user_repository, this.properties_repository);
+    this.start_ui      = new z.ViewModel.list.StartUIViewModel('start-ui', this, this.connect_repository, this.conversation_repository, this.properties_repository, this.search_repository, this.team_repository, this.user_repository);
     this.takeover      = new z.ViewModel.list.TakeoverViewModel('takeover', this.conversation_repository, this.user_repository);
+    this.teams_tabs    = new z.ViewModel.list.TeamsTabViewModel(this, this.conversation_repository, this.team_repository, this.user_repository);
     /* eslint-enable no-multi-spaces */
 
     this.self_user_picture = ko.pureComputed(() => {
@@ -78,8 +81,8 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     ko.applyBindings(this, document.getElementById(element_id));
   }
 
-
   _init_subscriptions() {
+    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, () => this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS, false));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => this.webapp_loaded(true));
     amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, this.open_preferences_account.bind(this));
     amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_DEVICES, this.open_preferences_devices.bind(this));
@@ -89,10 +92,6 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     amplify.subscribe(z.event.WebApp.SHORTCUT.ARCHIVE, () => this.click_on_archive_action(this.conversation_repository.active_conversation()));
     amplify.subscribe(z.event.WebApp.SHORTCUT.DELETE, () => this.click_on_clear_action(this.conversation_repository.active_conversation()));
     amplify.subscribe(z.event.WebApp.SHORTCUT.SILENCE, () => this.click_on_mute_action(this.conversation_repository.active_conversation()));
-  }
-
-  click_on_actions(conversation_et, event) {
-    this.actions.click_on_actions(conversation_et, event);
   }
 
   open_preferences_account() {
@@ -115,10 +114,10 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.switch_list(z.ViewModel.list.LIST_STATE.START_UI);
   }
 
-  switch_list(new_list_state) {
+  switch_list(new_list_state, respect_last_state = true) {
     if (this.list_state() !== new_list_state) {
       this._hide_list();
-      this._update_list(new_list_state);
+      this._update_list(new_list_state, respect_last_state);
       this._show_list(new_list_state);
     }
   }
@@ -139,7 +138,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     });
   }
 
-  _update_list(new_list_state) {
+  _update_list(new_list_state, respect_last_state) {
     switch (new_list_state) {
       case z.ViewModel.list.LIST_STATE.ARCHIVE:
         this.archive.update_list();
@@ -152,7 +151,9 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
         break;
       default:
         this.first_run(false);
-        this.content_view_model.switch_previous_content();
+        if (respect_last_state) {
+          this.content_view_model.switch_previous_content();
+        }
     }
   }
 

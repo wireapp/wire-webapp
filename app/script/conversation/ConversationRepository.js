@@ -33,14 +33,16 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @param {GiphyRepository} giphy_repository - Repository for Giphy GIFs
    * @param {CryptographyRepository} cryptography_repository - Repository for all cryptography interactions
    * @param {LinkPreviewRepository} link_repository - Repository for link previews
+   * @param {TeamRepository} team_repository - Repository for teams
    */
-  constructor(conversation_service, asset_service, user_repository, giphy_repository, cryptography_repository, link_repository) {
+  constructor(conversation_service, asset_service, user_repository, giphy_repository, cryptography_repository, link_repository, team_repository) {
     this.conversation_service = conversation_service;
     this.asset_service = asset_service;
     this.user_repository = user_repository;
     this.giphy_repository = giphy_repository;
     this.cryptography_repository = cryptography_repository;
     this.link_repository = link_repository;
+    this.team_repository = team_repository;
     this.logger = new z.util.Logger('z.conversation.ConversationRepository', z.config.LOGGER.OPTIONS);
 
     this.conversation_mapper = new z.conversation.ConversationMapper();
@@ -49,6 +51,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
+
+    this.active_team = this.team_repository.active_team;
 
     this.block_event_handling = true;
     this.fetching_conversations = {};
@@ -92,6 +96,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversations_call = ko.observableArray([]);
     this.conversations_cleared = ko.observableArray([]);
     this.conversations_unarchived = ko.observableArray([]);
+    this.conversations_unarchived.subscribe((conversation_ets) => this.update_conversations(conversation_ets));
 
     this._init_subscriptions();
   }
@@ -102,16 +107,24 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const calls = [];
       const cleared = [];
       const unarchived = [];
+      const active_team_id = this.active_team().id;
 
-      this.sorted_conversations().forEach(function(conversation_et) {
-        if (conversation_et.has_active_call()) {
-          calls.push(conversation_et);
-        } else if (conversation_et.is_cleared()) {
-          cleared.push(conversation_et);
-        } else if (conversation_et.is_archived()) {
-          archived.push(conversation_et);
-        } else {
-          unarchived.push(conversation_et);
+      this.sorted_conversations().forEach((conversation_et) => {
+        const {team_id} = conversation_et;
+
+        const is_team_conversation = team_id === active_team_id;
+        const is_guest_conversation = !active_team_id && team_id && conversation_et.is_guest;
+
+        if (is_team_conversation || is_guest_conversation) {
+          if (conversation_et.has_active_call()) {
+            calls.push(conversation_et);
+          } else if (conversation_et.is_cleared()) {
+            cleared.push(conversation_et);
+          } else if (conversation_et.is_archived()) {
+            archived.push(conversation_et);
+          } else {
+            unarchived.push(conversation_et);
+          }
         }
       });
 
@@ -133,6 +146,22 @@ z.conversation.ConversationRepository = class ConversationRepository {
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
   }
 
+  /**
+   * Set active team entity.
+   * @param {TeamEntity} team_et - only conversations that are related to this team are visible
+   * @returns {undefined} No return value
+   */
+  set_active_team(team_et) {
+    if (team_et) {
+      if (team_et.id !== this.active_team().id) {
+        this.active_team(team_et);
+        amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.get_most_recent_conversation());
+      }
+    } else {
+      throw new TypeError('Missing team entity');
+    }
+  }
+
 
   //##############################################################################
   // Conversation service interactions
@@ -147,7 +176,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    * @returns {Promise} Resolves when the conversation was created
    */
   create_new_conversation(user_ids, name) {
-    return this.conversation_service.create_conversation(user_ids, name)
+    return this.conversation_service.create_conversation(user_ids, name, this.active_team().id)
       .then((response) => {
         return this._on_create({conversation: response.id, data: response});
       });
@@ -169,7 +198,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
 
     return this.conversation_service.get_conversation_by_id(conversation_id)
       .then((response) => {
-        const conversation_et = this.conversation_mapper.map_conversation(response);
+        const conversation_et = this.map_conversations(response);
 
         this.logger.info(`Fetched conversation '${conversation_id}' from backend`);
         this.save_conversation(conversation_et);
@@ -210,7 +239,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           });
       })
       .then((conversations) => {
-        this.save_conversations(this.conversation_mapper.map_conversations(conversations));
+        this.save_conversations(this.map_conversations(conversations));
         amplify.publish(z.event.WebApp.CONVERSATION.LOADED_STATES);
         return this.conversations();
       });
@@ -499,8 +528,15 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   get_groups_by_name(query, is_username) {
     return this.sorted_conversations()
-      .filter(function(conversation_et) {
+      .filter((conversation_et) => {
         if (!conversation_et.is_group()) {
+          return false;
+        }
+
+        const active_team_id = this.active_team().id;
+        if (active_team_id && conversation_et.team_id !== active_team_id) {
+          return false;
+        } else if (!active_team_id && this.team_repository.known_team_ids().includes(conversation_et.team_id)) {
           return false;
         }
 
@@ -527,9 +563,8 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
         return false;
       })
-      .sort(function(conversation_a, conversation_b) {
-        const sort_query = is_username ? `@${query}` : query;
-        return z.util.StringUtil.sort_by_priority(conversation_a.display_name(), conversation_b.display_name(), sort_query);
+      .sort((conversation_a, conversation_b) => {
+        return z.util.StringUtil.sort_by_priority(conversation_a.display_name(), conversation_b.display_name(), query);
       });
   }
 
@@ -568,15 +603,28 @@ z.conversation.ConversationRepository = class ConversationRepository {
   /**
    * Get conversation with a user.
    * @param {User} user_et - User entity for whom to get the conversation
+   * @param {string} [team_id] - Team ID in which the conversation should be searched
    * @returns {Promise} Resolves with the conversation with requested user
    */
-  get_one_to_one_conversation(user_et) {
+  get_one_to_one_conversation(user_et, team_id = this.active_team().id) {
     for (const conversation_et of this.conversations()) {
-      if ([z.conversation.ConversationType.ONE2ONE, z.conversation.ConversationType.CONNECT].includes(conversation_et.type())) {
-        if (user_et.id === conversation_et.participating_user_ids()[0]) {
+      const with_expected_user = user_et.id === conversation_et.participating_user_ids()[0];
+
+      if (team_id) {
+        const active_group_conversation = conversation_et.is_group() && !conversation_et.removed_from_conversation();
+        const with_one_participant = conversation_et.participating_user_ids().length === 1;
+        const in_active_team = team_id === conversation_et.team_id;
+
+        if (active_group_conversation && in_active_team && with_one_participant && with_expected_user) {
           return Promise.resolve(conversation_et);
         }
+      } else if (with_expected_user && (conversation_et.is_one2one() || conversation_et.is_request())) {
+        return Promise.resolve(conversation_et);
       }
+    }
+
+    if (team_id) {
+      return this.create_new_conversation([user_et.id], undefined).then(({conversation_et}) => conversation_et);
     }
 
     return this.fetch_conversation_by_id(user_et.connection().conversation_id)
@@ -628,9 +676,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then(() => {
         this.logger.info('Updating group participants offline');
         this._init_state_updates();
-        this.update_conversations_offline(this.conversations_unarchived());
-        this.update_conversations_offline(this.conversations_archived());
-        this.update_conversations_offline(this.conversations_cleared());
+        this.update_conversations_offline(this.sorted_conversations());
       });
   }
 
@@ -663,10 +709,12 @@ z.conversation.ConversationRepository = class ConversationRepository {
         }
 
         this.update_participating_user_ets(conversation_et)
-          .then(function(updated_conversation_et) {
+          .then((updated_conversation_et) => {
             if (show_conversation) {
               amplify.publish(z.event.WebApp.CONVERSATION.SHOW, updated_conversation_et);
             }
+
+            this.conversations.notifySubscribers();
           });
 
         return conversation_et;
@@ -686,6 +734,23 @@ z.conversation.ConversationRepository = class ConversationRepository {
   map_connections(connection_ets) {
     this.logger.info(`Mapping '${connection_ets.length}' user connection(s) to conversations`, connection_ets);
     return Promise.all(connection_ets.map((connection_et) => this.map_connection(connection_et)));
+  }
+
+  map_conversations(payload) {
+    const is_guest_mapping = (conversation_et) => {
+      const team_id = conversation_et.team_id;
+      conversation_et.is_guest = !!(team_id && !this.team_repository.known_team_ids().includes(team_id));
+    };
+
+    if (payload.length) {
+      const conversation_ets = this.conversation_mapper.map_conversations(payload);
+      conversation_ets.forEach(is_guest_mapping);
+      return conversation_ets;
+    }
+
+    const conversation_et = this.conversation_mapper.map_conversation(payload);
+    is_guest_mapping(conversation_et);
+    return conversation_et;
   }
 
   /**
@@ -979,7 +1044,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
    */
   send_gif(conversation_et, url, tag) {
     if (!tag) {
-      tag = z.localization.Localizer.get_text(z.string.extensions_giphy_random);
+      tag = z.l10n.text(z.string.extensions_giphy_random);
     }
 
     const message = z.localization.Localizer.get_text({
@@ -2430,7 +2495,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           throw error;
         }
 
-        return this.update_participating_user_ets(this.conversation_mapper.map_conversation(event_json))
+        return this.update_participating_user_ets(this.map_conversations(event_json))
           .then((conversation_et) => {
             return this.save_conversation(conversation_et);
           })

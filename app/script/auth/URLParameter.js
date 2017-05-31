@@ -24,7 +24,6 @@ window.z.auth = z.auth || {};
 
 z.auth.URLParameter = {
   BOT: 'bot',
-  CALLING_V3: 'calling_v3',
   CONNECT: 'connect',
   ENVIRONMENT: 'env',
   EXPIRED: 'expired',

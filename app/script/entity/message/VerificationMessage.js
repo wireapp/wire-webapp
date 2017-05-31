@@ -42,21 +42,21 @@ z.entity.VerificationMessage = class VerificationMessage extends z.entity.Messag
 
     this.caption_started_using = ko.pureComputed(() => {
       if (this.user_ids().length > 1) {
-        return z.localization.Localizer.get_text(z.string.conversation_device_started_using_many);
+        return z.l10n.text(z.string.conversation_device_started_using_many);
       }
-      return z.localization.Localizer.get_text(z.string.conversation_device_started_using_one);
+      return z.l10n.text(z.string.conversation_device_started_using_one);
     });
 
     this.caption_new_device = ko.pureComputed(() => {
       if (this.user_ids().length > 1) {
-        return z.localization.Localizer.get_text(z.string.conversation_device_new_device_many);
+        return z.l10n.text(z.string.conversation_device_new_device_many);
       }
-      return z.localization.Localizer.get_text(z.string.conversation_device_new_device_one);
+      return z.l10n.text(z.string.conversation_device_new_device_one);
     });
 
     this.caption_unverified_device = ko.pureComputed(() => {
       if (this.is_self_device()) {
-        return z.localization.Localizer.get_text(z.string.conversation_device_your_devices);
+        return z.l10n.text(z.string.conversation_device_your_devices);
       }
       return z.localization.Localizer.get_text({
         id: z.string.conversation_device_user_devices,

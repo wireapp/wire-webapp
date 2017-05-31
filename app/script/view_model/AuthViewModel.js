@@ -32,7 +32,6 @@ z.ViewModel.AuthViewModel = class AuthViewModel {
       },
       FORWARDED_URL_PARAMETERS: [
         z.auth.URLParameter.BOT,
-        z.auth.URLParameter.CALLING_V3,
         z.auth.URLParameter.ENVIRONMENT,
         z.auth.URLParameter.LOCALYTICS,
       ],

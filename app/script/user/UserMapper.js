@@ -30,7 +30,7 @@ z.user.UserMapper = class UserMapper {
    */
   constructor(asset_service) {
     this.asset_service = asset_service;
-    this.logger = new z.util.Logger('z.search.SearchService', z.config.LOGGER.OPTIONS);
+    this.logger = new z.util.Logger('z.user.UserMapper', z.config.LOGGER.OPTIONS);
   }
 
   /**

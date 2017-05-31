@@ -33,7 +33,7 @@ describe('z.user.UserRepository', function() {
 
   beforeEach(function() {
     server = sinon.fakeServer.create();
-    return server.autoRespond = true;
+    server.autoRespond = true;
   });
 
   afterEach(function() {

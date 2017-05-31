@@ -29,16 +29,17 @@ z.entity.Conversation = class Conversation {
    * @param {string} conversation_id - Conversation ID
    */
   constructor(conversation_id = '') {
-    this.id = conversation_id;
     this.creator = undefined;
-    this.type = ko.observable();
+    this.id = conversation_id;
     this.name = ko.observable();
+    this.team_id = undefined;
+    this.type = ko.observable();
 
     this.input = ko.observable(z.util.StorageUtil.get_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`) || '');
     this.input.subscribe((text) => z.util.StorageUtil.set_value(`${z.storage.StorageKey.CONVERSATION.INPUT}|${this.id}`, text));
 
-    this.is_pending = ko.observable(false);
     this.is_loaded = ko.observable(false);
+    this.is_pending = ko.observable(false);
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]);
@@ -46,6 +47,8 @@ z.entity.Conversation = class Conversation {
     this.number_of_participants = ko.pureComputed(() => this.participating_user_ids().length);
 
     this.is_group = ko.pureComputed(() => this.type() === z.conversation.ConversationType.REGULAR);
+    this.is_guest = false;
+    this.is_managed = false;
     this.is_one2one = ko.pureComputed(() => this.type() === z.conversation.ConversationType.ONE2ONE);
     this.is_request = ko.pureComputed(() => this.type() === z.conversation.ConversationType.CONNECT);
     this.is_self = ko.pureComputed(() => this.type() === z.conversation.ConversationType.SELF);
@@ -193,7 +196,7 @@ z.entity.Conversation = class Conversation {
         }
 
         if (this.participating_user_ids().length === 0) {
-          return z.localization.Localizer.get_text(z.string.conversations_empty_conversation);
+          return z.l10n.text(z.string.conversations_empty_conversation);
         }
 
         return '…';
@@ -601,6 +604,8 @@ z.entity.Conversation = class Conversation {
       cleared_timestamp: this.cleared_timestamp(),
       ephemeral_timer: this.ephemeral_timer(),
       id: this.id,
+      is_guest: this.is_guest,
+      is_managed: this.is_managed,
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       muted_state: this.muted_state(),
@@ -608,6 +613,7 @@ z.entity.Conversation = class Conversation {
       name: this.name(),
       others: this.participating_user_ids(),
       status: this.status(),
+      team_id: this.team_id,
       type: this.type(),
       verification_state: this.verification_state(),
     };
