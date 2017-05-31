@@ -215,7 +215,7 @@ z.ViewModel.content.ContentViewModel = class ContentViewModel {
 
   _check_content_availability(content_state) {
     if (content_state === z.ViewModel.content.CONTENT_STATE.CONNECTION_REQUESTS) {
-      if (!this.user_repository.connect_requests().length) {
+      if (this.team_repository.active_team().id || !this.user_repository.connect_requests().length) {
         return z.ViewModel.content.CONTENT_STATE.WATERMARK;
       }
     }
