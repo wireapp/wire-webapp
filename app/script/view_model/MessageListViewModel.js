@@ -552,7 +552,7 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
         const message_ets = items.filter((item) => (item.category & z.message.MessageCategory.IMAGE) && !(item.category & z.message.MessageCategory.GIF));
         const [image_message_et] = message_ets.filter((item) => item.id === message_et.id);
 
-        amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et, message_ets);
+        amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et || message_et, message_ets);
       });
   }
 
