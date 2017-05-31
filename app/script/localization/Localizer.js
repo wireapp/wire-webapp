@@ -127,42 +127,42 @@ z.l10n = (() => {
 
 ko.bindingHandlers.l10n_href = {
   update(element, valueAccessor) {
-    element.setAttribute('href', z.l10n.text(valueAccessor()));
+    element.setAttribute('href', z.localization.Localizer.get_text(valueAccessor()));
   },
 };
 
 ko.bindingHandlers.l10n_input = {
   update(element, valueAccessor) {
-    element.setAttribute('value', z.l10n.text(valueAccessor()));
+    element.setAttribute('value', z.localization.Localizer.get_text(valueAccessor()));
   },
 };
 
 ko.bindingHandlers.l10n_placeholder = {
   update(element, valueAccessor) {
-    element.setAttribute('placeholder', z.l10n.text(valueAccessor()));
+    element.setAttribute('placeholder', z.localization.Localizer.get_text(valueAccessor()));
   },
 };
 
 ko.bindingHandlers.l10n_text = {
   update(element, valueAccessor) {
-    ko.utils.setTextContent(element, z.l10n.text(valueAccessor()));
+    ko.utils.setTextContent(element, z.localization.Localizer.get_text(valueAccessor()));
   },
 };
 
 ko.bindingHandlers.l10n_html = {
   update(element, valueAccessor) {
-    ko.utils.setHtml(element, z.l10n.text(valueAccessor()));
+    ko.utils.setHtml(element, z.localization.Localizer.get_text(valueAccessor()));
   },
 };
 
 ko.bindingHandlers.l10n_tooltip = {
   update(element, valueAccessor) {
-    element.setAttribute('title', z.l10n.text(valueAccessor()));
+    element.setAttribute('title', z.localization.Localizer.get_text(valueAccessor()));
   },
 };
 
 ko.bindingHandlers.l10n_aria_label = {
   update(element, valueAccessor) {
-    element.setAttribute('aria-label', z.l10n.text(valueAccessor()));
+    element.setAttribute('aria-label', z.localization.Localizer.get_text(valueAccessor()));
   },
 };
