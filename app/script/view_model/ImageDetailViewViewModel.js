@@ -169,14 +169,22 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
 
   click_on_show_next(view_model, event) {
     event.stopPropagation();
-    this.message_et(z.util.ArrayUtil.iterate_item(this.items(), this.message_et()));
-    this._load_image();
+    const next_messsage_et = z.util.ArrayUtil.iterate_item(this.items(), this.message_et());
+
+    if (next_messsage_et) {
+      this.message_et(next_messsage_et);
+      this._load_image();
+    }
   }
 
   click_on_show_previous(view_model, event) {
     event.stopPropagation();
-    this.message_et(z.util.ArrayUtil.iterate_item(this.items(), this.message_et(), true));
-    this._load_image();
+    const previous_message_et = z.util.ArrayUtil.iterate_item(this.items(), this.message_et(), true);
+
+    if (previous_message_et) {
+      this.message_et(z.util.ArrayUtil.iterate_item(this.items(), this.message_et(), true));
+      this._load_image();
+    }
   }
 
   _track_item_action(conversation_et, is_liked, type) {
