@@ -347,6 +347,7 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
 
   connect(user_et) {
     this.participants_bubble.hide();
+    this.active_team(this.team_repository.personal_space);
 
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
       common_users_count: user_et.mutual_friends_total(),
