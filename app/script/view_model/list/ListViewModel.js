@@ -82,6 +82,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
   }
 
   _init_subscriptions() {
+    amplify.subscribe(z.event.WebApp.CONVERSATION.SHOW, () => this.switch_list(z.ViewModel.list.LIST_STATE.CONVERSATIONS, false));
     amplify.subscribe(z.event.WebApp.LIFECYCLE.LOADED, () => this.webapp_loaded(true));
     amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_ACCOUNT, this.open_preferences_account.bind(this));
     amplify.subscribe(z.event.WebApp.PREFERENCES.MANAGE_DEVICES, this.open_preferences_devices.bind(this));
@@ -113,10 +114,10 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.switch_list(z.ViewModel.list.LIST_STATE.START_UI);
   }
 
-  switch_list(new_list_state) {
+  switch_list(new_list_state, respect_last_state = true) {
     if (this.list_state() !== new_list_state) {
       this._hide_list();
-      this._update_list(new_list_state);
+      this._update_list(new_list_state, respect_last_state);
       this._show_list(new_list_state);
     }
   }
@@ -137,7 +138,7 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     });
   }
 
-  _update_list(new_list_state) {
+  _update_list(new_list_state, respect_last_state) {
     switch (new_list_state) {
       case z.ViewModel.list.LIST_STATE.ARCHIVE:
         this.archive.update_list();
@@ -150,7 +151,9 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
         break;
       default:
         this.first_run(false);
-        this.content_view_model.switch_previous_content();
+        if (respect_last_state) {
+          this.content_view_model.switch_previous_content();
+        }
     }
   }
 
