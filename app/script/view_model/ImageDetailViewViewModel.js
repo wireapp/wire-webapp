@@ -67,10 +67,10 @@ z.ViewModel.ImageDetailViewViewModel = class ImageDetailViewViewModel {
     amplify.unsubscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.message_removed);
   }
 
-  show(message_ets, message_et, source) {
+  show(message_et, message_ets, source) {
     this.items(message_ets);
-    this.source = source;
     this.message_et(message_et);
+    this.source = source;
 
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.ADDED, this.message_added);
     amplify.subscribe(z.event.WebApp.CONVERSATION.MESSAGE.REMOVED, this.message_removed);

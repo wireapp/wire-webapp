@@ -140,7 +140,7 @@ z.ViewModel.content.CollectionViewModel = class CollectionViewModel {
   }
 
   click_on_image(message_et) {
-    amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, this.images(), message_et, 'collection');
+    amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et, this.images(), 'collection');
     this._track_opened_item(this.conversation_et(), 'image');
   }
 

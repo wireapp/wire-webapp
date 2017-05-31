@@ -550,7 +550,9 @@ z.ViewModel.MessageListViewModel = class MessageListViewModel {
     this.conversation_repository.get_events_for_category(this.conversation(), z.message.MessageCategory.IMAGE)
       .then(function(items) {
         const message_ets = items.filter((item) => (item.category & z.message.MessageCategory.IMAGE) && !(item.category & z.message.MessageCategory.GIF));
-        amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_ets, message_et);
+        const [image_message_et] = message_ets.filter((item) => item.id === message_et.id);
+
+        amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, image_message_et, message_ets);
       });
   }
 
