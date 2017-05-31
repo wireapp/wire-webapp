@@ -405,21 +405,13 @@ z.calling.v3.CallCenter = class CallCenter {
         e_call_et.set_remote_version(e_call_message_et);
 
         if (response) {
-          switch (e_call_et.state()) {
-            case z.calling.enum.CALL_STATE.INCOMING: {
-              this.logger.info(`Incoming e-call in conversation '${e_call_et.conversation_et.display_name()}' accepted on other device`);
-              return this.delete_call(conversation_id);
-            }
-
-            case z.calling.enum.CALL_STATE.OUTGOING: {
-              return e_call_et.update_e_participant(user_id, e_call_message_et)
-                .then(() => e_call_et.state(z.calling.enum.CALL_STATE.CONNECTING));
-            }
-
-            default: {
-              break;
-            }
+          if (user_id === this.user_repository.self().id) {
+            this.logger.info(`Incoming e-call in conversation '${e_call_et.conversation_et.display_name()}' accepted on other device`);
+            return this.delete_call(conversation_id);
           }
+
+          return e_call_et.update_e_participant(user_id, e_call_message_et)
+            .then(() => e_call_et.state(z.calling.enum.CALL_STATE.CONNECTING));
         }
 
         this.user_repository.get_user_by_id(user_id)
