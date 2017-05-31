@@ -299,6 +299,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
     import_promise
       .then((response) => {
+        this.active_team(this.team_repository.personal_space);
         return this._show_on_boarding_results(response);
       })
       .catch((error) => {
