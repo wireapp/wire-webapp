@@ -31,11 +31,12 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
    * @param {z.ViewModel.list.ListViewModel} list_view_model - List view model
    * @param {z.connect.ConnectRepository} connect_repository - Connect repository
    * @param {z.conversation.ConversationRepository} conversation_repository - Conversation repository
-   * @param {z.search.SearchRepository} search_repository - Search repository
-   * @param {z.user.UserRepository} user_repository - User repository
    * @param {z.properties.PropertiesRepository} properties_repository - Properties repository
+   * @param {z.search.SearchRepository} search_repository - Search repository
+   * @param {z.team.TeamRepository} team_repository - Team repoitory
+   * @param {z.user.UserRepository} user_repository - User repository
   */
-  constructor(element_id, list_view_model, connect_repository, conversation_repository, search_repository, user_repository, properties_repository) {
+  constructor(element_id, list_view_model, connect_repository, conversation_repository, properties_repository, search_repository, team_repository, user_repository) {
     this.click_on_close = this.click_on_close.bind(this);
     this.click_on_group = this.click_on_group.bind(this);
     this.click_on_other = this.click_on_other.bind(this);
@@ -51,9 +52,10 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     this.list_view_model = list_view_model;
     this.connect_repository = connect_repository;
     this.conversation_repository = conversation_repository;
-    this.search_repository = search_repository;
-    this.user_repository = user_repository;
     this.properties_repository = properties_repository;
+    this.search_repository = search_repository;
+    this.team_repository = team_repository;
+    this.user_repository = user_repository;
     this.logger = new z.util.Logger('z.ViewModel.list.StartUIViewModel', z.config.LOGGER.OPTIONS);
 
     this.submitted_search = false;
@@ -101,7 +103,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
     });
 
     this.user = this.user_repository.self;
-    this.active_team = this.conversation_repository.active_team;
+    this.active_team = this.team_repository.active_team;
     this.active_team.subscribe((active_team) => this.search(this.search_input()));
 
     this.active_team_name = ko.pureComputed(() => {
@@ -487,6 +489,7 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
 
   on_user_connect(user_et) {
     this._close_list();
+    this.active_team(this.team_repository.personal_space);
 
     amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.SENT_CONNECT_REQUEST, {
       common_users_count: user_et.mutual_friends_total(),
