@@ -611,11 +611,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       const with_expected_user = user_et.id === conversation_et.participating_user_ids()[0];
 
       if (team_id) {
-        const active_group_conversation = conversation_et.is_group() && !conversation_et.removed_from_conversation();
-        const with_one_participant = conversation_et.participating_user_ids().length === 1;
+        const active_1to1_conversation = !conversation_et.is_group() && !conversation_et.name() && !conversation_et.removed_from_conversation();
         const in_active_team = team_id === conversation_et.team_id;
 
-        if (active_group_conversation && in_active_team && with_one_participant && with_expected_user) {
+        if (active_1to1_conversation && in_active_team && with_expected_user) {
           return Promise.resolve(conversation_et);
         }
       } else if (with_expected_user && (conversation_et.is_one2one() || conversation_et.is_request())) {
