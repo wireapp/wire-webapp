@@ -58,8 +58,9 @@ z.user.UserRepository = class UserRepository {
         .filter((user_et) => user_et.is_connected());
     }).extend({rateLimit: 1000});
 
-    this.connected_users.subscribe((user_ets) => {
-      amplify.publish(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, z.tracking.CustomDimension.CONTACTS, user_ets.length);
+    this.number_of_connected_users = ko.pureComputed(() => this.connected_users().length);
+    this.number_of_connected_users.subscribe((number_of_connected_users) => {
+      amplify.publish(z.event.WebApp.ANALYTICS.CUSTOM_DIMENSION, z.tracking.CustomDimension.CONTACTS, number_of_connected_users);
     });
 
     amplify.subscribe(z.event.Backend.USER.CONNECTION, this.user_connection.bind(this));
