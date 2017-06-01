@@ -189,7 +189,7 @@ z.entity.Conversation = class Conversation {
      * - "..." if the user entities have not yet been attached yet
      */
     this.display_name = ko.pureComputed(() => {
-      if ([z.conversation.ConversationType.CONNECT, z.conversation.ConversationType.ONE2ONE].includes(this.type())) {
+      if (this.is_request() || this.is_one2one()) {
         if (this.participating_user_ets()[0] && this.participating_user_ets()[0].name) {
           return this.participating_user_ets()[0].name();
         }
