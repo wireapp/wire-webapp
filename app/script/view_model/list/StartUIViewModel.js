@@ -391,11 +391,11 @@ z.ViewModel.list.StartUIViewModel = class StartUIViewModel {
         if (_conversation_et.is_archived()) {
           this.conversation_repository.unarchive_conversation(_conversation_et);
         }
-        this._close_list();
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, _conversation_et);
         amplify.publish(z.event.WebApp.ANALYTICS.EVENT, z.tracking.EventName.CONNECT.OPENED_CONVERSATION, {
           conversation_type: conversation_et.is_group() ? 'group' : 'one_to_one',
         });
+        this._close_list();
       });
   }
 
