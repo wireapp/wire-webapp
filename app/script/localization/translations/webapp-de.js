@@ -215,6 +215,7 @@ z.string.de.conversation_message_delivered = 'Zugestellt';
 z.string.de.conversation_rename = ' hat die Unterhaltung umbenannt';
 z.string.de.conversation_rename_you = ' hast die Unterhaltung umbenannt';
 z.string.de.conversation_resume = 'Beginne eine Unterhaltung mit %@names';
+z.string.de.conversation_team_leave = ' wurde aus dem Team entfernt';
 z.string.de.conversation_ping = ' hat gepingt';
 z.string.de.conversation_ping_you = ' hast gepingt';
 z.string.de.conversation_today = 'Heute';

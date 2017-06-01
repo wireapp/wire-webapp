@@ -249,6 +249,7 @@ z.string.conversation_message_delivered = 'Delivered';
 z.string.conversation_rename = ' renamed the conversation';
 z.string.conversation_rename_you = ' renamed the conversation';
 z.string.conversation_resume = 'Start a conversation with %@names';
+z.string.conversation_team_leave = ' was removed from the team';
 z.string.conversation_ping = ' pinged';
 z.string.conversation_ping_you = ' pinged';
 z.string.conversation_today = 'today';
