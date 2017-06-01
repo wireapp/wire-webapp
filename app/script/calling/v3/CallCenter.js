@@ -341,7 +341,7 @@ z.calling.v3.CallCenter = class CallCenter {
         .then((e_call_et) => this._confirm_e_call_message(e_call_et, e_call_message_et))
         .then((e_call_et) => e_call_et.delete_e_participant(user_id, client_id, termination_reason))
         .then(function(e_call_et) {
-          if (!e_call_et.is_group()) {
+          if (!e_call_et.is_group) {
             e_call_et.deactivate_call(e_call_message_et, termination_reason);
           }
         })
@@ -479,7 +479,7 @@ z.calling.v3.CallCenter = class CallCenter {
    * @returns {undefined} Resolves if the message is valid
    */
   _validate_message_destination(e_call_et, e_call_message_et) {
-    if (e_call_et.is_group()) {
+    if (e_call_et.is_group) {
       const {dest_client_id, dest_user_id, type} = e_call_message_et;
 
       if (dest_user_id !== this.user_repository.self().id || dest_client_id !== this.client_repository.current_client().id) {
