@@ -81,11 +81,13 @@ z.conversation.EventBuilder = (function() {
   const _build_member_leave = (conversation_et, user_id) => {
     return {
       conversation: conversation_et.id,
+      data: {
+        user_ids: [user_id],
+      },
       from: user_id,
       id: z.util.create_random_uuid(),
       time: new Date().toISOString(),
       type: z.event.Backend.CONVERSATION.MEMBER_LEAVE,
-      user_ids: [user_id],
     };
   };
 
