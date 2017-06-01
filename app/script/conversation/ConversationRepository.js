@@ -597,7 +597,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .then((conversation_ids) => {
         return conversation_ids
           .map((conversation_id) => this._find_conversation_by_id(conversation_id))
-          .filter((conversation_et) => conversation_et);
+          .filter((conversation_et) => conversation_et && conversation_et.team_id === this.active_team().id);
       });
   }
 
