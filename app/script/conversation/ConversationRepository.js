@@ -96,7 +96,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
     this.conversations_call = ko.observableArray([]);
     this.conversations_cleared = ko.observableArray([]);
     this.conversations_unarchived = ko.observableArray([]);
-    this.conversations_unarchived.subscribe((conversation_ets) => this.update_conversations(conversation_ets));
 
     this._init_subscriptions();
   }
@@ -156,6 +155,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     if (team_et) {
       if (team_et.id !== this.active_team().id) {
         this.active_team(team_et);
+        this.update_conversations(this.conversations_unarchived());
         amplify.publish(z.event.WebApp.CONVERSATION.SHOW, this.get_most_recent_conversation());
       }
     } else {
