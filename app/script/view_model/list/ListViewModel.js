@@ -58,8 +58,6 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
     this.list_modal = ko.observable();
     this.webapp_loaded = ko.observable(false);
 
-    this.first_run = ko.observable(false);
-
     // Nested view models
     /* eslint-disable no-multi-spaces */
     this.archive       = new z.ViewModel.list.ArchiveViewModel('archive', this, this.conversation_repository);
@@ -150,7 +148,6 @@ z.ViewModel.list.ListViewModel = class ListViewModel {
         amplify.publish(z.event.WebApp.CONTENT.SWITCH, z.ViewModel.content.CONTENT_STATE.PREFERENCES_ACCOUNT);
         break;
       default:
-        this.first_run(false);
         if (respect_last_state) {
           this.content_view_model.switch_previous_content();
         }
