@@ -57,12 +57,12 @@ z.components.UserAvatar = class UserAvatar {
         return 'self';
       }
 
-      if (this.is_team_member) {
-        return '';
-      }
-
       if ((typeof params.selected === 'function') && params.selected()) {
         return 'selected';
+      }
+
+      if (this.is_team_member) {
+        return '';
       }
 
       if (this.user.is_blocked()) {
