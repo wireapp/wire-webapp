@@ -20,6 +20,7 @@
 'use strict';
 
 const wire = require('wire-webapp-core');
+const cryptobox = require('wire-webapp-cryptobox');
 
 const login = {
   email: process.env.WIRE_WEBAPP_BOT_EMAIL,
@@ -62,7 +63,11 @@ content.message =
   + `\r\n- Last commit from: ${commit.author}`
   + `\r\n- Last commit message: ${commit.message}`;
 
-new wire.User(login.email, login.password).login(false)
+const storagePath = `${process.env.HOME}/cryptobox`;
+const store = new cryptobox.store.FileStore(storagePath);
+const box = new cryptobox.Cryptobox(store, 1);
+
+new wire.User(login, box).login(false)
 .then(function(service) {
   return service.conversation.sendTextMessage(content.conversationId, content.message);
 })
