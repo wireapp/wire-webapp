@@ -78,6 +78,17 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
+  const _build_member_leave = (conversation_et, user_id) => {
+    return {
+      conversation: conversation_et.id,
+      from: user_id,
+      id: z.util.create_random_uuid(),
+      time: new Date().toISOString(),
+      type: z.event.Backend.CONVERSATION.MEMBER_LEAVE,
+      user_ids: [user_id],
+    };
+  };
+
   const _build_missed = (conversation_et, self_user_et) => {
     return {
       conversation: conversation_et.id,
@@ -136,6 +147,7 @@ z.conversation.EventBuilder = (function() {
     build_calling: _build_calling,
     build_degraded: _build_degraded,
     build_delete: _build_delete,
+    build_member_leave: _build_member_leave,
     build_missed: _build_missed,
     build_unable_to_decrypt: _build_unable_to_decrypt,
     build_voice_channel_activate: _build_voice_channel_activate,

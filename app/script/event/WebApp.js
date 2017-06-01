@@ -216,6 +216,7 @@ z.event.WebApp = {
   },
   TEAM: {
     EVENT_FROM_BACKEND: 'wire.webapp.team.event_from_backend',
+    MEMBER_LEAVE: 'wire.webapp.team.member_leave',
   },
   TELEMETRY: {
     BACKEND_REQUESTS: 'wire.webapp.telemetry.backend_requests',

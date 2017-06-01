@@ -199,6 +199,7 @@ z.team.TeamRepository = class TeamRepository {
     if (this.active_team().id === team_id) {
       this.active_team(this.personal_space);
     }
+    amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id);
   }
 
   _on_member_join(event_json) {
@@ -222,6 +223,7 @@ z.team.TeamRepository = class TeamRepository {
 
     if (this.user_repository.self().id !== user_id) {
       team_of_user.members.remove((member) => member.id === user_id);
+      amplify.publish(z.event.WebApp.TEAM.MEMBER_LEAVE, team_id, user_id);
     } else {
       this._on_delete({team: team_id});
     }

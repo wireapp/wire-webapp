@@ -143,6 +143,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     amplify.subscribe(z.event.WebApp.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
     amplify.subscribe(z.event.WebApp.CONVERSATION.PERSIST_STATE, this.save_conversation_state_in_db.bind(this));
     amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_notification_handling_state.bind(this));
+    amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.team_member_leave.bind(this));
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
   }
 
@@ -1059,6 +1060,27 @@ z.conversation.ConversationRepository = class ConversationRepository {
         this.send_text(message, conversation_et);
         return this.upload_images(conversation_et, [blob]);
       });
+  }
+
+  /**
+   * Team member was removed.
+   * @param {string} team_id - ID of team member left
+   * @param {string} [user_id] - Optional ID of user to leave
+   * @returns {undefined} No return value
+   */
+  team_member_leave(team_id, user_id) {
+    this.conversations()
+      .filter((conversation_et) => conversation_et.team_id = team_id)
+      .forEach((conversation_et) => {
+        if (user_id) {
+          const event = z.conversation.EventBuilder.build_member_leave(conversation_et, user_id);
+          amplify.publish(z.event.WebApp.EVENT.INJECT, event);
+        } else {
+          this._update_cleared_timestamp(conversation_et);
+          this._delete_messages(conversation_et);
+        }
+      });
+
   }
 
   /**
@@ -3068,11 +3090,11 @@ z.conversation.ConversationRepository = class ConversationRepository {
    *
    * @private
    * @param {Conversation} conversation_et - Conversation that contains the message
-   * @returns {Promise} Resolves when messages were deleted
+   * @returns {undefined} No return value
    */
   _delete_messages(conversation_et) {
     conversation_et.remove_messages();
-    return this.conversation_service.delete_messages_from_db(conversation_et.id);
+    this.conversation_service.delete_messages_from_db(conversation_et.id);
   }
 
   /**
