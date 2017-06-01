@@ -54,7 +54,6 @@ z.calling.entities.EFlow = class EFlow {
 
     // States
     this.is_answer = ko.observable(undefined);
-    this.is_group = this.e_call_et.is_group;
 
     // Audio
     this.audio = new z.calling.entities.FlowAudio(this, this.v3_call_center.media_repository);
@@ -773,7 +772,7 @@ z.calling.entities.EFlow = class EFlow {
         let e_call_message_et;
 
         if (this.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT) {
-          if (this.e_call_et.is_group()) {
+          if (this.e_call_et.is_group) {
             e_call_message_et = z.calling.mapper.ECallMessageMapper.build_group_setup(response, this.e_call_et.session_id, this._create_additional_payload());
           } else {
             e_call_message_et = z.calling.mapper.ECallMessageMapper.build_setup(response, this.e_call_et.session_id, this._create_additional_payload());

@@ -116,13 +116,13 @@ z.calling.mapper.SDPMapper = {
 
       // Code to nail in bit-rate and ptime settings for improved performance and experience
       } else if (sdp_line.startsWith('m=audio')) {
-        if (flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART || (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && flow_et.is_group())) {
+        if (flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART || (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && flow_et.is_group)) {
           sdp_lines.push(sdp_line);
           outline = `b=AS:${z.calling.mapper.SDPMapper.CONFIG.AUDIO_BITRATE}`;
         }
 
       } else if (sdp_line.startsWith('a=rtpmap')) {
-        if (flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART || (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && flow_et.is_group())) {
+        if (flow_et.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.ICE_RESTART || (sdp_source === z.calling.enum.SDP_SOURCE.LOCAL && flow_et.is_group)) {
           if (z.util.StringUtil.includes(sdp_line, 'opus')) {
             sdp_lines.push(sdp_line);
             outline = `a=ptime:${z.calling.mapper.SDPMapper.CONFIG.AUDIO_PTIME}`;

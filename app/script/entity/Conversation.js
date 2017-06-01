@@ -52,7 +52,7 @@ z.entity.Conversation = class Conversation {
     this.is_group = ko.pureComputed(() => {
       const group_type = this.type() === z.conversation.ConversationType.REGULAR;
       const group_conversation = group_type && !this.team_id;
-      const team_group_conversation = group_type && && this.team_id && this.participating_user_ids().length !== 1;
+      const team_group_conversation = group_type && this.team_id && this.participating_user_ids().length !== 1;
 
       return group_conversation || team_group_conversation;
     });
