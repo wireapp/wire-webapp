@@ -743,7 +743,7 @@ z.calling.entities.EFlow = class EFlow {
         }
 
         this.remote_sdp(remote_sdp);
-        this.logger.debug(`Saved remote '${this.remote_sdp().type}' SDP`, this.remote_sdp());
+        this.logger.debug(`Saved remote '${remote_sdp.type}' SDP`, this.remote_sdp());
       });
   }
 
@@ -766,10 +766,10 @@ z.calling.entities.EFlow = class EFlow {
           }
         }
 
-        this.logger.debug(`Sending local '${this.local_sdp().type}' SDP containing '${ice_candidates.length}' ICE candidates for flow with '${this.remote_user.name()}'\n${this.local_sdp().sdp}`);
+        this.logger.debug(`Sending local '${local_sdp.type}' SDP containing '${ice_candidates.length}' ICE candidates for flow with '${this.remote_user.name()}'\n${this.local_sdp().sdp}`);
         this.should_send_local_sdp(false);
 
-        const response = this.local_sdp().type === z.calling.rtc.SDP_TYPE.ANSWER;
+        const response = local_sdp.type === z.calling.rtc.SDP_TYPE.ANSWER;
         let e_call_message_et;
 
         if (this.negotiation_mode() === z.calling.enum.SDP_NEGOTIATION_MODE.DEFAULT) {
@@ -785,7 +785,7 @@ z.calling.entities.EFlow = class EFlow {
         return this.e_call_et.send_e_call_event(e_call_message_et)
           .then(() => {
             this.telemetry.time_step(z.telemetry.calling.CallSetupSteps.LOCAL_SDP_SEND);
-            this.logger.debug(`Sending local '${this.local_sdp().type}' SDP successful`, this.local_sdp());
+            this.logger.debug(`Sending local '${local_sdp.type}' SDP successful`, this.local_sdp());
           });
       })
       .catch((error) => {
