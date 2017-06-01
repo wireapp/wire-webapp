@@ -1080,7 +1080,6 @@ z.conversation.ConversationRepository = class ConversationRepository {
           this._delete_messages(conversation_et);
         }
       });
-
   }
 
   /**
