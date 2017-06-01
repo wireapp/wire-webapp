@@ -1073,8 +1073,10 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .filter((conversation_et) => conversation_et.team_id = team_id)
       .forEach((conversation_et) => {
         if (user_id) {
-          const member_leave_event = z.conversation.EventBuilder.build_member_leave(conversation_et, user_id);
-          amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
+          if (conversation_et.participating_user_ids().includes(user_id)) {
+            const member_leave_event = z.conversation.EventBuilder.build_member_leave(conversation_et, user_id);
+            amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event);
+          }
         } else {
           this._update_cleared_timestamp(conversation_et);
           this._delete_messages(conversation_et);
