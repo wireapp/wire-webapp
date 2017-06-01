@@ -93,7 +93,7 @@ z.ViewModel.content.CollectionDetailsViewModel = class CollectionDetailsViewMode
   }
 
   click_on_image(message_et) {
-    amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, this.items(), message_et, 'collection');
+    amplify.publish(z.event.WebApp.CONVERSATION.DETAIL_VIEW.SHOW, message_et, this.items(), 'collection');
   }
 
   should_show_header(message_et) {

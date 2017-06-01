@@ -271,7 +271,18 @@ z.string.uk.conversations_popover_notify = 'Увімкнути звук';
 z.string.uk.conversations_popover_silence = 'Вимкнути звук';
 z.string.uk.conversations_popover_unarchive = 'Розархівувати';
 
+z.string.uk.conversations_secondary_line_missed_call = '{{number}} пропущений дзвінок';
+z.string.uk.conversations_secondary_line_missed_calls = '{{number}} пропущених дзвінків';
+z.string.uk.conversations_secondary_line_new_message = '{{number}} нове повідомлення';
+z.string.uk.conversations_secondary_line_new_messages = '{{number}} нових повідомлень';
+z.string.uk.conversations_secondary_line_ping = '{{number}} пінг';
+z.string.uk.conversations_secondary_line_pings = '{{number}} пінгів';
+z.string.uk.conversations_secondary_line_person_left = '{{number}} учасник вийшов';
+z.string.uk.conversations_secondary_line_people_left = '{{number}} учасників вийшло';
+z.string.uk.conversations_secondary_line_person_added = '{{user1}} додав(-ла) {{user2}}';
+z.string.uk.conversations_secondary_line_people_added = '{{user}} учасників було додано';
 z.string.uk.conversations_secondary_line_timed_message = 'Тимчасове повідомлення';
+z.string.uk.conversations_secondary_line_renamed = '{{user}} перейменував(-ла)';
 
 z.string.uk.takeover_headline = 'Ніки вже тут.';
 z.string.uk.takeover_sub = 'Зарезервуйте свій унікальний нік в Wire.';

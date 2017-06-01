@@ -49,7 +49,7 @@ z.calling.entities.ECall = class ECall {
     this.v3_call_center = v3_call_center;
 
     const {id: conversation_id, is_group} = conversation_et;
-    const {calling_config, media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.v3_call_center;
+    const {media_stream_handler, media_repository, self_state, telemetry, user_repository} = this.v3_call_center;
 
     this.logger = new z.util.Logger(`z.calling.entities.ECall (${conversation_id})`, z.config.LOGGER.OPTIONS);
 
@@ -58,7 +58,6 @@ z.calling.entities.ECall = class ECall {
     this.timings = undefined;
 
     this.media_repository = media_repository;
-    this.config = calling_config;
     this.self_user = user_repository.self();
     this.self_state = self_state;
     this.telemetry = telemetry;
@@ -399,11 +398,15 @@ z.calling.entities.ECall = class ECall {
 
     this.logger.debug(`Set sending group check after random timeout of '${timeout_in_seconds}s'`);
     this.group_check_timeout = window.setTimeout(() => {
-      this.logger.debug(`Sending group check after random timeout of '${timeout_in_seconds}s'`);
-      const additional_payload = this.v3_call_center.create_additional_payload(this.id);
+      if (this.participants().length) {
+        this.logger.debug(`Sending group check after random timeout of '${timeout_in_seconds}s'`);
+        const additional_payload = this.v3_call_center.create_additional_payload(this.id);
 
-      this.send_e_call_event(z.calling.mapper.ECallMessageMapper.build_group_check(true, this.session_id, additional_payload));
-      this.schedule_group_check();
+        this.send_e_call_event(z.calling.mapper.ECallMessageMapper.build_group_check(true, this.session_id, additional_payload));
+        this.schedule_group_check();
+      } else {
+        this.leave_call(z.calling.enum.TERMINATION_REASON.OTHER_USER);
+      }
     }, timeout_in_seconds * 1000);
   }
 

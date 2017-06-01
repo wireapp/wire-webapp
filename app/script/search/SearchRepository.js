@@ -51,16 +51,28 @@ z.search.SearchRepository = class SearchRepository {
   /**
    * Search for users on the backend by name.
    * @param {string} name - Search query
+   * @param {boolean} is_username - Is query a username
+   * @param {number} [max_results=10] - Maximum number of results
    * @returns {Promise} Resolves with the search results
    */
-  search_by_name(name) {
+  search_by_name(name, is_username, max_results = 10) {
     return this.search_service.get_contacts(name, 30)
-    .then(({documents: matches}) => {
-      return this.search_result_mapper.map_results(matches, z.search.SEARCH_MODE.CONTACTS);
-    })
-    .then(({results, mode}) => {
-      return this._prepare_search_result(results, mode);
-    });
+      .then(({documents: matches}) => this.search_result_mapper.map_results(matches, z.search.SEARCH_MODE.CONTACTS))
+      .then(({results, mode}) => this._prepare_search_result(results, mode))
+      .then((user_ets) => {
+        if (is_username) {
+          user_ets = user_ets.filter((user_et) => z.util.StringUtil.starts_with(user_et.username(), name));
+        }
+
+        return user_ets
+          .sort((user_a, user_b) => {
+            if (is_username) {
+              return z.util.StringUtil.sort_by_priority(user_a.username(), user_b.username(), name);
+            }
+            return z.util.StringUtil.sort_by_priority(user_a.name(), user_b.name(), name);
+          })
+          .slice(0, max_results);
+      });
   }
 
   /**

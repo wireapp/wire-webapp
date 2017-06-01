@@ -281,6 +281,7 @@ z.string.fr.conversations_secondary_line_pings = '{{number}} pings';
 z.string.fr.conversations_secondary_line_person_left = '{{number}} personne est partie';
 z.string.fr.conversations_secondary_line_people_left = '{{number}} personnes sont parties';
 z.string.fr.conversations_secondary_line_person_added = '{{user1}} a ajouté {{user2}}';
+z.string.fr.conversations_secondary_line_people_added = '{{user}} ont été ajoutés';
 z.string.fr.conversations_secondary_line_timed_message = 'Message éphémère';
 
 z.string.fr.takeover_headline = 'Les identifiants sont disponibles.';
@@ -438,6 +439,8 @@ z.string.fr.search_connect = 'Connecter';
 z.string.fr.search_connections = 'Contacts';
 z.string.fr.search_groups = 'Groupes';
 z.string.fr.search_placeholder = 'Chercher par nom ou par identifiant';
+z.string.fr.search_team_groups = 'Groupes de conversations';
+z.string.fr.search_team_members = 'Membres du groupe';
 z.string.fr.search_top_people = 'Contacts favoris';
 z.string.fr.search_try_search = 'Trouver des contacts par\nnom ou identifiant';
 z.string.fr.search_no_contacts_on_wire = 'Vous n’avez pas de contacts sur Wire.\nEssayez de trouver des gens par\nleur nom ou leur identifiant.';

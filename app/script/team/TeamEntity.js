@@ -20,12 +20,15 @@
 'use strict';
 
 window.z = window.z || {};
-window.z.util = z.util || {};
+window.z.team = z.team || {};
 
-z.util.LocalizerUtil = {
-  join_names: function(user_ets, declension = z.string.Declension.ACCUSATIVE) {
-    const first_names = user_ets.map((user_et) => z.util.get_first_name(user_et, declension));
-    const names_string = first_names.join(', ');
-    return names_string.replace(/,(?=[^,]*$)/, ` ${z.l10n.text(z.string.and)}`);
-  },
+z.team.TeamEntity = class TeamEntity {
+  constructor(id) {
+    this.creator = undefined;
+    this.icon = '';
+    this.icon_key = undefined;
+    this.members = ko.observableArray([]);
+    this.id = id;
+    this.name = ko.observable('');
+  }
 };
