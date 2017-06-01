@@ -136,7 +136,16 @@ z.ViewModel.ParticipantsViewModel = class ParticipantsViewModel {
         })
         .sort((user_a, user_b) => z.util.StringUtil.sort_by_priority(user_a.first_name(), user_b.first_name()));
     }, this, {deferEvaluation: true});
-    this.team_members = ko.pureComputed(() => this.active_team().members());
+    this.team_members = ko.pureComputed(() => {
+      return this.active_team().members()
+        .filter((user_et) => {
+          for (const group_participant of this.participants()) {
+            if (user_et.id === group_participant.id) {
+              return false;
+            }
+          }
+        });
+    });
 
     this.add_people_tooltip = z.localization.Localizer.get_text({
       id: z.string.tooltip_people_add,
