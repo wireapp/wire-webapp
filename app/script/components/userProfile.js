@@ -326,7 +326,7 @@ z.components.UserProfileViewModel = class UserProfileViewModel {
           }
 
           if (this.user().is_unknown()) {
-            return 'user-profile-footer-connect-remove';
+            return this.conversation().team_id ? 'user-profile-footer-message-remove' : 'user-profile-footer-connect-remove';
           }
           if (this.user().is_ignored() || this.user().is_request()) {
             return 'user-profile-footer-pending-remove';
