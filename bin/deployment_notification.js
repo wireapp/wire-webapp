@@ -19,8 +19,8 @@
 
 'use strict';
 
-const wire = require('wire-webapp-core');
 const cryptobox = require('wire-webapp-cryptobox');
+const wire = require('wire-webapp-core');
 
 const login = {
   email: process.env.WIRE_WEBAPP_BOT_EMAIL,
