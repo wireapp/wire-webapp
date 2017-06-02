@@ -291,7 +291,7 @@ describe('Conversation', function() {
 
     it('displays the conversation name for a self conversation', function() {
       conversation_et.type(z.conversation.ConversationType.SELF);
-      expect(conversation_et.display_name()).toBe(undefined);
+      expect(conversation_et.display_name()).toBe('…');
 
       const conversation_name = 'My favorite music band';
       conversation_et.name(conversation_name);
