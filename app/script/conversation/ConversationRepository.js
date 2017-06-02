@@ -1074,7 +1074,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .forEach((conversation_et) => {
         if (user_id) {
           if (conversation_et.participating_user_ids().includes(user_id)) {
-            const member_leave_event = z.conversation.EventBuilder.build_team_leave(conversation_et, user_id);
+            const member_leave_event = z.conversation.EventBuilder.build_team_member_leave(conversation_et, user_id);
             amplify.publish(z.event.WebApp.EVENT.INJECT, member_leave_event, false);
           }
         } else {
@@ -2327,7 +2327,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           case z.event.Backend.CONVERSATION.MEMBER_JOIN:
             return this._on_member_join(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MEMBER_LEAVE:
-          case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
+          case z.event.Client.TEAM.MEMBER_LEAVE:
             return this._on_member_leave(conversation_et, event_json);
           case z.event.Backend.CONVERSATION.MEMBER_UPDATE:
             return this._on_member_update(conversation_et, event_json);

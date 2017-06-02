@@ -125,7 +125,7 @@ z.entity.MemberMessage = class MemberMessage extends z.entity.SystemMessage {
             return this._get_caption_with_names(z.string.conversation_member_join_you);
           }
           return this._get_caption_with_names(z.string.conversation_member_join);
-        case z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE:
+        case z.event.Client.TEAM.MEMBER_LEAVE:
           return z.l10n.text(z.string.conversation_team_leave);
         default:
           break;

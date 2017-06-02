@@ -88,7 +88,7 @@ z.conversation.EventBuilder = (function() {
     };
   };
 
-  const _build_team_leave = (conversation_et, user_id) => {
+  const _build_team_member_leave = (conversation_et, user_id) => {
     return {
       conversation: conversation_et.id,
       data: {
@@ -97,7 +97,7 @@ z.conversation.EventBuilder = (function() {
       from: user_id,
       id: z.util.create_random_uuid(),
       time: new Date().toISOString(),
-      type: z.event.Client.CONVERSATION.TEAM_MEMBER_LEAVE,
+      type: z.event.Client.TEAM.MEMBER_LEAVE,
     };
   };
 
@@ -150,7 +150,7 @@ z.conversation.EventBuilder = (function() {
     build_degraded: _build_degraded,
     build_delete: _build_delete,
     build_missed: _build_missed,
-    build_team_leave: _build_team_leave,
+    build_team_member_leave: _build_team_member_leave,
     build_unable_to_decrypt: _build_unable_to_decrypt,
     build_voice_channel_activate: _build_voice_channel_activate,
     build_voice_channel_deactivate: _build_voice_channel_deactivate,
