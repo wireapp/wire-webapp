@@ -272,6 +272,7 @@ z.main.App = class App {
       this.repository.announce.init();
       this.repository.audio.init(true);
       this.repository.client.cleanup_clients_and_sessions(true);
+      this.repository.conversations.cleanup_conversations();
       this.logger.info('App fully loaded');
     })
     .catch((error) => {

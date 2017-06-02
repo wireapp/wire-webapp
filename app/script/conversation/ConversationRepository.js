@@ -64,7 +64,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
     });
 
     this.filtered_conversations = ko.pureComputed(() => {
-      return this.conversations().filter(function(conversation_et) {
+      return this.conversations().filter((conversation_et) => {
         const states_to_filter = [
           z.user.ConnectionStatus.BLOCKED,
           z.user.ConnectionStatus.CANCELLED,
@@ -75,13 +75,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
           return false;
         }
 
-        if (conversation_et.is_cleared() && conversation_et.removed_from_conversation()) {
-          this.conversation_service.delete_conversation_from_in_db(conversation_et.id);
-          this.delete_conversation(conversation_et.id);
-          return false;
-        }
-
-        return true;
+        return !(conversation_et.is_cleared() && conversation_et.removed_from_conversation());
       });
     });
 
@@ -150,6 +144,19 @@ z.conversation.ConversationRepository = class ConversationRepository {
     amplify.subscribe(z.event.WebApp.EVENT.NOTIFICATION_HANDLING_STATE, this.set_notification_handling_state.bind(this));
     amplify.subscribe(z.event.WebApp.TEAM.MEMBER_LEAVE, this.team_member_leave.bind(this));
     amplify.subscribe(z.event.WebApp.USER.UNBLOCKED, this.unblocked_user.bind(this));
+  }
+
+  /**
+   * Remove obsolete conversations locally.
+   * @returns {undefined} No return value
+   */
+  cleanup_conversations() {
+    this.conversations().forEach((conversation_et) => {
+      if (conversation_et.is_group() && conversation_et.is_cleared() && conversation_et.removed_from_conversation() {
+        this.conversation_service.delete_conversation_from_in_db(conversation_et.id);
+        this.delete_conversation(conversation_et.id);
+      }
+    });
   }
 
   /**
