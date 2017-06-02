@@ -48,6 +48,8 @@ z.user.UserRepository = class UserRepository {
     this.users = ko.observableArray([]);
     this.connections = ko.observableArray([]);
 
+    this.fetching_users = {};
+
     this.connect_requests = ko.pureComputed(() => {
       return this.users()
         .filter((user_et) => user_et.is_incoming_request());
@@ -496,6 +498,20 @@ z.user.UserRepository = class UserRepository {
       return Promise.resolve([]);
     }
 
+    const user_ids_ongoing = [];
+    const user_ids_to_fetch = [];
+
+    const get_user_promises = user_ids
+      .map((user_id) => {
+        if (this.fetching_users.hasOwnProperty(user_id)) {
+          user_ids_ongoing.push(user_id);
+          return new Promise((resolve, reject) => this.fetching_users[user_id].push({reject_fn: reject, resolve_fn: resolve}));
+        }
+
+        user_ids_to_fetch.push(user_id);
+      })
+      .filter((get_promise) => get_promise);
+
     const _get_users = (user_id_chunk) => {
       return this.user_service.get_users(user_id_chunk)
         .then((response) => {
@@ -504,7 +520,7 @@ z.user.UserRepository = class UserRepository {
           }
           return [];
         })
-        .catch(function(error) {
+        .catch((error) => {
           if (error.code === z.service.BackendClientError.STATUS_CODE.NOT_FOUND) {
             return [];
           }
@@ -512,18 +528,33 @@ z.user.UserRepository = class UserRepository {
         });
     };
 
-    const user_id_chunks = z.util.ArrayUtil.chunk(user_ids, z.config.MAXIMUM_USERS_PER_REQUEST);
-    const get_users_promises = user_id_chunks.map((user_id_chunk) => _get_users(user_id_chunk));
-    return Promise.all(get_users_promises)
+    let fetch_user_promises = [];
+    if (user_ids_to_fetch.length) {
+      const user_id_chunks = z.util.ArrayUtil.chunk(user_ids_to_fetch, z.config.MAXIMUM_USERS_PER_REQUEST);
+      fetch_user_promises = user_id_chunks.map((user_id_chunk) => _get_users(user_id_chunk));
+    }
+
+    return Promise.all(fetch_user_promises)
+      .then((resolve_array) => {
+        const new_user_ets = _.flatten(resolve_array);
+
+        new_user_ets.forEach((user_et) => {
+          if (this.fetching_users.hasOwnProperty(user_et.id)) {
+            this.fetching_users[user_et.id].forEach(({resolve_fn}) => resolve_fn(user_et));
+          }
+        });
+
+        return Promise.all(get_user_promises.concat(this.save_users(new_user_ets)));
+      })
       .then((resolve_array) => {
         let fetched_user_ets = _.flatten(resolve_array);
 
-        // If the difference is 1 then we most likely have a case with a suspended user
+        // If there is a difference then we most likely have a case with a suspended user
         if (user_ids.length !== fetched_user_ets.length) {
           fetched_user_ets = this._add_suspended_users(user_ids, fetched_user_ets);
         }
 
-        return this.save_users(fetched_user_ets).then(() => fetched_user_ets);
+        return fetched_user_ets;
       });
   }
 
@@ -672,7 +703,7 @@ z.user.UserRepository = class UserRepository {
   /**
    * Save multiple users at once.
    * @param {Array<z.entity.User>} user_ets - Array of user entities to be stored
-   * @returns {undefined} No return value
+   * @returns {Promise} Resolves with users passed as parameter
    */
   save_users(user_ets) {
     const _user_exists = (user_et) => {
@@ -691,7 +722,7 @@ z.user.UserRepository = class UserRepository {
       .then((existing_user_ets) => {
         const new_user_ets = existing_user_ets.filter((user_et) => user_et);
         z.util.ko_array_push_all(this.users, new_user_ets);
-        return new_user_ets;
+        return user_ets;
       });
   }
 

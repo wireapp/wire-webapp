@@ -217,9 +217,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
         this.logger.info(`Fetched conversation '${conversation_id}' from backend`);
         this.save_conversation(conversation_et);
 
-        this.fetching_conversations[conversation_id].forEach(function({resolve_fn}) {
-          resolve_fn(conversation_et);
-        });
+        this.fetching_conversations[conversation_id].forEach(({resolve_fn}) => resolve_fn(conversation_et));
         delete this.fetching_conversations[conversation_id];
 
         return conversation_et;
@@ -227,9 +225,7 @@ z.conversation.ConversationRepository = class ConversationRepository {
       .catch(() => {
         const error = new z.conversation.ConversationError(z.conversation.ConversationError.TYPE.NOT_FOUND);
 
-        this.fetching_conversations[conversation_id].forEach(function({reject_fn}) {
-          reject_fn(error);
-        });
+        this.fetching_conversations[conversation_id].forEach(({reject_fn}) => reject_fn(error));
         delete this.fetching_conversations[conversation_id];
 
         throw error;
